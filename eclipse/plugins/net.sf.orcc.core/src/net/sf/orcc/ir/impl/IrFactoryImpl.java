@@ -268,6 +268,33 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public BlockBasic createBlockBasic() {
+		BlockBasicImpl blockBasic = new BlockBasicImpl();
+		return blockBasic;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public BlockIf createBlockIf() {
+		BlockIfImpl blockIf = new BlockIfImpl();
+		return blockIf;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public BlockWhile createBlockWhile() {
+		BlockWhileImpl blockWhile = new BlockWhileImpl();
+		return blockWhile;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public Cfg createCfg() {
 		CfgImpl cfg = new CfgImpl();
 		return cfg;
@@ -592,6 +619,13 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
+	public InstLoad createInstLoad(Var target, Var source, int index) {
+		List<Expression> indexes = new ArrayList<Expression>(1);
+		indexes.add(createExprInt(index));
+		return createInstLoad(target, source, indexes);
+	}
+
+	@Override
 	public InstLoad createInstLoad(Var target, Var source) {
 		InstLoadImpl instLoad = new InstLoadImpl();
 		instLoad.setTarget(IrFactory.eINSTANCE.createDef(target));
@@ -687,7 +721,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return createInstStore(lineNumber,
 				IrFactory.eINSTANCE.createDef(target), indexes, value);
 	}
-
+	
 	@Override
 	public InstStore createInstStore(Var target, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();
@@ -750,33 +784,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		List<Expression> indexes = new ArrayList<Expression>(1);
 		indexes.add(createExprVar(index));
 		return createInstStore(target, indexes, createExprVar(source));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public BlockBasic createBlockBasic() {
-		BlockBasicImpl blockBasic = new BlockBasicImpl();
-		return blockBasic;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public BlockIf createBlockIf() {
-		BlockIfImpl blockIf = new BlockIfImpl();
-		return blockIf;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public BlockWhile createBlockWhile() {
-		BlockWhileImpl blockWhile = new BlockWhileImpl();
-		return blockWhile;
 	}
 
 	/**

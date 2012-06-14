@@ -35,7 +35,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	ArgByRef createArgByRef();
-
+	
 	/**
 	 * Returns a new object of class '<em>Arg By Val</em>'.
 	 * <!-- begin-user-doc
@@ -71,6 +71,53 @@ public interface IrFactory extends EFactory {
 	 * @return new arguments by value with the given expressions
 	 */
 	List<Arg> createArgsByVal(List<Expression> values);
+
+	/**
+	 * Returns a new object of class '<em>Block Basic</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Block Basic</em>'.
+	 * @generated
+	 */
+	BlockBasic createBlockBasic();
+
+	/**
+	 * Returns a new object of class '<em>Block If</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Block If</em>'.
+	 * @generated
+	 */
+	BlockIf createBlockIf();
+
+	/**
+	 * Returns a new object of class '<em>Block While</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Block While</em>'.
+	 * @generated
+	 */
+	BlockWhile createBlockWhile();
+
+	/**
+	 * Returns a new object of class '<em>Cfg</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Cfg</em>'.
+	 * @generated
+	 */
+	Cfg createCfg();
+
+	/**
+	 * Returns a new object of class '<em>Cfg Node</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Cfg Node</em>'.
+	 * @generated
+	 */
+	CfgNode createCfgNode();
+
+	CfgNode createCfgNode(Block node);
 
 	/**
 	 * Returns a new object of class '<em>Def</em>'.
@@ -340,6 +387,16 @@ public interface IrFactory extends EFactory {
 			List<Expression> indexes);
 
 	/**
+	 * Creates an InstLoad with the given target, source, index.
+	 * 
+	 * @param target
+	 * @param source
+	 * @param index
+	 * @return a load
+	 */
+	InstLoad createInstLoad(Var target, Var source, int index);
+
+	/**
 	 * Creates an InstLoad with the given target and source.
 	 * 
 	 * @param target
@@ -554,33 +611,6 @@ public interface IrFactory extends EFactory {
 	InstStore createInstStore(Var target, Var index, Var source);
 
 	/**
-	 * Returns a new object of class '<em>Block Basic</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Block Basic</em>'.
-	 * @generated
-	 */
-	BlockBasic createBlockBasic();
-
-	/**
-	 * Returns a new object of class '<em>Block If</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Block If</em>'.
-	 * @generated
-	 */
-	BlockIf createBlockIf();
-
-	/**
-	 * Returns a new object of class '<em>Block While</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Block While</em>'.
-	 * @generated
-	 */
-	BlockWhile createBlockWhile();
-
-	/**
 	 * Returns a new object of class '<em>Param</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -606,26 +636,6 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Predicate createPredicate();
-
-	/**
-	 * Returns a new object of class '<em>Cfg</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Cfg</em>'.
-	 * @generated
-	 */
-	Cfg createCfg();
-
-	/**
-	 * Returns a new object of class '<em>Cfg Node</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Cfg Node</em>'.
-	 * @generated
-	 */
-	CfgNode createCfgNode();
-
-	CfgNode createCfgNode(Block node);
 
 	/**
 	 * Returns a new object of class '<em>Procedure</em>'.
