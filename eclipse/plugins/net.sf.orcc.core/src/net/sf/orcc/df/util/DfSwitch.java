@@ -132,6 +132,8 @@ public class DfSwitch<T> extends Switch<T> {
 			Actor actor = (Actor) theEObject;
 			T result = caseActor(actor);
 			if (result == null)
+				result = caseVertex(actor);
+			if (result == null)
 				result = caseAttributable(actor);
 			if (result == null)
 				result = defaultCase(theEObject);

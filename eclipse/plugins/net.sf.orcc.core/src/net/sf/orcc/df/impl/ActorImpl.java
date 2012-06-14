@@ -7,7 +7,6 @@
 package net.sf.orcc.df.impl;
 
 import java.util.Collection;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +17,11 @@ import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
+import net.sf.orcc.graph.impl.VertexImpl;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.MapAdapter;
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.util.impl.AttributableImpl;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
@@ -65,7 +64,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class ActorImpl extends AttributableImpl implements Actor {
+public class ActorImpl extends VertexImpl implements Actor {
 	/**
 	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -579,7 +578,7 @@ public class ActorImpl extends AttributableImpl implements Actor {
 		}
 		return actionsOutsideFsm;
 	}
-	
+
 	@Override
 	public <T> T getAdapter(Class<T> type) {
 		if (type == ProcessImpl.class) {

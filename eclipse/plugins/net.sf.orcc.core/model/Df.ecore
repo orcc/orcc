@@ -46,7 +46,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
         eType="#//Port" changeable="false" derived="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
         eType="#//Action" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="actionsOutsideFsm" upperBound="-1"

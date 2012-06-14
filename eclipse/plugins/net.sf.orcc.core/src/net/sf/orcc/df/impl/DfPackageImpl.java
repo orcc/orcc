@@ -1177,7 +1177,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		unitEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		instanceEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		actorEClass.getESuperTypes().add(theUtilPackage.getAttributable());
+		actorEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		networkEClass.getESuperTypes().add(theGraphPackage.getGraph());
 		broadcastEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		connectionEClass.getESuperTypes().add(theGraphPackage.getEdge());

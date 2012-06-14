@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.util.Attributable;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
@@ -66,7 +66,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Actor extends Attributable {
+public interface Actor extends Vertex {
 
 	/**
 	 * Returns the value of the '<em><b>Actions</b></em>' containment reference list.
@@ -91,7 +91,7 @@ public interface Actor extends Attributable {
 	 * @generated
 	 */
 	EList<Action> getActionsOutsideFsm();
-	
+
 	<T> T getAdapter(Class<T> type);
 
 	/**

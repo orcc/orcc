@@ -516,7 +516,43 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+	int ACTOR__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__LABEL = GraphPackage.VERTEX__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__NUMBER = GraphPackage.VERTEX__NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
@@ -524,7 +560,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
+	int ACTOR__ACTIONS = GraphPackage.VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
@@ -532,7 +568,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS_OUTSIDE_FSM = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
+	int ACTOR__ACTIONS_OUTSIDE_FSM = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
@@ -541,7 +577,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FILE_NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
+	int ACTOR__FILE_NAME = GraphPackage.VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Fsm</b></em>' containment reference. <!--
@@ -550,7 +586,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FSM = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
+	int ACTOR__FSM = GraphPackage.VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
@@ -558,7 +594,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INITIALIZES = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
+	int ACTOR__INITIALIZES = GraphPackage.VERTEX_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -566,7 +602,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INPUTS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
+	int ACTOR__INPUTS = GraphPackage.VERTEX_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute. <!--
@@ -575,7 +611,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__LINE_NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
+	int ACTOR__LINE_NUMBER = GraphPackage.VERTEX_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
@@ -584,7 +620,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__MO_C = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 7;
+	int ACTOR__MO_C = GraphPackage.VERTEX_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
@@ -593,7 +629,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NATIVE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 8;
+	int ACTOR__NATIVE = GraphPackage.VERTEX_FEATURE_COUNT + 8;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -602,7 +638,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 9;
+	int ACTOR__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -610,7 +646,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__OUTPUTS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 10;
+	int ACTOR__OUTPUTS = GraphPackage.VERTEX_FEATURE_COUNT + 10;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -618,7 +654,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PARAMETERS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 11;
+	int ACTOR__PARAMETERS = GraphPackage.VERTEX_FEATURE_COUNT + 11;
 
 	/**
 	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
@@ -626,7 +662,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PROCS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 12;
+	int ACTOR__PROCS = GraphPackage.VERTEX_FEATURE_COUNT + 12;
 
 	/**
 	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
@@ -634,7 +670,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__STATE_VARS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 13;
+	int ACTOR__STATE_VARS = GraphPackage.VERTEX_FEATURE_COUNT + 13;
 
 	/**
 	 * The feature id for the '<em><b>Template Data</b></em>' attribute.
@@ -643,7 +679,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__TEMPLATE_DATA = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 14;
+	int ACTOR__TEMPLATE_DATA = GraphPackage.VERTEX_FEATURE_COUNT + 14;
 
 	/**
 	 * The number of structural features of the '<em>Actor</em>' class. <!--
@@ -652,7 +688,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 15;
+	int ACTOR_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 15;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
