@@ -67,7 +67,7 @@ public class ArgumentEvaluator extends DfSwitch<Void> {
 					.getInitialValue()));
 		}
 
-		for (Vertex vertex : network.getEntities()) {
+		for (Vertex vertex : network.getChildren()) {
 			doSwitch(vertex);
 		}
 		return null;

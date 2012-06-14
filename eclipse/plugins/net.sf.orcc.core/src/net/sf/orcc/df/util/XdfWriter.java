@@ -374,7 +374,7 @@ public class XdfWriter {
 	 *            output path
 	 */
 	private void writeChildren(Network network, File path) {
-		for (Vertex vertex : network.getEntities()) {
+		for (Vertex vertex : network.getChildren()) {
 			Network child = vertex.getAdapter(Network.class);
 			if (child != null) {
 				// writes the network
@@ -624,7 +624,7 @@ public class XdfWriter {
 		writeDecls(xdf, "Param", network.getParameters());
 		writeDecls(xdf, "Variable", network.getVariables());
 
-		for (Vertex vertex : network.getEntities()) {
+		for (Vertex vertex : network.getChildren()) {
 			Instance instance = vertex.getAdapter(Instance.class);
 			if (instance != null) {
 				// writes an instance

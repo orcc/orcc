@@ -50,6 +50,7 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.ecore.EObject;
@@ -325,6 +326,21 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseAttributable(Attributable object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAdaptable(Adaptable object) {
 		return null;
 	}
 
@@ -1158,6 +1174,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseAttributable(cfg);
 			if (result == null)
+				result = caseAdaptable(cfg);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -1168,6 +1186,8 @@ public class IrSwitch<T> extends Switch<T> {
 				result = caseVertex(cfgNode);
 			if (result == null)
 				result = caseAttributable(cfgNode);
+			if (result == null)
+				result = caseAdaptable(cfgNode);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

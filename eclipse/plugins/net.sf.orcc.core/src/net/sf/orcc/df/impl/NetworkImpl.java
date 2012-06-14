@@ -78,13 +78,14 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NetworkImpl extends GraphImpl implements Network {
 	/**
-	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getEntities()
+	 * The cached value of the '{@link #getChildren() <em>Children</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getChildren()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Vertex> entities;
+	protected EList<Vertex> children;
 
 	/**
 	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
@@ -185,7 +186,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@Override
 	public void add(Vertex vertex) {
 		super.add(vertex);
-		getEntities().add(vertex);
+		getChildren().add(vertex);
 	}
 
 	@Override
@@ -229,7 +230,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 		}
 
 		i = 0;
-		for (Vertex vertex : getEntities()) {
+		for (Vertex vertex : getChildren()) {
 			Entity entity = vertex.getAdapter(Entity.class);
 			Map<Port, List<Connection>> map = entity.getOutgoingPortMap();
 			for (List<Connection> connections : map.values()) {
@@ -251,8 +252,8 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case DfPackage.NETWORK__ENTITIES:
-			return getEntities();
+		case DfPackage.NETWORK__CHILDREN:
+			return getChildren();
 		case DfPackage.NETWORK__FILE_NAME:
 			return getFileName();
 		case DfPackage.NETWORK__INPUTS:
@@ -300,8 +301,8 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case DfPackage.NETWORK__ENTITIES:
-			return entities != null && !entities.isEmpty();
+		case DfPackage.NETWORK__CHILDREN:
+			return children != null && !children.isEmpty();
 		case DfPackage.NETWORK__FILE_NAME:
 			return FILE_NAME_EDEFAULT == null ? fileName != null
 					: !FILE_NAME_EDEFAULT.equals(fileName);
@@ -333,9 +334,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case DfPackage.NETWORK__ENTITIES:
-			getEntities().clear();
-			getEntities().addAll((Collection<? extends Vertex>) newValue);
+		case DfPackage.NETWORK__CHILDREN:
+			getChildren().clear();
+			getChildren().addAll((Collection<? extends Vertex>) newValue);
 			return;
 		case DfPackage.NETWORK__FILE_NAME:
 			setFileName((String) newValue);
@@ -379,14 +380,27 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Vertex> getChildren() {
+		if (children == null) {
+			children = new EObjectResolvingEList<Vertex>(Vertex.class, this,
+					DfPackage.NETWORK__CHILDREN);
+		}
+		return children;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case DfPackage.NETWORK__ENTITIES:
-			getEntities().clear();
+		case DfPackage.NETWORK__CHILDREN:
+			getChildren().clear();
 			return;
 		case DfPackage.NETWORK__FILE_NAME:
 			setFileName(FILE_NAME_EDEFAULT);
@@ -442,7 +456,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	 */
 	public List<Actor> getAllActors() {
 		Set<Actor> actors = new HashSet<Actor>();
-		for (Vertex vertex : getEntities()) {
+		for (Vertex vertex : getChildren()) {
 			Actor actor = vertex.getAdapter(Actor.class);
 			if (actor == null) {
 				Network network = vertex.getAdapter(Network.class);
@@ -467,7 +481,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@Override
 	public List<Network> getAllNetworks() {
 		Set<Network> networks = new HashSet<Network>();
-		for (Vertex vertex : getEntities()) {
+		for (Vertex vertex : getChildren()) {
 			Network network = vertex.getAdapter(Network.class);
 			if (network != null) {
 				networks.add(network);
@@ -484,21 +498,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 		return (EList<Connection>) (EList<?>) getEdges();
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Vertex> getEntities() {
-		if (entities == null) {
-			entities = new EObjectResolvingEList<Vertex>(Vertex.class, this,
-					DfPackage.NETWORK__ENTITIES);
-		}
-		return entities;
-	}
-
 	@Override
 	public Vertex getEntity(String name) {
-		for (Vertex vertex : getEntities()) {
+		for (Vertex vertex : getChildren()) {
 			if (vertex.getLabel().equals(name)) {
 				return vertex;
 			}
@@ -577,7 +579,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@Deprecated
 	public EList<Instance> getInstances() {
 		EList<Instance> list = new BasicEList<Instance>();
-		for (Vertex vertex : getEntities()) {
+		for (Vertex vertex : getChildren()) {
 			Instance instance = vertex.getAdapter(Instance.class);
 			if (instance != null) {
 				list.add(instance);
@@ -597,7 +599,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	public List<Instance> getInstancesOf(Actor actor) {
 		List<Instance> instances = new ArrayList<Instance>();
 
-		for (Vertex vertex : getEntities()) {
+		for (Vertex vertex : getChildren()) {
 			Instance instance = vertex.getAdapter(Instance.class);
 			Actor candidate = vertex.getAdapter(Actor.class);
 			if (candidate == actor) {
@@ -737,7 +739,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	@Override
 	public void remove(Vertex vertex) {
-		getEntities().remove(vertex);
+		getChildren().remove(vertex);
 		super.remove(vertex);
 	}
 

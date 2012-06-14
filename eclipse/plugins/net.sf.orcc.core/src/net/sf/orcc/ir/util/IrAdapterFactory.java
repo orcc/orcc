@@ -50,6 +50,7 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -289,6 +290,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseAttributable(Attributable object) {
 			return createAttributableAdapter();
+		}
+
+		@Override
+		public Adapter caseAdaptable(Adaptable object) {
+			return createAdaptableAdapter();
 		}
 
 		@Override
@@ -537,6 +543,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createAttributableAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.util.Adaptable <em>Adaptable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.util.Adaptable
+	 * @generated
+	 */
+	public Adapter createAdaptableAdapter() {
 		return null;
 	}
 

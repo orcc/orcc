@@ -135,7 +135,7 @@ public class ActorMerger extends DfSwitch<Void> {
 		network.add(subNetworkInst);
 
 		network.removeVertices(vertices);
-		network.getEntities().removeAll(vertices);
+		network.getChildren().removeAll(vertices);
 
 		return subNetwork;
 	}

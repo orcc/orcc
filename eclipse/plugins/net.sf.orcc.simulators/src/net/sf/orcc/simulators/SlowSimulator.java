@@ -162,7 +162,7 @@ public class SlowSimulator extends AbstractSimulator {
 		GenericSource.setInputStimulus(stimulusFile);
 		GenericSource.setWriteListener(getWriteListener());
 
-		for (Vertex vertex : network.getEntities()) {
+		for (Vertex vertex : network.getChildren()) {
 			Instance instance = vertex.getAdapter(Instance.class);
 			ActorInterpreter interpreter = interpreters.get(instance);
 			interpreter.initialize();
@@ -196,7 +196,7 @@ public class SlowSimulator extends AbstractSimulator {
 			FileNotFoundException {
 		// Loop over the graph vertexes and get instances definition for
 		// instantiating the network to simulate.
-		for (Vertex vertex : network.getEntities()) {
+		for (Vertex vertex : network.getChildren()) {
 			Instance instance = vertex.getAdapter(Instance.class);
 			Actor actor = vertex.getAdapter(Actor.class);
 
@@ -219,7 +219,7 @@ public class SlowSimulator extends AbstractSimulator {
 		boolean isAlive = true;
 		do {
 			boolean hasExecuted = false;
-			for (Vertex vertex : network.getEntities()) {
+			for (Vertex vertex : network.getChildren()) {
 				int nbFiring = 0;
 				Instance instance = vertex.getAdapter(Instance.class);
 				ActorInterpreter interpreter = interpreters.get(instance);

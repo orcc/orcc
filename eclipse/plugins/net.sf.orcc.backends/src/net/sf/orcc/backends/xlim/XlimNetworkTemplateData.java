@@ -65,7 +65,7 @@ public class XlimNetworkTemplateData {
 	 * @param network
 	 */
 	public void computeActorOutputPortFanout(Network network) {
-		for (Vertex vertex : network.getEntities()) {
+		for (Vertex vertex : network.getChildren()) {
 			Entity entity = vertex.getAdapter(Entity.class);
 			Map<Port, List<Connection>> map = entity.getOutgoingPortMap();
 			for (List<Connection> values : map.values()) {

@@ -112,7 +112,7 @@ public class XlimBackendImpl extends AbstractBackend {
 			Map<String, String> mapping) {
 		Map<Integer, List<Instance>> computedMap = new HashMap<Integer, List<Instance>>();
 
-		for (Vertex vertex : network.getEntities()) {
+		for (Vertex vertex : network.getChildren()) {
 			Instance instance = vertex.getAdapter(Instance.class);
 			String path = instance.getHierarchicalName();
 			String component = mapping.get(path);

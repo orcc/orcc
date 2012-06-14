@@ -47,7 +47,7 @@ import org.eclipse.emf.common.util.EList;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.df.Network#getEntities <em>Entities</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Network#getChildren <em>Children</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}</li>
@@ -64,6 +64,22 @@ import org.eclipse.emf.common.util.EList;
  * @generated
  */
 public interface Network extends Graph, Adaptable {
+
+	/**
+	 * Returns the value of the '<em><b>Children</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.graph.Vertex}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Children</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Children</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Children()
+	 * @model
+	 * @generated
+	 */
+	EList<Vertex> getChildren();
 
 	/**
 	 * Adds the given port to this network. The port is added to the vertices
@@ -127,18 +143,6 @@ public interface Network extends Graph, Adaptable {
 	 * @return the list of this graph's connections
 	 */
 	EList<Connection> getConnections();
-
-	/**
-	 * Returns the value of the '<em><b>Entities</b></em>' reference list. The
-	 * list contents are of type {@link net.sf.orcc.graph.Vertex}. <!--
-	 * begin-user-doc --><!-- end-user-doc -->
-	 * 
-	 * @return the value of the '<em>Entities</em>' reference list.
-	 * @see net.sf.orcc.df.DfPackage#getNetwork_Entities()
-	 * @model
-	 * @generated
-	 */
-	EList<Vertex> getEntities();
 
 	/**
 	 * Returns the entity of this network that has the given name, or

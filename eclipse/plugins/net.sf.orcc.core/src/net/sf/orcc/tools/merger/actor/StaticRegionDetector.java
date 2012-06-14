@@ -96,7 +96,7 @@ public class StaticRegionDetector {
 		List<Edge> edges = new ArrayList<Edge>();
 
 		for (Vertex vertex : vertices) {
-			for (Vertex other : clusteredGraph.getEntities()) {
+			for (Vertex other : clusteredGraph.getChildren()) {
 				if (((Instance) vertex).getName().equals(
 						other.getLabel())) {
 					verticesCopy.add(other);

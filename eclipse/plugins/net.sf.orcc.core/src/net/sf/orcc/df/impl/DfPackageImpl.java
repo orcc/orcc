@@ -260,6 +260,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getNetwork_Children() {
+		return (EReference) networkEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -290,14 +299,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EAttribute getNetwork_FileName() {
 		return (EAttribute) networkEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNetwork_Entities() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1055,7 +1056,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(actorEClass, ACTOR__TEMPLATE_DATA);
 
 		networkEClass = createEClass(NETWORK);
-		createEReference(networkEClass, NETWORK__ENTITIES);
+		createEReference(networkEClass, NETWORK__CHILDREN);
 		createEAttribute(networkEClass, NETWORK__FILE_NAME);
 		createEReference(networkEClass, NETWORK__INPUTS);
 		createEReference(networkEClass, NETWORK__MO_C);
@@ -1337,8 +1338,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(networkEClass, Network.class, "Network", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNetwork_Entities(), theGraphPackage.getVertex(),
-				null, "entities", null, 0, -1, Network.class, !IS_TRANSIENT,
+		initEReference(getNetwork_Children(), theGraphPackage.getVertex(),
+				null, "children", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getNetwork_FileName(), ecorePackage.getEString(),

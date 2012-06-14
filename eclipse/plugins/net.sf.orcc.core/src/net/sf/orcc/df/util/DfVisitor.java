@@ -192,16 +192,8 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	@Override
 	public T caseNetwork(Network network) {
-		for (Port port : network.getInputs()) {
-			doSwitch(port);
-		}
-
-		for (Port port : network.getOutputs()) {
-			doSwitch(port);
-		}
-
-		for (Vertex entity : network.getEntities()) {
-			doSwitch(entity);
+		for (Vertex vertex : network.getVertices()) {
+			doSwitch(vertex);
 		}
 
 		for (Connection connection : network.getConnections()) {

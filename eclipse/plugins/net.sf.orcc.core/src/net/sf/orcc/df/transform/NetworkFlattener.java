@@ -65,8 +65,8 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	public Void caseNetwork(Network network) {
 		// make a copy because we modify the "entities" list in the loop
 		// and we want to avoid concurrent modification
-		List<Vertex> entities = new ArrayList<Vertex>(network.getEntities());
-		for (Vertex entity : entities) {
+		List<Vertex> children = new ArrayList<Vertex>(network.getChildren());
+		for (Vertex entity : children) {
 			Network subNetwork = entity.getAdapter(Network.class);
 			if (subNetwork == null) {
 				// cannot flatten anything else than a network
@@ -149,15 +149,15 @@ public class NetworkFlattener extends DfSwitch<Void> {
 
 	private void moveEntitiesAndConnections(Network network, Network subNetwork) {
 		// Rename subNetwork entities
-		for (Vertex vertex : subNetwork.getEntities()) {
+		for (Vertex vertex : subNetwork.getChildren()) {
 			Entity entity = vertex.getAdapter(Entity.class);
 			vertex.setLabel(subNetwork.getSimpleName() + "_"
 					+ entity.getSimpleName());
 		}
 
 		// move entities/instances and vertices in this network
-		network.getEntities().addAll(subNetwork.getEntities());
-		List<Vertex> vertices = new ArrayList<Vertex>(subNetwork.getEntities());
+		network.getChildren().addAll(subNetwork.getChildren());
+		List<Vertex> vertices = new ArrayList<Vertex>(subNetwork.getChildren());
 		for (Vertex vertex : vertices) {
 			network.getVertices().add(vertex);
 		}

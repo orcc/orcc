@@ -667,7 +667,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// creates a list of tasks: each task will print an actor when called
 		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
-		for (final Vertex entity : network.getEntities()) {
+		for (final Vertex vertex : network.getChildren()) {
 			tasks.add(new Callable<Boolean>() {
 
 				@Override
@@ -675,7 +675,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					if (isCanceled()) {
 						return false;
 					}
-					return printEntity(entity);
+					return printEntity(vertex);
 				}
 
 			});
@@ -732,15 +732,18 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// creates a list of tasks: each task will print an instance when called
 		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
-		for (final Instance instance : network.getInstances()) {
-			tasks.add(new Callable<Boolean>() {
+		for (Vertex vertex : network.getChildren()) {
+			final Instance instance = vertex.getAdapter(Instance.class);
+			if (instance != null) {
+				tasks.add(new Callable<Boolean>() {
 
-				@Override
-				public Boolean call() throws OrccException {
-					return printInstance(instance);
-				}
+					@Override
+					public Boolean call() throws OrccException {
+						return printInstance(instance);
+					}
 
-			});
+				});
+			}
 		}
 
 		// executes the tasks
@@ -876,7 +879,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			}
 		} catch (ParseException exp) {
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp(getClass().getSimpleName() + " [options] "
+			formatter
+					.printHelp(
+							getClass().getSimpleName()
+									+ " [options] "
 									+ "-p <project> -o <output.folder> <network.qualified.name>",
 							options);
 			return IApplication.EXIT_RELAUNCH;

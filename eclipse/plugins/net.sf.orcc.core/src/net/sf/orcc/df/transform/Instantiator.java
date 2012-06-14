@@ -103,8 +103,8 @@ public class Instantiator extends DfSwitch<Void> {
 	@Override
 	public Void caseNetwork(Network network) {
 		// copy instances to entities/instances
-		List<Vertex> entities = new ArrayList<Vertex>(network.getEntities());
-		for (Vertex vertex : entities) {
+		List<Vertex> children = new ArrayList<Vertex>(network.getChildren());
+		for (Vertex vertex : children) {
 			Instance instance = vertex.getAdapter(Instance.class);
 			if (instance == null) {
 				// cannot instantiate anything else than an instance

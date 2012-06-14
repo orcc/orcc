@@ -261,7 +261,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			actor.setName(clasz);
 
 			Instance instance = DfFactory.eINSTANCE.createInstance(name, actor);
-			network.getEntities().add(instance);
+			network.getChildren().add(instance);
 			vertexMap.put(vertex, instance);
 
 			Map<?, ?> variables = (Map<?, ?>) vertex

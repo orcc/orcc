@@ -68,7 +68,7 @@ public class RepetitionsAnalyzer {
 	 * 
 	 */
 	private void analyze() {
-		calculateRate(network.getEntities().get(0), new Rational(1, 1));
+		calculateRate(network.getChildren().get(0), new Rational(1, 1));
 
 		// get least common denominator
 		int lcm = 1;

@@ -112,7 +112,8 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Network) {
 				Network network = (Network) inputElement;
-				EList<Vertex> vertices = new BasicEList<Vertex>(network.getEntities());
+				EList<Vertex> vertices = new BasicEList<Vertex>(
+						network.getChildren());
 				return vertices.toArray();
 			}
 			return new Object[0];
@@ -180,7 +181,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			} else if (vertex instanceof Network) {
 				Network network = (Network) vertex;
 				mapping.put(network.getName(), component);
-				for (Vertex subEntity : network.getEntities()) {
+				for (Vertex subEntity : network.getChildren()) {
 					setMapping(subEntity, component);
 				}
 			}
@@ -245,15 +246,18 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		 *            an instance
 		 */
 		private void getComponents(Set<String> components, Network network) {
-			for (Instance instance : network.getInstances()) {
-				String component = mapping.get(instance.getHierarchicalName());
-				if (component != null) {
-					components.add(component);
+			for (Vertex entity : network.getChildren()) {
+				Instance instance = entity.getAdapter(Instance.class);
+				if (instance == null) {
+					Network subNetwork = entity.getAdapter(Network.class);
+					getComponents(components, subNetwork);
+				} else {
+					String component = mapping.get(instance
+							.getHierarchicalName());
+					if (component != null) {
+						components.add(component);
+					}
 				}
-			}
-			for (Vertex entity : network.getEntities()) {
-				Network subNetwork = (Network) entity;
-				getComponents(components, subNetwork);
 			}
 		}
 
@@ -378,12 +382,18 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			new Instantiator(false).doSwitch(network);
 
 			Set<String> instances = new HashSet<String>();
-			for (Instance instance : network.getInstances()) {
-				instances.add(instance.getHierarchicalName());
+			for (Vertex child : network.getChildren()) {
+				Instance instance = child.getAdapter(Instance.class);
+				if (instance != null) {
+					instances.add(instance.getHierarchicalName());
+				}
 			}
 			for (Network subNetwork : network.getAllNetworks()) {
-				for (Instance instance : subNetwork.getInstances()) {
-					instances.add(instance.getHierarchicalName());
+				for (Vertex child : subNetwork.getChildren()) {
+					Instance instance = child.getAdapter(Instance.class);
+					if (instance != null) {
+						instances.add(instance.getHierarchicalName());
+					}
 				}
 			}
 

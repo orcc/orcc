@@ -753,12 +753,13 @@ public interface DfPackage extends EPackage {
 	int NETWORK__VERTICES = GraphPackage.GRAPH__VERTICES;
 
 	/**
-	 * The feature id for the '<em><b>Entities</b></em>' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Children</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__ENTITIES = GraphPackage.GRAPH_FEATURE_COUNT + 0;
+	int NETWORK__CHILDREN = GraphPackage.GRAPH_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
@@ -1436,6 +1437,17 @@ public interface DfPackage extends EPackage {
 	EClass getNetwork();
 
 	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Network#getChildren <em>Children</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Children</em>'.
+	 * @see net.sf.orcc.df.Network#getChildren()
+	 * @see #getNetwork()
+	 * @generated
+	 */
+	EReference getNetwork_Children();
+
+	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -1481,19 +1493,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getNetwork_FileName();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.df.Network#getEntities <em>Entities</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Entities</em>'.
-	 * @see net.sf.orcc.df.Network#getEntities()
-	 * @see #getNetwork()
-	 * @generated
-	 */
-	EReference getNetwork_Entities();
 
 	/**
 	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}'.
@@ -2433,6 +2432,14 @@ public interface DfPackage extends EPackage {
 		EClass NETWORK = eINSTANCE.getNetwork();
 
 		/**
+		 * The meta object literal for the '<em><b>Children</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NETWORK__CHILDREN = eINSTANCE.getNetwork_Children();
+
+		/**
 		 * The meta object literal for the '<em><b>Mo C</b></em>' containment reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -2461,14 +2468,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute NETWORK__FILE_NAME = eINSTANCE.getNetwork_FileName();
-
-		/**
-		 * The meta object literal for the '<em><b>Entities</b></em>' reference list feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference NETWORK__ENTITIES = eINSTANCE.getNetwork_Entities();
 
 		/**
 		 * The meta object literal for the '<em><b>Inputs</b></em>' reference list feature.
