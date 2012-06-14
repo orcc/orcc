@@ -21,6 +21,29 @@ useClang() ::= <<
 set(CMAKE_C_COMPILER "clang")
 >>
 
+includeLibraries() ::= <<
+# Libraries folder
+set(LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
+
+# Runtime libraries inclusion
+set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
+set(ROXML_INCLUDE_DIR ${LIBS_DIR}/roxml/include)
+
+# Helps to find where SDL libraries are saved (win32 only)
+if(WIN32)
+	set(ENV{CMAKE_PREFIX_PATH} ${LIBS_DIR}/windows/SDL-*\;${LIBS_DIR}/windows/SDL_image-*)
+endif()
+
+find_package(Threads REQUIRED)
+
+add_subdirectory(${LIBS_DIR})
+include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
+
+find_package(SDL REQUIRED)
+include_directories(${SDL_INCLUDE_DIR})
+
+>>
+
 createExecutable(network) ::= <<
 set(filenames
 	${CMAKE_BINARY_DIR}/CMakeFiles/<network.simpleName>.ll.o

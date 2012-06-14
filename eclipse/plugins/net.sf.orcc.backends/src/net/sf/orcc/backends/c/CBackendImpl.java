@@ -110,6 +110,11 @@ public class CBackendImpl extends AbstractBackend {
 	protected boolean ringTopology;
 
 	/**
+	 * Path to target "src" folder
+	 */
+	private String srcPath;
+
+	/**
 	 * Configuration mapping
 	 */
 	protected Map<String, List<Instance>> targetToInstancesMap;
@@ -166,8 +171,9 @@ public class CBackendImpl extends AbstractBackend {
 		printer.getOptions().put("newScheduler", newScheduler);
 
 		// Set build and src directory
-		File srcDir = new File(path + "/src");
-		File buildDir = new File(path + "/build");
+		File srcDir = new File(path + File.separator + "src");
+		File buildDir = new File(path + File.separator + "build");
+		File binDir = new File(path + File.separator + "bin");
 
 		// If directories don't exist, create them
 		if (!srcDir.exists()) {
@@ -179,8 +185,11 @@ public class CBackendImpl extends AbstractBackend {
 			buildDir.mkdirs();
 		}
 
-		// Set src directory as path
-		path = srcDir.getAbsolutePath();
+		if (!binDir.exists()) {
+			binDir.mkdirs();
+		}
+
+		srcPath = srcDir.getPath();
 	}
 
 	@Override
@@ -248,7 +257,7 @@ public class CBackendImpl extends AbstractBackend {
 			transformation.doSwitch(actor);
 			if (debug) {
 				ResourceSet set = new ResourceSetImpl();
-				if (!IrUtil.serializeActor(set, path, actor)) {
+				if (!IrUtil.serializeActor(set, srcPath, actor)) {
 					System.err.println("Error with " + transformation
 							+ " on actor "
 							+ actor.getName());
@@ -329,7 +338,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		// print network
 		write("Printing network...\n");
-		printer.print(network.getSimpleName() + ".c", path, network);
+		printer.print(network.getSimpleName() + ".c", srcPath, network);
 
 		// print CMakeLists
 		printCMake(network);
@@ -347,15 +356,16 @@ public class CBackendImpl extends AbstractBackend {
 	public boolean exportRuntimeLibrary() throws OrccException {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-				File targetPath = new File(path).getParentFile();
-				copyFileToFilesystem("/runtime/run_cmake_with_VS_env.bat",
-						targetPath + File.separator
-								+ "run_cmake_with_VS_env.bat");
+
+				copyFileToFilesystem("/runtime/run_cmake_with_VS_env.bat", path
+						+ File.separator + "run_cmake_with_VS_env.bat");
 			}
 
 			String target = path + File.separator + "libs";
 			write("Export libraries sources into " + target + "... ");
-			if (copyFolderToFileSystem("/runtime/C", target)) {
+			if (copyFolderToFileSystem("/runtime/C", target)
+					&& copyFileToFilesystem("/runtime/README.txt", path
+							+ File.separator + "README.txt")) {
 				write("OK" + "\n");
 				return true;
 			} else {
@@ -369,19 +379,23 @@ public class CBackendImpl extends AbstractBackend {
 	protected void printCMake(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/c/CMakeLists.stg");
+		networkPrinter.print("CMakeLists.txt", srcPath, network);
+
+		networkPrinter = new StandardPrinter(
+				"net/sf/orcc/backends/c/RootCMakeLists.stg");
 		networkPrinter.print("CMakeLists.txt", path, network);
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		return printer.print(instance.getName() + ".c", path, instance);
+		return printer.print(instance.getName() + ".c", srcPath, instance);
 	}
 
 	protected void printMapping(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/util/Mapping.stg");
 		networkPrinter.getOptions().put("mapping", targetToInstancesMap);
-		networkPrinter.print(network.getName() + ".xcf", path, network);
+		networkPrinter.print(network.getName() + ".xcf", srcPath, network);
 	}
 
 }
