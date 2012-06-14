@@ -447,14 +447,14 @@ public interface DfPackage extends EPackage {
 	int INSTANCE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 3;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.df.impl.ProcessImpl <em>Process</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.EntityImpl <em>Entity</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.df.impl.ProcessImpl
-	 * @see net.sf.orcc.df.impl.DfPackageImpl#getProcess()
+	 * @see net.sf.orcc.df.impl.EntityImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getEntity()
 	 * @generated
 	 */
-	int PROCESS = 3;
+	int ENTITY = 3;
 
 	/**
 	 * The feature id for the '<em><b>Incoming Port Map</b></em>' attribute.
@@ -463,7 +463,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESS__INCOMING_PORT_MAP = 0;
+	int ENTITY__INCOMING_PORT_MAP = 0;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' reference list.
@@ -472,7 +472,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESS__INPUTS = 1;
+	int ENTITY__INPUTS = 1;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -481,7 +481,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESS__NAME = 2;
+	int ENTITY__NAME = 2;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing Port Map</b></em>' attribute.
@@ -490,7 +490,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESS__OUTGOING_PORT_MAP = 3;
+	int ENTITY__OUTGOING_PORT_MAP = 3;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' reference list.
@@ -499,16 +499,16 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESS__OUTPUTS = 4;
+	int ENTITY__OUTPUTS = 4;
 
 	/**
-	 * The number of structural features of the '<em>Process</em>' class.
+	 * The number of structural features of the '<em>Entity</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESS_FEATURE_COUNT = 5;
+	int ENTITY_FEATURE_COUNT = 5;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1635,69 +1635,69 @@ public interface DfPackage extends EPackage {
 	EAttribute getInstance_Name();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.df.Process <em>Process</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.df.Entity <em>Entity</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Process</em>'.
-	 * @see net.sf.orcc.df.Process
+	 * @return the meta object for class '<em>Entity</em>'.
+	 * @see net.sf.orcc.df.Entity
 	 * @generated
 	 */
-	EClass getProcess();
+	EClass getEntity();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Process#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.df.Process#getName()
-	 * @see #getProcess()
-	 * @generated
-	 */
-	EAttribute getProcess_Name();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Process#getIncomingPortMap <em>Incoming Port Map</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Entity#getIncomingPortMap <em>Incoming Port Map</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Incoming Port Map</em>'.
-	 * @see net.sf.orcc.df.Process#getIncomingPortMap()
-	 * @see #getProcess()
+	 * @see net.sf.orcc.df.Entity#getIncomingPortMap()
+	 * @see #getEntity()
 	 * @generated
 	 */
-	EAttribute getProcess_IncomingPortMap();
+	EAttribute getEntity_IncomingPortMap();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Process#getInputs <em>Inputs</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Entity#getInputs <em>Inputs</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference list '<em>Inputs</em>'.
-	 * @see net.sf.orcc.df.Process#getInputs()
-	 * @see #getProcess()
+	 * @see net.sf.orcc.df.Entity#getInputs()
+	 * @see #getEntity()
 	 * @generated
 	 */
-	EReference getProcess_Inputs();
+	EReference getEntity_Inputs();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Process#getOutgoingPortMap <em>Outgoing Port Map</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Entity#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.df.Entity#getName()
+	 * @see #getEntity()
+	 * @generated
+	 */
+	EAttribute getEntity_Name();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Entity#getOutgoingPortMap <em>Outgoing Port Map</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Outgoing Port Map</em>'.
-	 * @see net.sf.orcc.df.Process#getOutgoingPortMap()
-	 * @see #getProcess()
+	 * @see net.sf.orcc.df.Entity#getOutgoingPortMap()
+	 * @see #getEntity()
 	 * @generated
 	 */
-	EAttribute getProcess_OutgoingPortMap();
+	EAttribute getEntity_OutgoingPortMap();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Process#getOutputs <em>Outputs</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Entity#getOutputs <em>Outputs</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference list '<em>Outputs</em>'.
-	 * @see net.sf.orcc.df.Process#getOutputs()
-	 * @see #getProcess()
+	 * @see net.sf.orcc.df.Entity#getOutputs()
+	 * @see #getEntity()
 	 * @generated
 	 */
-	EReference getProcess_Outputs();
+	EReference getEntity_Outputs();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Broadcast <em>Broadcast</em>}'.
@@ -2589,22 +2589,14 @@ public interface DfPackage extends EPackage {
 		EAttribute INSTANCE__NAME = eINSTANCE.getInstance_Name();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.df.impl.ProcessImpl <em>Process</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.EntityImpl <em>Entity</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.df.impl.ProcessImpl
-		 * @see net.sf.orcc.df.impl.DfPackageImpl#getProcess()
+		 * @see net.sf.orcc.df.impl.EntityImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getEntity()
 		 * @generated
 		 */
-		EClass PROCESS = eINSTANCE.getProcess();
-
-		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute PROCESS__NAME = eINSTANCE.getProcess_Name();
+		EClass ENTITY = eINSTANCE.getEntity();
 
 		/**
 		 * The meta object literal for the '<em><b>Incoming Port Map</b></em>' attribute feature.
@@ -2612,8 +2604,8 @@ public interface DfPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PROCESS__INCOMING_PORT_MAP = eINSTANCE
-				.getProcess_IncomingPortMap();
+		EAttribute ENTITY__INCOMING_PORT_MAP = eINSTANCE
+				.getEntity_IncomingPortMap();
 
 		/**
 		 * The meta object literal for the '<em><b>Inputs</b></em>' reference list feature.
@@ -2621,7 +2613,15 @@ public interface DfPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PROCESS__INPUTS = eINSTANCE.getProcess_Inputs();
+		EReference ENTITY__INPUTS = eINSTANCE.getEntity_Inputs();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ENTITY__NAME = eINSTANCE.getEntity_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Outgoing Port Map</b></em>' attribute feature.
@@ -2629,8 +2629,8 @@ public interface DfPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PROCESS__OUTGOING_PORT_MAP = eINSTANCE
-				.getProcess_OutgoingPortMap();
+		EAttribute ENTITY__OUTGOING_PORT_MAP = eINSTANCE
+				.getEntity_OutgoingPortMap();
 
 		/**
 		 * The meta object literal for the '<em><b>Outputs</b></em>' reference list feature.
@@ -2638,7 +2638,7 @@ public interface DfPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PROCESS__OUTPUTS = eINSTANCE.getProcess_Outputs();
+		EReference ENTITY__OUTPUTS = eINSTANCE.getEntity_Outputs();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.BroadcastImpl <em>Broadcast</em>}' class.

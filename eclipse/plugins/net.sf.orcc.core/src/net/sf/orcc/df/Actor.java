@@ -92,6 +92,15 @@ public interface Actor extends Vertex {
 	 */
 	EList<Action> getActionsOutsideFsm();
 
+	/**
+	 * If possible, adapts this object to the given type: creates a new instance
+	 * of the given class, and returns it. If it is not possible to adapt this
+	 * object to the requested type, this method returns <code>null</code>.
+	 * 
+	 * @param type
+	 *            type of the class to which this object should be adapted
+	 * @return an instance of the given type, or <code>null</code>
+	 */
 	<T> T getAdapter(Class<T> type);
 
 	/**

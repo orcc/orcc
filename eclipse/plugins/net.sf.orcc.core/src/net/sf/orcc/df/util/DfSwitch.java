@@ -14,6 +14,7 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -121,9 +122,9 @@ public class DfSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case DfPackage.PROCESS: {
-			net.sf.orcc.df.Process process = (net.sf.orcc.df.Process) theEObject;
-			T result = caseProcess(process);
+		case DfPackage.ENTITY: {
+			Entity entity = (Entity) theEObject;
+			T result = caseEntity(entity);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -314,17 +315,17 @@ public class DfSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Process</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Entity</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Process</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Entity</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseProcess(net.sf.orcc.df.Process object) {
+	public T caseEntity(Entity object) {
 		return null;
 	}
 

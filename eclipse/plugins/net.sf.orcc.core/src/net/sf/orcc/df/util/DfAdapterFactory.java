@@ -14,6 +14,7 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -103,8 +104,8 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseProcess(net.sf.orcc.df.Process object) {
-			return createProcessAdapter();
+		public Adapter caseEntity(Entity object) {
+			return createEntityAdapter();
 		}
 
 		@Override
@@ -254,16 +255,16 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Process <em>Process</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Entity <em>Entity</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.df.Process
+	 * @see net.sf.orcc.df.Entity
 	 * @generated
 	 */
-	public Adapter createProcessAdapter() {
+	public Adapter createEntityAdapter() {
 		return null;
 	}
 

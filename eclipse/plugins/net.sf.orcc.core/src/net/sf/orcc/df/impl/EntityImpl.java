@@ -37,38 +37,44 @@ import java.util.Map;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.notify.Notification;
+
 import org.eclipse.emf.common.util.EList;
+
 import org.eclipse.emf.ecore.EClass;
+
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
+
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
 /**
- * <!-- begin-user-doc --> An implementation of the model object '
- * <em><b>Process</b></em>'. <!-- end-user-doc -->
+ * <!-- begin-user-doc -->
+ * An implementation of the model object '<em><b>Entity</b></em>'.
+ * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.df.impl.ProcessImpl#getIncomingPortMap <em>Incoming Port Map</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.ProcessImpl#getInputs <em>Inputs</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.ProcessImpl#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.ProcessImpl#getOutgoingPortMap <em>Outgoing Port Map</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.ProcessImpl#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getIncomingPortMap <em>Incoming Port Map</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getOutgoingPortMap <em>Outgoing Port Map</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getOutputs <em>Outputs</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
+public class EntityImpl extends EObjectImpl implements Entity {
 	/**
 	 * The cached value of the '{@link #getIncomingPortMap() <em>Incoming Port Map</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getIncomingPortMap()
 	 * @generated
 	 * @ordered
@@ -77,7 +83,8 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 
 	/**
 	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
@@ -86,7 +93,8 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -95,7 +103,8 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -104,8 +113,8 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 
 	/**
 	 * The cached value of the '{@link #getOutgoingPortMap() <em>Outgoing Port Map</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getOutgoingPortMap()
 	 * @generated
 	 * @ordered
@@ -114,7 +123,8 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
@@ -122,17 +132,18 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 	protected EList<Port> outputs;
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected ProcessImpl() {
+	protected EntityImpl() {
 		super();
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
-	protected ProcessImpl(Vertex vertex, EList<Port> inputs, EList<Port> outputs) {
+	protected EntityImpl(Vertex vertex, EList<Port> inputs, EList<Port> outputs) {
 		super();
 
 		this.name = vertex.getLabel();
@@ -182,87 +193,18 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-		case DfPackage.PROCESS__INCOMING_PORT_MAP:
-			return getIncomingPortMap();
-		case DfPackage.PROCESS__INPUTS:
-			return getInputs();
-		case DfPackage.PROCESS__NAME:
-			return getName();
-		case DfPackage.PROCESS__OUTGOING_PORT_MAP:
-			return getOutgoingPortMap();
-		case DfPackage.PROCESS__OUTPUTS:
-			return getOutputs();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-		case DfPackage.PROCESS__INCOMING_PORT_MAP:
-			return incomingPortMap != null;
-		case DfPackage.PROCESS__INPUTS:
-			return inputs != null && !inputs.isEmpty();
-		case DfPackage.PROCESS__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
-		case DfPackage.PROCESS__OUTGOING_PORT_MAP:
-			return outgoingPortMap != null;
-		case DfPackage.PROCESS__OUTPUTS:
-			return outputs != null && !outputs.isEmpty();
-		}
-		return super.eIsSet(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-		case DfPackage.PROCESS__NAME:
-			setName((String) newValue);
-			return;
-		}
-		super.eSet(featureID, newValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return DfPackage.Literals.PROCESS;
+		return DfPackage.Literals.ENTITY;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-		case DfPackage.PROCESS__NAME:
-			setName(NAME_EDEFAULT);
-			return;
-		}
-		super.eUnset(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Map<Port, Connection> getIncomingPortMap() {
@@ -270,19 +212,21 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
 		if (inputs == null) {
 			inputs = new EObjectResolvingEList<Port>(Port.class, this,
-					DfPackage.PROCESS__INPUTS);
+					DfPackage.ENTITY__INPUTS);
 		}
 		return inputs;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getName() {
@@ -290,27 +234,8 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map<Port, List<Connection>> getOutgoingPortMap() {
-		return outgoingPortMap;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getOutputs() {
-		if (outputs == null) {
-			outputs = new EObjectResolvingEList<Port>(Port.class, this,
-					DfPackage.PROCESS__OUTPUTS);
-		}
-		return outputs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -318,11 +243,109 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 		name = newName;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.PROCESS__NAME, oldName, name));
+					DfPackage.ENTITY__NAME, oldName, name));
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map<Port, List<Connection>> getOutgoingPortMap() {
+		return outgoingPortMap;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectResolvingEList<Port>(Port.class, this,
+					DfPackage.ENTITY__OUTPUTS);
+		}
+		return outputs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+		case DfPackage.ENTITY__INCOMING_PORT_MAP:
+			return getIncomingPortMap();
+		case DfPackage.ENTITY__INPUTS:
+			return getInputs();
+		case DfPackage.ENTITY__NAME:
+			return getName();
+		case DfPackage.ENTITY__OUTGOING_PORT_MAP:
+			return getOutgoingPortMap();
+		case DfPackage.ENTITY__OUTPUTS:
+			return getOutputs();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+		case DfPackage.ENTITY__NAME:
+			setName((String) newValue);
+			return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+		case DfPackage.ENTITY__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		}
+		super.eUnset(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+		case DfPackage.ENTITY__INCOMING_PORT_MAP:
+			return incomingPortMap != null;
+		case DfPackage.ENTITY__INPUTS:
+			return inputs != null && !inputs.isEmpty();
+		case DfPackage.ENTITY__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case DfPackage.ENTITY__OUTGOING_PORT_MAP:
+			return outgoingPortMap != null;
+		case DfPackage.ENTITY__OUTPUTS:
+			return outputs != null && !outputs.isEmpty();
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -341,4 +364,4 @@ public class ProcessImpl extends EObjectImpl implements net.sf.orcc.df.Process {
 		return result.toString();
 	}
 
-} // ProcessImpl
+} //EntityImpl

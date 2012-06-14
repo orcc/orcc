@@ -16,6 +16,7 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
@@ -68,7 +69,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass processEClass = null;
+	private EClass entityEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -405,8 +406,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getProcess() {
-		return processEClass;
+	public EClass getEntity() {
+		return entityEClass;
 	}
 
 	/**
@@ -414,8 +415,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getProcess_Name() {
-		return (EAttribute) processEClass.getEStructuralFeatures().get(2);
+	public EAttribute getEntity_IncomingPortMap() {
+		return (EAttribute) entityEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -423,8 +424,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getProcess_IncomingPortMap() {
-		return (EAttribute) processEClass.getEStructuralFeatures().get(0);
+	public EReference getEntity_Inputs() {
+		return (EReference) entityEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -432,8 +433,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcess_Inputs() {
-		return (EReference) processEClass.getEStructuralFeatures().get(1);
+	public EAttribute getEntity_Name() {
+		return (EAttribute) entityEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -441,8 +442,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getProcess_OutgoingPortMap() {
-		return (EAttribute) processEClass.getEStructuralFeatures().get(3);
+	public EAttribute getEntity_OutgoingPortMap() {
+		return (EAttribute) entityEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -450,8 +451,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcess_Outputs() {
-		return (EReference) processEClass.getEStructuralFeatures().get(4);
+	public EReference getEntity_Outputs() {
+		return (EReference) entityEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -1037,12 +1038,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(instanceEClass, INSTANCE__ENTITY);
 		createEAttribute(instanceEClass, INSTANCE__NAME);
 
-		processEClass = createEClass(PROCESS);
-		createEAttribute(processEClass, PROCESS__INCOMING_PORT_MAP);
-		createEReference(processEClass, PROCESS__INPUTS);
-		createEAttribute(processEClass, PROCESS__NAME);
-		createEAttribute(processEClass, PROCESS__OUTGOING_PORT_MAP);
-		createEReference(processEClass, PROCESS__OUTPUTS);
+		entityEClass = createEClass(ENTITY);
+		createEAttribute(entityEClass, ENTITY__INCOMING_PORT_MAP);
+		createEReference(entityEClass, ENTITY__INPUTS);
+		createEAttribute(entityEClass, ENTITY__NAME);
+		createEAttribute(entityEClass, ENTITY__OUTGOING_PORT_MAP);
+		createEReference(entityEClass, ENTITY__OUTPUTS);
 
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
@@ -1242,26 +1243,25 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
 
-		initEClass(processEClass, net.sf.orcc.df.Process.class, "Process",
-				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEClass(entityEClass, Entity.class, "Entity", !IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		EGenericType g1 = createEGenericType(this.getMap());
 		EGenericType g2 = createEGenericType(this.getPort());
 		g1.getETypeArguments().add(g2);
 		g2 = createEGenericType(this.getConnection());
 		g1.getETypeArguments().add(g2);
-		initEAttribute(getProcess_IncomingPortMap(), g1, "incomingPortMap",
-				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID,
-				IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcess_Inputs(), this.getPort(), null, "inputs",
-				null, 0, -1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE,
-				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED,
+		initEAttribute(getEntity_IncomingPortMap(), g1, "incomingPortMap",
+				null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
+				!IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEAttribute(getProcess_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+		initEReference(getEntity_Inputs(), this.getPort(), null, "inputs",
+				null, 0, -1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
+				!IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEntity_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 		g1 = createEGenericType(this.getMap());
 		g2 = createEGenericType(this.getPort());
 		g1.getETypeArguments().add(g2);
@@ -1269,15 +1269,14 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		g1.getETypeArguments().add(g2);
 		EGenericType g3 = createEGenericType(this.getConnection());
 		g2.getETypeArguments().add(g3);
-		initEAttribute(getProcess_OutgoingPortMap(), g1, "outgoingPortMap",
-				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID,
-				IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcess_Outputs(), this.getPort(), null, "outputs",
-				null, 0, -1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE,
-				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED,
+		initEAttribute(getEntity_OutgoingPortMap(), g1, "outgoingPortMap",
+				null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
+				!IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
+		initEReference(getEntity_Outputs(), this.getPort(), null, "outputs",
+				null, 0, -1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
+				!IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

@@ -14,6 +14,7 @@ import java.util.Map;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
@@ -580,9 +581,10 @@ public class ActorImpl extends VertexImpl implements Actor {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> T getAdapter(Class<T> type) {
-		if (type == ProcessImpl.class) {
-			// return new ProcessImpl(this, getInputs(), getOutputs());
+		if (type == Entity.class) {
+			return (T) new EntityImpl(this, getInputs(), getOutputs());
 		}
 		return null;
 	}

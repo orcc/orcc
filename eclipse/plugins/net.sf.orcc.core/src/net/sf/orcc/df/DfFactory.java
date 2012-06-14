@@ -216,13 +216,13 @@ public interface DfFactory extends EFactory {
 	Instance createInstance();
 
 	/**
-	 * Returns a new object of class '<em>Process</em>'.
+	 * Returns a new object of class '<em>Entity</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Process</em>'.
+	 * @return a new object of class '<em>Entity</em>'.
 	 * @generated
 	 */
-	Process createProcess();
+	Entity createEntity();
 
 	Instance createInstance(String id, EObject entity);
 

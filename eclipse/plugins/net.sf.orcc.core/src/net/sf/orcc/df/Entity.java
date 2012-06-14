@@ -38,115 +38,112 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * <!-- begin-user-doc --> A representation of the model object '
- * <em><b>Process</b></em>'. <!-- end-user-doc -->
+ * <!-- begin-user-doc -->
+ * A representation of the model object '<em><b>Entity</b></em>'.
+ * <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.df.Process#getIncomingPortMap <em>Incoming Port Map</em>}</li>
- *   <li>{@link net.sf.orcc.df.Process#getInputs <em>Inputs</em>}</li>
- *   <li>{@link net.sf.orcc.df.Process#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.df.Process#getOutgoingPortMap <em>Outgoing Port Map</em>}</li>
- *   <li>{@link net.sf.orcc.df.Process#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Entity#getIncomingPortMap <em>Incoming Port Map</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Entity#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Entity#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Entity#getOutgoingPortMap <em>Outgoing Port Map</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Entity#getOutputs <em>Outputs</em>}</li>
  * </ul>
  * </p>
  *
- * @see net.sf.orcc.df.DfPackage#getProcess()
+ * @see net.sf.orcc.df.DfPackage#getEntity()
  * @model
  * @generated
  */
-public interface Process extends EObject {
-
+public interface Entity extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Incoming Port Map</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * The incoming port map is a map that associates each input port of this
-	 * process with the connection that is connected to this port (if any). The
-	 * type of values is a connection, because an input port can have at most
-	 * one incoming connection.
+	 * If the meaning of the '<em>Incoming Port Map</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Incoming Port Map</em>' attribute.
-	 * @see net.sf.orcc.df.DfPackage#getProcess_IncomingPortMap()
+	 * @see net.sf.orcc.df.DfPackage#getEntity_IncomingPortMap()
 	 * @model dataType="net.sf.orcc.df.Map<net.sf.orcc.df.Port, net.sf.orcc.df.Connection>" changeable="false"
 	 * @generated
 	 */
 	Map<Port, Connection> getIncomingPortMap();
 
 	/**
-	 * Returns the value of the '<em><b>Inputs</b></em>' reference list. The
-	 * list contents are of type {@link net.sf.orcc.df.Port}. <!--
-	 * begin-user-doc -->
+	 * Returns the value of the '<em><b>Inputs</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc -->
 	 * <p>
-	 * The list of input ports of this process.
+	 * If the meaning of the '<em>Inputs</em>' reference list isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Inputs</em>' reference list.
-	 * @see net.sf.orcc.df.DfPackage#getProcess_Inputs()
-	 * @model
+	 * @see net.sf.orcc.df.DfPackage#getEntity_Inputs()
+	 * @model changeable="false" derived="true"
 	 * @generated
 	 */
 	EList<Port> getInputs();
 
 	/**
-	 * Returns the value of the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc -->
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
 	 * <p>
-	 * The name of this process.
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see net.sf.orcc.df.DfPackage#getProcess_Name()
+	 * @see net.sf.orcc.df.DfPackage#getEntity_Name()
 	 * @model
 	 * @generated
 	 */
 	String getName();
 
 	/**
-	 * Returns the value of the '<em><b>Outgoing Port Map</b></em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Entity#getName <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
-	 * <p>
-	 * The outgoing port map is a map that associates each output port of this
-	 * process with the list of connections that are connected to this port. The
-	 * type of values is a list because an output port can have several outgoing
-	 * connections to broadcast data.
-	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Outgoing Port Map</em>' attribute.
-	 * @see net.sf.orcc.df.DfPackage#getProcess_OutgoingPortMap()
-	 * @model dataType="net.sf.orcc.df.Map<net.sf.orcc.df.Port, net.sf.orcc.df.List<net.sf.orcc.df.Connection>>" changeable="false"
-	 * @generated
-	 */
-	Map<Port, List<Connection>> getOutgoingPortMap();
-
-	/**
-	 * Returns the value of the '<em><b>Outputs</b></em>' reference list. The
-	 * list contents are of type {@link net.sf.orcc.df.Port}. <!--
-	 * begin-user-doc -->
-	 * <p>
-	 * The list of output ports of this process.
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * 
-	 * @return the value of the '<em>Outputs</em>' reference list.
-	 * @see net.sf.orcc.df.DfPackage#getProcess_Outputs()
-	 * @model
-	 * @generated
-	 */
-	EList<Port> getOutputs();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Process#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
 	 */
 	void setName(String value);
 
-} // Process
+	/**
+	 * Returns the value of the '<em><b>Outgoing Port Map</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Outgoing Port Map</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Outgoing Port Map</em>' attribute.
+	 * @see net.sf.orcc.df.DfPackage#getEntity_OutgoingPortMap()
+	 * @model dataType="net.sf.orcc.df.Map<net.sf.orcc.df.Port, net.sf.orcc.df.List<net.sf.orcc.df.Connection>>" changeable="false"
+	 * @generated
+	 */
+	Map<Port, List<Connection>> getOutgoingPortMap();
+
+	/**
+	 * Returns the value of the '<em><b>Outputs</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Outputs</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Outputs</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getEntity_Outputs()
+	 * @model changeable="false" derived="true"
+	 * @generated
+	 */
+	EList<Port> getOutputs();
+
+} // Entity
