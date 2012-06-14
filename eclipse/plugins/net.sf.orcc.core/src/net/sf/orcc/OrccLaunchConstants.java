@@ -151,4 +151,10 @@ public interface OrccLaunchConstants {
 	 */
 	public static final String XDF_FILE = "net.sf.orcc.core.xdfFile";
 
+	/**
+	 * If this parameter is set to true, the library files should not be
+	 * exported when executing a backend.
+	 */
+	public static final String NO_LIBRARY_EXPORT = "net.sf.orcc.dontExportLibrary";
+
 }

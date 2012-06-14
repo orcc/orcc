@@ -20,6 +20,9 @@
                id="net.sf.orcc.backends.geneticAlgorithm">
          </option>
          <option
+               id="net.sf.orcc.dontExportLibrary">
+         </option>
+         <option
                id="net.sf.orcc.backends.enableTrace">
          </option>
       </backend>
@@ -29,6 +32,10 @@
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
+         <option
+               id="net.sf.orcc.dontExportLibrary">
+         </option>
+         
       </backend>
       <backend
             class="net.sf.orcc.backends.llvm.jit.JadeBackendImpl"
@@ -205,6 +212,14 @@
             <checkBox>
             </checkBox>
          </option>
+         <option
+               defaultValue="false"
+               description="If you made changes to the library, check this options to keep them when you regenerate the application."
+               id="net.sf.orcc.dontExportLibrary"
+               name="Don't export library">
+            <checkBox/>
+         </option>
+         
          <option
                defaultValue="false"
                description="XLIM Code Generation for Hardware Implementation"
