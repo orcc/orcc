@@ -30,7 +30,6 @@ package net.sf.orcc.df.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +43,6 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
-import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.impl.VertexImpl;
 import net.sf.orcc.moc.MoC;
@@ -323,14 +321,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public Map<Port, Connection> getIncomingPortMap() {
-		Map<Port, Connection> map = new HashMap<Port, Connection>();
-		for (Edge edge : getIncoming()) {
-			if (edge instanceof Connection) {
-				Connection connection = (Connection) edge;
-				map.put(connection.getTargetPort(), connection);
-			}
-		}
-		return map;
+		return getAdapter(Entity.class).getIncomingPortMap();
 	}
 
 	@Override
@@ -356,20 +347,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public Map<Port, List<Connection>> getOutgoingPortMap() {
-		Map<Port, List<Connection>> map = new HashMap<Port, List<Connection>>();
-		for (Edge edge : getOutgoing()) {
-			if (edge instanceof Connection) {
-				Connection connection = (Connection) edge;
-				Port source = connection.getSourcePort();
-				List<Connection> conns = map.get(source);
-				if (conns == null) {
-					conns = new ArrayList<Connection>(1);
-					map.put(source, conns);
-				}
-				conns.add(connection);
-			}
-		}
-		return map;
+		return getAdapter(Entity.class).getOutgoingPortMap();
 	}
 
 	@Override

@@ -35,6 +35,7 @@ import java.util.Map;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -57,7 +58,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 	@Override
 	public Void caseInstance(Instance instance) {
-		handle(instance.getSimpleName(), instance.getOutgoingPortMap());
+		handle(instance);
 		return null;
 	}
 
@@ -76,7 +77,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 			}
 		}
 
-		handle(network.getSimpleName(), network.getOutgoingPortMap());
+		handle(network);
 
 		return null;
 	}
@@ -118,11 +119,13 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		}
 	}
 
-	protected void handle(String name, Map<Port, List<Connection>> outMap) {
+	protected void handle(Vertex vertex) {
+		Entity entity = vertex.getAdapter(Entity.class);
+		Map<Port, List<Connection>> outMap = entity.getOutgoingPortMap();
 		for (Port srcPort : outMap.keySet()) {
 			List<Connection> outList = outMap.get(srcPort);
 			if (outList.size() > 1) {
-				createBroadcast(name, srcPort, outList);
+				createBroadcast(entity.getSimpleName(), srcPort, outList);
 			}
 		}
 	}

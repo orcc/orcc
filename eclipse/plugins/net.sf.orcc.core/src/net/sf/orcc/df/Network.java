@@ -29,14 +29,13 @@
 package net.sf.orcc.df;
 
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
-
 import net.sf.orcc.util.Adaptable;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
@@ -174,8 +173,6 @@ public interface Network extends Graph, Adaptable {
 	 */
 	String getFileName();
 
-	Map<Port, Connection> getIncomingPortMap();
-
 	/**
 	 * Returns the input port whose name matches the given name.
 	 * 
@@ -246,8 +243,6 @@ public interface Network extends Graph, Adaptable {
 	 * @generated
 	 */
 	String getName();
-
-	Map<Port, List<Connection>> getOutgoingPortMap();
 
 	/**
 	 * Returns the output port whose name matches the given name.

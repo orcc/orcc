@@ -98,9 +98,8 @@ public interface Entity extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
-	 * @see #setName(String)
 	 * @see net.sf.orcc.df.DfPackage#getEntity_Name()
-	 * @model
+	 * @model changeable="false"
 	 * @generated
 	 */
 	String getName();
@@ -143,15 +142,5 @@ public interface Entity extends EObject {
 	 * @return an unqualified name
 	 */
 	String getSimpleName();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Entity#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
-	 * @see #getName()
-	 * @generated
-	 */
-	void setName(String value);
 
 } // Entity

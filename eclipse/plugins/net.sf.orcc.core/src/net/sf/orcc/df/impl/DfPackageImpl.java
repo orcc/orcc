@@ -1255,7 +1255,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEntity_Name(), ecorePackage.getEString(), "name",
 				null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				!IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 		g1 = createEGenericType(this.getMap());
 		g2 = createEGenericType(this.getPort());

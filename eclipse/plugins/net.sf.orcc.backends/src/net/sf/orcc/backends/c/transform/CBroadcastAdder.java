@@ -32,9 +32,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.WriteListener;
 
 /**
@@ -59,7 +61,9 @@ public class CBroadcastAdder extends BroadcastAdder {
 	}
 
 	@Override
-	protected void handle(String name, Map<Port, List<Connection>> outMap) {
+	protected void handle(Vertex vertex) {
+		Entity entity = vertex.getAdapter(Entity.class);
+		Map<Port, List<Connection>> outMap = entity.getOutgoingPortMap();
 		for (Port srcPort : outMap.keySet()) {
 			createNeededBcast(srcPort, outMap.get(srcPort));
 		}
