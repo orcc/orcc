@@ -31,6 +31,7 @@ package net.sf.orcc.backends.llvm.tta;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.MAPPING;
+import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
 import java.io.IOException;
@@ -253,16 +254,20 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	 */
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
-		libPath = path + File.separator + "libs";
-		write("Export library files into " + libPath + "... ");
-		if (copyFolderToFileSystem("/runtime/TTA", libPath)) {
-			write("OK" + "\n");
-			new File(libPath + File.separator + "generate").setExecutable(true);
-			return true;
-		} else {
-			write("Error" + "\n");
-			return false;
+		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
+			libPath = path + File.separator + "libs";
+			write("Export library files into " + libPath + "... ");
+			if (copyFolderToFileSystem("/runtime/TTA", libPath)) {
+				write("OK" + "\n");
+				new File(libPath + File.separator + "generate")
+						.setExecutable(true);
+				return true;
+			} else {
+				write("Error" + "\n");
+				return false;
+			}
 		}
+		return false;
 	}
 
 	private void printDesign(Design design) {

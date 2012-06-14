@@ -97,6 +97,9 @@
          <option
                id="net.sf.orcc.backends.tta.fpga">
          </option>
+         <option
+               id="net.sf.orcc.dontExportLibrary">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.promela.PromelaBackendImpl"
