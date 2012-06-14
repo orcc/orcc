@@ -167,8 +167,12 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	@Override
 	public T caseInstance(Instance instance) {
-		if (instance.isActor()) {
-			Actor actor = instance.getActor();
+		Actor actor = instance.getAdapter(Actor.class);
+		if (actor == null) {
+			// instance of something else than an actor
+			doSwitch(instance.getEntity());
+		} else {
+			// instance of an actor
 			if (visitOnce) {
 				// if visitOnce is true, make sure we did not visit this actor
 				if (visited.contains(actor)) {
@@ -182,8 +186,6 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 			// visit actor (note the fall-through if visitOnce is false)
 			doSwitch(actor);
-		} else {
-			doSwitch(instance.getEntity());
 		}
 		return null;
 	}

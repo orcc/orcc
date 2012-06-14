@@ -18,7 +18,8 @@ public class UniqueInstantiator extends DfSwitch<Void> {
 
 	@Override
 	public Void caseNetwork(Network network) {
-		for (Instance instance : network.getInstances()) {
+		for (Vertex vertex : network.getEntities()) {
+			Instance instance = vertex.getAdapter(Instance.class);
 			Actor actor = instance.getActor();
 			if (actors.containsKey(actor)) {
 				Actor copy = IrUtil.copy(actor);

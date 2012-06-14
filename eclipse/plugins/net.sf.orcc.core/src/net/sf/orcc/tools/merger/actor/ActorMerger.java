@@ -135,7 +135,7 @@ public class ActorMerger extends DfSwitch<Void> {
 		network.add(subNetworkInst);
 
 		network.removeVertices(vertices);
-		network.getInstances().removeAll(vertices);
+		network.getEntities().removeAll(vertices);
 
 		return subNetwork;
 	}
@@ -168,7 +168,8 @@ public class ActorMerger extends DfSwitch<Void> {
 					.doSwitch(subNetwork);
 
 			// update parent network
-			Instance instance = network.getInstance("cluster" + index);
+			Vertex vertex = network.getEntity("cluster" + index);
+			Instance instance = vertex.getAdapter(Instance.class);
 			instance.setEntity(superActor);
 			for (Connection connection : network.getConnections()) {
 				Port srcPort = (Port) copier.get(connection.getSourcePort());

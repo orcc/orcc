@@ -119,7 +119,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 	}
 
 	private void copyStateVariables() {
-		for (Instance instance : network.getInstances()) {
+		for (Vertex vertex : network.getEntities()) {
+			Instance instance = vertex.getAdapter(Instance.class);
 			String id = instance.getName();
 			Actor actor = instance.getActor();
 			for (Var var : new ArrayList<Var>(actor.getStateVars())) {
@@ -131,7 +132,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 	}
 
 	private void copyProcedures() {
-		for (Instance instance : network.getInstances()) {
+		for (Vertex vertex : network.getEntities()) {
+			Instance instance = vertex.getAdapter(Instance.class);
 			String id = instance.getName();
 			Actor actor = instance.getActor();
 			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
