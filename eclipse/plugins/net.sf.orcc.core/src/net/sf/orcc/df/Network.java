@@ -127,7 +127,7 @@ public interface Network extends Graph, Adaptable {
 	 * @return the list of this graph's connections
 	 */
 	EList<Connection> getConnections();
-	
+
 	/**
 	 * Returns the value of the '<em><b>Entities</b></em>' reference list. The
 	 * list contents are of type {@link net.sf.orcc.graph.Vertex}. <!--
@@ -329,24 +329,6 @@ public interface Network extends Graph, Adaptable {
 	 * @generated
 	 */
 	EList<Var> getVariables();
-
-	/**
-	 * Removes the given instance from the list of instances, and then removes
-	 * it from this graph.
-	 * 
-	 * @param instance
-	 *            an instance
-	 */
-	void remove(Instance instance);
-
-	/**
-	 * Removes the given entity from the list of entities, and then removes it
-	 * from this graph.
-	 * 
-	 * @param entity
-	 *            an entity
-	 */
-	void removeEntity(Vertex entity);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.df.Network#getFileName

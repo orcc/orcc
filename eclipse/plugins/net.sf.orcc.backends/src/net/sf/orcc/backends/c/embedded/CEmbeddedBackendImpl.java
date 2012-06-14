@@ -99,7 +99,9 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/c/embedded/Network.stg");
 		printer.setTypePrinter(new CTypePrinter());
 
-		// print network
+		// instantiate and flattens network
+		new Instantiator(false, fifoSize).doSwitch(network);
+		new NetworkFlattener().doSwitch(network);
 
 		// This call is needed to associate instances to network vertices
 		network.computeTemplateMaps();
@@ -107,10 +109,6 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		CNetworkTemplateData data = new CNetworkTemplateData();
 		data.computeHierarchicalTemplateMaps(network);
 		network.setTemplateData(data);
-
-		// instantiate and flattens network
-		new Instantiator(false, fifoSize).doSwitch(network);
-		new NetworkFlattener().doSwitch(network);
 
 		// The classification gives production and consumption information from
 		// the graph

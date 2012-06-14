@@ -62,7 +62,6 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
@@ -185,23 +184,19 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	@Override
 	public void add(Vertex vertex) {
-		if (vertex instanceof Instance) {
-			getInstances().add((Instance) vertex);
-		} else if (!(vertex instanceof Port)) {
-			getEntities().add(vertex);
-		}
-		getVertices().add(vertex);
+		super.add(vertex);
+		getEntities().add(vertex);
 	}
 
 	@Override
 	public void addInput(Port port) {
-		getVertices().add(port);
+		super.add(port);
 		getInputs().add(port);
 	}
 
 	@Override
 	public void addOutput(Port port) {
-		getVertices().add(port);
+		super.add(port);
 		getOutputs().add(port);
 	}
 
@@ -228,21 +223,15 @@ public class NetworkImpl extends GraphImpl implements Network {
 	 * its source vertex (respectively target vertex).
 	 */
 	public void computeTemplateMaps() {
-		// Compute template maps of subnetworks
-		for (Instance instance : getInstances()) {
-			if (instance.isNetwork()) {
-				instance.getNetwork().computeTemplateMaps();
-			}
-		}
-
 		int i = 0;
 		for (Connection connection : getConnections()) {
 			connection.setAttribute("id", i++);
 		}
 
 		i = 0;
-		for (Instance instance : getInstances()) {
-			Map<Port, List<Connection>> map = instance.getOutgoingPortMap();
+		for (Vertex vertex : getEntities()) {
+			Entity entity = vertex.getAdapter(Entity.class);
+			Map<Port, List<Connection>> map = entity.getOutgoingPortMap();
 			for (List<Connection> connections : map.values()) {
 				int j = 0;
 				for (Connection connection : connections) {
@@ -453,11 +442,13 @@ public class NetworkImpl extends GraphImpl implements Network {
 	 */
 	public List<Actor> getAllActors() {
 		Set<Actor> actors = new HashSet<Actor>();
-		for (EObject entity : getAllEntities()) {
-			if (entity instanceof Actor) {
-				actors.add((Actor) entity);
-			} else if (entity instanceof Network) {
-				actors.addAll(((Network) entity).getAllActors());
+		for (Vertex vertex : getEntities()) {
+			Actor actor = vertex.getAdapter(Actor.class);
+			if (actor == null) {
+				Network network = vertex.getAdapter(Network.class);
+				actors.addAll(network.getAllActors());
+			} else {
+				actors.add(actor);
 			}
 		}
 
@@ -473,26 +464,12 @@ public class NetworkImpl extends GraphImpl implements Network {
 		return list;
 	}
 
-	/**
-	 * Returns all the entities in this network (contained in "entities" and
-	 * referenced by "instances").
-	 * 
-	 * @return an iterable of Entity
-	 */
-	private List<EObject> getAllEntities() {
-		List<EObject> entities = new ArrayList<EObject>(getEntities());
-		for (Instance instance : getInstances()) {
-			entities.add(instance.getEntity());
-		}
-		return entities;
-	}
-
 	@Override
 	public List<Network> getAllNetworks() {
 		Set<Network> networks = new HashSet<Network>();
-		for (EObject entity : getAllEntities()) {
-			if (entity instanceof Network) {
-				Network network = (Network) entity;
+		for (Vertex vertex : getEntities()) {
+			Network network = vertex.getAdapter(Network.class);
+			if (network != null) {
 				networks.add(network);
 				networks.addAll(network.getAllNetworks());
 			}
@@ -583,6 +560,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	@Override
+	@Deprecated
 	public Instance getInstance(String id) {
 		for (Instance instance : getInstances()) {
 			if (instance.getName().equals(id)) {
@@ -591,8 +569,12 @@ public class NetworkImpl extends GraphImpl implements Network {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * @return
+	 */
 	@Override
+	@Deprecated
 	public EList<Instance> getInstances() {
 		EList<Instance> list = new BasicEList<Instance>();
 		for (Vertex vertex : getEntities()) {
@@ -615,11 +597,13 @@ public class NetworkImpl extends GraphImpl implements Network {
 	public List<Instance> getInstancesOf(Actor actor) {
 		List<Instance> instances = new ArrayList<Instance>();
 
-		for (Instance instance : getInstances()) {
-			if (instance.isActor() && instance.getActor() == actor) {
+		for (Vertex vertex : getEntities()) {
+			Instance instance = vertex.getAdapter(Instance.class);
+			Actor candidate = vertex.getAdapter(Actor.class);
+			if (candidate == actor) {
 				instances.add(instance);
-			} else if (instance.isNetwork()) {
-				Network network = instance.getNetwork();
+			} else {
+				Network network = vertex.getAdapter(Network.class);
 				instances.addAll(network.getInstancesOf(actor));
 			}
 		}
@@ -752,15 +736,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	@Override
-	public void remove(Instance instance) {
-		getInstances().remove(instance);
-		remove((Vertex) instance);
-	}
-
-	@Override
-	public void removeEntity(Vertex entity) {
-		getEntities().remove(entity);
-		remove(entity);
+	public void remove(Vertex vertex) {
+		getEntities().remove(vertex);
+		super.remove(vertex);
 	}
 
 	/**

@@ -104,7 +104,7 @@ public interface Entity extends EObject {
 	 * @generated
 	 */
 	String getName();
-	
+
 	/**
 	 * Returns the value of the '<em><b>Outgoing Port Map</b></em>' attribute.
 	 * <!-- begin-user-doc -->

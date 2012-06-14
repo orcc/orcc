@@ -63,6 +63,8 @@ public class NetworkFlattener extends DfSwitch<Void> {
 
 	@Override
 	public Void caseNetwork(Network network) {
+		// make a copy because we modify the "entities" list in the loop
+		// and we want to avoid concurrent modification
 		List<Vertex> entities = new ArrayList<Vertex>(network.getEntities());
 		for (Vertex entity : entities) {
 			Network subNetwork = entity.getAdapter(Network.class);
@@ -82,7 +84,7 @@ public class NetworkFlattener extends DfSwitch<Void> {
 			linkIncomingConnections(network, subNetwork);
 
 			// remove entity from network
-			network.removeEntity(entity);
+			network.remove(entity);
 
 			// remove connections to clean up incoming/outgoing of instances
 			subNetwork.removeEdges(subNetwork.getConnections());
