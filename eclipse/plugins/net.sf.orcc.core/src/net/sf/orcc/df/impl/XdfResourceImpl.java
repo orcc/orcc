@@ -113,7 +113,7 @@ public class XdfResourceImpl extends ResourceImpl {
 			source = network.getInput(arg.substring(0, dash));
 		} else {
 			// first vertex is an instance
-			source = network.getEntity(arg.substring(0, dot));
+			source = network.getChild(arg.substring(0, dot));
 			sourcePort = arg.substring(dot + 1, dash);
 		}
 
@@ -124,7 +124,7 @@ public class XdfResourceImpl extends ResourceImpl {
 			target = network.getOutput(arg.substring(dash));
 		} else {
 			// second vertex is an instance
-			target = network.getEntity(arg.substring(dash, dot));
+			target = network.getChild(arg.substring(dash, dot));
 			targetPort = arg.substring(dot + 1);
 		}
 
@@ -181,7 +181,7 @@ public class XdfResourceImpl extends ResourceImpl {
 					} else if (fragment.startsWith("outputs.")) {
 						return network.getOutput(name);
 					} else if (fragment.startsWith("instances.")) {
-						return network.getEntity(name);
+						return network.getChild(name);
 					} else if (fragment.startsWith("parameters.")) {
 						return network.getParameter(name);
 					} else if (fragment.startsWith("variables.")) {

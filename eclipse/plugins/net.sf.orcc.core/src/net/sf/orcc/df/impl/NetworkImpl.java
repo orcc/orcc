@@ -380,19 +380,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Vertex> getChildren() {
-		if (children == null) {
-			children = new EObjectResolvingEList<Vertex>(Vertex.class, this,
-					DfPackage.NETWORK__CHILDREN);
-		}
-		return children;
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -435,10 +422,8 @@ public class NetworkImpl extends GraphImpl implements Network {
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
 			return (T) new EntityImpl(this, getInputs(), getOutputs());
-		} else if (type.isAssignableFrom(getClass())) {
-			return (T) this;
 		}
-		return null;
+		return super.getAdapter(type);
 	}
 
 	/**
@@ -493,19 +478,32 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public EList<Connection> getConnections() {
-		return (EList<Connection>) (EList<?>) getEdges();
-	}
-
-	@Override
-	public Vertex getEntity(String name) {
+	public Vertex getChild(String name) {
 		for (Vertex vertex : getChildren()) {
 			if (vertex.getLabel().equals(name)) {
 				return vertex;
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Vertex> getChildren() {
+		if (children == null) {
+			children = new EObjectResolvingEList<Vertex>(Vertex.class, this,
+					DfPackage.NETWORK__CHILDREN);
+		}
+		return children;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public EList<Connection> getConnections() {
+		return (EList<Connection>) (EList<?>) getEdges();
 	}
 
 	@Override

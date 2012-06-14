@@ -66,22 +66,6 @@ import org.eclipse.emf.common.util.EList;
 public interface Network extends Graph, Adaptable {
 
 	/**
-	 * Returns the value of the '<em><b>Children</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.graph.Vertex}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Children</em>' reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Children</em>' reference list.
-	 * @see net.sf.orcc.df.DfPackage#getNetwork_Children()
-	 * @model
-	 * @generated
-	 */
-	EList<Vertex> getChildren();
-
-	/**
 	 * Adds the given port to this network. The port is added to the vertices
 	 * and the inputs list.
 	 * 
@@ -136,6 +120,33 @@ public interface Network extends Graph, Adaptable {
 	List<Network> getAllNetworks();
 
 	/**
+	 * Returns the child of this network that has the given name, or
+	 * <code>null</code> if no such child could be found.
+	 * 
+	 * @param name
+	 *            name of the child
+	 * @return a child of this given network, or <code>null</code>
+	 */
+	Vertex getChild(String name);
+
+	/**
+	 * Returns the value of the '<em><b>Children</b></em>' reference list. The
+	 * list contents are of type {@link net.sf.orcc.graph.Vertex}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Children</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Children</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Children()
+	 * @model
+	 * @generated
+	 */
+	EList<Vertex> getChildren();
+
+	/**
 	 * Returns the list of this graph's connections. This returns the same as
 	 * {@link #getEdges()} but as a list of {@link Connection}s rather than as a
 	 * list of edges.
@@ -143,16 +154,6 @@ public interface Network extends Graph, Adaptable {
 	 * @return the list of this graph's connections
 	 */
 	EList<Connection> getConnections();
-
-	/**
-	 * Returns the entity of this network that has the given name, or
-	 * <code>null</code> if no entity could be found.
-	 * 
-	 * @param name
-	 *            name of the entity
-	 * @return an entity of this given network, or <code>null</code>
-	 */
-	Vertex getEntity(String name);
 
 	/**
 	 * Returns the file this network is defined in.
@@ -200,8 +201,9 @@ public interface Network extends Graph, Adaptable {
 	Instance getInstance(String id);
 
 	/**
-	 * Returns the same as {@link #getEntities()}.
-	 * @return
+	 * Returns a list that contains all children that are adaptable to Instance.
+	 * 
+	 * @return a list of instances
 	 * @deprecated
 	 */
 	@Deprecated

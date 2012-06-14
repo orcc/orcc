@@ -253,7 +253,12 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> T getAdapter(Class<T> type) {
+		if (type.isAssignableFrom(getClass())) {
+			return (T) this;
+		}
+
 		// by default a vertex cannot be adapted to anything else
 		// subclasses should extend this method
 		return null;

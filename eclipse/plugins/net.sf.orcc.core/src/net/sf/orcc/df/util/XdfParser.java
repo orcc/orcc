@@ -673,7 +673,7 @@ public class XdfParser {
 
 			return port;
 		} else {
-			Vertex vertex = network.getEntity(vertexName);
+			Vertex vertex = network.getChild(vertexName);
 			if (vertex == null) {
 				throw new OrccRuntimeException(
 						"An Connection element has an invalid"
