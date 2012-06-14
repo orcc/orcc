@@ -10,6 +10,7 @@ import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.ecore.EObject;
@@ -81,6 +82,8 @@ public class GraphSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseAttributable(graph);
 			if (result == null)
+				result = caseAdaptable(graph);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -89,6 +92,8 @@ public class GraphSwitch<T> extends Switch<T> {
 			T result = caseVertex(vertex);
 			if (result == null)
 				result = caseAttributable(vertex);
+			if (result == null)
+				result = caseAdaptable(vertex);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -134,6 +139,21 @@ public class GraphSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseAttributable(Attributable object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAdaptable(Adaptable object) {
 		return null;
 	}
 

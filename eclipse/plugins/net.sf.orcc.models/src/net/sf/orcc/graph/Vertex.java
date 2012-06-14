@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.graph;
 
+import net.sf.orcc.util.Adaptable;
 import java.util.List;
 
 import net.sf.orcc.util.Attributable;
@@ -32,7 +33,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Vertex extends Attributable {
+public interface Vertex extends Attributable, Adaptable {
 
 	/**
 	 * Returns the graph in which this vertex is contained, or <code>null</code>

@@ -312,6 +312,7 @@ public class GraphPackageImpl extends EPackageImpl implements GraphPackage {
 		// Add supertypes to classes
 		graphEClass.getESuperTypes().add(this.getVertex());
 		vertexEClass.getESuperTypes().add(theUtilPackage.getAttributable());
+		vertexEClass.getESuperTypes().add(theUtilPackage.getAdaptable());
 		edgeEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 
 		// Initialize classes and features; add operations and parameters

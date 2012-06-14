@@ -7,7 +7,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="vertices" upperBound="-1"
         eType="#//Vertex" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Vertex" eSuperTypes="Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Vertex" eSuperTypes="Util.ecore#//Attributable Util.ecore#//Adaptable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="incoming" upperBound="-1"
         eType="#//Edge" eOpposite="#//Edge/target"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="label" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>

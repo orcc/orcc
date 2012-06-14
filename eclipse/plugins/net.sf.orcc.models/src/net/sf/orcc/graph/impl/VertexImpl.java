@@ -253,6 +253,13 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	}
 
 	@Override
+	public <T> T getAdapter(Class<T> type) {
+		// by default a vertex cannot be adapted to anything else
+		// subclasses should extend this method
+		return null;
+	}
+
+	@Override
 	public Graph getGraph() {
 		return (Graph) eContainer();
 	}
