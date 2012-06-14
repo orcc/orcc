@@ -112,9 +112,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Network) {
 				Network network = (Network) inputElement;
-				EList<Vertex> vertices = new BasicEList<Vertex>();
-				vertices.addAll(network.getInstances());
-				vertices.addAll(network.getEntities());
+				EList<Vertex> vertices = new BasicEList<Vertex>(network.getEntities());
 				return vertices.toArray();
 			}
 			return new Object[0];
@@ -184,9 +182,6 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 				mapping.put(network.getName(), component);
 				for (Vertex subEntity : network.getEntities()) {
 					setMapping(subEntity, component);
-				}
-				for (Instance subInstance : network.getInstances()) {
-					setMapping(subInstance, component);
 				}
 			}
 		}

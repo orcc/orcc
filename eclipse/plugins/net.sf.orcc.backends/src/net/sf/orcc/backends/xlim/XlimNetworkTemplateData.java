@@ -33,9 +33,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 
 /**
  * This class is giving the necessary information for the XLIM Network
@@ -64,8 +65,9 @@ public class XlimNetworkTemplateData {
 	 * @param network
 	 */
 	public void computeActorOutputPortFanout(Network network) {
-		for (Instance instance : network.getInstances()) {
-			Map<Port, List<Connection>> map = instance.getOutgoingPortMap();
+		for (Vertex vertex : network.getEntities()) {
+			Entity entity = vertex.getAdapter(Entity.class);
+			Map<Port, List<Connection>> map = entity.getOutgoingPortMap();
 			for (List<Connection> values : map.values()) {
 				int cp = 0;
 				for (Connection connection : values) {

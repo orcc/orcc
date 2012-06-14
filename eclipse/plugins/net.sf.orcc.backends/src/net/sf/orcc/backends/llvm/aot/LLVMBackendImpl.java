@@ -159,10 +159,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 			transformation.doSwitch(network);
 			if (debug) {
 				ResourceSet set = new ResourceSetImpl();
-				for (Instance instance : network.getInstances()) {
-					if (!IrUtil.serializeActor(set, path, instance)) {
+				for (Vertex vertex : network.getEntities()) {
+					if (!IrUtil.serializeActor(set, path, vertex)) {
 						System.err.println("Error with " + transformation
-								+ " on instance " + instance.getName());
+								+ " on instance " + vertex.getLabel());
 					}
 				}
 			}

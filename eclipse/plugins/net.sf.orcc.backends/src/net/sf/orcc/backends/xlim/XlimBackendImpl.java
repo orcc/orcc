@@ -67,6 +67,7 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
@@ -111,7 +112,8 @@ public class XlimBackendImpl extends AbstractBackend {
 			Map<String, String> mapping) {
 		Map<Integer, List<Instance>> computedMap = new HashMap<Integer, List<Instance>>();
 
-		for (Instance instance : network.getInstances()) {
+		for (Vertex vertex : network.getEntities()) {
+			Instance instance = vertex.getAdapter(Instance.class);
 			String path = instance.getHierarchicalName();
 			String component = mapping.get(path);
 			if (component != null) {

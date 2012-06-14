@@ -149,7 +149,8 @@ public class XdfImporter {
 			graph.addVertex(vertex);
 		}
 
-		for (Instance instance : network.getInstances()) {
+		for (net.sf.orcc.graph.Vertex v : network.getEntities()) {
+			Instance instance = (Instance) v;
 			Vertex vertex = getVertex(instance,
 					configuration.getVertexType("Instance"));
 
