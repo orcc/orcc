@@ -127,6 +127,9 @@
          <option
                id="net.sf.orcc.backends.classify">
          </option>
+         <option
+               id="net.sf.orcc.dontExportLibrary">
+         </option>         
       </backend>
    </extension>
    <extension

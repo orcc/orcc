@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.cplusplus;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -161,15 +162,18 @@ public class YaceBackend extends AbstractBackend {
 
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
-		String target = path + File.separator + "libs";
-		write("Export libraries sources into " + target + "... ");
-		if (copyFolderToFileSystem("/runtime/C++", target)) {
-			write("OK" + "\n");
-			return true;
-		} else {
-			write("Error" + "\n");
-			return false;
+		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
+			String target = path + File.separator + "libs";
+			write("Export libraries sources into " + target + "... ");
+			if (copyFolderToFileSystem("/runtime/C++", target)) {
+				write("OK" + "\n");
+				return true;
+			} else {
+				write("Error" + "\n");
+				return false;
+			}
 		}
+		return false;
 	}
 
 }
