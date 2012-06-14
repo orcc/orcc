@@ -778,21 +778,13 @@ public interface DfPackage extends EPackage {
 	int NETWORK__INPUTS = GraphPackage.GRAPH_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Instances</b></em>' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__INSTANCES = GraphPackage.GRAPH_FEATURE_COUNT + 3;
-
-	/**
 	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__MO_C = GraphPackage.GRAPH_FEATURE_COUNT + 4;
+	int NETWORK__MO_C = GraphPackage.GRAPH_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -801,7 +793,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__NAME = GraphPackage.GRAPH_FEATURE_COUNT + 5;
+	int NETWORK__NAME = GraphPackage.GRAPH_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' reference list.
@@ -809,7 +801,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__OUTPUTS = GraphPackage.GRAPH_FEATURE_COUNT + 6;
+	int NETWORK__OUTPUTS = GraphPackage.GRAPH_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -817,7 +809,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__PARAMETERS = GraphPackage.GRAPH_FEATURE_COUNT + 7;
+	int NETWORK__PARAMETERS = GraphPackage.GRAPH_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Template Data</b></em>' attribute.
@@ -826,7 +818,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__TEMPLATE_DATA = GraphPackage.GRAPH_FEATURE_COUNT + 8;
+	int NETWORK__TEMPLATE_DATA = GraphPackage.GRAPH_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Variables</b></em>' containment reference list.
@@ -834,7 +826,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__VARIABLES = GraphPackage.GRAPH_FEATURE_COUNT + 9;
+	int NETWORK__VARIABLES = GraphPackage.GRAPH_FEATURE_COUNT + 8;
 
 	/**
 	 * The number of structural features of the '<em>Network</em>' class. <!--
@@ -843,7 +835,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 10;
+	int NETWORK_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1477,19 +1469,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getNetwork_Variables();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.df.Network#getInstances <em>Instances</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Instances</em>'.
-	 * @see net.sf.orcc.df.Network#getInstances()
-	 * @see #getNetwork()
-	 * @generated
-	 */
-	EReference getNetwork_Instances();
 
 	/**
 	 * Returns the meta object for the attribute '
@@ -2475,14 +2454,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference NETWORK__VARIABLES = eINSTANCE.getNetwork_Variables();
-
-		/**
-		 * The meta object literal for the '<em><b>Instances</b></em>' reference list feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference NETWORK__INSTANCES = eINSTANCE.getNetwork_Instances();
 
 		/**
 		 * The meta object literal for the '<em><b>File Name</b></em>' attribute feature.

@@ -109,6 +109,8 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseAttributable(port);
 			if (result == null)
+				result = caseAdaptable(port);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -118,9 +120,9 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseVertex(instance);
 			if (result == null)
-				result = caseAdaptable(instance);
-			if (result == null)
 				result = caseAttributable(instance);
+			if (result == null)
+				result = caseAdaptable(instance);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -138,9 +140,9 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseVertex(actor);
 			if (result == null)
-				result = caseAdaptable(actor);
-			if (result == null)
 				result = caseAttributable(actor);
+			if (result == null)
+				result = caseAdaptable(actor);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -151,11 +153,11 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseGraph(network);
 			if (result == null)
-				result = caseAdaptable(network);
-			if (result == null)
 				result = caseVertex(network);
 			if (result == null)
 				result = caseAttributable(network);
+			if (result == null)
+				result = caseAdaptable(network);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -167,6 +169,8 @@ public class DfSwitch<T> extends Switch<T> {
 				result = caseVertex(broadcast);
 			if (result == null)
 				result = caseAttributable(broadcast);
+			if (result == null)
+				result = caseAdaptable(broadcast);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -201,6 +205,8 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseAttributable(fsm);
 			if (result == null)
+				result = caseAdaptable(fsm);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -218,6 +224,8 @@ public class DfSwitch<T> extends Switch<T> {
 				result = caseVertex(state);
 			if (result == null)
 				result = caseAttributable(state);
+			if (result == null)
+				result = caseAdaptable(state);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

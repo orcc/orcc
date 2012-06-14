@@ -59,6 +59,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -112,15 +113,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 	 * @ordered
 	 */
 	protected EList<Port> inputs;
-
-	/**
-	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInstances()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Instance> instances;
 
 	/**
 	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
@@ -276,8 +268,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 			return getFileName();
 		case DfPackage.NETWORK__INPUTS:
 			return getInputs();
-		case DfPackage.NETWORK__INSTANCES:
-			return getInstances();
 		case DfPackage.NETWORK__MO_C:
 			return getMoC();
 		case DfPackage.NETWORK__NAME:
@@ -328,8 +318,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 					: !FILE_NAME_EDEFAULT.equals(fileName);
 		case DfPackage.NETWORK__INPUTS:
 			return inputs != null && !inputs.isEmpty();
-		case DfPackage.NETWORK__INSTANCES:
-			return instances != null && !instances.isEmpty();
 		case DfPackage.NETWORK__MO_C:
 			return moC != null;
 		case DfPackage.NETWORK__NAME:
@@ -366,10 +354,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 		case DfPackage.NETWORK__INPUTS:
 			getInputs().clear();
 			getInputs().addAll((Collection<? extends Port>) newValue);
-			return;
-		case DfPackage.NETWORK__INSTANCES:
-			getInstances().clear();
-			getInstances().addAll((Collection<? extends Instance>) newValue);
 			return;
 		case DfPackage.NETWORK__MO_C:
 			setMoC((MoC) newValue);
@@ -421,9 +405,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 		case DfPackage.NETWORK__INPUTS:
 			getInputs().clear();
 			return;
-		case DfPackage.NETWORK__INSTANCES:
-			getInstances().clear();
-			return;
 		case DfPackage.NETWORK__MO_C:
 			setMoC((MoC) null);
 			return;
@@ -451,6 +432,8 @@ public class NetworkImpl extends GraphImpl implements Network {
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
 			return (T) new EntityImpl(this, getInputs(), getOutputs());
+		} else if (type.isAssignableFrom(getClass())) {
+			return (T) this;
 		}
 		return null;
 	}
@@ -537,6 +520,16 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	@Override
+	public Vertex getEntity(String name) {
+		for (Vertex vertex : getEntities()) {
+			if (vertex.getLabel().equals(name)) {
+				return vertex;
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public IFile getFile() {
 		String fileName = getFileName();
 		if (fileName == null) {
@@ -598,17 +591,17 @@ public class NetworkImpl extends GraphImpl implements Network {
 		}
 		return null;
 	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
+	
+	@Override
 	public EList<Instance> getInstances() {
-		if (instances == null) {
-			instances = new EObjectResolvingEList<Instance>(Instance.class,
-					this, DfPackage.NETWORK__INSTANCES);
+		EList<Instance> list = new BasicEList<Instance>();
+		for (Vertex vertex : getEntities()) {
+			Instance instance = vertex.getAdapter(Instance.class);
+			if (instance != null) {
+				list.add(instance);
+			}
 		}
-		return instances;
+		return list;
 	}
 
 	/**

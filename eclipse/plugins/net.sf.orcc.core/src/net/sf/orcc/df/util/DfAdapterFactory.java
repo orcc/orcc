@@ -186,13 +186,13 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseVertex(Vertex object) {
-			return createVertexAdapter();
+		public Adapter caseAdaptable(Adaptable object) {
+			return createAdaptableAdapter();
 		}
 
 		@Override
-		public Adapter caseAdaptable(Adaptable object) {
-			return createAdaptableAdapter();
+		public Adapter caseVertex(Vertex object) {
+			return createVertexAdapter();
 		}
 
 		@Override

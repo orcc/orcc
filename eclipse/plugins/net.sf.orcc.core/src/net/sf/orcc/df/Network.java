@@ -50,7 +50,6 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.df.Network#getEntities <em>Entities</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getInstances <em>Instances</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}</li>
@@ -128,7 +127,7 @@ public interface Network extends Graph, Adaptable {
 	 * @return the list of this graph's connections
 	 */
 	EList<Connection> getConnections();
-
+	
 	/**
 	 * Returns the value of the '<em><b>Entities</b></em>' reference list. The
 	 * list contents are of type {@link net.sf.orcc.graph.Vertex}. <!--
@@ -140,6 +139,16 @@ public interface Network extends Graph, Adaptable {
 	 * @generated
 	 */
 	EList<Vertex> getEntities();
+
+	/**
+	 * Returns the entity of this network that has the given name, or
+	 * <code>null</code> if no entity could be found.
+	 * 
+	 * @param name
+	 *            name of the entity
+	 * @return an entity of this given network, or <code>null</code>
+	 */
+	Vertex getEntity(String name);
 
 	/**
 	 * Returns the file this network is defined in.
@@ -183,18 +192,15 @@ public interface Network extends Graph, Adaptable {
 	 */
 	EList<Port> getInputs();
 
+	@Deprecated
 	Instance getInstance(String id);
 
 	/**
-	 * Returns the value of the '<em><b>Instances</b></em>' reference list. The
-	 * list contents are of type {@link net.sf.orcc.df.Instance}. <!--
-	 * begin-user-doc --><!-- end-user-doc -->
-	 * 
-	 * @return the value of the '<em>Instances</em>' reference list.
-	 * @see net.sf.orcc.df.DfPackage#getNetwork_Instances()
-	 * @model
-	 * @generated
+	 * Returns the same as {@link #getEntities()}.
+	 * @return
+	 * @deprecated
 	 */
+	@Deprecated
 	EList<Instance> getInstances();
 
 	/**

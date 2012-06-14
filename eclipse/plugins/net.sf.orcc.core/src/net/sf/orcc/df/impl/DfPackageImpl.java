@@ -264,7 +264,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_MoC() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(4);
+		return (EReference) networkEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -273,7 +273,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getNetwork_Name() {
-		return (EAttribute) networkEClass.getEStructuralFeatures().get(5);
+		return (EAttribute) networkEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -281,15 +281,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Variables() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(9);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNetwork_Instances() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(3);
+		return (EReference) networkEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -323,7 +315,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Outputs() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(6);
+		return (EReference) networkEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -332,7 +324,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Parameters() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(7);
+		return (EReference) networkEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -341,7 +333,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getNetwork_TemplateData() {
-		return (EAttribute) networkEClass.getEStructuralFeatures().get(8);
+		return (EAttribute) networkEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -1066,7 +1058,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(networkEClass, NETWORK__ENTITIES);
 		createEAttribute(networkEClass, NETWORK__FILE_NAME);
 		createEReference(networkEClass, NETWORK__INPUTS);
-		createEReference(networkEClass, NETWORK__INSTANCES);
 		createEReference(networkEClass, NETWORK__MO_C);
 		createEAttribute(networkEClass, NETWORK__NAME);
 		createEReference(networkEClass, NETWORK__OUTPUTS);
@@ -1357,10 +1348,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEReference(getNetwork_Inputs(), this.getPort(), null, "inputs",
 				null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNetwork_Instances(), this.getInstance(), null,
-				"instances", null, 0, -1, Network.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_MoC(), theMocPackage.getMoC(), null, "moC",
 				null, 0, 1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,

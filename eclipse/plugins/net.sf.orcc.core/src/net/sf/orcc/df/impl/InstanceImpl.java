@@ -247,6 +247,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				return null;
 			}
 			return (T) new EntityImpl(this, inputs, outputs);
+		} else if (type.isAssignableFrom(getClass())) {
+			return (T) this;
 		}
 		return null;
 	}

@@ -585,6 +585,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
 			return (T) new EntityImpl(this, getInputs(), getOutputs());
+		} else if (type.isAssignableFrom(getClass())) {
+			return (T) this;
 		}
 		return null;
 	}
