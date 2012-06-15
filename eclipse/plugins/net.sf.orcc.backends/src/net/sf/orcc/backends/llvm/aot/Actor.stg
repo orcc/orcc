@@ -190,6 +190,7 @@ if(action.outputPattern.varToPortMap.(store.target.variable) && !action.outputPa
 else
 ><varName(store.target.variable, store)> = getelementptr <store.target.variable.type>* <Var(store.target.variable)>, i32 0<if(store.indexes)>, <indexes(store.indexes)><endif><
 endif>
+
 store <store.target.variable.type.innermostType> <Expr(store.value)>, <store.target.variable.type.innermostType>* <varName(store.target.variable, store)><
 else
 >store <store.target.variable.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)><
@@ -205,6 +206,7 @@ elseif(action.peekPattern.varToPortMap.(load.source.variable))
 else
 ><varName(load.source.variable, load)> = getelementptr <load.source.variable.type>* <Var(load.source.variable)>, i32 0, <indexes(load.indexes)><
 endif>
+
 <Var(load.target.variable)> = load <load.source.variable.type.innermostType>* <varName(load.source.variable, load)><
 else
 ><Var(load.target.variable)> = load <load.source.variable.type>* <Var(load.source.variable)><
