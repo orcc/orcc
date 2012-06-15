@@ -193,7 +193,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 		printer.setTypePrinter(new LLVMTypePrinter());
 		printer.getOptions().put("fifoSize", fifoSize);
 		printInstances(network);
-		printEntities(network);
 
 		// print network
 		write("Printing network...\n");
@@ -239,11 +238,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	protected boolean printInstance(Instance instance) {
 		return printer.print(instance.getSimpleName() + ".ll", path, instance);
-	}
-
-	@Override
-	protected boolean printEntity(Vertex vertex) {
-		return printer.print(vertex.getLabel() + ".ll", path, vertex);
 	}
 
 }
