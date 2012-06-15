@@ -184,6 +184,7 @@ public interface Actor extends Vertex, Adaptable {
 
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * The default value is <code>""</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
@@ -193,7 +194,7 @@ public interface Actor extends Vertex, Adaptable {
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
 	 * @see net.sf.orcc.df.DfPackage#getActor_Name()
-	 * @model
+	 * @model default="" transient="true" volatile="true" derived="true"
 	 * @generated
 	 */
 	String getName();

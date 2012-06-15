@@ -721,7 +721,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return createInstStore(lineNumber,
 				IrFactory.eINSTANCE.createDef(target), indexes, value);
 	}
-	
+
 	@Override
 	public InstStore createInstStore(Var target, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();

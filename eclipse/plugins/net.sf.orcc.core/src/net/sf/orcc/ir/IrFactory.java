@@ -35,7 +35,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	ArgByRef createArgByRef();
-	
+
 	/**
 	 * Returns a new object of class '<em>Arg By Val</em>'.
 	 * <!-- begin-user-doc

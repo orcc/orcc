@@ -186,17 +186,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
+	protected static final String NAME_EDEFAULT = "";
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
@@ -406,8 +396,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 		case DfPackage.ACTOR__NATIVE:
 			return native_ != NATIVE_EDEFAULT;
 		case DfPackage.ACTOR__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		case DfPackage.ACTOR__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
 		case DfPackage.ACTOR__PARAMETERS:
@@ -675,10 +665,9 @@ public class ActorImpl extends VertexImpl implements Actor {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
 	 */
 	public String getName() {
-		return name;
+		return getLabel();
 	}
 
 	@Override
@@ -912,14 +901,9 @@ public class ActorImpl extends VertexImpl implements Actor {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
 	 */
 	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ACTOR__NAME, oldName, name));
+		setLabel(newName);
 	}
 
 	/**
@@ -965,8 +949,6 @@ public class ActorImpl extends VertexImpl implements Actor {
 		result.append(lineNumber);
 		result.append(", native: ");
 		result.append(native_);
-		result.append(", name: ");
-		result.append(name);
 		result.append(", templateData: ");
 		result.append(templateData);
 		result.append(')');
