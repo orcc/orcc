@@ -32,16 +32,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.df.Broadcast;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -53,6 +61,9 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * 
  */
 public class BroadcastAdder extends DfSwitch<Void> {
+
+	private static DfFactory dfFactory = DfFactory.eINSTANCE;
+	private static IrFactory irFactory = IrFactory.eINSTANCE;
 
 	protected Network network;
 
@@ -93,30 +104,77 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 	protected void createBroadcast(String id, Port port,
 			List<? extends Edge> outList) {
+
 		// Add broadcast vertex
-		Broadcast bcast = DfFactory.eINSTANCE.createBroadcast(outList.size(),
-				port.getType());
+		Actor bcast = dfFactory.createActor();
 		bcast.setName(id + "_" + port.getName());
+		
 		network.add(bcast);
+
+		Type portType = irFactory.createTypeList(1, port.getType());
+
+		Pattern inputPattern = dfFactory.createPattern();
+		Pattern outputPattern = dfFactory.createPattern();
+
+		Port input = dfFactory.createPort(EcoreUtil.copy(port.getType()),
+				"input");
+		bcast.getInputs().add(input);
 
 		// Creates a connection between the vertex and the broadcast
 		Connection conn = (Connection) outList.get(0);
-		Connection incoming = DfFactory.eINSTANCE.createConnection(
-				conn.getSource(), conn.getSourcePort(), bcast,
-				bcast.getInput(), EcoreUtil.copyAll(conn.getAttributes()));
+		Connection incoming = dfFactory.createConnection(conn.getSource(),
+				conn.getSourcePort(), bcast, input,
+				EcoreUtil.copyAll(conn.getAttributes()));
 		incoming.getAttributes()
 				.addAll(EcoreUtil.copyAll(conn.getAttributes()));
 		network.getConnections().add(incoming);
 
+		inputPattern.setNumTokens(input, 1);
+		inputPattern.setVariable(input,
+				irFactory.createVar(portType, "input", true, 0));
+
 		// Change the source of the other connections
 		int i = 0;
 		for (Edge edge : outList) {
-			Port outputPort = bcast.getOutput("output_" + i);
-			i++;
+			Port output = dfFactory.createPort(EcoreUtil.copy(port.getType()),
+					"output_" + i);
+			bcast.getOutputs().add(output);
+
 			Connection connection = (Connection) edge;
-			connection.setSourcePort(outputPort);
+			connection.setSourcePort(output);
 			connection.setSource(bcast);
+
+			outputPattern.setNumTokens(output, 1);
+			outputPattern.setVariable(output,
+					irFactory.createVar(portType, "output_" + i, true, 0));
+
+			i++;
 		}
+
+		// Create body of the broadcast
+		Procedure body = irFactory.createProcedure("copy", 0,
+				irFactory.createTypeVoid());
+		Var tmpVar = body.newTempLocalVariable(portType, "tmp");
+		BlockBasic block = IrUtil.getLast(body.getBlocks());
+
+		block.add(irFactory.createInstLoad(tmpVar,
+				inputPattern.getVariable(input), 0));
+		for (Port output : bcast.getOutputs()) {
+			block.add(irFactory.createInstStore(
+					outputPattern.getVariable(output), 0, tmpVar));
+		}
+
+		// Create the scheduler
+		Procedure scheduler = irFactory.createProcedure("isSchedulable_copy",
+				0, irFactory.createTypeBool());
+		BlockBasic block2 = IrUtil.getLast(scheduler.getBlocks());
+		block2.add(irFactory.createInstReturn(irFactory.createExprBool(true)));
+
+		Action copy = dfFactory.createAction("copy", inputPattern,
+				outputPattern, dfFactory.createPattern(), scheduler, body);
+
+		bcast.getActions().add(copy);
+		bcast.getActionsOutsideFsm().add(copy);
 	}
 
 	protected void handle(Vertex vertex) {
