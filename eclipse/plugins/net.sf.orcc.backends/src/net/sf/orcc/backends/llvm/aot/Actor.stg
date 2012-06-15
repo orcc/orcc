@@ -185,30 +185,30 @@ endif>
 
 printStore(store) ::= <<
 <if(store.target.variable.type.list)>
-<if(action.outputPattern.varToPortMap.(store.target.variable) && !action.outputPattern.varToPortMap.(store.target.variable).native)>
-<printPortAccess(first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(store.target.variable))), action.outputPattern.varToPortMap.(store.target.variable), store.target.variable, store.indexes, store)>
-<else>
-<varName(store.target.variable, store)> = getelementptr <store.target.variable.type>* <Var(store.target.variable)>, i32 0<if(store.indexes)>, <indexes(store.indexes)><endif>
-<endif>
-store <store.target.variable.type.innermostType> <Expr(store.value)>, <store.target.variable.type.innermostType>* <varName(store.target.variable, store)>
-<else>
-store <store.target.variable.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)>
-<endif>
+<if(action.outputPattern.varToPortMap.(store.target.variable) && !action.outputPattern.varToPortMap.(store.target.variable).native)
+><printPortAccess(first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(store.target.variable))), action.outputPattern.varToPortMap.(store.target.variable), store.target.variable, store.indexes, store)><
+else
+><varName(store.target.variable, store)> = getelementptr <store.target.variable.type>* <Var(store.target.variable)>, i32 0<if(store.indexes)>, <indexes(store.indexes)><endif><
+endif>
+store <store.target.variable.type.innermostType> <Expr(store.value)>, <store.target.variable.type.innermostType>* <varName(store.target.variable, store)><
+else
+>store <store.target.variable.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)><
+endif>
 >>
 
 printLoad(load) ::= <<
-<if(load.source.variable.type.list)>
-<if(action.inputPattern.varToPortMap.(load.source.variable) && !action.inputPattern.varToPortMap.(load.source.variable).native)>
-<printPortAccess(instance.incomingPortMap.(action.inputPattern.varToPortMap.(load.source.variable)), action.inputPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)>
-<elseif(action.peekPattern.varToPortMap.(load.source.variable))>
-<printPortAccess(instance.incomingPortMap.(action.peekPattern.varToPortMap.(load.source.variable)), action.peekPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)>
-<else>
-<varName(load.source.variable, load)> = getelementptr <load.source.variable.type>* <Var(load.source.variable)>, i32 0, <indexes(load.indexes)>
-<endif>
-<Var(load.target.variable)> = load <load.source.variable.type.innermostType>* <varName(load.source.variable, load)>
-<else>
-<Var(load.target.variable)> = load <load.source.variable.type>* <Var(load.source.variable)>
-<endif>
+<if(load.source.variable.type.list)><
+if(action.inputPattern.varToPortMap.(load.source.variable) && !action.inputPattern.varToPortMap.(load.source.variable).native)
+><printPortAccess(instance.incomingPortMap.(action.inputPattern.varToPortMap.(load.source.variable)), action.inputPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)><
+elseif(action.peekPattern.varToPortMap.(load.source.variable))
+><printPortAccess(instance.incomingPortMap.(action.peekPattern.varToPortMap.(load.source.variable)), action.peekPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)><
+else
+><varName(load.source.variable, load)> = getelementptr <load.source.variable.type>* <Var(load.source.variable)>, i32 0, <indexes(load.indexes)
+><endif>
+<Var(load.target.variable)> = load <load.source.variable.type.innermostType>* <varName(load.source.variable, load)><
+else
+><Var(load.target.variable)> = load <load.source.variable.type>* <Var(load.source.variable)><
+endif>
 >>
 
 printPortAccess(fifo, port, var, indexes, instruction) ::= <<
