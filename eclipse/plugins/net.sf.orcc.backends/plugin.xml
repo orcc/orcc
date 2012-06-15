@@ -62,6 +62,9 @@
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
+         <option
+               id="net.sf.orcc.dontExportLibrary">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"

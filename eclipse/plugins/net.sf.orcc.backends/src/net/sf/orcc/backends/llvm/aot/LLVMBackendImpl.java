@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.llvm.aot;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
 import java.util.HashMap;
@@ -214,21 +215,25 @@ public class LLVMBackendImpl extends AbstractBackend {
 	 */
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
-		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-			File targetPath = new File(path).getParentFile();
-			copyFileToFilesystem("/runtime/run_cmake_with_VS_env.bat",
-					targetPath + File.separator + "run_cmake_with_VS_env.bat");
-		}
+		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
+			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+				File targetPath = new File(path).getParentFile();
+				copyFileToFilesystem("/runtime/run_cmake_with_VS_env.bat",
+						targetPath + File.separator
+								+ "run_cmake_with_VS_env.bat");
+			}
 
-		String target = path + File.separator + "libs";
-		write("Export libraries sources into " + target + "... ");
-		if (copyFolderToFileSystem("/runtime/C", target)) {
-			write("OK" + "\n");
-			return true;
-		} else {
-			write("Error" + "\n");
-			return false;
+			String target = path + File.separator + "libs";
+			write("Export libraries sources into " + target + "... ");
+			if (copyFolderToFileSystem("/runtime/C", target)) {
+				write("OK" + "\n");
+				return true;
+			} else {
+				write("Error" + "\n");
+				return false;
+			}
 		}
+		return false;
 	}
 
 	@Override
