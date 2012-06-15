@@ -44,6 +44,7 @@ import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.Attribute;
 
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -174,8 +175,7 @@ public class Instantiator extends DfSwitch<Void> {
 	private void instantiate(Network network, Instance instance) {
 		// copy object
 		Copier copier = new Copier();
-		Vertex newEntity = (Vertex) copier.copy(instance.getEntity());
-		copier.copyReferences();
+		Vertex newEntity = (Vertex) IrUtil.copy(copier, instance.getEntity());
 
 		// instantiate sub network
 		doSwitch(newEntity);
