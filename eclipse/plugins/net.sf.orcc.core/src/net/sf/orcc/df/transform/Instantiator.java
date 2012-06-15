@@ -174,7 +174,7 @@ public class Instantiator extends DfSwitch<Void> {
 	 */
 	private void instantiate(Network network, Instance instance) {
 		// copy object
-		Copier copier = new Copier();
+		Copier copier = new Copier(true);
 		Vertex newEntity = (Vertex) IrUtil.copy(copier, instance.getEntity());
 
 		// instantiate sub network
@@ -187,15 +187,15 @@ public class Instantiator extends DfSwitch<Void> {
 		network.add(newEntity);
 		connect(copier, instance, newEntity);
 
-		// remove instance
-		network.remove(instance);
-
 		// assigns arguments' values to network's variables
 		for (Argument argument : instance.getArguments()) {
 			Var var = (Var) copier.get(argument.getVariable());
 			Expression value = argument.getValue();
 			var.setInitialValue(value);
 		}
+
+		// remove instance
+		network.remove(instance);
 	}
 
 }
