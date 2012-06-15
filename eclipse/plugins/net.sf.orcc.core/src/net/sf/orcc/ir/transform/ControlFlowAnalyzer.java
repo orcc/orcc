@@ -43,13 +43,13 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
- * This class defines a transformation to build the CFG of procedures.
+ * This class defines a control flow analyzer which build the CFG of procedures.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
  * 
  */
-public class CfgBuilder extends AbstractIrVisitor<CfgNode> {
+public class ControlFlowAnalyzer extends AbstractIrVisitor<CfgNode> {
 
 	protected Cfg cfg;
 

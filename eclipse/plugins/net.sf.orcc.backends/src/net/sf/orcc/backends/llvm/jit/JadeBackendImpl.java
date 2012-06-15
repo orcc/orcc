@@ -69,7 +69,7 @@ import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
-import net.sf.orcc.ir.transform.CfgBuilder;
+import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
@@ -174,7 +174,7 @@ public class JadeBackendImpl extends AbstractBackend {
 				new DfVisitor<Expression>(new CastAdder(false)),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
-				new DfVisitor<CfgNode>(new CfgBuilder()),
+				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
 				new DfVisitor<Void>(new ListInitializer()),
 				new DfVisitor<Void>(new TemplateInfoComputing()) };
 

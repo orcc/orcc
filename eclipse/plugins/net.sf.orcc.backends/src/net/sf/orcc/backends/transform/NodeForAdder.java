@@ -48,7 +48,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.transform.CfgBuilder;
+import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -69,7 +69,7 @@ public class NodeForAdder extends DfVisitor<Object> {
 		irVisitor = new Builder();
 	}
 
-	private class ForNodeCfg extends CfgBuilder {
+	private class ForNodeCfg extends ControlFlowAnalyzer {
 		@Override
 		public CfgNode caseBlockSpecific(BlockSpecific node) {
 			if (((IrNodeSpecific) node).isNodeFor()) {
@@ -127,7 +127,7 @@ public class NodeForAdder extends DfVisitor<Object> {
 	@Override
 	public Object caseActor(Actor actor) {
 		// Build first CFG
-		new CfgBuilder().doSwitch(actor);
+		new ControlFlowAnalyzer().doSwitch(actor);
 
 		// Transform actor
 		super.caseActor(actor);

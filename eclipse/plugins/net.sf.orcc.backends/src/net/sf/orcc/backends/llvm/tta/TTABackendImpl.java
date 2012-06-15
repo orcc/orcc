@@ -77,7 +77,7 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
-import net.sf.orcc.ir.transform.CfgBuilder;
+import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
@@ -195,7 +195,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				new DfVisitor<Expression>(new CastAdder(false)),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
-				new DfVisitor<CfgNode>(new CfgBuilder()),
+				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
 				new DfVisitor<Void>(new TemplateInfoComputing()), };
 
 		for (DfSwitch<?> transformation : transformations) {

@@ -66,7 +66,7 @@ import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
-import net.sf.orcc.ir.transform.CfgBuilder;
+import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
@@ -239,7 +239,7 @@ public class CBackendImpl extends AbstractBackend {
 			transformations.add(new DfVisitor<Void>(new ListFlattener()));
 			transformations.add(new DfVisitor<Expression>(
 					new TacTransformation()));
-			transformations.add(new DfVisitor<CfgNode>(new CfgBuilder()));
+			transformations.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
 			transformations
 					.add(new DfVisitor<Void>(new InstPhiTransformation()));
 			transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
