@@ -32,15 +32,16 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.moc.MoC;
+import net.sf.orcc.util.Adaptable;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * <!-- begin-user-doc -->This class defines an instance. An instance has an id, a class, parameters
- * and attributes. The class of the instance points to an actor or a network.<!-- end-user-doc -->
+ * <!-- begin-user-doc -->This class defines an instance. An instance has an id,
+ * a class, parameters and attributes. The class of the instance points to an
+ * actor or a network.<!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
@@ -66,9 +67,11 @@ public interface Instance extends Vertex, Adaptable {
 	Actor getActor();
 
 	/**
-	 * Returns the value of the '<em><b>Arguments</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Argument}.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * Returns the value of the '<em><b>Arguments</b></em>' containment
+	 * reference list. The list contents are of type
+	 * {@link net.sf.orcc.df.Argument}. <!-- begin-user-doc --><!-- end-user-doc
+	 * -->
+	 * 
 	 * @return the value of the '<em>Arguments</em>' containment reference list.
 	 * @see net.sf.orcc.df.DfPackage#getInstance_Arguments()
 	 * @model containment="true"
@@ -77,16 +80,9 @@ public interface Instance extends Vertex, Adaptable {
 	EList<Argument> getArguments();
 
 	/**
-	 * Returns the broadcast referenced by this instance.
+	 * Returns the value of the '<em><b>Entity</b></em>' reference. <!--
+	 * begin-user-doc --><!-- end-user-doc -->
 	 * 
-	 * @return the broadcast referenced by this instance, or <code>null</code>
-	 *         if this instance does not reference a broadcasst
-	 */
-	Broadcast getBroadcast();
-
-	/**
-	 * Returns the value of the '<em><b>Entity</b></em>' reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
 	 * @return the value of the '<em>Entity</em>' reference.
 	 * @see #setEntity(EObject)
 	 * @see net.sf.orcc.df.DfPackage#getInstance_Entity()
@@ -96,10 +92,12 @@ public interface Instance extends Vertex, Adaptable {
 	EObject getEntity();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Entity</em>' reference.
+	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getEntity
+	 * <em>Entity</em>}' reference. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Entity</em>' reference.
 	 * @see #getEntity()
 	 * @generated
 	 */
@@ -127,8 +125,9 @@ public interface Instance extends Vertex, Adaptable {
 	MoC getMoC();
 
 	/**
-	 * Returns the value of the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * Returns the value of the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
 	 * @see net.sf.orcc.df.DfPackage#getInstance_Name()
@@ -157,13 +156,6 @@ public interface Instance extends Vertex, Adaptable {
 	 * @return <code>true</code> if this instance references an actor
 	 */
 	boolean isActor();
-
-	/**
-	 * Returns <code>true</code> if this instance references a broadcast.
-	 * 
-	 * @return <code>true</code> if this instance references a broadcast
-	 */
-	boolean isBroadcast();
 
 	/**
 	 * Returns <code>true</code> if this instance references a network.

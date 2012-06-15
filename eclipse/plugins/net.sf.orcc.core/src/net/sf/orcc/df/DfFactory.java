@@ -118,26 +118,6 @@ public interface DfFactory extends EFactory {
 	Argument createArgument(Var variable, Expression value);
 
 	/**
-	 * Returns a new object of class '<em>Broadcast</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Broadcast</em>'.
-	 * @generated
-	 */
-	Broadcast createBroadcast();
-
-	/**
-	 * Creates a new broadcast with the given number of outputs and type. Type
-	 * is copied.
-	 * 
-	 * @param numOutput
-	 *            number of outputs
-	 * @param type
-	 *            type of this broadcast
-	 */
-	Broadcast createBroadcast(int numOutputs, Type type);
-
-	/**
 	 * Returns a new object of class '<em>Connection</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->

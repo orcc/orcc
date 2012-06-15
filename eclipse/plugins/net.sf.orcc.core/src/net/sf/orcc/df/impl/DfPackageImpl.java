@@ -12,7 +12,6 @@ import java.util.Map;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
@@ -65,17 +64,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	private EClass instanceEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass entityEClass = null;
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass broadcastEClass = null;
+	private EClass entityEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -150,15 +142,13 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	private EClass argumentEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	private EDataType mapEDataType = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	private EDataType listEDataType = null;
@@ -260,8 +250,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getNetwork_Children() {
@@ -277,8 +266,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getNetwork_Name() {
@@ -302,8 +290,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getNetwork_Inputs() {
@@ -311,8 +298,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getNetwork_Outputs() {
@@ -320,8 +306,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getNetwork_Parameters() {
@@ -329,8 +314,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getNetwork_TemplateData() {
@@ -386,8 +370,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getInstance_Name() {
@@ -395,8 +378,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getEntity() {
@@ -404,8 +386,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getEntity_IncomingPortMap() {
@@ -413,8 +394,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getEntity_Inputs() {
@@ -422,8 +402,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getEntity_Name() {
@@ -431,8 +410,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getEntity_OutgoingPortMap() {
@@ -440,47 +418,11 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getEntity_Outputs() {
 		return (EReference) entityEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getBroadcast() {
-		return broadcastEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getBroadcast_Inputs() {
-		return (EReference) broadcastEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBroadcast_Name() {
-		return (EAttribute) broadcastEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getBroadcast_Outputs() {
-		return (EReference) broadcastEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -604,8 +546,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getActor_TemplateData() {
@@ -621,8 +562,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getActor_Name() {
@@ -646,8 +586,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getActor_Inputs() {
@@ -655,8 +594,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getActor_Outputs() {
@@ -664,8 +602,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getActor_Parameters() {
@@ -769,8 +706,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getPort_Name() {
@@ -920,8 +856,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EDataType getMap() {
@@ -929,8 +864,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EDataType getList() {
@@ -978,8 +912,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getUnit_Name() {
@@ -1065,11 +998,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(networkEClass, NETWORK__PARAMETERS);
 		createEAttribute(networkEClass, NETWORK__TEMPLATE_DATA);
 		createEReference(networkEClass, NETWORK__VARIABLES);
-
-		broadcastEClass = createEClass(BROADCAST);
-		createEReference(broadcastEClass, BROADCAST__INPUTS);
-		createEAttribute(broadcastEClass, BROADCAST__NAME);
-		createEReference(broadcastEClass, BROADCAST__OUTPUTS);
 
 		connectionEClass = createEClass(CONNECTION);
 		createEReference(connectionEClass, CONNECTION__SOURCE_PORT);
@@ -1175,7 +1103,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		actorEClass.getESuperTypes().add(theUtilPackage.getAdaptable());
 		networkEClass.getESuperTypes().add(theGraphPackage.getGraph());
 		networkEClass.getESuperTypes().add(theUtilPackage.getAdaptable());
-		broadcastEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		connectionEClass.getESuperTypes().add(theGraphPackage.getEdge());
 		actionEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		fsmEClass.getESuperTypes().add(theGraphPackage.getGraph());
@@ -1372,21 +1299,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null,
 				"variables", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(broadcastEClass, Broadcast.class, "Broadcast", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getBroadcast_Inputs(), this.getPort(), null, "inputs",
-				null, 0, -1, Broadcast.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBroadcast_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, Broadcast.class, IS_TRANSIENT, IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
-				IS_ORDERED);
-		initEReference(getBroadcast_Outputs(), this.getPort(), null, "outputs",
-				null, 0, -1, Broadcast.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(connectionEClass, Connection.class, "Connection",

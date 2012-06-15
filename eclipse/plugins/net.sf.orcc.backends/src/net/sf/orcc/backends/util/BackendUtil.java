@@ -25,10 +25,6 @@ public class BackendUtil {
 			String name = new String();
 			if (instance.isActor()) {
 				name = instance.getHierarchicalName();
-			} else if (instance.isBroadcast()) {
-				// Broadcasts are mapped with their source
-				name = ((Instance) instance.getBroadcast().getPredecessors()
-						.get(0)).getHierarchicalName();
 			}
 
 			// Map each instance to its associate component

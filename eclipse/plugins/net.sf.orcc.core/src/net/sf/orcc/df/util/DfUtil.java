@@ -169,8 +169,7 @@ public class DfUtil {
 			return network.getInputs().contains(port);
 		}
 		EStructuralFeature feature = port.eContainingFeature();
-		return feature == DfPackage.eINSTANCE.getActor_Inputs()
-				|| feature == DfPackage.eINSTANCE.getBroadcast_Inputs();
+		return feature == DfPackage.eINSTANCE.getActor_Inputs();
 	}
 
 }

@@ -13,7 +13,6 @@ import java.util.Map;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
@@ -106,8 +105,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			return createActor();
 		case DfPackage.NETWORK:
 			return createNetwork();
-		case DfPackage.BROADCAST:
-			return createBroadcast();
 		case DfPackage.CONNECTION:
 			return createConnection();
 		case DfPackage.ACTION:
@@ -137,8 +134,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -155,8 +151,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -241,8 +236,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Map<?, ?> createMapFromString(EDataType eDataType,
@@ -251,8 +245,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String convertMapToString(EDataType eDataType, Object instanceValue) {
@@ -260,8 +253,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public List<?> createListFromString(EDataType eDataType, String initialValue) {
@@ -269,8 +261,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String convertListToString(EDataType eDataType, Object instanceValue) {
@@ -283,28 +274,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 		argument.setVariable(variable);
 		argument.setValue(value);
 		return argument;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Broadcast createBroadcast() {
-		BroadcastImpl broadcast = new BroadcastImpl();
-		return broadcast;
-	}
-
-	@Override
-	public Broadcast createBroadcast(int numOutputs, Type type) {
-		BroadcastImpl broadcast = new BroadcastImpl();
-
-		broadcast.getInputs().add(createPort(EcoreUtil.copy(type), "input"));
-		for (int i = 0; i < numOutputs; i++) {
-			String name = "output_" + i;
-			broadcast.getOutputs().add(createPort(EcoreUtil.copy(type), name));
-		}
-
-		return broadcast;
 	}
 
 	/**
@@ -364,8 +333,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Entity createEntity() {

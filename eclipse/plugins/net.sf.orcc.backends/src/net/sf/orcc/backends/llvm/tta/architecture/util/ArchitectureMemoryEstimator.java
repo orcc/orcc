@@ -33,7 +33,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.util.DfVisitor;
@@ -100,11 +99,6 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 				bits += doSwitch(action);
 			}
 			return bits;
-		}
-
-		@Override
-		public Integer caseBroadcast(Broadcast broadcast) {
-			return 512;
 		}
 
 		@Override

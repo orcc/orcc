@@ -57,8 +57,6 @@ public class StandardPrinter extends AbstractPrinter {
 
 	protected Map<String, Object> options;
 
-	private boolean printBroadcasts;
-
 	/**
 	 * Creates a new network printer.
 	 * 
@@ -83,23 +81,6 @@ public class StandardPrinter extends AbstractPrinter {
 	public StandardPrinter(String templateName, boolean keepUnchangedFiles) {
 		this(templateName);
 		this.keepUnchangedFiles = keepUnchangedFiles;
-	}
-
-	/**
-	 * Creates a new instance printer.
-	 * 
-	 * @param templateName
-	 *            the name of the template
-	 * @param keepUnchangedFiles
-	 *            if the printer must keep printing files from unchanged
-	 *            instances
-	 * @param printBroadcasts
-	 *            if the printer have to print broadcast instances
-	 */
-	public StandardPrinter(String templateName, boolean keepUnchangedFiles,
-			boolean printBroadcasts) {
-		this(templateName, keepUnchangedFiles);
-		this.printBroadcasts = printBroadcasts;
 	}
 
 	/**
@@ -235,8 +216,7 @@ public class StandardPrinter extends AbstractPrinter {
 	public boolean print(String fileName, String path, Instance instance) {
 		String file = path + File.separator + fileName;
 		if (instance.isNetwork()
-				|| (instance.isActor() && !instance.getActor().isNative())
-				|| (instance.isBroadcast() && printBroadcasts)) {
+				|| (instance.isActor() && !instance.getActor().isNative())) {
 			if (keepUnchangedFiles) {
 				// if source file is older than target file, do not generate
 				long sourceLastModified = getLastModifiedHierarchy(instance);

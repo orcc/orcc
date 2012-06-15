@@ -11,7 +11,6 @@ import java.util.Map;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
@@ -117,11 +116,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseNetwork(Network object) {
 			return createNetworkAdapter();
-		}
-
-		@Override
-		public Adapter caseBroadcast(Broadcast object) {
-			return createBroadcastAdapter();
 		}
 
 		@Override
@@ -271,20 +265,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEntityAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Broadcast <em>Broadcast</em>}'.
-	 * <!-- begin-user-doc
-	 * --> This default implementation returns null so that we can easily ignore
-	 * cases; it's useful to ignore a case when inheritance will catch all the
-	 * cases anyway. <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.df.Broadcast
-	 * @generated
-	 */
-	public Adapter createBroadcastAdapter() {
 		return null;
 	}
 

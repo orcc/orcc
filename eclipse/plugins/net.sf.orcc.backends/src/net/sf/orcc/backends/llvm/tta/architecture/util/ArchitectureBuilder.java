@@ -45,7 +45,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.Signal;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -68,14 +67,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	 * the given network and the mapping.
 	 */
 	private class Mapper extends DfVisitor<Void> {
-		@Override
-		public Void caseBroadcast(Broadcast broadcast) {
-			Processor processor = design.getProcessor(mapping
-					.getMappedComponent(broadcast));
-			processor.getMappedActors().add(broadcast);
-			componentMap.put(broadcast, processor);
-			return null;
-		}
 
 		@Override
 		public Void caseConnection(Connection connection) {

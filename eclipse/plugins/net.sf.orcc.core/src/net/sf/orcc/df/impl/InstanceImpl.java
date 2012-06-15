@@ -35,7 +35,6 @@ import java.util.Map;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
@@ -274,11 +273,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		return arguments;
 	}
 
-	@Override
-	public Broadcast getBroadcast() {
-		return (Broadcast) getEntity();
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -366,11 +360,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	@Override
 	public boolean isActor() {
 		return getEntity() instanceof Actor;
-	}
-
-	@Override
-	public boolean isBroadcast() {
-		return getEntity() instanceof Broadcast;
 	}
 
 	public boolean isInstance() {

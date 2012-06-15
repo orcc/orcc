@@ -33,7 +33,6 @@ import java.util.Set;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -146,17 +145,6 @@ public class DfVisitor<T> extends DfSwitch<T> {
 			doSwitch(initialize);
 		}
 
-		return null;
-	}
-
-	@Override
-	public T caseBroadcast(Broadcast broadcast) {
-		for (Port port : broadcast.getInputs()) {
-			doSwitch(port);
-		}
-		for (Port port : broadcast.getOutputs()) {
-			doSwitch(port);
-		}
 		return null;
 	}
 

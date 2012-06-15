@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfVisitor;
@@ -49,19 +48,6 @@ import net.sf.orcc.graph.Vertex;
 public class Mapping {
 
 	private class Visitor extends DfVisitor<Void> {
-		@Override
-		public Void caseBroadcast(Broadcast broadcast) {
-			if (mapBroadcasts) {
-				// Broadcasts are mapped with their source
-				Instance instance = (Instance) broadcast.getPredecessors().get(
-						0);
-				map(userMapping.get(instance.getHierarchicalName()), broadcast);
-			} else {
-				unmappedEntities.add(broadcast);
-			}
-			return null;
-		}
-
 		@Override
 		public Void caseInstance(Instance instance) {
 			if (mapNativeActors || !instance.getActor().isNative()) {

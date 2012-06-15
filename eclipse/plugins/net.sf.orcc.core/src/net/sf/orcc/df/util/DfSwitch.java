@@ -11,7 +11,6 @@ import java.util.Map;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
@@ -158,19 +157,6 @@ public class DfSwitch<T> extends Switch<T> {
 				result = caseAttributable(network);
 			if (result == null)
 				result = caseAdaptable(network);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case DfPackage.BROADCAST: {
-			Broadcast broadcast = (Broadcast) theEObject;
-			T result = caseBroadcast(broadcast);
-			if (result == null)
-				result = caseVertex(broadcast);
-			if (result == null)
-				result = caseAttributable(broadcast);
-			if (result == null)
-				result = caseAdaptable(broadcast);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -341,21 +327,6 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseEntity(Entity object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Broadcast</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Broadcast</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseBroadcast(Broadcast object) {
 		return null;
 	}
 
