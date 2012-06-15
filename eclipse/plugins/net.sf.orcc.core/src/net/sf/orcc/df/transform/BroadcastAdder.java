@@ -108,8 +108,10 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		// Add broadcast vertex
 		Actor bcast = dfFactory.createActor();
 		bcast.setName(id + "_" + port.getName());
-		
-		network.add(bcast);
+
+		Instance instance = dfFactory.createInstance(id + "_" + port.getName(),
+				bcast);
+		network.add(instance);
 
 		Type portType = irFactory.createTypeList(1, port.getType());
 
@@ -123,7 +125,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		// Creates a connection between the vertex and the broadcast
 		Connection conn = (Connection) outList.get(0);
 		Connection incoming = dfFactory.createConnection(conn.getSource(),
-				conn.getSourcePort(), bcast, input,
+				conn.getSourcePort(), instance, input,
 				EcoreUtil.copyAll(conn.getAttributes()));
 		incoming.getAttributes()
 				.addAll(EcoreUtil.copyAll(conn.getAttributes()));
@@ -142,7 +144,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 			Connection connection = (Connection) edge;
 			connection.setSourcePort(output);
-			connection.setSource(bcast);
+			connection.setSource(instance);
 
 			outputPattern.setNumTokens(output, 1);
 			outputPattern.setVariable(output,
