@@ -14,4 +14,4 @@ if defined VS100COMNTOOLS (
 )
 
 echo Launching "cmake-gui"
-cmake-gui
+cmake-gui .
