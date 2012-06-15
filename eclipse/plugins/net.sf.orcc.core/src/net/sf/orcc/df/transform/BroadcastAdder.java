@@ -113,7 +113,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 				bcast);
 		network.add(instance);
 
-		Type portType = irFactory.createTypeList(1, port.getType());
+		Type portVarType = irFactory.createTypeList(1, port.getType());
 
 		Pattern inputPattern = dfFactory.createPattern();
 		Pattern outputPattern = dfFactory.createPattern();
@@ -133,7 +133,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 		inputPattern.setNumTokens(input, 1);
 		inputPattern.setVariable(input,
-				irFactory.createVar(portType, "input", true, 0));
+				irFactory.createVar(portVarType, "input", true, 0));
 
 		// Change the source of the other connections
 		int i = 0;
@@ -148,7 +148,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 			outputPattern.setNumTokens(output, 1);
 			outputPattern.setVariable(output,
-					irFactory.createVar(portType, "output_" + i, true, 0));
+					irFactory.createVar(portVarType, "output_" + i, true, 0));
 
 			i++;
 		}
@@ -156,7 +156,8 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		// Create body of the broadcast
 		Procedure body = irFactory.createProcedure("copy", 0,
 				irFactory.createTypeVoid());
-		Var tmpVar = body.newTempLocalVariable(portType, "tmp");
+		Var tmpVar = body.newTempLocalVariable(IrUtil.copy(port.getType()),
+				"tmp");
 		BlockBasic block = IrUtil.getLast(body.getBlocks());
 
 		block.add(irFactory.createInstLoad(tmpVar,
