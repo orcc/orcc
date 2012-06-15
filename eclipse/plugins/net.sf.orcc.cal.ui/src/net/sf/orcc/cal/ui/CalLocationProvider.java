@@ -65,7 +65,7 @@ public class CalLocationProvider extends DefaultLocationInFileProvider {
 		if (node == null && obj instanceof AstState) {
 			AstState state = (AstState) obj;
 			if (state.getNode() instanceof INode) {
-				node = (INode) state.getNode();
+				return ITextRegion.EMPTY_REGION;
 			} else {
 				if (obj.eContainer() == null)
 					return ITextRegion.EMPTY_REGION;
