@@ -234,25 +234,28 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
 			EList<Port> inputs, outputs;
-			if (entity instanceof Actor) {
-				inputs = ((Actor) entity).getInputs();
-				outputs = ((Actor) entity).getOutputs();
-			} else if (entity instanceof Network) {
-				inputs = ((Network) entity).getInputs();
-				outputs = ((Network) entity).getOutputs();
+			EObject object = getEntity();
+			if (object instanceof Actor) {
+				inputs = ((Actor) object).getInputs();
+				outputs = ((Actor) object).getOutputs();
+			} else if (object instanceof Network) {
+				inputs = ((Network) object).getInputs();
+				outputs = ((Network) object).getOutputs();
 			} else {
 				// cannot adapt instances of other objects to Entity
 				return null;
 			}
 			return (T) new EntityImpl(this, inputs, outputs);
 		} else if (type == Actor.class) {
-			if (entity instanceof Actor) {
-				return (T) entity;
+			EObject object = getEntity();
+			if (object instanceof Actor) {
+				return (T) object;
 			}
 			return null;
 		} else if (type == Network.class) {
-			if (entity instanceof Network) {
-				return (T) entity;
+			EObject object = getEntity();
+			if (object instanceof Network) {
+				return (T) object;
 			}
 			return null;
 		}
