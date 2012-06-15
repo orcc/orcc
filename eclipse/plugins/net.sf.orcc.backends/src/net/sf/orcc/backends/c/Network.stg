@@ -1,73 +1,13 @@
 GetInstanceId(vertex) ::= <<
-<if (vertex.broadcast)>bcast_<endif><vertex.name>
->>
-
-BroadcastWrite(n, port) ::= <<
-fifo_<vertex.type>_write_1(<GetInstanceId(vertex)>_output_<n>, tok_input);
->>
-
-printBroadcastWrite(OutputNum, OutputPorts) ::= <<
-<if(first(OutputNum))>
-<BroadcastWrite(first(OutputNum),first(OutputPorts))>
-<printBroadcastWrite(rest(OutputNum),rest(OutputPorts))>
-<endif>
->>
-
-outputPatternPort(num, port) ::= <<
-if (!fifo_<vertex.type>_has_room(<GetInstanceId(vertex)>_output_<num>, 1, 1)) {
-	ports |= (1 \<\< <num>);
-}
->>
-
-outputPattern(outputsNumPort, outputsPort) ::= <<
-<if(first(outputsNumPort))>
-<outputPatternPort(first(outputsNumPort),first(outputsPort))>
-<outputPattern(rest(outputsNumPort),rest(outputsPort))>
-<endif>
->>
-
-printOutputPattern(outputsNumPort, outputsPort) ::= <<
-<if(first(outputsNumPort))>
-int ports = 0;
-<outputPattern(outputsNumPort, outputsPort)>
-if (ports != 0) {
-	si-\>num_firings = i;
-	si-\>reason = full;
-	si-\>ports = ports;
-	return;
-}
-<endif>
->>
-
-declareBroadcast(vertex) ::= <<
-<if (vertex.broadcast)
->
-void <GetInstanceId(vertex)>_scheduler(struct schedinfo_s *si) {
-	int i = 0;
-	<vertex.type> tok_input;
-
-	while (fifo_<vertex.type>_has_tokens(<GetInstanceId(vertex)>_input, 0, 1)) {
-		<printOutputPattern(vertex.outputList, vertex.outputs.list)>
-
-		tok_input = fifo_<vertex.type>_read_1(<GetInstanceId(vertex)>_input, 0);
-		<printBroadcastWrite(vertex.outputList, vertex.outputs.list)>
-		i++;
-	}
-
-	si-\>reason = starved;
-	si-\>num_firings = i;
-	si-\>ports = 0x01;
-}<
-endif>
-
+<vertex.name>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
 
 allocateFifo(edge, readers_nb) ::= <%
-<if (!edge.source.port && !edge.target.port)>
-<if (edge.source.broadcast || edge.source.actor)>
+<if(!edge.source.port && !edge.target.port)>
+<if(edge.source.actor)>
 DECLARE_FIFO(<edge.sourcePort.type>, <if(edge.size)><edge.size><else>SIZE<endif>, <edge.idNoBcast>, <readers_nb>)
 <else>
 DECLARE_FIFO(<edge.targetPort.type>, <if(edge.size)><edge.size><else>SIZE<endif>, <edge.idNoBcast>, <readers_nb>)
@@ -88,7 +28,7 @@ allocateFifos(vertex) ::= <<
 // assigns FIFOs
 
 doAssignFifo(source, port, count) ::= <<
-<if(source.actor || source.broadcast)>struct fifo_<port.type>_s *<GetInstanceId(source)>_<port.name> = &fifo_<count>;<endif>
+<if(source.actor)>struct fifo_<port.type>_s *<GetInstanceId(source)>_<port.name> = &fifo_<count>;<endif>
 >>
 
 tryAssignFifoSrc(edge) ::= <<
@@ -120,7 +60,7 @@ fifo_<type>_clear(&fifo_<count>);
 >>
 
 doClearFifo(edge) ::= <%
-<if (edge.source.broadcast || edge.source.actor)>
+<if(edge.source.actor)>
 <clearFifoType(
   edge.sourcePort.type, edge.size, edge.idNoBcast, edge.sourcePort, edge.source)>
 <else>
@@ -130,7 +70,7 @@ doClearFifo(edge) ::= <%
 %>
 
 tryClearFifo(edge) ::= <%
-<if (edge.source.instance && edge.target.instance)>
+<if(edge.source.instance && edge.target.instance)>
 <doClearFifo(edge)>
 <endif>
 %>
@@ -149,17 +89,17 @@ void clear_fifos(){
 // Declare actors
 
 printActorAddress(instance, addComma) ::= <<
-<if(instance.actor || instance.broadcast)><if(addComma)>, <endif>&<GetInstanceId(instance)><endif>
+<if(instance.actor)><if(addComma)>, <endif>&<GetInstanceId(instance)><endif>
 >>
 
 declareActorArray(instances, addComma = false) ::= <<
 <if(rest(instances))
 ><printActorAddress(first(instances),addComma)
-><	if(first(instances).actor || first(instances).broadcast)
+>< if(first(instances).actor)
 ><declareActorArray(rest(instances),"true")
 ><	else
-><declareActorArray(rest(instances),addComma)
-	><endif
+><declareActorArray(rest(instances),addComma)><
+   endif
 ><else
 ><printActorAddress(first(instances),addComma)
 ><endif>
@@ -173,19 +113,15 @@ struct actor_s *actors[] = {<declareActorArray(instances)>};
 // Define actors
 
 NumInputs(instance) ::= <<
-<if (instance.actor)
-><length(instance.actor.inputs)><
-elseif (instance.broadcast)>1<else>0<endif>
+<if(instance.actor)><length(instance.actor.inputs)>0<endif>
 >>
 
 NumOutputs(instance) ::= <<
-<if (instance.actor)
-><length(instance.actor.outputs)><
-elseif (instance.broadcast)><instance.broadcast.numOutputs><else>0<endif>
+<if(instance.actor)><length(instance.actor.outputs)><else>0<endif>
 >>
 
 fillActorStruct(instance) ::= <<
-<if(instance.actor || instance.broadcast)>
+<if(instance.actor)>
 struct actor_s <GetInstanceId(instance)> = {"<GetInstanceId(instance)>", <if(network.templateData.instanceNameToGroupIdMap.(instance.name))> <network.templateData.instanceNameToGroupIdMap.(instance.name)> <else>0<endif>, <GetInstanceId(instance)>_scheduler, <
 NumInputs(instance)>, <NumOutputs(instance)>, 0, 0, NULL, 0};
 <endif>
@@ -205,7 +141,7 @@ extern void <instance.name>_initialize(<instance.actor.inputs: { port | unsigned
 >>
 
 actionScheduler(instance) ::= <<
-<if(instance.actor || instance.broadcast)>
+<if(instance.actor)>
 extern void <instance.name>_scheduler(struct schedinfo_s *si);
 <endif>
 >>
@@ -353,9 +289,6 @@ printNetwork(network, options) ::= <<
 // FIFO pointer assignments
 
 <network.vertices: assignFifos()>
-
-////////////////////////////////////////////////////////////////////////////////
-<network.entities: declareBroadcast()>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
