@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.cal.ui;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.cal.cal.AstAction;
@@ -37,10 +37,9 @@ import net.sf.orcc.cal.cal.CalPackage;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.INode;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.resource.DefaultLocationInFileProvider;
-import org.eclipse.xtext.util.ITextRegion;
 
 /**
  * This class provides location for the objects of the AST.
@@ -60,24 +59,29 @@ public class CalLocationProvider extends DefaultLocationInFileProvider {
 	}
 
 	@Override
-	protected ITextRegion getTextRegion(EObject obj, boolean isSignificant) {
-		INode node = NodeModelUtils.findActualNodeFor(obj);
-		if (node == null && obj instanceof AstState) {
-			AstState state = (AstState) obj;
-			if (state.getNode() instanceof INode) {
-				return ITextRegion.EMPTY_REGION;
-			} else {
-				if (obj.eContainer() == null)
-					return ITextRegion.EMPTY_REGION;
-				return getTextRegion(obj.eContainer(), isSignificant);
+	protected List<INode> getLocationNodes(EObject obj) {
+		if (obj instanceof AstState) {
+			List<INode> result = new ArrayList<INode>();
+			Object astStateNode = ((AstState) obj).getNode();
+			if (astStateNode instanceof INode) {
+				result.add((INode) astStateNode);
 			}
+			return result;
+		} else {
+			return super.getLocationNodes(obj);
 		}
-		List<INode> nodes = null;
-		if (isSignificant)
-			nodes = getLocationNodes(obj);
-		if (nodes == null || nodes.isEmpty())
-			nodes = Collections.<INode> singletonList(node);
-		return createRegion(nodes);
+
 	}
 
+	@Override
+	protected ICompositeNode findNodeFor(EObject semanticObject) {
+		ICompositeNode node = super.findNodeFor(semanticObject);
+		if (node == null && semanticObject instanceof AstState) {
+			AstState obj = (AstState) semanticObject;
+			return obj.getNode() instanceof INode ? ((INode) obj.getNode())
+					.getParent() : null;
+		} else {
+			return node;
+		}
+	}
 }
