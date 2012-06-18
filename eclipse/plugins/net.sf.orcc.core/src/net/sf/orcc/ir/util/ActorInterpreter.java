@@ -119,7 +119,11 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 *            parameters of the instance of the given actor
 	 */
 	public ActorInterpreter(Actor actor, List<Argument> arguments) {
-		this.arguments = arguments;
+		if (arguments == null) {
+			this.arguments = Collections.emptyList();
+		} else {
+			this.arguments = arguments;
+		}
 		exprInterpreter = new ExpressionEvaluator();
 		setActor(actor);
 	}
