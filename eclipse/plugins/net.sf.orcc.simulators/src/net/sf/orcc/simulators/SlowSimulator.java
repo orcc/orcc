@@ -36,24 +36,19 @@ import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.runtime.SimulatorFifo;
 import net.sf.orcc.runtime.impl.GenericSource;
 import net.sf.orcc.util.Attribute;
@@ -83,7 +78,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private int fifoSize;
 
-	protected Map<Instance, ActorInterpreter> interpreters;
+	protected Map<Actor, ActorInterpreter> interpreters;
 
 	protected IProject project;
 
@@ -95,13 +90,27 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected String xdfFile;
 
+	/**
+	 * Creates FIFOs and connects ports together.
+	 * 
+	 * @param src
+	 *            name of the source actor
+	 * @param srcPort
+	 *            source port
+	 * @param tgt
+	 *            name of the target actor
+	 * @param tgtPort
+	 *            target port
+	 * @param fifoSize
+	 *            size of the FIFO
+	 */
 	@SuppressWarnings("unchecked")
-	protected void connectActors(Instance src, Port srcPort, Instance tgt,
+	protected void connectFifos(String src, Port srcPort, String tgt,
 			Port tgtPort, int fifoSize) {
 		SimulatorFifo fifo = null;
 		if (enableTraces) {
-			String fifoName = src.getName() + "_" + srcPort.getName() + "_"
-					+ tgt.getName() + "_" + tgtPort.getName();
+			String fifoName = src + "_" + srcPort.getName() + "_" + tgt + "_"
+					+ tgtPort.getName();
 			fifo = new SimulatorFifo(srcPort.getType(), fifoSize, traceFolder,
 					fifoName, enableTraces);
 		} else {
@@ -139,22 +148,40 @@ public class SlowSimulator extends AbstractSimulator {
 			Vertex srcVertex = connection.getSource();
 			Vertex tgtVertex = connection.getTarget();
 
-			if (srcVertex instanceof Instance && tgtVertex instanceof Instance) {
+			if (srcVertex instanceof Actor && tgtVertex instanceof Actor) {
 				// get FIFO size (user-defined nor default)
 				Integer connectionSize = connection.getSize();
 				int size = (connectionSize == null) ? fifoSize : connectionSize;
 
 				// create the communication FIFO between source and target
 				// actors
-				Instance src = (Instance) srcVertex;
-				Instance tgt = (Instance) tgtVertex;
+				Actor src = (Actor) srcVertex;
+				Actor tgt = (Actor) tgtVertex;
 				Port srcPort = connection.getSourcePort();
 				Port tgtPort = connection.getTargetPort();
 				// connect source and target actors
 				if ((srcPort != null) && (tgtPort != null)) {
-					connectActors(src, srcPort, tgt, tgtPort, size);
+					connectFifos(src.getName(), srcPort, tgt.getName(),
+							tgtPort, size);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Visits the network and creates one interpreter per actor.
+	 * 
+	 * @param network
+	 *            the network
+	 */
+	protected void createInterpreters(Network network) {
+		for (Vertex vertex : network.getChildren()) {
+			Actor actor = vertex.getAdapter(Actor.class);
+
+			ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
+					actor, null, getWriteListener());
+
+			interpreters.put(actor, interpreter);
 		}
 	}
 
@@ -163,8 +190,8 @@ public class SlowSimulator extends AbstractSimulator {
 		GenericSource.setWriteListener(getWriteListener());
 
 		for (Vertex vertex : network.getChildren()) {
-			Instance instance = vertex.getAdapter(Instance.class);
-			ActorInterpreter interpreter = interpreters.get(instance);
+			Actor actor = vertex.getAdapter(Actor.class);
+			ActorInterpreter interpreter = interpreters.get(actor);
 			interpreter.initialize();
 		}
 	}
@@ -184,45 +211,14 @@ public class SlowSimulator extends AbstractSimulator {
 		vtlFolders = OrccUtil.getOutputFolders(project);
 	}
 
-	/**
-	 * Visit the network graph for instantiating the vertexes (actors we want to
-	 * simulate). Created actor instances are stored in the simuActorsMap.
-	 * 
-	 * @param graph
-	 * @throws OrccException
-	 * @throws FileNotFoundException
-	 */
-	protected void instantiateNetwork(Network network) throws OrccException,
-			FileNotFoundException {
-		// Loop over the graph vertexes and get instances definition for
-		// instantiating the network to simulate.
-		for (Vertex vertex : network.getChildren()) {
-			Instance instance = vertex.getAdapter(Instance.class);
-			Actor actor = vertex.getAdapter(Actor.class);
-
-			// copy actor with references (in case it references units)
-			Actor clonedActor = IrUtil.copy(actor);
-			instance.setEntity(clonedActor);
-
-			// add the cloned actor to the resource of the original actor.
-			// the interpreter will need that information
-			actor.eResource().getContents().add(clonedActor);
-
-			ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-					clonedActor, instance.getArguments(), getWriteListener());
-
-			interpreters.put(instance, interpreter);
-		}
-	}
-
 	protected void runNetwork(Network network) {
 		boolean isAlive = true;
 		do {
 			boolean hasExecuted = false;
 			for (Vertex vertex : network.getChildren()) {
 				int nbFiring = 0;
-				Instance instance = vertex.getAdapter(Instance.class);
-				ActorInterpreter interpreter = interpreters.get(instance);
+				Actor actor = vertex.getAdapter(Actor.class);
+				ActorInterpreter interpreter = interpreters.get(actor);
 
 				while (interpreter.schedule()) {
 					// check for cancelation
@@ -247,65 +243,27 @@ public class SlowSimulator extends AbstractSimulator {
 	public void start(String mode) {
 		try {
 			SimulatorDescriptor.killDescriptors();
-			interpreters = new HashMap<Instance, ActorInterpreter>();
+			interpreters = new HashMap<Actor, ActorInterpreter>();
 
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 			ResourceSet set = new ResourceSetImpl();
 			Network network = EcoreHelper.getEObject(set, file);
 
-			// instantiate and flattens network
-			new Instantiator(false).doSwitch(network);
+			// full instantiation (no more instances)
+			new Instantiator(true).doSwitch(network);
+
+			// flattens network
 			new NetworkFlattener().doSwitch(network);
 
-			// Parse XDF file, do some transformations and return the
-			// graph corresponding to the flat network instantiation.
-			instantiateNetwork(network);
-			updateConnections(network);
+			// create interpreters, connect network, initialize, and run
+			createInterpreters(network);
 			connectNetwork(network);
 			initializeNetwork(network);
 			runNetwork(network);
 			SimulatorDescriptor.killDescriptors();
-		} catch (OrccException e) {
-			throw new OrccRuntimeException(e.getMessage());
-		} catch (FileNotFoundException e) {
-			throw new OrccRuntimeException(e.getMessage());
 		} finally {
 			// clean up to prevent memory leak
 			interpreters = null;
-		}
-	}
-
-	protected void updateConnections(Network network) throws OrccException {
-		for (Connection connection : network.getConnections()) {
-			Vertex srcVertex = connection.getSource();
-			Vertex tgtVertex = connection.getTarget();
-
-			if (srcVertex instanceof Instance) {
-				Instance source = (Instance) srcVertex;
-				String srcPortName = connection.getSourcePort().getName();
-
-				Port srcPort;
-				if (source.isActor()) {
-					srcPort = source.getActor().getOutput(srcPortName);
-				} else {
-					srcPort = source.getBroadcast().getOutput(srcPortName);
-				}
-				connection.setSourcePort(srcPort);
-			}
-
-			if (tgtVertex instanceof Instance) {
-				Instance target = (Instance) tgtVertex;
-				String dstPortName = connection.getTargetPort().getName();
-
-				Port dstPort;
-				if (target.isActor()) {
-					dstPort = target.getActor().getInput(dstPortName);
-				} else {
-					dstPort = target.getBroadcast().getInput();
-				}
-
-				connection.setTargetPort(dstPort);
-			}
 		}
 	}
 
