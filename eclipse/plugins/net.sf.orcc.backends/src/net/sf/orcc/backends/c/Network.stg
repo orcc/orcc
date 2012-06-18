@@ -235,10 +235,6 @@ printNetwork(network, options) ::= <<
 #include \<time.h\>
 <endif>
 
-#ifdef __APPLE__
-#include "SDL.h"
-#endif
-
 #ifndef _WIN32
 #define __USE_GNU
 #endif
