@@ -60,9 +60,9 @@ printDesign(instance) ::= <<
 \<!-- /<printHierarchicalPath(instance.hierarchicalId)> --\>
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
-	<actorPorts()>
+	<actorPorts(instance)>
 	<parameters(instance.arguments)>
-	<stateVars()>
+	<stateVars(instance)>
 	<instance.actor.actions: typeDef()>
 	<instance.actor.actions: action(); separator="\n">
 	<fpgaType()>
