@@ -584,13 +584,17 @@ public class NetworkImpl extends GraphImpl implements Network {
 		List<Instance> instances = new ArrayList<Instance>();
 
 		for (Vertex vertex : getChildren()) {
-			Instance instance = vertex.getAdapter(Instance.class);
 			Actor candidate = vertex.getAdapter(Actor.class);
-			if (candidate == actor) {
-				instances.add(instance);
-			} else {
+			if (candidate == null) {
+				// vertex is a network or an instance of a network
 				Network network = vertex.getAdapter(Network.class);
 				instances.addAll(network.getInstancesOf(actor));
+			} else if (candidate == actor) {
+				Instance instance = vertex.getAdapter(Instance.class);
+				if (instance != null) {
+					// make sure the vertex is an instance
+					instances.add(instance);
+				}
 			}
 		}
 
