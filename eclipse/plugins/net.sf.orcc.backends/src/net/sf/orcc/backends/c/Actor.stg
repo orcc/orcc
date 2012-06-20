@@ -126,29 +126,29 @@ void <instance.name>_initialize(<instance.actor.inputs: { port | unsigned int fi
 }
 >>
 
-initializeFifoId(port) ::= <<
+initializeFifoId(port) ::= <%
 <if(instance.incomingPortMap.(port))>
 	fifo_<getPortName(port)>_id = fifo_<port.name>_id;
 <else>
 	/* input port getPortName(port) not connected */
 <endif>
->>
+%>
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 printInstructions(instructions) ::= <<
-<instructions: {instr | <printAttributes(instr)> <
+<instructions: {instr | <printAttributes(instr)><
 if (instr.assign)><printAssign(assign=instr)><
 elseif (instr.call)><printCall(call=instr)><
 elseif (instr.load)><printLoad(load=instr)><
 elseif (instr.return)><printReturn(return=instr)><
 elseif (instr.store)><printStore(store=instr)><
+elseif (instr.instTernary)><printInstTernary(instr)><
 elseif (instr.instSpecific)><printInstSpecific(instr)><
-endif>}>
+endif>}; separator="\n">
 >>
 
 printAssign(assign) ::= <<
-
 <assign.target.variable.indexedName> = <assign.value>;
 >>
 
@@ -209,7 +209,6 @@ endif>
 >>
 
 printLoad(load) ::= <<
-
 <if (action.inputPattern.varToPortMap.(load.source.variable) || action.outputPattern.varToPortMap.(load.source.variable) || action.peekPattern.varToPortMap.(load.source.variable))
 ><load.target.variable.indexedName> = tokens_<getPort(load.source.variable)>[(index_<getPort(load.source.variable)> + (<first(load.indexes)>)) % SIZE_<getPort(load.source.variable)>];<
 else
@@ -218,7 +217,6 @@ endif>
 >>
 
 printReadEnd(port, numTokens) ::= <<
-
 <if(options.enableTrace)>
 {
 	int i;
@@ -238,7 +236,6 @@ endif>
 >>
 
 printStore(store) ::= <<
-
 <if(action.inputPattern.varToPortMap.(store.target.variable) || action.outputPattern.varToPortMap.(store.target.variable) || action.peekPattern.varToPortMap.(store.target.variable))
 ><if(action.outputPattern.varToPortMap.(store.target.variable).native)
 >printf("<getPort(store.target.variable)> = %i\n", <store.value>);<
@@ -251,7 +248,6 @@ endif>
 >>
 
 printWriteEnd(port, numTokens) ::= <<
-
 <if(options.enableTrace)>
 {
 	int i;
@@ -264,6 +260,10 @@ printWriteEnd(port, numTokens) ::= <<
 index_<port.name> += <numTokens>;
 >>
 
+printInstTernary(instTernary) ::= <<
+<instTernary.target.variable.indexedName> = <instTernary.conditionValue> ? <instTernary.trueValue> : <instTernary.falseValue>;
+>>
+
 // specific instruction
 printInstSpecific(instSpecific) ::= <<>>
 
@@ -272,21 +272,20 @@ printInstSpecific(instSpecific) ::= <<>>
 ///////////////////////////////////////////////////////////////////////////////
 
 printNodes(nodes) ::= <<
-<nodes: {node | <printAttributes(node)> <if (node.nodeBlock)><printBlockNode(node)><
+<nodes: {node | <printAttributes(node)><if (node.nodeBlock)><printBlockNode(node)><
 elseif (node.nodeIf)><printIfNode(node)><
 elseif (node.nodeWhile)><printWhileNode(node)><
 elseif (node.nodeSpecific)><printNodeSpecific(node)><
-endif>}>
+endif>}; separator="\n">
 >>
 
 // block node
-printBlockNode(blockNode) ::= <<
+printBlockNode(blockNode) ::= <%
 <printInstructions(blockNode.instructions)>
->>
+%>
 
 // if node
 printIfNode(ifNode) ::= <<
-
 if (<ifNode.condition>) {
 	<printNodes(ifNode.thenNodes)>
 }<if(ifNode.elseNodes)> else {
@@ -297,12 +296,12 @@ if (<ifNode.condition>) {
 
 // while node
 printWhileNode(whileNode) ::= <<
-
 while (<whileNode.condition>) {
 	<printNodes(whileNode.nodes)>
 }
 <printBlockNode(whileNode.joinNode)>
 >>
+
 
 // specific node
 printNodeSpecific(nodeSpecific) ::= <<>>
