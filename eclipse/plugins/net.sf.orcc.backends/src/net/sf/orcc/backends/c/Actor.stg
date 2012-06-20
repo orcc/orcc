@@ -138,11 +138,11 @@ initializeFifoId(port) ::= <%
 ///////////////////////////////////////////////////////////////////////////////
 printInstructions(instructions) ::= <<
 <instructions: {instr | <printAttributes(instr)><
-if (instr.assign)><printAssign(assign=instr)><
-elseif (instr.call)><printCall(call=instr)><
-elseif (instr.load)><printLoad(load=instr)><
-elseif (instr.return)><printReturn(return=instr)><
-elseif (instr.store)><printStore(store=instr)><
+if (instr.instAssign)><printAssign(assign=instr)><
+elseif (instr.instCall)><printCall(call=instr)><
+elseif (instr.instLoad)><printLoad(load=instr)><
+elseif (instr.instReturn)><printReturn(return=instr)><
+elseif (instr.instStore)><printStore(store=instr)><
 elseif (instr.instTernary)><printInstTernary(instr)><
 elseif (instr.instSpecific)><printInstSpecific(instr)><
 endif>}; separator="\n">
