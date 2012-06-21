@@ -156,10 +156,9 @@ public class NetworkFlattener extends DfSwitch<Void> {
 		}
 
 		// move entities/instances and vertices in this network
-		network.getChildren().addAll(subNetwork.getChildren());
 		List<Vertex> vertices = new ArrayList<Vertex>(subNetwork.getChildren());
 		for (Vertex vertex : vertices) {
-			network.getVertices().add(vertex);
+			network.add(vertex);
 		}
 
 		// move connections between entities in this network
