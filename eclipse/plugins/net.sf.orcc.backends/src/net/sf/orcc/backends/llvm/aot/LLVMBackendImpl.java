@@ -152,8 +152,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
 				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
-				new DfVisitor<Void>(new ListInitializer()),
-				new DfVisitor<Void>(new TemplateInfoComputing()) };
+				new DfVisitor<Void>(new ListInitializer()), };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(network);
@@ -169,6 +168,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 			}
 		}
 
+		new DfVisitor<Void>(new TemplateInfoComputing()).doSwitch(network);
 		network.computeTemplateMaps();
 
 		for (Actor actor : network.getAllActors()) {
