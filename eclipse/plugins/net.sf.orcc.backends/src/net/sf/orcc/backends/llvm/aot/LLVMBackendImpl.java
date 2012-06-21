@@ -57,7 +57,6 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
@@ -160,10 +159,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 			transformation.doSwitch(network);
 			if (debug) {
 				ResourceSet set = new ResourceSetImpl();
-				for (Vertex vertex : network.getChildren()) {
-					if (!IrUtil.serializeActor(set, path, vertex)) {
+				for (Actor actor : network.getAllActors()) {
+					if (actor.getFileName() != null
+							&& !IrUtil.serializeActor(set, path, actor)) {
 						System.err.println("Error with " + transformation
-								+ " on instance " + vertex.getLabel());
+								+ " on actor " + actor.getName());
 					}
 				}
 			}
