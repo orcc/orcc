@@ -137,7 +137,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		new NetworkFlattener().doSwitch(network);
 
 		DfSwitch<?>[] transformations = { new BroadcastAdder(),
-				new TypeResizer(true, true, false), new UnitImporter(),
+				new UnitImporter(), new TypeResizer(true, true, false),
 				new DfVisitor<Void>(new SSATransformation()),
 				new DeadGlobalElimination(),
 				new DfVisitor<Void>(new DeadCodeElimination()),
