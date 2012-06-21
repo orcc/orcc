@@ -753,10 +753,6 @@ public enum OpBinary implements Enumerator {
 	 */
 	public OpBinary getInverse() {
 		switch (this) {
-		case DIV:
-			return TIMES;
-		case DIV_INT:
-			return TIMES;
 		case EQ:
 			return NE;
 		case GE:
@@ -767,18 +763,8 @@ public enum OpBinary implements Enumerator {
 			return GT;
 		case LT:
 			return GE;
-		case MINUS:
-			return PLUS;
 		case NE:
 			return EQ;
-		case PLUS:
-			return MINUS;
-		case SHIFT_LEFT:
-			return SHIFT_RIGHT;
-		case SHIFT_RIGHT:
-			return SHIFT_LEFT;
-		case TIMES:
-			return DIV;
 		default:
 			return this;
 		}
