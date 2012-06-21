@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
@@ -47,6 +48,7 @@ import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Param;
@@ -163,6 +165,21 @@ public class Inliner extends AbstractIrVisitor<Void> {
 			}
 			for (Expression e : store.getIndexes()) {
 				super.doSwitch(e);
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstSpecific(InstSpecific specific) {
+			if (specific instanceof InstTernary) {
+				InstTernary ternary = (InstTernary) specific;
+				Var var = ternary.getTarget().getVariable();
+				if (localToLocalsMap.containsKey(var)) {
+					ternary.getTarget().setVariable(localToLocalsMap.get(var));
+				}
+				doSwitch(ternary.getConditionValue());
+				doSwitch(ternary.getTrueValue());
+				doSwitch(ternary.getFalseValue());
 			}
 			return null;
 		}
