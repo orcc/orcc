@@ -37,8 +37,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
+import net.sf.orcc.backends.c.CNetworkTemplateData;
 import net.sf.orcc.backends.promela.transform.GuardsExtractor;
 import net.sf.orcc.backends.promela.transform.NetworkStateDefExtractor;
+import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
 import net.sf.orcc.backends.promela.transform.PromelaTokenAnalyzer;
 import net.sf.orcc.backends.transform.Inliner;
@@ -52,6 +54,7 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
@@ -60,6 +63,7 @@ import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -105,8 +109,6 @@ public class PromelaBackendImpl extends AbstractBackend {
 		DfSwitch<?>[] transformations = {
 				new UnitImporter(),
 				new DfVisitor<Void>(new Inliner(true, true)),
-				// new ListFlattener(), //Promela does not support multi
-				// dimensional arrays
 				new RenameTransformation(this.transformations),
 				new DfVisitor<Object>(new PhiRemoval()) };
 		for (DfSwitch<?> transformation : transformations) {
@@ -126,13 +128,16 @@ public class PromelaBackendImpl extends AbstractBackend {
 			transformation.doSwitch(instance.getActor());
 		}
 		new PromelaTokenAnalyzer(netStateDef).doSwitch(instance);
+		new PromelaSchedulabilityTest(netStateDef).doSwitch(instance);
 	}
 
-	private void transformInstances(List<Instance> instances)
+	private void transformInstances(EList<Vertex> vertices)
 			throws OrccException {
 		write("Transforming instances...\n");
-		for (Instance instance : instances) {
-			transformInstance(instance);
+		for (Vertex v : vertices) {
+			if(v instanceof Instance) {
+				transformInstance((Instance)v);
+			}
 		}
 	}
 
@@ -143,6 +148,9 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
+		CNetworkTemplateData data = new CNetworkTemplateData();
+		data.computeHierarchicalTemplateMaps(network);
+		network.setTemplateData(data);
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
@@ -156,13 +164,12 @@ public class PromelaBackendImpl extends AbstractBackend {
 		instancePrinter.getOptions().put("loadPeeks", loadPeeks);
 		instancePrinter.getOptions().put("network", network);
 
-		List<Actor> actors = network.getAllActors();
-		transformActors(actors);
+		transformActors(network.getAllActors());
 
 		netStateDef = new NetworkStateDefExtractor();
 		netStateDef.doSwitch(network);
 
-		transformInstances(network.getInstances());
+		transformInstances(network.getChildren());
 		printInstances(network);
 
 		new BroadcastAdder().doSwitch(network);

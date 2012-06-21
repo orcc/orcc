@@ -45,10 +45,12 @@ import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
@@ -70,43 +72,53 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 
 		@Override
 		public Void caseBlockIf(BlockIf nodeIf) {
-			conditionVars.push(new HashSet<Var>());
-			inCondition = true;
+			ifConditionVars.push(new HashSet<Var>());
+			inIfCondition = true;
 			doSwitch(nodeIf.getCondition());
-			inCondition = false;
+			inIfCondition = false;
 			doSwitch(nodeIf.getThenBlocks());
 			doSwitch(nodeIf.getElseBlocks());
-			conditionVars.pop();
+			ifConditionVars.pop();
 			doSwitch(nodeIf.getJoinBlock());
 			return null;
 		}
 
 		@Override
 		public Void caseBlockWhile(BlockWhile nodeWhile) {
-			conditionVars.push(new HashSet<Var>());
-			inCondition = true;
+			whileConditionVars.push(new HashSet<Var>());
+			inWhileCondition = true;
 			doSwitch(nodeWhile.getCondition());
-			inCondition = false;
+			inWhileCondition = false;
 			doSwitch(nodeWhile.getBlocks());
-			conditionVars.pop();
+			whileConditionVars.pop();
 			doSwitch(nodeWhile.getJoinBlock());
 			return null;
 		}
 
 		@Override
 		public Void caseExprVar(ExprVar var) {
-			if (inCondition) {
-				conditionVars.peek().add(var.getUse().getVariable());
+			if (inIfCondition) {
+				ifConditionVars.peek().add(var.getUse().getVariable());
+			} else if (inWhileCondition) {
+				whileConditionVars.peek().add(var.getUse().getVariable());
 			} else {
 				addVariableDep(currentTargetVar, var.getUse().getVariable());
 			}
 			return null;
 		}
-
+		
 		@Override
 		public Void caseInstAssign(InstAssign assign) {
 			addTargetVar(assign.getTarget().getVariable());
-			return super.caseInstAssign(assign);
+			super.caseInstAssign(assign);
+			currentTargetVar = null;
+			return null; 
+		}
+		
+		@Override
+		public Void caseInstReturn(InstReturn inst) {
+			// skip returns
+			return null;
 		}
 
 		@Override
@@ -121,6 +133,9 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		public Void caseInstLoad(InstLoad load) {
 			addVariableDep(load.getTarget().getVariable(), load.getSource()
 					.getVariable());
+			for (Expression e : load.getIndexes()) {
+				doSwitch(e);
+			}
 			if (inScheduler) {
 				// this might not be needed as 'casePattern' should do the same
 				varsUsedInScheduling.add(load.getSource().getVariable());
@@ -138,18 +153,25 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		public Void caseInstStore(InstStore store) {
 			addTargetVar(store.getTarget().getVariable());
 			doSwitch(store.getValue());
+			for (Expression e : store.getIndexes()) {
+				doSwitch(e);
+			}
 			return null;
 		}
 	}
 
-	private Stack<Set<Var>> conditionVars = new Stack<Set<Var>>();
+	private Stack<Set<Var>> ifConditionVars = new Stack<Set<Var>>();
 
+	private Stack<Set<Var>> whileConditionVars = new Stack<Set<Var>>();
+	
 	private Var currentTargetVar = null;
 
 	private Map<Port, Port> fifoTargetToSourceMap = new HashMap<Port, Port>();
 
-	private boolean inCondition = false;
+	private boolean inIfCondition = false;
 
+	private boolean inWhileCondition = false;
+	
 	private Set<Port> inputPortsUsedInScheduling = new HashSet<Port>();
 
 	private boolean inScheduler = false;
@@ -164,6 +186,8 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 
 	private Map<Var, Set<Var>> variableDependency = new HashMap<Var, Set<Var>>();
 
+	private Map<Var, Set<Var>> variableDependencyNoIf = new HashMap<Var, Set<Var>>();
+	
 	private Set<Var> variablesWithLoops = new HashSet<Var>();
 
 	private Set<Var> varsUsedInScheduling = new HashSet<Var>();
@@ -183,8 +207,13 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		currentTargetVar = target;
 		if (!variableDependency.containsKey(target)) {
 			variableDependency.put(target, new HashSet<Var>());
+			variableDependencyNoIf.put(target, new HashSet<Var>());
 		}
-		for (Set<Var> s : conditionVars) {
+		for (Set<Var> s : whileConditionVars) {
+			variableDependency.get(target).addAll(s);
+			variableDependencyNoIf.get(target).addAll(s);
+		}
+		for (Set<Var> s : ifConditionVars) {
 			variableDependency.get(target).addAll(s);
 		}
 	}
@@ -195,14 +224,16 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 	private void addVariableDep(Var target, Var source) {
 		if (!variableDependency.containsKey(target)) {
 			variableDependency.put(target, new HashSet<Var>());
+			variableDependencyNoIf.put(target, new HashSet<Var>());
 		}
 		variableDependency.get(target).add(source);
+		variableDependencyNoIf.get(target).add(source);
 	}
 
 	void analyzeVarDeps() {
 		visited.clear();
 		for (Var currentVar : variableDependency.keySet()) {
-			getTransitiveClosure(currentVar, visited);
+			getTransitiveClosure(currentVar, visited, true);
 			if (visited.contains(currentVar)) {
 				variablesWithLoops.add(currentVar);
 			}
@@ -235,7 +266,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 			for (Port port : action.getOutputPattern().getPorts()) {
 				visited.clear();
 				Var portVar = action.getOutputPattern().getVariable(port);
-				getTransitiveClosure(portVar, visited);
+				getTransitiveClosure(portVar, visited, true);
 				if (!outputPortToInputPortMap.containsKey(port)) {
 					outputPortToDepVariablesMap.put(port, new HashSet<Var>());
 					outputPortToInputPortMap.put(port, new HashSet<Port>());
@@ -243,7 +274,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 				for (Var var : visited) {
 					outputPortToDepVariablesMap.get(port).add(var);
 					if (action.getInputPattern().contains(var)) {
-						outputPortToInputPortMap.get(port).add(
+						outputPortToInputPortMap.get(port).add( 
 								action.getInputPattern().getPort(var));
 					}
 				}
@@ -277,17 +308,18 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		return portsUsedInScheduling;
 	}
 
-	public void getTransitiveClosure(Var variable, Set<Var> transitiveClosure) {
-		if (variableDependency.containsKey(variable)) {
-			for (Var v : variableDependency.get(variable)) {
+	public void getTransitiveClosure(Var variable, Set<Var> transitiveClosure, boolean includeIfConditions) {
+		Map<Var, Set<Var>> varDep = includeIfConditions ? variableDependency : variableDependencyNoIf;
+		if (varDep.containsKey(variable)) {
+			for (Var v : varDep.get(variable)) {
 				if (!transitiveClosure.contains(v)) {
 					transitiveClosure.add(v);
-					getTransitiveClosure(v, transitiveClosure);
+					getTransitiveClosure(v, transitiveClosure, includeIfConditions);
 				}
 			}
 		}
 	}
-
+	
 	/**
 	 * @return the variableDependency
 	 */
@@ -300,6 +332,10 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 	 */
 	public Set<Var> getVarsUsedInScheduling() {
 		return varsUsedInScheduling;
+	}
+	
+	public boolean hasLoop(Var var) {
+		return variablesWithLoops.contains(var);
 	}
 
 	/*
