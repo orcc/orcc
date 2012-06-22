@@ -98,6 +98,28 @@ void source_init() {
 	loopsCount = nbLoops;
 }
 
+int source_open(char* fileName) {
+	stop = 0;
+	nb = 0;
+
+	file = fopen(fileName, "rb");
+	if (file == NULL) {
+		if (input_file == NULL) {
+			input_file = "<null>";
+		}
+
+		fprintf(stderr, "could not open file \"%s\"\n", fileName);
+		wait_for_key();
+		exit(1);
+	}
+	if(PRINT_SPEED) {
+		atexit(printSpeed);
+	}
+	startTime = clock();
+	loopsCount = nbLoops;
+	return (int)file;
+}
+
 unsigned int source_getNbLoop(void)
 {
 	return nbLoops;
@@ -117,6 +139,13 @@ int source_sizeOfFile() {
 	struct stat st; 
 	fstat(fileno(file), &st); 
 	return st.st_size; 
+}
+
+int source_sizeOfFileFd(int fdVal) {
+	FILE* fd = (FILE*) fdVal;
+	struct stat st;
+	fstat(fileno(fd), &st);
+	return st.st_size;
 }
 
 int source_is_stopped() {
@@ -141,9 +170,31 @@ void source_rewind() {
 	}
 }
 
+void source_rewindFd(int fdVal) {
+	FILE* fd = (FILE*) fdVal;
+	if(fd != NULL) {
+		rewind(fd);
+		if (genetic){
+			if(nb < LOOP_NUMBER) {
+				nb++;
+			}
+			else{
+				stop = 1;
+			}
+		}
+	}
+}
+
 void source_close() {
 	if(file != NULL) {
 		int n = fclose(file);
+	}
+}
+
+void source_closeFd(int fdVal) {
+	FILE* fd = (FILE*) fdVal;
+	if(fd != NULL) {
+		int n = fclose(fd);
 	}
 }
 
@@ -175,6 +226,18 @@ unsigned int source_readByte(){
 
 void source_readNBytes(unsigned char *outTable, unsigned int nbTokenToRead){
 	int n = fread(outTable, 1, nbTokenToRead, file);
+
+	if(n < nbTokenToRead) {
+		fprintf(stderr,"Problem when reading input file.\n");
+		exit(-4);
+	}
+	nbByteRead += nbTokenToRead * 8;
+}
+
+
+void source_readNBytesFd(int fdVal, unsigned char *outTable, unsigned int nbTokenToRead){
+	FILE* fd = (FILE*) fdVal;
+	int n = fread(outTable, 1, nbTokenToRead, fd);
 
 	if(n < nbTokenToRead) {
 		fprintf(stderr,"Problem when reading input file.\n");
