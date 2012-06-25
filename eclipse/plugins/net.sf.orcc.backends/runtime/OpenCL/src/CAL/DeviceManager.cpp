@@ -43,6 +43,7 @@ DeviceManager::DeviceManager(cl_device_type deviceType) :
 		deviceType(deviceType) {
 	if (findPlatforms()){
 		context = createContext(deviceType,*platforms);
+		commandQueue = createCommandQueue();
 	}
 
 }
@@ -93,6 +94,10 @@ cl_context DeviceManager::createContext(cl_device_type deviceType, cl_platform_i
 	return context;
 }
 
+cl_command_queue DeviceManager::createCommandQueue(){
+	return createCommandQueue(context,devices);
+}
+
 cl_command_queue DeviceManager::createCommandQueue(cl_context context,
 		cl_device_id *device) {
 	cl_int errNum;
@@ -124,9 +129,6 @@ cl_command_queue DeviceManager::createCommandQueue(cl_context context,
 		return NULL;
 	}
 
-	// In this example, we just choose the first available device.  In a
-	// real program, you would likely use all available devices or choose
-	// the highest performance device based on OpenCL device queries
 	commandQueue = clCreateCommandQueue(context, devices[0], 0, NULL);
 	if (commandQueue == NULL) {
 		delete[] devices;
@@ -137,6 +139,10 @@ cl_command_queue DeviceManager::createCommandQueue(cl_context context,
 	*device = devices[0];
 	delete[] devices;
 	return commandQueue;
+}
+
+cl_program DeviceManager::createProgram(const char* fileName){
+	return createProgram(context,devices[0],fileName);
 }
 
 cl_program DeviceManager::createProgram(cl_context context, cl_device_id device,
@@ -179,11 +185,22 @@ cl_program DeviceManager::createProgram(cl_context context, cl_device_id device,
 	return program;
 }
 
+bool DeviceManager::findDevices(){
+	cl_int errNum;
+	// Use always the Default Platform
+	errNum = clGetDeviceIDs(platforms[0],CL_DEVICE_TYPE_ALL,MAX_DEVICES,devices,&numDevices);
+	if (errNum != CL_SUCCESS) {
+			std::cerr << "Error: Failed to get host Device IDs" << std::endl;
+			return false;
+	}
+
+}
+
 bool DeviceManager::findPlatforms() {
 	cl_int errNum;
 
 	errNum = clGetPlatformIDs(MAX_PLATFORMS, platforms, &numPlatforms);
-	if (errNum) {
+	if (errNum != CL_SUCCESS) {
 		std::cerr << "Error: Failed to get host Platforms IDs" << std::endl;
 		return false;
 	}
@@ -204,7 +221,7 @@ bool DeviceManager::findPlatforms() {
 		// Get Platform Name
 		errNum = clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME,
 				sizeof(buffer), buffer, NULL);
-		if (errNum) {
+		if (errNum != CL_SUCCESS) {
 			std::cerr << "Error: Failed to get the platform name" << std::endl;
 			return false;
 		}
@@ -213,7 +230,7 @@ bool DeviceManager::findPlatforms() {
 		//Get Platform Version
 		errNum = clGetPlatformInfo(platforms[i], CL_PLATFORM_VERSION,
 				sizeof(buffer), buffer, NULL);
-		if (errNum) {
+		if (errNum != CL_SUCCESS) {
 			std::cerr << "Error: Failed to get the platform version"
 					<< std::endl;
 			return false;
@@ -223,7 +240,7 @@ bool DeviceManager::findPlatforms() {
 		//Get Platform Profile
 		errNum = clGetPlatformInfo(platforms[i], CL_PLATFORM_PROFILE,
 				sizeof(buffer), buffer, NULL);
-		if (errNum) {
+		if (errNum != CL_SUCCESS) {
 			std::cerr << "Error: Failed to get the platform profile"
 					<< std::endl;
 			return false;

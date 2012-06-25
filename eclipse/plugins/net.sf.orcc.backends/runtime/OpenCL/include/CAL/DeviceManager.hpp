@@ -39,6 +39,8 @@
 
 #define MAX_PLATFORMS 256
 
+#define MAX_DEVICES 16
+
 /* !
  *  \class DeviceManager
  *  \author Endri Bezati
@@ -51,26 +53,36 @@ public:
 	DeviceManager(cl_device_type);
 
 	~DeviceManager();
-
-	// Find OpenCL capable devices on the host
+	// Find the OpenCL capable devices on the host
+	bool findDevices();
+	// Find the OpenCL capable platforms on the host
 	bool findPlatforms();
 
 	// Choosing the OpenCL platform and creating a context
 	cl_context createContext(cl_device_type device_type, cl_platform_id &platforms);
 
 	// Choosing an available device and Creating the command queue
+	cl_command_queue createCommandQueue();
 	cl_command_queue createCommandQueue(cl_context context,
 			cl_device_id *device);
 
 	// Create an OpenCL Program
+	cl_program createProgram(const char* fileName);
 	cl_program createProgram(cl_context context, cl_device_id device,
 			const char* fileName);
 private:
+	// OpenCL Devices
+	cl_device_id devices[MAX_DEVICES];
+	cl_uint numDevices;
+	cl_device_type deviceType;
+
+	// OpenCL Platform
 	cl_platform_id platforms[MAX_PLATFORMS];
 	cl_uint numPlatforms;
-	cl_device_id devices;
-	cl_device_type deviceType;
+	// OpenCL Context
 	cl_context context;
+
+	// OpenCL Command Queue
 	cl_command_queue commandQueue;
 };
 #endif // __DEVICE_MANAGER_HPP__
