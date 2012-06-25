@@ -136,8 +136,11 @@ public class OpenCLPrinter {
 	 *            the instance to generate code for
 	 * @return <code>true</code> if the instance was cached
 	 */
-	public boolean print(String path, String kernelPath, Instance instance) {
-		String file = path + File.separator + instance.getName() + ".cpp";
+	public boolean print(String srcPath, String kernelPath, String includePath,
+			Instance instance) {
+		String file = srcPath + File.separator + instance.getName() + ".cpp";
+		String includeFile = includePath + File.separator + instance.getName()
+				+ ".hpp";
 		String kernelFile = kernelPath + File.separator + instance.getName()
 				+ ".cl";
 		if (instance.isNetwork()
@@ -152,10 +155,17 @@ public class OpenCLPrinter {
 				}
 			}
 			try {
-				// Print Host
+				// Print Host Header file
 				CharSequence sequence = new ActorPrinter()
-						.printInstance(instance);
-				PrintStream ps = new PrintStream(new FileOutputStream(file));
+						.printHeader(instance);
+				PrintStream ps = new PrintStream(new FileOutputStream(
+						includeFile));
+				ps.print(sequence.toString());
+				ps.close();
+
+				// Print Host source file
+				sequence = new ActorPrinter().printInstance(instance);
+				ps = new PrintStream(new FileOutputStream(file));
 				ps.print(sequence.toString());
 				ps.close();
 

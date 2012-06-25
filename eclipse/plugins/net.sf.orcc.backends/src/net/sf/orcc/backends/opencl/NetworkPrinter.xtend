@@ -53,11 +53,21 @@ class NetworkPrinter extends BasePrinter {
 		// Network: «network.simpleName»
 		// ////////////////////////////////////////////////////////////////////////////
 		#include "CAL/DeviceManager.hpp"
-
-
+		«FOR vertex : network.vertices»
+		«IF vertex instanceof Instance»
+		#include "«instanceName("",vertex as Instance,".hpp")»"
+		«ENDIF»
+		«ENDFOR»
+		
 		int main(int argc, char** argv){
 			// Intialize the context of an OpenCL GPU device
 			DeviceManager deviceManager = DeviceManager(CL_DEVICE_TYPE_GPU);
+			
+			«FOR vertex : network.vertices»
+			«IF vertex instanceof Instance»
+			«instanceName("",vertex as Instance,"")» «instanceName("i_",vertex as Instance,"")» = «instanceName("",vertex as Instance,"(deviceManager)")»;
+			«ENDIF»
+			«ENDFOR»
 			
 			return 0;
 		}
@@ -84,7 +94,7 @@ class NetworkPrinter extends BasePrinter {
 		src/«network.simpleName».cpp
 		«FOR vertex : network.vertices»
 		«IF vertex instanceof Instance»
-		«instanceName(vertex as Instance)»
+		«instanceName("src/",vertex as Instance,".cpp")»
 		«ENDIF»
 		«ENDFOR»
 		)
@@ -92,7 +102,7 @@ class NetworkPrinter extends BasePrinter {
 		'''	
 	}
 	
-	def instanceName(Instance instance){
-		'''src/«instance.simpleName».cpp'''
+	def instanceName(String prefix,Instance instance,String suffix){
+		'''«prefix»«instance.simpleName»«suffix»'''
 	}
 }

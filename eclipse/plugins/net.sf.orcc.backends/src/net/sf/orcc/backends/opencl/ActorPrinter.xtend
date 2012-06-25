@@ -51,12 +51,61 @@ class ActorPrinter extends BasePrinter {
 		// CAL Actor Source File: "«instance.actor.file»"
 		// Actor: «instance.simpleName»
 		// ////////////////////////////////////////////////////////////////////////////
+		#include "«instance.name».hpp"
+		#include <iostream>
+		
+		«instance.name»::«instance.name»(DeviceManager deviceManager)
+			:deviceManager(deviceManager){
+			}
+		
+		«instance.name»::~«instance.name»(){
+		}
+		
+		
+		void «instance.name»::initialize(){
+		}
+		
+		cl_uint «instance.name»::schedule(){
+		}
 		'''
 	}
 	
 	def printKernel(Instance instance)  {
 		'''
 		__kernel void «instance.simpleName»(
+		'''
+	}
+	
+	def printHeader(Instance instance){
+		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		var date = new Date();
+		'''
+		// ////////////////////////////////////////////////////////////////////////////
+		// EPFL - OpenCL Backend
+		// --
+		// Date :  «dateFormat.format(date)»
+		// CAL Actor Header File: "«instance.actor.file»"
+		// Actor: «instance.simpleName»
+		// ////////////////////////////////////////////////////////////////////////////
+		#ifndef __«instance.name.toUpperCase»_HPP__
+		#define __«instance.name.toUpperCase»_HPP__
+		
+		#include "CAL/DeviceManager.hpp"
+		
+		class «instance.name»{
+		public:
+			// Constuctor & Destructor
+			«instance.name»(DeviceManager);
+			~«instance.name»();
+			
+			// Methods
+			void initialize();
+			cl_uint schedule();
+		private:
+			DeviceManager deviceManager;	
+		};
+		
+		#endif // __«instance.name.toUpperCase»_HPP__
 		'''
 	}
 	

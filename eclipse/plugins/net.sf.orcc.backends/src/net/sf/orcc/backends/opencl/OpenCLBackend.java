@@ -60,6 +60,7 @@ public class OpenCLBackend extends AbstractBackend {
 	private boolean debugMode;
 	private String srcPath;
 	private String kernelSrcPath;
+	private String includePath;
 
 	@Override
 	protected void doInitializeOptions() {
@@ -69,11 +70,16 @@ public class OpenCLBackend extends AbstractBackend {
 		File srcDir = new File(path + File.separator + "src");
 		File kernelSrcDir = new File(srcDir.getPath() + File.separator
 				+ "kernels");
+		File includeDir = new File(path + File.separator + "include");
 		File buildDir = new File(path + File.separator + "build");
 
 		/** Create the directories if they do not exists **/
 		if (!srcDir.exists()) {
 			srcDir.mkdirs();
+		}
+
+		if (!includeDir.exists()) {
+			includeDir.mkdirs();
 		}
 
 		if (!kernelSrcDir.exists()) {
@@ -87,6 +93,7 @@ public class OpenCLBackend extends AbstractBackend {
 		/** Initialize the source Path **/
 		srcPath = srcDir.getPath();
 		kernelSrcPath = kernelSrcDir.getPath();
+		includePath = includeDir.getPath();
 	}
 
 	@Override
@@ -161,7 +168,7 @@ public class OpenCLBackend extends AbstractBackend {
 	@Override
 	public boolean printInstance(Instance instance) {
 		OpenCLPrinter printer = new OpenCLPrinter(!debugMode);
-		printer.print(srcPath, kernelSrcPath, instance);
+		printer.print(srcPath, kernelSrcPath, includePath, instance);
 		return false;
 	}
 
