@@ -33,6 +33,11 @@ import net.sf.orcc.backends.opencl.BasePrinter
 import net.sf.orcc.df.Instance
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.List
+import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.Type
+import net.sf.orcc.ir.Expression
+import net.sf.orcc.ir.TypeList
 
 /*
  * OpenCL Actor Printer
@@ -43,6 +48,7 @@ class ActorPrinter extends BasePrinter {
 	def printInstance(Instance instance)  {
 		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		var date = new Date();
+		var actor = instance.actor;
 		'''
 		// ////////////////////////////////////////////////////////////////////////////
 		// EPFL - OpenCL Backend
@@ -55,8 +61,10 @@ class ActorPrinter extends BasePrinter {
 		#include <iostream>
 		
 		«instance.name»::«instance.name»(DeviceManager deviceManager)
-			:deviceManager(deviceManager){
-			}
+			:deviceManager(deviceManager)
+		{
+			«FOR v : actor.stateVars.filter(v|v.initialValue != null)»sv_«instance.name».«printArg(v.type, v.indexedName, v.initialValue)»«ENDFOR»
+		}
 		
 		«instance.name»::~«instance.name»(){
 		}
@@ -90,7 +98,12 @@ class ActorPrinter extends BasePrinter {
 		#ifndef __«instance.name.toUpperCase»_HPP__
 		#define __«instance.name.toUpperCase»_HPP__
 		
+		
 		#include "CAL/DeviceManager.hpp"
+		«IF !instance.actor.stateVars.empty»
+		// «instance.name» state variables
+		«printStateVars(instance, instance.actor.stateVars)»
+		«ENDIF»
 		
 		class «instance.name»{
 		public:
@@ -102,10 +115,37 @@ class ActorPrinter extends BasePrinter {
 			void initialize();
 			cl_uint schedule();
 		private:
-			DeviceManager deviceManager;	
+			DeviceManager deviceManager;
+			«IF !instance.actor.stateVars.empty»
+			«instance.name»_stateVars sv_«instance.name»;
+			«ENDIF»	
 		};
 		
 		#endif // __«instance.name.toUpperCase»_HPP__
+		'''
+	}
+	
+	def printStateVars(Instance instance,List<Var> stateVars){
+		''' 	
+		typedef struct{
+			«FOR variable: stateVars SEPARATOR "\n"»«variable.varDecl»;«ENDFOR»
+		} «instance.name»_stateVars;
+		'''	
+	}
+	
+	def private varDecl(Var v) {
+		'''«v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»'''
+	}
+	
+		def dispatch printArg(Type type, String name, Expression expr) {
+			'''
+			«name» = «expr.doSwitch»;
+			'''
+		}
+	def dispatch printArg(TypeList type, String name, Expression expr){ 
+		'''
+		// C++11 allows array initializer in initialization list but not yet implemented in VS10... use that instead.
+		«type.doSwitch» tmp_«name»«FOR dim:type.dimensions»[«dim»]«ENDFOR»= «expr.doSwitch»;
 		'''
 	}
 	
