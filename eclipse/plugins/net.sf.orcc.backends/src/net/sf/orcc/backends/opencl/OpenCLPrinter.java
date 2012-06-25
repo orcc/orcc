@@ -154,13 +154,13 @@ public class OpenCLPrinter {
 			try {
 				// Print Host
 				CharSequence sequence = new ActorPrinter()
-						.compileInstance(instance);
+						.printInstance(instance);
 				PrintStream ps = new PrintStream(new FileOutputStream(file));
 				ps.print(sequence.toString());
 				ps.close();
 
 				// Print Kernel
-				sequence = new ActorPrinter().compileKernel(instance);
+				sequence = new ActorPrinter().printKernel(instance);
 				ps = new PrintStream(new FileOutputStream(kernelFile));
 				ps.print(sequence.toString());
 				ps.close();
@@ -197,14 +197,14 @@ public class OpenCLPrinter {
 					return true;
 				}
 			}
-			CharSequence sequence = new NetworkPrinter().compileNetwork(
-					network, options);
+			CharSequence sequence = new NetworkPrinter().printNetwork(network,
+					options);
 			PrintStream ps = new PrintStream(new FileOutputStream(file));
 			ps.print(sequence.toString());
 			ps.close();
 
 			file = path + File.separator + "CMakeLists.txt";
-			sequence = new NetworkPrinter().compileCmakeLists(network, options);
+			sequence = new NetworkPrinter().printCmakeLists(network, options);
 			ps = new PrintStream(new FileOutputStream(file));
 			ps.print(sequence.toString());
 			ps.close();

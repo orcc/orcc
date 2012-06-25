@@ -41,7 +41,7 @@ import net.sf.orcc.df.Instance
  * @author Endri Bezati
  */
 class NetworkPrinter extends BasePrinter {
-	def compileNetwork(Network network, Map options){ 
+	def printNetwork(Network network, Map options){ 
 		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		var date = new Date();
 		'''
@@ -52,10 +52,19 @@ class NetworkPrinter extends BasePrinter {
 		// Network Source File: "«network.file»" 
 		// Network: «network.simpleName»
 		// ////////////////////////////////////////////////////////////////////////////
+		#include "CAL/DeviceManager.hpp"
+
+
+		int main(int argc, char** argv){
+			// Intialize the context of an OpenCL GPU device
+			DeviceManager deviceManager = DeviceManager(CL_DEVICE_TYPE_GPU);
+			
+			return 0;
+		}
 		'''
 	}
 	
-	def compileCmakeLists(Network network, Map options){
+	def printCmakeLists(Network network, Map options){
 		'''
 		# EPFL OpenCL Backend, CMakeLists.txt file
 		# Generated from "«network.file»"
@@ -71,17 +80,19 @@ class NetworkPrinter extends BasePrinter {
 		include_directories( "${CMAKE_SOURCE_DIR}/include" )
 		
 		add_executable(«network.simpleName»
-		«network.simpleName».cpp
+		src/CAL/DeviceManager.cpp
+		src/«network.simpleName».cpp
 		«FOR vertex : network.vertices»
 		«IF vertex instanceof Instance»
 		«instanceName(vertex as Instance)»
 		«ENDIF»
 		«ENDFOR»
 		)
+		target_link_libraries( «network.simpleName» ${OPENCL_LIBRARIES} )
 		'''	
 	}
 	
 	def instanceName(Instance instance){
-		'''«instance.simpleName».cpp'''
+		'''src/«instance.simpleName».cpp'''
 	}
 }

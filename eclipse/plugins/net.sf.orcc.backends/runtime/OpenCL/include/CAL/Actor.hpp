@@ -27,8 +27,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef __ACTOR_H__
-#define __ACTOR_H__
+#ifndef __ACTOR_HPP__
+#define __ACTOR_HPP__
 
 #include "CL/cl.hpp"
 
@@ -47,6 +47,6 @@ public:
 
 	~Actor() {
 	}
-}
+};
 
-#endif //__ACTOR_H__
+#endif //__ACTOR_HPP__
