@@ -29,7 +29,6 @@
 package net.sf.orcc.tools.merger.action;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,11 +196,11 @@ public class GuardInternalizer {
 			BlockIf blockIf = irFactory.createBlockIf();
 			blockIf.setCondition(getCondition(actionCopy));
 
-			renameVariables(actionCopy.getScheduler().getLocals(), body);
+			renameVariables(actionCopy.getScheduler(), body);
 			body.getLocals().addAll(actionCopy.getScheduler().getLocals());
 			elseBlocks.addAll(actionCopy.getScheduler().getBlocks());
 
-			renameVariables(actionCopy.getBody().getLocals(), body);
+			renameVariables(actionCopy.getBody(), body);
 			body.getLocals().addAll(actionCopy.getBody().getLocals());
 			blockIf.getThenBlocks().addAll(actionCopy.getBody().getBlocks());
 
@@ -289,11 +288,13 @@ public class GuardInternalizer {
 		}
 	}
 
-	private void renameVariables(Collection<Var> vars, Procedure procedure) {
-		for (Var var : vars) {
+	private void renameVariables(Procedure oldProc, Procedure newProc) {
+		for (Var var : oldProc.getLocals()) {
 			String varName = var.getName();
-			for (int i = 0; procedure.getLocal(varName) != null
-					|| actor.getStateVar(varName) != null; i++) {
+			for (int i = 0; newProc.getLocal(varName) != null
+					|| actor.getStateVar(varName) != null
+					|| (oldProc.getLocal(varName) != null && oldProc
+							.getLocal(varName) != var); i++) {
 				varName = var.getName() + i;
 			}
 			var.setName(varName);
