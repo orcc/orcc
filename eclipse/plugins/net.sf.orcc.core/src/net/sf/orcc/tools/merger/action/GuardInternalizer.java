@@ -236,6 +236,7 @@ public class GuardInternalizer {
 			renameVariables(actionCopy.getBody(), body);
 			body.getLocals().addAll(actionCopy.getBody().getLocals());
 			blockIf.getThenBlocks().addAll(actionCopy.getBody().getBlocks());
+			blockIf.setJoinBlock(irFactory.createBlockBasic());
 
 			elseBlocks.add(blockIf);
 			elseBlocks = blockIf.getElseBlocks();
