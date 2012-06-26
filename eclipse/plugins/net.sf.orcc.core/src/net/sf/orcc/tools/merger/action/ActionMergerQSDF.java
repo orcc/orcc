@@ -142,14 +142,7 @@ public class ActionMergerQSDF {
 		initRet.setValue(factory.createExprBinary(initRet.getValue(),
 				OpBinary.LOGIC_AND, notPrev, factory.createTypeBool()));
 
-		// Rename variables
-		for (Var var : prevSched.getLocals()) {
-			String varName = var.getName();
-			for (int i = 0; isExistingVar(varName, initSched); i++) {
-				varName = var.getName() + i;
-			}
-			var.setName(varName);
-		}
+		renameVariables(prevSched, initSched);
 
 		// Merge both schedulers
 		initSched.getLocals().addAll(prevSched.getLocals());
@@ -173,10 +166,18 @@ public class ActionMergerQSDF {
 		}
 
 	}
-
-	private boolean isExistingVar(String varName, Procedure procedure) {
-		return procedure.getLocal(varName) != null
-				|| actor.getStateVar(varName) != null;
+	
+	private void renameVariables(Procedure oldProc, Procedure newProc) {
+		for (Var var : oldProc.getLocals()) {
+			String varName = var.getName();
+			for (int i = 0; newProc.getLocal(varName) != null
+					|| actor.getStateVar(varName) != null
+					|| (oldProc.getLocal(varName) != null && oldProc
+							.getLocal(varName) != var); i++) {
+				varName = var.getName() + i;
+			}
+			var.setName(varName);
+		}
 	}
 
 }

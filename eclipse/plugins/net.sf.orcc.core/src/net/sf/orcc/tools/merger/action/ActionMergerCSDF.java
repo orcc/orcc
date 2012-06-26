@@ -79,20 +79,15 @@ public class ActionMergerCSDF {
 	 */
 	private class BodyBuilder implements PatternVisitor {
 
+		private List<Block> blocks;
 		private int depth;
 		private List<Var> indexes;
-		private List<Block> blocks;
 		private Procedure procedure;
 
 		public BodyBuilder(Procedure procedure) {
 			this.procedure = procedure;
 			this.blocks = procedure.getBlocks();
 			this.indexes = new ArrayList<Var>();
-		}
-
-		private boolean isExistingVar(String varName) {
-			return procedure.getLocal(varName) != null
-					|| actor.getStateVar(varName) != null;
 		}
 
 		private EList<Instruction> updateCounter(Pattern pattern) {
@@ -174,14 +169,7 @@ public class ActionMergerCSDF {
 			Action action = pattern.getAction();
 			Procedure bodyCopy = IrUtil.copy(action.getBody());
 
-			// Rename variables
-			for (Var var : bodyCopy.getLocals()) {
-				String varName = var.getName();
-				for (int i = 0; isExistingVar(varName); i++) {
-					varName = var.getName() + i;
-				}
-				var.setName(varName);
-			}
+			renameVariables(bodyCopy, procedure);
 
 			// Move variables and blocks in the body of the new action
 			procedure.getLocals().addAll(bodyCopy.getLocals());
@@ -232,15 +220,15 @@ public class ActionMergerCSDF {
 		}
 	}
 
-	private final DfFactory dfFactory = DfFactory.eINSTANCE;
-	private final IrFactory irFactory = IrFactory.eINSTANCE;
-
-	private CSDFMoC clasz;
 	private Actor actor;
+	private CSDFMoC clasz;
 
+	private final DfFactory dfFactory = DfFactory.eINSTANCE;
 	private Pattern inputPattern;
-	private Pattern outputPattern;
+
+	private final IrFactory irFactory = IrFactory.eINSTANCE;
 	private String name;
+	private Pattern outputPattern;
 	private Map<Port, Var> portToVarCountMap;
 
 	/**
@@ -351,4 +339,18 @@ public class ActionMergerCSDF {
 		return dfFactory.createAction(name, inputPattern, outputPattern,
 				peeked, scheduler, body);
 	}
+
+	private void renameVariables(Procedure oldProc, Procedure newProc) {
+		for (Var var : oldProc.getLocals()) {
+			String varName = var.getName();
+			for (int i = 0; newProc.getLocal(varName) != null
+					|| actor.getStateVar(varName) != null
+					|| (oldProc.getLocal(varName) != null && oldProc
+							.getLocal(varName) != var); i++) {
+				varName = var.getName() + i;
+			}
+			var.setName(varName);
+		}
+	}
+
 }

@@ -29,7 +29,9 @@
 package net.sf.orcc.tools.merger.action;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -107,15 +109,32 @@ public class GuardInternalizer {
 	}
 
 	private Actor actor;
-	private int i;
-
 	private final DfFactory dfFactory = DfFactory.eINSTANCE;
+
+	private int i;
 	private final IrFactory irFactory = IrFactory.eINSTANCE;
 
 	/**
 	 * Creates a new classifier
 	 */
 	public GuardInternalizer() {
+	}
+
+	private void clean(Actor actor) {
+		Set<Action> usedActions = new HashSet<Action>();
+		usedActions.addAll(actor.getActionsOutsideFsm());
+		usedActions.addAll(actor.getInitializes());
+		if (actor.hasFsm()) {
+			for (Edge edge : actor.getFsm().getEdges()) {
+				Transition transition = (Transition) edge;
+				usedActions.add(transition.getAction());
+			}
+		}
+		for (Action action : new ArrayList<Action>(actor.getActions())) {
+			if (!usedActions.contains(action)) {
+				IrUtil.delete(action);
+			}
+		}
 	}
 
 	/**
@@ -240,6 +259,7 @@ public class GuardInternalizer {
 
 			elseBlocks.add(blockIf);
 			elseBlocks = blockIf.getElseBlocks();
+			IrUtil.delete(actionCopy);
 		}
 
 		BlockBasic lastBlock = body.getLast();
@@ -282,5 +302,7 @@ public class GuardInternalizer {
 			actor.getActionsOutsideFsm().clear();
 			actor.getActionsOutsideFsm().add(action);
 		}
+
+		clean(actor);
 	}
 }
