@@ -761,6 +761,10 @@ public enum OpBinary implements Enumerator {
 			return LE;
 		case LE:
 			return GT;
+		case LOGIC_AND:
+			return LOGIC_OR;
+		case LOGIC_OR:
+			return LOGIC_AND;
 		case LT:
 			return GE;
 		case NE:
