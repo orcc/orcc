@@ -29,16 +29,22 @@
  
 package net.sf.orcc.backends.opencl
 
-import net.sf.orcc.backends.opencl.BasePrinter
-import net.sf.orcc.df.Instance
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.List
-import net.sf.orcc.ir.Var
-import net.sf.orcc.ir.Type
-import net.sf.orcc.ir.Expression
-import net.sf.orcc.ir.TypeList
+import net.sf.orcc.df.Action
+import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
+import net.sf.orcc.ir.BlockBasic
+import net.sf.orcc.ir.ExprVar
+import net.sf.orcc.ir.Expression
+import net.sf.orcc.ir.InstAssign
+import net.sf.orcc.ir.InstLoad
+import net.sf.orcc.ir.InstStore
+import net.sf.orcc.ir.Procedure
+import net.sf.orcc.ir.Type
+import net.sf.orcc.ir.TypeList
+import net.sf.orcc.ir.Var
 
 /*
  * OpenCL Actor Printer
@@ -46,69 +52,7 @@ import net.sf.orcc.df.Port
  * @author Endri Bezati
  */
 class ActorPrinter extends BasePrinter {
-	def printInstance(Instance instance)  {
-		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		var date = new Date();
-		var actor = instance.actor;
-		'''
-		// ////////////////////////////////////////////////////////////////////////////
-		// EPFL - OpenCL Backend
-		// --
-		// Date :  «dateFormat.format(date)»
-		// CAL Actor Source File: "«instance.actor.file»"
-		// Actor: «instance.simpleName»
-		// ////////////////////////////////////////////////////////////////////////////
-		#include "«instance.name».hpp"
-		#include <iostream>
-		
-		«instance.name»::«instance.name»(DeviceManager deviceManager)
-			:deviceManager(deviceManager)
-		{
-			«FOR v : actor.stateVars.filter(v|v.initialValue != null)»sv_«instance.name».«printArg(v.type, v.indexedName, v.initialValue)»«ENDFOR»
-		}
-		
-		«instance.name»::~«instance.name»(){
-		}
-		
-		
-		void «instance.name»::initialize(){
-		}
-		
-		cl_uint «instance.name»::schedule(){
-		}
-		'''
-	}
-	
-	def printKernel(Instance instance)  {
-		'''
-		__kernel void «instance.simpleName»(
-			«instance.printKernelIO()»
-			)
-		{
-			
-		}
-		'''
-	}
-	
-	def printKernelIO(Instance instance){
-		'''
-		«IF !instance.actor.stateVars.empty»
-		__global «instance.name»_stateVars sv_«instance.name»,
-		«ENDIF»
-		«FOR port : instance.actor.inputs SEPARATOR ","» 
-		__global const «port.type.doSwitch» *pIn_«port.name» 
-		«ENDFOR»
-		«FOR port : instance.actor.outputs SEPARATOR ","» 
-		__global «port.type.doSwitch» *pIn_«port.name» 
-		«ENDFOR»
-		'''
-	}
-	
-	def printPort(Port port, Integer size, Integer fanout){
-		'''
-		<«port.type.doSwitch», «fanout»«IF size != null», «size»«ENDIF»> port_«port.name»;
-		'''
-	}
+	Instance currentInstance;
 	
 	def printHeader(Instance instance){
 		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -151,6 +95,98 @@ class ActorPrinter extends BasePrinter {
 		'''
 	}
 	
+	def printInstance(Instance instance)  {
+		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		var date = new Date();
+		var actor = instance.actor;
+		currentInstance = instance;
+		'''
+		// ////////////////////////////////////////////////////////////////////////////
+		// EPFL - OpenCL Backend
+		// --
+		// Date :  «dateFormat.format(date)»
+		// CAL Actor Source File: "«instance.actor.file»"
+		// Actor: «instance.simpleName»
+		// ////////////////////////////////////////////////////////////////////////////
+		#include "«instance.name».hpp"
+		#include <iostream>
+		
+		«instance.name»::«instance.name»(DeviceManager deviceManager)
+			:deviceManager(deviceManager)
+		{
+			«FOR v : actor.stateVars.filter(v|v.initialValue != null)»sv_«instance.name».«printArg(v.type, v.indexedName, v.initialValue)»«ENDFOR»
+		}
+		
+		«instance.name»::~«instance.name»(){
+		}
+		
+		
+		void «instance.name»::initialize(){
+		}
+		
+		cl_uint «instance.name»::schedule(){
+		}
+		'''
+	}
+	
+	def printKernel(Instance instance)  {
+		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		var date = new Date();
+		var actor = instance.actor;
+		currentInstance = instance;
+		'''
+		// ////////////////////////////////////////////////////////////////////////////
+		// EPFL - OpenCL Backend
+		// --
+		// Date :  «dateFormat.format(date)»
+		// CAL Actor Kernel File: "«instance.actor.file»"
+		// Actor: «instance.simpleName»
+		// ////////////////////////////////////////////////////////////////////////////
+		
+		// List of actions
+		«FOR action : actor.actions SEPARATOR "\n"»«action.printKernelAction(instance)»«ENDFOR»
+		
+		// The kernel
+		__kernel void «instance.simpleName»(
+			«IF !instance.actor.stateVars.empty»
+			__global «instance.name»_stateVars sv_«instance.name»,
+			«ENDIF»
+			«printPort(instance.actor.inputs,"pIn_","__global const")»
+			«printPort(instance.actor.outputs,"pOut_","__global")»
+			)
+		{
+			int gid = get_global_id(0);
+		}
+		'''
+	}
+	
+
+	def printKernelAction(Action action, Instance instance){
+		'''
+		«action.body.returnType.doSwitch» «action.body.name» (
+			int gid,
+			«IF !instance.actor.stateVars.empty»
+			«instance.name»_stateVars sv_«instance.name»,
+			«ENDIF»
+			«printPort(action.inputPattern.ports,"","")»
+			«printPort(action.outputPattern.ports,"","")»
+			) 
+		{
+			«action.body.doSwitch»
+		}
+		'''
+	}
+	
+	def printPort(List<Port> ports,String type, String prefix){
+		'''
+		«FOR port : ports SEPARATOR ","» 
+		«IF !prefix.equals("")»«prefix» «ENDIF»«port.type.doSwitch» *«type»«port.name» 
+		«ENDFOR»
+		'''
+	}
+	
+	
+	
 	def printStateVars(Instance instance,List<Var> stateVars){
 		''' 	
 		typedef struct{
@@ -176,4 +212,43 @@ class ActorPrinter extends BasePrinter {
 		'''
 	}
 	
+	// Expressions
+	
+	override caseExprVar(ExprVar expr){
+		'''«IF expr.use.variable.global»«currentInstance.name».«ENDIF»«expr.use.variable.indexedName»'''
+	} 
+	
+	// Procedure
+	
+	override caseProcedure(Procedure procedure) '''
+		«FOR variable : procedure.locals SEPARATOR "\n"»«variable.varDecl»;«ENDFOR»
+		«FOR node : procedure.blocks»«node.doSwitch»«ENDFOR»
+	'''
+	
+	// Block
+	override caseBlockBasic(BlockBasic node){ 
+		'''
+		«FOR inst : node.instructions»«inst.doSwitch»«ENDFOR»
+		'''
+	}
+	
+	// Assign, Load, Store
+	
+	override caseInstAssign(InstAssign inst){
+		'''
+		«IF inst.target.variable.global»«currentInstance.name».«ENDIF»«inst.target.variable.name» = «inst.value.doSwitch»;
+		'''
+	}
+	
+	override caseInstLoad(InstLoad inst){ 
+		'''
+		«IF inst.target.variable.global»sv_«currentInstance.name».«ENDIF»«inst.target.variable.indexedName» = «IF inst.source.variable.global»sv_«currentInstance.name».«ENDIF»«inst.source.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR»;
+		''' 
+	}
+	
+	override caseInstStore(InstStore inst){
+		'''
+		«IF inst.target.variable.global»sv_«currentInstance.name».«ENDIF»«inst.target.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR» = «inst.value.doSwitch»;
+		'''
+	} 
 }
