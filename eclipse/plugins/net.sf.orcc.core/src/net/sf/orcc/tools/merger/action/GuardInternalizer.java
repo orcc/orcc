@@ -29,9 +29,7 @@
 package net.sf.orcc.tools.merger.action;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -120,14 +118,6 @@ public class GuardInternalizer {
 	public GuardInternalizer() {
 	}
 
-	private Expression getCondition(Action action) {
-		BlockBasic block = IrUtil.getLast(action.getScheduler().getBlocks());
-		InstReturn ret = (InstReturn) block.getInstructions().get(
-				block.getInstructions().size() - 1);
-		EcoreUtil.remove(ret);
-		return ret.getValue();
-	}
-
 	/**
 	 * Creates an isSchedulable.
 	 * 
@@ -141,6 +131,49 @@ public class GuardInternalizer {
 		block.add(irFactory.createInstReturn((irFactory.createExprBool(true))));
 
 		return procedure;
+	}
+
+	private Expression getCondition(Action action) {
+		BlockBasic block = IrUtil.getLast(action.getScheduler().getBlocks());
+		InstReturn ret = (InstReturn) block.getInstructions().get(
+				block.getInstructions().size() - 1);
+		EcoreUtil.remove(ret);
+		return ret.getValue();
+	}
+
+	private List<Action> getExecutableActions(State state) {
+		List<Action> executableActions = new ArrayList<Action>();
+		for (Edge edge : state.getOutgoing()) {
+			Transition transition = (Transition) edge;
+			executableActions.add(transition.getAction());
+		}
+		return executableActions;
+	}
+
+	private boolean internalizable(List<Action> actions) {
+		if (actions != null && !actions.isEmpty()) {
+			Pattern baseInput = actions.get(0).getInputPattern();
+			Pattern baseOutput = actions.get(0).getOutputPattern();
+			for (Action action : actions) {
+				Pattern input = action.getInputPattern();
+				Pattern output = action.getOutputPattern();
+				if (!(baseInput.isSupersetOf(input)
+						&& baseOutput.isSupersetOf(output)
+						&& input.isSupersetOf(baseInput) && output
+							.isSupersetOf(baseOutput))) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private boolean internalizable(State state) {
+		if (state.getSuccessors().size() > 1) {
+			return false;
+		}
+		return internalizable(getExecutableActions(state));
 	}
 
 	/**
@@ -214,80 +247,6 @@ public class GuardInternalizer {
 		return body;
 	}
 
-	private List<List<Action>> sortByPattern(List<Action> actions) {
-		List<List<Action>> sortedActions = new ArrayList<List<Action>>();
-		for (Action action : actions) {
-			Pattern input = action.getInputPattern();
-			Pattern output = action.getOutputPattern();
-			boolean founded = false;
-			for (int i = 0; i < sortedActions.size(); i++) {
-				Pattern testedInput = sortedActions.get(i).get(0)
-						.getInputPattern();
-				Pattern testedOutput = sortedActions.get(i).get(0)
-						.getOutputPattern();
-				if (testedInput.isSupersetOf(input)
-						&& testedOutput.isSupersetOf(output)
-						&& input.isSupersetOf(testedInput)
-						&& output.isSupersetOf(testedOutput)) {
-					founded = true;
-					sortedActions.get(i).add(action);
-				}
-			}
-
-			if (!founded) {
-				List<Action> newConfiguration = new ArrayList<Action>(1);
-				newConfiguration.add(action);
-				sortedActions.add(newConfiguration);
-			}
-		}
-		return sortedActions;
-	}
-
-	private Map<State, List<Action>> sortByTargetState(State currentState) {
-		Map<State, List<Action>> sortedActions = new HashMap<State, List<Action>>();
-		for (Edge edge : currentState.getOutgoing()) {
-			Transition transition = (Transition) edge;
-			State targetState = (State) edge.getTarget();
-			if (sortedActions.containsKey(targetState)) {
-				sortedActions.get(targetState).add(transition.getAction());
-			} else {
-				List<Action> newList = new ArrayList<Action>(1);
-				newList.add(transition.getAction());
-				sortedActions.put(targetState, newList);
-			}
-		}
-		return sortedActions;
-	}
-
-	public void transform(Actor actor) {
-		this.actor = actor;
-		this.i = 0;
-
-		if (actor.hasFsm()) {
-			FSM fsm = actor.getFsm();
-			for (State currentState : fsm.getStates()) {
-				Map<State, List<Action>> sortedActionsByTarget = sortByTargetState(currentState);
-				fsm.removeEdges(currentState.getOutgoing());
-				for (State targetState : sortedActionsByTarget.keySet()) {
-					for (List<Action> mergableActions : sortByPattern(sortedActionsByTarget
-							.get(targetState))) {
-						Action action = mergeActions(mergableActions);
-						fsm.add(dfFactory.createTransition(currentState,
-								action, targetState));
-					}
-				}
-			}
-		}
-
-		List<List<Action>> sortedActions = sortByPattern(actor
-				.getActionsOutsideFsm());
-		actor.getActionsOutsideFsm().clear();
-		for (List<Action> mergableActions : sortedActions) {
-			Action action = mergeActions(mergableActions);
-			actor.getActionsOutsideFsm().add(action);
-		}
-	}
-
 	private void renameVariables(Procedure oldProc, Procedure newProc) {
 		for (Var var : oldProc.getLocals()) {
 			String varName = var.getName();
@@ -298,6 +257,29 @@ public class GuardInternalizer {
 				varName = var.getName() + i;
 			}
 			var.setName(varName);
+		}
+	}
+
+	public void transform(Actor actor) {
+		this.actor = actor;
+		this.i = 0;
+
+		if (actor.hasFsm()) {
+			FSM fsm = actor.getFsm();
+			for (State currentState : fsm.getStates()) {
+				if (internalizable(currentState)) {
+					State target = (State) currentState.getSuccessors().get(0);
+					Action action = mergeActions(getExecutableActions(currentState));
+					fsm.removeEdges(currentState.getOutgoing());
+					fsm.addTransition(currentState, action, target);
+				}
+			}
+		}
+
+		if (internalizable(actor.getActionsOutsideFsm())) {
+			Action action = mergeActions(actor.getActionsOutsideFsm());
+			actor.getActionsOutsideFsm().clear();
+			actor.getActionsOutsideFsm().add(action);
 		}
 	}
 }
