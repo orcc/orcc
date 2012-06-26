@@ -57,6 +57,7 @@ import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
+import net.sf.orcc.tools.merger.action.GuardInternalizer;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.resources.IMarker;
@@ -117,6 +118,9 @@ public class Classifier extends DfVisitor<Void> {
 
 		try {
 			this.actor = actor;
+
+			// Internalize possible guards to avoid wrong classification
+			new GuardInternalizer().transform(actor);
 
 			actor.resetTokenConsumption();
 			actor.resetTokenProduction();
