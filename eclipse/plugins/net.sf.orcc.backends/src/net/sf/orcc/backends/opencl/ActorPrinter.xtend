@@ -38,6 +38,7 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.TypeList
+import net.sf.orcc.df.Port
 
 /*
  * OpenCL Actor Printer
@@ -81,6 +82,31 @@ class ActorPrinter extends BasePrinter {
 	def printKernel(Instance instance)  {
 		'''
 		__kernel void «instance.simpleName»(
+			«instance.printKernelIO()»
+			)
+		{
+			
+		}
+		'''
+	}
+	
+	def printKernelIO(Instance instance){
+		'''
+		«IF !instance.actor.stateVars.empty»
+		__global «instance.name»_stateVars sv_«instance.name»,
+		«ENDIF»
+		«FOR port : instance.actor.inputs SEPARATOR ","» 
+		__global const «port.type.doSwitch» *pIn_«port.name» 
+		«ENDFOR»
+		«FOR port : instance.actor.outputs SEPARATOR ","» 
+		__global «port.type.doSwitch» *pIn_«port.name» 
+		«ENDFOR»
+		'''
+	}
+	
+	def printPort(Port port, Integer size, Integer fanout){
+		'''
+		<«port.type.doSwitch», «fanout»«IF size != null», «size»«ENDIF»> port_«port.name»;
 		'''
 	}
 	
@@ -137,11 +163,12 @@ class ActorPrinter extends BasePrinter {
 		'''«v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»'''
 	}
 	
-		def dispatch printArg(Type type, String name, Expression expr) {
-			'''
-			«name» = «expr.doSwitch»;
-			'''
-		}
+	def dispatch printArg(Type type, String name, Expression expr) {
+		'''
+		«name» = «expr.doSwitch»;
+		'''
+	}
+	
 	def dispatch printArg(TypeList type, String name, Expression expr){ 
 		'''
 		// C++11 allows array initializer in initialization list but not yet implemented in VS10... use that instead.

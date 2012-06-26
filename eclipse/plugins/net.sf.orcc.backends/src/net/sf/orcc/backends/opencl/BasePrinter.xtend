@@ -50,9 +50,8 @@ import net.sf.orcc.ir.ExprBinary
  */
 
 class BasePrinter extends IrSwitch {
-	override caseExprBinary(ExprBinary expr){
-		'''(«expr.getE1.doSwitch» «expr.op.text» «expr.getE2.doSwitch»)'''
-	} 
+	
+	override caseExprBinary(ExprBinary expr) '''(«expr.getE1.doSwitch» «expr.op.text» «expr.getE2.doSwitch»)'''
 
 	override caseExprBool(ExprBool expr) '''«expr.value»'''
 	
@@ -71,7 +70,7 @@ class BasePrinter extends IrSwitch {
 	override caseTypeBool(TypeBool type)  '''bool'''
 	
 	override caseTypeInt(TypeInt type) {
-		printInt(type.size)
+		dataTypes(type.size); 
 	}
 
 	override caseTypeList(TypeList type) {
@@ -81,14 +80,14 @@ class BasePrinter extends IrSwitch {
 	override caseTypeString(TypeString type)  '''std::string'''
 
 	override caseTypeUint(TypeUint type) {
-		"unsigned " + printInt(type.size);
+		"unsigned " + dataTypes(type.size); 
 	}
 
 	override caseTypeVoid(TypeVoid type) {
 		"void";
 	}
 	
-	def private printInt(int size) {
+	def private dataTypes(int size){
 		if (size <= 8) {
 			return "char";
 		} else if (size <= 16) {
@@ -96,7 +95,7 @@ class BasePrinter extends IrSwitch {
 		} else if (size <= 32) {
 			return "int";
 		} else if (size <= 64) {
-			return "long long";
+			return "long";
 		} else {
 			return null;
 		}
