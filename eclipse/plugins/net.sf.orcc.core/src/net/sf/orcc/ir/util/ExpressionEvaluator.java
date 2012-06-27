@@ -41,8 +41,6 @@ import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
@@ -58,24 +56,15 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ExpressionEvaluator extends IrSwitch<Object> {
 
-	private boolean throwException;
-
 	private TypeList typeList;
 
 	@Override
 	public Object caseExprBinary(ExprBinary expr) {
 		Object val1 = doSwitch(expr.getE1());
 		Object val2 = doSwitch(expr.getE2());
-		Object result = interpretBinaryExpr(val1, expr.getOp(), val2);
+		Object result = ValueUtil.compute(val1, expr.getOp(), val2);
 
 		if (result == null) {
-			// will throw exception if uninitialized variable used
-			throwException = true;
-			doSwitch(expr.getE1());
-			doSwitch(expr.getE2());
-			throwException = false;
-
-			// if no exception has been thrown, throw it now
 			throw new OrccRuntimeException(
 					"Could not evaluate binary expression:\n"
 							+ new ExpressionPrinter().doSwitch(expr) + "\n");
@@ -124,19 +113,12 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 	@Override
 	public Object caseExprUnary(ExprUnary expr) {
 		Object value = doSwitch(expr.getExpr());
-		Object result = interpretUnaryExpr(expr.getOp(), value);
+		Object result = ValueUtil.compute(expr.getOp(), value);
 
 		if (result == null) {
-			// will throw exception if uninitialized variable used
-			throwException = true;
-			doSwitch(expr.getExpr());
-			throwException = false;
-
-			// if no exception has been thrown, throw it now
 			throw new OrccRuntimeException(
-					"Could not evaluate unary expression " + "expr "
-							+ expr.getOp().toString() + "("
-							+ expr.getOp().getText() + ")\n");
+					"Could not evaluate unary expression "
+							+ new ExpressionPrinter().doSwitch(expr) + "\n");
 		}
 		return result;
 	}
@@ -145,8 +127,7 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 	public Object caseExprVar(ExprVar expr) {
 		Var var = expr.getUse().getVariable();
 		Object value = var.getValue();
-		if (value == null && throwException) {
-			throwException = false;
+		if (value == null) {
 			throw new OrccRuntimeException("Uninitialized variable: "
 					+ var.getName());
 		}
@@ -210,91 +191,6 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 
 		// evaluated ok, but not as an integer
 		throw new OrccRuntimeException("expected integer expression");
-	}
-
-	/**
-	 * Returns the value of <code>val1</code> <code>op</code> <code>val2</code>.
-	 * Returns <code>null</code> if the value of the expression cannot be
-	 * computed.
-	 * 
-	 * @param val1
-	 *            an expression
-	 * @param op
-	 *            a binary operator
-	 * @param val2
-	 *            another expression
-	 * @return the value of <code>val1</code> <code>op</code> <code>val2</code>
-	 */
-	public Object interpretBinaryExpr(Object val1, OpBinary op, Object val2) {
-		switch (op) {
-		case BITAND:
-			return ValueUtil.and(val1, val2);
-		case BITOR:
-			return ValueUtil.or(val1, val2);
-		case BITXOR:
-			return ValueUtil.xor(val1, val2);
-		case DIV:
-			return ValueUtil.divide(val1, val2);
-		case DIV_INT:
-			return ValueUtil.divide(val1, val2);
-		case EQ:
-			return ValueUtil.equals(val1, val2);
-		case EXP:
-			return ValueUtil.pow(val1, val2);
-		case GE:
-			return ValueUtil.ge(val1, val2);
-		case GT:
-			return ValueUtil.gt(val1, val2);
-		case LOGIC_AND:
-			return ValueUtil.logicAnd(val1, val2);
-		case LE:
-			return ValueUtil.le(val1, val2);
-		case LOGIC_OR:
-			return ValueUtil.logicOr(val1, val2);
-		case LT:
-			return ValueUtil.lt(val1, val2);
-		case MINUS:
-			return ValueUtil.subtract(val1, val2);
-		case MOD:
-			return ValueUtil.mod(val1, val2);
-		case NE:
-			return ValueUtil.notEquals(val1, val2);
-		case PLUS:
-			return ValueUtil.add(val1, val2);
-		case SHIFT_LEFT:
-			return ValueUtil.shiftLeft(val1, val2);
-		case SHIFT_RIGHT:
-			return ValueUtil.shiftRight(val1, val2);
-		case TIMES:
-			return ValueUtil.multiply(val1, val2);
-		default:
-			return null;
-		}
-	}
-
-	/**
-	 * Returns the value of <code>op</code> <code>value</code>. Returns
-	 * <code>null</code> if the value of the expression cannot be computed.
-	 * 
-	 * @param op
-	 *            a unary operator
-	 * @param value
-	 *            an expression
-	 * @return the value of <code>op</code> <code>value</code>
-	 */
-	public Object interpretUnaryExpr(OpUnary op, Object value) {
-		switch (op) {
-		case BITNOT:
-			return ValueUtil.not(value);
-		case LOGIC_NOT:
-			return ValueUtil.logicNot(value);
-		case MINUS:
-			return ValueUtil.negate(value);
-		case NUM_ELTS:
-			return ValueUtil.length(value);
-		default:
-			return null;
-		}
 	}
 
 	public void setType(TypeList typeList) {

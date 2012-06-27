@@ -32,6 +32,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.ValueUtil;
 
 /**
  * This class defines a partial expression evaluator.
@@ -48,7 +49,7 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 		try {
 			Object val1 = doSwitch(expr.getE1());
 			Object val2 = doSwitch(expr.getE2());
-			return interpretBinaryExpr(val1, expr.getOp(), val2);
+			return ValueUtil.compute(val1, expr.getOp(), val2);
 		} catch (OrccRuntimeException e) {
 			// if the expression could not be evaluated
 			if (schedulableMode) {
@@ -65,7 +66,7 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	public Object caseExprUnary(ExprUnary expr) {
 		try {
 			Object value = doSwitch(expr.getExpr());
-			return interpretUnaryExpr(expr.getOp(), value);
+			return ValueUtil.compute(expr.getOp(), value);
 		} catch (OrccRuntimeException e) {
 			if (schedulableMode) {
 				throw e;

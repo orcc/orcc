@@ -43,6 +43,8 @@ import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 
@@ -90,6 +92,91 @@ public class ValueUtil {
 			return ((BigInteger) val1).and((BigInteger) val2);
 		}
 		throw new OrccRuntimeException("type mismatch in and");
+	}
+
+	/**
+	 * Returns the value of <code>op</code> <code>value</code>. Returns
+	 * <code>null</code> if the value of the expression cannot be computed.
+	 * 
+	 * @param op
+	 *            a unary operator
+	 * @param value
+	 *            an expression
+	 * @return the value of <code>op</code> <code>value</code>
+	 */
+	public static Object compute(OpUnary op, Object value) {
+		switch (op) {
+		case BITNOT:
+			return ValueUtil.not(value);
+		case LOGIC_NOT:
+			return ValueUtil.logicNot(value);
+		case MINUS:
+			return ValueUtil.negate(value);
+		case NUM_ELTS:
+			return ValueUtil.length(value);
+		default:
+			return null;
+		}
+	}
+
+	/**
+	 * Returns the value of <code>val1</code> <code>op</code> <code>val2</code>.
+	 * Returns <code>null</code> if the value of the expression cannot be
+	 * computed.
+	 * 
+	 * @param val1
+	 *            an expression
+	 * @param op
+	 *            a binary operator
+	 * @param val2
+	 *            another expression
+	 * @return the value of <code>val1</code> <code>op</code> <code>val2</code>
+	 */
+	public static Object compute(Object val1, OpBinary op, Object val2) {
+		switch (op) {
+		case BITAND:
+			return ValueUtil.and(val1, val2);
+		case BITOR:
+			return ValueUtil.or(val1, val2);
+		case BITXOR:
+			return ValueUtil.xor(val1, val2);
+		case DIV:
+			return ValueUtil.divide(val1, val2);
+		case DIV_INT:
+			return ValueUtil.divide(val1, val2);
+		case EQ:
+			return ValueUtil.equals(val1, val2);
+		case EXP:
+			return ValueUtil.pow(val1, val2);
+		case GE:
+			return ValueUtil.ge(val1, val2);
+		case GT:
+			return ValueUtil.gt(val1, val2);
+		case LOGIC_AND:
+			return ValueUtil.logicAnd(val1, val2);
+		case LE:
+			return ValueUtil.le(val1, val2);
+		case LOGIC_OR:
+			return ValueUtil.logicOr(val1, val2);
+		case LT:
+			return ValueUtil.lt(val1, val2);
+		case MINUS:
+			return ValueUtil.subtract(val1, val2);
+		case MOD:
+			return ValueUtil.mod(val1, val2);
+		case NE:
+			return ValueUtil.notEquals(val1, val2);
+		case PLUS:
+			return ValueUtil.add(val1, val2);
+		case SHIFT_LEFT:
+			return ValueUtil.shiftLeft(val1, val2);
+		case SHIFT_RIGHT:
+			return ValueUtil.shiftRight(val1, val2);
+		case TIMES:
+			return ValueUtil.multiply(val1, val2);
+		default:
+			return null;
+		}
 	}
 
 	/**

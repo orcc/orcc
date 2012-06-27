@@ -58,7 +58,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
-import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 
@@ -127,8 +126,7 @@ public class Evaluator extends CalSwitch<Expression> {
 		Object val1 = ValueUtil.getValue(e1);
 		Object val2 = ValueUtil.getValue(e2);
 
-		Object result = new ExpressionEvaluator().interpretBinaryExpr(val1, op,
-				val2);
+		Object result = ValueUtil.compute(val1, op, val2);
 		return ValueUtil.getExpression(result);
 	}
 
@@ -251,7 +249,7 @@ public class Evaluator extends CalSwitch<Expression> {
 		Expression expr = getValue(expression.getExpression());
 		Object value = ValueUtil.getValue(expr);
 
-		Object result = new ExpressionEvaluator().interpretUnaryExpr(op, value);
+		Object result = ValueUtil.compute(op, value);
 		return ValueUtil.getExpression(result);
 	}
 
