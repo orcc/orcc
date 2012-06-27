@@ -34,7 +34,9 @@ import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -318,6 +320,9 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				"net/sf/orcc/backends/llvm/tta/TCE_Simulation.stg");
 		simPrinter.getOptions().put("profile", profile);
 		simPrinter.print("top.cc", path, design);
+
+		print(path + File.separator + "top.madf",
+				new TCE_Design_MADF().doSwitch(design));
 	}
 
 	private void printProcessor(Processor tta) {
@@ -385,6 +390,16 @@ public class TTABackendImpl extends LLVMBackendImpl {
 			System.err.println("TCE error: ");
 			e.printStackTrace();
 		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void print(String file, CharSequence sequence) {
+		try {
+			PrintStream ps = new PrintStream(new FileOutputStream(file));
+			ps.print(sequence.toString());
+			ps.close();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
