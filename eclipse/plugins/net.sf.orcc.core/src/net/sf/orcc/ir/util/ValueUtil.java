@@ -69,7 +69,7 @@ public class ValueUtil {
 			return ((BigDecimal) val1).add((BigDecimal) val2);
 		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).add((BigInteger) val2);
-		} else if (isString(val1) || isString(val2)){
+		} else if (isString(val1) || isString(val2)) {
 			return val1.toString() + val2.toString();
 		}
 		throw new OrccRuntimeException("type mismatch in add");
@@ -265,6 +265,14 @@ public class ValueUtil {
 		throw new OrccRuntimeException("unexpected type in set");
 	}
 
+	/**
+	 * Returns the IR Expression that matches the given runtime value. Value is
+	 * expected to be one of Boolean, BigDecimal, BigInteger, String, or Array.
+	 * 
+	 * @param value
+	 *            a runtime value
+	 * @return an IR expression
+	 */
 	public static Expression getExpression(Object value) {
 		if (isBool(value)) {
 			return IrFactory.eINSTANCE.createExprBool((Boolean) value);
@@ -293,6 +301,39 @@ public class ValueUtil {
 			return ((BigInteger) value).intValue();
 		}
 		throw new OrccRuntimeException("type mismatch in getIntValue");
+	}
+
+	/**
+	 * Returns the IR Type of the given runtime value. Value is expected to be
+	 * one of Boolean, BigDecimal, BigInteger, String, or Array.
+	 * 
+	 * @param value
+	 *            a runtime value
+	 * @return an IR type
+	 */
+	public static Type getType(Object value) {
+		if (isBool(value)) {
+			return IrFactory.eINSTANCE.createTypeBool();
+		} else if (isFloat(value)) {
+			return IrFactory.eINSTANCE.createTypeFloat();
+		} else if (isInt(value)) {
+			return IrFactory.eINSTANCE.createTypeIntOrUint((BigInteger) value);
+		} else if (isString(value)) {
+			return IrFactory.eINSTANCE.createTypeString();
+		} else if (isList(value)) {
+			int size = Array.getLength(value);
+			Type type = null;
+			if (size > 0) {
+				type = getType(Array.get(value, 0));
+				for (int i = 0; i < size; i++) {
+					Type t2 = getType(Array.get(value, i));
+					type = TypeUtil.getLub(type, t2);
+				}
+			}
+			return IrFactory.eINSTANCE.createTypeList(size, type);
+		} else {
+			return null;
+		}
 	}
 
 	/**
