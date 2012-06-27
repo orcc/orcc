@@ -161,22 +161,15 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// do not transform actors
 	}
 
-	protected void doAnalyzeNetwork(Network network) throws OrccException {
-		write("Analyze the network...\n");
-
-		new ComplexHwOpDetector(getWriteListener()).doSwitch(network);
-		if (classify) {
-			new Classifier(getWriteListener()).doSwitch(network);
-		}
-	}
-
 	protected Network doTransformNetwork(Network network) throws OrccException {
-		write("Transform the network...\n");
-
+		write("Analyze and transform the network...\n");
+		new ComplexHwOpDetector(getWriteListener()).doSwitch(network);
 		new Instantiator(false, fifoSize).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 		new BroadcastAdder().doSwitch(network);
-
+		if (classify) {
+			new Classifier(getWriteListener()).doSwitch(network);
+		}
 		if (normalize) {
 			new ActionMerger().doSwitch(network);
 		}
@@ -216,7 +209,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 
-		doAnalyzeNetwork(network);
 		doTransformNetwork(network);
 
 		// build the design
