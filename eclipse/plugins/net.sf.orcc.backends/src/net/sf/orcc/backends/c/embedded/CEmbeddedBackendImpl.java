@@ -35,7 +35,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
-import net.sf.orcc.backends.c.CNetworkTemplateData;
 import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
@@ -105,10 +104,6 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 
 		// This call is needed to associate instances to network vertices
 		network.computeTemplateMaps();
-
-		CNetworkTemplateData data = new CNetworkTemplateData();
-		data.computeHierarchicalTemplateMaps(network);
-		network.setTemplateData(data);
 
 		// The classification gives production and consumption information from
 		// the graph

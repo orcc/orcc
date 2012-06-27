@@ -150,8 +150,11 @@ public class CBackendImpl extends AbstractBackend {
 			merge = false;
 		}
 
+		// FIXME: Readd the method in native function and compute the
+		// hierarchical id of each actor.
 		useGeneticAlgo = getAttribute("net.sf.orcc.backends.geneticAlgorithm",
 				false);
+		
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
 		debug = getAttribute(DEBUG_MODE, true);
 		threadsNb = Integer.parseInt(getAttribute(
@@ -239,7 +242,8 @@ public class CBackendImpl extends AbstractBackend {
 			transformations.add(new DfVisitor<Void>(new ListFlattener()));
 			transformations.add(new DfVisitor<Expression>(
 					new TacTransformation()));
-			transformations.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+			transformations.add(new DfVisitor<CfgNode>(
+					new ControlFlowAnalyzer()));
 			transformations
 					.add(new DfVisitor<Void>(new InstPhiTransformation()));
 			transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
@@ -259,8 +263,7 @@ public class CBackendImpl extends AbstractBackend {
 				ResourceSet set = new ResourceSetImpl();
 				if (!IrUtil.serializeActor(set, srcPath, actor)) {
 					System.err.println("Error with " + transformation
-							+ " on actor "
-							+ actor.getName());
+							+ " on actor " + actor.getName());
 				}
 			}
 		}
@@ -271,10 +274,6 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	protected Network doTransformNetwork(Network network) throws OrccException {
-		CNetworkTemplateData data = new CNetworkTemplateData();
-		data.computeHierarchicalTemplateMaps(network);
-		network.setTemplateData(data);
-
 		// instantiate and flattens network
 		write("Instantiating...\n");
 		new Instantiator(false, fifoSize).doSwitch(network);

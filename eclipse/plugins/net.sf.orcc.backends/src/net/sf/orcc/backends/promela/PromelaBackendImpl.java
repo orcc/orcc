@@ -37,11 +37,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
-import net.sf.orcc.backends.c.CNetworkTemplateData;
 import net.sf.orcc.backends.promela.transform.GuardsExtractor;
 import net.sf.orcc.backends.promela.transform.NetworkStateDefExtractor;
-import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
+import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
 import net.sf.orcc.backends.promela.transform.PromelaTokenAnalyzer;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.df.Action;
@@ -148,9 +147,6 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		CNetworkTemplateData data = new CNetworkTemplateData();
-		data.computeHierarchicalTemplateMaps(network);
-		network.setTemplateData(data);
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
