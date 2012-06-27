@@ -367,6 +367,22 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	}
 
 	@Override
+	public boolean intersectsWith(Pattern other) {
+		for (Port port : getPorts()) {
+			if (!other.getPorts().contains(port)) {
+				continue;
+			}
+
+			if (this.getNumTokens(port) >= 1 && other.getNumTokens(port) >= 1) {
+				// if both patterns use at least one token on the same port
+				// they intersect
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public boolean isEmpty() {
 		return getPorts().isEmpty();
 	}

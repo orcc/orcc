@@ -65,17 +65,15 @@ public interface DfFactory extends EFactory {
 			Procedure body);
 
 	/**
-	 * Creates a new action with empty patterns, the given tag, scheduler and
-	 * body.
+	 * Creates a new action with empty patterns, scheduler and body, and the
+	 * given tag.
 	 * 
+	 * @param lineNumber
+	 *            the line number
 	 * @param tag
 	 *            action tag
-	 * @param scheduler
-	 *            procedure that computes scheduling information
-	 * @param body
-	 *            procedure that holds the body of the action
 	 */
-	Action createAction(String tag, Procedure scheduler, Procedure body);
+	Action createAction(int lineNumber, String tag);
 
 	/**
 	 * Creates a new action.

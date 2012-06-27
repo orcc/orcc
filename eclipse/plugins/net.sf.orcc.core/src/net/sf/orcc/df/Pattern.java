@@ -136,6 +136,18 @@ public interface Pattern extends EObject {
 	EMap<Var, Port> getVarToPortMap();
 
 	/**
+	 * Returns <code>true</code> if this pattern intersects with the given
+	 * pattern. Two patterns intersect if they consume tokens from the same
+	 * port(s).
+	 * 
+	 * @param other
+	 *            another pattern
+	 * @return <code>true</code> if this pattern intersects with the given
+	 *         pattern
+	 */
+	boolean intersectsWith(Pattern other);
+
+	/**
 	 * Returns <code>true</code> if this pattern is empty.
 	 * 
 	 * @return <code>true</code> if this pattern is emptyS

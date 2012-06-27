@@ -28,6 +28,7 @@ import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
@@ -191,15 +192,23 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Action createAction(String tagName, Procedure scheduler,
-			Procedure body) {
+	public Action createAction(int lineNumber, String tag) {
 		ActionImpl action = new ActionImpl();
+		action.setTag(createTag(tag));
+
+		Procedure body = IrFactory.eINSTANCE.createProcedure(tag, lineNumber,
+				IrFactory.eINSTANCE.createTypeVoid());
 		action.setBody(body);
+
 		action.setInputPattern(createPattern());
 		action.setOutputPattern(createPattern());
 		action.setPeekPattern(createPattern());
+
+		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
+				"isSchedulable_" + tag, lineNumber,
+				IrFactory.eINSTANCE.createTypeBool());
 		action.setScheduler(scheduler);
-		action.setTag(createTag(tagName));
+
 		return action;
 	}
 
