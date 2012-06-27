@@ -250,13 +250,6 @@ public class XlimBackendImpl extends AbstractBackend {
 	private void printTestbench(StandardPrinter printer, Instance instance) {
 		printer.print(instance.getName() + "_tb.vhd", path + File.separator
 				+ "Testbench", instance);
-
-		if (instance.isNetwork()) {
-			Network network = instance.getNetwork();
-			for (Instance subInstance : network.getInstances()) {
-				printTestbench(printer, subInstance);
-			}
-		}
 	}
 
 	private void printTCL(Instance instance) {
@@ -282,7 +275,8 @@ public class XlimBackendImpl extends AbstractBackend {
 			String name = instance.getName();
 			Network network = instance.getNetwork();
 			if (!entitySet.contains(name)) {
-				for (Instance subInstance : network.getInstances()) {
+				for (Vertex vertex : network.getChildren()) {
+					Instance subInstance = vertex.getAdapter(Instance.class);
 					computeEntityList(subInstance);
 				}
 
