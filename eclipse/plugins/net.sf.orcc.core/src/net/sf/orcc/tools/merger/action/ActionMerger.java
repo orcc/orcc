@@ -45,8 +45,8 @@ public class ActionMerger extends DfVisitor<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
-		if (!actor.isNative()) {
-			MoC clasz = actor.getMoC();
+		MoC clasz = actor.getMoC();
+		if (clasz != null) {
 			if (clasz.isSDF()) {
 				// Do nothing
 			} else if (clasz.isCSDF()) {
