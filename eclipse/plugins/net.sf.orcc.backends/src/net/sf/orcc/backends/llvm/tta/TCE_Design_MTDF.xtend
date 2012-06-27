@@ -39,16 +39,16 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
  * @author Herve Yviquel
  * 
  */
-class TCE_Design_MADF extends ArchitectureVisitor<CharSequence> {
+class TCE_Design_MTDF extends ArchitectureVisitor<CharSequence> {
 	
 	override caseDesign(Design design){
 		'''
 		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-		<madf version="0.1">
+		<multi-tta version="0.1">
 			«FOR processor:design.processors»
 			«doSwitch(processor)»
 			«ENDFOR»
-		</madf>
+		</multi-tta>
 		'''
 	}
 	
@@ -56,7 +56,6 @@ class TCE_Design_MADF extends ArchitectureVisitor<CharSequence> {
 		'''
 		<processor name="«processor.name»" >
 			<adf path="processor_«processor.name»/" filename="processor_«processor.name».adf" />
-			<idf path="processor_«processor.name»/" filename="processor_«processor.name».idf" />
 			<tpef path="processor_«processor.name»/" filename="processor_«processor.name».tpef" />
 		</processor>
 		'''
