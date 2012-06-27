@@ -50,7 +50,7 @@ public class ActionMerger extends DfVisitor<Void> {
 			if (clasz.isSDF()) {
 				// Do nothing
 			} else if (clasz.isCSDF()) {
-				// new ActionMergerCSDF().merge(actor);
+				new ActionMergerCSDF().merge(actor);
 			} else if (clasz.isQuasiStatic()) {
 				new ActionMergerQSDF().merge(actor);
 			}
