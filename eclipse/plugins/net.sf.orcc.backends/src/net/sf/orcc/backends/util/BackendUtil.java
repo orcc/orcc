@@ -10,6 +10,7 @@ import java.util.Map;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.graph.Vertex;
 
 /**
  * @author Herve Yviquel
@@ -21,7 +22,8 @@ public class BackendUtil {
 			Map<String, String> mapping,
 			Map<String, List<Instance>> targetToInstancesMap,
 			List<Instance> unmappedInstances) {
-		for (Instance instance : network.getInstances()) {
+		for (Vertex vertex : network.getChildren()) {
+			Instance instance = vertex.getAdapter(Instance.class);
 			String name = new String();
 			if (instance.isActor()) {
 				name = instance.getHierarchicalName();
