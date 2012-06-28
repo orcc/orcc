@@ -522,6 +522,11 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 */
 	public void initialize() {
 		try {
+			// initializes parameters
+			for (Var var : actor.getParameters()) {
+				initializeVar(var);
+			}
+
 			// initializes state variables
 			for (Var stateVar : actor.getStateVars()) {
 				initializeVar(stateVar);
