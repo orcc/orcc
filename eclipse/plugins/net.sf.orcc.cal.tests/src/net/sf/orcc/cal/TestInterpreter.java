@@ -31,7 +31,6 @@ package net.sf.orcc.cal;
 import java.util.List;
 
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Argument;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;
@@ -52,8 +51,8 @@ public class TestInterpreter extends ActorInterpreter {
 
 	private StringBuilder builder;
 
-	public TestInterpreter(Actor actor, List<Argument> arguments) {
-		super(actor, arguments);
+	public TestInterpreter(Actor actor) {
+		super(actor);
 		builder = new StringBuilder();
 	}
 

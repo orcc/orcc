@@ -39,7 +39,6 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
@@ -523,16 +522,6 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 */
 	public void initialize() {
 		try {
-			// initializes actors parameters from instance map
-			for (Argument argument : arguments) {
-				Var parameter = actor.getParameter(argument.getVariable()
-						.getName());
-				if (parameter != null) {
-					parameter.setValue(exprInterpreter.doSwitch(argument
-							.getValue()));
-				}
-			}
-
 			// initializes state variables
 			for (Var stateVar : actor.getStateVars()) {
 				initializeVar(stateVar);

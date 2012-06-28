@@ -87,7 +87,7 @@ public class AllTests extends AbstractXtextTests {
 		Assert.assertNotNull("expected parsing, validation, and code "
 				+ "generation to be correct for " + name, entity);
 
-		TestInterpreter interpreter = new TestInterpreter((Actor) entity, null);
+		TestInterpreter interpreter = new TestInterpreter((Actor) entity);
 		interpreter.initialize();
 		interpreter.schedule();
 

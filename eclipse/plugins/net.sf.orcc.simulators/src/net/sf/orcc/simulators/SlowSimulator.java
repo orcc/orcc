@@ -179,7 +179,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Actor actor = vertex.getAdapter(Actor.class);
 
 			ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-					actor, null, getWriteListener());
+					actor, getWriteListener());
 
 			interpreters.put(actor, interpreter);
 		}

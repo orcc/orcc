@@ -34,7 +34,6 @@ import java.util.List;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Arg;
@@ -66,9 +65,9 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 	private WriteListener listener;
 
-	public ConnectedActorInterpreter(Actor actor, List<Argument> arguments,
+	public ConnectedActorInterpreter(Actor actor,
 			WriteListener listener) {
-		super(actor, arguments);
+		super(actor);
 		this.listener = listener;
 	}
 

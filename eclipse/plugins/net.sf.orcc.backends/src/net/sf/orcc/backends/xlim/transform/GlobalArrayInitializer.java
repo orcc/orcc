@@ -28,12 +28,9 @@
  */
 package net.sf.orcc.backends.xlim.transform;
 
-import java.util.Collections;
-
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
@@ -57,7 +54,7 @@ public class GlobalArrayInitializer extends DfVisitor<Void> {
 		private boolean initToZero;
 
 		public XlimActorInitializer(Actor actor, boolean initToZero) {
-			super(actor, Collections.<Argument> emptyList());
+			super(actor);
 			this.initToZero = initToZero;
 		}
 
