@@ -32,8 +32,9 @@ import static java.math.BigInteger.ONE;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
@@ -43,7 +44,6 @@ import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Unit;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
@@ -69,8 +69,8 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.EStructuralFeature.Setting;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines an interpreter for an actor. The interpreter can
@@ -83,11 +83,6 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 public class ActorInterpreter extends IrSwitch<Object> {
 
 	protected Actor actor;
-
-	/**
-	 * Actor's constant parameters to be set at initialization time
-	 */
-	protected List<Argument> arguments;
 
 	/**
 	 * branch being visited
@@ -106,7 +101,6 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * 
 	 */
 	public ActorInterpreter() {
-		this.arguments = Collections.emptyList();
 		exprInterpreter = new ExpressionEvaluator();
 	}
 
@@ -118,12 +112,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * @param parameters
 	 *            parameters of the instance of the given actor
 	 */
-	public ActorInterpreter(Actor actor, List<Argument> arguments) {
-		if (arguments == null) {
-			this.arguments = Collections.emptyList();
-		} else {
-			this.arguments = arguments;
-		}
+	public ActorInterpreter(Actor actor) {
 		exprInterpreter = new ExpressionEvaluator();
 		setActor(actor);
 	}
@@ -374,6 +363,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
+
 		// Allocate local List variables
 		for (Var local : procedure.getLocals()) {
 			Type type = local.getType();
@@ -549,21 +539,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 			}
 
 			// initializes runtime value of constants declared in units
-			Resource resource = actor.eResource();
-			if (resource != null) {
-				ResourceSet set = resource.getResourceSet();
-				for (Resource res : set.getResources()) {
-					EObject eObject = res.getContents().get(0);
-					if (eObject instanceof Unit) {
-						Unit unit = (Unit) eObject;
-						for (Var var : unit.getConstants()) {
-							if (var.getValue() == null) {
-								initializeVar(var);
-							}
-						}
-					}
-				}
-			}
+			initExternalResources(actor);
 
 			// Get initializing procedure if any
 			for (Action action : actor.getInitializes()) {
@@ -575,6 +551,26 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		} catch (OrccRuntimeException ex) {
 			throw new OrccRuntimeException("Runtime exception thrown by actor "
 					+ actor.getName(), ex);
+		}
+	}
+
+	/**
+	 * Initializes external resources referenced by an object (actor, procedure,
+	 * etc.)
+	 * 
+	 * @param obj
+	 *            an EObject which potentially use external variables or
+	 *            procedures
+	 */
+	private void initExternalResources(EObject obj) {
+		Map<EObject, Collection<Setting>> map = EcoreUtil.ExternalCrossReferencer
+				.find(obj);
+		for (EObject externalObject : map.keySet()) {
+			if (externalObject instanceof Var && ((Var) externalObject).getValue() == null) {
+				initializeVar((Var) externalObject);
+			} else if (externalObject instanceof Procedure) {
+				initExternalResources(externalObject);
+			}
 		}
 	}
 
