@@ -60,7 +60,6 @@ import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -150,7 +149,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
-
+		//new Classifier(getWriteListener()).doSwitch(network);
 		instancePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/promela/Actor.stg");
 		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
