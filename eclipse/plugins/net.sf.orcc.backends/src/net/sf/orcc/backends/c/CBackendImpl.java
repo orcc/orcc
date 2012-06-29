@@ -178,7 +178,7 @@ public class CBackendImpl extends AbstractBackend {
 		File buildDir = new File(path + File.separator + "build");
 		File binDir = new File(path + File.separator + "bin");
 
-		// If directories doesn't exist, create them
+		// If directories don't exist, create them
 		if (!srcDir.exists()) {
 			srcDir.mkdirs();
 		}

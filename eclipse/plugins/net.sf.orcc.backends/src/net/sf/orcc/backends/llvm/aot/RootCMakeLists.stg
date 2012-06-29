@@ -1,0 +1,36 @@
+printNetwork(network, options) ::= <<
+# Generated from <network.simpleName>
+
+cmake_minimum_required (VERSION 2.6)
+
+project (<network.simpleName>)
+
+<useClang()>
+
+# Output folder
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+
+# Libraries folder
+set(LIBS_DIR ${CMAKE_SOURCE_DIR}/libs)
+set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
+
+# Runtime libraries inclusion
+set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
+set(ROXML_INCLUDE_DIR ${LIBS_DIR}/roxml/include)
+
+# Helps cmake to find where SDL libraries are saved (win32 only)
+if(WIN32)
+	set(ENV{CMAKE_PREFIX_PATH} ${LIBS_DIR}/windows/SDL-*\;${LIBS_DIR}/windows/SDL_image-*)
+endif()
+
+add_subdirectory(${LIBS_DIR})
+add_subdirectory(${SRC_DIR})
+
+>>
+
+useClang() ::= <<
+# LLVM compiler
+set(CMAKE_C_COMPILER "clang")
+>>
+
+

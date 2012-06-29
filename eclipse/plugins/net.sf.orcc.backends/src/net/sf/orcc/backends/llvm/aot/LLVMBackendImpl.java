@@ -87,6 +87,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected boolean debug;
 
 	/**
+	 * Path to target "src" folder
+	 */
+	private String srcPath;
+
+	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
 	 * transformation hash map.
 	 */
@@ -103,21 +108,23 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	public void doInitializeOptions() {
 		// Set build and src directory
-		File srcDir = new File(path + "/src");
-		File buildDir = new File(path + "/build");
+		File srcDir = new File(path + File.separator + "src");
+		File buildDir = new File(path + File.separator + "build");
+		File binDir = new File(path + File.separator + "bin");
 
 		// If directories don't exist, create them
 		if (!srcDir.exists()) {
 			srcDir.mkdirs();
 		}
-
-		// If directories don't exist, create them
 		if (!buildDir.exists()) {
 			buildDir.mkdirs();
 		}
+		if (!binDir.exists()) {
+			binDir.mkdirs();
+		}
 
 		// Set src directory as path
-		path = srcDir.getAbsolutePath();
+		srcPath = srcDir.getAbsolutePath();
 
 		// Initialize debug mode attribute
 		debug = getAttribute(DEBUG_MODE, false);
@@ -160,7 +167,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				ResourceSet set = new ResourceSetImpl();
 				for (Actor actor : network.getAllActors()) {
 					if (actor.getFileName() != null
-							&& !IrUtil.serializeActor(set, path, actor)) {
+							&& !IrUtil.serializeActor(set, srcPath, actor)) {
 						System.err.println("Error with " + transformation
 								+ " on actor " + actor.getName());
 					}
@@ -200,10 +207,14 @@ public class LLVMBackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/llvm/aot/Network.stg");
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
-		printer.print(network.getSimpleName() + ".ll", path, network);
+		printer.print(network.getSimpleName() + ".ll", srcPath, network);
 
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/llvm/aot/CMakeLists.stg");
+		networkPrinter.print("CMakeLists.txt", srcPath, network);
+
+		networkPrinter = new StandardPrinter(
+				"net/sf/orcc/backends/llvm/aot/RootCMakeLists.stg");
 		networkPrinter.print("CMakeLists.txt", path, network);
 	}
 
@@ -215,16 +226,15 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
+			// Copy specific windows batch file
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-				File targetPath = new File(path).getParentFile();
-				copyFileToFilesystem("/runtime/run_cmake_with_VS_env.bat",
-						targetPath + File.separator
-								+ "run_cmake_with_VS_env.bat");
+				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
+						path + File.separator + "run_cmake_with_VS_env.bat");
 			}
 
 			String target = path + File.separator + "libs";
 			write("Export libraries sources into " + target + "... ");
-			if (copyFolderToFileSystem("/runtime/C", target)) {
+			if (copyFolderToFileSystem("/runtime/C/libs", target)) {
 				write("OK" + "\n");
 				return true;
 			} else {
@@ -237,7 +247,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return printer.print(instance.getSimpleName() + ".ll", path, instance);
+		return printer.print(instance.getSimpleName() + ".ll", srcPath,
+				instance);
 	}
 
 }
