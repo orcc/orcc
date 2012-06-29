@@ -34,6 +34,7 @@ Bugfixes
 configuration.
 - Tools: The normalizer is working back and it has been improved to avoid useless
 memory copies from the FIFOs.
+- interpreter: working with imports within imports
 
 Misc
 ----
