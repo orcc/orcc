@@ -178,16 +178,13 @@ public class CBackendImpl extends AbstractBackend {
 		File buildDir = new File(path + File.separator + "build");
 		File binDir = new File(path + File.separator + "bin");
 
-		// If directories don't exist, create them
+		// If directories doesn't exist, create them
 		if (!srcDir.exists()) {
 			srcDir.mkdirs();
 		}
-
-		// If directories don't exist, create them
 		if (!buildDir.exists()) {
 			buildDir.mkdirs();
 		}
-
 		if (!binDir.exists()) {
 			binDir.mkdirs();
 		}
@@ -354,17 +351,18 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
+			// Copy specific windows batch file
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-
-				copyFileToFilesystem("/runtime/run_cmake_with_VS_env.bat", path
-						+ File.separator + "run_cmake_with_VS_env.bat");
+				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
+						path + File.separator + "run_cmake_with_VS_env.bat");
 			}
+			
+			copyFileToFilesystem("/runtime/C/README.txt", path + File.separator
+					+ "README.txt");
 
 			String target = path + File.separator + "libs";
 			write("Export libraries sources into " + target + "... ");
-			if (copyFolderToFileSystem("/runtime/C", target)
-					&& copyFileToFilesystem("/runtime/README.txt", path
-							+ File.separator + "README.txt")) {
+			if (copyFolderToFileSystem("/runtime/C/libs", target)) {
 				write("OK" + "\n");
 				return true;
 			} else {
