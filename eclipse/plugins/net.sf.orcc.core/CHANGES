@@ -15,7 +15,7 @@ possible to desactivate this export, to not overwrite user-modified library.
 	* add option to choose the configuration of the processors between several 
 	predefined profiles. 
 	* support the mapping of several actors on the same processor.
-- C backend : Folder structure of generated application has changed. It is now
+- C/LLVM backend : Folder structure of generated application has changed. It is now
   /
   |-bin/
   |-build/
