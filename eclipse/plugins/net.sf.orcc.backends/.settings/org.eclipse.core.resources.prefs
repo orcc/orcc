@@ -1,12 +1,2 @@
 eclipse.preferences.version=1
-encoding//model/IrSpecific.ecore=UTF-8
-encoding//model/TTA.ecorediag=UTF-8
-encoding//runtime/TTA/generate=utf-8
-encoding//runtime/TTA/orcc_/__init__.py=utf-8
-encoding//runtime/TTA/orcc_/design.py=utf-8
-encoding//runtime/TTA/orcc_/memory.py=utf-8
-encoding//runtime/TTA/orcc_/port.py=utf-8
-encoding//runtime/TTA/orcc_/processor.py=utf-8
-encoding//src/net/sf/orcc/backends/cplusplus=UTF-8
-encoding//src/net/sf/orcc/backends/llvm/tta=UTF-8
-encoding//src/net/sf/orcc/backends/opencl=UTF-8
+encoding/<project>=UTF-8
