@@ -33,6 +33,8 @@ import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +54,7 @@ import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
+import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.backends.xlim.transform.InstTernaryAdder;
 import net.sf.orcc.backends.xlim.transform.ListFlattener;
 import net.sf.orcc.backends.xlim.transform.XlimDeadVariableRemoval;
@@ -389,10 +392,15 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	protected void printMapping(Network network) {
-		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/util/Mapping.stg");
-		networkPrinter.getOptions().put("mapping", targetToInstancesMap);
-		networkPrinter.print(network.getName() + ".xcf", srcPath, network);
+		try {
+			CharSequence xcfContent = new XcfPrinter().compileXcfFile(network,
+					targetToInstancesMap);
+			PrintStream ps = new PrintStream(path + File.separator
+					+ network.getSimpleName() + ".xcf");
+			ps.print(xcfContent.toString());
+			ps.close();
+		} catch (FileNotFoundException e) {
+		}
 	}
 
 }
