@@ -52,7 +52,7 @@ class XcfPrinter {
 	'''
 	
 	def printPartition(String index, List<Instance> instances)'''
-		<Partition id="«index»">'
+		<Partition id="«index»">
 		«FOR instance : instances»
 			<Instance id="«instance.name»"/>
 		«ENDFOR»
