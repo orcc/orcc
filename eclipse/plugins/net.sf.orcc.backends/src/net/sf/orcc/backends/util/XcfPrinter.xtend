@@ -42,20 +42,34 @@ import net.sf.orcc.df.Network
  */
 class XcfPrinter {
 	
-	def compileXcfFile(Network network, Map<String, List<Instance>> actorToCoreMap) '''
+	int i = 0
+	
+	new() {
+		
+	}
+	
+	def compileXcfFile(Network network, Map<String, List<Instance>> coreToInstanceMap) '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<Configuration>
 			<Partitioning>
-			«actorToCoreMap.forEach[coreIndex, instanceList | printPartition(coreIndex, instanceList)]»
+				«FOR core : coreToInstanceMap.keySet»
+				«printPartition(coreToInstanceMap.get(core))»
+				«ENDFOR»
 			</Partitioning>
 		</Configuration>
 	'''
 	
-	def printPartition(String index, List<Instance> instances)'''
-		<Partition id="«index»">
-		«FOR instance : instances»
+	def printPartition(List<Instance> instances)'''
+		<Partition id="«printIndex()»">
+			«FOR instance : instances»
 			<Instance id="«instance.name»"/>
-		«ENDFOR»
+			«ENDFOR»
 		</Partition>
 	'''
+	
+	def printIndex() {
+		val result = i.toString
+		i = i + 1
+		return result
+	}
 }
