@@ -44,10 +44,6 @@ class XcfPrinter {
 	
 	int i = 0
 	
-	new() {
-		
-	}
-	
 	def compileXcfFile(Network network, Map<String, List<Instance>> coreToInstanceMap) '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<Configuration>
