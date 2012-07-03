@@ -395,8 +395,8 @@ public class CBackendImpl extends AbstractBackend {
 		try {
 			CharSequence xcfContent = new XcfPrinter().compileXcfFile(network,
 					targetToInstancesMap);
-			PrintStream ps = new PrintStream(path + File.separator
-					+ network.getSimpleName() + ".xcf");
+			PrintStream ps = new PrintStream(srcPath + File.separator
+					+ network.getName() + ".xcf");
 			ps.print(xcfContent.toString());
 			ps.close();
 		} catch (FileNotFoundException e) {
