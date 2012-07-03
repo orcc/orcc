@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.cplusplus;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
@@ -40,6 +41,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.transform.TypeResizer;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -70,8 +72,11 @@ public class YaceBackend extends AbstractBackend {
 
 	private boolean merge;
 
+	protected Map<String, String> mapping;
+
 	@Override
 	public void doInitializeOptions() {
+		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		merge = getAttribute("net.sf.orcc.backends.merge", false);
 		debugMode = getAttribute(DEBUG_MODE, true);
@@ -157,6 +162,23 @@ public class YaceBackend extends AbstractBackend {
 	public void printNetwork(Network network) throws OrccException {
 		YacePrinter printer = new YacePrinter();
 		printer.getOptions().put("codesign", getAttribute("codesign", false));
+
+		Map<String, List<Instance>> targetToInstancesMap;
+		for (String component : mapping.values()) {
+			if (!component.isEmpty()) {
+				targetToInstancesMap = new HashMap<String, List<Instance>>();
+				List<Instance> unmappedInstances = new ArrayList<Instance>();
+				BackendUtil.computeMapping(network, mapping,
+						targetToInstancesMap, unmappedInstances);
+				printer.getOptions().put("threads", targetToInstancesMap);
+				for (Instance instance : unmappedInstances) {
+					write("Warning: The instance '" + instance.getName()
+							+ "' is not mapped.\n");
+				}
+				break;
+			}
+		}
+
 		printer.print(path, network);
 	}
 

@@ -35,8 +35,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -193,11 +195,21 @@ public class YacePrinter {
 			ps.print(sequence.toString());
 			ps.close();
 
-			file = path + File.separator + network.getSimpleName() + ".xcf";
-			sequence = new NetworkPrinter().compileXcfFile(network);
-			ps = new PrintStream(new FileOutputStream(file));
-			ps.print(sequence.toString());
-			ps.close();
+			if (options.containsKey("threads")) {
+				// TODO when all backends will run with Xtend : replace
+				// "options" map by another king of object, more
+				// specific (which not contain java.lang.Object instances)
+				@SuppressWarnings("unchecked")
+				Map<String, List<Instance>> instanceToCoreMap = (Map<String, List<Instance>>) options
+						.get("threads");
+				
+				file = path + File.separator + network.getSimpleName() + ".xcf";
+				sequence = new XcfPrinter().compileXcfFile(network,
+						instanceToCoreMap);
+				ps = new PrintStream(new FileOutputStream(file));
+				ps.print(sequence.toString());
+				ps.close();
+			}
 
 			file = path + File.separator + "CMakeLists.txt";
 			sequence = new NetworkPrinter().compileCmakeLists(network, options);

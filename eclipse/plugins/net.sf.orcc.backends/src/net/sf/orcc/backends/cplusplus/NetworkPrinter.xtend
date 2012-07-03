@@ -182,17 +182,4 @@ class NetworkPrinter extends AbstractPrinter {
 		set(libraries ${libraries} ${CMAKE_THREAD_LIBS_INIT} "stdc++")
 		target_link_libraries(«network.simpleName» ${libraries})
 	'''
-	
-	def compileXcfFile(Network network) '''
-		<?xml version="1.0" encoding="UTF-8"?>
-		<Configuration>
-			<Partitioning>
-				<Partition id="0">
-					«FOR instance : network.instances»
-					<Instance id="«FOR segment: instance.hierarchicalId»/«segment»«ENDFOR»"/>
-					«ENDFOR»
-				</Partition> 
-			</Partitioning>
-		</Configuration>
-	'''
 }
