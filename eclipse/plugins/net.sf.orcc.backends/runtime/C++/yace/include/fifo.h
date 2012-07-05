@@ -40,17 +40,18 @@
 
 #include <string.h>
 
+#include "barrier.h"
+
 /*! \class Fifo fifo.h
  *  \brief A template class that implements a non-bocking ring buffer.
- *  The size of the fifo is a template argument to improve performance.
  */
-template <typename T, int size = 4096>
+template <typename T>
 class Fifo
 {
 public:
 	/*! \brief Constructor
 	 */
-	Fifo(int threshold=4096);
+	Fifo(int size=4096, int threshold=4096);
 
 	/*! \brief Destructor
 	 */
@@ -104,13 +105,13 @@ public:
 	/*! \brief get the number of available data
 	 *  \return The number of available data elements in the ring buffer
 	 */
-	unsigned int getCount() const { return (size + wr_ptr - rd_ptr) % size; }
+	unsigned int getCount() const { return (size + wr_ptr - rd_ptr) & (size - 1); }
 	
 	/*! \brief get the number of available rooms
 	 *	keep one slot empty for full/empty disambiguation
 	 *  \return The number of available rooms in the ring buffer
 	 */
-	unsigned int getRooms() const { return (size + rd_ptr - wr_ptr - 1) % size; }
+	unsigned int getRooms() const { return (size + rd_ptr - wr_ptr - 1) & (size - 1); }
 
 private:
 	T * buffer; /*!< start address of the ring buffer*/
@@ -118,55 +119,61 @@ private:
 	unsigned int rd_ptr; /*!< read counter*/
 
 	unsigned int wr_ptr; /*!< write counter*/
+
+	unsigned int size;
 };
 
 
-template <typename T, int size>
-Fifo<T, size>::Fifo(int threshold)
+template <typename T>
+Fifo<T>::Fifo(int size, int threshold)
 	: buffer(new T[size + threshold])
 	, rd_ptr(0)
-	, wr_ptr(0) 
+	, wr_ptr(0)
+	, size(size) 
 {
+	if((size) & (size - 1) != 0) {
+		// size is not a power of 2
+	}
 }
 
-template <typename T, int size> 
-Fifo<T, size>::~Fifo()
+template <typename T> 
+Fifo<T>::~Fifo()
 {
 	delete [] buffer;
 }
 
-template <typename T, int size>
-inline T* Fifo<T, size>::getWrPtr() const
+template <typename T>
+inline T* Fifo<T>::getWrPtr() const
 {
 	return buffer + wr_ptr;
 }
 
-template <typename T, int size>
-void Fifo<T, size>::incWrPtr()
+template <typename T>
+void Fifo<T>::incWrPtr()
 {
-	++wr_ptr;
-	wr_ptr %= size;
+	++ wr_ptr;
+	wr_ptr &= (size - 1);
 }
 
-template <typename T, int size>
-void Fifo<T, size>::incWrPtr(unsigned int nb_val)
+template <typename T>
+void Fifo<T>::incWrPtr(unsigned int nb_val)
 {
 	if((wr_ptr + nb_val) > size)
 	{
 		memcpy(buffer, buffer + size, (wr_ptr + nb_val - size) * sizeof(T));
 	}
 	wr_ptr += nb_val;
-	wr_ptr %= size;
+	wr_ptr &= (size - 1);
 }
 
-template <typename T, int size>
-inline T* Fifo<T, size>::getRdPtr() const
+template <typename T>
+inline T* Fifo<T>::getRdPtr() const
 {
 	return buffer + rd_ptr;
 }
 
-template <typename T, int size>
-inline T* Fifo<T, size>::getRdPtr(unsigned uNbVal)
+template <typename T>
+inline T* Fifo<T>::getRdPtr(unsigned uNbVal)
 {
 	T * pVal = buffer + rd_ptr;
 	if((rd_ptr + uNbVal) > size)
@@ -176,30 +183,30 @@ inline T* Fifo<T, size>::getRdPtr(unsigned uNbVal)
 	return pVal;
 }
 
-template <typename T, int size>
-void Fifo<T, size>::incRdPtr()
+template <typename T>
+void Fifo<T>::incRdPtr()
 {
 	++rd_ptr;
-	rd_ptr %= size;
+	rd_ptr &= (size - 1);
 }
 
-template <typename T, int size>
-void Fifo<T, size>::incRdPtr(unsigned int nb_val)
+template <typename T>
+void Fifo<T>::incRdPtr(unsigned int nb_val)
 {
 	rd_ptr += nb_val;
-	rd_ptr %= size;
+	rd_ptr &= (size - 1);
 }
 
-template <typename T, int size> 
-inline void Fifo<T, size>::put(T * pVal)
+template <typename T> 
+inline void Fifo<T>::put(T * pVal)
 {
 	buffer[wr_ptr] = *pVal;
 	++wr_ptr;
-	wr_ptr %= size;
+	wr_ptr &= (size - 1);
 }
 
-template <typename T, int size> 
-inline void Fifo<T, size>::put(T * pVal, unsigned uNbVal) 
+template <typename T> 
+inline void Fifo<T>::put(T * pVal, unsigned uNbVal) 
 {
 	if((wr_ptr + uNbVal) > size) 
 	{
@@ -212,7 +219,7 @@ inline void Fifo<T, size>::put(T * pVal, unsigned uNbVal)
 		memcpy(buffer + wr_ptr, pVal, uNbVal * sizeof(T));
 	}
 	wr_ptr += uNbVal;
-	wr_ptr %= size;
+	wr_ptr &= (size - 1);
 }
 
 #endif

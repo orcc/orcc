@@ -55,7 +55,7 @@ class AbstractPrinter extends IrSwitch {
 		
 	override caseExprBinary(ExprBinary expr) '''(«expr.getE1.doSwitch» «expr.op.text» «expr.getE2.doSwitch»)'''
 
-	override caseExprBool(ExprBool expr) '''«expr.value»'''
+	override caseExprBool(ExprBool expr) '''«IF expr.value»1«ELSE»0«ENDIF»'''
 	
 	override caseExprFloat(ExprFloat expr) '''«expr.value»'''
 
@@ -69,7 +69,7 @@ class AbstractPrinter extends IrSwitch {
 
 	override caseExprVar(ExprVar expr) '''«expr.use.variable.indexedName»'''
 	
-	override caseTypeBool(TypeBool type)  '''bool'''
+	override caseTypeBool(TypeBool type)  '''int'''
 	
 	override caseTypeInt(TypeInt type) {
 		printInt(type.size)
@@ -79,7 +79,7 @@ class AbstractPrinter extends IrSwitch {
 		type.type.doSwitch
 	}
 
-	override caseTypeString(TypeString type)  '''std::string'''
+	override caseTypeString(TypeString type)  '''char*'''
 
 	override caseTypeUint(TypeUint type) {
 		"unsigned " + printInt(type.size);

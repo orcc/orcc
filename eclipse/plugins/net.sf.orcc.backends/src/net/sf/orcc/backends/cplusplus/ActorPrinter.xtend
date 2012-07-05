@@ -90,15 +90,15 @@ import net.sf.orcc.ir.Var
 			
 			«FOR port : actor.outputs.filter(connectedOutput)»«port.compilePort(instance.outgoingPortMap.get(port).get(0).size, instance.outgoingPortMap.get(port).size)»«ENDFOR»
 			
-			«FOR proc : actor.procs.filter(p | !p.native) SEPARATOR "\n"»«proc.compileProcedure»«ENDFOR»
+			«actor.procs.filter(p | !p.native).map[compileProcedure].join»
 			
-			«FOR action : actor.initializes SEPARATOR "\n"»«action.compileAction»«ENDFOR»
+			«actor.initializes.map[compileAction].join»
 		
 			void initialize() {
 				«FOR action : actor.initializes SEPARATOR "\n"»«action.name»();«ENDFOR»
 			}
 		
-			«FOR action : actor.actions SEPARATOR "\n"»«action.compileAction»«ENDFOR»
+			«actor.actions.map[compileAction].join»
 		
 			«actor.compileScheduler»
 			
@@ -180,11 +180,11 @@ import net.sf.orcc.ir.Var
 	
 	
 	def compilePort(Port port, Integer size) '''
-		PortIn<«port.type.doSwitch»«IF size != null», «size»«ENDIF»> port_«port.name»;
+		PortIn<«port.type.doSwitch»> port_«port.name»;
 	'''
 	
 	def compilePort(Port port, Integer size, Integer fanout) '''
-		PortOut<«port.type.doSwitch», «fanout»«IF size != null», «size»«ENDIF»> port_«port.name»;
+		PortOut<«port.type.doSwitch», «fanout»> port_«port.name»;
 	'''
 
 	def compileNativeProc(Procedure proc) '''
@@ -214,14 +214,15 @@ import net.sf.orcc.ir.Var
 			«ENDFOR»
 			«action.body.doSwitch»
 			«FOR e : action.inputPattern.numTokensMap»
-			port_«e.key.name».incRdPtr(«IF e.value > 1»«e.value»«ENDIF»);
+			port_«e.key.name».release(«IF e.value > 1»«e.value»«ENDIF»);
 			status_«e.key.name»_ -= «e.value»;
 			«ENDFOR»
 			«FOR e : action.outputPattern.numTokensMap»
-			port_«e.key.name».incWrPtr(«e.key.name»«IF e.value > 1», «e.value»«ENDIF»);
+			port_«e.key.name».release(«e.key.name»«IF e.value > 1», «e.value»«ENDIF»);
 			status_«e.key.name»_ -= «e.value»;
 		«ENDFOR»
 		}
+		
 	'''
 	
 	def private varDecl(Var v) {

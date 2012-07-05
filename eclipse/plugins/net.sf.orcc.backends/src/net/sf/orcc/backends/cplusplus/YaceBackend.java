@@ -137,7 +137,6 @@ public class YaceBackend extends AbstractBackend {
 
 		network.computeTemplateMaps();
 		printInstances(network);
-
 		// print network
 		write("Printing network...\n");
 		printNetwork(network);

@@ -84,7 +84,7 @@ class NetworkPrinter extends AbstractPrinter {
 		«ENDFOR»
 				
 		«FOR edge : network.connections»
-		Fifo<«edge.sourcePort.type.doSwitch»«IF edge.size!= null», «edge.size»«ENDIF»> fifo_«edge.attributes.filter(a|"id".equals(a.name)).iterator.next.pojoValue»;
+		Fifo<«edge.sourcePort.type.doSwitch»> fifo_«edge.attributes.filter(a|"id".equals(a.name)).iterator.next.pojoValue»«IF edge.size!= null»(«edge.size»)«ENDIF»;
 		«ENDFOR»
 
 		int main(int argc, char *argv[]) {
@@ -96,8 +96,8 @@ class NetworkPrinter extends AbstractPrinter {
 			«ENDFOR»
 
 			«FOR e : network.connections»
-			inst_«(e.source as Instance).name».port_«e.sourcePort.name»(&fifo_«e.attributes.filter(a|"id" == a.name).iterator.next.pojoValue»);
-			inst_«(e.target as Instance).name».port_«e.targetPort.name»(&fifo_«e.attributes.filter(a|"id" == a.name).iterator.next.pojoValue»);
+			inst_«(e.source as Instance).name».port_«e.sourcePort.name»(&fifo_«e.attributes.findFirst(a|"id" == a.name).pojoValue»);
+			inst_«(e.target as Instance).name».port_«e.targetPort.name»(&fifo_«e.attributes.findFirst(a|"id" == a.name).pojoValue»);
 			«ENDFOR»
 						
 			ConfigParser parser(config_file, actors);

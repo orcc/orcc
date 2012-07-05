@@ -44,7 +44,7 @@
 #include "fifo.h"
 
 
-template<typename T, int size=4096>
+template<typename T>
 struct NullPort
 {
 	T* getRdPtr(unsigned int=0) { return 0; }
@@ -55,32 +55,32 @@ struct NullPort
 	unsigned int getRooms() { return 0; }
 };
 
-template<typename T, int size=4096>
+template<typename T>
 struct PortIn
 {
-	void operator() (Fifo<T, size>* pfifo)  {  this->pfifo = pfifo; }
+	void operator() (Fifo<T>* pfifo)  {  this->pfifo = pfifo; }
 
 	T* getRdPtr() { return  pfifo->getRdPtr(); }
 
 	T* getRdPtr(unsigned int val) { return pfifo->getRdPtr(val); }
 
-	void incRdPtr() { pfifo->incRdPtr(); }
+	void release() { pfifo->incRdPtr(); }
 
-	void incRdPtr(unsigned int val) { pfifo->incRdPtr(val); }
+	void release(unsigned int val) { pfifo->incRdPtr(val); }
 
 	unsigned int getCount() { return pfifo->getCount(); }
 
-	Fifo<T, size>* pfifo;
+	Fifo<T>* pfifo;
 };
 
-template<typename T, int num, int size=4096>
+template<typename T, int num>
 struct PortOut
 {
-	void operator() (Fifo<T, size>* pfifo) { fifos.push_back(pfifo); }
+	void operator() (Fifo<T>* pfifo) { fifos.push_back(pfifo); }
 
 	T* getWrPtr() { return  fifos[0]->getWrPtr(); }
 
-	void incWrPtr(T* buf) 
+	void release(T* buf) 
 	{
 		fifos[0]->incWrPtr();
 		for(int i = 1; i<num; i++)
@@ -89,7 +89,7 @@ struct PortOut
 		}
 	}
 
-	void incWrPtr(T* buf, unsigned int val)
+	void release(T* buf, unsigned int val)
 	{
 		fifos[0]->incWrPtr(val);
 		for(int i = 1; i<num; i++)
@@ -109,99 +109,27 @@ struct PortOut
 		return rooms;
 	}
 
-	std::vector<Fifo<T, size>* > fifos;
+	std::vector<Fifo<T>* > fifos;
 };
 
 /*! 
  *  partial specialization for a single connected fifo
  */
-template<typename T, int size>
-struct PortOut<T, 1, size>
+template<typename T>
+struct PortOut<T, 1>
 {
-	void operator() (Fifo<T, size>* pfifo) { this->pfifo = pfifo; }
+	void operator() (Fifo<T>* pfifo) { this->pfifo = pfifo; }
 
 	T* getWrPtr() { return pfifo->getWrPtr(); }
 
-	void incWrPtr(T* buf) { pfifo->incWrPtr(); }
+	void release(T* buf) { pfifo->incWrPtr(); }
 
-	void incWrPtr(T* buf, unsigned int val)	{ pfifo->incWrPtr(val); }
+	void release(T* buf, unsigned int val)	{ pfifo->incWrPtr(val); }
 
 	unsigned int getRooms() { return pfifo->getRooms(); }
 
-	Fifo<T, size>* pfifo;
-};
-
-/*! 
- *  partial specialization for 2 connected fifos
- */
-template<typename T, int size>
-struct PortOut<T, 2, size>
-{
-	void operator() (Fifo<T, size>* pfifo) { fifos.push_back(pfifo); }
-
-	T* getWrPtr() { return  fifos[0]->getWrPtr(); }
-
-	void incWrPtr(T* buf) 
-	{
-		fifos[0]->incWrPtr();
-		fifos[1]->put(buf);
-	}
-
-	void incWrPtr(T* buf, unsigned int val)
-	{
-		fifos[0]->incWrPtr(val);
-		fifos[1]->put(buf, val);
-	}
-
-	unsigned int getRooms()
-	{
-		int rooms0 = fifos[0]->getRooms();
-		int rooms1 = fifos[1]->getRooms();
-		return (rooms0 < rooms1) ? rooms0 : rooms1;
-	}
-
-	std::vector<Fifo<T, size>* > fifos;
-};
-
-/*! 
- *  partial specialization for 4 connected fifos
- */
-template<typename T, int size>
-struct PortOut<T, 4, size>
-{
-	void operator() (Fifo<T, size>* pfifo) { fifos.push_back(pfifo); }
-
-	T* getWrPtr() { return  fifos[0]->getWrPtr(); }
-
-	void incWrPtr(T* buf) 
-	{
-		fifos[0]->incWrPtr();
-		fifos[1]->put(buf);
-		fifos[2]->put(buf);
-		fifos[3]->put(buf);
-	}
-
-	void incWrPtr(T* buf, unsigned int val)
-	{
-		fifos[0]->incWrPtr(val);
-		fifos[1]->put(buf, val);
-		fifos[2]->put(buf, val);
-		fifos[3]->put(buf, val);
-	}
-
-	unsigned int getRooms()
-	{
-		int rooms0 = fifos[0]->getRooms();
-		int rooms1 = fifos[1]->getRooms();
-		int rooms2 = fifos[2]->getRooms();
-		int rooms3 = fifos[3]->getRooms();
-		rooms0 = (rooms0 < rooms1) ? rooms0 : rooms1;
-		rooms0 = (rooms0 < rooms2) ? rooms0 : rooms2;
-		rooms0 = (rooms0 < rooms3) ? rooms0 : rooms3;
-		return rooms0;
-	}
-
-	std::vector<Fifo<T, size>* > fifos;
+	Fifo<T>* pfifo;
 };
 
 #endif
+
