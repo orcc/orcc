@@ -99,7 +99,6 @@ void Condition::broadcast()
 	long w = InterlockedExchangeAdd(&m_waiters, 0);
 	if (w > 0)
 	{
-		// we are broadcasting.
 		m_was_broadcast = 1;
 		have_waiters = 1;
 	}
@@ -107,10 +106,8 @@ void Condition::broadcast()
 	int result = 0;
 	if (have_waiters)
 	{
-		// Wake up all the waiters.
 		ReleaseSemaphore(m_sema, m_waiters, NULL);
 		WaitForSingleObject(m_event, INFINITE) ;
-		//end of broadcasting
 		m_was_broadcast = 0;
 	}
 #else

@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.backends.cplusplus.entities;
 
+import net.sf.orcc.graph.GraphPackage;
+import net.sf.orcc.df.DfPackage;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
@@ -71,24 +73,6 @@ public interface YaceEntitiesPackage extends EPackage {
 	int COMMUNICATOR = 4;
 
 	/**
-	 * The feature id for the '<em><b>Intf</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int COMMUNICATOR__INTF = EcorePackage.EOBJECT_FEATURE_COUNT + 0;
-
-	/**
-	 * The number of structural features of the '<em>Communicator</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int COMMUNICATOR_FEATURE_COUNT = EcorePackage.EOBJECT_FEATURE_COUNT + 1;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.cplusplus.entities.impl.SenderImpl <em>Sender</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -99,13 +83,193 @@ public interface YaceEntitiesPackage extends EPackage {
 	int SENDER = 0;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__ATTRIBUTES = DfPackage.ACTOR__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__INCOMING = DfPackage.ACTOR__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__LABEL = DfPackage.ACTOR__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__NUMBER = DfPackage.ACTOR__NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__OUTGOING = DfPackage.ACTOR__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__ACTIONS = DfPackage.ACTOR__ACTIONS;
+
+	/**
+	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__ACTIONS_OUTSIDE_FSM = DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM;
+
+	/**
+	 * The feature id for the '<em><b>File Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__FILE_NAME = DfPackage.ACTOR__FILE_NAME;
+
+	/**
+	 * The feature id for the '<em><b>Fsm</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__FSM = DfPackage.ACTOR__FSM;
+
+	/**
+	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__INITIALIZES = DfPackage.ACTOR__INITIALIZES;
+
+	/**
+	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__INPUTS = DfPackage.ACTOR__INPUTS;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__LINE_NUMBER = DfPackage.ACTOR__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Mo C</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__MO_C = DfPackage.ACTOR__MO_C;
+
+	/**
+	 * The feature id for the '<em><b>Native</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__NATIVE = DfPackage.ACTOR__NATIVE;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__NAME = DfPackage.ACTOR__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__OUTPUTS = DfPackage.ACTOR__OUTPUTS;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__PARAMETERS = DfPackage.ACTOR__PARAMETERS;
+
+	/**
+	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__PROCS = DfPackage.ACTOR__PROCS;
+
+	/**
+	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__STATE_VARS = DfPackage.ACTOR__STATE_VARS;
+
+	/**
+	 * The feature id for the '<em><b>Template Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__TEMPLATE_DATA = DfPackage.ACTOR__TEMPLATE_DATA;
+
+	/**
 	 * The feature id for the '<em><b>Intf</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SENDER__INTF = COMMUNICATOR__INTF;
+	int SENDER__INTF = DfPackage.ACTOR_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Input</b></em>' reference.
@@ -114,7 +278,7 @@ public interface YaceEntitiesPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SENDER__INPUT = COMMUNICATOR_FEATURE_COUNT + 0;
+	int SENDER__INPUT = DfPackage.ACTOR_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Sender</em>' class.
@@ -123,7 +287,7 @@ public interface YaceEntitiesPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SENDER_FEATURE_COUNT = COMMUNICATOR_FEATURE_COUNT + 1;
+	int SENDER_FEATURE_COUNT = DfPackage.ACTOR_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.cplusplus.entities.impl.ReceiverImpl <em>Receiver</em>}' class.
@@ -136,13 +300,193 @@ public interface YaceEntitiesPackage extends EPackage {
 	int RECEIVER = 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__ATTRIBUTES = DfPackage.ACTOR__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__INCOMING = DfPackage.ACTOR__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__LABEL = DfPackage.ACTOR__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__NUMBER = DfPackage.ACTOR__NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__OUTGOING = DfPackage.ACTOR__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__ACTIONS = DfPackage.ACTOR__ACTIONS;
+
+	/**
+	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__ACTIONS_OUTSIDE_FSM = DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM;
+
+	/**
+	 * The feature id for the '<em><b>File Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__FILE_NAME = DfPackage.ACTOR__FILE_NAME;
+
+	/**
+	 * The feature id for the '<em><b>Fsm</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__FSM = DfPackage.ACTOR__FSM;
+
+	/**
+	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__INITIALIZES = DfPackage.ACTOR__INITIALIZES;
+
+	/**
+	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__INPUTS = DfPackage.ACTOR__INPUTS;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__LINE_NUMBER = DfPackage.ACTOR__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Mo C</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__MO_C = DfPackage.ACTOR__MO_C;
+
+	/**
+	 * The feature id for the '<em><b>Native</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__NATIVE = DfPackage.ACTOR__NATIVE;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__NAME = DfPackage.ACTOR__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__OUTPUTS = DfPackage.ACTOR__OUTPUTS;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__PARAMETERS = DfPackage.ACTOR__PARAMETERS;
+
+	/**
+	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__PROCS = DfPackage.ACTOR__PROCS;
+
+	/**
+	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__STATE_VARS = DfPackage.ACTOR__STATE_VARS;
+
+	/**
+	 * The feature id for the '<em><b>Template Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__TEMPLATE_DATA = DfPackage.ACTOR__TEMPLATE_DATA;
+
+	/**
 	 * The feature id for the '<em><b>Intf</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int RECEIVER__INTF = COMMUNICATOR__INTF;
+	int RECEIVER__INTF = DfPackage.ACTOR_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Output</b></em>' reference.
@@ -151,7 +495,7 @@ public interface YaceEntitiesPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int RECEIVER__OUTPUT = COMMUNICATOR_FEATURE_COUNT + 0;
+	int RECEIVER__OUTPUT = DfPackage.ACTOR_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Receiver</em>' class.
@@ -160,7 +504,7 @@ public interface YaceEntitiesPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int RECEIVER_FEATURE_COUNT = COMMUNICATOR_FEATURE_COUNT + 1;
+	int RECEIVER_FEATURE_COUNT = DfPackage.ACTOR_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.cplusplus.entities.impl.InterfaceImpl <em>Interface</em>}' class.
@@ -244,6 +588,69 @@ public interface YaceEntitiesPackage extends EPackage {
 	 * @ordered
 	 */
 	int INTERFACE_ETHERNET_FEATURE_COUNT = INTERFACE_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__LABEL = GraphPackage.VERTEX__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__NUMBER = GraphPackage.VERTEX__NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Intf</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__INTF = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Communicator</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 
 	/**

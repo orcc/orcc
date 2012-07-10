@@ -71,15 +71,15 @@ class NetworkPrinter extends AbstractPrinter {
 		#undef OUT
 		#endif
 		
-		«FOR instance : network.instances.filter(i | i.isActor) SEPARATOR "\n"»#include "«instance.name».h"«ENDFOR»
-		«IF network.instances.findFirst(i | i.entity instanceof Sender) != null»#include "Sender.h"«ENDIF»
-		«IF network.instances.findFirst(i | i.entity instanceof Receiver) != null»#include "Receiver.h"«ENDIF»
+		«FOR instance : network.instances.filter(i | i.isActor && !(i.actor.native)) SEPARATOR "\n"»#include "«instance.name».h"«ENDFOR»
+		«IF network.instances.findFirst(i | i.entity instanceof Sender) != null»#include "sender.h" #include "ethernet.h"«ENDIF»
+		«IF network.instances.findFirst(i | i.entity instanceof Receiver) != null»#include "receiver.h" #include "ethernet.h"«ENDIF»
 
 		«FOR instance : network.instances.filter(i | i.entity instanceof Communicator)»
 		«(instance.entity as Communicator).compileCommunicator(instance.name)»
 		«ENDFOR»
 		
-		«FOR instance : network.instances.filter(i | i.isActor)»
+		«FOR instance : network.instances.filter(i | i.isActor && !(i.actor.native))»
 		«instance.name» inst_«instance.name»;
 		«ENDFOR»
 				
@@ -117,7 +117,7 @@ class NetworkPrinter extends AbstractPrinter {
 		val interface = interfaces.findFirst(intf | intf.equals(receiver.intf))
 		'''
 		«IF interface == null»«receiver.intf.compileInterface»«ENDIF»
-		Receiver<«receiver.output.type.doSwitch»> inst_«name»(«receiver.intf.id»);
+		Receiver<«receiver.output.type.doSwitch»> inst_«name»(&«receiver.intf.id»);
 		'''
 	}
 	
@@ -125,7 +125,7 @@ class NetworkPrinter extends AbstractPrinter {
 		val interface = interfaces.findFirst(intf | intf.equals(sender.intf))
 		'''
 		«IF interface == null»«sender.intf.compileInterface»«ENDIF»
-		Sender<«sender.input.type.doSwitch»> inst_«name»(«sender.intf.id»);
+		Sender<«sender.input.type.doSwitch»> inst_«name»(&«sender.intf.id»);
 		'''
 	}
 
@@ -172,7 +172,7 @@ class NetworkPrinter extends AbstractPrinter {
 
 		add_executable («network.simpleName»
 		«network.simpleName».cpp
-		«FOR instance : network.instances.filter(i | i.isActor) SEPARATOR "\n"»«instance.name».h«ENDFOR»
+		«FOR instance : network.instances.filter(i | i.isActor && !i.actor.native) SEPARATOR "\n"»«instance.name».h«ENDFOR»
 		)
 
 		set(libraries Yace TinyXml)

@@ -16,10 +16,12 @@ import net.sf.orcc.backends.cplusplus.entities.YaceEntitiesPackage;
 
 import net.sf.orcc.df.DfPackage;
 
+import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.ir.IrPackage;
 
 import net.sf.orcc.moc.MocPackage;
 
+import net.sf.orcc.util.UtilPackage;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
@@ -315,17 +317,24 @@ public class YaceEntitiesPackageImpl extends EPackageImpl implements YaceEntitie
 
 		// Obtain other dependent packages
 		DfPackage theDfPackage = (DfPackage)EPackage.Registry.INSTANCE.getEPackage(DfPackage.eNS_URI);
+		UtilPackage theUtilPackage = (UtilPackage)EPackage.Registry.INSTANCE.getEPackage(UtilPackage.eNS_URI);
 		EcorePackage theEcorePackage = (EcorePackage)EPackage.Registry.INSTANCE.getEPackage(EcorePackage.eNS_URI);
+		GraphPackage theGraphPackage = (GraphPackage)EPackage.Registry.INSTANCE.getEPackage(GraphPackage.eNS_URI);
 
 		// Create type parameters
 
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
+		senderEClass.getESuperTypes().add(theDfPackage.getActor());
 		senderEClass.getESuperTypes().add(this.getCommunicator());
+		senderEClass.getESuperTypes().add(theUtilPackage.getAdaptable());
+		receiverEClass.getESuperTypes().add(theDfPackage.getActor());
 		receiverEClass.getESuperTypes().add(this.getCommunicator());
+		receiverEClass.getESuperTypes().add(theUtilPackage.getAdaptable());
 		interfaceEthernetEClass.getESuperTypes().add(this.getInterface());
-		communicatorEClass.getESuperTypes().add(theEcorePackage.getEObject());
+		communicatorEClass.getESuperTypes().add(theGraphPackage.getVertex());
+		communicatorEClass.getESuperTypes().add(theUtilPackage.getAdaptable());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(senderEClass, Sender.class, "Sender", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -339,7 +348,7 @@ public class YaceEntitiesPackageImpl extends EPackageImpl implements YaceEntitie
 
 		initEClass(interfaceEthernetEClass, InterfaceEthernet.class, "InterfaceEthernet", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getInterfaceEthernet_Ip(), theEcorePackage.getEString(), "ip", null, 0, 1, InterfaceEthernet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getInterfaceEthernet_PortNumber(), theEcorePackage.getEInt(), "portNumber", null, 0, 1, InterfaceEthernet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getInterfaceEthernet_PortNumber(), theEcorePackage.getELong(), "portNumber", null, 0, 1, InterfaceEthernet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getInterfaceEthernet_Server(), theEcorePackage.getEBoolean(), "server", null, 0, 1, InterfaceEthernet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(communicatorEClass, Communicator.class, "Communicator", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

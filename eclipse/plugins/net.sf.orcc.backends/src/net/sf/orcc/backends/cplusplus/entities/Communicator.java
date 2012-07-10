@@ -6,6 +6,9 @@
  */
 package net.sf.orcc.backends.cplusplus.entities;
 
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.Adaptable;
+import net.sf.orcc.df.Entity;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -24,7 +27,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  * @generated
  */
-public interface Communicator extends EObject {
+public interface Communicator extends Vertex, Adaptable {
 	/**
 	 * Returns the value of the '<em><b>Intf</b></em>' reference.
 	 * <!-- begin-user-doc -->

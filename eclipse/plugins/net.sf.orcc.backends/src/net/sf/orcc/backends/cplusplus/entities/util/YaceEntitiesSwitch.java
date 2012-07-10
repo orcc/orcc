@@ -8,6 +8,11 @@ package net.sf.orcc.backends.cplusplus.entities.util;
 
 import net.sf.orcc.backends.cplusplus.entities.*;
 
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.Adaptable;
+import net.sf.orcc.util.Attributable;
+import net.sf.orcc.df.Entity;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 
@@ -73,14 +78,22 @@ public class YaceEntitiesSwitch<T> extends Switch<T> {
 			case YaceEntitiesPackage.SENDER: {
 				Sender sender = (Sender)theEObject;
 				T result = caseSender(sender);
+				if (result == null) result = caseActor(sender);
 				if (result == null) result = caseCommunicator(sender);
+				if (result == null) result = caseVertex(sender);
+				if (result == null) result = caseAttributable(sender);
+				if (result == null) result = caseAdaptable(sender);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case YaceEntitiesPackage.RECEIVER: {
 				Receiver receiver = (Receiver)theEObject;
 				T result = caseReceiver(receiver);
+				if (result == null) result = caseActor(receiver);
 				if (result == null) result = caseCommunicator(receiver);
+				if (result == null) result = caseVertex(receiver);
+				if (result == null) result = caseAttributable(receiver);
+				if (result == null) result = caseAdaptable(receiver);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -100,6 +113,9 @@ public class YaceEntitiesSwitch<T> extends Switch<T> {
 			case YaceEntitiesPackage.COMMUNICATOR: {
 				Communicator communicator = (Communicator)theEObject;
 				T result = caseCommunicator(communicator);
+				if (result == null) result = caseVertex(communicator);
+				if (result == null) result = caseAttributable(communicator);
+				if (result == null) result = caseAdaptable(communicator);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -179,6 +195,66 @@ public class YaceEntitiesSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseCommunicator(Communicator object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Attributable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Attributable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAttributable(Attributable object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAdaptable(Adaptable object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Vertex</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Vertex</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseVertex(Vertex object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Actor</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Actor</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseActor(Actor object) {
 		return null;
 	}
 

@@ -10,15 +10,12 @@ import net.sf.orcc.backends.cplusplus.entities.InterfaceEthernet;
 import net.sf.orcc.backends.cplusplus.entities.YaceEntitiesPackage;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Interface Ethernet</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Interface Ethernet</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -30,11 +27,12 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *
  * @generated
  */
-public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEthernet {
+public class InterfaceEthernetImpl extends InterfaceImpl implements
+		InterfaceEthernet {
 	/**
-	 * The default value of the '{@link #getIp() <em>Ip</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The default value of the '{@link #getIp() <em>Ip</em>}' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getIp()
 	 * @generated
 	 * @ordered
@@ -42,9 +40,9 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	protected static final String IP_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getIp() <em>Ip</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getIp() <em>Ip</em>}' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getIp()
 	 * @generated
 	 * @ordered
@@ -53,28 +51,25 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 
 	/**
 	 * The default value of the '{@link #getPortNumber() <em>Port Number</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getPortNumber()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int PORT_NUMBER_EDEFAULT = 0;
+	protected static final long PORT_NUMBER_EDEFAULT = 0L;
 
 	/**
 	 * The cached value of the '{@link #getPortNumber() <em>Port Number</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getPortNumber()
 	 * @generated
 	 * @ordered
 	 */
-	protected int portNumber = PORT_NUMBER_EDEFAULT;
+	protected long portNumber = PORT_NUMBER_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #isServer() <em>Server</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #isServer()
 	 * @generated
 	 * @ordered
@@ -83,8 +78,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 
 	/**
 	 * The cached value of the '{@link #isServer() <em>Server</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #isServer()
 	 * @generated
 	 * @ordered
@@ -92,8 +86,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	protected boolean server = SERVER_EDEFAULT;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected InterfaceEthernetImpl() {
@@ -101,8 +94,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -111,8 +103,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getIp() {
@@ -120,8 +111,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setIp(String newIp) {
@@ -132,29 +122,26 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getPortNumber() {
+	public long getPortNumber() {
 		return portNumber;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setPortNumber(int newPortNumber) {
-		int oldPortNumber = portNumber;
+	public void setPortNumber(long newPortNumber) {
+		long oldPortNumber = portNumber;
 		portNumber = newPortNumber;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, YaceEntitiesPackage.INTERFACE_ETHERNET__PORT_NUMBER, oldPortNumber, portNumber));
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public boolean isServer() {
@@ -162,8 +149,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setServer(boolean newServer) {
@@ -174,8 +160,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -192,8 +177,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -203,7 +187,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 				setIp((String)newValue);
 				return;
 			case YaceEntitiesPackage.INTERFACE_ETHERNET__PORT_NUMBER:
-				setPortNumber((Integer)newValue);
+				setPortNumber((Long)newValue);
 				return;
 			case YaceEntitiesPackage.INTERFACE_ETHERNET__SERVER:
 				setServer((Boolean)newValue);
@@ -213,8 +197,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -234,8 +217,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -252,8 +234,7 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -271,4 +252,4 @@ public class InterfaceEthernetImpl extends InterfaceImpl implements InterfaceEth
 		return result.toString();
 	}
 
-} //InterfaceEthernetImpl
+} // InterfaceEthernetImpl

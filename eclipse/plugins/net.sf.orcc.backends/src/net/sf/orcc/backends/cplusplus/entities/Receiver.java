@@ -6,7 +6,9 @@
  */
 package net.sf.orcc.backends.cplusplus.entities;
 
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.util.Adaptable;
 
 /**
  * <!-- begin-user-doc -->
@@ -24,7 +26,7 @@ import net.sf.orcc.df.Port;
  * @model
  * @generated
  */
-public interface Receiver extends Communicator {
+public interface Receiver extends Actor, Communicator, Adaptable {
 	/**
 	 * Returns the value of the '<em><b>Output</b></em>' reference.
 	 * <!-- begin-user-doc -->

@@ -8,6 +8,11 @@ package net.sf.orcc.backends.cplusplus.entities.util;
 
 import net.sf.orcc.backends.cplusplus.entities.*;
 
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.Adaptable;
+import net.sf.orcc.util.Attributable;
+import net.sf.orcc.df.Entity;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
 
@@ -90,6 +95,22 @@ public class YaceEntitiesAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseCommunicator(Communicator object) {
 				return createCommunicatorAdapter();
+			}
+			@Override
+			public Adapter caseAttributable(Attributable object) {
+				return createAttributableAdapter();
+			}
+			@Override
+			public Adapter caseAdaptable(Adaptable object) {
+				return createAdaptableAdapter();
+			}
+			@Override
+			public Adapter caseVertex(Vertex object) {
+				return createVertexAdapter();
+			}
+			@Override
+			public Adapter caseActor(Actor object) {
+				return createActorAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -178,6 +199,62 @@ public class YaceEntitiesAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createCommunicatorAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.util.Attributable <em>Attributable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.util.Attributable
+	 * @generated
+	 */
+	public Adapter createAttributableAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.util.Adaptable <em>Adaptable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.util.Adaptable
+	 * @generated
+	 */
+	public Adapter createAdaptableAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.graph.Vertex <em>Vertex</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.graph.Vertex
+	 * @generated
+	 */
+	public Adapter createVertexAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Actor <em>Actor</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Actor
+	 * @generated
+	 */
+	public Adapter createActorAdapter() {
 		return null;
 	}
 

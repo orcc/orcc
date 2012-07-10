@@ -61,12 +61,12 @@ public interface InterfaceEthernet extends Interface {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Port Number</em>' attribute.
-	 * @see #setPortNumber(int)
+	 * @see #setPortNumber(long)
 	 * @see net.sf.orcc.backends.cplusplus.entities.YaceEntitiesPackage#getInterfaceEthernet_PortNumber()
 	 * @model
 	 * @generated
 	 */
-	int getPortNumber();
+	long getPortNumber();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.cplusplus.entities.InterfaceEthernet#getPortNumber <em>Port Number</em>}' attribute.
@@ -76,7 +76,7 @@ public interface InterfaceEthernet extends Interface {
 	 * @see #getPortNumber()
 	 * @generated
 	 */
-	void setPortNumber(int value);
+	void setPortNumber(long value);
 
 	/**
 	 * Returns the value of the '<em><b>Server</b></em>' attribute.
