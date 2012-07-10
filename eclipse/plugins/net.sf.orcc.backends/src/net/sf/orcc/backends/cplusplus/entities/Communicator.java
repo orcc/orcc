@@ -8,8 +8,6 @@ package net.sf.orcc.backends.cplusplus.entities;
 
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.Adaptable;
-import net.sf.orcc.df.Entity;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->

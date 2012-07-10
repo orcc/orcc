@@ -30,6 +30,7 @@
  package net.sf.orcc.backends.cplusplus
 
 
+
 /*
  * A network printer.
  *  
@@ -38,13 +39,13 @@
  */
 import java.util.List
 import java.util.Map
+import net.sf.orcc.backends.cplusplus.entities.Communicator
+import net.sf.orcc.backends.cplusplus.entities.Interface
+import net.sf.orcc.backends.cplusplus.entities.InterfaceEthernet
+import net.sf.orcc.backends.cplusplus.entities.Receiver
+import net.sf.orcc.backends.cplusplus.entities.Sender
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
-import net.sf.orcc.backends.cplusplus.entities.Interface
-import net.sf.orcc.backends.cplusplus.entities.Communicator
-import net.sf.orcc.backends.cplusplus.entities.Sender
-import net.sf.orcc.backends.cplusplus.entities.Receiver
-import net.sf.orcc.backends.cplusplus.entities.InterfaceEthernet
 
 class NetworkPrinter extends AbstractPrinter {
 	
@@ -104,6 +105,10 @@ class NetworkPrinter extends AbstractPrinter {
 			ThreadPool& pool = parser.getThreadPool();
 
 			pool.start(0);
+			
+			«FOR instance : network.instances.filter(i | i.entity instanceof Communicator)»
+			«instance.name».start(0);
+			«ENDFOR»
 
 			pool.wait();
 			

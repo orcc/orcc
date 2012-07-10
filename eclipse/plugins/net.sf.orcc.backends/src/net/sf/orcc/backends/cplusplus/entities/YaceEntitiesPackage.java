@@ -6,13 +6,13 @@
  */
 package net.sf.orcc.backends.cplusplus.entities;
 
-import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.graph.GraphPackage;
+
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.EcorePackage;
 
 /**
  * <!-- begin-user-doc -->
