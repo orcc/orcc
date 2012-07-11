@@ -40,6 +40,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.tools.classifier.Classifier;
 
@@ -110,8 +111,29 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		write("Starting classification of actors... ");
 		new Classifier(getWriteListener()).doSwitch(network);
 		write("done\n");
+		
+		// Check that all actors have SDF MoC 
+		// or CSDF (converted to SDF)
+		boolean isSDF = true;
+		for(Actor actor : network.getAllActors())
+		{
+			MoC moc = actor.getMoC();
+			
+			if(moc.isSDF())
+			{
+				// This is what we want, do nothing
+			} else {
+				if(moc.isCSDF()){
+					// TODO CSDF actor will be converted into SDF
+				} else {
+					// Actor is neither SDF nor CSDF. Cannot use the backend
+					isSDF = false;
+				}
+			}
+		}
 
-		if (network.getMoC().isCSDF()) {
+		// Print actors
+		if (isSDF) {
 			SDFMoC moc = (SDFMoC) network.getAllActors().get(0).getMoC();
 			moc.toString();
 			write("Printing network...\n");
