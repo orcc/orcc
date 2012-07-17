@@ -112,7 +112,7 @@ void print_and_exit(const char *msg) {
 	exit(1);
 }
 
-static const char *usage = "%s: -i <file> [-o <file>] [-w <file>] [-l <number of loop iterations>]\n";
+static const char *usage = "%s: -i <file> [-o <file>] [-w <file>] [-m <mapping file>] [-l <number of loop iterations>]\n";
 static char *program;
 
 void print_usage() {
