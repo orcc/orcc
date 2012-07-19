@@ -30,7 +30,7 @@ void print_help(void)
 	fprintf (stderr, "LGPL command line XML parser\n<blunderer@blunderer.org>\n") ;
 }
 
-void print_usage_roxml(const char *progname)
+void print_usage(const char *progname)
 {
 	fprintf (stderr, "\nusage: %s [-q|-h] <filename> [/]<node1>/<node2>/<node3>/.../<nodeN>\n", progname);
 	fprintf (stderr, "-q|--quiet activate quiet mode\n-h|--help display this message\n");
@@ -73,11 +73,11 @@ int main(int argc, char ** argv)
 				break ;
 			case 'h':
 				print_help();
-				print_usage_roxml(argv[0]);
+				print_usage(argv[0]);
 				return EXIT_FAILURE;
 				break;
 			default:
-				print_usage_roxml(argv[0]);
+				print_usage(argv[0]);
 				return EXIT_FAILURE;
 				break;
 		}
@@ -85,7 +85,7 @@ int main(int argc, char ** argv)
 
 	if(argc < optind + 2) {
 		fprintf(stderr,"wrong syntax\n");
-		print_usage_roxml(argv[0]);
+		print_usage(argv[0]);
 		return -1;
 	}
 
@@ -100,16 +100,27 @@ int main(int argc, char ** argv)
 	for(j = 0; j < max; j++)
 	{
 		char *c = NULL;
+		char *s = NULL;
+		node_t *child;
+		node_t *ns = NULL;
 		c = roxml_get_content(ans[j], NULL, 0, NULL);
 		if(c) {
 			if(*c == 0) {
 				int i = 0;
 				int nb_chld = roxml_get_chld_nb(ans[j]);
 				for(i = 0; i < nb_chld; i++)	{
-					c = roxml_get_name(roxml_get_chld(ans[j], NULL, i), NULL, 0);
+					child = roxml_get_chld(ans[j], NULL, i);
+					ns = roxml_get_ns(child);
+					c = roxml_get_name(child, NULL, 0);
 					if (! quiet)	{
 						fprintf(stdout,"ans[%d]: ", j);
 					}
+					if (ns) {
+						s = roxml_get_name(ns, NULL, 0);
+						if (strlen(s)) {
+							fprintf(stdout, "%s:", s);
+						}
+					} 
 					fprintf(stdout,"%s\n", c);
 				}
 			} else {

@@ -93,7 +93,7 @@ typedef struct _xpath_node {
 	struct _xpath_node *next;	/*!< next xpath pointer */
 } xpath_node_t;
 
-/** \struct xpath_tok_t
+/** \struct xpath_tok_table_t
  *
  * \brief xpath token structure
  * 
@@ -115,9 +115,22 @@ typedef struct _xpath_tok_table {
  * xpath id
  */
 typedef struct _xpath_tok {
-	unsigned char id;		/*!< token id */
+	unsigned char id;		/*!< token id starts at ROXML_XPATH_FIRST_ID */
 	struct _xpath_tok *next;	/*!< next xpath token */
 } xpath_tok_t;
+
+/** \struct roxml_ns_t
+ *
+ * \brief namespace structure
+ * 
+ * This is the structure for a namespace. It contains the
+ * namespace alias
+ */
+typedef struct _roxml_ns {
+	unsigned char id;		/*!< priv id == ROXML_NS_ID */
+	void * next;			/*!< one other priv data is following */
+	char * alias;			/*!< ns alias */
+} roxml_ns_t;
 
 /** \struct node_t
  *
@@ -128,7 +141,7 @@ typedef struct _xpath_tok {
  * tree links
  */
 typedef struct node {
-	unsigned char type;		/*!< document or buffer / attribute or value */
+	unsigned short type;		/*!< document or buffer / attribute or value */
 	union {
 		char *buf;		/*!< buffer address */
 		FILE *fil;		/*!< loaded document */
@@ -139,13 +152,13 @@ typedef struct node {
 	struct node *sibl;		/*!< ref to brother */
 	struct node *chld;		/*!< ref to chld */
 	struct node *prnt;		/*!< ref to parent */
-	struct node *attr;		/*!< ref to attributes */
-	struct node *text;		/*!< ref to content */
-	struct node *next;		/*!< ref to next (internal use) */
-	void *priv;			/*!< ref to xpath tok (internal use) */
+	struct node *attr;		/*!< ref to attribute */
+	struct node *next;		/*!< ref to last chld (internal use) */
+	struct node *ns;		/*!< ref to namespace definition */
+	void *priv;			/*!< ref to xpath tok (internal use) or alias for namespaces */
 } node_t;
 
-/** \struct _roxml_load_ctx
+/** \struct roxml_load_ctx_t
  *
  * \brief xml parsing context
  * 
@@ -154,23 +167,29 @@ typedef struct node {
  */
 typedef struct _roxml_load_ctx {
 	int pos;				/*!< position in file */
-	int empty_text_node;			/*!< if text node is empty (only '\t' '\r' '\n' ' ' */
+	int empty_text_node;			/*!< if text node is empty (only contains tabs, spaces, carriage return and line feed */
 	int state;				/*!< state (state machine main var) */
 	int previous_state;			/*!< previous state */
 	int mode;				/*!< mode quoted or normal */
 	int inside_node_state;			/*!< sub state for attributes*/
 	int content_quoted;			/*!< content of attribute was quoted */
 	int type;				/*!< source type (file or buffer) */
+	int nsdef;				/*!< indicate if this is a nsdef */
+	int ns;					/*!< indicate if a ns is used for this node */
 	void * src;				/*!< source (file or buffer) */
 	node_t *candidat_node;			/*!< node being processed */
 	node_t *candidat_txt;			/*!< text node being processed */
 	node_t *candidat_arg;			/*!< attr node being processed */
 	node_t *candidat_val;			/*!< attr value being processed */
 	node_t *current_node;			/*!< current node */
+	node_t *namespaces;			/*!< available namespaces */
+	node_t *last_ns;			/*!< last declared namespaces */
+	char * curr_name;			/*!< current node name (attr or elm) */
+	int curr_name_len;			/*!< current node name (attr or elm) lenght */
+	int doctype;				/*!< nested doctype count */
 } roxml_load_ctx_t;
 
-/** \struct _roxml_xpath_ctx
- *
+/** \struct roxml_xpath_ctx_t
  * \brief xpath parsing context
  * 
  * obscure structure that contains all the xapth
@@ -180,7 +199,7 @@ typedef struct _roxml_xpath_ctx {
 	int pos;				/*!< position in string */
 	int is_first_node;			/*!< is it the first node of xpath */
 	int wait_first_node;			/*!< are we waiting for the first node of a xpath */
-	int shorten_cond;			/*!< is the cond a short confition */
+	int shorten_cond;			/*!< is the cond a short condition */
 	int nbpath;				/*!< number of xpath in this string */
 	int bracket;				/*!< are we inside two brackets */
 	int parenthesys;			/*!< are we inside two parenthesys */
@@ -193,7 +212,7 @@ typedef struct _roxml_xpath_ctx {
 	xpath_cond_t * new_cond;		/*!< current xpath cond */
 } roxml_xpath_ctx_t;
 
-/** \struct _roxml_parser_item
+/** \struct roxml_parser_item_t
  *
  * \brief the parser item struct
  * 

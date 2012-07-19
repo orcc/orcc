@@ -41,29 +41,38 @@
 #define ROXML_OPERATOR_MUL	11
 #define ROXML_OPERATOR_DIV	12
 
-#define ROXML_FUNC_INTCOMP	0
-#define ROXML_FUNC_STRCOMP	1
-#define ROXML_FUNC_POS		2
-#define ROXML_FUNC_FIRST	3
-#define ROXML_FUNC_LAST		4
-#define ROXML_FUNC_TEXT		5
-#define ROXML_FUNC_NODE		6
-#define ROXML_FUNC_COMMENT	7
-#define ROXML_FUNC_PI		8
-#define ROXML_FUNC_XPATH	9
+#define ROXML_FUNC_INTCOMP	1
+#define ROXML_FUNC_STRCOMP	2
+#define ROXML_FUNC_POS		3
+#define ROXML_FUNC_FIRST	4
+#define ROXML_FUNC_LAST		5
+#define ROXML_FUNC_TEXT		6
+#define ROXML_FUNC_NODE		7
+#define ROXML_FUNC_COMMENT	8
+#define ROXML_FUNC_PI		9
+#define ROXML_FUNC_XPATH	10
+#define ROXML_FUNC_NSURI	11
 
 #define ROXML_FUNC_POS_STR	"position()"
 #define ROXML_FUNC_FIRST_STR	"first()"
 #define ROXML_FUNC_LAST_STR	"last()"
+#define ROXML_FUNC_NSURI_STR	"namespace-uri()"
+
 #define ROXML_FUNC_TEXT_STR	"text()"
 #define ROXML_FUNC_NODE_STR	"node()"
 #define ROXML_FUNC_COMMENT_STR	"comment()"
 #define ROXML_FUNC_PI_STR	"processing-instruction()"
 
-#define ROXML_BULK_READ		4096
-#define ROXML_LONG_LEN		512
-#define ROXML_BASE_LEN		128
-#define ROXML_BULK_CTX		8
+#define ROXML_BULK_READ		4096		/* This is the internal buffer size for chunk of xml files */
+
+#define ROXML_LONG_LEN		512		/* This is the max size for XML objects (node name, attribute name and values...) 
+						 * It is caused by the split of the XML file for parsing: 
+						 * 512 bytes are reserved as security to handle splitting inside an XML object.
+						 */
+
+#define ROXML_BASE_LEN		256		/* this is the len of internal buffers. If a requested buffer is bigger, 
+						 * then a malloc/free will occur and may slow down libroxml.
+						 */
 
 #define ROXML_ID_CHILD		0
 #define ROXML_ID_DESC_O_SELF	1
@@ -104,6 +113,15 @@
 #define ROXML_DESC_O_SELF	2
 
 #define ROXML_REQTABLE_ID	0
+#define ROXML_NS_ID		1
+#define ROXML_XPATH_FIRST_ID	16	
+
+/**
+ * \def MAX_NS_LEN
+ * 
+ * constant for namespace lenght
+ */
+#define MAX_NS_LEN		128
 
 /**
  * \def INTERNAL_BUF_SIZE
@@ -138,7 +156,7 @@
  * 
  * constant for char table pointers
  */
-#define PTR_CHAR_START	3
+#define PTR_CHAR_STAR	3
 
 /**
  * \def PTR_NODE
@@ -169,7 +187,7 @@
 #define PTR_INT_STAR	7
 
 /**
- * \def PTR_RESULT
+ * \def PTR_NODE_RESULT
  * 
  * constant for node table pointers where node are not to delete
  */
@@ -197,11 +215,18 @@
 #define ROXML_BUFF	0x02
 
 /**
- * \def ROXML_INT_ROOT
+ * \def ROXML_PENDING
  * 
  * constant for pending node
  */
 #define ROXML_PENDING	0x04
+
+/**
+ * \def ROXML_INVALID
+ * 
+ * constant for invalid node
+ */
+#define ROXML_INVALID	0x03
 
 /**
  * \def STATE_NODE_NONE

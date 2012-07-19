@@ -41,8 +41,19 @@
 
 /** \brief internal function
  *
+ * \fn void ROXML_INT roxml_reset_ns(node_t *n, node_t *ns);
+ * This function remove the namespace of a node if it is the one
+ * specified as argument, and replace it with its parent one
+ * \param n is one node of the tree
+ * \param ns is one nsdef of the tree
+ * \return void
+ */
+void	ROXML_INT roxml_reset_ns		(node_t *n, node_t *ns);
+
+/** \brief internal function
+ *
  * \fn void ROXML_INT roxml_free_node(node_t *n);
- * This function delete a node 
+ * This function delete a node without handling its tree
  * \param n is one node of the tree
  * \return void
  */
@@ -93,26 +104,16 @@ void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
  */
 node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
 
-/** \brief internal function
- *
- * \fn node_t* ROXML_INT roxml_parent_node(node_t *parent, node_t *n);
- * This function give a node to its parent and the parent to the node
- * \param parent is the parent node
- * \param n is one orphan node of the tree
- * \return the parented node
- */
-node_t * ROXML_INT roxml_parent_node		(node_t *parent, node_t *n);
-
 /** \brief node relocate function
  *
- * \fn roxml_parent_node_at(node_t *parent, node_t *n, int position);
+ * \fn roxml_parent_node(node_t *parent, node_t *n, int position);
  * this function change the position of a node in its parent list
  * \param parent the parent node
  * \param n the node to parent
  * \param position the position, 0 means or > nb children means at the end
  * \return 
  */
-void ROXML_INT roxml_parent_node_at		(node_t *parent, node_t * n, int position);
+node_t * ROXML_INT roxml_parent_node		(node_t *parent, node_t * n, int position);
 
 /** \brief alloc memory function
  *
@@ -200,6 +201,17 @@ int ROXML_INT roxml_double_cmp			(double a, double b, int op);
  * \return 1 if comparison is ok, esle 0
  */
 double ROXML_INT roxml_double_oper(double a, double b, int op);
+
+/** \brief  string comparison function
+ *
+ * \fn roxml_string_cmp(char *sa, char *sb, int op);
+ * this function compare two strings using one defined operator
+ * \param sa first operand
+ * \param sb second operand
+ * \param op the operator to use
+ * \return 1 if comparison is ok, else 0
+ */
+int ROXML_INT roxml_string_cmp			(char *sa, char *sb, int op); 
 
 /** \brief predicat validation function
  *
@@ -303,18 +315,18 @@ void ROXML_INT roxml_write_string		(char ** buf, FILE * f, char * str, int *offs
 
 /** \brief tree write function
  *
- * \fn roxml_write_node(node_t * n, FILE *f, char * buf, int human, int lvl, int *offset, int *len); 
+ * \fn roxml_write_node(node_t * n, FILE *f, char ** buf, int human, int lvl, int *offset, int *len); 
  * this function write each node of the tree to output
  * \param n the node to write
  * \param f the file pointer if any
- * \param buf the pointer to string if any
+ * \param buf the pointer to the buffer string if any
  * \param human 1 to use the human format else 0
  * \param lvl the current level in tree
  * \param offset the current offset in stream
  * \param len the total len of buffer if any
  * \return 
  */
-void ROXML_INT roxml_write_node			(node_t * n, FILE *f, char * buf, int human, int lvl, int *offset, int *len); 
+void ROXML_INT roxml_write_node			(node_t * n, FILE *f, char ** buf, int human, int lvl, int *offset, int *len); 
 
 /** \brief attribute node deletion function
  *
@@ -431,6 +443,15 @@ node_t ** ROXML_INT roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpat
  */
 int ROXML_INT roxml_is_separator(char sep);
 
+/** \brief number tester
+ *
+ * \fn int roxml_is_number(char *input);
+ * This function tells if a string is a number
+ * \param input string to test
+ * \return 1 if the string was a number else 0
+ */
+int roxml_is_number(char *input);
+
 /** \brief node creation during parsing
  *
  * \fn roxml_process_begin_node(roxml_load_ctx_t *context, int position);
@@ -440,6 +461,27 @@ int ROXML_INT roxml_is_separator(char sep);
  * \return
  */
 void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position);
+
+/** \brief namespace without alias name creation during parsing
+ *
+ * \fn roxml_process_unaliased_ns(roxml_load_ctx_t *context);
+ * this function create a new namespace without alias (default ns or remove ns)
+ * \param context the parsing context
+ * \return
+ */
+void ROXML_INT roxml_process_unaliased_ns(roxml_load_ctx_t *context);
+
+
+/** \brief name space lookup in list
+ *
+ * \fn roxml_lookup_nsdef(node_t * nsdef, char * ns);
+ * this function look for requested name space in nsdef list
+ * \param nsdef the nsdef list
+ * \param ns the namespace to find
+ * \return the nsdef node or NULL
+ */
+node_t * ROXML_INT roxml_lookup_nsdef(node_t * nsdef, char * ns);
+
 
 #ifdef __DEBUG
 extern unsigned int _nb_node;
