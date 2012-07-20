@@ -31,6 +31,7 @@ package net.sf.orcc.tools.classifier;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.ValueUtil;
 
@@ -67,6 +68,18 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 		try {
 			Object value = doSwitch(expr.getExpr());
 			return ValueUtil.compute(expr.getOp(), value);
+		} catch (OrccRuntimeException e) {
+			if (schedulableMode) {
+				throw e;
+			}
+			return null;
+		}
+	}
+	
+	@Override
+	public Object caseExprVar(ExprVar expr) {
+		try {
+			return super.caseExprVar(expr);
 		} catch (OrccRuntimeException e) {
 			if (schedulableMode) {
 				throw e;
