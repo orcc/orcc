@@ -28,8 +28,12 @@
  */
 package net.sf.orcc.backends.java;
 
+import java.util.Iterator;
+
 import net.sf.orcc.backends.c.CExpressionPrinter;
 import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.Expression;
 
 /**
  * This class defines a C++ expression printer. It refines the C expression
@@ -46,4 +50,20 @@ public class JavaExprPrinter extends CExpressionPrinter {
 		return expr.isValue() ? "true" : "false";
 	}
 
+	@Override
+	public String caseExprList(ExprList expr) {
+		StringBuilder builder = new StringBuilder();
+		builder.append('{');
+
+		Iterator<Expression> it = expr.getValue().iterator();
+		if (it.hasNext()) {
+			builder.append(doSwitch(it.next()));
+			while (it.hasNext()) {
+				builder.append(", ").append(
+						doSwitch(it.next(), Integer.MAX_VALUE, 0));
+			}
+		}
+
+		return builder.append('}').toString();
+	}
 }

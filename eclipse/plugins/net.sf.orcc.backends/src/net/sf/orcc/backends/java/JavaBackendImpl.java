@@ -32,13 +32,13 @@ import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.BroadcastAdder;
@@ -46,7 +46,6 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.util.OrccUtil;
 
@@ -61,37 +60,47 @@ import org.eclipse.core.resources.IFile;
 public class JavaBackendImpl extends AbstractBackend {
 
 	private boolean debug;
+	private JavaPrinter printer;
+	
+	private String srcPath;
+	private String libsPath;
 
-	private final Map<String, String> transformations;
+	private final Map<String, String> replacementMap;
 
 	public JavaBackendImpl() {
-		transformations = new HashMap<String, String>();
-		transformations.put("initialize", "my_initialize");
-		transformations.put("isSchedulable_initialize",
+		replacementMap = new HashMap<String, String>();
+		replacementMap.put("initialize", "my_initialize");
+		replacementMap.put("isSchedulable_initialize",
 				"my_isSchedulable_initialize");
+		
+		replacementMap.put("byte", "my_byte");
+		replacementMap.put("int", "my_int");
+		replacementMap.put("boolean", "my_boolean");
+		replacementMap.put("long", "my_long");
+		replacementMap.put("short", "my_short");
 
-		transformations.put("byte", "my_byte");
-		transformations.put("int", "my_int");
-		transformations.put("boolean", "my_boolean");
-		transformations.put("long", "my_long");
-		transformations.put("short", "my_short");
 	}
 
 	@Override
 	protected void doInitializeOptions() {
 		debug = getAttribute(DEBUG_MODE, true);
+
+		printer = new JavaPrinter(!debug);
+		
+		srcPath = path + File.separator + "src";
+		libsPath = path + File.separator + "libs";
 	}
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new RenameTransformation(this.transformations) };
+		
+		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
+		transformations.add(new UnitImporter());
+		transformations.add(new RenameTransformation(replacementMap));
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
-
-		actor.setTemplateData(new JavaTemplateData(actor));
 	}
 
 	private Network doTransformNetwork(Network network) throws OrccException {
@@ -102,7 +111,6 @@ public class JavaBackendImpl extends AbstractBackend {
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
 
-		// Add broadcasts before printing
 		new BroadcastAdder().doSwitch(network);
 
 		return network;
@@ -111,7 +119,6 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
-
 		transformActors(actors);
 		printActors(actors);
 	}
@@ -134,9 +141,8 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
-			String target = path + File.separator + "libs";
-			write("Export libraries sources into " + target + "... ");
-			if (copyFolderToFileSystem("/runtime/Java", target)) {
+			write("Export libraries sources into " + libsPath + "... ");
+			if (copyFolderToFileSystem("/runtime/Java/src", libsPath)) {
 				write("OK" + "\n");
 				return true;
 			} else {
@@ -149,25 +155,10 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		StandardPrinter actorPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/java/Actor.stg", !debug);
-		actorPrinter.setExpressionPrinter(new JavaExprPrinter());
-		actorPrinter.setTypePrinter(new JavaTypePrinter());
-
-		// create folder if necessary
-		String folder = path + File.separator + OrccUtil.getFolder(actor);
-		new File(folder).mkdirs();
-
-		// transfer to template usage status of native procedures
-		for (Procedure p : actor.getProcs()) {
-			if (!p.getName().equals("print") && p.isNative()) {
-				actorPrinter.getOptions().put("usingNativeProc", true);
-				break;
-			}
-		}
-
-		return actorPrinter.print(actor.getSimpleName() + ".java", folder,
-				actor);
+		
+		String folder = srcPath + File.separator + OrccUtil.getFolder(actor);
+		
+		return printer.print(folder, actor);
 	}
 
 	/**
@@ -179,20 +170,8 @@ public class JavaBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	protected void printNetwork(Network network) throws OrccException {
-		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/java/Network.stg");
-		printer.setExpressionPrinter(new JavaExprPrinter());
-		printer.setTypePrinter(new JavaTypePrinter());
-		printer.getOptions().put("fifoSize", fifoSize);
-
-		// create folder if necessary
-		String folder = path + File.separator
-				+ network.getPackage().replace('.', '/');
-		new File(folder).mkdirs();
-
-		String fileName = network.getSimpleName() + ".java";
-
-		printer.print(fileName, folder, network);
+		printer.printEclipseProjectFiles(path, network);
+		printer.print(srcPath, network);
 	}
 
 }
