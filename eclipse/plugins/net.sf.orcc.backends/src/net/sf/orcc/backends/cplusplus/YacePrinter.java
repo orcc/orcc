@@ -30,21 +30,14 @@
 package net.sf.orcc.backends.cplusplus;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.util.XcfPrinter;
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a printer for "standard" objects, namely actors,
@@ -56,11 +49,9 @@ import org.eclipse.emf.ecore.EObject;
  * @author Ghislain Roquier
  * 
  */
-public class YacePrinter {
+public class YacePrinter extends CommonPrinter {
 
 	private boolean keepUnchangedFiles;
-
-	protected Map<String, Object> options;
 
 	/**
 	 * Creates a new network printer.
@@ -69,57 +60,11 @@ public class YacePrinter {
 	 *            the name of the template
 	 */
 	public YacePrinter() {
-		options = new HashMap<String, Object>();
+		super();
 	}
 
 	public YacePrinter(boolean keepUnchangedFiles) {
-		this();
-		this.keepUnchangedFiles = keepUnchangedFiles;
-	}
-
-	/**
-	 * Returns the time of the most recently modified file in the hierarchy.
-	 * 
-	 * @param instance
-	 *            an instance
-	 * @return the time of the most recently modified file in the hierarchy
-	 */
-	private long getLastModifiedHierarchy(Instance instance) {
-		long instanceModified = 0;
-		if (instance.isActor()) {
-			Actor actor = instance.getActor();
-			if (actor.getFileName() == null) {
-				// if source file does not exist, force to generate
-				instanceModified = Long.MAX_VALUE;
-			} else {
-				IFile file;
-				if (instance.isActor()) {
-					file = instance.getActor().getFile();
-				} else if (instance.isNetwork()) {
-					file = instance.getNetwork().getFile();
-				} else {
-					return Long.MAX_VALUE;
-				}
-				instanceModified = file.getLocalTimeStamp();
-			}
-		} else if (instance.isNetwork()) {
-			Network network = instance.getNetwork();
-			instanceModified = network.getFile().getLocalTimeStamp();
-		}
-
-		EObject cter = instance.eContainer();
-		if (cter instanceof Network) {
-			Network network = (Network) cter;
-			long parentModif;
-			if (network.getFile() != null) {
-				parentModif = network.getFile().getLocalTimeStamp();
-			} else {
-				parentModif = Long.MAX_VALUE;
-			}
-			return Math.max(parentModif, instanceModified);
-		} else {
-			return instanceModified;
-		}
+		super(keepUnchangedFiles);
 	}
 
 	public Map<String, Object> getOptions() {
@@ -150,14 +95,9 @@ public class YacePrinter {
 					return true;
 				}
 			}
-			try {
-				CharSequence sequence = new ActorPrinter()
-						.compileInstance(instance);
-				PrintStream ps = new PrintStream(new FileOutputStream(file));
-				ps.print(sequence.toString());
-				ps.close();
-			} catch (FileNotFoundException e) {
-			}
+			CharSequence sequence = new ActorPrinter()
+					.compileInstance(instance);
+			printFile(sequence.toString(), file);
 		}
 		return false;
 	}
@@ -178,48 +118,36 @@ public class YacePrinter {
 	 *             if there is an I/O error
 	 */
 	public boolean print(String path, Network network) {
-		try {
-			String file = path + File.separator + network.getSimpleName()
-					+ ".cpp";
-			if (keepUnchangedFiles) {
-				// if source file is older than target file, do not generate
-				long sourceTimeStamp = network.getFile().getLocalTimeStamp();
-				File targetFile = new File(file);
-				if (sourceTimeStamp < targetFile.lastModified()) {
-					return true;
-				}
+		String file = path + File.separator + network.getSimpleName() + ".cpp";
+		if (keepUnchangedFiles) {
+			// if source file is older than target file, do not generate
+			long sourceTimeStamp = network.getFile().getLocalTimeStamp();
+			File targetFile = new File(file);
+			if (sourceTimeStamp < targetFile.lastModified()) {
+				return true;
 			}
-			CharSequence sequence = new NetworkPrinter().compileNetwork(
-					network, options);
-			PrintStream ps = new PrintStream(new FileOutputStream(file));
-			ps.print(sequence.toString());
-			ps.close();
-
-			if (options.containsKey("threads")) {
-				// TODO when all backends will run with Xtend : replace
-				// "options" map by another king of object, more
-				// specific (which not contain java.lang.Object instances)
-				@SuppressWarnings("unchecked")
-				Map<String, List<Instance>> instanceToCoreMap = (Map<String, List<Instance>>) options
-						.get("threads");
-				
-				file = path + File.separator + network.getSimpleName() + ".xcf";
-				sequence = new XcfPrinter().compileXcfFile(network,
-						instanceToCoreMap);
-				ps = new PrintStream(new FileOutputStream(file));
-				ps.print(sequence.toString());
-				ps.close();
-			}
-
-			file = path + File.separator + "CMakeLists.txt";
-			sequence = new NetworkPrinter().compileCmakeLists(network, options);
-			ps = new PrintStream(new FileOutputStream(file));
-			ps.print(sequence.toString());
-			ps.close();
-
-		} catch (FileNotFoundException e) {
 		}
+		CharSequence sequence = new NetworkPrinter().compileNetwork(network,
+				options);
+		printFile(sequence.toString(), file);
+
+		if (options.containsKey("threads")) {
+			// TODO when all backends will run with Xtend : replace
+			// "options" map by another king of object, more
+			// specific (which not contain java.lang.Object instances)
+			@SuppressWarnings("unchecked")
+			Map<String, List<Instance>> instanceToCoreMap = (Map<String, List<Instance>>) options
+					.get("threads");
+
+			file = path + File.separator + network.getSimpleName() + ".xcf";
+			sequence = new XcfPrinter().compileXcfFile(network,
+					instanceToCoreMap);
+			printFile(sequence.toString(), file);
+		}
+
+		file = path + File.separator + "CMakeLists.txt";
+		sequence = new NetworkPrinter().compileCmakeLists(network, options);
+		printFile(sequence.toString(), file);
 		return false;
 	}
-
 }
