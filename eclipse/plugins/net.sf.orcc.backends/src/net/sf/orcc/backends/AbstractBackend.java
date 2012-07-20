@@ -783,6 +783,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		Object obj = options.get(OUTPUT_FOLDER);
 		if (obj instanceof String) {
 			outputFolder = (String) obj;
+			if(outputFolder.startsWith("~")){
+				outputFolder = outputFolder.replace("~",System.getProperty("user.home"));
+			}
 		} else {
 			outputFolder = "";
 		}
@@ -795,7 +798,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		// set output path
-		path = new File(outputFolder).getAbsolutePath();
+		path =  new File(outputFolder).getAbsolutePath();
 
 		doInitializeOptions();
 	}
