@@ -166,7 +166,7 @@ public class SimulatorFifo {
 	 * @return <code>true</code> if there is enough room for the given number of
 	 *         tokens in this FIFO
 	 */
-	final public boolean hasRoom(int numTokens) {
+	public boolean hasRoom(int numTokens) {
 		return content.remainingCapacity() >= numTokens;
 	}
 
@@ -179,7 +179,7 @@ public class SimulatorFifo {
 	 * @return <code>true</code> if the FIFO contains at least the given number
 	 *         of tokens
 	 */
-	final public boolean hasTokens(int numTokens) {
+	public boolean hasTokens(int numTokens) {
 		return content.size() >= numTokens;
 	}
 
