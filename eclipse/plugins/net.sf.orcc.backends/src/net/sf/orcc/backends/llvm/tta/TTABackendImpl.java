@@ -321,8 +321,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		simPrinter.getOptions().put("profile", profile);
 		simPrinter.print("top.cc", path, design);
 
-		print(path + File.separator + "top.mtdf",
-				new TCE_Design_MTDF().doSwitch(design));
+		print(path + File.separator + "top.pndf",
+				new TCE_Design_PNDF().doSwitch(design));
 	}
 
 	private void printProcessor(Processor tta) {
