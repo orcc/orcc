@@ -83,7 +83,7 @@ public class CommonPrinter {
 	public Map<String, Object> getOptions() {
 		return options;
 	}
-	
+
 	/**
 	 * Returns the time of the most recently modified file in the hierarchy.
 	 * 
@@ -134,7 +134,7 @@ public class CommonPrinter {
 	}
 
 	/**
-	 * Returns the time of the last modification on Actor
+	 * Returns the time of the last modification on an Actor
 	 * 
 	 * @param actor
 	 *            an actor
@@ -150,12 +150,12 @@ public class CommonPrinter {
 		}
 
 	}
-	
+
 	/**
-	 * Returns the time of the last modification on Actor
+	 * Returns the time of the last modification on a Network
 	 * 
-	 * @param actor
-	 *            an actor
+	 * @param network
+	 *            a network
 	 * @return the time of the last modification
 	 */
 	protected long getLastModified(Network network) {
@@ -168,7 +168,7 @@ public class CommonPrinter {
 		}
 
 	}
-	
+
 	/**
 	 * Create a file and print content inside it. If parent folder doesn't
 	 * exists, create it.
@@ -179,10 +179,10 @@ public class CommonPrinter {
 	 *            complete path of the file
 	 * @return true if the file has correctly been written
 	 */
-	public boolean printFile(String content, String filePath){
+	public boolean printFile(String content, String filePath) {
 		try {
 			File file = new File(filePath);
-			if( ! file.getParentFile().exists()){
+			if (!file.getParentFile().exists()) {
 				file.getParentFile().mkdirs();
 			}
 			PrintStream ps = new PrintStream(new FileOutputStream(filePath));
