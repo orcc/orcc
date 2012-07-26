@@ -3,10 +3,8 @@ package net.sf.orcc.tools.merger.actor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -22,14 +20,11 @@ import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
@@ -50,6 +45,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 
 	private Actor superActor;
 
+	private Procedure actionBody;
+
 	private AbstractScheduler scheduler;
 
 	private Network network;
@@ -57,8 +54,6 @@ public class MergerSdf extends DfSwitch<Actor> {
 	private Copier copier;
 
 	private Map<Port, Port> portsMap = new HashMap<Port, Port>();
-
-	private Map<Port, Var> inputToVarMap = new HashMap<Port, Var>();
 
 	private int depth;
 
@@ -73,14 +68,14 @@ public class MergerSdf extends DfSwitch<Actor> {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Type type = factory.createTypeList(size, eltType);
 		Var var = factory.createVar(0, type, name, true, true);
-		superActor.getStateVars().add(var);
+		actionBody.getLocals().add(var);
 	}
 
 	private void addCounter(String name) {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Var varCount = factory.createVar(0, factory.createTypeInt(32), name,
 				true, factory.createExprInt(0));
-		superActor.getStateVars().add(varCount);
+		actionBody.getLocals().add(varCount);
 	}
 
 	/**
@@ -144,33 +139,21 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * Create global list variables to replace the FIFOs.
 	 * 
 	 */
-	private void createStateVariables() {
+	private void createInnerBuffers() {
 		buffersMap = new HashMap<Port, Var>();
-		inputToVarMap = new HashMap<Port, Var>();
-		SDFMoC sdfMoc = (SDFMoC) superActor.getMoC();
 
 		int index = 0;
-		// Create buffers for inputs
+		// Create counters for inputs
 		for (Port port : superActor.getInputs()) {
-			String name = "buffer_" + index++;
-			int numTokens = sdfMoc.getNumTokensConsumed(port);
-			addBuffer(name, numTokens, port.getType());
-			addCounter(name + "_r");
-			inputToVarMap.put(port, superActor.getStateVar(name));
-			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
+			addCounter(port.getName() + "_r");
 		}
 
-		// Create buffers for outputs
+		// Create counters for outputs
 		for (Port port : superActor.getOutputs()) {
-			String name = "buffer_" + index++;
-			int numTokens = sdfMoc.getNumTokensProduced(port);
-			addBuffer(name, numTokens, port.getType());
-			addCounter(name + "_w");
-			inputToVarMap.put(port, superActor.getStateVar(name));
-			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
+			addCounter(port.getName() + "_w");
 		}
 
-		// Create buffers for connections inside the sub-graph
+		// Create buffers and counters for inner connections
 		for (Map.Entry<Connection, Integer> entry : scheduler.getMaxTokens()
 				.entrySet()) {
 			String name = "buffer_" + index++;
@@ -178,42 +161,9 @@ public class MergerSdf extends DfSwitch<Actor> {
 			addBuffer(name, entry.getValue(), conn.getSourcePort().getType());
 			addCounter(name + "_w");
 			addCounter(name + "_r");
-			buffersMap.put(conn.getSourcePort(), superActor.getStateVar(name));
-			buffersMap.put(conn.getTargetPort(), superActor.getStateVar(name));
-		}
-	}
-
-	/**
-	 * Turns actions of CSDF actors into procedures
-	 * 
-	 */
-	private void createProcedures() {
-		IrFactory factory = IrFactory.eINSTANCE;
-		for (Actor actor : scheduler.getSchedule().getActors()) {
-			CSDFMoC moc = (CSDFMoC) actor.getMoC();
-			Iterator<Invocation> it = moc.getInvocations().iterator();
-
-			Set<Action> alreadyExists = new HashSet<Action>();
-			while (it.hasNext()) {
-				Action action = it.next().getAction();
-				if (!alreadyExists.contains(action)) {
-					alreadyExists.add(action);
-					String name = actor.getName() + "_" + action.getName();
-					Procedure proc = factory.createProcedure(name, 0,
-							factory.createTypeVoid());
-
-					Procedure body = action.getBody();
-					List<Block> nodes = body.getBlocks();
-					proc.getLocals().addAll(body.getLocals());
-					proc.getBlocks().addAll(nodes);
-					IrUtil.getLast(nodes).add(factory.createInstReturn());
-					superActor.getProcs().add(proc);
-					new ChangeFifoArrayAccess(action.getInputPattern(),
-							action.getOutputPattern(), buffersMap)
-							.doSwitch(superActor);
-
-				}
-			}
+			Var var = actionBody.getLocal(name);
+			buffersMap.put(conn.getSourcePort(), var);
+			buffersMap.put(conn.getTargetPort(), var);
 		}
 	}
 
@@ -258,114 +208,26 @@ public class MergerSdf extends DfSwitch<Actor> {
 	}
 
 	/**
-	 * copies the value of source into target
-	 * 
-	 * @param procedure
-	 * @param source
-	 * @param target
-	 */
-	private void createCopies(Procedure procedure, String name, Var source,
-			Var target) {
-		IrFactory factory = IrFactory.eINSTANCE;
-
-		List<Block> nodes = procedure.getBlocks();
-
-		int size = ((TypeList) source.getType()).getSize();
-
-		Var tmpVar = procedure.getLocal("tmp_" + name);
-
-		if (size == 1) {
-			List<Expression> indexes = new ArrayList<Expression>();
-			indexes.add(factory.createExprInt(0));
-			InstLoad load = factory.createInstLoad(tmpVar, source, indexes);
-			indexes = new ArrayList<Expression>();
-			indexes.add(factory.createExprInt(0));
-			InstStore store = factory.createInstStore(0, target, indexes,
-					factory.createExprVar(tmpVar));
-			BlockBasic node = IrUtil.getLast(nodes);
-			node.add(load);
-			node.add(store);
-		} else {
-			Var loop = procedure.getLocal("idx_0");
-			BlockBasic block = IrUtil.getLast(nodes);
-			block.add(factory.createInstAssign(loop, factory.createExprInt(0)));
-
-			Expression condition = factory.createExprBinary(
-					factory.createExprVar(loop), OpBinary.LT,
-					factory.createExprInt(size), factory.createTypeBool());
-
-			BlockWhile nodeWhile = factory.createBlockWhile();
-			nodeWhile.setJoinBlock(factory.createBlockBasic());
-			nodeWhile.setCondition(condition);
-			nodes.add(nodeWhile);
-
-			List<Expression> indexes = new ArrayList<Expression>();
-			indexes.add(factory.createExprVar(loop));
-			InstLoad load = factory.createInstLoad(tmpVar, source, indexes);
-
-			indexes = new ArrayList<Expression>();
-			indexes.add(factory.createExprVar(loop));
-			InstStore store = factory.createInstStore(0, target, indexes,
-					factory.createExprVar(tmpVar));
-			BlockBasic childBlock = IrUtil.getLast(nodeWhile.getBlocks());
-			childBlock.add(load);
-			childBlock.add(store);
-
-			// increment loop counter
-			Expression expr = factory.createExprBinary(
-					factory.createExprVar(loop), OpBinary.PLUS,
-					factory.createExprInt(1), factory.createTypeInt(32));
-			InstAssign assign = factory.createInstAssign(loop, expr);
-			childBlock.add(assign);
-		}
-	}
-
-	private void createCopiesFromInputs(Procedure procedure, Pattern ip) {
-		for (Port port : superActor.getInputs()) {
-			Var input = ip.getVariable(port);
-			Var buffer = inputToVarMap.get(port);
-
-			createCopies(procedure, port.getName(), input, buffer);
-		}
-	}
-
-	private void createCopiesToOutputs(Procedure procedure, Pattern op) {
-		for (Port port : superActor.getOutputs()) {
-			Var output = op.getVariable(port);
-			Var buffer = inputToVarMap.get(port);
-
-			createCopies(procedure, port.getName(), buffer, output);
-		}
-	}
-
-	/**
-	 * Creates a return instruction that uses the results of the hasTokens tests
-	 * previously created. Returns true right now.
-	 * 
-	 * @param block
-	 *            block to which return is to be added
-	 */
-	private void createInputCondition(BlockBasic block) {
-		final IrFactory factory = IrFactory.eINSTANCE;
-		InstReturn returnInstr = factory.createInstReturn(factory
-				.createExprBool(true));
-		block.add(returnInstr);
-	}
-
-	/**
 	 * Creates the scheduler of the static action.
 	 * 
 	 * @return the scheduler of the static action
 	 */
 	private Procedure createScheduler() {
-		IrFactory factory = IrFactory.eINSTANCE;
+		final IrFactory factory = IrFactory.eINSTANCE;
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
 				SCHEDULER_NAME, 0, IrFactory.eINSTANCE.createTypeBool());
-
-		BlockBasic block = factory.createBlockBasic();
-		procedure.getBlocks().add(block);
-		createInputCondition(block);
+		InstReturn returnInstr = factory.createInstReturn(factory
+				.createExprBool(true));
+		procedure.getLast().add(returnInstr);
 		return procedure;
+	}
+
+	private void copyLocalVariables(String id, Action action) {
+		List<Var> vars = new ArrayList<Var>(action.getBody().getLocals());
+		for (Var var : vars) {
+			var.setName(id + "_" + action.getName() + "_" + var.getName());
+			actionBody.getLocals().add(var);
+		}
 	}
 
 	/**
@@ -382,14 +244,14 @@ public class MergerSdf extends DfSwitch<Actor> {
 			if (iterand.isActor()) {
 				Actor actor = iterand.getActor();
 				CSDFMoC moc = (CSDFMoC) actor.getMoC();
-				BlockBasic block = IrUtil.getLast(nodes);
 				for (Invocation invocation : moc.getInvocations()) {
 					Action action = invocation.getAction();
-					Procedure proc = superActor.getProcedure(actor.getName()
-							+ "_" + action.getName());
-					block.add(factory.createInstCall(0, null, proc,
-							new ArrayList<Expression>()));
+					copyLocalVariables(actor.getName(), action);
+					new ChangeFifoArrayAccess(action.getInputPattern(),
+							action.getOutputPattern(), buffersMap, actionBody)
+							.doSwitch(action.getBody());
 
+					nodes.addAll(action.getBody().getBlocks());
 				}
 
 			} else {
@@ -436,15 +298,16 @@ public class MergerSdf extends DfSwitch<Actor> {
 	private Procedure createBody(Pattern ip, Pattern op) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
-		Procedure procedure = factory.createProcedure(ACTION_NAME, 0,
+		actionBody = factory.createProcedure(ACTION_NAME, 0,
 				IrFactory.eINSTANCE.createTypeVoid());
 
+		createInnerBuffers();
 		// Add loop counter(s)
 		int i = 0;
 		do { // one loop var is required even if the schedule as a depth of 0
 			Var counter = factory.createVar(0, factory.createTypeInt(32),
 					"idx_" + i, false, true);
-			procedure.getLocals().add(counter);
+			actionBody.getLocals().add(counter);
 			i++;
 		} while (i < scheduler.getDepth());
 
@@ -453,22 +316,22 @@ public class MergerSdf extends DfSwitch<Actor> {
 			Type type = port.getType();
 			String name = port.getName();
 			Var tmp = factory.createVar(0, type, "tmp_" + name, false, true);
-			procedure.getLocals().add(tmp);
+			actionBody.getLocals().add(tmp);
 		}
 
 		for (Port port : op.getPorts()) {
 			Type type = port.getType();
 			String name = port.getName();
 			Var tmp = factory.createVar(0, type, "tmp_" + name, false, true);
-			procedure.getLocals().add(tmp);
+			actionBody.getLocals().add(tmp);
 		}
 
 		// Initialize read/write counters
 		for (Var var : new HashSet<Var>(buffersMap.values())) {
-			Var read = superActor.getStateVar(var.getName() + "_r");
-			Var write = superActor.getStateVar(var.getName() + "_w");
+			Var read = actionBody.getLocal(var.getName() + "_r");
+			Var write = actionBody.getLocal(var.getName() + "_w");
 
-			BlockBasic block = procedure.getLast();
+			BlockBasic block = actionBody.getLast();
 			if (read != null) {
 				block.add(factory.createInstStore(read,
 						factory.createExprInt(0)));
@@ -479,14 +342,10 @@ public class MergerSdf extends DfSwitch<Actor> {
 			}
 		}
 
-		createCopiesFromInputs(procedure, ip);
+		createStaticSchedule(actionBody, scheduler.getSchedule(),
+				actionBody.getBlocks());
 
-		createStaticSchedule(procedure, scheduler.getSchedule(),
-				procedure.getBlocks());
-
-		createCopiesToOutputs(procedure, op);
-
-		return procedure;
+		return actionBody;
 	}
 
 	/**
@@ -494,14 +353,18 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * 
 	 */
 	private void createStaticAction() {
+		Action action = DfFactory.eINSTANCE.createAction();
 		Pattern ip = createInputPattern();
 		Pattern op = createOutputPattern();
 		Procedure scheduler = createScheduler();
 		Procedure body = createBody(ip, op);
 
-		Action action = DfFactory.eINSTANCE.createAction(
-				DfFactory.eINSTANCE.createTag(), ip, op,
-				DfFactory.eINSTANCE.createPattern(), scheduler, body);
+		action.setTag(DfFactory.eINSTANCE.createTag());
+		action.setInputPattern(ip);
+		action.setOutputPattern(op);
+		action.setPeekPattern(DfFactory.eINSTANCE.createPattern());
+		action.setScheduler(scheduler);
+		action.setBody(body);
 
 		superActor.getActions().add(action);
 		superActor.getActionsOutsideFsm().add(action);
@@ -517,8 +380,6 @@ public class MergerSdf extends DfSwitch<Actor> {
 		createPorts();
 		copyStateVariables();
 		copyProcedures();
-		createStateVariables();
-		createProcedures();
 		createStaticAction();
 
 		return superActor;

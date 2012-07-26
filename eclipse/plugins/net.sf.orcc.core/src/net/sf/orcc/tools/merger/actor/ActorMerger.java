@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -40,8 +41,14 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.Instantiator;
-import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -55,13 +62,42 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Ghislain Roquier
  * 
  */
-public class ActorMerger extends DfSwitch<Void> {
+public class ActorMerger extends DfVisitor<Void> {
+
+	private class IrVisitor extends AbstractIrVisitor<Void> {
+
+		@Override
+		public Void caseInstLoad(InstLoad load) {
+			Use use = load.getSource();
+			Var var = use.getVariable();
+			Port port = action.getInputPattern().getVarToPortMap().get(var);
+			if (port != null) {
+				var.setName(port.getName());
+			}
+
+			return null;
+		}
+
+		@Override
+		public Void caseInstStore(InstStore store) {
+			Def def = store.getTarget();
+			Var var = def.getVariable();
+			Port port = action.getOutputPattern().getVarToPortMap().get(var);
+			if (port != null) {
+				var.setName(port.getName());
+			}
+
+			return null;
+		}
+	}
 
 	private Copier copier;
 
 	private int index;
 
 	private Network network;
+
+	private Action action;
 
 	/**
 	 * 
@@ -99,6 +135,9 @@ public class ActorMerger extends DfSwitch<Void> {
 					&& vertices.contains(tgtVertex)) {
 				Instance tgt = (Instance) copier.get(tgtVertex);
 				Port tgtPort = connection.getTargetPort();
+
+				tgtPort.setName("input_" + inIndex);
+				caseActor(tgt.getActor());
 				Port input = DfFactory.eINSTANCE
 						.createPort(EcoreUtil.copy(tgtPort.getType()), "input_"
 								+ inIndex++);
@@ -116,6 +155,8 @@ public class ActorMerger extends DfSwitch<Void> {
 					&& !vertices.contains(tgtVertex)) {
 				Instance src = (Instance) copier.get(srcVertex);
 				Port srcPort = connection.getSourcePort();
+				srcPort.setName("output_" + outIndex);
+				caseActor(src.getActor());
 				Port output = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(srcPort.getType()), "output_"
 								+ outIndex++);
@@ -141,6 +182,12 @@ public class ActorMerger extends DfSwitch<Void> {
 		return subNetwork;
 	}
 
+	@Override
+	public Void caseAction(Action action) {
+		this.action = action;
+		return super.caseAction(action);
+	}
+
 	/**
 	 * 
 	 */
@@ -148,8 +195,7 @@ public class ActorMerger extends DfSwitch<Void> {
 	public Void caseNetwork(Network network) {
 		this.network = network;
 		copier = new Copier();
-		// make instance unique in the network
-//		new UniqueInstantiator().doSwitch(network);
+		irVisitor = new IrVisitor();
 
 		// static region detections
 		StaticRegionDetector detector = new StaticRegionDetector(network);
