@@ -29,8 +29,7 @@
 
 package net.sf.orcc.tools.merger.actor;
 
-import net.sf.orcc.df.Instance;
-import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.df.Actor;
 
 /**
  * This class defines an element of the body of a schedule. An iterand can be
@@ -43,7 +42,7 @@ import net.sf.orcc.graph.Vertex;
 public class Iterand {
 
 	private enum Type {
-		SCHEDULE, VERTEX
+		SCHEDULE, ACTOR
 	}
 
 	private Object contents;
@@ -55,32 +54,32 @@ public class Iterand {
 		type = Type.SCHEDULE;
 	}
 
-	public Iterand(Vertex vertex) {
-		contents = vertex;
-		type = Type.VERTEX;
+	public Iterand(Actor actor) {
+		contents = actor;
+		type = Type.ACTOR;
 	}
 
 	public Schedule getSchedule() {
 		return (Schedule) contents;
 	}
 
-	public Vertex getVertex() {
-		return (Vertex) contents;
+	public Actor getActor() {
+		return (Actor) contents;
 	}
 
 	public boolean isSchedule() {
 		return (type == Type.SCHEDULE);
 	}
 
-	public boolean isVertex() {
-		return (type == Type.VERTEX);
+	public boolean isActor() {
+		return (type == Type.ACTOR);
 	}
 
 	@Override
 	public String toString() {
 		Object obj;
-		if (isVertex()) {
-			obj = ((Instance) contents).getName();
+		if (isActor()) {
+			obj = ((Actor) contents).getName();
 		} else {
 			obj = contents;
 		}

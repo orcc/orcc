@@ -34,7 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.df.Actor;
 
 /**
  * This class defines a schedule. A schedule is composed of a header
@@ -67,14 +67,14 @@ public class Schedule {
 		this.iterands.addAll(iterands);
 	}
 
-	public Set<Vertex> getActors() {
-		Set<Vertex> actors = new LinkedHashSet<Vertex>();
+	public Set<Actor> getActors() {
+		Set<Actor> actors = new LinkedHashSet<Actor>();
 		LinkedList<Iterand> stack = new LinkedList<Iterand>(iterands);
 
 		while (!stack.isEmpty()) {
 			Iterand iterand = stack.pop();
-			if (iterand.isVertex()) {
-				actors.add(iterand.getVertex());
+			if (iterand.isActor()) {
+				actors.add(iterand.getActor());
 			} else {
 				Schedule schedule = iterand.getSchedule();
 				for (Iterand subIterand : schedule.getIterands()) {

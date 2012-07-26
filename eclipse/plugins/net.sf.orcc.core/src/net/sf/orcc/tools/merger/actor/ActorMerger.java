@@ -39,6 +39,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.IrUtil;
@@ -148,14 +149,14 @@ public class ActorMerger extends DfSwitch<Void> {
 		this.network = network;
 		copier = new Copier();
 		// make instance unique in the network
-		new UniqueInstantiator().doSwitch(network);
+//		new UniqueInstantiator().doSwitch(network);
 
 		// static region detections
 		StaticRegionDetector detector = new StaticRegionDetector(network);
 		for (List<Instance> instances : detector.staticRegionSets()) {
 			// transform the parent network and return the child network
 			Network subNetwork = transformNetwork(instances);
-
+			new Instantiator(true).doSwitch(subNetwork);
 			// create the static schedule of vertices
 			AbstractScheduler scheduler = new SASLoopScheduler(subNetwork);
 			scheduler.schedule();

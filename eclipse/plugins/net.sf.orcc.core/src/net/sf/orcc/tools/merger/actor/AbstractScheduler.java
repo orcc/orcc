@@ -32,11 +32,10 @@ package net.sf.orcc.tools.merger.actor;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.graph.Edge;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
 
 /**
@@ -53,7 +52,7 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	protected Map<Connection, Integer> maxTokens;
 
-	protected Map<Vertex, Integer> repetitions;
+	protected Map<Actor, Integer> repetitions;
 
 	private int depth;
 
@@ -69,11 +68,12 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	private void computeMemoryBound(Schedule schedule) {
 		for (Iterand iterand : schedule.getIterands()) {
-			if (iterand.isVertex()) {
-				Vertex vertex = iterand.getVertex();
-				for (Edge edge : vertex.getIncoming()) {
+			if (iterand.isActor()) {
+				Actor actor = iterand.getActor();
+				for (Edge edge : actor.getIncoming()) {
 					Connection conn = (Connection) edge;
-					if (conn.getSource() instanceof Instance) {
+					Actor src = conn.getSource().getAdapter(Actor.class);
+					if (src != null) {
 						Connection connection = (Connection) edge;
 						int cns = connection.getTargetPort()
 								.getNumTokensConsumed();
@@ -81,13 +81,14 @@ public abstract class AbstractScheduler implements IScheduler {
 					}
 				}
 
-				for (Edge edge : vertex.getOutgoing()) {
+				for (Edge edge : actor.getOutgoing()) {
 					Connection conn = (Connection) edge;
-					if (conn.getTarget() instanceof Instance) {
+					Actor tgt = conn.getTarget().getAdapter(Actor.class);
+					if (tgt != null) {
 						Connection connection = (Connection) edge;
 						int current = tokens.get(connection);
 						int max = maxTokens.get(connection);
-						CSDFMoC moc = (CSDFMoC) ((Instance) vertex).getMoC();
+						CSDFMoC moc = (CSDFMoC) actor.getMoC();
 						int prd = moc.getNumTokensProduced(connection
 								.getSourcePort());
 						tokens.put(connection, current + prd);
@@ -125,8 +126,9 @@ public abstract class AbstractScheduler implements IScheduler {
 			tokens = new HashMap<Connection, Integer>();
 
 			for (Connection connection : network.getConnections()) {
-				if (connection.getSource() instanceof Instance
-						&& connection.getTarget() instanceof Instance)
+				Actor src = connection.getSource().getAdapter(Actor.class);
+				Actor tgt = connection.getTarget().getAdapter(Actor.class);
+				if (src != null && tgt != null)
 					maxTokens.put(connection, 0);
 				tokens.put(connection, 0);
 			}
@@ -149,7 +151,7 @@ public abstract class AbstractScheduler implements IScheduler {
 	 * 
 	 * @return
 	 */
-	public Map<Vertex, Integer> getRepetitions() {
+	public Map<Actor, Integer> getRepetitions() {
 		return repetitions;
 	}
 

@@ -12,7 +12,6 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
@@ -97,8 +96,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 
 		for (Port port : network.getInputs()) {
 			Connection connection = (Connection) port.getOutgoing().get(0);
-			Vertex tgt = connection.getTarget();
-			CSDFMoC moc = (CSDFMoC) ((Instance) tgt).getMoC();
+			Actor tgt = connection.getTarget().getAdapter(Actor.class);
+			CSDFMoC moc = (CSDFMoC) tgt.getMoC();
 			int cns = scheduler.getRepetitions().get(tgt)
 					* moc.getNumTokensConsumed(connection.getTargetPort());
 			Port portCopy = (Port) copier.get(port);
@@ -108,8 +107,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 
 		for (Port port : network.getOutputs()) {
 			Connection connection = (Connection) port.getIncoming().get(0);
-			Vertex src = connection.getSource();
-			CSDFMoC moc = (CSDFMoC) ((Instance) src).getMoC();
+			Actor src = connection.getSource().getAdapter(Actor.class);
+			CSDFMoC moc = (CSDFMoC) src.getMoC();
 			int prd = scheduler.getRepetitions().get(src)
 					* moc.getNumTokensProduced(connection.getSourcePort());
 			Port portCopy = (Port) copier.get(port);
@@ -120,9 +119,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 
 	private void copyStateVariables() {
 		for (Vertex vertex : network.getChildren()) {
-			Instance instance = vertex.getAdapter(Instance.class);
-			String id = instance.getName();
-			Actor actor = instance.getActor();
+			Actor actor = vertex.getAdapter(Actor.class);
+			String id = actor.getName();
 			for (Var var : new ArrayList<Var>(actor.getStateVars())) {
 				String name = var.getName();
 				actor.getStateVar(name).setName(id + "_" + name);
@@ -133,9 +131,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 
 	private void copyProcedures() {
 		for (Vertex vertex : network.getChildren()) {
-			Instance instance = vertex.getAdapter(Instance.class);
-			String id = instance.getName();
-			Actor actor = instance.getActor();
+			Actor actor = vertex.getAdapter(Actor.class);
+			String id = actor.getName();
 			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
 				proc.setName(id + "_" + proc.getName());
 				superActor.getProcs().add(proc);
@@ -192,10 +189,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 */
 	private void createProcedures() {
 		IrFactory factory = IrFactory.eINSTANCE;
-		for (Vertex vertex : scheduler.getSchedule().getActors()) {
-			Instance instance = ((Instance) vertex);
-
-			CSDFMoC moc = (CSDFMoC) instance.getMoC();
+		for (Actor actor : scheduler.getSchedule().getActors()) {
+			CSDFMoC moc = (CSDFMoC) actor.getMoC();
 			Iterator<Invocation> it = moc.getInvocations().iterator();
 
 			Set<Action> alreadyExists = new HashSet<Action>();
@@ -203,7 +198,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 				Action action = it.next().getAction();
 				if (!alreadyExists.contains(action)) {
 					alreadyExists.add(action);
-					String name = instance.getName() + "_" + action.getName();
+					String name = actor.getName() + "_" + action.getName();
 					Procedure proc = factory.createProcedure(name, 0,
 							factory.createTypeVoid());
 
@@ -384,13 +379,13 @@ public class MergerSdf extends DfSwitch<Actor> {
 			List<Block> nodes) {
 		IrFactory factory = IrFactory.eINSTANCE;
 		for (Iterand iterand : schedule.getIterands()) {
-			if (iterand.isVertex()) {
-				Instance instance = (Instance) iterand.getVertex();
-				CSDFMoC moc = (CSDFMoC) instance.getMoC();
+			if (iterand.isActor()) {
+				Actor actor = iterand.getActor();
+				CSDFMoC moc = (CSDFMoC) actor.getMoC();
 				BlockBasic block = IrUtil.getLast(nodes);
 				for (Invocation invocation : moc.getInvocations()) {
 					Action action = invocation.getAction();
-					Procedure proc = superActor.getProcedure(instance.getName()
+					Procedure proc = superActor.getProcedure(actor.getName()
 							+ "_" + action.getName());
 					block.add(factory.createInstCall(0, null, proc,
 							new ArrayList<Expression>()));
