@@ -44,6 +44,7 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.ExprBinary
+import net.sf.orcc.ir.TypeFloat
 
 /*
  * An abstract printer.
@@ -70,6 +71,8 @@ class AbstractPrinter extends IrSwitch {
 	override caseExprVar(ExprVar expr) '''«expr.use.variable.indexedName»'''
 	
 	override caseTypeBool(TypeBool type)  '''int'''
+	
+	override caseTypeFloat(TypeFloat type)  '''float'''
 	
 	override caseTypeInt(TypeInt type) {
 		printInt(type.size)

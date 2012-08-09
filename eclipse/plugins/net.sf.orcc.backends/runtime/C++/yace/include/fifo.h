@@ -131,7 +131,7 @@ Fifo<T>::Fifo(int size, int threshold)
 	, wr_ptr(0)
 	, size(size) 
 {
-	if((size) & (size - 1) != 0) {
+	if((size & (size - 1)) != 0) {
 		// size is not a power of 2
 	}
 }
@@ -158,9 +158,10 @@ void Fifo<T>::incWrPtr()
 template <typename T>
 void Fifo<T>::incWrPtr(unsigned int nb_val)
 {
-	if((wr_ptr + nb_val) > size)
+	int rest = wr_ptr + nb_val - size;
+	if(rest > 0)
 	{
-		memcpy(buffer, buffer + size, (wr_ptr + nb_val - size) * sizeof(T));
+		memcpy(buffer, buffer + size, rest*sizeof(T));
 	}
 	wr_ptr += nb_val;
 	wr_ptr &= (size - 1);
@@ -176,9 +177,10 @@ template <typename T>
 inline T* Fifo<T>::getRdPtr(unsigned uNbVal)
 {
 	T * pVal = buffer + rd_ptr;
-	if((rd_ptr + uNbVal) > size)
+	int rest = rd_ptr + uNbVal - size;
+	if(rest > 0)
 	{
-		memcpy(buffer + size, buffer, (rd_ptr + uNbVal - size) * sizeof(T)); 
+		memcpy(buffer + size, buffer, rest*sizeof(T)); 
 	} 
 	return pVal;
 }

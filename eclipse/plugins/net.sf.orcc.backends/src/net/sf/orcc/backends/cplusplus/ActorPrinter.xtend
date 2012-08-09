@@ -128,7 +128,7 @@ import net.sf.orcc.ir.Var
 	'''
 	
 	override caseProcedure(Procedure procedure) '''
-		«FOR variable : procedure.locals SEPARATOR "\n"»«variable.varDecl»;«ENDFOR»
+		«FOR variable : procedure.locals SEPARATOR "\n"»«variable.varDeclWithInit»;«ENDFOR»
 		«FOR node : procedure.blocks»«node.doSwitch»«ENDFOR»
 	'''
 
@@ -227,6 +227,10 @@ import net.sf.orcc.ir.Var
 	
 	def private varDecl(Var v) {
 		'''«v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»'''
+	}
+	
+	def private varDeclWithInit(Var v) {
+		'''«v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»«IF v.initialValue != null» = «v.initialValue.doSwitch»«ENDIF»'''
 	}
 	
 	def dispatch compileArg(ArgByRef arg) {

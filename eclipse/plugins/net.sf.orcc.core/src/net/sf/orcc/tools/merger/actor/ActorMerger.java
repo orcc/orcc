@@ -91,6 +91,8 @@ public class ActorMerger extends DfVisitor<Void> {
 		}
 	}
 
+	private final DfFactory dfFactory = DfFactory.eINSTANCE;
+
 	private Copier copier;
 
 	private int index;
@@ -105,10 +107,10 @@ public class ActorMerger extends DfVisitor<Void> {
 	 * @return the SDF/CSDF child network
 	 */
 	private Network transformNetwork(List<Instance> vertices) {
-		Network subNetwork = DfFactory.eINSTANCE.createNetwork();
+		Network subNetwork = dfFactory.createNetwork();
 		subNetwork.setName("cluster" + index);
-		Instance subNetworkInst = DfFactory.eINSTANCE.createInstance("cluster"
-				+ index, subNetwork);
+		Instance subNetworkInst = dfFactory.createInstance("cluster" + index,
+				subNetwork);
 
 		Set<Connection> newConnections = new HashSet<Connection>();
 		List<Connection> oldConnections = new ArrayList<Connection>();
@@ -126,7 +128,7 @@ public class ActorMerger extends DfVisitor<Void> {
 				subNetwork.add(src);
 				subNetwork.add(tgt);
 				subNetwork.getConnections().add(
-						DfFactory.eINSTANCE.createConnection(src,
+						dfFactory.createConnection(src,
 								connection.getSourcePort(), tgt,
 								connection.getTargetPort(),
 								connection.getAttributes()));
@@ -138,18 +140,17 @@ public class ActorMerger extends DfVisitor<Void> {
 
 				tgtPort.setName("input_" + inIndex);
 				caseActor(tgt.getActor());
-				Port input = DfFactory.eINSTANCE
+				Port input = dfFactory
 						.createPort(EcoreUtil.copy(tgtPort.getType()), "input_"
 								+ inIndex++);
 				subNetwork.addInput(input);
 				subNetwork.getConnections().add(
-						DfFactory.eINSTANCE.createConnection(input, null, tgt,
-								tgtPort));
+						dfFactory.createConnection(input, null, tgt, tgtPort));
 
 				// add connection is the parent network
-				newConnections.add(DfFactory.eINSTANCE.createConnection(
-						srcVertex, connection.getSourcePort(), subNetworkInst,
-						input, IrUtil.copy(connection.getAttributes())));
+				newConnections.add(dfFactory.createConnection(srcVertex,
+						connection.getSourcePort(), subNetworkInst, input,
+						IrUtil.copy(connection.getAttributes())));
 				oldConnections.add(connection);
 			} else if (vertices.contains(srcVertex)
 					&& !vertices.contains(tgtVertex)) {
@@ -157,17 +158,15 @@ public class ActorMerger extends DfVisitor<Void> {
 				Port srcPort = connection.getSourcePort();
 				srcPort.setName("output_" + outIndex);
 				caseActor(src.getActor());
-				Port output = DfFactory.eINSTANCE.createPort(
+				Port output = dfFactory.createPort(
 						EcoreUtil.copy(srcPort.getType()), "output_"
 								+ outIndex++);
 				subNetwork.addOutput(output);
 				subNetwork.getConnections().add(
-						DfFactory.eINSTANCE.createConnection(src, srcPort,
-								output, null));
+						dfFactory.createConnection(src, srcPort, output, null));
 				// add connection is the parent network
-				newConnections.add(DfFactory.eINSTANCE.createConnection(
-						subNetworkInst, output, tgtVertex,
-						connection.getTargetPort(),
+				newConnections.add(dfFactory.createConnection(subNetworkInst,
+						output, tgtVertex, connection.getTargetPort(),
 						IrUtil.copy(connection.getAttributes())));
 				oldConnections.add(connection);
 			}
