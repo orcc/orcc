@@ -262,8 +262,10 @@ public class MergerSdf extends DfSwitch<Actor> {
 			Actor actor = vertex.getAdapter(Actor.class);
 			String id = actor.getName();
 			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
-				proc.setName(id + "_" + proc.getName());
-				superActor.getProcs().add(proc);
+				if(!proc.isNative()) {
+					proc.setName(id + "_" + proc.getName());
+					superActor.getProcs().add(proc);
+				}
 			}
 		}
 	}

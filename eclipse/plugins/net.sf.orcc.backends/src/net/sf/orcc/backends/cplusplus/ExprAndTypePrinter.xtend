@@ -52,11 +52,11 @@ import net.sf.orcc.ir.TypeFloat
  * @author Ghislain Roquier
  * 
  */
-class AbstractPrinter extends IrSwitch {
+class ExprAndTypePrinter extends IrSwitch {
 		
 	override caseExprBinary(ExprBinary expr) '''(«expr.getE1.doSwitch» «expr.op.text» «expr.getE2.doSwitch»)'''
 
-	override caseExprBool(ExprBool expr) '''«IF expr.value»1«ELSE»0«ENDIF»'''
+	override caseExprBool(ExprBool expr) '''«IF expr.value»true«ELSE»false«ENDIF»'''
 	
 	override caseExprFloat(ExprFloat expr) '''«expr.value»'''
 
@@ -70,7 +70,7 @@ class AbstractPrinter extends IrSwitch {
 
 	override caseExprVar(ExprVar expr) '''«expr.use.variable.indexedName»'''
 	
-	override caseTypeBool(TypeBool type)  '''int'''
+	override caseTypeBool(TypeBool type)  '''bool'''
 	
 	override caseTypeFloat(TypeFloat type)  '''float'''
 	

@@ -57,7 +57,7 @@ import net.sf.orcc.ir.Var
  *  
  * @author Ghislain Roquier
  * 
- */class ActorPrinter extends AbstractPrinter {
+ */class ActorPrinter extends ExprAndTypePrinter {
 	
 	def compileInstance(Instance instance)  {
 		var actor = instance.actor
@@ -70,7 +70,9 @@ import net.sf.orcc.ir.Var
 		#include "actor.h"
 		#include "port.h"
 				
-		«FOR proc : actor.procs.filter(p | p.native && !"print".equals(p.name)) SEPARATOR "\n"»«proc.compileNativeProc»«ENDFOR»
+		«FOR proc : actor.procs.filter(p | p.native && !"print".equals(p.name))»
+			«proc.compileNativeProc»
+		«ENDFOR»
 		
 		class «instance.name»: public Actor {
 		public:	
@@ -81,21 +83,25 @@ import net.sf.orcc.ir.Var
 			}
 		
 			«FOR port : actor.inputs»
-			«IF instance.incomingPortMap.get(port) != null»
-			«port.compilePort(instance.incomingPortMap.get(port).size)»
-			«ELSE»
-			NullPort<«port.type.doSwitch»> port_«port.name»;
-			«ENDIF»
+				«IF instance.incomingPortMap.get(port) != null»
+					«port.compilePort(instance.incomingPortMap.get(port).size)»
+				«ELSE»
+					NullPort<«port.type.doSwitch»> port_«port.name»;
+				«ENDIF»
 			«ENDFOR»			
 			
-			«FOR port : actor.outputs.filter(connectedOutput)»«port.compilePort(instance.outgoingPortMap.get(port).get(0).size, instance.outgoingPortMap.get(port).size)»«ENDFOR»
+			«FOR port : actor.outputs.filter(connectedOutput)»
+				«port.compilePort(instance.outgoingPortMap.get(port).get(0).size, instance.outgoingPortMap.get(port).size)»
+			«ENDFOR»
 			
 			«actor.procs.filter(p | !p.native).map[compileProcedure].join»
 			
 			«actor.initializes.map[compileAction].join»
 		
 			void initialize() {
-				«FOR action : actor.initializes SEPARATOR "\n"»«action.name»();«ENDFOR»
+				«FOR action : actor.initializes»
+					«action.name»();
+				«ENDFOR»
 			}
 		
 			«actor.actions.map[compileAction].join»

@@ -47,7 +47,7 @@ import net.sf.orcc.backends.cplusplus.entities.Sender
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 
-class NetworkPrinter extends AbstractPrinter {
+class NetworkPrinter extends ExprAndTypePrinter {
 	
 	EntitiesPrinter entitiesPrinter
 	
@@ -72,33 +72,39 @@ class NetworkPrinter extends AbstractPrinter {
 		#undef OUT
 		#endif
 		
-		«FOR instance : network.instances.filter(i | i.isActor && !(i.actor.native)) SEPARATOR "\n"»#include "«instance.name».h"«ENDFOR»
-		«IF network.instances.findFirst(i | i.entity instanceof Sender) != null»#include "sender.h" #include "ethernet.h"«ENDIF»
-		«IF network.instances.findFirst(i | i.entity instanceof Receiver) != null»#include "receiver.h" #include "ethernet.h"«ENDIF»
+		«FOR instance : network.children.filter(typeof(Instance))»
+			 #include "«instance.name».h"
+		«ENDFOR»
+		«IF network.children.filter(typeof(Instance)).findFirst(i | i.entity instanceof Sender) != null»
+			#include "sender.h" #include "ethernet.h"
+		«ENDIF»
+		«IF network.children.filter(typeof(Instance)).findFirst(i | i.entity instanceof Receiver) != null»
+			#include "receiver.h" #include "ethernet.h"
+		«ENDIF»
 
-		«FOR instance : network.instances.filter(i | i.entity instanceof Communicator)»
-		«(instance.entity as Communicator).compileCommunicator(instance.name)»
+		«FOR instance : network.children.filter(typeof(Instance)).filter(i | i.entity instanceof Communicator)»
+			«(instance.entity as Communicator).compileCommunicator(instance.name)»
 		«ENDFOR»
 		
-		«FOR instance : network.instances.filter(i | i.isActor && !(i.actor.native))»
-		«instance.name» inst_«instance.name»;
+		«FOR instance : network.children.filter(typeof(Instance))»
+			«instance.name» inst_«instance.name»;
 		«ENDFOR»
-				
+
 		«FOR edge : network.connections»
-		Fifo<«edge.sourcePort.type.doSwitch»> fifo_«edge.attributes.filter(a|"id".equals(a.name)).iterator.next.pojoValue»«IF edge.size!= null»(«edge.size»)«ENDIF»;
+			Fifo<«edge.sourcePort.type.doSwitch»> fifo_«edge.attributes.filter(a|"id".equals(a.name)).iterator.next.pojoValue»«IF edge.size!= null»(«edge.size»)«ENDIF»;
 		«ENDFOR»
 
 		int main(int argc, char *argv[]) {
 			GetOpt(argc, argv).getOptions();
 			
 			std::map<std::string, Actor*> actors;
-			«FOR instance : network.instances.filter(i | i.isActor) »
-			actors["«FOR seg : instance.hierarchicalId»/«seg»«ENDFOR»"] = &inst_«instance.name»;
+			«FOR instance : network.children.filter(typeof(Instance))»
+				actors["«FOR seg : instance.hierarchicalId»/«seg»«ENDFOR»"] = &inst_«instance.name»;
 			«ENDFOR»
 
 			«FOR e : network.connections»
-			inst_«(e.source as Instance).name».port_«e.sourcePort.name»(&fifo_«e.attributes.findFirst(a|"id" == a.name).pojoValue»);
-			inst_«(e.target as Instance).name».port_«e.targetPort.name»(&fifo_«e.attributes.findFirst(a|"id" == a.name).pojoValue»);
+				inst_«(e.source as Instance).name».port_«e.sourcePort.name»(&fifo_«e.attributes.findFirst(a|"id" == a.name).pojoValue»);
+				inst_«(e.target as Instance).name».port_«e.targetPort.name»(&fifo_«e.attributes.findFirst(a|"id" == a.name).pojoValue»);
 			«ENDFOR»
 						
 			ConfigParser parser(config_file, actors);
@@ -106,8 +112,8 @@ class NetworkPrinter extends AbstractPrinter {
 
 			pool.start(0);
 			
-			«FOR instance : network.instances.filter(i | i.entity instanceof Communicator)»
-			«instance.name».start(0);
+			«FOR instance : network.children.filter(typeof(Instance)).filter(i | i.entity instanceof Communicator)»
+				«instance.name».start(0);
 			«ENDFOR»
 
 			pool.wait();
@@ -121,7 +127,9 @@ class NetworkPrinter extends AbstractPrinter {
 	def dispatch compileCommunicator(Receiver receiver, String name) {
 		val interface = interfaces.findFirst(intf | intf.equals(receiver.intf))
 		'''
-		«IF interface == null»«receiver.intf.compileInterface»«ENDIF»
+		«IF interface == null»
+			«receiver.intf.compileInterface»
+		«ENDIF»
 		Receiver<«receiver.output.type.doSwitch»> inst_«name»(&«receiver.intf.id»);
 		'''
 	}
@@ -129,7 +137,9 @@ class NetworkPrinter extends AbstractPrinter {
 	def dispatch compileCommunicator(Sender sender, String name) {		
 		val interface = interfaces.findFirst(intf | intf.equals(sender.intf))
 		'''
-		«IF interface == null»«sender.intf.compileInterface»«ENDIF»
+		«IF interface == null»
+			«sender.intf.compileInterface»
+		«ENDIF»
 		Sender<«sender.input.type.doSwitch»> inst_«name»(&«sender.intf.id»);
 		'''
 	}
@@ -140,9 +150,9 @@ class NetworkPrinter extends AbstractPrinter {
 	def dispatch compileInterface(InterfaceEthernet intf) {
 		interfaces.add(intf) '''
 		«IF intf.server»
-		TcpServerSocket «intf.id»(«intf.portNumber»);
+			TcpServerSocket «intf.id»(«intf.portNumber»);
 		«ELSE»
-		TcpClientSocket «intf.id»(«intf.ip», «intf.portNumber»);
+			TcpClientSocket «intf.id»(«intf.ip», «intf.portNumber»);
 		«ENDIF»
 	'''
 	}
@@ -177,14 +187,16 @@ class NetworkPrinter extends AbstractPrinter {
 
 		add_executable («network.simpleName»
 		«network.simpleName».cpp
-		«FOR instance : network.instances.filter(i | i.isActor && !i.actor.native) SEPARATOR "\n"»«instance.name».h«ENDFOR»
+		«FOR instance : network.children.filter(typeof(Instance))»
+			«instance.name».h
+		«ENDFOR»
 		)
 
 		set(libraries Yace TinyXml)
 		if(NOT NO_DISPLAY)
 		set(libraries ${libraries} ${SDL_LIBRARY})
 		endif()
-		set(libraries ${libraries} ${CMAKE_THREAD_LIBS_INIT} "stdc++")
+		set(libraries ${libraries} ${CMAKE_THREAD_LIBS_INIT})
 		target_link_libraries(«network.simpleName» ${libraries})
 	'''
 }

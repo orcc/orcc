@@ -47,11 +47,11 @@ class EntitiesPrinter extends YaceEntitiesSwitch {
 	
 	List<Interface> interfaces
 	
-	AbstractPrinter typePrinter
+	ExprAndTypePrinter typePrinter
 	
 	new () {
 		interfaces = newArrayList()
-		typePrinter = new AbstractPrinter
+		typePrinter = new ExprAndTypePrinter
 	}
 	
 	override caseReceiver(Receiver receiver) {
