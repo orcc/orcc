@@ -34,15 +34,14 @@ import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.CustomPrinter;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMBackendImpl;
@@ -320,8 +319,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		simPrinter.getOptions().put("profile", profile);
 		simPrinter.print("top.cc", path, design);
 
-		print(path + File.separator + "top.pndf",
-				new TCE_Design_PNDF().doSwitch(design));
+		CommonPrinter.printFile(new TCE_Design_PNDF().doSwitch(design), path
+				+ File.separator + "top.pndf");
 	}
 
 	private void generateProcessor(Processor tta) {
@@ -389,16 +388,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 			System.err.println("TCE error: ");
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void print(String file, CharSequence sequence) {
-		try {
-			PrintStream ps = new PrintStream(new FileOutputStream(file));
-			ps.print(sequence.toString());
-			ps.close();
-		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

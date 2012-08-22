@@ -97,7 +97,7 @@ public class YacePrinter extends CommonPrinter {
 			}
 			CharSequence sequence = new ActorPrinter()
 					.compileInstance(instance);
-			printFile(sequence.toString(), file);
+			printFile(sequence, file);
 		}
 		return false;
 	}
@@ -129,7 +129,7 @@ public class YacePrinter extends CommonPrinter {
 		}
 		CharSequence sequence = new NetworkPrinter().compileNetwork(network,
 				options);
-		printFile(sequence.toString(), file);
+		printFile(sequence, file);
 
 		if (options.containsKey("threads")) {
 			// TODO when all backends will run with Xtend : replace
@@ -142,12 +142,12 @@ public class YacePrinter extends CommonPrinter {
 			file = path + File.separator + network.getSimpleName() + ".xcf";
 			sequence = new XcfPrinter().compileXcfFile(network,
 					instanceToCoreMap);
-			printFile(sequence.toString(), file);
+			printFile(sequence, file);
 		}
 
 		file = path + File.separator + "CMakeLists.txt";
 		sequence = new NetworkPrinter().compileCmakeLists(network, options);
-		printFile(sequence.toString(), file);
+		printFile(sequence, file);
 		return false;
 	}
 }

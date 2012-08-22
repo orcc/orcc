@@ -179,7 +179,7 @@ public class CommonPrinter {
 	 *            complete path of the file
 	 * @return true if the file has correctly been written
 	 */
-	public boolean printFile(String content, String filePath) {
+	public static boolean printFile(String content, String filePath) {
 		try {
 			File file = new File(filePath);
 			if (!file.getParentFile().exists()) {
@@ -193,5 +193,19 @@ public class CommonPrinter {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * Create a file and print content inside it. If parent folder doesn't
+	 * exists, create it.
+	 * 
+	 * @param content
+	 *            text to write in file
+	 * @param filePath
+	 *            complete path of the file
+	 * @return true if the file has correctly been written
+	 */
+	public static boolean printFile(CharSequence content, String filePath) {
+		return printFile(content.toString(), filePath);
 	}
 }

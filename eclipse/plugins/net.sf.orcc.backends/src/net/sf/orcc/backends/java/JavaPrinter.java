@@ -49,7 +49,7 @@ import net.sf.orcc.ir.util.ExpressionPrinter;
  * 
  */
 public class JavaPrinter extends CommonPrinter {
-	
+
 	ExpressionPrinter exprPrinter;
 
 	public JavaPrinter() {
@@ -76,7 +76,7 @@ public class JavaPrinter extends CommonPrinter {
 	 */
 	public boolean print(String folder, Actor actor) {
 		String file = folder + File.separator + actor.getSimpleName() + ".java";
-		
+
 		if (!actor.isNative()) {
 			if (keepUnchangedFiles) {
 				long sourceLastModified = getLastModified(actor);
@@ -85,8 +85,9 @@ public class JavaPrinter extends CommonPrinter {
 					return true;
 				}
 			}
-			CharSequence sequence = new ActorPrinter(actor).getActorFileContent();
-			if (!printFile(sequence.toString(), file)) {
+			CharSequence sequence = new ActorPrinter(actor)
+					.getActorFileContent();
+			if (!printFile(sequence, file)) {
 				throw new OrccRuntimeException("Unable to write file " + file);
 			}
 		}
@@ -104,7 +105,8 @@ public class JavaPrinter extends CommonPrinter {
 	 */
 	public boolean print(String folder, Network network) {
 
-		String file = folder + File.separator + network.getSimpleName() + ".java";
+		String file = folder + File.separator + network.getSimpleName()
+				+ ".java";
 		if (keepUnchangedFiles) {
 			// if source file is older than target file, do not generate
 			long sourceTimeStamp = network.getFile().getLocalTimeStamp();
@@ -115,7 +117,7 @@ public class JavaPrinter extends CommonPrinter {
 		}
 		CharSequence sequence = new NetworkPrinter(network)
 				.getNetworkFileContent(options);
-		if (!printFile(sequence.toString(), file)) {
+		if (!printFile(sequence, file)) {
 			throw new OrccRuntimeException("Unable to write file " + file);
 		}
 		return false;
@@ -125,17 +127,17 @@ public class JavaPrinter extends CommonPrinter {
 		CharSequence sequence = "";
 
 		String projFile = folder + File.separator + ".project";
-		if( ! new File(projFile).exists() || ! keepUnchangedFiles) {
+		if (!new File(projFile).exists() || !keepUnchangedFiles) {
 			sequence = new NetworkPrinter(network)
 					.getProjectFileContent(options);
-			printFile(sequence.toString(), projFile);
+			printFile(sequence, projFile);
 		}
 
 		String cpFile = folder + File.separator + ".classpath";
-		if( ! new File(cpFile).exists() || ! keepUnchangedFiles) {
+		if (!new File(cpFile).exists() || !keepUnchangedFiles) {
 			sequence = new NetworkPrinter(network)
 					.getClasspathFileContent(options);
-			printFile(sequence.toString(), cpFile);
+			printFile(sequence, cpFile);
 		}
 	}
 }
