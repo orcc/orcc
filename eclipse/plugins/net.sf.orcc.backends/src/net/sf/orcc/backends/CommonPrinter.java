@@ -37,11 +37,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a printer for "standard" objects, namely actors,
@@ -82,55 +80,6 @@ public class CommonPrinter {
 	 */
 	public Map<String, Object> getOptions() {
 		return options;
-	}
-
-	/**
-	 * Returns the time of the most recently modified file in the hierarchy.
-	 * 
-	 * @deprecated this method should not work anymore. Use
-	 *             <code>getLastModified(Actor)</code> or
-	 *             <code>getLastModified(Network)</code> instead
-	 * @param instance
-	 *            an instance
-	 * @return the time of the most recently modified file in the hierarchy
-	 */
-	@Deprecated
-	protected long getLastModifiedHierarchy(Instance instance) {
-		long instanceModified = 0;
-		if (instance.isActor()) {
-			Actor actor = instance.getActor();
-			if (actor.getFileName() == null) {
-				// if source file does not exist, force to generate
-				instanceModified = Long.MAX_VALUE;
-			} else {
-				IFile file;
-				if (instance.isActor()) {
-					file = instance.getActor().getFile();
-				} else if (instance.isNetwork()) {
-					file = instance.getNetwork().getFile();
-				} else {
-					return Long.MAX_VALUE;
-				}
-				instanceModified = file.getLocalTimeStamp();
-			}
-		} else if (instance.isNetwork()) {
-			Network network = instance.getNetwork();
-			instanceModified = network.getFile().getLocalTimeStamp();
-		}
-
-		EObject cter = instance.eContainer();
-		if (cter instanceof Network) {
-			Network network = (Network) cter;
-			long parentModif;
-			if (network.getFile() != null) {
-				parentModif = network.getFile().getLocalTimeStamp();
-			} else {
-				parentModif = Long.MAX_VALUE;
-			}
-			return Math.max(parentModif, instanceModified);
-		} else {
-			return instanceModified;
-		}
 	}
 
 	/**
@@ -194,7 +143,7 @@ public class CommonPrinter {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Create a file and print content inside it. If parent folder doesn't
 	 * exists, create it.
