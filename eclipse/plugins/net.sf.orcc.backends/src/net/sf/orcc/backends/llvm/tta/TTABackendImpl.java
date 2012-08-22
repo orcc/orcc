@@ -234,9 +234,9 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 		// print the design
 		for (Processor processor : design.getProcessors()) {
-			printProcessor(processor);
+			generateProcessor(processor);
 		}
-		printDesign(design);
+		generateDesign(design);
 
 		if (finalize) {
 			runPythonScript();
@@ -266,8 +266,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		return false;
 	}
 
-	private void printDesign(Design design) {
-
+	private void generateDesign(Design design) {
 		// VHDL Network of TTA processors
 		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/llvm/tta/VHDL_Design.stg");
@@ -325,7 +324,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				new TCE_Design_PNDF().doSwitch(design));
 	}
 
-	private void printProcessor(Processor tta) {
+	private void generateProcessor(Processor tta) {
 		String processorPath = OrccUtil.createFolder(path, tta.getName());
 
 		// Print VHDL description
