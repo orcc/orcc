@@ -88,7 +88,12 @@ public class YacePrinter extends CommonPrinter {
 				|| (instance.isActor() && !instance.getActor().isNative())) {
 			if (keepUnchangedFiles) {
 				// if source file is older than target file, do not generate
-				long sourceLastModified = getLastModifiedHierarchy(instance);
+				long sourceLastModified;
+				if(instance.isActor()){
+					sourceLastModified = getLastModified(instance.getActor());
+				} else {
+					sourceLastModified = getLastModified(instance.getNetwork());
+				}
 				File targetFile = new File(file);
 				long targetLastModified = targetFile.lastModified();
 				if (sourceLastModified < targetLastModified) {
