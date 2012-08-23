@@ -107,6 +107,15 @@ public interface Procedure extends Attributable {
 	EList<Block> getNodes();
 
 	/**
+	 * Returns the parameter of this procedure with the given name.
+	 * 
+	 * @param name
+	 *            name
+	 * @return a parameter, or <code>null</code>
+	 */
+	Param getParameter(String name);
+
+	/**
 	 * Returns the parameters of this procedure.
 	 * 
 	 * @return the parameters of this procedure

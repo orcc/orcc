@@ -10,12 +10,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -456,6 +456,16 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	@Override
 	public EList<Block> getNodes() {
 		return getBlocks();
+	}
+
+	@Override
+	public Param getParameter(String name) {
+		for (Param param : getParameters()) {
+			if (param.getVariable().getName().equals(name)) {
+				return param;
+			}
+		}
+		return null;
 	}
 
 	/**
