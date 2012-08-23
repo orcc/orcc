@@ -808,7 +808,7 @@ public interface IrFactory extends EFactory {
 
 	/**
 	 * Creates a new variable with the given location, type, and name. The
-	 * variable may be global or local, and assignable or not. Type is copied.
+	 * variable may be assignable or not. Type is copied.
 	 * 
 	 * @param lineNumber
 	 *            the number of the line at which the variable is defined
@@ -816,17 +816,14 @@ public interface IrFactory extends EFactory {
 	 *            the variable type
 	 * @param name
 	 *            the variable name
-	 * @param global
-	 *            whether this variable is global
 	 * @param assignable
 	 *            whether this variable is assignable
 	 */
-	Var createVar(int lineNumber, Type type, String name, boolean global,
-			boolean assignable);
+	Var createVar(int lineNumber, Type type, String name, boolean assignable);
 
 	/**
-	 * Creates a new global variable with the given location, type, name,
-	 * initial value. The variable may be assignable or not.
+	 * Creates a new variable with the given location, type, name, initial
+	 * value. The variable may be assignable or not.
 	 * 
 	 * @param lineNumber
 	 *            the number of the line at which the variable is defined
@@ -843,8 +840,8 @@ public interface IrFactory extends EFactory {
 			Expression initialValue);
 
 	/**
-	 * Creates a new local variable with the given location, type, name, index.
-	 * The variable may be assignable or not. Type is copied.
+	 * Creates a new variable with the given location, type, name, index. The
+	 * variable may be assignable or not. Type is copied.
 	 * 
 	 * @param lineNumber
 	 *            the number of the line at which the variable is defined

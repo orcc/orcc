@@ -502,7 +502,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private Var createTab(String name, Type entryType, int size) {
 		Type type = factory.createTypeList(size, entryType);
-		Var newList = factory.createVar(0, type, name, true, true);
+		Var newList = factory.createVar(0, type, name, true);
 		if (!actor.getStateVars().contains(newList.getName())) {
 			actor.getStateVars().add(newList);
 		}
@@ -982,7 +982,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 				repeatInput = true;
 
 				Var untagBuffer = factory.createVar(0, entryType, "buffer",
-						true, true);
+						true);
 				Var untagReadIndex = factory.createVar(0,
 						factory.createTypeInt(32), "UntagReadIndex", true,
 						factory.createExprInt(0));
@@ -1149,7 +1149,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			} else {
 				if (verifNumTokens > 1) {
 					Var untagBuffer = factory.createVar(0, entryType, "buffer",
-							true, true);
+							true);
 					Var untagReadIndex = factory.createVar(0,
 							factory.createTypeInt(32), "UntagReadIndex", true,
 							factory.createExprInt(0));

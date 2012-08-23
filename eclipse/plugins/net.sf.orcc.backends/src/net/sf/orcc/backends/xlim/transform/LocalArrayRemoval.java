@@ -60,7 +60,6 @@ public class LocalArrayRemoval extends AbstractIrVisitor<Void> {
 						var.getName() + "_" + procedure.getName(), true,
 						var.getIndex());
 				newVar.setInitialValue(var.getInitialValue());
-				newVar.setGlobal(true);
 
 				EList<Use> uses = var.getUses();
 				while (!uses.isEmpty()) {

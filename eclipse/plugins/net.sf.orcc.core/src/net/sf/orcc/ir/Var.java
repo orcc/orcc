@@ -136,10 +136,14 @@ public interface Var extends Attributable {
 	boolean isDefined();
 
 	/**
-	 * Returns <code>true</code> if this variable is global.
-	 * 
-	 * @return <code>true</code> if this variable is global
-	 * @model
+	 * Returns the value of the '<em><b>Global</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->Returns <code>true</code> if this variable is
+	 * global.<!-- end-user-doc -->
+	 * @return the value of the '<em>Global</em>' attribute.
+	 * @see net.sf.orcc.ir.IrPackage#getVar_Global()
+	 * @model default="false" transient="true" changeable="false" volatile="true" derived="true"
+	 * @generated
 	 */
 	boolean isGlobal();
 
@@ -151,9 +155,8 @@ public interface Var extends Attributable {
 	boolean isInitialized();
 
 	/**
-	 * Returns <code>true</code> if this variable is local.
-	 * 
-	 * @return <code>true</code> if this variable is local
+	 * <!-- begin-user-doc -->Returns <code>true</code> if this variable is
+	 * local.<!-- end-user-doc -->
 	 */
 	boolean isLocal();
 
@@ -171,14 +174,6 @@ public interface Var extends Attributable {
 	 *            <code>true</code> if the variable is assignable
 	 */
 	void setAssignable(boolean assignable);
-
-	/**
-	 * Sets this variable as global or not.
-	 * 
-	 * @param global
-	 *            <code>true</code> if this variable should be global
-	 */
-	void setGlobal(boolean global);
 
 	/**
 	 * Sets the SSA index of this variable. Valid only for local scalar

@@ -812,7 +812,7 @@ public class XdfParser {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
-			Var var = IrFactory.eINSTANCE.createVar(0, type, name, true, false);
+			Var var = IrFactory.eINSTANCE.createVar(0, type, name, false);
 			network.getParameters().add(var);
 		} else if (kind.equals("Variable")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl

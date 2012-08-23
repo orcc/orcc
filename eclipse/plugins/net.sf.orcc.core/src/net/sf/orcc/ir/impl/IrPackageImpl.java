@@ -1210,7 +1210,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getVar_Name() {
-		return (EAttribute) varEClass.getEStructuralFeatures().get(6);
+		return (EAttribute) varEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -1219,7 +1219,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getVar_Type() {
-		return (EReference) varEClass.getEStructuralFeatures().get(7);
+		return (EReference) varEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -1228,7 +1228,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getVar_Value() {
-		return (EAttribute) varEClass.getEStructuralFeatures().get(9);
+		return (EAttribute) varEClass.getEStructuralFeatures().get(10);
 	}
 
 	/**
@@ -1255,7 +1255,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getVar_Uses() {
-		return (EReference) varEClass.getEStructuralFeatures().get(8);
+		return (EReference) varEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -1274,6 +1274,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EAttribute getVar_LineNumber() {
 		return (EAttribute) varEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getVar_Local() {
+		return (EAttribute) varEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -1688,6 +1697,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEAttribute(varEClass, VAR__INDEX);
 		createEReference(varEClass, VAR__INITIAL_VALUE);
 		createEAttribute(varEClass, VAR__LINE_NUMBER);
+		createEAttribute(varEClass, VAR__LOCAL);
 		createEAttribute(varEClass, VAR__NAME);
 		createEReference(varEClass, VAR__TYPE);
 		createEReference(varEClass, VAR__USES);
@@ -2149,8 +2159,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Global(), ecorePackage.getEBoolean(), "global",
-				null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				"false", 0, 1, Var.class, IS_TRANSIENT, IS_VOLATILE,
+				!IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
 		initEAttribute(getVar_Index(), ecorePackage.getEInt(), "index", null,
 				0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
@@ -2163,6 +2173,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				"lineNumber", null, 0, 1, Var.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVar_Local(), ecorePackage.getEBoolean(), "local",
+				"false", 0, 1, Var.class, IS_TRANSIENT, IS_VOLATILE,
+				!IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
 		initEAttribute(getVar_Name(), theEcorePackage.getEString(), "name",
 				null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,

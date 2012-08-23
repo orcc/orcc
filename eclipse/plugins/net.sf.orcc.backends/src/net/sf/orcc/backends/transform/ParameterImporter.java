@@ -105,7 +105,6 @@ public class ParameterImporter extends DfVisitor<Void> {
 		}
 
 		variable = IrFactory.eINSTANCE.createVar(0, type, name, false, 0);
-		variable.setGlobal(true);
 		actor.getStateVars().add(variable);
 		return variable;
 	}

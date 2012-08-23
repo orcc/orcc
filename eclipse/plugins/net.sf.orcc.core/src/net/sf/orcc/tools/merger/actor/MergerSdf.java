@@ -262,7 +262,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			Actor actor = vertex.getAdapter(Actor.class);
 			String id = actor.getName();
 			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
-				if(!proc.isNative()) {
+				if (!proc.isNative()) {
 					proc.setName(id + "_" + proc.getName());
 					superActor.getProcs().add(proc);
 				}
@@ -302,7 +302,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			int size = entry.getValue();
 			Type eltType = conn.getSourcePort().getType();
 			Type type = irFactory.createTypeList(size, eltType);
-			Var buffer = irFactory.createVar(0, type, name, true, true);
+			Var buffer = irFactory.createVar(0, type, name, true);
 			body.getLocals().add(buffer);
 
 			// create write counter
@@ -333,7 +333,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			int numTokens = moc.getNumTokensConsumed(port);
 			Type type = irFactory.createTypeList(numTokens,
 					EcoreUtil.copy(port.getType()));
-			Var var = irFactory.createVar(0, type, port.getName(), false, true);
+			Var var = irFactory.createVar(0, type, port.getName(), true);
 			inputPattern.setNumTokens(port, numTokens);
 			inputPattern.setVariable(port, var);
 		}
@@ -350,7 +350,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			int numTokens = moc.getNumTokensProduced(port);
 			Type type = irFactory.createTypeList(numTokens,
 					EcoreUtil.copy(port.getType()));
-			Var var = irFactory.createVar(0, type, port.getName(), false, true);
+			Var var = irFactory.createVar(0, type, port.getName(), true);
 			outputPattern.setNumTokens(port, numTokens);
 			outputPattern.setVariable(port, var);
 		}
@@ -447,7 +447,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 		int i = 0;
 		do { // one loop var is required even if the schedule as a depth of 0
 			Var counter = irFactory.createVar(0, irFactory.createTypeInt(32),
-					"idx_" + i, false, true);
+					"idx_" + i, true);
 			body.getLocals().add(counter);
 			i++;
 		} while (i < scheduler.getDepth());

@@ -995,10 +995,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	@Override
 	public Var createVar(int lineNumber, Type type, String name,
-			boolean global, boolean assignable) {
+			boolean assignable) {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
-		var.setGlobal(global);
 		var.setLineNumber(lineNumber);
 		var.setName(name);
 		var.setType(EcoreUtil.copy(type));
@@ -1010,7 +1009,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			boolean assignable, Expression initialValue) {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
-		var.setGlobal(true);
 		var.setInitialValue(initialValue);
 		var.setLineNumber(lineNumber);
 		var.setName(name);
@@ -1023,7 +1021,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			boolean assignable, int index) {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
-		var.setGlobal(false);
 		var.setIndex(index);
 		var.setLineNumber(lineNumber);
 		var.setName(name);

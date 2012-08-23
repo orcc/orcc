@@ -968,6 +968,14 @@ public interface IrPackage extends EPackage {
 		EAttribute VAR__LINE_NUMBER = eINSTANCE.getVar_LineNumber();
 
 		/**
+		 * The meta object literal for the '<em><b>Local</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute VAR__LOCAL = eINSTANCE.getVar_Local();
+
+		/**
 		 * The meta object literal for the '<em><b>Global</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -2651,13 +2659,22 @@ public interface IrPackage extends EPackage {
 	int VAR__LINE_NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
 
 	/**
+	 * The feature id for the '<em><b>Local</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__LOCAL = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
+	int VAR__NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
@@ -2666,7 +2683,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__TYPE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 7;
+	int VAR__TYPE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 8;
 
 	/**
 	 * The feature id for the '<em><b>Uses</b></em>' reference list. <!--
@@ -2675,7 +2692,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__USES = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 8;
+	int VAR__USES = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute.
@@ -2683,7 +2700,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__VALUE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 9;
+	int VAR__VALUE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 10;
 
 	/**
 	 * The number of structural features of the '<em>Var</em>' class. <!--
@@ -2692,7 +2709,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 10;
+	int VAR_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 11;
 
 	/**
 	 * The feature id for the '<em><b>Variable</b></em>' reference. <!--
@@ -4108,6 +4125,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getVar_LineNumber();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#isLocal <em>Local</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Local</em>'.
+	 * @see net.sf.orcc.ir.Var#isLocal()
+	 * @see #getVar()
+	 * @generated
+	 */
+	EAttribute getVar_Local();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#isGlobal <em>Global</em>}'.

@@ -124,8 +124,7 @@ public class StringTransformation extends DfVisitor<Void> {
 							type.setSize(llvmStr.getSize());
 
 							Var variable = IrFactory.eINSTANCE.createVar(
-									call.getLineNumber(), type, name, true,
-									false);
+									call.getLineNumber(), type, name, false);
 							variable.setInitialValue(IrFactory.eINSTANCE
 									.createExprString(llvmStr.getStr()));
 							stateVars.add(variable);
@@ -227,7 +226,7 @@ public class StringTransformation extends DfVisitor<Void> {
 		type.setSize(llvmStr.getSize());
 
 		Var variable = IrFactory.eINSTANCE.createVar(print.getLineNumber(),
-				type, name, true, false);
+				type, name, false);
 		variable.setInitialValue(IrFactory.eINSTANCE.createExprString(llvmStr
 				.getStr()));
 

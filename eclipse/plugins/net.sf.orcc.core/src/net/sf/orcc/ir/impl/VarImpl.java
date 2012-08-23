@@ -8,9 +8,13 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
@@ -20,6 +24,7 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
@@ -37,6 +42,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getIndex <em>Index</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getInitialValue <em>Initial Value</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isLocal <em>Local</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getType <em>Type</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getUses <em>Uses</em>}</li>
@@ -85,15 +91,6 @@ public class VarImpl extends AttributableImpl implements Var {
 	protected static final boolean GLOBAL_EDEFAULT = false;
 
 	/**
-	 * The cached value of the '{@link #isGlobal() <em>Global</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isGlobal()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean global = GLOBAL_EDEFAULT;
-
-	/**
 	 * The default value of the '{@link #getIndex() <em>Index</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getIndex()
@@ -140,6 +137,16 @@ public class VarImpl extends AttributableImpl implements Var {
 	 * @ordered
 	 */
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isLocal() <em>Local</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isLocal()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean LOCAL_EDEFAULT = false;
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -262,6 +269,8 @@ public class VarImpl extends AttributableImpl implements Var {
 			return getInitialValue();
 		case IrPackage.VAR__LINE_NUMBER:
 			return getLineNumber();
+		case IrPackage.VAR__LOCAL:
+			return isLocal();
 		case IrPackage.VAR__NAME:
 			return getName();
 		case IrPackage.VAR__TYPE:
@@ -325,13 +334,15 @@ public class VarImpl extends AttributableImpl implements Var {
 		case IrPackage.VAR__DEFS:
 			return defs != null && !defs.isEmpty();
 		case IrPackage.VAR__GLOBAL:
-			return global != GLOBAL_EDEFAULT;
+			return isGlobal() != GLOBAL_EDEFAULT;
 		case IrPackage.VAR__INDEX:
 			return index != INDEX_EDEFAULT;
 		case IrPackage.VAR__INITIAL_VALUE:
 			return initialValue != null;
 		case IrPackage.VAR__LINE_NUMBER:
 			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case IrPackage.VAR__LOCAL:
+			return isLocal() != LOCAL_EDEFAULT;
 		case IrPackage.VAR__NAME:
 			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
 					.equals(name);
@@ -360,9 +371,6 @@ public class VarImpl extends AttributableImpl implements Var {
 		case IrPackage.VAR__DEFS:
 			getDefs().clear();
 			getDefs().addAll((Collection<? extends Def>) newValue);
-			return;
-		case IrPackage.VAR__GLOBAL:
-			setGlobal((Boolean) newValue);
 			return;
 		case IrPackage.VAR__INDEX:
 			setIndex((Integer) newValue);
@@ -411,9 +419,6 @@ public class VarImpl extends AttributableImpl implements Var {
 			return;
 		case IrPackage.VAR__DEFS:
 			getDefs().clear();
-			return;
-		case IrPackage.VAR__GLOBAL:
-			setGlobal(GLOBAL_EDEFAULT);
 			return;
 		case IrPackage.VAR__INDEX:
 			setIndex(INDEX_EDEFAULT);
@@ -536,12 +541,10 @@ public class VarImpl extends AttributableImpl implements Var {
 		return !getDefs().isEmpty();
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
+	@Override
 	public boolean isGlobal() {
-		return global;
+		EObject cter = eContainer();
+		return (cter instanceof Actor || cter instanceof Unit);
 	}
 
 	@Override
@@ -551,7 +554,8 @@ public class VarImpl extends AttributableImpl implements Var {
 
 	@Override
 	public boolean isLocal() {
-		return !global;
+		EObject cter = eContainer();
+		return (cter instanceof Procedure || cter instanceof Pattern);
 	}
 
 	@Override
@@ -569,18 +573,6 @@ public class VarImpl extends AttributableImpl implements Var {
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.VAR__ASSIGNABLE, oldAssignable, assignable));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setGlobal(boolean newGlobal) {
-		boolean oldGlobal = global;
-		global = newGlobal;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.VAR__GLOBAL, oldGlobal, global));
 	}
 
 	/**
@@ -692,7 +684,7 @@ public class VarImpl extends AttributableImpl implements Var {
 		result.append(" <assignable: ");
 		result.append(assignable);
 		result.append(", global: ");
-		result.append(global);
+		result.append(isGlobal());
 		result.append('>');
 		if (value != null) {
 			result.append(" value = ");
