@@ -53,9 +53,7 @@ import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Vertex;
 
 /**
- * This class define an architecture builder from the mapping of actors on a set
- * of processors. The processors and their interconnections are instantiated
- * during the visit of a given process network.
+ * This class contains several methods to build a hardware design.
  * 
  * @author Herve Yviquel
  * 
@@ -113,9 +111,9 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private Design design;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
-	private Mapping mapping;
-
 	private boolean limitConnection = false;
+
+	private Mapping mapping;
 
 	/**
 	 * Add a simple signal to the design. The signal is the translation of
@@ -178,10 +176,19 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	}
 
 	/**
+	 * Build a design from a network of actors, a predefined configuration of
+	 * the processors and finally the mapping of the actors on a set of
+	 * processors. The processors and their interconnections are instantiated
+	 * during the visit of a given process network.
+	 * 
 	 * @param network
+	 *            The dataflow network of the current description to compile
 	 * @param configuration
+	 *            A predefined configuration of the processors
 	 * @param mapping
-	 * @return
+	 *            The mapping of the actors contained by the network on a set of
+	 *            processors
+	 * @return A new design
 	 */
 	public Design build(Network network, ProcessorConfiguration configuration,
 			Mapping mapping) {
