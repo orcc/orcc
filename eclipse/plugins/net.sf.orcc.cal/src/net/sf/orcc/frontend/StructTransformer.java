@@ -255,8 +255,10 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 		AstExpression value = variable.getValue();
 		if (value != null) {
+			AstIrUtil.setLocal(local);
 			new ExprTransformer(procedure, procedure.getBlocks(), local)
 					.doSwitch(value);
+			AstIrUtil.unsetLocal(local);
 		}
 
 		Frontend.putMapping(variable, local);

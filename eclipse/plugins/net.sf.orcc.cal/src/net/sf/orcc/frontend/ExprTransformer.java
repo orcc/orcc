@@ -380,7 +380,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			}
 		} else {
 			if (procedure != null) {
-				if (var.isGlobal()) {
+				if (!AstIrUtil.isLocal(var)) {
 					Var global = var;
 					var = procedure.getLocal("local_" + global.getName());
 					if (var == null) {
@@ -482,7 +482,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 * @return a scalar variable that can be used as a target
 	 */
 	private Var getScalar(Type type, String name) {
-		if (target != null && target.isLocal() && indexes == null) {
+		if (target != null && AstIrUtil.isLocal(target) && indexes == null) {
 			// local scalar => ok
 			return target;
 		} else {
@@ -510,7 +510,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		int lineNumber = Util.getLocation(astObject);
 
 		Instruction instruction;
-		if (target.isLocal() && indexes == null) {
+		if (AstIrUtil.isLocal(target) && indexes == null) {
 			instruction = eINSTANCE.createInstAssign(lineNumber, target, value);
 		} else {
 			if (indexes == null) {

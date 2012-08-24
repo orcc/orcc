@@ -46,7 +46,7 @@ import net.sf.orcc.ir.Var;
  * 
  */
 public class AstIrUtil {
-
+	
 	/**
 	 * Returns the IR equivalent of the given AST variable using its name. This
 	 * method is intended for generators/foreach loops.
@@ -65,6 +65,14 @@ public class AstIrUtil {
 		}
 
 		return var;
+	}
+	
+	public static boolean isLocal(Var variable) {
+		return variable.hasAttribute("local") || variable.isLocal();
+	}
+	
+	public static void setLocal(Var variable) {
+		variable.setAttribute("local",  null);
 	}
 
 	/**
@@ -85,6 +93,10 @@ public class AstIrUtil {
 			irExpressions.add(transformer.doSwitch(expression));
 		}
 		return irExpressions;
+	}
+
+	public static void unsetLocal(Var variable) {
+		variable.removeAttribute("local");
 	}
 
 }
