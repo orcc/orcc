@@ -9,11 +9,13 @@ package net.sf.orcc.ir.impl;
 import java.util.Collection;
 
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -544,7 +546,7 @@ public class VarImpl extends AttributableImpl implements Var {
 	@Override
 	public boolean isGlobal() {
 		EObject cter = eContainer();
-		return (cter instanceof Actor || cter instanceof Unit);
+		return (cter instanceof Actor || cter instanceof Network || cter instanceof Unit);
 	}
 
 	@Override
@@ -555,7 +557,7 @@ public class VarImpl extends AttributableImpl implements Var {
 	@Override
 	public boolean isLocal() {
 		EObject cter = eContainer();
-		return (cter instanceof Procedure || cter instanceof Pattern);
+		return (cter instanceof Procedure || cter instanceof Param || cter instanceof Pattern);
 	}
 
 	@Override
