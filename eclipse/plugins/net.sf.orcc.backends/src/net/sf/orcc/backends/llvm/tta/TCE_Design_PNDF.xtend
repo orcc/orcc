@@ -30,8 +30,8 @@
  package net.sf.orcc.backends.llvm.tta
 
 import net.sf.orcc.backends.llvm.tta.architecture.Design
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureVisitor
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
+import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureVisitor
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -40,6 +40,12 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
  * 
  */
 class TCE_Design_PNDF extends ArchitectureVisitor<CharSequence> {
+	
+	String path;
+	
+	new(String path){
+		this.path = path;
+	}
 	
 	override caseDesign(Design design){
 		'''
@@ -55,8 +61,8 @@ class TCE_Design_PNDF extends ArchitectureVisitor<CharSequence> {
 	override caseProcessor(Processor processor){
 		'''
 		<processor name="«processor.name»" >
-			<adf path="processor_«processor.name»/" filename="processor_«processor.name».adf" />
-			<tpef path="processor_«processor.name»/" filename="processor_«processor.name».tpef" />
+			<adf path="«path»/«processor.name»/" filename="«processor.name».adf" />
+			<tpef path="«path»/«processor.name»/" filename="«processor.name».tpef" />
 		</processor>
 		'''
 	}

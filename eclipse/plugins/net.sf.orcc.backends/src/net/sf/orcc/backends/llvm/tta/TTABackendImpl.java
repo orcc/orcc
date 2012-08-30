@@ -317,7 +317,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		simPrinter.getOptions().put("profile", profile);
 		simPrinter.print("top.cc", path, design);
 
-		CommonPrinter.printFile(new TCE_Design_PNDF().doSwitch(design), path
+		CommonPrinter.printFile(new TCE_Design_PNDF(path).doSwitch(design), path
 				+ File.separator + "top.pndf");
 	}
 
