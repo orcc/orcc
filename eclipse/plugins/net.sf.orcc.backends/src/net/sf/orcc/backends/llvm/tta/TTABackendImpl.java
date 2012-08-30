@@ -66,6 +66,7 @@ import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.BroadcastAdder;
@@ -96,19 +97,19 @@ import net.sf.orcc.util.OrccUtil;
  */
 public class TTABackendImpl extends LLVMBackendImpl {
 
+	String actorsPath;
+	private boolean classify;
 	private ProcessorConfiguration configuration;
 	private boolean debug;
 	private Design design;
 	private boolean finalize;
-	private FPGA fpga;
-	String instancePath;
 
+	private FPGA fpga;
 	private String libPath;
 	private Mapping mapping;
-	private boolean profile;
-	private boolean classify;
-	private boolean normalize;
 	private boolean merge;
+	private boolean normalize;
+	private boolean profile;
 
 	private Map<String, String> userMapping;
 
@@ -218,8 +219,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				mapping);
 
 		// print instances and entities
-		String oldPath = path;
-		path = OrccUtil.createFolder(path, "actors");
+		actorsPath = OrccUtil.createFolder(path, "actors");
 		printer = new StandardPrinter(
 				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
@@ -228,8 +228,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		printer.getOptions().put("portToAddrSpaceIdMap",
 				computePortToAddrSpaceIdMap(network));
 		printInstances(network);
-		printEntities(network);
-		path = oldPath;
 
 		// print the design
 		for (Processor processor : design.getProcessors()) {
@@ -365,6 +363,11 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		schedulerPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		schedulerPrinter.setTypePrinter(new LLVMTypePrinter());
 		schedulerPrinter.print(tta.getName() + ".ll", processorPath, tta);
+	}
+
+	protected boolean printInstance(Instance instance) {
+		return printer.print(instance.getSimpleName() + ".ll", actorsPath,
+				instance);
 	}
 
 	private void runPythonScript() throws OrccException {
