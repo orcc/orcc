@@ -90,8 +90,10 @@ class NetworkPrinter extends ExprAndTypePrinter {
 			«instance.name» inst_«instance.name»;
 		«ENDFOR»
 
-		«FOR edge : network.connections»
-			Fifo<«edge.sourcePort.type.doSwitch»> fifo_«edge.attributes.filter(a|"id".equals(a.name)).iterator.next.pojoValue»«IF edge.size!= null»(«edge.size»)«ENDIF»;
+		«FOR instance : network.children.filter(typeof(Instance))»
+			«FOR edges : instance.outgoingPortMap.values»
+				Fifo<«edges.get(0).sourcePort.type.doSwitch», «edges.get(0).getAttribute("nbReaders").pojoValue»> fifo_«edges.get(0).getAttribute("idNoBcast").pojoValue»«IF edges.get(0).size!= null»(«edges.get(0).size»)«ENDIF»;
+			«ENDFOR»
 		«ENDFOR»
 
 		int main(int argc, char *argv[]) {
@@ -103,8 +105,8 @@ class NetworkPrinter extends ExprAndTypePrinter {
 			«ENDFOR»
 
 			«FOR e : network.connections»
-				inst_«(e.source as Instance).name».port_«e.sourcePort.name»(&fifo_«e.attributes.findFirst(a|"id" == a.name).pojoValue»);
-				inst_«(e.target as Instance).name».port_«e.targetPort.name»(&fifo_«e.attributes.findFirst(a|"id" == a.name).pojoValue»);
+				inst_«(e.source as Instance).name».port_«e.sourcePort.name» = &fifo_«e.getAttribute("idNoBcast").pojoValue»;
+				inst_«(e.target as Instance).name».port_«e.targetPort.name» = &fifo_«e.getAttribute("idNoBcast").pojoValue»;
 			«ENDFOR»
 						
 			ConfigParser parser(config_file, actors);

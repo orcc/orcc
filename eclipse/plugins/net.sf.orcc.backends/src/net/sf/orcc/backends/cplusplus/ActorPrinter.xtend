@@ -59,7 +59,10 @@ import net.sf.orcc.ir.Var
  * 
  */class ActorPrinter extends ExprAndTypePrinter {
 	
+	Instance instance
+	
 	def compileInstance(Instance instance)  {
+		this.instance = instance
 		var actor = instance.actor
 		var connectedOutput = [ Port port | instance.outgoingPortMap.get(port) != null ]
 		'''
@@ -68,7 +71,7 @@ import net.sf.orcc.ir.Var
 		
 		#include <iostream>
 		#include "actor.h"
-		#include "port.h"
+		#include "fifo_n.h"
 				
 		«FOR proc : actor.procs.filter(p | p.native && !"print".equals(p.name))»
 			«proc.compileNativeProc»
@@ -83,15 +86,11 @@ import net.sf.orcc.ir.Var
 			}
 		
 			«FOR port : actor.inputs»
-				«IF instance.incomingPortMap.get(port) != null»
-					«port.compilePort(instance.incomingPortMap.get(port).size)»
-				«ELSE»
-					NullPort<«port.type.doSwitch»> port_«port.name»;
-				«ENDIF»
+				«port.compilePort(instance.incomingPortMap.get(port).getAttribute("nbReaders").pojoValue)»
 			«ENDFOR»			
 			
 			«FOR port : actor.outputs.filter(connectedOutput)»
-				«port.compilePort(instance.outgoingPortMap.get(port).get(0).size, instance.outgoingPortMap.get(port).size)»
+				«port.compilePort(instance.outgoingPortMap.get(port).size)»
 			«ENDFOR»
 			
 			«actor.procs.filter(p | !p.native).map[compileProcedure].join»
@@ -129,7 +128,7 @@ import net.sf.orcc.ir.Var
 
 	def dispatch compileArg(TypeList type, String name, Expression expr) '''
 		// C++11 allows array initializer in initialization list but not yet implemented in VS10... use that instead.
-		«type.doSwitch» tmp_«name»«FOR dim:type.dimensions»[«dim»]«ENDFOR»= «expr.doSwitch»;
+		«type.doSwitch» tmp_«name»«FOR dim:type.dimensions»[«dim»]«ENDFOR» = «expr.doSwitch»;
 		memcpy(«name», tmp_«name», «FOR dim : type.dimensions SEPARATOR "*"»«dim»«ENDFOR»*sizeof(«type.innermostType.doSwitch»));
 	'''
 	
@@ -184,13 +183,8 @@ import net.sf.orcc.ir.Var
 		«inst.target.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR» = «inst.value.doSwitch»;
 	'''
 	
-	
-	def compilePort(Port port, Integer size) '''
-		PortIn<«port.type.doSwitch»> port_«port.name»;
-	'''
-	
-	def compilePort(Port port, Integer size, Integer fanout) '''
-		PortOut<«port.type.doSwitch», «fanout»> port_«port.name»;
+	def compilePort(Port port, Object nbReaders) '''
+		Fifo<«port.type.doSwitch», «nbReaders»>* port_«port.name»;
 	'''
 
 	def compileNativeProc(Procedure proc) '''
@@ -206,25 +200,25 @@ import net.sf.orcc.ir.Var
 	def compileAction(Action action) '''
 		«action.scheduler.returnType.doSwitch» «action.scheduler.name» () {	
 			«FOR e : action.peekPattern.numTokensMap»
-			«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name».getRdPtr(«IF e.value > 1»«e.value»«ENDIF»);
+				«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
 			«ENDFOR»
 			«action.scheduler.doSwitch»
 		}
 
 		«action.body.returnType.doSwitch» «action.body.name» () {	
 			«FOR e : action.inputPattern.numTokensMap»
-			«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name».getRdPtr(«IF e.value > 1»«e.value»«ENDIF»);
+				«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports»
-			«port.type.doSwitch»* «port.name» = port_«port.name».getWrPtr();
+			«port.type.doSwitch»* «port.name» = port_«port.name»->write_address();
 			«ENDFOR»
 			«action.body.doSwitch»
 			«FOR e : action.inputPattern.numTokensMap»
-			port_«e.key.name».release(«IF e.value > 1»«e.value»«ENDIF»);
+			port_«e.key.name»->read_advance(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
 			status_«e.key.name»_ -= «e.value»;
 			«ENDFOR»
 			«FOR e : action.outputPattern.numTokensMap»
-			port_«e.key.name».release(«e.key.name»«IF e.value > 1», «e.value»«ENDIF»);
+			port_«e.key.name»->write_advance(«IF e.value > 1»«e.value»«ENDIF»);
 			status_«e.key.name»_ -= «e.value»;
 		«ENDFOR»
 		}
@@ -249,8 +243,8 @@ import net.sf.orcc.ir.Var
 	
 	def compileScheduler(Actor actor) '''	
 		void schedule(EStatus& status) {	
-			«FOR port : actor.inputs SEPARATOR "\n"»status_«port.name»_=port_«port.name».getCount();«ENDFOR»
-			«FOR port : actor.outputs SEPARATOR "\n"»status_«port.name»_=port_«port.name».getRooms();«ENDFOR»
+			«FOR port : actor.inputs SEPARATOR "\n"»status_«port.name»_=port_«port.name»->count(«instance.incomingPortMap.get(port).getAttribute("fifoId").pojoValue»);«ENDFOR»
+			«FOR port : actor.outputs SEPARATOR "\n"»status_«port.name»_=port_«port.name»->rooms();«ENDFOR»
 		
 			bool res = true;
 			while (res) {

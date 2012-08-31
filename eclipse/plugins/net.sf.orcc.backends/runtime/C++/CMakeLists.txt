@@ -22,7 +22,6 @@ yace/include/fifo.h
 yace/include/get_opt.h
 yace/include/interface.h
 yace/include/mutex.h
-yace/include/port.h
 yace/include/receiver.h
 yace/include/scheduler.h
 yace/include/sender.h

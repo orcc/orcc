@@ -45,118 +45,82 @@
 /*! \class Fifo fifo.h
  *  \brief A template class that implements a non-bocking ring buffer.
  */
-template <typename T>
+template <typename T, int nb_reader>
 class Fifo
 {
 public:
-	/*! \brief Constructor
-	 */
 	Fifo(int size=4096, int threshold=4096);
-
-	/*! \brief Destructor
-	 */
 	~Fifo();
 
-	/*! \brief copy of one data element from pBuf to buffer + wr_ptr
-	 *  \param[in] pBuf
-	 */
-	void put(T pBuf[]);
+	T* write_address() const;
 
-	/*! \brief copy of nb_data element from pBuf to buffer + wr_ptr
-	 *  \param[in] pBuf The buffer to copy
-	 *  \param[in] nb_data The number of data to copy
-	 */
-	void put(T pBuf[], unsigned int nb_data);
+	void write_advance();
 
-	/*! \brief get the write pointer
-	 *  \return The write pointer
-	 */
-	T* getWrPtr() const;
+	void write_advance(unsigned int nb_data);
 
-	/*! \brief increment by one the write pointer
-	 */
-	void incWrPtr();
+	T* read_address(int reader_id) const;
 
-	/*! \brief increment by nb_data the write pointer
-	 *  \param[in] nb_data The number of data to increment
-	 */
-	void incWrPtr(unsigned int nb_data);
+	T* read_address(int reader_id, unsigned nb_data);
 
-	/*! \brief get the read pointer
-	 *  \return The read pointer
-	 */
-	T* getRdPtr() const;
-
-	/*! \brief get the read pointer
-	 *  \param[in] nb_data posible copy to the 
-	 *  \return The read pointer
-	 */
-	T* getRdPtr(unsigned nb_data);
-
-	/*! \brief increment the write counter
-	 */
-	void incRdPtr();
-
-	/*! \brief increment the write counter
-	 *  \return The write counter
-	 */
-	void incRdPtr(unsigned int nb_data);
+	void read_advance(int reader_id, unsigned int nb_data=1);
 	
-	/*! \brief get the number of available data
-	 *  \return The number of available data elements in the ring buffer
-	 */
-	unsigned int getCount() const { return (size + wr_ptr - rd_ptr) & (size - 1); }
-	
-	/*! \brief get the number of available rooms
-	 *	keep one slot empty for full/empty disambiguation
-	 *  \return The number of available rooms in the ring buffer
-	 */
-	unsigned int getRooms() const { return (size + rd_ptr - wr_ptr - 1) & (size - 1); }
+	unsigned int count(int reader_id) const
+	{
+		return (size + wr_ptr - rd_ptr[reader_id]) & (size - 1);
+	}
+
+	unsigned int rooms() const
+	{
+		unsigned int min_rooms = 0xFFFFFFFF;
+		for (int i = 0; i < nb_reader; i++) {
+			unsigned int rooms = (size + rd_ptr[i] - wr_ptr - 1) & (size - 1);
+			min_rooms = min_rooms < rooms ? min_rooms : rooms;
+		}
+		return min_rooms;
+	}
 
 private:
-	T * buffer; /*!< start address of the ring buffer*/
+	T * buffer;
 
-	unsigned int rd_ptr; /*!< read counter*/
+	unsigned int rd_ptr[nb_reader];
 
-	unsigned int wr_ptr; /*!< write counter*/
+	unsigned int wr_ptr;
 
 	unsigned int size;
 };
 
 
-template <typename T>
-Fifo<T>::Fifo(int size, int threshold)
+template <typename T, int nb_reader>
+Fifo<T, nb_reader>::Fifo(int size, int threshold)
 	: buffer(new T[size + threshold])
-	, rd_ptr(0)
 	, wr_ptr(0)
 	, size(size) 
 {
-	if((size & (size - 1)) != 0) {
-		// size is not a power of 2
-	}
+	for(int i=0; i<nb_reader; i++)
+		rd_ptr[i] = 0;
 }
 
-template <typename T> 
-Fifo<T>::~Fifo()
+template <typename T, int nb_reader>
+Fifo<T, nb_reader>::~Fifo()
 {
 	delete [] buffer;
 }
 
-template <typename T>
-inline T* Fifo<T>::getWrPtr() const
+template <typename T, int nb_reader>
+inline T* Fifo<T, nb_reader>::write_address() const
 {
 	return buffer + wr_ptr;
 }
 
-template <typename T>
-void Fifo<T>::incWrPtr()
+template <typename T, int nb_reader>
+void Fifo<T, nb_reader>::write_advance()
 {
 	++ wr_ptr;
 	wr_ptr &= (size - 1);
 }
 
-template <typename T>
-void Fifo<T>::incWrPtr(unsigned int nb_val)
+template <typename T, int nb_reader>
+void Fifo<T, nb_reader>::write_advance(unsigned int nb_val)
 {
 	int rest = wr_ptr + nb_val - size;
 	if(rest > 0)
@@ -167,17 +131,17 @@ void Fifo<T>::incWrPtr(unsigned int nb_val)
 	wr_ptr &= (size - 1);
 }
 
-template <typename T>
-inline T* Fifo<T>::getRdPtr() const
+template <typename T, int nb_reader>
+inline T* Fifo<T, nb_reader>::read_address(int reader_id) const
 {
-	return buffer + rd_ptr;
+	return buffer + rd_ptr[reader_id];
 }
 
-template <typename T>
-inline T* Fifo<T>::getRdPtr(unsigned uNbVal)
+template <typename T, int nb_reader>
+inline T* Fifo<T, nb_reader>::read_address(int reader_id, unsigned uNbVal)
 {
-	T * pVal = buffer + rd_ptr;
-	int rest = rd_ptr + uNbVal - size;
+	T * pVal = buffer + rd_ptr[reader_id];
+	int rest = rd_ptr[reader_id] + uNbVal - size;
 	if(rest > 0)
 	{
 		memcpy(buffer + size, buffer, rest*sizeof(T)); 
@@ -185,43 +149,12 @@ inline T* Fifo<T>::getRdPtr(unsigned uNbVal)
 	return pVal;
 }
 
-template <typename T>
-void Fifo<T>::incRdPtr()
+template <typename T, int nb_reader>
+void Fifo<T, nb_reader>::read_advance(int reader_id, unsigned int nb_val)
 {
-	++rd_ptr;
-	rd_ptr &= (size - 1);
-}
-
-template <typename T>
-void Fifo<T>::incRdPtr(unsigned int nb_val)
-{
-	rd_ptr += nb_val;
-	rd_ptr &= (size - 1);
-}
-
-template <typename T> 
-inline void Fifo<T>::put(T * pVal)
-{
-	buffer[wr_ptr] = *pVal;
-	++wr_ptr;
-	wr_ptr &= (size - 1);
-}
-
-template <typename T> 
-inline void Fifo<T>::put(T * pVal, unsigned uNbVal) 
-{
-	if((wr_ptr + uNbVal) > size) 
-	{
-		unsigned int head = size - wr_ptr;
-		memcpy(buffer + wr_ptr, pVal, head * sizeof(T)); 
-		memcpy(buffer, pVal + head, (uNbVal - head) * sizeof(T)); 
-	} 
-	else 
-	{
-		memcpy(buffer + wr_ptr, pVal, uNbVal * sizeof(T));
-	}
-	wr_ptr += uNbVal;
-	wr_ptr &= (size - 1);
+	rd_ptr[reader_id] += nb_val;
+	rd_ptr[reader_id] &= (size - 1);
 }
 
 #endif
+

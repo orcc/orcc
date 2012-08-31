@@ -62,7 +62,12 @@ class ExprAndTypePrinter extends IrSwitch {
 
 	override caseExprInt(ExprInt expr) '''«expr.value»«IF expr.long»LL«ENDIF»'''
 
-	override caseExprList(ExprList expr) '''{ «FOR value: expr.value SEPARATOR ", "»«value.doSwitch»«ENDFOR» }'''
+	override caseExprList(ExprList expr) '''
+	{
+		«FOR value: expr.value SEPARATOR ","» 
+			«value.doSwitch»
+		«ENDFOR»
+	}'''
 
 	override caseExprString(ExprString expr) '''"«expr.value»"'''
 

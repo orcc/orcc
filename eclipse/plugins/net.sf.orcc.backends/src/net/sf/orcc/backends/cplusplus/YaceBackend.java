@@ -43,12 +43,16 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
@@ -136,6 +140,18 @@ public class YaceBackend extends AbstractBackend {
 		transformActors(network.getAllActors());
 
 		network.computeTemplateMaps();
+
+		// hack, should be done in the method just above
+		for (Vertex vertex : network.getChildren()) {
+			Entity entity = vertex.getAdapter(Entity.class);
+			Map<Port, List<Connection>> map = entity.getOutgoingPortMap();
+			for (List<Connection> connections : map.values()) {
+				for (Connection connection : connections) {
+					connection.setAttribute("nbReaders", connections.size());
+				}
+			}
+		}
+		
 		printInstances(network);
 		// print network
 		write("Printing network...\n");
