@@ -142,7 +142,7 @@ try:
             profile(srcPath)
             
 except KeyboardInterrupt:
-        print "Abort by user."
-        sys.exit(-1)
+    sys.exit("Abort by user.")
 
-
+except Exception, err:
+    sys.exit("ERROR: %s\n" % str(err))
