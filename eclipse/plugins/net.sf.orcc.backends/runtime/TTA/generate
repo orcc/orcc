@@ -30,6 +30,8 @@
 #
 # @author Herve Yviquel
 
+
+from orcc_ import *
 import getopt
 import os
 import shutil
@@ -119,24 +121,28 @@ tracePath = os.path.join(srcPath, "trace")
 sys.path.insert(0, libPath)
 sys.path.insert(0, srcPath)
 
-from orcc_ import *
 from informations_.informations import *
-			
-for o, a in opts:
-	if o in ("-c", "--compile"):
-		compile(a, debug, srcPath)
 
-for o, a in opts:
-	if o in ("-s", "--simulate"):
-		simulate(debug, srcPath)
 
-for o, a in opts:
-	if o in ("-g", "--generate"):
-		generate(a, debug, srcPath)
-        
-for o, a in opts:
-    if o in ("-p", "--profile"):
-        print "test"
-        profile(srcPath)
+try:
+    for o, a in opts:
+    	if o in ("-c", "--compile"):
+    		compile(a, debug, srcPath)
+    
+    for o, a in opts:
+    	if o in ("-s", "--simulate"):
+    		simulate(debug, srcPath)
+    
+    for o, a in opts:
+    	if o in ("-g", "--generate"):
+    		generate(a, debug, srcPath)
+            
+    for o, a in opts:
+        if o in ("-p", "--profile"):
+            profile(srcPath)
+            
+except KeyboardInterrupt:
+        print "Abort by user."
+        sys.exit(-1)
 
 
