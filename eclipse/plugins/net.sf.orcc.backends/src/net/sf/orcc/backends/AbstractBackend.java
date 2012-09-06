@@ -60,6 +60,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
@@ -168,6 +169,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		if (isCanceled()) {
 			return;
 		}
+		new NetworkValidator().doSwitch(network);
+		
 
 		// because the UnitImporter will load additional resources, we filter
 		// only actors
