@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.df.Instance;
@@ -102,6 +103,54 @@ public class BackendUtil {
 	public static int quantizeUp(int value) {
 		double tmp = Math.log(value) / Math.log(2.0);
 		return (int) (Math.pow(2, Math.ceil(tmp)));
+	}
+
+	/**
+	 * Convert a string version into a int[4] array with major, minor, release
+	 * and qualifier number. Each part is set to -1 if number can't be parsed.
+	 * 
+	 * @return version number in int[4] form
+	 */
+	public static int[] getVersionArrayFromString(String version) {
+		int[] result = { -1, -1, -1, -1 };
+		StringTokenizer t = new StringTokenizer(version, ".");
+		for (int i = 0; t.hasMoreTokens() && i < 4; ++i) {
+			try {
+				int value = Integer.parseInt(t.nextToken());
+				result[i] = value;
+			} catch (NumberFormatException e) {
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Compares version strings.
+	 * 
+	 * @return result of comparison, as integer : a negative value if left <
+	 *         right, a positive one if left > right or 0 if left == right
+	 */
+	public static int compareVersions(int[] left, int[] right) {
+		if (left == null) {
+			return -1;
+		}
+
+		int result = Integer.valueOf(left[0]).compareTo(right[0]);
+		if (result != 0) {
+			return result;
+		}
+
+		result = Integer.valueOf(left[1]).compareTo(right[1]);
+		if (result != 0) {
+			return result;
+		}
+
+		result = Integer.valueOf(left[2]).compareTo(right[2]);
+		if (result != 0) {
+			return result;
+		}
+
+		return Integer.valueOf(left[3]).compareTo(right[3]);
 	}
 
 }

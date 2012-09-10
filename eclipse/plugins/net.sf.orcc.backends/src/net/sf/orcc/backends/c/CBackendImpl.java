@@ -33,12 +33,16 @@ import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -83,6 +87,7 @@ import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -353,7 +358,32 @@ public class CBackendImpl extends AbstractBackend {
 	 */
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
-		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
+		
+		boolean exportLibrary = getAttribute(NO_LIBRARY_EXPORT, true);
+
+		String libsPath = path + File.separator + "libs";
+		File vFile = new File(libsPath + File.separator + "VERSION");
+
+		String currentBundleVersion = Platform
+				.getBundle("net.sf.orcc.backends").getHeaders()
+				.get("Bundle-Version");
+
+		if (vFile.exists()) {
+			try {
+				Scanner reader = new Scanner(new FileInputStream(vFile));
+				reader.hasNextLine();
+				String libVersion = reader.nextLine();
+
+				int compareResult = BackendUtil.compareVersions(
+						BackendUtil.getVersionArrayFromString(currentBundleVersion),
+						BackendUtil.getVersionArrayFromString(libVersion));
+				exportLibrary = compareResult > 0;
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (exportLibrary) {
 			// Copy specific windows batch file
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
 				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
@@ -363,9 +393,17 @@ public class CBackendImpl extends AbstractBackend {
 			copyFileToFilesystem("/runtime/C/README.txt", path + File.separator
 					+ "README.txt");
 
-			String target = path + File.separator + "libs";
-			write("Export libraries sources into " + target + "... ");
-			if (copyFolderToFileSystem("/runtime/C/libs", target)) {
+			try {
+				FileOutputStream os = new FileOutputStream(vFile);
+				byte[] bytes = currentBundleVersion.getBytes();
+				os.write(bytes, 0, bytes.length);
+				os.close();
+			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
+			}
+
+			write("Export libraries sources into " + libsPath + "... ");
+			if (copyFolderToFileSystem("/runtime/C/libs", libsPath)) {
 				write("OK" + "\n");
 				return true;
 			} else {
