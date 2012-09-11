@@ -38,6 +38,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -59,9 +60,9 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	protected AbstractIrVisitor<T> irVisitor;
 
-	protected boolean visitOnce;
-
 	private Set<Actor> visited;
+
+	protected boolean visitOnce;
 
 	/**
 	 * Creates a new visitor that visits objects from the Df model. Each actor
@@ -198,6 +199,19 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	@Override
 	public T casePort(Port port) {
+		return null;
+	}
+
+	@Override
+	public T caseUnit(Unit unit) {
+		for (Var stateVar : unit.getConstants()) {
+			doSwitch(stateVar);
+		}
+
+		for (Procedure procedure : unit.getProcedures()) {
+			doSwitch(procedure);
+		}
+
 		return null;
 	}
 
