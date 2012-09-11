@@ -27,6 +27,7 @@ import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
@@ -319,7 +320,8 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			Vertex target, Port targetPort, int size) {
 		Connection connection = createConnection(source, sourcePort, target,
 				targetPort);
-		connection.setAttribute(Connection.BUFFER_SIZE, size);
+		ExprInt expr = IrFactory.eINSTANCE.createExprInt(size);
+		connection.setAttribute(Connection.BUFFER_SIZE, expr);
 		return connection;
 	}
 
