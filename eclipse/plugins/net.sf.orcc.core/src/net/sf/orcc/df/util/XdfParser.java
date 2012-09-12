@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -601,14 +602,14 @@ public class XdfParser {
 	 */
 	private final ExprParser exprParser;
 
+	private IFile file;
+
 	private Network network;
 
 	/**
 	 * XDF type parser.
 	 */
 	private final TypeParser typeParser;
-
-	private IFile file;
 
 	/**
 	 * Creates a new network parser.
@@ -636,10 +637,19 @@ public class XdfParser {
 		if (vertex instanceof Port) {
 			return null;
 		} else {
-			URI uri = EcoreUtil.getURI(((Instance) vertex).getEntity());
-			uri = uri.appendFragment("//@" + dir + "." + portName);
+			// create port and set name in case proxy can't be resolved
 			Port proxy = DfFactory.eINSTANCE.createPort();
-			((InternalEObject) proxy).eSetProxyURI(uri);
+			proxy.setName(portName);
+
+			// check proxy URI
+			EObject entity = ((Instance) vertex).getEntity();
+			URI proxyURI = ((InternalEObject) entity).eProxyURI();
+			if (proxyURI != null) {
+				// entity has a proxy URI, set it on proxy
+				URI uri = EcoreUtil.getURI(entity);
+				uri = uri.appendFragment("//@" + dir + "." + portName);
+				((InternalEObject) proxy).eSetProxyURI(uri);
+			}
 			return proxy;
 		}
 	}
@@ -682,6 +692,43 @@ public class XdfParser {
 
 			return vertex;
 		}
+	}
+
+	/**
+	 * Finds the .ir or .xdf file that defines the entity that matches the given
+	 * class. If found, this method creates a proxy and sets it as instance's
+	 * entity.
+	 * 
+	 * @param instance
+	 *            an instance
+	 * @param clasz
+	 *            qualified class of the entity
+	 */
+	private void resolveEntity(Instance instance, String clasz) {
+		EObject proxy = null;
+		IProject project = file.getProject();
+		IFile file = OrccUtil.getFile(project, clasz, "ir");
+		if (file != null && file.exists()) {
+			proxy = DfFactory.eINSTANCE.createActor();
+		} else {
+			file = OrccUtil.getFile(project, clasz, "xdf");
+			if (file != null && file.exists()) {
+				proxy = DfFactory.eINSTANCE.createNetwork();
+			} else {
+				// no file exists, create a dummy actor with the correct name
+				Actor actor = DfFactory.eINSTANCE.createActor();
+				actor.setName(clasz);
+				instance.setEntity(actor);
+				return;
+			}
+		}
+
+		// create proxy
+		String pathName = file.getFullPath().toString();
+		URI uri = URI.createPlatformResourceURI(pathName, true);
+		uri = uri.appendFragment("/0");
+		instance.setEntity(proxy);
+		((InternalEObject) proxy).eSetProxyURI(uri);
 	}
 
 	/**
@@ -801,6 +848,13 @@ public class XdfParser {
 		network.getConnections().add(conn);
 	}
 
+	/**
+	 * Parses the given Decl element, and adds a parameter or variable to
+	 * {@link #network} depending on Decl's kind.
+	 * 
+	 * @param decl
+	 *            a Decl element
+	 */
 	private void parseDecl(Element decl) {
 		String kind = decl.getAttribute("kind");
 		String name = decl.getAttribute("name");
@@ -842,6 +896,10 @@ public class XdfParser {
 					+ "must have a valid \"id\" attribute");
 		}
 
+		// create instance
+		Instance instance = DfFactory.eINSTANCE.createInstance();
+		instance.setName(id);
+
 		// instance class
 		String clasz = null;
 		Node child = element.getFirstChild();
@@ -854,40 +912,14 @@ public class XdfParser {
 			}
 		}
 
+		// throw exception if no class
 		if (clasz == null || clasz.isEmpty()) {
 			throw new OrccRuntimeException("An Instance element "
 					+ "must have a valid \"Class\" child.");
 		}
 
-		EObject proxy = null;
-		IProject project = file.getProject();
-		IFile file = OrccUtil.getFile(project, clasz, "ir");
-		if (file == null || !file.exists()) {
-			file = OrccUtil.getFile(project, clasz, "xdf");
-			if (file != null && file.exists()) {
-				proxy = DfFactory.eINSTANCE.createNetwork();
-			}
-		} else {
-			proxy = DfFactory.eINSTANCE.createActor();
-		}
-
-		if (proxy == null) {
-			throw new OrccRuntimeException("Actor or network \"" + clasz
-					+ "\" not found!\nIf this actor/network has errors,"
-					+ " please correct them and try again; otherwise, try to "
-					+ "refresh/clean projects.");
-		}
-
-		// create instance
-		Instance instance = DfFactory.eINSTANCE.createInstance();
-		instance.setName(id);
-
-		// create proxy
-		String pathName = file.getFullPath().toString();
-		URI uri = URI.createPlatformResourceURI(pathName, true);
-		uri = uri.appendFragment("/0");
-		instance.setEntity(proxy);
-		((InternalEObject) proxy).eSetProxyURI(uri);
+		// resolve the file that defines the given class
+		resolveEntity(instance, clasz);
 
 		// instance parameters and attributes
 		parseParameters(instance, child);
