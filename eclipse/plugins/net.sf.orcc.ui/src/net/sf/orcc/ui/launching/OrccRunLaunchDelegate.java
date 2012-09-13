@@ -30,6 +30,7 @@ package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import net.sf.orcc.OrccActivator;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.BackendFactory;
 
 import org.eclipse.core.runtime.CoreException;
@@ -66,6 +67,11 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 				BackendFactory factory = BackendFactory.getInstance();
 				factory.runBackend(process.getProgressMonitor(), process,
 						configuration.getAttributes());
+				process.writeText("Orcc backend done.");
+			} catch (OrccRuntimeException exception) {
+				process.writeText("ERROR: " + exception.getMessage() + "\n");
+				process.writeText(backend
+						+ " backend could not generate code\n");
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if we
 				// got an error too soon
@@ -76,7 +82,6 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 								+ " backend could not generate code", e);
 				throw new CoreException(status);
 			}
-			process.writeText("Orcc backend done.");
 		} finally {
 			process.terminate();
 		}
