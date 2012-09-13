@@ -71,15 +71,17 @@ import net.sf.orcc.ir.Var
 		
 		#include <iostream>
 		#include "actor.h"
-		#include "fifo_n.h"
+		#include "fifo.h"
 				
 		«FOR proc : actor.procs.filter(p | p.native && !"print".equals(p.name))»
 			«proc.compileNativeProc»
 		«ENDFOR»
 		
-		class «instance.name»: public Actor {
+		class «instance.name»: public Actor
+		{
 		public:	
-			«instance.name»() {
+			«instance.name»()
+			{
 				«FOR arg : instance.arguments»«compileArg(arg.variable.type, arg.variable.indexedName, arg.value)»«ENDFOR»
 				«FOR v : actor.stateVars.filter(v|v.initialValue != null)»«compileArg(v.type, v.indexedName, v.initialValue)»«ENDFOR»
 				«IF actor.fsm != null»state_ = state_«actor.fsm.initialState.name»;«ENDIF»
@@ -97,7 +99,8 @@ import net.sf.orcc.ir.Var
 			
 			«actor.initializes.map[compileAction].join»
 		
-			void initialize() {
+			void initialize()
+			{
 				«FOR action : actor.initializes»
 					«action.name»();
 				«ENDFOR»
@@ -114,8 +117,12 @@ import net.sf.orcc.ir.Var
 			«FOR port : actor.inputs SEPARATOR "\n"»int status_«port.name»_;«ENDFOR»
 			«FOR port : actor.outputs SEPARATOR "\n"»int status_«port.name»_;«ENDFOR»
 			«IF actor.fsm != null»
-			int state_;
-			enum states {«FOR state : actor.fsm.states SEPARATOR ", "»state_«state.name»«ENDFOR»};
+			enum states
+			{
+				«FOR state : actor.fsm.states SEPARATOR ","»
+					state_«state.name»
+				«ENDFOR»
+			} state_;
 			«ENDIF»
 		};
 		#endif
@@ -142,16 +149,21 @@ import net.sf.orcc.ir.Var
 	'''
 
 	override caseBlockIf(BlockIf node) '''
-		if(«node.condition.doSwitch») {
+		if(«node.condition.doSwitch»)
+		{
 			«FOR then : node.thenBlocks»«then.doSwitch»«ENDFOR»	
-		} «IF node.elseBlocks != null»else {
+		} 
+		«IF !node.elseBlocks.empty»
+		else
+		{
 			«FOR els : node.elseBlocks»«els.doSwitch»«ENDFOR»
 		}«ENDIF»
 		«node.joinBlock.doSwitch»
 	'''
 
 	override caseBlockWhile(BlockWhile node) '''
-		while(«node.condition.doSwitch») {
+		while(«node.condition.doSwitch»)
+		{
 			«FOR whil : node.blocks»«whil.doSwitch»«ENDFOR»
 		}
 		«node.joinBlock.doSwitch»
@@ -192,20 +204,23 @@ import net.sf.orcc.ir.Var
 	'''
 
 	def compileProcedure(Procedure proc) '''
-		«proc.returnType.doSwitch» «proc.name» («FOR param : proc.parameters SEPARATOR ", "»«param.variable.varDecl»«ENDFOR») {
+		«proc.returnType.doSwitch» «proc.name» («FOR param : proc.parameters SEPARATOR ", "»«param.variable.varDecl»«ENDFOR»)
+		{
 			«proc.doSwitch»
 		}
 	'''
 	
 	def compileAction(Action action) '''
-		«action.scheduler.returnType.doSwitch» «action.scheduler.name» () {	
+		«action.scheduler.returnType.doSwitch» «action.scheduler.name» ()
+		{
 			«FOR e : action.peekPattern.numTokensMap»
 				«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
 			«ENDFOR»
 			«action.scheduler.doSwitch»
 		}
 
-		«action.body.returnType.doSwitch» «action.body.name» () {	
+		«action.body.returnType.doSwitch» «action.body.name» ()
+		{
 			«FOR e : action.inputPattern.numTokensMap»
 				«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
 			«ENDFOR»
@@ -242,7 +257,8 @@ import net.sf.orcc.ir.Var
 	}
 	
 	def compileScheduler(Actor actor) '''	
-		void schedule(EStatus& status) {	
+		void schedule(EStatus& status)
+		{	
 			«FOR port : actor.inputs SEPARATOR "\n"»status_«port.name»_=port_«port.name»->count(«instance.incomingPortMap.get(port).getAttribute("fifoId").pojoValue»);«ENDFOR»
 			«FOR port : actor.outputs SEPARATOR "\n"»status_«port.name»_=port_«port.name»->rooms();«ENDFOR»
 		
@@ -250,7 +266,7 @@ import net.sf.orcc.ir.Var
 			while (res) {
 				«IF actor.fsm!=null»
 				res = false;
-				«FOR action : actor.actionsOutsideFsm BEFORE "if" SEPARATOR " else if"»«action.compileScheduler(null)»«ENDFOR»
+				«FOR action : actor.actionsOutsideFsm BEFORE "if" SEPARATOR "\nelse if"»«action.compileScheduler(null)»«ENDFOR»
 				if(!res) {
 					switch(state_) {
 						«actor.fsm.compilerScheduler»
@@ -258,7 +274,7 @@ import net.sf.orcc.ir.Var
 				}
 				«ELSE»
 				res = false;
-				«FOR action : actor.actions BEFORE "if" SEPARATOR " else if"»«action.compileScheduler(null)»«ENDFOR»
+				«FOR action : actor.actions BEFORE "if" SEPARATOR "\nelse if"»«action.compileScheduler(null)»«ENDFOR»
 				«ENDIF»
 			}
 		}
@@ -266,7 +282,8 @@ import net.sf.orcc.ir.Var
 	'''
 	
 	def compileScheduler(Action action, State state) '''
-		(«FOR e : action.inputPattern.numTokensMap»status_«e.key.name»_ >= «e.value» && «ENDFOR»isSchedulable_«action.name»()) {
+		(«FOR e : action.inputPattern.numTokensMap»status_«e.key.name»_ >= «e.value» && «ENDFOR»isSchedulable_«action.name»())
+		{
 			«IF !action.outputPattern.empty»
 			if(«FOR e : action.outputPattern.numTokensMap SEPARATOR " && "»status_«e.key.name»_ >= «e.value»«ENDFOR») {
 				«action.body.name»();
@@ -285,7 +302,7 @@ import net.sf.orcc.ir.Var
 	def compilerScheduler(FSM fsm) '''
 		«FOR state : fsm.states»
 		case state_«state.name»:
-			«FOR edge : state.outgoing BEFORE "if" SEPARATOR " else if"»«(edge as Transition).action.compileScheduler(edge.target as State)»«ENDFOR»
+			«FOR edge : state.outgoing BEFORE "if" SEPARATOR "\nelse if"»«(edge as Transition).action.compileScheduler(edge.target as State)»«ENDFOR»
 			break;
 		«ENDFOR»
 	'''

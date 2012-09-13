@@ -32,7 +32,7 @@
 #include <stdlib.h>
 
 #ifndef NO_DISPLAY
-#include "SDL.h"
+#include <SDL/SDL.h>
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
 #else
@@ -64,9 +64,9 @@ void displayYUV_setSize(int width, int height)
 {
 #ifndef NO_DISPLAY
 	//std::cout << "set display to " << width << " x " << height << std::endl;
-	m_screen = SDL_SetVideoMode(width, height, 0, SDL_SWSURFACE);
+	m_screen = SDL_SetVideoMode(width, height, 0, SDL_HWSURFACE);
 	if (m_screen == NULL) {
-		std::cerr <<  "Couldn't set video mode" << width << height << std::endl;
+		fprintf(stderr, "Couldn't set video mode!\n");
 		press_a_key(-1);
 	}
 

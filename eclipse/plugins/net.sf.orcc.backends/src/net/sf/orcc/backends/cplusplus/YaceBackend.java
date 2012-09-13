@@ -48,6 +48,7 @@ import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
@@ -115,6 +116,7 @@ public class YaceBackend extends AbstractBackend {
 		new Instantiator(false).doSwitch(network);
 		write("done\n");
 		new NetworkFlattener().doSwitch(network);
+		new ArgumentEvaluator().doSwitch(network);
 
 		if (classify) {
 			write("Starting classification of actors... ");
@@ -151,7 +153,7 @@ public class YaceBackend extends AbstractBackend {
 				}
 			}
 		}
-		
+
 		printInstances(network);
 		// print network
 		write("Printing network...\n");

@@ -87,7 +87,7 @@ class ExprAndTypePrinter extends IrSwitch {
 		type.type.doSwitch
 	}
 
-	override caseTypeString(TypeString type)  '''char*'''
+	override caseTypeString(TypeString type)  '''std::string'''
 
 	override caseTypeUint(TypeUint type) {
 		"unsigned " + printInt(type.size);
