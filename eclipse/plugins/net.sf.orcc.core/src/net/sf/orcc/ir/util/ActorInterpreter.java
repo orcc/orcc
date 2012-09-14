@@ -93,7 +93,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	/**
 	 * Actor's FSM current state
 	 */
-	private State fsmState;
+	protected State fsmState;
 
 	/**
 	 * Creates a new interpreter with no actor and no parameters.
@@ -485,7 +485,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * 
 	 * @return the schedulable action or null
 	 */
-	public final Action getNextAction() {
+	public Action getNextAction() {
 		// Check next schedulable action in respect of the priority order
 		for (Action action : actor.getActionsOutsideFsm()) {
 			if (isSchedulable(action)) {
