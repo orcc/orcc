@@ -37,7 +37,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +45,7 @@ import java.util.Scanner;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.CastAdder;
@@ -428,15 +428,9 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	protected void printMapping(Network network) {
-		try {
-			CharSequence xcfContent = new XcfPrinter().compileXcfFile(network,
-					targetToInstancesMap);
-			PrintStream ps = new PrintStream(srcPath + File.separator
-					+ network.getName() + ".xcf");
-			ps.print(xcfContent.toString());
-			ps.close();
-		} catch (FileNotFoundException e) {
-		}
+		CommonPrinter.printFile(
+				new XcfPrinter().compileXcfFile(network, targetToInstancesMap),
+				srcPath + File.separator + network.getName() + ".xcf");
 	}
 
 }
