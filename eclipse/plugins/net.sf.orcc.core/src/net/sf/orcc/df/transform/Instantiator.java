@@ -190,8 +190,13 @@ public class Instantiator extends DfSwitch<Void> {
 		// assigns arguments' values to network's variables
 		for (Argument argument : instance.getArguments()) {
 			Var var = (Var) copier.get(argument.getVariable());
-			Expression value = argument.getValue();
-			var.setInitialValue(value);
+			// If instance's parameter correspond to an actor's parameter
+			if(var != null) {
+				Expression value = argument.getValue();
+				var.setInitialValue(value);
+			} else {
+				// TODO : Display a warning ?
+			}
 		}
 
 		// remove instance
