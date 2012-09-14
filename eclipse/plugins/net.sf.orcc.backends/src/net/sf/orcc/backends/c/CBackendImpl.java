@@ -110,10 +110,10 @@ public class CBackendImpl extends AbstractBackend {
 
 	protected boolean enableTrace;
 	protected Map<String, String> mapping;
-	protected boolean merge;
+	protected boolean mergeActors;
 
 	protected boolean newScheduler;
-	protected boolean normalize;
+	protected boolean mergeActions;
 	protected StandardPrinter printer;
 	protected boolean ringTopology;
 
@@ -150,19 +150,17 @@ public class CBackendImpl extends AbstractBackend {
 	public void doInitializeOptions() {
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		if (classify) {
-			// only retrieve the merge option if classify is true
-			merge = getAttribute("net.sf.orcc.backends.merge", false);
-		} else {
-			merge = false;
-		}
+		// Merging operations needs classification
+		mergeActions = classify
+				&& getAttribute("net.sf.orcc.backends.normalize", false);
+		mergeActors = classify
+				&& getAttribute("net.sf.orcc.backends.merge", false);
 
 		// FIXME: Readd the method in native function and compute the
 		// hierarchical id of each actor.
 		useGeneticAlgo = getAttribute("net.sf.orcc.backends.geneticAlgorithm",
 				false);
-		
+
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
 		debug = getAttribute(DEBUG_MODE, true);
 		threadsNb = Integer.parseInt(getAttribute(
@@ -212,7 +210,7 @@ public class CBackendImpl extends AbstractBackend {
 		replacementMap.put("OUT", "OUT_my_precious");
 		replacementMap.put("IN", "IN_my_precious");
 
-		if (normalize) {
+		if (mergeActions) {
 			new ActionMerger().doSwitch(actor);
 		}
 
@@ -288,10 +286,10 @@ public class CBackendImpl extends AbstractBackend {
 		if (classify) {
 			write("Classification of actors...\n");
 			new Classifier(getWriteListener()).doSwitch(network);
-			if (merge) {
-				write("Merging of actors...\n");
-				new ActorMerger().doSwitch(network);
-			}
+		}
+		if (mergeActors) {
+			write("Merging of actors...\n");
+			new ActorMerger().doSwitch(network);
 		}
 
 		new CBroadcastAdder(getWriteListener()).doSwitch(network);
@@ -358,7 +356,7 @@ public class CBackendImpl extends AbstractBackend {
 	 */
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
-		
+
 		boolean exportLibrary = getAttribute(NO_LIBRARY_EXPORT, true);
 
 		String libsPath = path + File.separator + "libs";
@@ -374,8 +372,8 @@ public class CBackendImpl extends AbstractBackend {
 				reader.hasNextLine();
 				String libVersion = reader.nextLine();
 
-				int compareResult = BackendUtil.compareVersions(
-						BackendUtil.getVersionArrayFromString(currentBundleVersion),
+				int compareResult = BackendUtil.compareVersions(BackendUtil
+						.getVersionArrayFromString(currentBundleVersion),
 						BackendUtil.getVersionArrayFromString(libVersion));
 				exportLibrary = compareResult > 0;
 			} catch (FileNotFoundException e) {
@@ -389,7 +387,7 @@ public class CBackendImpl extends AbstractBackend {
 				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
 						path + File.separator + "run_cmake_with_VS_env.bat");
 			}
-			
+
 			copyFileToFilesystem("/runtime/C/README.txt", path + File.separator
 					+ "README.txt");
 
