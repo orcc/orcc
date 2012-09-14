@@ -107,8 +107,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	private FPGA fpga;
 	private String libPath;
 	private Mapping mapping;
-	private boolean merge;
-	private boolean normalize;
+	private boolean mergeActors;
+	private boolean mergeActions;
 	private boolean profile;
 
 	private Map<String, String> userMapping;
@@ -154,8 +154,10 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		userMapping = getAttribute(MAPPING, new HashMap<String, String>());
 
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		merge = getAttribute("net.sf.orcc.backends.merge", false);
+		mergeActions = classify
+				&& getAttribute("net.sf.orcc.backends.normalize", false);
+		mergeActors = classify
+				&& getAttribute("net.sf.orcc.backends.merge", false);
 	}
 
 	@Override
@@ -172,10 +174,10 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		if (classify) {
 			new Classifier(getWriteListener()).doSwitch(network);
 		}
-		if (normalize) {
+		if (mergeActions) {
 			new ActionMerger().doSwitch(network);
 		}
-		if (merge) {
+		if (mergeActors) {
 			new ActorMerger().doSwitch(network);
 		}
 
@@ -312,8 +314,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		wavePrinter.print("wave.do", path, design);
 
 		// TCE
-		CommonPrinter.printFile(new TCE_Design_PNDF(path).doSwitch(design), path
-				+ File.separator + "top.pndf");
+		CommonPrinter.printFile(new TCE_Design_PNDF(path).doSwitch(design),
+				path + File.separator + "top.pndf");
 	}
 
 	private void generateProcessor(Processor tta) {
