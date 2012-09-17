@@ -176,6 +176,48 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	}
 
 	/**
+	 * Build a design from an actor to simulate it outside of a whole system.
+	 * 
+	 * @param actor
+	 *            The actor to evaluate
+	 * @param configuration
+	 *            A predefined configuration of the processors
+	 * @return A new design
+	 */
+	public Design build(Instance actor, ProcessorConfiguration configuration) {
+		this.componentMap = new HashMap<Vertex, Component>();
+		this.bufferMap = new HashMap<Component, Map<Component, Memory>>();
+		this.design = factory.createDesign();
+
+		Processor simProc = factory.createProcessor(actor.getName(),
+				configuration, 0);
+		design.add(simProc);
+
+		for (net.sf.orcc.df.Port port : actor.getActor().getInputs()) {
+			Processor writer = factory.createProcessor(port.getName(),
+					ProcessorConfiguration.STANDARD, 0);
+			design.add(writer);
+
+			Memory ram = connect(writer, simProc);
+			ram.getMappedConnections().add(actor.getIncomingPortMap().get(port));
+		}
+
+		for (net.sf.orcc.df.Port port : actor.getActor().getOutputs()) {
+			Processor reader = factory.createProcessor(port.getName(),
+					ProcessorConfiguration.STANDARD, 0);
+			design.add(reader);
+
+			Memory ram = connect(reader, simProc);
+			ram.getMappedConnections().add(
+					actor.getOutgoingPortMap().get(port).get(0));
+		}
+
+		new ArchitectureMemoryEstimator().doSwitch(design);
+
+		return design;
+	}
+
+	/**
 	 * Build a design from a network of actors, a predefined configuration of
 	 * the processors and finally the mapping of the actors on a set of
 	 * processors. The processors and their interconnections are instantiated
@@ -212,6 +254,38 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		new ArchitectureMemoryEstimator().doSwitch(design);
 
 		return design;
+	}
+
+	/**
+	 * Connect two processors together.
+	 * 
+	 * @param source
+	 *            the processor source
+	 * @param target
+	 *            the processor target
+	 * @return the created ram
+	 */
+	private Memory connect(Processor source, Processor target) {
+		Memory ram;
+		if (source == target) {
+			// It's the same processor, then a new local RAM is created.
+			ram = factory.createMemory("lmem_" + bufferId);
+			FunctionUnit lsu = source.connect(ram);
+			ram.setSourcePort(lsu);
+			ram.setTargetPort(lsu);
+			source.getLocalRAMs().add(ram);
+		} else {
+			// Creation of a new shared memory connected to both processors.
+			ram = factory.createMemory("smem_" + bufferId);
+			FunctionUnit sourceLSU = source.connect(ram);
+			FunctionUnit targetLSU = target.connect(ram);
+			ram.setSource(source);
+			ram.setTarget(target);
+			ram.setSourcePort(sourceLSU);
+			ram.setTargetPort(targetLSU);
+			design.add(ram);
+		}
+		return ram;
 	}
 
 	private boolean isNative(Connection connection) {
@@ -251,26 +325,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		if (limitConnection && tgtToBufferMap.containsKey(target)) {
 			ram = tgtToBufferMap.get(target);
 		} else {
-			if (source == target) {
-				// Both actors are mapped to the same processor, then the
-				// FIFO is mapped to a new local RAM.
-				ram = factory.createMemory("lmem_" + bufferId);
-				FunctionUnit lsu = source.connect(ram);
-				ram.setSourcePort(lsu);
-				ram.setTargetPort(lsu);
-				source.getLocalRAMs().add(ram);
-			} else {
-				// Both actors are mapped to different processors, then the
-				// FIFO is mapped in a new shared memory.
-				ram = factory.createMemory("smem_" + bufferId);
-				FunctionUnit sourceLSU = source.connect(ram);
-				FunctionUnit targetLSU = target.connect(ram);
-				ram.setSource(source);
-				ram.setTarget(target);
-				ram.setSourcePort(sourceLSU);
-				ram.setTargetPort(targetLSU);
-				design.add(ram);
-			}
+			ram = connect(source, target);
 			ram.setAttribute("id", bufferId++);
 
 			if (limitConnection) {
