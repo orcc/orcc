@@ -64,6 +64,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Writes;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.ecore.EObject;
@@ -133,6 +134,8 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseAttributable(design);
 			if (result == null)
+				result = caseAdaptable(design);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -168,6 +171,8 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseAttributable(component);
 			if (result == null)
+				result = caseAdaptable(component);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -178,6 +183,8 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = caseVertex(port);
 			if (result == null)
 				result = caseAttributable(port);
+			if (result == null)
+				result = caseAdaptable(port);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -204,6 +211,8 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = caseVertex(processor);
 			if (result == null)
 				result = caseAttributable(processor);
+			if (result == null)
+				result = caseAdaptable(processor);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -245,6 +254,8 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = caseVertex(functionUnit);
 			if (result == null)
 				result = caseAttributable(functionUnit);
+			if (result == null)
+				result = caseAdaptable(functionUnit);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -846,6 +857,21 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseAttributable(Attributable object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAdaptable(Adaptable object) {
 		return null;
 	}
 

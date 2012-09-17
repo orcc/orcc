@@ -30,6 +30,7 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
+import net.sf.orcc.df.Instance;
 import java.util.Map;
 
 import net.sf.orcc.df.Connection;
@@ -193,7 +194,7 @@ public interface Processor extends Component {
 	 * @model
 	 * @generated
 	 */
-	EList<Vertex> getMappedActors();
+	EList<Instance> getMappedActors();
 
 	Map<Memory, Integer> getMemToAddrSpaceIdMap();
 

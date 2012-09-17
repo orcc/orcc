@@ -46,6 +46,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.llvm.tta.architecture.Socket;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
@@ -166,7 +167,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Vertex> mappedActors;
+	protected EList<Instance> mappedActors;
 
 	/**
 	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
@@ -393,7 +394,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			return;
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			getMappedActors().clear();
-			getMappedActors().addAll((Collection<? extends Vertex>) newValue);
+			getMappedActors().addAll((Collection<? extends Instance>) newValue);
 			return;
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
 			setConfiguration((ProcessorConfiguration) newValue);
@@ -545,9 +546,9 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Vertex> getMappedActors() {
+	public EList<Instance> getMappedActors() {
 		if (mappedActors == null) {
-			mappedActors = new EObjectResolvingEList<Vertex>(Vertex.class,
+			mappedActors = new EObjectResolvingEList<Instance>(Instance.class,
 					this, ArchitecturePackage.PROCESSOR__MAPPED_ACTORS);
 		}
 		return mappedActors;
