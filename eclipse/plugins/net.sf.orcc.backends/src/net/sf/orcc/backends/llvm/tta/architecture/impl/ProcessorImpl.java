@@ -46,10 +46,9 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.llvm.tta.architecture.Socket;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.graph.Edge;
-import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

@@ -30,11 +30,10 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
-import net.sf.orcc.df.Instance;
 import java.util.Map;
 
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.df.Instance;
 
 import org.eclipse.emf.common.util.EList;
 
