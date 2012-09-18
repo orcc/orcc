@@ -31,11 +31,11 @@ package net.sf.orcc.graph.visit;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.eclipse.emf.ecore.EReference;
-
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
+
+import org.eclipse.emf.ecore.EReference;
 
 /**
  * This class defines Depth-First Search (DFS) for a graph.
@@ -68,6 +68,18 @@ public class DFS extends Ordering {
 	}
 
 	/**
+	 * Initializes this DFS for a graph of <code>n</code> vertices. Does not
+	 * perform any kind of visit.
+	 * 
+	 * @param n
+	 *            the expected number of vertices
+	 */
+	public DFS(int n) {
+		this(GraphPackage.Literals.VERTEX__OUTGOING,
+				GraphPackage.Literals.EDGE__TARGET, n);
+	}
+
+	/**
 	 * Builds the list of vertices that can be reached from the given vertex
 	 * using depth-first search. Equivalent to <code>this(vertex, false)</code>
 	 * 
@@ -92,9 +104,8 @@ public class DFS extends Ordering {
 	 *             if the given vertex is not contained in a graph
 	 */
 	public DFS(Vertex vertex, boolean order) {
-		super(vertex.getGraph().getVertices().size());
-		refEdges = GraphPackage.Literals.VERTEX__OUTGOING;
-		refVertex = GraphPackage.Literals.EDGE__TARGET;
+		this(vertex.getGraph().getVertices().size());
+
 		if (order) {
 			visitPost(vertex);
 		} else {
