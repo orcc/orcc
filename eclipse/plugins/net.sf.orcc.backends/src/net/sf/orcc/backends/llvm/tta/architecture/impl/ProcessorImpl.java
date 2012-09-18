@@ -452,6 +452,11 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		super.eUnset(featureID);
 	}
 
+	@Override
+	public Integer getAddrSpaceId(Connection connection) {
+		return getMemToAddrSpaceIdMap().get(getMemory(connection));
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -482,21 +487,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 */
 	public ProcessorConfiguration getConfiguration() {
 		return configuration;
-	}
-
-	@Override
-	public Integer getAddrSpaceId(Connection connection) {
-		for (Memory mem : getLocalRAMs()) {
-			if (mem.getMappedConnections().contains(connection)) {
-				return getMemToAddrSpaceIdMap().get(mem);
-			}
-		}
-		for (Memory mem : getSharedRAMs()) {
-			if (mem.getMappedConnections().contains(connection)) {
-				return getMemToAddrSpaceIdMap().get(mem);
-			}
-		}
-		return null;
 	}
 
 	public FunctionUnit getFunctionUnit(String name) {
@@ -551,6 +541,21 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 					this, ArchitecturePackage.PROCESSOR__MAPPED_ACTORS);
 		}
 		return mappedActors;
+	}
+
+	@Override
+	public Memory getMemory(Connection connection) {
+		for (Memory mem : getLocalRAMs()) {
+			if (mem.getMappedConnections().contains(connection)) {
+				return mem;
+			}
+		}
+		for (Memory mem : getSharedRAMs()) {
+			if (mem.getMappedConnections().contains(connection)) {
+				return mem;
+			}
+		}
+		return null;
 	}
 
 	@Override
