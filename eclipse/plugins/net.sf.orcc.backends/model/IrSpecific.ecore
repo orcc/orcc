@@ -37,7 +37,7 @@
         eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Block" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="step" ordered="false" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction"
         containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="init" upperBound="-1" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="init" ordered="false" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction"
         containment="true"/>
   </eClassifiers>
 </ecore:EPackage>

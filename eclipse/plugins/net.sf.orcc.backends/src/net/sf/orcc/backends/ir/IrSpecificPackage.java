@@ -355,7 +355,7 @@ public interface IrSpecificPackage extends EPackage {
 	int BLOCK_FOR__STEP = IrPackage.BLOCK_FEATURE_COUNT + 4;
 
 	/**
-	 * The feature id for the '<em><b>Init</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Init</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -567,10 +567,10 @@ public interface IrSpecificPackage extends EPackage {
 	EReference getBlockFor_Step();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getInit <em>Init</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.BlockFor#getInit <em>Init</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Init</em>'.
+	 * @return the meta object for the containment reference '<em>Init</em>'.
 	 * @see net.sf.orcc.backends.ir.BlockFor#getInit()
 	 * @see #getBlockFor()
 	 * @generated
@@ -758,7 +758,7 @@ public interface IrSpecificPackage extends EPackage {
 		EReference BLOCK_FOR__STEP = eINSTANCE.getBlockFor_Step();
 
 		/**
-		 * The meta object literal for the '<em><b>Init</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Init</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

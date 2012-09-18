@@ -157,20 +157,30 @@ public interface BlockFor extends Block {
 	void setStep(Instruction value);
 
 	/**
-	 * Returns the value of the '<em><b>Init</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.ir.Instruction}.
+	 * Returns the value of the '<em><b>Init</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Init</em>' containment reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Init</em>' containment reference list.
+	 * @return the value of the '<em>Init</em>' containment reference.
+	 * @see #setInit(Instruction)
 	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getBlockFor_Init()
-	 * @model containment="true"
+	 * @model containment="true" ordered="false"
 	 * @generated
 	 */
-	EList<Instruction> getInit();
+	Instruction getInit();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.ir.BlockFor#getInit <em>Init</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Init</em>' containment reference.
+	 * @see #getInit()
+	 * @generated
+	 */
+	void setInit(Instruction value);
 
 	public boolean isNodeFor();
 

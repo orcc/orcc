@@ -105,14 +105,14 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	protected Instruction step;
 
 	/**
-	 * The cached value of the '{@link #getInit() <em>Init</em>}' containment reference list.
+	 * The cached value of the '{@link #getInit() <em>Init</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getInit()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Instruction> init;
+	protected Instruction init;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -342,12 +342,53 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Instruction> getInit() {
-		if (init == null) {
-			init = new EObjectContainmentEList<Instruction>(Instruction.class,
-					this, IrSpecificPackage.BLOCK_FOR__INIT);
-		}
+	public Instruction getInit() {
 		return init;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetInit(Instruction newInit,
+			NotificationChain msgs) {
+		Instruction oldInit = init;
+		init = newInit;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrSpecificPackage.BLOCK_FOR__INIT,
+					oldInit, newInit);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setInit(Instruction newInit) {
+		if (newInit != init) {
+			NotificationChain msgs = null;
+			if (init != null)
+				msgs = ((InternalEObject) init)
+						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.BLOCK_FOR__INIT, null, msgs);
+			if (newInit != null)
+				msgs = ((InternalEObject) newInit)
+						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.BLOCK_FOR__INIT, null, msgs);
+			msgs = basicSetInit(newInit, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.BLOCK_FOR__INIT, newInit, newInit));
 	}
 
 	/**
@@ -368,7 +409,7 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 		case IrSpecificPackage.BLOCK_FOR__STEP:
 			return basicSetStep(null, msgs);
 		case IrSpecificPackage.BLOCK_FOR__INIT:
-			return ((InternalEList<?>) getInit()).basicRemove(otherEnd, msgs);
+			return basicSetInit(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -423,8 +464,7 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 			setStep((Instruction) newValue);
 			return;
 		case IrSpecificPackage.BLOCK_FOR__INIT:
-			getInit().clear();
-			getInit().addAll((Collection<? extends Instruction>) newValue);
+			setInit((Instruction) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -454,7 +494,7 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 			setStep((Instruction) null);
 			return;
 		case IrSpecificPackage.BLOCK_FOR__INIT:
-			getInit().clear();
+			setInit((Instruction) null);
 			return;
 		}
 		super.eUnset(featureID);
@@ -479,7 +519,7 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 		case IrSpecificPackage.BLOCK_FOR__STEP:
 			return step != null;
 		case IrSpecificPackage.BLOCK_FOR__INIT:
-			return init != null && !init.isEmpty();
+			return init != null;
 		}
 		return super.eIsSet(featureID);
 	}
