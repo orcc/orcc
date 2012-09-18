@@ -7,7 +7,7 @@ Notable changes and features
 - New LLVM backend with static compilation (the old version is renamed as Jade 
 backend).
 - For backends which export a runtime library (c, tta, Java, llvm), it is now
-possible to desactivate this export, to not overwrite user-modified library.
+possible to deactivate this export, to not overwrite user-modified library.
 - LLVM/Jade backends: experimental support of floating point type.
 - TTA backend: 
 	* new interconnection mechanism between the processors.
