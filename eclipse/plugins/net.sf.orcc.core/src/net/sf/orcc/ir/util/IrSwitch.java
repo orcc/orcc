@@ -11,6 +11,10 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
@@ -32,11 +36,6 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockSpecific;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
@@ -266,21 +265,6 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T casePredicate(Predicate object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Block Specific</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Block Specific</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseBlockSpecific(BlockSpecific object) {
 		return null;
 	}
 
@@ -859,17 +843,6 @@ public class IrSwitch<T> extends Switch<T> {
 				result = caseBlock(blockWhile);
 			if (result == null)
 				result = caseAttributable(blockWhile);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case IrPackage.BLOCK_SPECIFIC: {
-			BlockSpecific blockSpecific = (BlockSpecific) theEObject;
-			T result = caseBlockSpecific(blockSpecific);
-			if (result == null)
-				result = caseBlock(blockSpecific);
-			if (result == null)
-				result = caseAttributable(blockSpecific);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

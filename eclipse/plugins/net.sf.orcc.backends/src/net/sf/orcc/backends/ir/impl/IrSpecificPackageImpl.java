@@ -286,7 +286,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getBlockFor_LoopCounter() {
+	public EReference getBlockFor_Step() {
 		return (EReference) blockForEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -348,7 +348,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 		createEReference(blockForEClass, BLOCK_FOR__JOIN_NODE);
 		createEAttribute(blockForEClass, BLOCK_FOR__LINE_NUMBER);
 		createEReference(blockForEClass, BLOCK_FOR__NODES);
-		createEReference(blockForEClass, BLOCK_FOR__LOOP_COUNTER);
+		createEReference(blockForEClass, BLOCK_FOR__STEP);
 		createEReference(blockForEClass, BLOCK_FOR__INIT);
 	}
 
@@ -391,7 +391,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 				theIrPackage.getInstSpecific());
 		instCastEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
-		blockForEClass.getESuperTypes().add(theIrPackage.getBlockSpecific());
+		blockForEClass.getESuperTypes().add(theIrPackage.getBlock());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(instAssignIndexEClass, InstAssignIndex.class,
@@ -464,11 +464,10 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 				"nodes", null, 0, -1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getBlockFor_LoopCounter(),
-				theIrPackage.getInstruction(), null, "loopCounter", null, 0,
-				-1, BlockFor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+		initEReference(getBlockFor_Step(), theIrPackage.getInstruction(), null,
+				"step", null, 0, 1, BlockFor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, !IS_ORDERED);
 		initEReference(getBlockFor_Init(), theIrPackage.getInstruction(), null,
 				"init", null, 0, -1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,

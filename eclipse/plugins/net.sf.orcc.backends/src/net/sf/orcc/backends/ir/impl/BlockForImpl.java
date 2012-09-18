@@ -8,14 +8,14 @@ package net.sf.orcc.backends.ir.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.backends.ir.BlockFor;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.impl.BlockImpl;
 
-import net.sf.orcc.ir.impl.BlockSpecificImpl;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -36,14 +36,14 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getJoinNode <em>Join Node</em>}</li>
  *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getLineNumber <em>Line Number</em>}</li>
  *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getNodes <em>Nodes</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getLoopCounter <em>Loop Counter</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getStep <em>Step</em>}</li>
  *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getInit <em>Init</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class BlockForImpl extends BlockSpecificImpl implements BlockFor {
+public class BlockForImpl extends BlockImpl implements BlockFor {
 	/**
 	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
 	 * <!-- begin-user-doc -->
@@ -95,14 +95,14 @@ public class BlockForImpl extends BlockSpecificImpl implements BlockFor {
 	protected EList<Block> nodes;
 
 	/**
-	 * The cached value of the '{@link #getLoopCounter() <em>Loop Counter</em>}' containment reference list.
+	 * The cached value of the '{@link #getStep() <em>Step</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getLoopCounter()
+	 * @see #getStep()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Instruction> loopCounter;
+	protected Instruction step;
 
 	/**
 	 * The cached value of the '{@link #getInit() <em>Init</em>}' containment reference list.
@@ -288,13 +288,53 @@ public class BlockForImpl extends BlockSpecificImpl implements BlockFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Instruction> getLoopCounter() {
-		if (loopCounter == null) {
-			loopCounter = new EObjectContainmentEList<Instruction>(
-					Instruction.class, this,
-					IrSpecificPackage.BLOCK_FOR__LOOP_COUNTER);
+	public Instruction getStep() {
+		return step;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetStep(Instruction newStep,
+			NotificationChain msgs) {
+		Instruction oldStep = step;
+		step = newStep;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrSpecificPackage.BLOCK_FOR__STEP,
+					oldStep, newStep);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
-		return loopCounter;
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setStep(Instruction newStep) {
+		if (newStep != step) {
+			NotificationChain msgs = null;
+			if (step != null)
+				msgs = ((InternalEObject) step)
+						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.BLOCK_FOR__STEP, null, msgs);
+			if (newStep != null)
+				msgs = ((InternalEObject) newStep)
+						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.BLOCK_FOR__STEP, null, msgs);
+			msgs = basicSetStep(newStep, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.BLOCK_FOR__STEP, newStep, newStep));
 	}
 
 	/**
@@ -325,9 +365,8 @@ public class BlockForImpl extends BlockSpecificImpl implements BlockFor {
 			return basicSetJoinNode(null, msgs);
 		case IrSpecificPackage.BLOCK_FOR__NODES:
 			return ((InternalEList<?>) getNodes()).basicRemove(otherEnd, msgs);
-		case IrSpecificPackage.BLOCK_FOR__LOOP_COUNTER:
-			return ((InternalEList<?>) getLoopCounter()).basicRemove(otherEnd,
-					msgs);
+		case IrSpecificPackage.BLOCK_FOR__STEP:
+			return basicSetStep(null, msgs);
 		case IrSpecificPackage.BLOCK_FOR__INIT:
 			return ((InternalEList<?>) getInit()).basicRemove(otherEnd, msgs);
 		}
@@ -350,8 +389,8 @@ public class BlockForImpl extends BlockSpecificImpl implements BlockFor {
 			return getLineNumber();
 		case IrSpecificPackage.BLOCK_FOR__NODES:
 			return getNodes();
-		case IrSpecificPackage.BLOCK_FOR__LOOP_COUNTER:
-			return getLoopCounter();
+		case IrSpecificPackage.BLOCK_FOR__STEP:
+			return getStep();
 		case IrSpecificPackage.BLOCK_FOR__INIT:
 			return getInit();
 		}
@@ -380,10 +419,8 @@ public class BlockForImpl extends BlockSpecificImpl implements BlockFor {
 			getNodes().clear();
 			getNodes().addAll((Collection<? extends Block>) newValue);
 			return;
-		case IrSpecificPackage.BLOCK_FOR__LOOP_COUNTER:
-			getLoopCounter().clear();
-			getLoopCounter().addAll(
-					(Collection<? extends Instruction>) newValue);
+		case IrSpecificPackage.BLOCK_FOR__STEP:
+			setStep((Instruction) newValue);
 			return;
 		case IrSpecificPackage.BLOCK_FOR__INIT:
 			getInit().clear();
@@ -413,8 +450,8 @@ public class BlockForImpl extends BlockSpecificImpl implements BlockFor {
 		case IrSpecificPackage.BLOCK_FOR__NODES:
 			getNodes().clear();
 			return;
-		case IrSpecificPackage.BLOCK_FOR__LOOP_COUNTER:
-			getLoopCounter().clear();
+		case IrSpecificPackage.BLOCK_FOR__STEP:
+			setStep((Instruction) null);
 			return;
 		case IrSpecificPackage.BLOCK_FOR__INIT:
 			getInit().clear();
@@ -439,8 +476,8 @@ public class BlockForImpl extends BlockSpecificImpl implements BlockFor {
 			return lineNumber != LINE_NUMBER_EDEFAULT;
 		case IrSpecificPackage.BLOCK_FOR__NODES:
 			return nodes != null && !nodes.isEmpty();
-		case IrSpecificPackage.BLOCK_FOR__LOOP_COUNTER:
-			return loopCounter != null && !loopCounter.isEmpty();
+		case IrSpecificPackage.BLOCK_FOR__STEP:
+			return step != null;
 		case IrSpecificPackage.BLOCK_FOR__INIT:
 			return init != null && !init.isEmpty();
 		}

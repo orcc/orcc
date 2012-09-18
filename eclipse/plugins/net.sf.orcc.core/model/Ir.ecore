@@ -49,7 +49,6 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="blocks" upperBound="-1"
         eType="#//Block" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="BlockSpecific" abstract="true" eSuperTypes="#//Block"/>
   <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="predicate" eType="#//Predicate"

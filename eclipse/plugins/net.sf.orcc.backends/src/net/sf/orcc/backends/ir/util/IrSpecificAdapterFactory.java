@@ -12,7 +12,6 @@ import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockSpecific;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.util.Attributable;
@@ -113,11 +112,6 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseBlock(Block object) {
 			return createBlockAdapter();
-		}
-
-		@Override
-		public Adapter caseBlockSpecific(BlockSpecific object) {
-			return createBlockSpecificAdapter();
 		}
 
 		@Override
@@ -238,20 +232,6 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createBlockAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.BlockSpecific <em>Block Specific</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.BlockSpecific
-	 * @generated
-	 */
-	public Adapter createBlockSpecificAdapter() {
 		return null;
 	}
 

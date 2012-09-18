@@ -32,14 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.ir.BlockFor;
-import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockSpecific;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
@@ -70,14 +68,6 @@ public class NodeForAdder extends DfVisitor<Object> {
 	}
 
 	private class ForNodeCfg extends ControlFlowAnalyzer {
-		@Override
-		public CfgNode caseBlockSpecific(BlockSpecific node) {
-			if (((IrNodeSpecific) node).isNodeFor()) {
-				return caseBlockFor((BlockFor) node);
-			}
-
-			return null;
-		}
 
 		public CfgNode caseBlockFor(BlockFor node) {
 			CfgNode join = addNode(node.getJoinNode());
@@ -190,7 +180,8 @@ public class NodeForAdder extends DfVisitor<Object> {
 			nodeFor.getNodes().addAll(nodeWhile.getBlocks());
 
 			// Add loop counters and inits
-			nodeFor.getLoopCounter().addAll(loopCnts);
+			// FIXME :
+			// nodeFor.getLoopCounter().addAll(loopCnts);
 			nodeFor.getInit().addAll(initCnts);
 
 			// Copy attributes

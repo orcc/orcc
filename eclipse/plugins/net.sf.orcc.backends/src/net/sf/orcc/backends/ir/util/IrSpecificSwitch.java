@@ -12,7 +12,6 @@ import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockSpecific;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.util.Attributable;
@@ -116,8 +115,6 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 		case IrSpecificPackage.BLOCK_FOR: {
 			BlockFor blockFor = (BlockFor) theEObject;
 			T result = caseBlockFor(blockFor);
-			if (result == null)
-				result = caseBlockSpecific(blockFor);
 			if (result == null)
 				result = caseBlock(blockFor);
 			if (result == null)
@@ -228,21 +225,6 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseBlock(Block object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Block Specific</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Block Specific</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseBlockSpecific(BlockSpecific object) {
 		return null;
 	}
 

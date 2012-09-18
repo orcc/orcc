@@ -298,7 +298,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__ATTRIBUTES = IrPackage.BLOCK_SPECIFIC__ATTRIBUTES;
+	int BLOCK_FOR__ATTRIBUTES = IrPackage.BLOCK__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
@@ -307,7 +307,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__CFG_NODE = IrPackage.BLOCK_SPECIFIC__CFG_NODE;
+	int BLOCK_FOR__CFG_NODE = IrPackage.BLOCK__CFG_NODE;
 
 	/**
 	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
@@ -316,7 +316,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__CONDITION = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 0;
+	int BLOCK_FOR__CONDITION = IrPackage.BLOCK_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
@@ -325,7 +325,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__JOIN_NODE = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 1;
+	int BLOCK_FOR__JOIN_NODE = IrPackage.BLOCK_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -334,7 +334,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__LINE_NUMBER = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 2;
+	int BLOCK_FOR__LINE_NUMBER = IrPackage.BLOCK_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
@@ -343,16 +343,16 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__NODES = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 3;
+	int BLOCK_FOR__NODES = IrPackage.BLOCK_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Loop Counter</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Step</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__LOOP_COUNTER = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 4;
+	int BLOCK_FOR__STEP = IrPackage.BLOCK_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Init</b></em>' containment reference list.
@@ -361,7 +361,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__INIT = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 5;
+	int BLOCK_FOR__INIT = IrPackage.BLOCK_FEATURE_COUNT + 5;
 
 	/**
 	 * The number of structural features of the '<em>Block For</em>' class.
@@ -370,7 +370,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR_FEATURE_COUNT = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 6;
+	int BLOCK_FOR_FEATURE_COUNT = IrPackage.BLOCK_FEATURE_COUNT + 6;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.InstAssignIndex <em>Inst Assign Index</em>}'.
@@ -556,15 +556,15 @@ public interface IrSpecificPackage extends EPackage {
 	EReference getBlockFor_Nodes();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getLoopCounter <em>Loop Counter</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.BlockFor#getStep <em>Step</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Loop Counter</em>'.
-	 * @see net.sf.orcc.backends.ir.BlockFor#getLoopCounter()
+	 * @return the meta object for the containment reference '<em>Step</em>'.
+	 * @see net.sf.orcc.backends.ir.BlockFor#getStep()
 	 * @see #getBlockFor()
 	 * @generated
 	 */
-	EReference getBlockFor_LoopCounter();
+	EReference getBlockFor_Step();
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getInit <em>Init</em>}'.
@@ -750,13 +750,12 @@ public interface IrSpecificPackage extends EPackage {
 		EReference BLOCK_FOR__NODES = eINSTANCE.getBlockFor_Nodes();
 
 		/**
-		 * The meta object literal for the '<em><b>Loop Counter</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Step</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_FOR__LOOP_COUNTER = eINSTANCE
-				.getBlockFor_LoopCounter();
+		EReference BLOCK_FOR__STEP = eINSTANCE.getBlockFor_Step();
 
 		/**
 		 * The meta object literal for the '<em><b>Init</b></em>' containment reference list feature.

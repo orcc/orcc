@@ -137,12 +137,11 @@ public interface Var extends Attributable {
 
 	/**
 	 * Returns the value of the '<em><b>Global</b></em>' attribute.
-	 * The default value is <code>"false"</code>.
 	 * <!-- begin-user-doc -->Returns <code>true</code> if this variable is
 	 * global.<!-- end-user-doc -->
 	 * @return the value of the '<em>Global</em>' attribute.
 	 * @see net.sf.orcc.ir.IrPackage#getVar_Global()
-	 * @model default="false" transient="true" changeable="false" volatile="true" derived="true"
+	 * @model transient="true" changeable="false" volatile="true" derived="true"
 	 * @generated
 	 */
 	boolean isGlobal();

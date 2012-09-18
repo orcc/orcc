@@ -12,6 +12,10 @@ import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
@@ -34,11 +38,6 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockSpecific;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Param;
@@ -178,13 +177,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass blockWhileEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass blockSpecificEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -869,15 +861,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EReference getBlockWhile_Blocks() {
 		return (EReference) blockWhileEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getBlockSpecific() {
-		return blockSpecificEClass;
 	}
 
 	/**
@@ -1590,8 +1573,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEAttribute(blockWhileEClass, BLOCK_WHILE__LINE_NUMBER);
 		createEReference(blockWhileEClass, BLOCK_WHILE__BLOCKS);
 
-		blockSpecificEClass = createEClass(BLOCK_SPECIFIC);
-
 		instructionEClass = createEClass(INSTRUCTION);
 		createEAttribute(instructionEClass, INSTRUCTION__LINE_NUMBER);
 		createEReference(instructionEClass, INSTRUCTION__PREDICATE);
@@ -1763,7 +1744,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		blockBasicEClass.getESuperTypes().add(this.getBlock());
 		blockIfEClass.getESuperTypes().add(this.getBlock());
 		blockWhileEClass.getESuperTypes().add(this.getBlock());
-		blockSpecificEClass.getESuperTypes().add(this.getBlock());
 		instructionEClass.getESuperTypes()
 				.add(theUtilPackage.getAttributable());
 		instAssignEClass.getESuperTypes().add(this.getInstruction());
@@ -1898,9 +1878,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				null, 0, -1, BlockWhile.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(blockSpecificEClass, BlockSpecific.class, "BlockSpecific",
-				IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(instructionEClass, Instruction.class, "Instruction",
 				IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -2159,7 +2136,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Global(), ecorePackage.getEBoolean(), "global",
-				"false", 0, 1, Var.class, IS_TRANSIENT, IS_VOLATILE,
+				null, 0, 1, Var.class, IS_TRANSIENT, IS_VOLATILE,
 				!IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
 		initEAttribute(getVar_Index(), ecorePackage.getEInt(), "index", null,
@@ -2174,7 +2151,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Local(), ecorePackage.getEBoolean(), "local",
-				"false", 0, 1, Var.class, IS_TRANSIENT, IS_VOLATILE,
+				null, 0, 1, Var.class, IS_TRANSIENT, IS_VOLATILE,
 				!IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
 		initEAttribute(getVar_Name(), theEcorePackage.getEString(), "name",

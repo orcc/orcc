@@ -26,7 +26,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Def"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="BlockFor" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//BlockSpecific">
+  <eClassifiers xsi:type="ecore:EClass" name="BlockFor" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//Block">
     <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//BlockBasic"
@@ -35,8 +35,8 @@
         defaultValueLiteral="0"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Block" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="loopCounter" upperBound="-1"
-        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="step" ordered="false" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction"
+        containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="init" upperBound="-1" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction"
         containment="true"/>
   </eClassifiers>

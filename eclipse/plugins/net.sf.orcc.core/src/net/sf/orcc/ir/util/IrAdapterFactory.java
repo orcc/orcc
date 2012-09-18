@@ -11,6 +11,10 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
@@ -32,11 +36,6 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockSpecific;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
@@ -110,11 +109,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseBlockWhile(BlockWhile object) {
 			return createBlockWhileAdapter();
-		}
-
-		@Override
-		public Adapter caseBlockSpecific(BlockSpecific object) {
-			return createBlockSpecificAdapter();
 		}
 
 		@Override
@@ -823,20 +817,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createBlockWhileAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.BlockSpecific <em>Block Specific</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.BlockSpecific
-	 * @generated
-	 */
-	public Adapter createBlockSpecificAdapter() {
 		return null;
 	}
 

@@ -6,12 +6,11 @@
  */
 package net.sf.orcc.backends.ir;
 
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
 
-import net.sf.orcc.ir.BlockSpecific;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -26,7 +25,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.ir.BlockFor#getJoinNode <em>Join Node</em>}</li>
  *   <li>{@link net.sf.orcc.backends.ir.BlockFor#getLineNumber <em>Line Number</em>}</li>
  *   <li>{@link net.sf.orcc.backends.ir.BlockFor#getNodes <em>Nodes</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.BlockFor#getLoopCounter <em>Loop Counter</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.BlockFor#getStep <em>Step</em>}</li>
  *   <li>{@link net.sf.orcc.backends.ir.BlockFor#getInit <em>Init</em>}</li>
  * </ul>
  * </p>
@@ -35,7 +34,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface BlockFor extends BlockSpecific {
+public interface BlockFor extends Block {
 	/**
 	 * Returns the value of the '<em><b>Condition</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
@@ -132,20 +131,30 @@ public interface BlockFor extends BlockSpecific {
 	EList<Block> getNodes();
 
 	/**
-	 * Returns the value of the '<em><b>Loop Counter</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.ir.Instruction}.
+	 * Returns the value of the '<em><b>Step</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Loop Counter</em>' containment reference list isn't clear,
+	 * If the meaning of the '<em>Step</em>' containment reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Loop Counter</em>' containment reference list.
-	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getBlockFor_LoopCounter()
-	 * @model containment="true"
+	 * @return the value of the '<em>Step</em>' containment reference.
+	 * @see #setStep(Instruction)
+	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getBlockFor_Step()
+	 * @model containment="true" ordered="false"
 	 * @generated
 	 */
-	EList<Instruction> getLoopCounter();
+	Instruction getStep();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.ir.BlockFor#getStep <em>Step</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Step</em>' containment reference.
+	 * @see #getStep()
+	 * @generated
+	 */
+	void setStep(Instruction value);
 
 	/**
 	 * Returns the value of the '<em><b>Init</b></em>' containment reference list.
