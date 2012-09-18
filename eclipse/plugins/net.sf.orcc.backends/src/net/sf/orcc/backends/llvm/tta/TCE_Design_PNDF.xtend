@@ -31,7 +31,7 @@
 
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureVisitor
+import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -39,7 +39,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureVisitor
  * @author Herve Yviquel
  * 
  */
-class TCE_Design_PNDF extends ArchitectureVisitor<CharSequence> {
+class TCE_Design_PNDF extends ArchitectureSwitch<CharSequence> {
 	
 	String path;
 	
@@ -47,25 +47,44 @@ class TCE_Design_PNDF extends ArchitectureVisitor<CharSequence> {
 		this.path = path;
 	}
 	
-	override caseDesign(Design design){
+	override caseDesign(Design design)
 		'''
 		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 		<processor-network version="0.1">
 			«FOR processor:design.processors»
-			«doSwitch(processor)»
+				«processor.doSwitch»
 			«ENDFOR»
 		</processor-network>
 		'''
-	}
 	
-	override caseProcessor(Processor processor){
+	override caseProcessor(Processor processor)
 		'''
 		<processor name="«processor.name»" >
-			<adf path="«path»/«processor.name»/" filename="«processor.name».adf" />
-			<tpef path="«path»/«processor.name»/" filename="«processor.name».tpef" />
+			<adf>«path»/«processor.name»/«processor.name».adf</adf>
+			<tpef>«path»/«processor.name»/«processor.name».tpef</tpef>
+			«FOR instance: processor.mappedActors»
+				«FOR input: instance.actor.inputs.filter(port | !port.native)»
+					«var incoming = instance.incomingPortMap.get(input)»
+					<input name="fifo_«incoming.getValue("id").toString»">
+						<address-space>«processor.getMemory(incoming).name»</address-space>
+						<signed>«input.type.int»</signed>
+						<width>«input.type.sizeInBits/8»</width>
+						<size>«incoming.size»</size>
+						<trace>«path»/trace/«instance.name»_«input.name».txt</trace>
+					</input>
+				«ENDFOR»
+				«FOR output : instance.actor.outputs.filter(port | !port.native)»
+					«var outgoing = instance.outgoingPortMap.get(output).get(0)»
+					<output name="fifo_«outgoing.getValue("id").toString»">
+						<address-space>«processor.getMemory(outgoing).name»</address-space>
+						<signed>«output.type.int»</signed>
+						<width>«output.type.sizeInBits/8»</width>
+						<size>«outgoing.size»</size>
+						<trace>«path»/trace/«instance.name»_«output.name».txt</trace>
+					</output>
+				«ENDFOR»
+			«ENDFOR»
 		</processor>
 		'''
-	}
-	
 	
 }
