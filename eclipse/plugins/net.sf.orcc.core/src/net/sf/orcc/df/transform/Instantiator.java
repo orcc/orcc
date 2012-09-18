@@ -47,6 +47,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.Attribute;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
@@ -106,16 +107,16 @@ public class Instantiator extends DfSwitch<Void> {
 				continue;
 			}
 
-			Actor actor = instance.getAdapter(Actor.class);
-			if (actor == null) {
-				// instance of a network
+			EObject entity = instance.getEntity();
+			if (entity instanceof Network) {
 				instantiate(network, instance);
-			} else {
+			} else if (entity instanceof Actor) {
 				if (instantiateActors) {
 					instantiate(network, instance);
 				}
 
 				// set attribute's value when passed as instance parameter
+				Actor actor = instance.getAdapter(Actor.class);
 				for (Argument argument : instance.getArguments()) {
 					Attribute attribute = actor.getAttribute(argument
 							.getVariable().getName());
