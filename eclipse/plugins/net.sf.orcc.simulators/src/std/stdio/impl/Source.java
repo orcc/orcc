@@ -49,11 +49,11 @@ public class Source extends GenericSource {
 
 	private static final int INFINITE_LOOPS = -1;
 
-	private static int nbLoops = INFINITE_LOOPS;
+	private static int nbLoops = 1;
 	private static int loopsCount;
 
 	public static void source_exit(BigInteger status) {
-		System.exit(status.intValue());
+		//System.exit(status.intValue());
 	}
 
 	public static BigInteger source_getNbLoop() {
