@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RVC-CAL Xtext model plug-in
 Bundle-Vendor: IETR/INSA Rennes
-Bundle-Version: 1.1.1.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-SymbolicName: net.sf.orcc.cal; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext;bundle-version="2.0.0",
