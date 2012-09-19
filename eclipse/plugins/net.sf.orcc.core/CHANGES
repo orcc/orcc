@@ -10,14 +10,15 @@ Notable changes and features
 - Front-end: experimental support of new floating point types (half and double).
 - New LLVM backend with static compilation (the old version is renamed as Jade 
 backend).
-- For backends which export a runtime library (c, tta, Java, llvm), it is now
+- The C++ backend is back with an included runtime.
+- For backends which export a runtime library (C, TTA, Java, LLVM), it is now
 possible to deactivate this export, to not overwrite user-modified library.
 - LLVM/Jade backends: experimental support of floating point type.
 - TTA backend: 
 	* new interconnection mechanism between the processors.
-	* support simulation and profiling using ttasim (experimental branch of TCE).
+	* support simulation and profiling using ttanetsim (experimental branch of TCE).
 	* add option to choose the configuration of the processors between several 
-	predefined profiles. 
+	predefined profiles.
 	* support the mapping of several actors on the same processor.
 - C/LLVM backend : Folder structure of generated application has changed. It is now
   /
@@ -31,18 +32,22 @@ possible to deactivate this export, to not overwrite user-modified library.
   CMake must be run from the root folder of the application (and not
   from src/ anymore)
   Final executable is now written in bin/ folder
+- UI: Improve user experience by printing better error messages.
 	
 Bugfixes
 --------
 - UI: Removing an existing mapping was not possible without removing the runtime
 configuration.
-- Tools: The normalizer is working back and it has been improved to avoid useless
-memory copies from the FIFOs.
-- interpreter: working with imports within imports
+- Tools: The classifier, the action merger and the actor merger are (almost) 
+	working back and their performances have been improved.
+- Interpreter: working with imports within imports.
+- RoXML: Update to latest version to fix some parsing errors on Windows caused by
+CRLF for end of line.
 
 Misc
 ----
 - Move the 'models' plugin in Orcc repository and remove dependencies to dftools.
+- The Java backend is now using Xtend instead StringTemplate to generate the files.
 
 
 1.1.1     April 2012
