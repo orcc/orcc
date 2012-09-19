@@ -492,7 +492,6 @@ public class ActorInterpreter extends IrSwitch<Object> {
 				if (checkOutputPattern(action.getOutputPattern())) {
 					return action;
 				}
-				return null;
 			}
 		}
 
