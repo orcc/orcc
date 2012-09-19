@@ -52,37 +52,60 @@ import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * Replace NodeWhile into NodeFor.
+ * Replace BlockWhile by BlockFor when it is possible.
  * 
- * CFG must be build before any call to this transformation.
+ * Cfg must be built before any call to this transformation.
  * 
  * @author Jerome Gorin
+ * @author Antoine Lorence
  */
-public class NodeForAdder extends DfVisitor<Object> {
+public class BlockForAdder extends DfVisitor<Void> {
 
-	public NodeForAdder() {
+	public BlockForAdder() {
 		irVisitor = new Builder();
 	}
 
-	private class ForNodeCfg extends ControlFlowAnalyzer {
+	/**
+	 * Build the Cfg for procedure containing specific 1 or more "for" blocks.
+	 * 
+	 * @author Antoine Lorence
+	 * 
+	 */
+	private class BlockForCfg extends ControlFlowAnalyzer {
 
-		public CfgNode caseBlockFor(BlockFor node) {
-			CfgNode join = addNode(node.getJoinNode());
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * net.sf.orcc.ir.util.IrSwitch#defaultCase(org.eclipse.emf.ecore.EObject
+		 * )
+		 */
+		@Override
+		public CfgNode defaultCase(EObject object) {
+			if( object instanceof BlockFor) {
+				return caseBlockFor((BlockFor) object);
+			}
+			return super.defaultCase(object);
+		}
+
+		public CfgNode caseBlockFor(BlockFor block) {
+			CfgNode join = addNode(block.getJoinNode());
 			cfg.getVertices().add(join);
 
 			if (last != null) {
 				addEdge(join);
 			}
 
-			CfgNode cfgNode = addNode(node);
+			CfgNode cfgNode = addNode(block);
 			addEdge(cfgNode);
 
 			last = join;
 			flag = true;
-			last = doSwitch(node.getNodes());
+			last = doSwitch(block.getNodes());
 
 			// reset flag (in case there are no nodes in "then" branch)
 			flag = false;
@@ -93,7 +116,13 @@ public class NodeForAdder extends DfVisitor<Object> {
 		}
 	}
 
-	private class VarGetter extends AbstractIrVisitor<Object> {
+	/**
+	 * Build a list of all variables used in an Expression.
+	 * 
+	 * @author Antoine Lorence
+	 * 
+	 */
+	private class VarGetter extends AbstractIrVisitor<Void> {
 
 		private List<Var> vars;
 
@@ -103,7 +132,7 @@ public class NodeForAdder extends DfVisitor<Object> {
 		}
 
 		@Override
-		public Object caseExprVar(ExprVar expr) {
+		public Void caseExprVar(ExprVar expr) {
 			vars.add(expr.getUse().getVariable());
 			return null;
 		}
@@ -114,37 +143,32 @@ public class NodeForAdder extends DfVisitor<Object> {
 
 	}
 
-	@Override
-	public Object caseActor(Actor actor) {
-		// Build first CFG
-		new ControlFlowAnalyzer().doSwitch(actor);
-
-		// Transform actor
-		super.caseActor(actor);
-
-		// Rebuild CFG with for node
-		new ForNodeCfg().doSwitch(actor);
-
-		return null;
-	}
-
-	private class Builder extends AbstractIrVisitor<Object> {
+	/**
+	 * Class used for ?
+	 * 
+	 * @author Antoine Lorence
+	 * 
+	 */
+	private class Builder extends AbstractIrVisitor<Void> {
 		@Override
-		public Object caseBlockWhile(BlockWhile nodeWhile) {
-			super.caseBlockWhile(nodeWhile);
+		public Void caseBlockWhile(BlockWhile blockWhile) {
 
-			// Get properties of the while node
-			EList<Block> nodes = nodeWhile.getBlocks();
+			// Ensure that while body procedure has its while blocks replaced
+			// before
+			super.caseBlockWhile(blockWhile);
 
-			if (nodes.isEmpty()) {
+			// Get properties of the while block
+			EList<Block> blocks = blockWhile.getBlocks();
+
+			if (blocks.isEmpty()) {
 				// Don't treat empty nodes
 				return null;
 			}
 
-			Expression condition = nodeWhile.getCondition();
-			Block endNode = nodes.get(nodes.size() - 1);
+			Expression condition = blockWhile.getCondition();
+			Block lastBlock = blocks.get(blocks.size() - 1);
 
-			CfgNode previousCFGNode = (CfgNode) nodeWhile.getJoinBlock()
+			CfgNode previousCFGNode = (CfgNode) blockWhile.getJoinBlock()
 					.getCfgNode().getPredecessors().get(0);
 			Block previousNode = previousCFGNode.getNode();
 
@@ -154,7 +178,7 @@ public class NodeForAdder extends DfVisitor<Object> {
 
 			for (Var conditionVar : conditionVars) {
 				// Get assignements on the variables contained in the condition
-				Instruction loopCnt = getLastAssign(conditionVar, endNode);
+				Instruction loopCnt = getLastAssign(conditionVar, lastBlock);
 				Instruction initCnt = getLastAssign(conditionVar, previousNode);
 
 				if (loopCnt != null) {
@@ -172,26 +196,28 @@ public class NodeForAdder extends DfVisitor<Object> {
 			}
 
 			// Create node for
-			BlockFor nodeFor = IrSpecificFactory.eINSTANCE.createBlockFor();
+			BlockFor blockFor = IrSpecificFactory.eINSTANCE.createBlockFor();
 
-			nodeFor.setCondition(nodeWhile.getCondition());
-			nodeFor.setLineNumber(nodeWhile.getLineNumber());
-			nodeFor.setJoinNode(nodeWhile.getJoinBlock());
-			nodeFor.getNodes().addAll(nodeWhile.getBlocks());
+			blockFor.setCondition(blockWhile.getCondition());
+			blockFor.setLineNumber(blockWhile.getLineNumber());
+			blockFor.setJoinNode(blockWhile.getJoinBlock());
+			blockFor.getNodes().addAll(blockWhile.getBlocks());
 
 			// Add loop counters and inits
 			// FIXME :
-			// nodeFor.getLoopCounter().addAll(loopCnts);
-			nodeFor.getInit().addAll(initCnts);
+			if (loopCnts.size() > 0)
+				blockFor.setStep(loopCnts.get(0));
+			if (initCnts.size() > 0)
+				blockFor.setInit(initCnts.get(0));
 
 			// Copy attributes
-			for (Attribute attribute : nodeWhile.getAttributes()) {
-				// TODO: copy attribute
-				nodeFor.setAttribute(attribute.getName(), null);
+			for (Attribute attribute : blockWhile.getAttributes()) {
+				// TODO: copy attribute instead of linking it
+				blockFor.setAttribute(attribute.getName(), attribute.getValue());
 			}
 
 			// Replace node
-			EcoreUtil.replace(nodeWhile, nodeFor);
+			EcoreUtil.replace(blockWhile, blockFor);
 
 			return null;
 		}
@@ -246,4 +272,19 @@ public class NodeForAdder extends DfVisitor<Object> {
 			return lastAssign;
 		}
 	}
+
+	@Override
+	public Void caseActor(Actor actor) {
+		// First build Cfg for existing code
+		new DfVisitor<CfgNode>(new ControlFlowAnalyzer()).doSwitch(actor);
+
+		// Transform actor, try to replace WhileBlock by ForBlock
+		super.caseActor(actor);
+
+		// Rebuild CFG with for node
+		new DfVisitor<CfgNode>(new BlockForCfg()).doSwitch(actor);
+
+		return null;
+	}
+
 }
