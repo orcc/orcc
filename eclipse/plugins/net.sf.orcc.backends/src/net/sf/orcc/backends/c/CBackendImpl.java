@@ -357,7 +357,7 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
 
-		boolean exportLibrary = getAttribute(NO_LIBRARY_EXPORT, true);
+		boolean exportLibrary = !getAttribute(NO_LIBRARY_EXPORT, true);
 
 		String libsPath = path + File.separator + "libs";
 		File vFile = new File(libsPath + File.separator + "VERSION");
