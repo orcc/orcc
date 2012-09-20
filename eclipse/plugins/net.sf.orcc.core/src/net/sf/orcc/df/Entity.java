@@ -33,6 +33,7 @@ package net.sf.orcc.df;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.Var;
 import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EObject;
@@ -50,6 +51,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.sf.orcc.df.Entity#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.Entity#getOutgoingPortMap <em>Outgoing Port Map</em>}</li>
  *   <li>{@link net.sf.orcc.df.Entity#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Entity#getParameters <em>Parameters</em>}</li>
  * </ul>
  * </p>
  *
@@ -99,7 +101,7 @@ public interface Entity extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see net.sf.orcc.df.DfPackage#getEntity_Name()
-	 * @model transient="true" changeable="false" volatile="true" derived="true"
+	 * @model changeable="false"
 	 * @generated
 	 */
 	String getName();
@@ -134,6 +136,22 @@ public interface Entity extends EObject {
 	 * @generated
 	 */
 	EList<Port> getOutputs();
+
+	/**
+	 * Returns the value of the '<em><b>Parameters</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Var}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Parameters</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Parameters</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getEntity_Parameters()
+	 * @model changeable="false" derived="true"
+	 * @generated
+	 */
+	EList<Var> getParameters();
 
 	/**
 	 * Returns the last component of the qualified name returned by

@@ -39,6 +39,7 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
@@ -60,12 +61,23 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getOutgoingPortMap <em>Outgoing Port Map</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getParameters <em>Parameters</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class EntityImpl extends EObjectImpl implements Entity {
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
 	/**
 	 * The cached value of the '{@link #getIncomingPortMap() <em>Incoming Port Map</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -87,14 +99,14 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	protected EList<Port> inputs;
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String NAME_EDEFAULT = null;
+	protected String name = NAME_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getOutgoingPortMap() <em>Outgoing Port Map</em>}' attribute.
@@ -116,6 +128,16 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	 */
 	protected EList<Port> outputs;
 
+	/**
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getParameters()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> parameters;
+
 	private Vertex vertex;
 
 	/**
@@ -128,14 +150,72 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->Creates a new Entity with the given name, input
+	 * ports, output ports, parameters. This constructor should only be used to
+	 * build a temporary entity, or an entity that will NOT be used to compute
+	 * incoming/outgoing port map (see the other constructor).<!-- end-user-doc
+	 * -->
+	 * 
+	 * @param name
+	 *            name of the entity
+	 * @param inputs
+	 *            a list of input ports
+	 * @param outputs
+	 *            a list of output ports
+	 * @param parameters
+	 *            a list of parameters
 	 */
-	protected EntityImpl(Vertex vertex, EList<Port> inputs, EList<Port> outputs) {
+	public EntityImpl(String name, EList<Port> inputs, EList<Port> outputs, EList<Var> parameters) {
+		super();
+
+		this.name = name;
+		this.inputs = inputs;
+		this.outputs = outputs;
+		this.parameters = parameters;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->Creates a new Entity on the given vertex, with the
+	 * given input ports, output ports, parameters. This constructor can be used
+	 * to create an entity that will be used to compute the incoming/outgoing
+	 * port map.<!-- end-user-doc -->
+	 * 
+	 * @param name
+	 *            name of the entity
+	 * @param inputs
+	 *            a list of input ports
+	 * @param outputs
+	 *            a list of output ports
+	 * @param parameters
+	 *            a list of parameters
+	 */
+	public EntityImpl(Vertex vertex, EList<Port> inputs, EList<Port> outputs, EList<Var> parameters) {
 		super();
 
 		this.vertex = vertex;
 		this.inputs = inputs;
 		this.outputs = outputs;
+		this.parameters = parameters;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->Creates a new Entity on the given vertex, with the
+	 * inputs, outputs, parameters of the given entity. This constructor MUST be
+	 * used when wrapping another entity so that it can be used to compute the
+	 * incoming/outgoing port map.<!-- end-user-doc -->
+	 * 
+	 * @param vertex
+	 *            the vertex to use when computing incoming/outgoing port map
+	 * @param entity
+	 *            the entity that the new entity will be based on
+	 */
+	protected EntityImpl(Vertex vertex, Entity entity) {
+		super();
+
+		this.vertex = vertex;
+		inputs = entity.getInputs();
+		outputs = entity.getOutputs();
+		parameters = entity.getParameters();
 	}
 
 	/**
@@ -143,6 +223,11 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	 */
 	private void computeIncomingPortMap() {
 		incomingPortMap = new HashMap<Port, Connection>();
+		if (vertex == null) {
+			throw new IllegalArgumentException("cannot compute incoming port "
+					+ "map on an entity that is not associated with a vertex");
+		}
+
 		for (Edge edge : vertex.getIncoming()) {
 			if (edge instanceof Connection) {
 				Connection connection = (Connection) edge;
@@ -156,6 +241,11 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	 */
 	private void computeOutgoingPortMap() {
 		outgoingPortMap = new HashMap<Port, List<Connection>>();
+		if (vertex == null) {
+			throw new IllegalArgumentException("cannot compute outgoing port "
+					+ "map on an entity that is not associated with a vertex");
+		}
+
 		for (Edge edge : vertex.getOutgoing()) {
 			if (edge instanceof Connection) {
 				Connection connection = (Connection) edge;
@@ -188,6 +278,8 @@ public class EntityImpl extends EObjectImpl implements Entity {
 			return getOutgoingPortMap();
 		case DfPackage.ENTITY__OUTPUTS:
 			return getOutputs();
+		case DfPackage.ENTITY__PARAMETERS:
+			return getParameters();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -205,12 +297,14 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		case DfPackage.ENTITY__INPUTS:
 			return inputs != null && !inputs.isEmpty();
 		case DfPackage.ENTITY__NAME:
-			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
-					.equals(getName());
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		case DfPackage.ENTITY__OUTGOING_PORT_MAP:
 			return outgoingPortMap != null;
 		case DfPackage.ENTITY__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
+		case DfPackage.ENTITY__PARAMETERS:
+			return parameters != null && !parameters.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -248,7 +342,13 @@ public class EntityImpl extends EObjectImpl implements Entity {
 
 	@Override
 	public String getName() {
-		return vertex.getLabel();
+		if (vertex == null) {
+			// if vertex is null, name is valid
+			return name;
+		} else {
+			// otherwise the name is given by the vertex
+			return vertex.getLabel();
+		}
 	}
 
 	@Override
@@ -272,6 +372,19 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		return outputs;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Var> getParameters() {
+		if (parameters == null) {
+			parameters = new EObjectResolvingEList<Var>(Var.class, this,
+					DfPackage.ENTITY__PARAMETERS);
+		}
+		return parameters;
+	}
+
 	@Override
 	public String getSimpleName() {
 		return DfUtil.getSimpleName(getName());
@@ -290,6 +403,8 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (incomingPortMap: ");
 		result.append(incomingPortMap);
+		result.append(", name: ");
+		result.append(name);
 		result.append(", outgoingPortMap: ");
 		result.append(outgoingPortMap);
 		result.append(')');

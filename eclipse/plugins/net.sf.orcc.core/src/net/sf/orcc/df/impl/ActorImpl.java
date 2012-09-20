@@ -574,7 +574,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	@SuppressWarnings("unchecked")
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
-			return (T) new EntityImpl(this, getInputs(), getOutputs());
+			return (T) new EntityImpl(this, getInputs(), getOutputs(), getParameters());
 		}
 		return super.getAdapter(type);
 	}

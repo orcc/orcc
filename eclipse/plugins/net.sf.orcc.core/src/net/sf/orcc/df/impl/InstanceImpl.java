@@ -104,6 +104,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	/**
 	 * The cached value of the '{@link #getEntity() <em>Entity</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getEntity()
 	 * @generated
 	 * @ordered
@@ -113,6 +114,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -130,6 +132,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EObject basicGetEntity() {
@@ -138,6 +141,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -157,6 +161,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -172,6 +177,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -190,6 +196,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -212,6 +219,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -221,6 +229,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -256,12 +265,11 @@ public class InstanceImpl extends VertexImpl implements Instance {
 					Adaptable adaptable = (Adaptable) object;
 					Entity entity = adaptable.getAdapter(Entity.class);
 					if (entity != null) {
-						EList<Port> inputs = entity.getInputs();
-						EList<Port> outputs = entity.getOutputs();
-
-						// saves the adapted entity
-						cachedAdaptedEntity = new EntityImpl(this, inputs,
-								outputs);
+						// wraps the adapted entity into a new entity
+						// which is associated with this instance
+						// so it can be used to compute incoming/outgoing
+						// port maps.
+						cachedAdaptedEntity = new EntityImpl(this, entity);
 					}
 				}
 			}
@@ -286,6 +294,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Argument> getArguments() {
@@ -298,6 +307,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EObject getEntity() {
@@ -396,6 +406,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setEntity(EObject newEntity) {

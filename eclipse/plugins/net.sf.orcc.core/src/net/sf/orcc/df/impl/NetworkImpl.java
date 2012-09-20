@@ -419,7 +419,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@SuppressWarnings("unchecked")
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
-			return (T) new EntityImpl(this, getInputs(), getOutputs());
+			return (T) new EntityImpl(this, getInputs(), getOutputs(), getParameters());
 		}
 		return super.getAdapter(type);
 	}

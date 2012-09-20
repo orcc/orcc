@@ -493,13 +493,22 @@ public interface DfPackage extends EPackage {
 	int ENTITY__OUTPUTS = 4;
 
 	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY__PARAMETERS = 5;
+
+	/**
 	 * The number of structural features of the '<em>Entity</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY_FEATURE_COUNT = 5;
+	int ENTITY_FEATURE_COUNT = 6;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1591,6 +1600,17 @@ public interface DfPackage extends EPackage {
 	EReference getEntity_Outputs();
 
 	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Entity#getParameters <em>Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Parameters</em>'.
+	 * @see net.sf.orcc.df.Entity#getParameters()
+	 * @see #getEntity()
+	 * @generated
+	 */
+	EReference getEntity_Parameters();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Action <em>Action</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Action</em>'.
@@ -2480,6 +2500,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ENTITY__OUTPUTS = eINSTANCE.getEntity_Outputs();
+
+		/**
+		 * The meta object literal for the '<em><b>Parameters</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ENTITY__PARAMETERS = eINSTANCE.getEntity_Parameters();
 
 		/**
 		 * The meta object literal for the '

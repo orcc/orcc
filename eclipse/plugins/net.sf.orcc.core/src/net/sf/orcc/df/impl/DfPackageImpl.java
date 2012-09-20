@@ -426,6 +426,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getEntity_Parameters() {
+		return (EReference) entityEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -970,6 +979,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(entityEClass, ENTITY__NAME);
 		createEAttribute(entityEClass, ENTITY__OUTGOING_PORT_MAP);
 		createEReference(entityEClass, ENTITY__OUTPUTS);
+		createEReference(entityEClass, ENTITY__PARAMETERS);
 
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
@@ -1181,8 +1191,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEntity_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, Entity.class, IS_TRANSIENT, IS_VOLATILE,
-				!IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
+				!IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 		g1 = createEGenericType(this.getMap());
 		g2 = createEGenericType(this.getPort());
@@ -1199,6 +1209,11 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, -1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
 				!IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEReference(getEntity_Parameters(), theIrPackage.getVar(), null,
+				"parameters", null, 0, -1, Entity.class, !IS_TRANSIENT,
+				!IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE,
+				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
