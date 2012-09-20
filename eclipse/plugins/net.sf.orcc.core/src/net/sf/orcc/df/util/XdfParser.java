@@ -667,15 +667,11 @@ public class XdfParser {
 			Port proxy = DfFactory.eINSTANCE.createPort();
 			proxy.setName(portName);
 
-			// check proxy URI
+			// create proxy
 			EObject entity = ((Instance) vertex).getEntity();
-			URI proxyURI = ((InternalEObject) entity).eProxyURI();
-			if (proxyURI != null) {
-				// entity has a proxy URI, set it on proxy
-				URI uri = EcoreUtil.getURI(entity);
-				uri = uri.appendFragment("//@" + dir + "." + portName);
-				((InternalEObject) proxy).eSetProxyURI(uri);
-			}
+			URI uri = EcoreUtil.getURI(entity);
+			uri = uri.appendFragment("//@" + dir + "." + portName);
+			((InternalEObject) proxy).eSetProxyURI(uri);
 			return proxy;
 		}
 	}
@@ -1036,7 +1032,6 @@ public class XdfParser {
 
 		// create network and add to resource
 		network = DfFactory.eINSTANCE.createNetwork();
-		resource.getContents().add(network);
 
 		// update name
 		URI uri = resource.getURI();
@@ -1048,6 +1043,11 @@ public class XdfParser {
 		network.setFileName(file.getFullPath().toString());
 
 		parseBody(xdfElement);
+
+		// add network to resource *after* it has been parsed
+		// otherwise proxies are solved eagerly
+		// (which causes all sub-networks to be loaded)
+		resource.getContents().add(network);
 	}
 
 	/**
