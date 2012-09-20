@@ -43,6 +43,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntityResolver;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -663,16 +664,39 @@ public class XdfParser {
 		if (vertex instanceof Port) {
 			return null;
 		} else {
-			// create port and set name in case proxy can't be resolved
-			Port proxy = DfFactory.eINSTANCE.createPort();
-			proxy.setName(portName);
+			Instance instance = (Instance) vertex;
 
-			// create proxy
-			EObject entity = ((Instance) vertex).getEntity();
-			URI uri = EcoreUtil.getURI(entity);
-			uri = uri.appendFragment("//@" + dir + "." + portName);
-			((InternalEObject) proxy).eSetProxyURI(uri);
-			return proxy;
+			EObject entity = instance.getEntity();
+			if (entity.eIsProxy()) {
+				// if entity is a proxy, create URI of port
+				URI uri = EcoreUtil.getURI(entity);
+				uri = uri.appendFragment("//@" + dir + "." + portName);
+
+				// and return a new proxy port with that URI
+				Port proxy = DfFactory.eINSTANCE.createPort();
+				((InternalEObject) proxy).eSetProxyURI(uri);
+				return proxy;
+			} else {
+				// if entity is not a proxy, adapt to Entity and find port
+				Entity adapted = instance.getAdapter(Entity.class);
+				EList<Port> ports;
+				if ("inputs".equals(dir)) {
+					ports = adapted.getInputs();
+				} else {
+					ports = adapted.getOutputs();
+				}
+
+				for (Port port : ports) {
+					if (portName.equals(port.getName())) {
+						return port;
+					}
+				}
+			}
+
+			// last resort, create a dummy port with the given name
+			Port dummy = DfFactory.eINSTANCE.createPort();
+			dummy.setName(portName);
+			return dummy;
 		}
 	}
 
