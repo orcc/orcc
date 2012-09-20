@@ -45,9 +45,11 @@ import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.impl.VertexImpl;
 import net.sf.orcc.moc.MoC;
+import net.sf.orcc.util.Adaptable;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -66,22 +68,23 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
-	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * This class clears the value of cachedAdaptedEntity when a new entity is
+	 * set on the instance it listens to.
 	 * 
-	 * @see #getArguments()
-	 * @ordered
+	 * @author Matthieu Wipliez
+	 * 
 	 */
-	protected EList<Argument> arguments;
+	private static class EntityAdapterImpl extends AdapterImpl {
 
-	/**
-	 * The cached value of the '{@link #getEntity() <em>Entity</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getEntity()
-	 * @generated
-	 * @ordered
-	 */
-	protected EObject entity;
+		@Override
+		public void notifyChanged(Notification msg) {
+			if (msg.getEventType() == Notification.SET
+					&& msg.getFeatureID(Instance.class) == DfPackage.INSTANCE__ENTITY) {
+				((InstanceImpl) getTarget()).cachedAdaptedEntity = null;
+			}
+		}
+
+	}
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -93,11 +96,36 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	protected static final String NAME_EDEFAULT = null;
 
 	/**
+	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getArguments()
+	 * @ordered
+	 */
+	protected EList<Argument> arguments;
+
+	/**
+	 * when this Instance is adapted as an Entity, this field holds the adapted
+	 * entity until the method setEntity is called.
+	 */
+	private Entity cachedAdaptedEntity;
+	
+	/**
+	 * The cached value of the '{@link #getEntity() <em>Entity</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getEntity()
 	 * @generated
+	 * @ordered
+	 */
+	protected EObject entity;
+	
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	protected InstanceImpl() {
 		super();
+		
+		eAdapters().add(new EntityAdapterImpl());
 	}
 
 	/**
@@ -106,18 +134,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 */
 	public EObject basicGetEntity() {
 		return entity;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setEntity(EObject newEntity) {
-		EObject oldEntity = entity;
-		entity = newEntity;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 	}
 
 	/**
@@ -232,19 +248,26 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	@SuppressWarnings("unchecked")
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
-			EList<Port> inputs, outputs;
-			EObject object = getEntity();
-			if (object instanceof Actor) {
-				inputs = ((Actor) object).getInputs();
-				outputs = ((Actor) object).getOutputs();
-			} else if (object instanceof Network) {
-				inputs = ((Network) object).getInputs();
-				outputs = ((Network) object).getOutputs();
-			} else {
-				// cannot adapt instances of other objects to Entity
-				return null;
+			// if there is no adapted entity that was cached
+			// try to create it
+			if (cachedAdaptedEntity == null) {
+				EObject object = getEntity();
+				if (object instanceof Adaptable) {
+					Adaptable adaptable = (Adaptable) object;
+					Entity entity = adaptable.getAdapter(Entity.class);
+					if (entity != null) {
+						EList<Port> inputs = entity.getInputs();
+						EList<Port> outputs = entity.getOutputs();
+
+						// saves the adapted entity
+						cachedAdaptedEntity = new EntityImpl(this, inputs,
+								outputs);
+					}
+				}
 			}
-			return (T) new EntityImpl(this, inputs, outputs);
+
+			// return the adapted entity, or null
+			return (T) cachedAdaptedEntity;
 		} else if (type == Actor.class) {
 			EObject object = getEntity();
 			if (object instanceof Actor) {
@@ -369,6 +392,18 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	@Override
 	public boolean isNetwork() {
 		return getEntity() instanceof Network;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setEntity(EObject newEntity) {
+		EObject oldEntity = entity;
+		entity = newEntity;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 	}
 
 	@Override
