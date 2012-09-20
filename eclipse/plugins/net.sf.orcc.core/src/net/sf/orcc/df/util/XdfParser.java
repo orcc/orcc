@@ -36,16 +36,18 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.EntityResolver;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.impl.DefaultEntityResolverImpl;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -65,7 +67,6 @@ import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.UtilFactory;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
@@ -598,11 +599,32 @@ public class XdfParser {
 	}
 
 	/**
+	 * a list of entity resolvers
+	 */
+	private static final List<EntityResolver> resolvers = new ArrayList<EntityResolver>();
+
+	static {
+		resolvers.add(new DefaultEntityResolverImpl());
+	}
+
+	/**
+	 * Registers a new entity resolver. The resolvers are called in a
+	 * last-in-first-out manner: the last resolver to have been registered is
+	 * used first when trying to resolve entities, then if it cannot resolve,
+	 * the second to last, and so on, until the first resolver (which is the
+	 * {@link DefaultEntityResolverImpl}).
+	 * 
+	 * @param resolver
+	 *            entity resolver
+	 */
+	public static void registerResolver(EntityResolver resolver) {
+		resolvers.add(resolver);
+	}
+
+	/**
 	 * XDF expression parser.
 	 */
 	private final ExprParser exprParser;
-
-	private IFile file;
 
 	private Network network;
 
@@ -614,13 +636,17 @@ public class XdfParser {
 	/**
 	 * Creates a new network parser.
 	 */
-	public XdfParser(Resource resource) {
+	public XdfParser(Resource resource, InputStream inputStream) {
 		exprParser = new ExprParser();
 		typeParser = new TypeParser();
 
-		URI uri = resource.getURI();
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		file = root.getFile(new Path(uri.toPlatformString(true)));
+		// initialize resolvers with given resource
+		for (EntityResolver resolver : resolvers) {
+			resolver.initialize(resource);
+		}
+
+		// parse network
+		parseNetwork(resource, inputStream);
 	}
 
 	/**
@@ -692,43 +718,6 @@ public class XdfParser {
 
 			return vertex;
 		}
-	}
-
-	/**
-	 * Finds the .ir or .xdf file that defines the entity that matches the given
-	 * class. If found, this method creates a proxy and sets it as instance's
-	 * entity.
-	 * 
-	 * @param instance
-	 *            an instance
-	 * @param clasz
-	 *            qualified class of the entity
-	 */
-	private void resolveEntity(Instance instance, String clasz) {
-		EObject proxy = null;
-		IProject project = file.getProject();
-		IFile file = OrccUtil.getFile(project, clasz, "ir");
-		if (file != null && file.exists()) {
-			proxy = DfFactory.eINSTANCE.createActor();
-		} else {
-			file = OrccUtil.getFile(project, clasz, "xdf");
-			if (file != null && file.exists()) {
-				proxy = DfFactory.eINSTANCE.createNetwork();
-			} else {
-				// no file exists, create a dummy actor with the correct name
-				Actor actor = DfFactory.eINSTANCE.createActor();
-				actor.setName(clasz);
-				instance.setEntity(actor);
-				return;
-			}
-		}
-
-		// create proxy
-		String pathName = file.getFullPath().toString();
-		URI uri = URI.createPlatformResourceURI(pathName, true);
-		uri = uri.appendFragment("/0");
-		instance.setEntity(proxy);
-		((InternalEObject) proxy).eSetProxyURI(uri);
 	}
 
 	/**
@@ -896,8 +885,9 @@ public class XdfParser {
 					+ "must have a valid \"id\" attribute");
 		}
 
-		// create instance
+		// create and add instance with id
 		Instance instance = DfFactory.eINSTANCE.createInstance();
+		network.add(instance);
 		instance.setName(id);
 
 		// instance class
@@ -924,9 +914,6 @@ public class XdfParser {
 		// instance parameters and attributes
 		parseParameters(instance, child);
 		parseAttributes(instance.getAttributes(), child);
-
-		// add instance
-		network.add(instance);
 	}
 
 	/**
@@ -934,14 +921,13 @@ public class XdfParser {
 	 * 
 	 * @return a network
 	 */
-	public Network parseNetwork(InputStream inputStream) {
+	public void parseNetwork(Resource resource, InputStream inputStream) {
 		try {
 			// input
 			Document document = DomUtil.parseDocument(inputStream);
 
 			// parse the input, return the network
-			parseXDF(document);
-			return network;
+			parseXDF(resource, document);
 		} finally {
 			try {
 				inputStream.close();
@@ -1036,23 +1022,53 @@ public class XdfParser {
 	 * @param doc
 	 *            a DOM document that supposedly represent an XDF network
 	 */
-	private void parseXDF(Document doc) throws OrccRuntimeException {
-		Element root = doc.getDocumentElement();
-		if (!root.getNodeName().equals("XDF")) {
+	private void parseXDF(Resource resource, Document doc)
+			throws OrccRuntimeException {
+		Element xdfElement = doc.getDocumentElement();
+		if (!xdfElement.getNodeName().equals("XDF")) {
 			throw new OrccRuntimeException("Expected \"XDF\" start element");
 		}
 
-		String name = root.getAttribute("name");
+		String name = xdfElement.getAttribute("name");
 		if (name.isEmpty()) {
 			throw new OrccRuntimeException("Expected a \"name\" attribute");
 		}
 
-		this.network = DfFactory.eINSTANCE.createNetwork();
+		// create network and add to resource
+		network = DfFactory.eINSTANCE.createNetwork();
+		resource.getContents().add(network);
+
+		// update name
+		URI uri = resource.getURI();
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IFile file = root.getFile(new Path(uri.toPlatformString(true)));
+
 		String qName = OrccUtil.getQualifiedName(file);
 		network.setName(qName);
 		network.setFileName(file.getFullPath().toString());
 
-		parseBody(root);
+		parseBody(xdfElement);
+	}
+
+	/**
+	 * Resolves the reference to an entity with the given class name, and
+	 * updates the given instance accordingly. This method walks the resolvers
+	 * backwards until it finds a resolver that can resolve the entity.
+	 * 
+	 * @param instance
+	 *            an instance
+	 * @param className
+	 *            class name
+	 */
+	private void resolveEntity(Instance instance, String className) {
+		int size = resolvers.size();
+		ListIterator<EntityResolver> it = resolvers.listIterator(size);
+		while (it.hasPrevious()) {
+			EntityResolver resolver = it.previous();
+			if (resolver.resolve(instance, className)) {
+				break;
+			}
+		}
 	}
 
 }

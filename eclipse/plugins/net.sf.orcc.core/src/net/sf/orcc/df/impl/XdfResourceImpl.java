@@ -55,7 +55,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
  * This class defines a resource implementation for the Df model which is used
  * to serialize to/deserialize from XDF.
  * 
- * @author Matthie Wipliez
+ * @author Matthieu Wipliez
  * 
  */
 public class XdfResourceImpl extends ResourceImpl {
@@ -71,9 +71,12 @@ public class XdfResourceImpl extends ResourceImpl {
 	protected void doLoad(InputStream inputStream, Map<?, ?> options)
 			throws IOException {
 		try {
-			Network network = new XdfParser(this).parseNetwork(inputStream);
-			getContents().add(network);
+			// the parser creates a network and adds it to this resource
+			new XdfParser(this, inputStream);
 		} catch (OrccRuntimeException e) {
+			// if there was an error, removes the network parsed so far
+			getContents().clear();
+
 			e.printStackTrace();
 			throw new IOException(e);
 		}
