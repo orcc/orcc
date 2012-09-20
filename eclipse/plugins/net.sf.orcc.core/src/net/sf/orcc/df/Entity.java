@@ -99,7 +99,7 @@ public interface Entity extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see net.sf.orcc.df.DfPackage#getEntity_Name()
-	 * @model changeable="false"
+	 * @model transient="true" changeable="false" volatile="true" derived="true"
 	 * @generated
 	 */
 	String getName();

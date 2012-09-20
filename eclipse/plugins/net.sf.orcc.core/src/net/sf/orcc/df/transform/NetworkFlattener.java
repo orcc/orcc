@@ -151,8 +151,9 @@ public class NetworkFlattener extends DfSwitch<Void> {
 		// Rename subNetwork entities
 		for (Vertex vertex : subNetwork.getChildren()) {
 			Entity entity = vertex.getAdapter(Entity.class);
-			vertex.setLabel(subNetwork.getSimpleName() + "_"
-					+ entity.getSimpleName());
+			String name = subNetwork.getSimpleName() + "_"
+					+ entity.getSimpleName();
+			vertex.setLabel(name);
 		}
 
 		// move entities/instances and vertices in this network

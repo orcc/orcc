@@ -97,16 +97,6 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	protected static final String NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
-
-	/**
 	 * The cached value of the '{@link #getOutgoingPortMap() <em>Outgoing Port Map</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -215,8 +205,8 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		case DfPackage.ENTITY__INPUTS:
 			return inputs != null && !inputs.isEmpty();
 		case DfPackage.ENTITY__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		case DfPackage.ENTITY__OUTGOING_PORT_MAP:
 			return outgoingPortMap != null;
 		case DfPackage.ENTITY__OUTPUTS:
@@ -258,10 +248,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 
 	@Override
 	public String getName() {
-		if (name == null) {
-			name = vertex.getLabel();
-		}
-		return name;
+		return vertex.getLabel();
 	}
 
 	@Override
@@ -303,8 +290,6 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (incomingPortMap: ");
 		result.append(incomingPortMap);
-		result.append(", name: ");
-		result.append(name);
 		result.append(", outgoingPortMap: ");
 		result.append(outgoingPortMap);
 		result.append(')');
