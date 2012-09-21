@@ -57,6 +57,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -170,7 +171,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			return;
 		}
 		new NetworkValidator().doSwitch(network);
-		
 
 		// because the UnitImporter will load additional resources, we filter
 		// only actors
@@ -786,8 +786,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		Object obj = options.get(OUTPUT_FOLDER);
 		if (obj instanceof String) {
 			outputFolder = (String) obj;
-			if(outputFolder.startsWith("~")){
-				outputFolder = outputFolder.replace("~",System.getProperty("user.home"));
+			if (outputFolder.startsWith("~")) {
+				outputFolder = outputFolder.replace("~",
+						System.getProperty("user.home"));
 			}
 		} else {
 			outputFolder = "";
@@ -801,7 +802,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		// set output path
-		path =  new File(outputFolder).getAbsolutePath();
+		path = new File(outputFolder).getAbsolutePath();
 
 		doInitializeOptions();
 	}
@@ -877,12 +878,16 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				compileVTL();
 				compileXDF();
 				return IApplication.EXIT_OK;
+			} catch (OrccRuntimeException exception) {
+				System.err.println("ERROR: " + exception.getMessage());
+				System.err.println("Backend could not generate code");
 			} catch (Exception e) {
 				System.err.println("Could not run the back-end with \""
-						+ networkName + "\"");
+						+ networkName + "\" :");
+				System.err.println(e);
 				e.printStackTrace();
-				return IApplication.EXIT_RELAUNCH;
 			}
+			return IApplication.EXIT_RELAUNCH;
 		} catch (ParseException exp) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter
