@@ -76,6 +76,15 @@ public interface Entity extends EObject {
 	Map<Port, Connection> getIncomingPortMap();
 
 	/**
+	 * Returns the input port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an input port whose name matches the given name
+	 */
+	Port getInput(String name);
+
+	/**
 	 * Returns the value of the '<em><b>Inputs</b></em>' reference list.
 	 * The list contents are of type {@link net.sf.orcc.df.Port}.
 	 * <!-- begin-user-doc -->
@@ -122,6 +131,15 @@ public interface Entity extends EObject {
 	Map<Port, List<Connection>> getOutgoingPortMap();
 
 	/**
+	 * Returns the output port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an output port whose name matches the given name
+	 */
+	Port getOutput(String name);
+
+	/**
 	 * Returns the value of the '<em><b>Outputs</b></em>' reference list.
 	 * The list contents are of type {@link net.sf.orcc.df.Port}.
 	 * <!-- begin-user-doc -->
@@ -136,6 +154,15 @@ public interface Entity extends EObject {
 	 * @generated
 	 */
 	EList<Port> getOutputs();
+
+	/**
+	 * Returns the parameter with the given name.
+	 * 
+	 * @param name
+	 *            name of a parameter
+	 * @return the parameter with the given name
+	 */
+	Var getParameter(String name);
 
 	/**
 	 * Returns the value of the '<em><b>Parameters</b></em>' reference list.

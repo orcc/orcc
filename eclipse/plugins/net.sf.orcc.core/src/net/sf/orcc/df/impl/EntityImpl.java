@@ -44,6 +44,7 @@ import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
@@ -349,6 +350,17 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		return incomingPortMap;
 	}
 
+	@Override
+	public Port getInput(String name) {
+		List<Port> inputs = EcoreHelper.getList(this, "inputs");
+		for (Port port : inputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -381,6 +393,17 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		return outgoingPortMap;
 	}
 
+	@Override
+	public Port getOutput(String name) {
+		List<Port> outputs = EcoreHelper.getList(this, "outputs");
+		for (Port port : outputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -392,6 +415,16 @@ public class EntityImpl extends EObjectImpl implements Entity {
 					DfPackage.ENTITY__OUTPUTS);
 		}
 		return outputs;
+	}
+
+	@Override
+	public Var getParameter(String name) {
+		for (Var var : getParameters()) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
+		}
+		return null;
 	}
 
 	/**
