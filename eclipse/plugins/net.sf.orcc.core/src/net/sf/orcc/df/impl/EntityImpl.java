@@ -39,11 +39,14 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.ir.Var;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.Var;
 
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
@@ -68,6 +71,28 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  * @generated
  */
 public class EntityImpl extends EObjectImpl implements Entity {
+	
+	/**
+	 * This class clears the value of incomingPortMap or outgoingPortMap when the list of
+	 * incoming or outgoing connections of the "vertex" field changes.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class ConnectionListAdapter extends AdapterImpl {
+
+		@Override
+		public void notifyChanged(Notification msg) {
+			Object feature = msg.getFeature();
+			if (feature == GraphPackage.Literals.VERTEX__INCOMING) {
+				incomingPortMap = null;
+			} else if (feature == GraphPackage.Literals.VERTEX__OUTGOING) {
+				outgoingPortMap = null;
+			}
+		}
+
+	}
+	
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -196,6 +221,8 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.parameters = parameters;
+
+		vertex.eAdapters().add(new ConnectionListAdapter());
 	}
 
 	/**
@@ -210,12 +237,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	 *            the entity that the new entity will be based on
 	 */
 	protected EntityImpl(Vertex vertex, Entity entity) {
-		super();
-
-		this.vertex = vertex;
-		inputs = entity.getInputs();
-		outputs = entity.getOutputs();
-		parameters = entity.getParameters();
+		this(vertex, entity.getInputs(), entity.getOutputs(), entity.getParameters());
 	}
 
 	/**
