@@ -30,7 +30,9 @@ package net.sf.orcc.backends.transform;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.df.Actor;
@@ -49,24 +51,29 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.util.Attribute;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
- * Replace BlockWhile by BlockFor when it is possible.
- * 
- * Cfg must be built before any call to this transformation.
+ * Replace BlockWhile by BlockFor when it is possible. Cfg must be built before
+ * any call to this transformation. To do that, please run the
+ * {@link ControlFlowAnalyzer} before this one.
  * 
  * @author Jerome Gorin
  * @author Antoine Lorence
+ * @see net.sf.orcc.ir.transform.ControlFlowAnalyzer
  */
 public class BlockForAdder extends DfVisitor<Void> {
 
 	public BlockForAdder() {
-		irVisitor = new Builder();
+		irVisitor = new Builder(false);
+	}
+
+	public BlockForAdder(boolean fullReplacement) {
+		irVisitor = new Builder(fullReplacement);
 	}
 
 	/**
@@ -75,7 +82,7 @@ public class BlockForAdder extends DfVisitor<Void> {
 	 * @author Antoine Lorence
 	 * 
 	 */
-	private class BlockForCfg extends ControlFlowAnalyzer {
+	public class BlockForCfg extends ControlFlowAnalyzer {
 
 		/*
 		 * (non-Javadoc)
@@ -86,14 +93,14 @@ public class BlockForAdder extends DfVisitor<Void> {
 		 */
 		@Override
 		public CfgNode defaultCase(EObject object) {
-			if( object instanceof BlockFor) {
+			if (object instanceof BlockFor) {
 				return caseBlockFor((BlockFor) object);
 			}
 			return super.defaultCase(object);
 		}
 
 		public CfgNode caseBlockFor(BlockFor block) {
-			CfgNode join = addNode(block.getJoinNode());
+			CfgNode join = addNode(block.getJoinBlock());
 			cfg.getVertices().add(join);
 
 			if (last != null) {
@@ -105,7 +112,7 @@ public class BlockForAdder extends DfVisitor<Void> {
 
 			last = join;
 			flag = true;
-			last = doSwitch(block.getNodes());
+			last = doSwitch(block.getBlocks());
 
 			// reset flag (in case there are no nodes in "then" branch)
 			flag = false;
@@ -119,101 +126,125 @@ public class BlockForAdder extends DfVisitor<Void> {
 	/**
 	 * Build a list of all variables used in an Expression.
 	 * 
-	 * @author Antoine Lorence
-	 * 
 	 */
 	private class VarGetter extends AbstractIrVisitor<Void> {
 
 		private List<Var> vars;
+		private Expression expr;
 
 		public VarGetter(Expression expr) {
 			vars = new ArrayList<Var>();
-			doSwitch(expr);
+			this.expr = expr;
 		}
 
 		@Override
 		public Void caseExprVar(ExprVar expr) {
-			vars.add(expr.getUse().getVariable());
+			Var var = expr.getUse().getVariable();
+			if (!vars.contains(var)) {
+				vars.add(var);
+			}
 			return null;
 		}
 
 		public List<Var> get() {
+			doSwitch(expr);
 			return vars;
 		}
 
 	}
 
 	/**
-	 * Class used for ?
-	 * 
-	 * @author Antoine Lorence
+	 * Main visitor. Effectively replace while loops by for loops
 	 * 
 	 */
 	private class Builder extends AbstractIrVisitor<Void> {
+
+		boolean fullReplacement = false;
+
+		public Builder(boolean fullReplacement) {
+			this.fullReplacement = fullReplacement;
+		}
+
 		@Override
 		public Void caseBlockWhile(BlockWhile blockWhile) {
 
-			// Ensure that while body procedure has its while blocks replaced
-			// before
+			// Ensure that inner while blocks are replaced by for blocks before
+			// executing this
 			super.caseBlockWhile(blockWhile);
 
-			// Get properties of the while block
-			EList<Block> blocks = blockWhile.getBlocks();
+			// Get the list of variables used in while condition
+			Expression condition = blockWhile.getCondition();
+			List<Var> conditionVars = new VarGetter(condition).get();
 
+			// Get the last block of while's body
+			EList<Block> blocks = blockWhile.getBlocks();
 			if (blocks.isEmpty()) {
-				// Don't treat empty nodes
+				// Don't treat empty blocks
 				return null;
 			}
-
-			Expression condition = blockWhile.getCondition();
 			Block lastBlock = blocks.get(blocks.size() - 1);
 
-			CfgNode previousCFGNode = (CfgNode) blockWhile.getJoinBlock()
-					.getCfgNode().getPredecessors().get(0);
-			Block previousNode = previousCFGNode.getNode();
+			// Get the block immediately preceding while loop
+			
+			CfgNode joinNode = blockWhile.getJoinBlock().getCfgNode();
+			if(joinNode == null) {
+				throw new OrccRuntimeException(
+						"Control Flow Graph must be built. Please apply the ControlFlowAnalyzer before BlockForAdder (actor : "
+								+ actor.getName() + ").");
+			}
+			Block prevBlock = ((CfgNode) joinNode.getPredecessors().get(0))
+					.getNode();
 
-			List<Var> conditionVars = new VarGetter(condition).get();
-			List<Instruction> loopCnts = new ArrayList<Instruction>();
-			List<Instruction> initCnts = new ArrayList<Instruction>();
+			List<Instruction> stepInstrList = new ArrayList<Instruction>();
+			List<Instruction> initInstrList = new ArrayList<Instruction>();
 
 			for (Var conditionVar : conditionVars) {
-				// Get assignements on the variables contained in the condition
-				Instruction loopCnt = getLastAssign(conditionVar, lastBlock);
-				Instruction initCnt = getLastAssign(conditionVar, previousNode);
-
-				if (loopCnt != null) {
-					loopCnts.add(loopCnt);
+				// Get the last assignment on each variable contained in the
+				// condition
+				Instruction initInstr = getLastAssign(conditionVar, prevBlock);
+				if (initInstr != null) {
+					initInstrList.add(initInstr);
 				}
 
-				if (initCnt != null) {
-					initCnts.add(initCnt);
+				Instruction stepInstr = getLastAssign(conditionVar, lastBlock);
+				if (stepInstr != null) {
+					stepInstrList.add(stepInstr);
 				}
 			}
 
-			// No loop counter founds, no for node to create
-			if (loopCnts.isEmpty() && initCnts.isEmpty()) {
+			// If fullReplacment == true, step or init can be
+			// empty but not both (for loop is created with blank fields)
+			// If fullReplacment == false, no empty field is allowed.
+			if (fullReplacement && stepInstrList.isEmpty()
+					&& initInstrList.isEmpty()) {
+				return null;
+			} else if (stepInstrList.isEmpty() || initInstrList.isEmpty()) {
 				return null;
 			}
 
-			// Create node for
+			// Create block for
 			BlockFor blockFor = IrSpecificFactory.eINSTANCE.createBlockFor();
-
 			blockFor.setCondition(blockWhile.getCondition());
 			blockFor.setLineNumber(blockWhile.getLineNumber());
-			blockFor.setJoinNode(blockWhile.getJoinBlock());
-			blockFor.getNodes().addAll(blockWhile.getBlocks());
+			blockFor.setJoinBlock(blockWhile.getJoinBlock());
+			blockFor.getBlocks().addAll(blockWhile.getBlocks());
 
-			// Add loop counters and inits
-			// FIXME :
-			if (loopCnts.size() > 0)
-				blockFor.setStep(loopCnts.get(0));
-			if (initCnts.size() > 0)
-				blockFor.setInit(initCnts.get(0));
+			// Add init and step instructions, after removing them from their
+			// original location
+			for (Instruction instr : initInstrList) {
+				EcoreUtil.remove(instr);
+			}
+			blockFor.getInit().addAll(initInstrList);
+			for (Instruction instr : stepInstrList) {
+				EcoreUtil.remove(instr);
+			}
+			blockFor.getStep().addAll(stepInstrList);
 
 			// Copy attributes
+			Copier copier = new EcoreUtil.Copier();
 			for (Attribute attribute : blockWhile.getAttributes()) {
-				// TODO: copy attribute instead of linking it
-				blockFor.setAttribute(attribute.getName(), attribute.getValue());
+				blockFor.getAttributes()
+						.add((Attribute) copier.copy(attribute));
 			}
 
 			// Replace node
@@ -222,66 +253,64 @@ public class BlockForAdder extends DfVisitor<Void> {
 			return null;
 		}
 
-		private Instruction getLastAssign(Var var, Block lastNode) {
+		/**
+		 * Get the last <code>InstAssign</code> from <i>block</i> which targets
+		 * <i>var</i>.
+		 * 
+		 * @param var
+		 * @param block
+		 * @return the instruction
+		 */
+		private Instruction getLastAssign(Var var, Block block) {
 			EList<Def> defs = var.getDefs();
 
-			// Check if one var defs is located in the last node
-			BlockBasic lastBlockNode = null;
-
-			if (lastNode.isBlockIf()) {
-				lastBlockNode = ((BlockIf) lastNode).getJoinBlock();
-			} else if (lastNode.isBlockWhile()) {
-				lastBlockNode = ((BlockWhile) lastNode).getJoinBlock();
-			} else if (lastNode.isBlockBasic()) {
-				lastBlockNode = (BlockBasic) lastNode;
+			// Get the last block's BasicBlock
+			BlockBasic lastBlockBasic = null;
+			if (block.isBlockIf()) {
+				lastBlockBasic = ((BlockIf) block).getJoinBlock();
+			} else if (block.isBlockWhile()) {
+				lastBlockBasic = ((BlockWhile) block).getJoinBlock();
+			} else if (block.isBlockBasic()) {
+				lastBlockBasic = (BlockBasic) block;
 			} else {
-				lastBlockNode = ((BlockFor) lastNode).getJoinNode();
+				lastBlockBasic = ((BlockFor) block).getJoinBlock();
 			}
 
 			// Return in case of an empty node
-			EList<Instruction> instructions = lastBlockNode.getInstructions();
+			EList<Instruction> instructions = lastBlockBasic.getInstructions();
 			if (instructions.isEmpty()) {
 				return null;
 			}
 
-			// Look for the last assignation
-			InstAssign lastAssign = null;
-			for (Def def : defs) {
-				InstAssign instAssign = EcoreHelper.getContainerOfType(def,
-						InstAssign.class);
+			// Search for the last InstAssign concerning var (def or use)
+			ListIterator<Instruction> it = instructions
+					.listIterator(instructions.size());
+			while (it.hasPrevious()) {
+				Instruction candidateInstr = it.previous();
 
-				Instruction lastInstruction = instructions.get(instructions
-						.size() - 1);
-
-				// Get last assignation
-				if (lastInstruction.equals(instAssign)) {
-					lastAssign = instAssign;
-					break;
+				if (candidateInstr.isInstAssign()) {
+					if (defs.contains(((InstAssign) candidateInstr).getTarget())) {
+						return candidateInstr;
+					} else if (new VarGetter(
+							((InstAssign) candidateInstr).getValue()).get()
+							.contains(var)) {
+						return null;
+					}
 				}
 			}
 
-			if (lastAssign == null) {
-				// No assignation found
-				return null;
-			}
-
-			// Remove assign instructions and return the corresponding
-			// instruction
-			EcoreUtil.remove(lastAssign);
-
-			return lastAssign;
+			// No corresponding Instruction found, don't return anything
+			return null;
 		}
 	}
 
 	@Override
 	public Void caseActor(Actor actor) {
-		// First build Cfg for existing code
-		new DfVisitor<CfgNode>(new ControlFlowAnalyzer()).doSwitch(actor);
 
 		// Transform actor, try to replace WhileBlock by ForBlock
 		super.caseActor(actor);
 
-		// Rebuild CFG with for node
+		// Rebuild CFG with for loops
 		new DfVisitor<CfgNode>(new BlockForCfg()).doSwitch(actor);
 
 		return null;

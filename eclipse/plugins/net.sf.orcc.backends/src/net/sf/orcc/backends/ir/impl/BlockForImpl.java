@@ -33,9 +33,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getCondition <em>Condition</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getJoinNode <em>Join Node</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getJoinBlock <em>Join Block</em>}</li>
  *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getLineNumber <em>Line Number</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getNodes <em>Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getBlocks <em>Blocks</em>}</li>
  *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getStep <em>Step</em>}</li>
  *   <li>{@link net.sf.orcc.backends.ir.impl.BlockForImpl#getInit <em>Init</em>}</li>
  * </ul>
@@ -55,14 +55,14 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	protected Expression condition;
 
 	/**
-	 * The cached value of the '{@link #getJoinNode() <em>Join Node</em>}' containment reference.
+	 * The cached value of the '{@link #getJoinBlock() <em>Join Block</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getJoinNode()
+	 * @see #getJoinBlock()
 	 * @generated
 	 * @ordered
 	 */
-	protected BlockBasic joinNode;
+	protected BlockBasic joinBlock;
 
 	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -85,34 +85,34 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment reference list.
+	 * The cached value of the '{@link #getBlocks() <em>Blocks</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getNodes()
+	 * @see #getBlocks()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Block> nodes;
+	protected EList<Block> blocks;
 
 	/**
-	 * The cached value of the '{@link #getStep() <em>Step</em>}' containment reference.
+	 * The cached value of the '{@link #getStep() <em>Step</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getStep()
 	 * @generated
 	 * @ordered
 	 */
-	protected Instruction step;
+	protected EList<Instruction> step;
 
 	/**
-	 * The cached value of the '{@link #getInit() <em>Init</em>}' containment reference.
+	 * The cached value of the '{@link #getInit() <em>Init</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getInit()
 	 * @generated
 	 * @ordered
 	 */
-	protected Instruction init;
+	protected EList<Instruction> init;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -195,8 +195,8 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public BlockBasic getJoinNode() {
-		return joinNode;
+	public BlockBasic getJoinBlock() {
+		return joinBlock;
 	}
 
 	/**
@@ -204,14 +204,14 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetJoinNode(BlockBasic newJoinNode,
+	public NotificationChain basicSetJoinBlock(BlockBasic newJoinBlock,
 			NotificationChain msgs) {
-		BlockBasic oldJoinNode = joinNode;
-		joinNode = newJoinNode;
+		BlockBasic oldJoinBlock = joinBlock;
+		joinBlock = newJoinBlock;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrSpecificPackage.BLOCK_FOR__JOIN_NODE,
-					oldJoinNode, newJoinNode);
+					Notification.SET, IrSpecificPackage.BLOCK_FOR__JOIN_BLOCK,
+					oldJoinBlock, newJoinBlock);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -225,26 +225,26 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setJoinNode(BlockBasic newJoinNode) {
-		if (newJoinNode != joinNode) {
+	public void setJoinBlock(BlockBasic newJoinBlock) {
+		if (newJoinBlock != joinBlock) {
 			NotificationChain msgs = null;
-			if (joinNode != null)
-				msgs = ((InternalEObject) joinNode).eInverseRemove(this,
+			if (joinBlock != null)
+				msgs = ((InternalEObject) joinBlock).eInverseRemove(this,
 						EOPPOSITE_FEATURE_BASE
-								- IrSpecificPackage.BLOCK_FOR__JOIN_NODE, null,
-						msgs);
-			if (newJoinNode != null)
-				msgs = ((InternalEObject) newJoinNode).eInverseAdd(this,
+								- IrSpecificPackage.BLOCK_FOR__JOIN_BLOCK,
+						null, msgs);
+			if (newJoinBlock != null)
+				msgs = ((InternalEObject) newJoinBlock).eInverseAdd(this,
 						EOPPOSITE_FEATURE_BASE
-								- IrSpecificPackage.BLOCK_FOR__JOIN_NODE, null,
-						msgs);
-			msgs = basicSetJoinNode(newJoinNode, msgs);
+								- IrSpecificPackage.BLOCK_FOR__JOIN_BLOCK,
+						null, msgs);
+			msgs = basicSetJoinBlock(newJoinBlock, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrSpecificPackage.BLOCK_FOR__JOIN_NODE, newJoinNode,
-					newJoinNode));
+					IrSpecificPackage.BLOCK_FOR__JOIN_BLOCK, newJoinBlock,
+					newJoinBlock));
 	}
 
 	/**
@@ -275,12 +275,12 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Block> getNodes() {
-		if (nodes == null) {
-			nodes = new EObjectContainmentEList<Block>(Block.class, this,
-					IrSpecificPackage.BLOCK_FOR__NODES);
+	public EList<Block> getBlocks() {
+		if (blocks == null) {
+			blocks = new EObjectContainmentEList<Block>(Block.class, this,
+					IrSpecificPackage.BLOCK_FOR__BLOCKS);
 		}
-		return nodes;
+		return blocks;
 	}
 
 	/**
@@ -288,7 +288,11 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Instruction getStep() {
+	public EList<Instruction> getStep() {
+		if (step == null) {
+			step = new EObjectContainmentEList<Instruction>(Instruction.class,
+					this, IrSpecificPackage.BLOCK_FOR__STEP);
+		}
 		return step;
 	}
 
@@ -297,98 +301,12 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetStep(Instruction newStep,
-			NotificationChain msgs) {
-		Instruction oldStep = step;
-		step = newStep;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrSpecificPackage.BLOCK_FOR__STEP,
-					oldStep, newStep);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
+	public EList<Instruction> getInit() {
+		if (init == null) {
+			init = new EObjectContainmentEList<Instruction>(Instruction.class,
+					this, IrSpecificPackage.BLOCK_FOR__INIT);
 		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setStep(Instruction newStep) {
-		if (newStep != step) {
-			NotificationChain msgs = null;
-			if (step != null)
-				msgs = ((InternalEObject) step)
-						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
-								- IrSpecificPackage.BLOCK_FOR__STEP, null, msgs);
-			if (newStep != null)
-				msgs = ((InternalEObject) newStep)
-						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
-								- IrSpecificPackage.BLOCK_FOR__STEP, null, msgs);
-			msgs = basicSetStep(newStep, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrSpecificPackage.BLOCK_FOR__STEP, newStep, newStep));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Instruction getInit() {
 		return init;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetInit(Instruction newInit,
-			NotificationChain msgs) {
-		Instruction oldInit = init;
-		init = newInit;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrSpecificPackage.BLOCK_FOR__INIT,
-					oldInit, newInit);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setInit(Instruction newInit) {
-		if (newInit != init) {
-			NotificationChain msgs = null;
-			if (init != null)
-				msgs = ((InternalEObject) init)
-						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
-								- IrSpecificPackage.BLOCK_FOR__INIT, null, msgs);
-			if (newInit != null)
-				msgs = ((InternalEObject) newInit)
-						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
-								- IrSpecificPackage.BLOCK_FOR__INIT, null, msgs);
-			msgs = basicSetInit(newInit, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrSpecificPackage.BLOCK_FOR__INIT, newInit, newInit));
 	}
 
 	/**
@@ -402,14 +320,14 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 		switch (featureID) {
 		case IrSpecificPackage.BLOCK_FOR__CONDITION:
 			return basicSetCondition(null, msgs);
-		case IrSpecificPackage.BLOCK_FOR__JOIN_NODE:
-			return basicSetJoinNode(null, msgs);
-		case IrSpecificPackage.BLOCK_FOR__NODES:
-			return ((InternalEList<?>) getNodes()).basicRemove(otherEnd, msgs);
+		case IrSpecificPackage.BLOCK_FOR__JOIN_BLOCK:
+			return basicSetJoinBlock(null, msgs);
+		case IrSpecificPackage.BLOCK_FOR__BLOCKS:
+			return ((InternalEList<?>) getBlocks()).basicRemove(otherEnd, msgs);
 		case IrSpecificPackage.BLOCK_FOR__STEP:
-			return basicSetStep(null, msgs);
+			return ((InternalEList<?>) getStep()).basicRemove(otherEnd, msgs);
 		case IrSpecificPackage.BLOCK_FOR__INIT:
-			return basicSetInit(null, msgs);
+			return ((InternalEList<?>) getInit()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -424,12 +342,12 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 		switch (featureID) {
 		case IrSpecificPackage.BLOCK_FOR__CONDITION:
 			return getCondition();
-		case IrSpecificPackage.BLOCK_FOR__JOIN_NODE:
-			return getJoinNode();
+		case IrSpecificPackage.BLOCK_FOR__JOIN_BLOCK:
+			return getJoinBlock();
 		case IrSpecificPackage.BLOCK_FOR__LINE_NUMBER:
 			return getLineNumber();
-		case IrSpecificPackage.BLOCK_FOR__NODES:
-			return getNodes();
+		case IrSpecificPackage.BLOCK_FOR__BLOCKS:
+			return getBlocks();
 		case IrSpecificPackage.BLOCK_FOR__STEP:
 			return getStep();
 		case IrSpecificPackage.BLOCK_FOR__INIT:
@@ -450,21 +368,23 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 		case IrSpecificPackage.BLOCK_FOR__CONDITION:
 			setCondition((Expression) newValue);
 			return;
-		case IrSpecificPackage.BLOCK_FOR__JOIN_NODE:
-			setJoinNode((BlockBasic) newValue);
+		case IrSpecificPackage.BLOCK_FOR__JOIN_BLOCK:
+			setJoinBlock((BlockBasic) newValue);
 			return;
 		case IrSpecificPackage.BLOCK_FOR__LINE_NUMBER:
 			setLineNumber((Integer) newValue);
 			return;
-		case IrSpecificPackage.BLOCK_FOR__NODES:
-			getNodes().clear();
-			getNodes().addAll((Collection<? extends Block>) newValue);
+		case IrSpecificPackage.BLOCK_FOR__BLOCKS:
+			getBlocks().clear();
+			getBlocks().addAll((Collection<? extends Block>) newValue);
 			return;
 		case IrSpecificPackage.BLOCK_FOR__STEP:
-			setStep((Instruction) newValue);
+			getStep().clear();
+			getStep().addAll((Collection<? extends Instruction>) newValue);
 			return;
 		case IrSpecificPackage.BLOCK_FOR__INIT:
-			setInit((Instruction) newValue);
+			getInit().clear();
+			getInit().addAll((Collection<? extends Instruction>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -481,20 +401,20 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 		case IrSpecificPackage.BLOCK_FOR__CONDITION:
 			setCondition((Expression) null);
 			return;
-		case IrSpecificPackage.BLOCK_FOR__JOIN_NODE:
-			setJoinNode((BlockBasic) null);
+		case IrSpecificPackage.BLOCK_FOR__JOIN_BLOCK:
+			setJoinBlock((BlockBasic) null);
 			return;
 		case IrSpecificPackage.BLOCK_FOR__LINE_NUMBER:
 			setLineNumber(LINE_NUMBER_EDEFAULT);
 			return;
-		case IrSpecificPackage.BLOCK_FOR__NODES:
-			getNodes().clear();
+		case IrSpecificPackage.BLOCK_FOR__BLOCKS:
+			getBlocks().clear();
 			return;
 		case IrSpecificPackage.BLOCK_FOR__STEP:
-			setStep((Instruction) null);
+			getStep().clear();
 			return;
 		case IrSpecificPackage.BLOCK_FOR__INIT:
-			setInit((Instruction) null);
+			getInit().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -510,16 +430,16 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 		switch (featureID) {
 		case IrSpecificPackage.BLOCK_FOR__CONDITION:
 			return condition != null;
-		case IrSpecificPackage.BLOCK_FOR__JOIN_NODE:
-			return joinNode != null;
+		case IrSpecificPackage.BLOCK_FOR__JOIN_BLOCK:
+			return joinBlock != null;
 		case IrSpecificPackage.BLOCK_FOR__LINE_NUMBER:
 			return lineNumber != LINE_NUMBER_EDEFAULT;
-		case IrSpecificPackage.BLOCK_FOR__NODES:
-			return nodes != null && !nodes.isEmpty();
+		case IrSpecificPackage.BLOCK_FOR__BLOCKS:
+			return blocks != null && !blocks.isEmpty();
 		case IrSpecificPackage.BLOCK_FOR__STEP:
-			return step != null;
+			return step != null && !step.isEmpty();
 		case IrSpecificPackage.BLOCK_FOR__INIT:
-			return init != null;
+			return init != null && !init.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -542,11 +462,6 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	}
 
 	@Override
-	public boolean isNodeFor() {
-		return true;
-	}
-
-	@Override
 	public boolean isBlockBasic() {
 		return false;
 	}
@@ -559,6 +474,26 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	@Override
 	public boolean isBlockWhile() {
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.backends.ir.BlockFor#isNodeFor()
+	 */
+	@Override
+	public boolean isNodeFor() {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.backends.ir.BlockFor#isBlockFor()
+	 */
+	@Override
+	public boolean isBlockFor() {
+		return true;
 	}
 
 } //NodeForImpl

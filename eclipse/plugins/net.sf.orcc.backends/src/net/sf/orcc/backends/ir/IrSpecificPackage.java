@@ -319,13 +319,13 @@ public interface IrSpecificPackage extends EPackage {
 	int BLOCK_FOR__CONDITION = IrPackage.BLOCK_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
+	 * The feature id for the '<em><b>Join Block</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__JOIN_NODE = IrPackage.BLOCK_FEATURE_COUNT + 1;
+	int BLOCK_FOR__JOIN_BLOCK = IrPackage.BLOCK_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -337,16 +337,16 @@ public interface IrSpecificPackage extends EPackage {
 	int BLOCK_FOR__LINE_NUMBER = IrPackage.BLOCK_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Blocks</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_FOR__NODES = IrPackage.BLOCK_FEATURE_COUNT + 3;
+	int BLOCK_FOR__BLOCKS = IrPackage.BLOCK_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Step</b></em>' containment reference.
+	 * The feature id for the '<em><b>Step</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -355,7 +355,7 @@ public interface IrSpecificPackage extends EPackage {
 	int BLOCK_FOR__STEP = IrPackage.BLOCK_FEATURE_COUNT + 4;
 
 	/**
-	 * The feature id for the '<em><b>Init</b></em>' containment reference.
+	 * The feature id for the '<em><b>Init</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -523,15 +523,15 @@ public interface IrSpecificPackage extends EPackage {
 	EReference getBlockFor_Condition();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.BlockFor#getJoinNode <em>Join Node</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.BlockFor#getJoinBlock <em>Join Block</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Join Node</em>'.
-	 * @see net.sf.orcc.backends.ir.BlockFor#getJoinNode()
+	 * @return the meta object for the containment reference '<em>Join Block</em>'.
+	 * @see net.sf.orcc.backends.ir.BlockFor#getJoinBlock()
 	 * @see #getBlockFor()
 	 * @generated
 	 */
-	EReference getBlockFor_JoinNode();
+	EReference getBlockFor_JoinBlock();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.ir.BlockFor#getLineNumber <em>Line Number</em>}'.
@@ -545,21 +545,21 @@ public interface IrSpecificPackage extends EPackage {
 	EAttribute getBlockFor_LineNumber();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getNodes <em>Nodes</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getBlocks <em>Blocks</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Nodes</em>'.
-	 * @see net.sf.orcc.backends.ir.BlockFor#getNodes()
+	 * @return the meta object for the containment reference list '<em>Blocks</em>'.
+	 * @see net.sf.orcc.backends.ir.BlockFor#getBlocks()
 	 * @see #getBlockFor()
 	 * @generated
 	 */
-	EReference getBlockFor_Nodes();
+	EReference getBlockFor_Blocks();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.BlockFor#getStep <em>Step</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getStep <em>Step</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Step</em>'.
+	 * @return the meta object for the containment reference list '<em>Step</em>'.
 	 * @see net.sf.orcc.backends.ir.BlockFor#getStep()
 	 * @see #getBlockFor()
 	 * @generated
@@ -567,10 +567,10 @@ public interface IrSpecificPackage extends EPackage {
 	EReference getBlockFor_Step();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.BlockFor#getInit <em>Init</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getInit <em>Init</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Init</em>'.
+	 * @return the meta object for the containment reference list '<em>Init</em>'.
 	 * @see net.sf.orcc.backends.ir.BlockFor#getInit()
 	 * @see #getBlockFor()
 	 * @generated
@@ -726,12 +726,12 @@ public interface IrSpecificPackage extends EPackage {
 		EReference BLOCK_FOR__CONDITION = eINSTANCE.getBlockFor_Condition();
 
 		/**
-		 * The meta object literal for the '<em><b>Join Node</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Join Block</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_FOR__JOIN_NODE = eINSTANCE.getBlockFor_JoinNode();
+		EReference BLOCK_FOR__JOIN_BLOCK = eINSTANCE.getBlockFor_JoinBlock();
 
 		/**
 		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
@@ -742,15 +742,15 @@ public interface IrSpecificPackage extends EPackage {
 		EAttribute BLOCK_FOR__LINE_NUMBER = eINSTANCE.getBlockFor_LineNumber();
 
 		/**
-		 * The meta object literal for the '<em><b>Nodes</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Blocks</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_FOR__NODES = eINSTANCE.getBlockFor_Nodes();
+		EReference BLOCK_FOR__BLOCKS = eINSTANCE.getBlockFor_Blocks();
 
 		/**
-		 * The meta object literal for the '<em><b>Step</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Step</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -758,7 +758,7 @@ public interface IrSpecificPackage extends EPackage {
 		EReference BLOCK_FOR__STEP = eINSTANCE.getBlockFor_Step();
 
 		/**
-		 * The meta object literal for the '<em><b>Init</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Init</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

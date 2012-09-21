@@ -29,15 +29,15 @@
   <eClassifiers xsi:type="ecore:EClass" name="BlockFor" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//Block">
     <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
         containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//BlockBasic"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joinBlock" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//BlockBasic"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"
         defaultValueLiteral="0"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="blocks" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Block" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="step" ordered="false" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction"
-        containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="init" ordered="false" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction"
-        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="step" ordered="false" upperBound="-1"
+        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="init" ordered="false" upperBound="-1"
+        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction" containment="true"/>
   </eClassifiers>
 </ecore:EPackage>

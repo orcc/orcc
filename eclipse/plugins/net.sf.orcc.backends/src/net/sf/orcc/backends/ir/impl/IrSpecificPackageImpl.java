@@ -259,7 +259,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getBlockFor_JoinNode() {
+	public EReference getBlockFor_JoinBlock() {
 		return (EReference) blockForEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -277,7 +277,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getBlockFor_Nodes() {
+	public EReference getBlockFor_Blocks() {
 		return (EReference) blockForEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -345,9 +345,9 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 
 		blockForEClass = createEClass(BLOCK_FOR);
 		createEReference(blockForEClass, BLOCK_FOR__CONDITION);
-		createEReference(blockForEClass, BLOCK_FOR__JOIN_NODE);
+		createEReference(blockForEClass, BLOCK_FOR__JOIN_BLOCK);
 		createEAttribute(blockForEClass, BLOCK_FOR__LINE_NUMBER);
-		createEReference(blockForEClass, BLOCK_FOR__NODES);
+		createEReference(blockForEClass, BLOCK_FOR__BLOCKS);
 		createEReference(blockForEClass, BLOCK_FOR__STEP);
 		createEReference(blockForEClass, BLOCK_FOR__INIT);
 	}
@@ -452,24 +452,24 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 				null, "condition", null, 0, 1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getBlockFor_JoinNode(), theIrPackage.getBlockBasic(),
-				null, "joinNode", null, 0, 1, BlockFor.class, !IS_TRANSIENT,
+		initEReference(getBlockFor_JoinBlock(), theIrPackage.getBlockBasic(),
+				null, "joinBlock", null, 0, 1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getBlockFor_LineNumber(), theEcorePackage.getEInt(),
 				"lineNumber", "0", 0, 1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getBlockFor_Nodes(), theIrPackage.getBlock(), null,
-				"nodes", null, 0, -1, BlockFor.class, !IS_TRANSIENT,
+		initEReference(getBlockFor_Blocks(), theIrPackage.getBlock(), null,
+				"blocks", null, 0, -1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getBlockFor_Step(), theIrPackage.getInstruction(), null,
-				"step", null, 0, 1, BlockFor.class, !IS_TRANSIENT,
+				"step", null, 0, -1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, !IS_ORDERED);
 		initEReference(getBlockFor_Init(), theIrPackage.getInstruction(), null,
-				"init", null, 0, 1, BlockFor.class, !IS_TRANSIENT,
+				"init", null, 0, -1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, !IS_ORDERED);
 
