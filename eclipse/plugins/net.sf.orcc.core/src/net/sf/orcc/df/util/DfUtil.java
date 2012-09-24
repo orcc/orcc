@@ -28,13 +28,12 @@
  */
 package net.sf.orcc.df.util;
 
-import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 
 /**
  * This class contains utility methods to manipulate Df models.
@@ -100,12 +99,18 @@ public class DfUtil {
 	 */
 	public static boolean isInput(Port port) {
 		EObject cter = port.eContainer();
-		if (cter instanceof Network) {
-			Network network = (Network) cter;
-			return network.getInputs().contains(port);
+		if (cter instanceof Adaptable) {
+			Entity entity = ((Adaptable) cter).getAdapter(Entity.class);
+			if (entity != null) {
+				if (entity.getInputs().contains(port)) {
+					return true;
+				} else if (entity.getOutputs().contains(port)) {
+					return false;
+				}
+			}
 		}
-		EStructuralFeature feature = port.eContainingFeature();
-		return feature == DfPackage.eINSTANCE.getActor_Inputs();
+
+		throw new IllegalArgumentException("port not contained in an entity");
 	}
 
 }
