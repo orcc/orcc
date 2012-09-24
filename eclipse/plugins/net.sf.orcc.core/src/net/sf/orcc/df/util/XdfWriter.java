@@ -39,6 +39,7 @@ import java.util.List;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -60,6 +61,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrSwitch;
+import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -518,12 +520,15 @@ public class XdfWriter {
 		instanceElt.setAttribute("id", instance.getName());
 
 		// class
-		EObject entity = instance.getEntity();
-		if (entity != null) {
-			Element classElt = document.createElement("Class");
-			String name = EcoreHelper.getFeature(entity, "name");
-			classElt.setAttribute("name", name);
-			instanceElt.appendChild(classElt);
+		EObject eObject = instance.getEntity();
+		if (eObject instanceof Adaptable) {
+			Entity entity = ((Adaptable) eObject).getAdapter(Entity.class);
+			if (entity != null) {
+				Element classElt = document.createElement("Class");
+				String name = entity.getName();
+				classElt.setAttribute("name", name);
+				instanceElt.appendChild(classElt);
+			}
 		}
 
 		// parameters
