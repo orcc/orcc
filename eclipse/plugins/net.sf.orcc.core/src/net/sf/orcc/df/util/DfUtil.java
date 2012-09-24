@@ -28,11 +28,7 @@
  */
 package net.sf.orcc.df.util;
 
-import java.util.List;
-
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -47,66 +43,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
  * 
  */
 public class DfUtil {
-
-	/**
-	 * Returns the list of input ports of the given entity.
-	 * 
-	 * @param entity
-	 *            an entity
-	 * @return the list of input ports of the given entity
-	 */
-	public static List<Port> getInputs(EObject entity) {
-		if (entity instanceof Actor) {
-			return ((Actor) entity).getInputs();
-		} else if (entity instanceof Network) {
-			return ((Network) entity).getInputs();
-		} else {
-			return EcoreHelper.getList(entity, "inputs");
-		}
-	}
-
-	/**
-	 * Returns the list of input ports of the entity referenced by the given
-	 * instance.
-	 * 
-	 * @param instance
-	 *            an instance
-	 * @return the list of input ports of the given entity referenced by the
-	 *         given instance
-	 */
-	public static List<Port> getInputs(Instance instance) {
-		return getInputs(instance.getEntity());
-	}
-
-	/**
-	 * Returns the list of output ports of the given entity.
-	 * 
-	 * @param entity
-	 *            an entity
-	 * @return the list of output ports of the given entity
-	 */
-	public static List<Port> getOutputs(EObject entity) {
-		if (entity instanceof Actor) {
-			return ((Actor) entity).getOutputs();
-		} else if (entity instanceof Network) {
-			return ((Network) entity).getOutputs();
-		} else {
-			return EcoreHelper.getList(entity, "outputs");
-		}
-	}
-
-	/**
-	 * Returns the list of output ports of the entity referenced by the given
-	 * instance.
-	 * 
-	 * @param instance
-	 *            an instance
-	 * @return the list of output ports of the given entity referenced by the
-	 *         given instance
-	 */
-	public static List<Port> getOutputs(Instance instance) {
-		return getOutputs(instance.getEntity());
-	}
 
 	/**
 	 * Returns the package of the given name, which is composed of all the
