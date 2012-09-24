@@ -275,8 +275,17 @@ printNodes(nodes) ::= <<
 <nodes: {node | <printAttributes(node)><if (node.nodeBlock)><printBlockNode(node)><
 elseif (node.nodeIf)><printIfNode(node)><
 elseif (node.nodeWhile)><printWhileNode(node)><
+elseif (node.nodeFor)><printForNode(node)><
 elseif (node.nodeSpecific)><printNodeSpecific(node)><
 endif>}; separator="\n">
+>>
+
+// for node
+printForNode(forNode) ::= <<
+for(<forNode.init:{assign | <assign.target.variable.indexedName> = <assign.value>} ; separator=", "> ;<forNode.condition>; <forNode.step:{assign | <assign.target.variable.indexedName> = <assign.value>}; separator=", ">) {
+	<printNodes(forNode.blocks)>
+}
+<printBlockNode(forNode.joinNode)>
 >>
 
 // block node
