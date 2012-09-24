@@ -254,7 +254,8 @@ public class CBackendImpl extends AbstractBackend {
 
 			// transformations.add(new DfVisitor<Expression>(new
 			// LiteralIntegersAdder())); // Xlim only ?
-			transformations.add(new DfVisitor<Expression>(new CastAdder(true)));
+			transformations.add(new DfVisitor<Expression>(new CastAdder(true,
+					true)));
 
 			// NullPointerException when running backend with this transfo
 			// transformations.add(new XlimVariableRenamer());

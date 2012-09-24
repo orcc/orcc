@@ -165,6 +165,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// do not transform actors
 	}
 
+	@Override
 	protected Network doTransformNetwork(Network network) throws OrccException {
 		write("Analyze and transform the network...\n");
 		new ComplexHwOpDetector(getWriteListener()).doSwitch(network);
@@ -191,7 +192,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				new DfVisitor<Void>(new CopyPropagator()),
 				new DfVisitor<Void>(new ConstantPropagator()),
 				new DfVisitor<Void>(new InstPhiTransformation()),
-				new DfVisitor<Expression>(new CastAdder(false)),
+				new DfVisitor<Expression>(new CastAdder(false, true)),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
 				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
@@ -362,6 +363,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		schedulerPrinter.print(tta.getName() + ".ll", processorPath, tta);
 	}
 
+	@Override
 	protected boolean printInstance(Instance instance) {
 		return printer.print(instance.getSimpleName() + ".ll", actorsPath,
 				instance);

@@ -83,6 +83,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class CastAdder extends AbstractIrVisitor<Expression> {
 
 	private boolean castToUnsigned;
+	private boolean createEmptyBlockBasic;
 	private Type parentType;
 
 	/**
@@ -91,9 +92,13 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 	 * @param castToUnsigned
 	 *            <code>true</code> if an explicit cast is needed between signed
 	 *            and unsigned
+	 * @param createEmptyBlockBasic
+	 *            <code>true</code> if an Empty BlockBasic should be introduced
+	 *            when a ifNode has an empty thenBlock/elseBlock
 	 */
-	public CastAdder(boolean castToUnsigned) {
+	public CastAdder(boolean castToUnsigned, boolean createEmptyBlockBasic) {
 		this.castToUnsigned = castToUnsigned;
+		this.createEmptyBlockBasic = createEmptyBlockBasic;
 	}
 
 	@Override
@@ -374,14 +379,18 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		if (containingNode.isBlockIf()) {
 			BlockIf nodeIf = (BlockIf) containingNode;
 			if (value0.isExprVar()) {
-				BlockBasic block0 = IrFactory.eINSTANCE.createBlockBasic();
-				nodeIf.getThenBlocks().add(block0);
-				values.set(0, castExpression(value0, block0, 0));
+				if (createEmptyBlockBasic) {
+					BlockBasic block0 = IrFactory.eINSTANCE.createBlockBasic();
+					nodeIf.getThenBlocks().add(block0);
+					values.set(0, castExpression(value0, block0, 0));
+				}
 			}
 			if (value1.isExprVar()) {
-				BlockBasic block1 = IrFactory.eINSTANCE.createBlockBasic();
-				nodeIf.getElseBlocks().add(block1);
-				values.set(1, castExpression(value1, block1, 0));
+				if (createEmptyBlockBasic) {
+					BlockBasic block1 = IrFactory.eINSTANCE.createBlockBasic();
+					nodeIf.getElseBlocks().add(block1);
+					values.set(1, castExpression(value1, block1, 0));
+				}
 			}
 		} else {
 			BlockWhile nodeWhile = (BlockWhile) containingNode;

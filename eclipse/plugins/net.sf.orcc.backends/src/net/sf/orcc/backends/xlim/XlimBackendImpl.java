@@ -176,7 +176,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
 
 				new DfVisitor<Expression>(new LiteralIntegersAdder()),
-				new DfVisitor<Expression>(new CastAdder(true)),
+				new DfVisitor<Expression>(new CastAdder(true, true)),
 				new XlimVariableRenamer() };
 
 		for (DfSwitch<?> transformation : transformations) {

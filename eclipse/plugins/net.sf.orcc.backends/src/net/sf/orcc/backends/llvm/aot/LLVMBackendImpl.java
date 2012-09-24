@@ -155,7 +155,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new DfVisitor<Void>(new CopyPropagator()),
 				new DfVisitor<Void>(new ConstantPropagator()),
 				new DfVisitor<Void>(new InstPhiTransformation()),
-				new DfVisitor<Expression>(new CastAdder(false)),
+				new DfVisitor<Expression>(new CastAdder(false, true)),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
 				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
