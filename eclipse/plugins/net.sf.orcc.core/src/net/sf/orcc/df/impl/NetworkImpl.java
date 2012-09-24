@@ -74,6 +74,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public class NetworkImpl extends GraphImpl implements Network {
+	private Entity cachedAdaptedEntity;
+
 	/**
 	 * The cached value of the '{@link #getChildren() <em>Children</em>}' reference list.
 	 * <!-- begin-user-doc -->
@@ -418,7 +420,12 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@SuppressWarnings("unchecked")
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
-			return (T) new EntityImpl(this, getInputs(), getOutputs(), getParameters());
+			if (cachedAdaptedEntity == null) {
+				cachedAdaptedEntity = new EntityImpl(this, getInputs(),
+						getOutputs(), getParameters());
+			}
+
+			return (T) cachedAdaptedEntity;
 		}
 		return super.getAdapter(type);
 	}

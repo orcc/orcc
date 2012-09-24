@@ -92,6 +92,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 	 */
 	protected static final String FILE_NAME_EDEFAULT = null;
 
+	private Entity cachedAdaptedEntity;
+
 	/**
 	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -572,7 +574,12 @@ public class ActorImpl extends VertexImpl implements Actor {
 	@SuppressWarnings("unchecked")
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
-			return (T) new EntityImpl(this, getInputs(), getOutputs(), getParameters());
+			if (cachedAdaptedEntity == null) {
+				cachedAdaptedEntity = new EntityImpl(this, getInputs(),
+						getOutputs(), getParameters());
+			}
+
+			return (T) cachedAdaptedEntity;
 		}
 		return super.getAdapter(type);
 	}

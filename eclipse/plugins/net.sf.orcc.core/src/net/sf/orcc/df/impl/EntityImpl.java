@@ -53,9 +53,8 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Entity</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Entity</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -71,10 +70,11 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  * @generated
  */
 public class EntityImpl extends EObjectImpl implements Entity {
-	
+
 	/**
-	 * This class clears the value of incomingPortMap or outgoingPortMap when the list of
-	 * incoming or outgoing connections of the "vertex" field changes.
+	 * This class clears the value of incomingPortMap or outgoingPortMap when
+	 * the list of incoming or outgoing connections of the "vertex" field
+	 * changes.
 	 * 
 	 * @author Matthieu Wipliez
 	 * 
@@ -83,30 +83,25 @@ public class EntityImpl extends EObjectImpl implements Entity {
 
 		@Override
 		public void notifyChanged(Notification msg) {
-			Object feature = msg.getFeature();
-			if (feature == GraphPackage.Literals.VERTEX__INCOMING) {
-				incomingPortMap = null;
-			} else if (feature == GraphPackage.Literals.VERTEX__OUTGOING) {
-				outgoingPortMap = null;
+			if (incomingPortMap != null) {
+				Object feature = msg.getFeature();
+				if (feature == GraphPackage.Literals.VERTEX__INCOMING) {
+					incomingPortMap = null;
+				}
+			} else if (outgoingPortMap != null) {
+				Object feature = msg.getFeature();
+				if (feature == GraphPackage.Literals.VERTEX__OUTGOING) {
+					outgoingPortMap = null;
+				}
 			}
 		}
 
 	}
-	
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getIncomingPortMap() <em>Incoming Port Map</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getIncomingPortMap()
 	 * @generated
 	 * @ordered
@@ -115,8 +110,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 
 	/**
 	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
@@ -124,9 +118,17 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	protected EList<Port> inputs;
 
 	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -135,8 +137,8 @@ public class EntityImpl extends EObjectImpl implements Entity {
 
 	/**
 	 * The cached value of the '{@link #getOutgoingPortMap() <em>Outgoing Port Map</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getOutgoingPortMap()
 	 * @generated
 	 * @ordered
@@ -145,8 +147,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
@@ -155,8 +156,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 
 	/**
 	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getParameters()
 	 * @generated
 	 * @ordered
@@ -166,8 +166,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	private Vertex vertex;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected EntityImpl() {
@@ -190,7 +189,8 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	 * @param parameters
 	 *            a list of parameters
 	 */
-	public EntityImpl(String name, EList<Port> inputs, EList<Port> outputs, EList<Var> parameters) {
+	public EntityImpl(String name, EList<Port> inputs, EList<Port> outputs,
+			EList<Var> parameters) {
 		super();
 
 		this.name = name;
@@ -214,7 +214,8 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	 * @param parameters
 	 *            a list of parameters
 	 */
-	public EntityImpl(Vertex vertex, EList<Port> inputs, EList<Port> outputs, EList<Var> parameters) {
+	public EntityImpl(Vertex vertex, EList<Port> inputs, EList<Port> outputs,
+			EList<Var> parameters) {
 		super();
 
 		this.vertex = vertex;
@@ -237,7 +238,8 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	 *            the entity that the new entity will be based on
 	 */
 	protected EntityImpl(Vertex vertex, Entity entity) {
-		this(vertex, entity.getInputs(), entity.getOutputs(), entity.getParameters());
+		this(vertex, entity.getInputs(), entity.getOutputs(), entity
+				.getParameters());
 	}
 
 	/**
@@ -283,8 +285,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -307,8 +308,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -332,8 +332,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -360,8 +359,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
@@ -402,8 +400,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Port> getOutputs() {
@@ -425,8 +422,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Var> getParameters() {
@@ -443,8 +439,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -463,4 +458,4 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		return result.toString();
 	}
 
-} //EntityImpl
+} // EntityImpl
