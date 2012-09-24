@@ -32,6 +32,7 @@
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
+import net.sf.orcc.df.Port
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -68,7 +69,7 @@ class TCE_Design_PNDF extends ArchitectureSwitch<CharSequence> {
 					<input name="fifo_«incoming.getValue("id").toString»">
 						<address-space>«processor.getMemory(incoming).name»</address-space>
 						<signed>«input.type.int»</signed>
-						<width>«input.type.sizeInBits/8»</width>
+						<width>«input.width»</width>
 						<size>«incoming.size»</size>
 						<trace>«path»/trace/«instance.name»_«input.name».txt</trace>
 					</input>
@@ -78,7 +79,7 @@ class TCE_Design_PNDF extends ArchitectureSwitch<CharSequence> {
 					<output name="fifo_«outgoing.getValue("id").toString»">
 						<address-space>«processor.getMemory(outgoing).name»</address-space>
 						<signed>«output.type.int»</signed>
-						<width>«output.type.sizeInBits/8»</width>
+						<width>«output.width»</width>
 						<size>«outgoing.size»</size>
 						<trace>«path»/trace/«instance.name»_«output.name».txt</trace>
 					</output>
@@ -86,5 +87,9 @@ class TCE_Design_PNDF extends ArchitectureSwitch<CharSequence> {
 			«ENDFOR»
 		</processor>
 		'''
+		
+	def width(Port port) {
+		Math::ceil(port.type.sizeInBits/8.0).intValue
+	}
 	
 }
