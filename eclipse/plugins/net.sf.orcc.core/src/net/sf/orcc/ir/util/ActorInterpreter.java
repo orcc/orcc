@@ -66,6 +66,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature.Setting;
@@ -177,7 +178,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		try {
 			Var target = instr.getTarget().getVariable();
 			Object value = exprInterpreter.doSwitch(instr.getValue());
-			value = clipValue(target.getType(), value);
+			value = clipValue(target.getType(), value, instr);
 			target.setValue(value);
 		} catch (OrccRuntimeException e) {
 			String file = actor.getFileName();
@@ -275,7 +276,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		Var target = instr.getTarget().getVariable();
 		Object value = exprInterpreter.doSwitch(instr.getValue());
 		if (instr.getIndexes().isEmpty()) {
-			value = clipValue(target.getType(), value);
+			value = clipValue(target.getType(), value, instr);
 			target.setValue(value);
 		} else {
 			try {
@@ -287,7 +288,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 				}
 
 				Type type = ((TypeList) target.getType()).getInnermostType();
-				value = clipValue(type, value);
+				value = clipValue(type, value, instr);
 				ValueUtil.set(type, array, value, indexes);
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
@@ -400,9 +401,11 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 *            type of the target variable
 	 * @param value
 	 *            a value
+	 * @param instruction
+	 *            the instruction
 	 * @return the original value or a new value
 	 */
-	protected Object clipValue(Type type, Object value) {
+	protected Object clipValue(Type type, Object value, Instruction instruction) {
 		if (!ValueUtil.isInt(value)) {
 			return value;
 		}
@@ -421,7 +424,12 @@ public class ActorInterpreter extends IrSwitch<Object> {
 			}
 
 			if (!clippedValue.equals(intVal)) {
-				System.err.println("Warning: signed overflow/underflow");
+				System.err.println("[signed overflow/underflow] "
+						+ actor.getName()
+						+ ":"
+						+ ((Action) EcoreHelper.getContainerOfType(instruction,
+								Action.class)).getName() + " line: "
+						+ instruction.getLineNumber());
 			}
 		}
 
@@ -559,7 +567,8 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		Map<EObject, Collection<Setting>> map = EcoreUtil.ExternalCrossReferencer
 				.find(obj);
 		for (EObject externalObject : map.keySet()) {
-			if (externalObject instanceof Var && ((Var) externalObject).getValue() == null) {
+			if (externalObject instanceof Var
+					&& ((Var) externalObject).getValue() == null) {
 				initializeVar((Var) externalObject);
 			} else if (externalObject instanceof Procedure) {
 				initExternalResources(externalObject);
