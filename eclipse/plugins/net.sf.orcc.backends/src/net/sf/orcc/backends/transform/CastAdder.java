@@ -88,7 +88,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 
 	/**
 	 * Creates a new cast transformation. By default, this constructor creates
-	 * empty BlockBasic int if blocks when the/else is empty
+	 * an empty BlockBasic for the then or else part of a BlockIf if it is empty
 	 * 
 	 * @param castToUnsigned
 	 *            <code>true</code> if an explicit cast is needed between signed
