@@ -62,13 +62,13 @@ public class ComplexHwOpDetector extends DfVisitor<Void> {
 		public Void caseExprBinary(ExprBinary expr) {
 			OpBinary op = expr.getOp();
 			// The operation will be transform in a simple shift.
-			if (op == OpBinary.TIMES && !ValueUtil.isPowTwo(expr.getE1())
-					&& !ValueUtil.isPowTwo(expr.getE2())) {
+			if (op == OpBinary.TIMES && !ValueUtil.isPowerOfTwo(expr.getE1())
+					&& !ValueUtil.isPowerOfTwo(expr.getE2())) {
 				detectedOps.add(op);
 				operationsLines.add(EcoreHelper.getContainerOfType(expr,
 						Instruction.class).getLineNumber());
 			} else if ((op == OpBinary.MOD || op == OpBinary.DIV)
-					&& !ValueUtil.isPowTwo(expr.getE2())) {
+					&& !ValueUtil.isPowerOfTwo(expr.getE2())) {
 				detectedOps.add(op);
 				operationsLines.add(EcoreHelper.getContainerOfType(expr,
 						Instruction.class).getLineNumber());

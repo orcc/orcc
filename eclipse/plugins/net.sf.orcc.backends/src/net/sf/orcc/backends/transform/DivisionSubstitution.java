@@ -86,7 +86,7 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 				 * pow = closestPow_2(x); if (pow == x){ toShift =true; }else{
 				 * toShift = false; } }
 				 */
-				if (ValueUtil.isPowTwo(expr.getE2())) {
+				if (ValueUtil.isPowerOfTwo(expr.getE2())) {
 					toShift = true;
 				} else {
 					toShift = false;

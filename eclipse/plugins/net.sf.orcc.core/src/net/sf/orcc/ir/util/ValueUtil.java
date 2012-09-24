@@ -95,31 +95,6 @@ public class ValueUtil {
 	}
 
 	/**
-	 * Returns the value of <code>op</code> <code>value</code>. Returns
-	 * <code>null</code> if the value of the expression cannot be computed.
-	 * 
-	 * @param op
-	 *            a unary operator
-	 * @param value
-	 *            an expression
-	 * @return the value of <code>op</code> <code>value</code>
-	 */
-	public static Object compute(OpUnary op, Object value) {
-		switch (op) {
-		case BITNOT:
-			return ValueUtil.not(value);
-		case LOGIC_NOT:
-			return ValueUtil.logicNot(value);
-		case MINUS:
-			return ValueUtil.negate(value);
-		case NUM_ELTS:
-			return ValueUtil.length(value);
-		default:
-			return null;
-		}
-	}
-
-	/**
 	 * Returns the value of <code>val1</code> <code>op</code> <code>val2</code>.
 	 * Returns <code>null</code> if the value of the expression cannot be
 	 * computed.
@@ -174,6 +149,31 @@ public class ValueUtil {
 			return ValueUtil.shiftRight(val1, val2);
 		case TIMES:
 			return ValueUtil.multiply(val1, val2);
+		default:
+			return null;
+		}
+	}
+
+	/**
+	 * Returns the value of <code>op</code> <code>value</code>. Returns
+	 * <code>null</code> if the value of the expression cannot be computed.
+	 * 
+	 * @param op
+	 *            a unary operator
+	 * @param value
+	 *            an expression
+	 * @return the value of <code>op</code> <code>value</code>
+	 */
+	public static Object compute(OpUnary op, Object value) {
+		switch (op) {
+		case BITNOT:
+			return ValueUtil.not(value);
+		case LOGIC_NOT:
+			return ValueUtil.logicNot(value);
+		case MINUS:
+			return ValueUtil.negate(value);
+		case NUM_ELTS:
+			return ValueUtil.length(value);
 		default:
 			return null;
 		}
@@ -513,20 +513,31 @@ public class ValueUtil {
 	}
 
 	/**
-	 * Determine if an expression is evaluate as a pow two number.
+	 * Returns <code>true</code> if the given expression is a power of two.
 	 * 
 	 * @param expr
 	 *            an expression
-	 * @return true if the expression is evaluate as a pow two number
+	 * @return true if the expression is a power of two
 	 */
-	public static boolean isPowTwo(Expression expr) {
+	public static boolean isPowerOfTwo(Expression expr) {
 		int n;
 		try {
 			n = new ExpressionEvaluator().evaluateAsInteger(expr);
 		} catch (Exception e) {
 			return false;
 		}
-		return ((n != 0) && (n & (n - 1)) == 0);
+		return isPowerOfTwo(n);
+	}
+
+	/**
+	 * Returns <code>true</code> if the given integer is a power of two.
+	 * 
+	 * @param n
+	 *            an integer
+	 * @return <code>true</code> if the given integer is a power of two
+	 */
+	public static boolean isPowerOfTwo(int n) {
+		return (n > 0) && (n & (n - 1)) == 0;
 	}
 
 	/**
