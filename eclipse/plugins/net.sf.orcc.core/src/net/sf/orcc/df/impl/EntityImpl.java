@@ -44,7 +44,6 @@ import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
@@ -352,8 +351,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 
 	@Override
 	public Port getInput(String name) {
-		List<Port> inputs = EcoreHelper.getList(this, "inputs");
-		for (Port port : inputs) {
+		for (Port port : getInputs()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
@@ -395,8 +393,7 @@ public class EntityImpl extends EObjectImpl implements Entity {
 
 	@Override
 	public Port getOutput(String name) {
-		List<Port> outputs = EcoreHelper.getList(this, "outputs");
-		for (Port port : outputs) {
+		for (Port port : getOutputs()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}

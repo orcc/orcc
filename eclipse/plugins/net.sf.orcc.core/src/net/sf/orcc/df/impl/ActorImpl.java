@@ -8,7 +8,6 @@ package net.sf.orcc.df.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Action;
@@ -23,7 +22,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.MapAdapter;
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -622,8 +620,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 
 	@Override
 	public Port getInput(String name) {
-		List<Port> inputs = EcoreHelper.getList(this, "inputs");
-		for (Port port : inputs) {
+		for (Port port : getInputs()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
@@ -672,8 +669,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 
 	@Override
 	public Port getOutput(String name) {
-		List<Port> outputs = EcoreHelper.getList(this, "outputs");
-		for (Port port : outputs) {
+		for (Port port : getOutputs()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
