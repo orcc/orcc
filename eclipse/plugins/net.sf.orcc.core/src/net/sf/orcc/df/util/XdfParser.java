@@ -666,37 +666,33 @@ public class XdfParser {
 		} else {
 			Instance instance = (Instance) vertex;
 
-			EObject entity = instance.getEntity();
-			if (entity.eIsProxy()) {
+			Port port = null;
+			EObject eObject = instance.getEntity();
+			if (eObject.eIsProxy()) {
 				// if entity is a proxy, create URI of port
-				URI uri = EcoreUtil.getURI(entity);
+				URI uri = EcoreUtil.getURI(eObject);
 				uri = uri.appendFragment("//@" + dir + "." + portName);
 
 				// and return a new proxy port with that URI
-				Port proxy = DfFactory.eINSTANCE.createPort();
-				((InternalEObject) proxy).eSetProxyURI(uri);
-				return proxy;
+				port = DfFactory.eINSTANCE.createPort();
+				((InternalEObject) port).eSetProxyURI(uri);
 			} else {
 				// if entity is not a proxy, adapt to Entity and find port
-				Entity adapted = instance.getAdapter(Entity.class);
-				EList<Port> ports;
+				Entity entity = instance.getAdapter(Entity.class);
 				if ("inputs".equals(dir)) {
-					ports = adapted.getInputs();
-				} else {
-					ports = adapted.getOutputs();
-				}
-
-				for (Port port : ports) {
-					if (portName.equals(port.getName())) {
-						return port;
-					}
+					port = entity.getInput(portName);
+				} else if ("outputs".equals(dir)) {
+					port = entity.getOutput(portName);
 				}
 			}
 
 			// last resort, create a dummy port with the given name
-			Port dummy = DfFactory.eINSTANCE.createPort();
-			dummy.setName(portName);
-			return dummy;
+			if (port == null) {
+				port = DfFactory.eINSTANCE.createPort();
+				port.setName(portName);
+			}
+
+			return port;
 		}
 	}
 
@@ -967,16 +963,32 @@ public class XdfParser {
 							+ "must have a valid \"name\" attribute");
 				}
 
+				// retrieve param
+				Var param = null;
+				EObject eObject = instance.getEntity();
+				if (eObject.eIsProxy()) {
+					// if entity is a proxy, create URI of variable
+					URI uri = EcoreUtil.getURI(eObject);
+					uri = uri.appendFragment("//@parameters." + name);
+
+					// and return a new var port with that URI
+					param = IrFactory.eINSTANCE.createVar();
+					((InternalEObject) param).eSetProxyURI(uri);
+				} else {
+					// if entity is not a proxy, adapt to Entity and find param
+					Entity entity = instance.getAdapter(Entity.class);
+					param = entity.getParameter(name);
+				}
+
+				// just in case, create a dummy if no param was found
+				if (param == null) {
+					param = IrFactory.eINSTANCE.createVar();
+					param.setName(name);
+				}
+
+				// create argument with param and value
 				Expression expr = exprParser.parseExpr(node.getFirstChild());
-
-				// create proxy to variable
-				URI uri = EcoreUtil.getURI(instance.getEntity());
-				uri = uri.appendFragment("//@parameters." + name);
-				Var proxy = IrFactory.eINSTANCE.createVar();
-				((InternalEObject) proxy).eSetProxyURI(uri);
-
-				// create argument
-				Argument argument = DfFactory.eINSTANCE.createArgument(proxy,
+				Argument argument = DfFactory.eINSTANCE.createArgument(param,
 						expr);
 
 				instance.getArguments().add(argument);
