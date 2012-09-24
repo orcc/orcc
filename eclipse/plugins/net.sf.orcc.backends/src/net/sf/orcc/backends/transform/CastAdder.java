@@ -87,6 +87,18 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 	private Type parentType;
 
 	/**
+	 * Creates a new cast transformation. By default, this constructor creates
+	 * empty BlockBasic int if blocks when the/else is empty
+	 * 
+	 * @param castToUnsigned
+	 *            <code>true</code> if an explicit cast is needed between signed
+	 *            and unsigned
+	 */
+	public CastAdder(boolean castToUnsigned) {
+		this(castToUnsigned, true);
+	}
+
+	/**
 	 * Creates a new cast transformation
 	 * 
 	 * @param castToUnsigned
