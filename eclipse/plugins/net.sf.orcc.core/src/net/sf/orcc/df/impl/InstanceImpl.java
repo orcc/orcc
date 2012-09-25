@@ -44,6 +44,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.impl.VertexImpl;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.util.Adaptable;
 
@@ -90,6 +91,15 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	}
 
 	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
 	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}'
 	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -112,15 +122,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @ordered
 	 */
 	protected EObject entity;
-
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -284,6 +285,17 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			return null;
 		}
 		return super.getAdapter(type);
+	}
+
+	@Override
+	public Argument getArgument(String name) {
+		for (Argument argument : getArguments()) {
+			Var variable = argument.getVariable();
+			if (variable != null && variable.getName().equals(name)) {
+				return argument;
+			}
+		}
+		return null;
 	}
 
 	/**

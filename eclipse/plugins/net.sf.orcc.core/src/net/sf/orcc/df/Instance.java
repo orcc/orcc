@@ -42,16 +42,16 @@ import org.eclipse.emf.ecore.EObject;
  * <!-- begin-user-doc -->This class defines an instance. An instance has an id,
  * a class, parameters and attributes. The class of the instance points to an
  * actor or a network.<!-- end-user-doc -->
- *
+ * 
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.df.Instance#getArguments <em>Arguments</em>}</li>
- *   <li>{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}</li>
- *   <li>{@link net.sf.orcc.df.Instance#getName <em>Name</em>}</li>
+ * <li>{@link net.sf.orcc.df.Instance#getArguments <em>Arguments</em>}</li>
+ * <li>{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}</li>
+ * <li>{@link net.sf.orcc.df.Instance#getName <em>Name</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @see net.sf.orcc.df.DfPackage#getInstance()
  * @model
  * @generated
@@ -65,6 +65,16 @@ public interface Instance extends Vertex, Adaptable {
 	 *         this instance does not reference an actor
 	 */
 	Actor getActor();
+
+	/**
+	 * Returns the argument of this instance that has the given name, or
+	 * <code>null</code> if no such argument exists.
+	 * 
+	 * @param name
+	 *            name of an argument
+	 * @return an argument, or <code>null</code>
+	 */
+	Argument getArgument(String name);
 
 	/**
 	 * Returns the value of the '<em><b>Arguments</b></em>' containment
@@ -90,18 +100,6 @@ public interface Instance extends Vertex, Adaptable {
 	 * @generated
 	 */
 	EObject getEntity();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getEntity
-	 * <em>Entity</em>}' reference. <!-- begin-user-doc --> <!-- end-user-doc
-	 * -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Entity</em>' reference.
-	 * @see #getEntity()
-	 * @generated
-	 */
-	void setEntity(EObject value);
 
 	List<String> getHierarchicalId();
 
@@ -165,9 +163,23 @@ public interface Instance extends Vertex, Adaptable {
 	boolean isNetwork();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getEntity
+	 * <em>Entity</em>}' reference. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Entity</em>' reference.
+	 * @see #getEntity()
+	 * @generated
+	 */
+	void setEntity(EObject value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getName
+	 * <em>Name</em>}' attribute. <!-- begin-user-doc --><!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
 	 */
