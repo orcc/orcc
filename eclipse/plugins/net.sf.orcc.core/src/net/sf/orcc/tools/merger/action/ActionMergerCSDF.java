@@ -247,7 +247,6 @@ public class ActionMergerCSDF {
 		// Finds a pattern in the actions
 		PatternLoopRecognizer r = new PatternLoopRecognizer();
 		PatternExecution pattern = r.getPattern(clasz.getInvocations());
-		System.out.println(pattern);
 
 		// Build the new body
 		pattern.accept(new BodyBuilder(procedure));
