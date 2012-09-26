@@ -40,7 +40,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.ValueUtil;
-import net.sf.orcc.util.WriteListener;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.util.EcoreHelper;
 
 /**
@@ -80,11 +80,8 @@ public class ComplexHwOpDetector extends DfVisitor<Void> {
 	private Set<OpBinary> detectedOps;
 	private List<Integer> operationsLines;
 
-	private WriteListener writeListener;
-
-	public ComplexHwOpDetector(WriteListener writeListener) {
+	public ComplexHwOpDetector() {
 		this.irVisitor = new Detector();
-		this.writeListener = writeListener;
 	};
 
 	@Override
@@ -95,7 +92,7 @@ public class ComplexHwOpDetector extends DfVisitor<Void> {
 		super.caseInstance(instance);
 
 		if (!detectedOps.isEmpty()) {
-			writeListener.writeText("Warning: " + detectedOps.toString()
+			OrccLogger.warnln(detectedOps.toString()
 					+ " operation(s) detected in " + instance.getName()
 					+ " at line(s) " + operationsLines.toString() + ".\n");
 		}
