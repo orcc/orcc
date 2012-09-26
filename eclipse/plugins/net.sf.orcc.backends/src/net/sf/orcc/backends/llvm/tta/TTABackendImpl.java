@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the IRISA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -34,7 +34,6 @@ import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -388,11 +387,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 			long t1 = System.currentTimeMillis();
 			OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
 					+ "s");
-		} catch (IOException e) {
-			System.err.println("TCE error: ");
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			OrccLogger.severeln(e.getMessage());
 		}
 	}
 
