@@ -36,13 +36,16 @@ import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Inequality;
+import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.Priority;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
 
@@ -53,6 +56,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CrossReference;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
@@ -163,6 +167,38 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 		proposePorts(actor.getOutputs(), assignment, context, acceptor);
 	}
 
+	@Override
+	public void completeVariableReference_Variable(EObject model,
+			Assignment assignment, ContentAssistContext context,
+			ICompletionProposalAcceptor acceptor) {
+		AstEntity entity = EcoreUtil2
+				.getContainerOfType(model, AstEntity.class);
+		if (entity != null) {
+			// TODO: propose the imported variables as well.
+		}
+		AstUnit unit = EcoreUtil2.getContainerOfType(model, AstUnit.class);
+		if (unit != null) {
+			proposeVariable(unit.getVariables(), context, acceptor);
+		}
+		AstActor actor = EcoreUtil2.getContainerOfType(model, AstActor.class);
+		if (actor != null) {
+			proposeVariable(actor.getStateVariables(), context, acceptor);
+		}
+		AstAction action = EcoreUtil2
+				.getContainerOfType(model, AstAction.class);
+		if (action != null) {
+			proposeVariable(action.getVariables(), context, acceptor);
+			for (InputPattern input : action.getInputs()) {
+				proposeVariable(input.getTokens(), context, acceptor);
+			}
+		}
+		AstProcedure proc = EcoreUtil2.getContainerOfType(model,
+				AstProcedure.class);
+		if (proc != null) {
+			proposeVariable(proc.getVariables(), context, acceptor);
+		}
+	}
+
 	/**
 	 * Proposes all tags of length 1.
 	 * 
@@ -236,6 +272,18 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 				String tagName = getLabelProvider().getText(proposedTag);
 				ICompletionProposal proposal = createCompletionProposal(
 						tagName, context);
+				acceptor.accept(proposal);
+			}
+		}
+	}
+
+	private void proposeVariable(EList<Variable> vars,
+			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		for (Variable var : vars) {
+			String proposed = var.getName();
+			if (proposed.startsWith(context.getPrefix())) {
+				ICompletionProposal proposal = createCompletionProposal(
+						proposed, context);
 				acceptor.accept(proposal);
 			}
 		}
