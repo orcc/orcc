@@ -221,7 +221,9 @@ public class OrccProcess extends PlatformObject implements IProcess,
 	 * 
 	 * @param text
 	 *            a string
+	 * @deprecated Please use methods from {@link net.sf.orcc.util.OrccLogger} instead
 	 */
+	@Deprecated
 	public void writeText(String text) {
 		((OrccMonitor) proxy.getOutputStreamMonitor()).write(text);
 	}

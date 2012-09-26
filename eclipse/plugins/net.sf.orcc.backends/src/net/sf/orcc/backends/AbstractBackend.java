@@ -63,6 +63,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -155,7 +156,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	@Override
 	final public void compileVTL() throws OrccException {
 		// lists actors
-		write("Lists actors...\n");
+		OrccLogger.traceln("Lists actors...");
 		List<IFile> vtlFiles = OrccUtil.getAllFiles("ir", vtlFolders);
 		doVtlCodeGeneration(vtlFiles);
 	}
@@ -216,20 +217,20 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 				fileOut.createNewFile();
 			} catch (IOException e) {
-				write("Unable to write " + dest + " file\n");
+				OrccLogger.warnln("Unable to write " + dest + " file");
 				return false;
 			}
 		}
 
 		if (!fileOut.isFile()) {
-			write(dest + " is not a file path\n");
+			OrccLogger.warnln(dest + " is not a file path");
 			fileOut.delete();
 			return false;
 		}
 
 		InputStream is = this.getClass().getResourceAsStream(source);
 		if (is == null) {
-			write("Unable to find " + source + "\n");
+			OrccLogger.warnln("Unable to find " + source);
 			return false;
 		}
 		DataInputStream dis;
@@ -239,7 +240,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		try {
 			out = new FileOutputStream(fileOut);
 		} catch (FileNotFoundException e1) {
-			write("File " + dest + " not found !" + "\n");
+			OrccLogger.warnln("File " + dest + " not found !");
 			return false;
 		}
 
@@ -253,7 +254,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			dis.close();
 			out.close();
 		} catch (IOException e) {
-			write("IOError : " + e.getMessage() + "\n");
+			OrccLogger.warnln("IOError : " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -282,13 +283,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		if (!outputDir.exists()) {
 			if (!outputDir.mkdirs()) {
-				write("Unable to create " + outputDir + " folder\n");
+				OrccLogger.warnln("Unable to create " + outputDir + " folder");
 				return false;
 			}
 		}
 
 		if (!outputDir.isDirectory()) {
-			write(outputDir + " does not exists or is not a directory." + "\n");
+			OrccLogger.warnln(outputDir
+					+ " does not exists or is not a directory.");
 			return false;
 		}
 
@@ -315,8 +317,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				try {
 					Enumeration<JarEntry> jarEntries = jar.entries();
 					if (jarEntries == null) {
-						write("Unable to list content from " + jar.getName()
-								+ " file.\n");
+						OrccLogger.warnln("Unable to list content from "
+								+ jar.getName() + " file.");
 						return false;
 					}
 
@@ -365,7 +367,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				return result;
 			}
 		} catch (IOException e) {
-			write("IOError" + e.getMessage() + "\n");
+			OrccLogger.warnln("IOError" + e.getMessage());
 			return false;
 		}
 	}
@@ -584,7 +586,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// they may be transformed and not have the same properties (in
 		// particular concerning types), and instantiation then complains.
 
-		write("Parsing " + files.size() + " actors...\n");
+		OrccLogger.traceln("Parsing " + files.size() + " actors...");
 		ResourceSet set = new ResourceSetImpl();
 		List<Actor> actors = new ArrayList<Actor>();
 		for (IFile file : files) {
@@ -624,7 +626,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @throws OrccException
 	 */
 	final public void printActors(List<Actor> actors) throws OrccException {
-		write("Printing actors...\n");
+		OrccLogger.traceln("Printing actors...");
 		long t0 = System.currentTimeMillis();
 
 		// creates a list of tasks: each task will print an actor when called
@@ -647,13 +649,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		int numCached = executeTasks(tasks);
 
 		long t1 = System.currentTimeMillis();
-		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
+		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+				+ "s");
 
 		if (numCached > 0) {
-			write("*******************************************************************************\n");
-			write("* NOTE: " + numCached + " actors were not regenerated "
-					+ "because they were already up-to-date. *\n");
-			write("*******************************************************************************\n");
+			OrccLogger
+					.traceln("*******************************************************************************");
+			OrccLogger.traceln("* NOTE: " + numCached
+					+ " actors were not regenerated "
+					+ "because they were already up-to-date. *");
+			OrccLogger
+					.traceln("*******************************************************************************");
 		}
 	}
 
@@ -665,7 +671,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @throws OrccException
 	 */
 	final public void printEntities(Network network) throws OrccException {
-		write("Printing entities...\n");
+		OrccLogger.traceln("Printing entities...");
 		long t0 = System.currentTimeMillis();
 
 		// creates a list of tasks: each task will print an actor when called
@@ -691,10 +697,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
 
 		if (numCached > 0) {
-			write("*******************************************************************************\n");
-			write("* NOTE: " + numCached + " entities were not regenerated "
-					+ "because they were already up-to-date. *\n");
-			write("*******************************************************************************\n");
+			OrccLogger
+					.traceln("*******************************************************************************");
+			OrccLogger.traceln("* NOTE: " + numCached
+					+ " entities were not regenerated "
+					+ "because they were already up-to-date. *");
+			OrccLogger
+					.traceln("*******************************************************************************");
 		}
 	}
 
@@ -730,7 +739,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @throws OrccException
 	 */
 	final public void printInstances(Network network) throws OrccException {
-		write("Printing instances...\n");
+		OrccLogger.traceln("Printing instances...");
 		long t0 = System.currentTimeMillis();
 
 		// creates a list of tasks: each task will print an instance when called
@@ -753,13 +762,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		int numCached = executeTasks(tasks);
 
 		long t1 = System.currentTimeMillis();
-		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
+		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+				+ "s");
 
 		if (numCached > 0) {
-			write("*******************************************************************************\n");
-			write("* NOTE: " + numCached + " instances were not regenerated "
-					+ "because they were already up-to-date. *\n");
-			write("*******************************************************************************\n");
+			OrccLogger
+					.traceln("*******************************************************************************");
+			OrccLogger.traceln("* NOTE: " + numCached
+					+ " instances were not regenerated "
+					+ "because they were already up-to-date. *");
+			OrccLogger
+					.traceln("*******************************************************************************");
 		}
 	}
 
@@ -913,7 +926,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @throws OrccException
 	 */
 	final public void transformActors(List<Actor> actors) throws OrccException {
-		write("Transforming actors...\n");
+		OrccLogger.traceln("Transforming actors...");
 		for (Actor actor : actors) {
 			doTransformActor(actor);
 		}
@@ -924,9 +937,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param text
 	 *            a string
+	 * @deprecated Please use {@link net.sf.orcc.util.OrccLogger#trace(text)} or
+	 *             {@link net.sf.orcc.util.OrccLogger#traceln(text)} instead
 	 */
+	@Deprecated
 	final public void write(String text) {
-		listener.writeText(text);
+		OrccLogger.trace(text);
 	}
 
 }
