@@ -31,6 +31,8 @@ package net.sf.orcc.ui.launching;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.simulators.SimulatorFactory;
+import net.sf.orcc.ui.console.OrccUiConsoleHandler;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,6 +41,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
+import org.eclipse.debug.ui.DebugUITools;
 
 /**
  * This class implements a launch configuration delegate to launch a simulator.
@@ -56,14 +59,17 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		OrccProcess process = new OrccProcess(launch, configuration, monitor);
 		launch.addProcess(process);
 
+		// Configure the logger with the console attached to the process
+		OrccLogger.configureLoggerWithHandler(new OrccUiConsoleHandler(
+				DebugUITools.getConsole(process)));
+
 		try {
 			String simulatorName = configuration.getAttribute(SIMULATOR, "");
 
 			monitor.subTask("Launching simulator...");
-			process.writeText("\n");
-			process.writeText("*********************************************"
-					+ "**********************************\n");
-			process.writeText("Launching " + simulatorName + "...\n");
+			OrccLogger.traceln("*********************************************"
+					+ "**********************************");
+			OrccLogger.traceln("Launching " + simulatorName + "...");
 
 			try {
 				SimulatorFactory factory = SimulatorFactory.getInstance();
@@ -89,7 +95,7 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 								+ " simulation error: " + builder.toString());
 				throw new CoreException(status);
 			}
-			process.writeText("Orcc backend done.");
+			OrccLogger.traceln("Orcc backend done.");
 		} finally {
 			process.terminate();
 		}

@@ -32,6 +32,8 @@ import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.BackendFactory;
+import net.sf.orcc.ui.console.OrccUiConsoleHandler;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,6 +42,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
+import org.eclipse.debug.ui.DebugUITools;
 
 /**
  * This class implements a launch configuration delegate to launch a backend.
@@ -53,25 +56,32 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 	@SuppressWarnings("unchecked")
 	public void launch(ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
+
 		OrccProcess process = new OrccProcess(launch, configuration, monitor);
 		launch.addProcess(process);
 
 		try {
 			monitor.subTask("Launching backend...");
-			process.writeText("\n");
-			process.writeText("*********************************************"
-					+ "**********************************\n");
-			process.writeText("Launching Orcc backend...\n");
+
+			// Configure the logger with the console attached to the process
+			OrccLogger.configureLoggerWithHandler(new OrccUiConsoleHandler(
+					DebugUITools.getConsole(process)));
+
+			OrccLogger.traceln("*********************************************"
+					+ "**********************************");
+			OrccLogger.traceln("Launching Orcc backend...");
 			String backend = configuration.getAttribute(BACKEND, "");
 			try {
 				BackendFactory factory = BackendFactory.getInstance();
 				factory.runBackend(process.getProgressMonitor(), process,
 						configuration.getAttributes());
-				process.writeText("Orcc backend done.");
+
+				OrccLogger.traceln("Orcc backend done.");
 			} catch (OrccRuntimeException exception) {
-				process.writeText("ERROR: " + exception.getMessage() + "\n");
-				process.writeText(backend
+				OrccLogger.severe(exception.getMessage());
+				OrccLogger.severe(backend
 						+ " backend could not generate code\n");
+				monitor.setCanceled(true);
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if we
 				// got an error too soon
