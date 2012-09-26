@@ -114,8 +114,6 @@ public class OrccUiConsoleHandler extends Handler {
 			outStream.setColor(new Color(null, 133, 200, 62));
 		}
 
-		console.activate();
-
 		try {
 			outStream.write(message);
 		} catch (IOException e) {
