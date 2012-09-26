@@ -84,15 +84,68 @@ public class OrccLogger {
 
 	}
 
+	private static class ColoredConsoleHandler extends ConsoleHandler {
+
+		// See http://stackoverflow.com/q/5762491
+		public static final String ANSI_RESET = "\u001B[0m";
+		public static final String ANSI_RED = "\u001B[31m";
+		public static final String ANSI_YELLOW = "\u001B[33m";
+		public static final String ANSI_GREEN = "\u001B[32m";
+
+		/**
+		 * 
+		 */
+		public ColoredConsoleHandler() {
+			super();
+			setOutputStream(System.out);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.util.logging.ConsoleHandler#publish(java.util.logging.LogRecord)
+		 */
+		@Override
+		public void publish(LogRecord record) {
+			// Prevent console to add escape characters when running on Windows©
+			if (!System.getProperty("os.name").toLowerCase().startsWith("win")) {
+
+				LogRecord escpChars = new LogRecord(record.getLevel(), "");
+				escpChars.setParameters(new Object[] { "-raw" });
+
+				if (record.getLevel().intValue() == Level.SEVERE.intValue()) {
+					escpChars.setMessage(ANSI_RED);
+					super.publish(escpChars);
+					super.publish(record);
+					escpChars.setMessage(ANSI_RESET);
+					super.publish(escpChars);
+				} else if (record.getLevel().intValue() == Level.WARNING
+						.intValue()) {
+					escpChars.setMessage(ANSI_YELLOW);
+					super.publish(escpChars);
+					super.publish(record);
+					escpChars.setMessage(ANSI_RESET);
+				} else if (record.getLevel().intValue() == Level.FINE
+						.intValue()) {
+					escpChars.setMessage(ANSI_GREEN);
+					super.publish(escpChars);
+					super.publish(record);
+					escpChars.setMessage(ANSI_RESET);
+				}
+			}
+		}
+	}
+
 	private static Logger logger;
 
 	public static void configureLoggerWithHandler(Handler handler) {
 		logger = null;
 
 		Logger newLog = Logger.getAnonymousLogger();
-		handler.setFormatter(new DefaultOrccFormatter());
 		newLog.addHandler(handler);
 		newLog.setUseParentHandlers(false);
+		handler.setFormatter(new DefaultOrccFormatter());
 
 		logger = newLog;
 
@@ -139,7 +192,7 @@ public class OrccLogger {
 	 */
 	private static Logger getLogger() {
 		if (logger == null) {
-			configureLoggerWithHandler(new ConsoleHandler());
+			configureLoggerWithHandler(new ColoredConsoleHandler());
 		}
 		return logger;
 	}
@@ -152,7 +205,7 @@ public class OrccLogger {
 	 * @param level
 	 */
 	public static void setLevel(Level level) {
-		logger.setLevel(level);
+		getLogger().setLevel(level);
 	}
 
 	/**
