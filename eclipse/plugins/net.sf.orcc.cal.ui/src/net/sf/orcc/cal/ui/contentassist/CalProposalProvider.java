@@ -98,6 +98,7 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 		}
 	}
 
+	@Override
 	public void complete_QualifiedNameWithWildCard(EObject model,
 			RuleCall ruleCall, ContentAssistContext context,
 			ICompletionProposalAcceptor acceptor) {
@@ -124,28 +125,10 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 		}
 	}
 
-	public void completeInequality_Tags(EObject model, Assignment assignment,
-			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		if (model instanceof Priority) {
-			proposeAllTags(model, context, acceptor);
-		}
-	}
-
-	public void completeInputPattern_Port(EObject model, Assignment assignment,
-			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		AstActor actor = (AstActor) model.eContainer();
-		proposePorts(actor.getInputs(), assignment, context, acceptor);
-	}
-
-	public void completeOutputPattern_Port(EObject model,
+	@Override
+	public void completeAstTag_Identifiers(EObject model,
 			Assignment assignment, ContentAssistContext context,
 			ICompletionProposalAcceptor acceptor) {
-		AstActor actor = (AstActor) model.eContainer();
-		proposePorts(actor.getOutputs(), assignment, context, acceptor);
-	}
-
-	public void completeTag_Identifiers(EObject model, Assignment assignment,
-			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		if (model instanceof Inequality || model instanceof AstTransition) {
 			proposeAllTags(model.eContainer(), context, acceptor);
 		} else if (model instanceof AstTag) {
@@ -155,6 +138,29 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 				proposeTagAfter(tag, parent.eContainer(), context, acceptor);
 			}
 		}
+	}
+
+	@Override
+	public void completeInequality_Tags(EObject model, Assignment assignment,
+			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		if (model instanceof Priority) {
+			proposeAllTags(model, context, acceptor);
+		}
+	}
+
+	@Override
+	public void completeInputPattern_Port(EObject model, Assignment assignment,
+			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		AstActor actor = (AstActor) model.eContainer();
+		proposePorts(actor.getInputs(), assignment, context, acceptor);
+	}
+
+	@Override
+	public void completeOutputPattern_Port(EObject model,
+			Assignment assignment, ContentAssistContext context,
+			ICompletionProposalAcceptor acceptor) {
+		AstActor actor = (AstActor) model.eContainer();
+		proposePorts(actor.getOutputs(), assignment, context, acceptor);
 	}
 
 	/**
