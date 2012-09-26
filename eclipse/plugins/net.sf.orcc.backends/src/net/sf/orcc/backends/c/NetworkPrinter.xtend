@@ -32,6 +32,10 @@ import net.sf.orcc.df.Network
 import java.util.Map
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.df.Instance
+import net.sf.orcc.graph.Edge
+import net.sf.orcc.df.Actor
+import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.df.Connection
 
 /*
  * Compile Top_network Java source code 
@@ -106,7 +110,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// FIFO allocation
 		«FOR vertice : network.vertices»
-			«vertice.allocateFifo»
+			«vertice.allocateFifos»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
@@ -277,6 +281,20 @@ class NetworkPrinter extends CTemplate {
 
 	def assignFifo(Vertex vertex) { }
 
-	def allocateFifo(Vertex vertex) { }
+	def allocateFifos(Vertex vertex) '''
+		«FOR connectionList : (vertex as Instance)?.outgoingPortMap.values»
+			«allocateFifo(connectionList.get(0), connectionList.size)»
+		«ENDFOR»
+	'''
+	
+	def allocateFifo(Connection conn, int nbReaders) '''
+		«IF conn.source instanceof Actor»
+			DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.getValue("idNoBcast")», «nbReaders»)
+		«ELSEIF conn.target instanceof Actor»
+			DECLARE_FIFO(«conn.targetPort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.getValue("idNoBcast")», «nbReaders»)
+		«ELSE»
+			«OrccLogger::warnln("An edge has both source and target linked to a non-Actor vertex, the network is probably bad flattened.")»
+		«ENDIF»
+	'''
 
 }
