@@ -121,7 +121,7 @@ public class YaceBackend extends AbstractBackend {
 
 		if (classify) {
 			OrccLogger.trace("Starting classification of actors... ");
-			new Classifier(getWriteListener()).doSwitch(network);
+			new Classifier().doSwitch(network);
 			OrccLogger.traceRaw("done\n");
 			if (merge) {
 				new ActorMerger().doSwitch(network);

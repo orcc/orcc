@@ -149,7 +149,7 @@ public class JadeBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		if (classify) {
-			new Classifier(getWriteListener()).doSwitch(actor);
+			new Classifier().doSwitch(actor);
 			if (normalize) {
 				new ActionMerger().doSwitch(actor);
 			}

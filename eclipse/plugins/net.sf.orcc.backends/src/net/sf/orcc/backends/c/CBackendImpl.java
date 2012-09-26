@@ -291,7 +291,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		if (classify) {
 			OrccLogger.traceln("Classification of actors...");
-			new Classifier(getWriteListener()).doSwitch(network);
+			new Classifier().doSwitch(network);
 		}
 		if (mergeActors) {
 			OrccLogger.traceln("Merging of actors...");

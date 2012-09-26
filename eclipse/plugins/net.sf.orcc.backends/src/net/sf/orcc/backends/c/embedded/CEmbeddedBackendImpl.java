@@ -110,21 +110,19 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		// The classification gives production and consumption information from
 		// the graph
 		OrccLogger.trace("Starting classification of actors... ");
-		new Classifier(getWriteListener()).doSwitch(network);
+		new Classifier().doSwitch(network);
 		OrccLogger.traceln("done");
-		
-		// Check that all actors have SDF MoC 
+
+		// Check that all actors have SDF MoC
 		// or CSDF (converted to SDF)
 		boolean isSDF = true;
-		for(Actor actor : network.getAllActors())
-		{
+		for (Actor actor : network.getAllActors()) {
 			MoC moc = actor.getMoC();
-			
-			if(moc.isSDF())
-			{
+
+			if (moc.isSDF()) {
 				// This is what we want, do nothing
 			} else {
-				if(moc.isCSDF()){
+				if (moc.isCSDF()) {
 					// TODO CSDF actor will be converted into SDF
 				} else {
 					// Actor is neither SDF nor CSDF. Cannot use the backend

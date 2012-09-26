@@ -174,7 +174,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		new NetworkFlattener().doSwitch(network);
 		new BroadcastAdder().doSwitch(network);
 		if (classify) {
-			new Classifier(getWriteListener()).doSwitch(network);
+			new Classifier().doSwitch(network);
 		}
 		if (mergeActions) {
 			new ActionMerger().doSwitch(network);
