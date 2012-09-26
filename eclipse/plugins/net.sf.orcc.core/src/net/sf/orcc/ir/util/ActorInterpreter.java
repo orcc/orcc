@@ -65,6 +65,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -164,10 +165,10 @@ public class ActorInterpreter extends IrSwitch<Object> {
 					// management
 					String str = ((ExprString) expr).getValue();
 					String unescaped = OrccUtil.getUnescapedString(str);
-					System.out.print(unescaped);
+					OrccLogger.debugln(unescaped);
 				} else {
 					Object value = exprInterpreter.doSwitch(expr);
-					System.out.print(String.valueOf(value));
+					OrccLogger.debugln(String.valueOf(value));
 				}
 			}
 		}
@@ -424,11 +425,20 @@ public class ActorInterpreter extends IrSwitch<Object> {
 			}
 
 			if (!clippedValue.equals(intVal)) {
-				System.err.println("[signed overflow/underflow] "
-						+ actor.getName()
-						+ ":"
-						+ ((Action) EcoreHelper.getContainerOfType(instruction,
-								Action.class)).getName() + " line: "
+
+				String container = "";
+				Action parentAction = EcoreHelper.getContainerOfType(
+						instruction, Action.class);
+				if (parentAction != null) {
+					container = parentAction.getName();
+				} else if (EcoreHelper.getContainerOfType(instruction,
+						Procedure.class) != null) {
+					container = EcoreHelper.getContainerOfType(instruction,
+							Procedure.class).getName();
+				}
+
+				OrccLogger.warnln("[signed overflow/underflow] "
+						+ actor.getName() + ":" + container + " line: "
 						+ instruction.getLineNumber());
 			}
 		}
