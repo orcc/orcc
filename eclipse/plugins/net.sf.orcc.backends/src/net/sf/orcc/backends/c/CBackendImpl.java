@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -85,6 +86,7 @@ import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Platform;
@@ -279,17 +281,17 @@ public class CBackendImpl extends AbstractBackend {
 
 	protected Network doTransformNetwork(Network network) throws OrccException {
 		// instantiate and flattens network
-		write("Instantiating...\n");
+		OrccLogger.traceln("Instantiating...");
 		new Instantiator(false, fifoSize).doSwitch(network);
-		write("Flattening...\n");
+		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 
 		if (classify) {
-			write("Classification of actors...\n");
+			OrccLogger.traceln("Classification of actors...");
 			new Classifier(getWriteListener()).doSwitch(network);
 		}
 		if (mergeActors) {
-			write("Merging of actors...\n");
+			OrccLogger.traceln("Merging of actors...");
 			new ActorMerger().doSwitch(network);
 		}
 
@@ -310,6 +312,8 @@ public class CBackendImpl extends AbstractBackend {
 		if (debug) {
 			// Serialization of the actors will break proxy link
 			EcoreUtil.resolveAll(network);
+
+			OrccLogger.setLevel(Level.ALL);
 		}
 		transformActors(network.getAllActors());
 
@@ -327,8 +331,8 @@ public class CBackendImpl extends AbstractBackend {
 				BackendUtil.computeMapping(network, mapping,
 						targetToInstancesMap, unmappedInstances);
 				for (Instance instance : unmappedInstances) {
-					write("Warning: The instance '" + instance.getName()
-							+ "' is not mapped.\n");
+					OrccLogger.warnln("The instance '" + instance.getName()
+							+ "' is not mapped.");
 				}
 				break;
 			}
@@ -340,7 +344,7 @@ public class CBackendImpl extends AbstractBackend {
 		printInstances(network);
 
 		// print network
-		write("Printing network...\n");
+		OrccLogger.traceln("Printing network...");
 		printer.print(network.getSimpleName() + ".c", srcPath, network);
 
 		// print CMakeLists
@@ -401,12 +405,13 @@ public class CBackendImpl extends AbstractBackend {
 			} catch (IOException e) {
 			}
 
-			write("Export libraries sources into " + libsPath + "... ");
+			OrccLogger.trace("Export libraries sources into " + libsPath
+					+ "... ");
 			if (copyFolderToFileSystem("/runtime/C/libs", libsPath)) {
-				write("OK" + "\n");
+				OrccLogger.traceNoTime("OK" + "\n");
 				return true;
 			} else {
-				write("Error" + "\n");
+				OrccLogger.warnNoTime("Error" + "\n");
 				return false;
 			}
 		}
