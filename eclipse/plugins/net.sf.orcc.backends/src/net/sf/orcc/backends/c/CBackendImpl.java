@@ -181,6 +181,10 @@ public class CBackendImpl extends AbstractBackend {
 		printer.getOptions().put("ringTopology", ringTopology);
 		printer.getOptions().put("newScheduler", newScheduler);
 
+		if (debug) {
+			OrccLogger.setLevel(Level.ALL);
+		}
+
 		// Set build and src directory
 		File srcDir = new File(path + File.separator + "src");
 		File buildDir = new File(path + File.separator + "build");
@@ -196,7 +200,6 @@ public class CBackendImpl extends AbstractBackend {
 		if (!binDir.exists()) {
 			binDir.mkdirs();
 		}
-
 		srcPath = srcDir.getPath();
 	}
 
@@ -312,8 +315,6 @@ public class CBackendImpl extends AbstractBackend {
 		if (debug) {
 			// Serialization of the actors will break proxy link
 			EcoreUtil.resolveAll(network);
-
-			OrccLogger.setLevel(Level.ALL);
 		}
 		transformActors(network.getAllActors());
 
