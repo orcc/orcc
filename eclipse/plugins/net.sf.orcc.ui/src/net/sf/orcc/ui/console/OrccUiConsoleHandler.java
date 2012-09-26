@@ -30,10 +30,12 @@ package net.sf.orcc.ui.console;
 
 import java.io.IOException;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import net.sf.orcc.OrccRuntimeException;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
@@ -95,12 +97,27 @@ public class OrccUiConsoleHandler extends Handler {
 	 */
 	@Override
 	public void publish(LogRecord record) {
-		console.activate();
+
+		if (!isLoggable(record)) {
+			return;
+		}
+
+		String message;
+		message = getFormatter().format(record);
 
 		IOConsoleOutputStream outStream = console.newOutputStream();
+		if (record.getLevel().intValue() == Level.SEVERE.intValue()) {
+			outStream.setColor(new Color(null, 255, 0, 0));
+		} else if (record.getLevel().intValue() == Level.WARNING.intValue()) {
+			outStream.setColor(new Color(null, 250, 133, 50));
+		} else if (record.getLevel().intValue() == Level.FINE.intValue()) {
+			outStream.setColor(new Color(null, 133, 200, 62));
+		}
+
+		console.activate();
 
 		try {
-			outStream.write(record.getMessage());
+			outStream.write(message);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
