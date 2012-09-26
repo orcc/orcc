@@ -131,7 +131,7 @@ public class OpenCLBackend extends AbstractBackend {
 	private Network doTransformNetwork(Network network) throws OrccException {
 		OrccLogger.trace("Instantiating... ");
 		new Instantiator(false).doSwitch(network);
-		OrccLogger.traceNoTime("done\n");
+		OrccLogger.traceRaw("done\n");
 		new NetworkFlattener().doSwitch(network);
 
 		return network;
@@ -159,7 +159,7 @@ public class OpenCLBackend extends AbstractBackend {
 	public boolean exportRuntimeLibrary() throws OrccException {
 		OrccLogger.trace("Exporting Run-Time sources into " + path + "... ");
 		if (copyFolderToFileSystem("/runtime/OpenCL", path)) {
-			OrccLogger.traceNoTime("OK" + "\n");
+			OrccLogger.traceRaw("OK" + "\n");
 			return true;
 		} else {
 			return false;

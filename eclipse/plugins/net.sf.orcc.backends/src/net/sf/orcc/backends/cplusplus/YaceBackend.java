@@ -115,14 +115,14 @@ public class YaceBackend extends AbstractBackend {
 	private Network doTransformNetwork(Network network) throws OrccException {
 		OrccLogger.trace("Instantiating... ");
 		new Instantiator(false).doSwitch(network);
-		OrccLogger.traceNoTime("done\n");
+		OrccLogger.traceRaw("done\n");
 		new NetworkFlattener().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
 
 		if (classify) {
 			OrccLogger.trace("Starting classification of actors... ");
 			new Classifier(getWriteListener()).doSwitch(network);
-			OrccLogger.traceNoTime("done\n");
+			OrccLogger.traceRaw("done\n");
 			if (merge) {
 				new ActorMerger().doSwitch(network);
 			}
@@ -207,10 +207,10 @@ public class YaceBackend extends AbstractBackend {
 			OrccLogger
 					.trace("Export libraries sources into " + target + "... ");
 			if (copyFolderToFileSystem("/runtime/C++", target)) {
-				OrccLogger.traceNoTime("OK" + "\n");
+				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {
-				OrccLogger.warnNoTime("Error" + "\n");
+				OrccLogger.warnRaw("Error" + "\n");
 				return false;
 			}
 		}

@@ -237,10 +237,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 			OrccLogger
 					.trace("Export libraries sources into " + target + "... ");
 			if (copyFolderToFileSystem("/runtime/C/libs", target)) {
-				OrccLogger.traceNoTime("OK" + "\n");
+				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {
-				OrccLogger.warnNoTime("Error" + "\n");
+				OrccLogger.warnRaw("Error" + "\n");
 				return false;
 			}
 		}

@@ -145,10 +145,10 @@ public class JavaBackendImpl extends AbstractBackend {
 			OrccLogger.trace("Export libraries sources into " + libsPath
 					+ "... ");
 			if (copyFolderToFileSystem("/runtime/Java/src", libsPath)) {
-				OrccLogger.traceNoTime("OK" + "\n");
+				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {
-				OrccLogger.warnNoTime("Error" + "\n");
+				OrccLogger.warnRaw("Error" + "\n");
 				return false;
 			}
 		}

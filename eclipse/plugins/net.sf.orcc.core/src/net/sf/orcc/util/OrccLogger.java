@@ -68,17 +68,14 @@ public class OrccLogger {
 
 			if (!(record.getParameters() != null
 					&& record.getParameters().length > 0 && record
-						.getParameters()[0]
-					.equals("-noTime"))) {
+						.getParameters()[0].equals("-raw"))) {
 				Date date = new Date(record.getMillis());
 				DateFormat df = DateFormat.getTimeInstance();
 
 				output += df.format(date);
-			}
-			if (record.getLevel().intValue() > Level.INFO.intValue()) {
-				output += " " + record.getLevel();
-			}
-			if (!output.isEmpty()) {
+				if (record.getLevel().intValue() > Level.INFO.intValue()) {
+					output += " " + record.getLevel();
+				}
 				output += " : ";
 			}
 			output += record.getMessage();
@@ -103,8 +100,7 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Display a debug message to current console. A debug message will be
-	 * displayed only if backend is launched in "Debug Mode"
+	 * Display a debug message to current console.
 	 * 
 	 * @param message
 	 */
@@ -114,8 +110,7 @@ public class OrccLogger {
 
 	/**
 	 * Display a debug message to current console, appended with a line
-	 * separator character. A debug message will be displayed only if backend is
-	 * launched in "Debug Mode"
+	 * separator character.
 	 * 
 	 * @param message
 	 */
@@ -124,13 +119,14 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Display a debug message on the current console, without prepending time.
+	 * Display a debug message on the current console, without any prepended
+	 * string (time or level info).
 	 * 
 	 * @param message
 	 */
-	public static void debugNoTime(String message) {
+	public static void debugRaw(String message) {
 		LogRecord record = new LogRecord(Level.FINE, message);
-		record.setParameters(new Object[] { "-noTime" });
+		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
 
@@ -160,7 +156,7 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Display an error on the current console.
+	 * Display an error line on the current console.
 	 * 
 	 * @param message
 	 */
@@ -169,8 +165,8 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Display an error on the current console, appended with a line separator
-	 * character.
+	 * Display an error line on the current console, appended with a line
+	 * separator character.
 	 * 
 	 * @param message
 	 */
@@ -179,19 +175,19 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Display an error on the current console, without prepending time.
+	 * Display an error line on the current console, without any prepended
+	 * string (time or level info).
 	 * 
 	 * @param message
 	 */
-	public static void severeNoTime(String message) {
+	public static void severeRaw(String message) {
 		LogRecord record = new LogRecord(Level.SEVERE, message);
-		record.setParameters(new Object[] { "-noTime" });
+		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
 
 	/**
-	 * Display an information message on current Eclipse console or on sytem
-	 * console (if used from command line)
+	 * Display an information message on current console.
 	 * 
 	 * @param message
 	 */
@@ -200,9 +196,8 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Display an information message on current Eclipse console or on sytem
-	 * console (if used from command line). The message will be appended with a
-	 * line separator character.
+	 * Display an information message on current console. The message will be
+	 * appended with a line separator character.
 	 * 
 	 * @param message
 	 */
@@ -211,18 +206,19 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Display a warning on the current console, without prepending time.
+	 * Display an information message on the current console, without any
+	 * prepended string (time or level info).
 	 * 
 	 * @param message
 	 */
-	public static void traceNoTime(String message) {
+	public static void traceRaw(String message) {
 		LogRecord record = new LogRecord(Level.INFO, message);
-		record.setParameters(new Object[] { "-noTime" });
+		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
 
 	/**
-	 * Display a warning on the current console.
+	 * Display a warning line on the current console.
 	 * 
 	 * @param message
 	 */
@@ -231,8 +227,8 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Display a warning on the current console, appended with a line separator
-	 * character.
+	 * Display a warning line on the current console, appended with a line
+	 * separator character.
 	 * 
 	 * @param message
 	 */
@@ -241,13 +237,14 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Display a warning on the current console, without prepending time.
+	 * Display a warning line on the current console, without any prepended
+	 * string (time or level info).
 	 * 
 	 * @param message
 	 */
-	public static void warnNoTime(String message) {
+	public static void warnRaw(String message) {
 		LogRecord record = new LogRecord(Level.WARNING, message);
-		record.setParameters(new Object[] { "-noTime" });
+		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
 

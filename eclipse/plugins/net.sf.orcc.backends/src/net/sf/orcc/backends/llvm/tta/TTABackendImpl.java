@@ -255,12 +255,12 @@ public class TTABackendImpl extends LLVMBackendImpl {
 			libPath = path + File.separator + "libs";
 			OrccLogger.trace("Export library files into " + libPath + "... ");
 			if (copyFolderToFileSystem("/runtime/TTA", libPath)) {
-				OrccLogger.traceNoTime("OK" + "\n");
+				OrccLogger.traceRaw("OK" + "\n");
 				new File(libPath + File.separator + "generate")
 						.setExecutable(true);
 				return true;
 			} else {
-				OrccLogger.warnNoTime("Error" + "\n");
+				OrccLogger.warnRaw("Error" + "\n");
 				return false;
 			}
 		}
