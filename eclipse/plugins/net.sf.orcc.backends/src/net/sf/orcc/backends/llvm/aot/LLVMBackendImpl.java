@@ -68,6 +68,7 @@ import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -138,9 +139,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected Network doTransformNetwork(Network network) throws OrccException {
 
 		// instantiate and flattens network
-		write("Instantiating...\n");
+		OrccLogger.traceln("Instantiating...");
 		new Instantiator(false, fifoSize).doSwitch(network);
-		write("Flattening...\n");
+		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 
 		DfSwitch<?>[] transformations = { new BroadcastAdder(),
@@ -202,7 +203,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		printInstances(network);
 
 		// print network
-		write("Printing network...\n");
+		OrccLogger.traceln("Printing network...");
 		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/llvm/aot/Network.stg");
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
@@ -233,12 +234,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 			}
 
 			String target = path + File.separator + "libs";
-			write("Export libraries sources into " + target + "... ");
+			OrccLogger
+					.trace("Export libraries sources into " + target + "... ");
 			if (copyFolderToFileSystem("/runtime/C/libs", target)) {
-				write("OK" + "\n");
+				OrccLogger.traceNoTime("OK" + "\n");
 				return true;
 			} else {
-				write("Error" + "\n");
+				OrccLogger.warnNoTime("Error" + "\n");
 				return false;
 			}
 		}

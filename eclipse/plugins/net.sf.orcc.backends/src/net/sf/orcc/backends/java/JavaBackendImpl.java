@@ -47,6 +47,7 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transform.RenameTransformation;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -105,10 +106,10 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	private Network doTransformNetwork(Network network) throws OrccException {
 		// instantiate and flattens network
-		write("Instantiating...\n");
+		OrccLogger.traceln("Instantiating...");
 		new Instantiator(false, fifoSize).doSwitch(network);
 
-		write("Flattening...\n");
+		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 
 		new BroadcastAdder().doSwitch(network);
@@ -128,9 +129,9 @@ public class JavaBackendImpl extends AbstractBackend {
 		network = doTransformNetwork(network);
 
 		// print network
-		write("Printing network...\n");
+		OrccLogger.traceln("Printing network...");
 		printNetwork(network);
-		write("Done\n");
+		OrccLogger.traceln("Done");
 	}
 
 	/*
@@ -141,12 +142,13 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
-			write("Export libraries sources into " + libsPath + "... ");
+			OrccLogger.trace("Export libraries sources into " + libsPath
+					+ "... ");
 			if (copyFolderToFileSystem("/runtime/Java/src", libsPath)) {
-				write("OK" + "\n");
+				OrccLogger.traceNoTime("OK" + "\n");
 				return true;
 			} else {
-				write("Error" + "\n");
+				OrccLogger.warnNoTime("Error" + "\n");
 				return false;
 			}
 		}

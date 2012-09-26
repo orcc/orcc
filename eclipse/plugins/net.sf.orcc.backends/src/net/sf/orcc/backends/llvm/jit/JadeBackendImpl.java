@@ -78,6 +78,7 @@ import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -204,7 +205,7 @@ public class JadeBackendImpl extends AbstractBackend {
 		}
 
 		// Finalize actor generation
-		write("Finalize actors...\n");
+		OrccLogger.traceln("Finalize actors...");
 		finalizeActors(actors);
 	}
 
@@ -215,7 +216,7 @@ public class JadeBackendImpl extends AbstractBackend {
 		new NetworkFlattener().doSwitch(network);
 
 		// print network
-		write("Printing network...\n");
+		OrccLogger.traceln("Printing network...");
 		String pathName = path + "/" + network.getSimpleName() + ".xdf";
 		URI uri = URI.createFileURI(pathName);
 
@@ -235,8 +236,8 @@ public class JadeBackendImpl extends AbstractBackend {
 				BackendUtil.computeMapping(network, mapping,
 						targetToInstancesMap, unmappedInstances);
 				for (Instance instance : unmappedInstances) {
-					write("Warning: The instance '" + instance.getName()
-							+ "' is not mapped.\n");
+					OrccLogger.warnln("The instance '" + instance.getName()
+							+ "' is not mapped.");
 				}
 				break;
 			}

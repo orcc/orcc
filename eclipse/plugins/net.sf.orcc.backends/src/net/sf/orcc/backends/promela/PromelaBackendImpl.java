@@ -60,6 +60,8 @@ import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
+import net.sf.orcc.util.OrccLogger;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -131,7 +133,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	private void transformInstances(EList<Vertex> vertices)
 			throws OrccException {
-		write("Transforming instances...\n");
+		OrccLogger.traceln("Transforming instances...");
 		for (Vertex v : vertices) {
 			if(v instanceof Instance) {
 				transformInstance((Instance)v);

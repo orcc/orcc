@@ -12,6 +12,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.OrccLogger;
 
 /**
  * @author Herve Yviquel
@@ -60,8 +61,7 @@ public class BackendUtil {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							executingBackend.write("Generation error :" + line
-									+ "\n");
+							OrccLogger.warnln("Generation error :" + line);
 						}
 					} finally {
 						reader.close();

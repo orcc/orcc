@@ -78,6 +78,7 @@ import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -211,7 +212,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		data.computeTemplateMaps(network);
 		network.setTemplateData(data);
 
-		write("Printing network...\n");
+		OrccLogger.traceln("Printing network...");
 		printNetwork(network);
 	}
 

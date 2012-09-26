@@ -87,6 +87,7 @@ import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 
 /**
@@ -167,7 +168,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	@Override
 	protected Network doTransformNetwork(Network network) throws OrccException {
-		write("Analyze and transform the network...\n");
+		OrccLogger.traceln("Analyze and transform the network...");
 		new ComplexHwOpDetector(getWriteListener()).doSwitch(network);
 		new Instantiator(false, fifoSize).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
@@ -252,14 +253,14 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	public boolean exportRuntimeLibrary() throws OrccException {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
-			write("Export library files into " + libPath + "... ");
+			OrccLogger.trace("Export library files into " + libPath + "... ");
 			if (copyFolderToFileSystem("/runtime/TTA", libPath)) {
-				write("OK" + "\n");
+				OrccLogger.traceNoTime("OK" + "\n");
 				new File(libPath + File.separator + "generate")
 						.setExecutable(true);
 				return true;
 			} else {
-				write("Error" + "\n");
+				OrccLogger.warnNoTime("Error" + "\n");
 				return false;
 			}
 		}
@@ -380,12 +381,13 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 		String[] cmd = cmdList.toArray(new String[] {});
 		try {
-			write("Generating design...\n");
+			OrccLogger.traceln("Generating design...");
 			long t0 = System.currentTimeMillis();
 			final Process process = Runtime.getRuntime().exec(cmd);
 			process.waitFor();
 			long t1 = System.currentTimeMillis();
-			write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
+			OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+					+ "s");
 		} catch (IOException e) {
 			System.err.println("TCE error: ");
 			e.printStackTrace();

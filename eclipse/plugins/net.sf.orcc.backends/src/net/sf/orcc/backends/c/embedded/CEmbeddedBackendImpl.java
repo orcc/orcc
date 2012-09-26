@@ -43,6 +43,7 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.tools.classifier.Classifier;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
 
@@ -108,9 +109,9 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 
 		// The classification gives production and consumption information from
 		// the graph
-		write("Starting classification of actors... ");
+		OrccLogger.trace("Starting classification of actors... ");
 		new Classifier(getWriteListener()).doSwitch(network);
-		write("done\n");
+		OrccLogger.traceln("done");
 		
 		// Check that all actors have SDF MoC 
 		// or CSDF (converted to SDF)
@@ -136,11 +137,12 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		if (isSDF) {
 			SDFMoC moc = (SDFMoC) network.getAllActors().get(0).getMoC();
 			moc.toString();
-			write("Printing network...\n");
+			OrccLogger.traceln("Printing network...");
 			printer.print("./Algo/" + network.getName() + ".graphml", path,
 					network);
 		} else {
-			write("The network is not SDF. Other models are not yet supported.\n");
+			OrccLogger
+					.traceln("The network is not SDF. Other models are not yet supported.");
 		}
 	}
 

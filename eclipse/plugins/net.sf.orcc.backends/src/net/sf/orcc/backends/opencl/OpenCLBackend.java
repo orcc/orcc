@@ -46,6 +46,7 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transform.RenameTransformation;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
 
@@ -128,9 +129,9 @@ public class OpenCLBackend extends AbstractBackend {
 	 * @throws OrccException
 	 */
 	private Network doTransformNetwork(Network network) throws OrccException {
-		write("Instantiating... ");
+		OrccLogger.trace("Instantiating... ");
 		new Instantiator(false).doSwitch(network);
-		write("done\n");
+		OrccLogger.traceNoTime("done\n");
 		new NetworkFlattener().doSwitch(network);
 
 		return network;
@@ -150,15 +151,15 @@ public class OpenCLBackend extends AbstractBackend {
 		printInstances(network);
 
 		// print network
-		write("Printing network...\n");
+		OrccLogger.traceln("Printing network...");
 		printNetwork(network);
 	}
 
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
-		write("Exporting Run-Time sources into " + path + "... ");
+		OrccLogger.trace("Exporting Run-Time sources into " + path + "... ");
 		if (copyFolderToFileSystem("/runtime/OpenCL", path)) {
-			write("OK" + "\n");
+			OrccLogger.traceNoTime("OK" + "\n");
 			return true;
 		} else {
 			return false;

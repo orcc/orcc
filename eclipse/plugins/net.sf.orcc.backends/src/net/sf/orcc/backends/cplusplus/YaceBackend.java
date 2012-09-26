@@ -57,6 +57,7 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
 
@@ -112,16 +113,16 @@ public class YaceBackend extends AbstractBackend {
 	}
 
 	private Network doTransformNetwork(Network network) throws OrccException {
-		write("Instantiating... ");
+		OrccLogger.trace("Instantiating... ");
 		new Instantiator(false).doSwitch(network);
-		write("done\n");
+		OrccLogger.traceNoTime("done\n");
 		new NetworkFlattener().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
 
 		if (classify) {
-			write("Starting classification of actors... ");
+			OrccLogger.trace("Starting classification of actors... ");
 			new Classifier(getWriteListener()).doSwitch(network);
-			write("done\n");
+			OrccLogger.traceNoTime("done\n");
 			if (merge) {
 				new ActorMerger().doSwitch(network);
 			}
@@ -156,7 +157,7 @@ public class YaceBackend extends AbstractBackend {
 
 		printInstances(network);
 		// print network
-		write("Printing network...\n");
+		OrccLogger.traceln("Printing network...");
 		printNetwork(network);
 	}
 
@@ -189,8 +190,8 @@ public class YaceBackend extends AbstractBackend {
 						targetToInstancesMap, unmappedInstances);
 				printer.getOptions().put("threads", targetToInstancesMap);
 				for (Instance instance : unmappedInstances) {
-					write("Warning: The instance '" + instance.getName()
-							+ "' is not mapped.\n");
+					OrccLogger.warnln("Warning: The instance '"
+							+ instance.getName() + "' is not mapped.");
 				}
 				break;
 			}
@@ -203,12 +204,13 @@ public class YaceBackend extends AbstractBackend {
 	public boolean exportRuntimeLibrary() throws OrccException {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			String target = path + File.separator + "libs";
-			write("Export libraries sources into " + target + "... ");
+			OrccLogger
+					.trace("Export libraries sources into " + target + "... ");
 			if (copyFolderToFileSystem("/runtime/C++", target)) {
-				write("OK" + "\n");
+				OrccLogger.traceNoTime("OK" + "\n");
 				return true;
 			} else {
-				write("Error" + "\n");
+				OrccLogger.warnNoTime("Error" + "\n");
 				return false;
 			}
 		}
