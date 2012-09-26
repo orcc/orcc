@@ -449,7 +449,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 			Actor actor = vertex.getAdapter(Actor.class);
 			if (actor == null) {
 				Network network = vertex.getAdapter(Network.class);
-				actors.addAll(network.getAllActors());
+				if (network != null) {
+					actors.addAll(network.getAllActors());
+				}
 			} else {
 				actors.add(actor);
 			}
