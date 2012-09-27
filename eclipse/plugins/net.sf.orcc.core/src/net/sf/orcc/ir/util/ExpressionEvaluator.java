@@ -63,12 +63,6 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 		Object val1 = doSwitch(expr.getE1());
 		Object val2 = doSwitch(expr.getE2());
 		Object result = ValueUtil.compute(val1, expr.getOp(), val2);
-
-		if (result == null) {
-			throw new OrccRuntimeException(
-					"Could not evaluate binary expression:\n"
-							+ new ExpressionPrinter().doSwitch(expr) + "\n");
-		}
 		return result;
 	}
 
