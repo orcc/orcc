@@ -28,17 +28,18 @@
  */
 package net.sf.orcc.backends.c
 
-import net.sf.orcc.df.Network
+import java.util.HashMap
 import java.util.Map
-import net.sf.orcc.graph.Vertex
-import net.sf.orcc.df.Instance
-import net.sf.orcc.graph.Edge
 import net.sf.orcc.df.Actor
-import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
+import net.sf.orcc.graph.Vertex
+import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.df.Port
 
-/*
- * Compile Top_network Java source code 
+/**
+ * Compile Top_network C source code 
  *  
  * @author Antoine Lorence
  * 
@@ -47,16 +48,44 @@ class NetworkPrinter extends CTemplate {
 	
 	val Network network;
 	val Map<String, Object> options
-	var boolean geneticAlgo
-	var boolean newSchedul
+	
+	var boolean geneticAlgo = false
+	var boolean newSchedul = false
+	var boolean ringTopology = false
+	var int threadsNb = 1;
+	var int fifoSize;
+	
+	var int numberOfGroups
+	var Map sourceInstances
 	
 	new(Network network, Map<String, Object> options){
 		super()
 		this.network = network
 		this.options = options
 		
-		geneticAlgo = options.containsKey("useGeneticAlgorithm")
-		newSchedul = options.containsKey("newScheduler")
+		if (options.containsKey("useGeneticAlgorithm")) {
+			geneticAlgo = options.get("useGeneticAlgorithm") as Boolean
+			if (options.containsKey("threadsNb")) {
+				threadsNb = options.get("threadsNb") as Integer
+			} else {
+				OrccLogger::warnln("Genetic algorithm options has been checked, but threadsNb option is not set")
+			}
+		}
+		if (options.containsKey("newScheduler")) {
+			newSchedul = options.get("newScheduler") as Boolean
+		}
+		if (options.containsKey("ringTopology")) {
+			ringTopology = options.get("ringTopology") as Boolean
+		}
+		if (options.containsKey("fifoSize")) {
+			fifoSize = options.get("fifoSize") as Integer
+		} else {
+			OrccLogger::warnln("fifoSize option is not set")
+		}
+		
+		//Template datas :
+		numberOfGroups = -5
+		sourceInstances = new HashMap()
 	}
 
 	def getNetworkFileContent() '''
@@ -77,20 +106,11 @@ class NetworkPrinter extends CTemplate {
 		#include "orcc_fifo.h"
 		#include "orcc_scheduler.h"
 		#include "orcc_util.h"
-		«IF options.containsKey("threads") || geneticAlgo»
-			#include "orcc_thread.h"
-		«ENDIF»
-		«IF geneticAlgo»
-			#include "orcc_genetic.h"
-			#define THREAD_NB <options.threadsNb>
-		«ELSE»
-			#define MAX_THREAD_NB 10
-		«ENDIF»
 		
-		«IF newSchedul»
-			#define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
-		«ENDIF»
 		«IF geneticAlgo»
+			#include "orcc_thread.h"
+			#include "orcc_genetic.h"
+			#define THREAD_NB «threadsNb»
 			#define POPULATION_SIZE 100
 			#define GENERATION_NB 20
 			
@@ -102,54 +122,62 @@ class NetworkPrinter extends CTemplate {
 			#define STEP_BW_CHK 1000000
 			
 			#define CACHE_SIZE 4096
+		«ELSE»
+			#define MAX_THREAD_NB 10
+		«ENDIF»
+		«IF newSchedul»
+			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
 		«ENDIF»
 		
-		#define SIZE <options.fifoSize>
+		#define SIZE «fifoSize»
 		// #define PRINT_FIRINGS
 
 		/////////////////////////////////////////////////
 		// FIFO allocation
-		«FOR vertice : network.vertices»
+		«FOR vertice : network.children.filter(typeof(Instance)).filter[isActor]»
 			«vertice.allocateFifos»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// FIFO pointer assignments
-		«FOR vertice : network.vertices»
-			«vertice.assignFifo»
+		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+			«instance.assignFifo»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// Action schedulers
-		«FOR instance : network.children.filter(typeof(Instance))»
-			«instance.actorInitialize»
+		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+			extern void «instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ", "»unsigned int fifo_«port.name»_id«ENDFOR»);
 		«ENDFOR»
-		«FOR instance : network.children.filter(typeof(Instance))»
-			«instance.actionScheduler»
+		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+			extern void «instance.name»_scheduler(struct schedinfo_s *si);
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// Declaration of a struct actor for each actor
-		«FOR instance : network.children.filter(typeof(Instance))»
+		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			struct actor_s «instance.name»;
 		«ENDFOR»
 
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
-		«FOR instance : network.children.filter(typeof(Instance))»
-			«instance.fillActorsStructs»
+		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+			«/* TODO : replace 0 (2nd struct parameter) by <if(network.templateData.instanceNameToGroupIdMap.(instance.name))> <network.templateData.instanceNameToGroupIdMap.(instance.name)> <else>0<endif>*/»
+			struct actor_s «instance.name» = {"«instance.name»", 0, «instance.name»_scheduler, «instance.actor.inputs.size», «instance.actor.outputs.size * 10», 0, 0, NULL, 0};
 		«ENDFOR»
 		
-		«FOR instance : network.children.filter(typeof(Instance))»
-			«instance.declareActorArray»
-		«ENDFOR»
+		struct actor_s *actors[] = {
+			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor] SEPARATOR ","»
+				&«instance.name»
+			«ENDFOR»
+		};
 		
 		«IF geneticAlgo»
 			extern int source_is_stopped();
 			extern int clean_cache(int size);
 			
 			void clear_fifos() {
-				«FOR instance : network.children.filter(typeof(Instance))»
+				«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 					«instance.clearFifosWithMap»
 				«ENDFOR»
 			}
@@ -165,15 +193,19 @@ class NetworkPrinter extends CTemplate {
 		
 		/////////////////////////////////////////////////
 		// Initializer and launcher
-		«FOR instance : network.children.filter(typeof(Instance))»
-			«instance.printInitialize»
-		«ENDFOR»
+		void initialize_instances() {
+			«FOR instance : network.children.filter(typeof(Instance))»
+				«IF instance.isActor»
+					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ", "»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port) else "-1"»«ENDFOR»);
+				«ENDIF»
+			«ENDFOR»
+		}
 		
 		static void launcher() {
 			int i, display_scheduler = -1;
 			
 			cpu_set_t cpuset;
-			«IF geneticAlgo»
+			«IF !geneticAlgo»
 				thread_struct threads[MAX_THREAD_NB];
 				thread_id_struct threads_id[MAX_THREAD_NB];
 				
@@ -192,13 +224,13 @@ class NetworkPrinter extends CTemplate {
 				struct monitor_s monitoring;
 				
 				sync_init(&sched_sync);
-				genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB, <if(options.newScheduler)>RING_TOPOLOGY<else>0<endif>, <network.templateData.numberOfGroups>, GROUPS_RATIO);
+				genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB, «IF newSchedul»RING_TOPOLOGY«ELSE»0«ENDIF», «numberOfGroups», GROUPS_RATIO);
 				monitor_init(&monitoring, &sched_sync, &genetic_info);
 			«ENDIF»
 			
 			initialize_instances();
 			
-			«IF geneticAlgo»
+			«IF !geneticAlgo»
 				for(i=0; i < mapping->number_of_threads; ++i){
 					sched_init(&schedulers[i], mapping->threads_ids[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
 				}
@@ -208,9 +240,13 @@ class NetworkPrinter extends CTemplate {
 				}
 			«ENDIF»
 			
-			
 			«IF newSchedul && !geneticAlgo»
-				// <printAllAddSchedulable(network.templateData.sourceInstances)>
+				«/* TODO : Check for sourceInstances in network's template maps.
+				 * It is the list or maps which must be used in this block
+				 */»
+				«FOR instance : (network.templateData as Map).keySet»
+					sched_add_schedulable(«(instance as Instance).name»>.sched, &«(instance as Instance).name», RING_TOPOLOGY);
+				«ENDFOR»
 			«ENDIF»
 			
 			clear_cpu_set(cpuset);
@@ -254,46 +290,95 @@ class NetworkPrinter extends CTemplate {
 		}
 	'''
 	
-	def printInitialize(Instance instance) {
-		// <printInitializes(network.instances)
-		// Warning : list > element update
-	}
-
-	def printScheduler() { }
-
-	def fillActorsStructs(Instance instance) {
-		// see fillActorsStructs(network.instances)
-		// Warning : list > element update
-	}
-
-	def clearFifosWithMap(Instance instance) { }
-
-	def declareActorArray(Instance instance) {
-		// see <declareActorsArray(network.instances)>
-		// Warning : list > element update
-	}
-
-	def actionScheduler(Instance instance) { }
-
+	// TODO : simplify this :
+	def assignFifo(Instance instance) '''
+		«FOR connList : instance.outgoingPortMap.values»
+			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
+				«printFifoAssign(connList.head.source, connList.head.sourcePort, connList.head.getAttribute("idNoBcast").value as Integer)»
+			«ENDIF»
+			«FOR conn : connList»
+				«IF conn.source instanceof Instance && conn.target instanceof Instance»
+					«printFifoAssign(conn.target as Instance, conn.targetPort, conn.getAttribute("idNoBcast").value as Integer)»
+				«ENDIF»
+			«ENDFOR»
+		«ENDFOR»
+	'''
 	
-	
-	def actorInitialize(Instance instance) { }
+	def printFifoAssign(Vertex vertex, Port port, int fifoIndex) '''
+		«IF vertex instanceof Instance»struct fifo_«port.type.doSwitch»_s *«(vertex as Instance).name»_«port.name» = &fifo_«fifoIndex»;«ENDIF»
+	'''
 
-	def assignFifo(Vertex vertex) { }
+	def printScheduler() '''
+		void *scheduler(void *data) {
+			struct scheduler_s *sched = (struct scheduler_s *) data;
+			struct actor_s *my_actor;
+			struct schedinfo_s si;
+			«IF geneticAlgo»
+				
+				int i = 0;
+				clock_t start, end;	
+				semaphore_wait(sched->sem_thread);
+				start = clock ();
+			«ENDIF»
+			
+			while (1) {
+				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
+				if(my_actor != NULL){
+					si.num_firings = 0;
+					my_actor->sched_func(&si);
+		#ifdef PRINT_FIRINGS
+					printf("%2i  %5i\t%s\t%s\n", sched-\>id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
+		#endif
+				}
+				«IF geneticAlgo»
+				++i;
+				if(i > STEP_BW_CHK) {
+					end = clock ();
+					timeout = ((end - start) / (double)CLOCKS_PER_SEC) >= TIMEOUT;
+					i = 0;
+				}
+				if(source_is_stopped() || timeout) {
+					semaphore_set(sched->sync->sem_monitor);
+					clean_cache(CACHE_SIZE);
+					semaphore_wait(sched->sem_thread);
+					timeout = 0;
+					start = clock ();
+				}
+				«ENDIF»
+			}
+		}
+	'''
 
-	def allocateFifos(Vertex vertex) '''
-		«FOR connectionList : (vertex as Instance)?.outgoingPortMap.values»
+	def clearFifosWithMap(Instance instance) '''
+		«FOR connList : instance.outgoingPortMap.values»
+			«IF connList.get(0).source instanceof Instance && connList.get(0).target instanceof Instance»
+				«clearFifo(connList.get(0))»
+			«ENDIF»
+		«ENDFOR»
+	'''
+	def clearFifo(Connection connection) '''
+		«IF connection.source instanceof Actor»
+			fifo_«connection.sourcePort.type.doSwitch»_clear(&fifo_«connection.getAttribute("idNoBcast")»);
+		«ELSE»
+			fifo_«connection.targetPort.type.doSwitch»_clear(&fifo_«connection.getAttribute("id")»);
+		«ENDIF»
+	'''
+
+
+	def allocateFifos(Instance instance) '''
+		«FOR connectionList : instance.outgoingPortMap.values»
 			«allocateFifo(connectionList.get(0), connectionList.size)»
 		«ENDFOR»
 	'''
 	
 	def allocateFifo(Connection conn, int nbReaders) '''
-		«IF conn.source instanceof Actor»
-			DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.getValue("idNoBcast")», «nbReaders»)
-		«ELSEIF conn.target instanceof Actor»
-			DECLARE_FIFO(«conn.targetPort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.getValue("idNoBcast")», «nbReaders»)
+		«IF conn.source instanceof Instance»
+			DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.getAttribute("idNoBcast").value», «nbReaders»)
+		«ELSEIF conn.target instanceof Instance»
+			DECLARE_FIFO(«conn.targetPort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.getAttribute("idNoBcast").value», «nbReaders»)
 		«ELSE»
-			«OrccLogger::warnln("An edge has both source and target linked to a non-Actor vertex, the network is probably bad flattened.")»
+			«/* TODO: debug to find types of source & target when compiling a non-top network */»
+			«OrccLogger::warnln("An edge has both source and target linked to a non-Actor vertex.")»
 		«ENDIF»
 	'''
 

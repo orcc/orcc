@@ -31,7 +31,6 @@ package net.sf.orcc.backends.c
 import java.util.ArrayList
 import java.util.List
 import net.sf.orcc.df.Argument
-import net.sf.orcc.df.Port
 import net.sf.orcc.ir.Arg
 import net.sf.orcc.ir.ArgByRef
 import net.sf.orcc.ir.ArgByVal
@@ -48,7 +47,6 @@ import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
 import net.sf.orcc.ir.util.ExpressionPrinter
 import net.sf.orcc.ir.util.IrSwitch
-import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
 /*
@@ -79,76 +77,30 @@ class CTemplate extends IrSwitch {
 	 * Types
 	 *
 	 *****************************************/
-	override caseTypeBool(TypeBool type) {
-		if(type.isFifoType)
-			'''Boolean'''
-		else
-			'''boolean'''
-	}
+	override caseTypeBool(TypeBool type) 
+		'''i32'''
 
-	override caseTypeInt(TypeInt type) {
-		if(type.isFifoType)
-			printFifoInt(type.size)
-		else
-			printInt(type.size)
-	}
+	override caseTypeInt(TypeInt type)
+		'''i«type.size»'''
 
-	override caseTypeUint(TypeUint type) {
-		if(type.isFifoType)
-			printFifoInt(type.size)
-		else
-			printInt(type.size)
-	}
+	override caseTypeUint(TypeUint type) 
+		'''u«type.size»'''
 
 	override caseTypeFloat(TypeFloat type) {
-		if( type.isFifoType)
-			printFifoFloat(type.size)
-		else
-			printFloat(type.size)
+		if (type.size == 64) '''double'''
+		else '''float'''
 	}
 
 	override caseTypeString(TypeString type)
-		'''String'''
+		'''char *'''
 
 	override caseTypeVoid(TypeVoid type)
 		'''void'''
 	
 	override caseTypeList(TypeList typeList)
-		'''«typeList.innermostType.doSwitch»«FOR i : 1..typeList.dimensions.size»[]«ENDFOR»'''
+		//TODO : print sizes
+		'''«typeList.innermostType.doSwitch»'''
 
-	def private printFloat(int size) {
-		if (size == 64)
-			'''double'''
-		else
-			'''float'''
-	}
-	
-	def private printFifoFloat(int size) {
-		if (size == 64)
-			'''Double'''
-		else
-			'''Float'''
-	}
-	
-	def private printInt(int size) {
-		if (size <= 32) {
-			return "int";
-		} else if (size <= 64) {
-			return "long";
-		} else {
-			return null;
-		}
-	}
-	
-	def private printFifoInt(int size) {
-		if (size <= 32) {
-			return "Integer";
-		} else if (size <= 64) {
-			return "Long";
-		} else {
-			return null;
-		}
-	}
 	
 	/******************************************
 	 * 
@@ -158,9 +110,6 @@ class CTemplate extends IrSwitch {
 	/**
 	 * Return true if this type object is used in a Fifo
 	 */
-	def isFifoType(Type type) {
-		return EcoreHelper::getContainerOfType(type, typeof(Port)) != null
-	}
 	
 	 // Print actor arguments, when initializing it
 	def printArguments(EList<Var> actorParams, EList<Argument> arguments)

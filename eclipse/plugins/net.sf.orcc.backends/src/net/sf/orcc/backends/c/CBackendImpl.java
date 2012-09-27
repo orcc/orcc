@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2012, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -99,6 +99,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * 
  * @author Matthieu Wipliez
  * @author Herve Yviquel
+ * @author Antoine Lorence
  * 
  */
 public class CBackendImpl extends AbstractBackend {
@@ -116,8 +117,13 @@ public class CBackendImpl extends AbstractBackend {
 
 	protected boolean newScheduler;
 	protected boolean mergeActions;
-	protected StandardPrinter printer;
 	protected boolean ringTopology;
+
+	@Deprecated
+	protected StandardPrinter printer;
+
+	protected CPrinter xtendPrinter;
+
 
 	/**
 	 * Path to target "src" folder
@@ -181,8 +187,15 @@ public class CBackendImpl extends AbstractBackend {
 		printer.getOptions().put("ringTopology", ringTopology);
 		printer.getOptions().put("newScheduler", newScheduler);
 
+		xtendPrinter = new CPrinter(!debug);
+		xtendPrinter.getOptions().put("fifoSize", fifoSize);
+		xtendPrinter.getOptions().put("enableTrace", enableTrace);
+		xtendPrinter.getOptions().put("ringTopology", ringTopology);
+		xtendPrinter.getOptions().put("newScheduler", newScheduler);
+
 		if (debug) {
-			OrccLogger.setLevel(Level.ALL);
+			OrccLogger.setLevel(Level.FINEST);
+			OrccLogger.debugln("Debug mode is enabled");
 		}
 
 		// Set build and src directory
@@ -271,7 +284,7 @@ public class CBackendImpl extends AbstractBackend {
 			if (debug) {
 				ResourceSet set = new ResourceSetImpl();
 				if (!IrUtil.serializeActor(set, srcPath, actor)) {
-					System.err.println("Error with " + transformation
+					OrccLogger.warnln("Error with " + transformation
 							+ " on actor " + actor.getName());
 				}
 			}
@@ -320,11 +333,6 @@ public class CBackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/c/Network.stg");
-		printer.setExpressionPrinter(new CExpressionPrinter());
-		printer.setTypePrinter(new CTypePrinter());
-
 		for (String component : mapping.values()) {
 			if (!component.isEmpty()) {
 				targetToInstancesMap = new HashMap<String, List<Instance>>();
@@ -339,14 +347,19 @@ public class CBackendImpl extends AbstractBackend {
 			}
 		}
 
-		computeOptions(printer.getOptions());
+		computeOptions(xtendPrinter.getOptions());
 
 		// print instances
 		printInstances(network);
 
 		// print network
-		OrccLogger.traceln("Printing network...");
-		printer.print(network.getSimpleName() + ".c", srcPath, network);
+		OrccLogger.trace("Printing network...");
+
+		if (!xtendPrinter.print(srcPath, network)) {
+			OrccLogger.warnRaw("Done\n");
+		} else {
+			OrccLogger.warnRaw("Error\n");
+		}
 
 		// print CMakeLists
 		printCMake(network);
