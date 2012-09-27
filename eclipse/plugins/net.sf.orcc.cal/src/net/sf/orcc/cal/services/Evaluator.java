@@ -126,6 +126,10 @@ public class Evaluator extends CalSwitch<Expression> {
 		Object val1 = ValueUtil.getValue(e1);
 		Object val2 = ValueUtil.getValue(e2);
 
+		if (val1 == null || val2 == null) {
+			return null;
+		}
+
 		Object result = ValueUtil.compute(val1, op, val2);
 		return ValueUtil.getExpression(result);
 	}
