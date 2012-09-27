@@ -250,9 +250,13 @@ public class Evaluator extends CalSwitch<Expression> {
 	@Override
 	public Expression caseExpressionUnary(ExpressionUnary expression) {
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
+		
 		Expression expr = getValue(expression.getExpression());
+		if (expr == null) {
+			return null;
+		}
+		
 		Object value = ValueUtil.getValue(expr);
-
 		Object result = ValueUtil.compute(op, value);
 		return ValueUtil.getExpression(result);
 	}
