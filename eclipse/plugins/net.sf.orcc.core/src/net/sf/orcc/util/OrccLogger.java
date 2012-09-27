@@ -75,6 +75,9 @@ public class OrccLogger {
 				output += df.format(date);
 				if (record.getLevel().intValue() > Level.INFO.intValue()) {
 					output += " " + record.getLevel();
+				} else if (record.getLevel().intValue() == Level.FINE
+						.intValue()) {
+					output += " DEBUG";
 				}
 				output += " : ";
 			}
@@ -153,6 +156,9 @@ public class OrccLogger {
 	 */
 	public static void setLevel(Level level) {
 		getLogger().setLevel(level);
+		for (Handler handler : getLogger().getHandlers()) {
+			handler.setLevel(level);
+		}
 	}
 
 	/**
