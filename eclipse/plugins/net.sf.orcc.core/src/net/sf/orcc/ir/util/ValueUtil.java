@@ -264,8 +264,14 @@ public class ValueUtil {
 	 */
 	public static Object equals(Object val1, Object val2) {
 		if (isBool(val1) && isBool(val2) || isFloat(val1) && isFloat(val2)
-				|| isInt(val1) && isInt(val2)) {
+				|| isInt(val1) && isInt(val2) || isString(val1) && isString(val2)) {
 			return val1.equals(val2);
+		}
+		else if(isString(val1) && isInt(val2) || isInt(val1) && isString(val2)) {
+			if(getIntValue(val1) == getIntValue(val2) )
+				return true;
+			else
+				return false;
 		}
 		throw new OrccRuntimeException("type mismatch in equals");
 	}
@@ -386,6 +392,8 @@ public class ValueUtil {
 			return (Integer) value;
 		} else if (isInt(value)) {
 			return ((BigInteger) value).intValue();
+		} else if (isString(value)) {
+			return (Integer.parseInt((String) value));
 		}
 		throw new OrccRuntimeException("type mismatch in getIntValue");
 	}
