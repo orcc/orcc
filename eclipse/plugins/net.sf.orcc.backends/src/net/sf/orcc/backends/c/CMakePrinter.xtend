@@ -29,10 +29,17 @@
 package net.sf.orcc.backends.c
 
 import net.sf.orcc.df.Network
+import net.sf.orcc.df.Instance
 
 class CMakePrinter {
 	
-	def rootCMakePrinter(Network network) '''
+	val Network network
+	
+	new (Network network) {
+		this.network = network
+	}
+	
+	def rootCMakeContent() '''
 		# Generated from «network.simpleName»
 		
 		cmake_minimum_required (VERSION 2.6)
@@ -57,6 +64,29 @@ class CMakePrinter {
 		
 		add_subdirectory(${LIBS_DIR})
 		add_subdirectory(${SRC_DIR})
+	'''
+	
+	def srcCMakeContent() '''
+		# Generated from «network.simpleName»
+
+		cmake_minimum_required (VERSION 2.6)
+		
+		set(filenames
+			«network.simpleName».c
+			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+				«instance.name».c
+			«ENDFOR»
+		)
+		
+		find_package(Threads REQUIRED)
+		
+		find_package(SDL REQUIRED)
+		
+		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
+		
+		add_executable(«network.simpleName» ${filenames})
+				
+		target_link_libraries(«network.simpleName» orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 	'''
 	
 }

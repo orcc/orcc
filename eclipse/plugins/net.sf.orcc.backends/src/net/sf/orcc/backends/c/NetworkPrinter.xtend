@@ -34,12 +34,12 @@ import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
+import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.df.Port
 
 /**
- * Compile Top_network C source code 
+ * Compile top Network c source code 
  *  
  * @author Antoine Lorence
  * 
@@ -48,21 +48,27 @@ class NetworkPrinter extends CTemplate {
 	
 	val Network network;
 	val Map<String, Object> options
+	val int fifoSize;
 	
 	var boolean geneticAlgo = false
 	var boolean newSchedul = false
 	var boolean ringTopology = false
 	var int threadsNb = 1;
-	var int fifoSize;
 	
 	var int numberOfGroups
 	var Map sourceInstances
 	
-	new(Network network, Map<String, Object> options){
-		super()
+	new(Network network, Map<String, Object> options) {
 		this.network = network
 		this.options = options
 		
+		if (options.containsKey("fifoSize")) {
+			fifoSize = options.get("fifoSize") as Integer
+		} else {
+			fifoSize = 512
+			OrccLogger::warnln("fifoSize option is not set")
+		}
+
 		if (options.containsKey("useGeneticAlgorithm")) {
 			geneticAlgo = options.get("useGeneticAlgorithm") as Boolean
 			if (options.containsKey("threadsNb")) {
@@ -76,11 +82,6 @@ class NetworkPrinter extends CTemplate {
 		}
 		if (options.containsKey("ringTopology")) {
 			ringTopology = options.get("ringTopology") as Boolean
-		}
-		if (options.containsKey("fifoSize")) {
-			fifoSize = options.get("fifoSize") as Integer
-		} else {
-			OrccLogger::warnln("fifoSize option is not set")
 		}
 		
 		//Template datas :

@@ -45,17 +45,17 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.util.AbstractIrVisitor
 import net.sf.orcc.ir.util.ExpressionPrinter
-import net.sf.orcc.ir.util.IrSwitch
 import org.eclipse.emf.common.util.EList
 
 /*
- * Default Java Printer
+ * Default C Printer
  *  
  * @author Antoine Lorence
  * 
  */
-class CTemplate extends IrSwitch {
+class CTemplate extends AbstractIrVisitor<CharSequence> {
 	
 	ExpressionPrinter exprPrinter
 	

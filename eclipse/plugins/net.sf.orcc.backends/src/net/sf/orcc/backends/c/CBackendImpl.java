@@ -124,7 +124,6 @@ public class CBackendImpl extends AbstractBackend {
 
 	protected CPrinter xtendPrinter;
 
-
 	/**
 	 * Path to target "src" folder
 	 */
@@ -354,17 +353,24 @@ public class CBackendImpl extends AbstractBackend {
 
 		// print network
 		OrccLogger.trace("Printing network...");
-
-		if (!xtendPrinter.print(srcPath, network)) {
-			OrccLogger.warnRaw("Done\n");
-		} else {
+		if (xtendPrinter.print(srcPath, network)) {
 			OrccLogger.warnRaw("Error\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
 		}
 
 		// print CMakeLists
-		printCMake(network);
+		OrccLogger.traceln("Printing CMake project files");
+		CommonPrinter.printFile(new CMakePrinter(network).rootCMakeContent(),
+				path + File.separator + "CMakeLists.txt");
+		CommonPrinter.printFile(new CMakePrinter(network).srcCMakeContent(),
+				srcPath + File.separator + "CMakeLists.txt");
+
 		if (!useGeneticAlgo && targetToInstancesMap != null) {
-			printMapping(network);
+			OrccLogger.traceln("Printing mapping file");
+			CommonPrinter.printFile(
+					new XcfPrinter().compileXcfFile(targetToInstancesMap),
+					srcPath + File.separator + network.getName() + ".xcf");
 		}
 	}
 
@@ -432,25 +438,9 @@ public class CBackendImpl extends AbstractBackend {
 		return false;
 	}
 
-	protected void printCMake(Network network) {
-		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/c/CMakeLists.stg");
-		networkPrinter.print("CMakeLists.txt", srcPath, network);
-
-		networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/c/RootCMakeLists.stg");
-		networkPrinter.print("CMakeLists.txt", path, network);
-	}
-
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		return printer.print(instance.getName() + ".c", srcPath, instance);
-	}
-
-	protected void printMapping(Network network) {
-		CommonPrinter.printFile(
-				new XcfPrinter().compileXcfFile(network, targetToInstancesMap),
-				srcPath + File.separator + network.getName() + ".xcf");
+		return xtendPrinter.print(srcPath, instance);
 	}
 
 }

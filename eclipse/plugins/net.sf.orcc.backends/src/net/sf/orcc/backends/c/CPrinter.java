@@ -67,10 +67,10 @@ public class CPrinter extends CommonPrinter {
 		if (!needToReplace(targetActorFile, irFile)) {
 			return true;
 		}
-		CharSequence sequence = "";
-		// CharSequence sequence = new ActorPrinter(instance)
-		// .getActorFileContent();
-		if (!printFile(sequence, file)) {
+
+		CharSequence fileContent = new InstancePrinter(instance, options)
+				.getInstanceFileContent();
+		if (!printFile(fileContent, file)) {
 			throw new OrccRuntimeException("Unable to write file " + file);
 		}
 		return false;
@@ -94,14 +94,13 @@ public class CPrinter extends CommonPrinter {
 		if (!needToReplace(targetFile, newFile))
 			return true;
 
-		CharSequence sequence = new NetworkPrinter(network, options)
+		CharSequence fileContent = new NetworkPrinter(network, options)
 				.getNetworkFileContent();
 
-		if (!printFile(sequence, targetNetworkPath)) {
+		if (!printFile(fileContent, targetNetworkPath)) {
 			throw new OrccRuntimeException("Unable to write file "
 					+ targetNetworkPath);
 		}
 		return false;
 	}
-
 }

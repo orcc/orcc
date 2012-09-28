@@ -26,39 +26,43 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.util
+ package net.sf.orcc.backends.c
 
-import java.util.List
-import java.util.Map
 import net.sf.orcc.df.Instance
+import java.util.Map
 
-/**
- * Printer used to create the xcf file, containing information on
- * mapping between actors and processor cores
- * 
+/*
+ * Compile Instance c source code
+ *  
  * @author Antoine Lorence
  * 
  */
-class XcfPrinter {
+class InstancePrinter extends CTemplate {
 	
-	var i = 0
+	val Instance instance
 	
-	def compileXcfFile(Map<String, List<Instance>> coreToInstanceMap) '''
-		<?xml version="1.0" encoding="UTF-8"?>
-		<Configuration>
-			<Partitioning>
-				«FOR instances : coreToInstanceMap.values»
-					«instances.printPartition»
-				«ENDFOR»
-			</Partitioning>
-		</Configuration>
+	new(Instance instance, Map<String, Object> options) {
+		this.instance = instance
+	}
+	
+	def getInstanceFileContent() '''
+		// Source file is "«instance.actor.file»"
+		
+		#include <stdio.h>
+		#include <stdlib.h>
+		
+		#include "orcc_types.h"
+		#include "orcc_fifo.h"
+		#include "orcc_util.h"
+		#include "orcc_scheduler.h"
+		
+		#define SIZE <options.("fifoSize")>
+		<printAttributes(instance)>
+		
+		<if(options.newScheduler)>
+		#define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
+		<endif>
 	'''
+		
 	
-	def printPartition(List<Instance> instances) '''
-		<Partition id="« i = i + 1 »">
-			«FOR instance : instances»
-				<Instance id="«instance.name»"/>
-			«ENDFOR»
-		</Partition>
-	'''
 }
