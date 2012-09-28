@@ -94,7 +94,7 @@ public class ComplexHwOpDetector extends DfVisitor<Void> {
 		if (!detectedOps.isEmpty()) {
 			OrccLogger.warnln(detectedOps.toString()
 					+ " operation(s) detected in " + instance.getName()
-					+ " at line(s) " + operationsLines.toString() + ".\n");
+					+ " at line(s) " + operationsLines.toString() + ".");
 		}
 		return null;
 	}
