@@ -89,7 +89,7 @@ public class YacePrinter extends CommonPrinter {
 			if (keepUnchangedFiles) {
 				// if source file is older than target file, do not generate
 				long sourceLastModified;
-				if(instance.isActor()){
+				if (instance.isActor()) {
 					sourceLastModified = getLastModified(instance.getActor());
 				} else {
 					sourceLastModified = getLastModified(instance.getNetwork());
@@ -145,8 +145,7 @@ public class YacePrinter extends CommonPrinter {
 					.get("threads");
 
 			file = path + File.separator + network.getSimpleName() + ".xcf";
-			sequence = new XcfPrinter().compileXcfFile(network,
-					instanceToCoreMap);
+			sequence = new XcfPrinter().compileXcfFile(instanceToCoreMap);
 			printFile(sequence, file);
 		}
 
