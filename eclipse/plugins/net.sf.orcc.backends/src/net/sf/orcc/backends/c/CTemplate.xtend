@@ -30,6 +30,7 @@ package net.sf.orcc.backends.c
 
 import java.util.ArrayList
 import java.util.List
+import net.sf.orcc.backends.util.TemplateUtil
 import net.sf.orcc.df.Argument
 import net.sf.orcc.ir.Arg
 import net.sf.orcc.ir.ArgByRef
@@ -45,8 +46,6 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
-import net.sf.orcc.ir.util.AbstractIrVisitor
-import net.sf.orcc.ir.util.ExpressionPrinter
 import org.eclipse.emf.common.util.EList
 
 /*
@@ -55,9 +54,7 @@ import org.eclipse.emf.common.util.EList
  * @author Antoine Lorence
  * 
  */
-class CTemplate extends AbstractIrVisitor<CharSequence> {
-	
-	ExpressionPrinter exprPrinter
+class CTemplate extends TemplateUtil {
 	
 	new(){
 		this.exprPrinter = new CExpressionPrinter
@@ -167,12 +164,6 @@ class CTemplate extends AbstractIrVisitor<CharSequence> {
 			else from.sizeInBits
 		return sizeTo < sizeFrom
 	}
-	
-	/**
-	 * Print indexes list when accessing to an array (ex : "[INDEX][2][i + 1]" ) or when declare it
-	 */
-	def printArrayIndexes(List<Expression> list)
-		'''«FOR expr : list»[«expr.doSwitch»]«ENDFOR»'''
 	
 	/**
 	 * Print a variable declaration, with its modifiers (final, public/private),
