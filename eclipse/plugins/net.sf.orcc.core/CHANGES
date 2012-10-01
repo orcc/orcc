@@ -1,6 +1,10 @@
-1.2.1       unreleased
+1.2.2       unreleased
 ======================
 
+1.2.2       Oct 2012
+======================
+
+- Fix library extraction in C backend
 
 1.2.0       Sept 2012
 ======================
