@@ -28,13 +28,15 @@
  */
 package net.sf.orcc.backends.c;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.util.ExpressionPrinter;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class defines a C expression printer.
@@ -85,7 +87,18 @@ public class CExpressionPrinter extends ExpressionPrinter {
 
 	@Override
 	public String caseExprList(ExprList expr) {
-		throw new OrccRuntimeException("List expression not supported");
+		EList<Expression> value = expr.getValue();
+		String result = "{";
+		
+		for (int i = 0; i < value.size(); ++i) {
+			if (i > 0) {
+				result += ", ";
+			}
+			result += doSwitch(value.get(i));
+		}
+		result += "}";
+		
+		return result;
 	}
 
 }

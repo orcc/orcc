@@ -28,16 +28,8 @@
  */
 package net.sf.orcc.backends.c
 
-import java.util.ArrayList
-import java.util.List
 import net.sf.orcc.backends.util.TemplateUtil
-import net.sf.orcc.df.Argument
-import net.sf.orcc.ir.Arg
-import net.sf.orcc.ir.ArgByRef
-import net.sf.orcc.ir.ArgByVal
 import net.sf.orcc.ir.Expression
-import net.sf.orcc.ir.InstCall
-import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
 import net.sf.orcc.ir.TypeInt
@@ -45,8 +37,7 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
-import net.sf.orcc.ir.Var
-import org.eclipse.emf.common.util.EList
+import net.sf.orcc.ir.Type
 
 /*
  * Default C Printer
@@ -59,7 +50,6 @@ class CTemplate extends TemplateUtil {
 	new(){
 		this.exprPrinter = new CExpressionPrinter
 	}
-	
 	
 	/******************************************
 	 * 
@@ -104,91 +94,18 @@ class CTemplate extends TemplateUtil {
 	 * Helpers
 	 *
 	 *****************************************/
-	/**
-	 * Return true if this type object is used in a Fifo
-	 */
-	
-	 // Print actor arguments, when initializing it
-	def printArguments(EList<Var> actorParams, EList<Argument> arguments)
-		'''«FOR paramVar : actorParams SEPARATOR ", "»«arguments.findFirst([arg | arg.variable == paramVar]).value.doSwitch»«ENDFOR»'''
-	
-	/**
-	 * Print procedure parameter, when calling it. This helper may not
-	 * be used with "print" calls
-	 */
-	def printParameters(InstCall call) {
-		if(! call.parameters.empty) {
-			var List<CharSequence> finalList = new ArrayList<CharSequence>();
-			for( i : 0..call.parameters.size-1) {
-				val procParamType = call.procedure.parameters.get(i).variable.type
-				val callArgType =
-					if (call.parameters.get(i).byRef) {
-						(call.parameters.get(i) as ArgByRef).use.variable.type
-					} else {
-						(call.parameters.get(i) as ArgByVal).value.type
-					}
-				if(isCastNeeded(procParamType, callArgType)) {
-					finalList.add('''(«procParamType.doSwitch») («printParameter(call.parameters.get(i))»)''')
-				} else {
-					finalList.add('''«printParameter(call.parameters.get(i))»''')
-				}
-			}
-			'''«FOR arg : finalList SEPARATOR ", "»«arg»«ENDFOR»'''
+	 	
+	def printfFormat(Type type) {
+		switch type {
+			case type.bool: "i"
+			case type.float: "f"
+			case type.int && (type as TypeInt).long: "lli"
+			case type.int:"i"
+			case type.uint && (type as TypeUint).long: "llu"
+			case type.uint: "u"
+			case type.list: "p"
+			case type.string: "s"
+			case type.void: "p"
 		}
-	}
-	
-	/**
-	 * Print an argument of a call statement
-	 */
-	def printParameter(Arg arg) {
-		if(arg.byVal) {
-			if ((arg as ArgByVal).value.exprBinary) {
-				return '''(«(arg as ArgByVal).value.doSwitch»)'''
-			} else {
-				return (arg as ArgByVal).value.doSwitch
-			}
-		} else {
-			return (arg as ArgByRef).use.variable.name
-		}
-	}
-	
-	/**
-	 * Return true if size of type "to" is less than "from's" one
-	 */
-	def isCastNeeded(Type to, Type from) {
-		val sizeTo =
-			if(to.list) (to as TypeList).innermostType.sizeInBits
-			else to.sizeInBits
-		val sizeFrom =
-			if(from.list) (from as TypeList).innermostType.sizeInBits
-			else from.sizeInBits
-		return sizeTo < sizeFrom
-	}
-	
-	/**
-	 * Print a variable declaration, with its modifiers (final, public/private),
-	 * its type and its initial value (if any)
-	 */
-	def declareVariable(Var variable) {
-		
-		var modifier = ""
-		if(!variable.local){
-			modifier = if (variable.global) "public " else "private "
-			modifier = if(!variable.assignable) '''final «modifier»'''
-		}
-			
-		val initialization =
-			if(variable.initialized) {
-				''' = «variable.initialValue.doSwitch»'''
-			} else if (variable.value != null) {
-				''' = «variable.value»'''
-			} else if (variable.type.list) {
-				val type = variable.type as TypeList
-				''' = new «type.innermostType.doSwitch»«type.dimensionsExpr.printArrayIndexes»'''
-			}
-		
-		'''
-		«modifier»«variable.type.doSwitch» «variable.name»«initialization»;
-		'''
 	}
 }

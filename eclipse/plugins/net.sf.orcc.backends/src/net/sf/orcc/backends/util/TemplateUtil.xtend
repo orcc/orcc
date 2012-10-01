@@ -6,12 +6,13 @@ import net.sf.orcc.ir.Expression
 import java.util.List
 
 class TemplateUtil extends AbstractIrVisitor<CharSequence> {
-	protected ExpressionPrinter exprPrinter
 	
+	protected ExpressionPrinter exprPrinter
 		
 	/**
-	 * Print indexes list when accessing to an array (ex : "[INDEX][2][i + 1]" ) or when declare it
+	 * Print indexes list when accessing to an array (ex : <code>[INDEX][2][i + 1]</code>)
+	 * or when declaring it. If list is empty, return an empty string.
 	 */
-	def printArrayIndexes(List<Expression> list)
-		'''«FOR expr : list»[«expr.doSwitch»]«ENDFOR»'''
+	def printArrayIndexes(List<Expression> exprList)
+		'''«FOR expr : exprList»[«expr.doSwitch»]«ENDFOR»'''
 }
