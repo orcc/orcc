@@ -31,6 +31,7 @@ package net.sf.orcc.df.impl;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.EntityResolver;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -44,23 +45,28 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.resource.Resource;
 
 /**
- * This class is a default implementation of an entity resolver. This class may
- * serve as a base to other implementations of entity resolver.
+ * This class is a default, Eclipse-based implementation of an entity resolver.
+ * This class may serve as a base to other implementations of entity resolver.
  * 
  * @author Matthieu Wipliez
  * 
  */
 public class DefaultEntityResolverImpl implements EntityResolver {
 
+	private IFile file;
+
 	protected IProject project;
 
 	@Override
 	public void initialize(Resource resource) {
-		// cache project in which this resource is located
-		URI uri = resource.getURI();
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		String name = new Path(uri.toPlatformString(true)).segment(0);
-		project = root.getProject(name);
+		ResourcesPlugin plugin = ResourcesPlugin.getPlugin();
+		if (plugin != null) {
+			// cache project in which this resource is located
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			URI uri = resource.getURI();
+			file = root.getFile(new Path(uri.toPlatformString(true)));
+			project = file.getProject();
+		}
 	}
 
 	@Override
@@ -85,6 +91,18 @@ public class DefaultEntityResolverImpl implements EntityResolver {
 		instance.setEntity(proxy);
 		((InternalEObject) proxy).eSetProxyURI(uri);
 
+		return true;
+	}
+
+	@Override
+	public boolean setClassName(Network network) {
+		if (file == null) {
+			return false;
+		}
+
+		// set name using the IFile corresponding to the given Resource
+		String qName = OrccUtil.getQualifiedName(file);
+		network.setName(qName);
 		return true;
 	}
 

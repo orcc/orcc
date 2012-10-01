@@ -30,14 +30,12 @@ package net.sf.orcc.df;
 
 import org.eclipse.emf.ecore.resource.Resource;
 
-import net.sf.orcc.df.impl.DefaultEntityResolverImpl;
-import net.sf.orcc.df.util.XdfParser;
-
 /**
  * This interface defines how to resolve references to entities. A reference is
  * the qualified name (x.y.z) of an entity. Several resolvers can be registered
- * with the {@link XdfParser} class. See {@link DefaultEntityResolverImpl} for
- * the default implementation.
+ * with the {@link net.sf.orcc.df.util.XdfParser} class. See
+ * {@link net.sf.orcc.df.impl.DefaultEntityResolverImpl} for the default
+ * implementation.
  * 
  * @author Matthieu Wipliez
  * 
@@ -74,5 +72,15 @@ public interface EntityResolver {
 	 *         name
 	 */
 	boolean resolve(Instance instance, String className);
+
+	/**
+	 * Sets the class name of the given network based on the URI of the Resource
+	 * that was given to {@link #initialize(Resource)}.
+	 * 
+	 * @param network
+	 *            network whose class name
+	 * @return <code>true</code> if successful, <code>false</code> otherwise
+	 */
+	boolean setClassName(Network network);
 
 }

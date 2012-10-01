@@ -64,13 +64,8 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.DomUtil;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.UtilFactory;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -1069,15 +1064,25 @@ public class XdfParser {
 		// create network and add to resource
 		network = DfFactory.eINSTANCE.createNetwork();
 
-		// update name
+		// set class name with resolvers
+		int size = resolvers.size();
+		ListIterator<EntityResolver> it = resolvers.listIterator(size);
+		while (it.hasPrevious()) {
+			EntityResolver resolver = it.previous();
+			if (resolver.setClassName(network)) {
+				break;
+			}
+		}
+
+		// set file name based on the type of Resource
 		URI uri = resource.getURI();
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IFile file = root.getFile(new Path(uri.toPlatformString(true)));
+		if (uri.isPlatform()) {
+			network.setFileName(uri.toPlatformString(true));
+		} else {
+			network.setFileName(uri.toFileString());
+		}
 
-		String qName = OrccUtil.getQualifiedName(file);
-		network.setName(qName);
-		network.setFileName(file.getFullPath().toString());
-
+		// parses body
 		parseBody(xdfElement);
 
 		// add network to resource *after* it has been parsed
