@@ -37,22 +37,22 @@ import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
+import net.sf.orcc.ir.Arg
+import net.sf.orcc.ir.ArgByRef
+import net.sf.orcc.ir.ArgByVal
 import net.sf.orcc.ir.BlockBasic
 import net.sf.orcc.ir.BlockIf
 import net.sf.orcc.ir.BlockWhile
 import net.sf.orcc.ir.InstAssign
+import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.InstLoad
+import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.ir.InstCall
-import net.sf.orcc.ir.Arg
-import net.sf.orcc.ir.ArgByVal
-import net.sf.orcc.ir.ArgByRef
-import net.sf.orcc.ir.InstReturn
 
 /*
  * Compile Instance c source code
@@ -119,8 +119,10 @@ class InstancePrinter extends CTemplate {
 		«printAttributes»
 		
 		«IF newSchedul»
-			#define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
+			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
 		«ENDIF»
+		// #define PRINT_FIRINGS
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// Instance
 		extern struct actor_s «instance.name»;
@@ -194,30 +196,29 @@ class InstancePrinter extends CTemplate {
 		«FOR variable : instance.actor.stateVars»
 			«variable.declareStateVar»
 		«ENDFOR»
-		
 		«IF instance.actor.hasFsm»
-		////////////////////////////////////////////////////////////////////////////////
-		// Initial FSM state of the actor
-		enum states {
-			«FOR state : instance.actor.fsm.states SEPARATOR ","»
-				my_state_«state.name»
-			«ENDFOR»
-		};
-		
-		static char *stateNames[] = {
-			«FOR state : instance.actor.fsm.states SEPARATOR ","»
-				"«state.name»"
-			«ENDFOR»
-		};
-		
-		static enum states _FSM_state;
+			////////////////////////////////////////////////////////////////////////////////
+			// Initial FSM state of the actor
+			enum states {
+				«FOR state : instance.actor.fsm.states SEPARATOR ","»
+					my_state_«state.name»
+				«ENDFOR»
+			};
+			
+			static char *stateNames[] = {
+				«FOR state : instance.actor.fsm.states SEPARATOR ","»
+					"«state.name»"
+				«ENDFOR»
+			};
+			
+			static enum states _FSM_state;
 		«ENDIF»
-		
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
 		«FOR proc : instance.actor.procs»
 			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.map[variable.declare].join(", ")»);
 		«ENDFOR»
+		
 		«FOR proc : instance.actor.procs.filter[!native]»
 			«proc.print»
 		«ENDFOR»
@@ -247,11 +248,11 @@ class InstancePrinter extends CTemplate {
 		«IF instance.actor.hasFsm»
 			«printFsm»
 		«ELSE»
-			void <instance.name>_scheduler(struct schedinfo_s *si) {
+			void «instance.name»_scheduler(struct schedinfo_s *si) {
 				int i = 0;
 				si->ports = 0;
 			
-				<printCallTokenFunctions()>
+				«printCallTokensFunctions»
 				«IF enableTrace»
 					«printOpenFiles»
 				«ENDIF»
@@ -305,11 +306,20 @@ class InstancePrinter extends CTemplate {
 			«ENDIF»
 		
 			// jump to FSM state 
-			<printSwitch(fsm.states)>
+			switch (_FSM_state) {
+			«FOR state : instance.actor.fsm.states»
+				case my_state_«state.name»:
+					goto l_«state.name»;
+			«ENDFOR»
+			default:
+				printf("unknown state in «instance.name».c : %s\n", stateNames[_FSM_state]);
+				wait_for_key();
+				exit(1);
+			}
 		
 			// FSM transitions
 			«FOR state : instance.actor.fsm.states»
-				«state.printTransition»
+		«state.printTransition»
 			«ENDFOR»
 		finished:
 			«IF enableTrace»
@@ -325,8 +335,9 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	def printTransition(State state) '''
-		l_«state.name»:
-		«IF !instance.actor.actionsOutsideFsm.empty»
+	
+	l_«state.name»:
+		«IF ! instance.actor.actionsOutsideFsm.empty»
 			«instance.name»_outside_FSM_scheduler(si);
 			i += si->num_firings;
 		«ENDIF»
@@ -343,22 +354,43 @@ class InstancePrinter extends CTemplate {
 		«IF ! transitions.empty»
 			«actionTestState(state, transitions)»
 		«ELSE»
-			«/* TODO : printTransitionPattern(instance.actor.templateData.transitionPattern.(sourceState)) */»
+			«printTransitionPattern»
 			_FSM_state = my_state_«state.name»;
 			goto finished;
 		«ENDIF»
 	'''
 	
-	def actionTestState(State srcState, Iterable<Transition> transitions) '''
+	def printTransitionPattern() '''
+		«IF newSchedul»
+			
+		«ENDIF»
+		si->num_firings = i;
+		si->reason = starved;
+	'''
 	
-		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
-			«IF ! transitions.head.action.outputPattern.empty»
-			«printOutputPattern(transitions.head.action.outputPattern)»
-				_FSM_state = my_state_«srcState.name»;
-				si->num_firings = i;
-				si->reason = full;
-				goto finished;
+	def toto(State state) '''
+		if (numTokens_<port.name> - index_<port.name> \< <pattern.numTokensMap.(port)>) {
+			if(!<instance.name>.sched-\>round_robin || i \> 0) {
+				<if(instance.incomingPortMap.(port))>
+				sched_add_schedulable(<instance.name>.sched, &<instance.incomingPortMap.(port).source.name>, RING_TOPOLOGY);
+				<endif>
+		#ifdef PRINT_FIRINGS
+				printf("\tEmpty port: <port.name>\n");
+		#endif
 			}
+		}
+	'''
+
+	
+	def actionTestState(State srcState, Iterable<Transition> transitions) '''
+		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
+			«IF transitions.head.action.outputPattern != null»
+				«transitions.head.action.outputPattern.printOutputPattern»
+					_FSM_state = my_state_«srcState.name»;
+					si->num_firings = i;
+					si->reason = full;
+					goto finished;
+				}
 			«ENDIF»
 			«transitions.head.action.body.name»();
 			i++;
@@ -366,7 +398,6 @@ class InstancePrinter extends CTemplate {
 		} else {
 			«schedulingState(srcState, transitions.tail)»
 		}
-	
 	'''
 
 
@@ -386,16 +417,16 @@ class InstancePrinter extends CTemplate {
 			«FOR init : instance.actor.initializes»
 				«init.print»
 			«ENDFOR»
-		
-		static void initialize(struct schedinfo_s *si) {
-			int i = 0;
-				«instance.actor.initializes.printActions»
 			
-		finished:
-			// no read_end/write_end here!
-			return;
-		}
-		
+			static void initialize(struct schedinfo_s *si) {
+				int i = 0;
+				«instance.actor.initializes.printActions»
+				
+			finished:
+				// no read_end/write_end here!
+				return;
+			}
+			
 		«ENDIF»
 		void «instance.name»_initialize(«instance.actor.inputs.map['''unsigned int fifo_«name»_id'''].join(", ")») {
 			«IF ! instance.actor.initializes.empty»
@@ -403,9 +434,9 @@ class InstancePrinter extends CTemplate {
 				si.num_firings = 0;
 			«ENDIF»
 			«IF instance.actor.hasFsm»
-			
-			/* Set initial state to current FSM state */
-			_FSM_state = my_state_<instance.actor.fsm.initialState.name>;
+				
+				/* Set initial state to current FSM state */
+				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
 			«ENDIF»
 			
 			/* Set initial value to global variable */
@@ -418,9 +449,9 @@ class InstancePrinter extends CTemplate {
 				«port.initializeFifoId»
 			«ENDFOR»
 			«IF ! instance.actor.initializes.empty»
-			
-			/* Launch CAL initialize procedure */
-			initialize(&si);
+				
+				/* Launch CAL initialize procedure */
+				initialize(&si);
 			«ENDIF»
 		}
 	'''
@@ -453,17 +484,15 @@ class InstancePrinter extends CTemplate {
 		«IF !actions.empty»
 			«actionTest(actions.head, actions.tail)»
 		«ELSE»
-			«/* TODO : «instance.actor.templateData.inputPattern).printTransitionPattern» */»
+			«printTransitionPattern»
 			goto finished;
 		«ENDIF»
 	'''
-	
-	def printTransitionPattern() { }
 
 	
 	def actionTest(Action action, Iterable<Action> others) '''
 		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
-			«IF ! action.outputPattern.empty»
+			«IF action.outputPattern != null»
 				«action.outputPattern.printOutputPattern»
 					si->num_firings = i;
 					si->reason = full;
@@ -487,7 +516,7 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	def printOutputPatternsPort(Pattern pattern, Port port) {
-		var i = 0
+		var i = -1
 		'''
 			«FOR successor : instance.outgoingPortMap.get(port)»
 				«printOutputPatternPort(pattern, port, successor, i = i + 1)»
@@ -509,10 +538,8 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	
-	def checkInputPattern(Pattern pattern) '''
-		«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.numTokensMap.get(port)»  &&«ENDFOR»
-	'''
+	def checkInputPattern(Pattern pattern)
+		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.numTokensMap.get(port)» && «ENDFOR»'''
 	
 	def writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
@@ -553,11 +580,11 @@ class InstancePrinter extends CTemplate {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
-				
+			
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
 				«ENDFOR»
-				
+			
 				«FOR port : action.inputPattern.ports»
 					«IF enableTrace»
 					{
@@ -569,21 +596,22 @@ class InstancePrinter extends CTemplate {
 					«ENDIF»
 					index_«port.name» += «action.inputPattern.numTokensMap.get(port)»;
 				«ENDFOR»
+				
 				«FOR port : action.outputPattern.ports»
 					«IF enableTrace»
-					{
-						int i;
-						for (i = 0; i < «action.outputPattern.numTokensMap.get(port)»; i++) {
-							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+						{
+							int i;
+							for (i = 0; i < «action.outputPattern.numTokensMap.get(port)»; i++) {
+								fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+							}
 						}
-					}
 					«ENDIF»
-					
 					index_«port.name» += «action.outputPattern.numTokensMap.get(port)»;
 				«ENDFOR»
 			}
 			
 			«action.scheduler.print»
+			
 		'''
 		currentAction = null
 		return output
@@ -596,7 +624,7 @@ class InstancePrinter extends CTemplate {
 			«FOR variable : proc.locals»
 				«variable.declare»;
 			«ENDFOR»
-			
+		
 			«FOR block : proc.blocks»
 				«block.doSwitch»
 			«ENDFOR»
@@ -673,12 +701,11 @@ class InstancePrinter extends CTemplate {
 			«FOR thenBlock : block.thenBlocks»
 				«thenBlock.doSwitch»
 			«ENDFOR»
-		} «IF block.elseRequired» 
-			else {
-				«FOR elseBlock : block.elseBlocks»
-					«elseBlock.doSwitch»
-				«ENDFOR»
-			}
+		}«IF block.elseRequired» else {
+			«FOR elseBlock : block.elseBlocks»
+				«elseBlock.doSwitch»
+			«ENDFOR»
+		}
 		«ENDIF»
 	'''
 	
