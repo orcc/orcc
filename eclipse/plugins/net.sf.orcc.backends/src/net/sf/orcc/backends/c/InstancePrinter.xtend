@@ -282,7 +282,7 @@ class InstancePrinter extends CTemplate {
 	
 	def printCloseFiles() '''
 		«FOR port : instance.actor.inputs + instance.actor.outputs»
-			fclose(file_«port.name»;
+			fclose(file_«port.name»);
 		«ENDFOR»
 	'''
 	
