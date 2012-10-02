@@ -34,9 +34,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.math.BigInteger;
 
 import javax.swing.JFrame;
+
+import net.sf.orcc.runtime.impl.GenericDisplay;
 
 /**
  * This class defines native functions for the DisplayYUV actor.
@@ -44,7 +49,13 @@ import javax.swing.JFrame;
  * @author Matthieu Wipliez
  * 
  */
-public class Display {
+public class Display extends GenericDisplay {
+
+	private static RandomAccessFile in;
+
+	private static int frameNumber = 0;
+
+	private static boolean useCompare;
 
 	private static BufferStrategy buffer;
 
@@ -104,14 +115,82 @@ public class Display {
 	public static void compareYUV_comparePicture(byte[] pictureBufferY,
 			byte[] pictureBufferU, byte[] pictureBufferV,
 			BigInteger pictureWidth, BigInteger pictureHeight) {
+		int width = pictureWidth.intValue();
+		int height = pictureHeight.intValue();
 
+		byte[] Y = new byte[width * height];
+		byte[] U = new byte[width * height / 4];
+		byte[] V = new byte[width * height / 4];
+
+		if (useCompare) {
+			try {
+				int numErrors = 0;
+
+				System.out.println("Frame number " + frameNumber);
+				frameNumber++;
+
+				in.read(Y, 0, width * height);
+				in.read(U, 0, width * height / 4);
+				in.read(V, 0, width * height / 4);
+
+				numErrors += compareYUV_compareComponent(width, height, Y,
+						pictureBufferY, 16);
+				numErrors += compareYUV_compareComponent(width / 2, height / 2,
+						U, pictureBufferU, 8);
+				numErrors += compareYUV_compareComponent(width / 2, height / 2,
+						V, pictureBufferV, 8);
+
+				if (numErrors == 0) {
+					System.out.println("; no error detected !\n");
+				}
+
+				if (in.getFilePointer() == in.length()) {
+					in.seek(0L);
+					frameNumber = 0;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private static int compareYUV_compareComponent(int width, int height,
+			byte[] golden, byte[] approximate, int SizeMbSide) {
+		int pix_x, pix_y, blk_x, blk_y;
+		int error = 0;
+		int WidthSzInBlk = width / SizeMbSide;
+		int HeightSzInBlk = height / SizeMbSide;
+
+		for (blk_y = 0; blk_y < HeightSzInBlk; blk_y++) {
+			for (blk_x = 0; blk_x < WidthSzInBlk; blk_x++) {
+				for (pix_y = 0; pix_y < SizeMbSide; pix_y++) {
+					for (pix_x = 0; pix_x < SizeMbSide; pix_x++) {
+						int Idx_pix = (blk_y * SizeMbSide + pix_y) * width
+								+ (blk_x * SizeMbSide + pix_x);
+						if (golden[Idx_pix] - approximate[Idx_pix] != 0) {
+							error++;
+						}
+					}
+				}
+			}
+		}
+		return error;
 	}
 
 	/**
 	 * Init the YUV comparison.
 	 */
 	public static void compareYUV_init() {
-
+		useCompare = false;
+		if (!goldenReference.isEmpty()) {
+			try {
+				in = new RandomAccessFile(goldenReference, "r");
+				useCompare = true;
+			} catch (FileNotFoundException e) {
+				String msg = "file not found: \"" + goldenReference + "\"";
+				throw new RuntimeException(msg, e);
+			}
+		}
 	}
 
 	private static int convertYCbCrtoRGB(int y, int cb, int cr) {

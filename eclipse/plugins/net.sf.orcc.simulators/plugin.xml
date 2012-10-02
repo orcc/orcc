@@ -22,6 +22,15 @@
          </checkBox>
       </option>
       <option
+            description="Golden reference data to be compared"
+            id="net.sf.orcc.simulators.goldenReference"
+            name="Golden Reference">
+         <browseFile
+               folder="false"
+               workspace="false">
+         </browseFile>
+      </option>
+      <option
             description="Input data to be pushed to the CAL network we want to simulate"
             id="net.sf.orcc.simulators.inputStimulus"
             name="Input stimulus">
@@ -44,6 +53,9 @@
          </option>
          <option
                id="net.sf.orcc.simulators.inputStimulus">
+         </option>
+         <option
+               id="net.sf.orcc.simulators.goldenReference">
          </option>
       </simulator>
    </extension>
