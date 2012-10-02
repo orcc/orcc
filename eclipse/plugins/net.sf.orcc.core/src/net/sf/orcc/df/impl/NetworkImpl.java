@@ -593,9 +593,11 @@ public class NetworkImpl extends GraphImpl implements Network {
 		for (Vertex vertex : getChildren()) {
 			Actor candidate = vertex.getAdapter(Actor.class);
 			if (candidate == null) {
-				// vertex is a network or an instance of a network
 				Network network = vertex.getAdapter(Network.class);
-				instances.addAll(network.getInstancesOf(actor));
+				if (network != null) {
+					// if vertex is a network call getInstancesOf recursively
+					instances.addAll(network.getInstancesOf(actor));
+				}
 			} else if (candidate == actor) {
 				Instance instance = vertex.getAdapter(Instance.class);
 				if (instance != null) {
