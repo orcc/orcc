@@ -162,9 +162,9 @@ class NetworkPrinter extends CTemplate {
 
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
+		«/* TODO : replace 0 (2nd struct parameter) by <if(network.templateData.instanceNameToGroupIdMap.(instance.name))> <network.templateData.instanceNameToGroupIdMap.(instance.name)> <else>0<endif>*/»
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			«/* TODO : replace 0 (2nd struct parameter) by <if(network.templateData.instanceNameToGroupIdMap.(instance.name))> <network.templateData.instanceNameToGroupIdMap.(instance.name)> <else>0<endif>*/»
-			struct actor_s «instance.name» = {"«instance.name»", 0, «instance.name»_scheduler, «instance.actor.inputs.size», «instance.actor.outputs.size * 10», 0, 0, NULL, 0};
+			struct actor_s «instance.name» = {"«instance.name»", 0, «instance.name»_scheduler, «instance.actor.inputs.size»0, «instance.actor.outputs.size», 0, 0, NULL, 0};
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
@@ -197,7 +197,7 @@ class NetworkPrinter extends CTemplate {
 		void initialize_instances() {
 			«FOR instance : network.children.filter(typeof(Instance))»
 				«IF instance.isActor»
-					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ", "»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port) else "-1"»«ENDFOR»);
+					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).getAttribute("fifoId").value else "-1"»«ENDFOR»);
 				«ENDIF»
 			«ENDFOR»
 		}
@@ -328,23 +328,23 @@ class NetworkPrinter extends CTemplate {
 					si.num_firings = 0;
 					my_actor->sched_func(&si);
 		#ifdef PRINT_FIRINGS
-					printf("%2i  %5i\t%s\t%s\n", sched-\>id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
+					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 		#endif
 				}
 				«IF geneticAlgo»
-				++i;
-				if(i > STEP_BW_CHK) {
-					end = clock ();
-					timeout = ((end - start) / (double)CLOCKS_PER_SEC) >= TIMEOUT;
-					i = 0;
-				}
-				if(source_is_stopped() || timeout) {
-					semaphore_set(sched->sync->sem_monitor);
-					clean_cache(CACHE_SIZE);
-					semaphore_wait(sched->sem_thread);
-					timeout = 0;
-					start = clock ();
-				}
+					++i;
+					if(i > STEP_BW_CHK) {
+						end = clock();
+						timeout = ( (end - start) / (double) CLOCKS_PER_SEC) >= TIMEOUT;
+						i = 0;
+					}
+					if(source_is_stopped() || timeout) {
+						semaphore_set(sched->sync->sem_monitor);
+						clean_cache(CACHE_SIZE);
+						semaphore_wait(sched->sem_thread);
+						timeout = 0;
+						start = clock ();
+					}
 				«ENDIF»
 			}
 		}

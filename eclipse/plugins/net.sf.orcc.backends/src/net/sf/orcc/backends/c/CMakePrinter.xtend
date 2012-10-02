@@ -85,8 +85,7 @@ class CMakePrinter {
 		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
 		
 		add_executable(«network.simpleName» ${filenames})
-				
+		
 		target_link_libraries(«network.simpleName» orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 	'''
-	
 }
