@@ -624,6 +624,8 @@ public class XdfWriter {
 	 */
 	private void writeXDF(Element xdf, Network network) {
 		xdf.setAttribute("name", network.getSimpleName());
+		writeAttributes(xdf, network.getAttributes());
+
 		writePorts(xdf, "Input", network.getInputs());
 		writePorts(xdf, "Output", network.getOutputs());
 		writeDecls(xdf, "Param", network.getParameters());

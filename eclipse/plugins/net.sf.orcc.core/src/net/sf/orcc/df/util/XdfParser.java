@@ -732,6 +732,53 @@ public class XdfParser {
 	}
 
 	/**
+	 * Parses the given "Attribute" element.
+	 * 
+	 * @param attributes
+	 *            a list of attributes to fill
+	 * @param element
+	 *            an "Attribute" element
+	 */
+	private void parseAttribute(EList<Attribute> attributes, Element element) {
+		String kind = element.getAttribute("kind");
+		String attrName = element.getAttribute("name");
+		UtilFactory factory = UtilFactory.eINSTANCE;
+
+		Attribute attr;
+		if (kind.equals(XdfConstants.CUSTOM)) {
+			// find the first element child
+			Node child = element.getFirstChild();
+			while (child != null && child.getNodeType() != ELEMENT_NODE) {
+				child = child.getNextSibling();
+			}
+			if (child == null) {
+				return;
+			}
+
+			// serialize it to a String
+			String value = DomUtil.writeToString(child);
+			attr = factory.createAttribute(attrName, value);
+		} else if (kind.equals(XdfConstants.FLAG)) {
+			attr = factory.createAttribute(attrName, null);
+		} else if (kind.equals(XdfConstants.STRING)) {
+			String value = element.getAttribute("value");
+			attr = factory.createAttribute(attrName, value);
+		} else if (kind.equals(XdfConstants.TYPE)) {
+			Type type = typeParser.parseType(element.getFirstChild())
+					.getResult();
+			attr = factory.createAttribute(attrName, type);
+		} else if (kind.equals(XdfConstants.VALUE)) {
+			Expression expr = exprParser.parseExpr(element.getFirstChild());
+			attr = factory.createAttribute(attrName, expr);
+		} else {
+			throw new OrccRuntimeException("unsupported attribute kind: \""
+					+ kind + "\"");
+		}
+
+		attributes.add(attr);
+	}
+
+	/**
 	 * Parses the "Attribute" nodes.
 	 * 
 	 * @param attributes
@@ -744,44 +791,7 @@ public class XdfParser {
 		while (node != null) {
 			// only parses Attribute nodes, other nodes are ignored.
 			if (node.getNodeName().equals("Attribute")) {
-				Element attribute = (Element) node;
-				String kind = attribute.getAttribute("kind");
-				String attrName = attribute.getAttribute("name");
-				UtilFactory factory = UtilFactory.eINSTANCE;
-
-				Attribute attr;
-				if (kind.equals(XdfConstants.CUSTOM)) {
-					// find the first element child
-					Node child = node.getFirstChild();
-					while (child != null && child.getNodeType() != ELEMENT_NODE) {
-						child = child.getNextSibling();
-					}
-					if (child == null) {
-						continue;
-					}
-
-					// serialize it to a String
-					String value = DomUtil.writeToString(child);
-					attr = factory.createAttribute(attrName, value);
-				} else if (kind.equals(XdfConstants.FLAG)) {
-					attr = factory.createAttribute(attrName, null);
-				} else if (kind.equals(XdfConstants.STRING)) {
-					String value = attribute.getAttribute("value");
-					attr = factory.createAttribute(attrName, value);
-				} else if (kind.equals(XdfConstants.TYPE)) {
-					Type type = typeParser.parseType(attribute.getFirstChild())
-							.getResult();
-					attr = factory.createAttribute(attrName, type);
-				} else if (kind.equals(XdfConstants.VALUE)) {
-					Expression expr = exprParser
-							.parseExpr(node.getFirstChild());
-					attr = factory.createAttribute(attrName, expr);
-				} else {
-					throw new OrccRuntimeException(
-							"unsupported attribute kind: \"" + kind + "\"");
-				}
-
-				attributes.add(attr);
+				parseAttribute(attributes, (Element) node);
 			}
 
 			node = node.getNextSibling();
@@ -813,6 +823,8 @@ public class XdfParser {
 							"Package elements are not supported by Orcc yet");
 				} else if (name.equals("Port")) {
 					parsePort(element);
+				} else if (name.equals("Attribute")) {
+					parseAttribute(network.getAttributes(), element);
 				} else {
 					throw new OrccRuntimeException("invalid node \"" + name
 							+ "\"");
