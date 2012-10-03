@@ -66,6 +66,7 @@ import net.sf.orcc.backends.xlim.transform.XlimDeadVariableRemoval;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
@@ -299,6 +300,7 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		new CBroadcastAdder(getWriteListener()).doSwitch(network);
+		new ArgumentEvaluator().doSwitch(network);
 
 		return network;
 	}
