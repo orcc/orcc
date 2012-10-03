@@ -51,6 +51,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.OrccLogger;
 
 /**
  * This class contains several methods to build a hardware design.
@@ -176,48 +177,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	}
 
 	/**
-	 * Build a design from an actor to simulate it outside of a whole system.
-	 * 
-	 * @param actor
-	 *            The actor to evaluate
-	 * @param configuration
-	 *            A predefined configuration of the processors
-	 * @return A new design
-	 */
-	public Design build(Instance actor, ProcessorConfiguration configuration) {
-		this.componentMap = new HashMap<Vertex, Component>();
-		this.bufferMap = new HashMap<Component, Map<Component, Memory>>();
-		this.design = factory.createDesign();
-
-		Processor simProc = factory.createProcessor(actor.getName(),
-				configuration, 0);
-		design.add(simProc);
-
-		for (net.sf.orcc.df.Port port : actor.getActor().getInputs()) {
-			Processor writer = factory.createProcessor(port.getName(),
-					ProcessorConfiguration.STANDARD, 0);
-			design.add(writer);
-
-			Memory ram = connect(writer, simProc);
-			ram.getMappedConnections().add(actor.getIncomingPortMap().get(port));
-		}
-
-		for (net.sf.orcc.df.Port port : actor.getActor().getOutputs()) {
-			Processor reader = factory.createProcessor(port.getName(),
-					ProcessorConfiguration.STANDARD, 0);
-			design.add(reader);
-
-			Memory ram = connect(reader, simProc);
-			ram.getMappedConnections().add(
-					actor.getOutgoingPortMap().get(port).get(0));
-		}
-
-		new ArchitectureMemoryEstimator().doSwitch(design);
-
-		return design;
-	}
-
-	/**
 	 * Build a design from a network of actors, a predefined configuration of
 	 * the processors and finally the mapping of the actors on a set of
 	 * processors. The processors and their interconnections are instantiated
@@ -309,6 +268,13 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private void mapToBuffer(Connection connection) {
 		Processor source = (Processor) componentMap.get(connection.getSource());
 		Processor target = (Processor) componentMap.get(connection.getTarget());
+
+		if (source == null || target == null) {
+			// One of them is a network port.
+			OrccLogger.warnln("The given application cannot be synthesised "
+					+ "because it contains external FIFO port(s).");
+			return;
+		}
 
 		Memory ram;
 		Map<Component, Memory> tgtToBufferMap = null;
