@@ -40,6 +40,8 @@ def computeFileList():
     global fileList_all, fileList_reduce
 
     fileList_all = {
+
+        # MPEG-4 Part2 Simple Profile
         "mpeg" : [
             "MPEG4/SIMPLE/I-VOP/hit000",
             "MPEG4/SIMPLE/I-VOP/jvc000",
@@ -129,6 +131,10 @@ def computeFileList():
             "MPEG4/foreman_cif_xvid_384kbps_I_P",
             #"MPEG4/foreman_cif_xvid_384kbps_I_P_B",
             #"MPEG4/foreman_cif_xvid_700kbps_I_P_B",
+
+            ["MPEG4/foreman_qcif_30.bit", "MPEG4/foreman_qcif_30.yuv"],
+
+            #["MPEG4/old_town_cross_420_720p_MPEG4_SP_6Mbps.bit", "MPEG4/old_town_cross_420_720p_MPEG4_SP_6Mbps.yuv"]
             
             #"MPEG4/SIMPLE/P-VOP/jvc013",
             #"MPEG4/SIMPLE/P-VOP/hit012",
@@ -144,6 +150,7 @@ def computeFileList():
             "MPEG4/SIMPLE/P-VOP/san020"
         ],
     
+        # MPEG-4 Part10 / MPEG-4 AVC / H264
         "avc" : [
             ["AVC/CAVLC/general/AVCNL-1/NL1_Sony_D.jsv", "AVC/CAVLC/general/AVCNL-1/NL1_Sony_D.yuv"],
             ["AVC/CAVLC/general/AVCNL-2/SVA_NL1_B.264", "AVC/CAVLC/general/AVCNL-2/SVA_NL1_B_rec.yuv"],
@@ -189,7 +196,7 @@ def computeFileList():
     fileList_reduce = {
         "mpeg" : [
             "MPEG4/SIMPLE/P-VOP/hit001",
-            ["MPEG4/foreman_qcif_30.bit", "MPEG4/foreman_qcif_30.yuv"],
+            ["MPEG4/foreman_qcif_30.bit", "MPEG4/foreman_qcif_30.yuv"]
         ],
 
         "avc" : [
