@@ -28,10 +28,15 @@ endif
 endif>
 >>
 
-printCall(call,actor) ::= <%
+printNewLine() ::= <<
 
+
+>>
+
+printCall(call,actor) ::= <%
+<printNewLine()>
 <if(call.print)>
-printf(<call.parameters: printFormat()><call.parameters: printPrintfParam()>);
+printf(<call.parameters: printFormat()><call.parameters: printPrintfParam()>);<printNewLine()>
 <else>
 <if(call.target)>
 <call.target.variable.indexedName> = 
@@ -49,7 +54,7 @@ printf(<call.parameters: printFormat()><call.parameters: printPrintfParam()>);
 	<if (!actor.parameters.empty || !call.parameters.empty)>, <endif>
 	<actor.stateVars : printCallStateVarParam(); separator=", ">
 <endif>
-);
+); <printNewLine()>
 <endif>
 %>
 
