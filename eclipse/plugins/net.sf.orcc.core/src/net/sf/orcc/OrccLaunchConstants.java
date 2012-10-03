@@ -79,9 +79,10 @@ public interface OrccLaunchConstants {
 	 * (output)FIFO
 	 */
 	public static final String ENABLE_TRACES = "net.sf.orcc.simulators.enableTraces";
-	
+
 	/**
-	 * When enabled, interpreter compare the output of the decoder with a reference video.
+	 * When enabled, interpreter compare the output of the decoder with a
+	 * reference video.
 	 */
 	public static final String ENABLE_COMP = "net.sf.orcc.simulators.enableComparison";
 
@@ -94,7 +95,12 @@ public interface OrccLaunchConstants {
 	 * Input stimulus file associated with an Orcc configuration.
 	 */
 	public static final String INPUT_STIMULUS = "net.sf.orcc.simulators.inputStimulus";
-	
+
+	/**
+	 * Golden reference file associated with an Orcc configuration.
+	 */
+	public static final String GOLDEN_REFERENCE = "net.sf.orcc.simulators.goldenReference";
+
 	/**
 	 * Mapping associated with an Orcc configuration.
 	 */
@@ -134,7 +140,7 @@ public interface OrccLaunchConstants {
 	 * Simulator traces folder associated with an Orcc configuration
 	 */
 	public static final String TRACES_FOLDER = "net.sf.orcc.simulators.tracesFolder";
-	
+
 	/**
 	 * Simulator reference video for testing video output
 	 */
@@ -144,7 +150,7 @@ public interface OrccLaunchConstants {
 	 * Folder where the compiled Actors can be found.
 	 */
 	public static final String VTL_FOLDER = "net.sf.orcc.simulators.VTLFolder";
-	
+
 	/**
 	 * Input file associated with an Orcc configuration. Must be kept in sync
 	 * with options in the back-ends plug-in.
