@@ -88,4 +88,13 @@ public class CExpressionPrinter extends ExpressionPrinter {
 		throw new OrccRuntimeException("List expression not supported");
 	}
 
+	@Override
+	protected String toString(OpBinary op) {
+		if (op == OpBinary.DIV_INT) {
+			return "/";
+		} else {
+			return super.toString(op);
+		}
+	}
+
 }
