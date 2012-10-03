@@ -28,10 +28,12 @@
  */
  package net.sf.orcc.backends.c
 
+import java.util.HashMap
 import java.util.List
 import java.util.Map
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Connection
+import net.sf.orcc.df.DfFactory
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
@@ -72,9 +74,17 @@ class InstancePrinter extends CTemplate {
 	var boolean enableTrace = false
 	var int threadsNb = 1;
 	
+	val Pattern inputPattern
+	val Map<State, Pattern> transitionPattern
+	
 	var Action currentAction;
 	
 	new(Instance instance, Map<String, Object> options) {
+		
+		if ( ! instance.isActor) {
+			OrccLogger::severeln("Instance " + instance.name + " is not an Actor's instance")
+		}
+		
 		this.instance = instance
 		this.options = options
 		
@@ -102,6 +112,64 @@ class InstancePrinter extends CTemplate {
 		if (options.containsKey("enableTrace")) {
 			enableTrace = options.get("enableTrace") as Boolean
 		}
+		
+		inputPattern = buildInputPattern
+		transitionPattern = buildTransitionPattern
+	}
+	
+		
+	def buildInputPattern() {
+		val pattern = DfFactory::eINSTANCE.createPattern
+		
+		for (action : instance.actor.actionsOutsideFsm) {
+			val actionPattern = action.inputPattern
+			for (port : actionPattern.ports) {
+				var numTokens = pattern.getNumTokens(port);
+				if (numTokens == null) {
+					numTokens = actionPattern.getNumTokens(port);
+				} else {
+					numTokens = Math::max(numTokens, actionPattern.getNumTokens(port));
+				}
+
+				pattern.setNumTokens(port, numTokens);
+			}
+		}
+		
+		return pattern
+	}
+	
+	def buildTransitionPattern() {
+		
+		val transitionPattern = new HashMap<State, Pattern>
+		
+		val fsm = instance.actor.getFsm()
+		if (fsm == null) {
+			return null;
+		}
+
+		for (state : fsm.getStates()) {
+			val pattern = DfFactory::eINSTANCE.createPattern()
+			
+			for (edge : state.getOutgoing()) { 
+				val actionPattern = (edge as Transition).getAction.getInputPattern()
+				
+				for (Port port : actionPattern.getPorts()) {
+					
+					var numTokens = pattern.getNumTokens(port)
+					
+					if (numTokens == null) {
+						numTokens = actionPattern.getNumTokens(port)
+					} else {
+						numTokens = Math::max(numTokens, actionPattern.getNumTokens(port))
+					}
+
+					pattern.setNumTokens(port, numTokens)
+				}
+			}
+
+			transitionPattern.put(state, pattern)
+		}
+		return transitionPattern
 	}
 	
 	def getInstanceFileContent() '''
@@ -354,28 +422,30 @@ class InstancePrinter extends CTemplate {
 		«IF ! transitions.empty»
 			«actionTestState(state, transitions)»
 		«ELSE»
-			«printTransitionPattern»
+			«transitionPattern.get(state).printTransitionPattern»
 			_FSM_state = my_state_«state.name»;
 			goto finished;
 		«ENDIF»
 	'''
 	
-	def printTransitionPattern() '''
+	def printTransitionPattern(Pattern pattern) '''
 		«IF newSchedul»
-			
+			«FOR port : pattern.ports»
+				«printTransitionPatternPort(port, pattern)»
+			«ENDFOR»
 		«ENDIF»
 		si->num_firings = i;
 		si->reason = starved;
 	'''
 	
-	def toto(State state) '''
-		if (numTokens_<port.name> - index_<port.name> \< <pattern.numTokensMap.(port)>) {
-			if(!<instance.name>.sched-\>round_robin || i \> 0) {
-				<if(instance.incomingPortMap.(port))>
-				sched_add_schedulable(<instance.name>.sched, &<instance.incomingPortMap.(port).source.name>, RING_TOPOLOGY);
-				<endif>
+	def printTransitionPatternPort(Port port, Pattern pattern) '''
+		if (numTokens_«port.name» - index_«port.name» < «pattern.numTokensMap.get(port)») {
+			if( ! «instance.name».sched->round_robin || i > 0) {
+				«IF instance.incomingPortMap.containsKey(port)»
+					sched_add_schedulable(«instance.name».sched, &«(instance.incomingPortMap.get(port).source as Instance).name», RING_TOPOLOGY);
+				«ENDIF»
 		#ifdef PRINT_FIRINGS
-				printf("\tEmpty port: <port.name>\n");
+				printf("\tEmpty port: «port.name»\n");
 		#endif
 			}
 		}
@@ -484,7 +554,7 @@ class InstancePrinter extends CTemplate {
 		«IF !actions.empty»
 			«actionTest(actions.head, actions.tail)»
 		«ELSE»
-			«printTransitionPattern»
+			«printTransitionPattern(inputPattern)»
 			goto finished;
 		«ENDIF»
 	'''

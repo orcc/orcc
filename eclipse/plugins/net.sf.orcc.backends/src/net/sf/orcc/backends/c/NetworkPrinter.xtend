@@ -51,8 +51,10 @@ class NetworkPrinter extends CTemplate {
 	val int fifoSize;
 	
 	var boolean geneticAlgo = false
-	var boolean newSchedul = false
 	var boolean ringTopology = false
+	
+	var boolean newSchedul = false
+	
 	var int threadsNb = 1;
 	
 	var int numberOfGroups
@@ -71,11 +73,6 @@ class NetworkPrinter extends CTemplate {
 
 		if (options.containsKey("useGeneticAlgorithm")) {
 			geneticAlgo = options.get("useGeneticAlgorithm") as Boolean
-			if (options.containsKey("threadsNb")) {
-				threadsNb = options.get("threadsNb") as Integer
-			} else {
-				OrccLogger::warnln("Genetic algorithm options has been checked, but threadsNb option is not set")
-			}
 		}
 		if (options.containsKey("newScheduler")) {
 			newSchedul = options.get("newScheduler") as Boolean
@@ -83,7 +80,11 @@ class NetworkPrinter extends CTemplate {
 		if (options.containsKey("ringTopology")) {
 			ringTopology = options.get("ringTopology") as Boolean
 		}
+		if (options.containsKey("threadsNb")) {
+			threadsNb = options.get("threadsNb") as Integer
+		}
 		
+				
 		//Template datas :
 		numberOfGroups = -5
 		sourceInstances = new HashMap()
@@ -108,8 +109,10 @@ class NetworkPrinter extends CTemplate {
 		#include "orcc_scheduler.h"
 		#include "orcc_util.h"
 		
-		«IF geneticAlgo»
+		«IF geneticAlgo || threadsNb > 1»
 			#include "orcc_thread.h"
+		«ENDIF»
+		«IF geneticAlgo»
 			#include "orcc_genetic.h"
 			#define THREAD_NB «threadsNb»
 			#define POPULATION_SIZE 100
@@ -164,7 +167,7 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the actors array
 		«/* TODO : replace 0 (2nd struct parameter) by <if(network.templateData.instanceNameToGroupIdMap.(instance.name))> <network.templateData.instanceNameToGroupIdMap.(instance.name)> <else>0<endif>*/»
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			struct actor_s «instance.name» = {"«instance.name»", 0, «instance.name»_scheduler, «instance.actor.inputs.size»0, «instance.actor.outputs.size», 0, 0, NULL, 0};
+			struct actor_s «instance.name» = {"«instance.name»", 0, «instance.name»_scheduler, «instance.actor.inputs.size»0, «instance.actor.outputs.size», 0, 0, NULL, 0};			
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
@@ -206,7 +209,7 @@ class NetworkPrinter extends CTemplate {
 			int i, display_scheduler = -1;
 			
 			cpu_set_t cpuset;
-			«IF !geneticAlgo»
+			«IF ! geneticAlgo»
 				thread_struct threads[MAX_THREAD_NB];
 				thread_id_struct threads_id[MAX_THREAD_NB];
 				
@@ -241,13 +244,15 @@ class NetworkPrinter extends CTemplate {
 				}
 			«ENDIF»
 			
-			«IF newSchedul && !geneticAlgo»
+			«IF newSchedul && ! geneticAlgo»
 				«/* TODO : Check for sourceInstances in network's template maps.
 				 * It is the list or maps which must be used in this block
-				 */»
+				 
 				«FOR instance : (network.templateData as Map).keySet»
 					sched_add_schedulable(«(instance as Instance).name»>.sched, &«(instance as Instance).name», RING_TOPOLOGY);
 				«ENDFOR»
+				*/»
+				
 			«ENDIF»
 			
 			clear_cpu_set(cpuset);
@@ -302,6 +307,7 @@ class NetworkPrinter extends CTemplate {
 					«printFifoAssign(conn.target as Instance, conn.targetPort, conn.getAttribute("idNoBcast").value as Integer)»
 				«ENDIF»
 			«ENDFOR»
+			
 		«ENDFOR»
 	'''
 	
