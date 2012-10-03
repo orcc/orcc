@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.c
 
-import java.util.HashMap
 import java.util.Map
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
@@ -37,6 +36,7 @@ import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
+import java.util.HashMap
 
 /**
  * Compile top Network c source code 
@@ -57,8 +57,8 @@ class NetworkPrinter extends CTemplate {
 	
 	var int threadsNb = 1;
 	
-	var int numberOfGroups
-	var Map sourceInstances
+	val int numberOfGroups
+	val Map<Instance, Integer> instanceToIdMap
 	
 	new(Network network, Map<String, Object> options) {
 		this.network = network
@@ -83,11 +83,11 @@ class NetworkPrinter extends CTemplate {
 		if (options.containsKey("threadsNb")) {
 			threadsNb = options.get("threadsNb") as Integer
 		}
-		
 				
-		//Template datas :
-		numberOfGroups = -5
-		sourceInstances = new HashMap()
+		//Template data :
+		// TODO : set the right values when genetic algorithm will be fixed
+		numberOfGroups = 0
+		instanceToIdMap = computeInstanceToIdMap
 	}
 
 	def getNetworkFileContent() '''
@@ -165,9 +165,8 @@ class NetworkPrinter extends CTemplate {
 
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
-		«/* TODO : replace 0 (2nd struct parameter) by <if(network.templateData.instanceNameToGroupIdMap.(instance.name))> <network.templateData.instanceNameToGroupIdMap.(instance.name)> <else>0<endif>*/»
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			struct actor_s «instance.name» = {"«instance.name»", 0, «instance.name»_scheduler, «instance.actor.inputs.size»0, «instance.actor.outputs.size», 0, 0, NULL, 0};			
+			struct actor_s «instance.name» = {"«instance.name»", «numberOfGroups», «instance.name»_scheduler, «instance.actor.inputs.size»0, «instance.actor.outputs.size», 0, 0, NULL, 0};			
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
@@ -242,17 +241,6 @@ class NetworkPrinter extends CTemplate {
 				for(i=0; i < THREAD_NB; ++i){
 					sched_init(&schedulers[i], i, 0, NULL, &waiting_schedulables[i], &waiting_schedulables[(i+1) % THREAD_NB], THREAD_NB, &sched_sync);
 				}
-			«ENDIF»
-			
-			«IF newSchedul && ! geneticAlgo»
-				«/* TODO : Check for sourceInstances in network's template maps.
-				 * It is the list or maps which must be used in this block
-				 
-				«FOR instance : (network.templateData as Map).keySet»
-					sched_add_schedulable(«(instance as Instance).name»>.sched, &«(instance as Instance).name», RING_TOPOLOGY);
-				«ENDFOR»
-				*/»
-				
 			«ENDIF»
 			
 			clear_cpu_set(cpuset);
@@ -363,6 +351,7 @@ class NetworkPrinter extends CTemplate {
 			«ENDIF»
 		«ENDFOR»
 	'''
+	
 	def clearFifo(Connection connection) '''
 		«IF connection.source instanceof Actor»
 			fifo_«connection.sourcePort.type.doSwitch»_clear(&fifo_«connection.getAttribute("idNoBcast")»);
@@ -370,7 +359,6 @@ class NetworkPrinter extends CTemplate {
 			fifo_«connection.targetPort.type.doSwitch»_clear(&fifo_«connection.getAttribute("id")»);
 		«ENDIF»
 	'''
-
 
 	def allocateFifos(Instance instance) '''
 		«FOR connectionList : instance.outgoingPortMap.values»
@@ -389,4 +377,14 @@ class NetworkPrinter extends CTemplate {
 		«ENDIF»
 	'''
 
+	def computeInstanceToIdMap() {
+		val instanceToIdMap = new HashMap<Instance, Integer>
+		
+		for(instance : network.children.filter(typeof(Instance))) {
+			// TODO : compute the right value when genetic algorithm will be fixed
+			instanceToIdMap.put(instance, 0)
+		}
+		
+		return instanceToIdMap
+	}
 }

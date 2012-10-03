@@ -94,7 +94,6 @@ class CTemplate extends TemplateUtil {
 	 * Helpers
 	 *
 	 *****************************************/
-	 	
 	def printfFormat(Type type) {
 		switch type {
 			case type.bool: "i"
