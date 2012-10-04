@@ -35,7 +35,8 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.ir.util.ExpressionPrinter;
+
+import org.eclipse.core.resources.IFile;
 
 /**
  * This class defines a printer for "standard" objects, namely actors,
@@ -50,12 +51,6 @@ import net.sf.orcc.ir.util.ExpressionPrinter;
  */
 public class JavaPrinter extends CommonPrinter {
 
-	ExpressionPrinter exprPrinter;
-
-	public JavaPrinter() {
-		this(false);
-	}
-
 	public JavaPrinter(boolean keepUnchangedFiles) {
 		super(keepUnchangedFiles);
 		exprPrinter = new JavaExprPrinter();
@@ -65,25 +60,22 @@ public class JavaPrinter extends CommonPrinter {
 		return options;
 	}
 
-	/**
-	 * Prints the given instance to a file whose name and path are given.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param folder
-	 *            output directory
-	 * @param actor
-	 *            the actor to generate code for
-	 * @return <code>true</code> if the actor file was cached
+	 * @see net.sf.orcc.backends.CommonPrinter#print(java.lang.String,
+	 * net.sf.orcc.df.Instance)
 	 */
+	@Override
 	public boolean print(String folder, Actor actor) {
 		String file = folder + File.separator + actor.getSimpleName() + ".java";
 
+		IFile irFile = actor.getFile();
+		File targetActorFile = new File(file);
+
 		if (!actor.isNative()) {
-			if (keepUnchangedFiles) {
-				long sourceLastModified = getLastModified(actor);
-				File targetFile = new File(file);
-				if (sourceLastModified < targetFile.lastModified()) {
-					return true;
-				}
+			if (!needToReplace(targetActorFile, irFile)) {
+				return true;
 			}
 			CharSequence sequence = new ActorPrinter(actor)
 					.getActorFileContent();
@@ -94,34 +86,34 @@ public class JavaPrinter extends CommonPrinter {
 		return false;
 	}
 
-	/**
-	 * Prints the given network to a file whose name and path are given.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param folder
-	 *            output directory
-	 * @param network
-	 *            the network to generate code for
-	 * @return <code>true</code> if the network file was cached
+	 * @see net.sf.orcc.backends.CommonPrinter#print(java.lang.String,
+	 * net.sf.orcc.df.Instance)
 	 */
+	@Override
 	public boolean print(String folder, Network network) {
 
-		String file = folder + File.separator + network.getSimpleName()
+		String targetNetworkPath = folder + File.separator
+				+ network.getSimpleName()
 				+ ".java";
-		if (keepUnchangedFiles) {
-			// if source file is older than target file, do not generate
-			long sourceTimeStamp = network.getFile().getLocalTimeStamp();
-			File targetFile = new File(file);
-			if (sourceTimeStamp < targetFile.lastModified()) {
-				return true;
-			}
-		}
+
+		IFile newFile = network.getFile();
+		File targetFile = new File(targetNetworkPath);
+
+		if (!needToReplace(targetFile, newFile))
+			return true;
+
 		CharSequence sequence = new NetworkPrinter(network)
 				.getNetworkFileContent(options);
-		if (!printFile(sequence, file)) {
-			throw new OrccRuntimeException("Unable to write file " + file);
+		if (!printFile(sequence, targetNetworkPath)) {
+			throw new OrccRuntimeException("Unable to write file "
+					+ targetNetworkPath);
 		}
 		return false;
 	}
+
 
 	public void printEclipseProjectFiles(String folder, Network network) {
 		CharSequence sequence = "";

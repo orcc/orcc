@@ -30,6 +30,7 @@ package net.sf.orcc.backends.java
 
 import java.util.ArrayList
 import java.util.List
+import net.sf.orcc.backends.util.TemplateUtil
 import net.sf.orcc.df.Argument
 import net.sf.orcc.df.Port
 import net.sf.orcc.ir.Arg
@@ -46,8 +47,6 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
-import net.sf.orcc.ir.util.ExpressionPrinter
-import net.sf.orcc.ir.util.IrSwitch
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
@@ -57,9 +56,8 @@ import org.eclipse.emf.common.util.EList
  * @author Antoine Lorence
  * 
  */
-class JavaTemplate extends IrSwitch {
+class JavaTemplate extends TemplateUtil {
 	
-	ExpressionPrinter exprPrinter
 	
 	new(){
 		this.exprPrinter = new JavaExprPrinter
@@ -218,12 +216,6 @@ class JavaTemplate extends IrSwitch {
 			else from.sizeInBits
 		return sizeTo < sizeFrom
 	}
-	
-	/**
-	 * Print indexes list when accessing to an array (ex : "[INDEX][2][i + 1]" ) or when declare it
-	 */
-	def printArrayIndexes(List<Expression> list)
-		'''«FOR expr : list»[«expr.doSwitch»]«ENDFOR»'''
 	
 	/**
 	 * Print a variable declaration, with its modifiers (final, public/private),

@@ -31,7 +31,6 @@ package net.sf.orcc.backends.util
 import java.util.List
 import java.util.Map
 import net.sf.orcc.df.Instance
-import net.sf.orcc.df.Network
 
 /**
  * Printer used to create the xcf file, containing information on
@@ -44,7 +43,7 @@ class XcfPrinter {
 	
 	var i = 0
 	
-	def compileXcfFile(Network network, Map<String, List<Instance>> coreToInstanceMap) '''
+	def compileXcfFile(Map<String, List<Instance>> coreToInstanceMap) '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<Configuration>
 			<Partitioning>

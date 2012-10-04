@@ -37,7 +37,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 
 import org.eclipse.core.resources.IFile;
 
@@ -52,25 +54,26 @@ import org.eclipse.core.resources.IFile;
  * @author Antoine Lorence
  * 
  */
-public class CommonPrinter {
+public abstract class CommonPrinter {
 
 	protected boolean keepUnchangedFiles;
+	protected ExpressionPrinter exprPrinter;
 
 	protected Map<String, Object> options;
 
 	/**
-	 * Creates a new network printer.
+	 * Creates a new common printer.
 	 * 
 	 * @param templateName
 	 *            the name of the template
 	 */
 	protected CommonPrinter() {
-		options = new HashMap<String, Object>();
+		this(true);
 	}
 
 	protected CommonPrinter(boolean keepUnchangedFiles) {
-		this();
 		this.keepUnchangedFiles = keepUnchangedFiles;
+		options = new HashMap<String, Object>();
 	}
 
 	/**
@@ -118,6 +121,11 @@ public class CommonPrinter {
 
 	}
 
+	protected boolean needToReplace(File oldFile, IFile newFile) {
+		return !keepUnchangedFiles
+				|| newFile.getLocalTimeStamp() < oldFile.lastModified();
+	}
+
 	/**
 	 * Create a file and print content inside it. If parent folder doesn't
 	 * exists, create it.
@@ -156,5 +164,44 @@ public class CommonPrinter {
 	 */
 	public static boolean printFile(CharSequence content, String filePath) {
 		return printFile(content.toString(), filePath);
+	}
+	
+	/**
+	 * Prints the given actor to a file in the folder <i>folder</i>.
+	 * 
+	 * @param folder
+	 *            output directory
+	 * @param actor
+	 *            the actor to generate code for
+	 * @return <code>true</code> if the actor file was cached
+	 */
+	public boolean print(String folder, Actor actor) {
+		return true;
+	}
+
+	/**
+	 * Prints the given network to a file in the folder <i>folder</i>.
+	 * 
+	 * @param folder
+	 *            output directory
+	 * @param network
+	 *            the network to generate code for
+	 * @return <code>true</code> if the network file was cached
+	 */
+	public boolean print(String folder, Network network) {
+		return true;
+	}
+
+	/**
+	 * Prints the given instance to a file in the folder <i>folder</i>.
+	 * 
+	 * @param folder
+	 *            output directory
+	 * @param instance
+	 *            the instance to generate code for
+	 * @return <code>true</code> if the instance file was cached
+	 */
+	public boolean print(String folder, Instance instance) {
+		return true;
 	}
 }
