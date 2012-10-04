@@ -97,6 +97,10 @@ public class YaceBackend extends AbstractBackend {
 		replacementMap.put("max", "max_");
 		replacementMap.put("min", "min_");
 		replacementMap.put("select", "select_");
+		replacementMap.put("bitand", "bitand_");
+		replacementMap.put("bitor", "bitor_");
+		replacementMap.put("not", "not_");
+		replacementMap.put("and", "and_");
 		replacementMap.put("OUT", "OUT_");
 		replacementMap.put("IN", "IN_");
 		replacementMap.put("DEBUG", "DEBUG_");
