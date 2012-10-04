@@ -22,13 +22,21 @@
          </checkBox>
       </option>
       <option
-            description="Golden reference data to be compared"
+            defaultValue="false"
+            description="Golden reference to be compared with ouput data"
             id="net.sf.orcc.simulators.goldenReference"
             name="Golden Reference">
-         <browseFile
-               folder="false"
-               workspace="false">
-         </browseFile>
+         <checkBox>
+            <option
+                  description="Golden reference file to be compared"
+                  id="net.sf.orcc.simulators.goldenReferenceFile"
+                  name="Golden Reference File">
+               <browseFile
+                     folder="false"
+                     workspace="false">
+               </browseFile>
+            </option>
+         </checkBox>
       </option>
       <option
             description="Input data to be pushed to the CAL network we want to simulate"

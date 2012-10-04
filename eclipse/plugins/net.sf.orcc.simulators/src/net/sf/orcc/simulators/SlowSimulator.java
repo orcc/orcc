@@ -31,8 +31,9 @@ package net.sf.orcc.simulators;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE;
+import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE_FILE;
+import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
@@ -91,6 +92,8 @@ public class SlowSimulator extends AbstractSimulator {
 	protected List<IFolder> vtlFolders;
 
 	protected String xdfFile;
+
+	private boolean hasGoldenReference;
 
 	private String goldenReferenceFile;
 
@@ -193,8 +196,10 @@ public class SlowSimulator extends AbstractSimulator {
 		GenericSource.setInputStimulus(stimulusFile);
 		GenericSource.setWriteListener(getWriteListener());
 
-		GenericDisplay.setGoldenReference(goldenReferenceFile);
-		GenericDisplay.setWriteListener(getWriteListener());
+		if (hasGoldenReference) {
+			GenericDisplay.setGoldenReference(goldenReferenceFile);
+			GenericDisplay.setWriteListener(getWriteListener());
+		}
 
 		for (Vertex vertex : network.getChildren()) {
 			Actor actor = vertex.getAdapter(Actor.class);
@@ -207,7 +212,8 @@ public class SlowSimulator extends AbstractSimulator {
 	protected void initializeOptions() {
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		stimulusFile = getAttribute(INPUT_STIMULUS, "");
-		goldenReferenceFile = getAttribute(GOLDEN_REFERENCE, "");
+		hasGoldenReference = getAttribute(GOLDEN_REFERENCE, false);
+		goldenReferenceFile = getAttribute(GOLDEN_REFERENCE_FILE, "");
 		xdfFile = getAttribute(XDF_FILE, "");
 		String name = getAttribute(PROJECT, "");
 		enableTraces = getAttribute(ENABLE_TRACES, false);

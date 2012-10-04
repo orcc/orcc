@@ -97,9 +97,14 @@ public interface OrccLaunchConstants {
 	public static final String INPUT_STIMULUS = "net.sf.orcc.simulators.inputStimulus";
 
 	/**
-	 * Golden reference file associated with an Orcc configuration.
+	 * When set, a golden reference has to be compared with the ouput data of the network.
 	 */
 	public static final String GOLDEN_REFERENCE = "net.sf.orcc.simulators.goldenReference";
+
+	/**
+	 * Golden reference file associated with an Orcc configuration.
+	 */
+	public static final String GOLDEN_REFERENCE_FILE = "net.sf.orcc.simulators.goldenReferenceFile";
 
 	/**
 	 * Mapping associated with an Orcc configuration.
