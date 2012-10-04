@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2012, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,6 @@ import java.util.logging.Level;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CommonPrinter;
-import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.DivisionSubstitution;
@@ -72,6 +71,7 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
@@ -100,6 +100,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * 
  * @author Matthieu Wipliez
  * @author Herve Yviquel
+ * @author Antoine Lorence
  * 
  */
 public class CBackendImpl extends AbstractBackend {
@@ -117,8 +118,8 @@ public class CBackendImpl extends AbstractBackend {
 
 	protected boolean newScheduler;
 	protected boolean mergeActions;
-	protected StandardPrinter printer;
 	protected boolean ringTopology;
+	protected CPrinter printer;
 
 	/**
 	 * Path to target "src" folder
@@ -173,17 +174,15 @@ public class CBackendImpl extends AbstractBackend {
 				"net.sf.orcc.backends.newScheduler.topology", "Ring");
 		ringTopology = topology.equals("Ring");
 
-		printer = new StandardPrinter("net/sf/orcc/backends/c/Actor.stg",
-				!debug);
-		printer.setExpressionPrinter(new CExpressionPrinter());
-		printer.setTypePrinter(new CTypePrinter());
+		printer = new CPrinter(!debug);
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.getOptions().put("enableTrace", enableTrace);
 		printer.getOptions().put("ringTopology", ringTopology);
 		printer.getOptions().put("newScheduler", newScheduler);
 
 		if (debug) {
-			OrccLogger.setLevel(Level.ALL);
+			OrccLogger.setLevel(Level.FINEST);
+			OrccLogger.debugln("Debug mode is enabled");
 		}
 
 		// Set build and src directory
@@ -272,7 +271,7 @@ public class CBackendImpl extends AbstractBackend {
 			if (debug) {
 				ResourceSet set = new ResourceSetImpl();
 				if (!IrUtil.serializeActor(set, srcPath, actor)) {
-					System.err.println("Error with " + transformation
+					OrccLogger.warnln("Error with " + transformation
 							+ " on actor " + actor.getName());
 				}
 			}
@@ -322,11 +321,6 @@ public class CBackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/c/Network.stg");
-		printer.setExpressionPrinter(new CExpressionPrinter());
-		printer.setTypePrinter(new CTypePrinter());
-
 		for (String component : mapping.values()) {
 			if (!component.isEmpty()) {
 				targetToInstancesMap = new HashMap<String, List<Instance>>();
@@ -344,16 +338,33 @@ public class CBackendImpl extends AbstractBackend {
 		computeOptions(printer.getOptions());
 
 		// print instances
-		printInstances(network);
+		// printInstances(network);
+
+		for (Vertex v : network.getChildren()) {
+			Instance i = v.getAdapter(Instance.class);
+			printInstance(i);
+		}
 
 		// print network
-		OrccLogger.traceln("Printing network...");
-		printer.print(network.getSimpleName() + ".c", srcPath, network);
+		OrccLogger.trace("Printing network...");
+		if (printer.print(srcPath, network)) {
+			OrccLogger.warnRaw("Error\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
 
 		// print CMakeLists
-		printCMake(network);
+		OrccLogger.traceln("Printing CMake project files");
+		CommonPrinter.printFile(new CMakePrinter(network).rootCMakeContent(),
+				path + File.separator + "CMakeLists.txt");
+		CommonPrinter.printFile(new CMakePrinter(network).srcCMakeContent(),
+				srcPath + File.separator + "CMakeLists.txt");
+
 		if (!useGeneticAlgo && targetToInstancesMap != null) {
-			printMapping(network);
+			OrccLogger.traceln("Printing mapping file");
+			CommonPrinter.printFile(
+					new XcfPrinter().compileXcfFile(targetToInstancesMap),
+					srcPath + File.separator + network.getName() + ".xcf");
 		}
 	}
 
@@ -421,25 +432,9 @@ public class CBackendImpl extends AbstractBackend {
 		return false;
 	}
 
-	protected void printCMake(Network network) {
-		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/c/CMakeLists.stg");
-		networkPrinter.print("CMakeLists.txt", srcPath, network);
-
-		networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/c/RootCMakeLists.stg");
-		networkPrinter.print("CMakeLists.txt", path, network);
-	}
-
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		return printer.print(instance.getName() + ".c", srcPath, instance);
-	}
-
-	protected void printMapping(Network network) {
-		CommonPrinter.printFile(
-				new XcfPrinter().compileXcfFile(network, targetToInstancesMap),
-				srcPath + File.separator + network.getName() + ".xcf");
+		return printer.print(srcPath, instance);
 	}
 
 }
