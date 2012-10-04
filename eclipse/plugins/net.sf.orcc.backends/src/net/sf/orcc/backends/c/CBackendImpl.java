@@ -275,10 +275,6 @@ public class CBackendImpl extends AbstractBackend {
 				}
 			}
 		}
-
-		CActorTemplateData data = new CActorTemplateData();
-		data.computeTemplateMaps(actor);
-		actor.setTemplateData(data);
 	}
 
 	protected Network doTransformNetwork(Network network) throws OrccException {
