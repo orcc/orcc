@@ -47,7 +47,6 @@ import java.util.HashMap
 class NetworkPrinter extends CTemplate {
 	
 	val Network network;
-	val Map<String, Object> options
 	val int fifoSize;
 	
 	var boolean geneticAlgo = false
@@ -62,7 +61,6 @@ class NetworkPrinter extends CTemplate {
 	
 	new(Network network, Map<String, Object> options) {
 		this.network = network
-		this.options = options
 		
 		if (options.containsKey("fifoSize")) {
 			fifoSize = options.get("fifoSize") as Integer
