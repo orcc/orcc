@@ -71,7 +71,6 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
@@ -338,12 +337,7 @@ public class CBackendImpl extends AbstractBackend {
 		computeOptions(printer.getOptions());
 
 		// print instances
-		// printInstances(network);
-
-		for (Vertex v : network.getChildren()) {
-			Instance i = v.getAdapter(Instance.class);
-			printInstance(i);
-		}
+		printInstances(network);
 
 		// print network
 		OrccLogger.trace("Printing network...");
