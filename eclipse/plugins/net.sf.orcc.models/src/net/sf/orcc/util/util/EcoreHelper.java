@@ -30,8 +30,6 @@
 package net.sf.orcc.util.util;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -57,20 +55,6 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
  * 
  */
 public class EcoreHelper {
-
-	private static Field modCount;
-
-	static {
-		try {
-			modCount = AbstractList.class.getDeclaredField("modCount");
-
-			// set accessible
-			modCount.setAccessible(true);
-		} catch (Exception e) {
-			// should never happen
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Returns the container of <code>ele</code> with the given type, or
@@ -184,27 +168,6 @@ public class EcoreHelper {
 		EClass eClass = eObject.eClass();
 		EStructuralFeature feature = eClass.getEStructuralFeature(name);
 		return (List<T>) eObject.eGet(feature);
-	}
-
-	/**
-	 * Returns the "modCount" of the given object. The object must extend
-	 * AbstractList. If the field cannot be retrieved,
-	 * <code>(int) System.currentTimeMillis()</code> is returned.
-	 * 
-	 * @param obj
-	 *            an object that is supposed to extend AbstractList
-	 * @return the modCount if available, or a timestamp
-	 */
-	public static int getModCount(Object obj) {
-		if (obj instanceof AbstractList<?>) {
-			try {
-				return modCount.getInt(obj);
-			} catch (Exception e) {
-				// should never happen
-				e.printStackTrace();
-			}
-		}
-		return (int) System.currentTimeMillis();
 	}
 
 	/**
