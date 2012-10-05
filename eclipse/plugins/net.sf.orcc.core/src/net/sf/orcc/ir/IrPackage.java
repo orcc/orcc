@@ -2756,6 +2756,24 @@ public interface IrPackage extends EPackage {
 	int CFG__OUTGOING = GraphPackage.GRAPH__OUTGOING;
 
 	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__PREDECESSORS = GraphPackage.GRAPH__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__SUCCESSORS = GraphPackage.GRAPH__SUCCESSORS;
+
+	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2854,6 +2872,24 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int CFG_NODE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__PREDECESSORS = GraphPackage.VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
 
 	/**
 	 * The feature id for the '<em><b>Node</b></em>' reference.

@@ -316,6 +316,24 @@ public interface DfPackage extends EPackage {
 	int PORT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__PREDECESSORS = GraphPackage.VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -401,6 +419,24 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int INSTANCE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__PREDECESSORS = GraphPackage.VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
 
 	/**
 	 * The feature id for the '<em><b>Arguments</b></em>' containment reference list.
@@ -553,6 +589,24 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ACTOR__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__PREDECESSORS = GraphPackage.VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
 
 	/**
 	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
@@ -733,6 +787,24 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int NETWORK__OUTGOING = GraphPackage.GRAPH__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__PREDECESSORS = GraphPackage.GRAPH__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__SUCCESSORS = GraphPackage.GRAPH__SUCCESSORS;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
@@ -1013,6 +1085,24 @@ public interface DfPackage extends EPackage {
 	int FSM__OUTGOING = GraphPackage.GRAPH__OUTGOING;
 
 	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__PREDECESSORS = GraphPackage.GRAPH__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__SUCCESSORS = GraphPackage.GRAPH__SUCCESSORS;
+
+	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1144,6 +1234,24 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int STATE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__PREDECESSORS = GraphPackage.VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
 
 	/**
 	 * The number of structural features of the '<em>State</em>' class. <!--

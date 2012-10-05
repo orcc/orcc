@@ -42,16 +42,16 @@ import org.eclipse.emf.ecore.EObject;
  * <!-- begin-user-doc -->This class defines an instance. An instance has an id,
  * a class, parameters and attributes. The class of the instance points to an
  * actor or a network.<!-- end-user-doc -->
- * 
+ *
  * <p>
  * The following features are supported:
  * <ul>
- * <li>{@link net.sf.orcc.df.Instance#getArguments <em>Arguments</em>}</li>
- * <li>{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}</li>
- * <li>{@link net.sf.orcc.df.Instance#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Instance#getArguments <em>Arguments</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Instance#getName <em>Name</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see net.sf.orcc.df.DfPackage#getInstance()
  * @model
  * @generated
@@ -175,11 +175,9 @@ public interface Instance extends Vertex, Adaptable {
 	void setEntity(EObject value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getName
-	 * <em>Name</em>}' attribute. <!-- begin-user-doc --><!-- end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Name</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
 	 */
