@@ -72,25 +72,6 @@ printDesign(design, options) ::= <<
     \<!--                  --\>
     \<!-- Other components.--\>
     \<!--                  --\>
-    \<file xil_pn:name="wrapper/xilinx_fifo.vhd" xil_pn:type="FILE_VHDL"\>
-      \<association xil_pn:name="BehavioralSimulation"/\>
-      \<association xil_pn:name="Implementation"/\>
-    \</file\>
-    \<file xil_pn:name="wrapper/fifo_br.ngc" xil_pn:type="FILE_NGC"\>
-      \<association xil_pn:name="Implementation"/\>
-    \</file\>
-    \<file xil_pn:name="wrapper/broadcast.vhd" xil_pn:type="FILE_VHDL"\>
-      \<association xil_pn:name="BehavioralSimulation"/\>
-      \<association xil_pn:name="Implementation"/\>
-    \</file\>
-    \<file xil_pn:name="wrapper/broadcast_2.vhd" xil_pn:type="FILE_VHDL"\>
-      \<association xil_pn:name="BehavioralSimulation"/\>
-      \<association xil_pn:name="Implementation"/\>
-    \</file\>
-    \<file xil_pn:name="wrapper/broadcast_6.vhd" xil_pn:type="FILE_VHDL"\>
-      \<association xil_pn:name="BehavioralSimulation"/\>
-      \<association xil_pn:name="Implementation"/\>
-    \</file\>
     \<file xil_pn:name="interface/counter.vhd" xil_pn:type="FILE_VHDL"\>
       \<association xil_pn:name="BehavioralSimulation"/\>
       \<association xil_pn:name="Implementation"/\>
