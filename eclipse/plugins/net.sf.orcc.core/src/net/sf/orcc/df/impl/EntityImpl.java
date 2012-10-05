@@ -79,22 +79,20 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private static class ConnectionListAdapter extends AdapterImpl {
+	private class ConnectionListAdapter extends AdapterImpl {
 
 		@Override
 		public void notifyChanged(Notification msg) {
 			Object feature = msg.getFeature();
-
-			EntityImpl entity = (EntityImpl) target;
-			if (entity.incomingPortMap != null) {
+			if (incomingPortMap != null) {
 				if (feature == GraphPackage.Literals.VERTEX__INCOMING) {
-					entity.incomingPortMap = null;
+					incomingPortMap = null;
 				}
 			}
 
-			if (entity.outgoingPortMap != null) {
+			if (outgoingPortMap != null) {
 				if (feature == GraphPackage.Literals.VERTEX__OUTGOING) {
-					entity.outgoingPortMap = null;
+					outgoingPortMap = null;
 				}
 			}
 		}
