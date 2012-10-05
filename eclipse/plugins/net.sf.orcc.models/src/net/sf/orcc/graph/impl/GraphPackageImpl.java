@@ -183,6 +183,24 @@ public class GraphPackageImpl extends EPackageImpl implements GraphPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getVertex_Predecessors() {
+		return (EReference) vertexEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getVertex_Successors() {
+		return (EReference) vertexEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EAttribute getVertex_Number() {
 		return (EAttribute) vertexEClass.getEStructuralFeatures().get(2);
 	}
@@ -270,6 +288,8 @@ public class GraphPackageImpl extends EPackageImpl implements GraphPackage {
 		createEAttribute(vertexEClass, VERTEX__LABEL);
 		createEAttribute(vertexEClass, VERTEX__NUMBER);
 		createEReference(vertexEClass, VERTEX__OUTGOING);
+		createEReference(vertexEClass, VERTEX__PREDECESSORS);
+		createEReference(vertexEClass, VERTEX__SUCCESSORS);
 
 		edgeEClass = createEClass(EDGE);
 		createEAttribute(edgeEClass, EDGE__LABEL);
@@ -346,6 +366,16 @@ public class GraphPackageImpl extends EPackageImpl implements GraphPackage {
 				this.getEdge_Source(), "outgoing", null, 0, -1, Vertex.class,
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
 				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
+		initEReference(getVertex_Predecessors(), this.getVertex(), null,
+				"predecessors", null, 0, -1, Vertex.class, IS_TRANSIENT,
+				!IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE,
+				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
+		initEReference(getVertex_Successors(), this.getVertex(), null,
+				"successors", null, 0, -1, Vertex.class, IS_TRANSIENT,
+				!IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE,
+				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
 
 		initEClass(edgeEClass, Edge.class, "Edge", !IS_ABSTRACT, !IS_INTERFACE,

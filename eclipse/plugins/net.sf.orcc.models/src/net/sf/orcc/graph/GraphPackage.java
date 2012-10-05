@@ -127,13 +127,31 @@ public interface GraphPackage extends EPackage {
 	int VERTEX__OUTGOING = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__PREDECESSORS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__SUCCESSORS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
+
+	/**
 	 * The number of structural features of the '<em>Vertex</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
+	int VERTEX_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -179,6 +197,24 @@ public interface GraphPackage extends EPackage {
 	 * @ordered
 	 */
 	int GRAPH__OUTGOING = VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAPH__PREDECESSORS = VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAPH__SUCCESSORS = VERTEX__SUCCESSORS;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
@@ -327,6 +363,28 @@ public interface GraphPackage extends EPackage {
 	EReference getVertex_Outgoing();
 
 	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.graph.Vertex#getPredecessors <em>Predecessors</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Predecessors</em>'.
+	 * @see net.sf.orcc.graph.Vertex#getPredecessors()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_Predecessors();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.graph.Vertex#getSuccessors <em>Successors</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Successors</em>'.
+	 * @see net.sf.orcc.graph.Vertex#getSuccessors()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_Successors();
+
+	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.graph.Vertex#getNumber <em>Number</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -464,6 +522,22 @@ public interface GraphPackage extends EPackage {
 		 * @generated
 		 */
 		EReference VERTEX__OUTGOING = eINSTANCE.getVertex_Outgoing();
+
+		/**
+		 * The meta object literal for the '<em><b>Predecessors</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__PREDECESSORS = eINSTANCE.getVertex_Predecessors();
+
+		/**
+		 * The meta object literal for the '<em><b>Successors</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__SUCCESSORS = eINSTANCE.getVertex_Successors();
 
 		/**
 		 * The meta object literal for the '<em><b>Number</b></em>' attribute feature.

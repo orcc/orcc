@@ -16,14 +16,15 @@ import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.impl.AttributableImpl;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -37,12 +38,36 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getLabel <em>Label</em>}</li>
  *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getNumber <em>Number</em>}</li>
  *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getOutgoing <em>Outgoing</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getPredecessors <em>Predecessors</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getSuccessors <em>Successors</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class VertexImpl extends AttributableImpl implements Vertex {
+
+	private static class PredSuccAdapter extends AdapterImpl {
+
+		@Override
+		public void notifyChanged(Notification msg) {
+			Object feature = msg.getFeature();
+
+			VertexImpl vertex = (VertexImpl) target;
+			if (vertex.predecessors != null) {
+				if (feature == GraphPackage.Literals.VERTEX__INCOMING) {
+					vertex.predecessors = null;
+				}
+			}
+
+			if (vertex.successors != null) {
+				if (feature == GraphPackage.Literals.VERTEX__OUTGOING) {
+					vertex.successors = null;
+				}
+			}
+		}
+
+	}
 
 	/**
 	 * The cached value of the '{@link #getIncoming() <em>Incoming</em>}' reference list.
@@ -55,8 +80,7 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 
 	/**
 	 * The default value of the '{@link #getLabel() <em>Label</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLabel()
 	 * @generated
 	 * @ordered
@@ -65,8 +89,7 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 
 	/**
 	 * The cached value of the '{@link #getLabel() <em>Label</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLabel()
 	 * @generated
 	 * @ordered
@@ -75,8 +98,7 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 
 	/**
 	 * The default value of the '{@link #getNumber() <em>Number</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getNumber()
 	 * @generated
 	 * @ordered
@@ -85,8 +107,7 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 
 	/**
 	 * The cached value of the '{@link #getNumber() <em>Number</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getNumber()
 	 * @generated
 	 * @ordered
@@ -102,20 +123,30 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	 */
 	protected EList<Edge> outgoing;
 
-	private List<Vertex> predecessors;
+	/**
+	 * The cached value of the '{@link #getPredecessors() <em>Predecessors</em>}
+	 * ' reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getPredecessors()
+	 * @ordered
+	 */
+	protected EList<Vertex> predecessors;
 
-	private int predecessorsModCount;
-
-	private List<Vertex> successors;
-
-	private int successorsModCount;
+	/**
+	 * The cached value of the '{@link #getSuccessors() <em>Successors</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getSuccessors()
+	 * @ordered
+	 */
+	protected EList<Vertex> successors;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
 	 */
 	protected VertexImpl() {
 		super();
+		eAdapters().add(new PredSuccAdapter());
 	}
 
 	/**
@@ -133,6 +164,10 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 			return getNumber();
 		case GraphPackage.VERTEX__OUTGOING:
 			return getOutgoing();
+		case GraphPackage.VERTEX__PREDECESSORS:
+			return getPredecessors();
+		case GraphPackage.VERTEX__SUCCESSORS:
+			return getSuccessors();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -190,6 +225,10 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 			return number != NUMBER_EDEFAULT;
 		case GraphPackage.VERTEX__OUTGOING:
 			return outgoing != null && !outgoing.isEmpty();
+		case GraphPackage.VERTEX__PREDECESSORS:
+			return predecessors != null && !predecessors.isEmpty();
+		case GraphPackage.VERTEX__SUCCESSORS:
+			return successors != null && !successors.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -295,8 +334,7 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getLabel() {
@@ -304,8 +342,7 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getNumber() {
@@ -325,47 +362,46 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 		return outgoing;
 	}
 
-	@Override
-	public List<Vertex> getPredecessors() {
-		// some dark magic to avoid creating this list all the time
-		int modCount = EcoreHelper.getModCount(getIncoming());
-		if (predecessors != null && modCount == predecessorsModCount) {
-			return predecessors;
-		}
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 */
+	public EList<Vertex> getPredecessors() {
+		if (predecessors == null) {
+			predecessors = new EObjectEList<Vertex>(Vertex.class, this,
+					GraphPackage.VERTEX__PREDECESSORS);
 
-		predecessorsModCount = modCount;
-		predecessors = new ArrayList<Vertex>();
-		for (Edge edge : getIncoming()) {
-			Vertex source = edge.getSource();
-			if (!predecessors.contains(source)) {
-				predecessors.add(source);
+			for (Edge edge : getIncoming()) {
+				Vertex source = edge.getSource();
+				if (!predecessors.contains(source)) {
+					predecessors.add(source);
+				}
 			}
 		}
 		return predecessors;
 	}
 
-	@Override
-	public List<Vertex> getSuccessors() {
-		// some dark magic to avoid creating this list all the time
-		int modCount = EcoreHelper.getModCount(getOutgoing());
-		if (successors != null && modCount == successorsModCount) {
-			return successors;
-		}
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 */
+	public EList<Vertex> getSuccessors() {
+		if (successors == null) {
+			successors = new EObjectEList<Vertex>(Vertex.class, this,
+					GraphPackage.VERTEX__SUCCESSORS);
 
-		successorsModCount = modCount;
-		successors = new ArrayList<Vertex>();
-		for (Edge edge : getOutgoing()) {
-			Vertex target = edge.getTarget();
-			if (!successors.contains(target)) {
-				successors.add(target);
+			for (Edge edge : getOutgoing()) {
+				Vertex target = edge.getTarget();
+				if (!successors.contains(target)) {
+					successors.add(target);
+				}
 			}
 		}
 		return successors;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setLabel(String newLabel) {
@@ -377,8 +413,7 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setNumber(int newNumber) {

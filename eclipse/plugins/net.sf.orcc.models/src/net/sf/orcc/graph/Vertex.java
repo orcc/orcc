@@ -26,6 +26,8 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.graph.Vertex#getLabel <em>Label</em>}</li>
  *   <li>{@link net.sf.orcc.graph.Vertex#getNumber <em>Number</em>}</li>
  *   <li>{@link net.sf.orcc.graph.Vertex#getOutgoing <em>Outgoing</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.Vertex#getPredecessors <em>Predecessors</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.Vertex#getSuccessors <em>Successors</em>}</li>
  * </ul>
  * </p>
  *
@@ -108,20 +110,36 @@ public interface Vertex extends Attributable, Adaptable {
 	EList<Edge> getOutgoing();
 
 	/**
-	 * Returns the list of predecessors of this vertex. This list is built
-	 * on-the-fly from the incoming list.
-	 * 
-	 * @return the list of predecessors of this vertex
+	 * Returns the value of the '<em><b>Predecessors</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.graph.Vertex}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Predecessors</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Predecessors</em>' reference list.
+	 * @see net.sf.orcc.graph.GraphPackage#getVertex_Predecessors()
+	 * @model resolveProxies="false" transient="true" changeable="false" derived="true"
+	 * @generated
 	 */
-	List<Vertex> getPredecessors();
+	EList<Vertex> getPredecessors();
 
 	/**
-	 * Returns the list of successors of this vertex. This list is built
-	 * on-the-fly from the outgoing list.
-	 * 
-	 * @return the list of successors of this vertex
+	 * Returns the value of the '<em><b>Successors</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.graph.Vertex}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Successors</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Successors</em>' reference list.
+	 * @see net.sf.orcc.graph.GraphPackage#getVertex_Successors()
+	 * @model resolveProxies="false" transient="true" changeable="false" derived="true"
+	 * @generated
 	 */
-	List<Vertex> getSuccessors();
+	EList<Vertex> getSuccessors();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.graph.Vertex#getLabel <em>Label</em>}' attribute.
