@@ -43,9 +43,9 @@ class Design:
         self.name = name
         self.processors = processors
         self.targetAltera = targetAltera
-        self._xoeFifoFile = "fifo_br.xoe"
-        self._ngcFifoFile = "fifo_br.ngc"
-        self._vhdFifoFile = "fifo_br.vhd"
+        #self._xoeFifoFile = "fifo_br.xoe"
+        #self._ngcFifoFile = "fifo_br.ngc"
+        #self._vhdFifoFile = "fifo_br.vhd"
 
 
     def compile(self, srcPath, libPath, args, debug):
@@ -88,9 +88,9 @@ class Design:
             shutil.rmtree(cgPath, ignore_errors=True)
             os.mkdir(cgPath)
             self.generateCgFiles(libPath, cgPath)
-            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeFifoFile), "-p", os.path.join(cgPath, "cg_project.cgp")])
-            shutil.copy(os.path.join(cgPath, self._ngcFifoFile), os.path.join(srcPath, "wrapper"))
-            shutil.copy(os.path.join(cgPath, self._vhdFifoFile), os.path.join(srcPath, "wrapper"))
+            #retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeFifoFile), "-p", os.path.join(cgPath, "cg_project.cgp")])
+            #shutil.copy(os.path.join(cgPath, self._ngcFifoFile), os.path.join(srcPath, "wrapper"))
+            #shutil.copy(os.path.join(cgPath, self._vhdFifoFile), os.path.join(srcPath, "wrapper"))
             #shutil.rmtree(cgPath, ignore_errors=True)
 
         for processor in self.processors:
@@ -104,6 +104,6 @@ class Design:
         template = tempita.Template.from_filename(os.path.join(templatePath, "cg_project.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath)
         open(os.path.join(genPath, "cg_project.cgp"), "w").write(result)
-        template = tempita.Template.from_filename(os.path.join(templatePath, "xco_fifo.template"), namespace={}, encoding=None)
-        result = template.substitute(size=256)
-        open(os.path.join(genPath, self._xoeFifoFile), "w").write(result)
+        #template = tempita.Template.from_filename(os.path.join(templatePath, "xco_fifo.template"), namespace={}, encoding=None)
+        #result = template.substitute(size=256)
+        #open(os.path.join(genPath, self._xoeFifoFile), "w").write(result)

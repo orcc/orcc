@@ -202,29 +202,32 @@ printProcessor(processor) ::= <<
 
 printUcf() ::= <<
 NET "leds[0]" IOSTANDARD = LVCMOS18;
-NET "leds[0]" LOC = AE24;
+NET "leds[0]" LOC = AC22;
 NET "leds[1]" IOSTANDARD = LVCMOS18;
-NET "leds[1]" LOC = AD24;
+NET "leds[1]" LOC = AC24;
 NET "leds[2]" IOSTANDARD = LVCMOS18;
-NET "leds[2]" LOC = AD25;
-NET "leds[3]" IOSTANDARD = LVCMOS25;
-NET "leds[3]" LOC = G16;
+NET "leds[2]" LOC = AE22;
+NET "leds[3]" IOSTANDARD = LVCMOS18;		// LVCMOS25
+NET "leds[3]" LOC = AE23;
 NET "leds[4]" IOSTANDARD = LVCMOS18;
-NET "leds[4]" LOC = AD26;
-NET "leds[5]" IOSTANDARD = LVCMOS25;
-NET "leds[5]" LOC = G15;
-NET "leds[6]" IOSTANDARD = LVCMOS25;
-NET "leds[6]" LOC = L18;
-NET "leds[7]" IOSTANDARD = LVCMOS25;
-NET "leds[7]" LOC = H18;
+NET "leds[4]" LOC = AB23;
+NET "leds[5]" IOSTANDARD = LVCMOS18;		// LVCMOS25
+NET "leds[5]" LOC = AG23;
+NET "leds[6]" IOSTANDARD = LVCMOS18;		// LVCMOS25
+NET "leds[6]" LOC = AE24;
+NET "leds[7]" IOSTANDARD = LVCMOS18;		// LVCMOS25
+NET "leds[7]" LOC = AD24;
 
 NET "rst_n" TIG;
-NET "rst_n" IOSTANDARD = LVCMOS33;
+//LVCMOS33
+NET "rst_n" IOSTANDARD = LVCMOS25;
 NET "rst_n" PULLUP;
-NET "rst_n" LOC = E9;
+NET "rst_n" LOC = D22;
 
 NET "clk" TNM_NET = "sys_clk_pin";
+NET "clk" CLOCK_DEDICATED_ROUTE = FALSE;
 TIMESPEC TS_sys_clk_pin = PERIOD "sys_clk_pin" 100000 KHz;
-NET "clk" IOSTANDARD = LVCMOS33;
-NET "clk" LOC = AH15;
+//LVCMOS33
+NET "clk" IOSTANDARD = LVCMOS25;
+NET "clk" LOC = AE16;
 >>
