@@ -47,8 +47,8 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.runtime.SimulatorFifo;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.WriteListener;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.EObject;
@@ -63,12 +63,8 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ConnectedActorInterpreter extends ActorInterpreter {
 
-	private WriteListener listener;
-
-	public ConnectedActorInterpreter(Actor actor,
-			WriteListener listener) {
+	public ConnectedActorInterpreter(Actor actor) {
 		super(actor);
-		this.listener = listener;
 	}
 
 	/**
@@ -130,10 +126,10 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 					// management
 					String str = ((ExprString) expr).getValue();
 					String unescaped = OrccUtil.getUnescapedString(str);
-					listener.writeText(unescaped);
+					OrccLogger.trace(unescaped);
 				} else {
 					Object value = exprInterpreter.doSwitch(expr);
-					listener.writeText(String.valueOf(value));
+					OrccLogger.trace(String.valueOf(value));
 				}
 			}
 		}

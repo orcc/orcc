@@ -75,26 +75,21 @@ public interface OrccLaunchConstants {
 	public static final boolean DEFAULT_TRACES = false;
 
 	/**
-	 * When enabled, interpreter traces each time data is written to
-	 * (output)FIFO
-	 */
-	public static final String ENABLE_TRACES = "net.sf.orcc.simulators.enableTraces";
-
-	/**
 	 * When enabled, interpreter compare the output of the decoder with a
 	 * reference video.
 	 */
 	public static final String ENABLE_COMP = "net.sf.orcc.simulators.enableComparison";
 
 	/**
+	 * When enabled, interpreter traces each time data is written to
+	 * (output)FIFO
+	 */
+	public static final String ENABLE_TRACES = "net.sf.orcc.simulators.enableTraces";
+
+	/**
 	 * Size of FIFO channels when not specified by the network.
 	 */
 	public static final String FIFO_SIZE = "net.sf.orcc.fifoSize";
-
-	/**
-	 * Input stimulus file associated with an Orcc configuration.
-	 */
-	public static final String INPUT_STIMULUS = "net.sf.orcc.simulators.inputStimulus";
 
 	/**
 	 * When set, a golden reference has to be compared with the ouput data of the network.
@@ -107,9 +102,25 @@ public interface OrccLaunchConstants {
 	public static final String GOLDEN_REFERENCE_FILE = "net.sf.orcc.simulators.goldenReferenceFile";
 
 	/**
+	 * Input stimulus file associated with an Orcc configuration.
+	 */
+	public static final String INPUT_STIMULUS = "net.sf.orcc.simulators.inputStimulus";
+
+	/**
+	 * Parameter used to set max number of times an input file is read.
+	 */
+	public static final String LOOP_NUMBER = "net.sf.orcc.simulators.loopNumber";
+
+	/**
 	 * Mapping associated with an Orcc configuration.
 	 */
 	public static final String MAPPING = "net.sf.orcc.plugins.mapping";
+
+	/**
+	 * If this parameter is set to true, the library files should not be
+	 * exported when executing a backend.
+	 */
+	public static final String NO_LIBRARY_EXPORT = "net.sf.orcc.dontExportLibrary";
 
 	/**
 	 * Output folder associated with an Orcc configuration.
@@ -125,6 +136,11 @@ public interface OrccLaunchConstants {
 	 * Project associated with an Orcc configuration.
 	 */
 	public static final String PROJECT = "net.sf.orcc.project";
+
+	/**
+	 * Simulator reference video for testing video output
+	 */
+	public static final String REFERENCE_FILE = "net.sf.orcc.simulators.compareFile";
 
 	/**
 	 * Orcc run configuration type.
@@ -147,11 +163,6 @@ public interface OrccLaunchConstants {
 	public static final String TRACES_FOLDER = "net.sf.orcc.simulators.tracesFolder";
 
 	/**
-	 * Simulator reference video for testing video output
-	 */
-	public static final String REFERENCE_FILE = "net.sf.orcc.simulators.compareFile";
-
-	/**
 	 * Folder where the compiled Actors can be found.
 	 */
 	public static final String VTL_FOLDER = "net.sf.orcc.simulators.VTLFolder";
@@ -161,11 +172,5 @@ public interface OrccLaunchConstants {
 	 * with options in the back-ends plug-in.
 	 */
 	public static final String XDF_FILE = "net.sf.orcc.core.xdfFile";
-
-	/**
-	 * If this parameter is set to true, the library files should not be
-	 * exported when executing a backend.
-	 */
-	public static final String NO_LIBRARY_EXPORT = "net.sf.orcc.dontExportLibrary";
 
 }

@@ -33,7 +33,6 @@ import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import java.util.Map;
 
 import net.sf.orcc.plugins.PluginFactory;
-import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -85,7 +84,7 @@ public class SimulatorFactory extends PluginFactory {
 	 *            launch configuration
 	 * @throws Exception
 	 */
-	public void runSimulator(IProgressMonitor monitor, WriteListener listener,
+	public void runSimulator(IProgressMonitor monitor,
 			String mode, Map<String, Object> options) throws Exception {
 		// Get the simulator plugin
 		String simulatorName = (String) options.get(SIMULATOR);
@@ -93,7 +92,6 @@ public class SimulatorFactory extends PluginFactory {
 
 		simulator.setOptions(options);
 		simulator.setProgressMonitor(monitor);
-		simulator.setWriteListener(listener);
 		simulator.start(mode);
 	}
 

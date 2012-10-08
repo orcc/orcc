@@ -31,7 +31,6 @@ package net.sf.orcc.simulators;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -58,14 +57,6 @@ public interface Simulator {
 	 *            a progress monitor
 	 */
 	void setProgressMonitor(IProgressMonitor monitor);
-
-	/**
-	 * Sets the write listener used by this back-end.
-	 * 
-	 * @param monitor
-	 *            a write listener
-	 */
-	void setWriteListener(WriteListener listener);
 
 	/**
 	 * Starts the simulation.

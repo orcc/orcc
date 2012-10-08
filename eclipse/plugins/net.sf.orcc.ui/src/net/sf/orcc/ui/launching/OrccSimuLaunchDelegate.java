@@ -73,7 +73,7 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 
 			try {
 				SimulatorFactory factory = SimulatorFactory.getInstance();
-				factory.runSimulator(monitor, process, mode,
+				factory.runSimulator(monitor, mode,
 						configuration.getAttributes());
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if

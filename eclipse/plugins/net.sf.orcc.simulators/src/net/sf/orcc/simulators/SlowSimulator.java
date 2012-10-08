@@ -186,7 +186,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Actor actor = vertex.getAdapter(Actor.class);
 
 			ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-					actor, getWriteListener());
+					actor);
 
 			interpreters.put(actor, interpreter);
 		}
@@ -194,11 +194,9 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected void initializeNetwork(Network network) {
 		GenericSource.setInputStimulus(stimulusFile);
-		GenericSource.setWriteListener(getWriteListener());
 
 		if (hasGoldenReference) {
 			GenericDisplay.setGoldenReference(goldenReferenceFile);
-			GenericDisplay.setWriteListener(getWriteListener());
 		}
 
 		for (Vertex vertex : network.getChildren()) {

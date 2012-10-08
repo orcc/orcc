@@ -30,8 +30,6 @@ package net.sf.orcc.simulators;
 
 import java.util.Map;
 
-import net.sf.orcc.util.WriteListener;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -42,8 +40,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * 
  */
 public abstract class AbstractSimulator implements Simulator {
-
-	private WriteListener listener;
 
 	private IProgressMonitor monitor;
 
@@ -138,14 +134,6 @@ public abstract class AbstractSimulator implements Simulator {
 		return options;
 	}
 
-	/**
-	 * Returns the write listener.
-	 * 
-	 * @return the write listener
-	 */
-	protected WriteListener getWriteListener() {
-		return listener;
-	}
 
 	/**
 	 * Called when options are initialized.
@@ -174,24 +162,5 @@ public abstract class AbstractSimulator implements Simulator {
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor) {
 		this.monitor = monitor;
-	}
-
-	@Override
-	public void setWriteListener(WriteListener listener) {
-		this.listener = listener;
-	}
-
-	/**
-	 * Writes the given text to the process's normal output.
-	 * 
-	 * @param text
-	 *            a string
-	 */
-	final public void write(String text) {
-		if (listener == null) {
-			System.out.print(text);
-		} else {
-			listener.writeText(text);
-		}
 	}
 }

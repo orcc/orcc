@@ -50,6 +50,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
@@ -198,7 +199,7 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							write(line + "\n");
+							OrccLogger.traceln(line);
 						}
 					} finally {
 						reader.close();
@@ -219,7 +220,7 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							write("Generation error :" + line + "\n");
+							OrccLogger.traceln("Generation error :" + line);
 						}
 					} finally {
 						reader.close();
