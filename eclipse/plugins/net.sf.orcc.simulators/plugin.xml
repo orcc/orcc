@@ -67,4 +67,16 @@
          </option>
       </simulator>
    </extension>
+   <extension
+         id="simulator"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.simulators.SimulatorCli">
+         </run>
+      </application>
+   </extension>
 </plugin>
