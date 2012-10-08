@@ -130,6 +130,8 @@ public class DfSwitch<T> extends Switch<T> {
 			Entity entity = (Entity) theEObject;
 			T result = caseEntity(entity);
 			if (result == null)
+				result = caseAttributable(entity);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}

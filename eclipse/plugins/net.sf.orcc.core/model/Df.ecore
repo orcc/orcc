@@ -25,7 +25,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
         volatile="true" transient="true" derived="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Entity">
+  <eClassifiers xsi:type="ecore:EClass" name="Entity" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="incomingPortMap" changeable="false">
       <eGenericType eClassifier="#//Map">
         <eTypeArguments eClassifier="#//Port"/>

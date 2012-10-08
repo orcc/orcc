@@ -34,9 +34,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.ir.Var;
-import org.eclipse.emf.common.util.EList;
+import net.sf.orcc.util.Attributable;
 
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * <!-- begin-user-doc -->
@@ -59,7 +59,8 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface Entity extends EObject {
+public interface Entity extends Attributable {
+
 	/**
 	 * Returns the value of the '<em><b>Incoming Port Map</b></em>' attribute.
 	 * <!-- begin-user-doc -->

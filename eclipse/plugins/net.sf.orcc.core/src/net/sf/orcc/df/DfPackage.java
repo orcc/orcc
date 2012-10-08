@@ -484,13 +484,22 @@ public interface DfPackage extends EPackage {
 	int ENTITY = 3;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Incoming Port Map</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__INCOMING_PORT_MAP = 0;
+	int ENTITY__INCOMING_PORT_MAP = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' reference list.
@@ -499,7 +508,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__INPUTS = 1;
+	int ENTITY__INPUTS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -508,7 +517,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__NAME = 2;
+	int ENTITY__NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing Port Map</b></em>' attribute.
@@ -517,7 +526,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__OUTGOING_PORT_MAP = 3;
+	int ENTITY__OUTGOING_PORT_MAP = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' reference list.
@@ -526,7 +535,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__OUTPUTS = 4;
+	int ENTITY__OUTPUTS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' reference list.
@@ -535,7 +544,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__PARAMETERS = 5;
+	int ENTITY__PARAMETERS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
 
 	/**
 	 * The number of structural features of the '<em>Entity</em>' class.
@@ -544,7 +553,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY_FEATURE_COUNT = 6;
+	int ENTITY_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.

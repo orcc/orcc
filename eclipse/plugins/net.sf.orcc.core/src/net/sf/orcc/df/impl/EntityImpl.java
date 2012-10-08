@@ -44,12 +44,12 @@ import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.impl.AttributableImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
 /**
@@ -69,7 +69,7 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  *
  * @generated
  */
-public class EntityImpl extends EObjectImpl implements Entity {
+public class EntityImpl extends AttributableImpl implements Entity {
 
 	/**
 	 * This class clears the value of incomingPortMap or outgoingPortMap when
