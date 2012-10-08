@@ -44,6 +44,7 @@ import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.impl.AttributableImpl;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -100,6 +101,15 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	}
 
 	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
 	 * The cached value of the '{@link #getIncomingPortMap() <em>Incoming Port Map</em>}' attribute.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
@@ -117,15 +127,6 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	 * @ordered
 	 */
 	protected EList<Port> inputs;
-
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -342,6 +343,15 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	}
 
 	@Override
+	public EList<Attribute> getAttributes() {
+		if (vertex == null) {
+			return super.getAttributes();
+		} else {
+			return vertex.getAttributes();
+		}
+	}
+
+	@Override
 	public Map<Port, Connection> getIncomingPortMap() {
 		if (incomingPortMap == null) {
 			computeIncomingPortMap();
@@ -370,7 +380,7 @@ public class EntityImpl extends AttributableImpl implements Entity {
 		}
 		return inputs;
 	}
-
+	
 	@Override
 	public String getName() {
 		if (vertex == null) {
