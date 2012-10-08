@@ -679,12 +679,18 @@ public class XdfParser {
 				} else if ("outputs".equals(dir)) {
 					port = entity.getOutput(portName);
 				}
-			}
 
-			// last resort, create a dummy port with the given name
-			if (port == null) {
-				port = DfFactory.eINSTANCE.createPort();
-				port.setName(portName);
+				// last resort, create a dummy port with the given name
+				if (port == null) {
+					port = DfFactory.eINSTANCE.createPort(null, portName);
+
+					// and adds it to the entity
+					if ("inputs".equals(dir)) {
+						entity.getInputs().add(port);
+					} else {
+						entity.getOutputs().add(port);
+					}
+				}
 			}
 
 			return port;
