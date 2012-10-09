@@ -421,8 +421,8 @@ public class NetworkImpl extends GraphImpl implements Network {
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
 			if (cachedAdaptedEntity == null) {
-				cachedAdaptedEntity = new EntityImpl(this, getInputs(),
-						getOutputs(), getParameters());
+				cachedAdaptedEntity = new EntityImpl(this, getAttributes(),
+						getInputs(), getOutputs(), getParameters());
 			}
 
 			return (T) cachedAdaptedEntity;

@@ -216,11 +216,12 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	 * @param parameters
 	 *            a list of parameters
 	 */
-	public EntityImpl(Vertex vertex, EList<Port> inputs, EList<Port> outputs,
-			EList<Var> parameters) {
+	public EntityImpl(Vertex vertex, EList<Attribute> attributes,
+			EList<Port> inputs, EList<Port> outputs, EList<Var> parameters) {
 		super();
 
 		this.vertex = vertex;
+		this.attributes = attributes;
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.parameters = parameters;
@@ -240,8 +241,8 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	 *            the entity that the new entity will be based on
 	 */
 	protected EntityImpl(Vertex vertex, Entity entity) {
-		this(vertex, entity.getInputs(), entity.getOutputs(), entity
-				.getParameters());
+		this(vertex, entity.getAttributes(), entity.getInputs(), entity
+				.getOutputs(), entity.getParameters());
 	}
 
 	/**
@@ -340,15 +341,6 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	@Override
 	protected EClass eStaticClass() {
 		return DfPackage.Literals.ENTITY;
-	}
-
-	@Override
-	public EList<Attribute> getAttributes() {
-		if (vertex == null) {
-			return super.getAttributes();
-		} else {
-			return vertex.getAttributes();
-		}
 	}
 
 	@Override

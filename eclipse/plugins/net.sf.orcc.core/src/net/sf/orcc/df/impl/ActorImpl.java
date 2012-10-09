@@ -575,8 +575,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
 			if (cachedAdaptedEntity == null) {
-				cachedAdaptedEntity = new EntityImpl(this, getInputs(),
-						getOutputs(), getParameters());
+				cachedAdaptedEntity = new EntityImpl(this, getAttributes(),
+						getInputs(), getOutputs(), getParameters());
 			}
 
 			return (T) cachedAdaptedEntity;
