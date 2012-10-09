@@ -336,11 +336,11 @@ public class CBackendImpl extends AbstractBackend {
 		printInstances(network);
 
 		// print network
-		OrccLogger.trace("Printing network...");
+		OrccLogger.trace("Printing network... ");
 		if (printer.print(srcPath, network)) {
-			OrccLogger.warnRaw("Error\n");
+			OrccLogger.traceln("Cached");
 		} else {
-			OrccLogger.traceRaw("Done\n");
+			OrccLogger.traceln("Done");
 		}
 
 		// print CMakeLists
