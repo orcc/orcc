@@ -123,7 +123,7 @@ public abstract class CommonPrinter {
 
 	protected boolean needToReplace(File oldFile, IFile newFile) {
 		return !keepUnchangedFiles
-				|| newFile.getLocalTimeStamp() < oldFile.lastModified();
+				|| newFile.getLocalTimeStamp() > oldFile.lastModified();
 	}
 
 	/**
