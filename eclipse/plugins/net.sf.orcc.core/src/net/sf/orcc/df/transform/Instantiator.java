@@ -123,9 +123,9 @@ public class Instantiator extends DfSwitch<Void> {
 					if (parameter != null) {
 						parameter.setValue(argument.getValue());
 					} else {
-						OrccLogger.warnln("Network argument "
+						OrccLogger.warnln("Instance argument "
 								+ argument.getVariable().getName()
-								+ " is unknown in actor"
+								+ " is not a parameter of actor"
 								+ actor.getSimpleName());
 					}
 				}
