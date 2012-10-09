@@ -7,7 +7,8 @@ Bundle-Activator: net.sf.orcc.simulators.Activator
 Require-Bundle: net.sf.orcc.core;bundle-version="1.2.1",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.core.resources;bundle-version="3.7.0",
- net.sf.orcc.models;bundle-version="1.2.1"
+ net.sf.orcc.models;bundle-version="1.2.1",
+ org.apache.commons.cli
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: IETR/INSA Rennes

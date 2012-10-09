@@ -68,7 +68,7 @@
       </simulator>
    </extension>
    <extension
-         id="simulator"
+         id="cli"
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="singleton-global"

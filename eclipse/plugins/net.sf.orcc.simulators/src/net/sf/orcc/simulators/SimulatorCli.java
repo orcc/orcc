@@ -34,11 +34,20 @@ import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.util.OrccLogger;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -51,57 +60,94 @@ import org.eclipse.equinox.app.IApplicationContext;
  */
 public class SimulatorCli implements IApplication {
 
-	private boolean run = true;
-
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
 
-		Map<String, Object> options = new HashMap<String, Object>();
-		
-		Object value;
-		if((value = context.getArguments().get("-p")) != null) {
-			OrccLogger.traceln("Project : " + value);
-			options.put(PROJECT, value);
-		} else {
-			OrccLogger
-					.severeln("You must specify project with -p command line argument");
-			run = false;
-		}
-		if((value = context.getArguments().get("-xdf")) != null) {
-			OrccLogger.traceln("Xdf : " + value);
-			options.put(XDF_FILE, value);
-		} else {
-			OrccLogger
-					.severeln("You must specify a top network with -xdf command line argument");
-			run = false;
-		}
-		if((value = context.getArguments().get("-l")) != null) {
-			OrccLogger.traceln("Loops number : " + value);
-			options.put(LOOP_NUMBER, value);
-		}
-		if((value = context.getArguments().get("-i")) != null) {
-			OrccLogger.traceln("Input : " + value);
-			options.put(INPUT_STIMULUS, value);
-		} else {
-			OrccLogger
-					.severeln("You must specify a input stimulus with -i command line argument");
-			run = false;
-		}
-		
-		options.put(SIMULATOR, "Visitor interpreter and debugger");
+		Options clOptions = new Options();
+		Option opt;
 
-		if (run) {
-			SimulatorFactory.getInstance().runSimulator(
-					new NullProgressMonitor(), "run", options);
+		// Required command line arguments
+		opt = new Option("p", "project", true, "Set the project from ");
+		opt.setRequired(true);
+		clOptions.addOption(opt);
+
+		opt = new Option("i", "input", true, "Set the input stimulus file");
+		opt.setRequired(true);
+		clOptions.addOption(opt);
+
+		// Optional command line arguments
+		clOptions.addOption("l", "loopsnumber", true,
+				"Define the number of times input stimulus will be read"
+						+ "before application stop. If not defined,"
+						+ "application will run infinitely.");
+
+		clOptions.addOption("h", "help", false, "Print this help message");
+
+		try {
+			Map<String, Object> simulatorOptions = new HashMap<String, Object>();
+
+			CommandLineParser parser = new PosixParser();
+			CommandLine commandLine = parser.parse(
+					clOptions,
+					(String[]) context.getArguments().get(
+							IApplicationContext.APPLICATION_ARGS));
+
+			if (commandLine.hasOption('h')) {
+				printUsage(clOptions, null);
+				return IApplication.EXIT_RELAUNCH;
+			}
+
+			simulatorOptions.put(PROJECT, commandLine.getOptionValue('p'));
+			simulatorOptions.put(INPUT_STIMULUS,
+					commandLine.getOptionValue('i'));
+			simulatorOptions.put(XDF_FILE, commandLine.getArgList().get(0));
+
+			simulatorOptions.put(
+					LOOP_NUMBER,
+					commandLine.getOptionValue('l',
+							String.valueOf(Simulator.DEFAULT_NB_LOOPS)));
+
+			simulatorOptions.put(SIMULATOR, "Visitor interpreter and debugger");
+
+			try {
+
+				SimulatorFactory.getInstance().runSimulator(
+						new NullProgressMonitor(), "run", simulatorOptions);
+
+			} catch (OrccException oe) {
+				OrccLogger.severeln("Simulator has shut down");
+				return IApplication.EXIT_RESTART;
+			}
+
+			// Simulator correctly shut down
 			return IApplication.EXIT_OK;
-		} else {
-			return IApplication.EXIT_RELAUNCH;
+
+		} catch (UnrecognizedOptionException uoe) {
+			printUsage(clOptions, uoe.getLocalizedMessage());
+		} catch (ParseException pe) {
+			printUsage(clOptions, pe.getLocalizedMessage());
 		}
 
+		return IApplication.EXIT_RELAUNCH;
 	}
 
 	@Override
 	public void stop() {
-		
+
+	}
+
+	public void printUsage(Options options, String parserMsg) {
+
+		String footer = "";
+		if (parserMsg != null && !parserMsg.isEmpty()) {
+			footer = "\nMessage of the command line parser :\n" + parserMsg;
+		}
+
+		HelpFormatter helpFormatter = new HelpFormatter();
+		helpFormatter.setWidth(80);
+		helpFormatter
+				.printHelp(
+						"net.sf.orcc.simulators.cli [options] <qualified path of your top network>",
+						"Valid options are :", options, footer);
 	}
 }
