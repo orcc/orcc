@@ -60,7 +60,7 @@ public class SimulatorCli implements IApplication {
 		
 		Object value;
 		if((value = context.getArguments().get("-p")) != null) {
-			System.out.println("Project : " + value);
+			OrccLogger.traceln("Project : " + value);
 			options.put(PROJECT, value);
 		} else {
 			OrccLogger
@@ -68,7 +68,7 @@ public class SimulatorCli implements IApplication {
 			run = false;
 		}
 		if((value = context.getArguments().get("-xdf")) != null) {
-			System.out.println("Xdf : " + value);
+			OrccLogger.traceln("Xdf : " + value);
 			options.put(XDF_FILE, value);
 		} else {
 			OrccLogger
@@ -76,11 +76,11 @@ public class SimulatorCli implements IApplication {
 			run = false;
 		}
 		if((value = context.getArguments().get("-l")) != null) {
-			System.out.println("Loops number : " + value);
+			OrccLogger.traceln("Loops number : " + value);
 			options.put(LOOP_NUMBER, value);
 		}
 		if((value = context.getArguments().get("-i")) != null) {
-			System.out.println("Input : " + value);
+			OrccLogger.traceln("Input : " + value);
 			options.put(INPUT_STIMULUS, value);
 		} else {
 			OrccLogger
