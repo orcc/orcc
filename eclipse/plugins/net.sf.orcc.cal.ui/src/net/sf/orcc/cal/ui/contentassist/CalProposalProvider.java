@@ -42,6 +42,7 @@ import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Inequality;
 import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.Priority;
@@ -145,6 +146,25 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 	}
 
 	@Override
+	public void completeExpressionCall_Function(EObject model,
+			Assignment assignment, ContentAssistContext context,
+			ICompletionProposalAcceptor acceptor) {
+		AstEntity entity = EcoreUtil2
+				.getContainerOfType(model, AstEntity.class);
+		if (entity != null) {
+			// TODO: propose the imported functions as well.
+		}
+		AstUnit unit = EcoreUtil2.getContainerOfType(model, AstUnit.class);
+		if (unit != null) {
+			proposeFunctions(unit.getFunctions(), context, acceptor);
+		}
+		AstActor actor = EcoreUtil2.getContainerOfType(model, AstActor.class);
+		if (actor != null) {
+			proposeFunctions(actor.getFunctions(), context, acceptor);
+		}
+	}
+
+	@Override
 	public void completeInequality_Tags(EObject model, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		if (model instanceof Priority) {
@@ -178,24 +198,24 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 		}
 		AstUnit unit = EcoreUtil2.getContainerOfType(model, AstUnit.class);
 		if (unit != null) {
-			proposeVariable(unit.getVariables(), context, acceptor);
+			proposeVariables(unit.getVariables(), context, acceptor);
 		}
 		AstActor actor = EcoreUtil2.getContainerOfType(model, AstActor.class);
 		if (actor != null) {
-			proposeVariable(actor.getStateVariables(), context, acceptor);
+			proposeVariables(actor.getStateVariables(), context, acceptor);
 		}
 		AstAction action = EcoreUtil2
 				.getContainerOfType(model, AstAction.class);
 		if (action != null) {
-			proposeVariable(action.getVariables(), context, acceptor);
+			proposeVariables(action.getVariables(), context, acceptor);
 			for (InputPattern input : action.getInputs()) {
-				proposeVariable(input.getTokens(), context, acceptor);
+				proposeVariables(input.getTokens(), context, acceptor);
 			}
 		}
 		AstProcedure proc = EcoreUtil2.getContainerOfType(model,
 				AstProcedure.class);
 		if (proc != null) {
-			proposeVariable(proc.getVariables(), context, acceptor);
+			proposeVariables(proc.getVariables(), context, acceptor);
 		}
 	}
 
@@ -217,6 +237,23 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 			ICompletionProposal proposal = createCompletionProposal(tagName,
 					context);
 			acceptor.accept(proposal);
+		}
+	}
+
+	/**
+	 * @param functions
+	 * @param context
+	 * @param acceptor
+	 */
+	private void proposeFunctions(EList<Function> functions,
+			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		for (Function function : functions) {
+			String proposed = function.getName();
+			if (proposed.startsWith(context.getPrefix())) {
+				ICompletionProposal proposal = createCompletionProposal(
+						proposed, context);
+				acceptor.accept(proposal);
+			}
 		}
 	}
 
@@ -277,7 +314,15 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 		}
 	}
 
-	private void proposeVariable(EList<Variable> vars,
+	/**
+	 * Proposes the variables from the given variable list whose names match
+	 * with the prefix of the current context.
+	 * 
+	 * @param vars
+	 * @param context
+	 * @param acceptor
+	 */
+	private void proposeVariables(EList<Variable> vars,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		for (Variable var : vars) {
 			String proposed = var.getName();
