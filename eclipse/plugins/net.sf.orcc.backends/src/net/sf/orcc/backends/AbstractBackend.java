@@ -75,6 +75,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -827,23 +828,26 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
-		Map<?, ?> map = context.getArguments();
-		String[] args = (String[]) map
-				.get(IApplicationContext.APPLICATION_ARGS);
 
-		// create the command line parser
-		CommandLineParser parser = new PosixParser();
-
-		// configure the required options
 		Options options = new Options();
-		Option opt = new Option("p", "project", true, "project name");
+		Option opt;
+
+		// Required command line arguments
+		opt = new Option("p", "project", true, "Project name");
 		opt.setRequired(true);
 		options.addOption(opt);
 
-		opt = new Option("o", "output", true, "output folder");
+		opt = new Option("o", "output", true, "Output folder");
 		opt.setRequired(true);
 		options.addOption(opt);
 
+		// Optional command line arguments
+		options.addOption("c", "classify", false, "Classify the given network");
+		options.addOption("d", "debug", false, "Enable debug mode");
+		options.addOption("t", "transfo_add", false,
+				"Execute additional transformations before generate code");
+
+		// TODO : Delete this when it will be totally useless
 		setWriteListener(new WriteListener() {
 			@Override
 			public void writeText(String text) {
@@ -851,27 +855,23 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			}
 		});
 
-		// add optional options
-		options.addOption("c", "classify", false, "classify the given network");
-		options.addOption("t", "transfo_add", false,
-				"execute additional transformations before generate code");
-		options.addOption("d", "debug", false, "enable debug mode");
-
 		try {
-			// parse the command line arguments
-			CommandLine line = parser.parse(options, args);
+			CommandLineParser parser = new PosixParser();
 
-			String projectName = line.getOptionValue('p');
-			String outputFolder = line.getOptionValue('o');
+			// parse the command line arguments
+			CommandLine line = parser.parse(options, (String[]) context
+					.getArguments().get(IApplicationContext.APPLICATION_ARGS));
+
 			if (line.getArgs().length != 1) {
-				throw new ParseException("expected network name");
+				throw new ParseException(
+						"Expected network name as last argument");
 			}
 			String networkName = line.getArgs()[0];
 
 			Map<String, Object> optionMap = new HashMap<String, Object>();
-			optionMap.put(PROJECT, projectName);
+			optionMap.put(PROJECT, line.getOptionValue('p'));
 			optionMap.put(XDF_FILE, networkName);
-			optionMap.put(OUTPUT_FOLDER, outputFolder);
+			optionMap.put(OUTPUT_FOLDER, line.getOptionValue('o'));
 
 			if (line.hasOption('c')) {
 				optionMap.put("net.sf.orcc.backends.classify", true);
@@ -891,31 +891,45 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				compileVTL();
 				compileXDF();
 				return IApplication.EXIT_OK;
-			} catch (OrccRuntimeException exception) {
-				System.err.println("ERROR: " + exception.getMessage());
-				System.err.println("Backend could not generate code");
-			} catch (Exception e) {
-				System.err.println("Could not run the back-end with \""
+			} catch (OrccRuntimeException e) {
+				OrccLogger.severeln(e.getMessage());
+				OrccLogger.severeln("Could not run the back-end with \""
 						+ networkName + "\" :");
-				System.err.println(e);
+				OrccLogger.severeln(e.getLocalizedMessage());
+			} catch (Exception e) {
+				OrccLogger.severeln("Could not run the back-end with \""
+						+ networkName + "\" :");
+				OrccLogger.severeln(e.getLocalizedMessage());
 				e.printStackTrace();
 			}
-			return IApplication.EXIT_RELAUNCH;
+			return IApplication.EXIT_RESTART;
+
+		} catch (UnrecognizedOptionException uoe) {
+			printUsage(context, options, uoe.getLocalizedMessage());
 		} catch (ParseException exp) {
-			HelpFormatter formatter = new HelpFormatter();
-			formatter
-					.printHelp(
-							getClass().getSimpleName()
-									+ " [options] "
-									+ "-p <project> -o <output.folder> <network.qualified.name>",
-							options);
-			return IApplication.EXIT_RELAUNCH;
+			printUsage(context, options, exp.getLocalizedMessage());
 		}
+		return IApplication.EXIT_RELAUNCH;
 	}
 
 	@Override
 	public void stop() {
 
+	}
+
+	private void printUsage(IApplicationContext context, Options options,
+			String parserMsg) {
+
+		String footer = "";
+		if (parserMsg != null && !parserMsg.isEmpty()) {
+			footer = "\nMessage of the command line parser :\n" + parserMsg;
+		}
+
+		HelpFormatter helpFormatter = new HelpFormatter();
+		helpFormatter.setWidth(80);
+		helpFormatter.printHelp(context.getBrandingId()
+				+ "[options] <network.qualified.name>", "Valid options are :",
+				options, footer);
 	}
 
 	/**
