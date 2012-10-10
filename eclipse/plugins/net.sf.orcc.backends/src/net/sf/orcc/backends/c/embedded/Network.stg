@@ -4,7 +4,7 @@
 
 printArgument(argument) ::= <<
 	\<data key="arguments"\>
-	\<argument name="<argument.variable.name>" value="<argument.value.value>"/\>
+	\<argument name="<argument.variable.name>" value="<argument.value>"/\>
 	\</data\>
 >>
 

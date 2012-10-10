@@ -99,6 +99,7 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/c/embedded/Network.stg");
 		printer.setTypePrinter(new CTypePrinter());
+		printer.setExpressionPrinter(new CExpressionPrinter());
 
 		// instantiate and flattens network
 		new Instantiator(false, fifoSize).doSwitch(network);
