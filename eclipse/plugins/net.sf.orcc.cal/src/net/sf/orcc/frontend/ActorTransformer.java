@@ -115,12 +115,18 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 *            an integer number of repeat (equals to one if there is no
 	 *            repeat)
 	 */
-	private void actionLoadTokens(Procedure procedure, Var portVariable,
-			List<Variable> tokens, int repeat) {
+	private void actionLoadTokens(StructTransformer transformer,
+			Procedure procedure, Var portVariable, List<Variable> tokens,
+			int repeat) {
 		if (repeat == 1) {
 			int i = 0;
 
 			for (Variable token : tokens) {
+				// declare a fresh new variable here because we can have one in
+				// the body and one in the scheduler
+				Var local = (Var) transformer.doSwitch(token);
+				procedure.getLocals().add(local);
+
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(eINSTANCE.createExprInt(i));
 				int lineNumber = portVariable.getLineNumber();
@@ -149,6 +155,11 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			int numTokens = tokens.size();
 			Type type = ((TypeList) portVariable.getType()).getType();
 			for (Variable token : tokens) {
+				// declare a fresh new variable here because we can have one in
+				// the body and one in the scheduler
+				Var local = (Var) transformer.doSwitch(token);
+				procedure.getLocals().add(local);
+
 				int lineNumber = portVariable.getLineNumber();
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(eINSTANCE.createExprBinary(eINSTANCE
@@ -665,20 +676,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		// load/store tokens (depending on the type of pattern)
 		if (astPattern instanceof InputPattern) {
 			InputPattern pattern = (InputPattern) astPattern;
-
-			// declare tokens (only when the variable will be used)
 			List<Variable> tokens = pattern.getTokens();
-			if (repeat == 1 || tokens.size() > 1) {
-				for (Variable token : tokens) {
-					// do not use getMapping because we want to create a fresh
-					// new variable here because we can have one in the body and
-					// one in the scheduler
-					Var local = (Var) transformer.doSwitch(token);
-					procedure.getLocals().add(local);
-				}
-			}
-
-			actionLoadTokens(procedure, variable, tokens, repeat);
+			actionLoadTokens(transformer, procedure, variable, tokens, repeat);
 		} else {
 			OutputPattern pattern = (OutputPattern) astPattern;
 			List<AstExpression> values = pattern.getValues();
