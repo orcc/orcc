@@ -88,11 +88,15 @@ import net.sf.orcc.ir.Var
 			}
 		
 			«FOR port : actor.inputs»
+				«IF instance.incomingPortMap.get(port) != null»
 				«port.compilePort(instance.incomingPortMap.get(port).getAttribute("nbReaders").pojoValue)»
+				«ENDIF»
 			«ENDFOR»			
 			
 			«FOR port : actor.outputs.filter(connectedOutput)»
-				«port.compilePort(instance.outgoingPortMap.get(port).size)»
+				«IF instance.outgoingPortMap.get(port) != null»
+					«port.compilePort(instance.outgoingPortMap.get(port).size)»
+				«ENDIF»
 			«ENDFOR»
 			
 			«actor.procs.filter(p | !p.native).map[compileProcedure].join»
@@ -222,20 +226,32 @@ import net.sf.orcc.ir.Var
 		«action.body.returnType.doSwitch» «action.body.name» ()
 		{
 			«FOR e : action.inputPattern.numTokensMap»
-				«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
+				«IF instance.incomingPortMap.get(e.key) != null»
+					«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
+				«ELSE»
+					«e.key.type.doSwitch» «e.key.name»[«e.value»];
+				«ENDIF»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports»
-			«port.type.doSwitch»* «port.name» = port_«port.name»->write_address();
+				«IF instance.outgoingPortMap.get(port) != null»
+					«port.type.doSwitch»* «port.name» = port_«port.name»->write_address();
+				«ELSE»
+					«port.type.doSwitch» «port.name»«port.type»«FOR dim:port.type.dimensions»[«dim»]«ENDFOR»;
+				«ENDIF»
 			«ENDFOR»
 			«action.body.doSwitch»
 			«FOR e : action.inputPattern.numTokensMap»
-			port_«e.key.name»->read_advance(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
-			status_«e.key.name»_ -= «e.value»;
+				«IF instance.incomingPortMap.get(e.key) != null»
+					port_«e.key.name»->read_advance(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
+					status_«e.key.name»_ -= «e.value»;
+				«ENDIF»
 			«ENDFOR»
 			«FOR e : action.outputPattern.numTokensMap»
-			port_«e.key.name»->write_advance(«IF e.value > 1»«e.value»«ENDIF»);
-			status_«e.key.name»_ -= «e.value»;
-		«ENDFOR»
+				«IF instance.outgoingPortMap.get(e.key) != null»
+					port_«e.key.name»->write_advance(«IF e.value > 1»«e.value»«ENDIF»);
+					status_«e.key.name»_ -= «e.value»;
+				«ENDIF»
+			«ENDFOR»
 		}
 		
 	'''
@@ -259,8 +275,16 @@ import net.sf.orcc.ir.Var
 	def compileScheduler(Actor actor) '''	
 		void schedule(EStatus& status)
 		{	
-			«FOR port : actor.inputs SEPARATOR "\n"»status_«port.name»_=port_«port.name»->count(«instance.incomingPortMap.get(port).getAttribute("fifoId").pojoValue»);«ENDFOR»
-			«FOR port : actor.outputs SEPARATOR "\n"»status_«port.name»_=port_«port.name»->rooms();«ENDFOR»
+			«FOR port : actor.inputs»
+				«IF instance.incomingPortMap.get(port) != null»
+					status_«port.name»_=port_«port.name»->count(«instance.incomingPortMap.get(port).getAttribute("fifoId").pojoValue»);
+				«ENDIF»
+			«ENDFOR»
+			«FOR port : actor.outputs»
+				«IF instance.outgoingPortMap.get(port) != null»
+					status_«port.name»_=port_«port.name»->rooms();
+				«ENDIF»
+			«ENDFOR»
 		
 			bool res = true;
 			while (res) {

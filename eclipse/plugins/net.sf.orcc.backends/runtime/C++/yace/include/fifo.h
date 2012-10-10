@@ -49,7 +49,7 @@ template <typename T, int nb_reader>
 class Fifo
 {
 public:
-	Fifo(int size=512, int threshold=512);
+	Fifo(int size=4096, int threshold=1024);
 	~Fifo();
 
 	T* write_address() const;

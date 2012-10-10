@@ -51,14 +51,14 @@ static int loopsCount;
 
 void source_init() 
 {
-	if (input_file.c_str() == NULL)
+	if (input_file.empty())
 	{
 		std::cerr << "No input file given!" << std::endl;
 		exit(1);
 	}
 
 	file.open(input_file.c_str(), std::ios::binary);
-	if (file.bad())
+	if (!file.is_open())
 	{
 		std::cerr << "could not open file "<<  input_file << std::endl;
 		exit(1);
@@ -75,7 +75,6 @@ int source_sizeOfFile()
 	return size;
 }
 
-
 void source_rewind()
 {
 	file.clear();
@@ -86,7 +85,6 @@ unsigned int source_readByte()
 {
 	return file.get();
 }
-
 
 void source_readNBytes(unsigned char outTable[], unsigned int nbTokenToRead)
 {
@@ -114,3 +112,4 @@ void source_exit(int exitCode)
 	Scheduler* current_thread = (Scheduler*) Thread::currentThread();
 	current_thread->done();
 }
+
