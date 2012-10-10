@@ -38,19 +38,16 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include "get_opt.h"
 #include "scheduler.h"
 
-static FILE *file = NULL;
+static std::ifstream file;
 
 static int loopsCount;
-
-static unsigned int nbByteRead = 0;
 
 void source_init() 
 {
@@ -60,15 +57,10 @@ void source_init()
 		exit(1);
 	}
 
-	file = fopen(input_file.c_str(), "rb");
-	if (file == NULL) {
-		if (input_file.c_str() == NULL) 
-		{
-			input_file = "<null>";
-		}
-
+	file.open(input_file.c_str(), std::ios::binary);
+	if (file.bad())
+	{
 		std::cerr << "could not open file "<<  input_file << std::endl;
-//		wait_for_key();
 		exit(1);
 	}
 
@@ -77,48 +69,28 @@ void source_init()
 
 int source_sizeOfFile()
 { 
-	fseek (file, 0L, SEEK_END);
-	long size = ftell(file);
-	fseek (file, 0L, SEEK_SET);
+	file.seekg(0L, std::ios::end);
+	long size = file.tellg();
+	file.seekg(0L, std::ios::beg);
 	return size;
 }
 
 
 void source_rewind()
 {
-	if(file != NULL)
-	{
-		rewind(file);
-	}
+	file.clear();
+	file.seekg(0, std::ios::beg);
 }
 
 unsigned int source_readByte()
 {
-	unsigned char buf[1];
-	int n = fread(&buf, 1, 1, file);
-
-	if (n < 1) {
-		if (feof(file)) {
-			//std::cout << "warning" << std::endl;
-			rewind(file);
-			n = fread(&buf, 1, 1, file);
-		}
-		else {
-			std::cerr << "Problem when reading input file" << std::endl;
-		}
-	}
-	return buf[0];
+	return file.get();
 }
 
 
 void source_readNBytes(unsigned char outTable[], unsigned int nbTokenToRead)
 {
-	int n = fread(outTable, 1, nbTokenToRead, file);
-	if(n < nbTokenToRead)
-    {
-		fprintf(stderr,"Problem when reading input file.\n");
-		exit(-4);
-	}
+	file.read((char *)outTable, nbTokenToRead);
 }
 
 unsigned int source_getNbLoop(void)
@@ -138,7 +110,7 @@ bool source_isMaxLoopsReached()
 
 void source_exit(int exitCode)
 {
-	fclose(file);
+	file.close();
 	Scheduler* current_thread = (Scheduler*) Thread::currentThread();
 	current_thread->done();
 }
