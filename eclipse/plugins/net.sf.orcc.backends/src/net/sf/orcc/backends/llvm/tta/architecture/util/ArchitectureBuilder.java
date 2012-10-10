@@ -112,7 +112,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private Design design;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
-	private boolean limitConnection = false;
+	private boolean reduceConnections;
 
 	private Mapping mapping;
 
@@ -192,10 +192,11 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	 * @return A new design
 	 */
 	public Design build(Network network, ProcessorConfiguration configuration,
-			Mapping mapping) {
+			Mapping mapping, boolean reduceConnections) {
 		this.mapping = mapping;
 		this.componentMap = new HashMap<Vertex, Component>();
 		this.bufferMap = new HashMap<Component, Map<Component, Memory>>();
+		this.reduceConnections = reduceConnections;
 		this.design = factory.createDesign();
 
 		// Map all unmapped component to its own processor
@@ -271,15 +272,19 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 		if (source == null || target == null) {
 			// One of them is a network port.
-			OrccLogger.warnln("The given application cannot be synthesised "
-					+ "because it contains external FIFO port(s).");
+			OrccLogger.warnln("External FIFO port: The given application "
+					+ "cannot be synthesised.");
+
+			Processor proc = source == null ? target : source;
+			Memory ram = factory.createMemory("smem_" + bufferId);
+			proc.connect(ram);
 			return;
 		}
 
 		Memory ram;
 		Map<Component, Memory> tgtToBufferMap = null;
 
-		if (limitConnection) {
+		if (reduceConnections) {
 			if (bufferMap.containsKey(source)) {
 				tgtToBufferMap = bufferMap.get(source);
 			} else {
@@ -288,13 +293,13 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			}
 		}
 
-		if (limitConnection && tgtToBufferMap.containsKey(target)) {
+		if (reduceConnections && tgtToBufferMap.containsKey(target)) {
 			ram = tgtToBufferMap.get(target);
 		} else {
 			ram = connect(source, target);
 			ram.setAttribute("id", bufferId++);
 
-			if (limitConnection) {
+			if (reduceConnections) {
 				tgtToBufferMap.put(target, ram);
 			}
 		}

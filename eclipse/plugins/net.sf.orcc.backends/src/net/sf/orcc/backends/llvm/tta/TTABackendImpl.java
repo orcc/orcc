@@ -100,6 +100,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	String actorsPath;
 	private boolean classify;
 	private ProcessorConfiguration configuration;
+	private boolean reduceConnections;
 	private boolean debug;
 	private Design design;
 	private boolean finalize;
@@ -145,6 +146,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		profile = getAttribute("net.sf.orcc.backends.profile", false);
 		configuration = ProcessorConfiguration.getByName(getAttribute(
 				"net.sf.orcc.backends.llvm.tta.configuration", "Huge"));
+		reduceConnections = getAttribute(
+				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
 		userMapping = getAttribute(MAPPING, new HashMap<String, String>());
 
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
@@ -213,7 +216,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// build the design
 		mapping = new Mapping(network, userMapping, false, false);
 		design = new ArchitectureBuilder().build(network, configuration,
-				mapping);
+				mapping, reduceConnections);
 
 		// print instances and entities
 		actorsPath = OrccUtil.createFolder(path, "actors");
@@ -357,8 +360,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 		printer.getOptions().put("profile", profile);
-		printer.getOptions().put("portToIdMap",
-				computePortToIdMap(instance));
+		printer.getOptions().put("portToIdMap", computePortToIdMap(instance));
 		return printer.print(instance.getSimpleName() + ".ll", actorsPath,
 				instance);
 	}

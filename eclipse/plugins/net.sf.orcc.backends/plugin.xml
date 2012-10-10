@@ -95,6 +95,9 @@
                id="net.sf.orcc.backends.llvm.tta.configuration">
          </option>
          <option
+               id="net.sf.orcc.backends.llvm.tta.reduceConnections">
+         </option>
+         <option
                id="net.sf.orcc.backends.tta.finalizeGeneration">
          </option>
          <option
@@ -360,6 +363,13 @@
                   id="Huge">
                </comboBoxItem>
             </comboBox>
+         </option>
+          <option
+               defaultValue="false"
+               description="Map the FIFO channels on an existing memory when it's possible"
+               id="net.sf.orcc.backends.llvm.tta.reduceConnections"
+               name="Reduce the interconnection network">
+            <checkBox></checkBox>
          </option>
    </extension>
    <extension
