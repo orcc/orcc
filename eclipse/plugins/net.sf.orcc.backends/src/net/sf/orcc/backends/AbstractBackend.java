@@ -927,7 +927,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		HelpFormatter helpFormatter = new HelpFormatter();
 		helpFormatter.setWidth(80);
-		helpFormatter.printHelp(context.getBrandingId()
+		helpFormatter.printHelp(getClass().getSimpleName()
 				+ "[options] <network.qualified.name>", "Valid options are :",
 				options, footer);
 	}
