@@ -53,7 +53,11 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.transform.DeadCodeElimination;
+import net.sf.orcc.ir.transform.DeadGlobalElimination;
+import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
@@ -110,6 +114,12 @@ public class YaceBackend extends AbstractBackend {
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(false, false, false));
 		transformations.add(new RenameTransformation(replacementMap));
+		if(!debugMode) {
+			transformations.add(new DeadGlobalElimination());
+			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		}
+		
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}

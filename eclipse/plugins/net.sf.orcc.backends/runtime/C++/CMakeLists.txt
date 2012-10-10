@@ -38,6 +38,7 @@ yace/src/mutex.cpp
 yace/src/source.cpp
 yace/src/timer.cpp
 yace/src/thread.cpp
+yace/src/writer.cpp
 )
 
 

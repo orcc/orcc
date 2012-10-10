@@ -38,8 +38,10 @@
 
 #include "get_opt.h"
 
-std::string input_file;
 std::string config_file;
+std::string input_file;
+std::string write_file;
+
 int nbLoops = -1;
 
 GetOpt::GetOpt(int argc, char* argv[])
@@ -72,6 +74,7 @@ void GetOpt::getOptions()
 {
 	this->getOptionAs<std::string>("i", input_file);
 	this->getOptionAs<std::string>("p", config_file);
+	this->getOptionAs<std::string>("w", write_file);
 	bool exists = this->getOptionAs<int>("l", nbLoops);
 	if(!exists)
 		nbLoops = -1;

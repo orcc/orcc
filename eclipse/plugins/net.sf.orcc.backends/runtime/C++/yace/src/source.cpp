@@ -47,8 +47,6 @@
 #include "scheduler.h"
 
 static FILE *file = NULL;
-static int nb;
-static int stop;
 
 static int loopsCount;
 
@@ -56,9 +54,6 @@ static unsigned int nbByteRead = 0;
 
 void source_init() 
 {
-	stop = 0;
-	nb = 0;
-
 	if (input_file.c_str() == NULL)
 	{
 		std::cerr << "No input file given!" << std::endl;
@@ -80,29 +75,25 @@ void source_init()
 	loopsCount = nbLoops;
 }
 
-int source_sizeOfFile() { 
-	long curr, end;
-	curr = ftell (file);
-	fseek (file, 0, 2);
-	end = ftell (file);
-	fseek (file, curr, 0);
-	return end;
+int source_sizeOfFile()
+{ 
+	fseek (file, 0L, SEEK_END);
+	long size = ftell(file);
+	fseek (file, 0L, SEEK_SET);
+	return size;
 }
 
-int source_is_stopped() {
-	return stop;
-}
 
-void source_active_genetic() {
-}
-
-void source_rewind() {
-	if(file != NULL) {
+void source_rewind()
+{
+	if(file != NULL)
+	{
 		rewind(file);
 	}
 }
 
-unsigned int source_readByte(){
+unsigned int source_readByte()
+{
 	unsigned char buf[1];
 	int n = fread(&buf, 1, 1, file);
 
@@ -111,7 +102,6 @@ unsigned int source_readByte(){
 			//std::cout << "warning" << std::endl;
 			rewind(file);
 			n = fread(&buf, 1, 1, file);
-			nb++;
 		}
 		else {
 			std::cerr << "Problem when reading input file" << std::endl;
@@ -121,10 +111,11 @@ unsigned int source_readByte(){
 }
 
 
-void source_readNBytes(unsigned char outTable[], unsigned int nbTokenToRead){
+void source_readNBytes(unsigned char outTable[], unsigned int nbTokenToRead)
+{
 	int n = fread(outTable, 1, nbTokenToRead, file);
-
-	if(n < nbTokenToRead) {
+	if(n < nbTokenToRead)
+    {
 		fprintf(stderr,"Problem when reading input file.\n");
 		exit(-4);
 	}
@@ -135,17 +126,19 @@ unsigned int source_getNbLoop(void)
 	return nbLoops;
 }
 
-void source_decrementNbLoops(){
+void source_decrementNbLoops()
+{
 	--loopsCount;
 }
 
-bool source_isMaxLoopsReached(){
+bool source_isMaxLoopsReached()
+{
 	return nbLoops != -1 && loopsCount <= 0;
 }
 
 void source_exit(int exitCode)
 {
-	//fclose(file);
+	fclose(file);
 	Scheduler* current_thread = (Scheduler*) Thread::currentThread();
 	current_thread->done();
 }
