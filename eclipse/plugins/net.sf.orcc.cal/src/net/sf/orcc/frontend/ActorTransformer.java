@@ -67,14 +67,14 @@ import net.sf.orcc.frontend.schedule.ActionList;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.frontend.schedule.RegExpConverter;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -471,8 +471,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 						eINSTANCE.createTypeBool());
 		Procedure body = eINSTANCE.createProcedure(name, lineNumber,
 				eINSTANCE.createTypeVoid());
-		
-		// creates IR action 
+
+		// creates IR action
 		Action action = DfFactory.eINSTANCE.createAction(tag, inputPattern,
 				outputPattern, peekPattern, scheduler, body);
 
@@ -480,7 +480,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		transformActionBody(astAction, body, inputPattern, outputPattern);
 		transformActionScheduler(astAction, scheduler, peekPattern);
 		Util.transformAnnotations(action, astAction.getAnnotations());
-		
+
 		// add it to action list
 		actionList.add(action);
 	}
@@ -666,14 +666,16 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		if (astPattern instanceof InputPattern) {
 			InputPattern pattern = (InputPattern) astPattern;
 
-			// declare tokens
+			// declare tokens (only when the variable will be used)
 			List<Variable> tokens = pattern.getTokens();
-			for (Variable token : tokens) {
-				// do not use getMapping because we want to create a fresh new
-				// variable here
-				// because we can have one in the body and one in the scheduler
-				Var local = (Var) transformer.doSwitch(token);
-				procedure.getLocals().add(local);
+			if (repeat == 1 || tokens.size() > 1) {
+				for (Variable token : tokens) {
+					// do not use getMapping because we want to create a fresh
+					// new variable here because we can have one in the body and
+					// one in the scheduler
+					Var local = (Var) transformer.doSwitch(token);
+					procedure.getLocals().add(local);
+				}
 			}
 
 			actionLoadTokens(procedure, variable, tokens, repeat);
