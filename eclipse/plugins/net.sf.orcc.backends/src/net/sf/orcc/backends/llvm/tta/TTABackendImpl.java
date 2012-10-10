@@ -113,27 +113,21 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	private Map<String, String> userMapping;
 
-	private Map<Port, Integer> computePortToAddrSpaceIdMap(Network network) {
+	private Map<Port, Integer> computePortToAddrSpaceIdMap(Vertex vertex) {
 		Map<Port, Integer> map = new HashMap<Port, Integer>();
-		Map<Vertex, Processor> actorsToProcessorMap = design
-				.getActorToProcessorMap();
-		for (Vertex vertex : network.getVertices()) {
-			if (!(vertex instanceof Port)) {
-				Processor processor = actorsToProcessorMap.get(vertex);
-				for (Edge edge : vertex.getOutgoing()) {
-					Connection connection = (Connection) edge;
-					Port port = connection.getSourcePort();
-					if (!port.isNative()) {
-						map.put(port, processor.getAddrSpaceId(connection));
-					}
-				}
-				for (Edge edge : vertex.getIncoming()) {
-					Connection connection = (Connection) edge;
-					Port port = connection.getTargetPort();
-					if (!port.isNative()) {
-						map.put(port, processor.getAddrSpaceId(connection));
-					}
-				}
+		Processor processor = design.getActorToProcessorMap().get(vertex);
+		for (Edge edge : vertex.getIncoming()) {
+			Connection connection = (Connection) edge;
+			Port port = connection.getTargetPort();
+			if (!port.isNative()) {
+				map.put(port, processor.getAddrSpaceId(connection));
+			}
+		}
+		for (Edge edge : vertex.getOutgoing()) {
+			Connection connection = (Connection) edge;
+			Port port = connection.getSourcePort();
+			if (!port.isNative()) {
+				map.put(port, processor.getAddrSpaceId(connection));
 			}
 		}
 		return map;
@@ -223,13 +217,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 		// print instances and entities
 		actorsPath = OrccUtil.createFolder(path, "actors");
-		printer = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
-		printer.setExpressionPrinter(new LLVMExpressionPrinter());
-		printer.setTypePrinter(new LLVMTypePrinter());
-		printer.getOptions().put("profile", profile);
-		printer.getOptions().put("portToAddrSpaceIdMap",
-				computePortToAddrSpaceIdMap(network));
 		printInstances(network);
 
 		// print the design
@@ -365,6 +352,13 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
+		printer = new StandardPrinter(
+				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
+		printer.setExpressionPrinter(new LLVMExpressionPrinter());
+		printer.setTypePrinter(new LLVMTypePrinter());
+		printer.getOptions().put("profile", profile);
+		printer.getOptions().put("portToAddrSpaceIdMap",
+				computePortToAddrSpaceIdMap(instance));
 		return printer.print(instance.getSimpleName() + ".ll", actorsPath,
 				instance);
 	}
