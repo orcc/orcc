@@ -76,6 +76,7 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.graph.util.Dota;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
@@ -307,6 +308,9 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// TCE
 		CommonPrinter.printFile(new TCE_Design_PNDF(path).doSwitch(design),
 				path + File.separator + "top.pndf");
+		
+		CommonPrinter.printFile(new Dota().printDot(design),
+				path + File.separator + "top.dot");
 	}
 
 	private void generateProcessor(Processor tta) {
