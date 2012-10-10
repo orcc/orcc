@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+
+	<!-- This ant build file use "ant-contrib" library. See http://ant-contrib.sourceforge.net/
+	or simply install it with your system package manager -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
+    <target name="javadoc">
+		<if>
+			<not>
+				<or>
+					<isset property="eclipse.dir" />
+					<isset property="orcc.dir" />
+					<isset property="dest.dir" />
+				</or>
+			</not>
+			<then>
+				<fail>You must specify properties eclipse.dir, orcc.dir and dest.dir</fail>
+			</then>
+		</if>
+
+        <javadoc access="public"
+        	author="true"
+        	classpath="${eclipse.dir}/plugins/**"
+        	destdir="${dest.dir}"
+        	doctitle="Orcc javadoc"
+        	nodeprecated="false"
+        	nodeprecatedlist="false"
+        	noindex="false"
+        	nonavbar="false"
+        	notree="false"
+        	packagenames="net.sf.graphiti.model,net.sf.orcc.moc.impl,net.sf.graphiti.ui.editparts,net.sf.orcc.backends.ir.util,net.sf.orcc.cache.util,net.sf.graphiti.ui.actions,net.sf.orcc.df.util,net.sf.orcc.graph.impl,net.sf.orcc.cal.scoping,net.sf.orcc.backends.java,net.sf.orcc.tools.merger.action,intf.channel.impl,net.sf.orcc.backends.c,net.sf.orcc.util.sexp,net.sf.orcc.ui.editor,net.sf.orcc.cal.cal.util,net.sf.orcc.backends.cplusplus,net.sf.orcc.backends.cplusplus.entities.impl,net.sf.orcc.runtime.impl,net.sf.orcc.cal.parser.antlr,net.sf.orcc.cal.ui.contentassist.antlr,net.sf.orcc.cal.parseTreeConstruction,net.sf.orcc.df.impl,net.sf.orcc.cal.ui.labeling,net.sf.graphiti.ui.commands.refinement,net.sf.orcc.backends.xlim,net.sf.orcc.backends.llvm.tta.architecture,net.sf.graphiti.ui.commands,net.sf.graphiti.validators,net.sf.orcc.ir.impl,net.sf.orcc.util.impl,std.stdio.impl,net.sf.orcc.ui.preferences,net.sf.orcc.util,net.sf.orcc.cal.ui.internal,net.sf.orcc.backends.util,net.sf.orcc.backends.llvm.aot,net.sf.orcc.simulators,net.sf.orcc.cal.parser.antlr.internal,net.sf.orcc.cal.conversion,net.sf.graphiti.ui.figure,net.sf.orcc.backends.transform.ssa,net.sf.orcc.ir.util,net.sf.orcc.backends.llvm.tta.architecture.util,net.sf.orcc.ir,net.sf.orcc.cal.cal.impl,net.sf.orcc.ui.properties,net.sf.orcc.cal.cal,net.sf.orcc.backends.xlim.transform,net.sf.orcc.tools.classifier,net.sf.graphiti.ui.editpolicies,net.sf.orcc.runtime,net.sf.graphiti.ui,net.sf.orcc.plugins,net.sf.orcc.backends.opencl,net.sf.orcc.cal.ui.contentassist,net.sf.orcc.cal.ui.editor.hover,net.sf.orcc.backends.llvm.tta,net.sf.orcc.backends.promela.transform,net.sf.orcc.ir.transform,net.sf.orcc.cal.ui.quickfix,intf.channel.item,net.sf.orcc.ui,net.sf.orcc.backends.c.transform,net.sf.orcc.preferences,net.sf.graphiti.ui.properties,net.sf.orcc.ui.launching.tabs,intf.net.impl,net.sf.orcc.util.util,std.video.impl,net.sf.orcc.backends.promela,net.sf.orcc.backends.transform,net.sf.orcc.tools.classifier.smt,net.sf.orcc.cal.ui,net.sf.orcc.graph.visit,intf.net.item,net.sf.orcc.cal.ui.builder,net.sf.orcc.frontend.schedule,net.sf.orcc.tools.sequitur,net.sf.orcc.df,net.sf.orcc.cal.util,net.sf.orcc.cal.formatting,net.sf.orcc.backends.ir,net.sf.orcc.frontend,net.sf.graphiti.ui.wizards,net.sf.orcc.backends.cplusplus.entities,system.io.impl,net.sf.orcc.backends.llvm.jit,net.sf.orcc.tools.merger.actor,net.sf.orcc.cal.services,net.sf.orcc.cache.impl,net.sf.graphiti.ui.editors,net.sf.orcc.backends.llvm.transform,net.sf.orcc.cal.ui.outline,net.sf.orcc.cal.validation,net.sf.orcc.ui.console,net.sf.orcc.moc.util,net.sf.orcc.plugins.impl,net.sf.orcc.cache,net.sf.orcc.graph.util,net.sf.orcc.ui.refactoring,net.sf.orcc.tools.statistics,net.sf.orcc.moc,net.sf.orcc.cal.ui.contentassist.antlr.internal,net.sf.orcc.backends.llvm.tta.architecture.impl,net.sf.graphiti.ui.figure.shapes,net.sf.graphiti.ui.commands.copyPaste,net.sf.orcc.ir.cfg,net.sf.orcc.backends.c.embedded,net.sf.orcc.ui.launching.impl,net.sf.orcc.backends.llvm.tta.transform,net.sf.graphiti.io,net.sf.orcc.df.transform,net.sf.orcc.ui.launching,net.sf.orcc.backends.cplusplus.entities.util,net.sf.orcc.backends.ir.impl,system.io.item"
+        	source="1.6"
+        	sourcefiles="${orcc.dir}/eclipse/plugins/net.sf.orcc.core/src/net/sf/orcc/package-info.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.models/src/net/sf/orcc/graph/Edge.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.cal/src/net/sf/orcc/cal/CalValueConverter.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/AbstractBackend.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/MultipleClassLoader.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.models/src/net/sf/orcc/graph/GraphFactory.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.models/src/net/sf/orcc/graph/Vertex.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.cal/src-gen/net/sf/orcc/cal/CalStandaloneSetupGenerated.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.cal/src/net/sf/orcc/cal/CalStandaloneSetup.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.core/src/net/sf/orcc/OrccRuntimeException.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/package-info.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/AbstractPrinter.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.cal/src/net/sf/orcc/cal/CalConstants.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/TemplateData.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.cal/src/net/sf/orcc/cal/CalRuntimeModule.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.core/src/net/sf/orcc/OrccLaunchConstants.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.core/src/net/sf/orcc/OrccProperties.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/Activator.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/Backend.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/BackendFactory.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/CommonPrinter.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.core/src/net/sf/orcc/OrccProjectNature.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.core/src/net/sf/orcc/OrccException.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.core/src/net/sf/orcc/OrccActivator.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.core/src/net/sf/orcc/OrccPropertyTester.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.cal/src/net/sf/orcc/cal/CalSyntaxErrorMessageProvider.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/StandardPrinter.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.models/src/net/sf/orcc/graph/GraphPackage.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.models/src/net/sf/orcc/graph/Graph.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src/net/sf/orcc/backends/CustomPrinter.java,${orcc.dir}/eclipse/plugins/net.sf.orcc.cal/src-gen/net/sf/orcc/cal/AbstractCalRuntimeModule.java,/home/alorence/orcc_src/graphiti-editor/plugins/net.sf.graphiti.model/src/net/sf/graphiti/GraphitiModelPlugin.java"
+        	sourcepath="${orcc.dir}/eclipse/plugins/net.sf.orcc.cal.ui/src-gen:/home/alorence/orcc_src/graphiti-editor/plugins/net.sf.graphiti.ui/src:${orcc.dir}/eclipse/plugins/net.sf.orcc.cal/src:${orcc.dir}/eclipse/plugins/net.sf.orcc.cal/src-gen:${orcc.dir}/eclipse/plugins/net.sf.orcc.models/xtend-gen:${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/xtend-gen:${orcc.dir}/eclipse/plugins/net.sf.orcc.cal.ui/src:${orcc.dir}/eclipse/plugins/net.sf.orcc.core/src:${orcc.dir}/eclipse/plugins/net.sf.orcc.models/src:${orcc.dir}/eclipse/plugins/net.sf.orcc.ui/src:/home/alorence/orcc_src/graphiti-editor/plugins/net.sf.graphiti.model/src:${orcc.dir}/eclipse/plugins/net.sf.orcc.backends/src:${orcc.dir}/eclipse/plugins/net.sf.orcc.simulators/src" splitindex="true"
+        	use="true"
+        	version="true"/>
+    </target>
+</project>
