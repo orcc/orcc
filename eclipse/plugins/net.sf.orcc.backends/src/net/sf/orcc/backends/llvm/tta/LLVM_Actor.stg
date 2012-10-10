@@ -2,9 +2,9 @@ import "net/sf/orcc/backends/llvm/aot/Actor.stg"
 
 printExternalFifo(connection, port) ::= <<
 <if(!port.native)
->@fifo_<connection.id>_content = external addrspace(<options.portToAddrSpaceIdMap.(port)>) global [<connection.size> x <if(connection.sourcePort)><connection.sourcePort.type><else><connection.targetPort.type><endif>]
-@fifo_<connection.id>_rdIndex = external addrspace(<options.portToAddrSpaceIdMap.(port)>) global i32
-@fifo_<connection.id>_wrIndex = external addrspace(<options.portToAddrSpaceIdMap.(port)>) global i32<
+>@fifo_<connection.id>_content = external addrspace(<options.portToIdMap.(port)>) global [<connection.size> x <if(connection.sourcePort)><connection.sourcePort.type><else><connection.targetPort.type><endif>]
+@fifo_<connection.id>_rdIndex = external addrspace(<options.portToIdMap.(port)>) global i32
+@fifo_<connection.id>_wrIndex = external addrspace(<options.portToIdMap.(port)>) global i32<
 endif>
 >>
 
@@ -37,9 +37,9 @@ entry:
 	br label %read
 
 read:
-	%rdIndex = load volatile i32 addrspace(<options.portToAddrSpaceIdMap.(port)>)* @fifo_<connection.id>_rdIndex
+	%rdIndex = load volatile i32 addrspace(<options.portToIdMap.(port)>)* @fifo_<connection.id>_rdIndex
 	store i32 %rdIndex, i32* @index_<port.name>
-	%wrIndex = load volatile i32 addrspace(<options.portToAddrSpaceIdMap.(port)>)* @fifo_<connection.id>_wrIndex
+	%wrIndex = load volatile i32 addrspace(<options.portToIdMap.(port)>)* @fifo_<connection.id>_wrIndex
 	store i32 %wrIndex, i32* @wrIndex_<port.name>
 	%getNumTokens = sub i32 %wrIndex, %rdIndex
 	%numTokens = add i32 %rdIndex, %getNumTokens
@@ -53,7 +53,7 @@ entry:
 
 read_end:
 	%rdIndex = load i32* @index_<port.name>
-	store volatile i32 %rdIndex, i32 addrspace(<options.portToAddrSpaceIdMap.(port)>)* @fifo_<connection.id>_rdIndex
+	store volatile i32 %rdIndex, i32 addrspace(<options.portToIdMap.(port)>)* @fifo_<connection.id>_rdIndex
 	ret void
 }
 >>
@@ -64,9 +64,9 @@ entry:
 	br label %write
 
 write:
-	%wrIndex = load volatile i32 addrspace(<options.portToAddrSpaceIdMap.(port)>)* @fifo_<connection.id>_wrIndex
+	%wrIndex = load volatile i32 addrspace(<options.portToIdMap.(port)>)* @fifo_<connection.id>_wrIndex
 	store i32 %wrIndex, i32* @index_<port.name>
-	%rdIndex = load volatile i32 addrspace(<options.portToAddrSpaceIdMap.(port)>)* @fifo_<connection.id>_rdIndex
+	%rdIndex = load volatile i32 addrspace(<options.portToIdMap.(port)>)* @fifo_<connection.id>_rdIndex
 	store i32 %rdIndex, i32* @rdIndex_<port.name>
 	%size = load i32* @SIZE_<port.name>
 	%numTokens = sub i32 %wrIndex, %rdIndex
@@ -82,7 +82,7 @@ entry:
 
 write_end:
 	%wrIndex = load i32* @index_<port.name>
-	store volatile i32 %wrIndex, i32 addrspace(<options.portToAddrSpaceIdMap.(port)>)* @fifo_<connection.id>_wrIndex
+	store volatile i32 %wrIndex, i32 addrspace(<options.portToIdMap.(port)>)* @fifo_<connection.id>_wrIndex
 	ret void
 }
 >>
@@ -97,7 +97,7 @@ printStore(store) ::= <<
 <if(store.target.variable.type.list)>
 <if(action.outputPattern.varToPortMap.(store.target.variable) && !action.outputPattern.varToPortMap.(store.target.variable).native)>
 <printPortAccess(first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(store.target.variable))), action.outputPattern.varToPortMap.(store.target.variable), store.target.variable, store.indexes, store)>
-store volatile <store.target.variable.type.innermostType> <Expr(store.value)>, <store.target.variable.type.innermostType> addrspace(<options.portToAddrSpaceIdMap.(action.outputPattern.varToPortMap.(store.target.variable))>)* <varName(store.target.variable, store)>
+store volatile <store.target.variable.type.innermostType> <Expr(store.value)>, <store.target.variable.type.innermostType> addrspace(<options.portToIdMap.(action.outputPattern.varToPortMap.(store.target.variable))>)* <varName(store.target.variable, store)>
 <else>
 <varName(store.target.variable, store)> = getelementptr <store.target.variable.type>* <Var(store.target.variable)>, i32 0<if(store.indexes)>, <indexes(store.indexes)><endif>
 store <store.target.variable.type.innermostType> <Expr(store.value)>, <store.target.variable.type.innermostType>* <varName(store.target.variable, store)>
@@ -111,10 +111,10 @@ printLoad(load) ::= <<
 <if(load.source.variable.type.list)>
 <if(action.inputPattern.varToPortMap.(load.source.variable) && !action.inputPattern.varToPortMap.(load.source.variable).native)>
 <printPortAccess(instance.incomingPortMap.(action.inputPattern.varToPortMap.(load.source.variable)), action.inputPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)>
-<Var(load.target.variable)> = load volatile <load.source.variable.type.innermostType> addrspace(<options.portToAddrSpaceIdMap.(action.inputPattern.varToPortMap.(load.source.variable))>)* <varName(load.source.variable, load)>
+<Var(load.target.variable)> = load volatile <load.source.variable.type.innermostType> addrspace(<options.portToIdMap.(action.inputPattern.varToPortMap.(load.source.variable))>)* <varName(load.source.variable, load)>
 <elseif(action.peekPattern.varToPortMap.(load.source.variable))>
 <printPortAccess(instance.incomingPortMap.(action.peekPattern.varToPortMap.(load.source.variable)), action.peekPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)>
-<Var(load.target.variable)> = load volatile <load.source.variable.type.innermostType> addrspace(<options.portToAddrSpaceIdMap.(action.peekPattern.varToPortMap.(load.source.variable))>)* <varName(load.source.variable, load)>
+<Var(load.target.variable)> = load volatile <load.source.variable.type.innermostType> addrspace(<options.portToIdMap.(action.peekPattern.varToPortMap.(load.source.variable))>)* <varName(load.source.variable, load)>
 <else>
 <varName(load.source.variable, load)> = getelementptr <load.source.variable.type>* <Var(load.source.variable)>, i32 0, <indexes(load.indexes)>
 <Var(load.target.variable)> = load <load.source.variable.type.innermostType>* <varName(load.source.variable, load)>
@@ -128,7 +128,7 @@ printPortAccess(fifo, port, var, indexes, instruction) ::= <<
 <if(instance.actor.templateData.castedIndexes.(first(indexes)))>%cast_index_<var.name>_<procedure.accessMap.(instruction)> = zext <first(indexes).type> <Expr(first(indexes))> to i32<endif>
 %tmp_index_<var.name>_<procedure.accessMap.(instruction)> = add i32 %local_index_<port.name>, <if(instance.actor.templateData.castedIndexes.(first(indexes)))>%cast_index_<var.name>_<procedure.accessMap.(instruction)><else><Expr(first(indexes))><endif>
 %final_index_<var.name>_<procedure.accessMap.(instruction)> = urem i32 %tmp_index_<var.name>_<procedure.accessMap.(instruction)>, %local_size_<port.name>
-<varName(var, instruction)> = getelementptr [<fifo.size> x <port.type>] addrspace(<options.portToAddrSpaceIdMap.(port)>)* @fifo_<fifo.id>_content, i32 0, i32 %final_index_<var.name>_<procedure.accessMap.(instruction)>
+<varName(var, instruction)> = getelementptr [<fifo.size> x <port.type>] addrspace(<options.portToIdMap.(port)>)* @fifo_<fifo.id>_content, i32 0, i32 %final_index_<var.name>_<procedure.accessMap.(instruction)>
 >>
 
 printNativeRead(port, var) ::= <<

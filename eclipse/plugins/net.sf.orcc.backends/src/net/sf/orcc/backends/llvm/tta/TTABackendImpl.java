@@ -113,7 +113,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	private Map<String, String> userMapping;
 
-	private Map<Port, Integer> computePortToAddrSpaceIdMap(Vertex vertex) {
+	private Map<Port, Integer> computePortToIdMap(Vertex vertex) {
 		Map<Port, Integer> map = new HashMap<Port, Integer>();
 		Processor processor = design.getActorToProcessorMap().get(vertex);
 		for (Edge edge : vertex.getIncoming()) {
@@ -357,8 +357,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 		printer.getOptions().put("profile", profile);
-		printer.getOptions().put("portToAddrSpaceIdMap",
-				computePortToAddrSpaceIdMap(instance));
+		printer.getOptions().put("portToIdMap",
+				computePortToIdMap(instance));
 		return printer.print(instance.getSimpleName() + ".ll", actorsPath,
 				instance);
 	}
