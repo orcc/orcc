@@ -53,27 +53,21 @@ class Dota {
 		digraph G {
 			node [label="", shape=box];
 			«FOR vertex : graph.vertices»
-			«print(vertex)»
+				«vertex.print»
 			«ENDFOR»
 			«FOR edge : graph.edges»
-			«print(edge)»
+				«edge.print»
 			«ENDFOR»
 		}
 	'''
 
-	def private print(Edge edge) {
-		var label = edge.label
-		'''
-		node_«getId(edge.source)» -> node_«getId(edge.target)» «IF label != null && !label.empty » [label="(«edge.label»"]; «ENDIF»;
-		'''
-	}
+	def private print(Edge edge) '''
+		node_«edge.source.id» -> node_«edge.target.id» [label="«edge.label»"];
+	'''
 
-	def private print(Vertex vertex) {
-		var label = vertex.label
-		'''
-		node_«getId(vertex)» [label="(«vertex.number»)«IF label != null && !label.empty» «label»«ENDIF»"];
-		'''
-	}
+	def private print(Vertex vertex) '''
+		node_«vertex.id» [label="(«vertex.number») «vertex.label»"];
+	'''
 
 	def private getId(Vertex vertex) {
 		var id = vertexMap.get(vertex)
