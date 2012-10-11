@@ -22,12 +22,14 @@ import org.eclipse.emf.common.util.EList;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.graph.Vertex#getIncoming <em>Incoming</em>}</li>
  *   <li>{@link net.sf.orcc.graph.Vertex#getLabel <em>Label</em>}</li>
  *   <li>{@link net.sf.orcc.graph.Vertex#getNumber <em>Number</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.Vertex#getIncoming <em>Incoming</em>}</li>
  *   <li>{@link net.sf.orcc.graph.Vertex#getOutgoing <em>Outgoing</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.Vertex#getConnecting <em>Connecting</em>}</li>
  *   <li>{@link net.sf.orcc.graph.Vertex#getPredecessors <em>Predecessors</em>}</li>
  *   <li>{@link net.sf.orcc.graph.Vertex#getSuccessors <em>Successors</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.Vertex#getNeighbors <em>Neighbors</em>}</li>
  * </ul>
  * </p>
  *
@@ -110,6 +112,22 @@ public interface Vertex extends Attributable, Adaptable {
 	EList<Edge> getOutgoing();
 
 	/**
+	 * Returns the value of the '<em><b>Connecting</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.graph.Edge}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Connecting</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Connecting</em>' reference list.
+	 * @see net.sf.orcc.graph.GraphPackage#getVertex_Connecting()
+	 * @model resolveProxies="false" transient="true" changeable="false" derived="true"
+	 * @generated
+	 */
+	EList<Edge> getConnecting();
+
+	/**
 	 * Returns the value of the '<em><b>Predecessors</b></em>' reference list.
 	 * The list contents are of type {@link net.sf.orcc.graph.Vertex}.
 	 * <!-- begin-user-doc -->
@@ -140,6 +158,22 @@ public interface Vertex extends Attributable, Adaptable {
 	 * @generated
 	 */
 	EList<Vertex> getSuccessors();
+
+	/**
+	 * Returns the value of the '<em><b>Neighbors</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.graph.Vertex}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Neighboors</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Neighbors</em>' reference list.
+	 * @see net.sf.orcc.graph.GraphPackage#getVertex_Neighbors()
+	 * @model resolveProxies="false" transient="true" changeable="false" derived="true"
+	 * @generated
+	 */
+	EList<Vertex> getNeighbors();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.graph.Vertex#getLabel <em>Label</em>}' attribute.

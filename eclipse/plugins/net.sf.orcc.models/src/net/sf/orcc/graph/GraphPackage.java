@@ -91,22 +91,13 @@ public interface GraphPackage extends EPackage {
 	int VERTEX__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VERTEX__INCOMING = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX__LABEL = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
+	int VERTEX__LABEL = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Number</b></em>' attribute.
@@ -115,7 +106,16 @@ public interface GraphPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX__NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
+	int VERTEX__NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__INCOMING = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
@@ -127,13 +127,22 @@ public interface GraphPackage extends EPackage {
 	int VERTEX__OUTGOING = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__CONNECTING = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
+
+	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX__PREDECESSORS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
+	int VERTEX__PREDECESSORS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Successors</b></em>' reference list.
@@ -142,7 +151,16 @@ public interface GraphPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX__SUCCESSORS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
+	int VERTEX__SUCCESSORS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__NEIGHBORS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 7;
 
 	/**
 	 * The number of structural features of the '<em>Vertex</em>' class.
@@ -151,7 +169,7 @@ public interface GraphPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
+	int VERTEX_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 8;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -161,15 +179,6 @@ public interface GraphPackage extends EPackage {
 	 * @ordered
 	 */
 	int GRAPH__ATTRIBUTES = VERTEX__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int GRAPH__INCOMING = VERTEX__INCOMING;
 
 	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
@@ -190,6 +199,15 @@ public interface GraphPackage extends EPackage {
 	int GRAPH__NUMBER = VERTEX__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAPH__INCOMING = VERTEX__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -197,6 +215,15 @@ public interface GraphPackage extends EPackage {
 	 * @ordered
 	 */
 	int GRAPH__OUTGOING = VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAPH__CONNECTING = VERTEX__CONNECTING;
 
 	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
@@ -215,6 +242,15 @@ public interface GraphPackage extends EPackage {
 	 * @ordered
 	 */
 	int GRAPH__SUCCESSORS = VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAPH__NEIGHBORS = VERTEX__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
@@ -363,6 +399,17 @@ public interface GraphPackage extends EPackage {
 	EReference getVertex_Outgoing();
 
 	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.graph.Vertex#getConnecting <em>Connecting</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Connecting</em>'.
+	 * @see net.sf.orcc.graph.Vertex#getConnecting()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_Connecting();
+
+	/**
 	 * Returns the meta object for the reference list '{@link net.sf.orcc.graph.Vertex#getPredecessors <em>Predecessors</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -383,6 +430,17 @@ public interface GraphPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getVertex_Successors();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.graph.Vertex#getNeighbors <em>Neighbors</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Neighbors</em>'.
+	 * @see net.sf.orcc.graph.Vertex#getNeighbors()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_Neighbors();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.graph.Vertex#getNumber <em>Number</em>}'.
@@ -524,6 +582,14 @@ public interface GraphPackage extends EPackage {
 		EReference VERTEX__OUTGOING = eINSTANCE.getVertex_Outgoing();
 
 		/**
+		 * The meta object literal for the '<em><b>Connecting</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__CONNECTING = eINSTANCE.getVertex_Connecting();
+
+		/**
 		 * The meta object literal for the '<em><b>Predecessors</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -538,6 +604,14 @@ public interface GraphPackage extends EPackage {
 		 * @generated
 		 */
 		EReference VERTEX__SUCCESSORS = eINSTANCE.getVertex_Successors();
+
+		/**
+		 * The meta object literal for the '<em><b>Neighbors</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__NEIGHBORS = eINSTANCE.getVertex_Neighbors();
 
 		/**
 		 * The meta object literal for the '<em><b>Number</b></em>' attribute feature.

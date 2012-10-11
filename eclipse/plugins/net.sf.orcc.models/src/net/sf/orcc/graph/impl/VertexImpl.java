@@ -34,12 +34,14 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getIncoming <em>Incoming</em>}</li>
  *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getLabel <em>Label</em>}</li>
  *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getNumber <em>Number</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getIncoming <em>Incoming</em>}</li>
  *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getOutgoing <em>Outgoing</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getConnecting <em>Connecting</em>}</li>
  *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getPredecessors <em>Predecessors</em>}</li>
  *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getSuccessors <em>Successors</em>}</li>
+ *   <li>{@link net.sf.orcc.graph.impl.VertexImpl#getNeighbors <em>Neighbors</em>}</li>
  * </ul>
  * </p>
  *
@@ -57,26 +59,21 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 			if (vertex.predecessors != null) {
 				if (feature == GraphPackage.Literals.VERTEX__INCOMING) {
 					vertex.predecessors = null;
+					vertex.neighbors = null;
+					vertex.connecting = null;
 				}
 			}
 
 			if (vertex.successors != null) {
 				if (feature == GraphPackage.Literals.VERTEX__OUTGOING) {
 					vertex.successors = null;
+					vertex.neighbors = null;
+					vertex.connecting = null;
 				}
 			}
 		}
 
 	}
-
-	/**
-	 * The cached value of the '{@link #getIncoming() <em>Incoming</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getIncoming()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Edge> incoming;
 
 	/**
 	 * The default value of the '{@link #getLabel() <em>Label</em>}' attribute.
@@ -115,6 +112,15 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	protected int number = NUMBER_EDEFAULT;
 
 	/**
+	 * The cached value of the '{@link #getIncoming() <em>Incoming</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getIncoming()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Edge> incoming;
+
+	/**
 	 * The cached value of the '{@link #getOutgoing() <em>Outgoing</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutgoing()
@@ -122,6 +128,16 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	 * @ordered
 	 */
 	protected EList<Edge> outgoing;
+
+	/**
+	 * The cached value of the '{@link #getConnecting() <em>Connecting</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getConnecting()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Edge> connecting;
 
 	/**
 	 * The cached value of the '{@link #getPredecessors() <em>Predecessors</em>}
@@ -142,6 +158,16 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	protected EList<Vertex> successors;
 
 	/**
+	 * The cached value of the '{@link #getNeighbors() <em>Neighbors</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getNeighbors()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Vertex> neighbors;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	protected VertexImpl() {
@@ -156,18 +182,22 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case GraphPackage.VERTEX__INCOMING:
-			return getIncoming();
 		case GraphPackage.VERTEX__LABEL:
 			return getLabel();
 		case GraphPackage.VERTEX__NUMBER:
 			return getNumber();
+		case GraphPackage.VERTEX__INCOMING:
+			return getIncoming();
 		case GraphPackage.VERTEX__OUTGOING:
 			return getOutgoing();
+		case GraphPackage.VERTEX__CONNECTING:
+			return getConnecting();
 		case GraphPackage.VERTEX__PREDECESSORS:
 			return getPredecessors();
 		case GraphPackage.VERTEX__SUCCESSORS:
 			return getSuccessors();
+		case GraphPackage.VERTEX__NEIGHBORS:
+			return getNeighbors();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -216,19 +246,23 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case GraphPackage.VERTEX__INCOMING:
-			return incoming != null && !incoming.isEmpty();
 		case GraphPackage.VERTEX__LABEL:
 			return LABEL_EDEFAULT == null ? label != null : !LABEL_EDEFAULT
 					.equals(label);
 		case GraphPackage.VERTEX__NUMBER:
 			return number != NUMBER_EDEFAULT;
+		case GraphPackage.VERTEX__INCOMING:
+			return incoming != null && !incoming.isEmpty();
 		case GraphPackage.VERTEX__OUTGOING:
 			return outgoing != null && !outgoing.isEmpty();
+		case GraphPackage.VERTEX__CONNECTING:
+			return connecting != null && !connecting.isEmpty();
 		case GraphPackage.VERTEX__PREDECESSORS:
 			return predecessors != null && !predecessors.isEmpty();
 		case GraphPackage.VERTEX__SUCCESSORS:
 			return successors != null && !successors.isEmpty();
+		case GraphPackage.VERTEX__NEIGHBORS:
+			return neighbors != null && !neighbors.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -241,15 +275,15 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case GraphPackage.VERTEX__INCOMING:
-			getIncoming().clear();
-			getIncoming().addAll((Collection<? extends Edge>) newValue);
-			return;
 		case GraphPackage.VERTEX__LABEL:
 			setLabel((String) newValue);
 			return;
 		case GraphPackage.VERTEX__NUMBER:
 			setNumber((Integer) newValue);
+			return;
+		case GraphPackage.VERTEX__INCOMING:
+			getIncoming().clear();
+			getIncoming().addAll((Collection<? extends Edge>) newValue);
 			return;
 		case GraphPackage.VERTEX__OUTGOING:
 			getOutgoing().clear();
@@ -275,14 +309,14 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case GraphPackage.VERTEX__INCOMING:
-			getIncoming().clear();
-			return;
 		case GraphPackage.VERTEX__LABEL:
 			setLabel(LABEL_EDEFAULT);
 			return;
 		case GraphPackage.VERTEX__NUMBER:
 			setNumber(NUMBER_EDEFAULT);
+			return;
+		case GraphPackage.VERTEX__INCOMING:
+			getIncoming().clear();
 			return;
 		case GraphPackage.VERTEX__OUTGOING:
 			getOutgoing().clear();
@@ -363,6 +397,28 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public EList<Edge> getConnecting() {
+		if (connecting == null) {
+			connecting = new EObjectEList<Edge>(Edge.class, this,
+					GraphPackage.VERTEX__CONNECTING);
+			for (Edge edge : getIncoming()) {
+				if (!connecting.contains(edge)) {
+					connecting.add(edge);
+				}
+			}
+			for (Edge edge : getOutgoing()) {
+				if (!connecting.contains(edge)) {
+					connecting.add(edge);
+				}
+			}
+		}
+		return connecting;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 */
@@ -398,6 +454,28 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 			}
 		}
 		return successors;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public EList<Vertex> getNeighbors() {
+		if (neighbors == null) {
+			neighbors = new EObjectEList<Vertex>(Vertex.class, this,
+					GraphPackage.VERTEX__NEIGHBORS);
+			for(Vertex successor : getSuccessors()){
+				if(!neighbors.contains(successor)){
+					neighbors.add(successor);
+				}
+			}
+			for(Vertex predecessor : getPredecessors()){
+				if(!neighbors.contains(predecessor)){
+					neighbors.add(predecessor);
+				}
+			}
+		}
+		return neighbors;
 	}
 
 	/**
