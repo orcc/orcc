@@ -199,8 +199,10 @@ endif>
 
 printLoad(load) ::= <<
 <if(load.source.variable.type.list)><
-if(action.inputPattern.varToPortMap.(load.source.variable) && !action.inputPattern.varToPortMap.(load.source.variable).native)
+if((action.inputPattern.varToPortMap.(load.source.variable) && !action.inputPattern.varToPortMap.(load.source.variable).native))
 ><printPortAccess(instance.incomingPortMap.(action.inputPattern.varToPortMap.(load.source.variable)), action.inputPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)><
+elseif(action.outputPattern.varToPortMap.(load.source.variable) && !action.outputPattern.varToPortMap.(load.source.variable).native)
+><printPortAccess(first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(load.source.variable))), action.outputPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)><
 elseif(action.peekPattern.varToPortMap.(load.source.variable))
 ><printPortAccess(instance.incomingPortMap.(action.peekPattern.varToPortMap.(load.source.variable)), action.peekPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)><
 else
