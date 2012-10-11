@@ -100,15 +100,6 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN__ATTRIBUTES = GraphPackage.GRAPH__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int DESIGN__INCOMING = GraphPackage.GRAPH__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -127,6 +118,15 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN__NUMBER = GraphPackage.GRAPH__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__INCOMING = GraphPackage.GRAPH__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -134,6 +134,42 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int DESIGN__OUTGOING = GraphPackage.GRAPH__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__CONNECTING = GraphPackage.GRAPH__CONNECTING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__PREDECESSORS = GraphPackage.GRAPH__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__SUCCESSORS = GraphPackage.GRAPH__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__NEIGHBORS = GraphPackage.GRAPH__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
@@ -416,15 +452,6 @@ public interface ArchitecturePackage extends EPackage {
 	int COMPONENT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int COMPONENT__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -443,6 +470,15 @@ public interface ArchitecturePackage extends EPackage {
 	int COMPONENT__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -450,6 +486,42 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int COMPONENT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__CONNECTING = GraphPackage.VERTEX__CONNECTING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__PREDECESSORS = GraphPackage.VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__NEIGHBORS = GraphPackage.VERTEX__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -586,15 +658,6 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -613,6 +676,15 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -620,6 +692,42 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int PORT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__CONNECTING = GraphPackage.VERTEX__CONNECTING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__PREDECESSORS = GraphPackage.VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__NEIGHBORS = GraphPackage.VERTEX__NEIGHBORS;
 
 	/**
 	 * The number of structural features of the '<em>Port</em>' class. <!--
@@ -775,15 +883,6 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__ATTRIBUTES = COMPONENT__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PROCESSOR__INCOMING = COMPONENT__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -802,6 +901,15 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__NUMBER = COMPONENT__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__INCOMING = COMPONENT__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -809,6 +917,42 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int PROCESSOR__OUTGOING = COMPONENT__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__CONNECTING = COMPONENT__CONNECTING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__PREDECESSORS = COMPONENT__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__SUCCESSORS = COMPONENT__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__NEIGHBORS = COMPONENT__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1105,15 +1249,6 @@ public interface ArchitecturePackage extends EPackage {
 	int FUNCTION_UNIT__ATTRIBUTES = PORT__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FUNCTION_UNIT__INCOMING = PORT__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1132,6 +1267,15 @@ public interface ArchitecturePackage extends EPackage {
 	int FUNCTION_UNIT__NUMBER = PORT__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__INCOMING = PORT__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1139,6 +1283,42 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int FUNCTION_UNIT__OUTGOING = PORT__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__CONNECTING = PORT__CONNECTING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__PREDECESSORS = PORT__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__SUCCESSORS = PORT__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__NEIGHBORS = PORT__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--

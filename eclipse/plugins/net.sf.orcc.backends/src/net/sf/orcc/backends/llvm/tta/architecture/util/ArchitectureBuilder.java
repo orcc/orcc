@@ -107,7 +107,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private int bufferId = 0;
 
-	private Map<Component, Map<Component, Memory>> bufferMap;
 	private Map<Vertex, Component> componentMap;
 
 	private Design design;
@@ -195,7 +194,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			Mapping mapping, boolean reduceConnections) {
 		this.mapping = mapping;
 		this.componentMap = new HashMap<Vertex, Component>();
-		this.bufferMap = new HashMap<Component, Map<Component, Memory>>();
 		this.reduceConnections = reduceConnections;
 		this.design = factory.createDesign();
 
@@ -282,28 +280,14 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		}
 
 		Memory ram;
-		Map<Component, Memory> tgtToBufferMap = null;
-
-		if (reduceConnections) {
-			if (bufferMap.containsKey(source)) {
-				tgtToBufferMap = bufferMap.get(source);
-			} else {
-				tgtToBufferMap = new HashMap<Component, Memory>();
-				bufferMap.put(source, tgtToBufferMap);
-			}
-		}
-
-		if (reduceConnections && tgtToBufferMap.containsKey(target)) {
-			ram = tgtToBufferMap.get(target);
+		if (reduceConnections && source.getNeighbors().contains(target)) {
+			ram = source.getMemorySharedWith(target);
 		} else {
 			ram = connect(source, target);
 			ram.setAttribute("id", bufferId++);
-
-			if (reduceConnections) {
-				tgtToBufferMap.put(target, ram);
-			}
 		}
 
 		ram.getMappedConnections().add(connection);
 	}
+
 }

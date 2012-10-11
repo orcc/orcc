@@ -40,40 +40,24 @@ import org.eclipse.emf.common.util.EList;
 /**
  * <!-- begin-user-doc --> A representation of the model object '
  * <em><b>Processor</b></em>'. <!-- end-user-doc -->
- * 
+ *
  * <p>
  * The following features are supported:
  * <ul>
- * <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getGcu <em>
- * Gcu</em>}</li>
- * <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getBuses <em>
- * Buses</em>}</li>
- * <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getBridges
- * <em>Bridges</em>}</li>
- * <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getSockets
- * <em>Sockets</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getFunctionUnits
- * <em>Function Units</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getRegisterFiles
- * <em>Register Files</em>}</li>
- * <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getROM <em>
- * ROM</em>}</li>
- * <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getLocalRAMs
- * <em>Local RA Ms</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getSharedRAMs
- * <em>Shared RA Ms</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedActors
- * <em>Mapped Actors</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration
- * <em>Configuration</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getGcu <em>Gcu</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getBuses <em>Buses</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getBridges <em>Bridges</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getSockets <em>Sockets</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getFunctionUnits <em>Function Units</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getRegisterFiles <em>Register Files</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getROM <em>ROM</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getLocalRAMs <em>Local RA Ms</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getSharedRAMs <em>Shared RA Ms</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor()
  * @model
  * @generated
@@ -81,7 +65,6 @@ import org.eclipse.emf.common.util.EList;
 public interface Processor extends Component {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @model
 	 * @generated
 	 */
@@ -134,16 +117,14 @@ public interface Processor extends Component {
 	EList<Bus> getBuses();
 
 	/**
-	 * Returns the value of the '<em><b>Configuration</b></em>' attribute. The
-	 * literals are from the enumeration
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration}
-	 * . <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Configuration</b></em>' attribute.
+	 * The literals are from the enumeration {@link net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration}.
+	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Configuration</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Configuration</em>' attribute.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration
 	 * @see #setConfiguration(ProcessorConfiguration)
@@ -189,7 +170,6 @@ public interface Processor extends Component {
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Gcu</em>' containment reference.
 	 * @see #setGcu(GlobalControlUnit)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Gcu()
@@ -244,6 +224,16 @@ public interface Processor extends Component {
 	Memory getMemory(Connection connection);
 
 	/**
+	 * Returns the memory shared with the given processor.
+	 * 
+	 * @param processor
+	 *            the given processor
+	 * @return the memory shared with the given processor or null if it is not
+	 *         existing
+	 */
+	Memory getMemorySharedWith(Processor processor);
+
+	/**
 	 * Return the map associating each memory to its own address-space id.
 	 * 
 	 * @return the map
@@ -277,7 +267,6 @@ public interface Processor extends Component {
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>ROM</em>' containment reference.
 	 * @see #setROM(Memory)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_ROM()
@@ -323,13 +312,10 @@ public interface Processor extends Component {
 	EList<Socket> getSockets();
 
 	/**
-	 * Sets the value of the '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration
-	 * <em>Configuration</em>}' attribute. <!-- begin-user-doc --> <!--
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Configuration</em>' attribute.
+	 * @param value the new value of the '<em>Configuration</em>' attribute.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration
 	 * @see #getConfiguration()
 	 * @generated
@@ -337,26 +323,20 @@ public interface Processor extends Component {
 	void setConfiguration(ProcessorConfiguration value);
 
 	/**
-	 * Sets the value of the '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getGcu
-	 * <em>Gcu</em>}' containment reference. <!-- begin-user-doc --> <!--
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getGcu <em>Gcu</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Gcu</em>' containment reference.
+	 * @param value the new value of the '<em>Gcu</em>' containment reference.
 	 * @see #getGcu()
 	 * @generated
 	 */
 	void setGcu(GlobalControlUnit value);
 
 	/**
-	 * Sets the value of the '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getROM
-	 * <em>ROM</em>}' containment reference. <!-- begin-user-doc --> <!--
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getROM <em>ROM</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>ROM</em>' containment reference.
+	 * @param value the new value of the '<em>ROM</em>' containment reference.
 	 * @see #getROM()
 	 * @generated
 	 */

@@ -559,6 +559,21 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	@Override
+	public Memory getMemorySharedWith(Processor processor) {
+		for (Edge edge : getIncoming()) {
+			if (edge.getSource() == processor) {
+				return (Memory) edge;
+			}
+		}
+		for (Edge edge : getOutgoing()) {
+			if (edge.getTarget() == processor) {
+				return (Memory) edge;
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public Map<Memory, Integer> getMemToAddrSpaceIdMap() {
 		Map<Memory, Integer> map = new HashMap<Memory, Integer>();
 		for (int i = 0; i < getLocalRAMs().size(); i++) {
