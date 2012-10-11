@@ -33,8 +33,10 @@ import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 import java.util.List;
 
 import net.sf.orcc.cal.cal.AnnotationArgument;
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstEntity;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.IrFactory;
@@ -129,6 +131,18 @@ public class Util {
 	}
 
 	/**
+	 * Returns <code>true</code> if the variable is global.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return <code>true</code> if the variable is global
+	 */
+	public static boolean isGlobal(Variable variable) {
+		EObject cter = variable.eContainer();
+		return cter instanceof AstActor || cter instanceof AstUnit;
+	}
+
+	/**
 	 * Transforms the AST annotations to IR.
 	 * 
 	 * @param attr
@@ -146,11 +160,12 @@ public class Util {
 				ExprList pair = IrFactory.eINSTANCE.createExprList();
 				pair.getValue().add(
 						IrFactory.eINSTANCE.createExprString(arg.getName()));
-				
+
 				// Add value if exist
-				if (arg.getValue() != null){
-					pair.getValue().add(
-							IrFactory.eINSTANCE.createExprString(arg.getValue()));
+				if (arg.getValue() != null) {
+					pair.getValue()
+							.add(IrFactory.eINSTANCE.createExprString(arg
+									.getValue()));
 				}
 				arguments.getValue().add(pair);
 			}

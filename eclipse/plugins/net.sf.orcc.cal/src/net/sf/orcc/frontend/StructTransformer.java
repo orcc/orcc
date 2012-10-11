@@ -32,12 +32,10 @@ import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 
 import java.util.List;
 
-import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
-import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Statement;
 import net.sf.orcc.cal.cal.Variable;
@@ -201,8 +199,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 	@Override
 	public EObject caseVariable(Variable variable) {
-		EObject cter = variable.eContainer();
-		if (cter instanceof AstActor || cter instanceof AstUnit) {
+		if (Util.isGlobal(variable)) {
 			return caseVariableGlobal(variable);
 		} else {
 			return caseVariableLocal(variable);
