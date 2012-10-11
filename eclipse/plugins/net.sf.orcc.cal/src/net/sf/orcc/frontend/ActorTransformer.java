@@ -44,6 +44,7 @@ import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
+import net.sf.orcc.cal.cal.ExpressionVariable;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.OutputPattern;
@@ -70,6 +71,7 @@ import net.sf.orcc.frontend.schedule.RegExpConverter;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -82,8 +84,10 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -209,6 +213,22 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		}
 	}
 
+	private boolean needToBeCopied(AstExpression expr) {
+		if (!(expr instanceof ExpressionVariable)) {
+			return true;
+		}
+		Variable variable = ((ExpressionVariable) expr).getValue()
+				.getVariable();
+		if (Util.isGlobal(variable)) {
+			return true;
+		}
+		Var var = Frontend.getMapping(variable);
+		if (EcoreHelper.getContainerOfType(var, Pattern.class) != null) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Assigns tokens to the data that will be written.
 	 * 
@@ -234,10 +254,26 @@ public class ActorTransformer extends CalSwitch<Actor> {
 						portVariable, indexes).doSwitch(value);
 				i++;
 			}
-		} else if (values.size() == 1) {
+		} else if (values.size() == 1 && needToBeCopied(values.get(0))) {
+			// assign the expression to a new variable
 			AstExpression value = values.get(0);
 			new ExprTransformer(procedure, procedure.getBlocks(), portVariable)
 					.doSwitch(value);
+		} else if (values.size() == 1) {
+			// use directly the port variable
+			Variable variable = ((ExpressionVariable) values.get(0)).getValue()
+					.getVariable();
+			Var old = Frontend.getMapping(variable);
+			// replace the use/def of the old variable without moving the new
+			// one from its containing pattern
+			for (Def def : new ArrayList<Def>(old.getDefs())) {
+				def.setVariable(portVariable);
+			}
+			for (Use use : new ArrayList<Use>(old.getUses())) {
+				use.setVariable(portVariable);
+			}
+			Frontend.putMapping(variable, portVariable);
+			EcoreUtil.remove(old);
 		} else {
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
