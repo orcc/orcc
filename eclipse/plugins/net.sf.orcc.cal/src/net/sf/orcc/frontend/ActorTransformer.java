@@ -213,22 +213,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		}
 	}
 
-	private boolean needToBeCopied(AstExpression expr) {
-		if (!(expr instanceof ExpressionVariable)) {
-			return true;
-		}
-		Variable variable = ((ExpressionVariable) expr).getValue()
-				.getVariable();
-		if (Util.isGlobal(variable)) {
-			return true;
-		}
-		Var var = Frontend.getMapping(variable);
-		if (EcoreHelper.getContainerOfType(var, Pattern.class) != null) {
-			return true;
-		}
-		return false;
-	}
-
 	/**
 	 * Assigns tokens to the data that will be written.
 	 * 
@@ -482,6 +466,35 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		return eINSTANCE.createVar(lineNumber,
 				eINSTANCE.createTypeList(numTokens, port.getType()),
 				port.getName(), true, 0);
+	}
+
+	/**
+	 * Check if an expression need be be copied in the output port variable or
+	 * not.
+	 * 
+	 * @param expr
+	 *            the given expression
+	 * @return true if the expression need be be copied in the output port
+	 *         variable
+	 */
+	private boolean needToBeCopied(AstExpression expr) {
+		// if the expression is not a variable, it cannot be used directly
+		if (!(expr instanceof ExpressionVariable)) {
+			return true;
+		}
+		// if it's a global variable, it have to be copied to the fifo
+		Variable variable = ((ExpressionVariable) expr).getValue()
+				.getVariable();
+		if (Util.isGlobal(variable)) {
+			return true;
+		}
+		// if it's an input port variable, it have to be copied to the output
+		// fifo too
+		Var var = Frontend.getMapping(variable);
+		if (EcoreHelper.getContainerOfType(var, Pattern.class) != null) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
