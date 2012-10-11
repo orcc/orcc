@@ -113,7 +113,7 @@ printLoad(load) ::= <<
 <printPortAccess(instance.incomingPortMap.(action.inputPattern.varToPortMap.(load.source.variable)), action.inputPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)>
 <Var(load.target.variable)> = load volatile <load.source.variable.type.innermostType> addrspace(<options.portToIdMap.(action.inputPattern.varToPortMap.(load.source.variable))>)* <varName(load.source.variable, load)>
 <elseif(action.outputPattern.varToPortMap.(load.source.variable) && !action.outputPattern.varToPortMap.(load.source.variable).native)
-><printPortAccess(first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(load.source.variable))), action.outputPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)><
+><printPortAccess(first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(load.source.variable))), action.outputPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)>
 <Var(load.target.variable)> = load volatile <load.source.variable.type.innermostType> addrspace(<options.portToIdMap.(action.outputPattern.varToPortMap.(load.source.variable))>)* <varName(load.source.variable, load)>
 <elseif(action.peekPattern.varToPortMap.(load.source.variable))>
 <printPortAccess(instance.incomingPortMap.(action.peekPattern.varToPortMap.(load.source.variable)), action.peekPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)>
