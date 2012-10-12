@@ -81,6 +81,8 @@ public class SimulatorCli implements IApplication {
 						+ "before application stop. If not defined,"
 						+ "application will run infinitely.");
 
+		clOptions.addOption("n", "nodisplay", false,
+				"Disable display initialization");
 		clOptions.addOption("h", "help", false, "Print this help message");
 
 		try {
