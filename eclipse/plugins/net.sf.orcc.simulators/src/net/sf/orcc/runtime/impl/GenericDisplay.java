@@ -40,12 +40,12 @@ public class GenericDisplay {
 	/**
 	 * display is enabled.
 	 */
-	public static final int DISPLAY_ENABLE = 1;
+	public static final int DISPLAY_ENABLE = 2;
 
 	/**
 	 * display is ready.
 	 */
-	public static final int DISPLAY_READY = 2;
+	public static final int DISPLAY_READY = 1;
 
 	protected static String goldenReference = "";
 
