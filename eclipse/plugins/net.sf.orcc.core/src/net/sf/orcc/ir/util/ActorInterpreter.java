@@ -393,8 +393,8 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	/**
 	 * Returns a new value clipped to:
 	 * <ul>
-	 * <li>[-2**(n-1); 2**(n-1) - 1] if type is int(size=n)</li>
-	 * <li>[0; 2**n - 1] if type is uint(size=n)</li>
+	 * <li>[-2<sup>n-1</sup>; 2<sup>n-1</sup> - 1] if type is int (size=n)</li>
+	 * <li>[0; 2<sup>n-1</sup>] if type is uint (size=n)</li>
 	 * </ul>
 	 * Prints a warning in case of signed overflow/underflow.
 	 * 

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.simulators;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -106,9 +105,8 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			}
 
 			Class<?> clasz = Class.forName(name);
-			Method method = clasz
-					.getMethod(procedure.getName(), parameterTypes);
-			return method.invoke(null, args);
+			return clasz.getMethod(procedure.getName(), parameterTypes).invoke(
+					null, args);
 		} catch (Exception e) {
 			throw new OrccRuntimeException(
 					"exception during native procedure call to " + methodName,
