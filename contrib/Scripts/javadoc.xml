@@ -10,23 +10,25 @@
     <target name="javadoc">
 		<if>
 			<not>
-				<or>
-					<isset property="eclipse.dir" />
+				<and>
 					<isset property="plugins.dir" />
 					<isset property="dest.dir" />
-				</or>
+				</and>
 			</not>
 			<then>
-				<fail>You must specify properties eclipse.dir, orcc.dir and dest.dir</fail>
+				<fail>You must specify properties plugins.dir and dest.dir</fail>
 			</then>
 		</if>
 
+		<tstamp/>
+		
+
         <javadoc
-        	doctitle="Orcc javadoc" 
-			classpath="${eclipse.dir}/plugins/**"
+        	doctitle="Orcc documentation (generated ${TODAY})" 
+        	Windowtitle="Generated Orcc documentation"
 			destdir="${dest.dir}"
 			splitindex="true"
-        	nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.6"
+        	nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.7"
         	access="public" author="true" use="true" version="true">
 	        	<fileset dir="${plugins.dir}" defaultexcludes="yes">
 					<include name="**/src/**/*.java" />
