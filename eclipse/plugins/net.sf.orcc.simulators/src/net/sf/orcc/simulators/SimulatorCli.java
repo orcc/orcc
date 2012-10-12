@@ -77,9 +77,9 @@ public class SimulatorCli implements IApplication {
 
 		// Optional command line arguments
 		clOptions.addOption("l", "loopsnumber", true,
-				"Define the number of times input stimulus will be read"
-						+ "before application stop. If not defined,"
-						+ "application will run infinitely.");
+				"Defines the number of times input stimulus will be read before"
+						+ "application stop. A negative value means infinite."
+						+ "Default : 1 time.");
 
 		clOptions.addOption("n", "nodisplay", false,
 				"Disable display initialization");

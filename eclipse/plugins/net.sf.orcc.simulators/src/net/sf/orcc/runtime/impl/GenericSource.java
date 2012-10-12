@@ -29,10 +29,14 @@
 
 package net.sf.orcc.runtime.impl;
 
+import net.sf.orcc.simulators.Simulator;
+
 
 public class GenericSource {
 
 	protected static String inputStimulus = "";
+
+	protected static int nbLoops = Simulator.DEFAULT_NB_LOOPS;
 
 	/**
 	 * Sets the file name used by this Source class.
@@ -49,6 +53,10 @@ public class GenericSource {
 		GenericSource.inputStimulus = fileName;
 	}
 	
+	public static void setNbLoops(int nb) {
+		nbLoops = nb;
+	}
+
 	public void close(){
 		
 	}

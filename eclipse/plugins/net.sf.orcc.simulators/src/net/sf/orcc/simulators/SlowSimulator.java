@@ -34,6 +34,7 @@ import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE;
 import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE_FILE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
+import static net.sf.orcc.OrccLaunchConstants.LOOP_NUMBER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
@@ -96,6 +97,8 @@ public class SlowSimulator extends AbstractSimulator {
 	private boolean hasGoldenReference;
 
 	private String goldenReferenceFile;
+
+	private int loopsNumber;
 
 	/**
 	 * Creates FIFOs and connects ports together.
@@ -195,6 +198,8 @@ public class SlowSimulator extends AbstractSimulator {
 	protected void initializeNetwork(Network network) {
 		GenericSource.setInputStimulus(stimulusFile);
 
+		GenericSource.setNbLoops(loopsNumber);
+
 		if (hasGoldenReference) {
 			GenericDisplay.setGoldenReference(goldenReferenceFile);
 		}
@@ -221,6 +226,8 @@ public class SlowSimulator extends AbstractSimulator {
 		project = root.getProject(name);
 
 		vtlFolders = OrccUtil.getOutputFolders(project);
+
+		loopsNumber = getAttribute(LOOP_NUMBER, DEFAULT_NB_LOOPS);
 	}
 
 	protected void runNetwork(Network network) {
