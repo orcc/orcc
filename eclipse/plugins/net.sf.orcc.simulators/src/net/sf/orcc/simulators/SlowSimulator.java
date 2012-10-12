@@ -35,6 +35,7 @@ import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE;
 import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE_FILE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.LOOP_NUMBER;
+import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
@@ -56,6 +57,7 @@ import net.sf.orcc.runtime.SimulatorFifo;
 import net.sf.orcc.runtime.impl.GenericDisplay;
 import net.sf.orcc.runtime.impl.GenericSource;
 import net.sf.orcc.util.Attribute;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -99,6 +101,8 @@ public class SlowSimulator extends AbstractSimulator {
 	private String goldenReferenceFile;
 
 	private int loopsNumber;
+
+	private boolean noDisplay;
 
 	/**
 	 * Creates FIFOs and connects ports together.
@@ -204,6 +208,10 @@ public class SlowSimulator extends AbstractSimulator {
 			GenericDisplay.setGoldenReference(goldenReferenceFile);
 		}
 
+		if (noDisplay) {
+			GenericDisplay.setDisplayDisabled();
+		}
+
 		for (Vertex vertex : network.getChildren()) {
 			Actor actor = vertex.getAdapter(Actor.class);
 			ActorInterpreter interpreter = interpreters.get(actor);
@@ -228,6 +236,8 @@ public class SlowSimulator extends AbstractSimulator {
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
 		loopsNumber = getAttribute(LOOP_NUMBER, DEFAULT_NB_LOOPS);
+		
+		noDisplay = getAttribute(NO_DISPLAY, false);
 	}
 
 	protected void runNetwork(Network network) {
@@ -256,6 +266,7 @@ public class SlowSimulator extends AbstractSimulator {
 			}
 			isAlive = hasExecuted;
 		} while (isAlive);
+		OrccLogger.traceln("End of simulation");
 	}
 
 	@Override

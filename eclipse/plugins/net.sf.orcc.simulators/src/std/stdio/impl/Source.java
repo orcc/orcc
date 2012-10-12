@@ -34,6 +34,7 @@ import java.io.RandomAccessFile;
 import java.math.BigInteger;
 
 import net.sf.orcc.runtime.impl.GenericSource;
+import net.sf.orcc.simulators.AbstractSimulator;
 
 /**
  * This class defines native functions for the Source actor.
@@ -47,13 +48,10 @@ public class Source extends GenericSource {
 
 	private static RandomAccessFile in;
 
-	private static final int INFINITE_LOOPS = -1;
-
-	private static int nbLoops = 1;
 	private static int loopsCount;
 
 	public static void source_exit(BigInteger status) {
-		//System.exit(status.intValue());
+		AbstractSimulator.stop();
 	}
 
 	public static BigInteger source_getNbLoop() {
@@ -61,7 +59,7 @@ public class Source extends GenericSource {
 	}
 
 	public static Boolean source_isMaxLoopsReached() {
-		return nbLoops != INFINITE_LOOPS && loopsCount <= 0;
+		return loopsCount <= 0;
 	}
 
 	public static void source_decrementNbLoops() {

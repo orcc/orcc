@@ -45,6 +45,8 @@ public abstract class AbstractSimulator implements Simulator {
 
 	private Map<String, Object> options;
 
+	protected static boolean stopRequested = false;
+
 	/**
 	 * Returns the boolean-valued attribute with the given name. Returns the
 	 * given default value if the attribute is undefined.
@@ -153,14 +155,31 @@ public abstract class AbstractSimulator implements Simulator {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.simulators.Simulator#stop()
+	 */
 	@Override
 	public void setOptions(Map<String, Object> options) {
 		this.options = options;
 		initializeOptions();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.simulators.Simulator#stop()
+	 */
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor) {
 		this.monitor = monitor;
+	}
+
+	/**
+	 * Stop the simulation.
+	 */
+	public static void stop() {
+		stopRequested = true;
 	}
 }

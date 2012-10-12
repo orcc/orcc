@@ -28,8 +28,11 @@
  */
 package net.sf.orcc.simulators;
 
+import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE;
+import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE_FILE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.LOOP_NUMBER;
+import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
@@ -81,6 +84,10 @@ public class SimulatorCli implements IApplication {
 						+ "application stop. A negative value means infinite."
 						+ "Default : 1 time.");
 
+		clOptions.addOption("ref", "golden_reference", true,
+				"Reference file which will be"
+						+ "used to compare with decoded stream.");
+
 		clOptions.addOption("n", "nodisplay", false,
 				"Disable display initialization");
 		clOptions.addOption("h", "help", false, "Print this help message");
@@ -108,6 +115,16 @@ public class SimulatorCli implements IApplication {
 					LOOP_NUMBER,
 					commandLine.getOptionValue('l',
 							String.valueOf(Simulator.DEFAULT_NB_LOOPS)));
+
+			if (commandLine.hasOption('n')) {
+				simulatorOptions.put(NO_DISPLAY, true);
+			}
+
+			if (commandLine.hasOption("ref")) {
+				simulatorOptions.put(GOLDEN_REFERENCE, true);
+				simulatorOptions.put(GOLDEN_REFERENCE_FILE,
+						commandLine.getOptionValue("ref"));
+			}
 
 			simulatorOptions.put(SIMULATOR, "Visitor interpreter and debugger");
 

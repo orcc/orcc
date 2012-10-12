@@ -123,6 +123,11 @@ public interface OrccLaunchConstants {
 	public static final String NO_LIBRARY_EXPORT = "net.sf.orcc.dontExportLibrary";
 
 	/**
+	 * If this parameter is set to true, the display should not be initialized.
+	 */
+	public static final String NO_DISPLAY = "net.sf.orcc.no_display";
+
+	/**
 	 * Output folder associated with an Orcc configuration.
 	 */
 	public static final String OUTPUT_FOLDER = "net.sf.orcc.outputFolder";
