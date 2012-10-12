@@ -29,7 +29,6 @@
 
 package net.sf.orcc.runtime.impl;
 
-import net.sf.orcc.util.WriteListener;
 
 public class GenericDisplay {
 	/**
@@ -49,8 +48,6 @@ public class GenericDisplay {
 
 	protected static String goldenReference = "";
 
-	protected static WriteListener listener = null;
-
 	protected static int displayStatus = DISPLAY_ENABLE;
 
 	public static String getGoldenReference() {
@@ -59,10 +56,6 @@ public class GenericDisplay {
 
 	public static void setGoldenReference(String fileName) {
 		GenericDisplay.goldenReference = fileName;
-	}
-
-	public static void setWriteListener(WriteListener listener) {
-		GenericDisplay.listener = listener;
 	}
 
 	public void close() {
