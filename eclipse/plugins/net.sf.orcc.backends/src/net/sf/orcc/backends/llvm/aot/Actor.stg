@@ -219,7 +219,7 @@ printPortAccess(fifo, port, var, indexes, instruction) ::= <<
 <if(instance.actor.templateData.castedIndexes.(first(indexes)))>%cast_index_<var.name>_<procedure.accessMap.(instruction)> = zext <first(indexes).type> <Expr(first(indexes))> to i32<endif>
 %tmp_index_<var.name>_<procedure.accessMap.(instruction)> = add i32 %local_index_<port.name>, <if(instance.actor.templateData.castedIndexes.(first(indexes)))>%cast_index_<var.name>_<procedure.accessMap.(instruction)><else><Expr(first(indexes))><endif>
 %final_index_<var.name>_<procedure.accessMap.(instruction)> = urem i32 %tmp_index_<var.name>_<procedure.accessMap.(instruction)>, %local_size_<port.name>
-<varName(var, instruction)> = getelementptr [<fifo.size> x <port.type>]* @fifo_<fifo.id>_content, i32 0, i32 %final_index_<var.name>_<procedure.accessMap.(instruction)>
+<varName(var, instruction)> = getelementptr [<getSize(fifo)> x <port.type>]* @fifo_<getId(fifo, port)>_content, i32 0, i32 %final_index_<var.name>_<procedure.accessMap.(instruction)>
 >>
 
 varName(var, instruction) ::= <<
@@ -303,17 +303,25 @@ entry:
 // FIFO managment
 ///////////////////////////////////////////////////////////////////////////////
 
+getId(connection, port) ::= <%
+<if(connection)><connection.id><else><port.name><endif>
+%>
+
+getSize(connection) ::= <%
+<if(connection)><connection.size><else>512<endif>
+%>
+
 printExternalFifo(connection, port) ::= <<
 <if(!port.native)
->@fifo_<connection.id>_content = external global [<connection.size> x <port.type>]
-@fifo_<connection.id>_rdIndex = external global i32
-@fifo_<connection.id>_wrIndex = external global i32<
+>@fifo_<getId(connection, port)>_content = <if(connection)>external<else>internal<endif> global [<getSize(connection)> x <port.type>]<if(!connection)> zeroinitializer, align 32<endif>
+@fifo_<getId(connection, port)>_rdIndex = <if(connection)>external<else>internal<endif> global i32<if(!connection)> zeroinitializer, align 32<endif>
+@fifo_<getId(connection, port)>_wrIndex = <if(connection)>external<else>internal<endif> global i32<if(!connection)> zeroinitializer, align 32<endif><
 endif>
 >>
 
 printInput(port, connection) ::= <<
 <if(!port.native)
->@SIZE_<port.name> = internal constant i32 <connection.size>
+>@SIZE_<port.name> = internal constant i32 <getSize(connection)>
 @index_<port.name> = internal global i32 0
 @numTokens_<port.name> = internal global i32 0
 
@@ -323,7 +331,7 @@ endif>
 
 printOutput(port, connection) ::= <<
 <if(!port.native)
->@SIZE_<port.name> = internal constant i32 <connection.size>
+>@SIZE_<port.name> = internal constant i32 <getSize(connection)>
 @index_<port.name> = internal global i32 0
 @numFree_<port.name> = internal global i32 0
 
@@ -337,9 +345,9 @@ entry:
 	br label %read
 
 read:
-	%rdIndex = load i32* @fifo_<connection.id>_rdIndex
+	%rdIndex = load i32* @fifo_<getId(connection, port)>_rdIndex
 	store i32 %rdIndex, i32* @index_<port.name>
-	%wrIndex = load i32* @fifo_<connection.id>_wrIndex
+	%wrIndex = load i32* @fifo_<getId(connection, port)>_wrIndex
 	%getNumTokens = sub i32 %wrIndex, %rdIndex
 	%numTokens = add i32 %rdIndex, %getNumTokens
 	store i32 %numTokens, i32* @numTokens_<port.name>
@@ -352,7 +360,7 @@ entry:
 
 read_end:
 	%rdIndex = load i32* @index_<port.name>
-	store i32 %rdIndex, i32* @fifo_<connection.id>_rdIndex
+	store i32 %rdIndex, i32* @fifo_<getId(connection, port)>_rdIndex
 	ret void
 }
 >>
@@ -363,9 +371,9 @@ entry:
 	br label %write
 
 write:
-	%wrIndex = load i32* @fifo_<connection.id>_wrIndex
+	%wrIndex = load i32* @fifo_<getId(connection, port)>_wrIndex
 	store i32 %wrIndex, i32* @index_<port.name>
-	%rdIndex = load i32* @fifo_<connection.id>_rdIndex
+	%rdIndex = load i32* @fifo_<getId(connection, port)>_rdIndex
 	%size = load i32* @SIZE_<port.name>
 	%numTokens = sub i32 %wrIndex, %rdIndex
 	%getNumFree = sub i32 %size, %numTokens
@@ -380,7 +388,7 @@ entry:
 
 write_end:
 	%wrIndex = load i32* @index_<port.name>
-	store i32 %wrIndex, i32* @fifo_<connection.id>_wrIndex
+	store i32 %wrIndex, i32* @fifo_<getId(connection, port)>_wrIndex
 	ret void
 }
 >>
@@ -709,9 +717,9 @@ declare i32 @printf(i8* noalias , ...) nounwind
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Connected FIFOs
 
-<instance.incoming: { connection |<printExternalFifo(connection, connection.targetPort)>}; separator="\n\n">
+<instance.actor.inputs: { port |<printExternalFifo(instance.incomingPortMap.(port), port)>}; separator="\n\n">
 
-<instance.outgoing: { connection |<printExternalFifo(connection, connection.sourcePort)>}; separator="\n\n">
+<instance.actor.outputs: { port |<printExternalFifo(first(instance.outgoingPortMap.(port)), port)>}; separator="\n\n">
 
 <if(instance.actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
