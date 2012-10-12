@@ -42,7 +42,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public interface Simulator {
 	
-	public static final int DEFAULT_NB_LOOPS = -1;
+	public static final int DEFAULT_NB_LOOPS = 1;
 
 	/**
 	 * Sets the options of this back-end.
