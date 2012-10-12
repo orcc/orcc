@@ -32,11 +32,27 @@ package net.sf.orcc.runtime.impl;
 import net.sf.orcc.util.WriteListener;
 
 public class GenericDisplay {
+	/**
+	 * display is disabled.
+	 */
+	public static final int DISPLAY_DISABLE = 0;
+
+	/**
+	 * display is enabled.
+	 */
+	public static final int DISPLAY_ENABLE = 1;
+
+	/**
+	 * display is ready.
+	 */
+	public static final int DISPLAY_READY = 2;
 
 	protected static String goldenReference = "";
-	
+
 	protected static WriteListener listener = null;
-	
+
+	protected static int displayStatus = DISPLAY_ENABLE;
+
 	public static String getGoldenReference() {
 		return goldenReference;
 	}
@@ -44,13 +60,21 @@ public class GenericDisplay {
 	public static void setGoldenReference(String fileName) {
 		GenericDisplay.goldenReference = fileName;
 	}
-	
-	public static void setWriteListener(WriteListener listener){
+
+	public static void setWriteListener(WriteListener listener) {
 		GenericDisplay.listener = listener;
 	}
-	
-	public void close(){
-		
+
+	public void close() {
+
 	}
-	
+
+	public static void setDisplayEnabled() {
+		displayStatus = DISPLAY_ENABLE;
+	}
+
+	public static void setDisplayDisabled() {
+		displayStatus = DISPLAY_DISABLE;
+	}
+
 }

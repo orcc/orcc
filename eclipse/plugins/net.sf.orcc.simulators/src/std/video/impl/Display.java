@@ -61,21 +61,6 @@ public class Display extends GenericDisplay {
 
 	private static Canvas canvas;
 
-	/**
-	 * display is disabled.
-	 */
-	public static final int DISPLAY_DISABLE = 0;
-
-	/**
-	 * display is enabled.
-	 */
-	public static final int DISPLAY_ENABLE = 2;
-
-	/**
-	 * display is ready.
-	 */
-	public static final int DISPLAY_READY = 1;
-
 	private static JFrame frame;
 
 	private static BufferedImage image;
@@ -254,7 +239,7 @@ public class Display extends GenericDisplay {
 	 * @return the flags of the display
 	 */
 	public static BigInteger displayYUV_getFlags() {
-		return BigInteger.valueOf(DISPLAY_ENABLE | DISPLAY_READY);
+		return BigInteger.valueOf(displayStatus);
 	}
 
 	/**
@@ -281,6 +266,8 @@ public class Display extends GenericDisplay {
 		canvas = new Canvas();
 		frame.add(canvas);
 		frame.setVisible(true);
+
+		displayStatus |= DISPLAY_READY;
 	}
 
 	private static void setVideoSize(int newWidth, int newHeight) {
