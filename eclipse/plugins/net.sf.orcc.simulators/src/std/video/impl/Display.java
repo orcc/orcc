@@ -42,6 +42,7 @@ import java.math.BigInteger;
 import javax.swing.JFrame;
 
 import net.sf.orcc.runtime.impl.GenericDisplay;
+import net.sf.orcc.util.OrccLogger;
 
 /**
  * This class defines native functions for the DisplayYUV actor.
@@ -111,7 +112,7 @@ public class Display extends GenericDisplay {
 			try {
 				int numErrors = 0;
 
-				System.out.println("Frame number " + frameNumber);
+				OrccLogger.trace("Frame number " + frameNumber);
 				frameNumber++;
 
 				in.read(Y, 0, width * height);
@@ -126,7 +127,10 @@ public class Display extends GenericDisplay {
 						V, pictureBufferV, 8);
 
 				if (numErrors == 0) {
-					System.out.println("; no error detected !\n");
+					OrccLogger.traceRaw("; no error detected !\n");
+				} else {
+					OrccLogger.traceRaw("; " + numErrors
+							+ " errors detected !\n");
 				}
 
 				if (in.getFilePointer() == in.length()) {
@@ -292,7 +296,7 @@ public class Display extends GenericDisplay {
 
 	public static void fpsPrintNewPicDecoded() {
 		t2 = System.currentTimeMillis();
-		System.out.println("image displayed in " + (t2 - t1) + " ms");
+		OrccLogger.traceln("image displayed in " + (t2 - t1) + " ms");
 		t1 = t2;
 	}
 
