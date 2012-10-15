@@ -902,7 +902,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				OrccLogger.severeln(e.getLocalizedMessage());
 				e.printStackTrace();
 			}
-			return IApplication.EXIT_RESTART;
+			return IApplication.EXIT_RELAUNCH;
 
 		} catch (UnrecognizedOptionException uoe) {
 			printUsage(context, options, uoe.getLocalizedMessage());
