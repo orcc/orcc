@@ -31,9 +31,9 @@
         	nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.7"
         	access="public" author="true" use="true" version="true">
 	        	<fileset dir="${plugins.dir}" defaultexcludes="yes">
-					<include name="**/src/**/*.java" />
-					<include name="**/src-gen/**/*.java" />
-					<include name="**/xtend-gen/**/*.java" />
+					<include name="net.sf.orcc*/src/**/*.java" />
+					<include name="net.sf.orcc*/src-gen/**/*.java" />
+					<include name="net.sf.orcc*/xtend-gen/**/*.java" />
 				</fileset>
         </javadoc>
     </target>
