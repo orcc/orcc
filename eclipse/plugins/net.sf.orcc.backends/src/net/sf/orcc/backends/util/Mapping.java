@@ -50,7 +50,10 @@ public class Mapping {
 	private class Visitor extends DfVisitor<Void> {
 		@Override
 		public Void caseInstance(Instance instance) {
-			if (mapNativeActors || !instance.getActor().isNative()) {
+			if (mapBroadcasts && instance.getName().startsWith("bcast")) {
+				map(userMapping.get(((Instance) instance.getPredecessors().get(
+						0)).getHierarchicalName()), instance);
+			} else if (mapNativeActors || !instance.getActor().isNative()) {
 				map(userMapping.get(instance.getHierarchicalName()), instance);
 			}
 			return null;

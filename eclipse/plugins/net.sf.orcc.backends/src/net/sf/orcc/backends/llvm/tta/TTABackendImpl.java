@@ -215,7 +215,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		doTransformNetwork(network);
 
 		// build the design
-		mapping = new Mapping(network, userMapping, false, false);
+		mapping = new Mapping(network, userMapping, reduceConnections, false);
 		design = new ArchitectureBuilder().build(network, configuration,
 				mapping, reduceConnections);
 
@@ -308,9 +308,9 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// TCE
 		CommonPrinter.printFile(new TCE_Design_PNDF(path).doSwitch(design),
 				path + File.separator + "top.pndf");
-		
-		CommonPrinter.printFile(new Dota().printDot(design),
-				path + File.separator + "top.dot");
+
+		CommonPrinter.printFile(new Dota().printDot(design), path
+				+ File.separator + "top.dot");
 	}
 
 	private void generateProcessor(Processor tta) {
