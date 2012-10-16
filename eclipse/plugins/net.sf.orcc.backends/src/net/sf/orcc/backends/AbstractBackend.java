@@ -846,6 +846,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("d", "debug", false, "Enable debug mode");
 		options.addOption("t", "transfo_add", false,
 				"Execute additional transformations before generate code");
+		options.addOption("s", "advanced_sched", false, "(C) Use the "
+				+ "data-driven/demand-driven strategy for the actor-scheduler");
 
 		// TODO : Delete this when it will be totally useless
 		setWriteListener(new WriteListener() {
@@ -879,6 +881,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			if (line.hasOption('t')) {
 				optionMap.put("net.sf.orcc.backends.additionalTransfos", true);
+			}
+
+			if (line.hasOption('s')) {
+				optionMap.put("net.sf.orcc.backends.newScheduler", true);
 			}
 
 			if (line.hasOption('d')) {
@@ -928,7 +934,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		HelpFormatter helpFormatter = new HelpFormatter();
 		helpFormatter.setWidth(80);
 		helpFormatter.printHelp(getClass().getSimpleName()
-				+ "[options] <network.qualified.name>", "Valid options are :",
+				+ " [options] <network.qualified.name>", "Valid options are :",
 				options, footer);
 	}
 
