@@ -64,6 +64,10 @@ public class GlobalArrayInitializer extends DfVisitor<Void> {
 				for (Var stateVar : actor.getStateVars()) {
 					initializeVar(stateVar);
 				}
+				
+				for (Var parameter : actor.getParameters()) {
+					initializeVar(parameter);
+				}
 
 				// Get initializing procedure if any
 				for (Action action : actor.getInitializes()) {
