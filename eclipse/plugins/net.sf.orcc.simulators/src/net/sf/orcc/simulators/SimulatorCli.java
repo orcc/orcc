@@ -51,6 +51,10 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -62,6 +66,35 @@ import org.eclipse.equinox.app.IApplicationContext;
  * 
  */
 public class SimulatorCli implements IApplication {
+
+	boolean isAutoBuildActivated;
+	
+	IWorkspace workspace;
+
+	/**
+	 * Initilize
+	 */
+	public SimulatorCli() {
+		workspace = ResourcesPlugin.getWorkspace();
+	}
+
+
+	private void disableAutoBuild() throws CoreException {
+		IWorkspaceDescription desc = workspace.getDescription();
+		if (desc.isAutoBuilding()) {
+			isAutoBuildActivated = true;
+			desc.setAutoBuilding(false);
+			workspace.setDescription(desc);
+		}
+	}
+
+	private void restoreAutoBuild() throws CoreException {
+		if (isAutoBuildActivated) {
+			IWorkspaceDescription desc = workspace.getDescription();
+			desc.setAutoBuilding(true);
+			workspace.setDescription(desc);
+		}
+	}
 
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
@@ -130,12 +163,18 @@ public class SimulatorCli implements IApplication {
 
 			try {
 
+				disableAutoBuild();
+
 				SimulatorFactory.getInstance().runSimulator(
 						new NullProgressMonitor(), "run", simulatorOptions);
-
+			} catch (CoreException ce) {
+				OrccLogger.severeln("Unable to set the workspace properties.");
+				restoreAutoBuild();
+				return IApplication.EXIT_RELAUNCH;
 			} catch (OrccException oe) {
 				OrccLogger.severeln("Simulator has shut down");
-				return IApplication.EXIT_RESTART;
+				restoreAutoBuild();
+				return IApplication.EXIT_RELAUNCH;
 			}
 
 			// Simulator correctly shut down
