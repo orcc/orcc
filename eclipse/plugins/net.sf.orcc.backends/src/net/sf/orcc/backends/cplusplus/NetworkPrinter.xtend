@@ -161,21 +161,26 @@ class NetworkPrinter extends ExprAndTypePrinter {
 	
 	def compileCmakeLists(Network network, Map options) '''
 		cmake_minimum_required (VERSION 2.8)
+		
 		project («network.simpleName»)
+		
 		find_package(Threads REQUIRED)
 		if(NOT NO_DISPLAY)
-		find_package(SDL REQUIRED)
+			find_package(SDL REQUIRED)
 		endif()
 		
 		if(MSVC)
-		set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /ZI /Ob0 /Od /RTC1")
-		set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG")
+			set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /ZI /Ob0 /Od /RTC1")
+			set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG")
 		endif()
 
 		if(CMAKE_COMPILER_IS_GNUCXX)
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
+			set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 		endif()
+		
+		# Use this flag if unsigned / signed conversions produces errors
+		# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
 		set(YACE_INCLUDE_DIR ./libs/yace/include)
 		set(TINYXML_INCLUDE_DIR ./libs/tinyxml/include)
@@ -183,20 +188,22 @@ class NetworkPrinter extends ExprAndTypePrinter {
 
 		include_directories(${YACE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
 		if(NOT NO_DISPLAY)
-		include_directories(${SDL_INCLUDE_DIR})
+			include_directories(${SDL_INCLUDE_DIR})
 		endif()
 
-		add_executable («network.simpleName»
-		«network.simpleName».cpp
-		«FOR instance : network.children.filter(typeof(Instance))»
-			«instance.name».h
-		«ENDFOR»
+		add_executable ( «network.simpleName»
+			«network.simpleName».cpp
+			«FOR instance : network.children.filter(typeof(Instance))»
+				«instance.name».h
+			«ENDFOR»
 		)
 
 		set(libraries Yace TinyXml)
+		
 		if(NOT NO_DISPLAY)
-		set(libraries ${libraries} ${SDL_LIBRARY})
+			set(libraries ${libraries} ${SDL_LIBRARY})
 		endif()
+		
 		set(libraries ${libraries} ${CMAKE_THREAD_LIBS_INIT})
 		target_link_libraries(«network.simpleName» ${libraries})
 	'''
