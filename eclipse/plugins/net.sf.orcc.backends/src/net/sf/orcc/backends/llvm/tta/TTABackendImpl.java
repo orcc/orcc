@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.tta;
 
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
@@ -99,21 +96,17 @@ import net.sf.orcc.util.OrccUtil;
 public class TTABackendImpl extends LLVMBackendImpl {
 
 	String actorsPath;
-	private boolean classify;
 	private ProcessorConfiguration configuration;
 	private boolean reduceConnections;
-	private boolean debug;
 	private Design design;
 	private boolean finalize;
 
 	private FPGA fpga;
 	private String libPath;
-	private Mapping mapping;
-	private boolean mergeActors;
-	private boolean mergeActions;
+	private Mapping computedMapping;
 	private boolean profile;
 
-	private Map<String, String> userMapping;
+	private Map<String, String> mapping;
 
 	private Map<Port, Integer> computePortToIdMap(Vertex vertex) {
 		Map<Port, Integer> map = new HashMap<Port, Integer>();
@@ -137,25 +130,16 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	@Override
 	public void doInitializeOptions() {
-		debug = getAttribute(DEBUG_MODE, true);
 		finalize = getAttribute("net.sf.orcc.backends.tta.finalizeGeneration",
 				false);
 		fpga = FPGA.builder(getAttribute("net.sf.orcc.backends.tta.fpga",
 				"Stratix III (EP3SL150F1152C2)"));
-		// Set default FIFO size to 256
-		fifoSize = getAttribute(FIFO_SIZE, 512);
 		profile = getAttribute("net.sf.orcc.backends.profile", false);
 		configuration = ProcessorConfiguration.getByName(getAttribute(
 				"net.sf.orcc.backends.llvm.tta.configuration", "Huge"));
 		reduceConnections = getAttribute(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
-		userMapping = getAttribute(MAPPING, new HashMap<String, String>());
-
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		mergeActions = classify
-				&& getAttribute("net.sf.orcc.backends.normalize", false);
-		mergeActors = classify
-				&& getAttribute("net.sf.orcc.backends.merge", false);
+		
 	}
 
 	@Override
@@ -215,9 +199,9 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		doTransformNetwork(network);
 
 		// build the design
-		mapping = new Mapping(network, userMapping, reduceConnections, false);
+		computedMapping = new Mapping(network, mapping, reduceConnections, false);
 		design = new ArchitectureBuilder().build(network, configuration,
-				mapping, reduceConnections);
+				computedMapping, reduceConnections);
 
 		// print instances and entities
 		actorsPath = OrccUtil.createFolder(path, "actors");

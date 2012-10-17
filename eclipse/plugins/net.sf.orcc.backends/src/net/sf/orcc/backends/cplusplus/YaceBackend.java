@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.cplusplus;
 
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
@@ -76,20 +74,9 @@ public class YaceBackend extends AbstractBackend {
 
 	public static final String DEFAULT_PARTITION = "default_partition";
 
-	private boolean debugMode;
-
-	private boolean classify;
-
-	private boolean merge;
-
-	protected Map<String, String> mapping;
-
 	@Override
 	public void doInitializeOptions() {
-		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		merge = getAttribute("net.sf.orcc.backends.merge", false);
-		debugMode = getAttribute(DEBUG_MODE, true);
+
 	}
 
 	@Override
@@ -114,7 +101,7 @@ public class YaceBackend extends AbstractBackend {
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(false, false, false));
 		transformations.add(new RenameTransformation(replacementMap));
-		if(!debugMode) {
+		if(!debug) {
 			transformations.add(new DeadGlobalElimination());
 			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
@@ -136,10 +123,10 @@ public class YaceBackend extends AbstractBackend {
 		if (classify) {
 			OrccLogger.trace("Starting classification of actors... ");
 			new Classifier().doSwitch(network);
-			OrccLogger.traceRaw("done\n");
-			if (merge) {
-				new ActorMerger().doSwitch(network);
-			}
+			OrccLogger.traceRaw("done\n");	
+		}
+		if (mergeActors) {
+			new ActorMerger().doSwitch(network);
 		}
 
 		return network;
@@ -177,7 +164,7 @@ public class YaceBackend extends AbstractBackend {
 
 	@Override
 	public boolean printInstance(Instance instance) {
-		YacePrinter printer = new YacePrinter(!debugMode);
+		YacePrinter printer = new YacePrinter(!debug);
 		printer.print(path, instance);
 
 		return false;

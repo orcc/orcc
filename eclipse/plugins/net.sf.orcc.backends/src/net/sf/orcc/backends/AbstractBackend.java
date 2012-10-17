@@ -28,9 +28,13 @@
  */
 package net.sf.orcc.backends;
 
+import static net.sf.orcc.OrccLaunchConstants.CLASSIFY;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.MAPPING;
+import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTIONS;
+import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
@@ -130,6 +134,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * Fifo size used in backend.
 	 */
 	protected int fifoSize;
+	protected boolean debug;
+	protected Map<String, String> mapping;
+
+	protected boolean classify;
+	protected boolean mergeActions;
+	protected boolean mergeActors;
 
 	private IFile inputFile;
 
@@ -795,6 +805,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		inputFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
 
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+		debug = getAttribute(DEBUG_MODE, true);
+		mapping = getAttribute(MAPPING, new HashMap<String, String>());
+
+		classify = getAttribute(CLASSIFY, false);
+		// Merging transformations need the results of classification
+		mergeActions = classify && getAttribute(MERGE_ACTIONS, false);
+		mergeActors = classify && getAttribute(MERGE_ACTORS, false);
 
 		String outputFolder;
 		Object obj = options.get(OUTPUT_FOLDER);
@@ -882,17 +899,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			optionMap.put(DEBUG_MODE, line.hasOption('d'));
 
-			optionMap.put("net.sf.orcc.backends.classify", line.hasOption('c'));
+			optionMap.put(CLASSIFY, line.hasOption('c'));
+			String type = line.getOptionValue('m');
+			optionMap.put(MERGE_ACTIONS, type.equals("1") || type.equals("3"));
+			optionMap.put(MERGE_ACTORS, type.equals("2") || type.equals("3"));
+
 			optionMap.put("net.sf.orcc.backends.newScheduler",
 					line.hasOption('s'));
 			optionMap.put("net.sf.orcc.backends.additionalTransfos",
 					line.hasOption('t'));
-
-			String mergeType = line.getOptionValue('m');
-			optionMap.put("net.sf.orcc.backends.merge.actions",
-					mergeType.equals("1") || mergeType.equals("3"));
-			optionMap.put("net.sf.orcc.backends.merge.actors",
-					mergeType.equals("2") || mergeType.equals("3"));
 
 			try {
 				setOptions(optionMap);

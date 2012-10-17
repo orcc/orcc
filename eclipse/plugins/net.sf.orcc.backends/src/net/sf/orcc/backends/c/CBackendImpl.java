@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.c;
 
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
@@ -104,19 +102,9 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class CBackendImpl extends AbstractBackend {
 
-	protected boolean classify;
-	/**
-	 * Backend options
-	 */
-
-	protected boolean debug;
-
 	protected boolean enableTrace;
-	protected Map<String, String> mapping;
-	protected boolean mergeActors;
 
 	protected boolean newScheduler;
-	protected boolean mergeActions;
 	protected boolean ringTopology;
 	protected CPrinter printer;
 
@@ -151,21 +139,12 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		// Merging operations needs classification
-		mergeActions = classify
-				&& getAttribute("net.sf.orcc.backends.normalize", false);
-		mergeActors = classify
-				&& getAttribute("net.sf.orcc.backends.merge", false);
-
 		// FIXME: Readd the method in native function and compute the
 		// hierarchical id of each actor.
 		useGeneticAlgo = getAttribute("net.sf.orcc.backends.geneticAlgorithm",
 				false);
 
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
-		debug = getAttribute(DEBUG_MODE, true);
 		threadsNb = Integer.parseInt(getAttribute(
 				"net.sf.orcc.backends.processorsNumber", "1"));
 		enableTrace = getAttribute("net.sf.orcc.backends.enableTrace", false);

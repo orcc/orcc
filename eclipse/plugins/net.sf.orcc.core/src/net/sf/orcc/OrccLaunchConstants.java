@@ -177,5 +177,11 @@ public interface OrccLaunchConstants {
 	 * with options in the back-ends plug-in.
 	 */
 	public static final String XDF_FILE = "net.sf.orcc.core.xdfFile";
+	
+	public static final String MERGE_ACTIONS = "net.sf.orcc.core.mergeActions";
+	
+	public static final String MERGE_ACTORS = "net.sf.orcc.core.mergeActors";
+	
+	public static final String CLASSIFY = "net.sf.orcc.core.classify";
 
 }

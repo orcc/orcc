@@ -11,7 +11,7 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
-               id="net.sf.orcc.backends.classify">
+               id="net.sf.orcc.core.classify">
          </option>
          <option
                id="net.sf.orcc.backends.newScheduler">
@@ -50,7 +50,7 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
-               id="net.sf.orcc.backends.classify">
+               id="net.sf.orcc.core.classify">
          </option>
          <option
                id="net.sf.orcc.backends.byteexact">
@@ -89,7 +89,7 @@
                id="net.sf.orcc.backends.profile">
          </option>
          <option
-               id="net.sf.orcc.backends.classify">
+               id="net.sf.orcc.core.classify">
          </option>
          <option
                id="net.sf.orcc.backends.llvm.tta.configuration">
@@ -121,7 +121,7 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
-               id="net.sf.orcc.backends.classify">
+               id="net.sf.orcc.core.classify">
          </option>
       </backend>
       <backend
@@ -131,7 +131,7 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
-               id="net.sf.orcc.backends.classify">
+               id="net.sf.orcc.core.classify">
          </option>
          <option
                id="net.sf.orcc.dontExportLibrary">
@@ -156,21 +156,21 @@
          </option>
          <option
                defaultValue="false"
-               id="net.sf.orcc.backends.classify"
+               id="net.sf.orcc.core.classify"
                description="This option enables optimizations such as transformation to higher-level and actor merging"
                name="Classify actors">
             <checkBox>
                <option
                      defaultValue="false"
                      description="When activated, static actors will be merged together"
-                     id="net.sf.orcc.backends.merge"
+                     id="net.sf.orcc.core.mergeActors"
                      name="Merge static actors together">
                   <checkBox></checkBox>
                </option>
 		       <option
 		             defaultValue="false"
 		             description="Transform actors to higher-level"
-		             id="net.sf.orcc.backends.normalize"
+		             id="net.sf.orcc.core.mergeActions"
 		             name="Transform actors to higher-level">
 		          <checkBox></checkBox>
 		       </option>

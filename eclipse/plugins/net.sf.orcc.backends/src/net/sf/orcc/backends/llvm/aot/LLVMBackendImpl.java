@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.aot;
 
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
@@ -85,8 +84,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected StandardPrinter printer;
 	protected final Map<String, String> transformations;
 
-	protected boolean debug;
-
 	/**
 	 * Path to target "src" folder
 	 */
@@ -126,9 +123,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// Set src directory as path
 		srcPath = srcDir.getAbsolutePath();
-
-		// Initialize debug mode attribute
-		debug = getAttribute(DEBUG_MODE, false);
 	}
 
 	@Override

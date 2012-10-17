@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.backends.xlim;
 
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.OrccLaunchConstants.MAPPING;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,13 +92,9 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class XlimBackendImpl extends AbstractBackend {
 
-	private boolean useDebug;
-
 	private String fpgaType;
 
 	private boolean useHw;
-
-	private Map<String, String> mapping;
 
 	private boolean useMulti2mono;
 
@@ -133,10 +126,6 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		// General options
-		useDebug = getAttribute(DEBUG_MODE, false);
-		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-		// Backend options
 		useHw = getAttribute("net.sf.orcc.backends.xlimHard", false);
 		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
 				"xc2vp30-7-ff1152");
@@ -183,7 +172,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			ResourceSet set = new ResourceSetImpl();
-			if (useDebug && !IrUtil.serializeActor(set, path, actor)) {
+			if (debug && !IrUtil.serializeActor(set, path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}
@@ -227,11 +216,11 @@ public class XlimBackendImpl extends AbstractBackend {
 		StandardPrinter printer;
 		if (useHw) {
 			printer = new StandardPrinter(
-					"net/sf/orcc/backends/xlim/hw/Actor.stg", !useDebug);
+					"net/sf/orcc/backends/xlim/hw/Actor.stg", !debug);
 			printer.getOptions().put("fpgaType", fpgaType);
 		} else {
 			printer = new StandardPrinter(
-					"net/sf/orcc/backends/xlim/sw/Actor.stg", !useDebug);
+					"net/sf/orcc/backends/xlim/sw/Actor.stg", !debug);
 		}
 
 		printer.setExpressionPrinter(new XlimExprPrinter());

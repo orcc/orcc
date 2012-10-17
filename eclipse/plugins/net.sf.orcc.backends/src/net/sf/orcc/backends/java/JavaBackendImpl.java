@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.java;
 
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
@@ -60,9 +59,8 @@ import org.eclipse.core.resources.IFile;
  */
 public class JavaBackendImpl extends AbstractBackend {
 
-	private boolean debug;
 	private JavaPrinter printer;
-	
+
 	private String srcPath;
 	private String libsPath;
 
@@ -73,7 +71,7 @@ public class JavaBackendImpl extends AbstractBackend {
 		replacementMap.put("initialize", "my_initialize");
 		replacementMap.put("isSchedulable_initialize",
 				"my_isSchedulable_initialize");
-		
+
 		replacementMap.put("byte", "my_byte");
 		replacementMap.put("int", "my_int");
 		replacementMap.put("boolean", "my_boolean");
@@ -84,17 +82,15 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		debug = getAttribute(DEBUG_MODE, true);
-
 		printer = new JavaPrinter(!debug);
-		
+
 		srcPath = path + File.separator + "src";
 		libsPath = path + File.separator + "libs";
 	}
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		
+
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
 		transformations.add(new RenameTransformation(replacementMap));
@@ -157,9 +153,9 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		
+
 		String folder = srcPath + File.separator + OrccUtil.getFolder(actor);
-		
+
 		return printer.print(folder, actor);
 	}
 

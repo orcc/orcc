@@ -29,8 +29,6 @@
 package net.sf.orcc.backends.llvm.jit;
 
 import static net.sf.orcc.OrccActivator.getDefault;
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 
 import java.io.File;
@@ -96,12 +94,6 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class JadeBackendImpl extends AbstractBackend {
 
-	/**
-	 * Backend options
-	 */
-	private boolean classify;
-	private boolean debug;
-	private boolean normalize;
 	private boolean byteexact;
 	private String optLevel;
 	private String llvmGenMod;
@@ -114,7 +106,6 @@ public class JadeBackendImpl extends AbstractBackend {
 	/**
 	 * Configuration mapping
 	 */
-	private Map<String, String> mapping;
 	private Map<String, List<Instance>> targetToInstancesMap;
 
 	private final Map<String, String> transformations;
@@ -138,21 +129,17 @@ public class JadeBackendImpl extends AbstractBackend {
 	public void doInitializeOptions() {
 		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
 		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		byteexact = getAttribute("net.sf.orcc.backends.byteexact", false);
 		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
-		debug = getAttribute(DEBUG_MODE, true);
-		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 	}
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		if (classify) {
 			new Classifier().doSwitch(actor);
-			if (normalize) {
-				new ActionMerger().doSwitch(actor);
-			}
+		}
+		if (mergeActions) {
+			new ActionMerger().doSwitch(actor);
 		}
 
 		new UnitImporter().doSwitch(actor);

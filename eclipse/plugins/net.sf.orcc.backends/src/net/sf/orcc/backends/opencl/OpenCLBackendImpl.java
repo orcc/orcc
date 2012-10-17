@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.opencl;
 
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,14 +56,12 @@ import org.eclipse.core.resources.IFile;
  */
 public class OpenCLBackendImpl extends AbstractBackend {
 
-	private boolean debugMode;
 	private String srcPath;
 	private String kernelSrcPath;
 	private String includePath;
 
 	@Override
 	protected void doInitializeOptions() {
-		debugMode = getAttribute(DEBUG_MODE, true);
 
 		/** Create the build and source directories **/
 		File srcDir = new File(path + File.separator + "src");
@@ -168,7 +164,7 @@ public class OpenCLBackendImpl extends AbstractBackend {
 
 	@Override
 	public boolean printInstance(Instance instance) {
-		OpenCLPrinter printer = new OpenCLPrinter(!debugMode);
+		OpenCLPrinter printer = new OpenCLPrinter(!debug);
 		printer.print(srcPath, kernelSrcPath, includePath, instance);
 		return false;
 	}
@@ -182,7 +178,7 @@ public class OpenCLBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	public void printNetwork(Network network) throws OrccException {
-		OpenCLPrinter printer = new OpenCLPrinter(!debugMode);
+		OpenCLPrinter printer = new OpenCLPrinter(!debug);
 		printer.print(path, srcPath, network);
 	}
 }
