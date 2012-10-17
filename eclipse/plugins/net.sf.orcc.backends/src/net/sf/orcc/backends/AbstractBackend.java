@@ -843,13 +843,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// Optional command line arguments
 		options.addOption("d", "debug", false, "Enable debug mode");
-		
+
 		options.addOption("c", "classify", false, "Classify the given network");
 		options.addOption("m", "merge", false, "Merge (1) static actions "
 				+ "(2) static actors (3) both");
 		options.addOption("s", "advanced_sched", false, "(C) Use the "
 				+ "data-driven/demand-driven strategy for the actor-scheduler");
-		
+
 		// FIXME: choose independently the transformation to apply
 		options.addOption("t", "transfo_add", false,
 				"Execute additional transformations before generate code");
@@ -880,31 +880,19 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(XDF_FILE, networkName);
 			optionMap.put(OUTPUT_FOLDER, line.getOptionValue('o'));
 
-			if (line.hasOption('c')) {
-				optionMap.put("net.sf.orcc.backends.classify", true);
-			}
-			
+			optionMap.put(DEBUG_MODE, line.hasOption('d'));
+
+			optionMap.put("net.sf.orcc.backends.classify", line.hasOption('c'));
+			optionMap.put("net.sf.orcc.backends.newScheduler",
+					line.hasOption('s'));
+			optionMap.put("net.sf.orcc.backends.additionalTransfos",
+					line.hasOption('t'));
+
 			String mergeType = line.getOptionValue('m');
-			if(mergeType.equals("1")) {
-				optionMap.put("net.sf.orcc.backends.merge.actions", true);
-			} else if (mergeType.equals("2")) {
-				optionMap.put("net.sf.orcc.backends.merge.actors", true);
-			} else if (mergeType.equals("3")) {
-				optionMap.put("net.sf.orcc.backends.merge.actions", true);
-				optionMap.put("net.sf.orcc.backends.merge.actors", true);
-			} 
-
-			if (line.hasOption('t')) {
-				optionMap.put("net.sf.orcc.backends.additionalTransfos", true);
-			}
-
-			if (line.hasOption('s')) {
-				optionMap.put("net.sf.orcc.backends.newScheduler", true);
-			}
-
-			if (line.hasOption('d')) {
-				optionMap.put(DEBUG_MODE, true);
-			}
+			optionMap.put("net.sf.orcc.backends.merge.actions",
+					mergeType.equals("1") || mergeType.equals("3"));
+			optionMap.put("net.sf.orcc.backends.merge.actors",
+					mergeType.equals("2") || mergeType.equals("3"));
 
 			try {
 				setOptions(optionMap);
