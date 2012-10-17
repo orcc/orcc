@@ -56,7 +56,7 @@ import org.eclipse.core.resources.IFile;
  * @author Endri Bezati
  * 
  */
-public class OpenCLBackend extends AbstractBackend {
+public class OpenCLBackendImpl extends AbstractBackend {
 
 	private boolean debugMode;
 	private String srcPath;

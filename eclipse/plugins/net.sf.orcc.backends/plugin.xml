@@ -138,7 +138,7 @@
          </option>         
       </backend>
       <backend
-            class="net.sf.orcc.backends.opencl.OpenCLBackend"
+            class="net.sf.orcc.backends.opencl.OpenCLBackendImpl"
             name="OpenCL (Experimental)">
          <option
                id="net.sf.orcc.plugins.compileXDF">
@@ -453,6 +453,42 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.llvm.jit.JadeBackendImpl">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="cembedded"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.c.embedded.CEmbeddedBackendImpl">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="promela"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.promela.PromelaBackendImpl">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="opencl"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.opencl.OpenCLBackendImpl">
          </run>
       </application>
    </extension>
