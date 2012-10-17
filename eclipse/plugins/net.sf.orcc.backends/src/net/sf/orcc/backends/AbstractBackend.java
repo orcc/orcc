@@ -842,12 +842,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption(opt);
 
 		// Optional command line arguments
-		options.addOption("c", "classify", false, "Classify the given network");
 		options.addOption("d", "debug", false, "Enable debug mode");
-		options.addOption("t", "transfo_add", false,
-				"Execute additional transformations before generate code");
+		
+		options.addOption("c", "classify", false, "Classify the given network");
+		options.addOption("m", "merge", false, "Merge (1) static actions "
+				+ "(2) static actors (3) both");
 		options.addOption("s", "advanced_sched", false, "(C) Use the "
 				+ "data-driven/demand-driven strategy for the actor-scheduler");
+		
+		// FIXME: choose independently the transformation to apply
+		options.addOption("t", "transfo_add", false,
+				"Execute additional transformations before generate code");
 
 		// TODO : Delete this when it will be totally useless
 		setWriteListener(new WriteListener() {
@@ -878,6 +883,16 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			if (line.hasOption('c')) {
 				optionMap.put("net.sf.orcc.backends.classify", true);
 			}
+			
+			String mergeType = line.getOptionValue('m');
+			if(mergeType.equals("1")) {
+				optionMap.put("net.sf.orcc.backends.merge.actions", true);
+			} else if (mergeType.equals("2")) {
+				optionMap.put("net.sf.orcc.backends.merge.actors", true);
+			} else if (mergeType.equals("3")) {
+				optionMap.put("net.sf.orcc.backends.merge.actions", true);
+				optionMap.put("net.sf.orcc.backends.merge.actors", true);
+			} 
 
 			if (line.hasOption('t')) {
 				optionMap.put("net.sf.orcc.backends.additionalTransfos", true);
