@@ -900,9 +900,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(DEBUG_MODE, line.hasOption('d'));
 
 			optionMap.put(CLASSIFY, line.hasOption('c'));
-			String type = line.getOptionValue('m');
-			optionMap.put(MERGE_ACTIONS, type.equals("1") || type.equals("3"));
-			optionMap.put(MERGE_ACTORS, type.equals("2") || type.equals("3"));
+			if (line.hasOption('m')) {
+				String type = line.getOptionValue('m');
+				optionMap.put(MERGE_ACTIONS,
+						type.equals("1") || type.equals("3"));
+				optionMap.put(MERGE_ACTORS,
+						type.equals("2") || type.equals("3"));
+			}
 
 			optionMap.put("net.sf.orcc.backends.newScheduler",
 					line.hasOption('s'));
