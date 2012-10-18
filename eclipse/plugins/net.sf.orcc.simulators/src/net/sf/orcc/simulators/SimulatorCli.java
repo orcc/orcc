@@ -68,7 +68,7 @@ import org.eclipse.equinox.app.IApplicationContext;
 public class SimulatorCli implements IApplication {
 
 	boolean isAutoBuildActivated;
-	
+
 	IWorkspace workspace;
 
 	/**
@@ -77,7 +77,6 @@ public class SimulatorCli implements IApplication {
 	public SimulatorCli() {
 		workspace = ResourcesPlugin.getWorkspace();
 	}
-
 
 	private void disableAutoBuild() throws CoreException {
 		IWorkspaceDescription desc = workspace.getDescription();
@@ -117,7 +116,7 @@ public class SimulatorCli implements IApplication {
 						+ "application stop. A negative value means infinite. "
 						+ "Default : 1 time.");
 
-		clOptions.addOption("ref", "golden_reference", true,
+		clOptions.addOption("r", "golden_reference", true,
 				"Reference file which will be "
 						+ "used to compare with decoded stream.");
 
