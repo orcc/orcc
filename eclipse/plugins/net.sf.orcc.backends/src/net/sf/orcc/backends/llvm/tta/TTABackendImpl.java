@@ -137,7 +137,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				"net.sf.orcc.backends.llvm.tta.configuration", "Huge"));
 		reduceConnections = getAttribute(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
-		
+
 	}
 
 	@Override
@@ -197,7 +197,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		doTransformNetwork(network);
 
 		// build the design
-		computedMapping = new Mapping(network, mapping, reduceConnections, false);
+		computedMapping = new Mapping(network, mapping, reduceConnections,
+				false);
 		design = new ArchitectureBuilder().build(network, configuration,
 				computedMapping, reduceConnections);
 
@@ -341,7 +342,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		printer = new StandardPrinter(
+		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
