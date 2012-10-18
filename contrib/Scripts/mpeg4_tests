@@ -134,7 +134,7 @@ def computeFileList():
 
             ["MPEG4/foreman_qcif_30.bit", "MPEG4/foreman_qcif_30.yuv"],
 
-            ["MPEG4/old_town_cross_420_720p_MPEG4_SP_6Mbps.bit", "MPEG4/old_town_cross_420_720p_MPEG4_SP_6Mbps.yuv"]
+            ["MPEG4/old_town_cross_420_720p_MPEG4_SP_6Mbps.bit", "MPEG4/old_town_cross_420_720p_MPEG4_SP_6Mbps.yuv"],
             
             #"MPEG4/SIMPLE/P-VOP/jvc013",
             #"MPEG4/SIMPLE/P-VOP/hit012",
