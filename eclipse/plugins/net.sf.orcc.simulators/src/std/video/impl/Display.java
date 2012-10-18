@@ -243,7 +243,7 @@ public class Display extends GenericDisplay {
 	 * @return the flags of the display
 	 */
 	public static BigInteger displayYUV_getFlags() {
-		return BigInteger.valueOf(displayStatus + DISPLAY_READY);
+		return BigInteger.valueOf(displayStatus);
 	}
 
 	/**

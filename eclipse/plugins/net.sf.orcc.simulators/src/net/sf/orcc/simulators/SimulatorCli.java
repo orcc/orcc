@@ -152,10 +152,10 @@ public class SimulatorCli implements IApplication {
 				simulatorOptions.put(NO_DISPLAY, true);
 			}
 
-			if (commandLine.hasOption("ref")) {
+			if (commandLine.hasOption("r")) {
 				simulatorOptions.put(GOLDEN_REFERENCE, true);
 				simulatorOptions.put(GOLDEN_REFERENCE_FILE,
-						commandLine.getOptionValue("ref"));
+						commandLine.getOptionValue("r"));
 			}
 
 			simulatorOptions.put(SIMULATOR, "Visitor interpreter and debugger");
