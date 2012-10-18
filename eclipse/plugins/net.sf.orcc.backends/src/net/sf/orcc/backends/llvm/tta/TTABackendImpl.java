@@ -106,8 +106,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	private Mapping computedMapping;
 	private boolean profile;
 
-	private Map<String, String> mapping;
-
 	private Map<Port, Integer> computePortToIdMap(Vertex vertex) {
 		Map<Port, Integer> map = new HashMap<Port, Integer>();
 		Processor processor = design.getActorToProcessorMap().get(vertex);
