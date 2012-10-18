@@ -113,12 +113,12 @@ public class SimulatorCli implements IApplication {
 
 		// Optional command line arguments
 		clOptions.addOption("l", "loopsnumber", true,
-				"Defines the number of times input stimulus will be read before"
-						+ "application stop. A negative value means infinite."
+				"Defines the number of times input stimulus will be read before "
+						+ "application stop. A negative value means infinite. "
 						+ "Default : 1 time.");
 
 		clOptions.addOption("ref", "golden_reference", true,
-				"Reference file which will be"
+				"Reference file which will be "
 						+ "used to compare with decoded stream.");
 
 		clOptions.addOption("n", "nodisplay", false,
