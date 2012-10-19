@@ -276,9 +276,8 @@ class NetworkPrinter extends CTemplate {
 			
 			launcher();
 			
-			printf("End of simulation ! «IF ! geneticAlgo» Press a key to continue«ENDIF»\n");
-			«IF ! geneticAlgo»wait_for_key();«ENDIF»
-			return 0;
+			printf("End of simulation !\n");
+			return compareErrors;
 		}
 	'''
 	
