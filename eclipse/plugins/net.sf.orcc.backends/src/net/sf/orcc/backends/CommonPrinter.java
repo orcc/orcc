@@ -165,7 +165,24 @@ public abstract class CommonPrinter {
 	public static boolean printFile(CharSequence content, String filePath) {
 		return printFile(content.toString(), filePath);
 	}
-	
+
+	/**
+	 * Create a file and print content inside it. If parent folder doesn't
+	 * exists, create it.
+	 * 
+	 * @param content
+	 *            text to write in file
+	 * @param path
+	 *            complete path of the file
+	 * @param fileName
+	 *            name of the file
+	 * @return true if the file has correctly been written
+	 */
+	public static boolean printFile(CharSequence content, String path,
+			String fileName) {
+		return printFile(content.toString(), path + File.separator + fileName);
+	}
+
 	/**
 	 * Prints the given actor to a file in the folder <i>folder</i>.
 	 * 

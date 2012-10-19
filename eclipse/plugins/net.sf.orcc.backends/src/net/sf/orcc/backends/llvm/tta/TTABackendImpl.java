@@ -290,10 +290,9 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 		// TCE
 		CommonPrinter.printFile(new TCE_Design_PNDF(path).doSwitch(design),
-				path + File.separator + "top.pndf");
+				path, "top.pndf");
 
-		CommonPrinter.printFile(new Dota().printDot(design), path
-				+ File.separator + "top.dot");
+		CommonPrinter.printFile(new Dota().printDot(design), path, "top.dot");
 	}
 
 	private void generateProcessor(Processor tta) {
