@@ -91,6 +91,13 @@ public interface Graph extends Vertex {
 	Vertex getLast();
 
 	/**
+	 * Returns the vertex that has the given name, or <code>null</code>.
+	 * 
+	 * @return a vertex, or <code>null</code>
+	 */
+	Vertex getVertex(String name);
+
+	/**
 	 * Returns the value of the '<em><b>Vertices</b></em>' containment reference list.
 	 * The list contents are of type {@link net.sf.orcc.graph.Vertex}.
 	 * <!-- begin-user-doc --><!-- end-user-doc -->

@@ -217,6 +217,16 @@ public class GraphImpl extends VertexImpl implements Graph {
 		return last;
 	}
 
+	@Override
+	public Vertex getVertex(String name) {
+		for (Vertex vertex : getVertices()) {
+			if (name.equals(vertex.getLabel())) {
+				return vertex;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
