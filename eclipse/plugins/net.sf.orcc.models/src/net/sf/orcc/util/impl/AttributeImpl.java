@@ -317,9 +317,8 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 			return value;
 		}
 
-		value = getValue();
-		if (value != null) {
-			return value;
+		if (this.value != null) {
+			return this.value;
 		}
 
 		value = getReferencedValue();
