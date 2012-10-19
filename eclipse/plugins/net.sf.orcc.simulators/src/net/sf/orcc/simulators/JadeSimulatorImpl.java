@@ -154,7 +154,7 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 	}
 
 	@Override
-	public void start(String mode) {
+	public int start(String mode) {
 		// Flatten the network
 		flatten();
 
@@ -236,6 +236,7 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		return 0;
 	}
 
 }

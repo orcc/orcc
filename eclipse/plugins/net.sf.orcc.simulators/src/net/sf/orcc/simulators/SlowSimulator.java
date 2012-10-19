@@ -240,7 +240,7 @@ public class SlowSimulator extends AbstractSimulator {
 		noDisplay = getAttribute(NO_DISPLAY, false);
 	}
 
-	protected void runNetwork(Network network) {
+	protected int runNetwork(Network network) {
 		boolean hasExecuted;
 		do {
 			hasExecuted = false;
@@ -251,8 +251,8 @@ public class SlowSimulator extends AbstractSimulator {
 
 				while (interpreter.schedule()) {
 					// check for cancelation
-					if (isCanceled()) {
-						return;
+					if (isCanceled() || stopRequested) {
+						return statusCode;
 					}
 					nbFiring++;
 				}
@@ -260,16 +260,17 @@ public class SlowSimulator extends AbstractSimulator {
 				hasExecuted |= (nbFiring > 0);
 
 				// check for cancelation
-				if (isCanceled()) {
-					return;
+				if (isCanceled() || stopRequested) {
+					return statusCode;
 				}
 			}
 		} while (hasExecuted);
 		OrccLogger.traceln("End of simulation");
+		return statusCode;
 	}
 
 	@Override
-	public void start(String mode) {
+	public int start(String mode) {
 		try {
 			SimulatorDescriptor.killDescriptors();
 			interpreters = new HashMap<Actor, ActorInterpreter>();
@@ -293,7 +294,7 @@ public class SlowSimulator extends AbstractSimulator {
 		} finally {
 			// clean up to prevent memory leak
 			interpreters = null;
+			return statusCode;
 		}
 	}
-
 }

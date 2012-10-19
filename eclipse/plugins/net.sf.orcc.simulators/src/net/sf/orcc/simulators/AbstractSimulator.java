@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.simulators;
 
+import java.math.BigInteger;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,6 +47,7 @@ public abstract class AbstractSimulator implements Simulator {
 	private Map<String, Object> options;
 
 	protected static boolean stopRequested = false;
+	protected static int statusCode = 0;
 
 	/**
 	 * Returns the boolean-valued attribute with the given name. Returns the
@@ -136,7 +138,6 @@ public abstract class AbstractSimulator implements Simulator {
 		return options;
 	}
 
-
 	/**
 	 * Called when options are initialized.
 	 */
@@ -178,8 +179,12 @@ public abstract class AbstractSimulator implements Simulator {
 
 	/**
 	 * Stop the simulation.
+	 * 
+	 * @param status
+	 *            the status code which should be returned
 	 */
-	public static void stop() {
+	public static void stop(BigInteger status) {
 		stopRequested = true;
+		statusCode = status.intValue();
 	}
 }

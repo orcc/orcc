@@ -51,7 +51,7 @@ public class Source extends GenericSource {
 	private static int loopsCount;
 
 	public static void source_exit(BigInteger status) {
-		AbstractSimulator.stop();
+		AbstractSimulator.stop(status);
 	}
 
 	public static BigInteger source_getNbLoop() {
@@ -81,7 +81,8 @@ public class Source extends GenericSource {
 		try {
 			in.read(outTable, 0, nbTokenToRead.intValue());
 		} catch (IOException e) {
-			String msg = "I/O error when reading file \"" + inputStimulus + "\"";
+			String msg = "I/O error when reading file \"" + inputStimulus
+					+ "\"";
 			throw new RuntimeException(msg, e);
 		}
 	}
@@ -91,7 +92,8 @@ public class Source extends GenericSource {
 			// and for Damien, no there are no rewind on RandomAccessFile :)
 			in.seek(0L);
 		} catch (IOException e) {
-			String msg = "I/O error when rewinding file \"" + inputStimulus + "\"";
+			String msg = "I/O error when rewinding file \"" + inputStimulus
+					+ "\"";
 			throw new RuntimeException(msg, e);
 		}
 	}
@@ -103,8 +105,8 @@ public class Source extends GenericSource {
 			}
 			return BigInteger.valueOf(in.length());
 		} catch (IOException e) {
-			String msg = "I/O error when getting size of file \"" + inputStimulus
-					+ "\"";
+			String msg = "I/O error when getting size of file \""
+					+ inputStimulus + "\"";
 			throw new RuntimeException(msg, e);
 		}
 	}

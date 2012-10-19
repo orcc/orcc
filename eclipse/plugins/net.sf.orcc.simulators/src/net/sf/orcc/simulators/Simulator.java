@@ -41,7 +41,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * 
  */
 public interface Simulator {
-	
+
 	public static final int DEFAULT_NB_LOOPS = 1;
 
 	/**
@@ -66,6 +66,6 @@ public interface Simulator {
 	 * @param mode
 	 *            mode is "run" or "debug"
 	 */
-	void start(String mode);
+	int start(String mode);
 
 }
