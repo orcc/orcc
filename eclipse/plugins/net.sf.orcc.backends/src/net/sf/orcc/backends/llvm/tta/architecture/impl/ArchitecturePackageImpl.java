@@ -857,16 +857,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getFunctionUnit_Name() {
-		return (EAttribute) functionUnitEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getFunctionUnit_Operations() {
-		return (EReference) functionUnitEClass.getEStructuralFeatures().get(1);
+		return (EReference) functionUnitEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -874,7 +866,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getFunctionUnit_Ports() {
-		return (EReference) functionUnitEClass.getEStructuralFeatures().get(2);
+		return (EReference) functionUnitEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -882,7 +874,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getFunctionUnit_AddressSpace() {
-		return (EReference) functionUnitEClass.getEStructuralFeatures().get(3);
+		return (EReference) functionUnitEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -890,7 +882,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EAttribute getFunctionUnit_Implementation() {
-		return (EAttribute) functionUnitEClass.getEStructuralFeatures().get(4);
+		return (EAttribute) functionUnitEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1019,6 +1011,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EClass getPort() {
 		return portEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getPort_Name() {
+		return (EAttribute) portEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1488,6 +1489,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(componentEClass, COMPONENT__OUTPUTS);
 
 		portEClass = createEClass(PORT);
+		createEAttribute(portEClass, PORT__NAME);
 
 		memoryEClass = createEClass(MEMORY);
 		createEAttribute(memoryEClass, MEMORY__NAME);
@@ -1539,7 +1541,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				GLOBAL_CONTROL_UNIT__GUARD_LATENCY);
 
 		functionUnitEClass = createEClass(FUNCTION_UNIT);
-		createEAttribute(functionUnitEClass, FUNCTION_UNIT__NAME);
 		createEReference(functionUnitEClass, FUNCTION_UNIT__OPERATIONS);
 		createEReference(functionUnitEClass, FUNCTION_UNIT__PORTS);
 		createEReference(functionUnitEClass, FUNCTION_UNIT__ADDRESS_SPACE);
@@ -1767,6 +1768,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getPort_Name(), theEcorePackage.getEString(), "name",
+				null, 0, 1, Port.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(memoryEClass, Memory.class, "Memory", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1935,10 +1940,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(functionUnitEClass, FunctionUnit.class, "FunctionUnit",
 				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getFunctionUnit_Name(), ecorePackage.getEString(),
-				"name", null, 0, 1, FunctionUnit.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
 		initEReference(getFunctionUnit_Operations(), this.getOperation(), null,
 				"operations", null, 0, -1, FunctionUnit.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,

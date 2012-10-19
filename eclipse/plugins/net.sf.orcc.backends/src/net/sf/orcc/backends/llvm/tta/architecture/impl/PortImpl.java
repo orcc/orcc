@@ -39,11 +39,25 @@ import org.eclipse.emf.ecore.EClass;
  * <!-- begin-user-doc --> An implementation of the model object '
  * <em><b>Port</b></em>'. <!-- end-user-doc -->
  * <p>
+ * The following features are implemented:
+ * <ul>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.PortImpl#getName <em>Name</em>}</li>
+ * </ul>
  * </p>
  *
  * @generated
  */
 public class PortImpl extends VertexImpl implements Port {
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -62,17 +76,78 @@ public class PortImpl extends VertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 */
 	public String getName() {
 		return getLabel();
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 */
 	public void setName(String newName) {
 		setLabel(newName);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+		case ArchitecturePackage.PORT__NAME:
+			return getName();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+		case ArchitecturePackage.PORT__NAME:
+			setName((String) newValue);
+			return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+		case ArchitecturePackage.PORT__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		}
+		super.eUnset(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+		case ArchitecturePackage.PORT__NAME:
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
+		}
+		return super.eIsSet(featureID);
 	}
 
 	@Override

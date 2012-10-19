@@ -730,13 +730,22 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT__NEIGHBORS = GraphPackage.VERTEX__NEIGHBORS;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Port</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+	int PORT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl <em>Memory</em>}' class.
@@ -1327,7 +1336,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__NAME = PORT_FEATURE_COUNT + 0;
+	int FUNCTION_UNIT__NAME = PORT__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Operations</b></em>' containment reference list.
@@ -1335,7 +1344,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__OPERATIONS = PORT_FEATURE_COUNT + 1;
+	int FUNCTION_UNIT__OPERATIONS = PORT_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Ports</b></em>' containment reference list.
@@ -1343,7 +1352,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__PORTS = PORT_FEATURE_COUNT + 2;
+	int FUNCTION_UNIT__PORTS = PORT_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Address Space</b></em>' reference. <!--
@@ -1352,7 +1361,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__ADDRESS_SPACE = PORT_FEATURE_COUNT + 3;
+	int FUNCTION_UNIT__ADDRESS_SPACE = PORT_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Implementation</b></em>' attribute.
@@ -1361,7 +1370,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__IMPLEMENTATION = PORT_FEATURE_COUNT + 4;
+	int FUNCTION_UNIT__IMPLEMENTATION = PORT_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Function Unit</em>' class.
@@ -1369,7 +1378,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT_FEATURE_COUNT = PORT_FEATURE_COUNT + 5;
+	int FUNCTION_UNIT_FEATURE_COUNT = PORT_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -2796,16 +2805,6 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getFunctionUnit();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit#getName()
-	 * @see #getFunctionUnit()
-	 * @generated
-	 */
-	EAttribute getFunctionUnit_Name();
-
-	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit#getOperations <em>Operations</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Operations</em>'.
@@ -3012,6 +3011,17 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EClass getPort();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Port#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Port#getName()
+	 * @see #getPort()
+	 * @generated
+	 */
+	EAttribute getPort_Name();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Socket <em>Socket</em>}'.
@@ -4035,13 +4045,6 @@ public interface ArchitecturePackage extends EPackage {
 		EClass FUNCTION_UNIT = eINSTANCE.getFunctionUnit();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute FUNCTION_UNIT__NAME = eINSTANCE.getFunctionUnit_Name();
-
-		/**
 		 * The meta object literal for the '<em><b>Operations</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
@@ -4204,6 +4207,14 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EClass PORT = eINSTANCE.getPort();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PORT__NAME = eINSTANCE.getPort_Name();
 
 		/**
 		 * The meta object literal for the '

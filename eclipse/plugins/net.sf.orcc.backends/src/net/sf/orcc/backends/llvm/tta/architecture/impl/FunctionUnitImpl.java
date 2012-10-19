@@ -51,7 +51,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.FunctionUnitImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.FunctionUnitImpl#getOperations <em>Operations</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.FunctionUnitImpl#getPorts <em>Ports</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.FunctionUnitImpl#getAddressSpace <em>Address Space</em>}</li>
@@ -62,24 +61,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
-
 	/**
 	 * The cached value of the '{@link #getOperations() <em>Operations</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -143,26 +124,6 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	@Override
 	protected EClass eStaticClass() {
 		return ArchitecturePackage.Literals.FUNCTION_UNIT;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.FUNCTION_UNIT__NAME, oldName, name));
 	}
 
 	/**
@@ -275,8 +236,6 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case ArchitecturePackage.FUNCTION_UNIT__NAME:
-			return getName();
 		case ArchitecturePackage.FUNCTION_UNIT__OPERATIONS:
 			return getOperations();
 		case ArchitecturePackage.FUNCTION_UNIT__PORTS:
@@ -299,9 +258,6 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case ArchitecturePackage.FUNCTION_UNIT__NAME:
-			setName((String) newValue);
-			return;
 		case ArchitecturePackage.FUNCTION_UNIT__OPERATIONS:
 			getOperations().clear();
 			getOperations().addAll((Collection<? extends Operation>) newValue);
@@ -327,9 +283,6 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case ArchitecturePackage.FUNCTION_UNIT__NAME:
-			setName(NAME_EDEFAULT);
-			return;
 		case ArchitecturePackage.FUNCTION_UNIT__OPERATIONS:
 			getOperations().clear();
 			return;
@@ -353,9 +306,6 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case ArchitecturePackage.FUNCTION_UNIT__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
 		case ArchitecturePackage.FUNCTION_UNIT__OPERATIONS:
 			return operations != null && !operations.isEmpty();
 		case ArchitecturePackage.FUNCTION_UNIT__PORTS:
@@ -379,9 +329,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (name: ");
-		result.append(name);
-		result.append(", implementation: ");
+		result.append(" (implementation: ");
 		result.append(implementation);
 		result.append(')');
 		return result.toString();
