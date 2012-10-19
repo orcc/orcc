@@ -97,7 +97,27 @@ public interface Attributable extends EObject {
 	 *            name of an attribute
 	 * @return the value of an attribute or <code>null</code>
 	 */
-	<T> T getValue(String name);
+	<T extends EObject> T getValueAsEObject(String name);
+
+	/**
+	 * Returns the value of the first attribute that has the given name. If no
+	 * such attribute exists, return <code>null</code>.
+	 * 
+	 * @param name
+	 *            name of an attribute
+	 * @return the value of an attribute or <code>null</code>
+	 */
+	<T> T getValueAsObject(String name);
+
+	/**
+	 * Returns the value of the first attribute that has the given name. If no
+	 * such attribute exists, return <code>null</code>.
+	 * 
+	 * @param name
+	 *            name of an attribute
+	 * @return the value of an attribute or <code>null</code>
+	 */
+	String getValueAsString(String name);
 
 	/**
 	 * Returns <code>true</code> if this object has an attribute with the given

@@ -190,12 +190,36 @@ public abstract class AttributableImpl extends EObjectImpl implements
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T getValue(String name) {
+	public <T extends EObject> T getValueAsEObject(String name) {
 		Attribute attribute = getAttribute(name);
 		if (attribute == null) {
 			return null;
 		}
-		return (T) attribute.getValue();
+
+		EObject result = attribute.getReferencedValue();
+		if (result == null) {
+			result = attribute.getContainedValue();
+		}
+		return (T) result;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T getValueAsObject(String name) {
+		Attribute attribute = getAttribute(name);
+		if (attribute == null) {
+			return null;
+		}
+		return (T) attribute.getObjectValue();
+	}
+
+	@Override
+	public String getValueAsString(String name) {
+		Attribute attribute = getAttribute(name);
+		if (attribute == null) {
+			return null;
+		}
+		return attribute.getStringValue();
 	}
 
 	@Override
@@ -217,38 +241,32 @@ public abstract class AttributableImpl extends EObjectImpl implements
 
 	@Override
 	public void setAttribute(String name, EObject value) {
-		for (Attribute attribute : getAttributes()) {
-			if (name.equals(attribute.getName())) {
-				attribute.setEObjectValue(value);
-				return;
-			}
+		Attribute attribute = getAttribute(name);
+		if (attribute == null) {
+			attribute = eINSTANCE.createAttribute(name);
+			getAttributes().add(0, attribute);
 		}
-
-		getAttributes().add(0, eINSTANCE.createAttribute(name, value));
+		attribute.setEObjectValue(value);
 	}
 
 	@Override
 	public void setAttribute(String name, Object value) {
-		for (Attribute attribute : getAttributes()) {
-			if (name.equals(attribute.getName())) {
-				attribute.setPojoValue(value);
-				return;
-			}
+		Attribute attribute = getAttribute(name);
+		if (attribute == null) {
+			attribute = eINSTANCE.createAttribute(name);
+			getAttributes().add(0, attribute);
 		}
-
-		getAttributes().add(0, eINSTANCE.createAttribute(name, value));
+		attribute.setObjectValue(value);
 	}
 
 	@Override
 	public void setAttribute(String name, String value) {
-		for (Attribute attribute : getAttributes()) {
-			if (name.equals(attribute.getName())) {
-				attribute.setValue(value);
-				return;
-			}
+		Attribute attribute = getAttribute(name);
+		if (attribute == null) {
+			attribute = eINSTANCE.createAttribute(name);
+			getAttributes().add(0, attribute);
 		}
-
-		getAttributes().add(0, eINSTANCE.createAttribute(name, value));
+		attribute.setStringValue(value);
 	}
 
 }

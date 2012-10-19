@@ -154,7 +154,7 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getAttribute_PojoValue() {
+	public EAttribute getAttribute_ObjectValue() {
 		return (EAttribute) attributeEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -172,7 +172,7 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getAttribute_Value() {
+	public EAttribute getAttribute_StringValue() {
 		return (EAttribute) attributeEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -235,9 +235,9 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 		attributeEClass = createEClass(ATTRIBUTE);
 		createEAttribute(attributeEClass, ATTRIBUTE__NAME);
 		createEReference(attributeEClass, ATTRIBUTE__CONTAINED_VALUE);
-		createEAttribute(attributeEClass, ATTRIBUTE__POJO_VALUE);
+		createEAttribute(attributeEClass, ATTRIBUTE__OBJECT_VALUE);
 		createEReference(attributeEClass, ATTRIBUTE__REFERENCED_VALUE);
-		createEAttribute(attributeEClass, ATTRIBUTE__VALUE);
+		createEAttribute(attributeEClass, ATTRIBUTE__STRING_VALUE);
 
 		attributableEClass = createEClass(ATTRIBUTABLE);
 		createEReference(attributableEClass, ATTRIBUTABLE__ATTRIBUTES);
@@ -291,17 +291,17 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 				1, Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAttribute_PojoValue(), ecorePackage.getEJavaObject(),
-				"pojoValue", null, 0, 1, Attribute.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getAttribute_ObjectValue(),
+				ecorePackage.getEJavaObject(), "objectValue", null, 0, 1,
+				Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAttribute_ReferencedValue(),
 				theEcorePackage.getEObject(), null, "referencedValue", null, 0,
 				1, Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAttribute_Value(), ecorePackage.getEString(),
-				"value", null, 0, 1, Attribute.class, !IS_TRANSIENT,
+		initEAttribute(getAttribute_StringValue(), ecorePackage.getEString(),
+				"stringValue", null, 0, 1, Attribute.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 

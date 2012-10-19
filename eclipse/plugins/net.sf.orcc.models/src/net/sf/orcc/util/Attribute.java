@@ -17,9 +17,9 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link net.sf.orcc.util.Attribute#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.util.Attribute#getContainedValue <em>Contained Value</em>}</li>
- *   <li>{@link net.sf.orcc.util.Attribute#getPojoValue <em>Pojo Value</em>}</li>
+ *   <li>{@link net.sf.orcc.util.Attribute#getObjectValue <em>Object Value</em>}</li>
  *   <li>{@link net.sf.orcc.util.Attribute#getReferencedValue <em>Referenced Value</em>}</li>
- *   <li>{@link net.sf.orcc.util.Attribute#getValue <em>Value</em>}</li>
+ *   <li>{@link net.sf.orcc.util.Attribute#getStringValue <em>String Value</em>}</li>
  * </ul>
  * </p>
  *
@@ -54,16 +54,20 @@ public interface Attribute extends EObject {
 	String getName();
 
 	/**
-	 * Returns the value of the '<em><b>Pojo Value</b></em>' attribute.
-	 * <!-- begin-user-doc -->Returns the POJO value contained in this attribute. Note: if this
-	 * attribute is serialized, this value will be serialized as well.<!-- end-user-doc -->
-	 * @return the value of the '<em>Pojo Value</em>' attribute.
-	 * @see #setPojoValue(Object)
-	 * @see net.sf.orcc.util.UtilPackage#getAttribute_PojoValue()
+	 * Returns the value of the '<em><b>Object Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Object Value</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Object Value</em>' attribute.
+	 * @see #setObjectValue(Object)
+	 * @see net.sf.orcc.util.UtilPackage#getAttribute_ObjectValue()
 	 * @model
 	 * @generated
 	 */
-	Object getPojoValue();
+	Object getObjectValue();
 
 	/**
 	 * Returns the value of the '<em><b>Referenced Value</b></em>' reference.
@@ -78,12 +82,20 @@ public interface Attribute extends EObject {
 	EObject getReferencedValue();
 
 	/**
-	 * Returns the value contained in this attribute, looking in the following
-	 * order: 1) POJO, 2) referenced 3) contained.
-	 * 
-	 * @return the value
+	 * Returns the value of the '<em><b>String Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>String Value</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>String Value</em>' attribute.
+	 * @see #setStringValue(String)
+	 * @see net.sf.orcc.util.UtilPackage#getAttribute_StringValue()
+	 * @model
+	 * @generated
 	 */
-	Object getValue();
+	String getStringValue();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.util.Attribute#getContainedValue <em>Contained Value</em>}' containment reference.
@@ -113,13 +125,14 @@ public interface Attribute extends EObject {
 	void setName(String value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.util.Attribute#getPojoValue <em>Pojo Value</em>}' attribute.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @param value the new value of the '<em>Pojo Value</em>' attribute.
-	 * @see #getPojoValue()
+	 * Sets the value of the '{@link net.sf.orcc.util.Attribute#getObjectValue <em>Object Value</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Object Value</em>' attribute.
+	 * @see #getObjectValue()
 	 * @generated
 	 */
-	void setPojoValue(Object value);
+	void setObjectValue(Object value);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.util.Attribute#getReferencedValue <em>Referenced Value</em>}' reference.
@@ -131,13 +144,13 @@ public interface Attribute extends EObject {
 	void setReferencedValue(EObject value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.util.Attribute#getValue <em>Value</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.util.Attribute#getStringValue <em>String Value</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Value</em>' attribute.
-	 * @see #getValue()
+	 * @param value the new value of the '<em>String Value</em>' attribute.
+	 * @see #getStringValue()
 	 * @generated
 	 */
-	void setValue(String value);
+	void setStringValue(String value);
 
 }

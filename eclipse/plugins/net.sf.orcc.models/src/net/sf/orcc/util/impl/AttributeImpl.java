@@ -25,9 +25,9 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <ul>
  *   <li>{@link net.sf.orcc.util.impl.AttributeImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.util.impl.AttributeImpl#getContainedValue <em>Contained Value</em>}</li>
- *   <li>{@link net.sf.orcc.util.impl.AttributeImpl#getPojoValue <em>Pojo Value</em>}</li>
+ *   <li>{@link net.sf.orcc.util.impl.AttributeImpl#getObjectValue <em>Object Value</em>}</li>
  *   <li>{@link net.sf.orcc.util.impl.AttributeImpl#getReferencedValue <em>Referenced Value</em>}</li>
- *   <li>{@link net.sf.orcc.util.impl.AttributeImpl#getValue <em>Value</em>}</li>
+ *   <li>{@link net.sf.orcc.util.impl.AttributeImpl#getStringValue <em>String Value</em>}</li>
  * </ul>
  * </p>
  *
@@ -63,22 +63,24 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	protected EObject containedValue;
 
 	/**
-	 * The default value of the '{@link #getPojoValue() <em>Pojo Value</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getPojoValue()
+	 * The default value of the '{@link #getObjectValue() <em>Object Value</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getObjectValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final Object POJO_VALUE_EDEFAULT = null;
+	protected static final Object OBJECT_VALUE_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getPojoValue() <em>Pojo Value</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getPojoValue()
+	 * The cached value of the '{@link #getObjectValue() <em>Object Value</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getObjectValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected Object pojoValue = POJO_VALUE_EDEFAULT;
+	protected Object objectValue = OBJECT_VALUE_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getReferencedValue() <em>Referenced Value</em>}' reference.
@@ -91,24 +93,24 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	protected EObject referencedValue;
 
 	/**
-	 * The default value of the '{@link #getValue() <em>Value</em>}' attribute.
+	 * The default value of the '{@link #getStringValue() <em>String Value</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getValue()
+	 * @see #getStringValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String VALUE_EDEFAULT = null;
+	protected static final String STRING_VALUE_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getValue() <em>Value</em>}' attribute.
+	 * The cached value of the '{@link #getStringValue() <em>String Value</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getValue()
+	 * @see #getStringValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected String value = VALUE_EDEFAULT;
+	protected String stringValue = STRING_VALUE_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -157,14 +159,14 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 			return getName();
 		case UtilPackage.ATTRIBUTE__CONTAINED_VALUE:
 			return getContainedValue();
-		case UtilPackage.ATTRIBUTE__POJO_VALUE:
-			return getPojoValue();
+		case UtilPackage.ATTRIBUTE__OBJECT_VALUE:
+			return getObjectValue();
 		case UtilPackage.ATTRIBUTE__REFERENCED_VALUE:
 			if (resolve)
 				return getReferencedValue();
 			return basicGetReferencedValue();
-		case UtilPackage.ATTRIBUTE__VALUE:
-			return getValue();
+		case UtilPackage.ATTRIBUTE__STRING_VALUE:
+			return getStringValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -195,14 +197,14 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 					.equals(name);
 		case UtilPackage.ATTRIBUTE__CONTAINED_VALUE:
 			return containedValue != null;
-		case UtilPackage.ATTRIBUTE__POJO_VALUE:
-			return POJO_VALUE_EDEFAULT == null ? pojoValue != null
-					: !POJO_VALUE_EDEFAULT.equals(pojoValue);
+		case UtilPackage.ATTRIBUTE__OBJECT_VALUE:
+			return OBJECT_VALUE_EDEFAULT == null ? objectValue != null
+					: !OBJECT_VALUE_EDEFAULT.equals(objectValue);
 		case UtilPackage.ATTRIBUTE__REFERENCED_VALUE:
 			return referencedValue != null;
-		case UtilPackage.ATTRIBUTE__VALUE:
-			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
-					.equals(value);
+		case UtilPackage.ATTRIBUTE__STRING_VALUE:
+			return STRING_VALUE_EDEFAULT == null ? stringValue != null
+					: !STRING_VALUE_EDEFAULT.equals(stringValue);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -220,14 +222,14 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 		case UtilPackage.ATTRIBUTE__CONTAINED_VALUE:
 			setContainedValue((EObject) newValue);
 			return;
-		case UtilPackage.ATTRIBUTE__POJO_VALUE:
-			setPojoValue(newValue);
+		case UtilPackage.ATTRIBUTE__OBJECT_VALUE:
+			setObjectValue(newValue);
 			return;
 		case UtilPackage.ATTRIBUTE__REFERENCED_VALUE:
 			setReferencedValue((EObject) newValue);
 			return;
-		case UtilPackage.ATTRIBUTE__VALUE:
-			setValue((String) newValue);
+		case UtilPackage.ATTRIBUTE__STRING_VALUE:
+			setStringValue((String) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -255,14 +257,14 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 		case UtilPackage.ATTRIBUTE__CONTAINED_VALUE:
 			setContainedValue((EObject) null);
 			return;
-		case UtilPackage.ATTRIBUTE__POJO_VALUE:
-			setPojoValue(POJO_VALUE_EDEFAULT);
+		case UtilPackage.ATTRIBUTE__OBJECT_VALUE:
+			setObjectValue(OBJECT_VALUE_EDEFAULT);
 			return;
 		case UtilPackage.ATTRIBUTE__REFERENCED_VALUE:
 			setReferencedValue((EObject) null);
 			return;
-		case UtilPackage.ATTRIBUTE__VALUE:
-			setValue(VALUE_EDEFAULT);
+		case UtilPackage.ATTRIBUTE__STRING_VALUE:
+			setStringValue(STRING_VALUE_EDEFAULT);
 			return;
 		}
 		super.eUnset(featureID);
@@ -288,14 +290,6 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Object getPojoValue() {
-		return pojoValue;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EObject getReferencedValue() {
 		if (referencedValue != null && referencedValue.eIsProxy()) {
 			InternalEObject oldReferencedValue = (InternalEObject) referencedValue;
@@ -308,25 +302,6 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 			}
 		}
 		return referencedValue;
-	}
-
-	@Override
-	public Object getValue() {
-		Object value = getPojoValue();
-		if (value != null) {
-			return value;
-		}
-
-		if (this.value != null) {
-			return this.value;
-		}
-
-		value = getReferencedValue();
-		if (value != null) {
-			return value;
-		}
-
-		return getContainedValue();
 	}
 
 	/**
@@ -356,6 +331,29 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Object getObjectValue() {
+		return objectValue;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setObjectValue(Object newObjectValue) {
+		Object oldObjectValue = objectValue;
+		objectValue = newObjectValue;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					UtilPackage.ATTRIBUTE__OBJECT_VALUE, oldObjectValue,
+					objectValue));
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -371,18 +369,6 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setPojoValue(Object newPojoValue) {
-		Object oldPojoValue = pojoValue;
-		pojoValue = newPojoValue;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					UtilPackage.ATTRIBUTE__POJO_VALUE, oldPojoValue, pojoValue));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public void setReferencedValue(EObject newReferencedValue) {
 		EObject oldReferencedValue = referencedValue;
 		referencedValue = newReferencedValue;
@@ -392,13 +378,13 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 					oldReferencedValue, referencedValue));
 	}
 
-	@Override
-	public void setEObjectValue(EObject value) {
-		if (value != null && value.eContainer() == null) {
-			// if value is not contained, add it to the contained value
-			setContainedValue(value);
-		}
-		setReferencedValue(value);
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getStringValue() {
+		return stringValue;
 	}
 
 	/**
@@ -406,12 +392,22 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setValue(String newValue) {
-		String oldValue = value;
-		value = newValue;
+	public void setStringValue(String newStringValue) {
+		String oldStringValue = stringValue;
+		stringValue = newStringValue;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					UtilPackage.ATTRIBUTE__VALUE, oldValue, value));
+					UtilPackage.ATTRIBUTE__STRING_VALUE, oldStringValue,
+					stringValue));
+	}
+
+	@Override
+	public void setEObjectValue(EObject value) {
+		if (value != null && value.eContainer() == null) {
+			// if value is not contained, add it to the contained value
+			setContainedValue(value);
+		}
+		setReferencedValue(value);
 	}
 
 	/**
@@ -426,10 +422,10 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
-		result.append(", pojoValue: ");
-		result.append(pojoValue);
-		result.append(", value: ");
-		result.append(value);
+		result.append(", objectValue: ");
+		result.append(objectValue);
+		result.append(", stringValue: ");
+		result.append(stringValue);
 		result.append(')');
 		return result.toString();
 	}

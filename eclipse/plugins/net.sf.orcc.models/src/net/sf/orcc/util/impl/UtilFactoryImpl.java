@@ -88,30 +88,6 @@ public class UtilFactoryImpl extends EFactoryImpl implements UtilFactory {
 		return attribute;
 	}
 
-	@Override
-	public Attribute createAttribute(String name, EObject value) {
-		AttributeImpl attribute = new AttributeImpl();
-		attribute.setName(name);
-		attribute.setEObjectValue(value);
-		return attribute;
-	}
-
-	@Override
-	public Attribute createAttribute(String name, Object value) {
-		AttributeImpl attribute = new AttributeImpl();
-		attribute.setName(name);
-		attribute.setPojoValue(value);
-		return attribute;
-	}
-
-	@Override
-	public Attribute createAttribute(String name, String value) {
-		AttributeImpl attribute = new AttributeImpl();
-		attribute.setName(name);
-		attribute.setValue(value);
-		return attribute;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

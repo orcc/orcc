@@ -84,13 +84,13 @@ public interface UtilPackage extends EPackage {
 	int ATTRIBUTE__CONTAINED_VALUE = 1;
 
 	/**
-	 * The feature id for the '<em><b>Pojo Value</b></em>' attribute.
+	 * The feature id for the '<em><b>Object Value</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ATTRIBUTE__POJO_VALUE = 2;
+	int ATTRIBUTE__OBJECT_VALUE = 2;
 
 	/**
 	 * The feature id for the '<em><b>Referenced Value</b></em>' reference.
@@ -102,13 +102,13 @@ public interface UtilPackage extends EPackage {
 	int ATTRIBUTE__REFERENCED_VALUE = 3;
 
 	/**
-	 * The feature id for the '<em><b>Value</b></em>' attribute.
+	 * The feature id for the '<em><b>String Value</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ATTRIBUTE__VALUE = 4;
+	int ATTRIBUTE__STRING_VALUE = 4;
 
 	/**
 	 * The number of structural features of the '<em>Attribute</em>' class.
@@ -199,15 +199,15 @@ public interface UtilPackage extends EPackage {
 	EReference getAttribute_ContainedValue();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.util.Attribute#getPojoValue <em>Pojo Value</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.util.Attribute#getObjectValue <em>Object Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Pojo Value</em>'.
-	 * @see net.sf.orcc.util.Attribute#getPojoValue()
+	 * @return the meta object for the attribute '<em>Object Value</em>'.
+	 * @see net.sf.orcc.util.Attribute#getObjectValue()
 	 * @see #getAttribute()
 	 * @generated
 	 */
-	EAttribute getAttribute_PojoValue();
+	EAttribute getAttribute_ObjectValue();
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.util.Attribute#getReferencedValue <em>Referenced Value</em>}'.
@@ -221,15 +221,15 @@ public interface UtilPackage extends EPackage {
 	EReference getAttribute_ReferencedValue();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.util.Attribute#getValue <em>Value</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.util.Attribute#getStringValue <em>String Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Value</em>'.
-	 * @see net.sf.orcc.util.Attribute#getValue()
+	 * @return the meta object for the attribute '<em>String Value</em>'.
+	 * @see net.sf.orcc.util.Attribute#getStringValue()
 	 * @see #getAttribute()
 	 * @generated
 	 */
-	EAttribute getAttribute_Value();
+	EAttribute getAttribute_StringValue();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.util.Attributable <em>Attributable</em>}'.
@@ -312,12 +312,13 @@ public interface UtilPackage extends EPackage {
 				.getAttribute_ContainedValue();
 
 		/**
-		 * The meta object literal for the '<em><b>Pojo Value</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Object Value</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ATTRIBUTE__POJO_VALUE = eINSTANCE.getAttribute_PojoValue();
+		EAttribute ATTRIBUTE__OBJECT_VALUE = eINSTANCE
+				.getAttribute_ObjectValue();
 
 		/**
 		 * The meta object literal for the '<em><b>Referenced Value</b></em>' reference feature.
@@ -329,12 +330,13 @@ public interface UtilPackage extends EPackage {
 				.getAttribute_ReferencedValue();
 
 		/**
-		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>String Value</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ATTRIBUTE__VALUE = eINSTANCE.getAttribute_Value();
+		EAttribute ATTRIBUTE__STRING_VALUE = eINSTANCE
+				.getAttribute_StringValue();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.util.impl.AttributableImpl <em>Attributable</em>}' class.
