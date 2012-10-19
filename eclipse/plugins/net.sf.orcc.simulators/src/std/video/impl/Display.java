@@ -104,11 +104,11 @@ public class Display extends GenericDisplay {
 		int width = pictureWidth.intValue();
 		int height = pictureHeight.intValue();
 
-		byte[] Y = new byte[width * height];
-		byte[] U = new byte[width * height / 4];
-		byte[] V = new byte[width * height / 4];
-
 		if (useCompare) {
+			byte[] Y = new byte[width * height];
+			byte[] U = new byte[width * height / 4];
+			byte[] V = new byte[width * height / 4];
+
 			try {
 				int numErrors = 0;
 

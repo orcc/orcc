@@ -236,14 +236,14 @@ public class SlowSimulator extends AbstractSimulator {
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
 		loopsNumber = getAttribute(LOOP_NUMBER, DEFAULT_NB_LOOPS);
-		
+
 		noDisplay = getAttribute(NO_DISPLAY, false);
 	}
 
 	protected void runNetwork(Network network) {
-		boolean isAlive = true;
+		boolean hasExecuted;
 		do {
-			boolean hasExecuted = false;
+			hasExecuted = false;
 			for (Vertex vertex : network.getChildren()) {
 				int nbFiring = 0;
 				Actor actor = vertex.getAdapter(Actor.class);
@@ -264,8 +264,7 @@ public class SlowSimulator extends AbstractSimulator {
 					return;
 				}
 			}
-			isAlive = hasExecuted;
-		} while (isAlive);
+		} while (hasExecuted);
 		OrccLogger.traceln("End of simulation");
 	}
 
