@@ -748,9 +748,8 @@ public class XdfParser {
 	private void parseAttribute(EList<Attribute> attributes, Element element) {
 		String kind = element.getAttribute("kind");
 		String attrName = element.getAttribute("name");
-		UtilFactory factory = UtilFactory.eINSTANCE;
 
-		Attribute attr;
+		Attribute attr = UtilFactory.eINSTANCE.createAttribute(attrName);
 		if (kind.equals(XdfConstants.CUSTOM)) {
 			// find the first element child
 			Node child = element.getFirstChild();
@@ -763,19 +762,19 @@ public class XdfParser {
 
 			// serialize it to a String
 			String value = DomUtil.writeToString(child);
-			attr = factory.createAttribute(attrName, value);
+			attr.setStringValue(value);
 		} else if (kind.equals(XdfConstants.FLAG)) {
-			attr = factory.createAttribute(attrName);
+			// nothing to do
 		} else if (kind.equals(XdfConstants.STRING)) {
 			String value = element.getAttribute("value");
-			attr = factory.createAttribute(attrName, value);
+			attr.setStringValue(value);
 		} else if (kind.equals(XdfConstants.TYPE)) {
 			Type type = typeParser.parseType(element.getFirstChild())
 					.getResult();
-			attr = factory.createAttribute(attrName, type);
+			attr.setEObjectValue(type);
 		} else if (kind.equals(XdfConstants.VALUE)) {
 			Expression expr = exprParser.parseExpr(element.getFirstChild());
-			attr = factory.createAttribute(attrName, expr);
+			attr.setEObjectValue(expr);
 		} else {
 			throw new OrccRuntimeException("unsupported attribute kind: \""
 					+ kind + "\"");

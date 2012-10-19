@@ -59,7 +59,7 @@ public abstract class BlockImpl extends AttributableImpl implements Block {
 			if (attr == null) {
 				return edge;
 			}
-			Object value = attr.getPojoValue();
+			Object value = attr.getObjectValue();
 			if (value == null) {
 				return edge;
 			}
@@ -75,7 +75,7 @@ public abstract class BlockImpl extends AttributableImpl implements Block {
 		for (Edge edge : getCfgNode().getOutgoing()) {
 			Attribute attr = edge.getAttribute("flag");
 			if (attr != null) {
-				Object value = attr.getPojoValue();
+				Object value = attr.getObjectValue();
 				if (value instanceof Boolean && (Boolean) value) {
 					return edge;
 				}

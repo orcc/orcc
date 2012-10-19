@@ -177,8 +177,8 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 			if (attr.getContainedValue() instanceof Expression) {
 				Expression expr = (Expression) attr.getContainedValue();
 				return new ExpressionEvaluator().evaluateAsInteger(expr);
-			} else if (attr.getPojoValue() instanceof Integer) {
-				return (Integer) attr.getPojoValue();
+			} else if (attr.getObjectValue() instanceof Integer) {
+				return (Integer) attr.getObjectValue();
 			}
 		}
 		return null;

@@ -334,14 +334,13 @@ public class XdfWriter {
 			attributeElt.setAttribute("name", attribute.getName());
 
 			String kind;
-			Object value = attribute.getValue();
-			if (value instanceof String) {
-				String str = (String) value;
-				if (str.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
+			if (attribute.getStringValue() != null) {
+				String value = attribute.getStringValue();
+				if (value.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
 					// that is somewhat arbitrary, but a String is only
 					// considered XML content if it starts with that prologue
 					// (which written by default by DomUtil.writeToString)
-					Document document = DomUtil.parseDocument(str);
+					Document document = DomUtil.parseDocument(value);
 					Element docElt = document.getDocumentElement();
 					kind = XdfConstants.CUSTOM;
 
@@ -349,15 +348,15 @@ public class XdfWriter {
 					attributeElt.appendChild(imported);
 				} else {
 					kind = XdfConstants.STRING;
-					attributeElt.setAttribute("value", (String) value);
+					attributeElt.setAttribute("value", value);
 				}
-			} else if (value instanceof Type) {
+			} else if (attribute.getReferencedValue() instanceof Type) {
 				kind = XdfConstants.TYPE;
-				Type type = (Type) value;
+				Type type = (Type) attribute.getReferencedValue();
 				attributeElt.appendChild(writeType(type));
-			} else if (value instanceof Expression) {
+			} else if (attribute.getReferencedValue() instanceof Expression) {
 				kind = XdfConstants.VALUE;
-				Expression expr = (Expression) value;
+				Expression expr = (Expression) attribute.getReferencedValue();
 				writeExpr(attributeElt, expr);
 			} else {
 				// default is flag
