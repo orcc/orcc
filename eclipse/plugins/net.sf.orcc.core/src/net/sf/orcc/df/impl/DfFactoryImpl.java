@@ -415,7 +415,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 		// only set the attribute when the port is native
 		if (isNative) {
-			port.setAttribute("native", null);
+			port.addAttribute("native");
 		}
 		return port;
 	}

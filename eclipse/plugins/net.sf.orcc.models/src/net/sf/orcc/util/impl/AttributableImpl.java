@@ -70,6 +70,17 @@ public abstract class AttributableImpl extends EObjectImpl implements
 		super();
 	}
 
+	@Override
+	public void addAttribute(String name) {
+		for (Attribute attribute : getAttributes()) {
+			if (name.equals(attribute.getName())) {
+				return;
+			}
+		}
+
+		getAttributes().add(0, eINSTANCE.createAttribute(name));
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -208,7 +219,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 	public void setAttribute(String name, EObject value) {
 		for (Attribute attribute : getAttributes()) {
 			if (name.equals(attribute.getName())) {
-				attribute.setValue(value);
+				attribute.setEObjectValue(value);
 				return;
 			}
 		}
@@ -221,6 +232,18 @@ public abstract class AttributableImpl extends EObjectImpl implements
 		for (Attribute attribute : getAttributes()) {
 			if (name.equals(attribute.getName())) {
 				attribute.setPojoValue(value);
+				return;
+			}
+		}
+
+		getAttributes().add(0, eINSTANCE.createAttribute(name, value));
+	}
+
+	@Override
+	public void setAttribute(String name, String value) {
+		for (Attribute attribute : getAttributes()) {
+			if (name.equals(attribute.getName())) {
+				attribute.setValue(value);
 				return;
 			}
 		}

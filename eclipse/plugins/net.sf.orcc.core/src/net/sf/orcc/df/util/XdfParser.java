@@ -765,7 +765,7 @@ public class XdfParser {
 			String value = DomUtil.writeToString(child);
 			attr = factory.createAttribute(attrName, value);
 		} else if (kind.equals(XdfConstants.FLAG)) {
-			attr = factory.createAttribute(attrName, null);
+			attr = factory.createAttribute(attrName);
 		} else if (kind.equals(XdfConstants.STRING)) {
 			String value = element.getAttribute("value");
 			attr = factory.createAttribute(attrName, value);

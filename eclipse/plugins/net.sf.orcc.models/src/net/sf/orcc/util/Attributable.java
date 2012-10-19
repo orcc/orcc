@@ -32,8 +32,8 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- *<!-- begin-user-doc -->This class defines an
- *         attributable object.<!-- end-user-doc -->
+ * <!-- begin-user-doc -->This class defines an attributable object.<!--
+ * end-user-doc -->
  *
  * <p>
  * The following features are supported:
@@ -47,6 +47,14 @@ import org.eclipse.emf.ecore.EObject;
  * @generated
  */
 public interface Attributable extends EObject {
+
+	/**
+	 * Adds an attribute with the given name.
+	 * 
+	 * @param name
+	 *            name of the attribute
+	 */
+	void addAttribute(String name);
 
 	/**
 	 * Returns the nth attribute. If no such attribute exists, throws an
@@ -72,7 +80,8 @@ public interface Attributable extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Attributes</b></em>' containment reference list.
 	 * The list contents are of type {@link net.sf.orcc.util.Attribute}.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * <!-- begin-user-doc --><!--
+	 * end-user-doc -->
 	 * @return the value of the '<em>Attributes</em>' containment reference list.
 	 * @see net.sf.orcc.util.UtilPackage#getAttributable_Attributes()
 	 * @model containment="true"
@@ -109,11 +118,9 @@ public interface Attributable extends EObject {
 	void removeAttribute(String name);
 
 	/**
-	 * Sets the value of the attribute with the given name to the given value.
+	 * Sets the value of the attribute with the given name to the given EObject.
 	 * If no attribute exists with the given name, a new attribute is created
-	 * and inserted at the beginning of the attribute list. This makes it easier
-	 * to reference attributes by their index (the last attribute that was added
-	 * will be at index 0, not index getAttributes().size() - 1).
+	 * and inserted at the beginning of the attribute list.
 	 * 
 	 * @param name
 	 *            name of the attribute
@@ -123,11 +130,11 @@ public interface Attributable extends EObject {
 	void setAttribute(String name, EObject value);
 
 	/**
-	 * Sets the value of the attribute with the given name to the given value.
-	 * If no attribute exists with the given name, a new attribute is created
-	 * and inserted at the beginning of the attribute list. This makes it easier
-	 * to reference attributes by their index (the last attribute that was added
-	 * will be at index 0, not index getAttributes().size() - 1).
+	 * Sets the value of the attribute with the given name to the given POJO
+	 * value. If no attribute exists with the given name, a new attribute is
+	 * created and inserted at the beginning of the attribute list. This makes
+	 * it easier to reference attributes by their index (the last attribute that
+	 * was added will be at index 0, not index getAttributes().size() - 1).
 	 * 
 	 * @param name
 	 *            name of the attribute
@@ -135,5 +142,17 @@ public interface Attributable extends EObject {
 	 *            a POJO
 	 */
 	void setAttribute(String name, Object value);
+
+	/**
+	 * Sets the value of the attribute with the given name to the given String.
+	 * If no attribute exists with the given name, a new attribute is created
+	 * and inserted at the beginning of the attribute list.
+	 * 
+	 * @param name
+	 *            name of the attribute
+	 * @param value
+	 *            a String
+	 */
+	void setAttribute(String name, String value);
 
 }

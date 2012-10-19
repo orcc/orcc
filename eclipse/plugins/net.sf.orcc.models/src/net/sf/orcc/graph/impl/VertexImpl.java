@@ -464,13 +464,13 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 		if (neighbors == null) {
 			neighbors = new EObjectEList<Vertex>(Vertex.class, this,
 					GraphPackage.VERTEX__NEIGHBORS);
-			for(Vertex successor : getSuccessors()){
-				if(!neighbors.contains(successor)){
+			for (Vertex successor : getSuccessors()) {
+				if (!neighbors.contains(successor)) {
 					neighbors.add(successor);
 				}
 			}
-			for(Vertex predecessor : getPredecessors()){
-				if(!neighbors.contains(predecessor)){
+			for (Vertex predecessor : getPredecessors()) {
+				if (!neighbors.contains(predecessor)) {
 					neighbors.add(predecessor);
 				}
 			}

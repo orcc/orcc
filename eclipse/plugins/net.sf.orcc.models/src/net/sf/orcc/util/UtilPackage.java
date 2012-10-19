@@ -102,13 +102,22 @@ public interface UtilPackage extends EPackage {
 	int ATTRIBUTE__REFERENCED_VALUE = 3;
 
 	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ATTRIBUTE__VALUE = 4;
+
+	/**
 	 * The number of structural features of the '<em>Attribute</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ATTRIBUTE_FEATURE_COUNT = 4;
+	int ATTRIBUTE_FEATURE_COUNT = 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.util.impl.AttributableImpl <em>Attributable</em>}' class.
@@ -212,6 +221,17 @@ public interface UtilPackage extends EPackage {
 	EReference getAttribute_ReferencedValue();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.util.Attribute#getValue <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * @see net.sf.orcc.util.Attribute#getValue()
+	 * @see #getAttribute()
+	 * @generated
+	 */
+	EAttribute getAttribute_Value();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.util.Attributable <em>Attributable</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -307,6 +327,14 @@ public interface UtilPackage extends EPackage {
 		 */
 		EReference ATTRIBUTE__REFERENCED_VALUE = eINSTANCE
 				.getAttribute_ReferencedValue();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ATTRIBUTE__VALUE = eINSTANCE.getAttribute_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.util.impl.AttributableImpl <em>Attributable</em>}' class.

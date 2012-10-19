@@ -172,6 +172,15 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getAttribute_Value() {
+		return (EAttribute) attributeEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getAttributable() {
 		return attributableEClass;
 	}
@@ -228,6 +237,7 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 		createEReference(attributeEClass, ATTRIBUTE__CONTAINED_VALUE);
 		createEAttribute(attributeEClass, ATTRIBUTE__POJO_VALUE);
 		createEReference(attributeEClass, ATTRIBUTE__REFERENCED_VALUE);
+		createEAttribute(attributeEClass, ATTRIBUTE__VALUE);
 
 		attributableEClass = createEClass(ATTRIBUTABLE);
 		createEReference(attributableEClass, ATTRIBUTABLE__ATTRIBUTES);
@@ -289,6 +299,10 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 				theEcorePackage.getEObject(), null, "referencedValue", null, 0,
 				1, Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getAttribute_Value(), ecorePackage.getEString(),
+				"value", null, 0, 1, Attribute.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 
 		initEClass(attributableEClass, Attributable.class, "Attributable",

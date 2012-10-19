@@ -30,15 +30,13 @@ public interface UtilFactory extends EFactory {
 	Attribute createAttribute();
 
 	/**
-	 * Creates a new attribute with the given name and POJO value.
+	 * Creates a new attribute with the given name.
 	 * 
 	 * @param name
 	 *            name of the attribute
-	 * @param value
-	 *            a POJO
 	 * @return a new attribute
 	 */
-	Attribute createAttribute(String name, Object value);
+	Attribute createAttribute(String name);
 
 	/**
 	 * Creates a new attribute with the given name and value. If the given value
@@ -51,6 +49,28 @@ public interface UtilFactory extends EFactory {
 	 * @return a new attribute
 	 */
 	Attribute createAttribute(String name, EObject value);
+
+	/**
+	 * Creates a new attribute with the given name and POJO value.
+	 * 
+	 * @param name
+	 *            name of the attribute
+	 * @param value
+	 *            a POJO
+	 * @return a new attribute
+	 */
+	Attribute createAttribute(String name, Object value);
+
+	/**
+	 * Creates a new attribute with the given name and String.
+	 * 
+	 * @param name
+	 *            name of the attribute
+	 * @param value
+	 *            a String
+	 * @return a new attribute
+	 */
+	Attribute createAttribute(String name, String value);
 
 	/**
 	 * Returns the package supported by this factory.

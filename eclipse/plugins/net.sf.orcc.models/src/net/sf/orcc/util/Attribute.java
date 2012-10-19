@@ -19,6 +19,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.sf.orcc.util.Attribute#getContainedValue <em>Contained Value</em>}</li>
  *   <li>{@link net.sf.orcc.util.Attribute#getPojoValue <em>Pojo Value</em>}</li>
  *   <li>{@link net.sf.orcc.util.Attribute#getReferencedValue <em>Referenced Value</em>}</li>
+ *   <li>{@link net.sf.orcc.util.Attribute#getValue <em>Value</em>}</li>
  * </ul>
  * </p>
  *
@@ -94,6 +95,15 @@ public interface Attribute extends EObject {
 	void setContainedValue(EObject value);
 
 	/**
+	 * Sets the new value of this attribute. If the given value has no
+	 * container, this attribute becomes its new container.
+	 * 
+	 * @param value
+	 *            the new EObject value of this attribute
+	 */
+	void setEObjectValue(EObject value);
+
+	/**
 	 * Sets the value of the '{@link net.sf.orcc.util.Attribute#getName <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --><!-- end-user-doc -->
 	 * @param value the new value of the '<em>Name</em>' attribute.
@@ -121,12 +131,13 @@ public interface Attribute extends EObject {
 	void setReferencedValue(EObject value);
 
 	/**
-	 * Sets the new value of this attribute. If the given value has no
-	 * container, this attribute becomes its new container.
-	 * 
-	 * @param value
-	 *            the new EObject value of this attribute
+	 * Sets the value of the '{@link net.sf.orcc.util.Attribute#getValue <em>Value</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Value</em>' attribute.
+	 * @see #getValue()
+	 * @generated
 	 */
-	void setValue(EObject value);
+	void setValue(String value);
 
 }
