@@ -72,7 +72,7 @@ public class AstIrUtil {
 	}
 	
 	public static void setLocal(Var variable) {
-		variable.setAttribute("local",  null);
+		variable.addAttribute("local");
 	}
 
 	/**

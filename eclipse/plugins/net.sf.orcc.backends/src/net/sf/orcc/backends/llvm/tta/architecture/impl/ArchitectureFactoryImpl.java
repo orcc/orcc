@@ -897,7 +897,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	public Port createPort(net.sf.orcc.df.Port oldPort) {
 		PortImpl port = new PortImpl();
 		port.setName(oldPort.getName());
-		port.setAttribute("native", null);
+		port.addAttribute("native");
 		port.setAttribute("size", oldPort.getType().getSizeInBits());
 		return port;
 	}
@@ -906,7 +906,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	public Port createPort(String name) {
 		PortImpl port = new PortImpl();
 		port.setName(name);
-		port.setAttribute("native", null);
+		port.addAttribute("native");
 		return port;
 	}
 
