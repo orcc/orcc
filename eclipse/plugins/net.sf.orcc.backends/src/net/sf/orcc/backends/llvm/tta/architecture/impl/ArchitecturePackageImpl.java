@@ -2048,7 +2048,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				IS_ORDERED);
 		initEReference(getOperation_Pipeline(), this.getElement(), null,
 				"pipeline", null, 0, -1, Operation.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getOperation_Control(), ecorePackage.getEBoolean(),
 				"control", null, 0, 1, Operation.class, !IS_TRANSIENT,

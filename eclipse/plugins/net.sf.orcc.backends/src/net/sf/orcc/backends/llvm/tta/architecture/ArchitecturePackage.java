@@ -3086,9 +3086,9 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getOperation_Name();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Operation#getPipeline <em>Pipeline</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Operation#getPipeline <em>Pipeline</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Pipeline</em>'.
+	 * @return the meta object for the containment reference list '<em>Pipeline</em>'.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Operation#getPipeline()
 	 * @see #getOperation()
 	 * @generated
@@ -4270,7 +4270,7 @@ public interface ArchitecturePackage extends EPackage {
 		EAttribute OPERATION__NAME = eINSTANCE.getOperation_Name();
 
 		/**
-		 * The meta object literal for the '<em><b>Pipeline</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Pipeline</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */

@@ -38,14 +38,17 @@ import net.sf.orcc.backends.llvm.tta.architecture.Reads;
 import net.sf.orcc.backends.llvm.tta.architecture.Writes;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -81,7 +84,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	protected String name = NAME_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getPipeline() <em>Pipeline</em>}' reference list.
+	 * The cached value of the '{@link #getPipeline() <em>Pipeline</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getPipeline()
 	 * @generated
@@ -150,8 +153,8 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	 */
 	public EList<Element> getPipeline() {
 		if (pipeline == null) {
-			pipeline = new EObjectResolvingEList<Element>(Element.class, this,
-					ArchitecturePackage.OPERATION__PIPELINE);
+			pipeline = new EObjectContainmentEList<Element>(Element.class,
+					this, ArchitecturePackage.OPERATION__PIPELINE);
 		}
 		return pipeline;
 	}
@@ -166,6 +169,22 @@ public class OperationImpl extends EObjectImpl implements Operation {
 			portToIndexMap.put(port, i++);
 		}
 		return portToIndexMap;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+		case ArchitecturePackage.OPERATION__PIPELINE:
+			return ((InternalEList<?>) getPipeline()).basicRemove(otherEnd,
+					msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
