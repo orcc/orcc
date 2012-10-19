@@ -197,7 +197,7 @@ class NetworkPrinter extends CTemplate {
 		void initialize_instances() {
 			«FOR instance : network.children.filter(typeof(Instance))»
 				«IF instance.isActor»
-					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).getAttribute("fifoId").value else "-1"»«ENDFOR»);
+					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
 				«ENDIF»
 			«ENDFOR»
 		}
@@ -285,11 +285,11 @@ class NetworkPrinter extends CTemplate {
 	def assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
-				«printFifoAssign(connList.head.source, connList.head.sourcePort, connList.head.getAttribute("idNoBcast").value as Integer)»
+				«printFifoAssign(connList.head.source, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
 			«ENDIF»
 			«FOR conn : connList»
 				«IF conn.source instanceof Instance && conn.target instanceof Instance»
-					«printFifoAssign(conn.target as Instance, conn.targetPort, conn.getAttribute("idNoBcast").value as Integer)»
+					«printFifoAssign(conn.target as Instance, conn.targetPort, conn.<Integer>getValueAsObject("idNoBcast"))»
 				«ENDIF»
 			«ENDFOR»
 			
@@ -365,9 +365,9 @@ class NetworkPrinter extends CTemplate {
 	
 	def allocateFifo(Connection conn, int nbReaders) '''
 		«IF conn.source instanceof Instance»
-			DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.getAttribute("idNoBcast").value», «nbReaders»)
+			DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 		«ELSEIF conn.target instanceof Instance»
-			DECLARE_FIFO(«conn.targetPort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.getAttribute("idNoBcast").value», «nbReaders»)
+			DECLARE_FIFO(«conn.targetPort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 		«ELSE»
 			«/* TODO: debug to find types of source & target when compiling a non-top network */»
 			«OrccLogger::warnln("An edge has both source and target linked to a non-Actor vertex.")»

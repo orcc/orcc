@@ -168,9 +168,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			}
 		}
 
-		Signal signal = factory.createSignal(connection.getAttribute("id")
-				.getValue().toString(), size, source, target, sourcePort,
-				targetPort);
+		Signal signal = factory.createSignal(connection.getValueAsString("id"),
+				size, source, target, sourcePort, targetPort);
 
 		design.add(signal);
 	}

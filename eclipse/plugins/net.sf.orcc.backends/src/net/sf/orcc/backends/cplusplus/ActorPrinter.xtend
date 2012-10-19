@@ -89,7 +89,7 @@ import net.sf.orcc.ir.Var
 		
 			«FOR port : actor.inputs»
 				«IF instance.incomingPortMap.get(port) != null»
-				«port.compilePort(instance.incomingPortMap.get(port).getAttribute("nbReaders").pojoValue)»
+				«port.compilePort(instance.incomingPortMap.get(port).getAttribute("nbReaders").objectValue)»
 				«ENDIF»
 			«ENDFOR»			
 			
@@ -218,7 +218,7 @@ import net.sf.orcc.ir.Var
 		«action.scheduler.returnType.doSwitch» «action.scheduler.name» ()
 		{
 			«FOR e : action.peekPattern.numTokensMap»
-				«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
+				«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").objectValue»«IF e.value > 1», «e.value»«ENDIF»);
 			«ENDFOR»
 			«action.scheduler.doSwitch»
 		}
@@ -227,7 +227,7 @@ import net.sf.orcc.ir.Var
 		{
 			«FOR e : action.inputPattern.numTokensMap»
 				«IF instance.incomingPortMap.get(e.key) != null»
-					«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
+					«e.key.type.doSwitch»* «e.key.name» = port_«e.key.name»->read_address(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").objectValue»«IF e.value > 1», «e.value»«ENDIF»);
 				«ELSE»
 					«e.key.type.doSwitch» «e.key.name»[«e.value»];
 				«ENDIF»
@@ -242,7 +242,7 @@ import net.sf.orcc.ir.Var
 			«action.body.doSwitch»
 			«FOR e : action.inputPattern.numTokensMap»
 				«IF instance.incomingPortMap.get(e.key) != null»
-					port_«e.key.name»->read_advance(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").pojoValue»«IF e.value > 1», «e.value»«ENDIF»);
+					port_«e.key.name»->read_advance(«instance.incomingPortMap.get(e.key).getAttribute("fifoId").objectValue»«IF e.value > 1», «e.value»«ENDIF»);
 					status_«e.key.name»_ -= «e.value»;
 				«ENDIF»
 			«ENDFOR»
@@ -277,7 +277,7 @@ import net.sf.orcc.ir.Var
 		{	
 			«FOR port : actor.inputs»
 				«IF instance.incomingPortMap.get(port) != null»
-					status_«port.name»_=port_«port.name»->count(«instance.incomingPortMap.get(port).getAttribute("fifoId").pojoValue»);
+					status_«port.name»_=port_«port.name»->count(«instance.incomingPortMap.get(port).getAttribute("fifoId").objectValue»);
 				«ENDIF»
 			«ENDFOR»
 			«FOR port : actor.outputs»

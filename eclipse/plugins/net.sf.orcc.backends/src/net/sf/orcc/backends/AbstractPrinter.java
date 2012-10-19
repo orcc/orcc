@@ -113,11 +113,11 @@ public abstract class AbstractPrinter {
 			if (attribute == null) {
 				return super.getProperty(interp, st, o, property, propertyName);
 			} else {
-				Object value = attribute.getValue();
+				Object value = attribute.getObjectValue();
 				if (value == null) {
 					return true;
 				} else {
-					return attribute.getValue();
+					return attribute.getObjectValue();
 				}
 			}
 		}

@@ -31,7 +31,6 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.graph.impl.VertexImpl;
-import net.sf.orcc.util.Attribute;
 
 import org.eclipse.emf.ecore.EClass;
 
@@ -152,14 +151,12 @@ public class PortImpl extends VertexImpl implements Port {
 
 	@Override
 	public boolean isNative() {
-		Attribute attribute = getAttribute("native");
-		return attribute != null;
+		return hasAttribute("native");
 	}
 
 	@Override
 	public int getSize() {
-		Attribute attribute = getAttribute("size");
-		return (Integer) attribute.getValue();
+		return (Integer) getValueAsObject("size");
 	}
 
 } // PortImpl

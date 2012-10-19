@@ -88,9 +88,7 @@ import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
-import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.UtilFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -184,7 +182,8 @@ public class XdfExporter extends CalSwitch<Object> {
 				sourcePort, target, targetPort);
 		Integer bufferSize = (Integer) edge.getValue("buffer size");
 		if (bufferSize != null) {
-			connection.setAttribute(Connection.BUFFER_SIZE, IrFactory.eINSTANCE.createExprInt(bufferSize));
+			connection.setAttribute(Connection.BUFFER_SIZE,
+					IrFactory.eINSTANCE.createExprInt(bufferSize));
 		}
 
 		network.getConnections().add(connection);
@@ -290,9 +289,7 @@ public class XdfExporter extends CalSwitch<Object> {
 					// remove extra quotes
 					Expression expr = IrFactory.eINSTANCE
 							.createExprString(partName);
-					Attribute attr = UtilFactory.eINSTANCE.createAttribute(
-							"partName", expr);
-					instance.getAttributes().add(attr);
+					instance.setAttribute("partName", expr);
 				}
 			}
 		}
@@ -307,12 +304,12 @@ public class XdfExporter extends CalSwitch<Object> {
 	public Type caseAstTypeDouble(AstTypeDouble type) {
 		return IrFactory.eINSTANCE.createTypeFloat(64);
 	}
-	
+
 	@Override
 	public Type caseAstTypeFloat(AstTypeFloat type) {
 		return IrFactory.eINSTANCE.createTypeFloat(32);
 	}
-	
+
 	@Override
 	public Type caseAstTypeHalf(AstTypeHalf type) {
 		return IrFactory.eINSTANCE.createTypeFloat(16);

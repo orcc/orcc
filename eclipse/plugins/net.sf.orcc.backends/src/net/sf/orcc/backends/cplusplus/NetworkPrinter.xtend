@@ -92,7 +92,7 @@ class NetworkPrinter extends ExprAndTypePrinter {
 
 		«FOR instance : network.children.filter(typeof(Instance))»
 			«FOR edges : instance.outgoingPortMap.values»
-				Fifo<«edges.get(0).sourcePort.type.doSwitch», «edges.get(0).getAttribute("nbReaders").pojoValue»> fifo_«edges.get(0).getAttribute("idNoBcast").pojoValue»«IF edges.get(0).size!= null»(«edges.get(0).size»)«ENDIF»;
+				Fifo<«edges.get(0).sourcePort.type.doSwitch», «edges.get(0).getAttribute("nbReaders").objectValue»> fifo_«edges.get(0).getAttribute("idNoBcast").objectValue»«IF edges.get(0).size!= null»(«edges.get(0).size»)«ENDIF»;
 			«ENDFOR»
 		«ENDFOR»
 
@@ -105,8 +105,8 @@ class NetworkPrinter extends ExprAndTypePrinter {
 			«ENDFOR»
 
 			«FOR e : network.connections»
-				inst_«(e.source as Instance).name».port_«e.sourcePort.name» = &fifo_«e.getAttribute("idNoBcast").pojoValue»;
-				inst_«(e.target as Instance).name».port_«e.targetPort.name» = &fifo_«e.getAttribute("idNoBcast").pojoValue»;
+				inst_«(e.source as Instance).name».port_«e.sourcePort.name» = &fifo_«e.getAttribute("idNoBcast").objectValue»;
+				inst_«(e.target as Instance).name».port_«e.targetPort.name» = &fifo_«e.getAttribute("idNoBcast").objectValue»;
 			«ENDFOR»
 						
 			ConfigParser parser(config_file, actors);

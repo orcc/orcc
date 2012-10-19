@@ -148,7 +148,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 				Integer nbOfTokens = outputPattern.getNumTokens(port);
 				@SuppressWarnings("unchecked")
 				List<SimulatorFifo> fifos = (List<SimulatorFifo>) port
-						.getAttribute(0).getPojoValue();
+						.getAttribute(0).getObjectValue();
 				for (SimulatorFifo fifo : fifos) {
 					hasRooms &= fifo.hasRoom(nbOfTokens);
 				}
@@ -172,7 +172,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
 			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute(0)
-					.getPojoValue();
+					.getObjectValue();
 
 			Var variable = inputPattern.getVariable(port);
 			Type type = ((TypeList) variable.getType()).getInnermostType();
@@ -190,7 +190,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			int numTokens = outputPattern.getNumTokens(port);
 			@SuppressWarnings("unchecked")
 			List<SimulatorFifo> fifos = (List<SimulatorFifo>) port
-					.getAttribute(0).getPojoValue();
+					.getAttribute(0).getObjectValue();
 
 			Var variable = outputPattern.getVariable(port);
 			Type type = ((TypeList) variable.getType()).getInnermostType();
@@ -216,7 +216,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		// check tokens
 		for (Port port : pattern.getPorts()) {
 			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute(0)
-					.getPojoValue();
+					.getObjectValue();
 			boolean hasTok = fifo.hasTokens(pattern.getNumTokens(port));
 			if (!hasTok) {
 				return false;
@@ -228,7 +228,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		for (Port port : pattern.getPorts()) {
 			int numTokens = pattern.getNumTokens(port);
 			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute(0)
-					.getPojoValue();
+					.getObjectValue();
 
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {

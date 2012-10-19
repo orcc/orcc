@@ -656,7 +656,7 @@ class InstancePrinter extends CTemplate {
 		«IF false && ! object.attributes.empty»
 			//Attributes for «object.toString» :
 			«FOR attr : object.attributes»
-				//«attr.name» = «attr.value»
+				//«attr.name» = «attr.objectValue»
 			«ENDFOR»
 		«ENDIF»
 	'''

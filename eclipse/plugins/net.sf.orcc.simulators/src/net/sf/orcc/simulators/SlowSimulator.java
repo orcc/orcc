@@ -138,7 +138,7 @@ public class SlowSimulator extends AbstractSimulator {
 		if (attribute == null) {
 			fifos = null;
 		} else {
-			fifos = (List<SimulatorFifo>) attribute.getPojoValue();
+			fifos = (List<SimulatorFifo>) attribute.getObjectValue();
 		}
 		if (fifos == null) {
 			fifos = new ArrayList<SimulatorFifo>();
