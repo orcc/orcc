@@ -295,14 +295,11 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		vhdlPrinter.print(tta.getName() + ".vhd", processorPath, tta);
 
 		// Print high-level description
-		ArchitecturePrinter adfPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/TCE_Processor_ADF.stg");
-		ArchitecturePrinter idfPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/TCE_Processor_IDF.stg");
-		idfPrinter.getOptions().put("hwDb", design.getHardwareDatabase());
-
-		adfPrinter.print(tta.getName() + ".adf", processorPath, tta);
-		idfPrinter.print(tta.getName() + ".idf", processorPath, tta);
+		CommonPrinter.printFile(new TCE_Processor_ADF().print(tta),
+				processorPath, tta.getName() + ".adf");
+		CommonPrinter.printFile(
+				new TCE_Processor_IDF(design.getHardwareDatabase())
+						.doSwitch(tta), processorPath, tta.getName() + ".idf");
 
 		// Print ModelSim testbench and wave
 		String simPath = OrccUtil.createFolder(processorPath, "simulation");
@@ -315,7 +312,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		CommonPrinter.printFile(new ModelSim_Wave().doSwitch(tta), simPath,
 				"wave.do");
 		CommonPrinter.printFile(new ModelSim_Script(fpga).doSwitch(tta),
-				processorPath, processorPath);
+				processorPath, tta.getName() + ".tcl");
 
 		// Print assembly code of actor-scheduler
 		ArchitecturePrinter schedulerPrinter = new ArchitecturePrinter(
