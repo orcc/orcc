@@ -294,7 +294,7 @@ public class SlowSimulator extends AbstractSimulator {
 		} finally {
 			// clean up to prevent memory leak
 			interpreters = null;
-			return statusCode;
 		}
+		return statusCode;
 	}
 }
