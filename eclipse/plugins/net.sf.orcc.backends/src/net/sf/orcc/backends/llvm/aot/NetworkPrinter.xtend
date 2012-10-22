@@ -65,13 +65,13 @@ class NetworkPrinter extends LLVMTemplate {
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Declare the scheduling function of each actor
 		
-		«FOR instance : network.children.filter(typeof(Instance))»
+		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			declare void @«instance.name»_scheduler()
 		«ENDFOR»
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-				«IF ! instance.actor.initializes.empty»
-					declare void @«instance.name»_initialize()
-				«ENDIF»
+			«IF ! instance.actor.initializes.empty»
+				declare void @«instance.name»_initialize()
+			«ENDIF»
 		«ENDFOR»
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -88,7 +88,7 @@ class NetworkPrinter extends LLVMTemplate {
 			br label %loop
 		
 		loop:
-			«FOR instance : network.children.filter(typeof(Instance))»
+			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 				call void @«instance.name»_scheduler()
 			«ENDFOR»
 			br label %loop
