@@ -36,11 +36,12 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.common.util.WrappedException;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -109,17 +110,46 @@ public class EcoreHelper {
 	}
 
 	/**
-	 * Deserializes the EObject stored in the given file, and returns it.
+	 * Loads the resource that corresponds to the given file, and returns the
+	 * first object in its contents. Equivalent to
+	 * <code>getEObject(set, file, 0)</code>.
 	 * 
+	 * @param set
+	 *            a resource set
 	 * @param file
 	 *            a file whose extension is registered within EMF
 	 * @return the EObject serialized in the given file
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T extends EObject> T getEObject(ResourceSet set, IFile file) {
-		Resource resource = set.getResource(URI.createPlatformResourceURI(file
-				.getFullPath().toString(), true), true);
-		T eObject = (T) resource.getContents().get(0);
+		return getEObject(set, file, 0);
+	}
+
+	/**
+	 * Loads the resource that corresponds to the given file, and returns the
+	 * object in its contents at the given index, or <code>null</code>.
+	 * 
+	 * @param set
+	 *            a resource set
+	 * @param file
+	 *            a file whose extension is registered within EMF
+	 * @param index
+	 *            of the object to retrieve
+	 * @return an EObject, or <code>null</code>
+	 */
+	public static <T extends EObject> T getEObject(ResourceSet set, IFile file,
+			int index) {
+		Resource resource = getResource(set, file);
+		if (resource == null) {
+			return null;
+		}
+
+		EList<EObject> contents = resource.getContents();
+		if (index >= contents.size()) {
+			return null;
+		}
+
+		@SuppressWarnings("unchecked")
+		T eObject = (T) contents.get(index);
 		return eObject;
 	}
 
@@ -139,15 +169,21 @@ public class EcoreHelper {
 		return (T) eObject.eGet(feature);
 	}
 
+	public static IFile getFile(EObject eObject) {
+		Resource resource = eObject.eResource();
+		if (resource == null) {
+			return null;
+		}
+		return getFile(resource);
+	}
+
 	/**
 	 * Returns the IFile associated with the given resource.
 	 * 
 	 * @param resource
 	 *            a resource
-	 * @throws CoreException
-	 *             if something goes wrong
 	 */
-	public static IFile getFile(Resource resource) throws CoreException {
+	public static IFile getFile(Resource resource) {
 		String fullPath = resource.getURI().toPlatformString(true);
 		IPath path = new Path(fullPath);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -223,6 +259,27 @@ public class EcoreHelper {
 			}
 
 		};
+	}
+
+	/**
+	 * Returns the EMF resource in the given resource set that corresponds to
+	 * the given file. If the resource does not exist, this method will load it.
+	 * 
+	 * @param set
+	 *            a resource set
+	 * @param file
+	 *            an IFile
+	 * @return a Resource, or <code>null</code>
+	 */
+	public static Resource getResource(ResourceSet set, IFile file) {
+		String pathName = file.getFullPath().toString();
+		URI uri = URI.createPlatformResourceURI(pathName, true);
+		try {
+			return set.getResource(uri, true);
+		} catch (WrappedException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
