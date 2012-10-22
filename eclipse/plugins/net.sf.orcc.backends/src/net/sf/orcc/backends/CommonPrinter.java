@@ -39,7 +39,6 @@ import java.util.Map;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.ir.util.ExpressionPrinter;
 
 import org.eclipse.core.resources.IFile;
 
@@ -57,7 +56,6 @@ import org.eclipse.core.resources.IFile;
 public abstract class CommonPrinter {
 
 	protected boolean keepUnchangedFiles;
-	protected ExpressionPrinter exprPrinter;
 
 	protected Map<String, Object> options;
 

@@ -48,7 +48,6 @@ public class CPrinter extends CommonPrinter {
 	 */
 	public CPrinter(boolean keepUnchangedFiles) {
 		super(keepUnchangedFiles);
-		exprPrinter = new CExpressionPrinter();
 	}
 
 	/*
@@ -91,8 +90,9 @@ public class CPrinter extends CommonPrinter {
 		IFile newFile = network.getFile();
 		File targetFile = new File(targetNetworkPath);
 
-		if (!needToReplace(targetFile, newFile))
+		if (!needToReplace(targetFile, newFile)) {
 			return true;
+		}
 
 		CharSequence fileContent = new NetworkPrinter(network, options)
 				.getNetworkFileContent();

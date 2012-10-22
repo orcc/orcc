@@ -53,9 +53,9 @@ public class JavaPrinter extends CommonPrinter {
 
 	public JavaPrinter(boolean keepUnchangedFiles) {
 		super(keepUnchangedFiles);
-		exprPrinter = new JavaExprPrinter();
 	}
 
+	@Override
 	public Map<String, Object> getOptions() {
 		return options;
 	}
@@ -96,14 +96,14 @@ public class JavaPrinter extends CommonPrinter {
 	public boolean print(String folder, Network network) {
 
 		String targetNetworkPath = folder + File.separator
-				+ network.getSimpleName()
-				+ ".java";
+				+ network.getSimpleName() + ".java";
 
 		IFile newFile = network.getFile();
 		File targetFile = new File(targetNetworkPath);
 
-		if (!needToReplace(targetFile, newFile))
+		if (!needToReplace(targetFile, newFile)) {
 			return true;
+		}
 
 		CharSequence sequence = new NetworkPrinter(network)
 				.getNetworkFileContent(options);
@@ -113,7 +113,6 @@ public class JavaPrinter extends CommonPrinter {
 		}
 		return false;
 	}
-
 
 	public void printEclipseProjectFiles(String folder, Network network) {
 		CharSequence sequence = "";
