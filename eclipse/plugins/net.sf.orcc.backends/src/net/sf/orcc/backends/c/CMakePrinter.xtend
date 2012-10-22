@@ -31,6 +31,11 @@ package net.sf.orcc.backends.c
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Instance
 
+/**
+ * Generate CMakeList.txt content
+ * 
+ * @author Antoine Lorence
+ */
 class CMakePrinter {
 	
 	val Network network
