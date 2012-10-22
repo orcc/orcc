@@ -46,10 +46,7 @@ class ModelSim_Wave extends ArchitectureSwitch<CharSequence> {
 		add wave -noupdate -format Logic /tb_top/clk
 		add wave -noupdate -format Logic /tb_top/rst_n
 		
-		«FOR port: design.inputs»
-			«port.printNetworkPort»
-		«ENDFOR»
-		«FOR port: design.outputs»
+		«FOR port: design.inputs + design.outputs»
 			«port.printNetworkPort»
 		«ENDFOR»
 		

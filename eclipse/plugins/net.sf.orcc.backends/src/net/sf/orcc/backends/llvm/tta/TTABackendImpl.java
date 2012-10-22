@@ -241,11 +241,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	private void generateDesign(Design design) {
 		// VHDL Network of TTA processors
-		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/VHDL_Design.stg");
-		vhdlPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
-		vhdlPrinter.getOptions().put("fpga", fpga);
-		vhdlPrinter.print("top.vhd", path, design);
+		CommonPrinter.printFile(new VHDL_Design(fpga).doSwitch(design), path,
+				"top.vhd");
 
 		// Python package
 		String pythonPath = OrccUtil.createFolder(path, "informations_");
@@ -270,10 +267,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// ModelSim
 		CommonPrinter.printFile(new ModelSim_Script(fpga).doSwitch(design),
 				path, "top.tcl");
-		ArchitecturePrinter tbPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/VHDL_Testbench.stg");
-		tbPrinter.getOptions().put("fifoSize", fifoSize);
-		tbPrinter.print("top_tb.vhd", path, design);
+		CommonPrinter.printFile(new VHDL_Testbench().doSwitch(design), path,
+				"top_tb.vhd");
 		CommonPrinter.printFile(new ModelSim_Wave().doSwitch(design), path,
 				"wave.do");
 
@@ -288,11 +283,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		String processorPath = OrccUtil.createFolder(path, tta.getName());
 
 		// Print VHDL description
-		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/VHDL_Processor.stg");
-		vhdlPrinter.getOptions().put("fpga", fpga);
-
-		vhdlPrinter.print(tta.getName() + ".vhd", processorPath, tta);
+		CommonPrinter.printFile(new VHDL_Processor(fpga).doSwitch(tta),
+				processorPath, tta.getName() + ".vhd");
 
 		// Print high-level description
 		CommonPrinter.printFile(new TCE_Processor_ADF().print(tta),
@@ -300,19 +292,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		CommonPrinter.printFile(
 				new TCE_Processor_IDF(design.getHardwareDatabase())
 						.doSwitch(tta), processorPath, tta.getName() + ".idf");
-
-		// Print ModelSim testbench and wave
-		String simPath = OrccUtil.createFolder(processorPath, "simulation");
-		ArchitecturePrinter tbPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/VHDL_Testbench.stg");
-		tbPrinter.getOptions().put("fifoSize", fifoSize);
-		tbPrinter.getOptions().put("fpga", fpga);
-
-		tbPrinter.print(tta.getName() + "_tb.vhd", simPath, tta);
-		CommonPrinter.printFile(new ModelSim_Wave().doSwitch(tta), simPath,
-				"wave.do");
-		CommonPrinter.printFile(new ModelSim_Script(fpga).doSwitch(tta),
-				processorPath, tta.getName() + ".tcl");
 
 		// Print assembly code of actor-scheduler
 		ArchitecturePrinter schedulerPrinter = new ArchitecturePrinter(
