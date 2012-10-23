@@ -157,7 +157,7 @@ class VHDL_Processor extends ArchitectureSwitch<CharSequence> {
 		
 	def assign(Processor processor)
 		'''
-		wren_wire \<= not(wren_x_wire);
+		wren_wire <= not(wren_x_wire);
 		«FOR edge : processor.incoming»
 			«val link = edge as Link»
 			«val port = link.targetPort»
@@ -171,64 +171,63 @@ class VHDL_Processor extends ArchitectureSwitch<CharSequence> {
 		
 		«IF(fpga.altera)»
 		inst_dram_«processor.name» : entity work.dram_1p
-		  generic map(depth         =\> DATADEPTH,
-		              byte_width    =\> fu_LSU_0_dataw/4,
-		              addr_width	  =\> fu_LSU_0_addrw-2,
-		              bytes         =\> 4,
-		              init_file     =\> "dram_«processor.name».mif",
-		              device_family =\> device_family)
-		  port map(clk     =\> clk,
-		           wren    =\> wren_wire,
-		           address =\> dram_addr,
-		           byteen  =\> bytemask_wire,
-		           data    =\> dram_data_in_wire,
-		           queue   =\> dram_data_out_wire,
-		           rst_n   =\> rst_n);
+		  generic map(depth         => DATADEPTH,
+		              byte_width    => fu_LSU_0_dataw/4,
+		              addr_width	  => fu_LSU_0_addrw-2,
+		              bytes         => 4,
+		              init_file     => "dram_«processor.name».mif",
+		              device_family => device_family)
+		  port map(clk     => clk,
+		           wren    => wren_wire,
+		           address => dram_addr,
+		           byteen  => bytemask_wire,
+		           data    => dram_data_in_wire,
+		           queue   => dram_data_out_wire,
+		           rst_n   => rst_n);
 
 		inst_irom_«processor.name» : entity work.irom
-		  generic map(depth         =\> INSTRUCTIONDEPTH,
-		              byte_width    =\> IMEMMAUWIDTH,
-		              addr_width    =\> INSTRUCTIONADDRWIDTH,
-		              bytes         =\> IMEMWIDTHINMAUS,
-		              init_file     =\> "irom_«processor.name».mif",
-		              device_family =\> device_family)
-		  port map(clk     =\> clk,
-		           address =\> imem_addr(INSTRUCTIONADDRWIDTH-1 downto 0),
-		           queue   =\> idata_wire,
-		           rst_n   =\> rst_n);
+		  generic map(depth         => INSTRUCTIONDEPTH,
+		              byte_width    => IMEMMAUWIDTH,
+		              addr_width    => INSTRUCTIONADDRWIDTH,
+		              bytes         => IMEMWIDTHINMAUS,
+		              init_file     => "irom_«processor.name».mif",
+		              device_family => device_family)
+		  port map(clk     => clk,
+		           address => imem_addr(INSTRUCTIONADDRWIDTH-1 downto 0),
+		           queue   => idata_wire,
+		           rst_n   => rst_n);
 		«ELSE»
-		bytemask_i2 \<= wren_wire & wren_wire & wren_wire & wren_wire;
-		bytemask_i  \<= bytemask_i2 and bytemask_wire;
+		bytemask_i2 <= wren_wire & wren_wire & wren_wire & wren_wire;
+		bytemask_i  <= bytemask_i2 and bytemask_wire;
 		
 		inst_irom_«processor.name» : irom_«processor.name»
 		  port map (
-		    clka  =\> clk,
-		    addra =\> imem_addr(INSTRUCTIONADDRWIDTH-1 downto 0),
-		    douta =\> idata_wire);
+		    clka  => clk,
+		    addra => imem_addr(INSTRUCTIONADDRWIDTH-1 downto 0),
+		    douta => idata_wire);
 		
 		inst_dram_«processor.name» : dram_«processor.name»
 		  port map (
-		    clka  =\> clk,
-		    wea   =\> bytemask_i,
-		    addra =\> dram_addr,
-		    dina  =\> dram_data_in_wire,
-		    douta =\> dram_data_out_wire);
+		    clka  => clk,
+		    wea   => bytemask_i,
+		    addra => dram_addr,
+		    dina  => dram_data_in_wire,
+		    douta => dram_data_out_wire);
 		«ENDIF»
 		
 		inst_«processor.name»_tl : entity work.«processor.name»_tl
-		  port map(clk                      =\> clk,
-		           busy                     =\> '0',
-		           imem_addr                =\> imem_addr,
-		           imem_data                =\> idata_wire,
-		           pc_init                  =\> (others => '0'),
-		           fu_LSU_0_dmem_data_in    =\> dram_data_out_wire,
-		           fu_LSU_0_dmem_data_out   =\> dram_data_in_wire,
-		           fu_LSU_0_dmem_addr       =\> dram_addr,
-		           fu_LSU_0_dmem_wr_en_x(0) =\> wren_x_wire,
-		           fu_LSU_0_dmem_bytemask   =\> bytemask_wire,
-		           <processor.incoming: { edge |<mapPort(edge, edge.targetPort)>}; separator="\n">
-		           <processor.outgoing: { edge |<mapPort(edge, edge.sourcePort)>}; separator="\n">
-		           rstx                     =\> rst_n);
+		  port map(clk                      => clk,
+		           busy                     => '0',
+		           imem_addr                => imem_addr,
+		           imem_data                => idata_wire,
+		           pc_init                  => (others => '0'),
+		           fu_LSU_0_dmem_data_in    => dram_data_out_wire,
+		           fu_LSU_0_dmem_data_out   => dram_data_in_wire,
+		           fu_LSU_0_dmem_addr       => dram_addr,
+		           fu_LSU_0_dmem_wr_en_x(0) => wren_x_wire,
+		           fu_LSU_0_dmem_bytemask   => bytemask_wire,
+		           «processor.mapPorts»
+		           rstx                     => rst_n);
 		'''
 		
 	def declarePorts(Processor processor)
@@ -268,29 +267,43 @@ class VHDL_Processor extends ArchitectureSwitch<CharSequence> {
 		'''
 		signal fu_«port.name»_dmem_wr_en_x : std_logic;
 		'''
-		
+	
+	def mapPorts(Processor processor)
+		'''
+		«FOR edge : processor.incoming»
+			«val link = edge as Link»
+			«val port = link.targetPort»
+			«port.mapPort(link)»
+		«ENDFOR»
+		«FOR edge : processor.outgoing»
+			«val link = edge as Link»
+			«val port = link.sourcePort»
+			«port.mapPort(link)»
+		«ENDFOR»
+		'''
+	
 	def dispatch mapPort(Port port, Signal signal)
 		'''
-		fu_«port.name»_STRATIXIII_LED =\> «port.name»_i,
+		fu_«port.name»_STRATIXIII_LED => «port.name»_i,
 		'''
 	
 	def dispatch mapPort(Port port, Memory memory)
 		'''
-		fu_«port.name»_dmem_data_in    =\> fu_«port.name»_dmem_data_in,
-		fu_«port.name»_dmem_data_out   =\> fu_«port.name»_dmem_data_out,
-		fu_«port.name»_dmem_addr       =\> fu_«port.name»_dmem_addr,
-		fu_«port.name»_dmem_wr_en_x(0) =\> fu_«port.name»_dmem_wr_en_x,
-		fu_«port.name»_dmem_bytemask   =\> fu_«port.name»_dmem_bytemask,
+		fu_«port.name»_dmem_data_in    => fu_«port.name»_dmem_data_in,
+		fu_«port.name»_dmem_data_out   => fu_«port.name»_dmem_data_out,
+		fu_«port.name»_dmem_addr       => fu_«port.name»_dmem_addr,
+		fu_«port.name»_dmem_wr_en_x(0) => fu_«port.name»_dmem_wr_en_x,
+		fu_«port.name»_dmem_bytemask   => fu_«port.name»_dmem_bytemask,
 		'''
 
 	def dispatch mapSignal(Port port, Signal signal)
 		'''
-		«port.name» \<= «port.name»_i(«signal.size»-1 downto 0);
+		«port.name» <= «port.name»_i(«signal.size»-1 downto 0);
 		'''
 
 	def dispatch mapSignal(Port port, Memory memory)
 		'''
-		fu_«port.name»_dmem_wr_en \<= not(fu_«port.name»_dmem_wr_en_x);
+		fu_«port.name»_dmem_wr_en <= not(fu_«port.name»_dmem_wr_en_x);
 		'''
 
 }

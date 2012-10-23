@@ -66,19 +66,19 @@ class VHDL_Testbench extends ArchitectureSwitch<CharSequence> {
 		
 		  top_orcc : entity work.top
 		    port map (
-		      clk =\> clk,
+		      clk => clk,
 		      «design.mapSignals»
-		      rst_n =\> rst_n);
+		      rst_n => rst_n);
 		      
 		  -- clock generation
-		  clk \<= not clk after PERIOD/2;
+		  clk <= not clk after PERIOD/2;
 		
 		  -- reset generation
 		  reset_proc: process
 		  begin
-		    rst_n \<= '0';
+		    rst_n <= '0';
 		    wait for 100 ns;
-		    rst_n \<= '1';
+		    rst_n <= '1';
 		    wait;
 		  end process;
 		
@@ -115,7 +115,7 @@ class VHDL_Testbench extends ArchitectureSwitch<CharSequence> {
 	
 	def mapSignal(Port port)
 		'''
-		«port.name» =\> <port.name>,
+		«port.name» => <port.name>,
 		'''
 		
 	
