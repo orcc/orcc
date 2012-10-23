@@ -8,6 +8,11 @@ import java.util.List
 class TemplateUtil extends AbstractIrVisitor<CharSequence> {
 	
 	protected ExpressionPrinter exprPrinter
+	
+	new() {
+		super(true)
+		exprPrinter = new ExpressionPrinter
+	}
 		
 	/**
 	 * Print indexes list when accessing to an array (ex : <code>[INDEX][2][i + 1]</code>)

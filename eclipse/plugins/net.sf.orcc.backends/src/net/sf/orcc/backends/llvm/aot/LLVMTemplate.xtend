@@ -29,6 +29,8 @@
 package net.sf.orcc.backends.llvm.aot
 
 import net.sf.orcc.backends.util.TemplateUtil
+import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Port
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
@@ -37,7 +39,7 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
-import net.sf.orcc.ir.Type
+import net.sf.orcc.ir.Var
 
 /*
  * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
@@ -48,6 +50,7 @@ import net.sf.orcc.ir.Type
 class LLVMTemplate extends TemplateUtil {
 	
 	new(){
+		super()
 		this.exprPrinter = new LLVMExpressionPrinter
 	}
 	
@@ -96,17 +99,17 @@ class LLVMTemplate extends TemplateUtil {
 	 * Helpers
 	 *
 	 *****************************************/
-	def printfFormat(Type type) {
-		switch type {
-			case type.bool: "i"
-			case type.float: "f"
-			case type.int && (type as TypeInt).long: "lli"
-			case type.int:"i"
-			case type.uint && (type as TypeUint).long: "llu"
-			case type.uint: "u"
-			case type.list: "p"
-			case type.string: "s"
-			case type.void: "p"
-		}
+		
+	def getId(Connection connection, Port port) {
+		if(connection != null) connection.getAttribute("id").stringValue
+		else port.name
 	}
+
+	def getFifoSize(Connection connection) {
+		if(connection != null) connection.size.toString
+		else "512"
+	}
+	
+	def print(Var variable)
+		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.indexedName»'''
 }
