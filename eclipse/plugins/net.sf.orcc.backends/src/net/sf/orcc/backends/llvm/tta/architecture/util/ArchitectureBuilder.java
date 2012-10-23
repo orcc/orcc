@@ -106,6 +106,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	}
 
 	private int bufferId = 0;
+	private int signalId = 0;
 
 	private Map<Vertex, Component> componentMap;
 
@@ -168,7 +169,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			}
 		}
 
-		Signal signal = factory.createSignal(connection.getValueAsString("id"),
+		Signal signal = factory.createSignal("" + signalId++,
 				size, source, target, sourcePort, targetPort);
 
 		design.add(signal);
