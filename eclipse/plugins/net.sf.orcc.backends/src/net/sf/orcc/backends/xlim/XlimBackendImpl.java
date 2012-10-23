@@ -90,6 +90,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * @author Endri Bezati
  * 
  */
+@Deprecated
 public class XlimBackendImpl extends AbstractBackend {
 
 	private String fpgaType;

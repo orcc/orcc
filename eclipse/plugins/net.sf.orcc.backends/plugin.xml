@@ -68,7 +68,7 @@
       </backend>
       <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
-            name="XLIM">
+            name="XLIM (deprecated)">
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
