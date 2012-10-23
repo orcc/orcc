@@ -85,8 +85,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			if (actor.isNative()) {
 				Component component;
 				// A native actor describes a VHDL component from the library.
-				component = factory.createComponent(instance.getActor()
-						.getSimpleName());
+				component = factory.createComponent(instance.getName());
 				// The parameter of this actor is used as generic.
 				for (Argument arg : instance.getArguments()) {
 					component.setAttribute(arg.getVariable().getName(),
