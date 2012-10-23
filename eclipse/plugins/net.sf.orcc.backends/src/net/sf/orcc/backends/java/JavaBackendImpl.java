@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
@@ -89,8 +88,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
-
+	protected void doTransformActor(Actor actor) {
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
 		transformations.add(new RenameTransformation(replacementMap));
@@ -100,7 +98,7 @@ public class JavaBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private Network doTransformNetwork(Network network) throws OrccException {
+	private Network doTransformNetwork(Network network) {
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
 		new Instantiator(false, fifoSize).doSwitch(network);
@@ -114,14 +112,14 @@ public class JavaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) {
 		List<Actor> actors = parseActors(files);
 		transformActors(actors);
 		printActors(actors);
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) {
 		network = doTransformNetwork(network);
 
 		// print network
@@ -136,7 +134,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
 	 */
 	@Override
-	public boolean exportRuntimeLibrary() throws OrccException {
+	public boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			OrccLogger.trace("Export libraries sources into " + libsPath
 					+ "... ");
@@ -164,10 +162,8 @@ public class JavaBackendImpl extends AbstractBackend {
 	 * 
 	 * @param network
 	 *            a network
-	 * @throws OrccException
-	 *             if something goes wrong
 	 */
-	protected void printNetwork(Network network) throws OrccException {
+	protected void printNetwork(Network network) {
 		printer.printEclipseProjectFiles(path, network);
 		printer.print(srcPath, network);
 	}

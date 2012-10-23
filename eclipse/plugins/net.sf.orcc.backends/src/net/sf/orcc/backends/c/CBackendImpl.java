@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
@@ -105,8 +104,8 @@ public class CBackendImpl extends AbstractBackend {
 	protected boolean enableTrace;
 
 	protected boolean newScheduler;
-	protected boolean ringTopology;
 	protected CPrinter printer;
+	protected boolean ringTopology;
 
 	/**
 	 * Path to target "src" folder
@@ -182,7 +181,7 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
+	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
 		replacementMap.put("abs", "abs_my_precious");
 		replacementMap.put("getw", "getw_my_precious");
@@ -256,7 +255,7 @@ public class CBackendImpl extends AbstractBackend {
 		}
 	}
 
-	protected Network doTransformNetwork(Network network) throws OrccException {
+	protected Network doTransformNetwork(Network network) {
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
 		new Instantiator(false, fifoSize).doSwitch(network);
@@ -279,12 +278,12 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) {
 		// do not generate a C VTL
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) {
 		network = doTransformNetwork(network);
 
 		if (debug) {
@@ -337,14 +336,8 @@ public class CBackendImpl extends AbstractBackend {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
-	 */
 	@Override
-	public boolean exportRuntimeLibrary() throws OrccException {
-
+	public boolean exportRuntimeLibrary() {
 		boolean exportLibrary = !getAttribute(NO_LIBRARY_EXPORT, false);
 
 		String libsPath = path + File.separator + "libs";
@@ -402,7 +395,7 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printInstance(Instance instance) throws OrccException {
+	protected boolean printInstance(Instance instance) {
 		return printer.print(srcPath, instance);
 	}
 

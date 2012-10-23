@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMBackendImpl;
@@ -95,15 +94,15 @@ import net.sf.orcc.util.OrccUtil;
 public class TTABackendImpl extends LLVMBackendImpl {
 
 	String actorsPath;
+	private Mapping computedMapping;
 	private ProcessorConfiguration configuration;
-	private boolean reduceConnections;
 	private Design design;
 	private boolean finalize;
 
 	private FPGA fpga;
 	private String libPath;
-	private Mapping computedMapping;
 	private boolean profile;
+	private boolean reduceConnections;
 
 	private Map<Port, Integer> computePortToIdMap(Vertex vertex) {
 		Map<Port, Integer> map = new HashMap<Port, Integer>();
@@ -140,12 +139,12 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
+	protected void doTransformActor(Actor actor) {
 		// do not transform actors
 	}
 
 	@Override
-	protected Network doTransformNetwork(Network network) throws OrccException {
+	protected Network doTransformNetwork(Network network) {
 		OrccLogger.traceln("Analyze and transform the network...");
 		new ComplexHwOpDetector().doSwitch(network);
 		new Instantiator(false, fifoSize).doSwitch(network);
@@ -191,8 +190,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
-
+	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
 
 		// build the design
@@ -216,13 +214,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
-	 */
 	@Override
-	public boolean exportRuntimeLibrary() throws OrccException {
+	public boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
 			OrccLogger.trace("Export library files into " + libPath + "... ");
@@ -313,7 +306,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				instance);
 	}
 
-	private void runPythonScript() throws OrccException {
+	private void runPythonScript() {
 		List<String> cmdList = new ArrayList<String>();
 		cmdList.add(libPath + File.separator + "generate");
 		cmdList.add("-cg");

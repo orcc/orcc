@@ -29,6 +29,7 @@
 package net.sf.orcc.backends;
 
 import static net.sf.orcc.OrccLaunchConstants.CLASSIFY;
+import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
@@ -130,20 +131,20 @@ import org.eclipse.equinox.app.IApplicationContext;
  */
 public abstract class AbstractBackend implements Backend, IApplication {
 
+	protected boolean classify;
+	protected boolean debug;
 	/**
 	 * Fifo size used in backend.
 	 */
 	protected int fifoSize;
-	protected boolean debug;
-	protected Map<String, String> mapping;
-
-	protected boolean classify;
-	protected boolean mergeActions;
-	protected boolean mergeActors;
 
 	private IFile inputFile;
-
 	private WriteListener listener;
+	protected Map<String, String> mapping;
+
+	protected boolean mergeActions;
+
+	protected boolean mergeActors;
 
 	/**
 	 * the progress monitor
@@ -165,15 +166,22 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	private List<IFolder> vtlFolders;
 
 	@Override
-	final public void compileVTL() throws OrccException {
+	public void compile() {
+		compileVTL();
+
+		if ((Boolean) options.get(COMPILE_XDF)) {
+			compileXDF();
+		}
+	}
+
+	final private void compileVTL() {
 		// lists actors
 		OrccLogger.traceln("Lists actors...");
 		List<IFile> vtlFiles = OrccUtil.getAllFiles("ir", vtlFolders);
 		doVtlCodeGeneration(vtlFiles);
 	}
 
-	@Override
-	final public void compileXDF() throws OrccException {
+	final private void compileXDF() {
 		// set FIFO size
 		ResourceSet set = new ResourceSetImpl();
 
@@ -394,7 +402,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param actor
 	 *            the actor
 	 */
-	abstract protected void doTransformActor(Actor actor) throws OrccException;
+	abstract protected void doTransformActor(Actor actor);
 
 	/**
 	 * This method must be implemented by subclasses to do the actual code
@@ -402,10 +410,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param files
 	 *            a list of IR files
-	 * @throws OrccException
 	 */
-	abstract protected void doVtlCodeGeneration(List<IFile> files)
-			throws OrccException;
+	abstract protected void doVtlCodeGeneration(List<IFile> files);
 
 	/**
 	 * This method must be implemented by subclasses to do the actual code
@@ -413,10 +419,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param network
 	 *            a network
-	 * @throws OrccException
 	 */
-	abstract protected void doXdfCodeGeneration(Network network)
-			throws OrccException;
+	abstract protected void doXdfCodeGeneration(Network network);
 
 	/**
 	 * Executes the given list of tasks using a thread pool with one thread per
@@ -424,12 +428,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param tasks
 	 *            a list of tasks
-	 * @throws OrccException
-	 *             if something goes wrong (code generation fails or a task is
-	 *             interrupted)
 	 */
-	private int executeTasks(List<Callable<Boolean>> tasks)
-			throws OrccException {
+	private int executeTasks(List<Callable<Boolean>> tasks) {
 		// creates the pool
 		int nThreads = Runtime.getRuntime().availableProcessors();
 		ExecutorService pool = Executors.newFixedThreadPool(nThreads);
@@ -446,10 +446,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					}
 				} catch (ExecutionException e) {
 					Throwable cause = e.getCause();
-					if (cause instanceof OrccException) {
-						throw (OrccException) e.getCause();
+					if (cause instanceof OrccRuntimeException) {
+						throw (OrccRuntimeException) e.getCause();
 					} else {
-						throw new OrccException(
+						throw new OrccRuntimeException(
 								"one actor could not be printed", cause);
 					}
 				}
@@ -461,7 +461,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			return numCached;
 		} catch (InterruptedException e) {
-			throw new OrccException("actors could not be printed", e);
+			throw new OrccRuntimeException("actors could not be printed", e);
 		}
 	}
 
@@ -473,7 +473,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @return <code>true</code> if the libraries were correctly exported
 	 */
 	@Override
-	public boolean exportRuntimeLibrary() throws OrccException {
+	public boolean exportRuntimeLibrary() {
 		return false;
 	}
 
@@ -590,10 +590,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param files
 	 *            a list of JSON files
 	 * @return a list of actors
-	 * @throws OrccException
 	 */
-	final public List<Actor> parseActors(List<IFile> files)
-			throws OrccException {
+	final public List<Actor> parseActors(List<IFile> files) {
 		// NOTE: the actors are parsed but are NOT put in the actor pool because
 		// they may be transformed and not have the same properties (in
 		// particular concerning types), and instantiation then complains.
@@ -626,7 +624,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            the actor
 	 * @return <code>true</code> if the actor was cached
 	 */
-	protected boolean printActor(Actor actor) throws OrccException {
+	protected boolean printActor(Actor actor) {
 		return false;
 	}
 
@@ -635,9 +633,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param actors
 	 *            a list of actors
-	 * @throws OrccException
 	 */
-	final public void printActors(List<Actor> actors) throws OrccException {
+	final public void printActors(List<Actor> actors) {
 		OrccLogger.traceln("Printing actors...");
 		long t0 = System.currentTimeMillis();
 
@@ -647,7 +644,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			tasks.add(new Callable<Boolean>() {
 
 				@Override
-				public Boolean call() throws OrccException {
+				public Boolean call() {
 					if (isCanceled()) {
 						return false;
 					}
@@ -680,9 +677,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param entities
 	 *            a list of entities
-	 * @throws OrccException
 	 */
-	final public void printEntities(Network network) throws OrccException {
+	final public void printEntities(Network network) {
 		OrccLogger.traceln("Printing entities...");
 		long t0 = System.currentTimeMillis();
 
@@ -692,7 +688,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			tasks.add(new Callable<Boolean>() {
 
 				@Override
-				public Boolean call() throws OrccException {
+				public Boolean call() {
 					if (isCanceled()) {
 						return false;
 					}
@@ -727,7 +723,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            the entity
 	 * @return <code>true</code> if the actor was cached
 	 */
-	protected boolean printEntity(Vertex entity) throws OrccException {
+	protected boolean printEntity(Vertex entity) {
 		return false;
 	}
 
@@ -739,7 +735,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            the instance
 	 * @return <code>true</code> if the actor was cached
 	 */
-	protected boolean printInstance(Instance instance) throws OrccException {
+	protected boolean printInstance(Instance instance) {
 		return false;
 	}
 
@@ -750,7 +746,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            a network
 	 * @throws OrccException
 	 */
-	final public void printInstances(Network network) throws OrccException {
+	final public void printInstances(Network network) {
 		OrccLogger.traceln("Printing instances...");
 		long t0 = System.currentTimeMillis();
 
@@ -762,7 +758,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				tasks.add(new Callable<Boolean>() {
 
 					@Override
-					public Boolean call() throws OrccException {
+					public Boolean call() {
 						return printInstance(instance);
 					}
 
@@ -788,9 +784,19 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 	}
 
-	@Override
-	public void setWriteListener(WriteListener listener) {
-		this.listener = listener;
+	private void printUsage(IApplicationContext context, Options options,
+			String parserMsg) {
+
+		String footer = "";
+		if (parserMsg != null && !parserMsg.isEmpty()) {
+			footer = "\nMessage of the command line parser :\n" + parserMsg;
+		}
+
+		HelpFormatter helpFormatter = new HelpFormatter();
+		helpFormatter.setWidth(80);
+		helpFormatter.printHelp(getClass().getSimpleName()
+				+ " [options] <network.qualified.name>", "Valid options are :",
+				options, footer);
 	}
 
 	@Override
@@ -842,6 +848,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor) {
 		this.monitor = monitor;
+	}
+
+	@Override
+	public void setWriteListener(WriteListener listener) {
+		this.listener = listener;
 	}
 
 	@Override
@@ -946,21 +957,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	}
 
-	private void printUsage(IApplicationContext context, Options options,
-			String parserMsg) {
-
-		String footer = "";
-		if (parserMsg != null && !parserMsg.isEmpty()) {
-			footer = "\nMessage of the command line parser :\n" + parserMsg;
-		}
-
-		HelpFormatter helpFormatter = new HelpFormatter();
-		helpFormatter.setWidth(80);
-		helpFormatter.printHelp(getClass().getSimpleName()
-				+ " [options] <network.qualified.name>", "Valid options are :",
-				options, footer);
-	}
-
 	/**
 	 * Transforms instances of the given network.
 	 * 
@@ -968,7 +964,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            a list of actors
 	 * @throws OrccException
 	 */
-	final public void transformActors(List<Actor> actors) throws OrccException {
+	final public void transformActors(List<Actor> actors) {
 		OrccLogger.traceln("Transforming actors...");
 		for (Actor actor : actors) {
 			doTransformActor(actor);

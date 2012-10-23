@@ -76,15 +76,15 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 
-	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
+	private StandardPrinter instancePrinter;
 
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
 
-	private StandardPrinter instancePrinter;
+	private NetworkStateDefExtractor netStateDef;
+
+	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 
 	private final Map<String, String> transformations;
-
-	private NetworkStateDefExtractor netStateDef;
 
 	/**
 	 * Creates a new instance of the Promela back-end. Initializes the
@@ -105,9 +105,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
-		DfSwitch<?>[] transformations = {
-				new UnitImporter(),
+	protected void doTransformActor(Actor actor) {
+		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new DfVisitor<Void>(new Inliner(true, true)),
 				new RenameTransformation(this.transformations),
 				new DfVisitor<Object>(new PhiRemoval()) };
@@ -116,42 +115,17 @@ public class PromelaBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private void transformInstance(Instance instance) throws OrccException {
-		DfSwitch<?>[] transformations = {
-				new PromelaDeadGlobalElimination(
-						netStateDef.getVarsUsedInScheduling(),
-						netStateDef.getPortsUsedInScheduling()),
-				new GuardsExtractor(guards, priority, loadPeeks),
-				new DfVisitor<Void>(new DeadCodeElimination()),
-				new DfVisitor<Void>(new DeadVariableRemoval()) };
-		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(instance.getActor());
-		}
-		new PromelaTokenAnalyzer(netStateDef).doSwitch(instance);
-		new PromelaSchedulabilityTest(netStateDef).doSwitch(instance);
-	}
-
-	private void transformInstances(EList<Vertex> vertices)
-			throws OrccException {
-		OrccLogger.traceln("Transforming instances...");
-		for (Vertex v : vertices) {
-			if(v instanceof Instance) {
-				transformInstance((Instance)v);
-			}
-		}
-	}
-
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) {
 		// do not generate a PROMELA VTL
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) {
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
-		//new Classifier(getWriteListener()).doSwitch(network);
+		// new Classifier(getWriteListener()).doSwitch(network);
 		instancePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/promela/Actor.stg");
 		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
@@ -196,6 +170,30 @@ public class PromelaBackendImpl extends AbstractBackend {
 		printer.setTypePrinter(new PromelaTypePrinter());
 		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.print("main_" + network.getName() + ".pml", path, network);
+	}
+
+	private void transformInstance(Instance instance) {
+		DfSwitch<?>[] transformations = {
+				new PromelaDeadGlobalElimination(
+						netStateDef.getVarsUsedInScheduling(),
+						netStateDef.getPortsUsedInScheduling()),
+				new GuardsExtractor(guards, priority, loadPeeks),
+				new DfVisitor<Void>(new DeadCodeElimination()),
+				new DfVisitor<Void>(new DeadVariableRemoval()) };
+		for (DfSwitch<?> transformation : transformations) {
+			transformation.doSwitch(instance.getActor());
+		}
+		new PromelaTokenAnalyzer(netStateDef).doSwitch(instance);
+		new PromelaSchedulabilityTest(netStateDef).doSwitch(instance);
+	}
+
+	private void transformInstances(EList<Vertex> vertices) {
+		OrccLogger.traceln("Transforming instances...");
+		for (Vertex v : vertices) {
+			if (v instanceof Instance) {
+				transformInstance((Instance) v);
+			}
+		}
 	}
 
 }

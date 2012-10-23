@@ -30,7 +30,6 @@ package net.sf.orcc.backends;
 
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -44,24 +43,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 public interface Backend {
 
 	/**
-	 * Compiles the VTL by loading IR files, transforming actors and printing
-	 * them.
-	 * 
-	 * @throws OrccException
-	 *             if something goes wrong
+	 * Launches a compilation using the options provided to this back-end.
 	 */
-	void compileVTL() throws OrccException;
+	void compile();
 
-	/**
-	 * Loads a hierarchical XDF network and compile it. Compilation may include
-	 * instantiation, flattening, transforming, printing the network, or a
-	 * subset of these steps.
-	 * 
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	void compileXDF() throws OrccException;
-	
 	/**
 	 * Export runtime library used by source produced. Should be overridden by
 	 * back-ends that produce code source which need third party libraries at
@@ -69,7 +54,9 @@ public interface Backend {
 	 * 
 	 * @return <code>true</code> if the libraries were correctly exported
 	 */
-	boolean exportRuntimeLibrary() throws OrccException;
+	boolean exportRuntimeLibrary();
+
+	WriteListener getWriteListener();
 
 	/**
 	 * Sets the options of this back-end.
@@ -77,7 +64,7 @@ public interface Backend {
 	 * @param options
 	 *            a map of string to object
 	 */
-	public void setOptions(Map<String, Object> options) throws OrccException;
+	public void setOptions(Map<String, Object> options);
 
 	/**
 	 * Sets the progress monitor used by this back-end.
@@ -94,7 +81,5 @@ public interface Backend {
 	 *            a write listener
 	 */
 	void setWriteListener(WriteListener listener);
-	
-	WriteListener getWriteListener();
 
 }

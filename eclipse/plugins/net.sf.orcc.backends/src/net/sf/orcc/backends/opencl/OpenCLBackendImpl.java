@@ -56,9 +56,9 @@ import org.eclipse.core.resources.IFile;
  */
 public class OpenCLBackendImpl extends AbstractBackend {
 
-	private String srcPath;
-	private String kernelSrcPath;
 	private String includePath;
+	private String kernelSrcPath;
+	private String srcPath;
 
 	@Override
 	protected void doInitializeOptions() {
@@ -94,7 +94,7 @@ public class OpenCLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
+	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
 		replacementMap.put("abs", "abs_");
 		replacementMap.put("getw", "getw_");
@@ -124,7 +124,7 @@ public class OpenCLBackendImpl extends AbstractBackend {
 	 * @return a modified network
 	 * @throws OrccException
 	 */
-	private Network doTransformNetwork(Network network) throws OrccException {
+	private Network doTransformNetwork(Network network) {
 		OrccLogger.trace("Instantiating... ");
 		new Instantiator(false).doSwitch(network);
 		OrccLogger.traceRaw("done\n");
@@ -134,12 +134,12 @@ public class OpenCLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) {
 		// do not generate a OpenCL/C++ VTL
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) {
 		network = doTransformNetwork(network);
 		transformActors(network.getAllActors());
 
@@ -152,7 +152,7 @@ public class OpenCLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() throws OrccException {
+	public boolean exportRuntimeLibrary() {
 		OrccLogger.trace("Exporting Run-Time sources into " + path + "... ");
 		if (copyFolderToFileSystem("/runtime/OpenCL", path)) {
 			OrccLogger.traceRaw("OK" + "\n");
@@ -177,8 +177,9 @@ public class OpenCLBackendImpl extends AbstractBackend {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	public void printNetwork(Network network) throws OrccException {
+	public void printNetwork(Network network) {
 		OpenCLPrinter printer = new OpenCLPrinter(!debug);
 		printer.print(path, srcPath, network);
 	}
+
 }

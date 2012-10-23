@@ -29,7 +29,6 @@
 package net.sf.orcc.backends;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 
 import java.util.Map;
 
@@ -98,13 +97,8 @@ public class BackendFactory extends PluginFactory {
 		// Export libraries if needed by backend
 		backend.exportRuntimeLibrary();
 
-		// always compile VTL.
-		// an actor is only compiled if it needs to (based on modification date)
-		backend.compileVTL();
-
-		if ((Boolean) options.get(COMPILE_XDF)) {
-			backend.compileXDF();
-		}
+		// launches the compilation
+		backend.compile();
 	}
 
 }

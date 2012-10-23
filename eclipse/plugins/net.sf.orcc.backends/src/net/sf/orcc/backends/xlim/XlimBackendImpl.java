@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
 import net.sf.orcc.backends.StandardPrinter;
@@ -93,15 +92,36 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 @Deprecated
 public class XlimBackendImpl extends AbstractBackend {
 
+	private List<String> entities;
+
+	private HashSet<String> entitySet;
+
 	private String fpgaType;
 
 	private boolean useHw;
 
 	private boolean useMulti2mono;
 
-	private List<String> entities;
+	private void computeEntityList(Instance instance) {
+		if (instance.isActor()) {
+			String name = instance.getName();
+			if (!entitySet.contains(name)) {
+				entitySet.add(name);
+				entities.add(name);
+			}
+		} else if (instance.isNetwork()) {
+			String name = instance.getName();
+			Network network = instance.getNetwork();
+			if (!entitySet.contains(name)) {
+				for (Vertex vertex : network.getChildren()) {
+					Instance subInstance = vertex.getAdapter(Instance.class);
+					computeEntityList(subInstance);
+				}
 
-	private HashSet<String> entitySet;
+				entitySet.add(name);
+			}
+		}
+	}
 
 	private Map<Integer, List<Instance>> computeMapping(Network network,
 			Map<String, String> mapping) {
@@ -134,7 +154,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
+	protected void doTransformActor(Actor actor) {
 		XlimActorTemplateData data = new XlimActorTemplateData();
 		actor.setTemplateData(data);
 
@@ -183,12 +203,12 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) {
 		// do not generate an XLIM VTL
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) {
 		// instantiate and flattens network
 		new Instantiator(false, fifoSize).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
@@ -238,44 +258,6 @@ public class XlimBackendImpl extends AbstractBackend {
 		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}
 
-	private void printTestbench(StandardPrinter printer, Instance instance) {
-		printer.print(instance.getName() + "_tb.vhd", path + File.separator
-				+ "Testbench", instance);
-	}
-
-	private void printTCL(Instance instance) {
-		CustomPrinter printer = new CustomPrinter(
-				"net/sf/orcc/backends/xlim/hw/ModelSim_Script.stg");
-
-		entities = new ArrayList<String>();
-		entitySet = new HashSet<String>();
-		computeEntityList(instance);
-
-		printer.print("TCLLists.tcl", path, "TCLLists", "name", instance
-				.getNetwork().getName(), "entities", entities);
-	}
-
-	private void computeEntityList(Instance instance) {
-		if (instance.isActor()) {
-			String name = instance.getName();
-			if (!entitySet.contains(name)) {
-				entitySet.add(name);
-				entities.add(name);
-			}
-		} else if (instance.isNetwork()) {
-			String name = instance.getName();
-			Network network = instance.getNetwork();
-			if (!entitySet.contains(name)) {
-				for (Vertex vertex : network.getChildren()) {
-					Instance subInstance = vertex.getAdapter(Instance.class);
-					computeEntityList(subInstance);
-				}
-
-				entitySet.add(name);
-			}
-		}
-	}
-
 	private void printNetwork(Network network) {
 		StandardPrinter printer;
 		String file = network.getSimpleName();
@@ -316,6 +298,23 @@ public class XlimBackendImpl extends AbstractBackend {
 				printMapping(network, mapping);
 			}
 		}
+	}
+
+	private void printTCL(Instance instance) {
+		CustomPrinter printer = new CustomPrinter(
+				"net/sf/orcc/backends/xlim/hw/ModelSim_Script.stg");
+
+		entities = new ArrayList<String>();
+		entitySet = new HashSet<String>();
+		computeEntityList(instance);
+
+		printer.print("TCLLists.tcl", path, "TCLLists", "name", instance
+				.getNetwork().getName(), "entities", entities);
+	}
+
+	private void printTestbench(StandardPrinter printer, Instance instance) {
+		printer.print(instance.getName() + "_tb.vhd", path + File.separator
+				+ "Testbench", instance);
 	}
 
 	public void setFpgaType(String fpgaType) {

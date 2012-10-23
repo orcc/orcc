@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
@@ -82,12 +81,12 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 public class LLVMBackendImpl extends AbstractBackend {
 
 	protected StandardPrinter printer;
-	protected final Map<String, String> transformations;
-
 	/**
 	 * Path to target "src" folder
 	 */
 	private String srcPath;
+
+	protected final Map<String, String> transformations;
 
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
@@ -126,11 +125,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
+	protected void doTransformActor(Actor actor) {
 		// do not transform actor
 	}
 
-	protected Network doTransformNetwork(Network network) throws OrccException {
+	protected Network doTransformNetwork(Network network) {
 
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
@@ -181,12 +180,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) {
 		// do not generate a VTL
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) {
 		network = doTransformNetwork(network);
 
 		// print instances and entities
@@ -213,13 +212,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		networkPrinter.print("CMakeLists.txt", path, network);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
-	 */
 	@Override
-	public boolean exportRuntimeLibrary() throws OrccException {
+	public boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			// Copy specific windows batch file
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {

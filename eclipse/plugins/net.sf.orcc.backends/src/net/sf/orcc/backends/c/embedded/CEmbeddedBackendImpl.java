@@ -31,7 +31,6 @@ package net.sf.orcc.backends.c.embedded;
 import java.io.File;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
@@ -81,17 +80,17 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
+	protected void doTransformActor(Actor actor) {
 
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) {
 		// do not generate an embedded C VTL
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) {
 		// Transform all actors of the network
 		transformActors(network.getAllActors());
 		printActors(network.getAllActors());
@@ -150,7 +149,7 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 	 * print actors and reference them from the network generated code.
 	 */
 	@Override
-	protected boolean printActor(Actor actor) throws OrccException {
+	protected boolean printActor(Actor actor) {
 		boolean result = false;
 
 		// print IDL

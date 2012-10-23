@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
@@ -80,7 +79,7 @@ public class YaceBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
+	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
 		replacementMap.put("abs", "abs_");
 		replacementMap.put("getw", "getw_");
@@ -101,19 +100,19 @@ public class YaceBackend extends AbstractBackend {
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(false, false, false));
 		transformations.add(new RenameTransformation(replacementMap));
-		if(!debug) {
+		if (!debug) {
 			transformations.add(new DeadGlobalElimination());
 			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
 		}
-		
+
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
 
 	}
 
-	private Network doTransformNetwork(Network network) throws OrccException {
+	private Network doTransformNetwork(Network network) {
 		OrccLogger.trace("Instantiating... ");
 		new Instantiator(false).doSwitch(network);
 		OrccLogger.traceRaw("done\n");
@@ -123,7 +122,7 @@ public class YaceBackend extends AbstractBackend {
 		if (classify) {
 			OrccLogger.trace("Starting classification of actors... ");
 			new Classifier().doSwitch(network);
-			OrccLogger.traceRaw("done\n");	
+			OrccLogger.traceRaw("done\n");
 		}
 		if (mergeActors) {
 			new ActorMerger().doSwitch(network);
@@ -133,12 +132,12 @@ public class YaceBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) {
 		// do not generate a C++ VTL
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) {
 		network = doTransformNetwork(network);
 
 		transformActors(network.getAllActors());
@@ -175,10 +174,8 @@ public class YaceBackend extends AbstractBackend {
 	 * 
 	 * @param network
 	 *            a network
-	 * @throws OrccException
-	 *             if something goes wrong
 	 */
-	public void printNetwork(Network network) throws OrccException {
+	public void printNetwork(Network network) {
 		YacePrinter printer = new YacePrinter();
 		printer.getOptions().put("codesign", getAttribute("codesign", false));
 
@@ -202,7 +199,7 @@ public class YaceBackend extends AbstractBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() throws OrccException {
+	public boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			String target = path + File.separator + "libs";
 			OrccLogger

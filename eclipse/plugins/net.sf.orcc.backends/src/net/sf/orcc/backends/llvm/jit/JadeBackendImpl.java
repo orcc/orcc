@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
@@ -134,7 +133,7 @@ public class JadeBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
+	protected void doTransformActor(Actor actor) {
 		if (classify) {
 			new Classifier().doSwitch(actor);
 		}
@@ -175,7 +174,7 @@ public class JadeBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) {
 		List<Actor> actors = parseActors(files);
 
 		printer = new StandardPrinter(
@@ -197,7 +196,7 @@ public class JadeBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) {
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
@@ -235,7 +234,7 @@ public class JadeBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private void finalizeActors(List<Actor> actors) throws OrccException {
+	private void finalizeActors(List<Actor> actors) {
 		// Jade location has not been set
 		if (jadeToolbox.equals("")) {
 			if (!optLevel.equals("O0") || !llvmGenMod.equals("Assembly")) {
@@ -266,7 +265,7 @@ public class JadeBackendImpl extends AbstractBackend {
 		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}
 
-	private void runJadeToolBox(List<Actor> actors) throws OrccException {
+	private void runJadeToolBox(List<Actor> actors) {
 		List<String> cmdList = new ArrayList<String>();
 		cmdList.add(jadeToolbox);
 		cmdList.add("-" + optLevel);
