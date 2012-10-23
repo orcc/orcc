@@ -73,7 +73,6 @@ class Processor:
         self._vhdRamFile = "dram_" + self.id + ".vhd"
         self._xoeRamFile = "dram_" + self.id + ".xoe"
         self._ngcRamFile = "dram_" + self.id + ".ngc"
-        self._waveFile = "wave.do"
         # Useful names
         self._entity = self.id + "_tl"
 
@@ -163,41 +162,6 @@ class Processor:
         shutil.rmtree("vhdl", ignore_errors=True)
         
         return retcode
-
-
-    def simulate(self, srcPath, libPath, tracePath):
-        if self.inputs and not self._hasNativePort() :
-            instancePath = os.path.join(srcPath, self.id)
-            os.chdir(instancePath)
-            
-            shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opb"), instancePath)
-            shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opp"), instancePath)
-            shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.cc"), instancePath)
-
-            # Copy trace to the instance folder
-            for input in self.inputs:
-                traceName = self.id + "_" + input.name + ".txt"
-                fifoName = "tta_stream_%d.in" % (input.index)
-                srcTrace = os.path.join(tracePath, traceName)
-                tgtTrace = os.path.join(instancePath, fifoName)
-                shutil.copy(srcTrace, tgtTrace)
-
-            # Launch the simulation
-            retcode = subprocess.call(["ttasim", "--no-debugmode", "-e", "run; set filename stats.txt; set fileId [open $filename w]; puts $fileId [info proc cycles]; puts $fileId [info proc stats]; close $fileId; exit;", "-a", self._adfFile, "-p", self._tpefFile])
-
-            # Check generated data
-            i = 0
-            for output in self.outputs:
-                i += 1
-                traceName = self.id + "_" + output.name + ".txt"
-                fifoName = "tta_stream_%d.out" % (output.index)
-                srcTrace = os.path.join(tracePath, traceName)
-                tgtTrace = os.path.join(instancePath, fifoName)
-                self.diff(srcTrace, tgtTrace, output)
-                
-            os.remove("stream_units.opp")
-            os.remove("stream_units.opb")
-            os.remove("stream_units.cc")
             
     def profile(self, srcPath):
         instancePath = os.path.join(srcPath, self.id)
@@ -259,26 +223,3 @@ class Processor:
         template = tempita.Template.from_filename(os.path.join(templatePath, "xco_irom.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath, id=self.id, width=self.irom.getWidth(), depth=self.irom.getDepth())
         open(os.path.join(genPath, self._xoeRomFile), "w").write(result)
-
-    def diff(self, traceFile, genFile, port):
-        f_trace = open(traceFile, 'r')
-        f_gen = open(genFile, 'r')
-
-        # Compare files line after line
-        i = 0
-        for ligne1 in f_gen:
-            i += 1
-            ligne2 = f_trace.readline()
-            if ligne1 != ligne2:
-                break
-
-        # Compute the number of line
-        f_gen.seek(0)
-        j = 0
-        for ligne1 in f_gen:
-            j += 1
-
-        if i != j:
-            print "ERROR: Wrong generated data on '" + port.name + "' (index " + str(port.index) + " - line " + str(i) + ")."
-
-

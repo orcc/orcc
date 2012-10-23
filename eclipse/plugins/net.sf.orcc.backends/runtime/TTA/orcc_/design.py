@@ -55,12 +55,6 @@ class Design:
             if retcode != 0: 
                 sys.exit(retcode)
 
-
-    def simulate(self, srcPath, libPath, tracePath):
-        for processor in self.processors:
-            if not processor.isBroadcast:
-                print ">> Simulate the execution of " + processor.id + "."
-                processor.simulate(srcPath, libPath, tracePath)
                 
     def profile(self, srcPath):
         f = open("profiling.txt", "w")
