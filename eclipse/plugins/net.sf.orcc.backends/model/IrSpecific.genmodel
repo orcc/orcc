@@ -3,7 +3,7 @@
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src" modelPluginID="net.sf.orcc.backends"
     templateDirectory="/net.sf.orcc.models/templates" dynamicTemplates="true" modelName="IrSpecific"
     codeFormatting="true" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
-    copyrightFields="false" usedGenPackages="../../net.sf.orcc.core/model/Core.genmodel#//ir platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore">
+    copyrightFields="false" usedGenPackages="../../net.sf.orcc.core/model/Core.genmodel#//ir platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.orcc.models/model/Graph.genmodel#//util ../../net.sf.orcc.models/model/Graph.genmodel#//graph">
   <foreignModel>IrSpecific.ecore</foreignModel>
   <foreignModel>../../net.sf.orcc.core/model/Ir.ecore</foreignModel>
   <genPackages prefix="IrSpecific" basePackage="net.sf.orcc.backends" disposableProviderFactory="true"
@@ -17,24 +17,19 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//InstCast/target"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//InstCast/source"/>
     </genClasses>
-    <genClasses ecoreClass="IrSpecific.ecore#//InstGetElementPtr">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//InstGetElementPtr/indexes"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//InstGetElementPtr/target"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//InstGetElementPtr/source"/>
-    </genClasses>
     <genClasses ecoreClass="IrSpecific.ecore#//InstTernary">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//InstTernary/conditionValue"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//InstTernary/trueValue"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//InstTernary/falseValue"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//InstTernary/target"/>
     </genClasses>
-    <genClasses ecoreClass="IrSpecific.ecore#//NodeFor">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//NodeFor/condition"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//NodeFor/joinNode"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute IrSpecific.ecore#//NodeFor/lineNumber"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//NodeFor/nodes"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//NodeFor/loopCounter"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//NodeFor/init"/>
+    <genClasses ecoreClass="IrSpecific.ecore#//BlockFor">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//BlockFor/condition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//BlockFor/joinBlock"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute IrSpecific.ecore#//BlockFor/lineNumber"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//BlockFor/blocks"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//BlockFor/step"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference IrSpecific.ecore#//BlockFor/init"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
