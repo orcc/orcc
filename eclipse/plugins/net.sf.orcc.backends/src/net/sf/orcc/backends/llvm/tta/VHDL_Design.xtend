@@ -30,22 +30,25 @@ package net.sf.orcc.backends.llvm.tta
 
 import net.sf.orcc.backends.llvm.tta.architecture.Component
 import net.sf.orcc.backends.llvm.tta.architecture.Design
+import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Signal
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 import net.sf.orcc.backends.util.FPGA
+import net.sf.orcc.ir.util.ExpressionPrinter
 import net.sf.orcc.util.Attribute
 import org.eclipse.emf.common.util.EList
-import net.sf.orcc.backends.llvm.tta.architecture.Link
 
 class VHDL_Design extends ArchitectureSwitch<CharSequence> {
 	
+	ExpressionPrinter exprPrinter;
 	FPGA fpga;
 	
 	new(FPGA fpga) {
 		this.fpga = fpga;
+		this.exprPrinter = new ExpressionPrinter();
 	}
 	
 	override caseDesign(Design design)
@@ -158,7 +161,7 @@ class VHDL_Design extends ArchitectureSwitch<CharSequence> {
 	def assignGenerics(EList<Attribute> attributes)
 		'''
 		«FOR attribute : attributes SEPARATOR ",\n"»
-			«attribute.name» => «attribute.containedValue»
+			«attribute.name» => «exprPrinter.doSwitch(attribute.referencedValue)»
 		«ENDFOR»
 		'''
 		
