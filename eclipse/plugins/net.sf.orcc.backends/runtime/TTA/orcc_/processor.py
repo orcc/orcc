@@ -57,8 +57,6 @@ class Processor:
         # Useful filenames
         self._processorFile = self.id + ".vhd"
         self._memConstantsPkg = self.id + "_mem_constants_pkg.vhd"
-        self._tbFile = self.id + "_tb.vhd"
-        self._tclFile = self.id + ".tcl"
         self._adfFile = self.id + ".adf"
         self._idfFile = self.id + ".idf"
         self._llFile = self.id + ".ll"
@@ -158,10 +156,7 @@ class Processor:
         else:
             os.remove(self.id + ".mif")
             os.remove(self.id + "_data.mif")
-        shutil.move("imem_mau_pkg.vhdl", vhdlPath)
-        
-        # Manage simulation files
-        os.chmod(os.path.join(instanceSrcPath, self._tclFile), stat.S_IRWXU)        
+        shutil.move("imem_mau_pkg.vhdl", vhdlPath)    
 
         # Clean working directory
         os.remove(self._bemFile)
