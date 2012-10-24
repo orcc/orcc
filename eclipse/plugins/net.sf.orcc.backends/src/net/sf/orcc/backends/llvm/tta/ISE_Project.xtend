@@ -49,8 +49,6 @@ class ISE_Project extends ArchitectureSwitch<CharSequence> {
 		    <!--                                                                   -->
 		  </header>
 		
-		  <version xil_pn:ise_version="12.1" xil_pn:schema_version="2"/>
-		
 		  <files>
 		    <file xil_pn:name="top.ucf" xil_pn:type="FILE_UCF">
 		      <association xil_pn:name="Implementation"/>
@@ -73,14 +71,6 @@ class ISE_Project extends ArchitectureSwitch<CharSequence> {
 		      <association xil_pn:name="Implementation"/>
 		    </file>
 		    <file xil_pn:name="share/vhdl/tce_util_pkg.vhdl" xil_pn:type="FILE_VHDL">
-		      <association xil_pn:name="BehavioralSimulation"/>
-		      <association xil_pn:name="Implementation"/>
-		    </file>
-		    <file xil_pn:name="share/vhdl/cal_stream_in_8fifos.vhdl" xil_pn:type="FILE_VHDL">
-		      <association xil_pn:name="BehavioralSimulation"/>
-		      <association xil_pn:name="Implementation"/>
-		    </file>
-		    <file xil_pn:name="share/vhdl/cal_stream_out_8fifos.vhdl" xil_pn:type="FILE_VHDL">
 		      <association xil_pn:name="BehavioralSimulation"/>
 		      <association xil_pn:name="Implementation"/>
 		    </file>
@@ -177,7 +167,7 @@ class ISE_Project extends ArchitectureSwitch<CharSequence> {
 		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>
-		<file xil_pn:name="«processor.name»/tta/gcu_ic/output_socket_<length(processor.buses)>_1.vhdl" xil_pn:type="FILE_VHDL">
+		<file xil_pn:name="«processor.name»/tta/gcu_ic/output_socket_«processor.buses.size»_1.vhdl" xil_pn:type="FILE_VHDL">
 		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>
@@ -185,7 +175,7 @@ class ISE_Project extends ArchitectureSwitch<CharSequence> {
 		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>
-		<file xil_pn:name="«processor.name»/tta/gcu_ic/input_socket_<length(processor.buses)>.vhdl" xil_pn:type="FILE_VHDL">
+		<file xil_pn:name="«processor.name»/tta/gcu_ic/input_socket_«processor.buses.size».vhdl" xil_pn:type="FILE_VHDL">
 		  <association xil_pn:name="BehavioralSimulationprintUcf"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>
