@@ -617,6 +617,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	public GlobalControlUnit createGlobalControlUnitDefault(Processor tta,
 			Memory program) {
 		GlobalControlUnit gcu = createGlobalControlUnit(3, 1);
+		gcu.setName("gcu");
 		gcu.setAddressSpace(program);
 
 		// Sockets

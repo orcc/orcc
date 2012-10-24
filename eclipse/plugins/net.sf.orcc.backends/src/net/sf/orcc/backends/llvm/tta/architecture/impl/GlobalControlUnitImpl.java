@@ -52,6 +52,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.GlobalControlUnitImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.GlobalControlUnitImpl#getPorts <em>Ports</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.GlobalControlUnitImpl#getReturnAddress <em>Return Address</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.GlobalControlUnitImpl#getAddressSpace <em>Address Space</em>}</li>
@@ -65,6 +66,26 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class GlobalControlUnitImpl extends EObjectImpl implements
 		GlobalControlUnit {
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
+
 	/**
 	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -156,6 +177,29 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	@Override
 	protected EClass eStaticClass() {
 		return ArchitecturePackage.Literals.GLOBAL_CONTROL_UNIT;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.GLOBAL_CONTROL_UNIT__NAME, oldName,
+					name));
 	}
 
 	/**
@@ -353,6 +397,8 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__NAME:
+			return getName();
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
 			return getPorts();
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
@@ -379,6 +425,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__NAME:
+			setName((String) newValue);
+			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
 			getPorts().clear();
 			getPorts().addAll((Collection<? extends FuPort>) newValue);
@@ -410,6 +459,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
 			getPorts().clear();
 			return;
@@ -439,6 +491,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
 			return ports != null && !ports.isEmpty();
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
@@ -465,7 +520,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (delaySlots: ");
+		result.append(" (name: ");
+		result.append(name);
+		result.append(", delaySlots: ");
 		result.append(delaySlots);
 		result.append(", guardLatency: ");
 		result.append(guardLatency);

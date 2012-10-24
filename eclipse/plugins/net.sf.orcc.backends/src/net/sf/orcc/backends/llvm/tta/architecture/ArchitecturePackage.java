@@ -1190,12 +1190,21 @@ public interface ArchitecturePackage extends EPackage {
 	int SEGMENT_FEATURE_COUNT = 1;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GLOBAL_CONTROL_UNIT__NAME = 0;
+
+	/**
 	 * The feature id for the '<em><b>Ports</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_CONTROL_UNIT__PORTS = 0;
+	int GLOBAL_CONTROL_UNIT__PORTS = 1;
 
 	/**
 	 * The feature id for the '<em><b>Return Address</b></em>' containment reference.
@@ -1203,7 +1212,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_CONTROL_UNIT__RETURN_ADDRESS = 1;
+	int GLOBAL_CONTROL_UNIT__RETURN_ADDRESS = 2;
 
 	/**
 	 * The feature id for the '<em><b>Address Space</b></em>' reference. <!--
@@ -1212,7 +1221,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_CONTROL_UNIT__ADDRESS_SPACE = 2;
+	int GLOBAL_CONTROL_UNIT__ADDRESS_SPACE = 3;
 
 	/**
 	 * The feature id for the '<em><b>Operations</b></em>' containment reference list.
@@ -1220,7 +1229,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_CONTROL_UNIT__OPERATIONS = 3;
+	int GLOBAL_CONTROL_UNIT__OPERATIONS = 4;
 
 	/**
 	 * The feature id for the '<em><b>Delay Slots</b></em>' attribute. <!--
@@ -1229,7 +1238,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_CONTROL_UNIT__DELAY_SLOTS = 4;
+	int GLOBAL_CONTROL_UNIT__DELAY_SLOTS = 5;
 
 	/**
 	 * The feature id for the '<em><b>Guard Latency</b></em>' attribute. <!--
@@ -1238,7 +1247,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_CONTROL_UNIT__GUARD_LATENCY = 5;
+	int GLOBAL_CONTROL_UNIT__GUARD_LATENCY = 6;
 
 	/**
 	 * The number of structural features of the '<em>Global Control Unit</em>' class.
@@ -1246,7 +1255,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_CONTROL_UNIT_FEATURE_COUNT = 6;
+	int GLOBAL_CONTROL_UNIT_FEATURE_COUNT = 7;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -2736,6 +2745,17 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getGlobalControlUnit();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit#getName()
+	 * @see #getGlobalControlUnit()
+	 * @generated
+	 */
+	EAttribute getGlobalControlUnit_Name();
+
+	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit#getPorts <em>Ports</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Ports</em>'.
@@ -3983,6 +4003,15 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EClass GLOBAL_CONTROL_UNIT = eINSTANCE.getGlobalControlUnit();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute GLOBAL_CONTROL_UNIT__NAME = eINSTANCE
+				.getGlobalControlUnit_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' containment reference list feature.

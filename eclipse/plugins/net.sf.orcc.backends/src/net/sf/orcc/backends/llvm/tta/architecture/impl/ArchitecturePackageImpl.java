@@ -792,11 +792,12 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getGlobalControlUnit_Ports() {
-		return (EReference) globalControlUnitEClass.getEStructuralFeatures()
+	public EAttribute getGlobalControlUnit_Name() {
+		return (EAttribute) globalControlUnitEClass.getEStructuralFeatures()
 				.get(0);
 	}
 
@@ -804,7 +805,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getGlobalControlUnit_ReturnAddress() {
+	public EReference getGlobalControlUnit_Ports() {
 		return (EReference) globalControlUnitEClass.getEStructuralFeatures()
 				.get(1);
 	}
@@ -813,7 +814,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getGlobalControlUnit_AddressSpace() {
+	public EReference getGlobalControlUnit_ReturnAddress() {
 		return (EReference) globalControlUnitEClass.getEStructuralFeatures()
 				.get(2);
 	}
@@ -822,7 +823,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getGlobalControlUnit_Operations() {
+	public EReference getGlobalControlUnit_AddressSpace() {
 		return (EReference) globalControlUnitEClass.getEStructuralFeatures()
 				.get(3);
 	}
@@ -831,9 +832,18 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getGlobalControlUnit_Operations() {
+		return (EReference) globalControlUnitEClass.getEStructuralFeatures()
+				.get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EAttribute getGlobalControlUnit_DelaySlots() {
 		return (EAttribute) globalControlUnitEClass.getEStructuralFeatures()
-				.get(4);
+				.get(5);
 	}
 
 	/**
@@ -842,7 +852,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EAttribute getGlobalControlUnit_GuardLatency() {
 		return (EAttribute) globalControlUnitEClass.getEStructuralFeatures()
-				.get(5);
+				.get(6);
 	}
 
 	/**
@@ -1528,6 +1538,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(segmentEClass, SEGMENT__NAME);
 
 		globalControlUnitEClass = createEClass(GLOBAL_CONTROL_UNIT);
+		createEAttribute(globalControlUnitEClass, GLOBAL_CONTROL_UNIT__NAME);
 		createEReference(globalControlUnitEClass, GLOBAL_CONTROL_UNIT__PORTS);
 		createEReference(globalControlUnitEClass,
 				GLOBAL_CONTROL_UNIT__RETURN_ADDRESS);
@@ -1908,6 +1919,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(globalControlUnitEClass, GlobalControlUnit.class,
 				"GlobalControlUnit", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getGlobalControlUnit_Name(),
+				theEcorePackage.getEString(), "name", null, 0, 1,
+				GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 		initEReference(getGlobalControlUnit_Ports(), this.getFuPort(), null,
 				"ports", null, 0, -1, GlobalControlUnit.class, IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,

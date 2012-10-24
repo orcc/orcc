@@ -190,7 +190,7 @@ class TCE_Processor_ADF extends ArchitectureSwitch<CharSequence> {
 	
 	def print(GlobalControlUnit gcu) 
 		'''
-		<global-control-unit name="gcu">
+		<global-control-unit name="«gcu.name»">
 			«FOR port: gcu.ports»
 				«port.print(true, false)»
 			«ENDFOR»
