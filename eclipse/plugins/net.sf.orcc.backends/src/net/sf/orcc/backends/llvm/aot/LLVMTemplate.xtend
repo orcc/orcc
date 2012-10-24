@@ -40,6 +40,7 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.ExprList
 
 /*
  * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
@@ -60,7 +61,12 @@ class LLVMTemplate extends TemplateUtil {
 	 *
 	 *****************************************/
 	override caseExpression(Expression expr)
-		'''«exprPrinter.doSwitch(expr)»'''
+		'''«IF expr.exprList»«(expr as ExprList).doSwitch»«ELSE»«exprPrinter.doSwitch(expr)»«ENDIF»'''
+		
+	override caseExprList(ExprList exprList) {
+		val list = '''[«exprList.value.join(", ", ['''«exprList.type.doSwitch» «it.doSwitch»'''])»]'''
+		return list.wrap
+	}
 	
 	/******************************************
 	 * 
@@ -101,7 +107,7 @@ class LLVMTemplate extends TemplateUtil {
 	 *****************************************/
 		
 	def getId(Connection connection, Port port) {
-		if(connection != null) connection.getAttribute("id").stringValue
+		if(connection != null) connection.getAttribute("id").objectValue
 		else port.name
 	}
 

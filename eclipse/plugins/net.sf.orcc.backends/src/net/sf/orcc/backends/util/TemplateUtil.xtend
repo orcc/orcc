@@ -1,9 +1,10 @@
 package net.sf.orcc.backends.util
 
+import java.util.List
+import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.util.AbstractIrVisitor
 import net.sf.orcc.ir.util.ExpressionPrinter
-import net.sf.orcc.ir.Expression
-import java.util.List
+import org.apache.commons.lang.WordUtils
 
 class TemplateUtil extends AbstractIrVisitor<CharSequence> {
 	
@@ -20,4 +21,15 @@ class TemplateUtil extends AbstractIrVisitor<CharSequence> {
 	 */
 	def printArrayIndexes(List<Expression> exprList)
 		'''«FOR expr : exprList»[«expr.doSwitch»]«ENDFOR»'''
+	
+	/**
+	 * Split the string into lines with a max of n characters
+	 */
+	def wrap(CharSequence charSeq, int n) {
+		WordUtils::wrap(charSeq.toString, n)
+	}
+	
+	def wrap(CharSequence charSeq) {
+		wrap(charSeq, 80)
+	}
 }
