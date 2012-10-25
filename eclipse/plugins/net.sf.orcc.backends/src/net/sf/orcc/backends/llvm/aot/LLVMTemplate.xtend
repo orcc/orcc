@@ -65,7 +65,8 @@ class LLVMTemplate extends TemplateUtil {
 		
 	override caseExprList(ExprList exprList) {
 		val list = '''[«exprList.value.join(", ", ['''«exprList.type.doSwitch» «it.doSwitch»'''])»]'''
-		return list.wrap
+		//return list.wrap
+		return list
 	}
 	
 	/******************************************
