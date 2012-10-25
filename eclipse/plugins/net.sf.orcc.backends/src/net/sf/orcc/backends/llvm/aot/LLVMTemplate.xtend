@@ -41,6 +41,8 @@ import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
 import net.sf.orcc.ir.ExprList
+import net.sf.orcc.ir.ExprVar
+import net.sf.orcc.util.util.EcoreHelper
 
 /*
  * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
@@ -60,11 +62,17 @@ class LLVMTemplate extends TemplateUtil {
 	 * Expressions
 	 *
 	 *****************************************/
-	override caseExpression(Expression expr)
-		'''«IF expr.exprList»«(expr as ExprList).doSwitch»«ELSE»«exprPrinter.doSwitch(expr)»«ENDIF»'''
+	override caseExpression(Expression expr) {
+		if (expr.exprVar)
+			(expr as ExprVar).use.variable.print
+		else if (expr.exprList)
+			(expr as ExprList).doSwitch
+		else
+			exprPrinter.doSwitch(expr)
+	}
 		
 	override caseExprList(ExprList exprList) {
-		val list = '''[«exprList.value.join(", ", ['''«exprList.type.doSwitch» «it.doSwitch»'''])»]'''
+		val list = '''[«exprList.value.join(", ", ['''«IF it.type.list»«it.type.doSwitch»«ELSE»«(EcoreHelper::getContainerOfType(exprList, typeof(Var)).type as TypeList).innermostType.doSwitch» «it.doSwitch»«ENDIF»'''])»]'''
 		//return list.wrap
 		return list
 	}

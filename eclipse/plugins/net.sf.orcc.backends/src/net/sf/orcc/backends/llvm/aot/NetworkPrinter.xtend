@@ -56,9 +56,9 @@ class NetworkPrinter extends LLVMTemplate {
 		declare void @init_orcc(i32 %argc, i8** %argv)
 		
 		«FOR conn : network.connections»
-			@fifo_«conn.getAttribute("id")»_content = global [«conn.size» x «conn.sourcePort.type.doSwitch»] zeroinitializer, align 32
-			@fifo_«conn.getAttribute("id")»_rdIndex = global i32 zeroinitializer, align 32
-			@fifo_«conn.getAttribute("id")»_wrIndex = global i32 zeroinitializer, align 32
+			@fifo_«conn.getAttribute("id").objectValue»_content = global [«conn.size» x «conn.sourcePort.type.doSwitch»] zeroinitializer, align 32
+			@fifo_«conn.getAttribute("id").objectValue»_rdIndex = global i32 zeroinitializer, align 32
+			@fifo_«conn.getAttribute("id").objectValue»_wrIndex = global i32 zeroinitializer, align 32
 			
 		«ENDFOR»
 		

@@ -40,13 +40,17 @@ import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
 import net.sf.orcc.graph.Edge
+import net.sf.orcc.ir.Arg
+import net.sf.orcc.ir.ArgByVal
 import net.sf.orcc.ir.Block
 import net.sf.orcc.ir.BlockBasic
 import net.sf.orcc.ir.BlockIf
 import net.sf.orcc.ir.BlockWhile
 import net.sf.orcc.ir.CfgNode
+import net.sf.orcc.ir.ExprVar
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.InstAssign
+import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstPhi
 import net.sf.orcc.ir.InstReturn
@@ -59,10 +63,8 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
-import net.sf.orcc.ir.InstCall
-import net.sf.orcc.ir.Arg
-import net.sf.orcc.ir.ArgByVal
-import net.sf.orcc.ir.ExprVar
+import java.util.ArrayList
+import net.sf.orcc.ir.Type
 
 /*
  * Compile Instance llvm source code
@@ -134,8 +136,8 @@ class InstancePrinter extends LLVMTemplate {
 		«IF ! instance.actor.outputs.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Output ports
-			«FOR port : instance.actor.inputs.filter[ ! native]»
-				«printOutput(port, instance.outgoingPortMap.get(port)?.head)»
+			«FOR port : instance.actor.outputs.filter[ ! native]»
+				«printOutput(port, instance.outgoingPortMap.get(port).head)»
 			«ENDFOR»
 			
 		«ENDIF»
@@ -143,7 +145,7 @@ class InstancePrinter extends LLVMTemplate {
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Parameter values of the instance
 			«FOR i : 0..instance.arguments.size-1»
-				@«instance.actor.parameters.get(i).name» = internal global «instance.actor.parameters.get(i).type» «instance.arguments.get(i).value.doSwitch»
+				@«instance.actor.parameters.get(i).name» = internal global «instance.actor.parameters.get(i).type.doSwitch» «instance.arguments.get(i).value.doSwitch»
 			«ENDFOR»
 			
 		«ENDIF»
@@ -187,7 +189,7 @@ class InstancePrinter extends LLVMTemplate {
 			entry:
 				«printCallStartTokenFunctions»
 				«FOR init : instance.actor.initializes»
-					call «init.body.returnType» @«init.body.name»
+					call «init.body.returnType.doSwitch» @«init.body.name»()
 				«ENDFOR»
 				«printCallEndTokenFunctions»
 				ret void
@@ -287,48 +289,49 @@ class InstancePrinter extends LLVMTemplate {
 		val transition = outgoing.head as Transition
 		'''
 				; ACTION «transition.action.name»
-			«IF ! transition.action.inputPattern.empty»
-				;; Input pattern
-				«checkInputPattern(transition.action, transition.action.inputPattern, sourceState)»
-				%is_schedulable_«sourceState.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
-				%is_fireable_«sourceState.name»_«transition.action.name» = and i1 %is_schedulable_«sourceState.name»_«transition.action.name», %has_valid_inputs_«sourceState.name»_«transition.action.name»_«transition.action.inputPattern.ports.size»
-				
-				br i1 %is_fireable_«sourceState.name»_«transition.action.name», label %bb_«sourceState.name»_«transition.action.name»_check_outputs, label %bb_«sourceState.name»_«transition.action.name»_unschedulable:
-			«ELSE»
-				;; Empty input pattern
-				%is_fireable_«sourceState.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
-				
-				br i1 %is_fireable_«sourceState.name»_«transition.action.name», label %bb_«sourceState.name»_«transition.action.name»_check_outputs, label %bb_«sourceState.name»_«transition.action.name»_unschedulable
-			«ENDIF»
+				«IF ! transition.action.inputPattern.empty»
+					;; Input pattern
+					«checkInputPattern(transition.action, transition.action.inputPattern, sourceState)»
+					%is_schedulable_«sourceState.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
+					%is_fireable_«sourceState.name»_«transition.action.name» = and i1 %is_schedulable_«sourceState.name»_«transition.action.name», %has_valid_inputs_«sourceState.name»_«transition.action.name»_«transition.action.inputPattern.ports.size»
+					
+					br i1 %is_fireable_«sourceState.name»_«transition.action.name», label %bb_«sourceState.name»_«transition.action.name»_check_outputs, label %bb_«sourceState.name»_«transition.action.name»_unschedulable
+				«ELSE»
+					;; Empty input pattern
+					%is_fireable_«sourceState.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
+					
+					br i1 %is_fireable_«sourceState.name»_«transition.action.name», label %bb_«sourceState.name»_«transition.action.name»_check_outputs, label %bb_«sourceState.name»_«transition.action.name»_unschedulable
+				«ENDIF»
 			
 			
 			bb_«sourceState.name»_«transition.action.name»_check_outputs:
-			«IF ! transition.action.outputPattern.empty»
-				;; Output pattern
-				«checkOutputPattern(transition.action, transition.action.outputPattern, sourceState)»
-				
-				br i1 %has_valid_outputs_«sourceState.name»_«transition.action.name»_«transition.action.outputPattern.ports.size», label %bb_«sourceState.name»_«transition.action.name»_fire, label %bb_«sourceState.name»_finished<
-			«ELSE»
-				;; Empty output pattern
-				
-				br label %bb_«sourceState.name»_«transition.action.name»_fire
-			«ENDIF»
+				«IF ! transition.action.outputPattern.empty»
+					;; Output pattern
+					«checkOutputPattern(transition.action, transition.action.outputPattern, sourceState)»
+					
+					br i1 %has_valid_outputs_«sourceState.name»_«transition.action.name»_«transition.action.outputPattern.ports.size», label %bb_«sourceState.name»_«transition.action.name»_fire, label %bb_«sourceState.name»_finished
+				«ELSE»
+					;; Empty output pattern
+					
+					br label %bb_«sourceState.name»_«transition.action.name»_fire
+				«ENDIF»
 			
 			bb_«sourceState.name»_«transition.action.name»_fire:
 				call void @«transition.action.body.name» ()
 				
 				br label %bb_s_«transition.target.name»
-			bb_«sourceState.name»_«transition.action.name»_unschedulable
-			«IF outgoing.tail.size > 0»
-				«actionTestState(sourceState, outgoing.tail)»
-			«ELSE»
-				br label %bb_«sourceState.name»_finished
+			bb_«sourceState.name»_«transition.action.name»_unschedulable:
+				«IF outgoing.tail.size > 0»
+					«actionTestState(sourceState, outgoing.tail)»
+				«ELSE»
+					br label %bb_«sourceState.name»_finished
 			bb_«sourceState.name»_finished:
-				store i32 «stateToLabel.get(sourceState)», i32* @_FSM_state
-				br label %bb_waiting
-			«ENDIF»
+					store i32 «stateToLabel.get(sourceState)», i32* @_FSM_state
+					br label %bb_waiting
+				«ENDIF»
 		'''
 	}
+	
 
 	def schedulerWithoutFSM() '''
 		define void @«instance.name»_scheduler() « IF optionProfile»noinline «ENDIF»nounwind {
@@ -485,8 +488,9 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
 		
-		;sched body :
-		«action.scheduler.blocks.doSwitch»
+		«FOR block : action.scheduler.blocks»
+			«block.doSwitch»
+		«ENDFOR»
 		}
 		
 		define internal void @«action.body.name»() nounwind {
@@ -499,8 +503,9 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
 		
-		;action body :
-		«action.body.blocks.doSwitch»
+		«FOR block : action.body.blocks»
+			«block.doSwitch»
+		«ENDFOR»
 			«FOR port : action.inputPattern.ports.filter[ ! native]»
 				«printFifoEnd(port, action.inputPattern.numTokensMap.get(port))»
 			«ENDFOR»
@@ -522,7 +527,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def print(Procedure procedure) '''
 		«IF procedure.native»
-			declare «procedure.returnType» @«procedure.name»(«procedure.parameters.join(", ", [argumentDeclaration] )») nounwind
+			declare «procedure.returnType.doSwitch» @«procedure.name»(«procedure.parameters.join(", ", [argumentDeclaration] )») nounwind
 		«ELSE»
 			define internal «procedure.returnType.doSwitch» @«procedure.name»(«procedure.parameters.join(", ", [argumentDeclaration])») nounwind {
 			entry:
@@ -531,7 +536,9 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDFOR»
 				br label %b«procedure.blocks.head.label»
 			
-			«procedure.blocks.doSwitch»
+			«FOR block : procedure.blocks»
+				«block.doSwitch»
+			«ENDFOR»
 			}
 		«ENDIF»
 	'''
@@ -640,37 +647,61 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	override caseBlockBasic(BlockBasic blockBasic) '''
-		;BlockBasic
 		b«blockBasic.label»:
-			«blockBasic.instructions.visitInstructions»
+			«FOR instr : blockBasic.instructions»
+				«instr.doSwitch»
+			«ENDFOR»
 			«IF ! blockBasic.cfgNode.successors.empty»
 				br label %b«(blockBasic.cfgNode.successors.head as CfgNode).node.printNextLabel»
 			«ENDIF»
 	'''
 	
 	override caseBlockIf(BlockIf blockIf) '''
-		;BlockIf
 		b«blockIf.label»:
 			br i1 «blockIf.condition.doSwitch», label %b«blockIf.thenBlocks.head.printNextLabel», label %b«blockIf.elseBlocks.head.printNextLabel»
 		
-		«blockIf.thenBlocks.doSwitch»
+		«FOR block : blockIf.thenBlocks»
+			«block.doSwitch»
+		«ENDFOR»
 		
-		«blockIf.elseBlocks.doSwitch»
+		«FOR block : blockIf.elseBlocks»
+			«block.doSwitch»
+		«ENDFOR»
 		
 		«blockIf.joinBlock.doSwitch»
 	'''
 
 	override caseBlockWhile(BlockWhile blockwhile) '''
-		;BlockWhile
 		b«blockwhile.joinBlock.label»:
-			«blockwhile.joinBlock.instructions.visitInstructions»
+			«FOR instr : blockwhile.joinBlock.instructions»
+				«instr.doSwitch»
+			«ENDFOR»
 			br i1 «blockwhile.condition.doSwitch», label %b«blockwhile.blocks.head.label», label %b«blockwhile.label»
 		
-		«blockwhile.blocks.doSwitch»
+		«FOR block : blockwhile.blocks»
+			«block.doSwitch»
+		«ENDFOR»
 		
 		b«blockwhile.label»:
 			br label %b«(blockwhile.cfgNode.successors.head as CfgNode).node.printNextLabel»
 	'''
+	
+	override caseInstruction(Instruction instr) {
+		if(instr instanceof InstCast)
+			return caseInstCast(instr as InstCast)
+		else
+			super.caseInstruction(instr)
+	}
+	
+	def caseInstCast(InstCast cast) '''
+		%«cast.target.variable.indexedName» = «cast.printCastOp» «cast.source.variable.printCastType» «cast.source.variable.print» to «cast.target.variable.printCastType»
+	'''
+
+	def printCastOp(InstCast cast)
+		'''«IF cast.source.variable.type.list»bitcast«ELSEIF ! cast.extended»trunc«ELSEIF cast.signed»sext«ELSE»zext«ENDIF»'''
+
+	def printCastType(Var variable)
+		'''«variable.type.doSwitch»«IF variable.type.list»*«ENDIF»'''
 	
 	override caseInstAssign(InstAssign assign) 
 		'''%«assign.target.variable.indexedName» = «assign.value.doSwitch»'''
@@ -686,7 +717,7 @@ class InstancePrinter extends LLVMTemplate {
 		
 	override caseInstReturn(InstReturn retInst) {
 		val action = EcoreHelper::getContainerOfType(retInst, typeof(Action))
-		if ( action == null || EcoreHelper::getContainerOfType(retInst, typeof(Procedure)) != action.scheduler) {
+		if ( action == null || EcoreHelper::getContainerOfType(retInst, typeof(Procedure)) == action.scheduler) {
 			if(retInst.value == null)
 				'''ret void'''
 			else
@@ -702,15 +733,15 @@ class InstancePrinter extends LLVMTemplate {
 				«IF action != null && action.outputPattern.varToPortMap.get(store.target.variable) != null && ! action.outputPattern.varToPortMap.get(store.target.variable).native»
 					«printPortAccess(instance.outgoingPortMap.get(action.outputPattern.varToPortMap.get(store.target.variable)).head, action.outputPattern.varToPortMap.get(store.target.variable), store.target.variable, store.indexes, store)»
 				«ELSE»
-					«varName(store.target.variable, store)» = getelementptr «store.target.variable.type.doSwitch»* «store.target.variable.print», i32 0«store.indexes.join(", ", ", ", "", [doSwitch])»
+					«varName(store.target.variable, store)» = getelementptr «store.target.variable.type.doSwitch»* «store.target.variable.print», i32 0«store.indexes.join(", ", ", ", "", [printIndex])»
 				«ENDIF»
-				store «(store.target.variable.type as TypeList).innermostType» «store.value.doSwitch», «(store.target.variable.type as TypeList).innermostType»* «varName(store.target.variable, store)»
+				store «(store.target.variable.type as TypeList).innermostType.doSwitch» «store.value.doSwitch», «(store.target.variable.type as TypeList).innermostType.doSwitch»* «varName(store.target.variable, store)»
 			«ELSE»
 				store «store.target.variable.type.doSwitch» «store.value.doSwitch», «store.target.variable.type.doSwitch»* «store.target.variable.print»
 			«ENDIF»
 		'''
 	}
-	
+
 	override caseInstLoad(InstLoad load) {
 		val action = EcoreHelper::getContainerOfType(load, typeof(Action))
 		'''
@@ -722,7 +753,7 @@ class InstancePrinter extends LLVMTemplate {
 				«ELSEIF action != null && action.peekPattern.varToPortMap.get(load.source.variable) != null»
 					«printPortAccess(instance.incomingPortMap.get(action.peekPattern.varToPortMap.get(load.source.variable)), action.peekPattern.varToPortMap.get(load.source.variable), load.source.variable, load.indexes, load)»
 				«ELSE»
-					«varName(load.source.variable, load)» = getelementptr «load.source.variable.type.doSwitch»* «load.source.variable.print», i32 0, «load.indexes.join(", ", ", ", "", [doSwitch])»
+					«varName(load.source.variable, load)» = getelementptr «load.source.variable.type.doSwitch»* «load.source.variable.print», i32 0«load.indexes.join(", ", ", ", "", [printIndex])»
 				«ENDIF»
 				«load.target.variable.print» = load «(load.source.variable.type as TypeList).innermostType.doSwitch»* «varName(load.source.variable, load)»
 			«ELSE»
@@ -730,24 +761,47 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDIF»
 		'''
 	}
+		
+	def printIndex (Expression index) {
+		var type = ''''''
+		if (index.type != null)
+			type = index.type.doSwitch
+		else
+			type = "i32"
+		return '''«type» «index.doSwitch»'''
+	}
 	
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
 			call i32 (i8*, ...)* @printf(«call.parameters.join(", ", [printParameter])»)
 		«ELSE»
-			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType» @«call.procedure.name» («call.parameters.join(", ", [printParameter])»)
+			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («formatParameters(call.procedure.parameters, call.parameters).join(", ")»)
 		«ENDIF»
 	'''
 	
+	def formatParameters(EList<Param> params, EList<Arg> args) {
+		val paramList = new ArrayList<CharSequence>
+		if(params.size != 0) {
+			for (i : 0..params.size-1) {
+				paramList.add(printParameter(args.get(i), params.get(i).variable.type))
+			}
+		}
+		return paramList
+	}
+	
 	def printParameter(Arg arg) {
+		printParameter(arg, (arg as ArgByVal).value.type)
+	}
+
+	def printParameter(Arg arg, Type type) {
 		if (arg.byRef)
 			'''TODO'''
 		else if ((arg as ArgByVal).value.type.string)
-			'''i8* «IF ((arg as ArgByVal).value as ExprVar)?.use.variable.local» «(arg as ArgByVal).value.doSwitch» «ENDIF» noalias getelementptr inbounds («(arg as ArgByVal).value.type.doSwitch»* «(arg as ArgByVal).value.doSwitch», i64 0, i64 0)'''
+			'''i8* «IF ((arg as ArgByVal).value as ExprVar)?.use.variable.local» «(arg as ArgByVal).value.doSwitch» «ENDIF» noalias getelementptr inbounds («type.doSwitch»* «(arg as ArgByVal).value.doSwitch», i64 0, i64 0)'''
 		else
-			'''«(arg as ArgByVal).value.type.doSwitch»«IF (arg as ArgByVal).value.type.list»*«ENDIF» «(arg as ArgByVal).value.doSwitch»'''
+			'''«type.doSwitch»«IF type.list»*«ENDIF» «(arg as ArgByVal).value.doSwitch»'''
 	}
-
+	
 	
 	def varName(Var variable, Instruction instr) {
 		val procedure = EcoreHelper::getContainerOfType(instr, typeof(Procedure))
