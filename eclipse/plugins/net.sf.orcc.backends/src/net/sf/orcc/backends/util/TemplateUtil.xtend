@@ -4,7 +4,6 @@ import java.util.List
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.util.AbstractIrVisitor
 import net.sf.orcc.ir.util.ExpressionPrinter
-import org.apache.commons.lang.WordUtils
 
 class TemplateUtil extends AbstractIrVisitor<CharSequence> {
 	
@@ -26,7 +25,7 @@ class TemplateUtil extends AbstractIrVisitor<CharSequence> {
 	 * Split the string into lines with a max of n characters
 	 */
 	def wrap(CharSequence charSeq, int n) {
-		WordUtils::wrap(charSeq.toString, n)
+		// WordUtils::wrap(charSeq.toString, n)
 	}
 	
 	def wrap(CharSequence charSeq) {
