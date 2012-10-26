@@ -67,6 +67,8 @@ class LLVMTemplate extends TemplateUtil {
 	override caseExpression(Expression expr) {
 		if (expr.exprVar) 
 			return (expr as ExprVar).use.variable.print
+		if (expr.exprString) 
+			return '''c«exprPrinter.doSwitch(expr)»'''
 		else 
 			return exprPrinter.doSwitch(expr)
 	}
