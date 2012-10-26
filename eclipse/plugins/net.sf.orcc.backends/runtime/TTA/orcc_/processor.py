@@ -138,15 +138,23 @@ class Processor:
             shutil.move(self.id + "_data" + ".coe", cgPath)
             shutil.move(self.id + ".coe", cgPath)
             self.generateCgFiles(libPath, cgPath)
-            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeRomFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
-            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeRamFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
+            
+            if debug:
+				retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeRomFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
+				retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeRamFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
+            else:
+				retcode = subprocess.call(["coregen", "-intstyle", "silent", "-b", os.path.join(cgPath, self._xoeRomFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
+				retcode = subprocess.call(["coregen", "-intstyle", "silent", "-b", os.path.join(cgPath, self._xoeRamFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
+				
             shutil.copy(os.path.join(cgPath, self._ngcRomFile), vhdlPath)
             shutil.copy(os.path.join(cgPath, self._ngcRamFile), vhdlPath)
             shutil.copy(os.path.join(cgPath, self._mifRomFile), vhdlPath)
             shutil.copy(os.path.join(cgPath, self._mifRamFile), vhdlPath)
             shutil.copy(os.path.join(cgPath, self._vhdRomFile), vhdlPath)
             shutil.copy(os.path.join(cgPath, self._vhdRamFile), vhdlPath)
-            #shutil.rmtree(cgPath, ignore_errors=True)
+            
+            if not debug:
+				shutil.rmtree(cgPath, ignore_errors=True)
         
         # Copy files to build directory
         if targetAltera:
@@ -217,9 +225,9 @@ class Processor:
         template = tempita.Template.from_filename(os.path.join(templatePath, "cg_project.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath)
         open(os.path.join(genPath, "cg_project.cgp"), "w").write(result)
-        template = tempita.Template.from_filename(os.path.join(templatePath, "xco_dram.template"), namespace={}, encoding=None)
+        template = tempita.Template.from_filename(os.path.join(templatePath, "xco_ram_1p.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath, id=self.id, width=self.dram.getWidth(), depth=self.dram.getDepth())
         open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
-        template = tempita.Template.from_filename(os.path.join(templatePath, "xco_irom.template"), namespace={}, encoding=None)
+        template = tempita.Template.from_filename(os.path.join(templatePath, "xco_rom.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath, id=self.id, width=self.irom.getWidth(), depth=self.irom.getDepth())
         open(os.path.join(genPath, self._xoeRomFile), "w").write(result)
