@@ -53,7 +53,7 @@ import org.eclipse.emf.ecore.resource.Resource;
  */
 public class DefaultEntityResolverImpl implements EntityResolver {
 
-	private IFile file;
+	protected IFile file;
 
 	protected IProject project;
 

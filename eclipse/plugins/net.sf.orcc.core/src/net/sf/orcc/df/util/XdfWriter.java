@@ -64,7 +64,6 @@ import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.DomUtil;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
@@ -422,9 +421,9 @@ public class XdfWriter {
 
 		if (port == null) {
 			vertexAttr = "";
-			portAttr = ((Port) vertex).getName();
+			portAttr = vertex.getLabel();
 		} else {
-			vertexAttr = EcoreHelper.getFeature(vertex, "name");
+			vertexAttr = vertex.getLabel();
 			portAttr = port.getName();
 		}
 
