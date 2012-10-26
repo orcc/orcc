@@ -280,15 +280,6 @@ public interface DfPackage extends EPackage {
 	int PORT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -307,6 +298,15 @@ public interface DfPackage extends EPackage {
 	int PORT__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -314,6 +314,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int PORT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__CONNECTING = GraphPackage.VERTEX__CONNECTING;
 
 	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
@@ -332,6 +341,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int PORT__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__NEIGHBORS = GraphPackage.VERTEX__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -385,15 +403,6 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -412,6 +421,15 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -419,6 +437,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int INSTANCE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__CONNECTING = GraphPackage.VERTEX__CONNECTING;
 
 	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
@@ -437,6 +464,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int INSTANCE__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__NEIGHBORS = GraphPackage.VERTEX__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Arguments</b></em>' containment reference list.
@@ -564,15 +600,6 @@ public interface DfPackage extends EPackage {
 	int ACTOR__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -591,6 +618,15 @@ public interface DfPackage extends EPackage {
 	int ACTOR__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -598,6 +634,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ACTOR__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__CONNECTING = GraphPackage.VERTEX__CONNECTING;
 
 	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
@@ -616,6 +661,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ACTOR__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__NEIGHBORS = GraphPackage.VERTEX__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
@@ -762,15 +816,6 @@ public interface DfPackage extends EPackage {
 	int NETWORK__ATTRIBUTES = GraphPackage.GRAPH__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__INCOMING = GraphPackage.GRAPH__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -789,6 +834,15 @@ public interface DfPackage extends EPackage {
 	int NETWORK__NUMBER = GraphPackage.GRAPH__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__INCOMING = GraphPackage.GRAPH__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -796,6 +850,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int NETWORK__OUTGOING = GraphPackage.GRAPH__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__CONNECTING = GraphPackage.GRAPH__CONNECTING;
 
 	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
@@ -814,6 +877,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int NETWORK__SUCCESSORS = GraphPackage.GRAPH__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__NEIGHBORS = GraphPackage.GRAPH__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
@@ -1058,15 +1130,6 @@ public interface DfPackage extends EPackage {
 	int FSM__ATTRIBUTES = GraphPackage.GRAPH__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FSM__INCOMING = GraphPackage.GRAPH__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1085,6 +1148,15 @@ public interface DfPackage extends EPackage {
 	int FSM__NUMBER = GraphPackage.GRAPH__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__INCOMING = GraphPackage.GRAPH__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1092,6 +1164,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int FSM__OUTGOING = GraphPackage.GRAPH__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__CONNECTING = GraphPackage.GRAPH__CONNECTING;
 
 	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
@@ -1110,6 +1191,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int FSM__SUCCESSORS = GraphPackage.GRAPH__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__NEIGHBORS = GraphPackage.GRAPH__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
@@ -1209,15 +1299,6 @@ public interface DfPackage extends EPackage {
 	int STATE__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int STATE__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1236,6 +1317,15 @@ public interface DfPackage extends EPackage {
 	int STATE__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -1243,6 +1333,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int STATE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__CONNECTING = GraphPackage.VERTEX__CONNECTING;
 
 	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
@@ -1261,6 +1360,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int STATE__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__NEIGHBORS = GraphPackage.VERTEX__NEIGHBORS;
 
 	/**
 	 * The number of structural features of the '<em>State</em>' class. <!--

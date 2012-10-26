@@ -2720,15 +2720,6 @@ public interface IrPackage extends EPackage {
 	int CFG__ATTRIBUTES = GraphPackage.GRAPH__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int CFG__INCOMING = GraphPackage.GRAPH__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2747,6 +2738,15 @@ public interface IrPackage extends EPackage {
 	int CFG__NUMBER = GraphPackage.GRAPH__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__INCOMING = GraphPackage.GRAPH__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2754,6 +2754,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int CFG__OUTGOING = GraphPackage.GRAPH__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__CONNECTING = GraphPackage.GRAPH__CONNECTING;
 
 	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
@@ -2772,6 +2781,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int CFG__SUCCESSORS = GraphPackage.GRAPH__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__NEIGHBORS = GraphPackage.GRAPH__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
@@ -2838,15 +2856,6 @@ public interface IrPackage extends EPackage {
 	int CFG_NODE__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int CFG_NODE__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2865,6 +2874,15 @@ public interface IrPackage extends EPackage {
 	int CFG_NODE__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2872,6 +2890,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int CFG_NODE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__CONNECTING = GraphPackage.VERTEX__CONNECTING;
 
 	/**
 	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
@@ -2890,6 +2917,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int CFG_NODE__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__NEIGHBORS = GraphPackage.VERTEX__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Node</b></em>' reference.

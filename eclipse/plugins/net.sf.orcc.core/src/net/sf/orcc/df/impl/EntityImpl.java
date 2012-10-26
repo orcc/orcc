@@ -344,6 +344,18 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T getAdapter(Class<T> type) {
+		if (type.isAssignableFrom(getClass())) {
+			return (T) this;
+		}
+
+		// by default an entity cannot be adapted to anything else
+		// subclasses should extend this method
+		return null;
+	}
+
+	@Override
 	public Map<Port, Connection> getIncomingPortMap() {
 		if (incomingPortMap == null) {
 			computeIncomingPortMap();
@@ -372,7 +384,7 @@ public class EntityImpl extends AttributableImpl implements Entity {
 		}
 		return inputs;
 	}
-	
+
 	@Override
 	public String getName() {
 		if (vertex == null) {

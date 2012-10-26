@@ -132,6 +132,8 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseAttributable(entity);
 			if (result == null)
+				result = caseAdaptable(entity);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
