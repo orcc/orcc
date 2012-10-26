@@ -28,6 +28,7 @@
  */
  package net.sf.orcc.backends.llvm.aot
 
+import java.util.ArrayList
 import java.util.HashMap
 import java.util.Map
 import net.sf.orcc.backends.ir.InstCast
@@ -39,7 +40,6 @@ import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
-import net.sf.orcc.graph.Edge
 import net.sf.orcc.ir.Arg
 import net.sf.orcc.ir.ArgByVal
 import net.sf.orcc.ir.Block
@@ -58,13 +58,12 @@ import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Instruction
 import net.sf.orcc.ir.Param
 import net.sf.orcc.ir.Procedure
+import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
-import java.util.ArrayList
-import net.sf.orcc.ir.Type
 
 /*
  * Compile Instance llvm source code
@@ -278,62 +277,49 @@ class InstancePrinter extends LLVMTemplate {
 			«IF ! instance.actor.actionsOutsideFsm.empty»
 				call void @«instance.name»_outside_FSM_scheduler()
 			«ENDIF»
-		«schedulingStates(state, state.outgoing)»
-	'''
-	
-	def schedulingStates(State state, EList<Edge> outgoing) '''
-		«state.actionTestState(outgoing)»
-	'''
-	
-	// TODO : replace recursive calls by loop
-	def actionTestState(State sourceState, Iterable<Edge> outgoing) {
-		val transition = outgoing.head as Transition
-		'''
+		«FOR transition : state.outgoing.filter(typeof(Transition))»
 				; ACTION «transition.action.name»
 				«IF ! transition.action.inputPattern.empty»
 					;; Input pattern
-					«checkInputPattern(transition.action, transition.action.inputPattern, sourceState)»
-					%is_schedulable_«sourceState.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
-					%is_fireable_«sourceState.name»_«transition.action.name» = and i1 %is_schedulable_«sourceState.name»_«transition.action.name», %has_valid_inputs_«sourceState.name»_«transition.action.name»_«transition.action.inputPattern.ports.size»
+					«checkInputPattern(transition.action, transition.action.inputPattern, state)»
+					%is_schedulable_«state.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
+					%is_fireable_«state.name»_«transition.action.name» = and i1 %is_schedulable_«state.name»_«transition.action.name», %has_valid_inputs_«state.name»_«transition.action.name»_«transition.action.inputPattern.ports.size»
 					
-					br i1 %is_fireable_«sourceState.name»_«transition.action.name», label %bb_«sourceState.name»_«transition.action.name»_check_outputs, label %bb_«sourceState.name»_«transition.action.name»_unschedulable
+					br i1 %is_fireable_«state.name»_«transition.action.name», label %bb_«state.name»_«transition.action.name»_check_outputs, label %bb_«state.name»_«transition.action.name»_unschedulable
 				«ELSE»
 					;; Empty input pattern
-					%is_fireable_«sourceState.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
+					%is_fireable_«state.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
 					
-					br i1 %is_fireable_«sourceState.name»_«transition.action.name», label %bb_«sourceState.name»_«transition.action.name»_check_outputs, label %bb_«sourceState.name»_«transition.action.name»_unschedulable
+					br i1 %is_fireable_«state.name»_«transition.action.name», label %bb_«state.name»_«transition.action.name»_check_outputs, label %bb_«state.name»_«transition.action.name»_unschedulable
 				«ENDIF»
 			
 			
-			bb_«sourceState.name»_«transition.action.name»_check_outputs:
+			bb_«state.name»_«transition.action.name»_check_outputs:
 				«IF ! transition.action.outputPattern.empty»
 					;; Output pattern
-					«checkOutputPattern(transition.action, transition.action.outputPattern, sourceState)»
+					«checkOutputPattern(transition.action, transition.action.outputPattern, state)»
 					
-					br i1 %has_valid_outputs_«sourceState.name»_«transition.action.name»_«transition.action.outputPattern.ports.size», label %bb_«sourceState.name»_«transition.action.name»_fire, label %bb_«sourceState.name»_finished
+					br i1 %has_valid_outputs_«state.name»_«transition.action.name»_«transition.action.outputPattern.ports.size», label %bb_«state.name»_«transition.action.name»_fire, label %bb_«state.name»_finished
 				«ELSE»
 					;; Empty output pattern
 					
-					br label %bb_«sourceState.name»_«transition.action.name»_fire
+					br label %bb_«state.name»_«transition.action.name»_fire
 				«ENDIF»
 			
-			bb_«sourceState.name»_«transition.action.name»_fire:
+			bb_«state.name»_«transition.action.name»_fire:
 				call void @«transition.action.body.name» ()
 				
 				br label %bb_s_«transition.target.name»
-			bb_«sourceState.name»_«transition.action.name»_unschedulable:
-				«IF outgoing.tail.size > 0»
-					«actionTestState(sourceState, outgoing.tail)»
-				«ELSE»
-					br label %bb_«sourceState.name»_finished
-				«ENDIF»
-			«IF outgoing.tail.size <= 0»
-				bb_«sourceState.name»_finished:
-					store i32 «stateToLabel.get(sourceState)», i32* @_FSM_state
-					br label %bb_waiting
-			«ENDIF»
+			bb_«state.name»_«transition.action.name»_unschedulable:
+			
+		«ENDFOR»
+			br label %bb_«state.name»_finished
+		
+		bb_«state.name»_finished:
+			store i32 «stateToLabel.get(state)», i32* @_FSM_state
+			br label %bb_waiting
+		
 		'''
-	}
 
 	def schedulerWithoutFSM() '''
 		define void @«instance.name»_scheduler() « IF optionProfile»noinline «ENDIF»nounwind {
