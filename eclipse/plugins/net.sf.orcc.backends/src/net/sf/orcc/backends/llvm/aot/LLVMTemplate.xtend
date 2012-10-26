@@ -83,8 +83,7 @@ class LLVMTemplate extends TemplateUtil {
 		
 		val list = '''[«exprList.value.join(", ", ['''«currentType.doSwitch» «it.doSwitch»'''])»]'''
 		currentType = prevType
-		//return list.wrap
-		return list
+		return list.wrap
 	}
 	
 	/******************************************

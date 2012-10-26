@@ -12,7 +12,8 @@ Require-Bundle: org.apache.commons.cli;bundle-version="1.2.0",
  net.sf.orcc.models;bundle-version="1.2.1",
  org.stringtemplate;bundle-version="4.0.5",
  com.google.guava,
- org.eclipse.xtext.xbase.lib
+ org.eclipse.xtext.xbase.lib,
+ org.apache.commons.lang;bundle-version="2.6.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
