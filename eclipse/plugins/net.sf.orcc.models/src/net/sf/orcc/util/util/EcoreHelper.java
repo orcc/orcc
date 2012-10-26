@@ -41,7 +41,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.common.util.WrappedException;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -276,8 +275,7 @@ public class EcoreHelper {
 		URI uri = URI.createPlatformResourceURI(pathName, true);
 		try {
 			return set.getResource(uri, true);
-		} catch (WrappedException e) {
-			e.printStackTrace();
+		} catch (RuntimeException e) {
 		}
 		return null;
 	}
