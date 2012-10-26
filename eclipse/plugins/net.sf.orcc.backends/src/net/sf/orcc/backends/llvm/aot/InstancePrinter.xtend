@@ -340,64 +340,57 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	'''
 	
-	// TODO : replace this recursive method by a loop,simpler to read and maintain
 	def printActionLoop(EList<Action> actions, boolean outsideFSM) '''
-		«actionTest(actions.head, actions.tail, outsideFSM)»
-	'''
-	
-	def actionTest(Action action, Iterable<Action> restActions, boolean outsideFSM) '''
-			; ACTION «action.name»
-		«IF ! action.inputPattern.empty»
-			;; Input pattern
-			«checkInputPattern(action, action.inputPattern)»
-			%is_schedulable_«action.name» = call i1 @«action.scheduler.name» ()
-			%is_fireable_«action.name» = and i1 %is_schedulable_«action.name», %has_valid_inputs_«action.name»_«action.inputPattern.ports.size»
+		«FOR action : actions»
+				; ACTION «action.name»
+				«IF ! action.inputPattern.empty»
+					;; Input pattern
+					«checkInputPattern(action, action.inputPattern)»
+					%is_schedulable_«action.name» = call i1 @«action.scheduler.name» ()
+					%is_fireable_«action.name» = and i1 %is_schedulable_«action.name», %has_valid_inputs_«action.name»_«action.inputPattern.ports.size»
+					
+					br i1 %is_fireable_«action.name», label %bb_«action.name»_check_outputs, label %bb_«action.name»_unschedulable
+				«ELSE»
+					;; Empty input pattern
+					%is_fireable_«action.name» = call i1 @«action.scheduler.name» ()
+					
+					br i1 %is_fireable_«action.name», label %bb_«action.name»_check_outputs, label %bb_«action.name»_unschedulable
+				«ENDIF»
 			
-			br i1 %is_fireable_«action.name», label %bb_«action.name»_check_outputs, label %bb_«action.name»_unschedulable
-		«ELSE»
-			;; Empty input pattern
-			%is_fireable_«action.name» = call i1 @«action.scheduler.name» ()
+			bb_«action.name»_check_outputs:
+				«IF ! action.outputPattern.empty»
+					;; Output pattern
+					«checkOutputPattern(action, action.outputPattern)»
+					
+					br i1 %has_valid_outputs_«action.name»_«action.outputPattern.ports.size», label %bb_«action.name»_fire, label %bb_finished
+				«ELSE»
+					;; Empty output pattern
+					
+					br label %bb_«action.name»_fire
+				«ENDIF»
 			
-			br i1 %is_fireable_«action.name», label %bb_«action.name»_check_outputs, label %bb_«action.name»_unschedulable
-		«ENDIF»
-		
-		
-		bb_«action.name»_check_outputs:
-		«IF ! action.outputPattern.empty»
-			;; Output pattern
-			«checkOutputPattern(action, action.outputPattern)»
+			bb_«action.name»_fire:
+				call void @«action.body.name» ()
+				
+				«IF outsideFSM»
+					br label %bb_outside_scheduler_start
+				«ELSE»
+					br label %bb_scheduler_start
+				«ENDIF»
 			
-			br i1 %has_valid_outputs_«action.name»_«action.outputPattern.ports.size», label %bb_«action.name»_fire, label %bb_finished
-		«ELSE»
-			;; Empty output pattern
-			
-			br label %bb_«action.name»_fire
-		«ENDIF»
-		
-		bb_«action.name»_fire:
-			call void @«action.body.name» ()
-		
-		«IF outsideFSM»
-			br label %bb_outside_scheduler_start
-		«ELSE»
-			br label %bb_scheduler_start
-		«ENDIF»
-		
-		bb_«action.name»_unschedulable:
-		«IF ! restActions.empty»
-			«actionTest(restActions.head, restActions.tail, outsideFSM)»
-		«ELSE»
+			bb_«action.name»_unschedulable:
+		«ENDFOR»
 			«IF outsideFSM»
 				br label %bb_outside_finished
 			«ELSE»
 				br label %bb_waiting
 			«ENDIF»
-		«ENDIF»
 	'''
 	
 	def checkInputPattern(Action action, Pattern pattern) {
 		checkInputPattern(action, pattern, null)
 	}
+	
 	def checkInputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if( state != null) '''«state.name»_''' else ""
 		val portToIndexMap = portToIndexByPatternMap.get(pattern)
