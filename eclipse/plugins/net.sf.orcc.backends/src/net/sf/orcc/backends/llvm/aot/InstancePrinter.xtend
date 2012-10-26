@@ -64,6 +64,7 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
+import java.util.List
 
 /*
  * Compile Instance llvm source code
@@ -75,10 +76,10 @@ class InstancePrinter extends LLVMTemplate {
 	
 	val Instance instance
 	
-	val Map<Expression, Expression> castedIndexes
-	val Map<Var, Var> castedList
-	val Map<State, Integer> stateToLabel
-	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap
+	val List<Expression> castedIndexes = new ArrayList<Expression>
+	val List<Var> castedList = new ArrayList<Var>
+	val Map<State, Integer> stateToLabel = new HashMap<State, Integer>
+	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
 	var optionProfile = false
 	
@@ -100,11 +101,10 @@ class InstancePrinter extends LLVMTemplate {
 		
 		this.instance = instance
 		
-		
-		castedIndexes = computeCastedIndex
-		castedList = computeCastedList
-		stateToLabel = computeStateToLabel
-		portToIndexByPatternMap = computePortToIndexByPatternMap
+		computeCastedIndex
+		computeCastedList
+		computeStateToLabel
+		computePortToIndexByPatternMap
 	}
 	
 	def getInstanceFileContent() '''
@@ -527,7 +527,7 @@ class InstancePrinter extends LLVMTemplate {
 	def label(Block block) '''b«block.cfgNode.number»'''
 	
 	def variableDeclaration(Var variable) {
-		if(variable.type.list && ! castedList.containsKey(variable)) '''%«variable.indexedName» = alloca «variable.type.doSwitch»'''
+		if(variable.type.list && ! castedList.contains(variable)) '''%«variable.indexedName» = alloca «variable.type.doSwitch»'''
 	}
 	
 	def argumentDeclaration(Param param) {
@@ -793,27 +793,24 @@ class InstancePrinter extends LLVMTemplate {
 		val procedure = EcoreHelper::getContainerOfType(instr, typeof(Procedure))
 		val accessMap = procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>
 		'''
-			«IF castedIndexes.containsKey(indexes.head)»
+			«IF castedIndexes.contains(indexes.head)»
 				%cast_index_«variable.name»_«accessMap.get(instr)» = zext «indexes.head.type.doSwitch» «indexes.head.doSwitch» to i32
 			«ENDIF»
-			%tmp_index_«variable.name»_«accessMap.get(instr)» = add i32 %local_index_«port.name», «IF castedIndexes.containsKey(indexes.head)»%cast_index_«variable.name»_«accessMap.get(instr)»«ELSE»«indexes.head.doSwitch»«ENDIF»
+			%tmp_index_«variable.name»_«accessMap.get(instr)» = add i32 %local_index_«port.name», «IF castedIndexes.contains(indexes.head)»%cast_index_«variable.name»_«accessMap.get(instr)»«ELSE»«indexes.head.doSwitch»«ENDIF»
 			%final_index_«variable.name»_«accessMap.get(instr)» = urem i32 %tmp_index_«variable.name»_«accessMap.get(instr)», %local_size_«port.name»
 			«varName(variable, instr)» = getelementptr [«connection.getFifoSize» x «port.type.doSwitch»]* @fifo_«getId(connection, port)»_content, i32 0, i32 %final_index_«variable.name»_«accessMap.get(instr)»
 		'''
 	}
 	
 	def computeCastedList() {
-		val castedList = new HashMap<Var, Var>
 		for (variable : instance.actor.eAllContents.toIterable.filter(typeof(Var))) {
 			if(variable.type.list && ! variable.defs.empty && variable.defs.head.eContainer instanceof InstCast) {
-				castedList.put(variable, variable)
+				castedList.add(variable)
 			}
 		}
-		return castedList
 	}
 
 	def computeStateToLabel() {
-		val stateToLabel = new HashMap<State, Integer>
 		if(instance.actor.hasFsm){
 			var i = 0
 			for ( state : instance.actor.fsm.states) {
@@ -821,29 +818,25 @@ class InstancePrinter extends LLVMTemplate {
 				i = i + 1
 			}
 		}
-		return stateToLabel
 	}
 	
 	def computeCastedIndex() {
-		val castedIndexes = new HashMap<Expression, Expression>
 		for (instr : instance.actor.eAllContents.toIterable.filter(typeof(Instruction))) {
 			if(instr.instLoad) {
 				val load = instr as InstLoad
 				if( ! load.indexes.empty && load.indexes.head.type.sizeInBits != 32) {
-					castedIndexes.put(load.indexes.head, load.indexes.head)
+					castedIndexes.add(load.indexes.head)
 				}
 			} else if (instr.instStore) {
 				val store = instr as InstStore
 				if( ! store.indexes.empty && store.indexes.head.type.sizeInBits != 32) {
-					castedIndexes.put(store.indexes.head, store.indexes.head)
+					castedIndexes.add(store.indexes.head)
 				}
 			}
 		}
-		return castedIndexes
 	}
 	
 	def computePortToIndexByPatternMap() {
-		val portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 		for(pattern : instance.actor.eAllContents.toIterable.filter(typeof(Pattern))) {
 			val portToIndex = new HashMap<Port, Integer>
 			var i = 1
@@ -853,6 +846,5 @@ class InstancePrinter extends LLVMTemplate {
 			}
 			portToIndexByPatternMap.put(pattern, portToIndex)
 		}
-		return portToIndexByPatternMap
 	}
 }
