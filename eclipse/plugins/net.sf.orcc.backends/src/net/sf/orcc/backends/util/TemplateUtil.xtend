@@ -19,8 +19,9 @@ class TemplateUtil extends AbstractIrVisitor<CharSequence> {
 	 * Print indexes list when accessing to an array (ex : <code>[INDEX][2][i + 1]</code>)
 	 * or when declaring it. If list is empty, return an empty string.
 	 */
-	def printArrayIndexes(List<Expression> exprList)
-		'''«FOR expr : exprList»[«expr.doSwitch»]«ENDFOR»'''
+	def printArrayIndexes(List<Expression> exprList) {
+		exprList.map['''[«doSwitch»]'''].join
+	}
 	
 	/**
 	 * Split the string into lines with a max of n characters

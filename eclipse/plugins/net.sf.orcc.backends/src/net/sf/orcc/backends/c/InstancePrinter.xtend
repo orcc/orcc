@@ -29,6 +29,7 @@
  package net.sf.orcc.backends.c
 
 import java.util.HashMap
+import java.util.LinkedList
 import java.util.List
 import java.util.Map
 import net.sf.orcc.df.Action
@@ -45,6 +46,7 @@ import net.sf.orcc.ir.ArgByVal
 import net.sf.orcc.ir.BlockBasic
 import net.sf.orcc.ir.BlockIf
 import net.sf.orcc.ir.BlockWhile
+import net.sf.orcc.ir.ExprString
 import net.sf.orcc.ir.InstAssign
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.InstLoad
@@ -55,8 +57,6 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
-import java.util.ArrayList
-import net.sf.orcc.ir.ExprString
 
 /*
  * Compile Instance c source code
@@ -77,8 +77,8 @@ class InstancePrinter extends CTemplate {
 	var boolean enableTrace = false
 	var int threadsNb = 1;
 	
-	val Pattern inputPattern
-	val Map<State, Pattern> transitionPattern
+	val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
+	val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 	
 	var Action currentAction;
 	
@@ -115,8 +115,8 @@ class InstancePrinter extends CTemplate {
 			enableTrace = options.get("enableTrace") as Boolean
 		}
 		
-		inputPattern = buildInputPattern
-		transitionPattern = buildTransitionPattern
+		buildInputPattern
+		buildTransitionPattern
 	}
 	
 	def getInstanceFileContent() '''
@@ -230,7 +230,7 @@ class InstancePrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
 		«FOR proc : instance.actor.procs»
-			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.map[variable.declare].join(", ")»);
+			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])»);
 		«ENDFOR»
 		
 		«FOR proc : instance.actor.procs.filter[!native]»
@@ -430,7 +430,7 @@ class InstancePrinter extends CTemplate {
 			}
 			
 		«ENDIF»
-		void «instance.name»_initialize(«instance.actor.inputs.map['''unsigned int fifo_«name»_id'''].join(", ")») {
+		void «instance.name»_initialize(«instance.actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])») {
 			«IF ! instance.actor.initializes.empty»
 				struct schedinfo_s si;
 				si.num_firings = 0;
@@ -616,7 +616,7 @@ class InstancePrinter extends CTemplate {
 	
 	def print(Procedure proc) '''
 		«proc.printAttributes»
-		static «proc.returnType.doSwitch» «proc.name»(«proc.parameters.map[variable.declare].join(", ")») {
+		static «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])») {
 			«FOR variable : proc.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -775,7 +775,7 @@ class InstancePrinter extends CTemplate {
 		«IF call.print»
 			printf(«call.parameters.printfArgs.join(", ")»);
 		«ELSE»
-			«IF call.target != null»«call.target.variable.indexedName» = «ENDIF»«call.procedure.name»(«call.parameters.map[printCallArg].join(", ")»);
+			«IF call.target != null»«call.target.variable.indexedName» = «ENDIF»«call.procedure.name»(«call.parameters.join(", ", [printCallArg])»);
 		«ENDIF»
 	'''
 	
@@ -809,7 +809,7 @@ class InstancePrinter extends CTemplate {
 	}	
 	
 	def printfArgs(List<Arg> args) {
-		val finalArgs = new ArrayList<CharSequence>
+		val finalArgs = new LinkedList<CharSequence>
 
 		val printfPattern = new StringBuilder
 		printfPattern.append('"')
@@ -828,7 +828,7 @@ class InstancePrinter extends CTemplate {
 			
 		}
 		printfPattern.append('"')
-		finalArgs.add(0, printfPattern.toString)
+		finalArgs.addFirst(printfPattern.toString)
 		return finalArgs
 	}
 	
@@ -838,57 +838,47 @@ class InstancePrinter extends CTemplate {
 	 *
 	 *****************************************/		
 	def buildInputPattern() {
-		val pattern = DfFactory::eINSTANCE.createPattern
-		
 		for (action : instance.actor.actionsOutsideFsm) {
 			val actionPattern = action.inputPattern
 			for (port : actionPattern.ports) {
-				var numTokens = pattern.getNumTokens(port);
+				var numTokens = inputPattern.getNumTokens(port);
 				if (numTokens == null) {
 					numTokens = actionPattern.getNumTokens(port);
 				} else {
 					numTokens = Math::max(numTokens, actionPattern.getNumTokens(port));
 				}
 
-				pattern.setNumTokens(port, numTokens);
+				inputPattern.setNumTokens(port, numTokens);
 			}
 		}
-		
-		return pattern
 	}
 	
-	def buildTransitionPattern() {
-		
-		val transitionPattern = new HashMap<State, Pattern>
-		
+	def buildTransitionPattern() {		
 		val fsm = instance.actor.getFsm()
-		if (fsm == null) {
-			return null;
-		}
-
-		for (state : fsm.getStates()) {
-			val pattern = DfFactory::eINSTANCE.createPattern()
-			
-			for (edge : state.getOutgoing()) { 
-				val actionPattern = (edge as Transition).getAction.getInputPattern()
+		
+		if (fsm != null) {
+			for (state : fsm.getStates()) {
+				val pattern = DfFactory::eINSTANCE.createPattern()
 				
-				for (Port port : actionPattern.getPorts()) {
+				for (edge : state.getOutgoing()) { 
+					val actionPattern = (edge as Transition).getAction.getInputPattern()
 					
-					var numTokens = pattern.getNumTokens(port)
-					
-					if (numTokens == null) {
-						numTokens = actionPattern.getNumTokens(port)
-					} else {
-						numTokens = Math::max(numTokens, actionPattern.getNumTokens(port))
+					for (Port port : actionPattern.getPorts()) {
+						
+						var numTokens = pattern.getNumTokens(port)
+						
+						if (numTokens == null) {
+							numTokens = actionPattern.getNumTokens(port)
+						} else {
+							numTokens = Math::max(numTokens, actionPattern.getNumTokens(port))
+						}
+	
+						pattern.setNumTokens(port, numTokens)
 					}
-
-					pattern.setNumTokens(port, numTokens)
 				}
+				transitionPattern.put(state, pattern)
 			}
-
-			transitionPattern.put(state, pattern)
 		}
-		return transitionPattern
 	}
 
 }
