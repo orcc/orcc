@@ -326,13 +326,14 @@ class InstancePrinter extends LLVMTemplate {
 					«actionTestState(sourceState, outgoing.tail)»
 				«ELSE»
 					br label %bb_«sourceState.name»_finished
-			bb_«sourceState.name»_finished:
+				«ENDIF»
+			«IF outgoing.tail.size <= 0»
+				bb_«sourceState.name»_finished:
 					store i32 «stateToLabel.get(sourceState)», i32* @_FSM_state
 					br label %bb_waiting
-				«ENDIF»
+			«ENDIF»
 		'''
 	}
-	
 
 	def schedulerWithoutFSM() '''
 		define void @«instance.name»_scheduler() « IF optionProfile»noinline «ENDIF»nounwind {
