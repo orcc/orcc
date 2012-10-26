@@ -106,12 +106,11 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) {
-		actorTransfos.add(new UnitImporter());
-		actorTransfos.add(new DfVisitor<Void>(new Inliner(true, true)));
-		actorTransfos.add(new RenameTransformation(this.transformations));
-		actorTransfos.add(new DfVisitor<Object>(new PhiRemoval()));
-
-		for (DfSwitch<?> transformation : actorTransfos) {
+		DfSwitch<?>[] transformations = { new UnitImporter(),
+				new DfVisitor<Void>(new Inliner(true, true)),
+				new RenameTransformation(this.transformations),
+				new DfVisitor<Object>(new PhiRemoval()) };
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
 	}

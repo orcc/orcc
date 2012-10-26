@@ -31,6 +31,7 @@ package net.sf.orcc.backends.llvm.aot;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,27 +146,28 @@ public class LLVMBackendImpl extends AbstractBackend {
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 
-		networkTransfos.add(new BroadcastAdder());
-		networkTransfos.add(new UnitImporter());
-		networkTransfos.add(new TypeResizer(true, true, false));
-		networkTransfos.add(new DfVisitor<Void>(new SSATransformation()));
-		networkTransfos.add(new DeadGlobalElimination());
-		networkTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
-		networkTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-		networkTransfos.add(new StringTransformation());
-		networkTransfos.add(new RenameTransformation(this.renameMap));
-		networkTransfos.add(new DfVisitor<Expression>(new TacTransformation()));
-		networkTransfos.add(new DfVisitor<Void>(new CopyPropagator()));
-		networkTransfos.add(new DfVisitor<Void>(new ConstantPropagator()));
-		networkTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
-		networkTransfos.add(new DfVisitor<Expression>(
+		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
+		transformations.add(new BroadcastAdder());
+		transformations.add(new UnitImporter());
+		transformations.add(new TypeResizer(true, true, false));
+		transformations.add(new DfVisitor<Void>(new SSATransformation()));
+		transformations.add(new DeadGlobalElimination());
+		transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+		transformations.add(new StringTransformation());
+		transformations.add(new RenameTransformation(this.renameMap));
+		transformations.add(new DfVisitor<Expression>(new TacTransformation()));
+		transformations.add(new DfVisitor<Void>(new CopyPropagator()));
+		transformations.add(new DfVisitor<Void>(new ConstantPropagator()));
+		transformations.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		transformations.add(new DfVisitor<Expression>(
 				new CastAdder(false, true)));
-		networkTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-		networkTransfos.add(new DfVisitor<Void>(new BlockCombine()));
-		networkTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
-		networkTransfos.add(new DfVisitor<Void>(new ListInitializer()));
+		transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		transformations.add(new DfVisitor<Void>(new BlockCombine()));
+		transformations.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		transformations.add(new DfVisitor<Void>(new ListInitializer()));
 
-		for (DfSwitch<?> transfo : networkTransfos) {
+		for (DfSwitch<?> transfo : transformations) {
 			transfo.doSwitch(network);
 			if (debug) {
 				ResourceSet set = new ResourceSetImpl();

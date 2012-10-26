@@ -31,6 +31,7 @@ package net.sf.orcc.backends.java;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,10 +89,11 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) {
-		actorTransfos.add(new UnitImporter());
-		actorTransfos.add(new RenameTransformation(replacementMap));
+		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
+		transformations.add(new UnitImporter());
+		transformations.add(new RenameTransformation(replacementMap));
 
-		for (DfSwitch<?> transformation : actorTransfos) {
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
 	}

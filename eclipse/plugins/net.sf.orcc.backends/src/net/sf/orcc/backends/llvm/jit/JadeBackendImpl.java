@@ -107,7 +107,7 @@ public class JadeBackendImpl extends AbstractBackend {
 	 */
 	private Map<String, List<Instance>> targetToInstancesMap;
 
-	private final Map<String, String> renameMap;
+	private final Map<String, String> transformations;
 	private StandardPrinter printer;
 
 	/**
@@ -115,13 +115,13 @@ public class JadeBackendImpl extends AbstractBackend {
 	 * transformation hash map.
 	 */
 	public JadeBackendImpl() {
-		renameMap = new HashMap<String, String>();
-		renameMap.put("abs", "abs_");
-		renameMap.put("getw", "getw_");
-		renameMap.put("index", "index_");
-		renameMap.put("min", "min_");
-		renameMap.put("max", "max_");
-		renameMap.put("select", "select_");
+		transformations = new HashMap<String, String>();
+		transformations.put("abs", "abs_");
+		transformations.put("getw", "getw_");
+		transformations.put("index", "index_");
+		transformations.put("min", "min_");
+		transformations.put("max", "max_");
+		transformations.put("select", "select_");
 	}
 
 	@Override
@@ -149,23 +149,23 @@ public class JadeBackendImpl extends AbstractBackend {
 			new TypeResizer(true, false, false).doSwitch(actor);
 		}
 
-		actorTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
-		actorTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-		actorTransfos.add(new StringTransformation());
-		actorTransfos.add(new RenameTransformation(this.renameMap));
-		actorTransfos.add(new DfVisitor<Expression>(new TacTransformation()));
-		actorTransfos.add(new DfVisitor<Void>(new CopyPropagator()));
-		actorTransfos.add(new DfVisitor<Void>(new ConstantPropagator()));
-		actorTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
-		actorTransfos
-				.add(new DfVisitor<Expression>(new CastAdder(false, true)));
-		actorTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-		actorTransfos.add(new DfVisitor<Void>(new BlockCombine()));
-		actorTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
-		actorTransfos.add(new DfVisitor<Void>(new ListInitializer()));
-		actorTransfos.add(new DfVisitor<Void>(new TemplateInfoComputing()));
+		DfSwitch<?>[] transformations = {
+				new DfVisitor<Void>(new DeadCodeElimination()),
+				new DfVisitor<Void>(new DeadVariableRemoval()),
+				new StringTransformation(),
+				new RenameTransformation(this.transformations),
+				new DfVisitor<Expression>(new TacTransformation()),
+				new DfVisitor<Void>(new CopyPropagator()),
+				new DfVisitor<Void>(new ConstantPropagator()),
+				new DfVisitor<Void>(new InstPhiTransformation()),
+				new DfVisitor<Expression>(new CastAdder(false, true)),
+				new DfVisitor<Void>(new EmptyBlockRemover()),
+				new DfVisitor<Void>(new BlockCombine()),
+				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
+				new DfVisitor<Void>(new ListInitializer()),
+				new DfVisitor<Void>(new TemplateInfoComputing()) };
 
-		for (DfSwitch<?> transformation : actorTransfos) {
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
 
