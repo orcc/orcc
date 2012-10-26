@@ -43,6 +43,7 @@ import net.sf.orcc.ir.util.TypePrinter;
  * @author Jerome GORIN
  * 
  */
+@Deprecated
 public class LLVMTypePrinter extends TypePrinter {
 
 	@Override

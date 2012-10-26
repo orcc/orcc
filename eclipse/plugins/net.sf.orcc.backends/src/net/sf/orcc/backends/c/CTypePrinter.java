@@ -42,6 +42,7 @@ import net.sf.orcc.ir.util.TypePrinter;
  * @author Matthieu Wipliez
  * 
  */
+@Deprecated
 public class CTypePrinter extends TypePrinter {
 
 	@Override
