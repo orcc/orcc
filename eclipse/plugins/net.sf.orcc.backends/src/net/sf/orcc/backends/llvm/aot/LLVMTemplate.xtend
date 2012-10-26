@@ -31,7 +31,10 @@ package net.sf.orcc.backends.llvm.aot
 import net.sf.orcc.backends.util.TemplateUtil
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Port
+import net.sf.orcc.ir.ExprList
+import net.sf.orcc.ir.ExprVar
 import net.sf.orcc.ir.Expression
+import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
 import net.sf.orcc.ir.TypeInt
@@ -40,9 +43,6 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
-import net.sf.orcc.ir.ExprList
-import net.sf.orcc.ir.ExprVar
-import net.sf.orcc.util.util.EcoreHelper
 
 /*
  * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
@@ -51,6 +51,8 @@ import net.sf.orcc.util.util.EcoreHelper
  * 
  */
 class LLVMTemplate extends TemplateUtil {
+	
+	var Type currentType = null
 	
 	new(){
 		super()
@@ -63,16 +65,24 @@ class LLVMTemplate extends TemplateUtil {
 	 *
 	 *****************************************/
 	override caseExpression(Expression expr) {
-		if (expr.exprVar)
-			(expr as ExprVar).use.variable.print
-		else if (expr.exprList)
-			(expr as ExprList).doSwitch
-		else
-			exprPrinter.doSwitch(expr)
+		if (expr.exprVar) 
+			return (expr as ExprVar).use.variable.print
+		else 
+			return exprPrinter.doSwitch(expr)
 	}
 		
 	override caseExprList(ExprList exprList) {
-		val list = '''[«exprList.value.join(", ", ['''«IF it.type.list»«it.type.doSwitch»«ELSE»«(EcoreHelper::getContainerOfType(exprList, typeof(Var)).type as TypeList).innermostType.doSwitch» «it.doSwitch»«ENDIF»'''])»]'''
+		val prevType = currentType
+		
+		currentType = 
+			if (exprList.eContainer instanceof Var) 
+				((exprList.eContainer as Var).type as TypeList).type
+			else
+				(currentType as TypeList).type
+
+		
+		val list = '''[«exprList.value.join(", ", ['''«currentType.doSwitch» «it.doSwitch»'''])»]'''
+		currentType = prevType
 		//return list.wrap
 		return list
 	}

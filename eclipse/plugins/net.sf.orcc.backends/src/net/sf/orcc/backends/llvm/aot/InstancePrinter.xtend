@@ -264,7 +264,8 @@ class InstancePrinter extends LLVMTemplate {
 	def printFsmSwitch(FSM fsm) '''
 		%local_FSM_state = load i32* @_FSM_state
 		switch i32 %local_FSM_state, label %default [
-			«fsm.states.map[printFsmState].join» ]
+			«fsm.states.map[printFsmState].join»
+		]
 	'''
 	
 	def printFsmState(State state) '''
@@ -796,8 +797,8 @@ class InstancePrinter extends LLVMTemplate {
 	def printParameter(Arg arg, Type type) {
 		if (arg.byRef)
 			'''TODO'''
-		else if ((arg as ArgByVal).value.type.string)
-			'''i8* «IF ((arg as ArgByVal).value as ExprVar)?.use.variable.local» «(arg as ArgByVal).value.doSwitch» «ENDIF» noalias getelementptr inbounds («type.doSwitch»* «(arg as ArgByVal).value.doSwitch», i64 0, i64 0)'''
+		else if (type.string)
+			'''i8* «IF ((arg as ArgByVal).value as ExprVar)?.use.variable.local» «(arg as ArgByVal).value.doSwitch» «ELSE» noalias getelementptr inbounds («(arg as ArgByVal).value.type.doSwitch»* «(arg as ArgByVal).value.doSwitch», i64 0, i64 0)«ENDIF»'''
 		else
 			'''«type.doSwitch»«IF type.list»*«ENDIF» «(arg as ArgByVal).value.doSwitch»'''
 	}
