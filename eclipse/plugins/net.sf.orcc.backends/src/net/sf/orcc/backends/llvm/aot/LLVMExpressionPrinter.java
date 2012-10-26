@@ -33,6 +33,7 @@ import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -229,6 +230,11 @@ public class LLVMExpressionPrinter extends ExpressionPrinter {
 	@Override
 	public String caseExprVar(ExprVar expr) {
 		return expr.getUse().getVariable().getIndexedName();
+	}
+
+	@Override
+	public String caseExprString(ExprString expr) {
+		return "c" + super.caseExprString(expr);
 	}
 
 }

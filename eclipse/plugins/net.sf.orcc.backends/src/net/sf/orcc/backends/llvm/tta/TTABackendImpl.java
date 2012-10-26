@@ -165,7 +165,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				new DfVisitor<Void>(new PrintRemoval()),
 				new DfVisitor<Void>(new SSATransformation()),
 				new StringTransformation(),
-				new RenameTransformation(this.transformations),
+				new RenameTransformation(this.renameMap),
 				new DfVisitor<Expression>(new TacTransformation()),
 				new DfVisitor<Void>(new CopyPropagator()),
 				new DfVisitor<Void>(new ConstantPropagator()),

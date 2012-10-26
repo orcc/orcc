@@ -31,15 +31,15 @@ package net.sf.orcc.backends.llvm.aot;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.StandardPrinter;
+import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
-import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
@@ -80,26 +80,33 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class LLVMBackendImpl extends AbstractBackend {
 
-	protected StandardPrinter printer;
+	protected LLVMPrinter xtendPrinter;
+
 	/**
 	 * Path to target "src" folder
 	 */
 	private String srcPath;
+	/**
+	 * Path to target "lib" folder
+	 */
+	private String libPath;
 
-	protected final Map<String, String> transformations;
+	protected final Map<String, String> renameMap;
 
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
 	 * transformation hash map.
 	 */
 	public LLVMBackendImpl() {
-		transformations = new HashMap<String, String>();
-		transformations.put("abs", "abs_");
-		transformations.put("getw", "getw_");
-		transformations.put("index", "index_");
-		transformations.put("min", "min_");
-		transformations.put("max", "max_");
-		transformations.put("select", "select_");
+		renameMap = new HashMap<String, String>();
+		renameMap.put("abs", "abs_");
+		renameMap.put("getw", "getw_");
+		renameMap.put("index", "index_");
+		renameMap.put("min", "min_");
+		renameMap.put("max", "max_");
+		renameMap.put("select", "select_");
+
+		xtendPrinter = new LLVMPrinter(false);
 	}
 
 	@Override
@@ -122,6 +129,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// Set src directory as path
 		srcPath = srcDir.getAbsolutePath();
+		libPath = path + File.separator + "libs";
 	}
 
 	@Override
@@ -137,23 +145,26 @@ public class LLVMBackendImpl extends AbstractBackend {
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 
-		DfSwitch<?>[] transformations = { new BroadcastAdder(),
-				new UnitImporter(), new TypeResizer(true, true, false),
-				new DfVisitor<Void>(new SSATransformation()),
-				new DeadGlobalElimination(),
-				new DfVisitor<Void>(new DeadCodeElimination()),
-				new DfVisitor<Void>(new DeadVariableRemoval()),
-				new StringTransformation(),
-				new RenameTransformation(this.transformations),
-				new DfVisitor<Expression>(new TacTransformation()),
-				new DfVisitor<Void>(new CopyPropagator()),
-				new DfVisitor<Void>(new ConstantPropagator()),
-				new DfVisitor<Void>(new InstPhiTransformation()),
-				new DfVisitor<Expression>(new CastAdder(false, true)),
-				new DfVisitor<Void>(new EmptyBlockRemover()),
-				new DfVisitor<Void>(new BlockCombine()),
-				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
-				new DfVisitor<Void>(new ListInitializer()), };
+		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
+		transformations.add(new BroadcastAdder());
+		transformations.add(new UnitImporter());
+		transformations.add(new TypeResizer(true, true, false));
+		transformations.add(new DfVisitor<Void>(new SSATransformation()));
+		transformations.add(new DeadGlobalElimination());
+		transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+		transformations.add(new StringTransformation());
+		transformations.add(new RenameTransformation(this.renameMap));
+		transformations.add(new DfVisitor<Expression>(new TacTransformation()));
+		transformations.add(new DfVisitor<Void>(new CopyPropagator()));
+		transformations.add(new DfVisitor<Void>(new ConstantPropagator()));
+		transformations.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		transformations.add(new DfVisitor<Expression>(
+				new CastAdder(false, true)));
+		transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		transformations.add(new DfVisitor<Void>(new BlockCombine()));
+		transformations.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		transformations.add(new DfVisitor<Void>(new ListInitializer()));
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(network);
@@ -169,13 +180,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 			}
 		}
 
-		new DfVisitor<Void>(new TemplateInfoComputing()).doSwitch(network);
-		network.computeTemplateMaps();
-
-		for (Actor actor : network.getAllActors()) {
-			actor.setTemplateData(new LLVMTemplateData().compute(actor));
-		}
-
 		return network;
 	}
 
@@ -189,27 +193,17 @@ public class LLVMBackendImpl extends AbstractBackend {
 		network = doTransformNetwork(network);
 
 		// print instances and entities
-		printer = new StandardPrinter("net/sf/orcc/backends/llvm/aot/Actor.stg");
-		printer.setExpressionPrinter(new LLVMExpressionPrinter());
-		printer.setTypePrinter(new LLVMTypePrinter());
-		printer.getOptions().put("fifoSize", fifoSize);
+		xtendPrinter.getOptions().put("fifoSize", fifoSize);
 		printInstances(network);
 
 		// print network
 		OrccLogger.traceln("Printing network...");
-		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/aot/Network.stg");
-		printer.setExpressionPrinter(new LLVMExpressionPrinter());
-		printer.setTypePrinter(new LLVMTypePrinter());
-		printer.print(network.getSimpleName() + ".ll", srcPath, network);
+		xtendPrinter.print(srcPath, network);
 
-		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/aot/CMakeLists.stg");
-		networkPrinter.print("CMakeLists.txt", srcPath, network);
-
-		networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/aot/RootCMakeLists.stg");
-		networkPrinter.print("CMakeLists.txt", path, network);
+		CommonPrinter.printFile(new CMakePrinter(network).rootCMakeContent(),
+				path + File.separator + "CMakeLists.txt");
+		CommonPrinter.printFile(new CMakePrinter(network).srcCMakeContent(),
+				srcPath + File.separator + "CMakeLists.txt");
 	}
 
 	@Override
@@ -220,11 +214,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
 						path + File.separator + "run_cmake_with_VS_env.bat");
 			}
-
-			String target = path + File.separator + "libs";
-			OrccLogger
-					.trace("Export libraries sources into " + target + "... ");
-			if (copyFolderToFileSystem("/runtime/C/libs", target)) {
+			OrccLogger.trace("Export libraries sources into " + libPath
+					+ "... ");
+			if (copyFolderToFileSystem("/runtime/C/libs", libPath)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {
@@ -237,8 +229,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return printer.print(instance.getSimpleName() + ".ll", srcPath,
-				instance);
+		return xtendPrinter.print(srcPath, instance);
 	}
 
 }
