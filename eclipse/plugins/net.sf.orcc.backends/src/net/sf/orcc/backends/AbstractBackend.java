@@ -929,6 +929,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			String networkName = line.getArgs()[0];
 
 			Map<String, Object> optionMap = new HashMap<String, Object>();
+			optionMap.put(COMPILE_XDF, true);
 			optionMap.put(PROJECT, line.getOptionValue('p'));
 			optionMap.put(XDF_FILE, networkName);
 			optionMap.put(OUTPUT_FOLDER, line.getOptionValue('o'));
