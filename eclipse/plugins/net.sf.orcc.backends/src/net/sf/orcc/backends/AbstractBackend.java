@@ -66,6 +66,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
@@ -131,7 +132,6 @@ import org.eclipse.equinox.app.IApplicationContext;
  */
 public abstract class AbstractBackend implements Backend, IApplication {
 
-	protected boolean classify;
 	protected boolean debug;
 	/**
 	 * Fifo size used in backend.
@@ -142,8 +142,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	private WriteListener listener;
 	protected Map<String, String> mapping;
 
-	protected boolean mergeActions;
+	/**
+	 * List of transformations to apply on each network
+	 */
+	protected List<DfSwitch<?>> networkTransfos;
+	/**
+	 * List of transformations to apply on each actor
+	 */
+	protected List<DfSwitch<?>> actorTransfos;
 
+	protected boolean classify;
+	protected boolean mergeActions;
 	protected boolean mergeActors;
 
 	/**
@@ -151,6 +160,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	private IProgressMonitor monitor;
 
+	/**
+	 * Options of backend execution. Its content can be manipulated with
+	 * {@link #getAttribute} and {@link #setAttribute}
+	 */
 	private Map<String, Object> options;
 
 	/**
@@ -158,12 +171,23 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected String path;
 
+	/**
+	 * Represents the project where call application to build is located
+	 */
 	protected IProject project;
 
 	/**
 	 * Path of the folder that contains VTL under IR form.
 	 */
 	private List<IFolder> vtlFolders;
+
+	/**
+	 * Initialize some members
+	 */
+	public AbstractBackend() {
+		actorTransfos = new ArrayList<DfSwitch<?>>();
+		networkTransfos = new ArrayList<DfSwitch<?>>();
+	}
 
 	@Override
 	public void compile() {
@@ -928,8 +952,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			try {
 				setOptions(optionMap);
 				exportRuntimeLibrary();
-				compileVTL();
-				compileXDF();
+				compile();
 				return IApplication.EXIT_OK;
 			} catch (OrccRuntimeException e) {
 				OrccLogger.severeln(e.getMessage());
