@@ -40,6 +40,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
+import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
@@ -166,19 +167,22 @@ public class LLVMBackendImpl extends AbstractBackend {
 		transformations.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
 		transformations.add(new DfVisitor<Void>(new ListInitializer()));
 
-		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(network);
+		for (DfSwitch<?> transfo : transformations) {
+			transfo.doSwitch(network);
 			if (debug) {
 				ResourceSet set = new ResourceSetImpl();
 				for (Actor actor : network.getAllActors()) {
 					if (actor.getFileName() != null
 							&& !IrUtil.serializeActor(set, srcPath, actor)) {
-						System.err.println("Error with " + transformation
+						OrccLogger.severeln("Transformation" + transfo
 								+ " on actor " + actor.getName());
 					}
 				}
 			}
 		}
+
+		new DfVisitor<Void>(new TemplateInfoComputing()).doSwitch(network);
+		network.computeTemplateMaps();
 
 		return network;
 	}
