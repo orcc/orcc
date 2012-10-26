@@ -160,23 +160,24 @@ public class TTABackendImpl extends LLVMBackendImpl {
 			new ActorMerger().doSwitch(network);
 		}
 
-		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new TypeResizer(true, true, false),
-				new DfVisitor<Void>(new PrintRemoval()),
-				new DfVisitor<Void>(new SSATransformation()),
-				new StringTransformation(),
-				new RenameTransformation(this.renameMap),
-				new DfVisitor<Expression>(new TacTransformation()),
-				new DfVisitor<Void>(new CopyPropagator()),
-				new DfVisitor<Void>(new ConstantPropagator()),
-				new DfVisitor<Void>(new InstPhiTransformation()),
-				new DfVisitor<Expression>(new CastAdder(false, true)),
-				new DfVisitor<Void>(new EmptyBlockRemover()),
-				new DfVisitor<Void>(new BlockCombine()),
-				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
-				new DfVisitor<Void>(new TemplateInfoComputing()), };
+		actorTransfos.add(new UnitImporter());
+		actorTransfos.add(new TypeResizer(true, true, false));
+		actorTransfos.add(new DfVisitor<Void>(new PrintRemoval()));
+		actorTransfos.add(new DfVisitor<Void>(new SSATransformation()));
+		actorTransfos.add(new StringTransformation());
+		actorTransfos.add(new RenameTransformation(this.renameMap));
+		actorTransfos.add(new DfVisitor<Expression>(new TacTransformation()));
+		actorTransfos.add(new DfVisitor<Void>(new CopyPropagator()));
+		actorTransfos.add(new DfVisitor<Void>(new ConstantPropagator()));
+		actorTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		actorTransfos
+				.add(new DfVisitor<Expression>(new CastAdder(false, true)));
+		actorTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		actorTransfos.add(new DfVisitor<Void>(new BlockCombine()));
+		actorTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		actorTransfos.add(new DfVisitor<Void>(new TemplateInfoComputing()));
 
-		for (DfSwitch<?> transformation : transformations) {
+		for (DfSwitch<?> transformation : actorTransfos) {
 			transformation.doSwitch(network);
 		}
 

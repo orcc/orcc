@@ -138,7 +138,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		// FIXME: Readd the method in native function and compute the
+		// FIXME: Read the method in native function and compute the
 		// hierarchical id of each actor.
 		useGeneticAlgo = getAttribute("net.sf.orcc.backends.geneticAlgorithm",
 				false);
@@ -196,54 +196,52 @@ public class CBackendImpl extends AbstractBackend {
 			new ActionMerger().doSwitch(actor);
 		}
 
-		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(true, false, true));
-		transformations.add(new RenameTransformation(replacementMap));
+		actorTransfos.add(new UnitImporter());
+		actorTransfos.add(new TypeResizer(true, false, true));
+		actorTransfos.add(new RenameTransformation(replacementMap));
 
 		// If "-t" option is passed to command line, apply additional
 		// transformations
 		if (getAttribute("net.sf.orcc.backends.additionalTransfos", false)) {
-			transformations.add(new StoreOnceTransformation());
-			transformations.add(new DfVisitor<Void>(new SSATransformation()));
-			transformations.add(new DfVisitor<Object>(new PhiRemoval()));
-			transformations.add(new Multi2MonoToken());
-			transformations.add(new DivisionSubstitution());
-			transformations.add(new ParameterImporter());
-			transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
+			actorTransfos.add(new StoreOnceTransformation());
+			actorTransfos.add(new DfVisitor<Void>(new SSATransformation()));
+			actorTransfos.add(new DfVisitor<Object>(new PhiRemoval()));
+			actorTransfos.add(new Multi2MonoToken());
+			actorTransfos.add(new DivisionSubstitution());
+			actorTransfos.add(new ParameterImporter());
+			actorTransfos.add(new DfVisitor<Void>(new Inliner(true, true)));
 
 			// transformations.add(new UnaryListRemoval());
 			// transformations.add(new GlobalArrayInitializer(true));
 
-			transformations.add(new DfVisitor<Void>(new InstTernaryAdder()));
+			actorTransfos.add(new DfVisitor<Void>(new InstTernaryAdder()));
 			// transformations.add(new CustomPeekAdder()); // Xlim only ?
 
-			transformations.add(new DeadGlobalElimination());
+			actorTransfos.add(new DeadGlobalElimination());
 
-			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
-			transformations.add(new DfVisitor<Void>(
-					new XlimDeadVariableRemoval()));
-			transformations.add(new DfVisitor<Void>(new ListFlattener()));
-			transformations.add(new DfVisitor<Expression>(
-					new TacTransformation()));
-			transformations.add(new DfVisitor<CfgNode>(
-					new ControlFlowAnalyzer()));
-			transformations
-					.add(new DfVisitor<Void>(new InstPhiTransformation()));
-			transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-			transformations.add(new DfVisitor<Void>(new BlockCombine()));
+			actorTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+			actorTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+			actorTransfos
+					.add(new DfVisitor<Void>(new XlimDeadVariableRemoval()));
+			actorTransfos.add(new DfVisitor<Void>(new ListFlattener()));
+			actorTransfos
+					.add(new DfVisitor<Expression>(new TacTransformation()));
+			actorTransfos
+					.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+			actorTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
+			actorTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+			actorTransfos.add(new DfVisitor<Void>(new BlockCombine()));
 
 			// transformations.add(new DfVisitor<Expression>(new
 			// LiteralIntegersAdder())); // Xlim only ?
-			transformations.add(new DfVisitor<Expression>(new CastAdder(true,
+			actorTransfos.add(new DfVisitor<Expression>(new CastAdder(true,
 					true)));
 
 			// NullPointerException when running backend with this transfo
 			// transformations.add(new XlimVariableRenamer());
 		}
 
-		for (DfSwitch<?> transformation : transformations) {
+		for (DfSwitch<?> transformation : actorTransfos) {
 			transformation.doSwitch(actor);
 			if (debug) {
 				ResourceSet set = new ResourceSetImpl();

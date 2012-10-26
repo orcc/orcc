@@ -96,17 +96,16 @@ public class YaceBackend extends AbstractBackend {
 		replacementMap.put("DEBUG", "DEBUG_");
 		replacementMap.put("INT_MIN", "INT_MIN_");
 
-		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(false, false, false));
-		transformations.add(new RenameTransformation(replacementMap));
+		actorTransfos.add(new UnitImporter());
+		actorTransfos.add(new TypeResizer(false, false, false));
+		actorTransfos.add(new RenameTransformation(replacementMap));
 		if (!debug) {
-			transformations.add(new DeadGlobalElimination());
-			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
+			actorTransfos.add(new DeadGlobalElimination());
+			actorTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+			actorTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
 		}
 
-		for (DfSwitch<?> transformation : transformations) {
+		for (DfSwitch<?> transformation : actorTransfos) {
 			transformation.doSwitch(actor);
 		}
 
