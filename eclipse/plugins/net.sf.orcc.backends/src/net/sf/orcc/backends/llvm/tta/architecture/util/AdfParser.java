@@ -48,17 +48,23 @@ import net.sf.orcc.backends.llvm.tta.architecture.OpBinary;
 import net.sf.orcc.backends.llvm.tta.architecture.OpUnary;
 import net.sf.orcc.backends.llvm.tta.architecture.Operation;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
+import net.sf.orcc.backends.llvm.tta.architecture.Reads;
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile;
+import net.sf.orcc.backends.llvm.tta.architecture.Resource;
 import net.sf.orcc.backends.llvm.tta.architecture.Segment;
 import net.sf.orcc.backends.llvm.tta.architecture.ShortImmediate;
 import net.sf.orcc.backends.llvm.tta.architecture.Socket;
 import net.sf.orcc.backends.llvm.tta.architecture.Term;
+import net.sf.orcc.backends.llvm.tta.architecture.TermBool;
+import net.sf.orcc.backends.llvm.tta.architecture.TermUnit;
+import net.sf.orcc.backends.llvm.tta.architecture.Writes;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccLogger;
 
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * @author Herve Yviquel
@@ -70,27 +76,27 @@ public class AdfParser {
 	private Processor processor;
 	private Map<String, Memory> memoryMap;
 	private Map<FunctionUnit, String> fuToMemoryMap;
+	private String romName;
+	private Map<TermBool, String> termToRfMap;
 
-	private Operation getOperation(Element element) {
+	private Operation getOperation(Element element, EList<FuPort> ports) {
 		Operation op = factory.createOperation();
 
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element child = (Element) node;
-				String name = child.getNodeName();
-				if (name.equals("name")) {
-					op.setName(child.getNodeValue());
-				} else if (name.equals("bind")) {
-					// TODO
-				} else if (name.equals("pipeline")) {
-					// TODO
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
-				}
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
+			String name = child.getNodeName();
+			if (name.equals("name")) {
+				op.setName(DomUtil.getNodeValue(child));
+			} else if (name.equals("bind")) {
+				int index = DomUtil.getNodeIntAttr("name", child);
+				FuPort port = getPort(ports, DomUtil.getNodeValue(child));
+				op.getPortToIndexMap().put(port, index);
+			} else if (name.equals("pipeline")) {
+				op.getPipeline().addAll(getPipeline(child));
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-			node = node.getNextSibling();
+			child = DomUtil.getNextElementSibling(child);
 		}
 
 		return op;
@@ -98,28 +104,24 @@ public class AdfParser {
 
 	private FuPort getPort(Element element) {
 		FuPort port = factory.createFuPort();
-		port.setName(element.getAttribute("name"));
+		port.setName(DomUtil.getNodeAttr("name", element));
 
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element child = (Element) node;
-				String name = child.getNodeName();
-				if (name.equals("width")) {
-					int width = Integer.parseInt(child.getNodeValue());
-					port.setWidth(width);
-				} else if (name.equals("trigger")) {
-					port.setTrigger(true);
-				} else if (name.equals("sets-optcode")) {
-					port.setOpcodeSelector(true);
-				} else if (name.equals("connects-to")) {
-					// TODO
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
-				}
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
+			String name = child.getNodeName();
+			if (name.equals("width")) {
+				int width = DomUtil.getNodeIntValue(child);
+				port.setWidth(width);
+			} else if (name.equals("triggers")) {
+				port.setTrigger(true);
+			} else if (name.equals("sets-opcode")) {
+				port.setOpcodeSelector(true);
+			} else if (name.equals("connects-to")) {
+				// TODO
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-			node = node.getNextSibling();
+			child = DomUtil.getNextElementSibling(child);
 		}
 
 		return port;
@@ -128,23 +130,20 @@ public class AdfParser {
 	private ShortImmediate getShortImmediate(Element element) {
 		ShortImmediate shortImmediate = factory.createShortImmediate();
 
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element child = (Element) node;
-				String name = child.getNodeName();
-				if (name.equals("width")) {
-					int width = Integer.parseInt(child.getNodeValue());
-					shortImmediate.setWidth(width);
-				} else if (name.equals("extension")) {
-					Extension extension = Extension.get(child.getNodeValue());
-					shortImmediate.setExtension(extension);
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
-				}
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
+			String name = child.getNodeName();
+			if (name.equals("width")) {
+				int width = DomUtil.getNodeIntValue(child);
+				shortImmediate.setWidth(width);
+			} else if (name.equals("extension")) {
+				Extension extension = Extension
+						.get(DomUtil.getNodeValue(child));
+				shortImmediate.setExtension(extension);
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-			node = node.getNextSibling();
+			child = DomUtil.getNextElementSibling(child);
 		}
 
 		return shortImmediate;
@@ -156,119 +155,137 @@ public class AdfParser {
 	}
 
 	private Guard getGuard(Element element) {
-		Node node = element.getFirstChild();
-		if (node.getNodeType() == Node.ELEMENT_NODE) {
-			Element child = (Element) node;
-			String name = child.getNodeName();
-			if (name.equals("simple-expr")) {
-				ExprUnary expr = getExprUnary(child);
-				expr.setOperator(OpUnary.SIMPLE);
-				return expr;
-			} else if (name.equals("inverted-expr")) {
-				ExprUnary expr = getExprUnary(child);
-				expr.setOperator(OpUnary.INVERTED);
-				return expr;
-			} else if (name.equals("and-expr")) {
-				ExprBinary expr = getExprBinary(child);
-				expr.setOperator(OpBinary.AND);
-				return expr;
-			} else if (name.equals("or-expr")) {
-				ExprBinary expr = getExprBinary(child);
-				expr.setOperator(OpBinary.OR);
-				return expr;
-			} else if (name.equals("always-true")) {
-				return factory.createExprTrue();
-			} else if (name.equals("always-false")) {
-				return factory.createExprFalse();
-			} else {
-				throw new OrccRuntimeException("invalid node \"" + name + "\"");
-			}
+		Element child = DomUtil.getFirstElementChild(element);
+
+		String name = child.getNodeName();
+		if (name.equals("simple-expr") || name.equals("inverted-expr")) {
+			return getExprUnary(child);
+		} else if (name.equals("and-expr") || name.equals("or-expr")) {
+			return getExprBinary(child);
+		} else if (name.equals("always-true")) {
+			return factory.createExprTrue();
+		} else if (name.equals("always-false")) {
+			return factory.createExprFalse();
 		} else {
-			throw new OrccRuntimeException("invalid node");
+			throw new OrccRuntimeException("invalid node \"" + name + "\"");
 		}
 	}
 
 	private Term getTerm(Element element) {
-		Node node = element.getFirstChild();
-		if (node.getNodeType() == Node.ELEMENT_NODE) {
-			Element child = (Element) node;
+		String name = element.getNodeName();
+		if (name.equals("bool")) {
+			TermBool term = factory.createTermBool();
+			Element child = DomUtil.getFirstElementChild(element);
+			String rfName = DomUtil.getNodeValue(child);
+			termToRfMap.put(term, rfName);
+			child = DomUtil.getNextElementSibling(child);
+			int index = DomUtil.getNodeIntValue(child);
+			term.setIndex(index);
+			return term;
+		} else if (name.equals("unit")) {
+			TermUnit term = factory.createTermUnit();
+			// TODO
+			return term;
+		} else {
+			throw new OrccRuntimeException("invalid node \"" + name + "\"");
+		}
+	}
+
+	private EList<net.sf.orcc.backends.llvm.tta.architecture.Element> getPipeline(
+			Element element) {
+		EList<net.sf.orcc.backends.llvm.tta.architecture.Element> pipeline = new BasicEList<net.sf.orcc.backends.llvm.tta.architecture.Element>();
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
 			String name = child.getNodeName();
-			if (name.equals("bool")) {
-				Term term = factory.createTermBool();
-				return term;
-			} else if (name.equals("inverted-expr")) {
-				Term term = factory.createTermUnit();
-				return term;
+			if (name.equals("reads")) {
+				Reads reads = factory.createReads();
+				reads.setStartCycle(DomUtil.getChildIntValue("start-cycle",
+						child));
+				reads.setCycles(DomUtil.getChildIntValue("cycles", child));
+				pipeline.add(reads);
+			} else if (name.equals("writes")) {
+				Writes writes = factory.createWrites();
+				writes.setStartCycle(DomUtil.getChildIntValue("start-cycle",
+						child));
+				writes.setCycles(DomUtil.getChildIntValue("cycles", child));
+				pipeline.add(writes);
+			} else if (name.equals("resource")) {
+				Resource resource = factory.createResource();
+				pipeline.add(resource);
 			} else {
 				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-		} else {
-			throw new OrccRuntimeException("invalid node");
+			child = DomUtil.getNextElementSibling(child);
 		}
+		return pipeline;
 	}
 
 	private ExprUnary getExprUnary(Element element) {
 		ExprUnary expr = factory.createExprUnary();
-		
-		Node node = element.getFirstChild();
-		if (node.getNodeType() != Node.ELEMENT_NODE) {
-			OrccLogger.severeln("invalid node");
+
+		String name = element.getNodeName();
+		if (name.equals("simple-expr")) {
+			expr.setOperator(OpUnary.SIMPLE);
+		} else if (name.equals("inverted-expr")) {
+			expr.setOperator(OpUnary.INVERTED);
 		}
-		expr.setTerm(getTerm((Element) node));
-		
+
+		Term term = getTerm(DomUtil.getFirstElementChild(element));
+		expr.setTerm(term);
+
 		return expr;
 	}
 
 	private ExprBinary getExprBinary(Element element) {
 		ExprBinary expr = factory.createExprBinary();
-		
-		Node node = element.getFirstChild();
-		if (node.getNodeType() != Node.ELEMENT_NODE) {
-			OrccLogger.severeln("invalid node");
+
+		String name = element.getNodeName();
+		if (name.equals("and-expr")) {
+			expr.setOperator(OpBinary.AND);
+		} else if (name.equals("or-expr")) {
+			expr.setOperator(OpBinary.OR);
 		}
-		expr.setE1(getExprUnary((Element) node));
-		
-		node = element.getNextSibling();
-		if (node.getNodeType() != Node.ELEMENT_NODE) {
-			OrccLogger.severeln("invalid node");
-		}
-		expr.setE2(getExprUnary((Element) node));
-		
+
+		Element child = DomUtil.getFirstElementChild(element);
+		ExprUnary e1 = getExprUnary(child);
+		child = DomUtil.getNextElementSibling(child);
+		ExprUnary e2 = getExprUnary(child);
+
+		expr.setE1(e1);
+		expr.setE2(e2);
+
 		return expr;
 	}
 
 	private void parseAddressSpace(Element element) {
 		Memory memory = factory.createMemory();
-		memory.setName(element.getAttribute("name"));
+		String memName = DomUtil.getNodeAttr("name", element);
+		memory.setName(memName);
 
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element child = (Element) node;
-				String name = child.getNodeName();
-				if (name.equals("width")) {
-					int width = Integer.parseInt(child.getNodeValue());
-					memory.setWordWidth(width);
-				} else if (name.equals("min-address")) {
-					int min = Integer.parseInt(child.getNodeValue());
-					memory.setMinAddress(min);
-				} else if (name.equals("max-address")) {
-					int max = Integer.parseInt(child.getNodeValue());
-					memory.setMinAddress(max);
-				} else if (name.equals("numerical-id")) {
-					// FIXME: Something to do ?
-				} else if (name.equals("shared-memory")) {
-					OrccLogger
-							.severeln("Parsing ADF with shared memory is not supported");
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
-				}
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
+			String name = child.getNodeName();
+			if (name.equals("width")) {
+				int width = DomUtil.getNodeIntValue(child);
+				memory.setWordWidth(width);
+			} else if (name.equals("min-address")) {
+				int min = DomUtil.getNodeIntValue(child);
+				memory.setMinAddress(min);
+			} else if (name.equals("max-address")) {
+				int max = DomUtil.getNodeIntValue(child);
+				memory.setMinAddress(max);
+			} else if (name.equals("numerical-id")) {
+				// FIXME: Something to do ?
+			} else if (name.equals("shared-memory")) {
+				throw new OrccRuntimeException(
+						"Parsing ADF with shared memory is not supported");
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-			node = node.getNextSibling();
+			child = DomUtil.getNextElementSibling(child);
 		}
 
-		memoryMap.put(memory.getName(), memory);
+		memoryMap.put(memName, memory);
 	}
 
 	/**
@@ -283,13 +300,11 @@ public class AdfParser {
 			throw new OrccRuntimeException("Expected \"adf\" start element");
 		}
 
-		String name = adfElement.getAttribute("name");
-		if (name.isEmpty()) {
-			throw new OrccRuntimeException("Expected a \"name\" attribute");
-		}
-
 		processor = ArchitectureFactory.eINSTANCE.createProcessor();
 		memoryMap = new HashMap<String, Memory>();
+		fuToMemoryMap = new HashMap<FunctionUnit, String>();
+		termToRfMap = new HashMap<TermBool, String>();
+
 		parseBody(adfElement);
 	}
 
@@ -301,126 +316,129 @@ public class AdfParser {
 	 * @param root
 	 */
 	private void parseBody(Element root) {
-		Node node = root.getFirstChild();
-		while (node != null) {
-			// this test allows us to skip #text nodes
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element element = (Element) node;
-				String name = node.getNodeName();
-				if (name.equals("bus")) {
-					parseBus(element);
-				} else if (name.equals("socket")) {
-					parseSocket(element);
-				} else if (name.equals("function-unit")) {
-					parseFU(element);
-				} else if (name.equals("global-control-unit")) {
-					parseGCU(element);
-				} else if (name.equals("address-space")) {
-					parseAddressSpace(element);
-				} else if (name.equals("register-file")) {
-					parseRF(element);
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
-				}
+		Element element = DomUtil.getFirstElementChild(root);
+		while (element != null) {
+			String name = element.getNodeName();
+			if (name.equals("bus")) {
+				parseBus(element);
+			} else if (name.equals("socket")) {
+				parseSocket(element);
+			} else if (name.equals("function-unit")) {
+				parseFU(element);
+			} else if (name.equals("global-control-unit")) {
+				parseGCU(element);
+			} else if (name.equals("address-space")) {
+				parseAddressSpace(element);
+			} else if (name.equals("register-file")) {
+				parseRF(element);
+			} else if (name.equals("immediate-unit")) {
+				// TODO
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-
-			node = node.getNextSibling();
+			element = DomUtil.getNextElementSibling(element);
 		}
 
+		// Connect local memories
 		for (FunctionUnit fu : fuToMemoryMap.keySet()) {
 			String name = fuToMemoryMap.get(fu);
 			Memory memory = memoryMap.get(name);
 			if (memory == null) {
 				OrccLogger.severeln("Unknow address space \"" + name + "\".");
 			}
+			processor.getLocalRAMs().add(memory);
 			fu.setAddressSpace(memory);
+		}
+
+		// Connect rom
+		Memory memory = memoryMap.get(romName);
+		if (memory == null) {
+			OrccLogger.severeln("Unknow address space \"" + romName + "\".");
+		}
+		processor.setROM(memory);
+		processor.getGcu().setAddressSpace(memory);
+
+		for (TermBool term : termToRfMap.keySet()) {
+			term.setRegister(processor.getRegisterFile(termToRfMap.get(term)));
 		}
 	}
 
 	private void parseBus(Element element) {
 		Bus bus = factory.createBus();
-		bus.setName(element.getAttribute("name"));
+		bus.setName(DomUtil.getNodeAttr("name", element));
 
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element child = (Element) node;
-				String name = child.getNodeName();
-				if (name.equals("width")) {
-					int width = Integer.parseInt(child.getNodeValue());
-					bus.setWidth(width);
-				} else if (name.equals("guard")) {
-					bus.getGuards().add(getGuard(child));
-				} else if (name.equals("segment")) {
-					bus.getSegments().add(getSegment(child));
-				} else if (name.equals("short-immediate")) {
-					bus.setShortImmediate(getShortImmediate(child));
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
-				}
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
+			String name = child.getNodeName();
+			if (name.equals("width")) {
+				int width = DomUtil.getNodeIntValue(child);
+				bus.setWidth(width);
+			} else if (name.equals("guard")) {
+				bus.getGuards().add(getGuard(child));
+			} else if (name.equals("segment")) {
+				bus.getSegments().add(getSegment(child));
+			} else if (name.equals("short-immediate")) {
+				bus.setShortImmediate(getShortImmediate(child));
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-			node = node.getNextSibling();
+			child = DomUtil.getNextElementSibling(child);
 		}
 		processor.getBuses().add(bus);
 	}
 
 	private void parseFU(Element element) {
 		FunctionUnit fu = factory.createFunctionUnit();
-		fu.setName(element.getAttribute("name"));
+		fu.setName(DomUtil.getNodeAttr("name", element));
 
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element child = (Element) node;
-				String name = node.getNodeName();
-				if (name.equals("port")) {
-					fu.getPorts().add(getPort(child));
-				} else if (name.equals("operation")) {
-					fu.getOperations().add(getOperation(child));
-				} else if (name.equals("address-space")) {
-					fuToMemoryMap.put(fu, child.getNodeValue());
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
+			String name = child.getNodeName();
+			if (name.equals("port")) {
+				fu.getPorts().add(getPort(child));
+			} else if (name.equals("operation")) {
+				fu.getOperations().add(getOperation(child, fu.getPorts()));
+			} else if (name.equals("address-space")) {
+				String asName = DomUtil.getNodeValue(child);
+				if (!asName.isEmpty()) {
+					fuToMemoryMap.put(fu, DomUtil.getNodeValue(child));
 				}
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-			node = node.getNextSibling();
+			child = DomUtil.getNextElementSibling(child);
 		}
 		processor.getFunctionUnits().add(fu);
 	}
 
 	private void parseGCU(Element element) {
 		GlobalControlUnit gcu = factory.createGlobalControlUnit();
-		gcu.setName(element.getAttribute("name"));
+		gcu.setName(DomUtil.getNodeAttr("name", element));
 
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element child = (Element) node;
-				String name = node.getNodeName();
-				if (name.equals("port")) {
-					gcu.getPorts().add(getPort(child));
-				} else if (name.equals("special-port")) {
-					FuPort port = getPort(child);
-					gcu.setReturnAddress(port);
-				} else if (name.equals("ctrl-operation")) {
-					gcu.getOperations().add(getOperation(child));
-				} else if (name.equals("address-space")) {
-					// TODO
-				} else if (name.equals("delay-slot")) {
-					int delay = Integer.parseInt(child.getNodeValue());
-					gcu.setDelaySlots(delay);
-				} else if (name.equals("guard-latency")) {
-					int latency = Integer.parseInt(child.getNodeValue());
-					gcu.setDelaySlots(latency);
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
-				}
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
+			String name = child.getNodeName();
+			if (name.equals("port")) {
+				gcu.getPorts().add(getPort(child));
+			} else if (name.equals("special-port")) {
+				gcu.getPorts().add(getPort(child));
+			} else if (name.equals("ctrl-operation")) {
+				gcu.getOperations().add(getOperation(child, gcu.getPorts()));
+			} else if (name.equals("address-space")) {
+				romName = DomUtil.getNodeValue(child);
+			} else if (name.equals("delay-slots")) {
+				int delay = DomUtil.getNodeIntValue(child);
+				gcu.setDelaySlots(delay);
+			} else if (name.equals("guard-latency")) {
+				int latency = DomUtil.getNodeIntValue(child);
+				gcu.setDelaySlots(latency);
+			} else if (name.equals("return-address")) {
+				FuPort port = gcu.getPort(DomUtil.getNodeValue(child));
+				gcu.setReturnAddress(port);
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-			node = node.getNextSibling();
+			child = DomUtil.getNextElementSibling(child);
 		}
 
 		processor.setGcu(gcu);
@@ -451,33 +469,33 @@ public class AdfParser {
 
 	private void parseRF(Element element) {
 		RegisterFile rf = factory.createRegisterFile();
-		rf.setName(element.getAttribute("name"));
+		rf.setName(DomUtil.getNodeAttr("name", element));
 
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element child = (Element) node;
-				String name = node.getNodeName();
-				if (name.equals("width")) {
-					int width = Integer.parseInt(child.getNodeValue());
-					rf.setWidth(width);
-				} else if (name.equals("size")) {
-					int size = Integer.parseInt(child.getNodeValue());
-					rf.setSize(size);
-				} else if (name.equals("max-reads")) {
-					int maxReads = Integer.parseInt(child.getNodeValue());
-					rf.setMaxReads(maxReads);
-				} else if (name.equals("max-writes")) {
-					int maxWrites = Integer.parseInt(child.getNodeValue());
-					rf.setMaxWrites(maxWrites);
-				} else if (name.equals("port")) {
-					rf.getPorts().add(getPort(child));
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
-				}
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
+			String name = child.getNodeName();
+			if (name.equals("width")) {
+				int width = DomUtil.getNodeIntValue(child);
+				rf.setWidth(width);
+			} else if (name.equals("size")) {
+				int size = DomUtil.getNodeIntValue(child);
+				rf.setSize(size);
+			} else if (name.equals("max-reads")) {
+				int maxReads = DomUtil.getNodeIntValue(child);
+				rf.setMaxReads(maxReads);
+			} else if (name.equals("max-writes")) {
+				int maxWrites = DomUtil.getNodeIntValue(child);
+				rf.setMaxWrites(maxWrites);
+			} else if (name.equals("port")) {
+				rf.getPorts().add(getPort(child));
+			} else if (name.equals("type")) {
+				// FIXME: Something to do...
+			} else if (name.equals("guard-latency")) {
+				// FIXME: Something to do...
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-			node = node.getNextSibling();
+			child = DomUtil.getNextElementSibling(child);
 		}
 
 		processor.getRegisterFiles().add(rf);
@@ -485,26 +503,31 @@ public class AdfParser {
 
 	private void parseSocket(Element element) {
 		Socket socket = factory.createSocket();
-		socket.setName(element.getAttribute("name"));
+		socket.setName(DomUtil.getNodeAttr("name", element));
 
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element child = (Element) node;
-				String name = child.getNodeName();
-				if (name.equals("writes-to")) {
-					// TODO
-				} else if (name.equals("reads-from")) {
-					// TODO
-				} else {
-					throw new OrccRuntimeException("invalid node \"" + name
-							+ "\"");
-				}
+		Element child = DomUtil.getFirstElementChild(element);
+		while (child != null) {
+			String name = child.getNodeName();
+			if (name.equals("writes-to")) {
+				// TODO
+			} else if (name.equals("reads-from")) {
+				// TODO
+			} else {
+				throw new OrccRuntimeException("invalid node \"" + name + "\"");
 			}
-			node = node.getNextSibling();
+			child = DomUtil.getNextElementSibling(child);
 		}
 
 		processor.getSockets().add(socket);
+	}
+
+	private FuPort getPort(EList<FuPort> ports, String name) {
+		for (FuPort port : ports) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
 	}
 
 }
