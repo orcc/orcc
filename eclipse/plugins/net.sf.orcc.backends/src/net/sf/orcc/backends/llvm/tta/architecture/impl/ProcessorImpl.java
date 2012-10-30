@@ -598,6 +598,15 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		return registerFiles;
 	}
 
+	public RegisterFile getRegisterFile(String name) {
+		for (RegisterFile rf : getRegisterFiles()) {
+			if (rf.getName().equals(name)) {
+				return rf;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

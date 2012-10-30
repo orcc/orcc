@@ -30,10 +30,10 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.FuPort;
 import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Operation;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -68,8 +68,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 		GlobalControlUnit {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -78,8 +77,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -97,8 +95,8 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 
 	/**
 	 * The cached value of the '{@link #getReturnAddress() <em>Return Address</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getReturnAddress()
 	 * @generated
 	 * @ordered
@@ -180,8 +178,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getName() {
@@ -189,8 +186,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -223,8 +219,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public NotificationChain basicSetReturnAddress(FuPort newReturnAddress,
@@ -245,8 +240,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setReturnAddress(FuPort newReturnAddress) {
@@ -528,6 +522,16 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 		result.append(guardLatency);
 		result.append(')');
 		return result.toString();
+	}
+
+	@Override
+	public FuPort getPort(String name) {
+		for (FuPort port : getPorts()) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
 	}
 
 } // GlobalControlUnitImpl

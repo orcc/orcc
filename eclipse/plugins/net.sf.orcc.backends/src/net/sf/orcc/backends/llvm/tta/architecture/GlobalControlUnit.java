@@ -29,13 +29,11 @@
 package net.sf.orcc.backends.llvm.tta.architecture;
 
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Global Control Unit</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> A representation of the model object '
+ * <em><b>Global Control Unit</b></em>'. <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
@@ -56,13 +54,14 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface GlobalControlUnit extends EObject {
 	/**
-	 * Returns the value of the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear, there really
+	 * should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getGlobalControlUnit_Name()
@@ -73,8 +72,7 @@ public interface GlobalControlUnit extends EObject {
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
@@ -82,20 +80,31 @@ public interface GlobalControlUnit extends EObject {
 	void setName(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Ports</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.FuPort}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Ports</b></em>' containment reference
+	 * list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.FuPort}. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Ports</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Ports</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Ports</em>' containment reference list.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getGlobalControlUnit_Ports()
 	 * @model containment="true" transient="true"
 	 * @generated
 	 */
 	EList<FuPort> getPorts();
+
+	/**
+	 * Returns the port of the GCU with the given name.
+	 * 
+	 * @param name
+	 *            the name of the port
+	 * @return the port
+	 */
+	FuPort getPort(String name);
 
 	/**
 	 * Returns the value of the '<em><b>Return Address</b></em>' containment reference.
@@ -124,13 +133,14 @@ public interface GlobalControlUnit extends EObject {
 	void setReturnAddress(FuPort value);
 
 	/**
-	 * Returns the value of the '<em><b>Address Space</b></em>' reference.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Address Space</b></em>' reference. <!--
+	 * begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Address Space</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Address Space</em>' reference.
 	 * @see #setAddressSpace(Memory)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getGlobalControlUnit_AddressSpace()
@@ -141,8 +151,8 @@ public interface GlobalControlUnit extends EObject {
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit#getAddressSpace <em>Address Space</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @param value the new value of the '<em>Address Space</em>' reference.
 	 * @see #getAddressSpace()
 	 * @generated
@@ -150,15 +160,18 @@ public interface GlobalControlUnit extends EObject {
 	void setAddressSpace(Memory value);
 
 	/**
-	 * Returns the value of the '<em><b>Operations</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Operation}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Operations</b></em>' containment
+	 * reference list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Operation}. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Operations</em>' reference isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Operations</em>' reference isn't clear, there
+	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Operations</em>' containment reference list.
+	 * 
+	 * @return the value of the '<em>Operations</em>' containment reference
+	 *         list.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getGlobalControlUnit_Operations()
 	 * @model containment="true"
 	 * @generated
@@ -166,13 +179,14 @@ public interface GlobalControlUnit extends EObject {
 	EList<Operation> getOperations();
 
 	/**
-	 * Returns the value of the '<em><b>Delay Slots</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Delay Slots</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Delay Slots</em>' attribute isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Delay Slots</em>' attribute isn't clear, there
+	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Delay Slots</em>' attribute.
 	 * @see #setDelaySlots(int)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getGlobalControlUnit_DelaySlots()
@@ -183,8 +197,8 @@ public interface GlobalControlUnit extends EObject {
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit#getDelaySlots <em>Delay Slots</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @param value the new value of the '<em>Delay Slots</em>' attribute.
 	 * @see #getDelaySlots()
 	 * @generated
@@ -192,13 +206,14 @@ public interface GlobalControlUnit extends EObject {
 	void setDelaySlots(int value);
 
 	/**
-	 * Returns the value of the '<em><b>Guard Latency</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Guard Latency</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Guard Latency</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Guard Latency</em>' attribute.
 	 * @see #setGuardLatency(int)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getGlobalControlUnit_GuardLatency()
@@ -209,8 +224,8 @@ public interface GlobalControlUnit extends EObject {
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit#getGuardLatency <em>Guard Latency</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @param value the new value of the '<em>Guard Latency</em>' attribute.
 	 * @see #getGuardLatency()
 	 * @generated

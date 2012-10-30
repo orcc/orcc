@@ -260,6 +260,15 @@ public interface Processor extends Component {
 	EList<RegisterFile> getRegisterFiles();
 
 	/**
+	 * Returns the register file with the given name.
+	 * 
+	 * @param name
+	 *            the given name
+	 * @return the register file with the given name
+	 */
+	RegisterFile getRegisterFile(String name);
+
+	/**
 	 * Returns the value of the '<em><b>ROM</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
