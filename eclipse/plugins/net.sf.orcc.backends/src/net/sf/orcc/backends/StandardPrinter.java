@@ -51,6 +51,7 @@ import org.stringtemplate.v4.ST;
  * @author Matthieu Wipliez
  * 
  */
+@Deprecated
 public class StandardPrinter extends AbstractPrinter {
 
 	private boolean keepUnchangedFiles;
