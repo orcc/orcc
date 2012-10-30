@@ -55,6 +55,10 @@ import org.eclipse.core.resources.IFile;
  */
 public abstract class CommonPrinter {
 
+	/**
+	 * If true, files which were not modified since the last compile will be
+	 * cached and not be printed a second time.
+	 */
 	protected boolean keepUnchangedFiles;
 
 	protected Map<String, Object> options;
@@ -119,6 +123,12 @@ public abstract class CommonPrinter {
 
 	}
 
+	/**
+	 * Return true if oldFile need to be replaced by newFile
+	 * 
+	 * @param oldFile
+	 * @param newFile
+	 */
 	protected boolean needToReplace(File oldFile, IFile newFile) {
 		return !keepUnchangedFiles
 				|| newFile.getLocalTimeStamp() > oldFile.lastModified();
