@@ -219,7 +219,7 @@ class ActorPrinter extends JavaTemplate {
 			int i = 0;
 			do {
 				res = false;
-				«FOR action : actor.actions SEPARATOR " else "»«action.actionFireingTest»«ENDFOR»
+				«actor.actions.join(" else ", [actionFireingTest])»
 				i += res ? 1 : 0;
 			} while(res);
 			return i;
@@ -239,7 +239,7 @@ class ActorPrinter extends JavaTemplate {
 			private boolean outside_FSM_scheduler() {
 				boolean res = false;
 				
-				«FOR action : actor.actionsOutsideFsm SEPARATOR " else "»«action.actionFireingTest»«ENDFOR»
+				«actor.actionsOutsideFsm.join(" else ", [actionFireingTest])»
 				return res;
 			}
 			
@@ -338,7 +338,7 @@ class ActorPrinter extends JavaTemplate {
 				"", // Before
 				" && ", // Separator
 				''' && «action.scheduler.name»()''', // After
-				[ port | '''fifo_«port.name».hasTokens(«action.inputPattern.numTokensMap.get(port)»)'''] // Function
+				[ '''fifo_«it.name».hasTokens(«action.inputPattern.numTokensMap.get(it)»)'''] // Function
 			)
 		}
 	}
@@ -350,7 +350,7 @@ class ActorPrinter extends JavaTemplate {
 	def outputSchedulingTest(Action action) {
 		action.outputPattern.ports.join(
 			" && ", // Separator
-			[ port | '''fifo_«port.name».hasRoom(«action.outputPattern.numTokensMap.get(port)»)''' ] // Function
+			['''fifo_«it.name».hasRoom(«action.outputPattern.numTokensMap.get(it)»)''' ] // Function
 		)
 	}
 	
@@ -397,7 +397,6 @@ class ActorPrinter extends JavaTemplate {
 			val castType =
 				if (inst.target.variable.type.list) (inst.target.variable.type as TypeList).innermostType.doSwitch
 				else inst.target.variable.type.doSwitch
-			
 			'''
 			«inst.target.variable.indexedName» = («castType») («inst.value.doSwitch»);
 			'''

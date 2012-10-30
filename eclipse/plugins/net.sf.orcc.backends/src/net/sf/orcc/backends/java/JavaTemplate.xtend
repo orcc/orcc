@@ -185,7 +185,7 @@ class JavaTemplate extends TemplateUtil {
 					finalList.add('''«printParameter(call.parameters.get(i))»''')
 				}
 			}
-			'''«FOR arg : finalList SEPARATOR ", "»«arg»«ENDFOR»'''
+			finalList.join(", ")
 		}
 	}
 	
@@ -240,7 +240,7 @@ class JavaTemplate extends TemplateUtil {
 			}
 		
 		'''
-		«modifier»«variable.type.doSwitch» «variable.name»«initialization»;
+			«modifier»«variable.type.doSwitch» «variable.name»«initialization»;
 		'''
 	}
 }
