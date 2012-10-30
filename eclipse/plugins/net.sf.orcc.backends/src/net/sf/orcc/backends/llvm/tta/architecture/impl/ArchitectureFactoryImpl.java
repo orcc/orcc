@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Map;
 
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
@@ -66,6 +68,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Term;
 import net.sf.orcc.backends.llvm.tta.architecture.TermBool;
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Writes;
+import net.sf.orcc.backends.llvm.tta.architecture.util.AdfParser;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -932,53 +935,67 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	@Override
 	public Processor createProcessor(String name, ProcessorConfiguration conf,
 			int ramSize) {
-		Processor processor = createProcessor();
-		processor.setName(name);
+		Processor processor = null;
 
-		// Address spaces
-		Memory program = createMemory("instructions");
-		Memory data = createMemory("data");
-		processor.setROM(program);
-		processor.getLocalRAMs().add(data);
-		// Buses
-		for (int i = 0; i < conf.getBusNb(); i++) {
-			Bus bus = createBusDefault(i, 32);
-			processor.getBuses().add(bus);
+		if (conf == ProcessorConfiguration.FAST) {
+			try {
+				FileInputStream fis = new FileInputStream(
+						"/home/hyviquel/Workspaces/experimental/orcc/eclipse/plugins/net.sf.orcc.backends/runtime/TTA/adf/clustered_mul4.adf");
+				processor = new AdfParser().parseProcessor(fis);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		} else {
+			processor = createProcessor();
+
+			// Address spaces
+			Memory program = createMemory("instructions");
+			Memory data = createMemory("data");
+			processor.setROM(program);
+			processor.getLocalRAMs().add(data);
+			// Buses
+			for (int i = 0; i < conf.getBusNb(); i++) {
+				Bus bus = createBusDefault(i, 32);
+				processor.getBuses().add(bus);
+			}
+			// Global Control Unit
+			processor
+					.setGcu(createGlobalControlUnitDefault(processor, program));
+			// Register files
+			RegisterFile bool = createRegisterFileDefault(processor, "BOOL",
+					conf.getBoolRfSize(), 1);
+			processor.getRegisterFiles().add(bool);
+			for (int i = 0; i < conf.getIntRfNb(); i++) {
+				RegisterFile rf = createRegisterFileDefault(processor, "RF_"
+						+ i, conf.getIntRfSize(), 32);
+				processor.getRegisterFiles().add(rf);
+			}
+			// Guards
+			for (Bus bus : processor.getBuses()) {
+				bus.getGuards().addAll(createGuardsDefault(bool));
+			}
+			// Functional units
+			EList<FunctionUnit> units = processor.getFunctionUnits();
+			// * ALU
+			for (int i = 0; i < conf.getAluNb(); i++) {
+				FunctionUnit alu = createAluUnit(processor, "ALU_" + i);
+				units.add(alu);
+			}
+			// * LSU
+			for (int i = 0; i < conf.getLsuNb(); i++) {
+				units.add(createLSU(i, processor, data));
+			}
+			// * Mul
+			for (int i = 0; i < conf.getMulNb(); i++) {
+				units.add(createMultiplier("Mul_" + i, processor));
+			}
+			// * And-ior-xor
+			String[] aixOperations2 = { "and", "ior", "xor" };
+			units.add(createFunctionUnit(processor, "And_ior_xor", null,
+					aixOperations2, "LU"));
 		}
-		// Global Control Unit
-		processor.setGcu(createGlobalControlUnitDefault(processor, program));
-		// Register files
-		RegisterFile bool = createRegisterFileDefault(processor, "BOOL",
-				conf.getBoolRfSize(), 1);
-		processor.getRegisterFiles().add(bool);
-		for (int i = 0; i < conf.getIntRfNb(); i++) {
-			RegisterFile rf = createRegisterFileDefault(processor, "RF_" + i,
-					conf.getIntRfSize(), 32);
-			processor.getRegisterFiles().add(rf);
-		}
-		// Guards
-		for (Bus bus : processor.getBuses()) {
-			bus.getGuards().addAll(createGuardsDefault(bool));
-		}
-		// Functional units
-		EList<FunctionUnit> units = processor.getFunctionUnits();
-		// * ALU
-		for (int i = 0; i < conf.getAluNb(); i++) {
-			FunctionUnit alu = createAluUnit(processor, "ALU_" + i);
-			units.add(alu);
-		}
-		// * LSU
-		for (int i = 0; i < conf.getLsuNb(); i++) {
-			units.add(createLSU(i, processor, data));
-		}
-		// * Mul
-		for (int i = 0; i < conf.getMulNb(); i++) {
-			units.add(createMultiplier("Mul_" + i, processor));
-		}
-		// * And-ior-xor
-		String[] aixOperations2 = { "and", "ior", "xor" };
-		units.add(createFunctionUnit(processor, "And_ior_xor", null,
-				aixOperations2, "LU"));
+
+		processor.setName(name);
 
 		return processor;
 	}

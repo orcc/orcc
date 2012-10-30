@@ -2266,6 +2266,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				ProcessorConfiguration.CUSTOM);
 		addEEnumLiteral(processorConfigurationEEnum,
 				ProcessorConfiguration.HUGE);
+		addEEnumLiteral(processorConfigurationEEnum,
+				ProcessorConfiguration.FAST);
+		addEEnumLiteral(processorConfigurationEEnum,
+				ProcessorConfiguration.OTHER);
 
 		initEEnum(socketTypeEEnum, SocketType.class, "SocketType");
 		addEEnumLiteral(socketTypeEEnum, SocketType.INPUT);

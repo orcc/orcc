@@ -73,7 +73,23 @@ public enum ProcessorConfiguration implements Enumerator {
 	 * @generated
 	 * @ordered
 	 */
-	HUGE(2, "Huge", "Huge");
+	HUGE(2, "Huge", "Huge"), /**
+								 * The '<em><b>Fast</b></em>' literal object.
+								 * <!-- begin-user-doc -->
+								 * <!-- end-user-doc -->
+								 * @see #FAST_VALUE
+								 * @generated
+								 * @ordered
+								 */
+	FAST(3, "Fast", "Fast"), /**
+								 * The '<em><b>Other</b></em>' literal object.
+								 * <!-- begin-user-doc -->
+								 * <!-- end-user-doc -->
+								 * @see #OTHER_VALUE
+								 * @generated
+								 * @ordered
+								 */
+	OTHER(4, "Other", "Other");
 
 	/**
 	 * The '<em><b>Standard</b></em>' literal value.
@@ -121,12 +137,42 @@ public enum ProcessorConfiguration implements Enumerator {
 	public static final int HUGE_VALUE = 2;
 
 	/**
+	 * The '<em><b>Fast</b></em>' literal value.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of '<em><b>Fast</b></em>' literal object isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @see #FAST
+	 * @model name="Fast"
+	 * @generated
+	 * @ordered
+	 */
+	public static final int FAST_VALUE = 3;
+
+	/**
+	 * The '<em><b>Other</b></em>' literal value.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of '<em><b>Other</b></em>' literal object isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @see #OTHER
+	 * @model name="Other"
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OTHER_VALUE = 4;
+
+	/**
 	 * An array of all the '<em><b>Processor Configuration</b></em>' enumerators.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	private static final ProcessorConfiguration[] VALUES_ARRAY = new ProcessorConfiguration[] {
-			STANDARD, CUSTOM, HUGE, };
+			STANDARD, CUSTOM, HUGE, FAST, OTHER, };
 
 	/**
 	 * A public read-only list of all the '<em><b>Processor Configuration</b></em>' enumerators.
@@ -180,6 +226,10 @@ public enum ProcessorConfiguration implements Enumerator {
 			return CUSTOM;
 		case HUGE_VALUE:
 			return HUGE;
+		case FAST_VALUE:
+			return FAST;
+		case OTHER_VALUE:
+			return OTHER;
 		}
 		return null;
 	}

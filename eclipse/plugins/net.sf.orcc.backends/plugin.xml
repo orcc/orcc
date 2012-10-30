@@ -360,6 +360,9 @@
                   id="Custom">
                </comboBoxItem>
                <comboBoxItem
+                  id="Fast">
+               </comboBoxItem>
+               <comboBoxItem
                   id="Huge">
                </comboBoxItem>
             </comboBox>

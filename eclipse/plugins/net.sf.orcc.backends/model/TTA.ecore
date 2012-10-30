@@ -85,6 +85,8 @@
     <eLiterals name="Standard"/>
     <eLiterals name="Custom" value="1"/>
     <eLiterals name="Huge" value="2"/>
+    <eLiterals name="Fast" value="3" literal="Fast"/>
+    <eLiterals name="Other" value="4" literal="Other"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Bus">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
