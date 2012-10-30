@@ -357,6 +357,7 @@ public class CBackendImpl extends AbstractBackend {
 						.getVersionArrayFromString(currentBundleVersion),
 						BackendUtil.getVersionArrayFromString(libVersion));
 				exportLibrary = compareResult > 0;
+				reader.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
