@@ -35,6 +35,7 @@ package net.sf.orcc.util;
  * @author Matthieu Wipliez
  * 
  */
+@Deprecated
 public interface WriteListener {
 
 	/**
