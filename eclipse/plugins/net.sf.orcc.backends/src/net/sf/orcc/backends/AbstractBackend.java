@@ -71,7 +71,6 @@ import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.WriteListener;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.apache.commons.cli.CommandLine;
@@ -139,7 +138,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected int fifoSize;
 
 	private IFile inputFile;
-	private WriteListener listener;
 	protected Map<String, String> mapping;
 
 	/**
@@ -590,11 +588,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		return options;
 	}
 
-	@Override
-	public WriteListener getWriteListener() {
-		return listener;
-	}
-
 	/**
 	 * Returns true if this process has been canceled.
 	 * 
@@ -875,11 +868,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	@Override
-	public void setWriteListener(WriteListener listener) {
-		this.listener = listener;
-	}
-
-	@Override
 	public Object start(IApplicationContext context) throws Exception {
 
 		Options options = new Options();
@@ -906,14 +894,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// FIXME: choose independently the transformation to apply
 		options.addOption("t", "transfo_add", false,
 				"Execute additional transformations before generate code");
-
-		// TODO : Delete this when it will be totally useless
-		setWriteListener(new WriteListener() {
-			@Override
-			public void writeText(String text) {
-				System.out.print(text);
-			}
-		});
 
 		try {
 			CommandLineParser parser = new PosixParser();

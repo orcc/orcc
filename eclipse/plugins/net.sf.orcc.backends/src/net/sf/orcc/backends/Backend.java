@@ -30,8 +30,6 @@ package net.sf.orcc.backends;
 
 import java.util.Map;
 
-import net.sf.orcc.util.WriteListener;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -56,8 +54,6 @@ public interface Backend {
 	 */
 	boolean exportRuntimeLibrary();
 
-	WriteListener getWriteListener();
-
 	/**
 	 * Sets the options of this back-end.
 	 * 
@@ -73,13 +69,5 @@ public interface Backend {
 	 *            a progress monitor
 	 */
 	void setProgressMonitor(IProgressMonitor monitor);
-
-	/**
-	 * Sets the write listener used by this back-end.
-	 * 
-	 * @param monitor
-	 *            a write listener
-	 */
-	void setWriteListener(WriteListener listener);
 
 }

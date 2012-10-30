@@ -33,7 +33,6 @@ import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import java.util.Map;
 
 import net.sf.orcc.plugins.PluginFactory;
-import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -85,15 +84,14 @@ public class BackendFactory extends PluginFactory {
 	 *            launch configuration
 	 * @throws Exception
 	 */
-	public void runBackend(IProgressMonitor monitor, WriteListener listener,
-			Map<String, Object> options) throws Exception {
+	public void runBackend(IProgressMonitor monitor, Map<String, Object> options)
+			throws Exception {
 		String backendName = (String) options.get(BACKEND);
 		Backend backend = (Backend) plugins.get(backendName);
 
 		backend.setProgressMonitor(monitor);
-		backend.setWriteListener(listener);
 		backend.setOptions(options);
-		
+
 		// Export libraries if needed by backend
 		backend.exportRuntimeLibrary();
 

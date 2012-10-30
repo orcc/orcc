@@ -30,8 +30,6 @@ package net.sf.orcc.ui.launching;
 
 import java.io.IOException;
 
-import net.sf.orcc.util.WriteListener;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -53,8 +51,7 @@ import org.eclipse.debug.core.model.IStreamsProxy;
  * @author Matthieu Wipliez
  * 
  */
-public class OrccProcess extends PlatformObject implements IProcess,
-		WriteListener {
+public class OrccProcess extends PlatformObject implements IProcess {
 
 	/**
 	 * This class defines an implementation of stream monitor.
@@ -221,7 +218,8 @@ public class OrccProcess extends PlatformObject implements IProcess,
 	 * 
 	 * @param text
 	 *            a string
-	 * @deprecated Please use methods from {@link net.sf.orcc.util.OrccLogger} instead
+	 * @deprecated Please use methods from {@link net.sf.orcc.util.OrccLogger}
+	 *             instead
 	 */
 	@Deprecated
 	public void writeText(String text) {

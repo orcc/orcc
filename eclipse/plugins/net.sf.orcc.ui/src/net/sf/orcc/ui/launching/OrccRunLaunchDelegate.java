@@ -73,7 +73,7 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 			String backend = configuration.getAttribute(BACKEND, "");
 			try {
 				BackendFactory factory = BackendFactory.getInstance();
-				factory.runBackend(process.getProgressMonitor(), process,
+				factory.runBackend(process.getProgressMonitor(),
 						configuration.getAttributes());
 
 				OrccLogger.traceln("Orcc backend done.");
