@@ -169,27 +169,17 @@ public class DomUtil {
 	}
 
 	/**
-	 * Returns the attribute's value of the first node tagged with the given tag
-	 * name from the given list of nodes.
+	 * Returns the value of the attribute for the given node.
 	 * 
-	 * @param tagName
-	 *            the tag of the node
 	 * @param attrName
 	 *            the name of the attribute
-	 * @param nodes
-	 *            the list of the nodes
-	 * @return the attribute's value of the node tagged with the given tag name
+	 * @param node
+	 *            the given node
+	 * 
+	 * @return the value of the attribute for the given node
 	 */
-	public static String getNodeAttr(String tagName, String attrName,
-			NodeList nodes) {
-		for (int x = 0; x < nodes.getLength(); x++) {
-			Node node = nodes.item(x);
-			if (node.getNodeName().equalsIgnoreCase(tagName)) {
-				getNodeAttr(attrName, node);
-			}
-		}
-
-		return "";
+	public static int getNodeIntAttr(String attrName, Node node) {
+		return Integer.parseInt(getNodeAttr(attrName, node));
 	}
 
 	/**
@@ -214,9 +204,9 @@ public class DomUtil {
 	 * @return the integer value of the node identified by the given tag from
 	 *         the given list of nodes
 	 */
-	public static int getNodeIntValue(String tagName, NodeList nodes)
+	public static int getChildIntValue(String tagName, Node node)
 			throws NumberFormatException {
-		return Integer.parseInt(getNodeValue(tagName, nodes));
+		return Integer.parseInt(getChildValue(tagName, node));
 	}
 
 	/**
@@ -242,17 +232,18 @@ public class DomUtil {
 	 * 
 	 * @param tagName
 	 *            a tag identifying the node
-	 * @param nodes
+	 * @param node
 	 *            a list of nodes
 	 * @return the string value of the node identified with the given tag from
 	 *         the given list of nodes
 	 */
-	public static String getNodeValue(String tagName, NodeList nodes) {
-		for (int x = 0; x < nodes.getLength(); x++) {
-			Node node = nodes.item(x);
-			if (node.getNodeName().equalsIgnoreCase(tagName)) {
-				getNodeValue(node);
+	public static String getChildValue(String tagName, Node node) {
+		Element child = getFirstElementChild(node);
+		while (child != null) {
+			if (child.getNodeName().equals(tagName)) {
+				return getNodeValue(child);
 			}
+			child = getNextElementSibling(child);
 		}
 		return "";
 	}
