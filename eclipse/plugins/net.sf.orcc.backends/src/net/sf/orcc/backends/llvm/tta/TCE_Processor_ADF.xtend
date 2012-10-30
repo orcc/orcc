@@ -36,7 +36,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.ExprUnary
 import net.sf.orcc.backends.llvm.tta.architecture.FuPort
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit
 import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit
-import net.sf.orcc.backends.llvm.tta.architecture.Guard
 import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Operation
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
@@ -203,13 +202,6 @@ class TCE_Processor_ADF extends ArchitectureSwitch<CharSequence> {
 			<delay-slots>«gcu.delaySlots»</delay-slots>
 			<guard-latency>«gcu.guardLatency»</guard-latency>
 		</global-control-unit>
-		'''
-	
-	def print(Guard guard) 
-		'''
-		<guard>
-			<printExpression(guard)>
-		</guard>
 		'''
 	
 	def print(Operation operation, boolean isControl) 
