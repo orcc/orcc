@@ -84,17 +84,16 @@ class InstancePrinter extends LLVMTemplate {
 	var optionProfile = false
 	
 	/**
-	 * Default constructor, do not activate profile option
+	 * Default constructor, do not activate profile option and do not set instance (Jade requirement)
 	 */
-	new(Instance instance) {
-		this(instance, false)
+	new() {
+		instance = null
 	}
 	
 	/**
-	 * Constructor, set profile option to true or false
+	 * Default constructor, do not activate profile option
 	 */
-	new(Instance instance, boolean optionProfile) {
-		
+	new(Instance instance) {
 		if ( ! instance.isActor) {
 			OrccLogger::severeln("Instance " + instance.name + " is not an Actor's instance")
 		}
@@ -105,6 +104,14 @@ class InstancePrinter extends LLVMTemplate {
 		computeCastedList
 		computeStateToLabel
 		computePortToIndexByPatternMap
+	}
+	
+	/**
+	 * Constructor, set profile option to true or false
+	 */
+	new(Instance instance, boolean optionProfile) {
+		this(instance)
+		this.optionProfile = optionProfile
 	}
 	
 	def getInstanceFileContent() '''
@@ -152,7 +159,7 @@ class InstancePrinter extends LLVMTemplate {
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; State variables of the actor
 			«FOR variable : instance.actor.stateVars»
-				@«variable.name» = internal «variable.printStateVarNature» «variable.type.doSwitch» «variable.initialize»
+				«variable.stateVar»
 			«ENDFOR»
 			
 		«ENDIF»
@@ -214,6 +221,10 @@ class InstancePrinter extends LLVMTemplate {
 			«schedulerWithoutFSM»
 		«ENDIF»
 	'''
+	
+	def stateVar(Var variable)
+		'''@«variable.name» = internal «variable.printStateVarNature» «variable.type.doSwitch» «variable.initialize»'''
+
 	
 	def schedulerWithFSM() '''
 		@_FSM_state = internal global i32 «stateToLabel.get(instance.actor.fsm.initialState)»
