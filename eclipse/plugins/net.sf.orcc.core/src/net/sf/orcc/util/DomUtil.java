@@ -39,7 +39,10 @@ import net.sf.orcc.OrccRuntimeException;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSInput;
@@ -48,10 +51,12 @@ import org.w3c.dom.ls.LSParser;
 import org.w3c.dom.ls.LSSerializer;
 
 /**
- * This class defines utility methods to create DOM documents and print them to
- * an output stream using DOM 3 Load Save objects.
+ * This class defines utility methods to create DOM documents, to print them to
+ * an output stream using DOM 3 Load Save objects and to make easier the parsing
+ * of XML files.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
 public class DomUtil {
@@ -70,6 +75,21 @@ public class DomUtil {
 	public static Document createDocument(String docElt) {
 		getImplementation();
 		return impl.createDocument("", docElt, null);
+	}
+
+	/**
+	 * @param root
+	 * @return
+	 */
+	public static Element getFirstElementChild(Node root) {
+		Node node = root.getFirstChild();
+		while (node != null) {
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				return (Element) node;
+			}
+			node = node.getNextSibling();
+		}
+		return null;
 	}
 
 	/**
@@ -99,17 +119,142 @@ public class DomUtil {
 	}
 
 	/**
-	 * Parses the given String as XML and returns the corresponding DOM
-	 * document. The String is converted to an input stream so that encoding is
-	 * taken into account (otherwise if we pass a String to an LSInput DOM will
-	 * ignore the encoding and assume UTF-16).
+	 * Returns the next sibling element of the given node.
 	 * 
-	 * @param str
-	 *            a String
-	 * @return a DOM document
+	 * @param node
+	 *            the given node
+	 * @return the next sibling element of the given node
 	 */
-	public static Document parseDocument(String str) {
-		return parseDocument(new ByteArrayInputStream(str.getBytes()));
+	public static Element getNextElementSibling(Node node) {
+		node = node.getNextSibling();
+		while (node != null) {
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				return (Element) node;
+			}
+			node = node.getNextSibling();
+		}
+		return null;
+	}
+
+	public static Node getNode(String tagName, NodeList nodes) {
+		for (int x = 0; x < nodes.getLength(); x++) {
+			Node node = nodes.item(x);
+			if (node.getNodeName().equalsIgnoreCase(tagName)) {
+				return node;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the value of the attribute for the given node.
+	 * 
+	 * @param attrName
+	 *            the name of the attribute
+	 * @param node
+	 *            the given node
+	 * 
+	 * @return the value of the attribute for the given node
+	 */
+	public static String getNodeAttr(String attrName, Node node) {
+		NamedNodeMap attrs = node.getAttributes();
+		for (int y = 0; y < attrs.getLength(); y++) {
+			Node attr = attrs.item(y);
+			if (attr.getNodeName().equalsIgnoreCase(attrName)) {
+				return attr.getNodeValue();
+			}
+		}
+		return "";
+	}
+
+	/**
+	 * Returns the attribute's value of the first node tagged with the given tag
+	 * name from the given list of nodes.
+	 * 
+	 * @param tagName
+	 *            the tag of the node
+	 * @param attrName
+	 *            the name of the attribute
+	 * @param nodes
+	 *            the list of the nodes
+	 * @return the attribute's value of the node tagged with the given tag name
+	 */
+	public static String getNodeAttr(String tagName, String attrName,
+			NodeList nodes) {
+		for (int x = 0; x < nodes.getLength(); x++) {
+			Node node = nodes.item(x);
+			if (node.getNodeName().equalsIgnoreCase(tagName)) {
+				getNodeAttr(attrName, node);
+			}
+		}
+
+		return "";
+	}
+
+	/**
+	 * Return the integer value of the given node.
+	 * 
+	 * @param node
+	 *            a node
+	 * @return the integer value of the given node
+	 */
+	public static int getNodeIntValue(Node node) throws NumberFormatException {
+		return Integer.parseInt(getNodeValue(node));
+	}
+
+	/**
+	 * Return the integer value of the node identified by the given tag from the
+	 * given list of nodes.
+	 * 
+	 * @param tagName
+	 *            a tag
+	 * @param nodes
+	 *            a list of nodes
+	 * @return the integer value of the node identified by the given tag from
+	 *         the given list of nodes
+	 */
+	public static int getNodeIntValue(String tagName, NodeList nodes)
+			throws NumberFormatException {
+		return Integer.parseInt(getNodeValue(tagName, nodes));
+	}
+
+	/**
+	 * Return the string value of the given node (eventually empty).
+	 * 
+	 * @param node
+	 *            a node
+	 * @return the string value of the given node
+	 */
+	public static String getNodeValue(Node node) {
+		NodeList childNodes = node.getChildNodes();
+		for (int x = 0; x < childNodes.getLength(); x++) {
+			Node data = childNodes.item(x);
+			if (data.getNodeType() == Node.TEXT_NODE)
+				return data.getNodeValue();
+		}
+		return "";
+	}
+
+	/**
+	 * Return the string value (eventually empty) of the node identified with
+	 * the given tag from the given list of nodes.
+	 * 
+	 * @param tagName
+	 *            a tag identifying the node
+	 * @param nodes
+	 *            a list of nodes
+	 * @return the string value of the node identified with the given tag from
+	 *         the given list of nodes
+	 */
+	public static String getNodeValue(String tagName, NodeList nodes) {
+		for (int x = 0; x < nodes.getLength(); x++) {
+			Node node = nodes.item(x);
+			if (node.getNodeName().equalsIgnoreCase(tagName)) {
+				getNodeValue(node);
+			}
+		}
+		return "";
 	}
 
 	/**
@@ -139,17 +284,17 @@ public class DomUtil {
 	}
 
 	/**
-	 * Returns a string representation of the given node. Like
-	 * {@link #parseDocument(String)}, we use an intermediary byte array output
-	 * stream so we can specify the encoding.
+	 * Parses the given String as XML and returns the corresponding DOM
+	 * document. The String is converted to an input stream so that encoding is
+	 * taken into account (otherwise if we pass a String to an LSInput DOM will
+	 * ignore the encoding and assume UTF-16).
 	 * 
-	 * @param node
-	 *            a DOM node
+	 * @param str
+	 *            a String
+	 * @return a DOM document
 	 */
-	public static String writeToString(Node node) {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		writeDocument(os, node);
-		return os.toString();
+	public static Document parseDocument(String str) {
+		return parseDocument(new ByteArrayInputStream(str.getBytes()));
 	}
 
 	/**
@@ -172,6 +317,20 @@ public class DomUtil {
 		LSSerializer serializer = implLS.createLSSerializer();
 		serializer.getDomConfig().setParameter("format-pretty-print", true);
 		serializer.write(node, output);
+	}
+
+	/**
+	 * Returns a string representation of the given node. Like
+	 * {@link #parseDocument(String)}, we use an intermediary byte array output
+	 * stream so we can specify the encoding.
+	 * 
+	 * @param node
+	 *            a DOM node
+	 */
+	public static String writeToString(Node node) {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		writeDocument(os, node);
+		return os.toString();
 	}
 
 }
