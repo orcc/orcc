@@ -271,7 +271,7 @@ public class CBackendImpl extends AbstractBackend {
 			new ActorMerger().doSwitch(network);
 		}
 
-		new CBroadcastAdder(getWriteListener()).doSwitch(network);
+		new CBroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
 
 		return network;

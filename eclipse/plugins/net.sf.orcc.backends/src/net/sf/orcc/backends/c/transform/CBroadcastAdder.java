@@ -37,7 +37,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.util.WriteListener;
+import net.sf.orcc.util.OrccLogger;
 
 /**
  * Adds broadcast actors only when some fifos from same port have different
@@ -47,12 +47,6 @@ import net.sf.orcc.util.WriteListener;
  * 
  */
 public class CBroadcastAdder extends BroadcastAdder {
-
-	private WriteListener listener;
-
-	public CBroadcastAdder(WriteListener listener) {
-		this.listener = listener;
-	}
 
 	@Override
 	public Void casePort(Port port) {
@@ -75,11 +69,11 @@ public class CBroadcastAdder extends BroadcastAdder {
 			for (Edge edge : edges) {
 				if (size != ((Connection) edge).getSize()) {
 					createBroadcast(network.getName(), srcPort, edges);
-					listener.writeText("Warning: Different-sized FIFOs connected to port '"
-							+ srcPort.getName()
-							+ "' in '"
-							+ network.getName()
-							+ "'. A broadcast is created.\n");
+					OrccLogger
+							.warnln("Different-sized FIFOs connected to port '"
+									+ srcPort.getName() + "' in '"
+									+ network.getName()
+									+ "'. A broadcast is created.\n");
 				}
 			}
 		}
