@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, IRISA
+ * Copyright (c) 2011, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,72 +26,52 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.xlim.transform;
+package net.sf.orcc.backends.transform;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import net.sf.orcc.df.Action;
-import net.sf.orcc.df.Pattern;
-import net.sf.orcc.df.Port;
-import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines an actor transformation that replace list of one element
- * used to stock input/output value by a scalar
+ * Replace local arrays by global ones.
  * 
  * @author Herve Yviquel
  * 
  */
-public class UnaryListRemoval extends DfVisitor<Void> {
+public class LocalArrayRemoval extends AbstractIrVisitor<Void> {
 
 	@Override
-	public Void caseAction(Action action) {
-		doSwitch(action.getInputPattern());
-		doSwitch(action.getOutputPattern());
+	public Void caseProcedure(Procedure procedure) {
+		Actor actor = EcoreHelper.getContainerOfType(procedure, Actor.class);
+		EList<Var> stateVars = actor.getStateVars();
+		for (Var var : new ArrayList<Var>(procedure.getLocals())) {
+			if (var.getType().isList()) {
+				Var newVar = IrFactory.eINSTANCE.createVar(var.getType(),
+						var.getName() + "_" + procedure.getName(), true,
+						var.getIndex());
+				newVar.setInitialValue(var.getInitialValue());
 
-		return null;
-	}
-
-	@Override
-	public Void casePattern(Pattern pattern) {
-		List<Port> ports = new ArrayList<Port>(pattern.getPorts());
-		for (Port port : ports) {
-			if (pattern.getNumTokens(port) == 1) {
-				Var var = pattern.getVariable(port);
-
-				// Transform in scalar variable
-				var.setType(((TypeList) var.getType()).getInnermostType());
-
-				// Transform load in assignment
-				for (Use use : new ArrayList<Use>(var.getUses())) {
-					InstLoad load = EcoreHelper.getContainerOfType(use,
-							InstLoad.class);
-					InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-							load.getTarget().getVariable(), load.getSource()
-									.getVariable());
-					EcoreUtil.replace(load, assign);
-					IrUtil.delete(load);
+				EList<Use> uses = var.getUses();
+				while (!uses.isEmpty()) {
+					uses.get(0).setVariable(newVar);
+				}
+				EList<Def> defs = var.getDefs();
+				while (!defs.isEmpty()) {
+					defs.get(0).setVariable(newVar);
 				}
 
-				// Transform store in assignment
-				for (Def def : new ArrayList<Def>(var.getDefs())) {
-					InstStore store = EcoreHelper.getContainerOfType(def,
-							InstStore.class);
-					store.getIndexes().clear();
-				}
+				IrUtil.delete(var);
+				stateVars.add(newVar);
 			}
 		}
 		return null;

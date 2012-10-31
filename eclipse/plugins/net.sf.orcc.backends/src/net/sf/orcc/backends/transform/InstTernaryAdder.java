@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.xlim.transform;
+package net.sf.orcc.backends.transform;
 
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
