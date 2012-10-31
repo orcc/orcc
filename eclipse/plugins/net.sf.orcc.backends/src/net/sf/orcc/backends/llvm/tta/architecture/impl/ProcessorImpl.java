@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.backends.TemplateData;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
@@ -187,8 +186,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * @ordered
 	 */
 	protected ProcessorConfiguration configuration = CONFIGURATION_EDEFAULT;
-
-	protected TemplateData templateData;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
