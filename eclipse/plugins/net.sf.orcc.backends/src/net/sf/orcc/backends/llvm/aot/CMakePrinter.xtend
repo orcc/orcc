@@ -91,8 +91,6 @@ class CMakePrinter {
 			«FOR instance : network.children.filter(typeof(Instance)).filter[ ! actor.native]»
 				${CMAKE_BINARY_DIR}/CMakeFiles/«instance.name».ll.o
 			«ENDFOR»
-			# Useless ?
-			# <network.entities: sourceFile();separator="\n">
 		)
 		
 		macro (compileAssemblyFile name) 
@@ -108,10 +106,6 @@ class CMakePrinter {
 		«FOR instance : network.children.filter(typeof(Instance)).filter[ ! actor.native]»
 			compileAssemblyFile(«instance.name»)
 		«ENDFOR»
-		# Useless ?
-		# <network.entities: compileAssemblyFile();separator="\n">
-		
-		find_package(Threads REQUIRED)
 		
 		find_package(SDL REQUIRED)
 		
