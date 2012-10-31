@@ -36,6 +36,7 @@ import java.util.logging.LogRecord;
 import net.sf.orcc.OrccRuntimeException;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
@@ -52,8 +53,42 @@ public class OrccUiConsoleHandler extends Handler {
 
 	IOConsole console = null;
 
+	class PublishProcess implements Runnable {
+
+		LogRecord record;
+
+		/**
+		 * 
+		 */
+		public PublishProcess(LogRecord record) {
+			this.record = record;
+		}
+
+		@Override
+		public void run() {
+			String message;
+			message = getFormatter().format(record);
+
+			IOConsoleOutputStream outStream = console.newOutputStream();
+
+			if (record.getLevel().intValue() == Level.SEVERE.intValue()) {
+				outStream.setColor(new Color(null, 255, 0, 0));
+			} else if (record.getLevel().intValue() == Level.WARNING.intValue()) {
+				outStream.setColor(new Color(null, 250, 133, 50));
+			} else if (record.getLevel().intValue() == Level.FINE.intValue()) {
+				outStream.setColor(new Color(null, 133, 200, 62));
+			}
+
+			try {
+				outStream.write(message);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	/**
-	 * Build the Ecliple console handler
+	 * Build the Eclipse console handler
 	 * 
 	 * @param currentConsole
 	 *            the current eclipse ProcessConsole
@@ -64,6 +99,7 @@ public class OrccUiConsoleHandler extends Handler {
 		if (currentConsole instanceof IOConsole) {
 			this.console = (IOConsole) currentConsole;
 			console.activate();
+
 		} else {
 			throw new OrccRuntimeException(
 					"Invalid console passed in parameter");
@@ -102,22 +138,6 @@ public class OrccUiConsoleHandler extends Handler {
 			return;
 		}
 
-		String message;
-		message = getFormatter().format(record);
-
-		IOConsoleOutputStream outStream = console.newOutputStream();
-		if (record.getLevel().intValue() == Level.SEVERE.intValue()) {
-			outStream.setColor(new Color(null, 255, 0, 0));
-		} else if (record.getLevel().intValue() == Level.WARNING.intValue()) {
-			outStream.setColor(new Color(null, 250, 133, 50));
-		} else if (record.getLevel().intValue() == Level.FINE.intValue()) {
-			outStream.setColor(new Color(null, 133, 200, 62));
-		}
-
-		try {
-			outStream.write(message);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Display.getDefault().syncExec(new PublishProcess(record));
 	}
 }
