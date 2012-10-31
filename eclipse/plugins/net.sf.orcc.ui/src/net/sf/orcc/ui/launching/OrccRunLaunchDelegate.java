@@ -78,14 +78,14 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 
 				OrccLogger.traceln("Orcc backend done.");
 			} catch (OrccRuntimeException exception) {
-				OrccLogger.severe(exception.getMessage());
-				OrccLogger.severe(backend
+				OrccLogger.severeln(exception.getMessage());
+				OrccLogger.severeln(backend
 						+ " backend could not generate code\n");
-				monitor.setCanceled(true);
+				process.terminate();
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if we
 				// got an error too soon
-				monitor.setCanceled(true);
+				process.terminate();
 
 				IStatus status = new Status(IStatus.ERROR,
 						OrccActivator.PLUGIN_ID, backend
