@@ -80,7 +80,8 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 			} catch (OrccRuntimeException exception) {
 				OrccLogger.severeln(exception.getMessage());
 				OrccLogger.severeln(backend
-						+ " backend could not generate code\n");
+						+ " backend could not generate code ("
+						+ exception.getCause() + ")");
 				process.terminate();
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if we
