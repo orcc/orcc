@@ -36,8 +36,6 @@ import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 
-import org.eclipse.core.resources.IFile;
-
 /**
  * This class defines a printer for "standard" objects, namely actors,
  * instances, and networks. This class supports caching in order not to
@@ -70,15 +68,16 @@ public class JavaPrinter extends CommonPrinter {
 	public boolean print(String folder, Actor actor) {
 		String file = folder + File.separator + actor.getSimpleName() + ".java";
 
-		IFile irFile = actor.getFile();
 		File targetActorFile = new File(file);
 
 		if (!actor.isNative()) {
-			if (!needToReplace(targetActorFile, irFile)) {
-				return true;
-			}
+
 			CharSequence sequence = new ActorPrinter(actor)
 					.getActorFileContent();
+
+			if (!needToReplace(targetActorFile, sequence.toString())) {
+				return true;
+			}
 			if (!printFile(sequence, file)) {
 				throw new OrccRuntimeException("Unable to write file " + file);
 			}
@@ -98,15 +97,15 @@ public class JavaPrinter extends CommonPrinter {
 		String targetNetworkPath = folder + File.separator
 				+ network.getSimpleName() + ".java";
 
-		IFile newFile = network.getFile();
 		File targetFile = new File(targetNetworkPath);
-
-		if (!needToReplace(targetFile, newFile)) {
-			return true;
-		}
 
 		CharSequence sequence = new NetworkPrinter(network)
 				.getNetworkFileContent(options);
+
+		if (!needToReplace(targetFile, sequence.toString())) {
+			return true;
+		}
+
 		if (!printFile(sequence, targetNetworkPath)) {
 			throw new OrccRuntimeException("Unable to write file "
 					+ targetNetworkPath);

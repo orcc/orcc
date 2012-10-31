@@ -35,8 +35,6 @@ import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
-import org.eclipse.core.resources.IFile;
-
 /**
  * @author Antoine Lorence
  * 
@@ -60,15 +58,15 @@ public class CPrinter extends CommonPrinter {
 	public boolean print(String folder, Instance instance) {
 		String file = folder + File.separator + instance.getName() + ".c";
 
-		IFile irFile = instance.getActor().getFile();
 		File targetActorFile = new File(file);
-
-		if (!needToReplace(targetActorFile, irFile)) {
-			return true;
-		}
 
 		CharSequence fileContent = new InstancePrinter(instance, options)
 				.getInstanceFileContent();
+
+		if (!needToReplace(targetActorFile, fileContent.toString())) {
+			return true;
+		}
+
 		if (!printFile(fileContent, file)) {
 			throw new OrccRuntimeException("Unable to write file " + file);
 		}
@@ -87,15 +85,14 @@ public class CPrinter extends CommonPrinter {
 		String targetNetworkPath = folder + File.separator
 				+ network.getSimpleName() + ".c";
 
-		IFile newFile = network.getFile();
 		File targetFile = new File(targetNetworkPath);
-
-		if (!needToReplace(targetFile, newFile)) {
-			return true;
-		}
 
 		CharSequence fileContent = new NetworkPrinter(network, options)
 				.getNetworkFileContent();
+
+		if (!needToReplace(targetFile, fileContent.toString())) {
+			return true;
+		}
 
 		if (!printFile(fileContent, targetNetworkPath)) {
 			throw new OrccRuntimeException("Unable to write file "

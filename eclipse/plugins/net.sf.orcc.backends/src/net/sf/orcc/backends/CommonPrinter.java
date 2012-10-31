@@ -29,10 +29,15 @@
  */
 package net.sf.orcc.backends;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,6 +69,15 @@ public abstract class CommonPrinter {
 	protected Map<String, Object> options;
 
 	/**
+	 * The algorithm used with MessageDigest. Can be MD, SHA, etc (see <a
+	 * href="http://docs
+	 * .oracle.com/javase/1.4.2/docs/guide/security/CryptoSpec.html#AppA">
+	 * http://docs
+	 * .oracle.com/javase/1.4.2/docs/guide/security/CryptoSpec.html#AppA</a>)
+	 */
+	private static final String digestAlgo = "MD5";
+
+	/**
 	 * Creates a new common printer.
 	 * 
 	 * @param templateName
@@ -93,7 +107,9 @@ public abstract class CommonPrinter {
 	 * @param actor
 	 *            an actor
 	 * @return the time of the last modification
+	 * @deprecated please use needToReplace() instead
 	 */
+	@Deprecated
 	protected long getLastModified(Actor actor) {
 		IFile actorFile = actor.getFile();
 		if (actorFile == null) {
@@ -102,7 +118,6 @@ public abstract class CommonPrinter {
 		} else {
 			return actorFile.getLocalTimeStamp();
 		}
-
 	}
 
 	/**
@@ -111,7 +126,9 @@ public abstract class CommonPrinter {
 	 * @param network
 	 *            a network
 	 * @return the time of the last modification
+	 * @deprecated please use needToReplace() instead
 	 */
+	@Deprecated
 	protected long getLastModified(Network network) {
 		IFile networkFile = network.getFile();
 		if (networkFile == null) {
@@ -120,18 +137,83 @@ public abstract class CommonPrinter {
 		} else {
 			return networkFile.getLocalTimeStamp();
 		}
-
 	}
 
 	/**
-	 * Return true if oldFile need to be replaced by newFile
+	 * Return the hash array for the byte[] content
 	 * 
-	 * @param oldFile
-	 * @param newFile
+	 * @param content
+	 * @return a byte[] containing the hash
 	 */
-	protected boolean needToReplace(File oldFile, IFile newFile) {
-		return !keepUnchangedFiles
-				|| newFile.getLocalTimeStamp() > oldFile.lastModified();
+	protected byte[] hash(byte[] content) {
+		try {
+			// MessageDigest is NOT thread safe, it must be created locally on
+			// each call, it can't be a member of this class
+			MessageDigest messageDigest = MessageDigest.getInstance(digestAlgo);
+			return messageDigest.digest(content);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return new byte[0];
+	}
+
+	/**
+	 * Return the hash array for the String content
+	 * 
+	 * @param content
+	 * @return a byte[] containing the hash
+	 */
+	protected byte[] hash(String content) {
+		return hash(content.getBytes());
+	}
+
+	/**
+	 * Return the hash array for the file
+	 * 
+	 * @param file
+	 * @return a byte[] containing the hash
+	 */
+	protected byte[] hash(File file) {
+		BufferedInputStream in;
+		try {
+			// MessageDigest is NOT thread safe, it must be created locally on
+			// each call, it can't be a member of this class
+			MessageDigest messageDigest = MessageDigest.getInstance(digestAlgo);
+
+			in = new BufferedInputStream(new FileInputStream(file));
+			int theByte = 0;
+			try {
+				while ((theByte = in.read()) != -1) {
+					messageDigest.update((byte) theByte);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				in.close();
+			}
+			return messageDigest.digest();
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return new byte[0];
+	}
+
+	/**
+	 * Return true if targetFile content need to be replaced by the content's
+	 * value
+	 * 
+	 * @param targetFile
+	 * @param content
+	 */
+	protected boolean needToReplace(File targetFile, String content) {
+		return !keepUnchangedFiles || !targetFile.exists()
+				|| !MessageDigest.isEqual(hash(targetFile), hash(content));
 	}
 
 	/**
