@@ -91,7 +91,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * @author Herve Yviquel
  * 
  */
-public class JadeBackendImpl extends AbstractBackend {
+public class JadeBackend extends AbstractBackend {
 
 	private boolean byteexact;
 	private String optLevel;
@@ -114,7 +114,7 @@ public class JadeBackendImpl extends AbstractBackend {
 	 * Creates a new instance of the LLVM back-end. Initializes the
 	 * transformation hash map.
 	 */
-	public JadeBackendImpl() {
+	public JadeBackend() {
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_");
 		transformations.put("getw", "getw_");

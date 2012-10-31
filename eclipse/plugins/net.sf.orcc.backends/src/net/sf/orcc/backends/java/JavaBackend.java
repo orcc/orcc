@@ -56,7 +56,7 @@ import org.eclipse.core.resources.IFile;
  * @author Matthieu Wipliez
  * 
  */
-public class JavaBackendImpl extends AbstractBackend {
+public class JavaBackend extends AbstractBackend {
 
 	private JavaPrinter printer;
 
@@ -65,7 +65,7 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	private final Map<String, String> replacementMap;
 
-	public JavaBackendImpl() {
+	public JavaBackend() {
 		replacementMap = new HashMap<String, String>();
 		replacementMap.put("initialize", "my_initialize");
 		replacementMap.put("isSchedulable_initialize",

@@ -79,7 +79,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * @author Herve Yviquel
  * 
  */
-public class LLVMBackendImpl extends AbstractBackend {
+public class LLVMBackend extends AbstractBackend {
 
 	protected LLVMPrinter xtendPrinter;
 
@@ -98,7 +98,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	 * Creates a new instance of the LLVM back-end. Initializes the
 	 * transformation hash map.
 	 */
-	public LLVMBackendImpl() {
+	public LLVMBackend() {
 		renameMap = new HashMap<String, String>();
 		renameMap.put("abs", "abs_");
 		renameMap.put("getw", "getw_");

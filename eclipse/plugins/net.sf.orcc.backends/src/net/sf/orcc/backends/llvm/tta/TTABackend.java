@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.CommonPrinter;
-import net.sf.orcc.backends.llvm.aot.LLVMBackendImpl;
+import net.sf.orcc.backends.llvm.aot.LLVMBackend;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
@@ -87,7 +87,7 @@ import net.sf.orcc.util.OrccUtil;
  * @author Herve Yviquel
  * 
  */
-public class TTABackendImpl extends LLVMBackendImpl {
+public class TTABackend extends LLVMBackend {
 
 	String actorsPath;
 	private Mapping computedMapping;

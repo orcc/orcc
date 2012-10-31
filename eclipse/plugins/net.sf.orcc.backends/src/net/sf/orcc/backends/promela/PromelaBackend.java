@@ -72,7 +72,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Ghislain Roquier
  * 
  */
-public class PromelaBackendImpl extends AbstractBackend {
+public class PromelaBackend extends AbstractBackend {
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 
@@ -90,7 +90,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	 * Creates a new instance of the Promela back-end. Initializes the
 	 * transformation hash map.
 	 */
-	public PromelaBackendImpl() {
+	public PromelaBackend() {
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_");
 		transformations.put("getw", "getw_");

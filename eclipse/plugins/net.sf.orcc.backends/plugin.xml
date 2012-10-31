@@ -5,7 +5,7 @@
    <extension
          point="net.sf.orcc.backends.backends">
       <backend
-            class="net.sf.orcc.backends.c.CBackendImpl"
+            class="net.sf.orcc.backends.c.CBackend"
             name="C">
          <option
                id="net.sf.orcc.plugins.compileXDF">
@@ -27,7 +27,7 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.java.JavaBackendImpl"
+            class="net.sf.orcc.backends.java.JavaBackend"
             name="Java">
          <option
                id="net.sf.orcc.plugins.compileXDF">
@@ -38,7 +38,7 @@
          
       </backend>
       <backend
-            class="net.sf.orcc.backends.llvm.jit.JadeBackendImpl"
+            class="net.sf.orcc.backends.llvm.jit.JadeBackend"
             name="Jade">
          <option
                id="net.sf.orcc.backends.llvmMode">
@@ -57,7 +57,7 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.llvm.aot.LLVMBackendImpl"
+            class="net.sf.orcc.backends.llvm.aot.LLVMBackend"
             name="LLVM">
          <option
                id="net.sf.orcc.plugins.compileXDF">
@@ -67,7 +67,7 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.xlim.XlimBackendImpl"
+            class="net.sf.orcc.backends.xlim.XlimBackend"
             name="XLIM (deprecated)">
          <option
                id="net.sf.orcc.plugins.compileXDF">
@@ -80,7 +80,7 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.llvm.tta.TTABackendImpl"
+            class="net.sf.orcc.backends.llvm.tta.TTABackend"
             name="TTA">
          <option
                id="net.sf.orcc.plugins.compileXDF">
@@ -108,14 +108,14 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.promela.PromelaBackendImpl"
+            class="net.sf.orcc.backends.promela.PromelaBackend"
             name="PROMELA">
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.c.embedded.CEmbeddedBackendImpl"
+            class="net.sf.orcc.backends.c.embedded.CEmbeddedBackend"
             name="CEmbedded">
          <option
                id="net.sf.orcc.plugins.compileXDF">
@@ -138,7 +138,7 @@
          </option>         
       </backend>
       <backend
-            class="net.sf.orcc.backends.opencl.OpenCLBackendImpl"
+            class="net.sf.orcc.backends.opencl.OpenCLBackend"
             name="OpenCL (Experimental)">
          <option
                id="net.sf.orcc.plugins.compileXDF">
@@ -383,7 +383,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.c.CBackendImpl">
+               class="net.sf.orcc.backends.c.CBackend">
          </run>
       </application>
    </extension>
@@ -407,7 +407,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.java.JavaBackendImpl">
+               class="net.sf.orcc.backends.java.JavaBackend">
          </run>
       </application>
    </extension>
@@ -419,7 +419,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.xlim.XlimBackendImpl">
+               class="net.sf.orcc.backends.xlim.XlimBackend">
          </run>
       </application>
    </extension>
@@ -431,7 +431,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.llvm.tta.TTABackendImpl">
+               class="net.sf.orcc.backends.llvm.tta.TTABackend">
          </run>
       </application>
    </extension>
@@ -443,7 +443,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.llvm.aot.LLVMBackendImpl">
+               class="net.sf.orcc.backends.llvm.aot.LLVMBackend">
          </run>
       </application>
    </extension>
@@ -455,7 +455,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.llvm.jit.JadeBackendImpl">
+               class="net.sf.orcc.backends.llvm.jit.JadeBackend">
          </run>
       </application>
    </extension>
@@ -467,7 +467,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.c.embedded.CEmbeddedBackendImpl">
+               class="net.sf.orcc.backends.c.embedded.CEmbeddedBackend">
          </run>
       </application>
    </extension>
@@ -479,7 +479,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.promela.PromelaBackendImpl">
+               class="net.sf.orcc.backends.promela.PromelaBackend">
          </run>
       </application>
    </extension>
@@ -491,7 +491,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.opencl.OpenCLBackendImpl">
+               class="net.sf.orcc.backends.opencl.OpenCLBackend">
          </run>
       </application>
    </extension>

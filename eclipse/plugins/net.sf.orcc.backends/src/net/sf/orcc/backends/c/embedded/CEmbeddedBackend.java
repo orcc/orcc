@@ -51,7 +51,7 @@ import org.eclipse.core.resources.IFile;
  * 
  * @author mpelcat
  */
-public class CEmbeddedBackendImpl extends AbstractBackend {
+public class CEmbeddedBackend extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {

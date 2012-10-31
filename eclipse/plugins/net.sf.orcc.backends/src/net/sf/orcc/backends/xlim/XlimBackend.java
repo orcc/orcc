@@ -90,7 +90,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * 
  */
 @Deprecated
-public class XlimBackendImpl extends AbstractBackend {
+public class XlimBackend extends AbstractBackend {
 
 	private List<String> entities;
 

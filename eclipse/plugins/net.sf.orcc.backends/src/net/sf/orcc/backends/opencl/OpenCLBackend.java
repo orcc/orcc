@@ -54,7 +54,7 @@ import org.eclipse.core.resources.IFile;
  * @author Endri Bezati
  * 
  */
-public class OpenCLBackendImpl extends AbstractBackend {
+public class OpenCLBackend extends AbstractBackend {
 
 	private String includePath;
 	private String kernelSrcPath;
