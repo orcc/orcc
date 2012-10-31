@@ -37,17 +37,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.CommonPrinter;
-import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMBackendImpl;
-import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
-import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureBuilder;
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitecturePrinter;
 import net.sf.orcc.backends.llvm.tta.transform.ComplexHwOpDetector;
 import net.sf.orcc.backends.llvm.tta.transform.PrintRemoval;
 import net.sf.orcc.backends.transform.CastAdder;
@@ -182,10 +178,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 		network.computeTemplateMaps();
 
-		for (Actor actor : network.getAllActors()) {
-			actor.setTemplateData(new TTAActorTemplateData().compute(actor));
-		}
-
 		return network;
 	}
 
@@ -287,23 +279,16 @@ public class TTABackendImpl extends LLVMBackendImpl {
 						.doSwitch(tta), processorPath, tta.getName() + ".idf");
 
 		// Print assembly code of actor-scheduler
-		ArchitecturePrinter schedulerPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/LLVM_Processor.stg");
-		schedulerPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
-		schedulerPrinter.setTypePrinter(new LLVMTypePrinter());
-		schedulerPrinter.print(tta.getName() + ".ll", processorPath, tta);
+		CommonPrinter.printFile(new LLVM_Processor().print(tta), processorPath,
+				tta.getName() + ".ll");
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
-		printer.setExpressionPrinter(new LLVMExpressionPrinter());
-		printer.setTypePrinter(new LLVMTypePrinter());
-		printer.getOptions().put("profile", profile);
-		printer.getOptions().put("portToIdMap", computePortToIdMap(instance));
-		return printer.print(instance.getSimpleName() + ".ll", actorsPath,
-				instance);
+		CommonPrinter.printFile(new LLVM_Actor(instance, profile,
+				computePortToIdMap(instance)).getInstanceFileContent(),
+				actorsPath, instance.getSimpleName() + ".ll");
+		return false;
 	}
 
 	private void runPythonScript() {
