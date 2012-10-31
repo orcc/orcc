@@ -31,19 +31,24 @@ package net.sf.orcc.backends.llvm.jit
 import java.util.HashMap
 import java.util.Map
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
+import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
-import net.sf.orcc.ir.Var
-import net.sf.orcc.ir.TypeBool
-import net.sf.orcc.ir.TypeUint
-import net.sf.orcc.ir.TypeInt
-import net.sf.orcc.ir.Type
-import net.sf.orcc.ir.TypeList
-import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.Param
-import net.sf.orcc.df.Action
+import net.sf.orcc.ir.Procedure
+import net.sf.orcc.ir.Type
+import net.sf.orcc.ir.TypeInt
+import net.sf.orcc.ir.TypeList
+import net.sf.orcc.ir.TypeUint
+import net.sf.orcc.ir.Var
+import net.sf.orcc.moc.CSDFMoC
+import net.sf.orcc.moc.QSDFMoC
+import net.sf.orcc.df.Pattern
+import java.util.ArrayList
+import java.util.List
+import net.sf.orcc.moc.MoC
 
 /**
  * Generate Jade content
@@ -56,11 +61,14 @@ class ActorPrinter extends InstancePrinter {
 	
 	var currentId = 0
 	val Map<Object, Integer> uids = new HashMap<Object, Integer>
+	val List<Pattern> patternList = new ArrayList<Pattern>
 	
 	new(Actor actor) {
 		super()
 		
 		this.actor = actor
+		
+		computePatternIndexes
 	}
 	
 	/**
@@ -230,16 +238,50 @@ class ActorPrinter extends InstancePrinter {
 			«action.action_MD»
 		«ENDFOR»
 		; Patterns
-		<actor.templateData.patterns.keys: {pattern | <pattern_MD(actor, pattern)>}; separator="\n">
+		«FOR pattern : patternList»
+			«pattern.pattern_MD»
+		«ENDFOR»
 		; Variables of patterns
-		<actor.templateData.patterns.keys: {pattern | <pattern_vars_MD(actor, pattern, pattern.portToVarMap)>}; separator="\n">
+		«FOR pattern : patternList.filter[portToVarMap != null]»
+			«pattern.portToVarMap.objectReference» = metadata !{«pattern.ports.join(", ", ['''metadata «objectReference»'''])»}
+		«ENDFOR»
 		; Number of tokens of patterns
-		<actor.templateData.patterns.keys: {pattern | <pattern_numTokens_MD(actor, pattern, pattern.numTokensMap)>}; separator="\n">
-		<if(actor.MoC)>
-		; MoC
-		<MoC_MD(actor)>
-		<endif>
+		«FOR pattern : patternList.filter[portToVarMap != null]»
+			«pattern.numTokensMap.objectReference» =  metadata !{<pattern.ports: {port | metadata <port_decl_MD(actor, port)>, i32 <numTokens.(port)>}; separator=", ">}
+			«pattern.numTokensMap.objectReference» =  metadata !{«pattern.ports.join(", ", ['''metadata «objectReference», i32 «pattern.numTokensMap.get(it)»'''])»}
+		«ENDFOR»
+		«IF actor.hasMoC»
+			; MoC
+			«moC_MD»
+		«ENDIF»
 	'''
+	def moC_MD() {
+		val value =
+			if (actor.moC.CSDF) ''' , metadata «actor.moC.objectReference»'''
+			else if (actor.moC.quasiStatic) ''' , «(actor.moC as QSDFMoC).actions.join(", ", ['''metadata «objectReference»'''])»'''
+			else ""
+		'''
+			«actor.moC.objectReference» = metadata !{«actor.moC.MoCName_MD»«value»}
+		'''
+	}
+	
+	/*
+	 * TODO : check validity of this method
+	 */
+	def MoCName_MD(MoC moc) 
+		'''metadata !«IF moc.quasiStatic»QuasiStatic«ENDIF»«IF moc.CSDF»«IF moc.SDF»SDF«ELSE»CSDF«ENDIF»«ENDIF»«IF moc.DPN»DPN«ENDIF»«IF moc.KPN»KPN«ENDIF»'''
+		
+	def pattern_MD(Pattern pattern) {
+		val numTokens =
+			if (pattern.numTokensMap != null) '''metadata «pattern.numTokensMap.objectReference»'''
+			else "null"
+		val variables =
+			if ( ! pattern.variables.empty) '''metadata «pattern.portToVarMap.objectReference»'''
+			else "null"
+		'''
+			«pattern.objectReference» = metadata !{«numTokens», «variables»}
+		'''
+	}
 	
 	def action_MD(Action action) {
 		val tag = if (action.tag.identifiers.empty) "null"
@@ -252,13 +294,12 @@ class ActorPrinter extends InstancePrinter {
 				else '''metadata «action.peekPattern.objectReference»'''
 		'''
 			;; «action.name»
-			«action.objectReference» = metadata !{«tag», «input», «output»,«peek», metadata «action.objectReference»
-				>, metadata <Body_decl_MD(actor, action)>}
-			<if(!action.tag.identifiers.empty)>
-			<Tag_MD(actor, action.tag)>
-			<endif>
-			<Sched_MD(actor, action)>
-			<Body_MD(actor, action)>
+			«action.objectReference» = metadata !{«tag», «input», «output»,«peek», metadata «action.objectReference», metadata «action.body.objectReference»}
+			«IF ! action.tag.identifiers.empty»
+				«action.tag.objectReference» = metadata  !{«action.tag.identifiers.join(", ", [varName_MD])»}
+			«ENDIF»
+			«action.scheduler.objectReference» = metadata  !{«action.scheduler.name.varName_MD», «action.scheduler.procNative_MD», i1()* @«action.scheduler.name»}
+			«action.body.objectReference» = metadata  !{«action.body.name.varName_MD», «action.body.procNative_MD», void()* @«action.body.name»}
 		'''
 	}
 
@@ -346,7 +387,34 @@ class ActorPrinter extends InstancePrinter {
 	
 	def fifoVarName(Port port)
 		'''@«port.name»_ptr'''
-
-
 	
+	def fifoVar(Port port, Var variable) '''
+		%«variable.name»_ptr = load «port.type.doSwitch»** «port.fifoVarName»
+		%«variable.name» = bitcast «port.type.doSwitch»* %«variable.name»_ptr to «variable.type.doSwitch»*
+	'''
+
+	def void computePatternIndexes() {
+		for (init : actor.initializes) {
+			patternList.add(init.inputPattern)
+			patternList.add(init.outputPattern)
+			patternList.add(init.peekPattern)
+		}
+		for (action : actor.actions) {
+			patternList.add(action.inputPattern)
+			patternList.add(action.outputPattern)
+			patternList.add(action.peekPattern)
+		}
+		if (actor.hasMoC) {
+			val moc = actor.moC
+			if(moc.SDF || moc.CSDF) {
+				patternList.add((moc as CSDFMoC).inputPattern)
+				patternList.add((moc as CSDFMoC).outputPattern)
+			} else if (moc.quasiStatic) {
+				for (action : (moc as QSDFMoC).actions) {
+					patternList.add(((moc as QSDFMoC).getMoC(action) as CSDFMoC).inputPattern)
+					patternList.add(((moc as QSDFMoC).getMoC(action) as CSDFMoC).outputPattern)
+				}
+			}
+		}
+	}
 }
