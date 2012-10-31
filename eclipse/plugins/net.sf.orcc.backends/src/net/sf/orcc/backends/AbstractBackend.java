@@ -471,8 +471,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					if (cause instanceof OrccRuntimeException) {
 						throw (OrccRuntimeException) e.getCause();
 					} else {
+						String msg = "";
+						if (e.getCause().getMessage() != null) {
+							msg = "(" + e.getCause().getMessage() + ")";
+						}
 						throw new OrccRuntimeException(
-								"one actor could not be printed", cause);
+								"One actor could not be printed " + msg,
+								e.getCause());
 					}
 				}
 			}
