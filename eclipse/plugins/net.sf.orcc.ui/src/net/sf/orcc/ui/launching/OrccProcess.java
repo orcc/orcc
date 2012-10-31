@@ -89,23 +89,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		public void removeListener(IStreamListener listener) {
 			list.remove(listener);
 		}
-
-		/**
-		 * Writes the given text to the contents watched by this monitor.
-		 * 
-		 * @param text
-		 *            a string
-		 */
-		private void write(String text) {
-			synchronized (this) {
-				contents += text;
-			}
-
-			for (Object listener : list.getListeners()) {
-				((IStreamListener) listener).streamAppended(text, this);
-			}
-		}
-
 	}
 
 	private class OrccProxy implements IStreamsProxy {
@@ -212,18 +195,4 @@ public class OrccProcess extends PlatformObject implements IProcess {
 			monitor.done();
 		}
 	}
-
-	/**
-	 * Writes the given text to the normal output of this process.
-	 * 
-	 * @param text
-	 *            a string
-	 * @deprecated Please use methods from {@link net.sf.orcc.util.OrccLogger}
-	 *             instead
-	 */
-	@Deprecated
-	public void writeText(String text) {
-		((OrccMonitor) proxy.getOutputStreamMonitor()).write(text);
-	}
-
 }
