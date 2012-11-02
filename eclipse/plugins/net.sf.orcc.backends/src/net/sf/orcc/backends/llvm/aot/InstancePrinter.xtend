@@ -150,8 +150,8 @@ class InstancePrinter extends LLVMTemplate {
 		«IF ! instance.actor.parameters.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Parameter values of the instance
-			«FOR i : 0..instance.arguments.size-1»
-				@«instance.actor.parameters.get(i).name» = internal global «instance.actor.parameters.get(i).type.doSwitch» «instance.arguments.get(i).value.doSwitch»
+			«FOR arg : instance.arguments»
+				@«arg.variable.name» = internal global «arg.variable.type.doSwitch» «arg.value.doSwitch»
 			«ENDFOR»
 			
 		«ENDIF»
