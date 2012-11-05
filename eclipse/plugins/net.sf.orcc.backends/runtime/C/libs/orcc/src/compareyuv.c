@@ -173,6 +173,7 @@ void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pic
 		{
 			printf("; no error detected !\n");
 		} else {
+			printf("; %d errors detected !\n", numErrors);
 			compareErrors += numErrors;
 		}
 
