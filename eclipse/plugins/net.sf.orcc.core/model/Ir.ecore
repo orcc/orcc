@@ -106,7 +106,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Expression"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Expression" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Expression" abstract="true" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable"/>
   <eClassifiers xsi:type="ecore:EClass" name="ExprBinary" eSuperTypes="#//Expression">
     <eStructuralFeatures xsi:type="ecore:EReference" name="e1" eType="#//Expression"
         containment="true" resolveProxies="false"/>

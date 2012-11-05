@@ -8,6 +8,7 @@ package net.sf.orcc.ir;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EFactory;
@@ -498,7 +499,7 @@ public interface IrFactory extends EFactory {
 	 * @return a store
 	 */
 	InstStore createInstStore(int lineNumber, Def target,
-			List<Expression> indexes, Expression value);
+			Collection<Expression> indexes, Expression value);
 
 	/**
 	 * Creates an InstStore with the given location, target, indexes, value.
@@ -510,7 +511,7 @@ public interface IrFactory extends EFactory {
 	 * @return a store
 	 */
 	InstStore createInstStore(int lineNumber, Var target,
-			List<Expression> indexes, Expression value);
+			Collection<Expression> indexes, Expression value);
 
 	/**
 	 * Creates an InstStore with the given target and source.

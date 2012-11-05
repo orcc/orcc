@@ -30,9 +30,9 @@ package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.util.impl.AttributableImpl;
 
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * This class is an abstract implementation of {@link Expression}.
@@ -41,7 +41,8 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * @generated
  * 
  */
-public abstract class ExpressionImpl extends EObjectImpl implements Expression {
+public abstract class ExpressionImpl extends AttributableImpl implements
+		Expression {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

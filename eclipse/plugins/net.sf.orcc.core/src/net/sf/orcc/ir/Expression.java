@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.ecore.EObject;
+import net.sf.orcc.util.Attributable;
 
 /**
  * This interface defines an expression.
@@ -38,69 +38,69 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  * 
  */
-public interface Expression extends EObject {
+public interface Expression extends Attributable {
 
 	/**
 	 * Returns the type of this expression.
 	 * 
 	 * @return the type of this expression
 	 */
-	public Type getType();
+	Type getType();
 
 	/**
 	 * Returns true if the expression is a binary expression.
 	 * 
 	 * @return true if the expression is a binary expression
 	 */
-	public boolean isExprBinary();
+	boolean isExprBinary();
 
 	/**
 	 * Returns true if the expression is a boolean expression.
 	 * 
 	 * @return true if the expression is a boolean expression
 	 */
-	public boolean isExprBool();
+	boolean isExprBool();
 
 	/**
 	 * Returns true if the expression is a float expression.
 	 * 
 	 * @return true if the expression is a float expression
 	 */
-	public boolean isExprFloat();
+	boolean isExprFloat();
 
 	/**
 	 * Returns true if the expression is an integer expression.
 	 * 
 	 * @return true if the expression is an integer expression
 	 */
-	public boolean isExprInt();
+	boolean isExprInt();
 
 	/**
 	 * Returns true if the expression is a list expression.
 	 * 
 	 * @return true if the expression is a list expression
 	 */
-	public boolean isExprList();
+	boolean isExprList();
 
 	/**
 	 * Returns true if the expression is a string expression.
 	 * 
 	 * @return true if the expression is a string expression
 	 */
-	public boolean isExprString();
+	boolean isExprString();
 
 	/**
 	 * Returns true if the expression is a unary expression.
 	 * 
 	 * @return true if the expression is a unary expression
 	 */
-	public boolean isExprUnary();
+	boolean isExprUnary();
 
 	/**
 	 * Returns true if the expression is a variable expression.
 	 * 
 	 * @return true if the expression is a variable expression
 	 */
-	public boolean isExprVar();
+	boolean isExprVar();
 
 }

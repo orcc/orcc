@@ -1755,6 +1755,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		instStoreEClass.getESuperTypes().add(this.getInstruction());
 		argByRefEClass.getESuperTypes().add(this.getArg());
 		argByValEClass.getESuperTypes().add(this.getArg());
+		expressionEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		exprBinaryEClass.getESuperTypes().add(this.getExpression());
 		exprBoolEClass.getESuperTypes().add(this.getExpression());
 		exprFloatEClass.getESuperTypes().add(this.getExpression());

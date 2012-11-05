@@ -962,6 +962,8 @@ public class IrSwitch<T> extends Switch<T> {
 			Expression expression = (Expression) theEObject;
 			T result = caseExpression(expression);
 			if (result == null)
+				result = caseAttributable(expression);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -970,6 +972,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseExprBinary(exprBinary);
 			if (result == null)
 				result = caseExpression(exprBinary);
+			if (result == null)
+				result = caseAttributable(exprBinary);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -980,6 +984,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseExpression(exprBool);
 			if (result == null)
+				result = caseAttributable(exprBool);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -988,6 +994,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseExprFloat(exprFloat);
 			if (result == null)
 				result = caseExpression(exprFloat);
+			if (result == null)
+				result = caseAttributable(exprFloat);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -998,6 +1006,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseExpression(exprInt);
 			if (result == null)
+				result = caseAttributable(exprInt);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -1006,6 +1016,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseExprList(exprList);
 			if (result == null)
 				result = caseExpression(exprList);
+			if (result == null)
+				result = caseAttributable(exprList);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -1016,6 +1028,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseExpression(exprString);
 			if (result == null)
+				result = caseAttributable(exprString);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -1025,6 +1039,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseExpression(exprUnary);
 			if (result == null)
+				result = caseAttributable(exprUnary);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -1033,6 +1049,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseExprVar(exprVar);
 			if (result == null)
 				result = caseExpression(exprVar);
+			if (result == null)
+				result = caseAttributable(exprVar);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

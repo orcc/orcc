@@ -2123,12 +2123,30 @@ public interface IrPackage extends EPackage {
 	int ARG_BY_VAL_FEATURE_COUNT = ARG_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPRESSION__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
 	 * The number of structural features of the '<em>Expression</em>' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int EXPRESSION_FEATURE_COUNT = 0;
+	int EXPRESSION_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY__ATTRIBUTES = EXPRESSION__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>E1</b></em>' containment reference. <!--
@@ -2175,6 +2193,15 @@ public interface IrPackage extends EPackage {
 	int EXPR_BINARY_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 4;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BOOL__ATTRIBUTES = EXPRESSION__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -2193,6 +2220,15 @@ public interface IrPackage extends EPackage {
 	int EXPR_BOOL_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_FLOAT__ATTRIBUTES = EXPRESSION__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -2208,6 +2244,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int EXPR_FLOAT_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_INT__ATTRIBUTES = EXPRESSION__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
@@ -2228,6 +2273,15 @@ public interface IrPackage extends EPackage {
 	int EXPR_INT_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_LIST__ATTRIBUTES = EXPRESSION__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -2245,6 +2299,15 @@ public interface IrPackage extends EPackage {
 	int EXPR_LIST_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_STRING__ATTRIBUTES = EXPRESSION__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Value</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -2260,6 +2323,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int EXPR_STRING_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_UNARY__ATTRIBUTES = EXPRESSION__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Expr</b></em>' containment reference. <!--
@@ -2295,6 +2367,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int EXPR_UNARY_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_VAR__ATTRIBUTES = EXPRESSION__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Use</b></em>' containment reference. <!--

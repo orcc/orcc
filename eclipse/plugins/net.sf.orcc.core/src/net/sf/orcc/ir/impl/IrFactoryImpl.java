@@ -9,6 +9,7 @@ package net.sf.orcc.ir.impl;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.sf.orcc.ir.Arg;
@@ -706,7 +707,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	@Override
 	public InstStore createInstStore(int lineNumber, Def target,
-			List<Expression> indexes, Expression value) {
+			Collection<Expression> indexes, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();
 		instStore.setLineNumber(lineNumber);
 		instStore.setTarget(target);
@@ -717,7 +718,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	@Override
 	public InstStore createInstStore(int lineNumber, Var target,
-			List<Expression> indexes, Expression value) {
+			Collection<Expression> indexes, Expression value) {
 		return createInstStore(lineNumber,
 				IrFactory.eINSTANCE.createDef(target), indexes, value);
 	}
