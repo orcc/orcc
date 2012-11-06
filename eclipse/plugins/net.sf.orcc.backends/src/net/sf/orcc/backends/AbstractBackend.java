@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends;
 
+import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.OrccLaunchConstants.CLASSIFY;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
@@ -39,6 +40,8 @@ import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
+import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.util.OrccUtil.getFile;
 
 import java.io.DataInputStream;
@@ -88,6 +91,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -891,9 +895,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("d", "debug", false, "Enable debug mode");
 
 		options.addOption("c", "classify", false, "Classify the given network");
+		options.addOption("smt", "smt-solver", false,
+				"Set path to the binary of the SMT solver");
 		options.addOption("m", "merge", false, "Merge (1) static actions "
 				+ "(2) static actors (3) both");
-		options.addOption("s", "advanced_sched", false, "(C) Use the "
+		options.addOption("s", "advanced-scheduler", false, "(C) Use the "
 				+ "data-driven/demand-driven strategy for the actor-scheduler");
 
 		// FIXME: choose independently the transformation to apply
@@ -922,6 +928,26 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(DEBUG_MODE, line.hasOption('d'));
 
 			optionMap.put(CLASSIFY, line.hasOption('c'));
+
+			if (line.hasOption("smt")) {
+				String smt_path = line.getOptionValue("smt");
+				String smt_option = new String();
+
+				if (smt_path.contains("cvc3")) {
+					smt_option = "+lang smt2";
+				} else if (smt_path.contains("z3")) {
+					if (Platform.OS_WIN32.equals(Platform.getOS())) {
+						smt_option = "/smt2 /m";
+					} else {
+						smt_option = "-smt2 -m";
+					}
+				} else {
+					OrccLogger.warnln("Unknown SMT solver.");
+				}
+				getDefault().setPreference(P_SOLVER, smt_path);
+				getDefault().setPreference(P_SOLVER_OPTIONS, smt_option);
+			}
+
 			if (line.hasOption('m')) {
 				String type = line.getOptionValue('m');
 				optionMap.put(MERGE_ACTIONS,
