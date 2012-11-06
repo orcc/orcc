@@ -33,6 +33,9 @@
 //Nb Loops
 extern unsigned int nbLoops;
 
+// Directory for input files.
+extern char *input_directory;
+
 // input file
 extern char *input_file;
 

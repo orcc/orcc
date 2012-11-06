@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <string.h>
 
 #include "orcc_util.h"
 
@@ -99,19 +100,33 @@ void source_init() {
 }
 
 long source_open(char* fileName) {
+	char fullPathName[256];
+
 	stop = 0;
 	nb = 0;
-
-	file = fopen(fileName, "rb");
-	if (file == NULL) {
-		if (input_file == NULL) {
-			input_file = "<null>";
+	if(input_directory == NULL) {
+		file = fopen(fileName, "rb");
+		if (file == NULL) {
+			fprintf(stderr, "could not open file \"%s\"\n", fileName);
+			wait_for_key();
+			exit(1);
 		}
-
-		fprintf(stderr, "could not open file \"%s\"\n", fileName);
-		wait_for_key();
-		exit(1);
 	}
+	else {
+		if(strlen(fileName)+strlen(input_directory)>=256) {
+			fprintf(stderr, "Path too long : input_directory : %s ; fileName : %s\n", input_directory, fileName);
+			exit(-1);
+		}
+		strcpy(fullPathName, input_directory);
+		strcat(fullPathName, fileName);
+		file = fopen(fullPathName, "rb");
+		if (file == NULL) {
+			fprintf(stderr, "could not open file \"%s\"\n", fullPathName);
+			wait_for_key();
+			exit(1);
+		}
+	}
+
 	if(PRINT_SPEED) {
 		atexit(printSpeed);
 	}
@@ -135,7 +150,7 @@ void source_exit(int exitCode)
 	}
 }
 
-int source_sizeOfFile() { 
+unsigned int source_sizeOfFile() {
 	struct stat st; 
 	fstat(fileno(file), &st); 
 	return st.st_size; 

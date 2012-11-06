@@ -54,6 +54,9 @@ extern int getopt(int nargc, char * const *nargv, const char *ostr);
 //Nb Loops
 unsigned int nbLoops = DEFAULT_INFINITE_LOOP; // -1: infinite loop.
 
+// Directory for input files.
+char *input_directory = NULL;
+
 // input file
 char *input_file;
 
@@ -124,7 +127,7 @@ void print_usage() {
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-	const char *ostr = "g:i:l:m:no:w:";
+	const char *ostr = "g:i:l:m:no:w:d:";
 	int c;
 
 	program = argv[0];
@@ -138,6 +141,9 @@ void init_orcc(int argc, char *argv[]) {
 		case ':': // BADARG
 			fprintf(stderr, "missing argument\n");
 			exit(1);
+		case 'd':
+			input_directory = strdup(optarg);
+			break;
 		case 'g':
 			output_genetic = strdup(optarg);
 			break;
