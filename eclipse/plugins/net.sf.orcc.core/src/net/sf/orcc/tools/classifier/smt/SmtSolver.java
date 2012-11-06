@@ -129,10 +129,10 @@ public class SmtSolver {
 			SExpParser parser = new SExpParser(builder.toString());
 			SExp exp = parser.read();
 			if (exp == null || !exp.isSymbol()) {
-				OrccLogger.warnln("Actor " + actor.getName() + ": ");
+				OrccLogger.warnln("Solving of actor " + actor.getName() + ":");
 				String error[] = builder.toString().split("\n");
 				for (int i = 0; i < error.length; i++) {
-					OrccLogger.warnln(error[i]);
+					OrccLogger.traceln(error[i]);
 				}
 				return;
 			}
