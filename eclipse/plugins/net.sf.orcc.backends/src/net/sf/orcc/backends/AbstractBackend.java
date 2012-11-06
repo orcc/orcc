@@ -728,7 +728,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		int numCached = executeTasks(tasks);
 
 		long t1 = System.currentTimeMillis();
-		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
+		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+				+ "s");
 
 		if (numCached > 0) {
 			OrccLogger
@@ -1005,18 +1006,4 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			doTransformActor(actor);
 		}
 	}
-
-	/**
-	 * Writes the given text to the process's normal output.
-	 * 
-	 * @param text
-	 *            a string
-	 * @deprecated Please use {@link net.sf.orcc.util.OrccLogger#trace(text)} or
-	 *             {@link net.sf.orcc.util.OrccLogger#traceln(text)} instead
-	 */
-	@Deprecated
-	final public void write(String text) {
-		OrccLogger.trace(text);
-	}
-
 }
