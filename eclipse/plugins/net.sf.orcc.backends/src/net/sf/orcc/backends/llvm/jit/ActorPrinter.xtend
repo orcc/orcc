@@ -28,14 +28,19 @@
  */
 package net.sf.orcc.backends.llvm.jit
 
-import java.util.HashMap
-import java.util.Map
+import java.util.ArrayList
+import java.util.List
+import net.sf.orcc.backends.ir.InstCast
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
+import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
+import net.sf.orcc.ir.InstLoad
+import net.sf.orcc.ir.InstReturn
+import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Param
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.Type
@@ -44,15 +49,8 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
-import net.sf.orcc.moc.QSDFMoC
-import net.sf.orcc.df.Pattern
-import java.util.ArrayList
-import java.util.List
 import net.sf.orcc.moc.MoC
-import net.sf.orcc.ir.InstLoad
-import net.sf.orcc.ir.InstStore
-import net.sf.orcc.ir.InstReturn
-import net.sf.orcc.backends.ir.InstCast
+import net.sf.orcc.moc.QSDFMoC
 
 /**
  * Generate Jade content
@@ -63,8 +61,7 @@ class ActorPrinter extends InstancePrinter {
 	
 	val Actor actor
 	
-	var currentId = 0
-	val Map<Object, Integer> uids = new HashMap<Object, Integer>
+	val List<Integer> objRefList = new ArrayList<Integer>
 	val List<Pattern> patternList = new ArrayList<Pattern>
 	
 	new(Actor actor) {
@@ -83,12 +80,13 @@ class ActorPrinter extends InstancePrinter {
 	 * @return unique reference to the given object
 	 */
 	def getObjectReference(Object object) {
-		var id = currentId
-		if(uids.containsKey(object)) {
-			id = uids.get(object)
-		} else {
-			uids.put(object, id)
-			currentId = id + 1
+		// We use hashCode instead of object itself in the list to ensure
+		// for example 2 instances of Type with same parameters will be
+		// duplicated in the list
+		var id = objRefList.indexOf(object.hashCode)
+		if(id == -1) {
+			objRefList.add(object.hashCode)
+			id = objRefList.size - 1
 		}
 		return '''!«id»'''
 	}
@@ -364,7 +362,7 @@ class ActorPrinter extends InstancePrinter {
 		'''
 	}
 	
-	// In some case, «actor.fsm.transitions» can be the same list than the first «state.outgoing». So we use «actor.name.concat("_transitions")» to prevent this
+	// In some case, «actor.fsm.transitions» can be the same object list than «actor.fsm.states.get(0).outgoing». We use «actor.name.concat("_transitions")» to prevent this
 	def FSM_MD() '''
 		«actor.fsm.objectReference» = metadata !{«actor.fsm.initialState.name.name_MD», metadata «actor.fsm.states.objectReference», metadata «actor.name.concat("_transitions").objectReference»}
 		;;; States
