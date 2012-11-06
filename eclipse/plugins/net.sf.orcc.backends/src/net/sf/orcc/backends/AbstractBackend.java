@@ -895,7 +895,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("d", "debug", false, "Enable debug mode");
 
 		options.addOption("c", "classify", false, "Classify the given network");
-		options.addOption("smt", "smt-solver", false,
+		options.addOption("smt", "smt-solver", true,
 				"Set path to the binary of the SMT solver");
 		options.addOption("m", "merge", false, "Merge (1) static actions "
 				+ "(2) static actors (3) both");
