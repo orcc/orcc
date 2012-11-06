@@ -39,12 +39,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.StandardPrinter;
-import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
-import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
+import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
@@ -55,6 +54,7 @@ import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.BackendUtil;
+import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -93,7 +93,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class JadeBackend extends AbstractBackend {
 
-	private boolean byteexact;
+	private boolean biteexact;
 	private String optLevel;
 	private String llvmGenMod;
 
@@ -107,29 +107,38 @@ public class JadeBackend extends AbstractBackend {
 	 */
 	private Map<String, List<Instance>> targetToInstancesMap;
 
-	private final Map<String, String> transformations;
-	private StandardPrinter printer;
+	private final Map<String, String> renameMap;
+
+	private JadePrinter printer;
 
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
 	 * transformation hash map.
 	 */
 	public JadeBackend() {
-		transformations = new HashMap<String, String>();
-		transformations.put("abs", "abs_");
-		transformations.put("getw", "getw_");
-		transformations.put("index", "index_");
-		transformations.put("min", "min_");
-		transformations.put("max", "max_");
-		transformations.put("select", "select_");
+		renameMap = new HashMap<String, String>();
+		renameMap.put("abs", "abs_");
+		renameMap.put("getw", "getw_");
+		renameMap.put("index", "index_");
+		renameMap.put("min", "min_");
+		renameMap.put("max", "max_");
+		renameMap.put("select", "select_");
 	}
 
 	@Override
 	public void doInitializeOptions() {
 		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
 		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
-		byteexact = getAttribute("net.sf.orcc.backends.byteexact", false);
+		biteexact = getAttribute("net.sf.orcc.backends.byteexact", false);
 		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
+
+		printer = new JadePrinter(!debug);
+		printer.getOptions().put("fifoSize", fifoSize);
+
+		if (debug) {
+			OrccLogger.setLevel(Level.FINEST);
+			OrccLogger.debugln("Debug mode is enabled");
+		}
 	}
 
 	@Override
@@ -145,42 +154,35 @@ public class JadeBackend extends AbstractBackend {
 		new DfVisitor<Void>(new SSATransformation()).doSwitch(actor);
 		new DeadGlobalElimination().doSwitch(actor);
 
-		if (!byteexact) {
+		if (!biteexact) {
 			new TypeResizer(true, false, false).doSwitch(actor);
 		}
 
-		DfSwitch<?>[] transformations = {
-				new DfVisitor<Void>(new DeadCodeElimination()),
-				new DfVisitor<Void>(new DeadVariableRemoval()),
-				new StringTransformation(),
-				new RenameTransformation(this.transformations),
-				new DfVisitor<Expression>(new TacTransformation()),
-				new DfVisitor<Void>(new CopyPropagator()),
-				new DfVisitor<Void>(new ConstantPropagator()),
-				new DfVisitor<Void>(new InstPhiTransformation()),
-				new DfVisitor<Expression>(new CastAdder(false, true)),
-				new DfVisitor<Void>(new EmptyBlockRemover()),
-				new DfVisitor<Void>(new BlockCombine()),
-				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
-				new DfVisitor<Void>(new ListInitializer()),
-				new DfVisitor<Void>(new TemplateInfoComputing()) };
+		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
 
-		for (DfSwitch<?> transformation : transformations) {
+		transfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		transfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+		transfos.add(new StringTransformation());
+		transfos.add(new RenameTransformation(this.renameMap));
+		transfos.add(new DfVisitor<Expression>(new TacTransformation()));
+		transfos.add(new DfVisitor<Void>(new CopyPropagator()));
+		transfos.add(new DfVisitor<Void>(new ConstantPropagator()));
+		transfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		transfos.add(new DfVisitor<Expression>(new CastAdder(false, true)));
+		transfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		transfos.add(new DfVisitor<Void>(new BlockCombine()));
+		transfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		transfos.add(new DfVisitor<Void>(new ListInitializer()));
+		transfos.add(new DfVisitor<Void>(new TemplateInfoComputing()));
+
+		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(actor);
 		}
-
-		// Organize metadata information for the current actor
-		actor.setTemplateData(new JadeTemplateData().compute(actor));
 	}
 
 	@Override
 	protected void doVtlCodeGeneration(List<IFile> files) {
 		List<Actor> actors = parseActors(files);
-
-		printer = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/jit/Actor.stg", !debug);
-		printer.setExpressionPrinter(new LLVMExpressionPrinter());
-		printer.setTypePrinter(new LLVMTypePrinter());
 
 		// transforms and prints actors
 		transformActors(actors);
@@ -253,16 +255,15 @@ public class JadeBackend extends AbstractBackend {
 	protected boolean printActor(Actor actor) {
 		// Create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
-		new File(folder).mkdirs();
 
-		return printer.print(actor.getSimpleName(), folder, actor);
+		new File(folder).mkdirs();
+		return printer.print(folder, actor);
 	}
 
 	private void printMapping(Network network) {
-		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/util/Mapping.stg");
-		networkPrinter.getOptions().put("mapping", targetToInstancesMap);
-		networkPrinter.print(network.getName() + ".xcf", path, network);
+		CommonPrinter.printFile(
+				new XcfPrinter().compileXcfFile(targetToInstancesMap), path,
+				"mapping.xcf");
 	}
 
 	private void runJadeToolBox(List<Actor> actors) {
