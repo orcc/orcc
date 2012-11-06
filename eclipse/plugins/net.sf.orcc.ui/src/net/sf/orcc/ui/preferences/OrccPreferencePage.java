@@ -81,11 +81,7 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 			String text = button.getText();
 
 			updateMode = false;
-			if ("CVC3".equals(text)) {
-				// no model option because CVC3 does not know how to deal
-				// with arrays, and does not support (get-value)
-				textControl.setText("+lang smt2");
-			} else if ("Z3".equals(text)) {
+			if ("Z3".equals(text)) {
 				if (Platform.OS_WIN32.equals(Platform.getOS())) {
 					textControl.setText("/smt2");
 				} else {
@@ -221,7 +217,7 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		// radio buttons
 		RadioGroupFieldEditor fieldRadio = new RadioGroupFieldEditor(
 				P_SOLVER_TYPE, "Set default options for solver:", 2,
-				new String[][] { { "CVC3", "CVC3" }, { "Z3", "Z3" },
+				new String[][] { { "Z3 v4.12+ (recommended)", "Z3" },
 						{ "Custom", "Custom" }, }, composite);
 		radioComposite = fieldRadio.getRadioBoxControl(composite);
 		addField(fieldRadio);

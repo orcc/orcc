@@ -897,7 +897,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		options.addOption("c", "classify", false, "Classify the given network");
 		options.addOption("smt", "smt-solver", true,
-				"Set path to the binary of the SMT solver");
+				"Set path to the binary of the SMT solver (Z3 v4.12+)");
 		options.addOption("m", "merge", false, "Merge (1) static actions "
 				+ "(2) static actors (3) both");
 		options.addOption("s", "advanced-scheduler", false, "(C) Use the "
@@ -934,19 +934,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				String smt_path = line.getOptionValue("smt");
 				String smt_option = new String();
 
-				if (smt_path.contains("cvc3")) {
-					smt_option = "+lang smt2";
-				} else if (smt_path.contains("z3")) {
+				if (smt_path.contains("z3")) {
 					if (Platform.OS_WIN32.equals(Platform.getOS())) {
 						smt_option = "/smt2";
 					} else {
 						smt_option = "-smt2";
 					}
+					getDefault().setPreference(P_SOLVER, smt_path);
+					getDefault().setPreference(P_SOLVER_OPTIONS, smt_option);
 				} else {
 					OrccLogger.warnln("Unknown SMT solver.");
 				}
-				getDefault().setPreference(P_SOLVER, smt_path);
-				getDefault().setPreference(P_SOLVER_OPTIONS, smt_option);
 			}
 
 			if (line.hasOption('m')) {
