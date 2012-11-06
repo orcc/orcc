@@ -76,8 +76,8 @@ class InstancePrinter extends LLVMTemplate {
 	
 	protected val Instance instance
 	
+	protected val List<Var> castedList = new ArrayList<Var>
 	val List<Expression> castedIndexes = new ArrayList<Expression>
-	val List<Var> castedList = new ArrayList<Var>
 	val Map<State, Integer> stateToLabel = new HashMap<State, Integer>
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
@@ -541,7 +541,8 @@ class InstancePrinter extends LLVMTemplate {
 	def label(Block block) '''b«block.cfgNode.number»'''
 	
 	def variableDeclaration(Var variable) {
-		if(variable.type.list && ! castedList.contains(variable)) '''%«variable.indexedName» = alloca «variable.type.doSwitch»'''
+		if(variable.type.list && ! castedList.contains(variable))
+			'''%«variable.indexedName» = alloca «variable.type.doSwitch»'''
 	}
 	
 	def argumentDeclaration(Param param) {
@@ -731,8 +732,7 @@ class InstancePrinter extends LLVMTemplate {
 				'''ret void'''
 			else
 				'''ret «retInst.value.type.doSwitch» «retInst.value.doSwitch»'''
-		}
-			
+		}	
 	}
 	
 	override caseInstStore(InstStore store) {

@@ -49,6 +49,10 @@ import net.sf.orcc.df.Pattern
 import java.util.ArrayList
 import java.util.List
 import net.sf.orcc.moc.MoC
+import net.sf.orcc.ir.InstLoad
+import net.sf.orcc.ir.InstStore
+import net.sf.orcc.ir.InstReturn
+import net.sf.orcc.backends.ir.InstCast
 
 /**
  * Generate Jade content
@@ -68,7 +72,8 @@ class ActorPrinter extends InstancePrinter {
 		
 		this.actor = actor
 		
-		computePatternIndexes
+		computePatterns
+		computeCastedList
 	}
 	
 	/**
@@ -101,7 +106,7 @@ class ActorPrinter extends InstancePrinter {
 			«ENDFOR»
 		«ENDIF»
 		
-		«IF ! actor.inputs.empty»
+		«IF ! actor.outputs.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Output FIFOs
 			«FOR output : actor.outputs»
@@ -169,6 +174,7 @@ class ActorPrinter extends InstancePrinter {
 		«IF ! actor.stateVars.empty»
 			!state_variables = !{«actor.stateVars.join(", ", [objectReference])»}
 		«ENDIF»
+		
 		«IF ! actor.procs.empty»
 			!procedures = !{«actor.procs.join(", ", [objectReference])»}
 		«ENDIF»
@@ -178,55 +184,62 @@ class ActorPrinter extends InstancePrinter {
 		«IF ! actor.actions.empty»
 			!actions = !{«actor.actions.join(", ", [objectReference])»}
 		«ENDIF»
+		
 		«IF actor.moC != null»
 			!MoC = !{«actor.moC.objectReference»}
 		«ENDIF»
 		
-		«actor.file.fullPath.objectReference» = metadata !{«actor.file.fullPath.toString.varName_MD»}
-		«actor.name.objectReference» = metadata !{«actor.name.varName_MD»}
+		«actor.file.fullPath.objectReference» = metadata !{«actor.file.fullPath.toString.name_MD»}
+		«actor.name.objectReference» = metadata !{«actor.name.name_MD»}
 		
 		; Action-scheduler
 		«actionScheduler_MD»
 		«IF ! actor.inputs.empty»
+			
 			; Input ports
 			«FOR port : actor.inputs»
-				«port.objectReference» = metadata !{metadata «port.type.objectReference», «port.name.varName_MD», «port.type.doSwitch»** «port.fifoVarName»}
-				«port.type.objectReference» = metadata  !{«port.type.varType_MD», «port.type.varSize_MD»}
+				«port.objectReference» = metadata !{metadata «port.type.objectReference», «port.name.name_MD», «port.type.doSwitch»** «port.fifoVarName»}
+				«port.type.objectReference» = metadata !{«port.type.varType_MD», «port.type.varSize_MD»}
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.outputs.empty»
+			
 			; Output ports
 			«FOR port : actor.outputs»
-				«port.objectReference» = metadata !{metadata «port.type.objectReference», «port.name.varName_MD», «port.type.doSwitch»** «port.fifoVarName»}
-				«port.type.objectReference» = metadata  !{«port.type.varType_MD», «port.type.varSize_MD»}
+				«port.objectReference» = metadata !{metadata «port.type.objectReference», «port.name.name_MD», «port.type.doSwitch»** «port.fifoVarName»}
+				«port.type.objectReference» = metadata !{«port.type.varType_MD», «port.type.varSize_MD»}
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.parameters.empty»
+			
 			; Parameters
 			«FOR param : actor.parameters»
+				; «param.name»
 				«param.objectReference» = metadata !{metadata «param.name.objectReference», metadata «param.type.objectReference», «param.type.doSwitch»* @«param.name»}
-				«param.name.objectReference» = metadata !{«param.name.varName_MD», «param.varAssignable_MD», i32 0, «param.varIndex_MD»}
+				«param.name.objectReference» = metadata !{«param.name.name_MD», «param.varAssignable_MD», i32 0, «param.varIndex_MD»}
 				«param.type.objectReference» = metadata  !{«param.type.varType_MD», «param.type.varSize_MD»}
-				
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.stateVars.empty»
+			
 			; State Variables
 			«FOR stateVar : actor.stateVars»
 				;; «stateVar.name»
-				«stateVar.objectReference» = metadata !{metadata «stateVar.name.objectReference», metadata «stateVar.type.objectReference», «IF stateVar.initialized» metadata «stateVar.name.objectReference»«ELSE»null«ENDIF», «stateVar.type.doSwitch»* @«stateVar.name»}
-				«stateVar.name.objectReference» = metadata !{«stateVar.name.varName_MD», «stateVar.varAssignable_MD», i32 0, «stateVar.varIndex_MD»}
-				«stateVar.type.objectReference» = metadata !{«stateVar.type.varType_MD», «stateVar.type.varSize_MD»}«IF stateVar.initialized»«stateVar.name.objectReference» = metadata !{«stateVar.type.doSwitch» «stateVar.initialValue.doSwitch»}«ENDIF»
+				«stateVar.objectReference» = metadata !{metadata «stateVar.name.objectReference», metadata «stateVar.type.objectReference», «IF stateVar.initialized»metadata «stateVar.initialValue.objectReference»«ELSE»null«ENDIF», «stateVar.type.doSwitch»* @«stateVar.name»}
+				«stateVar.name.objectReference» = metadata !{«stateVar.name.name_MD», «stateVar.varAssignable_MD», i32 0, «stateVar.varIndex_MD»}
+				«stateVar.type.objectReference» = metadata !{«stateVar.type.varType_MD», «stateVar.type.varSize_MD»}
+				«IF stateVar.initialized»«stateVar.initialValue.objectReference» = metadata !{«stateVar.type.doSwitch» «stateVar.initialValue.doSwitch»}«ENDIF»
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.procs.empty»
-			; Functions and procedures
 			
+			; Functions and procedures
 			«FOR proc : actor.procs»
-				«proc.objectReference» = metadata !{«proc.name.varName_MD», «proc.procNative_MD», «proc.returnType.doSwitch»(«proc.parameters.join(", ", [argumentTypeDeclaration]).wrap»)* @«proc.name»}
+				«proc.objectReference» = metadata !{«proc.name.name_MD», «proc.procNative_MD», «proc.returnType.doSwitch»(«proc.parameters.join(", ", [argumentTypeDeclaration]).wrap»)* @«proc.name»}
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.initializes.empty»
+			
 			; Initializes
 			«FOR action : actor.initializes»
 				«action.action_MD»
@@ -236,6 +249,7 @@ class ActorPrinter extends InstancePrinter {
 		; Actions
 		«FOR action : actor.actions»
 			«action.action_MD»
+			
 		«ENDFOR»
 		; Patterns
 		«FOR pattern : patternList»
@@ -245,16 +259,18 @@ class ActorPrinter extends InstancePrinter {
 		«FOR pattern : patternList.filter[portToVarMap != null]»
 			«pattern.portToVarMap.objectReference» = metadata !{«pattern.ports.join(", ", ['''metadata «objectReference»'''])»}
 		«ENDFOR»
+		
 		; Number of tokens of patterns
-		«FOR pattern : patternList.filter[portToVarMap != null]»
-			«pattern.numTokensMap.objectReference» =  metadata !{<pattern.ports: {port | metadata <port_decl_MD(actor, port)>, i32 <numTokens.(port)>}; separator=", ">}
-			«pattern.numTokensMap.objectReference» =  metadata !{«pattern.ports.join(", ", ['''metadata «objectReference», i32 «pattern.numTokensMap.get(it)»'''])»}
+		«FOR pattern : patternList.filter[numTokensMap != null]»
+			«pattern.numTokensMap.objectReference» = metadata !{«pattern.ports.join(", ", ['''metadata «objectReference», i32 «pattern.numTokensMap.get(it)»'''])»}
 		«ENDFOR»
 		«IF actor.hasMoC»
+			
 			; MoC
 			«moC_MD»
 		«ENDIF»
 	'''
+	
 	def moC_MD() {
 		val value =
 			if (actor.moC.CSDF) ''' , metadata «actor.moC.objectReference»'''
@@ -264,19 +280,24 @@ class ActorPrinter extends InstancePrinter {
 			«actor.moC.objectReference» = metadata !{«actor.moC.MoCName_MD»«value»}
 		'''
 	}
-	
-	/*
-	 * TODO : check validity of this method
-	 */
-	def MoCName_MD(MoC moc) 
-		'''metadata !«IF moc.quasiStatic»QuasiStatic«ENDIF»«IF moc.CSDF»«IF moc.SDF»SDF«ELSE»CSDF«ENDIF»«ENDIF»«IF moc.DPN»DPN«ENDIF»«IF moc.KPN»KPN«ENDIF»'''
+
+	def MoCName_MD(MoC moc) {
+		val mocValue = switch(moc) {
+			case moc.quasiStatic : "QuasiStatic"
+			case moc.DPN : "DPN"
+			case moc.KPN : "KPN"
+			case moc.SDF : "SDF"
+			case moc.CSDF : "CSDF"
+		}
+		'''metadata !"«mocValue»"'''
+	}
 		
 	def pattern_MD(Pattern pattern) {
 		val numTokens =
 			if (pattern.numTokensMap != null) '''metadata «pattern.numTokensMap.objectReference»'''
 			else "null"
 		val variables =
-			if ( ! pattern.variables.empty) '''metadata «pattern.portToVarMap.objectReference»'''
+			if ( pattern.portToVarMap != null) '''metadata «pattern.portToVarMap.objectReference»'''
 			else "null"
 		'''
 			«pattern.objectReference» = metadata !{«numTokens», «variables»}
@@ -294,19 +315,19 @@ class ActorPrinter extends InstancePrinter {
 				else '''metadata «action.peekPattern.objectReference»'''
 		'''
 			;; «action.name»
-			«action.objectReference» = metadata !{«tag», «input», «output»,«peek», metadata «action.objectReference», metadata «action.body.objectReference»}
+			«action.objectReference» = metadata !{«tag», «input», «output», «peek», metadata «action.scheduler.objectReference», metadata «action.body.objectReference»}
 			«IF ! action.tag.identifiers.empty»
-				«action.tag.objectReference» = metadata  !{«action.tag.identifiers.join(", ", [varName_MD])»}
+				«action.tag.objectReference» = metadata  !{«action.tag.identifiers.join(", ", [name_MD])»}
 			«ENDIF»
-			«action.scheduler.objectReference» = metadata  !{«action.scheduler.name.varName_MD», «action.scheduler.procNative_MD», i1()* @«action.scheduler.name»}
-			«action.body.objectReference» = metadata  !{«action.body.name.varName_MD», «action.body.procNative_MD», void()* @«action.body.name»}
+			«action.scheduler.objectReference» = metadata  !{«action.scheduler.name.name_MD», «action.scheduler.procNative_MD», i1()* @«action.scheduler.name»}
+			«action.body.objectReference» = metadata  !{«action.body.name.name_MD», «action.body.procNative_MD», void()* @«action.body.name»}
 		'''
 	}
 
 	def argumentTypeDeclaration(Param param) {
-		if (param.variable.type.string) " i8* "
-		else if (param.variable.type.list) ''' «param.variable.type.doSwitch»* '''
-		else ''' «param.variable.type.doSwitch» '''
+		if (param.variable.type.string) "i8*"
+		else if (param.variable.type.list) '''«param.variable.type.doSwitch»*'''
+		else '''«param.variable.type.doSwitch»'''
 	}
 
 	def procNative_MD(Procedure proc)
@@ -320,9 +341,9 @@ class ActorPrinter extends InstancePrinter {
 		'''i1 «IF variable.assignable»1«ELSE»0«ENDIF»'''
 	
 	def varSize_MD(Type type)
-		'''«IF type.list» «(type as TypeList).dimensions.join(", ", ['''i32 «it»'''])» «ELSE» null «ENDIF»'''
+		'''«IF type.list»«(type as TypeList).dimensions.join(", ", ['''i32 «it»'''])»«ELSE»null«ENDIF»'''
 	
-	def varName_MD(String name)
+	def name_MD(String name)
 		'''metadata !"«name»"'''
 	
 	def actionScheduler_MD() {
@@ -331,23 +352,25 @@ class ActorPrinter extends InstancePrinter {
 		'''
 			«actor.objectReference» = metadata !{«outsideFSM», «fsm»}
 			«IF ! actor.actionsOutsideFsm.empty»
+				
 				;; Actions outside FSM
 				«actor.actionsOutsideFsm.objectReference» = metadata !{«actor.actionsOutsideFsm.join(", ", ['''metadata «objectReference»'''])»}
 			«ENDIF»
 			«IF actor.fsm != null»
+				
 				;; FSM
 				«FSM_MD»
 			«ENDIF»
-			
 		'''
 	}
 	
+	// In some case, «actor.fsm.transitions» can be the same list than the first «state.outgoing». So we use «actor.name.concat("_transitions")» to prevent this
 	def FSM_MD() '''
-		«actor.fsm.objectReference» = metadata !{«actor.fsm.initialState.name.varName_MD», metadata «actor.fsm.states.objectReference», metadata «actor.fsm.transitions.objectReference»}
+		«actor.fsm.objectReference» = metadata !{«actor.fsm.initialState.name.name_MD», metadata «actor.fsm.states.objectReference», metadata «actor.name.concat("_transitions").objectReference»}
 		;;; States
-		«actor.fsm.states.objectReference» = metadata !{«actor.fsm.states.join(", ", [name.varName_MD])»}
+		«actor.fsm.states.objectReference» = metadata !{«actor.fsm.states.join(", ", [name.name_MD])»}
 		;;; All transitions
-		«actor.fsm.transitions.objectReference» = metadata !{«actor.fsm.states.join(", ", ['''metadata «objectReference»'''])»}
+		«actor.name.concat("_transitions").objectReference» = metadata !{«actor.fsm.states.join(", ", ['''metadata «objectReference»'''])»}
 		«FOR state : actor.fsm.states»
 			«state.transition_MD»
 		«ENDFOR»
@@ -356,12 +379,12 @@ class ActorPrinter extends InstancePrinter {
 	def transition_MD(State state) '''
 		;;;; Transitions from «state.name»
 		«IF state.outgoing.empty»
-			«state.objectReference» = metadata !{«state.name.varName_MD», null}
+			«state.objectReference» = metadata !{«state.name.name_MD», null}
 		«ELSE»
-			«state.objectReference» = metadata !{«state.name.varName_MD», metadata «state.outgoing.objectReference»}
-			«state.outgoing.objectReference» = metadata !{«state.outgoing.join(", ", ['''metadata «objectReference»'''])»}
+			«state.objectReference» = metadata !{«state.name.name_MD», metadata «state.outgoing.objectReference»}
+			«state.outgoing.objectReference» = metadata !{«state.outgoing.join(", ", ['''metadata «(it as Transition).objectReference»'''])»}
 			«FOR transition : state.outgoing»
-				«transition.objectReference» = metadata !{metadata «(transition as Transition).action.objectReference», «state.name.varName_MD»"}
+				«(transition as Transition).objectReference» = metadata !{metadata «(transition as Transition).action.objectReference», «(transition as Transition).target.name.name_MD»}
 			«ENDFOR»
 		«ENDIF»
 	'''
@@ -376,6 +399,66 @@ class ActorPrinter extends InstancePrinter {
 			default: ""
 		}
 	}
+	
+	override caseInstLoad(InstLoad load) '''
+		«IF load.source.variable.type.list»
+			«load.source.variable.varName(load)» = getelementptr «load.source.variable.type.doSwitch»* «load.source.variable.print», i32 0«load.indexes.join(", ", ", ", "", [printIndex])»
+			«load.target.variable.print» = load «(load.source.variable.type as TypeList).innermostType.doSwitch»* «load.source.variable.varName(load)»
+		«ELSE»
+			«load.target.variable.print» = load «load.source.variable.type.doSwitch»* «load.source.variable.print»
+		«ENDIF»
+	'''
+	
+	override caseInstStore(InstStore store) '''
+		«IF store.target.variable.type.list»
+			«store.target.variable.varName(store)» = getelementptr «store.target.variable.type.doSwitch»* «store.target.variable.print», i32 0«store.indexes.join(", ", ", ", "", [printIndex])»
+			store «(store.target.variable.type as TypeList).innermostType.doSwitch» «store.value.doSwitch», «(store.target.variable.type as TypeList).innermostType.doSwitch»* «store.target.variable.varName(store)»
+		«ELSE»
+			store «store.target.variable.type.doSwitch» «store.value.doSwitch», «store.target.variable.type.doSwitch»* «store.target.variable.print»
+		«ENDIF»
+	'''
+	
+	override caseInstReturn(InstReturn retInst) {
+		if(retInst.value == null)
+			'''ret void'''
+		else
+			'''ret «retInst.value.type.doSwitch» «retInst.value.doSwitch»'''
+	}
+	
+	override print(Action action) '''
+		define «action.scheduler.returnType.doSwitch» @«action.scheduler.name»(«action.scheduler.parameters.join(", ", [argumentDeclaration])») nounwind {
+		entry:
+			«FOR local : action.scheduler.locals»
+				«local.variableDeclaration»
+			«ENDFOR»
+			«FOR port : action.peekPattern.ports.filter[ ! native]»
+				«port.fifoVar(action.inputPattern.portToVarMap.get(port))»
+			«ENDFOR»
+			br label %b«action.scheduler.blocks.head.label»
+			
+		«FOR block : action.scheduler.blocks»
+			«block.doSwitch»
+		«ENDFOR»
+		}
+		
+		define void @«action.body.name»(«action.body.parameters.join(", ", [argumentDeclaration])») nounwind {
+		entry:
+			«FOR local : action.body.locals»
+				«local.variableDeclaration»
+			«ENDFOR»
+			«FOR port : action.inputPattern.ports.filter[ ! native]»
+				«port.fifoVar(action.inputPattern.portToVarMap.get(port))»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.filter[ ! native]»
+				«port.fifoVar(action.outputPattern.portToVarMap.get(port))»
+			«ENDFOR»
+			br label %b«action.body.blocks.head.label»
+		
+		«FOR block : action.body.blocks»
+			«block.doSwitch»
+		«ENDFOR»
+		}
+	'''
 	
 	def actorParameter(Var variable)
 		'''@«variable.name» = global «variable.type.doSwitch» undef'''
@@ -393,27 +476,41 @@ class ActorPrinter extends InstancePrinter {
 		%«variable.name» = bitcast «port.type.doSwitch»* %«variable.name»_ptr to «variable.type.doSwitch»*
 	'''
 
-	def void computePatternIndexes() {
+	def void computePatterns() {
 		for (init : actor.initializes) {
-			patternList.add(init.inputPattern)
-			patternList.add(init.outputPattern)
-			patternList.add(init.peekPattern)
+			init.inputPattern.compute
+			init.outputPattern.compute
+			init.peekPattern.compute
 		}
 		for (action : actor.actions) {
-			patternList.add(action.inputPattern)
-			patternList.add(action.outputPattern)
-			patternList.add(action.peekPattern)
+			action.inputPattern.compute
+			action.outputPattern.compute
+			action.peekPattern.compute
 		}
 		if (actor.hasMoC) {
 			val moc = actor.moC
 			if(moc.SDF || moc.CSDF) {
-				patternList.add((moc as CSDFMoC).inputPattern)
-				patternList.add((moc as CSDFMoC).outputPattern)
+				(moc as CSDFMoC).inputPattern.compute;
+				(moc as CSDFMoC).outputPattern.compute;
 			} else if (moc.quasiStatic) {
 				for (action : (moc as QSDFMoC).actions) {
-					patternList.add(((moc as QSDFMoC).getMoC(action) as CSDFMoC).inputPattern)
-					patternList.add(((moc as QSDFMoC).getMoC(action) as CSDFMoC).outputPattern)
+					((moc as QSDFMoC).getMoC(action) as CSDFMoC).inputPattern.compute;
+					((moc as QSDFMoC).getMoC(action) as CSDFMoC).outputPattern.compute;
 				}
+			}
+		}
+	}
+	
+	def compute(Pattern pattern) {
+		if( ! pattern.empty)
+			patternList.add(pattern)
+	}
+	
+	override computeCastedList() {
+		castedList.clear
+		for (variable : actor.eAllContents.toIterable.filter(typeof(Var))) {
+			if(variable.type.list && ! variable.defs.empty && variable.defs.head.eContainer instanceof InstCast) {
+				castedList.add(variable)
 			}
 		}
 	}

@@ -26,26 +26,24 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.aot;
+package net.sf.orcc.backends.llvm.jit;
 
 import java.io.File;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.backends.CommonPrinter;
-import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Network;
+import net.sf.orcc.backends.llvm.aot.LLVMPrinter;
+import net.sf.orcc.df.Actor;
 
 /**
  * @author Antoine Lorence
  * 
  */
-public class LLVMPrinter extends CommonPrinter {
+public class JadePrinter extends LLVMPrinter {
 
 	/**
 	 * @param keepUnchangedFiles
-	 *            used to configure file caching
 	 */
-	public LLVMPrinter(boolean keepUnchangedFiles) {
+	public JadePrinter(boolean keepUnchangedFiles) {
 		super(keepUnchangedFiles);
 	}
 
@@ -53,52 +51,26 @@ public class LLVMPrinter extends CommonPrinter {
 	 * (non-Javadoc)
 	 * 
 	 * @see net.sf.orcc.backends.CommonPrinter#print(java.lang.String,
-	 * net.sf.orcc.df.Instance)
+	 * net.sf.orcc.df.Actor)
 	 */
 	@Override
-	public boolean print(String folder, Instance instance) {
-		String file = folder + File.separator + instance.getName() + ".ll";
-
+	public boolean print(String folder, Actor actor) {
+		String file = folder + File.separator + actor.getSimpleName();
 		File targetActorFile = new File(file);
 
-		CharSequence fileContent = new InstancePrinter(instance)
-				.getInstanceFileContent();
+		if (!actor.isNative()) {
 
-		if (!needToReplace(targetActorFile, fileContent.toString())) {
-			return true;
-		}
+			CharSequence sequence = new ActorPrinter(actor)
+					.getActorFileContent();
 
-		if (!printFile(fileContent, file)) {
-			throw new OrccRuntimeException("Unable to write file " + file);
-		}
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.orcc.backends.CommonPrinter#print(java.lang.String,
-	 * net.sf.orcc.df.Network)
-	 */
-	@Override
-	public boolean print(String folder, Network network) {
-
-		String targetNetworkPath = folder + File.separator
-				+ network.getSimpleName() + ".ll";
-
-		File targetFile = new File(targetNetworkPath);
-
-		CharSequence fileContent = new NetworkPrinter(network, options)
-				.getNetworkFileContent();
-
-		if (!needToReplace(targetFile, fileContent.toString())) {
-			return true;
-		}
-
-		if (!printFile(fileContent, targetNetworkPath)) {
-			throw new OrccRuntimeException("Unable to write file "
-					+ targetNetworkPath);
+			if (!needToReplace(targetActorFile, sequence.toString())) {
+				return true;
+			}
+			if (!printFile(sequence, file)) {
+				throw new OrccRuntimeException("Unable to write file " + file);
+			}
 		}
 		return false;
 	}
+
 }
