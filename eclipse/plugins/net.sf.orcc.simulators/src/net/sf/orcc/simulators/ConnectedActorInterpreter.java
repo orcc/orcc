@@ -124,10 +124,10 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 					// management
 					String str = ((ExprString) expr).getValue();
 					String unescaped = OrccUtil.getUnescapedString(str);
-					OrccLogger.trace(unescaped);
+					OrccLogger.traceRaw(unescaped);
 				} else {
 					Object value = exprInterpreter.doSwitch(expr);
-					OrccLogger.trace(String.valueOf(value));
+					OrccLogger.traceRaw(String.valueOf(value));
 				}
 			}
 		}
@@ -141,6 +141,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 *            output pattern of an action
 	 * @return true if the pattern is empty or satisfiable
 	 */
+	@Override
 	protected boolean checkOutputPattern(Pattern outputPattern) {
 		boolean hasRooms = true;
 		if (outputPattern != null) {
@@ -162,6 +163,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 * 
 	 * @param action
 	 */
+	@Override
 	public void execute(Action action) {
 		// allocate patterns
 		Pattern inputPattern = action.getInputPattern();
@@ -211,6 +213,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 *            an action
 	 * @return true if the given action is schedulable
 	 */
+	@Override
 	protected boolean isSchedulable(Action action) {
 		Pattern pattern = action.getInputPattern();
 		// check tokens
