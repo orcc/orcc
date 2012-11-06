@@ -2,8 +2,56 @@
 <osal version="0.1">
 
   <operation>
-    <name>ORCC_PRINT</name>
-    <description>Writes a single 8bit char to "standard output" which is platform dependent. In simulator outputs the character to simulator console. Used for debugging. printf() uses this by default.</description>
+    <name>SOURCE_INIT</name>
+    <description></description>
+    <inputs>1</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="SIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(stdout, IO(1));
+    </trigger-semantics>
+  </operation>
+
+  <operation>
+    <name>SOURCE_READBYTE</name>
+    <description></description>
+    <inputs>1</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="SIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(stdout, IO(1));
+    </trigger-semantics>
+  </operation>
+
+  <operation>
+    <name>SOURCE_SIZEOFFILE</name>
+    <description></description>
+    <inputs>1</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="SIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(stdout, IO(1));
+    </trigger-semantics>
+  </operation>
+
+  <operation>
+    <name>SOURCE_REWIND</name>
+    <description></description>
+    <inputs>1</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="SIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(stdout, IO(1));
+    </trigger-semantics>
+  </operation>
+
+  <operation>
+    <name>PRINT</name>
+    <description></description>
     <inputs>1</inputs>
     <outputs>0</outputs>
     <side-effects/>
@@ -14,25 +62,14 @@
   </operation>
   
   <operation>
-    <name>ORCC_READ</name>
-    <description>Writes a single 8bit char to "standard output" which is platform dependent. In simulator outputs the character to simulator console. Used for debugging. printf() uses this by default.</description>
+    <name>PRINT_CYCLE_COUNT</name>
+    <description></description>
     <inputs>0</inputs>
-    <outputs>1</outputs>
+    <outputs>0</outputs>
     <side-effects/>
     <in id="1" type="SIntWord"/>
     <trigger-semantics>
       EXEC_OPERATION(read, IO(1));
     </trigger-semantics>
   </operation>
-  
-  <operation>
-    <name>ORCC_CYCLE</name>
-    <description>Writes a single 8bit char to "standard output" which is platform dependent. In simulator outputs the character to simulator console. Used for debugging. printf() uses this by default.</description>
-    <inputs>0</inputs>
-    <outputs>1</outputs>
-    <side-effects/>
-    <in id="1" type="SIntWord"/>
-    <trigger-semantics>
-      EXEC_OPERATION(read, IO(1));
-    </trigger-semantics>
-  </operation>
+</osal>
