@@ -53,6 +53,7 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.sexp.SExp;
 import net.sf.orcc.util.sexp.SExpList;
@@ -128,7 +129,11 @@ public class SmtSolver {
 			SExpParser parser = new SExpParser(builder.toString());
 			SExp exp = parser.read();
 			if (exp == null || !exp.isSymbol()) {
-				System.err.println(actor.getName() + ": " + builder.toString());
+				OrccLogger.warnln("Actor " + actor.getName() + ": ");
+				String error[] = builder.toString().split("\n");
+				for (int i = 0; i < error.length; i++) {
+					OrccLogger.warnln(error[i]);
+				}
 				return;
 			}
 
@@ -317,7 +322,7 @@ public class SmtSolver {
 				try {
 					String line = reader.readLine();
 					while (line != null) {
-						System.err.println(line);
+						OrccLogger.severeln(line);
 						line = reader.readLine();
 					}
 				} catch (IOException e) {
