@@ -937,9 +937,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					smt_option = "+lang smt2";
 				} else if (smt_path.contains("z3")) {
 					if (Platform.OS_WIN32.equals(Platform.getOS())) {
-						smt_option = "/smt2 /m";
+						smt_option = "/smt2";
 					} else {
-						smt_option = "-smt2 -m";
+						smt_option = "-smt2";
 					}
 				} else {
 					OrccLogger.warnln("Unknown SMT solver.");

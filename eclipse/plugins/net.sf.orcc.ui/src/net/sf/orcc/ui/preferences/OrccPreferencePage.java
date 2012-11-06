@@ -87,9 +87,9 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 				textControl.setText("+lang smt2");
 			} else if ("Z3".equals(text)) {
 				if (Platform.OS_WIN32.equals(Platform.getOS())) {
-					textControl.setText("/smt2 /m");
+					textControl.setText("/smt2");
 				} else {
-					textControl.setText("-smt2 -m");
+					textControl.setText("-smt2");
 				}
 			}
 			updateMode = true;
