@@ -91,15 +91,15 @@ public class Classifier extends DfVisitor<Void> {
 			if (checker.checkSat(previous, action)) {
 				OrccLogger.traceln(actor.getName() + ": guards of actions "
 						+ previous.getName() + " and " + action.getName()
-						+ " are compatible\n");
+						+ " are compatible");
 				return true;
 			}
 
 			return false;
 		} catch (OrccRuntimeException e) {
-			OrccLogger.traceln(actor.getName()
-					+ ": could not check time-dependency\n");
-			e.printStackTrace();
+			OrccLogger.warnln(actor.getName()
+					+ ": could not check time-dependency (" + e.getMessage()
+					+ ")");
 			return true;
 		}
 	}
@@ -123,10 +123,9 @@ public class Classifier extends DfVisitor<Void> {
 		} catch (Exception e) {
 			MoC moc = MocFactory.eINSTANCE.createDPNMoC();
 			actor.setMoC(moc);
-			OrccLogger.warnln("An exception occurred when classifying actor "
-					+ actor.getName() + "\n");
-			OrccLogger.traceln("MoC of " + actor.getName() + ": " + moc + "\n");
-			e.printStackTrace();
+			OrccLogger.warnln("An exception occurred when classifying actor ("
+					+ e.getMessage() + ")");
+			OrccLogger.traceln("MoC of " + actor.getName() + ": " + moc);
 		} finally {
 			this.actor = null;
 		}
@@ -152,24 +151,20 @@ public class Classifier extends DfVisitor<Void> {
 		} catch (CoreException e) {
 		}
 
-		// checks for empty actors
-		List<Action> actions = actor.getActions();
-		if (actions.isEmpty()) {
-			OrccLogger.traceln("actor " + actor.getName()
-					+ " does not contain any actions, defaults to dynamic\n");
-			actor.setMoC(MocFactory.eINSTANCE.createKPNMoC());
-			return;
-		}
-
-		// checks for actors with time-dependent behavior
 		MoC moc;
-		if (isTimeDependent()) {
+		List<Action> actions = actor.getActions();
+
+		if (actions.isEmpty()) {
+			// checks for empty actors
+			OrccLogger.traceln("Actor " + actor.getName()
+					+ " does not contain any actions, defaults to dynamic");
+			moc = MocFactory.eINSTANCE.createKPNMoC();
+			return;
+		} else if (isTimeDependent()) {
+			// checks for actors with time-dependent behavior
 			moc = MocFactory.eINSTANCE.createDPNMoC();
 			showMarker();
 		} else {
-			// merges actions with the same input/output pattern together
-			// new SDFActionsMerger().visit(actor);
-
 			// first tries SDF with *all* the actions of the actor
 			moc = classifySDF(actions);
 			if (!moc.isSDF()) {
@@ -195,7 +190,7 @@ public class Classifier extends DfVisitor<Void> {
 
 		// set and print MoC
 		actor.setMoC(moc);
-		OrccLogger.traceln("MoC of " + actor.getName() + ": " + moc + "\n");
+		OrccLogger.traceln("MoC of " + actor.getName() + ": " + moc);
 	}
 
 	/**
@@ -295,7 +290,7 @@ public class Classifier extends DfVisitor<Void> {
 		String name = actor.getName();
 		if (!isQuasiStaticFsm(fsm)) {
 			OrccLogger.traceln(name
-					+ " has an FSM that is NOT compatible with quasi-static\n");
+					+ " has an FSM that is NOT compatible with quasi-static");
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
@@ -304,15 +299,14 @@ public class Classifier extends DfVisitor<Void> {
 		// analyze the configuration of this actor
 		List<Port> ports = findConfigurationPorts(fsm);
 		if (ports.isEmpty()) {
-			OrccLogger.traceln("no configuration ports found for " + name
-					+ "\n");
+			OrccLogger.traceln("no configuration ports found for " + name);
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
 		Map<Action, Map<String, Object>> configurations = findConfigurationValues(
 				fsm, ports);
 		if (configurations.isEmpty()) {
-			OrccLogger.traceln("no configurations for " + name + "\n");
+			OrccLogger.traceln("no configurations for " + name);
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
@@ -323,8 +317,7 @@ public class Classifier extends DfVisitor<Void> {
 		for (Action action : fsm.getTargetActions(initialState)) {
 			Map<String, Object> configuration = configurations.get(action);
 			if (configuration == null) {
-				OrccLogger.traceln("no configuration for " + action.getName()
-						+ "\n");
+				OrccLogger.traceln("no configuration for " + action.getName());
 				return MocFactory.eINSTANCE.createKPNMoC();
 			}
 			MoC staticClass = classifyFsmConfiguration(configuration);

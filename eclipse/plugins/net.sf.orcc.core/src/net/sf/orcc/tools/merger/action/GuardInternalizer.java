@@ -56,6 +56,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -204,8 +205,8 @@ public class GuardInternalizer {
 	 */
 	private Action mergeActions(List<Action> actions) {
 		if (actions.size() > 1) {
-			System.out.println("Internalize >> Actor " + actor.getSimpleName()
-					+ " - Actions " + actions);
+			OrccLogger.traceln("Internalize some actions of " + actor.getName()
+					+ " " + actions);
 
 			String name = "";
 			for (Action mergedAction : actions) {
