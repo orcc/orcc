@@ -109,7 +109,7 @@ public class CEmbeddedBackend extends AbstractBackend {
 
 		// The classification gives production and consumption information from
 		// the graph
-		OrccLogger.trace("Starting classification of actors... ");
+		OrccLogger.traceln("Starting classification of actors... ");
 		new Classifier().doSwitch(network);
 		OrccLogger.traceln("done");
 
