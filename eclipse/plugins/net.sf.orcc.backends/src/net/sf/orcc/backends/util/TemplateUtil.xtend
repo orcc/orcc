@@ -20,7 +20,7 @@ class TemplateUtil extends AbstractIrVisitor<CharSequence> {
 	 * or when declaring it. If list is empty, return an empty string.
 	 */
 	def printArrayIndexes(List<Expression> exprList) {
-		exprList.map['''[«doSwitch»]'''].join
+		exprList.join("", ['''[«doSwitch»]'''])
 	}
 	
 	/**
