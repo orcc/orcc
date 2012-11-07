@@ -78,7 +78,6 @@ class InstancePrinter extends LLVMTemplate {
 	
 	protected val List<Var> castedList = new ArrayList<Var>
 	val List<Expression> castedIndexes = new ArrayList<Expression>
-	val Map<State, Integer> stateToLabel = new HashMap<State, Integer>
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
 	var optionProfile = false
@@ -102,7 +101,6 @@ class InstancePrinter extends LLVMTemplate {
 		
 		computeCastedIndex
 		computeCastedList
-		computeStateToLabel
 		computePortToIndexByPatternMap
 	}
 	
@@ -229,7 +227,7 @@ class InstancePrinter extends LLVMTemplate {
 
 	
 	def schedulerWithFSM() '''
-		@_FSM_state = internal global i32 «stateToLabel.get(instance.actor.fsm.initialState)»
+		@_FSM_state = internal global i32 «instance.actor.fsm.states.indexOf(instance.actor.fsm.initialState)»
 		
 		«IF ! instance.actor.actionsOutsideFsm.empty»
 			define void @«instance.name»_outside_FSM_scheduler() nounwind {
@@ -281,7 +279,7 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 	
 	def printFsmState(State state) '''
-		i32 «stateToLabel.get(state)», label %bb_s_«state.name»
+		i32 «instance.actor.fsm.states.indexOf(state)», label %bb_s_«state.name»
 	'''
 
 	def printTransition(State state) '''
@@ -329,7 +327,7 @@ class InstancePrinter extends LLVMTemplate {
 			br label %bb_«state.name»_finished
 		
 		bb_«state.name»_finished:
-			store i32 «stateToLabel.get(state)», i32* @_FSM_state
+			store i32 «instance.actor.fsm.states.indexOf(state)», i32* @_FSM_state
 			br label %bb_waiting
 		
 		'''
@@ -846,16 +844,6 @@ class InstancePrinter extends LLVMTemplate {
 		for (variable : instance.actor.eAllContents.toIterable.filter(typeof(Var))) {
 			if(variable.type.list && ! variable.defs.empty && variable.defs.head.eContainer instanceof InstCast) {
 				castedList.add(variable)
-			}
-		}
-	}
-
-	def computeStateToLabel() {
-		if(instance.actor.hasFsm){
-			var i = 0
-			for ( state : instance.actor.fsm.states) {
-				stateToLabel.put(state, i)
-				i = i + 1
 			}
 		}
 	}
