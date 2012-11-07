@@ -97,6 +97,13 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 				Processor processor = design.getProcessor(mapping
 						.getMappedComponent(instance));
 				processor.getMappedActors().add(instance);
+
+				if (processor.getFunctionUnit("ORCC_FU") == null
+						&& actor.useNativeProcedure()) {
+					processor.getFunctionUnits().add(
+							factory.createOrccFU(processor));
+				}
+
 				componentMap.put(instance, processor);
 			}
 
@@ -168,8 +175,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			}
 		}
 
-		Signal signal = factory.createSignal("" + signalId++,
-				size, source, target, sourcePort, targetPort);
+		Signal signal = factory.createSignal("" + signalId++, size, source,
+				target, sourcePort, targetPort);
 
 		design.add(signal);
 	}

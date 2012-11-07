@@ -349,7 +349,7 @@ public interface ArchitectureFactory extends EFactory {
 	Memory createMemory();
 
 	/**
-	 * Returns a new memory object. 
+	 * Returns a new memory object.
 	 * 
 	 * @param name
 	 *            the name of the address space
@@ -394,6 +394,16 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a control Operation
 	 */
 	Operation createOperationCtrl(String name, FuPort port);
+
+	/**
+	 * Returns a new function unit able to execute specific operation for Orcc
+	 * simulation.
+	 * 
+	 * @param tta
+	 *            the processor where the FU will be added
+	 * @return a new ORCC_FU
+	 */
+	FunctionUnit createOrccFU(Processor tta);
 
 	/**
 	 * Return a new signal unit

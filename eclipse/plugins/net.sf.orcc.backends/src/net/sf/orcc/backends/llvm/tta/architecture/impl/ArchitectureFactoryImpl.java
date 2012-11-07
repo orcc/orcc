@@ -315,6 +315,41 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return functionUnit;
 	}
 
+	public FunctionUnit createOrccFU(Processor tta) {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		String name = "ORCC_FU";
+		functionUnit.setName(name);
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket i2 = createInputSocket(name + "_i2", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
+		// Port
+		FuPort in1t = createFuPort("in1t", 32, true, true);
+		FuPort in2 = createFuPort("in2", 32, false, false);
+		FuPort out = createFuPort("out", 32, false, false);
+		in1t.connect(i1);
+		in2.connect(i2);
+		out.connect(o1);
+		functionUnit.getPorts().add(in1t);
+		functionUnit.getPorts().add(in2);
+		functionUnit.getPorts().add(out);
+		functionUnit.setImplementation(name);
+
+		String[] oneInputOps = { "SOURCE_INIT", "SOURCE_READBYTE",
+				"SOURCE_SIZEOFFILE", "SOURCE_REWIND", "PRINT_CYCLE_COUNT" };
+		String[] twoInputOps = { "PRINT" };
+		for (String operation : oneInputOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in1t, out));
+		}
+		for (String operation : twoInputOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in1t, in2, out));
+		}
+		return functionUnit;
+	}
+
 	@Override
 	public FunctionUnit createAluUnit(Processor tta, String name) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();

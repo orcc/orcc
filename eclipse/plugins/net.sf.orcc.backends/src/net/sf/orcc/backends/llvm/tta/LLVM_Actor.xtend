@@ -35,6 +35,7 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.InstCall
 
 class LLVM_Actor extends InstancePrinter {
 	
@@ -105,5 +106,15 @@ class LLVM_Actor extends InstancePrinter {
 			«ENDFOR»
 			ret void
 		}
+	'''
+	
+	override caseInstCall(InstCall call) '''
+		«IF call.print»
+			call i32 (i8*, ...)* @printf(«call.parameters.join(", ", [printParameter])»)
+		«ELSEIF call.procedure.native»
+			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»tail call void asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "ir,ir"(i32 0«IF call.parameters != null», «formatParameters(call.procedure.parameters, call.parameters).join(", ")»«ENDIF») nounwind
+		«ELSE»
+			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («formatParameters(call.procedure.parameters, call.parameters).join(", ")»)
+		«ENDIF»
 	'''
 }
