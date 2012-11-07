@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="X0" x="57" y="161"/>
+      <vertex id="X1" x="57" y="254"/>
+      <vertex id="ROW" x="149" y="79"/>
+      <vertex id="Y0" x="672" y="108"/>
+      <vertex id="Y1" x="677" y="179"/>
+      <vertex id="Y2" x="683" y="245"/>
+      <vertex id="Y3" x="653" y="288"/>
+      <vertex id="$id_n$0" x="148" y="182"/>
+      <vertex id="$id_n$1" x="267" y="163"/>
+      <vertex id="$id_n$2" x="409" y="164"/>
+      <vertex id="$id_n$3" x="508" y="172"/>
+      <vertex id="$id_n$4" x="581" y="172"/>
+   </vertices>
+</layout>

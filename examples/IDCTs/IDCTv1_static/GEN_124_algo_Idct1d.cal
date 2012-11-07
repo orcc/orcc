@@ -1,0 +1,38 @@
+// GEN_124_algo_Idct1d.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+// Copyright (c) 2004-2005 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+
+import all caltrop.lib.BitOps;
+
+actor GEN_124_algo_Idct1d ( bool ROW ) int X ==> int Y :
+
+  list[ int ] W0 = [ 2048, 2676, 2841, 1609 ];
+  list[ int ] W1 = [ 2048, 1108,  565, 2408 ];
+
+  action X:[x] repeat 8 ==> Y:[ y[0], y[4], y[6], y[2], y[3], y[7], y[5], y[1] ]
+  var
+   list[ int ] y,
+   int y6,
+   int y7,
+   list[ int ] o = if ROW then [ 128, 128, 0, 0, 0, 0, 0, 0 ] else [ 65536, 65536, 4, 4, 4, 4, 4, 4 ] end
+  do
+    x := [ x[0], x[4], x[2], x[6], x[1], x[7], x[5], x[3] ];
+    y := [ (x[2*i] * W0[i] +  x[2*i+1] * W1[i]), (x[2*i] * W1[i] -  x[2*i+1] * W0[i]) : for i in Integers(0,3) ];
+    y := [ rshift( y[i] + o[i], if ROW then 0 else 3 end ) : for i in Integers( 0, 7 ) ];
+    y := [ y[4*i] + y[4*i+2], y[4*i] - y[4*i+2], y[4*i+1] + y[4*i+3], y[4*i+1] - y[4*i+3]  : for i in Integers( 0, 1) ];
+    y6 := rshift( 181*( y[5] + y[7] ) + 128, 8 );
+    y7 := rshift( 181*( y[5] - y[7] ) + 128, 8 );
+    y := [ y[0], y[1], y[4], y[6], y[2], y[3], y6, y7 ];
+    y := [ y[4*i] + y[4*i+2], y[4*i] - y[4*i+2], y[4*i+1] + y[4*i+3], y[4*i+1] - y[4*i+3]  : for i in Integers( 0, 1) ];
+    y := [ rshift( y[i], if ROW then 8 else 14 end ) : for i in Integers(0,7) ];
+  end
+
+end

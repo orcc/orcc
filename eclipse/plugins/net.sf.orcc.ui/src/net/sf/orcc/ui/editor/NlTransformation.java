@@ -34,14 +34,14 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.graphiti.io.ITransformation;
-import net.sf.graphiti.model.AbstractObject;
-import net.sf.graphiti.model.Edge;
-import net.sf.graphiti.model.Graph;
-import net.sf.graphiti.model.ObjectType;
-import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractPrinter;
+import net.sf.orcc.graphiti.io.ITransformation;
+import net.sf.orcc.graphiti.model.AbstractObject;
+import net.sf.orcc.graphiti.model.Edge;
+import net.sf.orcc.graphiti.model.Graph;
+import net.sf.orcc.graphiti.model.ObjectType;
+import net.sf.orcc.graphiti.model.Vertex;
 
 import org.eclipse.core.resources.IFile;
 import org.stringtemplate.v4.Interpreter;

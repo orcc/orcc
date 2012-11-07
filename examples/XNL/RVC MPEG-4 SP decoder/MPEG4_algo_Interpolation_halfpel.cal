@@ -1,0 +1,123 @@
+// MPEG4_algo_Interpolation_halfpel.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+// Copyright (c) 2004-2005 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+
+// Interpolation for motion compensation
+
+import all caltrop.lib.BitOps;
+
+actor MPEG4_algo_Interpolation_halfpel ( int PIX_SZ, int FLAG_SZ ) int(size=PIX_SZ) RD, int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
+
+  _CAL_tokenMonitor := true;
+
+  // Compensation function
+  function compensate( p00, p10, p01, p11 ) :
+    if flags = 0 then p00 else
+      if flags = 1 then
+        // interpolate y only
+        rshift( (p00 + p01 + 1) - round, 1 )
+      else
+        if flags = 2 then
+          // interpolate x only
+          rshift( (p00 + p10 + 1) - round, 1 )
+        else
+          // interpolate x and y
+          rshift( ( p00 + p10 + p01 + p11 + 2) - round, 2 )
+        end
+      end
+    end
+  end
+
+  int(size=5) x;
+  int(size=5) y;
+  int(size=3) flags;
+  int(size=2) round;
+
+  start: action halfpel:[ f ] ==>
+  do
+    x := 0;
+    y := 0;
+    flags := rshift(f,1);
+    round := bitand(f,1);
+  end
+
+  done: action ==>
+  guard
+    y = 9
+  end
+
+  int( size=PIX_SZ ) d0;
+  int( size=PIX_SZ ) d1;
+  int( size=PIX_SZ ) d2;
+  int( size=PIX_SZ ) d3;
+  int( size=PIX_SZ ) d4;
+  int( size=PIX_SZ ) d5;
+  int( size=PIX_SZ ) d6;
+  int( size=PIX_SZ ) d7;
+  int( size=PIX_SZ ) d8;
+  int( size=PIX_SZ ) d9;
+
+  row_col_0: action RD:[d] ==>
+  guard
+    (x = 0) or (y = 0)
+  do
+    d9 := d8;
+    d8 := d7;
+    d7 := d6;
+    d6 := d5;
+    d5 := d4;
+    d4 := d3;
+    d3 := d2;
+    d2 := d1;
+    d1 := d0;
+    d0 := d;
+    x := x + 1;
+    if x >= 9 then
+      x := 0;
+      y := y + 1;
+    end
+  end
+
+  other: action RD:[d] ==> MOT:[ p ]
+  var
+     p = compensate(d9, d8, d0, d )
+  do
+    d9 := d8;
+    d8 := d7;
+    d7 := d6;
+    d6 := d5;
+    d5 := d4;
+    d4 := d3;
+    d3 := d2;
+    d2 := d1;
+    d1 := d0;
+    d0 := d;
+    x := x + 1;
+    if x >= 9 then
+      x := 0;
+      y := y + 1;
+    end
+  end
+
+  schedule fsm start:
+
+    start        ( start     ) --> interpolate;
+    interpolate  ( done      ) --> start;
+    interpolate  ( row_col_0 ) --> interpolate;
+    interpolate  ( other     ) --> interpolate;
+
+  end
+
+  priority
+    done > row_col_0 > other;
+  end
+
+end

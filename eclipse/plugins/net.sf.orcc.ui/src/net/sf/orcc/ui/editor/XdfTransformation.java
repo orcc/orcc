@@ -30,8 +30,8 @@ package net.sf.orcc.ui.editor;
 
 import java.io.OutputStream;
 
-import net.sf.graphiti.io.ITransformation;
-import net.sf.graphiti.model.Graph;
+import net.sf.orcc.graphiti.io.ITransformation;
+import net.sf.orcc.graphiti.model.Graph;
 
 import org.eclipse.core.resources.IFile;
 

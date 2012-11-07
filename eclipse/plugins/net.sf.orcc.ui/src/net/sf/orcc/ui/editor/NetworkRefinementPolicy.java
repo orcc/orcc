@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ui.editor;
 
-import net.sf.graphiti.model.DefaultRefinementPolicy;
-import net.sf.graphiti.model.Vertex;
+import net.sf.orcc.graphiti.model.DefaultRefinementPolicy;
+import net.sf.orcc.graphiti.model.Vertex;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;

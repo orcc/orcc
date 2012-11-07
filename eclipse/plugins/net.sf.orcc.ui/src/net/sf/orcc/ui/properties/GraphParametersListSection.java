@@ -31,7 +31,7 @@ package net.sf.orcc.ui.properties;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
-import net.sf.graphiti.ui.properties.ListSection;
+import net.sf.orcc.graphiti.ui.properties.ListSection;
 
 /**
  * This class defines a list section for graph parameters.

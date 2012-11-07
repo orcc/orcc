@@ -1,11 +1,1502 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Jade</name>
+	<name>Jade-Debug@Jade</name>
 	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.make.core.makeBuilder</name>
+			<triggers>clean,full,incremental,</triggers>
+			<arguments>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
+					<value>clean</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.enableCleanBuild</key>
+					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.append_environment</key>
+					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.stopOnError</key>
+					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.enabledIncrementalBuild</key>
+					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.command</key>
+					<value>/usr/bin/make</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.contents</key>
+					<value>org.eclipse.cdt.make.core.activeConfigSettings</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.target.inc</key>
+					<value>all</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.arguments</key>
+					<value>-j8</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.buildLocation</key>
+					<value>/home/alorence/orcc_src/orcc/contrib/Jade</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.useDefaultBuildCmd</key>
+					<value>false</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.environment</key>
+					<value>VERBOSE=1|CMAKE_NO_VERBOSE=1|</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.enableFullBuild</key>
+					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.target.auto</key>
+					<value>all</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.enableAutoBuild</key>
+					<value>false</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.target.clean</key>
+					<value>clean</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.fullBuildTarget</key>
+					<value>all</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.buildArguments</key>
+					<value></value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.location</key>
+					<value>/home/alorence/orcc_src/orcc/contrib/Jade</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.autoBuildTarget</key>
+					<value>all</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.core.errorOutputParser</key>
+					<value>org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.make.core.ScannerConfigBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+		<nature>org.eclipse.cdt.make.core.makeNature</nature>
+		<nature>org.eclipse.cdt.make.core.ScannerConfigNature</nature>
+		<nature>org.eclipse.cdt.core.cnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>[Source directory]</name>
+			<type>2</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src</location>
+		</link>
+		<link>
+			<name>[Subprojects]</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Subprojects]/Jade</name>
+			<type>2</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src</location>
+		</link>
+		<link>
+			<name>[Targets]</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Source Files/Connector.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/Connector.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Source Files/Initializer.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/Initializer.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Source Files/Instantiator.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/Instantiator.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Source Files/ConfigurationEngine.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/ConfigurationEngine.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Source Files/Configuration.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/Configuration.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Source Files/Reconfiguration.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/Reconfiguration.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Header Files/Connector.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/Connector.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Header Files/Initializer.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/Initializer.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Header Files/Instantiator.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/Instantiator.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Header Files/Reconfiguration.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ConfigurationEngine/Reconfiguration.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ConfigurationEngine/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine/Source Files/Decoder.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCEngine/Decoder.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine/Source Files/RVCEngine.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCEngine/RVCEngine.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine/Header Files/Constant.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCEngine/Constant.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCEngine/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/Source Files/HDAGEdge.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/Graph/HDAGEdge.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/Source Files/HDAGGraph.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/Graph/HDAGGraph.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/Source Files/HDAGVertex.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/Graph/HDAGVertex.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/Source Files/DotWriter.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/Graph/DotWriter.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] HDAGGraph/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRActor</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRActor/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRActor/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRActor/Source Files/BroadcastActor.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRActor/BroadcastActor.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRActor/Source Files/BroadcastAdder.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRActor/BroadcastAdder.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRActor/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRActor/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRActor/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRActor/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Action.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Action.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/ActionScheduler.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/ActionScheduler.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Actor.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Actor.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Connection.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Connection.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Entity.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Entity.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Expression.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Expression.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/FSM.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/FSM.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Instance.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Instance.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Network.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Network.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Package.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Package.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Pattern.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Pattern.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Port.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Port.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Source Files/Procedure.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRCore/Procedure.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRCore/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Source Files/LLVMArmFix.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRJit/LLVMArmFix.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Source Files/LLVMExecution.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRJit/LLVMExecution.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Source Files/LLVMOptimizer.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRJit/LLVMOptimizer.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Source Files/LLVMParser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRJit/LLVMParser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Source Files/LLVMUtility.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRJit/LLVMUtility.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Source Files/LLVMWriter.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRJit/LLVMWriter.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Header Files/NativeDecl.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRJit/NativeDecl.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRJit/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Source Files/CheckPinoRules.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRMerger/CheckPinoRules.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Source Files/Merger.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRMerger/Merger.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Source Files/Rational.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRMerger/Rational.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Source Files/SuperInstance.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRMerger/SuperInstance.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Header Files/CheckPinoRules.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRMerger/CheckPinoRules.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Header Files/Rational.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRMerger/Rational.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRMerger/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IROptimize</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IROptimize/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IROptimize/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IROptimize/Source Files/InstanceInternalize.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IROptimize/InstanceInternalize.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IROptimize/Source Files/FifoFnRemoval.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IROptimize/FifoFnRemoval.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IROptimize/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IROptimize/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IROptimize/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IROptimize/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/Source Files/IRLinker.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRSerialize/IRLinker.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/Source Files/IRParser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRSerialize/IRParser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/Source Files/IRWriter.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRSerialize/IRWriter.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/Source Files/IRUnwriter.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRSerialize/IRUnwriter.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/Header Files/IRConstant.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRSerialize/IRConstant.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRSerialize/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/Source Files/FunctionMng.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRUtil/FunctionMng.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/Source Files/PackageMng.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRUtil/PackageMng.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/Source Files/OptionMng.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRUtil/OptionMng.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/Source Files/CompressionMng.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRUtil/CompressionMng.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/Source Files/TraceMng.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/IRUtil/TraceMng.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] IRUtil/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Source Files/ActionSchedulerAdder.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/ActionSchedulerAdder.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Source Files/CSDFScheduler.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/CSDFScheduler.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Source Files/DPNScheduler.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/DPNScheduler.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Source Files/QSDFScheduler.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/QSDFScheduler.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Source Files/RoundRobinScheduler.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/RoundRobinScheduler.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Source Files/Fifo.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/Fifo.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Header Files/ActionSchedulerAdder.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/ActionSchedulerAdder.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Header Files/CSDFScheduler.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/CSDFScheduler.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Header Files/DPNScheduler.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/DPNScheduler.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Header Files/QSDFScheduler.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RoundRobinScheduler/QSDFScheduler.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RoundRobinScheduler/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/Source Files/Manager.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/Scenario/Manager.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/Source Files/Scenario.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/Scenario/Scenario.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/Source Files/ScenarioParser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/Scenario/ScenarioParser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/Header Files/Scenario.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/Scenario/Scenario.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/Header Files/ScenarioParser.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/Scenario/ScenarioParser.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] Scenario/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/Source Files/tinystr.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/TinyXml/tinystr.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/Source Files/tinyxml.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/TinyXml/tinyxml.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/Source Files/tinyxmlerror.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/TinyXml/tinyxmlerror.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/Source Files/tinyxmlparser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/TinyXml/tinyxmlparser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] TinyXml/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize/Source Files/XCFParser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XCFSerialize/XCFParser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize/Source Files/XCFConstant.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XCFSerialize/XCFConstant.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize/Header Files/XCFConstant.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XCFSerialize/XCFConstant.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XCFSerialize/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Source Files/BinOpSeqParser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/BinOpSeqParser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Source Files/ExprParser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/ExprParser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Source Files/NetworkParser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/NetworkParser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Source Files/TypeParser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/TypeParser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Source Files/XDFConstant.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/XDFConstant.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Source Files/XDFParser.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/XDFParser.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Source Files/XDFWriter.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/XDFWriter.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Header Files/BinOpSeqParser.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/BinOpSeqParser.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Header Files/ExprParser.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/ExprParser.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Header Files/NetworkParser.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/NetworkParser.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Header Files/ParseContinuation.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/ParseContinuation.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Header Files/TypeParser.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/TypeParser.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Header Files/XDFConstant.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/XDFSerialize/XDFConstant.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] XDFSerialize/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/gzread.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/gzread.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/gzwrite.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/gzwrite.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/gzclose.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/gzclose.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/gzlib.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/gzlib.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/deflate.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/deflate.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/inflate.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/inflate.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/adler32.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/adler32.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/crc32.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/crc32.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/infback.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/infback.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/inffast.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/inffast.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/inftrees.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/inftrees.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/trees.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/trees.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Source Files/zutil.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/ZLib/zutil.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] ZLib/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Source Files/RVCDecoder.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCDecoder/RVCDecoder.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Source Files/source.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCDecoder/source.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Source Files/display.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCDecoder/display.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Source Files/fpsPrint.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCDecoder/fpsPrint.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Source Files/compareyuv.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCDecoder/compareyuv.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Source Files/writer.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCDecoder/writer.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Source Files/orcc_util.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCDecoder/orcc_util.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Header Files/orcc_util.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCDecoder/orcc_util.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Header Files/orcc_types.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/lib/RVCDecoder/orcc_types.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] RVCDecoder/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/compare.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/compare.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/compareyuv.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/compareyuv.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/display.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/display.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/getopt.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/getopt.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/source.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/source.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/writer.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/writer.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/source_no_loop.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/source_no_loop.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/orcc_util.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/orcc_util.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/thread.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/thread.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/genetic.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/genetic.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/accessFile.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/accessFile.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Source Files/fpsPrint.c</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/orcc/orcc/src/fpsPrint.c</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[lib] orcc/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade/Source Files/Jade.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/tools/Jade/Jade.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade/Source Files/Console.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/tools/Jade/Console.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade/Header Files/Console.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/tools/Jade/Console.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] Jade/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/Source Files/Toolbox.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/tools/ToolBox/Toolbox.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/Source Files/ArMng.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/tools/ToolBox/ArMng.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/Source Files/FilesMng.cpp</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/tools/ToolBox/FilesMng.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/Header Files/ArMng.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/tools/ToolBox/ArMng.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/Header Files/FilesMng.h</name>
+			<type>1</type>
+			<location>/home/alorence/orcc_src/orcc/contrib/Jade/src/tools/ToolBox/FilesMng.h</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] JadeToolbox/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

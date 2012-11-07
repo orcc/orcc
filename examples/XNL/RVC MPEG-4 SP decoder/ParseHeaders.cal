@@ -1,0 +1,1285 @@
+// ParseHeaders.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+// Copyright (c) 2004-2006 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+
+import all caltrop.lib.BitOps;
+
+// BTYPE Output
+// A single stream of control tokens is sent on the BTYPE output to distribute
+// VOP and block type information. A minimum of 12 bits is required for this token,
+// which also sends the VOP width and height parameters. The relevant parameters are:
+
+//  MB_COORD_SZ   - size of any variable that contains a macroblock coordinate
+//  BTYPE_SZ   - size of the BTYPE output (min. 12)
+
+//  Bits to signal token type
+//  NEWVOP      2048
+//  INTRA       1024
+//  INTER        512
+
+//  If the NEWVOP bits is set, the following field can be masked off:
+//  QUANT_MASK     31
+//  ROUND_TYPE     32
+//  FCODE_MASK    448
+//  FCODE_SHIFT     6
+
+//  The next two tokens after NEWVOP are the width and height in macroblocks
+
+//  The INTER type also has
+//  ACPRED          1
+//  ACCODED         2
+//  FOURMV          4
+//  MOTION          8
+
+//  The INTRA type also has ACPRED
+
+actor ParseHeaders (
+    // Maximum image width (in units of macroblocks) that the decoder can handle.
+    // It is used to allocate line buffer space at compile time.
+    int MAXW_IN_MB,
+
+  int MB_COORD_SZ,
+  int BTYPE_SZ,
+  int MV_SZ,
+  int NEWVOP,
+  int INTRA,
+  int INTER,
+  int QUANT_MASK,
+  int ROUND_TYPE,
+  int FCODE_MASK,
+  int FCODE_SHIFT,
+  int ACPRED,
+  int ACCODED,
+  int FOURMV,
+  int MOTION,
+  int SAMPLE_COUNT_SZ,
+  int SAMPLE_SZ
+ ) bool bits ==> int(size=BTYPE_SZ) BTYPE, int(size=MV_SZ) MV, int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE, bool LAST :
+
+  // Constants for various field lengths (bits) and special values.
+
+  int VO_HEADER_LENGTH      = 27;
+  int VO_NO_SHORT_HEADER    = 8;
+  int VO_ID_LENGTH          = 5;
+
+  int VOL_START_CODE_LENGTH               = 28;
+  int VOL_START_CODE                      = 18;
+  int VOL_ID_LENGTH                       = 5;
+  int VIDEO_OBJECT_TYPE_INDICATION_LENGTH = 8;
+  int VISUAL_OBJECT_LAYER_VERID_LENGTH    = 4;
+  int VISUAL_OBJECT_LAYER_PRIORITY_LENGTH = 3;
+  int ASPECT_RATIO_INFO_LENGTH            = 4;
+  int ASPECT_RATIO_INFO_IS_DETAILED       = 15;
+  int PAR_WIDTH_LENGTH                    = 8;
+  int PAR_HEIGHT_LENGTH                   = 8;
+  int CHROMA_FORMAT_LENGTH                = 2;
+  int LOW_DELAY_LENGTH                    = 1;
+  int FIRST_HALF_BIT_RATE_LENGTH          = 15;
+  int LAST_HALF_BIT_RATE_LENGTH           = 15;
+  int FIRST_HALF_VBV_BUF_SZ_LENGTH        = 15;
+  int LAST_HALF_VBV_BUF_SZ_LENGTH         = 3;
+  int FIRST_HALF_VBV_OCC_LENGTH           = 11;
+  int LAST_HALF_VBV_OCC_LENGTH            = 15;
+  int VOL_SHAPE_LENGTH                    = 2;
+  int MARKER_LENGTH                       = 1;
+  int TIME_INC_RES_LENGTH                 = 16;
+  int VOL_WIDTH_LENGTH                    = 13;
+  int VOL_HEIGHT_LENGTH                   = 13;
+
+  //int TIME_INC_RES_MASK                   = lshift( 1, TIME_INC_RES_LENGTH      ) - 1;
+  // Note: mask off width, height in units of MBs, not pixels
+  //int VOL_WIDTH_MASK                      = lshift( 1, VOL_WIDTH_LENGTH - 4     ) - 1;
+  //int VOL_HEIGHT_MASK                     = lshift( 1, VOL_HEIGHT_LENGTH - 4    ) - 1;
+  //int ASPECT_RATIO_INFO_MASK              = lshift( 1, ASPECT_RATIO_INFO_LENGTH ) - 1;
+
+  int RUN_LENGTH                          = 6;
+  int RUN_MASK                            = lshift( 1, RUN_LENGTH   ) - 1;
+  int LEVEL_LENGTH                        = 12;
+  int LEVEL_MASK                          = lshift( 1, LEVEL_LENGTH ) - 1;
+
+  // count of misc VOL bits:
+  //    interlaced            OBMC_disabled            vol_sprite_usage        not_8_bit
+  //    vol_quant_type        complexity_est_disable   resync_marker_disable   data_partitioning_enable
+  //    scalability
+  // Note: We assume data_partitioning_enable is always false, so the model
+  //       does not do a conditional read of reversible_vlc_enable
+  int MISC_BIT_LENGTH = 9;
+
+  int VOP_START_CODE_LENGTH           = 32;
+  int VOP_START_CODE                  = 438;
+  int VOP_PREDICTION_LENGTH           = 2;
+  int B_VOP                           = 2;
+  int P_VOP                           = 1;
+  int I_VOP                           = 0;
+  int INTRA_DC_VLC_THR_LENGTH         = 3;
+  int VOP_FCODE_FOR_LENGTH            = 3;
+  int VOP_FCODE_FOR_MASK              = lshift( 1, VOP_FCODE_FOR_LENGTH ) - 1;
+  int BITS_QUANT                      = 5;
+  int BITS_QUANT_MASK                 = lshift( 1, BITS_QUANT           ) - 1;
+  int MCBPC_LENGTH                    = 9;
+  int ESCAPE_CODE                     = 7167;
+
+  function mask_bits( v, n ) --> int :
+    bitand( v, lshift(1,n)-1 )
+  end
+  
+  // Utility action to read a specified number of bits.
+  // This is an unnamed action, ie it is always enabled and has highest priority.
+  // Use the procedures set_bits_to_read() to start reading, test for
+  // completion with the boolean done_reading_bits() and get the value
+  // with read_result(). Use the done function in a guard to wait for the
+  // reading to be complete.
+  int(size=7) bits_to_read_count := -1;
+  int(size=33) read_result_in_progress;
+  procedure set_bits_to_read( int count )
+  begin
+    bits_to_read_count := count - 1;
+    read_result_in_progress := 0;
+  end
+  function done_reading_bits() --> bool : bits_to_read_count < 0 end
+  function read_result() --> int : read_result_in_progress end
+  action bits:[ b ] ==>
+  guard 
+    not done_reading_bits()
+  do
+    read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if b then 1 else 0 end );
+    bits_to_read_count := bits_to_read_count - 1;
+    bit_count := bit_count + 1;
+  end
+
+  int(size=4) bit_count := 0;
+
+/*************************************************************
+ *************************************************************
+ ********                  start VOL                  ********
+ *************************************************************
+ *************************************************************/
+
+  look_for_vo: action ==>
+  do
+    set_bits_to_read( VO_HEADER_LENGTH );
+  end
+
+  // We can only handle VOL without short header
+  vo_header.good: action ==>
+  guard
+    done_reading_bits(),
+    mask_bits( read_result(), VO_HEADER_LENGTH ) = VO_NO_SHORT_HEADER
+  do
+    set_bits_to_read( VO_ID_LENGTH );
+  end
+
+  vo_skip_id_field: action ==>
+  guard
+    done_reading_bits()
+  do
+    set_bits_to_read( VOL_START_CODE_LENGTH );
+  end
+
+  vol_startcode.good: action ==>
+  guard
+    done_reading_bits(),
+    mask_bits( read_result(), VOL_START_CODE_LENGTH ) = VOL_START_CODE
+  do
+    // Ignore the next two fields
+    set_bits_to_read( VOL_ID_LENGTH + VIDEO_OBJECT_TYPE_INDICATION_LENGTH );
+  end
+
+  vol_object_layer_identification: action bits:[b] ==>
+  guard
+    done_reading_bits()
+  do
+    set_bits_to_read(
+       if b then
+         // is_object_layer_identifier asserted
+         VISUAL_OBJECT_LAYER_VERID_LENGTH + VISUAL_OBJECT_LAYER_PRIORITY_LENGTH + ASPECT_RATIO_INFO_LENGTH
+       else
+         ASPECT_RATIO_INFO_LENGTH
+       end );
+    bit_count := bit_count + 1;
+  end
+
+  vol_aspect.detailed: action  ==>
+  guard
+    done_reading_bits(),
+    mask_bits( read_result(), ASPECT_RATIO_INFO_LENGTH ) = ASPECT_RATIO_INFO_IS_DETAILED
+  do
+    // Skip over aspect ratio details
+    set_bits_to_read( PAR_WIDTH_LENGTH + PAR_HEIGHT_LENGTH );
+  end
+
+  vol_control.detailed: action bits:[b] ==>
+  guard
+    done_reading_bits(),
+    b
+  do
+    set_bits_to_read( CHROMA_FORMAT_LENGTH + LOW_DELAY_LENGTH );
+    bit_count := bit_count + 1;
+  end
+
+  vol_vbv.detailed: action bits:[b] ==>
+  guard
+    done_reading_bits(),
+    b
+  do
+    set_bits_to_read(   FIRST_HALF_BIT_RATE_LENGTH    + MARKER_LENGTH +
+                        LAST_HALF_BIT_RATE_LENGTH     + MARKER_LENGTH +
+                        FIRST_HALF_VBV_BUF_SZ_LENGTH  + MARKER_LENGTH +
+                        LAST_HALF_VBV_BUF_SZ_LENGTH   +
+                        FIRST_HALF_VBV_OCC_LENGTH     + MARKER_LENGTH +
+                        LAST_HALF_VBV_OCC_LENGTH      + MARKER_LENGTH );
+    bit_count := bit_count + 1;
+  end
+
+  vol_shape: action ==>
+  guard
+    done_reading_bits()
+  do
+    set_bits_to_read( VOL_SHAPE_LENGTH + MARKER_LENGTH + TIME_INC_RES_LENGTH + MARKER_LENGTH + 1 );
+  end
+
+  int(size=7) mylog;
+
+  vol_time_inc_res: action ==>
+  guard
+    done_reading_bits()
+  var
+    int(size=TIME_INC_RES_LENGTH+1) time_inc_res := mask_bits( rshift( read_result(), 2 ), TIME_INC_RES_LENGTH ),  // pick out the time_inc_res field
+    int(size=7) count := 0,
+    int(size=7) ones  := 0
+  do
+    while ( count = 0 or time_inc_res != 0 ) do
+      if bitand( time_inc_res, 1 ) = 1 then
+        ones := ones + 1;
+      end
+      count := count + 1;
+      time_inc_res := rshift( time_inc_res, 1 );
+    end
+    mylog := if ones > 1 then count else count - 1 end;
+    mylog := if mylog < 1 then 1 else mylog end;
+    set_bits_to_read(if bitand( read_result(), 1 ) = 1 then
+      // fixed vop rate
+      //mylog + MARKER_LENGTH 
+      mylog
+    else
+      // variable vop rate
+      //MARKER_LENGTH
+      0
+    end + MARKER_LENGTH + VOL_WIDTH_LENGTH + MARKER_LENGTH );
+  end
+
+  // The vol width and height in units of macroblocks, ie. the pixel w/h divided by 16.
+  // Note: there is no provision in the model for pixel sizes that are no multiples of 16.
+  int(size=MB_COORD_SZ) vol_width;
+  int(size=MB_COORD_SZ) vol_height;
+
+  vol_width: action ==>
+  guard
+    done_reading_bits()
+  do
+    vol_width  := mask_bits( rshift( read_result(), MARKER_LENGTH + 4 ), VOL_WIDTH_LENGTH-4 ); // strip marker and divide by 16
+    set_bits_to_read( VOL_HEIGHT_LENGTH + MARKER_LENGTH );
+  end
+
+  vol_height: action ==>
+  guard
+    done_reading_bits()
+  do
+    vol_height  := mask_bits( rshift( read_result(), MARKER_LENGTH + 4  ), VOL_HEIGHT_LENGTH ); // strip marker and divide by 16
+    set_bits_to_read( MISC_BIT_LENGTH );
+  end
+
+  // Detect unsupported features:
+  // interlaced, sprites, not 8-bit pixels, not using method 2 quantization, data partitioning, scalability
+  // vol_misc.unsupported: action  ==>
+  // guard
+  //   done_reading_bits(),
+    // test mask is 9-bit binary 101110011
+  //   bitand( read_result(), 371 ) != 0 
+  // end
+
+/*************************************************************
+ *************************************************************
+ ********                  start VOP                  ********
+ *************************************************************
+ *************************************************************/
+
+  byte_align: action ==>
+  do
+    set_bits_to_read( 8 - bitand( bit_count, 7 ) );
+  end
+
+  // Note: no check for correct bit stuffing
+
+  get_vop_code: action ==>
+  guard
+    done_reading_bits()
+  do
+    set_bits_to_read( VOP_START_CODE_LENGTH );
+  end
+
+  // Note: the model does not support user data here
+  vop_code.done: action ==>
+  guard
+    done_reading_bits(),
+    read_result() = 1
+  do
+    bit_count := 0;
+  end
+
+  int(size=MB_COORD_SZ) mbx;
+  int(size=MB_COORD_SZ) mby;
+
+  vop_code.start: action ==>
+  guard
+    done_reading_bits(),
+    read_result() = VOP_START_CODE
+  do
+    mbx     := 0;
+    mby     := 0;
+    set_bits_to_read( VOP_PREDICTION_LENGTH );
+  end
+
+  // int(size=2) prediction_type;
+
+  // vop_predict.supported: action ==>
+  // guard
+  //   done_reading_bits(),
+  //   mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = I_VOP or
+  //   mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = P_VOP
+  // do
+  //   prediction_type := read_result();
+  // end
+
+  bool prediction_is_IVOP;
+
+  vop_predict: action ==>
+  guard
+    done_reading_bits()
+  do
+    prediction_is_IVOP := mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = I_VOP;
+  end
+ 
+  // Note: the model does not support time_base. It just skips over the right number of bits.
+  vop_timebase.one: action bits:[b] ==>
+  guard
+    b
+  do
+    // Skip over module-time_base
+    bit_count := bit_count + 1;
+  end
+
+  vop_timebase.zero:action bits:[b] ==>
+  do
+    bit_count := bit_count + 1;
+    set_bits_to_read( MARKER_LENGTH + mylog + MARKER_LENGTH );
+  end
+
+  int(size=4) comp;
+
+  // TODO: the model does not communicate to the display driver
+  // to re-use the current VOP in place of the uncoded one.
+  vop_coding.uncoded: action bits:[b] ==>
+  guard
+    done_reading_bits(),
+    not b
+  do
+    comp := 0;
+    bit_count := bit_count + 1;
+  end
+
+  vop_coding.coded: action bits:[b] ==>
+  guard
+    done_reading_bits()
+  do
+    set_bits_to_read(
+       if not prediction_is_IVOP then
+         // round_type, intra_dc_vlc_thr[3], vop_quant[5], vop_fcode_for[3]
+         1 + INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH
+       else
+         // intra_dc_vlc_thr[3], vop_quant[5]
+         INTRA_DC_VLC_THR_LENGTH + BITS_QUANT
+       end );
+    bit_count := bit_count + 1;
+  end
+
+  // int(size=10) resync_marker_length;
+  int(size=VOP_FCODE_FOR_LENGTH+1) fcode;
+
+  send_new_vop_cmd: action ==> BTYPE:[ cmd ]
+  guard
+    done_reading_bits()
+  var
+    bool round := false,
+    int(size=BTYPE_SZ) cmd := bitor( NEWVOP, if prediction_is_IVOP then INTRA else INTER end ),
+    int(size=BITS_QUANT+1) vop_quant
+  do
+    if not prediction_is_IVOP then
+      round := bitand( rshift( read_result(), INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 1 ) = 1;
+      vop_quant := bitand( rshift( read_result(), VOP_FCODE_FOR_LENGTH ), BITS_QUANT_MASK );
+      fcode := bitand( read_result(), VOP_FCODE_FOR_MASK );
+      // resync_marker_length := 16 + fcode;
+    else
+      vop_quant := bitand( read_result(), BITS_QUANT_MASK );
+      fcode := 0;
+      // resync_marker_length := 17;
+    end
+    cmd := bitor( cmd, bitand(vop_quant,QUANT_MASK) );
+    cmd := bitor( cmd, if round then ROUND_TYPE else 0 end );
+    cmd := bitor( cmd, bitand( lshift( fcode, FCODE_SHIFT), FCODE_MASK) );
+end
+
+send_new_vop_width: action ==> BTYPE: [ vol_width ] end
+
+send_new_vop_height: action ==> BTYPE: [ vol_height ] end
+
+/*************************************************************
+ *************************************************************
+ ********                  start MB                   ********
+ *************************************************************
+ *************************************************************/
+
+  int CBP_SZ = 7;
+  
+  int(size=CBP_SZ) cbp;
+
+  // Advance the mb coordinates with wrap
+  procedure next_mbxy()
+  begin
+    mbx := mbx + 1;
+    if mbx = vol_width then
+      mbx := 0;
+      mby := mby + 1;
+    end
+  end
+
+  // Go look for next VOP
+  mb_done: action ==>
+  guard
+    mby = vol_height
+  end
+
+  get_mcbpc.ivop: action ==>
+  guard
+    prediction_is_IVOP
+  do
+    start_vld_engine( MCBPC_IVOP_START_INDEX );
+  end
+
+  get_mcbpc.pvop: action bits:[b] ==>
+  guard
+    not prediction_is_IVOP,
+    not b
+  do
+    start_vld_engine( MCBPC_PVOP_START_INDEX  );
+    bit_count := bit_count + 1;
+  end
+
+  // Nothing to do - uncoded
+  mcbpc_pvop_uncoded: action bits:[b] ==>
+      BTYPE:[ INTER ]
+  guard
+    not prediction_is_IVOP
+  do
+    next_mbxy();
+    bit_count := bit_count + 1;
+  end
+
+  mcbpc_pvop_uncoded1: action ==>
+      BTYPE:[ INTER ]
+  end
+
+  bool acpredflag;
+  bool btype_is_INTRA;
+  int(size=CBP_SZ) cbpc;
+  bool fourmvflag;
+
+  get_mbtype.noac: action ==>
+  guard
+    vld_success(),
+    bitand( vld_result(), 7 ) != 3,
+    bitand( vld_result(), 7 ) != 4
+  var
+    int mcbpc = vld_result(),
+    int type = bitand( mcbpc, 7 )
+  do
+    btype_is_INTRA := type >= 3;
+    fourmvflag := (type = 2);
+    cbpc := bitand( rshift( mcbpc, 4 ), 3 );
+    acpredflag := false;
+    start_vld_engine( CBPY_START_INDEX );
+  end
+
+  get_mbtype.ac: action bits:[b] ==> 
+  guard
+    vld_success()
+  var
+    int mcbpc = vld_result(),
+    int type = bitand( mcbpc, 7 )
+  do
+    btype_is_INTRA := true;
+    cbpc := bitand( rshift( mcbpc, 4 ), 3 );
+    acpredflag := b;
+    bit_count := bit_count + 1;
+    start_vld_engine( CBPY_START_INDEX );
+  end
+
+  bool ac_coded;
+
+  int(size=4) mvcomp;
+
+  final_cbpy_inter: action ==>
+  guard
+    vld_success(),
+    not btype_is_INTRA
+  var
+    int cbpy = 15 - vld_result()
+  do
+    comp := 0;
+    mvcomp := 0;
+    cbp := bitor( lshift( cbpy, 2), cbpc );
+  end
+
+  final_cbpy_intra: action ==>
+  guard
+    vld_success()
+  var
+    int cbpy = vld_result()
+  do
+    comp := 0;
+    cbp := bitor( lshift(cbpy, 2), cbpc );
+  end
+
+  mb_dispatch_done: action ==>
+  guard
+    comp = 6
+  do
+    next_mbxy();
+  end
+
+  mb_dispatch_intra: action ==> BTYPE:[ cmd ]
+  guard
+    btype_is_INTRA
+  var
+    int(size=BTYPE_SZ) cmd := INTRA
+  do
+    ac_coded := bitand( cbp, lshift( 1,  5 - comp)) != 0;
+    cmd := bitor( cmd, if ac_coded then ACCODED else 0 end );
+    cmd := bitor( cmd, if acpredflag then ACPRED else 0 end );
+  end
+
+  mb_dispatch_inter_no_ac: action ==> BTYPE:[ bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ]
+  guard
+    bitand( cbp, lshift( 1,  5 - comp)) = 0
+  do
+    ac_coded := false;
+    comp := comp + 1;
+  end
+
+  mb_dispatch_inter_ac_coded: action ==> BTYPE:[ bitor(bitor( INTER, ACCODED ), bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ]
+  do
+    ac_coded := true;
+  end
+
+
+  vld_start_intra: action ==>
+  guard
+    btype_is_INTRA
+  do
+    start_vld_engine( if comp < 4 then DCBITS_Y_START_INDEX else DCBITS_UV_START_INDEX end );
+    b_last := false;
+  end
+
+  // There are AC coefficients
+  vld_start_inter.ac_coded: action ==>
+  guard
+    ac_coded
+  do 
+    b_last := false;
+  end
+
+  // No AC coefficients
+  vld_start_inter.not_ac_coded: action ==> RUN:[0], VALUE:[0], LAST:[true]
+  do
+    b_last := true;
+  end
+
+  // The Y DC value is at most 12 bits, UV at most 13 bits
+  int(size=5) dc_bits;
+
+  get_dc_bits.none: action ==> RUN:[0], VALUE:[0], LAST:[ not ac_coded ]
+  guard
+    vld_success(),
+    vld_result() = 0
+  do
+    b_last := not ac_coded;
+  end
+
+  get_dc_bits.some: action ==>
+  guard
+    vld_success()
+  do
+    dc_bits := vld_result();
+    set_bits_to_read( dc_bits );
+  end
+
+  int(size=14) msb_result;
+ 
+  dc_bits_shift: action ==>
+  var
+    int(size=5) count = dc_bits,
+    int(size=14) shift = 1
+  do
+    while count > 1 do
+      shift := lshift( shift, 1 );
+      count := count - 1;
+    end
+    msb_result := shift;
+  end
+
+  get_dc: action ==>  RUN:[0], VALUE:[v], LAST:[ not ac_coded ]
+  guard
+    done_reading_bits()
+  var
+    int(size=14) v = read_result()
+  do
+    if bitand( v, msb_result ) = 0 then
+      v := v + 1 - lshift( msb_result, 1 );
+    end   
+    set_bits_to_read( if dc_bits > 8 then MARKER_LENGTH else 0 end );
+    b_last := not ac_coded;
+  end
+
+  bool b_last;
+
+  block_done: action ==>
+  guard
+    done_reading_bits(),
+    b_last
+  do
+    comp := comp + 1;
+  end
+
+  dct_coeff: action ==>
+  guard
+    done_reading_bits()
+  do
+    start_vld_engine( if btype_is_INTRA then COEFF_INTRA_START_INDEX else COEFF_INTER_START_INDEX end );
+  end
+
+  vld_code: action bits:[sign] ==> VALUE:[if sign then -level else level end], RUN:[run], LAST:[ last ]
+  guard
+    vld_success(),
+    vld_result() != ESCAPE_CODE
+  var
+    int(size=VLD_TABLE_DATA_BITS) val = vld_result(),
+    int(size=SAMPLE_COUNT_SZ) run,
+    int(size=SAMPLE_SZ) level,
+    bool last
+  do
+    run   := if btype_is_INTRA then bitand( rshift( val, 8), 255)
+                               else bitand( rshift( val, 4), 255) end;
+    last  := if btype_is_INTRA then bitand( rshift( val, 16), 1) != 0
+                               else bitand( rshift( val, 12), 1) != 0 end;
+    level := if btype_is_INTRA then bitand( val, 255)
+                               else bitand( val, 15) end;
+    b_last := last;
+    bit_count := bit_count + 1;
+  end
+
+  vld_level: action bits:[level_offset] ==>
+  guard
+    vld_success(),
+    not level_offset
+  do
+    bit_count := bit_count + 1;
+    start_vld_engine( if btype_is_INTRA then COEFF_INTRA_START_INDEX else COEFF_INTER_START_INDEX end );
+  end
+
+  vld_run_or_direct: action bits:[level_offset] ==>
+  guard
+    vld_success()
+  do
+    bit_count := bit_count + 1;
+  end
+
+  vld_run: action bits:[run_offset] ==>
+  guard
+    not run_offset
+  do
+    bit_count := bit_count + 1;
+    start_vld_engine( if btype_is_INTRA then COEFF_INTRA_START_INDEX else COEFF_INTER_START_INDEX end );
+  end
+
+  vld_direct_read: action bits:[run_offset] ==>
+  do
+    bit_count := bit_count + 1;
+    set_bits_to_read( 1 + RUN_LENGTH + MARKER_LENGTH + LEVEL_LENGTH + MARKER_LENGTH );
+  end
+
+  vld_direct: action  ==>  VALUE:[if sign then -level else level end], RUN:[run], LAST:[ last ]
+  guard
+    done_reading_bits()
+  var
+    int(size=SAMPLE_COUNT_SZ) run,
+    int(size=SAMPLE_SZ) level,
+    bool sign,
+    bool last
+  do
+    last  := bitand( rshift( read_result(), RUN_LENGTH + MARKER_LENGTH + LEVEL_LENGTH + MARKER_LENGTH ), 1          ) != 0;
+    run   := bitand( rshift( read_result(),              MARKER_LENGTH + LEVEL_LENGTH + MARKER_LENGTH ), RUN_MASK   );
+    level := bitand( rshift( read_result(),                                             MARKER_LENGTH ), LEVEL_MASK );
+    if level >= 2048 then
+      sign  := true;
+      level := 4096 - level;
+    else
+      sign := false;
+    end
+    b_last := last;
+  end
+
+  function intra_max_level( bool last, int run) :
+    if not last then
+      if run = 0 then 27 else
+        if run = 1 then 10 else
+          if run = 2 then 5 else
+            if run = 3 then 4 else
+              if run < 8 then 3 else
+                if run < 10 then 2 else
+                  if run < 15 then 1 else 0 end
+                end
+              end
+            end
+          end
+        end
+      end
+    else
+      if run = 0 then 8 else
+        if run = 1 then 3 else
+          if run < 7 then 2 else
+            if run < 21 then 1 else 0 end
+          end
+        end
+      end
+    end
+  end
+
+  function inter_max_level( bool last, int run) :
+    if not last then
+      if run = 0 then 12 else
+        if run = 1 then 6 else
+          if run = 2 then 4 else
+            if run < 7 then 3 else
+              if run < 11 then 2 else
+                if run < 27 then 1 else 0 end
+              end
+            end
+          end
+        end
+      end
+    else
+      if run = 0 then 3 else
+        if run = 1 then 2 else
+          if run < 41 then 1 else 0 end
+        end
+      end
+    end
+  end
+  
+  int(size=SAMPLE_SZ) level_lookup_inter;
+  int(size=SAMPLE_SZ) level_lookup_intra;
+  
+  do_level_lookup: action ==>
+   guard
+    vld_success()
+  var
+    int(size=VLD_TABLE_DATA_BITS-2) val = vld_result()
+  do
+    level_lookup_inter := inter_max_level( bitand( rshift( val, 12), 1) != 0, bitand( rshift( val, 4), 255));
+    level_lookup_intra := intra_max_level( bitand( rshift( val, 16), 1) != 0, bitand( rshift( val, 8), 255));
+  end
+  
+  vld_level_lookup: action bits:[sign] ==> VALUE:[if sign then -level else level end], RUN:[run], LAST:[ last ]
+  var
+    int(size=VLD_TABLE_DATA_BITS-2) val = vld_result(),
+    int(size=SAMPLE_COUNT_SZ) run,
+    int(size=SAMPLE_SZ) level,
+    bool last
+  do
+    run   := if btype_is_INTRA then bitand( rshift( val, 8), 255)
+                               else bitand( rshift( val, 4), 255) end;
+    last  := if btype_is_INTRA then bitand( rshift( val, 16), 1) != 0
+                               else bitand( rshift( val, 12), 1) != 0 end;
+    level := if btype_is_INTRA then bitand( val, 255) + level_lookup_intra
+                               else bitand( val, 15) + level_lookup_inter end;
+    b_last := last;
+    bit_count := bit_count + 1;
+  end
+
+  function intra_max_run( bool last, int level) :
+    if not last then
+      if level = 1 then 14 else
+        if level = 2 then 9 else
+          if level = 3 then 7 else
+            if level = 4 then 3 else
+              if level = 5 then 2 else
+                if level < 11 then 1 else 0 end
+              end
+            end
+          end
+        end
+      end
+    else
+     if level = 1 then 20 else
+        if level = 2 then 6 else
+          if level = 3 then 1 else 0 end
+        end
+      end
+    end
+  end
+
+  function inter_max_run( bool last, int level) :
+    if not last then
+      if level = 1 then 26 else
+        if level = 2 then 10 else
+          if level = 3 then 6 else
+            if level = 4 then 2 else
+              if level = 5 or level = 6 then 1 else 0 end
+            end
+          end
+        end
+      end
+    else
+      if level = 1 then 40 else
+        if level = 2 then 1 else 0 end
+      end
+    end
+  end
+
+  int(size=SAMPLE_SZ) run_lookup_inter;
+  int(size=SAMPLE_SZ) run_lookup_intra;
+
+  // Do lookup both ways  
+  do_run_lookup: action ==>
+  guard
+    vld_success()
+  var
+    int(size=VLD_TABLE_DATA_BITS-2) val = vld_result()
+  do
+    run_lookup_inter := inter_max_run( bitand( rshift( val, 12), 1) != 0,
+                                   bitand( val, 15) );
+    run_lookup_intra := intra_max_run( bitand( rshift( val, 16), 1) != 0, 
+                                   bitand( val, 255) );
+  end
+  
+  vld_run_lookup: action bits:[sign] ==> VALUE:[if sign then -level else level end], RUN:[run], LAST:[ last ]
+  var
+    int(size=VLD_TABLE_DATA_BITS-2) val = vld_result(),
+    int(size=SAMPLE_COUNT_SZ) run,
+    int(size=SAMPLE_SZ) level,
+    bool last
+  do
+    last  := if btype_is_INTRA then bitand( rshift( val, 16), 1) != 0
+                               else bitand( rshift( val, 12), 1) != 0 end;                                  
+    level := if btype_is_INTRA then bitand( val, 255)
+                               else bitand( val, 15) end;                                  
+    run   := if btype_is_INTRA then bitand( rshift( val, 8), 255) + run_lookup_intra
+                               else bitand( rshift( val, 4), 255) + run_lookup_inter end + 1;                                  
+    b_last := last;
+    bit_count := bit_count + 1;
+  end
+
+/*************************************************************
+ *************************************************************
+ ********               Motion Decode                 ********
+ *************************************************************
+ *************************************************************/
+
+  mvcode_done: action ==>
+  guard
+    mvcomp = 4 or (mvcomp = 1 and not fourmvflag )
+  end
+
+  mvcode: action ==>
+  do
+    start_vld_engine( MV_START_INDEX );
+  end
+
+  mag_x: action ==> MV:[ mvval ]
+  guard
+    vld_success()
+  var
+    int (size=VLD_TABLE_DATA_BITS) mvval = vld_result()
+  do
+    set_bits_to_read( if fcode <= 1 or mvval = 0 then 0 else fcode end );
+  end
+
+  get_residual_x: action ==> MV:[ read_result() ]
+  guard
+    done_reading_bits()
+  end
+
+  mag_y: action ==> MV:[ mvval ]
+  guard
+    vld_success()
+  var
+    int (size=VLD_TABLE_DATA_BITS) mvval = vld_result()
+  do
+    set_bits_to_read( if fcode <= 1 or mvval = 0 then 0 else fcode-1 end );
+  end
+
+  get_residual_y: action ==> MV:[ read_result() ]
+  guard
+    done_reading_bits()
+  do
+    mvcomp := mvcomp + 1;
+  end
+
+  int VLD_TABLE_ADDR_BITS       = 12;
+  int VLD_TABLE_DATA_BITS       = 20;
+
+  list( type:int( size=VLD_TABLE_DATA_BITS ), size=760 ) vld_table = [
+
+// Automatically-generated tables for bitwise MPEG-4 VLD
+//
+// Decoding proceeds as follows:
+// 1. Set index to a starting value for the desired code (see embedded comments).
+// 2. Read the next bit in the incoming stream.
+// 3. Fetch the value at table[ index + bit ]
+// 4. Take the following action based on table value:
+//     4.1. If lsb = 1, terminate decoding with illegal codeword error.
+//     4.2. If 2nd lsb = 1, the codeword is not complete,
+//          so set index to value >> 2, go to step 2.
+//     4.3. For all other values stop decoding and return value >> 2
+
+// start index for MCBPC_IVOP is 0
+// (cumulative table size is 16 words x 20 bits)
+
+ 10, 12, 18, 58, 26, 76, 34, 16,
+ 42, 50, 1, 80, 144, 208, 140, 204,
+
+// start index for MCBPC_PVOP is 16
+// (cumulative table size is 58 words x 20 bits)
+
+ 74, 0, 82, 226, 90, 218, 98, 202,
+ 106, 178, 114, 162, 122, 146, 130, 138,
+ 1, 1, 208, 144, 154, 140, 80, 196,
+ 170, 204, 76, 200, 186, 194, 136, 72,
+ 132, 68, 210, 12, 16, 192, 128, 64,
+ 8, 4,
+
+// start index for CBPY is 58
+// (cumulative table size is 92 words x 20 bits)
+
+ 242, 338, 250, 314, 258, 298, 266, 290,
+ 274, 282, 1, 1, 24, 36, 32, 16,
+ 306, 0, 8, 4, 322, 330, 48, 40,
+ 56, 20, 346, 60, 354, 362, 52, 12,
+ 44, 28,
+
+// start index for DCBITS_Y is 92
+// (cumulative table size is 118 words x 20 bits)
+
+ 378, 466, 386, 458, 394, 16, 402, 20,
+ 410, 24, 418, 28, 426, 32, 434, 36,
+ 442, 40, 450, 44, 1, 48, 12, 0,
+ 8, 4,
+
+// start index for DCBITS_UV is 118
+// (cumulative table size is 144 words x 20 bits)
+
+ 482, 570, 490, 8, 498, 12, 506, 16,
+ 514, 20, 522, 24, 530, 28, 538, 32,
+ 546, 36, 554, 40, 562, 44, 1, 48,
+ 4, 0,
+
+// start index for COEFF_INTER is 144
+// (cumulative table size is 380 words x 20 bits)
+
+ 586, 1498, 594, 1426, 602, 1338, 610, 1194,
+ 618, 1066, 626, 874, 634, 818, 642, 794,
+ 650, 770, 658, 714, 666, 690, 674, 682,
+ 1, 1, 1, 1, 698, 706, 1, 1,
+ 1, 1, 722, 746, 730, 738, 1, 1,
+ 1, 1, 754, 762, 1, 1, 1, 1,
+ 778, 786, 16456, 16396, 44, 40, 802, 810,
+ 18180, 18116, 18052, 17988, 826, 850, 834, 842,
+ 584, 520, 456, 392, 858, 866, 328, 204,
+ 140, 80, 882, 28668, 890, 946, 898, 922,
+ 906, 914, 48, 84, 1476, 1540, 930, 938,
+ 18244, 18308, 18372, 18436, 954, 1010, 962, 986,
+ 970, 978, 88, 144, 268, 332, 994, 1002,
+ 396, 648, 1604, 1668, 1018, 1042, 1026, 1034,
+ 18500, 18564, 18628, 18692, 1050, 1058, 18756, 18820,
+ 18884, 18948, 1074, 1138, 1082, 1114, 1090, 1106,
+ 1098, 17924, 36, 32, 17860, 17796, 1122, 1130,
+ 17732, 17668, 17604, 17540, 1146, 1170, 1154, 1162,
+ 17476, 16392, 1412, 1348, 1178, 1186, 1284, 1220,
+ 1156, 1092, 1202, 1282, 1210, 1258, 1218, 1242,
+ 1226, 1234, 1028, 964, 264, 200, 1250, 17412,
+ 28, 24, 1266, 1274, 17348, 17284, 17220, 17156,
+ 1290, 1314, 1298, 1306, 17092, 17028, 16964, 900,
+ 1322, 1330, 836, 136, 76, 20, 1346, 1402,
+ 1354, 1378, 1362, 1370, 16900, 16836, 16772, 16708,
+ 1386, 1394, 772, 708, 644, 16, 1410, 1418,
+ 16644, 16580, 16516, 16452, 1434, 1482, 1442, 1466,
+ 1450, 1458, 580, 516, 452, 388, 1474, 324,
+ 72, 12, 1490, 16388, 260, 196, 4, 1506,
+ 68, 1514, 132, 8,
+
+// start index for COEFF_INTRA is 380
+// (cumulative table size is 616 words x 20 bits)
+
+ 1530, 2442, 1538, 2370, 1546, 2282, 1554, 2138,
+ 1562, 2010, 1570, 1818, 1578, 1762, 1586, 1738,
+ 1594, 1714, 1602, 1658, 1610, 1634, 1618, 1626,
+ 1, 1, 1, 1, 1642, 1650, 1, 1,
+ 1, 1, 1666, 1690, 1674, 1682, 1, 1,
+ 1, 1, 1698, 1706, 1, 1, 1, 1,
+ 1722, 1730, 262172, 262168, 88, 84, 1746, 1754,
+ 264200, 263180, 262164, 13316, 1770, 1794, 1778, 1786,
+ 5132, 8200, 4108, 3088, 1802, 1810, 2064, 1052,
+ 80, 76, 1826, 28668, 1834, 1890, 1842, 1866,
+ 1850, 1858, 92, 96, 1056, 9224, 1874, 1882,
+ 265224, 266248, 277508, 278532, 1898, 1954, 1906, 1930,
+ 1914, 1922, 100, 104, 108, 1060, 1938, 1946,
+ 6156, 1064, 2068, 7180, 1962, 1986, 1970, 1978,
+ 14340, 262176, 267272, 268296, 1994, 2002, 279556, 280580,
+ 281604, 282628, 2018, 2082, 2026, 2058, 2034, 2050,
+ 2042, 276484, 72, 68, 275460, 274436, 2066, 2074,
+ 273412, 272388, 263176, 262160, 2090, 2114, 2098, 2106,
+ 12292, 11268, 7176, 6152, 2122, 2130, 5128, 3084,
+ 2060, 1048, 2146, 2226, 2154, 2202, 2162, 2186,
+ 2170, 2178, 1044, 64, 4104, 60, 2194, 270340,
+ 56, 52, 2210, 2218, 269316, 268292, 262156, 10244,
+ 2234, 2258, 2242, 2250, 9220, 8196, 271364, 3080,
+ 2266, 2274, 1040, 48, 44, 40, 2290, 2346,
+ 2298, 2322, 2306, 2314, 266244, 265220, 6148, 267268,
+ 2330, 2338, 7172, 2056, 1036, 36, 2354, 2362,
+ 262152, 5124, 264196, 263172, 2378, 2426, 2386, 2410,
+ 2394, 2402, 4100, 3076, 32, 28, 2418, 2052,
+ 1032, 24, 2434, 262148, 20, 16, 4, 2450,
+ 8, 2458, 1028, 12,
+
+// start index for MV is 616
+// (cumulative table size is 760 words x 20 bits)
+
+ 2474, 0, 2482, 3034, 2490, 3026, 2498, 3018,
+ 2506, 2978, 2514, 2890, 2522, 2770, 2530, 2714,
+ 2538, 2658, 2546, 2634, 2554, 2610, 2562, 2586,
+ 2570, 2578, 1, 1, 1, 1, 2594, 2602,
+ 1, 1, 1, 1, 2618, 2626, 128, -128,
+ 124, -124, 2642, 2650, 120, -120, 116, -116,
+ 2666, 2690, 2674, 2682, 112, -112, 108, -108,
+ 2698, 2706, 104, -104, 100, -100, 2722, 2746,
+ 2730, 2738, 96, -96, 92, -92, 2754, 2762,
+ 88, -88, 84, -84, 2778, 2834, 2786, 2810,
+ 2794, 2802, 80, -80, 76, -76, 2818, 2826,
+ 72, -72, 68, -68, 2842, 2866, 2850, 2858,
+ 64, -64, 60, -60, 2874, 2882, 56, -56,
+ 52, -52, 2898, 2970, 2906, 2946, 2914, 2938,
+ 2922, 2930, 48, -48, 44, -44, 40, -40,
+ 2954, 2962, 36, -36, 32, -32, 28, -28,
+ 2986, 3010, 2994, 3002, 24, -24, 20, -20,
+ 16, -16, 12, -12, 8, -8, 4, -4
+  ];
+
+  // Starting indices into VLD table above
+  int MCBPC_IVOP_START_INDEX    = 0;
+  int MCBPC_PVOP_START_INDEX    = 16;
+  int CBPY_START_INDEX          = 58;
+  int DCBITS_Y_START_INDEX      = 92;
+  int DCBITS_UV_START_INDEX     = 118;
+  int COEFF_INTER_START_INDEX   = 144;
+  int COEFF_INTRA_START_INDEX   = 380;
+  int MV_START_INDEX            = 616;
+
+  // VLD decode engine.
+  int( size=VLD_TABLE_ADDR_BITS ) vld_index;
+  int( size=VLD_TABLE_DATA_BITS ) vld_codeword := 1;
+  procedure start_vld_engine( int index )
+  begin
+    vld_index := index;
+    vld_codeword := 2;
+  end
+  function vld_success() --> bool : bitand(vld_codeword,3) = 0 end
+  function vld_failure() --> bool : bitand(vld_codeword,1) = 1 end
+  function vld_result() --> int( size=VLD_TABLE_DATA_BITS ) : rshift(vld_codeword,2) end
+  action bits:[ b ] ==>
+  guard
+    bitand(vld_codeword,3) = 2 
+  do
+    vld_codeword := vld_table[ vld_index + if b then 1 else 0 end ];
+    vld_index := rshift(vld_codeword,2);
+    bit_count := bit_count + 1;
+  end
+  vld_failure: action ==>
+  guard
+    vld_failure()
+//  do
+//    println("Bad VLD codeword");
+  end
+
+  generic_done: action ==>
+  guard
+    done_reading_bits()
+  end
+
+  generic_done_with_bitread: action bits:[b] ==>
+  guard
+    done_reading_bits()
+  do
+    bit_count := bit_count + 1;
+  end
+
+  // stuck: action ==>
+  // do
+  //   set_bits_to_read(0);
+  //   reset_texture();
+    // println("Stuck at bit_count " + bit_count);
+  // end
+
+  schedule fsm look_for_vo :
+
+    // Process a new VOL
+    look_for_vo        ( look_for_vo                      ) --> vo_header;
+    vo_header          ( generic_done                     ) --> stuck;
+    vo_header          ( vo_header.good                   ) --> vo_skip_id_field;
+    vo_skip_id_field   ( vo_skip_id_field                 ) --> look_for_vol;
+
+    // Process a new VOL
+    look_for_vol       ( generic_done                     ) --> stuck;
+    look_for_vol       ( vol_startcode.good               ) --> vol_object;
+    vol_object         ( vol_object_layer_identification  ) --> vol_aspect;
+    vol_aspect         ( vol_aspect.detailed              ) --> vol_control;
+    vol_aspect         ( generic_done                     ) --> vol_control;
+    vol_control        ( vol_control.detailed             ) --> vol_vbv;
+    vol_control        ( generic_done_with_bitread        ) --> vol_shape;
+    vol_vbv            ( vol_vbv.detailed                 ) --> vol_shape;
+    vol_vbv            ( generic_done_with_bitread        ) --> vol_shape;
+    vol_shape          ( vol_shape                        ) --> vol_time_inc_res;
+    vol_time_inc_res   ( vol_time_inc_res                 ) --> vol_width;
+    vol_width          ( vol_width                        ) --> vol_height;
+    vol_height         ( vol_height                       ) --> vol_misc;
+    // vol_misc           ( vol_misc.unsupported             ) --> stuck;
+    vol_misc           ( generic_done                     ) --> look_for_vop;
+
+    // Process a new VOP
+    look_for_vop       ( byte_align                       ) --> get_vop_code;
+    get_vop_code       ( get_vop_code                     ) --> vop_code;
+    vop_code           ( vop_code.done                    ) --> look_for_vol;
+    vop_code           ( vop_code.start                   ) --> vop_predict;
+    vop_code           ( generic_done                     ) --> stuck;
+    vop_predict        ( vop_predict /* .supported */     ) --> vop_timebase;
+    // vop_predict        ( generic_done                     ) --> stuck;
+    vop_timebase       ( vop_timebase.one                 ) --> vop_timebase;
+    vop_timebase       ( vop_timebase.zero                ) --> vop_coding;
+    vop_coding         ( vop_coding.uncoded               ) --> look_for_vop;
+	vop_coding         ( vop_coding.coded                 ) --> send_new_vop_info;
+	send_new_vop_info  ( send_new_vop_cmd                 ) --> send_new_vop_width;
+	send_new_vop_width ( send_new_vop_width               ) --> send_new_vop_height;
+	send_new_vop_height( send_new_vop_height              ) --> mb;
+
+    // Start MB
+    mb          ( mb_done                    ) --> look_for_vop;
+	mb            ( mcbpc_pvop_uncoded         ) --> pvop_uncoded1;
+	pvop_uncoded1 ( mcbpc_pvop_uncoded1        ) --> pvop_uncoded2;
+	pvop_uncoded2 ( mcbpc_pvop_uncoded1        ) --> pvop_uncoded3;
+	pvop_uncoded3 ( mcbpc_pvop_uncoded1        ) --> pvop_uncoded4;
+	pvop_uncoded4 ( mcbpc_pvop_uncoded1        ) --> pvop_uncoded5;
+	pvop_uncoded5 ( mcbpc_pvop_uncoded1        ) --> mb;
+    mb          ( get_mcbpc                  ) --> get_mbtype;
+    get_mbtype  ( vld_failure                ) --> stuck;
+    get_mbtype  ( get_mbtype                 ) --> final_cbpy;
+    final_cbpy  ( vld_failure                ) --> stuck;
+    final_cbpy  ( final_cbpy_intra           ) --> block;
+    final_cbpy  ( final_cbpy_inter           ) --> mv;
+
+    // process all blocks in an MB
+    block      ( mb_dispatch_done           ) --> mb;
+    block      ( mb_dispatch_intra          ) --> texture;
+    block      ( mb_dispatch_inter_ac_coded ) --> texture;
+    block      ( mb_dispatch_inter_no_ac    ) --> block;
+
+    // Start texture
+    texture    ( vld_start_intra            ) --> get_dc_bits;
+    texture    ( vld_start_inter            ) --> texac;
+    get_dc_bits ( get_dc_bits.none          ) --> texac;
+    get_dc_bits ( get_dc_bits.some          ) --> get_dc;
+    get_dc_bits ( vld_failure               ) --> stuck;
+    get_dc      ( dc_bits_shift             ) --> get_dc_a;
+    get_dc_a    ( get_dc                    ) --> texac;
+    texac       ( block_done                ) --> block;
+    texac       ( dct_coeff                 ) --> vld1;
+    vld1        ( vld_code                  ) --> texac;
+    vld1        ( vld_level                 ) --> vld4;
+    vld1        ( vld_run_or_direct         ) --> vld7;
+    vld7        ( vld_run                   ) --> vld6;
+    vld7        ( vld_direct_read           ) --> vld_direct;
+    vld1        ( vld_failure               ) --> stuck;
+    vld_direct  ( vld_direct                ) --> texac;
+    vld4 ( do_level_lookup           ) --> vld4a;
+    vld4 ( vld_failure                ) --> stuck;
+    vld4a ( vld_level_lookup           ) --> texac;
+    vld6 ( do_run_lookup              ) --> vld6a;
+    vld6 ( vld_failure                ) --> stuck;
+    vld6a ( vld_run_lookup             ) --> texac;
+
+    // mv()
+    mv              ( mvcode_done       ) -->  block;
+    mv              ( mvcode            ) -->  mag_x;
+    mag_x           ( vld_failure       ) -->  stuck;
+    mag_x           ( mag_x             ) -->  get_residual_x;         
+    get_residual_x  ( get_residual_x    ) -->  mv_y;
+    mv_y            ( mvcode            ) -->  mag_y;
+    mag_y           ( vld_failure       ) -->  stuck;
+    mag_y           ( mag_y             ) -->  get_residual_y;
+    get_residual_y  ( get_residual_y    ) -->  mv;
+
+    // stuck( stuck ) --> stuck_for_good;
+  end
+
+  priority
+
+    vo_header.good         >  generic_done;
+//    vol_start_code.good    >  generic_done;   // JWJ: vol_start_code.good does not exist
+    vol_aspect.detailed    >  generic_done;
+    vol_control.detailed   >  generic_done_with_bitread;
+    vol_vbv.detailed       >  generic_done_with_bitread;
+    // vol_misc.unsupported   >  generic_done;
+
+    vop_code.done          >  generic_done;
+    vop_code.start         >  generic_done;
+    // vop_predict.supported  >  generic_done;
+    vop_timebase.one       >  vop_timebase.zero;
+    vop_coding.uncoded     >  vop_coding.coded;
+
+    mb_done > get_mcbpc;
+    mb_done > mcbpc_pvop_uncoded;
+    get_mcbpc.pvop > mcbpc_pvop_uncoded;
+
+    get_mbtype.noac > get_mbtype.ac;
+    final_cbpy_inter > final_cbpy_intra;
+    mb_dispatch_done > mb_dispatch_intra >
+    mb_dispatch_inter_no_ac > mb_dispatch_inter_ac_coded;
+
+    vld_start_intra > vld_start_inter;
+    get_dc_bits.none > get_dc_bits.some;
+    block_done > dct_coeff;
+    vld_code > vld_level > vld_run_or_direct;
+    vld_run > vld_direct_read;
+
+    vld_start_inter.ac_coded > vld_start_inter.not_ac_coded;
+
+    mvcode_done > mvcode;
+  end
+
+end

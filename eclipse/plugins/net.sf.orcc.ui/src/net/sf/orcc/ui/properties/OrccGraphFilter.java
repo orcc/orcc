@@ -1,6 +1,6 @@
 package net.sf.orcc.ui.properties;
 
-import net.sf.graphiti.model.Graph;
+import net.sf.orcc.graphiti.model.Graph;
 
 import org.eclipse.gef.EditPart;
 import org.eclipse.jface.viewers.IFilter;

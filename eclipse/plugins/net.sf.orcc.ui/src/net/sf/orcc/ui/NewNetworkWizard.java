@@ -28,11 +28,11 @@
  */
 package net.sf.orcc.ui;
 
-import net.sf.graphiti.GraphitiModelPlugin;
-import net.sf.graphiti.model.Configuration;
-import net.sf.graphiti.model.Graph;
-import net.sf.graphiti.model.ObjectType;
-import net.sf.graphiti.ui.wizards.WizardSaveGraphPage;
+import net.sf.orcc.graphiti.GraphitiModelPlugin;
+import net.sf.orcc.graphiti.model.Configuration;
+import net.sf.orcc.graphiti.model.Graph;
+import net.sf.orcc.graphiti.model.ObjectType;
+import net.sf.orcc.graphiti.ui.wizards.WizardSaveGraphPage;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.dialogs.MessageDialog;

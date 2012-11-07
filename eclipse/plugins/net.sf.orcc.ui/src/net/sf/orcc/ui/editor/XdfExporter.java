@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ui.editor;
 
-import static net.sf.graphiti.model.ObjectType.PARAMETER_ID;
-import static net.sf.graphiti.model.ObjectType.PARAMETER_REFINEMENT;
+import static net.sf.orcc.graphiti.model.ObjectType.PARAMETER_ID;
+import static net.sf.orcc.graphiti.model.ObjectType.PARAMETER_REFINEMENT;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,11 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.graphiti.io.LayoutWriter;
-import net.sf.graphiti.model.Edge;
-import net.sf.graphiti.model.Graph;
-import net.sf.graphiti.model.ObjectType;
-import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstType;
@@ -81,6 +76,11 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graphiti.io.LayoutWriter;
+import net.sf.orcc.graphiti.model.Edge;
+import net.sf.orcc.graphiti.model.Graph;
+import net.sf.orcc.graphiti.model.ObjectType;
+import net.sf.orcc.graphiti.model.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;

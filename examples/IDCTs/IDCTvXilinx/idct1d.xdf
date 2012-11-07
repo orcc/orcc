@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="idct1d">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="X0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="X1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ROW">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="Y0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Y1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Y2">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Y3">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <Decl kind="Param" name="MEM_SZ"/>
+    <Decl kind="Variable" name="ACC_SZ">
+        <Expr kind="Literal" literal-kind="Integer" value="24"/>
+    </Decl>
+    <Decl kind="Variable" name="COEFF_SZ">
+        <Expr kind="Literal" literal-kind="Integer" value="13"/>
+    </Decl>
+    <Decl kind="Variable" name="SCALE_SZ">
+        <Expr kind="Literal" literal-kind="Integer" value="30"/>
+    </Decl>
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="$id_n$0">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Scale"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="csz">
+            <Expr kind="Var" name="COEFF_SZ"/>
+        </Parameter>
+        <Parameter name="isz">
+            <Expr kind="Var" name="MEM_SZ"/>
+        </Parameter>
+        <Parameter name="osz">
+            <Expr kind="Var" name="SCALE_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="$id_n$1">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Combine"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="isz">
+            <Expr kind="Var" name="SCALE_SZ"/>
+        </Parameter>
+        <Parameter name="osz">
+            <Expr kind="Var" name="ACC_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="$id_n$2">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="ShuffleFly"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="sz">
+            <Expr kind="Var" name="ACC_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="$id_n$3">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Shuffle"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="sz">
+            <Expr kind="Var" name="ACC_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="$id_n$4">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Final"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="isz">
+            <Expr kind="Var" name="ACC_SZ"/>
+        </Parameter>
+        <Parameter name="osz">
+            <Expr kind="Var" name="MEM_SZ"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="$id_n$0" dst-port="X0" src="" src-port="X0"/>
+    <Connection dst="$id_n$0" dst-port="X1" src="" src-port="X1"/>
+    <Connection dst="$id_n$1" dst-port="ROW" src="" src-port="ROW"/>
+    <Connection dst="$id_n$1" dst-port="X0" src="$id_n$0" src-port="Y0"/>
+    <Connection dst="$id_n$1" dst-port="X1" src="$id_n$0" src-port="Y1"/>
+    <Connection dst="$id_n$1" dst-port="X2" src="$id_n$0" src-port="Y2"/>
+    <Connection dst="$id_n$1" dst-port="X3" src="$id_n$0" src-port="Y3"/>
+    <Connection dst="$id_n$2" dst-port="X0" src="$id_n$1" src-port="Y0"/>
+    <Connection dst="$id_n$2" dst-port="X1" src="$id_n$1" src-port="Y1"/>
+    <Connection dst="$id_n$3" dst-port="X0" src="$id_n$2" src-port="Y0"/>
+    <Connection dst="$id_n$3" dst-port="X1" src="$id_n$2" src-port="Y1"/>
+    <Connection dst="$id_n$3" dst-port="X2" src="$id_n$2" src-port="Y2"/>
+    <Connection dst="$id_n$3" dst-port="X3" src="$id_n$2" src-port="Y3"/>
+    <Connection dst="$id_n$4" dst-port="X0" src="$id_n$3" src-port="Y0"/>
+    <Connection dst="$id_n$4" dst-port="X1" src="$id_n$3" src-port="Y1"/>
+    <Connection dst="$id_n$4" dst-port="X2" src="$id_n$3" src-port="Y2"/>
+    <Connection dst="$id_n$4" dst-port="X3" src="$id_n$3" src-port="Y3"/>
+    <Connection dst="" dst-port="Y0" src="$id_n$4" src-port="Y0"/>
+    <Connection dst="" dst-port="Y1" src="$id_n$4" src-port="Y1"/>
+    <Connection dst="" dst-port="Y2" src="$id_n$4" src-port="Y2"/>
+    <Connection dst="" dst-port="Y3" src="$id_n$4" src-port="Y3"/>
+</XDF>

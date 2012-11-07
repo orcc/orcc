@@ -1,0 +1,34 @@
+// GEN_mgnt_DCSplit.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+// Copyright (c) 2006 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+
+import all caltrop.lib.BitOps;
+
+actor GEN_mgnt_DCSplit ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC :
+
+  int(size=8) count := 0;
+
+  dc: action IN:[ x ] ==> DC:[ x ]
+  guard
+    count = 0
+  do
+    count := 1;
+  end
+
+  ac: action IN:[ x ] ==> AC:[ x ]
+  do
+    count := bitand( count + 1, 63);
+  end
+
+  priority
+    dc > ac;
+  end
+end

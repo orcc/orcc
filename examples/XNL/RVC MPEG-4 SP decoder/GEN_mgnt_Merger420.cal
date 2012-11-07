@@ -1,0 +1,22 @@
+// GEN_mgnt_Merger420.cal
+//
+// Author: Christophe Lucarz (christophe.lucarz@epfl.ch)
+
+actor GEN_mgnt_Merger420 (int PIX_SZ) list[int] Y, list[int] U, list[int] V ==> list[int] YUV :
+
+// Select the Y blocks 
+Y:action Y:[y] repeat 4*64 ==> YUV:[ [y[i] : for i in Integers(0 , 255)] ] repeat 256 end
+
+// Select the U blocks 
+U:action U:[u] repeat 64 ==> YUV:[ [u[i] : for i in Integers(0, 63)] ] repeat 64 end
+
+// Select the V blocks 
+V:action V:[v] repeat 64 ==> YUV:[ [v[i] : for i in Integers(0 , 63)] ] repeat 64 end
+
+schedule fsm Y :
+   Y     ( Y ) --> U ;
+   U     ( U ) --> V ;
+   V     ( V ) --> Y ;
+ end
+
+endactor

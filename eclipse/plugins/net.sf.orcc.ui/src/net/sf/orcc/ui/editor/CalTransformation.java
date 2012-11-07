@@ -30,15 +30,15 @@ package net.sf.orcc.ui.editor;
 
 import java.io.OutputStream;
 
-import net.sf.graphiti.GraphitiModelPlugin;
-import net.sf.graphiti.io.ITransformation;
-import net.sf.graphiti.model.Configuration;
-import net.sf.graphiti.model.Graph;
-import net.sf.graphiti.model.ObjectType;
-import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.graphiti.GraphitiModelPlugin;
+import net.sf.orcc.graphiti.io.ITransformation;
+import net.sf.orcc.graphiti.model.Configuration;
+import net.sf.orcc.graphiti.model.Graph;
+import net.sf.orcc.graphiti.model.ObjectType;
+import net.sf.orcc.graphiti.model.Vertex;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;

@@ -33,12 +33,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&
 
    <url>
       <update label="Orcc Project Update Site" url="http://orcc.sourceforge.net/eclipse/updates/"/>
-      <discovery label="Graphiti Editor Update Site" url="http://graphiti-editor.sf.net/eclipse"/>
    </url>
-
-   <requires>
-      <import feature="net.sf.graphiti" version="0.0.0" match="greaterOrEqual"/>
-   </requires>
 
    <plugin
          id="net.sf.orcc.core"
@@ -108,6 +103,27 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&
          download-size="0"
          install-size="0"
          version="4.0.5"
+         unpack="false"/>
+
+   <plugin
+         id="net.sf.orcc.graphiti.model"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.sf.orcc.graphiti.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.jgrapht"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>

@@ -1,0 +1,33 @@
+import all caltrop.lib.BitOps;
+
+actor Scale (int SIN_SZ, int SOUT_SZ) int (size=SIN_SZ) SIn ==> int (size=SOUT_SZ) SOut :
+
+int A = 1024;
+int B = 1138;
+int C = 1730;
+int D = 1609;
+int E = 1264;
+int F = 1922;
+int G = 1788;
+int H = 2923;
+int K = 2718;
+int L = 2528;
+
+  list (type: int (size=16), size=64) Scale_factor =
+[
+  A, B, C, D, A, D, C, B,
+  B, E, F, G, B, G, F, E,
+  C, F, H, K, C, K, H, F,
+  D, G, K, L, D, L, K, G,
+  A, B, C, D, A, D, C, B,
+  D, G, K, L, D, L, K, G,
+  C, F, H, K, C, K, H, F,
+  B, E, F, G, B, G, F, E
+];
+  action SIn: [x] repeat 64 ==> SOut: [y] repeat 64
+    var y
+      do
+        y := [x[i] * Scale_factor[i]: for i in Integers(0, 63)];
+        y[0] := y[0] + 4096;
+      end
+end

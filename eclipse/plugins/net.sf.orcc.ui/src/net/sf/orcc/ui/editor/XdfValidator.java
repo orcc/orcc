@@ -30,11 +30,11 @@ package net.sf.orcc.ui.editor;
 
 import java.util.Set;
 
-import net.sf.graphiti.model.Graph;
-import net.sf.graphiti.model.IRefinementPolicy;
-import net.sf.graphiti.model.ObjectType;
-import net.sf.graphiti.model.Vertex;
-import net.sf.graphiti.validators.DataflowValidator;
+import net.sf.orcc.graphiti.model.Graph;
+import net.sf.orcc.graphiti.model.IRefinementPolicy;
+import net.sf.orcc.graphiti.model.ObjectType;
+import net.sf.orcc.graphiti.model.Vertex;
+import net.sf.orcc.graphiti.validators.DataflowValidator;
 
 import org.eclipse.core.resources.IFile;
 

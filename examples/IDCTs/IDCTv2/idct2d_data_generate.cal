@@ -1,0 +1,16 @@
+actor idct2d_data_generate () ==> bool S, int DATA :
+
+  write_sign: action ==> S:[ true ] 
+  end
+
+  write_data: action ==> DATA:[ [data[s]:for s in Integers(0,63)] ] repeat 64
+  var
+    data = [ 64 - i : for i in Integers(0, 63) ]
+  end
+
+  schedule fsm write_sign:
+    write_sign (write_sign) --> write_data;
+    write_data (write_data) --> write_sign;
+  end
+
+end

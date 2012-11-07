@@ -28,28 +28,28 @@
  */
 package net.sf.orcc.ui.editor;
 
-import static net.sf.graphiti.GraphitiModelPlugin.getDefault;
-import static net.sf.graphiti.model.ObjectType.PARAMETER_ID;
-import static net.sf.graphiti.model.ObjectType.PARAMETER_REFINEMENT;
-import static net.sf.graphiti.model.ObjectType.PARAMETER_SOURCE_PORT;
-import static net.sf.graphiti.model.ObjectType.PARAMETER_TARGET_PORT;
+import static net.sf.orcc.graphiti.GraphitiModelPlugin.getDefault;
+import static net.sf.orcc.graphiti.model.ObjectType.PARAMETER_ID;
+import static net.sf.orcc.graphiti.model.ObjectType.PARAMETER_REFINEMENT;
+import static net.sf.orcc.graphiti.model.ObjectType.PARAMETER_SOURCE_PORT;
+import static net.sf.orcc.graphiti.model.ObjectType.PARAMETER_TARGET_PORT;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.graphiti.io.LayoutReader;
-import net.sf.graphiti.model.Configuration;
-import net.sf.graphiti.model.Edge;
-import net.sf.graphiti.model.Graph;
-import net.sf.graphiti.model.ObjectType;
-import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graphiti.io.LayoutReader;
+import net.sf.orcc.graphiti.model.Configuration;
+import net.sf.orcc.graphiti.model.Edge;
+import net.sf.orcc.graphiti.model.Graph;
+import net.sf.orcc.graphiti.model.ObjectType;
+import net.sf.orcc.graphiti.model.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;

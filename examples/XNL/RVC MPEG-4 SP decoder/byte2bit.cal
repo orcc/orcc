@@ -1,0 +1,44 @@
+// byte2bit.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+// Copyright (c) 2004-2005 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.import all caltrop.lib.BitOps;
+
+// Read in bytes and shift out serially in msb-first order.
+
+import all caltrop.lib.BitOps;
+
+actor byte2bit () int(size=8) in8 ==> bool out :
+
+  int(size=4) count := 0;
+  int(size=9) buf;
+
+  // Read in an new byte when needed
+  reload: action in8:[i] ==>
+  guard count = 0
+  do
+    buf := i;
+    count := 8;
+  end
+
+  // Write out bits in msb first order
+  shift: action ==> out:[ bit ]
+  guard
+    count != 0
+  var
+    bool bit = bitand( buf, 128) != 0
+  do
+    count := count - 1;
+    buf := lshift( buf, 1 );
+  end
+
+  priority
+    reload > shift;
+  end
+end

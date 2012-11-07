@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="in" x="18" y="105"/>
+      <vertex id="signed" x="548" y="133"/>
+      <vertex id="out" x="679" y="48"/>
+      <vertex id="$id_n$0" x="59" y="86"/>
+      <vertex id="$id_n$1" x="169" y="57"/>
+      <vertex id="$id_n$2" x="304" y="22"/>
+      <vertex id="$id_n$3" x="296" y="74"/>
+      <vertex id="$id_n$4" x="407" y="27"/>
+      <vertex id="$id_n$5" x="593" y="211"/>
+      <vertex id="$id_n$6" x="494" y="26"/>
+      <vertex id="$id_n$7" x="597" y="27"/>
+   </vertices>
+</layout>

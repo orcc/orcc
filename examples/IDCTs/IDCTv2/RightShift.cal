@@ -1,0 +1,7 @@
+
+actor RightShift () int In ==> int Out :
+
+  action In:[ x ] repeat 64 ==> Out: [ [ rshift(x[i], 13) : for i in 0 .. 63 ] ] repeat 64
+  end
+
+ end

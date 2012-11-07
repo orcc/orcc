@@ -31,7 +31,7 @@ package net.sf.orcc.ui.properties;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
-import net.sf.graphiti.ui.properties.MapSection;
+import net.sf.orcc.graphiti.ui.properties.MapSection;
 
 /**
  * This class defines a map section for vertex parameters.

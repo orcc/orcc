@@ -1,0 +1,23 @@
+// GEN_algo_Clip.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+// Copyright (c) 2004-2005 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+
+// Limit pixel value to either [0,255] or [-255,255]
+
+actor GEN_algo_Clip ( int isz, int osz ) int(size=isz) I, bool SIGNED ==> int(size=osz) O :
+
+
+  action I:[a] repeat 64, SIGNED:[s] ==> O:[b] repeat 64
+  var
+       lim = if s then -255 else 0 end,
+	   b := [ if (a[i] < lim) then lim else if (a[i] > 255) then 255 else a[i] end end : for i in Integers(0,63) ]
+  end
+end

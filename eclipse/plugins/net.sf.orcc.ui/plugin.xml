@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="net.sf.graphiti.model.definition">
+         point="net.sf.orcc.graphiti.model.definition">
       <configuration
             extension="xdf"
             name="XDF"
@@ -146,7 +146,7 @@
             extension="cal"
             name="CAL"
             type="text"
-            validator="net.sf.graphiti.validators.ActorValidator">
+            validator="net.sf.orcc.graphiti.validators.ActorValidator">
          <graphType
                name="CAL actor">
             <parameter
@@ -463,8 +463,8 @@
    </extension>
    <extension point="org.eclipse.ui.editors">
       <editor
-            class="net.sf.graphiti.ui.editors.GraphEditor"
-            contributorClass="net.sf.graphiti.ui.editors.GraphActionBarContributor"
+            class="net.sf.orcc.graphiti.ui.editors.GraphEditor"
+            contributorClass="net.sf.orcc.graphiti.ui.editors.GraphActionBarContributor"
             default="true"
             extensions="xdf"
             icon="icons/network.gif"
@@ -513,19 +513,19 @@
    <extension
          point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
       <propertyTabs
-            contributorId="net.sf.graphiti.ui.properties.contributor">
+            contributorId="net.sf.orcc.graphiti.ui.properties.contributor">
          <propertyTab
-               category="net.sf.graphiti.ui.properties.category.vertex"
+               category="net.sf.orcc.graphiti.ui.properties.category.vertex"
                id="net.sf.orcc.ui.properties.tab.vertex.parameters"
                label="Instance parameters">
          </propertyTab>
          <propertyTab
-               category="net.sf.graphiti.ui.properties.category.graph"
+               category="net.sf.orcc.graphiti.ui.properties.category.graph"
                id="net.sf.orcc.ui.properties.tab.graph.parameters"
                label="Network parameters">
          </propertyTab>
          <propertyTab
-               category="net.sf.graphiti.ui.properties.category.graph"
+               category="net.sf.orcc.graphiti.ui.properties.category.graph"
                id="net.sf.orcc.ui.properties.tab.graph.variables"
                label="Network variable declarations">
          </propertyTab>
@@ -534,7 +534,7 @@
    <extension
          point="org.eclipse.ui.views.properties.tabbed.propertySections">
       <propertySections
-            contributorId="net.sf.graphiti.ui.properties.contributor">
+            contributorId="net.sf.orcc.graphiti.ui.properties.contributor">
          <propertySection
                class="net.sf.orcc.ui.properties.VertexParametersMapSection"
                filter="net.sf.orcc.ui.properties.OrccVertexFilter"

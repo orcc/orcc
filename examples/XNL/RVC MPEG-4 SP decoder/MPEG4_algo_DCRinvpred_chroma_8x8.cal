@@ -1,0 +1,231 @@
+// MPEG4_algo_DCRinvpred_chroma_8x8.cal
+//
+// Created By:  David B. Parlour (dave.parlour@xilinx.com)
+// Modified By: Andrew Kinane (kinanea@eeng.dcu.ie)
+//         
+// Copyright (c) 2004-2005 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+//
+// Functionality:
+// This module reconstructs the DC coefficient of the current 8x8 block based on the
+// gradients between neighbouring block DC coefficients (see ISO/IEC 14496-2). This 
+// module also forwards the decoded prediction direction to the inverse AC prediction
+// (IAP) module and a pointer to the neighbouring block used for the prediction. Since
+// inverse quantisation is necessary to reconstruct the DC coefficient, the decoded 
+// quantisation parameter is forwarded to the inverse quantisation module.
+//
+// Input Ports:
+// ============
+// int(size=BTYPE_SZ) BTYPE
+// This input token specifies the coding mode of the current 8x8 block. When executing, 
+// the first 3 BTYPE tokens of a VOP relate to global parameters of the VOP. The first BTYPE 
+// token indicates a new VOP, and the subsequent two BTYPE tokens indicate the width and the 
+// height of the VOP in macroblocks respectively. All subsequent BTYPE tokens for the VOP 
+// specify the coding mode of the current 8x8 block. For details on the structure of the
+// BTYPE token, refer to ParseHeaders.cal
+//
+// int(size=MB_COORD_SZ) A
+// The address of the 8x8 block neighbour to the left of the current 8x8 block.
+//
+// int(size=MB_COORD_SZ) B
+// The address of the 8x8 block neighbour to the above left of the current 8x8 block.
+//
+// int(size=MB_COORD_SZ) C
+// The address of the 8x8 block neighbour to the above of the current 8x8 block.
+//
+// int(size=SAMPLE_SZ) QFS_DC
+// The decoded prediction of the current block DC coefficient
+//
+// Output Ports:
+// =============
+// int(size=SAMPLE_SZ) QF_DC
+// The reconstructed DC coefficient of the current block.
+//
+// int(size=MB_COORD_SZ+2) PTR
+// The address of the 8x8 block used for the prediction in the encoder.
+//
+// int(size=3) AC_PRED_DIR
+// A flag to communicate the direction of prediction to the IAP block but also info
+// about the scan mode of the block to the inverse scan block
+// AC_PRED_DIR = -2 => NEWVOP flag
+// AC_PRED_DIR = -1 => An uncoded block so skip inverse AC prediction
+// AC_PRED_DIR =  0 => No inverse AC prediction but use zig zag inverse scan
+// AC_PRED_DIR =  1 => Prediction form the left and use alternate vertical scan
+// AC_PRED_DIR =  2 => Prediction form the top and use alternate horizontal scan
+//
+// bool SIGNED
+// A flag to indicate to the IDCT module that the block is either INTER or INTRA.
+// This is used when saturating the reconstructed pixels if necessary.
+// 
+// int(size=QUANT_SZ) QUANT
+// This is the decoded value of the flag 'quantiser_scale' . See see ISO/IEC 14496-2.
+//
+// Modifications:
+// * Re-named output port START to AC_PRED_DIR
+// * Function dc_scaler() is now luminance specific. 
+// * In advance action, indices adjust after every component instead of 6 since now
+//   dealing with a single 8x8 block rather than 6 8x8 blocks.
+
+import all caltrop.lib.BitOps;
+
+actor MPEG4_algo_DCRinvpred_chroma_8x8 (
+ int DCVAL,
+ int MAXW_IN_MB,
+ int MB_COORD_SZ,
+ int BTYPE_SZ,
+ int SAMPLE_SZ,
+ int NEWVOP,
+ int INTRA,
+ int INTER,
+ int QUANT_MASK,
+ int ACCODED,
+ int ACPRED,
+ int QUANT_SZ
+)
+ int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B, int(size=MB_COORD_SZ) C, int(size=SAMPLE_SZ) QFS_DC ==>
+   int(size=SAMPLE_SZ) QF_DC, int(size=MB_COORD_SZ) PTR, int(size=3) AC_PRED_DIR, bool SIGNED, int(size=QUANT_SZ) QUANT :
+
+  // Use 3 address lines for component index to save address calculation effort
+  // Also, location 0 is reserved for all uncoded blocks. This protocol must
+  // be identical to the buffer addressing in Reconstruct.cal, since pointer
+  // values are passed on ports A, B, C.   
+   
+  int SCALER_SZ = 7;                 // Bitwidth needed for 'dc_scalar' - see ISO/IEC 14496-2
+  int( size=QUANT_SZ ) QP;           // Decoded 'quantiser_scale' - see ISO/IEC 14496-2 
+  int( size=2 ) round;               // Flag to indicate whether 'quantiser_scale' is even or odd            
+  int BUF_SIZE = (MAXW_IN_MB + 2);   // Have 4 8x8 blocks per MB                                             
+  int ptr := 1;                      // Pointer to current 8x8 block on current row                          
+                                     // using circular buffer addressing. Start at 4, since 0-3 are reserved.
+  // Initialize to the dummy values needed for uncoded blocks (always mapped to index 0)
+  list( type:int(size=SAMPLE_SZ), size=BUF_SIZE ) dc_buf := [ DCVAL : for k in Integers(1,BUF_SIZE) ];
+  int(size=SAMPLE_SZ) dc_pred;       // Decoded DC prediction value          
+  int(size=SCALER_SZ) scaler;        // Decoded 'dc_scalar'                  
+  bool is_signed;                    // Flag to indicate INTER or INTRA block
+  int(size=SAMPLE_SZ) dc_val;        // Reconstructed DC coefficient  
+
+  
+  // Check for NEWVOP flag
+  // A -ve means there is no data, so the inverse zigzag may flush its buffer
+  start: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ -2 ]
+  guard
+    bitand( cmd, NEWVOP ) != 0
+  do
+    ptr   := 1;
+    QP    := bitand( cmd, QUANT_MASK);
+    round := bitxor( bitand( QP, 1 ), 1 );
+  end
+
+  // Used to skip BTYPE tokens where necessary
+  skip: action BTYPE:[ x ] ==>
+  end
+
+  // Check for an INTER block with coded AC coefficients
+  read.inter_ac: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[QP]
+  guard
+    bitand( cmd, INTER   ) != 0,
+    bitand( cmd, ACCODED ) != 0
+  do
+    is_signed := true;
+  end
+
+  // Any other block except INTRA
+  read.other: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ -1 ]
+  guard
+    bitand( cmd, INTRA ) = 0
+  end
+
+  // Function to return absolute value
+  function abs( x ) :
+    if x < 0 then (-x) else x end
+  end
+
+  // Calculate DC scaler for INTRA blocks
+  // Note that this function is specific to chrominance 8x8 blocks!!!
+  function dc_scaler( ) --> int(size=SCALER_SZ):
+    // UV component
+    if QP > 0 and QP < 5 then 8 else
+      if QP > 4 and QP < 25 then rshift(QP + 13, 1) else QP - 6 end
+    end
+  end
+
+  // Read an INTRA block
+  read.intra: action BTYPE:[ cmd ], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[QP]
+  var
+    int(size=SAMPLE_SZ) dca = dc_buf[ a ],
+    int(size=SAMPLE_SZ) dcb = dc_buf[ b ],
+    int(size=SAMPLE_SZ) dcc = dc_buf[ c ],
+    int(size=SAMPLE_SZ) horiz = abs( dcb - dcc ),
+    int(size=SAMPLE_SZ) vert  = abs( dca - dcb ),
+    bool top = vert < horiz,
+    int(size=3) s,
+    bool ac = bitand(cmd,ACPRED) != 0
+  do
+    scaler  := dc_scaler();
+    dc_pred := ( (if top then dcc else dca end) + rshift(scaler,1) ) / scaler;
+    s := if not ac then 0 else if top then 2 else 1 end end;
+    is_signed := scaler=0;
+  end
+ 
+  // Do dequant on INTER block DC
+  getdc.inter: action QFS_DC:[ dc ] ==>
+  var
+    int(size=SAMPLE_SZ) v = ( QP * (lshift( abs(dc), 1) + 1) ) - round
+  do
+    dc_val := if dc = 0 then 0 else
+                if not is_signed then dc else
+                  if dc < 0 then -v else v end end end;
+  end
+
+  // Do prediction on INTRA block DC
+  getdc.intra: action QFS_DC:[ dc ] ==>
+  do
+    dc_val := (dc + dc_pred) * scaler;
+  end
+
+  function saturate( x )
+    var
+      bool minus = x < -2048,
+      bool plus  = x >  2047 :
+    if minus then -2048 else if plus then 2047 else x end end
+  end
+
+  sat: action ==> QF_DC:[ dc ]
+  var
+    int(size=SAMPLE_SZ) dc = saturate( dc_val )
+  do
+    dc_buf [ptr] :=  dc;
+  end
+
+  advance: action ==>
+  do
+    ptr := if ptr = 1 then BUF_SIZE-1 else ptr-1 end;
+  end
+
+  schedule fsm read :
+    read          ( start          ) --> getw;
+    read          ( read.inter_ac  ) --> inter;
+    read          ( read.intra     ) --> intra;
+    read          ( read.other     ) --> advance;
+
+    getw          ( skip           ) --> geth;
+    geth          ( skip           ) --> read;
+
+    intra         ( getdc.intra    ) --> sat;
+
+    inter         ( getdc.inter    ) --> sat;
+
+    sat           ( sat            ) --> advance;
+
+    advance       ( advance        ) --> read;
+  end
+
+  priority
+    start         > read;
+    read.inter_ac > read.other > read.intra;
+  end
+end

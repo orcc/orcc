@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ui.properties;
 
-import net.sf.graphiti.ui.properties.MapSection;
+import net.sf.orcc.graphiti.ui.properties.MapSection;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;

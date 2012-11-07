@@ -1,0 +1,9 @@
+actor idct2d_data_generate () ==> bool S, int DATA :
+
+  action ==> S:[ true ], DATA:[ [data[s]:for s in Integers(0,63)] ] repeat 64
+  var
+    data = [ 64 - i : for i in Integers(0, 63) ]
+  end
+
+  
+end
