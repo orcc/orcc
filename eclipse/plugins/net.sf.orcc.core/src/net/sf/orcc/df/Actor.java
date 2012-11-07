@@ -423,4 +423,11 @@ public interface Actor extends Vertex, Adaptable {
 	 */
 	void setTemplateData(Object value);
 
+	/**
+	 * Returns true if the actor is using a native procedure/function.
+	 * 
+	 * @return true if actor is using a native procedure/function, otherwise false.
+	 */
+	public boolean useNativeProcedure();
+
 }

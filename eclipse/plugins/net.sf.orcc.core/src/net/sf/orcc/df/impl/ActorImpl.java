@@ -18,6 +18,7 @@ import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.graph.impl.VertexImpl;
+import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.MapAdapter;
@@ -30,11 +31,13 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -123,8 +126,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 
 	/**
 	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
@@ -180,8 +182,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -190,8 +191,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
@@ -200,8 +200,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 
 	/**
 	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getParameters()
 	 * @generated
 	 * @ordered
@@ -228,8 +227,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 
 	/**
 	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getTemplateData()
 	 * @generated
 	 * @ordered
@@ -238,8 +237,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 
 	/**
 	 * The cached value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getTemplateData()
 	 * @generated
 	 * @ordered
@@ -636,8 +635,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
@@ -667,8 +665,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	public String getName() {
 		return getLabel();
@@ -685,8 +682,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Port> getOutputs() {
@@ -713,8 +709,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Var> getParameters() {
@@ -786,8 +781,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Object getTemplateData() {
@@ -902,8 +896,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	public void setName(String newName) {
 		setLabel(newName);
@@ -923,8 +916,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setTemplateData(Object newTemplateData) {
@@ -956,6 +948,21 @@ public class ActorImpl extends VertexImpl implements Actor {
 		result.append(templateData);
 		result.append(')');
 		return result.toString();
+	}
+
+	@Override
+	public boolean useNativeProcedure() {
+		TreeIterator<Object> it = EcoreUtil.getAllContents(this, true);
+		while (it.hasNext()) {
+			Object object = it.next();
+			if (object instanceof InstCall) {
+				InstCall call = (InstCall) object;
+				if (call.getProcedure().isNative()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 } // ActorImpl
