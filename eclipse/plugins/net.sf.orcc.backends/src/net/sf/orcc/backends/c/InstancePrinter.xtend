@@ -82,6 +82,14 @@ class InstancePrinter extends CTemplate {
 	
 	var Action currentAction;
 	
+	/**
+	 * Default constructor, used only by another backend (when subclass)
+	 */
+	new() {
+		instance = null
+		fifoSize = 0
+	}
+	
 	new(Instance instance, Map<String, Object> options) {
 		
 		if ( ! instance.isActor) {
@@ -94,7 +102,6 @@ class InstancePrinter extends CTemplate {
 			fifoSize = options.get("fifoSize") as Integer
 		} else {
 			fifoSize = 512
-			OrccLogger::warnln("fifoSize option is not set")
 		}
 		
 		if (options.containsKey("useGeneticAlgorithm")) {

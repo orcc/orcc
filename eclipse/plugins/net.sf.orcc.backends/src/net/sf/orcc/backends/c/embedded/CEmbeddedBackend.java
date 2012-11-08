@@ -28,13 +28,9 @@
  */
 package net.sf.orcc.backends.c.embedded;
 
-import java.io.File;
 import java.util.List;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.StandardPrinter;
-import net.sf.orcc.backends.c.CExpressionPrinter;
-import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
@@ -55,33 +51,10 @@ public class CEmbeddedBackend extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		// Set Algo, Code, Code/src and Code/IDL directory
-		File algoDir = new File(path + "/Algo");
-		File codeDir = new File(path + "/Code");
-		File srcDir = new File(path + "/Code/src");
-		File idlDir = new File(path + "/Code/IDL");
-
-		// If directories don't exist, create them
-		if (!algoDir.exists()) {
-			algoDir.mkdirs();
-		}
-
-		if (!codeDir.exists()) {
-			codeDir.mkdirs();
-		}
-
-		if (!srcDir.exists()) {
-			srcDir.mkdirs();
-		}
-
-		if (!idlDir.exists()) {
-			idlDir.mkdirs();
-		}
 	}
 
 	@Override
 	protected void doTransformActor(Actor actor) {
-
 	}
 
 	@Override
@@ -91,14 +64,8 @@ public class CEmbeddedBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		// Transform all actors of the network
-		transformActors(network.getAllActors());
+		// Print actors
 		printActors(network.getAllActors());
-
-		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/c/embedded/Network.stg");
-		printer.setTypePrinter(new CTypePrinter());
-		printer.setExpressionPrinter(new CExpressionPrinter());
 
 		// instantiate and flattens network
 		new Instantiator(false, fifoSize).doSwitch(network);
@@ -131,13 +98,14 @@ public class CEmbeddedBackend extends AbstractBackend {
 			}
 		}
 
-		// Print actors
+		// Print network
 		if (isSDF) {
 			SDFMoC moc = (SDFMoC) network.getAllActors().get(0).getMoC();
 			moc.toString();
 			OrccLogger.traceln("Printing network...");
-			printer.print("./Algo/" + network.getName() + ".graphml", path,
-					network);
+
+			new NetworkPrinter(network).printNetwork(path);
+
 		} else {
 			OrccLogger
 					.traceln("The network is not SDF. Other models are not yet supported.");
@@ -150,24 +118,9 @@ public class CEmbeddedBackend extends AbstractBackend {
 	 */
 	@Override
 	protected boolean printActor(Actor actor) {
-		boolean result = false;
 
-		// print IDL
-		StandardPrinter printerIDL = new StandardPrinter(
-				"net/sf/orcc/backends/c/embedded/ActorIDL.stg", false);
-		printerIDL.setExpressionPrinter(new CExpressionPrinter());
-		printerIDL.setTypePrinter(new CTypePrinter());
-		result = printerIDL.print("./Code/IDL/" + actor.getSimpleName()
-				+ ".idl", path, actor);
+		int result = new ActorPrinter(actor, debug).printIDLAndCFiles(path);
 
-		// Print C code
-		StandardPrinter printerC = new StandardPrinter(
-				"net/sf/orcc/backends/c/embedded/ActorC.stg", false);
-		printerC.setExpressionPrinter(new CExpressionPrinter());
-		printerC.setTypePrinter(new CTypePrinter());
-		result |= printerC.print("./Code/src/" + actor.getSimpleName() + ".c",
-				path, actor);
-
-		return result;
+		return result != 0;
 	}
 }
