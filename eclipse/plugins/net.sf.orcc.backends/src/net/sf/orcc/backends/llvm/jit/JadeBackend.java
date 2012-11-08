@@ -43,7 +43,6 @@ import java.util.logging.Level;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
@@ -261,9 +260,8 @@ public class JadeBackend extends AbstractBackend {
 	}
 
 	private void printMapping(Network network) {
-		CommonPrinter.printFile(
-				new XcfPrinter().compileXcfFile(targetToInstancesMap), path,
-				"mapping.xcf");
+		new XcfPrinter(targetToInstancesMap).printXcfFile(path + File.separator
+				+ "mapping.xcf");
 	}
 
 	private void runJadeToolBox(List<Actor> actors) {

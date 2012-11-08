@@ -27,7 +27,8 @@
  * SUCH DAMAGE.
  */
  package net.sf.orcc.backends.c
-
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 import java.util.HashMap
 import java.util.LinkedList
 import java.util.List
@@ -57,6 +58,7 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
+import java.io.File
 
 /*
  * Compile Instance c source code
@@ -98,32 +100,52 @@ class InstancePrinter extends CTemplate {
 		
 		this.instance = instance
 		
-		if (options.containsKey("fifoSize")) {
-			fifoSize = options.get("fifoSize") as Integer
+		if (options.containsKey(FIFO_SIZE)) {
+			fifoSize = options.get(FIFO_SIZE) as Integer
 		} else {
 			fifoSize = 512
 		}
 		
-		if (options.containsKey("useGeneticAlgorithm")) {
-			geneticAlgo = options.get("useGeneticAlgorithm") as Boolean
-			if (options.containsKey("threadsNb")) {
-				threadsNb = options.get("threadsNb") as Integer
-			} else {
-				OrccLogger::warnln("Genetic algorithm options has been checked, but threadsNb option is not set")
-			}
+		if (options.containsKey(GENETIC_ALGORITHM)) {
+			geneticAlgo = options.get(GENETIC_ALGORITHM) as Boolean
 		}
-		if (options.containsKey("newScheduler")) {
-			newSchedul = options.get("newScheduler") as Boolean
+		
+		if (options.containsKey(THREADS_NB)) {
+			threadsNb = Integer::valueOf(options.get(THREADS_NB) as String)
+		} else if (geneticAlgo) {
+			OrccLogger::warnln("Genetic algorithm options has been checked, but THREADS_NB option is not set")
 		}
-		if (options.containsKey("ringTopology")) {
-			ringTopology = options.get("ringTopology") as Boolean
+		
+		if (options.containsKey(NEW_SCHEDULER)) {
+			newSchedul = options.get(NEW_SCHEDULER) as Boolean
 		}
-		if (options.containsKey("enableTrace")) {
-			enableTrace = options.get("enableTrace") as Boolean
+		if (options.containsKey(NEW_SCHEDULER_TOPOLOGY)) {
+			ringTopology = options.get(NEW_SCHEDULER_TOPOLOGY).equals("Ring")
 		}
+		if (options.containsKey(ENABLE_TRACES)) {
+			enableTrace = options.get(ENABLE_TRACES) as Boolean
+		}
+		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 		
 		buildInputPattern
 		buildTransitionPattern
+	}
+	
+	/**
+	 * Print file content for the instance
+	 * 
+	 */
+	def printInstance(String targetFolder) {
+		val content = instanceFileContent
+		val file = new File(targetFolder + File::separator + instance.name + ".c")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return false
+		} else {
+			return true
+		}
 	}
 	
 	def getInstanceFileContent() '''

@@ -30,18 +30,28 @@ package net.sf.orcc.backends.c
 
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Instance
+import net.sf.orcc.backends.util.CommonPrinter
+import java.io.File
 
 /**
  * Generate CMakeList.txt content
  * 
  * @author Antoine Lorence
  */
-class CMakePrinter {
+class CMakePrinter extends CommonPrinter {
 	
 	val Network network
 	
 	new (Network network) {
 		this.network = network
+	}
+	
+	def printCMakeFiles(String targetFolder) {
+		val root = new File(targetFolder + File::separator + "CMakeLists.txt")
+		val src = new File(targetFolder + File::separator + "src" + File::separator + "CMakeLists.txt")
+		
+		printFile(rootCMakeContent, root)
+		printFile(srcCMakeContent, src)
 	}
 	
 	def rootCMakeContent() '''

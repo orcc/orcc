@@ -23,7 +23,7 @@
                id="net.sf.orcc.dontExportLibrary">
          </option>
          <option
-               id="net.sf.orcc.backends.enableTrace">
+               id="net.sf.orcc.backends.enableTraces">
          </option>
       </backend>
       <backend
@@ -226,8 +226,8 @@
          <option
                defaultValue="false"
                description="Enable traces in fifo"
-               id="net.sf.orcc.backends.enableTrace"
-               name="Enable trace">
+               id="net.sf.orcc.backends.enableTraces"
+               name="Enable traces">
             <checkBox>
             </checkBox>
          </option>

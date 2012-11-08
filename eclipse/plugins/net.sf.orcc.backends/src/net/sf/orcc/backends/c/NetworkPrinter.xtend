@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.c
 
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 import java.util.Map
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
@@ -37,6 +39,7 @@ import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
 import java.util.HashMap
+import java.io.File
 
 /**
  * Compile top Network c source code 
@@ -62,30 +65,44 @@ class NetworkPrinter extends CTemplate {
 	new(Network network, Map<String, Object> options) {
 		this.network = network
 		
-		if (options.containsKey("fifoSize")) {
-			fifoSize = options.get("fifoSize") as Integer
+		if (options.containsKey(FIFO_SIZE)) {
+			fifoSize = options.get(FIFO_SIZE) as Integer
 		} else {
-			fifoSize = 512
-			OrccLogger::warnln("fifoSize option is not set")
+			fifoSize = DEFAULT_FIFO_SIZE
 		}
 
-		if (options.containsKey("useGeneticAlgorithm")) {
-			geneticAlgo = options.get("useGeneticAlgorithm") as Boolean
+		if (options.containsKey(GENETIC_ALGORITHM)) {
+			geneticAlgo = options.get(GENETIC_ALGORITHM) as Boolean
 		}
-		if (options.containsKey("newScheduler")) {
-			newSchedul = options.get("newScheduler") as Boolean
+		if (options.containsKey(NEW_SCHEDULER)) {
+			newSchedul = options.get(NEW_SCHEDULER) as Boolean
 		}
-		if (options.containsKey("ringTopology")) {
-			ringTopology = options.get("ringTopology") as Boolean
+		if (options.containsKey(NEW_SCHEDULER_TOPOLOGY) ) {
+			ringTopology = options.get(NEW_SCHEDULER_TOPOLOGY).equals("Ring")
 		}
-		if (options.containsKey("threadsNb")) {
-			threadsNb = options.get("threadsNb") as Integer
+		if (options.containsKey(THREADS_NB)) {
+			threadsNb = Integer::valueOf(options.get(THREADS_NB) as String)
 		}
-				
+		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
+		
 		//Template data :
 		// TODO : set the right values when genetic algorithm will be fixed
 		numberOfGroups = 0
 		instanceToIdMap = computeInstanceToIdMap
+	}
+	
+	def print(String targetFolder) {
+		
+		val content = networkFileContent
+		val file = new File(targetFolder + File::separator + network.simpleName + ".c")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
 	}
 
 	def getNetworkFileContent() '''

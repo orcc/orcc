@@ -29,6 +29,9 @@
 package net.sf.orcc.backends.c;
 
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
+import static net.sf.orcc.backends.OrccBackendsConstants.ADDITIONAL_TRANSFOS;
+import static net.sf.orcc.backends.OrccBackendsConstants.GENETIC_ALGORITHM;
+import static net.sf.orcc.backends.OrccBackendsConstants.THREADS_NB;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +46,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.DivisionSubstitution;
@@ -101,12 +103,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class CBackend extends AbstractBackend {
 
-	protected boolean enableTrace;
-
-	protected boolean newScheduler;
-	protected CPrinter printer;
-	protected boolean ringTopology;
-
 	/**
 	 * Path to target "src" folder
 	 */
@@ -116,68 +112,23 @@ public class CBackend extends AbstractBackend {
 	 * Configuration mapping
 	 */
 	protected Map<String, List<Instance>> targetToInstancesMap;
-	protected int threadsNb;
-
-	protected boolean useGeneticAlgo;
-
-	protected void computeOptions(Map<String, Object> options) {
-		options.put("newScheduler", newScheduler);
-		options.put("ringTopology", ringTopology);
-		options.put("fifoSize", fifoSize);
-
-		if (useGeneticAlgo) {
-			options.put("useGeneticAlgorithm", useGeneticAlgo);
-			options.put("threadsNb", threadsNb);
-		} else {
-			if (targetToInstancesMap != null) {
-				options.put("threads", targetToInstancesMap);
-				options.put("threadsNb", targetToInstancesMap.size());
-			}
-		}
-	}
 
 	@Override
 	public void doInitializeOptions() {
-		// FIXME: Readd the method in native function and compute the
-		// hierarchical id of each actor.
-		useGeneticAlgo = getAttribute("net.sf.orcc.backends.geneticAlgorithm",
-				false);
-
-		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
-		threadsNb = Integer.parseInt(getAttribute(
-				"net.sf.orcc.backends.processorsNumber", "1"));
-		enableTrace = getAttribute("net.sf.orcc.backends.enableTrace", false);
-		String topology = getAttribute(
-				"net.sf.orcc.backends.newScheduler.topology", "Ring");
-		ringTopology = topology.equals("Ring");
-
-		printer = new CPrinter(!debug);
-		printer.getOptions().put("fifoSize", fifoSize);
-		printer.getOptions().put("enableTrace", enableTrace);
-		printer.getOptions().put("ringTopology", ringTopology);
-		printer.getOptions().put("newScheduler", newScheduler);
-
 		if (debug) {
 			OrccLogger.setLevel(Level.FINEST);
 			OrccLogger.debugln("Debug mode is enabled");
 		}
 
-		// Set build and src directory
-		File srcDir = new File(path + File.separator + "src");
-		File buildDir = new File(path + File.separator + "build");
-		File binDir = new File(path + File.separator + "bin");
+		if (!getAttribute(GENETIC_ALGORITHM, false)
+				&& targetToInstancesMap != null) {
+			options.put(THREADS_NB, targetToInstancesMap.size());
+		}
 
-		// If directories don't exist, create them
-		if (!srcDir.exists()) {
-			srcDir.mkdirs();
-		}
-		if (!buildDir.exists()) {
-			buildDir.mkdirs();
-		}
-		if (!binDir.exists()) {
-			binDir.mkdirs();
-		}
-		srcPath = srcDir.getPath();
+		new File(path + File.separator + "build").mkdirs();
+		new File(path + File.separator + "bin").mkdirs();
+
+		srcPath = path + File.separator + "src";
 	}
 
 	@Override
@@ -206,7 +157,7 @@ public class CBackend extends AbstractBackend {
 
 		// If "-t" option is passed to command line, apply additional
 		// transformations
-		if (getAttribute("net.sf.orcc.backends.additionalTransfos", false)) {
+		if (getAttribute(ADDITIONAL_TRANSFOS, false)) {
 			transformations.add(new StoreOnceTransformation());
 			transformations.add(new DfVisitor<Void>(new SSATransformation()));
 			transformations.add(new DfVisitor<Object>(new PhiRemoval()));
@@ -258,7 +209,7 @@ public class CBackend extends AbstractBackend {
 		}
 	}
 
-	protected Network doTransformNetwork(Network network) {
+	protected void doTransformNetwork(Network network) {
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
 		new Instantiator(false, fifoSize).doSwitch(network);
@@ -276,8 +227,6 @@ public class CBackend extends AbstractBackend {
 
 		new CBroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
-
-		return network;
 	}
 
 	@Override
@@ -287,7 +236,7 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		network = doTransformNetwork(network);
+		doTransformNetwork(network);
 
 		if (debug) {
 			// Serialization of the actors will break proxy link
@@ -311,14 +260,12 @@ public class CBackend extends AbstractBackend {
 			}
 		}
 
-		computeOptions(printer.getOptions());
-
 		// print instances
 		printInstances(network);
 
 		// print network
 		OrccLogger.trace("Printing network... ");
-		if (printer.print(srcPath, network)) {
+		if (new NetworkPrinter(network, options).print(srcPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
@@ -326,16 +273,13 @@ public class CBackend extends AbstractBackend {
 
 		// print CMakeLists
 		OrccLogger.traceln("Printing CMake project files");
-		CommonPrinter.printFile(new CMakePrinter(network).rootCMakeContent(),
-				path + File.separator + "CMakeLists.txt");
-		CommonPrinter.printFile(new CMakePrinter(network).srcCMakeContent(),
-				srcPath + File.separator + "CMakeLists.txt");
+		new CMakePrinter(network).printCMakeFiles(path);
 
-		if (!useGeneticAlgo && targetToInstancesMap != null) {
+		if (!getAttribute(GENETIC_ALGORITHM, false)
+				&& targetToInstancesMap != null) {
 			OrccLogger.traceln("Printing mapping file");
-			CommonPrinter.printFile(
-					new XcfPrinter().compileXcfFile(targetToInstancesMap),
-					srcPath + File.separator + network.getName() + ".xcf");
+			new XcfPrinter(targetToInstancesMap).printXcfFile(srcPath
+					+ File.separator + network.getName() + ".xcf");
 		}
 	}
 
@@ -400,7 +344,7 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return printer.print(srcPath, instance);
+		return new InstancePrinter(instance, options).printInstance(srcPath);
 	}
 
 }

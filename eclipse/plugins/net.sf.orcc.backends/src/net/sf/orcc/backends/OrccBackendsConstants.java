@@ -26,78 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c;
-
-import java.io.File;
-
-import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.backends.CommonPrinter;
-import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Network;
+package net.sf.orcc.backends;
 
 /**
  * @author Antoine Lorence
  * 
  */
-public class CPrinter extends CommonPrinter {
+public class OrccBackendsConstants {
 
-	/**
-	 * 
-	 */
-	public CPrinter(boolean keepUnchangedFiles) {
-		super(keepUnchangedFiles);
+	public static final String GENETIC_ALGORITHM = "net.sf.orcc.backends.geneticAlgorithm";
+	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
+	public static final String NEW_SCHEDULER_TOPOLOGY = "net.sf.orcc.backends.newScheduler.topology";
+
+	public static enum Topology {
+		Ring, Mesh
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.orcc.backends.CommonPrinter#print(java.lang.String,
-	 * net.sf.orcc.df.Instance)
-	 */
-	@Override
-	public boolean print(String folder, Instance instance) {
-		String file = folder + File.separator + instance.getName() + ".c";
+	public static final String THREADS_NB = "net.sf.orcc.backends.processorsNumber";
 
-		File targetActorFile = new File(file);
+	public static final String CONVERT_MULTI2MONO = "net.sf.orcc.backends.multi2mono";
+	public static final String ADDITIONAL_TRANSFOS = "net.sf.orcc.backends.add_transfos";
 
-		CharSequence fileContent = new InstancePrinter(instance, options)
-				.getInstanceFileContent();
-
-		if (!needToReplace(targetActorFile, fileContent.toString())) {
-			return true;
-		}
-
-		if (!printFile(fileContent, file)) {
-			throw new OrccRuntimeException("Unable to write file " + file);
-		}
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.orcc.backends.CommonPrinter#print(java.lang.String,
-	 * net.sf.orcc.df.Network)
-	 */
-	@Override
-	public boolean print(String folder, Network network) {
-
-		String targetNetworkPath = folder + File.separator
-				+ network.getSimpleName() + ".c";
-
-		File targetFile = new File(targetNetworkPath);
-
-		CharSequence fileContent = new NetworkPrinter(network, options)
-				.getNetworkFileContent();
-
-		if (!needToReplace(targetFile, fileContent.toString())) {
-			return true;
-		}
-
-		if (!printFile(fileContent, targetNetworkPath)) {
-			throw new OrccRuntimeException("Unable to write file "
-					+ targetNetworkPath);
-		}
-		return false;
-	}
 }

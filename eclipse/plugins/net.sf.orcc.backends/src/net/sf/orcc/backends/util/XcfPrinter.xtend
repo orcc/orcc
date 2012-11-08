@@ -31,6 +31,7 @@ package net.sf.orcc.backends.util
 import java.util.List
 import java.util.Map
 import net.sf.orcc.df.Instance
+import java.io.File
 
 /**
  * Printer used to create the xcf file, containing information on
@@ -39,11 +40,21 @@ import net.sf.orcc.df.Instance
  * @author Antoine Lorence
  * 
  */
-class XcfPrinter {
+class XcfPrinter extends CommonPrinter {
+	
+	Map<String, List<Instance>> coreToInstanceMap
 	
 	var i = 0
 	
-	def compileXcfFile(Map<String, List<Instance>> coreToInstanceMap) '''
+	new(Map<String, List<Instance>> coreToInstanceMap) {
+		this.coreToInstanceMap = coreToInstanceMap
+	}
+	
+	def printXcfFile(String fileName) {
+		printFile(compileXcfFile, new File(fileName))
+	}
+	
+	def compileXcfFile() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<Configuration>
 			<Partitioning>

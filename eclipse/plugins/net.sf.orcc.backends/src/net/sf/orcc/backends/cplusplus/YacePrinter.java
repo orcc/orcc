@@ -67,6 +67,7 @@ public class YacePrinter extends CommonPrinter {
 		super(keepUnchangedFiles);
 	}
 
+	@Override
 	public Map<String, Object> getOptions() {
 		return options;
 	}
@@ -82,6 +83,7 @@ public class YacePrinter extends CommonPrinter {
 	 *            the instance to generate code for
 	 * @return <code>true</code> if the instance was cached
 	 */
+	@Override
 	public boolean print(String path, Instance instance) {
 		String file = path + File.separator + instance.getName() + ".h";
 		if (instance.isNetwork()
@@ -122,6 +124,7 @@ public class YacePrinter extends CommonPrinter {
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
+	@Override
 	public boolean print(String path, Network network) {
 		String file = path + File.separator + network.getSimpleName() + ".cpp";
 		if (keepUnchangedFiles) {
@@ -137,16 +140,12 @@ public class YacePrinter extends CommonPrinter {
 		printFile(sequence, file);
 
 		if (options.containsKey("threads")) {
-			// TODO when all backends will run with Xtend : replace
-			// "options" map by another king of object, more
-			// specific (which not contain java.lang.Object instances)
 			@SuppressWarnings("unchecked")
 			Map<String, List<Instance>> instanceToCoreMap = (Map<String, List<Instance>>) options
 					.get("threads");
 
-			file = path + File.separator + network.getSimpleName() + ".xcf";
-			sequence = new XcfPrinter().compileXcfFile(instanceToCoreMap);
-			printFile(sequence, file);
+			new XcfPrinter(instanceToCoreMap).printXcfFile(path
+					+ File.separator + network.getSimpleName() + ".xcf");
 		}
 
 		file = path + File.separator + "CMakeLists.txt";

@@ -40,6 +40,9 @@ import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.backends.OrccBackendsConstants.ADDITIONAL_TRANSFOS;
+import static net.sf.orcc.backends.OrccBackendsConstants.CONVERT_MULTI2MONO;
+import static net.sf.orcc.backends.OrccBackendsConstants.NEW_SCHEDULER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.util.OrccUtil.getFile;
@@ -167,7 +170,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * Options of backend execution. Its content can be manipulated with
 	 * {@link #getAttribute} and {@link #setAttribute}
 	 */
-	private Map<String, Object> options;
+	protected Map<String, Object> options;
 
 	/**
 	 * Path where output files will be written.
@@ -848,8 +851,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		mergeActions = classify && getAttribute(MERGE_ACTIONS, false);
 		mergeActors = classify && getAttribute(MERGE_ACTORS, false);
 
-		convertMulti2Mono = getAttribute("net.sf.orcc.backends.multi2mono",
-				false);
+		convertMulti2Mono = getAttribute(CONVERT_MULTI2MONO, false);
 
 		String outputFolder;
 		Object obj = options.get(OUTPUT_FOLDER);
@@ -864,10 +866,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		if (outputFolder.isEmpty()) {
-			String tmpdir = System.getProperty("java.io.tmpdir");
-			File output = new File(tmpdir, "orcc");
-			output.mkdir();
-			outputFolder = output.getAbsolutePath();
+			File tempOrccDir = new File(System.getProperty("java.io.tmpdir"),
+					"orcc");
+			tempOrccDir.mkdir();
+			outputFolder = tempOrccDir.getAbsolutePath();
 		}
 
 		// set output path
@@ -962,12 +964,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 						type.equals("2") || type.equals("3"));
 			}
 
-			optionMap.put("net.sf.orcc.backends.newScheduler",
-					line.hasOption('s'));
-			optionMap.put("net.sf.orcc.backends.multi2mono",
-					line.hasOption("m2m"));
-			optionMap.put("net.sf.orcc.backends.additionalTransfos",
-					line.hasOption('t'));
+			optionMap.put(NEW_SCHEDULER, line.hasOption('s'));
+			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
+			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 
 			try {
 				setOptions(optionMap);
