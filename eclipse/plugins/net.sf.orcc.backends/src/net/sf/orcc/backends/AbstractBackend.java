@@ -902,7 +902,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("c", "classify", false, "Classify the given network");
 		options.addOption("smt", "smt-solver", true,
 				"Set path to the binary of the SMT solver (Z3 v4.12+)");
-		options.addOption("m", "merge", false, "Merge (1) static actions "
+		options.addOption("m", "merge", true, "Merge (1) static actions "
 				+ "(2) static actors (3) both");
 		options.addOption("s", "advanced-scheduler", false, "(C) Use the "
 				+ "data-driven/demand-driven strategy for the actor-scheduler");
