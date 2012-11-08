@@ -975,7 +975,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				compile();
 				return IApplication.EXIT_OK;
 			} catch (OrccRuntimeException e) {
-				OrccLogger.severeln(e.getMessage());
 				OrccLogger.severeln("Could not run the back-end with \""
 						+ networkName + "\" :");
 				OrccLogger.severeln(e.getLocalizedMessage());
