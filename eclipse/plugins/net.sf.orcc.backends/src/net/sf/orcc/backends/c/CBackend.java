@@ -195,6 +195,9 @@ public class CBackend extends AbstractBackend {
 		if (mergeActions) {
 			new ActionMerger().doSwitch(actor);
 		}
+		if (convertMulti2Mono) {
+			new Multi2MonoToken().doSwitch(actor);
+		}
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());

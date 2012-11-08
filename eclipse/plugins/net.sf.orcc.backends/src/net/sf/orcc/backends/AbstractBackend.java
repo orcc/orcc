@@ -156,6 +156,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected boolean classify;
 	protected boolean mergeActions;
 	protected boolean mergeActors;
+	protected boolean convertMulti2Mono;
 
 	/**
 	 * the progress monitor
@@ -847,6 +848,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		mergeActions = classify && getAttribute(MERGE_ACTIONS, false);
 		mergeActors = classify && getAttribute(MERGE_ACTORS, false);
 
+		convertMulti2Mono = getAttribute("net.sf.orcc.backends.multi2mono",
+				false);
+
 		String outputFolder;
 		Object obj = options.get(OUTPUT_FOLDER);
 		if (obj instanceof String) {
@@ -902,6 +906,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				+ "(2) static actors (3) both");
 		options.addOption("s", "advanced-scheduler", false, "(C) Use the "
 				+ "data-driven/demand-driven strategy for the actor-scheduler");
+		options.addOption("m2m", "multi2mono", false,
+				"Transform high-level actors with multi-tokens actions"
+						+ " in low-level actors with mono-token actions");
 
 		// FIXME: choose independently the transformation to apply
 		options.addOption("t", "transfo_add", false,
@@ -957,6 +964,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			optionMap.put("net.sf.orcc.backends.newScheduler",
 					line.hasOption('s'));
+			optionMap.put("net.sf.orcc.backends.multi2mono",
+					line.hasOption("m2m"));
 			optionMap.put("net.sf.orcc.backends.additionalTransfos",
 					line.hasOption('t'));
 
