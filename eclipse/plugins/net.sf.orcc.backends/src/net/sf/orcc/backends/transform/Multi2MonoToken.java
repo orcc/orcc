@@ -30,11 +30,11 @@
 package net.sf.orcc.backends.transform;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Action;
@@ -203,6 +203,21 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			}
 			return null;
 		}
+		
+		@Override
+		public Object caseInstLoad(InstLoad load) {
+			Var varSource = load.getSource().getVariable();
+			Pattern pattern = EcoreHelper.getContainerOfType(varSource,
+					Pattern.class);
+			if (pattern != null) {
+				Port testPort = pattern.getPort(varSource);
+				if (port.equals(testPort)) {
+					// change tab Name
+					load.getSource().setVariable(tab);
+				}
+			}
+			return null;
+		}
 
 	}
 
@@ -217,14 +232,13 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	private List<Var> inputBuffers;
 	private int inputIndex;
 	private List<Port> inputPorts;
-	private List<Action> noRepeatActions;
+	private Set<Action> noRepeatActions;
 	private int numTokens;
 	private int outputIndex;
 	private Port port;
 	private List<Var> readIndexes;
 	private boolean repeatInput;
 	private Var result;
-	private Map<String, State> statesMap;
 	private List<Action> visitedActions;
 	private List<String> visitedActionsNames;
 	private int visitedRenameIndex;
@@ -298,15 +312,25 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	/**
 	 * Adds an FSM to an actor if it has not already
 	 * 
+	 * @param initialState
+	 *            initial state of the new FSM
 	 */
-	private void addFsm() {
+	private void setFsm(State initialState) {
 		fsm = DfFactory.eINSTANCE.createFSM();
-		State initState = statesMap.get("init");
-		fsm.getStates().add(initState);
-		fsm.setInitialState(initState);
+		fsm.getStates().add(initialState);
+		fsm.setInitialState(initialState);
 		for (Action action : actor.getActionsOutsideFsm()) {
-			fsm.addTransition(initState, action, initState);
+			fsm.addTransition(initialState, action, initialState);
 		}
+
+		// ListIterator<Action> it = actor.getActionsOutsideFsm()
+		// .listIterator();
+		// while (it.hasNext()) {
+		// Action actionUntagged = it.next();
+		// if (!actionUntagged.getTag().isEmpty()){
+		// actor.getActionsOutsideFsm().remove(actionUntagged);
+		// }
+		// }
 
 		actor.getActionsOutsideFsm().clear();
 		actor.setFsm(fsm);
@@ -323,9 +347,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		AddedUntaggedActions = new ArrayList<Action>();
 		inputBuffers = new ArrayList<Var>();
 		inputPorts = new ArrayList<Port>();
-		noRepeatActions = new ArrayList<Action>();
+		noRepeatActions = new HashSet<Action>();
 		readIndexes = new ArrayList<Var>();
-		statesMap = new HashMap<String, State>();
 		writeIndexes = new ArrayList<Var>();
 		bufferSizes = new ArrayList<Integer>();
 		visitedActions = new ArrayList<Action>();
@@ -816,9 +839,12 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		if (fsm == null) {
 			List<Action> actions = new ArrayList<Action>(
 					actor.getActionsOutsideFsm());
+
 			// check repeats on all actions
 			boolean transformOutFSM = false;
 			for (Action verifAction : actions) {
+				// if (!verifAction.getTag().isEmpty()) {
+
 				// check repeats on input ports
 				for (Entry<Port, Integer> verifEntry : verifAction
 						.getInputPattern().getNumTokensMap().entrySet()) {
@@ -837,16 +863,17 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 						break;
 					}
 				}
+				// }
 			}
 			if (transformOutFSM == true) {
 				// ////////
 				State initState = DfFactory.eINSTANCE.createState("init");
-				statesMap.put("init", initState);
-				// statesMap.put("init", initState);
 				// no FSM: simply visit all the actions
-				addFsm();
+				setFsm(initState);
 				for (Action action : actions) {
-					visitTransition(initState, initState, action);
+					if (!action.getTag().isEmpty()) {
+						visitTransition(initState, initState, action);
+					}
 				}
 				modifyNoRepeatActionsInFSM();
 				transformOutFSM = false;
@@ -889,7 +916,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 						fsm.getTransitions().add(t);
 					}
 				}
-				transitionsList.clear();
+				//transitionsList.clear();
 				modifyNoRepeatActionsInFSM();
 				transformFSM = false;
 			}
@@ -909,7 +936,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			// modify only untagged actions existing before transformation
 			if (!AddedUntaggedActions.contains(action)) {
 				scanUntaggedInputs(action);
-				scanUntaggedOutputs(action);
+				// scanUntaggedOutputs(action);
 			}
 		}
 	}
@@ -1192,11 +1219,11 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 *            action containing the outputs to check
 	 */
 	private void scanUntaggedOutputs(Action action) {
-		for (Entry<Port, Integer> verifEntry : action.getInputPattern()
+		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
 				.getNumTokensMap().entrySet()) {
 			int verifNumTokens = verifEntry.getValue();
 			if (verifNumTokens > 1) {
-				for (Entry<Port, Integer> entry : action.getInputPattern()
+				for (Entry<Port, Integer> entry : action.getOutputPattern()
 						.getNumTokensMap().entrySet()) {
 					numTokens = entry.getValue();
 					Port verifPort = entry.getKey();
@@ -1239,7 +1266,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	}
 
 	/**
-	 * 
+	 * if an already transformed action is reused in an another FSM transition, this method uses the transformed action to connect it to the current FSM transition
 	 * 
 	 * @param action
 	 * @param source
@@ -1377,7 +1404,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		// verify if the action is already transformed ==> update FSM
 		verifVisitedActions(action, sourceState, targetState);
 
-		if (!repeatInput && !noRepeatActions.contains(action)) {
+		if (!repeatInput) {
 			noRepeatActions.add(action);
 		}
 		repeatInput = false;
