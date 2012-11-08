@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.c
 
-import net.sf.orcc.backends.util.TemplateUtil
+import net.sf.orcc.backends.util.CommonPrinter
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
@@ -45,7 +45,7 @@ import net.sf.orcc.ir.Type
  * @author Antoine Lorence
  * 
  */
-class CTemplate extends TemplateUtil {
+class CTemplate extends CommonPrinter {
 	
 	new(){
 		this.exprPrinter = new CExpressionPrinter

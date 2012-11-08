@@ -15,11 +15,15 @@ import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
 import java.io.FileOutputStream
 import java.io.PrintStream
-
-import static net.sf.orcc.backends.util.TemplateUtil.*
 import net.sf.orcc.util.OrccLogger
 
-class TemplateUtil extends AbstractIrVisitor<CharSequence> {
+import static net.sf.orcc.backends.util.CommonPrinter.*
+
+/**
+ * Define commons methods for all backends printers
+ * 
+ */
+class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	
 	protected ExpressionPrinter exprPrinter
 	protected var overwriteAllFiles = false

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
-import net.sf.orcc.backends.util.TemplateUtil
+import net.sf.orcc.backends.util.CommonPrinter
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Port
 import net.sf.orcc.ir.ExprList
@@ -50,7 +50,7 @@ import net.sf.orcc.ir.Var
  * @author Antoine Lorence
  * 
  */
-class LLVMTemplate extends TemplateUtil {
+class LLVMTemplate extends CommonPrinter {
 	
 	var Type currentType = null
 	

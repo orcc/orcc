@@ -30,7 +30,7 @@ package net.sf.orcc.backends.java
 
 import java.util.ArrayList
 import java.util.List
-import net.sf.orcc.backends.util.TemplateUtil
+import net.sf.orcc.backends.util.CommonPrinter
 import net.sf.orcc.df.Argument
 import net.sf.orcc.df.Port
 import net.sf.orcc.ir.Arg
@@ -56,7 +56,7 @@ import org.eclipse.emf.common.util.EList
  * @author Antoine Lorence
  * 
  */
-class JavaTemplate extends TemplateUtil {
+class JavaTemplate extends CommonPrinter {
 	
 	
 	new(){
