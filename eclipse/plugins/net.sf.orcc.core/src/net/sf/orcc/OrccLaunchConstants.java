@@ -81,10 +81,9 @@ public interface OrccLaunchConstants {
 	public static final String ENABLE_COMP = "net.sf.orcc.simulators.enableComparison";
 
 	/**
-	 * When enabled, interpreter traces each time data is written to
-	 * (output)FIFO
+	 * When enabled, interpreter traces each time data is written to (output)
 	 */
-	public static final String ENABLE_TRACES = "net.sf.orcc.simulators.enableTraces";
+	public static final String ENABLE_TRACES = "net.sf.orcc.backends.enableTraces";
 
 	/**
 	 * Size of FIFO channels when not specified by the network.
@@ -92,7 +91,8 @@ public interface OrccLaunchConstants {
 	public static final String FIFO_SIZE = "net.sf.orcc.fifoSize";
 
 	/**
-	 * When set, a golden reference has to be compared with the ouput data of the network.
+	 * When set, a golden reference has to be compared with the ouput data of
+	 * the network.
 	 */
 	public static final String GOLDEN_REFERENCE = "net.sf.orcc.simulators.goldenReference";
 
@@ -177,11 +177,11 @@ public interface OrccLaunchConstants {
 	 * with options in the back-ends plug-in.
 	 */
 	public static final String XDF_FILE = "net.sf.orcc.core.xdfFile";
-	
+
 	public static final String MERGE_ACTIONS = "net.sf.orcc.core.mergeActions";
-	
+
 	public static final String MERGE_ACTORS = "net.sf.orcc.core.mergeActors";
-	
+
 	public static final String CLASSIFY = "net.sf.orcc.core.classify";
 
 }
