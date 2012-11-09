@@ -33,9 +33,12 @@ import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
+import net.sf.orcc.ir.Arg
+import net.sf.orcc.ir.InstCall
+import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
-import net.sf.orcc.ir.InstCall
+import org.eclipse.emf.common.util.EList
 
 class LLVM_Actor extends InstancePrinter {
 	
@@ -46,7 +49,12 @@ class LLVM_Actor extends InstancePrinter {
 		this.portToIdMap = portToIdMap
 	}
 	
-	override printAddrSpace(Port port) ''' addrspace(«portToIdMap.get(port)»)'''
+	override printAddrSpace(Port port) {
+		val id = portToIdMap.get(port);
+		if(id != null) {
+			''' addrspace(«id»)'''
+		}
+	}
 	
 	override printProperties(Port port) ''' volatile'''
 	
@@ -112,9 +120,25 @@ class LLVM_Actor extends InstancePrinter {
 		«IF call.print»
 			call i32 (i8*, ...)* @printf(«call.parameters.join(", ", [printParameter])»)
 		«ELSEIF call.procedure.native»
-			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»tail call void asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "ir,ir"(i32 0«IF call.parameters != null», «formatParameters(call.procedure.parameters, call.parameters).join(", ")»«ENDIF») nounwind
+			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF call.target != null»=ir, «ENDIF»ir«call.parameters.ir»"(i32 0«IF !call.parameters.nullOrEmpty», «formatParameters(call.procedure.parameters, call.parameters).join(", ")»«ENDIF») nounwind
 		«ELSE»
 			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («formatParameters(call.procedure.parameters, call.parameters).join(", ")»)
 		«ENDIF»
 	'''
+	
+	override print(Procedure procedure) '''
+		«IF !procedure.native»
+			«super.print(procedure)»
+		«ENDIF»
+	'''
+	
+	def getIr(EList<Arg> args) {
+		val irs = new String;
+		if(args.size != 0) {
+			for (i : 0..args.size-1) {
+				irs.concat(", ir")
+			}
+		}
+		return irs
+	}
 }

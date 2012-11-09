@@ -65,14 +65,16 @@ class TCE_Design_PNDF extends ArchitectureSwitch<CharSequence> {
 			<tpef>«path»/«processor.name»/«processor.name».tpef</tpef>
 			«FOR instance: processor.mappedActors»
 				«FOR input: instance.actor.inputs.filter(port | !port.native)»
-					«var incoming = instance.incomingPortMap.get(input)»
-					<input name="fifo_«incoming.getValueAsObject("id").toString»">
-						<address-space>«processor.getMemory(incoming).name»</address-space>
-						<signed>«input.type.int»</signed>
-						<width>«input.width»</width>
-						<size>«incoming.size»</size>
-						<trace>«path»/trace/«instance.name»_«input.name».txt</trace>
-					</input>
+					«IF instance.incomingPortMap.get(input) != null»
+						«var incoming = instance.incomingPortMap.get(input)»
+						<input name="fifo_«incoming.getValueAsObject("id").toString»">
+							<address-space>«processor.getMemory(incoming).name»</address-space>
+							<signed>«input.type.int»</signed>
+							<width>«input.width»</width>
+							<size>«incoming.size»</size>
+							<trace>«path»/trace/«instance.name»_«input.name».txt</trace>
+						</input>
+					«ENDIF»
 				«ENDFOR»
 				«FOR output : instance.actor.outputs.filter(port | !port.native)»
 					«var outgoing = instance.outgoingPortMap.get(output).get(0)»
