@@ -184,12 +184,10 @@ public class ModelPropertySource implements IPropertySource,
 					return;
 				}
 
-				// For instance name
-				if ("id".equals(id)) {
-					// update only if another instance has not the same
-					if (graph.vertexExistsCaseInsensitive(str)) {
-						return;
-					}
+				// Ensure that "id" property is unique in the graph (in case
+				// insensitive mode)
+				if ("id".equals(id) && graph.vertexExistsCaseInsensitive(str)) {
+					return;
 				}
 
 				ParameterChangeValueCommand command = new ParameterChangeValueCommand(
