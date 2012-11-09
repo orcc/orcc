@@ -51,20 +51,46 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
+import java.util.Map
+import java.io.File
+
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.util.OrccLogger
 
 /*
  * An actor printer.
  *  
  * @author Ghislain Roquier
  * 
- */class ActorPrinter extends ExprAndTypePrinter {
+ */class InstancePrinter extends ExprAndTypePrinter {
 	
 	Instance instance
 	
-	def compileInstance(Instance instance)  {
+	new (Instance instance, Map<String, Object> options) {
 		this.instance = instance
-		var actor = instance.actor
-		var connectedOutput = [ Port port | instance.outgoingPortMap.get(port) != null ]
+		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
+	}
+	
+	def print(String targetFolder) {
+		
+		val content = compileInstance
+		val file = new File(targetFolder + File::separator + instance.name + ".h")
+		
+		OrccLogger::traceln("overwrite : "+overwriteAllFiles)
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
+	}
+	
+	def compileInstance()  {
+		val actor = instance.actor
+		val connectedOutput = [ Port port | instance.outgoingPortMap.get(port) != null ]
 		'''
 		#ifndef __«instance.name.toUpperCase»_H__
 		#define __«instance.name.toUpperCase»_H__

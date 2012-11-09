@@ -29,14 +29,7 @@
  
  package net.sf.orcc.backends.cplusplus
 
-
-
-/*
- * A network printer.
- *  
- * @author Ghislain Roquier
- * 
- */
+import java.io.File
 import java.util.List
 import java.util.Map
 import net.sf.orcc.backends.cplusplus.entities.Communicator
@@ -47,18 +40,58 @@ import net.sf.orcc.backends.cplusplus.entities.Sender
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 
+import static net.sf.orcc.OrccLaunchConstants.*
+
+/*
+ * A network printer.
+ *  
+ * @author Ghislain Roquier
+ * 
+ */
 class NetworkPrinter extends ExprAndTypePrinter {
 	
 	EntitiesPrinter entitiesPrinter
 	
 	List<Interface> interfaces
 	
-	new () {
+	Network network
+	
+	new (Network network, Map<String, Object> options) {
 		entitiesPrinter = new EntitiesPrinter
 		interfaces = newArrayList;
+		
+		this.network = network
+		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
-	def compileNetwork(Network network, Map options) '''
+		
+	def printNetwork(String targetFolder) {
+		
+		val content = compileNetwork
+		val file = new File(targetFolder + File::separator + network.simpleName + ".cpp")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
+	}
+	
+	def printCMakeLists(String targetFolder) {
+		val content = compileCmakeLists
+		val file = new File(targetFolder + File::separator + "CMakeLists.txt")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
+	}
+	
+	def compileNetwork() '''
 		#include <map>
 		#include <string>
 
@@ -159,7 +192,7 @@ class NetworkPrinter extends ExprAndTypePrinter {
 	'''
 	}
 	
-	def compileCmakeLists(Network network, Map options) '''
+	def compileCmakeLists() '''
 		cmake_minimum_required (VERSION 2.8)
 		
 		project («network.simpleName»)

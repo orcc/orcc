@@ -35,10 +35,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
+import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Entity;
@@ -75,7 +77,10 @@ public class YaceBackend extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-
+		if (debug) {
+			OrccLogger.setLevel(Level.FINEST);
+			OrccLogger.debugln("Debug mode is enabled");
+		}
 	}
 
 	@Override
@@ -112,7 +117,7 @@ public class YaceBackend extends AbstractBackend {
 
 	}
 
-	private Network doTransformNetwork(Network network) {
+	private void doTransformNetwork(Network network) {
 		OrccLogger.trace("Instantiating... ");
 		new Instantiator(false).doSwitch(network);
 		OrccLogger.traceRaw("done\n");
@@ -127,8 +132,6 @@ public class YaceBackend extends AbstractBackend {
 		if (mergeActors) {
 			new ActorMerger().doSwitch(network);
 		}
-
-		return network;
 	}
 
 	@Override
@@ -138,8 +141,8 @@ public class YaceBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		network = doTransformNetwork(network);
 
+		doTransformNetwork(network);
 		transformActors(network.getAllActors());
 
 		network.computeTemplateMaps();
@@ -163,10 +166,7 @@ public class YaceBackend extends AbstractBackend {
 
 	@Override
 	public boolean printInstance(Instance instance) {
-		YacePrinter printer = new YacePrinter(!debug);
-		printer.print(path, instance);
-
-		return false;
+		return new InstancePrinter(instance, options).print(path) > 1;
 	}
 
 	/**
@@ -176,17 +176,21 @@ public class YaceBackend extends AbstractBackend {
 	 *            a network
 	 */
 	public void printNetwork(Network network) {
-		YacePrinter printer = new YacePrinter();
-		printer.getOptions().put("codesign", getAttribute("codesign", false));
 
 		Map<String, List<Instance>> targetToInstancesMap;
+
 		for (String component : mapping.values()) {
 			if (!component.isEmpty()) {
+
 				targetToInstancesMap = new HashMap<String, List<Instance>>();
 				List<Instance> unmappedInstances = new ArrayList<Instance>();
+
 				BackendUtil.computeMapping(network, mapping,
 						targetToInstancesMap, unmappedInstances);
-				printer.getOptions().put("threads", targetToInstancesMap);
+
+				new XcfPrinter(targetToInstancesMap).printXcfFile(path
+						+ File.separator + network.getSimpleName() + ".xcf");
+
 				for (Instance instance : unmappedInstances) {
 					OrccLogger.warnln("Warning: The instance '"
 							+ instance.getName() + "' is not mapped.");
@@ -195,7 +199,11 @@ public class YaceBackend extends AbstractBackend {
 			}
 		}
 
-		printer.print(path, network);
+		NetworkPrinter printer = new NetworkPrinter(network, options);
+
+		printer.printNetwork(path);
+		printer.printCMakeLists(path);
+
 	}
 
 	@Override

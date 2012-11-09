@@ -29,7 +29,8 @@
 
 package net.sf.orcc.backends.cplusplus
 
-import net.sf.orcc.ir.util.IrSwitch
+import net.sf.orcc.backends.util.CommonPrinter
+import net.sf.orcc.ir.ExprBinary
 import net.sf.orcc.ir.ExprBool
 import net.sf.orcc.ir.ExprFloat
 import net.sf.orcc.ir.ExprInt
@@ -38,13 +39,12 @@ import net.sf.orcc.ir.ExprString
 import net.sf.orcc.ir.ExprUnary
 import net.sf.orcc.ir.ExprVar
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.TypeFloat
 import net.sf.orcc.ir.TypeInt
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
-import net.sf.orcc.ir.ExprBinary
-import net.sf.orcc.ir.TypeFloat
 
 /*
  * An abstract printer.
@@ -52,7 +52,7 @@ import net.sf.orcc.ir.TypeFloat
  * @author Ghislain Roquier
  * 
  */
-class ExprAndTypePrinter extends IrSwitch {
+class ExprAndTypePrinter extends CommonPrinter {
 		
 	override caseExprBinary(ExprBinary expr) '''(«expr.getE1.doSwitch» «expr.op.text» «expr.getE2.doSwitch»)'''
 
