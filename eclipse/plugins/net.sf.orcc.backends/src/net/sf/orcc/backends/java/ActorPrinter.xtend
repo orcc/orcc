@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.java
 
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.State
@@ -44,6 +46,8 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
+import java.util.Map
+import java.io.File
 
 /*
  * Compile Top_network Java source code 
@@ -55,8 +59,24 @@ class ActorPrinter extends JavaTemplate {
 	
 	Actor actor
 	
-	new(Actor actor){
+	new(Actor actor, Map<String, Object> options){
 		this.actor = actor
+		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
+	}
+	
+		
+	def print(String targetFolder) {
+		
+		val content = getActorFileContent
+		val file = new File(targetFolder + File::separator + actor.simpleName + ".java")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
 	}
 
 	def getActorFileContent() '''

@@ -28,9 +28,12 @@
  */
 package net.sf.orcc.backends.java
 
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 import java.util.Map
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
+import java.io.File
 
 /*
  * Compile Top_network Java source code 
@@ -42,12 +45,54 @@ class NetworkPrinter extends JavaTemplate {
 	
 	Network network;
 	
-	new(Network network){
+	new(Network network, Map<String, Object> options){
 		super()
 		this.network = network
+		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
-	def getNetworkFileContent(Map<String, Object> options) '''
+			
+	def printNetwork(String targetFolder) {
+		
+		var content = getNetworkFileContent
+		var file = new File(targetFolder + File::separator + network.simpleName + ".java")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
+		
+	}		
+		
+	def printEclipseProjectsFiles(String targetFolder) {
+		
+		var filesCached = 0
+		
+		var content = classpathFileContent
+		var file = new File(targetFolder + File::separator + ".classpath")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+		} else {
+			filesCached = filesCached + 1
+		}
+		
+		content = projectFileContent
+		file = new File(targetFolder + File::separator + ".project")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+		} else {
+			filesCached = filesCached + 1
+		}
+		
+		return filesCached
+	}
+	
+	def getNetworkFileContent() '''
 		// File generated from «network.fileName»
 
 		import net.sf.orcc.runtime.*;
@@ -145,7 +190,7 @@ class NetworkPrinter extends JavaTemplate {
 		return true
 	}
 	
-	def getProjectFileContent(Map<String, Object> options) '''
+	def getProjectFileContent() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<projectDescription>
 			<name>«network.simpleName»</name>
@@ -165,7 +210,7 @@ class NetworkPrinter extends JavaTemplate {
 		</projectDescription>
 	'''
 	
-	def getClasspathFileContent(Map<String, Object> options) '''
+	def getClasspathFileContent() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<classpath>
 			<classpathentry kind="src" path="libs"/>

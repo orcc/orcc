@@ -58,8 +58,6 @@ import org.eclipse.core.resources.IFile;
  */
 public class JavaBackend extends AbstractBackend {
 
-	private JavaPrinter printer;
-
 	private String srcPath;
 	private String libsPath;
 
@@ -81,10 +79,9 @@ public class JavaBackend extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		printer = new JavaPrinter(!debug);
-
-		srcPath = path + File.separator + "src";
 		libsPath = path + File.separator + "libs";
+		srcPath = path + File.separator + "src";
+		new File(path + File.separator + "bin").mkdirs();
 	}
 
 	@Override
@@ -151,10 +148,8 @@ public class JavaBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-
 		String folder = srcPath + File.separator + OrccUtil.getFolder(actor);
-
-		return printer.print(folder, actor);
+		return new ActorPrinter(actor, options).print(folder) > 0;
 	}
 
 	/**
@@ -164,8 +159,8 @@ public class JavaBackend extends AbstractBackend {
 	 *            a network
 	 */
 	protected void printNetwork(Network network) {
-		printer.printEclipseProjectFiles(path, network);
-		printer.print(srcPath, network);
+		NetworkPrinter printer = new NetworkPrinter(network, options);
+		printer.printNetwork(srcPath);
+		printer.printEclipseProjectsFiles(path);
 	}
-
 }
