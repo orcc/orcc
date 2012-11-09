@@ -97,7 +97,6 @@ public class TTABackend extends LLVMBackend {
 
 	private FPGA fpga;
 	private String libPath;
-	private boolean profile;
 	private boolean reduceConnections;
 
 	private Map<Port, Integer> computePortToIdMap(Vertex vertex) {
@@ -126,7 +125,6 @@ public class TTABackend extends LLVMBackend {
 				false);
 		fpga = FPGA.builder(getAttribute("net.sf.orcc.backends.tta.fpga",
 				"Stratix III (EP3SL150F1152C2)"));
-		profile = getAttribute("net.sf.orcc.backends.profile", false);
 		configuration = ProcessorConfiguration.getByName(getAttribute(
 				"net.sf.orcc.backends.llvm.tta.configuration", "Huge"));
 		reduceConnections = getAttribute(
