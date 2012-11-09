@@ -35,6 +35,7 @@ import os
 import shutil
 import stat
 import sys
+import subprocess
 
 
 class Design:
@@ -50,6 +51,7 @@ class Design:
 
     def compile(self, srcPath, libPath, args, debug):
         os.putenv("TCE_OSAL_PATH", os.path.join(libPath, "opset"))
+        retcode = subprocess.call(["buildopset", os.path.join(libPath, "opset", "orcc")])
 
         for processor in self.processors:
             print ">> Compile code of " + processor.id + "."
