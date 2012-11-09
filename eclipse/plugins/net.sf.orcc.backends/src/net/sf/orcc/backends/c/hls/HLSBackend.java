@@ -41,7 +41,7 @@ import java.util.logging.Level;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.CMakePrinter;
 import net.sf.orcc.backends.c.InstancePrinter;
-import net.sf.orcc.backends.c.NetworkPrinter;
+import net.sf.orcc.backends.c.hls.NetworkPrinter;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.TypeResizer;
