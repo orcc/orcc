@@ -49,6 +49,8 @@ class Design:
 
 
     def compile(self, srcPath, libPath, args, debug):
+        os.putenv("TCE_OSAL_PATH", os.path.join(libPath, "opset"))
+
         for processor in self.processors:
             print ">> Compile code of " + processor.id + "."
             retcode = processor.compile(srcPath, libPath, args, debug)

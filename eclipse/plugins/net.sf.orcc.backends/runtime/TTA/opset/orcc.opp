@@ -7,9 +7,9 @@
     <inputs>1</inputs>
     <outputs>0</outputs>
     <side-effects/>
-    <in id="1" type="SIntWord"/>
+    <in id="1" type="UIntWord"/>
     <trigger-semantics>
-      EXEC_OPERATION(stdout, IO(1));
+      EXEC_OPERATION(source_init, IO(1));
     </trigger-semantics>
   </operation>
 
@@ -17,11 +17,12 @@
     <name>SOURCE_READBYTE</name>
     <description></description>
     <inputs>1</inputs>
-    <outputs>0</outputs>
+    <outputs>1</outputs>
     <side-effects/>
-    <in id="1" type="SIntWord"/>
+    <in id="1" type="UIntWord"/>
+    <out id="2" type="UIntWord"/>
     <trigger-semantics>
-      EXEC_OPERATION(stdout, IO(1));
+      EXEC_OPERATION(source_readbyte, IO(1), IO(2));
     </trigger-semantics>
   </operation>
 
@@ -29,11 +30,12 @@
     <name>SOURCE_SIZEOFFILE</name>
     <description></description>
     <inputs>1</inputs>
-    <outputs>0</outputs>
+    <outputs>1</outputs>
     <side-effects/>
-    <in id="1" type="SIntWord"/>
+    <in id="1" type="UIntWord"/>
+    <out id="2" type="UIntWord"/>
     <trigger-semantics>
-      EXEC_OPERATION(stdout, IO(1));
+      EXEC_OPERATION(source_sizeoffile, IO(1), IO(2));
     </trigger-semantics>
   </operation>
 
@@ -43,33 +45,59 @@
     <inputs>1</inputs>
     <outputs>0</outputs>
     <side-effects/>
-    <in id="1" type="SIntWord"/>
+    <in id="1" type="UIntWord"/>
     <trigger-semantics>
-      EXEC_OPERATION(stdout, IO(1));
+      EXEC_OPERATION(source_rewind, IO(1));
     </trigger-semantics>
   </operation>
 
   <operation>
-    <name>PRINT</name>
+    <name>SOURCE_DECREMENTNBLOOPS</name>
     <description></description>
     <inputs>1</inputs>
     <outputs>0</outputs>
     <side-effects/>
-    <in id="1" type="SIntWord"/>
+    <in id="1" type="UIntWord"/>
     <trigger-semantics>
-      EXEC_OPERATION(stdout, IO(1));
+      EXEC_OPERATION(source_decrementnbloops, IO(1));
+    </trigger-semantics>
+  </operation>
+ 
+  <operation>
+    <name>SOURCE_ISMAXLOOPSREACHED</name>
+    <description></description>
+    <inputs>1</inputs>
+    <outputs>1</outputs>
+    <side-effects/>
+    <in id="1" type="UIntWord"/>
+    <out id="2" type="UIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(source_ismaxloopsreached, IO(1), IO(2));
     </trigger-semantics>
   </operation>
   
   <operation>
-    <name>PRINT_CYCLE_COUNT</name>
+    <name>PRINT</name>
     <description></description>
-    <inputs>0</inputs>
+    <inputs>2</inputs>
     <outputs>0</outputs>
     <side-effects/>
-    <in id="1" type="SIntWord"/>
+    <in id="1" type="UIntWord"/>
+    <in id="2" type="UIntWord"/>
     <trigger-semantics>
-      EXEC_OPERATION(read, IO(1));
+      EXEC_OPERATION(print, IO(1));
+    </trigger-semantics>
+  </operation>
+  
+  <operation>
+    <name>PRINT_CYCLECOUNT</name>
+    <description></description>
+    <inputs>1</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="UIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(print_cyclecount, IO(1));
     </trigger-semantics>
   </operation>
 </osal>
