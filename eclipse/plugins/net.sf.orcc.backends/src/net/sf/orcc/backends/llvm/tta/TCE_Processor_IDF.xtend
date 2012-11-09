@@ -29,10 +29,11 @@
 package net.sf.orcc.backends.llvm.tta
 
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit
+import net.sf.orcc.backends.llvm.tta.architecture.Implementation
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
-import net.sf.orcc.backends.llvm.tta.architecture.Implementation
+import net.sf.orcc.util.OrccLogger
 import org.eclipse.emf.common.util.EMap
 
 class TCE_Processor_IDF extends ArchitectureSwitch<CharSequence> {
@@ -65,26 +66,32 @@ class TCE_Processor_IDF extends ArchitectureSwitch<CharSequence> {
 		</adf-implementation>
 		'''
 
-	override caseFunctionUnit(FunctionUnit fu)
-		'''
-		<fu name="«fu.name»">
-			<hdb-file>«fu.implementation.hdbFile»</hdb-file>
-			<fu-id>«fu.implementation.id»</fu-id>
-		</fu>
-		'''
+	override caseFunctionUnit(FunctionUnit fu) {
+		val impl = hwDb.get(fu.implementation)
+		if(impl == null){
+			OrccLogger::warnln("Unknown implementation of " + fu.name)
+		} else {
+			'''
+			<fu name="«fu.name»">
+				<hdb-file>«impl.hdbFile»</hdb-file>
+				<fu-id>«impl.id»</fu-id>
+			</fu>
+			'''
+		}
+	}
 
-	override caseRegisterFile(RegisterFile rf)
-		'''
-		<rf name="«rf.name»">
-			<hdb-file>«rf.implementation.hdbFile»</hdb-file>
-		    <rf-id>«rf.implementation.id»</rf-id>
-		</rf>
-		'''
-		
-	def hdbFile(String implementation) 
-		'''«hwDb.get(implementation).hdbFile»'''
-		
-	def id(String implementation) 
-		'''«hwDb.get(implementation).id»'''
+	override caseRegisterFile(RegisterFile rf) {
+		val impl = hwDb.get(rf.implementation)
+		if(impl == null){
+			OrccLogger::warnln("Unknown implementation of " + rf.name)
+		} else {
+			'''
+			<rf name="«rf.name»">
+				<hdb-file>«impl.hdbFile»</hdb-file>
+			    <rf-id>«impl.id»</rf-id>
+			</rf>
+			'''
+		}
+	}
 		
 }
