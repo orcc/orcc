@@ -108,7 +108,7 @@ public class Graph extends AbstractObject {
 		for (Parameter parameter : parameters) {
 			setValue(parameter.getName(), parameter.getDefault());
 		}
-		
+
 		// initially, no layout
 		setValue(PROPERTY_HAS_LAYOUT, false);
 	}
@@ -207,6 +207,26 @@ public class Graph extends AbstractObject {
 	 */
 	public Vertex findVertex(String vertexId) {
 		return vertices.get(vertexId);
+	}
+
+	/**
+	 * Compare searchedId with known vertex ids, and return true if one already
+	 * exists with the same name (case insensitive compare)
+	 * 
+	 * @param searchedId
+	 *            vertex id to check
+	 * @return true if searchedId already exists
+	 */
+	public boolean vertexExistsCaseInsensitive(String searchedId) {
+
+		for (String vertexId : vertices.keySet()) {
+			if (vertexId.equalsIgnoreCase(searchedId)) {
+				return true;
+			}
+		}
+
+		return false;
+
 	}
 
 	/**

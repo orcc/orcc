@@ -111,8 +111,7 @@ public class VertexCreateCommand extends Command {
 						}
 
 						if (graph != null) {
-							Vertex vertex = graph.findVertex(vertexId);
-							if (vertex != null) {
+							if (graph.vertexExistsCaseInsensitive(vertexId)) {
 								return "A vertex already exists with the same identifier";
 							}
 						}

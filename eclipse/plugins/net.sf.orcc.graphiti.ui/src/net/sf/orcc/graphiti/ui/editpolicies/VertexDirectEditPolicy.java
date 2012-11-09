@@ -66,7 +66,9 @@ public class VertexDirectEditPolicy extends DirectEditPolicy {
 				}
 
 				vertex = graph.findVertex(vertexId);
-				if (vertex != null && !vertex.equals(getHost().getModel())) {
+				if (graph.vertexExistsCaseInsensitive(vertexId)
+						|| vertex != null
+						&& !vertex.equals(getHost().getModel())) {
 					return "A vertex already exists with the same identifier";
 				}
 

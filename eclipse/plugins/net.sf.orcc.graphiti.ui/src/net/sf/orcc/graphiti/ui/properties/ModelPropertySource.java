@@ -184,6 +184,14 @@ public class ModelPropertySource implements IPropertySource,
 					return;
 				}
 
+				// For instance name
+				if ("id".equals(id)) {
+					// update only if another instance has not the same
+					if (graph.vertexExistsCaseInsensitive(str)) {
+						return;
+					}
+				}
+
 				ParameterChangeValueCommand command = new ParameterChangeValueCommand(
 						model, "Change value");
 				Class<?> parameterType = model.getParameter((String) id)
@@ -217,5 +225,4 @@ public class ModelPropertySource implements IPropertySource,
 			e.printStackTrace();
 		}
 	}
-
 }

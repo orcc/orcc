@@ -120,8 +120,7 @@ public class PasteCommand extends Command {
 						}
 
 						if (graph != null) {
-							Vertex vertex = graph.findVertex(vertexId);
-							if (vertex != null) {
+							if (graph.vertexExistsCaseInsensitive(vertexId)) {
 								return "A vertex already exists with the same identifier";
 							}
 						}
@@ -165,9 +164,7 @@ public class PasteCommand extends Command {
 						+ previousBounds.width + 10, previousBounds.y
 						+ previousBounds.height + 10, bounds.width,
 						bounds.height);
-				vertex
-						.firePropertyChange(Vertex.PROPERTY_SIZE, null,
-								newBounds);
+				vertex.firePropertyChange(Vertex.PROPERTY_SIZE, null, newBounds);
 
 				dirty = true;
 			}
