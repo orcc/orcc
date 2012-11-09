@@ -28,20 +28,52 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Instance
+import net.sf.orcc.backends.util.CommonPrinter
+import java.util.Map
+import java.io.File
 
 /**
  * Generate CMakeList.txt content
  * 
  * @author Antoine Lorence
  */
-class CMakePrinter {
+class CMakePrinter extends CommonPrinter {
 	
 	Network network;
 
-	new(Network network) {
+	new(Network network, Map<String, Object> options) {
 		this.network = network;
+		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
+	}
+	
+	def printFiles(String targetFolder) {
+		
+		var int cachedFiles = 0
+				
+		var content = rootCMakeContent
+		var file = new File(targetFolder + File::separator + "CMakeLists.txt")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+		} else {
+			cachedFiles = cachedFiles + 1
+		}
+		
+		content = srcCMakeContent
+		file = new File(targetFolder + File::separator + "src" + File::separator + "CMakeLists.txt")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+		} else {
+			cachedFiles = cachedFiles + 1
+		}
+		
+		return cachedFiles
 	}
 	
 	/**

@@ -28,9 +28,12 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 import java.util.Map
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
+import java.io.File
 
 /*
  * Compile Network LLVM source code 
@@ -45,6 +48,21 @@ class NetworkPrinter extends LLVMTemplate {
 	new(Network network, Map<String, Object> options){
 		super()
 		this.network = network
+		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
+	}
+		
+	def print(String targetFolder) {
+		
+		val content = networkFileContent
+		val file = new File(targetFolder + File::separator + network.simpleName + ".ll")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
 	}
 	
 	def getNetworkFileContent() '''

@@ -285,7 +285,7 @@ public class TTABackend extends LLVMBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		CommonPrinter.printFile(new LLVM_Actor(instance, profile,
+		CommonPrinter.printFile(new LLVM_Actor(instance, options,
 				computePortToIdMap(instance)).getInstanceFileContent(),
 				actorsPath, instance.getSimpleName() + ".ll");
 		return false;

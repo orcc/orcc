@@ -108,8 +108,6 @@ public class JadeBackend extends AbstractBackend {
 
 	private final Map<String, String> renameMap;
 
-	private JadePrinter printer;
-
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
 	 * transformation hash map.
@@ -130,9 +128,6 @@ public class JadeBackend extends AbstractBackend {
 		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
 		biteexact = getAttribute("net.sf.orcc.backends.byteexact", false);
 		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
-
-		printer = new JadePrinter(!debug);
-		printer.getOptions().put("fifoSize", fifoSize);
 
 		if (debug) {
 			OrccLogger.setLevel(Level.FINEST);
@@ -252,11 +247,8 @@ public class JadeBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		// Create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
-
-		new File(folder).mkdirs();
-		return printer.print(folder, actor);
+		return new ActorPrinter(actor, options).print(folder) > 0;
 	}
 
 	private void printMapping(Network network) {

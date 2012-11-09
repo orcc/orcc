@@ -28,6 +28,8 @@
  */
  package net.sf.orcc.backends.llvm.aot
 
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.Map
@@ -65,6 +67,7 @@ import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 import java.util.List
+import java.io.File
 
 /*
  * Compile Instance llvm source code
@@ -93,25 +96,36 @@ class InstancePrinter extends LLVMTemplate {
 	/**
 	 * Default constructor, do not activate profile option
 	 */
-	new(Instance instance) {
+	new(Instance instance, Map<String, Object> options) {
 		if ( ! instance.isActor) {
 			OrccLogger::severeln("Instance " + instance.name + " is not an Actor's instance")
 		}
 		
 		this.instance = instance
 		
+		if(options.containsKey("net.sf.orcc.backends.profile")){
+			optionProfile = options.get("net.sf.orcc.backends.profile") as Boolean
+		}
+		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
+		
 		computeCastedIndex
 		computeCastedList
 		computeStateToLabel
 		computePortToIndexByPatternMap
 	}
-	
-	/**
-	 * Constructor, set profile option to true or false
-	 */
-	new(Instance instance, boolean optionProfile) {
-		this(instance)
-		this.optionProfile = optionProfile
+		
+	def print(String targetFolder) {
+		
+		val content = instanceFileContent
+		val file = new File(targetFolder + File::separator + instance.name + ".ll")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
 	}
 	
 	def getInstanceFileContent() '''

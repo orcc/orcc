@@ -41,8 +41,8 @@ class LLVM_Actor extends InstancePrinter {
 	
 	Map<Port, Integer> portToIdMap;
 	
-	new(Instance instance, boolean optionProfile, Map<Port, Integer> portToIdMap) {
-		super(instance, optionProfile)
+	new(Instance instance, Map<String, Object> options, Map<Port, Integer> portToIdMap) {
+		super(instance, options)
 		this.portToIdMap = portToIdMap
 	}
 	

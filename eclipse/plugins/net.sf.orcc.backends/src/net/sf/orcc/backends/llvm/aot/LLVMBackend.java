@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
@@ -81,8 +80,6 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class LLVMBackend extends AbstractBackend {
 
-	protected LLVMPrinter xtendPrinter;
-
 	/**
 	 * Path to target "src" folder
 	 */
@@ -106,8 +103,6 @@ public class LLVMBackend extends AbstractBackend {
 		renameMap.put("min", "min_");
 		renameMap.put("max", "max_");
 		renameMap.put("select", "select_");
-
-		xtendPrinter = new LLVMPrinter(false);
 	}
 
 	@Override
@@ -197,17 +192,13 @@ public class LLVMBackend extends AbstractBackend {
 		network = doTransformNetwork(network);
 
 		// print instances and entities
-		xtendPrinter.getOptions().put("fifoSize", fifoSize);
 		printInstances(network);
 
 		// print network
 		OrccLogger.traceln("Printing network...");
-		xtendPrinter.print(srcPath, network);
+		new NetworkPrinter(network, options).print(srcPath);
 
-		CommonPrinter.printFile(new CMakePrinter(network).rootCMakeContent(),
-				path + File.separator + "CMakeLists.txt");
-		CommonPrinter.printFile(new CMakePrinter(network).srcCMakeContent(),
-				srcPath + File.separator + "CMakeLists.txt");
+		new CMakePrinter(network, options).printFiles(path);
 	}
 
 	@Override
@@ -233,7 +224,7 @@ public class LLVMBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return xtendPrinter.print(srcPath, instance);
+		return new InstancePrinter(instance, options).print(srcPath) > 0;
 	}
 
 }

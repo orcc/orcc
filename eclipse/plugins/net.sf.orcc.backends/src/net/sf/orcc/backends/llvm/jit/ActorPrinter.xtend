@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.jit
 
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 import java.util.ArrayList
 import java.util.List
 import net.sf.orcc.backends.ir.InstCast
@@ -51,6 +53,8 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
 import net.sf.orcc.moc.MoC
 import net.sf.orcc.moc.QSDFMoC
+import java.util.Map
+import java.io.File
 
 /**
  * Generate Jade content
@@ -64,13 +68,28 @@ class ActorPrinter extends InstancePrinter {
 	val List<Integer> objRefList = new ArrayList<Integer>
 	val List<Pattern> patternList = new ArrayList<Pattern>
 	
-	new(Actor actor) {
+	new(Actor actor, Map<String, Object> options) {
 		super()
 		
 		this.actor = actor
 		
+		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
+		
 		computePatterns
 		computeCastedList
+	}
+	
+	override print(String targetFolder) {
+		
+		val content = actorFileContent
+		val file = new File(targetFolder + File::separator + actor.simpleName)
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
 	}
 	
 	/**
