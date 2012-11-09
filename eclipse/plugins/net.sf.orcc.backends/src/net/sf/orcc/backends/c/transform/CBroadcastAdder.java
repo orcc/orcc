@@ -68,7 +68,7 @@ public class CBroadcastAdder extends BroadcastAdder {
 			int size = ((Connection) edges.get(0)).getSize();
 			for (Edge edge : edges) {
 				if (size != ((Connection) edge).getSize()) {
-					createBroadcast(network.getName(), srcPort, edges);
+					createBroadcast(network.getSimpleName(), srcPort, edges);
 					OrccLogger
 							.warnln("Different-sized FIFOs connected to port '"
 									+ srcPort.getName() + "' in '"
