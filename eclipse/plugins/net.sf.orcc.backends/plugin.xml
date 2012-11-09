@@ -27,6 +27,19 @@
          </option>
       </backend>
       <backend
+            class="net.sf.orcc.backends.c.hls.HLSBackend"
+            name="HLS">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.core.classify">
+         </option>
+         <option
+               id="net.sf.orcc.dontExportLibrary">
+         </option>
+      </backend>
+      <backend
             class="net.sf.orcc.backends.java.JavaBackend"
             name="Java">
          <option
@@ -468,6 +481,18 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.c.embedded.CEmbeddedBackend">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="hls"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.c.hls.HLSBackend">
          </run>
       </application>
    </extension>
