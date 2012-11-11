@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.backends.c.hls;
 
-import static net.sf.orcc.backends.OrccBackendsConstants.GENETIC_ALGORITHM;
-import static net.sf.orcc.backends.OrccBackendsConstants.THREADS_NB;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,9 +36,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.c.CMakePrinter;
 import net.sf.orcc.backends.c.InstancePrinter;
-import net.sf.orcc.backends.c.hls.NetworkPrinter;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.TypeResizer;
@@ -88,11 +83,6 @@ public class HLSBackend extends CBackend {
 		if (debug) {
 			OrccLogger.setLevel(Level.FINEST);
 			OrccLogger.debugln("Debug mode is enabled");
-		}
-
-		if (!getAttribute(GENETIC_ALGORITHM, false)
-				&& targetToInstancesMap != null) {
-			options.put(THREADS_NB, targetToInstancesMap.size());
 		}
 
 		new File(path + File.separator + "build").mkdirs();
@@ -198,10 +188,6 @@ public class HLSBackend extends CBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
-
-		// print CMakeLists
-		OrccLogger.traceln("Printing CMake project files");
-		new CMakePrinter(network).printCMakeFiles(path);
 	}
 
 	@Override
