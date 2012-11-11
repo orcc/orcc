@@ -49,8 +49,8 @@ import java.io.File
  */
 class NetworkPrinter extends CTemplate {
 	
-	val Network network;
-	val int fifoSize;
+	protected val Network network;
+	protected val int fifoSize;
 	
 	var boolean geneticAlgo = false
 	var boolean ringTopology = false
@@ -60,7 +60,7 @@ class NetworkPrinter extends CTemplate {
 	var int threadsNb = 1;
 	
 	val int numberOfGroups
-	val Map<Instance, Integer> instanceToIdMap
+	protected val Map<Instance, Integer> instanceToIdMap
 	
 	new(Network network, Map<String, Object> options) {
 		this.network = network

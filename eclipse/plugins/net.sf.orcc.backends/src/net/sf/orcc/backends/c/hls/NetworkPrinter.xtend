@@ -28,19 +28,9 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
 import java.util.Map
-import net.sf.orcc.df.Actor
-import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
-import net.sf.orcc.df.Port
-import net.sf.orcc.graph.Vertex
-import net.sf.orcc.util.OrccLogger
-import java.util.HashMap
-import java.io.File
-import net.sf.orcc.backends.c.CTemplate
 
 /**
  * Compile top Network c source code 
@@ -48,45 +38,13 @@ import net.sf.orcc.backends.c.CTemplate
  * @author Antoine Lorence
  * 
  */
-class NetworkPrinter extends CTemplate {
-	
-	val Network network;
-	val int fifoSize;
-	
-	val int numberOfGroups
-	val Map<Instance, Integer> instanceToIdMap
-	
-	new(Network network, Map<String, Object> options) {
-		this.network = network
-		
-		if (options.containsKey(FIFO_SIZE)) {
-			fifoSize = options.get(FIFO_SIZE) as Integer
-		} else {
-			fifoSize = DEFAULT_FIFO_SIZE
-		}
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
-		
-		//Template data :
-		// TODO : set the right values when genetic algorithm will be fixed
-		numberOfGroups = 0
-		instanceToIdMap = computeInstanceToIdMap
-	}
-	
-	def print(String targetFolder) {
-		
-		val content = networkFileContent
-		val file = new File(targetFolder + File::separator + network.simpleName + ".c")
-		
-		if(needToWriteFile(content, file)) {
-			printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
+class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
+
+	new(Network network, Map<String,Object> options) {
+		super(network, options)
 	}
 
-	def getNetworkFileContent() '''
+	override getNetworkFileContent() '''
 		// Generated from "«network.name»"
 
 		#include <locale.h>
@@ -172,68 +130,5 @@ class NetworkPrinter extends CTemplate {
 			return compareErrors;
 		}
 	'''
-	
-	// TODO : simplify this :
-	def assignFifo(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
-				«printFifoAssign(connList.head.source, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
-			«ENDIF»
-			«FOR conn : connList»
-				«IF conn.source instanceof Instance && conn.target instanceof Instance»
-					«printFifoAssign(conn.target as Instance, conn.targetPort, conn.<Integer>getValueAsObject("idNoBcast"))»
-				«ENDIF»
-			«ENDFOR»
-			
-		«ENDFOR»
-	'''
-	
-	def printFifoAssign(Vertex vertex, Port port, int fifoIndex) '''
-		«IF vertex instanceof Instance»struct fifo_«port.type.doSwitch»_s *«(vertex as Instance).name»_«port.name» = &fifo_«fifoIndex»;«ENDIF»
-	'''
 
-
-	def clearFifosWithMap(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF connList.get(0).source instanceof Instance && connList.get(0).target instanceof Instance»
-				«clearFifo(connList.get(0))»
-			«ENDIF»
-		«ENDFOR»
-	'''
-	
-	def clearFifo(Connection connection) '''
-		«IF connection.source instanceof Actor»
-			fifo_«connection.sourcePort.type.doSwitch»_clear(&fifo_«connection.getAttribute("idNoBcast")»);
-		«ELSE»
-			fifo_«connection.targetPort.type.doSwitch»_clear(&fifo_«connection.getAttribute("id")»);
-		«ENDIF»
-	'''
-
-	def allocateFifos(Instance instance) '''
-		«FOR connectionList : instance.outgoingPortMap.values»
-			«allocateFifo(connectionList.get(0), connectionList.size)»
-		«ENDFOR»
-	'''
-	
-	def allocateFifo(Connection conn, int nbReaders) '''
-		«IF conn.source instanceof Instance»
-			DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
-		«ELSEIF conn.target instanceof Instance»
-			DECLARE_FIFO(«conn.targetPort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
-		«ELSE»
-			«/* TODO: debug to find types of source & target when compiling a non-top network */»
-			«OrccLogger::warnln("An edge has both source and target linked to a non-Actor vertex.")»
-		«ENDIF»
-	'''
-
-	def computeInstanceToIdMap() {
-		val instanceToIdMap = new HashMap<Instance, Integer>
-		
-		for(instance : network.children.filter(typeof(Instance))) {
-			// TODO : compute the right value when genetic algorithm will be fixed
-			instanceToIdMap.put(instance, 0)
-		}
-		
-		return instanceToIdMap
-	}
 }
