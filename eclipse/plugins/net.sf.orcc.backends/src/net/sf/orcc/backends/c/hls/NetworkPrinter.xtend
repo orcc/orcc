@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.c.hls
 
+import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
@@ -130,5 +131,35 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			return compareErrors;
 		}
 	'''
+	
+	def getProjectFileContent() '''
+		<?xml version="1.0" encoding="UTF-8"?>
+		<project xmlns="com.autoesl.autopilot.project" top="main" projectType="C/C++">
+		  <files>
+		    <file name="src/«network.simpleName».c" sc="0" tb="false" cflags=""/>
+		    «FOR instance : network.children.filter(typeof(Instance))»
+		    	<file name="src/«instance.name».c" sc="0" tb="false" cflags=""/>
+		    «ENDFOR»
+		  </files>
+		  <solutions>
+		    <solution name="solution1" status="active"/>
+		  </solutions>
+		  <includePaths/>
+		  <libraryPaths/>
+		</project>
+	'''
+	
+	override print(String targetFolder) {
+		val i = super.print(targetFolder)
+		val content = projectFileContent
+		val file = new File(targetFolder + File::separator + "vivado_hls.app")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return i
+		} else {
+			return i + 1
+		}
+	}
 
 }
