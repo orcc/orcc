@@ -59,7 +59,6 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		#include "orcc_types.h"
 		#include "orcc_fifo.h"
 		#include "orcc_scheduler.h"
-		#include "orcc_util.h"
 
 		
 		#define SIZE «fifoSize»
