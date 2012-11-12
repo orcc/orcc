@@ -29,6 +29,7 @@
 
 package net.sf.orcc.backends.promela;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,20 +85,20 @@ public class PromelaBackend extends AbstractBackend {
 
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 
-	private final Map<String, String> transformations;
+	private final Map<String, String> renameMap;
 
 	/**
 	 * Creates a new instance of the Promela back-end. Initializes the
 	 * transformation hash map.
 	 */
 	public PromelaBackend() {
-		transformations = new HashMap<String, String>();
-		transformations.put("abs", "abs_");
-		transformations.put("getw", "getw_");
-		transformations.put("index", "index_");
-		transformations.put("max", "max_");
-		transformations.put("min", "min_");
-		transformations.put("select", "select_");
+		renameMap = new HashMap<String, String>();
+		renameMap.put("abs", "abs_");
+		renameMap.put("getw", "getw_");
+		renameMap.put("index", "index_");
+		renameMap.put("max", "max_");
+		renameMap.put("min", "min_");
+		renameMap.put("select", "select_");
 	}
 
 	@Override
@@ -106,11 +107,15 @@ public class PromelaBackend extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) {
-		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new DfVisitor<Void>(new Inliner(true, true)),
-				new RenameTransformation(this.transformations),
-				new DfVisitor<Object>(new PhiRemoval()) };
-		for (DfSwitch<?> transformation : transformations) {
+
+		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
+
+		transfos.add(new UnitImporter());
+		transfos.add(new DfVisitor<Void>(new Inliner(true, true)));
+		transfos.add(new RenameTransformation(renameMap));
+		transfos.add(new DfVisitor<Object>(new PhiRemoval()));
+
+		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(actor);
 		}
 	}
@@ -173,14 +178,17 @@ public class PromelaBackend extends AbstractBackend {
 	}
 
 	private void transformInstance(Instance instance) {
-		DfSwitch<?>[] transformations = {
-				new PromelaDeadGlobalElimination(
-						netStateDef.getVarsUsedInScheduling(),
-						netStateDef.getPortsUsedInScheduling()),
-				new GuardsExtractor(guards, priority, loadPeeks),
-				new DfVisitor<Void>(new DeadCodeElimination()),
-				new DfVisitor<Void>(new DeadVariableRemoval()) };
-		for (DfSwitch<?> transformation : transformations) {
+
+		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
+
+		transfos.add(new PromelaDeadGlobalElimination(netStateDef
+				.getVarsUsedInScheduling(), netStateDef
+				.getPortsUsedInScheduling()));
+		transfos.add(new GuardsExtractor(guards, priority, loadPeeks));
+		transfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		transfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+
+		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(instance.getActor());
 		}
 		new PromelaTokenAnalyzer(netStateDef).doSwitch(instance);
