@@ -48,9 +48,8 @@ import net.sf.orcc.backends.llvm.tta.architecture.Socket
 import net.sf.orcc.backends.llvm.tta.architecture.TermBool
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Writes
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 
-class TCE_Processor_ADF extends ArchitectureSwitch<CharSequence> {
+class TCE_Processor_ADF extends TTAPrinter {
 		
 	def print(Processor processor)
 		'''

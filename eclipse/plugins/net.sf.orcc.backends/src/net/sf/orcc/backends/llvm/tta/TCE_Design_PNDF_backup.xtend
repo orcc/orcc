@@ -39,7 +39,7 @@ import net.sf.orcc.df.Port
  * @author Herve Yviquel
  * 
  */
-class TCE_Design_PNDF extends TTAPrinter {
+class TCE_Design_PNDF_backup extends TTAPrinter {
 	
 	String path;
 	
@@ -64,22 +64,22 @@ class TCE_Design_PNDF extends TTAPrinter {
 			<tpef>«path»/«processor.name»/«processor.name».tpef</tpef>
 			«FOR instance: processor.mappedActors»
 				«FOR input: instance.actor.inputs.filter(port | !port.native)»
-					«IF instance.incomingPortMap.get(input) != null»
-						«var incoming = instance.incomingPortMap.get(input)»
-						<input name="fifo_«incoming.getValueAsObject("id").toString»">
-							<address-space>«processor.getMemory(incoming).name»</address-space>
-							<signed>«input.type.int»</signed>
-							<width>«input.width»</width>
-							<size>«incoming.size»</size>
-							<trace>«path»/trace/«instance.name»_«input.name».txt</trace>
-						</input>
-					«ENDIF»
+					«var incoming = instance.incomingPortMap.get(input)»
+					<input name="«input.name»">
+						<address-space>«processor.getMemory(incoming).name»</address-space>
+						<var>fifo_«incoming.getValueAsObject("id").toString»</var>
+						<type>«input.type.int»</type>
+						<width>«input.width»</width>
+						<size>«incoming.size»</size>
+						<trace>«path»/trace/«instance.name»_«input.name».txt</trace>
+					</input>
 				«ENDFOR»
 				«FOR output : instance.actor.outputs.filter(port | !port.native)»
 					«var outgoing = instance.outgoingPortMap.get(output).get(0)»
-					<output name="fifo_«outgoing.getValueAsObject("id").toString»">
+					<output name="«output.name»">
 						<address-space>«processor.getMemory(outgoing).name»</address-space>
-						<signed>«output.type.int»</signed>
+						<var>fifo_«outgoing.getValueAsObject("id").toString»</var>
+						<type>«output.type»</type>
 						<width>«output.width»</width>
 						<size>«outgoing.size»</size>
 						<trace>«path»/trace/«instance.name»_«output.name».txt</trace>

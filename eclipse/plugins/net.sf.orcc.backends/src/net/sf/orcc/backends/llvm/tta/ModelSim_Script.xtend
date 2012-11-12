@@ -30,10 +30,9 @@ package net.sf.orcc.backends.llvm.tta
 
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 import net.sf.orcc.backends.util.FPGA
 
-class ModelSim_Script extends ArchitectureSwitch<CharSequence> {
+class ModelSim_Script extends TTAPrinter {
 	
 	private FPGA fpga;
 	

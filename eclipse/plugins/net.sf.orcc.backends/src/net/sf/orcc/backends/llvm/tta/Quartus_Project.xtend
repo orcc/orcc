@@ -28,12 +28,11 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
 
-class Quartus_Project extends ArchitectureSwitch<CharSequence> {
+class Quartus_Project extends TTAPrinter {
 	
 	private FPGA fpga;
 	

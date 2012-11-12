@@ -32,9 +32,8 @@ import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 
-class ModelSim_Wave extends ArchitectureSwitch<CharSequence> {
+class ModelSim_Wave extends TTAPrinter {
 	
 	override caseDesign(Design design) 
 		'''

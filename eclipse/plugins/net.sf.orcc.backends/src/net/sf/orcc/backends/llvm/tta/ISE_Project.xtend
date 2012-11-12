@@ -28,11 +28,10 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 
-class ISE_Project extends ArchitectureSwitch<CharSequence> {
+class ISE_Project extends TTAPrinter {
 	
 	override caseDesign(Design design) 
 		'''

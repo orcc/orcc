@@ -29,10 +29,9 @@
 package net.sf.orcc.backends.llvm.tta
 
 import net.sf.orcc.backends.llvm.tta.architecture.Design
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 
-class VHDL_Testbench extends ArchitectureSwitch<CharSequence> {
+class VHDL_Testbench extends TTAPrinter {
 	
 	
 	override caseDesign(Design design)

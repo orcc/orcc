@@ -35,13 +35,12 @@ import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Signal
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.ir.util.ExpressionPrinter
 import net.sf.orcc.util.Attribute
 import org.eclipse.emf.common.util.EList
 
-class VHDL_Design extends ArchitectureSwitch<CharSequence> {
+class VHDL_Design extends TTAPrinter {
 	
 	ExpressionPrinter exprPrinter;
 	FPGA fpga;

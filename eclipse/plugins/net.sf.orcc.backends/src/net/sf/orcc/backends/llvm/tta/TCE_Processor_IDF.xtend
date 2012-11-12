@@ -32,11 +32,10 @@ import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Implementation
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 import net.sf.orcc.util.OrccLogger
 import org.eclipse.emf.common.util.EMap
 
-class TCE_Processor_IDF extends ArchitectureSwitch<CharSequence> {
+class TCE_Processor_IDF extends TTAPrinter {
 	
 	EMap<String, Implementation> hwDb;
 	

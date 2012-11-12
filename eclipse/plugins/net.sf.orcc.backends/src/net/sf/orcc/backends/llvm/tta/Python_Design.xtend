@@ -32,10 +32,9 @@ import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureSwitch
 import net.sf.orcc.backends.util.FPGA
 
-class Python_Design extends ArchitectureSwitch<CharSequence> {
+class Python_Design extends TTAPrinter {
 	
 	private FPGA fpga;
 	
