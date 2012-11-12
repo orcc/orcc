@@ -33,6 +33,8 @@ import java.util.Map
 import net.sf.orcc.df.Network
 
 import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Instance
 
 /**
  * Compile top Network c source code 
@@ -53,7 +55,7 @@ class NetworkPrinter extends PromelaTemplate {
 	def print(String targetFolder) {
 		
 		val content = networkFileContent
-		val file = new File(targetFolder + "main_" + File::separator + network.simpleName + ".pml")
+		val file = new File(targetFolder + File::separator + "main_" + network.simpleName + ".pml")
 		
 		if(needToWriteFile(content, file)) {
 			printFile(content, file)
@@ -64,7 +66,55 @@ class NetworkPrinter extends PromelaTemplate {
 	}
 
 	def getNetworkFileContent() '''
+		// Generated from "«network.name»"
 		
+		#define uint int
+		#define SIZE 1
+		
+		// FIFO allocation
+		«FOR connection : network.connections»
+			«connection.allocateFifo»
+		«ENDFOR»
+		
+		// FIFO assignment
+		«FOR connection : network.connections»
+			«connection.assignFifo»
+		«ENDFOR»
+		
+		// Include the actors
+		«FOR instance : network.children.filter(typeof(Instance))»
+			#include "«instance.simpleName».pml"
+		«ENDFOR»
+		
+		init {
+			/*Inputs here*/
+		
+			/*Start processes*/
+			atomic{
+				«FOR instance : network.children.filter(typeof(Instance))»
+					run «instance.simpleName»(/*init_state*/);
+				«ENDFOR»
+			}	
+		}
 	'''
+
+	def allocateFifo(Connection connection) { 
+		val size = if (connection.size != null) connection.size
+					else "SIZE"
+		'''
+			«IF connection.source != null»
+				chan chan_«connection.getAttribute("id").stringValue» = [«size»] of {«connection.sourcePort.type.doSwitch»};
+			«ELSE»
+				chan chan_«connection.getAttribute("id").stringValue» = [«size»] of {«connection.targetPort.type.doSwitch»};
+			«ENDIF»
+		'''
+	}
 	
+	def assignFifo(Connection connection) '''
+		«IF connection.source != null»
+			#define chan_«(connection.source as Instance).simpleName»_«connection.sourcePort.name» chan_«connection.getAttribute("id").stringValue»
+		«ELSEIF connection.target != null»
+			#define chan_«(connection.target as Instance).simpleName»_«connection.targetPort.name» chan_«connection.getAttribute("id").stringValue»
+		«ENDIF»
+	'''
 }
