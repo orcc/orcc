@@ -77,7 +77,7 @@
   </operation>
   
   <operation>
-    <name>PRINT</name>
+    <name>SOURCE_EXIT</name>
     <description></description>
     <inputs>2</inputs>
     <outputs>0</outputs>
@@ -85,7 +85,33 @@
     <in id="1" type="UIntWord"/>
     <in id="2" type="UIntWord"/>
     <trigger-semantics>
-      EXEC_OPERATION(print, IO(1));
+      EXEC_OPERATION(source_exit, IO(1), IO(2));
+    </trigger-semantics>
+  </operation>
+  
+  <operation>
+    <name>TTA_PRINT</name>
+    <description></description>
+    <inputs>2</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="UIntWord"/>
+    <in id="2" type="UIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(tta_print, IO(1), IO(2));
+    </trigger-semantics>
+  </operation>
+  
+  <operation>
+    <name>DISPLAY_CHECKSUM</name>
+    <description></description>
+    <inputs>2</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="UIntWord"/>
+    <in id="2" type="UIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(display_checksum, IO(1), IO(2));
     </trigger-semantics>
   </operation>
   

@@ -37,16 +37,17 @@ END_DEFINE_STATE
 OPERATION_WITH_STATE(SOURCE_INIT, ORCC_FU)
 
 TRIGGER
+    OUTPUT_STREAM << "source_init()\n";
     string input_file = NetworkSimulatorContext::inputFile();
 
     if (input_file.empty()) {
-        fprintf(stderr, "No input file given!\n");
+        OUTPUT_STREAM << "No input file given!\n";
         exit(1);
     }
 
     STATE.file = fopen(input_file.c_str(), "rb");
     if (STATE.file == NULL) {
-        fprintf(stderr, "could not open input file.\n");
+        OUTPUT_STREAM << "could not open input file.\n";
         exit(1);
     }
 END_TRIGGER;
@@ -64,15 +65,17 @@ TRIGGER
 
     if (n < 1) {
         if (feof(STATE.file)) {
-            printf("warning\n");
+            OUTPUT_STREAM << "warning\n";
             rewind(STATE.file);
             n = fread(&buf, 1, 1, STATE.file);
         }
         else {
-            fprintf(stderr,"Problem when reading input file.\n");
+            OUTPUT_STREAM << "Problem when reading input file.\n";
+            exit(1);
         }
     }
-    IO(1) = buf[0];
+
+    IO(2) = buf[0];
 END_TRIGGER;
 
 END_OPERATION_WITH_STATE(SOURCE_READBYTE)
@@ -83,11 +86,12 @@ END_OPERATION_WITH_STATE(SOURCE_READBYTE)
 OPERATION_WITH_STATE(SOURCE_SIZEOFFILE, ORCC_FU)
 
 TRIGGER
+    OUTPUT_STREAM << "source_sizeoffile()\n";
     struct stat st; 
     int size;
     fstat(fileno(STATE.file), &st); 
     size = st.st_size;
-    IO(1) = size; 
+    IO(2) = size; 
 END_TRIGGER;
 
 END_OPERATION_WITH_STATE(SOURCE_SIZEOFFILE)
@@ -106,23 +110,67 @@ END_TRIGGER;
 END_OPERATION_WITH_STATE(SOURCE_REWIND)
 
 //////////////////////////////////////////////////////////////////////////////
-// PRINT
+// SOURCE_DECREMENTNBLOOPS
 //////////////////////////////////////////////////////////////////////////////
-OPERATION(PRINT)
+OPERATION_WITH_STATE(SOURCE_DECREMENTNBLOOPS, ORCC_FU)
 
 TRIGGER
-    OUTPUT_STREAM << static_cast<char>(INT(1));
+
 END_TRIGGER;
 
-END_OPERATION(PRINT)
+END_OPERATION_WITH_STATE(SOURCE_DECREMENTNBLOOPS)
+
+//////////////////////////////////////////////////////////////////////////////
+// SOURCE_ISMAXLOOPSREACHED
+//////////////////////////////////////////////////////////////////////////////
+OPERATION_WITH_STATE(SOURCE_ISMAXLOOPSREACHED, ORCC_FU)
+
+TRIGGER
+    IO(2) = false;
+END_TRIGGER;
+
+END_OPERATION_WITH_STATE(SOURCE_ISMAXLOOPSREACHED)
+
+//////////////////////////////////////////////////////////////////////////////
+// DISPLAY_CHECKSUM
+//////////////////////////////////////////////////////////////////////////////
+OPERATION(SOURCE_EXIT)
+
+TRIGGER
+    exit(INT(2));
+END_TRIGGER;
+
+END_OPERATION(SOURCE_EXIT)
+
+//////////////////////////////////////////////////////////////////////////////
+// PRINT
+//////////////////////////////////////////////////////////////////////////////
+OPERATION(TTA_PRINT)
+
+TRIGGER
+    OUTPUT_STREAM << "print = " << INT(2) << "\n";
+END_TRIGGER;
+
+END_OPERATION(TTA_PRINT)
+
+//////////////////////////////////////////////////////////////////////////////
+// DISPLAY_CHECKSUM
+//////////////////////////////////////////////////////////////////////////////
+OPERATION_WITH_STATE(DISPLAY_CHECKSUM, ORCC_FU)
+
+TRIGGER
+    OUTPUT_STREAM << "Checksum = " << INT(2) << "\n";
+END_TRIGGER;
+
+END_OPERATION_WITH_STATE(DISPLAY_CHECKSUM)
 
 //////////////////////////////////////////////////////////////////////////////
 // PRINT_CYCLE_COUNT
 //////////////////////////////////////////////////////////////////////////////
-OPERATION(PRINT_CYCLE_COUNT)
+OPERATION(PRINT_CYCLECOUNT)
 
 TRIGGER
     OUTPUT_STREAM << "CYCLE = " << CYCLE_COUNT << "\n";
 END_TRIGGER;
 
-END_OPERATION(PRINT_CYCLE_COUNT)
+END_OPERATION(PRINT_CYCLECOUNT)

@@ -349,18 +349,18 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				"source_sizeoffile", "source_ismaxloopsreached" };
 		String[] oneInputOps = { "source_init", "source_rewind",
 				"source_decrementnbloops", "print_cyclecount" };
-		String[] twoInputOps = { "print" };
+		String[] twoInputOps = { "tta_print", "source_exit", "display_checksum" };
 		for (String operation : oneInputOps) {
 			functionUnit.getOperations().add(
 					createOperationDefault(operation, in1t));
 		}
 		for (String operation : oneInputOneOutputOps) {
 			functionUnit.getOperations().add(
-					createOperationDefault2(operation, in1t, out));
+					createOperationDefault(operation, in1t, out));
 		}
 		for (String operation : twoInputOps) {
 			functionUnit.getOperations().add(
-					createOperationDefault(operation, in1t, in2));
+					createOperationDefault2(operation, in1t, in2));
 		}
 		return functionUnit;
 	}
@@ -870,11 +870,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	private Operation createOperationDefault2(String name, FuPort in1,
-			FuPort out) {
+			FuPort in2) {
 		Operation operation = createOperation(name);
 		operation.setControl(false);
 		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createWrites(out, 0, 1));
+		operation.getPipeline().add(createReads(in2, 0, 1));
 		return operation;
 	}
 
