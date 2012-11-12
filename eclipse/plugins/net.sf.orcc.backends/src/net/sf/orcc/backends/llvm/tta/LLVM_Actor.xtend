@@ -117,12 +117,10 @@ class LLVM_Actor extends InstancePrinter {
 	'''
 	
 	override caseInstCall(InstCall call) '''
-		«IF call.print»
-			call i32 (i8*, ...)* @printf(«call.parameters.join(", ", [printParameter])»)
-		«ELSEIF call.procedure.native»
+		«IF call.procedure.native»
 			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF call.target != null»=ir, «ENDIF»ir«call.parameters.ir»"(i32 0«IF !call.parameters.nullOrEmpty», «formatParameters(call.procedure.parameters, call.parameters).join(", ")»«ENDIF») nounwind
 		«ELSE»
-			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («formatParameters(call.procedure.parameters, call.parameters).join(", ")»)
+			«super.caseInstCall(call)»
 		«ENDIF»
 	'''
 	
@@ -133,11 +131,9 @@ class LLVM_Actor extends InstancePrinter {
 	'''
 	
 	def getIr(EList<Arg> args) {
-		val irs = new String;
-		if(args.size != 0) {
-			for (i : 0..args.size-1) {
-				irs.concat(", ir")
-			}
+		var irs = new String;
+		for (arg : args) {
+			irs = irs + ", ir"
 		}
 		return irs
 	}
