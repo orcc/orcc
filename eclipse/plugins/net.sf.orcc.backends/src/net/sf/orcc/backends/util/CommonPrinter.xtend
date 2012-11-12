@@ -18,6 +18,13 @@ import java.io.PrintStream
 import net.sf.orcc.util.OrccLogger
 
 import static net.sf.orcc.backends.util.CommonPrinter.*
+import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.TypeFloat
+import net.sf.orcc.ir.TypeInt
+import net.sf.orcc.ir.TypeString
+import net.sf.orcc.ir.TypeUint
+import net.sf.orcc.ir.TypeList
+import net.sf.orcc.ir.TypeVoid
 
 /**
  * Define commons methods for all backends printers
@@ -152,4 +159,35 @@ class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 			return false;
 		}
 	}
+	
+	override caseTypeBool(TypeBool type) {
+		"bool"
+	}
+	
+	override caseTypeFloat(TypeFloat type) {
+		if(type.half) "half"
+		else if (type.double) "double"
+		else "float"
+	}
+	
+	override caseTypeInt(TypeInt type) {
+		'''int(size=«type.size»);'''
+	}
+	
+	override caseTypeUint(TypeUint type) {
+		'''uint(size=«type.size»);'''
+	}
+	
+	override caseTypeString(TypeString type) {
+		"String"
+	}
+	
+	override caseTypeList(TypeList type) {
+		'''List(type:«type.type.doSwitch», size=«type.size»)'''
+	}
+	
+	override caseTypeVoid(TypeVoid object) {
+		"void"
+	}
+	
 }
