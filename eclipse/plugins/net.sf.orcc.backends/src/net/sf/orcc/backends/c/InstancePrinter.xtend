@@ -68,8 +68,8 @@ import java.io.File
  */
 class InstancePrinter extends CTemplate {
 	
-	val Instance instance
-	val int fifoSize;
+	protected val Instance instance
+	protected val int fifoSize;
 	
 	var boolean geneticAlgo = false
 	
