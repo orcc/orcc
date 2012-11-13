@@ -91,12 +91,12 @@ class Processor:
         if debug:
             shutil.rmtree(tempPath, ignore_errors=True)
             os.mkdir(tempPath)
-            retcode = subprocess.call(["tcecc"] + args + ["-O3", "--temp-dir", tempPath, "-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
+            retcode = subprocess.call(["tcecc"] + args + ["-O3", "--swfp", "--temp-dir", tempPath, "-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
             #if retcode == 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
             if retcode == 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
         
         else:
-            retcode = subprocess.call(["tcecc"] + args + ["-O3", "-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
+            retcode = subprocess.call(["tcecc"] + args + ["-O3", "--swfp", "-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
             
         return retcode
 
