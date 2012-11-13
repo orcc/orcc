@@ -109,8 +109,8 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		Actor bcast = dfFactory.createActor();
 		bcast.setName(id + "_" + port.getName());
 
-		Instance instance = dfFactory.createInstance(id + "_" + port.getName(),
-				bcast);
+		Instance instance = dfFactory.createInstance(id + "_" + port.getName()
+				+ "_bcast", bcast);
 		network.add(instance);
 
 		Type portVarType = irFactory.createTypeList(1, port.getType());
