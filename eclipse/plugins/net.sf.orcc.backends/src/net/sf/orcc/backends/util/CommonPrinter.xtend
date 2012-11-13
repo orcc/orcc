@@ -51,18 +51,18 @@ class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * Print indexes list when accessing to an array (ex : <code>[INDEX][2][i + 1]</code>)
 	 * or when declaring it. If list is empty, return an empty string.
 	 */
-	def protected printArrayIndexes(List<Expression> exprList) {
+	def printArrayIndexes(List<Expression> exprList) {
 		exprList.join("", ['''[«doSwitch»]'''])
 	}
 	
 	/**
 	 * Split the string into lines with a max of n characters
 	 */
-	def protected wrap(CharSequence charSeq, int n) {
+	def wrap(CharSequence charSeq, int n) {
 		WordUtils::wrap(charSeq.toString, n)
 	}
 	
-	def protected wrap(CharSequence charSeq) {
+	def wrap(CharSequence charSeq) {
 		wrap(charSeq, 80)
 	}
 	
@@ -90,7 +90,7 @@ class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * @param file
 	 * @return a byte[] containing the hash
 	 */
-	def protected hash(File file) {
+	def hash(File file) {
 		try {
 			// MessageDigest is NOT thread safe, it must be created locally on
 			// each call, it can't be a member of this class
@@ -128,7 +128,7 @@ class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * @param targetFile
 	 * @param content
 	 */
-	def protected needToWriteFile(CharSequence content, File target) {
+	def needToWriteFile(CharSequence content, File target) {
 		return overwriteAllFiles || ! target.exists()
 				|| ! MessageDigest::isEqual(hash(target), hash(content.toString.bytes));
 	}
@@ -143,7 +143,7 @@ class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 *            file to write content to
 	 * @return true if the file has correctly been written
 	 */
-	def protected printFile(CharSequence content, File target) {
+	def printFile(CharSequence content, File target) {
 		try {
 			if ( ! target.getParentFile().exists()) {
 				target.getParentFile().mkdirs();
