@@ -29,10 +29,26 @@
  package net.sf.orcc.backends.promela
 
 import java.io.File
+import java.util.List
 import java.util.Map
+import net.sf.orcc.df.Action
 import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Pattern
+import net.sf.orcc.df.State
+import net.sf.orcc.df.Transition
+import net.sf.orcc.ir.Expression
+import net.sf.orcc.ir.InstAssign
+import net.sf.orcc.ir.InstCall
+import net.sf.orcc.ir.InstLoad
+import net.sf.orcc.ir.InstReturn
+import net.sf.orcc.ir.InstStore
+import net.sf.orcc.ir.Var
+import org.eclipse.emf.ecore.EObject
 
 import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.ir.BlockBasic
+import net.sf.orcc.ir.BlockIf
+import net.sf.orcc.ir.BlockWhile
 
 /*
  * Compile Instance promela
@@ -44,9 +60,17 @@ class InstancePrinter extends PromelaTemplate {
 	
 	val Instance instance
 	
+	val Map<Action, List<InstLoad>> loadPeeks
+	val Map<Action, List<Expression>> guards
+	val Map<EObject, List<Action>> priority
+	
 	new(Instance instance, Map<String, Object> options) {
 		
 		this.instance = instance
+		
+		loadPeeks = options.get("loadPeeks") as Map<Action, List<InstLoad>>
+		guards = options.get("guards") as Map<Action, List<Expression>>
+		priority = options.get("priority") as Map<EObject, List<Action>>
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
@@ -68,7 +92,330 @@ class InstancePrinter extends PromelaTemplate {
 	}
 	
 	def getInstanceFileContent() '''
+		/*state need to be global in order to reach it from never claims*/
+		int «instance.simpleName»_state;
+		
+		proctype «instance.simpleName»(«instance.actor.parameters.join(", ", [declare])») {
+		
+			«IF instance.actor.hasFsm»
+				/* States of the FSM */
+				«FOR i : 0..instance.actor.fsm.states.size-1»
+					int state_«instance.actor.fsm.states.get(i).name» = «i»;
+				«ENDFOR»
+			«ENDIF»
+		
+			/*peek variables*/
+			«FOR action : instance.actor.actions»
+				«FOR inst : loadPeeks.get(action)»
+					«inst.target.variable.type.doSwitch» «inst.target.variable.name» = 0;
+				«ENDFOR»
+				«FOR inst : loadPeeks.get(action)»
+					bool «inst.target.variable.name»_done = 0;
+				«ENDFOR»
+			«ENDFOR»
+		
+			«IF ! instance.actor.stateVars.empty»
+				/* State variables */
+				«FOR stateVar : instance.actor.stateVars»
+					«stateVar.declareStateVar»
+				«ENDFOR»
+				«FOR stateVar : instance.actor.stateVars»
+					«stateVar.initializeStateVar»
+				«ENDFOR»
+			«ENDIF»
+			
+			«IF ! instance.arguments.empty»
+				/* Instance's arguments*/
+				«FOR arg : instance.arguments»
+					int «arg.variable.name» = «arg.value.doSwitch»
+				«ENDFOR»
+			«ENDIF»
+			
+			/* Ports */
+			«FOR port : instance.actor.inputs»
+				«port.type.doSwitch» «port.name»[«port.numTokensConsumed»];
+			«ENDFOR»
+			«FOR port : instance.actor.outputs»
+				«port.type.doSwitch» «port.name»[«port.numTokensProduced»];
+			«ENDFOR»
+		
+		
+			«IF instance.actor.hasFsm»
+				/* Initial State */
+				«instance.simpleName»_state = state_«instance.actor.fsm.initialState.name»;
+				
+				do
+				<actor.fsm.states: newState()>
+				«FOR state : instance.actor.fsm.states»
+					«state.newState»
+				«ENDFOR»
+				od;
+				<else>
+				do
+				:: skip -\> 
+				  if
+				  <actor.actionsOutsideFsm: { a | <peekPattern(pattern=a.peekPattern,action=a)>}>
+				  <actor.actionsOutsideFsm: scheduler(); separator="\n">
+				  fi;
+				od;
+			«ENDIF»
+		}
 	'''
 	
+	def newState(State state) '''
+		::	«instance.simpleName»_state == state_«state.name» -> {
+			if
+		«FOR edge : state.outgoing»
+			«(edge as Transition).action.printPeekPattern»
+			«(edge as Transition).action.printSchedulerFSM((edge as Transition))»
+		«ENDFOR»
+		«instance.actor.actionsOutsideFsm.map[printPeekPattern].join»
+		«FOR action : instance.actor.actionsOutsideFsm»
+			«action.printScheduler»
+		«ENDFOR»
+			fi;
+		}
+	'''
 
+	def printPeekPattern(Action action) {
+		val pattern = action.peekPattern
+		if( ! pattern.variables.empty) {
+			'''
+				::	/*«action.name»_peek()*/ atomic { 
+					nempty(«pattern.variables.join(" && ", [peekPatternCheck(pattern)])»)«loadPeeks.get(action).join(" && ", " && ", "", ['''«target.variable.name»_done == 0'''])» ->
+					«FOR variable : pattern.variables»
+						chan_«instance.simpleName»_«pattern.varToPortMap.get(variable).name»?<«variable.name»[0]>;
+					«ENDFOR»
+					«FOR instLoad : loadPeeks.get(action)»
+						«instLoad.target.variable.name»_done = 1;
+					«ENDFOR»
+				}
+			'''
+		}
+	}
+	
+	def peekPatternCheck(Var variable, Pattern pattern)
+		'''chan_«instance.simpleName»_«pattern.varToPortMap.get(variable).name»'''
+	
+	
+	def printSchedulerFSM(Action action, Transition trans) '''
+		::	/* «action.name» */ atomic { 
+			«action.guardFSM(trans)» «action.inputPattern.inputChannelCheck» «action.outputPattern.outputChannelCheck»
+			-> 
+			/* Temp variables*/
+			int promela_io_index; // used for reading/writing multiple tokens
+			«FOR local : action.body.locals»
+				«local.declare»;
+			«ENDFOR»
+			 
+			«action.inputPattern.inputPattern»
+			
+			«FOR block : action.body.blocks»
+				«block.doSwitch»
+			«ENDFOR»
+			
+			«action.outputPattern.outputPattern»
+			
+			«instance.simpleName»_state = state_«trans.target.name»;
+			
+			«FOR instLoad : loadPeeks.get(action)»
+				«instLoad.target.variable.name»_done = 0;
+			«ENDFOR»
+			
+		#ifdef PNAME
+		printf("«instance.simpleName».«action.name»();\n");
+		#endif
+		#ifdef PFSM
+		printf("state = state_«trans.target.name»;\n");
+		#endif
+		«IF ! instance.actor.stateVars.empty»
+			#ifdef PSTATE
+			printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join("", ['''«name»«type.dimensions.join("",["[0]"])»'''])»;
+			#endif
+		«ENDIF»
+		}
+	'''
+
+	
+	
+	def guardFSM(Action action, EObject object) {
+		if (guards.containsKey(action)) {
+			'''«guards.get(action).join(" && ", [doSwitch])» «priority.get(object).join("&& ", " && ", "", [priorities])» «action.peekDone»'''
+		} else {
+			'''skip «priority.get(object).join(" && ", [priorities])» «action.peekDone»'''
+		}
+	}
+	
+	def priorities(Action action) {
+		if(guards.containsKey(action)) {
+			'''!(«guards.get(action).join(" && ", [doSwitch])») «action.peekDone»'''
+		}
+	}
+	
+	def peekDone(Action action)
+		'''«loadPeeks.get(action).join("&& ", " && ", "", ['''«target.variable.name»_done == 1'''])»'''
+
+	def inputChannelCheck(Pattern pattern) {
+		if( ! pattern.ports.empty) {
+			'''«pattern.ports.join(" && ", " && ", "", ['''nempty(chan_«instance.simpleName»_«name»)'''])»'''
+		}
+	}
+
+	def outputChannelCheck(Pattern pattern) {
+		if( ! pattern.ports.empty) {
+			'''«pattern.ports.join(" && ", " && ", "", ['''nfull(chan_«instance.simpleName»_«name»)'''])»'''
+		}
+	}
+	
+	def inputPattern(Pattern pattern) '''
+		«FOR variable : pattern.variables»
+			promela_io_index=0;
+			do
+			:: promela_io_index < «variable.type.dimensions.head» -> 
+				chan_«instance.simpleName»_«pattern.varToPortMap.get(variable).name»?«variable.name»[promela_io_index];
+				promela_io_index = promela_io_index + 1;
+			:: else -> break;
+			od;
+		«ENDFOR»
+	'''
+
+	def outputPattern(Pattern pattern) '''
+		«FOR variable : pattern.variables»
+			promela_io_index=0;
+			do
+			:: promela_io_index < «variable.type.dimensions.head» -> 
+				chan_«instance.simpleName»_«pattern.varToPortMap.get(variable).name»!«variable.name»[promela_io_index];
+				promela_io_index = promela_io_index + 1;
+			:: else -> break;
+			od;
+		«ENDFOR»
+	'''
+
+	def printScheduler(Action action) '''
+		:: /* «action.name» */ atomic { 
+			«action.guard» «action.inputPattern.inputChannelCheck» «action.outputPattern.outputChannelCheck»
+			->
+			
+			/* Temp variables*/
+			int promela_io_index; // used for reading/writing multiple tokens
+			«FOR local : action.body.locals»
+				«local.declare»;
+			«ENDFOR»
+			 
+			«action.inputPattern.inputPattern»
+			
+			«FOR block : action.body.blocks»
+				«block.doSwitch»
+			«ENDFOR»
+			
+			«action.outputPattern.outputPattern»
+			
+		#ifdef PNAME
+		printf("«instance.simpleName».«action.name»();\n");
+		#endif
+		«IF ! instance.actor.stateVars.empty»
+			#ifdef PSTATE
+			printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join("", ['''«name»«type.dimensions.join("",["[0]"])»'''])»;
+			#endif
+		«ENDIF»
+		}	
+	'''
+	
+	def guard(Action action) {
+		guardFSM(action, action)
+	}
+
+	def declareStateVar(Var variable) '''
+		«IF variable.initialized»
+			«IF ! variable.assignable»
+				«IF ! variable.type.list»
+					«variable.type.doSwitch» «variable.name» = «variable.initialValue.doSwitch»;
+				«ELSE»
+					«variable.declare» = «variable.initialValue.doSwitch»;
+				«ENDIF»
+			«ELSE»
+				«IF variable.type.list»
+					«variable.declare("_backup")» = «variable.initialValue.doSwitch»;
+				«ENDIF»
+				«variable.declare»;
+			«ENDIF»
+		«ELSE»
+			«variable.declare»;
+		«ENDIF»
+	'''
+
+	def initializeStateVar(Var variable) {
+		if(variable.assignable && variable.initialized) {
+			if( ! variable.type.list) {
+				'''«variable.name» = «variable.initialValue.doSwitch»;'''
+			} else {
+				'''//memcpy(«variable.name», «variable.name»_backup, sizeof(«variable.name»_backup));'''
+			}
+		}
+	}
+
+	override declare(Var variable) {
+		variable.declare("")	
+	}
+
+	def declare(Var variable, String nameSuffix)
+		'''«variable.type.doSwitch» «variable.indexedName»«nameSuffix»«variable.type.dimensionsExpr.printArrayIndexes»'''
+	
+	override caseInstAssign(InstAssign assign) '''
+		«assign.target.variable.indexedName» = «assign.value.doSwitch»;
+	'''
+
+	override caseInstCall(InstCall call) {
+		if(call.print) '''
+			printf(«call.parameters.printfArgs.join(", ")»);
+		'''
+		else '''
+			«IF call.target != null»«call.target.variable.name» = «ENDIF»1;
+		'''
+	}
+	
+	override caseInstLoad(InstLoad load) '''
+		«load.target.variable.indexedName» = «load.source.variable.indexedName»«load.indexes.printArrayIndexes»;
+	'''
+	
+	override caseInstStore(InstStore store) '''
+		«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
+	'''
+	
+	override caseInstReturn(InstReturn returnInstr) ''''''
+	
+	override caseBlockBasic(BlockBasic block) '''
+		«FOR instr : block.instructions»
+			«instr.doSwitch»
+		«ENDFOR»
+	'''
+	
+	override caseBlockIf(BlockIf blockIf) '''
+		if 
+		:: («blockIf.condition.doSwitch») ->
+			«FOR block : blockIf.thenBlocks»
+				«block.doSwitch»
+			«ENDFOR»
+		«IF blockIf.elseRequired»
+		:: else ->
+			«FOR block : blockIf.elseBlocks»
+				«block.doSwitch»
+			«ENDFOR»
+		«ENDIF»
+		fi;
+			«blockIf.joinBlock.doSwitch»
+	'''
+	
+	override caseBlockWhile(BlockWhile blockWhile) '''
+		do 
+		:: «blockWhile.condition.doSwitch» ->
+			«FOR block : blockWhile.blocks»
+				«block.doSwitch»
+			«ENDFOR»
+		:: else -> break;
+		od;
+		
+		«blockWhile.joinBlock.doSwitch»
+	'''
+	
 }
