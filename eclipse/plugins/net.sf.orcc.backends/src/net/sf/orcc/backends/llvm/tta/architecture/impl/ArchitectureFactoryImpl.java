@@ -340,7 +340,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				"source_sizeoffile", "source_ismaxloopsreached" };
 		String[] oneInputOps = { "source_init", "source_rewind",
 				"source_decrementnbloops", "print_cyclecount" };
-		String[] twoInputOps = { "tta_print", "source_exit", "display_checksum" };
+		String[] twoInputOps = { "source_exit", "display_checksum" };
 		for (String operation : oneInputOps) {
 			functionUnit.getOperations().add(
 					createOperationDefault(operation, in1t));
