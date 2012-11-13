@@ -29,13 +29,11 @@
 package net.sf.orcc.backends.promela
 
 import net.sf.orcc.backends.c.CTemplate
-import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
 import net.sf.orcc.ir.TypeInt
 import net.sf.orcc.ir.TypeList
-import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
-import net.sf.orcc.ir.TypeVoid
+import net.sf.orcc.ir.TypeBool
 
 /*
  * Default C Printer
@@ -50,28 +48,21 @@ class PromelaTemplate extends CTemplate {
 	 * Types
 	 *
 	 *****************************************/
-	override caseTypeBool(TypeBool type) 
-		'''i32'''
+	override caseTypeBool(TypeBool type)
+		'''bool'''
 
 	override caseTypeInt(TypeInt type)
-		'''i«type.size»'''
+		'''int'''
 
 	override caseTypeUint(TypeUint type) 
-		'''u«type.size»'''
+		'''uint'''
 
 	override caseTypeFloat(TypeFloat type) {
 		if (type.size == 64) '''double'''
 		else '''float'''
 	}
 
-	override caseTypeString(TypeString type)
-		'''char *'''
-
-	override caseTypeVoid(TypeVoid type)
-		'''void'''
-	
 	override caseTypeList(TypeList typeList)
-		//TODO : print sizes
 		'''«typeList.innermostType.doSwitch»'''
 
 }

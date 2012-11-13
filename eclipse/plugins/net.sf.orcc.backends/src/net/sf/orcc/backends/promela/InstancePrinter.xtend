@@ -85,9 +85,9 @@ class InstancePrinter extends PromelaTemplate {
 		
 		if(needToWriteFile(content, file)) {
 			printFile(content, file)
-			return false
+			return 0
 		} else {
-			return true
+			return 1
 		}
 	}
 	
@@ -95,6 +95,7 @@ class InstancePrinter extends PromelaTemplate {
 		/*state need to be global in order to reach it from never claims*/
 		int «instance.simpleName»_state;
 		
+		/* Process */
 		proctype «instance.simpleName»(«instance.actor.parameters.join(", ", [declare])») {
 		
 			«IF instance.actor.hasFsm»
@@ -139,24 +140,26 @@ class InstancePrinter extends PromelaTemplate {
 				«port.type.doSwitch» «port.name»[«port.numTokensProduced»];
 			«ENDFOR»
 		
-		
 			«IF instance.actor.hasFsm»
 				/* Initial State */
 				«instance.simpleName»_state = state_«instance.actor.fsm.initialState.name»;
 				
 				do
-				<actor.fsm.states: newState()>
 				«FOR state : instance.actor.fsm.states»
 					«state.newState»
 				«ENDFOR»
 				od;
-				<else>
+			«ELSE»
 				do
-				:: skip -\> 
-				  if
-				  <actor.actionsOutsideFsm: { a | <peekPattern(pattern=a.peekPattern,action=a)>}>
-				  <actor.actionsOutsideFsm: scheduler(); separator="\n">
-				  fi;
+				:: skip ->
+					if
+					«FOR action : instance.actor.actionsOutsideFsm»
+						«action.printPeekPattern»
+					«ENDFOR»
+					«FOR action : instance.actor.actionsOutsideFsm»
+						«action.printScheduler»
+					«ENDFOR»
+					fi;
 				od;
 			«ENDIF»
 		}
@@ -165,14 +168,14 @@ class InstancePrinter extends PromelaTemplate {
 	def newState(State state) '''
 		::	«instance.simpleName»_state == state_«state.name» -> {
 			if
-		«FOR edge : state.outgoing»
-			«(edge as Transition).action.printPeekPattern»
-			«(edge as Transition).action.printSchedulerFSM((edge as Transition))»
-		«ENDFOR»
-		«instance.actor.actionsOutsideFsm.map[printPeekPattern].join»
-		«FOR action : instance.actor.actionsOutsideFsm»
-			«action.printScheduler»
-		«ENDFOR»
+			«FOR edge : state.outgoing»
+				«(edge as Transition).action.printPeekPattern»
+				«(edge as Transition).action.printSchedulerFSM((edge as Transition))»
+			«ENDFOR»
+			«instance.actor.actionsOutsideFsm.map[printPeekPattern].join»
+			«FOR action : instance.actor.actionsOutsideFsm»
+				«action.printScheduler»
+			«ENDFOR»
 			fi;
 		}
 	'''
@@ -230,16 +233,14 @@ class InstancePrinter extends PromelaTemplate {
 		#endif
 		«IF ! instance.actor.stateVars.empty»
 			#ifdef PSTATE
-			printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join("", ['''«name»«type.dimensions.join("",["[0]"])»'''])»;
+			printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join(", ", ['''«name»«type.dimensions.join("",["[0]"])»'''])»);
 			#endif
 		«ENDIF»
 		}
 	'''
-
-	
 	
 	def guardFSM(Action action, EObject object) {
-		if (guards.containsKey(action)) {
+		if ( ! guards.get(action).nullOrEmpty) {
 			'''«guards.get(action).join(" && ", [doSwitch])» «priority.get(object).join("&& ", " && ", "", [priorities])» «action.peekDone»'''
 		} else {
 			'''skip «priority.get(object).join(" && ", [priorities])» «action.peekDone»'''
@@ -292,7 +293,7 @@ class InstancePrinter extends PromelaTemplate {
 	'''
 
 	def printScheduler(Action action) '''
-		:: /* «action.name» */ atomic { 
+		:: /* «action.name» */ atomic {
 			«action.guard» «action.inputPattern.inputChannelCheck» «action.outputPattern.outputChannelCheck»
 			->
 			
@@ -301,7 +302,7 @@ class InstancePrinter extends PromelaTemplate {
 			«FOR local : action.body.locals»
 				«local.declare»;
 			«ENDFOR»
-			 
+			
 			«action.inputPattern.inputPattern»
 			
 			«FOR block : action.body.blocks»
@@ -315,7 +316,7 @@ class InstancePrinter extends PromelaTemplate {
 		#endif
 		«IF ! instance.actor.stateVars.empty»
 			#ifdef PSTATE
-			printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join("", ['''«name»«type.dimensions.join("",["[0]"])»'''])»;
+			printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join("", ['''«name»«type.dimensions.join("",["[0]"])»'''])»);
 			#endif
 		«ENDIF»
 		}	
@@ -366,6 +367,7 @@ class InstancePrinter extends PromelaTemplate {
 	'''
 
 	override caseInstCall(InstCall call) {
+		//ERROR this function call must be removed, in this case we give a 1, it is OK if it is "data"
 		if(call.print) '''
 			printf(«call.parameters.printfArgs.join(", ")»);
 		'''
@@ -396,7 +398,7 @@ class InstancePrinter extends PromelaTemplate {
 			«FOR block : blockIf.thenBlocks»
 				«block.doSwitch»
 			«ENDFOR»
-		«IF blockIf.elseRequired»
+		«IF ! blockIf.elseBlocks.nullOrEmpty»
 		:: else ->
 			«FOR block : blockIf.elseBlocks»
 				«block.doSwitch»

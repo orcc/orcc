@@ -36,8 +36,6 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.StandardPrinter;
-import net.sf.orcc.backends.c.CExpressionPrinter;
 import net.sf.orcc.backends.promela.transform.GuardsExtractor;
 import net.sf.orcc.backends.promela.transform.NetworkStateDefExtractor;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
@@ -76,13 +74,8 @@ import org.eclipse.emf.ecore.EObject;
 public class PromelaBackend extends AbstractBackend {
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
-
-	private StandardPrinter instancePrinter;
-
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
-
 	private NetworkStateDefExtractor netStateDef;
-
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 
 	private final Map<String, String> renameMap;
@@ -127,18 +120,17 @@ public class PromelaBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		// instantiate and flattens network
+
+		// Instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
+
+		// Classify network
 		// new Classifier(getWriteListener()).doSwitch(network);
-		instancePrinter = new StandardPrinter(
-				"net/sf/orcc/backends/promela/Actor.stg");
-		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
-		instancePrinter.setTypePrinter(new PromelaTypePrinter());
-		instancePrinter.getOptions().put("guards", guards);
-		instancePrinter.getOptions().put("priority", priority);
-		instancePrinter.getOptions().put("loadPeeks", loadPeeks);
-		instancePrinter.getOptions().put("network", network);
+
+		options.put("guards", guards);
+		options.put("priority", priority);
+		options.put("loadPeeks", loadPeeks);
 
 		transformActors(network.getAllActors());
 
@@ -151,14 +143,12 @@ public class PromelaBackend extends AbstractBackend {
 		new BroadcastAdder().doSwitch(network);
 
 		network.computeTemplateMaps();
-
 		printNetwork(network);
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return instancePrinter.print(instance.getName() + ".pml", path,
-				instance);
+		return new InstancePrinter(instance, options).printInstance(path) > 0;
 	}
 
 	/**

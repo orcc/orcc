@@ -55,7 +55,7 @@ class NetworkPrinter extends PromelaTemplate {
 	def print(String targetFolder) {
 		
 		val content = networkFileContent
-		val file = new File(targetFolder + File::separator + "main_" + network.simpleName + ".pml")
+		val file = new File(targetFolder + File::separator + "main_" + network.name + ".pml")
 		
 		if(needToWriteFile(content, file)) {
 			printFile(content, file)
@@ -103,18 +103,19 @@ class NetworkPrinter extends PromelaTemplate {
 					else "SIZE"
 		'''
 			«IF connection.source != null»
-				chan chan_«connection.getAttribute("id").stringValue» = [«size»] of {«connection.sourcePort.type.doSwitch»};
+				chan chan_«connection.<Object>getValueAsObject("id")» = [«size»] of {«connection.sourcePort.type.doSwitch»};
 			«ELSE»
-				chan chan_«connection.getAttribute("id").stringValue» = [«size»] of {«connection.targetPort.type.doSwitch»};
+				chan chan_«connection.<Object>getValueAsObject("id")» = [«size»] of {«connection.targetPort.type.doSwitch»};
 			«ENDIF»
 		'''
 	}
 	
 	def assignFifo(Connection connection) '''
 		«IF connection.source != null»
-			#define chan_«(connection.source as Instance).simpleName»_«connection.sourcePort.name» chan_«connection.getAttribute("id").stringValue»
-		«ELSEIF connection.target != null»
-			#define chan_«(connection.target as Instance).simpleName»_«connection.targetPort.name» chan_«connection.getAttribute("id").stringValue»
+			#define chan_«(connection.source as Instance).simpleName»_«connection.sourcePort.name» chan_«connection.<Object>getValueAsObject("id")»
+		«ENDIF»
+		«IF connection.target != null»
+			#define chan_«(connection.target as Instance).simpleName»_«connection.targetPort.name» chan_«connection.<Object>getValueAsObject("id")»
 		«ENDIF»
 	'''
 }
