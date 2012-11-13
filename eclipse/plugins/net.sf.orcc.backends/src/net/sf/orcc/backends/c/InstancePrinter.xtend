@@ -30,7 +30,6 @@
 
 import java.io.File
 import java.util.HashMap
-import java.util.LinkedList
 import java.util.List
 import java.util.Map
 import net.sf.orcc.df.Action
@@ -47,7 +46,6 @@ import net.sf.orcc.ir.ArgByVal
 import net.sf.orcc.ir.BlockBasic
 import net.sf.orcc.ir.BlockIf
 import net.sf.orcc.ir.BlockWhile
-import net.sf.orcc.ir.ExprString
 import net.sf.orcc.ir.InstAssign
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.InstLoad
@@ -827,30 +825,7 @@ class InstancePrinter extends CTemplate {
 			(arg as ArgByVal).value.doSwitch
 		}
 	}	
-	
-	def printfArgs(List<Arg> args) {
-		val finalArgs = new LinkedList<CharSequence>
 
-		val printfPattern = new StringBuilder
-		printfPattern.append('"')
-		
-		for (arg : args) {
-			
-			if(arg.byRef) {
-				printfPattern.append("%" + (arg as ArgByRef).use.variable.type.printfFormat)
-				finalArgs.add((arg as ArgByRef).use.variable.name)
-			} else if((arg as ArgByVal).value.exprString) {
-				printfPattern.append(((arg as ArgByVal).value as ExprString).value)
-			} else {
-				printfPattern.append("%" + (arg as ArgByVal).value.type.printfFormat)
-				finalArgs.add((arg as ArgByVal).value.doSwitch)
-			}
-			
-		}
-		printfPattern.append('"')
-		finalArgs.addFirst(printfPattern.toString)
-		return finalArgs
-	}
 	
 	/******************************************
 	 * 

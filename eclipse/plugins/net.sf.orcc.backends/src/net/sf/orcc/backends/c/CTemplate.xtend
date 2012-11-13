@@ -40,6 +40,12 @@ import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
+import java.util.List
+import net.sf.orcc.ir.Arg
+import java.util.LinkedList
+import net.sf.orcc.ir.ArgByRef
+import net.sf.orcc.ir.ArgByVal
+import net.sf.orcc.ir.ExprString
 
 /*
  * Default C Printer
@@ -113,6 +119,31 @@ class CTemplate extends CommonPrinter {
 			case type.string: "s"
 			case type.void: "p"
 		}
+	}
+	
+		
+	def printfArgs(List<Arg> args) {
+		val finalArgs = new LinkedList<CharSequence>
+
+		val printfPattern = new StringBuilder
+		printfPattern.append('"')
+		
+		for (arg : args) {
+			
+			if(arg.byRef) {
+				printfPattern.append("%" + (arg as ArgByRef).use.variable.type.printfFormat)
+				finalArgs.add((arg as ArgByRef).use.variable.name)
+			} else if((arg as ArgByVal).value.exprString) {
+				printfPattern.append(((arg as ArgByVal).value as ExprString).value)
+			} else {
+				printfPattern.append("%" + (arg as ArgByVal).value.type.printfFormat)
+				finalArgs.add((arg as ArgByVal).value.doSwitch)
+			}
+			
+		}
+		printfPattern.append('"')
+		finalArgs.addFirst(printfPattern.toString)
+		return finalArgs
 	}
 	
 	/**
