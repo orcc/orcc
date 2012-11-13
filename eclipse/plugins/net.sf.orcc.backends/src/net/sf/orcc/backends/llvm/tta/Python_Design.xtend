@@ -67,7 +67,7 @@ class Python_Design extends TTAPrinter {
 		'''
 		
 	override caseProcessor(Processor processor)
-		'''Processor("«processor.name»", «processor.name»_instances, «processor.name»_inputs, «processor.name»_outputs)'''
+		'''Processor("«processor.name»", «processor.name»_instances, «processor.name»_inputs, «processor.name»_outputs, «processor.usePrint»)'''
 		
 	def printPort(Port port, int index) 
 		'''Port("«port.label»", «index»«IF(port.native)», True, «port.size»«ENDIF»)'''
@@ -78,6 +78,14 @@ class Python_Design extends TTAPrinter {
 		«processor.name»_outputs = [«FOR edge: processor.outgoing SEPARATOR ', '»«(edge as Link).sourcePort.printPort(0)»«ENDFOR»]
 		«processor.name»_instances = [«FOR instance: processor.mappedActors SEPARATOR ', '»"«instance.name»"«ENDFOR»]
 		'''
+		
+	def usePrint(Processor processor) {
+		if(processor.mappedActors.filter[actor.useNativeProcedure].empty) {
+			'''False'''
+		} else {
+			'''True'''
+		}
+	}
 
 	
 }

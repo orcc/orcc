@@ -43,7 +43,7 @@ import tempita
 
 class Processor:
 
-    def __init__(self, name, actors, inputs, outputs):
+    def __init__(self, name, actors, inputs, outputs, usePrint):
         # General
         self.id = name
         # Ports
@@ -54,6 +54,7 @@ class Processor:
         self.dram = None
         # Actors
         self.actors = actors
+        self.usePrint = usePrint
         # Useful filenames
         self._processorFile = self.id + ".vhd"
         self._memConstantsPkg = self.id + "_mem_constants_pkg.vhd"
@@ -87,17 +88,21 @@ class Processor:
         sourceFiles = [self._llFile]
         for actor in self.actors:
             sourceFiles.append(os.path.join(actorsPath, actor + ".ll"))
-        
+
+        opt = args + ["-O3", "-o", self._tpefFile, "-a", self._adfFile]
+
         if debug:
             shutil.rmtree(tempPath, ignore_errors=True)
             os.mkdir(tempPath)
-            retcode = subprocess.call(["tcecc"] + args + ["-O3", "--swfp", "--temp-dir", tempPath, "-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
-            #if retcode == 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
-            if retcode == 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
+            opt = opt + ["--temp-dir", tempPath]
+        if self.usePrint:
+            opt = opt + ["--swfp"]
+
+        retcode = subprocess.call(["tcecc"] + opt + sourceFiles)
+
+        if retcode == 0 and debug:
+            retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
         
-        else:
-            retcode = subprocess.call(["tcecc"] + args + ["-O3", "--swfp", "-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
-            
         return retcode
 
     def generate(self, srcPath, libPath, args, debug, targetAltera):
