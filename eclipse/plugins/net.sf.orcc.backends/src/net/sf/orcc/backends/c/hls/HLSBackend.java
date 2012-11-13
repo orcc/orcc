@@ -126,6 +126,7 @@ public class HLSBackend extends CBackend {
 		}
 	}
 
+	@Override
 	protected void doTransformNetwork(Network network) {
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
@@ -191,6 +192,6 @@ public class HLSBackend extends CBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(instance, options).printInstance(srcPath);
+		return new InstancePrinter(instance, options).printInstance(srcPath) > 0;
 	}
 }
