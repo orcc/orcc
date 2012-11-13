@@ -75,7 +75,7 @@ TRIGGER
         }
     }
 
-    IO(2) = buf[0];
+    IO(2) = static_cast<UIntWord>(buf[0]);
 END_TRIGGER;
 
 END_OPERATION_WITH_STATE(SOURCE_READBYTE)
@@ -91,7 +91,7 @@ TRIGGER
     int size;
     fstat(fileno(STATE.file), &st); 
     size = st.st_size;
-    IO(2) = size; 
+    IO(2) = static_cast<UIntWord>(size); 
 END_TRIGGER;
 
 END_OPERATION_WITH_STATE(SOURCE_SIZEOFFILE)
