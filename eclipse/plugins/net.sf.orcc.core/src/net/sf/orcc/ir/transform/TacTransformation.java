@@ -71,7 +71,7 @@ public class TacTransformation extends AbstractIrVisitor<Expression> {
 
 	private static IrFactory factory = IrFactory.eINSTANCE;
 
-	private int complexityLevel = 0;
+	protected int complexityLevel = 0;
 
 	@Override
 	public Expression caseBlockIf(BlockIf nodeIf) {
