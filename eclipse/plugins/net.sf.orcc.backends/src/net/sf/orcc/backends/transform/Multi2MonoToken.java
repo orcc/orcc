@@ -815,7 +815,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 								readIndex, OpBinary.NE,
 								factory.createExprInt(0), port);
 						consumeToken(body, position, port);
-						noRepeatActions.remove(action);
+						//noRepeatActions.remove(action);
 
 						int index = it.previousIndex();
 						action.getInputPattern().remove(port);
@@ -1333,7 +1333,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			}
 			outputIndex = 0;
 		}
-		repeatInput = false;
+		//repeatInput = false;
 	}
 
 	/**
