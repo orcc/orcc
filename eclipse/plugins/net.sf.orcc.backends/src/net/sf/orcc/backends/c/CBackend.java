@@ -344,7 +344,7 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(instance, options).printInstance(srcPath);
+		return new InstancePrinter(instance, options).printInstance(srcPath) > 0;
 	}
 
 }

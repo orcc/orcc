@@ -38,6 +38,8 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Type
+import net.sf.orcc.ir.Var
+import net.sf.orcc.util.Attributable
 
 /*
  * Default C Printer
@@ -51,19 +53,15 @@ class CTemplate extends CommonPrinter {
 		this.exprPrinter = new CExpressionPrinter
 	}
 	
-	/******************************************
-	 * 
-	 * Expressions
-	 *
-	 *****************************************/
+	/////////////////////////////////
+	// Expressions
+	/////////////////////////////////
 	override caseExpression(Expression expr)
 		'''«exprPrinter.doSwitch(expr)»'''
 	
-	/******************************************
-	 * 
-	 * Types
-	 *
-	 *****************************************/
+	/////////////////////////////////
+	// Types
+	/////////////////////////////////
 	override caseTypeBool(TypeBool type) 
 		'''i32'''
 
@@ -89,11 +87,20 @@ class CTemplate extends CommonPrinter {
 		'''«typeList.innermostType.doSwitch»'''
 
 	
-	/******************************************
-	 * 
-	 * Helpers
-	 *
-	 *****************************************/
+	def declare(Var variable)
+		'''«variable.type.doSwitch» «variable.indexedName»«variable.type.dimensionsExpr.printArrayIndexes»'''
+	
+	
+	/////////////////////////////////
+	// Helpers
+	/////////////////////////////////
+	
+	 /**
+	  * Print for a type, the corresponding formatted text to
+	  * use inside a printf() call.
+	  * @param type the type to print
+	  * @return printf() type format
+	  */
 	def printfFormat(Type type) {
 		switch type {
 			case type.bool: "i"
@@ -107,4 +114,19 @@ class CTemplate extends CommonPrinter {
 			case type.void: "p"
 		}
 	}
+	
+	/**
+	 * Print attributes objectValues list as a comment (preceded by '//')
+	 * for an Attributable object
+	 * @param object the object
+	 * @return comment block
+	 */
+	def printAttributes(Attributable object) '''
+		«IF false && ! object.attributes.empty»
+			//Attributes for «object.toString» :
+			«FOR attr : object.attributes»
+				// - «attr.name» = «attr.objectValue»
+			«ENDFOR»
+		«ENDIF»
+	'''
 }

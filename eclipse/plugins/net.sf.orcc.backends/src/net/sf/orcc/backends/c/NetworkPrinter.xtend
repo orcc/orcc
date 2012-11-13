@@ -42,7 +42,7 @@ import java.util.HashMap
 import java.io.File
 
 /**
- * Compile top Network c source code 
+ * Generate and print network source file for C backend.
  *  
  * @author Antoine Lorence
  * 
@@ -92,6 +92,11 @@ class NetworkPrinter extends CTemplate {
 		instanceToIdMap = computeInstanceToIdMap
 	}
 	
+	/**
+	 * Print file content for the network
+	 * @param targetFolder folder to print the network file
+	 * @return 1 if file was cached, 0 if file was printed
+	 */
 	def print(String targetFolder) {
 		
 		val content = networkFileContent

@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
  package net.sf.orcc.backends.c
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
+
+import java.io.File
 import java.util.HashMap
 import java.util.LinkedList
 import java.util.List
@@ -56,12 +56,13 @@ import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
-import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
-import java.io.File
 
-/*
- * Compile Instance c source code
+import static net.sf.orcc.OrccLaunchConstants.*
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+
+/**
+ * Generate and print instance source file for C backend.
  *  
  * @author Antoine Lorence
  * 
@@ -134,7 +135,8 @@ class InstancePrinter extends CTemplate {
 	
 	/**
 	 * Print file content for the instance
-	 * 
+	 * @param targetFolder folder to print the instance file
+	 * @return 1 if file was cached, 0 if file was printed
 	 */
 	def printInstance(String targetFolder) {
 		val content = instanceFileContent
@@ -142,9 +144,9 @@ class InstancePrinter extends CTemplate {
 		
 		if(needToWriteFile(content, file)) {
 			printFile(content, file)
-			return false
+			return 0
 		} else {
-			return true
+			return 1
 		}
 	}
 	
@@ -677,18 +679,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 	
-	def declare(Var variable)
-		'''«variable.type.doSwitch» «variable.indexedName»«variable.type.dimensionsExpr.printArrayIndexes»'''
 
-	
-	def printAttributes(Attributable object) '''
-		«IF false && ! object.attributes.empty»
-			//Attributes for «object.toString» :
-			«FOR attr : object.attributes»
-				//«attr.name» = «attr.objectValue»
-			«ENDFOR»
-		«ENDIF»
-	'''
 
 	def instanceArgs() '''
 		«FOR arg : instance.arguments»
