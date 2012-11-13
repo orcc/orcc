@@ -101,6 +101,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 				if (processor.getFunctionUnit("ORCC_FU") == null
 						&& actor.useNativeProcedure()) {
 					processor.getFunctionUnits().add(
+							factory.createIoFU(processor));
+					processor.getFunctionUnits().add(
 							factory.createOrccFU(processor));
 				}
 

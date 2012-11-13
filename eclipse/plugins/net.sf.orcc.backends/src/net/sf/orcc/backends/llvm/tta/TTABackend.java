@@ -45,7 +45,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureBuilder;
 import net.sf.orcc.backends.llvm.tta.transform.ComplexHwOpDetector;
-import net.sf.orcc.backends.llvm.tta.transform.PrintRemoval;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
@@ -156,7 +155,6 @@ public class TTABackend extends LLVMBackend {
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new TypeResizer(true, true, false),
-				new DfVisitor<Void>(new PrintRemoval()),
 				new DfVisitor<Void>(new SSATransformation()),
 				new StringTransformation(),
 				new RenameTransformation(this.renameMap),

@@ -330,6 +330,8 @@ public interface ArchitectureFactory extends EFactory {
 	 */
 	Socket createInputSocket(String name, EList<Segment> segments);
 
+	FunctionUnit createIoFU(Processor tta);
+
 	/**
 	 * Return a new Load/Store unit with the given parameters
 	 * 
