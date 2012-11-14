@@ -34,6 +34,10 @@ import net.sf.orcc.ir.TypeInt
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.ExprList
+import net.sf.orcc.ir.ExprString
+import net.sf.orcc.ir.ExprInt
+import net.sf.orcc.ir.ExprBool
 
 /*
  * Default C Printer
@@ -65,4 +69,18 @@ class PromelaTemplate extends CTemplate {
 	override caseTypeList(TypeList typeList)
 		'''«typeList.innermostType.doSwitch»'''
 
+	
+	override caseExprList(ExprList object)
+		'''1 /*{«object.value.join(", ", [doSwitch])»}*/'''
+		
+	override caseExprString(ExprString object)
+		'''"«object.doSwitch»"'''
+	
+	override caseExprInt(ExprInt object)
+		'''«object.value»«IF object.long»L«ENDIF»'''
+	
+	override caseExprBool(ExprBool object)
+		'''«IF object.value»1«ELSE»0«ENDIF»'''
+		
+	
 }

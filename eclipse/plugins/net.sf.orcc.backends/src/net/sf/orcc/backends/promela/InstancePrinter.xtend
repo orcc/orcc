@@ -115,7 +115,7 @@ class InstancePrinter extends PromelaTemplate {
 				«ENDFOR»
 			«ENDFOR»
 		
-			«IF ! instance.actor.stateVars.empty»
+			«IF ! instance.actor.stateVars.nullOrEmpty»
 				/* State variables */
 				«FOR stateVar : instance.actor.stateVars»
 					«stateVar.declareStateVar»
@@ -125,7 +125,7 @@ class InstancePrinter extends PromelaTemplate {
 				«ENDFOR»
 			«ENDIF»
 			
-			«IF ! instance.arguments.empty»
+			«IF ! instance.arguments.nullOrEmpty»
 				/* Instance's arguments*/
 				«FOR arg : instance.arguments»
 					int «arg.variable.name» = «arg.value.doSwitch»
@@ -172,7 +172,9 @@ class InstancePrinter extends PromelaTemplate {
 				«(edge as Transition).action.printPeekPattern»
 				«(edge as Transition).action.printSchedulerFSM((edge as Transition))»
 			«ENDFOR»
-			«instance.actor.actionsOutsideFsm.map[printPeekPattern].join»
+			«FOR action : instance.actor.actionsOutsideFsm»
+				«action.printPeekPattern»
+			«ENDFOR»
 			«FOR action : instance.actor.actionsOutsideFsm»
 				«action.printScheduler»
 			«ENDFOR»
@@ -182,12 +184,17 @@ class InstancePrinter extends PromelaTemplate {
 
 	def printPeekPattern(Action action) {
 		val pattern = action.peekPattern
-		if( ! pattern.variables.empty) {
+		if( ! pattern.variables.nullOrEmpty) {
 			'''
 				::	/*«action.name»_peek()*/ atomic { 
 					nempty(«pattern.variables.join(" && ", [peekPatternCheck(pattern)])»)«loadPeeks.get(action).join(" && ", " && ", "", ['''«target.variable.name»_done == 0'''])» ->
 					«FOR variable : pattern.variables»
 						chan_«instance.simpleName»_«pattern.varToPortMap.get(variable).name»?<«variable.name»[0]>;
+					«ENDFOR»
+					«FOR variable : pattern.variables»
+						«FOR ld : loadPeeks.get(action)»
+							«ld.doSwitch»
+						«ENDFOR»
 					«ENDFOR»
 					«FOR instLoad : loadPeeks.get(action)»
 						«instLoad.target.variable.name»_done = 1;
@@ -203,7 +210,9 @@ class InstancePrinter extends PromelaTemplate {
 	
 	def printSchedulerFSM(Action action, Transition trans) '''
 		::	/* «action.name» */ atomic { 
-			«action.guardFSM(trans)» «action.inputPattern.inputChannelCheck» «action.outputPattern.outputChannelCheck»
+			«action.guardFSM(trans)»
+			«action.inputPattern.inputChannelCheck»
+			«action.outputPattern.outputChannelCheck»
 			-> 
 			/* Temp variables*/
 			int promela_io_index; // used for reading/writing multiple tokens
@@ -225,46 +234,46 @@ class InstancePrinter extends PromelaTemplate {
 				«instLoad.target.variable.name»_done = 0;
 			«ENDFOR»
 			
-		#ifdef PNAME
-		printf("«instance.simpleName».«action.name»();\n");
-		#endif
-		#ifdef PFSM
-		printf("state = state_«trans.target.name»;\n");
-		#endif
-		«IF ! instance.actor.stateVars.empty»
-			#ifdef PSTATE
-			printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join(", ", ['''«name»«type.dimensions.join("",["[0]"])»'''])»);
+			#ifdef PNAME
+			printf("«instance.simpleName».«action.name»();\n");
 			#endif
-		«ENDIF»
+			#ifdef PFSM
+			printf("state = state_«trans.target.name»;\n");
+			#endif
+			«IF ! instance.actor.stateVars.nullOrEmpty»
+				#ifdef PSTATE
+				printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join(", ", ['''«name»«type.dimensions.join("",["[0]"])»'''])»);
+				#endif
+			«ENDIF»
 		}
 	'''
 	
 	def guardFSM(Action action, EObject object) {
 		if ( ! guards.get(action).nullOrEmpty) {
-			'''«guards.get(action).join(" && ", [doSwitch])» «priority.get(object).join("&& ", " && ", "", [priorities])» «action.peekDone»'''
+			'''«guards.get(action).join(" && ", [doSwitch])»«priority.get(object).join(" && ", " && ", "", [priorities])»«action.peekDone»'''
 		} else {
-			'''skip «priority.get(object).join(" && ", [priorities])» «action.peekDone»'''
+			'''skip«priority.get(object).join(" && ", " && ", "", [priorities])»«action.peekDone»'''
 		}
 	}
 	
 	def priorities(Action action) {
 		if(guards.containsKey(action)) {
-			'''!(«guards.get(action).join(" && ", [doSwitch])») «action.peekDone»'''
+			'''!(«guards.get(action).join(" && ", [doSwitch])»)«action.peekDone»'''
 		}
 	}
 	
 	def peekDone(Action action)
-		'''«loadPeeks.get(action).join("&& ", " && ", "", ['''«target.variable.name»_done == 1'''])»'''
+		'''«loadPeeks.get(action).join(" && ", " && ", "", ['''«target.variable.name»_done == 1'''])»'''
 
 	def inputChannelCheck(Pattern pattern) {
-		if( ! pattern.ports.empty) {
-			'''«pattern.ports.join(" && ", " && ", "", ['''nempty(chan_«instance.simpleName»_«name»)'''])»'''
+		if( ! pattern.ports.nullOrEmpty) {
+			'''«pattern.ports.join("&& ", "\n&& ", "", ['''nempty(chan_«instance.simpleName»_«name»)'''])»'''
 		}
 	}
 
 	def outputChannelCheck(Pattern pattern) {
-		if( ! pattern.ports.empty) {
-			'''«pattern.ports.join(" && ", " && ", "", ['''nfull(chan_«instance.simpleName»_«name»)'''])»'''
+		if( ! pattern.ports.nullOrEmpty) {
+			'''«pattern.ports.join("&& ", "\n&& ", "", ['''nfull(chan_«instance.simpleName»_«name»)'''])»'''
 		}
 	}
 	
@@ -294,7 +303,9 @@ class InstancePrinter extends PromelaTemplate {
 
 	def printScheduler(Action action) '''
 		:: /* «action.name» */ atomic {
-			«action.guard» «action.inputPattern.inputChannelCheck» «action.outputPattern.outputChannelCheck»
+			«action.guard»
+			«action.inputPattern.inputChannelCheck»
+			«action.outputPattern.outputChannelCheck»
 			->
 			
 			/* Temp variables*/
@@ -311,14 +322,14 @@ class InstancePrinter extends PromelaTemplate {
 			
 			«action.outputPattern.outputPattern»
 			
-		#ifdef PNAME
-		printf("«instance.simpleName».«action.name»();\n");
-		#endif
-		«IF ! instance.actor.stateVars.empty»
-			#ifdef PSTATE
-			printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join("", ['''«name»«type.dimensions.join("",["[0]"])»'''])»);
+			#ifdef PNAME
+			printf("«instance.simpleName».«action.name»();\n");
 			#endif
-		«ENDIF»
+			«IF ! instance.actor.stateVars.nullOrEmpty»
+				#ifdef PSTATE
+				printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join("", ['''«name»«type.dimensions.join("",["[0]"])»'''])»);
+				#endif
+			«ENDIF»
 		}	
 	'''
 	
@@ -330,13 +341,13 @@ class InstancePrinter extends PromelaTemplate {
 		«IF variable.initialized»
 			«IF ! variable.assignable»
 				«IF ! variable.type.list»
-					«variable.type.doSwitch» «variable.name» = «variable.initialValue.doSwitch»;
+					«variable.type.doSwitch» «variable.name» = «variable.initialValue.doSwitch.wrap»;
 				«ELSE»
-					«variable.declare» = «variable.initialValue.doSwitch»;
+					«variable.declare» = «variable.initialValue.doSwitch.wrap»;
 				«ENDIF»
 			«ELSE»
 				«IF variable.type.list»
-					«variable.declare("_backup")» = «variable.initialValue.doSwitch»;
+					«variable.declare("_backup")» = «variable.initialValue.doSwitch.wrap»;
 				«ENDIF»
 				«variable.declare»;
 			«ENDIF»
