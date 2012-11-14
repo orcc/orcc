@@ -242,7 +242,7 @@ class InstancePrinter extends PromelaTemplate {
 			#endif
 			«IF ! instance.actor.stateVars.nullOrEmpty»
 				#ifdef PSTATE
-				printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join(", ", ['''«name»«type.dimensions.join("",["[0]"])»'''])»);
+				printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join(", ", ['''«name»«type.dimensions.join(",",["[0]"])»'''])»);
 				#endif
 			«ENDIF»
 		}
@@ -327,7 +327,7 @@ class InstancePrinter extends PromelaTemplate {
 			#endif
 			«IF ! instance.actor.stateVars.nullOrEmpty»
 				#ifdef PSTATE
-				printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join("", ['''«name»«type.dimensions.join("",["[0]"])»'''])»);
+				printf("«instance.actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «instance.actor.stateVars.join(",", ['''«name»«type.dimensions.join("",["[0]"])»'''])»);
 				#endif
 			«ENDIF»
 		}	

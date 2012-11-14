@@ -55,7 +55,7 @@ class NetworkPrinter extends PromelaTemplate {
 	def print(String targetFolder) {
 		
 		val content = networkFileContent
-		val file = new File(targetFolder + File::separator + "main_" + network.name + ".pml")
+		val file = new File(targetFolder + File::separator + "main_" + network.simpleName + ".pml")
 		
 		if(needToWriteFile(content, file)) {
 			printFile(content, file)
