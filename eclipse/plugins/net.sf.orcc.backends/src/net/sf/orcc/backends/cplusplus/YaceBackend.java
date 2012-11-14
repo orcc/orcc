@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.transform.TypeResizer;
@@ -77,10 +76,6 @@ public class YaceBackend extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		if (debug) {
-			OrccLogger.setLevel(Level.FINEST);
-			OrccLogger.debugln("Debug mode is enabled");
-		}
 	}
 
 	@Override

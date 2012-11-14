@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
@@ -79,10 +78,6 @@ public class HLSBackend extends CBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		if (debug) {
-			OrccLogger.setLevel(Level.FINEST);
-			OrccLogger.debugln("Debug mode is enabled");
-		}
 
 		new File(path + File.separator + "build").mkdirs();
 		new File(path + File.separator + "bin").mkdirs();

@@ -67,6 +67,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
@@ -113,8 +114,8 @@ import org.osgi.framework.Bundle;
  * <p>
  * The following methods are abstract and must be implemented by back-ends:
  * <ul>
- * <li>{@link #doInitializeOptions()} is called by {@link #setOptions(Map)} to
- * initialize the options of the back-end.</li>
+ * <li>{@link #doInitializeOptions()} is called at the end of
+ * {@link #setOptions(Map)} to initialize the options of the back-end.</li>
  * <li>{@link #doTransformActor(Actor)} is called by
  * {@link #transformActors(List)} to transform a list of actors.</li>
  * <li>{@link #doVtlCodeGeneration(List)} is called to compile a list of actors.
@@ -451,7 +452,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Called when options are initialized.
+	 * Called by {@link #setOptions(Map)} when options are initialized. This
+	 * method may be implemented by backend to set member variables specific to
+	 * it.
 	 */
 	abstract protected void doInitializeOptions();
 
@@ -890,6 +893,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		} else if (outputFolder.startsWith("~")) {
 			outputFolder = outputFolder.replace("~",
 					System.getProperty("user.home"));
+		}
+
+		if (debug) {
+			OrccLogger.setLevel(Level.FINEST);
+			OrccLogger.debugln("Debug mode is enabled");
 		}
 
 		// set output path

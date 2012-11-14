@@ -39,7 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -128,11 +127,6 @@ public class JadeBackend extends AbstractBackend {
 		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
 		biteexact = getAttribute("net.sf.orcc.backends.byteexact", false);
 		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
-
-		if (debug) {
-			OrccLogger.setLevel(Level.FINEST);
-			OrccLogger.debugln("Debug mode is enabled");
-		}
 	}
 
 	@Override

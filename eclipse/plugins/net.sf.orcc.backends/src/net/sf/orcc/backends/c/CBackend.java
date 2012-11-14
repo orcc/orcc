@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Level;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
@@ -115,16 +114,13 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		if (debug) {
-			OrccLogger.setLevel(Level.FINEST);
-			OrccLogger.debugln("Debug mode is enabled");
-		}
 
 		if (!getAttribute(GENETIC_ALGORITHM, false)
 				&& targetToInstancesMap != null) {
 			options.put(THREADS_NB, targetToInstancesMap.size());
 		}
 
+		// Create empty folders
 		new File(path + File.separator + "build").mkdirs();
 		new File(path + File.separator + "bin").mkdirs();
 
