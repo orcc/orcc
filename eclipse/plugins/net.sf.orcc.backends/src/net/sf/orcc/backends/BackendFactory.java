@@ -90,10 +90,8 @@ public class BackendFactory extends PluginFactory {
 		Backend backend = (Backend) plugins.get(backendName);
 
 		backend.setProgressMonitor(monitor);
-		backend.setOptions(options);
 
-		// Export libraries if needed by backend
-		backend.exportRuntimeLibrary();
+		backend.setOptions(options);
 
 		// launches the compilation
 		backend.compile();

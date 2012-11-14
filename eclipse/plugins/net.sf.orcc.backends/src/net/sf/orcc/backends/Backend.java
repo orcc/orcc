@@ -55,7 +55,8 @@ public interface Backend {
 	boolean exportRuntimeLibrary();
 
 	/**
-	 * Sets the options of this back-end.
+	 * Register options set on eclipse "Run configuration" or command line to
+	 * use it while code generation process.
 	 * 
 	 * @param options
 	 *            a map of string to object

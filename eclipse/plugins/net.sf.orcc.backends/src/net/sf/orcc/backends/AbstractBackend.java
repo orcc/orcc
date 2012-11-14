@@ -29,6 +29,7 @@
 package net.sf.orcc.backends;
 
 import static net.sf.orcc.OrccActivator.getDefault;
+import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.CLASSIFY;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
@@ -102,6 +103,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.osgi.framework.Bundle;
 
 /**
  * This class is an abstract implementation of {@link Backend}. The two entry
@@ -197,11 +199,38 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	@Override
 	public void compile() {
+
+		boolean compilexdf = getAttribute(COMPILE_XDF, false);
+
+		String orccVersion = "<unknown>";
+		Bundle bundle = Platform.getBundle("net.sf.orcc.backends");
+		if (bundle != null) {
+			orccVersion = bundle.getHeaders().get("Bundle-Version");
+		}
+
+		String backendName = getAttribute(BACKEND, "<unknown>");
+
+		OrccLogger.traceln("*********************************************"
+				+ "************************************");
+		OrccLogger.traceln("* Orcc version : " + orccVersion);
+		OrccLogger.traceln("* Backend : " + backendName);
+		OrccLogger.traceln("* Project : " + project.getName());
+		if (compilexdf) {
+			String topNetwork = getAttribute(XDF_FILE, "<unknown>");
+			OrccLogger.traceln("* Network : " + topNetwork);
+		}
+		OrccLogger.traceln("* Output folder : " + path);
+		OrccLogger.traceln("*********************************************"
+				+ "************************************");
+
+		exportRuntimeLibrary();
 		compileVTL();
 
-		if ((Boolean) options.get(COMPILE_XDF)) {
+		if (compilexdf) {
 			compileXDF();
 		}
+
+		OrccLogger.traceln("Orcc backend done.");
 	}
 
 	final private void compileVTL() {
@@ -692,13 +721,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				+ "s");
 
 		if (numCached > 0) {
-			OrccLogger
-					.traceln("*******************************************************************************");
+			OrccLogger.traceln("*********************************************"
+					+ "************************************");
 			OrccLogger.traceln("* NOTE: " + numCached
 					+ " actors were not regenerated "
-					+ "because they were already up-to-date. *");
-			OrccLogger
-					.traceln("*******************************************************************************");
+					+ "because they were already up-to-date.   *");
+			OrccLogger.traceln("*********************************************"
+					+ "************************************");
 		}
 	}
 
@@ -736,13 +765,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				+ "s");
 
 		if (numCached > 0) {
-			OrccLogger
-					.traceln("*******************************************************************************");
+			OrccLogger.traceln("*********************************************"
+					+ "************************************");
 			OrccLogger.traceln("* NOTE: " + numCached
 					+ " entities were not regenerated "
-					+ "because they were already up-to-date. *");
-			OrccLogger
-					.traceln("*******************************************************************************");
+					+ "because they were already up-to-date.  *");
+			OrccLogger.traceln("*********************************************"
+					+ "************************************");
 		}
 	}
 
@@ -805,13 +834,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				+ "s");
 
 		if (numCached > 0) {
-			OrccLogger
-					.traceln("*******************************************************************************");
+			OrccLogger.traceln("*********************************************"
+					+ "************************************");
 			OrccLogger.traceln("* NOTE: " + numCached
 					+ " instances were not regenerated "
 					+ "because they were already up-to-date. *");
-			OrccLogger
-					.traceln("*******************************************************************************");
+			OrccLogger.traceln("*********************************************"
+					+ "************************************");
 		}
 	}
 
@@ -834,10 +863,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	public void setOptions(Map<String, Object> options) {
 		this.options = options;
 
-		String name = getAttribute(PROJECT, "");
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		project = root.getProject(getAttribute(PROJECT, ""));
 
-		project = root.getProject(name);
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
 		inputFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
@@ -853,23 +881,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		convertMulti2Mono = getAttribute(CONVERT_MULTI2MONO, false);
 
-		String outputFolder;
-		Object obj = options.get(OUTPUT_FOLDER);
-		if (obj instanceof String) {
-			outputFolder = (String) obj;
-			if (outputFolder.startsWith("~")) {
-				outputFolder = outputFolder.replace("~",
-						System.getProperty("user.home"));
-			}
-		} else {
-			outputFolder = "";
-		}
-
+		String outputFolder = getAttribute(OUTPUT_FOLDER, "");
 		if (outputFolder.isEmpty()) {
 			File tempOrccDir = new File(System.getProperty("java.io.tmpdir"),
 					"orcc");
 			tempOrccDir.mkdir();
 			outputFolder = tempOrccDir.getAbsolutePath();
+		} else if (outputFolder.startsWith("~")) {
+			outputFolder = outputFolder.replace("~",
+					System.getProperty("user.home"));
 		}
 
 		// set output path
@@ -968,9 +988,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 
+			Class<? extends AbstractBackend> clasz = this.getClass();
+			optionMap.put(BACKEND, clasz.getName());
+
 			try {
 				setOptions(optionMap);
-				exportRuntimeLibrary();
+
 				compile();
 				return IApplication.EXIT_OK;
 			} catch (OrccRuntimeException e) {
