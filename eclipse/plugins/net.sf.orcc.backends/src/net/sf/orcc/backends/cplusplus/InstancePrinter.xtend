@@ -29,6 +29,8 @@
  
 package net.sf.orcc.backends.cplusplus
 
+import java.io.File
+import java.util.Map
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.FSM
@@ -51,12 +53,8 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
-import java.util.Map
-import java.io.File
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
 import static net.sf.orcc.OrccLaunchConstants.*
-import net.sf.orcc.util.OrccLogger
 
 /*
  * An actor printer.
@@ -77,8 +75,6 @@ import net.sf.orcc.util.OrccLogger
 		
 		val content = compileInstance
 		val file = new File(targetFolder + File::separator + instance.name + ".h")
-		
-		OrccLogger::traceln("overwrite : "+overwriteAllFiles)
 		
 		if(needToWriteFile(content, file)) {
 			printFile(content, file)
