@@ -28,7 +28,7 @@
       </backend>
       <backend
             class="net.sf.orcc.backends.c.hls.HLSBackend"
-            name="HLS">
+            name="HLS (experimental)">
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
