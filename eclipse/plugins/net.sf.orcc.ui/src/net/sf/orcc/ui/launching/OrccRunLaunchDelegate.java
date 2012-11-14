@@ -67,23 +67,19 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 			OrccLogger.configureLoggerWithHandler(new OrccUiConsoleHandler(
 					DebugUITools.getConsole(process)));
 
-			OrccLogger.traceln("*********************************************"
-					+ "**********************************");
-			OrccLogger.traceln("Launching Orcc backend...");
-			String backend = configuration.getAttribute(BACKEND, "");
 			try {
 				BackendFactory factory = BackendFactory.getInstance();
 				factory.runBackend(process.getProgressMonitor(),
 						configuration.getAttributes());
-
-				OrccLogger.traceln("Orcc backend done.");
 			} catch (OrccRuntimeException exception) {
+				String backend = configuration.getAttribute(BACKEND, "");
 				OrccLogger.severeln(exception.getMessage());
 				OrccLogger.severeln(backend
 						+ " backend could not generate code ("
 						+ exception.getCause() + ")");
 				process.terminate();
 			} catch (Exception e) {
+				String backend = configuration.getAttribute(BACKEND, "");
 				// clear actor pool because it might not have been done if we
 				// got an error too soon
 				process.terminate();
