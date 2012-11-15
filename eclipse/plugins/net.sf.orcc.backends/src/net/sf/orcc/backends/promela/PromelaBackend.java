@@ -132,6 +132,8 @@ public class PromelaBackend extends AbstractBackend {
 		options.put("priority", priority);
 		options.put("loadPeeks", loadPeeks);
 
+		new BroadcastAdder().doSwitch(network);
+		
 		transformActors(network.getAllActors());
 
 		netStateDef = new NetworkStateDefExtractor();
@@ -139,8 +141,6 @@ public class PromelaBackend extends AbstractBackend {
 
 		transformInstances(network.getChildren());
 		printInstances(network);
-
-		new BroadcastAdder().doSwitch(network);
 
 		network.computeTemplateMaps();
 		printNetwork(network);
