@@ -28,12 +28,18 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
+import net.sf.orcc.OrccRuntimeException
 import net.sf.orcc.backends.util.CommonPrinter
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Port
+import net.sf.orcc.ir.ExprBinary
+import net.sf.orcc.ir.ExprBool
+import net.sf.orcc.ir.ExprInt
 import net.sf.orcc.ir.ExprList
+import net.sf.orcc.ir.ExprString
+import net.sf.orcc.ir.ExprUnary
 import net.sf.orcc.ir.ExprVar
-import net.sf.orcc.ir.Expression
+import net.sf.orcc.ir.OpBinary
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
@@ -53,24 +59,107 @@ import net.sf.orcc.ir.Var
 class LLVMTemplate extends CommonPrinter {
 	
 	var Type currentType = null
+	var signed = false
+	var floating = false
 	
 	new(){
 		super()
-		this.exprPrinter = new LLVMExpressionPrinter
 	}
 	
-	/******************************************
-	 * 
-	 * Expressions
-	 *
-	 *****************************************/
-	override caseExpression(Expression expr) {
-		if (expr.exprVar) 
-			return (expr as ExprVar).use.variable.print
-		if (expr.exprString) 
-			return '''c«exprPrinter.doSwitch(expr)»'''
-		else 
-			return exprPrinter.doSwitch(expr)
+	/////////////////////////////////
+	// Expressions
+	/////////////////////////////////
+	
+	override stringRepresentation(OpBinary op) {
+		switch (op) {
+			case OpBinary::BITAND: 		"and"
+			case OpBinary::BITOR: 		"or"
+			case OpBinary::BITXOR:		"xor"
+			case OpBinary::DIV:
+				if (floating) 			"fdiv"
+				else if (signed)		"sdiv"
+				else					"udiv"
+			case OpBinary::DIV_INT:
+				if (floating)			"fdiv"
+				else if (signed) 		"sdiv"
+				else					"udiv"
+			case OpBinary::EQ:
+				if (floating)			"fcmp oeq"
+				else					"icmp eq"
+			case OpBinary::EXP:			"pow"
+			case OpBinary::GE:
+				if (floating)			"fcmp oge"
+				else if (signed)		"icmp sge"
+				else 					"icmp uge"
+			case OpBinary::GT:
+				if (floating)			"fcmp ogt"
+				else if (signed)		"icmp sgt"
+				else 					"icmp ugt"
+			case OpBinary::LOGIC_AND:	"and"
+			case OpBinary::LE:
+				if (floating)			"fcmp ole"
+				else if (signed)		"icmp sle"
+				else 					"icmp ule"
+			case OpBinary::LOGIC_OR:	"or"
+			case OpBinary::LT:
+				if (floating)			"fcmp olt"
+				else if (signed)		"icmp slt"
+				else 					"icmp ult"
+			case OpBinary::MINUS:
+				if (floating)			"fsub"
+				else 					"sub"
+			case OpBinary::MOD:
+				if (floating)			"frem"
+				else if (signed)		"srem"
+				else 					"urem"
+			case OpBinary::NE:
+				if (floating)			"fcmp one"
+				else 					"icmp ne"
+			case OpBinary::PLUS:
+				if (floating)			"fadd"
+				else 					"add"
+			case OpBinary::SHIFT_LEFT:	"shl"
+			case OpBinary::SHIFT_RIGHT:
+				if (signed)				"ashr"
+				else 					"lshr"
+			case OpBinary::TIMES:
+				if (floating)			"fmul"
+				else 					"mul"
+			default:
+				throw new OrccRuntimeException("Unknown binary operator : " + op)
+		}
+	}
+	
+	override caseExprBinary(ExprBinary expr) {
+		val op = expr.op
+		val e1 = expr.e1
+		val e2 = expr.e2
+
+		val type = 
+			if (e1 instanceof ExprVar) {
+				(e1 as ExprVar).use.variable.type
+			} else if (e2 instanceof ExprVar) {
+				(e2 as ExprVar).use.variable.type
+			} else {
+				expr.type
+			}
+
+		signed = !type.uint
+		floating = type.float
+
+		'''«op.stringRepresentation» «type.doSwitch» «e1.doSwitch», «e2.doSwitch»'''
+	}
+	
+	override caseExprUnary(ExprUnary expr) {
+		throw new OrccRuntimeException("No unary expression in LLVM")
+	}
+	
+	override caseExprString(ExprString expr) {
+		'''c«super.caseExprString(expr)»'''
+	}
+	
+	override caseExprVar(ExprVar expr) {
+		(expr as ExprVar).use.variable.print
 	}
 		
 	override caseExprList(ExprList exprList) {
@@ -83,16 +172,23 @@ class LLVMTemplate extends CommonPrinter {
 				(currentType as TypeList).type
 
 		
-		val list = '''[«exprList.value.join(", ", ['''«currentType.doSwitch» «it.doSwitch»'''])»]'''
+		val list = '''[«exprList.value.join(", ", ['''«currentType.doSwitch» «doSwitch»'''])»]'''
 		currentType = prevType
 		return list.wrap
 	}
 	
-	/******************************************
-	 * 
-	 * Types
-	 *
-	 *****************************************/
+	override caseExprBool(ExprBool expr) {
+		if(expr.value) "1" else "0"
+	}
+	
+	override caseExprInt(ExprInt expr) {
+		expr.value.toString
+	}
+	
+	/////////////////////////////////
+	// Types
+	/////////////////////////////////
+	
 	override caseTypeBool(TypeBool type) 
 		'''i1'''
 

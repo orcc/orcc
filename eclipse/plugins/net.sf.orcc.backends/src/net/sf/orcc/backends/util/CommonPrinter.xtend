@@ -4,27 +4,36 @@ import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.PrintStream
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.List
+import net.sf.orcc.ir.ExprBinary
+import net.sf.orcc.ir.ExprBool
+import net.sf.orcc.ir.ExprFloat
+import net.sf.orcc.ir.ExprInt
+import net.sf.orcc.ir.ExprList
+import net.sf.orcc.ir.ExprString
+import net.sf.orcc.ir.ExprUnary
+import net.sf.orcc.ir.ExprVar
 import net.sf.orcc.ir.Expression
-import net.sf.orcc.ir.util.AbstractIrVisitor
-import net.sf.orcc.ir.util.ExpressionPrinter
-import org.apache.commons.lang.ArrayUtils
-import org.apache.commons.lang.WordUtils
-import java.io.FileOutputStream
-import java.io.PrintStream
-import net.sf.orcc.util.OrccLogger
-
-import static net.sf.orcc.backends.util.CommonPrinter.*
+import net.sf.orcc.ir.OpBinary
+import net.sf.orcc.ir.OpUnary
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
 import net.sf.orcc.ir.TypeInt
+import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
-import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeVoid
+import net.sf.orcc.ir.util.AbstractIrVisitor
+import net.sf.orcc.util.OrccLogger
+import org.apache.commons.lang.ArrayUtils
+import org.apache.commons.lang.WordUtils
+
+import static net.sf.orcc.backends.util.CommonPrinter.*
 
 /**
  * Define commons methods for all backends printers
@@ -32,8 +41,10 @@ import net.sf.orcc.ir.TypeVoid
  */
 class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	
-	protected ExpressionPrinter exprPrinter
 	protected var overwriteAllFiles = false
+	
+	protected var precedence = Integer::MAX_VALUE
+	protected var branch = 0
 	
 	/**
 	 * The algorithm used with MessageDigest. Can be MD, SHA, etc (see <a
@@ -44,7 +55,6 @@ class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	
 	new() {
 		super(true)
-		exprPrinter = new ExpressionPrinter
 	}
 		
 	/**
@@ -190,4 +200,72 @@ class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 		"void"
 	}
 	
+	/**
+	 * Print expression after saving informations to correctly
+	 * add parenthesis everywhere it is needed
+	 */
+	def protected printExpr(Expression expr, int newPrecedence, int newBranch) {
+		
+		val oldBranch = branch;
+		val oldPrecedence = precedence;
+
+		branch = newBranch;
+		precedence = newPrecedence;
+		
+		val resultingExpr = expr.doSwitch;
+		
+		precedence = oldPrecedence;
+		branch = oldBranch;
+		
+		return resultingExpr
+	}
+	
+	def stringRepresentation(OpBinary op) {
+		op.text
+	}
+	
+	def stringRepresentation(OpUnary op) {
+		op.text
+	}
+	
+	override caseExprBinary(ExprBinary expr) {
+		val op = expr.op
+		val resultingExpr =
+			'''«expr.e1.printExpr(op.precedence, 0)» «op.stringRepresentation» «expr.e2.printExpr(op.precedence, 1)»'''
+		
+		if ( op.needsParentheses(precedence, branch)) {
+			'''(«resultingExpr»)'''
+		} else {
+			resultingExpr
+		}
+	}
+	
+	override caseExprUnary(ExprUnary expr)
+		'''«expr.op.stringRepresentation»«expr.expr.printExpr(Integer::MIN_VALUE, branch)»'''
+		
+	override caseExprFloat(ExprFloat object) {
+		String::valueOf(object.value)
+	}
+	
+	override caseExprInt(ExprInt object) {
+		String::valueOf(object.value)
+	}
+	
+	override caseExprBool(ExprBool object) {
+		String::valueOf(object.value)
+	}
+	
+	override caseExprVar(ExprVar object) {
+		object.use.variable.indexedName
+	}
+	
+	override caseExprList(ExprList expr) {
+		'''{«expr.value.join(", ", [printExpr(Integer::MAX_VALUE, 0)])»}'''
+	}
+
+	override caseExprString(ExprString expr) {
+		// note the difference with the caseExprString method from the
+		// expression evaluator: quotes around the string
+		return '''"«String::valueOf(expr.value)»"''';
+	}
 }

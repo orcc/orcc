@@ -36,7 +36,6 @@ import net.sf.orcc.df.Port
 import net.sf.orcc.ir.Arg
 import net.sf.orcc.ir.ArgByRef
 import net.sf.orcc.ir.ArgByVal
-import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeBool
@@ -57,20 +56,6 @@ import org.eclipse.emf.common.util.EList
  * 
  */
 class JavaTemplate extends CommonPrinter {
-	
-	
-	new(){
-		this.exprPrinter = new JavaExprPrinter
-	}
-	
-	
-	/******************************************
-	 * 
-	 * Expressions
-	 *
-	 *****************************************/
-	override caseExpression(Expression expr)
-		'''«exprPrinter.doSwitch(expr)»'''
 	
 	/******************************************
 	 * 

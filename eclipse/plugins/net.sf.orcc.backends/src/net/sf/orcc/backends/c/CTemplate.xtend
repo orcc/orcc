@@ -28,8 +28,18 @@
  */
 package net.sf.orcc.backends.c
 
+import java.util.LinkedList
+import java.util.List
 import net.sf.orcc.backends.util.CommonPrinter
-import net.sf.orcc.ir.Expression
+import net.sf.orcc.ir.Arg
+import net.sf.orcc.ir.ArgByRef
+import net.sf.orcc.ir.ArgByVal
+import net.sf.orcc.ir.ExprBinary
+import net.sf.orcc.ir.ExprBool
+import net.sf.orcc.ir.ExprInt
+import net.sf.orcc.ir.ExprString
+import net.sf.orcc.ir.OpBinary
+import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
 import net.sf.orcc.ir.TypeInt
@@ -37,15 +47,8 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
-import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
-import java.util.List
-import net.sf.orcc.ir.Arg
-import java.util.LinkedList
-import net.sf.orcc.ir.ArgByRef
-import net.sf.orcc.ir.ArgByVal
-import net.sf.orcc.ir.ExprString
 
 /*
  * Default C Printer
@@ -55,15 +58,50 @@ import net.sf.orcc.ir.ExprString
  */
 class CTemplate extends CommonPrinter {
 	
-	new(){
-		this.exprPrinter = new CExpressionPrinter
-	}
-	
 	/////////////////////////////////
 	// Expressions
 	/////////////////////////////////
-	override caseExpression(Expression expr)
-		'''«exprPrinter.doSwitch(expr)»'''
+	
+	override caseExprBinary(ExprBinary expr) {
+		val op = expr.op
+		var nextPrec =
+			if (op == OpBinary::SHIFT_LEFT || op == OpBinary::SHIFT_RIGHT) {
+				// special case, for shifts always put parentheses because compilers
+				// often issue warnings
+				Integer::MIN_VALUE;
+			} else {
+				op.precedence;
+			}
+		
+		val resultingExpr =
+			'''«expr.e1.printExpr(nextPrec, 0)» «op.stringRepresentation» «expr.e2.printExpr(nextPrec, 1)»'''
+		
+		if ( op.needsParentheses(precedence, branch)) {
+			'''(«resultingExpr»)'''
+		} else {
+			resultingExpr
+		}
+	}
+	
+	override caseExprBool(ExprBool object) {
+		if (object.value) "1" else "0"
+	}
+	
+	override caseExprInt(ExprInt object) {
+		val longVal = object.value.longValue
+		if(longVal < Integer::MIN_VALUE || longVal > Integer::MAX_VALUE) {
+			'''«longVal»L'''
+		} else {
+			'''«longVal»'''
+		}
+	}
+	
+	override stringRepresentation(OpBinary op) {
+		if (op == OpBinary::DIV_INT)
+			"/"
+		else
+			super.stringRepresentation(op)
+	}
 	
 	/////////////////////////////////
 	// Types
