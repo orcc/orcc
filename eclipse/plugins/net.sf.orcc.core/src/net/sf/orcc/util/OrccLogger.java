@@ -104,6 +104,13 @@ public class OrccLogger {
 	private OrccLogger() {
 	}
 
+	/**
+	 * Register specific log Handler to display messages sent threw OrccLogger.
+	 * If this method is never called, the default Handler will be
+	 * {@link java.util.logging.ConsoleHandler}
+	 * 
+	 * @param handler
+	 */
 	public static void configureLoggerWithHandler(Handler handler) {
 		logger = null;
 
