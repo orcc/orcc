@@ -48,6 +48,13 @@ import java.util.logging.Logger;
  */
 public class OrccLogger {
 
+	public final static Level SEVERE = Level.SEVERE;
+	public final static Level WARNING = Level.WARNING;
+	public final static Level NOTICE = Level.INFO;
+	public final static Level TRACE = Level.FINE;
+	public final static Level DEBUG = Level.FINER;
+	public final static Level ALL = Level.ALL;
+
 	/**
 	 * Define how text must be printed to logger (Eclipse or System console)
 	 * 
@@ -73,10 +80,12 @@ public class OrccLogger {
 				DateFormat df = DateFormat.getTimeInstance();
 
 				output += df.format(date);
-				if (record.getLevel().intValue() > Level.INFO.intValue()) {
+				// Default printing for warn & severe
+				if (record.getLevel().intValue() > NOTICE.intValue()) {
 					output += " " + record.getLevel();
-				} else if (record.getLevel().intValue() == Level.FINE
-						.intValue()) {
+				} else if (record.getLevel().intValue() == NOTICE.intValue()) {
+					output += " NOTICE";
+				} else if (record.getLevel().intValue() == DEBUG.intValue()) {
 					output += " DEBUG";
 				}
 				output += " : ";
@@ -89,6 +98,12 @@ public class OrccLogger {
 
 	private static Logger logger;
 
+	/**
+	 * Ensure class can't be instantiated
+	 */
+	private OrccLogger() {
+	}
+
 	public static void configureLoggerWithHandler(Handler handler) {
 		logger = null;
 
@@ -99,7 +114,35 @@ public class OrccLogger {
 
 		logger = newLog;
 
-		setLevel(Level.INFO);
+		setLevel(TRACE);
+	}
+
+	/**
+	 * Return the current logger, or a newly created one if it doesn't exists.
+	 * If it is created here, a default ConsoleHandler is used as Logger's
+	 * Handler.
+	 * 
+	 * @return
+	 */
+	private static Logger getLogger() {
+		if (logger == null) {
+			configureLoggerWithHandler(new ConsoleHandler());
+		}
+		return logger;
+	}
+
+	/**
+	 * Set the minimum level displayed. By default, OrccLogger display messages
+	 * from INFO level and highest. Call this method with DEBUG or ALL as
+	 * argument to display debug messages.
+	 * 
+	 * @param level
+	 */
+	public static void setLevel(Level level) {
+		getLogger().setLevel(level);
+		for (Handler handler : getLogger().getHandlers()) {
+			handler.setLevel(level);
+		}
 	}
 
 	/**
@@ -108,7 +151,7 @@ public class OrccLogger {
 	 * @param message
 	 */
 	public static void debug(String message) {
-		getLogger().log(Level.FINE, message);
+		getLogger().log(DEBUG, message);
 	}
 
 	/**
@@ -128,66 +171,7 @@ public class OrccLogger {
 	 * @param message
 	 */
 	public static void debugRaw(String message) {
-		LogRecord record = new LogRecord(Level.FINE, message);
-		record.setParameters(new Object[] { "-raw" });
-		getLogger().log(record);
-	}
-
-	/**
-	 * Return the current logger, or a newly created one if it doesn't exists.
-	 * If it is created here, a default ConsoleHandler is used as Logger's
-	 * Handler.
-	 * 
-	 * @return
-	 */
-	private static Logger getLogger() {
-		if (logger == null) {
-			configureLoggerWithHandler(new ConsoleHandler());
-		}
-		return logger;
-	}
-
-	/**
-	 * Set the minimum level displayed. By default, OrccLogger display messages
-	 * from INFO level and highest. Call this method with Level.FINE as argument
-	 * to display debug messages.
-	 * 
-	 * @param level
-	 */
-	public static void setLevel(Level level) {
-		getLogger().setLevel(level);
-		for (Handler handler : getLogger().getHandlers()) {
-			handler.setLevel(level);
-		}
-	}
-
-	/**
-	 * Display an error line on the current console.
-	 * 
-	 * @param message
-	 */
-	public static void severe(String message) {
-		getLogger().log(Level.SEVERE, message);
-	}
-
-	/**
-	 * Display an error line on the current console, appended with a line
-	 * separator character.
-	 * 
-	 * @param message
-	 */
-	public static void severeln(String message) {
-		severe(message + System.getProperty("line.separator"));
-	}
-
-	/**
-	 * Display an error line on the current console, without any prepended
-	 * string (time or level info).
-	 * 
-	 * @param message
-	 */
-	public static void severeRaw(String message) {
-		LogRecord record = new LogRecord(Level.SEVERE, message);
+		LogRecord record = new LogRecord(DEBUG, message);
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
@@ -198,7 +182,7 @@ public class OrccLogger {
 	 * @param message
 	 */
 	public static void trace(String message) {
-		getLogger().log(Level.INFO, message);
+		getLogger().log(TRACE, message);
 	}
 
 	/**
@@ -218,7 +202,38 @@ public class OrccLogger {
 	 * @param message
 	 */
 	public static void traceRaw(String message) {
-		LogRecord record = new LogRecord(Level.INFO, message);
+		LogRecord record = new LogRecord(TRACE, message);
+		record.setParameters(new Object[] { "-raw" });
+		getLogger().log(record);
+	}
+
+	/**
+	 * Display a notice message to current console.
+	 * 
+	 * @param message
+	 */
+	public static void notice(String message) {
+		getLogger().log(NOTICE, message);
+	}
+
+	/**
+	 * Display a notice message to current console, appended with a line
+	 * separator character.
+	 * 
+	 * @param message
+	 */
+	public static void noticeln(String message) {
+		debug(message + System.getProperty("line.separator"));
+	}
+
+	/**
+	 * Display a notice message on the current console, without any prepended
+	 * string (time or level info).
+	 * 
+	 * @param message
+	 */
+	public static void noticeRaw(String message) {
+		LogRecord record = new LogRecord(NOTICE, message);
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
@@ -229,7 +244,7 @@ public class OrccLogger {
 	 * @param message
 	 */
 	public static void warn(String message) {
-		getLogger().log(Level.WARNING, message);
+		getLogger().log(WARNING, message);
 	}
 
 	/**
@@ -249,14 +264,39 @@ public class OrccLogger {
 	 * @param message
 	 */
 	public static void warnRaw(String message) {
-		LogRecord record = new LogRecord(Level.WARNING, message);
+		LogRecord record = new LogRecord(WARNING, message);
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
 
 	/**
-	 * Ensure class can't be instantiated
+	 * Display an error line on the current console.
+	 * 
+	 * @param message
 	 */
-	private OrccLogger() {
+	public static void severe(String message) {
+		getLogger().log(SEVERE, message);
+	}
+
+	/**
+	 * Display an error line on the current console, appended with a line
+	 * separator character.
+	 * 
+	 * @param message
+	 */
+	public static void severeln(String message) {
+		severe(message + System.getProperty("line.separator"));
+	}
+
+	/**
+	 * Display an error line on the current console, without any prepended
+	 * string (time or level info).
+	 * 
+	 * @param message
+	 */
+	public static void severeRaw(String message) {
+		LogRecord record = new LogRecord(SEVERE, message);
+		record.setParameters(new Object[] { "-raw" });
+		getLogger().log(record);
 	}
 }
