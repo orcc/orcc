@@ -71,14 +71,20 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 				BackendFactory factory = BackendFactory.getInstance();
 				factory.runBackend(process.getProgressMonitor(),
 						configuration.getAttributes());
-			} catch (OrccRuntimeException exception) {
+
+			} catch (OrccRuntimeException e) {
+
 				String backend = configuration.getAttribute(BACKEND, "");
-				OrccLogger.severeln(exception.getMessage());
+				if (!e.getMessage().isEmpty()) {
+					OrccLogger.severeln(e.getMessage());
+				}
 				OrccLogger.severeln(backend
-						+ " backend could not generate code ("
-						+ exception.getCause() + ")");
+						+ " backend could not generate code (" + e.getCause()
+						+ ")");
 				process.terminate();
+
 			} catch (Exception e) {
+
 				String backend = configuration.getAttribute(BACKEND, "");
 				// clear actor pool because it might not have been done if we
 				// got an error too soon

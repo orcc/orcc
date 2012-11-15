@@ -528,7 +528,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			return numCached;
 		} catch (InterruptedException e) {
-			throw new OrccRuntimeException("actors could not be printed", e);
+			throw new OrccRuntimeException("Actors could not be printed", e);
 		}
 	}
 
@@ -997,7 +997,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 
 			Class<? extends AbstractBackend> clasz = this.getClass();
-			optionMap.put(BACKEND, clasz.getName());
+			String backend = clasz.getName();
+			optionMap.put(BACKEND, backend);
 
 			try {
 				setOptions(optionMap);
@@ -1005,13 +1006,23 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				compile();
 				return IApplication.EXIT_OK;
 			} catch (OrccRuntimeException e) {
-				OrccLogger.severeln("Could not run the back-end with \""
-						+ networkName + "\" :");
-				OrccLogger.severeln(e.getLocalizedMessage());
+
+				if (!e.getMessage().isEmpty()) {
+					OrccLogger.severeln(e.getMessage());
+				}
+				OrccLogger.severeln(backend
+						+ " backend could not generate code (" + e.getCause()
+						+ ")");
+
 			} catch (Exception e) {
-				OrccLogger.severeln("Could not run the back-end with \""
-						+ networkName + "\" :");
-				OrccLogger.severeln(e.getLocalizedMessage());
+
+				if (!e.getMessage().isEmpty()) {
+					OrccLogger.severeln(e.getMessage());
+				}
+				OrccLogger.severeln(backend
+						+ " backend could not generate code (" + e.getCause()
+						+ ")");
+
 				e.printStackTrace();
 			}
 			return IApplication.EXIT_RELAUNCH;
