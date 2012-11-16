@@ -580,7 +580,7 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	def printInput(Port port, Connection connection) '''
-		@SIZE_«port.name» = internal constant i32 «connection.getFifoSize»
+		@SIZE_«port.name» = internal constant i32 «connection.fifoSize»
 		@index_«port.name» = internal global i32 0
 		@numTokens_«port.name» = internal global i32 0
 		
@@ -614,7 +614,7 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 		
 	def printOutput(Port port, Connection connection) '''
-		@SIZE_«port.name» = internal constant i32 «connection.getFifoSize»
+		@SIZE_«port.name» = internal constant i32 «connection.fifoSize»
 		@index_«port.name» = internal global i32 0
 		@rdIndex_«port.name» = internal global i32 0
 		@numFree_«port.name» = internal global i32 0
@@ -663,11 +663,14 @@ class InstancePrinter extends LLVMTemplate {
 	 */
 	def getProperties(Port port) ''''''
 	
-	def printExternalFifo(Connection conn, Port port) '''
-		@fifo_«getId(conn, port)»_content = «IF conn != null»external«port.addrSpace»«ELSE»internal«ENDIF» global [«conn.getFifoSize» x «port.type.doSwitch»]«IF conn == null» zeroinitializer, align 32«ENDIF»
-		@fifo_«getId(conn, port)»_rdIndex = «IF conn != null»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF conn == null» zeroinitializer, align 32«ENDIF»
-		@fifo_«getId(conn, port)»_wrIndex = «IF conn != null»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF conn == null» zeroinitializer, align 32«ENDIF»
-	'''
+	def printExternalFifo(Connection conn, Port port) {
+		val isConnected = conn != null
+		'''
+		@fifo_«getId(conn, port)»_content = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global [«conn.fifoSize» x «port.type.doSwitch»]«IF !isConnected» zeroinitializer, align 32«ENDIF»
+		@fifo_«getId(conn, port)»_rdIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
+		@fifo_«getId(conn, port)»_wrIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
+		'''
+	}
 	
 	def printNextLabel(Block block) {
 		if (block.blockWhile) (block as BlockWhile).joinBlock.label
@@ -851,13 +854,15 @@ class InstancePrinter extends LLVMTemplate {
 	def printPortAccess(Connection connection, Port port, Var variable, EList<Expression> indexes, Instruction instr) {
 		val procedure = EcoreHelper::getContainerOfType(instr, typeof(Procedure))
 		val accessMap = procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>
+		val accessId = accessMap.get(instr)
+		val needCast = castedIndexes.contains(indexes.head)
 		'''
-			«IF castedIndexes.contains(indexes.head)»
-				%cast_index_«variable.name»_«accessMap.get(instr)» = zext «indexes.head.type.doSwitch» «indexes.head.doSwitch» to i32
+			«IF needCast»
+				%cast_index_«variable.name»_«accessId» = zext «indexes.head.type.doSwitch» «indexes.head.doSwitch» to i32
 			«ENDIF»
-			%tmp_index_«variable.name»_«accessMap.get(instr)» = add i32 %local_index_«port.name», «IF castedIndexes.contains(indexes.head)»%cast_index_«variable.name»_«accessMap.get(instr)»«ELSE»«indexes.head.doSwitch»«ENDIF»
-			%final_index_«variable.name»_«accessMap.get(instr)» = urem i32 %tmp_index_«variable.name»_«accessMap.get(instr)», %local_size_«port.name»
-			«varName(variable, instr)» = getelementptr [«connection.getFifoSize» x «port.type.doSwitch»]«port.addrSpace»* @fifo_«getId(connection, port)»_content, i32 0, i32 %final_index_«variable.name»_«accessMap.get(instr)»
+			%tmp_index_«variable.name»_«accessId» = add i32 %local_index_«port.name», «IF needCast»%cast_index_«variable.name»_«accessId»«ELSE»«indexes.head.doSwitch»«ENDIF»
+			%final_index_«variable.name»_«accessId» = urem i32 %tmp_index_«variable.name»_«accessId», %local_size_«port.name»
+			«varName(variable, instr)» = getelementptr [«connection.fifoSize» x «port.type.doSwitch»]«port.addrSpace»* @fifo_«getId(connection, port)»_content, i32 0, i32 %final_index_«variable.name»_«accessId»
 		'''
 	}
 	
