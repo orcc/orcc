@@ -306,39 +306,42 @@ class InstancePrinter extends LLVMTemplate {
 				call void @«instance.name»_outside_FSM_scheduler()
 			«ENDIF»
 		«FOR transition : state.outgoing.filter(typeof(Transition))»
-				; ACTION «transition.action.name»
-				«IF ! transition.action.inputPattern.ports.filter[!native].empty»
+				«val action = transition.action»
+				«val actionName = action.name»
+				«val extName = state.name + "_" + actionName»
+				; ACTION «actionName»
+				«IF ! action.inputPattern.ports.filter[!native].empty»
 					;; Input pattern
-					«checkInputPattern(transition.action, transition.action.inputPattern, state)»
-					%is_schedulable_«state.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
-					%is_fireable_«state.name»_«transition.action.name» = and i1 %is_schedulable_«state.name»_«transition.action.name», %has_valid_inputs_«state.name»_«transition.action.name»_«transition.action.inputPattern.ports.size»
+					«checkInputPattern(action, action.inputPattern, state)»
+					%is_schedulable_«extName» = call i1 @«action.scheduler.name» ()
+					%is_fireable_«extName» = and i1 %is_schedulable_«extName», %has_valid_inputs_«extName»_«action.inputPattern.ports.size»
 					
-					br i1 %is_fireable_«state.name»_«transition.action.name», label %bb_«state.name»_«transition.action.name»_check_outputs, label %bb_«state.name»_«transition.action.name»_unschedulable
+					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ELSE»
 					;; Empty input pattern
-					%is_fireable_«state.name»_«transition.action.name» = call i1 @«transition.action.scheduler.name» ()
+					%is_fireable_«extName» = call i1 @«action.scheduler.name» ()
 					
-					br i1 %is_fireable_«state.name»_«transition.action.name», label %bb_«state.name»_«transition.action.name»_check_outputs, label %bb_«state.name»_«transition.action.name»_unschedulable
+					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ENDIF»
 			
 			
-			bb_«state.name»_«transition.action.name»_check_outputs:
-				«IF ! transition.action.outputPattern.ports.filter[!native].empty»
+			bb_«extName»_check_outputs:
+				«IF ! action.outputPattern.ports.filter[!native].empty»
 					;; Output pattern
-					«checkOutputPattern(transition.action, transition.action.outputPattern, state)»
+					«checkOutputPattern(action, action.outputPattern, state)»
 					
-					br i1 %has_valid_outputs_«transition.action.outputPattern.ports.last.name»_«state.name»_«transition.action.name», label %bb_«state.name»_«transition.action.name»_fire, label %bb_«state.name»_finished
+					br i1 %has_valid_outputs_«action.outputPattern.ports.last.name»_«extName», label %bb_«extName»_fire, label %bb_«state.name»_finished
 				«ELSE»
 					;; Empty output pattern
 					
-					br label %bb_«state.name»_«transition.action.name»_fire
+					br label %bb_«extName»_fire
 				«ENDIF»
 			
-			bb_«state.name»_«transition.action.name»_fire:
-				call void @«transition.action.body.name» ()
+			bb_«extName»_fire:
+				call void @«action.body.name» ()
 				
 				br label %bb_s_«transition.target.name»
-			bb_«state.name»_«transition.action.name»_unschedulable:
+			bb_«extName»_unschedulable:
 			
 		«ENDFOR»
 			br label %bb_«state.name»_finished
@@ -370,34 +373,35 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def printActionLoop(EList<Action> actions, boolean outsideFSM) '''
 		«FOR action : actions»
-				; ACTION «action.name»
+			«val name = action.name»
+				; ACTION «name»				
 				«IF ! action.inputPattern.ports.filter[!native].empty»
 					;; Input pattern
 					«checkInputPattern(action, action.inputPattern)»
-					%is_schedulable_«action.name» = call i1 @«action.scheduler.name» ()
-					%is_fireable_«action.name» = and i1 %is_schedulable_«action.name», %has_valid_inputs_«action.name»_«action.inputPattern.ports.size»
+					%is_schedulable_«name» = call i1 @«action.scheduler.name» ()
+					%is_fireable_«name» = and i1 %is_schedulable_«name», %has_valid_inputs_«name»_«action.inputPattern.ports.size»
 					
-					br i1 %is_fireable_«action.name», label %bb_«action.name»_check_outputs, label %bb_«action.name»_unschedulable
+					br i1 %is_fireable_«name», label %bb_«name»_check_outputs, label %bb_«name»_unschedulable
 				«ELSE»
 					;; Empty input pattern
-					%is_fireable_«action.name» = call i1 @«action.scheduler.name» ()
+					%is_fireable_«name» = call i1 @«action.scheduler.name» ()
 					
-					br i1 %is_fireable_«action.name», label %bb_«action.name»_check_outputs, label %bb_«action.name»_unschedulable
+					br i1 %is_fireable_«name», label %bb_«name»_check_outputs, label %bb_«name»_unschedulable
 				«ENDIF»
 			
-			bb_«action.name»_check_outputs:
+			bb_«name»_check_outputs:
 				«IF ! action.outputPattern.ports.filter[!native].empty»
 					;; Output pattern
 					«checkOutputPattern(action, action.outputPattern)»
 					
-					br i1 %has_valid_outputs_«action.outputPattern.ports.last.name»_«action.name», label %bb_«action.name»_fire, label %bb_finished
+					br i1 %has_valid_outputs_«action.outputPattern.ports.last.name»_«name», label %bb_«name»_fire, label %bb_finished
 				«ELSE»
 					;; Empty output pattern
 					
-					br label %bb_«action.name»_fire
+					br label %bb_«name»_fire
 				«ENDIF»
 			
-			bb_«action.name»_fire:
+			bb_«name»_fire:
 				call void @«action.body.name» ()
 				
 				«IF outsideFSM»
@@ -406,7 +410,7 @@ class InstancePrinter extends LLVMTemplate {
 					br label %bb_scheduler_start
 				«ENDIF»
 			
-			bb_«action.name»_unschedulable:
+			bb_«name»_unschedulable:
 		«ENDFOR»
 			«IF outsideFSM»
 				br label %bb_outside_finished

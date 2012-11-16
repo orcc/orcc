@@ -49,14 +49,14 @@ class LLVM_Actor extends InstancePrinter {
 		this.portToIdMap = portToIdMap
 	}
 	
-	override printAddrSpace(Port port) {
+	override getAddrSpace(Port port) {
 		val id = portToIdMap.get(port);
 		if(id != null) {
 			''' addrspace(«id»)'''
 		}
 	}
 	
-	override printProperties(Port port) ''' volatile'''
+	override getProperties(Port port) ''' volatile'''
 	
 	def printNativeWrite(Port port, Var variable) {
 		val innerType = (variable.type as TypeList).innermostType.doSwitch
