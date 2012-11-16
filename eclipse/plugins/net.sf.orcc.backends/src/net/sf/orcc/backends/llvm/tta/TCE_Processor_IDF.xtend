@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
+import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Implementation
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
@@ -41,6 +42,11 @@ class TCE_Processor_IDF extends TTAPrinter {
 	
 	new(EMap<String, Implementation> hwDb) {
 		this.hwDb = hwDb;
+	}
+	
+	def print(Processor processor, String targetFolder) {
+		val file = new File(targetFolder + File::separator + processor.getName() + ".idf")
+		printFile(doSwitch(processor), file)
 	}
 		
 		

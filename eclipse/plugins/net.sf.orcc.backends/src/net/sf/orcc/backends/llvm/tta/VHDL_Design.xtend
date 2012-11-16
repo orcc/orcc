@@ -39,6 +39,7 @@ import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.ir.util.ExpressionPrinter
 import net.sf.orcc.util.Attribute
 import org.eclipse.emf.common.util.EList
+import java.io.File
 
 class VHDL_Design extends TTAPrinter {
 	
@@ -48,6 +49,11 @@ class VHDL_Design extends TTAPrinter {
 	new(FPGA fpga) {
 		this.fpga = fpga;
 		this.exprPrinter = new ExpressionPrinter();
+	}
+	
+	def print(Design design, String targetFolder) {
+		val file = new File(targetFolder + File::separator + "top.vhdl")
+		printFile(doSwitch(design), file)
 	}
 	
 	override caseDesign(Design design)

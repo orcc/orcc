@@ -30,8 +30,14 @@ package net.sf.orcc.backends.llvm.tta
 
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Port
+import java.io.File
 
 class VHDL_Testbench extends TTAPrinter {
+	
+	def print(Design design, String targetFolder) {
+		val file = new File(targetFolder + File::separator + "top_tb.vhd")
+		printFile(doSwitch(design), file)
+	}
 	
 	
 	override caseDesign(Design design)

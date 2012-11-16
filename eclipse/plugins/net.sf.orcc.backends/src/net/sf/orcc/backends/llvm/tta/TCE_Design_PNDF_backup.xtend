@@ -32,6 +32,7 @@
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.df.Port
+import java.io.File
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -45,6 +46,11 @@ class TCE_Design_PNDF_backup extends TTAPrinter {
 	
 	new(String path){
 		this.path = path;
+	}
+	
+	def print(Design design, String targetFolder) {
+		val file = new File(targetFolder + File::separator + "top.pndf")
+		printFile(doSwitch(design), file)
 	}
 	
 	override caseDesign(Design design)

@@ -28,11 +28,13 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
+import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
+import net.sf.orcc.util.OrccUtil
 
 class Python_Design extends TTAPrinter {
 	
@@ -40,6 +42,13 @@ class Python_Design extends TTAPrinter {
 	
 	new(FPGA fpga) {
 		this.fpga = fpga;
+	}
+	
+	def print(Design design, String targetFolder) {
+		val pythonPath = OrccUtil::createFolder(targetFolder, "informations_");
+		val file = new File(pythonPath + File::separator + "informations.py")
+		printFile(doSwitch(design), file)
+		new File(pythonPath + File::separator + "__init__.py")
 	}
 	
 	override caseDesign(Design design) 

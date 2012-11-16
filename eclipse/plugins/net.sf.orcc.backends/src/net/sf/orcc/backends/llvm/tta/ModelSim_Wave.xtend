@@ -32,8 +32,14 @@ import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
+import java.io.File
 
 class ModelSim_Wave extends TTAPrinter {
+	
+	def print(Design design, String targetFolder) {
+		val file = new File(targetFolder + File::separator + "wave.do")
+		printFile(doSwitch(design), file)
+	}
 	
 	override caseDesign(Design design) 
 		'''

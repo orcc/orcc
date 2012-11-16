@@ -30,10 +30,16 @@ package net.sf.orcc.backends.llvm.tta
 
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.aot.LLVMTemplate
+import java.io.File
 
 class LLVM_Processor extends LLVMTemplate {
 	
-	def print(Processor processor)
+	def print(Processor processor, String targetFolder) {
+		val file = new File(targetFolder + File::separator + processor.getName() + ".ll")
+		printFile(processor.print, file)
+	}
+	
+	def private print(Processor processor)
 		'''
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Declare and initialize FIFO variables 

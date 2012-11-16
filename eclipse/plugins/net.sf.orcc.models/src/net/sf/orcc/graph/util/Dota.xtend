@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.graph.util
 
+import java.io.File
+import java.io.FileOutputStream
+import java.io.PrintStream
 import java.util.HashMap
 import java.util.Map
 import net.sf.orcc.graph.Edge
@@ -48,24 +51,31 @@ class Dota {
 	new() {
 		vertexMap = new HashMap<Vertex, Integer>()
 	}
+	
+	def print(Graph graph, String targetFolder, String filename) {
+		val file = new File(targetFolder+ File::separator + filename);
+		val ps = new PrintStream(new FileOutputStream(file));
+		ps.print(graph.dot);
+		ps.close();
+	}
 
-	def printDot(Graph graph) '''
+	def private dot(Graph graph) '''
 		digraph G {
 			node [label="", shape=box];
 			«FOR vertex : graph.vertices»
-				«vertex.print»
+				«vertex.dot»
 			«ENDFOR»
 			«FOR edge : graph.edges»
-				«edge.print»
+				«edge.dot»
 			«ENDFOR»
 		}
 	'''
 
-	def private print(Edge edge) '''
+	def private dot(Edge edge) '''
 		node_«edge.source.id» -> node_«edge.target.id» [label="«edge.label»"];
 	'''
 
-	def private print(Vertex vertex) '''
+	def private dot(Vertex vertex) '''
 		node_«vertex.id» [label="(«vertex.number») «vertex.label»"];
 	'''
 

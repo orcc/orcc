@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
+import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 
@@ -205,8 +206,15 @@ class ISE_Project extends TTAPrinter {
 		  <association xil_pn:name="Implementation"/>
 		</file>
 		'''
+		
+	def print(Design design, String targetFolder) {
+		val ucfFile = new File(targetFolder + File::separator + "top.ucf")
+		val xiseFile = new File(targetFolder + File::separator + "top.xise")
+		printFile(getUcfContent, ucfFile)
+		printFile(doSwitch(design), xiseFile)
+	}
 	
-	def printUcf()
+	def private getUcfContent()
 		'''
 		NET "leds[0]" IOSTANDARD = LVCMOS18;
 		NET "leds[0]" LOC = AC22;

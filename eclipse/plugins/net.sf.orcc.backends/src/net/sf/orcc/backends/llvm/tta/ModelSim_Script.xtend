@@ -31,6 +31,7 @@ package net.sf.orcc.backends.llvm.tta
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
+import java.io.File
 
 class ModelSim_Script extends TTAPrinter {
 	
@@ -38,6 +39,11 @@ class ModelSim_Script extends TTAPrinter {
 	
 	new(FPGA fpga) {
 		this.fpga = fpga;
+	}
+	
+	def print(Design design, String targetFolder) {
+		val file = new File(targetFolder + File::separator + "top.tcl")
+		printFile(doSwitch(design), file)
 	}
 	
 	override caseDesign(Design design) 

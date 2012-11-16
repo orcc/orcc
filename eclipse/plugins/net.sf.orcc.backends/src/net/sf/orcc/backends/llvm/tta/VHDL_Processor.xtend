@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
+import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Port
@@ -41,6 +42,11 @@ class VHDL_Processor extends TTAPrinter {
 	
 	new(FPGA fpga) {
 		this.fpga = fpga;
+	}
+	
+	def print(Processor processor, String targetFolder) {
+		val file = new File(targetFolder + File::separator + processor.getName() + ".vhd")
+		printFile(doSwitch(processor), file)
 	}
 		
 	override caseProcessor(Processor processor)

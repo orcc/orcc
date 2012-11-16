@@ -40,7 +40,7 @@ class TTAPrinter extends ArchitectureSwitch<CharSequence> {
 		commonPrinter = new CommonPrinter
 	}
 	
-	def printFile(CharSequence content, File target) {
+	def protected printFile(CharSequence content, File target) {
 		commonPrinter.printFile(content, target);
 	}
 

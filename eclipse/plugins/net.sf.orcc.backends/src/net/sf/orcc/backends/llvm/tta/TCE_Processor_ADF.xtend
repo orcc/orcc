@@ -48,8 +48,14 @@ import net.sf.orcc.backends.llvm.tta.architecture.Socket
 import net.sf.orcc.backends.llvm.tta.architecture.TermBool
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Writes
+import java.io.File
 
 class TCE_Processor_ADF extends TTAPrinter {
+	
+	def print(Processor processor, String targetFolder) {
+		val file = new File(targetFolder + File::separator + processor.getName() + ".adf")
+		printFile(doSwitch(processor), file)
+	}
 		
 	def print(Processor processor)
 		'''

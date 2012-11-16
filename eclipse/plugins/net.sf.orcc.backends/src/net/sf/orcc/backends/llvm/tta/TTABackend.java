@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.backends.CommonPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMBackend;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
@@ -222,61 +221,42 @@ public class TTABackend extends LLVMBackend {
 
 	private void generateDesign(Design design) {
 		// VHDL Network of TTA processors
-		CommonPrinter.printFile(new VHDL_Design(fpga).doSwitch(design), path,
-				"top.vhd");
+		new VHDL_Design(fpga).print(design, path);
 
-		// Python package
-		String pythonPath = OrccUtil.createFolder(path, "informations_");
-		CommonPrinter.printFile(new Python_Design(fpga).doSwitch(design),
-				pythonPath, "informations.py");
-		OrccUtil.createFile(pythonPath, "__init__.py");
+		// Create python package
+		new Python_Design(fpga).print(design, path);
 
+		// Create project files
 		if (fpga.isAltera()) {
-			// Quartus
-			Quartus_Project template = new Quartus_Project(fpga);
-			CommonPrinter.printFile(template.caseDesign(design), path,
-					"top.qsf");
-			CommonPrinter.printFile(template.printQpf(), path, "top.qpf");
+			new Quartus_Project(fpga).print(design, path);
 		} else if (fpga.isXilinx()) {
-			// ISE
-			ISE_Project template = new ISE_Project();
-			CommonPrinter.printFile(template.caseDesign(design), path,
-					"top.xise");
-			CommonPrinter.printFile(template.printUcf(), path, "top.ucf");
+			new ISE_Project().print(design, path);
 		}
 
 		// ModelSim
-		CommonPrinter.printFile(new ModelSim_Script(fpga).doSwitch(design),
-				path, "top.tcl");
-		CommonPrinter.printFile(new VHDL_Testbench().doSwitch(design), path,
-				"top_tb.vhd");
-		CommonPrinter.printFile(new ModelSim_Wave().doSwitch(design), path,
-				"wave.do");
+		new ModelSim_Script(fpga).print(design, path);
+		new VHDL_Testbench().print(design, path);
+		new ModelSim_Wave().print(design, path);
 
 		// TCE
-		CommonPrinter.printFile(new TCE_Design_PNDF(path).doSwitch(design),
-				path, "top.pndf");
+		new TCE_Design_PNDF(path).print(design, path);
 
-		CommonPrinter.printFile(new Dota().printDot(design), path, "top.dot");
+		new Dota().print(design, path, "top.dot");
 	}
 
 	private void generateProcessor(Processor tta) {
 		String processorPath = OrccUtil.createFolder(path, tta.getName());
 
 		// Print VHDL description
-		CommonPrinter.printFile(new VHDL_Processor(fpga).doSwitch(tta),
-				processorPath, tta.getName() + ".vhd");
+		new VHDL_Processor(fpga).print(tta, processorPath);
 
 		// Print high-level description
-		CommonPrinter.printFile(new TCE_Processor_ADF().print(tta),
-				processorPath, tta.getName() + ".adf");
-		CommonPrinter.printFile(
-				new TCE_Processor_IDF(design.getHardwareDatabase())
-						.doSwitch(tta), processorPath, tta.getName() + ".idf");
+		new TCE_Processor_ADF().print(tta, processorPath);
+		new TCE_Processor_IDF(design.getHardwareDatabase()).print(tta,
+				processorPath);
 
 		// Print assembly code of actor-scheduler
-		CommonPrinter.printFile(new LLVM_Processor().print(tta), processorPath,
-				tta.getName() + ".ll");
+		new LLVM_Processor().print(tta, processorPath);
 	}
 
 	@Override
