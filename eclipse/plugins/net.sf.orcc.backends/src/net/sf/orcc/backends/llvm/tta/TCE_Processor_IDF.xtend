@@ -29,13 +29,13 @@
 package net.sf.orcc.backends.llvm.tta
 
 import java.io.File
+import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Implementation
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile
 import net.sf.orcc.util.OrccLogger
 import org.eclipse.emf.common.util.EMap
-import net.sf.orcc.backends.util.CommonPrinter
 
 class TCE_Processor_IDF extends CommonPrinter {
 	

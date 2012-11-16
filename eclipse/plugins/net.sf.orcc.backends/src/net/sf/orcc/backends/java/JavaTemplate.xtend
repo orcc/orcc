@@ -30,7 +30,7 @@ package net.sf.orcc.backends.java
 
 import java.util.ArrayList
 import java.util.List
-import net.sf.orcc.backends.util.CommonPrinter
+import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Argument
 import net.sf.orcc.df.Port
 import net.sf.orcc.ir.Arg

@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.backends.llvm.jit
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
+import java.io.File
 import java.util.ArrayList
 import java.util.List
+import java.util.Map
 import net.sf.orcc.backends.ir.InstCast
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.df.Action
@@ -53,8 +53,8 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
 import net.sf.orcc.moc.MoC
 import net.sf.orcc.moc.QSDFMoC
-import java.util.Map
-import java.io.File
+
+import static net.sf.orcc.OrccLaunchConstants.*
 
 /**
  * Generate Jade content

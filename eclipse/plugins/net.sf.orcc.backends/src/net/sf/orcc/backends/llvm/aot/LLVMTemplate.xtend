@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.llvm.aot
 
 import net.sf.orcc.OrccRuntimeException
-import net.sf.orcc.backends.util.CommonPrinter
+import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Port
 import net.sf.orcc.ir.ExprBinary

@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.backends.c
 
-import net.sf.orcc.df.Network
-import net.sf.orcc.df.Instance
-import net.sf.orcc.backends.util.CommonPrinter
 import java.io.File
+import net.sf.orcc.backends.CommonPrinter
+import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
 
 /**
  * Generate CMakeList.txt content

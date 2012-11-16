@@ -28,13 +28,13 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
-import net.sf.orcc.df.Network
-import net.sf.orcc.df.Instance
-import net.sf.orcc.backends.util.CommonPrinter
-import java.util.Map
 import java.io.File
+import java.util.Map
+import net.sf.orcc.backends.CommonPrinter
+import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
+
+import static net.sf.orcc.OrccLaunchConstants.*
 
 /**
  * Generate CMakeList.txt content

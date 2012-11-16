@@ -30,7 +30,6 @@ package net.sf.orcc.backends.c
 
 import java.util.LinkedList
 import java.util.List
-import net.sf.orcc.backends.util.CommonPrinter
 import net.sf.orcc.ir.Arg
 import net.sf.orcc.ir.ArgByRef
 import net.sf.orcc.ir.ArgByVal
@@ -49,6 +48,7 @@ import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
+import net.sf.orcc.backends.CommonPrinter
 
 /*
  * Default C Printer

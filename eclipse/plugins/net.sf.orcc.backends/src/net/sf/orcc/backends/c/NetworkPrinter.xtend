@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.c
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
+import java.io.File
+import java.util.HashMap
 import java.util.Map
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
@@ -38,8 +38,9 @@ import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
-import java.util.HashMap
-import java.io.File
+
+import static net.sf.orcc.OrccLaunchConstants.*
+import static net.sf.orcc.backends.OrccBackendsConstants.*
 
 /**
  * Generate and print network source file for C backend.

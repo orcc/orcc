@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
+import java.io.File
+import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Component
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
@@ -39,8 +41,6 @@ import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.ir.util.ExpressionPrinter
 import net.sf.orcc.util.Attribute
 import org.eclipse.emf.common.util.EList
-import java.io.File
-import net.sf.orcc.backends.util.CommonPrinter
 
 class VHDL_Design extends CommonPrinter {
 	

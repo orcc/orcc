@@ -28,11 +28,11 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
+import java.io.File
+import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
-import java.io.File
-import net.sf.orcc.backends.util.CommonPrinter
 
 class Quartus_Project extends CommonPrinter {
 	

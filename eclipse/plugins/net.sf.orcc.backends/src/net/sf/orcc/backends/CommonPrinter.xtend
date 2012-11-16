@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.util
+package net.sf.orcc.backends
 
 import java.io.BufferedInputStream
 import java.io.File
@@ -32,8 +32,6 @@ import net.sf.orcc.ir.util.AbstractIrVisitor
 import net.sf.orcc.util.OrccLogger
 import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
-
-import static net.sf.orcc.backends.util.CommonPrinter.*
 
 /**
  * Define commons methods for all backends printers

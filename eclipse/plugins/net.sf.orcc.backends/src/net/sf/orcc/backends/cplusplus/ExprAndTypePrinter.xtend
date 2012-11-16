@@ -29,7 +29,7 @@
 
 package net.sf.orcc.backends.cplusplus
 
-import net.sf.orcc.backends.util.CommonPrinter
+import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.ir.ExprBinary
 import net.sf.orcc.ir.ExprBool
 import net.sf.orcc.ir.ExprFloat
