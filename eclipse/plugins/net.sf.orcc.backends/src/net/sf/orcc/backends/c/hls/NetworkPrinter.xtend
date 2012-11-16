@@ -118,9 +118,10 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		val i = super.print(targetFolder)
 		val content = projectFileContent
 		val file = new File(targetFolder + File::separator + "vivado_hls.app")
-		
+		val file2 = new File(targetFolder + File::separator + network.simpleName + ".cpp")
 		if(needToWriteFile(content, file)) {
 			printFile(content, file)
+			printFile(content, file2)
 			return i
 		} else {
 			return i + 1
@@ -131,5 +132,5 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		if(connection != null) connection.getAttribute("id").objectValue
 		else port.name
 	}
-
+	
 }
