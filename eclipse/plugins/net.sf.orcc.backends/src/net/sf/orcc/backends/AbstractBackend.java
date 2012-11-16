@@ -95,6 +95,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
@@ -204,7 +205,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		boolean compilexdf = getAttribute(COMPILE_XDF, false);
 
 		String orccVersion = "<unknown>";
-		Bundle bundle = Platform.getBundle("net.sf.orcc.backends");
+		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
 		if (bundle != null) {
 			orccVersion = bundle.getHeaders().get("Bundle-Version");
 		}
@@ -996,8 +997,18 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 
+			//
 			Class<? extends AbstractBackend> clasz = this.getClass();
 			String backend = clasz.getName();
+			IConfigurationElement[] elements = Platform.getExtensionRegistry()
+					.getConfigurationElementsFor(
+							Activator.PLUGIN_ID + ".backends");
+			for (IConfigurationElement element : elements) {
+				if (backend.equals(element.getAttribute("class"))) {
+					backend = element.getAttribute("name");
+					break;
+				}
+			}
 			optionMap.put(BACKEND, backend);
 
 			try {
