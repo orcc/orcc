@@ -29,11 +29,13 @@
 package net.sf.orcc.backends.llvm.tta
 
 import net.sf.orcc.backends.llvm.tta.architecture.Design
+import net.sf.orcc.backends.llvm.tta.architecture.Link
+import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.backends.util.FPGA
 import java.io.File
+import net.sf.orcc.backends.util.FPGA
 
-class ModelSim_Script extends TTAPrinter {
+class ModelSimPrinter extends TTAPrinter {
 	
 	private FPGA fpga;
 	
@@ -42,11 +44,85 @@ class ModelSim_Script extends TTAPrinter {
 	}
 	
 	def print(Design design, String targetFolder) {
-		val file = new File(targetFolder + File::separator + "top.tcl")
-		printFile(doSwitch(design), file)
+		val waveFile = new File(targetFolder + File::separator + "wave.do")
+		val tclFile = new File(targetFolder + File::separator + "top.tcl")
+		printFile(design.wave, waveFile)
+		printFile(design.tcl, tclFile)
 	}
 	
-	override caseDesign(Design design) 
+	def private wave(Design design) 
+		'''
+		onerror {resume}
+		quietly WaveActivateNextPane {} 0
+		add wave -noupdate -divider <NULL>
+		add wave -noupdate -divider Top
+		add wave -noupdate -divider <NULL>
+		add wave -noupdate -format Logic /tb_top/clk
+		add wave -noupdate -format Logic /tb_top/rst_n
+		
+		«FOR port: design.inputs + design.outputs»
+			«port.wave»
+		«ENDFOR»
+		
+		«FOR processor: design.processors»
+			«processor.wave()»
+		«ENDFOR»
+		
+		TreeUpdate [SetDefaultTree]
+		WaveRestoreCursors {{Cursor 1} {112 ps} 0}
+		configure wave -namecolwidth 222
+		configure wave -valuecolwidth 100
+		configure wave -justifyvalue left
+		configure wave -signalnamewidth 1
+		configure wave -snapdistance 10
+		configure wave -datasetprefix 0
+		configure wave -rowmargin 4
+		configure wave -childrowmargin 2
+		configure wave -gridoffset 0
+		configure wave -gridperiod 1
+		configure wave -griddelta 40
+		configure wave -timeline 0
+		configure wave -timelineunits ns
+		update
+		WaveRestoreZoom {0 ps} {2911 ps}
+		'''
+		
+			
+	def	private wave(Port port) 
+		'''
+		add wave -noupdate -format Literal /tb_top/top_orcc/«port.label»
+		'''
+		
+	def	private wave(Processor processor)
+		'''
+		add wave -noupdate -divider \<NULL\>
+		add wave -noupdate -divider «processor.name»
+		add wave -noupdate -divider inputs
+		«FOR edge: processor.incoming»
+			«val Link link = edge as Link»
+			«link.wave(processor, link.targetPort)»
+		«ENDFOR»
+		add wave -noupdate -divider outputs
+		«FOR edge: processor.outgoing»
+			«val Link link = edge as Link»
+			«link.wave(processor, link.sourcePort)»
+		«ENDFOR»
+		'''
+		
+	def private wave(Link link, Processor processor, Port port) 
+		'''
+		«IF(!link.signal)»
+		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_data_in
+		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_data_out
+		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_addr
+		add wave -noupdate -format Logic tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_wr_en
+		add wave -noupdate -format Literal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_bytemask<
+		«ELSE»
+		add wave -noupdate -format Literal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>
+		«ENDIF»
+		'''
+		
+		def private tcl(Design design) 
 		'''
 		# Remove old libraries
 		vdel -all -lib work
@@ -91,7 +167,7 @@ class ModelSim_Script extends TTAPrinter {
 		vcom -93 -quiet -work work share/vhdl/stratix3_led_io_always_1.vhd
 		
 		«FOR processor:design.processors»
-			«processor.doSwitch()»
+			«processor.tcl»
 		«ENDFOR»
 		
 		# Network
@@ -102,7 +178,7 @@ class ModelSim_Script extends TTAPrinter {
 		vsim -novopt «IF(fpga.altera)»-L altera_mf «ENDIF»work.tb_top -t ps -do "do wave.do;"
 		'''
 
-	override caseProcessor(Processor processor)
+	def private tcl(Processor processor)
 		'''
 		# Compile processor <processor.name>
 		vcom -93 -quiet -work work <processor.name>/tta/vhdl/imem_mau_pkg.vhdl
@@ -131,5 +207,4 @@ class ModelSim_Script extends TTAPrinter {
 		exec cp -f wrapper/irom_<processor.name>.mif . &
 		«ENDIF»
 		'''
-		
 }
