@@ -856,7 +856,7 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 	}
 	
-	def computeCastedList() {
+	def protected computeCastedList() {
 		for (variable : instance.actor.eAllContents.toIterable.filter(typeof(Var))) {
 			if(variable.type.list && ! variable.defs.empty && variable.defs.head.eContainer instanceof InstCast) {
 				castedList.add(variable)
@@ -864,7 +864,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	}
 
-	def computeStateToLabel() {
+	def private computeStateToLabel() {
 		if(instance.actor.hasFsm){
 			var i = 0
 			for ( state : instance.actor.fsm.states) {
@@ -874,7 +874,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	}
 	
-	def computeCastedIndex() {
+	def private computeCastedIndex() {
 		for (instr : instance.actor.eAllContents.toIterable.filter(typeof(Instruction))) {
 			if(instr.instLoad) {
 				val load = instr as InstLoad
@@ -890,7 +890,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	}
 	
-	def computePortToIndexByPatternMap() {
+	def private computePortToIndexByPatternMap() {
 		for(pattern : instance.actor.eAllContents.toIterable.filter(typeof(Pattern))) {
 			val portToIndex = new HashMap<Port, Integer>
 			var i = 1
