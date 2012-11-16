@@ -28,10 +28,11 @@
  */
 package net.sf.orcc.backends.util
 
+import java.io.File
 import java.util.List
 import java.util.Map
+import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Instance
-import java.io.File
 
 /**
  * Printer used to create the xcf file, containing information on
