@@ -760,7 +760,7 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 			«IF variable.type.list»
 				«val innerType = (variable.type as TypeList).innermostType»
-				«IF action != null && action.outputPattern.varToPortMap.get(variable) != null && ! action.outputPattern.varToPortMap.get(variable).native»
+				«IF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«printPortAccess(instance.outgoingPortMap.get(port).head, port, variable, store.indexes, store)»
 					store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«port.addrSpace»* «varName(variable, store)»
@@ -781,15 +781,15 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 			«IF variable.type.list»
 				«val innerType = (variable.type as TypeList).innermostType»
-				«IF action != null && action.inputPattern.varToPortMap.get(variable) != null && ! action.inputPattern.varToPortMap.get(variable).native»
+				«IF action != null && action.inputPattern.contains(variable) && ! action.inputPattern.varToPortMap.get(variable).native»
 					«val port = action.inputPattern.varToPortMap.get(variable)»
 					«printPortAccess(instance.incomingPortMap.get(port), port, variable, load.indexes, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
-				«ELSEIF action != null && action.outputPattern.varToPortMap.get(variable) != null && ! action.outputPattern.varToPortMap.get(variable).native»
+				«ELSEIF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«printPortAccess(instance.outgoingPortMap.get(port).head, port, variable, load.indexes, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
-				«ELSEIF action != null && action.peekPattern.varToPortMap.get(variable) != null»
+				«ELSEIF action != null && action.peekPattern.contains(variable)»
 					«val port = action.peekPattern.varToPortMap.get(variable)»
 					«printPortAccess(instance.incomingPortMap.get(port), port, variable, load.indexes, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
