@@ -1063,10 +1063,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			for (int i = 0; i < conf.getMulNb(); i++) {
 				units.add(createMultiplier("Mul_" + i, processor));
 			}
-			// * And-ior-xor
-			String[] aixOperations2 = { "and", "ior", "xor" };
-			units.add(createFunctionUnit(processor, "And_ior_xor", null,
-					aixOperations2, "LU"));
 		}
 
 		processor.setName(name);
