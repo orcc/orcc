@@ -997,9 +997,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 
-			//
-			Class<? extends AbstractBackend> clasz = this.getClass();
-			String backend = clasz.getName();
+			// Set backend name in options map
+			String backend = this.getClass().getName();
 			IConfigurationElement[] elements = Platform.getExtensionRegistry()
 					.getConfigurationElementsFor(
 							Activator.PLUGIN_ID + ".backends");
