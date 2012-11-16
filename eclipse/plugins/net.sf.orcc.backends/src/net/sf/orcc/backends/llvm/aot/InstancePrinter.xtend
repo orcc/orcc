@@ -130,6 +130,8 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	def getInstanceFileContent() '''
+		«val inputs = instance.actor.inputs.filter[ ! native]»
+		«val outputs = instance.actor.outputs.filter[ ! native]»
 		«printArchitecture»
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -138,27 +140,27 @@ class InstancePrinter extends LLVMTemplate {
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Connected FIFOs
-		«FOR port : instance.actor.inputs.filter[ ! native]»
+		«FOR port : inputs»
 			«printExternalFifo(instance.incomingPortMap.get(port), port)»
 			
 		«ENDFOR»
-		«FOR port : instance.actor.outputs.filter[ ! native]»
+		«FOR port : outputs»
 			«printExternalFifo(instance.outgoingPortMap.get(port).head, port)»
 			
 		«ENDFOR»
 		«IF ! instance.actor.inputs.empty »
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Input ports
-			«FOR port : instance.actor.inputs.filter[ ! native]»
-				«printInput(port, instance.incomingPortMap.get(port))»
+			«FOR port : inputs»
+				«port.printInput»
 			«ENDFOR»
 			
 		«ENDIF»
 		«IF ! instance.actor.outputs.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Output ports
-			«FOR port : instance.actor.outputs.filter[ ! native]»
-				«printOutput(port, instance.outgoingPortMap.get(port).head)»
+			«FOR port : outputs»
+				«port.printOutput»
 			«ENDFOR»
 			
 		«ENDIF»
@@ -539,10 +541,11 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 	
 	def print(Procedure procedure) '''
+		«val parameters = procedure.parameters.join(", ", [argumentDeclaration] )»
 		«IF procedure.native»
-			declare «procedure.returnType.doSwitch» @«procedure.name»(«procedure.parameters.join(", ", [argumentDeclaration] )») nounwind
+			declare «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind
 		«ELSE»
-			define internal «procedure.returnType.doSwitch» @«procedure.name»(«procedure.parameters.join(", ", [argumentDeclaration])») nounwind {
+			define internal «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind {
 			entry:
 			«FOR local : procedure.locals»
 			«local.variableDeclaration»
@@ -564,9 +567,10 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	def argumentDeclaration(Param param) {
-		if (param.variable.type.string) '''i8* %«param.variable.name»'''
-		else if (param.variable.type.list) '''«param.variable.type.doSwitch»* %«param.variable.name»'''
-		else '''«param.variable.type.doSwitch» %«param.variable.name»'''
+		val variable = param.variable
+		if (variable.type.string) '''i8* %«variable.name»'''
+		else if (variable.type.list) '''«variable.type.doSwitch»* %«variable.name»'''
+		else '''«variable.type.doSwitch» %«variable.name»'''
 	}
 	
 	def initialize(Var variable) {
@@ -579,15 +583,12 @@ class InstancePrinter extends LLVMTemplate {
 		else "constant"
 	}
 	
-	def printInput(Port port, Connection connection) '''
+	def printInput(Port port) '''
+		«val connection = instance.incomingPortMap.get(port)»
 		@SIZE_«port.name» = internal constant i32 «connection.fifoSize»
 		@index_«port.name» = internal global i32 0
 		@numTokens_«port.name» = internal global i32 0
 		
-		«printReadTokensFunction(port, connection)»
-	'''
-	
-	def printReadTokensFunction(Port port, Connection connection) '''
 		define internal void @read_«port.name»() {
 		entry:
 			br label %read
@@ -613,16 +614,13 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	'''
 		
-	def printOutput(Port port, Connection connection) '''
+	def printOutput(Port port) '''
+		«val connection = instance.outgoingPortMap.get(port).head»
 		@SIZE_«port.name» = internal constant i32 «connection.fifoSize»
 		@index_«port.name» = internal global i32 0
 		@rdIndex_«port.name» = internal global i32 0
 		@numFree_«port.name» = internal global i32 0
 		
-		«printWriteTokensFunction(port, connection)»
-	'''
-	
-	def printWriteTokensFunction(Port port, Connection connection) '''
 		define internal void @write_«port.name»() {
 		entry:
 			br label %write
