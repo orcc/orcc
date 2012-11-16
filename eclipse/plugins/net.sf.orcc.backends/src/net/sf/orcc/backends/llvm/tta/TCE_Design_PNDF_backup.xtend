@@ -33,6 +33,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.df.Port
 import java.io.File
+import net.sf.orcc.backends.util.CommonPrinter
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -40,7 +41,7 @@ import java.io.File
  * @author Herve Yviquel
  * 
  */
-class TCE_Design_PNDF_backup extends TTAPrinter {
+class TCE_Design_PNDF_backup extends CommonPrinter {
 	
 	String path;
 	
@@ -50,20 +51,20 @@ class TCE_Design_PNDF_backup extends TTAPrinter {
 	
 	def print(Design design, String targetFolder) {
 		val file = new File(targetFolder + File::separator + "top.pndf")
-		printFile(doSwitch(design), file)
+		printFile(design.pndf, file)
 	}
 	
-	override caseDesign(Design design)
+	def private getPndf(Design design)
 		'''
 		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 		<processor-network version="0.1">
 			«FOR processor:design.processors»
-				«processor.doSwitch»
+				«processor.pndf»
 			«ENDFOR»
 		</processor-network>
 		'''
 	
-	override caseProcessor(Processor processor)
+	def private getPndf(Processor processor)
 		'''
 		<processor name="«processor.name»" >
 			<adf>«path»/«processor.name»/«processor.name».adf</adf>
@@ -95,7 +96,7 @@ class TCE_Design_PNDF_backup extends TTAPrinter {
 		</processor>
 		'''
 		
-	def width(Port port) {
+	def private getWidth(Port port) {
 		Math::ceil(port.type.sizeInBits/8.0).intValue
 	}
 	

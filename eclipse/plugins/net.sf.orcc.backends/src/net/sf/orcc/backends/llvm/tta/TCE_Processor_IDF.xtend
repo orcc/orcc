@@ -35,8 +35,9 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile
 import net.sf.orcc.util.OrccLogger
 import org.eclipse.emf.common.util.EMap
+import net.sf.orcc.backends.util.CommonPrinter
 
-class TCE_Processor_IDF extends TTAPrinter {
+class TCE_Processor_IDF extends CommonPrinter {
 	
 	EMap<String, Implementation> hwDb;
 	
@@ -46,11 +47,11 @@ class TCE_Processor_IDF extends TTAPrinter {
 	
 	def print(Processor processor, String targetFolder) {
 		val file = new File(targetFolder + File::separator + processor.getName() + ".idf")
-		printFile(doSwitch(processor), file)
+		printFile(processor.idf, file)
 	}
 		
 		
-	override caseProcessor(Processor processor)
+	def private getIdf(Processor processor)
 		'''
 		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 		<adf-implementation>
@@ -62,16 +63,16 @@ class TCE_Processor_IDF extends TTAPrinter {
 			</ic-decoder-plugin>
 			
 			«FOR fu: processor.functionUnits»
-				«fu.doSwitch»
+				«fu.idf»
 			«ENDFOR»
 			«FOR rf: processor.registerFiles»
-				«rf.doSwitch»
+				«rf.idf»
 			«ENDFOR»
 			
 		</adf-implementation>
 		'''
 
-	override caseFunctionUnit(FunctionUnit fu) {
+	def private getIdf(FunctionUnit fu) {
 		val impl = hwDb.get(fu.implementation)
 		if(impl == null){
 			OrccLogger::warnln("Unknown implementation of " + fu.name)
@@ -85,7 +86,7 @@ class TCE_Processor_IDF extends TTAPrinter {
 		}
 	}
 
-	override caseRegisterFile(RegisterFile rf) {
+	def private getIdf(RegisterFile rf) {
 		val impl = hwDb.get(rf.implementation)
 		if(impl == null){
 			OrccLogger::warnln("Unknown implementation of " + rf.name)

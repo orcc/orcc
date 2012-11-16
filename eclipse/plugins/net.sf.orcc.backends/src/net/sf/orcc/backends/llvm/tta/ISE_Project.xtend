@@ -31,10 +31,18 @@ package net.sf.orcc.backends.llvm.tta
 import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
+import net.sf.orcc.backends.util.CommonPrinter
 
-class ISE_Project extends TTAPrinter {
+class ISE_Project extends CommonPrinter {
 	
-	override caseDesign(Design design) 
+	def print(Design design, String targetFolder) {
+		val ucfFile = new File(targetFolder + File::separator + "top.ucf")
+		val xiseFile = new File(targetFolder + File::separator + "top.xise")
+		printFile(ucf, ucfFile)
+		printFile(design.xise, xiseFile)
+	}
+	
+	def private getXise(Design design) 
 		'''
 		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 		<project xmlns="http://www.xilinx.com/XMLSchema" xmlns:xil_pn="http://www.xilinx.com/XMLSchema">
@@ -60,7 +68,7 @@ class ISE_Project extends TTAPrinter {
 		    </file>
 		
 		    «FOR processor:design.processors»
-				«processor.doSwitch»
+				«processor.xise»
 			«ENDFOR»
 		
 		    <!--                   -->
@@ -144,7 +152,7 @@ class ISE_Project extends TTAPrinter {
 		</project>
 		'''
 		
-	override caseProcessor(Processor processor)
+	def private getXise(Processor processor)
 		'''
 		<!-- Processor «processor.name» -->
 		<file xil_pn:name="«processor.name»/tta/vhdl/«processor.name»_tl_params_pkg.vhdl" xil_pn:type="FILE_VHDL">
@@ -206,15 +214,8 @@ class ISE_Project extends TTAPrinter {
 		  <association xil_pn:name="Implementation"/>
 		</file>
 		'''
-		
-	def print(Design design, String targetFolder) {
-		val ucfFile = new File(targetFolder + File::separator + "top.ucf")
-		val xiseFile = new File(targetFolder + File::separator + "top.xise")
-		printFile(getUcfContent, ucfFile)
-		printFile(doSwitch(design), xiseFile)
-	}
 	
-	def private getUcfContent()
+	def private getUcf()
 		'''
 		NET "leds[0]" IOSTANDARD = LVCMOS18;
 		NET "leds[0]" LOC = AC22;

@@ -40,8 +40,9 @@ import net.sf.orcc.ir.util.ExpressionPrinter
 import net.sf.orcc.util.Attribute
 import org.eclipse.emf.common.util.EList
 import java.io.File
+import net.sf.orcc.backends.util.CommonPrinter
 
-class VHDL_Design extends TTAPrinter {
+class VHDL_Design extends CommonPrinter {
 	
 	ExpressionPrinter exprPrinter;
 	FPGA fpga;
@@ -53,10 +54,10 @@ class VHDL_Design extends TTAPrinter {
 	
 	def print(Design design, String targetFolder) {
 		val file = new File(targetFolder + File::separator + "top.vhdl")
-		printFile(doSwitch(design), file)
+		printFile(design.vhdl, file)
 	}
 	
-	override caseDesign(Design design)
+	def private getVhdl(Design design)
 		'''
 		-------------------------------------------------------------------------------
 		-- Title      : Network: «design.name»
@@ -104,7 +105,7 @@ class VHDL_Design extends TTAPrinter {
 		end bdf_type;
 		'''
 		
-	override caseProcessor(Processor processor)
+	def private getVhdl(Processor processor)
 		'''
 		«processor.name»_inst : entity work.«processor.name»
 		  generic map(device_family => "«fpga.family»")
@@ -113,7 +114,7 @@ class VHDL_Design extends TTAPrinter {
 		           rst_n                  => rst_n);
 		'''
 	
-	override caseComponent(Component component)
+	def private getVhdl(Component component)
 		'''
 		«component.name»_inst : entity work.«component.name»
 		  «IF(!component.attributes.empty)»generic map(«component.attributes.assignGenerics»)«ENDIF»
@@ -122,7 +123,7 @@ class VHDL_Design extends TTAPrinter {
 		           rst_n => rst_n);
 		'''
 		
-	override caseMemory(Memory memory)
+	def private getVhdl(Memory memory)
 		'''
 		«memory.name» : entity work.dram_2p
 		  generic map(depth      => «memory.depth»/4,
@@ -144,12 +145,12 @@ class VHDL_Design extends TTAPrinter {
 		           rst_n      => rst_n);
 		'''
 		
-	def assign(Port port, Signal signal)
+	def private assign(Port port, Signal signal)
 		'''
 		«port.name» <= s_«signal.name»;
 		'''
 		
-	def assignPorts(Component component)
+	def private assignPorts(Component component)
 		'''
 		«FOR edge : component.incoming»
 			«val link = edge as Link»
@@ -163,14 +164,14 @@ class VHDL_Design extends TTAPrinter {
 		«ENDFOR»
 		'''
 		
-	def assignGenerics(EList<Attribute> attributes)
+	def private assignGenerics(EList<Attribute> attributes)
 		'''
 		«FOR attribute : attributes SEPARATOR ",\n"»
 			«attribute.name» => «exprPrinter.doSwitch(attribute.referencedValue)»
 		«ENDFOR»
 		'''
 		
-	def dispatch assignInput(Port port, Memory memory)
+	def private dispatch assignInput(Port port, Memory memory)
 		'''
 		fu_«port.name»_dmem_data_in  => «memory.name»_queue_p2,
 		fu_«port.name»_dmem_data_out => «memory.name»_data_p2,
@@ -179,12 +180,12 @@ class VHDL_Design extends TTAPrinter {
 		fu_«port.name»_dmem_bytemask => «memory.name»_byteen_p2,
 		'''
 	
-	def dispatch assignInput(Port port, Signal signal)
+	def private dispatch assignInput(Port port, Signal signal)
 		'''
 		«port.name» => s_«signal.name»(«signal.size»-1 downto 0),
 		'''
 		
-	def dispatch assignOutput(Port port, Memory memory)
+	def private dispatch assignOutput(Port port, Memory memory)
 		'''
 		fu_«port.name»_dmem_data_in  => «memory.name»_queue_p1,
 		fu_«port.name»_dmem_data_out => «memory.name»_data_p1,
@@ -193,12 +194,12 @@ class VHDL_Design extends TTAPrinter {
 		fu_«port.name»_dmem_bytemask => «memory.name»_byteen_p1,
 		'''
 	
-	def dispatch assignOutput(Port port, Signal signal)
+	def private dispatch assignOutput(Port port, Signal signal)
 		'''
 		«port.name»(«signal.size»-1 downto 0) => s_«signal.name»,
 		'''
 		
-	def instantiate(Design design)
+	def private instantiate(Design design)
 		'''
 		---------------------------------------------------------------------------
 		-- Ports instantiation 
@@ -213,24 +214,24 @@ class VHDL_Design extends TTAPrinter {
 		-- Buffers instantiation 
 		--------------------------------------------------------------------------- 
 		«FOR memory : design.sharedMemories SEPARATOR "\n"»
-			«memory.doSwitch»
+			«memory.vhdl»
 		«ENDFOR»
 		---------------------------------------------------------------------------
 		-- Processors instantiation 
 		---------------------------------------------------------------------------
 		«FOR processor : design.processors SEPARATOR "\n"»
-			«processor.doSwitch»
+			«processor.vhdl»
 		«ENDFOR»
 		---------------------------------------------------------------------------
 		-- Components instantiation 
 		---------------------------------------------------------------------------
 		«FOR component : design.components SEPARATOR "\n"»
-			«component.doSwitch»
+			«component.vhdl»
 		«ENDFOR»
 		---------------------------------------------------------------------------
 		'''
 		
-	def declareSignals(Design design)
+	def private declareSignals(Design design)
 		'''
 		---------------------------------------------------------------------------
 		-- Signals declaration
@@ -244,12 +245,12 @@ class VHDL_Design extends TTAPrinter {
 		---------------------------------------------------------------------------
 		'''
 		
-	def declare(Signal signal)
+	def private declare(Signal signal)
 		'''
 		signal s_«signal.name» : std_logic_vector(«signal.size»-1 downto 0);
 		'''
 		
-	def declareSignals(Memory memory)
+	def private declareSignals(Memory memory)
 		'''
 		signal «memory.name»_wren_p1    : std_logic;
 		signal «memory.name»_address_p1 : std_logic_vector(«memory.addrWidth»-2-1 downto 0);
@@ -263,7 +264,7 @@ class VHDL_Design extends TTAPrinter {
 		signal «memory.name»_queue_p2   : std_logic_vector(31 downto 0);
 		'''
 		
-	def declarePorts(Design design)
+	def private declarePorts(Design design)
 		'''
 		«FOR port : design.inputs»
 			«port.name» : in std_logic_vector(«port.size»-1 downto 0);

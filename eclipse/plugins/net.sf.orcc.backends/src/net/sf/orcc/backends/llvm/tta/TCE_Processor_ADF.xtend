@@ -49,83 +49,84 @@ import net.sf.orcc.backends.llvm.tta.architecture.TermBool
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Writes
 import java.io.File
+import net.sf.orcc.backends.util.CommonPrinter
 
-class TCE_Processor_ADF extends TTAPrinter {
+class TCE_Processor_ADF extends CommonPrinter {
 	
 	def print(Processor processor, String targetFolder) {
 		val file = new File(targetFolder + File::separator + processor.getName() + ".adf")
-		printFile(print(processor), file)
+		printFile(processor.adf, file)
 	}
 		
-	def print(Processor processor)
+	def private getAdf(Processor processor)
 		'''
 		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 		<adf version="1.7">
 			«FOR bus: processor.buses»
-				«bus.printBus»
+				«bus.adf»
 			«ENDFOR»
 			«FOR socket: processor.sockets»
-				«socket.print»
+				«socket.adf»
 			«ENDFOR»
 			«FOR fu: processor.functionUnits»
-				«fu.print»
+				«fu.adf»
 			«ENDFOR»
 			«FOR rf: processor.registerFiles»
-				«rf.print»
+				«rf.adf»
 			«ENDFOR»
-			«processor.ROM.print(processor, false)»
+			«processor.ROM.getAdf(processor, false)»
 			«FOR ram: processor.localRAMs»
-				«ram.print(processor, true)»
+				«ram.getAdf(processor, true)»
 			«ENDFOR»
 			«FOR ram: processor.sharedRAMs»
-				«ram.print(processor, true)»
+				«ram.getAdf(processor, true)»
 			«ENDFOR»
-			«processor.gcu?.print»
+			«processor.gcu?.adf»
 		</adf>
 		'''
 	
-	def printBus(Bus bus) 
+	def private getAdf(Bus bus) 
 		'''
 		<bus name="«bus.name»">
 			<width>«bus.width»</width>
 			«FOR guard: bus.guards»
 				<guard>
-					«guard.doSwitch»
+					«guard.adfExpr»
 				</guard>
 			«ENDFOR»
 			«FOR segment: bus.segments»
-				«segment.print»
+				«segment.adf»
 			«ENDFOR»
-			«bus.shortImmediate.print»
+			«bus.shortImmediate.adf»
 		</bus>
 		'''
 	
-	override caseExprBinary(ExprBinary expr) 
+	def private dispatch getAdfExpr(ExprBinary expr) 
 		'''
 		«IF(expr.and)»<and-expr>«ELSE»<or-expr>«ENDIF»
-			«expr.e1.doSwitch»
-			«expr.e2.doSwitch»
+			«expr.e1.adfExpr»
+			«expr.e2.adfExpr»
 		«IF(expr.and)»</and-expr>«ELSE»</or-expr>«ENDIF»
 		'''
 	
-	override caseExprUnary(ExprUnary expr) 
+	def private dispatch getAdfExpr(ExprUnary expr) 
 		'''
 		«IF(expr.simple)»<simple-expr>«ELSE»<inverted-expr>«ENDIF»
-			«expr.term.doSwitch»
+			«expr.term.adfTerm»
 		«IF(expr.simple)»</simple-expr>«ELSE»</inverted-expr>«ENDIF»
 		'''
 	
-	override caseExprFalse(ExprFalse object) 
+	def private dispatch getAdfExpr(ExprFalse object) 
 		'''
 		<always-false/>
 		'''
 	
-	override caseExprTrue(ExprTrue object) 
+	def private dispatch getAdfExpr(ExprTrue object) 
 		'''
 		<always-true/>
 		'''
 		
-	override caseTermBool(TermBool term)
+	def private dispatch getAdfTerm(TermBool term)
 		'''
 		<bool>
 			<name>«term.register.name»</name>
@@ -133,7 +134,7 @@ class TCE_Processor_ADF extends TTAPrinter {
 		</bool>
 		'''
 	
-	override caseTermUnit(TermUnit term)
+	def private dispatch getAdfTerm(TermUnit term)
 		'''
 		<unit>
 			<name>«term.functionUnit.name»</name>
@@ -141,7 +142,7 @@ class TCE_Processor_ADF extends TTAPrinter {
 		</unit>
 		'''
 		
-	override caseReads(Reads element)
+	def private dispatch getAdfElement(Reads element)
 		'''
 		«val Operation op = element.eContainer as Operation»
 		<reads name="«op.portToIndexMap.get(element.port)»">
@@ -150,7 +151,7 @@ class TCE_Processor_ADF extends TTAPrinter {
 		</reads>
 		'''
 
-	override caseWrites(Writes element) 
+	def private dispatch getAdfElement(Writes element) 
 		'''
 		«val Operation op = element.eContainer as Operation»
 		<writes name="«op.portToIndexMap.get(element.port)»">
@@ -159,7 +160,7 @@ class TCE_Processor_ADF extends TTAPrinter {
 		</writes>
 		'''
 
-	override caseResource(Resource element)
+	def private dispatch getAdfElement(Resource element)
 		'''
 		<resource name="«element.name»">
 			<start-cycle>«element.startCycle»</start-cycle>
@@ -168,7 +169,7 @@ class TCE_Processor_ADF extends TTAPrinter {
 		'''
 	
 	
-	def print(FuPort port, boolean needWidth, boolean isSpecial) 
+	def private getAdf(FuPort port, boolean needWidth, boolean isSpecial) 
 		'''
 		<«IF(isSpecial)»special-«ENDIF»port name="«port.name»">
 			«port.inputSocket?.connect»
@@ -179,29 +180,29 @@ class TCE_Processor_ADF extends TTAPrinter {
 		</«IF(isSpecial)»special-«ENDIF»port>
 		'''
 	
-	def print(FunctionUnit fu) 
+	def private getAdf(FunctionUnit fu) 
 		'''
 		<function-unit name="«fu.name»">
 			«FOR port: fu.ports»
-				«port.print(true, false)»
+				«port.getAdf(true, false)»
 			«ENDFOR»
 			«FOR operation: fu.operations»
-				«operation.print(false)»
+				«operation.getAdf(false)»
 			«ENDFOR»
 			«fu.addressSpace.connect»
 		</function-unit>
 		'''
 	
-	def print(GlobalControlUnit gcu) 
+	def private getAdf(GlobalControlUnit gcu) 
 		'''
 		<global-control-unit name="«gcu.name»">
 			«FOR port: gcu.ports»
-				«port.print(true, false)»
+				«port.getAdf(true, false)»
 			«ENDFOR»
-			«gcu.returnAddress.print(true, true)»
+			«gcu.returnAddress.getAdf(true, true)»
 			<return-address>«gcu.returnAddress.name»</return-address>
 			«FOR operation: gcu.operations»
-				«operation.print(true)»
+				«operation.getAdf(true)»
 			«ENDFOR»
 			<address-space>«gcu.addressSpace.name»</address-space>
 			<delay-slots>«gcu.delaySlots»</delay-slots>
@@ -209,7 +210,7 @@ class TCE_Processor_ADF extends TTAPrinter {
 		</global-control-unit>
 		'''
 	
-	def print(Operation operation, boolean isControl) 
+	def private getAdf(Operation operation, boolean isControl) 
 		'''
 		<«IF(isControl)»ctrl-«ENDIF»operation>
 			<name>«operation.name»</name>
@@ -218,13 +219,13 @@ class TCE_Processor_ADF extends TTAPrinter {
 			«ENDFOR»
 			<pipeline>
 				«FOR element: operation.pipeline»
-					«element.doSwitch»
+					«element.adfElement»
 				«ENDFOR»
 			</pipeline>
 		</«IF(isControl)»ctrl-«ENDIF»operation>
 		'''
 	
-	def print(RegisterFile rf) 
+	def private getAdf(RegisterFile rf) 
 		'''
 		<register-file name="«rf.name»">
 			<type>normal</type>
@@ -233,12 +234,12 @@ class TCE_Processor_ADF extends TTAPrinter {
 			<max-reads>«rf.maxReads»</max-reads>
 			<max-writes>«rf.maxWrites»</max-writes>
 			«FOR port: rf.ports»
-				«port.print(false, false)»
+				«port.getAdf(false, false)»
 			«ENDFOR»
 		</register-file>
 		'''
 	
-	def print(Socket socket) 
+	def private getAdf(Socket socket) 
 		'''
 		<socket name="«socket.name»">
 			«FOR segment: socket.connectedSegments»
@@ -247,7 +248,7 @@ class TCE_Processor_ADF extends TTAPrinter {
 		</socket>
 		'''
 	
-	def print(Memory addressSpace, Processor processor, boolean isRAM) 
+	def private getAdf(Memory addressSpace, Processor processor, boolean isRAM) 
 		'''
 		<address-space name="«addressSpace.name»">
 			<width>«addressSpace.wordWidth»</width>
@@ -258,14 +259,14 @@ class TCE_Processor_ADF extends TTAPrinter {
 		</address-space>
 		'''
 		
-	def print(Segment segment) 
+	def private getAdf(Segment segment) 
 		'''
 		<segment name="«segment.name»">
 			<writes-to/>
 		</segment>
 		'''
 
-	def print(ShortImmediate shortImmediate) 
+	def private getAdf(ShortImmediate shortImmediate) 
 		'''
 		<short-immediate>
 			<extension>zero</extension>
@@ -273,7 +274,7 @@ class TCE_Processor_ADF extends TTAPrinter {
 		</short-immediate>
 		'''
 		
-	def connect(Segment segment, Socket socket)
+	def private connect(Segment segment, Socket socket)
 		'''
 		«IF(socket.input)»<reads-from>«ELSE»<writes-to>«ENDIF»
 			<bus>«segment.bus.name»</bus>
@@ -281,12 +282,12 @@ class TCE_Processor_ADF extends TTAPrinter {
 		«IF(socket.input)»</reads-from>«ELSE»</writes-to>«ENDIF»
 		'''
 		
-	def connect(Socket socket)
+	def private connect(Socket socket)
 		'''
 		<connects-to>«socket.name»</connects-to>
 		'''
 		
-	def connect(Memory addressSpace)
+	def private connect(Memory addressSpace)
 		'''
 		«IF(addressSpace == null)»<address-space/>«ELSE»<address-space>«addressSpace.name»</address-space>«ENDIF»
 		'''

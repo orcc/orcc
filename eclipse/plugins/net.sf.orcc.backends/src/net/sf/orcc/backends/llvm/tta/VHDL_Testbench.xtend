@@ -31,16 +31,17 @@ package net.sf.orcc.backends.llvm.tta
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import java.io.File
+import net.sf.orcc.backends.util.CommonPrinter
 
-class VHDL_Testbench extends TTAPrinter {
+class VHDL_Testbench extends CommonPrinter {
 	
 	def print(Design design, String targetFolder) {
 		val file = new File(targetFolder + File::separator + "top_tb.vhd")
-		printFile(doSwitch(design), file)
+		printFile(design.vhdl, file)
 	}
 	
 	
-	override caseDesign(Design design)
+	def private getVhdl(Design design)
 		'''
 		------------------------------------------------------------------------------
 		-- Generated from <vertex.simpleName>
@@ -90,7 +91,7 @@ class VHDL_Testbench extends TTAPrinter {
 		end architecture arch_tb_top;
 		'''
 		
-	def declareVertexSigAndConst(Design design)
+	def private declareVertexSigAndConst(Design design)
 		'''
 		constant PERIOD : time := 10 ns;
 		--
@@ -106,19 +107,19 @@ class VHDL_Testbench extends TTAPrinter {
 		signal rst_n : std_logic := '0';
 		'''
 		
-	def declareSignal(Port port)
+	def private declareSignal(Port port)
 		'''
 		signal «port.name» : std_logic_vector(«port.size»-1 downto 0);
 		'''
 		
-	def mapSignals(Design design)
+	def private mapSignals(Design design)
 		'''
 		«FOR port : design.inputs + design.outputs»
 			«port.mapSignal»
 		«ENDFOR»
 		'''
 	
-	def mapSignal(Port port)
+	def private mapSignal(Port port)
 		'''
 		«port.name» => <port.name>,
 		'''

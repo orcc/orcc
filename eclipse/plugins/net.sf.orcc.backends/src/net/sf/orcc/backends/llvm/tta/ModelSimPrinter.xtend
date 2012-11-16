@@ -34,8 +34,9 @@ import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import java.io.File
 import net.sf.orcc.backends.util.FPGA
+import net.sf.orcc.backends.util.CommonPrinter
 
-class ModelSimPrinter extends TTAPrinter {
+class ModelSimPrinter extends CommonPrinter {
 	
 	private FPGA fpga;
 	
@@ -50,7 +51,7 @@ class ModelSimPrinter extends TTAPrinter {
 		printFile(design.tcl, tclFile)
 	}
 	
-	def private wave(Design design) 
+	def private getWave(Design design) 
 		'''
 		onerror {resume}
 		quietly WaveActivateNextPane {} 0
@@ -65,7 +66,7 @@ class ModelSimPrinter extends TTAPrinter {
 		«ENDFOR»
 		
 		«FOR processor: design.processors»
-			«processor.wave()»
+			«processor.wave»
 		«ENDFOR»
 		
 		TreeUpdate [SetDefaultTree]
@@ -88,28 +89,28 @@ class ModelSimPrinter extends TTAPrinter {
 		'''
 		
 			
-	def	private wave(Port port) 
+	def	private getWave(Port port) 
 		'''
 		add wave -noupdate -format Literal /tb_top/top_orcc/«port.label»
 		'''
 		
-	def	private wave(Processor processor)
+	def	private getWave(Processor processor)
 		'''
 		add wave -noupdate -divider \<NULL\>
 		add wave -noupdate -divider «processor.name»
 		add wave -noupdate -divider inputs
 		«FOR edge: processor.incoming»
 			«val Link link = edge as Link»
-			«link.wave(processor, link.targetPort)»
+			«link.getWave(processor, link.targetPort)»
 		«ENDFOR»
 		add wave -noupdate -divider outputs
 		«FOR edge: processor.outgoing»
 			«val Link link = edge as Link»
-			«link.wave(processor, link.sourcePort)»
+			«link.getWave(processor, link.sourcePort)»
 		«ENDFOR»
 		'''
 		
-	def private wave(Link link, Processor processor, Port port) 
+	def private getWave(Link link, Processor processor, Port port) 
 		'''
 		«IF(!link.signal)»
 		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_data_in
@@ -122,7 +123,7 @@ class ModelSimPrinter extends TTAPrinter {
 		«ENDIF»
 		'''
 		
-		def private tcl(Design design) 
+		def private getTcl(Design design) 
 		'''
 		# Remove old libraries
 		vdel -all -lib work
@@ -178,7 +179,7 @@ class ModelSimPrinter extends TTAPrinter {
 		vsim -novopt «IF(fpga.altera)»-L altera_mf «ENDIF»work.tb_top -t ps -do "do wave.do;"
 		'''
 
-	def private tcl(Processor processor)
+	def private getTcl(Processor processor)
 		'''
 		# Compile processor <processor.name>
 		vcom -93 -quiet -work work <processor.name>/tta/vhdl/imem_mau_pkg.vhdl

@@ -35,8 +35,9 @@ import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Signal
 import net.sf.orcc.backends.util.FPGA
+import net.sf.orcc.backends.util.CommonPrinter
 
-class VHDL_Processor extends TTAPrinter {
+class VHDL_Processor extends CommonPrinter {
 	
 	FPGA fpga;
 	
@@ -46,10 +47,10 @@ class VHDL_Processor extends TTAPrinter {
 	
 	def print(Processor processor, String targetFolder) {
 		val file = new File(targetFolder + File::separator + processor.getName() + ".vhd")
-		printFile(doSwitch(processor), file)
+		printFile(processor.vhdl, file)
 	}
 		
-	override caseProcessor(Processor processor)
+	def private getVhdl(Processor processor)
 		'''
 		-------------------------------------------------------------------------------
 		-- Title      : «processor.name»
@@ -107,7 +108,7 @@ class VHDL_Processor extends TTAPrinter {
 		end bdf_type;
 		'''
 		
-	def declare(Processor processor)
+	def private declare(Processor processor)
 		'''
 		«IF(fpga.xilinx)»
 		---------------------------------------------------------------------------
@@ -160,7 +161,7 @@ class VHDL_Processor extends TTAPrinter {
 		---------------------------------------------------------------------------
 		'''
 		
-	def assign(Processor processor)
+	def private assign(Processor processor)
 		'''
 		wren_wire <= not(wren_x_wire);
 		«FOR edge : processor.incoming»
@@ -235,7 +236,7 @@ class VHDL_Processor extends TTAPrinter {
 		           rstx                     => rst_n);
 		'''
 		
-	def declarePorts(Processor processor)
+	def private declarePorts(Processor processor)
 		'''
 		«FOR edge : processor.incoming»
 			«val link = edge as Link»
@@ -249,12 +250,12 @@ class VHDL_Processor extends TTAPrinter {
 		«ENDFOR»
 		'''
 		
-	def dispatch declarePort(Port port, Signal signal)
+	def private dispatch declarePort(Port port, Signal signal)
 		'''
 		«port.name» : out std_logic_vector(«signal.size»-1 downto 0);
 		'''
 	
-	def dispatch declarePort(Port port, Memory memory)
+	def private dispatch declarePort(Port port, Memory memory)
 		'''
 		fu_«port.name»_dmem_data_in  : in std_logic_vector(fu_«port.name»_dataw-1 downto 0);
 		fu_«port.name»_dmem_data_out : out std_logic_vector(fu_«port.name»_dataw-1 downto 0);
@@ -263,17 +264,17 @@ class VHDL_Processor extends TTAPrinter {
 		fu_«port.name»_dmem_bytemask : out std_logic_vector(fu_«port.name»_dataw/8-1 downto 0);
 		'''
 
-	def dispatch declareSignal(Port port, Signal signal)
+	def private dispatch declareSignal(Port port, Signal signal)
 		'''
 		signal «port.name»_i : std_logic_vector(7 downto 0);
 		'''
 
-	def dispatch declareSignal(Port port, Memory memory)
+	def private dispatch declareSignal(Port port, Memory memory)
 		'''
 		signal fu_«port.name»_dmem_wr_en_x : std_logic;
 		'''
 	
-	def mapPorts(Processor processor)
+	def private mapPorts(Processor processor)
 		'''
 		«FOR edge : processor.incoming»
 			«val link = edge as Link»
@@ -287,12 +288,12 @@ class VHDL_Processor extends TTAPrinter {
 		«ENDFOR»
 		'''
 	
-	def dispatch mapPort(Port port, Signal signal)
+	def private dispatch mapPort(Port port, Signal signal)
 		'''
 		fu_«port.name»_STRATIXIII_LED => «port.name»_i,
 		'''
 	
-	def dispatch mapPort(Port port, Memory memory)
+	def private dispatch mapPort(Port port, Memory memory)
 		'''
 		fu_«port.name»_dmem_data_in    => fu_«port.name»_dmem_data_in,
 		fu_«port.name»_dmem_data_out   => fu_«port.name»_dmem_data_out,
@@ -301,12 +302,12 @@ class VHDL_Processor extends TTAPrinter {
 		fu_«port.name»_dmem_bytemask   => fu_«port.name»_dmem_bytemask,
 		'''
 
-	def dispatch mapSignal(Port port, Signal signal)
+	def private dispatch mapSignal(Port port, Signal signal)
 		'''
 		«port.name» <= «port.name»_i(«signal.size»-1 downto 0);
 		'''
 
-	def dispatch mapSignal(Port port, Memory memory)
+	def private dispatch mapSignal(Port port, Memory memory)
 		'''
 		fu_«port.name»_dmem_wr_en <= not(fu_«port.name»_dmem_wr_en_x);
 		'''

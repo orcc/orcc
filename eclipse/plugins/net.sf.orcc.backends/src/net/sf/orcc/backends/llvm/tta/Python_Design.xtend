@@ -35,8 +35,9 @@ import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.backends.util.CommonPrinter
 
-class Python_Design extends TTAPrinter {
+class Python_Design extends CommonPrinter {
 	
 	private FPGA fpga;
 	
@@ -47,11 +48,11 @@ class Python_Design extends TTAPrinter {
 	def print(Design design, String targetFolder) {
 		val pythonPath = OrccUtil::createFolder(targetFolder, "informations_");
 		val file = new File(pythonPath + File::separator + "informations.py")
-		printFile(doSwitch(design), file)
+		printFile(design.python, file)
 		new File(pythonPath + File::separator + "__init__.py").createNewFile
 	}
 	
-	override caseDesign(Design design) 
+	def private getPython(Design design) 
 		'''
 		# -*- coding: utf-8 -*-
 		#
@@ -61,13 +62,13 @@ class Python_Design extends TTAPrinter {
 		from orcc_ import *
 		
 		«FOR processor: design.processors»
-			«processor.initProcessor»
+			«processor.pythonInit»
 		«ENDFOR»
 		
 		## Processors initialization
 		processors = [
 			«FOR processor: design.processors SEPARATOR ','»
-				«processor.doSwitch»
+				«processor.python»
 			«ENDFOR»
 		]
 		
@@ -75,20 +76,20 @@ class Python_Design extends TTAPrinter {
 		design = Design("«design.name»", processors, «IF(fpga.altera)»True«ELSE»False«ENDIF»)
 		'''
 		
-	override caseProcessor(Processor processor)
+	def private getPython(Processor processor)
 		'''Processor("«processor.name»", «processor.name»_instances, «processor.name»_inputs, «processor.name»_outputs, «processor.usePrint»)'''
 		
-	def printPort(Port port, int index) 
+	def private getPython(Port port, int index) 
 		'''Port("«port.label»", «index»«IF(port.native)», True, «port.size»«ENDIF»)'''
 
-	def initProcessor(Processor processor)
+	def private getPythonInit(Processor processor)
 		'''
-		«processor.name»_inputs = [«FOR edge: processor.incoming SEPARATOR ', '»«(edge as Link).targetPort.printPort(0)»«ENDFOR»]
-		«processor.name»_outputs = [«FOR edge: processor.outgoing SEPARATOR ', '»«(edge as Link).sourcePort.printPort(0)»«ENDFOR»]
+		«processor.name»_inputs = [«FOR edge: processor.incoming SEPARATOR ', '»«(edge as Link).targetPort.getPython(0)»«ENDFOR»]
+		«processor.name»_outputs = [«FOR edge: processor.outgoing SEPARATOR ', '»«(edge as Link).sourcePort.getPython(0)»«ENDFOR»]
 		«processor.name»_instances = [«FOR instance: processor.mappedActors SEPARATOR ', '»"«instance.name»"«ENDFOR»]
 		'''
 		
-	def usePrint(Processor processor) {
+	def private usePrint(Processor processor) {
 		if(processor.mappedActors.filter[actor.useNativeProcedure].empty) {
 			'''False'''
 		} else {
