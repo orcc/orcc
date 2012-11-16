@@ -48,7 +48,7 @@ class Python_Design extends TTAPrinter {
 		val pythonPath = OrccUtil::createFolder(targetFolder, "informations_");
 		val file = new File(pythonPath + File::separator + "informations.py")
 		printFile(doSwitch(design), file)
-		new File(pythonPath + File::separator + "__init__.py")
+		new File(pythonPath + File::separator + "__init__.py").createNewFile
 	}
 	
 	override caseDesign(Design design) 

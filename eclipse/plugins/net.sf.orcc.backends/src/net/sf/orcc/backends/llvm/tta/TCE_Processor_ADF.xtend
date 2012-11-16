@@ -54,7 +54,7 @@ class TCE_Processor_ADF extends TTAPrinter {
 	
 	def print(Processor processor, String targetFolder) {
 		val file = new File(targetFolder + File::separator + processor.getName() + ".adf")
-		printFile(doSwitch(processor), file)
+		printFile(print(processor), file)
 	}
 		
 	def print(Processor processor)
