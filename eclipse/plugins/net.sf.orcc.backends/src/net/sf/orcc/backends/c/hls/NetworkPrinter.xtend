@@ -32,6 +32,8 @@ import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
+import net.sf.orcc.df.Port
+import net.sf.orcc.graph.Vertex
 
 /**
  * Compile top Network c source code 
@@ -48,86 +50,38 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	override getNetworkFileContent() '''
 		// Generated from "«network.name»"
 
-		#include <locale.h>
-		#include <stdio.h>
-		#include <stdlib.h>
-		
-		#ifndef _WIN32
-		#define __USE_GNU
-		#endif
-		
-		#include "orcc_types.h"
-		#include "orcc_fifo.h"
-		#include "orcc_scheduler.h"
+		#include <hls_stream.h>
+		using namespace hls;
 
-		
-		#define SIZE «fifoSize»
-		// #define PRINT_FIRINGS
-
-		/////////////////////////////////////////////////
-		// FIFO allocation
-		«FOR vertice : network.children.filter(typeof(Instance)).filter[isActor]»
-			«vertice.allocateFifos»
-		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// FIFO pointer assignments
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			«instance.assignFifo»
+			«instance.assignFifoHLS»
 		«ENDFOR»
+		
+		
 		
 		/////////////////////////////////////////////////
 		// Action schedulers
+		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			extern void «instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ", "»unsigned int fifo_«port.name»_id«ENDFOR»);
-		«ENDFOR»
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			extern void «instance.name»_scheduler(struct schedinfo_s *si);
+			void «instance.name»_scheduler();
 		«ENDFOR»
 		
-		/////////////////////////////////////////////////
-		// Declaration of a struct actor for each actor
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			struct actor_s «instance.name»;
-		«ENDFOR»
-
-		/////////////////////////////////////////////////
-		// Declaration of the actors array
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			struct actor_s «instance.name» = {"«instance.name»", «instanceToIdMap.get(instance)», «instance.name»_scheduler, «instance.actor.inputs.size»0, «instance.actor.outputs.size», 0, 0, NULL, 0};			
-		«ENDFOR»
-		
-		struct actor_s *actors[] = {
-			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor] SEPARATOR ","»
-				&«instance.name»
-			«ENDFOR»
-		};
-		
-		/////////////////////////////////////////////////
-		// Initializer and launcher
-		void initialize_instances() {
-			«FOR instance : network.children.filter(typeof(Instance))»
-				«IF instance.isActor»
-					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
-				«ENDIF»
-			«ENDFOR»
-		}
-		
-		struct scheduler_s scheduler;
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
-		int main(int argc, char *argv[]) {
-			initialize_instances();
+		int main() {
 			
 			while(1) {
 				«FOR instance : network.children.filter(typeof(Instance))»
 					«IF instance.isActor»
-						«instance.name»_scheduler(scheduler);
+						«instance.name»_scheduler();
 					«ENDIF»
 				«ENDFOR»
 			}
-			return compareErrors;
+			return 0;
 		}
 	'''
 	
@@ -147,7 +101,18 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		  <libraryPaths/>
 		</project>
 	'''
+	def assignFifoHLS(Instance instance) '''
+		«FOR connList : instance.outgoingPortMap.values»
+			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
+				«printFifoAssignHLS(connList.head.source, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
+			«ENDIF»
+			
+		«ENDFOR»
+	'''
 	
+	def printFifoAssignHLS(Vertex vertex, Port port, int fifoIndex) '''
+		«IF vertex instanceof Instance»stream<«port.type.doSwitch»> «(vertex as Instance).name»_«port.name»;«ENDIF»
+	'''
 	override print(String targetFolder) {
 		val i = super.print(targetFolder)
 		val content = projectFileContent
