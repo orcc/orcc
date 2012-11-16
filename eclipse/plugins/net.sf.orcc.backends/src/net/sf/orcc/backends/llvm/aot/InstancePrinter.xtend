@@ -28,8 +28,6 @@
  */
  package net.sf.orcc.backends.llvm.aot
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.Map
@@ -68,6 +66,9 @@ import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 import java.util.List
 import java.io.File
+
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 
 /*
  * Compile Instance llvm source code
@@ -326,7 +327,7 @@ class InstancePrinter extends LLVMTemplate {
 					;; Output pattern
 					«checkOutputPattern(transition.action, transition.action.outputPattern, state)»
 					
-					br i1 %has_valid_outputs_«state.name»_«transition.action.name»_«transition.action.outputPattern.ports.size», label %bb_«state.name»_«transition.action.name»_fire, label %bb_«state.name»_finished
+					br i1 %has_valid_outputs_«transition.action.outputPattern.ports.last.name»_«state.name»_«transition.action.name», label %bb_«state.name»_«transition.action.name»_fire, label %bb_«state.name»_finished
 				«ELSE»
 					;; Empty output pattern
 					
@@ -389,7 +390,7 @@ class InstancePrinter extends LLVMTemplate {
 					;; Output pattern
 					«checkOutputPattern(action, action.outputPattern)»
 					
-					br i1 %has_valid_outputs_«action.name»_«action.outputPattern.ports.size», label %bb_«action.name»_fire, label %bb_finished
+					br i1 %has_valid_outputs_«action.outputPattern.ports.last.name»_«action.name», label %bb_«action.name»_fire, label %bb_finished
 				«ELSE»
 					;; Empty output pattern
 					
@@ -442,26 +443,25 @@ class InstancePrinter extends LLVMTemplate {
 	def checkOutputPattern(Action action, Pattern pattern) {
 		checkOutputPattern(action, pattern, null)
 	}
+	
 	def checkOutputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if( state != null) '''«state.name»_''' else ""
-		val portToIndexMap = portToIndexByPatternMap.get(pattern)
-		val firstPort = pattern.ports.head
+		val ports = pattern.ports.filter[!native].toList
 		'''
-			%size_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @SIZE_«firstPort.name»
-			%index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @index_«firstPort.name»
-			%rdIndex_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @rdIndex_«firstPort.name»
-			%tmp_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = sub i32 %size_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», %index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)»
-			%status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = add i32 %tmp_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», %rdIndex_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)»
-			%has_valid_outputs_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = icmp uge i32 %status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», «pattern.numTokensMap.get(firstPort)»
-			
-			«FOR port : pattern.ports.filter[!native].tail»
-				%size_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @SIZE_«port.name»
-				%index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @index_«port.name»
-				%rdIndex_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @rdIndex_«port.name»
-				%tmp_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = sub i32 %size_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», %index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)»
-				%status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = add i32 %tmp_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», %rdIndex_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)»
-				%available_output_«stateName»«action.name»_«port.name» = icmp sge i32 %status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», «pattern.numTokensMap.get(port)»
-				%has_valid_outputs_«stateName»«action.name»_«portToIndexMap.get(port)» = and i1 %has_valid_outputs_«stateName»«action.name»_«portToIndexMap.get(pattern.ports.get(pattern.ports.indexOf(port) - 1))», %available_output_«stateName»«action.name»_«port.name»
+			«FOR port : ports»
+				«val extName = port.name + "_" + stateName + action.name»
+				«val numTokens = pattern.numTokensMap.get(port)»
+				%size_«extName» = load i32* @SIZE_«port.name»
+				%index_«extName» = load i32* @index_«port.name»
+				%rdIndex_«extName» = load i32* @rdIndex_«port.name»
+				%tmp_«extName» = sub i32 %size_«extName», %index_«extName»
+				%status_«extName» = add i32 %tmp_«extName», %rdIndex_«extName»
+				«IF !port.equals(ports.head)»
+					%available_output_«extName» = icmp sge i32 %status_«extName», «numTokens»
+					%has_valid_outputs_«extName» = and i1 %has_valid_outputs_«ports.get(ports.indexOf(port) - 1).name»_«stateName»«action.name», %available_output_«extName»
+				«ELSE»
+					%has_valid_outputs_«extName» = icmp uge i32 %status_«extName», «numTokens»
+				«ENDIF»
 				
 			«ENDFOR»
 		'''
