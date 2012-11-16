@@ -34,6 +34,7 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
+import net.sf.orcc.df.Connection
 
 /**
  * Compile top Network c source code 
@@ -104,14 +105,14 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	def assignFifoHLS(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
-				«printFifoAssignHLS(connList.head.source, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
+				«printFifoAssignHLS(connList.head.source, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"),connList.head )»
 			«ENDIF»
 			
 		«ENDFOR»
 	'''
 	
-	def printFifoAssignHLS(Vertex vertex, Port port, int fifoIndex) '''
-		«IF vertex instanceof Instance»stream<«port.type.doSwitch»> «(vertex as Instance).name»_«port.name»;«ENDIF»
+	def printFifoAssignHLS(Vertex vertex, Port port, int fifoIndex, Connection connection) '''
+		«IF vertex instanceof Instance»stream<«port.type.doSwitch»> myStream_«connection.getId(port)»;«ENDIF»
 	'''
 	override print(String targetFolder) {
 		val i = super.print(targetFolder)
@@ -124,6 +125,11 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		} else {
 			return i + 1
 		}
+	}
+	
+	def getId(Connection connection, Port port) {
+		if(connection != null) connection.getAttribute("id").objectValue
+		else port.name
 	}
 
 }
