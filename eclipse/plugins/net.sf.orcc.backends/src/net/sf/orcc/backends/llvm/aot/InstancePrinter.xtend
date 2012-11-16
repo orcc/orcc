@@ -240,7 +240,7 @@ class InstancePrinter extends LLVMTemplate {
 	def printArchitecture() '''target triple = "x86_64"'''
 	
 	def stateVar(Var variable)
-		'''@«variable.name» = internal «variable.printStateVarNature» «variable.type.doSwitch» «variable.initialize»'''
+		'''@«variable.name» = internal «variable.stateVarNature» «variable.type.doSwitch» «variable.initialize»'''
 
 	
 	def schedulerWithFSM() '''
@@ -574,7 +574,7 @@ class InstancePrinter extends LLVMTemplate {
 		else "zeroinitializer, align 32"
 	}
 
-	def printStateVarNature(Var variable) {
+	def getStateVarNature(Var variable) {
 		if(variable.assignable) "global"
 		else "constant"
 	}
@@ -672,7 +672,7 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 	}
 	
-	def printNextLabel(Block block) {
+	def getNextLabel(Block block) {
 		if (block.blockWhile) (block as BlockWhile).joinBlock.label
 		else block.label
 	}
@@ -683,13 +683,13 @@ class InstancePrinter extends LLVMTemplate {
 				«instr.doSwitch»
 			«ENDFOR»
 			«IF ! blockBasic.cfgNode.successors.empty»
-				br label %b«(blockBasic.cfgNode.successors.head as CfgNode).node.printNextLabel»
+				br label %b«(blockBasic.cfgNode.successors.head as CfgNode).node.nextLabel»
 			«ENDIF»
 	'''
 	
 	override caseBlockIf(BlockIf blockIf) '''
 		b«blockIf.label»:
-			br i1 «blockIf.condition.doSwitch», label %b«blockIf.thenBlocks.head.printNextLabel», label %b«blockIf.elseBlocks.head.printNextLabel»
+			br i1 «blockIf.condition.doSwitch», label %b«blockIf.thenBlocks.head.nextLabel», label %b«blockIf.elseBlocks.head.nextLabel»
 		
 		«FOR block : blockIf.thenBlocks»
 			«block.doSwitch»
@@ -714,7 +714,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 		
 		b«blockwhile.label»:
-			br label %b«(blockwhile.cfgNode.successors.head as CfgNode).node.printNextLabel»
+			br label %b«(blockwhile.cfgNode.successors.head as CfgNode).node.nextLabel»
 	'''
 	
 	override caseInstruction(Instruction instr) {
@@ -725,22 +725,22 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	def caseInstCast(InstCast cast) '''
-		%«cast.target.variable.indexedName» = «cast.printCastOp» «cast.source.variable.printCastType» «cast.source.variable.print» to «cast.target.variable.printCastType»
+		%«cast.target.variable.indexedName» = «cast.castOp» «cast.source.variable.castType» «cast.source.variable.print» to «cast.target.variable.castType»
 	'''
 
-	def printCastOp(InstCast cast)
+	def getCastOp(InstCast cast)
 		'''«IF cast.source.variable.type.list»bitcast«ELSEIF ! cast.extended»trunc«ELSEIF cast.signed»sext«ELSE»zext«ENDIF»'''
 
-	def printCastType(Var variable)
+	def getCastType(Var variable)
 		'''«variable.type.doSwitch»«IF variable.type.list»*«ENDIF»'''
 	
 	override caseInstAssign(InstAssign assign) 
 		'''%«assign.target.variable.indexedName» = «assign.value.doSwitch»'''
 	
 	override caseInstPhi(InstPhi phi)
-		'''«phi.target.variable.print» = phi «phi.target.variable.type.doSwitch» «phi.printPhiPairs»'''
+		'''«phi.target.variable.print» = phi «phi.target.variable.type.doSwitch» «phi.phiPairs»'''
 		
-	def printPhiPairs(InstPhi phi) 
+	def getPhiPairs(InstPhi phi) 
 		'''«printPhiExpr(phi.values.head, (phi.block.cfgNode.predecessors.head as CfgNode).node)», «printPhiExpr(phi.values.tail.head, (phi.block.cfgNode.predecessors.tail.head as CfgNode).node)»'''
 	
 	def printPhiExpr(Expression expr, Block block)
