@@ -755,7 +755,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	override caseInstStore(InstStore store) {
 		val action = EcoreHelper::getContainerOfType(store, typeof(Action))
-		var variable = store.target.variable
+		val variable = store.target.variable
 		'''
 			«IF variable.type.list»
 				«val innerType = (variable.type as TypeList).innermostType»
@@ -775,28 +775,29 @@ class InstancePrinter extends LLVMTemplate {
 
 	override caseInstLoad(InstLoad load) {
 		val action = EcoreHelper::getContainerOfType(load, typeof(Action))
-		var variable = load.source.variable
+		val variable = load.source.variable
+		val target = load.target.variable.print
 		'''
 			«IF variable.type.list»
 				«val innerType = (variable.type as TypeList).innermostType»
 				«IF action != null && action.inputPattern.varToPortMap.get(variable) != null && ! action.inputPattern.varToPortMap.get(variable).native»
 					«val port = action.inputPattern.varToPortMap.get(variable)»
 					«printPortAccess(instance.incomingPortMap.get(port), port, variable, load.indexes, load)»
-					«load.target.variable.print» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
+					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
 				«ELSEIF action != null && action.outputPattern.varToPortMap.get(variable) != null && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«printPortAccess(instance.outgoingPortMap.get(port).head, port, variable, load.indexes, load)»
-					«load.target.variable.print» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
+					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
 				«ELSEIF action != null && action.peekPattern.varToPortMap.get(variable) != null»
 					«val port = action.peekPattern.varToPortMap.get(variable)»
 					«printPortAccess(instance.incomingPortMap.get(port), port, variable, load.indexes, load)»
-					«load.target.variable.print» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
+					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
 				«ELSE»
 					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "", [printIndex])»
-					«load.target.variable.print» = load «innerType.doSwitch»* «varName(variable, load)»
+					«target» = load «innerType.doSwitch»* «varName(variable, load)»
 				«ENDIF»				
 			«ELSE»
-				«load.target.variable.print» = load «variable.type.doSwitch»* «variable.print»
+				«target» = load «variable.type.doSwitch»* «variable.print»
 			«ENDIF»
 		'''
 	}
