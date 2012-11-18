@@ -67,7 +67,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		/////////////////////////////////////////////////
 		// FIFO pointer assignments
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			«instance.assignFifoHLS»
+			«instance.assignFifo»
 		«ENDFOR»
 		
 		
@@ -111,7 +111,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		  <libraryPaths/>
 		</project>
 	'''
-	def assignFifoHLS(Instance instance) '''
+	override assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
 				«printFifoAssignHLS(connList.head.source, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"),connList.head )»
@@ -126,11 +126,12 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	override print(String targetFolder) {
 		val i = super.print(targetFolder)
 		val content = projectFileContent
+		val content2 = networkFileContent
 		val file = new File(targetFolder + File::separator + "vivado_hls.app")
 		val file2 = new File(targetFolder + File::separator + network.simpleName + ".cpp")
-		if(needToWriteFile(content, file)) {
+		if(needToWriteFile(content, file2)) {
 			printFile(content, file)
-			printFile(content, file2)
+			printFile(content2, file2)
 			return i
 		} else {
 			return i + 1
