@@ -39,6 +39,7 @@ import net.sf.orcc.df.Action
 import java.io.File
 import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
+import java.util.List
 
 /*
  * Compile Instance c source code
@@ -81,11 +82,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Output FIFOs
-		«FOR port : instance.actor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.values»
-			extern stream<«port.type.doSwitch»>	myStream_«connection.get(0).getId(port)»;
-			«ENDFOR»
+		
+		«FOR connection : instance.outgoingPortMap.values»
+			extern stream<«connection.get(0).sourcePort.type.doSwitch»>	myStream_«connection.get(0).getId(connection.get(0).sourcePort)»;
 		«ENDFOR»
+		
 		
 		
 		
@@ -177,9 +178,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printTransition(State state) '''
 		l_«state.name»:
-		«IF ! instance.actor.actionsOutsideFsm.empty»
-			«instance.name»
-		«ENDIF»
 		«IF !state.outgoing.empty»
 			«schedulingState(state, state.outgoing.map[it as Transition])»
 		«ENDIF»
@@ -297,5 +295,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
 		'''
-	} 
+	}
+	 
+	override printActionLoop(List<Action> actions) '''
+		«actions.printActions»
+	'''
 }
