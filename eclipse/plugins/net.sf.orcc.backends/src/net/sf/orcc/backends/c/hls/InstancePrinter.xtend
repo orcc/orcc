@@ -37,6 +37,8 @@ import net.sf.orcc.df.Port
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Action
 import java.io.File
+import net.sf.orcc.ir.InstLoad
+import net.sf.orcc.ir.InstStore
 
 /*
  * Compile Instance c source code
@@ -80,7 +82,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Output FIFOs
 		«FOR port : instance.actor.outputs.filter[! native]»
-			extern stream<«port.type.doSwitch»>	myStream_«instance.outgoingPortMap.values.head.get(0).getId(port)»;
+			«FOR connection : instance.outgoingPortMap.values»
+			extern stream<«port.type.doSwitch»>	myStream_«connection.get(0).getId(port)»;
+			«ENDFOR»
 		«ENDFOR»
 		
 		
@@ -162,7 +166,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«FOR state : instance.actor.fsm.states»
 		«state.printTransition»
 			«ENDFOR»
-		
+		}
 		}
 	'''
 	
@@ -198,11 +202,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«IF transitions.head.action.outputPattern != null»
 				«transitions.head.action.outputPattern.printOutputPattern»
 					_FSM_state = my_state_«srcState.name»;	
-					goto finished;
+					//goto finished;
 				}
 			«ENDIF»
 			«transitions.head.action.body.name»();
-			i++;
+			
 			goto l_«transitions.head.target.name»;
 		} else {
 			«schedulingState(srcState, transitions.tail)»
@@ -230,4 +234,68 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	}
 	
+	override actionTest(Action action, Iterable<Action> others) '''
+		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+			«IF action.outputPattern != null»
+				«action.outputPattern.printOutputPattern»
+					//goto finished;
+				}
+			«ENDIF»
+			«action.body.name»();
+		} else {
+			«others.printActions»
+		}
+	'''
+	
+	override print(Action action) {
+		currentAction = action
+		val output = '''
+			static void «action.body.name»() {
+				«FOR variable : action.body.locals»
+					«variable.declare»;
+				«ENDFOR»
+			
+				«FOR block : action.body.blocks»
+					«block.doSwitch»
+				«ENDFOR»
+			
+				«FOR port : action.inputPattern.ports»
+					
+					
+				«ENDFOR»
+				
+				«FOR port : action.outputPattern.ports»
+					
+				«ENDFOR»
+			}
+			
+			«action.scheduler.print»
+			
+		'''
+		currentAction = null
+		return output
+	}
+	
+	override caseInstLoad(InstLoad load) {
+		val srcPort = load.source.variable.getPort
+		'''
+			«IF srcPort != null»
+				«load.target.variable.indexedName» = myStream_«(instance.incomingPortMap.get(srcPort).getId(srcPort))».read();
+			«ELSE»
+				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
+			«ENDIF»
+		'''
+	}
+
+	
+	override caseInstStore(InstStore store) {
+		val trgtPort = store.target.variable.port
+		'''
+		«IF trgtPort != null»
+				myStream_«instance.outgoingPortMap.values.head.get(0).getId(trgtPort)».write(«store.value.doSwitch»);
+		«ELSE»
+			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
+		«ENDIF»
+		'''
+	} 
 }
