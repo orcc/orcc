@@ -85,10 +85,8 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		int main() {
 			
 			while(1) {
-				«FOR instance : network.children.filter(typeof(Instance))»
-					«IF instance.isActor»
-						«instance.name»_scheduler();
-					«ENDIF»
+				«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+					«instance.name»_scheduler();
 				«ENDFOR»
 			}
 			return 0;
@@ -114,15 +112,16 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	override assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
-				«printFifoAssignHLS(connList.head.source, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"),connList.head )»
+				«printFifoAssignHLS(connList.head.source as Instance, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"),connList.head )»
 			«ENDIF»
 			
 		«ENDFOR»
 	'''
 	
-	def printFifoAssignHLS(Vertex vertex, Port port, int fifoIndex, Connection connection) '''
-		«IF vertex instanceof Instance»stream<«port.type.doSwitch»> myStream_«connection.getId(port)»;«ENDIF»
+	def printFifoAssignHLS(Instance vertex, Port port, int fifoIndex, Connection connection) '''
+		stream<«connection.fifoType.doSwitch»> myStream_«connection.fifoName»;
 	'''
+	
 	override print(String targetFolder) {
 		val i = super.print(targetFolder)
 		val content = projectFileContent
@@ -138,9 +137,12 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		}
 	}
 	
-	def getId(Connection connection, Port port) {
-		if(connection != null) connection.getAttribute("id").objectValue
-		else port.name
+	def fifoName(Connection connection)
+		'''fifo_«connection.getAttribute("id").objectValue»'''
+	
+	def fifoType(Connection connection) {
+		connection.sourcePort.type
 	}
+		
 	
 }

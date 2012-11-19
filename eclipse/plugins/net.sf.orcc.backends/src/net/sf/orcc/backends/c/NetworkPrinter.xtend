@@ -36,7 +36,6 @@ import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
-import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
 
 import static net.sf.orcc.OrccLaunchConstants.*
@@ -308,7 +307,7 @@ class NetworkPrinter extends CTemplate {
 	def assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
-				«printFifoAssign(connList.head.source, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
+				«printFifoAssign(connList.head.source as Instance, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
 			«ENDIF»
 			«FOR conn : connList»
 				«IF conn.source instanceof Instance && conn.target instanceof Instance»
@@ -319,8 +318,8 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 	'''
 	
-	def printFifoAssign(Vertex vertex, Port port, int fifoIndex) '''
-		«IF vertex instanceof Instance»struct fifo_«port.type.doSwitch»_s *«(vertex as Instance).name»_«port.name» = &fifo_«fifoIndex»;«ENDIF»
+	def printFifoAssign(Instance instance, Port port, int fifoIndex) '''
+		struct fifo_«port.type.doSwitch»_s *«instance.name»_«port.name» = &fifo_«fifoIndex»;
 	'''
 
 	def printScheduler() '''

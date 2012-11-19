@@ -82,9 +82,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Output FIFOs
-		
-		«FOR connection : instance.outgoingPortMap.values»
-			extern stream<«connection.get(0).sourcePort.type.doSwitch»>	myStream_«connection.get(0).getId(connection.get(0).sourcePort)»;
+		«FOR port : instance.actor.outputs.filter[! native]»
+			«FOR connection : instance.outgoingPortMap.get(port)»
+				extern stream<«connection.sourcePort.type.doSwitch»> myStream_«connection.getId(connection.sourcePort)»;
+			«ENDFOR»
 		«ENDFOR»
 		
 		
@@ -146,28 +147,28 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 	override printFsm() '''
 		«IF ! instance.actor.actionsOutsideFsm.empty»
-		void «instance.name»_outside_FSM_scheduler() {
-			/* Set initial state to current FSM state */
-				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
-			«instance.actor.actionsOutsideFsm.printActionLoop»
-		}
+			void «instance.name»_outside_FSM_scheduler() {
+				/* Set initial state to current FSM state */
+					_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
+				«instance.actor.actionsOutsideFsm.printActionLoop»
+			}
 		«ENDIF»
 		
 		void «instance.name»_scheduler() {
-		/* Set initial state to current FSM state */
-				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
+			/* Set initial state to current FSM state */
+			_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
 			// jump to FSM state 
 			switch (_FSM_state) {
-			«FOR state : instance.actor.fsm.states»
-				case my_state_«state.name»:
-					goto l_«state.name»;
-			«ENDFOR»
-		
-			// FSM transitions
-			«FOR state : instance.actor.fsm.states»
+				«FOR state : instance.actor.fsm.states»
+					case my_state_«state.name»:
+						goto l_«state.name»;
+				«ENDFOR»
+			
+				// FSM transitions
+				«FOR state : instance.actor.fsm.states»
 		«state.printTransition»
-			«ENDFOR»
-		}
+				«ENDFOR»
+			}
 		}
 	'''
 	
@@ -178,9 +179,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printTransition(State state) '''
 		l_«state.name»:
-		«IF !state.outgoing.empty»
-			«schedulingState(state, state.outgoing.map[it as Transition])»
-		«ENDIF»
+			«IF !state.outgoing.empty»
+				«schedulingState(state, state.outgoing.map[it as Transition])»
+			«ENDIF»
 	'''
 
 	override schedulingState(State state, Iterable<Transition> transitions) '''

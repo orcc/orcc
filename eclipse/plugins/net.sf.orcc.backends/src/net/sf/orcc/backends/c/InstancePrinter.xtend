@@ -81,7 +81,7 @@ class InstancePrinter extends CTemplate {
 	val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 	
-	var Action currentAction;
+	protected var Action currentAction;
 	
 	/**
 	 * Default constructor, used only by another backend (when subclass)
