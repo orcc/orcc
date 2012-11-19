@@ -67,7 +67,7 @@ class ISE_Project extends CommonPrinter {
 		      <association xil_pn:name="Implementation"/>
 		    </file>
 		
-		    «FOR processor:design.processors»
+			«FOR processor:design.processors»
 				«processor.xise»
 			«ENDFOR»
 		
