@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
@@ -43,6 +42,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
+import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
@@ -138,7 +138,7 @@ public class HLSBackend extends CBackend {
 			new ActorMerger().doSwitch(network);
 		}
 
-		new CBroadcastAdder().doSwitch(network);
+		new BroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
 	}
 
