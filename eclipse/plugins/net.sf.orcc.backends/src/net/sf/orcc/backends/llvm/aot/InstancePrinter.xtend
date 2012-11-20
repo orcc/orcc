@@ -816,11 +816,11 @@ class InstancePrinter extends LLVMTemplate {
 		«IF call.print»
 			call i32 (i8*, ...)* @printf(«call.parameters.join(", ", [printParameter])»)
 		«ELSE»
-			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («formatParameters(call.procedure.parameters, call.parameters).join(", ")»)
+			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.parameters.format(call.procedure.parameters).join(", ")»)
 		«ENDIF»
 	'''
 	
-	def formatParameters(EList<Param> params, EList<Arg> args) {
+	def format(EList<Arg> args, EList<Param> params) {
 		val paramList = new ArrayList<CharSequence>
 		if(params.size != 0) {
 			for (i : 0..params.size-1) {

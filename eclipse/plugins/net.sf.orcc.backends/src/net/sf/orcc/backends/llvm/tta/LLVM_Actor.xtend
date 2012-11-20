@@ -117,10 +117,13 @@ class LLVM_Actor extends InstancePrinter {
 	'''
 	
 	override caseInstCall(InstCall call) '''
+		«val target = call.target»
+		«val args = call.parameters»
+		«val parameters = call.procedure.parameters»
 		«IF call.print»
-			call i32 (i8*, ...)* @printf(«call.parameters.join(", ", [printParameter])»)
+			call i32 (i8*, ...)* @printf(«args.join(", ", [printParameter])»)
 		«ELSEIF call.procedure.native»
-			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF call.target != null»=ir, «ENDIF»ir«call.parameters.ir»"(i32 0«IF !call.parameters.nullOrEmpty», «formatParameters(call.procedure.parameters, call.parameters).join(", ")»«ENDIF») nounwind
+			«IF target != null»%«target.variable.indexedName» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
 		«ELSE»
 			«super.caseInstCall(call)»
 		«ENDIF»
