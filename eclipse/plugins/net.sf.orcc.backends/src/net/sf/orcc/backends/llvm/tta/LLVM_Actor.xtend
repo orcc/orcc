@@ -39,6 +39,7 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import org.eclipse.emf.common.util.EList
+import net.sf.orcc.ir.ArgByVal
 
 class LLVM_Actor extends InstancePrinter {
 	
@@ -121,7 +122,7 @@ class LLVM_Actor extends InstancePrinter {
 		«val args = call.parameters»
 		«val parameters = call.procedure.parameters»
 		«IF call.print»
-			call i32 (i8*, ...)* @printf(«args.join(", ", [printParameter])»)
+			call i32 (i8*, ...)* @printf(«args.join(", ", [printParameter((it as ArgByVal).value.type)])»)
 		«ELSEIF call.procedure.native»
 			«IF target != null»%«target.variable.indexedName» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
 		«ELSE»
