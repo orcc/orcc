@@ -203,7 +203,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			}
 			return null;
 		}
-		
+
 		@Override
 		public Object caseInstLoad(InstLoad load) {
 			Var varSource = load.getSource().getVariable();
@@ -815,7 +815,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 								readIndex, OpBinary.NE,
 								factory.createExprInt(0), port);
 						consumeToken(body, position, port);
-						//noRepeatActions.remove(action);
+						// noRepeatActions.remove(action);
 
 						int index = it.previousIndex();
 						action.getInputPattern().remove(port);
@@ -916,7 +916,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 						fsm.getTransitions().add(t);
 					}
 				}
-				//transitionsList.clear();
+				// transitionsList.clear();
 				modifyNoRepeatActionsInFSM();
 				transformFSM = false;
 			}
@@ -1213,11 +1213,14 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	}
 
 	/**
-	 * this method visits the outputs of an untagged action to check repeats
+	 * this method visits the outputs of an untagged action to check repeats not
+	 * !! not used because it deals with a very rare case of untaggedactions having
+	 * multi token on he inputs and outputs
 	 * 
 	 * @param action
 	 *            action containing the outputs to check
 	 */
+	@SuppressWarnings("unused")
 	private void scanUntaggedOutputs(Action action) {
 		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
 				.getNumTokensMap().entrySet()) {
@@ -1266,7 +1269,9 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	}
 
 	/**
-	 * if an already transformed action is reused in an another FSM transition, this method uses the transformed action to connect it to the current FSM transition
+	 * if an already transformed action is reused in an another FSM transition,
+	 * this method uses the transformed action to connect it to the current FSM
+	 * transition
 	 * 
 	 * @param action
 	 * @param source
@@ -1333,7 +1338,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			}
 			outputIndex = 0;
 		}
-		//repeatInput = false;
+		// repeatInput = false;
 	}
 
 	/**
