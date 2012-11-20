@@ -491,7 +491,7 @@ class InstancePrinter extends CTemplate {
 		«IF instance.incomingPortMap.get(port) != null»
 			fifo_«port.fullName»_id = fifo_«port.name»_id;
 		«ELSE»
-			«OrccLogger::warnln("["+instance.name+"] Input port "+port.fullName+" not connected.")»
+			«OrccLogger::noticeln("["+instance.name+"] Input port "+port.fullName+" not connected.")»
 		«ENDIF»
 	'''
 
