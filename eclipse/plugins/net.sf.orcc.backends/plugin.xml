@@ -94,7 +94,7 @@
       </backend>
       <backend
             class="net.sf.orcc.backends.llvm.tta.TTABackend"
-            name="TTA-based MPSoC">
+            name="TTA">
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
