@@ -287,9 +287,10 @@ public class JadeBackend extends AbstractBackend {
 		try {
 			BackendUtil.startExec(this, cmd);
 		} catch (IOException e) {
-			System.err.println("Jade toolbox error : ");
-			e.printStackTrace();
+			OrccLogger.severeln("Jade toolbox error : ");
+			for (StackTraceElement elt : e.getStackTrace()) {
+				OrccLogger.traceln(elt.toString());
+			}
 		}
 	}
-
 }

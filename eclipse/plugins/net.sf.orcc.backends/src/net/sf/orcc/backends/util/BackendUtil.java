@@ -61,7 +61,7 @@ public class BackendUtil {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							OrccLogger.warnln("Generation error :" + line);
+							OrccLogger.warnln("Generation error : " + line);
 						}
 					} finally {
 						reader.close();
