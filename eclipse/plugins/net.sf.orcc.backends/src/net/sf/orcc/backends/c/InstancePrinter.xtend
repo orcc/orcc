@@ -791,9 +791,9 @@ class InstancePrinter extends CTemplate {
 	
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
-			printf(«call.parameters.printfArgs.join(", ")»);
+			printf(«call.arguments.printfArgs.join(", ")»);
 		«ELSE»
-			«IF call.target != null»«call.target.variable.indexedName» = «ENDIF»«call.procedure.name»(«call.parameters.join(", ", [printCallArg])»);
+			«IF call.target != null»«call.target.variable.indexedName» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ", [printCallArg])»);
 		«ENDIF»
 	'''
 	

@@ -245,8 +245,8 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 				newExpressions.add(expr);
 			}
 
-			call.getParameters().clear();
-			call.getParameters().addAll(
+			call.getArguments().clear();
+			call.getArguments().addAll(
 					IrFactory.eINSTANCE.createArgsByVal(newExpressions));
 
 			parentType = oldParentType;
@@ -270,7 +270,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		} else {
 			// Call to print procedure : see if integer parameter cast is
 			// necessary (LLVM only)
-			EList<Arg> arguments = call.getParameters();
+			EList<Arg> arguments = call.getArguments();
 			List<Instruction> castInstrToAdd = new ArrayList<Instruction>();
 			List<String> varCasted = new ArrayList<String>();
 

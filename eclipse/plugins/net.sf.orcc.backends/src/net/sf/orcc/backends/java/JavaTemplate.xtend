@@ -154,20 +154,20 @@ class JavaTemplate extends CommonPrinter {
 	 * be used with "print" calls
 	 */
 	def printParameters(InstCall call) {
-		if(! call.parameters.empty) {
+		if(! call.arguments.empty) {
 			var List<CharSequence> finalList = new ArrayList<CharSequence>();
-			for( i : 0..call.parameters.size-1) {
+			for( i : 0..call.arguments.size-1) {
 				val procParamType = call.procedure.parameters.get(i).variable.type
 				val callArgType =
-					if (call.parameters.get(i).byRef) {
-						(call.parameters.get(i) as ArgByRef).use.variable.type
+					if (call.arguments.get(i).byRef) {
+						(call.arguments.get(i) as ArgByRef).use.variable.type
 					} else {
-						(call.parameters.get(i) as ArgByVal).value.type
+						(call.arguments.get(i) as ArgByVal).value.type
 					}
 				if(isCastNeeded(procParamType, callArgType)) {
-					finalList.add('''(«procParamType.doSwitch») («printParameter(call.parameters.get(i))»)''')
+					finalList.add('''(«procParamType.doSwitch») («printParameter(call.arguments.get(i))»)''')
 				} else {
-					finalList.add('''«printParameter(call.parameters.get(i))»''')
+					finalList.add('''«printParameter(call.arguments.get(i))»''')
 				}
 			}
 			finalList.join(", ")

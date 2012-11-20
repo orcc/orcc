@@ -112,7 +112,7 @@ public class Inliner extends AbstractIrVisitor<Void> {
 					call.getTarget().setVariable(localToLocalsMap.get(var));
 				}
 			}
-			for (Arg arg : call.getParameters()) {
+			for (Arg arg : call.getArguments()) {
 				doSwitch(arg);
 			}
 			return null;
@@ -260,7 +260,7 @@ public class Inliner extends AbstractIrVisitor<Void> {
 		// 3.2
 		int i = 0;
 		BlockBasic assignBlock = IrFactory.eINSTANCE.createBlockBasic();
-		for (Arg arg : currentCall.getParameters()) {
+		for (Arg arg : currentCall.getArguments()) {
 			Param param = calledProc.getParameters().get(i);
 			if (arg.isByRef()) {
 				ArgByRef ref = (ArgByRef) arg;

@@ -259,7 +259,7 @@ public class GuardSatChecker {
 				Var variable = call.getTarget().getVariable();
 
 				String args = new String();
-				for (Arg arg : call.getParameters()) {
+				for (Arg arg : call.getArguments()) {
 					if (arg.isByVal()) {
 						Expression expr = ((ArgByVal) arg).getValue();
 						args += " " + doSwitch(expr);

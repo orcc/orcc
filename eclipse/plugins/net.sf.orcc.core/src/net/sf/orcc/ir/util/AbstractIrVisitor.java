@@ -150,7 +150,7 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	@Override
 	public T caseInstCall(InstCall call) {
 		if (visitFull) {
-			for (Arg arg : call.getParameters()) {
+			for (Arg arg : call.getArguments()) {
 				doSwitch(arg);
 			}
 		}

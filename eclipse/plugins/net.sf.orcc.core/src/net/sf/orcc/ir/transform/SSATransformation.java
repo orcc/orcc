@@ -291,7 +291,7 @@ public class SSATransformation extends AbstractIrVisitor<Void> {
 
 	@Override
 	public Void caseInstCall(InstCall call) {
-		replaceUses(call.getParameters());
+		replaceUses(call.getArguments());
 		replaceDef(call.getTarget());
 		return null;
 	}

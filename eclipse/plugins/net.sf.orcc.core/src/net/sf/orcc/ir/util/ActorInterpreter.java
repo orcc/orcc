@@ -194,7 +194,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		Procedure proc = call.getProcedure();
 
 		// Set the input parameters of the called procedure if any
-		List<Arg> callParams = call.getParameters();
+		List<Arg> callParams = call.getArguments();
 
 		// Special "print" case
 		if (call.isPrint()) {

@@ -579,7 +579,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		}
 		instCall.setProcedure(procedure);
 		if (parameters != null) {
-			instCall.getParameters().addAll(createArgsByVal(parameters));
+			instCall.getArguments().addAll(createArgsByVal(parameters));
 		}
 
 		return instCall;

@@ -128,8 +128,8 @@ public class LiteralIntegersAdder extends AbstractIrVisitor<Expression> {
 	public Expression caseInstCall(InstCall call) {
 		List<Expression> newArgs = transformExpressionList(EcoreHelper
 				.getObjects(call, Expression.class));
-		call.getParameters().clear();
-		call.getParameters().addAll(
+		call.getArguments().clear();
+		call.getArguments().addAll(
 				IrFactory.eINSTANCE.createArgsByVal(newArgs));
 		return null;
 	}

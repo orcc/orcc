@@ -87,7 +87,7 @@ public class StoreOnceTransformation extends DfVisitor<Object> {
 
 		@Override
 		public Set<Var> caseInstCall(InstCall call) {
-			for (Arg arg : call.getParameters()) {
+			for (Arg arg : call.getArguments()) {
 				if (arg.isByVal()) {
 					ArgByVal argByVal = (ArgByVal) arg;
 					if (argByVal.getValue().isExprVar()) {
@@ -218,7 +218,7 @@ public class StoreOnceTransformation extends DfVisitor<Object> {
 			}
 			index = 0;
 			for (Var var : loadedVars) {
-				call.getParameters().add(index++,
+				call.getArguments().add(index++,
 						IrFactory.eINSTANCE.createArgByVal(var));
 			}
 			return null;

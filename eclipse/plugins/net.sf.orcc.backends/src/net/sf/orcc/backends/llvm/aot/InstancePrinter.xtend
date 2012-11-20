@@ -814,9 +814,9 @@ class InstancePrinter extends LLVMTemplate {
 	
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
-			call i32 (i8*, ...)* @printf(«call.parameters.join(", ", [printParameter((it as ArgByVal).value.type)])»)
+			call i32 (i8*, ...)* @printf(«call.arguments.join(", ", [printParameter((it as ArgByVal).value.type)])»)
 		«ELSE»
-			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.parameters.format(call.procedure.parameters).join(", ")»)
+			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
 		«ENDIF»
 	'''
 	

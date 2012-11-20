@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.java
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.State
@@ -48,6 +46,9 @@ import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 import java.util.Map
 import java.io.File
+
+import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.OrccLaunchConstants.*
 
 /*
  * Compile Top_network Java source code 
@@ -459,7 +460,7 @@ class ActorPrinter extends JavaTemplate {
 		}
 		'''
 		«IF call.print»
-			System.out.println(«FOR param : call.parameters SEPARATOR " + "»«printParameter(param)»«ENDFOR»);
+			System.out.println(«FOR param : call.getArguments SEPARATOR " + "»«printParameter(param)»«ENDFOR»);
 		«ELSE»
 			«target»«native»«call.procedure.name»(«printParameters(call)»);
 		«ENDIF»

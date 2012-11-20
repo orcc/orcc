@@ -265,12 +265,12 @@ public interface IrPackage extends EPackage {
 		EClass INST_CALL = eINSTANCE.getInstCall();
 
 		/**
-		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
+		 * The meta object literal for the '<em><b>Arguments</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_CALL__PARAMETERS = eINSTANCE.getInstCall_Parameters();
+		EReference INST_CALL__ARGUMENTS = eINSTANCE.getInstCall_Arguments();
 
 		/**
 		 * The meta object literal for the '<em><b>Procedure</b></em>' reference feature.
@@ -1742,12 +1742,13 @@ public interface IrPackage extends EPackage {
 	int INST_CALL__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
-	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Arguments</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CALL__PARAMETERS = INSTRUCTION_FEATURE_COUNT + 0;
+	int INST_CALL__ARGUMENTS = INSTRUCTION_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Procedure</b></em>' reference. <!--
@@ -3322,17 +3323,15 @@ public interface IrPackage extends EPackage {
 	EClass getInstCall();
 
 	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.InstCall#getParameters <em>Parameters</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Parameters</em>'.
-	 * @see net.sf.orcc.ir.InstCall#getParameters()
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.InstCall#getArguments <em>Arguments</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Arguments</em>'.
+	 * @see net.sf.orcc.ir.InstCall#getArguments()
 	 * @see #getInstCall()
 	 * @generated
 	 */
-	EReference getInstCall_Parameters();
+	EReference getInstCall_Arguments();
 
 	/**
 	 * Returns the meta object for the reference '

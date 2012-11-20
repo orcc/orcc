@@ -45,6 +45,9 @@ public interface InstCall extends Instruction {
 	 * @return the parameters of this call instruction
 	 * @model containment="true"
 	 */
+	EList<Arg> getArguments();
+
+	@Deprecated
 	EList<Arg> getParameters();
 
 	/**

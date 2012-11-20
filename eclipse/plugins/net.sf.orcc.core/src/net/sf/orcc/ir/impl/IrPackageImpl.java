@@ -949,7 +949,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstCall_Parameters() {
+	public EReference getInstCall_Arguments() {
 		return (EReference) instCallEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -1582,7 +1582,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(instAssignEClass, INST_ASSIGN__VALUE);
 
 		instCallEClass = createEClass(INST_CALL);
-		createEReference(instCallEClass, INST_CALL__PARAMETERS);
+		createEReference(instCallEClass, INST_CALL__ARGUMENTS);
 		createEReference(instCallEClass, INST_CALL__PROCEDURE);
 		createEReference(instCallEClass, INST_CALL__TARGET);
 
@@ -1904,8 +1904,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(instCallEClass, InstCall.class, "InstCall", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstCall_Parameters(), this.getArg(), null,
-				"parameters", null, 0, -1, InstCall.class, !IS_TRANSIENT,
+		initEReference(getInstCall_Arguments(), this.getArg(), null,
+				"arguments", null, 0, -1, InstCall.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstCall_Procedure(), this.getProcedure(), null,

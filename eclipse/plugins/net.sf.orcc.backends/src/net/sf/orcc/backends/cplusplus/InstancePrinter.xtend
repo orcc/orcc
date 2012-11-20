@@ -201,11 +201,11 @@ import static net.sf.orcc.OrccLaunchConstants.*
 	override caseInstCall(InstCall inst) {
 	if(inst.print) {
 	'''
-		std::cout << «FOR arg : inst.parameters SEPARATOR " << "»«arg.compileArg»«ENDFOR»;
+		std::cout << «FOR arg : inst.arguments SEPARATOR " << "»«arg.compileArg»«ENDFOR»;
 	'''
 	} else {
 	'''
-		«IF inst.target!=null»«inst.target.variable.indexedName» = «ENDIF»«inst.procedure.name»(«FOR arg : inst.parameters SEPARATOR ", "»«arg.compileArg»«ENDFOR»);
+		«IF inst.target!=null»«inst.target.variable.indexedName» = «ENDIF»«inst.procedure.name»(«FOR arg : inst.getArguments SEPARATOR ", "»«arg.compileArg»«ENDFOR»);
 	'''
 	}
 }

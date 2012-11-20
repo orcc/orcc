@@ -32,7 +32,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.InstCallImpl#getParameters <em>Parameters</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.InstCallImpl#getArguments <em>Arguments</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.InstCallImpl#getProcedure <em>Procedure</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.InstCallImpl#getTarget <em>Target</em>}</li>
  * </ul>
@@ -42,13 +42,14 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class InstCallImpl extends InstructionImpl implements InstCall {
 	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getParameters()
+	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getArguments()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Arg> parameters;
+	protected EList<Arg> arguments;
 
 	/**
 	 * The cached value of the '{@link #getProcedure() <em>Procedure</em>}' reference.
@@ -111,8 +112,8 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.INST_CALL__PARAMETERS:
-			return getParameters();
+		case IrPackage.INST_CALL__ARGUMENTS:
+			return getArguments();
 		case IrPackage.INST_CALL__PROCEDURE:
 			if (resolve)
 				return getProcedure();
@@ -131,8 +132,8 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case IrPackage.INST_CALL__PARAMETERS:
-			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
+		case IrPackage.INST_CALL__ARGUMENTS:
+			return ((InternalEList<?>) getArguments()).basicRemove(otherEnd,
 					msgs);
 		case IrPackage.INST_CALL__TARGET:
 			return basicSetTarget(null, msgs);
@@ -147,8 +148,8 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.INST_CALL__PARAMETERS:
-			return parameters != null && !parameters.isEmpty();
+		case IrPackage.INST_CALL__ARGUMENTS:
+			return arguments != null && !arguments.isEmpty();
 		case IrPackage.INST_CALL__PROCEDURE:
 			return procedure != null;
 		case IrPackage.INST_CALL__TARGET:
@@ -165,9 +166,9 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.INST_CALL__PARAMETERS:
-			getParameters().clear();
-			getParameters().addAll((Collection<? extends Arg>) newValue);
+		case IrPackage.INST_CALL__ARGUMENTS:
+			getArguments().clear();
+			getArguments().addAll((Collection<? extends Arg>) newValue);
 			return;
 		case IrPackage.INST_CALL__PROCEDURE:
 			setProcedure((Procedure) newValue);
@@ -195,8 +196,8 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.INST_CALL__PARAMETERS:
-			getParameters().clear();
+		case IrPackage.INST_CALL__ARGUMENTS:
+			getArguments().clear();
 			return;
 		case IrPackage.INST_CALL__PROCEDURE:
 			setProcedure((Procedure) null);
@@ -212,12 +213,12 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Arg> getParameters() {
-		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Arg>(Arg.class, this,
-					IrPackage.INST_CALL__PARAMETERS);
+	public EList<Arg> getArguments() {
+		if (arguments == null) {
+			arguments = new EObjectContainmentEList<Arg>(Arg.class, this,
+					IrPackage.INST_CALL__ARGUMENTS);
 		}
-		return parameters;
+		return arguments;
 	}
 
 	/**
@@ -312,7 +313,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 		}
 
 		builder.append(getProcedure().getName());
-		for (Arg arg : getParameters()) {
+		for (Arg arg : getArguments()) {
 			if (arg.isByVal()) {
 				Expression expr = ((ArgByVal) arg).getValue();
 				builder.append(", ");
@@ -320,6 +321,12 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 			}
 		}
 		return builder.append(")").toString();
+	}
+
+	@Override
+	@Deprecated
+	public EList<Arg> getParameters() {
+		return getArguments();
 	}
 
 } // InstCallImpl

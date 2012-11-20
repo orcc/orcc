@@ -210,8 +210,8 @@ public class TacTransformation extends AbstractIrVisitor<Expression> {
 		complexityLevel++;
 		List<Expression> newArgs = splitExpressionList(EcoreHelper.getObjects(
 				call, Expression.class));
-		call.getParameters().clear();
-		call.getParameters().addAll(factory.createArgsByVal(newArgs));
+		call.getArguments().clear();
+		call.getArguments().addAll(factory.createArgsByVal(newArgs));
 		complexityLevel--;
 		return null;
 	}

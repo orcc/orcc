@@ -119,7 +119,7 @@ class LLVM_Actor extends InstancePrinter {
 	
 	override caseInstCall(InstCall call) '''
 		«val target = call.target»
-		«val args = call.parameters»
+		«val args = call.arguments»
 		«val parameters = call.procedure.parameters»
 		«IF call.print»
 			call i32 (i8*, ...)* @printf(«args.join(", ", [printParameter((it as ArgByVal).value.type)])»)

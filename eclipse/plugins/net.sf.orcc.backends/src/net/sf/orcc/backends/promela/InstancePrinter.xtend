@@ -44,11 +44,11 @@ import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Var
 import org.eclipse.emf.ecore.EObject
-
-import static net.sf.orcc.OrccLaunchConstants.*
 import net.sf.orcc.ir.BlockBasic
 import net.sf.orcc.ir.BlockIf
 import net.sf.orcc.ir.BlockWhile
+
+import static net.sf.orcc.OrccLaunchConstants.*
 
 /*
  * Compile Instance promela
@@ -380,7 +380,7 @@ class InstancePrinter extends PromelaTemplate {
 	override caseInstCall(InstCall call) {
 		//ERROR this function call must be removed, in this case we give a 1, it is OK if it is "data"
 		if(call.print) '''
-			printf(«call.parameters.printfArgs.join(", ")»);
+			printf(«call.arguments.printfArgs.join(", ")»);
 		'''
 		else '''
 			«IF call.target != null»«call.target.variable.name» = «ENDIF»1;

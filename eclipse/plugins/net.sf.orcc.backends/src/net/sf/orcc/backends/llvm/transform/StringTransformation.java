@@ -106,7 +106,7 @@ public class StringTransformation extends DfVisitor<Void> {
 				transformPrint(call);
 			} else {
 				List<Arg> newParameters = new ArrayList<Arg>();
-				List<Arg> parameters = call.getParameters();
+				List<Arg> parameters = call.getArguments();
 
 				for (Arg arg : parameters) {
 					if (arg.isByVal()) {
@@ -177,7 +177,7 @@ public class StringTransformation extends DfVisitor<Void> {
 	private void transformPrint(InstCall print) {
 		String value = "";
 		List<Arg> newParameters = new ArrayList<Arg>();
-		List<Arg> parameters = print.getParameters();
+		List<Arg> parameters = print.getArguments();
 		String name = "str" + strCnt++;
 
 		// Iterate though all the println arguments to provide an only
