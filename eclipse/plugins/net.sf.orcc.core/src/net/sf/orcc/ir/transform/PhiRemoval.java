@@ -121,17 +121,17 @@ public class PhiRemoval extends AbstractIrVisitor<Object> {
 	public Object caseBlockWhile(BlockWhile node) {
 		List<Block> nodes = EcoreHelper.getContainingList(node);
 		// the node before the while.
-		if (indexNode > 0) {
-			Block previousNode = nodes.get(indexNode - 1);
+		if (indexBlock > 0) {
+			Block previousNode = nodes.get(indexBlock - 1);
 			if (previousNode.isBlockBasic()) {
 				targetBlock = (BlockBasic) previousNode;
 			} else {
 				targetBlock = IrFactory.eINSTANCE.createBlockBasic();
-				nodes.add(indexNode, targetBlock);
+				nodes.add(indexBlock, targetBlock);
 			}
 		} else {
 			targetBlock = IrFactory.eINSTANCE.createBlockBasic();
-			nodes.add(indexNode, targetBlock);
+			nodes.add(indexBlock, targetBlock);
 		}
 
 		BlockBasic join = node.getJoinBlock();

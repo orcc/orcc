@@ -311,13 +311,13 @@ public class Inliner extends AbstractIrVisitor<Void> {
 		}
 		// 7. Add all inlined blocks
 		List<Block> nodes = findNode(callerProc.getBlocks(), beginningBlock);
-		indexNode = nodes.indexOf(beginningBlock);
+		indexBlock = nodes.indexOf(beginningBlock);
 		List<Block> inlined = calledProc.getBlocks();
 		if (!assignBlock.getInstructions().isEmpty()) {
 			inlined.add(0, assignBlock);
 		}
 		inlined.add(followingBlock);
-		nodes.addAll(indexNode + 1, inlined);
+		nodes.addAll(indexBlock + 1, inlined);
 		// 8.
 		IrUtil.delete(currentCall);
 	}

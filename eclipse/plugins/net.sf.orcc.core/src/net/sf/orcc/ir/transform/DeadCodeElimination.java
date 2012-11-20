@@ -54,14 +54,14 @@ import net.sf.orcc.util.util.EcoreHelper;
 public class DeadCodeElimination extends AbstractIrVisitor<Void> {
 
 	private void addNodes(List<Block> nodes, BlockBasic join, int index) {
-		indexNode--;
+		indexBlock--;
 		List<Block> parentNodes = EcoreHelper.getContainingList(join);
-		parentNodes.remove(indexNode);
+		parentNodes.remove(indexBlock);
 
 		int size = nodes.size();
-		parentNodes.addAll(indexNode, nodes);
+		parentNodes.addAll(indexBlock, nodes);
 
-		parentNodes.add(indexNode + size, join);
+		parentNodes.add(indexBlock + size, join);
 		replacePhis(join, index);
 	}
 

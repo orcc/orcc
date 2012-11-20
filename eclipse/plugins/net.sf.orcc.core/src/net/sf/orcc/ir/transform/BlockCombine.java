@@ -58,7 +58,7 @@ public class BlockCombine extends AbstractIrVisitor<Void> {
 
 			// remove this block
 			EcoreUtil.remove(block);
-			indexNode--;
+			indexBlock--;
 		}
 
 		return null;

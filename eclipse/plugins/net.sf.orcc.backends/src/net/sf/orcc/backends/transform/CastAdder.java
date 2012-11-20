@@ -408,9 +408,9 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 			BlockWhile nodeWhile = (BlockWhile) containingNode;
 			if (value0.isExprVar()) {
 				BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
-				EcoreHelper.getContainingList(containingNode).add(indexNode,
+				EcoreHelper.getContainingList(containingNode).add(indexBlock,
 						block);
-				indexNode++;
+				indexBlock++;
 				values.set(0, castExpression(value0, block, 0));
 			}
 			if (value1.isExprVar()) {

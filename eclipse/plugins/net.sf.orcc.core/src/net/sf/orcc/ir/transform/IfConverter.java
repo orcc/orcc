@@ -70,7 +70,7 @@ public class IfConverter extends AbstractIrVisitor<Object> {
 
 		// remove this block
 		EcoreUtil.remove(block);
-		indexNode--;
+		indexBlock--;
 
 		return null;
 	}
