@@ -106,12 +106,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«ENDFOR»
 			};
 			
-			static char *stateNames[] = {
-				«FOR state : instance.actor.fsm.states SEPARATOR ","»
-					"«state.name»"
-				«ENDFOR»
-			};
-			
 			static enum states _FSM_state;
 		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////

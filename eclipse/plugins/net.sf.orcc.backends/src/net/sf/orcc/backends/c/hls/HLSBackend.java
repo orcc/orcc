@@ -96,6 +96,7 @@ public class HLSBackend extends CBackend {
 		replacementMap.put("select", "select_my_precious");
 		replacementMap.put("OUT", "OUT_my_precious");
 		replacementMap.put("IN", "IN_my_precious");
+		replacementMap.put("bitand", "bitand_my_precious");
 
 		if (mergeActions) {
 			new ActionMerger().doSwitch(actor);

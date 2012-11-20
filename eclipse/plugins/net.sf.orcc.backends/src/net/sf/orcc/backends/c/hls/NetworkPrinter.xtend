@@ -91,8 +91,8 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		// Main
 		int main() {
 			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-				«IF ! instance.actor.initializes.empty»
-					«instance.name»_initialize();
+				«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm )»
+					 «instance.name»_initialize();
 				«ENDIF»
 			«ENDFOR»
 			
