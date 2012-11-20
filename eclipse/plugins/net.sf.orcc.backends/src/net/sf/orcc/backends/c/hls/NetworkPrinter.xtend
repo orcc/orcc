@@ -30,11 +30,10 @@ package net.sf.orcc.backends.c.hls
 
 import java.io.File
 import java.util.Map
+import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
-import net.sf.orcc.graph.Vertex
-import net.sf.orcc.df.Connection
 
 /**
  * Compile top Network c source code 
