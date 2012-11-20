@@ -313,49 +313,49 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	}
 
 	@Override
-	public Object caseBlockIf(BlockIf node) {
+	public Object caseBlockIf(BlockIf block) {
 		// Interpret first expression ("if" condition)
-		Object condition = exprInterpreter.doSwitch(node.getCondition());
+		Object condition = exprInterpreter.doSwitch(block.getCondition());
 
 		Object ret;
 		// if (condition is true)
 		if (ValueUtil.isBool(condition)) {
 			int oldBranch = branch;
 			if (ValueUtil.isTrue(condition)) {
-				doSwitch(node.getThenBlocks());
+				doSwitch(block.getThenBlocks());
 				branch = 0;
 			} else {
-				doSwitch(node.getElseBlocks());
+				doSwitch(block.getElseBlocks());
 				branch = 1;
 			}
 
-			ret = doSwitch(node.getJoinBlock());
+			ret = doSwitch(block.getJoinBlock());
 			branch = oldBranch;
 		} else {
 			throw new OrccRuntimeException("Condition "
-					+ new ExpressionPrinter().doSwitch(node.getCondition())
-					+ " not boolean at line " + node.getLineNumber() + "\n");
+					+ new ExpressionPrinter().doSwitch(block.getCondition())
+					+ " not boolean at line " + block.getLineNumber() + "\n");
 		}
 		return ret;
 	}
 
 	@Override
-	public Object caseBlockWhile(BlockWhile node) {
+	public Object caseBlockWhile(BlockWhile block) {
 		int oldBranch = branch;
 		branch = 0;
-		doSwitch(node.getJoinBlock());
+		doSwitch(block.getJoinBlock());
 
 		// Interpret first expression ("while" condition)
-		Object condition = exprInterpreter.doSwitch(node.getCondition());
+		Object condition = exprInterpreter.doSwitch(block.getCondition());
 
 		// while (condition is true) do
 		branch = 1;
 		while (ValueUtil.isTrue(condition)) {
-			doSwitch(node.getBlocks());
-			doSwitch(node.getJoinBlock());
+			doSwitch(block.getBlocks());
+			doSwitch(block.getJoinBlock());
 
 			// Interpret next value of "while" condition
-			condition = exprInterpreter.doSwitch(node.getCondition());
+			condition = exprInterpreter.doSwitch(block.getCondition());
 		}
 
 		branch = oldBranch;
@@ -447,14 +447,14 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	}
 
 	/**
-	 * Visits the nodes of the given node list.
+	 * Visits the blocks of the given block list.
 	 * 
-	 * @param nodes
-	 *            a list of nodes that belong to a procedure
+	 * @param blocks
+	 *            a list of blocks that belong to a procedure
 	 */
-	protected Object doSwitch(List<Block> nodes) {
-		for (Block node : nodes) {
-			Object result = doSwitch(node);
+	protected Object doSwitch(List<Block> blocks) {
+		for (Block block : blocks) {
+			Object result = doSwitch(block);
 			if (result != null) {
 				return result;
 			}

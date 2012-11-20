@@ -52,7 +52,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 
 /**
- * This abstract class implements a no-op visitor on IR procedures, nodes,
+ * This abstract class implements a no-op visitor on IR procedures, blocks,
  * instructions, and (if visitFull is <code>true</code>) expressions. This class
  * should be extended by classes that implement intra-procedural IR visitors and
  * transformations.
@@ -64,7 +64,7 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 
 	protected int indexInst;
 
-	protected int indexNode;
+	protected int indexBlock;
 
 	/**
 	 * current procedure being visited
@@ -74,14 +74,14 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	private final boolean visitFull;
 
 	/**
-	 * Creates a new abstract IR visitor that visits all nodes and instructions.
+	 * Creates a new abstract IR visitor that visits all blocks and instructions.
 	 */
 	public AbstractIrVisitor() {
 		visitFull = false;
 	}
 
 	/**
-	 * Creates a new abstract actor visitor that visits all nodes and
+	 * Creates a new abstract actor visitor that visits all blocks and
 	 * instructions, and may also visit all the expressions if
 	 * <code>visitFull</code> is <code>true</code>.
 	 * 
@@ -104,25 +104,25 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	}
 
 	@Override
-	public T caseBlockIf(BlockIf nodeIf) {
+	public T caseBlockIf(BlockIf blockIf) {
 		if (visitFull) {
-			doSwitch(nodeIf.getCondition());
+			doSwitch(blockIf.getCondition());
 		}
 
-		doSwitch(nodeIf.getThenBlocks());
-		doSwitch(nodeIf.getElseBlocks());
-		doSwitch(nodeIf.getJoinBlock());
+		doSwitch(blockIf.getThenBlocks());
+		doSwitch(blockIf.getElseBlocks());
+		doSwitch(blockIf.getJoinBlock());
 		return null;
 	}
 
 	@Override
-	public T caseBlockWhile(BlockWhile nodeWhile) {
+	public T caseBlockWhile(BlockWhile blockWhile) {
 		if (visitFull) {
-			doSwitch(nodeWhile.getCondition());
+			doSwitch(blockWhile.getCondition());
 		}
 
-		doSwitch(nodeWhile.getBlocks());
-		doSwitch(nodeWhile.getJoinBlock());
+		doSwitch(blockWhile.getBlocks());
+		doSwitch(blockWhile.getJoinBlock());
 		return null;
 	}
 
@@ -237,14 +237,14 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	 *            a list of blocks that belong to a procedure
 	 */
 	public T visitBlocks(List<Block> blocks) {
-		int oldIndexNode = indexNode;
+		int oldIndexNode = indexBlock;
 		T result = null;
-		for (indexNode = 0; indexNode < blocks.size() && result == null; indexNode++) {
-			Block node = blocks.get(indexNode);
-			result = doSwitch(node);
+		for (indexBlock = 0; indexBlock < blocks.size() && result == null; indexBlock++) {
+			Block block = blocks.get(indexBlock);
+			result = doSwitch(block);
 		}
 
-		indexNode = oldIndexNode;
+		indexBlock = oldIndexNode;
 		return result;
 	}
 
@@ -255,14 +255,14 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	 *            a list of blocks that belong to a procedure
 	 */
 	public T visitBlocksReverse(List<Block> blocks) {
-		int oldIndexNode = indexNode;
+		int oldIndexNode = indexBlock;
 		T result = null;
-		for (indexNode = blocks.size() - 1; indexNode >= 0 && result == null; indexNode--) {
-			Block node = blocks.get(indexNode);
-			result = doSwitch(node);
+		for (indexBlock = blocks.size() - 1; indexBlock >= 0 && result == null; indexBlock--) {
+			Block block = blocks.get(indexBlock);
+			result = doSwitch(block);
 		}
 
-		indexNode = oldIndexNode;
+		indexBlock = oldIndexNode;
 		return result;
 	}
 
