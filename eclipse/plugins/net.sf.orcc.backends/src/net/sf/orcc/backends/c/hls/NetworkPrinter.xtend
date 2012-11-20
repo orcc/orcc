@@ -35,6 +35,8 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 
+
+
 /**
  * Compile top Network c source code 
  *  
@@ -75,6 +77,10 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		// Action schedulers
 		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+			void «instance.name»_initialize();
+		«ENDFOR»
+		
+		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			void «instance.name»_scheduler();
 		«ENDFOR»
 		
@@ -82,6 +88,9 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main() {
+			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+					«instance.name»_initialize();
+			«ENDFOR»
 			
 			while(1) {
 				«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
@@ -118,18 +127,21 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	'''
 	
 	def printFifoAssignHLS(Instance vertex, Port port, int fifoIndex, Connection connection) '''
-		stream<«connection.fifoType.doSwitch»> myStream_«connection.fifoName»;
+		stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
 	'''
 	
 	override print(String targetFolder) {
 		val i = super.print(targetFolder)
-		val content = projectFileContent
-		val content2 = networkFileContent
-		val file = new File(targetFolder + File::separator + "vivado_hls.app")
-		val file2 = new File(targetFolder + File::separator + network.simpleName + ".cpp")
-		if(needToWriteFile(content, file2)) {
-			printFile(content, file)
-			printFile(content2, file2)
+		val contentProject = projectFileContent
+		val contentNetwork = networkFileContent
+		val contentTestBench = "int test() { return 0;}"
+		val projectFile = new File(targetFolder + File::separator + "vivado_hls.app")
+		val NetworkFile = new File(targetFolder + File::separator + network.simpleName + ".cpp")
+		val testBenchFile = new File(targetFolder + File::separator + "testBench" + ".cpp")
+		if(needToWriteFile(contentNetwork, NetworkFile)) {
+			printFile(contentProject, projectFile)
+			printFile(contentNetwork, NetworkFile)
+			printFile(contentTestBench, testBenchFile)
 			return i
 		} else {
 			return i + 1
@@ -137,7 +149,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	}
 	
 	def fifoName(Connection connection)
-		'''fifo_«connection.getAttribute("id").objectValue»'''
+		'''myStream_«connection.getAttribute("id").objectValue»'''
 	
 	def fifoType(Connection connection) {
 		connection.sourcePort.type

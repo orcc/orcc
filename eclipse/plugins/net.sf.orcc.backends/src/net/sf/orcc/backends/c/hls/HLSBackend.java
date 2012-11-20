@@ -108,6 +108,7 @@ public class HLSBackend extends CBackend {
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, false, true));
 		transformations.add(new RenameTransformation(replacementMap));
+		transformations.add(new Multi2MonoToken());
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);

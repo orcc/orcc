@@ -40,6 +40,7 @@ import java.io.File
 import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
 import java.util.List
+import net.sf.orcc.ir.Var
 
 /*
  * Compile Instance c source code
@@ -73,10 +74,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		
 		////////////////////////////////////////////////////////////////////////////////
-		// Predecessor FIFOS
+		// Input FIFOS
 		«FOR port : instance.actor.inputs»
 			«IF instance.incomingPortMap.get(port) != null»
-				extern stream<«port.type.doSwitch»>	myStream_«(instance.incomingPortMap.get(port).getId(port))»;
+				extern stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
 			«ENDIF»
 		«ENDFOR»
 		
@@ -84,7 +85,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Output FIFOs
 		«FOR port : instance.actor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(port)»
-				extern stream<«connection.sourcePort.type.doSwitch»> myStream_«connection.getId(connection.sourcePort)»;
+				extern stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
 			«ENDFOR»
 		«ENDFOR»
 		
@@ -131,7 +132,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Initializes
-		
+		«initializeFunction»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
@@ -148,15 +149,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override printFsm() '''
 		«IF ! instance.actor.actionsOutsideFsm.empty»
 			void «instance.name»_outside_FSM_scheduler() {
-				/* Set initial state to current FSM state */
-					_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
 				«instance.actor.actionsOutsideFsm.printActionLoop»
 			}
 		«ENDIF»
 		
 		void «instance.name»_scheduler() {
-			/* Set initial state to current FSM state */
-			_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
 			// jump to FSM state 
 			switch (_FSM_state) {
 				«FOR state : instance.actor.fsm.states»
@@ -179,6 +176,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printTransition(State state) '''
 		l_«state.name»:
+			«IF ! instance.actor.actionsOutsideFsm.empty»
+				«instance.name»_outside_FSM_scheduler();
+			«ENDIF»
 			«IF !state.outgoing.empty»
 				«schedulingState(state, state.outgoing.map[it as Transition])»
 			«ENDIF»
@@ -201,7 +201,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«IF transitions.head.action.outputPattern != null»
 				«transitions.head.action.outputPattern.printOutputPattern»
 					_FSM_state = my_state_«srcState.name»;	
-					//goto finished;
 				}
 			«ENDIF»
 			«transitions.head.action.body.name»();
@@ -213,13 +212,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
-		if (!myStream_«instance.outgoingPortMap.values.head.get(0).getId(port)».empty()) {
+		if (!«instance.outgoingPortMap.get(port).head.fifoName».empty()) {
 			stop = 1;
 		}
 	'''
 	
 	override checkInputPattern(Pattern pattern)
-	'''«FOR port : pattern.ports»!myStream_«(instance.incomingPortMap.get(port).getId(port))».empty() && «ENDFOR»'''
+	'''«FOR port : pattern.ports»!«instance.incomingPortMap.get(port).fifoName».empty() && «ENDFOR»'''
 	
 	override printInstance(String targetFolder) {
 		val content = instanceFileContent
@@ -237,7 +236,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 			«IF action.outputPattern != null»
 				«action.outputPattern.printOutputPattern»
-					//goto finished;
 				}
 			«ENDIF»
 			«action.body.name»();
@@ -257,15 +255,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
 				«ENDFOR»
-			
-				«FOR port : action.inputPattern.ports»
-					
-					
-				«ENDFOR»
-				
-				«FOR port : action.outputPattern.ports»
-					
-				«ENDFOR»
 			}
 			
 			«action.scheduler.print»
@@ -279,7 +268,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«load.target.variable.indexedName» = myStream_«(instance.incomingPortMap.get(srcPort).getId(srcPort))».read();
+				«load.target.variable.indexedName» = «instance.incomingPortMap.get(srcPort).fifoName».read();
 			«ELSE»
 				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
@@ -291,7 +280,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val trgtPort = store.target.variable.port
 		'''
 		«IF trgtPort != null»
-				myStream_«instance.outgoingPortMap.values.head.get(0).getId(trgtPort)».write(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
@@ -300,5 +289,50 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	 
 	override printActionLoop(List<Action> actions) '''
 		«actions.printActions»
+	'''
+	
+	def fifoName(Connection connection)
+		'''myStream_«connection.getAttribute("id").objectValue»'''
+	
+	def fifoType(Connection connection) {
+		connection.sourcePort.type
+	}
+	
+	override initializeFunction() '''
+		«IF ! instance.actor.initializes.empty»
+			«FOR init : instance.actor.initializes»
+				«init.print»
+			«ENDFOR»
+			
+			static void initialize() {
+				
+				«instance.actor.initializes.printActions»
+				
+				// no read_end/write_end here!
+				return;
+			}
+			
+		«ENDIF»
+		void «instance.name»_initialize() {
+			
+			«IF instance.actor.hasFsm»
+				
+				/* Set initial state to current FSM state */
+				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
+			«ENDIF»
+			
+			/* Set initial value to global variable */
+			«FOR variable : instance.actor.stateVars»
+				«variable.stateVarInit»
+			«ENDFOR»
+		}
+	'''
+	
+	override stateVarInit(Var variable) '''
+		«IF variable.assignable && variable.initialized»
+			«IF ! variable.type.list»
+				«variable.name» = «variable.initialValue.doSwitch»;
+			«ENDIF»
+		«ENDIF»
 	'''
 }
