@@ -92,9 +92,9 @@ class Python_Design extends CommonPrinter {
 		
 	def private usePrint(Processor processor) {
 		if(ArchitectureUtil::needToPrint(processor.mappedActors)) {
-			'''False'''
-		} else {
 			'''True'''
+		} else {
+			'''False'''
 		}
 	}
 
