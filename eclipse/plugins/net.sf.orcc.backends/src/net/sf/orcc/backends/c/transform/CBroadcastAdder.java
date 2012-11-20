@@ -70,10 +70,11 @@ public class CBroadcastAdder extends BroadcastAdder {
 				if (size != ((Connection) edge).getSize()) {
 					createBroadcast(network.getSimpleName(), srcPort, edges);
 					OrccLogger
-							.warnln("Different-sized FIFOs connected to port '"
-									+ srcPort.getName() + "' in '"
+							.noticeln("Different-sized FIFOs connected to port '"
+									+ srcPort.getName()
+									+ "' in '"
 									+ network.getName()
-									+ "'. A broadcast is created.\n");
+									+ "'. A broadcast is created.");
 				}
 			}
 		}
