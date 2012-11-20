@@ -34,6 +34,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
+import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureUtil
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.util.OrccUtil
 
@@ -90,7 +91,7 @@ class Python_Design extends CommonPrinter {
 		'''
 		
 	def private usePrint(Processor processor) {
-		if(processor.mappedActors.filter[actor.useNativeProcedure].empty) {
+		if(ArchitectureUtil::needToPrint(processor.mappedActors)) {
 			'''False'''
 		} else {
 			'''True'''

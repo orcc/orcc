@@ -98,14 +98,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 						.getMappedComponent(instance));
 				processor.getMappedActors().add(instance);
 
-				if (processor.getFunctionUnit("ORCC_FU") == null
-						&& actor.useNativeProcedure()) {
-					processor.getFunctionUnits().add(
-							factory.createIoFU(processor));
-					processor.getFunctionUnits().add(
-							factory.createOrccFU(processor));
-				}
-
 				componentMap.put(instance, processor);
 			}
 
@@ -218,6 +210,16 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 		new Mapper().doSwitch(network);
 		new ArchitectureMemoryEstimator().doSwitch(design);
+
+		for (Processor processor : design.getProcessors()) {
+			if (ArchitectureUtil.needOrccFu(processor.getMappedActors())) {
+				processor.getFunctionUnits().add(
+						factory.createOrccFU(processor));
+			}
+			if (ArchitectureUtil.needToPrint(processor.getMappedActors())) {
+				processor.getFunctionUnits().add(factory.createIoFU(processor));
+			}
+		}
 
 		return design;
 	}
