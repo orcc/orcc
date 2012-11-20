@@ -230,7 +230,7 @@ public class OrccLogger {
 	 * @param message
 	 */
 	public static void noticeln(String message) {
-		debug(message + System.getProperty("line.separator"));
+		notice(message + System.getProperty("line.separator"));
 	}
 
 	/**
