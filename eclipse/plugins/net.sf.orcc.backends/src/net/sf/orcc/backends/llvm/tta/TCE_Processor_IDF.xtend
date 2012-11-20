@@ -89,7 +89,7 @@ class TCE_Processor_IDF extends CommonPrinter {
 	def private getIdf(RegisterFile rf) {
 		val impl = hwDb.get(rf.implementation)
 		if(impl == null){
-			OrccLogger::warnln("Unknown implementation of " + rf.name)
+			OrccLogger::noticeln("Unknown implementation of " + rf.name)
 		} else {
 			'''
 			<rf name="«rf.name»">
