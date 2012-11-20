@@ -313,6 +313,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			}
 			
 		«ENDIF»
+		
+		«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm)»
 		void «instance.name»_initialize() {
 			
 			«IF instance.actor.hasFsm»
@@ -321,11 +323,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
 			«ENDIF»
 			
-			/* Set initial value to global variable */
-			«FOR variable : instance.actor.stateVars»
-				«variable.stateVarInit»
-			«ENDFOR»
+			«IF !instance.actor.stateVars.empty»
+				/* Set initial value to global variable */
+				«FOR variable : instance.actor.stateVars»
+					«variable.stateVarInit»
+				«ENDFOR»
+			«ENDIF»
 		}
+		«ENDIF»
 	'''
 	
 	override stateVarInit(Var variable) '''

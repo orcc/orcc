@@ -77,7 +77,9 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		// Action schedulers
 		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			void «instance.name»_initialize();
+			«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm )»
+				void «instance.name»_initialize();
+			«ENDIF»
 		«ENDFOR»
 		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
@@ -89,7 +91,9 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		// Main
 		int main() {
 			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+				«IF ! instance.actor.initializes.empty»
 					«instance.name»_initialize();
+				«ENDIF»
 			«ENDFOR»
 			
 			while(1) {
