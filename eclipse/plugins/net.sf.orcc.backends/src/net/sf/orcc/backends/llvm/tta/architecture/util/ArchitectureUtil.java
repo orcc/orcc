@@ -37,6 +37,15 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 
 public class ArchitectureUtil {
 
+	/**
+	 * Return true if at least one actor of the given list is using the 'print'
+	 * function.
+	 * 
+	 * @param actors
+	 *            the given list of actors
+	 * @return true if at least one actor of the given list is using the 'print'
+	 *         function
+	 */
 	public static boolean needToPrint(EList<Instance> actors) {
 		for (Instance instance : actors) {
 			TreeIterator<Object> it = EcoreUtil.getAllContents(
@@ -54,6 +63,15 @@ public class ArchitectureUtil {
 		return false;
 	}
 
+	/**
+	 * Return true if at least one actor of the given list is using a native
+	 * function which are only usable in simulation.
+	 * 
+	 * @param actors
+	 *            the given list of actors
+	 * @return true if at least one actor of the given list is using a native
+	 *         function which are only usable in simulation
+	 */
 	public static boolean needOrccFu(EList<Instance> actors) {
 		for (Instance instance : actors) {
 			TreeIterator<Object> it = EcoreUtil.getAllContents(
