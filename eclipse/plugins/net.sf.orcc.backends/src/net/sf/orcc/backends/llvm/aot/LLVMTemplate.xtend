@@ -226,11 +226,15 @@ class LLVMTemplate extends CommonPrinter {
 	 *****************************************/
 		
 	def getId(Connection connection, Port port) {
-		if(connection != null) connection.getAttribute("id").objectValue
+		if(connection != null) connection.id
 		else port.name
 	}
+	
+	def getId(Connection connection) {
+		connection.getAttribute("id").objectValue
+	}
 
-	def getFifoSize(Connection connection) {
+	def getSize(Connection connection) {
 		if(connection != null) connection.size.toString
 		else "512"
 	}

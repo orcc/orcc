@@ -565,7 +565,7 @@ class InstancePrinter extends LLVMTemplate {
 	def printInput(Connection connection, Port port) '''
 		«connection.printExternalFifo(port)»
 	
-		@SIZE_«port.name» = internal constant i32 «connection.fifoSize»
+		@SIZE_«port.name» = internal constant i32 «connection.size»
 		@index_«port.name» = internal global i32 0
 		@numTokens_«port.name» = internal global i32 0
 		
@@ -597,7 +597,7 @@ class InstancePrinter extends LLVMTemplate {
 	def printOutput(Connection connection, Port port) '''
 		«connection.printExternalFifo(port)»
 	
-		@SIZE_«port.name» = internal constant i32 «connection.fifoSize»
+		@SIZE_«port.name» = internal constant i32 «connection.size»
 		@index_«port.name» = internal global i32 0
 		@rdIndex_«port.name» = internal global i32 0
 		@numFree_«port.name» = internal global i32 0
@@ -645,7 +645,7 @@ class InstancePrinter extends LLVMTemplate {
 	def printExternalFifo(Connection conn, Port port) {
 		val isConnected = conn != null
 		'''
-		@fifo_«conn.getId(port)»_content = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global [«conn.fifoSize» x «port.type.doSwitch»]«IF !isConnected» zeroinitializer, align 32«ENDIF»
+		@fifo_«conn.getId(port)»_content = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global [«conn.size» x «port.type.doSwitch»]«IF !isConnected» zeroinitializer, align 32«ENDIF»
 		@fifo_«conn.getId(port)»_rdIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
 		@fifo_«conn.getId(port)»_wrIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
 		'''
@@ -837,7 +837,7 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDIF»
 			%tmp_index_«variable.name»_«accessId» = add i32 %local_index_«port.name», «IF needCast»%cast_index_«variable.name»_«accessId»«ELSE»«indexes.head.doSwitch»«ENDIF»
 			%final_index_«variable.name»_«accessId» = urem i32 %tmp_index_«variable.name»_«accessId», %local_size_«port.name»
-			«varName(variable, instr)» = getelementptr [«connection.fifoSize» x «port.type.doSwitch»]«port.addrSpace»* @fifo_«connection.getId(port)»_content, i32 0, i32 %final_index_«variable.name»_«accessId»
+			«varName(variable, instr)» = getelementptr [«connection.size» x «port.type.doSwitch»]«port.addrSpace»* @fifo_«connection.getId(port)»_content, i32 0, i32 %final_index_«variable.name»_«accessId»
 		'''
 	}
 	

@@ -76,7 +76,7 @@ class LLVM_Actor extends InstancePrinter {
 			«FOR local : action.scheduler.locals»
 				«local.variableDeclaration»
 			«ENDFOR»
-			«FOR port : action.peekPattern.ports.filter[ ! native]»
+			«FOR port : action.peekPattern.ports.notNative»
 				«port.fifoVar»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
@@ -91,10 +91,10 @@ class LLVM_Actor extends InstancePrinter {
 			«FOR local : action.body.locals»
 				«local.variableDeclaration»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.filter[ native ]»
+			«FOR port : action.outputPattern.ports.notNative»
 				«action.outputPattern.getVariable(port).variableDeclaration»
 			«ENDFOR»
-			«FOR port : action.inputPattern.ports.filter[ ! native] + action.outputPattern.ports.filter[ ! native]»
+			«FOR port : action.inputPattern.ports.notNative + action.outputPattern.ports.notNative»
 				«port.fifoVar»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
