@@ -49,7 +49,6 @@ import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
@@ -142,7 +141,6 @@ public class LLVMBackend extends AbstractBackend {
 		new NetworkFlattener().doSwitch(network);
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new BroadcastAdder());
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, true, false));
 		transformations.add(new DfVisitor<Void>(new SSATransformation()));

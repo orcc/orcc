@@ -290,12 +290,14 @@ class InstancePrinter extends LLVMTemplate {
 				«val action = transition.action»
 				«val actionName = action.name»
 				«val extName = state.name + "_" + actionName»
+				«val inputPattern = action.inputPattern»
+				«val outputPattern = action.outputPattern»
 				; ACTION «actionName»
-				«IF ! action.inputPattern.ports.notNative.empty»
+				«IF !inputPattern.ports.notNative.empty»
 					;; Input pattern
-					«checkInputPattern(action, action.inputPattern, state)»
+					«checkInputPattern(action, inputPattern, state)»
 					%is_schedulable_«extName» = call i1 @«action.scheduler.name» ()
-					%is_fireable_«extName» = and i1 %is_schedulable_«extName», %has_valid_inputs_«extName»_«action.inputPattern.ports.size»
+					%is_fireable_«extName» = and i1 %is_schedulable_«extName», %has_valid_inputs_«extName»_«inputPattern.ports.size»
 					
 					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ELSE»
@@ -307,11 +309,12 @@ class InstancePrinter extends LLVMTemplate {
 			
 			
 			bb_«extName»_check_outputs:
-				«IF ! action.outputPattern.ports.notNative.empty»
+				«IF !outputPattern.ports.notNative.empty»
+					«val lastPort = outputPattern.ports.last»
 					;; Output pattern
-					«checkOutputPattern(action, action.outputPattern, state)»
+					«checkOutputPattern(action, outputPattern, state)»
 					
-					br i1 %has_valid_outputs_«action.outputPattern.ports.last.name»_«extName», label %bb_«extName»_fire, label %bb_«state.name»_finished
+					br i1 %has_valid_outputs_«lastPort.name»_«instance.outgoingPortMap.get(lastPort).last.id»_«extName», label %bb_«extName»_fire, label %bb_«state.name»_finished
 				«ELSE»
 					;; Empty output pattern
 					
@@ -355,12 +358,14 @@ class InstancePrinter extends LLVMTemplate {
 	def printActionLoop(EList<Action> actions, boolean outsideFSM) '''
 		«FOR action : actions»
 			«val name = action.name»
+			«val inputPattern = action.inputPattern»
+			«val outputPattern = action.outputPattern»
 				; ACTION «name»				
-				«IF ! action.inputPattern.ports.notNative.empty»
+				«IF !inputPattern.ports.notNative.empty»
 					;; Input pattern
-					«checkInputPattern(action, action.inputPattern)»
+					«checkInputPattern(action, inputPattern)»
 					%is_schedulable_«name» = call i1 @«action.scheduler.name» ()
-					%is_fireable_«name» = and i1 %is_schedulable_«name», %has_valid_inputs_«name»_«action.inputPattern.ports.size»
+					%is_fireable_«name» = and i1 %is_schedulable_«name», %has_valid_inputs_«name»_«inputPattern.ports.size»
 					
 					br i1 %is_fireable_«name», label %bb_«name»_check_outputs, label %bb_«name»_unschedulable
 				«ELSE»
@@ -371,11 +376,12 @@ class InstancePrinter extends LLVMTemplate {
 				«ENDIF»
 			
 			bb_«name»_check_outputs:
-				«IF ! action.outputPattern.ports.notNative.empty»
+				«IF !outputPattern.ports.notNative.empty»
+					«val lastPort = outputPattern.ports.last»
 					;; Output pattern
-					«checkOutputPattern(action, action.outputPattern)»
+					«checkOutputPattern(action, outputPattern)»
 					
-					br i1 %has_valid_outputs_«action.outputPattern.ports.last.name»_«name», label %bb_«name»_fire, label %bb_finished
+					br i1 %has_valid_outputs_«lastPort.name»_«instance.outgoingPortMap.get(lastPort).last.id»_«name», label %bb_«name»_fire, label %bb_finished
 				«ELSE»
 					;; Empty output pattern
 					
@@ -407,16 +413,18 @@ class InstancePrinter extends LLVMTemplate {
 	def checkInputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if( state != null) '''«state.name»_''' else ""
 		val portToIndexMap = portToIndexByPatternMap.get(pattern)
-		val firstPort = pattern.ports.notNative.head		
+		val firstPort = pattern.ports.notNative.head
+		val firstName = firstPort.name + "_" + instance.incomingPortMap.get(firstPort).id
 		'''
-			%numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @numTokens_«firstPort.name»
-			%index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @index_«firstPort.name»
+			%numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @numTokens_«firstName»
+			%index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @index_«firstName»
 			%status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = sub i32 %numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», %index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)»
 			%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = icmp sge i32 %status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», «pattern.numTokensMap.get(firstPort)»
 			
 			«FOR port : pattern.ports.notNative.tail»
-				%numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @numTokens_«port.name»
-				%index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @index_«port.name»
+				«val name = port.name + "_" + instance.incomingPortMap.get(port).id»
+				%numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @numTokens_«name»
+				%index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @index_«name»
 				%status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = sub i32 %numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», %index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)»
 				%available_input_«stateName»«action.name»_«port.name» = icmp uge i32 %status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», «pattern.numTokensMap.get(port)»
 				%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(port)» = and i1 %has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(pattern.ports.get(pattern.ports.indexOf(port) - 1))», %available_input_«stateName»«action.name»_«port.name»
@@ -431,53 +439,65 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def checkOutputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if( state != null) '''«state.name»_''' else ""
-		val ports = pattern.ports.notNative.toList
+		val connections = pattern.ports.notNative.map[instance.outgoingPortMap.get(it)].flatten.toList
 		'''
-			«FOR port : ports»
-				«val extName = port.name + "_" + stateName + action.name»
+			«FOR connection : connections»
+				«val port = connection.sourcePort»
+				«val name = port.name + "_" + connection.id»
+				«val extName = name + "_" + stateName + action.name»
 				«val numTokens = pattern.numTokensMap.get(port)»
-				%size_«extName» = load i32* @SIZE_«port.name»
-				%index_«extName» = load i32* @index_«port.name»
-				%rdIndex_«extName» = load i32* @rdIndex_«port.name»
+				%size_«extName» = load i32* @SIZE_«name»
+				%index_«extName» = load i32* @index_«name»
+				%rdIndex_«extName» = load i32* @rdIndex_«name»
 				%tmp_«extName» = sub i32 %size_«extName», %index_«extName»
 				%status_«extName» = add i32 %tmp_«extName», %rdIndex_«extName»
-				«IF !port.equals(ports.head)»
+				«IF !connection.equals(connections.head)»
+					«val lastConnection = connections.get(connections.indexOf(connection) - 1)»
+					«val lastName = lastConnection.sourcePort.name + "_" + lastConnection.id»
 					%available_output_«extName» = icmp sge i32 %status_«extName», «numTokens»
-					%has_valid_outputs_«extName» = and i1 %has_valid_outputs_«ports.get(ports.indexOf(port) - 1).name»_«stateName»«action.name», %available_output_«extName»
+					%has_valid_outputs_«extName» = and i1 %has_valid_outputs_«lastName»_«stateName»«action.name», %available_output_«extName»
 				«ELSE»
 					%has_valid_outputs_«extName» = icmp uge i32 %status_«extName», «numTokens»
 				«ENDIF»
-				
 			«ENDFOR»
 		'''
 	}
 
 	def printCallStartTokenFunctions() '''
 		«FOR port : instance.actor.inputs»
-			call void @read_«port.name»()
+			«val connection = instance.incomingPortMap.get(port)»
+			call void @read_«port.name»_«connection.id»()
 		«ENDFOR»
 		«FOR port : instance.actor.outputs.notNative»
-			call void @write_«port.name»()
+			«FOR connection : instance.outgoingPortMap.get(port)»
+				call void @write_«port.name»_«connection.id»()
+			«ENDFOR»
 		«ENDFOR»
 	'''
 
 	def printCallEndTokenFunctions() '''
 		«FOR port : instance.actor.inputs»
-			call void @read_end_«port.name»()
+			«val connection = instance.incomingPortMap.get(port)»
+			call void @read_end_«port.name»_«connection.id»()
 		«ENDFOR»
 		«FOR port : instance.actor.outputs.notNative»
-			call void @write_end_«port.name»()
+			«FOR connection : instance.outgoingPortMap.get(port)»
+				call void @write_end_«port.name»_«connection.id»()
+			«ENDFOR»
 		«ENDFOR»
 	'''
 	
 	def print(Action action) '''
+		«val inputPattern = action.inputPattern»
+		«val outputPattern = action.outputPattern»
+		«val peekPattern = action.peekPattern»
 		define internal i1 @«action.scheduler.name»() nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
 				«local.variableDeclaration»
 			«ENDFOR»
-			«FOR port : action.peekPattern.ports.notNative»
-				«port.fifoVar»
+			«FOR port : peekPattern.ports.notNative»
+				«port.loadVar(instance.incomingPortMap.get(port))»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
 		
@@ -491,33 +511,40 @@ class InstancePrinter extends LLVMTemplate {
 			«FOR local : action.body.locals»
 				«local.variableDeclaration»
 			«ENDFOR»
-			«FOR port : action.inputPattern.ports.notNative + action.outputPattern.ports.notNative»
-				«port.fifoVar»
+			«FOR port : inputPattern.ports.notNative»
+				«port.loadVar(instance.incomingPortMap.get(port))»
+			«ENDFOR»
+			«FOR port : outputPattern.ports.notNative»
+				«FOR connection : instance.outgoingPortMap.get(port)»
+					«port.loadVar(connection)»
+				«ENDFOR»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
 		
 		«FOR block : action.body.blocks»
 			«block.doSwitch»
 		«ENDFOR»
-			«FOR port : action.inputPattern.ports.notNative»
-				«printFifoEnd(port, action.inputPattern.numTokensMap.get(port))»
+			«FOR port : inputPattern.ports.notNative»
+				«port.updateVar(instance.incomingPortMap.get(port), inputPattern.getNumTokens(port))»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.notNative»
-				«printFifoEnd(port, action.outputPattern.numTokensMap.get(port))»
+			«FOR port : outputPattern.ports.notNative»
+				«FOR connection : instance.outgoingPortMap.get(port)»
+					«port.updateVar(connection, outputPattern.getNumTokens(port))»
+				«ENDFOR»
 			«ENDFOR»
 			ret void
 		}
 	'''
 	
-	def printFifoEnd(Port port, Integer numTokens) '''
-		%new_index_«port.name» = add i32 %local_index_«port.name», «numTokens»
-		store i32 %new_index_«port.name», i32* @index_«port.name»
+	def loadVar(Port port, Connection connection) '''
+		%local_index_«port.name»_«connection?.id» = load i32* @index_«port.name»_«connection?.id»
+		%local_size_«port.name»_«connection?.id» = load i32* @SIZE_«port.name»_«connection?.id»
 	'''
-
-	def fifoVar(Port port) '''
-		%local_index_«port.name» = load i32* @index_«port.name»
-		%local_size_«port.name» = load i32* @SIZE_«port.name»
-	'''
+	
+	def updateVar(Port port, Connection connection, Integer numTokens) '''
+		%new_index_«port.name»_«connection?.id» = add i32 %local_index_«port.name»_«connection?.id», «numTokens»
+		store i32 %new_index_«port.name»_«connection?.id», i32* @index_«port.name»_«connection?.id»
+	'''	
 	
 	def print(Procedure procedure) '''
 		«val parameters = procedure.parameters.join(", ", [argumentDeclaration] )»
@@ -563,69 +590,77 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	def printInput(Connection connection, Port port) '''
+		«val id = connection.id»
+		«val name = port.name + "_" + id»
+		«val addrSpace = port.addrSpace»
+		«val prop = port.properties»
 		«connection.printExternalFifo(port)»
 	
-		@SIZE_«port.name» = internal constant i32 «connection.size»
-		@index_«port.name» = internal global i32 0
-		@numTokens_«port.name» = internal global i32 0
+		@SIZE_«name» = internal constant i32 «connection.size»
+		@index_«name» = internal global i32 0
+		@numTokens_«name» = internal global i32 0
 		
-		define internal void @read_«port.name»() {
+		define internal void @read_«name»() {
 		entry:
 			br label %read
 		
 		read:
-			%rdIndex = load«port.properties» i32«port.addrSpace»* @fifo_«connection.getId(port)»_rdIndex
-			store i32 %rdIndex, i32* @index_«port.name»
-			%wrIndex = load«port.properties» i32«port.addrSpace»* @fifo_«connection.getId(port)»_wrIndex
+			%rdIndex = load«prop» i32«addrSpace»* @fifo_«connection.getId(port)»_rdIndex
+			store i32 %rdIndex, i32* @index_«name»
+			%wrIndex = load«prop» i32«addrSpace»* @fifo_«connection.getId(port)»_wrIndex
 			%getNumTokens = sub i32 %wrIndex, %rdIndex
 			%numTokens = add i32 %rdIndex, %getNumTokens
-			store i32 %numTokens, i32* @numTokens_«port.name»
+			store i32 %numTokens, i32* @numTokens_«name»
 			ret void
 		}
 
-		define internal void @read_end_«port.name»() {
+		define internal void @read_end_«name»() {
 		entry:
 			br label %read_end
 		
 		read_end:
-			%rdIndex = load i32* @index_«port.name»
-			store«port.properties» i32 %rdIndex, i32«port.addrSpace»* @fifo_«connection.getId(port)»_rdIndex
+			%rdIndex = load i32* @index_«name»
+			store«prop» i32 %rdIndex, i32«addrSpace»* @fifo_«connection.getId(port)»_rdIndex
 			ret void
 		}
 	'''
 		
 	def printOutput(Connection connection, Port port) '''
+		«val id = connection.id»
+		«val name = port.name + "_" + id»
+		«val addrSpace = port.addrSpace»
+		«val prop = port.properties»
 		«connection.printExternalFifo(port)»
 	
-		@SIZE_«port.name» = internal constant i32 «connection.size»
-		@index_«port.name» = internal global i32 0
-		@rdIndex_«port.name» = internal global i32 0
-		@numFree_«port.name» = internal global i32 0
+		@SIZE_«name» = internal constant i32 «connection.size»
+		@index_«name» = internal global i32 0
+		@rdIndex_«name» = internal global i32 0
+		@numFree_«name» = internal global i32 0
 		
-		define internal void @write_«port.name»() {
+		define internal void @write_«name»() {
 		entry:
 			br label %write
 		
 		write:
-			%wrIndex = load«port.properties» i32«port.addrSpace»* @fifo_«connection.getId(port)»_wrIndex
-			store i32 %wrIndex, i32* @index_«port.name»
-			%rdIndex = load«port.properties» i32«port.addrSpace»* @fifo_«connection.getId(port)»_rdIndex
-			store i32 %rdIndex, i32* @rdIndex_«port.name»
-			%size = load i32* @SIZE_«port.name»
+			%wrIndex = load«prop» i32«addrSpace»* @fifo_«id»_wrIndex
+			store i32 %wrIndex, i32* @index_«name»
+			%rdIndex = load«prop» i32«addrSpace»* @fifo_«id»_rdIndex
+			store i32 %rdIndex, i32* @rdIndex_«name»
+			%size = load i32* @SIZE_«name»
 			%numTokens = sub i32 %wrIndex, %rdIndex
 			%getNumFree = sub i32 %size, %numTokens
 			%numFree = add i32 %wrIndex, %getNumFree
-			store i32 %numFree, i32* @numFree_«port.name»
+			store i32 %numFree, i32* @numFree_«name»
 			ret void
 		}
 		
-		define internal void @write_end_«port.name»() {
+		define internal void @write_end_«name»() {
 		entry:
 			br label %write_end
 		
 		write_end:
-			%wrIndex = load i32* @index_«port.name»
-			store«port.properties» i32 %wrIndex, i32«port.addrSpace»* @fifo_«connection.getId(port)»_wrIndex
+			%wrIndex = load i32* @index_«name»
+			store«prop» i32 %wrIndex, i32«addrSpace»* @fifo_«id»_wrIndex
 			ret void
 		}
 	'''
@@ -642,14 +677,20 @@ class InstancePrinter extends LLVMTemplate {
 	 */
 	def getProperties(Port port) ''''''
 	
-	def printExternalFifo(Connection conn, Port port) {
-		val isConnected = conn != null
-		'''
-		@fifo_«conn.getId(port)»_content = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global [«conn.size» x «port.type.doSwitch»]«IF !isConnected» zeroinitializer, align 32«ENDIF»
-		@fifo_«conn.getId(port)»_rdIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
-		@fifo_«conn.getId(port)»_wrIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
-		'''
-	}
+	def printExternalFifo(Connection conn, Port port) '''
+		«val name = "fifo_" + conn.getId(port)»
+		«val type = port.type.doSwitch»
+		«IF conn != null»
+			«val addrSpace = port.addrSpace»
+			@«name»_content = external«addrSpace» global [«conn.size» x «type»]
+			@«name»_rdIndex = external«addrSpace» global i32
+			@«name»_wrIndex = external«addrSpace» global i32
+		«ELSE»
+			@«name»_content = internal global [«conn.size» x «type»] zeroinitializer, align 32
+			@«name»_rdIndex = internal global i32 zeroinitializer, align 32
+			@«name»_wrIndex = internal global i32 zeroinitializer, align 32
+		«ENDIF»
+	'''
 	
 	def getNextLabel(Block block) {
 		if (block.blockWhile) (block as BlockWhile).joinBlock.label
@@ -743,8 +784,10 @@ class InstancePrinter extends LLVMTemplate {
 				«val innerType = (variable.type as TypeList).innermostType»
 				«IF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
-					«printPortAccess(instance.outgoingPortMap.get(port).head, port, variable, store.indexes, store)»
-					store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«port.addrSpace»* «varName(variable, store)»
+					«FOR connection : instance.outgoingPortMap.get(port)»
+						«printPortAccess(connection, port, variable, store.indexes, store)»
+						store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«port.addrSpace»* «varName(variable, store)»_«connection.id»
+					«ENDFOR»
 				«ELSE»
 					«varName(variable, store)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«store.indexes.join(", ", ", ", "", [printIndex])»
 					store «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»* «varName(variable, store)»
@@ -764,16 +807,19 @@ class InstancePrinter extends LLVMTemplate {
 				«val innerType = (variable.type as TypeList).innermostType»
 				«IF action != null && action.inputPattern.contains(variable) && ! action.inputPattern.varToPortMap.get(variable).native»
 					«val port = action.inputPattern.varToPortMap.get(variable)»
-					«printPortAccess(instance.incomingPortMap.get(port), port, variable, load.indexes, load)»
-					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
+					«val connection = instance.incomingPortMap.get(port)»
+					«printPortAccess(connection, port, variable, load.indexes, load)»
+					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»_«connection.id»
 				«ELSEIF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
-					«printPortAccess(instance.outgoingPortMap.get(port).head, port, variable, load.indexes, load)»
-					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
+					«val connection = instance.outgoingPortMap.get(port).head»
+					«printPortAccess(connection, port, variable, load.indexes, load)»
+					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»_«connection.id»
 				«ELSEIF action != null && action.peekPattern.contains(variable)»
 					«val port = action.peekPattern.varToPortMap.get(variable)»
-					«printPortAccess(instance.incomingPortMap.get(port), port, variable, load.indexes, load)»
-					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»
+					«val connection = instance.incomingPortMap.get(port)»
+					«printPortAccess(connection, port, variable, load.indexes, load)»
+					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»_«connection.id»
 				«ELSE»
 					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "", [printIndex])»
 					«target» = load «innerType.doSwitch»* «varName(variable, load)»
@@ -831,13 +877,15 @@ class InstancePrinter extends LLVMTemplate {
 		val accessMap = procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>
 		val accessId = accessMap.get(instr)
 		val needCast = castedIndexes.contains(indexes.head)
+		val fifoName = port.name + "_" + connection.id
+		val extName = variable.name + "_" + accessId + "_" + connection.id
 		'''
 			«IF needCast»
-				%cast_index_«variable.name»_«accessId» = zext «indexes.head.type.doSwitch» «indexes.head.doSwitch» to i32
+				%cast_index_«extName» = zext «indexes.head.type.doSwitch» «indexes.head.doSwitch» to i32
 			«ENDIF»
-			%tmp_index_«variable.name»_«accessId» = add i32 %local_index_«port.name», «IF needCast»%cast_index_«variable.name»_«accessId»«ELSE»«indexes.head.doSwitch»«ENDIF»
-			%final_index_«variable.name»_«accessId» = urem i32 %tmp_index_«variable.name»_«accessId», %local_size_«port.name»
-			«varName(variable, instr)» = getelementptr [«connection.size» x «port.type.doSwitch»]«port.addrSpace»* @fifo_«connection.getId(port)»_content, i32 0, i32 %final_index_«variable.name»_«accessId»
+			%tmp_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«indexes.head.doSwitch»«ENDIF»
+			%final_index_«extName» = urem i32 %tmp_index_«extName», %local_size_«fifoName»
+			«varName(variable, instr)»_«connection.id» = getelementptr [«connection.size» x «port.type.doSwitch»]«port.addrSpace»* @fifo_«connection.getId(port)»_content, i32 0, i32 %final_index_«extName»
 		'''
 	}
 	
@@ -886,4 +934,5 @@ class InstancePrinter extends LLVMTemplate {
 			portToIndexByPatternMap.put(pattern, portToIndex)
 		}
 	}
+
 }

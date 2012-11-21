@@ -77,7 +77,7 @@ class LLVM_Actor extends InstancePrinter {
 				«local.variableDeclaration»
 			«ENDFOR»
 			«FOR port : action.peekPattern.ports.notNative»
-				«port.fifoVar»
+				«port.loadVar(instance.incomingPortMap.get(port))»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
 		
@@ -95,22 +95,25 @@ class LLVM_Actor extends InstancePrinter {
 				«action.outputPattern.getVariable(port).variableDeclaration»
 			«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative + action.outputPattern.ports.notNative»
-				«port.fifoVar»
+				«port.loadVar(instance.incomingPortMap.get(port))»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
 		
 		«FOR block : action.body.blocks»
 			«block.doSwitch»
 		«ENDFOR»
-			«FOR port : action.inputPattern.ports.filter[ ! native]»
-				«printFifoEnd(port, action.inputPattern.numTokensMap.get(port))»
-				call void @read_end_«port.name»()
+			«FOR port : action.inputPattern.ports.notNative»
+				«val connection = instance.incomingPortMap.get(port)»
+				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port))»
+				call void @read_end_«port.name»_«connection.id»()
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.filter[ ! native]»
-				«printFifoEnd(port, action.outputPattern.numTokensMap.get(port))»
-				call void @write_end_«port.name»()
+			«FOR port : action.outputPattern.ports.notNative»
+				«FOR connection : instance.outgoingPortMap.get(port)»
+					«port.updateVar(connection, action.outputPattern.getNumTokens(port))»
+					call void @write_end_«port.name»_«connection.id»()
+				«ENDFOR»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.filter[ native ]»
+			«FOR port : action.outputPattern.ports.notNative»
 				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
 			«ENDFOR»
 			ret void
