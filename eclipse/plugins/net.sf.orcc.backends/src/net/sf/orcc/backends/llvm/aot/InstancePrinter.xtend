@@ -130,8 +130,8 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	def getInstanceFileContent() '''
-		«val inputs = instance.actor.inputs.filter[ ! native]»
-		«val outputs = instance.actor.outputs.filter[ ! native]»
+		«val inputs = instance.actor.inputs.notNative»
+		«val outputs = instance.actor.outputs.notNative»
 		«printArchitecture»
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -291,7 +291,7 @@ class InstancePrinter extends LLVMTemplate {
 				«val actionName = action.name»
 				«val extName = state.name + "_" + actionName»
 				; ACTION «actionName»
-				«IF ! action.inputPattern.ports.filter[!native].empty»
+				«IF ! action.inputPattern.ports.notNative.empty»
 					;; Input pattern
 					«checkInputPattern(action, action.inputPattern, state)»
 					%is_schedulable_«extName» = call i1 @«action.scheduler.name» ()
@@ -307,7 +307,7 @@ class InstancePrinter extends LLVMTemplate {
 			
 			
 			bb_«extName»_check_outputs:
-				«IF ! action.outputPattern.ports.filter[!native].empty»
+				«IF ! action.outputPattern.ports.notNative.empty»
 					;; Output pattern
 					«checkOutputPattern(action, action.outputPattern, state)»
 					
@@ -356,7 +356,7 @@ class InstancePrinter extends LLVMTemplate {
 		«FOR action : actions»
 			«val name = action.name»
 				; ACTION «name»				
-				«IF ! action.inputPattern.ports.filter[!native].empty»
+				«IF ! action.inputPattern.ports.notNative.empty»
 					;; Input pattern
 					«checkInputPattern(action, action.inputPattern)»
 					%is_schedulable_«name» = call i1 @«action.scheduler.name» ()
@@ -371,7 +371,7 @@ class InstancePrinter extends LLVMTemplate {
 				«ENDIF»
 			
 			bb_«name»_check_outputs:
-				«IF ! action.outputPattern.ports.filter[!native].empty»
+				«IF ! action.outputPattern.ports.notNative.empty»
 					;; Output pattern
 					«checkOutputPattern(action, action.outputPattern)»
 					
@@ -407,14 +407,14 @@ class InstancePrinter extends LLVMTemplate {
 	def checkInputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if( state != null) '''«state.name»_''' else ""
 		val portToIndexMap = portToIndexByPatternMap.get(pattern)
-		val firstPort = pattern.ports.filter[!native].head		
+		val firstPort = pattern.ports.notNative.head		
 		'''
 			%numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @numTokens_«firstPort.name»
 			%index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @index_«firstPort.name»
 			%status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = sub i32 %numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», %index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)»
 			%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = icmp sge i32 %status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», «pattern.numTokensMap.get(firstPort)»
 			
-			«FOR port : pattern.ports.filter[!native].tail»
+			«FOR port : pattern.ports.notNative.tail»
 				%numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @numTokens_«port.name»
 				%index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @index_«port.name»
 				%status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = sub i32 %numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», %index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)»
@@ -431,7 +431,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def checkOutputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if( state != null) '''«state.name»_''' else ""
-		val ports = pattern.ports.filter[!native].toList
+		val ports = pattern.ports.notNative.toList
 		'''
 			«FOR port : ports»
 				«val extName = port.name + "_" + stateName + action.name»
@@ -456,7 +456,7 @@ class InstancePrinter extends LLVMTemplate {
 		«FOR port : instance.actor.inputs»
 			call void @read_«port.name»()
 		«ENDFOR»
-		«FOR port : instance.actor.outputs.filter[ ! native]»
+		«FOR port : instance.actor.outputs.notNative»
 			call void @write_«port.name»()
 		«ENDFOR»
 	'''
@@ -465,7 +465,7 @@ class InstancePrinter extends LLVMTemplate {
 		«FOR port : instance.actor.inputs»
 			call void @read_end_«port.name»()
 		«ENDFOR»
-		«FOR port : instance.actor.outputs.filter[ ! native]»
+		«FOR port : instance.actor.outputs.notNative»
 			call void @write_end_«port.name»()
 		«ENDFOR»
 	'''
@@ -476,7 +476,7 @@ class InstancePrinter extends LLVMTemplate {
 			«FOR local : action.scheduler.locals»
 				«local.variableDeclaration»
 			«ENDFOR»
-			«FOR port : action.peekPattern.ports.filter[ ! native]»
+			«FOR port : action.peekPattern.ports.notNative»
 				«port.fifoVar»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
@@ -491,7 +491,7 @@ class InstancePrinter extends LLVMTemplate {
 			«FOR local : action.body.locals»
 				«local.variableDeclaration»
 			«ENDFOR»
-			«FOR port : action.inputPattern.ports.filter[ ! native] + action.outputPattern.ports.filter[ ! native]»
+			«FOR port : action.inputPattern.ports.notNative + action.outputPattern.ports.notNative»
 				«port.fifoVar»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
@@ -499,10 +499,10 @@ class InstancePrinter extends LLVMTemplate {
 		«FOR block : action.body.blocks»
 			«block.doSwitch»
 		«ENDFOR»
-			«FOR port : action.inputPattern.ports.filter[ ! native]»
+			«FOR port : action.inputPattern.ports.notNative»
 				«printFifoEnd(port, action.inputPattern.numTokensMap.get(port))»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.filter[ ! native]»
+			«FOR port : action.outputPattern.ports.notNative»
 				«printFifoEnd(port, action.outputPattern.numTokensMap.get(port))»
 			«ENDFOR»
 			ret void

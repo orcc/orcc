@@ -49,6 +49,9 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
+import org.eclipse.emf.common.util.EList
+import net.sf.orcc.graph.Vertex
+import net.sf.orcc.df.Instance
 
 /*
  * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
@@ -234,4 +237,12 @@ class LLVMTemplate extends CommonPrinter {
 	
 	def print(Var variable)
 		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.indexedName»'''
+		
+	def getNotNative(EList<Port> ports) {
+		ports.filter[!native]
+	}
+	
+	def getActorInstances(EList<Vertex> vertices) {
+		vertices.filter(typeof(Instance)).filter[isActor]
+	}
 }
