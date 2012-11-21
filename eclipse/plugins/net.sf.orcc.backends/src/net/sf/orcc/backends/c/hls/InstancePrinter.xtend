@@ -136,6 +136,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			void «instance.name»_scheduler() {		
 				
 				«instance.actor.actionsOutsideFsm.printActionLoop»
+				
+			finished:
+				return;
 			}
 		«ENDIF»
 	'''
@@ -144,6 +147,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF ! instance.actor.actionsOutsideFsm.empty»
 			void «instance.name»_outside_FSM_scheduler() {
 				«instance.actor.actionsOutsideFsm.printActionLoop»
+			finished:
+				return;
+			// no read_end/write_end here!
+			return;
 			}
 		«ENDIF»
 		
@@ -154,12 +161,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					case my_state_«state.name»:
 						goto l_«state.name»;
 				«ENDFOR»
-			
+			default:
+				goto finished;
+			}
 				// FSM transitions
 				«FOR state : instance.actor.fsm.states»
 		«state.printTransition»
 				«ENDFOR»
-			}
+		finished:
+			return;
 		}
 	'''
 	
@@ -177,24 +187,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«schedulingState(state, state.outgoing.map[it as Transition])»
 			«ENDIF»
 	'''
-
-	override schedulingState(State state, Iterable<Transition> transitions) '''
-		«IF ! transitions.empty»
-			«actionTestState(state, transitions)»
-		«ENDIF»
-	'''
-	
-	override printActions(Iterable<Action> actions) '''
-		«IF !actions.empty»
-			«actionTest(actions.head, actions.tail)»
-		«ENDIF»
-	'''
 	
 	override actionTestState(State srcState, Iterable<Transition> transitions) '''
 		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
 			«IF transitions.head.action.outputPattern != null»
 				«transitions.head.action.outputPattern.printOutputPattern»
-					_FSM_state = my_state_«srcState.name»;	
+					_FSM_state = my_state_«srcState.name»;
+					goto finished;	
 				}
 			«ENDIF»
 			«transitions.head.action.body.name»();
@@ -230,6 +229,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 			«IF action.outputPattern != null»
 				«action.outputPattern.printOutputPattern»
+					goto finished;
 				}
 			«ENDIF»
 			«action.body.name»();
@@ -302,6 +302,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				
 				«instance.actor.initializes.printActions»
 				
+			finished:
 				// no read_end/write_end here!
 				return;
 			}
@@ -332,6 +333,23 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«IF ! variable.type.list»
 				«variable.name» = «variable.initialValue.doSwitch»;
 			«ENDIF»
+		«ENDIF»
+	'''
+	
+	override printActions(Iterable<Action> actions) '''
+		«IF !actions.empty»
+			«actionTest(actions.head, actions.tail)»
+		«ELSE»
+			goto finished;
+		«ENDIF»
+	'''
+	
+	override schedulingState(State state, Iterable<Transition> transitions) '''
+		«IF ! transitions.empty»
+			«actionTestState(state, transitions)»
+		«ELSE»
+			_FSM_state = my_state_«state.name»;
+			goto finished;
 		«ENDIF»
 	'''
 }
