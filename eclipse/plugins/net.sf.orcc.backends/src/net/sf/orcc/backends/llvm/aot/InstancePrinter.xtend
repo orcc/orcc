@@ -139,65 +139,44 @@ class InstancePrinter extends LLVMTemplate {
 		declare i32 @printf(i8* noalias , ...) nounwind 
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-		; Connected FIFOs
+		; FIFOs
 		«FOR port : inputs»
-			«printExternalFifo(instance.incomingPortMap.get(port), port)»
-			
+			«val connection = instance.incomingPortMap.get(port)»
+			«connection.printInput(port)»
 		«ENDFOR»
+		
 		«FOR port : outputs»
-			«printExternalFifo(instance.outgoingPortMap.get(port).head, port)»
+			«FOR connection : instance.outgoingPortMap.get(port)»
+				«connection.printOutput(port)»
+			«ENDFOR»
+		«ENDFOR»
+		
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		; Parameters
+		«FOR arg : instance.arguments»
+			@«arg.variable.name» = internal global «arg.variable.type.doSwitch» «arg.value.doSwitch»
+		«ENDFOR»
+
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		; State variables
+		«FOR variable : instance.actor.stateVars»
+			«variable.stateVar»
+		«ENDFOR»
+		
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		; Functions/procedures
+		«FOR proc : instance.actor.procs»
+			«proc.print»
 			
 		«ENDFOR»
-		«IF ! instance.actor.inputs.empty »
-			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-			; Input ports
-			«FOR port : inputs»
-				«port.printInput»
-			«ENDFOR»
+
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		; Initializes
+		«FOR init : instance.actor.initializes»
+			«init.print»
 			
-		«ENDIF»
-		«IF ! instance.actor.outputs.empty»
-			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-			; Output ports
-			«FOR port : outputs»
-				«port.printOutput»
-			«ENDFOR»
-			
-		«ENDIF»
-		«IF ! instance.actor.parameters.empty»
-			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-			; Parameter values of the instance
-			«FOR arg : instance.arguments»
-				@«arg.variable.name» = internal global «arg.variable.type.doSwitch» «arg.value.doSwitch»
-			«ENDFOR»
-			
-		«ENDIF»
-		«IF ! instance.actor.stateVars.empty»
-			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-			; State variables of the actor
-			«FOR variable : instance.actor.stateVars»
-				«variable.stateVar»
-			«ENDFOR»
-			
-		«ENDIF»
-		«IF ! instance.actor.procs.empty»
-			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-			; Functions/procedures
-			«FOR proc : instance.actor.procs»
-				«proc.print»
-				
-			«ENDFOR»
-			
-		«ENDIF»
-		«IF ! instance.actor.initializes.empty»
-			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-			; Initializes
-			«FOR init : instance.actor.initializes»
-				«init.print»
-				
-			«ENDFOR»
-			
-		«ENDIF»
+		«ENDFOR»
+
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Actions
 		«FOR action : instance.actor.actions»
@@ -583,8 +562,9 @@ class InstancePrinter extends LLVMTemplate {
 		else "constant"
 	}
 	
-	def printInput(Port port) '''
-		«val connection = instance.incomingPortMap.get(port)»
+	def printInput(Connection connection, Port port) '''
+		«connection.printExternalFifo(port)»
+	
 		@SIZE_«port.name» = internal constant i32 «connection.fifoSize»
 		@index_«port.name» = internal global i32 0
 		@numTokens_«port.name» = internal global i32 0
@@ -594,9 +574,9 @@ class InstancePrinter extends LLVMTemplate {
 			br label %read
 		
 		read:
-			%rdIndex = load«port.properties» i32«port.addrSpace»* @fifo_«getId(connection, port)»_rdIndex
+			%rdIndex = load«port.properties» i32«port.addrSpace»* @fifo_«connection.getId(port)»_rdIndex
 			store i32 %rdIndex, i32* @index_«port.name»
-			%wrIndex = load«port.properties» i32«port.addrSpace»* @fifo_«getId(connection, port)»_wrIndex
+			%wrIndex = load«port.properties» i32«port.addrSpace»* @fifo_«connection.getId(port)»_wrIndex
 			%getNumTokens = sub i32 %wrIndex, %rdIndex
 			%numTokens = add i32 %rdIndex, %getNumTokens
 			store i32 %numTokens, i32* @numTokens_«port.name»
@@ -609,13 +589,14 @@ class InstancePrinter extends LLVMTemplate {
 		
 		read_end:
 			%rdIndex = load i32* @index_«port.name»
-			store«port.properties» i32 %rdIndex, i32«port.addrSpace»* @fifo_«getId(connection, port)»_rdIndex
+			store«port.properties» i32 %rdIndex, i32«port.addrSpace»* @fifo_«connection.getId(port)»_rdIndex
 			ret void
 		}
 	'''
 		
-	def printOutput(Port port) '''
-		«val connection = instance.outgoingPortMap.get(port).head»
+	def printOutput(Connection connection, Port port) '''
+		«connection.printExternalFifo(port)»
+	
 		@SIZE_«port.name» = internal constant i32 «connection.fifoSize»
 		@index_«port.name» = internal global i32 0
 		@rdIndex_«port.name» = internal global i32 0
@@ -626,9 +607,9 @@ class InstancePrinter extends LLVMTemplate {
 			br label %write
 		
 		write:
-			%wrIndex = load«port.properties» i32«port.addrSpace»* @fifo_«getId(connection, port)»_wrIndex
+			%wrIndex = load«port.properties» i32«port.addrSpace»* @fifo_«connection.getId(port)»_wrIndex
 			store i32 %wrIndex, i32* @index_«port.name»
-			%rdIndex = load«port.properties» i32«port.addrSpace»* @fifo_«getId(connection, port)»_rdIndex
+			%rdIndex = load«port.properties» i32«port.addrSpace»* @fifo_«connection.getId(port)»_rdIndex
 			store i32 %rdIndex, i32* @rdIndex_«port.name»
 			%size = load i32* @SIZE_«port.name»
 			%numTokens = sub i32 %wrIndex, %rdIndex
@@ -644,7 +625,7 @@ class InstancePrinter extends LLVMTemplate {
 		
 		write_end:
 			%wrIndex = load i32* @index_«port.name»
-			store«port.properties» i32 %wrIndex, i32«port.addrSpace»* @fifo_«getId(connection, port)»_wrIndex
+			store«port.properties» i32 %wrIndex, i32«port.addrSpace»* @fifo_«connection.getId(port)»_wrIndex
 			ret void
 		}
 	'''
@@ -664,9 +645,9 @@ class InstancePrinter extends LLVMTemplate {
 	def printExternalFifo(Connection conn, Port port) {
 		val isConnected = conn != null
 		'''
-		@fifo_«getId(conn, port)»_content = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global [«conn.fifoSize» x «port.type.doSwitch»]«IF !isConnected» zeroinitializer, align 32«ENDIF»
-		@fifo_«getId(conn, port)»_rdIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
-		@fifo_«getId(conn, port)»_wrIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
+		@fifo_«conn.getId(port)»_content = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global [«conn.fifoSize» x «port.type.doSwitch»]«IF !isConnected» zeroinitializer, align 32«ENDIF»
+		@fifo_«conn.getId(port)»_rdIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
+		@fifo_«conn.getId(port)»_wrIndex = «IF isConnected»external«port.addrSpace»«ELSE»internal«ENDIF» global i32«IF !isConnected» zeroinitializer, align 32«ENDIF»
 		'''
 	}
 	
@@ -856,7 +837,7 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDIF»
 			%tmp_index_«variable.name»_«accessId» = add i32 %local_index_«port.name», «IF needCast»%cast_index_«variable.name»_«accessId»«ELSE»«indexes.head.doSwitch»«ENDIF»
 			%final_index_«variable.name»_«accessId» = urem i32 %tmp_index_«variable.name»_«accessId», %local_size_«port.name»
-			«varName(variable, instr)» = getelementptr [«connection.fifoSize» x «port.type.doSwitch»]«port.addrSpace»* @fifo_«getId(connection, port)»_content, i32 0, i32 %final_index_«variable.name»_«accessId»
+			«varName(variable, instr)» = getelementptr [«connection.fifoSize» x «port.type.doSwitch»]«port.addrSpace»* @fifo_«connection.getId(port)»_content, i32 0, i32 %final_index_«variable.name»_«accessId»
 		'''
 	}
 	
