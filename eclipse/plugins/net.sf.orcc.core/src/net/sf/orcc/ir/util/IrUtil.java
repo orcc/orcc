@@ -85,7 +85,7 @@ public class IrUtil {
 		Block containingNode = EcoreHelper.getContainerOfType(expression,
 				Block.class);
 		if (containingInst != null) {
-			if (containingInst.isInstPhi() && isWhileJoinNode(containingNode)) {
+			if (containingInst.isInstPhi() && isWhileJoinBlock(containingNode)) {
 				BlockWhile nodeWhile = EcoreHelper.getContainerOfType(
 						containingNode, BlockWhile.class);
 				addToPreviousNodeBlock(nodeWhile, instruction);
@@ -265,33 +265,33 @@ public class IrUtil {
 	 * Returns the last block in the given list of nodes. A new block is created
 	 * if there is no block in the given node list.
 	 * 
-	 * @param nodes
+	 * @param blocks
 	 *            a list of nodes
 	 * @return a block
 	 */
-	public static BlockBasic getLast(List<Block> nodes) {
+	public static BlockBasic getLast(List<Block> blocks) {
 		BlockBasic block;
-		if (nodes.isEmpty()) {
+		if (blocks.isEmpty()) {
 			block = IrFactory.eINSTANCE.createBlockBasic();
-			nodes.add(block);
+			blocks.add(block);
 		} else {
-			Block node = nodes.get(nodes.size() - 1);
+			Block node = blocks.get(blocks.size() - 1);
 			if (node.isBlockBasic()) {
 				block = (BlockBasic) node;
 			} else {
 				block = IrFactory.eINSTANCE.createBlockBasic();
-				nodes.add(block);
+				blocks.add(block);
 			}
 		}
 
 		return block;
 	}
 
-	private static boolean isWhileJoinNode(Block node) {
-		if (node.isBlockBasic()) {
-			BlockWhile nodeWhile = EcoreHelper.getContainerOfType(node,
+	private static boolean isWhileJoinBlock(Block block) {
+		if (block.isBlockBasic()) {
+			BlockWhile nodeWhile = EcoreHelper.getContainerOfType(block,
 					BlockWhile.class);
-			return (nodeWhile != null && nodeWhile.getJoinBlock() == node);
+			return (nodeWhile != null && nodeWhile.getJoinBlock() == block);
 		}
 		return false;
 	}
