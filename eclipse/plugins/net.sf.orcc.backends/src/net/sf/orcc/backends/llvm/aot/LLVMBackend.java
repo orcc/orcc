@@ -187,6 +187,7 @@ public class LLVMBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
+		checkTopLevel(network);
 		network = doTransformNetwork(network);
 
 		// print instances and entities

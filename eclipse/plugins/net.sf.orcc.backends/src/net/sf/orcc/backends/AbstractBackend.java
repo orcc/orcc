@@ -981,4 +981,21 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			doTransformActor(actor);
 		}
 	}
+
+	/**
+	 * Check if the given network does not contain any ports. In the contrary
+	 * case, an RuntimeException is thrown.
+	 * 
+	 * @param network
+	 *            the given network
+	 */
+	protected void checkTopLevel(Network network) {
+		if (!network.getInputs().isEmpty() || !network.getOutputs().isEmpty()) {
+			// FIXME: A warning could be sufficient if the generation of
+			// sub-network is supported
+			throw new OrccRuntimeException(
+					"The given network contains port(s): Be sure to run the code "
+							+ "generation on the top-level network.");
+		}
+	}
 }

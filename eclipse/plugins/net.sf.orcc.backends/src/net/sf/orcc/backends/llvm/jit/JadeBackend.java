@@ -187,6 +187,7 @@ public class JadeBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
+		checkTopLevel(network);
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);

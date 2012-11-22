@@ -232,6 +232,7 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
+		checkTopLevel(network);
 		doTransformNetwork(network);
 
 		if (debug) {

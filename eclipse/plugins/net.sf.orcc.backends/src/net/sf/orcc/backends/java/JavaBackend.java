@@ -117,6 +117,7 @@ public class JavaBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
+		checkTopLevel(network);
 		network = doTransformNetwork(network);
 
 		// print network

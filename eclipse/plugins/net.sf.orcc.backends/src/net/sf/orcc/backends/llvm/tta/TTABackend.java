@@ -150,6 +150,7 @@ public class TTABackend extends LLVMBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
+		checkTopLevel(network);
 		doTransformNetwork(network);
 
 		// build the design

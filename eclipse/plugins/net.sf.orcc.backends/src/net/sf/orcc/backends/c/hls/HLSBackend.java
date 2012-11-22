@@ -77,7 +77,7 @@ public class HLSBackend extends CBackend {
 	protected Map<String, List<Instance>> targetToInstancesMap;
 
 	@Override
-	public void doInitializeOptions() {
+	protected void doInitializeOptions() {
 
 		new File(path + File.separator + "build").mkdirs();
 		new File(path + File.separator + "bin").mkdirs();
@@ -151,6 +151,7 @@ public class HLSBackend extends CBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
+		checkTopLevel(network);
 		doTransformNetwork(network);
 
 		if (debug) {
