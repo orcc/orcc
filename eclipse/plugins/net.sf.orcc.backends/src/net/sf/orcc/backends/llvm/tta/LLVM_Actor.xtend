@@ -91,11 +91,16 @@ class LLVM_Actor extends InstancePrinter {
 			«FOR local : action.body.locals»
 				«local.declare»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.notNative»
+			«FOR port : action.outputPattern.ports.filter[native]»
 				«action.outputPattern.getVariable(port).declare»
 			«ENDFOR»
-			«FOR port : action.inputPattern.ports.notNative + action.outputPattern.ports.notNative»
+			«FOR port : action.inputPattern.ports.notNative»
 				«port.loadVar(instance.incomingPortMap.get(port))»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.notNative»
+				«FOR connection : instance.outgoingPortMap.get(port)»
+					«port.loadVar(connection)»
+				«ENDFOR»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
 		
@@ -113,7 +118,7 @@ class LLVM_Actor extends InstancePrinter {
 					call void @write_end_«port.name»_«connection.id»()
 				«ENDFOR»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.notNative»
+			«FOR port : action.outputPattern.ports.filter[native]»
 				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
 			«ENDFOR»
 			ret void
