@@ -143,7 +143,7 @@ class ActorPrinter extends InstancePrinter {
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; State variables of the actor
 			«FOR variable : actor.stateVars»
-				«variable.stateVar»
+				«variable.declare»
 			«ENDFOR»
 		«ENDIF»
 		

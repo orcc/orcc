@@ -85,7 +85,7 @@ class InstancePrinter extends LLVMTemplate {
 	val Map<State, Integer> stateToLabel = new HashMap<State, Integer>
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
-	var optionProfile = false
+	protected var optionProfile = false
 	
 	/**
 	 * Default constructor, do not activate profile option and do not set instance (Jade requirement)
@@ -160,7 +160,7 @@ class InstancePrinter extends LLVMTemplate {
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; State variables
 		«FOR variable : instance.actor.stateVars»
-			«variable.stateVar»
+			«variable.declare»
 		«ENDFOR»
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -219,10 +219,6 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 	
 	def printArchitecture() '''target triple = "x86_64"'''
-	
-	def protected stateVar(Var variable)
-		'''@«variable.name» = internal «variable.stateVarNature» «variable.type.doSwitch» «variable.initialize»'''
-
 	
 	def private schedulerWithFSM() '''
 		@_FSM_state = internal global i32 «stateToLabel.get(instance.actor.fsm.initialState)»
@@ -287,11 +283,11 @@ class InstancePrinter extends LLVMTemplate {
 				call void @«instance.name»_outside_FSM_scheduler()
 			«ENDIF»
 		«FOR transition : state.outgoing.filter(typeof(Transition))»
-				«val action = transition.action»
-				«val actionName = action.name»
-				«val extName = state.name + "_" + actionName»
-				«val inputPattern = action.inputPattern»
-				«val outputPattern = action.outputPattern»
+			«val action = transition.action»
+			«val actionName = action.name»
+			«val extName = state.name + "_" + actionName»
+			«val inputPattern = action.inputPattern»
+			«val outputPattern = action.outputPattern»
 				; ACTION «actionName»
 				«IF !inputPattern.ports.notNative.empty»
 					;; Input pattern
@@ -306,7 +302,6 @@ class InstancePrinter extends LLVMTemplate {
 
 					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ENDIF»
-			
 			
 			bb_«extName»_check_outputs:
 				«IF !outputPattern.ports.notNative.empty»
@@ -363,7 +358,7 @@ class InstancePrinter extends LLVMTemplate {
 				; ACTION «name»
 				«IF !inputPattern.ports.notNative.empty»
 					;; Input pattern
-					«checkInputPattern(action, inputPattern)»
+					«checkInputPattern(action, inputPattern, null)»
 					%is_schedulable_«name» = call i1 @«action.scheduler.name» ()
 					%is_fireable_«name» = and i1 %is_schedulable_«name», %has_valid_inputs_«name»_«inputPattern.ports.size»
 
@@ -379,7 +374,7 @@ class InstancePrinter extends LLVMTemplate {
 				«IF !outputPattern.ports.notNative.empty»
 					«val lastPort = outputPattern.ports.last»
 					;; Output pattern
-					«checkOutputPattern(action, outputPattern)»
+					«checkOutputPattern(action, outputPattern, null)»
 		
 					br i1 %has_valid_outputs_«lastPort.name»_«instance.outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«name», label %bb_«name»_fire, label %bb_finished
 				«ELSE»
@@ -406,10 +401,6 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDIF»
 	'''
 	
-	def private checkInputPattern(Action action, Pattern pattern) {
-		checkInputPattern(action, pattern, null)
-	}
-	
 	def private checkInputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if( state != null) '''«state.name»_''' else ""
 		val portToIndexMap = portToIndexByPatternMap.get(pattern)
@@ -431,10 +422,6 @@ class InstancePrinter extends LLVMTemplate {
 				
 			«ENDFOR»
 		'''
-	}
-
-	def private checkOutputPattern(Action action, Pattern pattern) {
-		checkOutputPattern(action, pattern, null)
 	}
 	
 	def private checkOutputPattern(Action action, Pattern pattern, State state) {
@@ -506,7 +493,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 		}
 		
-		define internal void @«action.body.name»() nounwind {
+		define internal void @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
@@ -551,7 +538,7 @@ class InstancePrinter extends LLVMTemplate {
 		«IF procedure.native»
 			declare «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind
 		«ELSE»
-			define internal «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind {
+			define internal «procedure.returnType.doSwitch» @«procedure.name»(«parameters») «IF optionProfile»noinline «ENDIF»nounwind {
 			entry:
 			«FOR local : procedure.locals»
 				«local.declare»
@@ -568,8 +555,15 @@ class InstancePrinter extends LLVMTemplate {
 	def protected label(Block block) '''b«block.cfgNode.number»'''
 	
 	def protected declare(Var variable) {
-		if(variable.type.list && ! castedList.contains(variable))
+		if(variable.global)
+			'''@«variable.name» = internal «IF variable.assignable»global«ELSE»constant«ENDIF» «variable.type.doSwitch» «variable.initialize»'''
+		else if(variable.type.list && ! castedList.contains(variable))
 			'''%«variable.indexedName» = alloca «variable.type.doSwitch»'''
+	}
+	
+	def protected initialize(Var variable) {
+		if(variable.initialValue != null) variable.initialValue.doSwitch
+		else "zeroinitializer, align 32"
 	}
 	
 	def protected argumentDeclaration(Param param) {
@@ -577,16 +571,6 @@ class InstancePrinter extends LLVMTemplate {
 		if (variable.type.string) '''i8* %«variable.name»'''
 		else if (variable.type.list) '''«variable.type.doSwitch»* %«variable.name»'''
 		else '''«variable.type.doSwitch» %«variable.name»'''
-	}
-	
-	def protected initialize(Var variable) {
-		if(variable.initialValue != null) variable.initialValue.doSwitch
-		else "zeroinitializer, align 32"
-	}
-
-	def private getStateVarNature(Var variable) {
-		if(variable.assignable) "global"
-		else "constant"
 	}
 	
 	def private printInput(Connection connection, Port port) '''
