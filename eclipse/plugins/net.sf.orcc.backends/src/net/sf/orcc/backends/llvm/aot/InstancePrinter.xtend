@@ -748,10 +748,10 @@ class InstancePrinter extends LLVMTemplate {
 		%«cast.target.variable.indexedName» = «cast.castOp» «cast.source.variable.castType» «cast.source.variable.print» to «cast.target.variable.castType»
 	'''
 
-	def getCastOp(InstCast cast)
+	def private getCastOp(InstCast cast)
 		'''«IF cast.source.variable.type.list»bitcast«ELSEIF ! cast.extended»trunc«ELSEIF cast.signed»sext«ELSE»zext«ENDIF»'''
 
-	def getCastType(Var variable)
+	def private getCastType(Var variable)
 		'''«variable.type.doSwitch»«IF variable.type.list»*«ENDIF»'''
 	
 	override caseInstAssign(InstAssign assign) 
