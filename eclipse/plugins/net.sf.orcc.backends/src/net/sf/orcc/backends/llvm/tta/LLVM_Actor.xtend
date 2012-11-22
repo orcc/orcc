@@ -110,12 +110,12 @@ class LLVM_Actor extends InstancePrinter {
 			«FOR port : action.inputPattern.ports.notNative»
 				«val connection = instance.incomingPortMap.get(port)»
 				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port))»
-				call void @read_end_«port.name»_«connection.id»()
+				call void @read_end_«port.name»_«connection.getSafeId(port)»()
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
 				«FOR connection : instance.outgoingPortMap.get(port)»
 					«port.updateVar(connection, action.outputPattern.getNumTokens(port))»
-					call void @write_end_«port.name»_«connection.id»()
+					call void @write_end_«port.name»_«connection.getSafeId(port)»()
 				«ENDFOR»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.filter[native]»

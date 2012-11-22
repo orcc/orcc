@@ -224,17 +224,13 @@ class LLVMTemplate extends CommonPrinter {
 	 * Helpers
 	 *
 	 *****************************************/
-		
-	def protected getId(Connection connection, Port port) {
-		if(connection != null) connection.id
+	
+	def protected getSafeId(Connection connection, Port port) {
+		if(connection != null) connection.getAttribute("id").objectValue
 		else port.name
 	}
-	
-	def protected getId(Connection connection) {
-		connection.getAttribute("id").objectValue
-	}
 
-	def protected getSize(Connection connection) {
+	def protected getSafeSize(Connection connection) {
 		if(connection != null) connection.size.toString
 		else "512"
 	}
