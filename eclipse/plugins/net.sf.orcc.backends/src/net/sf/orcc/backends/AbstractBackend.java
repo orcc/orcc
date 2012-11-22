@@ -60,11 +60,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -486,54 +481,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	abstract protected void doXdfCodeGeneration(Network network);
 
 	/**
-	 * Executes the given list of tasks using a thread pool with one thread per
-	 * processor available.
-	 * 
-	 * @param tasks
-	 *            a list of tasks
-	 */
-	private int executeTasks(List<Callable<Boolean>> tasks) {
-		// creates the pool
-		int nThreads = Runtime.getRuntime().availableProcessors();
-		ExecutorService pool = Executors.newFixedThreadPool(nThreads);
-		try {
-			// invokes all tasks and wait for them to complete
-			List<Future<Boolean>> completeTasks = pool.invokeAll(tasks);
-
-			// counts number of cached actors and checks exceptions
-			int numCached = 0;
-			for (Future<Boolean> completeTask : completeTasks) {
-				try {
-					if (completeTask.get()) {
-						numCached++;
-					}
-				} catch (ExecutionException e) {
-					Throwable cause = e.getCause();
-					if (cause instanceof OrccRuntimeException) {
-						throw (OrccRuntimeException) e.getCause();
-					} else {
-						String msg = "";
-						if (e.getCause().getMessage() != null) {
-							msg = "(" + e.getCause().getMessage() + ")";
-						}
-						throw new OrccRuntimeException(
-								"One actor could not be printed " + msg,
-								e.getCause());
-					}
-				}
-			}
-
-			// shutdowns the pool
-			// no need to wait because tasks are completed after invokeAll
-			pool.shutdown();
-
-			return numCached;
-		} catch (InterruptedException e) {
-			throw new OrccRuntimeException("Actors could not be printed", e);
-		}
-	}
-
-	/**
 	 * Export runtime library used by source produced. Should be overridden by
 	 * back-ends that produce code source which need third party libraries at
 	 * runtime.
@@ -701,24 +648,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		OrccLogger.traceln("Printing actors...");
 		long t0 = System.currentTimeMillis();
 
-		// creates a list of tasks: each task will print an actor when called
-		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
+		int numCached = 0;
 		for (final Actor actor : actors) {
-			tasks.add(new Callable<Boolean>() {
-
-				@Override
-				public Boolean call() {
-					if (isCanceled()) {
-						return false;
-					}
-					return printActor(actor);
-				}
-
-			});
+			if (printActor(actor)) {
+				++numCached;
+			}
 		}
-
-		// executes the tasks
-		int numCached = executeTasks(tasks);
 
 		long t1 = System.currentTimeMillis();
 		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
@@ -745,24 +680,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		OrccLogger.traceln("Printing entities...");
 		long t0 = System.currentTimeMillis();
 
-		// creates a list of tasks: each task will print an actor when called
-		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
+		int numCached = 0;
 		for (final Vertex vertex : network.getChildren()) {
-			tasks.add(new Callable<Boolean>() {
 
-				@Override
-				public Boolean call() {
-					if (isCanceled()) {
-						return false;
-					}
-					return printEntity(vertex);
-				}
-
-			});
+			if (printEntity(vertex)) {
+				++numCached;
+			}
 		}
-
-		// executes the tasks
-		int numCached = executeTasks(tasks);
 
 		long t1 = System.currentTimeMillis();
 		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
@@ -814,24 +738,18 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		OrccLogger.traceln("Printing instances...");
 		long t0 = System.currentTimeMillis();
 
+		int numCached = 0;
+
 		// creates a list of tasks: each task will print an instance when called
-		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
 		for (Vertex vertex : network.getChildren()) {
 			final Instance instance = vertex.getAdapter(Instance.class);
+
 			if (instance != null) {
-				tasks.add(new Callable<Boolean>() {
-
-					@Override
-					public Boolean call() {
-						return printInstance(instance);
-					}
-
-				});
+				if (printInstance(instance)) {
+					++numCached;
+				}
 			}
 		}
-
-		// executes the tasks
-		int numCached = executeTasks(tasks);
 
 		long t1 = System.currentTimeMillis();
 		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
