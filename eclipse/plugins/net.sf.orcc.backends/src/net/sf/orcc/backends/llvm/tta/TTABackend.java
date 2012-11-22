@@ -57,7 +57,6 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
@@ -141,7 +140,6 @@ public class TTABackend extends LLVMBackend {
 		new ComplexHwOpDetector().doSwitch(network);
 		new Instantiator(false, fifoSize).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
-		new BroadcastAdder().doSwitch(network);
 		if (classify) {
 			new Classifier().doSwitch(network);
 		}
