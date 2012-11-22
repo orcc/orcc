@@ -32,9 +32,7 @@ import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.backends.llvm.aot.LLVMBackend;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
@@ -53,17 +51,13 @@ import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.graph.Edge;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.util.Dota;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
@@ -95,26 +89,6 @@ public class TTABackend extends LLVMBackend {
 	private FPGA fpga;
 	private String libPath;
 	private boolean reduceConnections;
-
-	private Map<Port, Integer> computePortToIdMap(Vertex vertex) {
-		Map<Port, Integer> map = new HashMap<Port, Integer>();
-		Processor processor = design.getActorToProcessorMap().get(vertex);
-		for (Edge edge : vertex.getIncoming()) {
-			Connection connection = (Connection) edge;
-			Port port = connection.getTargetPort();
-			if (!port.isNative()) {
-				map.put(port, processor.getAddrSpaceId(connection));
-			}
-		}
-		for (Edge edge : vertex.getOutgoing()) {
-			Connection connection = (Connection) edge;
-			Port port = connection.getSourcePort();
-			if (!port.isNative()) {
-				map.put(port, processor.getAddrSpaceId(connection));
-			}
-		}
-		return map;
-	}
 
 	@Override
 	public void doInitializeOptions() {
@@ -258,8 +232,8 @@ public class TTABackend extends LLVMBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		new LLVM_Actor(instance, options, computePortToIdMap(instance))
-				.print(actorsPath);
+		new LLVM_Actor(instance, options, design.getActorToProcessorMap().get(
+				instance)).print(actorsPath);
 		return false;
 	}
 

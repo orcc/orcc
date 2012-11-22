@@ -592,7 +592,7 @@ class InstancePrinter extends LLVMTemplate {
 	def private printInput(Connection connection, Port port) '''
 		«val id = connection.getSafeId(port)»
 		«val name = port.name + "_" + id»
-		«val addrSpace = port.addrSpace»
+		«val addrSpace = connection.addrSpace»
 		«val prop = port.properties»
 		«connection.printExternalFifo(port)»
 	
@@ -628,7 +628,7 @@ class InstancePrinter extends LLVMTemplate {
 	def private printOutput(Connection connection, Port port) '''
 		«val id = connection.getSafeId(port)»
 		«val name = port.name + "_" + id»
-		«val addrSpace = port.addrSpace»
+		«val addrSpace = connection.addrSpace»
 		«val prop = port.properties»
 		«connection.printExternalFifo(port)»
 	
@@ -669,7 +669,7 @@ class InstancePrinter extends LLVMTemplate {
 	 * Returns an annotation describing the address space. 
 	 * This annotation is required by the TTA backend.
 	 */
-	def protected getAddrSpace(Port port) ''''''
+	def protected getAddrSpace(Connection connection) ''''''
 	
 	/**
 	 * Returns an annotation describing the properties of the access. 
@@ -681,7 +681,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val name = "fifo_" + conn.getSafeId(port)»
 		«val type = port.type.doSwitch»
 		«IF conn != null»
-			«val addrSpace = port.addrSpace»
+			«val addrSpace = conn.addrSpace»
 			@«name»_content = external«addrSpace» global [«conn.safeSize» x «type»]
 			@«name»_rdIndex = external«addrSpace» global i32
 			@«name»_wrIndex = external«addrSpace» global i32
@@ -786,7 +786,7 @@ class InstancePrinter extends LLVMTemplate {
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«FOR connection : instance.outgoingPortMap.get(port)»
 						«printPortAccess(connection, port, variable, store.indexes, store)»
-						store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«port.addrSpace»* «varName(variable, store)»_«connection.getSafeId(port)»
+						store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«connection.addrSpace»* «varName(variable, store)»_«connection.getSafeId(port)»
 					«ENDFOR»
 				«ELSE»
 					«varName(variable, store)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«store.indexes.join(", ", ", ", "", [printIndex])»
@@ -809,17 +809,17 @@ class InstancePrinter extends LLVMTemplate {
 					«val port = action.inputPattern.varToPortMap.get(variable)»
 					«val connection = instance.incomingPortMap.get(port)»
 					«printPortAccess(connection, port, variable, load.indexes, load)»
-					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
+					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSEIF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«val connection = instance.outgoingPortMap.get(port).head»
 					«printPortAccess(connection, port, variable, load.indexes, load)»
-					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
+					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSEIF action != null && action.peekPattern.contains(variable)»
 					«val port = action.peekPattern.varToPortMap.get(variable)»
 					«val connection = instance.incomingPortMap.get(port)»
 					«printPortAccess(connection, port, variable, load.indexes, load)»
-					«target» = load«port.properties» «innerType.doSwitch»«port.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
+					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSE»
 					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "", [printIndex])»
 					«target» = load «innerType.doSwitch»* «varName(variable, load)»
@@ -885,7 +885,7 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDIF»
 			%tmp_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«indexes.head.doSwitch»«ENDIF»
 			%final_index_«extName» = urem i32 %tmp_index_«extName», %local_size_«fifoName»
-			«varName(variable, instr)»_«connection.getSafeId(port)» = getelementptr [«connection.safeSize» x «port.type.doSwitch»]«port.addrSpace»* @fifo_«connection.getSafeId(port)»_content, i32 0, i32 %final_index_«extName»
+			«varName(variable, instr)»_«connection.getSafeId(port)» = getelementptr [«connection.safeSize» x «port.type.doSwitch»]«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_content, i32 0, i32 %final_index_«extName»
 		'''
 	}
 	

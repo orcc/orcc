@@ -40,18 +40,20 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import org.eclipse.emf.common.util.EList
 import net.sf.orcc.ir.ArgByVal
+import net.sf.orcc.df.Connection
+import net.sf.orcc.backends.llvm.tta.architecture.Processor
 
 class LLVM_Actor extends InstancePrinter {
 	
-	Map<Port, Integer> portToIdMap;
+	Processor processor;
 	
-	new(Instance instance, Map<String, Object> options, Map<Port, Integer> portToIdMap) {
+	new(Instance instance, Map<String, Object> options, Processor processor) {
 		super(instance, options)
-		this.portToIdMap = portToIdMap
+		this.processor = processor
 	}
 	
-	override getAddrSpace(Port port) {
-		val id = portToIdMap.get(port);
+	override getAddrSpace(Connection connection) {
+		val id = processor.getAddrSpaceId(connection)
 		if(id != null) {
 			''' addrspace(«id»)'''
 		}
