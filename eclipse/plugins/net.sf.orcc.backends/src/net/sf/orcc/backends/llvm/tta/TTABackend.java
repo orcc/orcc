@@ -163,10 +163,7 @@ public class TTABackend extends LLVMBackend {
 		printInstances(network);
 
 		// print the design
-		for (Processor processor : design.getProcessors()) {
-			generateProcessor(processor);
-		}
-		generateDesign(design);
+		printDesign(design);
 
 		if (finalize) {
 			runPythonScript();
@@ -191,7 +188,21 @@ public class TTABackend extends LLVMBackend {
 		return false;
 	}
 
-	private void generateDesign(Design design) {
+	/**
+	 * Prints a set of files used to generate the given design.
+	 * 
+	 * @param design
+	 *            a design
+	 */
+	private void printDesign(Design design) {
+		OrccLogger.traceln("Printing design...");
+		long t0 = System.currentTimeMillis();
+
+		// Generate each processor
+		for (Processor processor : design.getProcessors()) {
+			printProcessor(processor);
+		}
+
 		// VHDL Network of TTA processors
 		new VHDL_Design(fpga).print(design, path);
 
@@ -213,9 +224,19 @@ public class TTABackend extends LLVMBackend {
 		new TCE_Design_PNDF(path).print(design, path);
 
 		new Dota().print(design, path, "top.dot");
+
+		long t1 = System.currentTimeMillis();
+		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+				+ "s");
 	}
 
-	private void generateProcessor(Processor tta) {
+	/**
+	 * Prints a set of files used to generate the given processor.
+	 * 
+	 * @param tta
+	 *            a processor
+	 */
+	private void printProcessor(Processor tta) {
 		String processorPath = OrccUtil.createFolder(path, tta.getName());
 
 		// Print VHDL description
@@ -237,6 +258,10 @@ public class TTABackend extends LLVMBackend {
 		return false;
 	}
 
+	/**
+	 * Runs the python script to compile the application and generate the whole
+	 * design using the TCE toolset. (FIXME: Rewrite this awful method)
+	 */
 	private void runPythonScript() {
 		List<String> cmdList = new ArrayList<String>();
 		cmdList.add(libPath + File.separator + "generate");
