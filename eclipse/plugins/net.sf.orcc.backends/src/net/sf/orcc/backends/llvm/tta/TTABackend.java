@@ -91,7 +91,7 @@ public class TTABackend extends LLVMBackend {
 	private boolean reduceConnections;
 
 	@Override
-	public void doInitializeOptions() {
+	protected void doInitializeOptions() {
 		finalize = getAttribute("net.sf.orcc.backends.tta.finalizeGeneration",
 				false);
 		fpga = FPGA.builder(getAttribute("net.sf.orcc.backends.tta.fpga",

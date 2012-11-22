@@ -113,7 +113,7 @@ public class CBackend extends AbstractBackend {
 	protected Map<String, List<Instance>> targetToInstancesMap;
 
 	@Override
-	public void doInitializeOptions() {
+	protected void doInitializeOptions() {
 
 		if (!getAttribute(GENETIC_ALGORITHM, false)
 				&& targetToInstancesMap != null) {

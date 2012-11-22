@@ -105,7 +105,7 @@ public class LLVMBackend extends AbstractBackend {
 	}
 
 	@Override
-	public void doInitializeOptions() {
+	protected void doInitializeOptions() {
 		// Set build and src directory
 		File srcDir = new File(path + File.separator + "src");
 		File buildDir = new File(path + File.separator + "build");
