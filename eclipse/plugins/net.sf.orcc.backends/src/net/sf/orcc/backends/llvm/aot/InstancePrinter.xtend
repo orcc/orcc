@@ -494,7 +494,7 @@ class InstancePrinter extends LLVMTemplate {
 		define internal i1 @«action.scheduler.name»() nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
-				«local.variableDeclaration»
+				«local.declare»
 			«ENDFOR»
 			«FOR port : peekPattern.ports.notNative»
 				«port.loadVar(instance.incomingPortMap.get(port))»
@@ -509,7 +509,7 @@ class InstancePrinter extends LLVMTemplate {
 		define internal void @«action.body.name»() nounwind {
 		entry:
 			«FOR local : action.body.locals»
-				«local.variableDeclaration»
+				«local.declare»
 			«ENDFOR»
 			«FOR port : inputPattern.ports.notNative»
 				«port.loadVar(instance.incomingPortMap.get(port))»
@@ -554,7 +554,7 @@ class InstancePrinter extends LLVMTemplate {
 			define internal «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind {
 			entry:
 			«FOR local : procedure.locals»
-			«local.variableDeclaration»
+				«local.declare»
 			«ENDFOR»
 				br label %b«procedure.blocks.head.label»
 			
@@ -567,7 +567,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def label(Block block) '''b«block.cfgNode.number»'''
 	
-	def variableDeclaration(Var variable) {
+	def declare(Var variable) {
 		if(variable.type.list && ! castedList.contains(variable))
 			'''%«variable.indexedName» = alloca «variable.type.doSwitch»'''
 	}

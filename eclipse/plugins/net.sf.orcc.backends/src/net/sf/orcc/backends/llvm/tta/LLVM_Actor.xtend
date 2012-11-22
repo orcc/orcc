@@ -74,7 +74,7 @@ class LLVM_Actor extends InstancePrinter {
 		define internal i1 @«action.scheduler.name»() nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
-				«local.variableDeclaration»
+				«local.declare»
 			«ENDFOR»
 			«FOR port : action.peekPattern.ports.notNative»
 				«port.loadVar(instance.incomingPortMap.get(port))»
@@ -89,10 +89,10 @@ class LLVM_Actor extends InstancePrinter {
 		define internal void @«action.body.name»() nounwind {
 		entry:
 			«FOR local : action.body.locals»
-				«local.variableDeclaration»
+				«local.declare»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
-				«action.outputPattern.getVariable(port).variableDeclaration»
+				«action.outputPattern.getVariable(port).declare»
 			«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative + action.outputPattern.ports.notNative»
 				«port.loadVar(instance.incomingPortMap.get(port))»

@@ -446,7 +446,7 @@ class ActorPrinter extends InstancePrinter {
 		define «action.scheduler.returnType.doSwitch» @«action.scheduler.name»(«action.scheduler.parameters.join(", ", [argumentDeclaration])») nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
-				«local.variableDeclaration»
+				«local.declare»
 			«ENDFOR»
 			«FOR port : action.peekPattern.ports.filter[ ! native]»
 				«port.fifoVar(action.inputPattern.portToVarMap.get(port))»
@@ -461,7 +461,7 @@ class ActorPrinter extends InstancePrinter {
 		define void @«action.body.name»(«action.body.parameters.join(", ", [argumentDeclaration])») nounwind {
 		entry:
 			«FOR local : action.body.locals»
-				«local.variableDeclaration»
+				«local.declare»
 			«ENDFOR»
 			«FOR port : action.inputPattern.ports.filter[ ! native]»
 				«port.fifoVar(action.inputPattern.portToVarMap.get(port))»
