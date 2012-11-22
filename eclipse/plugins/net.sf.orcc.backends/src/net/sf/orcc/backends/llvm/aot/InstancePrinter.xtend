@@ -231,7 +231,7 @@ class InstancePrinter extends LLVMTemplate {
 			define void @«instance.name»_outside_FSM_scheduler() nounwind {
 			entry:
 				br label %bb_outside_scheduler_start
-				
+
 			bb_outside_scheduler_start:
 				;; no read/write here!
 			«printActionLoop(instance.actor.actionsOutsideFsm, true)»
@@ -298,12 +298,12 @@ class InstancePrinter extends LLVMTemplate {
 					«checkInputPattern(action, inputPattern, state)»
 					%is_schedulable_«extName» = call i1 @«action.scheduler.name» ()
 					%is_fireable_«extName» = and i1 %is_schedulable_«extName», %has_valid_inputs_«extName»_«inputPattern.ports.size»
-					
+
 					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ELSE»
 					;; Empty input pattern
 					%is_fireable_«extName» = call i1 @«action.scheduler.name» ()
-					
+
 					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ENDIF»
 			
@@ -313,11 +313,11 @@ class InstancePrinter extends LLVMTemplate {
 					«val lastPort = outputPattern.ports.last»
 					;; Output pattern
 					«checkOutputPattern(action, outputPattern, state)»
-					
+
 					br i1 %has_valid_outputs_«lastPort.name»_«instance.outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«extName», label %bb_«extName»_fire, label %bb_«state.name»_finished
 				«ELSE»
 					;; Empty output pattern
-					
+
 					br label %bb_«extName»_fire
 				«ENDIF»
 			
@@ -341,7 +341,7 @@ class InstancePrinter extends LLVMTemplate {
 		entry:
 			«printCallStartTokenFunctions»
 			br label %bb_scheduler_start
-			
+
 		bb_scheduler_start:
 		«printActionLoop(instance.actor.actionsOutsideFsm, false)»
 		
@@ -360,18 +360,18 @@ class InstancePrinter extends LLVMTemplate {
 			«val name = action.name»
 			«val inputPattern = action.inputPattern»
 			«val outputPattern = action.outputPattern»
-				; ACTION «name»				
+				; ACTION «name»
 				«IF !inputPattern.ports.notNative.empty»
 					;; Input pattern
 					«checkInputPattern(action, inputPattern)»
 					%is_schedulable_«name» = call i1 @«action.scheduler.name» ()
 					%is_fireable_«name» = and i1 %is_schedulable_«name», %has_valid_inputs_«name»_«inputPattern.ports.size»
-					
+
 					br i1 %is_fireable_«name», label %bb_«name»_check_outputs, label %bb_«name»_unschedulable
 				«ELSE»
 					;; Empty input pattern
 					%is_fireable_«name» = call i1 @«action.scheduler.name» ()
-					
+
 					br i1 %is_fireable_«name», label %bb_«name»_check_outputs, label %bb_«name»_unschedulable
 				«ENDIF»
 			
@@ -380,7 +380,7 @@ class InstancePrinter extends LLVMTemplate {
 					«val lastPort = outputPattern.ports.last»
 					;; Output pattern
 					«checkOutputPattern(action, outputPattern)»
-					
+		
 					br i1 %has_valid_outputs_«lastPort.name»_«instance.outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«name», label %bb_«name»_fire, label %bb_finished
 				«ELSE»
 					;; Empty output pattern
@@ -599,11 +599,11 @@ class InstancePrinter extends LLVMTemplate {
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
 		@index_«name» = internal global i32 0
 		@numTokens_«name» = internal global i32 0
-		
+
 		define internal void @read_«name»() {
 		entry:
 			br label %read
-		
+
 		read:
 			%rdIndex = load«prop» i32«addrSpace»* @fifo_«id»_rdIndex
 			store i32 %rdIndex, i32* @index_«name»
@@ -617,7 +617,7 @@ class InstancePrinter extends LLVMTemplate {
 		define internal void @read_end_«name»() {
 		entry:
 			br label %read_end
-		
+
 		read_end:
 			%rdIndex = load i32* @index_«name»
 			store«prop» i32 %rdIndex, i32«addrSpace»* @fifo_«id»_rdIndex
@@ -636,11 +636,11 @@ class InstancePrinter extends LLVMTemplate {
 		@index_«name» = internal global i32 0
 		@rdIndex_«name» = internal global i32 0
 		@numFree_«name» = internal global i32 0
-		
+
 		define internal void @write_«name»() {
 		entry:
 			br label %write
-		
+
 		write:
 			%wrIndex = load«prop» i32«addrSpace»* @fifo_«id»_wrIndex
 			store i32 %wrIndex, i32* @index_«name»
@@ -653,7 +653,7 @@ class InstancePrinter extends LLVMTemplate {
 			store i32 %numFree, i32* @numFree_«name»
 			ret void
 		}
-		
+
 		define internal void @write_end_«name»() {
 		entry:
 			br label %write_end
