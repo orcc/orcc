@@ -79,7 +79,7 @@ class CMakePrinter extends CommonPrinter {
 	/**
 	 * Return CMakeList's content to write in the root target folder
 	 */
-	def rootCMakeContent() '''
+	def private rootCMakeContent() '''
 		# Generated from «network.simpleName»
 		
 		cmake_minimum_required (VERSION 2.6)
@@ -113,7 +113,7 @@ class CMakePrinter extends CommonPrinter {
 	/**
 	 * Return CMakeList's content to write in the src subdirectory
 	 */
-	def srcCMakeContent() '''
+	def private srcCMakeContent() '''
 		# Generated from «network.simpleName»
 		
 		cmake_minimum_required (VERSION 2.6)

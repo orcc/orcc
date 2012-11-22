@@ -64,7 +64,7 @@ class NetworkPrinter extends LLVMTemplate {
 		}
 	}
 	
-	def getNetworkFileContent() '''
+	def private getNetworkFileContent() '''
 		target triple = "x86_64"
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

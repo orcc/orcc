@@ -129,7 +129,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	}
 	
-	def getInstanceFileContent() '''
+	def private getInstanceFileContent() '''
 		«val inputs = instance.actor.inputs.notNative»
 		«val outputs = instance.actor.outputs.notNative»
 		«printArchitecture»
@@ -220,11 +220,11 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def printArchitecture() '''target triple = "x86_64"'''
 	
-	def stateVar(Var variable)
+	def protected stateVar(Var variable)
 		'''@«variable.name» = internal «variable.stateVarNature» «variable.type.doSwitch» «variable.initialize»'''
 
 	
-	def schedulerWithFSM() '''
+	def private schedulerWithFSM() '''
 		@_FSM_state = internal global i32 «stateToLabel.get(instance.actor.fsm.initialState)»
 		
 		«IF ! instance.actor.actionsOutsideFsm.empty»
@@ -269,18 +269,18 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	'''
 	
-	def printFsmSwitch(FSM fsm) '''
+	def private printFsmSwitch(FSM fsm) '''
 		%local_FSM_state = load i32* @_FSM_state
 		switch i32 %local_FSM_state, label %default [
 			«fsm.states.map[printFsmState].join»
 		]
 	'''
 	
-	def printFsmState(State state) '''
+	def private printFsmState(State state) '''
 		i32 «stateToLabel.get(state)», label %bb_s_«state.name»
 	'''
 
-	def printTransition(State state) '''
+	def private printTransition(State state) '''
 		; STATE «state.name»
 		bb_s_«state.name»:
 			«IF ! instance.actor.actionsOutsideFsm.empty»
@@ -336,7 +336,7 @@ class InstancePrinter extends LLVMTemplate {
 		
 		'''
 
-	def schedulerWithoutFSM() '''
+	def private schedulerWithoutFSM() '''
 		define void @«instance.name»_scheduler() « IF optionProfile»noinline «ENDIF»nounwind {
 		entry:
 			«printCallStartTokenFunctions»
@@ -355,7 +355,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	'''
 	
-	def printActionLoop(EList<Action> actions, boolean outsideFSM) '''
+	def private printActionLoop(EList<Action> actions, boolean outsideFSM) '''
 		«FOR action : actions»
 			«val name = action.name»
 			«val inputPattern = action.inputPattern»
@@ -406,11 +406,11 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDIF»
 	'''
 	
-	def checkInputPattern(Action action, Pattern pattern) {
+	def private checkInputPattern(Action action, Pattern pattern) {
 		checkInputPattern(action, pattern, null)
 	}
 	
-	def checkInputPattern(Action action, Pattern pattern, State state) {
+	def private checkInputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if( state != null) '''«state.name»_''' else ""
 		val portToIndexMap = portToIndexByPatternMap.get(pattern)
 		val firstPort = pattern.ports.notNative.head
@@ -433,11 +433,11 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 	}
 
-	def checkOutputPattern(Action action, Pattern pattern) {
+	def private checkOutputPattern(Action action, Pattern pattern) {
 		checkOutputPattern(action, pattern, null)
 	}
 	
-	def checkOutputPattern(Action action, Pattern pattern, State state) {
+	def private checkOutputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if( state != null) '''«state.name»_''' else ""
 		val connections = pattern.ports.notNative.map[instance.outgoingPortMap.get(it)].flatten.toList
 		'''
@@ -463,7 +463,7 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 	}
 
-	def printCallStartTokenFunctions() '''
+	def private printCallStartTokenFunctions() '''
 		«FOR port : instance.actor.inputs»
 			«val connection = instance.incomingPortMap.get(port)»
 			call void @read_«port.name»_«connection.id»()
@@ -475,7 +475,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 	'''
 
-	def printCallEndTokenFunctions() '''
+	def private printCallEndTokenFunctions() '''
 		«FOR port : instance.actor.inputs»
 			«val connection = instance.incomingPortMap.get(port)»
 			call void @read_end_«port.name»_«connection.id»()
@@ -487,7 +487,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 	'''
 	
-	def print(Action action) '''
+	def protected print(Action action) '''
 		«val inputPattern = action.inputPattern»
 		«val outputPattern = action.outputPattern»
 		«val peekPattern = action.peekPattern»
@@ -536,17 +536,17 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	'''
 	
-	def loadVar(Port port, Connection connection) '''
+	def protected loadVar(Port port, Connection connection) '''
 		%local_index_«port.name»_«connection?.id» = load i32* @index_«port.name»_«connection?.id»
 		%local_size_«port.name»_«connection?.id» = load i32* @SIZE_«port.name»_«connection?.id»
 	'''
 	
-	def updateVar(Port port, Connection connection, Integer numTokens) '''
+	def protected updateVar(Port port, Connection connection, Integer numTokens) '''
 		%new_index_«port.name»_«connection?.id» = add i32 %local_index_«port.name»_«connection?.id», «numTokens»
 		store i32 %new_index_«port.name»_«connection?.id», i32* @index_«port.name»_«connection?.id»
 	'''	
 	
-	def print(Procedure procedure) '''
+	def protected print(Procedure procedure) '''
 		«val parameters = procedure.parameters.join(", ", [argumentDeclaration] )»
 		«IF procedure.native»
 			declare «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind
@@ -565,31 +565,31 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDIF»
 	'''
 	
-	def label(Block block) '''b«block.cfgNode.number»'''
+	def protected label(Block block) '''b«block.cfgNode.number»'''
 	
-	def declare(Var variable) {
+	def protected declare(Var variable) {
 		if(variable.type.list && ! castedList.contains(variable))
 			'''%«variable.indexedName» = alloca «variable.type.doSwitch»'''
 	}
 	
-	def argumentDeclaration(Param param) {
+	def protected argumentDeclaration(Param param) {
 		val variable = param.variable
 		if (variable.type.string) '''i8* %«variable.name»'''
 		else if (variable.type.list) '''«variable.type.doSwitch»* %«variable.name»'''
 		else '''«variable.type.doSwitch» %«variable.name»'''
 	}
 	
-	def initialize(Var variable) {
+	def protected initialize(Var variable) {
 		if(variable.initialValue != null) variable.initialValue.doSwitch
 		else "zeroinitializer, align 32"
 	}
 
-	def getStateVarNature(Var variable) {
+	def private getStateVarNature(Var variable) {
 		if(variable.assignable) "global"
 		else "constant"
 	}
 	
-	def printInput(Connection connection, Port port) '''
+	def private printInput(Connection connection, Port port) '''
 		«val id = connection.id»
 		«val name = port.name + "_" + id»
 		«val addrSpace = port.addrSpace»
@@ -625,7 +625,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	'''
 		
-	def printOutput(Connection connection, Port port) '''
+	def private printOutput(Connection connection, Port port) '''
 		«val id = connection.id»
 		«val name = port.name + "_" + id»
 		«val addrSpace = port.addrSpace»
@@ -669,15 +669,15 @@ class InstancePrinter extends LLVMTemplate {
 	 * Returns an annotation describing the address space. 
 	 * This annotation is required by the TTA backend.
 	 */
-	def getAddrSpace(Port port) ''''''
+	def protected getAddrSpace(Port port) ''''''
 	
 	/**
 	 * Returns an annotation describing the properties of the access. 
 	 * This annotation is required by the TTA backend.
 	 */
-	def getProperties(Port port) ''''''
+	def protected getProperties(Port port) ''''''
 	
-	def printExternalFifo(Connection conn, Port port) '''
+	def private printExternalFifo(Connection conn, Port port) '''
 		«val name = "fifo_" + conn.getId(port)»
 		«val type = port.type.doSwitch»
 		«IF conn != null»
@@ -692,7 +692,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDIF»
 	'''
 	
-	def getNextLabel(Block block) {
+	def private getNextLabel(Block block) {
 		if (block.blockWhile) (block as BlockWhile).joinBlock.label
 		else block.label
 	}
@@ -760,10 +760,10 @@ class InstancePrinter extends LLVMTemplate {
 	override caseInstPhi(InstPhi phi)
 		'''«phi.target.variable.print» = phi «phi.target.variable.type.doSwitch» «phi.phiPairs»'''
 		
-	def getPhiPairs(InstPhi phi) 
+	def private getPhiPairs(InstPhi phi) 
 		'''«printPhiExpr(phi.values.head, (phi.block.cfgNode.predecessors.head as CfgNode).node)», «printPhiExpr(phi.values.tail.head, (phi.block.cfgNode.predecessors.tail.head as CfgNode).node)»'''
 	
-	def printPhiExpr(Expression expr, Block block)
+	def private printPhiExpr(Expression expr, Block block)
 		'''[«expr.doSwitch», %b«block.label»]'''
 		
 	override caseInstReturn(InstReturn retInst) {
@@ -830,7 +830,7 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 	}
 		
-	def printIndex (Expression index) {
+	def protected printIndex (Expression index) {
 		var type = ''''''
 		if (index.type != null)
 			type = index.type.doSwitch
@@ -847,7 +847,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDIF»
 	'''
 	
-	def format(EList<Arg> args, EList<Param> params) {
+	def protected format(EList<Arg> args, EList<Param> params) {
 		val paramList = new ArrayList<CharSequence>
 		if(params.size != 0) {
 			for (i : 0..params.size-1) {
@@ -857,7 +857,7 @@ class InstancePrinter extends LLVMTemplate {
 		return paramList
 	}
 
-	def printParameter(Arg arg, Type type) {
+	def protected printParameter(Arg arg, Type type) {
 		if (arg.byRef)
 			'''TODO'''
 		else if (type.string)
@@ -867,12 +867,12 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	
-	def varName(Var variable, Instruction instr) {
+	def protected varName(Var variable, Instruction instr) {
 		val procedure = EcoreHelper::getContainerOfType(instr, typeof(Procedure))
 		'''%«variable.name»_elt_«(procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>).get(instr)»'''
 	}
 
-	def printPortAccess(Connection connection, Port port, Var variable, EList<Expression> indexes, Instruction instr) {
+	def private printPortAccess(Connection connection, Port port, Var variable, EList<Expression> indexes, Instruction instr) {
 		val procedure = EcoreHelper::getContainerOfType(instr, typeof(Procedure))
 		val accessMap = procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>
 		val accessId = accessMap.get(instr)

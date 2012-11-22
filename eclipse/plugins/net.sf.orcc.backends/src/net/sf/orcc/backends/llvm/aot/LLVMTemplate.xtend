@@ -225,28 +225,28 @@ class LLVMTemplate extends CommonPrinter {
 	 *
 	 *****************************************/
 		
-	def getId(Connection connection, Port port) {
+	def protected getId(Connection connection, Port port) {
 		if(connection != null) connection.id
 		else port.name
 	}
 	
-	def getId(Connection connection) {
+	def protected getId(Connection connection) {
 		connection.getAttribute("id").objectValue
 	}
 
-	def getSize(Connection connection) {
+	def protected getSize(Connection connection) {
 		if(connection != null) connection.size.toString
 		else "512"
 	}
 	
-	def print(Var variable)
+	def protected print(Var variable)
 		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.indexedName»'''
 		
-	def getNotNative(List<Port> ports) {
+	def protected getNotNative(List<Port> ports) {
 		ports.filter[!native]
 	}
 	
-	def getActorInstances(List<Vertex> vertices) {
+	def protected getActorInstances(List<Vertex> vertices) {
 		vertices.filter(typeof(Instance)).filter[isActor]
 	}
 }
