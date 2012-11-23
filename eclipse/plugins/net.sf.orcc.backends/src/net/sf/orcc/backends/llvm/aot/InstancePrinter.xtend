@@ -553,7 +553,7 @@ class InstancePrinter extends LLVMTemplate {
 	def protected argumentDeclaration(Param param) {
 		val variable = param.variable
 		if (variable.type.string) '''i8* %«variable.name»'''
-		else if (variable.type.list) '''«variable.type.doSwitch»* %«variable.name»'''
+		else if (variable.type.list) '''«variable.type.doSwitch»* noalias %«variable.name»'''
 		else '''«variable.type.doSwitch» %«variable.name»'''
 	}
 	
