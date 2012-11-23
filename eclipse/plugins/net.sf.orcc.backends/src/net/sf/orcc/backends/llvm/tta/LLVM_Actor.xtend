@@ -88,7 +88,7 @@ class LLVM_Actor extends InstancePrinter {
 		«ENDFOR»
 		}
 		
-		define internal void @«action.body.name»() nounwind {
+		define internal void @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»

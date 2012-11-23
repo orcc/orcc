@@ -98,12 +98,11 @@ class InstancePrinter extends LLVMTemplate {
 	 * Default constructor, do not activate profile option
 	 */
 	new(Instance instance, Map<String, Object> options) {
-		if ( ! instance.isActor) {
-			OrccLogger::severeln("Instance " + instance.name + " is not an Actor's instance")
-		}
-		
 		this.instance = instance
 		
+		if (!instance.isActor) {
+			OrccLogger::severeln("Instance " + instance.name + " is not an Actor's instance")
+		}
 		if(options.containsKey("net.sf.orcc.backends.profile")){
 			optionProfile = options.get("net.sf.orcc.backends.profile") as Boolean
 		}
@@ -117,7 +116,6 @@ class InstancePrinter extends LLVMTemplate {
 	}
 		
 	def print(String targetFolder) {
-		
 		val content = instanceFileContent
 		val file = new File(targetFolder + File::separator + instance.name + ".ll")
 		
@@ -218,7 +216,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDIF»
 	'''
 	
-	def printArchitecture() '''target triple = "x86_64"'''
+	def protected printArchitecture() '''target triple = "x86_64"'''
 	
 	def private schedulerWithFSM() '''
 		@_FSM_state = internal global i32 «stateToLabel.get(instance.actor.fsm.initialState)»
@@ -402,7 +400,7 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 	
 	def private checkInputPattern(Action action, Pattern pattern, State state) {
-		val stateName = if( state != null) '''«state.name»_''' else ""
+		val stateName = if(state != null) '''«state.name»_''' else ""
 		val portToIndexMap = portToIndexByPatternMap.get(pattern)
 		val firstPort = pattern.ports.notNative.head
 		val firstName = firstPort.name + "_" + instance.incomingPortMap.get(firstPort).getSafeId(firstPort)
@@ -425,7 +423,7 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	def private checkOutputPattern(Action action, Pattern pattern, State state) {
-		val stateName = if( state != null) '''«state.name»_''' else ""
+		val stateName = if(state != null) '''«state.name»_''' else ""
 		val connections = pattern.ports.notNative.map[instance.outgoingPortMap.get(it)].flatten.toList
 		'''
 			«FOR connection : connections»
