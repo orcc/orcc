@@ -812,14 +812,8 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 	}
 		
-	def protected printIndex (Expression index) {
-		var type = ''''''
-		if (index.type != null)
-			type = index.type.doSwitch
-		else
-			type = "i32"
-		return '''«type» «index.doSwitch»'''
-	}
+	def protected printIndex(Expression index)
+		'''«index.type.doSwitch» «index.doSwitch»'''
 	
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
