@@ -32,7 +32,6 @@ package net.sf.orcc.backends.transform;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -323,15 +322,6 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			fsm.addTransition(initialState, action, initialState);
 		}
 
-		// ListIterator<Action> it = actor.getActionsOutsideFsm()
-		// .listIterator();
-		// while (it.hasNext()) {
-		// Action actionUntagged = it.next();
-		// if (!actionUntagged.getTag().isEmpty()){
-		// actor.getActionsOutsideFsm().remove(actionUntagged);
-		// }
-		// }
-
 		actor.getActionsOutsideFsm().clear();
 		actor.setFsm(fsm);
 	}
@@ -357,29 +347,6 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		modifyRepeatActionsInFSM();
 		modifyUntaggedActions(actor);
 		return null;
-	}
-
-	/**
-	 * This method adds instructions for an action to read from a specific
-	 * buffer at a specific index
-	 * 
-	 * @param body
-	 *            body of the action
-	 * @param position
-	 *            position of the buffer in inputBuffers list
-	 */
-	private void consumeToken(Procedure body, int position, Port port) {
-		BlockBasic bodyNode = body.getFirst();
-		Var index = body.newTempLocalVariable(factory.createTypeInt(32),
-				"index" + port.getName());
-		index.setIndex(1);
-		Var writeIndex = writeIndexes.get(position);
-		bodyNode.add(factory.createInstLoad(index, writeIndex));
-
-		Expression value = factory.createExprBinary(
-				factory.createExprVar(index), OpBinary.PLUS,
-				factory.createExprInt(1), factory.createTypeInt(32));
-		bodyNode.add(factory.createInstStore(writeIndex, value));
 	}
 
 	/**
@@ -786,46 +753,6 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		blkNode.add(index, factory.createInstAssign(result, expression));
 	}
 
-	/**
-	 * This method modifies the no-repeat-actions to read from buffers instead
-	 * of ports
-	 * 
-	 */
-	private void modifyNoRepeatActionsInFSM() {
-		for (Transition transition : fsm.getTransitions()) {
-			Action action = transition.getAction();
-			if (noRepeatActions.contains(action)) {
-				ListIterator<Port> it = action.getInputPattern().getPorts()
-						.listIterator();
-				while (it.hasNext()) {
-					Port port = it.next();
-					if (inputPorts.contains(port)) {
-						int position = portPosition(inputPorts, port);
-						Procedure body = action.getBody();
-						Var buffer = inputBuffers.get(position);
-						Var writeIndex = writeIndexes.get(position);
-						Var readIndex = readIndexes.get(position);
-						int bufferSize = bufferSizes.get(position);
-
-						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-								buffer, writeIndex, port, bufferSize);
-						modifyActionScheduler.doSwitch(action.getBody());
-						modifyActionScheduler.doSwitch(action.getScheduler());
-						modifyActionSchedulability(action, writeIndex,
-								readIndex, OpBinary.NE,
-								factory.createExprInt(0), port);
-						consumeToken(body, position, port);
-						// noRepeatActions.remove(action);
-
-						int index = it.previousIndex();
-						action.getInputPattern().remove(port);
-						it = action.getInputPattern().getPorts()
-								.listIterator(index);
-					}
-				}
-			}
-		}
-	}
 
 	/**
 	 * this method transforms tagged actions in the FSM
@@ -841,84 +768,29 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 					actor.getActionsOutsideFsm());
 
 			// check repeats on all actions
-			boolean transformOutFSM = false;
-			for (Action verifAction : actions) {
-				// if (!verifAction.getTag().isEmpty()) {
 
-				// check repeats on input ports
-				for (Entry<Port, Integer> verifEntry : verifAction
-						.getInputPattern().getNumTokensMap().entrySet()) {
-					int verifNumTokens = verifEntry.getValue();
-					if (verifNumTokens > 1) {
-						transformOutFSM = true;
-						break;
-					}
+			// ////////
+			State initState = DfFactory.eINSTANCE.createState("init");
+			// no FSM: simply visit all the actions
+			setFsm(initState);
+			for (Action action : actions) {
+				if (!action.getTag().isEmpty()) {
+					visitTransition(initState, initState, action);
 				}
-				// check repeats on output ports
-				for (Entry<Port, Integer> verifEntry : verifAction
-						.getOutputPattern().getNumTokensMap().entrySet()) {
-					int verifNumTokens = verifEntry.getValue();
-					if (verifNumTokens > 1) {
-						transformOutFSM = true;
-						break;
-					}
-				}
-				// }
-			}
-			if (transformOutFSM == true) {
-				// ////////
-				State initState = DfFactory.eINSTANCE.createState("init");
-				// no FSM: simply visit all the actions
-				setFsm(initState);
-				for (Action action : actions) {
-					if (!action.getTag().isEmpty()) {
-						visitTransition(initState, initState, action);
-					}
-				}
-				modifyNoRepeatActionsInFSM();
-				transformOutFSM = false;
 			}
 
 		} else {
-			List<Action> actions = new ArrayList<Action>(actor.getActions());
-			boolean transformFSM = false;
-			for (Action verifAction : actions) {
-				// check repeats on input ports
-				for (Entry<Port, Integer> verifEntry : verifAction
-						.getInputPattern().getNumTokensMap().entrySet()) {
-					int verifNumTokens = verifEntry.getValue();
-					if (verifNumTokens > 1) {
-						transformFSM = true;
-						break;
-					}
-				}
-				// check repeats on output ports
-				for (Entry<Port, Integer> verifEntry : verifAction
-						.getOutputPattern().getNumTokensMap().entrySet()) {
-					int verifNumTokens = verifEntry.getValue();
-					if (verifNumTokens > 1) {
-						transformFSM = true;
-						break;
-					}
-				}
+			// with an FSM: visits all transitions
+			for (Transition transition : fsm.getTransitions()) {
+				State source = transition.getSource();
+				State target = transition.getTarget();
+				Action action = transition.getAction();
+				visitTransition(source, target, action);
 			}
-			if (transformFSM == true) {
-				// with an FSM: visits all transitions
-
-				for (Transition transition : fsm.getTransitions()) {
-					State source = transition.getSource();
-					State target = transition.getTarget();
-					Action action = transition.getAction();
-					visitTransition(source, target, action);
+			if (!transitionsList.isEmpty()) {
+				for (Transition t : transitionsList) {
+					fsm.getTransitions().add(t);
 				}
-				if (!transitionsList.isEmpty()) {
-					for (Transition t : transitionsList) {
-						fsm.getTransitions().add(t);
-					}
-				}
-				// transitionsList.clear();
-				modifyNoRepeatActionsInFSM();
-				transformFSM = false;
 			}
 		}
 	}
@@ -1002,24 +874,19 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 *            name of the target state of the action in the actor fsm
 	 */
 	private void scanInputs(Action action, State sourceState, State targetState) {
-		for (Entry<Port, Integer> verifEntry : action.getInputPattern()
-				.getNumTokensMap().entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
-			if (verifNumTokens > 1) {
-				repeatInput = true;
-
-				Var untagBuffer = factory.createVar(0, entryType, "buffer",
-						true);
-				Var untagReadIndex = factory.createVar(0,
-						factory.createTypeInt(32), "UntagReadIndex", true,
-						factory.createExprInt(0));
-				Var untagWriteIndex = factory.createVar(0,
-						factory.createTypeInt(32), "UntagWriteIndex", true,
-						factory.createExprInt(0));
-				// if input repeat detected --> treat all input ports
 
 				for (Entry<Port, Integer> entry : action.getInputPattern()
 						.getNumTokensMap().entrySet()) {
+					
+					Var untagBuffer = factory.createVar(0, entryType, "buffer",
+							true);
+					Var untagReadIndex = factory.createVar(0,
+							factory.createTypeInt(32), "UntagReadIndex", true,
+							factory.createExprInt(0));
+					Var untagWriteIndex = factory.createVar(0,
+							factory.createTypeInt(32), "UntagWriteIndex", true,
+							factory.createExprInt(0));
+					
 					numTokens = entry.getValue();
 					inputIndex = inputIndex + 100;
 					port = entry.getKey();
@@ -1070,11 +937,6 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 				}
 
 				action.getInputPattern().clear();
-				break;
-
-			}
-		}
-		inputIndex = 0;
 	}
 
 	/**
@@ -1214,8 +1076,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 
 	/**
 	 * this method visits the outputs of an untagged action to check repeats not
-	 * !! not used because it deals with a very rare case of untaggedactions having
-	 * multi token on he inputs and outputs
+	 * !! not used because it deals with a very rare case of untaggedactions
+	 * having multi token on he inputs and outputs
 	 * 
 	 * @param action
 	 *            action containing the outputs to check
