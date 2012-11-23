@@ -935,7 +935,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				return IApplication.EXIT_OK;
 			} catch (OrccRuntimeException e) {
 
-				if (!e.getMessage().isEmpty()) {
+				if (e.getMessage() != null && !e.getMessage().isEmpty()) {
 					OrccLogger.severeln(e.getMessage());
 				}
 				OrccLogger.severeln(backend
@@ -944,7 +944,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			} catch (Exception e) {
 
-				if (!e.getMessage().isEmpty()) {
+				if (e.getMessage() != null && !e.getMessage().isEmpty()) {
 					OrccLogger.severeln(e.getMessage());
 				}
 				OrccLogger.severeln(backend
