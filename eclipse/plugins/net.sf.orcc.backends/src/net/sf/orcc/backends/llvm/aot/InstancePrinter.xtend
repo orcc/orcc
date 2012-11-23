@@ -197,18 +197,6 @@ class InstancePrinter extends LLVMTemplate {
 			
 		«ENDIF»
 		
-		«IF optionProfile»
-			@_waiting_count = global i32 zeroinitializer, align 32
-			
-			define void @«instance.name»_wait() nounwind noinline {
-			entry:
-				%tmp = load volatile i32* @_waiting_count
-				%tmp_2 = add i32 %tmp, 1
-				store volatile i32 %tmp_2, i32* @_waiting_count
-				ret void
-			}
-		«ENDIF»
-		
 		«IF instance.actor.hasFsm»
 			«schedulerWithFSM»
 		«ELSE»
@@ -236,7 +224,7 @@ class InstancePrinter extends LLVMTemplate {
 			}
 		«ENDIF»
 		
-		define void @«instance.name»_scheduler() «IF optionProfile»noinline «ENDIF»nounwind {
+		define void @«instance.name»_scheduler() nounwind {
 		entry:
 			br label %bb_scheduler_start
 		
@@ -254,7 +242,6 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 		
 		bb_waiting:
-			«IF optionProfile»call void @«instance.name»_wait()«ENDIF»
 			br label %bb_finished
 		
 		bb_finished:
@@ -330,7 +317,7 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 
 	def private schedulerWithoutFSM() '''
-		define void @«instance.name»_scheduler() « IF optionProfile»noinline «ENDIF»nounwind {
+		define void @«instance.name»_scheduler() nounwind {
 		entry:
 			«printCallStartTokenFunctions»
 			br label %bb_scheduler_start
@@ -339,7 +326,6 @@ class InstancePrinter extends LLVMTemplate {
 		«printActionLoop(instance.actor.actionsOutsideFsm, false)»
 		
 		bb_waiting:
-			«IF optionProfile»call void @«instance.name»_wait()«ENDIF»
 			br label %bb_finished
 		
 		bb_finished:
@@ -536,7 +522,7 @@ class InstancePrinter extends LLVMTemplate {
 		«IF procedure.native»
 			declare «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind
 		«ELSE»
-			define internal «procedure.returnType.doSwitch» @«procedure.name»(«parameters») «IF optionProfile»noinline «ENDIF»nounwind {
+			define internal «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind {
 			entry:
 			«FOR local : procedure.locals»
 				«local.declare»
