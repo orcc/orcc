@@ -1,0 +1,8 @@
+#Common rules for Eclipse projects
+bin
+xtend-gen
+src-gen
+
+# Specific rules to ignore Xtext arifacts
+plugin.xml_gen
+.antlr-generator-3.2.0.jar
