@@ -1,7 +1,7 @@
 #Common rules for Eclipse projects
 bin
 xtend-gen
-src-gen
+# src-gen folders are ignoreed with a specific .gitignore for each
 
 # Specific rules to ignore Xtext arifacts
 plugin.xml_gen
