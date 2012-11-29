@@ -117,6 +117,9 @@
                id="net.sf.orcc.backends.tta.fpga">
          </option>
          <option
+               id="net.sf.orcc.backends.metricMapping">
+         </option>
+         <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
       </backend>
@@ -215,6 +218,21 @@
 	               		description="Specify the number of CPU cores to use for the mapping"
 	               		id="net.sf.orcc.backends.processorsNumber"
 	               		name="Number of CPU cores">
+            		<textBox></textBox>
+         		</option>
+            </checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Uses graph partitioning algorithm to find a balanced mapping of the actors on the processor cores"
+               id="net.sf.orcc.backends.metricMapping"
+               name="Metric-based actor mapping">
+            <checkBox>
+            	<option
+	               		defaultValue="1"
+	               		description="Specify the number of processor cores to use for the mapping"
+	               		id="net.sf.orcc.backends.processorsNumber"
+	               		name="Number of processor cores">
             		<textBox></textBox>
          		</option>
             </checkBox>
