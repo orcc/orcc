@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.graph.util
+package net.sf.orcc.backends.util;
 
 import java.io.File
 import java.io.FileOutputStream
