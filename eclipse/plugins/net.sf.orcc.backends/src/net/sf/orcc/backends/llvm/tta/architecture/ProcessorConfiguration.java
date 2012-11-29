@@ -304,6 +304,8 @@ public enum ProcessorConfiguration implements Enumerator {
 			return 4;
 		case HUGE:
 			return 12;
+		case FAST:
+			return 3;
 		case STANDARD:
 		default:
 			return 1;
@@ -316,6 +318,8 @@ public enum ProcessorConfiguration implements Enumerator {
 			return 6;
 		case HUGE:
 			return 32;
+		case FAST:
+			return 18;
 		case STANDARD:
 		default:
 			return 2;
@@ -328,6 +332,8 @@ public enum ProcessorConfiguration implements Enumerator {
 			return 4;
 		case HUGE:
 			return 8;
+		case FAST:
+			return 3;
 		case STANDARD:
 		default:
 			return 2;
@@ -338,6 +344,7 @@ public enum ProcessorConfiguration implements Enumerator {
 		switch (this) {
 		case HUGE:
 			return 8;
+		case FAST:
 		case STANDARD:
 		case CUSTOM:
 		default:
@@ -351,6 +358,7 @@ public enum ProcessorConfiguration implements Enumerator {
 			return 2;
 		case STANDARD:
 		case CUSTOM:
+		case FAST:
 		default:
 			return 1;
 		}
@@ -360,6 +368,8 @@ public enum ProcessorConfiguration implements Enumerator {
 		switch (this) {
 		case HUGE:
 			return 32;
+		case FAST:
+			return 14;
 		case STANDARD:
 		case CUSTOM:
 		default:
@@ -371,6 +381,8 @@ public enum ProcessorConfiguration implements Enumerator {
 		switch (this) {
 		case HUGE:
 			return 3;
+		case FAST:
+			return 6;
 		case STANDARD:
 		case CUSTOM:
 		default:
