@@ -68,6 +68,12 @@ public class Mapping {
 	private boolean mapNativeActors;
 	private List<Vertex> unmappedEntities;
 	private Map<String, String> userMapping;
+	
+	public Mapping(){
+		this.componentToEntitiesMap = new HashMap<String, List<Vertex>>();
+		this.entityToComponentMap = new HashMap<Vertex, String>();
+		this.unmappedEntities = new ArrayList<Vertex>();
+	}
 
 	public Mapping(Network network, Map<String, String> userMapping) {
 		this(network, userMapping, false, true);
@@ -75,13 +81,18 @@ public class Mapping {
 
 	public Mapping(Network network, Map<String, String> userMapping,
 			boolean mapBroadcasts, boolean mapNativeActors) {
+		this();
 		this.userMapping = userMapping;
 		this.mapBroadcasts = mapBroadcasts;
 		this.mapNativeActors = mapNativeActors;
-		this.componentToEntitiesMap = new HashMap<String, List<Vertex>>();
-		this.entityToComponentMap = new HashMap<Vertex, String>();
-		this.unmappedEntities = new ArrayList<Vertex>();
 		new Visitor().caseNetwork(network);
+	}
+
+	/**
+	 * @return
+	 */
+	public Set<String> getComponents() {
+		return componentToEntitiesMap.keySet();
 	}
 
 	/**
@@ -116,13 +127,6 @@ public class Mapping {
 
 	public List<Vertex> getUnmappedEntities() {
 		return unmappedEntities;
-	}
-
-	/**
-	 * @return
-	 */
-	public Set<String> getComponents() {
-		return componentToEntitiesMap.keySet();
 	}
 
 	/**
