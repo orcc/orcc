@@ -1,6 +1,9 @@
 #Common rules for Eclipse projects
 bin
 xtend-gen
+*.pyc
+*.opb
+
 # src-gen folders are ignoreed with a specific .gitignore for each
 
 # Specific rules to ignore Xtext arifacts
