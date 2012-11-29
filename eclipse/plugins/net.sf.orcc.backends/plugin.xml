@@ -160,13 +160,6 @@
    </extension>
    <extension
          point="net.sf.orcc.core.options">
-		 <option
-               defaultValue="false"
-               id="net.sf.orcc.backends.partition"
-               description="This option enables to generate multithreaded code based on instance attributes"
-               name="Generate multithreaded code">
-            <checkBox/>
-         </option>
          <option
                defaultValue="false"
                id="net.sf.orcc.core.classify"
@@ -309,19 +302,6 @@
                      id="O3">
                </comboBoxItem>
             </comboBox>
-         </option>
-         <option
-               defaultValue="false"
-               id="net.sf.orcc.backends.coDesign"
-               name="Co-Design">
-            <checkBox></checkBox>
-         </option>
-         <option
-               defaultValue="false"
-               description="When activated, static actors will be merged together"
-               id="net.sf.orcc.backends.merger2"
-               name="New version of merger">
-            <checkBox></checkBox>
          </option>
          <option
                defaultValue="false"
