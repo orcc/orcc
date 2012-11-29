@@ -28,13 +28,17 @@
  */
 package net.sf.orcc.backends.util
 
+import com.google.common.collect.BiMap
+import com.google.common.collect.HashBiMap
+import java.io.BufferedReader
+import java.io.DataInputStream
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.InputStreamReader
 import java.io.PrintStream
 import java.util.ArrayList
-import java.util.HashMap
 import java.util.List
-import java.util.Map
 import net.sf.orcc.OrccActivator
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
@@ -53,25 +57,22 @@ class Metiss {
 	
 	private String metis;
 	
-	private Map<Vertex, Integer> vertexMap
-	private int rank
+	private BiMap<Vertex, Integer> vertexMap
+	private int rank = 0
 	
 	new() {
-		vertexMap = new HashMap<Vertex, Integer>()
+		vertexMap = HashBiMap::create()
 		metis = OrccActivator::getDefault().getPreference(PreferenceConstants::P_METIS, "");
 	}
 	
 	def partition(Network network, String folder, int partitionNumber) {
 		print(network, folder, "top.metis")
 		run(partitionNumber, folder)
-		
-		val mapping = new Mapping
-		mapping.unmappedEntities.addAll(network.children)
-		return mapping
+		return parse(partitionNumber, folder)
 	}
 	
 	def private print(Network network, String targetFolder, String filename) {
-		for(vertex: network.vertices)
+		for(vertex: network.children.notNative)
 			vertexMap.put(vertex, rank = rank + 1)
 		
 		val file = new File(targetFolder+ File::separator + filename);
@@ -81,7 +82,7 @@ class Metiss {
 	}
 
 	def private metiss(Network network) '''
-		«network.vertices.notNative.size» «network.edgeNumber» 011
+		«network.vertices.notNative.size» «network.edges.notSignal.size» 010
 		«FOR instance : network.children.notNative»
 			«instance.metiss»
 		«ENDFOR»
@@ -90,12 +91,9 @@ class Metiss {
 
 	def private metiss(Instance instance) '''
 		% «instance.label»
-		«instance.weight» «instance.neighbors.notNative.map[getEdge(instance, it)].join(" ")»
+		«instance.weight» «instance.incoming.notSignal.map[source.id].join(" ")» «instance.outgoing.notSignal.map[target.id].join(" ")»
 	'''
 	
-	def private getEdge(Vertex current, Vertex neighbor) 
-		'''«neighbor.id» «getWeight(current, neighbor)»'''
-
 	def private getId(Vertex vertex) {
 		vertexMap.get(vertex)
 	}
@@ -107,17 +105,6 @@ class Metiss {
 		} else {
 			1000
 		}
-	}
-	
-	def private getWeight(Vertex current, Vertex neighbor) {
-		var weight = 0
-		for(outgoing : current.outgoing.notSignal)
-			if(outgoing.target == neighbor)
-				weight = weight + 1
-		for(incoming : current.incoming.notSignal)
-			if(incoming.source == neighbor)
-				weight = weight + 1
-		return weight
 	}
 	
 	def private run(int partitionNumber, String path) {
@@ -134,18 +121,29 @@ class Metiss {
 					+ "s");
 	}
 	
-	def private getEdgeNumber(Network network) {
-		var number = 0
-		var visited = new ArrayList<Vertex>
-		for(instance : network.vertices.notNative) {
-			for(neighbor: instance.neighbors.notNative){
-				if(!visited.contains(neighbor)) {
-					number = number + 1
-				}
+	def private parse(int partitionNumber, String path) {
+		val mapping = new Mapping
+		try{
+			// Open the file that is the first 
+			// command line parameter
+			val fstream = new FileInputStream(path + File::separator + "top.metis.part." + partitionNumber)
+			// Get the object of DataInputStream
+			val in = new DataInputStream(fstream)
+			val br = new BufferedReader(new InputStreamReader(in))
+			var partition = ""
+			val map = vertexMap.inverse as BiMap<Integer, Vertex>
+			var i = 1
+			//Read File Line By Line
+			while ((partition = br.readLine()) != null) {
+				mapping.map("proc_" + partition, map.get(i))
+				i = i + 1
 			}
-			visited.add(instance)
+			//Close the input stream
+			in.close();
+		}catch (Exception e){//Catch exception if any
+			OrccLogger::severeln("Error: " + e.getMessage());
 		}
-		return number		
+		return mapping
 	}
 	
 	def private getNotNative(List<Vertex> vertices) {
