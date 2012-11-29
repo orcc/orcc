@@ -48,8 +48,10 @@ import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
+import net.sf.orcc.backends.util.Metiss;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -58,8 +60,8 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.util.Dota;
-import net.sf.orcc.graph.util.Metiss;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
@@ -90,6 +92,9 @@ public class TTABackend extends LLVMBackend {
 	private FPGA fpga;
 	private String libPath;
 	private boolean reduceConnections;
+	private boolean balanceMapping;
+
+	private int processorNumber;
 
 	@Override
 	protected void doInitializeOptions() {
@@ -101,7 +106,10 @@ public class TTABackend extends LLVMBackend {
 				"net.sf.orcc.backends.llvm.tta.configuration", "Huge"));
 		reduceConnections = getAttribute(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
-
+		balanceMapping = getAttribute("net.sf.orcc.backends.metricMapping",
+				false);
+		processorNumber = Integer.parseInt(getAttribute(
+				"net.sf.orcc.backends.processorsNumber", "0"));
 	}
 
 	@Override
@@ -152,12 +160,25 @@ public class TTABackend extends LLVMBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
-		
-		new Metiss().print(network, path, "top.metiss");
+
+		if (balanceMapping) {
+			for (Vertex vertex : network.getChildren()) {
+				Instance instance = vertex.getAdapter(Instance.class);
+				if (instance != null) {
+					String weight = mapping.get(instance.getHierarchicalName());
+					if (weight != null) {
+						instance.setAttribute("weight", weight);
+					}
+				}
+			}
+			computedMapping = new Metiss().partition(network, path,
+					processorNumber);
+		} else {
+			computedMapping = new Mapping(network, mapping, reduceConnections,
+					false);
+		}
 
 		// build the design
-		computedMapping = new Mapping(network, mapping, reduceConnections,
-				false);
 		design = new ArchitectureBuilder().build(network, configuration,
 				computedMapping, reduceConnections);
 
@@ -274,18 +295,12 @@ public class TTABackend extends LLVMBackend {
 		}
 		cmdList.add(path);
 
-		String[] cmd = cmdList.toArray(new String[] {});
-		try {
-			OrccLogger.traceln("Generating design...");
-			long t0 = System.currentTimeMillis();
-			final Process process = Runtime.getRuntime().exec(cmd);
-			process.waitFor();
-			long t1 = System.currentTimeMillis();
-			OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-					+ "s");
-		} catch (Exception e) {
-			OrccLogger.severeln(e.getMessage());
-		}
+		OrccLogger.traceln("Generating design...");
+		long t0 = System.currentTimeMillis();
+		BackendUtil.runExternalProgram(cmdList);
+		long t1 = System.currentTimeMillis();
+		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+				+ "s");
 	}
 
 }

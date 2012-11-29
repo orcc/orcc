@@ -26,15 +26,23 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.util;
+package net.sf.orcc.backends.util
 
 import java.io.File
 import java.io.FileOutputStream
 import java.io.PrintStream
+import java.util.ArrayList
 import java.util.HashMap
+import java.util.List
 import java.util.Map
-import net.sf.orcc.graph.Graph
+import net.sf.orcc.OrccActivator
+import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
+import net.sf.orcc.graph.Edge
 import net.sf.orcc.graph.Vertex
+import net.sf.orcc.preferences.PreferenceConstants
+import net.sf.orcc.util.OrccLogger
 
 /**
  * This class defines a graph converter to metiss format.
@@ -42,36 +50,47 @@ import net.sf.orcc.graph.Vertex
  * @author Herve Yviquel
  */
 class Metiss {
-		
-	private Map<Vertex, Integer> vertexMap
 	
+	private String metis;
+	
+	private Map<Vertex, Integer> vertexMap
 	private int rank
 	
 	new() {
 		vertexMap = new HashMap<Vertex, Integer>()
+		metis = OrccActivator::getDefault().getPreference(PreferenceConstants::P_METIS, "");
 	}
 	
-	def print(Graph graph, String targetFolder, String filename) {
-		for(vertex: graph.vertices)
+	def partition(Network network, String folder, int partitionNumber) {
+		print(network, folder, "top.metis")
+		run(partitionNumber, folder)
+		
+		val mapping = new Mapping
+		mapping.unmappedEntities.addAll(network.children)
+		return mapping
+	}
+	
+	def private print(Network network, String targetFolder, String filename) {
+		for(vertex: network.vertices)
 			vertexMap.put(vertex, rank = rank + 1)
 		
 		val file = new File(targetFolder+ File::separator + filename);
 		val ps = new PrintStream(new FileOutputStream(file));
-		ps.print(graph.metiss);
+		ps.print(network.metiss);
 		ps.close();
 	}
 
-	def private metiss(Graph graph) '''
-		«graph.vertices.size» «graph.edges.size» 011
-		«FOR vertex : graph.vertices»
-			«vertex.metiss»
+	def private metiss(Network network) '''
+		«network.vertices.notNative.size» «network.edgeNumber» 011
+		«FOR instance : network.children.notNative»
+			«instance.metiss»
 		«ENDFOR»
 		
 	'''
 
-	def private metiss(Vertex vertex) '''
-		% «vertex.label»
-		«vertex.weight» «vertex.neighbors.map[getEdge(vertex, it)].join(" ")»
+	def private metiss(Instance instance) '''
+		% «instance.label»
+		«instance.weight» «instance.neighbors.notNative.map[getEdge(instance, it)].join(" ")»
 	'''
 	
 	def private getEdge(Vertex current, Vertex neighbor) 
@@ -86,19 +105,55 @@ class Metiss {
 		if(att != null) {
 			att.stringValue
 		} else {
-			0
+			1000
 		}
 	}
 	
 	def private getWeight(Vertex current, Vertex neighbor) {
 		var weight = 0
-		for(outgoing : current.outgoing)
+		for(outgoing : current.outgoing.notSignal)
 			if(outgoing.target == neighbor)
 				weight = weight + 1
-		for(incoming : current.incoming)
+		for(incoming : current.incoming.notSignal)
 			if(incoming.source == neighbor)
 				weight = weight + 1
 		return weight
+	}
+	
+	def private run(int partitionNumber, String path) {
+		var cmdList = new ArrayList<String>()
+		cmdList.add(metis)
+		cmdList.add(path + File::separator + "top.metis")
+		cmdList.add(partitionNumber.toString)
+		OrccLogger::traceln(cmdList.toString)
+		OrccLogger::traceln("Solving actor partitioning...");
+		val t0 = System::currentTimeMillis;
+		BackendUtil::runExternalProgram(cmdList)
+		val t1 = System::currentTimeMillis();
+		OrccLogger::traceln("Done in " + ((t1 - t0) as float / 1000.0)
+					+ "s");
+	}
+	
+	def private getEdgeNumber(Network network) {
+		var number = 0
+		var visited = new ArrayList<Vertex>
+		for(instance : network.vertices.notNative) {
+			for(neighbor: instance.neighbors.notNative){
+				if(!visited.contains(neighbor)) {
+					number = number + 1
+				}
+			}
+			visited.add(instance)
+		}
+		return number		
+	}
+	
+	def private getNotNative(List<Vertex> vertices) {
+		vertices.filter(typeof(Instance)).filter[!actor.native]
+	}
+	
+	def private getNotSignal(List<Edge> edges) {
+		edges.filter(typeof(Connection)).filter[!sourcePort.native && !targetPort.native]
 	}
 
 }
