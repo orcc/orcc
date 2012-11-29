@@ -83,8 +83,8 @@ class Metiss {
 	
 	def private getWeight(Vertex vertex) {
 		var att = vertex.getAttribute("weight")
-		if(att != null && att.objectValue instanceof Integer) {
-			att.objectValue as Integer
+		if(att != null) {
+			att.stringValue
 		} else {
 			0
 		}
