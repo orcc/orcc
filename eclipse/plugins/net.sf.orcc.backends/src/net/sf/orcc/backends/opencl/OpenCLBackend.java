@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -122,7 +121,6 @@ public class OpenCLBackend extends AbstractBackend {
 	 * @param network
 	 *            the network
 	 * @return a modified network
-	 * @throws OrccException
 	 */
 	private Network doTransformNetwork(Network network) {
 		OrccLogger.trace("Instantiating... ");
@@ -174,8 +172,6 @@ public class OpenCLBackend extends AbstractBackend {
 	 * 
 	 * @param network
 	 *            a network
-	 * @throws OrccException
-	 *             if something goes wrong
 	 */
 	public void printNetwork(Network network) {
 		OpenCLPrinter printer = new OpenCLPrinter(!debug);

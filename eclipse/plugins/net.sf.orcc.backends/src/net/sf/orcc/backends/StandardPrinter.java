@@ -30,7 +30,6 @@
 package net.sf.orcc.backends;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -153,8 +152,6 @@ public class StandardPrinter extends AbstractPrinter {
 	 * @param actor
 	 *            the actor to generate code for
 	 * @return <code>true</code> if the actor was cached
-	 * @throws IOException
-	 *             if there is an I/O error
 	 */
 	public boolean print(String fileName, String path, Actor actor) {
 		if (!actor.isNative()) {
@@ -248,8 +245,6 @@ public class StandardPrinter extends AbstractPrinter {
 	 * @param instanceName
 	 *            name of the root ST rule
 	 * @return <code>true</code> if the network was cached
-	 * @throws IOException
-	 *             if there is an I/O error
 	 */
 	public boolean print(String fileName, String path, Network network) {
 		String file = path + File.separator + fileName;

@@ -64,7 +64,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -732,7 +731,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param network
 	 *            a network
-	 * @throws OrccException
 	 */
 	final public void printInstances(Network network) {
 		OrccLogger.traceln("Printing instances...");
@@ -973,7 +971,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param actors
 	 *            a list of actors
-	 * @throws OrccException
 	 */
 	final public void transformActors(List<Actor> actors) {
 		OrccLogger.traceln("Transforming actors...");
