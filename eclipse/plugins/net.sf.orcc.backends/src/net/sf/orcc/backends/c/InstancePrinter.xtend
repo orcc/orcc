@@ -470,11 +470,6 @@ class InstancePrinter extends CTemplate {
 				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
 			«ENDIF»
 			
-			/* Set initial value to global variable */
-			«FOR variable : instance.actor.stateVars»
-				«variable.stateVarInit»
-			«ENDFOR»
-			
 			/* Initialize input FIFOs id */
 			«FOR port : instance.actor.inputs»
 				«port.initializeFifoId»
@@ -492,16 +487,6 @@ class InstancePrinter extends CTemplate {
 			fifo_«port.fullName»_id = fifo_«port.name»_id;
 		«ELSE»
 			«OrccLogger::noticeln("["+instance.name+"] Input port "+port.fullName+" not connected.")»
-		«ENDIF»
-	'''
-
-	def stateVarInit(Var variable) '''
-		«IF variable.assignable && variable.initialized»
-			«IF ! variable.type.list»
-				«variable.name» = «variable.initialValue.doSwitch»;
-			«ELSE»
-				memcpy(«variable.name», «variable.name»_backup, sizeof(«variable.name»_backup));
-			«ENDIF»
 		«ENDIF»
 	'''
 	
@@ -667,10 +652,7 @@ class InstancePrinter extends CTemplate {
 					static const «variable.declare» = «variable.initialValue.doSwitch»;
 				«ENDIF»
 			«ELSE»
-				«IF variable.type.list»
-					static «variable.type.doSwitch» «variable.name»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
-				«ENDIF»
-				static «variable.declare»;
+				static «variable.declare» = «variable.initialValue.doSwitch»;
 			«ENDIF»
 		«ELSE»
 			static «variable.declare»;
