@@ -317,22 +317,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				/* Set initial state to current FSM state */
 				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
 			«ENDIF»
-			
-			«IF !instance.actor.stateVars.empty»
-				/* Set initial value to global variable */
-				«FOR variable : instance.actor.stateVars»
-					«variable.stateVarInit»
-				«ENDFOR»
-			«ENDIF»
 		}
-		«ENDIF»
-	'''
-	
-	override stateVarInit(Var variable) '''
-		«IF variable.assignable && variable.initialized»
-			«IF ! variable.type.list»
-				«variable.name» = «variable.initialValue.doSwitch»;
-			«ENDIF»
 		«ENDIF»
 	'''
 	
