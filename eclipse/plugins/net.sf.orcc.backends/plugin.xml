@@ -80,19 +80,6 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.xlim.XlimBackend"
-            name="XLIM (deprecated)">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
-         </option>
-         <option
-               id="net.sf.orcc.backends.xlimHard">
-         </option>
-         <option
-               id="net.sf.orcc.backends.multi2mono">
-         </option>
-      </backend>
-      <backend
             class="net.sf.orcc.backends.llvm.tta.TTABackend"
             name="TTA">
          <option
@@ -261,21 +248,6 @@
                id="net.sf.orcc.dontExportLibrary"
                name="Don't export library">
             <checkBox/>
-         </option>
-         
-         <option
-               defaultValue="false"
-               description="XLIM Code Generation for Hardware Implementation"
-               id="net.sf.orcc.backends.xlimHard"
-               name="Hardware XLIM Code Generation">
-            <checkBox>
-               <option
-                     defaultValue="xc2vp30-7-ff1152"
-                     description="XLIM Select FPGA Family Type"
-                     id="net.sf.orcc.backends.xlimFpgaType"
-                     name="FPGA Type">
-                  <textBox></textBox>
-               </option></checkBox>
          </option>
          <option
                defaultValue="false"
