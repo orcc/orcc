@@ -103,7 +103,7 @@ public class TTABackend extends LLVMBackend {
 		fpga = FPGA.builder(getAttribute("net.sf.orcc.backends.tta.fpga",
 				"Stratix III (EP3SL150F1152C2)"));
 		configuration = ProcessorConfiguration.getByName(getAttribute(
-				"net.sf.orcc.backends.llvm.tta.configuration", "Huge"));
+				"net.sf.orcc.backends.llvm.tta.configuration", "Standard"));
 		reduceConnections = getAttribute(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
 		balanceMapping = getAttribute("net.sf.orcc.backends.metricMapping",
