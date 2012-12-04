@@ -45,7 +45,7 @@ import net.sf.orcc.ir.ExprBool
  * @author Antoine Lorence
  * 
  */
-class PromelaTemplate extends CTemplate {
+abstract class PromelaTemplate extends CTemplate {
 	
 	/******************************************
 	 * 
