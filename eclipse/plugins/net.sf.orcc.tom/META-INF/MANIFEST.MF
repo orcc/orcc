@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tom
+Bundle-SymbolicName: net.sf.orcc.tom
+Bundle-Version: 1.2.1.qualifier
+Bundle-ClassPath: tom.jar,
+ eclipse-juno/plugins/fr.loria.eclipse.tom_2.9.0/lib/aircube-bundle.jar
