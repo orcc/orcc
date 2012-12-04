@@ -37,6 +37,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.ExprUnary
 import net.sf.orcc.backends.llvm.tta.architecture.FuPort
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit
 import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit
+import net.sf.orcc.backends.llvm.tta.architecture.Implementation
 import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Operation
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
@@ -49,12 +50,22 @@ import net.sf.orcc.backends.llvm.tta.architecture.Socket
 import net.sf.orcc.backends.llvm.tta.architecture.TermBool
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Writes
+import net.sf.orcc.util.OrccLogger
+import org.eclipse.emf.common.util.EMap
 
-class TCE_Processor_ADF extends TTATemplate {
+class TCE_Processor extends TTATemplate {
+	
+	EMap<String, Implementation> hwDb;
+	
+	new(EMap<String, Implementation> hwDb) {
+		this.hwDb = hwDb;
+	}
 	
 	def print(Processor processor, String targetFolder) {
-		val file = new File(targetFolder + File::separator + processor.getName() + ".adf")
-		printFile(processor.adf, file)
+		val adfFile = new File(targetFolder + File::separator + processor.getName() + ".adf")
+		val idfFile = new File(targetFolder + File::separator + processor.getName() + ".idf")
+		printFile(processor.adf, adfFile)
+		printFile(processor.idf, idfFile)
 	}
 		
 	def private getAdf(Processor processor)
@@ -290,4 +301,58 @@ class TCE_Processor_ADF extends TTATemplate {
 		'''
 		«IF(addressSpace == null)»<address-space/>«ELSE»<address-space>«addressSpace.name»</address-space>«ENDIF»
 		'''
+		
+
+		
+		
+	def private getIdf(Processor processor)
+		'''
+		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+		<adf-implementation>
+			
+			<ic-decoder-plugin>
+				<name>DefaultICDecoder</name>
+				<file>DefaultICDecoderPlugin.so</file>
+				<hdb-file>asic_130nm_1.5V.hdb</hdb-file>
+			</ic-decoder-plugin>
+			
+			«FOR fu: processor.functionUnits»
+				«fu.idf»
+			«ENDFOR»
+			«FOR rf: processor.registerFiles»
+				«rf.idf»
+			«ENDFOR»
+			
+		</adf-implementation>
+		'''
+
+	def private getIdf(FunctionUnit fu) {
+		val impl = hwDb.get(fu.implementation)
+		if(impl == null){
+			OrccLogger::noticeln("Unknown implementation of " + fu.name + 
+			", the design will not be able to be generated.")
+		} else {
+			'''
+			<fu name="«fu.name»">
+				<hdb-file>«impl.hdbFile»</hdb-file>
+				<fu-id>«impl.id»</fu-id>
+			</fu>
+			'''
+		}
+	}
+
+	def private getIdf(RegisterFile rf) {
+		val impl = hwDb.get(rf.implementation)
+		if(impl == null){
+			OrccLogger::noticeln("Unknown implementation of " + rf.name + 
+			", the design will not be able to be generated.")
+		} else {
+			'''
+			<rf name="«rf.name»">
+				<hdb-file>«impl.hdbFile»</hdb-file>
+			    <rf-id>«impl.id»</rf-id>
+			</rf>
+			'''
+		}
+	}
 }
