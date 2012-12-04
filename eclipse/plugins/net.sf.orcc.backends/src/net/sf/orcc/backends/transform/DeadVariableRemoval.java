@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, IRISA
+ * Copyright (c) 2010-2012, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -31,16 +31,16 @@ package net.sf.orcc.backends.transform;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.transform.DeadVariableRemoval;
 
 /**
- * This class defines an extension of DeadVariableRemoval to do specified
- * treatment with XLIM backend.
+ * This class defines an extension of DeadVariableRemoval to remove variable
+ * from specific instructions as well. TODO: Remove InstCast
  * 
  * @author Herve Yviquel
  * 
  */
-public class XlimDeadVariableRemoval extends DeadVariableRemoval {
+public class DeadVariableRemoval extends
+		net.sf.orcc.ir.transform.DeadVariableRemoval {
 
 	@Override
 	public Void caseInstSpecific(InstSpecific specific) {
