@@ -263,17 +263,11 @@ public class TTABackend extends LLVMBackend {
 		}
 
 		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-				+ "s");
+		OrccLogger.traceln("Done in " + (t1 - t0) / 1000.0 + "s");
 
 		if (numCached > 0) {
-			OrccLogger.traceln("*********************************************"
-					+ "************************************");
-			OrccLogger.traceln("* NOTE: " + numCached
-					+ " files were not regenerated "
+			OrccLogger.noticeln(numCached + " files were not regenerated "
 					+ "because they were already up-to-date.");
-			OrccLogger.traceln("*********************************************"
-					+ "************************************");
 		}
 	}
 
