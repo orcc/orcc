@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
+import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
@@ -47,6 +48,7 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
@@ -110,6 +112,7 @@ public class HLSBackend extends CBackend {
 		transformations.add(new TypeResizer(true, false, true));
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new Multi2MonoToken());
+		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
