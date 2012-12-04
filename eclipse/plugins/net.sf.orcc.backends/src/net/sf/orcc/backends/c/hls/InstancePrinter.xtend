@@ -40,7 +40,6 @@ import java.io.File
 import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
 import java.util.List
-import net.sf.orcc.ir.Var
 
 /*
  * Compile Instance c source code
