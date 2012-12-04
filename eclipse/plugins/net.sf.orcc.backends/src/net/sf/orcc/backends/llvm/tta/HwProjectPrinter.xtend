@@ -33,7 +33,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
 
-class ProjectPrinter extends TTATemplate {
+class HwProjectPrinter extends TTAPrinter {
 	
 	private FPGA fpga;
 	

@@ -37,7 +37,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureUtil
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.util.OrccUtil
 
-class Python_Design extends TTATemplate {
+class PyDesignPrinter extends TTAPrinter {
 	
 	private FPGA fpga;
 	

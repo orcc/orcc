@@ -36,7 +36,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Signal
 import net.sf.orcc.backends.util.FPGA
 
-class VHDL_Processor extends TTATemplate {
+class HwProcessorPrinter extends TTAPrinter {
 	
 	FPGA fpga;
 	

@@ -40,7 +40,7 @@ import net.sf.orcc.df.Port
  * @author Herve Yviquel
  * 
  */
-class TCE_Design_PNDF extends TTATemplate {
+class TceDesignPrinter extends TTAPrinter {
 	
 	String path;
 	

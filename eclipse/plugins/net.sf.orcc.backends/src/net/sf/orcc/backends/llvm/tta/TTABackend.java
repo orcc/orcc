@@ -225,19 +225,19 @@ public class TTABackend extends LLVMBackend {
 		long t0 = System.currentTimeMillis();
 
 		// VHDL Network of TTA processors
-		new VHDL_Design(fpga).print(design, path);
+		new HwDesignPrinter(fpga).print(design, path);
 
 		// Create python package
-		new Python_Design(fpga).print(design, path);
+		new PyDesignPrinter(fpga).print(design, path);
 
 		// Create project files
-		new ProjectPrinter(fpga).print(design, path);
+		new HwProjectPrinter(fpga).print(design, path);
 
 		// Create testbench files
-		new VHDL_Testbench(fpga).print(design, path);
+		new HwTestbenchPrinter(fpga).print(design, path);
 
 		// TCE
-		new TCE_Design_PNDF(path).print(design, path);
+		new TceDesignPrinter(path).print(design, path);
 
 		new Dota().print(design, path, "top.dot");
 
@@ -282,21 +282,21 @@ public class TTABackend extends LLVMBackend {
 		int cached = 0;
 		
 		// Print VHDL description
-		cached += new VHDL_Processor(fpga).print(tta, processorPath);
+		cached += new HwProcessorPrinter(fpga).print(tta, processorPath);
 
 		// Print high-level description
-		cached += new TCE_Processor(design.getHardwareDatabase()).print(tta,
+		cached += new TceProcessorPrinter(design.getHardwareDatabase()).print(tta,
 				processorPath);
 
 		// Print assembly code of actor-scheduler
-		cached += new LLVM_Processor().print(tta, processorPath);
+		cached += new SwProcessorPrinter().print(tta, processorPath);
 		
 		return cached;
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new LLVM_Actor(instance, options, design
+		return new SwActorPrinter(instance, options, design
 				.getActorToProcessorMap().get(instance)).print(actorsPath) > 0;
 	}
 

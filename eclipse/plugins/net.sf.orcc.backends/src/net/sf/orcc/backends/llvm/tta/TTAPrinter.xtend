@@ -31,11 +31,10 @@ package net.sf.orcc.backends.llvm.tta
 import net.sf.orcc.backends.CommonPrinter
 
 /*
- * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
+ * Default TTA Printer.
  *  
- * @author Antoine Lorence
- * 
+ * @author Herve Yviquel
  */
-abstract class TTATemplate extends CommonPrinter {
+abstract class TTAPrinter extends CommonPrinter {
 	
 }

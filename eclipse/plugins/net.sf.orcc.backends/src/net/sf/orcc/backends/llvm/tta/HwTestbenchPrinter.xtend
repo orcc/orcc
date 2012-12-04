@@ -35,7 +35,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.util.FPGA
 
-class VHDL_Testbench extends TTATemplate {
+class HwTestbenchPrinter extends TTAPrinter {
 	
 	private FPGA fpga;
 	

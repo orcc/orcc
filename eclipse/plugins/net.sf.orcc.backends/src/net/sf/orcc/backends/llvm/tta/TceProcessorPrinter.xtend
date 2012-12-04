@@ -53,7 +53,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Writes
 import net.sf.orcc.util.OrccLogger
 import org.eclipse.emf.common.util.EMap
 
-class TCE_Processor extends TTATemplate {
+class TceProcessorPrinter extends TTAPrinter {
 	
 	EMap<String, Implementation> hwDb;
 	

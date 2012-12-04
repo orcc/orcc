@@ -41,7 +41,7 @@ import net.sf.orcc.ir.util.ExpressionPrinter
 import net.sf.orcc.util.Attribute
 import org.eclipse.emf.common.util.EList
 
-class VHDL_Design extends TTATemplate {
+class HwDesignPrinter extends TTAPrinter {
 	
 	ExpressionPrinter exprPrinter;
 	FPGA fpga;

@@ -32,7 +32,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.aot.LLVMTemplate
 import java.io.File
 
-class LLVM_Processor extends LLVMTemplate {
+class SwProcessorPrinter extends LLVMTemplate {
 	
 	def print(Processor processor, String targetFolder) {
 		val content = processor.print
