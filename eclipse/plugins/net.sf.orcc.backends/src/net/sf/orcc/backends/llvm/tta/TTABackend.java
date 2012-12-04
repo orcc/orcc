@@ -242,8 +242,7 @@ public class TTABackend extends LLVMBackend {
 		new Dota().print(design, path, "top.dot");
 
 		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-				+ "s");
+		OrccLogger.traceln("Done in " + (t1 - t0) / 1000.0 + "s");
 	}
 
 	/**
@@ -325,8 +324,7 @@ public class TTABackend extends LLVMBackend {
 		long t0 = System.currentTimeMillis();
 		BackendUtil.runExternalProgram(cmdList);
 		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-				+ "s");
+		OrccLogger.traceln("Done in " + (t1 - t0) / 1000.0 + "s");
 	}
 
 }
