@@ -161,7 +161,11 @@ public class TTABackend extends LLVMBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
 
+		// Compute the actor mapping
 		if (balanceMapping) {
+			// Dynamically by solving an equivalent graph partitioning problem
+
+			// Add an attribute 'weight' to each instance
 			for (Vertex vertex : network.getChildren()) {
 				Instance instance = vertex.getAdapter(Instance.class);
 				if (instance != null) {
@@ -171,25 +175,27 @@ public class TTABackend extends LLVMBackend {
 					}
 				}
 			}
+
+			// Launch a solver tool called Metis
 			computedMapping = new Metiss().partition(network, path,
 					processorNumber);
 		} else {
+			// Statically from the given mapping
 			computedMapping = new Mapping(network, mapping, reduceConnections,
 					false);
 		}
 
-		// build the design
+		// Build the design from the mapping
 		design = new ArchitectureBuilder().build(network, configuration,
 				computedMapping, reduceConnections);
 
-		// print instances and entities
+		// Generate files
 		actorsPath = OrccUtil.createFolder(path, "actors");
 		printInstances(network);
-
-		// print the design
 		printDesign(design);
 
 		if (finalize) {
+			// Launch the TCE toolset
 			runPythonScript();
 		}
 	}
@@ -224,19 +230,13 @@ public class TTABackend extends LLVMBackend {
 		OrccLogger.traceln("Printing design...");
 		long t0 = System.currentTimeMillis();
 
-		// VHDL Network of TTA processors
+		// Create HDL project
 		new HwDesignPrinter(fpga).print(design, path);
-
-		// Create python package
-		new PyDesignPrinter(fpga).print(design, path);
-
-		// Create project files
 		new HwProjectPrinter(fpga).print(design, path);
-
-		// Create testbench files
 		new HwTestbenchPrinter(fpga).print(design, path);
 
-		// TCE
+		// Create TCE project
+		new PyDesignPrinter(fpga).print(design, path);
 		new TceDesignPrinter(path).print(design, path);
 
 		new Dota().print(design, path, "top.dot");
@@ -246,6 +246,13 @@ public class TTABackend extends LLVMBackend {
 				+ "s");
 	}
 
+	/**
+	 * Print processor of the given design. If some files already exist and are
+	 * identical, then they are not printed.
+	 * 
+	 * @param design
+	 *            the given design
+	 */
 	private void printProcessors(Design design) {
 		OrccLogger.traceln("Printing processors...");
 		long t0 = System.currentTimeMillis();
@@ -276,21 +283,22 @@ public class TTABackend extends LLVMBackend {
 	 * 
 	 * @param tta
 	 *            a processor
+	 * @return the number of cached files
 	 */
 	private int printProcessor(Processor tta) {
 		String processorPath = OrccUtil.createFolder(path, tta.getName());
 		int cached = 0;
-		
+
 		// Print VHDL description
 		cached += new HwProcessorPrinter(fpga).print(tta, processorPath);
 
 		// Print high-level description
-		cached += new TceProcessorPrinter(design.getHardwareDatabase()).print(tta,
-				processorPath);
+		cached += new TceProcessorPrinter(design.getHardwareDatabase()).print(
+				tta, processorPath);
 
 		// Print assembly code of actor-scheduler
 		cached += new SwProcessorPrinter().print(tta, processorPath);
-		
+
 		return cached;
 	}
 
