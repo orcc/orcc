@@ -30,8 +30,6 @@ package net.sf.orcc.cal.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
@@ -49,9 +47,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 
 /**
  * This application take a folder path in argument and create a valid Eclipse
@@ -98,32 +93,6 @@ public class WorkspaceCreator implements IApplication {
 	}
 
 	/**
-	 * Scan the list of IJavaProject rax Classpath, extract projects from this
-	 * list and add them to the IProject referencedProjects list.
-	 * 
-	 * @throws CoreException
-	 */
-	private void registerReferencedProjects(IJavaProject jp, IProject p)
-			throws CoreException {
-
-		List<IProject> referencedProjects = new ArrayList<IProject>();
-
-		IClasspathEntry[] classpathEntries = jp.getRawClasspath();
-		for (IClasspathEntry cpe : classpathEntries) {
-			if (cpe.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
-				IProject referencedProject = (IProject) workspace.getRoot()
-						.getProject(cpe.getPath().toString());
-
-				referencedProjects.add(referencedProject);
-			}
-		}
-
-		IProjectDescription desc = p.getDescription();
-		desc.setReferencedProjects(referencedProjects.toArray(new IProject[0]));
-		p.setDescription(desc, progressMonitor);
-	}
-
-	/**
 	 * Open searchFolder and try to find .project files inside it. Then, try to
 	 * create an eclipse projects and add it to the current workspace.
 	 * 
@@ -157,9 +126,6 @@ public class WorkspaceCreator implements IApplication {
 							project.create(description, progressMonitor);
 							project.open(progressMonitor);
 
-							IJavaProject jp = JavaCore.create(project);
-							registerReferencedProjects(jp, project);
-							
 							System.out.println(project.getName());
 						}
 					}

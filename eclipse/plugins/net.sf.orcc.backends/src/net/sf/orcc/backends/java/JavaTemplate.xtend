@@ -55,7 +55,7 @@ import org.eclipse.emf.common.util.EList
  * @author Antoine Lorence
  * 
  */
-class JavaTemplate extends CommonPrinter {
+abstract class JavaTemplate extends CommonPrinter {
 	
 	/******************************************
 	 * 

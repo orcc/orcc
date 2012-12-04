@@ -267,9 +267,7 @@ public class TTABackend extends LLVMBackend {
 		new VHDL_Processor(fpga).print(tta, processorPath);
 
 		// Print high-level description
-		new TCE_Processor_ADF().print(tta, processorPath);
-		new TCE_Processor_IDF(design.getHardwareDatabase()).print(tta,
-				processorPath);
+		new TCE_Processor(design.getHardwareDatabase()).print(tta, processorPath);
 
 		// Print assembly code of actor-scheduler
 		new LLVM_Processor().print(tta, processorPath);

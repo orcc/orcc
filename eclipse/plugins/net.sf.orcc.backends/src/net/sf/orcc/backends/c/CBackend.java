@@ -47,6 +47,7 @@ import java.util.Scanner;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.CastAdder;
+import net.sf.orcc.backends.transform.DeadVariableRemoval;
 import net.sf.orcc.backends.transform.DivisionSubstitution;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.Inliner;
@@ -57,7 +58,6 @@ import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.transform.TypeResizer;
-import net.sf.orcc.backends.transform.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
@@ -75,7 +75,6 @@ import net.sf.orcc.ir.transform.BlockCombine;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
-import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
@@ -166,14 +165,11 @@ public class CBackend extends AbstractBackend {
 			// transformations.add(new GlobalArrayInitializer(true));
 
 			transformations.add(new DfVisitor<Void>(new InstTernaryAdder()));
-			// transformations.add(new CustomPeekAdder()); // Xlim only ?
-
 			transformations.add(new DeadGlobalElimination());
 
 			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
-			transformations.add(new DfVisitor<Void>(
-					new XlimDeadVariableRemoval()));
+			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 			transformations.add(new DfVisitor<Void>(new ListFlattener()));
 			transformations.add(new DfVisitor<Expression>(
 					new TacTransformation()));
@@ -184,13 +180,8 @@ public class CBackend extends AbstractBackend {
 			transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
 			transformations.add(new DfVisitor<Void>(new BlockCombine()));
 
-			// transformations.add(new DfVisitor<Expression>(new
-			// LiteralIntegersAdder())); // Xlim only ?
 			transformations.add(new DfVisitor<Expression>(new CastAdder(true,
 					true)));
-
-			// NullPointerException when running backend with this transfo
-			// transformations.add(new XlimVariableRenamer());
 		}
 
 		for (DfSwitch<?> transformation : transformations) {

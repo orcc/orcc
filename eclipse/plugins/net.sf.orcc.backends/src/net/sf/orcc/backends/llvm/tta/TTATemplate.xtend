@@ -26,61 +26,16 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.promela
+package net.sf.orcc.backends.llvm.tta
 
-import net.sf.orcc.backends.c.CTemplate
-import net.sf.orcc.ir.TypeFloat
-import net.sf.orcc.ir.TypeInt
-import net.sf.orcc.ir.TypeList
-import net.sf.orcc.ir.TypeUint
-import net.sf.orcc.ir.TypeBool
-import net.sf.orcc.ir.ExprList
-import net.sf.orcc.ir.ExprString
-import net.sf.orcc.ir.ExprInt
-import net.sf.orcc.ir.ExprBool
+import net.sf.orcc.backends.CommonPrinter
 
 /*
- * Default C Printer
+ * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
  *  
  * @author Antoine Lorence
  * 
  */
-abstract class PromelaTemplate extends CTemplate {
-	
-	/******************************************
-	 * 
-	 * Types
-	 *
-	 *****************************************/
-	override caseTypeBool(TypeBool type)
-		'''bool'''
-
-	override caseTypeInt(TypeInt type)
-		'''int'''
-
-	override caseTypeUint(TypeUint type) 
-		'''uint'''
-
-	override caseTypeFloat(TypeFloat type) {
-		if (type.size == 64) '''double'''
-		else '''float'''
-	}
-
-	override caseTypeList(TypeList typeList)
-		'''«typeList.innermostType.doSwitch»'''
-
-	
-	override caseExprList(ExprList object)
-		'''1 /*{«object.value.join(", ", [doSwitch])»}*/'''
-		
-	override caseExprString(ExprString object)
-		'''"«object.doSwitch»"'''
-	
-	override caseExprInt(ExprInt object)
-		'''«object.value»«IF object.long»L«ENDIF»'''
-	
-	override caseExprBool(ExprBool object)
-		'''«IF object.value»1«ELSE»0«ENDIF»'''
-		
+abstract class TTATemplate extends CommonPrinter {
 	
 }

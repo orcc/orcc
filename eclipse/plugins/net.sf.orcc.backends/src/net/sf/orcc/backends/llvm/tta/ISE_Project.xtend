@@ -29,11 +29,10 @@
 package net.sf.orcc.backends.llvm.tta
 
 import java.io.File
-import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 
-class ISE_Project extends CommonPrinter {
+class ISE_Project extends TTATemplate {
 	
 	def print(Design design, String targetFolder) {
 		val ucfFile = new File(targetFolder + File::separator + "top.ucf")

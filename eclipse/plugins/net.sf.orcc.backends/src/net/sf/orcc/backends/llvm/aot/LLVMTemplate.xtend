@@ -59,7 +59,7 @@ import net.sf.orcc.ir.Var
  * @author Antoine Lorence
  * 
  */
-class LLVMTemplate extends CommonPrinter {
+abstract class LLVMTemplate extends CommonPrinter {
 	
 	var Type currentType = null
 	var signed = false

@@ -56,7 +56,7 @@ import net.sf.orcc.backends.CommonPrinter
  * @author Antoine Lorence
  * 
  */
-class CTemplate extends CommonPrinter {
+abstract class CTemplate extends CommonPrinter {
 	
 	/////////////////////////////////
 	// Expressions

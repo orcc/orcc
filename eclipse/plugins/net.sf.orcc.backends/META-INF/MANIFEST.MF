@@ -10,7 +10,6 @@ Require-Bundle: org.apache.commons.cli;bundle-version="1.2.0",
  org.eclipse.core.resources;bundle-version="3.7.0",
  net.sf.orcc.core;bundle-version="1.2.1",
  net.sf.orcc.models;bundle-version="1.2.1",
- org.stringtemplate;bundle-version="4.0.5",
  com.google.guava,
  org.eclipse.xtext.xbase.lib,
  org.apache.commons.lang;bundle-version="2.6.0"
@@ -30,7 +29,5 @@ Export-Package: net.sf.orcc.backends,
  net.sf.orcc.backends.opencl,
  net.sf.orcc.backends.transform,
  net.sf.orcc.backends.transform.ssa,
- net.sf.orcc.backends.util,
- net.sf.orcc.backends.xlim,
- net.sf.orcc.backends.xlim.transform
+ net.sf.orcc.backends.util
 

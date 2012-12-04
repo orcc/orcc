@@ -49,7 +49,7 @@ import net.sf.orcc.ir.ExprBinary
  * @author Endri Bezati
  */
 
-class BasePrinter extends IrSwitch {
+abstract class BasePrinter extends IrSwitch {
 	
 	override caseExprBinary(ExprBinary expr) '''(«expr.getE1.doSwitch» «expr.op.text» «expr.getE2.doSwitch»)'''
 

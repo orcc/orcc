@@ -50,6 +50,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -57,6 +58,8 @@ import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.xtext.diagnostics.Severity;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.util.CancelIndicator;
@@ -125,9 +128,9 @@ public class FrontendCli implements IApplication {
 	 * @return true if errors were found in resource
 	 */
 	private boolean hasErrors(Resource resource) {
-	
+
 		boolean hasErrors = false;
-	
+
 		// contains linking errors
 		List<Diagnostic> errors = resource.getErrors();
 		if (!errors.isEmpty()) {
@@ -136,13 +139,13 @@ public class FrontendCli implements IApplication {
 			}
 			hasErrors = true;
 		}
-	
+
 		// validates (unique names and CAL validator)
 		IResourceValidator v = ((XtextResource) resource)
 				.getResourceServiceProvider().getResourceValidator();
 		List<Issue> issues = v.validate(resource, CheckMode.ALL,
 				CancelIndicator.NullImpl);
-	
+
 		for (Issue issue : issues) {
 			if (issue.getSeverity() == Severity.ERROR) {
 				System.err.println(issue.toString());
@@ -151,7 +154,7 @@ public class FrontendCli implements IApplication {
 				System.out.println(issue.toString());
 			}
 		}
-	
+
 		return hasErrors;
 	}
 
@@ -166,7 +169,7 @@ public class FrontendCli implements IApplication {
 	 */
 	private List<IFile> getCalFiles(IContainer container) throws OrccException {
 		List<IFile> actors = new ArrayList<IFile>();
-	
+
 		IResource[] members = null;
 		try {
 			members = container.members();
@@ -185,7 +188,7 @@ public class FrontendCli implements IApplication {
 			throw new OrccException("Unable to get members of IContainer "
 					+ container.getName());
 		}
-	
+
 		return actors;
 	}
 
@@ -202,14 +205,24 @@ public class FrontendCli implements IApplication {
 		unorderedProjects.add(currentProject);
 
 		try {
-			IProject[] refProjects = currentProject.getReferencedProjects();
-	
-			for (IProject p : refProjects) {
-				if (!unorderedProjects.contains(p)) {
-					storeProjectToCompile(p);
+
+			IClasspathEntry[] classpathEntries = JavaCore
+					.create(currentProject).getRawClasspath();
+
+			for (IClasspathEntry cpEntry : classpathEntries) {
+
+				// Check for projects referenced in build path
+				if (cpEntry.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
+
+					IProject projectInBuildPath = workspace.getRoot()
+							.getProject(cpEntry.getPath().toString());
+
+					if (!unorderedProjects.contains(projectInBuildPath)) {
+						storeProjectToCompile(projectInBuildPath);
+					}
 				}
 			}
-	
+
 		} catch (CoreException e) {
 			throw new OrccException("Unable to get referenced projects"
 					+ currentProject.getName());
@@ -227,8 +240,7 @@ public class FrontendCli implements IApplication {
 	 * @param projectName
 	 * @throws OrccException
 	 */
-	private void setProject(String projectName)
-			throws OrccException {
+	private void setProject(String projectName) throws OrccException {
 
 		IProject currentProject = workspace.getRoot().getProject(projectName);
 		if (currentProject != null) {
@@ -280,7 +292,7 @@ public class FrontendCli implements IApplication {
 		// Reorder unit list
 		ArrayList<String> tempUnitList = new ArrayList<String>();
 		tempUnitList.addAll(orderedUnits);
-		
+
 		for (String curUnitQName : tempUnitList) {
 
 			EList<Import> imports = ((AstEntity) resourceList.get(curUnitQName)
@@ -354,13 +366,15 @@ public class FrontendCli implements IApplication {
 			// If needed, restore autoBuild config state in eclipse config file
 			restoreAutoBuild();
 
+			workspace.save(true, new NullProgressMonitor());
+
 		} catch (OrccException oe) {
 			System.err.println(oe.getMessage());
 		} catch (CoreException ce) {
 			System.err.println(ce.getMessage());
 		} finally {
 			try {
-			restoreAutoBuild();
+				restoreAutoBuild();
 			} catch (CoreException e) {
 				System.err.println(e.getMessage());
 			}

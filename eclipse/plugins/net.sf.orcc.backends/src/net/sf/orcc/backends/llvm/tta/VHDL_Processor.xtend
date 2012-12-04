@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.llvm.tta
 
 import java.io.File
-import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Port
@@ -37,7 +36,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Signal
 import net.sf.orcc.backends.util.FPGA
 
-class VHDL_Processor extends CommonPrinter {
+class VHDL_Processor extends TTATemplate {
 	
 	FPGA fpga;
 	

@@ -37,7 +37,7 @@ import org.apache.commons.lang.WordUtils
  * Define commons methods for all backends printers
  * 
  */
-class CommonPrinter extends AbstractIrVisitor<CharSequence> {
+abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	
 	protected var overwriteAllFiles = false
 	

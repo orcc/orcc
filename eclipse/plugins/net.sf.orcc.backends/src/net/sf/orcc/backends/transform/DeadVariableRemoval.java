@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, IETR/INSA of Rennes
+ * Copyright (c) 2010-2012, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,10 +10,10 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the IRISA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
- * about
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,61 +26,34 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.promela
+package net.sf.orcc.backends.transform;
 
-import net.sf.orcc.backends.c.CTemplate
-import net.sf.orcc.ir.TypeFloat
-import net.sf.orcc.ir.TypeInt
-import net.sf.orcc.ir.TypeList
-import net.sf.orcc.ir.TypeUint
-import net.sf.orcc.ir.TypeBool
-import net.sf.orcc.ir.ExprList
-import net.sf.orcc.ir.ExprString
-import net.sf.orcc.ir.ExprInt
-import net.sf.orcc.ir.ExprBool
+import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.Var;
 
-/*
- * Default C Printer
- *  
- * @author Antoine Lorence
+/**
+ * This class defines an extension of DeadVariableRemoval to remove variable
+ * from specific instructions as well. TODO: Remove InstCast
+ * 
+ * @author Herve Yviquel
  * 
  */
-abstract class PromelaTemplate extends CTemplate {
-	
-	/******************************************
-	 * 
-	 * Types
-	 *
-	 *****************************************/
-	override caseTypeBool(TypeBool type)
-		'''bool'''
+public class DeadVariableRemoval extends
+		net.sf.orcc.ir.transform.DeadVariableRemoval {
 
-	override caseTypeInt(TypeInt type)
-		'''int'''
+	@Override
+	public Void caseInstSpecific(InstSpecific specific) {
+		if (specific instanceof InstTernary) {
+			InstTernary ternaryOperation = (InstTernary) specific;
 
-	override caseTypeUint(TypeUint type) 
-		'''uint'''
-
-	override caseTypeFloat(TypeFloat type) {
-		if (type.size == 64) '''double'''
-		else '''float'''
+			Var target = ternaryOperation.getTarget().getVariable();
+			if (target != null && !target.isUsed()) {
+				handleInstruction(target, ternaryOperation);
+			}
+			return null;
+		}
+		return super.caseInstSpecific(specific);
 	}
 
-	override caseTypeList(TypeList typeList)
-		'''«typeList.innermostType.doSwitch»'''
-
-	
-	override caseExprList(ExprList object)
-		'''1 /*{«object.value.join(", ", [doSwitch])»}*/'''
-		
-	override caseExprString(ExprString object)
-		'''"«object.doSwitch»"'''
-	
-	override caseExprInt(ExprInt object)
-		'''«object.value»«IF object.long»L«ENDIF»'''
-	
-	override caseExprBool(ExprBool object)
-		'''«IF object.value»1«ELSE»0«ENDIF»'''
-		
-	
 }
