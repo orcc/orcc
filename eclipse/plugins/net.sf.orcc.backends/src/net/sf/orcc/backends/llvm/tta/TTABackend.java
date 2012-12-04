@@ -231,11 +231,7 @@ public class TTABackend extends LLVMBackend {
 		new Python_Design(fpga).print(design, path);
 
 		// Create project files
-		if (fpga.isAltera()) {
-			new Quartus_Project(fpga).print(design, path);
-		} else if (fpga.isXilinx()) {
-			new ISE_Project().print(design, path);
-		}
+		new ProjectPrinter(fpga).print(design, path);
 
 		// ModelSim
 		new ModelSimPrinter(fpga).print(design, path);
