@@ -233,9 +233,8 @@ public class TTABackend extends LLVMBackend {
 		// Create project files
 		new ProjectPrinter(fpga).print(design, path);
 
-		// ModelSim
-		new ModelSimPrinter(fpga).print(design, path);
-		new VHDL_Testbench().print(design, path);
+		// Create testbench files
+		new VHDL_Testbench(fpga).print(design, path);
 
 		// TCE
 		new TCE_Design_PNDF(path).print(design, path);

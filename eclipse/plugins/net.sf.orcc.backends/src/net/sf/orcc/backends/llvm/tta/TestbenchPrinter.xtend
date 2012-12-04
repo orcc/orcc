@@ -30,12 +30,12 @@ package net.sf.orcc.backends.llvm.tta
 
 import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
-import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
+import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.util.FPGA
 
-class ModelSimPrinter extends TTATemplate {
+class VHDL_Testbench extends TTATemplate {
 	
 	private FPGA fpga;
 	
@@ -44,11 +44,98 @@ class ModelSimPrinter extends TTATemplate {
 	}
 	
 	def print(Design design, String targetFolder) {
+		val vhdlFile = new File(targetFolder + File::separator + "top_tb.vhd")
 		val waveFile = new File(targetFolder + File::separator + "wave.do")
 		val tclFile = new File(targetFolder + File::separator + "top.tcl")
+		
+		printFile(design.vhdl, vhdlFile)
 		printFile(design.wave, waveFile)
 		printFile(design.tcl, tclFile)
 	}
+	
+	
+	def private getVhdl(Design design)
+		'''
+		------------------------------------------------------------------------------
+		-- Generated from <vertex.simpleName>
+		------------------------------------------------------------------------------
+		
+		library ieee;
+		use ieee.std_logic_1164.all; 
+		use std.textio.all;
+		use ieee.numeric_std.all;
+		
+		library work;
+		use work.sim_package.all;
+		
+		entity tb_top is
+		
+		end tb_top;
+		
+		
+		architecture arch_tb_top of tb_top is 
+		
+		  ---------------------------------------------------------------------------
+		  -- Signal & constant declaration
+		  --------------------------------------------------------------------------- 
+		  «design.declareVertexSigAndConst»
+		  ---------------------------------------------------------------------------
+		
+		begin
+		
+		  top_orcc : entity work.top
+		    port map (
+		      clk => clk,
+		      «design.mapSignals»
+		      rst_n => rst_n);
+		      
+		  -- clock generation
+		  clk <= not clk after PERIOD/2;
+		
+		  -- reset generation
+		  reset_proc: process
+		  begin
+		    rst_n <= '0';
+		    wait for 100 ns;
+		    rst_n <= '1';
+		    wait;
+		  end process;
+		
+		end architecture arch_tb_top;
+		'''
+		
+	def private declareVertexSigAndConst(Design design)
+		'''
+		constant PERIOD : time := 10 ns;
+		--
+		type severity_level is (note, warning, error, failure);		
+		--
+		-- Input and Output signals
+		«FOR port : design.inputs + design.outputs»
+			«port.declareSignal»
+		«ENDFOR»
+		--
+		-- Configuration
+		signal clk   : std_logic := '0';
+		signal rst_n : std_logic := '0';
+		'''
+		
+	def private declareSignal(Port port)
+		'''
+		signal «port.name» : std_logic_vector(«port.size»-1 downto 0);
+		'''
+		
+	def private mapSignals(Design design)
+		'''
+		«FOR port : design.inputs + design.outputs»
+			«port.mapSignal»
+		«ENDFOR»
+		'''
+	
+	def private mapSignal(Port port)
+		'''
+		«port.name» => <port.name>,
+		'''
 	
 	def private getWave(Design design) 
 		'''
@@ -207,4 +294,6 @@ class ModelSimPrinter extends TTATemplate {
 		exec cp -f wrapper/irom_<processor.name>.mif . &
 		«ENDIF»
 		'''
+		
+	
 }
