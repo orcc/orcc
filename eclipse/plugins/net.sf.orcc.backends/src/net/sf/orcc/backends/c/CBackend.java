@@ -165,8 +165,6 @@ public class CBackend extends AbstractBackend {
 			// transformations.add(new GlobalArrayInitializer(true));
 
 			transformations.add(new DfVisitor<Void>(new InstTernaryAdder()));
-			// transformations.add(new CustomPeekAdder()); // Xlim only ?
-
 			transformations.add(new DeadGlobalElimination());
 
 			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
@@ -182,13 +180,8 @@ public class CBackend extends AbstractBackend {
 			transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
 			transformations.add(new DfVisitor<Void>(new BlockCombine()));
 
-			// transformations.add(new DfVisitor<Expression>(new
-			// LiteralIntegersAdder())); // Xlim only ?
 			transformations.add(new DfVisitor<Expression>(new CastAdder(true,
 					true)));
-
-			// NullPointerException when running backend with this transfo
-			// transformations.add(new XlimVariableRenamer());
 		}
 
 		for (DfSwitch<?> transformation : transformations) {
