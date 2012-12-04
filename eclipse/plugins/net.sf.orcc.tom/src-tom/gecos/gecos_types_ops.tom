@@ -1,0 +1,52 @@
+//User operators
+
+
+/*PROTECTED REGION ID(mcall_tom_operator_with_param) ENABLED START*/
+
+%op Type baseType (size : int){
+	is_fsym(t) {$t instanceof BaseType}
+	get_slot(size,t) {((BaseType)$t).getSize()}
+	make(_children) {fr.irisa.cairn.gecos.model.tom.gecos.internal.GecosTomFactory.createBaseType($_children)}
+}
+
+
+%op Type intType (size : int){
+	is_fsym(t) {$t instanceof BaseType}
+	get_slot(size,t) {((BaseType)$t).getSize()}
+	make(_children) {fr.irisa.cairn.gecos.model.tom.gecos.internal.GecosTomFactory.createBaseType($_children)}
+}
+
+%op Type floatType (size : int){
+	is_fsym(t) {($t instanceof BaseType) }
+	get_slot(size,t) {((BaseType)$t).getSize()}
+	make(_children) {fr.irisa.cairn.gecos.model.tom.gecos.internal.GecosTomFactory.createBaseType($_children)}
+}
+
+%op Type arrayType (base : Type, size : int){
+	is_fsym(t) {$t instanceof ArrayType}
+	get_slot(size,t) {((ArrayType)$t).getSize()}
+	get_slot(base,t) {((ArrayType)$t).getBase()}
+	make(_base,_size) {fr.irisa.cairn.gecos.model.tom.gecos.internal.GecosTomFactory.createArrayType($_base,$_size)}
+}
+
+%op Type ptrType (base : Type){
+	is_fsym(t) {$t instanceof PointerType}
+	get_slot(base,t) {((PointerType)$t).getBase()}
+	make(_base) {fr.irisa.cairn.gecos.model.tom.gecos.internal.GecosTomFactory.createPointerType($_base)}
+}
+
+
+%op Type funcType (result : Type, args: TypeL){
+	is_fsym(t) {$t instanceof FunctionType}
+	get_slot(result,t) {((FunctionType)$t).getReturnType()}
+	get_slot(args,t) {enforce(((FunctionType)$t).getParameters())}
+	make(result,args) {fr.irisa.cairn.gecos.model.tom.gecos.internal.GecosTomFactory.createFunctionType($result,args)}
+}
+
+// FIXME Nacim
+
+// addd Resucture, Fields, Union,s
+
+
+/*PROTECTED REGION END*/
+

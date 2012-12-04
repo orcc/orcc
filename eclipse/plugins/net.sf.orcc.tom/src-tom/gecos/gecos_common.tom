@@ -1,0 +1,15 @@
+%include { string.tom }
+%include { boolean.tom }
+%include { int.tom }
+%include { long.tom }
+%include { float.tom }
+%include { double.tom }
+
+private static <O> EList<O> enforce(EList l) {
+		return l;
+}
+
+private static <O> EList<O> append(O e,EList<O> l) {
+       l.add(e);
+       return l;
+}
