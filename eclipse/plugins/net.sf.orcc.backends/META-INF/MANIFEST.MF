@@ -30,7 +30,5 @@ Export-Package: net.sf.orcc.backends,
  net.sf.orcc.backends.opencl,
  net.sf.orcc.backends.transform,
  net.sf.orcc.backends.transform.ssa,
- net.sf.orcc.backends.util,
- net.sf.orcc.backends.xlim,
- net.sf.orcc.backends.xlim.transform
+ net.sf.orcc.backends.util
 

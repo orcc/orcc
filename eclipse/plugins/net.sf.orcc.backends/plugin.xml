@@ -423,18 +423,6 @@
       </application>
    </extension>
    <extension
-         id="xlim"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.xlim.XlimBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
          id="tta"
          point="org.eclipse.core.runtime.applications">
       <application
