@@ -219,13 +219,10 @@ public class TTABackend extends LLVMBackend {
 	 *            a design
 	 */
 	private void printDesign(Design design) {
+		printProcessors(design);
+
 		OrccLogger.traceln("Printing design...");
 		long t0 = System.currentTimeMillis();
-
-		// Generate each processor
-		for (Processor processor : design.getProcessors()) {
-			printProcessor(processor);
-		}
 
 		// VHDL Network of TTA processors
 		new VHDL_Design(fpga).print(design, path);
@@ -254,30 +251,58 @@ public class TTABackend extends LLVMBackend {
 				+ "s");
 	}
 
+	private void printProcessors(Design design) {
+		OrccLogger.traceln("Printing processors...");
+		long t0 = System.currentTimeMillis();
+
+		int numCached = 0;
+
+		for (Processor processor : design.getProcessors()) {
+			numCached += printProcessor(processor);
+		}
+
+		long t1 = System.currentTimeMillis();
+		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+				+ "s");
+
+		if (numCached > 0) {
+			OrccLogger.traceln("*********************************************"
+					+ "************************************");
+			OrccLogger.traceln("* NOTE: " + numCached
+					+ " files were not regenerated "
+					+ "because they were already up-to-date.");
+			OrccLogger.traceln("*********************************************"
+					+ "************************************");
+		}
+	}
+
 	/**
 	 * Prints a set of files used to generate the given processor.
 	 * 
 	 * @param tta
 	 *            a processor
 	 */
-	private void printProcessor(Processor tta) {
+	private int printProcessor(Processor tta) {
 		String processorPath = OrccUtil.createFolder(path, tta.getName());
-
+		int cached = 0;
+		
 		// Print VHDL description
-		new VHDL_Processor(fpga).print(tta, processorPath);
+		cached += new VHDL_Processor(fpga).print(tta, processorPath);
 
 		// Print high-level description
-		new TCE_Processor(design.getHardwareDatabase()).print(tta, processorPath);
+		cached += new TCE_Processor(design.getHardwareDatabase()).print(tta,
+				processorPath);
 
 		// Print assembly code of actor-scheduler
-		new LLVM_Processor().print(tta, processorPath);
+		cached += new LLVM_Processor().print(tta, processorPath);
+		
+		return cached;
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		new LLVM_Actor(instance, options, design.getActorToProcessorMap().get(
-				instance)).print(actorsPath);
-		return false;
+		return new LLVM_Actor(instance, options, design
+				.getActorToProcessorMap().get(instance)).print(actorsPath) > 0;
 	}
 
 	/**
