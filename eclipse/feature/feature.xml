@@ -85,13 +85,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&
          unpack="false"/>
 
    <plugin
-         id="org.stringtemplate"
-         download-size="0"
-         install-size="0"
-         version="4.0.5"
-         unpack="false"/>
-
-   <plugin
          id="net.sf.orcc.graphiti.model"
          download-size="0"
          install-size="0"
