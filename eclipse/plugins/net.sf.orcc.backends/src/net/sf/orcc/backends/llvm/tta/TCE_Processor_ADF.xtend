@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.llvm.tta
 
 import java.io.File
-import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Bus
 import net.sf.orcc.backends.llvm.tta.architecture.ExprBinary
 import net.sf.orcc.backends.llvm.tta.architecture.ExprFalse
@@ -51,7 +50,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.TermBool
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Writes
 
-class TCE_Processor_ADF extends CommonPrinter {
+class TCE_Processor_ADF extends TTATemplate {
 	
 	def print(Processor processor, String targetFolder) {
 		val file = new File(targetFolder + File::separator + processor.getName() + ".adf")

@@ -29,14 +29,13 @@
 package net.sf.orcc.backends.llvm.tta
 
 import java.io.File
-import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
 
-class ModelSimPrinter extends CommonPrinter {
+class ModelSimPrinter extends TTATemplate {
 	
 	private FPGA fpga;
 	

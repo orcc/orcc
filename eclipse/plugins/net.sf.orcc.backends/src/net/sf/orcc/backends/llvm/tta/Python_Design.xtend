@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.llvm.tta
 
 import java.io.File
-import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Port
@@ -38,7 +37,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureUtil
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.util.OrccUtil
 
-class Python_Design extends CommonPrinter {
+class Python_Design extends TTATemplate {
 	
 	private FPGA fpga;
 	
