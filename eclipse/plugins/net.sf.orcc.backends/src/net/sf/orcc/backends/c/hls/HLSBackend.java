@@ -151,7 +151,6 @@ public class HLSBackend extends CBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		checkTopLevel(network);
 		doTransformNetwork(network);
 
 		if (debug) {
