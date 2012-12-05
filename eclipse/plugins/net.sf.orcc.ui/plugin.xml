@@ -321,12 +321,12 @@
          </edgeType>
          <import>
             <transformation
-                  class="net.sf.orcc.ui.editor.NlTransformation">
+                  class="net.sf.orcc.ui.editor.NLTransformation">
             </transformation>
          </import>
          <export>
             <transformation
-                  class="net.sf.orcc.ui.editor.NlTransformation">
+                  class="net.sf.orcc.ui.editor.NLTransformation">
             </transformation>
          </export>
       </configuration>
