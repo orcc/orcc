@@ -53,7 +53,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Writes
 import net.sf.orcc.util.OrccLogger
 import org.eclipse.emf.common.util.EMap
 
-class TCE_Processor extends TTATemplate {
+class TceProcessorPrinter extends TTAPrinter {
 	
 	EMap<String, Implementation> hwDb;
 	
@@ -64,8 +64,22 @@ class TCE_Processor extends TTATemplate {
 	def print(Processor processor, String targetFolder) {
 		val adfFile = new File(targetFolder + File::separator + processor.getName() + ".adf")
 		val idfFile = new File(targetFolder + File::separator + processor.getName() + ".idf")
-		printFile(processor.adf, adfFile)
-		printFile(processor.idf, idfFile)
+		val adfContent = processor.adf
+		val idfContent = processor.idf
+		var cached = 0
+		
+		if(needToWriteFile(adfContent, adfFile)) {
+			printFile(adfContent, adfFile)
+		} else {
+			cached = cached + 1
+		}
+		if(needToWriteFile(idfContent, idfFile)) {
+			printFile(idfContent, idfFile)
+		} else {
+			cached = cached + 1
+		}
+		
+		return cached
 	}
 		
 	def private getAdf(Processor processor)

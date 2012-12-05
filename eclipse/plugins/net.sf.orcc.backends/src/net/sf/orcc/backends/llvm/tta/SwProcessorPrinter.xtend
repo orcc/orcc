@@ -32,11 +32,18 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.aot.LLVMTemplate
 import java.io.File
 
-class LLVM_Processor extends LLVMTemplate {
+class SwProcessorPrinter extends LLVMTemplate {
 	
 	def print(Processor processor, String targetFolder) {
+		val content = processor.print
 		val file = new File(targetFolder + File::separator + processor.getName() + ".ll")
-		printFile(processor.print, file)
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
 	}
 	
 	def private print(Processor processor)

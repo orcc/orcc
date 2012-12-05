@@ -659,13 +659,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				+ "s");
 
 		if (numCached > 0) {
-			OrccLogger.traceln("*********************************************"
-					+ "************************************");
-			OrccLogger.traceln("* NOTE: " + numCached
-					+ " actors were not regenerated "
-					+ "because they were already up-to-date.   *");
-			OrccLogger.traceln("*********************************************"
-					+ "************************************");
+			OrccLogger.noticeln(numCached + " actors were not regenerated "
+					+ "because they were already up-to-date.");
 		}
 	}
 
@@ -692,13 +687,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				+ "s");
 
 		if (numCached > 0) {
-			OrccLogger.traceln("*********************************************"
-					+ "************************************");
-			OrccLogger.traceln("* NOTE: " + numCached
-					+ " entities were not regenerated "
-					+ "because they were already up-to-date.  *");
-			OrccLogger.traceln("*********************************************"
-					+ "************************************");
+			OrccLogger.noticeln(numCached + " entities were not regenerated "
+					+ "because they were already up-to-date.");
 		}
 	}
 
@@ -754,13 +744,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				+ "s");
 
 		if (numCached > 0) {
-			OrccLogger.traceln("*********************************************"
-					+ "************************************");
-			OrccLogger.traceln("* NOTE: " + numCached
-					+ " instances were not regenerated "
+			OrccLogger.noticeln(numCached + " instances were not regenerated "
 					+ "because they were already up-to-date. *");
-			OrccLogger.traceln("*********************************************"
-					+ "************************************");
 		}
 	}
 

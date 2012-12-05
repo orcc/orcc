@@ -36,7 +36,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Signal
 import net.sf.orcc.backends.util.FPGA
 
-class VHDL_Processor extends TTATemplate {
+class HwProcessorPrinter extends TTAPrinter {
 	
 	FPGA fpga;
 	
@@ -46,7 +46,14 @@ class VHDL_Processor extends TTATemplate {
 	
 	def print(Processor processor, String targetFolder) {
 		val file = new File(targetFolder + File::separator + processor.getName() + ".vhd")
-		printFile(processor.vhdl, file)
+		val content = processor.vhdl
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
 	}
 		
 	def private getVhdl(Processor processor)

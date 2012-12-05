@@ -43,7 +43,7 @@ import net.sf.orcc.ir.ArgByVal
 import net.sf.orcc.df.Connection
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 
-class LLVM_Actor extends InstancePrinter {
+class SwActorPrinter extends InstancePrinter {
 	
 	Processor processor;
 	
