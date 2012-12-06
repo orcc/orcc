@@ -232,7 +232,13 @@ class InstancePrinter extends CTemplate {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Parameter values of the instance
-		«instanceArgs»
+		«FOR arg : instance.arguments»
+			«IF arg.value.exprList»
+				static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
+			«ELSE»
+				#define «arg.variable.name» «arg.value.doSwitch»
+			«ENDIF»
+		«ENDFOR»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// State variables of the actor
@@ -657,18 +663,6 @@ class InstancePrinter extends CTemplate {
 		«ELSE»
 			static «variable.declare»;
 		«ENDIF»
-	'''
-	
-
-
-	def instanceArgs() '''
-		«FOR arg : instance.arguments»
-			«IF arg.value.exprList»
-				static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
-			«ELSE»
-				#define «arg.variable.name» «arg.value.doSwitch»
-			«ENDIF»
-		«ENDFOR»
 	'''
 
 	def fullName(Port port)
