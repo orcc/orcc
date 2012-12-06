@@ -84,7 +84,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 
 	private boolean castToUnsigned;
 	private boolean createEmptyBlockBasic;
-	private Type parentType;
+	protected Type parentType;
 
 	/**
 	 * Creates a new cast transformation. By default, this constructor creates
@@ -538,7 +538,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		}
 	}
 
-	private boolean needCast(Type type1, Type type2) {
+	protected boolean needCast(Type type1, Type type2) {
 		if (type1.isList() && type2.isList()) {
 			TypeList typeList1 = (TypeList) type1;
 			TypeList typeList2 = (TypeList) type2;
