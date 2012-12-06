@@ -199,6 +199,11 @@ public class XdfImporter {
 	 * @return a graph
 	 */
 	public Graph transform(IFile file) {
+		if (!file.exists()) {
+			throw new OrccRuntimeException("The file " + file.getName()
+					+ " does not exist.");
+		}
+
 		vertexMap = new HashMap<net.sf.orcc.graph.Vertex, Vertex>();
 
 		ResourceSet set = new ResourceSetImpl();

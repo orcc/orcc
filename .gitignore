@@ -1,10 +1,12 @@
-#Common rules for Eclipse projects
-bin
-xtend-gen
+# General ignore patterns
 *.pyc
 *.opb
 
-# src-gen folders are ignoreed with a specific .gitignore for each
+#Common rules for Eclipse projects
+# src-gen folders are ignored with a specific .gitignore inside each
+bin
+xtend-gen
+.metadata
 
 # Specific rules to ignore Xtext arifacts
 plugin.xml_gen
