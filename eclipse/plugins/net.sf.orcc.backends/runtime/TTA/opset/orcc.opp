@@ -103,6 +103,30 @@
   </operation>
   
   <operation>
+    <name>FPSPRINTINIT</name>
+    <description></description>
+    <inputs>1</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="UIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(fpsPrintInit, IO(1));
+    </trigger-semantics>
+  </operation>
+
+  <operation>
+    <name>FPSPRINTNEWPICDECODED</name>
+    <description></description>
+    <inputs>1</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="UIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(fpsPrintNewPicDecoded, IO(1));
+    </trigger-semantics>
+  </operation>
+  
+  <operation>
     <name>PRINT_CYCLECOUNT</name>
     <description></description>
     <inputs>1</inputs>
