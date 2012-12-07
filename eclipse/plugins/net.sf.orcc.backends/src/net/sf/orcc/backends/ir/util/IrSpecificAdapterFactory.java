@@ -7,11 +7,13 @@
 package net.sf.orcc.backends.ir.util;
 
 import net.sf.orcc.backends.ir.BlockFor;
+import net.sf.orcc.backends.ir.ExprNull;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.util.Attributable;
@@ -95,6 +97,11 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
+		public Adapter caseExprNull(ExprNull object) {
+			return createExprNullAdapter();
+		}
+
+		@Override
 		public Adapter caseAttributable(Attributable object) {
 			return createAttributableAdapter();
 		}
@@ -112,6 +119,11 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseBlock(Block object) {
 			return createBlockAdapter();
+		}
+
+		@Override
+		public Adapter caseExpression(Expression object) {
+			return createExpressionAdapter();
 		}
 
 		@Override
@@ -192,6 +204,20 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.ExprNull <em>Expr Null</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.ir.ExprNull
+	 * @generated
+	 */
+	public Adapter createExprNullAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '
 	 * {@link net.sf.orcc.ir.Instruction <em>Instruction</em>}'. <!--
 	 * begin-user-doc --> This default implementation returns null so that we
@@ -232,6 +258,20 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createBlockAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Expression
+	 * @generated
+	 */
+	public Adapter createExpressionAdapter() {
 		return null;
 	}
 

@@ -40,4 +40,5 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="init" ordered="false" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction" containment="true"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprNull" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//Expression"/>
 </ecore:EPackage>

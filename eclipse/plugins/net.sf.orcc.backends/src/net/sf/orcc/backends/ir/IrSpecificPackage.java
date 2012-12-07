@@ -373,6 +373,34 @@ public interface IrSpecificPackage extends EPackage {
 	int BLOCK_FOR_FEATURE_COUNT = IrPackage.BLOCK_FEATURE_COUNT + 6;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.ExprNullImpl <em>Expr Null</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.ir.impl.ExprNullImpl
+	 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getExprNull()
+	 * @generated
+	 */
+	int EXPR_NULL = 4;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_NULL__ATTRIBUTES = IrPackage.EXPRESSION__ATTRIBUTES;
+
+	/**
+	 * The number of structural features of the '<em>Expr Null</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_NULL_FEATURE_COUNT = IrPackage.EXPRESSION_FEATURE_COUNT + 0;
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.InstAssignIndex <em>Inst Assign Index</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -578,6 +606,16 @@ public interface IrSpecificPackage extends EPackage {
 	EReference getBlockFor_Init();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.ExprNull <em>Expr Null</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr Null</em>'.
+	 * @see net.sf.orcc.backends.ir.ExprNull
+	 * @generated
+	 */
+	EClass getExprNull();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -764,6 +802,16 @@ public interface IrSpecificPackage extends EPackage {
 		 * @generated
 		 */
 		EReference BLOCK_FOR__INIT = eINSTANCE.getBlockFor_Init();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.ir.impl.ExprNullImpl <em>Expr Null</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.ir.impl.ExprNullImpl
+		 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getExprNull()
+		 * @generated
+		 */
+		EClass EXPR_NULL = eINSTANCE.getExprNull();
 
 	}
 

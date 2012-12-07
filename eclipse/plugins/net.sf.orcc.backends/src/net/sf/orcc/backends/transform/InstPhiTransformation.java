@@ -31,6 +31,7 @@ package net.sf.orcc.backends.transform;
 import java.util.List;
 
 import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstPhi;
@@ -68,6 +69,8 @@ public class InstPhiTransformation extends AbstractIrVisitor<Void> {
 					Expression expr;
 					if (target.getType().isBool()) {
 						expr = IrFactory.eINSTANCE.createExprBool(false);
+					} else if (target.getType().isString()) {
+						expr = IrSpecificFactory.eINSTANCE.createExprNull();
 					} else {
 						expr = IrFactory.eINSTANCE.createExprInt(0);
 					}

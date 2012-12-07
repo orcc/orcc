@@ -9,6 +9,7 @@ package net.sf.orcc.backends.ir.impl;
 import java.util.List;
 
 import net.sf.orcc.backends.ir.BlockFor;
+import net.sf.orcc.backends.ir.ExprNull;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstTernary;
@@ -76,6 +77,8 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 			return createInstTernary();
 		case IrSpecificPackage.BLOCK_FOR:
 			return createBlockFor();
+		case IrSpecificPackage.EXPR_NULL:
+			return createExprNull();
 		default:
 			throw new IllegalArgumentException("The class '" + eClass.getName()
 					+ "' is not a valid classifier");
@@ -134,6 +137,16 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	public BlockFor createBlockFor() {
 		BlockForImpl blockFor = new BlockForImpl();
 		return blockFor;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprNull createExprNull() {
+		ExprNullImpl exprNull = new ExprNullImpl();
+		return exprNull;
 	}
 
 	@Override
