@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.llvm.aot.LLVMBackend;
+import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
@@ -146,6 +147,7 @@ public class TTABackend extends LLVMBackend {
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
 				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
+				new DfVisitor<Void>(new ListInitializer()),
 				new DfVisitor<Void>(new TemplateInfoComputing()), };
 
 		for (DfSwitch<?> transformation : transformations) {
