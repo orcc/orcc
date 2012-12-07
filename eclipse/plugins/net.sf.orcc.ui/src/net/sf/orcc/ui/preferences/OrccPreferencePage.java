@@ -82,7 +82,7 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 			String text = button.getText();
 
 			updateMode = false;
-			if ("Z3".equals(text)) {
+			if (text.contains("Z3")) {
 				if (Platform.OS_WIN32.equals(Platform.getOS())) {
 					textControl.setText("/smt2");
 				} else {
