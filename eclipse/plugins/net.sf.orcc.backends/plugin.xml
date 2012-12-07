@@ -158,16 +158,16 @@
             <checkBox>
                <option
                      defaultValue="false"
-                     description="When activated, static actors will be merged together"
+                     description="When activated, static regions of the network will be merged together"
                      id="net.sf.orcc.core.mergeActors"
                      name="Merge static actors together">
                   <checkBox></checkBox>
                </option>
 		       <option
 		             defaultValue="false"
-		             description="Transform actors to higher-level"
+		             description="When activated, static and quasi-static actors are transformed to an higher-level"
 		             id="net.sf.orcc.core.mergeActions"
-		             name="Transform actors to higher-level">
+		             name="Merge static actions together">
 		          <checkBox></checkBox>
 		       </option>
             </checkBox>

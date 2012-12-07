@@ -7,11 +7,13 @@
 package net.sf.orcc.backends.ir.util;
 
 import net.sf.orcc.backends.ir.BlockFor;
+import net.sf.orcc.backends.ir.ExprNull;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.util.Attributable;
@@ -123,6 +125,17 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
+		case IrSpecificPackage.EXPR_NULL: {
+			ExprNull exprNull = (ExprNull) theEObject;
+			T result = caseExprNull(exprNull);
+			if (result == null)
+				result = caseExpression(exprNull);
+			if (result == null)
+				result = caseAttributable(exprNull);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
 		default:
 			return defaultCase(theEObject);
 		}
@@ -186,6 +199,21 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Expr Null</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Expr Null</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseExprNull(ExprNull object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Instruction</em>'.
 	 * <!-- begin-user-doc --> This implementation
 	 * returns null; returning a non-null result will terminate the switch. <!--
@@ -225,6 +253,21 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseBlock(Block object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Expression</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Expression</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseExpression(Expression object) {
 		return null;
 	}
 

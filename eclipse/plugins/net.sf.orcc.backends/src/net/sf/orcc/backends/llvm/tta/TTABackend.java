@@ -43,6 +43,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureBuilder;
 import net.sf.orcc.backends.llvm.tta.transform.ComplexHwOpDetector;
+import net.sf.orcc.backends.llvm.tta.transform.PrintRemoval;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
@@ -133,8 +134,15 @@ public class TTABackend extends LLVMBackend {
 		if (mergeActors) {
 			new ActorMerger().doSwitch(network);
 		}
+		new UnitImporter().doSwitch(network);
+		if (!debug) {
+			new DfVisitor<Void>(new PrintRemoval()).doSwitch(network);
+			OrccLogger.noticeln("All calls to printing functions are removed for performance purpose.");
+		} else {
+			OrccLogger.noticeln("A noticeable deterioration in performance could appear due to printing call.");
+		}
 
-		DfSwitch<?>[] transformations = { new UnitImporter(),
+		DfSwitch<?>[] transformations = { 
 				new TypeResizer(true, true, false),
 				new DfVisitor<Void>(new SSATransformation()),
 				new StringTransformation(),

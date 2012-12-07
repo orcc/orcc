@@ -71,6 +71,15 @@ public interface IrSpecificFactory extends EFactory {
 	 */
 	BlockFor createBlockFor();
 
+	/**
+	 * Returns a new object of class '<em>Expr Null</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Null</em>'.
+	 * @generated
+	 */
+	ExprNull createExprNull();
+
 	InstTernary createInstTernary(Var target, Expression condition,
 			Expression trueValue, Expression falseValue);
 

@@ -69,6 +69,7 @@ import java.io.File
 
 import static net.sf.orcc.backends.OrccBackendsConstants.*
 import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.backends.ir.ExprNull
 
 /*
  * Compile Instance llvm source code
@@ -711,6 +712,15 @@ class InstancePrinter extends LLVMTemplate {
 		else
 			super.caseInstruction(instr)
 	}
+	
+	override caseExpression(Expression expr) {
+		if(expr instanceof ExprNull)
+			return caseExprNull(expr as ExprNull)
+		else
+			super.caseExpression(expr)
+	}
+	
+	def caseExprNull(ExprNull expr) '''null'''
 	
 	def caseInstCast(InstCast cast) '''
 		%«cast.target.variable.indexedName» = «cast.castOp» «cast.source.variable.castType» «cast.source.variable.print» to «cast.target.variable.castType»

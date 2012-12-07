@@ -7,6 +7,7 @@
 package net.sf.orcc.backends.ir.impl;
 
 import net.sf.orcc.backends.ir.BlockFor;
+import net.sf.orcc.backends.ir.ExprNull;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstTernary;
@@ -56,6 +57,13 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass blockForEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass exprNullEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -304,6 +312,15 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getExprNull() {
+		return exprNullEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public IrSpecificFactory getIrSpecificFactory() {
 		return (IrSpecificFactory) getEFactoryInstance();
 	}
@@ -350,6 +367,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 		createEReference(blockForEClass, BLOCK_FOR__BLOCKS);
 		createEReference(blockForEClass, BLOCK_FOR__STEP);
 		createEReference(blockForEClass, BLOCK_FOR__INIT);
+
+		exprNullEClass = createEClass(EXPR_NULL);
 	}
 
 	/**
@@ -392,6 +411,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 		instCastEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		blockForEClass.getESuperTypes().add(theIrPackage.getBlock());
+		exprNullEClass.getESuperTypes().add(theIrPackage.getExpression());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(instAssignIndexEClass, InstAssignIndex.class,
@@ -472,6 +492,9 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 				"init", null, 0, -1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, !IS_ORDERED);
+
+		initEClass(exprNullEClass, ExprNull.class, "ExprNull", !IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
 		createResource(eNS_URI);

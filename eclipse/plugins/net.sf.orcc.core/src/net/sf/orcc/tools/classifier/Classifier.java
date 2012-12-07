@@ -74,6 +74,15 @@ import org.eclipse.core.runtime.CoreException;
 public class Classifier extends DfVisitor<Void> {
 
 	private Actor actor;
+	private boolean internalizeGuards;
+
+	public Classifier() {
+		this(false);
+	}
+
+	public Classifier(boolean internalizeGuards) {
+		this.internalizeGuards = internalizeGuards;
+	}
 
 	/**
 	 * Tries to evaluate the guards to check if they are compatible.
@@ -113,8 +122,10 @@ public class Classifier extends DfVisitor<Void> {
 		try {
 			this.actor = actor;
 
-			// Internalize possible guards to avoid wrong classification
-			new GuardInternalizer().transform(actor);
+			if (internalizeGuards) {
+				// Internalize possible guards to avoid wrong classification
+				new GuardInternalizer().transform(actor);
+			}
 
 			actor.resetTokenConsumption();
 			actor.resetTokenProduction();

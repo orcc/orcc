@@ -36,6 +36,7 @@ import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.IrFactory;
@@ -46,118 +47,67 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * Change string into global constant. Parameters of println becomes state
  * variables into the current actor
  * 
- * 
- * @author Jerome GORIN
+ * @author Jerome Gorin
+ * @author Herve Yviquel
  * 
  */
 public class StringTransformation extends DfVisitor<Void> {
 
-	/**
-	 * Change characters in strings to fit LLVM constraints
-	 * 
-	 * 
-	 * @author Jerome GORIN
-	 * 
-	 */
-	private class LLVMString {
-
-		private StringBuffer llvmStr;
-
-		private int size;
-
-		LLVMString(String str) {
-			// Replace characters unsupported by llvm
-			size = str.length() + 1;
-			llvmStr = new StringBuffer(str + "\\00");
-			replace("\\n", "\\0A");
-			replace("\\t", "\\09");
-		}
-
-		int getSize() {
-			return size;
-		}
-
-		String getStr() {
-			return llvmStr.toString();
-		}
-
-		void replace(String car, String newCar) {
-			int index = llvmStr.indexOf(car);
-			while (index != -1) {
-				llvmStr.delete(index, index + car.length());
-				llvmStr.insert(index, newCar);
-				index = llvmStr.indexOf(car);
-				size -= 1;
-			}
-
-		}
-	}
-
 	private class PrintTransformer extends AbstractIrVisitor<Void> {
+
+		public PrintTransformer() {
+			super(true);
+		}
+
+		@Override
+		public Void caseExprString(ExprString expr) {
+			Var variable = createStringVariable(expr.getValue());
+			stateVars.add(variable);
+			ExprVar exprVar = IrFactory.eINSTANCE.createExprVar(variable);
+			EcoreUtil.replace(expr, exprVar);
+			return null;
+		}
+
 		@Override
 		public Void caseInstCall(InstCall call) {
 			if (call.isPrint()) {
 				transformPrint(call);
 			} else {
-				List<Arg> newParameters = new ArrayList<Arg>();
-				List<Arg> parameters = call.getArguments();
-
-				for (Arg arg : parameters) {
+				for (Arg arg : call.getArguments()) {
 					if (arg.isByVal()) {
 						Expression expr = ((ArgByVal) arg).getValue();
 						if (expr.isExprString()) {
-							String strExprVal = (((ExprString) expr).getValue());
-							LLVMString llvmStr = new LLVMString(strExprVal);
-
 							// Create state variable that contains println
 							// arguments
-							String name = "str" + strCnt++;
-
-							TypeString type = IrFactory.eINSTANCE
-									.createTypeString();
-							type.setSize(llvmStr.getSize());
-
-							Var variable = IrFactory.eINSTANCE.createVar(
-									call.getLineNumber(), type, name, false);
-							variable.setInitialValue(IrFactory.eINSTANCE
-									.createExprString(llvmStr.getStr()));
+							String strExprVal = (((ExprString) expr).getValue());
+							Var variable = createStringVariable(strExprVal);
 							stateVars.add(variable);
 
-							newParameters.add(IrFactory.eINSTANCE
+							EcoreUtil.replace(arg, IrFactory.eINSTANCE
 									.createArgByVal(variable));
-
-						} else {
-							newParameters.add(arg);
 						}
-					} else {
-						newParameters.add(arg);
 					}
 				}
-
-				parameters.clear();
-				parameters.addAll(newParameters);
 			}
-
 			return null;
 		}
 	}
 
-	/**
-	 * State variables of the actor
-	 */
 	private EList<Var> stateVars;
-
-	/**
-	 * String counter
-	 */
 	private int strCnt;
 
+	/**
+	 * Create a transformation that make the calls of 'print' function compliant
+	 * with LLVM assembly language reference.
+	 */
 	public StringTransformation() {
 		this.irVisitor = new PrintTransformer();
 	}
@@ -174,11 +124,44 @@ public class StringTransformation extends DfVisitor<Void> {
 		return super.caseActor(actor);
 	}
 
-	private void transformPrint(InstCall print) {
-		String value = "";
+	/**
+	 * Create a variable initialized with an LLVM-compliant ExprString.
+	 * 
+	 * @param str
+	 *            A string
+	 * @return A variable initialized with an LLVM-compliant ExprString extract
+	 *         from the given string
+	 */
+	private Var createStringVariable(String str) {
+		int size = str.length();
+		str = str + "\\00";
+		size -= StringUtils.countMatches(str, "\\n");
+		str = str.replaceAll("\\\\n", "\\\\0A");
+		size -= StringUtils.countMatches(str, "\\t");
+		str = str.replaceAll("\\\\t", "\\\\09");
+
+		// Create state variable that contains println arguments
+		TypeString type = IrFactory.eINSTANCE.createTypeString();
+		type.setSize(size + 1);
+
+		Var variable = IrFactory.eINSTANCE.createVar(type, "str" + strCnt++,
+				false, 0);
+		variable.setInitialValue(IrFactory.eINSTANCE.createExprString(str));
+
+		return variable;
+	}
+
+	/**
+	 * Transform a call of 'print' function to make it compliant with LLVM
+	 * assembly language reference.
+	 * 
+	 * @param call
+	 *            the given call instruction of 'print' function
+	 */
+	private void transformPrint(InstCall call) {
+		String value = new String();
 		List<Arg> newParameters = new ArrayList<Arg>();
-		List<Arg> parameters = print.getArguments();
-		String name = "str" + strCnt++;
+		List<Arg> parameters = call.getArguments();
 
 		// Iterate though all the println arguments to provide an only
 		// string value
@@ -219,18 +202,7 @@ public class StringTransformation extends DfVisitor<Void> {
 			}
 		}
 
-		LLVMString llvmStr = new LLVMString(value);
-
-		// Create state variable that contains println arguments
-		TypeString type = IrFactory.eINSTANCE.createTypeString();
-		type.setSize(llvmStr.getSize());
-
-		Var variable = IrFactory.eINSTANCE.createVar(print.getLineNumber(),
-				type, name, false);
-		variable.setInitialValue(IrFactory.eINSTANCE.createExprString(llvmStr
-				.getStr()));
-
-		// Set the created state variable into call argument
+		Var variable = createStringVariable(value);
 		stateVars.add(variable);
 		newParameters.add(IrFactory.eINSTANCE.createArgByVal(variable));
 

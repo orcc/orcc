@@ -208,7 +208,7 @@ abstract class LLVMTemplate extends CommonPrinter {
 	}
 
 	override caseTypeString(TypeString type) {
-		if(type.size == 0) '''i8''' 
+		if(type.size == 0) '''i8*''' 
 		else '''[«type.size» x i8]'''
 	}
 
