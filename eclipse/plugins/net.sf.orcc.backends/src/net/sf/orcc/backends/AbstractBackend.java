@@ -745,7 +745,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		if (numCached > 0) {
 			OrccLogger.noticeln(numCached + " instances were not regenerated "
-					+ "because they were already up-to-date. *");
+					+ "because they were already up-to-date.");
 		}
 	}
 
