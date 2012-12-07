@@ -34,8 +34,7 @@ import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
-
-
+import net.sf.orcc.ir.TypeBool
 
 /**
  * Compile top Network c source code 
@@ -159,5 +158,6 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		connection.sourcePort.type
 	}
 		
-	
+	override caseTypeBool(TypeBool type) 
+		'''bool'''
 }

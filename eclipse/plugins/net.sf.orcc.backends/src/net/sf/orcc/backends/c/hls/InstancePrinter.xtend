@@ -40,6 +40,7 @@ import java.io.File
 import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
 import java.util.List
+import net.sf.orcc.ir.TypeBool
 
 /*
  * Compile Instance c source code
@@ -204,7 +205,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
-		if (!«instance.outgoingPortMap.get(port).head.fifoName».empty()) {
+		if («instance.outgoingPortMap.get(port).head.fifoName».full()) {
 			stop = 1;
 		}
 	'''
@@ -340,4 +341,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			goto finished;
 		«ENDIF»
 	'''
+	
+	override caseTypeBool(TypeBool type) 
+		'''bool'''
 }
