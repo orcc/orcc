@@ -36,6 +36,7 @@ import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.IrFactory;
@@ -61,6 +62,19 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class StringTransformation extends DfVisitor<Void> {
 
 	private class PrintTransformer extends AbstractIrVisitor<Void> {
+
+		public PrintTransformer() {
+			super(true);
+		}
+
+		@Override
+		public Void caseExprString(ExprString expr) {
+			Var variable = createStringVariable(expr.getValue());
+			stateVars.add(variable);
+			ExprVar exprVar = IrFactory.eINSTANCE.createExprVar(variable);
+			EcoreUtil.replace(expr, exprVar);
+			return null;
+		}
 
 		@Override
 		public Void caseInstCall(InstCall call) {
