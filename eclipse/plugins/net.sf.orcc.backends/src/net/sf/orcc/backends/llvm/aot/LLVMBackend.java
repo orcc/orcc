@@ -143,11 +143,11 @@ public class LLVMBackend extends AbstractBackend {
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, true, false));
+		transformations.add(new StringTransformation());
 		transformations.add(new DfVisitor<Void>(new SSATransformation()));
 		transformations.add(new DeadGlobalElimination());
 		transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
 		transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-		transformations.add(new StringTransformation());
 		transformations.add(new RenameTransformation(this.renameMap));
 		transformations.add(new DfVisitor<Expression>(new TacTransformation()));
 		transformations.add(new DfVisitor<Void>(new CopyPropagator()));
