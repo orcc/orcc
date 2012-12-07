@@ -35,6 +35,8 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.TypeInt
+import net.sf.orcc.ir.TypeUint
 
 /**
  * Compile top Network c source code 
@@ -52,17 +54,8 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		// Generated from "«network.name»"
 
 		#include <hls_stream.h>
+		#include <ap_int.h>
 		using namespace hls;
-
-		typedef signed char i8;
-		typedef short i16;
-		typedef int i32;
-		typedef long long int i64;
-		
-		typedef unsigned char u8;
-		typedef unsigned short u16;
-		typedef unsigned int u32;
-		typedef unsigned long long int u64;
 		
 		/////////////////////////////////////////////////
 		// FIFO pointer assignments
@@ -160,4 +153,10 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		
 	override caseTypeBool(TypeBool type) 
 		'''bool'''
+		
+	override caseTypeInt(TypeInt type)
+		'''ap_int<«type.size»>'''
+
+	override caseTypeUint(TypeUint type) 
+		'''ap_uint<«type.size»>'''
 }

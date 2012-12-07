@@ -41,6 +41,8 @@ import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
 import java.util.List
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.TypeInt
+import net.sf.orcc.ir.TypeUint
 
 /*
  * Compile Instance c source code
@@ -59,18 +61,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Source file is "«instance.actor.file»"
 		
 		#include <hls_stream.h>
+		#include <ap_int.h>
 		using namespace hls;
-		
-		typedef signed char i8;
-		typedef short i16;
-		typedef int i32;
-		typedef long long int i64;
-		
-		typedef unsigned char u8;
-		typedef unsigned short u16;
-		typedef unsigned int u32;
-		typedef unsigned long long int u64;
-		
 		
 		
 		////////////////////////////////////////////////////////////////////////////////
@@ -262,7 +254,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«load.target.variable.indexedName» = «instance.incomingPortMap.get(srcPort).fifoName».read();
+				 «instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
 			«ELSE»
 				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
@@ -274,7 +266,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val trgtPort = store.target.variable.port
 		'''
 		«IF trgtPort != null»
-				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
@@ -344,4 +336,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override caseTypeBool(TypeBool type) 
 		'''bool'''
+		
+	override caseTypeInt(TypeInt type)
+		'''ap_int<«type.size»>'''
+
+	override caseTypeUint(TypeUint type) 
+		'''ap_uint<«type.size»>'''
+		
 }
