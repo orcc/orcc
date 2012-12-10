@@ -245,7 +245,7 @@ public class SSATransformation extends AbstractIrVisitor<Void> {
 	 * @param object
 	 *            an object
 	 */
-	private void replaceUses(EObject eObject) {
+	protected void replaceUses(EObject eObject) {
 		for (Use use : EcoreHelper.getObjects(eObject, Use.class)) {
 			Var oldVar = use.getVariable();
 			if (oldVar.isLocal()) {
