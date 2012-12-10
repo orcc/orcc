@@ -82,14 +82,15 @@ class TceDesignPrinter extends TTAPrinter {
 					«ENDIF»
 				«ENDFOR»
 				«FOR output : instance.actor.outputs.filter(port | !port.native)»
-					«var outgoing = instance.outgoingPortMap.get(output).get(0)»
-					<output name="fifo_«outgoing.getValueAsObject("id").toString»">
-						<address-space>«processor.getMemory(outgoing).name»</address-space>
-						<signed>«output.type.int»</signed>
-						<width>«output.width»</width>
-						<size>«outgoing.size»</size>
-						<trace>«path»/trace/«instance.name»_«output.name».txt</trace>
-					</output>
+					«FOR outgoing : instance.outgoingPortMap.get(output)»
+						<output name="fifo_«outgoing.getValueAsObject("id").toString»">
+							<address-space>«processor.getMemory(outgoing).name»</address-space>
+							<signed>«output.type.int»</signed>
+							<width>«output.width»</width>
+							<size>«outgoing.size»</size>
+							<trace>«path»/trace/«instance.name»_«output.name».txt</trace>
+						</output>
+					«ENDFOR»
 				«ENDFOR»
 			«ENDFOR»
 		</processor>
