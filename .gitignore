@@ -11,3 +11,9 @@ xtend-gen
 # Specific rules to ignore Xtext arifacts
 plugin.xml_gen
 .antlr-generator-3.2.0.jar
+
+# Do not track CHANGELOG symlinks
+**/CHANGES
+**/CHANGELOG
+**/CHANGES.md
+**/CHANGELOG.md
