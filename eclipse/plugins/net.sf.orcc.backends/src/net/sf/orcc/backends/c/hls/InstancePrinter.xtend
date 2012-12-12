@@ -45,7 +45,7 @@ import net.sf.orcc.ir.TypeBool
 /*
  * Compile Instance c source code
  *  
- * @author Antoine Lorence
+ * @author Antoine Lorence and Khaled Jerbi 
  * 
  */
  
@@ -262,7 +262,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«load.target.variable.indexedName» = «instance.incomingPortMap.get(srcPort).fifoName».read();
+				 «instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
 			«ELSE»
 				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
@@ -274,7 +274,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val trgtPort = store.target.variable.port
 		'''
 		«IF trgtPort != null»
-				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
