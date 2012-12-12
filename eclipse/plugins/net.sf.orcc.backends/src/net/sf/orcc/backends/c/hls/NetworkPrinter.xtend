@@ -39,7 +39,7 @@ import net.sf.orcc.ir.TypeBool
 /**
  * Compile top Network c source code 
  *  
- * @author Antoine Lorence
+ * @author Antoine Lorence and Khaled Jerbi
  * 
  */
 class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
@@ -73,7 +73,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		
 		
 		/////////////////////////////////////////////////
-		// Action schedulers
+		// Action initializes schedulers
 		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm )»
@@ -122,14 +122,18 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	'''
 	override assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
-				«printFifoAssignHLS(connList.head.source as Instance, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"),connList.head )»
+			«IF (!(connList.head.source instanceof Port) && !(connList.head.target instanceof Port))||(!(connList.head.source instanceof Port) && (connList.head.target instanceof Port))»
+				«printFifoAssignHLS(connList.head )»
+			«ENDIF»			
+		«ENDFOR»
+		«FOR connList : instance.incomingPortMap.values»
+			«IF ((connList.source instanceof Port) && !(connList.target instanceof Port))»
+				«printFifoAssignHLS(connList)»
 			«ENDIF»
-			
 		«ENDFOR»
 	'''
 	
-	def printFifoAssignHLS(Instance vertex, Port port, int fifoIndex, Connection connection) '''
+	def printFifoAssignHLS(Connection connection) '''
 		stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
 	'''
 	
@@ -155,7 +159,11 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		'''myStream_«connection.getAttribute("id").objectValue»'''
 	
 	def fifoType(Connection connection) {
-		connection.sourcePort.type
+		if (connection.sourcePort != null){	
+			connection.sourcePort.type
+		}else{
+			connection.targetPort.type
+		}
 	}
 		
 	override caseTypeBool(TypeBool type) 
