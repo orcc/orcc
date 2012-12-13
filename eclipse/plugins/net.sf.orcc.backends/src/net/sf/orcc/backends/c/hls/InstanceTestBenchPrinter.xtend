@@ -68,14 +68,13 @@ import java.io.File
 	ap_start : IN STD_LOGIC;
 	ap_done : OUT STD_LOGIC;
 	ap_idle : OUT STD_LOGIC;
-	ap_ready : OUT STD_LOGIC;
 	«FOR connection : instance.outgoingPortMap.values»
 		«assignOutputFifo(connection.head)»
 	«ENDFOR»
 	«FOR connection : instance.incomingPortMap.values»
 		«assignInputFifo(connection)»
 	«ENDFOR»
-	ap_return : OUT STD_LOGIC_VECTOR (31 downto 0)
+	ap_ready : OUT STD_LOGIC
 	 );
 	END COMPONENT;	
 		
@@ -91,7 +90,6 @@ import java.io.File
 	«FOR connection : instance.incomingPortMap.values»
 		«printInputSignalFifoAssignHLS(connection)»
 	«ENDFOR»
-	signal ap_return :  STD_LOGIC_VECTOR (31 downto 0):= (others => '0');
 	
 	-- Configuration
 	signal count       : integer range 255 downto 0 := 0;
@@ -124,14 +122,13 @@ import java.io.File
 	ap_start => ap_start,
 	ap_done => ap_done,
 	ap_idle => ap_idle,
-	ap_ready =>ap_ready,
 	«FOR connection : instance.outgoingPortMap.values»
 		«printOutputFifoMappingHLS(connection.head)»
 	«ENDFOR»
 	«FOR connection : instance.incomingPortMap.values»
 		«printInputFifoMappingHLS(connection)»
 	«ENDFOR»
-	ap_return => ap_return);
+	ap_ready =>ap_ready);
 
 	clockProcess : process
 	   begin
