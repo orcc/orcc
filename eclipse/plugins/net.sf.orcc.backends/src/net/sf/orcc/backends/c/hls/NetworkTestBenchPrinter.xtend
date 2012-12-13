@@ -48,6 +48,19 @@ import java.io.File
 	new(Network benchNetwork, Map<String,Object> options) {
 		super(benchNetwork, options)
 	}
+	
+	override print(String targetFolder) {
+		
+		val contentNetwork = networkFileContent
+		val NetworkFile = new File(targetFolder + File::separator + network.simpleName + ".vhd")
+		
+		if(needToWriteFile(contentNetwork, NetworkFile)) {
+			printFile(contentNetwork, NetworkFile)
+			return 0
+		} else {
+			return 1
+		}
+	}
 
 	override getNetworkFileContent() '''
 	LIBRARY ieee;
@@ -241,12 +254,12 @@ import java.io.File
 	
 	def assignFifoFile(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
-			«IF (connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
+			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
 				file sim_file_«instance.name»_«connList.head.sourcePort.name»  : text is "«instance.name»_«connList.head.sourcePort.name».txt";
 			«ENDIF»
 		«ENDFOR»
 		«FOR connList : instance.incomingPortMap.values»
-			«IF !(connList.source instanceof Port) && (connList.target instanceof Port)»
+			«IF (connList.source instanceof Port) && !(connList.target instanceof Port)»
 				file sim_file_«instance.name»_«connList.targetPort.name»  : text is "«instance.name»_«connList.targetPort.name».txt";
 			«ENDIF»
 		«ENDFOR»
@@ -401,19 +414,7 @@ import java.io.File
 			«ENDIF»
 		«ENDFOR»
 	'''
-	
-	override print(String targetFolder) {
-		val i = super.print(targetFolder)
-		
-		val contentNetwork = networkFileContent
-		val NetworkFile = new File(targetFolder + File::separator + network.simpleName + ".vhd")
-		if(needToWriteFile(contentNetwork, NetworkFile)) {
-			printFile(contentNetwork, NetworkFile)
-			return i
-		} else {
-			return i + 1
-		}
-	}
+
 	
 	def fifoName(Connection connection)
 		'''myStream_«connection.getAttribute("id").objectValue»_V'''
