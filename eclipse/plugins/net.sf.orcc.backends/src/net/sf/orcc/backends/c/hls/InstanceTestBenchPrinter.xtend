@@ -51,6 +51,7 @@ import java.io.File
 	override getInstanceFileContent() '''
 	LIBRARY ieee;
 	USE ieee.std_logic_1164.ALL;
+	USE ieee.std_logic_unsigned.all;
 	USE ieee.numeric_std.ALL;
 	USE std.textio.all;
 	
@@ -211,22 +212,22 @@ import java.io.File
 	
 	def printOutputSignalFifoAssignHLS(Connection connection) '''
 		«IF connection.fifoType.bool»
-			signal «connection.fifoName»_din    : OUT STD_LOGIC := '0';
+			signal «connection.fifoName»_din    :  STD_LOGIC := '0';
 		«ELSE»
-			signal «connection.fifoName»_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
+			signal «connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
 		«ENDIF»
-		signal «connection.fifoName»_full_n : IN STD_LOGIC := '0';
-		signal «connection.fifoName»_write  : OUT STD_LOGIC := '0';
+		signal «connection.fifoName»_full_n :  STD_LOGIC := '0';
+		signal «connection.fifoName»_write  :  STD_LOGIC := '0';
 	'''
 	
 	def printInputSignalFifoAssignHLS(Connection connection) '''
 		«IF connection.fifoType.bool»
-			signal «connection.fifoName»_dout   : IN STD_LOGIC := '0';
+			signal «connection.fifoName»_dout   :  STD_LOGIC := '0';
 		«ELSE»
-			signal «connection.fifoName»_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
+			signal «connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
 		«ENDIF»
-		signal «connection.fifoName»_empty_n : IN STD_LOGIC := '0';
-		signal «connection.fifoName»_read    : OUT STD_LOGIC := '0';
+		signal «connection.fifoName»_empty_n :  STD_LOGIC := '0';
+		signal «connection.fifoName»_read    :  STD_LOGIC := '0';
 	'''
 	
 	def printOutputFifoMappingHLS(Connection connection) '''
@@ -252,7 +253,7 @@ import java.io.File
 
 		when read_file =>
 		if (not endfile (sim_file_«instance.name»_«connection.targetPort.name»)) then
-			readline(sim_file_DecoderIntra_bits, line_number);
+			readline(sim_file_«instance.name»_«connection.targetPort.name», line_number);
 			if (line_number'length > 0 and line_number(1) /= '/') then
 				read(line_number, input_bit);
 				«IF connection.fifoType.int»
@@ -296,7 +297,7 @@ import java.io.File
 				«ENDIF»
 				ap_start <= '1';      
 		end if;
-			elsif (endfile (sim_file_DecoderIntra_bits)) then
+			elsif (endfile (sim_file_«instance.name»_«connection.targetPort.name»)) then
 				ap_start <= '0';
 				«connection.fifoName»_empty_n <= '0';
 			end if;

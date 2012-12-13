@@ -149,8 +149,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«instance.actor.actionsOutsideFsm.printActionLoop»
 			finished:
 				return;
-			// no read_end/write_end here!
-			return;
 			}
 		«ENDIF»
 		
@@ -262,7 +260,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				 «instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
+				 «instance.incomingPortMap.get(srcPort).fifoName».read(«load.target.variable.indexedName»);
 			«ELSE»
 				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
@@ -274,7 +272,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val trgtPort = store.target.variable.port
 		'''
 		«IF trgtPort != null»
-				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
