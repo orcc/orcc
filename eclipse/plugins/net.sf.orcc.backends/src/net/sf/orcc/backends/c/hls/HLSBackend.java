@@ -74,6 +74,11 @@ public class HLSBackend extends CBackend {
 	private String srcPath;
 
 	/**
+	 * Path to target "testBench" folder
+	 */
+	private String testBenchPath;
+
+	/**
 	 * Configuration mapping
 	 */
 	protected Map<String, List<Instance>> targetToInstancesMap;
@@ -85,6 +90,7 @@ public class HLSBackend extends CBackend {
 		new File(path + File.separator + "bin").mkdirs();
 
 		srcPath = path + File.separator + "src";
+		testBenchPath = path + File.separator + "testBench";
 	}
 
 	@Override
@@ -188,10 +194,20 @@ public class HLSBackend extends CBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
+		
+		OrccLogger.trace("Printing network testbench... ");
+		if (new NetworkTestBenchPrinter(network, options).print(testBenchPath) > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
+		
+		
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
+		new InstanceTestBenchPrinter(instance, options).printInstance(testBenchPath);
 		return new InstancePrinter(instance, options).printInstance(srcPath) > 0;
 	}
 }

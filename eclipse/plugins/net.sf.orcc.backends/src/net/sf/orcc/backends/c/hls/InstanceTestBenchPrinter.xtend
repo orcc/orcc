@@ -44,8 +44,8 @@ import java.io.File
  
  class InstanceTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
-	new(Instance instanceTestBench, Map<String, Object> options) {
-		super(instanceTestBench, options)
+	new(Instance benchInstance, Map<String, Object> options) {
+		super(benchInstance, options)
 	}
 
 	override getInstanceFileContent() '''
@@ -69,8 +69,8 @@ import java.io.File
 	ap_done : OUT STD_LOGIC;
 	ap_idle : OUT STD_LOGIC;
 	ap_ready : OUT STD_LOGIC;
-	«FOR connection : instance.outgoingPortMap.values.head»
-		«assignOutputFifo(connection)»
+	«FOR connection : instance.outgoingPortMap.values»
+		«assignOutputFifo(connection.head)»
 	«ENDFOR»
 	«FOR connection : instance.incomingPortMap.values»
 		«assignInputFifo(connection)»
@@ -85,8 +85,8 @@ import java.io.File
 	signal ap_done :  STD_LOGIC;
 	signal ap_idle :  STD_LOGIC;
 	signal ap_ready :  STD_LOGIC;
-	«FOR connection : instance.outgoingPortMap.values.head»
-		«printOutputSignalFifoAssignHLS(connection)»
+	«FOR connection : instance.outgoingPortMap.values»
+		«printOutputSignalFifoAssignHLS(connection.head)»
 	«ENDFOR»
 	«FOR connection : instance.incomingPortMap.values»
 		«printInputSignalFifoAssignHLS(connection)»
@@ -106,13 +106,13 @@ import java.io.File
 	
 	 -- Input and Output files
 	signal tb_FSM_bits  : tb_type;
-	«FOR connection : instance.outgoingPortMap.values.head»
-		«IF (connection.source instanceof Port) && !(connection.target instanceof Port)»
-				file sim_file_«instance.name»_«connection.sourcePort.name»  : text is "«instance.name»_«connection.sourcePort.name».txt";
+	«FOR connection : instance.outgoingPortMap.values»
+		«IF !(connection.head.source instanceof Port) && (connection.head.target instanceof Port)»
+				file sim_file_«instance.name»_«connection.head.sourcePort.name»  : text is "«instance.name»_«connection.head.sourcePort.name».txt";
 		«ENDIF»
 	«ENDFOR»
 	«FOR connection : instance.incomingPortMap.values»
-		«IF !(connection.source instanceof Port) && (connection.target instanceof Port)»
+		«IF (connection.source instanceof Port) && !(connection.target instanceof Port)»
 				file sim_file_«instance.name»_«connection.targetPort.name»  : text is "«instance.name»_«connection.targetPort.name».txt";
 		«ENDIF»
 	«ENDFOR»
@@ -125,8 +125,8 @@ import java.io.File
 	ap_done => ap_done,
 	ap_idle => ap_idle,
 	ap_ready =>ap_ready,
-	«FOR connection : instance.outgoingPortMap.values.head»
-		«printOutputFifoMappingHLS(connection)»
+	«FOR connection : instance.outgoingPortMap.values»
+		«printOutputFifoMappingHLS(connection.head)»
 	«ENDFOR»
 	«FOR connection : instance.incomingPortMap.values»
 		«printInputFifoMappingHLS(connection)»
@@ -181,9 +181,9 @@ import java.io.File
 	end process WaveGen_Proc_Out;
 	«ENDIF»
 	
-	«FOR connection : instance.outgoingPortMap.values.head»
-		«IF !(connection.source instanceof Port) && (connection.target instanceof Port)»
-				«connection.fifoName»_full_n <= '1';
+	«FOR connection : instance.outgoingPortMap.values»
+		«IF !(connection.head.source instanceof Port) && (connection.head.target instanceof Port)»
+				«connection.head.fifoName»_full_n <= '1';
 		«ENDIF»
 	«ENDFOR»
 	
