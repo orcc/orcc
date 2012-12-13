@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.c.hls
 
 import net.sf.orcc.df.Instance
-import net.sf.orcc.df.Network
 import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Port
@@ -43,13 +42,13 @@ import java.io.File
  */
  
  
- class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
+ class InstanceTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
-	new(Network benchNetwork, Map<String,Object> options) {
-		super(benchNetwork, options)
+	new(Instance instanceTestBench, Map<String, Object> options) {
+		super(instanceTestBench, options)
 	}
 
-	override getNetworkFileContent() '''
+	override getInstanceFileContent() '''
 	LIBRARY ieee;
 	USE ieee.std_logic_1164.ALL;
 	USE ieee.numeric_std.ALL;
@@ -62,7 +61,7 @@ import java.io.File
 	ARCHITECTURE behavior OF testbench IS
 	
 	-- Component Declaration
-	COMPONENT main
+	COMPONENT «instance.name»_scheduler
 	PORT(
 	ap_clk : IN STD_LOGIC;
 	ap_rst : IN STD_LOGIC;
@@ -70,8 +69,11 @@ import java.io.File
 	ap_done : OUT STD_LOGIC;
 	ap_idle : OUT STD_LOGIC;
 	ap_ready : OUT STD_LOGIC;
-	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-		«instance.assignFifo»
+	«FOR connection : instance.outgoingPortMap.values.head»
+		«assignOutputFifo(connection)»
+	«ENDFOR»
+	«FOR connection : instance.incomingPortMap.values»
+		«assignInputFifo(connection)»
 	«ENDFOR»
 	ap_return : OUT STD_LOGIC_VECTOR (31 downto 0)
 	 );
@@ -83,8 +85,11 @@ import java.io.File
 	signal ap_done :  STD_LOGIC;
 	signal ap_idle :  STD_LOGIC;
 	signal ap_ready :  STD_LOGIC;
-	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-		«instance.assignFifoSignal»
+	«FOR connection : instance.outgoingPortMap.values.head»
+		«printOutputSignalFifoAssignHLS(connection)»
+	«ENDFOR»
+	«FOR connection : instance.incomingPortMap.values»
+		«printInputSignalFifoAssignHLS(connection)»
 	«ENDFOR»
 	signal ap_return :  STD_LOGIC_VECTOR (31 downto 0):= (others => '0');
 	
@@ -101,8 +106,15 @@ import java.io.File
 	
 	 -- Input and Output files
 	signal tb_FSM_bits  : tb_type;
-	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-		«instance.assignFifoFile»
+	«FOR connection : instance.outgoingPortMap.values.head»
+		«IF (connection.source instanceof Port) && !(connection.target instanceof Port)»
+				file sim_file_«instance.name»_«connection.sourcePort.name»  : text is "«instance.name»_«connection.sourcePort.name».txt";
+		«ENDIF»
+	«ENDFOR»
+	«FOR connection : instance.incomingPortMap.values»
+		«IF !(connection.source instanceof Port) && (connection.target instanceof Port)»
+				file sim_file_«instance.name»_«connection.targetPort.name»  : text is "«instance.name»_«connection.targetPort.name».txt";
+		«ENDIF»
 	«ENDFOR»
 	begin
 
@@ -113,8 +125,11 @@ import java.io.File
 	ap_done => ap_done,
 	ap_idle => ap_idle,
 	ap_ready =>ap_ready,
-	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-		«instance.mappingFifoSignal»
+	«FOR connection : instance.outgoingPortMap.values.head»
+		«printOutputFifoMappingHLS(connection)»
+	«ENDFOR»
+	«FOR connection : instance.incomingPortMap.values»
+		«printInputFifoMappingHLS(connection)»
 	«ENDFOR»
 	ap_return => ap_return);
 
@@ -140,66 +155,42 @@ import java.io.File
 	      wait;
 	   end process;
 	
-	«IF ! network.inputs.empty»
+	«IF ! instance.incomingPortMap.empty»
 	WaveGen_Proc_In : process (ap_clk)
 	  variable Input_bit   : integer range 2147483647 downto - 2147483648;
 	  variable line_number : line;
 	begin
 	  if rising_edge(ap_clk) then
-	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-		«instance.waveGenInputs»
+	«FOR connection : instance.incomingPortMap.values»
+		«printInputWaveGen(instance, connection)»
 	«ENDFOR»
 	end if;
 	end process WaveGen_Proc_In;
 	«ENDIF»
 	
-	«IF ! network.outputs.empty»
+	«IF ! instance.outgoingPortMap.empty»
 	WaveGen_Proc_Out : process (clock)
 	variable Input_bit   : integer range 2147483647 downto - 2147483648;
 	variable line_number : line;
 	begin
 	if (rising_edge(clock)) then
-	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-		«instance.waveGenOutputs»
+	«FOR connection : instance.outgoingPortMap.values.head»
+		«printOutputWaveGen(instance, connection)»
 	«ENDFOR»
 	end if;
 	end process WaveGen_Proc_Out;
 	«ENDIF»
 	
-	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-		«instance.initOutputs»
+	«FOR connection : instance.outgoingPortMap.values.head»
+		«IF !(connection.source instanceof Port) && (connection.target instanceof Port)»
+				«connection.fifoName»_full_n <= '1';
+		«ENDIF»
 	«ENDFOR»
 	
 	END;
 	'''
 	
-	override assignFifo(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«printOutputFifoAssignHLS(connList.head )»
-			«ENDIF»
-		«ENDFOR»
-		«FOR connList : instance.incomingPortMap.values»
-			«IF (connList.source instanceof Port) && !(connList.target instanceof Port) »
-				«printInputFifoAssignHLS(connList)»
-			«ENDIF»
-		«ENDFOR»
-	'''
-	
-	def assignFifoSignal(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«printOutputSignalFifoAssignHLS(connList.head )»
-			«ENDIF»
-		«ENDFOR»
-		«FOR connList : instance.incomingPortMap.values»
-			«IF (connList.source instanceof Port) && !(connList.target instanceof Port)»
-				«printInputSignalFifoAssignHLS(connList)»
-			«ENDIF»
-		«ENDFOR»
-	'''
-	
-	def printOutputFifoAssignHLS( Connection connection) '''
+	def assignOutputFifo(Connection connection) '''
 		«IF connection.fifoType.bool»
 			«connection.fifoName»_din    : OUT STD_LOGIC;
 		«ELSE»
@@ -209,7 +200,9 @@ import java.io.File
 		«connection.fifoName»_write  : OUT STD_LOGIC;
 	'''
 	
-	def printInputFifoAssignHLS(Connection connection) '''
+	
+	
+	def assignInputFifo(Connection connection) '''
 		«IF connection.fifoType.bool»
 			«connection.fifoName»_dout   : IN STD_LOGIC;
 		«ELSE»
@@ -239,32 +232,6 @@ import java.io.File
 		signal «connection.fifoName»_read    : OUT STD_LOGIC := '0';
 	'''
 	
-	def assignFifoFile(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF (connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
-				file sim_file_«instance.name»_«connList.head.sourcePort.name»  : text is "«instance.name»_«connList.head.sourcePort.name».txt";
-			«ENDIF»
-		«ENDFOR»
-		«FOR connList : instance.incomingPortMap.values»
-			«IF !(connList.source instanceof Port) && (connList.target instanceof Port)»
-				file sim_file_«instance.name»_«connList.targetPort.name»  : text is "«instance.name»_«connList.targetPort.name».txt";
-			«ENDIF»
-		«ENDFOR»
-	'''
-	
-	def mappingFifoSignal(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«printOutputFifoMappingHLS(connList.head )»
-			«ENDIF»
-		«ENDFOR»
-		«FOR connList : instance.incomingPortMap.values»
-			«IF (connList.source instanceof Port
-			) && !(connList.target instanceof Port)»
-				«printInputFifoMappingHLS(connList)»
-			«ENDIF»
-		«ENDFOR»
-	'''
 	def printOutputFifoMappingHLS(Connection connection) '''
 		«connection.fifoName»_din    => «connection.fifoName»_din,
 		«connection.fifoName»_full_n => «connection.fifoName»_full_n,
@@ -275,22 +242,6 @@ import java.io.File
 		«connection.fifoName»_dout    => «connection.fifoName»_dout,
 		«connection.fifoName»_empty_n => «connection.fifoName»_empty_n,
 		«connection.fifoName»_read    => «connection.fifoName»_read,
-	'''
-	
-	def waveGenInputs(Instance instance) '''
-		«FOR connList : instance.incomingPortMap.values»
-			«IF (connList.source instanceof Port) && !(connList.target instanceof Port)»
-				«printInputWaveGen(connList.target as Instance ,connList)»
-			«ENDIF»
-		«ENDFOR»
-	'''
-	
-	def waveGenOutputs(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«printOutputWaveGen(connList.head.source as Instance,connList.head )»
-			«ENDIF»
-		«ENDFOR»
 	'''
 	
 	def printInputWaveGen(Instance instance, Connection connection) '''
@@ -394,24 +345,15 @@ import java.io.File
 		end if;
 	'''
 	
-	def initOutputs(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«connList.head.fifoName»_full_n <= '1';
-			«ENDIF»
-		«ENDFOR»
-	'''
-	
-	override print(String targetFolder) {
-		val i = super.print(targetFolder)
+	override printInstance(String targetFolder) {
+		val content = instanceFileContent
+		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
 		
-		val contentNetwork = networkFileContent
-		val NetworkFile = new File(targetFolder + File::separator + network.simpleName + ".vhd")
-		if(needToWriteFile(contentNetwork, NetworkFile)) {
-			printFile(contentNetwork, NetworkFile)
-			return i
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
 		} else {
-			return i + 1
+			return 1
 		}
 	}
 	
