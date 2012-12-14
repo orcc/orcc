@@ -871,11 +871,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			if (line.hasOption('f')) {
 				String fifo_size = line.getOptionValue('f');
 				try {
-					Integer.parseInt(fifo_size);
+					int size = Integer.parseInt(fifo_size);
+					optionMap.put(FIFO_SIZE, size);
 				} catch (NumberFormatException e) {
 					throw new ParseException("Expected integer as FIFO size");
 				}
-				optionMap.put(FIFO_SIZE, fifo_size);
 			}
 
 			optionMap.put(CLASSIFY, line.hasOption('c'));
