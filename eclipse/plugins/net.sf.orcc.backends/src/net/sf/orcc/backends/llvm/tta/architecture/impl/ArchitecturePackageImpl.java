@@ -1790,15 +1790,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				null, 0, 1, Memory.class, IS_TRANSIENT, IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
-		initEAttribute(getMemory_MinAddress(), ecorePackage.getEInt(),
+		initEAttribute(getMemory_MinAddress(), ecorePackage.getELong(),
 				"minAddress", null, 0, 1, Memory.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMemory_MaxAddress(), ecorePackage.getEInt(),
+		initEAttribute(getMemory_MaxAddress(), theEcorePackage.getELong(),
 				"maxAddress", null, 0, 1, Memory.class, IS_TRANSIENT,
 				IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMemory_Depth(), theEcorePackage.getEInt(), "depth",
+		initEAttribute(getMemory_Depth(), theEcorePackage.getELong(), "depth",
 				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);

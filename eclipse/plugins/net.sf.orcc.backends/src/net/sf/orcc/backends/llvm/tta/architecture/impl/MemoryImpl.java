@@ -78,7 +78,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int MIN_ADDRESS_EDEFAULT = 0;
+	protected static final long MIN_ADDRESS_EDEFAULT = 0L;
 
 	/**
 	 * The cached value of the '{@link #getMinAddress() <em>Min Address</em>}' attribute.
@@ -87,7 +87,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * @generated
 	 * @ordered
 	 */
-	protected int minAddress = MIN_ADDRESS_EDEFAULT;
+	protected long minAddress = MIN_ADDRESS_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getMaxAddress() <em>Max Address</em>}' attribute.
@@ -96,7 +96,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int MAX_ADDRESS_EDEFAULT = 0;
+	protected static final long MAX_ADDRESS_EDEFAULT = 0L;
 
 	/**
 	 * The default value of the '{@link #getDepth() <em>Depth</em>}' attribute.
@@ -105,7 +105,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int DEPTH_EDEFAULT = 0;
+	protected static final long DEPTH_EDEFAULT = 0L;
 
 	/**
 	 * The cached value of the '{@link #getDepth() <em>Depth</em>}' attribute.
@@ -114,7 +114,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * @generated
 	 * @ordered
 	 */
-	protected int depth = DEPTH_EDEFAULT;
+	protected long depth = DEPTH_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getWordWidth() <em>Word Width</em>}' attribute.
@@ -188,16 +188,17 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getMinAddress() {
+	public long getMinAddress() {
 		return minAddress;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setMinAddress(int newMinAddress) {
-		int oldMinAddress = minAddress;
+	public void setMinAddress(long newMinAddress) {
+		long oldMinAddress = minAddress;
 		minAddress = newMinAddress;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
@@ -208,7 +209,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
-	public int getMaxAddress() {
+	public long getMaxAddress() {
 		return getMinAddress() + getDepth() - 1;
 	}
 
@@ -216,16 +217,17 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getDepth() {
+	public long getDepth() {
 		return depth;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setDepth(int newDepth) {
-		int oldDepth = depth;
+	public void setDepth(long newDepth) {
+		long oldDepth = depth;
 		depth = newDepth;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
@@ -317,10 +319,10 @@ public class MemoryImpl extends LinkImpl implements Memory {
 			setName((String) newValue);
 			return;
 		case ArchitecturePackage.MEMORY__MIN_ADDRESS:
-			setMinAddress((Integer) newValue);
+			setMinAddress((Long) newValue);
 			return;
 		case ArchitecturePackage.MEMORY__DEPTH:
-			setDepth((Integer) newValue);
+			setDepth((Long) newValue);
 			return;
 		case ArchitecturePackage.MEMORY__WORD_WIDTH:
 			setWordWidth((Integer) newValue);

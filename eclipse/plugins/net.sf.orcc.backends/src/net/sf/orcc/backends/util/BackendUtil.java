@@ -100,9 +100,9 @@ public class BackendUtil {
 	 *            the value to round up
 	 * @return the next power of 2 after the value
 	 */
-	public static int quantizeUp(int value) {
+	public static long quantizeUp(long value) {
 		double tmp = Math.log(value) / Math.log(2.0);
-		return (int) (Math.pow(2, Math.ceil(tmp)));
+		return (long) Math.pow(2, Math.ceil(tmp));
 	}
 
 	/**
