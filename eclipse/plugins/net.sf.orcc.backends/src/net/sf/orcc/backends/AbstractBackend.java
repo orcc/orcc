@@ -830,6 +830,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// Optional command line arguments
 		options.addOption("d", "debug", false, "Enable debug mode");
+		options.addOption("f", "fifo-size", true,
+				"Default size of the FIFO channels");
 
 		options.addOption("c", "classify", false, "Classify the given network");
 		options.addOption("smt", "smt-solver", true,
@@ -866,6 +868,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(OUTPUT_FOLDER, line.getOptionValue('o'));
 
 			optionMap.put(DEBUG_MODE, line.hasOption('d'));
+			if (line.hasOption('f')) {
+				String fifo_size = line.getOptionValue('f');
+				try {
+					int size = Integer.parseInt(fifo_size);
+					optionMap.put(FIFO_SIZE, size);
+				} catch (NumberFormatException e) {
+					throw new ParseException("Expected integer as FIFO size");
+				}
+			}
 
 			optionMap.put(CLASSIFY, line.hasOption('c'));
 

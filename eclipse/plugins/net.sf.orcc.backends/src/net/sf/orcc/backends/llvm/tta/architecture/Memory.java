@@ -91,12 +91,12 @@ public interface Memory extends Link {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Min Address</em>' attribute.
-	 * @see #setMinAddress(int)
+	 * @see #setMinAddress(long)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getMemory_MinAddress()
 	 * @model
 	 * @generated
 	 */
-	int getMinAddress();
+	long getMinAddress();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getMinAddress <em>Min Address</em>}' attribute.
@@ -106,7 +106,7 @@ public interface Memory extends Link {
 	 * @see #getMinAddress()
 	 * @generated
 	 */
-	void setMinAddress(int value);
+	void setMinAddress(long value);
 
 	/**
 	 * Returns the value of the '<em><b>Max Address</b></em>' attribute.
@@ -121,7 +121,7 @@ public interface Memory extends Link {
 	 * @model transient="true" changeable="false" volatile="true" derived="true"
 	 * @generated
 	 */
-	int getMaxAddress();
+	long getMaxAddress();
 
 	/**
 	 * Returns the value of the '<em><b>Depth</b></em>' attribute. <!--
@@ -138,15 +138,17 @@ public interface Memory extends Link {
 	 * @model
 	 * @generated
 	 */
-	int getDepth();
+	long getDepth();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getDepth <em>Depth</em>}' attribute. The value 
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getDepth <em>Depth</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Depth</em>' attribute.
 	 * @see #getDepth()
+	 * @generated
 	 */
-	void setDepth(int value);
+	void setDepth(long value);
 
 	/**
 	 * Returns the value of the '<em><b>Word Width</b></em>' attribute.
