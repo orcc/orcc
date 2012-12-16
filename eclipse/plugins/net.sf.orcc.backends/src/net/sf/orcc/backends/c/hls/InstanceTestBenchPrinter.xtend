@@ -185,6 +185,9 @@ import java.io.File
 		«ENDIF»
 	«ENDFOR»
 	
+	«IF (instance.outgoingPortMap.empty) && (instance.incomingPortMap.empty)»
+	ap_start <= '1';
+	«ENDIF»
 	END;
 	'''
 	

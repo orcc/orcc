@@ -168,11 +168,11 @@ import java.io.File
 	«ENDIF»
 	
 	«IF ! network.outputs.empty»
-	WaveGen_Proc_Out : process (clock)
+	WaveGen_Proc_Out : process (ap_clk)
 	variable Input_bit   : integer range 2147483647 downto - 2147483648;
 	variable line_number : line;
 	begin
-	if (rising_edge(clock)) then
+	if (rising_edge(ap_clk)) then
 	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 		«instance.waveGenOutputs»
 	«ENDFOR»
@@ -184,6 +184,9 @@ import java.io.File
 		«instance.initOutputs»
 	«ENDFOR»
 	
+	«IF (network.outputs.empty) && (network.inputs.empty)»
+	ap_start <= '1';
+	«ENDIF»
 	END;
 	'''
 	
@@ -377,31 +380,31 @@ import java.io.File
 				read(line_number, input_bit);
 				«IF connection.fifoType.int»
 				assert («connection.fifoName»_din  = std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»)))
-				-- report "on Y incorrectly value computed : " & to_string(to_integer(to_signed(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
-				report "on port Y incorrectly value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
+				-- report "on «connection.fifoName» incorrectly value computed : " & to_string(to_integer(to_signed(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
+				report "on port «connection.fifoName» incorrectly value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
 				severity error;
 				«ENDIF»
 				«IF connection.fifoType.uint»
 				assert («connection.fifoName»_din  = std_logic_vector(to_unsigned(input_bit, «connection.fifoType.sizeInBits»)))
-				-- report "on Y incorrectly value computed : " & to_string(to_integer(to_unsigned(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
-				report "on port Y incorrectly value computed : " & str(to_integer(unsigned(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
+				-- report "on «connection.fifoName» incorrectly value computed : " & to_string(to_integer(to_unsigned(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
+				report "on port «connection.fifoName» incorrectly value computed : " & str(to_integer(unsigned(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
 				severity error;
 				«ENDIF»
 				«IF connection.fifoType.bool»
 				if (input_bit = 1)
 					assert («connection.fifoName»_din  = '1')
-					report "0" instead of "1"
+					report on port «connection.fifoName» "0" instead of "1"
 					severity error;
 				else
 					assert («connection.fifoName»_din  = '0')
-					report "1" instead of "0"
+					report on port «connection.fifoName» "1" instead of "0"
 					severity error;
 				end if;
 				«ENDIF»
 				
 			
 				-- assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»)))
-				-- report "on port Y correct value computed : " & str(to_integer(signed(Y_data))) & " equals :" & str(input_bit)
+				-- report "on port «connection.fifoName» correct value computed : " & str(to_integer(signed(Y_data))) & " equals :" & str(input_bit)
 				-- severity note;
 
 			end if;

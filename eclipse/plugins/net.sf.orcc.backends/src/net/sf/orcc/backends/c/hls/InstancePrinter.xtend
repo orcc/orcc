@@ -195,8 +195,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				}
 			«ENDIF»
 			«transitions.head.action.body.name»();
-			
-			goto l_«transitions.head.target.name»;
+			_FSM_state = my_state_«transitions.head.target.name»;
+			goto finished;	
 		} else {
 			«schedulingState(srcState, transitions.tail)»
 		}
@@ -257,14 +257,17 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 	
 	override caseInstLoad(InstLoad load) {
+		if(load.eContainer != null){
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				 «instance.incomingPortMap.get(srcPort).fifoName».read(«load.target.variable.indexedName»);
+				 «instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
 			«ELSE»
 				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
 		'''
+		
+		}
 	}
 
 	
@@ -272,7 +275,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val trgtPort = store.target.variable.port
 		'''
 		«IF trgtPort != null»
-				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
