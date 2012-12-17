@@ -87,6 +87,7 @@ class InstancePrinter extends LLVMTemplate {
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
 	protected var optionProfile = false
+	protected var optionArch = "x86_64"
 	
 	/**
 	 * Default constructor, do not activate profile option and do not set instance (Jade requirement)
@@ -106,6 +107,9 @@ class InstancePrinter extends LLVMTemplate {
 		}
 		if(options.containsKey("net.sf.orcc.backends.profile")){
 			optionProfile = options.get("net.sf.orcc.backends.profile") as Boolean
+		}
+		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
+			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
 		}
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
@@ -205,7 +209,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDIF»
 	'''
 	
-	def protected printArchitecture() '''target triple = "x86_64"'''
+	def protected printArchitecture() '''target triple = "«optionArch»"'''
 	
 	def private schedulerWithFSM() '''
 		@_FSM_state = internal global i32 «stateToLabel.get(instance.actor.fsm.initialState)»

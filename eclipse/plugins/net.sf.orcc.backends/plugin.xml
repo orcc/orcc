@@ -76,6 +76,9 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
+               id="net.sf.orcc.backends.llvm.aot.targetTriple">
+         </option>
+         <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
       </backend>
@@ -350,13 +353,20 @@
                </comboBoxItem>
             </comboBox>
          </option>
-          <option
+         <option
                defaultValue="false"
                description="Map the FIFO channels on an existing memory when it's possible"
                id="net.sf.orcc.backends.llvm.tta.reduceConnections"
                name="Reduce the interconnection network">
             <checkBox></checkBox>
          </option>
+		<option
+				defaultValue="x86_64"
+				description="Specify the target triple"
+				id="net.sf.orcc.backends.llvm.aot.targetTriple"
+				name="Target triple">
+			<textBox></textBox>
+		</option>
    </extension>
    <extension
          id="c"
