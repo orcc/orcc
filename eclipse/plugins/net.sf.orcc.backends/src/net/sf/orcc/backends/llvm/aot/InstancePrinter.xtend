@@ -278,13 +278,15 @@ class InstancePrinter extends LLVMTemplate {
 				«IF !inputPattern.ports.notNative.empty»
 					;; Input pattern
 					«checkInputPattern(action, inputPattern, state)»
-					%is_schedulable_«extName» = call i1 @«action.scheduler.name» ()
+					%guard_«extName» = call «action.scheduler.returnType.doSwitch» @«action.scheduler.name» ()
+					%is_schedulable_«extName» = icmp eq «action.scheduler.returnType.doSwitch» %guard_«extName», 1
 					%is_fireable_«extName» = and i1 %is_schedulable_«extName», %has_valid_inputs_«extName»_«inputPattern.ports.size»
 
 					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ELSE»
 					;; Empty input pattern
-					%is_fireable_«extName» = call i1 @«action.scheduler.name» ()
+					%guard_«extName» = call «action.scheduler.returnType.doSwitch» @«action.scheduler.name» ()
+					%is_fireable_«extName» = icmp eq «action.scheduler.returnType.doSwitch» %guard_«extName», 1
 
 					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ENDIF»
@@ -344,13 +346,15 @@ class InstancePrinter extends LLVMTemplate {
 				«IF !inputPattern.ports.notNative.empty»
 					;; Input pattern
 					«checkInputPattern(action, inputPattern, null)»
-					%is_schedulable_«name» = call i1 @«action.scheduler.name» ()
+					%guard_«name» = call «action.scheduler.returnType.doSwitch» @«action.scheduler.name» ()
+					%is_schedulable_«name» = icmp eq «action.scheduler.returnType.doSwitch» %guard_«name», 1
 					%is_fireable_«name» = and i1 %is_schedulable_«name», %has_valid_inputs_«name»_«inputPattern.ports.size»
 
 					br i1 %is_fireable_«name», label %bb_«name»_check_outputs, label %bb_«name»_unschedulable
 				«ELSE»
 					;; Empty input pattern
-					%is_fireable_«name» = call i1 @«action.scheduler.name» ()
+					%guard_«name» = call «action.scheduler.returnType.doSwitch» @«action.scheduler.name» ()
+					%is_fireable_«name» = icmp eq «action.scheduler.returnType.doSwitch» %guard_«name», 1
 
 					br i1 %is_fireable_«name», label %bb_«name»_check_outputs, label %bb_«name»_unschedulable
 				«ENDIF»
