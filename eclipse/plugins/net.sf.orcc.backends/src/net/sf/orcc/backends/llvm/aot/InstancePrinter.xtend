@@ -463,7 +463,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val inputPattern = action.inputPattern»
 		«val outputPattern = action.outputPattern»
 		«val peekPattern = action.peekPattern»
-		define internal i1 @«action.scheduler.name»() nounwind {
+		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
 				«local.declare»
@@ -478,7 +478,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 		}
 		
-		define internal void @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
