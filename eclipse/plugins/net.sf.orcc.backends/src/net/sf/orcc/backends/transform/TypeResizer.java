@@ -35,7 +35,10 @@ import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -44,6 +47,8 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a transformation that changes size of variable to fit
@@ -62,14 +67,37 @@ public class TypeResizer extends DfVisitor<Void> {
 
 		@Override
 		public Void caseExprBinary(ExprBinary expr) {
-			checkType(expr.getType());
+			Type type = expr.getType();
+			if (!type.isBool()) {
+				checkType(type);
+			}
 			return super.caseExprBinary(expr);
 		}
 
 		@Override
 		public Void caseExprUnary(ExprUnary expr) {
-			checkType(expr.getType());
+			Type type = expr.getType();
+			if (!type.isBool()) {
+				checkType(type);
+			}
 			return super.caseExprUnary(expr);
+		}
+
+		@Override
+		public Void caseExprBool(ExprBool expr) {
+			if (castBoolToInt) {
+				ExprInt newExpr = IrFactory.eINSTANCE.createExprInt(expr
+						.isValue() ? 1 : 0);
+				checkType(newExpr.getType());
+				EcoreUtil.replace(expr, newExpr);
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseExprInt(ExprInt expr) {
+			checkType(expr.getType());
+			return null;
 		}
 
 		@Override
@@ -84,12 +112,14 @@ public class TypeResizer extends DfVisitor<Void> {
 	private boolean castNativePort;
 	private boolean castTo32bits;
 	private boolean castToPow2bits;
+	private boolean castBoolToInt;
 
 	public TypeResizer(boolean castToPow2bits, boolean castTo32bits,
-			boolean castNativePort) {
+			boolean castNativePort, boolean castBoolToInt) {
 		this.castToPow2bits = castToPow2bits;
 		this.castTo32bits = castTo32bits;
 		this.castNativePort = castNativePort;
+		this.castBoolToInt = castBoolToInt;
 		this.irVisitor = new InnerTypeResizer();
 	}
 
@@ -134,6 +164,10 @@ public class TypeResizer extends DfVisitor<Void> {
 		} else if (type.isList()) {
 			TypeList listType = (TypeList) type;
 			checkType(listType.getType());
+		} else if (castBoolToInt && type.isBool()) {
+			TypeUint newType = IrFactory.eINSTANCE
+					.createTypeUint(getIntSize(type.getSizeInBits()));
+			EcoreUtil.replace(type, newType);
 		}
 	}
 

@@ -110,7 +110,11 @@ class InstancePrinter extends CTemplate {
 		}
 		
 		if (options.containsKey(THREADS_NB)) {
-			threadsNb = Integer::valueOf(options.get(THREADS_NB) as String)
+			if(options.get(THREADS_NB) instanceof String) {
+				threadsNb = Integer::valueOf(options.get(THREADS_NB) as String)
+			} else {
+				threadsNb = options.get(THREADS_NB) as Integer
+			}
 		} else if (geneticAlgo) {
 			OrccLogger::warnln("Genetic algorithm options has been checked, but THREADS_NB option is not set")
 		}

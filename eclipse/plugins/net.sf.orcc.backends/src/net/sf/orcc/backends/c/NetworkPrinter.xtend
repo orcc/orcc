@@ -81,7 +81,11 @@ class NetworkPrinter extends CTemplate {
 			ringTopology = options.get(NEW_SCHEDULER_TOPOLOGY).equals("Ring")
 		}
 		if (options.containsKey(THREADS_NB)) {
-			threadsNb = Integer::valueOf(options.get(THREADS_NB) as String)
+			if(options.get(THREADS_NB) instanceof String) {
+				threadsNb = Integer::valueOf(options.get(THREADS_NB) as String)
+			} else {
+				threadsNb = options.get(THREADS_NB) as Integer
+			}
 		}
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean

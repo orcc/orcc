@@ -87,6 +87,7 @@ class InstancePrinter extends LLVMTemplate {
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
 	protected var optionProfile = false
+	protected var optionArch = "x86_64"
 	
 	/**
 	 * Default constructor, do not activate profile option and do not set instance (Jade requirement)
@@ -106,6 +107,9 @@ class InstancePrinter extends LLVMTemplate {
 		}
 		if(options.containsKey("net.sf.orcc.backends.profile")){
 			optionProfile = options.get("net.sf.orcc.backends.profile") as Boolean
+		}
+		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
+			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
 		}
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
@@ -205,7 +209,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDIF»
 	'''
 	
-	def protected printArchitecture() '''target triple = "x86_64"'''
+	def protected printArchitecture() '''target triple = "«optionArch»"'''
 	
 	def private schedulerWithFSM() '''
 		@_FSM_state = internal global i32 «stateToLabel.get(instance.actor.fsm.initialState)»
@@ -278,13 +282,15 @@ class InstancePrinter extends LLVMTemplate {
 				«IF !inputPattern.ports.notNative.empty»
 					;; Input pattern
 					«checkInputPattern(action, inputPattern, state)»
-					%is_schedulable_«extName» = call i1 @«action.scheduler.name» ()
+					%guard_«extName» = call «action.scheduler.returnType.doSwitch» @«action.scheduler.name» ()
+					%is_schedulable_«extName» = icmp eq «action.scheduler.returnType.doSwitch» %guard_«extName», 1
 					%is_fireable_«extName» = and i1 %is_schedulable_«extName», %has_valid_inputs_«extName»_«inputPattern.ports.size»
 
 					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ELSE»
 					;; Empty input pattern
-					%is_fireable_«extName» = call i1 @«action.scheduler.name» ()
+					%guard_«extName» = call «action.scheduler.returnType.doSwitch» @«action.scheduler.name» ()
+					%is_fireable_«extName» = icmp eq «action.scheduler.returnType.doSwitch» %guard_«extName», 1
 
 					br i1 %is_fireable_«extName», label %bb_«extName»_check_outputs, label %bb_«extName»_unschedulable
 				«ENDIF»
@@ -344,13 +350,15 @@ class InstancePrinter extends LLVMTemplate {
 				«IF !inputPattern.ports.notNative.empty»
 					;; Input pattern
 					«checkInputPattern(action, inputPattern, null)»
-					%is_schedulable_«name» = call i1 @«action.scheduler.name» ()
+					%guard_«name» = call «action.scheduler.returnType.doSwitch» @«action.scheduler.name» ()
+					%is_schedulable_«name» = icmp eq «action.scheduler.returnType.doSwitch» %guard_«name», 1
 					%is_fireable_«name» = and i1 %is_schedulable_«name», %has_valid_inputs_«name»_«inputPattern.ports.size»
 
 					br i1 %is_fireable_«name», label %bb_«name»_check_outputs, label %bb_«name»_unschedulable
 				«ELSE»
 					;; Empty input pattern
-					%is_fireable_«name» = call i1 @«action.scheduler.name» ()
+					%guard_«name» = call «action.scheduler.returnType.doSwitch» @«action.scheduler.name» ()
+					%is_fireable_«name» = icmp eq «action.scheduler.returnType.doSwitch» %guard_«name», 1
 
 					br i1 %is_fireable_«name», label %bb_«name»_check_outputs, label %bb_«name»_unschedulable
 				«ENDIF»
@@ -463,7 +471,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val inputPattern = action.inputPattern»
 		«val outputPattern = action.outputPattern»
 		«val peekPattern = action.peekPattern»
-		define internal i1 @«action.scheduler.name»() nounwind {
+		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
 				«local.declare»
@@ -478,7 +486,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 		}
 		
-		define internal void @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»

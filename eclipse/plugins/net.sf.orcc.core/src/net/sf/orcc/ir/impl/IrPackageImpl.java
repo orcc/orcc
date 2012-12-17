@@ -1390,6 +1390,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getExprInt_Type() {
+		return (EReference) exprIntEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getExprList() {
 		return exprListEClass;
 	}
@@ -1631,6 +1640,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		exprIntEClass = createEClass(EXPR_INT);
 		createEAttribute(exprIntEClass, EXPR_INT__VALUE);
+		createEReference(exprIntEClass, EXPR_INT__TYPE);
 
 		exprListEClass = createEClass(EXPR_LIST);
 		createEReference(exprListEClass, EXPR_LIST__VALUE);
@@ -2035,6 +2045,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				"value", null, 0, 1, ExprInt.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
+		initEReference(getExprInt_Type(), this.getType(), null, "type", null,
+				0, 1, ExprInt.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(exprListEClass, ExprList.class, "ExprList", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

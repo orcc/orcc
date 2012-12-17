@@ -73,7 +73,7 @@ class SwActorPrinter extends InstancePrinter {
 	override printArchitecture() ''''''
 
 	override print(Action action) '''
-		define internal i1 @«action.scheduler.name»() nounwind {
+		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
 				«local.declare»
@@ -88,7 +88,7 @@ class SwActorPrinter extends InstancePrinter {
 		«ENDFOR»
 		}
 		
-		define internal void @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»

@@ -147,7 +147,7 @@ public class CBackend extends AbstractBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(true, false, true));
+		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 
 		// If "-t" option is passed to command line, apply additional
