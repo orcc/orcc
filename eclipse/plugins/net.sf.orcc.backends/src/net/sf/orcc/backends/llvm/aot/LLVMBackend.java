@@ -142,7 +142,7 @@ public class LLVMBackend extends AbstractBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(true, true, false));
+		transformations.add(new TypeResizer(true, true, false, false));
 		transformations.add(new StringTransformation());
 		transformations.add(new DfVisitor<Void>(new SSATransformation()));
 		transformations.add(new DeadGlobalElimination());

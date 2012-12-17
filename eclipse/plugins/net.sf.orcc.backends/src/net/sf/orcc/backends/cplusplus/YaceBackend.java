@@ -98,7 +98,7 @@ public class YaceBackend extends AbstractBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(false, false, false));
+		transformations.add(new TypeResizer(false, false, false, false));
 		transformations.add(new RenameTransformation(replacementMap));
 		if (!debug) {
 			transformations.add(new DeadGlobalElimination());

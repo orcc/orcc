@@ -143,7 +143,7 @@ public class TTABackend extends LLVMBackend {
 		}
 
 		DfSwitch<?>[] transformations = { 
-				new TypeResizer(true, true, false),
+				new TypeResizer(true, true, false, true),
 				new DfVisitor<Void>(new SSATransformation()),
 				new StringTransformation(),
 				new RenameTransformation(this.renameMap),
