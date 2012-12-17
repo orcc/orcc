@@ -35,6 +35,8 @@ import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Param;
@@ -79,6 +81,23 @@ public class TypeResizer extends DfVisitor<Void> {
 				checkType(type);
 			}
 			return super.caseExprUnary(expr);
+		}
+
+		@Override
+		public Void caseExprBool(ExprBool expr) {
+			if (castBoolToInt) {
+				ExprInt newExpr = IrFactory.eINSTANCE.createExprInt(expr
+						.isValue() ? 1 : 0);
+				checkType(newExpr.getType());
+				EcoreUtil.replace(expr, newExpr);
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseExprInt(ExprInt expr) {
+			checkType(expr.getType());
+			return null;
 		}
 
 		@Override
