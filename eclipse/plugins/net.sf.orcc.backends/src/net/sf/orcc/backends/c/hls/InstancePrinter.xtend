@@ -286,8 +286,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«actions.printActions»
 	'''
 	
-	def fifoName(Connection connection)
-		'''myStream_«connection.getAttribute("id").objectValue»'''
+	def fifoName(Connection connection) '''
+		«IF connection != null»
+			myStream_«connection.getAttribute("id").objectValue»
+		«ENDIF»
+	'''
 	
 	def fifoType(Connection connection) {
 		if(connection.sourcePort == null){
