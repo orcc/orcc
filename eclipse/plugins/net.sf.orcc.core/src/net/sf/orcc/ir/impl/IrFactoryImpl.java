@@ -405,21 +405,19 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public ExprInt createExprInt(BigInteger value) {
 		ExprIntImpl exprInt = new ExprIntImpl();
 		exprInt.setValue(value);
+		int size = value.bitLength() + 1;
+		exprInt.setType(IrFactory.eINSTANCE.createTypeInt(size));
 		return exprInt;
 	}
 
 	@Override
 	public ExprInt createExprInt(int value) {
-		ExprIntImpl exprInt = new ExprIntImpl();
-		exprInt.setValue(BigInteger.valueOf(value));
-		return exprInt;
+		return createExprInt(BigInteger.valueOf(value));
 	}
 
 	@Override
 	public ExprInt createExprInt(long value) {
-		ExprIntImpl exprInt = new ExprIntImpl();
-		exprInt.setValue(BigInteger.valueOf(value));
-		return exprInt;
+		return createExprInt(BigInteger.valueOf(value));
 	}
 
 	/**
