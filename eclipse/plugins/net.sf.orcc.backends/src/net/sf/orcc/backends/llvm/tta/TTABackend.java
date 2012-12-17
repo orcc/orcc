@@ -68,6 +68,9 @@ import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
+import net.sf.orcc.ir.transform.DeadCodeElimination;
+import net.sf.orcc.ir.transform.DeadGlobalElimination;
+import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
@@ -122,44 +125,53 @@ public class TTABackend extends LLVMBackend {
 	@Override
 	protected Network doTransformNetwork(Network network) {
 		OrccLogger.traceln("Analyze and transform the network...");
-		new ComplexHwOpDetector().doSwitch(network);
-		new Instantiator(false, fifoSize).doSwitch(network);
-		new NetworkFlattener().doSwitch(network);
+
+		List<DfSwitch<?>> visitors = new ArrayList<DfSwitch<?>>();
+
+		visitors.add(new ComplexHwOpDetector());
+		visitors.add(new UnitImporter());
+		visitors.add(new Instantiator(false, fifoSize));
+		visitors.add(new NetworkFlattener());
+
 		if (classify) {
-			new Classifier().doSwitch(network);
+			visitors.add(new Classifier());
 		}
 		if (mergeActions) {
-			new ActionMerger().doSwitch(network);
+			visitors.add(new ActionMerger());
 		}
 		if (mergeActors) {
-			new ActorMerger().doSwitch(network);
+			visitors.add(new ActorMerger());
 		}
-		new UnitImporter().doSwitch(network);
+
 		if (!debug) {
-			new DfVisitor<Void>(new PrintRemoval()).doSwitch(network);
-			OrccLogger.noticeln("All calls to printing functions are removed for performance purpose.");
+			visitors.add(new PrintRemoval());
+			OrccLogger.noticeln("All calls to printing functions are"
+					+ " removed for performance purpose.");
 		} else {
-			OrccLogger.noticeln("A noticeable deterioration in performance could appear due to printing call.");
+			OrccLogger.noticeln("A noticeable deterioration in "
+					+ "performance could appear due to printing call.");
 		}
 
-		DfSwitch<?>[] transformations = { 
-				new TypeResizer(true, true, false, true),
-				new DfVisitor<Void>(new SSATransformation()),
-				new StringTransformation(),
-				new RenameTransformation(this.renameMap),
-				new DfVisitor<Expression>(new TacTransformation()),
-				new DfVisitor<Void>(new CopyPropagator()),
-				new DfVisitor<Void>(new ConstantPropagator()),
-				new DfVisitor<Void>(new InstPhiTransformation()),
-				new DfVisitor<Expression>(new CastAdder(false, true)),
-				new DfVisitor<Void>(new EmptyBlockRemover()),
-				new DfVisitor<Void>(new BlockCombine()),
-				new DfVisitor<CfgNode>(new ControlFlowAnalyzer()),
-				new DfVisitor<Void>(new ListInitializer()),
-				new DfVisitor<Void>(new TemplateInfoComputing()), };
+		visitors.add(new TypeResizer(true, true, false, true));
+		visitors.add(new DfVisitor<Void>(new SSATransformation()));
+		visitors.add(new StringTransformation());
+		visitors.add(new RenameTransformation(this.renameMap));
+		visitors.add(new DfVisitor<Expression>(new TacTransformation()));
+		visitors.add(new DeadGlobalElimination());
+		visitors.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		visitors.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+		visitors.add(new DfVisitor<Void>(new CopyPropagator()));
+		visitors.add(new DfVisitor<Void>(new ConstantPropagator()));
+		visitors.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		visitors.add(new DfVisitor<Expression>(new CastAdder(false, true)));
+		visitors.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		visitors.add(new DfVisitor<Void>(new BlockCombine()));
+		visitors.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		visitors.add(new DfVisitor<Void>(new ListInitializer()));
+		visitors.add(new DfVisitor<Void>(new TemplateInfoComputing()));
 
-		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(network);
+		for (DfSwitch<?> transfo : visitors) {
+			transfo.doSwitch(network);
 		}
 
 		network.computeTemplateMaps();
