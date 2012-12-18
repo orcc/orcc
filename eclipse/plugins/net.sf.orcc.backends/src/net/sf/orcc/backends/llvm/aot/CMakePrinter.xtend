@@ -81,33 +81,31 @@ class CMakePrinter extends CommonPrinter {
 	 */
 	def private rootCMakeContent() '''
 		# Generated from «network.simpleName»
-		
 		cmake_minimum_required (VERSION 2.6)
 		
-		project («network.simpleName»)
-		
-		# LLVM compiler
 		set(CMAKE_C_COMPILER "clang")
+		
+		project («network.simpleName» C)
+		
+		# Parse libraries
+		add_subdirectory(libs)
+		
+		# Configure build types specific flags for clang
+		# set (CMAKE_C_FLAGS_RELEASE "-O4 -DNDEBUG")
+		if("${CMAKE_BUILD_TYPE}" STREQUAL "")
+		    set(CLANG_FLAGS "")
+		else(${CMAKE_BUILD_TYPE})
+		    string(TOUPPER ${CMAKE_BUILD_TYPE} CMBT)
+		    set(CLANG_FLAGS ${CMAKE_C_FLAGS_${CMBT}})
+		endif()
+		
+		message(STATUS "Clang FLAGS : " ${CLANG_FLAGS})
+		separate_arguments(CLANG_FLAGS)
 		
 		# Output folder
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 		
-		# Libraries folder
-		set(LIBS_DIR ${CMAKE_SOURCE_DIR}/libs)
-		set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-		
-		# Runtime libraries inclusion
-		set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
-		set(ROXML_INCLUDE_DIR ${LIBS_DIR}/roxml/include)
-		
-		# Helps cmake to find where SDL libraries are saved (win32 only)
-		if(WIN32)
-			set(ENV{CMAKE_PREFIX_PATH} ${LIBS_DIR}/windows/SDL-*\;${LIBS_DIR}/windows/SDL_image-*)
-		endif()
-		
-		add_subdirectory(${LIBS_DIR})
-		add_subdirectory(${SRC_DIR})
-		
+		add_subdirectory(src)
 	'''
 	
 	/**
@@ -118,33 +116,30 @@ class CMakePrinter extends CommonPrinter {
 		
 		cmake_minimum_required (VERSION 2.6)
 		
-		set(filenames
-			${CMAKE_BINARY_DIR}/CMakeFiles/«network.simpleName».ll.o
+		set(«network.simpleName»_SRCS
+			«network.simpleName».ll
 			«FOR instance : network.children.filter(typeof(Instance)).filter[ ! actor.native]»
-				${CMAKE_BINARY_DIR}/CMakeFiles/«instance.name».ll.o
+				«instance.name».ll
 			«ENDFOR»
 		)
 		
-		macro (compileAssemblyFile name) 
-			add_custom_command(
-				OUTPUT ${CMAKE_BINARY_DIR}/CMakeFiles/${name}.ll.o
-				DEPENDS ${SRC_DIR}/${name}.ll
-				COMMAND ${CMAKE_C_COMPILER} -c ${SRC_DIR}/${name}.ll -o ${CMAKE_BINARY_DIR}/CMakeFiles/${name}.ll.o
-				COMMENT "Building LLVM object ${name}.ll.o" 
-			)
-		endmacro(compileAssemblyFile)
+		foreach(_infile ${«network.simpleName»_SRCS})
+		    string(REPLACE ".ll" ${CMAKE_C_OUTPUT_EXTENSION} _outfile ${_infile})
+		    set(_inpath ${CMAKE_CURRENT_SOURCE_DIR}/${_infile})
+		    set(_outpath ${CMAKE_CURRENT_BINARY_DIR}/${_outfile})
 		
-		compileAssemblyFile(«network.simpleName»)
-		«FOR instance : network.children.filter(typeof(Instance)).filter[ ! actor.native]»
-			compileAssemblyFile(«instance.name»)
-		«ENDFOR»
+		    add_custom_command(
+		        OUTPUT ${_outpath}
+		        DEPENDS ${_inpath}
+		        COMMAND clang ${CLANG_FLAGS} -c ${_inpath} -o ${_outpath}
+		        COMMENT "Building LLVM object ${_outfile}"
+		    )
+		    set(«network.simpleName»_OBJS ${«network.simpleName»_OBJS} ${_outpath})
+		endforeach()
 		
-		find_package(SDL REQUIRED)
-		
-		add_executable(«network.simpleName» ${filenames})
+		add_executable(«network.simpleName» ${«network.simpleName»_OBJS})
 		
 		set_target_properties(«network.simpleName» PROPERTIES LINKER_LANGUAGE C)
-		
 		target_link_libraries(«network.simpleName» orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 	'''
 }

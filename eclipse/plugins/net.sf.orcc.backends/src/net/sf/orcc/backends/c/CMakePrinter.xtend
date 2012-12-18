@@ -72,11 +72,6 @@ class CMakePrinter extends CommonPrinter {
 		set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
 		set(ROXML_INCLUDE_DIR ${LIBS_DIR}/roxml/include)
 		
-		# Helps cmake to find where SDL libraries are saved (win32 only)
-		if(WIN32)
-			set(ENV{CMAKE_PREFIX_PATH} ${LIBS_DIR}/windows/SDL-*\;${LIBS_DIR}/windows/SDL_image-*)
-		endif()
-		
 		add_subdirectory(${LIBS_DIR})
 		add_subdirectory(${SRC_DIR})
 	'''
@@ -92,10 +87,6 @@ class CMakePrinter extends CommonPrinter {
 				«instance.name».c
 			«ENDFOR»
 		)
-		
-		find_package(Threads REQUIRED)
-		
-		find_package(SDL REQUIRED)
 		
 		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
 		
