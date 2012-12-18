@@ -405,7 +405,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public ExprInt createExprInt(BigInteger value) {
 		ExprIntImpl exprInt = new ExprIntImpl();
 		exprInt.setValue(value);
-		exprInt.setType(createTypeIntOrUint(value));
+		exprInt.setType(createTypeInt(value.bitLength() + 1));
 		return exprInt;
 	}
 
