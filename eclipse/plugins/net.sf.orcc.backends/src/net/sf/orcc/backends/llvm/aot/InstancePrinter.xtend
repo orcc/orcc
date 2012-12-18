@@ -840,9 +840,10 @@ class InstancePrinter extends LLVMTemplate {
 	def protected printParameter(Arg arg, Type type) {
 		if (arg.byRef)
 			'''TODO'''
-		else if (type.string)
-			'''i8* «IF ((arg as ArgByVal).value as ExprVar)?.use.variable.local» «(arg as ArgByVal).value.doSwitch» «ELSE» noalias getelementptr inbounds («(arg as ArgByVal).value.type.doSwitch»* «(arg as ArgByVal).value.doSwitch», i64 0, i64 0)«ENDIF»'''
-		else
+		else if (type.string) {
+			val expr = (arg as ArgByVal).value as ExprVar
+			'''i8* «IF expr.use.variable.local» «expr.doSwitch» «ELSE» getelementptr («expr.type.doSwitch»* «expr.doSwitch», i32 0, i32 0)«ENDIF»'''
+		} else
 			'''«type.doSwitch»«IF type.list»*«ENDIF» «(arg as ArgByVal).value.doSwitch»'''
 	}
 	
