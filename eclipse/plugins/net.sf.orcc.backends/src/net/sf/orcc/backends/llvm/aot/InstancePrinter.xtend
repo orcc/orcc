@@ -455,7 +455,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 	'''
 
-	def private printCallEndTokenFunctions() '''
+	def protected printCallEndTokenFunctions() '''
 		«FOR port : instance.actor.inputs»
 			«val connection = instance.incomingPortMap.get(port)»
 			call void @read_end_«port.name»_«connection.getSafeId(port)»()

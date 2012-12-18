@@ -153,4 +153,6 @@ class SwActorPrinter extends InstancePrinter {
 		}
 		return irs
 	}
+	
+	override protected printCallEndTokenFunctions() ''''''
 }
