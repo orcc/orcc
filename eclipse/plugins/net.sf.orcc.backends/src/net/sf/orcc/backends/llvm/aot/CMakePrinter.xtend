@@ -131,7 +131,7 @@ class CMakePrinter extends CommonPrinter {
 		    add_custom_command(
 		        OUTPUT ${_outpath}
 		        DEPENDS ${_inpath}
-		        COMMAND clang ${CLANG_FLAGS} -c ${_inpath} -o ${_outpath}
+		        COMMAND ${CMAKE_C_COMPILER} ${CLANG_FLAGS} -c ${_inpath} -o ${_outpath}
 		        COMMENT "Building LLVM object ${_outfile}"
 		    )
 		    set(«network.simpleName»_OBJS ${«network.simpleName»_OBJS} ${_outpath})
@@ -140,6 +140,6 @@ class CMakePrinter extends CommonPrinter {
 		add_executable(«network.simpleName» ${«network.simpleName»_OBJS})
 		
 		set_target_properties(«network.simpleName» PROPERTIES LINKER_LANGUAGE C)
-		target_link_libraries(«network.simpleName» orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+		target_link_libraries(«network.simpleName» orcc ${SDL_LIBRARY})
 	'''
 }
