@@ -64,12 +64,6 @@ public interface BlockIf extends Block {
 	 */
 	Expression getCondition();
 
-	@Deprecated
-	EList<Block> getElseNodes();
-
-	@Deprecated
-	BlockBasic getJoinNode();
-
 	/**
 	 * Returns the value of the '<em><b>Line Number</b></em>' attribute. <!--
 	 * begin-user-doc --> Returns the line number on which this "if" starts.<!--
@@ -82,9 +76,6 @@ public interface BlockIf extends Block {
 	 * @generated
 	 */
 	int getLineNumber();
-
-	@Deprecated
-	EList<Block> getThenNodes();
 
 	/**
 	 * Returns <code>true</code> if it is necessary to generate an "else" branch
@@ -140,9 +131,6 @@ public interface BlockIf extends Block {
 	 * @generated
 	 */
 	void setJoinBlock(BlockBasic value);
-
-	@Deprecated
-	void setJoinNode(BlockBasic value);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.BlockIf#getLineNumber <em>Line Number</em>}' attribute.

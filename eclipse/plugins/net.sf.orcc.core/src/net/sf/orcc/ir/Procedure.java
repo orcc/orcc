@@ -50,8 +50,8 @@ public interface Procedure extends Attributable {
 	Cfg getCfg();
 
 	/**
-	 * Returns the first block in the list of nodes of the given procedure. A
-	 * new block is created if there is no block in the given node list.
+	 * Returns the first block in the list of blocks of the given procedure. A
+	 * new block is created if there is no block in the given block list.
 	 * 
 	 * @param procedure
 	 *            a procedure
@@ -60,8 +60,8 @@ public interface Procedure extends Attributable {
 	BlockBasic getFirst();
 
 	/**
-	 * Returns the last block in the list of nodes of the given procedure. A new
-	 * block is created if there is no block in the given node list.
+	 * Returns the last block in the list of blocks of the given procedure. A new
+	 * block is created if there is no block in the given block list.
 	 * 
 	 * @param procedure
 	 *            a procedure
@@ -102,9 +102,6 @@ public interface Procedure extends Attributable {
 	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
 	String getName();
-
-	@Deprecated
-	EList<Block> getNodes();
 
 	/**
 	 * Returns the parameter of this procedure with the given name.

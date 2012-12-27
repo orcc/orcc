@@ -394,10 +394,10 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	}
 
 	/**
-	 * Returns the first block in the list of nodes of this procedure. A new
-	 * block is created if there is no block in the given node list.
+	 * Returns the first block in the list of blocks of this procedure. A new
+	 * block is created if there is no block in the given block list.
 	 * 
-	 * @return the first block in the list of nodes of this procedure
+	 * @return the first block in the list of blocks of this procedure
 	 */
 	@Override
 	public BlockBasic getFirst() {
@@ -405,10 +405,10 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	}
 
 	/**
-	 * Returns the last block in the list of nodes of this procedure. A new
-	 * block is created if there is no block in the given node list.
+	 * Returns the last block in the list of blocks of this procedure. A new
+	 * block is created if there is no block in the given block list.
 	 * 
-	 * @return the last block in the list of nodes of this procedure
+	 * @return the last block in the list of blocks of this procedure
 	 */
 	@Override
 	public BlockBasic getLast() {
@@ -452,11 +452,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	public EList<Block> getNodes() {
-		return getBlocks();
 	}
 
 	@Override

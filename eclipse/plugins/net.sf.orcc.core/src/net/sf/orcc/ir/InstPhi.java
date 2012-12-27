@@ -51,7 +51,7 @@ public interface InstPhi extends Instruction {
 	/**
 	 * Returns the target of this call (may be <code>null</code>).
 	 * 
-	 * @return the target of this node (may be <code>null</code>)
+	 * @return the target of this phi assignment (may be <code>null</code>)
 	 * @model containment="true"
 	 */
 	Def getTarget();
@@ -74,7 +74,7 @@ public interface InstPhi extends Instruction {
 	void setOldVariable(Var old);
 
 	/**
-	 * Sets the target of this node.
+	 * Sets the target of this phi assignment.
 	 * 
 	 * @param target
 	 *            a local variable

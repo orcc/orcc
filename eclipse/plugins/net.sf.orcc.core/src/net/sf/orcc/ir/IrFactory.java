@@ -651,7 +651,7 @@ public interface IrFactory extends EFactory {
 
 	/**
 	 * Creates a new procedure, not external, with empty parameters, locals, and
-	 * nodes. Return type is copied.
+	 * blocks. Return type is copied.
 	 * 
 	 * @param name
 	 *            The procedure name.

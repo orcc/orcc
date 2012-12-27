@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
- * <em><b>Node Block</b></em>'. <!-- end-user-doc -->
+ * <em><b>BlockBasic</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -178,11 +178,6 @@ public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 	}
 
 	@Override
-	public boolean isNodeBlock() {
-		return true;
-	}
-
-	@Override
 	public Iterator<Instruction> iterator() {
 		return getInstructions().iterator();
 	}
@@ -213,4 +208,4 @@ public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 		return sb.toString();
 	}
 
-} // NodeBlockImpl
+} // BlockBasicImpl

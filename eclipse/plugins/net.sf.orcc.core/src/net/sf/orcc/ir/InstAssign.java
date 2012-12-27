@@ -38,23 +38,23 @@ package net.sf.orcc.ir;
 public interface InstAssign extends Instruction {
 
 	/**
-	 * Returns the target of this node.
+	 * Returns the target of this assignment.
 	 * 
-	 * @return the target of this node
+	 * @return the target of this assignment
 	 * @model containment="true"
 	 */
 	Def getTarget();
 
 	/**
-	 * Returns the value of this node.
+	 * Returns the value of this assignment.
 	 * 
-	 * @return the value of this node
+	 * @return the value of this assignment
 	 * @model containment="true"
 	 */
 	Expression getValue();
 
 	/**
-	 * Sets the target of this node.
+	 * Sets the target of this assignment.
 	 * 
 	 * @param target
 	 *            a local variable
@@ -62,7 +62,7 @@ public interface InstAssign extends Instruction {
 	void setTarget(Def target);
 
 	/**
-	 * Sets the value of this node. Uses are updated to point to this node.
+	 * Sets the value of this assignment. Uses are updated to point to this assignment.
 	 * 
 	 * @param value
 	 *            an expression
