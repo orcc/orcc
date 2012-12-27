@@ -31,5 +31,4 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.tools.classifier,
  net.sf.orcc.tools.merger.action,
  net.sf.orcc.tools.merger.actor,
- net.sf.orcc.tools.statistics,
  net.sf.orcc.util
