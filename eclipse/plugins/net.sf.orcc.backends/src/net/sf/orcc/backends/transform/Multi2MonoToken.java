@@ -585,7 +585,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private void defineUntaggedBody(Var readCounter, Var storeList,
 			Procedure body, Var localINPUT, Port port, int bufferSize) {
-		BlockBasic bodyNode = body.getFirst();
+		BlockBasic bodyBlock = body.getFirst();
 
 		EList<Var> locals = body.getLocals();
 		Var input = factory.createVar(0, port.getType(), port.getName()
@@ -594,12 +594,12 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		List<Expression> load2Index = new ArrayList<Expression>(1);
 		load2Index.add(factory.createExprInt(0));
 
-		bodyNode.add(factory.createInstLoad(input, localINPUT, load2Index));
+		bodyBlock.add(factory.createInstLoad(input, localINPUT, load2Index));
 
 		Var counter = factory.createVar(0, readCounter.getType(),
 				port.getName() + "_Local_counter", true, 1);
 		locals.add(counter);
-		bodyNode.add(factory.createInstLoad(counter, readCounter));
+		bodyBlock.add(factory.createInstLoad(counter, readCounter));
 
 		Var mask = factory.createVar(0, factory.createTypeInt(32), "mask",
 				true, 1);
@@ -608,14 +608,14 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 				factory.createExprVar(counter), OpBinary.BITAND,
 				factory.createExprInt(bufferSize - 1),
 				factory.createTypeInt(32));
-		bodyNode.add(factory.createInstAssign(mask, maskValue));
+		bodyBlock.add(factory.createInstAssign(mask, maskValue));
 
-		bodyNode.add(factory.createInstStore(storeList, mask, input));
+		bodyBlock.add(factory.createInstStore(storeList, mask, input));
 
 		Expression indexInc = factory.createExprBinary(
 				factory.createExprVar(counter), OpBinary.PLUS,
 				factory.createExprInt(1), readCounter.getType());
-		bodyNode.add(factory.createInstStore(readCounter, indexInc));
+		bodyBlock.add(factory.createInstStore(readCounter, indexInc));
 	}
 
 	/**
@@ -666,21 +666,21 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			Var readIndex, OpBinary op, Expression reference, Port port) {
 		int index = 0;
 		Procedure scheduler = action.getScheduler();
-		BlockBasic bodyNode = scheduler.getLast();
+		BlockBasic bodyBlock = scheduler.getLast();
 		EList<Var> locals = scheduler.getLocals();
 
 		Var localRead = factory.createVar(0, factory.createTypeInt(32),
 				"readIndex_" + port.getName() + "_" + inputIndex, true,
 				inputIndex);
 		locals.add(localRead);
-		bodyNode.add(index, factory.createInstLoad(localRead, readIndex));
+		bodyBlock.add(index, factory.createInstLoad(localRead, readIndex));
 		index++;
 
 		Var localWrite = factory.createVar(0, factory.createTypeInt(32),
 				"writeIndex_" + port.getName() + "_" + inputIndex, true,
 				inputIndex);
 		locals.add(localWrite);
-		bodyNode.add(index, factory.createInstLoad(localWrite, writeIndex));
+		bodyBlock.add(index, factory.createInstLoad(localWrite, writeIndex));
 		index++;
 
 		Var diff = factory.createVar(0, factory.createTypeInt(32), "diff"
@@ -689,7 +689,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		Expression value = factory.createExprBinary(
 				factory.createExprVar(localRead), OpBinary.MINUS,
 				factory.createExprVar(localWrite), factory.createTypeInt(32));
-		bodyNode.add(index, factory.createInstAssign(diff, value));
+		bodyBlock.add(index, factory.createInstAssign(diff, value));
 		index++;
 
 		Var conditionVar = factory.createVar(0, factory.createTypeBool(),
@@ -698,21 +698,21 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		Expression value2 = factory.createExprBinary(
 				factory.createExprVar(diff), op, reference,
 				factory.createTypeBool());
-		bodyNode.add(index, factory.createInstAssign(conditionVar, value2));
+		bodyBlock.add(index, factory.createInstAssign(conditionVar, value2));
 		index++;
 
 		Var myResult = factory.createVar(0, factory.createTypeBool(),
 				"myResult_" + port.getName(), true, inputIndex);
 		locals.add(myResult);
-		int returnIndex = bodyNode.getInstructions().size() - 1;
-		InstReturn actionReturn = (InstReturn) bodyNode.getInstructions().get(
+		int returnIndex = bodyBlock.getInstructions().size() - 1;
+		InstReturn actionReturn = (InstReturn) bodyBlock.getInstructions().get(
 				returnIndex);
 		// VarLocal currentResult
 		Expression e = factory.createExprBinary(actionReturn.getValue(),
 				OpBinary.LOGIC_AND, factory.createExprVar(conditionVar),
 				factory.createTypeBool());
 
-		bodyNode.add(returnIndex, factory.createInstAssign(myResult, e));
+		bodyBlock.add(returnIndex, factory.createInstAssign(myResult, e));
 		actionReturn.setValue(factory.createExprVar(myResult));
 	}
 
@@ -724,16 +724,16 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private void modifyDoneAction(Var counter, int portIndex, String portName) {
 
-		BlockBasic blkNode = done.getBody().getFirst();
-		blkNode.add(factory.createInstStore(counter, 0));
+		BlockBasic basicBlock = done.getBody().getFirst();
+		basicBlock.add(factory.createInstStore(counter, 0));
 
-		blkNode = done.getScheduler().getFirst();
+		basicBlock = done.getScheduler().getFirst();
 		EList<Var> schedulerLocals = done.getScheduler().getLocals();
 		Var localCounter = factory.createVar(0, counter.getType(),
 				"localCounterModif" + portName, true, portIndex);
 		schedulerLocals.add(localCounter);
 
-		blkNode.add(1, factory.createInstLoad(localCounter, counter));
+		basicBlock.add(1, factory.createInstLoad(localCounter, counter));
 
 		Var temp = factory.createVar(0, factory.createTypeBool(), "temp"
 				+ portName, true, portIndex);
@@ -742,15 +742,15 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		Expression counterExpression = factory.createExprVar(localCounter);
 		Expression schedulerValue = factory.createExprBinary(counterExpression,
 				OpBinary.EQ, guardValue, factory.createTypeBool());
-		int index = blkNode.getInstructions().size() - 1;
-		blkNode.add(index, factory.createInstAssign(temp, schedulerValue));
+		int index = basicBlock.getInstructions().size() - 1;
+		basicBlock.add(index, factory.createInstAssign(temp, schedulerValue));
 		index++;
 
 		Expression buffrerExpression = factory.createExprVar(result);
 		Expression resultExpression = factory.createExprVar(temp);
 		Expression expression = factory.createExprBinary(buffrerExpression,
 				OpBinary.LOGIC_AND, resultExpression, factory.createTypeBool());
-		blkNode.add(index, factory.createInstAssign(result, expression));
+		basicBlock.add(index, factory.createInstAssign(result, expression));
 	}
 
 
@@ -916,11 +916,11 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 					}
 
 					Procedure body = action.getBody();
-					BlockBasic bodyNode = body.getFirst();
+					BlockBasic bodyBlock = body.getFirst();
 					Var index = body.newTempLocalVariable(
 							factory.createTypeInt(32), "writeIndex");
 					index.setIndex(1);
-					bodyNode.add(factory.createInstLoad(index, untagWriteIndex));
+					bodyBlock.add(factory.createInstLoad(index, untagWriteIndex));
 					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
 							untagBuffer, untagWriteIndex, bufferSize);
 					modifyProcessAction.doSwitch(action.getBody());
@@ -930,8 +930,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 							factory.createExprVar(index), OpBinary.PLUS,
 							factory.createExprInt(numTokens),
 							factory.createTypeInt(32));
-					BlockBasic lastNode = body.getLast();
-					lastNode.add(factory
+					BlockBasic lastBlock = body.getLast();
+					lastBlock.add(factory
 							.createInstStore(untagWriteIndex, value));
 
 				}

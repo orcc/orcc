@@ -64,7 +64,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class InstTernaryAdder extends AbstractIrVisitor<Void> {
 
 	private Var condVar;
-	private BlockBasic newBlockNode;
+	private BlockBasic newBasicBlock;
 
 	@Override
 	public Void caseBlockIf(BlockIf blockIf) {
@@ -77,7 +77,7 @@ public class InstTernaryAdder extends AbstractIrVisitor<Void> {
 		condVar.setIndex(1);
 		InstAssign assignCond = IrFactory.eINSTANCE.createInstAssign(condVar,
 				condExpr);
-		newBlockNode.add(assignCond);
+		newBasicBlock.add(assignCond);
 
 		doSwitch(blockIf.getThenBlocks());
 		doSwitch(blockIf.getElseBlocks());
@@ -89,19 +89,19 @@ public class InstTernaryAdder extends AbstractIrVisitor<Void> {
 
 	@Override
 	public Void caseInstAssign(InstAssign assign) {
-		newBlockNode.add(IrUtil.copy(assign));
+		newBasicBlock.add(IrUtil.copy(assign));
 		return null;
 	}
 
 	@Override
 	public Void caseInstCall(InstCall call) {
-		newBlockNode.add(IrUtil.copy(call));
+		newBasicBlock.add(IrUtil.copy(call));
 		return null;
 	}
 
 	@Override
 	public Void caseInstLoad(InstLoad load) {
-		newBlockNode.add(IrUtil.copy(load));
+		newBasicBlock.add(IrUtil.copy(load));
 		return null;
 	}
 
@@ -113,35 +113,35 @@ public class InstTernaryAdder extends AbstractIrVisitor<Void> {
 				IrUtil.copy(phi.getValues().get(0)),
 				IrUtil.copy(phi.getValues().get(1)));
 
-		newBlockNode.add(ternaryOp);
+		newBasicBlock.add(ternaryOp);
 		return null;
 	}
 
 	@Override
 	public Void caseInstReturn(InstReturn returnInstr) {
-		newBlockNode.add(IrUtil.copy(returnInstr));
+		newBasicBlock.add(IrUtil.copy(returnInstr));
 		return null;
 	}
 
 	@Override
 	public Void caseInstSpecific(InstSpecific inst) {
-		newBlockNode.add(IrUtil.copy(inst));
+		newBasicBlock.add(IrUtil.copy(inst));
 		return null;
 	}
 
 	@Override
 	public Void caseInstStore(InstStore store) {
-		newBlockNode.add(IrUtil.copy(store));
+		newBasicBlock.add(IrUtil.copy(store));
 		return null;
 	}
 
 	@Override
 	public Void caseProcedure(Procedure procedure) {
 		if (isTernarisable(procedure)) {
-			newBlockNode = IrFactoryImpl.eINSTANCE.createBlockBasic();
+			newBasicBlock = IrFactoryImpl.eINSTANCE.createBlockBasic();
 			super.caseProcedure(procedure);
 			IrUtil.delete(procedure.getBlocks());
-			procedure.getBlocks().add(newBlockNode);
+			procedure.getBlocks().add(newBasicBlock);
 		}
 		return null;
 	}

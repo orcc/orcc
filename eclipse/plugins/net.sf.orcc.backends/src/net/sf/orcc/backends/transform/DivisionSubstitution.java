@@ -35,15 +35,15 @@ import java.util.List;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -66,10 +66,8 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 	private IrFactory factory = IrFactory.eINSTANCE;
 	private Procedure divProc;
 
-	
 	private class Substitutor extends AbstractIrVisitor<Object> {
-		
-		
+
 		public Substitutor() {
 			super(true);
 		}
@@ -167,18 +165,18 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 					factory.createTypeInt(16), "remainder");
 
 			// Create procedural code
-			EList<Block> nodes = divProc.getBlocks();
-			nodes.add(createInitBlock(result, flipResult, denom, numer, mask,
+			EList<Block> blocks = divProc.getBlocks();
+			blocks.add(createInitBlock(result, flipResult, denom, numer, mask,
 					remainder));
-			nodes.add(createNodeIf(varNum, flipResult));
-			nodes.add(createNodeIf(varDenum, flipResult));
-			nodes.add(createAssignmentBlock(varDenum, remainder, varNum, denom,
-					mask, i));
+			blocks.add(createBlockIf(varNum, flipResult));
+			blocks.add(createBlockIf(varDenum, flipResult));
+			blocks.add(createAssignmentBlock(varDenum, remainder, varNum,
+					denom, mask, i));
 			for (int k = 0; k < 16; k++) {
-				createRepeatBlock(nodes, k, numer, remainder, denom, result,
+				createRepeatBlock(blocks, k, numer, remainder, denom, result,
 						mask, varDenum);
 			}
-			nodes.add(createResultNodeIf(flipResult, result));
+			blocks.add(createResultBlockIf(flipResult, result));
 
 			// Create return instruction
 			BlockBasic blockReturn = factory.createBlockBasic();
@@ -212,7 +210,7 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 		 *            to be initialized to zero
 		 * @param flipResult
 		 *            to be initialized to zero
-		 * @return node block with initialization assigns
+		 * @return a basic block with initialization assigns
 		 */
 		private BlockBasic createInitBlock(Var result, Var flipResult,
 				Var denom, Var numer, Var mask, Var remainder) {
@@ -227,24 +225,23 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 		}
 
 		/**
-		 * creates the following if node: if (var < 0) { var = -var; flip ^= 1;
-		 * }
+		 * creates the following if block: if (var < 0) var = -var; flip ^= 1;
 		 * 
 		 * @param var
 		 *            (see definition)
 		 * @param flip
 		 *            (see definition)
-		 * @return if node
+		 * @return if block
 		 */
-		private BlockIf createNodeIf(Var var, Var flip) {
-			BlockIf nodeIf = factory.createBlockIf();
+		private BlockIf createBlockIf(Var var, Var flip) {
+			BlockIf blockIf = factory.createBlockIf();
 			BlockBasic blockIf_1 = factory.createBlockBasic();
 			Expression conditionIf_1 = factory.createExprBinary(
 					factory.createExprVar(var), OpBinary.LT,
 					factory.createExprInt(0), factory.createTypeBool());
-			nodeIf.setCondition(conditionIf_1);
+			blockIf.setCondition(conditionIf_1);
 			BlockBasic join = factory.createBlockBasic();
-			nodeIf.setJoinBlock(join);
+			blockIf.setJoinBlock(join);
 			Expression oppNomerator = factory.createExprBinary(
 					factory.createExprInt(0), OpBinary.MINUS,
 					factory.createExprVar(var), factory.createTypeInt());
@@ -255,18 +252,18 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 					factory.createExprInt(1), factory.createTypeInt());
 			InstAssign assign11 = factory.createInstAssign(flip, xorFlip);
 			blockIf_1.add(assign11);
-			nodeIf.getThenBlocks().add(blockIf_1);
+			blockIf.getThenBlocks().add(blockIf_1);
 			BlockBasic blockIf_2 = factory.createBlockBasic();
 			InstAssign assign20 = factory.createInstAssign(var, var);
 			blockIf_2.add(assign20);
 			InstAssign assign21 = factory.createInstAssign(flip, flip);
 			blockIf_2.add(assign21);
-			nodeIf.getElseBlocks().add(blockIf_2);
-			return nodeIf;
+			blockIf.getElseBlocks().add(blockIf_2);
+			return blockIf;
 		}
 
 		/**
-		 * creates the required if node specified in the xilinx division model
+		 * creates the required if block specified in the xilinx division model
 		 * 
 		 * @param numer
 		 * @param denom
@@ -275,26 +272,26 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 		 * @param remainder
 		 * @param varDenum
 		 * @param i
-		 * @return if Node
+		 * @return if block
 		 */
-		private BlockIf createNodeIfRepeatBlock(Var numer, Var denom,
+		private BlockIf createBlockIfRepeatBlock(Var numer, Var denom,
 				Var result, Var mask, Var remainder, Var varDenum, int k) {
-			BlockIf nodeIf = factory.createBlockIf();
+			BlockIf blockIf = factory.createBlockIf();
 			Expression condition = factory.createExprBinary(
 					factory.createExprVar(numer), OpBinary.GE,
 					factory.createExprVar(denom), factory.createTypeBool());
-			nodeIf.setCondition(condition);
+			blockIf.setCondition(condition);
 
 			BlockBasic join = factory.createBlockBasic();
-			nodeIf.setJoinBlock(join);
+			blockIf.setJoinBlock(join);
 
-			BlockBasic nodeBlk = factory.createBlockBasic();
+			BlockBasic basic = factory.createBlockBasic();
 
 			Expression orExpr = factory.createExprBinary(
 					factory.createExprVar(result), OpBinary.BITOR,
 					factory.createExprVar(mask), factory.createTypeInt());
 			InstAssign assignBlk_0 = factory.createInstAssign(result, orExpr);
-			nodeBlk.add(assignBlk_0);
+			basic.add(assignBlk_0);
 
 			Expression minusExpr = factory.createExprBinary(
 					factory.createExprInt(15), OpBinary.MINUS,
@@ -307,15 +304,15 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 					lShiftExpr, factory.createTypeInt());
 			InstAssign assignBlk_1 = factory.createInstAssign(remainder,
 					RemainderMinus);
-			nodeBlk.add(assignBlk_1);
+			basic.add(assignBlk_1);
 
-			nodeIf.getThenBlocks().add(nodeBlk);
+			blockIf.getThenBlocks().add(basic);
 
-			return nodeIf;
+			return blockIf;
 		}
 
 		/**
-		 * returns the required while node Specified in the xilinx division
+		 * returns the required while block Specified in the xilinx division
 		 * model
 		 * 
 		 * @param i
@@ -327,11 +324,11 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 		 * @param varDenum
 		 * @return
 		 */
-		private void createRepeatBlock(EList<Block> nodes, int k, Var numer,
+		private void createRepeatBlock(EList<Block> blocks, int k, Var numer,
 				Var remainder, Var denom, Var result, Var mask, Var varDenum) {
 
-			BlockBasic nodeBlk_0 = factory.createBlockBasic();
-			BlockBasic nodeBlk_1 = factory.createBlockBasic();
+			BlockBasic basic0 = factory.createBlockBasic();
+			BlockBasic basic1 = factory.createBlockBasic();
 
 			Expression andExpr = factory.createExprBinary(
 					factory.createExprVar(remainder), OpBinary.BITAND,
@@ -344,12 +341,12 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 
 			InstAssign assignBlk_0 = factory.createInstAssign(numer, shiftExpr);
 
-			nodeBlk_0.add(assignBlk_0);
-			nodes.add(nodeBlk_0);
+			basic0.add(assignBlk_0);
+			blocks.add(basic0);
 
-			BlockIf nodeIf = createNodeIfRepeatBlock(numer, denom, result,
+			BlockIf nodeIf = createBlockIfRepeatBlock(numer, denom, result,
 					mask, remainder, varDenum, k);
-			nodes.add(nodeIf);
+			blocks.add(nodeIf);
 
 			Expression maskShift = factory.createExprBinary(
 					factory.createExprVar(mask), OpBinary.SHIFT_RIGHT,
@@ -359,35 +356,35 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 					factory.createTypeInt());
 			InstAssign assignBlk_10 = factory.createInstAssign(mask,
 					assignBlk_1Value);
-			nodeBlk_1.add(assignBlk_10);
-			nodes.add(nodeBlk_1);
+			basic1.add(assignBlk_10);
+			blocks.add(basic1);
 		}
 
 		/**
-		 * returns an if node if (flipResult != 0) { result = -result; }
+		 * returns an if block if (flipResult != 0) { result = -result; }
 		 * 
 		 * @param flipResult
 		 *            (see definition)
 		 * @param result
 		 *            (see definition)
-		 * @return If node (see definition)
+		 * @return If block (see definition)
 		 */
-		private BlockIf createResultNodeIf(Var flipResult, Var result) {
-			BlockIf nodeIf = factory.createBlockIf();
+		private BlockIf createResultBlockIf(Var flipResult, Var result) {
+			BlockIf blockIf = factory.createBlockIf();
 			BlockBasic blockIf_1 = factory.createBlockBasic();
 			Expression conditionIf = factory.createExprBinary(
 					factory.createExprVar(flipResult), OpBinary.NE,
 					factory.createExprInt(0), factory.createTypeBool());
-			nodeIf.setCondition(conditionIf);
+			blockIf.setCondition(conditionIf);
 			BlockBasic join = factory.createBlockBasic();
-			nodeIf.setJoinBlock(join);
+			blockIf.setJoinBlock(join);
 			Expression oppflip = factory.createExprBinary(
 					factory.createExprInt(0), OpBinary.MINUS,
 					factory.createExprVar(result), factory.createTypeInt());
 			InstAssign assign10 = factory.createInstAssign(result, oppflip);
 			blockIf_1.add(assign10);
-			nodeIf.getThenBlocks().add(blockIf_1);
-			return nodeIf;
+			blockIf.getThenBlocks().add(blockIf_1);
+			return blockIf;
 		}
 	}
 
@@ -395,7 +392,7 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 	public Void caseActor(Actor actor) {
 		this.actor = actor;
 		checkDiv();
-		
+
 		if (divProc != null) {
 			actor.getProcs().add(0, divProc);
 		}

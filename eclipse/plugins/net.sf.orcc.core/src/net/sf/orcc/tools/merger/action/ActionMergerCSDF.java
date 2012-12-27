@@ -126,19 +126,19 @@ public class ActionMergerCSDF {
 			block.add(assign);
 
 			// Create while
-			List<Block> oldNodes = blocks;
-			BlockWhile nodeWhile = irFactory.createBlockWhile();
-			nodeWhile.setJoinBlock(irFactory.createBlockBasic());
+			List<Block> oldBlocks = blocks;
+			BlockWhile blockWhile = irFactory.createBlockWhile();
+			blockWhile.setJoinBlock(irFactory.createBlockBasic());
 
-			blocks = nodeWhile.getBlocks();
-			oldNodes.add(nodeWhile);
+			blocks = blockWhile.getBlocks();
+			oldBlocks.add(blockWhile);
 
 			// Create the loop condition
 			Expression condition = irFactory.createExprBinary(
 					irFactory.createExprVar(loopVar), OpBinary.LT,
 					irFactory.createExprInt(pattern.getNumIterations()),
 					irFactory.createTypeBool());
-			nodeWhile.setCondition(condition);
+			blockWhile.setCondition(condition);
 
 			// Accept sub pattern
 			pattern.getPattern().accept(this);
@@ -152,7 +152,7 @@ public class ActionMergerCSDF {
 			block.add(assign);
 
 			// Restore stuff
-			this.blocks = oldNodes;
+			this.blocks = oldBlocks;
 			depth--;
 		}
 

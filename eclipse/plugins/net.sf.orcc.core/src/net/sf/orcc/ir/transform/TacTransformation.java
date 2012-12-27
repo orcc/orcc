@@ -59,7 +59,7 @@ import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * Split expression and effective node that contains more than one fundamental
+ * Split expression and effective block that contains more than one fundamental
  * operation into a series of simple expressions.
  * 
  * @author Jerome GORIN
@@ -74,23 +74,23 @@ public class TacTransformation extends AbstractIrVisitor<Expression> {
 	protected int complexityLevel = 0;
 
 	@Override
-	public Expression caseBlockIf(BlockIf nodeIf) {
+	public Expression caseBlockIf(BlockIf blockIf) {
 		complexityLevel++;
-		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		blockIf.setCondition(doSwitch(blockIf.getCondition()));
 		complexityLevel--;
-		doSwitch(nodeIf.getThenBlocks());
-		doSwitch(nodeIf.getElseBlocks());
-		doSwitch(nodeIf.getJoinBlock());
+		doSwitch(blockIf.getThenBlocks());
+		doSwitch(blockIf.getElseBlocks());
+		doSwitch(blockIf.getJoinBlock());
 		return null;
 	}
 
 	@Override
-	public Expression caseBlockWhile(BlockWhile nodeWhile) {
+	public Expression caseBlockWhile(BlockWhile blockWhile) {
 		complexityLevel++;
-		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		blockWhile.setCondition(doSwitch(blockWhile.getCondition()));
 		complexityLevel--;
-		doSwitch(nodeWhile.getBlocks());
-		doSwitch(nodeWhile.getJoinBlock());
+		doSwitch(blockWhile.getBlocks());
+		doSwitch(blockWhile.getJoinBlock());
 		return null;
 	}
 
