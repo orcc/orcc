@@ -646,7 +646,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Procedure createProcedure();
-	
+
 	Procedure createProcedure(String name, Type returnType, Param param);
 
 	/**

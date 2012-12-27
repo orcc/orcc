@@ -75,8 +75,6 @@
         eType="ecore:EClass Ir.ecore#//Procedure" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="stateVars" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="templateData" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"
-        transient="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Network" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Graph ../../net.sf.orcc.models/model/Util.ecore#//Adaptable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="children" upperBound="-1"
@@ -92,7 +90,6 @@
         eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="templateData" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
   </eClassifiers>

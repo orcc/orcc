@@ -57,7 +57,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getProcs <em>Procs</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getStateVars <em>State Vars</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getTemplateData <em>Template Data</em>}</li>
  * </ul>
  * </p>
  *
@@ -223,26 +222,6 @@ public class ActorImpl extends VertexImpl implements Actor {
 	protected EList<Var> stateVars;
 
 	/**
-	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @see #getTemplateData()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final Object TEMPLATE_DATA_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @see #getTemplateData()
-	 * @generated
-	 * @ordered
-	 */
-	protected Object templateData = TEMPLATE_DATA_EDEFAULT;
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	protected ActorImpl() {
@@ -324,8 +303,6 @@ public class ActorImpl extends VertexImpl implements Actor {
 			return getProcs();
 		case DfPackage.ACTOR__STATE_VARS:
 			return getStateVars();
-		case DfPackage.ACTOR__TEMPLATE_DATA:
-			return getTemplateData();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -402,9 +379,6 @@ public class ActorImpl extends VertexImpl implements Actor {
 			return procs != null && !procs.isEmpty();
 		case DfPackage.ACTOR__STATE_VARS:
 			return stateVars != null && !stateVars.isEmpty();
-		case DfPackage.ACTOR__TEMPLATE_DATA:
-			return TEMPLATE_DATA_EDEFAULT == null ? templateData != null
-					: !TEMPLATE_DATA_EDEFAULT.equals(templateData);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -468,9 +442,6 @@ public class ActorImpl extends VertexImpl implements Actor {
 			getStateVars().clear();
 			getStateVars().addAll((Collection<? extends Var>) newValue);
 			return;
-		case DfPackage.ACTOR__TEMPLATE_DATA:
-			setTemplateData(newValue);
-			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -532,9 +503,6 @@ public class ActorImpl extends VertexImpl implements Actor {
 			return;
 		case DfPackage.ACTOR__STATE_VARS:
 			getStateVars().clear();
-			return;
-		case DfPackage.ACTOR__TEMPLATE_DATA:
-			setTemplateData(TEMPLATE_DATA_EDEFAULT);
 			return;
 		}
 		super.eUnset(featureID);
@@ -777,14 +745,6 @@ public class ActorImpl extends VertexImpl implements Actor {
 		return stateVars;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Object getTemplateData() {
-		return templateData;
-	}
-
 	@Override
 	public boolean hasFsm() {
 		return fsm != null;
@@ -916,19 +876,6 @@ public class ActorImpl extends VertexImpl implements Actor {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTemplateData(Object newTemplateData) {
-		Object oldTemplateData = templateData;
-		templateData = newTemplateData;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ACTOR__TEMPLATE_DATA, oldTemplateData,
-					templateData));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public String toString() {
 		if (eIsProxy())
@@ -941,8 +888,6 @@ public class ActorImpl extends VertexImpl implements Actor {
 		result.append(lineNumber);
 		result.append(", native: ");
 		result.append(native_);
-		result.append(", templateData: ");
-		result.append(templateData);
 		result.append(')');
 		return result.toString();
 	}

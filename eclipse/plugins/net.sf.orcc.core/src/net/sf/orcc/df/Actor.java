@@ -59,7 +59,6 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.df.Actor#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.df.Actor#getProcs <em>Procs</em>}</li>
  *   <li>{@link net.sf.orcc.df.Actor#getStateVars <em>State Vars</em>}</li>
- *   <li>{@link net.sf.orcc.df.Actor#getTemplateData <em>Template Data</em>}</li>
  * </ul>
  * </p>
  *
@@ -304,22 +303,6 @@ public interface Actor extends Vertex, Adaptable {
 	EList<Var> getStateVars();
 
 	/**
-	 * Returns the value of the '<em><b>Template Data</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Template Data</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Template Data</em>' attribute.
-	 * @see #setTemplateData(Object)
-	 * @see net.sf.orcc.df.DfPackage#getActor_TemplateData()
-	 * @model transient="true"
-	 * @generated
-	 */
-	Object getTemplateData();
-
-	/**
 	 * Returns true if this actor has an FSM.
 	 * 
 	 * @return true if this actor has an FSM
@@ -412,15 +395,5 @@ public interface Actor extends Vertex, Adaptable {
 	 * @generated
 	 */
 	void setNative(boolean value);
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getTemplateData <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Template Data</em>' attribute.
-	 * @see #getTemplateData()
-	 * @generated
-	 */
-	void setTemplateData(Object value);
 
 }
