@@ -61,7 +61,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class StringTransformation extends DfVisitor<Void> {
 
-	private class PrintTransformer extends AbstractIrVisitor<Void> {
+	protected class PrintTransformer extends AbstractIrVisitor<Void> {
 
 		public PrintTransformer() {
 			super(true);
@@ -71,7 +71,7 @@ public class StringTransformation extends DfVisitor<Void> {
 		public Void caseExprString(ExprString expr) {
 			Var variable = createStringVariable(expr.getValue());
 			stateVars.add(variable);
-			ExprVar exprVar = IrFactory.eINSTANCE.createExprVar(variable);
+			ExprVar exprVar = factory.createExprVar(variable);
 			EcoreUtil.replace(expr, exprVar);
 			return null;
 		}
@@ -91,18 +91,86 @@ public class StringTransformation extends DfVisitor<Void> {
 							Var variable = createStringVariable(strExprVal);
 							stateVars.add(variable);
 
-							EcoreUtil.replace(arg, IrFactory.eINSTANCE
-									.createArgByVal(variable));
+							EcoreUtil.replace(arg,
+									factory.createArgByVal(variable));
 						}
 					}
 				}
 			}
 			return null;
 		}
+		
+		/**
+		 * Transform a call of 'print' function to make it compliant with LLVM
+		 * assembly language reference.
+		 * 
+		 * @param call
+		 *            the given call instruction of 'print' function
+		 */
+		protected void transformPrint(InstCall call) {
+			String value = new String();
+			List<Arg> newParameters = new ArrayList<Arg>();
+			List<Arg> parameters = call.getArguments();
+
+			// Iterate though all the println arguments to provide an only
+			// string value
+			for (Arg arg : parameters) {
+				if (arg.isByVal()) {
+					Expression expr = ((ArgByVal) arg).getValue();
+					if (expr.isExprString()) {
+						String strExprVal = (((ExprString) expr).getValue());
+						value += strExprVal;
+					} else {
+						Type type = expr.getType();
+						if (type.isBool()) {
+							value += "%i";
+						} else if (type.isFloat()) {
+							value += "%f";
+						} else if (type.isInt()) {
+							TypeInt intType = (TypeInt) type;
+							if (intType.isLong()) {
+								value += "%ll";
+							} else {
+								value += "%i";
+							}
+						} else if (type.isList()) {
+							value += "%p";
+						} else if (type.isString()) {
+							value += "%s";
+						} else if (type.isUint()) {
+							TypeUint uintType = (TypeUint) type;
+							if (uintType.isLong()) {
+								value += "%ll";
+							} else {
+								value += "%u";
+							}
+						} else if (type.isVoid()) {
+							value += "%p";
+						}
+					}
+				}
+			}
+
+			Var variable = createStringVariable(value);
+			stateVars.add(variable);
+			newParameters.add(factory.createArgByVal(variable));
+
+			for (Arg arg : parameters) {
+				if (arg.isByVal()) {
+					Expression expr = ((ArgByVal) arg).getValue();
+					if (!expr.isExprString()) {
+						newParameters.add(arg);
+					}
+				}
+			}
+			parameters.clear();
+			parameters.addAll(newParameters);
+		}
 	}
 
-	private EList<Var> stateVars;
-	private int strCnt;
+	protected static IrFactory factory = IrFactory.eINSTANCE;
+	protected EList<Var> stateVars;
+	protected int strCnt;
 
 	/**
 	 * Create a transformation that make the calls of 'print' function compliant
@@ -132,7 +200,7 @@ public class StringTransformation extends DfVisitor<Void> {
 	 * @return A variable initialized with an LLVM-compliant ExprString extract
 	 *         from the given string
 	 */
-	private Var createStringVariable(String str) {
+	protected Var createStringVariable(String str) {
 		int size = str.length();
 		str = str + "\\00";
 		size -= StringUtils.countMatches(str, "\\n");
@@ -141,81 +209,13 @@ public class StringTransformation extends DfVisitor<Void> {
 		str = str.replaceAll("\\\\t", "\\\\09");
 
 		// Create state variable that contains println arguments
-		TypeString type = IrFactory.eINSTANCE.createTypeString();
+		TypeString type = factory.createTypeString();
 		type.setSize(size + 1);
 
-		Var variable = IrFactory.eINSTANCE.createVar(type, "str" + strCnt++,
-				false, 0);
-		variable.setInitialValue(IrFactory.eINSTANCE.createExprString(str));
+		Var variable = factory.createVar(type, "str" + strCnt++, false, 0);
+		variable.setInitialValue(factory.createExprString(str));
 
 		return variable;
-	}
-
-	/**
-	 * Transform a call of 'print' function to make it compliant with LLVM
-	 * assembly language reference.
-	 * 
-	 * @param call
-	 *            the given call instruction of 'print' function
-	 */
-	private void transformPrint(InstCall call) {
-		String value = new String();
-		List<Arg> newParameters = new ArrayList<Arg>();
-		List<Arg> parameters = call.getArguments();
-
-		// Iterate though all the println arguments to provide an only
-		// string value
-		for (Arg arg : parameters) {
-			if (arg.isByVal()) {
-				Expression expr = ((ArgByVal) arg).getValue();
-				if (expr.isExprString()) {
-					String strExprVal = (((ExprString) expr).getValue());
-					value += strExprVal;
-				} else {
-					Type type = expr.getType();
-					if (type.isBool()) {
-						value += "%i";
-					} else if (type.isFloat()) {
-						value += "%f";
-					} else if (type.isInt()) {
-						TypeInt intType = (TypeInt) type;
-						if (intType.isLong()) {
-							value += "%ll";
-						} else {
-							value += "%i";
-						}
-					} else if (type.isList()) {
-						value += "%p";
-					} else if (type.isString()) {
-						value += "%s";
-					} else if (type.isUint()) {
-						TypeUint uintType = (TypeUint) type;
-						if (uintType.isLong()) {
-							value += "%ll";
-						} else {
-							value += "%u";
-						}
-					} else if (type.isVoid()) {
-						value += "%p";
-					}
-				}
-			}
-		}
-
-		Var variable = createStringVariable(value);
-		stateVars.add(variable);
-		newParameters.add(IrFactory.eINSTANCE.createArgByVal(variable));
-
-		for (Arg arg : parameters) {
-			if (arg.isByVal()) {
-				Expression expr = ((ArgByVal) arg).getValue();
-				if (!expr.isExprString()) {
-					newParameters.add(arg);
-				}
-			}
-		}
-		parameters.clear();
-		parameters.addAll(newParameters);
 	}
 
 }

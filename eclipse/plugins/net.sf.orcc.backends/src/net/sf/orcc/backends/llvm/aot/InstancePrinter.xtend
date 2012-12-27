@@ -528,7 +528,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def protected print(Procedure procedure) '''
 		«val parameters = procedure.parameters.join(", ", [argumentDeclaration] )»
-		«IF procedure.native»
+		«IF procedure.native || procedure.blocks.nullOrEmpty»
 			declare «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind
 		«ELSE»
 			define internal «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind {

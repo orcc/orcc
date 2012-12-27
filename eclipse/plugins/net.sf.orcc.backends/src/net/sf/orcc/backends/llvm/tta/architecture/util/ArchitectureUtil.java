@@ -48,16 +48,9 @@ public class ArchitectureUtil {
 	 */
 	public static boolean needToPrint(EList<Instance> actors) {
 		for (Instance instance : actors) {
-			TreeIterator<Object> it = EcoreUtil.getAllContents(
-					instance.getActor(), true);
-			while (it.hasNext()) {
-				Object object = it.next();
-				if (object instanceof InstCall) {
-					InstCall call = (InstCall) object;
-					if (call.isPrint()) {
-						return true;
-					}
-				}
+			if (instance.getActor().getProcedure("lwpr_print_int") != null
+					|| instance.getActor().getProcedure("lwpr_print_str") != null) {
+				return true;
 			}
 		}
 		return false;
