@@ -71,9 +71,10 @@ class TceDesignPrinter extends TTAPrinter {
 			«FOR instance: processor.mappedActors»
 				«FOR input: instance.actor.inputs.filter(port | !port.native)»
 					«IF instance.incomingPortMap.get(input) != null»
-						«var incoming = instance.incomingPortMap.get(input)»
-						<input name="fifo_«incoming.getValueAsObject("id").toString»">
+						«val incoming = instance.incomingPortMap.get(input)»
+						<input name="«input.name»">
 							<address-space>«processor.getMemory(incoming).name»</address-space>
+							<var-name>fifo_«incoming.getValueAsObject("id").toString»</var-name>
 							<signed>«input.type.int»</signed>
 							<width>«input.width»</width>
 							<size>«incoming.size»</size>
@@ -81,10 +82,12 @@ class TceDesignPrinter extends TTAPrinter {
 						</input>
 					«ENDIF»
 				«ENDFOR»
-				«FOR output : instance.actor.outputs.filter(port | !port.native)»
+				«FOR output : instance.actor.outputs.filter[!native]»
 					«FOR outgoing : instance.outgoingPortMap.get(output)»
-						<output name="fifo_«outgoing.getValueAsObject("id").toString»">
+						«val id = outgoing.getValueAsObject("id").toString»
+						<output name="«output.name»_«id»">
 							<address-space>«processor.getMemory(outgoing).name»</address-space>
+							<var-name>fifo_«id»</var-name>
 							<signed>«output.type.int»</signed>
 							<width>«output.width»</width>
 							<size>«outgoing.size»</size>

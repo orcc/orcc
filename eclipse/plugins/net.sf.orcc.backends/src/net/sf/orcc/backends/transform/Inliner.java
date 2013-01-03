@@ -211,25 +211,25 @@ public class Inliner extends AbstractIrVisitor<Void> {
 	}
 
 	/**
-	 * Find the given node into the given nodes location.
+	 * Find the given block into the given blocks location.
 	 * 
-	 * @param locationNodes
-	 * @param nodeToFind
+	 * @param locationBlocks
+	 * @param blockToFind
 	 * @return
 	 */
-	public List<Block> findNode(List<Block> locationNodes, Block nodeToFind) {
-		if (locationNodes.contains(nodeToFind)) {
-			return locationNodes;
+	public List<Block> findBlock(List<Block> locationBlocks, Block blockToFind) {
+		if (locationBlocks.contains(blockToFind)) {
+			return locationBlocks;
 		} else {
 			List<Block> n = null;
-			for (Block node : locationNodes) {
-				if (node.isBlockIf()) {
-					n = findNode(((BlockIf) node).getElseBlocks(), nodeToFind);
+			for (Block block : locationBlocks) {
+				if (block.isBlockIf()) {
+					n = findBlock(((BlockIf) block).getElseBlocks(), blockToFind);
 					if (n == null)
-						n = findNode(((BlockIf) node).getThenBlocks(),
-								nodeToFind);
-				} else if (node.isBlockWhile()) {
-					n = findNode(((BlockWhile) node).getBlocks(), nodeToFind);
+						n = findBlock(((BlockIf) block).getThenBlocks(),
+								blockToFind);
+				} else if (block.isBlockWhile()) {
+					n = findBlock(((BlockWhile) block).getBlocks(), blockToFind);
 				}
 				if (n != null)
 					return n;
@@ -310,14 +310,14 @@ public class Inliner extends AbstractIrVisitor<Void> {
 			followingBlock.add(beginningBlock.getInstructions().get(indexInst));
 		}
 		// 7. Add all inlined blocks
-		List<Block> nodes = findNode(callerProc.getBlocks(), beginningBlock);
-		indexBlock = nodes.indexOf(beginningBlock);
+		List<Block> blocks = findBlock(callerProc.getBlocks(), beginningBlock);
+		indexBlock = blocks.indexOf(beginningBlock);
 		List<Block> inlined = calledProc.getBlocks();
 		if (!assignBlock.getInstructions().isEmpty()) {
 			inlined.add(0, assignBlock);
 		}
 		inlined.add(followingBlock);
-		nodes.addAll(indexBlock + 1, inlined);
+		blocks.addAll(indexBlock + 1, inlined);
 		// 8.
 		IrUtil.delete(currentCall);
 	}

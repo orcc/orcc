@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
- * <em><b>CFG Node</b></em>'. <!-- end-user-doc -->
+ * <em><b>BlockBasic</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -251,19 +251,4 @@ public abstract class BlockImpl extends AttributableImpl implements Block {
 		return EcoreHelper.getContainerOfType(this, Procedure.class);
 	}
 
-	@Override
-	public boolean isNodeBlock() {
-		return false;
-	}
-
-	@Override
-	public boolean isNodeIf() {
-		return false;
-	}
-
-	@Override
-	public boolean isNodeWhile() {
-		return false;
-	}
-
-} // NodeImpl
+} // BlockImpl

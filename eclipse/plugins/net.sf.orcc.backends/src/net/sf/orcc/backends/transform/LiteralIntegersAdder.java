@@ -170,19 +170,19 @@ public class LiteralIntegersAdder extends AbstractIrVisitor<Expression> {
 	}
 
 	@Override
-	public Expression caseBlockIf(BlockIf nodeIf) {
-		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
-		doSwitch(nodeIf.getThenBlocks());
-		doSwitch(nodeIf.getElseBlocks());
-		doSwitch(nodeIf.getJoinBlock());
+	public Expression caseBlockIf(BlockIf blockIf) {
+		blockIf.setCondition(doSwitch(blockIf.getCondition()));
+		doSwitch(blockIf.getThenBlocks());
+		doSwitch(blockIf.getElseBlocks());
+		doSwitch(blockIf.getJoinBlock());
 		return null;
 	}
 
 	@Override
-	public Expression caseBlockWhile(BlockWhile nodeWhile) {
-		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
-		doSwitch(nodeWhile.getBlocks());
-		doSwitch(nodeWhile.getJoinBlock());
+	public Expression caseBlockWhile(BlockWhile blockWhile) {
+		blockWhile.setCondition(doSwitch(blockWhile.getCondition()));
+		doSwitch(blockWhile.getBlocks());
+		doSwitch(blockWhile.getJoinBlock());
 		return null;
 	}
 

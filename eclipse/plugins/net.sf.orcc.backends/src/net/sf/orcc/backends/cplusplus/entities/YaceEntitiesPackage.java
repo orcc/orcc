@@ -92,15 +92,6 @@ public interface YaceEntitiesPackage extends EPackage {
 	int SENDER__ATTRIBUTES = DfPackage.ACTOR__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int SENDER__INCOMING = DfPackage.ACTOR__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -119,6 +110,15 @@ public interface YaceEntitiesPackage extends EPackage {
 	int SENDER__NUMBER = DfPackage.ACTOR__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__INCOMING = DfPackage.ACTOR__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -126,6 +126,42 @@ public interface YaceEntitiesPackage extends EPackage {
 	 * @ordered
 	 */
 	int SENDER__OUTGOING = DfPackage.ACTOR__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__CONNECTING = DfPackage.ACTOR__CONNECTING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__PREDECESSORS = DfPackage.ACTOR__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__SUCCESSORS = DfPackage.ACTOR__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENDER__NEIGHBORS = DfPackage.ACTOR__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
@@ -254,15 +290,6 @@ public interface YaceEntitiesPackage extends EPackage {
 	int SENDER__STATE_VARS = DfPackage.ACTOR__STATE_VARS;
 
 	/**
-	 * The feature id for the '<em><b>Template Data</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int SENDER__TEMPLATE_DATA = DfPackage.ACTOR__TEMPLATE_DATA;
-
-	/**
 	 * The feature id for the '<em><b>Intf</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -309,15 +336,6 @@ public interface YaceEntitiesPackage extends EPackage {
 	int RECEIVER__ATTRIBUTES = DfPackage.ACTOR__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int RECEIVER__INCOMING = DfPackage.ACTOR__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -336,6 +354,15 @@ public interface YaceEntitiesPackage extends EPackage {
 	int RECEIVER__NUMBER = DfPackage.ACTOR__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__INCOMING = DfPackage.ACTOR__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -343,6 +370,42 @@ public interface YaceEntitiesPackage extends EPackage {
 	 * @ordered
 	 */
 	int RECEIVER__OUTGOING = DfPackage.ACTOR__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__CONNECTING = DfPackage.ACTOR__CONNECTING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__PREDECESSORS = DfPackage.ACTOR__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__SUCCESSORS = DfPackage.ACTOR__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RECEIVER__NEIGHBORS = DfPackage.ACTOR__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
@@ -471,15 +534,6 @@ public interface YaceEntitiesPackage extends EPackage {
 	int RECEIVER__STATE_VARS = DfPackage.ACTOR__STATE_VARS;
 
 	/**
-	 * The feature id for the '<em><b>Template Data</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int RECEIVER__TEMPLATE_DATA = DfPackage.ACTOR__TEMPLATE_DATA;
-
-	/**
 	 * The feature id for the '<em><b>Intf</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -599,15 +653,6 @@ public interface YaceEntitiesPackage extends EPackage {
 	int COMMUNICATOR__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int COMMUNICATOR__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -626,6 +671,15 @@ public interface YaceEntitiesPackage extends EPackage {
 	int COMMUNICATOR__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -633,6 +687,42 @@ public interface YaceEntitiesPackage extends EPackage {
 	 * @ordered
 	 */
 	int COMMUNICATOR__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Connecting</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__CONNECTING = GraphPackage.VERTEX__CONNECTING;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__PREDECESSORS = GraphPackage.VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__SUCCESSORS = GraphPackage.VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Neighbors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMMUNICATOR__NEIGHBORS = GraphPackage.VERTEX__NEIGHBORS;
 
 	/**
 	 * The feature id for the '<em><b>Intf</b></em>' reference.

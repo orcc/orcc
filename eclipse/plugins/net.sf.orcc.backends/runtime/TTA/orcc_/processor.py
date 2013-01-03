@@ -96,7 +96,7 @@ class Processor:
             os.mkdir(tempPath)
             opt = opt + ["--temp-dir", tempPath]
         if self.usePrint:
-            opt = opt + ["--swfp"]
+            opt = opt + ["-llwpr"]
 
         retcode = subprocess.call(["tcecc"] + opt + sourceFiles)
 

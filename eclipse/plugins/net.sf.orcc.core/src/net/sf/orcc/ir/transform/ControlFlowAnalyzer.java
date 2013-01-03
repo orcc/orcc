@@ -71,17 +71,19 @@ public class ControlFlowAnalyzer extends AbstractIrVisitor<CfgNode> {
 	/**
 	 * Creates a node and adds it to this CFG.
 	 * 
+	 * @param block
+	 *            the related block
 	 * @return a newly-created node
 	 */
-	protected CfgNode addNode(Block node) {
-		CfgNode cfgNode = factory.createCfgNode(node);
+	protected CfgNode addNode(Block block) {
+		CfgNode cfgNode = factory.createCfgNode(block);
 		cfg.add(cfgNode);
 		return cfgNode;
 	}
 
 	@Override
-	public CfgNode caseBlockBasic(BlockBasic node) {
-		CfgNode cfgNode = addNode(node);
+	public CfgNode caseBlockBasic(BlockBasic block) {
+		CfgNode cfgNode = addNode(block);
 		if (last != null) {
 			addEdge(cfgNode);
 		}
@@ -90,24 +92,24 @@ public class ControlFlowAnalyzer extends AbstractIrVisitor<CfgNode> {
 	}
 
 	@Override
-	public CfgNode caseBlockIf(BlockIf node) {
-		CfgNode cfgNode = addNode(node);
+	public CfgNode caseBlockIf(BlockIf block) {
+		CfgNode cfgNode = addNode(block);
 		if (last != null) {
 			addEdge(cfgNode);
 		}
 
-		CfgNode join = addNode(node.getJoinBlock());
+		CfgNode join = addNode(block.getJoinBlock());
 
 		last = cfgNode;
 		flag = true;
-		last = doSwitch(node.getThenBlocks());
+		last = doSwitch(block.getThenBlocks());
 
 		// reset flag (in case there are no nodes in "then" branch)
 		flag = false;
 		addEdge(join);
 
 		last = cfgNode;
-		last = doSwitch(node.getElseBlocks());
+		last = doSwitch(block.getElseBlocks());
 		addEdge(join);
 		last = join;
 
@@ -115,8 +117,8 @@ public class ControlFlowAnalyzer extends AbstractIrVisitor<CfgNode> {
 	}
 
 	@Override
-	public CfgNode caseBlockWhile(BlockWhile node) {
-		CfgNode join = addNode(node.getJoinBlock());
+	public CfgNode caseBlockWhile(BlockWhile block) {
+		CfgNode join = addNode(block.getJoinBlock());
 
 		if (last != null) {
 			addEdge(join);
@@ -124,14 +126,14 @@ public class ControlFlowAnalyzer extends AbstractIrVisitor<CfgNode> {
 
 		flag = true;
 		last = join;
-		CfgNode cfgNode = addNode(node);
+		CfgNode cfgNode = addNode(block);
 		addEdge(cfgNode);
 
 		last = join;
 		flag = true;
-		last = doSwitch(node.getBlocks());
+		last = doSwitch(block.getBlocks());
 
-		// reset flag (in case there are no nodes in "then" branch)
+		// reset flag (in case there are no block in "then" branch)
 		flag = false;
 		addEdge(join);
 		last = cfgNode;
@@ -148,15 +150,15 @@ public class ControlFlowAnalyzer extends AbstractIrVisitor<CfgNode> {
 	}
 
 	/**
-	 * Visits the given node list.
+	 * Visits the given block list.
 	 * 
-	 * @param nodes
-	 *            a list of nodes
-	 * @return the last node of the node list
+	 * @param blocks
+	 *            a list of blocks
+	 * @return the last block of the block list
 	 */
-	public CfgNode doSwitch(List<Block> nodes) {
-		for (Block node : nodes) {
-			last = doSwitch(node);
+	public CfgNode doSwitch(List<Block> blocks) {
+		for (Block block : blocks) {
+			last = doSwitch(block);
 		}
 
 		return last;

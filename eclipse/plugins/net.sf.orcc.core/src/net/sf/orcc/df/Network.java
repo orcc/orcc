@@ -53,7 +53,6 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.df.Network#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getParameters <em>Parameters</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getTemplateData <em>Template Data</em>}</li>
  *   <li>{@link net.sf.orcc.df.Network#getVariables <em>Variables</em>}</li>
  * </ul>
  * </p>
@@ -295,23 +294,6 @@ public interface Network extends Graph, Adaptable {
 	String getSimpleName();
 
 	/**
-	 * Returns the value of the '<em><b>Template Data</b></em>' attribute. <!--
-	 * begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Template Data</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * 
-	 * @return the value of the '<em>Template Data</em>' attribute.
-	 * @see #setTemplateData(Object)
-	 * @see net.sf.orcc.df.DfPackage#getNetwork_TemplateData()
-	 * @model
-	 * @generated
-	 */
-	Object getTemplateData();
-
-	/**
 	 * Returns the variable with the given name.
 	 * 
 	 * @param name
@@ -361,15 +343,5 @@ public interface Network extends Graph, Adaptable {
 	 * @generated
 	 */
 	void setName(String value);
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Network#getTemplateData <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @param value the new value of the '<em>Template Data</em>' attribute.
-	 * @see #getTemplateData()
-	 * @generated
-	 */
-	void setTemplateData(Object value);
 
 }

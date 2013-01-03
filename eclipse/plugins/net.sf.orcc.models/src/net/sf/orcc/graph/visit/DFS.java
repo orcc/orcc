@@ -45,6 +45,8 @@ import org.eclipse.emf.ecore.EReference;
  */
 public class DFS extends Ordering {
 
+	private boolean containsCycle = false;
+
 	/**
 	 * current number. Starts at one.
 	 */
@@ -114,6 +116,15 @@ public class DFS extends Ordering {
 	}
 
 	/**
+	 * Returns true if the visited graph contains at least one cycle.
+	 * 
+	 * @return true if the visited graph contains at least one cycle
+	 */
+	public boolean containsCycle() {
+		return containsCycle;
+	}
+
+	/**
 	 * Visits the given vertex. Adds it to the vertices list and sets its
 	 * number.
 	 * 
@@ -144,6 +155,8 @@ public class DFS extends Ordering {
 			Vertex w = (Vertex) it.previous().eGet(refVertex);
 			if (!visited.contains(w)) {
 				visitPost(w);
+			} else {
+				containsCycle = true;
 			}
 		}
 
@@ -166,6 +179,8 @@ public class DFS extends Ordering {
 			Vertex w = (Vertex) edge.eGet(refVertex);
 			if (!visited.contains(w)) {
 				visitPre(w);
+			} else {
+				containsCycle = true;
 			}
 		}
 	}

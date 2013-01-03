@@ -106,7 +106,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 	 *            and unsigned
 	 * @param createEmptyBlockBasic
 	 *            <code>true</code> if an Empty BlockBasic should be introduced
-	 *            when a ifNode has an empty thenBlock/elseBlock
+	 *            when a ifBlock has an empty thenBlock/elseBlock
 	 */
 	public CastAdder(boolean castToUnsigned, boolean createEmptyBlockBasic) {
 		this.castToUnsigned = castToUnsigned;
@@ -114,24 +114,24 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 	}
 
 	@Override
-	public Expression caseBlockIf(BlockIf nodeIf) {
+	public Expression caseBlockIf(BlockIf blockIf) {
 		Type oldParentType = parentType;
 		parentType = IrFactory.eINSTANCE.createTypeBool();
-		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
-		doSwitch(nodeIf.getThenBlocks());
-		doSwitch(nodeIf.getElseBlocks());
-		doSwitch(nodeIf.getJoinBlock());
+		blockIf.setCondition(doSwitch(blockIf.getCondition()));
+		doSwitch(blockIf.getThenBlocks());
+		doSwitch(blockIf.getElseBlocks());
+		doSwitch(blockIf.getJoinBlock());
 		parentType = oldParentType;
 		return null;
 	}
 
 	@Override
-	public Expression caseBlockWhile(BlockWhile nodeWhile) {
+	public Expression caseBlockWhile(BlockWhile blockWhile) {
 		Type oldParentType = parentType;
 		parentType = IrFactory.eINSTANCE.createTypeBool();
-		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
-		doSwitch(nodeWhile.getBlocks());
-		doSwitch(nodeWhile.getJoinBlock());
+		blockWhile.setCondition(doSwitch(blockWhile.getCondition()));
+		doSwitch(blockWhile.getBlocks());
+		doSwitch(blockWhile.getJoinBlock());
 		parentType = oldParentType;
 		return null;
 	}
@@ -385,37 +385,37 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		Type oldParentType = parentType;
 		parentType = phi.getTarget().getVariable().getType();
 		EList<Expression> values = phi.getValues();
-		Block containingNode = (Block) phi.eContainer().eContainer();
+		Block containingBlock = (Block) phi.eContainer().eContainer();
 		Expression value0 = phi.getValues().get(0);
 		Expression value1 = phi.getValues().get(1);
-		if (containingNode.isBlockIf()) {
-			BlockIf nodeIf = (BlockIf) containingNode;
+		if (containingBlock.isBlockIf()) {
+			BlockIf blockIf = (BlockIf) containingBlock;
 			if (value0.isExprVar()) {
 				if (createEmptyBlockBasic) {
 					BlockBasic block0 = IrFactory.eINSTANCE.createBlockBasic();
-					nodeIf.getThenBlocks().add(block0);
+					blockIf.getThenBlocks().add(block0);
 					values.set(0, castExpression(value0, block0, 0));
 				}
 			}
 			if (value1.isExprVar()) {
 				if (createEmptyBlockBasic) {
 					BlockBasic block1 = IrFactory.eINSTANCE.createBlockBasic();
-					nodeIf.getElseBlocks().add(block1);
+					blockIf.getElseBlocks().add(block1);
 					values.set(1, castExpression(value1, block1, 0));
 				}
 			}
 		} else {
-			BlockWhile nodeWhile = (BlockWhile) containingNode;
+			BlockWhile blockWhile = (BlockWhile) containingBlock;
 			if (value0.isExprVar()) {
 				BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
-				EcoreHelper.getContainingList(containingNode).add(indexBlock,
+				EcoreHelper.getContainingList(containingBlock).add(indexBlock,
 						block);
 				indexBlock++;
 				values.set(0, castExpression(value0, block, 0));
 			}
 			if (value1.isExprVar()) {
 				BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
-				nodeWhile.getBlocks().add(block);
+				blockWhile.getBlocks().add(block);
 				values.set(1, castExpression(value1, block, 0));
 			}
 		}
@@ -481,7 +481,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		return expr;
 	}
 
-	private Expression castExpression(Expression expr, BlockBasic node,
+	private Expression castExpression(Expression expr, BlockBasic block,
 			int index) {
 		if (needCast(expr.getType(), parentType)) {
 			Var oldVar;
@@ -493,7 +493,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 						"expr_" + procedure.getName());
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 						oldVar, IrUtil.copy(expr));
-				node.add(index, assign);
+				block.add(index, assign);
 				index++;
 			}
 
@@ -502,7 +502,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 					"castedExpr_" + procedure.getName());
 			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(oldVar,
 					newVar);
-			node.add(index, cast);
+			block.add(index, cast);
 			return IrFactory.eINSTANCE.createExprVar(newVar);
 		}
 

@@ -379,10 +379,10 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * 
 	 * @param procedure
 	 * @param schedule
-	 * @param nodes
+	 * @param blocks
 	 */
 	private void createStaticSchedule(Procedure procedure, Schedule schedule,
-			List<Block> nodes) {
+			List<Block> blocks) {
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isActor()) {
 				Actor actor = iterand.getActor();
@@ -392,7 +392,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 					copyLocalVariables(actor.getName(), procedure, action);
 					new ChangeFifoArrayAccess(action, procedure)
 							.doSwitch(action.getBody());
-					nodes.addAll(action.getBody().getBlocks());
+					blocks.addAll(action.getBody().getBlocks());
 				}
 
 			} else {
@@ -400,7 +400,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 				Var loopVar = procedure.getLocal("idx_" + depth);
 
 				// init counter
-				BlockBasic block = IrUtil.getLast(nodes);
+				BlockBasic block = IrUtil.getLast(blocks);
 				block.add(irFactory.createInstAssign(loopVar,
 						irFactory.createExprInt(0)));
 
@@ -410,14 +410,14 @@ public class MergerSdf extends DfSwitch<Actor> {
 						irFactory.createExprInt(sched.getIterationCount()),
 						irFactory.createTypeBool());
 
-				BlockWhile nodeWhile = irFactory.createBlockWhile();
-				nodeWhile.setJoinBlock(irFactory.createBlockBasic());
-				nodeWhile.setCondition(condition);
-				nodes.add(nodeWhile);
+				BlockWhile blockWhile = irFactory.createBlockWhile();
+				blockWhile.setJoinBlock(irFactory.createBlockBasic());
+				blockWhile.setCondition(condition);
+				blocks.add(blockWhile);
 
 				depth++;
 				// recursion
-				createStaticSchedule(procedure, sched, nodeWhile.getBlocks());
+				createStaticSchedule(procedure, sched, blockWhile.getBlocks());
 				depth--;
 
 				// Increment current while loop variable
@@ -426,7 +426,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 								OpBinary.PLUS, irFactory.createExprInt(1),
 								irFactory.createTypeInt(32));
 				InstAssign assign = irFactory.createInstAssign(loopVar, expr);
-				IrUtil.getLast(nodeWhile.getBlocks()).add(assign);
+				IrUtil.getLast(blockWhile.getBlocks()).add(assign);
 			}
 		}
 	}

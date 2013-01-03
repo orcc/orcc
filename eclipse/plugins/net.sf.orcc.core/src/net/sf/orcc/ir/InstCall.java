@@ -61,7 +61,7 @@ public interface InstCall extends Instruction {
 	/**
 	 * Returns the target of this call (may be <code>null</code>).
 	 * 
-	 * @return the target of this node (may be <code>null</code>)
+	 * @return the target of this call (may be <code>null</code>)
 	 * @model containment="true"
 	 */
 	Def getTarget();

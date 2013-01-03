@@ -647,9 +647,11 @@ public interface IrFactory extends EFactory {
 	 */
 	Procedure createProcedure();
 
+	Procedure createProcedure(String name, Type returnType, Param param);
+
 	/**
 	 * Creates a new procedure, not external, with empty parameters, locals, and
-	 * nodes. Return type is copied.
+	 * blocks. Return type is copied.
 	 * 
 	 * @param name
 	 *            The procedure name.

@@ -88,8 +88,8 @@ public class TypeResizer extends DfVisitor<Void> {
 			if (castBoolToInt) {
 				ExprInt newExpr = IrFactory.eINSTANCE.createExprInt(expr
 						.isValue() ? 1 : 0);
-				checkType(newExpr.getType());
 				EcoreUtil.replace(expr, newExpr);
+				return doSwitch(newExpr);
 			}
 			return null;
 		}

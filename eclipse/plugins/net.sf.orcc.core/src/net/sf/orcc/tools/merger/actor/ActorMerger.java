@@ -50,6 +50,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -206,7 +207,7 @@ public class ActorMerger extends DfVisitor<Void> {
 			AbstractScheduler scheduler = new SASLoopScheduler(subNetwork);
 			scheduler.schedule();
 
-			System.out.println("Schedule of cluster" + index + " is "
+			OrccLogger.traceln("Schedule of cluster" + index + " is "
 					+ scheduler.getSchedule());
 
 			// merge vertices inside a single actor

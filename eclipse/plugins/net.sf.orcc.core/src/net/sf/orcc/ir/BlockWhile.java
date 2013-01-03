@@ -61,9 +61,6 @@ public interface BlockWhile extends Block {
 	 */
 	Expression getCondition();
 
-	@Deprecated
-	BlockBasic getJoinNode();
-
 	/**
 	 * Returns the value of the '<em><b>Line Number</b></em>' attribute. <!--
 	 * begin-user-doc -->Returns the line number on which this "while" starts.
@@ -76,9 +73,6 @@ public interface BlockWhile extends Block {
 	 * @generated
 	 */
 	int getLineNumber();
-
-	@Deprecated
-	EList<Block> getNodes();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.BlockWhile#getCondition <em>Condition</em>}' containment reference.
@@ -114,9 +108,6 @@ public interface BlockWhile extends Block {
 	 * @generated
 	 */
 	void setJoinBlock(BlockBasic value);
-
-	@Deprecated
-	void setJoinNode(BlockBasic value);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.BlockWhile#getLineNumber <em>Line Number</em>}' attribute.

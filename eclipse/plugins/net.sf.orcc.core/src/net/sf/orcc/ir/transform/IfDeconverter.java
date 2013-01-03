@@ -59,7 +59,7 @@ public class IfDeconverter extends AbstractIrVisitor<Object> {
 
 	private Predicate currentPredicate;
 
-	private List<BlockIf> nodeIfList;
+	private List<BlockIf> blockIfList;
 
 	@Override
 	public Object caseBlockBasic(BlockBasic block) {
@@ -101,8 +101,8 @@ public class IfDeconverter extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseBlockWhile(BlockWhile nodeWhile) {
-		throw new OrccRuntimeException("unsupported NodeWhile");
+	public Object caseBlockWhile(BlockWhile blockWhile) {
+		throw new OrccRuntimeException("unsupported BlockWhile");
 	}
 
 	@Override
@@ -113,45 +113,45 @@ public class IfDeconverter extends AbstractIrVisitor<Object> {
 			return null;
 		}
 
-		nodeIfList = new ArrayList<BlockIf>();
+		blockIfList = new ArrayList<BlockIf>();
 
 		// initialized to "null" so that the first empty predicate will create
 		// an unconditional block
 		currentPredicate = null;
 
-		List<Block> nodes = procedure.getBlocks();
-		if (!nodes.isEmpty()) {
-			doSwitch(nodes.get(0));
+		List<Block> blocks = procedure.getBlocks();
+		if (!blocks.isEmpty()) {
+			doSwitch(blocks.get(0));
 		}
 
 		return null;
 	}
 
 	/**
-	 * Returns the list of nodes that matches the given condition (if any).
+	 * Returns the list of blocks that matches the given condition (if any).
 	 * 
-	 * @param parentNodes
-	 *            list of nodes to which the "if" we're looking for belongs
+	 * @param parentBlocks
+	 *            list of blocks to which the "if" we're looking for belongs
 	 * @param condition
 	 *            a condition
-	 * @return the list of nodes that matches the given condition, or
+	 * @return the list of blocks that matches the given condition, or
 	 *         <code>null</code>
 	 */
-	private List<Block> findNodes(List<Block> parentNodes, Expression condition) {
-		for (BlockIf nodeIf : nodeIfList) {
-			List<Block> nodes = EcoreHelper.getContainingList(nodeIf);
-			if (EcoreUtil.equals(condition, nodeIf.getCondition())
-					&& parentNodes == nodes) {
-				return nodeIf.getThenBlocks();
+	private List<Block> findBlocks(List<Block> parentBlocks, Expression condition) {
+		for (BlockIf blockIf : blockIfList) {
+			List<Block> blocks = EcoreHelper.getContainingList(blockIf);
+			if (EcoreUtil.equals(condition, blockIf.getCondition())
+					&& parentBlocks == blocks) {
+				return blockIf.getThenBlocks();
 			} else {
 				if (condition.isExprUnary()) {
 					ExprUnary unary = (ExprUnary) condition;
 					Expression expr = unary.getExpr();
 
 					if (unary.getOp() == OpUnary.LOGIC_NOT
-							&& EcoreUtil.equals(expr, nodeIf.getCondition())
-							&& parentNodes == nodes) {
-						return nodeIf.getElseBlocks();
+							&& EcoreUtil.equals(expr, blockIf.getCondition())
+							&& parentBlocks == blocks) {
+						return blockIf.getElseBlocks();
 					}
 				}
 			}
@@ -171,11 +171,11 @@ public class IfDeconverter extends AbstractIrVisitor<Object> {
 	private BlockBasic updateTargetBlock(Procedure procedure,
 			Predicate predicate) {
 		currentPredicate = IrFactory.eINSTANCE.createPredicate();
-		List<Block> parentNodes = procedure.getBlocks();
+		List<Block> parentBlocks = procedure.getBlocks();
 
 		if (predicate.isEmpty()) {
 			// unconditioned predicate => forgets all ifs
-			nodeIfList.clear();
+			blockIfList.clear();
 
 			// creates a new block
 			BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
@@ -183,25 +183,25 @@ public class IfDeconverter extends AbstractIrVisitor<Object> {
 			return block;
 		} else {
 			for (Expression condition : predicate.getExpressions()) {
-				List<Block> nodes = findNodes(parentNodes, condition);
-				if (nodes == null) {
+				List<Block> blocks = findBlocks(parentBlocks, condition);
+				if (blocks == null) {
 					// create a new if
-					BlockIf nodeIf = IrFactory.eINSTANCE.createBlockIf();
-					nodeIf.setCondition(IrUtil.copy(condition));
-					nodeIf.setJoinBlock(IrFactory.eINSTANCE.createBlockBasic());
-					nodeIfList.add(nodeIf);
-					parentNodes.add(nodeIf);
+					BlockIf blockIf = IrFactory.eINSTANCE.createBlockIf();
+					blockIf.setCondition(IrUtil.copy(condition));
+					blockIf.setJoinBlock(IrFactory.eINSTANCE.createBlockBasic());
+					blockIfList.add(blockIf);
+					parentBlocks.add(blockIf);
 
-					// use the nodes of the "then" branch
-					parentNodes = nodeIf.getThenBlocks();
+					// use the blocks of the "then" branch
+					parentBlocks = blockIf.getThenBlocks();
 				} else {
-					parentNodes = nodes;
+					parentBlocks = blocks;
 				}
 
 				currentPredicate.add(IrUtil.copy(condition));
 			}
 
-			return IrUtil.getLast(parentNodes);
+			return IrUtil.getLast(parentBlocks);
 		}
 	}
 
