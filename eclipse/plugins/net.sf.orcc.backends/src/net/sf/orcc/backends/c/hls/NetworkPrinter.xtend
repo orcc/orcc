@@ -73,7 +73,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		
 		
 		/////////////////////////////////////////////////
-		// Action initializes schedulers
+		// Actions initializes
 		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm )»
@@ -81,11 +81,20 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			«ENDIF»
 		«ENDFOR»
 		
+		// Actions schedulers
+		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			void «instance.name»_scheduler();
+			void «instance.name»_scheduler(«instance.assignAllInstanceFifoDeclaration»);
 		«ENDFOR»
 		
-		
+		// main loop definition
+		void loopModule(«network.children.filter(typeof(Instance)).filter[isActor].filter[! (it.incomingPortMap.empty)].join(",", [assignAllFifoDeclaration])»){
+			while(1) {
+				«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+					«instance.name»_scheduler(«instance.assignInstanceFifoUse»);
+				«ENDFOR»
+			}
+		}
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main() {
@@ -94,12 +103,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 					 «instance.name»_initialize();
 				«ENDIF»
 			«ENDFOR»
-			
-			while(1) {
-				«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-					«instance.name»_scheduler();
-				«ENDFOR»
-			}
+			loopModule(«network.children.filter(typeof(Instance)).filter[isActor].filter[! (it.incomingPortMap.empty)].join(",",[assignFifoUse])»);
 			return 0;
 		}
 	'''
@@ -134,7 +138,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	'''
 	
 	def printFifoAssignHLS(Connection connection) '''
-		stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
+		static stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
 	'''
 	
 	override print(String targetFolder) {
@@ -168,4 +172,38 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		
 	override caseTypeBool(TypeBool type) 
 		'''bool'''
+		
+	def assignAllFifoDeclaration(Instance instance) {
+		val inList = instance.incomingPortMap.values
+		val outList = instance.outgoingPortMap.values.map[head].filter[target instanceof Port]
+		
+		'''«(inList + outList).join(",", [printFifoAssignDeclarationHLS])»'''
+	}
+	
+	def assignAllInstanceFifoDeclaration(Instance instance) {
+		val inList = instance.incomingPortMap.values
+		val outList = instance.outgoingPortMap.values.map[head]
+		
+		'''«(inList + outList).join(",", [printFifoAssignDeclarationHLS])»'''
+	}
+		
+	def printFifoAssignDeclarationHLS(Connection connection) 
+	'''stream<«connection.fifoType.doSwitch»>& «connection.fifoName»'''
+	
+	def assignFifoUse(Instance instance) {
+		val inList = instance.incomingPortMap.values
+		val outList = instance.outgoingPortMap.values.map[head].filter[ (target instanceof Port)]
+		
+		return '''«(inList + outList).join(",", [printFifoAssignUSEHLS])»'''
+	}
+	
+	def assignInstanceFifoUse(Instance instance) {
+		val inList = instance.incomingPortMap.values
+		val outList = instance.outgoingPortMap.values.map[head]
+		
+		return '''«(inList + outList).join(",", [printFifoAssignUSEHLS])»'''
+	}
+	
+	def printFifoAssignUSEHLS(Connection connection) 
+	'''«connection.fifoName»'''
 }

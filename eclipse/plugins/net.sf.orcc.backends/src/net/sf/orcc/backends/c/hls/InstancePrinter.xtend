@@ -41,6 +41,7 @@ import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
 import java.util.List
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.TypeList
 
 /*
  * Compile Instance c source code
@@ -59,6 +60,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Source file is "«instance.actor.file»"
 		
 		#include <hls_stream.h>
+		#include <stdio.h>
+		#include <stdlib.h>
 		using namespace hls;
 		
 		typedef signed char i8;
@@ -71,28 +74,17 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		typedef unsigned int u32;
 		typedef unsigned long long int u64;
 		
-		
-		
 		////////////////////////////////////////////////////////////////////////////////
-		// Input FIFOS
-		«FOR port : instance.actor.inputs»
-			«IF instance.incomingPortMap.get(port) != null»
-				extern stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
+		
+		// Parameter values of the instance
+		«FOR arg : instance.arguments»
+			«IF arg.value.exprList»
+				static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
+			«ELSE»
+				#define «arg.variable.name» «arg.value.doSwitch»
 			«ENDIF»
 		«ENDFOR»
 		
-		////////////////////////////////////////////////////////////////////////////////
-		// Output FIFOs
-		«FOR port : instance.actor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(port)»
-				extern stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
-			«ENDFOR»
-		«ENDFOR»
-		
-		
-		
-		
-		////////////////////////////////////////////////////////////////////////////////
 		// State variables of the actor
 		«FOR variable : instance.actor.stateVars»
 			«variable.declareStateVar»
@@ -108,6 +100,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			
 			static enum states _FSM_state;
 		«ENDIF»
+		
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
 		«FOR proc : instance.actor.procs»
@@ -133,7 +127,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF instance.actor.hasFsm»
 			«printFsm»
 		«ELSE»
-			void «instance.name»_scheduler() {		
+			void «instance.name»_scheduler(«instance.assignFifoDeclaration») {		
 				
 				«instance.actor.actionsOutsideFsm.printActionLoop»
 				
@@ -145,14 +139,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 	override printFsm() '''
 		«IF ! instance.actor.actionsOutsideFsm.empty»
-			void «instance.name»_outside_FSM_scheduler() {
+			void «instance.name»_outside_FSM_scheduler(«instance.assignInputFifoDeclaration») {
 				«instance.actor.actionsOutsideFsm.printActionLoop»
 			finished:
 				return;
 			}
 		«ENDIF»
 		
-		void «instance.name»_scheduler() {
+		void «instance.name»_scheduler(«instance.assignFifoDeclaration») {
 			// jump to FSM state 
 			switch (_FSM_state) {
 				«FOR state : instance.actor.fsm.states»
@@ -179,7 +173,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override printTransition(State state) '''
 		l_«state.name»:
 			«IF ! instance.actor.actionsOutsideFsm.empty»
-				«instance.name»_outside_FSM_scheduler();
+				«instance.name»_outside_FSM_scheduler(«instance.assignInputFifoUse»);
 			«ENDIF»
 			«IF !state.outgoing.empty»
 				«schedulingState(state, state.outgoing.map[it as Transition])»
@@ -187,50 +181,36 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	override actionTestState(State srcState, Iterable<Transition> transitions) '''
+	«IF transitions.head.action.outputPattern == null»
 		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
-			«IF transitions.head.action.outputPattern != null»
-				«transitions.head.action.outputPattern.printOutputPattern»
-					_FSM_state = my_state_«srcState.name»;
-					goto finished;	
-				}
+	«ELSE»
+		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»() «transitions.head.action.outputPattern.printOutputPattern») {
+	«ENDIF»	
+			«transitions.head.action.body.name»(«printActionInputFifos(transitions.head.action)»«printActionOutputFifos(transitions.head.action)»);
+			«IF transitions.head.target != srcState»
+				_FSM_state = my_state_«transitions.head.target.name»;
+				goto finished;
+			«ELSE»
+				goto l_«transitions.head.target.name»;
 			«ENDIF»
-			«transitions.head.action.body.name»();
-			_FSM_state = my_state_«transitions.head.target.name»;
-			goto finished;	
 		} else {
 			«schedulingState(srcState, transitions.tail)»
 		}
 	'''
 	
-	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
-		if («instance.outgoingPortMap.get(port).head.fifoName».full()) {
-			stop = 1;
-		}
-	'''
+	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) 
+	'''&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())'''
 	
 	override checkInputPattern(Pattern pattern)
-	'''«FOR port : pattern.ports»!«instance.incomingPortMap.get(port).fifoName».empty() && «ENDFOR»'''
+	'''«FOR port : pattern.ports»!«instance.incomingPortMap.get(port).fifoName».empty() &&«ENDFOR»'''
 	
-	override printInstance(String targetFolder) {
-		val content = instanceFileContent
-		val file = new File(targetFolder + File::separator + instance.name + ".cpp")
-		
-		if(needToWriteFile(content, file)) {
-			printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
 	
 	override actionTest(Action action, Iterable<Action> others) '''
 		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 			«IF action.outputPattern != null»
 				«action.outputPattern.printOutputPattern»
-					goto finished;
-				}
 			«ENDIF»
-			«action.body.name»();
+			«action.body.name»(«action.printActionInputFifosUse»«action.printActionOutputFifosUse»);
 		} else {
 			«others.printActions»
 		}
@@ -239,7 +219,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override print(Action action) {
 		currentAction = action
 		val output = '''
-			static void «action.body.name»() {
+			static void «action.body.name»(«printActionInputFifosDeclaration(action)»«printActionOutputFifosDeclaration(action)») {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
@@ -286,11 +266,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«actions.printActions»
 	'''
 	
-	def fifoName(Connection connection) '''
-		«IF connection != null»
-			myStream_«connection.getAttribute("id").objectValue»
-		«ENDIF»
-	'''
+	def fifoName(Connection connection) {
+		if (connection != null){
+		'''myStream_«connection.getAttribute("id").objectValue»'''
+		}
+	}
 	
 	def fifoType(Connection connection) {
 		if(connection.sourcePort == null){
@@ -346,6 +326,108 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 	
-	override caseTypeBool(TypeBool type) 
-		'''bool'''
+	override caseTypeBool(TypeBool type) '''
+	bool
+	'''
+		
+	override printOutputPattern(Pattern pattern) '''
+		«FOR port : pattern.ports» 
+			«printOutputPatternsPort(pattern, port)»
+		«ENDFOR»
+	'''
+	
+	override printOutputPatternsPort(Pattern pattern, Port port) {
+		var i = -1 '''
+		«FOR successor : instance.outgoingPortMap.get(port)»
+			 «printOutputPatternPort(pattern, port, successor, i = i + 1)»
+		«ENDFOR»
+	'''
+	}
+	
+	def assignFifoDeclaration(Instance instance){
+	
+	val inList = instance.incomingPortMap.values
+	val outList = instance.outgoingPortMap.values.map[head]
+	'''«(inList + outList).join(",", [printFifoAssignDeclarationHLS])»'''
+	}
+	
+	def printFifoAssignDeclarationHLS(Connection connection) '''
+		stream<«connection.fifoType.doSwitch»>& «connection.fifoName»
+	'''
+	
+	def assignInputFifoDeclaration(Instance instance) '''
+		«instance.incomingPortMap.values.join(",",[printInputFifoAssignDeclarationHLS])»
+	'''
+	
+	def printInputFifoAssignDeclarationHLS(Connection connection) '''
+		stream<«connection.fifoType.doSwitch»>& «connection.fifoName»
+	'''
+	
+	def assignInputFifoUse(Instance instance) '''
+		«instance.incomingPortMap.values.join(",",[printInputFifoAssignUseHLS])»
+	'''
+	
+	def printInputFifoAssignUseHLS(Connection connection) '''
+		«connection.fifoName»
+	'''
+	
+	def assignOutputFifoUse(Instance instance) '''
+		«instance.outgoingPortMap.values.join(",",[head.printInputFifoAssignUseHLS])»
+	'''
+	
+	def printOutputFifoAssignUseHLS(Connection connection) '''
+		«connection.fifoName»
+	'''
+	
+	def printActionInputFifos (Action action)'''
+	«action.inputPattern.ports.join(",",[inputPortUse])»
+	'''
+	
+	def printActionOutputFifos (Action action)'''
+	«action.outputPattern.ports.join(",",[outputPortPrinterUse])»
+	'''
+	
+	def printActionInputFifosDeclaration (Action action)'''
+	«action.inputPattern.ports.join(",",[inputPortPrinter])»
+	'''
+	
+	def printActionOutputFifosDeclaration (Action action)
+		'''«action.outputPattern.ports.join(",",[outputPortPrinter])»'''
+	
+	def inputPortPrinter (Port port)'''
+		stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>& «instance.incomingPortMap.get(port).fifoName»
+	'''
+	
+	def outputPortPrinter (Port port)'''
+		stream<«instance.outgoingPortMap.get(port).head.fifoType.doSwitch»>& «instance.outgoingPortMap.get(port).head.fifoName»
+	'''
+	
+	
+	def printActionInputFifosUse (Action action)'''
+	«action.inputPattern.ports.join(",",[inputPortUse])»
+	'''
+	
+	def printActionOutputFifosUse (Action action)'''
+	«action.outputPattern.ports.join(",",[outputPortPrinterUse])»
+	'''
+	
+	def inputPortUse (Port port)'''
+		«instance.incomingPortMap.get(port).fifoName»
+	'''
+	
+	def outputPortPrinterUse (Port port)'''
+		«instance.outgoingPortMap.get(port).head.fifoName»
+	'''
+	
+	override printInstance(String targetFolder) {
+		val content = instanceFileContent
+		val file = new File(targetFolder + File::separator + instance.name + ".cpp")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
+	}
 }
