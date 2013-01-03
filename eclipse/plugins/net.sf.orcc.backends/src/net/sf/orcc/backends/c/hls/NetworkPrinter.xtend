@@ -63,6 +63,8 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		typedef unsigned short u16;
 		typedef unsigned int u32;
 		typedef unsigned long long int u64;
+				
+		static i8 flag;
 		
 		/////////////////////////////////////////////////
 		// FIFO pointer assignments
@@ -98,12 +100,20 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main() {
+			flag = 0;
+			while(flag == 0){
 			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 				«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm )»
 					 «instance.name»_initialize();
 				«ENDIF»
 			«ENDFOR»
+			flag = 1;
+			}
+			
+			while (flag == 1){
 			loopModule(«network.children.filter(typeof(Instance)).filter[isActor].filter[! (it.incomingPortMap.empty)].join(",",[assignFifoUse])»);
+			}
+			
 			return 0;
 		}
 	'''
