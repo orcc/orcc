@@ -500,7 +500,8 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 		Pattern pattern = newWriteAction.getOutputPattern();
 		pattern.setVariable(port, OUTPUT);
 		pattern.setNumTokens(port, 1);
-
+		
+		actor.getActionsOutsideFsm().add(newWriteAction);
 		return newWriteAction;
 	}
 
