@@ -997,9 +997,14 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 		load2Index.add(index);
 		insideBlock.add(irFactory.createInstStore(untagBuffer, load2Index,
 				irFactory.createExprVar(tmpVar)));
+		Expression counterIncrementation = irFactory.createExprBinary(irFactory.createExprVar(localWriteIndex), OpBinary.PLUS,
+				irFactory.createExprInt(1),
+				irFactory.createTypeInt(32));
+		insideBlock.add(irFactory.createInstAssign(localWriteIndex, counterIncrementation));
 		whileBlock.getBlocks().add(insideBlock);
 		body.getBlocks().add(whileBlock);
-
+		
+		// create increment block for read index
 		BlockBasic incrementBlock = irFactory.createBlockBasic();
 		Expression increment = irFactory
 				.createExprBinary(irFactory.createExprVar(untagReadIndex),
@@ -1268,7 +1273,10 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 				int visitedIndex = actionNamePosition(visitedActionsNames,
 						actionName);
 				Action updateAction = visitedActions.get(visitedIndex);
-				updateFSM(updateAction, action, source, target);
+				Transition transition = dfFactory.createTransition(source,
+						updateAction, target);
+				transitionsList.add(transition);
+				visitedRenameIndex++;
 			} else {
 				visitedActionsNames.add(actionName);
 				visitedActions.add(IrUtil.copy(action));
