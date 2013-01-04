@@ -242,6 +242,8 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 	private int outputIndex;
 	private Port port;
 	private List<Var> readIndexes;
+	private List<Var> outputReadIndexes;
+	private List<Var> outputWriteIndexes;
 	private boolean repeatInput;
 	private List<Transition> transitionsList;
 	private List<Action> visitedActions;
@@ -329,6 +331,8 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 		outputPorts = new ArrayList<Port>();
 		noRepeatActions = new HashSet<Action>();
 		readIndexes = new ArrayList<Var>();
+		outputReadIndexes = new ArrayList<Var>();
+		outputWriteIndexes = new ArrayList<Var>();
 		writeIndexes = new ArrayList<Var>();
 		bufferSizes = new ArrayList<Integer>();
 		visitedActions = new ArrayList<Action>();
@@ -896,8 +900,8 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 			if (outputPorts.contains(port)) {
 				int position = portPosition(outputPorts, port);
 				untagBuffer = outputBuffers.get(position);
-				untagReadIndex = readIndexes.get(position);
-				untagWriteIndex = writeIndexes.get(position);
+				untagReadIndex = outputReadIndexes.get(position);
+				untagWriteIndex = outputWriteIndexes.get(position);
 				bufferSize = bufferSizes.get(position);
 			} else {
 				outputPorts.add(port);
@@ -907,17 +911,17 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 				outputBuffers.add(untagBuffer);
 				untagReadIndex = createCounter("outputReadIndex_"
 						+ port.getName());
-				readIndexes.add(untagReadIndex);
+				outputReadIndexes.add(untagReadIndex);
 				untagWriteIndex = createCounter("outputWriteIndex_"
 						+ port.getName());
-				writeIndexes.add(untagWriteIndex);
+				outputWriteIndexes.add(untagWriteIndex);
 
 				write = createUntaggedWriteAction(action.getName(),
 						untagWriteIndex, untagBuffer, untagReadIndex,
 						untagWriteIndex, bufferSize);
 				write.getOutputPattern().setNumTokens(port, 1);
 			}
-			
+
 			Procedure body = action.getBody();
 			Var index = body.newTempLocalVariable(irFactory.createTypeInt(32),
 					"outputWriteIndex");
@@ -931,13 +935,12 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 					tab);
 			modifyProcessActionWrite.doSwitch(action.getBody());
 
-			addWhileLoop(numTokens, untagReadIndex, tab, bufferSize,
+			dataTransfer(numTokens, untagReadIndex, tab, bufferSize,
 					untagBuffer, action.getBody());
 
 		}
 		// remove outputPattern from transition action
 		action.getOutputPattern().clear();
-
 	}
 
 	/**
@@ -957,28 +960,31 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 	 * @param body
 	 *            procedure where to add the loop
 	 */
-	private void addWhileLoop(int numTokens, Var untagReadIndex, Var tab,
+	private void dataTransfer(int numTokens, Var untagReadIndex, Var tab,
 			int bufferSize, Var untagBuffer, Procedure body) {
-		BlockBasic insideBlock = irFactory.createBlockBasic();
-		// create loop counter
+		
+		// create and initialize loop counter
+		BlockBasic initCounterBlock = irFactory.createBlockBasic();
 		Var localWriteIndex = body.newTempLocalVariable(
 				irFactory.createTypeInt(32), "loopCounter");
-		localWriteIndex.setInitialValue(irFactory.createExprInt(0));
+		initCounterBlock.add(irFactory.createInstAssign(localWriteIndex, irFactory.createExprInt(0)));
+		body.getBlocks().add(initCounterBlock);
 		// create while block
 		BlockWhile whileBlock = irFactory.createBlockWhile();
 		// create and set while condition
+		BlockBasic insideBlock = irFactory.createBlockBasic();
 		Expression condition = irFactory.createExprBinary(
 				irFactory.createExprVar(localWriteIndex), OpBinary.LT,
 				irFactory.createExprInt(numTokens), irFactory.createTypeBool());
 		whileBlock.setCondition(condition);
-		
+
 		// create then node
-		Var tmpVar = body.newTempLocalVariable(
-				irFactory.createTypeInt(32), "tmpVar");
+		Var tmpVar = body.newTempLocalVariable(irFactory.createTypeInt(32),
+				"tmpVar");
 		List<Expression> loadIndex = new ArrayList<Expression>(1);
 		loadIndex.add(irFactory.createExprVar(localWriteIndex));
 		insideBlock.add(irFactory.createInstLoad(tmpVar, tab, loadIndex));
-		
+
 		Expression maskValue = irFactory.createExprBinary(
 				irFactory.createExprVar(untagReadIndex), OpBinary.BITAND,
 				irFactory.createExprInt(bufferSize - 1),
@@ -988,10 +994,19 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 				irFactory.createTypeInt(32));
 		List<Expression> load2Index = new ArrayList<Expression>(1);
 		load2Index.add(index);
-		insideBlock.add(irFactory.createInstStore(untagBuffer, load2Index, irFactory.createExprVar(tmpVar)));
+		insideBlock.add(irFactory.createInstStore(untagBuffer, load2Index,
+				irFactory.createExprVar(tmpVar)));
 		whileBlock.getBlocks().add(insideBlock);
-		
 		body.getBlocks().add(whileBlock);
+
+		BlockBasic incrementBlock = irFactory.createBlockBasic();
+		Expression increment = irFactory
+				.createExprBinary(irFactory.createExprVar(untagReadIndex),
+						OpBinary.PLUS, irFactory.createExprInt(numTokens),
+						irFactory.createTypeInt(32));
+		incrementBlock.add(irFactory
+				.createInstAssign(untagReadIndex, increment));
+		body.getBlocks().add(incrementBlock);
 	}
 
 	/**
