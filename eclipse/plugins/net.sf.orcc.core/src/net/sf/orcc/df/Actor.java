@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.df;
 
+import java.util.List;
+import java.util.Map;
+
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -91,6 +94,10 @@ public interface Actor extends Vertex, Adaptable {
 	 * @generated
 	 */
 	EList<Action> getActionsOutsideFsm();
+	
+	Map<Port, Connection> getIncomingPortMap();
+
+	Map<Port, List<Connection>> getOutgoingPortMap();
 
 	/**
 	 * Returns the file this actor is defined in.

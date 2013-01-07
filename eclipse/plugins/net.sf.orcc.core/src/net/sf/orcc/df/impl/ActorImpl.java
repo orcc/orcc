@@ -8,10 +8,12 @@ package net.sf.orcc.df.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.FSM;
@@ -776,6 +778,16 @@ public class ActorImpl extends VertexImpl implements Actor {
 		for (Port port : getOutputs()) {
 			port.resetTokenProduction();
 		}
+	}
+	
+	@Override
+	public Map<Port, Connection> getIncomingPortMap() {
+		return getAdapter(Entity.class).getIncomingPortMap();
+	}
+	
+	@Override
+	public Map<Port, List<Connection>> getOutgoingPortMap() {
+		return getAdapter(Entity.class).getOutgoingPortMap();
 	}
 
 	/**
