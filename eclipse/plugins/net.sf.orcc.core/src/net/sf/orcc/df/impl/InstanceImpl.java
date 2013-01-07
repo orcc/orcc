@@ -349,11 +349,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	}
 
 	@Override
-	public String getId() {
-		return getName();
-	}
-
-	@Override
 	public Map<Port, Connection> getIncomingPortMap() {
 		return getAdapter(Entity.class).getIncomingPortMap();
 	}
