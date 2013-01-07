@@ -199,7 +199,7 @@ public class CBackend extends AbstractBackend {
 	protected void doTransformNetwork(Network network) {
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
-		new Instantiator(false, fifoSize).doSwitch(network);
+		new Instantiator(true, fifoSize).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 
@@ -249,7 +249,7 @@ public class CBackend extends AbstractBackend {
 		}
 
 		// print instances
-		printInstances(network);
+		printChildren(network);
 
 		// print network
 		OrccLogger.trace("Printing network... ");

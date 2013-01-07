@@ -191,7 +191,7 @@ public class LLVMBackend extends AbstractBackend {
 		network = doTransformNetwork(network);
 
 		// print instances and entities
-		printInstances(network);
+		printChildren(network);
 
 		// print network
 		OrccLogger.traceln("Printing network...");

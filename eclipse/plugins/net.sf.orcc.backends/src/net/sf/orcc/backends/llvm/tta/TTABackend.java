@@ -213,7 +213,7 @@ public class TTABackend extends LLVMBackend {
 
 		// Generate files
 		actorsPath = OrccUtil.createFolder(path, "actors");
-		printInstances(network);
+		printChildren(network);
 		printDesign(design);
 
 		if (finalize) {

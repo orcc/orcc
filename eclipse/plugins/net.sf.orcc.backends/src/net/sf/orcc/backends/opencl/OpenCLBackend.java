@@ -142,7 +142,7 @@ public class OpenCLBackend extends AbstractBackend {
 		transformActors(network.getAllActors());
 
 		network.computeTemplateMaps();
-		printInstances(network);
+		printChildren(network);
 
 		// print network
 		OrccLogger.traceln("Printing network...");

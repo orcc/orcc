@@ -140,7 +140,7 @@ public class PromelaBackend extends AbstractBackend {
 		netStateDef.doSwitch(network);
 
 		transformInstances(network.getChildren());
-		printInstances(network);
+		printChildren(network);
 
 		network.computeTemplateMaps();
 		printNetwork(network);

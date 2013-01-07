@@ -185,7 +185,7 @@ public class HLSBackend extends CBackend {
 		}
 
 		// print instances
-		printInstances(network);
+		printChildren(network);
 
 		// print network
 		OrccLogger.trace("Printing network... ");
