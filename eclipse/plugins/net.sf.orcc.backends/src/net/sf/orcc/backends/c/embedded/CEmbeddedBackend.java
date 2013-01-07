@@ -119,7 +119,7 @@ public class CEmbeddedBackend extends AbstractBackend {
 	@Override
 	protected boolean printActor(Actor actor) {
 
-		int result = new ActorPrinter(actor, debug).printIDLAndCFiles(path);
+		int result = new ActorPrinter(options).printIDLAndCFiles(path, actor);
 
 		return result != 0;
 	}

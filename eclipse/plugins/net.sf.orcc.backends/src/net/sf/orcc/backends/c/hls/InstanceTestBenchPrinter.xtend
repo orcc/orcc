@@ -43,12 +43,26 @@ import java.io.File
  
  
  class InstanceTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinter {
-
-	new(Instance benchInstance, Map<String, Object> options) {
-		super(benchInstance, options)
+ 	
+ 	new(Map<String, Object> options) {
+		super(options)
+	}
+	
+	override print(String targetFolder, Instance instance) {
+		setInstance(instance)
+		
+		val content = fileContent
+		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
 	}
 
-	override getInstanceFileContent() '''
+	override getFileContent() '''
 	LIBRARY ieee;
 	USE ieee.std_logic_1164.ALL;
 	USE ieee.std_logic_unsigned.all;
@@ -345,18 +359,6 @@ import java.io.File
 			end if;
 		end if;
 	'''
-	
-	override printInstance(String targetFolder) {
-		val content = instanceFileContent
-		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
-		
-		if(needToWriteFile(content, file)) {
-			printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
 	
 	def fifoName(Connection connection)
 		'''myStream_«connection.getAttribute("id").objectValue»_V'''

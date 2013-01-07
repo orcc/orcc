@@ -31,15 +31,16 @@ package net.sf.orcc.backends.c
 import java.io.File
 import java.util.HashMap
 import java.util.Map
-import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
-import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.graph.Vertex
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.OrccBackendsConstants.*
+import net.sf.orcc.df.Actor
 
 /**
  * Generate and print network source file for C backend.
@@ -60,7 +61,7 @@ class NetworkPrinter extends CTemplate {
 	var int threadsNb = 1;
 	
 	val int numberOfGroups
-	protected val Map<Instance, Integer> instanceToIdMap
+	protected val Map<Vertex, Integer> vertexToIdMap
 	
 	new(Network network, Map<String, Object> options) {
 		this.network = network
@@ -93,7 +94,10 @@ class NetworkPrinter extends CTemplate {
 		//Template data :
 		// TODO : set the right values when genetic algorithm will be fixed
 		numberOfGroups = 0
-		instanceToIdMap = computeInstanceToIdMap
+		vertexToIdMap = new HashMap<Vertex, Integer>
+		for(instance : network.children) {
+			vertexToIdMap.put(instance, 0)
+		}
 	}
 	
 	/**
@@ -162,40 +166,38 @@ class NetworkPrinter extends CTemplate {
 
 		/////////////////////////////////////////////////
 		// FIFO allocation
-		«FOR vertice : network.children.filter(typeof(Instance)).filter[isActor]»
-			«vertice.allocateFifos»
+		«FOR child : network.children»
+			«child.allocateFifos»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// FIFO pointer assignments
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			«instance.assignFifo»
+		«FOR child : network.children»
+			«child.assignFifo»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// Action schedulers
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			extern void «instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ", "»unsigned int fifo_«port.name»_id«ENDFOR»);
-		«ENDFOR»
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			extern void «instance.name»_scheduler(struct schedinfo_s *si);
+		«FOR child : network.children»
+			extern void «child.label»_initialize(«FOR incoming : child.incoming SEPARATOR ", "»unsigned int fifo_«(incoming as Connection).targetPort.name»_id«ENDFOR»);
+			extern void «child.label»_scheduler(struct schedinfo_s *si);
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// Declaration of a struct actor for each actor
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			struct actor_s «instance.name»;
+		«FOR child : network.children»
+			struct actor_s «child.label»;
 		«ENDFOR»
 
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			struct actor_s «instance.name» = {"«instance.name»", «instanceToIdMap.get(instance)», «instance.name»_scheduler, «instance.actor.inputs.size»0, «instance.actor.outputs.size», 0, 0, NULL, 0};			
+		«FOR child : network.children»
+			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
-			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor] SEPARATOR ","»
-				&«instance.name»
+			«FOR child : network.children SEPARATOR ","»
+				&«child.label»
 			«ENDFOR»
 		};
 		
@@ -204,8 +206,8 @@ class NetworkPrinter extends CTemplate {
 			extern int clean_cache(int size);
 			
 			void clear_fifos() {
-				«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-					«instance.clearFifosWithMap»
+				«FOR connection : network.connections»
+					fifo_«connection.targetPort.type.doSwitch»_clear(&fifo_«connection.getAttribute("id")»);
 				«ENDFOR»
 			}
 			static int timeout = 0;
@@ -221,9 +223,13 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Initializer and launcher
 		void initialize_instances() {
-			«FOR instance : network.children.filter(typeof(Instance))»
-				«IF instance.isActor»
+			«FOR vertex : network.children»
+				«val instance = vertex.getAdapter(typeof(Instance))»
+				«IF instance != null»
 					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
+				«ELSE»
+					«val actor = vertex.getAdapter(typeof(Actor))»
+					«actor.name»_initialize(«FOR port : actor.inputs SEPARATOR ","»«if (actor.incomingPortMap.get(port) != null) actor.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
 				«ENDIF»
 			«ENDFOR»
 		}
@@ -307,23 +313,18 @@ class NetworkPrinter extends CTemplate {
 		}
 	'''
 	
-	// TODO : simplify this :
-	def assignFifo(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
-				«printFifoAssign(connList.head.source as Instance, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
-			«ENDIF»
+	def assignFifo(Vertex vertex) '''
+		«FOR connList : vertex.getAdapter(typeof(Entity)).outgoingPortMap.values»
+			«printFifoAssign(connList.head.source.label, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
 			«FOR conn : connList»
-				«IF conn.source instanceof Instance && conn.target instanceof Instance»
-					«printFifoAssign(conn.target as Instance, conn.targetPort, conn.<Integer>getValueAsObject("idNoBcast"))»
-				«ENDIF»
+				«printFifoAssign(conn.target.label, conn.targetPort, conn.<Integer>getValueAsObject("idNoBcast"))»
 			«ENDFOR»
 			
 		«ENDFOR»
 	'''
 	
-	def printFifoAssign(Instance instance, Port port, int fifoIndex) '''
-		struct fifo_«port.type.doSwitch»_s *«instance.name»_«port.name» = &fifo_«fifoIndex»;
+	def printFifoAssign(String name, Port port, int fifoIndex) '''
+		struct fifo_«port.type.doSwitch»_s *«name»_«port.name» = &fifo_«fifoIndex»;
 	'''
 
 	def printScheduler() '''
@@ -367,47 +368,14 @@ class NetworkPrinter extends CTemplate {
 		}
 	'''
 
-	def clearFifosWithMap(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF connList.get(0).source instanceof Instance && connList.get(0).target instanceof Instance»
-				«clearFifo(connList.get(0))»
-			«ENDIF»
-		«ENDFOR»
-	'''
-	
-	def clearFifo(Connection connection) '''
-		«IF connection.source instanceof Actor»
-			fifo_«connection.sourcePort.type.doSwitch»_clear(&fifo_«connection.getAttribute("idNoBcast")»);
-		«ELSE»
-			fifo_«connection.targetPort.type.doSwitch»_clear(&fifo_«connection.getAttribute("id")»);
-		«ENDIF»
-	'''
-
-	def allocateFifos(Instance instance) '''
-		«FOR connectionList : instance.outgoingPortMap.values»
+	def allocateFifos(Vertex vertex) '''
+		«FOR connectionList : vertex.getAdapter(typeof(Entity)).outgoingPortMap.values»
 			«allocateFifo(connectionList.get(0), connectionList.size)»
 		«ENDFOR»
 	'''
 	
 	def allocateFifo(Connection conn, int nbReaders) '''
-		«IF conn.source instanceof Instance»
-			DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
-		«ELSEIF conn.target instanceof Instance»
-			DECLARE_FIFO(«conn.targetPort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
-		«ELSE»
-			«/* TODO: debug to find types of source & target when compiling a non-top network */»
-			«OrccLogger::warnln("An edge has both source and target linked to a non-Actor vertex.")»
-		«ENDIF»
+		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 	'''
-
-	def computeInstanceToIdMap() {
-		val instanceToIdMap = new HashMap<Instance, Integer>
-		
-		for(instance : network.children.filter(typeof(Instance))) {
-			// TODO : compute the right value when genetic algorithm will be fixed
-			instanceToIdMap.put(instance, 0)
-		}
-		
-		return instanceToIdMap
-	}
+	
 }

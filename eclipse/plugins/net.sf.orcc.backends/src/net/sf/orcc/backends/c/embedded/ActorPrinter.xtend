@@ -36,6 +36,7 @@ import net.sf.orcc.df.Actor
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.InstReturn
 import java.io.File
+import java.util.Map
 
 /**
  * Generate network as graphml file
@@ -44,16 +45,11 @@ import java.io.File
  */
 class ActorPrinter extends InstancePrinter {
 	
-	val Actor actor
-	
-	new(Actor actor, boolean overwriteAllFiles) {
-		this.actor = actor
-		
-		this.overwriteAllFiles = overwriteAllFiles
+	new(Map<String, Object> options) {
+		super(options)
 	}
 	
-	def printIDLAndCFiles(String targetFolder) {
-		
+	def printIDLAndCFiles(String targetFolder, Actor actor) {
 		var numFilesCached = 0
 		
 		val idlContent = actorIDLContent

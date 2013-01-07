@@ -52,11 +52,11 @@ import net.sf.orcc.ir.TypeList
  
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
-	new(Instance instance, Map<String, Object> options) {
-		super(instance, options)
+	new(Map<String, Object> options) {
+		super(options)
 	}
 	
-	override getInstanceFileContent() '''
+	override getFileContent() '''
 		// Source file is "«instance.actor.file»"
 		
 		#include <hls_stream.h>
@@ -419,8 +419,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«instance.outgoingPortMap.get(port).head.fifoName»
 	'''
 	
-	override printInstance(String targetFolder) {
-		val content = instanceFileContent
+	override print(String targetFolder, Instance instance) {
+		setInstance(instance)
+		
+		val content = fileContent
 		val file = new File(targetFolder + File::separator + instance.name + ".cpp")
 		
 		if(needToWriteFile(content, file)) {
