@@ -941,9 +941,7 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 				index.setIndex(1);
 				body.getFirst().add(
 						irFactory.createInstLoad(index, untagWriteIndex));
-				String listName = action.getName() + "NewWriteList"
-						+ outputIndex;
-				Var tab = createTab(listName, entryType, numTokens);
+			
 				ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
 						untagBuffer);
 				modifyProcessActionWrite.doSwitch(action.getBody());
@@ -956,9 +954,6 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 				incrementBlock.add(irFactory
 						.createInstAssign(untagReadIndex, increment));
 				body.getBlocks().add(incrementBlock);
-
-				//dataTransfer(numTokens, untagReadIndex, tab, bufferSize,
-					//	untagBuffer, action.getBody());
 
 				if (outputIndex == 100) {
 					done = createDoneAction(action.getName() + "newWriteDone",
