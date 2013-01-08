@@ -47,7 +47,6 @@ import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
@@ -487,21 +486,23 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 	 *            global variable write list
 	 * @return new write action
 	 */
-	private Action createUntaggedWriteAction(String actionName,
-			Var writeIdx, Var writeList, Var readIndex, Var writeIndex,
-			int bufferSize) {
+	private Action createUntaggedWriteAction(String actionName, Var writeIdx,
+			Var writeList, Var readIndex, Var writeIndex, int bufferSize) {
 		String writeName = actionName + port.getName() + "_untaggedWrite";
-		Expression expression = irFactory.createExprBool(true);
+		Expression expression = irFactory.createExprBinary(
+				irFactory.createExprVar(readIndex), OpBinary.NE,
+				irFactory.createExprVar(writeIndex),
+				irFactory.createTypeInt(32));
 		Action newWriteAction = createAction(expression, writeName);
 
 		Var OUTPUT = irFactory.createVar(0,
 				irFactory.createTypeList(1, port.getType()), port.getName()
 						+ "_OUTPUT", true, 0);
-		defineWriteBody(writeIdx, writeList, newWriteAction.getBody(),
-				OUTPUT, bufferSize);
+		defineWriteBody(writeIdx, writeList, newWriteAction.getBody(), OUTPUT,
+				bufferSize);
 
-		modifyActionSchedulability(newWriteAction, writeIndex, readIndex,
-				OpBinary.GT, irFactory.createExprInt(0), port);
+		//modifyActionSchedulability(newWriteAction, writeIndex, readIndex,
+			//	OpBinary.GT, irFactory.createExprInt(0), port);
 		// add output pattern
 		Pattern pattern = newWriteAction.getOutputPattern();
 		pattern.setVariable(port, OUTPUT);
@@ -569,8 +570,8 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 	 * @param body
 	 *            body of the new write action
 	 */
-	private void defineWriteBody(Var writeIdx, Var writeList,
-			Procedure body, Var OUTPUT, int bufferSize) {
+	private void defineWriteBody(Var writeIdx, Var writeList, Procedure body,
+			Var OUTPUT, int bufferSize) {
 		BlockBasic bodyNode = body.getFirst();
 		EList<Var> locals = body.getLocals();
 		Var counter1 = irFactory.createVar(0, writeIdx.getType(),
@@ -581,7 +582,7 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 		Var output = irFactory.createVar(0, port.getType(), port.getName()
 				+ "_LocalOutput", true, outputIndex);
 		locals.add(output);
-		
+
 		List<Expression> load2Index = new ArrayList<Expression>(1);
 		load2Index.add(irFactory.createExprVar(counter1));
 		bodyNode.add(irFactory.createInstLoad(output, writeList, load2Index));
@@ -941,18 +942,18 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 				index.setIndex(1);
 				body.getFirst().add(
 						irFactory.createInstLoad(index, untagWriteIndex));
-			
+
 				ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
 						untagBuffer);
 				modifyProcessActionWrite.doSwitch(action.getBody());
-				
+
 				BlockBasic incrementBlock = irFactory.createBlockBasic();
-				Expression increment = irFactory
-						.createExprBinary(irFactory.createExprVar(untagReadIndex),
-								OpBinary.PLUS, irFactory.createExprInt(numTokens),
-								irFactory.createTypeInt(32));
-				incrementBlock.add(irFactory
-						.createInstAssign(untagReadIndex, increment));
+				Expression increment = irFactory.createExprBinary(
+						irFactory.createExprVar(untagReadIndex), OpBinary.PLUS,
+						irFactory.createExprInt(numTokens),
+						irFactory.createTypeInt(32));
+				incrementBlock.add(irFactory.createInstAssign(untagReadIndex,
+						increment));
 				body.getBlocks().add(incrementBlock);
 
 				if (outputIndex == 100) {
@@ -972,82 +973,7 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 			action.getOutputPattern().clear();
 			outputIndex = 0;
 		}
-		
-	}
 
-	/**
-	 * This function creates a for loop to move date from newlist to the
-	 * untagged buffer
-	 * 
-	 * @param numTokens
-	 *            number of loop cycles
-	 * @param untagReadIndex
-	 *            global read index
-	 * @param tab
-	 *            source tab
-	 * @param bufferSize
-	 *            used for the mask
-	 * @param untagbuffer
-	 *            target tab
-	 * @param body
-	 *            procedure where to add the loop
-	 */
-	private void dataTransfer(int numTokens, Var untagReadIndex, Var tab,
-			int bufferSize, Var untagBuffer, Procedure body) {
-
-		// create and initialize loop counter
-		BlockBasic initCounterBlock = irFactory.createBlockBasic();
-		Var localWriteIndex = body.newTempLocalVariable(
-				irFactory.createTypeInt(32), "loopCounter");
-		initCounterBlock.add(irFactory.createInstAssign(localWriteIndex,
-				irFactory.createExprInt(0)));
-		body.getBlocks().add(initCounterBlock);
-		// create while block
-		BlockWhile whileBlock = irFactory.createBlockWhile();
-		// create and set while condition
-		BlockBasic insideBlock = irFactory.createBlockBasic();
-		Expression condition = irFactory.createExprBinary(
-				irFactory.createExprVar(localWriteIndex), OpBinary.LT,
-				irFactory.createExprInt(numTokens), irFactory.createTypeBool());
-		whileBlock.setCondition(condition);
-
-		// create then node
-		Var tmpVar = body.newTempLocalVariable(irFactory.createTypeInt(32),
-				"tmpVar");
-		List<Expression> loadIndex = new ArrayList<Expression>(1);
-		loadIndex.add(irFactory.createExprVar(localWriteIndex));
-		insideBlock.add(irFactory.createInstLoad(tmpVar, tab, loadIndex));
-
-		Expression index = irFactory.createExprBinary(
-				irFactory.createExprVar(untagReadIndex), OpBinary.PLUS,
-				irFactory.createExprVar(localWriteIndex),
-				irFactory.createTypeInt(32));
-
-		Expression maskValue = irFactory.createExprBinary(index,
-				OpBinary.BITAND, irFactory.createExprInt(bufferSize - 1),
-				irFactory.createTypeInt(32));
-
-		List<Expression> load2Index = new ArrayList<Expression>(1);
-		load2Index.add(maskValue);
-		insideBlock.add(irFactory.createInstStore(untagBuffer, load2Index,
-				irFactory.createExprVar(tmpVar)));
-		Expression counterIncrementation = irFactory.createExprBinary(
-				irFactory.createExprVar(localWriteIndex), OpBinary.PLUS,
-				irFactory.createExprInt(1), irFactory.createTypeInt(32));
-		insideBlock.add(irFactory.createInstAssign(localWriteIndex,
-				counterIncrementation));
-		whileBlock.getBlocks().add(insideBlock);
-		body.getBlocks().add(whileBlock);
-
-		// create increment block for read index
-		BlockBasic incrementBlock = irFactory.createBlockBasic();
-		Expression increment = irFactory
-				.createExprBinary(irFactory.createExprVar(untagReadIndex),
-						OpBinary.PLUS, irFactory.createExprInt(numTokens),
-						irFactory.createTypeInt(32));
-		incrementBlock.add(irFactory
-				.createInstAssign(untagReadIndex, increment));
-		body.getBlocks().add(incrementBlock);
 	}
 
 	/**
@@ -1263,6 +1189,7 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 		}
 		// repeatInput = false;
 	}
+
 	/**
 	 * Updates the write index of the buffer after reading tokens
 	 * 
