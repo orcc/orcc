@@ -37,6 +37,7 @@ import java.util.Map;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
+import net.sf.orcc.backends.transform.Multi2MonoTokenHLS;
 import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
@@ -117,7 +118,7 @@ public class HLSBackend extends CBackend {
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
-		transformations.add(new Multi2MonoToken());
+		transformations.add(new Multi2MonoTokenHLS());
 		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 
 		for (DfSwitch<?> transformation : transformations) {
