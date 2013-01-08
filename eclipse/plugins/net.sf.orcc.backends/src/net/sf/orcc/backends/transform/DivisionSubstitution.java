@@ -464,6 +464,7 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 		for (Action verifAction : actions) {
 			Substitutor substitutor = new Substitutor();
 			substitutor.doSwitch(verifAction.getBody());
+			substitutor.doSwitch(verifAction.getScheduler());
 		}
 	}
 }
