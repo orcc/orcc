@@ -49,7 +49,7 @@ def usage():
     print "-d, --debug \t\t\t Debug mode, generate extra files and print additionnal information"
     print "-g, --generate=[options] \t Generate the VHDL files of the TTA processors"
     print "-p, --profile \t\t\t Generate a text file containing all the results of the profiling (Need to have already the traces of the simulator)"
-    print "--clean \t\t\t Clean source directory ('generated') and build directory ('build-generated')"
+    print "-s, --simulate \t\t\t Simulate each processor independantly from its execution trace"
     
 
 def compile(arg, debug, target):
@@ -78,10 +78,13 @@ def generate(arg, debug, target):
 
 def profile(target):
     design.profile(target)
+    
+def simulate(target):
+    design.simulate()
 
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "hcgdpx:v", ["help", "compile=", "generate=", "profile", "debug"])
+	opts, args = getopt.getopt(sys.argv[1:], "hcgdpsx:v", ["help", "compile=", "generate=", "profile", "debug", "simulate"])
 except getopt.GetoptError, err:
 	print str(err)
 	usage()
@@ -119,6 +122,10 @@ try:
     for o, a in opts:
     	if o in ("-g", "--generate"):
     		generate(a, debug, srcPath)
+    
+    for o, a in opts:
+        if o in ("-s", "--simulate"):
+            simulate(srcPath)
             
     for o, a in opts:
         if o in ("-p", "--profile"):

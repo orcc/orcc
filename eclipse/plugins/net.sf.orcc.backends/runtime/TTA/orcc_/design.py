@@ -105,3 +105,9 @@ class Design:
         template = tempita.Template.from_filename(os.path.join(templatePath, "xco_ram_2p.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath, id="ram_2p", width=512, depth=32)
         open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
+
+    def simulate(self):
+        for processor in self.processors:
+            retcode = processor.simulate()
+            if retcode != 0: 
+                sys.exit(retcode)
