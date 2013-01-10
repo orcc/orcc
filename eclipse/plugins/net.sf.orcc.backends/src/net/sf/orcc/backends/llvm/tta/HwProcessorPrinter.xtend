@@ -124,7 +124,7 @@ class HwProcessorPrinter extends TTAPrinter {
 		  port (
 		    clka  : in  std_logic;
 		    wea   : in  std_logic_vector(3 downto 0);
-		    addra : in  std_logic_vector(fu_LSU_0_addrw-1 downto 0);
+		    addra : in  std_logic_vector(fu_LSU_0_addrw-2-1 downto 0);
 		    dina  : in  std_logic_vector(fu_LSU_0_dataw-1 downto 0);
 		    douta : out std_logic_vector(fu_LSU_0_dataw-1 downto 0));
 		end component;
