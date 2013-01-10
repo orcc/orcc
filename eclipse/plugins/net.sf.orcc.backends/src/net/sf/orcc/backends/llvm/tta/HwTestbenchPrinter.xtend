@@ -34,6 +34,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.util.FPGA
+import net.sf.orcc.backends.llvm.tta.architecture.Memory
 
 class HwTestbenchPrinter extends TTAPrinter {
 	
@@ -252,8 +253,12 @@ class HwTestbenchPrinter extends TTAPrinter {
 		vcom -93 -quiet -work work share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl
 		vcom -93 -quiet -work work share/vhdl/stratix3_led_io_always_1.vhd
 		
-		«FOR processor:design.processors»
+		«FOR processor: design.processors»
 			«processor.tcl»
+		«ENDFOR»
+		
+		«FOR memory: design.sharedMemories»
+			«memory.tcl»
 		«ENDFOR»
 		
 		# Network
@@ -264,6 +269,11 @@ class HwTestbenchPrinter extends TTAPrinter {
 		vsim -novopt «IF(fpga.altera)»-L altera_mf «ENDIF»work.tb_top -t ps -do "do wave.do;"
 		'''
 
+	def	private getTcl(Memory memory) 
+		'''
+		vcom -93 -quiet -work work wrapper/dram_2p_«memory.name».vhd
+		'''
+		
 	def private getTcl(Processor processor)
 		'''
 		# Compile processor «processor.name»

@@ -5,7 +5,7 @@
 ##############################################################
 #
 # BEGIN Select
-SELECT Block_Memory_Generator
+SELECT Block_Memory_Generator xilinx.com:ip:blk_mem_gen:6.3
 # END Select
 # BEGIN Parameters
 CSET additional_inputs_for_power_estimation=false
@@ -17,7 +17,7 @@ CSET axi_type=AXI4_Full
 CSET byte_size=8
 CSET coe_file=no_coe_file_loaded
 CSET collision_warnings=ALL
-CSET component_name=blk_mem_gen_v6_3
+CSET component_name=dram_2p_{{id}}
 CSET disable_collision_warnings=false
 CSET disable_out_of_range_warnings=false
 CSET ecc=false
