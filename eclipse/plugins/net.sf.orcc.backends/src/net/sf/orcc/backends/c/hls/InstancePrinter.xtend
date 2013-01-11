@@ -60,6 +60,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		#include <hls_stream.h>
 		using namespace hls;
+		#include <stdio.h>
+		#include <stdlib.h>
 		
 		typedef signed char i8;
 		typedef short i16;
