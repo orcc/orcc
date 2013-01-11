@@ -217,9 +217,10 @@ public class FrontendCli implements IApplication {
 	 * 
 	 * @param currentProject
 	 * @throws OrccException
+	 * @throws CoreException
 	 */
 	private void storeProjectToCompile(IProject currentProject)
-			throws OrccException {
+			throws OrccException, CoreException {
 		unorderedProjects.add(currentProject);
 
 		try {
@@ -250,6 +251,11 @@ public class FrontendCli implements IApplication {
 		// been stored, so adding the current project now ensure order is right
 		if (!orderedProjects.contains(currentProject)) {
 			orderedProjects.add(currentProject);
+
+			IFolder outputDir = OrccUtil.getOutputFolder(currentProject);
+			if (!outputDir.exists()) {
+				outputDir.create(true, true, new NullProgressMonitor());
+			}
 		}
 	}
 
