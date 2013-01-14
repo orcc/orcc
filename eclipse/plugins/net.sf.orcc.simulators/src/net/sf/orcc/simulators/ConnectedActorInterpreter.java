@@ -46,6 +46,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.runtime.SimulatorFifo;
+import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -218,8 +219,13 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		Pattern pattern = action.getInputPattern();
 		// check tokens
 		for (Port port : pattern.getPorts()) {
-			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute(0)
-					.getObjectValue();
+			Attribute att = port.getAttribute("fifo");
+			if (att == null) {
+				// this port is not connected, consequently this action cannot
+				// be scheduled
+				return false;
+			}
+			SimulatorFifo fifo = (SimulatorFifo) att.getObjectValue();
 			boolean hasTok = fifo.hasTokens(pattern.getNumTokens(port));
 			if (!hasTok) {
 				return false;
