@@ -167,9 +167,9 @@ public class FrontendCli implements IApplication {
 	}
 
 	/**
-	 * Get all actors, units and network files from container (IProject or
-	 * IFolder) and all its subfolders. Index is the qualified name
-	 * corresponding to the file.
+	 * Get all actors, units and, if includeNetworks == true, network files from
+	 * container (IProject or IFolder) and all its subfolders. Index is the
+	 * qualified name corresponding to the file.
 	 * 
 	 * @param container
 	 *            instance of IProject or IFolder to search in
@@ -190,7 +190,8 @@ public class FrontendCli implements IApplication {
 
 				if (resource.getType() == IResource.FOLDER) {
 
-					calFiles.putAll(getAllFiles((IFolder) resource));
+					calFiles.putAll(getAllFiles((IFolder) resource,
+							includeNetworks));
 
 				} else if (resource.getType() == IResource.FILE
 						&& resource.getFileExtension() != null) {
