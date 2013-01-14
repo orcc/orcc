@@ -202,6 +202,13 @@ public class HLSBackend extends CBackend {
 			OrccLogger.traceRaw("Done\n");
 		}
 		
+		OrccLogger.trace("Printing network VHDL Top... ");
+		if (new TopVhdlPrinter(network, options).print(srcPath) > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
+		
 		
 	}
 

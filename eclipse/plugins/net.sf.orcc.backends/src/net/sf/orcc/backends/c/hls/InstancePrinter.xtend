@@ -196,7 +196,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					goto finished;	
 				}
 			«ENDIF»
-			«transitions.head.action.body.name»();
+			«instance.name»_«transitions.head.action.body.name»();
 			_FSM_state = my_state_«transitions.head.target.name»;
 			goto finished;	
 		} else {
@@ -232,7 +232,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					goto finished;
 				}
 			«ENDIF»
-			«action.body.name»();
+			«instance.name»_«action.body.name»();
 		} else {
 			«others.printActions»
 		}
@@ -241,7 +241,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override print(Action action) {
 		currentAction = action
 		val output = '''
-			static void «action.body.name»() {
+			static void «instance.name»_«action.body.name»() {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»

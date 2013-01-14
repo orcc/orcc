@@ -65,7 +65,7 @@ import java.io.File
 			«instance.assignFifo»
 		«ENDFOR»
 		ap_return : OUT STD_LOGIC_VECTOR (31 downto 0));
-	end entity DecoderIntra;
+	end entity TopDesign;
 		
 		-- ----------------------------------------------------------------------------------
 		-- Architecture Declaration
@@ -77,9 +77,12 @@ import java.io.File
 		-- Signal Instantiation
 		-- ----------------------------------------------------------------------------------
 		
-		ap_clk :  STD_LOGIC;
-		ap_rst :  STD_LOGIC;
-		ap_start :  STD_LOGIC;
+		signal tmp_ap_clk :  STD_LOGIC;
+		signal tmp_ap_rst :  STD_LOGIC;
+		signal tmp_ap_start :  STD_LOGIC;
+		signal tmp_ap_done :  STD_LOGIC;
+		signal tmp_ap_idle :  STD_LOGIC;
+		signal tmp_ap_ready :  STD_LOGIC;
 		
 		-- FIFO Instantiation
 		
@@ -87,7 +90,7 @@ import java.io.File
 			«instance.assignFifoSignal»
 		«ENDFOR»
 		
-	*-- ----------------------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------------
 	-- Components of the Network
 	-- ---------------------------------------------------------------------------------------
 		
@@ -125,6 +128,9 @@ import java.io.File
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			«instance.assignNetworkPorts»
 		«ENDFOR»
+			tmp_ap_start <= ap_start;
+		tmp_ap_clk <= ap_clk;
+		tmp_ap_rst <= ap_rst;
 		
 	end architecture rtl;
 	'''
@@ -132,16 +138,16 @@ import java.io.File
 	def assignNetworkPorts (Instance instance)'''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«connList.head.fifoName»_V_in <= «connList.head.fifoName»_V_in;
-				«connList.head.fifoName»_V_full_n <= «connList.head.fifoName»_V_full_n;
-				«connList.head.fifoName»_V_write <= «connList.head.fifoName»_V_write;
+				«connList.head.fifoName»_V_din <= tmp_«connList.head.fifoName»_din;
+				tmp_«connList.head.fifoName»_full_n <= «connList.head.fifoName»_V_full_n;
+				«connList.head.fifoName»_V_write <= tmp_«connList.head.fifoName»_write;
 			«ENDIF»
 		«ENDFOR»
 		«FOR connList : instance.incomingPortMap.values»
 			«IF (connList.source instanceof Port) && !(connList.target instanceof Port) »
-				«connList.fifoName»_V_dout <= «connList.fifoName»_V_dout;
-				«connList.fifoName»_V_empty_n <= «connList.fifoName»_V_empty_n;
-				«connList.fifoName»_V_read <= «connList.fifoName»_V_read;
+				tmp_«connList.fifoName»_dout <= «connList.fifoName»_V_dout;
+				tmp_«connList.fifoName»_empty_n <= «connList.fifoName»_V_empty_n;
+				«connList.fifoName»_V_read <= tmp_«connList.fifoName»_read;
 			«ENDIF»
 		«ENDFOR»
 	''' 
@@ -163,19 +169,22 @@ import java.io.File
 		call_«instance.name»_scheduler : component «instance.name»_scheduler
 		port map(
 			«FOR connList : instance.outgoingPortMap.values»
-				«connList.head.fifoName»_V_in => «connList.head.fifoName»_V_in,
-				«connList.head.fifoName»_V_full_n => «connList.head.fifoName»_V_full_n,
-				«connList.head.fifoName»_V_write => «connList.head.fifoName»_V_write,
+				«connList.head.fifoName»_V_din => tmp_«connList.head.fifoName»_din,
+				«connList.head.fifoName»_V_full_n => tmp_«connList.head.fifoName»_full_n,
+				«connList.head.fifoName»_V_write => tmp_«connList.head.fifoName»_write,
 			«ENDFOR»
 			«FOR connList : instance.incomingPortMap.values»
-				«connList.fifoName»_V_dout => «connList.fifoName»_V_dout,
-				«connList.fifoName»_V_empty_n => «connList.fifoName»_V_empty_n,
-				«connList.fifoName»_V_read => «connList.fifoName»_V_read,
+				«connList.fifoName»_V_dout => tmp_«connList.fifoName»_dout,
+				«connList.fifoName»_V_empty_n => tmp_«connList.fifoName»_empty_n,
+				«connList.fifoName»_V_read => tmp_«connList.fifoName»_read,
 			«ENDFOR»
 			
-			ap_start => ap_start,
-			ap_clk => ap_clk,
-			ap_rst => ap_rst
+			ap_start => tmp_ap_start,
+			ap_clk => tmp_ap_clk,
+			ap_rst => tmp_ap_rst,
+			ap_done => tmp_ap_done,
+			ap_idle => tmp_ap_idle,
+			ap_ready => tmp_ap_ready
 			);
 	'''
 	
@@ -194,17 +203,17 @@ import java.io.File
 	'''
 	
 	def printFifoMapping (Connection connection)'''
-		«connection.fifoName»_V : FIFO_main_myStream 
+		«connection.fifoName»_V : FIFO_main_myStream
 				generic map (width => «connection.fifoType.sizeInBits - 1»)
 		port map (
-			clk => ap_clk,
-			reset => ap_rst,
-			if_din => «connection.fifoName»_V_din,
-			if_full_n => «connection.fifoName»_V_full_n,
-			if_write => «connection.fifoName»_V_write,
-			if_dout => «connection.fifoName»_V_dout,
-			if_empty_n => «connection.fifoName»_V_empty_n,
-			if_read => «connection.fifoName»_V_read
+			clk => tmp_ap_clk,
+			reset => tmp_ap_rst,
+			if_din => tmp_«connection.fifoName»_din,
+			if_full_n => tmp_«connection.fifoName»_full_n,
+			if_write => tmp_«connection.fifoName»_write,
+			if_dout => tmp_«connection.fifoName»_dout,
+			if_empty_n => tmp_«connection.fifoName»_empty_n,
+			if_read => tmp_«connection.fifoName»_read
 		);
 	'''
 	
@@ -243,31 +252,37 @@ import java.io.File
 	
 	def assignFifoSignal(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
-				«printOutputFifoAssignHLS(connList.head )»
+			«printOutputFifoSignalAssignHLS(connList.head )»
+			«IF connList.head.target instanceof Port»
+				«printInputFifoSignalAssignHLS(connList.head)»
+			«ENDIF»
 		«ENDFOR»
-		«FOR connList : instance.incomingPortMap.values»
-				«printInputFifoAssignHLS(connList)»
+		«FOR connection : instance.incomingPortMap.values»
+			«printInputFifoSignalAssignHLS(connection)»
+			«IF connection.source instanceof Port»
+					«printOutputFifoSignalAssignHLS(connection)»
+			«ENDIF»
 		«ENDFOR»
 	'''
 	
 	def printOutputFifoSignalAssignHLS( Connection connection) '''
 		«IF connection.fifoType.bool»
-			signal «connection.fifoName»_V_din    :  STD_LOGIC;
+			signal tmp_«connection.fifoName»_din    :  STD_LOGIC;
 		«ELSE»
-			«connection.fifoName»_V_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
+			signal tmp_«connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
 		«ENDIF»
-		signal «connection.fifoName»_V_full_n :  STD_LOGIC;
-		signal «connection.fifoName»_V_write  :  STD_LOGIC;
+		signal tmp_«connection.fifoName»_full_n :  STD_LOGIC;
+		signal tmp_«connection.fifoName»_write  :  STD_LOGIC;
 	'''
 	
 	def printInputFifoSignalAssignHLS(Connection connection) '''
 		«IF connection.fifoType.bool»
-			signal «connection.fifoName»_V_dout   :  STD_LOGIC;
+			signal tmp_«connection.fifoName»_dout   :  STD_LOGIC;
 		«ELSE»
-			signal «connection.fifoName»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
+			signal tmp_«connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
 		«ENDIF»
-		signal «connection.fifoName»_V_empty_n :  STD_LOGIC;
-		signal «connection.fifoName»_V_read    :  STD_LOGIC;
+		signal tmp_«connection.fifoName»_empty_n :  STD_LOGIC;
+		signal tmp_«connection.fifoName»_read    :  STD_LOGIC;
 	'''
 	
 	def declareComponentSignal(Instance instance) '''
@@ -290,7 +305,7 @@ import java.io.File
 	'''	
 	
 	def fifoName(Connection connection)
-		'''myStream_«connection.getAttribute("id").objectValue»_V'''
+		'''myStream_«connection.getAttribute("id").objectValue»'''
 	
 	def fifoType(Connection connection) {
 		if (connection.sourcePort != null){	
@@ -301,79 +316,3 @@ import java.io.File
 	}
 }
  
- class FIFOvhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
-
-	new(Network net, Map<String,Object> options) {
-		super(net, options)
-	}
-
-	def getFIFOFileContent() '''
-			library ieee;
-	use ieee.std_logic_1164.all;
-	use ieee.std_logic_arith.all;
-	entity FIFO_main_myStream_0_V is 
-	    generic (
-	        DATA_WIDTH : integer := 8;
-	        ADDR_WIDTH : integer := 10;
-	        DEPTH : integer := 513);
-	    port (
-	        clk : IN STD_LOGIC;
-	        reset : IN STD_LOGIC;
-	        if_empty_n : OUT STD_LOGIC;
-	        if_read : IN STD_LOGIC;
-	        if_dout : OUT STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
-	        if_full_n : OUT STD_LOGIC;
-	        if_write : IN STD_LOGIC;
-	        if_din : IN STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0));
-	end entity;
-	
-	architecture rtl of FIFO_main_myStream_0_V is
-	    type memtype is array (0 to DEPTH - 1) of STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
-	    signal mStorage : memtype;
-	    signal mInPtr  : UNSIGNED(ADDR_WIDTH - 1 downto 0) := (others => '0');
-	    signal mOutPtr : UNSIGNED(ADDR_WIDTH - 1 downto 0) := (others => '0');
-	    signal internal_empty_n, internal_full_n : STD_LOGIC;
-	    signal mFlag_nEF_hint : STD_LOGIC := '0';  -- 0: empty hint, 1: full hint
-	begin
-	    if_dout <= mStorage(CONV_INTEGER(mOutPtr));
-	    if_empty_n <= internal_empty_n;
-	    if_full_n <= internal_full_n;
-	
-	    internal_empty_n <= '0' when mInPtr = mOutPtr and mFlag_nEF_hint = '0' else '1';
-	    internal_full_n <= '0' when mInptr = mOutPtr and mFlag_nEF_hint = '1' else '1';
-	
-	    process (clk)
-	    begin
-	        if clk'event and clk = '1' then
-	            if reset = '1' then
-	                mInPtr <= (others => '0');
-	                mOutPtr <= (others => '0');
-	                mFlag_nEF_hint <= '0'; -- empty hint
-	            else
-	                if if_read = '1' and internal_empty_n = '1' then
-	                    if (mOutPtr = DEPTH -1) then
-	                        mOutPtr <= (others => '0');
-	                        mFlag_nEF_hint <= not mFlag_nEF_hint;
-	                    else
-	                        mOutPtr <= mOutPtr + 1;
-	                    end if;
-	                end if;
-	                if if_write = '1' and internal_full_n = '1' then
-	                    mStorage(CONV_INTEGER(mInPtr)) <= if_din;
-	                    if (mInPtr = DEPTH -1) then
-	                        mInPtr <= (others => '0');
-	                        mFlag_nEF_hint <= not mFlag_nEF_hint;
-	                    else
-	                        mInPtr <= mInPtr + 1;
-	                    end if;
-	                end if;
-	            end if;
-	        end if;
-	    end process;
-	   
-	end architecture;
-	'''
-	
-	
-}
-
