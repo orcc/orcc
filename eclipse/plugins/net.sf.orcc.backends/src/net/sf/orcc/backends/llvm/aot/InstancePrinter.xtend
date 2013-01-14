@@ -654,20 +654,25 @@ class InstancePrinter extends LLVMTemplate {
 	 */
 	def protected getProperties(Port port) ''''''
 	
-	def private printExternalFifo(Connection conn, Port port) '''
-		«val name = "fifo_" + conn.getSafeId(port)»
-		«val type = port.type.doSwitch»
-		«IF conn != null»
-			«val addrSpace = conn.addrSpace»
+	def private printExternalFifo(Connection conn, Port port) {
+		val name = "fifo_" + conn.getSafeId(port)
+		val type = port.type.doSwitch
+		if(conn != null) {
+			val addrSpace = conn.addrSpace
+			'''
 			@«name»_content = external«addrSpace» global [«conn.safeSize» x «type»]
 			@«name»_rdIndex = external«addrSpace» global i32
 			@«name»_wrIndex = external«addrSpace» global i32
-		«ELSE»
+			'''
+		} else { 
+			OrccLogger::noticeln("["+instance.name+"] Port "+port.name+" not connected.")
+			'''
 			@«name»_content = internal global [«conn.safeSize» x «type»] zeroinitializer, align 32
 			@«name»_rdIndex = internal global i32 zeroinitializer, align 32
 			@«name»_wrIndex = internal global i32 zeroinitializer, align 32
-		«ENDIF»
-	'''
+			'''
+		}
+	}
 	
 	def private getNextLabel(Block block) {
 		if (block.blockWhile) (block as BlockWhile).joinBlock.label

@@ -167,17 +167,19 @@ public class FrontendCli implements IApplication {
 	}
 
 	/**
-	 * Get all actors and units files from container (IProject or IFolder) and
-	 * all its subfolders. Index is the qualified name corresponding to the
-	 * file.
+	 * Get all actors, units and, if includeNetworks == true, network files from
+	 * container (IProject or IFolder) and all its subfolders. Index is the
+	 * qualified name corresponding to the file.
 	 * 
 	 * @param container
 	 *            instance of IProject or IFolder to search in
+	 * @param includeNetworks
+	 *            set to true to include xdf files in the returned map
 	 * @return a map of qualified names / IFile descriptors
 	 * @throws OrccException
 	 */
-	private Map<String, IFile> getAllFiles(IContainer container)
-			throws OrccException {
+	private Map<String, IFile> getAllFiles(IContainer container,
+			boolean includeNetworks) throws OrccException {
 
 		Map<String, IFile> calFiles = new HashMap<String, IFile>();
 		IResource[] members = null;
@@ -188,17 +190,19 @@ public class FrontendCli implements IApplication {
 
 				if (resource.getType() == IResource.FOLDER) {
 
-					calFiles.putAll(getAllFiles((IFolder) resource));
+					calFiles.putAll(getAllFiles((IFolder) resource,
+							includeNetworks));
 
 				} else if (resource.getType() == IResource.FILE
-						&& resource.getFileExtension() != null
-						&& (resource.getFileExtension().equals("cal") || resource
-								.getFileExtension().equals("xdf"))) {
-
-					String packageName = resource.getProjectRelativePath()
-							.removeFirstSegments(1).removeFileExtension()
-							.toString().replace('/', '.');
-					calFiles.put(packageName, (IFile) resource);
+						&& resource.getFileExtension() != null) {
+					if (resource.getFileExtension().equals("cal")
+							|| (includeNetworks && resource.getFileExtension()
+									.equals("xdf"))) {
+						String packageName = resource.getProjectRelativePath()
+								.removeFirstSegments(1).removeFileExtension()
+								.toString().replace('/', '.');
+						calFiles.put(packageName, (IFile) resource);
+					}
 
 				}
 			}
@@ -211,15 +215,31 @@ public class FrontendCli implements IApplication {
 	}
 
 	/**
+	 * Get all actors and units files from container (IProject or IFolder) and
+	 * all its subfolders. Index is the qualified name corresponding to the
+	 * file. In this default implementation, xdf files are not included in the
+	 * resulting map
+	 * 
+	 * @param container
+	 * @return
+	 * @throws OrccException
+	 */
+	private Map<String, IFile> getAllFiles(IContainer container)
+			throws OrccException {
+		return getAllFiles(container, false);
+	}
+
+	/**
 	 * Add currentProject dependencies to an orderedList of projects to compile,
 	 * then add currentProject itself. This method should not run in infinite
 	 * loop if projects dependencies are cycling.
 	 * 
 	 * @param currentProject
 	 * @throws OrccException
+	 * @throws CoreException
 	 */
 	private void storeProjectToCompile(IProject currentProject)
-			throws OrccException {
+			throws OrccException, CoreException {
 		unorderedProjects.add(currentProject);
 
 		try {
@@ -250,6 +270,11 @@ public class FrontendCli implements IApplication {
 		// been stored, so adding the current project now ensure order is right
 		if (!orderedProjects.contains(currentProject)) {
 			orderedProjects.add(currentProject);
+
+			IFolder outputDir = OrccUtil.getOutputFolder(currentProject);
+			if (!outputDir.exists()) {
+				outputDir.create(true, true, new NullProgressMonitor());
+			}
 		}
 	}
 
@@ -471,7 +496,7 @@ public class FrontendCli implements IApplication {
 				return IApplication.EXIT_RELAUNCH;
 			}
 
-			if (args.length >= 2) {
+			if (args.length >= 2 && !args[1].isEmpty()) {
 
 				IFile networkFile = OrccUtil.getFile(baseProject, args[1],
 						"xdf");
@@ -507,7 +532,7 @@ public class FrontendCli implements IApplication {
 			} else {
 				Map<String, IFile> allFiles = new HashMap<String, IFile>();
 				for (IProject project : orderedProjects) {
-					allFiles.putAll(getAllFiles(project));
+					allFiles.putAll(getAllFiles(project, true));
 				}
 
 				System.out

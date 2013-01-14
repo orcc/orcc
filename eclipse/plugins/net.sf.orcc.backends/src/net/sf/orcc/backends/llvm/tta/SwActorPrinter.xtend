@@ -31,15 +31,15 @@ package net.sf.orcc.backends.llvm.tta
 import java.util.Map
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.df.Action
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
-import net.sf.orcc.ir.Arg
+import net.sf.orcc.df.Action
+import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.Procedure
-import net.sf.orcc.ir.TypeList
-import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.Arg
 import org.eclipse.emf.common.util.EList
 
 class SwActorPrinter extends InstancePrinter {
@@ -58,7 +58,11 @@ class SwActorPrinter extends InstancePrinter {
 		}
 	}
 	
-	override getProperties(Port port) ''' volatile'''
+	override getProperties(Port port) {
+		if(!instance.outgoingPortMap.get(port).nullOrEmpty || instance.incomingPortMap.get(port) != null) {
+			''' volatile'''
+		}
+	}
 	
 	def printNativeWrite(Port port, Var variable) {
 		val innerType = (variable.type as TypeList).innermostType.doSwitch
