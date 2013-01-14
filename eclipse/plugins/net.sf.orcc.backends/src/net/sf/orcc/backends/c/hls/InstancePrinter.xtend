@@ -108,7 +108,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«ENDFOR»
 			};
 			
-			static enum states _FSM_state;
+			static enum states _FSM_state = my_state_«instance.actor.fsm.initialState.name»;;
 		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
@@ -189,29 +189,42 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	override actionTestState(State srcState, Iterable<Transition> transitions) '''
+		«IF transitions.head.action.outputPattern == null»
 		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
-			«IF transitions.head.action.outputPattern != null»
-				«transitions.head.action.outputPattern.printOutputPattern»
-					_FSM_state = my_state_«srcState.name»;
-					goto finished;	
-				}
-			«ENDIF»
+	«ELSE»
+		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»() «transitions.head.action.outputPattern.printOutputPattern») {
+	«ENDIF»	
 			«instance.name»_«transitions.head.action.body.name»();
-			_FSM_state = my_state_«transitions.head.target.name»;
-			goto finished;	
+			«IF transitions.head.target != srcState»
+				_FSM_state = my_state_«transitions.head.target.name»;
+				goto finished;
+			«ELSE»
+				goto l_«transitions.head.target.name»;
+			«ENDIF»
 		} else {
 			«schedulingState(srcState, transitions.tail)»
 		}
 	'''
 	
-	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
-		if («instance.outgoingPortMap.get(port).head.fifoName».full()) {
-			stop = 1;
-		}
+	override printOutputPattern(Pattern pattern) '''
+		«FOR port : pattern.ports» 
+			«printOutputPatternsPort(pattern, port)»
+		«ENDFOR»
 	'''
 	
+	override printOutputPatternsPort(Pattern pattern, Port port) {
+		var i = -1 '''
+		«FOR successor : instance.outgoingPortMap.get(port)»
+			 «printOutputPatternPort(pattern, port, successor, i = i + 1)»
+		«ENDFOR»
+	'''
+	}
+	
+	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) 
+	'''&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())'''
+	
 	override checkInputPattern(Pattern pattern)
-	'''«FOR port : pattern.ports»!«instance.incomingPortMap.get(port).fifoName».empty() && «ENDFOR»'''
+	'''«FOR port : pattern.ports»!«instance.incomingPortMap.get(port).fifoName».empty() &&«ENDFOR»'''
 	
 	override printInstance(String targetFolder) {
 		val content = instanceFileContent
@@ -229,8 +242,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 			«IF action.outputPattern != null»
 				«action.outputPattern.printOutputPattern»
-					goto finished;
-				}
 			«ENDIF»
 			«instance.name»_«action.body.name»();
 		} else {
@@ -317,17 +328,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				return;
 			}
 			
-		«ENDIF»
-		
-		«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm)»
-		void «instance.name»_initialize() {
-			
-			«IF instance.actor.hasFsm»
-				
-				/* Set initial state to current FSM state */
-				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
-			«ENDIF»
-		}
 		«ENDIF»
 	'''
 	
