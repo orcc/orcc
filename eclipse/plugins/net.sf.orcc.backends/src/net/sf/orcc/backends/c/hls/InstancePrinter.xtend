@@ -228,9 +228,19 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printInstance(String targetFolder) {
 		val content = instanceFileContent
+		val scriptContent = script(targetFolder);
+		val directiveContent = directive(targetFolder);
+		val batchContent = batch
 		val file = new File(targetFolder + File::separator + instance.name + ".cpp")
+		val scriptFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name + File::separator + "script_" + instance.name + ".tcl"
+		)
+		val directiveFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name  + File::separator + "directive_" + instance.name + ".tcl")
+		val batchFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name  + File::separator + "batchCommand_" + instance.name + ".bat")
 		
 		if(needToWriteFile(content, file)) {
+			printFile(batchContent, batchFile)
+			printFile(scriptContent, scriptFile)
+			printFile(directiveContent, directiveFile)
 			printFile(content, file)
 			return 0
 		} else {
@@ -350,4 +360,52 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override caseTypeBool(TypeBool type) 
 		'''bool'''
+		
+	def script (String path)'''
+	open_project subProject
+	set_top «instance.name»_scheduler
+	add_files ../«instance.name».cpp
+	
+	open_solution "solution"
+	set_part  {xc7a100tcsg324-1}
+	create_clock -period 10
+	
+	source "directive_«instance.name».tcl"
+	csynth_design
+	'''
+	
+	def directive (String path)'''
+	 #set_directives
+	'''
+	
+	def batch ()'''
+	@echo off
+	
+	
+	PATH=D:\Xilinx\Vivado_HLS\2012.3\bin;%PATH%;D:\Xilinx\Vivado_HLS\2012.3\msys\bin
+	
+	set AUTOESL_HOME=D:\Xilinx\Vivado_HLS\2012.3\bin
+	set VIVADO_HLS_HOME=D:\Xilinx\Vivado_HLS\2012.3\bin
+	
+	echo ===============================
+	echo == Vivado HLS Command Prompt 
+	echo == Available commands:
+	echo == vivado_hls,apcc,gcc,g++,make
+	echo ===============================
+	
+	
+	if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
+	vivado_hls -i -f script_«instance.name».tcl 
+	exit
+	set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
+	%COMSPEC% 
+	goto EOF
+	
+	:_NotX64
+	set COMSPEC=%WINDIR%\System32\cmd.exe
+	rem %COMSPEC% /c %0 %1 %2 %3 %4 %5 %6 %7 %8 %9 
+	%COMSPEC% 
+	
+	:EOF
+	'''
 }

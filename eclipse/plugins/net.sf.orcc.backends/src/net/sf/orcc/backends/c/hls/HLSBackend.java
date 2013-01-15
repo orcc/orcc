@@ -77,6 +77,7 @@ public class HLSBackend extends CBackend {
 	 * Path to target "testBench" folder
 	 */
 	private String testBenchPath;
+	private String commandPath;
 
 	/**
 	 * Configuration mapping
@@ -91,6 +92,7 @@ public class HLSBackend extends CBackend {
 
 		srcPath = path + File.separator + "src";
 		testBenchPath = path + File.separator + "testBench";
+		commandPath = srcPath + File.separator + "batchCommand";
 	}
 
 	@Override
@@ -204,6 +206,13 @@ public class HLSBackend extends CBackend {
 		
 		OrccLogger.trace("Printing network VHDL Top... ");
 		if (new TopVhdlPrinter(network, options).print(srcPath) > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
+		
+		OrccLogger.trace("Printing batch command... ");
+		if (new BatchCommandPrinter(network, options).print(commandPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
