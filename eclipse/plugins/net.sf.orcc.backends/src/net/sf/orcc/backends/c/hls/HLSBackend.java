@@ -91,7 +91,7 @@ public class HLSBackend extends CBackend {
 		new File(path + File.separator + "bin").mkdirs();
 
 		srcPath = path + File.separator + "src";
-		testBenchPath = path + File.separator + "testBench";
+		testBenchPath = srcPath + File.separator + "testBench";
 		commandPath = srcPath + File.separator + "batchCommand";
 	}
 

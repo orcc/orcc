@@ -128,7 +128,7 @@ import java.io.File
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			«instance.assignNetworkPorts»
 		«ENDFOR»
-			tmp_ap_start <= ap_start;
+		tmp_ap_start <= ap_start;
 		tmp_ap_clk <= ap_clk;
 		tmp_ap_rst <= ap_rst;
 		
@@ -139,7 +139,7 @@ import java.io.File
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
 				«connList.head.fifoName»_V_din <= tmp_«connList.head.fifoName»_din;
-				tmp_«connList.head.fifoName»_full_n <= «connList.head.fifoName»_V_full_n;
+				--tmp_«connList.head.fifoName»_full_n <= «connList.head.fifoName»_V_full_n;
 				«connList.head.fifoName»_V_write <= tmp_«connList.head.fifoName»_write;
 			«ENDIF»
 		«ENDFOR»
