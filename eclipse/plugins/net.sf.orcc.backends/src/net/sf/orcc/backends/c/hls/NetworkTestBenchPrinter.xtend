@@ -52,7 +52,7 @@ import java.io.File
 	override print(String targetFolder) {
 		
 		val contentNetwork = networkFileContent
-		val NetworkFile = new File(targetFolder + File::separator + network.simpleName + ".vhd")
+		val NetworkFile = new File(targetFolder + File::separator + network.simpleName +"_TopTestBench" + ".vhd")
 		
 		if(needToWriteFile(contentNetwork, NetworkFile)) {
 			printFile(contentNetwork, NetworkFile)

@@ -72,8 +72,9 @@ import java.io.File
 	def getcopierContent (String target){
 		
 	'''
+		cd ..
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-				xcopy /s D:\WORK\Tests\MPEG4SPP2_ResearchDesign\VIVADOIntraTBench\src\subProject_«instance.name»\testAdd\solution\syn\vhdl D:\WORK\Tests\MPEG4SPP2_ResearchDesign\VIVADOIntraTBench\src\generatedVHDL
+			xcopy /s D:\WORK\Tests\MPEG4SPP2_ResearchDesign\VIVADOIntraTBench\src\subProject_«instance.name»\subProject\solution\syn\vhdl D:\WORK\Tests\MPEG4SPP2_ResearchDesign\VIVADOIntraTBench\src\generatedVHDL
 		«ENDFOR»
 		
 	'''

@@ -231,21 +231,13 @@ import java.io.File
 	'''
 	
 	def printOutputFifoAssignHLS( Connection connection) '''
-		«IF connection.fifoType.bool»
-			«connection.fifoName»_V_din    : OUT STD_LOGIC;
-		«ELSE»
-			«connection.fifoName»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits -1» downto 0);
-		«ENDIF»
+		«connection.fifoName»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
 		«connection.fifoName»_V_full_n : IN STD_LOGIC;
 		«connection.fifoName»_V_write  : OUT STD_LOGIC;
 	'''
 	
 	def printInputFifoAssignHLS(Connection connection) '''
-		«IF connection.fifoType.bool»
-			«connection.fifoName»_V_dout   : IN STD_LOGIC;
-		«ELSE»
-			«connection.fifoName»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
-		«ENDIF»
+		«connection.fifoName»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
 		«connection.fifoName»_V_empty_n : IN STD_LOGIC;
 		«connection.fifoName»_V_read    : OUT STD_LOGIC;
 	'''
@@ -266,21 +258,13 @@ import java.io.File
 	'''
 	
 	def printOutputFifoSignalAssignHLS( Connection connection) '''
-		«IF connection.fifoType.bool»
-			signal tmp_«connection.fifoName»_din    :  STD_LOGIC;
-		«ELSE»
-			signal tmp_«connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
-		«ENDIF»
+		signal tmp_«connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 		signal tmp_«connection.fifoName»_full_n :  STD_LOGIC;
 		signal tmp_«connection.fifoName»_write  :  STD_LOGIC;
 	'''
 	
 	def printInputFifoSignalAssignHLS(Connection connection) '''
-		«IF connection.fifoType.bool»
-			signal tmp_«connection.fifoName»_dout   :  STD_LOGIC;
-		«ELSE»
-			signal tmp_«connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
-		«ENDIF»
+		signal tmp_«connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 		signal tmp_«connection.fifoName»_empty_n :  STD_LOGIC;
 		signal tmp_«connection.fifoName»_read    :  STD_LOGIC;
 	'''
