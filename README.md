@@ -1,7 +1,7 @@
 Open RVC-CAL Compiler
 =====================
 
-Compiler for RVC-CAL applications
+Orcc is a development environment under BSD license dedicated to dataflow programming. Its primary purpose is to provide developers with a compiler infrastructure to allow several languages (software and hardware) to be generated from the same description composed of RVC-CAL actors and XDF networks. Orcc does not generate assembly or executable code directly, rather it generates source code that must be compiled by another tool.
 
 Documentation
 -------------
