@@ -47,31 +47,22 @@ import java.io.File
 	}
 
 	override getNetworkFileContent()'''
+		PATH=D:\Xilinx\Vivado_HLS\2012.3\bin;%PATH%;D:\Xilinx\Vivado_HLS\2012.3\msys\bin
+		set AUTOESL_HOME=D:\Xilinx\Vivado_HLS\2012.3\bin
+		set VIVADO_HLS_HOME=D:\Xilinx\Vivado_HLS\2012.3\bin
+		
+		if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
+		set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
+		goto START
+		:_NotX64
+		set COMSPEC=%WINDIR%\System32\cmd.exe
+		:START
+		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			cd ..\subProject_«instance.name»
-			start batchCommand_«instance.name».bat
+			%COMSPEC% /C vivado_hls -i -f script_«instance.name».tcl
 		«ENDFOR»
-	''' 
-	
-	override print(String targetFolder) {
 		
-		val contentNetwork = networkFileContent
-		val copier = getcopierContent(targetFolder)
-		val NetworkFile = new File(targetFolder + File::separator + "Command" + ".bat")
-		val copierFile = new File(targetFolder + File::separator + "copier" + ".bat")
-		
-		if(needToWriteFile(contentNetwork, NetworkFile)) {
-			printFile(contentNetwork, NetworkFile)
-			printFile(copier, copierFile)
-			return 0
-		} else {
-			return 1
-		}
-	}
-	
-	def getcopierContent (String target){
-		
-	'''
 		cd..
 		md generatedVHDL
 		copy %cd%\genericFifo.vhd %cd%\generatedVHDL
@@ -80,7 +71,20 @@ import java.io.File
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			xcopy /s/y %cd%\subProject_«instance.name»\subProject\solution\syn\vhdl %cd%\generatedVHDL
 		«ENDFOR»
-	'''
+	''' 
+	
+	override print(String targetFolder) {
+		
+		val contentNetwork = networkFileContent
+		val NetworkFile = new File(targetFolder + File::separator + "Command" + ".bat")
+		
+		if(needToWriteFile(contentNetwork, NetworkFile)) {
+			printFile(contentNetwork, NetworkFile)
+			return 0
+		} else {
+			return 1
+		}
 	}
+	
 }
  

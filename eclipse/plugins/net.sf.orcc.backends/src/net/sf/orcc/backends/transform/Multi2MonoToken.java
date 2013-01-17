@@ -330,7 +330,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		visitedActionsNames = new ArrayList<String>();
 		transitionsList = new ArrayList<Transition>();
 		modifyRepeatActionsInFSM();
-		modifyUntaggedActions(actor);
+		modifyUntaggedActions();
 		return null;
 	}
 
@@ -379,7 +379,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private void createActionsSet(Action action, State sourceState,
 			State targetState) {
-		scanInputs(action, sourceState, targetState);
+		scanInputs(action);
 		scanOutputs(action, sourceState, targetState);
 	}
 
@@ -750,19 +750,16 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		fsm = actor.getFsm();
 
 		if (fsm == null) {
-			List<Action> actions = new ArrayList<Action>(
-					actor.getActionsOutsideFsm());
 
-			// check repeats on all actions
-
-			// ////////
 			State initState = dfFactory.createState("init");
 			// no FSM: simply visit all the actions
 			setFsm(initState);
+
+			List<Action> actions = new ArrayList<Action>(actor.getActions());
 			for (Action action : actions) {
-				if (!action.getTag().isEmpty()) {
-					visitTransition(initState, initState, action);
-				}
+
+				visitTransition(initState, initState, action);
+
 			}
 
 		} else {
@@ -787,14 +784,16 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 * @param actor
 	 *            the actor containing the untagged actions to modify
 	 */
-	private void modifyUntaggedActions(Actor actor) {
-		List<Action> actions = new ArrayList<Action>(
-				actor.getActionsOutsideFsm());
-		for (Action action : actions) {
-			// modify only untagged actions existing before transformation
-			if (!AddedUntaggedActions.contains(action)) {
-				scanUntaggedInputs(action);
-				// scanUntaggedOutputs(action);
+	private void modifyUntaggedActions() {
+		if (actor.getFsm() != null) {
+			List<Action> actions = new ArrayList<Action>(
+					actor.getActionsOutsideFsm());
+			for (Action action : actions) {
+				// modify only untagged actions existing before transformation
+				if (!AddedUntaggedActions.contains(action)) {
+					scanUntaggedInputs(action);
+					// scanUntaggedOutputs(action);
+				}
 			}
 		}
 	}
@@ -858,7 +857,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 * @param targetName
 	 *            name of the target state of the action in the FSM
 	 */
-	private void scanInputs(Action action, State sourceState, State targetState) {
+	private void scanInputs(Action action) {
 
 		for (Entry<Port, Integer> entry : action.getInputPattern()
 				.getNumTokensMap().entrySet()) {

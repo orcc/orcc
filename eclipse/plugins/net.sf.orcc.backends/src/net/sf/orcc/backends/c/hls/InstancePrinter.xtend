@@ -41,6 +41,7 @@ import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
 import java.util.List
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.TypeList
 
 /*
  * Compile Instance c source code
@@ -74,6 +75,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		typedef unsigned long long int u64;
 		
 		
+		// Parameter values of the instance
+		«FOR arg : instance.arguments»
+			«IF arg.value.exprList»
+				static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
+			«ELSE»
+				#define «arg.variable.name» «arg.value.doSwitch»
+			«ENDIF»
+		«ENDFOR»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Input FIFOS
@@ -230,15 +239,12 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val content = instanceFileContent
 		val scriptContent = script(targetFolder);
 		val directiveContent = directive(targetFolder);
-		val batchContent = batch
 		val file = new File(targetFolder + File::separator + instance.name + ".cpp")
 		val scriptFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name + File::separator + "script_" + instance.name + ".tcl"
 		)
 		val directiveFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name  + File::separator + "directive_" + instance.name + ".tcl")
-		val batchFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name  + File::separator + "batchCommand_" + instance.name + ".bat")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(batchContent, batchFile)
 			printFile(scriptContent, scriptFile)
 			printFile(directiveContent, directiveFile)
 			printFile(content, file)
@@ -372,40 +378,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	source "directive_«instance.name».tcl"
 	csynth_design
+	exit
+	exit
 	'''
 	
 	def directive (String path)'''
 	 #set_directives
-	'''
-	
-	def batch ()'''
-	@echo off
-	
-	
-	PATH=D:\Xilinx\Vivado_HLS\2012.3\bin;%PATH%;D:\Xilinx\Vivado_HLS\2012.3\msys\bin
-	
-	set AUTOESL_HOME=D:\Xilinx\Vivado_HLS\2012.3\bin
-	set VIVADO_HLS_HOME=D:\Xilinx\Vivado_HLS\2012.3\bin
-	
-	echo ===============================
-	echo == Vivado HLS Command Prompt 
-	echo == Available commands:
-	echo == vivado_hls,apcc,gcc,g++,make
-	echo ===============================
-	
-	
-	if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
-	vivado_hls -i -f script_«instance.name».tcl 
-	exit
-	set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
-	%COMSPEC% 
-	goto EOF
-	
-	:_NotX64
-	set COMSPEC=%WINDIR%\System32\cmd.exe
-	rem %COMSPEC% /c %0 %1 %2 %3 %4 %5 %6 %7 %8 %9 
-	%COMSPEC% 
-	
-	:EOF
 	'''
 }
