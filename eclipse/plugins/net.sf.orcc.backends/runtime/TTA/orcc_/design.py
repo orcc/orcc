@@ -40,13 +40,11 @@ import subprocess
 
 class Design:
 
-    def __init__(self, name, processors, targetAltera):
+    def __init__(self, name, processors, memories, targetAltera):
         self.name = name
         self.processors = processors
+        self.memories = memories
         self.targetAltera = targetAltera
-        #self._xoeFifoFile = "fifo_br.xoe"
-        #self._ngcFifoFile = "fifo_br.ngc"
-        #self._vhdFifoFile = "fifo_br.vhd"
 
 
     def compile(self, srcPath, libPath, args, debug):
@@ -85,11 +83,29 @@ class Design:
             cgPath = os.path.join(srcPath, "ipcore_dir_gen")
             shutil.rmtree(cgPath, ignore_errors=True)
             os.mkdir(cgPath)
-            #self.generateCgFiles(libPath, cgPath)
-            #retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeFifoFile), "-p", os.path.join(cgPath, "cg_project.cgp")])
-            #shutil.copy(os.path.join(cgPath, self._ngcFifoFile), os.path.join(srcPath, "wrapper"))
-            #shutil.copy(os.path.join(cgPath, self._vhdFifoFile), os.path.join(srcPath, "wrapper"))
-            #shutil.rmtree(cgPath, ignore_errors=True)
+
+            templatePath = os.path.join(libPath, "templates")
+            template = tempita.Template.from_filename(os.path.join(templatePath, "cg_project.template"), namespace={}, encoding=None)
+            result = template.substitute(path=cgPath)
+            open(os.path.join(cgPath, "cg_project.cgp"), "w").write(result)
+
+            for memory in self.memories:
+                id = "dram_2p_" + memory.getName()
+                ngcRamFile = id + ".ngc"
+                vhdRamFile = id + ".vhd"
+                xoeRamFile = id + ".xoe"
+
+                template = tempita.Template.from_filename(os.path.join(templatePath, "xco_ram_2p.template"), namespace={}, encoding=None)
+                result = template.substitute(path=cgPath, id=memory.getName(), width=memory.getWidth(), depth=memory.getDepth())
+                open(os.path.join(cgPath, xoeRamFile), "w").write(result)
+
+                retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, xoeRamFile), "-p", os.path.join(cgPath, "cg_project.cgp")])
+
+                shutil.copy(os.path.join(cgPath, ngcRamFile), os.path.join(srcPath, "wrapper"))
+                shutil.copy(os.path.join(cgPath, vhdRamFile), os.path.join(srcPath, "wrapper"))
+                
+            if not debug:
+                shutil.rmtree(cgPath, ignore_errors=True)
 
         for processor in self.processors:
             print ">> Generate " + processor.id + "."

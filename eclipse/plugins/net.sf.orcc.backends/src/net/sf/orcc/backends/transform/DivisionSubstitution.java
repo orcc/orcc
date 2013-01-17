@@ -43,6 +43,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
@@ -50,16 +51,18 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.ir.util.ValueUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * This class defines a visitor that transforms a division into an equivalent
- * hardware compilable function specified in xilinx division model
+ * This class defines a visitor that transforms a division and a modulo into an
+ * equivalent hardware compilable function specified in xilinx division model
  * 
  * @author Khaled Jerbi
  * @author Herve Yviquel
+ * @author Endri Bezati
  * 
  */
 public class DivisionSubstitution extends DfVisitor<Void> {
@@ -119,6 +122,63 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 					IrUtil.addInstBeforeExpr(expr, assign0);
 					IrUtil.addInstBeforeExpr(expr, assign1);
 					IrUtil.addInstBeforeExpr(expr, call);
+
+					EcoreUtil.replace(expr, factory.createExprVar(varResult));
+				}
+			} else if (expr.getOp() == OpBinary.MOD) {
+				// Replace the modulo by the naive operation of
+				// mod(num, den) = num - den*(num/den)
+				if (ValueUtil.isPowerOfTwo(expr.getE2())) {
+					toShift = true;
+				} else {
+					toShift = false;
+				}
+				if (toShift == false) {
+					if (divProc == null) {
+						divProc = createDivProc();
+					}
+
+					Instruction inst = EcoreHelper.getContainerOfType(expr,
+							Instruction.class);
+					int lineNumber = inst.getLineNumber();
+					Var varNum = procedure.newTempLocalVariable(
+							factory.createTypeInt(16), "num_mod_" + lineNumber);
+					Var varDenum = procedure.newTempLocalVariable(
+							factory.createTypeInt(16), "den_mod_" + lineNumber);
+					Var varDivResult = procedure.newTempLocalVariable(
+							factory.createTypeInt(16), "divResult_mod_"
+									+ lineNumber);
+
+					InstAssign assign0 = factory.createInstAssign(varNum,
+							expr.getE1());
+					InstAssign assign1 = factory.createInstAssign(varDenum,
+							expr.getE2());
+
+					List<Expression> parameters = new ArrayList<Expression>();
+					parameters.add(factory.createExprVar(varNum));
+					parameters.add(factory.createExprVar(varDenum));
+
+					InstCall call = factory.createInstCall(varDivResult,
+							divProc, parameters);
+
+					Var varResult = procedure.newTempLocalVariable(
+							factory.createTypeInt(16), "result_mod_"
+									+ lineNumber);
+
+					ExprBinary exprDenumMultDiv = factory.createExprBinary(
+							factory.createExprVar(varDenum), OpBinary.TIMES,
+							factory.createExprVar(varDivResult),
+							factory.createTypeInt(16));
+
+					InstAssign assign2 = factory.createInstAssign(varResult,
+							factory.createExprBinary(
+									factory.createExprVar(varNum),
+									OpBinary.MINUS, exprDenumMultDiv,
+									factory.createTypeInt(16)));
+					IrUtil.addInstBeforeExpr(expr, assign0);
+					IrUtil.addInstBeforeExpr(expr, assign1);
+					IrUtil.addInstBeforeExpr(expr, call);
+					IrUtil.addInstBeforeExpr(expr, assign2);
 
 					EcoreUtil.replace(expr, factory.createExprVar(varResult));
 				}
@@ -404,6 +464,7 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 		for (Action verifAction : actions) {
 			Substitutor substitutor = new Substitutor();
 			substitutor.doSwitch(verifAction.getBody());
+			substitutor.doSwitch(verifAction.getScheduler());
 		}
 	}
 }

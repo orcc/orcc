@@ -47,7 +47,6 @@ import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
@@ -228,6 +227,7 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 
 	private List<Action> AddedUntaggedActions;
 	private List<Integer> bufferSizes;
+	private List<Integer> outputBufferSizes;
 	// private int bufferSize;
 	private Type entryType;
 	private FSM fsm;
@@ -247,10 +247,13 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 	private boolean repeatInput;
 	private List<Transition> transitionsList;
 	private List<Action> visitedActions;
+	private List<Action> outputVisitedActions;
 	private List<String> visitedActionsNames;
 	private int visitedRenameIndex;
 	private Action write;
 	private List<Var> writeIndexes;
+	private Var result;
+	private Action done;
 
 	/**
 	 * returns the position of an action name in an actions names list
@@ -335,7 +338,9 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 		outputWriteIndexes = new ArrayList<Var>();
 		writeIndexes = new ArrayList<Var>();
 		bufferSizes = new ArrayList<Integer>();
+		outputBufferSizes = new ArrayList<Integer>();
 		visitedActions = new ArrayList<Action>();
+		outputVisitedActions = new ArrayList<Action>();
 		visitedActionsNames = new ArrayList<String>();
 		transitionsList = new ArrayList<Transition>();
 		modifyRepeatActionsInFSM();
@@ -481,27 +486,29 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 	 *            global variable write list
 	 * @return new write action
 	 */
-	private Action createUntaggedWriteAction(String actionName,
-			Var writeCounter, Var writeList, Var readIndex, Var writeIndex,
-			int bufferSize) {
+	private Action createUntaggedWriteAction(String actionName, Var writeIdx,
+			Var writeList, Var readIndex, Var writeIndex, int bufferSize) {
 		String writeName = actionName + port.getName() + "_untaggedWrite";
-		Expression expression = irFactory.createExprBool(true);
+		Expression expression = irFactory.createExprBinary(
+				irFactory.createExprVar(readIndex), OpBinary.NE,
+				irFactory.createExprVar(writeIndex),
+				irFactory.createTypeInt(32));
 		Action newWriteAction = createAction(expression, writeName);
 
 		Var OUTPUT = irFactory.createVar(0,
 				irFactory.createTypeList(1, port.getType()), port.getName()
 						+ "_OUTPUT", true, 0);
-		defineWriteBody(writeCounter, writeList, newWriteAction.getBody(),
-				OUTPUT, bufferSize);
+		defineWriteBody(writeIdx, writeList, newWriteAction.getBody(), OUTPUT,
+				bufferSize);
 
-		modifyActionSchedulability(newWriteAction, writeIndex, readIndex,
-				OpBinary.GT, irFactory.createExprInt(1), port);
+		//modifyActionSchedulability(newWriteAction, writeIndex, readIndex,
+			//	OpBinary.GT, irFactory.createExprInt(0), port);
 		// add output pattern
 		Pattern pattern = newWriteAction.getOutputPattern();
 		pattern.setVariable(port, OUTPUT);
 		pattern.setNumTokens(port, 1);
-		
-		actor.getActionsOutsideFsm().add(newWriteAction);
+
+		// actor.getActionsOutsideFsm().add(newWriteAction);
 		return newWriteAction;
 	}
 
@@ -563,29 +570,21 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 	 * @param body
 	 *            body of the new write action
 	 */
-	private void defineWriteBody(Var writeCounter, Var writeList,
-			Procedure body, Var OUTPUT, int bufferSize) {
+	private void defineWriteBody(Var writeIdx, Var writeList, Procedure body,
+			Var OUTPUT, int bufferSize) {
 		BlockBasic bodyNode = body.getFirst();
 		EList<Var> locals = body.getLocals();
-		Var counter1 = irFactory.createVar(0, writeCounter.getType(),
+		Var counter1 = irFactory.createVar(0, writeIdx.getType(),
 				port.getName() + "_Local_writeCounter", true, outputIndex);
 		locals.add(counter1);
-		bodyNode.add(irFactory.createInstLoad(counter1, writeCounter));
+		bodyNode.add(irFactory.createInstLoad(counter1, writeIdx));
 
 		Var output = irFactory.createVar(0, port.getType(), port.getName()
 				+ "_LocalOutput", true, outputIndex);
 		locals.add(output);
 
-		Var mask = irFactory.createVar(0, irFactory.createTypeInt(32), "mask",
-				true, 1);
-		locals.add(mask);
-		Expression maskValue = irFactory.createExprBinary(
-				irFactory.createExprVar(writeCounter), OpBinary.BITAND,
-				irFactory.createExprInt(bufferSize - 1),
-				irFactory.createTypeInt(32));
-		bodyNode.add(irFactory.createInstAssign(mask, maskValue));
 		List<Expression> load2Index = new ArrayList<Expression>(1);
-		load2Index.add(irFactory.createExprVar(mask));
+		load2Index.add(irFactory.createExprVar(counter1));
 		bodyNode.add(irFactory.createInstLoad(output, writeList, load2Index));
 
 		Expression assign2Value = irFactory.createExprBinary(
@@ -594,7 +593,7 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 
 		// locals.put(OUTPUT.getName(), OUTPUT);
 		bodyNode.add(irFactory.createInstStore(OUTPUT, 0, output));
-		bodyNode.add(irFactory.createInstStore(writeCounter, assign2Value));
+		bodyNode.add(irFactory.createInstStore(writeIdx, assign2Value));
 	}
 
 	/**
@@ -880,139 +879,101 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 	 *            name of the target state of the action in the actor fsm
 	 */
 	private void scanOutputs(Action action, State sourceState, State targetState) {
-		for (Entry<Port, Integer> entry : action.getOutputPattern()
-				.getNumTokensMap().entrySet()) {
 
-			Var untagBuffer = irFactory.createVar(0, entryType, "outputBuffer",
-					true);
-			Var untagReadIndex = irFactory.createVar(0,
-					irFactory.createTypeInt(32), "outputUntagReadIndex", true,
-					irFactory.createExprInt(0));
-			Var untagWriteIndex = irFactory.createVar(0,
-					irFactory.createTypeInt(32), "outputUntagWriteIndex", true,
-					irFactory.createExprInt(0));
+		if (!action.getOutputPattern().isEmpty()) {
+			String writeName = "newStateWrite" + action.getName();
+			State writeState = dfFactory.createState(writeName);
+			fsm.getStates().add(writeState);
+			fsm.replaceTarget(sourceState, action, writeState);
 
-			numTokens = entry.getValue();
-			outIndex = outIndex + 100;
-			port = entry.getKey();
-			int bufferSize = OptimalOutputBufferSize(port);
-			entryType = port.getType();
+			for (Entry<Port, Integer> entry : action.getOutputPattern()
+					.getNumTokensMap().entrySet()) {
 
-			if (outputPorts.contains(port)) {
-				int position = portPosition(outputPorts, port);
-				untagBuffer = outputBuffers.get(position);
-				untagReadIndex = outputReadIndexes.get(position);
-				untagWriteIndex = outputWriteIndexes.get(position);
-				bufferSize = bufferSizes.get(position);
-			} else {
-				outputPorts.add(port);
-				bufferSizes.add(bufferSize);
-				untagBuffer = createTab(port.getName() + "_outputBuffer",
-						entryType, bufferSize);
-				outputBuffers.add(untagBuffer);
-				untagReadIndex = createCounter("outputReadIndex_"
-						+ port.getName());
-				outputReadIndexes.add(untagReadIndex);
-				untagWriteIndex = createCounter("outputWriteIndex_"
-						+ port.getName());
-				outputWriteIndexes.add(untagWriteIndex);
+				outputIndex = outputIndex + 100;
+				Var untagBuffer = irFactory.createVar(0, entryType,
+						"outputBuffer", true);
+				Var untagReadIndex = irFactory.createVar(0,
+						irFactory.createTypeInt(32), "outputUntagReadIndex",
+						true, irFactory.createExprInt(0));
+				Var untagWriteIndex = irFactory.createVar(0,
+						irFactory.createTypeInt(32), "outputUntagWriteIndex",
+						true, irFactory.createExprInt(0));
 
-				write = createUntaggedWriteAction(action.getName(),
-						untagWriteIndex, untagBuffer, untagReadIndex,
-						untagWriteIndex, bufferSize);
-				write.getOutputPattern().setNumTokens(port, 1);
-			}
+				numTokens = entry.getValue();
+				outIndex = outIndex + 100;
+				port = entry.getKey();
+				int bufferSize = OptimalOutputBufferSize(port);
+				entryType = port.getType();
 
-			Procedure body = action.getBody();
-			Var index = body.newTempLocalVariable(irFactory.createTypeInt(32),
-					"outputWriteIndex");
-			index.setIndex(1);
-			body.getFirst().add(
-					irFactory.createInstLoad(index, untagWriteIndex));
-			outputIndex = outputIndex + 100;
-			String listName = action.getName() + "NewWriteList" + outputIndex;
-			Var tab = createTab(listName, entryType, numTokens);
-			ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
-					tab);
-			modifyProcessActionWrite.doSwitch(action.getBody());
+				if (outputPorts.contains(port)) {
+					int position = portPosition(outputPorts, port);
+					untagBuffer = outputBuffers.get(position);
+					untagReadIndex = outputReadIndexes.get(position);
+					untagWriteIndex = outputWriteIndexes.get(position);
+					bufferSize = outputBufferSizes.get(position);
+					write = outputVisitedActions.get(position);
+				} else {
+					outputPorts.add(port);
+					outputBufferSizes.add(bufferSize);
+					untagBuffer = createTab(port.getName() + "_outputBuffer",
+							entryType, bufferSize);
+					outputBuffers.add(untagBuffer);
+					untagReadIndex = createCounter("outputReadIndex_"
+							+ port.getName());
+					outputReadIndexes.add(untagReadIndex);
+					untagWriteIndex = createCounter("outputWriteIndex_"
+							+ port.getName());
+					outputWriteIndexes.add(untagWriteIndex);
 
-			dataTransfer(numTokens, untagReadIndex, tab, bufferSize,
-					untagBuffer, action.getBody());
+					write = createUntaggedWriteAction(action.getName(),
+							untagWriteIndex, untagBuffer, untagReadIndex,
+							untagWriteIndex, bufferSize);
+					write.getOutputPattern().setNumTokens(port, 1);
+					outputVisitedActions.add(write);
+				}
 
-		}
-		// remove outputPattern from transition action
-		action.getOutputPattern().clear();
-	}
+				Transition transitionWrite = dfFactory.createTransition(
+						writeState, write, writeState);
+				transitionsList.add(transitionWrite);
 
-	/**
-	 * This function creates a for loop to move date from newlist to the
-	 * untagged buffer
-	 * 
-	 * @param numTokens
-	 *            number of loop cycles
-	 * @param untagReadIndex
-	 *            global read index
-	 * @param tab
-	 *            source tab
-	 * @param bufferSize
-	 *            used for the mask
-	 * @param untagbuffer
-	 *            target tab
-	 * @param body
-	 *            procedure where to add the loop
-	 */
-	private void dataTransfer(int numTokens, Var untagReadIndex, Var tab,
-			int bufferSize, Var untagBuffer, Procedure body) {
-		
-		// create and initialize loop counter
-		BlockBasic initCounterBlock = irFactory.createBlockBasic();
-		Var localWriteIndex = body.newTempLocalVariable(
-				irFactory.createTypeInt(32), "loopCounter");
-		initCounterBlock.add(irFactory.createInstAssign(localWriteIndex, irFactory.createExprInt(0)));
-		body.getBlocks().add(initCounterBlock);
-		// create while block
-		BlockWhile whileBlock = irFactory.createBlockWhile();
-		// create and set while condition
-		BlockBasic insideBlock = irFactory.createBlockBasic();
-		Expression condition = irFactory.createExprBinary(
-				irFactory.createExprVar(localWriteIndex), OpBinary.LT,
-				irFactory.createExprInt(numTokens), irFactory.createTypeBool());
-		whileBlock.setCondition(condition);
+				Procedure body = action.getBody();
+				Var index = body.newTempLocalVariable(
+						irFactory.createTypeInt(32), "outputWriteIndex");
+				index.setIndex(1);
+				body.getFirst().add(
+						irFactory.createInstLoad(index, untagWriteIndex));
 
-		// create then node
-		Var tmpVar = body.newTempLocalVariable(irFactory.createTypeInt(32),
-				"tmpVar");
-		List<Expression> loadIndex = new ArrayList<Expression>(1);
-		loadIndex.add(irFactory.createExprVar(localWriteIndex));
-		insideBlock.add(irFactory.createInstLoad(tmpVar, tab, loadIndex));
+				ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
+						untagBuffer);
+				modifyProcessActionWrite.doSwitch(action.getBody());
 
-		Expression maskValue = irFactory.createExprBinary(
-				irFactory.createExprVar(untagReadIndex), OpBinary.BITAND,
-				irFactory.createExprInt(bufferSize - 1),
-				irFactory.createTypeInt(32));
-		Expression index = irFactory.createExprBinary(maskValue, OpBinary.PLUS,
-				irFactory.createExprVar(localWriteIndex),
-				irFactory.createTypeInt(32));
-		List<Expression> load2Index = new ArrayList<Expression>(1);
-		load2Index.add(index);
-		insideBlock.add(irFactory.createInstStore(untagBuffer, load2Index,
-				irFactory.createExprVar(tmpVar)));
-		Expression counterIncrementation = irFactory.createExprBinary(irFactory.createExprVar(localWriteIndex), OpBinary.PLUS,
-				irFactory.createExprInt(1),
-				irFactory.createTypeInt(32));
-		insideBlock.add(irFactory.createInstAssign(localWriteIndex, counterIncrementation));
-		whileBlock.getBlocks().add(insideBlock);
-		body.getBlocks().add(whileBlock);
-		
-		// create increment block for read index
-		BlockBasic incrementBlock = irFactory.createBlockBasic();
-		Expression increment = irFactory
-				.createExprBinary(irFactory.createExprVar(untagReadIndex),
-						OpBinary.PLUS, irFactory.createExprInt(numTokens),
+				BlockBasic incrementBlock = irFactory.createBlockBasic();
+				Expression increment = irFactory.createExprBinary(
+						irFactory.createExprVar(untagReadIndex), OpBinary.PLUS,
+						irFactory.createExprInt(numTokens),
 						irFactory.createTypeInt(32));
-		incrementBlock.add(irFactory
-				.createInstAssign(untagReadIndex, increment));
-		body.getBlocks().add(incrementBlock);
+				incrementBlock.add(irFactory.createInstAssign(untagReadIndex,
+						increment));
+				body.getBlocks().add(incrementBlock);
+
+				if (outputIndex == 100) {
+					done = createDoneAction(action.getName() + "newWriteDone",
+							untagReadIndex, untagWriteIndex);
+					Transition transitionDone = dfFactory.createTransition(
+							writeState, done, targetState);
+					transitionsList.add(transitionDone);
+
+				} else {
+					modifyDoneAction(untagReadIndex, untagWriteIndex,
+							outputIndex, port.getName());
+				}
+
+			}
+			// remove outputPattern from transition action
+			action.getOutputPattern().clear();
+			outputIndex = 0;
+		}
+
 	}
 
 	/**
@@ -1273,16 +1234,104 @@ public class Multi2MonoTokenHLS extends DfVisitor<Void> {
 				int visitedIndex = actionNamePosition(visitedActionsNames,
 						actionName);
 				Action updateAction = visitedActions.get(visitedIndex);
-				Transition transition = dfFactory.createTransition(source,
-						updateAction, target);
-				transitionsList.add(transition);
-				visitedRenameIndex++;
+				updateFSM(action, updateAction, source, target);
+
 			} else {
 				visitedActionsNames.add(actionName);
 				visitedActions.add(IrUtil.copy(action));
 				createActionsSet(action, source, target);
 			}
 		}
+	}
+
+	/**
+	 * This method creates the done action that is schedulable when required
+	 * number of tokens is read (written)
+	 * 
+	 * @param actionName
+	 *            name of the action
+	 * @param counter
+	 *            global variable counter used for reading (writing) tokens
+	 * @param numTokens
+	 *            repeat value
+	 * @return new done action
+	 */
+	private Action createDoneAction(String name, Var readIdx, Var writeIdx) {
+		Tag tag = dfFactory.createTag(name);
+
+		// Body building ;-)
+		Procedure body = irFactory.createProcedure(name, 0,
+				irFactory.createTypeVoid());
+		BlockBasic blockBody = irFactory.createBlockBasic();
+		blockBody.add(irFactory.createInstStore(readIdx, 0));
+		blockBody.add(irFactory.createInstStore(writeIdx, 0));
+		blockBody.add(irFactory.createInstReturn());
+		body.getBlocks().add(blockBody);
+
+		// Scheduler building
+		Procedure scheduler = irFactory.createProcedure(
+				"isSchedulable_" + name, 0, irFactory.createTypeBool());
+		Var temp = scheduler.newTempLocalVariable(irFactory.createTypeBool(),
+				"temp");
+		temp.setIndex(1);
+
+		scheduler.getLocals().add(temp);
+		result = irFactory.createVar(0, irFactory.createTypeBool(), "res",
+				true, 0);
+
+		scheduler.getLocals().add(result);
+
+		BlockBasic blockScheduler = irFactory.createBlockBasic();
+		Expression expression = irFactory.createExprBinary(
+				irFactory.createExprVar(writeIdx), OpBinary.EQ,
+				irFactory.createExprVar(readIdx), irFactory.createTypeBool());
+		blockScheduler.add(irFactory.createInstAssign(temp, expression));
+		blockScheduler.add(irFactory.createInstAssign(result,
+				irFactory.createExprVar(temp)));
+		blockScheduler.add(irFactory.createInstReturn(irFactory
+				.createExprVar(result)));
+		scheduler.getBlocks().add(blockScheduler);
+
+		Action action = dfFactory.createAction(tag, dfFactory.createPattern(),
+				dfFactory.createPattern(), dfFactory.createPattern(),
+				scheduler, body);
+		this.actor.getActions().add(action);
+
+		return action;
+	}
+
+	/**
+	 * This method changes the schedulability of the done action
+	 * 
+	 * @param counter
+	 *            Global Var counter
+	 */
+	private void modifyDoneAction(Var readIdx, Var writeIdx, int portIndex,
+			String portName) {
+
+		BlockBasic basicBlock = done.getBody().getFirst();
+		basicBlock.add(irFactory.createInstStore(readIdx, 0));
+		basicBlock.add(irFactory.createInstStore(writeIdx, 0));
+
+		basicBlock = done.getScheduler().getFirst();
+		EList<Var> schedulerLocals = done.getScheduler().getLocals();
+
+		Var temp = irFactory.createVar(0, irFactory.createTypeBool(), "temp"
+				+ portName, true, portIndex);
+		schedulerLocals.add(temp);
+		Expression schedulerValue = irFactory.createExprBinary(
+				irFactory.createExprVar(writeIdx), OpBinary.EQ,
+				irFactory.createExprVar(readIdx), irFactory.createTypeBool());
+		int index = basicBlock.getInstructions().size() - 1;
+		basicBlock.add(index, irFactory.createInstAssign(temp, schedulerValue));
+		index++;
+
+		Expression buffrerExpression = irFactory.createExprVar(result);
+		Expression resultExpression = irFactory.createExprVar(temp);
+		Expression expression = irFactory.createExprBinary(buffrerExpression,
+				OpBinary.LOGIC_AND, resultExpression,
+				irFactory.createTypeBool());
+		basicBlock.add(index, irFactory.createInstAssign(result, expression));
 	}
 
 	/**

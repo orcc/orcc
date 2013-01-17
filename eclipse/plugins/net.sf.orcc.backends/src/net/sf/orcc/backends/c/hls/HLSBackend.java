@@ -194,7 +194,7 @@ public class HLSBackend extends CBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
-		
+
 		OrccLogger.trace("Printing network testbench... ");
 		if (new NetworkTestBenchPrinter(network, options).print(testBenchPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
