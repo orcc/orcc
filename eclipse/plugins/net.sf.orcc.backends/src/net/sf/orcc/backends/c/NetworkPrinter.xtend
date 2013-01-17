@@ -52,7 +52,7 @@ class NetworkPrinter extends CTemplate {
 	protected val Network network;
 	protected val int fifoSize;
 	
-	var boolean geneticAlgo = false
+	protected var boolean geneticAlgo = false
 	var boolean ringTopology = false
 	
 	var boolean newSchedul = false
