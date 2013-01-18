@@ -70,7 +70,7 @@ class InstancePrinter extends CTemplate {
 	protected val Instance instance
 	protected val int fifoSize;
 	
-	var boolean geneticAlgo = false
+	protected var boolean geneticAlgo = false
 	
 	var boolean newSchedul = false
 	var boolean ringTopology = false
