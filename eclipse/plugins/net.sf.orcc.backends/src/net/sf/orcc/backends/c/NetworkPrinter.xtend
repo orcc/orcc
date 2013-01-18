@@ -223,7 +223,7 @@ class NetworkPrinter extends CTemplate {
 		// Initializer and launcher
 		void initialize_instances() {
 			«FOR instance : network.children.actorInstances»
-				«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
+				«instance.name»_initialize(«instance.actor.inputs.join(", ", [getFifoId(instance)])»);
 			«ENDFOR»
 		}
 		
@@ -240,6 +240,14 @@ class NetworkPrinter extends CTemplate {
 			return compareErrors;
 		}
 	'''
+	
+	def private getFifoId(Port port, Instance instance) {
+		if(instance.incomingPortMap.containsKey(port)) {
+			String::valueOf(instance.incomingPortMap.get(port).<Integer>getValueAsObject("fifoId"))
+		} else {
+			"-1"
+		}
+	}
 	
 	def protected printLauncher() '''
 		static void launcher() {
