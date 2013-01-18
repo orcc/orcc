@@ -54,7 +54,7 @@ class CMakePrinter extends CommonPrinter {
 		printFile(srcCMakeContent, src)
 	}
 	
-	def rootCMakeContent() '''
+	def private rootCMakeContent() '''
 		# Generated from «network.simpleName»
 		
 		cmake_minimum_required (VERSION 2.6)
@@ -76,14 +76,14 @@ class CMakePrinter extends CommonPrinter {
 
 	/**
 	 * Goal of this method is to allow text produced to be extended
-	 * for specific usages
+	 * for specific usages (other backends)
 	 */
 	def protected addLibrariesSubdirs() '''
 		add_subdirectory(${LIBS_DIR})
 		add_subdirectory(${SRC_DIR})
 	'''
 
-	def srcCMakeContent() '''
+	def private srcCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		cmake_minimum_required (VERSION 2.6)

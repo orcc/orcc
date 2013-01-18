@@ -114,7 +114,7 @@ class NetworkPrinter extends CTemplate {
 		}
 	}
 
-	def getNetworkFileContent() '''
+	def protected getNetworkFileContent() '''
 		// Generated from "«network.name»"
 
 		#include <locale.h>
@@ -175,7 +175,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Action schedulers
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			extern void «instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ", "»unsigned int fifo_«port.name»_id«ENDFOR»);
+			extern void «instance.name»_initialize(«instance.actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
 		«ENDFOR»
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			extern void «instance.name»_scheduler(struct schedinfo_s *si);
@@ -221,13 +221,26 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Initializer and launcher
 		void initialize_instances() {
-			«FOR instance : network.children.filter(typeof(Instance))»
-				«IF instance.isActor»
-					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
-				«ENDIF»
+			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+				«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
 			«ENDFOR»
 		}
 		
+		«printLauncher»
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// Main
+		int main(int argc, char *argv[]) {
+			init_orcc(argc, argv);
+			
+			launcher();
+			
+			printf("End of simulation !\n");
+			return compareErrors;
+		}
+	'''
+	
+	def protected printLauncher() '''
 		static void launcher() {
 			int i, display_scheduler = -1;
 			
@@ -294,21 +307,10 @@ class NetworkPrinter extends CTemplate {
 				thread_join(thread_monitor);
 			«ENDIF»
 		}
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// Main
-		int main(int argc, char *argv[]) {
-			init_orcc(argc, argv);
-			
-			launcher();
-			
-			printf("End of simulation !\n");
-			return compareErrors;
-		}
 	'''
 	
 	// TODO : simplify this :
-	def assignFifo(Instance instance) '''
+	def protected assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
 				«printFifoAssign(connList.head.source as Instance, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
@@ -322,11 +324,11 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 	'''
 	
-	def printFifoAssign(Instance instance, Port port, int fifoIndex) '''
+	def private printFifoAssign(Instance instance, Port port, int fifoIndex) '''
 		struct fifo_«port.type.doSwitch»_s *«instance.name»_«port.name» = &fifo_«fifoIndex»;
 	'''
 
-	def printScheduler() '''
+	def protected printScheduler() '''
 		void *scheduler(void *data) {
 			struct scheduler_s *sched = (struct scheduler_s *) data;
 			struct actor_s *my_actor;
@@ -367,7 +369,7 @@ class NetworkPrinter extends CTemplate {
 		}
 	'''
 
-	def clearFifosWithMap(Instance instance) '''
+	def private clearFifosWithMap(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF connList.get(0).source instanceof Instance && connList.get(0).target instanceof Instance»
 				«clearFifo(connList.get(0))»
@@ -375,7 +377,7 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 	'''
 	
-	def clearFifo(Connection connection) '''
+	def private clearFifo(Connection connection) '''
 		«IF connection.source instanceof Actor»
 			fifo_«connection.sourcePort.type.doSwitch»_clear(&fifo_«connection.getAttribute("idNoBcast")»);
 		«ELSE»
@@ -383,13 +385,13 @@ class NetworkPrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def allocateFifos(Instance instance) '''
+	def private allocateFifos(Instance instance) '''
 		«FOR connectionList : instance.outgoingPortMap.values»
 			«allocateFifo(connectionList.get(0), connectionList.size)»
 		«ENDFOR»
 	'''
 	
-	def allocateFifo(Connection conn, int nbReaders) '''
+	def private allocateFifo(Connection conn, int nbReaders) '''
 		«IF conn.source instanceof Instance»
 			DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 		«ELSEIF conn.target instanceof Instance»
@@ -400,7 +402,7 @@ class NetworkPrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def computeInstanceToIdMap() {
+	def private computeInstanceToIdMap() {
 		val instanceToIdMap = new HashMap<Instance, Integer>
 		
 		for(instance : network.children.filter(typeof(Instance))) {
