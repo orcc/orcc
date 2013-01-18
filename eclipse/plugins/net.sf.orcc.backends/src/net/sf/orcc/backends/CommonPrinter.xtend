@@ -32,6 +32,9 @@ import net.sf.orcc.ir.util.AbstractIrVisitor
 import net.sf.orcc.util.OrccLogger
 import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
+import net.sf.orcc.df.Port
+import net.sf.orcc.graph.Vertex
+import net.sf.orcc.df.Instance
 
 /**
  * Define commons methods for all backends printers
@@ -265,5 +268,19 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 		// note the difference with the caseExprString method from the
 		// expression evaluator: quotes around the string
 		return '''"«String::valueOf(expr.value)»"''';
+	}
+	
+	/**
+	 * Filter ports, and return only thus which are not native as a list
+	 */
+	def protected getNotNative(List<Port> ports) {
+		ports.filter[!native]
+	}
+	
+	/**
+	 * Filter vertex, return only Actor's Instances.
+	 */
+	def protected getActorInstances(List<Vertex> vertices) {
+		vertices.filter(typeof(Instance)).filter[isActor]
 	}
 }
