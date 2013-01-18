@@ -162,39 +162,40 @@ class NetworkPrinter extends CTemplate {
 
 		/////////////////////////////////////////////////
 		// FIFO allocation
-		«FOR vertice : network.children.filter(typeof(Instance)).filter[isActor]»
+		«FOR vertice : network.children.actorInstances»
 			«vertice.allocateFifos»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// FIFO pointer assignments
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+		«FOR instance : network.children.actorInstances»
 			«instance.assignFifo»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
-		// Action schedulers
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+		// Action initializes
+		«FOR instance : network.children.actorInstances»
 			extern void «instance.name»_initialize(«instance.actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
 		«ENDFOR»
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+		// Action schedulers		
+		«FOR instance : network.children.actorInstances»
 			extern void «instance.name»_scheduler(struct schedinfo_s *si);
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// Declaration of a struct actor for each actor
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+		«FOR instance : network.children.actorInstances»
 			struct actor_s «instance.name»;
 		«ENDFOR»
 
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+		«FOR instance : network.children.actorInstances»
 			struct actor_s «instance.name» = {"«instance.name»", «instanceToIdMap.get(instance)», «instance.name»_scheduler, «instance.actor.inputs.size»0, «instance.actor.outputs.size», 0, 0, NULL, 0};			
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
-			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor] SEPARATOR ","»
+			«FOR instance : network.children.actorInstances SEPARATOR ","»
 				&«instance.name»
 			«ENDFOR»
 		};
@@ -204,7 +205,7 @@ class NetworkPrinter extends CTemplate {
 			extern int clean_cache(int size);
 			
 			void clear_fifos() {
-				«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+				«FOR instance : network.children.actorInstances»
 					«instance.clearFifosWithMap»
 				«ENDFOR»
 			}
@@ -221,7 +222,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Initializer and launcher
 		void initialize_instances() {
-			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+			«FOR instance : network.children.actorInstances»
 				«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
 			«ENDFOR»
 		}
@@ -405,7 +406,7 @@ class NetworkPrinter extends CTemplate {
 	def private computeInstanceToIdMap() {
 		val instanceToIdMap = new HashMap<Instance, Integer>
 		
-		for(instance : network.children.filter(typeof(Instance))) {
+		for(instance : network.children.actorInstances) {
 			// TODO : compute the right value when genetic algorithm will be fixed
 			instanceToIdMap.put(instance, 0)
 		}
