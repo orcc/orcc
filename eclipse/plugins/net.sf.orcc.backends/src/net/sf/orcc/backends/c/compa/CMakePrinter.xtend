@@ -29,13 +29,11 @@
 package net.sf.orcc.backends.c.compa
 
 import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccLogger
 
 class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 	
 	new(Network network) {
 		super(network)
-		OrccLogger::traceln("CMakePrinter created")
 	}
 	
 	override public addLibrariesSubdirs() '''

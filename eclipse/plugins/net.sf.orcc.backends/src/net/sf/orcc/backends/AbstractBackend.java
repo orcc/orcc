@@ -136,859 +136,859 @@ import org.osgi.framework.Bundle;
  */
 public abstract class AbstractBackend implements Backend, IApplication {
 
-	protected boolean debug;
-	/**
-	 * Fifo size used in backend.
-	 */
-	protected int fifoSize;
-
-	private IFile inputFile;
-	protected Map<String, String> mapping;
-
-	/**
-	 * List of transformations to apply on each network
-	 */
-	protected List<DfSwitch<?>> networkTransfos;
-	/**
-	 * List of transformations to apply on each actor
-	 */
-	protected List<DfSwitch<?>> actorTransfos;
-
-	protected boolean classify;
-	protected boolean mergeActions;
-	protected boolean mergeActors;
-	protected boolean convertMulti2Mono;
-
-	/**
-	 * the progress monitor
-	 */
-	private IProgressMonitor monitor;
-
-	/**
-	 * Options of backend execution. Its content can be manipulated with
-	 * {@link #getAttribute} and {@link #setAttribute}
-	 */
-	protected Map<String, Object> options;
-
-	/**
-	 * Path where output files will be written.
-	 */
-	protected String path;
-
-	/**
-	 * Represents the project where call application to build is located
-	 */
-	protected IProject project;
-
-	/**
-	 * Path of the folder that contains VTL under IR form.
-	 */
-	private List<IFolder> vtlFolders;
-
-	/**
-	 * Initialize some members
-	 */
-	public AbstractBackend() {
-		actorTransfos = new ArrayList<DfSwitch<?>>();
-		networkTransfos = new ArrayList<DfSwitch<?>>();
-	}
-
-	@Override
-	public void compile() {
-
-		boolean compilexdf = getAttribute(COMPILE_XDF, false);
-
-		String orccVersion = "<unknown>";
-		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
-		if (bundle != null) {
-			orccVersion = bundle.getHeaders().get("Bundle-Version");
-		}
-
-		String backendName = getAttribute(BACKEND, "<unknown>");
-
-		OrccLogger.traceln("*********************************************"
-				+ "************************************");
-		OrccLogger.traceln("* Orcc version : " + orccVersion);
-		OrccLogger.traceln("* Backend : " + backendName);
-		OrccLogger.traceln("* Project : " + project.getName());
-		if (compilexdf) {
-			String topNetwork = getAttribute(XDF_FILE, "<unknown>");
-			OrccLogger.traceln("* Network : " + topNetwork);
-		}
-		OrccLogger.traceln("* Output folder : " + path);
-		OrccLogger.traceln("*********************************************"
-				+ "************************************");
-
-		exportRuntimeLibrary();
-		compileVTL();
-
-		if (compilexdf) {
-			compileXDF();
-		}
-
-		OrccLogger.traceln("Orcc backend done.");
-	}
-
-	final private void compileVTL() {
-		// lists actors
-		OrccLogger.traceln("Lists actors...");
-		List<IFile> vtlFiles = OrccUtil.getAllFiles("ir", vtlFolders);
-		doVtlCodeGeneration(vtlFiles);
-	}
-
-	final private void compileXDF() {
-		// set FIFO size
-		ResourceSet set = new ResourceSetImpl();
-
-		// parses top network
-		Network network = EcoreHelper.getEObject(set, inputFile);
-		if (isCanceled()) {
-			return;
-		}
-		new NetworkValidator().doSwitch(network);
-
-		// because the UnitImporter will load additional resources, we filter
-		// only actors
-		List<Actor> actors = new ArrayList<Actor>();
-		for (Resource resource : set.getResources()) {
-			EObject eObject = resource.getContents().get(0);
-			if (eObject instanceof Actor) {
-				actors.add((Actor) eObject);
-			}
-		}
-
-		if (isCanceled()) {
-			return;
-		}
-		doXdfCodeGeneration(network);
-	}
-
-	/**
-	 * Copy <i>source</i> file at <i>destination</i> path. If <i>destination</i>
-	 * parents folder does not exists, they will be created
-	 * 
-	 * @param source
-	 *            Resource file path starting with '/'. Must be an existing path
-	 *            relative to classpath (JAR file root or project classpath)
-	 * @param destination
-	 *            Path of the target file
-	 * @return <code>true</code> if the file has been successfully copied
-	 */
-	protected boolean copyFileToFilesystem(final String source,
-			final String dest) {
-		int bufferSize = 512;
-
-		assert source != null;
-		assert dest != null;
-		assert source.startsWith("/");
-
-		File fileOut = new File(dest);
-		if (!fileOut.exists()) {
-			try {
-				File parentDir = fileOut.getParentFile();
-				if (parentDir != null) {
-					parentDir.mkdirs();
-				}
-				fileOut.createNewFile();
-			} catch (IOException e) {
-				OrccLogger.warnln("Unable to write " + dest + " file");
-				return false;
-			}
-		}
-
-		if (!fileOut.isFile()) {
-			OrccLogger.warnln(dest + " is not a file path");
-			fileOut.delete();
-			return false;
-		}
-
-		InputStream is = this.getClass().getResourceAsStream(source);
-		if (is == null) {
-			OrccLogger.warnln("Unable to find " + source);
-			return false;
-		}
-		DataInputStream dis;
-		dis = new DataInputStream(is);
-
-		FileOutputStream out;
-		try {
-			out = new FileOutputStream(fileOut);
-		} catch (FileNotFoundException e1) {
-			OrccLogger.warnln("File " + dest + " not found !");
-			return false;
-		}
-
-		try {
-			byte[] b = new byte[bufferSize];
-			int i = is.read(b);
-			while (i != -1) {
-				out.write(b, 0, i);
-				i = is.read(b);
-			}
-			dis.close();
-			out.close();
-		} catch (IOException e) {
-			OrccLogger.warnln("IOError : " + e.getMessage());
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Copy <i>source</i> folder and all its content under <i>destination</i>.
-	 * Final '/' is not required for both parameters. If <i>destination</i> does
-	 * not exists, it will be created
-	 * 
-	 * @param source
-	 *            Resource folder path starting with '/'. Must be an existing
-	 *            path relative to classpath (JAR file root or project
-	 *            classpath)
-	 * @param destination
-	 *            Filesystem folder path
-	 * @return <code>true</code> if the folder has been successfully copied
-	 */
-	protected boolean copyFolderToFileSystem(final String source,
-			final String destination) {
-		assert source != null;
-		assert destination != null;
-		assert source.startsWith("/");
-
-		File outputDir = new File(destination);
-
-		if (!outputDir.exists()) {
-			if (!outputDir.mkdirs()) {
-				OrccLogger.warnln("Unable to create " + outputDir + " folder");
-				return false;
-			}
-		}
-
-		if (!outputDir.isDirectory()) {
-			OrccLogger.warnln(outputDir
-					+ " does not exists or is not a directory.");
-			return false;
-		}
-
-		String inputDir;
-		// Remove last '/' character (if needed)
-		if (source.charAt(source.length() - 1) == '/') {
-			inputDir = source.substring(0, source.length() - 1);
-		} else {
-			inputDir = source;
-		}
-
-		try {
-			URL toto = this.getClass().getResource(inputDir);
-			URL inputURL = FileLocator.resolve(toto);
-			String inputPath = inputURL.toString();
-
-			boolean result = true;
-
-			if (inputPath.startsWith("jar:file:")) {
-				// Backend running from jar file
-				inputPath = inputPath.substring(9, inputPath.indexOf('!'));
-
-				JarFile jar = new JarFile(inputPath);
-				try {
-					Enumeration<JarEntry> jarEntries = jar.entries();
-					if (jarEntries == null) {
-						OrccLogger.warnln("Unable to list content from "
-								+ jar.getName() + " file.");
-						return false;
-					}
-
-					// "source" value without starting '/' char
-					String sourceMinusSlash = source.substring(1);
-
-					JarEntry elt;
-					while (jarEntries.hasMoreElements()) {
-
-						elt = jarEntries.nextElement();
-
-						// Only deal with sub-files of 'source' path
-						if (elt.isDirectory()
-								|| !elt.getName().startsWith(sourceMinusSlash)) {
-							continue;
-						}
-
-						String newInPath = "/" + elt.getName();
-						String newOutPath = outputDir
-								+ File.separator
-								+ elt.getName().substring(
-										sourceMinusSlash.length());
-						result &= copyFileToFilesystem(newInPath, newOutPath);
-					}
-					return result;
-				} finally {
-					jar.close();
-				}
-			} else {
-				// Backend running from filesystem
-				File[] listDir = new File(inputPath.substring(5)).listFiles();
-
-				for (File elt : listDir) {
-					String newInPath = inputDir + File.separator
-							+ elt.getName();
-
-					String newOutPath = outputDir + File.separator
-							+ elt.getName();
-
-					if (elt.isDirectory()) {
-						result &= copyFolderToFileSystem(newInPath, newOutPath);
-					} else {
-						result &= copyFileToFilesystem(newInPath, newOutPath);
-					}
-				}
-				return result;
-			}
-		} catch (IOException e) {
-			OrccLogger.warnln("IOError" + e.getMessage());
-			return false;
-		}
-	}
-
-	/**
-	 * Called by {@link #setOptions(Map)} when options are initialized. This
-	 * method may be implemented by backend to set member variables specific to
-	 * it.
-	 */
-	abstract protected void doInitializeOptions();
-
-	/**
-	 * Transforms the given actor.
-	 * 
-	 * @param actor
-	 *            the actor
-	 */
-	abstract protected void doTransformActor(Actor actor);
-
-	/**
-	 * This method must be implemented by subclasses to do the actual code
-	 * generation for VTL.
-	 * 
-	 * @param files
-	 *            a list of IR files
-	 */
-	abstract protected void doVtlCodeGeneration(List<IFile> files);
-
-	/**
-	 * This method must be implemented by subclasses to do the actual code
-	 * generation for the network or its instances or both.
-	 * 
-	 * @param network
-	 *            a network
-	 */
-	abstract protected void doXdfCodeGeneration(Network network);
-
-	/**
-	 * Export runtime library used by source produced. Should be overridden by
-	 * back-ends that produce code source which need third party libraries at
-	 * runtime.
-	 * 
-	 * @return <code>true</code> if the libraries were correctly exported
-	 */
-	@Override
-	public boolean exportRuntimeLibrary() {
-		return false;
-	}
-
-	/**
-	 * Returns the boolean-valued attribute with the given name. Returns the
-	 * given default value if the attribute is undefined.
-	 * 
-	 * @param attributeName
-	 *            the name of the attribute
-	 * @param defaultValue
-	 *            the value to use if no value is found
-	 * @return the value or the default value if no value was found.
-	 */
-	final public boolean getAttribute(String attributeName, boolean defaultValue) {
-		Object obj = options.get(attributeName);
-		if (obj instanceof Boolean) {
-			return (Boolean) obj;
-		} else {
-			return defaultValue;
-		}
-	}
-
-	/**
-	 * Returns the integer-valued attribute with the given name. Returns the
-	 * given default value if the attribute is undefined.
-	 * 
-	 * @param attributeName
-	 *            the name of the attribute
-	 * @param defaultValue
-	 *            the value to use if no value is found
-	 * @return the value or the default value if no value was found.
-	 */
-	final public int getAttribute(String attributeName, int defaultValue) {
-		Object obj = options.get(attributeName);
-		if (obj instanceof Integer) {
-			return (Integer) obj;
-		} else {
-			return defaultValue;
-		}
-	}
-
-	/**
-	 * Returns the map-valued attribute with the given name. Returns the given
-	 * default value if the attribute is undefined.
-	 * 
-	 * @param attributeName
-	 *            the name of the attribute
-	 * @param defaultValue
-	 *            the value to use if no value is found
-	 * @return the value or the default value if no value was found.
-	 */
-	@SuppressWarnings("unchecked")
-	final public Map<String, String> getAttribute(String attributeName,
-			Map<String, String> defaultValue) {
-		Object obj = options.get(attributeName);
-		if (obj instanceof Map<?, ?>) {
-			return (Map<String, String>) obj;
-		} else {
-			return defaultValue;
-		}
-	}
-
-	/**
-	 * Returns the string-valued attribute with the given name. Returns the
-	 * given default value if the attribute is undefined.
-	 * 
-	 * @param attributeName
-	 *            the name of the attribute
-	 * @param defaultValue
-	 *            the value to use if no value is found
-	 * @return the value or the default value if no value was found.
-	 */
-	final public String getAttribute(String attributeName, String defaultValue) {
-		Object obj = options.get(attributeName);
-		if (obj instanceof String) {
-			return (String) obj;
-		} else {
-			return defaultValue;
-		}
-	}
-
-	/**
-	 * Returns a map containing the backend attributes in this launch
-	 * configuration. Returns an empty map if the backend configuration has no
-	 * attributes.
-	 * 
-	 * @return a map of attribute keys and values.
-	 */
-	final public Map<String, Object> getAttributes() {
-		return options;
-	}
-
-	/**
-	 * Returns true if this process has been canceled.
-	 * 
-	 * @return true if this process has been canceled
-	 */
-	protected boolean isCanceled() {
-		if (monitor == null) {
-			return false;
-		} else {
-			return monitor.isCanceled();
-		}
-	}
-
-	/**
-	 * Parses the given file list and returns a list of actors.
-	 * 
-	 * @param files
-	 *            a list of JSON files
-	 * @return a list of actors
-	 */
-	final public List<Actor> parseActors(List<IFile> files) {
-		// NOTE: the actors are parsed but are NOT put in the actor pool because
-		// they may be transformed and not have the same properties (in
-		// particular concerning types), and instantiation then complains.
-
-		OrccLogger.traceln("Parsing " + files.size() + " actors...");
-		ResourceSet set = new ResourceSetImpl();
-		List<Actor> actors = new ArrayList<Actor>();
-		for (IFile file : files) {
-			Resource resource = set.getResource(URI.createPlatformResourceURI(
-					file.getFullPath().toString(), true), true);
-			EObject eObject = resource.getContents().get(0);
-			if (eObject instanceof Actor) {
-				// do not add units
-				actors.add((Actor) eObject);
-			}
-
-			if (isCanceled()) {
-				break;
-			}
-		}
-
-		return actors;
-	}
-
-	/**
-	 * Prints the given actor. Should be overridden by back-ends that wish to
-	 * print the given actor.
-	 * 
-	 * @param actor
-	 *            the actor
-	 * @return <code>true</code> if the actor was cached
-	 */
-	protected boolean printActor(Actor actor) {
-		return false;
-	}
-
-	/**
-	 * Print instances of the given network.
-	 * 
-	 * @param actors
-	 *            a list of actors
-	 */
-	final public void printActors(List<Actor> actors) {
-		OrccLogger.traceln("Printing actors...");
-		long t0 = System.currentTimeMillis();
-
-		int numCached = 0;
-		for (final Actor actor : actors) {
-			if (printActor(actor)) {
-				++numCached;
-			}
-		}
-
-		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-				+ "s");
-
-		if (numCached > 0) {
-			OrccLogger.noticeln(numCached + " actors were not regenerated "
-					+ "because they were already up-to-date.");
-		}
-	}
-
-	/**
-	 * Print entities of the given network.
-	 * 
-	 * @param entities
-	 *            a list of entities
-	 */
-	final public void printEntities(Network network) {
-		OrccLogger.traceln("Printing entities...");
-		long t0 = System.currentTimeMillis();
-
-		int numCached = 0;
-		for (final Vertex vertex : network.getChildren()) {
-
-			if (printEntity(vertex)) {
-				++numCached;
-			}
-		}
-
-		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-				+ "s");
-
-		if (numCached > 0) {
-			OrccLogger.noticeln(numCached + " entities were not regenerated "
-					+ "because they were already up-to-date.");
-		}
-	}
-
-	/**
-	 * Prints the given entity. Should be overridden by back-ends that wish to
-	 * print the given entity.
-	 * 
-	 * @param entity
-	 *            the entity
-	 * @return <code>true</code> if the actor was cached
-	 */
-	protected boolean printEntity(Vertex entity) {
-		return false;
-	}
-
-	/**
-	 * Prints the given instance. Should be overridden by back-ends that wish to
-	 * print the given instance.
-	 * 
-	 * @param instance
-	 *            the instance
-	 * @return <code>true</code> if the actor was cached
-	 */
-	protected boolean printInstance(Instance instance) {
-		return false;
-	}
-
-	/**
-	 * Print instances of the given network.
-	 * 
-	 * @param network
-	 *            a network
-	 */
-	final public void printInstances(Network network) {
-		OrccLogger.traceln("Printing instances...");
-		long t0 = System.currentTimeMillis();
-
-		int numCached = 0;
-
-		// creates a list of tasks: each task will print an instance when called
-		for (Vertex vertex : network.getChildren()) {
-			final Instance instance = vertex.getAdapter(Instance.class);
-
-			if (instance != null) {
-				if (printInstance(instance)) {
-					++numCached;
-				}
-			}
-		}
-
-		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-				+ "s");
-
-		if (numCached > 0) {
-			OrccLogger.noticeln(numCached + " instances were not regenerated "
-					+ "because they were already up-to-date.");
-		}
-	}
-
-	private void printUsage(IApplicationContext context, Options options,
-			String parserMsg) {
-
-		String footer = "";
-		if (parserMsg != null && !parserMsg.isEmpty()) {
-			footer = "\nMessage of the command line parser :\n" + parserMsg;
-		}
-
-		HelpFormatter helpFormatter = new HelpFormatter();
-		helpFormatter.setWidth(80);
-		helpFormatter.printHelp(getClass().getSimpleName()
-				+ " [options] <network.qualified.name>", "Valid options are :",
-				options, footer);
-	}
-
-	@Override
-	public void setOptions(Map<String, Object> options) {
-		this.options = options;
-
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		project = root.getProject(getAttribute(PROJECT, ""));
-
-		vtlFolders = OrccUtil.getOutputFolders(project);
-
-		inputFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
-
-		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-		debug = getAttribute(DEBUG_MODE, true);
-		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-
-		classify = getAttribute(CLASSIFY, false);
-		// Merging transformations need the results of classification
-		mergeActions = classify && getAttribute(MERGE_ACTIONS, false);
-		mergeActors = classify && getAttribute(MERGE_ACTORS, false);
-
-		convertMulti2Mono = getAttribute(CONVERT_MULTI2MONO, false);
-
-		String outputFolder = getAttribute(OUTPUT_FOLDER, "");
-		if (outputFolder.isEmpty()) {
-			File tempOrccDir = new File(System.getProperty("java.io.tmpdir"),
-					"orcc");
-			tempOrccDir.mkdir();
-			outputFolder = tempOrccDir.getAbsolutePath();
-		} else if (outputFolder.startsWith("~")) {
-			outputFolder = outputFolder.replace("~",
-					System.getProperty("user.home"));
-		}
-
-		if (debug) {
-			OrccLogger.setLevel(Level.FINEST);
-			OrccLogger.debugln("Debug mode is enabled");
-		}
-
-		// set output path
-		path = new File(outputFolder).getAbsolutePath();
-
-		doInitializeOptions();
-	}
-
-	@Override
-	public void setProgressMonitor(IProgressMonitor monitor) {
-		this.monitor = monitor;
-	}
-
-	@Override
-	public Object start(IApplicationContext context) throws Exception {
-
-		Options options = new Options();
-		Option opt;
-
-		// Required command line arguments
-		opt = new Option("p", "project", true, "Project name");
-		opt.setRequired(true);
-		options.addOption(opt);
-
-		opt = new Option("o", "output", true, "Output folder");
-		opt.setRequired(true);
-		options.addOption(opt);
-
-		// Optional command line arguments
-		options.addOption("d", "debug", false, "Enable debug mode");
-		options.addOption("f", "fifo-size", true,
-				"Default size of the FIFO channels");
-
-		options.addOption("c", "classify", false, "Classify the given network");
-		options.addOption("smt", "smt-solver", true,
-				"Set path to the binary of the SMT solver (Z3 v4.12+)");
-		options.addOption("m", "merge", true, "Merge (1) static actions "
-				+ "(2) static actors (3) both");
-		options.addOption("s", "advanced-scheduler", false, "(C) Use the "
-				+ "data-driven/demand-driven strategy for the actor-scheduler");
-		options.addOption("m2m", "multi2mono", false,
-				"Transform high-level actors with multi-tokens actions"
-						+ " in low-level actors with mono-token actions");
-
-		// FIXME: choose independently the transformation to apply
-		options.addOption("t", "transfo_add", false,
-				"Execute additional transformations before generate code");
-
-		try {
-			CommandLineParser parser = new PosixParser();
-
-			// parse the command line arguments
-			CommandLine line = parser.parse(options, (String[]) context
-					.getArguments().get(IApplicationContext.APPLICATION_ARGS));
-
-			if (line.getArgs().length != 1) {
-				throw new ParseException(
-						"Expected network name as last argument");
-			}
-			String networkName = line.getArgs()[0];
-
-			Map<String, Object> optionMap = new HashMap<String, Object>();
-			optionMap.put(COMPILE_XDF, true);
-			optionMap.put(PROJECT, line.getOptionValue('p'));
-			optionMap.put(XDF_FILE, networkName);
-			optionMap.put(OUTPUT_FOLDER, line.getOptionValue('o'));
-
-			optionMap.put(DEBUG_MODE, line.hasOption('d'));
-			if (line.hasOption('f')) {
-				String fifo_size = line.getOptionValue('f');
-				try {
-					int size = Integer.parseInt(fifo_size);
-					optionMap.put(FIFO_SIZE, size);
-				} catch (NumberFormatException e) {
-					throw new ParseException("Expected integer as FIFO size");
-				}
-			}
-
-			optionMap.put(CLASSIFY, line.hasOption('c'));
-
-			if (line.hasOption("smt")) {
-				String smt_path = line.getOptionValue("smt");
-				String smt_option = new String();
-
-				if (smt_path.contains("z3")) {
-					if (Platform.OS_WIN32.equals(Platform.getOS())) {
-						smt_option = "/smt2";
-					} else {
-						smt_option = "-smt2";
-					}
-					getDefault().setPreference(P_SOLVER, smt_path);
-					getDefault().setPreference(P_SOLVER_OPTIONS, smt_option);
-				} else {
-					OrccLogger.warnln("Unknown SMT solver.");
-				}
-			}
-
-			if (line.hasOption('m')) {
-				String type = line.getOptionValue('m');
-				optionMap.put(MERGE_ACTIONS,
-						type.equals("1") || type.equals("3"));
-				optionMap.put(MERGE_ACTORS,
-						type.equals("2") || type.equals("3"));
-			}
-
-			optionMap.put(NEW_SCHEDULER, line.hasOption('s'));
-			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
-			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
-
-			// Set backend name in options map
-			String backend = this.getClass().getName();
-			IConfigurationElement[] elements = Platform.getExtensionRegistry()
-					.getConfigurationElementsFor(
-							Activator.PLUGIN_ID + ".backends");
-			for (IConfigurationElement element : elements) {
-				if (backend.equals(element.getAttribute("class"))) {
-					backend = element.getAttribute("name");
-					break;
-				}
-			}
-			optionMap.put(BACKEND, backend);
-
-			try {
-				setOptions(optionMap);
-
-				compile();
-				return IApplication.EXIT_OK;
-			} catch (OrccRuntimeException e) {
-
-				if (e.getMessage() != null && !e.getMessage().isEmpty()) {
-					OrccLogger.severeln(e.getMessage());
-				}
-				OrccLogger.severeln(backend
-						+ " backend could not generate code (" + e.getCause()
-						+ ")");
-
-			} catch (Exception e) {
-
-				if (e.getMessage() != null && !e.getMessage().isEmpty()) {
-					OrccLogger.severeln(e.getMessage());
-				}
-				OrccLogger.severeln(backend
-						+ " backend could not generate code (" + e.getCause()
-						+ ")");
-
-				e.printStackTrace();
-			}
-			return IApplication.EXIT_RELAUNCH;
-
-		} catch (UnrecognizedOptionException uoe) {
-			printUsage(context, options, uoe.getLocalizedMessage());
-		} catch (ParseException exp) {
-			printUsage(context, options, exp.getLocalizedMessage());
-		}
-		return IApplication.EXIT_RELAUNCH;
-	}
-
-	@Override
-	public void stop() {
-
-	}
-
-	/**
-	 * Transforms instances of the given network.
-	 * 
-	 * @param actors
-	 *            a list of actors
-	 */
-	final public void transformActors(List<Actor> actors) {
-		OrccLogger.traceln("Transforming actors...");
-		for (Actor actor : actors) {
-			doTransformActor(actor);
-		}
-	}
-
-	/**
-	 * Check if the given network does not contain any ports. In the contrary
-	 * case, an RuntimeException is thrown.
-	 * 
-	 * @param network
-	 *            the given network
-	 */
-	protected void checkTopLevel(Network network) {
-		if (!network.getInputs().isEmpty() || !network.getOutputs().isEmpty()) {
-			// FIXME: A warning could be sufficient if the generation of
-			// sub-network is supported
-			throw new OrccRuntimeException(
-					"The given network contains port(s): Be sure to run the code "
-							+ "generation on the top-level network.");
-		}
-	}
+ protected boolean debug;
+ /**
+  * Fifo size used in backend.
+  */
+ protected int fifoSize;
+
+ private IFile inputFile;
+ protected Map<String, String> mapping;
+
+ /**
+  * List of transformations to apply on each network
+  */
+ protected List<DfSwitch<?>> networkTransfos;
+ /**
+  * List of transformations to apply on each actor
+  */
+ protected List<DfSwitch<?>> actorTransfos;
+
+ protected boolean classify;
+ protected boolean mergeActions;
+ protected boolean mergeActors;
+ protected boolean convertMulti2Mono;
+
+ /**
+  * the progress monitor
+  */
+ private IProgressMonitor monitor;
+
+ /**
+  * Options of backend execution. Its content can be manipulated with
+  * {@link #getAttribute} and {@link #setAttribute}
+  */
+ protected Map<String, Object> options;
+
+ /**
+  * Path where output files will be written.
+  */
+ protected String path;
+
+ /**
+  * Represents the project where call application to build is located
+  */
+ protected IProject project;
+
+ /**
+  * Path of the folder that contains VTL under IR form.
+  */
+ private List<IFolder> vtlFolders;
+
+ /**
+  * Initialize some members
+  */
+ public AbstractBackend() {
+  actorTransfos = new ArrayList<DfSwitch<?>>();
+  networkTransfos = new ArrayList<DfSwitch<?>>();
+ }
+
+ @Override
+ public void compile() {
+
+  boolean compilexdf = getAttribute(COMPILE_XDF, false);
+
+  String orccVersion = "<unknown>";
+  Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
+  if (bundle != null) {
+   orccVersion = bundle.getHeaders().get("Bundle-Version");
+  }
+
+  String backendName = getAttribute(BACKEND, "<unknown>");
+
+  OrccLogger.traceln("*********************************************"
+    + "************************************");
+  OrccLogger.traceln("* Orcc version : " + orccVersion);
+  OrccLogger.traceln("* Backend : " + backendName);
+  OrccLogger.traceln("* Project : " + project.getName());
+  if (compilexdf) {
+   String topNetwork = getAttribute(XDF_FILE, "<unknown>");
+   OrccLogger.traceln("* Network : " + topNetwork);
+  }
+  OrccLogger.traceln("* Output folder : " + path);
+  OrccLogger.traceln("*********************************************"
+    + "************************************");
+
+  exportRuntimeLibrary();
+  compileVTL();
+
+  if (compilexdf) {
+   compileXDF();
+  }
+
+  OrccLogger.traceln("Orcc backend done.");
+ }
+
+ final private void compileVTL() {
+  // lists actors
+  OrccLogger.traceln("Lists actors...");
+  List<IFile> vtlFiles = OrccUtil.getAllFiles("ir", vtlFolders);
+  doVtlCodeGeneration(vtlFiles);
+ }
+
+ final private void compileXDF() {
+  // set FIFO size
+  ResourceSet set = new ResourceSetImpl();
+
+  // parses top network
+  Network network = EcoreHelper.getEObject(set, inputFile);
+  if (isCanceled()) {
+   return;
+  }
+  new NetworkValidator().doSwitch(network);
+
+  // because the UnitImporter will load additional resources, we filter
+  // only actors
+  List<Actor> actors = new ArrayList<Actor>();
+  for (Resource resource : set.getResources()) {
+   EObject eObject = resource.getContents().get(0);
+   if (eObject instanceof Actor) {
+    actors.add((Actor) eObject);
+   }
+  }
+
+  if (isCanceled()) {
+   return;
+  }
+  doXdfCodeGeneration(network);
+ }
+
+ /**
+  * Copy <i>source</i> file at <i>destination</i> path. If <i>destination</i>
+  * parents folder does not exists, they will be created
+  * 
+  * @param source
+  *            Resource file path starting with '/'. Must be an existing path
+  *            relative to classpath (JAR file root or project classpath)
+  * @param destination
+  *            Path of the target file
+  * @return <code>true</code> if the file has been successfully copied
+  */
+ protected boolean copyFileToFilesystem(final String source,
+   final String dest) {
+  int bufferSize = 512;
+
+  assert source != null;
+  assert dest != null;
+  assert source.startsWith("/");
+
+  File fileOut = new File(dest);
+  if (!fileOut.exists()) {
+   try {
+    File parentDir = fileOut.getParentFile();
+    if (parentDir != null) {
+     parentDir.mkdirs();
+    }
+    fileOut.createNewFile();
+   } catch (IOException e) {
+    OrccLogger.warnln("Unable to write " + dest + " file");
+    return false;
+   }
+  }
+
+  if (!fileOut.isFile()) {
+   OrccLogger.warnln(dest + " is not a file path");
+   fileOut.delete();
+   return false;
+  }
+
+  InputStream is = this.getClass().getResourceAsStream(source);
+  if (is == null) {
+   OrccLogger.warnln("Unable to find " + source);
+   return false;
+  }
+  DataInputStream dis;
+  dis = new DataInputStream(is);
+
+  FileOutputStream out;
+  try {
+   out = new FileOutputStream(fileOut);
+  } catch (FileNotFoundException e1) {
+   OrccLogger.warnln("File " + dest + " not found !");
+   return false;
+  }
+
+  try {
+   byte[] b = new byte[bufferSize];
+   int i = is.read(b);
+   while (i != -1) {
+    out.write(b, 0, i);
+    i = is.read(b);
+   }
+   dis.close();
+   out.close();
+  } catch (IOException e) {
+   OrccLogger.warnln("IOError : " + e.getMessage());
+   return false;
+  }
+  return true;
+ }
+
+ /**
+  * Copy <i>source</i> folder and all its content under <i>destination</i>.
+  * Final '/' is not required for both parameters. If <i>destination</i> does
+  * not exists, it will be created
+  * 
+  * @param source
+  *            Resource folder path starting with '/'. Must be an existing
+  *            path relative to classpath (JAR file root or project
+  *            classpath)
+  * @param destination
+  *            Filesystem folder path
+  * @return <code>true</code> if the folder has been successfully copied
+  */
+ protected boolean copyFolderToFileSystem(final String source,
+   final String destination) {
+  assert source != null;
+  assert destination != null;
+  assert source.startsWith("/");
+
+  File outputDir = new File(destination);
+
+  if (!outputDir.exists()) {
+   if (!outputDir.mkdirs()) {
+    OrccLogger.warnln("Unable to create " + outputDir + " folder");
+    return false;
+   }
+  }
+
+  if (!outputDir.isDirectory()) {
+   OrccLogger.warnln(outputDir
+     + " does not exists or is not a directory.");
+   return false;
+  }
+
+  String inputDir;
+  // Remove last '/' character (if needed)
+  if (source.charAt(source.length() - 1) == '/') {
+   inputDir = source.substring(0, source.length() - 1);
+  } else {
+   inputDir = source;
+  }
+
+  try {
+   URL toto = this.getClass().getResource(inputDir);
+   URL inputURL = FileLocator.resolve(toto);
+   String inputPath = inputURL.toString();
+
+   boolean result = true;
+
+   if (inputPath.startsWith("jar:file:")) {
+    // Backend running from jar file
+    inputPath = inputPath.substring(9, inputPath.indexOf('!'));
+
+    JarFile jar = new JarFile(inputPath);
+    try {
+     Enumeration<JarEntry> jarEntries = jar.entries();
+     if (jarEntries == null) {
+      OrccLogger.warnln("Unable to list content from "
+        + jar.getName() + " file.");
+      return false;
+     }
+
+     // "source" value without starting '/' char
+     String sourceMinusSlash = source.substring(1);
+
+     JarEntry elt;
+     while (jarEntries.hasMoreElements()) {
+
+      elt = jarEntries.nextElement();
+
+      // Only deal with sub-files of 'source' path
+      if (elt.isDirectory()
+        || !elt.getName().startsWith(sourceMinusSlash)) {
+       continue;
+      }
+
+      String newInPath = "/" + elt.getName();
+      String newOutPath = outputDir
+        + File.separator
+        + elt.getName().substring(
+          sourceMinusSlash.length());
+      result &= copyFileToFilesystem(newInPath, newOutPath);
+     }
+     return result;
+    } finally {
+     jar.close();
+    }
+   } else {
+    // Backend running from filesystem
+    File[] listDir = new File(inputPath.substring(5)).listFiles();
+
+    for (File elt : listDir) {
+     String newInPath = inputDir + File.separator
+       + elt.getName();
+
+     String newOutPath = outputDir + File.separator
+       + elt.getName();
+
+     if (elt.isDirectory()) {
+      result &= copyFolderToFileSystem(newInPath, newOutPath);
+     } else {
+      result &= copyFileToFilesystem(newInPath, newOutPath);
+     }
+    }
+    return result;
+   }
+  } catch (IOException e) {
+   OrccLogger.warnln("IOError" + e.getMessage());
+   return false;
+  }
+ }
+
+ /**
+  * Called by {@link #setOptions(Map)} when options are initialized. This
+  * method may be implemented by backend to set member variables specific to
+  * it.
+  */
+ abstract protected void doInitializeOptions();
+
+ /**
+  * Transforms the given actor.
+  * 
+  * @param actor
+  *            the actor
+  */
+ abstract protected void doTransformActor(Actor actor);
+
+ /**
+  * This method must be implemented by subclasses to do the actual code
+  * generation for VTL.
+  * 
+  * @param files
+  *            a list of IR files
+  */
+ abstract protected void doVtlCodeGeneration(List<IFile> files);
+
+ /**
+  * This method must be implemented by subclasses to do the actual code
+  * generation for the network or its instances or both.
+  * 
+  * @param network
+  *            a network
+  */
+ abstract protected void doXdfCodeGeneration(Network network);
+
+ /**
+  * Export runtime library used by source produced. Should be overridden by
+  * back-ends that produce code source which need third party libraries at
+  * runtime.
+  * 
+  * @return <code>true</code> if the libraries were correctly exported
+  */
+ @Override
+ public boolean exportRuntimeLibrary() {
+  return false;
+ }
+
+ /**
+  * Returns the boolean-valued attribute with the given name. Returns the
+  * given default value if the attribute is undefined.
+  * 
+  * @param attributeName
+  *            the name of the attribute
+  * @param defaultValue
+  *            the value to use if no value is found
+  * @return the value or the default value if no value was found.
+  */
+ final public boolean getAttribute(String attributeName, boolean defaultValue) {
+  Object obj = options.get(attributeName);
+  if (obj instanceof Boolean) {
+   return (Boolean) obj;
+  } else {
+   return defaultValue;
+  }
+ }
+
+ /**
+  * Returns the integer-valued attribute with the given name. Returns the
+  * given default value if the attribute is undefined.
+  * 
+  * @param attributeName
+  *            the name of the attribute
+  * @param defaultValue
+  *            the value to use if no value is found
+  * @return the value or the default value if no value was found.
+  */
+ final public int getAttribute(String attributeName, int defaultValue) {
+  Object obj = options.get(attributeName);
+  if (obj instanceof Integer) {
+   return (Integer) obj;
+  } else {
+   return defaultValue;
+  }
+ }
+
+ /**
+  * Returns the map-valued attribute with the given name. Returns the given
+  * default value if the attribute is undefined.
+  * 
+  * @param attributeName
+  *            the name of the attribute
+  * @param defaultValue
+  *            the value to use if no value is found
+  * @return the value or the default value if no value was found.
+  */
+ @SuppressWarnings("unchecked")
+ final public Map<String, String> getAttribute(String attributeName,
+   Map<String, String> defaultValue) {
+  Object obj = options.get(attributeName);
+  if (obj instanceof Map<?, ?>) {
+   return (Map<String, String>) obj;
+  } else {
+   return defaultValue;
+  }
+ }
+
+ /**
+  * Returns the string-valued attribute with the given name. Returns the
+  * given default value if the attribute is undefined.
+  * 
+  * @param attributeName
+  *            the name of the attribute
+  * @param defaultValue
+  *            the value to use if no value is found
+  * @return the value or the default value if no value was found.
+  */
+ final public String getAttribute(String attributeName, String defaultValue) {
+  Object obj = options.get(attributeName);
+  if (obj instanceof String) {
+   return (String) obj;
+  } else {
+   return defaultValue;
+  }
+ }
+
+ /**
+  * Returns a map containing the backend attributes in this launch
+  * configuration. Returns an empty map if the backend configuration has no
+  * attributes.
+  * 
+  * @return a map of attribute keys and values.
+  */
+ final public Map<String, Object> getAttributes() {
+  return options;
+ }
+
+ /**
+  * Returns true if this process has been canceled.
+  * 
+  * @return true if this process has been canceled
+  */
+ protected boolean isCanceled() {
+  if (monitor == null) {
+   return false;
+  } else {
+   return monitor.isCanceled();
+  }
+ }
+
+ /**
+  * Parses the given file list and returns a list of actors.
+  * 
+  * @param files
+  *            a list of JSON files
+  * @return a list of actors
+  */
+ final public List<Actor> parseActors(List<IFile> files) {
+  // NOTE: the actors are parsed but are NOT put in the actor pool because
+  // they may be transformed and not have the same properties (in
+  // particular concerning types), and instantiation then complains.
+
+  OrccLogger.traceln("Parsing " + files.size() + " actors...");
+  ResourceSet set = new ResourceSetImpl();
+  List<Actor> actors = new ArrayList<Actor>();
+  for (IFile file : files) {
+   Resource resource = set.getResource(URI.createPlatformResourceURI(
+     file.getFullPath().toString(), true), true);
+   EObject eObject = resource.getContents().get(0);
+   if (eObject instanceof Actor) {
+    // do not add units
+    actors.add((Actor) eObject);
+   }
+
+   if (isCanceled()) {
+    break;
+   }
+  }
+
+  return actors;
+ }
+
+ /**
+  * Prints the given actor. Should be overridden by back-ends that wish to
+  * print the given actor.
+  * 
+  * @param actor
+  *            the actor
+  * @return <code>true</code> if the actor was cached
+  */
+ protected boolean printActor(Actor actor) {
+  return false;
+ }
+
+ /**
+  * Print instances of the given network.
+  * 
+  * @param actors
+  *            a list of actors
+  */
+ final public void printActors(List<Actor> actors) {
+  OrccLogger.traceln("Printing actors...");
+  long t0 = System.currentTimeMillis();
+
+  int numCached = 0;
+  for (final Actor actor : actors) {
+   if (printActor(actor)) {
+    ++numCached;
+   }
+  }
+
+  long t1 = System.currentTimeMillis();
+  OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+    + "s");
+
+  if (numCached > 0) {
+   OrccLogger.noticeln(numCached + " actors were not regenerated "
+     + "because they were already up-to-date.");
+  }
+ }
+
+ /**
+  * Print entities of the given network.
+  * 
+  * @param entities
+  *            a list of entities
+  */
+ final public void printEntities(Network network) {
+  OrccLogger.traceln("Printing entities...");
+  long t0 = System.currentTimeMillis();
+
+  int numCached = 0;
+  for (final Vertex vertex : network.getChildren()) {
+
+   if (printEntity(vertex)) {
+    ++numCached;
+   }
+  }
+
+  long t1 = System.currentTimeMillis();
+  OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+    + "s");
+
+  if (numCached > 0) {
+   OrccLogger.noticeln(numCached + " entities were not regenerated "
+     + "because they were already up-to-date.");
+  }
+ }
+
+ /**
+  * Prints the given entity. Should be overridden by back-ends that wish to
+  * print the given entity.
+  * 
+  * @param entity
+  *            the entity
+  * @return <code>true</code> if the actor was cached
+  */
+ protected boolean printEntity(Vertex entity) {
+  return false;
+ }
+
+ /**
+  * Prints the given instance. Should be overridden by back-ends that wish to
+  * print the given instance.
+  * 
+  * @param instance
+  *            the instance
+  * @return <code>true</code> if the actor was cached
+  */
+ protected boolean printInstance(Instance instance) {
+  return false;
+ }
+
+ /**
+  * Print instances of the given network.
+  * 
+  * @param network
+  *            a network
+  */
+ final public void printInstances(Network network) {
+  OrccLogger.traceln("Printing instances...");
+  long t0 = System.currentTimeMillis();
+
+  int numCached = 0;
+
+  // creates a list of tasks: each task will print an instance when called
+  for (Vertex vertex : network.getChildren()) {
+   final Instance instance = vertex.getAdapter(Instance.class);
+
+   if (instance != null) {
+    if (printInstance(instance)) {
+     ++numCached;
+    }
+   }
+  }
+
+  long t1 = System.currentTimeMillis();
+  OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+    + "s");
+
+  if (numCached > 0) {
+   OrccLogger.noticeln(numCached + " instances were not regenerated "
+     + "because they were already up-to-date.");
+  }
+ }
+
+ private void printUsage(IApplicationContext context, Options options,
+   String parserMsg) {
+
+  String footer = "";
+  if (parserMsg != null && !parserMsg.isEmpty()) {
+   footer = "\nMessage of the command line parser :\n" + parserMsg;
+  }
+
+  HelpFormatter helpFormatter = new HelpFormatter();
+  helpFormatter.setWidth(80);
+  helpFormatter.printHelp(getClass().getSimpleName()
+    + " [options] <network.qualified.name>", "Valid options are :",
+    options, footer);
+ }
+
+ @Override
+ public void setOptions(Map<String, Object> options) {
+  this.options = options;
+
+  IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+  project = root.getProject(getAttribute(PROJECT, ""));
+
+  vtlFolders = OrccUtil.getOutputFolders(project);
+
+  inputFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
+
+  fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+  debug = getAttribute(DEBUG_MODE, true);
+  mapping = getAttribute(MAPPING, new HashMap<String, String>());
+
+  classify = getAttribute(CLASSIFY, false);
+  // Merging transformations need the results of classification
+  mergeActions = classify && getAttribute(MERGE_ACTIONS, false);
+  mergeActors = classify && getAttribute(MERGE_ACTORS, false);
+
+  convertMulti2Mono = getAttribute(CONVERT_MULTI2MONO, false);
+
+  String outputFolder = getAttribute(OUTPUT_FOLDER, "");
+  if (outputFolder.isEmpty()) {
+   File tempOrccDir = new File(System.getProperty("java.io.tmpdir"),
+     "orcc");
+   tempOrccDir.mkdir();
+   outputFolder = tempOrccDir.getAbsolutePath();
+  } else if (outputFolder.startsWith("~")) {
+   outputFolder = outputFolder.replace("~",
+     System.getProperty("user.home"));
+  }
+
+  if (debug) {
+   OrccLogger.setLevel(Level.FINEST);
+   OrccLogger.debugln("Debug mode is enabled");
+  }
+
+  // set output path
+  path = new File(outputFolder).getAbsolutePath();
+
+  doInitializeOptions();
+ }
+
+ @Override
+ public void setProgressMonitor(IProgressMonitor monitor) {
+  this.monitor = monitor;
+ }
+
+ @Override
+ public Object start(IApplicationContext context) throws Exception {
+
+  Options options = new Options();
+  Option opt;
+
+  // Required command line arguments
+  opt = new Option("p", "project", true, "Project name");
+  opt.setRequired(true);
+  options.addOption(opt);
+
+  opt = new Option("o", "output", true, "Output folder");
+  opt.setRequired(true);
+  options.addOption(opt);
+
+  // Optional command line arguments
+  options.addOption("d", "debug", false, "Enable debug mode");
+  options.addOption("f", "fifo-size", true,
+    "Default size of the FIFO channels");
+
+  options.addOption("c", "classify", false, "Classify the given network");
+  options.addOption("smt", "smt-solver", true,
+    "Set path to the binary of the SMT solver (Z3 v4.12+)");
+  options.addOption("m", "merge", true, "Merge (1) static actions "
+    + "(2) static actors (3) both");
+  options.addOption("s", "advanced-scheduler", false, "(C) Use the "
+    + "data-driven/demand-driven strategy for the actor-scheduler");
+  options.addOption("m2m", "multi2mono", false,
+    "Transform high-level actors with multi-tokens actions"
+      + " in low-level actors with mono-token actions");
+
+  // FIXME: choose independently the transformation to apply
+  options.addOption("t", "transfo_add", false,
+    "Execute additional transformations before generate code");
+
+  try {
+   CommandLineParser parser = new PosixParser();
+
+   // parse the command line arguments
+   CommandLine line = parser.parse(options, (String[]) context
+     .getArguments().get(IApplicationContext.APPLICATION_ARGS));
+
+   if (line.getArgs().length != 1) {
+    throw new ParseException(
+      "Expected network name as last argument");
+   }
+   String networkName = line.getArgs()[0];
+
+   Map<String, Object> optionMap = new HashMap<String, Object>();
+   optionMap.put(COMPILE_XDF, true);
+   optionMap.put(PROJECT, line.getOptionValue('p'));
+   optionMap.put(XDF_FILE, networkName);
+   optionMap.put(OUTPUT_FOLDER, line.getOptionValue('o'));
+
+   optionMap.put(DEBUG_MODE, line.hasOption('d'));
+   if (line.hasOption('f')) {
+    String fifo_size = line.getOptionValue('f');
+    try {
+     int size = Integer.parseInt(fifo_size);
+     optionMap.put(FIFO_SIZE, size);
+    } catch (NumberFormatException e) {
+     throw new ParseException("Expected integer as FIFO size");
+    }
+   }
+
+   optionMap.put(CLASSIFY, line.hasOption('c'));
+
+   if (line.hasOption("smt")) {
+    String smt_path = line.getOptionValue("smt");
+    String smt_option = new String();
+
+    if (smt_path.contains("z3")) {
+     if (Platform.OS_WIN32.equals(Platform.getOS())) {
+      smt_option = "/smt2";
+     } else {
+      smt_option = "-smt2";
+     }
+     getDefault().setPreference(P_SOLVER, smt_path);
+     getDefault().setPreference(P_SOLVER_OPTIONS, smt_option);
+    } else {
+     OrccLogger.warnln("Unknown SMT solver.");
+    }
+   }
+
+   if (line.hasOption('m')) {
+    String type = line.getOptionValue('m');
+    optionMap.put(MERGE_ACTIONS,
+      type.equals("1") || type.equals("3"));
+    optionMap.put(MERGE_ACTORS,
+      type.equals("2") || type.equals("3"));
+   }
+
+   optionMap.put(NEW_SCHEDULER, line.hasOption('s'));
+   optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
+   optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
+
+   // Set backend name in options map
+   String backend = this.getClass().getName();
+   IConfigurationElement[] elements = Platform.getExtensionRegistry()
+     .getConfigurationElementsFor(
+       Activator.PLUGIN_ID + ".backends");
+   for (IConfigurationElement element : elements) {
+    if (backend.equals(element.getAttribute("class"))) {
+     backend = element.getAttribute("name");
+     break;
+    }
+   }
+   optionMap.put(BACKEND, backend);
+
+   try {
+    setOptions(optionMap);
+
+    compile();
+    return IApplication.EXIT_OK;
+   } catch (OrccRuntimeException e) {
+
+    if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+     OrccLogger.severeln(e.getMessage());
+    }
+    OrccLogger.severeln(backend
+      + " backend could not generate code (" + e.getCause()
+      + ")");
+
+   } catch (Exception e) {
+
+    if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+     OrccLogger.severeln(e.getMessage());
+    }
+    OrccLogger.severeln(backend
+      + " backend could not generate code (" + e.getCause()
+      + ")");
+
+    e.printStackTrace();
+   }
+   return IApplication.EXIT_RELAUNCH;
+
+  } catch (UnrecognizedOptionException uoe) {
+   printUsage(context, options, uoe.getLocalizedMessage());
+  } catch (ParseException exp) {
+   printUsage(context, options, exp.getLocalizedMessage());
+  }
+  return IApplication.EXIT_RELAUNCH;
+ }
+
+ @Override
+ public void stop() {
+
+ }
+
+ /**
+  * Transforms instances of the given network.
+  * 
+  * @param actors
+  *            a list of actors
+  */
+ final public void transformActors(List<Actor> actors) {
+  OrccLogger.traceln("Transforming actors...");
+  for (Actor actor : actors) {
+   doTransformActor(actor);
+  }
+ }
+
+ /**
+  * Check if the given network does not contain any ports. In the contrary
+  * case, an RuntimeException is thrown.
+  * 
+  * @param network
+  *            the given network
+  */
+ protected void checkTopLevel(Network network) {
+  if (!network.getInputs().isEmpty() || !network.getOutputs().isEmpty()) {
+   // FIXME: A warning could be sufficient if the generation of
+   // sub-network is supported
+   throw new OrccRuntimeException(
+     "The given network contains port(s): Be sure to run the code "
+       + "generation on the top-level network.");
+  }
+ }
 }

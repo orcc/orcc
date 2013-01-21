@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.c.InstancePrinter;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.TypeResizer;
@@ -99,15 +98,11 @@ public class COMPABackend extends CBackend {
 		if (mergeActions) {
 			new ActionMerger().doSwitch(actor);
 		}
-		if (convertMulti2Mono) {
-			new Multi2MonoToken().doSwitch(actor);
-		}
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
-		transformations.add(new Multi2MonoToken());
 		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 
 		for (DfSwitch<?> transformation : transformations) {

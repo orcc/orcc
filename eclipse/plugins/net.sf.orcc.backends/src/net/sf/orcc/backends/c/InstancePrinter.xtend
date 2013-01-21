@@ -78,7 +78,7 @@ class InstancePrinter extends CTemplate {
 	var boolean enableTrace = false
 	var int threadsNb = 1;
 	
-	val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
+	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 	
 	protected var Action currentAction;

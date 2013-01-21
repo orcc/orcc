@@ -32,7 +32,7 @@ import java.util.Map
 import net.sf.orcc.df.Network
 
 /**
- * Generate and print network source file for C backend.
+ * Generate and print network source file for COMPA backend.
  *  
  * @author Antoine Lorence
  * 
@@ -44,5 +44,32 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		
 		geneticAlgo = false
 	}
+
+	override protected printLauncher() '''
+		static void launcher() {
+			initialize_instances();
+			
+			// Call global scheduler
+			scheduler();
+		}
+	'''
+
+	override printScheduler() '''
+		void scheduler() {
+			int stop = 0;
+			while(!stop) {
+				«FOR instance : network.children.actorInstances»
+					«instance.name»_scheduler();
+				«ENDFOR»
+			}
+		}
+	'''
+	
+	override protected printActorsSchedulers() '''
+		// Action schedulers
+		«FOR instance : network.children.actorInstances»
+			extern void «instance.name»_scheduler();
+		«ENDFOR»
+		'''
 
 }

@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 /**
- * Privide a c backend without dependencies on SDL and pthread libraries,
+ * Provide a c backend without dependencies (SDL, pthread, etc.),
  * to allow source code produced to be compiled on HW platforms.
  * 
  * @author Antoine Lorence
