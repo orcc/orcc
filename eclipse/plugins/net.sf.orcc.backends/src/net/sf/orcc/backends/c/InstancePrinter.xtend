@@ -79,7 +79,7 @@ class InstancePrinter extends CTemplate {
 	var int threadsNb = 1;
 	
 	val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
-	val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
+	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 	
 	protected var Action currentAction;
 	
@@ -298,6 +298,10 @@ class InstancePrinter extends CTemplate {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
+		«actorScheduler»
+	'''
+	
+	def protected actorScheduler() '''
 		«IF instance.actor.hasFsm»
 			«printFsm»
 		«ELSE»
@@ -334,13 +338,13 @@ class InstancePrinter extends CTemplate {
 	 *****************************************/
 	def protected printFsm() '''
 		«IF ! instance.actor.actionsOutsideFsm.empty»
-		void «instance.name»_outside_FSM_scheduler(struct schedinfo_s *si) {
-			int i = 0;
-			«instance.actor.actionsOutsideFsm.printActionLoop»
-		finished:
-			// no read_end/write_end here!
-			return;
-		}
+			void «instance.name»_outside_FSM_scheduler(struct schedinfo_s *si) {
+				int i = 0;
+				«instance.actor.actionsOutsideFsm.printActionLoop»
+			finished:
+				// no read_end/write_end here!
+				return;
+			}
 		«ENDIF»
 		
 		void «instance.name»_scheduler(struct schedinfo_s *si) {
@@ -365,7 +369,7 @@ class InstancePrinter extends CTemplate {
 		
 			// FSM transitions
 			«FOR state : instance.actor.fsm.states»
-		«state.printTransition»
+		«state.printStateLabel»
 			«ENDFOR»
 		finished:
 			«IF enableTrace»
@@ -380,7 +384,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def protected printTransition(State state) '''
+	def protected printStateLabel(State state) '''
 	l_«state.name»:
 		«IF ! instance.actor.actionsOutsideFsm.empty»
 			«instance.name»_outside_FSM_scheduler(si);
@@ -391,21 +395,32 @@ class InstancePrinter extends CTemplate {
 			wait_for_key();
 			exit(1);
 		«ELSE»
-			«schedulingState(state, state.outgoing.map[it as Transition])»
+			«state.printStateTransitions»
 		«ENDIF»
 	'''
 	
-	def protected schedulingState(State state, Iterable<Transition> transitions) '''
-		«IF ! transitions.empty»
-			«actionTestState(state, transitions)»
-		«ELSE»
+	def protected printStateTransitions(State state) '''
+		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
+			if («trans.action.inputPattern.checkInputPattern»isSchedulable_«trans.action.name»()) {
+				«IF trans.action.outputPattern != null»
+					«trans.action.outputPattern.printOutputPattern»
+						_FSM_state = my_state_«state.name»;
+						si->num_firings = i;
+						si->reason = full;
+						goto finished;
+					}
+				«ENDIF»
+				«trans.action.body.name»();
+				i++;
+				goto l_«trans.target.name»;
+			}«ENDFOR» else {
 			«transitionPattern.get(state).printTransitionPattern»
 			_FSM_state = my_state_«state.name»;
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
-	def private printTransitionPattern(Pattern pattern) '''
+	def protected printTransitionPattern(Pattern pattern) '''
 		«IF newSchedul»
 			«FOR port : pattern.ports»
 				«printTransitionPatternPort(port, pattern)»
@@ -425,26 +440,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def protected actionTestState(State srcState, Iterable<Transition> transitions) '''
-		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
-			«IF transitions.head.action.outputPattern != null»
-				«transitions.head.action.outputPattern.printOutputPattern»
-					_FSM_state = my_state_«srcState.name»;
-					si->num_firings = i;
-					si->reason = full;
-					goto finished;
-				}
-			«ENDIF»
-			«transitions.head.action.body.name»();
-			i++;
-			goto l_«transitions.head.target.name»;
-		} else {
-			«schedulingState(srcState, transitions.tail)»
-		}
-	'''
-
-	
-	def private printCallTokensFunctions() '''
+	def protected printCallTokensFunctions() '''
 		«FOR port : instance.actor.inputs»
 			read_«port.name»();
 		«ENDFOR»
@@ -507,12 +503,21 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	def protected printActions(Iterable<Action> actions) '''
-		«IF !actions.empty»
-			«actionTest(actions.head, actions.tail)»
-		«ELSE»
-			«printTransitionPattern(inputPattern)»
+		«FOR action : actions SEPARATOR " else "»
+			if («inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+				«IF action.outputPattern != null»
+					«action.outputPattern.printOutputPattern»
+						si->num_firings = i;
+						si->reason = full;
+						goto finished;
+					}
+				«ENDIF»
+				«action.body.name»();
+				i++;
+			}«ENDFOR» else {
+			«inputPattern.printTransitionPattern»
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
 	def protected actionTest(Action action, Iterable<Action> others) '''

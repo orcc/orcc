@@ -177,10 +177,7 @@ class NetworkPrinter extends CTemplate {
 		«FOR instance : network.children.actorInstances»
 			extern void «instance.name»_initialize(«instance.actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
 		«ENDFOR»
-		// Action schedulers		
-		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_scheduler(struct schedinfo_s *si);
-		«ENDFOR»
+		«printActorsSchedulers»
 		
 		/////////////////////////////////////////////////
 		// Declaration of a struct actor for each actor
@@ -240,7 +237,14 @@ class NetworkPrinter extends CTemplate {
 			return compareErrors;
 		}
 	'''
-	
+
+	def protected printActorsSchedulers() '''
+		// Action schedulers
+		«FOR instance : network.children.actorInstances»
+			extern void «instance.name»_scheduler(struct schedinfo_s *si);
+		«ENDFOR»
+	'''
+
 	def private getFifoId(Port port, Instance instance) {
 		if(instance.incomingPortMap.containsKey(port)) {
 			String::valueOf(instance.incomingPortMap.get(port).<Integer>getValueAsObject("fifoId"))
@@ -248,7 +252,7 @@ class NetworkPrinter extends CTemplate {
 			"-1"
 		}
 	}
-	
+
 	def protected printLauncher() '''
 		static void launcher() {
 			int i, display_scheduler = -1;
@@ -317,7 +321,7 @@ class NetworkPrinter extends CTemplate {
 			«ENDIF»
 		}
 	'''
-	
+
 	// TODO : simplify this :
 	def protected assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
@@ -332,7 +336,7 @@ class NetworkPrinter extends CTemplate {
 			
 		«ENDFOR»
 	'''
-	
+
 	def private printFifoAssign(Instance instance, Port port, int fifoIndex) '''
 		struct fifo_«port.type.doSwitch»_s *«instance.name»_«port.name» = &fifo_«fifoIndex»;
 	'''

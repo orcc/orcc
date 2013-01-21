@@ -164,10 +164,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			default:
 				goto finished;
 			}
-				// FSM transitions
-				«FOR state : instance.actor.fsm.states»
-		«state.printTransition»
-				«ENDFOR»
+			// FSM transitions
+			«FOR state : instance.actor.fsm.states»
+		«state.printStateLabel»
+			«ENDFOR»
 		finished:
 			return;
 		}
@@ -178,32 +178,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		else port.name
 	}
 	
-	override printTransition(State state) '''
+	override printStateLabel(State state) '''
 		l_«state.name»:
 			«IF ! instance.actor.actionsOutsideFsm.empty»
 				«instance.name»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF !state.outgoing.empty»
-				«schedulingState(state, state.outgoing.map[it as Transition])»
+				«printStateTransitions(state)»
 			«ENDIF»
-	'''
-	
-	override actionTestState(State srcState, Iterable<Transition> transitions) '''
-		«IF transitions.head.action.outputPattern == null»
-		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
-	«ELSE»
-		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»() «transitions.head.action.outputPattern.printOutputPattern») {
-	«ENDIF»	
-			«instance.name»_«transitions.head.action.body.name»();
-			«IF transitions.head.target != srcState»
-				_FSM_state = my_state_«transitions.head.target.name»;
-				goto finished;
-			«ELSE»
-				goto l_«transitions.head.target.name»;
-			«ENDIF»
-		} else {
-			«schedulingState(srcState, transitions.tail)»
-		}
 	'''
 	
 	override printOutputPattern(Pattern pattern) '''
@@ -349,13 +331,24 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 	
-	override schedulingState(State state, Iterable<Transition> transitions) '''
-		«IF ! transitions.empty»
-			«actionTestState(state, transitions)»
-		«ELSE»
+	override printStateTransitions(State state) '''
+		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
+			«IF transitions.action.outputPattern == null»
+				if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»()) {
+			«ELSE»
+				if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»() «transitions.action.outputPattern.printOutputPattern») {
+			«ENDIF»	
+			«instance.name»_«transitions.action.body.name»();
+			«IF transitions.target != state»
+				_FSM_state = my_state_«transitions.target.name»;
+				goto finished;
+			«ELSE»
+				goto l_«transitions.target.name»;
+			«ENDIF»
+			}«ENDFOR» else {
 			_FSM_state = my_state_«state.name»;
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
 	override caseTypeBool(TypeBool type) 
