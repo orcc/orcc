@@ -44,6 +44,70 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		
 		geneticAlgo = false
 	}
+	
+	override protected getNetworkFileContent() '''
+		// Generated from "«network.name»"
+
+		#include <locale.h>
+		#include <stdio.h>
+		#include <stdlib.h>
+		
+		#ifndef _WIN32
+		#define __USE_GNU
+		#endif
+		
+		#include "orcc_types.h"
+		#include "orcc_fifo.h"
+		#include "orcc_scheduler.h"
+		#include "orcc_util.h"
+		
+		#define SIZE «fifoSize»
+		// #define PRINT_FIRINGS
+
+		/////////////////////////////////////////////////
+		// FIFO allocation
+		«FOR vertice : network.children.actorInstances»
+			«vertice.allocateFifos»
+		«ENDFOR»
+		
+		/////////////////////////////////////////////////
+		// FIFO pointer assignments
+		«FOR instance : network.children.actorInstances»
+			«instance.assignFifo»
+		«ENDFOR»
+		
+		/////////////////////////////////////////////////
+		// Action initializes
+		«FOR instance : network.children.actorInstances»
+			extern void «instance.name»_initialize(«instance.actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
+		«ENDFOR»
+		«printActorsSchedulers»
+
+		/////////////////////////////////////////////////
+		// Actor scheduler
+		«printScheduler»
+		
+		/////////////////////////////////////////////////
+		// Initializer and launcher
+		void initialize_instances() {
+			«FOR instance : network.children.actorInstances»
+				«instance.name»_initialize(«instance.actor.inputs.join(", ", [getFifoId(instance)])»);
+			«ENDFOR»
+		}
+		
+		«printLauncher»
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// Main
+		int main(int argc, char *argv[]) {
+			init_orcc(argc, argv);
+			
+			launcher();
+			
+			printf("End of simulation !\n");
+			return compareErrors;
+		}
+	'''
 
 	override protected printLauncher() '''
 		static void launcher() {

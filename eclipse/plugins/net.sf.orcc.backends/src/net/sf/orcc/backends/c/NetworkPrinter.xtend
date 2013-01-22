@@ -245,7 +245,7 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 	'''
 
-	def private getFifoId(Port port, Instance instance) {
+	def protected getFifoId(Port port, Instance instance) {
 		if(instance.incomingPortMap.containsKey(port)) {
 			String::valueOf(instance.incomingPortMap.get(port).<Integer>getValueAsObject("fifoId"))
 		} else {
@@ -398,7 +398,7 @@ class NetworkPrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def private allocateFifos(Instance instance) '''
+	def protected allocateFifos(Instance instance) '''
 		«FOR connectionList : instance.outgoingPortMap.values»
 			«allocateFifo(connectionList.get(0), connectionList.size)»
 		«ENDFOR»
