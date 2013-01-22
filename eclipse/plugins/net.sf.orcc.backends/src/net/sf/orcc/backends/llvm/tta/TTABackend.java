@@ -227,7 +227,7 @@ public class TTABackend extends LLVMBackend {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
 			OrccLogger.trace("Export library files into " + libPath + "... ");
-			if (copyFolderToFileSystem("/runtime/TTA", libPath)) {
+			if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				new File(libPath + File.separator + "generate")
 						.setExecutable(true);

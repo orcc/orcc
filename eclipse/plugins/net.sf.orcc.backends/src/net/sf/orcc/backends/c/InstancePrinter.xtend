@@ -70,7 +70,7 @@ class InstancePrinter extends CTemplate {
 	protected val Instance instance
 	protected val int fifoSize;
 	
-	var boolean geneticAlgo = false
+	protected var boolean geneticAlgo = false
 	
 	var boolean newSchedul = false
 	var boolean ringTopology = false
@@ -78,8 +78,8 @@ class InstancePrinter extends CTemplate {
 	var boolean enableTrace = false
 	var int threadsNb = 1;
 	
-	val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
-	val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
+	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
+	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 	
 	protected var Action currentAction;
 	
@@ -152,7 +152,7 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 	
-	def getInstanceFileContent() '''
+	def protected getInstanceFileContent() '''
 		// Source file is "«instance.actor.file»"
 		
 		#include <stdio.h>
@@ -298,6 +298,10 @@ class InstancePrinter extends CTemplate {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
+		«actorScheduler»
+	'''
+	
+	def protected actorScheduler() '''
 		«IF instance.actor.hasFsm»
 			«printFsm»
 		«ELSE»
@@ -332,15 +336,15 @@ class InstancePrinter extends CTemplate {
 	 * FSM
 	 *
 	 *****************************************/
-	def printFsm() '''
+	def protected printFsm() '''
 		«IF ! instance.actor.actionsOutsideFsm.empty»
-		void «instance.name»_outside_FSM_scheduler(struct schedinfo_s *si) {
-			int i = 0;
-			«instance.actor.actionsOutsideFsm.printActionLoop»
-		finished:
-			// no read_end/write_end here!
-			return;
-		}
+			void «instance.name»_outside_FSM_scheduler(struct schedinfo_s *si) {
+				int i = 0;
+				«instance.actor.actionsOutsideFsm.printActionLoop»
+			finished:
+				// no read_end/write_end here!
+				return;
+			}
 		«ENDIF»
 		
 		void «instance.name»_scheduler(struct schedinfo_s *si) {
@@ -365,7 +369,7 @@ class InstancePrinter extends CTemplate {
 		
 			// FSM transitions
 			«FOR state : instance.actor.fsm.states»
-		«state.printTransition»
+		«state.printStateLabel»
 			«ENDFOR»
 		finished:
 			«IF enableTrace»
@@ -380,7 +384,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def printTransition(State state) '''
+	def protected printStateLabel(State state) '''
 	l_«state.name»:
 		«IF ! instance.actor.actionsOutsideFsm.empty»
 			«instance.name»_outside_FSM_scheduler(si);
@@ -391,21 +395,32 @@ class InstancePrinter extends CTemplate {
 			wait_for_key();
 			exit(1);
 		«ELSE»
-			«schedulingState(state, state.outgoing.map[it as Transition])»
+			«state.printStateTransitions»
 		«ENDIF»
 	'''
 	
-	def schedulingState(State state, Iterable<Transition> transitions) '''
-		«IF ! transitions.empty»
-			«actionTestState(state, transitions)»
-		«ELSE»
+	def protected printStateTransitions(State state) '''
+		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
+			if («trans.action.inputPattern.checkInputPattern»isSchedulable_«trans.action.name»()) {
+				«IF trans.action.outputPattern != null»
+					«trans.action.outputPattern.printOutputPattern»
+						_FSM_state = my_state_«state.name»;
+						si->num_firings = i;
+						si->reason = full;
+						goto finished;
+					}
+				«ENDIF»
+				«trans.action.body.name»();
+				i++;
+				goto l_«trans.target.name»;
+			}«ENDFOR» else {
 			«transitionPattern.get(state).printTransitionPattern»
 			_FSM_state = my_state_«state.name»;
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
-	def printTransitionPattern(Pattern pattern) '''
+	def protected printTransitionPattern(Pattern pattern) '''
 		«IF newSchedul»
 			«FOR port : pattern.ports»
 				«printTransitionPatternPort(port, pattern)»
@@ -415,7 +430,7 @@ class InstancePrinter extends CTemplate {
 		si->reason = starved;
 	'''
 	
-	def printTransitionPatternPort(Port port, Pattern pattern) '''
+	def private printTransitionPatternPort(Port port, Pattern pattern) '''
 		if (numTokens_«port.name» - index_«port.name» < «pattern.numTokensMap.get(port)») {
 			if( ! «instance.name».sched->round_robin || i > 0) {
 				«IF instance.incomingPortMap.containsKey(port)»
@@ -425,26 +440,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def actionTestState(State srcState, Iterable<Transition> transitions) '''
-		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
-			«IF transitions.head.action.outputPattern != null»
-				«transitions.head.action.outputPattern.printOutputPattern»
-					_FSM_state = my_state_«srcState.name»;
-					si->num_firings = i;
-					si->reason = full;
-					goto finished;
-				}
-			«ENDIF»
-			«transitions.head.action.body.name»();
-			i++;
-			goto l_«transitions.head.target.name»;
-		} else {
-			«schedulingState(srcState, transitions.tail)»
-		}
-	'''
-
-	
-	def printCallTokensFunctions() '''
+	def protected printCallTokensFunctions() '''
 		«FOR port : instance.actor.inputs»
 			read_«port.name»();
 		«ENDFOR»
@@ -453,7 +449,7 @@ class InstancePrinter extends CTemplate {
 		«ENDFOR»
 	'''
 	
-	def initializeFunction() '''
+	def protected initializeFunction() '''
 		«IF ! instance.actor.initializes.empty»
 			«FOR init : instance.actor.initializes»
 				«init.print»
@@ -492,7 +488,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def initializeFifoId(Port port) '''
+	def private initializeFifoId(Port port) '''
 		«IF instance.incomingPortMap.get(port) != null»
 			fifo_«port.fullName»_id = fifo_«port.name»_id;
 		«ELSE»
@@ -500,22 +496,31 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 	
-	def printActionLoop(List<Action> actions) '''
+	def protected printActionLoop(List<Action> actions) '''
 		while (1) {
 			«actions.printActions»
 		}
 	'''
 	
-	def printActions(Iterable<Action> actions) '''
-		«IF !actions.empty»
-			«actionTest(actions.head, actions.tail)»
-		«ELSE»
-			«printTransitionPattern(inputPattern)»
+	def protected printActions(Iterable<Action> actions) '''
+		«FOR action : actions SEPARATOR " else "»
+			if («inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+				«IF action.outputPattern != null»
+					«action.outputPattern.printOutputPattern»
+						si->num_firings = i;
+						si->reason = full;
+						goto finished;
+					}
+				«ENDIF»
+				«action.body.name»();
+				i++;
+			}«ENDFOR» else {
+			«inputPattern.printTransitionPattern»
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
-	def actionTest(Action action, Iterable<Action> others) '''
+	def protected actionTest(Action action, Iterable<Action> others) '''
 		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 			«IF action.outputPattern != null»
 				«action.outputPattern.printOutputPattern»
@@ -531,7 +536,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def printOutputPattern(Pattern pattern) '''
+	def protected printOutputPattern(Pattern pattern) '''
 		int stop = 0;
 		«FOR port : pattern.ports»
 			«printOutputPatternsPort(pattern, port)»
@@ -539,7 +544,7 @@ class InstancePrinter extends CTemplate {
 		if (stop != 0) {
 	'''
 	
-	def printOutputPatternsPort(Pattern pattern, Port port) {
+	def protected printOutputPatternsPort(Pattern pattern, Port port) {
 		var i = -1
 		'''
 			«FOR successor : instance.outgoingPortMap.get(port)»
@@ -548,7 +553,7 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 	
-	def printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
+	def protected printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
 		if («pattern.numTokensMap.get(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
 			stop = 1;
 			«IF newSchedul»
@@ -559,10 +564,10 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def checkInputPattern(Pattern pattern)
+	def protected checkInputPattern(Pattern pattern)
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.numTokensMap.get(port)» && «ENDFOR»'''
 	
-	def writeTokensFunctions(Port port) '''
+	def private writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
 			index_«port.name» = «port.fullName»->write_ind;
 			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name»);
@@ -573,7 +578,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def readTokensFunctions(Port port) '''
+	def private readTokensFunctions(Port port) '''
 		static void read_«port.name»() {
 			«IF instance.incomingPortMap.containsKey(port)»
 				index_«port.name» = «port.fullName»->read_inds[fifo_«port.fullName»_id];
@@ -594,7 +599,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def print(Action action) {
+	def protected print(Action action) {
 		currentAction = action
 		val output = '''
 			static void «action.body.name»() {
@@ -638,7 +643,7 @@ class InstancePrinter extends CTemplate {
 		return output
 	}
 	
-	def print(Procedure proc) '''
+	def protected print(Procedure proc) '''
 		«proc.printAttributes»
 		static «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])») {
 			«FOR variable : proc.locals»
@@ -652,7 +657,7 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	// TODO : simplify this :
-	def declareStateVar(Var variable) '''
+	def protected declareStateVar(Var variable) '''
 		«variable.printAttributes»
 		«IF variable.initialized»
 			«IF ! variable.assignable»
@@ -669,15 +674,15 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def fullName(Port port)
+	def protected fullName(Port port)
 		'''«instance.name»_«port.name»'''
 	
-	def sizeOrDefaultSize(Connection conn) {
+	def private sizeOrDefaultSize(Connection conn) {
 		if(conn == null || conn.size == null) "SIZE"
 		else conn.size
 	}
 	
-	def getNumReaders(Port port) {
+	def private getNumReaders(Port port) {
 		if (instance.incomingPortMap.get(port) == null) {
 			'''0'''
 		} else {
@@ -687,13 +692,13 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 	
-	def printOpenFiles() '''
+	def private printOpenFiles() '''
 		«FOR port : instance.actor.inputs + instance.actor.outputs»
 			file_«port.name» = fopen("«port.fullName».txt", "a");
 		«ENDFOR»
 	'''
 	
-	def printCloseFiles() '''
+	def private printCloseFiles() '''
 		«FOR port : instance.actor.inputs + instance.actor.outputs»
 			fclose(file_«port.name»);
 		«ENDFOR»
@@ -784,7 +789,7 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 		
-	def getPort(Var variable) {
+	def protected getPort(Var variable) {
 		if(currentAction == null) {
 			null
 		} else if (currentAction?.inputPattern.varToPortMap.containsKey(variable)) {
@@ -798,7 +803,7 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 
-	def printCallArg(Arg arg) {
+	def private printCallArg(Arg arg) {
 		if(arg.byRef) {
 			"&" + (arg as ArgByRef).use.variable.indexedName + (arg as ArgByRef).indexes.printArrayIndexes
 		} else {
@@ -812,7 +817,7 @@ class InstancePrinter extends CTemplate {
 	 * Old templateData initialization
 	 *
 	 *****************************************/		
-	def buildInputPattern() {
+	def private buildInputPattern() {
 		for (action : instance.actor.actionsOutsideFsm) {
 			val actionPattern = action.inputPattern
 			for (port : actionPattern.ports) {
@@ -828,7 +833,7 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 	
-	def buildTransitionPattern() {		
+	def private buildTransitionPattern() {		
 		val fsm = instance.actor.getFsm()
 		
 		if (fsm != null) {

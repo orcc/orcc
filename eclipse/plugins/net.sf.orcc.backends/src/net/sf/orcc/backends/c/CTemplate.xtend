@@ -96,7 +96,7 @@ abstract class CTemplate extends CommonPrinter {
 		}
 	}
 	
-	override stringRepresentation(OpBinary op) {
+	override protected stringRepresentation(OpBinary op) {
 		if (op == OpBinary::DIV_INT)
 			"/"
 		else
@@ -131,7 +131,7 @@ abstract class CTemplate extends CommonPrinter {
 		'''«typeList.innermostType.doSwitch»'''
 
 	
-	def declare(Var variable)
+	def protected declare(Var variable)
 		'''«variable.type.doSwitch» «variable.indexedName»«variable.type.dimensionsExpr.printArrayIndexes»'''
 	
 	
@@ -145,7 +145,7 @@ abstract class CTemplate extends CommonPrinter {
 	  * @param type the type to print
 	  * @return printf() type format
 	  */
-	def printfFormat(Type type) {
+	def protected printfFormat(Type type) {
 		switch type {
 			case type.bool: "i"
 			case type.float: "f"
@@ -160,7 +160,7 @@ abstract class CTemplate extends CommonPrinter {
 	}
 	
 		
-	def printfArgs(List<Arg> args) {
+	def protected printfArgs(List<Arg> args) {
 		val finalArgs = new LinkedList<CharSequence>
 
 		val printfPattern = new StringBuilder
@@ -190,7 +190,7 @@ abstract class CTemplate extends CommonPrinter {
 	 * @param object the object
 	 * @return comment block
 	 */
-	def printAttributes(Attributable object) '''
+	def protected printAttributes(Attributable object) '''
 		«IF false && ! object.attributes.empty»
 			//Attributes for «object.toString» :
 			«FOR attr : object.attributes»
