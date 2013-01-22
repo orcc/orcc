@@ -1,9 +1,12 @@
-# 1.2.2 Dec 2012
+# 1.2.2 2013
 
 ### Notable changes and features
 
 - Add a new experimental backend called 'High Level Synthesis' (or HLS) which use Vivado
 toolset to generate HDL designs.
+- Add a new experimental backend called 'COMPA'. It generate C source code, without any dependency
+to external libraries (SDL, pthreads, etc.). This backend can't compile classical applications,
+because they use Display.cal and needs SDL to work.
 - LLVM/TTA backends do not use broadcast actors anymore. The broadcasting is directly made
 by the source actor.
 - TTA backend:
