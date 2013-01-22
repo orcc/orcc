@@ -504,7 +504,7 @@ class InstancePrinter extends CTemplate {
 	
 	def protected printActions(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
-			if («inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 				«IF action.outputPattern != null»
 					«action.outputPattern.printOutputPattern»
 						si->num_firings = i;
@@ -517,22 +517,6 @@ class InstancePrinter extends CTemplate {
 			}«ENDFOR» else {
 			«inputPattern.printTransitionPattern»
 			goto finished;
-		}
-	'''
-	
-	def protected actionTest(Action action, Iterable<Action> others) '''
-		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
-			«IF action.outputPattern != null»
-				«action.outputPattern.printOutputPattern»
-					si->num_firings = i;
-					si->reason = full;
-					goto finished;
-				}
-			«ENDIF»
-			«action.body.name»();
-			i++;
-		} else {
-			«others.printActions»
 		}
 	'''
 	

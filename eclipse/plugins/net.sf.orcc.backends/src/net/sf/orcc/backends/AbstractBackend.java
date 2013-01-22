@@ -48,13 +48,11 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.util.OrccUtil.getFile;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -291,12 +289,24 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		assert source.startsWith("/");
 		int bufferSize = 512;
 
-		InputStream is = this.getClass().getResourceAsStream(source);
-		if (is == null) {
+		URL sourceUrl = this.getClass().getResource(source);
+		if (sourceUrl == null) {
 			OrccLogger.warnln("Unable to find " + source);
 			return false;
-		} else {
-			is = new BufferedInputStream(is);
+		}
+
+		File fileIn;
+		try {
+			if (sourceUrl.getProtocol().equals("bundleresource")) {
+				sourceUrl = FileLocator.resolve(sourceUrl);
+			}
+			fileIn = new File(sourceUrl.toURI());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return false;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
 		}
 
 		File fileOut = new File(dest);
@@ -319,30 +329,32 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				// Comute MD5 for in and out file, to check if out file neet to
 				// be written
 				try {
-					BufferedInputStream outFileInputStream = new BufferedInputStream(
-							new FileInputStream(fileOut));
+					FileInputStream isIn = new FileInputStream(fileIn);
+					FileInputStream isOut = new FileInputStream(fileOut);
 
 					MessageDigest mdIn = MessageDigest.getInstance("MD5");
 					MessageDigest mdOut = MessageDigest.getInstance("MD5");
 
 					byte[] b = new byte[bufferSize];
 					do {
-						is.read(b);
+						isIn.read(b);
 						mdIn.update(b);
-						outFileInputStream.read(b);
+						isOut.read(b);
 						mdOut.update(b);
 
-					} while (is.available() > 0);
+					} while (isIn.available() > 0);
 
-					outFileInputStream.close();
+					isIn.close();
+					isOut.close();
 
-					if (MessageDigest.isEqual(mdIn.digest(), mdOut.digest())) {
-						// Target file is the same than input, do not need to
+					byte[] in = mdIn.digest();
+					byte[] out = mdIn.digest();
+
+					if (MessageDigest.isEqual(in, out)) {
+						// Target file is the same than input, don't need to
 						// write it
-						is.close();
 						return true;
 					}
-
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (NoSuchAlgorithmException e) {
@@ -356,16 +368,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// Really write target file
 		try {
-			FileOutputStream out = new FileOutputStream(fileOut);
+			FileInputStream isIn = new FileInputStream(fileIn);
+			FileOutputStream isOut = new FileOutputStream(fileOut);
 
 			byte[] b = new byte[bufferSize];
-			int i = is.read(b);
+			int i = isIn.read(b);
 			while (i != -1) {
-				out.write(b, 0, i);
-				i = is.read(b);
+				isOut.write(b, 0, i);
+				i = isIn.read(b);
 			}
-			out.close();
-			is.close();
+			isOut.close();
+			isIn.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

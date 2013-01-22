@@ -236,17 +236,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	}
 	
-	override actionTest(Action action, Iterable<Action> others) '''
-		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
-			«IF action.outputPattern != null»
-				«action.outputPattern.printOutputPattern»
-			«ENDIF»
-			«instance.name»_«action.body.name»();
-		} else {
-			«others.printActions»
-		}
-	'''
-	
 	override print(Action action) {
 		currentAction = action
 		val output = '''
@@ -330,11 +319,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	override printActions(Iterable<Action> actions) '''
-		«IF !actions.empty»
-			«actionTest(actions.head, actions.tail)»
-		«ELSE»
+		«FOR action : actions SEPARATOR " else "»
+			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+				«IF action.outputPattern != null»
+					«action.outputPattern.printOutputPattern»
+				«ENDIF»
+				«instance.name»_«action.body.name»();
+			}«ENDFOR» else {
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
 	override printStateTransitions(State state) '''
