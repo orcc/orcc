@@ -83,6 +83,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -850,6 +851,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		try {
 			CommandLineParser parser = new PosixParser();
+
+			String cliOpts = StringUtils.join((Object[]) context.getArguments()
+					.get(IApplicationContext.APPLICATION_ARGS), " ");
+			OrccLogger.traceln("Command line arguments: " + cliOpts);
 
 			// parse the command line arguments
 			CommandLine line = parser.parse(options, (String[]) context
