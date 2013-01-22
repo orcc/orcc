@@ -28,13 +28,10 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
-import java.util.List
 import net.sf.orcc.OrccRuntimeException
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
-import net.sf.orcc.graph.Vertex
 import net.sf.orcc.ir.ExprBinary
 import net.sf.orcc.ir.ExprBool
 import net.sf.orcc.ir.ExprInt
@@ -237,12 +234,4 @@ abstract class LLVMTemplate extends CommonPrinter {
 	
 	def protected print(Var variable)
 		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.indexedName»'''
-		
-	def protected getNotNative(List<Port> ports) {
-		ports.filter[!native]
-	}
-	
-	def protected getActorInstances(List<Vertex> vertices) {
-		vertices.filter(typeof(Instance)).filter[isActor]
-	}
 }

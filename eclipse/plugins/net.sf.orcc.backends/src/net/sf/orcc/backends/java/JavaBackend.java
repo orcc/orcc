@@ -136,7 +136,7 @@ public class JavaBackend extends AbstractBackend {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			OrccLogger.trace("Export libraries sources into " + libsPath
 					+ "... ");
-			if (copyFolderToFileSystem("/runtime/Java/src", libsPath)) {
+			if (copyFolderToFileSystem("/runtime/Java/src", libsPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {

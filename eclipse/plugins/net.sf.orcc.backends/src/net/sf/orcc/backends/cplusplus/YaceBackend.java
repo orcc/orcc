@@ -207,7 +207,7 @@ public class YaceBackend extends AbstractBackend {
 			String target = path + File.separator + "libs";
 			OrccLogger
 					.trace("Export libraries sources into " + target + "... ");
-			if (copyFolderToFileSystem("/runtime/C++", target)) {
+			if (copyFolderToFileSystem("/runtime/C++", target, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {
