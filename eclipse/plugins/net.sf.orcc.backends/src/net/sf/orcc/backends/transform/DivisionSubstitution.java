@@ -77,6 +77,7 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 
 		@Override
 		public Object caseExprBinary(ExprBinary expr) {
+			super.caseExprBinary(expr);
 			boolean toShift = false;
 			// int pow = 0;
 			if (expr.getOp() == OpBinary.DIV) {
@@ -465,6 +466,11 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 			Substitutor substitutor = new Substitutor();
 			substitutor.doSwitch(verifAction.getBody());
 			substitutor.doSwitch(verifAction.getScheduler());
+		}
+
+		for (Procedure proc : actor.getProcs()) {
+			Substitutor substitutor = new Substitutor();
+			substitutor.doSwitch(proc);
 		}
 	}
 }
