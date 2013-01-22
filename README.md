@@ -12,3 +12,88 @@ Applications
 ------------
 
 Applications are available in the Open RVC-CAL Applications project : https://github.com/orcc/orc-apps
+
+Backends
+--------
+
+The current status of the existing back-ends is summed up in the following table :
+
+<table>
+  <tr>
+    <th></th>
+    <th>MPEG-4 Part 2 SP</th>
+    <th>MPEG-4 Part 10</th>
+    <th>MPEG-H Part 2</th>
+    <th>JPEG</th>
+  </tr>
+  <tr>
+    <th>C</th>
+    <td>OK</td>
+    <td>OK</td>
+    <td>OK</td>
+    <td>OK</td>
+  </tr>
+  <tr>
+    <th>C++</th>
+    <td>OK</td>
+    <td>NOK</td>
+    <td>NOK</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <th>HLS</th>
+    <td>OK</td>
+    <td>NOK</td>
+    <td>NOK</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <th>Jade</th>
+    <td>OK</td>
+    <td>OK</td>
+    <td>OK</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <th>Java</th>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <th>LLVM</th>
+    <td>OK</td>
+    <td>OK</td>
+    <td>OK</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <th>OpenCL</th>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <th>Promela</th>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <th>Simulator</th>
+    <td>OK</td>
+    <td>OK</td>
+    <td>NOK</td>
+    <td>OK</td>
+  </tr>
+  <tr>
+    <th>TTA</th>
+    <td>OK</td>
+    <td>NOK</td>
+    <td>NOK</td>
+    <td>N/A</td>
+  </tr>
+</table>
