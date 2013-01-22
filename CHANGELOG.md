@@ -6,7 +6,8 @@
 toolset to generate HDL designs.
 - Add a new experimental backend called 'COMPA'. It generate C source code, without any dependency
 to external libraries (SDL, pthreads, etc.). This backend can't compile classical applications,
-because they use Display.cal and needs SDL to work.
+because they use Display.cal and needs SDL to work. This backend was needed by members of COMPA
+research project (see http://compa-ietr.insa-rennes.fr)
 - LLVM/TTA backends do not use broadcast actors anymore. The broadcasting is directly made
 by the source actor.
 - TTA backend:
