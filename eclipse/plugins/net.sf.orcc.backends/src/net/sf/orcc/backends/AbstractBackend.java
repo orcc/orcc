@@ -48,11 +48,13 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.util.OrccUtil.getFile;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -289,23 +291,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		assert source.startsWith("/");
 		int bufferSize = 512;
 
-		URL sourceUrl = this.getClass().getResource(source);
-		if (sourceUrl == null) {
-			OrccLogger.warnln("Unable to find " + source);
-			return false;
-		}
+		InputStream sourceStream = this.getClass().getResourceAsStream(source);
 
-		File fileIn;
-		try {
-			if (sourceUrl.getProtocol().equals("bundleresource")) {
-				sourceUrl = FileLocator.resolve(sourceUrl);
-			}
-			fileIn = new File(sourceUrl.toURI());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (sourceStream == null) {
+			OrccLogger.warnln("Unable to find " + source);
 			return false;
 		}
 
@@ -329,7 +318,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				// Comute MD5 for in and out file, to check if out file neet to
 				// be written
 				try {
-					FileInputStream isIn = new FileInputStream(fileIn);
+					// Create a new Input stream to let original open for write
+					// action
+					BufferedInputStream isIn = new BufferedInputStream(this
+							.getClass().getResourceAsStream(source));
 					FileInputStream isOut = new FileInputStream(fileOut);
 
 					MessageDigest mdIn = MessageDigest.getInstance("MD5");
@@ -368,7 +360,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// Really write target file
 		try {
-			FileInputStream isIn = new FileInputStream(fileIn);
+			BufferedInputStream isIn = new BufferedInputStream(sourceStream);
 			FileOutputStream isOut = new FileOutputStream(fileOut);
 
 			byte[] b = new byte[bufferSize];
