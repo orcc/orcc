@@ -39,16 +39,16 @@ class NLTransformation implements ITransformation {
 		val List<Edge> connections = new ArrayList<Edge>(graph.edgeSet());
 
 		val result = '''
-			network «id»() «inputs.print» ==> «outputs.print» :
+			network Â«idÂ»() Â«inputs.printÂ» ==> Â«outputs.printÂ» :
 
 			entities
-				«FOR instance : instances»
-					«instance.getAttribute("id")» = «instance.getAttribute("refinement")»(«(instance.getAttribute("instance parameter") as Map<Object, Object>).printParameters»);
-				«ENDFOR»
+				Â«FOR instance : instancesÂ»
+					Â«instance.getAttribute("id")Â» = Â«instance.getAttribute("refinement")Â»(Â«(instance.getAttribute("instance parameter") as Map<Object, Object>).printParametersÂ»);
+				Â«ENDFORÂ»
 			structure
-				«FOR conn : connections»
-					«conn.source.getAttribute("id")»«IF conn.getAttribute("source port") != null».«conn.getAttribute("source port")»«ENDIF» --> «conn.target.getAttribute("id")»«IF conn.getAttribute("target port") != null».«conn.getAttribute("target port")»«ENDIF»;
-				«ENDFOR»
+				Â«FOR conn : connectionsÂ»
+					Â«conn.source.getAttribute("id")Â»Â«IF conn.getAttribute("source port") != nullÂ».Â«conn.getAttribute("source port")Â»Â«ENDIFÂ» --> Â«conn.target.getAttribute("id")Â»Â«IF conn.getAttribute("target port") != nullÂ».Â«conn.getAttribute("target port")Â»Â«ENDIFÂ»;
+				Â«ENDFORÂ»
 			end
 		'''
 		out.write(result.toString.bytes)
@@ -56,11 +56,11 @@ class NLTransformation implements ITransformation {
 	}
 
 	def printParameters(Map<Object, Object> map) {
-		map.entrySet.join(", ", ['''«key» = «value»'''])
+		map.entrySet.join(", ", ['''Â«keyÂ» = Â«valueÂ»'''])
 	}
 
 
 	def print(List<Vertex> ports) {
-		ports.join(", ", ['''«getAttribute("port type")» «getAttribute("id")»'''])
+		ports.join(", ", ['''Â«getAttribute("port type")Â» Â«getAttribute("id")Â»'''])
 	}
 }
