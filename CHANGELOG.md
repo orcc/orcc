@@ -18,8 +18,8 @@ by the source actor.
 	* Support a given set of 'native' functions for simulation purpose.
 	* Global performance improvement.
 	* Support automatic mapping of an application into a set of processors based on profiling.
-- Global improvement of the information displayed by the compiler. The following levels of 
-messages are possible : LOG, DEBUG, NOTICE, WARNING, DEFECT.
+- Global improvement of the informations displayed by the compiler. The following levels of 
+messages are available : DEBUG, TRACE, NOTICE, WARNING, SEVERE.
 - The classifier supports now the Z3 solver v4.12+, the support of other solver is dropped.
 - Back-end CLI has new options such as '-m2m' which launch the Multi2MonoToken transformation.
 - Front-end CLI is now able to only build the actors needed by a given network instead of building
