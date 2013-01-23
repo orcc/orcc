@@ -82,7 +82,6 @@ class InstancePrinter extends LLVMTemplate {
 	protected val Instance instance
 	
 	protected val List<Var> castedList = new ArrayList<Var>
-	val List<Expression> castedIndexes = new ArrayList<Expression>
 	val Map<State, Integer> stateToLabel = new HashMap<State, Integer>
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
@@ -114,7 +113,6 @@ class InstancePrinter extends LLVMTemplate {
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 		
-		computeCastedIndex
 		computeCastedList
 		computeStateToLabel
 		computePortToIndexByPatternMap
@@ -862,12 +860,12 @@ class InstancePrinter extends LLVMTemplate {
 		val procedure = EcoreHelper::getContainerOfType(instr, typeof(Procedure))
 		val accessMap = procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>
 		val accessId = accessMap.get(instr)
-		val needCast = castedIndexes.contains(indexes.head)
+		val needCast = indexes.head.type.sizeInBits != 32
 		val fifoName = port.name + "_" + connection.getSafeId(port)
 		val extName = variable.name + "_" + accessId + "_" + connection.getSafeId(port)
 		'''
 			«IF needCast»
-				%cast_index_«extName» = zext «indexes.head.type.doSwitch» «indexes.head.doSwitch» to i32
+				%cast_index_«extName» = «IF indexes.head.type.sizeInBits < 32»zext«ELSE»trunc«ENDIF» «indexes.head.type.doSwitch» «indexes.head.doSwitch» to i32
 			«ENDIF»
 			%tmp_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«indexes.head.doSwitch»«ENDIF»
 			%final_index_«extName» = urem i32 %tmp_index_«extName», %local_size_«fifoName»
@@ -889,22 +887,6 @@ class InstancePrinter extends LLVMTemplate {
 			for ( state : instance.actor.fsm.states) {
 				stateToLabel.put(state, i)
 				i = i + 1
-			}
-		}
-	}
-	
-	def private computeCastedIndex() {
-		for (instr : instance.actor.eAllContents.toIterable.filter(typeof(Instruction))) {
-			if(instr.instLoad) {
-				val load = instr as InstLoad
-				if( ! load.indexes.empty && load.indexes.head.type.sizeInBits != 32) {
-					castedIndexes.add(load.indexes.head)
-				}
-			} else if (instr.instStore) {
-				val store = instr as InstStore
-				if( ! store.indexes.empty && store.indexes.head.type.sizeInBits != 32) {
-					castedIndexes.add(store.indexes.head)
-				}
 			}
 		}
 	}
