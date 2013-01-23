@@ -1,0 +1,59 @@
+printActor(name, actor) ::= <%
+<if (!actor.native)>
+<name>.c
+<endif>
+%>
+
+printInstance(instance) ::= <%
+<if (instance.actor)>
+<printActor(instance.name, instance.actor)>
+<endif>
+%>
+
+printNetwork(network, options) ::= <<
+# Generated from <network.simpleName>
+
+cmake_minimum_required (VERSION 2.6)
+project (<network.simpleName>)
+
+# Libraries folder
+set(LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
+
+# Runtime libraries inclusion
+set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
+set(ROXML_INCLUDE_DIR ${LIBS_DIR}/roxml/include)
+
+# Helps to find where SDL libraries are saved (win32 only)
+if(WIN32)
+	set(ENV{CMAKE_PREFIX_PATH} ${LIBS_DIR}/windows/SDL-*\;${LIBS_DIR}/windows/SDL_image-*)
+endif()
+
+find_package(Threads REQUIRED)
+
+# Hmpp compiler
+set(HMPP_COMPILER CACHE STRING "hmpp compiler binary")
+
+set(CMAKE_C_COMPILER ${HMPP_COMPILER})
+set(CMAKE_CXX_COMPILER ${HMPP_COMPILER})
+set (CMAKE_C_FLAGS gcc)
+set (CMAKE_CXX_FLAGS g++)
+
+
+
+add_subdirectory(${LIBS_DIR})
+include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
+
+find_package(SDL REQUIRED)
+include_directories(${SDL_INCLUDE_DIR})
+
+set(filenames
+	<network.simpleName>.c
+	<network.instances: printInstance();separator="\n">
+)
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+
+add_executable(<network.simpleName> ${filenames})
+
+target_link_libraries(<network.simpleName> orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+>>
