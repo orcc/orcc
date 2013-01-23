@@ -96,4 +96,11 @@ The current status of the existing back-ends is summed up in the following table
     <td>NOK</td>
     <td>N/A</td>
   </tr>
+  <tr>
+    <th>Xronos</th>
+    <td>OK</td>
+    <td>NOK</td>
+    <td>N/A</td>
+    <td>OK</td>
+  </tr>
 </table>
