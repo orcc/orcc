@@ -298,8 +298,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 			// System.out.println("Indirect input dep: " + hasInputDep);
 			// System.out.println("IIR: " + hasIIR);
 			// Follow what happens on PEEK Ports
-			for (Port port : transition.getAction().getInputPattern()
-					.getPorts()) {
+			for (Port port : transition.getAction().getInputPattern().getPorts()) {
 				boolean portUsed = netStateDef.getVarsUsedInScheduling()
 						.contains(
 								transition.getAction().getInputPattern()

@@ -216,11 +216,11 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		for (Set<Var> s : whileConditionVars) {
 			variableDependency.get(target).addAll(s);
 			variableDependencyNoIf.get(target).addAll(s);
-			schedulingModel.addVarDep(actor, target, s);
+			schedulingModel.addVarDep(actor, target, s, false);
 		}
 		for (Set<Var> s : ifConditionVars) {
 			variableDependency.get(target).addAll(s);
-			//schedulingModel.addVarDep(actor, target, s);
+			schedulingModel.addVarDep(actor, target, s, true);
 		}
 	}
 

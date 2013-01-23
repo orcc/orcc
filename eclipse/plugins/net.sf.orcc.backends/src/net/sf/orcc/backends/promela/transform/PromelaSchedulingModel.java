@@ -11,6 +11,8 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Transition;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.ir.Var;
 
@@ -64,7 +66,9 @@ public class PromelaSchedulingModel {
 		actorToModelMap.get(a).addVarDep(target, source);
 	}
 	
-	public void addVarDep(Actor a, Var target, Set<Var> source) {
+	
+	public void addVarDep(Actor a, Var target, Set<Var> source, boolean isIfCondition) {
+		if(isIfCondition)return;
 		for (Var s : source) {
 			actorToModelMap.get(a).addVarDep(target, s);
 		}
@@ -279,9 +283,39 @@ public class PromelaSchedulingModel {
 		}
 	}
 	
-	/*private class Scenario {
-		private State initState;	
-	}*/
+	@SuppressWarnings("unused")
+	private class Scenario {
+		private State initState = null;
+		private State endState = null;
+		private Set<Transition> transitions = new HashSet<Transition>();
+		private Set<Transition> transInNonDetermLoops = new HashSet<Transition>();
+		
+		private void addTransition(Transition t) {
+			transitions.add(t);
+		}
+		
+		private Set<Transition> getTransitions() {
+			return transitions;
+		}
+
+		public State getInitState() {
+			return initState;
+		}
+
+		public void setInitState(State initState) {
+			this.initState = initState;
+		}
+
+		public State getEndState() {
+			return endState;
+		}
+
+		public void setEndState(State endState) {
+			this.endState = endState;
+		}
+		
+		
+	}
 	
 	/**
 	 * Rather long method that prints the model in dot format. Should at some point be replaced by something more neat.
@@ -298,26 +332,45 @@ public class PromelaSchedulingModel {
 			System.out.println(am.getActor().getSimpleName()+"_grds [label=guards, shape=box]");
 			for (Var v : am.getLocalSchedulingVars()) {
 				if ((v.isGlobal()||am.isPort(v)) && v.isAssignable()) {
-					System.out.println(am.getActor().getSimpleName() + "_" +  v.getName() + "[label="+ v.getName() + "]");
+					if (am.isPort(v)) {
+						System.out.println(am.getActor().getSimpleName() + "_" +  v.getName() + "[label="+ v.getName() + ", style=rounded,filled, shape=diamond]");
+					} else {
+						System.out.println(am.getActor().getSimpleName() + "_" +  v.getName() + "[label="+ v.getName() + "]");
+					}
 					System.out.println(am.getActor().getSimpleName()+"_grds ->" + am.getActor().getSimpleName() + "_" +  v.getName());
+					// All scheduling vars
 					for (Var dep : am.getReachableVars(v)) {
 						if ((dep.isGlobal()||am.isPort(dep)) && dep.isAssignable()) {
 							actorVars.add(dep);
+							if (am.isPort(dep)) {
+								System.out.println(am.getActor().getSimpleName() + "_" +dep.getName() + "[label="+ dep.getName() + ",style=rounded,filled, shape=diamond]");
+							} else {
+								System.out.println(am.getActor().getSimpleName() + "_" +dep.getName() + "[label="+ dep.getName() +"]");
+							}
 							System.out.println(am.getActor().getSimpleName() + "_" + v.getName() + " -> " + am.getActor().getSimpleName() + "_" +dep.getName());
+							// if the vars depend on input or them selves: draw some more arrows
+							for (Var depdep : am.getReachableVars(dep)) {
+								if (dep == depdep || am.isPort(depdep)) {
+									System.out.println(am.getActor().getSimpleName() + "_" + dep.getName() + " -> " + am.getActor().getSimpleName() + "_" +depdep.getName());
+								}
+							}
 						}
 					}
 				}
 			}
 			for (Var v : am.getSchedOutPortVars()) {
-				//if (v.isAssignable()) {
-					System.out.println(am.getActor().getSimpleName() + "_" +  v.getName() + "[label="+ v.getName() + "]");
-					for (Var dep : am.getReachableVars(v)) {
-						if ((dep.isGlobal()||am.isPort(dep)) && dep.isAssignable()) {
-							actorVars.add(dep);
-							System.out.println(am.getActor().getSimpleName() + "_" + v.getName() + " -> " + am.getActor().getSimpleName() + "_" +dep.getName());
+				System.out.println(am.getActor().getSimpleName() + "_" +  v.getName() + "[label="+ v.getName() + ",style=rounded,filled, shape=diamond]");
+				for (Var dep : am.getReachableVars(v)) {
+					if ((dep.isGlobal()||am.isPort(dep)) && dep.isAssignable()) {
+						actorVars.add(dep);
+						if (am.isPort(dep)) {
+							System.out.println(am.getActor().getSimpleName() + "_" +  dep.getName() + "[label="+ dep.getName() + ",style=rounded,filled, shape=diamond]");
+						} else {
+							System.out.println(am.getActor().getSimpleName() + "_" +  dep.getName() + "[label="+ dep.getName() + "]");
 						}
+						System.out.println(am.getActor().getSimpleName() + "_" + v.getName() + " -> " + am.getActor().getSimpleName() + "_" +dep.getName());
 					}
-				//}
+				}
 			}
 			System.out.print("subgraph cluster_" +am.getActor().getSimpleName()+ " {"+am.getActor().getSimpleName()+ "_grds ");
 			for (Var var : actorVars) {
