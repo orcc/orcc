@@ -50,32 +50,32 @@ public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
 	private class ExprVarGetter extends AbstractIrVisitor<Void> {
 		private Var result;
 		private String varName;
-		
-		public ExprVarGetter(String name){
+
+		public ExprVarGetter(String name) {
 			// Visit also expressions
 			super(true);
 			varName = name;
 		}
-		
+
 		@Override
 		public Void caseExprVar(ExprVar expr) {
 			Var currentVar = expr.getUse().getVariable();
-			if (currentVar.getName().compareTo(varName) == 0){
+			if (currentVar.getName().compareTo(varName) == 0) {
 				result = currentVar;
 			}
-			
+
 			return null;
 		}
-		
-		public Var getResult(){
+
+		public Var getResult() {
 			return result;
 		}
 	}
+
 	Map<Procedure, Integer> codelets;
 
-	
 	int codeletsCnt;
-	
+
 	@Override
 	public Void caseBlockWhile(BlockWhile blockWhile) {
 		super.caseBlockWhile(blockWhile);
@@ -83,22 +83,24 @@ public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
 		Attribute attribute = blockWhile.getAttribute("gridify");
 
 		if (attribute != null) {
-			ExprList args = (ExprList) attribute.getValue();
-			if (args != null){
+			ExprList args = (ExprList) attribute.getContainedValue();
+			if (args != null) {
 				for (int i = 0; i < args.getSize(); i++) {
-					
+
 					// Get induction variable
 					ExprList parameter = (ExprList) args.get(i);
 					ExprString exprString = ((ExprString) parameter.get(0));
-					ExprVarGetter exprVarGetter = new ExprVarGetter(exprString.getValue());
+					ExprVarGetter exprVarGetter = new ExprVarGetter(
+							exprString.getValue());
 					exprVarGetter.doSwitch(blockWhile);
-					
-					if (exprVarGetter.getResult() != null){
-						parameter.set(0, IrFactory.eINSTANCE.createExprVar(exprVarGetter.getResult()));
+
+					if (exprVarGetter.getResult() != null) {
+						parameter.set(0, IrFactory.eINSTANCE
+								.createExprVar(exprVarGetter.getResult()));
 					}
 				}
 			}
-			
+
 		}
 
 		return null;

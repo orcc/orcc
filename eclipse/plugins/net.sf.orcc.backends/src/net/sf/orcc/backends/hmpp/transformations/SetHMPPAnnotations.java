@@ -33,8 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.backends.ir.IrInstSpecific;
-import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Arg;
@@ -66,7 +64,7 @@ import org.eclipse.emf.common.util.EList;
 public class SetHMPPAnnotations extends DfVisitor<Void> {
 	Map<Procedure, Integer> codelets;
 	int codeletsCnt;
-	
+
 	private class InnerSetHMPPAnnotations extends AbstractIrVisitor<Void> {
 
 		@Override
@@ -77,11 +75,11 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			if (attribute != null) {
 
 				// Set callsite
-				call.setAttribute("#pragma hmpp " + getCodeletName(proc)
-						+ " callsite", null);
+				call.setAttribute("hmpp", "#pragma hmpp "
+						+ getCodeletName(proc) + " callsite");
 
 				// Set codelet
-				createCodelet(call.getProcedure(), call.getParameters(),
+				createCodelet(call.getProcedure(), call.getArguments(),
 						attribute);
 
 				// Set persistents variables
@@ -210,8 +208,8 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			}
 
 			// Set persistent process
-			actor.setAttribute("#pragma hmpp " + codeletName
-					+ " group, target=cuda, transfer=manual", null);
+			actor.setAttribute("hmpp", "#pragma hmpp " + codeletName
+					+ " group, target=cuda, transfer=manual");
 			List<Instruction> prepare = new ArrayList<Instruction>();
 			List<Instruction> close = new ArrayList<Instruction>();
 
@@ -221,9 +219,8 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 
 			for (Var var : persistentVar) {
 				// Set variable attribute
-				var.setAttribute("#pragma hmpp " + codeletName
-						+ " resident, args[" + var.getName() + "].io=inout",
-						null);
+				var.setAttribute("hmpp", "#pragma hmpp " + codeletName
+						+ " resident, args[" + var.getName() + "].io=inout");
 
 				// Create advancedload
 				prepare.add(createInstrAttribute("#pragma hmpp " + codeletName
@@ -239,7 +236,7 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			// Create release
 			close.add(createInstrAttribute("#pragma hmpp " + codeletName
 					+ " release"));
-			
+
 			// Getting current node block and add all
 			BlockBasic currentBlock = EcoreHelper.getContainerOfType(call,
 					BlockBasic.class);
@@ -257,13 +254,16 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 
 			return "codeletlabel" + codelets.get(proc);
 		}
-		
-		private Instruction createInstrAttribute(String attrStr) {
-			IrInstSpecific instSpecific = IrSpecificFactory.eINSTANCE
-					.createIrInstSpecific();
-			instSpecific.setAttribute(attrStr, null);
 
-			return instSpecific;
+		private Instruction createInstrAttribute(String attrStr) {
+			/*
+			 * IrInstSpecific instSpecific = IrSpecificFactory.eINSTANCE
+			 * .createIrInstSpecific(); instSpecific.setAttribute(attrStr,
+			 * null);
+			 * 
+			 * return instSpecific;
+			 */
+			return null;
 		}
 	}
 
@@ -285,6 +285,5 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 
 		return null;
 	}
-
 
 }

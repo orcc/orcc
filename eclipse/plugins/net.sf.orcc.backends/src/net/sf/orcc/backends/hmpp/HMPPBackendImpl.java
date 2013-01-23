@@ -32,22 +32,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.StandardPrinter;
-import net.sf.orcc.backends.c.CBackendImpl;
-import net.sf.orcc.backends.c.CExpressionPrinter;
-import net.sf.orcc.backends.c.CTypePrinter;
+import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.hmpp.transformations.CodeletInliner;
 import net.sf.orcc.backends.hmpp.transformations.ConstantRegisterCleaner;
 import net.sf.orcc.backends.hmpp.transformations.DisableAnnotations;
 import net.sf.orcc.backends.hmpp.transformations.PrepareHMPPAnnotations;
 import net.sf.orcc.backends.hmpp.transformations.SetHMPPAnnotations;
-import net.sf.orcc.backends.transform.NodeForAdder;
+import net.sf.orcc.backends.transform.BlockForAdder;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -58,36 +55,34 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * @author Jérôme Gorin
  * 
  */
-public class HMPPBackendImpl extends CBackendImpl {
+public class HMPPBackendImpl extends CBackend {
 	protected boolean disableAnnotation;
-	
+
 	@Override
 	public void doInitializeOptions() {
 		super.doInitializeOptions();
-		printer = new StandardPrinter("net/sf/orcc/backends/hmpp/Actor.stg",
-				HMPPBackendImpl.class);
-		printer.setExpressionPrinter(new CExpressionPrinter());
-		printer.setTypePrinter(new CTypePrinter());
-		printer.setExpressionPrinter(new CExpressionPrinter());
-		printer.setTypePrinter(new CTypePrinter());
-		printer.getOptions().put("fifoSize", fifoSize);
-		printer.getOptions().put("enableTrace", enableTrace);
-		printer.getOptions().put("ringTopology", ringTopology);
-		printer.getOptions().put("newScheduler", newScheduler);
-		
-		disableAnnotation = getAttribute("net.sf.orcc.backends.hmpp.disablePragma", false);
+
+		/*
+		 * printer.getOptions().put("fifoSize", fifoSize);
+		 * printer.getOptions().put("enableTrace", enableTrace);
+		 * printer.getOptions().put("ringTopology", ringTopology);
+		 * printer.getOptions().put("newScheduler", newScheduler);
+		 */
+
+		disableAnnotation = getAttribute(
+				"net.sf.orcc.backends.hmpp.disablePragma", false);
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
+	protected void doTransformActor(Actor actor) {
 		super.doTransformActor(actor);
-		
-		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>(); 
+
+		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new DfVisitor<Void>(new PrepareHMPPAnnotations()));
 		transformations.add(new DfVisitor<Void>(new ConstantRegisterCleaner()));
 		transformations.add(new DfVisitor<Void>(new CodeletInliner()));
 		transformations.add(new SetHMPPAnnotations());
-		transformations.add(new NodeForAdder());
+		transformations.add(new BlockForAdder());
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -97,30 +92,23 @@ public class HMPPBackendImpl extends CBackendImpl {
 						+ actor.getName());
 			}
 		}
-		
-		if (disableAnnotation){
+
+		if (disableAnnotation) {
 			new DisableAnnotations().doSwitch(actor);
 		}
-		
+
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() throws OrccException {
+	public boolean exportRuntimeLibrary() {
 		String target = path + File.separator + "libs";
-		write("Export libraries sources into " + target + "... ");
-		if (copyFolderToFileSystem("/runtime/HMPP", target)) {
-			write("OK" + "\n");
-		} else {
-			write("Error" + "\n");
-		}
-		return true;
+
+		OrccLogger.traceln("Export libraries sources into " + target + "... ");
+
+		return copyFolderToFileSystem("/runtime/HMPP", target, debug);
 	}
 
-	@Override
 	protected void printCMake(Network network) {
-		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/hmpp/HMPPMakeLists.stg",
-				HMPPBackendImpl.class);
-		networkPrinter.print("CMakeLists.txt", path, network);
+
 	}
 }
