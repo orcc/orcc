@@ -52,7 +52,7 @@ class HwDesignPrinter extends TTAPrinter {
 	}
 	
 	def print(Design design, String targetFolder) {
-		val file = new File(targetFolder + File::separator + "top.vhdl")
+		val file = new File(targetFolder + File::separator + "top.vhd")
 		printFile(design.vhdl, file)
 	}
 	
@@ -95,7 +95,7 @@ class HwDesignPrinter extends TTAPrinter {
 		------------------------------------------------------------------------------
 		architecture bdf_type of top is
 		
-		  «design.declareSignals»
+		  «design.declare»
 		
 		begin
 		
@@ -106,6 +106,8 @@ class HwDesignPrinter extends TTAPrinter {
 		
 	def private getVhdl(Processor processor)
 		'''
+		
+		
 		«processor.name»_inst : entity work.«processor.name»
 		  generic map(device_family => "«fpga.family»")
 		  port map(clk                    => clk,
@@ -124,24 +126,42 @@ class HwDesignPrinter extends TTAPrinter {
 		
 	def private getVhdl(Memory memory)
 		'''
-		«memory.name» : entity work.dram_2p
-		  generic map(depth      => «memory.depth»/4,
-		              byte_width => «memory.wordWidth»,
-		              addr_width => «memory.addrWidth»-2,
-		              bytes      => 4,
-		              device_family => "«fpga.family»")
-		  port map(clk        => clk,
-		           wren_p1    => «memory.name»_wren_p1,
-		           address_p1 => «memory.name»_address_p1,
-		           byteen_p1  => «memory.name»_byteen_p1,
-		           data_p1    => «memory.name»_data_p1,
-		           queue_p1   => «memory.name»_queue_p1,
-		           wren_p2    => «memory.name»_wren_p2,
-		           address_p2 => «memory.name»_address_p2,
-		           byteen_p2  => «memory.name»_byteen_p2,
-		           data_p2    => «memory.name»_data_p2,
-		           queue_p2   => «memory.name»_queue_p2,
-		           rst_n      => rst_n);
+		«IF(fpga.xilinx)»
+			«memory.name»_bytemask_p1 <= («memory.name»_wren_p1 & «memory.name»_wren_p1 & «memory.name»_wren_p1 & «memory.name»_wren_p1) and «memory.name»_byteen_p1;
+			«memory.name»_bytemask_p2 <= («memory.name»_wren_p2 & «memory.name»_wren_p2 & «memory.name»_wren_p2 & «memory.name»_wren_p2) and «memory.name»_byteen_p2;
+
+			«memory.name» : entity work.dram_2p_«memory.name»
+			  port map(clka   => clk,
+			           wea    => «memory.name»_bytemask_p1,
+			           addra  => «memory.name»_address_p1,
+			           dina   => «memory.name»_data_p1,
+			           douta  => «memory.name»_queue_p1,
+			           clkb   => clk,
+			           web    => «memory.name»_bytemask_p2,
+			           addrb  => «memory.name»_address_p2,
+			           dinb   => «memory.name»_data_p2,
+			           doutb  => «memory.name»_queue_p2);
+		«ELSE»
+			«memory.name» : entity work.dram_2p
+			  generic map(depth      => «memory.depth»/4,
+			              byte_width => «memory.wordWidth»,
+			              addr_width => «memory.addrWidth»-2,
+			              bytes      => 4,
+			              device_family => "«fpga.family»")
+			  port map(clk        => clk,
+			           wren_p1    => «memory.name»_wren_p1,
+			           address_p1 => «memory.name»_address_p1,
+			           byteen_p1  => «memory.name»_byteen_p1,
+			           data_p1    => «memory.name»_data_p1,
+			           queue_p1   => «memory.name»_queue_p1,
+			           wren_p2    => «memory.name»_wren_p2,
+			           address_p2 => «memory.name»_address_p2,
+			           byteen_p2  => «memory.name»_byteen_p2,
+			           data_p2    => «memory.name»_data_p2,
+			           queue_p2   => «memory.name»_queue_p2,
+			           rst_n      => rst_n);
+		«ENDIF»
+
 		'''
 		
 	def private assign(Port port, Signal signal)
@@ -230,8 +250,28 @@ class HwDesignPrinter extends TTAPrinter {
 		---------------------------------------------------------------------------
 		'''
 		
-	def private declareSignals(Design design)
+	def private declare(Design design)
 		'''
+		«IF(fpga.xilinx)»
+			«val addrWidth = design.sharedMemories.get(0).addrWidth»
+			---------------------------------------------------------------------------
+			-- Components declaration
+			---------------------------------------------------------------------------		
+			component dram_2p
+			  port (
+			    clka  : in  std_logic;
+			    wea   : in  std_logic_vector(3 downto 0);
+			    addra : in  std_logic_vector(«addrWidth»-2-1 downto 0);
+			    dina  : in  std_logic_vector(31 downto 0);
+			    douta : out std_logic_vector(31 downto 0);
+			    clkb  : in  std_logic;
+			    web   : in  std_logic_vector(3 downto 0);
+			    addrb : in  std_logic_vector(«addrWidth»-2-1 downto 0);
+			    dinb  : in  std_logic_vector(31 downto 0);
+			    doutb : out std_logic_vector(31 downto 0));
+			end component;
+
+		«ENDIF»
 		---------------------------------------------------------------------------
 		-- Signals declaration
 		---------------------------------------------------------------------------
@@ -251,16 +291,20 @@ class HwDesignPrinter extends TTAPrinter {
 		
 	def private declareSignals(Memory memory)
 		'''
-		signal «memory.name»_wren_p1    : std_logic;
-		signal «memory.name»_address_p1 : std_logic_vector(«memory.addrWidth»-2-1 downto 0);
-		signal «memory.name»_byteen_p1  : std_logic_vector(3 downto 0);
-		signal «memory.name»_data_p1    : std_logic_vector(31 downto 0);
-		signal «memory.name»_queue_p1   : std_logic_vector(31 downto 0);
-		signal «memory.name»_wren_p2    : std_logic;
-		signal «memory.name»_address_p2 : std_logic_vector(«memory.addrWidth»-2-1 downto 0);
-		signal «memory.name»_byteen_p2  : std_logic_vector(3 downto 0);
-		signal «memory.name»_data_p2    : std_logic_vector(31 downto 0);
-		signal «memory.name»_queue_p2   : std_logic_vector(31 downto 0);
+		signal «memory.name»_wren_p1     : std_logic;
+		signal «memory.name»_address_p1  : std_logic_vector(«memory.addrWidth»-2-1 downto 0);
+		signal «memory.name»_byteen_p1   : std_logic_vector(3 downto 0);
+		signal «memory.name»_data_p1     : std_logic_vector(31 downto 0);
+		signal «memory.name»_queue_p1    : std_logic_vector(31 downto 0);
+		signal «memory.name»_wren_p2     : std_logic;
+		signal «memory.name»_address_p2  : std_logic_vector(«memory.addrWidth»-2-1 downto 0);
+		signal «memory.name»_byteen_p2   : std_logic_vector(3 downto 0);
+		signal «memory.name»_data_p2     : std_logic_vector(31 downto 0);
+		signal «memory.name»_queue_p2    : std_logic_vector(31 downto 0);
+		«IF(fpga.xilinx)»
+			signal «memory.name»_bytemask_p1 : std_logic_vector(3 downto 0);
+			signal «memory.name»_bytemask_p2 : std_logic_vector(3 downto 0);
+		«ENDIF»
 		'''
 		
 	def private declarePorts(Design design)

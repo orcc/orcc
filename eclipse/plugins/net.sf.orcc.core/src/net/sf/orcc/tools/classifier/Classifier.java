@@ -73,7 +73,6 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class Classifier extends DfVisitor<Void> {
 
-	private Actor actor;
 	private boolean internalizeGuards;
 
 	public Classifier() {

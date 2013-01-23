@@ -142,17 +142,17 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	public Object caseBlockIf(BlockIf node) {
+	public Object caseBlockIf(BlockIf block) {
 		// Interpret first expression ("if" condition)
-		Object condition = exprInterpreter.doSwitch(node.getCondition());
+		Object condition = exprInterpreter.doSwitch(block.getCondition());
 
 		int oldBranch = branch;
 		if (ValueUtil.isBool(condition)) {
 			if (ValueUtil.isTrue(condition)) {
-				doSwitch(node.getThenBlocks());
+				doSwitch(block.getThenBlocks());
 				branch = 0;
 			} else {
-				doSwitch(node.getElseBlocks());
+				doSwitch(block.getElseBlocks());
 				branch = 1;
 			}
 
@@ -165,32 +165,32 @@ public class AbstractInterpreter extends ActorInterpreter {
 			branch = -1;
 		}
 
-		doSwitch(node.getJoinBlock());
+		doSwitch(block.getJoinBlock());
 		branch = oldBranch;
 		return null;
 	}
 
 	@Override
-	public Object caseBlockWhile(BlockWhile node) {
+	public Object caseBlockWhile(BlockWhile block) {
 		int oldBranch = branch;
 		branch = 0;
-		doSwitch(node.getJoinBlock());
+		doSwitch(block.getJoinBlock());
 
 		// Interpret first expression ("while" condition)
-		Object condition = exprInterpreter.doSwitch(node.getCondition());
+		Object condition = exprInterpreter.doSwitch(block.getCondition());
 
 		if (ValueUtil.isBool(condition)) {
 			branch = 1;
 			while (ValueUtil.isTrue(condition)) {
-				doSwitch(node.getBlocks());
-				doSwitch(node.getJoinBlock());
+				doSwitch(block.getBlocks());
+				doSwitch(block.getJoinBlock());
 
 				// Interpret next value of "while" condition
-				condition = exprInterpreter.doSwitch(node.getCondition());
+				condition = exprInterpreter.doSwitch(block.getCondition());
 				if (schedulableMode && !ValueUtil.isBool(condition)) {
 					throw new OrccRuntimeException(
 							"Condition not boolean at line "
-									+ node.getLineNumber() + "\n");
+									+ block.getLineNumber() + "\n");
 				}
 			}
 		} else if (schedulableMode) {

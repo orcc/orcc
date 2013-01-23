@@ -57,12 +57,12 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 	 * The class defines a Network visitor used to evaluate the memory needs of
 	 * the given dataflow entities.
 	 */
-	private class InnerDfVisitor extends DfVisitor<Integer> {
-		private class InnerIrVisitor extends AbstractIrVisitor<Integer> {
+	private class InnerDfVisitor extends DfVisitor<Long> {
+		private class InnerIrVisitor extends AbstractIrVisitor<Long> {
 
 			@Override
-			public Integer caseProcedure(Procedure procedure) {
-				int bits = 0;
+			public Long caseProcedure(Procedure procedure) {
+				long bits = 0;
 				for (Var local : procedure.getLocals()) {
 					bits += doSwitch(local);
 				}
@@ -70,8 +70,8 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 			}
 
 			@Override
-			public Integer caseVar(Var var) {
-				return getSize(var.getType());
+			public Long caseVar(Var var) {
+				return (long) getSize(var.getType());
 			}
 
 		}
@@ -81,40 +81,42 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 		}
 
 		@Override
-		public Integer caseAction(Action action) {
-			int bits = doSwitch(action.getScheduler())
+		public Long caseAction(Action action) {
+			long bits = doSwitch(action.getScheduler())
 					+ doSwitch(action.getBody());
-			return (int) Math.ceil(bits + bits * ERROR_MARGIN);
+			return (long) Math.ceil(bits + bits * ERROR_MARGIN);
 		}
 
 		@Override
-		public Integer caseActor(Actor actor) {
-			int bits = 0;
+		public Long caseActor(Actor actor) {
+			long bits = 0;
 			for (Var var : actor.getStateVars()) {
 				if (var.isAssignable() || var.getType().isList()) {
-					bits += getSize(var.getType());
+					int tmp = getSize(var.getType());
+					bits += tmp;
 				}
 			}
 			for (Action action : actor.getActions()) {
-				bits += doSwitch(action);
+				long tmp = doSwitch(action);
+				bits += tmp;
 			}
 			return bits;
 		}
 
 		@Override
-		public Integer caseConnection(Connection connection) {
+		public Long caseConnection(Connection connection) {
 			int bits = connection.getSize()
 					* getSize(connection.getSourcePort().getType()) + 2 * 32;
-			return (int) Math.ceil(bits + bits * ERROR_MARGIN);
+			return (long) Math.ceil(bits + bits * ERROR_MARGIN);
 		}
 
 		@Override
-		public Integer caseInstance(Instance instance) {
+		public Long caseInstance(Instance instance) {
 			return doSwitch(instance.getActor());
 		}
 	}
 
-	private DfVisitor<Integer> dfVisitor;
+	private DfVisitor<Long> dfVisitor;
 
 	public ArchitectureMemoryEstimator() {
 		dfVisitor = new InnerDfVisitor();
@@ -146,12 +148,13 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
 		// Increase the size of the first RAM according to the memory needs for
 		// the stack and the state of the actors.
-		int bits = 0;
+		long bits = 0;
 		for (Vertex entity : processor.getMappedActors()) {
 			bits += dfVisitor.doSwitch(entity);
 		}
 		Memory ram = processor.getLocalRAMs().get(0);
-		ram.setDepth(BackendUtil.quantizeUp(ram.getDepth() + bits / 8));
+		long size = BackendUtil.quantizeUp(ram.getDepth() + bits / 8);
+		ram.setDepth(size);
 		ram.setWordWidth(8);
 		ram.setMinAddress(0);
 		return null;

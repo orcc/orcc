@@ -65,19 +65,19 @@ public class BlockCombine extends AbstractIrVisitor<Void> {
 	}
 
 	@Override
-	public Void caseBlockIf(BlockIf node) {
+	public Void caseBlockIf(BlockIf block) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
-		doSwitch(node.getThenBlocks());
+		doSwitch(block.getThenBlocks());
 
 		// so that previous blocks are not linked to else branch
 		previous = null;
-		doSwitch(node.getElseBlocks());
+		doSwitch(block.getElseBlocks());
 
 		// so that neither then nor else branch are linked to this join
 		// as a matter of fact, this also ensures correctness in nested ifs
 		previous = null;
-		doSwitch(node.getJoinBlock());
+		doSwitch(block.getJoinBlock());
 
 		// we do not set previous to null again, because join may be combined
 		// with next blocks (actually it needs to be).
@@ -86,10 +86,10 @@ public class BlockCombine extends AbstractIrVisitor<Void> {
 	}
 
 	@Override
-	public Void caseBlockWhile(BlockWhile node) {
+	public Void caseBlockWhile(BlockWhile block) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
-		doSwitch(node.getBlocks());
+		doSwitch(block.getBlocks());
 
 		// no previous block to be linked to
 		previous = null;

@@ -28,18 +28,23 @@
  */
 package net.sf.orcc.frontend;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Import;
-import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -52,7 +57,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -66,6 +70,10 @@ import org.eclipse.xtext.util.CancelIndicator;
 import org.eclipse.xtext.validation.CheckMode;
 import org.eclipse.xtext.validation.IResourceValidator;
 import org.eclipse.xtext.validation.Issue;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This class defines an RVC-CAL command line version of the frontend. It should
@@ -84,7 +92,7 @@ public class FrontendCli implements IApplication {
 
 	private List<IProject> orderedProjects;
 	private List<IProject> unorderedProjects;
-	private ResourceSet emfResourceSet;
+	private ResourceSet resourceSet;
 	private IWorkspace workspace;
 	private boolean isAutoBuildActivated;
 
@@ -97,9 +105,9 @@ public class FrontendCli implements IApplication {
 		CalStandaloneSetup.doSetup();
 
 		// Get the resource set used by Frontend
-		emfResourceSet = Frontend.instance.getResourceSet();
+		resourceSet = Frontend.instance.getResourceSet();
 		// Register the package to ensure it is available during loading.
-		emfResourceSet.getPackageRegistry().put(CalPackage.eNS_URI,
+		resourceSet.getPackageRegistry().put(CalPackage.eNS_URI,
 				CalPackage.eINSTANCE);
 	}
 
@@ -159,17 +167,21 @@ public class FrontendCli implements IApplication {
 	}
 
 	/**
-	 * Get all actors and units files from container (IProject or IFolder) and
-	 * all its subfolders.
+	 * Get all actors, units and, if includeNetworks == true, network files from
+	 * container (IProject or IFolder) and all its subfolders. Index is the
+	 * qualified name corresponding to the file.
 	 * 
 	 * @param container
 	 *            instance of IProject or IFolder to search in
-	 * @return list of *.cal files from container
+	 * @param includeNetworks
+	 *            set to true to include xdf files in the returned map
+	 * @return a map of qualified names / IFile descriptors
 	 * @throws OrccException
 	 */
-	private List<IFile> getCalFiles(IContainer container) throws OrccException {
-		List<IFile> actors = new ArrayList<IFile>();
+	private Map<String, IFile> getAllFiles(IContainer container,
+			boolean includeNetworks) throws OrccException {
 
+		Map<String, IFile> calFiles = new HashMap<String, IFile>();
 		IResource[] members = null;
 		try {
 			members = container.members();
@@ -177,11 +189,21 @@ public class FrontendCli implements IApplication {
 			for (IResource resource : members) {
 
 				if (resource.getType() == IResource.FOLDER) {
-					actors.addAll(getCalFiles((IFolder) resource));
+
+					calFiles.putAll(getAllFiles((IFolder) resource,
+							includeNetworks));
+
 				} else if (resource.getType() == IResource.FILE
-						&& resource.getFileExtension() != null
-						&& resource.getFileExtension().equals("cal")) {
-					actors.add((IFile) resource);
+						&& resource.getFileExtension() != null) {
+					if (resource.getFileExtension().equals("cal")
+							|| (includeNetworks && resource.getFileExtension()
+									.equals("xdf"))) {
+						String packageName = resource.getProjectRelativePath()
+								.removeFirstSegments(1).removeFileExtension()
+								.toString().replace('/', '.');
+						calFiles.put(packageName, (IFile) resource);
+					}
+
 				}
 			}
 		} catch (CoreException e) {
@@ -189,7 +211,22 @@ public class FrontendCli implements IApplication {
 					+ container.getName());
 		}
 
-		return actors;
+		return calFiles;
+	}
+
+	/**
+	 * Get all actors and units files from container (IProject or IFolder) and
+	 * all its subfolders. Index is the qualified name corresponding to the
+	 * file. In this default implementation, xdf files are not included in the
+	 * resulting map
+	 * 
+	 * @param container
+	 * @return
+	 * @throws OrccException
+	 */
+	private Map<String, IFile> getAllFiles(IContainer container)
+			throws OrccException {
+		return getAllFiles(container, false);
 	}
 
 	/**
@@ -199,9 +236,10 @@ public class FrontendCli implements IApplication {
 	 * 
 	 * @param currentProject
 	 * @throws OrccException
+	 * @throws CoreException
 	 */
 	private void storeProjectToCompile(IProject currentProject)
-			throws OrccException {
+			throws OrccException, CoreException {
 		unorderedProjects.add(currentProject);
 
 		try {
@@ -214,11 +252,11 @@ public class FrontendCli implements IApplication {
 				// Check for projects referenced in build path
 				if (cpEntry.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
 
-					IProject projectInBuildPath = workspace.getRoot()
+					IProject projectInClasspath = workspace.getRoot()
 							.getProject(cpEntry.getPath().toString());
 
-					if (!unorderedProjects.contains(projectInBuildPath)) {
-						storeProjectToCompile(projectInBuildPath);
+					if (!unorderedProjects.contains(projectInClasspath)) {
+						storeProjectToCompile(projectInClasspath);
 					}
 				}
 			}
@@ -228,44 +266,144 @@ public class FrontendCli implements IApplication {
 					+ currentProject.getName());
 		}
 
+		// This function is recursive, and projects referenced in classpath have
+		// been stored, so adding the current project now ensure order is right
 		if (!orderedProjects.contains(currentProject)) {
 			orderedProjects.add(currentProject);
+
+			IFolder outputDir = OrccUtil.getOutputFolder(currentProject);
+			if (!outputDir.exists()) {
+				outputDir.create(true, true, new NullProgressMonitor());
+			}
 		}
 	}
 
 	/**
-	 * Set projectName as current project and store dependencies to compile
-	 * before current project
+	 * Write IR files for all instance's children of a gived network
 	 * 
-	 * @param projectName
-	 * @throws OrccException
+	 * @param networkContent
+	 *            the input stream of xdf file content
+	 * @param qnameFileMap
 	 */
-	private void setProject(String projectName) throws OrccException {
+	private void writeIrFilesFromXdfContent(InputStream networkContent,
+			Map<String, IFile> qnameFileMap) {
 
-		IProject currentProject = workspace.getRoot().getProject(projectName);
-		if (currentProject != null) {
-			storeProjectToCompile(currentProject);
-		} else {
-			throw new OrccException("Impossible to find project named "
-					+ projectName);
+		Document document = DomUtil.parseDocument(networkContent);
+
+		Element root = document.getDocumentElement();
+
+		NodeList rootChildren = root.getChildNodes();
+		for (int i = 0; i < rootChildren.getLength(); ++i) {
+
+			Node rootChild = rootChildren.item(i);
+
+			if (rootChild.getNodeType() == Node.ELEMENT_NODE
+					&& ((Element) rootChild).getNodeName().equals("Instance")) {
+
+				Element instanceElt = (Element) rootChild;
+
+				NodeList instanceChildren = instanceElt.getChildNodes();
+				for (int j = 0; j < instanceChildren.getLength(); ++j) {
+
+					Node instanceChild = instanceChildren.item(j);
+
+					if (instanceChild.getNodeType() == Node.ELEMENT_NODE
+							&& ((Element) instanceChild).getNodeName().equals(
+									"Class")) {
+
+						String qualifiedName = ((Element) instanceChild)
+								.getAttribute("name");
+
+						if (qnameFileMap.containsKey(qualifiedName)) {
+
+							IFile file = qnameFileMap.get(qualifiedName);
+							if (file.getFileExtension().equals("xdf")) {
+								try {
+									writeIrFilesFromXdfContent(
+											new FileInputStream(file
+													.getLocationURI().getPath()),
+											qnameFileMap);
+								} catch (FileNotFoundException e) {
+									System.err
+											.println("Unable to open file corresponding to "
+													+ qualifiedName);
+								}
+							} else {
+								writeIrFile(qnameFileMap.get(qualifiedName),
+										qnameFileMap);
+							}
+						} else {
+							System.err
+									.println(qualifiedName
+											+ " does not exists in the current workspace");
+						}
+					}
+				}
+			}
 		}
 	}
 
 	/**
-	 * Write IR files of the project p under the default folder
-	 * &lt;project_folder&gt;/bin
+	 * Write the IR file corresponding to a *.cal one (Unit or Actor). This
+	 * method search for imported Units, and ensure they are all build before
+	 * doing the job for the current file
+	 * 
+	 * @param calFile
+	 *            the file to build
+	 * @param qnameFileMap
+	 *            a map with all known xdf and cal files of the workspace,
+	 *            indexed from their qualified name
+	 */
+	private void writeIrFile(IFile calFile, Map<String, IFile> qnameFileMap) {
+
+		Frontend.instance.setOutputFolder(OrccUtil.getOutputFolder(calFile
+				.getProject()));
+
+		Resource resource = EcoreHelper.getResource(resourceSet, calFile);
+
+		// Current actor to build
+		AstEntity astEntity = (AstEntity) resource.getContents().get(0);
+
+		for (Import importedQName : astEntity.getImports()) {
+			String nameSpace = importedQName.getImportedNamespace();
+			String importedUnit = nameSpace.substring(0,
+					nameSpace.lastIndexOf('.'));
+
+			if (qnameFileMap.containsKey(importedUnit)) {
+				IFile file = qnameFileMap.remove(importedUnit);
+
+				writeIrFile(file, qnameFileMap);
+			}
+		}
+
+		if (astEntity.getUnit() != null) {
+			System.out.println("Unit : " + calFile.getName() + " from project "
+					+ calFile.getProject().getName());
+		} else {
+			System.out.println("Actor : " + calFile.getName()
+					+ " from project " + calFile.getProject().getName());
+		}
+
+		// Really write Actor IR
+		if (!hasErrors(resource)) {
+			Frontend.getEntity(astEntity);
+		}
+
+	}
+
+	/**
+	 * Write IR files for all cla corresponding files of a project
 	 * 
 	 * @param p
 	 *            project to compile
 	 * @throws OrccException
 	 */
-	private void writeProjectIR(IProject p) throws OrccException {
+	private void writeIrFilesFromProject(IProject p,
+			Map<String, IFile> qnameFileMap) throws OrccException {
 
 		Frontend.instance.setOutputFolder(OrccUtil.getOutputFolder(p));
 
-		List<IFile> fileList = getCalFiles(p);
-
-		Map<String, Resource> resourceList = new HashMap<String, Resource>();
+		Map<String, Resource> resourceMap = new HashMap<String, Resource>();
 		ArrayList<String> orderedUnits = new ArrayList<String>();
 
 		System.out.println("-----------------------------");
@@ -274,61 +412,60 @@ public class FrontendCli implements IApplication {
 
 		// Save list of units qualified names and map of qualified name /
 		// entities
-		for (IFile file : fileList) {
-			URI uri = URI.createPlatformResourceURI(file.getFullPath()
-					.toString(), true);
-			Resource resource = emfResourceSet.getResource(uri, true);
+		for (Entry<String, IFile> entry : qnameFileMap.entrySet()) {
 
+			Resource resource = EcoreHelper.getResource(resourceSet,
+					entry.getValue());
 			AstEntity entity = (AstEntity) resource.getContents().get(0);
-			String qName = Util.getQualifiedName(entity);
 
-			resourceList.put(qName, resource);
+			resourceMap.put(entry.getKey(), resource);
 
 			if (entity.getUnit() != null) {
-				orderedUnits.add(qName);
+				orderedUnits.add(entry.getKey());
 			}
 		}
 
-		// Reorder unit list
+		// Reorder unit list, to ensure units depending on others are built
+		// after it/them
 		ArrayList<String> tempUnitList = new ArrayList<String>();
 		tempUnitList.addAll(orderedUnits);
 
 		for (String curUnitQName : tempUnitList) {
 
-			EList<Import> imports = ((AstEntity) resourceList.get(curUnitQName)
+			// Get imports for the current unit
+			EList<Import> imports = ((AstEntity) resourceMap.get(curUnitQName)
 					.getContents().get(0)).getImports();
 
 			for (Import i : imports) {
 				String importedNamespace = i.getImportedNamespace();
-				String importedQName = importedNamespace.substring(0,
+				String importQName = importedNamespace.substring(0,
 						importedNamespace.lastIndexOf('.'));
 
-				if (orderedUnits.contains(importedQName)) {
-					orderedUnits.remove(importedQName);
+				// Move the needed unit just before the current one
+				if (orderedUnits.contains(importQName)) {
+					orderedUnits.remove(importQName);
 					orderedUnits.add(orderedUnits.indexOf(curUnitQName),
-							importedQName);
+							importQName);
 				}
 			}
 		}
 
-		// Build units in right order
+		// Build units, and remove them from the resource map
 		for (String unitQName : orderedUnits) {
 			System.out.println("Unit : " + unitQName);
 
-			Resource resource = resourceList.get(unitQName);
+			Resource resource = resourceMap.remove(unitQName);
 			if (!hasErrors(resource)) {
 				Frontend.getEntity((AstEntity) resource.getContents().get(0));
 			}
-			resourceList.remove(unitQName);
 		}
 
 		// Build actors
-		for (String actorQName : resourceList.keySet()) {
+		for (String actorQName : resourceMap.keySet()) {
 			System.out.println("Actor : " + actorQName);
 
-			Resource resource = resourceList.get(actorQName);
+			Resource resource = resourceMap.get(actorQName);
 			if (!hasErrors(resource)) {
-
 				Frontend.getEntity((AstEntity) resource.getContents().get(0));
 			}
 		}
@@ -336,16 +473,46 @@ public class FrontendCli implements IApplication {
 
 	@Override
 	public Object start(IApplicationContext context) {
-		Map<?, ?> map = context.getArguments();
-
-		String[] args = (String[]) map
-				.get(IApplicationContext.APPLICATION_ARGS);
+		String[] args = (String[]) context.getArguments().get(
+				IApplicationContext.APPLICATION_ARGS);
 
 		String projectName = "";
-		if (args.length == 1) {
+		IProject baseProject = null;
+		InputStream network = null;
+		String networkName = "";
+
+		if (args.length >= 1) {
+
+			System.out.print("Command line arguments are \"");
+			for (String arg : args) {
+				System.out.print(arg + " ");
+			}
+			System.out.println("\"");
+
 			projectName = args[0];
+			baseProject = workspace.getRoot().getProject(projectName);
+			if (baseProject == null) {
+				System.err.println("Unable to find project " + projectName);
+				return IApplication.EXIT_RELAUNCH;
+			}
+
+			if (args.length >= 2 && !args[1].isEmpty()) {
+
+				IFile networkFile = OrccUtil.getFile(baseProject, args[1],
+						"xdf");
+				if (networkFile != null) {
+					try {
+						network = new FileInputStream(networkFile
+								.getLocationURI().getPath());
+						networkName = args[1];
+					} catch (FileNotFoundException e) {
+						network = null;
+					}
+				}
+			}
 		} else {
-			System.err.println("Please pass the project name in argument.");
+			System.err.println("Usage : \n"
+					+ "net.sf.orcc.cal.cli <project> [<network>]");
 			return IApplication.EXIT_RELAUNCH;
 		}
 
@@ -355,11 +522,27 @@ public class FrontendCli implements IApplication {
 			disableAutoBuild();
 
 			System.out.print("Setup " + projectName + " as working project ");
-			setProject(projectName);
+			storeProjectToCompile(baseProject);
 			System.out.println("Done");
 
-			for (IProject p : orderedProjects) {
-				writeProjectIR(p);
+			if (network == null) {
+				for (IProject project : orderedProjects) {
+					writeIrFilesFromProject(project, getAllFiles(project));
+				}
+			} else {
+				Map<String, IFile> allFiles = new HashMap<String, IFile>();
+				for (IProject project : orderedProjects) {
+					allFiles.putAll(getAllFiles(project, true));
+				}
+
+				System.out
+						.println("-----------------------------------------------");
+				System.out.println("Building needed files for network "
+						+ networkName);
+				System.out
+						.println("-----------------------------------------------");
+
+				writeIrFilesFromXdfContent(network, allFiles);
 			}
 			System.out.println("Done");
 

@@ -39,7 +39,7 @@ import net.sf.orcc.ir.TypeBool
 /**
  * Compile top Network c source code 
  *  
- * @author Antoine Lorence
+ * @author Antoine Lorence and Khaled Jerbi
  * 
  */
 class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
@@ -73,7 +73,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		
 		
 		/////////////////////////////////////////////////
-		// Action schedulers
+		// Action initializes schedulers
 		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm )»
@@ -122,14 +122,18 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	'''
 	override assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && !(connList.head.target instanceof Port)»
-				«printFifoAssignHLS(connList.head.source as Instance, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"),connList.head )»
+			«IF (!(connList.head.source instanceof Port) && !(connList.head.target instanceof Port))||(!(connList.head.source instanceof Port) && (connList.head.target instanceof Port))»
+				«printFifoAssignHLS(connList.head )»
+			«ENDIF»			
+		«ENDFOR»
+		«FOR connList : instance.incomingPortMap.values»
+			«IF ((connList.source instanceof Port) && !(connList.target instanceof Port))»
+				«printFifoAssignHLS(connList)»
 			«ENDIF»
-			
 		«ENDFOR»
 	'''
 	
-	def printFifoAssignHLS(Instance vertex, Port port, int fifoIndex, Connection connection) '''
+	def printFifoAssignHLS(Connection connection) '''
 		stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
 	'''
 	
@@ -137,14 +141,17 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		val i = super.print(targetFolder)
 		val contentProject = projectFileContent
 		val contentNetwork = networkFileContent
+		val contentVhdlTop = fifoFileContent
 		val contentTestBench = "int test() { return 0;}"
 		val projectFile = new File(targetFolder + File::separator + "vivado_hls.app")
 		val NetworkFile = new File(targetFolder + File::separator + network.simpleName + ".cpp")
 		val testBenchFile = new File(targetFolder + File::separator + "testBench" + ".cpp")
+		val FifoVhdlFile = new File(targetFolder + File::separator + "genericFifo" + ".vhd")
 		if(needToWriteFile(contentNetwork, NetworkFile)) {
 			printFile(contentProject, projectFile)
 			printFile(contentNetwork, NetworkFile)
 			printFile(contentTestBench, testBenchFile)
+			printFile(contentVhdlTop, FifoVhdlFile)
 			return i
 		} else {
 			return i + 1
@@ -155,9 +162,78 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		'''myStream_«connection.getAttribute("id").objectValue»'''
 	
 	def fifoType(Connection connection) {
-		connection.sourcePort.type
+		if (connection.sourcePort != null){	
+			connection.sourcePort.type
+		}else{
+			connection.targetPort.type
+		}
 	}
 		
 	override caseTypeBool(TypeBool type) 
 		'''bool'''
+		
+	def fifoFileContent()'''
+	library ieee;
+	use ieee.std_logic_1164.all;
+	use ieee.std_logic_arith.all;
+	entity FIFO_main_myStream is 
+	    generic (
+	        width : integer := 15);
+	    port (
+	        clk : IN STD_LOGIC;
+	        reset : IN STD_LOGIC;
+	        if_empty_n : OUT STD_LOGIC;
+	        if_read : IN STD_LOGIC;
+	        if_dout : OUT STD_LOGIC_VECTOR(width downto 0);
+	        if_full_n : OUT STD_LOGIC;
+	        if_write : IN STD_LOGIC;
+	        if_din : IN STD_LOGIC_VECTOR(width downto 0));
+	end entity;
+	
+	architecture rtl of FIFO_main_myStream is
+	    type memtype is array (0 to 513 - 1) of STD_LOGIC_VECTOR(width downto 0);
+	    signal mStorage : memtype;
+	    signal mInPtr  : UNSIGNED(10 - 1 downto 0) := (others => '0');
+	    signal mOutPtr : UNSIGNED(10 - 1 downto 0) := (others => '0');
+	    signal internal_empty_n, internal_full_n : STD_LOGIC;
+	    signal mFlag_nEF_hint : STD_LOGIC := '0';  -- 0: empty hint, 1: full hint
+	begin
+	    if_dout <= mStorage(CONV_INTEGER(mOutPtr));
+	    if_empty_n <= internal_empty_n;
+	    if_full_n <= internal_full_n;
+	
+	    internal_empty_n <= '0' when mInPtr = mOutPtr and mFlag_nEF_hint = '0' else '1';
+	    internal_full_n <= '0' when mInptr = mOutPtr and mFlag_nEF_hint = '1' else '1';
+	
+	    process (clk)
+	    begin
+	        if clk'event and clk = '1' then
+	            if reset = '1' then
+	                mInPtr <= (others => '0');
+	                mOutPtr <= (others => '0');
+	                mFlag_nEF_hint <= '0'; -- empty hint
+	            else
+	                if if_read = '1' and internal_empty_n = '1' then
+	                    if (mOutPtr = 513 -1) then
+	                        mOutPtr <= (others => '0');
+	                        mFlag_nEF_hint <= not mFlag_nEF_hint;
+	                    else
+	                        mOutPtr <= mOutPtr + 1;
+	                    end if;
+	                end if;
+	                if if_write = '1' and internal_full_n = '1' then
+	                    mStorage(CONV_INTEGER(mInPtr)) <= if_din;
+	                    if (mInPtr = 513 -1) then
+	                        mInPtr <= (others => '0');
+	                        mFlag_nEF_hint <= not mFlag_nEF_hint;
+	                    else
+	                        mInPtr <= mInPtr + 1;
+	                    end if;
+	                end if;
+	            end if;
+	        end if;
+	    end process;
+	   
+	end architecture;
+	'''
 }

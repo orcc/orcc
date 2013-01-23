@@ -347,7 +347,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		String[] oneInputOps = { "source_init", "source_rewind",
 				"source_decrementnbloops", "print_cyclecount", "fpsprintinit",
 				"fpsprintnewpicdecoded" };
-		String[] twoInputOps = { "source_exit", "display_checksum" };
+		String[] twoInputOps = { "source_exit", "display_checksum",
+				"throw_away" };
 		for (String operation : oneInputOps) {
 			functionUnit.getOperations().add(
 					createOperationDefault(operation, in1t));

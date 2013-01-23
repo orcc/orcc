@@ -74,6 +74,12 @@ public class HLSBackend extends CBackend {
 	private String srcPath;
 
 	/**
+	 * Path to target "testBench" folder
+	 */
+	private String testBenchPath;
+	private String commandPath;
+
+	/**
 	 * Configuration mapping
 	 */
 	protected Map<String, List<Instance>> targetToInstancesMap;
@@ -85,6 +91,8 @@ public class HLSBackend extends CBackend {
 		new File(path + File.separator + "bin").mkdirs();
 
 		srcPath = path + File.separator + "src";
+		testBenchPath = srcPath + File.separator + "testBench";
+		commandPath = srcPath + File.separator + "batchCommand";
 	}
 
 	@Override
@@ -109,7 +117,7 @@ public class HLSBackend extends CBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(true, false, true));
+		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new Multi2MonoToken());
 		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
@@ -188,10 +196,34 @@ public class HLSBackend extends CBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
+
+		OrccLogger.trace("Printing network testbench... ");
+		if (new NetworkTestBenchPrinter(network, options).print(testBenchPath) > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
+		
+		OrccLogger.trace("Printing network VHDL Top... ");
+		if (new TopVhdlPrinter(network, options).print(srcPath) > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
+		
+		OrccLogger.trace("Printing batch command... ");
+		if (new BatchCommandPrinter(network, options).print(commandPath) > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
+		
+		
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
+		new InstanceTestBenchPrinter(instance, options).printInstance(testBenchPath);
 		return new InstancePrinter(instance, options).printInstance(srcPath) > 0;
 	}
 }

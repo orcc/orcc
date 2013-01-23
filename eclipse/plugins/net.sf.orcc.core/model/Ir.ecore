@@ -124,6 +124,8 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ExprInt" eSuperTypes="#//Expression">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBigInteger"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type" containment="true"
+        resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ExprList" eSuperTypes="#//Expression">
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" upperBound="-1"

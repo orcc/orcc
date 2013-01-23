@@ -26,7 +26,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
- * <em><b>Node If</b></em>'. <!-- end-user-doc -->
+ * <em><b>BlockIf</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -291,22 +291,12 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 		return elseBlocks;
 	}
 
-	@Override
-	public EList<Block> getElseNodes() {
-		return getElseBlocks();
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public BlockBasic getJoinBlock() {
 		return joinBlock;
-	}
-
-	@Override
-	public BlockBasic getJoinNode() {
-		return getJoinBlock();
 	}
 
 	/**
@@ -330,11 +320,6 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	}
 
 	@Override
-	public EList<Block> getThenNodes() {
-		return getThenBlocks();
-	}
-
-	@Override
 	public boolean isBlockBasic() {
 		return false;
 	}
@@ -351,22 +336,17 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 
 	@Override
 	public boolean isElseRequired() {
-		List<Block> nodes = getElseNodes();
-		if (nodes.isEmpty()) {
+		List<Block> blocks = getElseBlocks();
+		if (blocks.isEmpty()) {
 			return false;
-		} else if (nodes.size() == 1) {
-			Block node = nodes.get(0);
-			if (node.isBlockBasic()) {
-				return !((BlockBasic) node).getInstructions().isEmpty();
+		} else if (blocks.size() == 1) {
+			Block block = blocks.get(0);
+			if (block.isBlockBasic()) {
+				return !((BlockBasic) block).getInstructions().isEmpty();
 			}
 		}
 
-		// more than one node, or one non-empty block node
-		return true;
-	}
-
-	@Override
-	public boolean isNodeIf() {
+		// more than one block, or one non-empty basic block
 		return true;
 	}
 
@@ -416,11 +396,6 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 					IrPackage.BLOCK_IF__JOIN_BLOCK, newJoinBlock, newJoinBlock));
 	}
 
-	@Override
-	public void setJoinNode(BlockBasic value) {
-		setJoinBlock(value);
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -449,4 +424,4 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 		return result.toString();
 	}
 
-} // NodeIfImpl
+} // BlockIfImpl

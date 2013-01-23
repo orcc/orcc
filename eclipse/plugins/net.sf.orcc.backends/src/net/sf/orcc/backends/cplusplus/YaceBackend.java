@@ -98,7 +98,7 @@ public class YaceBackend extends AbstractBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(false, false, false));
+		transformations.add(new TypeResizer(false, false, false, false));
 		transformations.add(new RenameTransformation(replacementMap));
 		if (!debug) {
 			transformations.add(new DeadGlobalElimination());
@@ -207,7 +207,7 @@ public class YaceBackend extends AbstractBackend {
 			String target = path + File.separator + "libs";
 			OrccLogger
 					.trace("Export libraries sources into " + target + "... ");
-			if (copyFolderToFileSystem("/runtime/C++", target)) {
+			if (copyFolderToFileSystem("/runtime/C++", target, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {

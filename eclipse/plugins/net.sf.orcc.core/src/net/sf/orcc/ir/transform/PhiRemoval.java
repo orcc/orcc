@@ -101,49 +101,49 @@ public class PhiRemoval extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseBlockIf(BlockIf node) {
-		BlockBasic join = node.getJoinBlock();
-		targetBlock = IrUtil.getLast(node.getThenBlocks());
+	public Object caseBlockIf(BlockIf block) {
+		BlockBasic join = block.getJoinBlock();
+		targetBlock = IrUtil.getLast(block.getThenBlocks());
 		phiIndex = 0;
 		caseBlockBasic(join);
 
-		targetBlock = IrUtil.getLast(node.getElseBlocks());
+		targetBlock = IrUtil.getLast(block.getElseBlocks());
 		phiIndex = 1;
 		caseBlockBasic(join);
 		new PhiRemover().caseBlockBasic(join);
 
-		doSwitch(node.getThenBlocks());
-		doSwitch(node.getElseBlocks());
+		doSwitch(block.getThenBlocks());
+		doSwitch(block.getElseBlocks());
 		return null;
 	}
 
 	@Override
-	public Object caseBlockWhile(BlockWhile node) {
-		List<Block> nodes = EcoreHelper.getContainingList(node);
-		// the node before the while.
+	public Object caseBlockWhile(BlockWhile block) {
+		List<Block> blocks = EcoreHelper.getContainingList(block);
+		// the block before the while.
 		if (indexBlock > 0) {
-			Block previousNode = nodes.get(indexBlock - 1);
-			if (previousNode.isBlockBasic()) {
-				targetBlock = (BlockBasic) previousNode;
+			Block previousBlock = blocks.get(indexBlock - 1);
+			if (previousBlock.isBlockBasic()) {
+				targetBlock = (BlockBasic) previousBlock;
 			} else {
 				targetBlock = IrFactory.eINSTANCE.createBlockBasic();
-				nodes.add(indexBlock, targetBlock);
+				blocks.add(indexBlock, targetBlock);
 			}
 		} else {
 			targetBlock = IrFactory.eINSTANCE.createBlockBasic();
-			nodes.add(indexBlock, targetBlock);
+			blocks.add(indexBlock, targetBlock);
 		}
 
-		BlockBasic join = node.getJoinBlock();
+		BlockBasic join = block.getJoinBlock();
 		phiIndex = 0;
 		caseBlockBasic(join);
 
-		// last node of the while
-		targetBlock = IrUtil.getLast(node.getBlocks());
+		// last block of the while
+		targetBlock = IrUtil.getLast(block.getBlocks());
 		phiIndex = 1;
 		caseBlockBasic(join);
 		new PhiRemover().caseBlockBasic(join);
-		doSwitch(node.getBlocks());
+		doSwitch(block.getBlocks());
 		return null;
 	}
 

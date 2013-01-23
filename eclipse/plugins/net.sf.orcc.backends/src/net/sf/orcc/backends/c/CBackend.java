@@ -34,15 +34,10 @@ import static net.sf.orcc.backends.OrccBackendsConstants.GENETIC_ALGORITHM;
 import static net.sf.orcc.backends.OrccBackendsConstants.THREADS_NB;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
@@ -86,7 +81,6 @@ import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -147,7 +141,7 @@ public class CBackend extends AbstractBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(true, false, true));
+		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 
 		// If "-t" option is passed to command line, apply additional
@@ -275,51 +269,22 @@ public class CBackend extends AbstractBackend {
 	public boolean exportRuntimeLibrary() {
 		boolean exportLibrary = !getAttribute(NO_LIBRARY_EXPORT, false);
 
-		String libsPath = path + File.separator + "libs";
-		File vFile = new File(libsPath + File.separator + "VERSION");
-
-		String currentBundleVersion = Platform
-				.getBundle("net.sf.orcc.backends").getHeaders()
-				.get("Bundle-Version");
-
-		if (vFile.exists()) {
-			try {
-				Scanner reader = new Scanner(new FileInputStream(vFile));
-				reader.hasNextLine();
-				String libVersion = reader.nextLine();
-
-				int compareResult = BackendUtil.compareVersions(BackendUtil
-						.getVersionArrayFromString(currentBundleVersion),
-						BackendUtil.getVersionArrayFromString(libVersion));
-				exportLibrary = compareResult > 0;
-				reader.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-
 		if (exportLibrary) {
+			String libsPath = path + File.separator + "libs";
+
 			// Copy specific windows batch file
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
 				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
-						path + File.separator + "run_cmake_with_VS_env.bat");
+						path + File.separator + "run_cmake_with_VS_env.bat",
+						debug);
 			}
 
 			copyFileToFilesystem("/runtime/C/README.txt", path + File.separator
-					+ "README.txt");
-
-			try {
-				FileOutputStream os = new FileOutputStream(vFile);
-				byte[] bytes = currentBundleVersion.getBytes();
-				os.write(bytes, 0, bytes.length);
-				os.close();
-			} catch (FileNotFoundException e) {
-			} catch (IOException e) {
-			}
+					+ "README.txt", debug);
 
 			OrccLogger.trace("Export libraries sources into " + libsPath
 					+ "... ");
-			if (copyFolderToFileSystem("/runtime/C/libs", libsPath)) {
+			if (copyFolderToFileSystem("/runtime/C/libs", libsPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {

@@ -278,7 +278,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Variables() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(8);
+		return (EReference) networkEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -311,14 +311,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EReference getNetwork_Parameters() {
 		return (EReference) networkEClass.getEStructuralFeatures().get(6);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getNetwork_TemplateData() {
-		return (EAttribute) networkEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -552,14 +544,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EReference getActor_StateVars() {
 		return (EReference) actorEClass.getEStructuralFeatures().get(13);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getActor_TemplateData() {
-		return (EAttribute) actorEClass.getEStructuralFeatures().get(14);
 	}
 
 	/**
@@ -996,7 +980,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(actorEClass, ACTOR__PARAMETERS);
 		createEReference(actorEClass, ACTOR__PROCS);
 		createEReference(actorEClass, ACTOR__STATE_VARS);
-		createEAttribute(actorEClass, ACTOR__TEMPLATE_DATA);
 
 		networkEClass = createEClass(NETWORK);
 		createEReference(networkEClass, NETWORK__CHILDREN);
@@ -1006,7 +989,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(networkEClass, NETWORK__NAME);
 		createEReference(networkEClass, NETWORK__OUTPUTS);
 		createEReference(networkEClass, NETWORK__PARAMETERS);
-		createEAttribute(networkEClass, NETWORK__TEMPLATE_DATA);
 		createEReference(networkEClass, NETWORK__VARIABLES);
 
 		connectionEClass = createEClass(CONNECTION);
@@ -1274,10 +1256,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"stateVars", null, 0, -1, Actor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActor_TemplateData(), ecorePackage.getEJavaObject(),
-				"templateData", null, 0, 1, Actor.class, IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
 
 		initEClass(networkEClass, Network.class, "Network", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1309,10 +1287,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"parameters", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getNetwork_TemplateData(),
-				ecorePackage.getEJavaObject(), "templateData", null, 0, 1,
-				Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null,
 				"variables", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,

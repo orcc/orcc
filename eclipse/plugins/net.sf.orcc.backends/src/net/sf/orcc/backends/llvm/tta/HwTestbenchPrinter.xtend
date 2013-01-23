@@ -34,6 +34,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.util.FPGA
+import net.sf.orcc.backends.llvm.tta.architecture.Memory
 
 class HwTestbenchPrinter extends TTAPrinter {
 	
@@ -57,7 +58,7 @@ class HwTestbenchPrinter extends TTAPrinter {
 	def private getVhdl(Design design)
 		'''
 		------------------------------------------------------------------------------
-		-- Generated from <vertex.simpleName>
+		-- Generated from «design.name»
 		------------------------------------------------------------------------------
 		
 		library ieee;
@@ -134,7 +135,7 @@ class HwTestbenchPrinter extends TTAPrinter {
 	
 	def private mapSignal(Port port)
 		'''
-		«port.name» => <port.name>,
+		«port.name» => «port.name»,
 		'''
 	
 	def private getWave(Design design) 
@@ -182,7 +183,7 @@ class HwTestbenchPrinter extends TTAPrinter {
 		
 	def	private getWave(Processor processor)
 		'''
-		add wave -noupdate -divider \<NULL\>
+		add wave -noupdate -divider <NULL>
 		add wave -noupdate -divider «processor.name»
 		add wave -noupdate -divider inputs
 		«FOR edge: processor.incoming»
@@ -199,13 +200,13 @@ class HwTestbenchPrinter extends TTAPrinter {
 	def private getWave(Link link, Processor processor, Port port) 
 		'''
 		«IF(!link.signal)»
-		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_data_in
-		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_data_out
-		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_addr
-		add wave -noupdate -format Logic tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_wr_en
-		add wave -noupdate -format Literal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>_dmem_bytemask<
+		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_«port.name»_dmem_data_in
+		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_«port.name»_dmem_data_out
+		add wave -noupdate -format Literal -radix decimal tb_top/top_orcc/«processor.name»_inst/fu_«port.name»_dmem_addr
+		add wave -noupdate -format Logic tb_top/top_orcc/«processor.name»_inst/fu_«port.name»_dmem_wr_en
+		add wave -noupdate -format Literal tb_top/top_orcc/«processor.name»_inst/fu_«port.name»_dmem_bytemask
 		«ELSE»
-		add wave -noupdate -format Literal tb_top/top_orcc/«processor.name»_inst/fu_<port.name>
+		add wave -noupdate -format Literal tb_top/top_orcc/«processor.name»_inst/fu_«port.name»
 		«ENDIF»
 		'''
 		
@@ -249,12 +250,15 @@ class HwTestbenchPrinter extends TTAPrinter {
 		vcom -93 -quiet -work work share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 		vcom -93 -quiet -work work share/vhdl/mul.vhdl
 		vcom -93 -quiet -work work share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl
-		vcom -93 -quiet -work work share/vhdl/and_ior_xor.vhdl
 		vcom -93 -quiet -work work share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl
 		vcom -93 -quiet -work work share/vhdl/stratix3_led_io_always_1.vhd
 		
-		«FOR processor:design.processors»
+		«FOR processor: design.processors»
 			«processor.tcl»
+		«ENDFOR»
+		
+		«FOR memory: design.sharedMemories»
+			«memory.tcl»
 		«ENDFOR»
 		
 		# Network
@@ -265,33 +269,38 @@ class HwTestbenchPrinter extends TTAPrinter {
 		vsim -novopt «IF(fpga.altera)»-L altera_mf «ENDIF»work.tb_top -t ps -do "do wave.do;"
 		'''
 
+	def	private getTcl(Memory memory) 
+		'''
+		vcom -93 -quiet -work work wrapper/dram_2p_«memory.name».vhd
+		'''
+		
 	def private getTcl(Processor processor)
 		'''
-		# Compile processor <processor.name>
-		vcom -93 -quiet -work work <processor.name>/tta/vhdl/imem_mau_pkg.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/vhdl/<processor.name>_tl_globals_pkg.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/vhdl/<processor.name>_tl_params_pkg.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/vhdl/<processor.name>_mem_constants_pkg.vhd
-		vcom -93 -quiet -work work <processor.name>/tta/vhdl/<processor.name>_tl.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/vhdl/<processor.name>.vhd
-		vcom -93 -quiet -work work <processor.name>/tta/gcu_ic/gcu_opcodes_pkg.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/gcu_ic/output_socket_<length(processor.buses)>_1.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/gcu_ic/output_socket_1_1.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/gcu_ic/input_socket_<length(processor.buses)>.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/gcu_ic/ifetch.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/gcu_ic/idecompressor.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/gcu_ic/ic.vhdl
-		vcom -93 -quiet -work work <processor.name>/tta/gcu_ic/decoder.vhdl
+		# Compile processor «processor.name»
+		vcom -93 -quiet -work work «processor.name»/tta/vhdl/imem_mau_pkg.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/vhdl/«processor.name»_tl_globals_pkg.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/vhdl/«processor.name»_tl_params_pkg.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/vhdl/«processor.name»_mem_constants_pkg.vhd
+		vcom -93 -quiet -work work «processor.name»/tta/vhdl/«processor.name»_tl.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/vhdl/«processor.name».vhd
+		vcom -93 -quiet -work work «processor.name»/tta/gcu_ic/gcu_opcodes_pkg.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/gcu_ic/output_socket_«processor.buses.size»_1.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/gcu_ic/output_socket_1_1.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/gcu_ic/input_socket_«processor.buses.size».vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/gcu_ic/ifetch.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/gcu_ic/idecompressor.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/gcu_ic/ic.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/gcu_ic/decoder.vhdl
 		
 		«IF(fpga.xilinx)»
-		vcom -93 -quiet -work work <processor.name>/tta/vhdl/dram_<processor.name>.vhd
-		vcom -93 -quiet -work work <processor.name>/tta/vhdl/irom_<processor.name>.vhd
+		vcom -93 -quiet -work work «processor.name»/tta/vhdl/dram_«processor.name».vhd
+		vcom -93 -quiet -work work «processor.name»/tta/vhdl/irom_«processor.name».vhd
 		
-		exec cp -f <processor.name>/tta/vhdl/dram_<processor.name>.mif . &
-		exec cp -f <processor.name>/tta/vhdl/irom_<processor.name>.mif . &
+		exec cp -f «processor.name»/tta/vhdl/dram_«processor.name».mif . &
+		exec cp -f «processor.name»/tta/vhdl/irom_«processor.name».mif . &
 		«ELSE»
-		exec cp -f wrapper/dram_<processor.name>.mif . &
-		exec cp -f wrapper/irom_<processor.name>.mif . &
+		exec cp -f wrapper/dram_«processor.name».mif . &
+		exec cp -f wrapper/irom_«processor.name».mif . &
 		«ENDIF»
 		'''
 		

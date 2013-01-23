@@ -39,28 +39,24 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLineNumber <em>Line Number
- * </em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLocals <em>Locals</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getName <em>Name</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#isNative <em>Native</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getBlocks <em>Blocks</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getParameters <em>Parameters
- * </em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getReturnType <em>Return Type
- * </em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getCfg <em>Cfg</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLocals <em>Locals</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#isNative <em>Native</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getBlocks <em>Blocks</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getParameters <em>Parameters</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getReturnType <em>Return Type</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getCfg <em>Cfg</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
-	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}'
-	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLineNumber()
 	 * @generated
 	 * @ordered
@@ -68,9 +64,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	protected static final int LINE_NUMBER_EDEFAULT = 0;
 
 	/**
-	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}'
-	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLineNumber()
 	 * @generated
 	 * @ordered
@@ -78,9 +73,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getLocals() <em>Locals</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getLocals() <em>Locals</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLocals()
 	 * @generated
 	 * @ordered
@@ -90,7 +84,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -105,7 +98,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -115,7 +107,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	/**
 	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #isNative()
 	 * @generated
 	 * @ordered
@@ -125,7 +116,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	/**
 	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #isNative()
 	 * @generated
 	 * @ordered
@@ -133,9 +123,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getBlocks() <em>Blocks</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getBlocks() <em>Blocks</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getBlocks()
 	 * @generated
 	 * @ordered
@@ -143,9 +132,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	protected EList<Block> blocks;
 
 	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getParameters()
 	 * @generated
 	 * @ordered
@@ -155,9 +143,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	private Expression result;
 
 	/**
-	 * The cached value of the '{@link #getReturnType() <em>Return Type</em>}'
-	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getReturnType() <em>Return Type</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getReturnType()
 	 * @generated
 	 * @ordered
@@ -165,9 +152,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	protected Type returnType;
 
 	/**
-	 * The cached value of the '{@link #getCfg() <em>Cfg</em>}' containment
-	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getCfg() <em>Cfg</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getCfg()
 	 * @generated
 	 * @ordered
@@ -188,7 +174,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetCfg(Cfg newCfg, NotificationChain msgs) {
@@ -197,18 +182,16 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this,
 					Notification.SET, IrPackage.PROCEDURE__CFG, oldCfg, newCfg);
-			if (msgs == null) {
+			if (msgs == null)
 				msgs = notification;
-			} else {
+			else
 				msgs.add(notification);
-			}
 		}
 		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetReturnType(Type newReturnType,
@@ -219,18 +202,16 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 			ENotificationImpl notification = new ENotificationImpl(this,
 					Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE,
 					oldReturnType, newReturnType);
-			if (msgs == null) {
+			if (msgs == null)
 				msgs = notification;
-			} else {
+			else
 				msgs.add(notification);
-			}
 		}
 		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -258,7 +239,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -282,7 +262,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -311,7 +290,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -351,7 +329,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -361,7 +338,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -397,7 +373,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -411,7 +386,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -420,10 +394,10 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	}
 
 	/**
-	 * Returns the first block in the list of nodes of this procedure. A new
-	 * block is created if there is no block in the given node list.
+	 * Returns the first block in the list of blocks of this procedure. A new
+	 * block is created if there is no block in the given block list.
 	 * 
-	 * @return the first block in the list of nodes of this procedure
+	 * @return the first block in the list of blocks of this procedure
 	 */
 	@Override
 	public BlockBasic getFirst() {
@@ -431,10 +405,10 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	}
 
 	/**
-	 * Returns the last block in the list of nodes of this procedure. A new
-	 * block is created if there is no block in the given node list.
+	 * Returns the last block in the list of blocks of this procedure. A new
+	 * block is created if there is no block in the given block list.
 	 * 
-	 * @return the last block in the list of nodes of this procedure
+	 * @return the last block in the list of blocks of this procedure
 	 */
 	@Override
 	public BlockBasic getLast() {
@@ -443,7 +417,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -458,7 +431,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -483,11 +455,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	}
 
 	@Override
-	public EList<Block> getNodes() {
-		return getBlocks();
-	}
-
-	@Override
 	public Param getParameter(String name) {
 		for (Param param : getParameters()) {
 			if (param.getVariable().getName().equals(name)) {
@@ -499,7 +466,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -518,7 +484,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -528,7 +493,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -564,76 +528,65 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void setCfg(Cfg newCfg) {
 		if (newCfg != cfg) {
 			NotificationChain msgs = null;
-			if (cfg != null) {
+			if (cfg != null)
 				msgs = ((InternalEObject) cfg).eInverseRemove(this,
 						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
 						null, msgs);
-			}
-			if (newCfg != null) {
+			if (newCfg != null)
 				msgs = ((InternalEObject) newCfg).eInverseAdd(this,
 						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
 						null, msgs);
-			}
 			msgs = basicSetCfg(newCfg, msgs);
-			if (msgs != null) {
+			if (msgs != null)
 				msgs.dispatch();
-			}
-		} else if (eNotificationRequired()) {
+		} else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.PROCEDURE__CFG, newCfg, newCfg));
-		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void setLineNumber(int newLineNumber) {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
-		if (eNotificationRequired()) {
+		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.PROCEDURE__LINE_NUMBER, oldLineNumber, lineNumber));
-		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
-		if (eNotificationRequired()) {
+		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.PROCEDURE__NAME, oldName, name));
-		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void setNative(boolean newNative) {
 		boolean oldNative = native_;
 		native_ = newNative;
-		if (eNotificationRequired()) {
+		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.PROCEDURE__NATIVE, oldNative, native_));
-		}
 	}
 
 	@Override
@@ -643,44 +596,37 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void setReturnType(Type newReturnType) {
 		if (newReturnType != returnType) {
 			NotificationChain msgs = null;
-			if (returnType != null) {
+			if (returnType != null)
 				msgs = ((InternalEObject) returnType).eInverseRemove(this,
 						EOPPOSITE_FEATURE_BASE
 								- IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
-			}
-			if (newReturnType != null) {
+			if (newReturnType != null)
 				msgs = ((InternalEObject) newReturnType).eInverseAdd(this,
 						EOPPOSITE_FEATURE_BASE
 								- IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
-			}
 			msgs = basicSetReturnType(newReturnType, msgs);
-			if (msgs != null) {
+			if (msgs != null)
 				msgs.dispatch();
-			}
-		} else if (eNotificationRequired()) {
+		} else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.PROCEDURE__RETURN_TYPE, newReturnType,
 					newReturnType));
-		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) {
+		if (eIsProxy())
 			return super.toString();
-		}
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (lineNumber: ");

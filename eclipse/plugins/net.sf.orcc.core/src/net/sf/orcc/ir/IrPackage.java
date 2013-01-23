@@ -145,6 +145,14 @@ public interface IrPackage extends EPackage {
 		EAttribute EXPR_INT__VALUE = eINSTANCE.getExprInt_Value();
 
 		/**
+		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_INT__TYPE = eINSTANCE.getExprInt_Type();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprListImpl <em>Expr List</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.ExprListImpl
@@ -2265,13 +2273,22 @@ public interface IrPackage extends EPackage {
 	int EXPR_INT__VALUE = EXPRESSION_FEATURE_COUNT + 0;
 
 	/**
+	 * The feature id for the '<em><b>Type</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_INT__TYPE = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Expr Int</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int EXPR_INT_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
+	int EXPR_INT_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -3173,6 +3190,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getExprInt_Value();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.ExprInt#getType <em>Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Type</em>'.
+	 * @see net.sf.orcc.ir.ExprInt#getType()
+	 * @see #getExprInt()
+	 * @generated
+	 */
+	EReference getExprInt_Type();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprList <em>Expr List</em>}'.

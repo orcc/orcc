@@ -479,16 +479,6 @@ public class BlockForImpl extends BlockImpl implements BlockFor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see net.sf.orcc.backends.ir.BlockFor#isNodeFor()
-	 */
-	@Override
-	public boolean isNodeFor() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see net.sf.orcc.backends.ir.BlockFor#isBlockFor()
 	 */
 	@Override

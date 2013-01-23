@@ -237,14 +237,14 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	 *            a list of blocks that belong to a procedure
 	 */
 	public T visitBlocks(List<Block> blocks) {
-		int oldIndexNode = indexBlock;
+		int oldIndexBlock = indexBlock;
 		T result = null;
 		for (indexBlock = 0; indexBlock < blocks.size() && result == null; indexBlock++) {
 			Block block = blocks.get(indexBlock);
 			result = doSwitch(block);
 		}
 
-		indexBlock = oldIndexNode;
+		indexBlock = oldIndexBlock;
 		return result;
 	}
 
@@ -255,14 +255,14 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	 *            a list of blocks that belong to a procedure
 	 */
 	public T visitBlocksReverse(List<Block> blocks) {
-		int oldIndexNode = indexBlock;
+		int oldIndexBlock = indexBlock;
 		T result = null;
 		for (indexBlock = blocks.size() - 1; indexBlock >= 0 && result == null; indexBlock--) {
 			Block block = blocks.get(indexBlock);
 			result = doSwitch(block);
 		}
 
-		indexBlock = oldIndexNode;
+		indexBlock = oldIndexBlock;
 		return result;
 	}
 

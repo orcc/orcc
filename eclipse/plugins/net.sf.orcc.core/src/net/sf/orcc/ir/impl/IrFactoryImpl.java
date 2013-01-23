@@ -405,21 +405,18 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public ExprInt createExprInt(BigInteger value) {
 		ExprIntImpl exprInt = new ExprIntImpl();
 		exprInt.setValue(value);
+		exprInt.setType(createTypeInt(value.bitLength() + 1));
 		return exprInt;
 	}
 
 	@Override
 	public ExprInt createExprInt(int value) {
-		ExprIntImpl exprInt = new ExprIntImpl();
-		exprInt.setValue(BigInteger.valueOf(value));
-		return exprInt;
+		return createExprInt(BigInteger.valueOf(value));
 	}
 
 	@Override
 	public ExprInt createExprInt(long value) {
-		ExprIntImpl exprInt = new ExprIntImpl();
-		exprInt.setValue(BigInteger.valueOf(value));
-		return exprInt;
+		return createExprInt(BigInteger.valueOf(value));
 	}
 
 	/**
@@ -857,6 +854,17 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		procedure.setLineNumber(lineNumber);
 		procedure.setName(name);
 		procedure.setReturnType(EcoreUtil.copy(returnType));
+
+		return procedure;
+	}
+
+	@Override
+	public Procedure createProcedure(String name, Type returnType, Param param) {
+		ProcedureImpl procedure = new ProcedureImpl();
+
+		procedure.setName(name);
+		procedure.setReturnType(EcoreUtil.copy(returnType));
+		procedure.getParameters().add(param);
 
 		return procedure;
 	}

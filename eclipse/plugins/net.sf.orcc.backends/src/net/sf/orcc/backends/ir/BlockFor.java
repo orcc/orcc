@@ -162,8 +162,6 @@ public interface BlockFor extends Block {
 	 */
 	EList<Instruction> getInit();
 
-	public boolean isNodeFor();
-
 	public boolean isBlockFor();
 
 } // NodeFor

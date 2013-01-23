@@ -34,7 +34,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
- * Remove empty node from if and while node.
+ * Remove empty block from if and while block.
  * 
  * @author Herve Yviquel
  * @author Jerome Gorin

@@ -76,39 +76,39 @@ public class IfConverter extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseBlockIf(BlockIf nodeIf) {
+	public Object caseBlockIf(BlockIf blockIf) {
 		Predicate previousPredicate = currentPredicate;
 
 		// predicate for "then" branch
 		currentPredicate = IrUtil.copy(previousPredicate);
 		currentPredicate.getExpressions().add(
-				IrUtil.copy(nodeIf.getCondition()));
-		doSwitch(nodeIf.getThenBlocks());
+				IrUtil.copy(blockIf.getCondition()));
+		doSwitch(blockIf.getThenBlocks());
 		IrUtil.delete(currentPredicate);
 
 		// predicate for "else" branch
 		currentPredicate = IrUtil.copy(previousPredicate);
 		currentPredicate.getExpressions().add(
 				IrFactory.eINSTANCE.createExprUnary(OpUnary.LOGIC_NOT,
-						IrUtil.copy(nodeIf.getCondition()),
+						IrUtil.copy(blockIf.getCondition()),
 						IrFactory.eINSTANCE.createTypeBool()));
-		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(blockIf.getElseBlocks());
 		IrUtil.delete(currentPredicate);
 
-		// restore predicate for "join" node
+		// restore predicate for "join" block
 		currentPredicate = previousPredicate;
-		doSwitch(nodeIf.getJoinBlock());
+		doSwitch(blockIf.getJoinBlock());
 
-		// deletes condition and node
-		IrUtil.delete(nodeIf.getCondition());
-		EcoreUtil.remove(nodeIf);
+		// deletes condition and block
+		IrUtil.delete(blockIf.getCondition());
+		EcoreUtil.remove(blockIf);
 
 		return null;
 	}
 
 	@Override
-	public Object caseBlockWhile(BlockWhile nodeWhile) {
-		throw new OrccRuntimeException("unsupported NodeWhile");
+	public Object caseBlockWhile(BlockWhile blockWhile) {
+		throw new OrccRuntimeException("unsupported BlockWhile");
 	}
 
 	@Override

@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.df.Action;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
@@ -187,6 +188,7 @@ public class Inliner extends AbstractIrVisitor<Void> {
 
 	private boolean inlineFunction;
 	private boolean inlineProcedure;
+	private boolean inlineActionBodyProcedure;
 
 	private InstReturn instReturn;
 
@@ -196,6 +198,15 @@ public class Inliner extends AbstractIrVisitor<Void> {
 	public Inliner(boolean inlineProcedure, boolean inlineFunction) {
 		this.inlineProcedure = inlineProcedure;
 		this.inlineFunction = inlineFunction;
+		this.inlineActionBodyProcedure = true;
+		this.updater = new ExpressionUpdater();
+	}
+
+	public Inliner(boolean inlineActionBodyProcedure, boolean inlineProcedure,
+			boolean inlineFunction) {
+		this.inlineProcedure = inlineProcedure;
+		this.inlineFunction = inlineFunction;
+		this.inlineActionBodyProcedure = inlineActionBodyProcedure;
 		this.updater = new ExpressionUpdater();
 	}
 
@@ -204,35 +215,52 @@ public class Inliner extends AbstractIrVisitor<Void> {
 		Type returnType = call.getProcedure().getReturnType();
 		if (returnType.isVoid() && inlineProcedure || !returnType.isVoid()
 				&& inlineFunction) {
-			if (!call.getProcedure().isNative())
-				inlineProcedure(call);
+			if (!call.getProcedure().isNative()) {
+				if (inlineActionBodyProcedure) {
+					inlineProcedure(call);
+				} else {
+					Procedure procedure = call.getProcedure();
+					Action action = EcoreHelper.getContainerOfType(procedure,
+							Action.class);
+					if (action != null) {
+						if (procedure != action.getBody()) {
+							inlineProcedure(call);
+						}
+					} else {
+						inlineProcedure(call);
+					}
+				}
+			}
 		}
 		return null;
 	}
 
 	/**
-	 * Find the given node into the given nodes location.
+	 * Find the given block into the given blocks location.
 	 * 
-	 * @param locationNodes
-	 * @param nodeToFind
+	 * @param locationBlocks
+	 * @param blockToFind
 	 * @return
 	 */
-	public List<Block> findNode(List<Block> locationNodes, Block nodeToFind) {
-		if (locationNodes.contains(nodeToFind)) {
-			return locationNodes;
+	public List<Block> findBlock(List<Block> locationBlocks, Block blockToFind) {
+		if (locationBlocks.contains(blockToFind)) {
+			return locationBlocks;
 		} else {
 			List<Block> n = null;
-			for (Block node : locationNodes) {
-				if (node.isBlockIf()) {
-					n = findNode(((BlockIf) node).getElseBlocks(), nodeToFind);
-					if (n == null)
-						n = findNode(((BlockIf) node).getThenBlocks(),
-								nodeToFind);
-				} else if (node.isBlockWhile()) {
-					n = findNode(((BlockWhile) node).getBlocks(), nodeToFind);
+			for (Block block : locationBlocks) {
+				if (block.isBlockIf()) {
+					n = findBlock(((BlockIf) block).getElseBlocks(),
+							blockToFind);
+					if (n == null) {
+						n = findBlock(((BlockIf) block).getThenBlocks(),
+								blockToFind);
+					}
+				} else if (block.isBlockWhile()) {
+					n = findBlock(((BlockWhile) block).getBlocks(), blockToFind);
 				}
-				if (n != null)
+				if (n != null) {
 					return n;
+				}
 			}
 		}
 		return null;
@@ -302,22 +330,23 @@ public class Inliner extends AbstractIrVisitor<Void> {
 		indexInst = 0;
 		while (indexInst < beginningBlock.getInstructions().size()) {
 			if (beginningBlock.getInstructions().get(indexInst)
-					.equals(currentCall))
+					.equals(currentCall)) {
 				break;
+			}
 			indexInst++;
 		}
 		while (indexInst < beginningBlock.getInstructions().size()) {
 			followingBlock.add(beginningBlock.getInstructions().get(indexInst));
 		}
 		// 7. Add all inlined blocks
-		List<Block> nodes = findNode(callerProc.getBlocks(), beginningBlock);
-		indexBlock = nodes.indexOf(beginningBlock);
+		List<Block> blocks = findBlock(callerProc.getBlocks(), beginningBlock);
+		indexBlock = blocks.indexOf(beginningBlock);
 		List<Block> inlined = calledProc.getBlocks();
 		if (!assignBlock.getInstructions().isEmpty()) {
 			inlined.add(0, assignBlock);
 		}
 		inlined.add(followingBlock);
-		nodes.addAll(indexBlock + 1, inlined);
+		blocks.addAll(indexBlock + 1, inlined);
 		// 8.
 		IrUtil.delete(currentCall);
 	}

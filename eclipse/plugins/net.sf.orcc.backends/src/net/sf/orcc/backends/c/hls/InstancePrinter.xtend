@@ -41,11 +41,12 @@ import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
 import java.util.List
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.TypeList
 
 /*
  * Compile Instance c source code
  *  
- * @author Antoine Lorence
+ * @author Antoine Lorence and Khaled Jerbi 
  * 
  */
  
@@ -60,6 +61,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		#include <hls_stream.h>
 		using namespace hls;
+		#include <stdio.h>
+		#include <stdlib.h>
 		
 		typedef signed char i8;
 		typedef short i16;
@@ -72,6 +75,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		typedef unsigned long long int u64;
 		
 		
+		// Parameter values of the instance
+		«FOR arg : instance.arguments»
+			«IF arg.value.exprList»
+				static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
+			«ELSE»
+				#define «arg.variable.name» «arg.value.doSwitch»
+			«ENDIF»
+		«ENDFOR»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Input FIFOS
@@ -106,7 +117,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«ENDFOR»
 			};
 			
-			static enum states _FSM_state;
+			static enum states _FSM_state = my_state_«instance.actor.fsm.initialState.name»;;
 		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
@@ -149,8 +160,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«instance.actor.actionsOutsideFsm.printActionLoop»
 			finished:
 				return;
-			// no read_end/write_end here!
-			return;
 			}
 		«ENDIF»
 		
@@ -164,10 +173,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			default:
 				goto finished;
 			}
-				// FSM transitions
-				«FOR state : instance.actor.fsm.states»
-		«state.printTransition»
-				«ENDFOR»
+			// FSM transitions
+			«FOR state : instance.actor.fsm.states»
+		«state.printStateLabel»
+			«ENDFOR»
 		finished:
 			return;
 		}
@@ -178,46 +187,48 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		else port.name
 	}
 	
-	override printTransition(State state) '''
+	override printStateLabel(State state) '''
 		l_«state.name»:
 			«IF ! instance.actor.actionsOutsideFsm.empty»
 				«instance.name»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF !state.outgoing.empty»
-				«schedulingState(state, state.outgoing.map[it as Transition])»
+				«printStateTransitions(state)»
 			«ENDIF»
 	'''
 	
-	override actionTestState(State srcState, Iterable<Transition> transitions) '''
-		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
-			«IF transitions.head.action.outputPattern != null»
-				«transitions.head.action.outputPattern.printOutputPattern»
-					_FSM_state = my_state_«srcState.name»;
-					goto finished;	
-				}
-			«ENDIF»
-			«transitions.head.action.body.name»();
-			
-			goto l_«transitions.head.target.name»;
-		} else {
-			«schedulingState(srcState, transitions.tail)»
-		}
+	override printOutputPattern(Pattern pattern) '''
+		«FOR port : pattern.ports» 
+			«printOutputPatternsPort(pattern, port)»
+		«ENDFOR»
 	'''
 	
-	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
-		if («instance.outgoingPortMap.get(port).head.fifoName».full()) {
-			stop = 1;
-		}
+	override printOutputPatternsPort(Pattern pattern, Port port) {
+		var i = -1 '''
+		«FOR successor : instance.outgoingPortMap.get(port)»
+			 «printOutputPatternPort(pattern, port, successor, i = i + 1)»
+		«ENDFOR»
 	'''
+	}
+	
+	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) 
+	'''&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())'''
 	
 	override checkInputPattern(Pattern pattern)
-	'''«FOR port : pattern.ports»!«instance.incomingPortMap.get(port).fifoName».empty() && «ENDFOR»'''
+	'''«FOR port : pattern.ports»!«instance.incomingPortMap.get(port).fifoName».empty() &&«ENDFOR»'''
 	
 	override printInstance(String targetFolder) {
 		val content = instanceFileContent
+		val scriptContent = script(targetFolder);
+		val directiveContent = directive(targetFolder);
 		val file = new File(targetFolder + File::separator + instance.name + ".cpp")
+		val scriptFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name + File::separator + "script_" + instance.name + ".tcl"
+		)
+		val directiveFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name  + File::separator + "directive_" + instance.name + ".tcl")
 		
 		if(needToWriteFile(content, file)) {
+			printFile(scriptContent, scriptFile)
+			printFile(directiveContent, directiveFile)
 			printFile(content, file)
 			return 0
 		} else {
@@ -225,23 +236,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	}
 	
-	override actionTest(Action action, Iterable<Action> others) '''
-		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
-			«IF action.outputPattern != null»
-				«action.outputPattern.printOutputPattern»
-					goto finished;
-				}
-			«ENDIF»
-			«action.body.name»();
-		} else {
-			«others.printActions»
-		}
-	'''
-	
 	override print(Action action) {
 		currentAction = action
 		val output = '''
-			static void «action.body.name»() {
+			static void «instance.name»_«action.body.name»() {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
@@ -259,14 +257,17 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 	
 	override caseInstLoad(InstLoad load) {
+		if(load.eContainer != null){
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«load.target.variable.indexedName» = «instance.incomingPortMap.get(srcPort).fifoName».read();
+				 «instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
 			«ELSE»
 				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
 		'''
+		
+		}
 	}
 
 	
@@ -274,7 +275,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val trgtPort = store.target.variable.port
 		'''
 		«IF trgtPort != null»
-				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
@@ -285,8 +286,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«actions.printActions»
 	'''
 	
-	def fifoName(Connection connection)
-		'''myStream_«connection.getAttribute("id").objectValue»'''
+	def fifoName(Connection connection) '''
+		«IF connection != null»
+			myStream_«connection.getAttribute("id").objectValue»
+		«ENDIF»
+	'''
 	
 	def fifoType(Connection connection) {
 		if(connection.sourcePort == null){
@@ -312,36 +316,59 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			}
 			
 		«ENDIF»
-		
-		«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm)»
-		void «instance.name»_initialize() {
-			
-			«IF instance.actor.hasFsm»
-				
-				/* Set initial state to current FSM state */
-				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
-			«ENDIF»
-		}
-		«ENDIF»
 	'''
 	
 	override printActions(Iterable<Action> actions) '''
-		«IF !actions.empty»
-			«actionTest(actions.head, actions.tail)»
-		«ELSE»
+		«FOR action : actions SEPARATOR " else "»
+			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+				«IF action.outputPattern != null»
+					«action.outputPattern.printOutputPattern»
+				«ENDIF»
+				«instance.name»_«action.body.name»();
+			}«ENDFOR» else {
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
-	override schedulingState(State state, Iterable<Transition> transitions) '''
-		«IF ! transitions.empty»
-			«actionTestState(state, transitions)»
-		«ELSE»
+	override printStateTransitions(State state) '''
+		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
+			«IF transitions.action.outputPattern == null»
+				if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»()) {
+			«ELSE»
+				if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»() «transitions.action.outputPattern.printOutputPattern») {
+			«ENDIF»	
+			«instance.name»_«transitions.action.body.name»();
+			«IF transitions.target != state»
+				_FSM_state = my_state_«transitions.target.name»;
+				goto finished;
+			«ELSE»
+				goto l_«transitions.target.name»;
+			«ENDIF»
+			}«ENDFOR» else {
 			_FSM_state = my_state_«state.name»;
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
 	override caseTypeBool(TypeBool type) 
 		'''bool'''
+		
+	def script (String path)'''
+	open_project subProject
+	set_top «instance.name»_scheduler
+	add_files ../«instance.name».cpp
+	
+	open_solution "solution"
+	set_part  {xc7a100tcsg324-1}
+	create_clock -period 10
+	
+	source "directive_«instance.name».tcl"
+	csynth_design
+	exit
+	exit
+	'''
+	
+	def directive (String path)'''
+	 #set_directives
+	'''
 }

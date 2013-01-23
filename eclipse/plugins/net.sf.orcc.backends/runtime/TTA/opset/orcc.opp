@@ -103,6 +103,19 @@
   </operation>
   
   <operation>
+    <name>THROW_AWAY</name>
+    <description></description>
+    <inputs>2</inputs>
+    <outputs>0</outputs>
+    <side-effects/>
+    <in id="1" type="UIntWord"/>
+    <in id="2" type="UIntWord"/>
+    <trigger-semantics>
+      EXEC_OPERATION(throw_away, IO(1), IO(2));
+    </trigger-semantics>
+  </operation>
+  
+  <operation>
     <name>FPSPRINTINIT</name>
     <description></description>
     <inputs>1</inputs>

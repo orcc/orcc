@@ -96,7 +96,7 @@ class Processor:
             os.mkdir(tempPath)
             opt = opt + ["--temp-dir", tempPath]
         if self.usePrint:
-            opt = opt + ["--swfp"]
+            opt = opt + ["-llwpr"]
 
         retcode = subprocess.call(["tcecc"] + opt + sourceFiles)
 
@@ -197,7 +197,7 @@ class Processor:
                 depth = content[2]
                 depth = depth[:len(depth) - 1]
         
-        return Memory(int(width), int(depth))
+        return Memory(fileName, int(width), int(depth))
 
     def _readAdf(self, fileName):
         adf = parse(fileName)
@@ -207,16 +207,16 @@ class Processor:
                 minAddress = int(node.getElementsByTagName("min-address")[0].childNodes[0].nodeValue)
                 maxAddress = int(node.getElementsByTagName("max-address")[0].childNodes[0].nodeValue)
                 depth = int((maxAddress - minAddress) / 4)
-        return Memory(width, depth)
+        return Memory(fileName, width, depth)
         
     def _hasNativePort(self):
         for input in self.inputs:
             if(input.isNative):
-                return True;
+                return True
         for output in self.outputs:
             if(output.isNative):
-                return True;
-        return False        
+                return True
+        return False
 
     def generateMemConstants(self, libPath, targetFile):
         template = tempita.Template.from_filename(os.path.join(libPath, "templates", "mem_constants.template"), namespace={}, encoding=None)

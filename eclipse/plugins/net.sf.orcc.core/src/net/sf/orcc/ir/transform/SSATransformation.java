@@ -84,12 +84,12 @@ public class SSATransformation extends AbstractIrVisitor<Void> {
 	private Map<String, Var> definitions;
 
 	/**
-	 * join node (if any)
+	 * join block (if any)
 	 */
 	private BlockBasic join;
 
 	/**
-	 * contains the current while node being treated (if any)
+	 * contains the current while block being treated (if any)
 	 */
 	private BlockWhile loop;
 
@@ -107,10 +107,10 @@ public class SSATransformation extends AbstractIrVisitor<Void> {
 	}
 
 	/**
-	 * Commits the phi assignments in the given join node.
+	 * Commits the phi assignments in the given join block.
 	 * 
 	 * @param innerJoin
-	 *            a NodeBlock that contains phi assignments
+	 *            a basic block that contains phi assignments
 	 */
 	private void commitPhi(BlockBasic innerJoin) {
 		for (Instruction instruction : innerJoin.getInstructions()) {
@@ -131,7 +131,7 @@ public class SSATransformation extends AbstractIrVisitor<Void> {
 	}
 
 	/**
-	 * Inserts a phi in the (current) join node.
+	 * Inserts a phi in the (current) join block.
 	 * 
 	 * @param oldVar
 	 *            old variable
@@ -164,11 +164,11 @@ public class SSATransformation extends AbstractIrVisitor<Void> {
 			if (loop != null) {
 				List<Use> uses = new ArrayList<Use>(oldVar.getUses());
 				for (Use use : uses) {
-					Block node = EcoreHelper.getContainerOfType(use,
+					Block block = EcoreHelper.getContainerOfType(use,
 							Block.class);
 
 					// only changes uses that are in the loop
-					if (node != join && EcoreUtil.isAncestor(loop, node)) {
+					if (block != join && EcoreUtil.isAncestor(loop, block)) {
 						use.setVariable(target);
 					}
 				}
@@ -297,24 +297,24 @@ public class SSATransformation extends AbstractIrVisitor<Void> {
 	}
 
 	@Override
-	public Void caseBlockIf(BlockIf nodeIf) {
+	public Void caseBlockIf(BlockIf blockIf) {
 		int outerBranch = branch;
 		BlockBasic outerJoin = join;
 		BlockWhile outerLoop = loop;
 
-		replaceUses(nodeIf.getCondition());
+		replaceUses(blockIf.getCondition());
 
-		join = nodeIf.getJoinBlock();
+		join = blockIf.getJoinBlock();
 		loop = null;
 
 		branch = 1;
-		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(blockIf.getThenBlocks());
 
 		// restore variables used in phi assignments
 		restoreVariables();
 
 		branch = 2;
-		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(blockIf.getElseBlocks());
 
 		// commit phi
 		BlockBasic innerJoin = join;
@@ -357,18 +357,18 @@ public class SSATransformation extends AbstractIrVisitor<Void> {
 	}
 
 	@Override
-	public Void caseBlockWhile(BlockWhile nodeWhile) {
+	public Void caseBlockWhile(BlockWhile blockWhile) {
 		int outerBranch = branch;
 		BlockBasic outerJoin = join;
 		BlockWhile outerLoop = loop;
 
-		replaceUses(nodeWhile.getCondition());
+		replaceUses(blockWhile.getCondition());
 
 		branch = 2;
-		join = nodeWhile.getJoinBlock();
-		loop = nodeWhile;
+		join = blockWhile.getJoinBlock();
+		loop = blockWhile;
 
-		doSwitch(nodeWhile.getBlocks());
+		doSwitch(blockWhile.getBlocks());
 
 		// commit phi
 		BlockBasic innerJoin = join;

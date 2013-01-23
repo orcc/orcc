@@ -36,9 +36,10 @@ import tempita
 
 class Memory:
 
-    def __init__(self, width, depth):
+    def __init__(self, name, width, depth):
         self.width = width
         self.depth = depth
+        self.name = name
         
     def generate(self, instanceName, templateFile, targetFile):
         template = tempita.Template.from_filename(templateFile, namespace={}, encoding=None)
@@ -58,5 +59,8 @@ class Memory:
         
     def getWidth(self):
         return self.width
+
+    def getName(self):
+        return self.name
         
 

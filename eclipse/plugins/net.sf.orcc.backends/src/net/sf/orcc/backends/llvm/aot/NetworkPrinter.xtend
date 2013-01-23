@@ -43,12 +43,17 @@ import static net.sf.orcc.OrccLaunchConstants.*
 class NetworkPrinter extends LLVMTemplate {
 	
 	Network network;
+	var optionArch = "x86_64"
 	
 	new(Network network, Map<String, Object> options){
 		super()
 		this.network = network
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
+		
+		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
+			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
+		}
 	}
 		
 	def print(String targetFolder) {
@@ -65,7 +70,7 @@ class NetworkPrinter extends LLVMTemplate {
 	}
 	
 	def private getNetworkFileContent() '''
-		target triple = "x86_64"
+		target triple = "«optionArch»"
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Declare and initialize FIFO variables 

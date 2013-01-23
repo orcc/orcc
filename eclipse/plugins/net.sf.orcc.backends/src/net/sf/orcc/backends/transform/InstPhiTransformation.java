@@ -45,7 +45,7 @@ import net.sf.orcc.ir.util.IrUtil;
 /**
  * 
  * This class defines a transformation that change the initial value expression
- * by a constant expression in order to put phiNode before whileNode
+ * by a constant expression in order to put join node before while block.
  * 
  * @author Herve Yviquel
  * 

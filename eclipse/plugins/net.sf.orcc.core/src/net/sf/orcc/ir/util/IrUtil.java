@@ -82,13 +82,13 @@ public class IrUtil {
 			Instruction instruction) {
 		Instruction containingInst = EcoreHelper.getContainerOfType(expression,
 				Instruction.class);
-		Block containingNode = EcoreHelper.getContainerOfType(expression,
+		Block containingBlock = EcoreHelper.getContainerOfType(expression,
 				Block.class);
 		if (containingInst != null) {
-			if (containingInst.isInstPhi() && isWhileJoinBlock(containingNode)) {
-				BlockWhile nodeWhile = EcoreHelper.getContainerOfType(
-						containingNode, BlockWhile.class);
-				addToPreviousNodeBlock(nodeWhile, instruction);
+			if (containingInst.isInstPhi() && isWhileJoinBlock(containingBlock)) {
+				BlockWhile blockWhile = EcoreHelper.getContainerOfType(
+						containingBlock, BlockWhile.class);
+				addToPreviousBlockBasic(blockWhile, instruction);
 				return false;
 			} else {
 				List<Instruction> instructions = EcoreHelper
@@ -99,23 +99,23 @@ public class IrUtil {
 			}
 		} else {
 			// The given expression is contained in the condition of If/While
-			if (containingNode.isBlockWhile()) {
-				BlockBasic joinNode = ((BlockWhile) containingNode)
+			if (containingBlock.isBlockWhile()) {
+				BlockBasic joinBlock = ((BlockWhile) containingBlock)
 						.getJoinBlock();
-				joinNode.add(instruction);
+				joinBlock.add(instruction);
 			} else {
-				addToPreviousNodeBlock(containingNode, instruction);
+				addToPreviousBlockBasic(containingBlock, instruction);
 			}
 			return false;
 		}
 	}
 
-	private static void addToPreviousNodeBlock(Block node,
+	private static void addToPreviousBlockBasic(Block block,
 			Instruction instruction) {
-		List<Block> nodes = EcoreHelper.getContainingList(node);
-		BlockBasic nodeBlock = IrFactory.eINSTANCE.createBlockBasic();
-		nodeBlock.add(instruction);
-		nodes.add(nodes.indexOf(node), nodeBlock);
+		List<Block> blocks = EcoreHelper.getContainingList(block);
+		BlockBasic blockBasic = IrFactory.eINSTANCE.createBlockBasic();
+		blockBasic.add(instruction);
+		blocks.add(blocks.indexOf(block), blockBasic);
 	}
 
 	/**
@@ -236,25 +236,25 @@ public class IrUtil {
 	}
 
 	/**
-	 * Returns the first block in the given list of nodes. A new block is
-	 * created if there is no block in the given node list.
+	 * Returns the first block in the given list of blocks. A new block is
+	 * created if there is no block in the given block list.
 	 * 
-	 * @param nodes
-	 *            a list of nodes
+	 * @param blocks
+	 *            a list of blocks
 	 * @return a block
 	 */
-	public static BlockBasic getFirst(List<Block> nodes) {
+	public static BlockBasic getFirst(List<Block> blocks) {
 		BlockBasic block;
-		if (nodes.isEmpty()) {
+		if (blocks.isEmpty()) {
 			block = IrFactory.eINSTANCE.createBlockBasic();
-			nodes.add(block);
+			blocks.add(block);
 		} else {
-			Block node = nodes.get(0);
-			if (node.isBlockBasic()) {
-				block = (BlockBasic) node;
+			Block firstBlock = blocks.get(0);
+			if (firstBlock.isBlockBasic()) {
+				block = (BlockBasic) firstBlock;
 			} else {
 				block = IrFactory.eINSTANCE.createBlockBasic();
-				nodes.add(0, block);
+				blocks.add(0, block);
 			}
 		}
 
@@ -262,11 +262,11 @@ public class IrUtil {
 	}
 
 	/**
-	 * Returns the last block in the given list of nodes. A new block is created
-	 * if there is no block in the given node list.
+	 * Returns the last block in the given list of blocks. A new block is
+	 * created if there is no block in the given block list.
 	 * 
 	 * @param blocks
-	 *            a list of nodes
+	 *            a list of blocks
 	 * @return a block
 	 */
 	public static BlockBasic getLast(List<Block> blocks) {
@@ -275,9 +275,9 @@ public class IrUtil {
 			block = IrFactory.eINSTANCE.createBlockBasic();
 			blocks.add(block);
 		} else {
-			Block node = blocks.get(blocks.size() - 1);
-			if (node.isBlockBasic()) {
-				block = (BlockBasic) node;
+			Block lastBlock = blocks.get(blocks.size() - 1);
+			if (lastBlock.isBlockBasic()) {
+				block = (BlockBasic) lastBlock;
 			} else {
 				block = IrFactory.eINSTANCE.createBlockBasic();
 				blocks.add(block);
@@ -289,9 +289,9 @@ public class IrUtil {
 
 	private static boolean isWhileJoinBlock(Block block) {
 		if (block.isBlockBasic()) {
-			BlockWhile nodeWhile = EcoreHelper.getContainerOfType(block,
+			BlockWhile blockWhile = EcoreHelper.getContainerOfType(block,
 					BlockWhile.class);
-			return (nodeWhile != null && nodeWhile.getJoinBlock() == block);
+			return (blockWhile != null && blockWhile.getJoinBlock() == block);
 		}
 		return false;
 	}

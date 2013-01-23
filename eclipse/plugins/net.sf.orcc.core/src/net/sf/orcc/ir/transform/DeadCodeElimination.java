@@ -53,34 +53,34 @@ import net.sf.orcc.util.util.EcoreHelper;
  */
 public class DeadCodeElimination extends AbstractIrVisitor<Void> {
 
-	private void addNodes(List<Block> nodes, BlockBasic join, int index) {
+	private void addBlocks(List<Block> blocks, BlockBasic join, int index) {
 		indexBlock--;
-		List<Block> parentNodes = EcoreHelper.getContainingList(join);
-		parentNodes.remove(indexBlock);
+		List<Block> parentBlocks = EcoreHelper.getContainingList(join);
+		parentBlocks.remove(indexBlock);
 
-		int size = nodes.size();
-		parentNodes.addAll(indexBlock, nodes);
+		int size = blocks.size();
+		parentBlocks.addAll(indexBlock, blocks);
 
-		parentNodes.add(indexBlock + size, join);
+		parentBlocks.add(indexBlock + size, join);
 		replacePhis(join, index);
 	}
 
 	@Override
-	public Void caseBlockIf(BlockIf node) {
-		Expression condition = node.getCondition();
+	public Void caseBlockIf(BlockIf block) {
+		Expression condition = block.getCondition();
 		if (condition.isExprBool()) {
 			if (((ExprBool) condition).isValue()) {
-				addNodes(node.getThenBlocks(), node.getJoinBlock(), 0);
+				addBlocks(block.getThenBlocks(), block.getJoinBlock(), 0);
 			} else {
-				addNodes(node.getElseBlocks(), node.getJoinBlock(), 1);
+				addBlocks(block.getElseBlocks(), block.getJoinBlock(), 1);
 			}
 		}
 
 		return null;
 	}
 
-	private void replacePhis(BlockBasic joinNode, int index) {
-		ListIterator<Instruction> it = joinNode.listIterator();
+	private void replacePhis(BlockBasic joinBlock, int index) {
+		ListIterator<Instruction> it = joinBlock.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
 			if (instruction.isInstPhi()) {

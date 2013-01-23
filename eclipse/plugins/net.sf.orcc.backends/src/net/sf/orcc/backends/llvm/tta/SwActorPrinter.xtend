@@ -30,18 +30,17 @@ package net.sf.orcc.backends.llvm.tta
 
 import java.util.Map
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
-import net.sf.orcc.df.Action
+import net.sf.orcc.backends.llvm.tta.architecture.Processor
+import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
-import net.sf.orcc.ir.Arg
+import net.sf.orcc.df.Action
+import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.Procedure
-import net.sf.orcc.ir.TypeList
-import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.Arg
 import org.eclipse.emf.common.util.EList
-import net.sf.orcc.ir.ArgByVal
-import net.sf.orcc.df.Connection
-import net.sf.orcc.backends.llvm.tta.architecture.Processor
 
 class SwActorPrinter extends InstancePrinter {
 	
@@ -59,7 +58,11 @@ class SwActorPrinter extends InstancePrinter {
 		}
 	}
 	
-	override getProperties(Port port) ''' volatile'''
+	override getProperties(Port port) {
+		if(!instance.outgoingPortMap.get(port).nullOrEmpty || instance.incomingPortMap.get(port) != null) {
+			''' volatile'''
+		}
+	}
 	
 	def printNativeWrite(Port port, Var variable) {
 		val innerType = (variable.type as TypeList).innermostType.doSwitch
@@ -73,7 +76,7 @@ class SwActorPrinter extends InstancePrinter {
 	override printArchitecture() ''''''
 
 	override print(Action action) '''
-		define internal i1 @«action.scheduler.name»() nounwind {
+		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
 				«local.declare»
@@ -88,7 +91,7 @@ class SwActorPrinter extends InstancePrinter {
 		«ENDFOR»
 		}
 		
-		define internal void @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
@@ -131,9 +134,7 @@ class SwActorPrinter extends InstancePrinter {
 		«val target = call.target»
 		«val args = call.arguments»
 		«val parameters = call.procedure.parameters»
-		«IF call.print»
-			call i32 (i8*, ...)* @printf(«args.join(", ", [printParameter((it as ArgByVal).value.type)])»)
-		«ELSEIF call.procedure.native»
+		«IF call.procedure.native»
 			«IF target != null»%«target.variable.indexedName» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
 		«ELSE»
 			«super.caseInstCall(call)»
@@ -153,4 +154,6 @@ class SwActorPrinter extends InstancePrinter {
 		}
 		return irs
 	}
+	
+	override protected printCallEndTokenFunctions() ''''''
 }

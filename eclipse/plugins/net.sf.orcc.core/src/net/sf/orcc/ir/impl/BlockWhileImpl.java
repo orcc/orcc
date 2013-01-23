@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
- * <em><b>Node While</b></em>'. <!-- end-user-doc -->
+ * <em><b>BlockWhile</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -273,22 +273,12 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 		return joinBlock;
 	}
 
-	@Override
-	public BlockBasic getJoinNode() {
-		return getJoinBlock();
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getLineNumber() {
 		return lineNumber;
-	}
-
-	@Override
-	public EList<Block> getNodes() {
-		return getBlocks();
 	}
 
 	@Override
@@ -303,11 +293,6 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 
 	@Override
 	public boolean isBlockWhile() {
-		return true;
-	}
-
-	@Override
-	public boolean isNodeWhile() {
 		return true;
 	}
 
@@ -359,11 +344,6 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 					newJoinBlock));
 	}
 
-	@Override
-	public void setJoinNode(BlockBasic value) {
-		setJoinBlock(value);
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -393,4 +373,4 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 		return result.toString();
 	}
 
-} // NodeWhileImpl
+} // BlockWhileImpl

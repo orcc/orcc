@@ -142,7 +142,7 @@ public class LLVMBackend extends AbstractBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(true, true, false));
+		transformations.add(new TypeResizer(true, true, false, false));
 		transformations.add(new StringTransformation());
 		transformations.add(new DfVisitor<Void>(new SSATransformation()));
 		transformations.add(new DeadGlobalElimination());
@@ -206,11 +206,12 @@ public class LLVMBackend extends AbstractBackend {
 			// Copy specific windows batch file
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
 				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
-						path + File.separator + "run_cmake_with_VS_env.bat");
+						path + File.separator + "run_cmake_with_VS_env.bat",
+						debug);
 			}
 			OrccLogger.trace("Export libraries sources into " + libPath
 					+ "... ");
-			if (copyFolderToFileSystem("/runtime/C/libs", libPath)) {
+			if (copyFolderToFileSystem("/runtime/C/libs", libPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {

@@ -36,6 +36,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureUtil
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.backends.llvm.tta.architecture.Memory
 
 class PyDesignPrinter extends TTAPrinter {
 	
@@ -72,12 +73,22 @@ class PyDesignPrinter extends TTAPrinter {
 			«ENDFOR»
 		]
 		
+		## Memories initialization
+		memories = [
+			«FOR memory: design.sharedMemories SEPARATOR ','»
+				«memory.python»
+			«ENDFOR»
+		]
+		
 		## Network initialization
-		design = Design("«design.name»", processors, «IF(fpga.altera)»True«ELSE»False«ENDIF»)
+		design = Design("«design.name»", processors, memories, «IF(fpga.altera)»True«ELSE»False«ENDIF»)
 		'''
 		
 	def private getPython(Processor processor)
 		'''Processor("«processor.name»", «processor.name»_instances, «processor.name»_inputs, «processor.name»_outputs, «processor.usePrint»)'''
+	
+	def private getPython(Memory memory)
+		'''Memory("«memory.name»", 32, «memory.depth/4»)'''
 		
 	def private getPython(Port port, int index) 
 		'''Port("«port.label»", «index»«IF(port.native)», True, «port.size»«ENDIF»)'''

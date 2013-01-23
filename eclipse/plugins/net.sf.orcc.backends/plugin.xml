@@ -27,6 +27,16 @@
          </option>
       </backend>
       <backend
+            class="net.sf.orcc.backends.c.compa.COMPABackend"
+            name="COMPA (experimental)">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.dontExportLibrary">
+         </option>
+      </backend>
+      <backend
             class="net.sf.orcc.backends.c.hls.HLSBackend"
             name="HLS (experimental)">
          <option
@@ -74,6 +84,9 @@
             name="LLVM">
          <option
                id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.backends.llvm.aot.targetTriple">
          </option>
          <option
                id="net.sf.orcc.dontExportLibrary">
@@ -350,13 +363,20 @@
                </comboBoxItem>
             </comboBox>
          </option>
-          <option
+         <option
                defaultValue="false"
                description="Map the FIFO channels on an existing memory when it's possible"
                id="net.sf.orcc.backends.llvm.tta.reduceConnections"
                name="Reduce the interconnection network">
             <checkBox></checkBox>
          </option>
+		<option
+				defaultValue="x86_64"
+				description="Specify the target triple"
+				id="net.sf.orcc.backends.llvm.aot.targetTriple"
+				name="Target triple">
+			<textBox></textBox>
+		</option>
    </extension>
    <extension
          id="c"
@@ -475,6 +495,18 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.opencl.OpenCLBackend">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="compa"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.c.compa.COMPABackend">
          </run>
       </application>
    </extension>

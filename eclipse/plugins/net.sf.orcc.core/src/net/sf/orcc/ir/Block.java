@@ -76,56 +76,32 @@ public interface Block extends Attributable {
 	Edge getEdgeTrue();
 
 	/**
-	 * Returns the procedure this node belongs to.
+	 * Returns the procedure this block belongs to.
 	 * 
-	 * @return the procedure this node belongs to
+	 * @return the procedure this block belongs to
 	 */
 	public Procedure getProcedure();
 
 	/**
-	 * Returns <code>true</code> if this node is a BlockBasic.
+	 * Returns <code>true</code> if this block is a BlockBasic.
 	 * 
-	 * @return <code>true</code> if this node is a BlockBasic
+	 * @return <code>true</code> if this block is a BlockBasic
 	 */
 	boolean isBlockBasic();
 
 	/**
-	 * Returns <code>true</code> if this node is an BlockIf.
+	 * Returns <code>true</code> if this block is an BlockIf.
 	 * 
-	 * @return <code>true</code> if this node is an BlockIf
+	 * @return <code>true</code> if this block is an BlockIf
 	 */
 	boolean isBlockIf();
 
 	/**
-	 * Returns <code>true</code> if this node is a BlockWhile.
+	 * Returns <code>true</code> if this block is a BlockWhile.
 	 * 
-	 * @return <code>true</code> if this node is a BlockWhile
+	 * @return <code>true</code> if this block is a BlockWhile
 	 */
 	boolean isBlockWhile();
-
-	/**
-	 * Returns <code>true</code> if this node is a NodeBlock.
-	 * 
-	 * @return <code>true</code> if this node is a NodeBlock
-	 */
-	@Deprecated
-	boolean isNodeBlock();
-
-	/**
-	 * Returns <code>true</code> if this node is an NodeIf.
-	 * 
-	 * @return <code>true</code> if this node is an NodeIf
-	 */
-	@Deprecated
-	boolean isNodeIf();
-
-	/**
-	 * Returns <code>true</code> if this node is a NodeWhile.
-	 * 
-	 * @return <code>true</code> if this node is a NodeWhile
-	 */
-	@Deprecated
-	boolean isNodeWhile();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Block#getCfgNode
