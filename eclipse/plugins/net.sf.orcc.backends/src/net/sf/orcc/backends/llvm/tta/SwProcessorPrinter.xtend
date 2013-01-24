@@ -55,9 +55,9 @@ class SwProcessorPrinter extends LLVMTemplate {
 		«FOR ram : processor.localRAMs + processor.sharedRAMs»
 			«val addrSpace = processor.memToAddrSpaceIdMap.get(ram)»
 			«FOR conn : ram.mappedConnections»
-				@fifo_«conn.getAttribute("id").objectValue»_content = addrspace(«addrSpace») global [«conn.size» x «conn.sourcePort.type.doSwitch»] zeroinitializer, align 32
-				@fifo_«conn.getAttribute("id").objectValue»_rdIndex = addrspace(«addrSpace») global i32 zeroinitializer, align 32
-				@fifo_«conn.getAttribute("id").objectValue»_wrIndex = addrspace(«addrSpace») global i32 zeroinitializer, align 32
+				@fifo_«conn.getAttribute("id").objectValue»_content = addrspace(«addrSpace») global [«conn.size» x «conn.sourcePort.type.doSwitch»] zeroinitializer
+				@fifo_«conn.getAttribute("id").objectValue»_rdIndex = addrspace(«addrSpace») global i32 zeroinitializer
+				@fifo_«conn.getAttribute("id").objectValue»_wrIndex = addrspace(«addrSpace») global i32 zeroinitializer
 				
 			«ENDFOR»
 		«ENDFOR»

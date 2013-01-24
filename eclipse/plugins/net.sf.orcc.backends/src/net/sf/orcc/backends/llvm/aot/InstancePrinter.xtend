@@ -554,7 +554,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def protected initialize(Var variable) {
 		if(variable.initialValue != null) variable.initialValue.doSwitch
-		else "zeroinitializer, align 32"
+		else "zeroinitializer"
 	}
 	
 	def protected argumentDeclaration(Param param) {
@@ -665,9 +665,9 @@ class InstancePrinter extends LLVMTemplate {
 		} else { 
 			OrccLogger::noticeln("["+instance.name+"] Port "+port.name+" not connected.")
 			'''
-			@«name»_content = internal global [«conn.safeSize» x «type»] zeroinitializer, align 32
-			@«name»_rdIndex = internal global i32 zeroinitializer, align 32
-			@«name»_wrIndex = internal global i32 zeroinitializer, align 32
+			@«name»_content = internal global [«conn.safeSize» x «type»] zeroinitializer
+			@«name»_rdIndex = internal global i32 zeroinitializer
+			@«name»_wrIndex = internal global i32 zeroinitializer
 			'''
 		}
 	}
