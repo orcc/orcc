@@ -191,7 +191,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	end entity;
 	
 	architecture rtl of FIFO_main_myStream is
-	    type memtype is array (0 to 513 - 1) of STD_LOGIC_VECTOR(width downto 0);
+	    type memtype is array (0 to «fifoSize») of STD_LOGIC_VECTOR(width downto 0);
 	    signal mStorage : memtype;
 	    signal mInPtr  : UNSIGNED(10 - 1 downto 0) := (others => '0');
 	    signal mOutPtr : UNSIGNED(10 - 1 downto 0) := (others => '0');
@@ -214,7 +214,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	                mFlag_nEF_hint <= '0'; -- empty hint
 	            else
 	                if if_read = '1' and internal_empty_n = '1' then
-	                    if (mOutPtr = 513 -1) then
+	                    if (mOutPtr = «fifoSize») then
 	                        mOutPtr <= (others => '0');
 	                        mFlag_nEF_hint <= not mFlag_nEF_hint;
 	                    else
@@ -223,7 +223,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	                end if;
 	                if if_write = '1' and internal_full_n = '1' then
 	                    mStorage(CONV_INTEGER(mInPtr)) <= if_din;
-	                    if (mInPtr = 513 -1) then
+	                    if (mInPtr = «fifoSize») then
 	                        mInPtr <= (others => '0');
 	                        mFlag_nEF_hint <= not mFlag_nEF_hint;
 	                    else
