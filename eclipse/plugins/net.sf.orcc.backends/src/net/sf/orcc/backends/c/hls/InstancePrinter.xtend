@@ -100,6 +100,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDFOR»
 		«ENDFOR»
 		
+		«IF instance.actor.outputs.empty»
+			stream<int> outFIFO_«instance.name»;
+		«ENDIF»
+		
 		
 		
 		
@@ -145,7 +149,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«printFsm»
 		«ELSE»
 			void «instance.name»_scheduler() {		
-				
+			«IF instance.actor.outputs.empty»
+				outFIFO_«instance.name».write(0);
+			«ENDIF»
 				«instance.actor.actionsOutsideFsm.printActionLoop»
 				
 			finished:
@@ -165,6 +171,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		void «instance.name»_scheduler() {
 			// jump to FSM state 
+			«IF instance.actor.outputs.empty»
+				outFIFO_«instance.name».write(0);
+			«ENDIF»
 			switch (_FSM_state) {
 				«FOR state : instance.actor.fsm.states»
 					case my_state_«state.name»:
@@ -212,10 +221,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 	
 	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) 
-	'''&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())'''
+	'''«IF !instance.outgoingPortMap.get(port).head.fifoName.toString.empty»
+	&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())«ENDIF»'''
 	
 	override checkInputPattern(Pattern pattern)
-	'''«FOR port : pattern.ports»!«instance.incomingPortMap.get(port).fifoName».empty() &&«ENDFOR»'''
+	'''«FOR port : pattern.ports»
+			«IF !instance.incomingPortMap.get(port).fifoName.toString.empty»
+				!«instance.incomingPortMap.get(port).fifoName».empty() &&
+			«ENDIF»
+		«ENDFOR»'''
 	
 	override printInstance(String targetFolder) {
 		val content = instanceFileContent
@@ -260,8 +274,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		if(load.eContainer != null){
 		val srcPort = load.source.variable.getPort
 		'''
-			«IF srcPort != null»
-				 «instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
+			«IF (srcPort != null)» 
+				«IF !instance.incomingPortMap.get(srcPort).fifoName.toString.empty»
+				 	«instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
+				 «ENDIF»
 			«ELSE»
 				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
@@ -274,8 +290,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override caseInstStore(InstStore store) {
 		val trgtPort = store.target.variable.port
 		'''
-		«IF trgtPort != null»
+		«IF (trgtPort != null)»
+			«IF !instance.outgoingPortMap.get(trgtPort).head.fifoName.toString.empty»
 				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
+			«ENDIF»
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
@@ -370,5 +388,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	def directive (String path)'''
 	 #set_directives
+	 config_dataflow -default_channel fifo -fifo_depth «fifoSize»
 	'''
 }
