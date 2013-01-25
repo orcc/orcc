@@ -9,6 +9,7 @@
         eType="#//Device" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="commandQueues" upperBound="-1"
         eType="#//CommandQueue"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="body" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Procedure"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Device">
     <eStructuralFeatures xsi:type="ecore:EReference" name="computeUnits" upperBound="-1"
@@ -43,4 +44,15 @@
   <eClassifiers xsi:type="ecore:EClass" name="KernelExecutionCommand" eSuperTypes="#//Command"/>
   <eClassifiers xsi:type="ecore:EClass" name="MemoryCommand" eSuperTypes="#//Command"/>
   <eClassifiers xsi:type="ecore:EClass" name="SynchronizationCommand" eSuperTypes="#//Command"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Kernel">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="globalMemory" upperBound="-1"
+        eType="#//GlobalMemory"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="localMemory" upperBound="-1"
+        eType="#//LocalMemory"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="constantMemory" upperBound="-1"
+        eType="#//Constantmemory"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="privateMemory" upperBound="-1"
+        eType="#//PrivateMemory"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="body" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Procedure"/>
+  </eClassifiers>
 </ecore:EPackage>
