@@ -228,6 +228,11 @@ import java.io.File
 				«printInputFifoAssignHLS(connList)»
 			«ENDIF»
 		«ENDFOR»
+		«IF instance.actor.outputs.empty»
+			outFIFO_«instance.name»_V_din    : OUT STD_LOGIC_VECTOR (31 downto 0);
+			outFIFO_«instance.name»_V_full_n : IN STD_LOGIC;
+			outFIFO_«instance.name»_V_write  : OUT STD_LOGIC;
+		«ENDIF»
 	'''
 	
 	def printOutputFifoAssignHLS( Connection connection) '''
@@ -255,6 +260,7 @@ import java.io.File
 					«printOutputFifoSignalAssignHLS(connection)»
 			«ENDIF»
 		«ENDFOR»
+		
 	'''
 	
 	def printOutputFifoSignalAssignHLS( Connection connection) '''

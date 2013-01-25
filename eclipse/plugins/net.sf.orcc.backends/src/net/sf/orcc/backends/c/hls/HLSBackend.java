@@ -117,7 +117,7 @@ public class HLSBackend extends CBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(true, false, true, false));
+		transformations.add(new TypeResizer(true, true, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new Multi2MonoToken());
 		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
