@@ -49,6 +49,7 @@ import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.backends.CommonPrinter
+import net.sf.orcc.ir.Instruction
 
 /*
  * Default C Printer
@@ -185,17 +186,19 @@ abstract class CTemplate extends CommonPrinter {
 	}
 	
 	/**
-	 * Print attributes objectValues list as a comment (preceded by '//')
-	 * for an Attributable object
+	 * Print attributes for an Attributable object.
+	 * Do nothing on C backend, but is used by others.
 	 * @param object the object
 	 * @return comment block
 	 */
-	def protected printAttributes(Attributable object) '''
-		«IF false && ! object.attributes.empty»
-			//Attributes for «object.toString» :
-			«FOR attr : object.attributes»
-				// - «attr.name» = «attr.objectValue»
-			«ENDFOR»
-		«ENDIF»
-	'''
+	def protected printAttributes(Attributable object)
+		''''''
+
+	/**
+	 * This helper return a representation of a given instruction without
+	 * trailing whitespace and semicolon
+	 */
+	def protected toExpression(Instruction instruction) {
+		instruction.doSwitch.toString.replaceAll("([^;]+);(\\s+)?", "$1")
+	}
 }

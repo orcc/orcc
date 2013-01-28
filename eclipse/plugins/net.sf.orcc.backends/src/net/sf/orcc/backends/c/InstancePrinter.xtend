@@ -33,6 +33,8 @@ import java.util.HashMap
 import java.util.List
 import java.util.Map
 import net.sf.orcc.OrccRuntimeException
+import net.sf.orcc.backends.ir.BlockFor
+import net.sf.orcc.backends.ir.InstTernary
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
@@ -98,9 +100,11 @@ class InstancePrinter extends CTemplate {
 	protected var Action currentAction;
 
 	/**
-	 * Default constructor, used only by another backend (when subclass)
+	 * Default constructor, used only by another backend (when subclass) which
+	 * not print instances but actors
 	 */
-	new() {
+	protected new() {
+		instance = null
 		fifoSize = 0
 	}
 	
@@ -779,6 +783,14 @@ class InstancePrinter extends CTemplate {
 			«instr.doSwitch»
 		«ENDFOR»
 	'''
+	
+	override caseBlockFor(BlockFor block) '''
+		for («block.init.join(", ")['''«toExpression»''']» ; «block.condition.doSwitch» ; «block.step.join(", ")['''«toExpression»''']») {
+			«FOR contentBlock : block.blocks»
+				«contentBlock.doSwitch»
+			«ENDFOR»
+		}
+	'''
 
 	/******************************************
 	 * 
@@ -830,7 +842,10 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 	
-		
+	override caseInstTernary(InstTernary inst) '''
+		«inst.target.variable.indexedName» = «inst.conditionValue.doSwitch» ? «inst.trueValue.doSwitch» : «inst.falseValue.doSwitch»;
+	'''
+
 	def protected getPort(Var variable) {
 		if(currentAction == null) {
 			null
@@ -853,7 +868,12 @@ class InstancePrinter extends CTemplate {
 		}
 	}	
 
-	
+	def private getInline() 
+		'''«IF profile»__attribute__((always_inline)) «ENDIF»'''
+
+	def private getNoInline() 
+		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
+
 	/******************************************
 	 * 
 	 * Old templateData initialization
@@ -868,17 +888,17 @@ class InstancePrinter extends CTemplate {
 			}
 		}
 	}
-	
+
 	def private buildTransitionPattern() {		
 		val fsm = actor.getFsm()
-		
+
 		if (fsm != null) {
 			for (state : fsm.getStates()) {
 				val pattern = DfFactory::eINSTANCE.createPattern()
-				
+
 				for (edge : state.getOutgoing()) { 
 					val actionPattern = (edge as Transition).getAction.getInputPattern()
-					
+
 					for (Port port : actionPattern.getPorts()) {
 						var numTokens = Math::max(pattern.getNumTokens(port), actionPattern.getNumTokens(port))
 						pattern.setNumTokens(port, numTokens)
@@ -888,11 +908,4 @@ class InstancePrinter extends CTemplate {
 			}
 		}
 	}
-	
-	def private getInline() 
-		'''«IF profile»__attribute__((always_inline)) «ENDIF»'''
-	
-	def private getNoInline() 
-		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
-
 }
