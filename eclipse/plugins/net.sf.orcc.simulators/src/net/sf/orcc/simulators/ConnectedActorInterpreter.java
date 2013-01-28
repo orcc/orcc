@@ -65,6 +65,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 	public ConnectedActorInterpreter(Actor actor) {
 		super(actor);
+		exprInterpreter = new RuntimeExpressionEvaluator();
 	}
 
 	/**
