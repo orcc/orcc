@@ -11,9 +11,9 @@
             name="Enable Traces">
          <checkBox>
             <option
-                  description="An other output folder for receiving simulator trace files"
+                  description="The folder where traces are saved"
                   id="net.sf.orcc.simulators.tracesFolder"
-                  name="Traces folder">
+                  name="Traces Folder">
                <browseFile
                      folder="true"
                      workspace="false">

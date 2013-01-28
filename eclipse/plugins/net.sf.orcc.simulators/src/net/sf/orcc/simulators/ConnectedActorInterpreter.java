@@ -93,8 +93,6 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			i++;
 		}
 
-		String methodName = procedure.getName();
-
 		try {
 			// get packageName and containerName for calling the correct native
 			// function
@@ -111,8 +109,8 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 					null, args);
 		} catch (Exception e) {
 			throw new OrccRuntimeException(
-					"exception during native procedure call to " + methodName,
-					e);
+					"exception during native procedure call to "
+							+ procedure.getName(), e);
 		}
 	}
 
