@@ -1,0 +1,16 @@
+%typeterm Proc {
+  implement { Procedure }
+  is_sort(t) { $t instanceof Procedure }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2}
+}
+
+%op Proc proc( name : String,  nat : boolean) {
+	is_fsym(t) {$t instanceof Procedure}
+	get_slot(name, t) {((Procedure)$t).getName()}
+	get_slot(nat, t) { ((Procedure)$t).isNative()}
+	make(_name, _native) {
+		net.sf.orcc.ir.impl.IrFactoryImpl.eINSTANCE.createProcedure($_name, $_native)
+	}
+	
+}
+
