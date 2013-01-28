@@ -26,84 +26,52 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.hmpp.transformations;
+package net.sf.orcc.backends.c.hmpp.transformations;
 
-import java.util.Map;
-
-import net.sf.orcc.ir.BlockWhile;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
-import net.sf.orcc.util.Attribute;
+import net.sf.orcc.ir.util.IrUtil;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * This class defines a HMMP annotations.
+ * This class defines transformation for removing registers that store a
+ * constant
  * 
  * @author Jérôme Gorin
  * 
  */
-public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
-	private class ExprVarGetter extends AbstractIrVisitor<Void> {
-		private Var result;
-		private String varName;
+public class ConstantRegisterCleaner extends AbstractIrVisitor<Void> {
 
-		public ExprVarGetter(String name) {
-			// Visit also expressions
-			super(true);
-			varName = name;
-		}
-
-		@Override
-		public Void caseExprVar(ExprVar expr) {
-			Var currentVar = expr.getUse().getVariable();
-			if (currentVar.getName().compareTo(varName) == 0) {
-				result = currentVar;
-			}
-
-			return null;
-		}
-
-		public Var getResult() {
-			return result;
-		}
-	}
-
-	Map<Procedure, Integer> codelets;
-
-	int codeletsCnt;
+	protected boolean changed;
 
 	@Override
-	public Void caseBlockWhile(BlockWhile blockWhile) {
-		super.caseBlockWhile(blockWhile);
-
-		Attribute attribute = blockWhile.getAttribute("gridify");
-
-		if (attribute != null) {
-			ExprList args = (ExprList) attribute.getContainedValue();
-			if (args != null) {
-				for (int i = 0; i < args.getSize(); i++) {
-
-					// Get induction variable
-					ExprList parameter = (ExprList) args.get(i);
-					ExprString exprString = ((ExprString) parameter.get(0));
-					ExprVarGetter exprVarGetter = new ExprVarGetter(
-							exprString.getValue());
-					exprVarGetter.doSwitch(blockWhile);
-
-					if (exprVarGetter.getResult() != null) {
-						parameter.set(0, IrFactory.eINSTANCE
-								.createExprVar(exprVarGetter.getResult()));
-					}
-				}
+	public Void caseInstLoad(InstLoad load) {
+		Var source = load.getSource().getVariable();
+		if (source.isGlobal() && load.getIndexes().isEmpty()) {
+			Var target = load.getTarget().getVariable();
+			EList<Use> targetUses = target.getUses();
+			changed = true;
+			while (!targetUses.isEmpty()) {
+				targetUses.get(0).setVariable(source);
 			}
-
+			EcoreUtil.remove(target);
+			IrUtil.delete(load);
 		}
 
 		return null;
+	}
 
+	@Override
+	public Void caseProcedure(Procedure procedure) {
+		do {
+			changed = false;
+			super.caseProcedure(procedure);
+		} while (changed);
+		return null;
 	}
 }

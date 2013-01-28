@@ -26,31 +26,84 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.hmpp.transformations;
+package net.sf.orcc.backends.c.hmpp.transformations;
 
-import net.sf.orcc.backends.transform.Inliner;
+import java.util.Map;
+
+import net.sf.orcc.ir.BlockWhile;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.util.Attribute;
 
 /**
- * This class defines a codelet transformation that inline the functions and/or
- * the procedures which are called inside a codelet
+ * This class defines a HMMP annotations.
  * 
  * @author Jérôme Gorin
  * 
  */
-public class CodeletInliner extends AbstractIrVisitor<Void> {
+public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
+	private class ExprVarGetter extends AbstractIrVisitor<Void> {
+		private Var result;
+		private String varName;
 
-	@Override
-	public Void caseProcedure(Procedure procedure) {
-		Attribute attribute = procedure.getAttribute("codelet");
-
-		if (attribute != null){
-			new Inliner(true, true).doSwitch(procedure);
+		public ExprVarGetter(String name) {
+			// Visit also expressions
+			super(true);
+			varName = name;
 		}
-		
-		return null;
+
+		@Override
+		public Void caseExprVar(ExprVar expr) {
+			Var currentVar = expr.getUse().getVariable();
+			if (currentVar.getName().compareTo(varName) == 0) {
+				result = currentVar;
+			}
+
+			return null;
+		}
+
+		public Var getResult() {
+			return result;
+		}
 	}
 
+	Map<Procedure, Integer> codelets;
+
+	int codeletsCnt;
+
+	@Override
+	public Void caseBlockWhile(BlockWhile blockWhile) {
+		super.caseBlockWhile(blockWhile);
+
+		Attribute attribute = blockWhile.getAttribute("gridify");
+
+		if (attribute != null) {
+			ExprList args = (ExprList) attribute.getContainedValue();
+			if (args != null) {
+				for (int i = 0; i < args.getSize(); i++) {
+
+					// Get induction variable
+					ExprList parameter = (ExprList) args.get(i);
+					ExprString exprString = ((ExprString) parameter.get(0));
+					ExprVarGetter exprVarGetter = new ExprVarGetter(
+							exprString.getValue());
+					exprVarGetter.doSwitch(blockWhile);
+
+					if (exprVarGetter.getResult() != null) {
+						parameter.set(0, IrFactory.eINSTANCE
+								.createExprVar(exprVarGetter.getResult()));
+					}
+				}
+			}
+
+		}
+
+		return null;
+
+	}
 }

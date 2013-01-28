@@ -26,52 +26,35 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.hmpp.transformations;
+package net.sf.orcc.backends.c.hmpp.transformations;
 
-import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractIrVisitor;
-import net.sf.orcc.ir.util.IrUtil;
-
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.util.Attributable;
+import net.sf.orcc.util.util.EcoreHelper;
 
 /**
- * This class defines transformation for removing registers that store a
- * constant
+ * This class defines a HMMP annotations.
  * 
  * @author Jérôme Gorin
  * 
  */
-public class ConstantRegisterCleaner extends AbstractIrVisitor<Void> {
-
-	protected boolean changed;
-
+public class DisableAnnotations extends DfVisitor<Void> {
 	@Override
-	public Void caseInstLoad(InstLoad load) {
-		Var source = load.getSource().getVariable();
-		if (source.isGlobal() && load.getIndexes().isEmpty()) {
-			Var target = load.getTarget().getVariable();
-			EList<Use> targetUses = target.getUses();
-			changed = true;
-			while (!targetUses.isEmpty()) {
-				targetUses.get(0).setVariable(source);
-			}
-			EcoreUtil.remove(target);
-			IrUtil.delete(load);
+	public Void caseActor(Actor actor) {
+		actor.getAttributes().clear();
+		
+		for (Attributable attributable : EcoreHelper.getObjects(actor,
+				Attributable.class)) {
+			attributable.getAttributes().clear();
+		}
+		
+		for (Instruction instr : EcoreHelper.getObjects(actor,
+				Instruction.class)) {
+			instr.getAttributes().clear();
 		}
 
-		return null;
-	}
-
-	@Override
-	public Void caseProcedure(Procedure procedure) {
-		do {
-			changed = false;
-			super.caseProcedure(procedure);
-		} while (changed);
 		return null;
 	}
 }

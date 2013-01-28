@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, IRISA
+ * Copyright (c) 2009-2013, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IRISA nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,35 +26,26 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.hmpp.transformations;
+ 
+package net.sf.orcc.backends.c.hmpp
 
-import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.util.Attributable;
-import net.sf.orcc.util.util.EcoreHelper;
+import net.sf.orcc.df.Instance
+import net.sf.orcc.util.Attributable
+import java.util.Map
 
-/**
- * This class defines a HMMP annotations.
- * 
- * @author Jérôme Gorin
- * 
- */
-public class DisableAnnotations extends DfVisitor<Void> {
-	@Override
-	public Void caseActor(Actor actor) {
-		actor.getAttributes().clear();
-		
-		for (Attributable attributable : EcoreHelper.getObjects(actor,
-				Attributable.class)) {
-			attributable.getAttributes().clear();
-		}
-		
-		for (Instruction instr : EcoreHelper.getObjects(actor,
-				Instruction.class)) {
-			instr.getAttributes().clear();
-		}
-
-		return null;
+class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
+	
+	new(Map<String, Object> options) {
+		super(options)
 	}
+
+	override printAttributes(Attributable eobject) '''
+		«IF eobject instanceof Instance»
+			«(eobject as Instance).printAttributes»
+		«ELSE»
+			«FOR attribute : eobject.attributes»
+				// «attribute.name» = «attribute.stringValue»
+			«ENDFOR»
+		«ENDIF»
+	'''
 }

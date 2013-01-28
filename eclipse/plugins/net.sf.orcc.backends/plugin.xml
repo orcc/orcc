@@ -46,6 +46,28 @@
          </option>
       </backend>
       <backend
+            class="net.sf.orcc.backends.c.hmpp.HMPPBackend"
+            name="HMPP">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.core.classify">
+         </option>
+         <option
+               id="net.sf.orcc.backends.newScheduler">
+         </option>
+         <option
+               id="net.sf.orcc.backends.geneticAlgorithm">
+         </option>
+         <option
+               id="net.sf.orcc.backends.enableTraces">
+         </option>
+         <option
+               id="net.sf.orcc.backends.hmpp.disablePragma">
+         </option>
+      </backend>
+      <backend
             class="net.sf.orcc.backends.c.hls.HLSBackend"
             name="HLS (experimental)">
          <option
@@ -538,6 +560,18 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.c.compa.COMPABackend">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="hmpp"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.c.hmpp.HMPPBackend">
          </run>
       </application>
    </extension>
