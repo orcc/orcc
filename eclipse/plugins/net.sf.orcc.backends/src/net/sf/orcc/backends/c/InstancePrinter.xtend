@@ -33,6 +33,8 @@ import java.util.HashMap
 import java.util.List
 import java.util.Map
 import net.sf.orcc.OrccRuntimeException
+import net.sf.orcc.backends.ir.BlockFor
+import net.sf.orcc.backends.ir.InstTernary
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
@@ -98,9 +100,11 @@ class InstancePrinter extends CTemplate {
 	protected var Action currentAction;
 
 	/**
-	 * Default constructor, used only by another backend (when subclass)
+	 * Default constructor, used only by another backend (when subclass) which
+	 * not print instances but actors
 	 */
-	new() {
+	protected new() {
+		instance = null
 		fifoSize = 0
 	}
 	
@@ -775,6 +779,14 @@ class InstancePrinter extends CTemplate {
 			«instr.doSwitch»
 		«ENDFOR»
 	'''
+	
+	override caseBlockFor(BlockFor block) '''
+		for («block.init.join(", ", ['''«doSwitch»'''])» ; «block.condition.doSwitch» ; «block.step.join(", ", ['''«doSwitch»'''])») {
+			«FOR contentBlock : block.blocks»
+				«contentBlock.doSwitch»
+			«ENDFOR»
+		}
+	'''
 
 	/******************************************
 	 * 
@@ -824,6 +836,10 @@ class InstancePrinter extends CTemplate {
 		«IF ret.value != null»
 			return «ret.value.doSwitch»;
 		«ENDIF»
+	'''
+	
+	override caseInstTernary(InstTernary inst) '''
+		«inst.target.variable.indexedName» = «inst.conditionValue.doSwitch» ? «inst.trueValue.doSwitch» : «inst.falseValue.doSwitch»;
 	'''
 	
 		

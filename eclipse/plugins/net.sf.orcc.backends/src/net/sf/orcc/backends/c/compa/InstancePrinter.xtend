@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
- package net.sf.orcc.backends.c.compa
+package net.sf.orcc.backends.c.compa
 
 import java.util.Map
 import net.sf.orcc.df.Pattern

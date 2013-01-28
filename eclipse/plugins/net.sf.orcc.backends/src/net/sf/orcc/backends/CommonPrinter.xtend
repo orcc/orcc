@@ -8,6 +8,8 @@ import java.io.IOException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.List
+import net.sf.orcc.backends.ir.BlockFor
+import net.sf.orcc.backends.ir.InstTernary
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
@@ -30,8 +32,10 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.util.AbstractIrVisitor
+import net.sf.orcc.util.OrccLogger
 import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
+import org.eclipse.emf.ecore.EObject
 
 /**
  * Define commons methods for all backends printers
@@ -236,6 +240,36 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 		// note the difference with the caseExprString method from the
 		// expression evaluator: quotes around the string
 		return '''"«String::valueOf(expr.value)»"''';
+	}
+	
+	override defaultCase(EObject object) {
+		if(object instanceof BlockFor) {
+			caseBlockFor(object as BlockFor)
+		} else if (object instanceof InstTernary) {
+			caseInstTernary(object as InstTernary)
+		}
+	}
+	
+	/**
+	 * Method manually added to print specific BlockFor object.
+	 * @param block For block
+	 * @see #defaultCase(EObject object)
+	 */
+	def caseBlockFor(BlockFor block) {
+		OrccLogger::warnln("This application contains for loop, which is not yet supported. "+
+		"Please override caseBlockFor() method in the backend you are using.");
+		return ''''''
+	}
+	
+	/**
+	 * Method manually added to print specific InstTernary object.
+	 * @param inst The ternary instruction
+	 * @see #defaultCase(EObject object)
+	 */
+	def caseInstTernary(InstTernary inst) {
+		OrccLogger::warnln("This application contains ternary instructions, which is not yet supported. "+
+		"Please override caseInstTernary() method in the backend you are using.");
+		return ''''''
 	}
 	
 	/**
