@@ -246,6 +246,12 @@ public class CBackend extends AbstractBackend {
 		}
 	}
 
+	protected void printCMake(Network network) {
+		// print CMakeLists
+		OrccLogger.traceln("Printing CMake project files");
+		new CMakePrinter(network).printCMakeFiles(path);
+	}
+
 	@Override
 	public boolean exportRuntimeLibrary() {
 		boolean exportLibrary = !getAttribute(NO_LIBRARY_EXPORT, false);
