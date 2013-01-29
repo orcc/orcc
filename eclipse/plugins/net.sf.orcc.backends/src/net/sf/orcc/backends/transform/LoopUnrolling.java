@@ -272,10 +272,11 @@ public class LoopUnrolling extends AbstractIrVisitor<Void> {
 	private int repetition = 0;
 
 	/** The unrolled loops **/
-	private List<Block> unrollBlocks;
+	private List<BlockBasic> unrollBlocks;
 
 	@Override
 	public Void caseBlockWhile(BlockWhile blockWhile) {
+		super.caseBlockWhile(blockWhile);
 		if (blockWhile.hasAttribute("unroll")) {
 			unroll(blockWhile);
 		}
@@ -313,7 +314,7 @@ public class LoopUnrolling extends AbstractIrVisitor<Void> {
 					repetition = ((ExprInt) e2).getIntValue();
 				}
 				if (testSimpleLoop(blockWhile)) {
-					unrollBlocks = new ArrayList<Block>(repetition);
+					unrollBlocks = new ArrayList<BlockBasic>(repetition);
 					for (int i = 0; i <= repetition; i++) {
 						unrollBlocks.add(i,
 								IrFactory.eINSTANCE.createBlockBasic());
@@ -344,11 +345,14 @@ public class LoopUnrolling extends AbstractIrVisitor<Void> {
 					}
 
 					if (containerBlocks != null) {
-						int idxBlockWhile = containerBlocks.indexOf(blockWhile);
+						BlockBasic combinedBlock = IrFactory.eINSTANCE.createBlockBasic();
 						for (int i = 0; i <= repetition; i++) {
-							containerBlocks.add(idxBlockWhile + i,
-									unrollBlocks.get(i));
+							combinedBlock.getInstructions().addAll(unrollBlocks.get(i).getInstructions());
 						}
+						
+						int idxBlockWhile = containerBlocks.indexOf(blockWhile);
+						containerBlocks.add(idxBlockWhile,combinedBlock);
+								
 						IrUtil.delete(blockWhile);
 					}
 
