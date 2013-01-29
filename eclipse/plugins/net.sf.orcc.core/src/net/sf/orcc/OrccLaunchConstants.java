@@ -171,7 +171,7 @@ public interface OrccLaunchConstants {
 	 * Folder where the compiled Actors can be found.
 	 */
 	public static final String VTL_FOLDER = "net.sf.orcc.simulators.VTLFolder";
-
+	
 	/**
 	 * Input file associated with an Orcc configuration. Must be kept in sync
 	 * with options in the back-ends plug-in.
@@ -183,5 +183,18 @@ public interface OrccLaunchConstants {
 	public static final String MERGE_ACTORS = "net.sf.orcc.core.mergeActors";
 
 	public static final String CLASSIFY = "net.sf.orcc.core.classify";
+	
+	/**
+	 * Cast the variables or ports using the TypeResizer transformation
+	 */
+	public static final String TYPE_RESIZER = "net.sf.orcc.core.transform.typeResizer";
+	/** TypeResizer Transformation Option:  cast to 2^n bits */
+	public static final String TYPE_RESIZER_CAST_TO2NBITS = "net.sf.orcc.core.transform.typeResizer.to2nbits";
+	/** TypeResizer Transformation Option:  cast to 32 bits */
+	public static final String TYPE_RESIZER_CAST_TO32BITS = "net.sf.orcc.core.transform.typeResizer.to32bits";
+	/** TypeResizer Transformation Option:  cast native ports */
+	public static final String TYPE_RESIZER_CAST_NATIVEPORTS = "net.sf.orcc.core.transform.typeResizer.nativePorts";
+	/** TypeResizer Transformation Option: cast boolean to integer */
+	public static final String TYPE_RESIZER_CAST_BOOLTOINT = "net.sf.orcc.core.transform.typeResizer.booltoint";
 
 }

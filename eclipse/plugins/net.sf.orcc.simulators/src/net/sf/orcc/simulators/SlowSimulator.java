@@ -38,6 +38,12 @@ import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
+import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER;
+import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER_CAST_BOOLTOINT;
+import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER_CAST_NATIVEPORTS;
+import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER_CAST_TO2NBITS;
+import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER_CAST_TO32BITS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +56,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.runtime.SimulatorFifo;
@@ -77,25 +84,21 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class SlowSimulator extends AbstractSimulator {
 
-	static String ENABLE_TRACES = "net.sf.orcc.simulators.enableTraces";
-	
-	private boolean enableTraces;
+	protected Map<Actor, ActorInterpreter> interpreters;
 
 	protected List<SimulatorFifo> fifoList;
 
-	private int fifoSize;
-
-	protected Map<Actor, ActorInterpreter> interpreters;
-
 	protected IProject project;
-
-	private String stimulusFile;
-
-	private String traceFolder;
 
 	protected List<IFolder> vtlFolders;
 
 	protected String xdfFile;
+
+	private int fifoSize;
+
+	private String stimulusFile;
+
+	private String traceFolder;
 
 	private boolean hasGoldenReference;
 
@@ -104,6 +107,12 @@ public class SlowSimulator extends AbstractSimulator {
 	private int loopsNumber;
 
 	private boolean noDisplay;
+
+	private boolean enableTraces;
+
+	private boolean enableTypeResizer;
+
+	private Boolean[] typeResizer = { false, false, false, false };
 
 	/**
 	 * Creates FIFOs and connects ports together.
@@ -239,6 +248,13 @@ public class SlowSimulator extends AbstractSimulator {
 		loopsNumber = getAttribute(LOOP_NUMBER, DEFAULT_NB_LOOPS);
 
 		noDisplay = getAttribute(NO_DISPLAY, false);
+
+		enableTypeResizer = getAttribute(TYPE_RESIZER, false);
+		typeResizer[0] = getAttribute(TYPE_RESIZER_CAST_TO2NBITS, false);
+		typeResizer[1] = getAttribute(TYPE_RESIZER_CAST_TO32BITS, false);
+		typeResizer[2] = getAttribute(TYPE_RESIZER_CAST_NATIVEPORTS, false);
+		typeResizer[3] = getAttribute(TYPE_RESIZER_CAST_BOOLTOINT, false);
+
 	}
 
 	protected int runNetwork(Network network) {
@@ -285,6 +301,12 @@ public class SlowSimulator extends AbstractSimulator {
 
 			// flattens network
 			new NetworkFlattener().doSwitch(network);
+
+			// if required, use the type sizer transformation
+			if (enableTypeResizer) {
+				new TypeResizer(typeResizer[0], typeResizer[1], typeResizer[2],
+						typeResizer[3]).doSwitch(network);
+			}
 
 			// create interpreters, connect network, initialize, and run
 			createInterpreters(network);
