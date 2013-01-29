@@ -29,7 +29,6 @@
 package net.sf.orcc.simulators;
 
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE;
 import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE_FILE;
@@ -78,6 +77,8 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class SlowSimulator extends AbstractSimulator {
 
+	static String ENABLE_TRACES = "net.sf.orcc.simulators.enableTraces";
+	
 	private boolean enableTraces;
 
 	protected List<SimulatorFifo> fifoList;

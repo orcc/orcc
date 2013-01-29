@@ -26,7 +26,7 @@ public class RuntimeExpressionEvaluator extends ExpressionEvaluator {
 				return result;
 			}
 		}
-		
+
 		result = super.caseExprBinary(expr);
 
 		if (result == null) {
