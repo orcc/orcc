@@ -37,7 +37,6 @@ import java.util.Map;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
-import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -46,6 +45,7 @@ import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
@@ -203,27 +203,27 @@ public class HLSBackend extends CBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
-		
+
 		OrccLogger.trace("Printing network VHDL Top... ");
 		if (new TopVhdlPrinter(network, options).print(srcPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
-		
+
 		OrccLogger.trace("Printing batch command... ");
 		if (new BatchCommandPrinter(network, options).print(commandPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
-		
-		
+
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		new InstanceTestBenchPrinter(instance, options).printInstance(testBenchPath);
+		new InstanceTestBenchPrinter(instance, options)
+				.printInstance(testBenchPath);
 		return new InstancePrinter(instance, options).printInstance(srcPath) > 0;
 	}
 }
