@@ -29,6 +29,7 @@
 
 package net.sf.orcc.runtime.impl;
 
+import net.sf.orcc.util.OrccLogger;
 
 public class GenericDisplay {
 	/**
@@ -64,10 +65,12 @@ public class GenericDisplay {
 
 	public static void setDisplayEnabled() {
 		displayStatus = DISPLAY_ENABLE;
+		OrccLogger.debugln("Display has been enabled");
 	}
 
 	public static void setDisplayDisabled() {
 		displayStatus = DISPLAY_DISABLE;
+		OrccLogger.debugln("Display has been disabled");
 	}
 
 }
