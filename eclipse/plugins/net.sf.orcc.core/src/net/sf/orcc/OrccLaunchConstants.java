@@ -114,7 +114,7 @@ public interface OrccLaunchConstants {
 	 * Project associated with an Orcc configuration.
 	 */
 	public static final String PROJECT = "net.sf.orcc.project";
-
+	
 	/**
 	 * Orcc run configuration type.
 	 */
@@ -141,5 +141,8 @@ public interface OrccLaunchConstants {
 	public static final String MERGE_ACTORS = "net.sf.orcc.core.mergeActors";
 
 	public static final String CLASSIFY = "net.sf.orcc.core.classify";
+	
+	public static final String PROFILE = "net.sf.orcc.simulator.profile";
+
 
 }

@@ -29,7 +29,10 @@
 package net.sf.orcc.simulators.slow;
 
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
+import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
 import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
@@ -60,7 +63,6 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.runtime.impl.GenericDisplay;
 import net.sf.orcc.runtime.impl.GenericSource;
-import net.sf.orcc.util.Attribute;
 import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.SimulatorDescriptor;
 import net.sf.orcc.util.OrccLogger;
@@ -178,6 +180,7 @@ public class SlowSimulator extends AbstractSimulator {
 							+ port.getName() + "] on Actor "
 							+ actor.getSimpleName());
 				}
+			}
 		}
 	}
 

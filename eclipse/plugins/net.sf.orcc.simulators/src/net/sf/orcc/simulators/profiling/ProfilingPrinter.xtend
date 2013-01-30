@@ -26,10 +26,10 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.simulators.slow
+package net.sf.orcc.simulators.profiling
 
-import net.sf.orcc.df.Connection
 import net.sf.orcc.tools.stats.StatisticsPrinter
+import net.sf.orcc.df.Connection
 import net.sf.orcc.simulators.slow.SimulatorFifo
 
 /**
@@ -39,11 +39,13 @@ import net.sf.orcc.simulators.slow.SimulatorFifo
  */
 class ProfilingPrinter extends StatisticsPrinter {
 	
-	override getConnectionsHeader() 
-		'''«super.connectionsHeader», Traffic'''
+	override getConnectionsHeader() '''
+		«super.connectionsHeader», Traffic
+	'''
 	
-	override getStats(Connection conn) 
-		'''«super.getStats(conn)», «conn.traffic»'''
+	override getStats(Connection conn) '''
+		«super.getStats(conn)», «conn.traffic»
+	'''
 	
 	def private getTraffic(Connection conn) {
 		val fifo = conn.getAttribute("fifo").objectValue as SimulatorFifo

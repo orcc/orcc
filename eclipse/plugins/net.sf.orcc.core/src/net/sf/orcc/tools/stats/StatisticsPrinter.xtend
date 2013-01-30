@@ -32,13 +32,13 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.PrintStream
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
 import org.eclipse.emf.common.util.EList
-import net.sf.orcc.df.Instance
-import net.sf.orcc.df.Actor
 
 /**
  * Generate statistics about an application.
@@ -92,9 +92,8 @@ class StatisticsPrinter {
 		«ENDFOR»
 	'''
 	
-	def private getChildrenHeader() '''
-		Name, Incoming, Outgoing, Inputs, Outputs, Actions, MoC
-	'''
+	def private getChildrenHeader() 
+		'''Name, Incoming, Outgoing, Inputs, Outputs, Actions, MoC'''
 	
 	def private getConnectionsStats(EList<Connection> connections) '''
 		«connectionsHeader»
@@ -103,21 +102,18 @@ class StatisticsPrinter {
 		«ENDFOR»
 	'''
 	
-	def protected getConnectionsHeader() '''
-		Source, Source port, Target, Target port, Size
-	'''
+	def protected getConnectionsHeader() 
+		'''Source, Source port, Target, Target port, Size'''
 	
-	def protected getStats(Connection conn) '''
-		«conn.source.label», «conn.sourcePort.name», «conn.target.label», «conn.targetPort.name», «conn.size»
-	'''
+	def protected getStats(Connection conn) 
+		'''«conn.source.label», «conn.sourcePort.name», «conn.target.label», «conn.targetPort.name», «conn.size»'''
 	
-	def private getStats(Actor actor) '''
-		«actor.name», «actor.incoming.size», «actor.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»
-	'''
+	def private getStats(Actor actor) 
+		'''«actor.name», «actor.incoming.size», «actor.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»'''
 	
-	def private getStats(Instance instance) '''
-		«val actor = instance.actor»
-		«instance.name», «instance.incoming.size», «instance.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»
-	'''
+	def private getStats(Instance instance) {
+		val actor = instance.actor
+		'''«instance.name», «instance.incoming.size», «instance.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»'''
+	}
 	
 }
