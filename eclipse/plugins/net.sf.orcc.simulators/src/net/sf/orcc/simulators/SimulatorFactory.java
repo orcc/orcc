@@ -78,14 +78,16 @@ public class SimulatorFactory extends PluginFactory {
 	/**
 	 * Runs the simulator specified by the configuration.
 	 * 
-	 * @param process
-	 *            the process that launched the simulator
-	 * @param configuration
-	 *            launch configuration
+	 * @param monitor
+	 *            Eclipse monitor to manage process
+	 * @param mode
+	 *            "run" or "debug"
+	 * @param options
+	 *            launch options
 	 * @throws Exception
 	 */
-	public void runSimulator(IProgressMonitor monitor,
-			String mode, Map<String, Object> options) throws Exception {
+	public void runSimulator(IProgressMonitor monitor, String mode,
+			Map<String, Object> options) throws Exception {
 		// Get the simulator plugin
 		String simulatorName = (String) options.get(SIMULATOR);
 		Simulator simulator = (Simulator) plugins.get(simulatorName);
