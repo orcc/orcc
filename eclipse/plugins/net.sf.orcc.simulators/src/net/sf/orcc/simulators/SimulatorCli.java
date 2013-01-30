@@ -122,6 +122,8 @@ public class SimulatorCli implements IApplication {
 
 		clOptions.addOption("n", "nodisplay", false,
 				"Disable display initialization");
+		clOptions.addOption("d", "debug", false,
+				"Launch simulator in debug mode");
 		clOptions.addOption("h", "help", false, "Print this help message");
 
 		try {
@@ -150,6 +152,10 @@ public class SimulatorCli implements IApplication {
 
 			if (commandLine.hasOption('n')) {
 				simulatorOptions.put(NO_DISPLAY, true);
+			}
+
+			if (commandLine.hasOption('d')) {
+				OrccLogger.setLevel(OrccLogger.DEBUG);
 			}
 
 			if (commandLine.hasOption("r")) {
