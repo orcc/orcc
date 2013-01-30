@@ -115,7 +115,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	protected void callPrintProcedure(Procedure procedure, List<Arg> arguments) {
+	protected void callPrintProcedure(List<Arg> arguments) {
 		for (Arg arg : arguments) {
 			if (arg.isByVal()) {
 				Expression expr = ((ArgByVal) arg).getValue();
