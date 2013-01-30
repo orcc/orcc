@@ -180,6 +180,8 @@ public class SimulatorCli implements IApplication {
 				OrccLogger.severeln("Simulator has shut down");
 				restoreAutoBuild();
 				return IApplication.EXIT_RELAUNCH;
+			} finally {
+				restoreAutoBuild();
 			}
 
 			// Simulator correctly shut down
