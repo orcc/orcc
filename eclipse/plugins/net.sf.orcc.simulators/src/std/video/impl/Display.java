@@ -278,8 +278,6 @@ public class Display extends GenericDisplay {
 		frame.add(canvas);
 		frame.setResizable(false);
 		frame.setVisible(true);
-
-		displayStatus |= DISPLAY_READY;
 	}
 
 	public static void fpsPrintInit() {
