@@ -30,7 +30,7 @@ package std.video.impl;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
-import java.awt.event.WindowAdapter;
+import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -52,19 +52,17 @@ import net.sf.orcc.util.OrccLogger;
  */
 public class Display extends GenericDisplay {
 
-	private static RandomAccessFile in;
-
-	private static int frameNumber = 0;
-
-	private static boolean useCompare;
-
 	private static BufferStrategy buffer;
 
 	private static Canvas canvas;
 
 	private static JFrame frame;
 
+	private static int frameNumber = 0;
+
 	private static BufferedImage image;
+
+	private static RandomAccessFile in;
 
 	private static int lastHeight;
 
@@ -74,6 +72,29 @@ public class Display extends GenericDisplay {
 
 	private static long t2;
 
+	private static boolean useCompare;
+
+	/**
+	 * Close open frames (if any) and clear all
+	 */
+	private static void clearAll() {
+		if (frame != null) {
+			WindowEvent wev = new WindowEvent(frame, WindowEvent.WINDOW_CLOSING);
+			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
+			frame.setVisible(false);
+			frame.dispose();
+		}
+		
+		if (buffer != null) {
+			buffer.dispose();
+		}
+
+		canvas = null;
+		image = null;
+		lastHeight = 0;
+		lastWidth = 0;
+	}
+
 	private static int clip(int n) {
 		if (n < 0) {
 			return 0;
@@ -82,6 +103,29 @@ public class Display extends GenericDisplay {
 		} else {
 			return n;
 		}
+	}
+
+	private static int compareYUV_compareComponent(int width, int height,
+			byte[] golden, byte[] approximate, int SizeMbSide) {
+		int pix_x, pix_y, blk_x, blk_y;
+		int error = 0;
+		int WidthSzInBlk = width / SizeMbSide;
+		int HeightSzInBlk = height / SizeMbSide;
+
+		for (blk_y = 0; blk_y < HeightSzInBlk; blk_y++) {
+			for (blk_x = 0; blk_x < WidthSzInBlk; blk_x++) {
+				for (pix_y = 0; pix_y < SizeMbSide; pix_y++) {
+					for (pix_x = 0; pix_x < SizeMbSide; pix_x++) {
+						int Idx_pix = (blk_y * SizeMbSide + pix_y) * width
+								+ (blk_x * SizeMbSide + pix_x);
+						if (golden[Idx_pix] - approximate[Idx_pix] != 0) {
+							error++;
+						}
+					}
+				}
+			}
+		}
+		return error;
 	}
 
 	/**
@@ -141,29 +185,6 @@ public class Display extends GenericDisplay {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private static int compareYUV_compareComponent(int width, int height,
-			byte[] golden, byte[] approximate, int SizeMbSide) {
-		int pix_x, pix_y, blk_x, blk_y;
-		int error = 0;
-		int WidthSzInBlk = width / SizeMbSide;
-		int HeightSzInBlk = height / SizeMbSide;
-
-		for (blk_y = 0; blk_y < HeightSzInBlk; blk_y++) {
-			for (blk_x = 0; blk_x < WidthSzInBlk; blk_x++) {
-				for (pix_y = 0; pix_y < SizeMbSide; pix_y++) {
-					for (pix_x = 0; pix_x < SizeMbSide; pix_x++) {
-						int Idx_pix = (blk_y * SizeMbSide + pix_y) * width
-								+ (blk_x * SizeMbSide + pix_x);
-						if (golden[Idx_pix] - approximate[Idx_pix] != 0) {
-							error++;
-						}
-					}
-				}
-			}
-		}
-		return error;
 	}
 
 	/**
@@ -250,29 +271,25 @@ public class Display extends GenericDisplay {
 	 * Initializes the display.
 	 */
 	public static void displayYUV_init() {
+		clearAll();
+
 		frame = new JFrame("display");
-		frame.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosing(WindowEvent e) {
-				if (buffer != null) {
-					buffer.dispose();
-				}
-
-				canvas = null;
-				image = null;
-				lastHeight = 0;
-				lastWidth = 0;
-			}
-
-		});
-
 		canvas = new Canvas();
 		frame.add(canvas);
 		frame.setResizable(false);
 		frame.setVisible(true);
 
 		displayStatus |= DISPLAY_READY;
+	}
+
+	public static void fpsPrintInit() {
+		t1 = System.currentTimeMillis();
+	}
+
+	public static void fpsPrintNewPicDecoded() {
+		t2 = System.currentTimeMillis();
+		OrccLogger.traceln("image displayed in " + (t2 - t1) + " ms");
+		t1 = t2;
 	}
 
 	private static void setVideoSize(int newWidth, int newHeight) {
@@ -288,16 +305,6 @@ public class Display extends GenericDisplay {
 			image = new BufferedImage(lastWidth, lastHeight,
 					BufferedImage.TYPE_INT_RGB);
 		}
-	}
-
-	public static void fpsPrintInit() {
-		t1 = System.currentTimeMillis();
-	}
-
-	public static void fpsPrintNewPicDecoded() {
-		t2 = System.currentTimeMillis();
-		OrccLogger.traceln("image displayed in " + (t2 - t1) + " ms");
-		t1 = t2;
 	}
 
 }
