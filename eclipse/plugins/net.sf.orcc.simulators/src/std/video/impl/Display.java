@@ -269,6 +269,7 @@ public class Display extends GenericDisplay {
 
 		canvas = new Canvas();
 		frame.add(canvas);
+		frame.setResizable(false);
 		frame.setVisible(true);
 
 		displayStatus |= DISPLAY_READY;
@@ -281,7 +282,6 @@ public class Display extends GenericDisplay {
 		if (canvas != null) {
 			canvas.setSize(lastWidth, lastHeight);
 			frame.pack();
-
 			canvas.createBufferStrategy(2);
 			buffer = canvas.getBufferStrategy();
 
