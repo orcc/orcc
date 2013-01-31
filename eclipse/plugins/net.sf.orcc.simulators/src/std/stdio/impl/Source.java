@@ -35,6 +35,7 @@ import java.math.BigInteger;
 
 import net.sf.orcc.runtime.impl.GenericSource;
 import net.sf.orcc.simulators.AbstractSimulator;
+import net.sf.orcc.util.OrccLogger;
 
 /**
  * This class defines native functions for the Source actor.
@@ -51,6 +52,8 @@ public class Source extends GenericSource {
 	private static int loopsCount;
 
 	public static void source_exit(BigInteger status) {
+		OrccLogger.traceln("Exit signal called by application. Return code: "
+				+ status.toString());
 		AbstractSimulator.stop(status);
 	}
 
