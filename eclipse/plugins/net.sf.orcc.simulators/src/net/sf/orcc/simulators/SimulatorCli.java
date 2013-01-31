@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.simulators;
 
+import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE;
 import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE_FILE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
@@ -117,9 +118,9 @@ public class SimulatorCli implements IApplication {
 						+ "Default : 1 time.");
 
 		clOptions.addOption("r", "golden_reference", true,
-				"Reference file which will be "
-						+ "used to compare with decoded stream.");
-
+				"Reference file which used to compare with decoded stream.");
+		clOptions.addOption("f", "fifo-size", true,
+				"Default size of the FIFO channels");
 		clOptions.addOption("n", "nodisplay", false,
 				"Disable display initialization");
 		clOptions.addOption("d", "debug", false,
@@ -145,10 +146,15 @@ public class SimulatorCli implements IApplication {
 					commandLine.getOptionValue('i'));
 			simulatorOptions.put(XDF_FILE, commandLine.getArgList().get(0));
 
-			simulatorOptions.put(
-					LOOP_NUMBER,
-					commandLine.getOptionValue('l',
-							String.valueOf(Simulator.DEFAULT_NB_LOOPS)));
+			if (commandLine.hasOption('f')) {
+				simulatorOptions.put(FIFO_SIZE,
+						Integer.valueOf(commandLine.getOptionValue('f')));
+			}
+
+			if (commandLine.hasOption('l')) {
+				simulatorOptions.put(LOOP_NUMBER,
+						commandLine.getOptionValue('l'));
+			}
 
 			if (commandLine.hasOption('n')) {
 				simulatorOptions.put(NO_DISPLAY, true);
