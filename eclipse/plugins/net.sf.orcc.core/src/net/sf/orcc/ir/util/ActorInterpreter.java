@@ -549,6 +549,13 @@ public class ActorInterpreter extends IrSwitch<Object> {
 
 			// initializes runtime value of constants declared in units
 			initExternalResources(actor);
+			
+			// initializes FSM status (if any)
+			if (actor.hasFsm()) {
+				fsmState = actor.getFsm().getInitialState();
+			} else {
+				fsmState = null;
+			}
 
 			// Get initializing procedure if any
 			for (Action action : actor.getInitializes()) {
@@ -666,14 +673,6 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 */
 	protected void setActor(Actor actor) {
 		this.actor = actor;
-
-		// set fsm state to initial state (if any)
-		if (actor.hasFsm()) {
-			fsmState = actor.getFsm().getInitialState();
-		} else {
-			fsmState = null;
-		}
-
 	}
 
 }
