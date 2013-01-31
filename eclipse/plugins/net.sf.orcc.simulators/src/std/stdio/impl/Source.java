@@ -73,7 +73,7 @@ public class Source extends GenericSource {
 		try {
 			in = new RandomAccessFile(inputStimulus, "r");
 		} catch (FileNotFoundException e) {
-			String msg = "file not found: \"" + inputStimulus + "\"";
+			String msg = "File not found: \"" + inputStimulus + "\"";
 			throw new RuntimeException(msg, e);
 		}
 		loopsCount = nbLoops;

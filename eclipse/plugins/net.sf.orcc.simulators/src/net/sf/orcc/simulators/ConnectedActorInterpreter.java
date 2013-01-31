@@ -109,7 +109,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 					null, args);
 		} catch (Exception e) {
 			throw new OrccRuntimeException(
-					"exception during native procedure call to "
+					"Exception during native procedure call to "
 							+ procedure.getName(), e);
 		}
 	}

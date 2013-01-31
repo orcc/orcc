@@ -42,6 +42,7 @@ import java.math.BigInteger;
 import javax.swing.JFrame;
 
 import net.sf.orcc.runtime.impl.GenericDisplay;
+import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.util.OrccLogger;
 
 /**
@@ -84,7 +85,7 @@ public class Display extends GenericDisplay {
 			frame.setVisible(false);
 			frame.dispose();
 		}
-		
+
 		if (buffer != null) {
 			buffer.dispose();
 		}
@@ -175,6 +176,8 @@ public class Display extends GenericDisplay {
 				} else {
 					OrccLogger.traceRaw("; " + numErrors
 							+ " errors detected !\n");
+
+					AbstractSimulator.statusCode++;
 				}
 
 				if (in.getFilePointer() == in.length()) {
@@ -197,7 +200,7 @@ public class Display extends GenericDisplay {
 				in = new RandomAccessFile(goldenReference, "r");
 				useCompare = true;
 			} catch (FileNotFoundException e) {
-				String msg = "file not found: \"" + goldenReference + "\"";
+				String msg = "File not found: \"" + goldenReference + "\"";
 				throw new RuntimeException(msg, e);
 			}
 		}
