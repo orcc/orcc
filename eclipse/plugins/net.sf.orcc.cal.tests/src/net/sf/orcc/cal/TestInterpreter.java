@@ -35,7 +35,6 @@ import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.util.OrccUtil;
 
@@ -57,7 +56,7 @@ public class TestInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	protected void callPrintProcedure(Procedure procedure, List<Arg> arguments) {
+	protected void callPrintProcedure(List<Arg> arguments) {
 		for (Arg arg : arguments) {
 			if (arg.isByVal()) {
 				Expression expr = ((ArgByVal) arg).getValue();
