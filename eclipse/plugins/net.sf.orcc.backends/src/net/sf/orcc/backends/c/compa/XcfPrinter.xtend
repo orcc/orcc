@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, IETR/INSA of Rennes
+ * Copyright (c) 2013, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@
  *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
- * about
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,51 +26,49 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.util
+package net.sf.orcc.backends.c.compa
 
-import java.io.File
 import java.util.List
 import java.util.Map
-import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
 
 /**
- * Printer used to create the xcf file, containing information on
- * mapping between actors and processor cores
- * 
+ * Generate and print xcf file for COMPA backend.
+ *  
  * @author Antoine Lorence
  * 
  */
-class XcfPrinter extends CommonPrinter {
+class XcfPrinter  extends net.sf.orcc.backends.util.XcfPrinter {
 	
-	protected Map<String, List<Instance>> coreToInstanceMap
+	Network network
 	
-	var i = 0
-	
-	new(Map<String, List<Instance>> coreToInstanceMap) {
-		this.coreToInstanceMap = coreToInstanceMap
+	new(Network network, Map<String,List<Instance>> coreToInstanceMap) {
+		super(coreToInstanceMap)		
+		this.network = network
 	}
-	
-	def printXcfFile(String fileName) {
-		printFile(compileXcfFile, new File(fileName))
-	}
-	
-	def protected compileXcfFile() '''
+
+	override protected compileXcfFile() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<Configuration>
 			<Partitioning>
-				«FOR instances : coreToInstanceMap.values»
-					«instances.printPartition»
-				«ENDFOR»
+				«IF coreToInstanceMap != null && coreToInstanceMap.size > 0»
+					«FOR instances : coreToInstanceMap.values»
+						«instances.printPartition»
+					«ENDFOR»
+				«ELSE»
+					«network.children.actorInstances.printPartition»
+				«ENDIF»
 			</Partitioning>
+			
+			«otherStuff»
 		</Configuration>
 	'''
 	
-	def protected printPartition(Iterable<Instance> instances) '''
-		<Partition id="« i = i + 1 »">
-			«FOR instance : instances»
-				<Instance id="«instance.name»"/>
-			«ENDFOR»
-		</Partition>
+	def protected otherStuff() '''
+		<!-- This can be used to print other useful informations, related
+		to any element of the instanciated model... -->
 	'''
+
+	
 }

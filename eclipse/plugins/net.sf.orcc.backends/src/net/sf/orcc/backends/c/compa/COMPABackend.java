@@ -197,6 +197,10 @@ public class COMPABackend extends CBackend {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		OrccLogger.traceln("Print network meta-informations...");
+		new XcfPrinter(network, targetToInstancesMap).printXcfFile(srcPath
+				+ File.separator + network.getSimpleName() + ".xcf");
 	}
 
 	@Override
