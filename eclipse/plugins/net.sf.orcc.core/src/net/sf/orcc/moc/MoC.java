@@ -38,6 +38,12 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  */
 public interface MoC extends EObject {
+	/**
+	 * Return the short name of the current MoC
+	 * 
+	 * @return The short name of the current MoC
+	 */
+	public String getShortName();
 
 	/**
 	 * Returns true if this MoC is CSDF.

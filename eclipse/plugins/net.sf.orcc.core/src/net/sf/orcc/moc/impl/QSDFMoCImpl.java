@@ -26,7 +26,7 @@ import org.eclipse.emf.ecore.EClass;
  * <em><b>QSDF Mo C</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- *
+ * 
  * @generated
  */
 public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
@@ -45,6 +45,7 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -55,6 +56,11 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	@Override
 	public Set<Action> getActions() {
 		return configurations.keySet();
+	}
+
+	@Override
+	public String getShortName() {
+		return "QSDF";
 	}
 
 	@Override
