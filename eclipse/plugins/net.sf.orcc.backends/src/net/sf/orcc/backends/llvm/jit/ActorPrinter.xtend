@@ -299,14 +299,7 @@ class ActorPrinter extends InstancePrinter {
 	}
 
 	def MoCName_MD(MoC moc) {
-		val mocValue = switch(moc) {
-			case moc.quasiStatic : "QuasiStatic"
-			case moc.DPN : "DPN"
-			case moc.KPN : "KPN"
-			case moc.SDF : "SDF"
-			case moc.CSDF : "CSDF"
-		}
-		'''metadata !"«mocValue»"'''
+		'''metadata !"«moc.shortName»"'''
 	}
 		
 	def pattern_MD(Pattern pattern) {
