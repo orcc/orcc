@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.simulators;
+package net.sf.orcc.simulators.slow;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.ValueUtil;
-import net.sf.orcc.runtime.SimulatorFifo;
+import net.sf.orcc.simulators.util.RuntimeExpressionEvaluator;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;

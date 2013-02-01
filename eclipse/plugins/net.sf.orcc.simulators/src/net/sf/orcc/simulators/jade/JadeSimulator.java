@@ -26,13 +26,13 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.simulators;
+package net.sf.orcc.simulators.jade;
 
-import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
+import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
-import static net.sf.orcc.OrccLaunchConstants.REFERENCE_FILE;
-import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
-import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
+import static net.sf.orcc.simulators.SimulatorsConstants.REFERENCE_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.TRACES_FOLDER;
+import static net.sf.orcc.simulators.SimulatorsConstants.VTL_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE;
 import static net.sf.orcc.util.OrccUtil.getFile;
@@ -50,6 +50,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -68,7 +69,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * @author Matthieu Wipliez
  * 
  */
-public class JadeSimulatorImpl extends AbstractSimulator {
+public class JadeSimulator extends AbstractSimulator {
 
 	/**
 	 * Path of Jade executable

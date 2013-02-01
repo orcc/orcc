@@ -29,10 +29,10 @@
 package net.sf.orcc.simulators;
 
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE;
-import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE_FILE;
-import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
-import static net.sf.orcc.OrccLaunchConstants.LOOP_NUMBER;
+import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
+import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
+import static net.sf.orcc.simulators.SimulatorsConstants.LOOP_NUMBER;
 import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;

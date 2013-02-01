@@ -1,4 +1,4 @@
-package net.sf.orcc.simulators;
+package net.sf.orcc.simulators.util;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;

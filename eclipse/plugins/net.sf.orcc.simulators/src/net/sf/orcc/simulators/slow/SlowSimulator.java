@@ -26,24 +26,23 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.simulators;
+package net.sf.orcc.simulators.slow;
 
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE;
-import static net.sf.orcc.OrccLaunchConstants.GOLDEN_REFERENCE_FILE;
-import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
-import static net.sf.orcc.OrccLaunchConstants.LOOP_NUMBER;
-import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
-import static net.sf.orcc.OrccLaunchConstants.PROJECT;
-import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
-import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
-import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER;
-import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER_CAST_BOOLTOINT;
-import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER_CAST_NATIVEPORTS;
-import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER_CAST_TO2NBITS;
-import static net.sf.orcc.OrccLaunchConstants.TYPE_RESIZER_CAST_TO32BITS;
+import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
+import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
+import static net.sf.orcc.simulators.SimulatorsConstants.LOOP_NUMBER;
+import static net.sf.orcc.simulators.SimulatorsConstants.PROFILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.PROFILE_FOLDER;
+import static net.sf.orcc.simulators.SimulatorsConstants.TRACES_FOLDER;
+import static net.sf.orcc.simulators.SimulatorsConstants.TYPE_RESIZER;
+import static net.sf.orcc.simulators.SimulatorsConstants.TYPE_RESIZER_CAST_BOOLTOINT;
+import static net.sf.orcc.simulators.SimulatorsConstants.TYPE_RESIZER_CAST_NATIVEPORTS;
+import static net.sf.orcc.simulators.SimulatorsConstants.TYPE_RESIZER_CAST_TO2NBITS;
+import static net.sf.orcc.simulators.SimulatorsConstants.TYPE_RESIZER_CAST_TO32BITS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,10 +58,11 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.runtime.SimulatorFifo;
 import net.sf.orcc.runtime.impl.GenericDisplay;
 import net.sf.orcc.runtime.impl.GenericSource;
 import net.sf.orcc.util.Attribute;
+import net.sf.orcc.simulators.AbstractSimulator;
+import net.sf.orcc.simulators.SimulatorDescriptor;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -83,10 +83,10 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * 
  */
 public class SlowSimulator extends AbstractSimulator {
-	
-	protected Map<Actor, ActorInterpreter> interpreters;
 
-	protected List<SimulatorFifo> fifoList;
+	private boolean enableTraces;
+
+	private boolean enableTypeResizer;
 
 	private int fifoSize;
 
@@ -94,9 +94,13 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private boolean hasGoldenReference;
 
+	protected Map<Actor, ActorInterpreter> interpreters;
+
 	private int loopsNumber;
 
 	private boolean noDisplay;
+
+	private boolean profile;
 
 	protected IProject project;
 
@@ -104,58 +108,13 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private String traceFolder;
 
+	private String profileFolder;
+
+	private Boolean[] typeResizer = { false, false, false, false };
+
 	protected List<IFolder> vtlFolders;
 
 	protected String xdfFile;
-	
-	private boolean enableTraces;
-
-	private boolean enableTypeResizer;
-	
-	private Boolean[] typeResizer = { false, false, false, false };
-
-	/**
-	 * Creates FIFOs and connects ports together.
-	 * 
-	 * @param src
-	 *            name of the source actor
-	 * @param srcPort
-	 *            source port
-	 * @param tgt
-	 *            name of the target actor
-	 * @param tgtPort
-	 *            target port
-	 * @param fifoSize
-	 *            size of the FIFO
-	 */
-	@SuppressWarnings("unchecked")
-	protected void connectFifos(String src, Port srcPort, String tgt,
-			Port tgtPort, int fifoSize) {
-		SimulatorFifo fifo = null;
-		if (enableTraces) {
-			String fifoName = src + "_" + srcPort.getName() + "_" + tgt + "_"
-					+ tgtPort.getName();
-			fifo = new SimulatorFifo(srcPort.getType(), fifoSize, traceFolder,
-					fifoName, enableTraces);
-		} else {
-			fifo = new SimulatorFifo(srcPort.getType(), fifoSize);
-		}
-
-		tgtPort.setAttribute("fifo", fifo);
-
-		Attribute attribute = srcPort.getAttribute("fifo");
-		List<SimulatorFifo> fifos;
-		if (attribute == null) {
-			fifos = null;
-		} else {
-			fifos = (List<SimulatorFifo>) attribute.getObjectValue();
-		}
-		if (fifos == null) {
-			fifos = new ArrayList<SimulatorFifo>();
-			srcPort.setAttribute("fifo", fifos);
-		}
-		fifos.add(fifo);
-	}
 
 	/**
 	 * Visit the network graph for building the required topology. Edges of the
@@ -165,30 +124,40 @@ public class SlowSimulator extends AbstractSimulator {
 	 * 
 	 * @param graph
 	 */
+	@SuppressWarnings("unchecked")
 	public void connectNetwork(Network network) {
-		// Loop over the connections and ask for the source and target actors
-		// connection through specified I/O ports.
 		for (Connection connection : network.getConnections()) {
-			Vertex srcVertex = connection.getSource();
-			Vertex tgtVertex = connection.getTarget();
+			Actor src = connection.getSource().getAdapter(Actor.class);
+			Actor tgt = connection.getTarget().getAdapter(Actor.class);
+			Port srcPort = connection.getSourcePort();
+			Port tgtPort = connection.getTargetPort();
+			int size = connection.getSize();
 
-			if (srcVertex instanceof Actor && tgtVertex instanceof Actor) {
-				// get FIFO size (user-defined nor default)
-				Integer connectionSize = connection.getSize();
-				int size = (connectionSize == null) ? fifoSize : connectionSize;
-
-				// create the communication FIFO between source and target
-				// actors
-				Actor src = (Actor) srcVertex;
-				Actor tgt = (Actor) tgtVertex;
-				Port srcPort = connection.getSourcePort();
-				Port tgtPort = connection.getTargetPort();
-				// connect source and target actors
-				if ((srcPort != null) && (tgtPort != null)) {
-					connectFifos(src.getName(), srcPort, tgt.getName(),
-							tgtPort, size);
-				}
+			if (src == null || tgt == null || srcPort == null
+					|| tgtPort == null) {
+				OrccLogger.warnln("The connection " + connection + " cannot "
+						+ "be connected to a pair of actors.");
+				break;
 			}
+
+			String name = src.getName() + "." + srcPort.getName() + " --> "
+					+ tgt.getName() + "." + tgtPort.getName();
+			SimulatorFifo fifo = new SimulatorFifo(srcPort.getType(), size,
+					traceFolder, name, enableTraces, profile);
+
+			tgtPort.setAttribute("fifo", fifo);
+
+			List<SimulatorFifo> fifos;
+			if (srcPort.hasAttribute("fifo")) {
+				fifos = (List<SimulatorFifo>) srcPort.getAttribute("fifo")
+						.getObjectValue();
+			} else {
+				fifos = new ArrayList<SimulatorFifo>();
+				srcPort.setAttribute("fifo", fifos);
+			}
+			fifos.add(fifo);
+
+			connection.setAttribute("fifo", fifo);
 		}
 
 		// print a warning message if there are some unconnected ports
@@ -209,7 +178,6 @@ public class SlowSimulator extends AbstractSimulator {
 							+ port.getName() + "] on Actor "
 							+ actor.getSimpleName());
 				}
-			}
 		}
 	}
 
@@ -260,6 +228,8 @@ public class SlowSimulator extends AbstractSimulator {
 		String name = getAttribute(PROJECT, "");
 		enableTraces = getAttribute(ENABLE_TRACES, false);
 		traceFolder = getAttribute(TRACES_FOLDER, "");
+		profile = getAttribute(PROFILE, false);
+		profileFolder = getAttribute(PROFILE_FOLDER, "");
 
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		project = root.getProject(name);
@@ -303,6 +273,7 @@ public class SlowSimulator extends AbstractSimulator {
 				}
 			}
 		} while (hasExecuted);
+
 		OrccLogger.traceln("End of simulation");
 		return statusCode;
 	}
@@ -318,7 +289,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Network network = EcoreHelper.getEObject(set, file);
 
 			// full instantiation (no more instances)
-			new Instantiator(true).doSwitch(network);
+			new Instantiator(true, fifoSize).doSwitch(network);
 
 			// flattens network
 			new NetworkFlattener().doSwitch(network);
@@ -335,6 +306,10 @@ public class SlowSimulator extends AbstractSimulator {
 			initializeNetwork(network);
 			runNetwork(network);
 			SimulatorDescriptor.killDescriptors();
+
+			if (profile) {
+				new ProfilingPrinter().print(profileFolder, network);
+			}
 		} finally {
 			// clean up to prevent memory leak
 			interpreters = null;

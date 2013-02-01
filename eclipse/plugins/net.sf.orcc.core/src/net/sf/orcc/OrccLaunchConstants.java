@@ -75,12 +75,6 @@ public interface OrccLaunchConstants {
 	public static final boolean DEFAULT_TRACES = false;
 
 	/**
-	 * When enabled, interpreter compare the output of the decoder with a
-	 * reference video.
-	 */
-	public static final String ENABLE_COMP = "net.sf.orcc.simulators.enableComparison";
-
-	/**
 	 * When enabled, interpreter traces each time data is written to (output)
 	 */
 	public static final String ENABLE_TRACES = "net.sf.orcc.backends.enableTraces";
@@ -89,27 +83,6 @@ public interface OrccLaunchConstants {
 	 * Size of FIFO channels when not specified by the network.
 	 */
 	public static final String FIFO_SIZE = "net.sf.orcc.fifoSize";
-
-	/**
-	 * When set, a golden reference has to be compared with the ouput data of
-	 * the network.
-	 */
-	public static final String GOLDEN_REFERENCE = "net.sf.orcc.simulators.goldenReference";
-
-	/**
-	 * Golden reference file associated with an Orcc configuration.
-	 */
-	public static final String GOLDEN_REFERENCE_FILE = "net.sf.orcc.simulators.goldenReferenceFile";
-
-	/**
-	 * Input stimulus file associated with an Orcc configuration.
-	 */
-	public static final String INPUT_STIMULUS = "net.sf.orcc.simulators.inputStimulus";
-
-	/**
-	 * Parameter used to set max number of times an input file is read.
-	 */
-	public static final String LOOP_NUMBER = "net.sf.orcc.simulators.loopNumber";
 
 	/**
 	 * Mapping associated with an Orcc configuration.
@@ -143,11 +116,6 @@ public interface OrccLaunchConstants {
 	public static final String PROJECT = "net.sf.orcc.project";
 
 	/**
-	 * Simulator reference video for testing video output
-	 */
-	public static final String REFERENCE_FILE = "net.sf.orcc.simulators.compareFile";
-
-	/**
 	 * Orcc run configuration type.
 	 */
 	public static final String RUN_CONFIG_TYPE = "net.sf.orcc.runLaunchConfigurationType";
@@ -163,16 +131,6 @@ public interface OrccLaunchConstants {
 	public static final String SIMULATOR = "net.sf.orcc.simulator";
 
 	/**
-	 * Simulator traces folder associated with an Orcc configuration
-	 */
-	public static final String TRACES_FOLDER = "net.sf.orcc.simulators.tracesFolder";
-
-	/**
-	 * Folder where the compiled Actors can be found.
-	 */
-	public static final String VTL_FOLDER = "net.sf.orcc.simulators.VTLFolder";
-	
-	/**
 	 * Input file associated with an Orcc configuration. Must be kept in sync
 	 * with options in the back-ends plug-in.
 	 */
@@ -183,18 +141,5 @@ public interface OrccLaunchConstants {
 	public static final String MERGE_ACTORS = "net.sf.orcc.core.mergeActors";
 
 	public static final String CLASSIFY = "net.sf.orcc.core.classify";
-	
-	/**
-	 * Cast the variables or ports using the TypeResizer transformation
-	 */
-	public static final String TYPE_RESIZER = "net.sf.orcc.core.transform.typeResizer";
-	/** TypeResizer Transformation Option:  cast to 2^n bits */
-	public static final String TYPE_RESIZER_CAST_TO2NBITS = "net.sf.orcc.core.transform.typeResizer.to2nbits";
-	/** TypeResizer Transformation Option:  cast to 32 bits */
-	public static final String TYPE_RESIZER_CAST_TO32BITS = "net.sf.orcc.core.transform.typeResizer.to32bits";
-	/** TypeResizer Transformation Option:  cast native ports */
-	public static final String TYPE_RESIZER_CAST_NATIVEPORTS = "net.sf.orcc.core.transform.typeResizer.nativePorts";
-	/** TypeResizer Transformation Option: cast boolean to integer */
-	public static final String TYPE_RESIZER_CAST_BOOLTOINT = "net.sf.orcc.core.transform.typeResizer.booltoint";
 
 }

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
+import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.SIMU_CONFIG_TYPE;
