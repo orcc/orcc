@@ -175,6 +175,9 @@ public abstract class AbstractSimulator implements Simulator {
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor) {
 		this.monitor = monitor;
+		// initialize also the simulation status variables
+		stopRequested = false;
+		statusCode = 0;
 	}
 
 	/**
