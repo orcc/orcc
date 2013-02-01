@@ -29,12 +29,14 @@
 package net.sf.orcc.backends.c.compa;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
+import net.sf.orcc.backends.c.compa.transform.XdfExtender;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
@@ -56,6 +58,8 @@ import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -135,6 +139,8 @@ public class COMPABackend extends CBackend {
 
 		new BroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
+
+		new XdfExtender().doSwitch(network);
 	}
 
 	@Override
@@ -150,8 +156,8 @@ public class COMPABackend extends CBackend {
 			// Serialization of the actors will break proxy link
 			EcoreUtil.resolveAll(network);
 		}
-		transformActors(network.getAllActors());
 
+		transformActors(network.getAllActors());
 		network.computeTemplateMaps();
 
 		for (String component : mapping.values()) {
@@ -181,6 +187,16 @@ public class COMPABackend extends CBackend {
 
 		new CMakePrinter(network).printCMakeFiles(path);
 
+		OrccLogger.traceln("Print flattened and attributed network...");
+		URI uri = URI.createFileURI(srcPath + File.separator
+				+ network.getSimpleName() + ".xdf");
+		Resource resource = new ResourceSetImpl().createResource(uri);
+		resource.getContents().add(network);
+		try {
+			resource.save(null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
