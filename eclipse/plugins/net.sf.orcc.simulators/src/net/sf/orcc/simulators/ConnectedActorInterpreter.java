@@ -146,13 +146,18 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		boolean hasRooms = true;
 		if (outputPattern != null) {
 			for (Port port : outputPattern.getPorts()) {
-				Integer nbOfTokens = outputPattern.getNumTokens(port);
-				@SuppressWarnings("unchecked")
-				List<SimulatorFifo> fifos = (List<SimulatorFifo>) port
-						.getAttribute(0).getObjectValue();
-				for (SimulatorFifo fifo : fifos) {
-					hasRooms &= fifo.hasRoom(nbOfTokens);
+				// check only connected output ports
+				Attribute attr = port.getAttribute("fifo");
+				if (attr != null) {
+					@SuppressWarnings("unchecked")
+					List<SimulatorFifo> fifos = (List<SimulatorFifo>) attr
+							.getObjectValue();
+					Integer nbOfTokens = outputPattern.getNumTokens(port);
+					for (SimulatorFifo fifo : fifos) {
+						hasRooms &= fifo.hasRoom(nbOfTokens);
+					}
 				}
+
 			}
 		}
 		return hasRooms;
@@ -163,7 +168,9 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 * 
 	 * @param action
 	 */
+
 	@Override
+	@SuppressWarnings("unchecked")
 	public void execute(Action action) {
 		// allocate patterns
 		Pattern inputPattern = action.getInputPattern();
@@ -173,9 +180,10 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
-			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute(0)
+			// a schedulable action can't have unconnected ports
+			// (@see #isSchedulable())
+			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute("fifo")
 					.getObjectValue();
-
 			Var variable = inputPattern.getVariable(port);
 			Type type = ((TypeList) variable.getType()).getInnermostType();
 			Object array = variable.getValue();
@@ -189,18 +197,20 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		doSwitch(action.getBody());
 
 		for (Port port : outputPattern.getPorts()) {
-			int numTokens = outputPattern.getNumTokens(port);
-			@SuppressWarnings("unchecked")
-			List<SimulatorFifo> fifos = (List<SimulatorFifo>) port
-					.getAttribute(0).getObjectValue();
-
-			Var variable = outputPattern.getVariable(port);
-			Type type = ((TypeList) variable.getType()).getInnermostType();
-			Object array = variable.getValue();
-			for (int i = 0; i < numTokens; i++) {
-				Object value = ValueUtil.get(type, array, i);
-				for (SimulatorFifo fifo : fifos) {
-					fifo.write(value);
+			// write tokens only on connected output ports
+			Attribute attr = port.getAttribute("fifo");
+			if (attr != null) {
+				List<SimulatorFifo> fifos = (List<SimulatorFifo>) attr
+						.getObjectValue();
+				int numTokens = outputPattern.getNumTokens(port);
+				Var variable = outputPattern.getVariable(port);
+				Type type = ((TypeList) variable.getType()).getInnermostType();
+				Object array = variable.getValue();
+				for (int i = 0; i < numTokens; i++) {
+					Object value = ValueUtil.get(type, array, i);
+					for (SimulatorFifo fifo : fifos) {
+						fifo.write(value);
+					}
 				}
 			}
 		}

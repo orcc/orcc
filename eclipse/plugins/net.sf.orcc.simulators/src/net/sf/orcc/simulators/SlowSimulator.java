@@ -83,35 +83,35 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * 
  */
 public class SlowSimulator extends AbstractSimulator {
-
+	
 	protected Map<Actor, ActorInterpreter> interpreters;
 
 	protected List<SimulatorFifo> fifoList;
 
-	protected IProject project;
-
-	protected List<IFolder> vtlFolders;
-
-	protected String xdfFile;
-
 	private int fifoSize;
 
-	private String stimulusFile;
-
-	private String traceFolder;
+	private String goldenReferenceFile;
 
 	private boolean hasGoldenReference;
-
-	private String goldenReferenceFile;
 
 	private int loopsNumber;
 
 	private boolean noDisplay;
 
+	protected IProject project;
+
+	private String stimulusFile;
+
+	private String traceFolder;
+
+	protected List<IFolder> vtlFolders;
+
+	protected String xdfFile;
+	
 	private boolean enableTraces;
 
 	private boolean enableTypeResizer;
-
+	
 	private Boolean[] typeResizer = { false, false, false, false };
 
 	/**
@@ -187,6 +187,27 @@ public class SlowSimulator extends AbstractSimulator {
 				if ((srcPort != null) && (tgtPort != null)) {
 					connectFifos(src.getName(), srcPort, tgt.getName(),
 							tgtPort, size);
+				}
+			}
+		}
+
+		// print a warning message if there are some unconnected ports
+		for (Actor actor : network.getAllActors()) {
+			// check input ports
+			for (Port port : actor.getInputs()) {
+				if (port.getAttribute("fifo") == null) {
+					OrccLogger.warnln("Unconnected Input Port ["
+							+ port.getName() + "] on Actor "
+							+ actor.getSimpleName());
+				}
+			}
+
+			// check output ports
+			for (Port port : actor.getOutputs()) {
+				if (port.getAttribute("fifo") == null) {
+					OrccLogger.warnln("Unconnected Output Port ["
+							+ port.getName() + "] on Actor "
+							+ actor.getSimpleName());
 				}
 			}
 		}
