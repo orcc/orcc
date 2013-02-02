@@ -43,12 +43,16 @@ import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.util.util.EcoreHelper
+import net.sf.orcc.ir.util.ValueUtil
 import org.eclipse.emf.common.util.EList
 import java.util.Map
 import java.io.File
 
+
 import static net.sf.orcc.backends.OrccBackendsConstants.*
 import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.ir.ExprInt
+
 
 /*
  * Compile Top_network Java source code 
@@ -485,5 +489,19 @@ class ActorPrinter extends JavaTemplate {
 		}
 	}
 	
+	/******************************************
+	 * 
+	 * Expressions
+	 *
+	 *****************************************/
+	
+	override caseExprInt(ExprInt object) {
+		val type = ValueUtil::getType(object.value)
+		if(type.sizeInBits > 32){
+			String::valueOf(object.value) + "L"
+		}else{
+			String::valueOf(object.value)
+		}
+	}
 	
 }
