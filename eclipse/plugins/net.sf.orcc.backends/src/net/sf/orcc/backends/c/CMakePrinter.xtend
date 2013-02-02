@@ -59,6 +59,8 @@ class CMakePrinter extends CommonPrinter {
 		
 		cmake_minimum_required (VERSION 2.6)
 		
+		find_package(SDL REQUIRED)
+		
 		project («network.simpleName»)
 		
 		# Output folder
@@ -95,7 +97,7 @@ class CMakePrinter extends CommonPrinter {
 			«ENDFOR»
 		)
 
-		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
+		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
 
 		add_executable(«network.simpleName» ${filenames})
 
