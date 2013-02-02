@@ -57,6 +57,7 @@ import org.eclipse.core.resources.IFile;
  * Java back-end.
  * 
  * @author Matthieu Wipliez
+ * @author Endri Bezati
  * 
  */
 public class JavaBackend extends AbstractBackend {
