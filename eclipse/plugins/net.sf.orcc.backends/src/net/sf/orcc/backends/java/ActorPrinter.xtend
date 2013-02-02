@@ -84,7 +84,9 @@ class ActorPrinter extends JavaTemplate {
 		/**
 		 * Generated from "«actor.fileName»"
 		 */
-		package «actor.getPackage»;
+		«IF !actor.getPackage.empty»
+			package «actor.getPackage»;
+		«ENDIF»
 		
 		import net.sf.orcc.runtime.Fifo;
 		import net.sf.orcc.runtime.actors.IActor;

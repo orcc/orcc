@@ -59,6 +59,9 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
+               id="net.sf.orcc.backends.compileVTL">
+         </option>
+         <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
          
@@ -380,6 +383,13 @@
 				name="Target triple">
 			<textBox></textBox>
 		</option>
+  <option
+        defaultValue="false"
+        description="Generate VTL for all actors"
+        id="net.sf.orcc.backends.compileVTL"
+        name="VTL Code Generation">
+     <checkBox></checkBox>
+  </option>
    </extension>
    <extension
          id="c"

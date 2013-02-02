@@ -211,7 +211,8 @@ abstract class JavaTemplate extends CommonPrinter {
 		var modifier = ""
 		if(!variable.local){
 			modifier = if (variable.global) "public " else "private "
-			modifier = if(!variable.assignable) '''final «modifier»'''
+			// FIXME: Actor Parameter should not have the final modifier 
+			// modifier = if(!variable.assignable) '''final «modifier»'''
 		}
 			
 		val initialization =
