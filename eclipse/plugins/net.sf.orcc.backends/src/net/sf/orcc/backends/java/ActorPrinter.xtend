@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.java
 
+import java.io.File
+import java.util.Map
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.State
@@ -35,6 +37,7 @@ import net.sf.orcc.df.Transition
 import net.sf.orcc.ir.BlockBasic
 import net.sf.orcc.ir.BlockIf
 import net.sf.orcc.ir.BlockWhile
+import net.sf.orcc.ir.ExprInt
 import net.sf.orcc.ir.InstAssign
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.InstLoad
@@ -43,15 +46,9 @@ import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.util.util.EcoreHelper
-import net.sf.orcc.ir.util.ValueUtil
 import org.eclipse.emf.common.util.EList
-import java.util.Map
-import java.io.File
 
-
-import static net.sf.orcc.backends.OrccBackendsConstants.*
 import static net.sf.orcc.OrccLaunchConstants.*
-import net.sf.orcc.ir.ExprInt
 
 
 /*
@@ -496,8 +493,8 @@ class ActorPrinter extends JavaTemplate {
 	 *****************************************/
 	
 	override caseExprInt(ExprInt object) {
-		val type = ValueUtil::getType(object.value)
-		if(type.sizeInBits > 32){
+		val longVal = object.value.longValue
+		if(longVal < Integer::MIN_VALUE || longVal > Integer::MAX_VALUE) {
 			String::valueOf(object.value) + "L"
 		}else{
 			String::valueOf(object.value)

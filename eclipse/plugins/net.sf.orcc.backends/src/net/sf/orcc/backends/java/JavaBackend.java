@@ -47,6 +47,8 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
@@ -98,7 +100,7 @@ public class JavaBackend extends AbstractBackend {
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
-
+		transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
