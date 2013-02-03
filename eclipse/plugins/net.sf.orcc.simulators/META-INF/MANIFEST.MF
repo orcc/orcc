@@ -18,6 +18,8 @@ Bundle-Vendor: IETR/INSA Rennes
 Export-Package: net.sf.orcc.runtime,
  net.sf.orcc.runtime.impl,
  net.sf.orcc.simulators,
+ net.sf.orcc.simulators.jade,
+ net.sf.orcc.simulators.slow,
  std.stdio.impl,
  std.video.impl
 Bundle-ClassPath: .
