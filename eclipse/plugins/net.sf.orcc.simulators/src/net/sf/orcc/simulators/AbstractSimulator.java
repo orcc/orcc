@@ -47,7 +47,7 @@ public abstract class AbstractSimulator implements Simulator {
 	private Map<String, Object> options;
 
 	protected static boolean stopRequested = false;
-	protected static int statusCode = 0;
+	public static int statusCode = 0;
 
 	/**
 	 * Returns the boolean-valued attribute with the given name. Returns the
@@ -175,6 +175,9 @@ public abstract class AbstractSimulator implements Simulator {
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor) {
 		this.monitor = monitor;
+		// initialize also the simulation status variables
+		stopRequested = false;
+		statusCode = 0;
 	}
 
 	/**
@@ -185,6 +188,6 @@ public abstract class AbstractSimulator implements Simulator {
 	 */
 	public static void stop(BigInteger status) {
 		stopRequested = true;
-		statusCode = status.intValue();
+		statusCode += status.intValue();
 	}
 }

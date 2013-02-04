@@ -128,6 +128,8 @@ class NetworkPrinter extends CTemplate {
 		#define __USE_GNU
 		#endif
 		
+		#include "SDL.h" //osx required
+		
 		#include "orcc_types.h"
 		#include "orcc_fifo.h"
 		#include "orcc_scheduler.h"

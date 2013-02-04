@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, IETR/INSA of Rennes
+ * Copyright (c) 2013, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,63 +26,49 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal;
+package net.sf.orcc.backends.c.compa
 
-import java.util.List;
-
-import net.sf.orcc.df.Actor;
-import net.sf.orcc.ir.Arg;
-import net.sf.orcc.ir.ArgByVal;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.util.OrccUtil;
+import java.util.List
+import java.util.Map
+import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
 
 /**
- * This interpreter implements
- * {@link #callPrintProcedure(net.sf.orcc.ir.Procedure, java.util.List)} to
- * check it gives the expected output.
- * 
- * @author Matthieu Wipliez
+ * Generate and print xcf file for COMPA backend.
+ *  
+ * @author Antoine Lorence
  * 
  */
-public class TestInterpreter extends ActorInterpreter {
-
-	private StringBuilder builder;
-
-	public TestInterpreter(Actor actor) {
-		super(actor);
-		builder = new StringBuilder();
+class XcfPrinter  extends net.sf.orcc.backends.util.XcfPrinter {
+	
+	Network network
+	
+	new(Network network, Map<String,List<Instance>> coreToInstanceMap) {
+		super(coreToInstanceMap)		
+		this.network = network
 	}
 
-	@Override
-	protected void callPrintProcedure(List<Arg> arguments) {
-		for (Arg arg : arguments) {
-			if (arg.isByVal()) {
-				Expression expr = ((ArgByVal) arg).getValue();
-				if (expr.isExprString()) {
-					// String characters rework for escaped control
-					// management
-					String str = ((ExprString) expr).getValue();
-					String unescaped = OrccUtil.getUnescapedString(str);
-					builder.append(unescaped);
-				} else {
-					Object value = exprInterpreter.doSwitch(expr);
-					builder.append(value);
-				}
-			}
-		}
-	}
+	override protected compileXcfFile() '''
+		<?xml version="1.0" encoding="UTF-8"?>
+		<Configuration>
+			<Partitioning>
+				«IF coreToInstanceMap != null && coreToInstanceMap.size > 0»
+					«FOR instances : coreToInstanceMap.values»
+						«instances.printPartition»
+					«ENDFOR»
+				«ELSE»
+					«network.children.actorInstances.printPartition»
+				«ENDIF»
+			</Partitioning>
+			
+			«otherStuff»
+		</Configuration>
+	'''
+	
+	def protected otherStuff() '''
+		<!-- This can be used to print other useful informations, related
+		to any element of the instanciated model... -->
+	'''
 
-	/**
-	 * Returns a String that contains everything the actor has written to the
-	 * standard output.
-	 * 
-	 * @return a String that contains everything the actor has written to the
-	 *         standard output.
-	 */
-	public String getOutput() {
-		return builder.toString();
-	}
-
+	
 }

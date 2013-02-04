@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, IETR/INSA of Rennes
+ * Copyright (c) 2013, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,63 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal;
-
-import java.util.List;
-
-import net.sf.orcc.df.Actor;
-import net.sf.orcc.ir.Arg;
-import net.sf.orcc.ir.ArgByVal;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.util.OrccUtil;
-
 /**
- * This interpreter implements
- * {@link #callPrintProcedure(net.sf.orcc.ir.Procedure, java.util.List)} to
- * check it gives the expected output.
- * 
- * @author Matthieu Wipliez
- * 
+ * @author Antoine Lorence
+ *
  */
-public class TestInterpreter extends ActorInterpreter {
-
-	private StringBuilder builder;
-
-	public TestInterpreter(Actor actor) {
-		super(actor);
-		builder = new StringBuilder();
-	}
-
-	@Override
-	protected void callPrintProcedure(List<Arg> arguments) {
-		for (Arg arg : arguments) {
-			if (arg.isByVal()) {
-				Expression expr = ((ArgByVal) arg).getValue();
-				if (expr.isExprString()) {
-					// String characters rework for escaped control
-					// management
-					String str = ((ExprString) expr).getValue();
-					String unescaped = OrccUtil.getUnescapedString(str);
-					builder.append(unescaped);
-				} else {
-					Object value = exprInterpreter.doSwitch(expr);
-					builder.append(value);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Returns a String that contains everything the actor has written to the
-	 * standard output.
-	 * 
-	 * @return a String that contains everything the actor has written to the
-	 *         standard output.
-	 */
-	public String getOutput() {
-		return builder.toString();
-	}
-
-}
+package net.sf.orcc.backends.c.compa.transform;

@@ -79,11 +79,28 @@
             </option>
          </checkBox>
       </option>
+      <option
+            defaultValue="false"
+            description="Golden reference to be compared with ouput data"
+            id="net.sf.orcc.simulators.profile"
+            name="Enable profiling">
+         <checkBox>            
+            <option
+                  description="Where the profiling results are saved"
+                  id="net.sf.orcc.simulators.profileFolder"
+                  name="Profiling folder">
+               <browseFile
+                     folder="true"
+                     workspace="false">
+               </browseFile>
+            </option>
+         </checkBox>
+      </option>
    </extension>
    <extension
          point="net.sf.orcc.simulators.simulators">
       <simulator
-            class="net.sf.orcc.simulators.SlowSimulator"
+            class="net.sf.orcc.simulators.slow.SlowSimulator"
             name="Visitor interpreter and debugger">
          <option
                id="net.sf.orcc.backends.enableTraces">
@@ -99,6 +116,9 @@
          </option>
          <option
                id="net.sf.orcc.core.transform.typeResizer">
+         </option>
+         <option
+               id="net.sf.orcc.simulators.profile">
          </option>
       </simulator>
    </extension>

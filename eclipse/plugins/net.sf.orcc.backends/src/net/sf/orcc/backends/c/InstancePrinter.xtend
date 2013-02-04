@@ -402,7 +402,7 @@ class InstancePrinter extends CTemplate {
 	def protected printStateTransitions(State state) '''
 		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
 			if («trans.action.inputPattern.checkInputPattern»isSchedulable_«trans.action.name»()) {
-				«IF trans.action.outputPattern != null»
+				«IF !trans.action.outputPattern.empty»
 					«trans.action.outputPattern.printOutputPattern»
 						_FSM_state = my_state_«state.name»;
 						si->num_firings = i;
@@ -505,7 +505,7 @@ class InstancePrinter extends CTemplate {
 	def protected printActions(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
 			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
-				«IF action.outputPattern != null»
+				«IF !action.outputPattern.empty»
 					«action.outputPattern.printOutputPattern»
 						si->num_firings = i;
 						si->reason = full;

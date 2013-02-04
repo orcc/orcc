@@ -61,6 +61,11 @@ class CMakePrinter extends CommonPrinter {
 		
 		project («network.simpleName»)
 		
+		if(NOT NO_EXTERNAL_DEPENDENCIES)
+			# Required by osx
+			find_package(SDL REQUIRED)
+		endif(NOT NO_EXTERNAL_DEPENDENCIES)
+		
 		# Output folder
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 		
@@ -95,7 +100,7 @@ class CMakePrinter extends CommonPrinter {
 			«ENDFOR»
 		)
 
-		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
+		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
 
 		add_executable(«network.simpleName» ${filenames})
 

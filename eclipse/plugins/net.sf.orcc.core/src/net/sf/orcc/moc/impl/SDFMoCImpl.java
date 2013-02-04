@@ -16,13 +16,14 @@ import org.eclipse.emf.ecore.EClass;
  * <em><b>SDF Mo C</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- *
+ * 
  * @generated
  */
 public class SDFMoCImpl extends CSDFMoCImpl implements SDFMoC {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected SDFMoCImpl() {
@@ -31,11 +32,17 @@ public class SDFMoCImpl extends CSDFMoCImpl implements SDFMoC {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	protected EClass eStaticClass() {
 		return MocPackage.Literals.SDF_MO_C;
+	}
+
+	@Override
+	public String getShortName() {
+		return "SDF";
 	}
 
 	@Override

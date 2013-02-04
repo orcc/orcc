@@ -29,6 +29,7 @@
 
 package net.sf.orcc.runtime.impl;
 
+import net.sf.orcc.util.OrccLogger;
 
 public class GenericDisplay {
 	/**
@@ -37,14 +38,9 @@ public class GenericDisplay {
 	public static final int DISPLAY_DISABLE = 0;
 
 	/**
-	 * display is enabled.
+	 * display is enabled. 2 instead of 1 for historical reasons
 	 */
 	public static final int DISPLAY_ENABLE = 2;
-
-	/**
-	 * display is ready.
-	 */
-	public static final int DISPLAY_READY = 1;
 
 	protected static String goldenReference = "";
 
@@ -64,10 +60,12 @@ public class GenericDisplay {
 
 	public static void setDisplayEnabled() {
 		displayStatus = DISPLAY_ENABLE;
+		OrccLogger.debugln("Display has been enabled");
 	}
 
 	public static void setDisplayDisabled() {
 		displayStatus = DISPLAY_DISABLE;
+		OrccLogger.debugln("Display has been disabled");
 	}
 
 }

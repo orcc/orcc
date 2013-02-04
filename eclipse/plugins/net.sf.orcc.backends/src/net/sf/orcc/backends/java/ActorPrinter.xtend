@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.java
 
+import java.io.File
+import java.util.Map
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.State
@@ -35,6 +37,7 @@ import net.sf.orcc.df.Transition
 import net.sf.orcc.ir.BlockBasic
 import net.sf.orcc.ir.BlockIf
 import net.sf.orcc.ir.BlockWhile
+import net.sf.orcc.ir.ExprInt
 import net.sf.orcc.ir.InstAssign
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.InstLoad
@@ -44,11 +47,9 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
-import java.util.Map
-import java.io.File
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
 import static net.sf.orcc.OrccLaunchConstants.*
+
 
 /*
  * Compile Top_network Java source code 
@@ -84,7 +85,9 @@ class ActorPrinter extends JavaTemplate {
 		/**
 		 * Generated from "«actor.fileName»"
 		 */
-		package «actor.getPackage»;
+		«IF !actor.getPackage.empty»
+			package «actor.getPackage»;
+		«ENDIF»
 		
 		import net.sf.orcc.runtime.Fifo;
 		import net.sf.orcc.runtime.actors.IActor;
@@ -483,5 +486,19 @@ class ActorPrinter extends JavaTemplate {
 		}
 	}
 	
+	/******************************************
+	 * 
+	 * Expressions
+	 *
+	 *****************************************/
+	
+	override caseExprInt(ExprInt object) {
+		val longVal = object.value.longValue
+		if(longVal < Integer::MIN_VALUE || longVal > Integer::MAX_VALUE) {
+			String::valueOf(object.value) + "L"
+		}else{
+			String::valueOf(object.value)
+		}
+	}
 	
 }

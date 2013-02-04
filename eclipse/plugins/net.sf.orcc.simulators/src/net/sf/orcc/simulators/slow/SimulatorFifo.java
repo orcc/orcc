@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.runtime;
+package net.sf.orcc.simulators.slow;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,6 +62,34 @@ public class SimulatorFifo {
 	private PrintWriter writer;
 
 	private boolean enableTraces;
+	private boolean profile;
+
+	private long traffic;
+
+	/**
+	 * Creates a new FIFO with the given type and size.
+	 * 
+	 * @param size
+	 *            the size of the FIFO
+	 */
+	public SimulatorFifo(int size) {
+		this(null, size, false);
+	}
+
+	/**
+	 * Creates a new FIFO with the given type and size.
+	 * 
+	 * @param type
+	 *            type of data in the FIFO
+	 * @param size
+	 *            the size of the FIFO
+	 */
+	public SimulatorFifo(Type type, int size, boolean profile) {
+		this.size = size;
+		this.type = type;
+		this.profile = profile;
+		content = new ArrayBlockingQueue<Object>(size);
+	}
 
 	/**
 	 * Creates a new FIFO with the given size and a file for tracing exchanged
@@ -76,9 +104,9 @@ public class SimulatorFifo {
 	 * @param fifoName
 	 *            name of the FIFO (and the trace file)
 	 */
-	public SimulatorFifo(Type type, int size, String folderName, String fifoName,
-			boolean enableTraces) {
-		this(type, size);
+	public SimulatorFifo(Type type, int size, String folderName,
+			String fifoName, boolean enableTraces, boolean profile) {
+		this(type, size, profile);
 		this.name = fifoName;
 		this.enableTraces = enableTraces;
 
@@ -99,30 +127,6 @@ public class SimulatorFifo {
 				throw new RuntimeException(msg, e);
 			}
 		}
-	}
-
-	/**
-	 * Creates a new FIFO with the given type and size.
-	 * 
-	 * @param size
-	 *            the size of the FIFO
-	 */
-	public SimulatorFifo(int size) {
-		this(null, size);
-	}
-
-	/**
-	 * Creates a new FIFO with the given type and size.
-	 * 
-	 * @param type
-	 *            type of data in the FIFO
-	 * @param size
-	 *            the size of the FIFO
-	 */
-	public SimulatorFifo(Type type, int size) {
-		this.size = size;
-		this.type = type;
-		content = new ArrayBlockingQueue<Object>(size);
 	}
 
 	public void closePrinter() {
@@ -155,6 +159,16 @@ public class SimulatorFifo {
 	 */
 	public int getSize() {
 		return size;
+	}
+
+	/**
+	 * Return the tokens traffic which goes through this FIFOs. The traffic is
+	 * kept only if the FIFO was set to be profiled at the initialization.
+	 * 
+	 * @return the global traffic through this FIFO
+	 */
+	public long getTraffic() {
+		return traffic;
 	}
 
 	/**
@@ -229,6 +243,9 @@ public class SimulatorFifo {
 
 		if (enableTraces) {
 			writePrinter(value);
+		}
+		if (profile) {
+			traffic++;
 		}
 	}
 

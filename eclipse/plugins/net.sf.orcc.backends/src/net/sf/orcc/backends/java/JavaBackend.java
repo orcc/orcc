@@ -38,12 +38,17 @@ import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
@@ -54,14 +59,17 @@ import org.eclipse.core.resources.IFile;
  * Java back-end.
  * 
  * @author Matthieu Wipliez
+ * @author Endri Bezati
  * 
  */
 public class JavaBackend extends AbstractBackend {
 
-	private String srcPath;
 	private String libsPath;
-
 	private final Map<String, String> replacementMap;
+
+	private String srcPath;
+
+	private boolean vtlCodeGeneration = false;
 
 	public JavaBackend() {
 		replacementMap = new HashMap<String, String>();
@@ -79,6 +87,8 @@ public class JavaBackend extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
+		vtlCodeGeneration = getAttribute("net.sf.orcc.backends.compileVTL",
+				false);
 		libsPath = path + File.separator + "libs";
 		srcPath = path + File.separator + "src";
 		new File(path + File.separator + "bin").mkdirs();
@@ -88,8 +98,9 @@ public class JavaBackend extends AbstractBackend {
 	protected void doTransformActor(Actor actor) {
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
+		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
-
+		transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
@@ -110,9 +121,11 @@ public class JavaBackend extends AbstractBackend {
 
 	@Override
 	protected void doVtlCodeGeneration(List<IFile> files) {
-		List<Actor> actors = parseActors(files);
-		transformActors(actors);
-		printActors(actors);
+		if (vtlCodeGeneration) {
+			List<Actor> actors = parseActors(files);
+			transformActors(actors);
+			printActors(actors);
+		}
 	}
 
 	@Override
@@ -123,6 +136,14 @@ public class JavaBackend extends AbstractBackend {
 		// print network
 		OrccLogger.traceln("Printing network...");
 		printNetwork(network);
+
+		if (!vtlCodeGeneration) {
+			new ArgumentEvaluator().doSwitch(network);
+			// Transform Actors
+			transformActors(network.getAllActors());
+			// print instances
+			printInstances(network);
+		}
 		OrccLogger.traceln("Done");
 	}
 
@@ -151,6 +172,16 @@ public class JavaBackend extends AbstractBackend {
 	protected boolean printActor(Actor actor) {
 		String folder = srcPath + File.separator + OrccUtil.getFolder(actor);
 		return new ActorPrinter(actor, options).print(folder) > 0;
+	}
+
+	@Override
+	protected boolean printInstance(Instance instance) {
+		if (!instance.hasAttribute("bcast")) {
+			String folder = srcPath + File.separator
+					+ OrccUtil.getFolder(instance.getActor());
+			return new InstancePrinter(instance, options).printInstance(folder) > 0;
+		}
+		return false;
 	}
 
 	/**

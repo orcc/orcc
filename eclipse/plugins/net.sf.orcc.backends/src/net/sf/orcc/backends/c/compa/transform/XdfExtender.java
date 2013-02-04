@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, IETR/INSA of Rennes
+ * Copyright (c) 2011, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,10 +10,10 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the IRISA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
- * about
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,51 +26,34 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.util
+package net.sf.orcc.backends.c.compa.transform;
 
-import java.io.File
-import java.util.List
-import java.util.Map
-import net.sf.orcc.backends.CommonPrinter
-import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.util.DfVisitor;
 
 /**
- * Printer used to create the xcf file, containing information on
- * mapping between actors and processor cores
+ * Add attributes to instances to save corresponding actor's MoC.
  * 
  * @author Antoine Lorence
  * 
  */
-class XcfPrinter extends CommonPrinter {
-	
-	protected Map<String, List<Instance>> coreToInstanceMap
-	
-	var i = 0
-	
-	new(Map<String, List<Instance>> coreToInstanceMap) {
-		this.coreToInstanceMap = coreToInstanceMap
+public class XdfExtender extends DfVisitor<Void> {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.df.util.DfSwitch#caseInstance(net.sf.orcc.df.Instance)
+	 */
+	@Override
+	public Void caseInstance(Instance instance) {
+		if (instance.isActor()) {
+			if (instance.getActor().getMoC() != null) {
+				instance.setAttribute("actorMoC", instance.getActor().getMoC()
+						.getShortName());
+			} else {
+				instance.setAttribute("actorMoC", "unknown");
+			}
+		}
+		return null;
 	}
-	
-	def printXcfFile(String fileName) {
-		printFile(compileXcfFile, new File(fileName))
-	}
-	
-	def protected compileXcfFile() '''
-		<?xml version="1.0" encoding="UTF-8"?>
-		<Configuration>
-			<Partitioning>
-				«FOR instances : coreToInstanceMap.values»
-					«instances.printPartition»
-				«ENDFOR»
-			</Partitioning>
-		</Configuration>
-	'''
-	
-	def protected printPartition(Iterable<Instance> instances) '''
-		<Partition id="« i = i + 1 »">
-			«FOR instance : instances»
-				<Instance id="«instance.name»"/>
-			«ENDFOR»
-		</Partition>
-	'''
 }
