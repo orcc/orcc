@@ -59,9 +59,12 @@ class CMakePrinter extends CommonPrinter {
 		
 		cmake_minimum_required (VERSION 2.6)
 		
-		find_package(SDL REQUIRED)
-		
 		project («network.simpleName»)
+		
+		if(NOT NO_EXTERNAL_DEPENDENCIES)
+			# Required by osx
+			find_package(SDL REQUIRED)
+		endif(NOT NO_EXTERNAL_DEPENDENCIES)
 		
 		# Output folder
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
