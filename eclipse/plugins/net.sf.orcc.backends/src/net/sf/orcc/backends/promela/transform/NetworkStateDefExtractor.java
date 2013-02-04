@@ -139,6 +139,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 			if (inScheduler) {
 				// this might not be needed as 'casePattern' should do the same
 				varsUsedInScheduling.add(load.getSource().getVariable());
+				schedulingModel.addVarUsedInScheduler(actor, load.getSource().getVariable());
 			}
 			return null;
 		}
@@ -194,8 +195,11 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 
 	private Set<Var> visited = new HashSet<Var>();
 
-	public NetworkStateDefExtractor() {
+	private PromelaSchedulingModel schedulingModel;
+	
+	public NetworkStateDefExtractor(PromelaSchedulingModel schedulingModel) {
 		this.irVisitor = new InnerIrVisitor();
+		this.schedulingModel = schedulingModel;
 	}
 
 	/*
@@ -212,9 +216,11 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		for (Set<Var> s : whileConditionVars) {
 			variableDependency.get(target).addAll(s);
 			variableDependencyNoIf.get(target).addAll(s);
+			schedulingModel.addVarDep(actor, target, s, false);
 		}
 		for (Set<Var> s : ifConditionVars) {
 			variableDependency.get(target).addAll(s);
+			schedulingModel.addVarDep(actor, target, s, true);
 		}
 	}
 
@@ -228,6 +234,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		}
 		variableDependency.get(target).add(source);
 		variableDependencyNoIf.get(target).add(source);
+		schedulingModel.addVarDep(actor, target, source);
 	}
 
 	void analyzeVarDeps() {
@@ -245,11 +252,11 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 	public Void caseAction(Action action) {
 		// solve the port dependency, procedures and functions should also be
 		// handled
-		doSwitch(action.getBody());
 		inScheduler = true;
 		doSwitch(action.getScheduler());
 		doSwitch(action.getPeekPattern());
 		inScheduler = false;
+		doSwitch(action.getBody());
 		return null;
 	}
 
@@ -286,6 +293,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 	@Override
 	public Void caseNetwork(Network network) {
 		for (Actor actor : network.getAllActors()) {
+			this.actor = actor;
 			doSwitch(actor);
 		}
 		identifyControlTokenPorts(network);

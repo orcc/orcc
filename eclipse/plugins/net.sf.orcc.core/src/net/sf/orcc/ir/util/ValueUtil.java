@@ -67,8 +67,13 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object add(Object val1, Object val2) {
+
 		if (isFloat(val1) && isFloat(val2)) {
 			return ((BigDecimal) val1).add((BigDecimal) val2);
+		} else if (isFloat(val1) && isInt(val2)) {
+			return ((BigDecimal) val1).add(new BigDecimal((BigInteger) val2));
+		} else if (isInt(val1) && isFloat(val2)) {
+			return new BigDecimal((BigInteger) val1).add((BigDecimal) val2);
 		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).add((BigInteger) val2);
 		} else if (isString(val1) || isString(val2)) {
@@ -88,7 +93,9 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object and(Object val1, Object val2) {
-		if (isInt(val1) && isInt(val2)) {
+		if (isBool(val1) && isBool(val2)) {
+			return ((Boolean) val1) & ((Boolean) val2);
+		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).and((BigInteger) val2);
 		}
 		throw new OrccRuntimeException("type mismatch in and");
@@ -245,6 +252,11 @@ public class ValueUtil {
 	public static Object divide(Object val1, Object val2) {
 		if (isFloat(val1) && isFloat(val2)) {
 			return ((BigDecimal) val1).divide((BigDecimal) val2);
+		} else if (isFloat(val1) && isInt(val2)) {
+			return ((BigDecimal) val1)
+					.divide(new BigDecimal((BigInteger) val2));
+		} else if (isInt(val1) && isFloat(val2)) {
+			return new BigDecimal((BigInteger) val1).divide((BigDecimal) val2);
 		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).divide((BigInteger) val2);
 		}
@@ -264,14 +276,16 @@ public class ValueUtil {
 	 */
 	public static Object equals(Object val1, Object val2) {
 		if (isBool(val1) && isBool(val2) || isFloat(val1) && isFloat(val2)
-				|| isInt(val1) && isInt(val2) || isString(val1) && isString(val2)) {
+				|| isInt(val1) && isInt(val2) || isString(val1)
+				&& isString(val2)) {
 			return val1.equals(val2);
-		}
-		else if(isString(val1) && isInt(val2) || isInt(val1) && isString(val2)) {
-			if(getIntValue(val1) == getIntValue(val2) )
+		} else if (isString(val1) && isInt(val2) || isInt(val1)
+				&& isString(val2)) {
+			if (getIntValue(val1) == getIntValue(val2)) {
 				return true;
-			else
+			} else {
 				return false;
+			}
 		}
 		throw new OrccRuntimeException("type mismatch in equals");
 	}
@@ -705,6 +719,12 @@ public class ValueUtil {
 	public static Object multiply(Object val1, Object val2) {
 		if (isFloat(val1) && isFloat(val2)) {
 			return ((BigDecimal) val1).multiply((BigDecimal) val2);
+		} else if (isFloat(val1) && isInt(val2)) {
+			return ((BigDecimal) val1).multiply(new BigDecimal(
+					(BigInteger) val2));
+		} else if (isInt(val1) && isFloat(val2)) {
+			return new BigDecimal((BigInteger) val1)
+					.multiply((BigDecimal) val2);
 		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).multiply((BigInteger) val2);
 		}
@@ -773,7 +793,9 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object or(Object val1, Object val2) {
-		if (isInt(val1) && isInt(val2)) {
+		if (isBool(val1) && isBool(val2)) {
+			return ((Boolean) val1) | ((Boolean) val2);
+		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).or((BigInteger) val2);
 		}
 		throw new OrccRuntimeException("type mismatch in or");
@@ -901,6 +923,12 @@ public class ValueUtil {
 	public static Object subtract(Object val1, Object val2) {
 		if (isFloat(val1) && isFloat(val2)) {
 			return ((BigDecimal) val1).subtract((BigDecimal) val2);
+		} else if (isFloat(val1) && isInt(val2)) {
+			return ((BigDecimal) val1).subtract(new BigDecimal(
+					(BigInteger) val2));
+		} else if (isInt(val1) && isFloat(val2)) {
+			return new BigDecimal((BigInteger) val1)
+					.subtract((BigDecimal) val2);
 		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).subtract((BigInteger) val2);
 		}
@@ -918,7 +946,9 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object xor(Object val1, Object val2) {
-		if (isInt(val1) && isInt(val2)) {
+		if (isBool(val1) && isBool(val2)) {
+			return ((Boolean) val1) ^ ((Boolean) val2);
+		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).xor((BigInteger) val2);
 		}
 		throw new OrccRuntimeException("type mismatch in xor");

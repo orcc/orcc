@@ -52,7 +52,7 @@ import java.io.File
 	override print(String targetFolder) {
 		
 		val contentNetwork = networkFileContent
-		val NetworkFile = new File(targetFolder + File::separator + network.simpleName + ".vhd")
+		val NetworkFile = new File(targetFolder + File::separator + network.simpleName +"_TopTestBench" + ".vhd")
 		
 		if(needToWriteFile(contentNetwork, NetworkFile)) {
 			printFile(contentNetwork, NetworkFile)
@@ -76,7 +76,7 @@ import java.io.File
 	ARCHITECTURE behavior OF testbench IS
 	
 	-- Component Declaration
-	COMPONENT main
+	COMPONENT TopDesign
 	PORT(
 	ap_clk : IN STD_LOGIC;
 	ap_rst : IN STD_LOGIC;
@@ -120,7 +120,7 @@ import java.io.File
 	«ENDFOR»
 	begin
 
-	uut : main port map (
+	uut : TopDesign port map (
 	ap_clk => ap_clk,
 	ap_rst => ap_rst,
 	ap_start => ap_start,
@@ -184,7 +184,7 @@ import java.io.File
 		«instance.initOutputs»
 	«ENDFOR»
 	
-	«IF (network.outputs.empty) && (network.inputs.empty)»
+	«IF  (network.inputs.empty)»
 	ap_start <= '1';
 	«ENDIF»
 	END;
@@ -220,7 +220,7 @@ import java.io.File
 		«IF connection.fifoType.bool»
 			«connection.fifoName»_din    : OUT STD_LOGIC;
 		«ELSE»
-			«connection.fifoName»_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
+			«connection.fifoName»_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
 		«ENDIF»
 		«connection.fifoName»_full_n : IN STD_LOGIC;
 		«connection.fifoName»_write  : OUT STD_LOGIC;
@@ -230,7 +230,7 @@ import java.io.File
 		«IF connection.fifoType.bool»
 			«connection.fifoName»_dout   : IN STD_LOGIC;
 		«ELSE»
-			«connection.fifoName»_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
+			«connection.fifoName»_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
 		«ENDIF»
 		«connection.fifoName»_empty_n : IN STD_LOGIC;
 		«connection.fifoName»_read    : OUT STD_LOGIC;
@@ -240,7 +240,7 @@ import java.io.File
 		«IF connection.fifoType.bool»
 			signal «connection.fifoName»_din    :  STD_LOGIC := '0';
 		«ELSE»
-			signal «connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
+			signal «connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits- 1» downto 0) := (others => '0');
 		«ENDIF»
 		signal «connection.fifoName»_full_n :  STD_LOGIC := '0';
 		signal «connection.fifoName»_write  :  STD_LOGIC := '0';
@@ -250,7 +250,7 @@ import java.io.File
 		«IF connection.fifoType.bool»
 			signal «connection.fifoName»_dout   :  STD_LOGIC := '0';
 		«ELSE»
-			signal «connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
+			signal «connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits- 1» downto 0) := (others => '0');
 		«ENDIF»
 		signal «connection.fifoName»_empty_n :  STD_LOGIC := '0';
 		signal «connection.fifoName»_read    :  STD_LOGIC := '0';

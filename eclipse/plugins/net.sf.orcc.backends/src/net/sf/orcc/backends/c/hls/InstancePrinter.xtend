@@ -28,19 +28,19 @@
  */
  package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.df.Instance
-import java.util.Map
+import java.io.File
+import java.util.List
+import net.sf.orcc.df.Action
+import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Pattern
+import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
-import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Port
-import net.sf.orcc.df.Pattern
-import net.sf.orcc.df.Action
-import java.io.File
 import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
-import java.util.List
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.TypeList
+import java.util.Map
 
 /*
  * Compile Instance c source code
@@ -60,6 +60,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		#include <hls_stream.h>
 		using namespace hls;
+		#include <stdio.h>
+		#include <stdlib.h>
 		
 		typedef signed char i8;
 		typedef short i16;
@@ -72,6 +74,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		typedef unsigned long long int u64;
 		
 		
+		// Parameter values of the instance
+		«FOR arg : instance.arguments»
+			«IF arg.value.exprList»
+				static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
+			«ELSE»
+				#define «arg.variable.name» «arg.value.doSwitch»
+			«ENDIF»
+		«ENDFOR»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Input FIFOS
@@ -88,6 +98,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				extern stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
 			«ENDFOR»
 		«ENDFOR»
+		
+		«IF instance.actor.outputs.empty»
+			stream<int> outFIFO_«instance.name»;
+		«ENDIF»
 		
 		
 		
@@ -106,7 +120,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«ENDFOR»
 			};
 			
-			static enum states _FSM_state;
+			static enum states _FSM_state = my_state_«instance.actor.fsm.initialState.name»;;
 		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
@@ -134,7 +148,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«printFsm»
 		«ELSE»
 			void «instance.name»_scheduler() {		
-				
+			«IF instance.actor.outputs.empty»
+				outFIFO_«instance.name».write(0);
+			«ENDIF»
 				«instance.actor.actionsOutsideFsm.printActionLoop»
 				
 			finished:
@@ -154,6 +170,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		void «instance.name»_scheduler() {
 			// jump to FSM state 
+			«IF instance.actor.outputs.empty»
+				outFIFO_«instance.name».write(0);
+			«ENDIF»
 			switch (_FSM_state) {
 				«FOR state : instance.actor.fsm.states»
 					case my_state_«state.name»:
@@ -162,10 +181,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			default:
 				goto finished;
 			}
-				// FSM transitions
-				«FOR state : instance.actor.fsm.states»
-		«state.printTransition»
-				«ENDFOR»
+			// FSM transitions
+			«FOR state : instance.actor.fsm.states»
+		«state.printStateLabel»
+			«ENDFOR»
 		finished:
 			return;
 		}
@@ -176,48 +195,53 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		else port.name
 	}
 	
-	override printTransition(State state) '''
+	override printStateLabel(State state) '''
 		l_«state.name»:
 			«IF ! instance.actor.actionsOutsideFsm.empty»
 				«instance.name»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF !state.outgoing.empty»
-				«schedulingState(state, state.outgoing.map[it as Transition])»
+				«printStateTransitions(state)»
 			«ENDIF»
 	'''
 	
-	override actionTestState(State srcState, Iterable<Transition> transitions) '''
-		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
-			«IF transitions.head.action.outputPattern != null»
-				«transitions.head.action.outputPattern.printOutputPattern»
-					_FSM_state = my_state_«srcState.name»;
-					goto finished;	
-				}
-			«ENDIF»
-			«transitions.head.action.body.name»();
-			_FSM_state = my_state_«transitions.head.target.name»;
-			goto finished;	
-		} else {
-			«schedulingState(srcState, transitions.tail)»
-		}
+	override printOutputPattern(Pattern pattern) '''
+		«FOR port : pattern.ports» 
+			«printOutputPatternsPort(pattern, port)»
+		«ENDFOR»
 	'''
 	
-	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
-		if («instance.outgoingPortMap.get(port).head.fifoName».full()) {
-			stop = 1;
-		}
+	override printOutputPatternsPort(Pattern pattern, Port port) {
+		var i = -1 '''
+		«FOR successor : instance.outgoingPortMap.get(port)»
+			 «printOutputPatternPort(pattern, port, successor, i = i + 1)»
+		«ENDFOR»
 	'''
+	}
+	
+	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) 
+	'''«IF !instance.outgoingPortMap.get(port).head.fifoName.toString.empty»
+	&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())«ENDIF»'''
 	
 	override checkInputPattern(Pattern pattern)
-	'''«FOR port : pattern.ports»!«instance.incomingPortMap.get(port).fifoName».empty() && «ENDFOR»'''
+	'''«FOR port : pattern.ports»
+			«IF !instance.incomingPortMap.get(port).fifoName.toString.empty»
+				!«instance.incomingPortMap.get(port).fifoName».empty() &&
+			«ENDIF»
+		«ENDFOR»'''
 	
-	override print(String targetFolder, Instance instance) {
-		setInstance(instance)
-		
-		val content = fileContent
+	override print(String targetFolder) {		
+		val content = getFileContent
+		val scriptContent = script(targetFolder);
+		val directiveContent = directive(targetFolder);
 		val file = new File(targetFolder + File::separator + instance.name + ".cpp")
+		val scriptFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name + File::separator + "script_" + instance.name + ".tcl"
+		)
+		val directiveFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name  + File::separator + "directive_" + instance.name + ".tcl")
 		
 		if(needToWriteFile(content, file)) {
+			printFile(scriptContent, scriptFile)
+			printFile(directiveContent, directiveFile)
 			printFile(content, file)
 			return 0
 		} else {
@@ -225,23 +249,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	}
 	
-	override actionTest(Action action, Iterable<Action> others) '''
-		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
-			«IF action.outputPattern != null»
-				«action.outputPattern.printOutputPattern»
-					goto finished;
-				}
-			«ENDIF»
-			«action.body.name»();
-		} else {
-			«others.printActions»
-		}
-	'''
-	
 	override print(Action action) {
 		currentAction = action
 		val output = '''
-			static void «action.body.name»() {
+			static void «instance.name»_«action.body.name»() {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
@@ -262,8 +273,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		if(load.eContainer != null){
 		val srcPort = load.source.variable.getPort
 		'''
-			«IF srcPort != null»
-				 «instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
+			«IF (srcPort != null)» 
+				«IF !instance.incomingPortMap.get(srcPort).fifoName.toString.empty»
+				 	«instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
+				 «ENDIF»
 			«ELSE»
 				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
@@ -276,8 +289,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override caseInstStore(InstStore store) {
 		val trgtPort = store.target.variable.port
 		'''
-		«IF trgtPort != null»
+		«IF (trgtPort != null)»
+			«IF !instance.outgoingPortMap.get(trgtPort).head.fifoName.toString.empty»
 				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
+			«ENDIF»
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
@@ -318,127 +333,60 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			}
 			
 		«ENDIF»
-		
-		«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm)»
-		void «instance.name»_initialize() {
-			
-			«IF instance.actor.hasFsm»
-				
-				/* Set initial state to current FSM state */
-				_FSM_state = my_state_«instance.actor.fsm.initialState.name»;
-			«ENDIF»
-		}
-		«ENDIF»
 	'''
 	
 	override printActions(Iterable<Action> actions) '''
-		«IF !actions.empty»
-			«actionTest(actions.head, actions.tail)»
-		«ELSE»
+		«FOR action : actions SEPARATOR " else "»
+			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+				«IF action.outputPattern != null»
+					«action.outputPattern.printOutputPattern»
+				«ENDIF»
+				«instance.name»_«action.body.name»();
+			}«ENDFOR» else {
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
-	override schedulingState(State state, Iterable<Transition> transitions) '''
-		«IF ! transitions.empty»
-			«actionTestState(state, transitions)»
-		«ELSE»
+	override printStateTransitions(State state) '''
+		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
+			«IF transitions.action.outputPattern == null»
+				if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»()) {
+			«ELSE»
+				if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»() «transitions.action.outputPattern.printOutputPattern») {
+			«ENDIF»	
+			«instance.name»_«transitions.action.body.name»();
+			«IF transitions.target != state»
+				_FSM_state = my_state_«transitions.target.name»;
+				goto finished;
+			«ELSE»
+				goto l_«transitions.target.name»;
+			«ENDIF»
+			}«ENDFOR» else {
 			_FSM_state = my_state_«state.name»;
 			goto finished;
-		«ENDIF»
+		}
 	'''
-		
-	override printOutputPattern(Pattern pattern) '''
-		«FOR port : pattern.ports» 
-			«printOutputPatternsPort(pattern, port)»
-		«ENDFOR»
-	'''
-	
-	override printOutputPatternsPort(Pattern pattern, Port port) {
-		var i = -1 '''
-		«FOR successor : instance.outgoingPortMap.get(port)»
-			 «printOutputPatternPort(pattern, port, successor, i = i + 1)»
-		«ENDFOR»
-	'''
-	}
-	
-	def assignFifoDeclaration(Instance instance){
-	
-	val inList = instance.incomingPortMap.values
-	val outList = instance.outgoingPortMap.values.map[head]
-	'''«(inList + outList).join(",", [printFifoAssignDeclarationHLS])»'''
-	}
-	
-	def printFifoAssignDeclarationHLS(Connection connection) '''
-		stream<«connection.fifoType.doSwitch»>& «connection.fifoName»
-	'''
-	
-	def assignInputFifoDeclaration(Instance instance) '''
-		«instance.incomingPortMap.values.join(",",[printInputFifoAssignDeclarationHLS])»
-	'''
-	
-	def printInputFifoAssignDeclarationHLS(Connection connection) '''
-		stream<«connection.fifoType.doSwitch»>& «connection.fifoName»
-	'''
-	
-	def assignInputFifoUse(Instance instance) '''
-		«instance.incomingPortMap.values.join(",",[printInputFifoAssignUseHLS])»
-	'''
-	
-	def printInputFifoAssignUseHLS(Connection connection) '''
-		«connection.fifoName»
-	'''
-	
-	def assignOutputFifoUse(Instance instance) '''
-		«instance.outgoingPortMap.values.join(",",[head.printInputFifoAssignUseHLS])»
-	'''
-	
-	def printOutputFifoAssignUseHLS(Connection connection) '''
-		«connection.fifoName»
-	'''
-	
-	def printActionInputFifos (Action action)'''
-	«action.inputPattern.ports.join(",",[inputPortUse])»
-	'''
-	
-	def printActionOutputFifos (Action action)'''
-	«action.outputPattern.ports.join(",",[outputPortPrinterUse])»
-	'''
-	
-	def printActionInputFifosDeclaration (Action action)'''
-	«action.inputPattern.ports.join(",",[inputPortPrinter])»
-	'''
-	
-	def printActionOutputFifosDeclaration (Action action)
-		'''«action.outputPattern.ports.join(",",[outputPortPrinter])»'''
-	
-	def inputPortPrinter (Port port)'''
-		stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>& «instance.incomingPortMap.get(port).fifoName»
-	'''
-	
-	def outputPortPrinter (Port port)'''
-		stream<«instance.outgoingPortMap.get(port).head.fifoType.doSwitch»>& «instance.outgoingPortMap.get(port).head.fifoName»
-	'''
-	
-	
-	def printActionInputFifosUse (Action action)'''
-	«action.inputPattern.ports.join(",",[inputPortUse])»
-	'''
-	
-	def printActionOutputFifosUse (Action action)'''
-	«action.outputPattern.ports.join(",",[outputPortPrinterUse])»
-	'''
-	
-	def inputPortUse (Port port)'''
-		«instance.incomingPortMap.get(port).fifoName»
-	'''
-	
-	def outputPortPrinterUse (Port port)'''
-		«instance.outgoingPortMap.get(port).head.fifoName»
-	'''
-	
-	
 	
 	override caseTypeBool(TypeBool type) 
 		'''bool'''
+		
+	def script (String path)'''
+	open_project subProject
+	set_top «instance.name»_scheduler
+	add_files ../«instance.name».cpp
+	
+	open_solution "solution"
+	set_part  {xc7a100tcsg324-1}
+	create_clock -period 10
+	
+	source "directive_«instance.name».tcl"
+	csynth_design
+	exit
+	exit
+	'''
+	
+	def directive (String path)'''
+	 #set_directives
+	 config_dataflow -default_channel fifo -fifo_depth «fifoSize»
+	'''
 }

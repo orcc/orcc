@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="architecture" nsURI="http://orcc.sf.net/backends/opencl/architecture/OpenCL_architecture"
+    nsPrefix="net.sf.orcc.backends.opencl.architecture">
+  <eClassifiers xsi:type="ecore:EClass" name="Host">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="hostMemory" upperBound="-1"
+        eType="#//HostMemory" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="devices" upperBound="-1"
+        eType="#//Device" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="commandQueues" upperBound="-1"
+        eType="#//CommandQueue"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="body" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Procedure"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Device">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="computeUnits" upperBound="-1"
+        eType="#//ComputeUnit" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="globalMemory" upperBound="-1"
+        eType="#//GlobalMemory" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="constantMemory" upperBound="-1"
+        eType="#//Constantmemory" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ComputeUnit">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="processingElements" upperBound="-1"
+        eType="#//ProcessingElement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="localMemory" upperBound="-1"
+        eType="#//LocalMemory" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ProcessingElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="privateMemory" upperBound="-1"
+        eType="#//PrivateMemory" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Memory" abstract="true" interface="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="HostMemory" eSuperTypes="#//Memory"/>
+  <eClassifiers xsi:type="ecore:EClass" name="GlobalMemory" eSuperTypes="#//Memory"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Constantmemory" eSuperTypes="#//Memory"/>
+  <eClassifiers xsi:type="ecore:EClass" name="LocalMemory" eSuperTypes="#//Memory"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PrivateMemory" eSuperTypes="#//Memory"/>
+  <eClassifiers xsi:type="ecore:EClass" name="CommandQueue">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="InOrderExecution" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="command" eType="#//Command"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Command" abstract="true" interface="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="KernelExecutionCommand" eSuperTypes="#//Command"/>
+  <eClassifiers xsi:type="ecore:EClass" name="MemoryCommand" eSuperTypes="#//Command"/>
+  <eClassifiers xsi:type="ecore:EClass" name="SynchronizationCommand" eSuperTypes="#//Command"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Kernel">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="globalMemory" upperBound="-1"
+        eType="#//GlobalMemory"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="localMemory" upperBound="-1"
+        eType="#//LocalMemory"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="constantMemory" upperBound="-1"
+        eType="#//Constantmemory"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="privateMemory" upperBound="-1"
+        eType="#//PrivateMemory"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="body" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Procedure"/>
+  </eClassifiers>
+</ecore:EPackage>

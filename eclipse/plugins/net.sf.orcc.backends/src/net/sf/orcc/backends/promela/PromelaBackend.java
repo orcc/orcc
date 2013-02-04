@@ -65,6 +65,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
+import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel;
+
 /**
  * This class defines a template-based PROMELA back-end.
  * 
@@ -77,7 +79,8 @@ public class PromelaBackend extends AbstractBackend {
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
 	private NetworkStateDefExtractor netStateDef;
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
-
+	private PromelaSchedulingModel schedulingModel;
+	
 	private final Map<String, String> renameMap;
 
 	/**
@@ -120,7 +123,7 @@ public class PromelaBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-
+		new BroadcastAdder().doSwitch(network);
 		// Instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
@@ -131,13 +134,15 @@ public class PromelaBackend extends AbstractBackend {
 		options.put("guards", guards);
 		options.put("priority", priority);
 		options.put("loadPeeks", loadPeeks);
-
-		new BroadcastAdder().doSwitch(network);
 		
 		transformActors(network.getAllActors());
 
-		netStateDef = new NetworkStateDefExtractor();
+		schedulingModel = new PromelaSchedulingModel(network);
+		
+		netStateDef = new NetworkStateDefExtractor(schedulingModel);
 		netStateDef.doSwitch(network);
+		
+		schedulingModel.printDependencyGraph();
 
 		transformInstances(network.getChildren());
 		printChildren(network);

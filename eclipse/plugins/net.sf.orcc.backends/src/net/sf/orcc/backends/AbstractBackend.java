@@ -48,14 +48,20 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.util.OrccUtil.getFile;
 
-import java.io.DataInputStream;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +89,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -92,7 +99,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -270,17 +276,27 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param source
 	 *            Resource file path starting with '/'. Must be an existing path
 	 *            relative to classpath (JAR file root or project classpath)
-	 * @param destination
+	 * @param dest
 	 *            Path of the target file
+	 * @param forceOverwrite
+	 *            set to true to ensure files will be really wrote. If not, MD5
+	 *            sum will be computed to check if files need to be written
 	 * @return <code>true</code> if the file has been successfully copied
 	 */
 	protected boolean copyFileToFilesystem(final String source,
-			final String dest) {
-		int bufferSize = 512;
+			final String dest, boolean forceOverwrite) {
 
 		assert source != null;
 		assert dest != null;
 		assert source.startsWith("/");
+		int bufferSize = 512;
+
+		InputStream sourceStream = this.getClass().getResourceAsStream(source);
+
+		if (sourceStream == null) {
+			OrccLogger.warnln("Unable to find " + source);
+			return false;
+		}
 
 		File fileOut = new File(dest);
 		if (!fileOut.exists()) {
@@ -294,43 +310,71 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				OrccLogger.warnln("Unable to write " + dest + " file");
 				return false;
 			}
-		}
-
-		if (!fileOut.isFile()) {
+		} else if (!fileOut.isFile()) {
 			OrccLogger.warnln(dest + " is not a file path");
-			fileOut.delete();
 			return false;
-		}
+		} else {
+			if (!forceOverwrite) {
+				// Comute MD5 for in and out file, to check if out file neet to
+				// be written
+				try {
+					// Create a new Input stream to let original open for write
+					// action
+					BufferedInputStream isIn = new BufferedInputStream(this
+							.getClass().getResourceAsStream(source));
+					FileInputStream isOut = new FileInputStream(fileOut);
 
-		InputStream is = this.getClass().getResourceAsStream(source);
-		if (is == null) {
-			OrccLogger.warnln("Unable to find " + source);
-			return false;
-		}
-		DataInputStream dis;
-		dis = new DataInputStream(is);
+					MessageDigest mdIn = MessageDigest.getInstance("MD5");
+					MessageDigest mdOut = MessageDigest.getInstance("MD5");
 
-		FileOutputStream out;
-		try {
-			out = new FileOutputStream(fileOut);
-		} catch (FileNotFoundException e1) {
-			OrccLogger.warnln("File " + dest + " not found !");
-			return false;
-		}
+					byte[] b = new byte[bufferSize];
+					do {
+						isIn.read(b);
+						mdIn.update(b);
+						isOut.read(b);
+						mdOut.update(b);
 
-		try {
-			byte[] b = new byte[bufferSize];
-			int i = is.read(b);
-			while (i != -1) {
-				out.write(b, 0, i);
-				i = is.read(b);
+					} while (isIn.available() > 0);
+
+					isIn.close();
+					isOut.close();
+
+					byte[] in = mdIn.digest();
+					byte[] out = mdIn.digest();
+
+					if (MessageDigest.isEqual(in, out)) {
+						// Target file is the same than input, don't need to
+						// write it
+						return true;
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (NoSuchAlgorithmException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
-			dis.close();
-			out.close();
-		} catch (IOException e) {
-			OrccLogger.warnln("IOError : " + e.getMessage());
-			return false;
+
 		}
+
+		// Really write target file
+		try {
+			BufferedInputStream isIn = new BufferedInputStream(sourceStream);
+			FileOutputStream isOut = new FileOutputStream(fileOut);
+
+			byte[] b = new byte[bufferSize];
+			int i = isIn.read(b);
+			while (i != -1) {
+				isOut.write(b, 0, i);
+				i = isIn.read(b);
+			}
+			isOut.close();
+			isIn.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		return true;
 	}
 
@@ -344,104 +388,109 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            path relative to classpath (JAR file root or project
 	 *            classpath)
 	 * @param destination
-	 *            Filesystem folder path
+	 *            File system folder path
+	 * @param forceOverwrite
+	 *            set to true to ensure files will be really wrote. If not, MD5
+	 *            sum will be computed to check if files need to be written
 	 * @return <code>true</code> if the folder has been successfully copied
 	 */
-	protected boolean copyFolderToFileSystem(final String source,
-			final String destination) {
+	protected boolean copyFolderToFileSystem(String source, String destination,
+			boolean forceOverwrite) {
 		assert source != null;
 		assert destination != null;
 		assert source.startsWith("/");
 
-		File outputDir = new File(destination);
+		// Add the last / if needed
+		if (!source.endsWith("/")) {
+			source = source + "/";
+		}
+		if (!destination.endsWith("/")) {
+			destination = destination + "/";
+		}
 
+		File outputDir = new File(destination);
 		if (!outputDir.exists()) {
 			if (!outputDir.mkdirs()) {
 				OrccLogger.warnln("Unable to create " + outputDir + " folder");
 				return false;
 			}
-		}
-
-		if (!outputDir.isDirectory()) {
-			OrccLogger.warnln(outputDir
-					+ " does not exists or is not a directory.");
+		} else if (!outputDir.isDirectory()) {
+			OrccLogger.warnln(outputDir + " is not a directory.");
 			return false;
 		}
 
-		String inputDir;
-		// Remove last '/' character (if needed)
-		if (source.charAt(source.length() - 1) == '/') {
-			inputDir = source.substring(0, source.length() - 1);
-		} else {
-			inputDir = source;
-		}
-
 		try {
-			URL toto = this.getClass().getResource(inputDir);
-			URL inputURL = FileLocator.resolve(toto);
-			String inputPath = inputURL.toString();
+			URL dirUrl = this.getClass().getResource(source);
+
+			if (dirUrl.getProtocol().equals("bundleresource")) {
+				dirUrl = FileLocator.resolve(dirUrl);
+			}
 
 			boolean result = true;
 
-			if (inputPath.startsWith("jar:file:")) {
-				// Backend running from jar file
-				inputPath = inputPath.substring(9, inputPath.indexOf('!'));
+			// XXX : Check if this test is still needed. It seems that libraries
+			// files & folders are always available as "file:" url
+			if (dirUrl.getProtocol().equals("jar")) {
+				// Copy folder from a jar
+				URI toto = new URI(dirUrl.getFile().split("!")[0]);
+				File file = new File(toto);
+				JarFile jar = new JarFile(file);
 
-				JarFile jar = new JarFile(inputPath);
-				try {
-					Enumeration<JarEntry> jarEntries = jar.entries();
-					if (jarEntries == null) {
-						OrccLogger.warnln("Unable to list content from "
-								+ jar.getName() + " file.");
-						return false;
-					}
-
-					// "source" value without starting '/' char
-					String sourceMinusSlash = source.substring(1);
-
-					JarEntry elt;
-					while (jarEntries.hasMoreElements()) {
-
-						elt = jarEntries.nextElement();
-
-						// Only deal with sub-files of 'source' path
-						if (elt.isDirectory()
-								|| !elt.getName().startsWith(sourceMinusSlash)) {
-							continue;
-						}
-
-						String newInPath = "/" + elt.getName();
-						String newOutPath = outputDir
-								+ File.separator
-								+ elt.getName().substring(
-										sourceMinusSlash.length());
-						result &= copyFileToFilesystem(newInPath, newOutPath);
-					}
-					return result;
-				} finally {
+				Enumeration<JarEntry> jarEntries = jar.entries();
+				if (jarEntries == null) {
+					OrccLogger.warnln("Unable to list content from "
+							+ jar.getName() + " file.");
 					jar.close();
+					return false;
 				}
-			} else {
-				// Backend running from filesystem
-				File[] listDir = new File(inputPath.substring(5)).listFiles();
 
-				for (File elt : listDir) {
-					String newInPath = inputDir + File.separator
-							+ elt.getName();
+				// "source" value without starting '/' char
+				String sourceMinusSlash = source.substring(1);
 
-					String newOutPath = outputDir + File.separator
-							+ elt.getName();
+				for (JarEntry jarEntry : Collections.list(jarEntries)) {
 
-					if (elt.isDirectory()) {
-						result &= copyFolderToFileSystem(newInPath, newOutPath);
+					// Only deal with sub-files of 'source' path
+					if (jarEntry.isDirectory()
+							|| !jarEntry.getName().startsWith(sourceMinusSlash)) {
+						continue;
+					}
+
+					String newInPath = "/" + jarEntry.getName();
+					String newOutPath = destination
+							+ jarEntry.getName().substring(
+									sourceMinusSlash.length());
+					result &= copyFileToFilesystem(newInPath, newOutPath,
+							forceOverwrite);
+				}
+				jar.close();
+
+				return result;
+
+			} else if (dirUrl.getProtocol().equals("file")) {
+				// Copy folder from file system
+				File[] listDir = new File(dirUrl.getFile()).listFiles();
+
+				for (File dirEntry : listDir) {
+					String newInPath = source + dirEntry.getName();
+					String newOutPath = destination + dirEntry.getName();
+
+					if (dirEntry.isDirectory()) {
+						result &= copyFolderToFileSystem(newInPath, newOutPath,
+								forceOverwrite);
 					} else {
-						result &= copyFileToFilesystem(newInPath, newOutPath);
+						result &= copyFileToFilesystem(newInPath, newOutPath,
+								forceOverwrite);
 					}
 				}
 				return result;
+			} else {
+				return false;
 			}
 		} catch (IOException e) {
-			OrccLogger.warnln("IOError" + e.getMessage());
+			OrccLogger.warnln("IOError : " + e.getMessage());
+			return false;
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -609,8 +658,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		ResourceSet set = new ResourceSetImpl();
 		List<Actor> actors = new ArrayList<Actor>();
 		for (IFile file : files) {
-			Resource resource = set.getResource(URI.createPlatformResourceURI(
-					file.getFullPath().toString(), true), true);
+			Resource resource = set.getResource(org.eclipse.emf.common.util.URI
+					.createPlatformResourceURI(file.getFullPath().toString(),
+							true), true);
 			EObject eObject = resource.getContents().get(0);
 			if (eObject instanceof Actor) {
 				// do not add units
@@ -812,6 +862,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		try {
 			CommandLineParser parser = new PosixParser();
+
+			String cliOpts = StringUtils.join((Object[]) context.getArguments()
+					.get(IApplicationContext.APPLICATION_ARGS), " ");
+			OrccLogger.traceln("Command line arguments: " + cliOpts);
 
 			// parse the command line arguments
 			CommandLine line = parser.parse(options, (String[]) context

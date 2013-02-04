@@ -43,7 +43,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
@@ -51,7 +50,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.ir.util.ValueUtil;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -77,6 +75,7 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 
 		@Override
 		public Object caseExprBinary(ExprBinary expr) {
+			super.caseExprBinary(expr);
 			boolean toShift = false;
 			// int pow = 0;
 			if (expr.getOp() == OpBinary.DIV) {
@@ -138,16 +137,12 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 						divProc = createDivProc();
 					}
 
-					Instruction inst = EcoreHelper.getContainerOfType(expr,
-							Instruction.class);
-					int lineNumber = inst.getLineNumber();
 					Var varNum = procedure.newTempLocalVariable(
-							factory.createTypeInt(16), "num_mod_" + lineNumber);
+							factory.createTypeInt(16), "num_mod");
 					Var varDenum = procedure.newTempLocalVariable(
-							factory.createTypeInt(16), "den_mod_" + lineNumber);
+							factory.createTypeInt(16), "den_mod");
 					Var varDivResult = procedure.newTempLocalVariable(
-							factory.createTypeInt(16), "divResult_mod_"
-									+ lineNumber);
+							factory.createTypeInt(16), "divResult_mod");
 
 					InstAssign assign0 = factory.createInstAssign(varNum,
 							expr.getE1());
@@ -162,8 +157,7 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 							divProc, parameters);
 
 					Var varResult = procedure.newTempLocalVariable(
-							factory.createTypeInt(16), "result_mod_"
-									+ lineNumber);
+							factory.createTypeInt(16), "result_mod");
 
 					ExprBinary exprDenumMultDiv = factory.createExprBinary(
 							factory.createExprVar(varDenum), OpBinary.TIMES,
@@ -465,6 +459,11 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 			Substitutor substitutor = new Substitutor();
 			substitutor.doSwitch(verifAction.getBody());
 			substitutor.doSwitch(verifAction.getScheduler());
+		}
+
+		for (Procedure proc : actor.getProcs()) {
+			Substitutor substitutor = new Substitutor();
+			substitutor.doSwitch(proc);
 		}
 	}
 }

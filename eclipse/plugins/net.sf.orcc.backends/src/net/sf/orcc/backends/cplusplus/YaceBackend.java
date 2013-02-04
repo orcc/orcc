@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
@@ -49,6 +48,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
@@ -207,7 +207,7 @@ public class YaceBackend extends AbstractBackend {
 			String target = path + File.separator + "libs";
 			OrccLogger
 					.trace("Export libraries sources into " + target + "... ");
-			if (copyFolderToFileSystem("/runtime/C++", target)) {
+			if (copyFolderToFileSystem("/runtime/C++", target, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {

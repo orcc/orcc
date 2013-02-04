@@ -47,7 +47,6 @@ import net.sf.orcc.backends.llvm.tta.transform.StringTransformation;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
-import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.BackendUtil;
@@ -59,6 +58,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
@@ -227,7 +227,7 @@ public class TTABackend extends LLVMBackend {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
 			OrccLogger.trace("Export library files into " + libPath + "... ");
-			if (copyFolderToFileSystem("/runtime/TTA", libPath)) {
+			if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				new File(libPath + File.separator + "generate")
 						.setExecutable(true);

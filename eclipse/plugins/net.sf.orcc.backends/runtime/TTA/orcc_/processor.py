@@ -100,8 +100,11 @@ class Processor:
 
         retcode = subprocess.call(["tcecc"] + opt + sourceFiles)
 
-        if retcode == 0 and debug:
-            retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
+        if debug:
+            if retcode == 0:
+                retcode = subprocess.call(["llvm-dis", os.path.join(tempPath, self.id + ".tpef_optimized.bc")])
+            if retcode == 0:
+                retcode = subprocess.call(["tcedisasm", "-n", self._adfFile, self._tpefFile])
         
         return retcode
 

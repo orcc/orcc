@@ -61,7 +61,6 @@ import net.sf.orcc.util.OrccLogger
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.OrccBackendsConstants.*
-import net.sf.orcc.df.Entity
 
 /**
  * Generate and print instance source file for C backend.
@@ -80,7 +79,7 @@ class InstancePrinter extends CTemplate {
 	
 	var String name
 	
-	var boolean geneticAlgo = false
+	protected var boolean geneticAlgo = false
 	
 	var boolean newSchedul = false
 	var boolean ringTopology = false
@@ -88,8 +87,8 @@ class InstancePrinter extends CTemplate {
 	var boolean enableTrace = false
 	var int threadsNb = 1;
 	
-	val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
-	val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
+	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
+	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 	
 	protected var Action currentAction;
 
@@ -209,7 +208,11 @@ class InstancePrinter extends CTemplate {
 		#include "orcc_scheduler.h"
 		
 		#define SIZE «fifoSize»
-		«attributable.printAttributes»
+		«IF instance != null»
+			«instance.printAttributes»
+		«ELSE»
+			«actor.printAttributes»
+		«ENDIF»
 		
 		«IF newSchedul»
 			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
@@ -242,7 +245,7 @@ class InstancePrinter extends CTemplate {
 		// Predecessors
 		«FOR port : actor.inputs»
 			«IF incomingPortMap.get(port) != null»
-				extern struct actor_s «incomingPortMap.get(port).source.label»;
+				extern struct actor_s «(incomingPortMap.get(port).source as Instance).name»;
 			«ENDIF»
 		«ENDFOR»
 		
@@ -269,7 +272,7 @@ class InstancePrinter extends CTemplate {
 		// Successors
 		«FOR port : actor.outputs»
 			«FOR successor : outgoingPortMap.get(port)»
-				extern struct actor_s «successor.target.label»;
+				extern struct actor_s «(successor.target as Instance).name»;
 			«ENDFOR»
 		«ENDFOR»
 		
@@ -279,19 +282,15 @@ class InstancePrinter extends CTemplate {
 			static unsigned int fifo_«port.fullName»_id;
 		«ENDFOR»
 		
-		////////////////////////////////////////////////////////////////////////////////
-		// Parameter values of the instance
 		«IF instance != null»
+			////////////////////////////////////////////////////////////////////////////////
+			// Parameter values of the instance
 			«FOR arg : instance.arguments»
 				«IF arg.value.exprList»
 					static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
 				«ELSE»
 					#define «arg.variable.name» «arg.value.doSwitch»
 				«ENDIF»
-			«ENDFOR»
-		«ELSE»
-			«FOR variable : actor.parameters»
-				«variable.declareStateVar»
 			«ENDFOR»
 		«ENDIF»
 		
@@ -349,6 +348,10 @@ class InstancePrinter extends CTemplate {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
+		«actorScheduler»
+	'''
+	
+	def protected actorScheduler() '''
 		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
@@ -383,15 +386,15 @@ class InstancePrinter extends CTemplate {
 	 * FSM
 	 *
 	 *****************************************/
-	def printFsm() '''
+	def protected printFsm() '''
 		«IF ! actor.actionsOutsideFsm.empty»
-		void «name»_outside_FSM_scheduler(struct schedinfo_s *si) {
-			int i = 0;
-			«actor.actionsOutsideFsm.printActionLoop»
-		finished:
-			// no read_end/write_end here!
-			return;
-		}
+			void «name»_outside_FSM_scheduler(struct schedinfo_s *si) {
+				int i = 0;
+				«actor.actionsOutsideFsm.printActionLoop»
+			finished:
+				// no read_end/write_end here!
+				return;
+			}
 		«ENDIF»
 		
 		void «name»_scheduler(struct schedinfo_s *si) {
@@ -416,7 +419,7 @@ class InstancePrinter extends CTemplate {
 		
 			// FSM transitions
 			«FOR state : actor.fsm.states»
-		«state.printTransition»
+		«state.printStateLabel»
 			«ENDFOR»
 		finished:
 			«IF enableTrace»
@@ -431,32 +434,43 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def printTransition(State state) '''
+	def protected printStateLabel(State state) '''
 	l_«state.name»:
 		«IF ! actor.actionsOutsideFsm.empty»
 			«name»_outside_FSM_scheduler(si);
 			i += si->num_firings;
 		«ENDIF»
 		«IF state.outgoing.empty»
-			printf("Stuck in state "«state.name»" in the instance «name»\n");
+			printf("Stuck in state "«state.name»" in «name»\n");
 			wait_for_key();
 			exit(1);
 		«ELSE»
-			«schedulingState(state, state.outgoing.map[it as Transition])»
+			«state.printStateTransitions»
 		«ENDIF»
 	'''
 	
-	def schedulingState(State state, Iterable<Transition> transitions) '''
-		«IF ! transitions.empty»
-			«actionTestState(state, transitions)»
-		«ELSE»
+	def protected printStateTransitions(State state) '''
+		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
+			if («trans.action.inputPattern.checkInputPattern»isSchedulable_«trans.action.name»()) {
+				«IF !trans.action.outputPattern.empty»
+					«trans.action.outputPattern.printOutputPattern»
+						_FSM_state = my_state_«state.name»;
+						si->num_firings = i;
+						si->reason = full;
+						goto finished;
+					}
+				«ENDIF»
+				«trans.action.body.name»();
+				i++;
+				goto l_«trans.target.name»;
+			}«ENDFOR» else {
 			«transitionPattern.get(state).printTransitionPattern»
 			_FSM_state = my_state_«state.name»;
 			goto finished;
-		«ENDIF»
+		}
 	'''
 	
-	def printTransitionPattern(Pattern pattern) '''
+	def protected printTransitionPattern(Pattern pattern) '''
 		«IF newSchedul»
 			«FOR port : pattern.ports»
 				«printTransitionPatternPort(port, pattern)»
@@ -466,36 +480,17 @@ class InstancePrinter extends CTemplate {
 		si->reason = starved;
 	'''
 	
-	def printTransitionPatternPort(Port port, Pattern pattern) '''
+	def private printTransitionPatternPort(Port port, Pattern pattern) '''
 		if (numTokens_«port.name» - index_«port.name» < «pattern.numTokensMap.get(port)») {
 			if( ! «name».sched->round_robin || i > 0) {
 				«IF incomingPortMap.containsKey(port)»
-					sched_add_schedulable(«name».sched, &«incomingPortMap.get(port).source.label», RING_TOPOLOGY);
+					sched_add_schedulable(«name».sched, &«(incomingPortMap.get(port).source as Instance).name», RING_TOPOLOGY);
 				«ENDIF»
 			}
 		}
 	'''
 	
-	def actionTestState(State srcState, Iterable<Transition> transitions) '''
-		if («transitions.head.action.inputPattern.checkInputPattern»isSchedulable_«transitions.head.action.name»()) {
-			«IF transitions.head.action.outputPattern != null»
-				«transitions.head.action.outputPattern.printOutputPattern»
-					_FSM_state = my_state_«srcState.name»;
-					si->num_firings = i;
-					si->reason = full;
-					goto finished;
-				}
-			«ENDIF»
-			«transitions.head.action.body.name»();
-			i++;
-			goto l_«transitions.head.target.name»;
-		} else {
-			«schedulingState(srcState, transitions.tail)»
-		}
-	'''
-
-	
-	def printCallTokensFunctions() '''
+	def protected printCallTokensFunctions() '''
 		«FOR port : actor.inputs»
 			read_«port.name»();
 		«ENDFOR»
@@ -504,7 +499,7 @@ class InstancePrinter extends CTemplate {
 		«ENDFOR»
 	'''
 	
-	def initializeFunction() '''
+	def protected initializeFunction() '''
 		«IF ! actor.initializes.empty»
 			«FOR init : actor.initializes»
 				«init.print»
@@ -520,7 +515,7 @@ class InstancePrinter extends CTemplate {
 			}
 			
 		«ENDIF»
-		void «name»_initialize(«actor.inputs.join(", ", ['''unsigned int fifo_«it.name»_id'''])») {
+		void «name»_initialize(«actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])») {
 			«IF ! actor.initializes.empty»
 				struct schedinfo_s si;
 				si.num_firings = 0;
@@ -543,7 +538,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def initializeFifoId(Port port) '''
+	def private initializeFifoId(Port port) '''
 		«IF incomingPortMap.get(port) != null»
 			fifo_«port.fullName»_id = fifo_«port.name»_id;
 		«ELSE»
@@ -551,38 +546,31 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 	
-	def printActionLoop(List<Action> actions) '''
+	def protected printActionLoop(List<Action> actions) '''
 		while (1) {
 			«actions.printActions»
 		}
 	'''
 	
-	def printActions(Iterable<Action> actions) '''
-		«IF !actions.empty»
-			«actionTest(actions.head, actions.tail)»
-		«ELSE»
-			«printTransitionPattern(inputPattern)»
+	def protected printActions(Iterable<Action> actions) '''
+		«FOR action : actions SEPARATOR " else "»
+			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+				«IF !action.outputPattern.empty»
+					«action.outputPattern.printOutputPattern»
+						si->num_firings = i;
+						si->reason = full;
+						goto finished;
+					}
+				«ENDIF»
+				«action.body.name»();
+				i++;
+			}«ENDFOR» else {
+			«inputPattern.printTransitionPattern»
 			goto finished;
-		«ENDIF»
-	'''
-	
-	def actionTest(Action action, Iterable<Action> others) '''
-		if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
-			«IF action.outputPattern != null»
-				«action.outputPattern.printOutputPattern»
-					si->num_firings = i;
-					si->reason = full;
-					goto finished;
-				}
-			«ENDIF»
-			«action.body.name»();
-			i++;
-		} else {
-			«others.printActions»
 		}
 	'''
 	
-	def printOutputPattern(Pattern pattern) '''
+	def protected printOutputPattern(Pattern pattern) '''
 		int stop = 0;
 		«FOR port : pattern.ports»
 			«printOutputPatternsPort(pattern, port)»
@@ -590,7 +578,7 @@ class InstancePrinter extends CTemplate {
 		if (stop != 0) {
 	'''
 	
-	def printOutputPatternsPort(Pattern pattern, Port port) {
+	def protected printOutputPatternsPort(Pattern pattern, Port port) {
 		var i = -1
 		'''
 			«FOR successor : outgoingPortMap.get(port)»
@@ -599,21 +587,21 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 	
-	def printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
+	def protected printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
 		if («pattern.numTokensMap.get(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
 			stop = 1;
 			«IF newSchedul»
 				if( ! «name».sched->round_robin || i > 0) {
-					sched_add_schedulable(«name».sched, &«successor.target.label», RING_TOPOLOGY);
+					sched_add_schedulable(«name».sched, &«(successor.target as Instance).name», RING_TOPOLOGY);
 				}
 			«ENDIF»
 		}
 	'''
 
-	def checkInputPattern(Pattern pattern)
+	def protected checkInputPattern(Pattern pattern)
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.numTokensMap.get(port)» && «ENDFOR»'''
 	
-	def writeTokensFunctions(Port port) '''
+	def private writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
 			index_«port.name» = «port.fullName»->write_ind;
 			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name»);
@@ -624,7 +612,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def readTokensFunctions(Port port) '''
+	def private readTokensFunctions(Port port) '''
 		static void read_«port.name»() {
 			«IF incomingPortMap.containsKey(port)»
 				index_«port.name» = «port.fullName»->read_inds[fifo_«port.fullName»_id];
@@ -645,7 +633,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def print(Action action) {
+	def protected print(Action action) {
 		currentAction = action
 		val output = '''
 			static void «action.body.name»() {
@@ -689,7 +677,7 @@ class InstancePrinter extends CTemplate {
 		return output
 	}
 	
-	def print(Procedure proc) '''
+	def protected print(Procedure proc) '''
 		«proc.printAttributes»
 		static «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])») {
 			«FOR variable : proc.locals»
@@ -703,7 +691,7 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	// TODO : simplify this :
-	def declareStateVar(Var variable) '''
+	def protected declareStateVar(Var variable) '''
 		«variable.printAttributes»
 		«IF variable.initialized»
 			«IF ! variable.assignable»
@@ -720,31 +708,31 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def fullName(Port port)
+	def protected fullName(Port port)
 		'''«name»_«port.name»'''
 	
-	def sizeOrDefaultSize(Connection conn) {
+	def private sizeOrDefaultSize(Connection conn) {
 		if(conn == null || conn.size == null) "SIZE"
 		else conn.size
 	}
 	
-	def getNumReaders(Port port) {
+	def private getNumReaders(Port port) {
 		if (incomingPortMap.get(port) == null) {
 			'''0'''
 		} else {
-			val predecessor = incomingPortMap.get(port).source.getAdapter(typeof(Entity))
+			val predecessor = incomingPortMap.get(port).source as Instance
 			val predecessorPort = incomingPortMap.get(port).sourcePort
 			'''«predecessor.outgoingPortMap.get(predecessorPort).size»'''
 		}
 	}
 	
-	def printOpenFiles() '''
+	def private printOpenFiles() '''
 		«FOR port : actor.inputs + actor.outputs»
 			file_«port.name» = fopen("«port.fullName».txt", "a");
 		«ENDFOR»
 	'''
 	
-	def printCloseFiles() '''
+	def private printCloseFiles() '''
 		«FOR port : actor.inputs + actor.outputs»
 			fclose(file_«port.name»);
 		«ENDFOR»
@@ -835,7 +823,7 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 		
-	def getPort(Var variable) {
+	def protected getPort(Var variable) {
 		if(currentAction == null) {
 			null
 		} else if (currentAction?.inputPattern.varToPortMap.containsKey(variable)) {
@@ -849,7 +837,7 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 
-	def printCallArg(Arg arg) {
+	def private printCallArg(Arg arg) {
 		if(arg.byRef) {
 			"&" + (arg as ArgByRef).use.variable.indexedName + (arg as ArgByRef).indexes.printArrayIndexes
 		} else {
@@ -863,7 +851,7 @@ class InstancePrinter extends CTemplate {
 	 * Old templateData initialization
 	 *
 	 *****************************************/		
-	def buildInputPattern() {
+	def private buildInputPattern() {
 		for (action : actor.actionsOutsideFsm) {
 			val actionPattern = action.inputPattern
 			for (port : actionPattern.ports) {
@@ -879,7 +867,7 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 	
-	def buildTransitionPattern() {		
+	def private buildTransitionPattern() {		
 		val fsm = actor.getFsm()
 		
 		if (fsm != null) {
@@ -906,7 +894,5 @@ class InstancePrinter extends CTemplate {
 			}
 		}
 	}
-	
-
 
 }

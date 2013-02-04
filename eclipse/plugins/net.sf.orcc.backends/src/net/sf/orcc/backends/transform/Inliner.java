@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.df.Action;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
@@ -187,6 +188,7 @@ public class Inliner extends AbstractIrVisitor<Void> {
 
 	private boolean inlineFunction;
 	private boolean inlineProcedure;
+	private boolean inlineActionBodyProcedure;
 
 	private InstReturn instReturn;
 
@@ -196,6 +198,15 @@ public class Inliner extends AbstractIrVisitor<Void> {
 	public Inliner(boolean inlineProcedure, boolean inlineFunction) {
 		this.inlineProcedure = inlineProcedure;
 		this.inlineFunction = inlineFunction;
+		this.inlineActionBodyProcedure = true;
+		this.updater = new ExpressionUpdater();
+	}
+
+	public Inliner(boolean inlineActionBodyProcedure, boolean inlineProcedure,
+			boolean inlineFunction) {
+		this.inlineProcedure = inlineProcedure;
+		this.inlineFunction = inlineFunction;
+		this.inlineActionBodyProcedure = inlineActionBodyProcedure;
 		this.updater = new ExpressionUpdater();
 	}
 
@@ -204,8 +215,22 @@ public class Inliner extends AbstractIrVisitor<Void> {
 		Type returnType = call.getProcedure().getReturnType();
 		if (returnType.isVoid() && inlineProcedure || !returnType.isVoid()
 				&& inlineFunction) {
-			if (!call.getProcedure().isNative())
-				inlineProcedure(call);
+			if (!call.getProcedure().isNative()) {
+				if (inlineActionBodyProcedure) {
+					inlineProcedure(call);
+				} else {
+					Procedure procedure = call.getProcedure();
+					Action action = EcoreHelper.getContainerOfType(procedure,
+							Action.class);
+					if (action != null) {
+						if (procedure != action.getBody()) {
+							inlineProcedure(call);
+						}
+					} else {
+						inlineProcedure(call);
+					}
+				}
+			}
 		}
 		return null;
 	}
@@ -224,15 +249,18 @@ public class Inliner extends AbstractIrVisitor<Void> {
 			List<Block> n = null;
 			for (Block block : locationBlocks) {
 				if (block.isBlockIf()) {
-					n = findBlock(((BlockIf) block).getElseBlocks(), blockToFind);
-					if (n == null)
+					n = findBlock(((BlockIf) block).getElseBlocks(),
+							blockToFind);
+					if (n == null) {
 						n = findBlock(((BlockIf) block).getThenBlocks(),
 								blockToFind);
+					}
 				} else if (block.isBlockWhile()) {
 					n = findBlock(((BlockWhile) block).getBlocks(), blockToFind);
 				}
-				if (n != null)
+				if (n != null) {
 					return n;
+				}
 			}
 		}
 		return null;
@@ -302,8 +330,9 @@ public class Inliner extends AbstractIrVisitor<Void> {
 		indexInst = 0;
 		while (indexInst < beginningBlock.getInstructions().size()) {
 			if (beginningBlock.getInstructions().get(indexInst)
-					.equals(currentCall))
+					.equals(currentCall)) {
 				break;
+			}
 			indexInst++;
 		}
 		while (indexInst < beginningBlock.getInstructions().size()) {

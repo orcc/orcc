@@ -151,12 +151,10 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * Calls the print procedure. Prints to stdout by default. This method may
 	 * be overridden.
 	 * 
-	 * @param procedure
-	 *            a native procedure
 	 * @param arguments
-	 *            arguments of the procedure
+	 *            arguments of the print
 	 */
-	protected void callPrintProcedure(Procedure procedure, List<Arg> arguments) {
+	protected void callPrintProcedure(List<Arg> arguments) {
 		for (Arg arg : arguments) {
 			if (arg.isByVal()) {
 				Expression expr = ((ArgByVal) arg).getValue();
@@ -165,10 +163,10 @@ public class ActorInterpreter extends IrSwitch<Object> {
 					// management
 					String str = ((ExprString) expr).getValue();
 					String unescaped = OrccUtil.getUnescapedString(str);
-					OrccLogger.debugln(unescaped);
+					OrccLogger.traceRaw(unescaped);
 				} else {
 					Object value = exprInterpreter.doSwitch(expr);
-					OrccLogger.debugln(String.valueOf(value));
+					OrccLogger.traceRaw(String.valueOf(value));
 				}
 			}
 		}
@@ -198,7 +196,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 
 		// Special "print" case
 		if (call.isPrint()) {
-			callPrintProcedure(proc, callParams);
+			callPrintProcedure(callParams);
 		} else if (proc.isNative()) {
 			Object result = callNativeProcedure(proc, callParams);
 			if (call.hasResult()) {
@@ -551,6 +549,13 @@ public class ActorInterpreter extends IrSwitch<Object> {
 
 			// initializes runtime value of constants declared in units
 			initExternalResources(actor);
+			
+			// initializes FSM status (if any)
+			if (actor.hasFsm()) {
+				fsmState = actor.getFsm().getInitialState();
+			} else {
+				fsmState = null;
+			}
 
 			// Get initializing procedure if any
 			for (Action action : actor.getInitializes()) {
@@ -668,14 +673,6 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 */
 	protected void setActor(Actor actor) {
 		this.actor = actor;
-
-		// set fsm state to initial state (if any)
-		if (actor.hasFsm()) {
-			fsmState = actor.getFsm().getInitialState();
-		} else {
-			fsmState = null;
-		}
-
 	}
 
 }

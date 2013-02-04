@@ -7,13 +7,13 @@
       <option
             defaultValue="false"
             description="Enable tracing feature of a simulator"
-            id="net.sf.orcc.simulators.enableTraces"
+            id="net.sf.orcc.backends.enableTraces"
             name="Enable Traces">
          <checkBox>
             <option
-                  description="An other output folder for receiving simulator trace files"
+                  description="The folder where traces are saved"
                   id="net.sf.orcc.simulators.tracesFolder"
-                  name="Traces folder">
+                  name="Traces Folder">
                <browseFile
                      folder="true"
                      workspace="false">
@@ -47,14 +47,63 @@
                workspace="false">
          </browseFile>
       </option>
+      <option
+            defaultValue="false"
+            description="Shanges size of variable to fit types of general-purpose programming language such as C, C++ or Java"
+            id="net.sf.orcc.core.transform.typeResizer"
+            name="Type Resizer">
+         <checkBox>
+            <option
+                  defaultValue="true"
+                  id="net.sf.orcc.core.transform.typeResizer.to2nbits"
+                  name="Cast To 2^n bits">
+               <checkBox></checkBox>
+            </option>
+            <option
+                  defaultValue="false"
+                  id="net.sf.orcc.core.transform.typeResizer.to32bits"
+                  name="Cast To 32bits">
+               <checkBox></checkBox>
+            </option>
+            <option
+                  defaultValue="true"
+                  id="net.sf.orcc.core.transform.typeResizer.nativePorts"
+                  name="Cast Native Ports">
+               <checkBox></checkBox>
+            </option>
+            <option
+                  defaultValue="false"
+                  id="net.sf.orcc.core.transform.typeResizer.booltoint"
+                  name="Cast Boolean To Integer">
+               <checkBox></checkBox>
+            </option>
+         </checkBox>
+      </option>
+      <option
+            defaultValue="false"
+            description="Golden reference to be compared with ouput data"
+            id="net.sf.orcc.simulators.profile"
+            name="Enable profiling">
+         <checkBox>            
+            <option
+                  description="Where the profiling results are saved"
+                  id="net.sf.orcc.simulators.profileFolder"
+                  name="Profiling folder">
+               <browseFile
+                     folder="true"
+                     workspace="false">
+               </browseFile>
+            </option>
+         </checkBox>
+      </option>
    </extension>
    <extension
          point="net.sf.orcc.simulators.simulators">
       <simulator
-            class="net.sf.orcc.simulators.SlowSimulator"
+            class="net.sf.orcc.simulators.slow.SlowSimulator"
             name="Visitor interpreter and debugger">
          <option
-               id="net.sf.orcc.simulators.enableTraces">
+               id="net.sf.orcc.backends.enableTraces">
          </option>
          <option
                id="net.sf.orcc.core.xdfFile">
@@ -64,6 +113,12 @@
          </option>
          <option
                id="net.sf.orcc.simulators.goldenReference">
+         </option>
+         <option
+               id="net.sf.orcc.core.transform.typeResizer">
+         </option>
+         <option
+               id="net.sf.orcc.simulators.profile">
          </option>
       </simulator>
    </extension>

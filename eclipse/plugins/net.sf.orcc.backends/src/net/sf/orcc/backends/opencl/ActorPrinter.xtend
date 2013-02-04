@@ -45,6 +45,8 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.BlockIf
+import net.sf.orcc.ir.BlockWhile
 
 /*
  * OpenCL Actor Printer
@@ -225,12 +227,7 @@ class ActorPrinter extends BasePrinter {
 		«FOR node : procedure.blocks»«node.doSwitch»«ENDFOR»
 	'''
 	
-	// Block
-	override caseBlockBasic(BlockBasic node){ 
-		'''
-		«FOR inst : node.instructions»«inst.doSwitch»«ENDFOR»
-		'''
-	}
+	
 	
 	// Assign, Load, Store
 	
@@ -251,4 +248,31 @@ class ActorPrinter extends BasePrinter {
 		«IF inst.target.variable.global»sv_«currentInstance.name».«ENDIF»«inst.target.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR» = «inst.value.doSwitch»;
 		'''
 	} 
+		
+	// Blocks
+	override caseBlockBasic(BlockBasic node){ 
+		'''
+		«FOR inst : node.instructions»«inst.doSwitch»«ENDFOR»
+		'''
+	}
+	override caseBlockIf(BlockIf block)'''
+		if («block.condition.doSwitch») {
+			«FOR thenBlock : block.thenBlocks»
+				«thenBlock.doSwitch»
+			«ENDFOR»
+		}«IF block.elseRequired» else {
+			«FOR elseBlock : block.elseBlocks»
+				«elseBlock.doSwitch»
+			«ENDFOR»
+		}
+		«ENDIF»
+	'''
+	
+	override caseBlockWhile(BlockWhile blockWhile)'''
+		while («blockWhile.condition.doSwitch») {
+			«FOR block : blockWhile.blocks»
+				«block.doSwitch»
+			«ENDFOR»
+		}
+	'''
 }

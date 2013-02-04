@@ -43,23 +43,9 @@ import java.io.File
  
  
  class InstanceTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinter {
- 	
- 	new(Map<String, Object> options) {
+
+	new(Map<String, Object> options) {
 		super(options)
-	}
-	
-	override print(String targetFolder, Instance instance) {
-		setInstance(instance)
-		
-		val content = fileContent
-		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
-		
-		if(needToWriteFile(content, file)) {
-			printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
 	}
 
 	override getFileContent() '''
@@ -359,6 +345,18 @@ import java.io.File
 			end if;
 		end if;
 	'''
+	
+	override print(String targetFolder) {		
+		val content = fileContent
+		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
+		
+		if(needToWriteFile(content, file)) {
+			printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
+	}
 	
 	def fifoName(Connection connection)
 		'''myStream_«connection.getAttribute("id").objectValue»_V'''

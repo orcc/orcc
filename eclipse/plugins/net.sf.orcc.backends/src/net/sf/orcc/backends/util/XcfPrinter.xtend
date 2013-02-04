@@ -43,7 +43,7 @@ import net.sf.orcc.df.Instance
  */
 class XcfPrinter extends CommonPrinter {
 	
-	Map<String, List<Instance>> coreToInstanceMap
+	protected Map<String, List<Instance>> coreToInstanceMap
 	
 	var i = 0
 	
@@ -55,7 +55,7 @@ class XcfPrinter extends CommonPrinter {
 		printFile(compileXcfFile, new File(fileName))
 	}
 	
-	def compileXcfFile() '''
+	def protected compileXcfFile() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<Configuration>
 			<Partitioning>
@@ -66,7 +66,7 @@ class XcfPrinter extends CommonPrinter {
 		</Configuration>
 	'''
 	
-	def printPartition(List<Instance> instances) '''
+	def protected printPartition(Iterable<Instance> instances) '''
 		<Partition id="« i = i + 1 »">
 			«FOR instance : instances»
 				<Instance id="«instance.name»"/>

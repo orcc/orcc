@@ -1,14 +1,29 @@
-# 1.2.2 Dec 2012
+# 1.2.2 2013
 
 ### Notable changes and features
 
+- CAL editor: Improve code completion.
+- Front-end: Optimization of the generated intermediated representation by removing most of 
+useless memory copies.
 - Add a new experimental backend called 'High Level Synthesis' (or HLS) which use Vivado
 toolset to generate HDL designs.
+- Add a new experimental backend called 'COMPA'. It generate C source code, without any dependency
+to external libraries (SDL, pthreads, etc.). This backend can't compile classical applications,
+because they use Display.cal and needs SDL to work. This backend was needed by members of COMPA
+research project (see http://compa-ietr.insa-rennes.fr)
 - LLVM/TTA backends do not use broadcast actors anymore. The broadcasting is directly made
 by the source actor.
 - TTA backend:
-	* Support 'printf' and 'native' functions.
+	* Support light weight printing library of the TCE.
+	* Support a given set of 'native' functions for simulation purpose.
 	* Global performance improvement.
+	* Support automatic mapping of an application into a set of processors based on profiling.
+- Global improvement of the informations displayed by the compiler. The following levels of 
+messages are available : DEBUG, TRACE, NOTICE, WARNING, SEVERE.
+- The classifier supports now the Z3 solver v4.12+, the support of other solver is dropped.
+- Back-end CLI has new options such as '-m2m' which launch the Multi2MonoToken transformation.
+- Front-end CLI is now able to only build the actors needed by a given network instead of building
+the whole project and all its dependancies.
 
 ### Bugfixes
 
@@ -16,14 +31,14 @@ by the source actor.
 - UI : when creating an instance in a graph, existing names are checked in case insensitive
 mode to fix Microsoft Windows bug when printing source files.
 - Disable threaded generation to fix random bugs in generated files (without performance lost).
+- TTA backend: Transform all boolean variables in i8 since TCE do not support boolean.
 
 ### Misc
 
 - Move Graphiti-editor plugins into Orcc repository. Only one eclipse feature has to be
 installed to use Orcc. Separate Graphiti-editor plugin is not needed anymore.
-- All backends (but XLIM) use now Xtend instead of Stringtemplate to print code.
-- Global improvement of the information displayed by the compiler. The following levels of 
-messages are possible : LOG, DEBUG, NOTICE, WARNING, DEFECT.
+- All backends use now Xtend instead of Stringtemplate to print code.
+- Deletion of the XLIM back-end (replaced by Xronos).
 
 # 1.2.1 Oct 2012
 

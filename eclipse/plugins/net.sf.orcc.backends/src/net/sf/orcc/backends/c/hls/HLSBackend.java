@@ -37,7 +37,6 @@ import java.util.Map;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
-import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -46,6 +45,7 @@ import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
@@ -77,6 +77,7 @@ public class HLSBackend extends CBackend {
 	 * Path to target "testBench" folder
 	 */
 	private String testBenchPath;
+	private String commandPath;
 
 	/**
 	 * Configuration mapping
@@ -90,7 +91,8 @@ public class HLSBackend extends CBackend {
 		new File(path + File.separator + "bin").mkdirs();
 
 		srcPath = path + File.separator + "src";
-		testBenchPath = path + File.separator + "testBench";
+		testBenchPath = srcPath + File.separator + "testBench";
+		commandPath = srcPath + File.separator + "batchCommand";
 	}
 
 	@Override
@@ -115,7 +117,7 @@ public class HLSBackend extends CBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(true, false, true, false));
+		transformations.add(new TypeResizer(true, true, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new Multi2MonoToken());
 		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
@@ -201,8 +203,21 @@ public class HLSBackend extends CBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
-		
-		
+
+		OrccLogger.trace("Printing network VHDL Top... ");
+		if (new TopVhdlPrinter(network, options).print(srcPath) > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
+
+		OrccLogger.trace("Printing batch command... ");
+		if (new BatchCommandPrinter(network, options).print(commandPath) > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
+
 	}
 
 	@Override

@@ -27,6 +27,19 @@
          </option>
       </backend>
       <backend
+            class="net.sf.orcc.backends.c.compa.COMPABackend"
+            name="COMPA (experimental)">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.core.classify">
+         </option>
+         <option
+               id="net.sf.orcc.dontExportLibrary">
+         </option>
+      </backend>
+      <backend
             class="net.sf.orcc.backends.c.hls.HLSBackend"
             name="HLS (experimental)">
          <option
@@ -44,6 +57,9 @@
             name="Java">
          <option
                id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.backends.compileVTL">
          </option>
          <option
                id="net.sf.orcc.dontExportLibrary">
@@ -367,6 +383,13 @@
 				name="Target triple">
 			<textBox></textBox>
 		</option>
+  <option
+        defaultValue="false"
+        description="Generate VTL for all actors"
+        id="net.sf.orcc.backends.compileVTL"
+        name="VTL Code Generation">
+     <checkBox></checkBox>
+  </option>
    </extension>
    <extension
          id="c"
@@ -485,6 +508,18 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.opencl.OpenCLBackend">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="compa"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.c.compa.COMPABackend">
          </run>
       </application>
    </extension>

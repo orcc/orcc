@@ -53,12 +53,17 @@ class CMakePrinter extends CommonPrinter {
 		printFile(srcCMakeContent, src)
 	}
 	
-	def rootCMakeContent() '''
+	def private rootCMakeContent() '''
 		# Generated from «network.simpleName»
 		
 		cmake_minimum_required (VERSION 2.6)
 		
 		project («network.simpleName»)
+		
+		if(NOT NO_EXTERNAL_DEPENDENCIES)
+			# Required by osx
+			find_package(SDL REQUIRED)
+		endif(NOT NO_EXTERNAL_DEPENDENCIES)
 		
 		# Output folder
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
@@ -69,28 +74,41 @@ class CMakePrinter extends CommonPrinter {
 		
 		# Runtime libraries inclusion
 		set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
-		set(ROXML_INCLUDE_DIR ${LIBS_DIR}/roxml/include)
 		
+		«addLibrariesSubdirs»
+	'''
+
+	/**
+	 * Goal of this method is to allow text produced to be extended
+	 * for specific usages (other backends)
+	 */
+	def protected addLibrariesSubdirs() '''
 		add_subdirectory(${LIBS_DIR})
 		add_subdirectory(${SRC_DIR})
 	'''
-	
-	def srcCMakeContent() '''
+
+	def private srcCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		cmake_minimum_required (VERSION 2.6)
-		
+
 		set(filenames
 			«network.simpleName».c
 			«FOR child : network.children»
 				«child.label».c
 			«ENDFOR»
 		)
-		
-		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
-		
+
+		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
+
 		add_executable(«network.simpleName» ${filenames})
-		
-		target_link_libraries(«network.simpleName» orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+
+		target_link_libraries(«network.simpleName» orcc)
+
+		# Build library without any external library required (SDL, pthread, etc)
+		if(NOT NO_EXTERNAL_DEPENDENCIES)
+			target_link_libraries(«network.simpleName» ${CMAKE_THREAD_LIBS_INIT})
+		endif(NOT NO_EXTERNAL_DEPENDENCIES)
+
 	'''
 }

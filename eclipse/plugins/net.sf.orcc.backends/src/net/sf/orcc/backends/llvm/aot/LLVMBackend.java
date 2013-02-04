@@ -43,7 +43,6 @@ import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
-import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.df.Actor;
@@ -51,6 +50,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
@@ -206,11 +206,12 @@ public class LLVMBackend extends AbstractBackend {
 			// Copy specific windows batch file
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
 				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
-						path + File.separator + "run_cmake_with_VS_env.bat");
+						path + File.separator + "run_cmake_with_VS_env.bat",
+						debug);
 			}
 			OrccLogger.trace("Export libraries sources into " + libPath
 					+ "... ");
-			if (copyFolderToFileSystem("/runtime/C/libs", libPath)) {
+			if (copyFolderToFileSystem("/runtime/C/libs", libPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				return true;
 			} else {

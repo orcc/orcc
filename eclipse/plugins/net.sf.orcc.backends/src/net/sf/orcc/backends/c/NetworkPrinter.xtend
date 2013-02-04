@@ -53,7 +53,7 @@ class NetworkPrinter extends CTemplate {
 	protected val Network network;
 	protected val int fifoSize;
 	
-	var boolean geneticAlgo = false
+	protected var boolean geneticAlgo = false
 	var boolean ringTopology = false
 	
 	var boolean newSchedul = false
@@ -118,7 +118,7 @@ class NetworkPrinter extends CTemplate {
 		}
 	}
 
-	def getNetworkFileContent() '''
+	def protected getNetworkFileContent() '''
 		// Generated from "«network.name»"
 
 		#include <locale.h>
@@ -131,6 +131,8 @@ class NetworkPrinter extends CTemplate {
 		#ifndef _WIN32
 		#define __USE_GNU
 		#endif
+		
+		#include "SDL.h" //osx required
 		
 		#include "orcc_types.h"
 		#include "orcc_fifo.h"
@@ -182,6 +184,7 @@ class NetworkPrinter extends CTemplate {
 			extern void «child.label»_initialize(«FOR incoming : child.incoming SEPARATOR ", "»unsigned int fifo_«(incoming as Connection).targetPort.name»_id«ENDFOR»);
 			extern void «child.label»_scheduler(struct schedinfo_s *si);
 		«ENDFOR»
+		«printActorsSchedulers»
 		
 		/////////////////////////////////////////////////
 		// Declaration of a struct actor for each actor
@@ -234,6 +237,36 @@ class NetworkPrinter extends CTemplate {
 			«ENDFOR»
 		}
 		
+		«printLauncher»
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// Main
+		int main(int argc, char *argv[]) {
+			init_orcc(argc, argv);
+			
+			launcher();
+			
+			printf("End of simulation !\n");
+			return compareErrors;
+		}
+	'''
+
+	def protected printActorsSchedulers() '''
+		// Action schedulers
+		«FOR instance : network.children.actorInstances»
+			extern void «instance.name»_scheduler(struct schedinfo_s *si);
+		«ENDFOR»
+	'''
+
+	def protected getFifoId(Port port, Instance instance) {
+		if(instance.incomingPortMap.containsKey(port)) {
+			String::valueOf(instance.incomingPortMap.get(port).<Integer>getValueAsObject("fifoId"))
+		} else {
+			"-1"
+		}
+	}
+
+	def protected printLauncher() '''
 		static void launcher() {
 			int i, display_scheduler = -1;
 			
@@ -300,17 +333,6 @@ class NetworkPrinter extends CTemplate {
 				thread_join(thread_monitor);
 			«ENDIF»
 		}
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// Main
-		int main(int argc, char *argv[]) {
-			init_orcc(argc, argv);
-			
-			launcher();
-			
-			printf("End of simulation !\n");
-			return compareErrors;
-		}
 	'''
 	
 	def assignFifo(Vertex vertex) '''
@@ -327,7 +349,7 @@ class NetworkPrinter extends CTemplate {
 		struct fifo_«port.type.doSwitch»_s *«name»_«port.name» = &fifo_«fifoIndex»;
 	'''
 
-	def printScheduler() '''
+	def protected printScheduler() '''
 		void *scheduler(void *data) {
 			struct scheduler_s *sched = (struct scheduler_s *) data;
 			struct actor_s *my_actor;
