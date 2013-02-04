@@ -100,7 +100,8 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			String name = EcoreHelper.getFeature(entity, "name");
 			int index = name.lastIndexOf('.');
 			if (index != -1) {
-				name = name.substring(0, index) + ".impl"
+				name = "net.sf.orcc.simulators.runtime."
+						+ name.substring(0, index) + ".impl"
 						+ name.substring(index);
 			}
 

@@ -32,11 +32,11 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.runtime.RuntimeFactory;
-import net.sf.orcc.runtime.impl.GenericSource;
-import net.sf.orcc.runtime.impl.IntfChannel;
-import net.sf.orcc.runtime.impl.IntfNet;
-import net.sf.orcc.runtime.impl.SystemIO;
+import net.sf.orcc.simulators.runtime.RuntimeFactory;
+import net.sf.orcc.simulators.runtime.impl.GenericSource;
+import net.sf.orcc.simulators.runtime.impl.IntfChannel;
+import net.sf.orcc.simulators.runtime.impl.IntfNet;
+import net.sf.orcc.simulators.runtime.impl.SystemIO;
 
 /**
  * This class handle handle descriptors used by the native functions.

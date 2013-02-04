@@ -15,12 +15,12 @@ Require-Bundle: net.sf.orcc.core;bundle-version="1.2.1",
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: IETR/INSA Rennes
-Export-Package: net.sf.orcc.runtime,
- net.sf.orcc.runtime.impl,
- net.sf.orcc.simulators,
+Export-Package: net.sf.orcc.simulators,
  net.sf.orcc.simulators.jade,
- net.sf.orcc.simulators.slow,
- std.stdio.impl,
- std.video.impl
+ net.sf.orcc.simulators.runtime,
+ net.sf.orcc.simulators.runtime.impl,
+ net.sf.orcc.simulators.runtime.std.stdio.impl,
+ net.sf.orcc.simulators.runtime.std.video.impl,
+ net.sf.orcc.simulators.slow
 Bundle-ClassPath: .
 
