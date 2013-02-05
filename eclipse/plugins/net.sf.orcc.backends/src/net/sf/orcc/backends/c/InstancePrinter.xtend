@@ -61,6 +61,7 @@ import net.sf.orcc.util.OrccLogger
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.OrccBackendsConstants.*
+import net.sf.orcc.df.Entity
 
 /**
  * Generate and print instance source file for C backend.
@@ -230,7 +231,7 @@ class InstancePrinter extends CTemplate {
 		«FOR port : actor.inputs»
 			static unsigned int index_«port.name»;
 			static unsigned int numTokens_«port.name»;
-			#define NUM_READERS_«port.name» «port.getNumReaders»
+			#define NUM_READERS_«port.name» «port.numReaders»
 			#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 			#define tokens_«port.name» «port.fullName»->contents
 			
@@ -245,7 +246,7 @@ class InstancePrinter extends CTemplate {
 		// Predecessors
 		«FOR port : actor.inputs»
 			«IF incomingPortMap.get(port) != null»
-				extern struct actor_s «(incomingPortMap.get(port).source as Instance).name»;
+				extern struct actor_s «incomingPortMap.get(port).source.label»;
 			«ENDIF»
 		«ENDFOR»
 		
@@ -272,7 +273,7 @@ class InstancePrinter extends CTemplate {
 		// Successors
 		«FOR port : actor.outputs»
 			«FOR successor : outgoingPortMap.get(port)»
-				extern struct actor_s «(successor.target as Instance).name»;
+				extern struct actor_s «successor.target.label»;
 			«ENDFOR»
 		«ENDFOR»
 		
@@ -282,15 +283,19 @@ class InstancePrinter extends CTemplate {
 			static unsigned int fifo_«port.fullName»_id;
 		«ENDFOR»
 		
+		////////////////////////////////////////////////////////////////////////////////
+		// Parameter values of the instance
 		«IF instance != null»
-			////////////////////////////////////////////////////////////////////////////////
-			// Parameter values of the instance
 			«FOR arg : instance.arguments»
 				«IF arg.value.exprList»
 					static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
 				«ELSE»
 					#define «arg.variable.name» «arg.value.doSwitch»
 				«ENDIF»
+			«ENDFOR»
+		«ELSE»
+			«FOR variable : actor.parameters»
+				«variable.declareStateVar»
 			«ENDFOR»
 		«ENDIF»
 		
@@ -484,7 +489,7 @@ class InstancePrinter extends CTemplate {
 		if (numTokens_«port.name» - index_«port.name» < «pattern.numTokensMap.get(port)») {
 			if( ! «name».sched->round_robin || i > 0) {
 				«IF incomingPortMap.containsKey(port)»
-					sched_add_schedulable(«name».sched, &«(incomingPortMap.get(port).source as Instance).name», RING_TOPOLOGY);
+					sched_add_schedulable(«name».sched, &«incomingPortMap.get(port).source.label», RING_TOPOLOGY);
 				«ENDIF»
 			}
 		}
@@ -515,7 +520,7 @@ class InstancePrinter extends CTemplate {
 			}
 			
 		«ENDIF»
-		void «name»_initialize(«actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])») {
+		void «name»_initialize(«actor.inputs.join(", ", ['''unsigned int fifo_«it.name»_id'''])») {
 			«IF ! actor.initializes.empty»
 				struct schedinfo_s si;
 				si.num_firings = 0;
@@ -720,7 +725,7 @@ class InstancePrinter extends CTemplate {
 		if (incomingPortMap.get(port) == null) {
 			'''0'''
 		} else {
-			val predecessor = incomingPortMap.get(port).source as Instance
+			val predecessor = incomingPortMap.get(port).source.getAdapter(typeof(Entity))
 			val predecessorPort = incomingPortMap.get(port).sourcePort
 			'''«predecessor.outgoingPortMap.get(predecessorPort).size»'''
 		}
