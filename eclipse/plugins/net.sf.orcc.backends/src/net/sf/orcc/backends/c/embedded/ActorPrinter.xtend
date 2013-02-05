@@ -32,7 +32,6 @@ package net.sf.orcc.backends.c.embedded
 import java.util.ArrayList
 import net.sf.orcc.backends.c.InstancePrinter
 import net.sf.orcc.df.Action
-import net.sf.orcc.df.Actor
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.InstReturn
 import java.io.File
@@ -49,7 +48,7 @@ class ActorPrinter extends InstancePrinter {
 		super(options)
 	}
 	
-	def printIDLAndCFiles(String targetFolder, Actor actor) {
+	override print(String targetFolder) {
 		var numFilesCached = 0
 		
 		val idlContent = actorIDLContent
