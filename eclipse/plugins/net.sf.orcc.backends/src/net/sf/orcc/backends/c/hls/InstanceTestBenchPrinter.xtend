@@ -192,11 +192,8 @@ import java.io.File
 	'''
 	
 	def assignOutputFifo(Connection connection) '''
-		«IF connection.fifoType.bool»
-			«connection.fifoName»_din    : OUT STD_LOGIC;
-		«ELSE»
-			«connection.fifoName»_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
-		«ENDIF»
+		
+		«connection.fifoName»_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
 		«connection.fifoName»_full_n : IN STD_LOGIC;
 		«connection.fifoName»_write  : OUT STD_LOGIC;
 	'''
@@ -204,31 +201,22 @@ import java.io.File
 	
 	
 	def assignInputFifo(Connection connection) '''
-		«IF connection.fifoType.bool»
-			«connection.fifoName»_dout   : IN STD_LOGIC;
-		«ELSE»
-			«connection.fifoName»_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
-		«ENDIF»
+		
+		«connection.fifoName»_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0);
 		«connection.fifoName»_empty_n : IN STD_LOGIC;
 		«connection.fifoName»_read    : OUT STD_LOGIC;
 	'''
 	
 	def printOutputSignalFifoAssignHLS(Connection connection) '''
-		«IF connection.fifoType.bool»
-			signal «connection.fifoName»_din    :  STD_LOGIC := '0';
-		«ELSE»
-			signal «connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
-		«ENDIF»
+		
+		signal «connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
 		signal «connection.fifoName»_full_n :  STD_LOGIC := '0';
 		signal «connection.fifoName»_write  :  STD_LOGIC := '0';
 	'''
 	
 	def printInputSignalFifoAssignHLS(Connection connection) '''
-		«IF connection.fifoType.bool»
-			signal «connection.fifoName»_dout   :  STD_LOGIC := '0';
-		«ELSE»
-			signal «connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
-		«ENDIF»
+		
+		signal «connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits» - 1 downto 0) := (others => '0');
 		signal «connection.fifoName»_empty_n :  STD_LOGIC := '0';
 		signal «connection.fifoName»_read    :  STD_LOGIC := '0';
 	'''

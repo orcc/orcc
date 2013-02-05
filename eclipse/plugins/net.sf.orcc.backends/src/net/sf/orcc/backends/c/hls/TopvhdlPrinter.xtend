@@ -139,7 +139,7 @@ import java.io.File
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
 				«connList.head.fifoName»_V_din <= tmp_«connList.head.fifoName»_din;
-				--tmp_«connList.head.fifoName»_full_n <= «connList.head.fifoName»_V_full_n;
+				tmp_«connList.head.fifoName»_full_n <= «connList.head.fifoName»_V_full_n;
 				«connList.head.fifoName»_V_write <= tmp_«connList.head.fifoName»_write;
 			«ENDIF»
 		«ENDFOR»
@@ -228,11 +228,6 @@ import java.io.File
 				«printInputFifoAssignHLS(connList)»
 			«ENDIF»
 		«ENDFOR»
-		«IF instance.actor.outputs.empty»
-			outFIFO_«instance.name»_V_din    : OUT STD_LOGIC_VECTOR (31 downto 0);
-			outFIFO_«instance.name»_V_full_n : IN STD_LOGIC;
-			outFIFO_«instance.name»_V_write  : OUT STD_LOGIC;
-		«ENDIF»
 	'''
 	
 	def printOutputFifoAssignHLS( Connection connection) '''

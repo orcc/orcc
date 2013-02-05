@@ -100,7 +100,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDFOR»
 		
 		«IF instance.actor.outputs.empty»
-			stream<int> outFIFO_«instance.name»;
+			extern stream<int> outFIFO_«instance.name»;
 		«ENDIF»
 		
 		
@@ -149,7 +149,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ELSE»
 			void «instance.name»_scheduler() {		
 			«IF instance.actor.outputs.empty»
-				outFIFO_«instance.name».write(0);
+				if (! outFIFO_«instance.name».full()){
+					outFIFO_«instance.name».write(0);
+				}
 			«ENDIF»
 				«instance.actor.actionsOutsideFsm.printActionLoop»
 				
@@ -171,7 +173,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		void «instance.name»_scheduler() {
 			// jump to FSM state 
 			«IF instance.actor.outputs.empty»
-				outFIFO_«instance.name».write(0);
+				if (! outFIFO_«instance.name».full()){
+					outFIFO_«instance.name».write(0);
+				}
 			«ENDIF»
 			switch (_FSM_state) {
 				«FOR state : instance.actor.fsm.states»
@@ -291,7 +295,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 		«IF (trgtPort != null)»
 			«IF !instance.outgoingPortMap.get(trgtPort).head.fifoName.toString.empty»
-				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
 			«ENDIF»
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
@@ -349,19 +353,12 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
-			«IF transitions.action.outputPattern == null»
-				if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»()) {
-			«ELSE»
-				if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»() «transitions.action.outputPattern.printOutputPattern») {
-			«ENDIF»	
-			«instance.name»_«transitions.action.body.name»();
-			«IF transitions.target != state»
+			if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»()) {
+				«instance.name»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;
-			«ELSE»
-				goto l_«transitions.target.name»;
-			«ENDIF»
-			}«ENDFOR» else {
+			}
+		«ENDFOR» else {
 			_FSM_state = my_state_«state.name»;
 			goto finished;
 		}
@@ -386,7 +383,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	def directive (String path)'''
-	 #set_directives
-	 config_dataflow -default_channel fifo -fifo_depth «fifoSize»
+	#set_directives
+	config_dataflow -default_channel fifo -fifo_depth «fifoSize»
+	#set_directive_pipeline «instance.name»_scheduler
+	«FOR action : instance.actor.actions»
+		#set_directive_pipeline «action.name»
+	«ENDFOR»
+	«FOR function : instance.actor.procs»
+		#set_directive_pipeline «function.name»
+	«ENDFOR»
 	'''
 }
