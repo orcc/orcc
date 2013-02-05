@@ -70,7 +70,7 @@ class ActorPrinter extends InstancePrinter {
 		super(options)
 	}
 	
-	override print(String targetFolder) {
+	override protected print(String targetFolder) {
 		val content = fileContent
 		val file = new File(targetFolder + File::separator + actor.simpleName)
 		
@@ -82,7 +82,7 @@ class ActorPrinter extends InstancePrinter {
 		}
 	}
 	
-	override setActor(Actor actor) {
+	override protected setActor(Actor actor) {
 		this.name = actor.name
 		this.actor = actor
 		this.incomingPortMap = actor.incomingPortMap
@@ -98,7 +98,7 @@ class ActorPrinter extends InstancePrinter {
 	 * @param object the object
 	 * @return unique reference to the given object
 	 */
-	def getObjectReference(Object object) {
+	def private getObjectReference(Object object) {
 		// We use hashCode instead of object itself in the list to ensure
 		// for example 2 instances of Type with same parameters will be
 		// duplicated in the list
@@ -110,7 +110,7 @@ class ActorPrinter extends InstancePrinter {
 		return '''!«id»'''
 	}
 	
-	override getFileContent() '''
+	override protected getFileContent() '''
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Generated from "«actor.name»"
 		declare i32 @printf(i8* noalias , ...) nounwind 
@@ -175,7 +175,7 @@ class ActorPrinter extends InstancePrinter {
 		«decl_MD»
 	'''
 	
-	def decl_MD() '''
+	def private decl_MD() '''
 		!source = !{«actor.file.fullPath.getObjectReference»}
 		!name = !{«actor.name.objectReference»}
 		!action_scheduler = !{«actor.objectReference»}
@@ -288,7 +288,7 @@ class ActorPrinter extends InstancePrinter {
 		«ENDIF»
 	'''
 	
-	def moC_MD() {
+	def private moC_MD() {
 		val value =
 			if (actor.moC.CSDF) ''' , metadata «actor.moC.objectReference»'''
 			else if (actor.moC.quasiStatic) ''' , «(actor.moC as QSDFMoC).actions.join(", ", ['''metadata «objectReference»'''])»'''
@@ -298,11 +298,11 @@ class ActorPrinter extends InstancePrinter {
 		'''
 	}
 
-	def MoCName_MD(MoC moc) {
+	def private MoCName_MD(MoC moc) {
 		'''metadata !"«moc.shortName»"'''
 	}
 		
-	def pattern_MD(Pattern pattern) {
+	def private pattern_MD(Pattern pattern) {
 		val numTokens =
 			if (pattern.numTokensMap != null) '''metadata «pattern.numTokensMap.objectReference»'''
 			else "null"
@@ -314,7 +314,7 @@ class ActorPrinter extends InstancePrinter {
 		'''
 	}
 	
-	def action_MD(Action action) {
+	def private action_MD(Action action) {
 		val tag = if (action.tag.identifiers.empty) "null"
 				else '''metadata «action.tag.objectReference»'''
 		val input = if (action.inputPattern.empty) "null"
@@ -334,29 +334,29 @@ class ActorPrinter extends InstancePrinter {
 		'''
 	}
 
-	def argumentTypeDeclaration(Param param) {
+	def private argumentTypeDeclaration(Param param) {
 		if (param.variable.type.string) "i8*"
 		else if (param.variable.type.list) '''«param.variable.type.doSwitch»*'''
 		else '''«param.variable.type.doSwitch»'''
 	}
 
-	def procNative_MD(Procedure proc)
+	def private procNative_MD(Procedure proc)
 		'''«IF proc.native»i1 1«ELSE»i1 0«ENDIF»'''
 
 	
-	def varIndex_MD(Var variable)
+	def private varIndex_MD(Var variable)
 		'''i32 «IF variable.index != null»«variable.index»«ELSE»0«ENDIF»'''
 	
-	def varAssignable_MD(Var variable) 
+	def private varAssignable_MD(Var variable) 
 		'''i1 «IF variable.assignable»1«ELSE»0«ENDIF»'''
 	
-	def varSize_MD(Type type)
+	def private varSize_MD(Type type)
 		'''«IF type.list»«(type as TypeList).dimensions.join(", ", ['''i32 «it»'''])»«ELSE»null«ENDIF»'''
 	
-	def name_MD(String name)
+	def private name_MD(String name)
 		'''metadata !"«name»"'''
 	
-	def actionScheduler_MD() {
+	def private actionScheduler_MD() {
 		val outsideFSM = if ( ! actor.actionsOutsideFsm.empty) '''metadata «actor.actionsOutsideFsm.objectReference»''' else "null"
 		val fsm = if (actor.fsm != null) '''metadata «actor.fsm.objectReference»''' else "null"
 		'''
@@ -375,7 +375,7 @@ class ActorPrinter extends InstancePrinter {
 	}
 	
 	// In some case, «actor.fsm.transitions» can be the same object list than «actor.fsm.states.get(0).outgoing». We use «actor.name.concat("_transitions")» to prevent this
-	def FSM_MD() '''
+	def private FSM_MD() '''
 		«actor.fsm.objectReference» = metadata !{«actor.fsm.initialState.name.name_MD», metadata «actor.fsm.states.objectReference», metadata «actor.name.concat("_transitions").objectReference»}
 		;;; States
 		«actor.fsm.states.objectReference» = metadata !{«actor.fsm.states.join(", ", [name.name_MD])»}
@@ -386,7 +386,7 @@ class ActorPrinter extends InstancePrinter {
 		«ENDFOR»
 	'''
 	
-	def transition_MD(State state) '''
+	def private transition_MD(State state) '''
 		;;;; Transitions from «state.name»
 		«IF state.outgoing.empty»
 			«state.objectReference» = metadata !{«state.name.name_MD», null}
@@ -399,7 +399,7 @@ class ActorPrinter extends InstancePrinter {
 		«ENDIF»
 	'''
 
-	def varType_MD(Type type) {
+	def private varType_MD(Type type) {
 		switch type {
 			case type.isInt: '''i32 «(type as TypeInt).size»'''
 			case type.isUint: '''i32 «(type as TypeUint).size»'''
@@ -435,7 +435,7 @@ class ActorPrinter extends InstancePrinter {
 			'''ret «retInst.value.type.doSwitch» «retInst.value.doSwitch»'''
 	}
 	
-	override print(Action action) '''
+	override protected print(Action action) '''
 		define «action.scheduler.returnType.doSwitch» @«action.scheduler.name»(«action.scheduler.parameters.join(", ", [argumentDeclaration])») nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
@@ -470,23 +470,23 @@ class ActorPrinter extends InstancePrinter {
 		}
 	'''
 	
-	def actorParameter(Var variable)
+	def private actorParameter(Var variable)
 		'''@«variable.name» = global «variable.type.doSwitch» undef'''
 
 	
-	def fifo(Port port) '''
+	def private fifo(Port port) '''
 		«port.fifoVarName» = global «port.type.doSwitch»* null
 	'''
 	
-	def fifoVarName(Port port)
+	def private fifoVarName(Port port)
 		'''@«port.name»_ptr'''
 	
-	def fifoVar(Port port, Var variable) '''
+	def private fifoVar(Port port, Var variable) '''
 		%«variable.name»_ptr = load «port.type.doSwitch»** «port.fifoVarName»
 		%«variable.name» = bitcast «port.type.doSwitch»* %«variable.name»_ptr to «variable.type.doSwitch»*
 	'''
 
-	def void computePatterns() {
+	def private void computePatterns() {
 		for (init : actor.initializes) {
 			init.inputPattern.compute
 			init.outputPattern.compute
@@ -511,12 +511,12 @@ class ActorPrinter extends InstancePrinter {
 		}
 	}
 	
-	def compute(Pattern pattern) {
+	def private compute(Pattern pattern) {
 		if( ! pattern.empty)
 			patternList.add(pattern)
 	}
 	
-	override computeCastedList() {
+	override protected computeCastedList() {
 		castedList.clear
 		for (variable : actor.eAllContents.toIterable.filter(typeof(Var))) {
 			if(variable.type.list && ! variable.defs.empty && variable.defs.head.eContainer instanceof InstCast) {

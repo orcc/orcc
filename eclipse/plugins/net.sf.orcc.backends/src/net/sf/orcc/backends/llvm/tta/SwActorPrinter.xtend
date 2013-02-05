@@ -50,20 +50,20 @@ class SwActorPrinter extends InstancePrinter {
 		this.processor = processor
 	}
 	
-	override getAddrSpace(Connection connection) {
+	override protected getAddrSpace(Connection connection) {
 		val id = processor.getAddrSpaceId(connection)
 		if(id != null) {
 			''' addrspace(«id»)'''
 		}
 	}
 	
-	override getProperties(Port port) {
+	override protected getProperties(Port port) {
 		if(!outgoingPortMap.get(port).nullOrEmpty || incomingPortMap.get(port) != null) {
 			''' volatile'''
 		}
 	}
 	
-	def printNativeWrite(Port port, Var variable) {
+	def private printNativeWrite(Port port, Var variable) {
 		val innerType = (variable.type as TypeList).innermostType.doSwitch
 		'''
 		%tmp_«variable.name»_elt = getelementptr «variable.type.doSwitch»* «variable.print», i32 0, i1 0 
@@ -72,9 +72,9 @@ class SwActorPrinter extends InstancePrinter {
 		'''
 	}
 	
-	override printArchitecture() ''''''
+	override protected printArchitecture() ''''''
 
-	override print(Action action) '''
+	override protected print(Action action) '''
 		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
@@ -140,13 +140,13 @@ class SwActorPrinter extends InstancePrinter {
 		«ENDIF»
 	'''
 	
-	override print(Procedure procedure) '''
+	override protected print(Procedure procedure) '''
 		«IF !procedure.native»
 			«super.print(procedure)»
 		«ENDIF»
 	'''
 	
-	def getIr(EList<Arg> args) {
+	def private getIr(EList<Arg> args) {
 		var irs = new String;
 		for (arg : args) {
 			irs = irs + ", ir"

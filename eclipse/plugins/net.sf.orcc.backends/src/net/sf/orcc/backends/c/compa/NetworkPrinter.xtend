@@ -118,7 +118,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		}
 	'''
 
-	override printScheduler() '''
+	override protected printScheduler() '''
 		void scheduler() {
 			int stop = 0;
 			while(!stop) {

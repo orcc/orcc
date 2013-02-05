@@ -335,7 +335,7 @@ class NetworkPrinter extends CTemplate {
 		}
 	'''
 	
-	def assignFifo(Vertex vertex) '''
+	def protected assignFifo(Vertex vertex) '''
 		«FOR connList : vertex.getAdapter(typeof(Entity)).outgoingPortMap.values»
 			«printFifoAssign(connList.head.source.label, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
 			«FOR conn : connList»
@@ -345,7 +345,7 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 	'''
 	
-	def printFifoAssign(String name, Port port, int fifoIndex) '''
+	def protected printFifoAssign(String name, Port port, int fifoIndex) '''
 		struct fifo_«port.type.doSwitch»_s *«name»_«port.name» = &fifo_«fifoIndex»;
 	'''
 
@@ -390,13 +390,13 @@ class NetworkPrinter extends CTemplate {
 		}
 	'''
 
-	def allocateFifos(Vertex vertex) '''
+	def protected allocateFifos(Vertex vertex) '''
 		«FOR connectionList : vertex.getAdapter(typeof(Entity)).outgoingPortMap.values»
 			«allocateFifo(connectionList.get(0), connectionList.size)»
 		«ENDFOR»
 	'''
 	
-	def allocateFifo(Connection conn, int nbReaders) '''
+	def protected allocateFifo(Connection conn, int nbReaders) '''
 		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 	'''
 	
