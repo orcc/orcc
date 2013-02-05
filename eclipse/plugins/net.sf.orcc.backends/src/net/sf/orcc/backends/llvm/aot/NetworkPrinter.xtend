@@ -33,6 +33,7 @@ import java.util.Map
 import net.sf.orcc.df.Network
 
 import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.df.Actor
 
 /*
  * Compile Network LLVM source code 
@@ -89,10 +90,14 @@ class NetworkPrinter extends LLVMTemplate {
 		
 		«FOR instance : network.children.actorInstances»
 			declare void @«instance.name»_scheduler()
-		«ENDFOR»
-		«FOR instance : network.children.actorInstances»
 			«IF ! instance.actor.initializes.empty»
 				declare void @«instance.name»_initialize()
+			«ENDIF»
+		«ENDFOR»
+		«FOR actor : network.children.filter(typeof(Actor))»
+			declare void @«actor.name»_scheduler()
+			«IF ! actor.initializes.empty»
+				declare void @«actor.name»_initialize()
 			«ENDIF»
 		«ENDFOR»
 		
@@ -107,11 +112,21 @@ class NetworkPrinter extends LLVMTemplate {
 					call void @«instance.name»_initialize()
 				«ENDIF»
 			«ENDFOR»
+			«FOR instance : network.children.actorInstances»
+				«IF ! instance.actor.initializes.empty»
+					call void @«instance.name»_initialize()
+				«ENDIF»
+			«ENDFOR»
+			«FOR actor : network.children.filter(typeof(Actor))»
+				«IF ! actor.initializes.empty»
+					call void @«actor.name»_initialize()
+				«ENDIF»
+			«ENDFOR»
 			br label %loop
 		
 		loop:
-			«FOR instance : network.children.actorInstances»
-				call void @«instance.name»_scheduler()
+			«FOR child : network.children»
+				call void @«child.label»_scheduler()
 			«ENDFOR»
 			br label %loop
 		}

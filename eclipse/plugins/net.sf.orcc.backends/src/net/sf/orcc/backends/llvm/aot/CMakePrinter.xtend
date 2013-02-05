@@ -31,7 +31,6 @@ package net.sf.orcc.backends.llvm.aot
 import java.io.File
 import java.util.Map
 import net.sf.orcc.backends.CommonPrinter
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 
 import static net.sf.orcc.OrccLaunchConstants.*
@@ -118,8 +117,8 @@ class CMakePrinter extends CommonPrinter {
 		
 		set(«network.simpleName»_SRCS
 			«network.simpleName».ll
-			«FOR instance : network.children.filter(typeof(Instance)).filter[ ! actor.native]»
-				«instance.name».ll
+			«FOR child : network.children»
+				«child.label».ll
 			«ENDFOR»
 		)
 		

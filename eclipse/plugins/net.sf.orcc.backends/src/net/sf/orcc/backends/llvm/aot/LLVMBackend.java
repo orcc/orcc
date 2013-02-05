@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.c.InstancePrinter;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
@@ -224,7 +225,12 @@ public class LLVMBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(instance, options).print(srcPath) > 0;
+		return new InstancePrinter(options).print(srcPath, instance) > 0;
+	}
+	
+	@Override
+	protected boolean printActor(Actor actor) {
+		return new InstancePrinter(options).print(srcPath, actor) > 0;
 	}
 
 }

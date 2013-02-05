@@ -243,7 +243,7 @@ public class JadeBackend extends AbstractBackend {
 	@Override
 	protected boolean printActor(Actor actor) {
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
-		return new ActorPrinter(actor, options).print(folder) > 0;
+		return new ActorPrinter(options).print(folder, actor) > 0;
 	}
 
 	private void printMapping(Network network) {

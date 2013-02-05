@@ -32,7 +32,6 @@ import java.util.Map
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.Action
 import net.sf.orcc.ir.Var
@@ -46,8 +45,8 @@ class SwActorPrinter extends InstancePrinter {
 	
 	Processor processor;
 	
-	new(Instance instance, Map<String, Object> options, Processor processor) {
-		super(instance, options)
+	new(Map<String, Object> options, Processor processor) {
+		super(options)
 		this.processor = processor
 	}
 	
@@ -59,7 +58,7 @@ class SwActorPrinter extends InstancePrinter {
 	}
 	
 	override getProperties(Port port) {
-		if(!instance.outgoingPortMap.get(port).nullOrEmpty || instance.incomingPortMap.get(port) != null) {
+		if(!outgoingPortMap.get(port).nullOrEmpty || incomingPortMap.get(port) != null) {
 			''' volatile'''
 		}
 	}
@@ -82,7 +81,7 @@ class SwActorPrinter extends InstancePrinter {
 				«local.declare»
 			«ENDFOR»
 			«FOR port : action.peekPattern.ports.notNative»
-				«port.loadVar(instance.incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port))»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
 		
@@ -100,10 +99,10 @@ class SwActorPrinter extends InstancePrinter {
 				«action.outputPattern.getVariable(port).declare»
 			«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
-				«port.loadVar(instance.incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port))»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
-				«FOR connection : instance.outgoingPortMap.get(port)»
+				«FOR connection : outgoingPortMap.get(port)»
 					«port.loadVar(connection)»
 				«ENDFOR»
 			«ENDFOR»
@@ -113,12 +112,12 @@ class SwActorPrinter extends InstancePrinter {
 			«block.doSwitch»
 		«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
-				«val connection = instance.incomingPortMap.get(port)»
+				«val connection = incomingPortMap.get(port)»
 				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port))»
 				call void @read_end_«port.name»_«connection.getSafeId(port)»()
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
-				«FOR connection : instance.outgoingPortMap.get(port)»
+				«FOR connection : outgoingPortMap.get(port)»
 					«port.updateVar(connection, action.outputPattern.getNumTokens(port))»
 					call void @write_end_«port.name»_«connection.getSafeId(port)»()
 				«ENDFOR»

@@ -70,6 +70,8 @@ import java.io.File
 import static net.sf.orcc.backends.OrccBackendsConstants.*
 import static net.sf.orcc.OrccLaunchConstants.*
 import net.sf.orcc.backends.ir.ExprNull
+import net.sf.orcc.df.Actor
+import net.sf.orcc.OrccRuntimeException
 
 /*
  * Compile Instance llvm source code
@@ -79,7 +81,11 @@ import net.sf.orcc.backends.ir.ExprNull
  */
 class InstancePrinter extends LLVMTemplate {
 	
-	protected val Instance instance
+	protected var Instance instance
+	protected var Actor actor
+	protected var Map<Port, Connection> incomingPortMap
+	protected var Map<Port, List<Connection>> outgoingPortMap
+	protected var String name
 	
 	protected val List<Var> castedList = new ArrayList<Var>
 	val Map<State, Integer> stateToLabel = new HashMap<State, Integer>
@@ -92,18 +98,12 @@ class InstancePrinter extends LLVMTemplate {
 	 * Default constructor, do not activate profile option and do not set instance (Jade requirement)
 	 */
 	new() {
-		instance = null
 	}
 	
 	/**
 	 * Default constructor, do not activate profile option
 	 */
-	new(Instance instance, Map<String, Object> options) {
-		this.instance = instance
-		
-		if (!instance.isActor) {
-			OrccLogger::severeln("Instance " + instance.name + " is not an Actor's instance")
-		}
+	new(Map<String, Object> options) {		
 		if(options.containsKey("net.sf.orcc.backends.profile")){
 			optionProfile = options.get("net.sf.orcc.backends.profile") as Boolean
 		}
@@ -117,9 +117,33 @@ class InstancePrinter extends LLVMTemplate {
 		computeStateToLabel
 		computePortToIndexByPatternMap
 	}
+	
+	/**
+	 * Print file content from a given instance
+	 * 
+	 * @param targetFolder folder to print the instance file
+	 * @param instance the given instance
+	 * @return 1 if file was cached, 0 if file was printed
+	 */
+	def print(String targetFolder, Instance instance) {
+		setInstance(instance)	
+		print(targetFolder)
+	}
+	
+	/**
+	 * Print file content from a given actor
+	 * 
+	 * @param targetFolder folder to print the instance file
+	 * @param instance the given instance
+	 * @return 1 if file was cached, 0 if file was printed
+	 */
+	def print(String targetFolder, Actor actor) {
+		setActor(actor)
+		print(targetFolder)
+	}
 		
-	def print(String targetFolder) {
-		val content = instanceFileContent
+	def protected print(String targetFolder) {
+		val content = fileContent
 		val file = new File(targetFolder + File::separator + instance.name + ".ll")
 		
 		if(needToWriteFile(content, file)) {
@@ -130,13 +154,32 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	}
 	
-	def private getInstanceFileContent() '''
-		«val inputs = instance.actor.inputs.notNative»
-		«val outputs = instance.actor.outputs.notNative»
+	def protected setInstance(Instance instance) {
+		if (!instance.isActor) {
+			throw new OrccRuntimeException("Instance " + instance.name + " is not an Actor's instance")
+		}
+		
+		this.instance = instance
+		this.name = instance.name
+		this.actor = instance.actor
+		this.incomingPortMap = instance.incomingPortMap
+		this.outgoingPortMap = instance.outgoingPortMap		
+	}
+	
+	def protected setActor(Actor actor) {
+		this.name = actor.name
+		this.actor = actor
+		this.incomingPortMap = actor.incomingPortMap
+		this.outgoingPortMap = actor.outgoingPortMap
+	}
+	
+	def private getFileContent() '''
+		«val inputs = actor.inputs.notNative»
+		«val outputs = actor.outputs.notNative»
 		«printArchitecture»
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-		; Generated from "«instance.actor.name»"
+		; Generated from "«actor.name»"
 		declare i32 @printf(i8* noalias , ...) nounwind 
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -147,7 +190,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 		
 		«FOR port : outputs»
-			«FOR connection : instance.outgoingPortMap.get(port)»
+			«FOR connection : outgoingPortMap.get(port)»
 				«connection.printOutput(port)»
 			«ENDFOR»
 		«ENDFOR»
@@ -160,38 +203,38 @@ class InstancePrinter extends LLVMTemplate {
 
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; State variables
-		«FOR variable : instance.actor.stateVars»
+		«FOR variable : actor.stateVars»
 			«variable.declare»
 		«ENDFOR»
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Functions/procedures
-		«FOR proc : instance.actor.procs»
+		«FOR proc : actor.procs»
 			«proc.print»
 			
 		«ENDFOR»
 
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Initializes
-		«FOR init : instance.actor.initializes»
+		«FOR init : actor.initializes»
 			«init.print»
 			
 		«ENDFOR»
 
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Actions
-		«FOR action : instance.actor.actions»
+		«FOR action : actor.actions»
 			«action.print»
 			
 		«ENDFOR»
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Action-scheduler
-		«IF ! instance.actor.initializes.empty»
-			define void @«instance.name»_initialize() nounwind {
+		«IF ! actor.initializes.empty»
+			define void @«name»_initialize() nounwind {
 			entry:
 				«printCallStartTokenFunctions»
-				«FOR init : instance.actor.initializes»
+				«FOR init : actor.initializes»
 					call «init.body.returnType.doSwitch» @«init.body.name»()
 				«ENDFOR»
 				«printCallEndTokenFunctions»
@@ -200,7 +243,7 @@ class InstancePrinter extends LLVMTemplate {
 			
 		«ENDIF»
 		
-		«IF instance.actor.hasFsm»
+		«IF actor.hasFsm»
 			«schedulerWithFSM»
 		«ELSE»
 			«schedulerWithoutFSM»
@@ -210,16 +253,16 @@ class InstancePrinter extends LLVMTemplate {
 	def protected printArchitecture() '''target triple = "«optionArch»"'''
 	
 	def private schedulerWithFSM() '''
-		@_FSM_state = internal global i32 «stateToLabel.get(instance.actor.fsm.initialState)»
+		@_FSM_state = internal global i32 «stateToLabel.get(actor.fsm.initialState)»
 		
-		«IF ! instance.actor.actionsOutsideFsm.empty»
-			define void @«instance.name»_outside_FSM_scheduler() nounwind {
+		«IF ! actor.actionsOutsideFsm.empty»
+			define void @«name»_outside_FSM_scheduler() nounwind {
 			entry:
 				br label %bb_outside_scheduler_start
 
 			bb_outside_scheduler_start:
 				;; no read/write here!
-			«printActionLoop(instance.actor.actionsOutsideFsm, true)»
+			«printActionLoop(actor.actionsOutsideFsm, true)»
 			
 			bb_outside_finished:
 				;; no read_end/write_end here!
@@ -227,20 +270,20 @@ class InstancePrinter extends LLVMTemplate {
 			}
 		«ENDIF»
 		
-		define void @«instance.name»_scheduler() nounwind {
+		define void @«name»_scheduler() nounwind {
 		entry:
 			br label %bb_scheduler_start
 		
 		bb_scheduler_start:
 			«printCallStartTokenFunctions»
-			«instance.actor.fsm.printFsmSwitch»
+			«actor.fsm.printFsmSwitch»
 			br label %bb_scheduler_start
 		
 		default:
 			; TODO: print error
 			br label %bb_scheduler_start
 		
-		«FOR state : instance.actor.fsm.states»
+		«FOR state : actor.fsm.states»
 			«state.printTransition»
 		«ENDFOR»
 		
@@ -267,8 +310,8 @@ class InstancePrinter extends LLVMTemplate {
 	def private printTransition(State state) '''
 		; STATE «state.name»
 		bb_s_«state.name»:
-			«IF ! instance.actor.actionsOutsideFsm.empty»
-				call void @«instance.name»_outside_FSM_scheduler()
+			«IF ! actor.actionsOutsideFsm.empty»
+				call void @«name»_outside_FSM_scheduler()
 			«ENDIF»
 		«FOR transition : state.outgoing.filter(typeof(Transition))»
 			«val action = transition.action»
@@ -299,7 +342,7 @@ class InstancePrinter extends LLVMTemplate {
 					;; Output pattern
 					«checkOutputPattern(action, outputPattern, state)»
 
-					br i1 %has_valid_outputs_«lastPort.name»_«instance.outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«extName», label %bb_«extName»_fire, label %bb_«state.name»_finished
+					br i1 %has_valid_outputs_«lastPort.name»_«outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«extName», label %bb_«extName»_fire, label %bb_«state.name»_finished
 				«ELSE»
 					;; Empty output pattern
 
@@ -322,13 +365,13 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 
 	def private schedulerWithoutFSM() '''
-		define void @«instance.name»_scheduler() nounwind {
+		define void @«name»_scheduler() nounwind {
 		entry:
 			«printCallStartTokenFunctions»
 			br label %bb_scheduler_start
 
 		bb_scheduler_start:
-		«printActionLoop(instance.actor.actionsOutsideFsm, false)»
+		«printActionLoop(actor.actionsOutsideFsm, false)»
 		
 		bb_waiting:
 			br label %bb_finished
@@ -367,7 +410,7 @@ class InstancePrinter extends LLVMTemplate {
 					;; Output pattern
 					«checkOutputPattern(action, outputPattern, null)»
 		
-					br i1 %has_valid_outputs_«lastPort.name»_«instance.outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«name», label %bb_«name»_fire, label %bb_finished
+					br i1 %has_valid_outputs_«lastPort.name»_«outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«name», label %bb_«name»_fire, label %bb_finished
 				«ELSE»
 					;; Empty output pattern
 					
@@ -396,7 +439,7 @@ class InstancePrinter extends LLVMTemplate {
 		val stateName = if(state != null) '''«state.name»_''' else ""
 		val portToIndexMap = portToIndexByPatternMap.get(pattern)
 		val firstPort = pattern.ports.notNative.head
-		val firstName = firstPort.name + "_" + instance.incomingPortMap.get(firstPort).getSafeId(firstPort)
+		val firstName = firstPort.name + "_" + incomingPortMap.get(firstPort).getSafeId(firstPort)
 		'''
 			%numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @numTokens_«firstName»
 			%index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @index_«firstName»
@@ -404,7 +447,7 @@ class InstancePrinter extends LLVMTemplate {
 			%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = icmp sge i32 %status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», «pattern.numTokensMap.get(firstPort)»
 			
 			«FOR port : pattern.ports.notNative.tail»
-				«val name = port.name + "_" + instance.incomingPortMap.get(port).getSafeId(port)»
+				«val name = port.name + "_" + incomingPortMap.get(port).getSafeId(port)»
 				%numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @numTokens_«name»
 				%index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @index_«name»
 				%status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = sub i32 %numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», %index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)»
@@ -417,7 +460,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def private checkOutputPattern(Action action, Pattern pattern, State state) {
 		val stateName = if(state != null) '''«state.name»_''' else ""
-		val connections = pattern.ports.notNative.map[instance.outgoingPortMap.get(it)].flatten.toList
+		val connections = pattern.ports.notNative.map[outgoingPortMap.get(it)].flatten.toList
 		'''
 			«FOR connection : connections»
 				«val port = connection.sourcePort»
@@ -442,24 +485,24 @@ class InstancePrinter extends LLVMTemplate {
 	}
 
 	def private printCallStartTokenFunctions() '''
-		«FOR port : instance.actor.inputs»
-			«val connection = instance.incomingPortMap.get(port)»
+		«FOR port : actor.inputs»
+			«val connection = incomingPortMap.get(port)»
 			call void @read_«port.name»_«connection.getSafeId(port)»()
 		«ENDFOR»
-		«FOR port : instance.actor.outputs.notNative»
-			«FOR connection : instance.outgoingPortMap.get(port)»
+		«FOR port : actor.outputs.notNative»
+			«FOR connection : outgoingPortMap.get(port)»
 				call void @write_«port.name»_«connection.getSafeId(port)»()
 			«ENDFOR»
 		«ENDFOR»
 	'''
 
 	def protected printCallEndTokenFunctions() '''
-		«FOR port : instance.actor.inputs»
-			«val connection = instance.incomingPortMap.get(port)»
+		«FOR port : actor.inputs»
+			«val connection = incomingPortMap.get(port)»
 			call void @read_end_«port.name»_«connection.getSafeId(port)»()
 		«ENDFOR»
-		«FOR port : instance.actor.outputs.notNative»
-			«FOR connection : instance.outgoingPortMap.get(port)»
+		«FOR port : actor.outputs.notNative»
+			«FOR connection : outgoingPortMap.get(port)»
 				call void @write_end_«port.name»_«connection.getSafeId(port)»()
 			«ENDFOR»
 		«ENDFOR»
@@ -475,7 +518,7 @@ class InstancePrinter extends LLVMTemplate {
 				«local.declare»
 			«ENDFOR»
 			«FOR port : peekPattern.ports.notNative»
-				«port.loadVar(instance.incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port))»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
 		
@@ -490,10 +533,10 @@ class InstancePrinter extends LLVMTemplate {
 				«local.declare»
 			«ENDFOR»
 			«FOR port : inputPattern.ports.notNative»
-				«port.loadVar(instance.incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port))»
 			«ENDFOR»
 			«FOR port : outputPattern.ports.notNative»
-				«FOR connection : instance.outgoingPortMap.get(port)»
+				«FOR connection : outgoingPortMap.get(port)»
 					«port.loadVar(connection)»
 				«ENDFOR»
 			«ENDFOR»
@@ -503,10 +546,10 @@ class InstancePrinter extends LLVMTemplate {
 			«block.doSwitch»
 		«ENDFOR»
 			«FOR port : inputPattern.ports.notNative»
-				«port.updateVar(instance.incomingPortMap.get(port), inputPattern.getNumTokens(port))»
+				«port.updateVar(incomingPortMap.get(port), inputPattern.getNumTokens(port))»
 			«ENDFOR»
 			«FOR port : outputPattern.ports.notNative»
-				«FOR connection : instance.outgoingPortMap.get(port)»
+				«FOR connection : outgoingPortMap.get(port)»
 					«port.updateVar(connection, outputPattern.getNumTokens(port))»
 				«ENDFOR»
 			«ENDFOR»
@@ -663,7 +706,7 @@ class InstancePrinter extends LLVMTemplate {
 			@«name»_wrIndex = external«addrSpace» global i32
 			'''
 		} else { 
-			OrccLogger::noticeln("["+instance.name+"] Port "+port.name+" not connected.")
+			OrccLogger::noticeln("["+name+"] Port "+port.name+" not connected.")
 			'''
 			@«name»_content = internal global [«conn.safeSize» x «type»] zeroinitializer
 			@«name»_rdIndex = internal global i32 zeroinitializer
@@ -773,7 +816,7 @@ class InstancePrinter extends LLVMTemplate {
 				«val innerType = (variable.type as TypeList).innermostType»
 				«IF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
-					«FOR connection : instance.outgoingPortMap.get(port)»
+					«FOR connection : outgoingPortMap.get(port)»
 						«printPortAccess(connection, port, variable, store.indexes, store)»
 						store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«connection.addrSpace»* «varName(variable, store)»_«connection.getSafeId(port)»
 					«ENDFOR»
@@ -796,17 +839,17 @@ class InstancePrinter extends LLVMTemplate {
 				«val innerType = (variable.type as TypeList).innermostType»
 				«IF action != null && action.inputPattern.contains(variable) && ! action.inputPattern.varToPortMap.get(variable).native»
 					«val port = action.inputPattern.varToPortMap.get(variable)»
-					«val connection = instance.incomingPortMap.get(port)»
+					«val connection = incomingPortMap.get(port)»
 					«printPortAccess(connection, port, variable, load.indexes, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSEIF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
-					«val connection = instance.outgoingPortMap.get(port).head»
+					«val connection = outgoingPortMap.get(port).head»
 					«printPortAccess(connection, port, variable, load.indexes, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSEIF action != null && action.peekPattern.contains(variable)»
 					«val port = action.peekPattern.varToPortMap.get(variable)»
-					«val connection = instance.incomingPortMap.get(port)»
+					«val connection = incomingPortMap.get(port)»
 					«printPortAccess(connection, port, variable, load.indexes, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSE»
@@ -874,7 +917,7 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	def protected computeCastedList() {
-		for (variable : instance.actor.eAllContents.toIterable.filter(typeof(Var))) {
+		for (variable : actor.eAllContents.toIterable.filter(typeof(Var))) {
 			if(variable.type.list && ! variable.defs.empty && variable.defs.head.eContainer instanceof InstCast) {
 				castedList.add(variable)
 			}
@@ -882,9 +925,9 @@ class InstancePrinter extends LLVMTemplate {
 	}
 
 	def private computeStateToLabel() {
-		if(instance.actor.hasFsm){
+		if(actor.hasFsm){
 			var i = 0
-			for ( state : instance.actor.fsm.states) {
+			for ( state : actor.fsm.states) {
 				stateToLabel.put(state, i)
 				i = i + 1
 			}
@@ -892,7 +935,7 @@ class InstancePrinter extends LLVMTemplate {
 	}
 	
 	def private computePortToIndexByPatternMap() {
-		for(pattern : instance.actor.eAllContents.toIterable.filter(typeof(Pattern))) {
+		for(pattern : actor.eAllContents.toIterable.filter(typeof(Pattern))) {
 			val portToIndex = new HashMap<Port, Integer>
 			var i = 1
 			for(port : pattern.ports) {

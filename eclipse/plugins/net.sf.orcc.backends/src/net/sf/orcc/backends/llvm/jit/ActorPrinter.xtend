@@ -35,7 +35,6 @@ import java.util.Map
 import net.sf.orcc.backends.ir.InstCast
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.df.Action
-import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
@@ -63,15 +62,11 @@ import static net.sf.orcc.OrccLaunchConstants.*
  */
 class ActorPrinter extends InstancePrinter {
 	
-	val Actor actor
-	
 	val List<Integer> objRefList = new ArrayList<Integer>
 	val List<Pattern> patternList = new ArrayList<Pattern>
 	
-	new(Actor actor, Map<String, Object> options) {
+	new(Map<String, Object> options) {
 		super()
-		
-		this.actor = actor
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 		
