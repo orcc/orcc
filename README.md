@@ -6,7 +6,8 @@ Orcc is a development environment under BSD license dedicated to dataflow progra
 Documentation
 -------------
 
-Documentation is located at http://orcc.sf.net
+* Documentation is located at http://orcc.sf.net
+* Javadoc is available at http://orcc.sf.net/javadoc/
 
 Applications
 ------------
