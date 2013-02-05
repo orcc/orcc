@@ -193,8 +193,8 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	architecture rtl of FIFO_main_myStream is
 	    type memtype is array (0 to «fifoSize») of STD_LOGIC_VECTOR(width downto 0);
 	    signal mStorage : memtype;
-	    signal mInPtr  : UNSIGNED(10 - 1 downto 0) := (others => '0');
-	    signal mOutPtr : UNSIGNED(10 - 1 downto 0) := (others => '0');
+	    signal mInPtr  : UNSIGNED(«closestLog_2(fifoSize)» - 1 downto 0) := (others => '0');
+	    signal mOutPtr : UNSIGNED(«closestLog_2(fifoSize)» - 1 downto 0) := (others => '0');
 	    signal internal_empty_n, internal_full_n : STD_LOGIC;
 	    signal mFlag_nEF_hint : STD_LOGIC := '0';  -- 0: empty hint, 1: full hint
 	begin
@@ -236,4 +236,14 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	   
 	end architecture;
 	'''
+	
+	def closestLog_2(int x) {
+		var p = 1;
+		var r = 0;
+		while (p < x) {
+			p = p * 2
+			r = r + 1
+		}
+		return r;
+	}
 }
