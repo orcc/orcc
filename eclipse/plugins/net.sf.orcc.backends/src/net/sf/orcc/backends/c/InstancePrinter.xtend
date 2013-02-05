@@ -597,7 +597,7 @@ class InstancePrinter extends CTemplate {
 			stop = 1;
 			«IF newSchedul»
 				if( ! «name».sched->round_robin || i > 0) {
-					sched_add_schedulable(«name».sched, &«(successor.target as Instance).name», RING_TOPOLOGY);
+					sched_add_schedulable(«name».sched, &«successor.target.label», RING_TOPOLOGY);
 				}
 			«ENDIF»
 		}
