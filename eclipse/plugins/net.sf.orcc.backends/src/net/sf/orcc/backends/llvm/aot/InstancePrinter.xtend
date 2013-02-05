@@ -112,10 +112,6 @@ class InstancePrinter extends LLVMTemplate {
 		}
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
-		
-		computeCastedList
-		computeStateToLabel
-		computePortToIndexByPatternMap
 	}
 	
 	/**
@@ -144,7 +140,7 @@ class InstancePrinter extends LLVMTemplate {
 		
 	def protected print(String targetFolder) {
 		val content = fileContent
-		val file = new File(targetFolder + File::separator + instance.name + ".ll")
+		val file = new File(targetFolder + File::separator + name + ".ll")
 		
 		if(needToWriteFile(content, file)) {
 			printFile(content, file)
@@ -163,7 +159,11 @@ class InstancePrinter extends LLVMTemplate {
 		this.name = instance.name
 		this.actor = instance.actor
 		this.incomingPortMap = instance.incomingPortMap
-		this.outgoingPortMap = instance.outgoingPortMap		
+		this.outgoingPortMap = instance.outgoingPortMap
+
+		computeCastedList
+		computeStateToLabel
+		computePortToIndexByPatternMap
 	}
 	
 	def protected setActor(Actor actor) {
@@ -171,6 +171,10 @@ class InstancePrinter extends LLVMTemplate {
 		this.actor = actor
 		this.incomingPortMap = actor.incomingPortMap
 		this.outgoingPortMap = actor.outgoingPortMap
+				
+		computeCastedList
+		computeStateToLabel
+		computePortToIndexByPatternMap
 	}
 	
 	def private getFileContent() '''
@@ -185,7 +189,7 @@ class InstancePrinter extends LLVMTemplate {
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; FIFOs
 		«FOR port : inputs»
-			«val connection = instance.incomingPortMap.get(port)»
+			«val connection = incomingPortMap.get(port)»
 			«connection.printInput(port)»
 		«ENDFOR»
 		
@@ -197,9 +201,15 @@ class InstancePrinter extends LLVMTemplate {
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Parameters
-		«FOR arg : instance.arguments»
-			@«arg.variable.name» = internal global «arg.variable.type.doSwitch» «arg.value.doSwitch»
-		«ENDFOR»
+		«IF instance != null»
+			«FOR arg : instance.arguments»
+				@«arg.variable.name» = internal global «arg.variable.type.doSwitch» «arg.value.doSwitch»
+			«ENDFOR»
+		«ELSE»
+			«FOR param : actor.parameters»
+				«param.declare»
+			«ENDFOR»
+		«ENDIF»
 
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; State variables
@@ -696,21 +706,21 @@ class InstancePrinter extends LLVMTemplate {
 	def protected getProperties(Port port) ''''''
 	
 	def private printExternalFifo(Connection conn, Port port) {
-		val name = "fifo_" + conn.getSafeId(port)
+		val fifoName = "fifo_" + conn.getSafeId(port)
 		val type = port.type.doSwitch
 		if(conn != null) {
 			val addrSpace = conn.addrSpace
 			'''
-			@«name»_content = external«addrSpace» global [«conn.safeSize» x «type»]
-			@«name»_rdIndex = external«addrSpace» global i32
-			@«name»_wrIndex = external«addrSpace» global i32
+			@«fifoName»_content = external«addrSpace» global [«conn.safeSize» x «type»]
+			@«fifoName»_rdIndex = external«addrSpace» global i32
+			@«fifoName»_wrIndex = external«addrSpace» global i32
 			'''
 		} else { 
 			OrccLogger::noticeln("["+name+"] Port "+port.name+" not connected.")
 			'''
-			@«name»_content = internal global [«conn.safeSize» x «type»] zeroinitializer
-			@«name»_rdIndex = internal global i32 zeroinitializer
-			@«name»_wrIndex = internal global i32 zeroinitializer
+			@«fifoName»_content = internal global [«conn.safeSize» x «type»] zeroinitializer
+			@«fifoName»_rdIndex = internal global i32 zeroinitializer
+			@«fifoName»_wrIndex = internal global i32 zeroinitializer
 			'''
 		}
 	}
