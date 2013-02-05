@@ -54,6 +54,7 @@ import net.sf.orcc.moc.MoC
 import net.sf.orcc.moc.QSDFMoC
 
 import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.df.Actor
 
 /**
  * Generate Jade content
@@ -66,17 +67,11 @@ class ActorPrinter extends InstancePrinter {
 	val List<Pattern> patternList = new ArrayList<Pattern>
 	
 	new(Map<String, Object> options) {
-		super()
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
-		
-		computePatterns
-		computeCastedList
+		super(options)
 	}
 	
 	override print(String targetFolder) {
-		
-		val content = actorFileContent
+		val content = fileContent
 		val file = new File(targetFolder + File::separator + actor.simpleName)
 		
 		if(needToWriteFile(content, file)) {
@@ -87,6 +82,16 @@ class ActorPrinter extends InstancePrinter {
 		}
 	}
 	
+	override setActor(Actor actor) {
+		this.name = actor.name
+		this.actor = actor
+		this.incomingPortMap = actor.incomingPortMap
+		this.outgoingPortMap = actor.outgoingPortMap
+
+		computePatterns
+		computeCastedList
+	}
+
 	/**
 	 * Return the unique id associated with the given object, prepended with '!'
 	 * 
@@ -105,7 +110,7 @@ class ActorPrinter extends InstancePrinter {
 		return '''!«id»'''
 	}
 	
-	def getActorFileContent() '''
+	override getFileContent() '''
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Generated from "«actor.name»"
 		declare i32 @printf(i8* noalias , ...) nounwind 

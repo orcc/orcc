@@ -95,12 +95,6 @@ class InstancePrinter extends LLVMTemplate {
 	protected var optionArch = "x86_64"
 	
 	/**
-	 * Default constructor, do not activate profile option and do not set instance (Jade requirement)
-	 */
-	new() {
-	}
-	
-	/**
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {		
@@ -177,7 +171,7 @@ class InstancePrinter extends LLVMTemplate {
 		computePortToIndexByPatternMap
 	}
 	
-	def private getFileContent() '''
+	def protected getFileContent() '''
 		«val inputs = actor.inputs.notNative»
 		«val outputs = actor.outputs.notNative»
 		«printArchitecture»
