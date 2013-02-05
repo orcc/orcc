@@ -64,7 +64,9 @@ public class TypeUtil {
 	 * @return the Greatest Lower Bound of the given types
 	 */
 	public static Type getGlb(Type t1, Type t2) {
-		if (t1.isInt() && t2.isInt()) {
+		if (t1.isBool() && t2.isBool()) {
+			return IrFactory.eINSTANCE.createTypeBool();
+		} else if (t1.isInt() && t2.isInt()) {
 			return IrFactory.eINSTANCE.createTypeInt(Math.min(
 					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
 		} else if (t1.isUint() && t2.isUint()) {

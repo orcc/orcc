@@ -103,7 +103,7 @@ class StatisticsPrinter {
 	'''
 	
 	def protected getConnectionsHeader() 
-		'''Source, Source port, Target, Target port, Size'''
+		'''Source, SrcPort, Target, TgtPort, Size'''
 	
 	def protected getStats(Connection conn) 
 		'''«conn.source.label», «conn.sourcePort.name», «conn.target.label», «conn.targetPort.name», «conn.size»'''

@@ -93,7 +93,9 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object and(Object val1, Object val2) {
-		if (isInt(val1) && isInt(val2)) {
+		if (isBool(val1) && isBool(val2)) {
+			return ((Boolean) val1) & ((Boolean) val2);
+		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).and((BigInteger) val2);
 		}
 		throw new OrccRuntimeException("type mismatch in and");
@@ -791,7 +793,9 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object or(Object val1, Object val2) {
-		if (isInt(val1) && isInt(val2)) {
+		if (isBool(val1) && isBool(val2)) {
+			return ((Boolean) val1) | ((Boolean) val2);
+		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).or((BigInteger) val2);
 		}
 		throw new OrccRuntimeException("type mismatch in or");
@@ -942,7 +946,9 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object xor(Object val1, Object val2) {
-		if (isInt(val1) && isInt(val2)) {
+		if (isBool(val1) && isBool(val2)) {
+			return ((Boolean) val1) ^ ((Boolean) val2);
+		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).xor((BigInteger) val2);
 		}
 		throw new OrccRuntimeException("type mismatch in xor");
