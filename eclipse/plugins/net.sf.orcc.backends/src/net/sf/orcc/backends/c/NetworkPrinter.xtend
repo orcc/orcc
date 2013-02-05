@@ -180,8 +180,13 @@ class NetworkPrinter extends CTemplate {
 		
 		/////////////////////////////////////////////////
 		// Action schedulers
+		«FOR instance : network.children.actorInstances»
+			extern void «instance.name»_initialize(«instance.actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
+		«ENDFOR»
+		«FOR actor : network.children.filter(typeof(Actor))»
+			extern void «actor.name»_initialize(«actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
+		«ENDFOR»
 		«FOR child : network.children»
-			extern void «child.label»_initialize(«FOR incoming : child.incoming SEPARATOR ", "»unsigned int fifo_«(incoming as Connection).targetPort.name»_id«ENDFOR»);
 			extern void «child.label»_scheduler(struct schedinfo_s *si);
 		«ENDFOR»
 		«printActorsSchedulers»
