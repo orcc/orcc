@@ -69,9 +69,10 @@ import net.sf.orcc.ir.TypeBool
 		«FOR port : instance.actor.inputs»
 			«IF instance.incomingPortMap.get(port) != null»
 				stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
-				int counter_«instance.incomingPortMap.get(port).fifoName»
-				«instance.incomingPortMap.get(port).fifoType.doSwitch» tab_«instance.incomingPortMap.get(port).fifoName»
-				«instance.incomingPortMap.get(port).fifoType.doSwitch» tmp_«instance.incomingPortMap.get(port).fifoName»
+				int counter_«instance.incomingPortMap.get(port).fifoName»;
+				«instance.incomingPortMap.get(port).fifoType.doSwitch» tab_«instance.incomingPortMap.get(port).fifoName»;
+				«instance.incomingPortMap.get(port).fifoType.doSwitch» tmp_«instance.incomingPortMap.get(port).fifoName»;
+				
 			«ENDIF»
 		«ENDFOR»
 		
@@ -81,16 +82,17 @@ import net.sf.orcc.ir.TypeBool
 		«FOR port : instance.actor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(port)»
 				stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
-				int counter_«connection.fifoName»
-				«connection.fifoType.doSwitch» tab_«connection.fifoName»
-				«connection.fifoType.doSwitch» tmp_«connection.fifoName»
+				int counter_«connection.fifoName»;
+				«connection.fifoType.doSwitch» tab_«connection.fifoName»;
+				«connection.fifoType.doSwitch» tmp_«connection.fifoName»;
+				
 			«ENDFOR»
 		«ENDFOR»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// functions definition
 		
-		«instance.name»_scheduler();
+		void «instance.name»_scheduler();
 		
 		////////////////////////////////////////////////////////////////////////////////
 		
@@ -102,7 +104,7 @@ import net.sf.orcc.ir.TypeBool
 			// read data
 			«FOR port : instance.actor.inputs»
 				«IF instance.incomingPortMap.get(port) != null»
-					fp=fopen("«instance.name».txt","r");
+					fp=fopen("«instance.name»_«port.name».txt","r");
 					for (i=0 ; i<1000 ; i++){
 						fscanf(fp, "%d", &tmp_«instance.incomingPortMap.get(port).fifoName»);
 						tab_«instance.incomingPortMap.get(port).fifoName»[i]=tmp_«instance.incomingPortMap.get(port).fifoName»;
@@ -136,7 +138,7 @@ import net.sf.orcc.ir.TypeBool
 			// write results	
 			«FOR port : instance.actor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
-					fp=fopen("«instance.name».txt","r");
+					fp=fopen("«instance.name»_«port.name».txt","r");
 					for (i=0 ; i<1000 ; i++){
 						tmp_«connection.fifoName»=tab_«connection.fifoName»[i];
 						fprintf(fp, "%d \n", tmp_«connection.fifoName»);
@@ -170,11 +172,7 @@ import net.sf.orcc.ir.TypeBool
 		}
 	}
 	
-	def fifoName(Connection connection) '''
-		«IF connection != null»
-			myStream_«connection.getAttribute("id").objectValue»
-		«ENDIF»
-	'''
+	def fifoName(Connection connection) '''«IF connection != null» myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
 	
 	override caseTypeBool(TypeBool type) 
 	'''bool'''

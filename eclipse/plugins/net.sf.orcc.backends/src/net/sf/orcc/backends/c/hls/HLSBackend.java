@@ -77,7 +77,8 @@ public class HLSBackend extends CBackend {
 	/**
 	 * Path to target "testBench" folder
 	 */
-	private String testBenchPath;
+	private String VHDLTestBenchPath;
+	private String coSimTestBenchPath;
 	private String commandPath;
 
 	/**
@@ -92,7 +93,8 @@ public class HLSBackend extends CBackend {
 		new File(path + File.separator + "bin").mkdirs();
 
 		srcPath = path + File.separator + "src";
-		testBenchPath = srcPath + File.separator + "testBench";
+		VHDLTestBenchPath = srcPath + File.separator + "VHDLTestBench";
+		coSimTestBenchPath = srcPath + File.separator + "coSimTestBench";
 		commandPath = srcPath + File.separator + "batchCommand";
 	}
 
@@ -200,7 +202,7 @@ public class HLSBackend extends CBackend {
 		}
 
 		OrccLogger.trace("Printing network testbench... ");
-		if (new NetworkTestBenchPrinter(network, options).print(testBenchPath) > 0) {
+		if (new NetworkTestBenchPrinter(network, options).print(VHDLTestBenchPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
@@ -224,7 +226,8 @@ public class HLSBackend extends CBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		new InstanceTestBenchPrinter(options).print(testBenchPath, instance);
+		new InstanceTestBenchPrinter(options).print(VHDLTestBenchPath, instance);
+		new InstanceCosimPrinter(options).print(coSimTestBenchPath, instance);
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}
 }
