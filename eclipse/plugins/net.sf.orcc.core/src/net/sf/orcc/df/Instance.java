@@ -105,14 +105,6 @@ public interface Instance extends Vertex, Adaptable {
 
 	String getHierarchicalName();
 
-	/**
-	 * Returns the identifier of this instance. Delegates to {@link #getName()}.
-	 * 
-	 * @return the identifier of this instance
-	 */
-	@Deprecated
-	String getId();
-
 	Map<Port, Connection> getIncomingPortMap();
 
 	/**

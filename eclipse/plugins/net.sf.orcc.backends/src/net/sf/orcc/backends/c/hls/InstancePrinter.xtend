@@ -28,20 +28,19 @@
  */
  package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.df.Instance
-import java.util.Map
+import java.io.File
+import java.util.List
+import net.sf.orcc.df.Action
+import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Pattern
+import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
-import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Port
-import net.sf.orcc.df.Pattern
-import net.sf.orcc.df.Action
-import java.io.File
 import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
-import java.util.List
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeList
+import java.util.Map
 
 /*
  * Compile Instance c source code
@@ -52,11 +51,11 @@ import net.sf.orcc.ir.TypeList
  
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
-	new(Instance instance, Map<String, Object> options) {
-		super(instance, options)
+	new(Map<String, Object> options) {
+		super(options)
 	}
 	
-	override getInstanceFileContent() '''
+	override getFileContent() '''
 		// Source file is "«instance.actor.file»"
 		
 		#include <hls_stream.h>
@@ -235,8 +234,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDIF»
 		«ENDFOR»'''
 	
-	override printInstance(String targetFolder) {
-		val content = instanceFileContent
+	override print(String targetFolder) {		
+		val content = getFileContent
 		val scriptContent = script(targetFolder);
 		val directiveContent = directive(targetFolder);
 		val file = new File(targetFolder + File::separator + instance.name + ".cpp")

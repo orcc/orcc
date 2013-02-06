@@ -69,7 +69,7 @@ class NetworkPrinter extends CTemplate {
 		return numFilesCached
 	}
 	
-	def getNetworkContent() '''
+	def private getNetworkContent() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 			<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
 		    <key attr.name="graph_desc" attr.type="string" for="node" id="graph_desc"/>
@@ -125,7 +125,7 @@ class NetworkPrinter extends CTemplate {
 		</graphml>
 	'''
 	
-	def print(Connection connection) '''
+	def private print(Connection connection) '''
 		<edge source="«(connection.source as Instance).name»" sourceport="«connection.sourcePort.name»" target="«(connection.target as Instance).name»" targetport="«connection.targetPort.name»">
 		    <data key="edge_prod">«((connection.source as Instance).actor.moC as CSDFMoC).outputPattern.numTokensMap.get(connection.sourcePort)»</data>
 		    <data key="edge_delay">«connection.printDelays»</data>
@@ -134,7 +134,7 @@ class NetworkPrinter extends CTemplate {
 		</edge>
 	'''
 	
-	def printDelays(Connection connection) {
+	def private printDelays(Connection connection) {
 		if (((connection.source as Instance).actor.moC as CSDFMoC).delayPattern.numTokensMap.containsKey(connection.sourcePort)) {
 			((connection.source as Instance).actor.moC as CSDFMoC).delayPattern.numTokensMap.get(connection.sourcePort)
 		} else {
@@ -142,9 +142,7 @@ class NetworkPrinter extends CTemplate {
 		}
 	}
 
-
-
-	def print(Instance instance) '''
+	def private print(Instance instance) '''
 		<node id="«instance.name»" kind="vertex">
 		<data key="graph_desc">../Code/IDL/«instance.actor.simpleName».idl</data>
 		<data key="name">«instance.actor.simpleName»</data>
@@ -161,7 +159,7 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 	'''
 	
-	def printStateVar(Var stateVar, Instance instance) '''
+	def private printStateVar(Var stateVar, Instance instance) '''
 		<edge source="«instance.name»" sourceport="«stateVar.name»_o" target="«instance.name»" targetport="«stateVar.name»_i">
 		    <data key="edge_prod">1</data>
 		    <data key="edge_delay">1</data>
@@ -171,7 +169,7 @@ class NetworkPrinter extends CTemplate {
 	'''
 
 	
-	def print(Argument argument) '''
+	def private print(Argument argument) '''
 		<data key="arguments">
 			<argument name="«argument.variable.name»" value="«argument.value.doSwitch»"/>
 		</data>

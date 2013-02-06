@@ -145,7 +145,7 @@ public class PromelaBackend extends AbstractBackend {
 		schedulingModel.printDependencyGraph();
 
 		transformInstances(network.getChildren());
-		printInstances(network);
+		printChildren(network);
 
 		network.computeTemplateMaps();
 		printNetwork(network);

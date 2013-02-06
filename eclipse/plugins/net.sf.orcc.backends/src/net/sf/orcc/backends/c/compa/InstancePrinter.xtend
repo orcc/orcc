@@ -29,7 +29,6 @@
  package net.sf.orcc.backends.c.compa
 
 import java.util.Map
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
@@ -43,8 +42,8 @@ import net.sf.orcc.df.Action
  */
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {	
 	
-	new(Instance instance, Map<String, Object> options) {
-		super(instance, options)
+	new(Map<String, Object> options) {
+		super(options)
 		geneticAlgo = false
 	}
 	

@@ -142,7 +142,7 @@ public class JavaBackend extends AbstractBackend {
 			// Transform Actors
 			transformActors(network.getAllActors());
 			// print instances
-			printInstances(network);
+			printChildren(network);
 		}
 		OrccLogger.traceln("Done");
 	}

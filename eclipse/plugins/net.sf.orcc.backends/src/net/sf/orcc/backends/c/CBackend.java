@@ -193,7 +193,7 @@ public class CBackend extends AbstractBackend {
 	protected void doTransformNetwork(Network network) {
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
-		new Instantiator(false, fifoSize).doSwitch(network);
+		new Instantiator(true, fifoSize).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 
@@ -243,7 +243,7 @@ public class CBackend extends AbstractBackend {
 		}
 
 		// print instances
-		printInstances(network);
+		printChildren(network);
 
 		// print network
 		OrccLogger.trace("Printing network... ");
@@ -297,7 +297,12 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(instance, options).printInstance(srcPath) > 0;
+		return new InstancePrinter(options).print(srcPath, instance) > 0;
+	}
+	
+	@Override
+	protected boolean printActor(Actor actor) {
+		return new InstancePrinter(options).print(srcPath, actor) > 0;
 	}
 
 }

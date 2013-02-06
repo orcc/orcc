@@ -175,7 +175,7 @@ public class COMPABackend extends CBackend {
 		}
 
 		// print instances
-		printInstances(network);
+		printChildren(network);
 
 		// print network
 		OrccLogger.trace("Printing network... ");
@@ -205,6 +205,6 @@ public class COMPABackend extends CBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(instance, options).printInstance(srcPath) > 0;
+		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}
 }

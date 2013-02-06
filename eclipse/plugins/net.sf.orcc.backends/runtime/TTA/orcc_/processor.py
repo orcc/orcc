@@ -186,6 +186,12 @@ class Processor:
         retcode = subprocess.call(["generate_cachegrind", self._tpefFile + ".trace"])
         return subprocess.check_output(["cgview", "-e", self._tpefFile + ".trace.cachegrind"])
 
+    def simulate(self):
+        if len(self.inputs)>0 and len(self.outputs)>0:
+            return subprocess.call(["ttanetsim", "-n", "top.pndf", "-t", self.id])
+        else:
+            return 0
+
     def _readMif(self, fileName):
         fh = open(fileName, "r")
         igot = fh.readlines()

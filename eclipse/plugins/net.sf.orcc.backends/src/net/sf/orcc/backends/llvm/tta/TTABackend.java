@@ -213,7 +213,7 @@ public class TTABackend extends LLVMBackend {
 
 		// Generate files
 		actorsPath = OrccUtil.createFolder(path, "actors");
-		printInstances(network);
+		printChildren(network);
 		printDesign(design);
 
 		if (finalize) {
@@ -319,8 +319,8 @@ public class TTABackend extends LLVMBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new SwActorPrinter(instance, options, design
-				.getActorToProcessorMap().get(instance)).print(actorsPath) > 0;
+		return new SwActorPrinter(options, design.getActorToProcessorMap().get(
+				instance)).print(actorsPath, instance) > 0;
 	}
 
 	/**

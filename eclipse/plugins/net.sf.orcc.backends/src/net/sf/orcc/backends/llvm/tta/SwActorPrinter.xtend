@@ -32,7 +32,6 @@ import java.util.Map
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.Action
 import net.sf.orcc.ir.Var
@@ -46,25 +45,25 @@ class SwActorPrinter extends InstancePrinter {
 	
 	Processor processor;
 	
-	new(Instance instance, Map<String, Object> options, Processor processor) {
-		super(instance, options)
+	new(Map<String, Object> options, Processor processor) {
+		super(options)
 		this.processor = processor
 	}
 	
-	override getAddrSpace(Connection connection) {
+	override protected getAddrSpace(Connection connection) {
 		val id = processor.getAddrSpaceId(connection)
 		if(id != null) {
 			''' addrspace(«id»)'''
 		}
 	}
 	
-	override getProperties(Port port) {
-		if(!instance.outgoingPortMap.get(port).nullOrEmpty || instance.incomingPortMap.get(port) != null) {
+	override protected getProperties(Port port) {
+		if(!outgoingPortMap.get(port).nullOrEmpty || incomingPortMap.get(port) != null) {
 			''' volatile'''
 		}
 	}
 	
-	def printNativeWrite(Port port, Var variable) {
+	def private printNativeWrite(Port port, Var variable) {
 		val innerType = (variable.type as TypeList).innermostType.doSwitch
 		'''
 		%tmp_«variable.name»_elt = getelementptr «variable.type.doSwitch»* «variable.print», i32 0, i1 0 
@@ -73,16 +72,16 @@ class SwActorPrinter extends InstancePrinter {
 		'''
 	}
 	
-	override printArchitecture() ''''''
+	override protected printArchitecture() ''''''
 
-	override print(Action action) '''
+	override protected print(Action action) '''
 		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
 				«local.declare»
 			«ENDFOR»
 			«FOR port : action.peekPattern.ports.notNative»
-				«port.loadVar(instance.incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port))»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
 		
@@ -100,10 +99,10 @@ class SwActorPrinter extends InstancePrinter {
 				«action.outputPattern.getVariable(port).declare»
 			«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
-				«port.loadVar(instance.incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port))»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
-				«FOR connection : instance.outgoingPortMap.get(port)»
+				«FOR connection : outgoingPortMap.get(port)»
 					«port.loadVar(connection)»
 				«ENDFOR»
 			«ENDFOR»
@@ -113,12 +112,12 @@ class SwActorPrinter extends InstancePrinter {
 			«block.doSwitch»
 		«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
-				«val connection = instance.incomingPortMap.get(port)»
+				«val connection = incomingPortMap.get(port)»
 				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port))»
 				call void @read_end_«port.name»_«connection.getSafeId(port)»()
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
-				«FOR connection : instance.outgoingPortMap.get(port)»
+				«FOR connection : outgoingPortMap.get(port)»
 					«port.updateVar(connection, action.outputPattern.getNumTokens(port))»
 					call void @write_end_«port.name»_«connection.getSafeId(port)»()
 				«ENDFOR»
@@ -141,13 +140,13 @@ class SwActorPrinter extends InstancePrinter {
 		«ENDIF»
 	'''
 	
-	override print(Procedure procedure) '''
+	override protected print(Procedure procedure) '''
 		«IF !procedure.native»
 			«super.print(procedure)»
 		«ENDIF»
 	'''
 	
-	def getIr(EList<Arg> args) {
+	def private getIr(EList<Arg> args) {
 		var irs = new String;
 		for (arg : args) {
 			irs = irs + ", ir"

@@ -136,7 +136,7 @@ public class LLVMBackend extends AbstractBackend {
 
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
-		new Instantiator(false, fifoSize).doSwitch(network);
+		new Instantiator(true, fifoSize).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 
@@ -191,7 +191,7 @@ public class LLVMBackend extends AbstractBackend {
 		network = doTransformNetwork(network);
 
 		// print instances and entities
-		printInstances(network);
+		printChildren(network);
 
 		// print network
 		OrccLogger.traceln("Printing network...");
@@ -224,7 +224,12 @@ public class LLVMBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(instance, options).print(srcPath) > 0;
+		return new InstancePrinter(options).print(srcPath, instance) > 0;
+	}
+
+	@Override
+	protected boolean printActor(Actor actor) {
+		return new InstancePrinter(options).print(srcPath, actor) > 0;
 	}
 
 }

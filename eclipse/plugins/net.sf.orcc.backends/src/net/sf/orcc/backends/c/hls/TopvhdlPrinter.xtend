@@ -217,7 +217,7 @@ import java.io.File
 		);
 	'''
 	
-	override assignFifo(Instance instance) '''
+	def assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
 				«printOutputFifoAssignHLS(connList.head )»

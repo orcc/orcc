@@ -189,7 +189,7 @@ public class HLSBackend extends CBackend {
 		}
 
 		// print instances
-		printInstances(network);
+		printChildren(network);
 
 		// print network
 		OrccLogger.trace("Printing network... ");
@@ -224,8 +224,7 @@ public class HLSBackend extends CBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		new InstanceTestBenchPrinter(instance, options)
-				.printInstance(testBenchPath);
-		return new InstancePrinter(instance, options).printInstance(srcPath) > 0;
+		new InstanceTestBenchPrinter(options).print(testBenchPath, instance);
+		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}
 }

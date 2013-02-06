@@ -720,15 +720,22 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param entities
 	 *            a list of entities
 	 */
-	final public void printEntities(Network network) {
-		OrccLogger.traceln("Printing entities...");
+	final public void printChildren(Network network) {
+		OrccLogger.traceln("Printing children...");
 		long t0 = System.currentTimeMillis();
 
 		int numCached = 0;
 		for (final Vertex vertex : network.getChildren()) {
-
-			if (printEntity(vertex)) {
-				++numCached;
+			final Instance instance = vertex.getAdapter(Instance.class);
+			final Actor actor = vertex.getAdapter(Actor.class);
+			if (instance != null) {
+				if (printInstance(instance)) {
+					++numCached;
+				}
+			} else if (actor != null) {
+				if (printActor(actor)) {
+					++numCached;
+				}
 			}
 		}
 
@@ -743,18 +750,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Prints the given entity. Should be overridden by back-ends that wish to
-	 * print the given entity.
-	 * 
-	 * @param entity
-	 *            the entity
-	 * @return <code>true</code> if the actor was cached
-	 */
-	protected boolean printEntity(Vertex entity) {
-		return false;
-	}
-
-	/**
 	 * Prints the given instance. Should be overridden by back-ends that wish to
 	 * print the given instance.
 	 * 
@@ -764,39 +759,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected boolean printInstance(Instance instance) {
 		return false;
-	}
-
-	/**
-	 * Print instances of the given network.
-	 * 
-	 * @param network
-	 *            a network
-	 */
-	final public void printInstances(Network network) {
-		OrccLogger.traceln("Printing instances...");
-		long t0 = System.currentTimeMillis();
-
-		int numCached = 0;
-
-		// creates a list of tasks: each task will print an instance when called
-		for (Vertex vertex : network.getChildren()) {
-			final Instance instance = vertex.getAdapter(Instance.class);
-
-			if (instance != null) {
-				if (printInstance(instance)) {
-					++numCached;
-				}
-			}
-		}
-
-		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-				+ "s");
-
-		if (numCached > 0) {
-			OrccLogger.noticeln(numCached + " instances were not regenerated "
-					+ "because they were already up-to-date.");
-		}
 	}
 
 	private void printUsage(IApplicationContext context, Options options,

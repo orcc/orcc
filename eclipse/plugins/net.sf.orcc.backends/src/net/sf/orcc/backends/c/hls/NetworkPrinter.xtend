@@ -120,7 +120,8 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		  <libraryPaths/>
 		</project>
 	'''
-	override assignFifo(Instance instance) '''
+	
+	def assignFifo(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF (!(connList.head.source instanceof Port) && !(connList.head.target instanceof Port))||(!(connList.head.source instanceof Port) && (connList.head.target instanceof Port))»
 				«printFifoAssignHLS(connList.head )»

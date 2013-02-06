@@ -44,11 +44,11 @@ import java.io.File
  
  class InstanceTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
-	new(Instance benchInstance, Map<String, Object> options) {
-		super(benchInstance, options)
+	new(Map<String, Object> options) {
+		super(options)
 	}
 
-	override getInstanceFileContent() '''
+	override getFileContent() '''
 	LIBRARY ieee;
 	USE ieee.std_logic_1164.ALL;
 	USE ieee.std_logic_unsigned.all;
@@ -334,8 +334,8 @@ import java.io.File
 		end if;
 	'''
 	
-	override printInstance(String targetFolder) {
-		val content = instanceFileContent
+	override print(String targetFolder) {		
+		val content = fileContent
 		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
 		
 		if(needToWriteFile(content, file)) {

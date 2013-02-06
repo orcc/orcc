@@ -153,7 +153,7 @@ public class YaceBackend extends AbstractBackend {
 			}
 		}
 
-		printInstances(network);
+		printChildren(network);
 		// print network
 		OrccLogger.traceln("Printing network...");
 		printNetwork(network);

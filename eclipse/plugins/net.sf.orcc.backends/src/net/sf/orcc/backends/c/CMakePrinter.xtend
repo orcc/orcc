@@ -30,7 +30,6 @@ package net.sf.orcc.backends.c
 
 import java.io.File
 import net.sf.orcc.backends.CommonPrinter
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 
 /**
@@ -95,8 +94,8 @@ class CMakePrinter extends CommonPrinter {
 
 		set(filenames
 			«network.simpleName».c
-			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-				«instance.name».c
+			«FOR child : network.children»
+				«child.label».c
 			«ENDFOR»
 		)
 
