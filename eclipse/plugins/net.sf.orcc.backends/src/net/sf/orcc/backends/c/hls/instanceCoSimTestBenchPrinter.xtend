@@ -28,10 +28,8 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.df.Instance
 import java.util.Map
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Port
 import java.io.File
 import net.sf.orcc.ir.TypeBool
 
@@ -43,13 +41,13 @@ import net.sf.orcc.ir.TypeBool
  */
  
  
- class InstanceTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinter {
+ class InstanceCosimPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
-	new(Instance benchInstance, Map<String, Object> options) {
-		super(benchInstance, options)
+	new(Map<String, Object> options) {
+		super(options)
 	}
 
-	override getInstanceFileContent() '''
+	override getFileContent() '''
 		#include <hls_stream.h>
 		using namespace hls;
 		#include <stdio.h>
@@ -152,9 +150,9 @@ import net.sf.orcc.ir.TypeBool
 		}
 		
 	'''	
-	override printInstance(String targetFolder) {
-		val content = instanceFileContent
-		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
+	override print(String targetFolder) {
+		val content = fileContent
+		val file = new File(targetFolder + File::separator + instance.name+ "_Csim_tb" + ".cpp")
 		
 		if(needToWriteFile(content, file)) {
 			printFile(content, file)
