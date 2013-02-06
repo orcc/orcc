@@ -45,6 +45,7 @@ import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -187,7 +188,9 @@ public class LLVMBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		checkTopLevel(network);
+		Validator.checkTopLevel(network);
+		Validator.checkMinimalFifoSize(network, fifoSize);
+
 		network = doTransformNetwork(network);
 
 		// print instances and entities

@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -130,7 +131,7 @@ public class JavaBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		checkTopLevel(network);
+		Validator.checkTopLevel(network);
 		network = doTransformNetwork(network);
 
 		// print network

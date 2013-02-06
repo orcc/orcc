@@ -51,6 +51,7 @@ import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.BackendUtil;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -187,7 +188,9 @@ public class JadeBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		checkTopLevel(network);
+		Validator.checkTopLevel(network);
+		Validator.checkMinimalFifoSize(network, fifoSize);
+
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);

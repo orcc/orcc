@@ -53,6 +53,7 @@ import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.BackendUtil;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -217,7 +218,9 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		checkTopLevel(network);
+		Validator.checkTopLevel(network);
+		Validator.checkMinimalFifoSize(network, fifoSize);
+
 		doTransformNetwork(network);
 
 		if (debug) {

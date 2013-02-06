@@ -85,8 +85,6 @@ class ActorPrinter extends InstancePrinter {
 	override protected setActor(Actor actor) {
 		this.name = actor.name
 		this.actor = actor
-		this.incomingPortMap = actor.incomingPortMap
-		this.outgoingPortMap = actor.outgoingPortMap
 
 		computePatterns
 		computeCastedList
