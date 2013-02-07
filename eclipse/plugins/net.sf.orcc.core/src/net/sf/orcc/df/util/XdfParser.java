@@ -930,14 +930,13 @@ public class XdfParser {
 			}
 		}
 
-		// throw exception if no class
-		if (clasz == null || clasz.isEmpty()) {
-			throw new OrccRuntimeException("An Instance element "
-					+ "must have a valid \"Class\" child.");
+		if (clasz != null && !clasz.isEmpty()) {
+			// resolve the file that defines the given class
+			resolveEntity(instance, clasz);
 		}
 
-		// resolve the file that defines the given class
-		resolveEntity(instance, clasz);
+
+
 
 		// instance parameters and attributes
 		parseParameters(instance, child);
