@@ -60,6 +60,11 @@ class CMakePrinter extends CommonPrinter {
 		
 		project («network.simpleName»)
 		
+		# Helps cmake to find where SDL libraries are saved (win32 only)
+		if(WIN32)
+			set(ENV{CMAKE_PREFIX_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/windows/SDL-*\;${CMAKE_CURRENT_SOURCE_DIR}/libs/windows/SDL_image-*)
+		endif(WIN32)
+
 		if(NOT NO_EXTERNAL_DEPENDENCIES)
 			# Required by osx
 			find_package(SDL REQUIRED)
