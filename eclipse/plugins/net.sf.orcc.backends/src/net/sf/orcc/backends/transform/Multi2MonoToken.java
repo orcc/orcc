@@ -173,6 +173,33 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			}
 			return null;
 		}
+		
+		@Override
+		public Object caseInstStore(InstStore store) {
+			Var varSource = store.getTarget().getVariable();
+			Pattern pattern = EcoreHelper.getContainerOfType(varSource,
+					Pattern.class);
+			if (pattern != null) {
+				Port testPort = pattern.getPort(varSource);
+				if (port.equals(testPort)) {
+					// change tab Name
+					store.getTarget().setVariable(tab);
+					Expression indexInit = store.getIndexes().get(0);
+					Expression indexFinal = irFactory.createExprBinary(
+							indexInit, OpBinary.PLUS,
+							irFactory.createExprVar(writeIndex),
+							irFactory.createTypeInt(32));
+					Expression exprMask = irFactory
+							.createExprInt(bufferSize - 1);
+					Expression maskValue = irFactory.createExprBinary(
+							indexFinal, OpBinary.BITAND, exprMask,
+							irFactory.createTypeInt(32));
+
+					store.getIndexes().add(maskValue);
+				}
+			}
+			return null;
+		}
 	}
 
 	/**
