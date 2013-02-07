@@ -100,7 +100,7 @@ import net.sf.orcc.ir.TypeBool
 			
 			FILE *fp
 			int i;
-			
+			int retval = 0;
 			// read data
 			«FOR port : instance.actor.inputs»
 				«IF instance.incomingPortMap.get(port) != null»
@@ -113,13 +113,14 @@ import net.sf.orcc.ir.TypeBool
 					fclose(fp);
 				«ENDIF»
 			«ENDFOR»
+			
 			// scheduler execution
 			for (i=0 ; i<1000 ; i++){
 				«FOR port : instance.actor.inputs»
 					«IF instance.incomingPortMap.get(port) != null»
 						if(!«instance.incomingPortMap.get(port).fifoName».full()){
-						«instance.incomingPortMap.get(port).fifoName».write(tab_«instance.incomingPortMap.get(port).fifoName»[counter_«instance.incomingPortMap.get(port).fifoName»]);
-						counter_«instance.incomingPortMap.get(port).fifoName» ++;
+							«instance.incomingPortMap.get(port).fifoName».write(tab_«instance.incomingPortMap.get(port).fifoName»[counter_«instance.incomingPortMap.get(port).fifoName»]);
+							counter_«instance.incomingPortMap.get(port).fifoName» ++;
 						}
 					«ENDIF»
 				«ENDFOR»
@@ -135,6 +136,7 @@ import net.sf.orcc.ir.TypeBool
 					«ENDFOR»
 				«ENDFOR»
 			}
+			
 			// write results	
 			«FOR port : instance.actor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
@@ -148,7 +150,22 @@ import net.sf.orcc.ir.TypeBool
 				«ENDFOR»
 			«ENDFOR»
 			
-			return 0;
+			// comparison with reference (gold) files
+			«FOR port : instance.actor.outputs.filter[! native]»
+				«FOR connection : instance.outgoingPortMap.get(port)»
+					retval += system("diff --brief -w «instance.name»_«port.name».txt gold_«instance.name»_«port.name».txt");
+				«ENDFOR»
+			«ENDFOR»
+			
+			
+			if (retval != 0) {
+				printf("Test failed !!!\n");
+				retval=1;
+			} else {
+				printf("Test passed !\n");
+			}
+			// Return 0 if the test is true
+			return retval;
 		}
 		
 	'''	
@@ -172,7 +189,7 @@ import net.sf.orcc.ir.TypeBool
 		}
 	}
 	
-	def fifoName(Connection connection) '''«IF connection != null» myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def fifoName(Connection connection) '''«IF connection != null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
 	
 	override caseTypeBool(TypeBool type) 
 	'''bool'''
