@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
@@ -93,20 +92,20 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 public class JadeBackend extends AbstractBackend {
 
 	private boolean biteexact;
-	private String optLevel;
-	private String llvmGenMod;
-
 	/**
 	 * Path of JadeToolbox executable
 	 */
 	private String jadeToolbox;
+	private String llvmGenMod;
+
+	private String optLevel;
+
+	private final Map<String, String> renameMap;
 
 	/**
 	 * Configuration mapping
 	 */
 	private Map<String, List<Instance>> targetToInstancesMap;
-
-	private final Map<String, String> renameMap;
 
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
@@ -224,7 +223,8 @@ public class JadeBackend extends AbstractBackend {
 		}
 
 		if (targetToInstancesMap != null) {
-			printMapping(network);
+			new XcfPrinter(targetToInstancesMap).printXcfFile(path
+					+ File.separator + "mapping.xcf");
 		}
 	}
 
@@ -232,11 +232,11 @@ public class JadeBackend extends AbstractBackend {
 		// Jade location has not been set
 		if (jadeToolbox.equals("")) {
 			if (!optLevel.equals("O0") || !llvmGenMod.equals("Assembly")) {
-				throw new OrccRuntimeException(
-						"For optimizing, generating bitcode or archive, Jade Toolbox path must first be set in window->Preference->Orcc");
-			} else {
-				return;
+				OrccLogger.warnln("For optimizing, generating bitcode or "
+						+ "archive, Jade Toolbox path must first be set in "
+						+ "window->Preference->Orcc");
 			}
+			return;
 		}
 
 		// JadeToolbox is required to finalize actors
@@ -247,11 +247,6 @@ public class JadeBackend extends AbstractBackend {
 	protected boolean printActor(Actor actor) {
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		return new ActorPrinter(options).print(folder, actor) > 0;
-	}
-
-	private void printMapping(Network network) {
-		new XcfPrinter(targetToInstancesMap).printXcfFile(path + File.separator
-				+ "mapping.xcf");
 	}
 
 	private void runJadeToolBox(List<Actor> actors) {
