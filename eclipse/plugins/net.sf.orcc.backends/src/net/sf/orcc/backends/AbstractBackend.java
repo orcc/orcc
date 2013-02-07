@@ -243,10 +243,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	final private void compileXDF() {
-		// set FIFO size
 		ResourceSet set = new ResourceSetImpl();
 
 		// parses top network
+		if (inputFile == null) {
+			throw new OrccRuntimeException("The input XDF file does not exist.");
+		}
 		Network network = EcoreHelper.getEObject(set, inputFile);
 		if (isCanceled()) {
 			return;
