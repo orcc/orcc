@@ -3,15 +3,10 @@ package net.sf.orcc.backends.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Network;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 
 /**
@@ -19,32 +14,6 @@ import net.sf.orcc.util.OrccLogger;
  * 
  */
 public class BackendUtil {
-
-	public static void computeMapping(Network network,
-			Map<String, String> mapping,
-			Map<String, List<Instance>> targetToInstancesMap,
-			List<Instance> unmappedInstances) {
-		for (Vertex vertex : network.getChildren()) {
-			Instance instance = vertex.getAdapter(Instance.class);
-			String name = new String();
-			if (instance.isActor()) {
-				name = instance.getHierarchicalName();
-			}
-
-			// Map each instance to its associate component
-			String component = mapping.get(name);
-			if (component != null) {
-				List<Instance> list = targetToInstancesMap.get(component);
-				if (list == null) {
-					list = new ArrayList<Instance>();
-					targetToInstancesMap.put(component, list);
-				}
-				list.add(instance);
-			} else {
-				unmappedInstances.add(instance);
-			}
-		}
-	}
 
 	public static void startExec(final AbstractBackend executingBackend,
 			String[] cmd) throws IOException {
