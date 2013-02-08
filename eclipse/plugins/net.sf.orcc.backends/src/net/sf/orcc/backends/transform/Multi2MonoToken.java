@@ -331,20 +331,11 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private void actionToTransition(Port port, Action action, Var buffer,
 			Var writeIndex, Var readIndex, int bufferSize) {
-		Procedure body = action.getBody();
-		Var wIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
-				"writeIndex");
-		Var rIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
-				"readIndex");
-		wIndex.setIndex(1);
-		body.getFirst().add(0,
-				irFactory.createInstLoad(wIndex, writeIndex));
-		body.getFirst().add(0,
-				irFactory.createInstLoad(rIndex, readIndex));
+	
 		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-				buffer, wIndex, port, bufferSize);
+				buffer, writeIndex, port, bufferSize);
 		modifyActionScheduler.doSwitch(action.getScheduler());
-		modifyActionSchedulability(action, wIndex, rIndex, OpBinary.GE,
+		modifyActionSchedulability(action, writeIndex, readIndex, OpBinary.GE,
 				irFactory.createExprInt(numTokens), port);
 	}
 
@@ -455,7 +446,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	private Action createDoneAction(String name, Var counter, int numTokens) {
 		Tag tag = dfFactory.createTag(name);
 
-		// Body building ;-)
+		// Body building 
 		Procedure body = irFactory.createProcedure(name, 0,
 				irFactory.createTypeVoid());
 		BlockBasic blockBody = irFactory.createBlockBasic();
@@ -545,17 +536,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 		defineUntaggedBody(readIndex, storeList, newUntaggedAction.getBody(),
 				localINPUT, port, bufferSize);
 		
-		Procedure body = newUntaggedAction.getBody();
-		Var wIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
-				"writeIndex");
-		Var rIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
-				"readIndex");
-		wIndex.setIndex(1);
-		body.getFirst().add(0,
-				irFactory.createInstLoad(wIndex, writeIndex));
-		body.getFirst().add(0,
-				irFactory.createInstLoad(rIndex, readIndex));
-		modifyActionSchedulability(newUntaggedAction, wIndex, rIndex,
+		
+		modifyActionSchedulability(newUntaggedAction, writeIndex, readIndex,
 				OpBinary.LT, irFactory.createExprInt(bufferSize), port);
 		Pattern pattern = newUntaggedAction.getInputPattern();
 		pattern.setNumTokens(port, 1);
@@ -582,13 +564,40 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private Action createWriteAction(String actionName, Var writeCounter,
 			Var writeList) {
-		String writeName = actionName + port.getName() + "_NewWrite";
+		String name = actionName + port.getName() + "_NewWrite";
+		Tag tag = dfFactory.createTag(name);
+		Procedure scheduler = irFactory.createProcedure(
+				"isSchedulable_" + name, 0, irFactory.createTypeBool());
+		BlockBasic blockScheduler = irFactory.createBlockBasic();
+		Var result = scheduler.newTempLocalVariable(irFactory.createTypeBool(),
+				"actionResult");
+		result.setIndex(1);
+		Var wCounter = scheduler.newTempLocalVariable(irFactory.createTypeInt(32),
+				"writeCounter");
+		wCounter.setIndex(1);
 		Expression guardValue = irFactory.createExprInt(numTokens);
-		Expression counterExpression = irFactory.createExprVar(writeCounter);
+		Expression counterExpression = irFactory.createExprVar(wCounter);
 		Expression expression = irFactory.createExprBinary(counterExpression,
 				OpBinary.LT, guardValue, irFactory.createTypeBool());
-		Action newWriteAction = createAction(expression, writeName);
+		scheduler.getFirst().add(0,
+				irFactory.createInstLoad(wCounter, writeCounter));
+		blockScheduler.add(irFactory.createInstAssign(result, expression));
+		blockScheduler.add(irFactory.createInstReturn(irFactory
+				.createExprVar(result)));
+		scheduler.getBlocks().add(blockScheduler);
 
+		// Body building ;-)
+		Procedure body = irFactory.createProcedure(name, 0,
+				irFactory.createTypeVoid());
+		BlockBasic blockBody = irFactory.createBlockBasic();
+		blockBody.add(irFactory.createInstReturn());
+		body.getBlocks().add(blockBody);
+
+		Action newWriteAction = dfFactory.createAction(tag, dfFactory.createPattern(),
+				dfFactory.createPattern(), dfFactory.createPattern(),
+				scheduler, body);
+		actor.getActions().add(newWriteAction);
+		
 		Var OUTPUT = irFactory.createVar(0,
 				irFactory.createTypeList(1, port.getType()), port.getName()
 						+ "_OUTPUT", true, 0);
@@ -673,7 +682,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 				+ "_LocalOutput", true, outputIndex);
 		locals.add(output);
 		List<Expression> load2Index = new ArrayList<Expression>(1);
-		load2Index.add(irFactory.createExprVar(writeCounter));
+		load2Index.add(irFactory.createExprVar(counter1));
 		bodyNode.add(irFactory.createInstLoad(output, writeList, load2Index));
 
 		Expression assign2Value = irFactory.createExprBinary(
@@ -1058,21 +1067,12 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 				Var writeIndex = writeIndexes.get(position);
 				Var readIndex = readIndexes.get(position);
 				bufferSize = bufferSizes.get(position);
-				Procedure body = action.getBody();
-				Var wIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
-						"writeIndex");
-				Var rIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
-						"readIndex");
-				wIndex.setIndex(1);
-				body.getFirst().add(0,
-						irFactory.createInstLoad(wIndex, writeIndex));
-				body.getFirst().add(0,
-						irFactory.createInstLoad(rIndex, readIndex));
+				
 				ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-						buffer, wIndex, verifPort, bufferSize);
+						buffer, writeIndex, verifPort, bufferSize);
 				modifyActionScheduler.doSwitch(action.getBody());
 				modifyActionScheduler.doSwitch(action.getScheduler());
-				modifyActionSchedulability(action, wIndex, rIndex,
+				modifyActionSchedulability(action, writeIndex, readIndex,
 						OpBinary.GE, irFactory.createExprInt(verifNumTokens),
 						verifPort);
 				updateUntagIndex(action, writeIndex, verifNumTokens);
@@ -1101,25 +1101,16 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 					createUntaggedAction(untagReadIndex, untagWriteIndex,
 							untagBuffer, verifPort, false, bufferSize);
 					
-					Procedure body = action.getBody();
-					Var wIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
-							"writeIndex");
-					Var rIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
-							"readIndex");
-					wIndex.setIndex(1);
-					body.getFirst().add(0,
-							irFactory.createInstLoad(wIndex, untagWriteIndex));
-					body.getFirst().add(0,
-							irFactory.createInstLoad(rIndex, untagReadIndex));
+					
 
 					ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-							untagBuffer, wIndex, verifPort, bufferSize);
+							untagBuffer, untagWriteIndex, verifPort, bufferSize);
 					modifyActionScheduler.doSwitch(action.getBody());
 					modifyActionScheduler.doSwitch(action.getScheduler());
-					modifyActionSchedulability(action, wIndex,
-							rIndex, OpBinary.GE,
+					modifyActionSchedulability(action, untagWriteIndex,
+							untagReadIndex, OpBinary.GE,
 							irFactory.createExprInt(verifNumTokens), verifPort);
-					updateUntagIndex(action, wIndex, verifNumTokens);
+					updateUntagIndex(action, untagWriteIndex, verifNumTokens);
 					action.getInputPattern().remove(verifPort);
 				}
 			}
