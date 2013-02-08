@@ -544,7 +544,18 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 
 		defineUntaggedBody(readIndex, storeList, newUntaggedAction.getBody(),
 				localINPUT, port, bufferSize);
-		modifyActionSchedulability(newUntaggedAction, writeIndex, readIndex,
+		
+		Procedure body = newUntaggedAction.getBody();
+		Var wIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
+				"writeIndex");
+		Var rIndex = body.newTempLocalVariable(irFactory.createTypeInt(32),
+				"readIndex");
+		wIndex.setIndex(1);
+		body.getFirst().add(0,
+				irFactory.createInstLoad(wIndex, writeIndex));
+		body.getFirst().add(0,
+				irFactory.createInstLoad(rIndex, readIndex));
+		modifyActionSchedulability(newUntaggedAction, wIndex, rIndex,
 				OpBinary.LT, irFactory.createExprInt(bufferSize), port);
 		Pattern pattern = newUntaggedAction.getInputPattern();
 		pattern.setNumTokens(port, 1);
