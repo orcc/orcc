@@ -155,6 +155,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			if (pattern != null) {
 				Port testPort = pattern.getPort(varSource);
 				if (port.equals(testPort)) {
+					// create load instruction for the index
+					
 					// change tab Name
 					load.getSource().setVariable(tab);
 					Expression indexInit = load.getIndexes().get(0);
@@ -935,7 +937,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			body.getFirst().add(
 					irFactory.createInstLoad(index, untagWriteIndex));
 			ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
-					untagBuffer, untagWriteIndex, bufferSize);
+					untagBuffer, index, bufferSize);
 			modifyProcessAction.doSwitch(action.getBody());
 			actionToTransition(port, action, untagBuffer, untagWriteIndex,
 					untagReadIndex, bufferSize);
