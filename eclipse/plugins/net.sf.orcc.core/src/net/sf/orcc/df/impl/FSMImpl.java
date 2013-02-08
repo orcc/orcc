@@ -217,4 +217,16 @@ public class FSMImpl extends GraphImpl implements FSM {
 					DfPackage.FSM__INITIAL_STATE, oldInitialState, initialState));
 	}
 
+	@Override
+	public void addState(State state) {
+		getStates().add(state);
+		getVertices().add(state);
+	}
+	
+	@Override
+	public void addTransition(Transition transition) {
+		getTransitions().add(transition);
+		getEdges().add(transition);
+	}
+
 } // FSMImpl

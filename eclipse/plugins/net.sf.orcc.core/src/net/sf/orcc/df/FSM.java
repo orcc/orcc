@@ -126,4 +126,20 @@ public interface FSM extends Graph {
 	 */
 	void setInitialState(State state);
 
+	/**
+	 * Adds new state to the FSM.
+	 * 
+	 * @param state
+	 *            a state
+	 */
+	void addState(State state);
+
+	/**
+	 * Adds new transition to the FSM.
+	 * 
+	 * @param transition
+	 *            a transition
+	 */
+	void addTransition(Transition transition);
+
 }

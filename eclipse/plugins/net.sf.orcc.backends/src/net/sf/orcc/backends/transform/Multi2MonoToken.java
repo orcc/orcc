@@ -786,7 +786,12 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			for (Action action : actions) {
 
 				visitTransition(initState, initState, action);
-
+				
+			}
+			if (!transitionsList.isEmpty()) {
+				for (Transition t : transitionsList) {
+					fsm.addTransition(t);
+				}
 			}
 
 		} else {
@@ -799,7 +804,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			}
 			if (!transitionsList.isEmpty()) {
 				for (Transition t : transitionsList) {
-					fsm.getTransitions().add(t);
+					fsm.addTransition(t);
 				}
 			}
 		}
@@ -963,7 +968,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			if (verifNumTokens > 1) {
 				String writeName = "newStateWrite" + action.getName();
 				State writeState = dfFactory.createState(writeName);
-				fsm.getStates().add(writeState);
+				fsm.addState(writeState);
 
 				fsm.replaceTarget(sourceState, action, writeState);
 
@@ -1145,7 +1150,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private void setFsm(State initialState) {
 		fsm = dfFactory.createFSM();
-		fsm.getStates().add(initialState);
+		fsm.addState(initialState);
 		fsm.setInitialState(initialState);
 		for (Action action : actor.getActionsOutsideFsm()) {
 			fsm.addTransition(initialState, action, initialState);
@@ -1189,7 +1194,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 				String updateWriteName = "newStateWrite" + action.getName()
 						+ visitedRenameIndex;
 				State writeState = dfFactory.createState(updateWriteName);
-				fsm.getStates().add(writeState);
+				fsm.addState(writeState);
 				// create new process action if not created while treating
 				// inputs
 				fsm.replaceTarget(source, oldAction, writeState);
