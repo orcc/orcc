@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
@@ -172,28 +171,7 @@ public class YaceBackend extends AbstractBackend {
 	 */
 	public void printNetwork(Network network) {
 
-		Map<String, List<Instance>> targetToInstancesMap;
-
-		for (String component : mapping.values()) {
-			if (!component.isEmpty()) {
-
-				targetToInstancesMap = new HashMap<String, List<Instance>>();
-				List<Instance> unmappedInstances = new ArrayList<Instance>();
-
-				BackendUtil.computeMapping(network, mapping,
-						targetToInstancesMap, unmappedInstances);
-
-				new XcfPrinter(targetToInstancesMap).printXcfFile(path
-						+ File.separator + network.getSimpleName() + ".xcf");
-
-				for (Instance instance : unmappedInstances) {
-					OrccLogger.warnln("Warning: The instance '"
-							+ instance.getName() + "' is not mapped.");
-				}
-				break;
-			}
-		}
-
+		new XcfPrinter().print(path, network, mapping);
 		NetworkPrinter printer = new NetworkPrinter(network, options);
 
 		printer.printNetwork(path);

@@ -31,7 +31,6 @@ package net.sf.orcc.backends.c;
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 import static net.sf.orcc.backends.OrccBackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.OrccBackendsConstants.GENETIC_ALGORITHM;
-import static net.sf.orcc.backends.OrccBackendsConstants.THREADS_NB;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,7 +51,6 @@ import net.sf.orcc.backends.transform.ListFlattener;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
@@ -101,19 +99,8 @@ public class CBackend extends AbstractBackend {
 	 */
 	private String srcPath;
 
-	/**
-	 * Configuration mapping
-	 */
-	protected Map<String, List<Instance>> targetToInstancesMap;
-
 	@Override
 	protected void doInitializeOptions() {
-
-		if (!getAttribute(GENETIC_ALGORITHM, false)
-				&& targetToInstancesMap != null) {
-			options.put(THREADS_NB, targetToInstancesMap.size());
-		}
-
 		// Create empty folders
 		new File(path + File.separator + "build").mkdirs();
 		new File(path + File.separator + "bin").mkdirs();
@@ -231,20 +218,6 @@ public class CBackend extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		for (String component : mapping.values()) {
-			if (!component.isEmpty()) {
-				targetToInstancesMap = new HashMap<String, List<Instance>>();
-				List<Instance> unmappedInstances = new ArrayList<Instance>();
-				BackendUtil.computeMapping(network, mapping,
-						targetToInstancesMap, unmappedInstances);
-				for (Instance instance : unmappedInstances) {
-					OrccLogger.warnln("The instance '" + instance.getName()
-							+ "' is not mapped.");
-				}
-				break;
-			}
-		}
-
 		// print instances
 		printChildren(network);
 
@@ -260,11 +233,8 @@ public class CBackend extends AbstractBackend {
 		OrccLogger.traceln("Printing CMake project files");
 		new CMakePrinter(network).printCMakeFiles(path);
 
-		if (!getAttribute(GENETIC_ALGORITHM, false)
-				&& targetToInstancesMap != null) {
-			OrccLogger.traceln("Printing mapping file");
-			new XcfPrinter(targetToInstancesMap).printXcfFile(srcPath
-					+ File.separator + network.getName() + ".xcf");
+		if (!getAttribute(GENETIC_ALGORITHM, false)) {
+			new XcfPrinter().print(srcPath, network, mapping);
 		}
 	}
 

@@ -53,7 +53,6 @@ import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
@@ -101,11 +100,6 @@ public class JadeBackend extends AbstractBackend {
 	private String optLevel;
 
 	private final Map<String, String> renameMap;
-
-	/**
-	 * Configuration mapping
-	 */
-	private Map<String, List<Instance>> targetToInstancesMap;
 
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
@@ -208,24 +202,7 @@ public class JadeBackend extends AbstractBackend {
 			e.printStackTrace();
 		}
 
-		for (String component : mapping.values()) {
-			if (!component.isEmpty()) {
-				targetToInstancesMap = new HashMap<String, List<Instance>>();
-				List<Instance> unmappedInstances = new ArrayList<Instance>();
-				BackendUtil.computeMapping(network, mapping,
-						targetToInstancesMap, unmappedInstances);
-				for (Instance instance : unmappedInstances) {
-					OrccLogger.warnln("The instance '" + instance.getName()
-							+ "' is not mapped.");
-				}
-				break;
-			}
-		}
-
-		if (targetToInstancesMap != null) {
-			new XcfPrinter(targetToInstancesMap).printXcfFile(path
-					+ File.separator + "mapping.xcf");
-		}
+		new XcfPrinter().print(path, network, mapping);
 	}
 
 	private void finalizeActors(List<Actor> actors) {

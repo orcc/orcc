@@ -38,7 +38,6 @@ import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.transform.DivisionSubstitution;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -175,20 +174,6 @@ public class HLSBackend extends CBackend {
 		transformActors(network.getAllActors());
 
 		network.computeTemplateMaps();
-
-		for (String component : mapping.values()) {
-			if (!component.isEmpty()) {
-				targetToInstancesMap = new HashMap<String, List<Instance>>();
-				List<Instance> unmappedInstances = new ArrayList<Instance>();
-				BackendUtil.computeMapping(network, mapping,
-						targetToInstancesMap, unmappedInstances);
-				for (Instance instance : unmappedInstances) {
-					OrccLogger.warnln("The instance '" + instance.getName()
-							+ "' is not mapped.");
-				}
-				break;
-			}
-		}
 
 		// print instances
 		printChildren(network);

@@ -29,10 +29,15 @@
 package net.sf.orcc.backends.util
 
 import java.io.File
+import java.util.ArrayList
+import java.util.HashMap
 import java.util.List
 import java.util.Map
 import net.sf.orcc.backends.CommonPrinter
-import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
+import net.sf.orcc.graph.Vertex
+import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.df.Actor
 
 /**
  * Printer used to create the xcf file, containing information on
@@ -43,34 +48,75 @@ import net.sf.orcc.df.Instance
  */
 class XcfPrinter extends CommonPrinter {
 	
-	protected Map<String, List<Instance>> coreToInstanceMap
+	var Map<String, List<Vertex>> mapping
+	var List<Vertex> unmapped
+	var int i
 	
-	var i = 0
-	
-	new(Map<String, List<Instance>> coreToInstanceMap) {
-		this.coreToInstanceMap = coreToInstanceMap
+	def print(String targetFolder, Network network, Map<String, String> initialMapping) {
+		val xcfFile = new File(targetFolder + File::separator + network.simpleName + ".xcf")
+		
+		network.computeMapping(initialMapping)
+		printFile(network.contentFile, xcfFile)
 	}
 	
-	def printXcfFile(String fileName) {
-		printFile(compileXcfFile, new File(fileName))
+	def private void computeMapping(Network network, Map<String, String> initialMapping) {	
+		mapping = new HashMap<String, List<Vertex>>
+		unmapped = new ArrayList<Vertex>
+		i = 0
+		if(!initialMapping.values.forall[nullOrEmpty]) {
+			OrccLogger::traceln(initialMapping.toString)
+			for (instance : network.children.actorInstances) {
+				instance.tryToMap(initialMapping.get(instance.hierarchicalName))
+			}
+			for (actor : network.children.filter(typeof(Actor))) {
+				actor.tryToMap(initialMapping.get(network.name + "_" + actor.name))
+			}
+		}
 	}
 	
-	def protected compileXcfFile() '''
+	def private tryToMap(Vertex vertex, String component) {	
+		if (!component.nullOrEmpty) {
+			if (!mapping.containsKey(component)) {
+				mapping.put(component, new ArrayList<Vertex>);
+			}
+			mapping.get(component).add(vertex);
+		} else {
+			OrccLogger::warnln("The instance '" + vertex.label
+						+ "' is not mapped.");
+			unmapped.add(vertex)
+		}
+	}
+	
+	def private getContentFile(Network network) '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<Configuration>
 			<Partitioning>
-				«FOR instances : coreToInstanceMap.values»
-					«instances.printPartition»
+				«IF !mapping.empty»
+					«FOR vertices : mapping.values»
+						«vertices.partition»
+					«ENDFOR»
+				«ELSE»
+					«network.children.partition»
+				«ENDIF»
+				«FOR vertex : unmapped»
+					<!-- Unmapped id="«vertex.label»" -->
 				«ENDFOR»
 			</Partitioning>
+			
+			«otherStuff»
 		</Configuration>
 	'''
 	
-	def protected printPartition(Iterable<Instance> instances) '''
+	def private getPartition(Iterable<Vertex> entities) '''
 		<Partition id="« i = i + 1 »">
-			«FOR instance : instances»
-				<Instance id="«instance.name»"/>
+			«FOR entity : entities»
+				<Instance id="«entity.label»"/>
 			«ENDFOR»
 		</Partition>
 	'''
+	
+	def private otherStuff() '''
+		<!-- Other useful informations related to any element of the instanciated model can be printed here -->
+	'''
+	
 }
