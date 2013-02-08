@@ -43,6 +43,7 @@ import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
+import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Validator;
@@ -66,6 +67,9 @@ import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.tools.classifier.Classifier;
+import net.sf.orcc.tools.merger.action.ActionMerger;
+import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
@@ -134,34 +138,45 @@ public class LLVMBackend extends AbstractBackend {
 	}
 
 	protected Network doTransformNetwork(Network network) {
+		OrccLogger.traceln("Analyze and transform the network...");
 
-		// instantiate and flattens network
-		OrccLogger.traceln("Instantiating...");
-		new Instantiator(true, fifoSize).doSwitch(network);
-		OrccLogger.traceln("Flattening...");
-		new NetworkFlattener().doSwitch(network);
+		List<DfSwitch<?>> visitors = new ArrayList<DfSwitch<?>>();
 
-		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new UnitImporter());
-		transformations.add(new TypeResizer(true, true, false, false));
-		transformations.add(new StringTransformation());
-		transformations.add(new DfVisitor<Void>(new SSATransformation()));
-		transformations.add(new DeadGlobalElimination());
-		transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
-		transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-		transformations.add(new RenameTransformation(this.renameMap));
-		transformations.add(new DfVisitor<Expression>(new TacTransformation()));
-		transformations.add(new DfVisitor<Void>(new CopyPropagator()));
-		transformations.add(new DfVisitor<Void>(new ConstantPropagator()));
-		transformations.add(new DfVisitor<Void>(new InstPhiTransformation()));
-		transformations.add(new DfVisitor<Expression>(
-				new CastAdder(false, true)));
-		transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-		transformations.add(new DfVisitor<Void>(new BlockCombine()));
-		transformations.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
-		transformations.add(new DfVisitor<Void>(new ListInitializer()));
+		visitors.add(new Instantiator(true, fifoSize));
+		visitors.add(new NetworkFlattener());
+		visitors.add(new UnitImporter());
 
-		for (DfSwitch<?> transfo : transformations) {
+		if (classify) {
+			visitors.add(new Classifier());
+		}
+		if (mergeActions) {
+			visitors.add(new ActionMerger());
+		}
+		if (mergeActors) {
+			visitors.add(new ActorMerger());
+		}
+		if (convertMulti2Mono) {
+			visitors.add(new Multi2MonoToken());
+		}
+		
+		visitors.add(new TypeResizer(true, true, false, false));
+		visitors.add(new StringTransformation());
+		visitors.add(new DfVisitor<Void>(new SSATransformation()));
+		visitors.add(new DeadGlobalElimination());
+		visitors.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		visitors.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+		visitors.add(new RenameTransformation(this.renameMap));
+		visitors.add(new DfVisitor<Expression>(new TacTransformation()));
+		visitors.add(new DfVisitor<Void>(new CopyPropagator()));
+		visitors.add(new DfVisitor<Void>(new ConstantPropagator()));
+		visitors.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		visitors.add(new DfVisitor<Expression>(new CastAdder(false, true)));
+		visitors.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		visitors.add(new DfVisitor<Void>(new BlockCombine()));
+		visitors.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		visitors.add(new DfVisitor<Void>(new ListInitializer()));
+
+		for (DfSwitch<?> transfo : visitors) {
 			transfo.doSwitch(network);
 			if (debug) {
 				ResourceSet set = new ResourceSetImpl();
