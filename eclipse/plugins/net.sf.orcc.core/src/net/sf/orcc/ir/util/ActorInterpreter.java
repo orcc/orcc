@@ -163,10 +163,10 @@ public class ActorInterpreter extends IrSwitch<Object> {
 					// management
 					String str = ((ExprString) expr).getValue();
 					String unescaped = OrccUtil.getUnescapedString(str);
-					OrccLogger.traceRaw(unescaped);
+					OrccLogger.noticeRaw(unescaped);
 				} else {
 					Object value = exprInterpreter.doSwitch(expr);
-					OrccLogger.traceRaw(String.valueOf(value));
+					OrccLogger.noticeRaw(String.valueOf(value));
 				}
 			}
 		}
@@ -174,10 +174,10 @@ public class ActorInterpreter extends IrSwitch<Object> {
 
 	@Override
 	public Object caseInstAssign(InstAssign instr) {
+		Var target = instr.getTarget().getVariable();
+		Object value = exprInterpreter.doSwitch(instr.getValue());
+		value = clipValue(target.getType(), value, instr);
 		try {
-			Var target = instr.getTarget().getVariable();
-			Object value = exprInterpreter.doSwitch(instr.getValue());
-			value = clipValue(target.getType(), value, instr);
 			target.setValue(value);
 		} catch (OrccRuntimeException e) {
 			String file = actor.getFileName();
@@ -229,20 +229,20 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		if (instr.getIndexes().isEmpty()) {
 			target.setValue(source.getValue());
 		} else {
-			try {
-				Object array = source.getValue();
-				Object[] indexes = new Object[instr.getIndexes().size()];
-				int i = 0;
-				for (Expression index : instr.getIndexes()) {
-					indexes[i++] = exprInterpreter.doSwitch(index);
-				}
 
-				Type type = ((TypeList) source.getType()).getInnermostType();
+			Object array = source.getValue();
+			Object[] indexes = new Object[instr.getIndexes().size()];
+			int i = 0;
+			for (Expression index : instr.getIndexes()) {
+				indexes[i++] = exprInterpreter.doSwitch(index);
+			}
+			Type type = ((TypeList) source.getType()).getInnermostType();
+			try {
 				Object value = ValueUtil.get(type, array, indexes);
 				target.setValue(value);
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
-						"Array index out of bounds at line "
+						"Array Index Out of Bound at line "
 								+ instr.getLineNumber());
 			}
 		}
@@ -266,8 +266,8 @@ public class ActorInterpreter extends IrSwitch<Object> {
 
 	@Override
 	public Object caseInstSpecific(InstSpecific instr) {
-		throw new OrccRuntimeException("does not know how to interpret a "
-				+ "specific instruction");
+		throw new OrccRuntimeException(
+				"does not know how to interpret a specific instruction");
 	}
 
 	@Override
@@ -278,21 +278,22 @@ public class ActorInterpreter extends IrSwitch<Object> {
 			value = clipValue(target.getType(), value, instr);
 			target.setValue(value);
 		} else {
-			try {
-				Object array = target.getValue();
-				Object[] indexes = new Object[instr.getIndexes().size()];
-				int i = 0;
-				for (Expression index : instr.getIndexes()) {
-					indexes[i++] = exprInterpreter.doSwitch(index);
-				}
 
-				Type type = ((TypeList) target.getType()).getInnermostType();
-				value = clipValue(type, value, instr);
+			Object array = target.getValue();
+			Object[] indexes = new Object[instr.getIndexes().size()];
+			int i = 0;
+			for (Expression index : instr.getIndexes()) {
+				indexes[i++] = exprInterpreter.doSwitch(index);
+			}
+
+			Type type = ((TypeList) target.getType()).getInnermostType();
+			value = clipValue(type, value, instr);
+			try {
 				ValueUtil.set(type, array, value, indexes);
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
-						"Array index out of bounds at line "
-								+ instr.getLineNumber());
+						"Array Index Out of Bound at line "
+								+ instr.getLineNumber() + "");
 			}
 		}
 		return null;
@@ -332,7 +333,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		} else {
 			throw new OrccRuntimeException("Condition "
 					+ new ExpressionPrinter().doSwitch(block.getCondition())
-					+ " not boolean at line " + block.getLineNumber() + "\n");
+					+ " not boolean at line " + block.getLineNumber());
 		}
 		return ret;
 	}
@@ -549,7 +550,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 
 			// initializes runtime value of constants declared in units
 			initExternalResources(actor);
-			
+
 			// initializes FSM status (if any)
 			if (actor.hasFsm()) {
 				fsmState = actor.getFsm().getInitialState();
