@@ -37,7 +37,6 @@ import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
-import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -47,8 +46,6 @@ import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.simulators.util.RuntimeExpressionEvaluator;
 import net.sf.orcc.util.Attribute;
-import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.EObject;
@@ -93,44 +90,22 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			i++;
 		}
 
+		// get packageName and containerName for calling the correct native
+		// function
+		EObject entity = procedure.eContainer();
+		String name = EcoreHelper.getFeature(entity, "name");
+		int index = name.lastIndexOf('.');
+		if (index != -1) {
+			name = "net.sf.orcc.simulators.runtime." + name.substring(0, index)
+					+ ".impl" + name.substring(index);
+		}
 		try {
-			// get packageName and containerName for calling the correct native
-			// function
-			EObject entity = procedure.eContainer();
-			String name = EcoreHelper.getFeature(entity, "name");
-			int index = name.lastIndexOf('.');
-			if (index != -1) {
-				name = "net.sf.orcc.simulators.runtime."
-						+ name.substring(0, index) + ".impl"
-						+ name.substring(index);
-			}
-
 			Class<?> clasz = Class.forName(name);
 			return clasz.getMethod(procedure.getName(), parameterTypes).invoke(
 					null, args);
 		} catch (Exception e) {
-			throw new OrccRuntimeException(
-					"Exception during native procedure call to "
-							+ procedure.getName(), e);
-		}
-	}
-
-	@Override
-	protected void callPrintProcedure(List<Arg> arguments) {
-		for (Arg arg : arguments) {
-			if (arg.isByVal()) {
-				Expression expr = ((ArgByVal) arg).getValue();
-				if (expr.isExprString()) {
-					// String characters rework for escaped control
-					// management
-					String str = ((ExprString) expr).getValue();
-					String unescaped = OrccUtil.getUnescapedString(str);
-					OrccLogger.traceRaw(unescaped);
-				} else {
-					Object value = exprInterpreter.doSwitch(expr);
-					OrccLogger.traceRaw(String.valueOf(value));
-				}
-			}
+			throw new OrccRuntimeException("Native produre call Exception for "
+					+ procedure.getName(), e);
 		}
 	}
 
