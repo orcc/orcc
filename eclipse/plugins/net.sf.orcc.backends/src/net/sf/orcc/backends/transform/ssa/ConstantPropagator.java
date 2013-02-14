@@ -59,7 +59,6 @@ public class ConstantPropagator extends AbstractIrVisitor<Void> {
 				EcoreUtil.replace(expr, IrUtil.copy(value));
 				IrUtil.delete(expr);
 			}
-			EcoreUtil.remove(assign.getTarget());
 			IrUtil.delete(assign);
 			indexInst--;
 		}
