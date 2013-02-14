@@ -139,14 +139,14 @@ import java.io.File
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
 				«connList.head.fifoName»_V_din <= tmp_«connList.head.fifoName»_din;
-				tmp_«connList.head.fifoName»_full_n <= «connList.head.fifoName»_V_full_n;
+				--tmp_«connList.head.fifoName»_full_n <= «connList.head.fifoName»_V_full_n;
 				«connList.head.fifoName»_V_write <= tmp_«connList.head.fifoName»_write;
 			«ENDIF»
 		«ENDFOR»
 		«FOR connList : instance.incomingPortMap.values»
 			«IF (connList.source instanceof Port) && !(connList.target instanceof Port) »
 				tmp_«connList.fifoName»_dout <= «connList.fifoName»_V_dout;
-				tmp_«connList.fifoName»_empty_n <= «connList.fifoName»_V_empty_n;
+				--tmp_«connList.fifoName»_empty_n <= «connList.fifoName»_V_empty_n;
 				«connList.fifoName»_V_read <= tmp_«connList.fifoName»_read;
 			«ENDIF»
 		«ENDFOR»
