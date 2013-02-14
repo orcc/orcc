@@ -137,7 +137,7 @@ public class LLVMBackend extends AbstractBackend {
 		// do not transform actor
 	}
 
-	protected Network doTransformNetwork(Network network) {
+	protected void doTransformNetwork(Network network) {
 		OrccLogger.traceln("Analyze and transform the network...");
 
 		List<DfSwitch<?>> visitors = new ArrayList<DfSwitch<?>>();
@@ -192,8 +192,6 @@ public class LLVMBackend extends AbstractBackend {
 
 		new DfVisitor<Void>(new TemplateInfoComputing()).doSwitch(network);
 		network.computeTemplateMaps();
-
-		return network;
 	}
 
 	@Override
@@ -206,7 +204,7 @@ public class LLVMBackend extends AbstractBackend {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
 
-		network = doTransformNetwork(network);
+		doTransformNetwork(network);
 
 		// print instances and entities
 		printChildren(network);
