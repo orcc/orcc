@@ -206,10 +206,10 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		Expression newValue = doSwitch(assign.getValue());
 		parentType = oldParentType;
 		if (newValue != assign.getValue()) {
-			// Assign is useless anymore
-			EList<Instruction> instructions = assign.getBlock()
-					.getInstructions();
-			InstCast cast = (InstCast) instructions.get(indexInst - 1);
+			// The assignment is useless now, we replace it by the cast
+			// instruction
+			InstCast cast = (InstCast) assign.getBlock().getInstructions()
+					.get(indexInst);
 			cast.setTarget(assign.getTarget());
 
 			IrUtil.delete(assign);
@@ -384,7 +384,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		Type oldParentType = parentType;
 		parentType = phi.getTarget().getVariable().getType();
 		EList<Expression> values = phi.getValues();
-		
+
 		// FIXME: Need improvment/merging
 		Block containingBlock = (Block) phi.getBlock().eContainer();
 		Expression value0 = phi.getValues().get(0);
