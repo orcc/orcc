@@ -218,28 +218,28 @@ import java.io.File
 	
 	def printOutputFifoAssignHLS( Connection connection) '''
 		
-		«connection.fifoName»_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
+		«connection.fifoName»_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
 		«connection.fifoName»_full_n : IN STD_LOGIC;
 		«connection.fifoName»_write  : OUT STD_LOGIC;
 	'''
 	
 	def printInputFifoAssignHLS(Connection connection) '''
 		
-		«connection.fifoName»_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
+		«connection.fifoName»_dout   : IN STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
 		«connection.fifoName»_empty_n : IN STD_LOGIC;
 		«connection.fifoName»_read    : OUT STD_LOGIC;
 	'''
 	
 	def printOutputSignalFifoAssignHLS(Connection connection) '''
 		
-		signal «connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits- 1» downto 0) := (others => '0');
+		signal «connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits- 1» downto 0) := (others => '0');
 		signal «connection.fifoName»_full_n :  STD_LOGIC := '0';
 		signal «connection.fifoName»_write  :  STD_LOGIC := '0';
 	'''
 	
 	def printInputSignalFifoAssignHLS(Connection connection) '''
 	
-		signal «connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits- 1» downto 0) := (others => '0');
+		signal «connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits- 1» downto 0) := (others => '0');
 		signal «connection.fifoName»_empty_n :  STD_LOGIC := '0';
 		signal «connection.fifoName»_read    :  STD_LOGIC := '0';
 	'''
@@ -312,13 +312,13 @@ import java.io.File
 			readline(sim_file_«instance.name»_«connection.targetPort.name», line_number);
 			if (line_number'length > 0 and line_number(1) /= '/') then
 				read(line_number, input_bit);
-				«IF connection.fifoType.int»
-					«connection.fifoName»_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»));
+				«IF connection.fifoTypeIn.int»
+					«connection.fifoName»_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoTypeIn.sizeInBits»));
 				«ENDIF»
-				«IF connection.fifoType.uint»
-					«connection.fifoName»_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoType.sizeInBits»));
+				«IF connection.fifoTypeIn.uint»
+					«connection.fifoName»_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeIn.sizeInBits»));
 				«ENDIF»
-				«IF connection.fifoType.bool»
+				«IF connection.fifoTypeIn.bool»
 					if (input_bit = 1) then 
 					«connection.fifoName»_dout  <= '1';
 					else
@@ -337,14 +337,14 @@ import java.io.File
 			readline(sim_file_«instance.name»_«connection.targetPort.name», line_number);
 			if (line_number'length > 0 and line_number(1) /= '/') then
 				read(line_number, input_bit);
-				«IF connection.fifoType.int»
-					«connection.fifoName»_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»));
+				«IF connection.fifoTypeIn.int»
+					«connection.fifoName»_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoTypeIn.sizeInBits»));
 				«ENDIF»
-				«IF connection.fifoType.uint»
-					«connection.fifoName»_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoType.sizeInBits»));
+				«IF connection.fifoTypeIn.uint»
+					«connection.fifoName»_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeIn.sizeInBits»));
 				«ENDIF»
 				«connection.fifoName»_empty_n <= '1';
-				«IF connection.fifoType.bool»
+				«IF connection.fifoTypeIn.bool»
 					if (input_bit = 1) then 
 					«connection.fifoName»_dout  <= '1';
 					else
@@ -366,19 +366,19 @@ import java.io.File
 			readline(sim_file_«vertex.name»_«connection.sourcePort.name», line_number);
 			if (line_number'length > 0 and line_number(1) /= '/') then
 				read(line_number, input_bit);
-				«IF connection.fifoType.int»
-				assert («connection.fifoName»_din  = std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»)))
+				«IF connection.fifoTypeOut.int»
+				assert («connection.fifoName»_din  = std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
 				-- report "on «connection.fifoName» incorrectly value computed : " & to_string(to_integer(to_signed(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
 				report "on port «connection.fifoName» incorrectly value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
 				severity error;
 				«ENDIF»
-				«IF connection.fifoType.uint»
-				assert («connection.fifoName»_din  = std_logic_vector(to_unsigned(input_bit, «connection.fifoType.sizeInBits»)))
+				«IF connection.fifoTypeOut.uint»
+				assert («connection.fifoName»_din  = std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeOut.sizeInBits»)))
 				-- report "on «connection.fifoName» incorrectly value computed : " & to_string(to_integer(to_unsigned(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
 				report "on port «connection.fifoName» incorrectly value computed : " & str(to_integer(unsigned(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
 				severity error;
 				«ENDIF»
-				«IF connection.fifoType.bool»
+				«IF connection.fifoTypeOut.bool»
 				if (input_bit = 1)
 					assert («connection.fifoName»_din  = '1')
 					report on port «connection.fifoName» "0" instead of "1"
@@ -391,7 +391,7 @@ import java.io.File
 				«ENDIF»
 				
 			
-				-- assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»)))
+				-- assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
 				-- report "on port «connection.fifoName» correct value computed : " & str(to_integer(signed(Y_data))) & " equals :" & str(input_bit)
 				-- severity note;
 
@@ -411,10 +411,18 @@ import java.io.File
 	def fifoName(Connection connection)
 		'''myStream_«connection.getAttribute("id").objectValue»_V'''
 	
-	def fifoType(Connection connection) {
-		if (connection.sourcePort != null){	
+	def fifoTypeOut(Connection connection) {
+		if(connection.sourcePort == null){
+		connection.targetPort.type}
+		else{
 			connection.sourcePort.type
-		}else{
+		}
+	}
+	
+	def fifoTypeIn(Connection connection) {
+		if(connection.targetPort == null){
+		connection.sourcePort.type}
+		else{
 			connection.targetPort.type
 		}
 	}

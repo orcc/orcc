@@ -35,10 +35,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.transform.DivisionSubstitution;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -121,9 +119,11 @@ public class HLSBackend extends CBackend {
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, true, true, false));
+
 		transformations.add(new RenameTransformation(replacementMap));
+		// transformations.add(new DisconnectedOutputPortRemoval());
 		transformations.add(new Multi2MonoToken());
-		transformations.add(new DivisionSubstitution());
+		// transformations.add(new DivisionSubstitution());
 		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 
 		for (DfSwitch<?> transformation : transformations) {
@@ -176,20 +176,6 @@ public class HLSBackend extends CBackend {
 
 		network.computeTemplateMaps();
 
-		for (String component : mapping.values()) {
-			if (!component.isEmpty()) {
-				targetToInstancesMap = new HashMap<String, List<Instance>>();
-				List<Instance> unmappedInstances = new ArrayList<Instance>();
-				BackendUtil.computeMapping(network, mapping,
-						targetToInstancesMap, unmappedInstances);
-				for (Instance instance : unmappedInstances) {
-					OrccLogger.warnln("The instance '" + instance.getName()
-							+ "' is not mapped.");
-				}
-				break;
-			}
-		}
-
 		// print instances
 		printChildren(network);
 
@@ -202,7 +188,8 @@ public class HLSBackend extends CBackend {
 		}
 
 		OrccLogger.trace("Printing network testbench... ");
-		if (new NetworkTestBenchPrinter(network, options).print(VHDLTestBenchPath) > 0) {
+		if (new NetworkTestBenchPrinter(network, options)
+				.print(VHDLTestBenchPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
@@ -226,7 +213,8 @@ public class HLSBackend extends CBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		new InstanceTestBenchPrinter(options).print(VHDLTestBenchPath, instance);
+		new InstanceTestBenchPrinter(options)
+				.print(VHDLTestBenchPath, instance);
 		new InstanceCosimPrinter(options).print(coSimTestBenchPath, instance);
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}

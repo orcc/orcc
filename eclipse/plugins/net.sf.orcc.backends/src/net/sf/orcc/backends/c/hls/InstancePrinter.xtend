@@ -87,7 +87,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Input FIFOS
 		«FOR port : instance.actor.inputs»
 			«IF instance.incomingPortMap.get(port) != null»
-				extern stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
+				extern stream<«instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
 			«ENDIF»
 		«ENDFOR»
 		
@@ -95,7 +95,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Output FIFOs
 		«FOR port : instance.actor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(port)»
-				extern stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
+				extern stream<«connection.fifoTypeOut.doSwitch»> «connection.fifoName»;
 			«ENDFOR»
 		«ENDFOR»
 		
@@ -186,9 +186,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				goto finished;
 			}
 			// FSM transitions
-			«FOR state : instance.actor.fsm.states»
-		«state.printStateLabel»
-			«ENDFOR»
+		«FOR state : instance.actor.fsm.states»
+			«state.printStateLabel»
+		«ENDFOR»
 		finished:
 			return;
 		}
@@ -307,17 +307,21 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«actions.printActions»
 	'''
 	
-	def fifoName(Connection connection) '''
-		«IF connection != null»
-			myStream_«connection.getAttribute("id").objectValue»
-		«ENDIF»
-	'''
+	def fifoName(Connection connection) '''«IF connection != null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
 	
-	def fifoType(Connection connection) {
+	def fifoTypeOut(Connection connection) {
 		if(connection.sourcePort == null){
 		connection.targetPort.type}
 		else{
 			connection.sourcePort.type
+		}
+	}
+	
+	def fifoTypeIn(Connection connection) {
+		if(connection.targetPort == null){
+		connection.sourcePort.type}
+		else{
+			connection.targetPort.type
 		}
 	}
 	
@@ -357,8 +361,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«instance.name»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;
+			
 			}
-		«ENDFOR» else {
+		«ENDFOR»
+		else {
 			_FSM_state = my_state_«state.name»;
 			goto finished;
 		}
@@ -373,7 +379,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	add_files ../«instance.name».cpp
 	
 	open_solution "solution"
-	set_part  {xc7a100tcsg324-1}
+	set_part  {xc7v2000tlflg1925-2l}
 	create_clock -period 10
 	
 	source "directive_«instance.name».tcl"
@@ -392,5 +398,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	«FOR function : instance.actor.procs»
 		#set_directive_pipeline «function.name»
 	«ENDFOR»
+	#config_bind -effort high
 	'''
 }

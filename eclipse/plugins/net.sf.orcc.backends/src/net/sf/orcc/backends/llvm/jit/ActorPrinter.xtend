@@ -376,7 +376,7 @@ class ActorPrinter extends InstancePrinter {
 	def private FSM_MD() '''
 		«actor.fsm.objectReference» = metadata !{«actor.fsm.initialState.name.name_MD», metadata «actor.fsm.states.objectReference», metadata «actor.name.concat("_transitions").objectReference»}
 		;;; States
-		«actor.fsm.states.objectReference» = metadata !{«actor.fsm.states.join(", ", [name.name_MD])»}
+		«actor.fsm.states.objectReference» = metadata !{«actor.fsm.states.join(", ", [it.name.name_MD])»}
 		;;; All transitions
 		«actor.name.concat("_transitions").objectReference» = metadata !{«actor.fsm.states.join(", ", ['''metadata «objectReference»'''])»}
 		«FOR state : actor.fsm.states»

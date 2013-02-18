@@ -164,9 +164,12 @@ public class XdfImporter {
 		Vertex vertex = new Vertex(type);
 		vertex.setValue(PARAMETER_ID, instance.getName());
 		EObject entity = instance.getEntity();
-		String name = EcoreHelper.getFeature(entity, "name");
-		if (name != null) {
-			vertex.setValue(PARAMETER_REFINEMENT, name);
+
+		if (entity != null) {
+			String name = EcoreHelper.getFeature(entity, "name");
+			if (name != null) {
+				vertex.setValue(PARAMETER_REFINEMENT, name);
+			}
 		}
 
 		// parameters

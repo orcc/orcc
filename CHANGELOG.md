@@ -2,36 +2,47 @@
 
 ### Notable changes and features
 
-- CAL editor: Improve code completion.
-- Front-end: Optimization of the generated intermediated representation by removing most of 
-useless memory copies.
-- Add a new experimental backend called 'High Level Synthesis' (or HLS) which use Vivado
-toolset to generate HDL designs.
-- Add a new experimental backend called 'COMPA'. It generate C source code, without any dependency
-to external libraries (SDL, pthreads, etc.). This backend can't compile classical applications,
-because they use Display.cal and needs SDL to work. This backend was needed by members of COMPA
-research project (see http://compa-ietr.insa-rennes.fr)
-- LLVM/TTA backends do not use broadcast actors anymore. The broadcasting is directly made
-by the source actor.
-- TTA backend:
-	* Support light weight printing library of the TCE.
-	* Support a given set of 'native' functions for simulation purpose.
-	* Global performance improvement.
-	* Support automatic mapping of an application into a set of processors based on profiling.
-- Global improvement of the informations displayed by the compiler. The following levels of 
-messages are available : DEBUG, TRACE, NOTICE, WARNING, SEVERE.
-- The classifier supports now the Z3 solver v4.12+, the support of other solver is dropped.
-- Back-end CLI has new options such as '-m2m' which launch the Multi2MonoToken transformation.
-- Front-end CLI is now able to only build the actors needed by a given network instead of building
-the whole project and all its dependancies.
+- Front-end : 
+	* Optimization of the generated intermediated representation by removing most of 
+	useless memory copies.
+	* New CLI option to build only the actors needed by a given network instead of building
+	the whole project and all its dependancies.
+- Simulator :
+	* New option to generate files containing statistics and profiling data.
+- Backends :
+	* Mapping files (XCF) are always generated, even if there is no mapping set in the UI.
+	* New CLI options such as '-m2m' which applies the Multi2MonoToken transformation.
+	* [C] Global improvement in the readibility of the generated code.
+	* [LLVM, TTA] Direct broadcasting by the source actor instead of dedicated broadcast.
+	* [TTA] Support light weight printing library of the TCE.
+	* [TTA] Support a given set of 'native' functions for simulation purpose.
+	* [TTA] Global performance improvement.
+	* [TTA] Automatic actor mapping onto multicore platform based on profiling informations.
+	* New 'High Level Synthesis' backend which uses Vivado toolset to generate HDL designs.
+	* New 'COMPA' backend which generates C source code, without any dependency to external 
+	libraries (SDL, pthreads, etc.). This backend can't compile classical applications, because
+	they use Display.cal and needs SDL to work. This backend was needed by members of COMPA
+	research project (see http://compa-ietr.insa-rennes.fr)
+- User interface :
+	* Improve code completion.
+	* Global improvement of the informations displayed by the compiler. The following levels of 
+	messages are available : DEBUG, TRACE, NOTICE, WARNING, SEVERE.
+- Classifier :
+	* Supports now the Z3 solver v4.12+, the support of other solver is dropped.
 
 ### Bugfixes
 
-- Caching function: Only files different from existing ones are printed on disk.
-- UI : when creating an instance in a graph, existing names are checked in case insensitive
-mode to fix Microsoft Windows bug when printing source files.
-- Disable threaded generation to fix random bugs in generated files (without performance lost).
-- TTA backend: Transform all boolean variables in i8 since TCE do not support boolean.
+- User interface : 
+	* When creating an instance in a graph, existing names are checked in case insensitive
+	mode to fix Microsoft Windows bug when printing source files.
+	* Graphiti does not crash anymore when an xdf which contains non assigned instances is
+	opened.
+	* Fix NullPointerException occuring when a wrong XDF path is set.
+- Backends :
+	* Disable threaded generation to fix random bugs in generated files (without performance lost).
+	* (TTA) Transform all boolean variables in i8 since TCE do not support boolean.
+	* Caching function: Only files different from existing ones are printed on disk.
+- Fix classification in case of CSDF schedule depending of actor parameter.
 
 ### Misc
 

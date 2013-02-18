@@ -162,7 +162,9 @@ class InstancePrinter extends CTemplate {
 		val content = fileContent
 		val file = new File(targetFolder + File::separator + name + ".c")
 		
-		if(needToWriteFile(content, file)) {
+		if(actor.native) {
+			OrccLogger::noticeln(name + " is native and not generated.")
+		} else if(needToWriteFile(content, file)) {
 			printFile(content, file)
 			return 0
 		} else {

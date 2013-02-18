@@ -31,6 +31,7 @@ package net.sf.orcc.backends.c
 import java.io.File
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Network
+import net.sf.orcc.df.Actor
 
 /**
  * Generate CMakeList.txt content
@@ -60,6 +61,11 @@ class CMakePrinter extends CommonPrinter {
 		
 		project («network.simpleName»)
 		
+		# Helps cmake to find where SDL libraries are saved (win32 only)
+		if(WIN32)
+			set(ENV{CMAKE_PREFIX_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/windows/SDL-*\;${CMAKE_CURRENT_SOURCE_DIR}/libs/windows/SDL_image-*)
+		endif(WIN32)
+
 		if(NOT NO_EXTERNAL_DEPENDENCIES)
 			# Required by osx
 			find_package(SDL REQUIRED)
@@ -94,7 +100,10 @@ class CMakePrinter extends CommonPrinter {
 
 		set(filenames
 			«network.simpleName».c
-			«FOR child : network.children»
+			«FOR child : network.children.actorInstances.filter[!actor.native]»
+				«child.label».c
+			«ENDFOR»
+			«FOR child : network.children.filter(typeof(Actor)).filter[!native]»
 				«child.label».c
 			«ENDFOR»
 		)

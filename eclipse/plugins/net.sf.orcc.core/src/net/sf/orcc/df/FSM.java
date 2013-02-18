@@ -126,4 +126,5 @@ public interface FSM extends Graph {
 	 */
 	void setInitialState(State state);
 
+	
 }

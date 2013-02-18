@@ -38,7 +38,8 @@ import java.util.Map;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.compa.transform.XdfExtender;
 import net.sf.orcc.backends.transform.Inliner;
-import net.sf.orcc.backends.util.BackendUtil;
+import net.sf.orcc.backends.util.Validator;
+import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -150,6 +151,9 @@ public class COMPABackend extends CBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
+		Validator.checkTopLevel(network);
+		Validator.checkMinimalFifoSize(network, fifoSize);
+
 		doTransformNetwork(network);
 
 		if (debug) {
@@ -159,20 +163,6 @@ public class COMPABackend extends CBackend {
 
 		transformActors(network.getAllActors());
 		network.computeTemplateMaps();
-
-		for (String component : mapping.values()) {
-			if (!component.isEmpty()) {
-				targetToInstancesMap = new HashMap<String, List<Instance>>();
-				List<Instance> unmappedInstances = new ArrayList<Instance>();
-				BackendUtil.computeMapping(network, mapping,
-						targetToInstancesMap, unmappedInstances);
-				for (Instance instance : unmappedInstances) {
-					OrccLogger.warnln("The instance '" + instance.getName()
-							+ "' is not mapped.");
-				}
-				break;
-			}
-		}
 
 		// print instances
 		printChildren(network);
@@ -199,8 +189,7 @@ public class COMPABackend extends CBackend {
 		}
 
 		OrccLogger.traceln("Print network meta-informations...");
-		new XcfPrinter(network, targetToInstancesMap).printXcfFile(srcPath
-				+ File.separator + network.getSimpleName() + ".xcf");
+		new XcfPrinter().print(srcPath, network, mapping);
 	}
 
 	@Override

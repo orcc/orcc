@@ -217,4 +217,6 @@ public class FSMImpl extends GraphImpl implements FSM {
 					DfPackage.FSM__INITIAL_STATE, oldInitialState, initialState));
 	}
 
+	
+
 } // FSMImpl

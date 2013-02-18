@@ -97,7 +97,7 @@ public class ExpressionPrinter extends IrSwitch<String> {
 	@Override
 	public String caseExprList(ExprList expr) {
 		StringBuilder builder = new StringBuilder();
-		builder.append('{');
+		builder.append('[');
 
 		Iterator<Expression> it = expr.getValue().iterator();
 		if (it.hasNext()) {
@@ -108,7 +108,7 @@ public class ExpressionPrinter extends IrSwitch<String> {
 			}
 		}
 
-		return builder.append('}').toString();
+		return builder.append(']').toString();
 	}
 
 	@Override
