@@ -123,7 +123,7 @@ public class TTABackend extends LLVMBackend {
 	}
 
 	@Override
-	protected Network doTransformNetwork(Network network) {
+	protected void doTransformNetwork(Network network) {
 		OrccLogger.traceln("Analyze and transform the network...");
 
 		List<DfSwitch<?>> visitors = new ArrayList<DfSwitch<?>>();
@@ -175,8 +175,6 @@ public class TTABackend extends LLVMBackend {
 		}
 
 		network.computeTemplateMaps();
-
-		return network;
 	}
 
 	@Override

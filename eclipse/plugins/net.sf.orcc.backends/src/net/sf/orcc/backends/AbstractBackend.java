@@ -255,16 +255,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 		new NetworkValidator().doSwitch(network);
 
-		// because the UnitImporter will load additional resources, we filter
-		// only actors
-		List<Actor> actors = new ArrayList<Actor>();
-		for (Resource resource : set.getResources()) {
-			EObject eObject = resource.getContents().get(0);
-			if (eObject instanceof Actor) {
-				actors.add((Actor) eObject);
-			}
-		}
-
 		if (isCanceled()) {
 			return;
 		}
