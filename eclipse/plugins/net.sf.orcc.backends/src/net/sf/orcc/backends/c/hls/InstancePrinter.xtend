@@ -186,9 +186,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				goto finished;
 			}
 			// FSM transitions
-			«FOR state : instance.actor.fsm.states»
-		«state.printStateLabel»
-			«ENDFOR»
+		«FOR state : instance.actor.fsm.states»
+			«state.printStateLabel»
+		«ENDFOR»
 		finished:
 			return;
 		}
@@ -307,11 +307,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«actions.printActions»
 	'''
 	
-	def fifoName(Connection connection) '''
-		«IF connection != null»
-			myStream_«connection.getAttribute("id").objectValue»
-		«ENDIF»
-	'''
+	def fifoName(Connection connection) '''«IF connection != null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
 	
 	def fifoTypeOut(Connection connection) {
 		if(connection.sourcePort == null){
@@ -367,7 +363,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				goto finished;
 			
 			}
-		«ENDFOR»else {
+		«ENDFOR»
+		else {
 			_FSM_state = my_state_«state.name»;
 			goto finished;
 		}
