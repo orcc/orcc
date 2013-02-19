@@ -36,9 +36,7 @@ import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
-import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
-import org.eclipse.emf.common.util.EList
 
 /**
  * Generate statistics about an application.
@@ -47,7 +45,7 @@ import org.eclipse.emf.common.util.EList
  */
 class StatisticsPrinter {
 	
-		/**
+	/**
 	 * Create a file and print content inside it. If parent folder doesn't
 	 * exists, create it.
 	 * 
@@ -75,39 +73,37 @@ class StatisticsPrinter {
 	}
 	
 	def print(String targetFolder, Network network) {
-		val fifosFile = new File(targetFolder + File::separator + "connections.csv")
-		val actorsFile = new File(targetFolder + File::separator + "children.csv")
-		
-		printFile(getConnectionsStats(network.connections), fifosFile)
-		printFile(getChildrenStats(network.children), actorsFile)
+		val file = new File(targetFolder + File::separator + "stats.csv")
+		printFile(network.content, file)
 	}
 	
-	def private getChildrenStats(EList<Vertex> vertices) '''
+	def private getContent(Network network) '''
+		«networkHeader»
+		«network.stats»
+		
 		«childrenHeader»
-		«FOR instance : vertices.filter(typeof(Instance))»
+		«FOR instance : network.children.filter(typeof(Instance))»
 			«instance.stats»
 		«ENDFOR»
-		«FOR actor : vertices.filter(typeof(Actor))»
+		«FOR actor : network.children.filter(typeof(Actor))»
 			«actor.stats»
 		«ENDFOR»
-	'''
-	
-	def private getChildrenHeader() 
-		'''Name, Incoming, Outgoing, Inputs, Outputs, Actions, MoC'''
-	
-	def private getConnectionsStats(EList<Connection> connections) '''
+		
 		«connectionsHeader»
-		«FOR conn : connections »
+		«FOR conn : network.connections »
 			«conn.stats»
 		«ENDFOR»
 	'''
 	
-	def protected getConnectionsHeader() 
-		'''Source, SrcPort, Target, TgtPort, Size'''
+	def protected getNetworkHeader() 
+		'''Name, Actors, Connections'''
+		
+	def protected getStats(Network network)
+		'''«network.name», «network.children.size», «network.connections.size»'''
 	
-	def protected getStats(Connection conn) 
-		'''«conn.source.label», «conn.sourcePort.name», «conn.target.label», «conn.targetPort.name», «conn.size»'''
-	
+	def protected getChildrenHeader() 
+		'''Name, Incoming, Outgoing, Inputs, Outputs, Actions, MoC'''
+
 	def private getStats(Actor actor) 
 		'''«actor.name», «actor.incoming.size», «actor.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»'''
 	
@@ -116,4 +112,10 @@ class StatisticsPrinter {
 		'''«instance.name», «instance.incoming.size», «instance.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»'''
 	}
 	
+	def protected getConnectionsHeader() 
+		'''Source, SrcPort, Target, TgtPort, Size'''
+	
+	def protected getStats(Connection conn) 
+		'''«conn.source.label», «conn.sourcePort.name», «conn.target.label», «conn.targetPort.name», «conn.size»'''
+
 }
