@@ -49,11 +49,11 @@ import net.sf.orcc.preferences.PreferenceConstants
 import net.sf.orcc.util.OrccLogger
 
 /**
- * This class defines a graph converter to metiss format.
+ * This class defines a graph converter to Metis format.
  * 
  * @author Herve Yviquel
  */
-class Metiss {
+class Metis {
 	
 	private String metis;
 	

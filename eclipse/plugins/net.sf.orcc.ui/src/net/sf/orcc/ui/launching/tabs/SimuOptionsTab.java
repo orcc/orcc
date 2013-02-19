@@ -28,21 +28,6 @@
  */
 package net.sf.orcc.ui.launching.tabs;
 
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-
-import java.math.BigInteger;
-
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
-
 /**
  * This class defines the options tab for simulation.
  * 
@@ -53,44 +38,8 @@ import org.eclipse.swt.widgets.Group;
 public class SimuOptionsTab extends OptionsTab {
 
 	@Override
-	protected void createGroup(Font font, Composite parent) {
-		final Group group = new Group(parent, SWT.NONE);
-		group.setFont(font);
-		group.setText("&Options:");
-		group.setLayout(new GridLayout(4, false));
-		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		group.setLayoutData(data);
-
-		createFifoSize(font, group);
-	}
-
-	@Override
 	public String getName() {
 		return "Simulation options";
-	}
-
-	@Override
-	public void initializeFrom(ILaunchConfiguration configuration) {
-		try {
-			int size = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-			int exponent = BigInteger.valueOf(size).bitLength() - 1;
-			spinner.setSelection(exponent);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		if (isValid(configuration)) {
-			int exponent = spinner.getSelection();
-			configuration.setAttribute(FIFO_SIZE, 1 << exponent);
-		}
-	}
-
-	@Override
-	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 	}
 
 }

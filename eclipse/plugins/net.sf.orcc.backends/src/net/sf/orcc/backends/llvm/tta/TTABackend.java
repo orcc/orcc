@@ -52,7 +52,7 @@ import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Metiss;
+import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -197,7 +197,7 @@ public class TTABackend extends LLVMBackend {
 			}
 
 			// Launch a solver tool called Metis
-			computedMapping = new Metiss().partition(network, path,
+			computedMapping = new Metis().partition(network, path,
 					processorNumber);
 		} else {
 			// Statically from the given mapping

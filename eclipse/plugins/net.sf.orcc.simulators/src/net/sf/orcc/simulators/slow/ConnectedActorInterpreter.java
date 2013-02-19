@@ -60,19 +60,19 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ConnectedActorInterpreter extends ActorInterpreter {
 
-	public ConnectedActorInterpreter(Actor actor) {
-		super(actor);
+	/**
+	 * Creates an actor interpreter dedicated to the simulator.
+	 * 
+	 * @param actor
+	 *            the actor to interprete
+	 * @param checkPrecision
+	 *            true if the interpreter has to check precision loss
+	 */
+	public ConnectedActorInterpreter(Actor actor, boolean checkPrecision) {
+		super(actor, checkPrecision);
 		exprInterpreter = new RuntimeExpressionEvaluator();
 	}
 
-	/**
-	 * Calls the given native procedure. This method may be overridden if one
-	 * wishes not to call native procedures (e.g. abstract interpreter).
-	 * 
-	 * @param procedure
-	 *            a native procedure
-	 * @return the result of calling the given procedure
-	 */
 	@Override
 	protected Object callNativeProcedure(Procedure procedure,
 			List<Arg> arguments) {
@@ -109,14 +109,6 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		}
 	}
 
-	/**
-	 * Returns true if the action has no output pattern, or if it has an output
-	 * pattern and there is enough room in the FIFOs to satisfy it.
-	 * 
-	 * @param outputPattern
-	 *            output pattern of an action
-	 * @return true if the pattern is empty or satisfiable
-	 */
 	@Override
 	protected boolean checkOutputPattern(Pattern outputPattern) {
 		boolean hasRooms = true;
@@ -138,12 +130,6 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		}
 		return hasRooms;
 	}
-
-	/**
-	 * Executes the given action.
-	 * 
-	 * @param action
-	 */
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -192,13 +178,6 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		}
 	}
 
-	/**
-	 * Returns true if the given action is schedulable.
-	 * 
-	 * @param action
-	 *            an action
-	 * @return true if the given action is schedulable
-	 */
 	@Override
 	protected boolean isSchedulable(Action action) {
 		Pattern pattern = action.getInputPattern();
