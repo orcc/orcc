@@ -133,6 +133,13 @@ public class BackendUtil {
 			ProcessBuilder builder = new ProcessBuilder(cmdList);
 			Process process = builder.start();
 			process.waitFor();
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					process.getInputStream()));
+			String line = new String();
+			while ((line = reader.readLine()) != null) {
+				OrccLogger.traceln(line);
+			}
 		} catch (Exception e) {
 			OrccLogger.severeln(e.getMessage());
 		}
