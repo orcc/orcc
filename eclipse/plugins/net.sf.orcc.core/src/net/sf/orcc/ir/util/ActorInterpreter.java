@@ -100,7 +100,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	protected State fsmState;
 
 	/**
-	 * Creates a new interpreter with no actor and no parameters.
+	 * Creates a new interpreter with no actor.
 	 * 
 	 */
 	public ActorInterpreter() {
@@ -112,8 +112,6 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * 
 	 * @param actor
 	 *            the actor to interpret
-	 * @param parameters
-	 *            parameters of the instance of the given actor
 	 */
 	public ActorInterpreter(Actor actor) {
 		this(actor, true);
@@ -165,10 +163,12 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * 
 	 * @param procedure
 	 *            a native procedure
+	 * @param arguments
+	 *            the arguments used to call the given procedure
 	 * @return the result of calling the given procedure
 	 */
 	protected Object callNativeProcedure(Procedure procedure,
-			List<Arg> parameters) {
+			List<Arg> arguments) {
 		return null;
 	}
 
