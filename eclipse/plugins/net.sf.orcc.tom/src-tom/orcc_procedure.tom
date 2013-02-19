@@ -1,3 +1,6 @@
+%include { string.tom }
+%include { boolean.tom }
+
 %typeterm Proc {
   implement { Procedure }
   is_sort(t) { $t instanceof Procedure }

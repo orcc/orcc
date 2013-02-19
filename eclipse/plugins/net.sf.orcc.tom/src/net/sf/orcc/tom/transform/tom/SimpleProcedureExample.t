@@ -4,10 +4,11 @@ import net.sf.orcc.df.*;
 import net.sf.orcc.ir.*;
 import net.sf.orcc.util.OrccLogger;
 
-public class LitteralInteger {
+/**
+* This simple class print the list of procedures named "untagged_0" in an actor
+*/
+public class SimpleProcedureExample {
 
-	%include { string.tom }
-	%include { boolean.tom }
 	%include { orcc_procedure.tom }
 
 	public void exec(Actor actor) {

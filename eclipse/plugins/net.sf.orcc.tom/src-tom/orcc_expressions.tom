@@ -1,4 +1,4 @@
-%include { orcc_elements.tom }
+%include { orcc_terminals.tom }
 
 %op TExpr exprVar( value : Var) {
 	is_fsym(t) {$t instanceof ExprVar}
