@@ -208,8 +208,10 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		if (newValue != assign.getValue()) {
 			// The assignment is useless now, we replace it by the cast
 			// instruction
-			InstCast cast = (InstCast) assign.getBlock().getInstructions()
-					.get(indexInst);
+			EList<Instruction> instructions = assign.getBlock()
+					.getInstructions();
+			InstCast cast = (InstCast) instructions.get(instructions
+					.indexOf(assign) - 1);
 			cast.setTarget(assign.getTarget());
 
 			IrUtil.delete(assign);
