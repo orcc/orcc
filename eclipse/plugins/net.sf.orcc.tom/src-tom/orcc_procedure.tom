@@ -11,6 +11,5 @@
 	make(_name, _native) {
 		net.sf.orcc.ir.impl.IrFactoryImpl.eINSTANCE.createProcedure($_name, $_native)
 	}
-	
 }
 

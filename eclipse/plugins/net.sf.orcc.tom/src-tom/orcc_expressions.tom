@@ -1,0 +1,38 @@
+%include { orcc_elements.tom }
+
+%op TExpr exprVar( value : Var) {
+	is_fsym(t) {$t instanceof ExprVar}
+	make(_value) {
+		net.sf.orcc.ir.impl.IrFactoryImpl.eINSTANCE.createExprVar(_value)
+	}
+}
+
+// Mapping for Expression type
+%typeterm TExpr {
+  implement { Expression }
+  is_sort(t) { $t instanceof Expression }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2}
+}
+
+// Mapping for ExprInt type
+%typeterm TExprInt {
+  implement { ExprInt }
+  is_sort(t) { $t instanceof ExprInt }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+
+// Mapping for ExprBool type
+%typeterm TExprBool {
+  implement { ExprBool }
+  is_sort(t) { $t instanceof ExprBool }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+
+// Mapping for ExprBinary type
+%typeterm TExprBinary {
+  implement { ExprBinary }
+  is_sort(t) { $t instanceof ExprBinary }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+
+
