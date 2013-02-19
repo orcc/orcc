@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.simulators.slow;
 
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
@@ -195,7 +196,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Actor actor = vertex.getAdapter(Actor.class);
 
 			ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-					actor);
+					actor, getAttribute(DEBUG_MODE, true));
 
 			interpreters.put(actor, interpreter);
 		}

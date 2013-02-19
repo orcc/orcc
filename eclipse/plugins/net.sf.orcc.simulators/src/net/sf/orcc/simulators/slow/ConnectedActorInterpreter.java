@@ -60,8 +60,16 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ConnectedActorInterpreter extends ActorInterpreter {
 
-	public ConnectedActorInterpreter(Actor actor) {
-		super(actor);
+	/**
+	 * Creates an actor interpreter dedicated to the simulator.
+	 * 
+	 * @param actor
+	 *            the actor to interprete
+	 * @param checkPrecision
+	 *            true if the interpreter has to check precision loss
+	 */
+	public ConnectedActorInterpreter(Actor actor, boolean checkPrecision) {
+		super(actor, checkPrecision);
 		exprInterpreter = new RuntimeExpressionEvaluator();
 	}
 
