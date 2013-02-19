@@ -38,6 +38,7 @@ import org.eclipse.emf.common.util.EList;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 
@@ -64,6 +65,21 @@ public class DisconnectedOutputPortRemoval extends DfVisitor<Void> {
 	List<Port> discPorts = new ArrayList<Port>();
 
 	@Override
+	public Void caseInstance(Instance instance) {
+		if (instance.isActor()) {
+			EList<Port> outports = instance.getActor().getOutputs();
+			Map<Port, List<Connection>> outMap = instance.getOutgoingPortMap();
+			Set<Port> outgp = outMap.keySet();
+			discPorts = findDiscPorts(outports, outgp);
+			outports.removeAll(discPorts);
+			return super.caseActor(instance.getActor());
+		} else {
+			return super.caseInstance(instance);
+
+		}
+	}
+
+	@Override
 	public Void caseActor(Actor actor) {
 
 		// TODO Auto-generated method stub
@@ -72,6 +88,14 @@ public class DisconnectedOutputPortRemoval extends DfVisitor<Void> {
 		Map<Port, List<Connection>> outMap = actor.getOutgoingPortMap();
 		Set<Port> outgp = outMap.keySet();
 
+		discPorts = findDiscPorts(outports, outgp);
+		outports.removeAll(discPorts);
+
+		return super.caseActor(actor);
+
+	}
+
+	List<Port> findDiscPorts(EList<Port> outports, Set<Port> outgp) {
 		ListIterator<Port> it = outports.listIterator();
 		while (it.hasNext()) {
 			Port port = it.next();
@@ -82,10 +106,7 @@ public class DisconnectedOutputPortRemoval extends DfVisitor<Void> {
 			}
 
 		}
-		actor.getOutputs().removeAll(discPorts);
-
-		return super.caseActor(actor);
-
+		return discPorts;
 	}
 
 	public Void casePattern(Pattern pattern) {
@@ -95,34 +116,38 @@ public class DisconnectedOutputPortRemoval extends DfVisitor<Void> {
 			if (ports.contains(discPort)) {
 				Var varOfPort = pattern.getVariable(discPort);
 				System.out.println(varOfPort.getName());
-				while (!varOfPort.getDefs().isEmpty()) {
-					Def defVar = varOfPort.getDefs().get(0);
 
-					Instruction instDefOfVar = EcoreHelper.getContainerOfType(
-							defVar, Instruction.class);
-					System.out.println(instDefOfVar);
-					IrUtil.delete(instDefOfVar);
-				}
-
-				while (!varOfPort.getUses().isEmpty()) {
-					Use defVar = varOfPort.getUses().get(0);
-
-					Instruction instDefOfVar = EcoreHelper.getContainerOfType(
-							defVar, Instruction.class);
-					System.out.println(instDefOfVar);
-					IrUtil.delete(instDefOfVar);
-				}
+				removeDefUseInst(varOfPort);
 
 				IrUtil.delete(varOfPort);
 
 				pattern.remove(discPort);
 
-				ports.remove(discPort);
+				// ports.remove(discPort);
 
 			}
 		}
 
 		return null;
+
+	}
+
+	private void removeDefUseInst(Var variable) {
+		List<Def> definitions = variable.getDefs();
+		while (!definitions.isEmpty()) {
+			Def def = definitions.get(0);
+			Instruction instruction = EcoreHelper.getContainerOfType(def,
+					Instruction.class);
+			IrUtil.delete(instruction);
+		}
+
+		List<Use> uses = variable.getUses();
+		while (!uses.isEmpty()) {
+			Use use = uses.get(0);
+			Instruction instruction = EcoreHelper.getContainerOfType(use,
+					Instruction.class);
+			IrUtil.delete(instruction);
+		}
 
 	}
 }
