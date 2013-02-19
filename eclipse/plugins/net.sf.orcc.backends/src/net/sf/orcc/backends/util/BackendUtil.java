@@ -129,10 +129,17 @@ public class BackendUtil {
 	 *            the list of command containing the program and its arguments
 	 */
 	public static void runExternalProgram(List<String> cmdList) {
-		String[] cmd = cmdList.toArray(new String[] {});
 		try {
-			final Process process = Runtime.getRuntime().exec(cmd);
+			ProcessBuilder builder = new ProcessBuilder(cmdList);
+			Process process = builder.start();
 			process.waitFor();
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					process.getInputStream()));
+			String line = new String();
+			while ((line = reader.readLine()) != null) {
+				OrccLogger.traceln(line);
+			}
 		} catch (Exception e) {
 			OrccLogger.severeln(e.getMessage());
 		}
