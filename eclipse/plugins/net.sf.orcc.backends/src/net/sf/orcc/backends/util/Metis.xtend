@@ -67,6 +67,9 @@ class Metis {
 	
 	new() {
 		metisPath = OrccActivator::getDefault().getPreference(PreferenceConstants::P_METIS, "");
+		if(!new File(metisPath).exists) {
+			throw new OrccRuntimeException("The given path to the Metis solver seems wrong.")
+		}
 	}
 	
 	def partition(Network network, String folder, int partitionNumber, Map<String, String> weightsMap) {
