@@ -34,12 +34,17 @@ import java.io.BufferedReader
 import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStreamReader
 import java.io.PrintStream
 import java.util.ArrayList
+import java.util.HashMap
 import java.util.List
+import java.util.Map
 import net.sf.orcc.OrccActivator
+import net.sf.orcc.OrccRuntimeException
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
@@ -55,45 +60,55 @@ import net.sf.orcc.util.OrccLogger
  */
 class Metis {
 	
-	private String metis;
+	private String metisPath;
 	
+	private Network network
 	private BiMap<Vertex, Integer> vertexMap
-	private int rank = 0
 	
 	new() {
-		vertexMap = HashBiMap::create()
-		metis = OrccActivator::getDefault().getPreference(PreferenceConstants::P_METIS, "");
+		metisPath = OrccActivator::getDefault().getPreference(PreferenceConstants::P_METIS, "");
 	}
 	
-	def partition(Network network, String folder, int partitionNumber) {
-		print(network, folder, "top.metis")
+	def partition(Network network, String folder, int partitionNumber, Map<String, String> weightsMap) {
+		val file = new File(folder + File::separator + "top.metis")
+		var rank = 0
+
+		this.vertexMap = HashBiMap::create()
+		this.network = network
+
+		for(vertex: network.notNativeChildren) {
+			// Set a unique number to each instance/actor
+			vertexMap.put(vertex, rank = rank + 1)
+			// Add the 'weight' attribute  to each instance/actor
+			vertex.setAttribute("weight", weightsMap.get(vertex.name))
+		}
+		
+		// Print metis-understandable graph representation in a file
+		printFile(network.metis, file)
+		// Solve the graph partitioning problem by launching Metis
 		run(partitionNumber, folder)
+
 		return parse(partitionNumber, folder)
 	}
+
+	def private getMetis(Network network) '''
+		«network.notNativeChildren.size» «network.notNativeConnections.size» 010
+		«FOR child : network.notNativeChildren»
+			% «child.label»
+			«child.weight» «child.incoming.notNativeConnections.map[source.id].join(" ")» «child.outgoing.notNativeConnections.map[target.id].join(" ")»
+		«ENDFOR»
+	'''
 	
-	def private print(Network network, String targetFolder, String filename) {
-		for(vertex: network.children.notNative)
-			vertexMap.put(vertex, rank = rank + 1)
-		
-		val file = new File(targetFolder+ File::separator + filename);
-		val ps = new PrintStream(new FileOutputStream(file));
-		ps.print(network.metiss);
-		ps.close();
+	def private getName(Vertex vertex) {
+		if(vertex instanceof Actor) {
+			network.name + "_" + (vertex as Actor).name
+		} else if (vertex instanceof Instance) {
+			(vertex as Instance).hierarchicalName
+		} else {
+			throw new OrccRuntimeException(vertex.label + " is neither an actor nor an instance.")
+		}
 	}
 
-	def private metiss(Network network) '''
-		«network.vertices.notNative.size» «network.edges.notSignal.size» 010
-		«FOR instance : network.children.notNative»
-			«instance.metiss»
-		«ENDFOR»
-		
-	'''
-
-	def private metiss(Instance instance) '''
-		% «instance.label»
-		«instance.weight» «instance.incoming.notSignal.map[source.id].join(" ")» «instance.outgoing.notSignal.map[target.id].join(" ")»
-	'''
-	
 	def private getId(Vertex vertex) {
 		vertexMap.get(vertex)
 	}
@@ -107,35 +122,36 @@ class Metis {
 		}
 	}
 	
-	def private run(int partitionNumber, String path) {
-		var cmdList = new ArrayList<String>()
-		cmdList.add(metis)
+	def private void run(int partitionNumber, String path) {
+		var cmdList = new ArrayList<String>
+		cmdList.add(metisPath)
 		cmdList.add(path + File::separator + "top.metis")
 		cmdList.add(partitionNumber.toString)
+
 		OrccLogger::traceln(cmdList.toString)
 		OrccLogger::traceln("Solving actor partitioning...");
+
 		val t0 = System::currentTimeMillis;
 		BackendUtil::runExternalProgram(cmdList)
 		val t1 = System::currentTimeMillis();
-		OrccLogger::traceln("Done in " + ((t1 - t0) as float / 1000.0)
-					+ "s");
+		OrccLogger::traceln("Done in " + ((t1 - t0) as float / 1000.0) + "s");
 	}
 	
 	def private parse(int partitionNumber, String path) {
-		val mapping = new Mapping
+		val indexMap = vertexMap.inverse as BiMap<Integer, Vertex>
+		val mapping = new HashMap<String, String>
 		try{
-			// Open the file that is the first 
-			// command line parameter
+			// Open the file that is the first command line parameter
 			val fstream = new FileInputStream(path + File::separator + "top.metis.part." + partitionNumber)
 			// Get the object of DataInputStream
 			val in = new DataInputStream(fstream)
 			val br = new BufferedReader(new InputStreamReader(in))
 			var partition = ""
-			val map = vertexMap.inverse as BiMap<Integer, Vertex>
+
 			var i = 1
 			//Read File Line By Line
 			while ((partition = br.readLine()) != null) {
-				mapping.map("proc_" + partition, map.get(i))
+				mapping.put(indexMap.get(i).name, partition)
 				i = i + 1
 			}
 			//Close the input stream
@@ -146,12 +162,44 @@ class Metis {
 		return mapping
 	}
 	
-	def private getNotNative(List<Vertex> vertices) {
-		vertices.filter(typeof(Instance)).filter[!actor.native]
+	def private getNotNativeChildren(Network network) {
+		network.children.filter(typeof(Instance)).filter[!actor.native]
+			+ network.children.filter(typeof(Actor)).filter[!native]
 	}
 	
-	def private getNotSignal(List<Edge> edges) {
+	def private getNotNativeConnections(Network network) {
+		network.connections.filter[!sourcePort.native && !targetPort.native]
+	}
+
+	def private getNotNativeConnections(List<Edge> edges) {
 		edges.filter(typeof(Connection)).filter[!sourcePort.native && !targetPort.native]
+	}
+
+	/**
+	 * Create a file and print content inside it. If parent folder doesn't
+	 * exists, create it.
+	 *
+	 * @param content
+	 *            text to write in file
+	 * @param target
+	 *            file to write content to
+	 * @return true if the file has correctly been written
+	 */
+	def private printFile(CharSequence content, File target) {
+		try {
+			if ( ! target.getParentFile().exists()) {
+				target.getParentFile().mkdirs();
+			}
+			val ps = new PrintStream(new FileOutputStream(target));
+			ps.print(content);
+			ps.close();
+			return true;
+		} catch (FileNotFoundException e) {
+			OrccLogger::severe("Unable to write file " + target.path + " : " + e.cause)
+			OrccLogger::severe(e.localizedMessage)
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }

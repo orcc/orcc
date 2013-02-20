@@ -62,7 +62,6 @@ import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.util.Dota;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
@@ -181,29 +180,16 @@ public class TTABackend extends LLVMBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
 
-		// Compute the actor mapping
 		if (balanceMapping) {
-			// Dynamically by solving an equivalent graph partitioning problem
-
-			// Add an attribute 'weight' to each instance
-			for (Vertex vertex : network.getChildren()) {
-				Instance instance = vertex.getAdapter(Instance.class);
-				if (instance != null) {
-					String weight = mapping.get(instance.getHierarchicalName());
-					if (weight != null) {
-						instance.setAttribute("weight", weight);
-					}
-				}
-			}
-
-			// Launch a solver tool called Metis
-			computedMapping = new Metis().partition(network, path,
-					processorNumber);
-		} else {
-			// Statically from the given mapping
-			computedMapping = new Mapping(network, mapping, reduceConnections,
-					false);
+			// Solve load balancing using Metis. The 'mapping' variable should
+			// be the weightsMap, giving a weight to each actor/instance.
+			mapping = new Metis().partition(network, path, processorNumber,
+					mapping);
 		}
+
+		// Compute the actor mapping
+		computedMapping = new Mapping(network, mapping, reduceConnections,
+				false);
 
 		// Build the design from the mapping
 		design = new ArchitectureBuilder().build(network, configuration,
