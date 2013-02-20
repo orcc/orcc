@@ -1,7 +1,226 @@
 
-// Mapping for Var type
-%typeterm TVar {
-  implement { Var }
-  is_sort(t) { $t instanceof Var }
+%typeterm Block {
+  implement { net.sf.orcc.ir.Block }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Block}
   equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
 }
+%typeterm BlockL {
+   implement { EList<net.sf.orcc.ir.Block> }
+     is_sort(t) { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Block>)$t).size() == 0 ||
+                  (((EList<net.sf.orcc.ir.Block>)$t).size() > 0 && 
+                    ((EList<net.sf.orcc.ir.Block>)$t).get(0) instanceof net.sf.orcc.ir.Block))}
+  equals(l1,l2)   {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
+}
+%typeterm BlockBasic {
+  implement { net.sf.orcc.ir.BlockBasic }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.BlockBasic }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm BlockIf {
+  implement { net.sf.orcc.ir.BlockIf }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.BlockIf }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm BlockWhile {
+  implement { net.sf.orcc.ir.BlockWhile }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.BlockWhile }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+
+
+%typeterm Instruction {
+  implement { net.sf.orcc.ir.Instruction }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Instruction }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm InstructionL {
+   implement { EList<net.sf.orcc.ir.Instruction> }
+     is_sort(t) { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Instruction>)$t).size() == 0 ||
+                  (((EList<net.sf.orcc.ir.Instruction>)$t).size() > 0 && 
+                    ((EList<net.sf.orcc.ir.Instruction>)$t).get(0) instanceof net.sf.orcc.ir.Instruction))}
+  equals(l1,l2)   {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
+}
+%typeterm InstCall {
+  implement { net.sf.orcc.ir.InstCall }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.InstCall }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm InstLoad {
+  implement { net.sf.orcc.ir.InstLoad }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.InstLoad }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm InstAssign {
+  implement { net.sf.orcc.ir.InstAssign }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.InstAssign }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm InstPhi {
+  implement { net.sf.orcc.ir.Instruction }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Instruction }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm InstReturn {
+  implement { net.sf.orcc.ir.InstReturn }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.InstReturn }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm InstStore {
+  implement { net.sf.orcc.ir.InstStore }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.InstStore }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm InstSpecific {
+  implement { net.sf.orcc.ir.InstSpecific }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.InstSpecific }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+
+
+%typeterm Expression {
+  implement { net.sf.orcc.ir.Expression }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Expression }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ExpressionL {
+   implement { EList<net.sf.orcc.ir.Expression> }
+     is_sort(t) { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Expression>)$t).size() == 0 ||
+                  (((EList<net.sf.orcc.ir.Expression>)$t).size() > 0 && 
+                    ((EList<net.sf.orcc.ir.Expression>)$t).get(0) instanceof net.sf.orcc.ir.Expression))}
+  equals(l1,l2)   {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
+}
+%typeterm ExprBinary {
+  implement { net.sf.orcc.ir.ExprBinary }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ExprBinary }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ExprUnary {
+  implement {net.sf.orcc.ir. ExprUnary }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ExprUnary }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ExprBool {
+  implement { net.sf.orcc.ir.ExprBool }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ExprBool }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ExprFloat {
+  implement { net.sf.orcc.ir.ExprFloat }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ExprFloat }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ExprInt {
+  implement { net.sf.orcc.ir.ExprInt }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ExprInt }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ExprList {
+  implement { net.sf.orcc.ir.ExprList }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ExprList }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ExprString {
+  implement { net.sf.orcc.ir.ExprString }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ExprString }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ExprVar {
+  implement { net.sf.orcc.ir.ExprVar }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ExprVar }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+
+
+%typeterm Type {
+  implement { net.sf.orcc.ir.Type }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Type }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm TypeVoid {
+  implement { net.sf.orcc.ir.TypeVoid }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.TypeVoid }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm TypeString {
+  implement { net.sf.orcc.ir.TypeString }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.TypeString }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm TypeInt {
+  implement { net.sf.orcc.ir.TypeInt }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.TypeInt }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm TypeUint {
+  implement { net.sf.orcc.ir.TypeUint }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.TypeUint }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm TypeBool {
+  implement { net.sf.orcc.ir.TypeBool }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.TypeBool }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm TypeList {
+  implement { net.sf.orcc.ir.TypeList }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.TypeList }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm TypeFloat {
+  implement { net.sf.orcc.ir.TypeFloat }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.TypeFloat }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+
+
+%typeterm Procedure {
+  implement { net.sf.orcc.ir.Procedure }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Procedure }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+
+%typeterm Param {
+  implement { net.sf.orcc.ir.Param }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Param }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ParamL {
+   implement { EList<net.sf.orcc.ir.Param> }
+     is_sort(t) { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Param>)$t).size() == 0 ||
+                  (((EList<net.sf.orcc.ir.Param>)$t).size() > 0 && 
+                    ((EList<net.sf.orcc.ir.Param>)$t).get(0) instanceof net.sf.orcc.ir.Param))}
+  equals(l1,l2)   {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
+}
+
+%typeterm Arg {
+  implement { net.sf.orcc.ir.Arg }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Arg }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ArgByRef {
+  implement { net.sf.orcc.ir.ArgByRef }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ArgByRef }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm ArgByVal {
+  implement { net.sf.orcc.ir.ArgByVal }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.ArgByVal }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+
+%typeterm Var {
+  implement { net.sf.orcc.ir.Var }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Var }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm Use {
+  implement { net.sf.orcc.ir.Use }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Use }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+%typeterm Def {
+  implement { net.sf.orcc.ir.Def }
+  is_sort(t) { $t instanceof net.sf.orcc.ir.Def }
+  equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
+}
+

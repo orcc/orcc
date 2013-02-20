@@ -1,0 +1,36 @@
+%include { orcc_terminals.tom }
+
+%op BlockBasic blockBasic( instructions : InstL ) {
+	is_fsym(t) {$t instanceof BlockBasic}
+	get_slot(instructions, t) {((net.sf.orcc.ir.BlockBasic)$t).getInstructions() }
+	make() {
+		net.sf.orcc.ir.IrFactory.eINSTANCE.createBlockBasic()()
+	}
+}
+
+%op Block BB(instructions : InstructionL){
+	is_fsym(t) {$t instanceof BlockBasic}
+	get_slot(instructions,t) { enforce(((BlockBasic)$t).getInstructions()) }
+	make(_instructions) { net.sf.orcc.ir.IrFactory.eINSTANCE.createBlockBasic()($_instructions) }
+}
+
+%op BlockIf blockIf( condition : Expr, thenBlocks : BlockL, elseBlocks : BlockL, joinBlock : BlockBasic ) {
+	is_fsym(t) {$t instanceof BlockIf}
+	get_slot(condition, t) {((net.sf.orcc.ir.BlockIf)$t).getCondition() }
+	get_slot(thenBlocks, t) {((net.sf.orcc.ir.BlockIf)$t).getThenBlocks() }
+	get_slot(elseBlocks, t) {((net.sf.orcc.ir.BlockIf)$t).getElseBlocks() }
+	get_slot(joinBlock, t) {((net.sf.orcc.ir.BlockIf)$t).getJoinBlock() }
+	make() {
+		net.sf.orcc.ir.IrFactory.eINSTANCE.createBlockIf()
+	}
+}
+
+%op BlockWhile blockWhile( condition : Expr, blocks : BlockL, joinBlock : BlockBasic ) {
+	is_fsym(t) {$t instanceof BlockWhile}
+	get_slot(condition, t) {((net.sf.orcc.ir.BlockWhile)$t).getCondition() }
+	get_slot(blocks, t) {((net.sf.orcc.ir.BlockWhile)$t).getBlocks() }
+	get_slot(joinBlock, t) {((net.sf.orcc.ir.BlockWhile)$t).getJoinBlock() }
+	make() {
+		net.sf.orcc.ir.IrFactory.eINSTANCE.createBlockWhile()
+	}
+}

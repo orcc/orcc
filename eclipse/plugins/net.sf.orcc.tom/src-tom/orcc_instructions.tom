@@ -1,0 +1,38 @@
+
+%op InstAssign assign( target : Var, source : Expression ) {
+	is_fsym(t) {$t instanceof InstAssign }
+	get_slot(target,t) {((InstAssign)$t).getTarget().getVar() }
+	get_slot(source,t) {((InstAssign)$t).getSource() }
+	make(_target, _value) {
+		net.sf.orcc.ir.IrFactory.eINSTANCE.createInstAssign($_target, $_value)
+	}
+}
+
+%op InstReturn Return( value : Expression ) {
+	is_fsym(t) {$t instanceof InstReturn }
+	get_slot(value,t) {((InstReturn)$t).getSource() }
+	make(_target, _value) {
+		net.sf.orcc.ir.IrFactory.eINSTANCE.createInstReturn($_target, $_value)
+	}
+}
+
+%op InstLoad load( target : Var, source : Var, indexes : ExpressionL ) {
+	is_fsym(t) {$t instanceof InstLoad }
+	get_slot(target,t) {((InstLoad)$t).getTarget().getVar() }
+	get_slot(source,t) {((InstLoad)$t).getSource().getVar() }
+	get_slot(indexes,t) {((InstLoad)$t).getSource().getIndexes() }
+	make(_target, _indexes, _source) {
+		net.sf.orcc.ir.IrFactory.eINSTANCE.createInstLoad($_target, $_indexes, $_source)
+	}
+}
+
+%op InstStore store( target : Var, source : Var, indexes : ExpressionL ) {
+	is_fsym(t) {$t instanceof InstStore }
+	get_slot(target,t) {((InstStore)$t).getTarget().getVar() }
+	get_slot(source,t) {((InstStore)$t).getSource().getVar() }
+	get_slot(indexes,t) {((InstStore)$t).getSource().getIndexes() }
+	make(_target, _value) {
+		net.sf.orcc.ir.IrFactory.eINSTANCE.createInstLoad($_target, $_value)
+	}
+}
+

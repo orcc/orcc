@@ -7,9 +7,10 @@ import net.sf.orcc.util.OrccLogger;
 /**
 * This simple class print the list of procedures named "untagged_0" in an actor
 */
-public class SimpleProcedureExample {
+public class SimpleProcedureMatch {
 
 	%include { orcc_procedure.tom }
+	%include { orcc_terminals.tom }
 
 	public void exec(Actor actor) {
 
@@ -17,7 +18,7 @@ public class SimpleProcedureExample {
 		
 		for(Procedure procedure : actor.getProcs()) {
 			%match (procedure){
-				p@proc("untagged_0", _) -> {
+				p@proc("untagged_0", _, _) -> {
 					OrccLogger.traceln(procedure.getName());
 				}
 			}
