@@ -77,7 +77,12 @@ public interface OrccLaunchConstants {
 	/**
 	 * When enabled, interpreter traces each time data is written to (output)
 	 */
-	public static final String ENABLE_TRACES = "net.sf.orcc.backends.enableTraces";
+	public static final String ENABLE_TRACES = "net.sf.orcc.tracing.enable";
+	
+	/**
+	 * Folder in which the tracing files have to be written
+	 */
+	public static final String TRACES_FOLDER = "net.sf.orcc.tracing.folder";
 
 	/**
 	 * Size of FIFO channels when not specified by the network.

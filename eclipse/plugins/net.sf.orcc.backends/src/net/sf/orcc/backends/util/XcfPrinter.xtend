@@ -64,7 +64,6 @@ class XcfPrinter extends CommonPrinter {
 		unmapped = new ArrayList<Vertex>
 		i = 0
 		if(!initialMapping.values.forall[nullOrEmpty]) {
-			OrccLogger::traceln(initialMapping.toString)
 			for (instance : network.children.actorInstances) {
 				instance.tryToMap(initialMapping.get(instance.hierarchicalName))
 			}

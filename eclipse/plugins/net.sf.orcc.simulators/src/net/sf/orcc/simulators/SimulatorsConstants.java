@@ -60,11 +60,6 @@ public class SimulatorsConstants {
 	 * Parameter used to set max number of times an input file is read.
 	 */
 	public static final String LOOP_NUMBER = "net.sf.orcc.simulators.loopNumber";
-	
-	/**
-	 * Simulator traces folder associated with an Orcc configuration
-	 */
-	public static final String TRACES_FOLDER = "net.sf.orcc.simulators.tracesFolder";
 
 	/**
 	 * Folder where the compiled Actors can be found.

@@ -28,13 +28,13 @@
  */
 package net.sf.orcc.simulators.jade;
 
-import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
-import static net.sf.orcc.simulators.SimulatorsConstants.REFERENCE_FILE;
-import static net.sf.orcc.simulators.SimulatorsConstants.TRACES_FOLDER;
-import static net.sf.orcc.simulators.SimulatorsConstants.VTL_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE;
+import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
+import static net.sf.orcc.simulators.SimulatorsConstants.REFERENCE_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.VTL_FOLDER;
 import static net.sf.orcc.util.OrccUtil.getFile;
 
 import java.io.BufferedReader;
