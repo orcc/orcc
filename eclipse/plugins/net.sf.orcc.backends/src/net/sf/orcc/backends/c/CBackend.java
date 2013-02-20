@@ -51,6 +51,7 @@ import net.sf.orcc.backends.transform.ListFlattener;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
+import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.XcfPrinter;
 import net.sf.orcc.df.Actor;
@@ -233,6 +234,12 @@ public class CBackend extends AbstractBackend {
 		OrccLogger.traceln("Printing CMake project files");
 		new CMakePrinter(network).printCMakeFiles(path);
 
+		if (balanceMapping) {
+			// Solve load balancing using Metis. The 'mapping' variable should
+			// be the weightsMap, giving a weight to each actor/instance.
+			mapping = new Metis().partition(network, path, processorNumber,
+					mapping);
+		}
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
 			new XcfPrinter().print(srcPath, network, mapping);
 		}

@@ -96,9 +96,6 @@ public class TTABackend extends LLVMBackend {
 	private FPGA fpga;
 	private String libPath;
 	private boolean reduceConnections;
-	private boolean balanceMapping;
-
-	private int processorNumber;
 
 	@Override
 	protected void doInitializeOptions() {
@@ -110,10 +107,6 @@ public class TTABackend extends LLVMBackend {
 				"net.sf.orcc.backends.llvm.tta.configuration", "Standard"));
 		reduceConnections = getAttribute(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
-		balanceMapping = getAttribute("net.sf.orcc.backends.metricMapping",
-				false);
-		processorNumber = Integer.parseInt(getAttribute(
-				"net.sf.orcc.backends.processorsNumber", "0"));
 	}
 
 	@Override

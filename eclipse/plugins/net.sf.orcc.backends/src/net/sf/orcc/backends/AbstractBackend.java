@@ -149,7 +149,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected int fifoSize;
 
 	private IFile inputFile;
+
 	protected Map<String, String> mapping;
+	protected boolean balanceMapping;
+	protected int processorNumber;
 
 	/**
 	 * List of transformations to apply on each network
@@ -781,7 +784,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		debug = getAttribute(DEBUG_MODE, true);
+
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
+		balanceMapping = getAttribute("net.sf.orcc.backends.metricMapping",
+				false);
+		processorNumber = Integer.parseInt(getAttribute(
+				"net.sf.orcc.backends.processorsNumber", "0"));
 
 		classify = getAttribute(CLASSIFY, false);
 		// Merging transformations need the results of classification
@@ -789,6 +797,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		mergeActors = classify && getAttribute(MERGE_ACTORS, false);
 
 		convertMulti2Mono = getAttribute(CONVERT_MULTI2MONO, false);
+
 
 		String outputFolder = getAttribute(OUTPUT_FOLDER, "");
 		if (outputFolder.isEmpty()) {

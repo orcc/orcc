@@ -20,6 +20,9 @@
                id="net.sf.orcc.backends.geneticAlgorithm">
          </option>
          <option
+               id="net.sf.orcc.backends.metricMapping">
+         </option>
+         <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
          <option
