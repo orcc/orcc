@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.c.hls
 
 import java.io.File
+import net.sf.orcc.util.OrccUtil
 import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
@@ -149,10 +150,10 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		val testBenchFile = new File(targetFolder + File::separator + "testBench" + ".cpp")
 		val FifoVhdlFile = new File(targetFolder + File::separator + "genericFifo" + ".vhd")
 		if(needToWriteFile(contentNetwork, NetworkFile)) {
-			printFile(contentProject, projectFile)
-			printFile(contentNetwork, NetworkFile)
-			printFile(contentTestBench, testBenchFile)
-			printFile(contentVhdlTop, FifoVhdlFile)
+			OrccUtil::printFile(contentProject, projectFile)
+			OrccUtil::printFile(contentNetwork, NetworkFile)
+			OrccUtil::printFile(contentTestBench, testBenchFile)
+			OrccUtil::printFile(contentVhdlTop, FifoVhdlFile)
 			return i
 		} else {
 			return i + 1

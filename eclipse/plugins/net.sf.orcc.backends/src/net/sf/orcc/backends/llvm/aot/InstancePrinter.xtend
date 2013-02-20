@@ -28,11 +28,16 @@
  */
  package net.sf.orcc.backends.llvm.aot
 
+import java.io.File
 import java.util.ArrayList
 import java.util.HashMap
+import java.util.List
 import java.util.Map
+import net.sf.orcc.OrccRuntimeException
+import net.sf.orcc.backends.ir.ExprNull
 import net.sf.orcc.backends.ir.InstCast
 import net.sf.orcc.df.Action
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.FSM
 import net.sf.orcc.df.Instance
@@ -62,16 +67,11 @@ import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
-import java.util.List
-import java.io.File
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
 import static net.sf.orcc.OrccLaunchConstants.*
-import net.sf.orcc.backends.ir.ExprNull
-import net.sf.orcc.df.Actor
-import net.sf.orcc.OrccRuntimeException
 
 /*
  * Compile Instance llvm source code
@@ -137,7 +137,7 @@ class InstancePrinter extends LLVMTemplate {
 		val file = new File(targetFolder + File::separator + name + ".ll")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

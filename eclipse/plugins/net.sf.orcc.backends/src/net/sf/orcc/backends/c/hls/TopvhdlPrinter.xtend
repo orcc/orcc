@@ -28,12 +28,13 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.df.Network
-import java.util.Map
-import net.sf.orcc.df.Instance
-import net.sf.orcc.df.Port
-import net.sf.orcc.df.Connection
 import java.io.File
+import java.util.Map
+import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
+import net.sf.orcc.df.Port
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Compile top Network c source code 
@@ -158,7 +159,7 @@ import java.io.File
 		val NetworkFile = new File(targetFolder + File::separator + network.simpleName+ "Top" + ".vhd")
 		
 		if(needToWriteFile(contentNetwork, NetworkFile)) {
-			printFile(contentNetwork, NetworkFile)
+			OrccUtil::printFile(contentNetwork, NetworkFile)
 			return 0
 		} else {
 			return 1

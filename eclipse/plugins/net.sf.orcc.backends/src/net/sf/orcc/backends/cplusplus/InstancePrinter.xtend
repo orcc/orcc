@@ -53,6 +53,7 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
+import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
 
@@ -77,7 +78,7 @@ import static net.sf.orcc.OrccLaunchConstants.*
 		val file = new File(targetFolder + File::separator + instance.name + ".h")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

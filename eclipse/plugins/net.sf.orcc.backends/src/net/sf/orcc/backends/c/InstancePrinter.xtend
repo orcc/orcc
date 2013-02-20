@@ -37,6 +37,7 @@ import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.DfFactory
+import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
@@ -58,10 +59,10 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.OrccBackendsConstants.*
-import net.sf.orcc.df.Entity
 
 /**
  * Generate and print instance source file for C backend.
@@ -167,7 +168,7 @@ class InstancePrinter extends CTemplate {
 		if(actor.native) {
 			OrccLogger::noticeln(name + " is native and not generated.")
 		} else if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

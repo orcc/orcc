@@ -45,11 +45,11 @@ import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
+import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.OrccLaunchConstants.*
-
 
 /*
  * Compile Top_network Java source code 
@@ -74,7 +74,7 @@ class ActorPrinter extends JavaTemplate {
 		val file = new File(targetFolder + File::separator + actor.simpleName + ".java")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

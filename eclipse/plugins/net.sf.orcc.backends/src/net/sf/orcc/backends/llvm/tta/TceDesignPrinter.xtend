@@ -33,6 +33,7 @@ import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.df.Port
+import net.sf.orcc.util.OrccUtil
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -50,7 +51,7 @@ class TceDesignPrinter extends TTAPrinter {
 	
 	def print(Design design, String targetFolder) {
 		val file = new File(targetFolder + File::separator + "top.pndf")
-		printFile(design.pndf, file)
+		OrccUtil::printFile(design.pndf, file)
 	}
 	
 	def private getPndf(Design design)

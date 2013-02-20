@@ -31,16 +31,17 @@ package net.sf.orcc.backends.c
 import java.io.File
 import java.util.HashMap
 import java.util.Map
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
+import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.OrccBackendsConstants.*
-import net.sf.orcc.df.Actor
 
 /**
  * Generate and print network source file for C backend.
@@ -111,7 +112,7 @@ class NetworkPrinter extends CTemplate {
 		val file = new File(targetFolder + File::separator + network.simpleName + ".c")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

@@ -35,6 +35,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Signal
 import net.sf.orcc.backends.util.FPGA
+import net.sf.orcc.util.OrccUtil
 
 class HwProcessorPrinter extends TTAPrinter {
 	
@@ -49,7 +50,7 @@ class HwProcessorPrinter extends TTAPrinter {
 		val content = processor.vhdl
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

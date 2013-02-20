@@ -31,12 +31,12 @@ package net.sf.orcc.backends.llvm.tta
 import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
+import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureUtil
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.backends.llvm.tta.architecture.Memory
 
 class PyDesignPrinter extends TTAPrinter {
 	
@@ -49,7 +49,7 @@ class PyDesignPrinter extends TTAPrinter {
 	def print(Design design, String targetFolder) {
 		val pythonPath = OrccUtil::createFolder(targetFolder, "informations_");
 		val file = new File(pythonPath + File::separator + "informations.py")
-		printFile(design.python, file)
+		OrccUtil::printFile(design.python, file)
 		new File(pythonPath + File::separator + "__init__.py").createNewFile
 	}
 	

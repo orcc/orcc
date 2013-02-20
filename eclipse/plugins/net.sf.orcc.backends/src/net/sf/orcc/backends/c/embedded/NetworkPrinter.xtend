@@ -29,6 +29,7 @@
 
 package net.sf.orcc.backends.c.embedded
 
+import java.io.File
 import net.sf.orcc.backends.c.CTemplate
 import net.sf.orcc.df.Argument
 import net.sf.orcc.df.Connection
@@ -36,7 +37,7 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
-import java.io.File
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate network as graphml file
@@ -61,7 +62,7 @@ class NetworkPrinter extends CTemplate {
 		)
 		
 		if(needToWriteFile(networkContent, graphmlFile)) {
-			printFile(networkContent, graphmlFile)
+			OrccUtil::printFile(networkContent, graphmlFile)
 		} else {
 			numFilesCached = numFilesCached + 1
 		}

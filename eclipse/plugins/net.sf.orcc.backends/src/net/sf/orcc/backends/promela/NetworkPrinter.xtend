@@ -30,11 +30,12 @@ package net.sf.orcc.backends.promela
 
 import java.io.File
 import java.util.Map
-import net.sf.orcc.df.Network
-
-import static net.sf.orcc.OrccLaunchConstants.*
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
+import net.sf.orcc.util.OrccUtil
+
+import static net.sf.orcc.OrccLaunchConstants.*
 
 /**
  * Compile top Network c source code 
@@ -58,7 +59,7 @@ class NetworkPrinter extends PromelaTemplate {
 		val file = new File(targetFolder + File::separator + "main_" + network.simpleName + ".pml")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

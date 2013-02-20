@@ -36,6 +36,9 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
+import net.sf.orcc.ir.BlockBasic
+import net.sf.orcc.ir.BlockIf
+import net.sf.orcc.ir.BlockWhile
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.InstAssign
 import net.sf.orcc.ir.InstCall
@@ -43,10 +46,8 @@ import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Var
+import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.ecore.EObject
-import net.sf.orcc.ir.BlockBasic
-import net.sf.orcc.ir.BlockIf
-import net.sf.orcc.ir.BlockWhile
 
 import static net.sf.orcc.OrccLaunchConstants.*
 
@@ -84,7 +85,7 @@ class InstancePrinter extends PromelaTemplate {
 		val file = new File(targetFolder + File::separator + instance.name + ".pml")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

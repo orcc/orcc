@@ -39,6 +39,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Signal
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.ir.util.ExpressionPrinter
 import net.sf.orcc.util.Attribute
+import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.common.util.EList
 
 class HwDesignPrinter extends TTAPrinter {
@@ -53,7 +54,7 @@ class HwDesignPrinter extends TTAPrinter {
 	
 	def print(Design design, String targetFolder) {
 		val file = new File(targetFolder + File::separator + "top.vhd")
-		printFile(design.vhdl, file)
+		OrccUtil::printFile(design.vhdl, file)
 	}
 	
 	def private getVhdl(Design design)

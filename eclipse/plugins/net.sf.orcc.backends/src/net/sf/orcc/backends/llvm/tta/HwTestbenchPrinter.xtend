@@ -30,11 +30,12 @@ package net.sf.orcc.backends.llvm.tta
 
 import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
+import net.sf.orcc.backends.llvm.tta.architecture.Link
+import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.util.FPGA
-import net.sf.orcc.backends.llvm.tta.architecture.Memory
+import net.sf.orcc.util.OrccUtil
 
 class HwTestbenchPrinter extends TTAPrinter {
 	
@@ -49,9 +50,9 @@ class HwTestbenchPrinter extends TTAPrinter {
 		val waveFile = new File(targetFolder + File::separator + "wave.do")
 		val tclFile = new File(targetFolder + File::separator + "top.tcl")
 		
-		printFile(design.vhdl, vhdlFile)
-		printFile(design.wave, waveFile)
-		printFile(design.tcl, tclFile)
+		OrccUtil::printFile(design.vhdl, vhdlFile)
+		OrccUtil::printFile(design.wave, waveFile)
+		OrccUtil::printFile(design.tcl, tclFile)
 	}
 	
 	

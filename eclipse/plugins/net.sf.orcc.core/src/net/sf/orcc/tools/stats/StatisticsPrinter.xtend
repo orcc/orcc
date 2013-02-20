@@ -29,14 +29,11 @@
 package net.sf.orcc.tools.stats
 
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.PrintStream
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate statistics about an application.
@@ -45,36 +42,9 @@ import net.sf.orcc.util.OrccLogger
  */
 class StatisticsPrinter {
 	
-	/**
-	 * Create a file and print content inside it. If parent folder doesn't
-	 * exists, create it.
-	 * 
-	 * @param content
-	 *            text to write in file
-	 * @param target
-	 *            file to write content to
-	 * @return true if the file has correctly been written
-	 */
-	def protected printFile(CharSequence content, File target) {
-		try {
-			if ( ! target.getParentFile().exists()) {
-				target.getParentFile().mkdirs();
-			}
-			val ps = new PrintStream(new FileOutputStream(target));
-			ps.print(content);
-			ps.close();
-			return true;
-		} catch (FileNotFoundException e) {
-			OrccLogger::severe("Unable to write file " + target.path + " : " + e.cause)
-			OrccLogger::severe(e.localizedMessage)
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
 	def print(String targetFolder, Network network) {
 		val file = new File(targetFolder + File::separator + "stats.csv")
-		printFile(network.content, file)
+		OrccUtil::printFile(network.content, file)
 	}
 	
 	def private getContent(Network network) '''

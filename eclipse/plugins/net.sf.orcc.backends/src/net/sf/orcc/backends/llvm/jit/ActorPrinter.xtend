@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.llvm.jit
 
 import java.io.File
+import net.sf.orcc.util.OrccUtil
 import java.util.ArrayList
 import java.util.List
 import java.util.Map
@@ -75,7 +76,7 @@ class ActorPrinter extends InstancePrinter {
 		val file = new File(targetFolder + File::separator + actor.simpleName)
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

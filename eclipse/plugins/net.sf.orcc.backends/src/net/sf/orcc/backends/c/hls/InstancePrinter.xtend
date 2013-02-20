@@ -28,6 +28,8 @@
  */
  package net.sf.orcc.backends.c.hls
 
+
+import net.sf.orcc.util.OrccUtil
 import java.io.File
 import java.util.List
 import net.sf.orcc.df.Action
@@ -244,9 +246,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val directiveFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name  + File::separator + "directive_" + instance.name + ".tcl")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(scriptContent, scriptFile)
-			printFile(directiveContent, directiveFile)
-			printFile(content, file)
+			OrccUtil::printFile(scriptContent, scriptFile)
+			OrccUtil::printFile(directiveContent, directiveFile)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

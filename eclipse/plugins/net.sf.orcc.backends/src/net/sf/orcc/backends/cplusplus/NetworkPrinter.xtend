@@ -39,6 +39,7 @@ import net.sf.orcc.backends.cplusplus.entities.Receiver
 import net.sf.orcc.backends.cplusplus.entities.Sender
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
+import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
 
@@ -72,7 +73,7 @@ class NetworkPrinter extends ExprAndTypePrinter {
 		val file = new File(targetFolder + File::separator + network.simpleName + ".cpp")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
@@ -84,7 +85,7 @@ class NetworkPrinter extends ExprAndTypePrinter {
 		val file = new File(targetFolder + File::separator + "CMakeLists.txt")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

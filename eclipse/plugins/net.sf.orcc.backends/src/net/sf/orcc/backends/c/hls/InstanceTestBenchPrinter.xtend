@@ -28,11 +28,12 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.df.Instance
+import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
-import java.io.File
+import net.sf.orcc.util.OrccUtil
 
 /**
  * generates top Network testbench
@@ -339,7 +340,7 @@ import java.io.File
 		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

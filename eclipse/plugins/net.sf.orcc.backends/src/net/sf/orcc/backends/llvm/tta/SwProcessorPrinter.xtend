@@ -28,9 +28,10 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
-import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.backends.llvm.aot.LLVMTemplate
 import java.io.File
+import net.sf.orcc.backends.llvm.aot.LLVMTemplate
+import net.sf.orcc.backends.llvm.tta.architecture.Processor
+import net.sf.orcc.util.OrccUtil
 
 class SwProcessorPrinter extends LLVMTemplate {
 	
@@ -39,7 +40,7 @@ class SwProcessorPrinter extends LLVMTemplate {
 		val file = new File(targetFolder + File::separator + processor.getName() + ".ll")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

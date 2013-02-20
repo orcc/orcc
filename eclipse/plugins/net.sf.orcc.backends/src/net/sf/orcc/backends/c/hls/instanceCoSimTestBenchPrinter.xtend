@@ -29,6 +29,8 @@
 package net.sf.orcc.backends.c.hls
 
 import java.util.Map
+
+import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.df.Connection
 import java.io.File
 import net.sf.orcc.ir.TypeBool
@@ -174,7 +176,7 @@ import net.sf.orcc.ir.TypeBool
 		val file = new File(targetFolder + File::separator + instance.name+ "_Csim_tb" + ".cpp")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

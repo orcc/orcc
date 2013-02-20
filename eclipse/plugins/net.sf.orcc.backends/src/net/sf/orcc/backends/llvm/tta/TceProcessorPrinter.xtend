@@ -51,6 +51,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.TermBool
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Writes
 import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.common.util.EMap
 
 class TceProcessorPrinter extends TTAPrinter {
@@ -69,12 +70,12 @@ class TceProcessorPrinter extends TTAPrinter {
 		var cached = 0
 		
 		if(needToWriteFile(adfContent, adfFile)) {
-			printFile(adfContent, adfFile)
+			OrccUtil::printFile(adfContent, adfFile)
 		} else {
 			cached = cached + 1
 		}
 		if(needToWriteFile(idfContent, idfFile)) {
-			printFile(idfContent, idfFile)
+			OrccUtil::printFile(idfContent, idfFile)
 		} else {
 			cached = cached + 1
 		}

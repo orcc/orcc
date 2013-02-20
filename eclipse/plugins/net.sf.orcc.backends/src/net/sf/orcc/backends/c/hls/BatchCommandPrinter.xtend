@@ -29,6 +29,8 @@
 package net.sf.orcc.backends.c.hls
 
 import net.sf.orcc.df.Network
+
+import net.sf.orcc.util.OrccUtil
 import java.util.Map
 import net.sf.orcc.df.Instance
 import java.io.File
@@ -79,7 +81,7 @@ import java.io.File
 		val NetworkFile = new File(targetFolder + File::separator + "Command" + ".bat")
 		
 		if(needToWriteFile(contentNetwork, NetworkFile)) {
-			printFile(contentNetwork, NetworkFile)
+			OrccUtil::printFile(contentNetwork, NetworkFile)
 			return 0
 		} else {
 			return 1

@@ -34,10 +34,7 @@ import java.io.BufferedReader
 import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.io.InputStreamReader
-import java.io.PrintStream
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
@@ -52,6 +49,7 @@ import net.sf.orcc.graph.Edge
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.preferences.PreferenceConstants
 import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 
 /**
  * This class defines a graph converter to Metis format.
@@ -87,7 +85,7 @@ class Metis {
 		}
 		
 		// Print metis-understandable graph representation in a file
-		printFile(network.metis, file)
+		OrccUtil::printFile(network.metis, file)
 		// Solve the graph partitioning problem by launching Metis
 		run(partitionNumber, folder)
 
@@ -175,33 +173,6 @@ class Metis {
 
 	def private getNotNativeConnections(List<Edge> edges) {
 		edges.filter(typeof(Connection)).filter[!sourcePort.native && !targetPort.native]
-	}
-
-	/**
-	 * Create a file and print content inside it. If parent folder doesn't
-	 * exists, create it.
-	 *
-	 * @param content
-	 *            text to write in file
-	 * @param target
-	 *            file to write content to
-	 * @return true if the file has correctly been written
-	 */
-	def private printFile(CharSequence content, File target) {
-		try {
-			if ( ! target.getParentFile().exists()) {
-				target.getParentFile().mkdirs();
-			}
-			val ps = new PrintStream(new FileOutputStream(target));
-			ps.print(content);
-			ps.close();
-			return true;
-		} catch (FileNotFoundException e) {
-			OrccLogger::severe("Unable to write file " + target.path + " : " + e.cause)
-			OrccLogger::severe(e.localizedMessage)
-			e.printStackTrace();
-			return false;
-		}
 	}
 
 }

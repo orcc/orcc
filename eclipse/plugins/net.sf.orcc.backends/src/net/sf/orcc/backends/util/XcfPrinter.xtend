@@ -34,10 +34,11 @@ import java.util.HashMap
 import java.util.List
 import java.util.Map
 import net.sf.orcc.backends.CommonPrinter
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.df.Actor
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Printer used to create the xcf file, containing information on
@@ -56,7 +57,7 @@ class XcfPrinter extends CommonPrinter {
 		val xcfFile = new File(targetFolder + File::separator + network.simpleName + ".xcf")
 		
 		network.computeMapping(initialMapping)
-		printFile(network.contentFile, xcfFile)
+		OrccUtil::printFile(network.contentFile, xcfFile)
 	}
 	
 	def private void computeMapping(Network network, Map<String, String> initialMapping) {	
