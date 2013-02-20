@@ -86,6 +86,7 @@ class InstancePrinter extends CTemplate {
 	var boolean ringTopology = false
 	
 	var boolean enableTrace = false
+	var String traceFolder
 	var int threadsNb = 1;
 	
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
@@ -129,6 +130,7 @@ class InstancePrinter extends CTemplate {
 		}
 		if (options.containsKey(ENABLE_TRACES)) {
 			enableTrace = options.get(ENABLE_TRACES) as Boolean
+			traceFolder = options.get(TRACES_FOLDER) as String
 		}
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
@@ -735,7 +737,7 @@ class InstancePrinter extends CTemplate {
 	
 	def private printOpenFiles() '''
 		«FOR port : actor.inputs + actor.outputs»
-			file_«port.name» = fopen("«port.fullName».txt", "a");
+			file_«port.name» = fopen("«traceFolder»«File::separator»«port.fullName».txt", "a");
 		«ENDFOR»
 	'''
 	
