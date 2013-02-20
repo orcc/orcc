@@ -82,21 +82,16 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * 
  */
 public class ActorInterpreter extends IrSwitch<Object> {
-
+	
+	/** the associated interpreted actor */
 	protected Actor actor;
-
-	/**
-	 * branch being visited
-	 */
+	/** branch being visited */
 	protected int branch;
-
-	private boolean checkPrecision;
-
+	/** <code>true</code> for a verbose interpretation */
+	protected boolean debugMode;
+	/** the expression evaluator */
 	protected ExpressionEvaluator exprInterpreter;
-
-	/**
-	 * Actor's FSM current state
-	 */
+	/** Actor's FSM current state */
 	protected State fsmState;
 
 	/**
@@ -104,7 +99,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * 
 	 */
 	public ActorInterpreter() {
-		this(true);
+		this(false);
 	}
 
 	/**
@@ -114,7 +109,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 *            the actor to interpret
 	 */
 	public ActorInterpreter(Actor actor) {
-		this(actor, true);
+		this(actor, false);
 	}
 
 	/**
@@ -122,23 +117,23 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * 
 	 * @param actor
 	 *            the actor to interpret
-	 * @param checkPrecision
-	 *            true if the interpreter has to check loss of precision
+	 * @param debugMode
+	 *            <code>true</code> if the interpretation is done in debug mode
 	 */
-	public ActorInterpreter(Actor actor, boolean checkPrecision) {
-		this(checkPrecision);
+	public ActorInterpreter(Actor actor, boolean debugMode) {
+		this(debugMode);
 		setActor(actor);
 	}
 
 	/**
 	 * Creates a new interpreter.
 	 * 
-	 * @param checkPrecision
-	 *            true if the interpreter has to check loss of precision
+	 * @param debugMode
+	 *            <code>true</code> if the interpretation is done in debug mode
 	 */
-	public ActorInterpreter(boolean checkPrecision) {
+	public ActorInterpreter(boolean debugMode) {
 		this.exprInterpreter = new ExpressionEvaluator();
-		this.checkPrecision = checkPrecision;
+		this.debugMode = debugMode;
 	}
 
 	/**
@@ -442,7 +437,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		BigInteger clippedValue = intVal.and(twoPowSize.subtract(ONE));
 
 		// check signed overflow/underflow
-		if (checkPrecision && type.isInt()) {
+		if (debugMode && type.isInt()) {
 			// if MSB is set, subtract 2**n to make negative number
 			if (clippedValue.testBit(n - 1)) {
 				clippedValue = clippedValue.subtract(twoPowSize);
