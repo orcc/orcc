@@ -131,8 +131,7 @@ class Metis {
 		cmdList.add(path + File::separator + "top.metis")
 		cmdList.add(partitionNumber.toString)
 
-		OrccLogger::traceln(cmdList.toString)
-		OrccLogger::traceln("Solving actor partitioning...");
+		OrccLogger::traceln("Solving actors partitioning on " + partitionNumber + " processors...");
 
 		val t0 = System::currentTimeMillis;
 		BackendUtil::runExternalProgram(cmdList)
