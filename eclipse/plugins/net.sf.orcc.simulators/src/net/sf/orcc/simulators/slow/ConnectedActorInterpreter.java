@@ -64,12 +64,12 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 * Creates an actor interpreter dedicated to the simulator.
 	 * 
 	 * @param actor
-	 *            the actor to interprete
-	 * @param checkPrecision
-	 *            true if the interpreter has to check precision loss
+	 *            the actor to interpret
+	 * @param debugMode
+	 *            <code>true</code> if the interpretation is done in debug mode
 	 */
-	public ConnectedActorInterpreter(Actor actor, boolean checkPrecision) {
-		super(actor, checkPrecision);
+	public ConnectedActorInterpreter(Actor actor, boolean debugMode) {
+		super(actor, debugMode);
 		exprInterpreter = new RuntimeExpressionEvaluator();
 	}
 
