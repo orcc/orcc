@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.simulators.SimulatorFactory;
@@ -63,13 +64,19 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		OrccLogger.configureLoggerWithHandler(new OrccUiConsoleHandler(
 				DebugUITools.getConsole(process)));
 
+		// set the log level
+		if (mode.equals("debug")
+				|| configuration.getAttribute(DEBUG_MODE, false)) {
+			OrccLogger.setLevel(OrccLogger.ALL);
+		} else {
+			OrccLogger.setLevel(OrccLogger.NOTICE);
+		}
+
 		try {
 			String simulatorName = configuration.getAttribute(SIMULATOR, "");
+			monitor.subTask("ORCC CAL SIMULATOR (" + simulatorName + ")");
 
-			monitor.subTask("Launching simulator...");
-			OrccLogger.traceln("*********************************************"
-					+ "**********************************");
-			OrccLogger.traceln("Launching " + simulatorName + "...");
+			OrccLogger.infoln("ORCC CAL SIMULATOR: " + simulatorName);
 
 			try {
 				SimulatorFactory factory = SimulatorFactory.getInstance();
@@ -95,9 +102,10 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 								+ " simulation error: " + builder.toString());
 				throw new CoreException(status);
 			}
-			OrccLogger.traceln("Orcc backend done.");
+			OrccLogger.infoln("Orcc backend done.");
 		} finally {
 			process.terminate();
+			OrccLogger.setLevel(OrccLogger.ALL);
 		}
 	}
 }

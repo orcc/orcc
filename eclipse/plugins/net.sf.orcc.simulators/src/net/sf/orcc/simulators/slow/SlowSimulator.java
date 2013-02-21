@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.simulators.slow;
 
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
@@ -119,8 +118,6 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected String xdfFile;
 
-	protected boolean debugMode;
-
 	/**
 	 * Visit the network graph for building the required topology. Edges of the
 	 * graph correspond to the connections between the actors. These connections
@@ -165,25 +162,23 @@ public class SlowSimulator extends AbstractSimulator {
 			connection.setAttribute("fifo", fifo);
 		}
 
-		if (debugMode) {
-			// print a warning message if there are some unconnected ports
-			for (Actor actor : network.getAllActors()) {
-				// check input ports
-				for (Port port : actor.getInputs()) {
-					if (port.getAttribute("fifo") == null) {
-						OrccLogger.warnln("Unconnected Input Port ["
-								+ port.getName() + "] on Actor "
-								+ actor.getSimpleName());
-					}
+		// print a warning message if there are some unconnected ports
+		for (Actor actor : network.getAllActors()) {
+			// check input ports
+			for (Port port : actor.getInputs()) {
+				if (port.getAttribute("fifo") == null) {
+					OrccLogger.warnln("Unconnected Input Port ["
+							+ port.getName() + "] on Actor "
+							+ actor.getSimpleName());
 				}
+			}
 
-				// check output ports
-				for (Port port : actor.getOutputs()) {
-					if (port.getAttribute("fifo") == null) {
-						OrccLogger.warnln("Unconnected Output Port ["
-								+ port.getName() + "] on Actor "
-								+ actor.getSimpleName());
-					}
+			// check output ports
+			for (Port port : actor.getOutputs()) {
+				if (port.getAttribute("fifo") == null) {
+					OrccLogger.warnln("Unconnected Output Port ["
+							+ port.getName() + "] on Actor "
+							+ actor.getSimpleName());
 				}
 			}
 		}
@@ -201,7 +196,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Actor actor = vertex.getAdapter(Actor.class);
 
 			ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-					actor, debugMode);
+					actor);
 
 			interpreters.put(actor, interpreter);
 		}
@@ -248,8 +243,6 @@ public class SlowSimulator extends AbstractSimulator {
 		loopsNumber = getAttribute(LOOP_NUMBER, DEFAULT_NB_LOOPS);
 
 		noDisplay = getAttribute(NO_DISPLAY, false);
-
-		debugMode = getAttribute(DEBUG_MODE, false);
 
 		enableTypeResizer = getAttribute(TYPE_RESIZER, false);
 		typeResizer[0] = getAttribute(TYPE_RESIZER_CAST_TO2NBITS, false);
