@@ -66,9 +66,7 @@ public class OrccUiConsoleHandler extends Handler {
 
 		@Override
 		public void run() {
-			String message;
-			message = getFormatter().format(record);
-
+			String message = getFormatter().format(record);
 			IOConsoleOutputStream outStream = console.newOutputStream();
 
 			if (record.getLevel().intValue() == OrccLogger.SEVERE.intValue()) {
@@ -79,6 +77,9 @@ public class OrccUiConsoleHandler extends Handler {
 			} else if (record.getLevel().intValue() == OrccLogger.DEBUG
 					.intValue()) {
 				outStream.setColor(new Color(null, 133, 200, 62));
+			}else if (record.getLevel().intValue() == OrccLogger.NOTICE
+					.intValue()) {
+				outStream.setColor(new Color(null, 0,0,156));
 			}
 
 			try {
