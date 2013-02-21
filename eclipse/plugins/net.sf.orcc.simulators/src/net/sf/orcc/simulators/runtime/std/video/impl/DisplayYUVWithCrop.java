@@ -228,7 +228,7 @@ public class DisplayYUVWithCrop {
 
 	public static void fpsPrintNewPicDecoded() {
 		t2 = System.currentTimeMillis();
-		OrccLogger.noticeln("image displayed in " + (t2 - t1) + " ms");
+		OrccLogger.noticeRaw("Image displayed in " + (t2 - t1) + " ms\n");
 		t1 = t2;
 	}
 
