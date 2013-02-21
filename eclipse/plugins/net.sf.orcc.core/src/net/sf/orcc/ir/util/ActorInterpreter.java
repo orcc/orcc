@@ -82,24 +82,20 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * 
  */
 public class ActorInterpreter extends IrSwitch<Object> {
-	
+
 	/** the associated interpreted actor */
 	protected Actor actor;
 	/** branch being visited */
 	protected int branch;
-	/** <code>true</code> for a verbose interpretation */
-	protected boolean debugMode;
 	/** the expression evaluator */
 	protected ExpressionEvaluator exprInterpreter;
 	/** Actor's FSM current state */
 	protected State fsmState;
 
 	/**
-	 * Creates a new interpreter with no actor.
-	 * 
+	 * Creates a new interpreter without any associated {@link Actor}
 	 */
 	public ActorInterpreter() {
-		this(false);
 	}
 
 	/**
@@ -109,31 +105,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 *            the actor to interpret
 	 */
 	public ActorInterpreter(Actor actor) {
-		this(actor, false);
-	}
-
-	/**
-	 * Creates a new interpreter.
-	 * 
-	 * @param actor
-	 *            the actor to interpret
-	 * @param debugMode
-	 *            <code>true</code> if the interpretation is done in debug mode
-	 */
-	public ActorInterpreter(Actor actor, boolean debugMode) {
-		this(debugMode);
 		setActor(actor);
-	}
-
-	/**
-	 * Creates a new interpreter.
-	 * 
-	 * @param debugMode
-	 *            <code>true</code> if the interpretation is done in debug mode
-	 */
-	public ActorInterpreter(boolean debugMode) {
-		this.exprInterpreter = new ExpressionEvaluator();
-		this.debugMode = debugMode;
 	}
 
 	/**
