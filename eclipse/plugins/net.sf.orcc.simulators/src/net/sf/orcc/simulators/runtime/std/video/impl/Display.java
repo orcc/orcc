@@ -41,6 +41,7 @@ import java.math.BigInteger;
 
 import javax.swing.JFrame;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.runtime.impl.GenericDisplay;
 import net.sf.orcc.util.OrccLogger;
@@ -201,7 +202,7 @@ public class Display extends GenericDisplay {
 				useCompare = true;
 			} catch (FileNotFoundException e) {
 				String msg = "File not found: \"" + goldenReference + "\"";
-				throw new RuntimeException(msg, e);
+				throw new OrccRuntimeException(msg, e);
 			}
 		}
 	}
