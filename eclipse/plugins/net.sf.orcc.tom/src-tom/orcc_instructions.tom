@@ -1,8 +1,8 @@
 
-%op InstAssign assign( target : Var, source : Expression ) {
+%op Instruction assign( target : Var, value : Expression ) {
 	is_fsym(t) {$t instanceof InstAssign }
-	get_slot(target,t) {((InstAssign)$t).getTarget().getVar() }
-	get_slot(source,t) {((InstAssign)$t).getSource() }
+	get_slot(target,t) {((InstAssign)$t).getTarget().getVariable() }
+	get_slot(value,t) {((InstAssign)$t).getValue() }
 	make(_target, _value) {
 		net.sf.orcc.ir.IrFactory.eINSTANCE.createInstAssign($_target, $_value)
 	}
@@ -11,12 +11,12 @@
 %op InstReturn return( value : Expression ) {
 	is_fsym(t) {$t instanceof InstReturn }
 	get_slot(value,t) {((InstReturn)$t).getSource() }
-	make(_target, _value) {
-		net.sf.orcc.ir.IrFactory.eINSTANCE.createInstReturn($_target, $_value)
+	make(_value) {
+		net.sf.orcc.ir.IrFactory.eINSTANCE.createInstReturn($$_value)
 	}
 }
 
-%op InstLoad load( target : Var, source : Var, indexes : ExpressionL ) {
+%op InstLoad load( target : Var, indexes : ExpressionL, source : Var ) {
 	is_fsym(t) {$t instanceof InstLoad }
 	get_slot(target,t) {((InstLoad)$t).getTarget().getVar() }
 	get_slot(source,t) {((InstLoad)$t).getSource().getVar() }
@@ -31,8 +31,8 @@
 	get_slot(target,t) {((InstStore)$t).getTarget().getVar() }
 	get_slot(source,t) {((InstStore)$t).getSource().getVar() }
 	get_slot(indexes,t) {((InstStore)$t).getSource().getIndexes() }
-	make(_target, _value) {
-		net.sf.orcc.ir.IrFactory.eINSTANCE.createInstLoad($_target, $_value)
+	make(_target, _source, unused) {
+		net.sf.orcc.ir.IrFactory.eINSTANCE.createInstLoad($_target, $_source)
 	}
 }
 

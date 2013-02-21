@@ -1,4 +1,6 @@
 %include { orcc_terminals.tom }
+%include { int.tom }
+%include { float.tom }
 
 %op ExprBinary add( e1 : Expression,  e2 : Expression, type : Type ) {
 	is_fsym(t) {($t instanceof net.sf.orcc.ir.ExprBinary) && ((net.sf.orcc.ir.ExprBinary) $t).getOp() == OpBinary.PLUS }
@@ -18,7 +20,7 @@
 	}
 }
 
-%op ExprInt exprInt( value : BigInteger ) {
+%op ExprInt exprInt( value : int ) {
 	is_fsym(t) { $t instanceof ExprInt }
 	get_slot(value, t) {((net.sf.orcc.ir.ExprInt)$t).getValue() }
 	make(_value) {
@@ -26,7 +28,7 @@
 	}
 }
 
-%op ExprBool exprBool( value : Boolean ) {
+%op ExprBool exprBool( value : boolean ) {
 	is_fsym(t) { $t instanceof ExprBool }
 	get_slot(value, t) {((net.sf.orcc.ir.ExprBool)$t).getValue() }
 	make(_value) {
@@ -34,7 +36,7 @@
 	}
 }
 
-%op ExprFloat exprFloat( value : BigDecimal ) {
+%op ExprFloat exprFloat( value : float ) {
 	is_fsym(t) { $t instanceof ExprFloat }
 	get_slot(value, t) {((net.sf.orcc.ir.ExprFloat)$t).getValue() }
 	make(_value) {
