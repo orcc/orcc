@@ -1,14 +1,13 @@
 %include { string.tom }
 %include { boolean.tom }
 
-%op Procedure proc( name : String,  native : Boolean, parameters : ParamL, blocks : BlockL, returnType : Type) {
+%op Procedure proc( name : String, returnType : Type, parameters : ParamL, blocks : BlockL) {
 	is_fsym(t) {$t instanceof net.sf.orcc.ir.Procedure}
 	get_slot(name, t) {((net.sf.orcc.ir.Procedure)$t).getName() }
 	get_slot(returnType, t) {((net.sf.orcc.ir.Procedure)$t).getReturnType() }
-	get_slot(native, t) { ((net.sf.orcc.ir.Procedure)$t).isNative() }
 	get_slot(parameters, t) { ((net.sf.orcc.ir.Procedure)$t).getParameters() }
 	get_slot(blocks, t) { ((net.sf.orcc.ir.Procedure)$t).getBlocks() }
-	make(_name, _returnType, _params) {
+	make(_name, _returnType, _params, _unused) {
 		net.sf.orcc.ir.IrFactory.eINSTANCE.createProcedure($_name, $_returnType, $_params)
 	}
 }
