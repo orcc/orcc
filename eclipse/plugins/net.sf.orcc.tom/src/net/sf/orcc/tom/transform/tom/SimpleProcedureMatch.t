@@ -20,7 +20,7 @@ public class SimpleProcedureMatch {
 		for(Procedure procedure : actor.getProcs()) {
 			%match (procedure){
 				p@proc("untagged_0", _, _, _) -> {
-					OrccLogger.traceln(procedure.getName());
+					OrccLogger.traceln(`p.getName());
 				}
 			}
 		}

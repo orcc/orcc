@@ -28,7 +28,7 @@ public class SimpleProcedureMatch {
 		for(Procedure procedure : actor.getProcs()) {
 			{{if (tom_is_sort_Procedure(procedure)) {if (tom_is_fun_sym_proc((( net.sf.orcc.ir.Procedure )procedure))) {if (tom_equal_term_String("untagged_0", tom_get_slot_proc_name((( net.sf.orcc.ir.Procedure )procedure)))) {
 
-					OrccLogger.traceln(procedure.getName());
+					OrccLogger.traceln((( net.sf.orcc.ir.Procedure )procedure).getName());
 				}}}}}
 
 		}
