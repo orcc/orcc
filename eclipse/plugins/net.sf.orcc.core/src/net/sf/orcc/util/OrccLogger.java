@@ -84,16 +84,18 @@ public class OrccLogger {
 				Date date = new Date(record.getMillis());
 				DateFormat df = DateFormat.getTimeInstance();
 
-				output += df.format(date);
+				output += df.format(date) + " ";
 				// Default printing for warn & severe
-				if (record.getLevel().intValue() > NOTICE.intValue()) {
-					output += " " + record.getLevel();
-				} else if (record.getLevel().intValue() == NOTICE.intValue()) {
-					output += " NOTICE";
-				} else if (record.getLevel().intValue() == DEBUG.intValue()) {
-					output += " DEBUG";
+				if (record.getLevel() == SEVERE) {
+					output += "!! ERROR !!";
+				} else if (record.getLevel() == WARNING) {
+					output += "<<WARNING>>";
+				} else if (record.getLevel() == TRACE) {
+					output += "<<TRACE>>";
+				} else if (record.getLevel() == DEBUG) {
+					output += "<<DEBUG>>";
 				}
-				output += " : ";
+				output += ": ";
 			}
 			output += record.getMessage();
 			return output;
