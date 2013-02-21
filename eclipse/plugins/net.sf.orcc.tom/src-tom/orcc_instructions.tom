@@ -8,7 +8,7 @@
 	}
 }
 
-%op InstReturn Return( value : Expression ) {
+%op InstReturn return( value : Expression ) {
 	is_fsym(t) {$t instanceof InstReturn }
 	get_slot(value,t) {((InstReturn)$t).getSource() }
 	make(_target, _value) {

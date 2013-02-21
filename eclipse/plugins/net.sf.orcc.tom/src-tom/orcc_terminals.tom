@@ -1,3 +1,4 @@
+%include { orcc_commons.tom }
 
 %typeterm Block {
   implement { net.sf.orcc.ir.Block }
@@ -5,12 +6,22 @@
   equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
 }
 %typeterm BlockL {
-   implement { EList<net.sf.orcc.ir.Block> }
-     is_sort(t) { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Block>)$t).size() == 0 ||
-                  (((EList<net.sf.orcc.ir.Block>)$t).size() > 0 && 
-                    ((EList<net.sf.orcc.ir.Block>)$t).get(0) instanceof net.sf.orcc.ir.Block))}
-  equals(l1,l2)   {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
+  implement { EList<net.sf.orcc.ir.Block> }
+  is_sort(t) { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Block>)$t).size() == 0 ||
+              (((EList<net.sf.orcc.ir.Block>)$t).size() > 0 && 
+              ((EList<net.sf.orcc.ir.Block>)$t).get(0) instanceof net.sf.orcc.ir.Block))}
+  equals(l1,l2) {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
 }
+%oparray BlockL BlockL (Block*) {
+    is_fsym(t) { $t instanceof EList<?> && 
+              (((EList<net.sf.orcc.ir.Block>)$t).size() == 0 
+              || (((EList<net.sf.orcc.ir.Block>)$t).size()>0 && ((EList<net.sf.orcc.ir.Block>)$t).get(0) instanceof net.sf.orcc.ir.Block))} 
+    make_empty(n) { new BasicEList<net.sf.orcc.ir.Block>($n) }
+    make_append(e,l) { append($e,$l) }
+    get_element(l,n) { $l.get($n) }
+    get_size(l)      { $l.size() }
+}
+
 %typeterm BlockBasic {
   implement { net.sf.orcc.ir.BlockBasic }
   is_sort(t) { $t instanceof net.sf.orcc.ir.BlockBasic }
@@ -34,12 +45,22 @@
   equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
 }
 %typeterm InstructionL {
-   implement { EList<net.sf.orcc.ir.Instruction> }
-     is_sort(t) { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Instruction>)$t).size() == 0 ||
-                  (((EList<net.sf.orcc.ir.Instruction>)$t).size() > 0 && 
-                    ((EList<net.sf.orcc.ir.Instruction>)$t).get(0) instanceof net.sf.orcc.ir.Instruction))}
+  implement { EList<net.sf.orcc.ir.Instruction> }
+  is_sort(t) { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Instruction>)$t).size() == 0 ||
+              (((EList<net.sf.orcc.ir.Instruction>)$t).size() > 0 && 
+              ((EList<net.sf.orcc.ir.Instruction>)$t).get(0) instanceof net.sf.orcc.ir.Instruction))}
   equals(l1,l2)   {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
 }
+%oparray InstructionL InstructionL (Instruction*) {
+    is_fsym(t) { $t instanceof EList<?> && 
+              (((EList<net.sf.orcc.ir.Instruction>)$t).size() == 0 
+              || (((EList<net.sf.orcc.ir.Instruction>)$t).size()>0 && ((EList<net.sf.orcc.ir.Instruction>)$t).get(0) instanceof net.sf.orcc.ir.Instruction))} 
+    make_empty(n) { new BasicEList<net.sf.orcc.ir.Instruction>($n) }
+    make_append(e,l) { append($e,$l) }
+    get_element(l,n) { $l.get($n) }
+    get_size(l)      { $l.size() }
+}
+
 %typeterm InstCall {
   implement { net.sf.orcc.ir.InstCall }
   is_sort(t) { $t instanceof net.sf.orcc.ir.InstCall }
@@ -89,6 +110,16 @@
                     ((EList<net.sf.orcc.ir.Expression>)$t).get(0) instanceof net.sf.orcc.ir.Expression))}
   equals(l1,l2)   {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
 }
+%oparray ExpressionL ExpressionL (Expression*) {
+    is_fsym(t) { $t instanceof EList<?> && 
+              (((EList<net.sf.orcc.ir.Expression>)$t).size() == 0 
+              || (((EList<net.sf.orcc.ir.Expression>)$t).size()>0 && ((EList<net.sf.orcc.ir.Expression>)$t).get(0) instanceof net.sf.orcc.ir.Expression))} 
+    make_empty(n) { new BasicEList<net.sf.orcc.ir.Expression>($n) }
+    make_append(e,l) { append($e,$l) }
+    get_element(l,n) { $l.get($n) }
+    get_size(l)      { $l.size() }
+}
+
 %typeterm ExprBinary {
   implement { net.sf.orcc.ir.ExprBinary }
   is_sort(t) { $t instanceof net.sf.orcc.ir.ExprBinary }
@@ -185,12 +216,22 @@
   equals(l1,l2) { $l1.equals($l2) || $l1 == $l2 }
 }
 %typeterm ParamL {
-   implement { EList<net.sf.orcc.ir.Param> }
-     is_sort(t) { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Param>)$t).size() == 0 ||
+  implement     { EList<net.sf.orcc.ir.Param> }
+  is_sort(t)    { $t instanceof EList<?> && (((EList<net.sf.orcc.ir.Param>)$t).size() == 0 ||
                   (((EList<net.sf.orcc.ir.Param>)$t).size() > 0 && 
-                    ((EList<net.sf.orcc.ir.Param>)$t).get(0) instanceof net.sf.orcc.ir.Param))}
-  equals(l1,l2)   {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
+                ((EList<net.sf.orcc.ir.Param>)$t).get(0) instanceof net.sf.orcc.ir.Param)) }
+  equals(l1,l2) {($l1!=null && $l1.equals($l2)) || $l1==$l2 }
 }
+%oparray ParamL ParamL (Param*) {
+    is_fsym(t) { $t instanceof EList<?> && 
+              (((EList<net.sf.orcc.ir.Param>)$t).size() == 0 
+              || (((EList<net.sf.orcc.ir.Param>)$t).size()>0 && ((EList<net.sf.orcc.ir.Param>)$t).get(0) instanceof net.sf.orcc.ir.Param))} 
+    make_empty(n) { new BasicEList<net.sf.orcc.ir.Param>($n) }
+    make_append(e,l) { append($e,$l) }
+    get_element(l,n) { $l.get($n) }
+    get_size(l)      { $l.size() }
+}
+
 
 %typeterm Arg {
   implement { net.sf.orcc.ir.Arg }
