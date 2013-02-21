@@ -437,7 +437,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		BigInteger clippedValue = intVal.and(twoPowSize.subtract(ONE));
 
 		// check signed overflow/underflow
-		if (debugMode && type.isInt()) {
+		if (type.isInt()) {
 			// if MSB is set, subtract 2**n to make negative number
 			if (clippedValue.testBit(n - 1)) {
 				clippedValue = clippedValue.subtract(twoPowSize);
