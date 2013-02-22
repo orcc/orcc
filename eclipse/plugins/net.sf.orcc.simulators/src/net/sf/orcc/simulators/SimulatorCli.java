@@ -44,6 +44,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccLogger.OrccLevel;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -161,7 +162,7 @@ public class SimulatorCli implements IApplication {
 			}
 
 			if (commandLine.hasOption('d')) {
-				OrccLogger.setLevel(OrccLogger.DEBUG);
+				OrccLogger.setLevel(OrccLevel.DEBUG);
 			}
 
 			if (commandLine.hasOption("r")) {

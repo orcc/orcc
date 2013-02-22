@@ -68,7 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
@@ -78,6 +77,7 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccLogger.OrccLevel;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -811,7 +811,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		if (debug) {
-			OrccLogger.setLevel(Level.FINEST);
+			OrccLogger.setLevel(OrccLevel.DEBUG);
 			OrccLogger.debugln("Debug mode is enabled");
 		}
 
