@@ -25,13 +25,11 @@ public class LiteralIntegersAdder {
 		for(Action action : actor.getActions()) {
 			Procedure actionBody = action.getBody();
 			%match (actionBody) {
-				proc(_, _, _, BlockL(blockBasic(InstructionL(_*, assign(_, _)))))
+				proc(_, _, _, BlockL(_*, blockBasic(InstructionL(_*, assign(_, exprInt()))), _*))
 				-> {
 					OrccLogger.traceln("");
 				}
 			}
 		}
-		
 	}
-
 }
