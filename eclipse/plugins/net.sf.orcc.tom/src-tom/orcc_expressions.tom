@@ -2,7 +2,7 @@
 %include { int.tom }
 %include { float.tom }
 
-%op ExprBinary add( e1 : Expression,  e2 : Expression, type : Type ) {
+%op Expression add( e1 : Expression,  e2 : Expression, type : Type ) {
 	is_fsym(t) {($t instanceof net.sf.orcc.ir.ExprBinary) && ((net.sf.orcc.ir.ExprBinary) $t).getOp() == OpBinary.PLUS }
 	get_slot(e1, t) {((net.sf.orcc.ir.ExprBinary)$t).getE1() }
 	get_slot(e2, t) {((net.sf.orcc.ir.ExprBinary)$t).getE2() }
@@ -12,7 +12,7 @@
 	}
 }
 
-%op ExprVar exprVar( value : Var ) {
+%op Expression exprVar( value : Var ) {
 	is_fsym(t) { $t instanceof ExprVar }
 	get_slot(value, t) {((net.sf.orcc.ir.ExprVar)$t).getValue() }
 	make(_value) {
@@ -20,15 +20,15 @@
 	}
 }
 
-%op ExprInt exprInt( value : int ) {
+%op Expression exprInt( value : int ) {
 	is_fsym(t) { $t instanceof ExprInt }
-	get_slot(value, t) {((net.sf.orcc.ir.ExprInt)$t).getValue() }
+	get_slot(value, t) {((net.sf.orcc.ir.ExprInt)$t).getValue().intValue() }
 	make(_value) {
 		net.sf.orcc.ir.IrFactory.eINSTANCE.createExprInt(_value)
 	}
 }
 
-%op ExprBool exprBool( value : boolean ) {
+%op Expression exprBool( value : boolean ) {
 	is_fsym(t) { $t instanceof ExprBool }
 	get_slot(value, t) {((net.sf.orcc.ir.ExprBool)$t).getValue() }
 	make(_value) {
@@ -36,7 +36,7 @@
 	}
 }
 
-%op ExprFloat exprFloat( value : float ) {
+%op Expression exprFloat( value : float ) {
 	is_fsym(t) { $t instanceof ExprFloat }
 	get_slot(value, t) {((net.sf.orcc.ir.ExprFloat)$t).getValue() }
 	make(_value) {
@@ -44,7 +44,7 @@
 	}
 }
 
-%op ExprList exprList( value : ExpressionL ) {
+%op Expression exprList( value : ExpressionL ) {
 	is_fsym(t) { $t instanceof ExprList }
 	get_slot(value, t) {((net.sf.orcc.ir.ExprList)$t).getValue() }
 	make(_value) {

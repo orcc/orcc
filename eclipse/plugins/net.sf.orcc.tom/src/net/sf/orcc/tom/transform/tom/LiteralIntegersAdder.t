@@ -25,9 +25,9 @@ public class LiteralIntegersAdder {
 		for(Action action : actor.getActions()) {
 			Procedure actionBody = action.getBody();
 			%match (actionBody) {
-				proc(_, _, _, BlockL(_*, blockBasic(InstructionL(_*, assign(_, exprInt()))), _*))
+				proc(_, _, _, BlockL(_*, toto@blockBasic(InstructionL(_*, assign(_, exprInt(_)))), _*))
 				-> {
-					OrccLogger.traceln("");
+					OrccLogger.traceln(`toto.toString());
 				}
 			}
 		}
