@@ -101,9 +101,7 @@ public class OrccLogger {
 		/** */
 		TRACE(Level.FINE),
 		/** */
-		DEBUG(Level.FINER),
-		/** */
-		ALL(Level.ALL);
+		DEBUG(Level.FINER);
 
 		private Level level;
 		private Level defaultLevel;
@@ -134,8 +132,8 @@ public class OrccLogger {
 		}
 	}
 
-	public static void changeLevel(OrccLevel level, Level newLevel) {
-		level.setLevel(newLevel);
+	public static void hide(OrccLevel level) {
+		level.setLevel(Level.ALL);
 	}
 
 	/**
@@ -164,7 +162,7 @@ public class OrccLogger {
 		Logger newLog = Logger.getAnonymousLogger();
 		newLog.addHandler(handler);
 		newLog.setUseParentHandlers(false);
-		handler.setFormatter(new DefaultOrccFormatter());
+		handler.setFormatter(formatter);
 
 		logger = newLog;
 
@@ -266,8 +264,6 @@ public class OrccLogger {
 			handler.setLevel(level.getLevel());
 		}
 	}
-	
-
 
 	/**
 	 * Display an error line on the current console.
