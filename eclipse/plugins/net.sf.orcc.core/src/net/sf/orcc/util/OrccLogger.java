@@ -101,7 +101,9 @@ public class OrccLogger {
 		/** */
 		TRACE(Level.FINE),
 		/** */
-		DEBUG(Level.FINER);
+		DEBUG(Level.FINER),
+		/** */
+		ALL(Level.FINEST);
 
 		private Level level;
 		private Level defaultLevel;
@@ -130,10 +132,6 @@ public class OrccLogger {
 		for (Handler handler : getLogger().getHandlers()) {
 			handler.setFormatter(formatter);
 		}
-	}
-
-	public static void hide(OrccLevel level) {
-		level.setLevel(Level.ALL);
 	}
 
 	/**
@@ -212,6 +210,10 @@ public class OrccLogger {
 			configureLoggerWithHandler(new ConsoleHandler());
 		}
 		return logger;
+	}
+
+	public static void hide(OrccLevel level) {
+		level.setLevel(Level.ALL);
 	}
 
 	/**
