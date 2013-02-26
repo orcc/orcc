@@ -49,9 +49,7 @@ import java.io.File
 	}
 
 	override getNetworkFileContent()'''
-		PATH=D:\Xilinx\Vivado_HLS\2012.3\bin;%PATH%;D:\Xilinx\Vivado_HLS\2012.3\msys\bin
-		set AUTOESL_HOME=D:\Xilinx\Vivado_HLS\2012.3\bin
-		set VIVADO_HLS_HOME=D:\Xilinx\Vivado_HLS\2012.3\bin
+		
 		
 		if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
 		set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
@@ -68,8 +66,9 @@ import java.io.File
 		cd..
 		md generatedVHDL
 		copy %cd%\genericFifo.vhd %cd%\generatedVHDL
-		copy %cd%\DecoderTop.vhd %cd%\generatedVHDL
-		copy %cd%\testBench\«network.simpleName»_TopTestBench.vhd %cd%\generatedVHDL
+		copy %cd%\«network.name»Top.vhd %cd%\generatedVHDL
+		copy %cd%\sim_package.vhd %cd%\generatedVHDL
+		copy %cd%\VHDLTestBench\«network.name»_TopTestBench.vhd %cd%\generatedVHDL
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			xcopy /s/y %cd%\subProject_«instance.name»\subProject\solution\syn\vhdl %cd%\generatedVHDL
 		«ENDFOR»

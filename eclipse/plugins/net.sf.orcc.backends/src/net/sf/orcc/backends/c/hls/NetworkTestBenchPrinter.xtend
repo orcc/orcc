@@ -53,7 +53,7 @@ import net.sf.orcc.util.OrccUtil
 	override print(String targetFolder) {
 		
 		val contentNetwork = networkFileContent
-		val NetworkFile = new File(targetFolder + File::separator + network.simpleName +"_TopTestBench" + ".vhd")
+		val NetworkFile = new File(targetFolder + File::separator + network.name +"_TopTestBench" + ".vhd")
 		
 		if(needToWriteFile(contentNetwork, NetworkFile)) {
 			OrccUtil::printFile(contentNetwork, NetworkFile)
@@ -70,6 +70,8 @@ import net.sf.orcc.util.OrccUtil
 	USE ieee.numeric_std.ALL;
 	USE std.textio.all;
 	
+	LIBRARY work;
+	USE work.sim_package.all;
 	
 	ENTITY testbench IS
 	END testbench;
@@ -393,7 +395,7 @@ import net.sf.orcc.util.OrccUtil
 				
 			
 				-- assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
-				-- report "on port «connection.fifoName» correct value computed : " & str(to_integer(signed(Y_data))) & " equals :" & str(input_bit)
+				-- report "on port «connection.fifoName» correct value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " equals :" & str(input_bit)
 				-- severity note;
 
 			end if;

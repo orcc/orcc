@@ -122,7 +122,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«ENDFOR»
 			};
 			
-			static enum states _FSM_state = my_state_«instance.actor.fsm.initialState.name»;;
+			static enum states _FSM_state = my_state_«instance.actor.fsm.initialState.name»;
 		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
@@ -297,7 +297,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 		«IF (trgtPort != null)»
 			«IF !instance.outgoingPortMap.get(trgtPort).head.fifoName.toString.empty»
-				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
 			«ENDIF»
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
@@ -348,10 +348,12 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override printActions(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
 			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+				if(1
 				«IF action.outputPattern != null»
 					«action.outputPattern.printOutputPattern»
-				«ENDIF»
-				«instance.name»_«action.body.name»();
+				«ENDIF»){
+					«instance.name»_«action.body.name»();
+				}
 			}«ENDFOR» else {
 			goto finished;
 		}
