@@ -123,7 +123,7 @@ public class HLSBackend extends CBackend {
 		transformations.add(new TypeResizer(true, true, true, false));
 
 		transformations.add(new RenameTransformation(replacementMap));
-		transformations.add(new DisconnectedOutputPortRemoval());
+		//transformations.add(new DisconnectedOutputPortRemoval());
 		transformations.add(new Multi2MonoToken());
 		transformations.add(new DivisionSubstitution());
 		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
