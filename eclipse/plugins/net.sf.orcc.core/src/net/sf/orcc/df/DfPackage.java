@@ -1415,13 +1415,13 @@ public interface DfPackage extends EPackage {
 	int TRANSITION__TARGET = GraphPackage.EDGE__TARGET;
 
 	/**
-	 * The feature id for the '<em><b>Action</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Actions</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRANSITION__ACTION = GraphPackage.EDGE_FEATURE_COUNT + 0;
+	int TRANSITION__ACTIONS = GraphPackage.EDGE_FEATURE_COUNT + 0;
 
 	/**
 	 * The number of structural features of the '<em>Transition</em>' class.
@@ -2242,16 +2242,15 @@ public interface DfPackage extends EPackage {
 	EClass getTransition();
 
 	/**
-	 * Returns the meta object for the reference '
-	 * {@link net.sf.orcc.df.Transition#getAction <em>Action</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the reference '<em>Action</em>'.
-	 * @see net.sf.orcc.df.Transition#getAction()
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Transition#getActions <em>Actions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Actions</em>'.
+	 * @see net.sf.orcc.df.Transition#getActions()
 	 * @see #getTransition()
 	 * @generated
 	 */
-	EReference getTransition_Action();
+	EReference getTransition_Actions();
 
 	/**
 	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
@@ -3002,11 +3001,12 @@ public interface DfPackage extends EPackage {
 		EClass TRANSITION = eINSTANCE.getTransition();
 
 		/**
-		 * The meta object literal for the '<em><b>Action</b></em>' reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Actions</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TRANSITION__ACTION = eINSTANCE.getTransition_Action();
+		EReference TRANSITION__ACTIONS = eINSTANCE.getTransition_Actions();
 
 		/**
 		 * The meta object literal for the '

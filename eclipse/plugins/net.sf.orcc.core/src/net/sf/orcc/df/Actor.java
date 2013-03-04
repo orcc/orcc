@@ -94,7 +94,7 @@ public interface Actor extends Vertex, Adaptable {
 	 * @generated
 	 */
 	EList<Action> getActionsOutsideFsm();
-	
+
 	Map<Port, Connection> getIncomingPortMap();
 
 	Map<Port, List<Connection>> getOutgoingPortMap();

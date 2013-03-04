@@ -6,16 +6,18 @@
  */
 package net.sf.orcc.df.impl;
 
+import java.util.Collection;
+
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.graph.impl.EdgeImpl;
 
-import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -23,25 +25,27 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.df.impl.TransitionImpl#getAction <em>Action</em>}</li>
+ * <li>{@link net.sf.orcc.df.impl.TransitionImpl#getActions <em>Actions</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
-	 * The cached value of the '{@link #getAction() <em>Action</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getAction()
+	 * The cached value of the '{@link #getActions() <em>Actions</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getActions()
 	 * @generated
 	 * @ordered
 	 */
-	protected Action action;
+	protected EList<Action> actions;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected TransitionImpl() {
@@ -50,41 +54,44 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case DfPackage.TRANSITION__ACTION:
-			if (resolve)
-				return getAction();
-			return basicGetAction();
+		case DfPackage.TRANSITION__ACTIONS:
+			return getActions();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case DfPackage.TRANSITION__ACTION:
-			return action != null;
+		case DfPackage.TRANSITION__ACTIONS:
+			return actions != null && !actions.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case DfPackage.TRANSITION__ACTION:
-			setAction((Action) newValue);
+		case DfPackage.TRANSITION__ACTIONS:
+			getActions().clear();
+			getActions().addAll((Collection<? extends Action>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -92,6 +99,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -101,19 +109,15 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	public Action getAction() {
-		if (action != null && action.eIsProxy()) {
-			InternalEObject oldAction = (InternalEObject) action;
-			action = (Action) eResolveProxy(oldAction);
-			if (action != oldAction) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.TRANSITION__ACTION, oldAction, action));
-			}
+	public EList<Action> getActions() {
+		if (actions == null) {
+			actions = new EObjectResolvingEList<Action>(Action.class, this,
+					DfPackage.TRANSITION__ACTIONS);
 		}
-		return action;
+		return actions;
 	}
 
 	@Override
@@ -128,33 +132,14 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Action basicGetAction() {
-		return action;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setAction(Action newAction) {
-		Action oldAction = action;
-		action = newAction;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.TRANSITION__ACTION, oldAction, action));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case DfPackage.TRANSITION__ACTION:
-			setAction((Action) null);
+		case DfPackage.TRANSITION__ACTIONS:
+			getActions().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -175,6 +160,14 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 			builder.append(getTarget().getName());
 		}
 		return builder.toString();
+	}
+
+	@Override
+	public Action getAction() {
+		if (getActions().isEmpty()) {
+			new OrccRuntimeException("There is no associated transition");
+		}
+		return getActions().get(0);
 	}
 
 } // TransitionImpl

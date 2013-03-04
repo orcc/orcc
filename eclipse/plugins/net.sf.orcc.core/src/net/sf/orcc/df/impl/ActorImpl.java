@@ -779,12 +779,12 @@ public class ActorImpl extends VertexImpl implements Actor {
 			port.resetTokenProduction();
 		}
 	}
-	
+
 	@Override
 	public Map<Port, Connection> getIncomingPortMap() {
 		return getAdapter(Entity.class).getIncomingPortMap();
 	}
-	
+
 	@Override
 	public Map<Port, List<Connection>> getOutgoingPortMap() {
 		return getAdapter(Entity.class).getOutgoingPortMap();

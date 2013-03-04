@@ -29,6 +29,7 @@
 package net.sf.orcc.df;
 
 import net.sf.orcc.graph.Edge;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class defines a transition of a Finite State Machine.
@@ -39,9 +40,25 @@ import net.sf.orcc.graph.Edge;
 public interface Transition extends Edge {
 
 	/**
-	 * Returns the list of actions that are the target of this transition.
+	 * Returns the value of the '<em><b>Actions</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Action}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Actions</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Actions</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getTransition_Actions()
+	 * @model
+	 * @generated
+	 */
+	EList<Action> getActions();
+
+	/**
+	 * Returns the first action that is the target of this transition.
 	 * 
-	 * @return the list of actions that are the target of this transition
+	 * @return the first action that are the target of this transition
 	 * @model
 	 */
 	Action getAction();
@@ -51,13 +68,5 @@ public interface Transition extends Edge {
 
 	@Override
 	State getTarget();
-
-	/**
-	 * Sets the action that is the target of this transition.
-	 * 
-	 * @param action
-	 *            the action that is the target of this transition
-	 */
-	void setAction(Action action);
 
 }

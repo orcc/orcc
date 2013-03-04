@@ -739,10 +739,11 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTransition_Action() {
+	public EReference getTransition_Actions() {
 		return (EReference) transitionEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -1019,7 +1020,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(tagEClass, TAG__IDENTIFIERS);
 
 		transitionEClass = createEClass(TRANSITION);
-		createEReference(transitionEClass, TRANSITION__ACTION);
+		createEReference(transitionEClass, TRANSITION__ACTIONS);
 
 		portToEIntegerObjectMapEntryEClass = createEClass(PORT_TO_EINTEGER_OBJECT_MAP_ENTRY);
 		createEReference(portToEIntegerObjectMapEntryEClass,
@@ -1376,8 +1377,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(transitionEClass, Transition.class, "Transition",
 				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getTransition_Action(), this.getAction(), null,
-				"action", null, 0, 1, Transition.class, !IS_TRANSIENT,
+		initEReference(getTransition_Actions(), this.getAction(), null,
+				"actions", null, 0, -1, Transition.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
