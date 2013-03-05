@@ -8,7 +8,6 @@ package net.sf.orcc.df.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.State;
@@ -107,6 +106,14 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 		return DfPackage.Literals.TRANSITION;
 	}
 
+	@Override
+	public Action getAction() {
+		if (getActions().isEmpty()) {
+			return null;
+		}
+		return getActions().get(0);
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -160,14 +167,6 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 			builder.append(getTarget().getName());
 		}
 		return builder.toString();
-	}
-
-	@Override
-	public Action getAction() {
-		if (getActions().isEmpty()) {
-			new OrccRuntimeException("There is no associated transition");
-		}
-		return getActions().get(0);
 	}
 
 } // TransitionImpl

@@ -56,9 +56,12 @@ public interface Transition extends Edge {
 	EList<Action> getActions();
 
 	/**
-	 * Returns the first action that is the target of this transition.
+	 * Returns the first action that is associated with this transition, or
+	 * <code>null</code> if there are no actions associated with this
+	 * transition.
 	 * 
-	 * @return the first action that are the target of this transition
+	 * @return the first action associated with this transition or
+	 *         <code>null</code>
 	 * @model
 	 */
 	Action getAction();
