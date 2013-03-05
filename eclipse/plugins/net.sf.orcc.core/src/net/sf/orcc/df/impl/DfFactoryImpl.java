@@ -494,11 +494,17 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Transition createTransition(State source, Action action, State target) {
+	public Transition createTransition(State source, State target) {
 		TransitionImpl transition = new TransitionImpl();
 		transition.setSource(source);
-		transition.getActions().add(action);
 		transition.setTarget(target);
+		return transition;
+	}
+
+	@Override
+	public Transition createTransition(State source, Action action, State target) {
+		Transition transition = createTransition(source, target);
+		transition.getActions().add(action);
 		return transition;
 	}
 
