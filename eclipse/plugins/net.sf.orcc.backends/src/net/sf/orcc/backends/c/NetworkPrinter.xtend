@@ -31,10 +31,8 @@ package net.sf.orcc.backends.c
 import java.io.File
 import java.util.HashMap
 import java.util.Map
-import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Entity
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
@@ -181,14 +179,8 @@ class NetworkPrinter extends CTemplate {
 		
 		/////////////////////////////////////////////////
 		// Action schedulers
-		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_initialize(«instance.actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
-		«ENDFOR»
-		«FOR actor : network.children.filter(typeof(Actor))»
-			extern void «actor.name»_initialize(«actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
-		«ENDFOR»
 		«FOR child : network.children»
-			extern void «child.label»_scheduler(struct schedinfo_s *si);
+			extern void «child.label»_initialize();
 		«ENDFOR»
 		«printActorsSchedulers»
 		
@@ -232,14 +224,8 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Initializer and launcher
 		void initialize_instances() {
-			«FOR vertex : network.children»
-				«val instance = vertex.getAdapter(typeof(Instance))»
-				«IF instance != null»
-					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
-				«ELSE»
-					«val actor = vertex.getAdapter(typeof(Actor))»
-					«actor.name»_initialize(«FOR port : actor.inputs SEPARATOR ","»«if (actor.incomingPortMap.get(port) != null) actor.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
-				«ENDIF»
+			«FOR child : network.children»
+				«child.label»_initialize();
 			«ENDFOR»
 		}
 		
@@ -259,18 +245,10 @@ class NetworkPrinter extends CTemplate {
 
 	def protected printActorsSchedulers() '''
 		// Action schedulers
-		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_scheduler(struct schedinfo_s *si);
+		«FOR child : network.children»
+			extern void «child.label»_scheduler(struct schedinfo_s *si);
 		«ENDFOR»
 	'''
-
-	def protected getFifoId(Port port, Instance instance) {
-		if(instance.incomingPortMap.containsKey(port)) {
-			String::valueOf(instance.incomingPortMap.get(port).<Integer>getValueAsObject("fifoId"))
-		} else {
-			"-1"
-		}
-	}
 
 	def protected printLauncher() '''
 		static void launcher() {

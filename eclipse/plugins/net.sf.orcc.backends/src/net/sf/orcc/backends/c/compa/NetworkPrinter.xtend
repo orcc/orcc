@@ -91,7 +91,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		// Initializer and launcher
 		void initialize_instances() {
 			«FOR instance : network.children.actorInstances»
-				«instance.name»_initialize(«instance.actor.inputs.join(", ", [getFifoId(instance)])»);
+				«instance.name»_initialize();
 			«ENDFOR»
 		}
 		
