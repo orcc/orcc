@@ -96,6 +96,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * Creates a new interpreter without any associated {@link Actor}
 	 */
 	public ActorInterpreter() {
+		this.exprInterpreter = new ExpressionEvaluator();
 	}
 
 	/**
@@ -105,6 +106,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 *            the actor to interpret
 	 */
 	public ActorInterpreter(Actor actor) {
+		this();
 		setActor(actor);
 	}
 
