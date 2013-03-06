@@ -247,7 +247,7 @@ class NetworkPrinter extends CTemplate {
 
 	def protected printLauncher() '''
 		static void launcher() {
-			int i, display_scheduler = -1;
+			int i;
 			
 			cpu_set_t cpuset;
 			«IF ! geneticAlgo»
@@ -286,25 +286,15 @@ class NetworkPrinter extends CTemplate {
 			clear_cpu_set(cpuset);
 			
 			for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
-				if(find_actor("display", schedulers[i].actors, schedulers[i].num_actors) == NULL){
-					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
-					set_thread_affinity(cpuset, i, threads[i]);
-				} else {
-					display_scheduler = i;
-				}
+				thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
+				set_thread_affinity(cpuset, i, threads[i]);
 			}
 			«IF geneticAlgo»
 				thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
 			«ENDIF»
 			
-			if(display_scheduler != -1){
-				(*scheduler)((void*) &schedulers[display_scheduler]);
-			}
-			
 			for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
-				if(i != display_scheduler){
-					thread_join(threads[i]);
-				}
+				thread_join(threads[i]);
 			}
 			«IF geneticAlgo»
 				thread_join(thread_monitor);
