@@ -193,7 +193,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
 		«FOR child : network.children»
-			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
+			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
@@ -223,11 +223,6 @@ class NetworkPrinter extends CTemplate {
 		
 		/////////////////////////////////////////////////
 		// Initializer and launcher
-		void initialize_instances() {
-			«FOR child : network.children»
-				«child.label»_initialize();
-			«ENDFOR»
-		}
 		
 		«printLauncher»
 		
@@ -277,8 +272,6 @@ class NetworkPrinter extends CTemplate {
 				genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB, «IF newSchedul»RING_TOPOLOGY«ELSE»0«ENDIF», «numberOfGroups», GROUPS_RATIO);
 				monitor_init(&monitoring, &sched_sync, &genetic_info);
 			«ENDIF»
-			
-			initialize_instances();
 			
 			«IF !geneticAlgo»
 				for(i=0; i < mapping->number_of_threads; ++i){
@@ -338,6 +331,7 @@ class NetworkPrinter extends CTemplate {
 			struct scheduler_s *sched = (struct scheduler_s *) data;
 			struct actor_s *my_actor;
 			struct schedinfo_s si;
+			int j;
 			«IF geneticAlgo»
 				
 				int i = 0;
@@ -345,6 +339,8 @@ class NetworkPrinter extends CTemplate {
 				semaphore_wait(sched->sem_thread);
 				start = clock ();
 			«ENDIF»
+			
+			sched_init_actors(sched);
 			
 			while (1) {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
