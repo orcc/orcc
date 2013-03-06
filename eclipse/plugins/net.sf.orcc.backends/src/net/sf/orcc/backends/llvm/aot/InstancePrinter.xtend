@@ -98,8 +98,8 @@ class InstancePrinter extends LLVMTemplate {
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {		
-		if(options.containsKey("net.sf.orcc.backends.profile")){
-			optionProfile = options.get("net.sf.orcc.backends.profile") as Boolean
+		if(options.containsKey(PROFILE)){
+			optionProfile = options.get(PROFILE) as Boolean
 		}
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
