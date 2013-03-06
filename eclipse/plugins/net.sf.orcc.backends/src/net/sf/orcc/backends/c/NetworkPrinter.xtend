@@ -178,11 +178,16 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
-		// Action schedulers
+		// Actor initializers
 		«FOR child : network.children»
 			extern void «child.label»_initialize();
 		«ENDFOR»
-		«printActorsSchedulers»
+		
+		/////////////////////////////////////////////////
+		// Action schedulers
+		«FOR child : network.children»
+			extern void «child.label»_scheduler(struct schedinfo_s *si);
+		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// Declaration of a struct actor for each actor
@@ -236,13 +241,6 @@ class NetworkPrinter extends CTemplate {
 			printf("End of simulation !\n");
 			return compareErrors;
 		}
-	'''
-
-	def protected printActorsSchedulers() '''
-		// Action schedulers
-		«FOR child : network.children»
-			extern void «child.label»_scheduler(struct schedinfo_s *si);
-		«ENDFOR»
 	'''
 
 	def protected printLauncher() '''
