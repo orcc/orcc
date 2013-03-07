@@ -105,7 +105,7 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 /**
  * Initialize the actors mapped to the given scheduler.
  */
-void sched_init_actors(struct scheduler_s *sched);
+void sched_init_actors(struct scheduler_s *sched, struct schedinfo_s *si);
 
 /**
  * Reinitialize the given scheduler.

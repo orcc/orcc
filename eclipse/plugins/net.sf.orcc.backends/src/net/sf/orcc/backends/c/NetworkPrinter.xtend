@@ -328,7 +328,7 @@ class NetworkPrinter extends CTemplate {
 				start = clock ();
 			«ENDIF»
 			
-			sched_init_actors(sched);
+			sched_init_actors(sched, &si);
 			
 			while (1) {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;

@@ -79,7 +79,7 @@ class InstancePrinter extends CTemplate {
 	protected var Map<Port, Connection> incomingPortMap
 	protected var Map<Port, List<Connection>> outgoingPortMap
 	
-	var String name
+	protected var String name
 	
 	protected var boolean geneticAlgo = false
 	
@@ -511,34 +511,23 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	def protected initializeFunction() '''
-		«IF ! actor.initializes.empty»
-			«FOR init : actor.initializes»
-				«init.print»
-			«ENDFOR»
-			
-			static «inline»void initialize(struct schedinfo_s *si) {
-				int i = 0;
-				«actor.initializes.printActions»
-				
-			finished:
-				// no read_end/write_end here!
-				return;
-			}
-			
-		«ENDIF»
-		«inline»void «name»_initialize() {
+		«FOR init : actor.initializes»
+			«init.print»
+		«ENDFOR»
+		
+		«inline»void «name»_initialize(struct schedinfo_s *si) {
+			int i = 0;
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
 			«ENDIF»
-			«IF ! actor.initializes.empty»
-
-				struct schedinfo_s si;
-				si.num_firings = 0;
-				
-				/* Launch CAL initialize procedure */
-				initialize(&si);
+			«IF !actor.initializes.nullOrEmpty»
+				«actor.initializes.printActions»
 			«ENDIF»
+			
+		finished:
+			// no read_end/write_end here!
+			return;
 		}
 	'''
 	
