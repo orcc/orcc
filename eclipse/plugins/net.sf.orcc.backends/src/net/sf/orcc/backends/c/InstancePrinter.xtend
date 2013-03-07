@@ -90,6 +90,8 @@ class InstancePrinter extends CTemplate {
 	var String traceFolder
 	var int threadsNb = 1;
 	
+	protected var profile = false
+	
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 	
@@ -132,6 +134,9 @@ class InstancePrinter extends CTemplate {
 		if (options.containsKey(ENABLE_TRACES)) {
 			enableTrace = options.get(ENABLE_TRACES) as Boolean
 			traceFolder = options.get(TRACES_FOLDER) as String
+		}
+		if(options.containsKey(PROFILE)){
+			profile = options.get(PROFILE) as Boolean
 		}
 		
 		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
@@ -361,7 +366,7 @@ class InstancePrinter extends CTemplate {
 		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
-			void «name»_scheduler(struct schedinfo_s *si) {
+			«noInline»void «name»_scheduler(struct schedinfo_s *si) {
 				int i = 0;
 				si->ports = 0;
 			
@@ -394,7 +399,7 @@ class InstancePrinter extends CTemplate {
 	 *****************************************/
 	def protected printFsm() '''
 		«IF ! actor.actionsOutsideFsm.empty»
-			void «name»_outside_FSM_scheduler(struct schedinfo_s *si) {
+			«inline»void «name»_outside_FSM_scheduler(struct schedinfo_s *si) {
 				int i = 0;
 				«actor.actionsOutsideFsm.printActionLoop»
 			finished:
@@ -403,7 +408,7 @@ class InstancePrinter extends CTemplate {
 			}
 		«ENDIF»
 		
-		void «name»_scheduler(struct schedinfo_s *si) {
+		«noInline»void «name»_scheduler(struct schedinfo_s *si) {
 			int i = 0;
 		
 			«printCallTokensFunctions»
@@ -511,7 +516,7 @@ class InstancePrinter extends CTemplate {
 				«init.print»
 			«ENDFOR»
 			
-			static void initialize(struct schedinfo_s *si) {
+			static «inline»void initialize(struct schedinfo_s *si) {
 				int i = 0;
 				«actor.initializes.printActions»
 				
@@ -521,7 +526,7 @@ class InstancePrinter extends CTemplate {
 			}
 			
 		«ENDIF»
-		void «name»_initialize() {
+		«inline»void «name»_initialize() {
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
@@ -640,7 +645,7 @@ class InstancePrinter extends CTemplate {
 	def protected print(Action action) {
 		currentAction = action
 		val output = '''
-			static void «action.body.name»() {
+			static «inline»void «action.body.name»() {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
@@ -683,7 +688,7 @@ class InstancePrinter extends CTemplate {
 	
 	def protected print(Procedure proc) '''
 		«proc.printAttributes»
-		static «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])») {
+		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])») {
 			«FOR variable : proc.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -906,5 +911,11 @@ class InstancePrinter extends CTemplate {
 			}
 		}
 	}
+	
+	def private getInline() 
+		'''«IF profile»__attribute__((always_inline)) «ENDIF»'''
+	
+	def private getNoInline() 
+		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
 
 }
