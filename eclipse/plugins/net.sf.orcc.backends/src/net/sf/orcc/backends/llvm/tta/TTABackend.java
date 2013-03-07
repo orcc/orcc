@@ -49,7 +49,6 @@ import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Metis;
@@ -315,7 +314,7 @@ public class TTABackend extends LLVMBackend {
 
 		OrccLogger.traceln("Generating design...");
 		long t0 = System.currentTimeMillis();
-		BackendUtil.runExternalProgram(cmdList);
+		OrccUtil.runExternalProgram(cmdList);
 		long t1 = System.currentTimeMillis();
 		OrccLogger.traceln("Done in " + (t1 - t0) / 1000.0 + "s");
 	}

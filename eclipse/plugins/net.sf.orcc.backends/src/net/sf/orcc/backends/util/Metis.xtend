@@ -132,7 +132,7 @@ class Metis {
 		OrccLogger::traceln("Solving actors partitioning on " + partitionNumber + " processors...");
 
 		val t0 = System::currentTimeMillis;
-		BackendUtil::runExternalProgram(cmdList)
+		OrccUtil::runExternalProgram(cmdList)
 		val t1 = System::currentTimeMillis();
 		OrccLogger::traceln("Done in " + ((t1 - t0) as float / 1000.0) + "s");
 	}
