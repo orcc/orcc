@@ -192,7 +192,8 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		DebugPlugin.getDefault().fireDebugEventSet(events);
 
 		if (monitor != null) {
-			monitor.setCanceled(terminated);
+			// Desactivate since it close the logger too
+			// monitor.setCanceled(terminated);
 			monitor.done();
 		}
 	}
