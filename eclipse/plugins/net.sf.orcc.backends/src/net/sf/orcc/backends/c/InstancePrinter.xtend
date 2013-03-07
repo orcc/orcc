@@ -62,7 +62,7 @@ import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
-import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
  * Generate and print instance source file for C backend.

@@ -72,7 +72,7 @@ import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.OrccLaunchConstants.*
-import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.backends.BackendsConstants.*
 
 /*
  * Compile Instance llvm source code

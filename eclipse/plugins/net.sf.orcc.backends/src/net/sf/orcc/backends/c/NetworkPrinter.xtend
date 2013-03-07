@@ -39,7 +39,7 @@ import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
-import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
  * Generate and print network source file for C backend.
