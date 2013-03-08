@@ -126,17 +126,19 @@ public class SmtSolver {
 				}
 			}
 
-			SExpParser parser = new SExpParser(builder.toString());
-			SExp exp = parser.read();
-			if (exp == null || !exp.isSymbol()) {
+			if (builder.toString().contains("error")) {
 				OrccLogger.warnln("Solving of actor " + actor.getName() + ":");
 				String error[] = builder.toString().split("\n");
 				for (int i = 0; i < error.length; i++) {
-					OrccLogger.traceln(error[i]);
+					if (!error[i].equals("sat")) {
+						OrccLogger.traceln(error[i]);
+					}
 				}
 				return;
 			}
 
+			SExpParser parser = new SExpParser(builder.toString());
+			SExp exp = parser.read();
 			SExpSymbol symbol = (SExpSymbol) exp;
 			satisfied = "sat".equals(symbol.getContents());
 

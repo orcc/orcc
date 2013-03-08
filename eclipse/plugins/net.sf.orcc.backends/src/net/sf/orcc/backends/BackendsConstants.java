@@ -32,7 +32,7 @@ package net.sf.orcc.backends;
  * @author Antoine Lorence
  * 
  */
-public class OrccBackendsConstants {
+public class BackendsConstants {
 
 	public static final String GENETIC_ALGORITHM = "net.sf.orcc.backends.geneticAlgorithm";
 	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
@@ -46,5 +46,7 @@ public class OrccBackendsConstants {
 
 	public static final String CONVERT_MULTI2MONO = "net.sf.orcc.backends.multi2mono";
 	public static final String ADDITIONAL_TRANSFOS = "net.sf.orcc.backends.add_transfos";
+	
+	public static final String PROFILE = "net.sf.orcc.backends.profile";
 
 }

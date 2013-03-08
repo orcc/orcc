@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.c;
 
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
-import static net.sf.orcc.backends.OrccBackendsConstants.ADDITIONAL_TRANSFOS;
-import static net.sf.orcc.backends.OrccBackendsConstants.GENETIC_ALGORITHM;
+import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
+import static net.sf.orcc.backends.BackendsConstants.GENETIC_ALGORITHM;
 
 import java.io.File;
 import java.util.ArrayList;

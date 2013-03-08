@@ -37,6 +37,7 @@
 struct actor_s {
 	char *name;
 	int group; /** id of his group. */
+	void (*init_func)();
 	void (*sched_func)(struct schedinfo_s *);
 	int num_inputs; /** number of input ports */
 	int num_outputs; /** number of output ports */
@@ -100,6 +101,11 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
 		struct waiting_s *ring_sending_schedulable, int schedulers_nb,
 		struct sync_s *sync);
+
+/**
+ * Initialize the actors mapped to the given scheduler.
+ */
+void sched_init_actors(struct scheduler_s *sched, struct schedinfo_s *si);
 
 /**
  * Reinitialize the given scheduler.

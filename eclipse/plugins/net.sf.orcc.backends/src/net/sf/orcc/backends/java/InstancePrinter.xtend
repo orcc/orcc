@@ -32,7 +32,7 @@ package net.sf.orcc.backends.java
 import net.sf.orcc.df.Instance
 import java.util.Map
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
+import static net.sf.orcc.backends.BackendsConstants.*
 import static net.sf.orcc.OrccLaunchConstants.*
 
 class InstancePrinter extends JavaTemplate {

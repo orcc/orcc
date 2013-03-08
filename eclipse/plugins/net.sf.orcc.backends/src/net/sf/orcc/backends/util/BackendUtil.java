@@ -3,7 +3,6 @@ package net.sf.orcc.backends.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import net.sf.orcc.backends.AbstractBackend;
@@ -120,29 +119,6 @@ public class BackendUtil {
 		}
 
 		return Integer.valueOf(left[3]).compareTo(right[3]);
-	}
-
-	/**
-	 * Run an external programs with the given commands list
-	 * 
-	 * @param cmdList
-	 *            the list of command containing the program and its arguments
-	 */
-	public static void runExternalProgram(List<String> cmdList) {
-		try {
-			ProcessBuilder builder = new ProcessBuilder(cmdList);
-			Process process = builder.start();
-			process.waitFor();
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					process.getInputStream()));
-			String line = new String();
-			while ((line = reader.readLine()) != null) {
-				OrccLogger.traceln(line);
-			}
-		} catch (Exception e) {
-			OrccLogger.severeln(e.getMessage());
-		}
 	}
 
 }
