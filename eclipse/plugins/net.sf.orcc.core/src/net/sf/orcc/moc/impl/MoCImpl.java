@@ -17,13 +17,12 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <em><b>Mo C</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- * 
+ *
  * @generated
  */
 public abstract class MoCImpl extends EObjectImpl implements MoC {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected MoCImpl() {
@@ -32,7 +31,6 @@ public abstract class MoCImpl extends EObjectImpl implements MoC {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

@@ -24,18 +24,17 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.df.impl.TransitionImpl#getActions <em>Actions</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.TransitionImpl#getActions <em>Actions</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
-	 * The cached value of the '{@link #getActions() <em>Actions</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getActions() <em>Actions</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getActions()
 	 * @generated
 	 * @ordered
@@ -44,7 +43,6 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected TransitionImpl() {
@@ -53,7 +51,6 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -67,7 +64,6 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -81,7 +77,6 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -98,7 +93,6 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -116,7 +110,6 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Action> getActions() {
@@ -139,7 +132,6 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
