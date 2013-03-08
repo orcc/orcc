@@ -534,12 +534,12 @@ class InstancePrinter extends CTemplate {
 	def private checkConnectivy() {
 		for(port : actor.inputs) {
 			if(incomingPortMap.get(port) == null) {
-				OrccLogger::noticeln("["+name+"] Input port "+port.fullName+" not connected.")
+				OrccLogger::noticeln("["+name+"] Input port "+port.name+" not connected.")
 			}
 		}
 		for(port : actor.outputs) {
 			if(outgoingPortMap.get(port) == null) {
-				OrccLogger::noticeln("["+name+"] Output port "+port.fullName+" not connected.")
+				OrccLogger::noticeln("["+name+"] Output port "+port.name+" not connected.")
 			}
 		}
 	}
