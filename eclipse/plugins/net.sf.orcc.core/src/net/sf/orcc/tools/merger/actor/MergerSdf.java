@@ -13,7 +13,6 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Block;
@@ -24,7 +23,6 @@ import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -324,7 +322,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * 
 	 * @return ip
 	 */
-	private void createInputPattern(Pattern inputPattern) {
+	private Pattern createInputPattern() {
+		Pattern inputPattern = dfFactory.createPattern();
 		SDFMoC moc = (SDFMoC) superActor.getMoC();
 		for (Port port : superActor.getInputs()) {
 			int numTokens = moc.getNumTokensConsumed(port);
@@ -334,6 +333,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			inputPattern.setNumTokens(port, numTokens);
 			inputPattern.setVariable(port, var);
 		}
+		return inputPattern;
 	}
 
 	/**
@@ -341,7 +341,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * 
 	 * @return op
 	 */
-	private void createOutputPattern(Pattern outputPattern) {
+	private Pattern createOutputPattern() {
+		Pattern outputPattern = dfFactory.createPattern();
 		SDFMoC moc = (SDFMoC) superActor.getMoC();
 		for (Port port : superActor.getOutputs()) {
 			int numTokens = moc.getNumTokensProduced(port);
@@ -351,6 +352,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			outputPattern.setNumTokens(port, numTokens);
 			outputPattern.setVariable(port, var);
 		}
+		return outputPattern;
 	}
 
 	/**
@@ -358,17 +360,12 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * 
 	 * @return the scheduler of the static action
 	 */
-	private void createScheduler(Procedure procedure) {
-		InstReturn returnInstr = irFactory.createInstReturn(irFactory
-				.createExprBool(true));
-		procedure.getLast().add(returnInstr);
-	}
-
-	private void copyLocalVariables(String id, Procedure body, Action action) {
-		for (Var var : new ArrayList<Var>(action.getBody().getLocals())) {
-			var.setName(id + "_" + action.getName() + "_" + var.getName());
-			body.getLocals().add(var);
-		}
+	private Procedure createScheduler() {
+		Procedure scheduler = irFactory.createProcedure(SCHEDULER_NAME, 0,
+				irFactory.createTypeBool());
+		scheduler.getLast().add(
+				irFactory.createInstReturn(irFactory.createExprBool(true)));
+		return scheduler;
 	}
 
 	/**
@@ -386,7 +383,12 @@ public class MergerSdf extends DfSwitch<Actor> {
 				CSDFMoC moc = (CSDFMoC) actor.getMoC();
 				for (Invocation invocation : moc.getInvocations()) {
 					Action action = invocation.getAction();
-					copyLocalVariables(actor.getName(), procedure, action);
+
+					// Copy local variable
+					for (Var var : new ArrayList<Var>(action.getBody().getLocals())) {
+						procedure.addLocal(var);
+					}
+					
 					new ChangeFifoArrayAccess(action, procedure)
 							.doSwitch(action.getBody());
 					blocks.addAll(action.getBody().getBlocks());
@@ -429,15 +431,13 @@ public class MergerSdf extends DfSwitch<Actor> {
 	}
 
 	/**
+	 * Creates the body of the static action.
 	 * 
-	 * @return
+	 * @return the body of the static action
 	 */
-	private void createBody(Procedure body, Pattern inputPattern,
-			Pattern outPattern) {
-		createInputPattern(inputPattern);
-
-		createOutputPattern(outPattern);
-
+	private Procedure createBody() {
+		Procedure body = irFactory.createProcedure(ACTION_NAME, 0,
+				irFactory.createTypeVoid());
 		createInnerBuffers(body);
 
 		// Add loop counter(s)
@@ -467,6 +467,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 		}
 
 		createStaticSchedule(body, scheduler.getSchedule(), body.getBlocks());
+
+		return body;
 	}
 
 	/**
@@ -474,21 +476,15 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * 
 	 */
 	private void createStaticAction() {
-		Tag tag = dfFactory.createTag();
-		inputPattern = dfFactory.createPattern();
-		outputPattern = dfFactory.createPattern();
+		inputPattern = createInputPattern();
+		outputPattern = createOutputPattern();
 		Pattern peekPattern = dfFactory.createPattern();
-		Procedure scheduler = irFactory.createProcedure(SCHEDULER_NAME, 0,
-				irFactory.createTypeBool());
-		Procedure body = irFactory.createProcedure(ACTION_NAME, 0,
-				irFactory.createTypeVoid());
 
-		Action action = dfFactory.createAction(tag, inputPattern,
+		Procedure scheduler = createScheduler();
+		Procedure body = createBody();
+
+		Action action = dfFactory.createAction(ACTION_NAME, inputPattern,
 				outputPattern, peekPattern, scheduler, body);
-
-		createScheduler(scheduler);
-
-		createBody(body, inputPattern, outputPattern);
 
 		superActor.getActions().add(action);
 		superActor.getActionsOutsideFsm().add(action);
@@ -497,7 +493,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 	@Override
 	public Actor caseNetwork(Network network) {
 		this.network = network;
-		superActor = dfFactory.createActor();
+		this.superActor = dfFactory.createActor();
 		superActor.setName(network.getName());
 
 		createPorts();
