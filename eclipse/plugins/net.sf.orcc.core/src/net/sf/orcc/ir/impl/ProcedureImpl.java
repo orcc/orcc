@@ -527,6 +527,28 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	}
 
 	/**
+	 * Add the given variable to {@link #procedure}'s locals and make its name
+	 * unique.
+	 * 
+	 * @param variable
+	 *            the variable to add
+	 */
+	@Override
+	public void addLocal(Var variable) {
+		String name = variable.getName();
+		Var existing = getLocal(name);
+		int i = 0;
+		while (existing != null) {
+			name = variable.getName() + i;
+			existing = getLocal(name);
+			i++;
+		}
+
+		variable.setName(name);
+		getLocals().add(variable);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
