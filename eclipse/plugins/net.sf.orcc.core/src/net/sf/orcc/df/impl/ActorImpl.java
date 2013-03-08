@@ -746,6 +746,28 @@ public class ActorImpl extends VertexImpl implements Actor {
 		}
 		return stateVars;
 	}
+	
+	/**
+	 * Add the given variable to {@link #actor}'s state variables and make its name
+	 * unique.
+	 * 
+	 * @param variable
+	 *            the variable to add
+	 */
+	@Override
+	public void addStateVar(Var variable) {
+		String name = variable.getName();
+		Var existing = getStateVar(name);
+		int i = 0;
+		while (existing != null) {
+			name = variable.getName() + i;
+			existing = getStateVar(name);
+			i++;
+		}
+
+		variable.setName(name);
+		getStateVars().add(variable);
+	}
 
 	@Override
 	public boolean hasFsm() {
