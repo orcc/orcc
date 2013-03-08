@@ -39,7 +39,6 @@ import java.util.Set;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Edge;
@@ -64,7 +63,7 @@ public class StaticRegionDetector {
 	private Set<Vertex> discovered = new HashSet<Vertex>();
 	private Set<Vertex> finished = new HashSet<Vertex>();
 
-	private Set<List<Instance>> staticRegionSet;
+	private Set<List<Vertex>> staticRegionSet;
 
 	private Network network;
 
@@ -87,18 +86,14 @@ public class StaticRegionDetector {
 		Actor actor = DfFactory.eINSTANCE.createActor();
 		actor.setName("cluster");
 
-		Instance cluster = DfFactory.eINSTANCE.createInstance(actor.getName(),
-				actor);
-
-		clusteredGraph.add(cluster);
+		clusteredGraph.add(actor);
 
 		List<Vertex> verticesCopy = new ArrayList<Vertex>();
 		List<Edge> edges = new ArrayList<Edge>();
 
 		for (Vertex vertex : vertices) {
 			for (Vertex other : clusteredGraph.getChildren()) {
-				if (((Instance) vertex).getName().equals(
-						other.getLabel())) {
+				if (vertex.getLabel().equals(other.getLabel())) {
 					verticesCopy.add(other);
 				}
 			}
@@ -113,7 +108,7 @@ public class StaticRegionDetector {
 				Port tgtPort = DfFactory.eINSTANCE.createPort();
 				actor.getInputs().add(tgtPort);
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						srcVertex, edge.getSourcePort(), cluster, tgtPort,
+						srcVertex, edge.getSourcePort(), actor, tgtPort,
 						edge.getAttributes());
 				edges.add(incoming);
 			} else if (verticesCopy.contains(srcVertex)
@@ -121,7 +116,7 @@ public class StaticRegionDetector {
 				Port srcPort = DfFactory.eINSTANCE.createPort();
 				actor.getOutputs().add(srcPort);
 				Connection outgoing = DfFactory.eINSTANCE.createConnection(
-						cluster, srcPort, tgtVertex, edge.getTargetPort(),
+						actor, srcPort, tgtVertex, edge.getTargetPort(),
 						edge.getAttributes());
 				edges.add(outgoing);
 			}
@@ -134,9 +129,9 @@ public class StaticRegionDetector {
 
 		for (List<Vertex> scc : sccs) {
 			if (scc.size() > 1) {
-				if (scc.remove(cluster)) {
+				if (scc.remove(actor)) {
 					for (Vertex v : scc) {
-						MoC moc = ((Instance) v).getMoC();
+						MoC moc = v.getAdapter(Actor.class).getMoC();
 						if (moc != null && !moc.isCSDF()) {
 							return true;
 						}
@@ -151,14 +146,13 @@ public class StaticRegionDetector {
 	 * DFS
 	 * 
 	 */
-	private void staticRegionAnalysis(Instance instance,
-			List<Instance> instances) {
+	private void staticRegionAnalysis(Vertex instance, List<Vertex> instances) {
 		LinkedList<Vertex> stack = new LinkedList<Vertex>(
 				Arrays.asList(instance));
 
 		while (!stack.isEmpty()) {
-			Instance v = (Instance) stack.pop();
-			MoC moc = v.getMoC();
+			Vertex v = stack.pop();
+			MoC moc = v.getAdapter(Actor.class).getMoC();
 			if (moc.isCSDF()) {
 				if (!discovered.contains(v)) {
 					discovered.add(v);
@@ -169,7 +163,7 @@ public class StaticRegionDetector {
 					finished.add(v);
 					for (Edge edge : v.getOutgoing()) {
 						Vertex tgtVertex = edge.getTarget();
-						moc = ((Instance) tgtVertex).getMoC();
+						moc = tgtVertex.getAdapter(Actor.class).getMoC();
 						if (!discovered.contains(tgtVertex) && moc.isCSDF()) {
 							if (instances != null) {
 								List<Vertex> l = new LinkedList<Vertex>(
@@ -192,28 +186,25 @@ public class StaticRegionDetector {
 	 * 
 	 * 
 	 */
-	public Set<List<Instance>> staticRegionSets() {
-		staticRegionSet = new HashSet<List<Instance>>();
-		List<List<Instance>> staticRegionList = new ArrayList<List<Instance>>();
+	public Set<List<Vertex>> staticRegionSets() {
+		staticRegionSet = new HashSet<List<Vertex>>();
+		List<List<Vertex>> staticRegionList = new ArrayList<List<Vertex>>();
 
 		discovered = new HashSet<Vertex>();
 		finished = new HashSet<Vertex>();
 
 		for (Vertex vertex : new ReversePostOrder(network, network.getInputs())) {
-			if (vertex instanceof Instance) {
-				Instance instance = (Instance) vertex;
-				MoC moc = instance.getMoC();
-				if (!discovered.contains(instance) && moc.isCSDF()) {
-					List<Instance> list = new LinkedList<Instance>();
-					staticRegionList.add(list);
-					staticRegionAnalysis(instance, list);
-				}
+			MoC moc = vertex.getAdapter(Actor.class).getMoC();
+			if (!discovered.contains(vertex) && moc.isCSDF()) {
+				List<Vertex> list = new LinkedList<Vertex>();
+				staticRegionList.add(list);
+				staticRegionAnalysis(vertex, list);
 			}
 		}
 
-		for (List<Instance> list1 : staticRegionList) {
+		for (List<Vertex> list1 : staticRegionList) {
 			if (list1.size() > 1) {
-				List<Instance> set1 = new ArrayList<Instance>(list1);
+				List<Vertex> set1 = new ArrayList<Vertex>(list1);
 				staticRegionSet.add(set1);
 			}
 		}

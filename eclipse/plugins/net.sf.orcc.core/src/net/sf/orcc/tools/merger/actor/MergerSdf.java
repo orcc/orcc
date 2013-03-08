@@ -178,8 +178,6 @@ public class MergerSdf extends DfSwitch<Actor> {
 
 	}
 
-	private static int index;
-
 	private static final String ACTION_NAME = "static_schedule";
 
 	private static final String SCHEDULER_NAME = "isSchedulable_" + ACTION_NAME;
@@ -220,7 +218,6 @@ public class MergerSdf extends DfSwitch<Actor> {
 		superActor.setMoC(sdfMoC);
 		superActor.getInputs().addAll(copier.copyAll(network.getInputs()));
 		superActor.getOutputs().addAll(copier.copyAll(network.getOutputs()));
-		copier.copyReferences();
 
 		for (Port port : network.getInputs()) {
 			Connection connection = (Connection) port.getOutgoing().get(0);
@@ -501,8 +498,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 	public Actor caseNetwork(Network network) {
 		this.network = network;
 		superActor = dfFactory.createActor();
-		String name = "Cluster" + index++;
-		superActor.setName(name);
+		superActor.setName(network.getName());
 
 		createPorts();
 		copyStateVariables();
