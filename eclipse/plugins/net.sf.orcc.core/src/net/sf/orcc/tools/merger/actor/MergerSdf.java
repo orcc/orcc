@@ -135,12 +135,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 
 			super.caseProcedure(procedure);
 
-			updateLoadIndex();
-			updateStoreIndex();
-			return null;
-		}
-
-		private void updateLoadIndex() {
+			// Update indexes			
 			for (Map.Entry<Var, Integer> entry : loads.entrySet()) {
 				Var var = entry.getKey();
 				int cns = entry.getValue();
@@ -151,13 +146,9 @@ public class MergerSdf extends DfSwitch<Actor> {
 						irFactory.createExprInt(cns), readVar.getType());
 
 				InstAssign assign = irFactory.createInstAssign(readVar, incr);
-				BlockBasic block = procedure.getLast();
-				int index = block.getInstructions().size() - 1;
-				block.add(index, assign);
+				procedure.getLast().add(assign);
 			}
-		}
-
-		private void updateStoreIndex() {
+			
 			for (Map.Entry<Var, Integer> entry : stores.entrySet()) {
 				Var var = entry.getKey();
 				int prd = entry.getValue();
@@ -168,10 +159,10 @@ public class MergerSdf extends DfSwitch<Actor> {
 						irFactory.createExprInt(prd), readVar.getType());
 
 				InstAssign assign = irFactory.createInstAssign(readVar, incr);
-				BlockBasic block = procedure.getLast();
-				int index = block.getInstructions().size() - 1;
-				block.add(index, assign);
+				procedure.getLast().add(assign);
 			}
+			
+			return null;
 		}
 
 	}

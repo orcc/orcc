@@ -60,8 +60,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class StaticRegionDetector {
 
-	private Set<Vertex> discovered = new HashSet<Vertex>();
-	private Set<Vertex> finished = new HashSet<Vertex>();
+	private Set<Vertex> discovered;
+	private Set<Vertex> finished;
 
 	private Set<List<Vertex>> staticRegionSet;
 
@@ -155,7 +155,7 @@ public class StaticRegionDetector {
 	 * @param instance
 	 * @param instances
 	 */
-	private void staticRegionAnalysis(Vertex instance, List<Vertex> instances) {
+	private void analysisStaticRegion(Vertex instance, List<Vertex> instances) {
 		LinkedList<Vertex> stack = new LinkedList<Vertex>(
 				Arrays.asList(instance));
 
@@ -195,19 +195,19 @@ public class StaticRegionDetector {
 	 * 
 	 * @return A set of lists of connected vertices that are static
 	 */
-	public Set<List<Vertex>> staticRegionSets() {
+	public Set<List<Vertex>> getStaticRegions() {
 		staticRegionSet = new HashSet<List<Vertex>>();
-		List<List<Vertex>> staticRegionList = new ArrayList<List<Vertex>>();
-
 		discovered = new HashSet<Vertex>();
 		finished = new HashSet<Vertex>();
+		
+		List<List<Vertex>> staticRegionList = new ArrayList<List<Vertex>>();
 
 		for (Vertex vertex : new ReversePostOrder(network, network.getInputs())) {
 			MoC moc = vertex.getAdapter(Actor.class).getMoC();
 			if (!discovered.contains(vertex) && moc.isCSDF()) {
 				List<Vertex> list = new LinkedList<Vertex>();
 				staticRegionList.add(list);
-				staticRegionAnalysis(vertex, list);
+				analysisStaticRegion(vertex, list);
 			}
 		}
 

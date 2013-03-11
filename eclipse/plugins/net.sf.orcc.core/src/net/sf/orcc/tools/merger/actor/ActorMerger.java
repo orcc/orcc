@@ -205,7 +205,7 @@ public class ActorMerger extends DfVisitor<Void> {
 
 		// static region detections
 		StaticRegionDetector detector = new StaticRegionDetector(network);
-		for (List<Vertex> instances : detector.staticRegionSets()) {
+		for (List<Vertex> instances : detector.getStaticRegions()) {
 			// transform the parent network and return the child network
 			Network subNetwork = transformNetwork(instances);
 			// create the static schedule of vertices
