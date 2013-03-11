@@ -492,7 +492,7 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	def private printTransitionPatternPort(Port port, Pattern pattern) '''
-		if (numTokens_«port.name» - index_«port.name» < «pattern.numTokensMap.get(port)») {
+		if (numTokens_«port.name» - index_«port.name» < «pattern.getNumTokens(port)») {
 			if( ! «name».sched->round_robin || i > 0) {
 				«IF incomingPortMap.containsKey(port)»
 					sched_add_schedulable(«name».sched, &«incomingPortMap.get(port).source.label», RING_TOPOLOGY);
@@ -586,7 +586,7 @@ class InstancePrinter extends CTemplate {
 	}
 	
 	def protected printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
-		if («pattern.numTokensMap.get(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
+		if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
 			stop = 1;
 			«IF newSchedul»
 				if( ! «name».sched->round_robin || i > 0) {
@@ -597,7 +597,7 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	def protected checkInputPattern(Pattern pattern)
-		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.numTokensMap.get(port)» && «ENDFOR»'''
+		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.getNumTokens(port)» && «ENDFOR»'''
 	
 	def private writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
@@ -647,24 +647,24 @@ class InstancePrinter extends CTemplate {
 					«IF enableTrace»
 					{
 						int i;
-						for (i = 0; i < «action.inputPattern.numTokensMap.get(port)»; i++) {
+						for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
 							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
 						}
 					}
 					«ENDIF»
-					index_«port.name» += «action.inputPattern.numTokensMap.get(port)»;
+					index_«port.name» += «action.inputPattern.getNumTokens(port)»;
 				«ENDFOR»
 				
 				«FOR port : action.outputPattern.ports»
 					«IF enableTrace»
 						{
 							int i;
-							for (i = 0; i < «action.outputPattern.numTokensMap.get(port)»; i++) {
+							for (i = 0; i < «action.outputPattern.getNumTokens(port)»; i++) {
 								fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
 							}
 						}
 					«ENDIF»
-					index_«port.name» += «action.outputPattern.numTokensMap.get(port)»;
+					index_«port.name» += «action.outputPattern.getNumTokens(port)»;
 				«ENDFOR»
 			}
 			
@@ -832,12 +832,12 @@ class InstancePrinter extends CTemplate {
 	def protected getPort(Var variable) {
 		if(currentAction == null) {
 			null
-		} else if (currentAction?.inputPattern.varToPortMap.containsKey(variable)) {
-			currentAction.inputPattern.varToPortMap.get(variable)
-		} else if(currentAction?.outputPattern.varToPortMap.containsKey(variable)) {
-			currentAction.outputPattern.varToPortMap.get(variable)
-		} else if(currentAction?.peekPattern.varToPortMap.containsKey(variable)) {
-			currentAction.peekPattern.varToPortMap.get(variable)
+		} else if (currentAction?.inputPattern.contains(variable)) {
+			currentAction.inputPattern.getPort(variable)
+		} else if(currentAction?.outputPattern.contains(variable)) {
+			currentAction.outputPattern.getPort(variable)
+		} else if(currentAction?.peekPattern.contains(variable)) {
+			currentAction.peekPattern.getPort(variable)
 		} else {
 			null
 		}
