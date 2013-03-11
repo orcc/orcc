@@ -67,15 +67,22 @@ public class StaticRegionDetector {
 
 	private Network network;
 
+	/**
+	 * Create a new detector of static region in a given network.
+	 * 
+	 * @param network
+	 *            the network to check
+	 */
 	public StaticRegionDetector(Network network) {
 		this.network = network;
 	}
 
 	/**
+	 * Check if a list of vertices contains a cycle.
 	 * 
-	 * @param graph
 	 * @param vertices
-	 * @return
+	 *            the list of vertices to check
+	 * @return true if the list contains a cycle
 	 */
 	private boolean introduceCycle(List<Vertex> vertices) {
 		network = EcoreUtil.copy(network);
@@ -143,8 +150,10 @@ public class StaticRegionDetector {
 	}
 
 	/**
-	 * DFS
+	 * Depth-First Search.
 	 * 
+	 * @param instance
+	 * @param instances
 	 */
 	private void staticRegionAnalysis(Vertex instance, List<Vertex> instances) {
 		LinkedList<Vertex> stack = new LinkedList<Vertex>(
@@ -182,9 +191,9 @@ public class StaticRegionDetector {
 
 	/**
 	 * Detects the static regions of the network. The detection is done by
-	 * traversing the graph
+	 * traversing the graph.
 	 * 
-	 * 
+	 * @return A set of lists of connected vertices that are static
 	 */
 	public Set<List<Vertex>> staticRegionSets() {
 		staticRegionSet = new HashSet<List<Vertex>>();
