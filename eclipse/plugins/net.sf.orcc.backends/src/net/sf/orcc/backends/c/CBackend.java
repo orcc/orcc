@@ -129,7 +129,6 @@ public class CBackend extends AbstractBackend {
 		}
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 
@@ -180,11 +179,11 @@ public class CBackend extends AbstractBackend {
 	}
 
 	protected void doTransformNetwork(Network network) {
-		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
 		new Instantiator(true, fifoSize).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
+		new UnitImporter().doSwitch(network);
 
 		if (classify) {
 			OrccLogger.traceln("Classification of actors...");
@@ -279,7 +278,7 @@ public class CBackend extends AbstractBackend {
 	protected boolean printInstance(Instance instance) {
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}
-	
+
 	@Override
 	protected boolean printActor(Actor actor) {
 		return new InstancePrinter(options).print(srcPath, actor) > 0;
