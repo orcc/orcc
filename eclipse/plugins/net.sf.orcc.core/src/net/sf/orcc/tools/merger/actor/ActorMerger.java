@@ -61,7 +61,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class ActorMerger extends DfVisitor<Void> {
 
-	private class IrVisitor extends AbstractIrVisitor<Void> {
+	private class InnerIrVisitor extends AbstractIrVisitor<Void> {
 
 		@Override
 		public Void caseInstLoad(InstLoad load) {
@@ -201,7 +201,7 @@ public class ActorMerger extends DfVisitor<Void> {
 	public Void caseNetwork(Network network) {
 		this.network = network;
 		copier = new Copier(true);
-		irVisitor = new IrVisitor();
+		irVisitor = new InnerIrVisitor();
 
 		// static region detections
 		StaticRegionDetector detector = new StaticRegionDetector(network);
