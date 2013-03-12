@@ -30,7 +30,6 @@ package net.sf.orcc.tools.merger.actor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -393,23 +392,6 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 			body.getLocals().add(counter);
 			i++;
 		} while (i < scheduler.getDepth());
-
-		// Initialize read/write counters
-		for (Var var : new HashSet<Var>(buffersMap.values())) {
-			BlockBasic block = body.getLast();
-
-			Var read = body.getLocal(var.getName() + "_r");
-			if (read != null) {
-				block.add(irFactory.createInstStore(read,
-						irFactory.createExprInt(0)));
-			}
-
-			Var write = body.getLocal(var.getName() + "_w");
-			if (write != null) {
-				block.add(irFactory.createInstStore(write,
-						irFactory.createExprInt(0)));
-			}
-		}
 
 		createStaticSchedule(body, scheduler.getSchedule(), body.getBlocks());
 
