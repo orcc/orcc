@@ -116,7 +116,6 @@ public class ActorMerger extends DfVisitor<Void> {
 			IrUtil.copy(copier, vertex);
 		}
 
-		int inIndex = 0, outIndex = 0;
 		for (Connection connection : network.getConnections()) {
 			Vertex oldSrc = connection.getSource();
 			Vertex oldTgt = connection.getTarget();
@@ -136,13 +135,11 @@ public class ActorMerger extends DfVisitor<Void> {
 			} else if (!vertices.contains(oldSrc) && vertices.contains(oldTgt)) {
 				Vertex tgt = (Vertex) copier.get(oldTgt);
 				Port tgtPort = (Port) copier.get(connection.getTargetPort());
-				tgtPort.setName("input_" + inIndex);
+				tgtPort.setName(tgt.getLabel() + "_" + tgtPort.getName());
 
 				caseActor(tgt.getAdapter(Actor.class));
 
-				Port input = dfFactory
-						.createPort(EcoreUtil.copy(tgtPort.getType()), "input_"
-								+ inIndex++);
+				Port input = EcoreUtil.copy(tgtPort);
 				subNetwork.addInput(input);
 
 				subNetwork.add(dfFactory.createConnection(input, null, tgt,
@@ -157,13 +154,11 @@ public class ActorMerger extends DfVisitor<Void> {
 			} else if (vertices.contains(oldSrc) && !vertices.contains(oldTgt)) {
 				Vertex src = (Vertex) copier.get(oldSrc);
 				Port srcPort = (Port) copier.get(connection.getSourcePort());
-				srcPort.setName("output_" + outIndex);
+				srcPort.setName(src.getLabel() + "_" + srcPort.getName());
 
 				caseActor(src.getAdapter(Actor.class));
 
-				Port output = dfFactory.createPort(
-						EcoreUtil.copy(srcPort.getType()), "output_"
-								+ outIndex++);
+				Port output = dfFactory.createPort(EcoreUtil.copy(srcPort));
 				subNetwork.addOutput(output);
 
 				subNetwork.add(dfFactory.createConnection(src, srcPort, output,
