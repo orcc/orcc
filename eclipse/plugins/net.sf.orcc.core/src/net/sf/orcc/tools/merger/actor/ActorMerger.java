@@ -31,7 +31,6 @@ package net.sf.orcc.tools.merger.actor;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -39,12 +38,6 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccLogger;
 
@@ -56,36 +49,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * 
  * @author Matthieu Wipliez
  * @author Ghislain Roquier
+ * @author Herve Yviquel
  * 
  */
 public class ActorMerger extends DfVisitor<Void> {
-
-	private class InnerIrVisitor extends AbstractIrVisitor<Void> {
-
-		@Override
-		public Void caseInstLoad(InstLoad load) {
-			Use use = load.getSource();
-			Var var = use.getVariable();
-			Port port = action.getInputPattern().getVarToPortMap().get(var);
-			if (port != null) {
-				var.setName(port.getName());
-			}
-
-			return null;
-		}
-
-		@Override
-		public Void caseInstStore(InstStore store) {
-			Def def = store.getTarget();
-			Var var = def.getVariable();
-			Port port = action.getOutputPattern().getVarToPortMap().get(var);
-			if (port != null) {
-				var.setName(port.getName());
-			}
-
-			return null;
-		}
-	}
 
 	private final DfFactory dfFactory = DfFactory.eINSTANCE;
 
@@ -94,8 +61,6 @@ public class ActorMerger extends DfVisitor<Void> {
 	private int index;
 
 	private Network network;
-
-	private Action action;
 
 	/**
 	 * Transforms the network to internalize the given list of vertices in their
@@ -186,21 +151,14 @@ public class ActorMerger extends DfVisitor<Void> {
 	}
 
 	@Override
-	public Void caseAction(Action action) {
-		this.action = action;
-		return super.caseAction(action);
-	}
-
-	@Override
 	public Void caseNetwork(Network network) {
 		this.network = network;
-		copier = new Copier(true);
-		irVisitor = new InnerIrVisitor();
 
 		List<List<Vertex>> staticRegions = new StaticRegionDetector()
 				.analyze(network);
 
 		for (List<Vertex> instances : staticRegions) {
+			copier = new Copier(true);
 			// transform the parent network and return the child network
 			Network subNetwork = transformNetwork(instances);
 			// create the static schedule of vertices
