@@ -209,7 +209,7 @@ public class ActorMerger extends DfVisitor<Void> {
 			// transform the parent network and return the child network
 			Network subNetwork = transformNetwork(instances);
 			// create the static schedule of vertices
-			AbstractScheduler scheduler = new SASLoopScheduler(subNetwork);
+			SASLoopScheduler scheduler = new SASLoopScheduler(subNetwork);
 			scheduler.schedule();
 
 			OrccLogger.traceln("Schedule of cluster" + index + " is "

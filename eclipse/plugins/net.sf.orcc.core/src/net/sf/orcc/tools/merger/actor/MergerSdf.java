@@ -135,7 +135,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 
 			super.caseProcedure(procedure);
 
-			// Update indexes			
+			// Update indexes
 			for (Map.Entry<Var, Integer> entry : loads.entrySet()) {
 				Var var = entry.getKey();
 				int cns = entry.getValue();
@@ -148,7 +148,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 				InstAssign assign = irFactory.createInstAssign(readVar, incr);
 				procedure.getLast().add(assign);
 			}
-			
+
 			for (Map.Entry<Var, Integer> entry : stores.entrySet()) {
 				Var var = entry.getKey();
 				int prd = entry.getValue();
@@ -161,7 +161,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 				InstAssign assign = irFactory.createInstAssign(readVar, incr);
 				procedure.getLast().add(assign);
 			}
-			
+
 			return null;
 		}
 
@@ -180,9 +180,9 @@ public class MergerSdf extends DfSwitch<Actor> {
 	private Copier copier;
 
 	private int depth;
-	private AbstractScheduler scheduler;
+	private SASLoopScheduler scheduler;
 
-	public MergerSdf(AbstractScheduler scheduler, Copier copier) {
+	public MergerSdf(SASLoopScheduler scheduler, Copier copier) {
 		this.scheduler = scheduler;
 		this.copier = copier;
 	}
@@ -204,7 +204,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			Connection connection = (Connection) port.getOutgoing().get(0);
 			Actor tgt = connection.getTarget().getAdapter(Actor.class);
 			CSDFMoC moc = (CSDFMoC) tgt.getMoC();
-			int cns = scheduler.getRepetitions().get(tgt)
+			int cns = scheduler.getRepetitions(tgt)
 					* moc.getNumTokensConsumed(connection.getTargetPort());
 			sdfMoC.getInputPattern().setNumTokens(portCopy, cns);
 
@@ -217,7 +217,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			Connection connection = (Connection) port.getIncoming().get(0);
 			Actor src = connection.getSource().getAdapter(Actor.class);
 			CSDFMoC moc = (CSDFMoC) src.getMoC();
-			int prd = scheduler.getRepetitions().get(src)
+			int prd = scheduler.getRepetitions(src)
 					* moc.getNumTokensProduced(connection.getSourcePort());
 			sdfMoC.getOutputPattern().setNumTokens(portCopy, prd);
 
