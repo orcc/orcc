@@ -26,76 +26,38 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.merger.action;
+package net.sf.orcc.tools.merger.pattern;
 
 /**
- * This class defines a loop pattern. A loop pattern is the invocation of one or
- * more patterns within a loop. It has the form:
- * 
- * <pre>
- * P = (n0 * p0, n1 * p1, ... nn * pn)
- * </pre>
+ * This class defines a pattern visitor.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class PatternLoop extends PatternExecution {
+public interface PatternVisitor {
 
-	private int numIterations;
+	/**
+	 * Visits the given loop pattern.
+	 * 
+	 * @param pattern
+	 *            a loop pattern
+	 */
+	public void visit(PatternLoop pattern);
 
-	private PatternExecution pattern;
+	/**
+	 * Visits the given sequential pattern.
+	 * 
+	 * @param pattern
+	 *            a sequential pattern
+	 */
+	public void visit(PatternSequential pattern);
 
-	public PatternLoop(int iterations, PatternExecution pattern) {
-		this.numIterations = iterations;
-		this.pattern = pattern;
-	}
-
-	@Override
-	public void accept(PatternVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
-	public int cost() {
-		return pattern.cost();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof PatternLoop) {
-			PatternLoop other = (PatternLoop) obj;
-			return numIterations == other.numIterations
-					&& pattern.equals(other.pattern);
-		}
-		return false;
-	}
-
-	public int getNumIterations() {
-		return numIterations;
-	}
-
-	public PatternExecution getPattern() {
-		return pattern;
-	}
-
-	@Override
-	public boolean isLoop() {
-		return true;
-	}
-
-	@Override
-	public boolean isSequential() {
-		return false;
-	}
-
-	@Override
-	public boolean isSimple() {
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return numIterations + " x " + pattern;
-	}
+	/**
+	 * Visits the given simple pattern.
+	 * 
+	 * @param pattern
+	 *            a simple pattern
+	 */
+	public void visit(PatternSimple pattern);
 
 }

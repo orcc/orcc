@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.merger.action;
+package net.sf.orcc.tools.merger.pattern;
 
 /**
  * This class defines a pattern. A pattern is the invocation of one or more

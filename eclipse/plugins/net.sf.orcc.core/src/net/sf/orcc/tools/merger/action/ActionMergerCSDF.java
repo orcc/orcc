@@ -59,6 +59,12 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
+import net.sf.orcc.tools.merger.pattern.PatternExecution;
+import net.sf.orcc.tools.merger.pattern.PatternLoop;
+import net.sf.orcc.tools.merger.pattern.PatternLoopRecognizer;
+import net.sf.orcc.tools.merger.pattern.PatternSequential;
+import net.sf.orcc.tools.merger.pattern.PatternSimple;
+import net.sf.orcc.tools.merger.pattern.PatternVisitor;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
