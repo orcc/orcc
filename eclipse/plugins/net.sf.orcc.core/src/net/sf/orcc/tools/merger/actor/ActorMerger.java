@@ -52,8 +52,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
- * This class defines a network transformation that merges SDF actors.
- * 
+ * This class defines a network transformation that merges static actors.
  * 
  * @author Matthieu Wipliez
  * @author Ghislain Roquier
@@ -99,9 +98,12 @@ public class ActorMerger extends DfVisitor<Void> {
 	private Action action;
 
 	/**
+	 * Transforms the network to internalize the given list of vertices in their
+	 * own subnetwork and returns this subnetwork.
 	 * 
 	 * @param vertices
-	 * @return the SDF/CSDF child network
+	 *            a given list of vertices
+	 * @return the SDF/CSDF child network containing the list of vertices
 	 */
 	private Network transformNetwork(List<Vertex> vertices) {
 		Network subNetwork = dfFactory.createNetwork();
@@ -129,7 +131,7 @@ public class ActorMerger extends DfVisitor<Void> {
 						tgtPort, IrUtil.copy(connection.getAttributes())));
 				subNetwork.add(src);
 				subNetwork.add(tgt);
-				
+
 				oldConnections.add(connection);
 			} else if (!vertices.contains(oldSrc) && vertices.contains(oldTgt)) {
 				Vertex tgt = (Vertex) copier.get(oldTgt);
@@ -150,7 +152,7 @@ public class ActorMerger extends DfVisitor<Void> {
 				newConnections.add(dfFactory.createConnection(oldSrc,
 						connection.getSourcePort(), subNetwork, input,
 						IrUtil.copy(connection.getAttributes())));
-				
+
 				oldConnections.add(connection);
 			} else if (vertices.contains(oldSrc) && !vertices.contains(oldTgt)) {
 				Vertex src = (Vertex) copier.get(oldSrc);
@@ -171,7 +173,7 @@ public class ActorMerger extends DfVisitor<Void> {
 				newConnections.add(dfFactory.createConnection(subNetwork,
 						output, oldTgt, connection.getTargetPort(),
 						IrUtil.copy(connection.getAttributes())));
-				
+
 				oldConnections.add(connection);
 			}
 
@@ -194,18 +196,16 @@ public class ActorMerger extends DfVisitor<Void> {
 		return super.caseAction(action);
 	}
 
-	/**
-	 * 
-	 */
 	@Override
 	public Void caseNetwork(Network network) {
 		this.network = network;
 		copier = new Copier(true);
 		irVisitor = new InnerIrVisitor();
 
-		// static region detections
-		StaticRegionDetector detector = new StaticRegionDetector(network);
-		for (List<Vertex> instances : detector.getStaticRegions()) {
+		List<List<Vertex>> staticRegions = new StaticRegionDetector()
+				.analyze(network);
+
+		for (List<Vertex> instances : staticRegions) {
 			// transform the parent network and return the child network
 			Network subNetwork = transformNetwork(instances);
 			// create the static schedule of vertices
