@@ -40,7 +40,7 @@ import net.sf.orcc.moc.SDFMoC;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
-public class MergerSdf extends DfSwitch<Actor> {
+public class ActorMergerSDF extends DfSwitch<Actor> {
 
 	public class ChangeFifoArrayAccess extends AbstractIrVisitor<Void> {
 
@@ -182,7 +182,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 	private int depth;
 	private SASLoopScheduler scheduler;
 
-	public MergerSdf(SASLoopScheduler scheduler, Copier copier) {
+	public ActorMergerSDF(SASLoopScheduler scheduler, Copier copier) {
 		this.scheduler = scheduler;
 		this.copier = copier;
 	}

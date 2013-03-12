@@ -216,7 +216,7 @@ public class ActorMerger extends DfVisitor<Void> {
 					+ scheduler.getSchedule());
 
 			// merge vertices inside a single actor
-			Actor superActor = new MergerSdf(scheduler, copier)
+			Actor superActor = new ActorMergerSDF(scheduler, copier)
 					.doSwitch(subNetwork);
 			network.add(superActor);
 			EcoreUtil.delete(subNetwork);
