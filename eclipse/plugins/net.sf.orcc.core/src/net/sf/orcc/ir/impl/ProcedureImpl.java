@@ -512,17 +512,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	 */
 	@Override
 	public Var newTempLocalVariable(Type type, String hint) {
-		String name = hint;
-		Var variable = getLocal(name);
-		int i = 0;
-		while (variable != null) {
-			name = hint + i;
-			variable = getLocal(name);
-			i++;
-		}
-
-		variable = IrFactory.eINSTANCE.createVar(0, type, name, true, 0);
-		getLocals().add(variable);
+		Var variable = IrFactory.eINSTANCE.createVar(0, type, hint, true, 0);
+		addLocal(variable);
 		return variable;
 	}
 
