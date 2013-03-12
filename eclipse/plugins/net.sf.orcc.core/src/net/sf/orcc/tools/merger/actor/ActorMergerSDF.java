@@ -282,18 +282,18 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 			portsMap.put(connection.getSourcePort(), portCopy);
 		}
 
-		// Move state variables and procedures
+		// Move variables and procedures
 		for (Vertex vertex : network.getChildren()) {
 			Actor actor = vertex.getAdapter(Actor.class);
-			String id = actor.getName();
 			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
-				if (!proc.isNative()) {
-					proc.setName(id + "_" + proc.getName());
-					superActor.getProcs().add(proc);
-				}
+				proc.setName(actor.getName() + "_" + proc.getName());
+				superActor.getProcs().add(proc);
 			}
 			for (Var var : new ArrayList<Var>(actor.getStateVars())) {
 				superActor.addStateVar(var);
+			}
+			for (Var param : new ArrayList<Var>(actor.getParameters())) {
+				superActor.addStateVar(param);
 			}
 		}
 
