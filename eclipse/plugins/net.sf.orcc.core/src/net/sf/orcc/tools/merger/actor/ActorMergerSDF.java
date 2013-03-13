@@ -353,18 +353,20 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 		Procedure body = irFactory.createProcedure("mergedAction", 0,
 				irFactory.createTypeVoid());
 
+		BlockBasic block = body.getLast();
+
 		// Create counters for inputs
 		for (Port port : superActor.getInputs()) {
 			Var readIdx = body.newTempLocalVariable(
 					irFactory.createTypeInt(32), port.getName() + "_r");
-			readIdx.setInitialValue(irFactory.createExprInt(0));
+			block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
 		}
 
 		// Create counters for outputs
 		for (Port port : superActor.getOutputs()) {
 			Var writeIdx = body.newTempLocalVariable(
 					irFactory.createTypeInt(32), port.getName() + "_w");
-			writeIdx.setInitialValue(irFactory.createExprInt(0));
+			block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
 		}
 
 		int index = 0;
@@ -381,12 +383,12 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 			// create write counter
 			Var writeIdx = body.newTempLocalVariable(
 					irFactory.createTypeInt(32), name + "_w");
-			writeIdx.setInitialValue(irFactory.createExprInt(0));
+			block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
 
 			// create read counter
 			Var readIdx = body.newTempLocalVariable(
 					irFactory.createTypeInt(32), name + "_r");
-			readIdx.setInitialValue(irFactory.createExprInt(0));
+			block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
 
 			buffersMap.put(conn.getSourcePort(), buffer);
 			buffersMap.put(conn.getTargetPort(), buffer);
@@ -395,9 +397,7 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 		// Add loop counter(s)
 		int i = 0;
 		do { // one loop var is required even if the schedule as a depth of 0
-			Var counter = irFactory.createVar(0, irFactory.createTypeInt(32),
-					"idx_" + i, true);
-			body.getLocals().add(counter);
+			body.newTempLocalVariable(irFactory.createTypeInt(32), "idx_" + i);
 			i++;
 		} while (i < scheduler.getDepth());
 
