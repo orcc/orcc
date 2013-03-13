@@ -50,6 +50,7 @@ import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.tools.classifier.GuardSatChecker;
+import net.sf.orcc.util.OrccLogger;
 
 /**
  * This class defines a merger for QSDF actors. In other words, a new action is
@@ -68,6 +69,7 @@ public class ActionMergerQSDF {
 		this.actor = actor;
 		MoC clasz = actor.getMoC();
 		if (clasz.isQuasiStatic()) {
+			OrccLogger.traceln("Merge actions of " + actor.getName());
 			QSDFMoC qsdfmoc = (QSDFMoC) clasz;
 
 			// Remove FSM
@@ -166,7 +168,7 @@ public class ActionMergerQSDF {
 		}
 
 	}
-	
+
 	private void renameVariables(Procedure oldProc, Procedure newProc) {
 		for (Var var : oldProc.getLocals()) {
 			String varName = var.getName();

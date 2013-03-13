@@ -65,6 +65,7 @@ import net.sf.orcc.tools.merger.pattern.PatternLoopRecognizer;
 import net.sf.orcc.tools.merger.pattern.PatternSequential;
 import net.sf.orcc.tools.merger.pattern.PatternSimple;
 import net.sf.orcc.tools.merger.pattern.PatternVisitor;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -314,8 +315,8 @@ public class ActionMergerCSDF {
 	public void merge(Actor actor) {
 		MoC clasz = actor.getMoC();
 		if (clasz.isCSDF()) {
-			Action action = new ActionMergerCSDF().merge("xxx",
-					(CSDFMoC) clasz, actor);
+			OrccLogger.traceln("Merge actions of " + actor.getName());
+			Action action = merge("xxx", (CSDFMoC) clasz, actor);
 
 			// Remove FSM
 			actor.setFsm(null);
