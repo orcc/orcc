@@ -85,7 +85,10 @@ public class SimulatorFactory extends PluginFactory {
 	 * @param options
 	 *            launch options
 	 * @throws Exception
+	 * @deprecated will be removed in a future version. Please consider using
+	 *             {@link #getSimulator} instead
 	 */
+	@Deprecated
 	public void runSimulator(IProgressMonitor monitor, String mode,
 			Map<String, Object> options) throws Exception {
 		// Get the simulator plugin
@@ -94,7 +97,19 @@ public class SimulatorFactory extends PluginFactory {
 
 		simulator.setOptions(options);
 		simulator.setProgressMonitor(monitor);
-		simulator.start(mode);
+		// simulator.start(mode);
+	}
+
+	/**
+	 * Return the simulator instance corresponding to <code>name</code>. Please
+	 * note that simulator returned is not configured with an options map.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public Simulator getSimulator(String name) {
+		Simulator simulator = (Simulator) plugins.get(name);
+		return simulator;
 	}
 
 }
