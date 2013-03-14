@@ -51,7 +51,7 @@ import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.XcfPrinter;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
@@ -202,7 +202,7 @@ public class JadeBackend extends AbstractBackend {
 			e.printStackTrace();
 		}
 
-		new XcfPrinter().print(path, network, mapping);
+		new Mapping().print(path, network, mapping);
 	}
 
 	private void finalizeActors(List<Actor> actors) {
