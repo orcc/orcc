@@ -53,6 +53,15 @@ class Mapping extends CommonPrinter {
 	var Map<String, List<Vertex>> mapping
 	var List<Vertex> unmapped
 	var int i
+	var force = false
+	
+	new() {
+		this.force = false
+	}
+	
+	new(boolean force) {
+		this.force = force
+	}
 	
 	def print(String targetFolder, Network network, Map<String, String> initialMapping) {
 		val xcfFile = new File(targetFolder + File::separator + network.simpleName + ".xcf")
@@ -63,9 +72,10 @@ class Mapping extends CommonPrinter {
 	
 	def void compute(Network network, Map<String, String> initialMapping) {	
 		mapping = new HashMap<String, List<Vertex>>
+		invMapping = new HashMap<Vertex, String>
 		unmapped = new ArrayList<Vertex>
 		i = 0
-		if(!initialMapping.values.forall[nullOrEmpty]) {
+		if(!initialMapping.values.forall[nullOrEmpty] || force) {
 			for (instance : network.children.actorInstances) {
 				instance.tryToMap(initialMapping.get(instance.hierarchicalName))
 			}

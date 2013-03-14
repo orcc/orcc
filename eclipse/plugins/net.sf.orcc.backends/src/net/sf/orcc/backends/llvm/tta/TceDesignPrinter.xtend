@@ -34,6 +34,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.df.Port
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.df.Actor
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -69,22 +70,23 @@ class TceDesignPrinter extends TTAPrinter {
 		<processor name="«processor.name»" >
 			<adf>«path»/«processor.name»/«processor.name».adf</adf>
 			<tpef>«path»/«processor.name»/«processor.name».tpef</tpef>
-			«FOR instance: processor.mappedActors»
-				«FOR input: instance.actor.inputs.filter(port | !port.native)»
-					«IF instance.incomingPortMap.get(input) != null»
-						«val incoming = instance.incomingPortMap.get(input)»
+			«FOR vertex: processor.mappedActors»
+				«val actor = vertex.getAdapter(typeof(Actor))»
+				«FOR input: actor.inputs.filter(port | !port.native)»
+					«IF actor.incomingPortMap.get(input) != null»
+						«val incoming = actor.incomingPortMap.get(input)»
 						<input name="«input.name»">
 							<address-space>«processor.getMemory(incoming).name»</address-space>
 							<var-name>fifo_«incoming.getValueAsObject("id").toString»</var-name>
 							<signed>«input.type.int»</signed>
 							<width>«input.width»</width>
 							<size>«incoming.size»</size>
-							<trace>«path»/trace/«instance.name»_«input.name».txt</trace>
+							<trace>«path»/trace/«vertex.label»_«input.name».txt</trace>
 						</input>
 					«ENDIF»
 				«ENDFOR»
-				«FOR output : instance.actor.outputs.filter[!native]»
-					«FOR outgoing : instance.outgoingPortMap.get(output)»
+				«FOR output : actor.outputs.filter[!native]»
+					«FOR outgoing : actor.outgoingPortMap.get(output)»
 						«val id = outgoing.getValueAsObject("id").toString»
 						<output name="«output.name»_«id»">
 							<address-space>«processor.getMemory(outgoing).name»</address-space>
@@ -92,7 +94,7 @@ class TceDesignPrinter extends TTAPrinter {
 							<signed>«output.type.int»</signed>
 							<width>«output.width»</width>
 							<size>«outgoing.size»</size>
-							<trace>«path»/trace/«instance.name»_«output.name».txt</trace>
+							<trace>«path»/trace/«vertex.label»_«output.name».txt</trace>
 						</output>
 					«ENDFOR»
 				«ENDFOR»

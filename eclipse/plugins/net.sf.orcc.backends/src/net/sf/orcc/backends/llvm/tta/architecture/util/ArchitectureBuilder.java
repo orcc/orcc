@@ -49,8 +49,8 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
-import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrccLogger;
 
 /**
@@ -61,50 +61,6 @@ import net.sf.orcc.util.OrccLogger;
  */
 public class ArchitectureBuilder extends DfSwitch<Design> {
 
-	/**
-	 * This class defines a network visitor used to create a design according to
-	 * the given network and the mapping.
-	 */
-	private class Mapper extends DfVisitor<Void> {
-
-		@Override
-		public Void caseConnection(Connection connection) {
-			if (isNative(connection)) {
-				// Native connection are hardware signals
-				addSignal(connection);
-			} else {
-				// FIFO connection are mapped to a memory
-				mapToBuffer(connection);
-			}
-			return null;
-		}
-
-		@Override
-		public Void caseInstance(Instance instance) {
-			Actor actor = instance.getActor();
-			if (actor.isNative()) {
-				Component component;
-				// A native actor describes a VHDL component from the library.
-				component = factory.createComponent(instance.getName());
-				// The parameter of this actor is used as generic.
-				for (Argument arg : instance.getArguments()) {
-					component.setAttribute(arg.getVariable().getName(),
-							arg.getValue());
-				}
-				design.add(component);
-				componentMap.put(instance, component);
-			} else {
-				Processor processor = design.getProcessor(mapping
-						.getMappedComponent(instance));
-				processor.getMappedActors().add(instance);
-
-				componentMap.put(instance, processor);
-			}
-
-			return null;
-		}
-	}
-
 	private int bufferId = 0;
 	private int signalId = 0;
 
@@ -113,8 +69,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private Design design;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
 	private boolean reduceConnections;
-
-	private Mapping mapping;
 
 	/**
 	 * Add a simple signal to the design. The signal is the translation of
@@ -192,14 +146,12 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	 */
 	public Design build(Network network, ProcessorConfiguration configuration,
 			Mapping mapping, boolean reduceConnections) {
-		this.mapping = mapping;
 		this.componentMap = new HashMap<Vertex, Component>();
 		this.reduceConnections = reduceConnections;
 		this.design = factory.createDesign();
 
 		// Map all unmapped component to its own processor
-		for (Vertex unmapped : new ArrayList<Vertex>(
-				mapping.getUnmappedEntities())) {
+		for (Vertex unmapped : new ArrayList<Vertex>(mapping.getUnmapped())) {
 			mapping.map("processor_" + unmapped.getLabel(), unmapped);
 		}
 
@@ -208,7 +160,48 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			design.add(factory.createProcessor(name, configuration, 0));
 		}
 
-		new Mapper().doSwitch(network);
+		// Map Actors
+		for (Vertex vertex : network.getChildren()) {
+			Instance instance = vertex.getAdapter(Instance.class);
+			Actor actor = vertex.getAdapter(Actor.class);
+			if (actor.isNative()) {
+				// A native actor describes a VHDL component from the library.
+				Component component = factory
+						.createComponent(vertex.getLabel());
+				// The parameter of this actor is used as generic.
+				if (instance != null) {
+					for (Argument arg : instance.getArguments()) {
+						component.setAttribute(arg.getVariable().getName(),
+								arg.getValue());
+					}
+				} else {
+					for (Var param : actor.getParameters()) {
+						component.setAttribute(param.getName(),
+								param.getInitialValue());
+					}
+				}
+				design.add(component);
+				componentMap.put(vertex, component);
+			} else {
+				Processor processor = design.getProcessor(mapping
+						.getComponent(vertex));
+				processor.getMappedActors().add(vertex);
+
+				componentMap.put(vertex, processor);
+			}
+		}
+
+		// Map FIFOs
+		for (Connection connection : network.getConnections()) {
+			if (isNative(connection)) {
+				// Native connection are hardware signals
+				addSignal(connection);
+			} else {
+				// FIFO connection are mapped to a memory
+				mapToBuffer(connection);
+			}
+		}
+
 		new ArchitectureMemoryEstimator().doSwitch(design);
 
 		for (Processor processor : design.getProcessors()) {
