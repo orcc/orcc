@@ -97,7 +97,7 @@ public class SimulatorFactory extends PluginFactory {
 
 		simulator.setOptions(options);
 		simulator.setProgressMonitor(monitor);
-		// simulator.start(mode);
+		simulator.run();
 	}
 
 	/**

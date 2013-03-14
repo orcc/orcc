@@ -190,4 +190,10 @@ public abstract class AbstractSimulator implements Simulator {
 		stopRequested = true;
 		statusCode += status.intValue();
 	}
+
+	@Override
+	public void stop() {
+		stopRequested = true;
+		statusCode = 999999;
+	}
 }

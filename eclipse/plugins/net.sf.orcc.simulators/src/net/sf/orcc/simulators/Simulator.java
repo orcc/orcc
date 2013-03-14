@@ -30,7 +30,7 @@ package net.sf.orcc.simulators;
 
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.StopableTask;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -40,7 +40,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * @author Matthieu Wipliez
  * 
  */
-public interface Simulator {
+public interface Simulator extends StopableTask {
 
 	public static final int DEFAULT_NB_LOOPS = 1;
 
@@ -50,7 +50,7 @@ public interface Simulator {
 	 * @param options
 	 *            a map of string to object
 	 */
-	public void setOptions(Map<String, Object> options) throws OrccException;
+	public void setOptions(Map<String, Object> options);
 
 	/**
 	 * Sets the progress monitor used by this back-end.
@@ -59,13 +59,5 @@ public interface Simulator {
 	 *            a progress monitor
 	 */
 	void setProgressMonitor(IProgressMonitor monitor);
-
-	/**
-	 * Starts the simulation.
-	 * 
-	 * @param mode
-	 *            mode is "run" or "debug"
-	 */
-	int start(String mode);
 
 }

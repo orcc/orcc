@@ -283,7 +283,7 @@ public class SlowSimulator extends AbstractSimulator {
 	}
 
 	@Override
-	public int start(String mode) {
+	public void run() {
 		try {
 			SimulatorDescriptor.killDescriptors();
 			interpreters = new HashMap<Actor, ActorInterpreter>();
@@ -308,7 +308,9 @@ public class SlowSimulator extends AbstractSimulator {
 			createInterpreters(network);
 			connectNetwork(network);
 			initializeNetwork(network);
+
 			runNetwork(network);
+
 			SimulatorDescriptor.killDescriptors();
 
 			if (profile) {
@@ -318,6 +320,5 @@ public class SlowSimulator extends AbstractSimulator {
 			// clean up to prevent memory leak
 			interpreters = null;
 		}
-		return statusCode;
 	}
 }
