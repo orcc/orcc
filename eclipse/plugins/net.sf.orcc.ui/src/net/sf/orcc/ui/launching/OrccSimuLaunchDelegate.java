@@ -90,6 +90,8 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 				OrccLogger.traceln("Simulation starts: " + simulatorName);
 				this.setName(simulatorName);
 
+				IStatus returnStatus = Status.OK_STATUS;
+
 				try {
 					Simulator simulator = SimulatorFactory.getInstance()
 							.getSimulator(simulatorName);
@@ -107,8 +109,9 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 					OrccLogger.severeln(simulatorName + " error ("
 							+ e.getCause() + ")");
 
-					return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-							simulatorName + " error", e);
+					returnStatus = new Status(IStatus.ERROR,
+							OrccActivator.PLUGIN_ID, simulatorName + " error",
+							e);
 
 				} catch (Exception e) {
 
@@ -123,12 +126,16 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 						throwable = throwable.getCause();
 					}
 
-					return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-							simulatorName + " simulation error: "
+					returnStatus = new Status(IStatus.ERROR,
+							OrccActivator.PLUGIN_ID, simulatorName
+									+ " simulation error: "
 									+ builder.toString());
+				} finally {
+					OrccLogger.restoreLevels();
+					OrccLogger.setLevel(OrccLevel.ALL);
 				}
 
-				return Status.OK_STATUS;
+				return returnStatus;
 			}
 
 			@Override
