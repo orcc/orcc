@@ -111,8 +111,8 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 				return Status.OK_STATUS;
 			}
 		};
-
-		job.setUser(true);
+		
+		job.setUser(false);
 		job.schedule();
 	}
 }

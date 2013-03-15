@@ -154,8 +154,8 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		// Configure the logger with the console attached to the process
 		OrccLogger.configureLoggerWithHandler(new OrccUiConsoleHandler(
 				DebugUITools.getConsole(process)));
-
-		job.setUser(true);
+		
+		job.setUser(false);
 		job.schedule();
 	}
 }
