@@ -31,6 +31,7 @@ package net.sf.orcc.simulators.runtime.std.video.impl;
 import java.awt.Canvas;
 import java.awt.Graphics;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -79,8 +80,8 @@ public class Display extends GenericDisplay {
 	/**
 	 * Close open frames (if any) and clear all
 	 */
-	private static void clearAll() {
-		if (frame != null) {
+	public static void clearAll() {
+		if (frame != null && frame.isVisible()) {
 			WindowEvent wev = new WindowEvent(frame, WindowEvent.WINDOW_CLOSING);
 			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
 			frame.setVisible(false);
@@ -282,6 +283,15 @@ public class Display extends GenericDisplay {
 		frame.add(canvas);
 		frame.setResizable(false);
 		frame.setVisible(true);
+
+		frame.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				frame.dispose();
+				AbstractSimulator.userStop();
+			}
+		});
 	}
 
 	public static void fpsPrintInit() {

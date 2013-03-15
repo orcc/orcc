@@ -56,11 +56,6 @@ public class OrccLogger {
 	 */
 	private static class DefaultOrccFormatter extends Formatter {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
-		 */
 		@Override
 		public String format(LogRecord record) {
 
@@ -91,6 +86,10 @@ public class OrccLogger {
 
 	}
 
+	/*
+	 * FIXME: Add Javadoc ! It is really important to keep everything logic and
+	 * make it simple to understand for everybody who needs to use it.
+	 */
 	public static enum OrccLevel {
 		/** */
 		SEVERE(Level.SEVERE),
@@ -128,6 +127,10 @@ public class OrccLogger {
 
 	private static Logger logger;
 
+	/*
+	 * FIXME: Add Javadoc ! It is really important to keep everything logic and
+	 * make it simple to understand for everybody who needs to use it.
+	 */
 	public static void changeFormatter(Formatter formatter) {
 		for (Handler handler : getLogger().getHandlers()) {
 			handler.setFormatter(formatter);

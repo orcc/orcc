@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, IETR/INSA of Rennes
+ * Copyright (c) 2013, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,45 +26,19 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.simulators;
-
-import java.util.Map;
-
-import net.sf.orcc.StopableTask;
-
-import org.eclipse.core.runtime.IProgressMonitor;
+package net.sf.orcc;
 
 /**
- * This interface defines a simulator.
+ * This interface simply add a stop() method to java.lang.Runnable.
  * 
- * @author Matthieu Wipliez
+ * @author Antoine Lorence
  * 
  */
-public interface Simulator extends StopableTask {
-
-	public static final int DEFAULT_NB_LOOPS = 1;
-
-	public enum SimulationEndOrigin {
-		EXTERNALSTOP, NORMALEND
-	}
+public interface StopableTask extends Runnable {
 
 	/**
-	 * Sets the options of this back-end.
-	 * 
-	 * @param options
-	 *            a map of string to object
+	 * Correctly stop this Runnable instance
 	 */
-	public void setOptions(Map<String, Object> options);
-
-	/**
-	 * Sets the progress monitor used by this back-end.
-	 * 
-	 * @param monitor
-	 *            a progress monitor
-	 * @deprecated please use stop() methods instead of progress monitor to
-	 *             close the application
-	 */
-	@Deprecated
-	void setProgressMonitor(IProgressMonitor monitor);
+	public void stop();
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2013, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -30,24 +30,26 @@ package net.sf.orcc.ui.launching;
 
 import java.io.IOException;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
 
 /**
- * This class defines an implementation of {@link IProcess} to launch a back-end
- * or a simulator.
+ * This process is used to imitate the behaviour of a classical external process
+ * launched in eclipse. It monitors a Job instance and try to stop it when user
+ * cancel the process (by clicking on the red square in the Console tab).
  * 
+ * @author Antoine Lorence
  * @author Matthieu Wipliez
  * 
  */
@@ -94,7 +96,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	private class OrccProxy implements IStreamsProxy {
 
 		private IStreamMonitor errorMonitor;
-
 		private IStreamMonitor outputMonitor;
 
 		public OrccProxy() {
@@ -114,47 +115,62 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 		@Override
 		public void write(String input) throws IOException {
-			// nothing to do
+			// Unsupported
 		}
-
 	}
 
-	private ILaunchConfiguration configuration;
+	class OrccJobAdapter extends JobChangeAdapter {
 
-	private ILaunch launch;
+		OrccProcess thisProcess;
 
-	private IProgressMonitor monitor;
+		OrccJobAdapter(OrccProcess process) {
+			thisProcess = process;
+		}
 
-	private IStreamsProxy proxy;
+		@Override
+		public void done(IJobChangeEvent event) {
+			DebugEvent endEvent = new DebugEvent(thisProcess,
+					DebugEvent.TERMINATE);
+			DebugEvent[] events = { endEvent };
+			DebugPlugin.getDefault().fireDebugEventSet(events);
+		}
+	}
 
-	private boolean terminated;
+	boolean terminated;
+	Job job;
+	ILaunch launch;
+	IStreamsProxy streamProxy;
 
-	public OrccProcess(ILaunch launch, ILaunchConfiguration configuration,
-			IProgressMonitor monitor) throws CoreException {
-		this.configuration = configuration;
+	OrccProcess(Job job, ILaunch launch) {
+		terminated = false;
+
+		this.job = job;
 		this.launch = launch;
-		this.monitor = monitor;
-		proxy = new OrccProxy();
+
+		streamProxy = new OrccProxy();
+
+		job.addJobChangeListener(new OrccJobAdapter(this));
 	}
 
 	@Override
 	public boolean canTerminate() {
-		return !terminated;
+		return !terminated && job.getState() == Job.RUNNING;
 	}
 
 	@Override
-	public String getAttribute(String key) {
-		return null;
+	public boolean isTerminated() {
+		return terminated && job.getState() == Job.NONE;
 	}
 
 	@Override
-	public int getExitValue() throws DebugException {
-		return 0;
+	public void terminate() throws DebugException {
+		job.cancel();
+		terminated = true;
 	}
 
 	@Override
 	public String getLabel() {
-		return configuration.getName();
+		return "Orcc virtual process";
 	}
 
 	@Override
@@ -162,39 +178,24 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		return launch;
 	}
 
-	public IProgressMonitor getProgressMonitor() {
-		return monitor;
-	}
-
 	@Override
 	public IStreamsProxy getStreamsProxy() {
-		return proxy;
-	}
-
-	@Override
-	public boolean isTerminated() {
-		return terminated;
+		return streamProxy;
 	}
 
 	@Override
 	public void setAttribute(String key, String value) {
+		// Unsupported
 	}
 
 	@Override
-	public void terminate() throws DebugException {
-		if (!canTerminate()) {
-			return;
-		}
-		terminated = true;
+	public String getAttribute(String key) {
+		// Unsupported
+		return null;
+	}
 
-		DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
-		DebugEvent[] events = { event };
-		DebugPlugin.getDefault().fireDebugEventSet(events);
-
-		if (monitor != null) {
-			// Desactivate since it close the logger too
-			// monitor.setCanceled(terminated);
-			monitor.done();
-		}
+	@Override
+	public int getExitValue() throws DebugException {
+		return job.getResult().getCode();
 	}
 }

@@ -54,10 +54,6 @@ public class GenericDisplay {
 		GenericDisplay.goldenReference = fileName;
 	}
 
-	public void close() {
-
-	}
-
 	public static void setDisplayEnabled() {
 		displayStatus = DISPLAY_ENABLE;
 		OrccLogger.debugln("Display has been enabled");
@@ -67,5 +63,4 @@ public class GenericDisplay {
 		displayStatus = DISPLAY_DISABLE;
 		OrccLogger.debugln("Display has been disabled");
 	}
-
 }
