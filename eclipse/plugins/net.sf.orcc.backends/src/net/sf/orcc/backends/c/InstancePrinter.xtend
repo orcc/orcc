@@ -133,9 +133,7 @@ class InstancePrinter extends CTemplate {
 		}
 		if (options.containsKey(ENABLE_TRACES)) {
 			enableTrace = options.get(ENABLE_TRACES) as Boolean
-			traceFolder = options.get(TRACES_FOLDER) as String
-			
-			traceFolder = traceFolder.replace('\\', "\\\\")
+			traceFolder = (options.get(TRACES_FOLDER) as String)?.replace('\\', "\\\\")
 		}
 		if(options.containsKey(PROFILE)){
 			profile = options.get(PROFILE) as Boolean
