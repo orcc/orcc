@@ -134,6 +134,8 @@ class InstancePrinter extends CTemplate {
 		if (options.containsKey(ENABLE_TRACES)) {
 			enableTrace = options.get(ENABLE_TRACES) as Boolean
 			traceFolder = options.get(TRACES_FOLDER) as String
+			
+			traceFolder = traceFolder.replace('\\', "\\\\")
 		}
 		if(options.containsKey(PROFILE)){
 			profile = options.get(PROFILE) as Boolean
@@ -734,7 +736,7 @@ class InstancePrinter extends CTemplate {
 	
 	def private printOpenFiles() '''
 		«FOR port : actor.inputs + actor.outputs»
-			file_«port.name» = fopen("«traceFolder»«File::separator»«port.fullName».txt", "a");
+			file_«port.name» = fopen("«traceFolder»«File::separator.replace('\\', "\\\\")»«port.fullName».txt", "a");
 		«ENDFOR»
 	'''
 	
