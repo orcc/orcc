@@ -274,6 +274,9 @@ public class ValueUtil {
 						/ doubleVal2);
 			}
 		}
+		if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).divide((BigInteger) val2);
+		}
 
 		throw new OrccRuntimeException("type mismatch in divide");
 	}
