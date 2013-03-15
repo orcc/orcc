@@ -65,6 +65,7 @@ import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.SimulatorDescriptor;
 import net.sf.orcc.simulators.runtime.impl.GenericDisplay;
 import net.sf.orcc.simulators.runtime.impl.GenericSource;
+import net.sf.orcc.simulators.runtime.std.video.impl.Display;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -250,9 +251,11 @@ public class SlowSimulator extends AbstractSimulator {
 		typeResizer[2] = getAttribute(TYPE_RESIZER_CAST_NATIVEPORTS, false);
 		typeResizer[3] = getAttribute(TYPE_RESIZER_CAST_BOOLTOINT, false);
 
+		stopRequested = false;
+		statusCode = 0;
 	}
 
-	protected int runNetwork(Network network) {
+	protected SimulationEndOrigin runNetwork(Network network) {
 		boolean hasExecuted;
 		do {
 			hasExecuted = false;
@@ -263,8 +266,8 @@ public class SlowSimulator extends AbstractSimulator {
 
 				while (interpreter.schedule()) {
 					// check for cancelation
-					if (isCanceled() || stopRequested) {
-						return statusCode;
+					if (isStopped()) {
+						return SimulationEndOrigin.EXTERNALSTOP;
 					}
 					nbFiring++;
 				}
@@ -272,14 +275,13 @@ public class SlowSimulator extends AbstractSimulator {
 				hasExecuted |= (nbFiring > 0);
 
 				// check for cancelation
-				if (isCanceled() || stopRequested) {
-					return statusCode;
+				if (isStopped()) {
+					return SimulationEndOrigin.EXTERNALSTOP;
 				}
 			}
 		} while (hasExecuted);
 
-		OrccLogger.traceln("End of simulation");
-		return statusCode;
+		return SimulationEndOrigin.NORMALEND;
 	}
 
 	@Override
@@ -309,9 +311,20 @@ public class SlowSimulator extends AbstractSimulator {
 			connectNetwork(network);
 			initializeNetwork(network);
 
-			runNetwork(network);
+			SimulationEndOrigin returnStatus = runNetwork(network);
 
 			SimulatorDescriptor.killDescriptors();
+			// Close the display and associated objects if necessary
+			Display.clearAll();
+
+			if (returnStatus == SimulationEndOrigin.EXTERNALSTOP) {
+				OrccLogger
+						.traceln("Simulation aborted (from application control).");
+			} else {
+				OrccLogger.traceln("End of simulation");
+				OrccLogger.traceln("Simulation returned status code "
+						+ statusCode);
+			}
 
 			if (profile) {
 				new ProfilingPrinter().print(profileFolder, network);

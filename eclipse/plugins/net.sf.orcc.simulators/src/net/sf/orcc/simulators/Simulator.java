@@ -44,6 +44,10 @@ public interface Simulator extends StopableTask {
 
 	public static final int DEFAULT_NB_LOOPS = 1;
 
+	public enum SimulationEndOrigin {
+		EXTERNALSTOP, NORMALEND
+	}
+
 	/**
 	 * Sets the options of this back-end.
 	 * 
@@ -57,7 +61,10 @@ public interface Simulator extends StopableTask {
 	 * 
 	 * @param monitor
 	 *            a progress monitor
+	 * @deprecated please use stop() methods instead of progress monitor to
+	 *             close the application
 	 */
+	@Deprecated
 	void setProgressMonitor(IProgressMonitor monitor);
 
 }

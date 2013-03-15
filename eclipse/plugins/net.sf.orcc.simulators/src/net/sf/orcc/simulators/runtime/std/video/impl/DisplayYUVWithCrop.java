@@ -38,6 +38,7 @@ import java.math.BigInteger;
 
 import javax.swing.JFrame;
 
+import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.util.OrccLogger;
 
 /**
@@ -197,6 +198,8 @@ public class DisplayYUVWithCrop {
 				image = null;
 				lastHeight = 0;
 				lastWidth = 0;
+
+				AbstractSimulator.stop(BigInteger.ZERO);
 			}
 
 		});

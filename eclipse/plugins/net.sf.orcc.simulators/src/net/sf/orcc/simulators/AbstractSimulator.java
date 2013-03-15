@@ -144,16 +144,12 @@ public abstract class AbstractSimulator implements Simulator {
 	abstract protected void initializeOptions();
 
 	/**
-	 * Returns true if this process has been canceled.
+	 * Returns true if this process has been stopped or canceled.
 	 * 
-	 * @return true if this process has been canceled
+	 * @return true if this process has been stopped or canceled
 	 */
-	protected boolean isCanceled() {
-		if (monitor == null) {
-			return false;
-		} else {
-			return monitor.isCanceled();
-		}
+	protected boolean isStopped() {
+		return stopRequested || (monitor != null && monitor.isCanceled());
 	}
 
 	/*
@@ -175,22 +171,33 @@ public abstract class AbstractSimulator implements Simulator {
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor) {
 		this.monitor = monitor;
-		// initialize also the simulation status variables
-		stopRequested = false;
-		statusCode = 0;
 	}
 
 	/**
-	 * Stop the simulation.
+	 * Stop the simulation. This method is called from application after a user
+	 * action (ex: display closed)
+	 * 
+	 * @param status
+	 *            the status code which should be returned
+	 */
+	public static void userStop() {
+		stopRequested = true;
+	}
+
+	/**
+	 * Stop the simulation. This method is called from application itself.
 	 * 
 	 * @param status
 	 *            the status code which should be returned
 	 */
 	public static void stop(BigInteger status) {
-		stopRequested = true;
 		statusCode += status.intValue();
+		stopRequested = true;
 	}
 
+	/**
+	 * Called by user when he manually stop the simulation.
+	 */
 	@Override
 	public void stop() {
 		stopRequested = true;

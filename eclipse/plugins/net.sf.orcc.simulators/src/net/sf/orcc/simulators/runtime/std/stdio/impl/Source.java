@@ -34,6 +34,7 @@ import java.io.RandomAccessFile;
 import java.math.BigInteger;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.runtime.impl.GenericSource;
 import net.sf.orcc.util.OrccLogger;
 
@@ -54,7 +55,7 @@ public class Source extends GenericSource {
 	public static void source_exit(BigInteger status) {
 		OrccLogger.traceln("Exit signal called by application. Return code: "
 				+ status.toString());
-		//AbstractSimulator.stop(status);
+		AbstractSimulator.stop(status);
 	}
 
 	public static BigInteger source_getNbLoop() {

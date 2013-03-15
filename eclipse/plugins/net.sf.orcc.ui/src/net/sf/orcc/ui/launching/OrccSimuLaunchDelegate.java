@@ -97,7 +97,6 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 					currentSimulator = simulator;
 
 					simulator.setOptions(configuration.getAttributes());
-					simulator.setProgressMonitor(monitor);
 					simulator.run();
 
 				} catch (OrccRuntimeException e) {
@@ -134,9 +133,11 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 
 			@Override
 			protected void canceling() {
-				super.canceling();
-				OrccLogger.traceln("Request simulator to stop.");
 				currentSimulator.stop();
+				super.canceling();
+				OrccLogger
+						.traceln("Simulation aborted (from eclipse control).");
+				this.done(Status.OK_STATUS);
 			}
 		};
 

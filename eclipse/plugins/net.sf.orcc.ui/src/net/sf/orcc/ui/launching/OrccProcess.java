@@ -32,7 +32,9 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -117,6 +119,23 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		}
 	}
 
+	class OrccJobAdapter extends JobChangeAdapter {
+
+		OrccProcess thisProcess;
+
+		OrccJobAdapter(OrccProcess process) {
+			thisProcess = process;
+		}
+
+		@Override
+		public void done(IJobChangeEvent event) {
+			DebugEvent endEvent = new DebugEvent(thisProcess,
+					DebugEvent.TERMINATE);
+			DebugEvent[] events = { endEvent };
+			DebugPlugin.getDefault().fireDebugEventSet(events);
+		}
+	}
+
 	boolean terminated;
 	Job job;
 	ILaunch launch;
@@ -129,6 +148,8 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		this.launch = launch;
 
 		streamProxy = new OrccProxy();
+
+		job.addJobChangeListener(new OrccJobAdapter(this));
 	}
 
 	@Override
@@ -145,10 +166,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	public void terminate() throws DebugException {
 		job.cancel();
 		terminated = true;
-
-		DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
-		DebugEvent[] events = { event };
-		DebugPlugin.getDefault().fireDebugEventSet(events);
 	}
 
 	@Override
