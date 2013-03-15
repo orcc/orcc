@@ -250,16 +250,31 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object divide(Object val1, Object val2) {
-		if (isFloat(val1) && isFloat(val2)) {
-			return ((BigDecimal) val1).divide((BigDecimal) val2);
-		} else if (isFloat(val1) && isInt(val2)) {
-			return ((BigDecimal) val1)
-					.divide(new BigDecimal((BigInteger) val2));
-		} else if (isInt(val1) && isFloat(val2)) {
-			return new BigDecimal((BigInteger) val1).divide((BigDecimal) val2);
-		} else if (isInt(val1) && isInt(val2)) {
-			return ((BigInteger) val1).divide((BigInteger) val2);
+
+		if (isFloat(val1)) {
+			double doubleVal1 = ((BigDecimal) val1).doubleValue();
+
+			if (isFloat(val2)) {
+				return new BigDecimal(doubleVal1
+						/ ((BigDecimal) val2).doubleValue());
+			} else if (isInt(val2)) {
+				return new BigDecimal(doubleVal1
+						/ ((BigInteger) val2).intValue());
+			}
+
 		}
+		if (isFloat(val2)) {
+			double doubleVal2 = ((BigDecimal) val2).doubleValue();
+
+			if (isFloat(val1)) {
+				return new BigDecimal(((BigDecimal) val1).doubleValue()
+						/ doubleVal2);
+			} else if (isInt(val1)) {
+				return new BigDecimal(((BigInteger) val1).intValue()
+						/ doubleVal2);
+			}
+		}
+
 		throw new OrccRuntimeException("type mismatch in divide");
 	}
 
