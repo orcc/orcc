@@ -73,8 +73,8 @@ class TceDesignPrinter extends TTAPrinter {
 			«FOR vertex: processor.mappedActors»
 				«val actor = vertex.getAdapter(typeof(Actor))»
 				«FOR input: actor.inputs.filter(port | !port.native)»
-					«IF actor.incomingPortMap.get(input) != null»
-						«val incoming = actor.incomingPortMap.get(input)»
+					«val incoming = actor.incomingPortMap.get(input)»
+					«IF incoming != null && !processor.mappedActors.contains(incoming.source)»
 						<input name="«input.name»">
 							<address-space>«processor.getMemory(incoming).name»</address-space>
 							<var-name>fifo_«incoming.getValueAsObject("id").toString»</var-name>
@@ -87,15 +87,17 @@ class TceDesignPrinter extends TTAPrinter {
 				«ENDFOR»
 				«FOR output : actor.outputs.filter[!native]»
 					«FOR outgoing : actor.outgoingPortMap.get(output)»
-						«val id = outgoing.getValueAsObject("id").toString»
-						<output name="«output.name»_«id»">
-							<address-space>«processor.getMemory(outgoing).name»</address-space>
-							<var-name>fifo_«id»</var-name>
-							<signed>«output.type.int»</signed>
-							<width>«output.width»</width>
-							<size>«outgoing.size»</size>
-							<trace>«path»/trace/«vertex.label»_«output.name».txt</trace>
-						</output>
+						«IF !processor.mappedActors.contains(outgoing.target)»
+							«val id = outgoing.getValueAsObject("id").toString»
+							<output name="«output.name»_«id»">
+								<address-space>«processor.getMemory(outgoing).name»</address-space>
+								<var-name>fifo_«id»</var-name>
+								<signed>«output.type.int»</signed>
+								<width>«output.width»</width>
+								<size>«outgoing.size»</size>
+								<trace>«path»/trace/«vertex.label»_«output.name».txt</trace>
+							</output>
+						«ENDIF»
 					«ENDFOR»
 				«ENDFOR»
 			«ENDFOR»
