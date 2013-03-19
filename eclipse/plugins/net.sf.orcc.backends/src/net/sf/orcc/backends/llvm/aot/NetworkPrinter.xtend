@@ -51,8 +51,6 @@ class NetworkPrinter extends LLVMTemplate {
 		super()
 		this.network = network
 		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
-		
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
 		}

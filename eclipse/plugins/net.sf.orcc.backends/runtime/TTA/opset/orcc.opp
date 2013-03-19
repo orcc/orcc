@@ -19,6 +19,9 @@
     <inputs>1</inputs>
     <outputs>1</outputs>
     <side-effects/>
+    <affected-by>
+      <operation name="SOURCE_INIT"/>
+    </affected-by>
     <in id="1" type="UIntWord"/>
     <out id="2" type="UIntWord"/>
     <trigger-semantics>
@@ -32,6 +35,9 @@
     <inputs>1</inputs>
     <outputs>1</outputs>
     <side-effects/>
+    <affected-by>
+      <operation name="SOURCE_INIT"/>
+    </affected-by>
     <in id="1" type="UIntWord"/>
     <out id="2" type="UIntWord"/>
     <trigger-semantics>
@@ -45,6 +51,9 @@
     <inputs>1</inputs>
     <outputs>0</outputs>
     <side-effects/>
+    <affected-by>
+      <operation name="SOURCE_INIT"/>
+    </affected-by>
     <in id="1" type="UIntWord"/>
     <trigger-semantics>
       EXEC_OPERATION(source_rewind, IO(1));
@@ -57,6 +66,9 @@
     <inputs>1</inputs>
     <outputs>0</outputs>
     <side-effects/>
+    <affected-by>
+      <operation name="SOURCE_INIT"/>
+    </affected-by>
     <in id="1" type="UIntWord"/>
     <trigger-semantics>
       EXEC_OPERATION(source_decrementnbloops, IO(1));

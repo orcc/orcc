@@ -29,20 +29,19 @@
 package net.sf.orcc.simulators;
 
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
-import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
-import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
-import static net.sf.orcc.simulators.SimulatorsConstants.LOOP_NUMBER;
 import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
+import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
+import static net.sf.orcc.simulators.SimulatorsConstants.LOOP_NUMBER;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccLogger.OrccLevel;
 
@@ -57,7 +56,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -177,13 +175,16 @@ public class SimulatorCli implements IApplication {
 
 				disableAutoBuild();
 
-				SimulatorFactory.getInstance().runSimulator(
-						new NullProgressMonitor(), "run", simulatorOptions);
+				Simulator simulator = SimulatorFactory.getInstance()
+						.getSimulator((String) simulatorOptions.get(SIMULATOR));
+				simulator.setOptions(simulatorOptions);
+				simulator.run();
+
 			} catch (CoreException ce) {
 				OrccLogger.severeln("Unable to set the workspace properties.");
 				restoreAutoBuild();
 				return IApplication.EXIT_RELAUNCH;
-			} catch (OrccException oe) {
+			} catch (OrccRuntimeException oe) {
 				OrccLogger.severeln("Simulator has shut down");
 				restoreAutoBuild();
 				return IApplication.EXIT_RELAUNCH;
@@ -196,8 +197,6 @@ public class SimulatorCli implements IApplication {
 
 		} catch (UnrecognizedOptionException uoe) {
 			printUsage(clOptions, uoe.getLocalizedMessage());
-		} catch (ParseException pe) {
-			printUsage(clOptions, pe.getLocalizedMessage());
 		}
 
 		return IApplication.EXIT_RELAUNCH;

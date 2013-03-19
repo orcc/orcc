@@ -121,7 +121,7 @@ public class TTABackend extends LLVMBackend {
 
 		visitors.add(new ComplexHwOpDetector());
 		visitors.add(new UnitImporter());
-		visitors.add(new Instantiator(false, fifoSize));
+		visitors.add(new Instantiator(true, fifoSize));
 		visitors.add(new NetworkFlattener());
 
 		if (classify) {
@@ -180,8 +180,8 @@ public class TTABackend extends LLVMBackend {
 		}
 
 		// Compute the actor mapping
-		computedMapping = new Mapping(network, mapping, reduceConnections,
-				false);
+		computedMapping = new Mapping(true);
+		computedMapping.compute(network, mapping);
 
 		// Build the design from the mapping
 		design = new ArchitectureBuilder().build(network, configuration,
@@ -297,6 +297,12 @@ public class TTABackend extends LLVMBackend {
 	protected boolean printInstance(Instance instance) {
 		return new SwActorPrinter(options, design.getActorToProcessorMap().get(
 				instance)).print(actorsPath, instance) > 0;
+	}
+
+	@Override
+	protected boolean printActor(Actor actor) {
+		return new SwActorPrinter(options, design.getActorToProcessorMap().get(
+				actor)).print(actorsPath, actor) > 0;
 	}
 
 	/**

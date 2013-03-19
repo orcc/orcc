@@ -1859,11 +1859,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"sharedRAMs", null, 0, -1, Processor.class, IS_TRANSIENT,
 				IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEReference(getProcessor_MappedActors(), theDfPackage.getInstance(),
-				null, "mappedActors", null, 0, -1, Processor.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
-				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
+		initEReference(getProcessor_MappedActors(),
+				theGraphPackage.getVertex(), null, "mappedActors", null, 0, -1,
+				Processor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 		initEAttribute(getProcessor_Configuration(),
 				this.getProcessorConfiguration(), "configuration", null, 0, 1,
 				Processor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,

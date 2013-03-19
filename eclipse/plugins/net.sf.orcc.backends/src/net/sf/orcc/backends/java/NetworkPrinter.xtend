@@ -49,8 +49,6 @@ class NetworkPrinter extends JavaTemplate {
 	new(Network network, Map<String, Object> options){
 		super()
 		this.network = network
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 			

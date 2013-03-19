@@ -53,7 +53,7 @@ import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.XcfPrinter;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -240,7 +240,7 @@ public class CBackend extends AbstractBackend {
 					mapping);
 		}
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
-			new XcfPrinter().print(srcPath, network, mapping);
+			new Mapping().print(srcPath, network, mapping);
 		}
 	}
 

@@ -32,6 +32,7 @@ import java.io.File
 import net.sf.orcc.backends.llvm.aot.LLVMTemplate
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.df.Actor
 
 class SwProcessorPrinter extends LLVMTemplate {
 	
@@ -66,12 +67,13 @@ class SwProcessorPrinter extends LLVMTemplate {
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Declare the scheduling function of each actor
 		
-		«FOR instance : processor.mappedActors»
-			declare void @«instance.name»_scheduler()
+		«FOR vertex : processor.mappedActors»
+			declare void @«vertex.label»_scheduler()
 		«ENDFOR»
-		«FOR instance : processor.mappedActors»
-			«IF ! instance.actor.initializes.empty»
-				declare void @«instance.name»_initialize()
+		«FOR vertex : processor.mappedActors»
+			«val actor = vertex.getAdapter(typeof(Actor))»
+			«IF !actor.initializes.empty»
+				declare void @«vertex.label»_initialize()
 			«ENDIF»
 		«ENDFOR»
 		
@@ -80,16 +82,17 @@ class SwProcessorPrinter extends LLVMTemplate {
 		
 		define void @main() noreturn nounwind {
 		entry:
-			«FOR instance : processor.mappedActors»
-				«IF ! instance.actor.initializes.empty»
-					call void @«instance.name»_initialize()
+			«FOR vertex : processor.mappedActors»
+				«val actor = vertex.getAdapter(typeof(Actor))»
+				«IF !actor.initializes.empty»
+					call void @«vertex.label»_initialize()
 				«ENDIF»
 			«ENDFOR»
 			br label %loop
 		
 		loop:
-			«FOR instance : processor.mappedActors»
-				call void @«instance.name»_scheduler()
+			«FOR vertex : processor.mappedActors»
+				call void @«vertex.label»_scheduler()
 			«ENDFOR»
 			br label %loop
 		}

@@ -39,6 +39,7 @@ import shutil
 import stat
 import subprocess
 import tempita
+import datetime
 
 
 class Processor:
@@ -88,6 +89,9 @@ class Processor:
         sourceFiles = [self._llFile]
         for actor in self.actors:
             sourceFiles.append(os.path.join(actorsPath, actor + ".ll"))
+
+        if not self.needRecompilation(self._tpefFile, sourceFiles + [self._adfFile]):
+            return 0
 
         opt = args + ["-O3", "-o", self._tpefFile, "-a", self._adfFile]
 
@@ -245,3 +249,12 @@ class Processor:
         template = tempita.Template.from_filename(os.path.join(templatePath, "xco_rom.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath, id=self.id, width=self.irom.getWidth(), depth=self.irom.getDepth())
         open(os.path.join(genPath, self._xoeRomFile), "w").write(result)
+
+    def needRecompilation(self, tpefFile, depFiles):
+        if not os.path.exists(tpefFile):
+            return True
+        t = os.path.getmtime(tpefFile)
+        for depFile in depFiles:
+            if os.path.getmtime(depFile) > t:
+                return True
+        return False
