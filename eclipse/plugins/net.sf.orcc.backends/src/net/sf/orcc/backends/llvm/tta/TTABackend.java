@@ -298,7 +298,7 @@ public class TTABackend extends LLVMBackend {
 		return new SwActorPrinter(options, design.getActorToProcessorMap().get(
 				instance)).print(actorsPath, instance) > 0;
 	}
-	
+
 	@Override
 	protected boolean printActor(Actor actor) {
 		return new SwActorPrinter(options, design.getActorToProcessorMap().get(

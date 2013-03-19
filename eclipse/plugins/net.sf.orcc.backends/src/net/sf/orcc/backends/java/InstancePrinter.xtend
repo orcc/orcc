@@ -42,7 +42,6 @@ class InstancePrinter extends JavaTemplate {
 	new(Instance instance, Map<String,Object> options){
 		this.instance = instance
 		this.options = options
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	def printInstance(String targetFolder){

@@ -62,8 +62,6 @@ class NetworkPrinter extends ExprAndTypePrinter {
 		interfaces = newArrayList;
 		
 		this.network = network
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 		

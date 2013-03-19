@@ -49,8 +49,6 @@ class NetworkPrinter extends PromelaTemplate {
 	
 	new(Network network, Map<String, Object> options) {
 		this.network = network
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	def print(String targetFolder) {

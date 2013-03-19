@@ -88,8 +88,6 @@ class NetworkPrinter extends CTemplate {
 			}
 		}
 		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
-		
 		//Template data :
 		// TODO : set the right values when genetic algorithm will be fixed
 		numberOfGroups = 0

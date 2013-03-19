@@ -68,8 +68,6 @@ import static net.sf.orcc.OrccLaunchConstants.*
 	
 	new (Instance instance, Map<String, Object> options) {
 		this.instance = instance
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	def print(String targetFolder) {

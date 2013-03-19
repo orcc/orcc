@@ -47,8 +47,6 @@ class CMakePrinter extends CommonPrinter {
 
 	new(Network network, Map<String, Object> options) {
 		this.network = network;
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	def printFiles(String targetFolder) {

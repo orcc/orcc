@@ -63,8 +63,6 @@ class ActorPrinter extends JavaTemplate {
 	
 	new(Actor actor, Map<String, Object> options){
 		this.actor = actor
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 		

@@ -41,8 +41,6 @@ import static net.sf.orcc.backends.CommonPrinter.*
  */
 abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	
-	protected var overwriteAllFiles = false
-	
 	protected var precedence = Integer::MAX_VALUE
 	protected var branch = 0
 	
@@ -139,7 +137,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * @param content
 	 */
 	def protected needToWriteFile(CharSequence content, File target) {
-		return overwriteAllFiles || ! target.exists()
+		return ! target.exists()
 				|| ! MessageDigest::isEqual(hash(target), hash(content.toString.bytes));
 	}
 	
