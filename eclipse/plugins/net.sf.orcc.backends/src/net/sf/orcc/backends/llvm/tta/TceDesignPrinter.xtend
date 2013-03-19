@@ -81,7 +81,7 @@ class TceDesignPrinter extends TTAPrinter {
 							<signed>«input.type.int»</signed>
 							<width>«input.width»</width>
 							<size>«incoming.size»</size>
-							<trace>«path»/trace/«vertex.label»_«input.name».txt</trace>
+							<trace>«path»/trace/«IF !vertex.label.contains("cluster")»«vertex.label»_«ENDIF»«input.name».txt</trace>
 						</input>
 					«ENDIF»
 				«ENDFOR»
@@ -95,7 +95,7 @@ class TceDesignPrinter extends TTAPrinter {
 								<signed>«output.type.int»</signed>
 								<width>«output.width»</width>
 								<size>«outgoing.size»</size>
-								<trace>«path»/trace/«vertex.label»_«output.name».txt</trace>
+								<trace>«path»/trace/«IF !vertex.label.contains("cluster")»«vertex.label»_«ENDIF»«output.name».txt</trace>
 							</output>
 						«ENDIF»
 					«ENDFOR»
