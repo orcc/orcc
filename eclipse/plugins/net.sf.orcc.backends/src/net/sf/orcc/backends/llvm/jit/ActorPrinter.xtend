@@ -396,7 +396,7 @@ class ActorPrinter extends InstancePrinter {
 		«ENDIF»
 	'''
 
-	def private varType_MD(Type type) {
+	def private CharSequence varType_MD(Type type) {
 		switch type {
 			case type.isInt: '''i32 «(type as TypeInt).size»'''
 			case type.isUint: '''i32 «(type as TypeUint).size»'''

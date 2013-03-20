@@ -43,7 +43,7 @@ import net.sf.orcc.backends.cplusplus.entities.InterfaceEthernet
  * @author Ghislain Roquier
  * 
  */
-class EntitiesPrinter extends YaceEntitiesSwitch {
+class EntitiesPrinter extends YaceEntitiesSwitch<CharSequence> {
 	
 	List<Interface> interfaces
 	

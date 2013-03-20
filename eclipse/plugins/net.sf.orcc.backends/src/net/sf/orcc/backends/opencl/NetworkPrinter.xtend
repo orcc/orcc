@@ -40,7 +40,7 @@ import net.sf.orcc.df.Network
  * @author Endri Bezati
  */
 class NetworkPrinter extends BasePrinter {
-	def printNetwork(Network network, Map options){ 
+	def printNetwork(Network network, Map<String, Object> options){ 
 		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		var date = new Date();
 		'''
@@ -73,7 +73,7 @@ class NetworkPrinter extends BasePrinter {
 		'''
 	}
 	
-	def printCmakeLists(Network network, Map options){
+	def printCmakeLists(Network network, Map<String, Object> options){
 		'''
 		# EPFL OpenCL Backend, CMakeLists.txt file
 		# Generated from "«network.file»"
