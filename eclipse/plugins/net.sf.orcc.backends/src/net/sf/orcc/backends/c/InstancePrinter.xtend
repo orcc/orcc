@@ -801,7 +801,7 @@ class InstancePrinter extends CTemplate {
 		val trgtPort = store.target.variable.port
 		'''
 		«IF trgtPort != null»
-			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable)?.native»
+			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
 				tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
