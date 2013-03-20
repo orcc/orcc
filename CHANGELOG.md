@@ -1,4 +1,4 @@
-# 1.2.2 2013
+# 1.3.0 March 2013
 
 ### Notable changes and features
 
@@ -9,6 +9,8 @@
 	the whole project and all its dependancies.
 - Simulator :
 	* New option to generate files containing statistics and profiling data.
+	* Simulation runtime has been reworked. A simulation can now be properly stopped by clicking on
+	the red square in the console tab or by closing the display window.
 - Backends :
 	* Mapping files (XCF) are always generated, even if there is no mapping set in the UI.
 	* New CLI options such as '-m2m' which applies the Multi2MonoToken transformation.
@@ -22,7 +24,7 @@
 	* New 'High Level Synthesis' backend which uses Vivado toolset to generate HDL designs.
 	* New 'COMPA' backend which generates C source code, without any dependency to external 
 	libraries (SDL, pthreads, etc.). This backend can't compile classical applications, because
-	they use Display.cal and needs SDL to work. This backend was needed by members of COMPA
+	they use Display.cal and needs to link with SDL. This backend was needed by members of COMPA
 	research project (see http://compa-ietr.insa-rennes.fr)
 - User interface :
 	* Improve code completion.
@@ -42,6 +44,7 @@
 	* Disable threaded generation to fix random bugs in generated files (without performance lost).
 	* (TTA) Transform all boolean variables in i8 since TCE do not support boolean.
 	* Caching function: Only files different from existing ones are printed on disk.
+	* Traces now works under windows, pathes are escaped with a backslash in source files generated.
 - Fix classification in case of CSDF schedule depending of actor parameter.
 - Fix merging of static actor.
 - Fix a bug related to the support of floating-point operation.
@@ -50,13 +53,13 @@
 
 - Move Graphiti-editor plugins into Orcc repository. Only one eclipse feature has to be
 installed to use Orcc. Separate Graphiti-editor plugin is not needed anymore.
-- All backends use now Xtend instead of Stringtemplate to print code.
+- All backends use now Xtend instead of StringTemplate to print code.
 - Deletion of the XLIM back-end (replaced by Xronos).
 
 ### Known problems
 
 - Declaration of a variable outside the explicit 'var' declaration blocks.
-- Wrong classification in case of complex data dependant behavior.
+- Wrong classification in case of complex data dependant behavior or floating points types usage.
 
 # 1.2.1 Oct 2012
 
