@@ -30,14 +30,12 @@ package net.sf.orcc.backends.util
 
 import net.sf.orcc.OrccRuntimeException
 import net.sf.orcc.df.Actor
+import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Entity
+import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.graph.Vertex
-
-import static net.sf.orcc.backends.util.Validator.*
-import net.sf.orcc.df.Instance
-import net.sf.orcc.df.Connection
 import net.sf.orcc.util.OrccLogger
 
 /**

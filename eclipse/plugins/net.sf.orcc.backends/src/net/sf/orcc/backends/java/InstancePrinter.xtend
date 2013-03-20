@@ -29,11 +29,8 @@
 
 package net.sf.orcc.backends.java
 
-import net.sf.orcc.df.Instance
 import java.util.Map
-
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.df.Instance
 
 class InstancePrinter extends JavaTemplate {
 	Instance instance

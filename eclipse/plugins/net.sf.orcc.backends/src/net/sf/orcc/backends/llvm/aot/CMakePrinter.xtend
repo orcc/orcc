@@ -34,8 +34,6 @@ import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /**
  * Generate CMakeList.txt content
  * 

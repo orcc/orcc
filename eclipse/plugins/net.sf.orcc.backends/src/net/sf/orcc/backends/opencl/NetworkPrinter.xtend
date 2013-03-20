@@ -28,12 +28,11 @@
  */
 package net.sf.orcc.backends.opencl
 
-import net.sf.orcc.backends.opencl.BasePrinter
-import net.sf.orcc.df.Network
-import java.util.Map
-import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Map
 import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
 
 /*
  * The Nework Printer
