@@ -859,14 +859,8 @@ class InstancePrinter extends CTemplate {
 		for (action : actor.actionsOutsideFsm) {
 			val actionPattern = action.inputPattern
 			for (port : actionPattern.ports) {
-				var numTokens = inputPattern.getNumTokens(port);
-				if (numTokens == null) {
-					numTokens = actionPattern.getNumTokens(port);
-				} else {
-					numTokens = Math::max(numTokens, actionPattern.getNumTokens(port));
-				}
-
-				inputPattern.setNumTokens(port, numTokens);
+				var numTokens = Math::max(inputPattern.getNumTokens(port), actionPattern.getNumTokens(port))
+				inputPattern.setNumTokens(port, numTokens)
 			}
 		}
 	}
@@ -882,15 +876,7 @@ class InstancePrinter extends CTemplate {
 					val actionPattern = (edge as Transition).getAction.getInputPattern()
 					
 					for (Port port : actionPattern.getPorts()) {
-						
-						var numTokens = pattern.getNumTokens(port)
-						
-						if (numTokens == null) {
-							numTokens = actionPattern.getNumTokens(port)
-						} else {
-							numTokens = Math::max(numTokens, actionPattern.getNumTokens(port))
-						}
-	
+						var numTokens = Math::max(pattern.getNumTokens(port), actionPattern.getNumTokens(port))
 						pattern.setNumTokens(port, numTokens)
 					}
 				}

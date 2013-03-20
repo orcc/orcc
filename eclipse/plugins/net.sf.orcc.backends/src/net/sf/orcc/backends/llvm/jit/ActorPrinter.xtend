@@ -344,7 +344,7 @@ class ActorPrinter extends InstancePrinter {
 
 	
 	def private varIndex_MD(Var variable)
-		'''i32 «IF variable.index != null»«variable.index»«ELSE»0«ENDIF»'''
+		'''i32 «variable.index»'''
 	
 	def private varAssignable_MD(Var variable) 
 		'''i1 «IF variable.assignable»1«ELSE»0«ENDIF»'''
