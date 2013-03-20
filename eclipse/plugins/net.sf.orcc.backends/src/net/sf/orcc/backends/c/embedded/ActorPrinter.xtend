@@ -99,8 +99,8 @@ class ActorPrinter extends InstancePrinter {
 		};
 	'''
 	
-	def private printInterface (Action action, String interface) '''
-		interface «interface» {
+	def private printInterface (Action action, String inter) '''
+		interface «inter» {
 			void «actor.simpleName»_«action.name» («action.printParameters»);
 		};
 	'''

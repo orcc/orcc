@@ -28,12 +28,11 @@
  */
 package net.sf.orcc.backends.opencl
 
-import net.sf.orcc.backends.opencl.BasePrinter
-import net.sf.orcc.df.Network
-import java.util.Map
-import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Map
 import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
 
 /*
  * The Nework Printer
@@ -41,7 +40,7 @@ import net.sf.orcc.df.Instance
  * @author Endri Bezati
  */
 class NetworkPrinter extends BasePrinter {
-	def printNetwork(Network network, Map options){ 
+	def printNetwork(Network network, Map<String, Object> options){ 
 		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		var date = new Date();
 		'''
@@ -74,7 +73,7 @@ class NetworkPrinter extends BasePrinter {
 		'''
 	}
 	
-	def printCmakeLists(Network network, Map options){
+	def printCmakeLists(Network network, Map<String, Object> options){
 		'''
 		# EPFL OpenCL Backend, CMakeLists.txt file
 		# Generated from "«network.file»"

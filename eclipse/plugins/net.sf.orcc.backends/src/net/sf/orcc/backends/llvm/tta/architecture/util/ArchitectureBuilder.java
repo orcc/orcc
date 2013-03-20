@@ -217,38 +217,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		return design;
 	}
 
-	/**
-	 * Connect two processors together.
-	 * 
-	 * @param source
-	 *            the processor source
-	 * @param target
-	 *            the processor target
-	 * @return the created ram
-	 */
-	private Memory connect(Processor source, Processor target) {
-		Memory ram;
-		if (source == target) {
-			// It's the same processor, then a new local RAM is created.
-			ram = factory.createMemory("lmem_" + bufferId);
-			FunctionUnit lsu = source.connect(ram);
-			ram.setSourcePort(lsu);
-			ram.setTargetPort(lsu);
-			source.getLocalRAMs().add(ram);
-		} else {
-			// Creation of a new shared memory connected to both processors.
-			ram = factory.createMemory("smem_" + bufferId);
-			FunctionUnit sourceLSU = source.connect(ram);
-			FunctionUnit targetLSU = target.connect(ram);
-			ram.setSource(source);
-			ram.setTarget(target);
-			ram.setSourcePort(sourceLSU);
-			ram.setTargetPort(targetLSU);
-			design.add(ram);
-		}
-		return ram;
-	}
-
 	private boolean isNative(Connection connection) {
 		net.sf.orcc.df.Port source = connection.getSourcePort();
 		net.sf.orcc.df.Port target = connection.getTargetPort();
@@ -285,8 +253,29 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		Memory ram;
 		if (reduceConnections && source.getNeighbors().contains(target)) {
 			ram = source.getMemorySharedWith(target);
+		} else if (source == target) {
+			// If both source and target are mapped to the same processor, then
+			// the connection will be mapped to a local RAM
+			if (reduceConnections && !source.getLocalRAMs().isEmpty()) {
+				// An existing local RAM
+				ram = source.getLocalRAMs().get(0);
+			} else {
+				// Or a newly created one
+				ram = factory.createMemory("lmem_" + bufferId);
+				source.connect(ram);
+				source.getLocalRAMs().add(ram);
+				ram.setAttribute("id", bufferId++);
+			}
 		} else {
-			ram = connect(source, target);
+			// Creation of a new shared memory connected to both processors.
+			ram = factory.createMemory("smem_" + bufferId);
+			FunctionUnit sourceLSU = source.connect(ram);
+			FunctionUnit targetLSU = target.connect(ram);
+			ram.setSource(source);
+			ram.setTarget(target);
+			ram.setSourcePort(sourceLSU);
+			ram.setTargetPort(targetLSU);
+			design.add(ram);
 			ram.setAttribute("id", bufferId++);
 		}
 

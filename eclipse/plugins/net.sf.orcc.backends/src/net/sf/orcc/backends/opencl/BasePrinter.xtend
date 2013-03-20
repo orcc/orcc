@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.opencl
 
-import net.sf.orcc.ir.util.IrSwitch
+import net.sf.orcc.ir.ExprBinary
 import net.sf.orcc.ir.ExprBool
 import net.sf.orcc.ir.ExprFloat
 import net.sf.orcc.ir.ExprInt
@@ -42,14 +42,15 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
-import net.sf.orcc.ir.ExprBinary
+import net.sf.orcc.ir.util.IrSwitch
+
 /*
  * An expression and type printer
  * 
  * @author Endri Bezati
  */
 
-abstract class BasePrinter extends IrSwitch {
+abstract class BasePrinter extends IrSwitch<CharSequence> {
 	
 	override caseExprBinary(ExprBinary expr) '''(«expr.getE1.doSwitch» «expr.op.text» «expr.getE2.doSwitch»)'''
 

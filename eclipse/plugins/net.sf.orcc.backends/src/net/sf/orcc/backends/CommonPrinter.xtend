@@ -33,8 +33,6 @@ import net.sf.orcc.ir.util.AbstractIrVisitor
 import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
 
-import static net.sf.orcc.backends.CommonPrinter.*
-
 /**
  * Define commons methods for all backends printers
  * 
