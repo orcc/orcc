@@ -155,8 +155,8 @@ class InstancePrinter extends CTemplate {
 	/**
 	 * Print file content from a given actor
 	 * 
-	 * @param targetFolder folder to print the instance file
-	 * @param instance the given instance
+	 * @param targetFolder folder to print the actor file
+	 * @param actor the given actor
 	 * @return 1 if file was cached, 0 if file was printed
 	 */
 	def print(String targetFolder, Actor actor) {
@@ -801,7 +801,7 @@ class InstancePrinter extends CTemplate {
 		val trgtPort = store.target.variable.port
 		'''
 		«IF trgtPort != null»
-			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable)?.native»
+			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
 				tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
@@ -859,14 +859,8 @@ class InstancePrinter extends CTemplate {
 		for (action : actor.actionsOutsideFsm) {
 			val actionPattern = action.inputPattern
 			for (port : actionPattern.ports) {
-				var numTokens = inputPattern.getNumTokens(port);
-				if (numTokens == null) {
-					numTokens = actionPattern.getNumTokens(port);
-				} else {
-					numTokens = Math::max(numTokens, actionPattern.getNumTokens(port));
-				}
-
-				inputPattern.setNumTokens(port, numTokens);
+				var numTokens = Math::max(inputPattern.getNumTokens(port), actionPattern.getNumTokens(port))
+				inputPattern.setNumTokens(port, numTokens)
 			}
 		}
 	}
@@ -882,15 +876,7 @@ class InstancePrinter extends CTemplate {
 					val actionPattern = (edge as Transition).getAction.getInputPattern()
 					
 					for (Port port : actionPattern.getPorts()) {
-						
-						var numTokens = pattern.getNumTokens(port)
-						
-						if (numTokens == null) {
-							numTokens = actionPattern.getNumTokens(port)
-						} else {
-							numTokens = Math::max(numTokens, actionPattern.getNumTokens(port))
-						}
-	
+						var numTokens = Math::max(pattern.getNumTokens(port), actionPattern.getNumTokens(port))
 						pattern.setNumTokens(port, numTokens)
 					}
 				}

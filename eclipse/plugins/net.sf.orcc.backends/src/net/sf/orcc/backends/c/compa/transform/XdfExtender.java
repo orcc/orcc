@@ -51,7 +51,7 @@ public class XdfExtender extends DfVisitor<Void> {
 				instance.setAttribute("actorMoC", instance.getActor().getMoC()
 						.getShortName());
 			} else {
-				instance.setAttribute("actorMoC", "unknown");
+				instance.setAttribute("actorMoC", "DPN");
 			}
 		}
 		return null;

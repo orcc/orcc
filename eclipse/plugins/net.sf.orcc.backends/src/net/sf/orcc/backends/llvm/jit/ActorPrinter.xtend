@@ -29,13 +29,13 @@
 package net.sf.orcc.backends.llvm.jit
 
 import java.io.File
-import net.sf.orcc.util.OrccUtil
 import java.util.ArrayList
 import java.util.List
 import java.util.Map
 import net.sf.orcc.backends.ir.InstCast
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.df.Action
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
@@ -53,9 +53,7 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
 import net.sf.orcc.moc.MoC
 import net.sf.orcc.moc.QSDFMoC
-
-import static net.sf.orcc.OrccLaunchConstants.*
-import net.sf.orcc.df.Actor
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate Jade content
@@ -344,7 +342,7 @@ class ActorPrinter extends InstancePrinter {
 
 	
 	def private varIndex_MD(Var variable)
-		'''i32 «IF variable.index != null»«variable.index»«ELSE»0«ENDIF»'''
+		'''i32 «variable.index»'''
 	
 	def private varAssignable_MD(Var variable) 
 		'''i1 «IF variable.assignable»1«ELSE»0«ENDIF»'''
@@ -398,7 +396,7 @@ class ActorPrinter extends InstancePrinter {
 		«ENDIF»
 	'''
 
-	def private varType_MD(Type type) {
+	def private CharSequence varType_MD(Type type) {
 		switch type {
 			case type.isInt: '''i32 «(type as TypeInt).size»'''
 			case type.isUint: '''i32 «(type as TypeUint).size»'''

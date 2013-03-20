@@ -34,8 +34,6 @@ import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /*
  * Compile Network LLVM source code 
  *  

@@ -126,7 +126,7 @@ class TceProcessorPrinter extends TTAPrinter {
 		</bus>
 		'''
 	
-	def private dispatch getAdfExpr(ExprBinary expr) 
+	def private dispatch CharSequence getAdfExpr(ExprBinary expr) 
 		'''
 		«IF(expr.and)»<and-expr>«ELSE»<or-expr>«ENDIF»
 			«expr.e1.adfExpr»
@@ -134,19 +134,19 @@ class TceProcessorPrinter extends TTAPrinter {
 		«IF(expr.and)»</and-expr>«ELSE»</or-expr>«ENDIF»
 		'''
 	
-	def private dispatch getAdfExpr(ExprUnary expr) 
+	def private dispatch CharSequence getAdfExpr(ExprUnary expr) 
 		'''
 		«IF(expr.simple)»<simple-expr>«ELSE»<inverted-expr>«ENDIF»
 			«expr.term.adfTerm»
 		«IF(expr.simple)»</simple-expr>«ELSE»</inverted-expr>«ENDIF»
 		'''
 	
-	def private dispatch getAdfExpr(ExprFalse object) 
+	def private dispatch CharSequence getAdfExpr(ExprFalse object) 
 		'''
 		<always-false/>
 		'''
 	
-	def private dispatch getAdfExpr(ExprTrue object) 
+	def private dispatch CharSequence getAdfExpr(ExprTrue object) 
 		'''
 		<always-true/>
 		'''

@@ -41,8 +41,6 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /*
  * A network printer.
  *  
@@ -159,9 +157,9 @@ class NetworkPrinter extends ExprAndTypePrinter {
 	'''
 	
 	def dispatch compileCommunicator(Receiver receiver, String name) {
-		val interface = interfaces.findFirst(intf | intf.equals(receiver.intf))
+		val inter = interfaces.findFirst(intf | intf.equals(receiver.intf))
 		'''
-		«IF interface == null»
+		«IF inter == null»
 			«receiver.intf.compileInterface»
 		«ENDIF»
 		Receiver<«receiver.output.type.doSwitch»> inst_«name»(&«receiver.intf.id»);
@@ -169,9 +167,9 @@ class NetworkPrinter extends ExprAndTypePrinter {
 	}
 	
 	def dispatch compileCommunicator(Sender sender, String name) {		
-		val interface = interfaces.findFirst(intf | intf.equals(sender.intf))
+		val inter = interfaces.findFirst(intf | intf.equals(sender.intf))
 		'''
-		«IF interface == null»
+		«IF inter == null»
 			«sender.intf.compileInterface»
 		«ENDIF»
 		Sender<«sender.input.type.doSwitch»> inst_«name»(&«sender.intf.id»);
