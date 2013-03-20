@@ -155,8 +155,8 @@ class InstancePrinter extends CTemplate {
 	/**
 	 * Print file content from a given actor
 	 * 
-	 * @param targetFolder folder to print the instance file
-	 * @param instance the given instance
+	 * @param targetFolder folder to print the actor file
+	 * @param actor the given actor
 	 * @return 1 if file was cached, 0 if file was printed
 	 */
 	def print(String targetFolder, Actor actor) {
