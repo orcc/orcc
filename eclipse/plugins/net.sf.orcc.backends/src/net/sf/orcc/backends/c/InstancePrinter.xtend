@@ -67,7 +67,7 @@ import static net.sf.orcc.backends.BackendsConstants.*
 /**
  * Generate and print instance source file for C backend.
  *  
- * @author Antoine Lorence
+ * @author Antoine Lorencetypeof
  * 
  */
 class InstancePrinter extends CTemplate {
@@ -328,7 +328,7 @@ class InstancePrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
 		«FOR proc : actor.procs»
-			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])»);
+			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]»);
 		«ENDFOR»
 		
 		«FOR proc : actor.procs.filter[!native]»
@@ -675,7 +675,7 @@ class InstancePrinter extends CTemplate {
 	
 	def protected print(Procedure proc) '''
 		«proc.printAttributes»
-		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])») {
+		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]») {
 			«FOR variable : proc.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -816,7 +816,7 @@ class InstancePrinter extends CTemplate {
 		«IF call.print»
 			printf(«call.arguments.printfArgs.join(", ")»);
 		«ELSE»
-			«IF call.target != null»«call.target.variable.indexedName» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ", [printCallArg])»);
+			«IF call.target != null»«call.target.variable.indexedName» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
 		«ENDIF»
 	'''
 	

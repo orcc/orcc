@@ -239,7 +239,7 @@ class ActorPrinter extends JavaTemplate {
 			int i = 0;
 			do {
 				res = false;
-				«actor.actions.join(" else ", [actionFireingTest])»
+				«actor.actions.join(" else ")[actionFireingTest]»
 				i += res ? 1 : 0;
 			} while(res);
 			return i;
@@ -259,7 +259,7 @@ class ActorPrinter extends JavaTemplate {
 			private boolean outside_FSM_scheduler() {
 				boolean res = false;
 				
-				«actor.actionsOutsideFsm.join(" else ", [actionFireingTest])»
+				«actor.actionsOutsideFsm.join(" else ")[actionFireingTest]»
 				return res;
 			}
 			
@@ -354,12 +354,7 @@ class ActorPrinter extends JavaTemplate {
 		if(action.inputPattern.ports.empty) {
 			return '''«action.scheduler.name»()'''
 		} else {
-			return action.inputPattern.ports.join(
-				"", // Before
-				" && ", // Separator
-				''' && «action.scheduler.name»()''', // After
-				[ '''fifo_«it.name».hasTokens(«action.inputPattern.numTokensMap.get(it)»)'''] // Function
-			)
+			return action.inputPattern.ports.join("", " && ", ''' && «action.scheduler.name»()''')[ '''fifo_«name».hasTokens(«action.inputPattern.numTokensMap.get(it)»)''']
 		}
 	}
 	
@@ -368,10 +363,7 @@ class ActorPrinter extends JavaTemplate {
 	 * Only one line printed.
 	 */
 	def outputSchedulingTest(Action action) {
-		action.outputPattern.ports.join(
-			" && ", // Separator
-			['''fifo_«it.name».hasRoom(«action.outputPattern.numTokensMap.get(it)»)''' ] // Function
-		)
+		action.outputPattern.ports.join(" && ")['''fifo_«name».hasRoom(«action.outputPattern.numTokensMap.get(it)»)''' ]
 	}
 	
 	/******************************************

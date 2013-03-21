@@ -99,12 +99,12 @@ class NetworkPrinter extends JavaTemplate {
 		public class «network.simpleName» implements IScheduler {
 			
 			// Declare actors objects
-			«FOR instance : network.children.filter(typeof(Instance)).filter([!broadcast])»
+			«FOR instance : network.children.filter(typeof(Instance)).filter[!broadcast]»
 				private IActor «instance.name»;
 			«ENDFOR»
 			
 			// Declare broadcast
-			«FOR instance : network.children.filter(typeof(Instance)).filter([broadcast])»
+			«FOR instance : network.children.filter(typeof(Instance)).filter[broadcast]»
 				private Broadcast<«instance.actor.getInput("input").type.doSwitch»> «instance.name»;
 			«ENDFOR»
 			
@@ -114,12 +114,12 @@ class NetworkPrinter extends JavaTemplate {
 			public void initialize() {
 				
 				// Instantiate actors
-				«FOR instance : network.children.filter(typeof(Instance)).filter([!broadcast])»
+				«FOR instance : network.children.filter(typeof(Instance)).filter[!broadcast]»
 					«instance.name» = new «instance.actor.name»(«printArguments(instance.actor.parameters, instance.arguments)»);
 				«ENDFOR»
 				
 				// Instantiate broadcast
-				«FOR instance : network.children.filter(typeof(Instance)).filter([broadcast])»
+				«FOR instance : network.children.filter(typeof(Instance)).filter[broadcast]»
 					«instance.name» = new Broadcast<«instance.actor.getInput("input").type.doSwitch»>(«instance.outgoing.size»);
 				«ENDFOR»
 				

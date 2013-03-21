@@ -570,7 +570,7 @@ class InstancePrinter extends LLVMTemplate {
 	'''	
 	
 	def protected print(Procedure procedure) '''
-		«val parameters = procedure.parameters.join(", ", [argumentDeclaration] )»
+		«val parameters = procedure.parameters.join(", ")[argumentDeclaration]»
 		«IF procedure.native || procedure.blocks.nullOrEmpty»
 			declare «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind
 		«ELSE»
@@ -823,7 +823,7 @@ class InstancePrinter extends LLVMTemplate {
 						store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«connection.addrSpace»* «varName(variable, store)»_«connection.getSafeId(port)»
 					«ENDFOR»
 				«ELSE»
-					«varName(variable, store)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«store.indexes.join(", ", ", ", "", [printIndex])»
+					«varName(variable, store)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«store.indexes.join(", ", ", ", "")[printIndex]»
 					store «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»* «varName(variable, store)»
 				«ENDIF»
 			«ELSE»
@@ -855,7 +855,7 @@ class InstancePrinter extends LLVMTemplate {
 					«printPortAccess(connection, port, variable, load.indexes, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSE»
-					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "", [printIndex])»
+					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "")[printIndex]»
 					«target» = load «innerType.doSwitch»* «varName(variable, load)»
 				«ENDIF»				
 			«ELSE»
@@ -869,7 +869,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
-			call i32 (i8*, ...)* @printf(«call.arguments.join(", ", [printParameter((it as ArgByVal).value.type)])»)
+			call i32 (i8*, ...)* @printf(«call.arguments.join(", ")[printParameter((it as ArgByVal).value.type)]»)
 		«ELSE»
 			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
 		«ENDIF»

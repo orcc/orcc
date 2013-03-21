@@ -58,7 +58,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * or when declaring it. If list is empty, return an empty string.
 	 */
 	def protected printArrayIndexes(List<Expression> exprList) {
-		exprList.join("", ['''[«doSwitch»]'''])
+		exprList.join("")['''[«doSwitch»]''']
 	}
 	
 	/**
@@ -229,7 +229,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	}
 	
 	override caseExprList(ExprList expr) {
-		'''{«expr.value.join(", ", [printExpr(Integer::MAX_VALUE, 0)])»}'''
+		'''{«expr.value.join(", ")[printExpr(Integer::MAX_VALUE, 0)]»}'''
 	}
 
 	override caseExprString(ExprString expr) {

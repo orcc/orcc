@@ -177,26 +177,26 @@ class ActorPrinter extends InstancePrinter {
 		!name = !{«actor.name.objectReference»}
 		!action_scheduler = !{«actor.objectReference»}
 		«IF ! actor.inputs.empty»
-			!inputs = !{«actor.inputs.join(", ", [objectReference])»}
+			!inputs = !{«actor.inputs.join(", ")[objectReference]»}
 		«ENDIF»
 		«IF ! actor.outputs.empty»
-			!outputs = !{«actor.outputs.join(", ", [objectReference])»}
+			!outputs = !{«actor.outputs.join(", ")[objectReference]»}
 		«ENDIF»
 		«IF ! actor.parameters.empty»
-			!parameters = !{«actor.parameters.join(", ", [objectReference])»}
+			!parameters = !{«actor.parameters.join(", ")[objectReference]»}
 		«ENDIF»
 		«IF ! actor.stateVars.empty»
-			!state_variables = !{«actor.stateVars.join(", ", [objectReference])»}
+			!state_variables = !{«actor.stateVars.join(", ")[objectReference]»}
 		«ENDIF»
 		
 		«IF ! actor.procs.empty»
-			!procedures = !{«actor.procs.join(", ", [objectReference])»}
+			!procedures = !{«actor.procs.join(", ")[objectReference]»}
 		«ENDIF»
 		«IF ! actor.initializes.empty»
-			!initializes = !{«actor.initializes.join(", ", [objectReference])»}
+			!initializes = !{«actor.initializes.join(", ")[objectReference]»}
 		«ENDIF»
 		«IF ! actor.actions.empty»
-			!actions = !{«actor.actions.join(", ", [objectReference])»}
+			!actions = !{«actor.actions.join(", ")[objectReference]»}
 		«ENDIF»
 		
 		«IF actor.moC != null»
@@ -249,7 +249,7 @@ class ActorPrinter extends InstancePrinter {
 			
 			; Functions and procedures
 			«FOR proc : actor.procs»
-				«proc.objectReference» = metadata !{«proc.name.name_MD», «proc.procNative_MD», «proc.returnType.doSwitch»(«proc.parameters.join(", ", [argumentTypeDeclaration]).wrap»)* @«proc.name»}
+				«proc.objectReference» = metadata !{«proc.name.name_MD», «proc.procNative_MD», «proc.returnType.doSwitch»(«proc.parameters.join(", ")[argumentTypeDeclaration].wrap»)* @«proc.name»}
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.initializes.empty»
@@ -271,12 +271,12 @@ class ActorPrinter extends InstancePrinter {
 		«ENDFOR»
 		; Variables of patterns
 		«FOR pattern : patternList.filter[portToVarMap != null]»
-			«pattern.portToVarMap.objectReference» = metadata !{«pattern.ports.join(", ", ['''metadata «objectReference»'''])»}
+			«pattern.portToVarMap.objectReference» = metadata !{«pattern.ports.join(", ")['''metadata «objectReference»''']»}
 		«ENDFOR»
 		
 		; Number of tokens of patterns
 		«FOR pattern : patternList.filter[numTokensMap != null]»
-			«pattern.numTokensMap.objectReference» = metadata !{«pattern.ports.join(", ", ['''metadata «objectReference», i32 «pattern.numTokensMap.get(it)»'''])»}
+			«pattern.numTokensMap.objectReference» = metadata !{«pattern.ports.join(", ")['''metadata «objectReference», i32 «pattern.numTokensMap.get(it)»''']»}
 		«ENDFOR»
 		«IF actor.hasMoC»
 			
@@ -288,7 +288,7 @@ class ActorPrinter extends InstancePrinter {
 	def private moC_MD() {
 		val value =
 			if (actor.moC.CSDF) ''' , metadata «actor.moC.objectReference»'''
-			else if (actor.moC.quasiStatic) ''' , «(actor.moC as QSDFMoC).actions.join(", ", ['''metadata «objectReference»'''])»'''
+			else if (actor.moC.quasiStatic) ''' , «(actor.moC as QSDFMoC).actions.join(", ")['''metadata «objectReference»''']»'''
 			else ""
 		'''
 			«actor.moC.objectReference» = metadata !{«actor.moC.MoCName_MD»«value»}
@@ -324,7 +324,7 @@ class ActorPrinter extends InstancePrinter {
 			;; «action.name»
 			«action.objectReference» = metadata !{«tag», «input», «output», «peek», metadata «action.scheduler.objectReference», metadata «action.body.objectReference»}
 			«IF ! action.tag.identifiers.empty»
-				«action.tag.objectReference» = metadata  !{«action.tag.identifiers.join(", ", [name_MD])»}
+				«action.tag.objectReference» = metadata  !{«action.tag.identifiers.join(", ")[name_MD]»}
 			«ENDIF»
 			«action.scheduler.objectReference» = metadata  !{«action.scheduler.name.name_MD», «action.scheduler.procNative_MD», i1()* @«action.scheduler.name»}
 			«action.body.objectReference» = metadata  !{«action.body.name.name_MD», «action.body.procNative_MD», void()* @«action.body.name»}
@@ -348,7 +348,7 @@ class ActorPrinter extends InstancePrinter {
 		'''i1 «IF variable.assignable»1«ELSE»0«ENDIF»'''
 	
 	def private varSize_MD(Type type)
-		'''«IF type.list»«(type as TypeList).dimensions.join(", ", ['''i32 «it»'''])»«ELSE»null«ENDIF»'''
+		'''«IF type.list»«(type as TypeList).dimensions.join(", ")['''i32 «it»''']»«ELSE»null«ENDIF»'''
 	
 	def private name_MD(String name)
 		'''metadata !"«name»"'''
@@ -361,7 +361,7 @@ class ActorPrinter extends InstancePrinter {
 			«IF ! actor.actionsOutsideFsm.empty»
 				
 				;; Actions outside FSM
-				«actor.actionsOutsideFsm.objectReference» = metadata !{«actor.actionsOutsideFsm.join(", ", ['''metadata «objectReference»'''])»}
+				«actor.actionsOutsideFsm.objectReference» = metadata !{«actor.actionsOutsideFsm.join(", ")['''metadata «objectReference»''']»}
 			«ENDIF»
 			«IF actor.fsm != null»
 				
@@ -375,9 +375,9 @@ class ActorPrinter extends InstancePrinter {
 	def private FSM_MD() '''
 		«actor.fsm.objectReference» = metadata !{«actor.fsm.initialState.name.name_MD», metadata «actor.fsm.states.objectReference», metadata «actor.name.concat("_transitions").objectReference»}
 		;;; States
-		«actor.fsm.states.objectReference» = metadata !{«actor.fsm.states.join(", ", [it.name.name_MD])»}
+		«actor.fsm.states.objectReference» = metadata !{«actor.fsm.states.join(", ")[it.name.name_MD]»}
 		;;; All transitions
-		«actor.name.concat("_transitions").objectReference» = metadata !{«actor.fsm.states.join(", ", ['''metadata «objectReference»'''])»}
+		«actor.name.concat("_transitions").objectReference» = metadata !{«actor.fsm.states.join(", ")['''metadata «objectReference»''']»}
 		«FOR state : actor.fsm.states»
 			«state.transition_MD»
 		«ENDFOR»
@@ -389,7 +389,7 @@ class ActorPrinter extends InstancePrinter {
 			«state.objectReference» = metadata !{«state.name.name_MD», null}
 		«ELSE»
 			«state.objectReference» = metadata !{«state.name.name_MD», metadata «state.outgoing.objectReference»}
-			«state.outgoing.objectReference» = metadata !{«state.outgoing.join(", ", ['''metadata «(it as Transition).objectReference»'''])»}
+			«state.outgoing.objectReference» = metadata !{«state.outgoing.join(", ")['''metadata «(it as Transition).objectReference»''']»}
 			«FOR transition : state.outgoing»
 				«(transition as Transition).objectReference» = metadata !{metadata «(transition as Transition).action.objectReference», «(transition as Transition).target.name.name_MD»}
 			«ENDFOR»
@@ -409,7 +409,7 @@ class ActorPrinter extends InstancePrinter {
 	
 	override caseInstLoad(InstLoad load) '''
 		«IF load.source.variable.type.list»
-			«load.source.variable.varName(load)» = getelementptr «load.source.variable.type.doSwitch»* «load.source.variable.print», i32 0«load.indexes.join(", ", ", ", "", [printIndex])»
+			«load.source.variable.varName(load)» = getelementptr «load.source.variable.type.doSwitch»* «load.source.variable.print», i32 0«load.indexes.join(", ", ", ", "")[printIndex]»
 			«load.target.variable.print» = load «(load.source.variable.type as TypeList).innermostType.doSwitch»* «load.source.variable.varName(load)»
 		«ELSE»
 			«load.target.variable.print» = load «load.source.variable.type.doSwitch»* «load.source.variable.print»
@@ -418,7 +418,7 @@ class ActorPrinter extends InstancePrinter {
 	
 	override caseInstStore(InstStore store) '''
 		«IF store.target.variable.type.list»
-			«store.target.variable.varName(store)» = getelementptr «store.target.variable.type.doSwitch»* «store.target.variable.print», i32 0«store.indexes.join(", ", ", ", "", [printIndex])»
+			«store.target.variable.varName(store)» = getelementptr «store.target.variable.type.doSwitch»* «store.target.variable.print», i32 0«store.indexes.join(", ", ", ", "")[printIndex]»
 			store «(store.target.variable.type as TypeList).innermostType.doSwitch» «store.value.doSwitch», «(store.target.variable.type as TypeList).innermostType.doSwitch»* «store.target.variable.varName(store)»
 		«ELSE»
 			store «store.target.variable.type.doSwitch» «store.value.doSwitch», «store.target.variable.type.doSwitch»* «store.target.variable.print»
@@ -433,7 +433,7 @@ class ActorPrinter extends InstancePrinter {
 	}
 	
 	override protected print(Action action) '''
-		define «action.scheduler.returnType.doSwitch» @«action.scheduler.name»(«action.scheduler.parameters.join(", ", [argumentDeclaration])») nounwind {
+		define «action.scheduler.returnType.doSwitch» @«action.scheduler.name»(«action.scheduler.parameters.join(", ")[argumentDeclaration]») nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
 				«local.declare»
@@ -448,7 +448,7 @@ class ActorPrinter extends InstancePrinter {
 		«ENDFOR»
 		}
 		
-		define void @«action.body.name»(«action.body.parameters.join(", ", [argumentDeclaration])») nounwind {
+		define void @«action.body.name»(«action.body.parameters.join(", ")[argumentDeclaration]») nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
