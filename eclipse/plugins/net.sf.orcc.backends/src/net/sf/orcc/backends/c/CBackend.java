@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.c;
 
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
-import static net.sf.orcc.backends.OrccBackendsConstants.ADDITIONAL_TRANSFOS;
-import static net.sf.orcc.backends.OrccBackendsConstants.GENETIC_ALGORITHM;
+import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
+import static net.sf.orcc.backends.BackendsConstants.GENETIC_ALGORITHM;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.XcfPrinter;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -129,7 +129,6 @@ public class CBackend extends AbstractBackend {
 		}
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 
@@ -180,11 +179,11 @@ public class CBackend extends AbstractBackend {
 	}
 
 	protected void doTransformNetwork(Network network) {
-		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
 		new Instantiator(true, fifoSize).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
+		new UnitImporter().doSwitch(network);
 
 		if (classify) {
 			OrccLogger.traceln("Classification of actors...");
@@ -241,7 +240,7 @@ public class CBackend extends AbstractBackend {
 					mapping);
 		}
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
-			new XcfPrinter().print(srcPath, network, mapping);
+			new Mapping().print(srcPath, network, mapping);
 		}
 	}
 
@@ -279,7 +278,7 @@ public class CBackend extends AbstractBackend {
 	protected boolean printInstance(Instance instance) {
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}
-	
+
 	@Override
 	protected boolean printActor(Actor actor) {
 		return new InstancePrinter(options).print(srcPath, actor) > 0;

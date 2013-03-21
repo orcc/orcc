@@ -34,8 +34,6 @@ import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /*
  * Compile Network LLVM source code 
  *  
@@ -50,8 +48,6 @@ class NetworkPrinter extends LLVMTemplate {
 	new(Network network, Map<String, Object> options){
 		super()
 		this.network = network
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 		
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String

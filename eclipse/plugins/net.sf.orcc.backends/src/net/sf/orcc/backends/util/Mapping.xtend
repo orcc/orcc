@@ -47,24 +47,35 @@ import net.sf.orcc.util.OrccUtil
  * @author Antoine Lorence
  * 
  */
-class XcfPrinter extends CommonPrinter {
+class Mapping extends CommonPrinter {
 	
+	var Map<Vertex, String> invMapping
 	var Map<String, List<Vertex>> mapping
 	var List<Vertex> unmapped
 	var int i
+	var force = false
+	
+	new() {
+		this.force = false
+	}
+	
+	new(boolean force) {
+		this.force = force
+	}
 	
 	def print(String targetFolder, Network network, Map<String, String> initialMapping) {
 		val xcfFile = new File(targetFolder + File::separator + network.simpleName + ".xcf")
 		
-		network.computeMapping(initialMapping)
+		network.compute(initialMapping)
 		OrccUtil::printFile(network.contentFile, xcfFile)
 	}
 	
-	def private void computeMapping(Network network, Map<String, String> initialMapping) {	
+	def void compute(Network network, Map<String, String> initialMapping) {	
 		mapping = new HashMap<String, List<Vertex>>
+		invMapping = new HashMap<Vertex, String>
 		unmapped = new ArrayList<Vertex>
 		i = 0
-		if(!initialMapping.values.forall[nullOrEmpty]) {
+		if(!initialMapping.values.forall[nullOrEmpty] || force) {
 			for (instance : network.children.actorInstances) {
 				instance.tryToMap(initialMapping.get(instance.hierarchicalName))
 			}
@@ -76,13 +87,10 @@ class XcfPrinter extends CommonPrinter {
 	
 	def private tryToMap(Vertex vertex, String component) {	
 		if (!component.nullOrEmpty) {
-			if (!mapping.containsKey(component)) {
-				mapping.put(component, new ArrayList<Vertex>);
-			}
-			mapping.get(component).add(vertex);
+			map(component, vertex)
 		} else {
 			OrccLogger::warnln("The instance '" + vertex.label
-						+ "' is not mapped.");
+						+ "' is not mapped.")
 			unmapped.add(vertex)
 		}
 	}
@@ -118,5 +126,29 @@ class XcfPrinter extends CommonPrinter {
 	def private otherStuff() '''
 		<!-- Other useful informations related to any element of the instanciated model can be printed here -->
 	'''
+	
+	def getComponents() {
+		mapping.keySet
+	}
+	
+	def getComponent(Vertex v) {
+		invMapping.get(v)
+	}
+	
+	def getMapping() {
+		mapping
+	}
+	
+	def getUnmapped() {
+		unmapped
+	}
+	
+	def map(String component, Vertex v) {
+		if (!mapping.containsKey(component)) {
+			mapping.put(component, new ArrayList<Vertex>)
+		}
+		mapping.get(component).add(v)
+		invMapping.put(v, component)
+	}
 	
 }

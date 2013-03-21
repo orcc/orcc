@@ -84,6 +84,7 @@ public class OrccUiConsoleHandler extends Handler {
 
 			try {
 				outStream.write(message);
+				outStream.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

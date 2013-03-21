@@ -107,14 +107,10 @@ import net.sf.orcc.util.OrccUtil
 	 -- Input and Output files
 	signal tb_FSM_bits  : tb_type;
 	«FOR connection : instance.outgoingPortMap.values»
-		«IF !(connection.head.source instanceof Port) && (connection.head.target instanceof Port)»
-				file sim_file_«instance.name»_«connection.head.sourcePort.name»  : text is "«instance.name»_«connection.head.sourcePort.name».txt";
-		«ENDIF»
+		file sim_file_«instance.name»_«connection.head.sourcePort.name»  : text is "«instance.name»_«connection.head.sourcePort.name».txt";
 	«ENDFOR»
 	«FOR connection : instance.incomingPortMap.values»
-		«IF (connection.source instanceof Port) && !(connection.target instanceof Port)»
-				file sim_file_«instance.name»_«connection.targetPort.name»  : text is "«instance.name»_«connection.targetPort.name».txt";
-		«ENDIF»
+		file sim_file_«instance.name»_«connection.targetPort.name»  : text is "«instance.name»_«connection.targetPort.name».txt";
 	«ENDFOR»
 	begin
 

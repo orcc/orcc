@@ -28,11 +28,13 @@
  */
 package net.sf.orcc.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -638,5 +640,28 @@ public class OrccUtil {
 		}
 
 		return builder.toString();
+	}
+
+	/**
+	 * Run an external programs with the given commands list
+	 * 
+	 * @param cmdList
+	 *            the list of command containing the program and its arguments
+	 */
+	public static void runExternalProgram(List<String> cmdList) {
+		try {
+			ProcessBuilder builder = new ProcessBuilder(cmdList);
+			Process process = builder.start();
+			process.waitFor();
+	
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					process.getInputStream()));
+			String line = new String();
+			while ((line = reader.readLine()) != null) {
+				OrccLogger.traceln(line);
+			}
+		} catch (Exception e) {
+			OrccLogger.severeln(e.getMessage());
+		}
 	}
 }

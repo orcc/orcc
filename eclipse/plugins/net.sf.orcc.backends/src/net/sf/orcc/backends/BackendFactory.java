@@ -83,7 +83,10 @@ public class BackendFactory extends PluginFactory {
 	 * @param configuration
 	 *            launch configuration
 	 * @throws Exception
+	 * @deprecated will be removed in a future version. Please consider using
+	 *             {@link #getBackend} instead
 	 */
+	@Deprecated
 	public void runBackend(IProgressMonitor monitor, Map<String, Object> options)
 			throws Exception {
 		String backendName = (String) options.get(BACKEND);
@@ -97,4 +100,16 @@ public class BackendFactory extends PluginFactory {
 		backend.compile();
 	}
 
+	/**
+	 * Return the backend instance corresponding to <code>name</code>. Please
+	 * note that backend returned is not configured with an options map.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public Backend getBackend(String name) {
+
+		Backend backend = (Backend) plugins.get(name);
+		return backend;
+	}
 }

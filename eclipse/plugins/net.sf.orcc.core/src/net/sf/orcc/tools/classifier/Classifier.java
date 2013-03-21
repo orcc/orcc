@@ -169,7 +169,6 @@ public class Classifier extends DfVisitor<Void> {
 			OrccLogger.traceln("Actor " + actor.getName()
 					+ " does not contain any actions, defaults to dynamic");
 			moc = MocFactory.eINSTANCE.createKPNMoC();
-			return;
 		} else if (isTimeDependent()) {
 			// checks for actors with time-dependent behavior
 			moc = MocFactory.eINSTANCE.createDPNMoC();

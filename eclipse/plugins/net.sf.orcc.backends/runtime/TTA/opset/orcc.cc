@@ -86,11 +86,19 @@ END_OPERATION_WITH_STATE(SOURCE_READBYTE)
 OPERATION_WITH_STATE(SOURCE_SIZEOFFILE, ORCC_FU)
 
 TRIGGER
-    OUTPUT_STREAM << "source_sizeoffile()\n";
     struct stat st; 
     int size;
+    if (STATE.file == NULL) {
+        OUTPUT_STREAM << "The input file is not initialized.\n";
+        exit(1);
+    }
     fstat(fileno(STATE.file), &st); 
     size = st.st_size;
+    if (size == -1) {
+        OUTPUT_STREAM << "Problem when reading input file.\n";
+        exit(1);
+    }
+    OUTPUT_STREAM << "File size = " << size << "\n";
     IO(2) = static_cast<UIntWord>(size); 
 END_TRIGGER;
 

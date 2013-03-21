@@ -33,15 +33,11 @@ import net.sf.orcc.ir.util.AbstractIrVisitor
 import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
 
-import static net.sf.orcc.backends.CommonPrinter.*
-
 /**
  * Define commons methods for all backends printers
  * 
  */
 abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
-	
-	protected var overwriteAllFiles = false
 	
 	protected var precedence = Integer::MAX_VALUE
 	protected var branch = 0
@@ -139,7 +135,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * @param content
 	 */
 	def protected needToWriteFile(CharSequence content, File target) {
-		return overwriteAllFiles || ! target.exists()
+		return ! target.exists()
 				|| ! MessageDigest::isEqual(hash(target), hash(content.toString.bytes));
 	}
 	

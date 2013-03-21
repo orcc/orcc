@@ -26,7 +26,6 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
 package net.sf.orcc.tools.merger.actor;
 
 import java.util.HashMap;
@@ -35,9 +34,10 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.util.Rational;
 
@@ -54,7 +54,6 @@ public class RepetitionsAnalyzer {
 	private Network network;
 
 	private Map<Actor, Rational> rationals = new HashMap<Actor, Rational>();
-
 	private Map<Actor, Integer> repetitions = new HashMap<Actor, Integer>();
 
 	public RepetitionsAnalyzer(Network network) {
@@ -105,27 +104,23 @@ public class RepetitionsAnalyzer {
 
 		for (Edge edge : actor.getOutgoing()) {
 			Connection conn = (Connection) edge;
-			Actor tgt = conn.getTarget().getAdapter(Actor.class);
-			if (tgt != null) {
+			Actor tgt = edge.getTarget().getAdapter(Actor.class);
+			if (tgt != null && !rationals.containsKey(tgt)) {
 				CSDFMoC tgtMoC = (CSDFMoC) tgt.getMoC();
-				if (!rationals.containsKey(tgt)) {
-					int prd = moc.getNumTokensProduced(conn.getSourcePort());
-					int cns = tgtMoC.getNumTokensConsumed(conn.getTargetPort());
-					calculateRate(tgt, rate.mul(new Rational(prd, cns)));
-				}
+				int prd = moc.getNumTokensProduced(conn.getSourcePort());
+				int cns = tgtMoC.getNumTokensConsumed(conn.getTargetPort());
+				calculateRate(tgt, rate.mul(new Rational(prd, cns)));
 			}
 		}
 
 		for (Edge edge : actor.getIncoming()) {
 			Connection conn = (Connection) edge;
 			Actor src = conn.getSource().getAdapter(Actor.class);
-			if (src != null) {
+			if (src != null && !rationals.containsKey(src)) {
 				CSDFMoC srcMoC = (CSDFMoC) src.getMoC();
-				if (!rationals.containsKey(src)) {
-					int prd = srcMoC.getNumTokensProduced(conn.getSourcePort());
-					int cns = moc.getNumTokensConsumed(conn.getTargetPort());
-					calculateRate(src, rate.mul(new Rational(cns, prd)));
-				}
+				int prd = srcMoC.getNumTokensProduced(conn.getSourcePort());
+				int cns = moc.getNumTokensConsumed(conn.getTargetPort());
+				calculateRate(src, rate.mul(new Rational(cns, prd)));
 			}
 		}
 	}
@@ -136,25 +131,24 @@ public class RepetitionsAnalyzer {
 	 */
 	private void checkConsistency() {
 		for (Connection connection : network.getConnections()) {
-			if (connection.getSource() instanceof Instance
-					&& connection.getTarget() instanceof Instance) {
-				int srcRate = repetitions.get(connection.getSource());
-				int tgtRate = repetitions.get(connection.getTarget());
+			Vertex src = connection.getSource();
+			Vertex tgt = connection.getTarget();
+			
+			if(src instanceof Port || tgt instanceof Port) {
+				return;
+			}
+			
+			CSDFMoC srcMoc = (CSDFMoC) src.getAdapter(Actor.class).getMoC();
+			CSDFMoC tgtMoc = (CSDFMoC) tgt.getAdapter(Actor.class).getMoC();
 
-				CSDFMoC srcMoc = (CSDFMoC) ((Instance) connection.getSource())
-						.getMoC();
-				CSDFMoC tgtMoc = (CSDFMoC) ((Instance) connection.getTarget())
-						.getMoC();
+			int srcRate = repetitions.get(src);
+			int tgtRate = repetitions.get(tgt);
+			int prd = srcMoc.getNumTokensProduced(connection.getSourcePort());
+			int cns = tgtMoc.getNumTokensConsumed(connection.getTargetPort());
 
-				int prd = srcMoc.getNumTokensProduced(connection
-						.getSourcePort());
-				int cns = tgtMoc.getNumTokensConsumed(connection
-						.getTargetPort());
-
-				if (srcRate * prd != tgtRate * cns) {
-					throw new OrccRuntimeException(
-							"the given network is inconsistent!");
-				}
+			if (srcRate * prd != tgtRate * cns) {
+				throw new OrccRuntimeException(
+						"the given network is inconsistent!");
 			}
 		}
 	}

@@ -94,7 +94,7 @@ public interface Actor extends Vertex, Adaptable {
 	 * @generated
 	 */
 	EList<Action> getActionsOutsideFsm();
-	
+
 	Map<Port, Connection> getIncomingPortMap();
 
 	Map<Port, List<Connection>> getOutgoingPortMap();
@@ -308,6 +308,15 @@ public interface Actor extends Vertex, Adaptable {
 	 * @generated
 	 */
 	EList<Var> getStateVars();
+	
+	/**
+	 * Add the given variable to {@link #actor}'s state variables and make its name
+	 * unique.
+	 * 
+	 * @param variable
+	 *            the variable to add
+	 */
+	void addStateVar(Var variable);
 
 	/**
 	 * Returns true if this actor has an FSM.

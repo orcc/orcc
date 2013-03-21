@@ -39,7 +39,7 @@ import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.compa.transform.XdfExtender;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.XcfPrinter;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -189,7 +189,7 @@ public class COMPABackend extends CBackend {
 		}
 
 		OrccLogger.traceln("Print network meta-informations...");
-		new XcfPrinter().print(srcPath, network, mapping);
+		new Mapping().print(srcPath, network, mapping);
 	}
 
 	@Override

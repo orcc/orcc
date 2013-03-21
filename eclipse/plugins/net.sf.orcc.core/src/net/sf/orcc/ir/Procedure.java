@@ -96,6 +96,15 @@ public interface Procedure extends Attributable {
 	EList<Var> getLocals();
 
 	/**
+	 * Add the given variable to {@link #procedure}'s locals and make its name
+	 * unique.
+	 * 
+	 * @param variable
+	 *            the variable to add
+	 */
+	void addLocal(Var variable);
+
+	/**
 	 * Returns the name of this procedure.
 	 * 
 	 * @return the name of this procedure

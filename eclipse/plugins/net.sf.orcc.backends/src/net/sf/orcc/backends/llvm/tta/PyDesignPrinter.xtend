@@ -97,7 +97,7 @@ class PyDesignPrinter extends TTAPrinter {
 		'''
 		«processor.name»_inputs = [«FOR edge: processor.incoming SEPARATOR ', '»«(edge as Link).targetPort.getPython(0)»«ENDFOR»]
 		«processor.name»_outputs = [«FOR edge: processor.outgoing SEPARATOR ', '»«(edge as Link).sourcePort.getPython(0)»«ENDFOR»]
-		«processor.name»_instances = [«FOR instance: processor.mappedActors SEPARATOR ', '»"«instance.name»"«ENDFOR»]
+		«processor.name»_instances = [«FOR actor: processor.mappedActors SEPARATOR ', '»"«actor.label»"«ENDFOR»]
 		'''
 		
 	def private usePrint(Processor processor) {

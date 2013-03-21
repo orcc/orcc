@@ -663,7 +663,9 @@ public class XdfParser {
 
 			Port port = null;
 			EObject eObject = instance.getEntity();
-			if (eObject.eIsProxy()) {
+			if (eObject == null) {
+				return null;
+			} else if (eObject.eIsProxy()) {
 				// if entity is a proxy, create URI of port
 				URI uri = EcoreUtil.getURI(eObject);
 				uri = uri.appendFragment("//@" + dir + "." + portName);
@@ -934,9 +936,6 @@ public class XdfParser {
 			// resolve the file that defines the given class
 			resolveEntity(instance, clasz);
 		}
-
-
-
 
 		// instance parameters and attributes
 		parseParameters(instance, child);

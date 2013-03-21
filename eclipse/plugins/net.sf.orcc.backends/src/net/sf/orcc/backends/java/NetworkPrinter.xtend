@@ -34,8 +34,6 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /*
  * Compile Top_network Java source code 
  *  
@@ -49,8 +47,6 @@ class NetworkPrinter extends JavaTemplate {
 	new(Network network, Map<String, Object> options){
 		super()
 		this.network = network
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 			

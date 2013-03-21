@@ -55,8 +55,6 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.OrccUtil
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /*
  * An actor printer.
  *  
@@ -68,8 +66,6 @@ import static net.sf.orcc.OrccLaunchConstants.*
 	
 	new (Instance instance, Map<String, Object> options) {
 		this.instance = instance
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	def print(String targetFolder) {

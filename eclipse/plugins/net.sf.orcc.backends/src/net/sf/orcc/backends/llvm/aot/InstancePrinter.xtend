@@ -71,7 +71,7 @@ import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
-import static net.sf.orcc.OrccLaunchConstants.*
+import static net.sf.orcc.backends.BackendsConstants.*
 
 /*
  * Compile Instance llvm source code
@@ -98,14 +98,12 @@ class InstancePrinter extends LLVMTemplate {
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {		
-		if(options.containsKey("net.sf.orcc.backends.profile")){
-			optionProfile = options.get("net.sf.orcc.backends.profile") as Boolean
+		if(options.containsKey(PROFILE)){
+			optionProfile = options.get(PROFILE) as Boolean
 		}
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
 		}
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	/**

@@ -33,7 +33,7 @@ package net.sf.orcc.backends.llvm.tta.architecture;
 import java.util.Map;
 
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
+import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -212,7 +212,7 @@ public interface Processor extends Component {
 	 * @model
 	 * @generated
 	 */
-	EList<Instance> getMappedActors();
+	EList<Vertex> getMappedActors();
 
 	/**
 	 * Returns the reference of the Memory where is mapped the given connection.

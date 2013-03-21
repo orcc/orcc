@@ -34,8 +34,6 @@ import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /**
  * Generate CMakeList.txt content
  * 
@@ -47,8 +45,6 @@ class CMakePrinter extends CommonPrinter {
 
 	new(Network network, Map<String, Object> options) {
 		this.network = network;
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	def printFiles(String targetFolder) {

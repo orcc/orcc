@@ -28,7 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.util;
 
-import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.InstCall;
 
 import org.eclipse.emf.common.util.EList;
@@ -46,10 +47,11 @@ public class ArchitectureUtil {
 	 * @return true if at least one actor of the given list is using the 'print'
 	 *         function
 	 */
-	public static boolean needToPrint(EList<Instance> actors) {
-		for (Instance instance : actors) {
-			if (instance.getActor().getProcedure("lwpr_print_int") != null
-					|| instance.getActor().getProcedure("lwpr_print_str") != null) {
+	public static boolean needToPrint(EList<Vertex> actors) {
+		for (Vertex v : actors) {
+			Actor actor = v.getAdapter(Actor.class);
+			if (actor.getProcedure("lwpr_print_int") != null
+					|| actor.getProcedure("lwpr_print_str") != null) {
 				return true;
 			}
 		}
@@ -65,10 +67,10 @@ public class ArchitectureUtil {
 	 * @return true if at least one actor of the given list is using a native
 	 *         function which are only usable in simulation
 	 */
-	public static boolean needOrccFu(EList<Instance> actors) {
-		for (Instance instance : actors) {
+	public static boolean needOrccFu(EList<Vertex> actors) {
+		for (Vertex v : actors) {
 			TreeIterator<Object> it = EcoreUtil.getAllContents(
-					instance.getActor(), true);
+					v.getAdapter(Actor.class), true);
 			while (it.hasNext()) {
 				Object object = it.next();
 				if (object instanceof InstCall) {

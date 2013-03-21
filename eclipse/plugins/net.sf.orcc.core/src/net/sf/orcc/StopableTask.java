@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, IETR/INSA of Rennes
+ * Copyright (c) 2013, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,25 +26,19 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends;
+package net.sf.orcc;
 
 /**
+ * This interface simply add a stop() method to java.lang.Runnable.
+ * 
  * @author Antoine Lorence
  * 
  */
-public class OrccBackendsConstants {
+public interface StopableTask extends Runnable {
 
-	public static final String GENETIC_ALGORITHM = "net.sf.orcc.backends.geneticAlgorithm";
-	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
-	public static final String NEW_SCHEDULER_TOPOLOGY = "net.sf.orcc.backends.newScheduler.topology";
-
-	public static enum Topology {
-		Ring, Mesh
-	}
-
-	public static final String THREADS_NB = "net.sf.orcc.backends.processorsNumber";
-
-	public static final String CONVERT_MULTI2MONO = "net.sf.orcc.backends.multi2mono";
-	public static final String ADDITIONAL_TRANSFOS = "net.sf.orcc.backends.add_transfos";
+	/**
+	 * Correctly stop this Runnable instance
+	 */
+	public void stop();
 
 }

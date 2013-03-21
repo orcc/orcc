@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.util.XcfPrinter;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Entity;
@@ -169,7 +169,7 @@ public class YaceBackend extends AbstractBackend {
 	 */
 	public void printNetwork(Network network) {
 
-		new XcfPrinter().print(path, network, mapping);
+		new Mapping().print(path, network, mapping);
 		NetworkPrinter printer = new NetworkPrinter(network, options);
 
 		printer.printNetwork(path);

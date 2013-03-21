@@ -49,8 +49,6 @@ import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /*
  * Compile Top_network Java source code 
  *  
@@ -63,8 +61,6 @@ class ActorPrinter extends JavaTemplate {
 	
 	new(Actor actor, Map<String, Object> options){
 		this.actor = actor
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 		

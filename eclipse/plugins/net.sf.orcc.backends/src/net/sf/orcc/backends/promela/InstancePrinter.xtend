@@ -49,8 +49,6 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.ecore.EObject
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /*
  * Compile Instance promela
  *  
@@ -72,8 +70,6 @@ class InstancePrinter extends PromelaTemplate {
 		loadPeeks = options.get("loadPeeks") as Map<Action, List<InstLoad>>
 		guards = options.get("guards") as Map<Action, List<Expression>>
 		priority = options.get("priority") as Map<EObject, List<Action>>
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	/**

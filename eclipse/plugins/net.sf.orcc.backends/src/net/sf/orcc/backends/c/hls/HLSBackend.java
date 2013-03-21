@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
+import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.df.Actor;
@@ -121,9 +122,7 @@ public class HLSBackend extends CBackend {
 		transformations.add(new TypeResizer(true, true, true, false));
 
 		transformations.add(new RenameTransformation(replacementMap));
-		// transformations.add(new DisconnectedOutputPortRemoval());
 		transformations.add(new Multi2MonoToken());
-		// transformations.add(new DivisionSubstitution());
 		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 
 		for (DfSwitch<?> transformation : transformations) {
@@ -157,6 +156,7 @@ public class HLSBackend extends CBackend {
 
 		new BroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
+		new DisconnectedOutputPortRemoval().doSwitch(network);
 	}
 
 	@Override

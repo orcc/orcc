@@ -28,6 +28,9 @@
          <option
                id="net.sf.orcc.tracing.enable">
          </option>
+         <option
+               id="net.sf.orcc.backends.profile">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.compa.COMPABackend"
@@ -96,6 +99,9 @@
          </option>
          <option
                id="net.sf.orcc.backends.llvm.aot.targetTriple">
+         </option>
+         <option
+               id="net.sf.orcc.core.classify">
          </option>
          <option
                id="net.sf.orcc.dontExportLibrary">

@@ -49,7 +49,6 @@ import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Metis;
@@ -122,7 +121,7 @@ public class TTABackend extends LLVMBackend {
 
 		visitors.add(new ComplexHwOpDetector());
 		visitors.add(new UnitImporter());
-		visitors.add(new Instantiator(false, fifoSize));
+		visitors.add(new Instantiator(true, fifoSize));
 		visitors.add(new NetworkFlattener());
 
 		if (classify) {
@@ -181,8 +180,8 @@ public class TTABackend extends LLVMBackend {
 		}
 
 		// Compute the actor mapping
-		computedMapping = new Mapping(network, mapping, reduceConnections,
-				false);
+		computedMapping = new Mapping(true);
+		computedMapping.compute(network, mapping);
 
 		// Build the design from the mapping
 		design = new ArchitectureBuilder().build(network, configuration,
@@ -300,6 +299,12 @@ public class TTABackend extends LLVMBackend {
 				instance)).print(actorsPath, instance) > 0;
 	}
 
+	@Override
+	protected boolean printActor(Actor actor) {
+		return new SwActorPrinter(options, design.getActorToProcessorMap().get(
+				actor)).print(actorsPath, actor) > 0;
+	}
+
 	/**
 	 * Runs the python script to compile the application and generate the whole
 	 * design using the TCE toolset. (FIXME: Rewrite this awful method)
@@ -315,7 +320,7 @@ public class TTABackend extends LLVMBackend {
 
 		OrccLogger.traceln("Generating design...");
 		long t0 = System.currentTimeMillis();
-		BackendUtil.runExternalProgram(cmdList);
+		OrccUtil.runExternalProgram(cmdList);
 		long t1 = System.currentTimeMillis();
 		OrccLogger.traceln("Done in " + (t1 - t0) / 1000.0 + "s");
 	}

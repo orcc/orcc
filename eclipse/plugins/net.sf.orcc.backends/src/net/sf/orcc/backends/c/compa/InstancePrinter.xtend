@@ -105,6 +105,27 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 	
+	override initializeFunction() '''
+		«FOR init : actor.initializes»
+			«init.print»
+		«ENDFOR»
+		
+		void «name»_initialize() {
+			int i = 0;
+			«IF actor.hasFsm»
+				/* Set initial state to current FSM state */
+				_FSM_state = my_state_«actor.fsm.initialState.name»;
+			«ENDIF»
+			«IF !actor.initializes.nullOrEmpty»
+				«actor.initializes.printActions»
+			«ENDIF»
+			
+		finished:
+			// no read_end/write_end here!
+			return;
+		}
+	'''
+	
 	override protected printFsm() '''
 		«IF ! instance.actor.actionsOutsideFsm.empty»
 			void «instance.name»_outside_FSM_scheduler() {
