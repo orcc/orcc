@@ -103,9 +103,9 @@ import static net.sf.orcc.OrccLaunchConstants.*
 		class «instance.name»: public Actor
 		{
 		public:	
-			«instance.name»()
+			«instance.name»(«FOR arg : instance.arguments SEPARATOR ", "»«arg.variable.type.doSwitch» «arg.variable.indexedName»«FOR dim : arg.variable.type.dimensions»[«dim»]«ENDFOR»«ENDFOR»)
+				«FOR arg : instance.arguments BEFORE ":" SEPARATOR "\n,"»  «arg.variable.indexedName»(«arg.variable.indexedName»)«ENDFOR»
 			{
-				«FOR arg : instance.arguments»«compileArg(arg.variable.type, arg.variable.indexedName, arg.value)»«ENDFOR»
 				«FOR v : actor.stateVars.filter(v|v.initialValue != null)»«compileArg(v.type, v.indexedName, v.initialValue)»«ENDFOR»
 				«IF actor.fsm != null»state_ = state_«actor.fsm.initialState.name»;«ENDIF»
 			}
