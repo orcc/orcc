@@ -67,7 +67,7 @@ import static net.sf.orcc.backends.BackendsConstants.*
 /**
  * Generate and print instance source file for C backend.
  *  
- * @author Antoine Lorencetypeof
+ * @author Antoine Lorence
  * 
  */
 class InstancePrinter extends CTemplate {

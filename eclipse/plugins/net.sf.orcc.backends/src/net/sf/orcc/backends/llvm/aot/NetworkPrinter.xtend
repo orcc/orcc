@@ -109,11 +109,6 @@ class NetworkPrinter extends LLVMTemplate {
 					call void @«instance.name»_initialize()
 				«ENDIF»
 			«ENDFOR»
-			«FOR instance : network.children.actorInstances»
-				«IF ! instance.actor.initializes.empty»
-					call void @«instance.name»_initialize()
-				«ENDIF»
-			«ENDFOR»
 			«FOR actor : network.children.filter(typeof(Actor))»
 				«IF ! actor.initializes.empty»
 					call void @«actor.name»_initialize()
