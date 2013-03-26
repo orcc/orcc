@@ -58,7 +58,7 @@ static clock_t startTime;
 static unsigned int nbByteRead = 0;
 
 // count number of times file were read
-unsigned int loopsCount;
+int loopsCount;
 
 void printSpeed(void) {
 	double executionTime;
