@@ -51,11 +51,9 @@ static void press_a_key(int code) {
 	exit(code);
 }
 
-
 char displayYUV_getFlags(){
-	return display_flags + DISPLAY_READY;
+	return display_flags;
 }
-
 
 static void displayYUV_setSize(int width, int height) {
 	printf("set display to %ix%i\n", width, height);
