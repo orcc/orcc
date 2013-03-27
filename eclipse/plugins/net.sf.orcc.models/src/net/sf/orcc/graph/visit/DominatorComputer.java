@@ -108,6 +108,15 @@ public class DominatorComputer {
 		return map;
 	}
 
+	/**
+	 * Returns the list of vertices in the specified order.
+	 * 
+	 * @return the list of vertices in the specified order
+	 */
+	public List<Vertex> getVertices() {
+		return vertices;
+	}
+
 	private int intersect(int[] doms, int b1, int b2) {
 		int finger1 = b1;
 		int finger2 = b2;
