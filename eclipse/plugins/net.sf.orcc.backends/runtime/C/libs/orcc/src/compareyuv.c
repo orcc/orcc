@@ -92,7 +92,7 @@ static int compareYUV_compareComponent(const int x_size, const int y_size,
 	}
 
 	if (error != 0) {
-		fprintf(stderr, "\n%d error(s) in %c Component !!!!!!!!!!!!!\n", error, Component_Type);
+		fprintf(stderr, "\n%d error(s) in %c Component !!!\n", error, Component_Type);
 	}
 	return error;
 }

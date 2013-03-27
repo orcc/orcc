@@ -48,7 +48,7 @@
 	#endif
 #endif
 
-extern char	*optarg;
+extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
 // Directory for input files.
@@ -120,8 +120,8 @@ void print_and_exit(const char *msg) {
 
 static char *program;
 static const char *usage =
-	"Usage: %s [arguments]\n"
-	"\nMandatory arguments:\n"
+	"\nUsage: %s [arguments]\n"
+	"Mandatory arguments:\n"
 	"-i <file>                  Input stimulus file.\n"
 
 	"\nOptional arguments:\n"
@@ -135,26 +135,26 @@ static const char *usage =
 
 	"\nOther specific arguments:\n"
 	"Depending on how the application has been designed, one of these arguments can be used. If none of them is set,\n"
-	"the application should not stop its execution itself."
+	"the application should not stop its execution itself.\n"
 	"-f <nb frames to decode>   Number of frames to decode before application close.\n"
 	"-l <nb input reading>      Number of times input stimulus is read before application close.\n";
 
 void print_usage() {
 	printf(usage, program);
+	fflush(stdout);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-	const char *ostr = "g:i:l:m:no:w:d:";
+	const char *ostr = "i:no:d:m:f:w:g:l:";
 	int c;
 
 	program = argv[0];
 	
-	c = getopt(argc, argv, ostr);
-	while (c != -1) {
+	while ((c = getopt(argc, argv, ostr)) != -1) {
 		switch (c) {
 		case '?': // BADCH
 			fprintf(stderr, "unknown argument\n");
@@ -174,6 +174,9 @@ void init_orcc(int argc, char *argv[]) {
 		case 'l':
 			nbLoops = strtoul(optarg, NULL, 10);
 			break;
+		case 'f':
+			nbFrames = strtoul(optarg, NULL, 10);
+			break;
 		case 'm':
 			mapping_file = strdup(optarg);
 			break;
@@ -187,10 +190,8 @@ void init_orcc(int argc, char *argv[]) {
 			write_file = strdup(optarg);
 			break;
 		default:
-			fprintf(stderr, "skipping option -%c\n", c);
+			fprintf(stderr, "Skipping option -%c\n", c);
 			break;
 		}
-
-		c = getopt(argc, argv, ostr);
 	}
 }

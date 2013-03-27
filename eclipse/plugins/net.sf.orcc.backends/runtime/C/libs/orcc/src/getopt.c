@@ -41,37 +41,41 @@ static char *rcsid = "$Id: getopt.c,v 1.2 1998/01/21 22:27:05 billm Exp $";
 #include <string.h>
 
 int	opterr = 1,		/* if error message should be printed */
-	optind = 1,		/* index into parent argv vector */
-	optopt,			/* character checked for validity */
-	optreset;		/* reset getopt */
-char	*optarg;		/* argument associated with option */
+		optind = 1,		/* index into parent argv vector */
+		optopt,			/* character checked for validity */
+		optreset;		/* reset getopt */
+char*	optarg;			/* argument associated with option */
 
-#define	BADCH	(int)'?'
+#define	BADCH		(int)'?'
 #define	BADARG	(int)':'
-#define	EMSG	""
+#define	EMSG		""
 
 /*
  * getopt --
  *	Parse argc/argv argument vector.
  */
 int getopt(int nargc, char * const *nargv, const char *ostr) {
-	static char *place = EMSG;		/* option letter processing */
-	char *oli;				/* option letter list index */
+	/* option letter processing */
+	static char *place = EMSG;
+	/* option letter list index */
+	char *oli;
 
-	if (optreset || !*place) {		/* update scanning pointer */
+	/* update scanning pointer */
+	if (optreset || !*place) {
 		optreset = 0;
 		if (optind >= nargc || *(place = nargv[optind]) != '-') {
 			place = EMSG;
 			return (-1);
 		}
-		if (place[1] && *++place == '-') {	/* found "--" */
+		/* found "--" */
+		if (place[1] && *++place == '-') {
 			++optind;
 			place = EMSG;
 			return (-1);
 		}
-	}					/* option letter okay? */
-	if ((optopt = (int)*place++) == (int)':' ||
-	    !(oli = strchr(ostr, optopt))) {
+	}
+	/* option letter okay? */
+	if ((optopt = (int)*place++) == (int)':' || !(oli = strchr(ostr,optopt))) {
 		/*
 		 * if the user didn't specify '-' as an option,
 		 * assume it means -1.
@@ -81,32 +85,37 @@ int getopt(int nargc, char * const *nargv, const char *ostr) {
 		if (!*place)
 			++optind;
 		if (opterr && *ostr != ':')
-			(void)fprintf(stderr,
-			    "%s: illegal option -- %c\n", nargv[0], optopt);
+			(void)fprintf(stderr,"%s: illegal option -- %c\n", nargv[0], optopt);
 		return (BADCH);
 	}
-	if (*++oli != ':') {			/* don't need argument */
+	/* don't need argument */
+	if (*++oli != ':') {
 		optarg = NULL;
 		if (!*place)
 			++optind;
 	}
-	else {					/* need an argument */
-		if (*place)			/* no white space */
+	/* need an argument */
+	else {
+		/* no white space */
+		if (*place)
 			optarg = place;
-		else if (nargc <= ++optind) {	/* no arg */
+		/* no arg */
+		else if (nargc <= ++optind) {
 			place = EMSG;
 			if (*ostr == ':')
 				return (BADARG);
 			if (opterr)
 				(void)fprintf(stderr,
-				    "%s: option requires an argument -- %c\n",
-				    nargv[0], optopt);
+					"%s: option requires an argument -- %c\n",
+					nargv[0], optopt);
 			return (BADCH);
 		}
-	 	else				/* white space */
+		/* white space */
+		else
 			optarg = nargv[optind];
 		place = EMSG;
 		++optind;
 	}
-	return (optopt);			/* dump back option letter */
+	/* dump back option letter */
+	return (optopt);
 }
