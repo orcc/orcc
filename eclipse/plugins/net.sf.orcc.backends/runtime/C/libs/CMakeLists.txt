@@ -20,10 +20,15 @@ set(orcc_SRCS
 	orcc/src/orcc_util.c
 )
 
+set(orcc_HDRS
+	orcc/include/orcc_util.h
+	orcc/include/orcc_types.h
+)
+
 # Build library without any external library required (SDL, pthread, etc)
 if(NO_EXTERNAL_DEPENDENCIES)
 
-	add_library (orcc STATIC ${orcc_SRCS})
+	add_library (orcc STATIC ${orcc_SRCS} ${orcc_HDRS})
 
 # Build library with all features (require external libraries)
 else(NO_EXTERNAL_DEPENDENCIES)
@@ -53,7 +58,20 @@ else(NO_EXTERNAL_DEPENDENCIES)
 		orcc/src/thread.c
 	)
 
-	add_library (orcc STATIC ${orcc_SRCS})
+	list(APPEND orcc_HDRS
+		orcc/include/orcc_fifo.h
+		orcc/include/orcc_fifo_socket.h
+		orcc/include/orcc_generic_fifo.h
+		orcc/include/orcc_generic_fifo.inl
+		orcc/include/orcc_generic_fifo_socket.h
+		orcc/include/orcc_genetic.h
+		orcc/include/orcc_scheduler.h
+		orcc/include/orcc_scheduler.inl
+		orcc/include/orcc_thread.h
+		orcc/include/socket.h
+	)
+
+	add_library (orcc STATIC ${orcc_SRCS} ${orcc_HDRS})
 	target_link_libraries(orcc roxml ${CMAKE_THREAD_LIBS_INIT} ${SDL_LIBRARY})
 
 endif(NO_EXTERNAL_DEPENDENCIES)
