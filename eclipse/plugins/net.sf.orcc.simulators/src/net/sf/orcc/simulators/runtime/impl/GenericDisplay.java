@@ -46,6 +46,12 @@ public class GenericDisplay {
 
 	protected static String goldenReference = "";
 
+	/**
+	 * This variable should store number of frames user want to decode before
+	 * stopping application
+	 */
+	public static int nbFrames;
+
 	protected static int displayStatus = DISPLAY_ENABLE;
 
 	public static String getGoldenReference() {

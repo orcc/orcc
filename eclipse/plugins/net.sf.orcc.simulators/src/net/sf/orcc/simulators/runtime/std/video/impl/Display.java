@@ -273,6 +273,16 @@ public class Display extends GenericDisplay {
 	}
 
 	/**
+	 * Return the value user has set in command line with -f argument.
+	 * 
+	 * @return The value set by user, or DEFAULT_NB_FRAMES value if user did not
+	 *         set any value
+	 */
+	public static BigInteger displayYUV_getNbFrames() {
+		return BigInteger.valueOf(nbFrames);
+	}
+
+	/**
 	 * Initializes the display.
 	 */
 	public static void displayYUV_init() {

@@ -31,7 +31,7 @@ package net.sf.orcc.simulators;
 /**
  * 
  * @author Hervé Yviquel
- *
+ * 
  */
 public class SimulatorsConstants {
 
@@ -40,7 +40,7 @@ public class SimulatorsConstants {
 	 * reference video.
 	 */
 	public static final String ENABLE_COMP = "net.sf.orcc.simulators.enableComparison";
-	
+
 	/**
 	 * When set, a golden reference has to be compared with the ouput data of
 	 * the network.
@@ -62,19 +62,24 @@ public class SimulatorsConstants {
 	public static final String LOOP_NUMBER = "net.sf.orcc.simulators.loopNumber";
 
 	/**
+	 * Parameter used to set max number of times an input file is read.
+	 */
+	public static final String FRAMES_NUMBER = "net.sf.orcc.simulators.framesNumber";
+
+	/**
 	 * Folder where the compiled Actors can be found.
 	 */
 	public static final String VTL_FOLDER = "net.sf.orcc.simulators.VTLFolder";
-	
+
 	/**
 	 * Simulator reference video for testing video output
 	 */
 	public static final String REFERENCE_FILE = "net.sf.orcc.simulators.compareFile";
-	
+
 	public static final String PROFILE = "net.sf.orcc.simulators.profile";
-	
+
 	public static final String PROFILE_FOLDER = "net.sf.orcc.simulators.profileFolder";
-	
+
 	/**
 	 * Cast the variables or ports using the TypeResizer transformation
 	 */

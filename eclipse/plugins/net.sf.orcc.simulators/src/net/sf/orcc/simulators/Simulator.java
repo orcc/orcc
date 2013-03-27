@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 public interface Simulator extends StopableTask {
 
 	public static final int DEFAULT_NB_LOOPS = 1;
+	public static final int DEFAULT_NB_FRAMES = -1;
 
 	public enum SimulationEndOrigin {
 		EXTERNALSTOP, NORMALEND

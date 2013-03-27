@@ -33,6 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.FRAMES_NUMBER;
 import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
 import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
 import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
@@ -111,10 +112,14 @@ public class SimulatorCli implements IApplication {
 		clOptions.addOption(opt);
 
 		// Optional command line arguments
-		clOptions.addOption("l", "loopsnumber", true,
+		clOptions.addOption("l", "loops_number", true,
 				"Defines the number of times input stimulus will be read before "
 						+ "application stop. A negative value means infinite. "
 						+ "Default : 1 time.");
+
+		clOptions.addOption("f", "frames_number", true,
+				"Defines the number of frames to"
+						+ "display before closing application.");
 
 		clOptions.addOption("r", "golden_reference", true,
 				"Reference file which used to compare with decoded stream.");
@@ -153,6 +158,10 @@ public class SimulatorCli implements IApplication {
 			if (commandLine.hasOption('l')) {
 				simulatorOptions.put(LOOP_NUMBER,
 						commandLine.getOptionValue('l'));
+			}
+			if (commandLine.hasOption('f')) {
+				simulatorOptions.put(FRAMES_NUMBER,
+						commandLine.getOptionValue('f'));
 			}
 
 			if (commandLine.hasOption('n')) {
