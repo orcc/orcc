@@ -33,12 +33,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EReference;
-
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
+
+import org.eclipse.emf.ecore.EReference;
 
 /**
  * This class defines a reverse post order based on a post-order DFS.
@@ -47,22 +47,6 @@ import net.sf.orcc.graph.Vertex;
  * 
  */
 public class ReversePostOrder extends DFS {
-
-	/**
-	 * Creates the reverse post-ordering of the given graph, starting from the
-	 * given entries. If <code>entries</code> is <code>null</code> or empty,
-	 * this method visits the graph to find roots. If no entry vertex is found,
-	 * the first vertex of the graph is used.
-	 * 
-	 * @param graph
-	 *            a graph
-	 * @param entries
-	 *            a list of vertex
-	 */
-	public ReversePostOrder(Graph graph, List<? extends Vertex> entries) {
-		this(graph, GraphPackage.Literals.VERTEX__OUTGOING,
-				GraphPackage.Literals.EDGE__TARGET, entries);
-	}
 
 	/**
 	 * Creates the reverse post-ordering of the given graph, starting from the
@@ -109,6 +93,44 @@ public class ReversePostOrder extends DFS {
 		}
 
 		Collections.reverse(vertices);
+	}
+
+	/**
+	 * Creates the reverse post-ordering of the given graph, starting from the
+	 * given roots. If <code>roots</code> is <code>null</code> or empty, this
+	 * method visits the graph to find roots. If no entry vertex is found, the
+	 * first vertex of the graph is used.
+	 * 
+	 * @param graph
+	 *            a graph
+	 * @param refEdges
+	 *            the EReference that returns either the incoming or outgoing
+	 *            edges of a vertex
+	 * @param refVertex
+	 *            the EReference that returns either the source or target of an
+	 *            edge
+	 * @param entries
+	 *            entry vertices given individually
+	 */
+	public ReversePostOrder(Graph graph, EReference refEdges,
+			EReference refVertex, Vertex... entries) {
+		this(graph, refEdges, refVertex, Arrays.asList(entries));
+	}
+
+	/**
+	 * Creates the reverse post-ordering of the given graph, starting from the
+	 * given entries. If <code>entries</code> is <code>null</code> or empty,
+	 * this method visits the graph to find roots. If no entry vertex is found,
+	 * the first vertex of the graph is used.
+	 * 
+	 * @param graph
+	 *            a graph
+	 * @param entries
+	 *            a list of vertex
+	 */
+	public ReversePostOrder(Graph graph, List<? extends Vertex> entries) {
+		this(graph, GraphPackage.Literals.VERTEX__OUTGOING,
+				GraphPackage.Literals.EDGE__TARGET, entries);
 	}
 
 	/**

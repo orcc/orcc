@@ -36,10 +36,10 @@ import java.util.Map;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.impl.GraphImpl;
+import net.sf.orcc.graph.visit.DominatorComputer;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.cfg.DominatorComputer;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.EList;
@@ -110,11 +110,11 @@ public class CfgImpl extends GraphImpl implements Cfg {
 
 	@Override
 	public void computeDominance() {
-		idoms = new DominatorComputer(this, true).computeDominance();
+		idoms = new DominatorComputer(this, exit, true).computeDominance();
 
 		// compute dominators last so we get the usual post-order numbering
 		// easier to debug
-		doms = new DominatorComputer(this, false).computeDominance();
+		doms = new DominatorComputer(this, entry, false).computeDominance();
 	}
 
 	/**
