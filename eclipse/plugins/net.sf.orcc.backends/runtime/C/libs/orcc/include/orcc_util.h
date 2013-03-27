@@ -58,6 +58,9 @@ extern int compareErrors;
 // Deprecated, will be removed in the future
 extern int nbLoops;
 
+// Number of frames to display before closing application
+extern int nbFrames;
+
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
 

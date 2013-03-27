@@ -261,3 +261,12 @@ void displayYUV_getEvent() {
 		}
 	}
 }
+
+/**
+ * @brief Return the number of frames the user want to decode before exiting the application.
+ * If user didn't use the -f flag, it returns -1 (DEFAULT_INFINITEà).
+ * @return The
+ */
+int displayYUV_getNbFrames() {
+	return nbFrames;
+}
