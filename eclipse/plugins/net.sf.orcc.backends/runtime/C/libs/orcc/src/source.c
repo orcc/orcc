@@ -266,5 +266,5 @@ void source_decrementNbLoops(){
 }
 
 int source_isMaxLoopsReached(){
-	return nbLoops != DEFAULT_INFINITE_LOOP && loopsCount <= 0;
+	return nbLoops != DEFAULT_INFINITE && loopsCount <= 0;
 }

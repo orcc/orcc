@@ -30,9 +30,6 @@
 #ifndef ORCC_UTIL_H
 #define ORCC_UTIL_H
 
-//Nb Loops
-extern unsigned int nbLoops;
-
 // Directory for input files.
 extern char *input_directory;
 
@@ -57,6 +54,10 @@ extern char display_flags;
 // compute number of errors in the program
 extern int compareErrors;
 
+// Number of times the input file is read
+// Deprecated, will be removed in the future
+extern int nbLoops;
+
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
 
@@ -70,7 +71,7 @@ void print_usage();
 #define DISPLAY_READY 1
 #define DISPLAY_ENABLE 2
 
-#define DEFAULT_INFINITE_LOOP -1
+#define DEFAULT_INFINITE -1
 
 // specific to Microsoft Visual Studio
 // disable warnings about fopen

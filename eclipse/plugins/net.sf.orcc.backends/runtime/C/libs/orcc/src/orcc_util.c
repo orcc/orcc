@@ -51,9 +51,6 @@
 extern char	*optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
-//Nb Loops
-unsigned int nbLoops = DEFAULT_INFINITE_LOOP; // -1: infinite loop.
-
 // Directory for input files.
 char *input_directory = NULL;
 
@@ -77,6 +74,9 @@ char display_flags = DISPLAY_ENABLE;
 
 // compute number of errors in the program
 int compareErrors = 0;
+
+// Nb times the input file is read
+int nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
 
 // Pause function
 void wait_for_key() {
