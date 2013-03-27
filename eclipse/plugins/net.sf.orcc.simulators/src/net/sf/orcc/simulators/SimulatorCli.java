@@ -118,7 +118,7 @@ public class SimulatorCli implements IApplication {
 
 		clOptions.addOption("r", "golden_reference", true,
 				"Reference file which used to compare with decoded stream.");
-		clOptions.addOption("f", "fifo-size", true,
+		clOptions.addOption("s", "fifo-size", true,
 				"Default size of the FIFO channels");
 		clOptions.addOption("n", "nodisplay", false,
 				"Disable display initialization");
@@ -145,9 +145,9 @@ public class SimulatorCli implements IApplication {
 					commandLine.getOptionValue('i'));
 			simulatorOptions.put(XDF_FILE, commandLine.getArgList().get(0));
 
-			if (commandLine.hasOption('f')) {
+			if (commandLine.hasOption('s')) {
 				simulatorOptions.put(FIFO_SIZE,
-						Integer.valueOf(commandLine.getOptionValue('f')));
+						Integer.valueOf(commandLine.getOptionValue('s')));
 			}
 
 			if (commandLine.hasOption('l')) {
