@@ -66,7 +66,8 @@ class StatisticsPrinter {
 		'''Name, Package, Actors, Connections, SDF, CSDF, QSDF, KPN, DPN'''
 		
 	def protected getStats(Network network)
-		'''«network.simpleName», «network.package», «network.children.size», «network.connections.size», «network.moCs.filter[SDF].size», «network.moCs.filter[CSDF && !SDF].size», «network.moCs.filter[quasiStatic].size», «network.moCs.filter[KPN].size», «network.moCs.filter[DPN].size»'''
+		// network.getPackage instead of network.package to allow Xtend < 2.4 to parse this file
+		'''«network.simpleName», «network.getPackage», «network.children.size», «network.connections.size», «network.moCs.filter[SDF].size», «network.moCs.filter[CSDF && !SDF].size», «network.moCs.filter[quasiStatic].size», «network.moCs.filter[KPN].size», «network.moCs.filter[DPN].size»'''
 	
 	def protected getChildrenHeader() 
 		'''Name, Incoming, Outgoing, Inputs, Outputs, Actions, FSM, MoC'''
@@ -83,7 +84,7 @@ class StatisticsPrinter {
 		'''«conn.source.label», «conn.sourcePort.name», «conn.target.label», «conn.targetPort.name», «conn.size»'''
 
 	def private getMoCs(Network network) {
-		network.children.map[getAdapter(typeof(Actor)).moC].filterNull
+		network.children.map[getAdapter(typeof(Actor))?.moC].filterNull
 	}
 
 }
