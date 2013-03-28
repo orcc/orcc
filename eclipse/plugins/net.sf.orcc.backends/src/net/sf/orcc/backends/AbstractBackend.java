@@ -798,7 +798,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		convertMulti2Mono = getAttribute(CONVERT_MULTI2MONO, false);
 
-
 		String outputFolder = getAttribute(OUTPUT_FOLDER, "");
 		if (outputFolder.isEmpty()) {
 			File tempOrccDir = new File(System.getProperty("java.io.tmpdir"),
@@ -843,7 +842,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// Optional command line arguments
 		options.addOption("d", "debug", false, "Enable debug mode");
-		options.addOption("f", "fifo-size", true,
+		options.addOption("s", "fifo-size", true,
 				"Default size of the FIFO channels");
 
 		options.addOption("c", "classify", false, "Classify the given network");
@@ -851,7 +850,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				"Set path to the binary of the SMT solver (Z3 v4.12+)");
 		options.addOption("m", "merge", true, "Merge (1) static actions "
 				+ "(2) static actors (3) both");
-		options.addOption("s", "advanced-scheduler", false, "(C) Use the "
+		options.addOption("as", "advanced-scheduler", false, "(C) Use the "
 				+ "data-driven/demand-driven strategy for the actor-scheduler");
 		options.addOption("m2m", "multi2mono", false,
 				"Transform high-level actors with multi-tokens actions"
@@ -885,10 +884,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(OUTPUT_FOLDER, line.getOptionValue('o'));
 
 			optionMap.put(DEBUG_MODE, line.hasOption('d'));
-			if (line.hasOption('f')) {
-				String fifo_size = line.getOptionValue('f');
+			if (line.hasOption('s')) {
 				try {
-					int size = Integer.parseInt(fifo_size);
+					int size = Integer.parseInt(line.getOptionValue('s'));
 					optionMap.put(FIFO_SIZE, size);
 				} catch (NumberFormatException e) {
 					throw new ParseException("Expected integer as FIFO size");
@@ -922,7 +920,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 						type.equals("2") || type.equals("3"));
 			}
 
-			optionMap.put(NEW_SCHEDULER, line.hasOption('s'));
+			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 
