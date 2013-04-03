@@ -39,8 +39,7 @@ import net.sf.orcc.backends.cplusplus.entities.Receiver
 import net.sf.orcc.backends.cplusplus.entities.Sender
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
-
-import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.util.OrccUtil
 
 /*
  * A network printer.
@@ -54,15 +53,13 @@ class NetworkPrinter extends ExprAndTypePrinter {
 	
 	List<Interface> interfaces
 	
-	Network network
+	protected Network network
 	
 	new (Network network, Map<String, Object> options) {
 		entitiesPrinter = new EntitiesPrinter
 		interfaces = newArrayList;
 		
 		this.network = network
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 		
@@ -72,7 +69,7 @@ class NetworkPrinter extends ExprAndTypePrinter {
 		val file = new File(targetFolder + File::separator + network.simpleName + ".cpp")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
@@ -84,7 +81,7 @@ class NetworkPrinter extends ExprAndTypePrinter {
 		val file = new File(targetFolder + File::separator + "CMakeLists.txt")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
@@ -119,27 +116,41 @@ class NetworkPrinter extends ExprAndTypePrinter {
 			«(instance.entity as Communicator).compileCommunicator(instance.name)»
 		«ENDFOR»
 		
-		«FOR instance : network.children.filter(typeof(Instance))»
-			«instance.name» inst_«instance.name»;
-		«ENDFOR»
-
-		«FOR instance : network.children.filter(typeof(Instance))»
-			«FOR edges : instance.outgoingPortMap.values»
-				Fifo<«edges.get(0).sourcePort.type.doSwitch», «edges.get(0).getAttribute("nbReaders").objectValue»> fifo_«edges.get(0).getAttribute("idNoBcast").objectValue»«IF edges.get(0).size!= null»(«edges.get(0).size»)«ENDIF»;
+		int main(int argc, char *argv[])
+		{
+			GetOpt options = GetOpt(argc, argv);
+			options.getOptions();
+			
+			«FOR param : network.parameters»
+				«param.type.doSwitch» «param.indexedName»«FOR dim:param.type.dimensions»[«dim»]«ENDFOR»;
 			«ENDFOR»
-		«ENDFOR»
+			
+			«FOR param : network.parameters»
+				if(!options.getOptionAs("«param.indexedName»", «param.indexedName»))
+				{
+					std::cerr << "«param.indexedName» is not defined!" << std::endl;
+					exit(-1);
+				}
+			«ENDFOR»
+			
+			«FOR instance : network.children.filter(typeof(Instance))»
+				«instance.name» *inst_«instance.name» = new «instance.name»(«FOR arg : instance.arguments SEPARATOR ", "»«arg.value.doSwitch»«ENDFOR»);
+			«ENDFOR»
 
-		int main(int argc, char *argv[]) {
-			GetOpt(argc, argv).getOptions();
+			«FOR instance : network.children.filter(typeof(Instance))»
+				«FOR edges : instance.outgoingPortMap.values»
+					Fifo<«edges.get(0).sourcePort.type.doSwitch», «edges.get(0).getAttribute("nbReaders").objectValue»> *fifo_«edges.get(0).getAttribute("idNoBcast").objectValue» = new Fifo<«edges.get(0).sourcePort.type.doSwitch», «edges.get(0).getAttribute("nbReaders").objectValue»>«IF edges.get(0).size!= null»(«edges.get(0).size»)«ENDIF»;
+				«ENDFOR»
+			«ENDFOR»
 			
 			std::map<std::string, Actor*> actors;
 			«FOR instance : network.children.filter(typeof(Instance))»
-				actors["«FOR seg : instance.hierarchicalId»/«seg»«ENDFOR»"] = &inst_«instance.name»;
+				actors["«FOR seg : instance.hierarchicalId»/«seg»«ENDFOR»"] = inst_«instance.name»;
 			«ENDFOR»
 
 			«FOR e : network.connections»
-				inst_«(e.source as Instance).name».port_«e.sourcePort.name» = &fifo_«e.getAttribute("idNoBcast").objectValue»;
-				inst_«(e.target as Instance).name».port_«e.targetPort.name» = &fifo_«e.getAttribute("idNoBcast").objectValue»;
+				inst_«(e.source as Instance).name»->port_«e.sourcePort.name» = fifo_«e.getAttribute("idNoBcast").objectValue»;
+				inst_«(e.target as Instance).name»->port_«e.targetPort.name» = fifo_«e.getAttribute("idNoBcast").objectValue»;
 			«ENDFOR»
 						
 			ConfigParser parser(config_file, actors);
@@ -158,11 +169,11 @@ class NetworkPrinter extends ExprAndTypePrinter {
 			return 0;
 		}
 	'''
-	
+
 	def dispatch compileCommunicator(Receiver receiver, String name) {
-		val interface = interfaces.findFirst(intf | intf.equals(receiver.intf))
+		val inter = interfaces.findFirst(intf | intf.equals(receiver.intf))
 		'''
-		«IF interface == null»
+		«IF inter == null»
 			«receiver.intf.compileInterface»
 		«ENDIF»
 		Receiver<«receiver.output.type.doSwitch»> inst_«name»(&«receiver.intf.id»);
@@ -170,9 +181,9 @@ class NetworkPrinter extends ExprAndTypePrinter {
 	}
 	
 	def dispatch compileCommunicator(Sender sender, String name) {		
-		val interface = interfaces.findFirst(intf | intf.equals(sender.intf))
+		val inter = interfaces.findFirst(intf | intf.equals(sender.intf))
 		'''
-		«IF interface == null»
+		«IF inter == null»
 			«sender.intf.compileInterface»
 		«ENDIF»
 		Sender<«sender.input.type.doSwitch»> inst_«name»(&«sender.intf.id»);

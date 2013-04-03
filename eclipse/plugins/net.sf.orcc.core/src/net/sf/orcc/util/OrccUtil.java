@@ -28,9 +28,14 @@
  */
 package net.sf.orcc.util;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -563,6 +568,34 @@ public class OrccUtil {
 	}
 
 	/**
+	 * Create a file and print content inside it. If parent folder doesn't
+	 * exists, create it.
+	 * 
+	 * @param content
+	 *            text to write in file
+	 * @param target
+	 *            file to write content to
+	 * @return true if the file has correctly been written
+	 */
+	public static boolean printFile(CharSequence content, File target) {
+		try {
+			if (!target.getParentFile().exists()) {
+				target.getParentFile().mkdirs();
+			}
+			PrintStream ps = new PrintStream(new FileOutputStream(target));
+			ps.print(content);
+			ps.close();
+			return true;
+		} catch (FileNotFoundException e) {
+			OrccLogger.severe("Unable to write file " + target.getPath()
+					+ " : " + e.getCause());
+			OrccLogger.severe(e.getLocalizedMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
 	 * Sets the contents of the given file, creating it if it does not exist.
 	 * 
 	 * @param file
@@ -609,4 +642,26 @@ public class OrccUtil {
 		return builder.toString();
 	}
 
+	/**
+	 * Run an external programs with the given commands list
+	 * 
+	 * @param cmdList
+	 *            the list of command containing the program and its arguments
+	 */
+	public static void runExternalProgram(List<String> cmdList) {
+		try {
+			ProcessBuilder builder = new ProcessBuilder(cmdList);
+			Process process = builder.start();
+			process.waitFor();
+	
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					process.getInputStream()));
+			String line = new String();
+			while ((line = reader.readLine()) != null) {
+				OrccLogger.traceln(line);
+			}
+		} catch (Exception e) {
+			OrccLogger.severeln(e.getMessage());
+		}
+	}
 }

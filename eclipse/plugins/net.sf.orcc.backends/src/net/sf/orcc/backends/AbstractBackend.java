@@ -41,9 +41,9 @@ import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
-import static net.sf.orcc.backends.OrccBackendsConstants.ADDITIONAL_TRANSFOS;
-import static net.sf.orcc.backends.OrccBackendsConstants.CONVERT_MULTI2MONO;
-import static net.sf.orcc.backends.OrccBackendsConstants.NEW_SCHEDULER;
+import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
+import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
+import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.util.OrccUtil.getFile;
@@ -68,7 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
@@ -78,6 +77,7 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccLogger.OrccLevel;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -149,7 +149,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected int fifoSize;
 
 	private IFile inputFile;
+
 	protected Map<String, String> mapping;
+	protected boolean balanceMapping;
+	protected int processorNumber;
 
 	/**
 	 * List of transformations to apply on each network
@@ -781,7 +784,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		debug = getAttribute(DEBUG_MODE, true);
+
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
+		balanceMapping = getAttribute("net.sf.orcc.backends.metricMapping",
+				false);
+		processorNumber = Integer.parseInt(getAttribute(
+				"net.sf.orcc.backends.processorsNumber", "0"));
 
 		classify = getAttribute(CLASSIFY, false);
 		// Merging transformations need the results of classification
@@ -802,7 +810,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		if (debug) {
-			OrccLogger.setLevel(Level.FINEST);
+			OrccLogger.setLevel(OrccLevel.DEBUG);
 			OrccLogger.debugln("Debug mode is enabled");
 		}
 
@@ -834,7 +842,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// Optional command line arguments
 		options.addOption("d", "debug", false, "Enable debug mode");
-		options.addOption("f", "fifo-size", true,
+		options.addOption("s", "fifo-size", true,
 				"Default size of the FIFO channels");
 
 		options.addOption("c", "classify", false, "Classify the given network");
@@ -842,7 +850,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				"Set path to the binary of the SMT solver (Z3 v4.12+)");
 		options.addOption("m", "merge", true, "Merge (1) static actions "
 				+ "(2) static actors (3) both");
-		options.addOption("s", "advanced-scheduler", false, "(C) Use the "
+		options.addOption("as", "advanced-scheduler", false, "(C) Use the "
 				+ "data-driven/demand-driven strategy for the actor-scheduler");
 		options.addOption("m2m", "multi2mono", false,
 				"Transform high-level actors with multi-tokens actions"
@@ -876,10 +884,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(OUTPUT_FOLDER, line.getOptionValue('o'));
 
 			optionMap.put(DEBUG_MODE, line.hasOption('d'));
-			if (line.hasOption('f')) {
-				String fifo_size = line.getOptionValue('f');
+			if (line.hasOption('s')) {
 				try {
-					int size = Integer.parseInt(fifo_size);
+					int size = Integer.parseInt(line.getOptionValue('s'));
 					optionMap.put(FIFO_SIZE, size);
 				} catch (NumberFormatException e) {
 					throw new ParseException("Expected integer as FIFO size");
@@ -913,7 +920,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 						type.equals("2") || type.equals("3"));
 			}
 
-			optionMap.put(NEW_SCHEDULER, line.hasOption('s'));
+			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 

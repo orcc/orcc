@@ -26,7 +26,6 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
 package net.sf.orcc.tools.merger.actor;
 
 import java.util.LinkedHashSet;
@@ -113,12 +112,12 @@ public class Schedule {
 	public String toString() {
 		String its = "";
 		for (Iterand iterand : iterands)
-			its += iterand;
+			its += iterand + " ";
 		String res = "";
 		if (iterationCount == 0 || iterationCount == 1) {
 			res = its;
 		} else {
-			res = "(" + iterationCount + its + ")";
+			res = "( " + iterationCount + " " + its + ")";
 		}
 		return res;
 	}

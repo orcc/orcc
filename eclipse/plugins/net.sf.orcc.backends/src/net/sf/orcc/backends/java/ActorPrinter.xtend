@@ -45,11 +45,9 @@ import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
+import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
-
-import static net.sf.orcc.OrccLaunchConstants.*
-
 
 /*
  * Compile Top_network Java source code 
@@ -63,8 +61,6 @@ class ActorPrinter extends JavaTemplate {
 	
 	new(Actor actor, Map<String, Object> options){
 		this.actor = actor
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 		
@@ -74,7 +70,7 @@ class ActorPrinter extends JavaTemplate {
 		val file = new File(targetFolder + File::separator + actor.simpleName + ".java")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
@@ -243,7 +239,7 @@ class ActorPrinter extends JavaTemplate {
 			int i = 0;
 			do {
 				res = false;
-				«actor.actions.join(" else ", [actionFireingTest])»
+				«actor.actions.join(" else ")[actionFireingTest]»
 				i += res ? 1 : 0;
 			} while(res);
 			return i;
@@ -263,7 +259,7 @@ class ActorPrinter extends JavaTemplate {
 			private boolean outside_FSM_scheduler() {
 				boolean res = false;
 				
-				«actor.actionsOutsideFsm.join(" else ", [actionFireingTest])»
+				«actor.actionsOutsideFsm.join(" else ")[actionFireingTest]»
 				return res;
 			}
 			
@@ -358,12 +354,7 @@ class ActorPrinter extends JavaTemplate {
 		if(action.inputPattern.ports.empty) {
 			return '''«action.scheduler.name»()'''
 		} else {
-			return action.inputPattern.ports.join(
-				"", // Before
-				" && ", // Separator
-				''' && «action.scheduler.name»()''', // After
-				[ '''fifo_«it.name».hasTokens(«action.inputPattern.numTokensMap.get(it)»)'''] // Function
-			)
+			return action.inputPattern.ports.join("", " && ", ''' && «action.scheduler.name»()''')[ '''fifo_«name».hasTokens(«action.inputPattern.numTokensMap.get(it)»)''']
 		}
 	}
 	
@@ -372,10 +363,7 @@ class ActorPrinter extends JavaTemplate {
 	 * Only one line printed.
 	 */
 	def outputSchedulingTest(Action action) {
-		action.outputPattern.ports.join(
-			" && ", // Separator
-			['''fifo_«it.name».hasRoom(«action.outputPattern.numTokensMap.get(it)»)''' ] // Function
-		)
+		action.outputPattern.ports.join(" && ")['''fifo_«name».hasRoom(«action.outputPattern.numTokensMap.get(it)»)''' ]
 	}
 	
 	/******************************************

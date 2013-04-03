@@ -31,12 +31,12 @@ package net.sf.orcc.backends.llvm.tta
 import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
+import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureUtil
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.backends.llvm.tta.architecture.Memory
 
 class PyDesignPrinter extends TTAPrinter {
 	
@@ -49,7 +49,7 @@ class PyDesignPrinter extends TTAPrinter {
 	def print(Design design, String targetFolder) {
 		val pythonPath = OrccUtil::createFolder(targetFolder, "informations_");
 		val file = new File(pythonPath + File::separator + "informations.py")
-		printFile(design.python, file)
+		OrccUtil::printFile(design.python, file)
 		new File(pythonPath + File::separator + "__init__.py").createNewFile
 	}
 	
@@ -97,7 +97,7 @@ class PyDesignPrinter extends TTAPrinter {
 		'''
 		«processor.name»_inputs = [«FOR edge: processor.incoming SEPARATOR ', '»«(edge as Link).targetPort.getPython(0)»«ENDFOR»]
 		«processor.name»_outputs = [«FOR edge: processor.outgoing SEPARATOR ', '»«(edge as Link).sourcePort.getPython(0)»«ENDFOR»]
-		«processor.name»_instances = [«FOR instance: processor.mappedActors SEPARATOR ', '»"«instance.name»"«ENDFOR»]
+		«processor.name»_instances = [«FOR actor: processor.mappedActors SEPARATOR ', '»"«actor.label»"«ENDFOR»]
 		'''
 		
 	def private usePrint(Processor processor) {

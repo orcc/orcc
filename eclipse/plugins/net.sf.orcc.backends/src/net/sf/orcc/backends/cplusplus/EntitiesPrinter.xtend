@@ -43,7 +43,7 @@ import net.sf.orcc.backends.cplusplus.entities.InterfaceEthernet
  * @author Ghislain Roquier
  * 
  */
-class EntitiesPrinter extends YaceEntitiesSwitch {
+class EntitiesPrinter extends YaceEntitiesSwitch<CharSequence> {
 	
 	List<Interface> interfaces
 	
@@ -55,9 +55,9 @@ class EntitiesPrinter extends YaceEntitiesSwitch {
 	}
 	
 	override caseReceiver(Receiver receiver) {
-		val interface = interfaces.findFirst(intf | intf.equals(receiver.intf))
+		val inter = interfaces.findFirst(intf | intf.equals(receiver.intf))
 		'''
-		«IF interface == null»«interface.doSwitch»«ENDIF»
+		«IF inter == null»«inter.doSwitch»«ENDIF»
 		Receiver<«typePrinter.doSwitch(receiver.output.type)»> inst_«receiver»
 		'''
 	}

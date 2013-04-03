@@ -29,6 +29,8 @@
 package net.sf.orcc.backends.c.hls
 
 import java.util.Map
+
+import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.df.Connection
 import java.io.File
 import net.sf.orcc.ir.TypeBool
@@ -70,7 +72,7 @@ import net.sf.orcc.ir.TypeBool
 			«IF instance.incomingPortMap.get(port) != null»
 				stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
 				int counter_«instance.incomingPortMap.get(port).fifoName»;
-				«instance.incomingPortMap.get(port).fifoType.doSwitch» tab_«instance.incomingPortMap.get(port).fifoName»;
+				«instance.incomingPortMap.get(port).fifoType.doSwitch» tab_«instance.incomingPortMap.get(port).fifoName»[1000];
 				«instance.incomingPortMap.get(port).fifoType.doSwitch» tmp_«instance.incomingPortMap.get(port).fifoName»;
 				
 			«ENDIF»
@@ -83,7 +85,7 @@ import net.sf.orcc.ir.TypeBool
 			«FOR connection : instance.outgoingPortMap.get(port)»
 				stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
 				int counter_«connection.fifoName»;
-				«connection.fifoType.doSwitch» tab_«connection.fifoName»;
+				«connection.fifoType.doSwitch» tab_«connection.fifoName» [1000];
 				«connection.fifoType.doSwitch» tmp_«connection.fifoName»;
 				
 			«ENDFOR»
@@ -96,9 +98,9 @@ import net.sf.orcc.ir.TypeBool
 		
 		////////////////////////////////////////////////////////////////////////////////
 		
-		int main{
+		int main (){
 			
-			FILE *fp
+			FILE *fp;
 			int i;
 			int retval = 0;
 			// read data
@@ -174,7 +176,7 @@ import net.sf.orcc.ir.TypeBool
 		val file = new File(targetFolder + File::separator + instance.name+ "_Csim_tb" + ".cpp")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

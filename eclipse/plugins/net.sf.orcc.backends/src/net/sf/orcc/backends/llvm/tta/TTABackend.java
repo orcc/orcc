@@ -49,10 +49,9 @@ import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Metiss;
+import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -62,7 +61,6 @@ import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.util.Dota;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
@@ -97,9 +95,6 @@ public class TTABackend extends LLVMBackend {
 	private FPGA fpga;
 	private String libPath;
 	private boolean reduceConnections;
-	private boolean balanceMapping;
-
-	private int processorNumber;
 
 	@Override
 	protected void doInitializeOptions() {
@@ -111,10 +106,6 @@ public class TTABackend extends LLVMBackend {
 				"net.sf.orcc.backends.llvm.tta.configuration", "Standard"));
 		reduceConnections = getAttribute(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
-		balanceMapping = getAttribute("net.sf.orcc.backends.metricMapping",
-				false);
-		processorNumber = Integer.parseInt(getAttribute(
-				"net.sf.orcc.backends.processorsNumber", "0"));
 	}
 
 	@Override
@@ -130,7 +121,7 @@ public class TTABackend extends LLVMBackend {
 
 		visitors.add(new ComplexHwOpDetector());
 		visitors.add(new UnitImporter());
-		visitors.add(new Instantiator(false, fifoSize));
+		visitors.add(new Instantiator(true, fifoSize));
 		visitors.add(new NetworkFlattener());
 
 		if (classify) {
@@ -181,29 +172,16 @@ public class TTABackend extends LLVMBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
 
-		// Compute the actor mapping
 		if (balanceMapping) {
-			// Dynamically by solving an equivalent graph partitioning problem
-
-			// Add an attribute 'weight' to each instance
-			for (Vertex vertex : network.getChildren()) {
-				Instance instance = vertex.getAdapter(Instance.class);
-				if (instance != null) {
-					String weight = mapping.get(instance.getHierarchicalName());
-					if (weight != null) {
-						instance.setAttribute("weight", weight);
-					}
-				}
-			}
-
-			// Launch a solver tool called Metis
-			computedMapping = new Metiss().partition(network, path,
-					processorNumber);
-		} else {
-			// Statically from the given mapping
-			computedMapping = new Mapping(network, mapping, reduceConnections,
-					false);
+			// Solve load balancing using Metis. The 'mapping' variable should
+			// be the weightsMap, giving a weight to each actor/instance.
+			mapping = new Metis().partition(network, path, processorNumber,
+					mapping);
 		}
+
+		// Compute the actor mapping
+		computedMapping = new Mapping(true);
+		computedMapping.compute(network, mapping);
 
 		// Build the design from the mapping
 		design = new ArchitectureBuilder().build(network, configuration,
@@ -321,6 +299,12 @@ public class TTABackend extends LLVMBackend {
 				instance)).print(actorsPath, instance) > 0;
 	}
 
+	@Override
+	protected boolean printActor(Actor actor) {
+		return new SwActorPrinter(options, design.getActorToProcessorMap().get(
+				actor)).print(actorsPath, actor) > 0;
+	}
+
 	/**
 	 * Runs the python script to compile the application and generate the whole
 	 * design using the TCE toolset. (FIXME: Rewrite this awful method)
@@ -336,7 +320,7 @@ public class TTABackend extends LLVMBackend {
 
 		OrccLogger.traceln("Generating design...");
 		long t0 = System.currentTimeMillis();
-		BackendUtil.runExternalProgram(cmdList);
+		OrccUtil.runExternalProgram(cmdList);
 		long t1 = System.currentTimeMillis();
 		OrccLogger.traceln("Done in " + (t1 - t0) / 1000.0 + "s");
 	}

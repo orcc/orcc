@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Synflow
+ * Copyright (c) 2012-2013, Synflow SAS
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,23 +26,21 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.cfg;
+package net.sf.orcc.graph.visit;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.graph.visit.Ordering;
-import net.sf.orcc.graph.visit.ReversePostOrder;
-import net.sf.orcc.ir.Cfg;
 
 import org.eclipse.emf.ecore.EReference;
 
 /**
- * This class computes the dominance information of a CFG using the algorithm
+ * This class computes the dominance information of a graph using the algorithm
  * described in "A Simple, Fast Dominance Algorithm" by Keith D. Cooper, Timothy
  * J. Harvey, and Ken Kennedy.
  * 
@@ -59,13 +57,15 @@ public class DominatorComputer {
 
 	/**
 	 * 
-	 * @param cfg
-	 *            control flow graph
+	 * @param graph
+	 *            a directed graph
+	 * @param root
+	 *            the root vertex (entry for dominance, exit for post-dominance)
 	 * @param isPost
 	 *            <code>true</code> if computing post-dominance information,
 	 *            <code>false</code> otherwise
 	 */
-	public DominatorComputer(Cfg cfg, boolean isPost) {
+	public DominatorComputer(Graph graph, Vertex root, boolean isPost) {
 		if (isPost) {
 			refEdges = GraphPackage.Literals.VERTEX__OUTGOING;
 			refVertex = GraphPackage.Literals.EDGE__TARGET;
@@ -76,8 +76,8 @@ public class DominatorComputer {
 
 		// opposite of source/target is outgoing/incoming
 		// opposite of incoming/outgoing is target/source
-		Ordering rpo = new ReversePostOrder(cfg, refVertex.getEOpposite(),
-				refEdges.getEOpposite(), null);
+		Ordering rpo = new ReversePostOrder(graph, refVertex.getEOpposite(),
+				refEdges.getEOpposite(), root);
 		this.vertices = rpo.getVertices();
 	}
 
@@ -106,6 +106,15 @@ public class DominatorComputer {
 			map.put(vertex, vertices.get(n - doms[b]));
 		}
 		return map;
+	}
+
+	/**
+	 * Returns the list of vertices in the specified order.
+	 * 
+	 * @return the list of vertices in the specified order
+	 */
+	public List<Vertex> getVertices() {
+		return vertices;
 	}
 
 	private int intersect(int[] doms, int b1, int b2) {

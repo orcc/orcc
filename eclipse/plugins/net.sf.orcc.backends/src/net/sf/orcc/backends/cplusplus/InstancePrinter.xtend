@@ -53,8 +53,7 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
-
-import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.util.OrccUtil
 
 /*
  * An actor printer.
@@ -67,8 +66,6 @@ import static net.sf.orcc.OrccLaunchConstants.*
 	
 	new (Instance instance, Map<String, Object> options) {
 		this.instance = instance
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	def print(String targetFolder) {
@@ -77,7 +74,7 @@ import static net.sf.orcc.OrccLaunchConstants.*
 		val file = new File(targetFolder + File::separator + instance.name + ".h")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
@@ -102,9 +99,9 @@ import static net.sf.orcc.OrccLaunchConstants.*
 		class «instance.name»: public Actor
 		{
 		public:	
-			«instance.name»()
+			«instance.name»(«FOR arg : instance.arguments SEPARATOR ", "»«arg.variable.type.doSwitch» «arg.variable.indexedName»«FOR dim : arg.variable.type.dimensions»[«dim»]«ENDFOR»«ENDFOR»)
+				«FOR arg : instance.arguments BEFORE ":" SEPARATOR "\n,"»  «arg.variable.indexedName»(«arg.variable.indexedName»)«ENDFOR»
 			{
-				«FOR arg : instance.arguments»«compileArg(arg.variable.type, arg.variable.indexedName, arg.value)»«ENDFOR»
 				«FOR v : actor.stateVars.filter(v|v.initialValue != null)»«compileArg(v.type, v.indexedName, v.initialValue)»«ENDFOR»
 				«IF actor.fsm != null»state_ = state_«actor.fsm.initialState.name»;«ENDIF»
 			}

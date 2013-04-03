@@ -287,6 +287,29 @@ public interface DfFactory extends EFactory {
 	 */
 	Transition createTransition();
 
+	/**
+	 * Creates a new transition from <code>source</code> to <code>target</code>.
+	 * 
+	 * @param source
+	 *            source state
+	 * @param target
+	 *            target state
+	 * @return a new transition
+	 */
+	Transition createTransition(State source, State target);
+
+	/**
+	 * Creates a new transition from <code>source</code> to <code>target</code>,
+	 * and associates it to the given action.
+	 * 
+	 * @param source
+	 *            source state
+	 * @param action
+	 *            an action
+	 * @param target
+	 *            target state
+	 * @return a new transition
+	 */
 	Transition createTransition(State source, Action action, State target);
 
 	/**

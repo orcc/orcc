@@ -286,6 +286,16 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 					}
 				}
 			}
+			// for each variable mentioned in a guard, find input ports on which these depend
+			for (Var var : actor.getStateVars()) {
+				visited.clear();
+				getTransitiveClosure(var, visited, true);
+				for (Var v : visited) {
+					if (action.getInputPattern().contains(v)) {
+						inputPortsUsedInScheduling.add(action.getInputPattern().getPort(v));
+					}
+				}
+			}
 		}
 		return null;
 	}

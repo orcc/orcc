@@ -31,6 +31,10 @@ package net.sf.orcc.ui;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IConsoleManager;
+import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -71,6 +75,33 @@ public class OrccUiActivator extends AbstractUIPlugin {
 		}
 
 		return image;
+	}
+
+	/**
+	 * Return an Orcc MessageConsole corresponding to <code>name</code>. If it
+	 * does not already exists, create and register it to the manager.
+	 * 
+	 * @param name
+	 *            Name of the console
+	 * @return The console instance
+	 */
+	public static MessageConsole getOrccConsole(String name) {
+
+		IConsoleManager conMan = ConsolePlugin.getDefault().getConsoleManager();
+
+		IConsole[] existing = conMan.getConsoles();
+		for (IConsole element : existing) {
+			if (name.equals(element.getName())) {
+				return (MessageConsole) element;
+			}
+		}
+
+		// no console found, so create a new one
+		MessageConsole myConsole = new MessageConsole(name,
+				getImageDescriptor("icons/orcc.png"));
+
+		conMan.addConsoles(new IConsole[] { myConsole });
+		return myConsole;
 	}
 
 	/**

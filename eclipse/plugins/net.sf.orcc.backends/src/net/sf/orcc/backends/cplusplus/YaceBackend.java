@@ -37,14 +37,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.util.XcfPrinter;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
@@ -116,7 +115,6 @@ public class YaceBackend extends AbstractBackend {
 		new Instantiator(false).doSwitch(network);
 		OrccLogger.traceRaw("done\n");
 		new NetworkFlattener().doSwitch(network);
-		new ArgumentEvaluator().doSwitch(network);
 
 		if (classify) {
 			OrccLogger.trace("Starting classification of actors... ");
@@ -171,7 +169,7 @@ public class YaceBackend extends AbstractBackend {
 	 */
 	public void printNetwork(Network network) {
 
-		new XcfPrinter().print(path, network, mapping);
+		new Mapping().print(path, network, mapping);
 		NetworkPrinter printer = new NetworkPrinter(network, options);
 
 		printer.printNetwork(path);

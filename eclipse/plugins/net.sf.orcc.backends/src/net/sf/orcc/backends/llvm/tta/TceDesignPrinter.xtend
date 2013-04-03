@@ -33,6 +33,8 @@ import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.df.Port
+import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.df.Actor
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -50,7 +52,7 @@ class TceDesignPrinter extends TTAPrinter {
 	
 	def print(Design design, String targetFolder) {
 		val file = new File(targetFolder + File::separator + "top.pndf")
-		printFile(design.pndf, file)
+		OrccUtil::printFile(design.pndf, file)
 	}
 	
 	def private getPndf(Design design)
@@ -68,31 +70,34 @@ class TceDesignPrinter extends TTAPrinter {
 		<processor name="«processor.name»" >
 			<adf>«path»/«processor.name»/«processor.name».adf</adf>
 			<tpef>«path»/«processor.name»/«processor.name».tpef</tpef>
-			«FOR instance: processor.mappedActors»
-				«FOR input: instance.actor.inputs.filter(port | !port.native)»
-					«IF instance.incomingPortMap.get(input) != null»
-						«val incoming = instance.incomingPortMap.get(input)»
+			«FOR vertex: processor.mappedActors»
+				«val actor = vertex.getAdapter(typeof(Actor))»
+				«FOR input: actor.inputs.filter(port | !port.native)»
+					«val incoming = actor.incomingPortMap.get(input)»
+					«IF incoming != null && !processor.mappedActors.contains(incoming.source)»
 						<input name="«input.name»">
 							<address-space>«processor.getMemory(incoming).name»</address-space>
 							<var-name>fifo_«incoming.getValueAsObject("id").toString»</var-name>
 							<signed>«input.type.int»</signed>
 							<width>«input.width»</width>
 							<size>«incoming.size»</size>
-							<trace>«path»/trace/«instance.name»_«input.name».txt</trace>
+							<trace>«path»/trace/«IF !vertex.label.contains("cluster")»«vertex.label»_«ENDIF»«input.name».txt</trace>
 						</input>
 					«ENDIF»
 				«ENDFOR»
-				«FOR output : instance.actor.outputs.filter[!native]»
-					«FOR outgoing : instance.outgoingPortMap.get(output)»
-						«val id = outgoing.getValueAsObject("id").toString»
-						<output name="«output.name»_«id»">
-							<address-space>«processor.getMemory(outgoing).name»</address-space>
-							<var-name>fifo_«id»</var-name>
-							<signed>«output.type.int»</signed>
-							<width>«output.width»</width>
-							<size>«outgoing.size»</size>
-							<trace>«path»/trace/«instance.name»_«output.name».txt</trace>
-						</output>
+				«FOR output : actor.outputs.filter[!native]»
+					«FOR outgoing : actor.outgoingPortMap.get(output)»
+						«IF !processor.mappedActors.contains(outgoing.target)»
+							«val id = outgoing.getValueAsObject("id").toString»
+							<output name="«output.name»_«id»">
+								<address-space>«processor.getMemory(outgoing).name»</address-space>
+								<var-name>fifo_«id»</var-name>
+								<signed>«output.type.int»</signed>
+								<width>«output.width»</width>
+								<size>«outgoing.size»</size>
+								<trace>«path»/trace/«IF !vertex.label.contains("cluster")»«vertex.label»_«ENDIF»«output.name».txt</trace>
+							</output>
+						«ENDIF»
 					«ENDFOR»
 				«ENDFOR»
 			«ENDFOR»

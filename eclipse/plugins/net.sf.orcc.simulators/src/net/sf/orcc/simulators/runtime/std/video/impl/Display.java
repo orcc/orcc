@@ -31,6 +31,7 @@ package net.sf.orcc.simulators.runtime.std.video.impl;
 import java.awt.Canvas;
 import java.awt.Graphics;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -41,6 +42,7 @@ import java.math.BigInteger;
 
 import javax.swing.JFrame;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.runtime.impl.GenericDisplay;
 import net.sf.orcc.util.OrccLogger;
@@ -78,8 +80,8 @@ public class Display extends GenericDisplay {
 	/**
 	 * Close open frames (if any) and clear all
 	 */
-	private static void clearAll() {
-		if (frame != null) {
+	public static void clearAll() {
+		if (frame != null && frame.isVisible()) {
 			WindowEvent wev = new WindowEvent(frame, WindowEvent.WINDOW_CLOSING);
 			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
 			frame.setVisible(false);
@@ -201,7 +203,7 @@ public class Display extends GenericDisplay {
 				useCompare = true;
 			} catch (FileNotFoundException e) {
 				String msg = "File not found: \"" + goldenReference + "\"";
-				throw new RuntimeException(msg, e);
+				throw new OrccRuntimeException(msg, e);
 			}
 		}
 	}
@@ -271,6 +273,16 @@ public class Display extends GenericDisplay {
 	}
 
 	/**
+	 * Return the value user has set in command line with -f argument.
+	 * 
+	 * @return The value set by user, or DEFAULT_NB_FRAMES value if user did not
+	 *         set any value
+	 */
+	public static BigInteger displayYUV_getNbFrames() {
+		return BigInteger.valueOf(nbFrames);
+	}
+
+	/**
 	 * Initializes the display.
 	 */
 	public static void displayYUV_init() {
@@ -281,6 +293,15 @@ public class Display extends GenericDisplay {
 		frame.add(canvas);
 		frame.setResizable(false);
 		frame.setVisible(true);
+
+		frame.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				frame.dispose();
+				AbstractSimulator.userStop();
+			}
+		});
 	}
 
 	public static void fpsPrintInit() {
@@ -289,7 +310,7 @@ public class Display extends GenericDisplay {
 
 	public static void fpsPrintNewPicDecoded() {
 		t2 = System.currentTimeMillis();
-		OrccLogger.traceln("image displayed in " + (t2 - t1) + " ms");
+		OrccLogger.noticeRaw("Image displayed in " + (t2 - t1) + " ms\n");
 		t1 = t2;
 	}
 

@@ -37,7 +37,6 @@ static unsigned int relativeStartTime;
 static int lastNumPic;
 static int numPicturesDecoded;
 
-
 static void print_fps_avg(void) {
 	unsigned int endTime = SDL_GetTicks();
 

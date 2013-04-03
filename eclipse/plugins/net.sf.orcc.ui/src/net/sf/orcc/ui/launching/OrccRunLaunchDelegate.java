@@ -31,7 +31,9 @@ package net.sf.orcc.ui.launching;
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.backends.Backend;
 import net.sf.orcc.backends.BackendFactory;
+import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.ui.console.OrccUiConsoleHandler;
 import net.sf.orcc.util.OrccLogger;
 
@@ -39,10 +41,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
-import org.eclipse.debug.ui.DebugUITools;
 
 /**
  * This class implements a launch configuration delegate to launch a backend.
@@ -53,51 +55,64 @@ import org.eclipse.debug.ui.DebugUITools;
 public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void launch(ILaunchConfiguration configuration, String mode,
+	public void launch(final ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
 
-		OrccProcess process = new OrccProcess(launch, configuration, monitor);
-		launch.addProcess(process);
+		monitor.subTask("Launching backend...");
 
-		try {
-			monitor.subTask("Launching backend...");
+		// Configure the logger with the console attached to the process
+		OrccLogger.configureLoggerWithHandler(new OrccUiConsoleHandler(
+				OrccUiActivator.getOrccConsole("Compilation console")));
 
-			// Configure the logger with the console attached to the process
-			OrccLogger.configureLoggerWithHandler(new OrccUiConsoleHandler(
-					DebugUITools.getConsole(process)));
+		Job job = new Job("Compile job") {
 
-			try {
-				BackendFactory factory = BackendFactory.getInstance();
-				factory.runBackend(process.getProgressMonitor(),
-						configuration.getAttributes());
+			@SuppressWarnings("unchecked")
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
 
-			} catch (OrccRuntimeException e) {
-
-				String backend = configuration.getAttribute(BACKEND, "");
-				if (!e.getMessage().isEmpty()) {
-					OrccLogger.severeln(e.getMessage());
+				String backendName = "unknown";
+				try {
+					backendName = configuration.getAttribute(BACKEND, "");
+				} catch (CoreException e1) {
+					OrccLogger
+							.severeln("Unable to find backend name in configuration attributes !");
+					return Status.CANCEL_STATUS;
 				}
-				OrccLogger.severeln(backend
-						+ " backend could not generate code (" + e.getCause()
-						+ ")");
-				process.terminate();
 
-			} catch (Exception e) {
+				setName(backendName);
 
-				String backend = configuration.getAttribute(BACKEND, "");
-				// clear actor pool because it might not have been done if we
-				// got an error too soon
-				process.terminate();
+				try {
+					// Get the backend instance
+					BackendFactory factory = BackendFactory.getInstance();
+					Backend backend = factory.getBackend(backendName);
 
-				IStatus status = new Status(IStatus.ERROR,
-						OrccActivator.PLUGIN_ID, backend
-								+ " backend could not generate code", e);
-				throw new CoreException(status);
+					// Configure it with options set in "Run Config" panel by
+					// user
+					backend.setOptions(configuration.getAttributes());
+					// Launch compilation
+					backend.compile();
+
+				} catch (OrccRuntimeException e) {
+
+					if (!e.getMessage().isEmpty()) {
+						OrccLogger.severeln(e.getMessage());
+					}
+					OrccLogger.severeln(backendName
+							+ " backend could not generate code ("
+							+ e.getCause() + ")");
+
+					return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+							backendName + " backend could not generate code", e);
+
+				} catch (Exception e) {
+					return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+							backendName + " backend could not generate code", e);
+				}
+				return Status.OK_STATUS;
 			}
-		} finally {
-			process.terminate();
-		}
+		};
+		
+		job.setUser(false);
+		job.schedule();
 	}
-
 }

@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.c;
 
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
-import static net.sf.orcc.backends.OrccBackendsConstants.ADDITIONAL_TRANSFOS;
-import static net.sf.orcc.backends.OrccBackendsConstants.GENETIC_ALGORITHM;
+import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
+import static net.sf.orcc.backends.BackendsConstants.GENETIC_ALGORITHM;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,8 +51,9 @@ import net.sf.orcc.backends.transform.ListFlattener;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
+import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.XcfPrinter;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -77,6 +78,7 @@ import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
+import net.sf.orcc.tools.stats.StatisticsPrinter;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
@@ -128,7 +130,6 @@ public class CBackend extends AbstractBackend {
 		}
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 
@@ -179,11 +180,11 @@ public class CBackend extends AbstractBackend {
 	}
 
 	protected void doTransformNetwork(Network network) {
-		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
 		new Instantiator(true, fifoSize).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
+		new UnitImporter().doSwitch(network);
 
 		if (classify) {
 			OrccLogger.traceln("Classification of actors...");
@@ -232,9 +233,16 @@ public class CBackend extends AbstractBackend {
 		// print CMakeLists
 		OrccLogger.traceln("Printing CMake project files");
 		new CMakePrinter(network).printCMakeFiles(path);
+		new StatisticsPrinter().print(srcPath, network);
 
+		if (balanceMapping) {
+			// Solve load balancing using Metis. The 'mapping' variable should
+			// be the weightsMap, giving a weight to each actor/instance.
+			mapping = new Metis().partition(network, path, processorNumber,
+					mapping);
+		}
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
-			new XcfPrinter().print(srcPath, network, mapping);
+			new Mapping().print(srcPath, network, mapping);
 		}
 	}
 
@@ -272,7 +280,7 @@ public class CBackend extends AbstractBackend {
 	protected boolean printInstance(Instance instance) {
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}
-	
+
 	@Override
 	protected boolean printActor(Actor actor) {
 		return new InstancePrinter(options).print(srcPath, actor) > 0;

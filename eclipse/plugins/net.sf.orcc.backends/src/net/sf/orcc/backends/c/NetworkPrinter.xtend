@@ -33,14 +33,13 @@ import java.util.HashMap
 import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Entity
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
+import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import net.sf.orcc.df.Actor
+import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
  * Generate and print network source file for C backend.
@@ -89,8 +88,6 @@ class NetworkPrinter extends CTemplate {
 			}
 		}
 		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
-		
 		//Template data :
 		// TODO : set the right values when genetic algorithm will be fixed
 		numberOfGroups = 0
@@ -111,7 +108,7 @@ class NetworkPrinter extends CTemplate {
 		val file = new File(targetFolder + File::separator + network.simpleName + ".c")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
@@ -179,17 +176,16 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
+		// Actor initializers
+		«FOR child : network.children»
+			extern void «child.label»_initialize();
+		«ENDFOR»
+		
+		/////////////////////////////////////////////////
 		// Action schedulers
-		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_initialize(«instance.actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
-		«ENDFOR»
-		«FOR actor : network.children.filter(typeof(Actor))»
-			extern void «actor.name»_initialize(«actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
-		«ENDFOR»
 		«FOR child : network.children»
 			extern void «child.label»_scheduler(struct schedinfo_s *si);
 		«ENDFOR»
-		«printActorsSchedulers»
 		
 		/////////////////////////////////////////////////
 		// Declaration of a struct actor for each actor
@@ -200,7 +196,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
 		«FOR child : network.children»
-			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
+			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
@@ -230,17 +226,6 @@ class NetworkPrinter extends CTemplate {
 		
 		/////////////////////////////////////////////////
 		// Initializer and launcher
-		void initialize_instances() {
-			«FOR vertex : network.children»
-				«val instance = vertex.getAdapter(typeof(Instance))»
-				«IF instance != null»
-					«instance.name»_initialize(«FOR port : instance.actor.inputs SEPARATOR ","»«if (instance.incomingPortMap.get(port) != null) instance.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
-				«ELSE»
-					«val actor = vertex.getAdapter(typeof(Actor))»
-					«actor.name»_initialize(«FOR port : actor.inputs SEPARATOR ","»«if (actor.incomingPortMap.get(port) != null) actor.incomingPortMap.get(port).<Object>getValueAsObject("fifoId") else "-1"»«ENDFOR»);
-				«ENDIF»
-			«ENDFOR»
-		}
 		
 		«printLauncher»
 		
@@ -256,24 +241,9 @@ class NetworkPrinter extends CTemplate {
 		}
 	'''
 
-	def protected printActorsSchedulers() '''
-		// Action schedulers
-		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_scheduler(struct schedinfo_s *si);
-		«ENDFOR»
-	'''
-
-	def protected getFifoId(Port port, Instance instance) {
-		if(instance.incomingPortMap.containsKey(port)) {
-			String::valueOf(instance.incomingPortMap.get(port).<Integer>getValueAsObject("fifoId"))
-		} else {
-			"-1"
-		}
-	}
-
 	def protected printLauncher() '''
 		static void launcher() {
-			int i, display_scheduler = -1;
+			int i;
 			
 			cpu_set_t cpuset;
 			«IF ! geneticAlgo»
@@ -299,8 +269,6 @@ class NetworkPrinter extends CTemplate {
 				monitor_init(&monitoring, &sched_sync, &genetic_info);
 			«ENDIF»
 			
-			initialize_instances();
-			
 			«IF !geneticAlgo»
 				for(i=0; i < mapping->number_of_threads; ++i){
 					sched_init(&schedulers[i], mapping->threads_ids[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
@@ -314,25 +282,15 @@ class NetworkPrinter extends CTemplate {
 			clear_cpu_set(cpuset);
 			
 			for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
-				if(find_actor("display", schedulers[i].actors, schedulers[i].num_actors) == NULL){
-					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
-					set_thread_affinity(cpuset, i, threads[i]);
-				} else {
-					display_scheduler = i;
-				}
+				thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
+				set_thread_affinity(cpuset, i, threads[i]);
 			}
 			«IF geneticAlgo»
 				thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
 			«ENDIF»
 			
-			if(display_scheduler != -1){
-				(*scheduler)((void*) &schedulers[display_scheduler]);
-			}
-			
 			for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
-				if(i != display_scheduler){
-					thread_join(threads[i]);
-				}
+				thread_join(threads[i]);
 			}
 			«IF geneticAlgo»
 				thread_join(thread_monitor);
@@ -359,6 +317,7 @@ class NetworkPrinter extends CTemplate {
 			struct scheduler_s *sched = (struct scheduler_s *) data;
 			struct actor_s *my_actor;
 			struct schedinfo_s si;
+			int j;
 			«IF geneticAlgo»
 				
 				int i = 0;
@@ -366,6 +325,8 @@ class NetworkPrinter extends CTemplate {
 				semaphore_wait(sched->sem_thread);
 				start = clock ();
 			«ENDIF»
+			
+			sched_init_actors(sched, &si);
 			
 			while (1) {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;

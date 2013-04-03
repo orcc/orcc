@@ -17,3 +17,7 @@ plugin.xml_gen
 **/CHANGELOG
 **/CHANGES.md
 **/CHANGELOG.md
+
+# Update site specific patterns
+eclipse/site/updates/features/
+eclipse/site/updates/plugins/

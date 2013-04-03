@@ -38,6 +38,9 @@ import java.math.BigInteger;
 
 import javax.swing.JFrame;
 
+import net.sf.orcc.simulators.AbstractSimulator;
+import net.sf.orcc.util.OrccLogger;
+
 /**
  * This class defines native functions for the DisplayYUV actor.
  * 
@@ -195,6 +198,8 @@ public class DisplayYUVWithCrop {
 				image = null;
 				lastHeight = 0;
 				lastWidth = 0;
+
+				AbstractSimulator.stop(BigInteger.ZERO);
 			}
 
 		});
@@ -226,7 +231,7 @@ public class DisplayYUVWithCrop {
 
 	public static void fpsPrintNewPicDecoded() {
 		t2 = System.currentTimeMillis();
-		System.out.println("image displayed in " + (t2 - t1) + " ms");
+		OrccLogger.noticeRaw("Image displayed in " + (t2 - t1) + " ms\n");
 		t1 = t2;
 	}
 

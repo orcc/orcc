@@ -4,12 +4,13 @@ import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.PrintStream
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.List
+import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Port
+import net.sf.orcc.graph.Vertex
 import net.sf.orcc.ir.ExprBinary
 import net.sf.orcc.ir.ExprBool
 import net.sf.orcc.ir.ExprFloat
@@ -29,20 +30,14 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.util.AbstractIrVisitor
-import net.sf.orcc.util.OrccLogger
 import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
-import net.sf.orcc.df.Port
-import net.sf.orcc.graph.Vertex
-import net.sf.orcc.df.Instance
 
 /**
  * Define commons methods for all backends printers
  * 
  */
 abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
-	
-	protected var overwriteAllFiles = false
 	
 	protected var precedence = Integer::MAX_VALUE
 	protected var branch = 0
@@ -63,7 +58,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * or when declaring it. If list is empty, return an empty string.
 	 */
 	def protected printArrayIndexes(List<Expression> exprList) {
-		exprList.join("", ['''[«doSwitch»]'''])
+		exprList.join("")['''[«doSwitch»]''']
 	}
 	
 	/**
@@ -140,35 +135,8 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * @param content
 	 */
 	def protected needToWriteFile(CharSequence content, File target) {
-		return overwriteAllFiles || ! target.exists()
+		return ! target.exists()
 				|| ! MessageDigest::isEqual(hash(target), hash(content.toString.bytes));
-	}
-	
-	/**
-	 * Create a file and print content inside it. If parent folder doesn't
-	 * exists, create it.
-	 * 
-	 * @param content
-	 *            text to write in file
-	 * @param target
-	 *            file to write content to
-	 * @return true if the file has correctly been written
-	 */
-	def protected printFile(CharSequence content, File target) {
-		try {
-			if ( ! target.getParentFile().exists()) {
-				target.getParentFile().mkdirs();
-			}
-			val ps = new PrintStream(new FileOutputStream(target));
-			ps.print(content);
-			ps.close();
-			return true;
-		} catch (FileNotFoundException e) {
-			OrccLogger::severe("Unable to write file " + target.path + " : " + e.cause)
-			OrccLogger::severe(e.localizedMessage)
-			e.printStackTrace();
-			return false;
-		}
 	}
 	
 	override caseTypeBool(TypeBool type) {
@@ -261,7 +229,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	}
 	
 	override caseExprList(ExprList expr) {
-		'''{«expr.value.join(", ", [printExpr(Integer::MAX_VALUE, 0)])»}'''
+		'''{«expr.value.join(", ")[printExpr(Integer::MAX_VALUE, 0)]»}'''
 	}
 
 	override caseExprString(ExprString expr) {

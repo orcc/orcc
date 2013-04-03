@@ -79,61 +79,41 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		/////////////////////////////////////////////////
 		// Action initializes
 		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_initialize(«instance.actor.inputs.join(", ", ['''unsigned int fifo_«name»_id'''])»);
+			extern void «instance.name»_initialize();
 		«ENDFOR»
-		«printActorsSchedulers»
+		
+		/////////////////////////////////////////////////
+		// Action schedulers
+		«FOR instance : network.children.actorInstances»
+			extern void «instance.name»_scheduler();
+		«ENDFOR»
 
 		/////////////////////////////////////////////////
 		// Actor scheduler
-		«printScheduler»
-		
-		/////////////////////////////////////////////////
-		// Initializer and launcher
-		void initialize_instances() {
-			«FOR instance : network.children.actorInstances»
-				«instance.name»_initialize(«instance.actor.inputs.join(", ", [getFifoId(instance)])»);
-			«ENDFOR»
-		}
-		
-		«printLauncher»
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// Main
-		int main(int argc, char *argv[]) {
-			init_orcc(argc, argv);
-			
-			launcher();
-			
-			printf("End of simulation !\n");
-			return compareErrors;
-		}
-	'''
-
-	override protected printLauncher() '''
-		static void launcher() {
-			initialize_instances();
-			
-			// Call global scheduler
-			scheduler();
-		}
-	'''
-
-	override protected printScheduler() '''
-		void scheduler() {
+		static void scheduler() {
 			int stop = 0;
+			
+			«FOR instance : network.children.actorInstances»
+				«instance.name»_initialize();
+			«ENDFOR»
+			
 			while(!stop) {
 				«FOR instance : network.children.actorInstances»
 					«instance.name»_scheduler();
 				«ENDFOR»
 			}
 		}
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// Main
+		int main(int argc, char *argv[]) {
+			init_orcc(argc, argv);
+			
+			scheduler();
+			
+			printf("End of simulation !\n");
+			return compareErrors;
+		}
 	'''
-	
-	override protected printActorsSchedulers() '''
-		// Action schedulers
-		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_scheduler();
-		«ENDFOR»
-		'''
 
 }

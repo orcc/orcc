@@ -51,6 +51,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.TermBool
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Writes
 import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.common.util.EMap
 
 class TceProcessorPrinter extends TTAPrinter {
@@ -69,12 +70,12 @@ class TceProcessorPrinter extends TTAPrinter {
 		var cached = 0
 		
 		if(needToWriteFile(adfContent, adfFile)) {
-			printFile(adfContent, adfFile)
+			OrccUtil::printFile(adfContent, adfFile)
 		} else {
 			cached = cached + 1
 		}
 		if(needToWriteFile(idfContent, idfFile)) {
-			printFile(idfContent, idfFile)
+			OrccUtil::printFile(idfContent, idfFile)
 		} else {
 			cached = cached + 1
 		}
@@ -125,7 +126,7 @@ class TceProcessorPrinter extends TTAPrinter {
 		</bus>
 		'''
 	
-	def private dispatch getAdfExpr(ExprBinary expr) 
+	def private dispatch CharSequence getAdfExpr(ExprBinary expr) 
 		'''
 		«IF(expr.and)»<and-expr>«ELSE»<or-expr>«ENDIF»
 			«expr.e1.adfExpr»
@@ -133,19 +134,19 @@ class TceProcessorPrinter extends TTAPrinter {
 		«IF(expr.and)»</and-expr>«ELSE»</or-expr>«ENDIF»
 		'''
 	
-	def private dispatch getAdfExpr(ExprUnary expr) 
+	def private dispatch CharSequence getAdfExpr(ExprUnary expr) 
 		'''
 		«IF(expr.simple)»<simple-expr>«ELSE»<inverted-expr>«ENDIF»
 			«expr.term.adfTerm»
 		«IF(expr.simple)»</simple-expr>«ELSE»</inverted-expr>«ENDIF»
 		'''
 	
-	def private dispatch getAdfExpr(ExprFalse object) 
+	def private dispatch CharSequence getAdfExpr(ExprFalse object) 
 		'''
 		<always-false/>
 		'''
 	
-	def private dispatch getAdfExpr(ExprTrue object) 
+	def private dispatch CharSequence getAdfExpr(ExprTrue object) 
 		'''
 		<always-true/>
 		'''

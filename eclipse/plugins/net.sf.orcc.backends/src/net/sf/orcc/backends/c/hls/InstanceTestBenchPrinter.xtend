@@ -28,11 +28,12 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.df.Instance
+import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
-import java.io.File
+import net.sf.orcc.util.OrccUtil
 
 /**
  * generates top Network testbench
@@ -106,14 +107,10 @@ import java.io.File
 	 -- Input and Output files
 	signal tb_FSM_bits  : tb_type;
 	«FOR connection : instance.outgoingPortMap.values»
-		«IF !(connection.head.source instanceof Port) && (connection.head.target instanceof Port)»
-				file sim_file_«instance.name»_«connection.head.sourcePort.name»  : text is "«instance.name»_«connection.head.sourcePort.name».txt";
-		«ENDIF»
+		file sim_file_«instance.name»_«connection.head.sourcePort.name»  : text is "«instance.name»_«connection.head.sourcePort.name».txt";
 	«ENDFOR»
 	«FOR connection : instance.incomingPortMap.values»
-		«IF (connection.source instanceof Port) && !(connection.target instanceof Port)»
-				file sim_file_«instance.name»_«connection.targetPort.name»  : text is "«instance.name»_«connection.targetPort.name».txt";
-		«ENDIF»
+		file sim_file_«instance.name»_«connection.targetPort.name»  : text is "«instance.name»_«connection.targetPort.name».txt";
 	«ENDFOR»
 	begin
 
@@ -339,7 +336,7 @@ import java.io.File
 		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1

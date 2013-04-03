@@ -58,7 +58,8 @@ static clock_t startTime;
 static unsigned int nbByteRead = 0;
 
 // count number of times file were read
-unsigned int loopsCount;
+// This variable is deprecated and will be removed in the future. Please don't use it anymore.
+int loopsCount;
 
 void printSpeed(void) {
 	double executionTime;
@@ -261,10 +262,12 @@ void source_readNBytesFd(long fdVal, unsigned char *outTable, unsigned int nbTok
 	nbByteRead += nbTokenToRead * 8;
 }
 
+// This function is deprecated and will be removed in the future. Please don't use it anymore.
 void source_decrementNbLoops(){
 	--loopsCount;
 }
 
+// This function is deprecated and will be removed in the future. Please don't use it anymore.
 int source_isMaxLoopsReached(){
-	return nbLoops != DEFAULT_INFINITE_LOOP && loopsCount <= 0;
+	return nbLoops != DEFAULT_INFINITE && loopsCount <= 0;
 }

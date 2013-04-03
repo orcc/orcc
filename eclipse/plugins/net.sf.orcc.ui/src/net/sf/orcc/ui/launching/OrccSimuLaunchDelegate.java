@@ -28,19 +28,25 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import net.sf.orcc.OrccActivator;
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.simulators.Simulator;
 import net.sf.orcc.simulators.SimulatorFactory;
 import net.sf.orcc.ui.console.OrccUiConsoleHandler;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccLogger.OrccLevel;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
+import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.ui.DebugUITools;
 
 /**
@@ -53,51 +59,103 @@ import org.eclipse.debug.ui.DebugUITools;
 public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void launch(ILaunchConfiguration configuration, String mode,
+	public void launch(final ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
-		OrccProcess process = new OrccProcess(launch, configuration, monitor);
+
+		// set the log level
+		if (mode.equals("debug")
+				|| configuration.getAttribute(DEBUG_MODE, false)) {
+			OrccLogger.setLevel(OrccLevel.ALL);
+		} else {
+			OrccLogger.setLevel(OrccLevel.NOTICE);
+		}
+
+		Job job = new Job("Simulation job") {
+
+			Simulator currentSimulator;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+
+				String simulatorName = "unknown";
+				try {
+					simulatorName = configuration.getAttribute(SIMULATOR, "");
+				} catch (CoreException e1) {
+					OrccLogger
+							.severeln("Unable to find simulator name in configuration attributes !");
+					return Status.CANCEL_STATUS;
+				}
+
+				OrccLogger.traceln("Simulation starts: " + simulatorName);
+				this.setName(simulatorName);
+
+				IStatus returnStatus = Status.OK_STATUS;
+
+				try {
+					Simulator simulator = SimulatorFactory.getInstance()
+							.getSimulator(simulatorName);
+
+					currentSimulator = simulator;
+
+					simulator.setOptions(configuration.getAttributes());
+					simulator.run();
+
+				} catch (OrccRuntimeException e) {
+
+					if (!e.getMessage().isEmpty()) {
+						OrccLogger.severeln(e.getMessage());
+					}
+					OrccLogger.severeln(simulatorName + " error ("
+							+ e.getCause() + ")");
+
+					returnStatus = new Status(IStatus.ERROR,
+							OrccActivator.PLUGIN_ID, simulatorName + " error",
+							e);
+
+				} catch (Exception e) {
+
+					e.printStackTrace();
+
+					Throwable throwable = e;
+					StringBuilder builder = new StringBuilder();
+					while (throwable != null
+							&& throwable.getCause() != throwable) {
+						builder.append(throwable.getLocalizedMessage());
+						builder.append('\n');
+						throwable = throwable.getCause();
+					}
+
+					returnStatus = new Status(IStatus.ERROR,
+							OrccActivator.PLUGIN_ID, simulatorName
+									+ " simulation error: "
+									+ builder.toString());
+				} finally {
+					OrccLogger.restoreLevels();
+					OrccLogger.setLevel(OrccLevel.ALL);
+				}
+
+				return returnStatus;
+			}
+
+			@Override
+			protected void canceling() {
+				currentSimulator.stop();
+				super.canceling();
+				OrccLogger
+						.traceln("Simulation aborted (from eclipse control).");
+				this.done(Status.OK_STATUS);
+			}
+		};
+
+		IProcess process = new OrccProcess(job, launch);
 		launch.addProcess(process);
 
 		// Configure the logger with the console attached to the process
 		OrccLogger.configureLoggerWithHandler(new OrccUiConsoleHandler(
 				DebugUITools.getConsole(process)));
-
-		try {
-			String simulatorName = configuration.getAttribute(SIMULATOR, "");
-
-			monitor.subTask("Launching simulator...");
-			OrccLogger.traceln("*********************************************"
-					+ "**********************************");
-			OrccLogger.traceln("Launching " + simulatorName + "...");
-
-			try {
-				SimulatorFactory factory = SimulatorFactory.getInstance();
-				factory.runSimulator(monitor, mode,
-						configuration.getAttributes());
-			} catch (Exception e) {
-				// clear actor pool because it might not have been done if
-				// we got an error too soon
-				monitor.setCanceled(true);
-
-				e.printStackTrace();
-
-				Throwable throwable = e;
-				StringBuilder builder = new StringBuilder();
-				while (throwable != null && throwable.getCause() != throwable) {
-					builder.append(throwable.getLocalizedMessage());
-					builder.append('\n');
-					throwable = throwable.getCause();
-				}
-
-				IStatus status = new Status(IStatus.ERROR,
-						OrccActivator.PLUGIN_ID, simulatorName
-								+ " simulation error: " + builder.toString());
-				throw new CoreException(status);
-			}
-			OrccLogger.traceln("Orcc backend done.");
-		} finally {
-			process.terminate();
-		}
+		
+		job.setUser(false);
+		job.schedule();
 	}
 }

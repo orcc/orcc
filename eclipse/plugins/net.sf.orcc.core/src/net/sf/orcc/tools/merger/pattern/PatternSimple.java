@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, EPFL
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,9 +10,9 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the EPFL nor the names of its contributors may be used 
- *     to endorse or promote products derived from this software without specific 
- *     prior written permission.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -26,22 +26,65 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+package net.sf.orcc.tools.merger.pattern;
 
-package net.sf.orcc.tools.merger.actor;
+import net.sf.orcc.df.Action;
 
 /**
- * This interface defines a scheduler.
+ * This class defines a simple pattern. A simple pattern is the invocation of
+ * one action.
  * 
- * @author Ghislain Roquier
+ * @author Matthieu Wipliez
  * 
  */
-public interface IScheduler {
+public class PatternSimple extends PatternExecution {
 
-	/**
-	 * Schedules the given network in-place.
-	 * 
-	 * @param network
-	 *            a network
-	 */
-	public void schedule();
+	private Action action;
+
+	public PatternSimple(Action action) {
+		this.action = action;
+	}
+
+	@Override
+	public void accept(PatternVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public int cost() {
+		return 1;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof PatternSimple) {
+			return action.equals(((PatternSimple) obj).action);
+		}
+		return false;
+	}
+
+	public Action getAction() {
+		return action;
+	}
+
+	@Override
+	public boolean isLoop() {
+		return false;
+	}
+
+	@Override
+	public boolean isSequential() {
+		return false;
+	}
+
+	@Override
+	public boolean isSimple() {
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return action.toString();
+	}
+
 }

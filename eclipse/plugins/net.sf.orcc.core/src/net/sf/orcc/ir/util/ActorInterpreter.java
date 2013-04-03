@@ -83,26 +83,20 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class ActorInterpreter extends IrSwitch<Object> {
 
+	/** the associated interpreted actor */
 	protected Actor actor;
-
-	/**
-	 * branch being visited
-	 */
+	/** branch being visited */
 	protected int branch;
-
+	/** the expression evaluator */
 	protected ExpressionEvaluator exprInterpreter;
-
-	/**
-	 * Actor's FSM current state
-	 */
+	/** Actor's FSM current state */
 	protected State fsmState;
 
 	/**
-	 * Creates a new interpreter with no actor and no parameters.
-	 * 
+	 * Creates a new interpreter without any associated {@link Actor}
 	 */
 	public ActorInterpreter() {
-		exprInterpreter = new ExpressionEvaluator();
+		this.exprInterpreter = new ExpressionEvaluator();
 	}
 
 	/**
@@ -110,11 +104,9 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * 
 	 * @param actor
 	 *            the actor to interpret
-	 * @param parameters
-	 *            parameters of the instance of the given actor
 	 */
 	public ActorInterpreter(Actor actor) {
-		exprInterpreter = new ExpressionEvaluator();
+		this();
 		setActor(actor);
 	}
 
@@ -140,10 +132,12 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * 
 	 * @param procedure
 	 *            a native procedure
+	 * @param arguments
+	 *            the arguments used to call the given procedure
 	 * @return the result of calling the given procedure
 	 */
 	protected Object callNativeProcedure(Procedure procedure,
-			List<Arg> parameters) {
+			List<Arg> arguments) {
 		return null;
 	}
 
@@ -170,6 +164,68 @@ public class ActorInterpreter extends IrSwitch<Object> {
 				}
 			}
 		}
+	}
+
+	@Override
+	public Object caseBlockBasic(BlockBasic block) {
+		List<Instruction> instructions = block.getInstructions();
+		for (Instruction instruction : instructions) {
+			Object result = doSwitch(instruction);
+			if (result != null) {
+				return result;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseBlockIf(BlockIf block) {
+		// Interpret first expression ("if" condition)
+		Object condition = exprInterpreter.doSwitch(block.getCondition());
+
+		Object ret;
+		// if (condition is true)
+		if (ValueUtil.isBool(condition)) {
+			int oldBranch = branch;
+			if (ValueUtil.isTrue(condition)) {
+				doSwitch(block.getThenBlocks());
+				branch = 0;
+			} else {
+				doSwitch(block.getElseBlocks());
+				branch = 1;
+			}
+
+			ret = doSwitch(block.getJoinBlock());
+			branch = oldBranch;
+		} else {
+			throw new OrccRuntimeException("Condition "
+					+ new ExpressionPrinter().doSwitch(block.getCondition())
+					+ " not boolean at line " + block.getLineNumber());
+		}
+		return ret;
+	}
+
+	@Override
+	public Object caseBlockWhile(BlockWhile block) {
+		int oldBranch = branch;
+		branch = 0;
+		doSwitch(block.getJoinBlock());
+
+		// Interpret first expression ("while" condition)
+		Object condition = exprInterpreter.doSwitch(block.getCondition());
+
+		// while (condition is true) do
+		branch = 1;
+		while (ValueUtil.isTrue(condition)) {
+			doSwitch(block.getBlocks());
+			doSwitch(block.getJoinBlock());
+
+			// Interpret next value of "while" condition
+			condition = exprInterpreter.doSwitch(block.getCondition());
+		}
+
+		branch = oldBranch;
+		return null;
 	}
 
 	@Override
@@ -296,68 +352,6 @@ public class ActorInterpreter extends IrSwitch<Object> {
 								+ instr.getLineNumber() + "");
 			}
 		}
-		return null;
-	}
-
-	@Override
-	public Object caseBlockBasic(BlockBasic block) {
-		List<Instruction> instructions = block.getInstructions();
-		for (Instruction instruction : instructions) {
-			Object result = doSwitch(instruction);
-			if (result != null) {
-				return result;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseBlockIf(BlockIf block) {
-		// Interpret first expression ("if" condition)
-		Object condition = exprInterpreter.doSwitch(block.getCondition());
-
-		Object ret;
-		// if (condition is true)
-		if (ValueUtil.isBool(condition)) {
-			int oldBranch = branch;
-			if (ValueUtil.isTrue(condition)) {
-				doSwitch(block.getThenBlocks());
-				branch = 0;
-			} else {
-				doSwitch(block.getElseBlocks());
-				branch = 1;
-			}
-
-			ret = doSwitch(block.getJoinBlock());
-			branch = oldBranch;
-		} else {
-			throw new OrccRuntimeException("Condition "
-					+ new ExpressionPrinter().doSwitch(block.getCondition())
-					+ " not boolean at line " + block.getLineNumber());
-		}
-		return ret;
-	}
-
-	@Override
-	public Object caseBlockWhile(BlockWhile block) {
-		int oldBranch = branch;
-		branch = 0;
-		doSwitch(block.getJoinBlock());
-
-		// Interpret first expression ("while" condition)
-		Object condition = exprInterpreter.doSwitch(block.getCondition());
-
-		// while (condition is true) do
-		branch = 1;
-		while (ValueUtil.isTrue(condition)) {
-			doSwitch(block.getBlocks());
-			doSwitch(block.getJoinBlock());
-
-			// Interpret next value of "while" condition
-			condition = exprInterpreter.doSwitch(block.getCondition());
-		}
-
-		branch = oldBranch;
 		return null;
 	}
 
@@ -532,6 +526,27 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	}
 
 	/**
+	 * Initializes external resources referenced by an object (actor, procedure,
+	 * etc.)
+	 * 
+	 * @param obj
+	 *            an EObject which potentially use external variables or
+	 *            procedures
+	 */
+	private void initExternalResources(EObject obj) {
+		Map<EObject, Collection<Setting>> map = EcoreUtil.ExternalCrossReferencer
+				.find(obj);
+		for (EObject externalObject : map.keySet()) {
+			if (externalObject instanceof Var
+					&& ((Var) externalObject).getValue() == null) {
+				initializeVar((Var) externalObject);
+			} else if (externalObject instanceof Procedure) {
+				initExternalResources(externalObject);
+			}
+		}
+	}
+
+	/**
 	 * Initialize interpreted actor. That is to say constant parameters,
 	 * initialized state variables, allocation and initialization of state
 	 * arrays.
@@ -568,27 +583,6 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		} catch (OrccRuntimeException ex) {
 			throw new OrccRuntimeException("Runtime exception thrown by actor "
 					+ actor.getName(), ex);
-		}
-	}
-
-	/**
-	 * Initializes external resources referenced by an object (actor, procedure,
-	 * etc.)
-	 * 
-	 * @param obj
-	 *            an EObject which potentially use external variables or
-	 *            procedures
-	 */
-	private void initExternalResources(EObject obj) {
-		Map<EObject, Collection<Setting>> map = EcoreUtil.ExternalCrossReferencer
-				.find(obj);
-		for (EObject externalObject : map.keySet()) {
-			if (externalObject instanceof Var
-					&& ((Var) externalObject).getValue() == null) {
-				initializeVar((Var) externalObject);
-			} else if (externalObject instanceof Procedure) {
-				initExternalResources(externalObject);
-			}
 		}
 	}
 

@@ -33,14 +33,15 @@ import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
+import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.FRAMES_NUMBER;
 import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
 import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
 import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
 import static net.sf.orcc.simulators.SimulatorsConstants.LOOP_NUMBER;
 import static net.sf.orcc.simulators.SimulatorsConstants.PROFILE;
 import static net.sf.orcc.simulators.SimulatorsConstants.PROFILE_FOLDER;
-import static net.sf.orcc.simulators.SimulatorsConstants.TRACES_FOLDER;
 import static net.sf.orcc.simulators.SimulatorsConstants.TYPE_RESIZER;
 import static net.sf.orcc.simulators.SimulatorsConstants.TYPE_RESIZER_CAST_BOOLTOINT;
 import static net.sf.orcc.simulators.SimulatorsConstants.TYPE_RESIZER_CAST_NATIVEPORTS;
@@ -65,6 +66,7 @@ import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.SimulatorDescriptor;
 import net.sf.orcc.simulators.runtime.impl.GenericDisplay;
 import net.sf.orcc.simulators.runtime.impl.GenericSource;
+import net.sf.orcc.simulators.runtime.std.video.impl.Display;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -182,6 +184,7 @@ public class SlowSimulator extends AbstractSimulator {
 				}
 			}
 		}
+
 	}
 
 	/**
@@ -240,6 +243,7 @@ public class SlowSimulator extends AbstractSimulator {
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
 		loopsNumber = getAttribute(LOOP_NUMBER, DEFAULT_NB_LOOPS);
+		GenericDisplay.nbFrames = getAttribute(FRAMES_NUMBER, DEFAULT_NB_FRAMES);
 
 		noDisplay = getAttribute(NO_DISPLAY, false);
 
@@ -249,9 +253,11 @@ public class SlowSimulator extends AbstractSimulator {
 		typeResizer[2] = getAttribute(TYPE_RESIZER_CAST_NATIVEPORTS, false);
 		typeResizer[3] = getAttribute(TYPE_RESIZER_CAST_BOOLTOINT, false);
 
+		stopRequested = false;
+		statusCode = 0;
 	}
 
-	protected int runNetwork(Network network) {
+	protected SimulationEndOrigin runNetwork(Network network) {
 		boolean hasExecuted;
 		do {
 			hasExecuted = false;
@@ -262,8 +268,8 @@ public class SlowSimulator extends AbstractSimulator {
 
 				while (interpreter.schedule()) {
 					// check for cancelation
-					if (isCanceled() || stopRequested) {
-						return statusCode;
+					if (isStopped()) {
+						return SimulationEndOrigin.EXTERNALSTOP;
 					}
 					nbFiring++;
 				}
@@ -271,18 +277,17 @@ public class SlowSimulator extends AbstractSimulator {
 				hasExecuted |= (nbFiring > 0);
 
 				// check for cancelation
-				if (isCanceled() || stopRequested) {
-					return statusCode;
+				if (isStopped()) {
+					return SimulationEndOrigin.EXTERNALSTOP;
 				}
 			}
 		} while (hasExecuted);
 
-		OrccLogger.traceln("End of simulation");
-		return statusCode;
+		return SimulationEndOrigin.NORMALEND;
 	}
 
 	@Override
-	public int start(String mode) {
+	public void run() {
 		try {
 			SimulatorDescriptor.killDescriptors();
 			interpreters = new HashMap<Actor, ActorInterpreter>();
@@ -307,8 +312,21 @@ public class SlowSimulator extends AbstractSimulator {
 			createInterpreters(network);
 			connectNetwork(network);
 			initializeNetwork(network);
-			runNetwork(network);
+
+			SimulationEndOrigin returnStatus = runNetwork(network);
+
 			SimulatorDescriptor.killDescriptors();
+			// Close the display and associated objects if necessary
+			Display.clearAll();
+
+			if (returnStatus == SimulationEndOrigin.EXTERNALSTOP) {
+				OrccLogger
+						.traceln("Simulation aborted (from application control).");
+			} else {
+				OrccLogger.traceln("End of simulation");
+				OrccLogger.traceln("Simulation returned status code "
+						+ statusCode);
+			}
 
 			if (profile) {
 				new ProfilingPrinter().print(profileFolder, network);
@@ -317,6 +335,5 @@ public class SlowSimulator extends AbstractSimulator {
 			// clean up to prevent memory leak
 			interpreters = null;
 		}
-		return statusCode;
 	}
 }

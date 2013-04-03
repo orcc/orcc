@@ -28,12 +28,11 @@
  */
 package net.sf.orcc.backends.java
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
+import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
-import java.io.File
+import net.sf.orcc.util.OrccUtil
 
 /*
  * Compile Top_network Java source code 
@@ -48,8 +47,6 @@ class NetworkPrinter extends JavaTemplate {
 	new(Network network, Map<String, Object> options){
 		super()
 		this.network = network
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 			
@@ -59,7 +56,7 @@ class NetworkPrinter extends JavaTemplate {
 		var file = new File(targetFolder + File::separator + network.simpleName + ".java")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
@@ -75,7 +72,7 @@ class NetworkPrinter extends JavaTemplate {
 		var file = new File(targetFolder + File::separator + ".classpath")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 		} else {
 			filesCached = filesCached + 1
 		}
@@ -84,7 +81,7 @@ class NetworkPrinter extends JavaTemplate {
 		file = new File(targetFolder + File::separator + ".project")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 		} else {
 			filesCached = filesCached + 1
 		}
@@ -102,12 +99,12 @@ class NetworkPrinter extends JavaTemplate {
 		public class «network.simpleName» implements IScheduler {
 			
 			// Declare actors objects
-			«FOR instance : network.children.filter(typeof(Instance)).filter([!broadcast])»
+			«FOR instance : network.children.filter(typeof(Instance)).filter[!broadcast]»
 				private IActor «instance.name»;
 			«ENDFOR»
 			
 			// Declare broadcast
-			«FOR instance : network.children.filter(typeof(Instance)).filter([broadcast])»
+			«FOR instance : network.children.filter(typeof(Instance)).filter[broadcast]»
 				private Broadcast<«instance.actor.getInput("input").type.doSwitch»> «instance.name»;
 			«ENDFOR»
 			
@@ -117,12 +114,12 @@ class NetworkPrinter extends JavaTemplate {
 			public void initialize() {
 				
 				// Instantiate actors
-				«FOR instance : network.children.filter(typeof(Instance)).filter([!broadcast])»
+				«FOR instance : network.children.filter(typeof(Instance)).filter[!broadcast]»
 					«instance.name» = new «instance.actor.name»(«printArguments(instance.actor.parameters, instance.arguments)»);
 				«ENDFOR»
 				
 				// Instantiate broadcast
-				«FOR instance : network.children.filter(typeof(Instance)).filter([broadcast])»
+				«FOR instance : network.children.filter(typeof(Instance)).filter[broadcast]»
 					«instance.name» = new Broadcast<«instance.actor.getInput("input").type.doSwitch»>(«instance.outgoing.size»);
 				«ENDFOR»
 				

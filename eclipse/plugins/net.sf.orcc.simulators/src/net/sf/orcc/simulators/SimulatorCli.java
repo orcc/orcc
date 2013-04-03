@@ -29,21 +29,22 @@
 package net.sf.orcc.simulators;
 
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
-import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
-import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
-import static net.sf.orcc.simulators.SimulatorsConstants.LOOP_NUMBER;
 import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.FRAMES_NUMBER;
+import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
+import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
+import static net.sf.orcc.simulators.SimulatorsConstants.LOOP_NUMBER;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccLogger.OrccLevel;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -56,7 +57,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -112,14 +112,18 @@ public class SimulatorCli implements IApplication {
 		clOptions.addOption(opt);
 
 		// Optional command line arguments
-		clOptions.addOption("l", "loopsnumber", true,
+		clOptions.addOption("l", "loops_number", true,
 				"Defines the number of times input stimulus will be read before "
 						+ "application stop. A negative value means infinite. "
 						+ "Default : 1 time.");
 
+		clOptions.addOption("f", "frames_number", true,
+				"Defines the number of frames to"
+						+ "display before closing application.");
+
 		clOptions.addOption("r", "golden_reference", true,
 				"Reference file which used to compare with decoded stream.");
-		clOptions.addOption("f", "fifo-size", true,
+		clOptions.addOption("s", "fifo-size", true,
 				"Default size of the FIFO channels");
 		clOptions.addOption("n", "nodisplay", false,
 				"Disable display initialization");
@@ -146,14 +150,18 @@ public class SimulatorCli implements IApplication {
 					commandLine.getOptionValue('i'));
 			simulatorOptions.put(XDF_FILE, commandLine.getArgList().get(0));
 
-			if (commandLine.hasOption('f')) {
+			if (commandLine.hasOption('s')) {
 				simulatorOptions.put(FIFO_SIZE,
-						Integer.valueOf(commandLine.getOptionValue('f')));
+						Integer.valueOf(commandLine.getOptionValue('s')));
 			}
 
 			if (commandLine.hasOption('l')) {
 				simulatorOptions.put(LOOP_NUMBER,
 						commandLine.getOptionValue('l'));
+			}
+			if (commandLine.hasOption('f')) {
+				simulatorOptions.put(FRAMES_NUMBER,
+						commandLine.getOptionValue('f'));
 			}
 
 			if (commandLine.hasOption('n')) {
@@ -161,7 +169,7 @@ public class SimulatorCli implements IApplication {
 			}
 
 			if (commandLine.hasOption('d')) {
-				OrccLogger.setLevel(OrccLogger.DEBUG);
+				OrccLogger.setLevel(OrccLevel.DEBUG);
 			}
 
 			if (commandLine.hasOption("r")) {
@@ -176,13 +184,16 @@ public class SimulatorCli implements IApplication {
 
 				disableAutoBuild();
 
-				SimulatorFactory.getInstance().runSimulator(
-						new NullProgressMonitor(), "run", simulatorOptions);
+				Simulator simulator = SimulatorFactory.getInstance()
+						.getSimulator((String) simulatorOptions.get(SIMULATOR));
+				simulator.setOptions(simulatorOptions);
+				simulator.run();
+
 			} catch (CoreException ce) {
 				OrccLogger.severeln("Unable to set the workspace properties.");
 				restoreAutoBuild();
 				return IApplication.EXIT_RELAUNCH;
-			} catch (OrccException oe) {
+			} catch (OrccRuntimeException oe) {
 				OrccLogger.severeln("Simulator has shut down");
 				restoreAutoBuild();
 				return IApplication.EXIT_RELAUNCH;
@@ -195,8 +206,6 @@ public class SimulatorCli implements IApplication {
 
 		} catch (UnrecognizedOptionException uoe) {
 			printUsage(clOptions, uoe.getLocalizedMessage());
-		} catch (ParseException pe) {
-			printUsage(clOptions, pe.getLocalizedMessage());
 		}
 
 		return IApplication.EXIT_RELAUNCH;

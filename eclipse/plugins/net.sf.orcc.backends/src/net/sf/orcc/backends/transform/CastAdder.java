@@ -31,6 +31,7 @@ package net.sf.orcc.backends.transform;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.ir.Arg;
@@ -82,6 +83,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class CastAdder extends AbstractIrVisitor<Expression> {
 
+	private static IrFactory factory = IrFactory.eINSTANCE;
+	private static IrSpecificFactory factorySpec = IrSpecificFactory.eINSTANCE;
 	private boolean castToUnsigned;
 	private boolean createEmptyBlockBasic;
 	protected Type parentType;
@@ -116,7 +119,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 	@Override
 	public Expression caseBlockIf(BlockIf blockIf) {
 		Type oldParentType = parentType;
-		parentType = IrFactory.eINSTANCE.createTypeBool();
+		parentType = factory.createTypeBool();
 		blockIf.setCondition(doSwitch(blockIf.getCondition()));
 		doSwitch(blockIf.getThenBlocks());
 		doSwitch(blockIf.getElseBlocks());
@@ -128,7 +131,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 	@Override
 	public Expression caseBlockWhile(BlockWhile blockWhile) {
 		Type oldParentType = parentType;
-		parentType = IrFactory.eINSTANCE.createTypeBool();
+		parentType = factory.createTypeBool();
 		blockWhile.setCondition(doSwitch(blockWhile.getCondition()));
 		doSwitch(blockWhile.getBlocks());
 		doSwitch(blockWhile.getJoinBlock());
@@ -203,13 +206,13 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		Expression newValue = doSwitch(assign.getValue());
 		parentType = oldParentType;
 		if (newValue != assign.getValue()) {
-			// Assign is useless anymore
+			// The assignment is useless now, we replace it by the cast
+			// instruction
 			EList<Instruction> instructions = assign.getBlock()
 					.getInstructions();
 			InstCast cast = (InstCast) instructions.get(instructions
 					.indexOf(assign) - 1);
-			cast.setTarget(IrFactory.eINSTANCE.createDef(assign.getTarget()
-					.getVariable()));
+			cast.setTarget(assign.getTarget());
 
 			IrUtil.delete(assign);
 		}
@@ -246,8 +249,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 			}
 
 			call.getArguments().clear();
-			call.getArguments().addAll(
-					IrFactory.eINSTANCE.createArgsByVal(newExpressions));
+			call.getArguments().addAll(factory.createArgsByVal(newExpressions));
 
 			parentType = oldParentType;
 
@@ -261,8 +263,8 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 
 					target.setType(IrUtil.copy(returnType));
 
-					InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(
-							target, castedTarget);
+					InstCast cast = factorySpec.createInstCast(target,
+							castedTarget);
 
 					call.getBlock().add(indexInst + 1, cast);
 				}
@@ -281,6 +283,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 				if (callArg.isByVal()) {
 					exprArg = ((ArgByVal) callArg).getValue();
 
+					// TODO: Cleaning
 					if (!(exprArg instanceof ExprVar)) {
 						/*
 						 * Nothing to do, cast is added only for print arguments
@@ -328,15 +331,14 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 						((ExprVar) exprArg).getUse().setVariable(target);
 
 						// Create the concrete cast instruction
-						Instruction castInstr = IrSpecificFactory.eINSTANCE
-								.createInstCast(source, target);
+						Instruction castInstr = factorySpec.createInstCast(
+								source, target);
 
 						// Append cast instruction to tempoary list
 						castInstrToAdd.add(castInstr);
 					}
 				} else {
-					System.out
-							.println("[Error] ArgByRef : unsupported print argument");
+					throw new OrccRuntimeException("ArgByRef not supported.");
 				}
 			}
 			// Add cast instructions just before call
@@ -372,8 +374,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 
 			target.setType(uncastedType);
 
-			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(target,
-					castedTarget);
+			InstCast cast = factorySpec.createInstCast(target, castedTarget);
 
 			load.getBlock().add(indexInst + 1, cast);
 		}
@@ -385,21 +386,23 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		Type oldParentType = parentType;
 		parentType = phi.getTarget().getVariable().getType();
 		EList<Expression> values = phi.getValues();
-		Block containingBlock = (Block) phi.eContainer().eContainer();
+
+		// FIXME: Need improvment/merging
+		Block containingBlock = (Block) phi.getBlock().eContainer();
 		Expression value0 = phi.getValues().get(0);
 		Expression value1 = phi.getValues().get(1);
 		if (containingBlock.isBlockIf()) {
 			BlockIf blockIf = (BlockIf) containingBlock;
 			if (value0.isExprVar()) {
 				if (createEmptyBlockBasic) {
-					BlockBasic block0 = IrFactory.eINSTANCE.createBlockBasic();
+					BlockBasic block0 = factory.createBlockBasic();
 					blockIf.getThenBlocks().add(block0);
 					values.set(0, castExpression(value0, block0, 0));
 				}
 			}
 			if (value1.isExprVar()) {
 				if (createEmptyBlockBasic) {
-					BlockBasic block1 = IrFactory.eINSTANCE.createBlockBasic();
+					BlockBasic block1 = factory.createBlockBasic();
 					blockIf.getElseBlocks().add(block1);
 					values.set(1, castExpression(value1, block1, 0));
 				}
@@ -407,14 +410,14 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		} else {
 			BlockWhile blockWhile = (BlockWhile) containingBlock;
 			if (value0.isExprVar()) {
-				BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
+				BlockBasic block = factory.createBlockBasic();
 				EcoreHelper.getContainingList(containingBlock).add(indexBlock,
 						block);
 				indexBlock++;
 				values.set(0, castExpression(value0, block, 0));
 			}
 			if (value1.isExprVar()) {
-				BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
+				BlockBasic block = factory.createBlockBasic();
 				blockWhile.getBlocks().add(block);
 				values.set(1, castExpression(value1, block, 0));
 			}
@@ -461,21 +464,20 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 				oldVar = procedure.newTempLocalVariable(
 						EcoreUtil.copy(expr.getType()),
 						"expr_" + procedure.getName());
-				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						oldVar, IrUtil.copy(expr));
+				InstAssign assign = factory.createInstAssign(oldVar,
+						IrUtil.copy(expr));
 				IrUtil.addInstBeforeExpr(expr, assign);
 			}
 
 			Var newVar = procedure.newTempLocalVariable(
 					EcoreUtil.copy(parentType),
 					"castedExpr_" + procedure.getName());
-			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(oldVar,
-					newVar);
+			InstCast cast = factorySpec.createInstCast(oldVar, newVar);
 			if (IrUtil.addInstBeforeExpr(expr, cast)) {
 				indexInst++;
 			}
 			IrUtil.delete(expr);
-			return IrFactory.eINSTANCE.createExprVar(newVar);
+			return factory.createExprVar(newVar);
 		}
 
 		return expr;
@@ -491,8 +493,8 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 				oldVar = procedure.newTempLocalVariable(
 						EcoreUtil.copy(expr.getType()),
 						"expr_" + procedure.getName());
-				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						oldVar, IrUtil.copy(expr));
+				InstAssign assign = factory.createInstAssign(oldVar,
+						IrUtil.copy(expr));
 				block.add(index, assign);
 				index++;
 			}
@@ -500,10 +502,9 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 			Var newVar = procedure.newTempLocalVariable(
 					EcoreUtil.copy(parentType),
 					"castedExpr_" + procedure.getName());
-			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(oldVar,
-					newVar);
+			InstCast cast = factorySpec.createInstCast(oldVar, newVar);
 			block.add(index, cast);
-			return IrFactory.eINSTANCE.createExprVar(newVar);
+			return factory.createExprVar(newVar);
 		}
 
 		return expr;

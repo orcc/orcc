@@ -32,6 +32,7 @@ import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
+import net.sf.orcc.util.OrccUtil
 
 class HwProjectPrinter extends TTAPrinter {
 	
@@ -45,13 +46,13 @@ class HwProjectPrinter extends TTAPrinter {
 		if(fpga.altera) {
 			val qpfFile = new File(targetFolder + File::separator + "top.qpf")
 			val qcfFile = new File(targetFolder + File::separator + "top.qsf")
-			printFile(design.qpf, qpfFile)
-			printFile(design.qcf, qcfFile)
+			OrccUtil::printFile(design.qpf, qpfFile)
+			OrccUtil::printFile(design.qcf, qcfFile)
 		} else if(fpga.xilinx) {
 			val ucfFile = new File(targetFolder + File::separator + "top.ucf")
 			val xiseFile = new File(targetFolder + File::separator + "top.xise")
-			printFile(design.ucf, ucfFile)
-			printFile(design.xise, xiseFile)
+			OrccUtil::printFile(design.ucf, ucfFile)
+			OrccUtil::printFile(design.xise, xiseFile)
 		}
 	}
 	

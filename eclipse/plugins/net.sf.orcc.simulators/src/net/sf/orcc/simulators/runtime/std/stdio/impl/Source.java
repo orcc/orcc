@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.runtime.impl.GenericSource;
 import net.sf.orcc.util.OrccLogger;
@@ -49,6 +50,7 @@ public class Source extends GenericSource {
 
 	private static RandomAccessFile in;
 
+	@Deprecated
 	private static int loopsCount;
 
 	public static void source_exit(BigInteger status) {
@@ -61,10 +63,12 @@ public class Source extends GenericSource {
 		return BigInteger.valueOf(nbLoops);
 	}
 
+	@Deprecated
 	public static Boolean source_isMaxLoopsReached() {
 		return loopsCount <= 0;
 	}
 
+	@Deprecated
 	public static void source_decrementNbLoops() {
 		--loopsCount;
 	}
@@ -74,7 +78,7 @@ public class Source extends GenericSource {
 			in = new RandomAccessFile(inputStimulus, "r");
 		} catch (FileNotFoundException e) {
 			String msg = "File not found: \"" + inputStimulus + "\"";
-			throw new RuntimeException(msg, e);
+			throw new OrccRuntimeException(msg, e);
 		}
 		loopsCount = nbLoops;
 	}
@@ -86,7 +90,7 @@ public class Source extends GenericSource {
 		} catch (IOException e) {
 			String msg = "I/O error when reading file \"" + inputStimulus
 					+ "\"";
-			throw new RuntimeException(msg, e);
+			throw new OrccRuntimeException(msg, e);
 		}
 	}
 
@@ -97,7 +101,7 @@ public class Source extends GenericSource {
 		} catch (IOException e) {
 			String msg = "I/O error when rewinding file \"" + inputStimulus
 					+ "\"";
-			throw new RuntimeException(msg, e);
+			throw new OrccRuntimeException(msg, e);
 		}
 	}
 

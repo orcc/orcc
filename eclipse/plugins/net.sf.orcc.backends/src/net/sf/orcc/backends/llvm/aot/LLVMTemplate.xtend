@@ -172,7 +172,7 @@ abstract class LLVMTemplate extends CommonPrinter {
 				(currentType as TypeList).type
 
 		
-		val list = '''[«exprList.value.join(", ", ['''«currentType.doSwitch» «doSwitch»'''])»]'''
+		val list = '''[«exprList.value.join(", ")['''«currentType.doSwitch» «doSwitch»''']»]'''
 		currentType = prevType
 		return list.wrap
 	}

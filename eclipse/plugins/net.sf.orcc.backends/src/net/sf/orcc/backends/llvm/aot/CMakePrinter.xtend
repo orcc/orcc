@@ -32,8 +32,7 @@ import java.io.File
 import java.util.Map
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Network
-
-import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate CMakeList.txt content
@@ -46,8 +45,6 @@ class CMakePrinter extends CommonPrinter {
 
 	new(Network network, Map<String, Object> options) {
 		this.network = network;
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	def printFiles(String targetFolder) {
@@ -58,7 +55,7 @@ class CMakePrinter extends CommonPrinter {
 		var file = new File(targetFolder + File::separator + "CMakeLists.txt")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 		} else {
 			cachedFiles = cachedFiles + 1
 		}
@@ -67,7 +64,7 @@ class CMakePrinter extends CommonPrinter {
 		file = new File(targetFolder + File::separator + "src" + File::separator + "CMakeLists.txt")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 		} else {
 			cachedFiles = cachedFiles + 1
 		}

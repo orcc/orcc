@@ -29,16 +29,11 @@
 package net.sf.orcc.tools.stats
 
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.PrintStream
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.graph.Vertex
-import net.sf.orcc.util.OrccLogger
-import org.eclipse.emf.common.util.EList
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate statistics about an application.
@@ -47,73 +42,49 @@ import org.eclipse.emf.common.util.EList
  */
 class StatisticsPrinter {
 	
-		/**
-	 * Create a file and print content inside it. If parent folder doesn't
-	 * exists, create it.
-	 * 
-	 * @param content
-	 *            text to write in file
-	 * @param target
-	 *            file to write content to
-	 * @return true if the file has correctly been written
-	 */
-	def protected printFile(CharSequence content, File target) {
-		try {
-			if ( ! target.getParentFile().exists()) {
-				target.getParentFile().mkdirs();
-			}
-			val ps = new PrintStream(new FileOutputStream(target));
-			ps.print(content);
-			ps.close();
-			return true;
-		} catch (FileNotFoundException e) {
-			OrccLogger::severe("Unable to write file " + target.path + " : " + e.cause)
-			OrccLogger::severe(e.localizedMessage)
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
 	def print(String targetFolder, Network network) {
-		val fifosFile = new File(targetFolder + File::separator + "connections.csv")
-		val actorsFile = new File(targetFolder + File::separator + "children.csv")
-		
-		printFile(getConnectionsStats(network.connections), fifosFile)
-		printFile(getChildrenStats(network.children), actorsFile)
+		val file = new File(targetFolder + File::separator + network.simpleName + ".csv")
+		OrccUtil::printFile(network.content, file)
 	}
 	
-	def private getChildrenStats(EList<Vertex> vertices) '''
+	def private getContent(Network network) '''
+		«networkHeader»
+		«network.stats»
+		
 		«childrenHeader»
-		«FOR instance : vertices.filter(typeof(Instance))»
-			«instance.stats»
+		«FOR child : network.children»
+			«child.stats»
 		«ENDFOR»
-		«FOR actor : vertices.filter(typeof(Actor))»
-			«actor.stats»
-		«ENDFOR»
-	'''
-	
-	def private getChildrenHeader() 
-		'''Name, Incoming, Outgoing, Inputs, Outputs, Actions, MoC'''
-	
-	def private getConnectionsStats(EList<Connection> connections) '''
+		
 		«connectionsHeader»
-		«FOR conn : connections »
+		«FOR conn : network.connections »
 			«conn.stats»
 		«ENDFOR»
 	'''
+	
+	def protected getNetworkHeader() 
+		'''Name, Package, Actors, Connections, SDF, CSDF, QSDF, KPN, DPN'''
+		
+	def protected getStats(Network network)
+		// network.getPackage instead of network.package to allow Xtend < 2.4 to parse this file
+		'''«network.simpleName», «network.getPackage», «network.children.size», «network.connections.size», «network.moCs.filter[SDF].size», «network.moCs.filter[CSDF && !SDF].size», «network.moCs.filter[quasiStatic].size», «network.moCs.filter[KPN].size», «network.moCs.filter[DPN].size»'''
+	
+	def protected getChildrenHeader() 
+		'''Name, Incoming, Outgoing, Inputs, Outputs, Actions, FSM, MoC'''
+
+	def private getStats(Vertex v) {
+		val actor = v.getAdapter(typeof(Actor))
+		'''«v.label», «v.incoming.size», «v.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.hasFsm», «actor.moC?.shortName»'''
+	}
 	
 	def protected getConnectionsHeader() 
 		'''Source, SrcPort, Target, TgtPort, Size'''
 	
 	def protected getStats(Connection conn) 
 		'''«conn.source.label», «conn.sourcePort.name», «conn.target.label», «conn.targetPort.name», «conn.size»'''
-	
-	def private getStats(Actor actor) 
-		'''«actor.name», «actor.incoming.size», «actor.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»'''
-	
-	def private getStats(Instance instance) {
-		val actor = instance.actor
-		'''«instance.name», «instance.incoming.size», «instance.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»'''
+
+	def private getMoCs(Network network) {
+		network.children.map[getAdapter(typeof(Actor))?.moC].filterNull
 	}
-	
+
 }

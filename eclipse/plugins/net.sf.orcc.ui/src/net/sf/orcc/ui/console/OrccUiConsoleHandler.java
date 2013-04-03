@@ -33,7 +33,7 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccLogger.OrccLevel;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -66,23 +66,25 @@ public class OrccUiConsoleHandler extends Handler {
 
 		@Override
 		public void run() {
-			String message;
-			message = getFormatter().format(record);
-
+			String message = getFormatter().format(record);
 			IOConsoleOutputStream outStream = console.newOutputStream();
 
-			if (record.getLevel().intValue() == OrccLogger.SEVERE.intValue()) {
+			if (record.getLevel().intValue() == OrccLevel.SEVERE.intValue()) {
 				outStream.setColor(new Color(null, 255, 0, 0));
-			} else if (record.getLevel().intValue() == OrccLogger.WARNING
+			} else if (record.getLevel().intValue() == OrccLevel.WARNING
 					.intValue()) {
 				outStream.setColor(new Color(null, 250, 133, 50));
-			} else if (record.getLevel().intValue() == OrccLogger.DEBUG
+			} else if (record.getLevel().intValue() == OrccLevel.DEBUG
 					.intValue()) {
 				outStream.setColor(new Color(null, 133, 200, 62));
+			} else if (record.getLevel().intValue() == OrccLevel.NOTICE
+					.intValue()) {
+				outStream.setColor(new Color(null, 0, 0, 156));
 			}
 
 			try {
 				outStream.write(message);
+				outStream.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

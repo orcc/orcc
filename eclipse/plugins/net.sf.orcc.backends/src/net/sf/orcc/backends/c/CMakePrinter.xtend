@@ -30,8 +30,9 @@ package net.sf.orcc.backends.c
 
 import java.io.File
 import net.sf.orcc.backends.CommonPrinter
-import net.sf.orcc.df.Network
 import net.sf.orcc.df.Actor
+import net.sf.orcc.df.Network
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate CMakeList.txt content
@@ -50,8 +51,8 @@ class CMakePrinter extends CommonPrinter {
 		val root = new File(targetFolder + File::separator + "CMakeLists.txt")
 		val src = new File(targetFolder + File::separator + "src" + File::separator + "CMakeLists.txt")
 		
-		printFile(rootCMakeContent, root)
-		printFile(srcCMakeContent, src)
+		OrccUtil::printFile(rootCMakeContent, root)
+		OrccUtil::printFile(srcCMakeContent, src)
 	}
 	
 	def private rootCMakeContent() '''

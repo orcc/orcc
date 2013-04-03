@@ -48,11 +48,8 @@
 	#endif
 #endif
 
-extern char	*optarg;
+extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
-
-//Nb Loops
-unsigned int nbLoops = DEFAULT_INFINITE_LOOP; // -1: infinite loop.
 
 // Directory for input files.
 char *input_directory = NULL;
@@ -77,6 +74,12 @@ char display_flags = DISPLAY_ENABLE;
 
 // compute number of errors in the program
 int compareErrors = 0;
+
+// Nb times the input file is read
+int nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
+
+// Nb frames to display
+int nbFrames = DEFAULT_INFINITE;
 
 // Pause function
 void wait_for_key() {
@@ -115,25 +118,43 @@ void print_and_exit(const char *msg) {
 	exit(1);
 }
 
-static const char *usage = "%s: -i <file> [-o <file>] [-w <file>] [-m <mapping file>] [-l <number of loop iterations>]\n";
 static char *program;
+static const char *usage =
+	"\nUsage: %s [arguments]\n"
+	"Mandatory arguments:\n"
+	"-i <file>                  Input stimulus file.\n"
+
+	"\nOptional arguments:\n"
+	"-n                         Ensure display will not be initialized (useful on non-graphic terminals).\n"
+	"-o <file>                  Output comparaison file.\n"
+	"-d <directory>             Directory containing input files (if application is multi-input.\n"
+	"-m <mapping file>          Xcf mapping file, to define actors/core mapping.\n"
+	// We need to document folowing options:
+	//"-w <file>                  TBD...\n"
+	//"-g <???>                   Output genetic: TBD...\n"
+
+	"\nOther specific arguments:\n"
+	"Depending on how the application has been designed, one of these arguments can be used. If none of them is set,\n"
+	"the application should not stop its execution itself.\n"
+	"-f <nb frames to decode>   Number of frames to decode before application close.\n"
+	"-l <nb input reading>      Number of times input stimulus is read before application close.\n";
 
 void print_usage() {
 	printf(usage, program);
+	fflush(stdout);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-	const char *ostr = "g:i:l:m:no:w:d:";
+	const char *ostr = "i:no:d:m:f:w:g:l:";
 	int c;
 
 	program = argv[0];
 	
-	c = getopt(argc, argv, ostr);
-	while (c != -1) {
+	while ((c = getopt(argc, argv, ostr)) != -1) {
 		switch (c) {
 		case '?': // BADCH
 			fprintf(stderr, "unknown argument\n");
@@ -153,6 +174,9 @@ void init_orcc(int argc, char *argv[]) {
 		case 'l':
 			nbLoops = strtoul(optarg, NULL, 10);
 			break;
+		case 'f':
+			nbFrames = strtoul(optarg, NULL, 10);
+			break;
 		case 'm':
 			mapping_file = strdup(optarg);
 			break;
@@ -166,10 +190,8 @@ void init_orcc(int argc, char *argv[]) {
 			write_file = strdup(optarg);
 			break;
 		default:
-			fprintf(stderr, "skipping option -%c\n", c);
+			fprintf(stderr, "Skipping option -%c\n", c);
 			break;
 		}
-
-		c = getopt(argc, argv, ostr);
 	}
 }

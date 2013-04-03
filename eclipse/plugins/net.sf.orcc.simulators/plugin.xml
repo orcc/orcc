@@ -6,14 +6,14 @@
          point="net.sf.orcc.core.options">
       <option
             defaultValue="false"
-            description="Enable tracing feature of a simulator"
-            id="net.sf.orcc.backends.enableTraces"
+            description="Enable tracing of the FIFOs"
+            id="net.sf.orcc.tracing.enable"
             name="Enable Traces">
          <checkBox>
             <option
                   description="The folder where traces are saved"
-                  id="net.sf.orcc.simulators.tracesFolder"
-                  name="Traces Folder">
+                  id="net.sf.orcc.tracing.folder"
+                  name="Traces folder">
                <browseFile
                      folder="true"
                      workspace="false">
@@ -103,9 +103,6 @@
             class="net.sf.orcc.simulators.slow.SlowSimulator"
             name="Visitor interpreter and debugger">
          <option
-               id="net.sf.orcc.backends.enableTraces">
-         </option>
-         <option
                id="net.sf.orcc.core.xdfFile">
          </option>
          <option
@@ -119,6 +116,9 @@
          </option>
          <option
                id="net.sf.orcc.simulators.profile">
+         </option>
+         <option
+               id="net.sf.orcc.tracing.enable">
          </option>
       </simulator>
    </extension>

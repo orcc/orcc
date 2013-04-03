@@ -30,10 +30,9 @@ package net.sf.orcc.backends.llvm.aot
 
 import java.io.File
 import java.util.Map
-import net.sf.orcc.df.Network
-
-import static net.sf.orcc.OrccLaunchConstants.*
 import net.sf.orcc.df.Actor
+import net.sf.orcc.df.Network
+import net.sf.orcc.util.OrccUtil
 
 /*
  * Compile Network LLVM source code 
@@ -50,8 +49,6 @@ class NetworkPrinter extends LLVMTemplate {
 		super()
 		this.network = network
 		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
-		
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
 		}
@@ -63,7 +60,7 @@ class NetworkPrinter extends LLVMTemplate {
 		val file = new File(targetFolder + File::separator + network.simpleName + ".ll")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
@@ -107,11 +104,6 @@ class NetworkPrinter extends LLVMTemplate {
 		define void @main(i32 %argc, i8** %argv) noinline noreturn nounwind {
 		entry:
 			call void @init_orcc(i32 %argc, i8** %argv);
-			«FOR instance : network.children.actorInstances»
-				«IF ! instance.actor.initializes.empty»
-					call void @«instance.name»_initialize()
-				«ENDIF»
-			«ENDFOR»
 			«FOR instance : network.children.actorInstances»
 				«IF ! instance.actor.initializes.empty»
 					call void @«instance.name»_initialize()

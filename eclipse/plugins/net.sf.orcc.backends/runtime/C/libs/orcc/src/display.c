@@ -26,6 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #include "SDL.h"
 #include "orcc_util.h"
 
@@ -37,7 +38,6 @@ static int init = 0;
 
 static int x, y , onclick = 0;
 static SDL_Rect rect;
-
 
 static void press_a_key(int code) {
 	char buf[2];
@@ -51,11 +51,9 @@ static void press_a_key(int code) {
 	exit(code);
 }
 
-
 char displayYUV_getFlags(){
-	return display_flags + DISPLAY_READY;
+	return display_flags;
 }
-
 
 static void displayYUV_setSize(int width, int height) {
 	printf("set display to %ix%i\n", width, height);
@@ -79,8 +77,8 @@ static void displayYUV_setSize(int width, int height) {
 }
 
 void displayYUV_displayPicture(unsigned char *pictureBufferY,
-		unsigned char *pictureBufferU, unsigned char *pictureBufferV,
-		unsigned int   pictureWidth, unsigned int pictureHeight) {
+                               unsigned char *pictureBufferU, unsigned char *pictureBufferV,
+                               unsigned int   pictureWidth,   unsigned int   pictureHeight) {
 	static unsigned int lastWidth = 0;
 	static unsigned int lastHeight = 0;
 	SDL_Event event;
@@ -89,8 +87,6 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY,
 	rect.y = 0;
 	rect.w = pictureWidth;
 	rect.h = pictureHeight;
-
-	
 
 	if ((pictureHeight != lastHeight) || (pictureWidth != lastWidth)) {
 		displayYUV_setSize(pictureWidth, pictureHeight);
@@ -136,6 +132,7 @@ void displayYUV_init() {
 		atexit(SDL_Quit);
 	}
 }
+
 /*******************************************************************************
  * displayYUV444_setSize
  ******************************************************************************/
@@ -152,14 +149,15 @@ static void displayYUV444_setSize(int winWidth, int winHeight, int pictureWidth,
 		SDL_FreeSurface(m_image);
 	}
 
-	m_image = SDL_CreateRGBSurface(SDL_SWSURFACE,  pictureWidth, pictureHeight, m_screen->format->BitsPerPixel,
-					 m_screen->format->Rmask, m_screen->format->Gmask, m_screen->format->Bmask, m_screen->format->Amask);
+	m_image = SDL_CreateRGBSurface(SDL_SWSURFACE, pictureWidth, pictureHeight, m_screen->format->BitsPerPixel,
+		m_screen->format->Rmask, m_screen->format->Gmask, m_screen->format->Bmask, m_screen->format->Amask);
 
 	if (m_image == NULL) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 		press_a_key(-1);
 	}
 }
+
 /*******************************************************************************
  * displayYUV444_init
  ******************************************************************************/
@@ -180,6 +178,7 @@ void displayYUV444_init(int winWidth, int winHeight, int pictureWidth, int pictu
 		onclick = 0;
 	}
 }
+
 /*******************************************************************************
  * clip255
  ******************************************************************************/
@@ -188,12 +187,13 @@ char clip255(int value) {
 	if (value <   0) return   0;
 	return value;
 }
+
 /*******************************************************************************
  * convertYUV444_to_RGB
  ******************************************************************************/
 void  convertYUV444_to_RGB(unsigned char *pictureBufferY,
-	unsigned char *pictureBufferU, unsigned char *pictureBufferV,
-	unsigned int   pictureWidth, unsigned int pictureHeight) {
+						   unsigned char *pictureBufferU, unsigned char *pictureBufferV,
+						   unsigned int   pictureWidth, unsigned int pictureHeight) {
 	unsigned int h, w;
 	int red, green, blue;
 	int pixel, idx_pixel;
@@ -206,18 +206,19 @@ void  convertYUV444_to_RGB(unsigned char *pictureBufferY,
 			green     = (256 * pictureBufferY[idx_pixel] -  87 * (pictureBufferU[idx_pixel] - 128) - 182 * (pictureBufferV[idx_pixel] - 128)) >> 8;
 			blue      = (256 * pictureBufferY[idx_pixel] + 452 * (pictureBufferU[idx_pixel] - 128)                                          ) >> 8;
 			pixel     = ((clip255(red)   << format->Rshift) & format->Rmask) |
-						((clip255(green) << format->Gshift) & format->Gmask) |
-						((clip255(blue)  << format->Bshift) & format->Bmask) ;
+					((clip255(green) << format->Gshift) & format->Gmask) |
+					((clip255(blue)  << format->Bshift) & format->Bmask) ;
 			* (int *) &((char *)m_image->pixels)[idx_pixel * format->BytesPerPixel] = pixel;
 		}
 	}
 }
+
 /*******************************************************************************
  * displayYUV444_displayPicture
  ******************************************************************************/
 void displayYUV444_displayPicture(unsigned char *pictureBufferY,
-				  unsigned char *pictureBufferU, unsigned char *pictureBufferV,
-				  unsigned int   pictureWidth, unsigned int pictureHeight) {
+								  unsigned char *pictureBufferU, unsigned char *pictureBufferV,
+								  unsigned int   pictureWidth, unsigned int pictureHeight) {
 	rect.x = x;
 	rect.y = y;
 	rect.w = pictureWidth;
@@ -228,6 +229,7 @@ void displayYUV444_displayPicture(unsigned char *pictureBufferY,
 	SDL_BlitSurface(m_image, NULL, m_screen, &rect);
 	SDL_UpdateRects(m_screen, 1, &rect);
 }
+
 /*******************************************************************************
  * displayYUV_getEvent
  ******************************************************************************/
@@ -262,4 +264,13 @@ void displayYUV_getEvent() {
 			break;
 		}
 	}
+}
+
+/**
+ * @brief Return the number of frames the user want to decode before exiting the application.
+ * If user didn't use the -f flag, it returns -1 (DEFAULT_INFINITEà).
+ * @return The
+ */
+int displayYUV_getNbFrames() {
+	return nbFrames;
 }

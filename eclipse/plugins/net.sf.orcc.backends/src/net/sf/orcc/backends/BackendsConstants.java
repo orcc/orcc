@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2012, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,38 +26,27 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.merger.action;
+package net.sf.orcc.backends;
 
 /**
- * This class defines a pattern visitor.
- * 
- * @author Matthieu Wipliez
+ * @author Antoine Lorence
  * 
  */
-public interface PatternVisitor {
+public class BackendsConstants {
 
-	/**
-	 * Visits the given loop pattern.
-	 * 
-	 * @param pattern
-	 *            a loop pattern
-	 */
-	public void visit(PatternLoop pattern);
+	public static final String GENETIC_ALGORITHM = "net.sf.orcc.backends.geneticAlgorithm";
+	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
+	public static final String NEW_SCHEDULER_TOPOLOGY = "net.sf.orcc.backends.newScheduler.topology";
 
-	/**
-	 * Visits the given sequential pattern.
-	 * 
-	 * @param pattern
-	 *            a sequential pattern
-	 */
-	public void visit(PatternSequential pattern);
+	public static enum Topology {
+		Ring, Mesh
+	}
 
-	/**
-	 * Visits the given simple pattern.
-	 * 
-	 * @param pattern
-	 *            a simple pattern
-	 */
-	public void visit(PatternSimple pattern);
+	public static final String THREADS_NB = "net.sf.orcc.backends.processorsNumber";
+
+	public static final String CONVERT_MULTI2MONO = "net.sf.orcc.backends.multi2mono";
+	public static final String ADDITIONAL_TRANSFOS = "net.sf.orcc.backends.add_transfos";
+	
+	public static final String PROFILE = "net.sf.orcc.backends.profile";
 
 }

@@ -28,11 +28,16 @@
  */
  package net.sf.orcc.backends.llvm.aot
 
+import java.io.File
 import java.util.ArrayList
 import java.util.HashMap
+import java.util.List
 import java.util.Map
+import net.sf.orcc.OrccRuntimeException
+import net.sf.orcc.backends.ir.ExprNull
 import net.sf.orcc.backends.ir.InstCast
 import net.sf.orcc.df.Action
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.FSM
 import net.sf.orcc.df.Instance
@@ -62,16 +67,11 @@ import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
-import java.util.List
-import java.io.File
 
-import static net.sf.orcc.backends.OrccBackendsConstants.*
-import static net.sf.orcc.OrccLaunchConstants.*
-import net.sf.orcc.backends.ir.ExprNull
-import net.sf.orcc.df.Actor
-import net.sf.orcc.OrccRuntimeException
+import static net.sf.orcc.backends.BackendsConstants.*
 
 /*
  * Compile Instance llvm source code
@@ -98,14 +98,12 @@ class InstancePrinter extends LLVMTemplate {
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {		
-		if(options.containsKey("net.sf.orcc.backends.profile")){
-			optionProfile = options.get("net.sf.orcc.backends.profile") as Boolean
+		if(options.containsKey(PROFILE)){
+			optionProfile = options.get(PROFILE) as Boolean
 		}
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
 		}
-		
-		overwriteAllFiles = options.get(DEBUG_MODE) as Boolean
 	}
 	
 	/**
@@ -137,7 +135,7 @@ class InstancePrinter extends LLVMTemplate {
 		val file = new File(targetFolder + File::separator + name + ".ll")
 		
 		if(needToWriteFile(content, file)) {
-			printFile(content, file)
+			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
@@ -572,7 +570,7 @@ class InstancePrinter extends LLVMTemplate {
 	'''	
 	
 	def protected print(Procedure procedure) '''
-		«val parameters = procedure.parameters.join(", ", [argumentDeclaration] )»
+		«val parameters = procedure.parameters.join(", ")[argumentDeclaration]»
 		«IF procedure.native || procedure.blocks.nullOrEmpty»
 			declare «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind
 		«ELSE»
@@ -825,7 +823,7 @@ class InstancePrinter extends LLVMTemplate {
 						store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«connection.addrSpace»* «varName(variable, store)»_«connection.getSafeId(port)»
 					«ENDFOR»
 				«ELSE»
-					«varName(variable, store)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«store.indexes.join(", ", ", ", "", [printIndex])»
+					«varName(variable, store)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«store.indexes.join(", ", ", ", "")[printIndex]»
 					store «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»* «varName(variable, store)»
 				«ENDIF»
 			«ELSE»
@@ -857,7 +855,7 @@ class InstancePrinter extends LLVMTemplate {
 					«printPortAccess(connection, port, variable, load.indexes, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSE»
-					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "", [printIndex])»
+					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "")[printIndex]»
 					«target» = load «innerType.doSwitch»* «varName(variable, load)»
 				«ENDIF»				
 			«ELSE»
@@ -871,7 +869,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
-			call i32 (i8*, ...)* @printf(«call.arguments.join(", ", [printParameter((it as ArgByVal).value.type)])»)
+			call i32 (i8*, ...)* @printf(«call.arguments.join(", ")[printParameter((it as ArgByVal).value.type)]»)
 		«ELSE»
 			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
 		«ENDIF»

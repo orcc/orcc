@@ -29,13 +29,14 @@
 
 package net.sf.orcc.backends.c.embedded
 
+import java.io.File
 import java.util.ArrayList
+import java.util.Map
 import net.sf.orcc.backends.c.InstancePrinter
 import net.sf.orcc.df.Action
-import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.InstReturn
-import java.io.File
-import java.util.Map
+import net.sf.orcc.ir.Procedure
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate network as graphml file
@@ -56,7 +57,7 @@ class ActorPrinter extends InstancePrinter {
 			+ "IDL" + File::separator + actor.simpleName + ".idl")
 		
 		if(needToWriteFile(idlContent, idlFile)) {
-			printFile(idlContent, idlFile)
+			OrccUtil::printFile(idlContent, idlFile)
 		} else {
 			numFilesCached = numFilesCached + 1
 		}
@@ -66,7 +67,7 @@ class ActorPrinter extends InstancePrinter {
 			+ "src" + File::separator + actor.simpleName + ".c")
 		
 		if(needToWriteFile(cContent, cFile)) {
-			printFile(idlContent, idlFile)
+			OrccUtil::printFile(idlContent, idlFile)
 		} else {
 			numFilesCached = numFilesCached + 1
 		}
@@ -98,8 +99,8 @@ class ActorPrinter extends InstancePrinter {
 		};
 	'''
 	
-	def private printInterface (Action action, String interface) '''
-		interface «interface» {
+	def private printInterface (Action action, String inter) '''
+		interface «inter» {
 			void «actor.simpleName»_«action.name» («action.printParameters»);
 		};
 	'''

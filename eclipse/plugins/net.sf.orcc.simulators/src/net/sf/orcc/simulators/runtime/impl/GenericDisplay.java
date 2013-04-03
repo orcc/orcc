@@ -38,11 +38,19 @@ public class GenericDisplay {
 	public static final int DISPLAY_DISABLE = 0;
 
 	/**
-	 * display is enabled. 2 instead of 1 for historical reasons
+	 * Enable display. Value of 3 (11b) is historical and for
+	 * backward-compatibility. It will be set to 1 when all aplications will
+	 * have been updated
 	 */
-	public static final int DISPLAY_ENABLE = 2;
+	public static final int DISPLAY_ENABLE = 3;
 
 	protected static String goldenReference = "";
+
+	/**
+	 * This variable should store number of frames user want to decode before
+	 * stopping application
+	 */
+	public static int nbFrames;
 
 	protected static int displayStatus = DISPLAY_ENABLE;
 
@@ -54,10 +62,6 @@ public class GenericDisplay {
 		GenericDisplay.goldenReference = fileName;
 	}
 
-	public void close() {
-
-	}
-
 	public static void setDisplayEnabled() {
 		displayStatus = DISPLAY_ENABLE;
 		OrccLogger.debugln("Display has been enabled");
@@ -67,5 +71,4 @@ public class GenericDisplay {
 		displayStatus = DISPLAY_DISABLE;
 		OrccLogger.debugln("Display has been disabled");
 	}
-
 }
