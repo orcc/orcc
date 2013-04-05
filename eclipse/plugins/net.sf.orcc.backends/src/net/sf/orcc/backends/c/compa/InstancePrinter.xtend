@@ -101,6 +101,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«FOR port : instance.actor.outputs.notNative»
 					write_end_«port.name»();
 				«ENDFOR»
+				«IF instance.actor.inputs.nullOrEmpty && instance.actor.outputs.nullOrEmpty »
+					// no read_end/write_end here!
+					return;
+				«ENDIF»
 			}
 		«ENDIF»
 	'''
