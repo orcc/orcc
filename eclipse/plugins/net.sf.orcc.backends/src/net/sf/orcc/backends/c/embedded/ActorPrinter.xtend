@@ -67,7 +67,7 @@ class ActorPrinter extends InstancePrinter {
 			+ "src" + File::separator + actor.simpleName + ".c")
 		
 		if(needToWriteFile(cContent, cFile)) {
-			OrccUtil::printFile(idlContent, idlFile)
+			OrccUtil::printFile(cContent, cFile)
 		} else {
 			numFilesCached = numFilesCached + 1
 		}
