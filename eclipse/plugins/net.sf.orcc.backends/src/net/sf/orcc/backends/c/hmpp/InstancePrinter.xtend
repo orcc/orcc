@@ -41,7 +41,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override printAttributes(Attributable eobject) '''
 		«IF eobject instanceof Instance»
-			«(eobject as Instance).printAttributes»
+			«(eobject as Instance).actor.printAttributes»
 		«ELSE»
 			«FOR attribute : eobject.attributes»
 				// «attribute.name» = «attribute.stringValue»
