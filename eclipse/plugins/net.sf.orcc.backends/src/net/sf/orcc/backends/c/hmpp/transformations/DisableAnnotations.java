@@ -35,7 +35,8 @@ import net.sf.orcc.util.Attributable;
 import net.sf.orcc.util.util.EcoreHelper;
 
 /**
- * This class defines a HMMP annotations.
+ * This transformation delete all attributes set on elements inside an actor
+ * (including actor's attributes)
  * 
  * @author Jérôme Gorin
  * 
@@ -44,12 +45,12 @@ public class DisableAnnotations extends DfVisitor<Void> {
 	@Override
 	public Void caseActor(Actor actor) {
 		actor.getAttributes().clear();
-		
+
 		for (Attributable attributable : EcoreHelper.getObjects(actor,
 				Attributable.class)) {
 			attributable.getAttributes().clear();
 		}
-		
+
 		for (Instruction instr : EcoreHelper.getObjects(actor,
 				Instruction.class)) {
 			instr.getAttributes().clear();

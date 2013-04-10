@@ -67,6 +67,10 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 
 	private class InnerSetHMPPAnnotations extends AbstractIrVisitor<Void> {
 
+		/**
+		 * Add hmpp "callsite" pragma for call instructions related to
+		 * procedures decorated with hmpp "codelet" pragma
+		 */
 		@Override
 		public Void caseInstCall(InstCall call) {
 			Procedure proc = call.getProcedure();

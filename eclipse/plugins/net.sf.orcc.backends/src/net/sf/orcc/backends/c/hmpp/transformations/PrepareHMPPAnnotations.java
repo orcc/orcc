@@ -41,12 +41,24 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.util.Attribute;
 
 /**
- * This class defines a HMMP annotations.
+ * This class add a list of variables to attributes on while blocks annotated
+ * with hmppcg "gridify" pragma. These reference to variables is used later (see
+ * SetHMPPAnnotations) to update attribute params and ensure parameters will be
+ * consistent with variables in code, even if they have been modified by another
+ * transformation.
  * 
  * @author Jérôme Gorin
  * 
  */
 public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
+
+	/**
+	 * This visitor search in a model element for a given variable name. When it
+	 * ends, it can return a reference to the corresponding Var object.
+	 * 
+	 * @author Jérôme Gorin
+	 * 
+	 */
 	private class ExprVarGetter extends AbstractIrVisitor<Void> {
 		private Var result;
 		private String varName;
@@ -71,10 +83,6 @@ public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
 			return result;
 		}
 	}
-
-	Map<Procedure, Integer> codelets;
-
-	int codeletsCnt;
 
 	@Override
 	public Void caseBlockWhile(BlockWhile blockWhile) {

@@ -31,11 +31,10 @@ package net.sf.orcc.backends.c.hmpp.transformations;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
-import net.sf.orcc.util.Attribute;
 
 /**
- * This class defines a codelet transformation that inline the functions and/or
- * the procedures which are called inside a codelet
+ * This class defines a transformation that inline functions and / or procedures
+ * called inside a codelet
  * 
  * @author Jérôme Gorin
  * 
@@ -44,12 +43,9 @@ public class CodeletInliner extends AbstractIrVisitor<Void> {
 
 	@Override
 	public Void caseProcedure(Procedure procedure) {
-		Attribute attribute = procedure.getAttribute("codelet");
-
-		if (attribute != null){
+		if (procedure.hasAttribute("codelet")) {
 			new Inliner(true, true).doSwitch(procedure);
 		}
-		
 		return null;
 	}
 
