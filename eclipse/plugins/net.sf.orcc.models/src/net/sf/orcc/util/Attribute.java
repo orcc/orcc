@@ -27,7 +27,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface Attribute extends EObject {
+public interface Attribute extends Attributable {
 
 	/**
 	 * Returns the value of the '<em><b>Contained Value</b></em>' containment reference.

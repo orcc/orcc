@@ -390,6 +390,10 @@ class InstancePrinter extends CTemplate {
 				«FOR port : actor.outputs.filter[!native]»
 					write_end_«port.name»();
 				«ENDFOR»
+				«IF actor.inputs.nullOrEmpty && actor.outputs.nullOrEmpty »
+					// no read_end/write_end here!
+					return;
+				«ENDIF»
 			}
 		«ENDIF»
 	'''
@@ -781,7 +785,7 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	override caseBlockFor(BlockFor block) '''
-		for («block.init.join(", ", ['''«doSwitch»'''])» ; «block.condition.doSwitch» ; «block.step.join(", ", ['''«doSwitch»'''])») {
+		for («block.init.join(", ")['''«toExpression»''']» ; «block.condition.doSwitch» ; «block.step.join(", ")['''«toExpression»''']») {
 			«FOR contentBlock : block.blocks»
 				«contentBlock.doSwitch»
 			«ENDFOR»
@@ -841,8 +845,7 @@ class InstancePrinter extends CTemplate {
 	override caseInstTernary(InstTernary inst) '''
 		«inst.target.variable.indexedName» = «inst.conditionValue.doSwitch» ? «inst.trueValue.doSwitch» : «inst.falseValue.doSwitch»;
 	'''
-	
-		
+
 	def protected getPort(Var variable) {
 		if(currentAction == null) {
 			null
@@ -865,7 +868,12 @@ class InstancePrinter extends CTemplate {
 		}
 	}	
 
-	
+	def private getInline() 
+		'''«IF profile»__attribute__((always_inline)) «ENDIF»'''
+
+	def private getNoInline() 
+		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
+
 	/******************************************
 	 * 
 	 * Old templateData initialization
@@ -880,17 +888,17 @@ class InstancePrinter extends CTemplate {
 			}
 		}
 	}
-	
+
 	def private buildTransitionPattern() {		
 		val fsm = actor.getFsm()
-		
+
 		if (fsm != null) {
 			for (state : fsm.getStates()) {
 				val pattern = DfFactory::eINSTANCE.createPattern()
-				
+
 				for (edge : state.getOutgoing()) { 
 					val actionPattern = (edge as Transition).getAction.getInputPattern()
-					
+
 					for (Port port : actionPattern.getPorts()) {
 						var numTokens = Math::max(pattern.getNumTokens(port), actionPattern.getNumTokens(port))
 						pattern.setNumTokens(port, numTokens)
@@ -900,11 +908,4 @@ class InstancePrinter extends CTemplate {
 			}
 		}
 	}
-	
-	def private getInline() 
-		'''«IF profile»__attribute__((always_inline)) «ENDIF»'''
-	
-	def private getNoInline() 
-		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
-
 }

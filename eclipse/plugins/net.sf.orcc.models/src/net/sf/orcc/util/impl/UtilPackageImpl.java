@@ -269,15 +269,12 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 		setNsPrefix(eNS_PREFIX);
 		setNsURI(eNS_URI);
 
-		// Obtain other dependent packages
-		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
-				.getEPackage(EcorePackage.eNS_URI);
-
 		// Create type parameters
 
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
+		attributeEClass.getESuperTypes().add(this.getAttributable());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(attributeEClass, Attribute.class, "Attribute", !IS_ABSTRACT,
@@ -287,8 +284,8 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 		initEReference(getAttribute_ContainedValue(),
-				theEcorePackage.getEObject(), null, "containedValue", null, 0,
-				1, Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				ecorePackage.getEObject(), null, "containedValue", null, 0, 1,
+				Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAttribute_ObjectValue(),
@@ -296,8 +293,8 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 				Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAttribute_ReferencedValue(),
-				theEcorePackage.getEObject(), null, "referencedValue", null, 0,
-				1, Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				ecorePackage.getEObject(), null, "referencedValue", null, 0, 1,
+				Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAttribute_StringValue(), ecorePackage.getEString(),

@@ -262,7 +262,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	}
 	
 	/**
-	 * Method manually added to print specific InstTernary object.
+	 * Print specific InstTernary object.
 	 * @param inst The ternary instruction
 	 * @see #defaultCase(EObject object)
 	 */

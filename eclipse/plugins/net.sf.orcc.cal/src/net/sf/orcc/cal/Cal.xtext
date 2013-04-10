@@ -295,6 +295,7 @@ ExpressionPostfix returns AstExpression:
     | '(' AstExpression ')';
 
 ExpressionCall:
+	(annotations += AstAnnotation)*
 	function=[Function|QualifiedName] '(' (parameters += AstExpression (',' parameters += AstExpression)*)? ')';
 
 ExpressionIndex:
