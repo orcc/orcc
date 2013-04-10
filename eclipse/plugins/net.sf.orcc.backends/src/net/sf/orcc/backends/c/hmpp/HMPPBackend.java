@@ -44,6 +44,8 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.CfgNode;
+import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccLogger;
 
@@ -77,11 +79,17 @@ public class HMPPBackend extends CBackend {
 		super.doTransformActor(actor);
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
+
+		// Must be applied before CodeletInliner:
 		transformations.add(new DfVisitor<Void>(new PrepareHMPPAnnotations()));
 		transformations.add(new DfVisitor<Void>(new ConstantRegisterCleaner()));
-		transformations.add(new DfVisitor<Void>(new CodeletInliner()));
 
+		// Must be applied after PrepareHMPPAnnotations:
+		transformations.add(new DfVisitor<Void>(new CodeletInliner()));
+		// Must be applied after CodeletInliner:
 		transformations.add(new SetHMPPAnnotations());
+
+		transformations.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
 		transformations.add(new BlockForAdder());
 
 		for (DfSwitch<?> transformation : transformations) {
@@ -96,7 +104,6 @@ public class HMPPBackend extends CBackend {
 		if (disableAnnotation) {
 			new DisableAnnotations().doSwitch(actor);
 		}
-
 	}
 
 	/*
@@ -111,10 +118,15 @@ public class HMPPBackend extends CBackend {
 	}
 
 	@Override
+	protected boolean printActor(Actor actor) {
+		return new InstancePrinter(options).print(srcPath, actor) > 0;
+	}
+
+	@Override
 	public boolean exportRuntimeLibrary() {
 		String target = path + File.separator + "libs";
 		OrccLogger.traceln("Export libraries sources into " + target + "... ");
-		return copyFolderToFileSystem("/runtime/HMPP", target, debug);
+		return copyFolderToFileSystem("/runtime/C", target, debug);
 	}
 
 	@Override

@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.c.hmpp.transformations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +38,11 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
-import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
@@ -53,6 +51,7 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.util.EcoreHelper;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -62,6 +61,7 @@ import org.eclipse.emf.common.util.EList;
  * 
  */
 public class SetHMPPAnnotations extends DfVisitor<Void> {
+
 	Map<Procedure, Integer> codelets;
 	int codeletsCnt;
 
@@ -74,17 +74,24 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 		@Override
 		public Void caseInstCall(InstCall call) {
 			Procedure proc = call.getProcedure();
-			Attribute attribute = proc.getAttribute("codelet");
 
-			if (attribute != null) {
+			if (proc.hasAttribute("codelet")) {
 
-				// Set callsite
-				call.setAttribute("hmpp", "#pragma hmpp "
-						+ getCodeletName(proc) + " callsite");
+				// Set "callsite" directive on call instruction
+				call.addAttribute("callsite");
+				call.getAttribute("callsite").setAttribute("grp_label",
+						getCodeletName(proc));
 
-				// Set codelet
-				createCodelet(call.getProcedure(), call.getArguments(),
-						attribute);
+				Attribute codelet = proc.getAttribute("codelet");
+				// Set "codelet" label
+				if (!codelet.hasAttribute("codelet_label")) {
+					codelet.setAttribute("codelet_label",
+							getCodeletName(call.getProcedure()));
+				}
+				// Set "codelet" directive parameters
+				if (!proc.getAttribute("codelet").hasAttribute("params")) {
+					setCodeletParameters(call, codelet);
+				}
 
 				// Set persistents variables
 				createPersistentVars(call);
@@ -93,40 +100,12 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			return null;
 		}
 
-		@Override
-		public Void caseBlockWhile(BlockWhile blockWhile) {
-			super.caseBlockWhile(blockWhile);
+		private void setCodeletParameters(InstCall call, Attribute codelet) {
 
-			Attribute attribute = blockWhile.getAttribute("gridify");
+			EList<Arg> args = call.getArguments();
 
-			if (attribute != null) {
-
-				createGridify(blockWhile, attribute);
-			}
-
-			return null;
-		}
-
-		private void createCodelet(Procedure proc, EList<Arg> args,
-				Attribute codelet) {
-			String codeletName = getCodeletName(proc);
-
-			// Set procedure pragma
-			String procPragma = "#pragma hmpp " + codeletName + " codelet";
-			ExprList values = (ExprList) codelet.getContainedValue();
-
-			if (values != null) {
-				for (int i = 0; i < values.getSize(); i++) {
-					ExprList parameter = (ExprList) values.get(i);
-					procPragma = procPragma + ", "
-							+ ((ExprString) parameter.get(0)).getValue();
-
-					if (parameter.getSize() > 0) {
-						procPragma = procPragma + " = "
-								+ ((ExprString) parameter.get(1)).getValue();
-					}
-				}
-			}
+			List<String> params = Arrays.asList(codelet.getValueAsString(
+					"params").split(","));
 
 			// Check if a parameter is an actor state
 			for (Arg arg : args) {
@@ -137,54 +116,55 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 						if (var.isGlobal() && var.isAssignable()) {
 
 							// Get corresponding parameter name
-							Param param = proc.getParameters().get(
-									args.indexOf(arg));
+							Param param = call.getProcedure().getParameters()
+									.get(args.indexOf(arg));
 
-							procPragma = procPragma + ", args["
-									+ param.getVariable().getName()
-									+ "].io = inout";
+							params.add("args[" + param.getVariable().getName()
+									+ "].io = inout");
 						}
 					}
 
 				}
 			}
 
-			// Set procedure attribute
-			codelet.setName(procPragma);
+			// Set procedure parameters
+			codelet.setAttribute("params", StringUtils.join(params, ","));
 
 		}
 
-		private void createGridify(BlockWhile blockWhile, Attribute gridify) {
-			// Set gridify annotation
-			String gridPragma = "#pragma hmppcg gridify (";
-			ExprList args = (ExprList) gridify.getContainedValue();
+		/**
+		 * If a BlockWhile has an hmppcg "gridify" attribute, it must be
+		 * consistent with variable names, even if they have been modified by
+		 * another transformation. That's why attribute stringValue is updated.
+		 */
+		@Override
+		public Void caseBlockWhile(BlockWhile blockWhile) {
+			super.caseBlockWhile(blockWhile);
 
-			if (args != null) {
-				for (int i = 0; i < args.getSize(); i++) {
+			if (blockWhile.hasAttribute("gridify")) {
 
-					// Get induction variable
-					ExprList parameter = (ExprList) args.get(i);
-					String inductionVar = "";
-					Expression paramExpr = parameter.get(0);
+				Attribute gridify = blockWhile.getAttribute("gridify");
 
-					if (paramExpr instanceof ExprString) {
-						inductionVar = ((ExprString) paramExpr).getValue();
-					} else if (paramExpr instanceof ExprVar) {
-						inductionVar = ((ExprVar) paramExpr).getUse()
-								.getVariable().getName();
+				if (gridify.hasAttribute("params")
+						&& gridify.getAttribute("params").getContainedValue() != null) {
+
+					ExprList varList = (ExprList) gridify
+							.getAttribute("params").getContainedValue();
+
+					List<String> updatedVarNames = new ArrayList<String>();
+					for (Expression expr : varList.getValue()) {
+						if (expr instanceof ExprVar) {
+							updatedVarNames.add(((ExprVar) expr).getUse()
+									.getVariable().getName());
+						}
 					}
 
-					gridPragma = gridPragma + inductionVar;
-
-					if (i != args.getSize() - 1) {
-						gridPragma += ", ";
-					}
+					gridify.setAttribute("params",
+							StringUtils.join(updatedVarNames, ","));
 				}
 			}
-			gridPragma += ")";
 
-			gridify.setName(gridPragma);
-
+			return null;
 		}
 
 		private void createPersistentVars(InstCall call) {
@@ -206,48 +186,64 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 				}
 			}
 
+			// The codelet has no persistent variable
 			if (persistentVar.isEmpty()) {
-				// The codelet has no persistent variable
 				return;
 			}
 
-			// Set persistent process
-			actor.setAttribute("hmpp", "#pragma hmpp " + codeletName
-					+ " group, target=cuda, transfer=manual");
-			List<Instruction> prepare = new ArrayList<Instruction>();
-			List<Instruction> close = new ArrayList<Instruction>();
+			// Set persistent process. Adds
+			// "#pragma hmpp <name> group, target=cuda, transfer=manual"
+			// before actor declaration
+			actor.addAttribute("group");
+			actor.getAttribute("group").setAttribute("grp_label", codeletName);
+			actor.getAttribute("group").setAttribute("params",
+					"target=cuda, transfer=manual");
 
-			// Create acquire
-			prepare.add(createInstrAttribute("#pragma hmpp " + codeletName
-					+ " acquire"));
+			// Create acquire. Adds "#pragma hmpp <codeletName> acquire" before
+			// call instruction
+			call.addAttribute("acquire");
+			call.getAttribute("acquire").setAttribute("grp_label", codeletName);
 
 			for (Var var : persistentVar) {
-				// Set variable attribute
-				var.setAttribute("hmpp", "#pragma hmpp " + codeletName
-						+ " resident, args[" + var.getName() + "].io=inout");
+				// Set variable attribute. Adds
+				// "#pragma hmpp <codeletName> resident, args[<var>].io=inout"
+				// before each variable declaration
+				var.addAttribute("resident");
+				var.getAttribute("resident").setAttribute("grp_label",
+						codeletName);
+				var.getAttribute("resident").setAttribute("params",
+						"args[" + var.getName() + "].io=inout");
 
-				// Create advancedload
-				prepare.add(createInstrAttribute("#pragma hmpp " + codeletName
-						+ " advancedload args[" + var.getName()
-						+ "], hostdata = \"" + var.getName() + "\""));
+				// Create advancedload. Adds
+				// "#pragma hmpp <codeletName> advancedload, args[<var>], hostdata="<var>""
+				// before call for each var
+				call.addAttribute("advancedload");
+				call.getAttribute("advancedload").setAttribute("grp_label",
+						codeletName);
+				call.getAttribute("advancedload").setAttribute(
+						"params",
+						"args[" + var.getName() + "], hostdata = \""
+								+ var.getName() + "\"");
 
-				// Create delegatedstore
-				close.add(createInstrAttribute("#pragma hmpp " + codeletName
-						+ " delegatedstore args[" + var.getName()
-						+ "], hostdata = \"" + var.getName() + "\""));
+				// Create delegatedstore. Adds
+				// "#pragma hmpp <codeletName> delegatedstore, args[<var>], hostdata="<var>""
+				// after
+				// call for each var
+				call.addAttribute("delegatedstore");
+				call.getAttribute("delegatedstore").addAttribute("after");
+				call.getAttribute("delegatedstore").setAttribute("grp_label",
+						codeletName);
+				call.getAttribute("delegatedstore").setAttribute(
+						"params",
+						"args[" + var.getName() + "], hostdata = \""
+								+ var.getName() + "\"");
 			}
 
-			// Create release
-			close.add(createInstrAttribute("#pragma hmpp " + codeletName
-					+ " release"));
-
-			// Getting current node block and add all
-			BlockBasic currentBlock = EcoreHelper.getContainerOfType(call,
-					BlockBasic.class);
-			currentBlock.getInstructions().addAll(currentBlock.indexOf(call),
-					prepare);
-			currentBlock.getInstructions().addAll(
-					currentBlock.indexOf(call) + 1, close);
+			// Create release. Adds "#pragma hmpp <codeletName> release" after
+			// call
+			call.addAttribute("release");
+			call.getAttribute("release").addAttribute("after");
+			call.getAttribute("release").setAttribute("grp_label", codeletName);
 		}
 
 		private String getCodeletName(Procedure proc) {
@@ -257,17 +253,6 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			}
 
 			return "codeletlabel" + codelets.get(proc);
-		}
-
-		private Instruction createInstrAttribute(String attrStr) {
-			/*
-			 * IrInstSpecific instSpecific = IrSpecificFactory.eINSTANCE
-			 * .createIrInstSpecific(); instSpecific.setAttribute(attrStr,
-			 * null);
-			 * 
-			 * return instSpecific;
-			 */
-			return null;
 		}
 	}
 

@@ -28,15 +28,13 @@
  */
 package net.sf.orcc.backends.c.hmpp.transformations;
 
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.util.Attribute;
 
@@ -60,26 +58,28 @@ public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
 	 * 
 	 */
 	private class ExprVarGetter extends AbstractIrVisitor<Void> {
-		private Var result;
+		private ExprVar result;
 		private String varName;
 
-		public ExprVarGetter(String name) {
+		public ExprVarGetter() {
 			// Visit also expressions
 			super(true);
-			varName = name;
+		}
+
+		public void setVariableName(String varName) {
+			this.varName = varName;
 		}
 
 		@Override
 		public Void caseExprVar(ExprVar expr) {
-			Var currentVar = expr.getUse().getVariable();
-			if (currentVar.getName().compareTo(varName) == 0) {
-				result = currentVar;
+			if (expr.getUse().getVariable().getName().compareTo(varName) == 0) {
+				result = expr;
 			}
 
 			return null;
 		}
 
-		public Var getResult() {
+		public ExprVar getResult() {
 			return result;
 		}
 	}
@@ -89,23 +89,29 @@ public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
 		super.caseBlockWhile(blockWhile);
 
 		Attribute attribute = blockWhile.getAttribute("gridify");
+		ExprVarGetter exprVarGetter = new ExprVarGetter();
 
-		if (attribute != null) {
-			ExprList args = (ExprList) attribute.getContainedValue();
-			if (args != null) {
-				for (int i = 0; i < args.getSize(); i++) {
+		if (attribute != null && attribute.hasAttribute("params")) {
 
-					// Get induction variable
-					ExprList parameter = (ExprList) args.get(i);
-					ExprString exprString = ((ExprString) parameter.get(0));
-					ExprVarGetter exprVarGetter = new ExprVarGetter(
-							exprString.getValue());
-					exprVarGetter.doSwitch(blockWhile);
+			List<String> varNames = Arrays.asList(attribute
+					.getAttribute("params").getStringValue().split(","));
 
-					if (exprVarGetter.getResult() != null) {
-						parameter.set(0, IrFactory.eINSTANCE
-								.createExprVar(exprVarGetter.getResult()));
+			for (String varName : varNames) {
+				exprVarGetter.setVariableName(varName);
+				exprVarGetter.doSwitch(blockWhile);
+
+				if (exprVarGetter.getResult() != null) {
+
+					if (attribute.getAttribute("params").getContainedValue() == null) {
+
+						attribute.getAttribute("params").setContainedValue(
+								IrFactory.eINSTANCE.createExprList());
 					}
+					ExprList variablesList = (ExprList) attribute.getAttribute(
+							"params").getContainedValue();
+
+					variablesList.getValue().add(exprVarGetter.getResult());
+
 				}
 			}
 
