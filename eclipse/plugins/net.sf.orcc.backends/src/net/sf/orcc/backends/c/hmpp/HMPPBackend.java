@@ -126,7 +126,17 @@ public class HMPPBackend extends CBackend {
 	public boolean exportRuntimeLibrary() {
 		String target = path + File.separator + "libs";
 		OrccLogger.traceln("Export libraries sources into " + target + "... ");
-		return copyFolderToFileSystem("/runtime/C", target, debug);
+
+		// Copy specific windows batch file
+		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+			copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat", target
+					+ File.separator + "run_cmake_with_VS_env.bat", debug);
+		}
+
+		// copyFileToFilesystem("/runtime/C/README.txt", target + File.separator
+		// + "README.txt", debug);
+
+		return copyFolderToFileSystem("/runtime/C/libs", target, debug);
 	}
 
 	@Override
