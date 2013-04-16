@@ -53,12 +53,14 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		# Runtime libraries inclusion
 		set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
 		
+		# Hmpp compiler
+		set(HMPP_COMPILER CACHE STRING "hmpp compiler binary")
+		
 		set(CMAKE_C_COMPILER ${HMPP_COMPILER})
 		set(CMAKE_CXX_COMPILER ${HMPP_COMPILER})
 		set(CMAKE_C_FLAGS gcc)
 		set(CMAKE_CXX_FLAGS g++)
 		
 		«addLibrariesSubdirs»
-		add_subdirectory(${SRC_DIR})
 	'''
 }

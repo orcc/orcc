@@ -230,9 +230,7 @@ public class CBackend extends AbstractBackend {
 			OrccLogger.traceRaw("Done\n");
 		}
 
-		// print CMakeLists
-		OrccLogger.traceln("Printing CMake project files");
-		new CMakePrinter(network).printCMakeFiles(path);
+		printCMake(network);
 		new StatisticsPrinter().print(srcPath, network);
 
 		if (balanceMapping) {
