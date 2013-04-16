@@ -38,7 +38,7 @@ import net.sf.orcc.backends.ir.BlockFor
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
-	val hmppDirectives = #["codelet", "codesite", "group", "acquire",
+	val hmppDirectives = #["codelet", "callsite", "group", "acquire",
 		"release", "advancedload", "delegatedstore", "resident"]
 	val hmppcgDirectives = #["gridify"]
 	
