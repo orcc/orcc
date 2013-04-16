@@ -165,8 +165,18 @@ public class ActorMerger extends DfVisitor<Void> {
 			SASLoopScheduler scheduler = new SASLoopScheduler(subNetwork);
 			scheduler.schedule();
 
-			OrccLogger.traceln("Schedule of cluster" + index + " is "
-					+ scheduler.getSchedule());
+			int actorcount = subNetwork.getChildren().size();
+			int fifocount = 0;
+			for (Connection conn : subNetwork.getConnections()) {
+				if (conn.getSourcePort() != null
+						&& conn.getTargetPort() != null) {
+					fifocount++;
+				}
+			}
+
+			OrccLogger.traceln("Cluster " + index);
+			OrccLogger.traceln(actorcount + "actors - " + fifocount + "fifos");
+			OrccLogger.traceln("Schedule is " + scheduler.getSchedule());
 
 			// merge vertices inside a single actor
 			Actor superActor = new ActorMergerSDF(scheduler, copier)
