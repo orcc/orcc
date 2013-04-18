@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="ir" nsURI="http://orcc.sf.net/backends/ir" nsPrefix="net.sf.orcc.backends.ir">
-  <eClassifiers xsi:type="ecore:EClass" name="InstAssignIndex" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
+  <eClassifiers xsi:type="ecore:EClass" name="InstAssignIndex" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//Instruction">
     <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression" containment="true"
         resolveProxies="false"/>
@@ -10,13 +10,13 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="listType" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Type"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="InstCast" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
+  <eClassifiers xsi:type="ecore:EClass" name="InstCast" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//Instruction">
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Def"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Use"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="InstTernary" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
+  <eClassifiers xsi:type="ecore:EClass" name="InstTernary" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//Instruction">
     <eStructuralFeatures xsi:type="ecore:EReference" name="conditionValue" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="trueValue" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"

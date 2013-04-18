@@ -54,8 +54,9 @@ public abstract class AttributableImpl extends EObjectImpl implements
 		Attributable {
 
 	/**
-	 * The cached value of the '{@link #getAttributes() <em>Attributes</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getAttributes() <em>Attributes</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getAttributes()
 	 * @generated
 	 * @ordered
@@ -64,6 +65,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected AttributableImpl() {
@@ -78,11 +80,12 @@ public abstract class AttributableImpl extends EObjectImpl implements
 			}
 		}
 
-		getAttributes().add(0, eINSTANCE.createAttribute(name));
+		getAttributes().add(eINSTANCE.createAttribute(name));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -96,6 +99,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -111,6 +115,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -124,6 +129,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -140,6 +146,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -149,6 +156,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -178,8 +186,10 @@ public abstract class AttributableImpl extends EObjectImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
+	@Override
 	public EList<Attribute> getAttributes() {
 		if (attributes == null) {
 			attributes = new EObjectContainmentEList<Attribute>(
@@ -244,7 +254,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 		Attribute attribute = getAttribute(name);
 		if (attribute == null) {
 			attribute = eINSTANCE.createAttribute(name);
-			getAttributes().add(0, attribute);
+			getAttributes().add(attribute);
 		}
 		attribute.setEObjectValue(value);
 	}
@@ -254,7 +264,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 		Attribute attribute = getAttribute(name);
 		if (attribute == null) {
 			attribute = eINSTANCE.createAttribute(name);
-			getAttributes().add(0, attribute);
+			getAttributes().add(attribute);
 		}
 		attribute.setObjectValue(value);
 	}
@@ -264,7 +274,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 		Attribute attribute = getAttribute(name);
 		if (attribute == null) {
 			attribute = eINSTANCE.createAttribute(name);
-			getAttributes().add(0, attribute);
+			getAttributes().add(attribute);
 		}
 		attribute.setStringValue(value);
 	}

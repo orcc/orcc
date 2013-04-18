@@ -100,7 +100,7 @@ void source_init() {
 	loopsCount = nbLoops;
 }
 
-long source_open(char* fileName) {
+long long source_open(char* fileName) {
 	char fullPathName[256];
 
 	stop = 0;
@@ -133,7 +133,7 @@ long source_open(char* fileName) {
 	}
 	startTime = clock();
 	loopsCount = nbLoops;
-	return (long)file;
+	return (long long)file;
 }
 
 unsigned int source_getNbLoop(void)
@@ -157,7 +157,7 @@ unsigned int source_sizeOfFile() {
 	return st.st_size; 
 }
 
-int source_sizeOfFileFd(long fdVal) {
+int source_sizeOfFileFd(long long fdVal) {
 	FILE* fd = (FILE*) fdVal;
 	struct stat st;
 	fstat(fileno(fd), &st);
@@ -186,7 +186,7 @@ void source_rewind() {
 	}
 }
 
-void source_rewindFd(long fdVal) {
+void source_rewindFd(long long fdVal) {
 	FILE* fd = (FILE*) fdVal;
 	if(fd != NULL) {
 		rewind(fd);
@@ -207,7 +207,7 @@ void source_close() {
 	}
 }
 
-void source_closeFd(long fdVal) {
+void source_closeFd(long long fdVal) {
 	FILE* fd = (FILE*) fdVal;
 	if(fd != NULL) {
 		int n = fclose(fd);
@@ -251,7 +251,7 @@ void source_readNBytes(unsigned char *outTable, unsigned int nbTokenToRead){
 }
 
 
-void source_readNBytesFd(long fdVal, unsigned char *outTable, unsigned int nbTokenToRead){
+void source_readNBytesFd(long long fdVal, unsigned char *outTable, unsigned int nbTokenToRead){
 	FILE* fd = (FILE*) fdVal;
 	int n = fread(outTable, 1, nbTokenToRead, fd);
 

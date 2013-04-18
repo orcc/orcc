@@ -407,9 +407,9 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 
 		// Add supertypes to classes
 		instAssignIndexEClass.getESuperTypes().add(
-				theIrPackage.getInstSpecific());
-		instCastEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
-		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+				theIrPackage.getInstruction());
+		instCastEClass.getESuperTypes().add(theIrPackage.getInstruction());
+		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstruction());
 		blockForEClass.getESuperTypes().add(theIrPackage.getBlock());
 		exprNullEClass.getESuperTypes().add(theIrPackage.getExpression());
 

@@ -12,7 +12,7 @@ import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.impl.InstSpecificImpl;
+import net.sf.orcc.ir.impl.InstructionImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -26,17 +26,20 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.ir.impl.InstCastImpl#getTarget <em>Target</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.impl.InstCastImpl#getSource <em>Source</em>}</li>
+ * <li>{@link net.sf.orcc.backends.ir.impl.InstCastImpl#getTarget <em>Target
+ * </em>}</li>
+ * <li>{@link net.sf.orcc.backends.ir.impl.InstCastImpl#getSource <em>Source
+ * </em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
-public class InstCastImpl extends InstSpecificImpl implements InstCast {
+public class InstCastImpl extends InstructionImpl implements InstCast {
 	/**
-	 * The cached value of the '{@link #getTarget() <em>Target</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTarget() <em>Target</em>}'
+	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTarget()
 	 * @generated
 	 * @ordered
@@ -44,8 +47,9 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	protected Def target;
 
 	/**
-	 * The cached value of the '{@link #getSource() <em>Source</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getSource() <em>Source</em>}'
+	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSource()
 	 * @generated
 	 * @ordered
@@ -54,6 +58,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected InstCastImpl() {
@@ -62,6 +67,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -71,6 +77,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -80,6 +87,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetTarget(Def newTarget,
@@ -90,42 +98,49 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 			ENotificationImpl notification = new ENotificationImpl(this,
 					Notification.SET, IrSpecificPackage.INST_CAST__TARGET,
 					oldTarget, newTarget);
-			if (msgs == null)
+			if (msgs == null) {
 				msgs = notification;
-			else
+			} else {
 				msgs.add(notification);
+			}
 		}
 		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setTarget(Def newTarget) {
 		if (newTarget != target) {
 			NotificationChain msgs = null;
-			if (target != null)
+			if (target != null) {
 				msgs = ((InternalEObject) target).eInverseRemove(this,
 						EOPPOSITE_FEATURE_BASE
 								- IrSpecificPackage.INST_CAST__TARGET, null,
 						msgs);
-			if (newTarget != null)
+			}
+			if (newTarget != null) {
 				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
 						EOPPOSITE_FEATURE_BASE
 								- IrSpecificPackage.INST_CAST__TARGET, null,
 						msgs);
+			}
 			msgs = basicSetTarget(newTarget, msgs);
-			if (msgs != null)
+			if (msgs != null) {
 				msgs.dispatch();
-		} else if (eNotificationRequired())
+			}
+		} else if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrSpecificPackage.INST_CAST__TARGET, newTarget, newTarget));
+		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -135,6 +150,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetSource(Use newSource,
@@ -145,10 +161,11 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 			ENotificationImpl notification = new ENotificationImpl(this,
 					Notification.SET, IrSpecificPackage.INST_CAST__SOURCE,
 					oldSource, newSource);
-			if (msgs == null)
+			if (msgs == null) {
 				msgs = notification;
-			else
+			} else {
 				msgs.add(notification);
+			}
 		}
 		return msgs;
 	}
@@ -235,32 +252,38 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setSource(Use newSource) {
 		if (newSource != source) {
 			NotificationChain msgs = null;
-			if (source != null)
+			if (source != null) {
 				msgs = ((InternalEObject) source).eInverseRemove(this,
 						EOPPOSITE_FEATURE_BASE
 								- IrSpecificPackage.INST_CAST__SOURCE, null,
 						msgs);
-			if (newSource != null)
+			}
+			if (newSource != null) {
 				msgs = ((InternalEObject) newSource).eInverseAdd(this,
 						EOPPOSITE_FEATURE_BASE
 								- IrSpecificPackage.INST_CAST__SOURCE, null,
 						msgs);
+			}
 			msgs = basicSetSource(newSource, msgs);
-			if (msgs != null)
+			if (msgs != null) {
 				msgs.dispatch();
-		} else if (eNotificationRequired())
+			}
+		} else if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrSpecificPackage.INST_CAST__SOURCE, newSource, newSource));
+		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -277,6 +300,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -292,6 +316,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -309,6 +334,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -326,6 +352,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override

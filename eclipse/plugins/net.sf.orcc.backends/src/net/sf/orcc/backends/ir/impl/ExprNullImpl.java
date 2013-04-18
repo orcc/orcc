@@ -43,13 +43,12 @@ import org.eclipse.emf.ecore.EClass;
  * <em><b>Expr Null</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- * 
+ *
  * @generated
  */
 public class ExprNullImpl extends ExpressionImpl implements ExprNull {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected ExprNullImpl() {
@@ -58,7 +57,6 @@ public class ExprNullImpl extends ExpressionImpl implements ExprNull {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

@@ -746,7 +746,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 		}
 		return stateVars;
 	}
-	
+
 	/**
 	 * Add the given variable to {@link #actor}'s state variables and make its name
 	 * unique.
