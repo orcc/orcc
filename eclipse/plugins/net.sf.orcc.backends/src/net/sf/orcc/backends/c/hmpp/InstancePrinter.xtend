@@ -88,12 +88,12 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 		var labels = ""
 			if(attr.hasAttribute("grp_label"))
-				labels = labels + " " + attr.getAttribute("grp_label").stringValue
+				labels = labels + " " + attr.getValueAsString("grp_label")
 			if(attr.hasAttribute("codelet_label"))
-				labels = labels + " " + attr.getAttribute("codelet_label").stringValue
+				labels = labels + " " + attr.getValueAsString("codelet_label")
 			
 		val params = if(attr.hasAttribute("params"))
-			", " + attr.getAttribute("params").stringValue
+			", " + attr.getValueAsString("params")
 
 		'''#pragma «directiveType»«labels» «attr.name»«params»'''
 	}
