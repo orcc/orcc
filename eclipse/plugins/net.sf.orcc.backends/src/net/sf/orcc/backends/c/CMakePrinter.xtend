@@ -95,7 +95,7 @@ class CMakePrinter extends CommonPrinter {
 		add_subdirectory(${SRC_DIR})
 	'''
 
-	def private srcCMakeContent() '''
+	def protected srcCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		cmake_minimum_required (VERSION 2.6)
@@ -120,6 +120,5 @@ class CMakePrinter extends CommonPrinter {
 		if(NOT NO_EXTERNAL_DEPENDENCIES)
 			target_link_libraries(«network.simpleName» ${CMAKE_THREAD_LIBS_INIT})
 		endif(NOT NO_EXTERNAL_DEPENDENCIES)
-
 	'''
 }

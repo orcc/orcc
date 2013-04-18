@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.c.hmpp
 
 import net.sf.orcc.df.Network
+import net.sf.orcc.df.Actor
 
 class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 	
@@ -56,11 +57,39 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		# Hmpp compiler
 		set(HMPP_COMPILER CACHE STRING "hmpp compiler binary")
 		
-		set(CMAKE_C_COMPILER ${HMPP_COMPILER})
-		set(CMAKE_CXX_COMPILER ${HMPP_COMPILER})
-		set(CMAKE_C_FLAGS gcc)
-		set(CMAKE_CXX_FLAGS g++)
-		
 		«addLibrariesSubdirs»
 	'''
+	
+	override protected srcCMakeContent() '''
+		# Generated from «network.simpleName»
+
+		cmake_minimum_required (VERSION 2.6)
+
+		set(filenames
+			«network.simpleName».c
+			«FOR child : network.children.actorInstances.filter[!actor.native]»
+				«child.label».c
+			«ENDFOR»
+			«FOR child : network.children.filter(typeof(Actor)).filter[!native]»
+				«child.label».c
+			«ENDFOR»
+		)
+		
+		set(CMAKE_C_COMPILER ${HMPP_COMPILER})
+		set(CMAKE_CXX_COMPILER ${HMPP_COMPILER})
+		set(CMAKE_C_FLAGS "gcc ${CMAKE_C_FLAGS}")
+		set(CMAKE_CXX_FLAGS "g++  ${CMAKE_CXX_FLAGS}")
+
+		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
+
+		add_executable(«network.simpleName» ${filenames})
+
+		target_link_libraries(«network.simpleName» orcc)
+
+		# Build library without any external library required (SDL, pthread, etc)
+		if(NOT NO_EXTERNAL_DEPENDENCIES)
+			target_link_libraries(«network.simpleName» ${CMAKE_THREAD_LIBS_INIT})
+		endif(NOT NO_EXTERNAL_DEPENDENCIES)
+	'''
+	
 }
