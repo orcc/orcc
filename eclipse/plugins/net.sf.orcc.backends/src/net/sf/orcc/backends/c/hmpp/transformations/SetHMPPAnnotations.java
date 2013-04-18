@@ -38,8 +38,6 @@ import java.util.Set;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.ir.Arg;
-import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprList;
@@ -55,7 +53,6 @@ import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.emf.common.util.EList;
 
 /**
  * This class defines a HMMP annotations.
@@ -80,7 +77,6 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			if (proc.hasAttribute("codelet")) {
 
 				Attribute codelet = proc.getAttribute("codelet");
-
 				// Set "codelet" label
 				if (codelet.hasAttribute("codelet_label")) {
 					setCodeletName(proc,
@@ -88,8 +84,9 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 				} else {
 					codelet.setAttribute("codelet_label", getCodeletName(proc));
 				}
+
 				// Set "codelet" missing parameters
-				setCodeletParameters(call, codelet);
+				setCodeletParameters(proc, codelet);
 
 				// Set "callsite" directive on call instruction
 				call.addAttribute("callsite");
@@ -100,35 +97,35 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			return null;
 		}
 
-		private void setCodeletParameters(InstCall call, Attribute codelet) {
+		/**
+		 * Add missing parameters to a given codelet, according given proc
+		 * parameters type. Non scalars
+		 * 
+		 * @param proc
+		 * @param codelet
+		 */
+		private void setCodeletParameters(Procedure proc, Attribute codelet) {
 
-			EList<Arg> args = call.getArguments();
-
-			List<String> params = Arrays.asList(codelet.getValueAsString(
+			// Explode existing codelet params as a list of String
+			List<String> cdltParams = Arrays.asList(codelet.getValueAsString(
 					"params").split(","));
 
-			// Check if a parameter is an actor state
-			for (Arg arg : args) {
-				if (arg.isByVal()) {
-					Expression value = ((ArgByVal) arg).getValue();
-					if (value.isExprVar()) {
-						Var var = ((ExprVar) value).getUse().getVariable();
-						if (var.isGlobal() && var.isAssignable()) {
+			// Check if procedure parameter is not a scalar
+			for (Param param : proc.getParameters()) {
+				if (param.getVariable().getType().isList()) {
+					// TODO: classify arguments according to their usage: in /
+					// out / inout
+					String newCodeletParam = "args["
+							+ param.getVariable().getName() + "].io = inout";
 
-							// Get corresponding parameter name
-							Param param = call.getProcedure().getParameters()
-									.get(args.indexOf(arg));
-
-							params.add("args[" + param.getVariable().getName()
-									+ "].io = inout");
-						}
+					if (!cdltParams.contains(newCodeletParam)) {
+						cdltParams.add(newCodeletParam);
 					}
-
 				}
 			}
 
-			// Set procedure parameters
-			codelet.setAttribute("params", StringUtils.join(params, ","));
+			// Restore codelets params by joining them with ", " separator
+			codelet.setAttribute("params", StringUtils.join(cdltParams, ", "));
 
 		}
 
