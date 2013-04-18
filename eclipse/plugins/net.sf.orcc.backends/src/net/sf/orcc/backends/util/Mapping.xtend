@@ -83,7 +83,7 @@ class Mapping extends CommonPrinter {
 				// In case of a composite actor, try to map it on a component referenced by its children
 				// FIXME: There is probably a better way to do this
 				if (actor.hasAttribute("mergedActors")) {
-					val clusteredActors = actor.getValueAsObject("mergedActors") as List<String>
+					val clusteredActors = actor.<List<String>>getValueAsObject("mergedActors")
 					actor.tryToMap(clusteredActors.map(a|initialMapping.get(a)).findFirst[!nullOrEmpty])
 				} else {
 					actor.tryToMap(initialMapping.get(network.name + "_" + actor.name))
