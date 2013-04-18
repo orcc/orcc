@@ -62,6 +62,8 @@ public class ActorMerger extends DfVisitor<Void> {
 
 	private Network network;
 
+	private List<String> mergedActors;
+
 	/**
 	 * Transforms the network to internalize the given list of vertices in their
 	 * own subnetwork and returns this subnetwork.
@@ -76,9 +78,11 @@ public class ActorMerger extends DfVisitor<Void> {
 
 		List<Connection> newConnections = new ArrayList<Connection>();
 		List<Connection> oldConnections = new ArrayList<Connection>();
+		mergedActors = new ArrayList<String>();
 
 		for (Vertex vertex : vertices) {
 			IrUtil.copy(copier, vertex);
+			mergedActors.add(network.getName() + "_" + vertex.getLabel());
 		}
 
 		for (Connection connection : network.getConnections()) {
@@ -174,13 +178,15 @@ public class ActorMerger extends DfVisitor<Void> {
 				}
 			}
 
-			OrccLogger.traceln("Cluster " + index);
-			OrccLogger.traceln(actorcount + "actors - " + fifocount + "fifos");
-			OrccLogger.traceln("Schedule is " + scheduler.getSchedule());
+			OrccLogger.traceln("Cluster" + index + " (" + actorcount
+					+ " actors, " + fifocount + " fifos" + ") => Schedule is "
+					+ scheduler.getSchedule());
 
 			// merge vertices inside a single actor
 			Actor superActor = new ActorMergerSDF(scheduler, copier)
 					.doSwitch(subNetwork);
+			superActor.setAttribute("mergedActors", mergedActors);
+
 			network.add(superActor);
 			EcoreUtil.delete(subNetwork);
 
