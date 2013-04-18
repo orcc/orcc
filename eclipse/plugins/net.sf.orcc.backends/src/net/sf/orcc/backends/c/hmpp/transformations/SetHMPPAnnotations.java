@@ -65,8 +65,7 @@ import org.eclipse.emf.common.util.EList;
  */
 public class SetHMPPAnnotations extends DfVisitor<Void> {
 
-	Map<Procedure, Integer> codelets;
-	int codeletsCnt;
+	Map<Procedure, String> codelets;
 
 	private class InnerSetHMPPAnnotations extends AbstractIrVisitor<Void> {
 
@@ -81,10 +80,13 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			if (proc.hasAttribute("codelet")) {
 
 				Attribute codelet = proc.getAttribute("codelet");
+
 				// Set "codelet" label
-				if (!codelet.hasAttribute("codelet_label")) {
-					codelet.setAttribute("codelet_label",
-							getCodeletName(call.getProcedure()));
+				if (codelet.hasAttribute("codelet_label")) {
+					setCodeletName(proc,
+							codelet.getValueAsString("codelet_label"));
+				} else {
+					codelet.setAttribute("codelet_label", getCodeletName(proc));
 				}
 				// Set "codelet" missing parameters
 				setCodeletParameters(call, codelet);
@@ -263,28 +265,29 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			}
 		}
 
+		private void setCodeletName(Procedure proc, String name) {
+			codelets.put(proc, name);
+		}
+
 		private String getCodeletName(Procedure proc) {
-
-			if (!codelets.containsKey(proc)) {
-				codelets.put(proc, codeletsCnt++);
+			String name = codelets.get(proc);
+			if (name == null) {
+				name = "codeletlabel" + codelets.size();
+				setCodeletName(proc, name);
 			}
-
-			return "codeletlabel" + codelets.get(proc);
+			return name;
 		}
 	}
 
 	public SetHMPPAnnotations() {
 		super();
-		codelets = new HashMap<Procedure, Integer>();
-		codeletsCnt = 0;
-
+		codelets = new HashMap<Procedure, String>();
 		irVisitor = new InnerSetHMPPAnnotations();
 	}
 
 	@Override
 	public Void caseActor(Actor actor) {
-		codelets = new HashMap<Procedure, Integer>();
-		codeletsCnt = 0;
+		codelets.clear();
 		this.actor = actor;
 
 		super.caseActor(actor);
