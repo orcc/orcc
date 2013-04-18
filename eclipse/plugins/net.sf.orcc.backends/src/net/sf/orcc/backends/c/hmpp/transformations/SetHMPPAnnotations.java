@@ -31,14 +31,17 @@ package net.sf.orcc.backends.c.hmpp.transformations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.BlockWhile;
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -77,24 +80,19 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 
 			if (proc.hasAttribute("codelet")) {
 
-				// Set "callsite" directive on call instruction
-				call.addAttribute("callsite");
-				call.getAttribute("callsite").setAttribute("grp_label",
-						getCodeletName(proc));
-
 				Attribute codelet = proc.getAttribute("codelet");
 				// Set "codelet" label
 				if (!codelet.hasAttribute("codelet_label")) {
 					codelet.setAttribute("codelet_label",
 							getCodeletName(call.getProcedure()));
 				}
-				// Set "codelet" directive parameters
-				if (!proc.getAttribute("codelet").hasAttribute("params")) {
-					setCodeletParameters(call, codelet);
-				}
+				// Set "codelet" missing parameters
+				setCodeletParameters(call, codelet);
 
-				// Set persistents variables
-				createPersistentVars(call);
+				// Set "callsite" directive on call instruction
+				call.addAttribute("callsite");
+				call.getAttribute("callsite").setAttribute("grp_label",
+						getCodeletName(proc));
 			}
 
 			return null;
@@ -167,8 +165,19 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			return null;
 		}
 
+		/**
+		 * Add all pragmas needed to perform manual transfers (hmpp) on global
+		 * variables used in procedure defined in the actor and decorated with
+		 * codelet/callsite attribute. This method has to be fixed since it does
+		 * not produce valid HMPP pragmas. We don't want to delete it because
+		 * the code can be reused in a future version of the backend.
+		 * 
+		 * @param call
+		 *            Call instruction decorated with an hmpp "callsite" pragma
+		 */
+		@SuppressWarnings("unused")
 		private void createPersistentVars(InstCall call) {
-			List<Var> persistentVar = new ArrayList<Var>();
+			Set<Var> persistentVar = new HashSet<Var>();
 			Procedure proc = call.getProcedure();
 			String codeletName = getCodeletName(proc);
 
@@ -178,8 +187,14 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 					for (Use use : var.getUses()) {
 						if (EcoreHelper
 								.getContainerOfType(use, Procedure.class)
-								.equals(proc)
-								&& !persistentVar.contains(var)) {
+								.equals(proc)) {
+							persistentVar.add(var);
+						}
+					}
+					for (Def def : var.getDefs()) {
+						if (EcoreHelper
+								.getContainerOfType(def, Procedure.class)
+								.equals(proc)) {
 							persistentVar.add(var);
 						}
 					}
@@ -201,12 +216,21 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 
 			// Create acquire. Adds "#pragma hmpp <codeletName> acquire" before
 			// call instruction
-			call.addAttribute("acquire");
-			call.getAttribute("acquire").setAttribute("grp_label", codeletName);
+			actor.addAttribute("acquire");
+			actor.getAttribute("acquire").addAttribute("first");
+			actor.getAttribute("acquire")
+					.setAttribute("grp_label", codeletName);
+
+			// Create release. Adds "#pragma hmpp <codeletName> release" after
+			// call
+			actor.addAttribute("release");
+			actor.getAttribute("release").addAttribute("last");
+			actor.getAttribute("release")
+					.setAttribute("grp_label", codeletName);
 
 			for (Var var : persistentVar) {
 				// Set variable attribute. Adds
-				// "#pragma hmpp <codeletName> resident, args[<var>].io=inout"
+				// "#pragma hmpp <codeleltName> resident, args[<var>].io=inout"
 				// before each variable declaration
 				var.addAttribute("resident");
 				var.getAttribute("resident").setAttribute("grp_label",
@@ -227,8 +251,7 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 
 				// Create delegatedstore. Adds
 				// "#pragma hmpp <codeletName> delegatedstore, args[<var>], hostdata="<var>""
-				// after
-				// call for each var
+				// after call for each var
 				call.addAttribute("delegatedstore");
 				call.getAttribute("delegatedstore").addAttribute("after");
 				call.getAttribute("delegatedstore").setAttribute("grp_label",
@@ -238,12 +261,6 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 						"args[" + var.getName() + "], hostdata = \""
 								+ var.getName() + "\"");
 			}
-
-			// Create release. Adds "#pragma hmpp <codeletName> release" after
-			// call
-			call.addAttribute("release");
-			call.getAttribute("release").addAttribute("after");
-			call.getAttribute("release").setAttribute("grp_label", codeletName);
 		}
 
 		private String getCodeletName(Procedure proc) {
