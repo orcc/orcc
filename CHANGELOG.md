@@ -1,3 +1,23 @@
+# Next release
+
+### Notable changes and features
+
+- Front-end:
+	* Annotations are allowed on a call instruction
+- Backends:
+	* [C] New option "-f <frames_count>" added to generated applications. It should replace "-l
+<loops_count>" in most cases.
+
+### Bugfixes
+
+- Front-end:
+	* Issue #44: Use of an annotation multiple time in the same scope cause editor to report
+a syntax error
+
+### Known problems
+
+### Misc
+
 # 1.3.0 March 2013
 
 ### Notable changes and features
