@@ -76,19 +76,13 @@
             class="net.sf.orcc.backends.llvm.jit.JadeBackend"
             name="Jade">
          <option
-               id="net.sf.orcc.backends.llvmMode">
-         </option>
-         <option
-               id="net.sf.orcc.backends.optLevel">
-         </option>
-         <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
                id="net.sf.orcc.core.classify">
          </option>
          <option
-               id="net.sf.orcc.backends.byteexact">
+               id="net.sf.orcc.backends.llvm.jit.bitaccurate">
          </option>
       </backend>
       <backend
@@ -294,46 +288,9 @@
             <checkBox></checkBox>
          </option>
          <option
-               defaultValue="Assembly"
-               description="Select a representation for the VTL"
-               id="net.sf.orcc.backends.llvmMode"
-               name="Generation mode:">
-            <comboBox>
-               <comboBoxItem
-                     id="Assembly">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="Bitcode">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="Archive">
-               </comboBoxItem>
-            </comboBox>
-         </option>
-         <option
-               defaultValue="O0"
-               description="Set level of optimization"
-               id="net.sf.orcc.backends.optLevel"
-               name="Optimization level:">
-            <comboBox>
-               <comboBoxItem
-                     id="O0">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="O1">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="O2">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="O3">
-               </comboBoxItem>
-            </comboBox>
-         </option>
-         <option
                defaultValue="false"
-               id="net.sf.orcc.backends.byteexact"
-               name="Generate byte exact code">
+               id="net.sf.orcc.backends.llvm.jit.bitaccurate"
+               name="Generate bit-accurate code">
             <checkBox></checkBox>
          </option>
          <option
