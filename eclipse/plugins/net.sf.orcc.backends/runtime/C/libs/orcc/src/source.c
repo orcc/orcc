@@ -102,6 +102,7 @@ void source_init() {
 
 long long source_open(char* fileName) {
 	char fullPathName[256];
+	FILE *file = NULL;
 
 	stop = 0;
 	nb = 0;
