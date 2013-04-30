@@ -161,6 +161,7 @@ import net.sf.orcc.util.OrccUtil
 	WaveGen_Proc_In : process (ap_clk)
 	  variable Input_bit   : integer range 2147483647 downto - 2147483648;
 	  variable line_number : line;
+	 
 	begin
 	  if rising_edge(ap_clk) then
 	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
@@ -323,9 +324,9 @@ import net.sf.orcc.util.OrccUtil
 				«ENDIF»
 				«IF connection.fifoTypeIn.bool»
 					if (input_bit = 1) then 
-					«connection.fifoName»_dout  <= '1';
+					«connection.fifoName»_dout  <= "1";
 					else
-					«connection.fifoName»_dout  <= '0';
+					«connection.fifoName»_dout  <= "0";
 					end if;
 				«ENDIF»
 				«connection.fifoName»_empty_n <= '1';
@@ -349,9 +350,9 @@ import net.sf.orcc.util.OrccUtil
 				«connection.fifoName»_empty_n <= '1';
 				«IF connection.fifoTypeIn.bool»
 					if (input_bit = 1) then 
-					«connection.fifoName»_dout  <= '1';
+					«connection.fifoName»_dout  <= "1";
 					else
-					«connection.fifoName»_dout  <= '0';
+					«connection.fifoName»_dout  <= "0";
 					end if;
 				«ENDIF»
 				ap_start <= '1';      
@@ -382,21 +383,21 @@ import net.sf.orcc.util.OrccUtil
 				severity error;
 				«ENDIF»
 				«IF connection.fifoTypeOut.bool»
-				if (input_bit = 1)
-					assert («connection.fifoName»_din  = '1')
+				if (input_bit = 1) then
+					assert («connection.fifoName»_din  = "1")
 					report on port «connection.fifoName» "0" instead of "1"
 					severity error;
 				else
-					assert («connection.fifoName»_din  = '0')
+					assert («connection.fifoName»_din  = "0")
 					report on port «connection.fifoName» "1" instead of "0"
 					severity error;
 				end if;
 				«ENDIF»
 				
 			
-				-- assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
-				-- report "on port «connection.fifoName» correct value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " equals :" & str(input_bit)
-				-- severity note;
+				assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
+				report "on port «connection.fifoName» correct value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " equals :" & str(input_bit)
+				severity note;
 
 			end if;
 		end if;
