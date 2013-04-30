@@ -561,6 +561,11 @@ public class VarImpl extends AttributableImpl implements Var {
 	}
 
 	@Override
+	public boolean isParam() {
+		return eContainingFeature() == IrPackage.Literals.PARAM__VARIABLE;
+	}
+
+	@Override
 	public boolean isUsed() {
 		return !getUses().isEmpty();
 	}

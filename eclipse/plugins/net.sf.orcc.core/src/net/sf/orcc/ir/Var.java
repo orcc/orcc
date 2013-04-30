@@ -160,6 +160,13 @@ public interface Var extends Attributable {
 	boolean isLocal();
 
 	/**
+	 * <!-- begin-user-doc -->Returns <code>true</code> if this variable is a
+	 * parameter of a procedure, i.e. if it is contained in a Param.<!--
+	 * end-user-doc -->
+	 */
+	boolean isParam();
+
+	/**
 	 * Returns true if this variable is used at least once.
 	 * 
 	 * @return true if this variable is used at least once.
