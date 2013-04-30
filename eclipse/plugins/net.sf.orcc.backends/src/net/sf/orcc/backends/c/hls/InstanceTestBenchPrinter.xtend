@@ -55,7 +55,8 @@ import net.sf.orcc.util.OrccUtil
 	USE ieee.std_logic_unsigned.all;
 	USE ieee.numeric_std.ALL;
 	USE std.textio.all;
-	
+	LIBRARY work;
+	USE work.sim_package.all;
 	
 	ENTITY testbench IS
 	END testbench;
@@ -95,8 +96,7 @@ import net.sf.orcc.util.OrccUtil
 	
 	-- Configuration
 	signal count       : integer range 255 downto 0 := 0;
-	signal countSendEdge : std_logic_vector(15 downto 0) := (others => '0');
-	
+		
 	constant PERIOD : time := 50 ns;
 	constant DUTY_CYCLE : real := 0.5;
 	constant OFFSET : time := 100 ns;
@@ -114,7 +114,7 @@ import net.sf.orcc.util.OrccUtil
 	«ENDFOR»
 	begin
 
-	uut : main port map (
+	uut : «instance.name»_scheduler port map (
 	ap_clk => ap_clk,
 	ap_rst => ap_rst,
 	ap_start => ap_start,
@@ -154,6 +154,10 @@ import net.sf.orcc.util.OrccUtil
 	WaveGen_Proc_In : process (ap_clk)
 	  variable Input_bit   : integer range 2147483647 downto - 2147483648;
 	  variable line_number : line;
+	  «FOR connection : instance.incomingPortMap.values»
+	  variable count«connection.fifoName»: integer:= 1;
+	«ENDFOR»
+	  
 	begin
 	  if rising_edge(ap_clk) then
 	«FOR connection : instance.incomingPortMap.values»
@@ -164,13 +168,16 @@ import net.sf.orcc.util.OrccUtil
 	«ENDIF»
 	
 	«IF ! instance.outgoingPortMap.empty»
-	WaveGen_Proc_Out : process (clock)
+	WaveGen_Proc_Out : process (ap_clk)
 	variable Input_bit   : integer range 2147483647 downto - 2147483648;
 	variable line_number : line;
+	«FOR connection : instance.outgoingPortMap.values»
+		variable count«connection.head.fifoName»: integer:= 1;
+	«ENDFOR»
 	begin
-	if (rising_edge(clock)) then
-	«FOR connection : instance.outgoingPortMap.values.head»
-		«printOutputWaveGen(instance, connection)»
+	if (rising_edge(ap_clk)) then
+	«FOR connection : instance.outgoingPortMap.values»
+		«printOutputWaveGen(instance, connection.head)»
 	«ENDFOR»
 	end if;
 	end process WaveGen_Proc_Out;
@@ -252,9 +259,9 @@ import net.sf.orcc.util.OrccUtil
 				«ENDIF»
 				«IF connection.fifoType.bool»
 					if (input_bit = 1) then 
-					«connection.fifoName»_dout  <= '1';
+					«connection.fifoName»_dout  <= "1";
 					else
-					«connection.fifoName»_dout  <= '0';
+					«connection.fifoName»_dout  <= "0";
 					end if;
 				«ENDIF»
 				«connection.fifoName»_empty_n <= '1';
@@ -265,6 +272,8 @@ import net.sf.orcc.util.OrccUtil
 
 		when CheckRead =>
 		if (not endfile (sim_file_«instance.name»_«connection.targetPort.name»)) and «connection.fifoName»_read = '1' then
+		 count«connection.fifoName» := count«connection.fifoName» + 1;
+		 report "Number of inputs«connection.fifoName» = " & integer'image(count«connection.fifoName»);
 			«connection.fifoName»_empty_n <= '0';
 			readline(sim_file_«instance.name»_«connection.targetPort.name», line_number);
 			if (line_number'length > 0 and line_number(1) /= '/') then
@@ -278,9 +287,9 @@ import net.sf.orcc.util.OrccUtil
 				«connection.fifoName»_empty_n <= '1';
 				«IF connection.fifoType.bool»
 					if (input_bit = 1) then 
-					«connection.fifoName»_dout  <= '1';
+					«connection.fifoName»_dout  <= "1";
 					else
-					«connection.fifoName»_dout  <= '0';
+					«connection.fifoName»_dout  <= "0";
 					end if;
 				«ENDIF»
 				ap_start <= '1';      
@@ -295,37 +304,39 @@ import net.sf.orcc.util.OrccUtil
 	
 	def printOutputWaveGen(Instance vertex, Connection connection) '''
 		if (not endfile (sim_file_«vertex.name»_«connection.sourcePort.name») and «connection.fifoName»_write = '1') then
+		count«connection.fifoName» := count«connection.fifoName» + 1;
+		 report "Number of inputs«connection.fifoName» = " & integer'image(count«connection.fifoName»);
 			readline(sim_file_«vertex.name»_«connection.sourcePort.name», line_number);
 			if (line_number'length > 0 and line_number(1) /= '/') then
 				read(line_number, input_bit);
 				«IF connection.fifoType.int»
 				assert («connection.fifoName»_din  = std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»)))
-				-- report "on Y incorrectly value computed : " & to_string(to_integer(to_signed(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
-				report "on port Y incorrectly value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
+				-- report "on «connection.fifoName» incorrectly value computed : " & to_string(to_integer(to_signed(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
+				report "on port «connection.fifoName» incorrectly value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
 				severity error;
 				«ENDIF»
 				«IF connection.fifoType.uint»
 				assert («connection.fifoName»_din  = std_logic_vector(to_unsigned(input_bit, «connection.fifoType.sizeInBits»)))
-				-- report "on Y incorrectly value computed : " & to_string(to_integer(to_unsigned(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
-				report "on port Y incorrectly value computed : " & str(to_integer(unsigned(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
+				-- report "on «connection.fifoName» incorrectly value computed : " & to_string(to_integer(to_unsigned(«connection.fifoName»_din))) & " instead of :" & to_string(input_bit)
+				report "on port «connection.fifoName» incorrectly value computed : " & str(to_integer(unsigned(«connection.fifoName»_din))) & " instead of :" & str(input_bit)
 				severity error;
 				«ENDIF»
 				«IF connection.fifoType.bool»
-				if (input_bit = 1)
-					assert («connection.fifoName»_din  = '1')
+				if (input_bit = 1) then
+					assert («connection.fifoName»_din  = "1")
 					report "0" instead of "1"
 					severity error;
 				else
-					assert («connection.fifoName»_din  = '0')
+					assert («connection.fifoName»_din  = "0")
 					report "1" instead of "0"
 					severity error;
 				end if;
 				«ENDIF»
 				
 			
-				-- assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»)))
-				-- report "on port Y correct value computed : " & str(to_integer(signed(Y_data))) & " equals :" & str(input_bit)
-				-- severity note;
+				 assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»)))
+				 report "on port «connection.fifoName» correct value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " equals :" & str(input_bit)
+				 severity note;
 
 			end if;
 		end if;
@@ -333,7 +344,7 @@ import net.sf.orcc.util.OrccUtil
 	
 	override print(String targetFolder) {		
 		val content = fileContent
-		val file = new File(targetFolder + File::separator + instance.name+ "_tb" + ".vhd")
+		val file = new File(targetFolder + File::separator + instance.name+ "TestBench" + ".vhd")//"_tb"
 		
 		if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)
