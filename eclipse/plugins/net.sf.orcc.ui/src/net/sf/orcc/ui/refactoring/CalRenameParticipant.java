@@ -114,6 +114,7 @@ public class CalRenameParticipant extends RenameParticipant {
 		InputStream in = actorFile.getContents();
 		try {
 			String actorContents = OrccUtil.getContents(in);
+			in.close();
 			String name = " " + simpleName + " ";
 			int offset = actorContents.indexOf(name);
 			if(offset == -1){

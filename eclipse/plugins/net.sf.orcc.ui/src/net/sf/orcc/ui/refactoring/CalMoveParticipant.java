@@ -88,8 +88,9 @@ public class CalMoveParticipant extends MoveParticipant {
 			// change package
 			InputStream in = actorFile.getContents();
 			try {
-				String networkContents = OrccUtil.getContents(in);
-				int offset = networkContents.indexOf(oldPackage);
+				String actorContents = OrccUtil.getContents(in);
+				in.close();
+				int offset = actorContents.indexOf(oldPackage);
 
 				TextChange textChange = new TextFileChange("Replace package '"
 						+ oldPackage + "' by references to '" + newPackage
