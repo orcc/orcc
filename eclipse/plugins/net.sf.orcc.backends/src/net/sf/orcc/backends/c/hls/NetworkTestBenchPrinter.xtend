@@ -107,8 +107,7 @@ import net.sf.orcc.util.OrccUtil
 	
 	-- Configuration
 	signal count       : integer range 255 downto 0 := 0;
-	signal countSendEdge : std_logic_vector(15 downto 0) := (others => '0');
-	
+		
 	constant PERIOD : time := 50 ns;
 	constant DUTY_CYCLE : real := 0.5;
 	constant OFFSET : time := 100 ns;
@@ -161,6 +160,11 @@ import net.sf.orcc.util.OrccUtil
 	WaveGen_Proc_In : process (ap_clk)
 	  variable Input_bit   : integer range 2147483647 downto - 2147483648;
 	  variable line_number : line;
+	 «FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+	 «FOR connection : instance.incomingPortMap.values»
+	   variable count«connection.fifoName»: integer:= 1;
+	«ENDFOR»
+	«ENDFOR»
 	 
 	begin
 	  if rising_edge(ap_clk) then
@@ -175,6 +179,11 @@ import net.sf.orcc.util.OrccUtil
 	WaveGen_Proc_Out : process (ap_clk)
 	variable Input_bit   : integer range 2147483647 downto - 2147483648;
 	variable line_number : line;
+	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
+	«FOR connection : instance.outgoingPortMap.values»
+		variable count«connection.head.fifoName»: integer:= 1;
+	«ENDFOR»
+	«ENDFOR»
 	begin
 	if (rising_edge(ap_clk)) then
 	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
@@ -337,6 +346,8 @@ import net.sf.orcc.util.OrccUtil
 
 		when CheckRead =>
 		if (not endfile (sim_file_«instance.name»_«connection.targetPort.name»)) and «connection.fifoName»_read = '1' then
+		 count«connection.fifoName» := count«connection.fifoName» + 1;
+		 report "Number of inputs«connection.fifoName» = " & integer'image(count«connection.fifoName»);
 			«connection.fifoName»_empty_n <= '0';
 			readline(sim_file_«instance.name»_«connection.targetPort.name», line_number);
 			if (line_number'length > 0 and line_number(1) /= '/') then
@@ -367,6 +378,8 @@ import net.sf.orcc.util.OrccUtil
 	
 	def printOutputWaveGen(Instance vertex, Connection connection) '''
 		if (not endfile (sim_file_«vertex.name»_«connection.sourcePort.name») and «connection.fifoName»_write = '1') then
+		count«connection.fifoName» := count«connection.fifoName» + 1;
+		 report "Number of inputs«connection.fifoName» = " & integer'image(count«connection.fifoName»);
 			readline(sim_file_«vertex.name»_«connection.sourcePort.name», line_number);
 			if (line_number'length > 0 and line_number(1) /= '/') then
 				read(line_number, input_bit);
