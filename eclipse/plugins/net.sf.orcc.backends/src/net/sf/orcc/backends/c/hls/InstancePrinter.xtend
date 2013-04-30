@@ -297,7 +297,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 		«IF (trgtPort != null)»
 			«IF !instance.outgoingPortMap.get(trgtPort).head.fifoName.toString.empty»
-				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
 			«ENDIF»
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
@@ -377,14 +377,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override caseTypeBool(TypeBool type) 
 		'''bool'''
 		
-	def script (String path)'''
+def script (String path)'''
+	
 	open_project subProject
 	set_top «instance.name»_scheduler
 	add_files ../«instance.name».cpp
-	
+	add_files -tb ../coSimTestBench/«instance.name»TestBench.cpp
 	open_solution "solution"
 	set_part  {xc7v2000tlflg1925-2l}
-	create_clock -period 10
+	create_clock -period 20
 	
 	source "directive_«instance.name».tcl"
 	csynth_design
@@ -394,7 +395,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	def directive (String path)'''
 	#set_directives
-	config_dataflow -default_channel fifo -fifo_depth «fifoSize»
+	#config_dataflow -default_channel fifo -fifo_depth «fifoSize»
 	#set_directive_pipeline «instance.name»_scheduler
 	«FOR action : instance.actor.actions»
 		#set_directive_pipeline «action.name»
