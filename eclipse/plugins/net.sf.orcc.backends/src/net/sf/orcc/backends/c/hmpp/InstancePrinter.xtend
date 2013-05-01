@@ -30,17 +30,17 @@
 package net.sf.orcc.backends.c.hmpp
 
 import java.util.Map
+import net.sf.orcc.backends.ir.BlockFor
 import net.sf.orcc.df.Instance
+import net.sf.orcc.ir.InstCall
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.Attribute
-import net.sf.orcc.ir.InstCall
-import net.sf.orcc.backends.ir.BlockFor
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
-	val hmppDirectives = #["codelet", "callsite", "group", "acquire",
-		"release", "advancedload", "delegatedstore", "resident"]
-	val hmppcgDirectives = #["gridify"]
+	val hmppDirectives = newArrayList("codelet", "callsite", "group", "acquire",
+		"release", "advancedload", "delegatedstore", "resident")
+	val hmppcgDirectives = newArrayList("gridify")
 	
 	new(Map<String, Object> options) {
 		super(options)
