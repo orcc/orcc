@@ -82,7 +82,7 @@ struct waiting_s {
 
 struct mapping_s {
 	int number_of_threads;
-	int *threads_ids;
+	int *threads_affinities;
 	struct actor_s ***partitions_of_actors;
 	int *partitions_size;
 };

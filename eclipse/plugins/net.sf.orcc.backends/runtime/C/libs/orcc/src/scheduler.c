@@ -178,7 +178,7 @@ struct mapping_s* allocate_mapping(int number_of_threads) {
 	struct mapping_s *mapping = (struct mapping_s *) malloc(
 			sizeof(struct mapping_s));
 	mapping->number_of_threads = number_of_threads;
-	mapping->threads_ids = (int*) malloc(number_of_threads * sizeof(int));
+	mapping->threads_affinities = (int*) malloc(number_of_threads * sizeof(int));
 	mapping->partitions_of_actors = (struct actor_s ***) malloc(
 			number_of_threads * sizeof(struct actor_s **));
 	mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
@@ -197,7 +197,7 @@ void delete_mapping(struct mapping_s* mapping, int clean_all) {
 	}
 	free(mapping->partitions_of_actors);
 	free(mapping->partitions_size);
-	free(mapping->threads_ids);
+	free(mapping->threads_affinities);
 	free(mapping);
 }
 
@@ -207,7 +207,7 @@ void delete_mapping(struct mapping_s* mapping, int clean_all) {
 struct mapping_s* map_actors(struct actor_s **actors, int actors_size) {
 	if (mapping_file == NULL) {
 		struct mapping_s *mapping = allocate_mapping(1);
-		mapping->threads_ids[0] = 0;
+		mapping->threads_affinities[0] = 0;
 		mapping->partitions_size[0] = actors_size;
 		mapping->partitions_of_actors[0] = actors;
 		return mapping;
@@ -254,7 +254,7 @@ struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
 
 			attribute = roxml_get_attr(partition, "id", 0);
 			nb = roxml_get_content(attribute, NULL, 0, &size);
-			mappings_set->mappings[i]->threads_ids[j] = atoi(nb);
+			mappings_set->mappings[i]->threads_affinities[j] = atoi(nb);
 
 			mappings_set->mappings[i]->partitions_of_actors[j]
 					= (struct actor_s **) malloc(

@@ -271,7 +271,7 @@ class NetworkPrinter extends CTemplate {
 			
 			«IF !geneticAlgo»
 				for(i=0; i < mapping->number_of_threads; ++i){
-					sched_init(&schedulers[i], mapping->threads_ids[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
+					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
 				}
 			«ELSE»
 				for(i=0; i < THREAD_NB; ++i){
@@ -283,7 +283,7 @@ class NetworkPrinter extends CTemplate {
 			
 			for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
 				thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
-				set_thread_affinity(cpuset, i, threads[i]);
+				set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 			}
 			«IF geneticAlgo»
 				thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
