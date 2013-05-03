@@ -185,7 +185,7 @@ public class JadeBackend extends AbstractBackend {
 			e.printStackTrace();
 		}
 
-		new Mapping().print(path, network, mapping);
+		new Mapping(network, mapping).print(path);
 	}
 
 	@Override

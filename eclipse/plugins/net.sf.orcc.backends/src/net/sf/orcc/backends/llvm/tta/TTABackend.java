@@ -180,8 +180,7 @@ public class TTABackend extends LLVMBackend {
 		}
 
 		// Compute the actor mapping
-		computedMapping = new Mapping(true);
-		computedMapping.compute(network, mapping);
+		computedMapping = new Mapping(network, mapping, true);
 
 		// Build the design from the mapping
 		design = new ArchitectureBuilder().build(network, configuration,

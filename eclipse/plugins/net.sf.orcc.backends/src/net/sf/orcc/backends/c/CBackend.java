@@ -242,7 +242,7 @@ public class CBackend extends AbstractBackend {
 					mapping);
 		}
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
-			new Mapping().print(srcPath, network, mapping);
+			new Mapping(network, mapping).print(srcPath);
 		}
 	}
 

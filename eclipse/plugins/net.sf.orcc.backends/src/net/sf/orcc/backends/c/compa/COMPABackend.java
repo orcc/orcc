@@ -189,7 +189,7 @@ public class COMPABackend extends CBackend {
 		}
 
 		OrccLogger.traceln("Print network meta-informations...");
-		new Mapping().print(srcPath, network, mapping);
+		new Mapping(network, mapping).print(srcPath);
 	}
 
 	@Override

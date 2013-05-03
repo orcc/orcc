@@ -49,44 +49,49 @@ import net.sf.orcc.util.OrccUtil
  */
 class Mapping extends CommonPrinter {
 
+	var Network network
+
 	var Map<Vertex, String> invMapping
 	var Map<String, List<Vertex>> mapping
 	var List<Vertex> unmapped
 	var int i
-	var force = false
 
-	new() {
-		this.force = false
+	private new(Network network) {
+		this.network = network
+		this.mapping = new HashMap<String, List<Vertex>>
+		this.invMapping = new HashMap<Vertex, String>
+		this.unmapped = new ArrayList<Vertex>
 	}
 
-	new(boolean force) {
-		this.force = force
+	public new(Network network, Map<String, String> map, boolean processEmpty) {
+		this(network)
+		computeFromMap(map, processEmpty)
 	}
 
-	def print(String targetFolder, Network network, Map<String, String> initialMapping) {
+	public new(Network network, Map<String, String> map) {
+		this(network, map, false)
+	}
+
+	def print(String targetFolder) {
 		val xcfFile = new File(targetFolder + File::separator + network.simpleName + ".xcf")
-
-		network.compute(initialMapping)
 		OrccUtil::printFile(network.contentFile, xcfFile)
 	}
 
-	def void compute(Network network, Map<String, String> initialMapping) {
-		mapping = new HashMap<String, List<Vertex>>
-		invMapping = new HashMap<Vertex, String>
-		unmapped = new ArrayList<Vertex>
+	def void computeFromMap(Map<String, String> map, boolean processEmptyMap) {
 		i = 0
-		if (!initialMapping.values.forall[nullOrEmpty] || force) {
+		if (!map.values.forall[nullOrEmpty] || processEmptyMap) {
 			for (instance : network.children.actorInstances) {
-				instance.tryToMap(initialMapping.get(instance.hierarchicalName))
+				instance.tryToMap(map.get(instance.hierarchicalName))
 			}
 			for (actor : network.children.filter(typeof(Actor))) {
+
 				// In case of a composite actor, try to map it on a component referenced by its children
 				// FIXME: There is probably a better way to do this
 				if (actor.hasAttribute("mergedActors")) {
 					val clusteredActors = actor.<List<String>>getValueAsObject("mergedActors")
-					actor.tryToMap(clusteredActors.map(a|initialMapping.get(a)).findFirst[!nullOrEmpty])
+					actor.tryToMap(clusteredActors.map(a|map.get(a)).findFirst[!nullOrEmpty])
 				} else {
-					actor.tryToMap(initialMapping.get(network.name + "_" + actor.name))
+					actor.tryToMap(map.get(network.name + "_" + actor.name))
 				}
 			}
 		}
@@ -117,7 +122,7 @@ class Mapping extends CommonPrinter {
 				«ENDFOR»
 			</Partitioning>
 			
-			«otherStuff»
+			<!-- Other useful informations related to any element of the instanciated model can be printed here -->
 		</Configuration>
 	'''
 
@@ -127,10 +132,6 @@ class Mapping extends CommonPrinter {
 				<Instance id="«entity.label»"/>
 			«ENDFOR»
 		</Partition>
-	'''
-
-	def private otherStuff() '''
-		<!-- Other useful informations related to any element of the instanciated model can be printed here -->
 	'''
 
 	def getComponents() {

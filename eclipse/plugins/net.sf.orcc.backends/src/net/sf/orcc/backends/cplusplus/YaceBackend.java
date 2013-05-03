@@ -169,7 +169,7 @@ public class YaceBackend extends AbstractBackend {
 	 */
 	public void printNetwork(Network network) {
 
-		new Mapping().print(path, network, mapping);
+		new Mapping(network, mapping).print(path);
 		NetworkPrinter printer = new NetworkPrinter(network, options);
 
 		printer.printNetwork(path);
