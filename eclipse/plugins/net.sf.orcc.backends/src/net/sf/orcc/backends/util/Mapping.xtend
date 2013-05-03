@@ -33,12 +33,14 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import java.util.Map
+import javax.xml.parsers.DocumentBuilderFactory
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.OrccUtil
+import org.w3c.dom.Element
 
 /**
  * Printer used to create the xcf file, containing information on
@@ -72,6 +74,11 @@ class Mapping extends CommonPrinter {
 		this(network, map, false)
 	}
 
+	public new(Network network, String xcfFile) {
+		this(network)
+		computeFromFile(xcfFile)
+	}
+
 	def print(String targetFolder) {
 		val xcfFile = new File(targetFolder + File::separator + network.simpleName + ".xcf")
 		OrccUtil::printFile(network.contentFile, xcfFile)
@@ -94,6 +101,40 @@ class Mapping extends CommonPrinter {
 					actor.tryToMap(map.get(network.name + "_" + actor.name))
 				}
 			}
+		}
+	}
+
+	def public void computeFromFile(String xcfFile) {
+		val builder = DocumentBuilderFactory::newInstance.newDocumentBuilder
+		val dom = builder.parse(xcfFile)
+		val configuration = dom.documentElement
+		configuration.normalize
+		val partitioning = configuration.getElementsByTagName("Partitioning").item(0) as Element
+
+		if (partitioning != null) {
+			val partitions = partitioning.getElementsByTagName("Partition")
+
+			for (i : 0 .. partitions.length-1) {
+				val partNode = partitions.item(i)
+				val partition = partNode as Element
+				val partName = partition.getAttribute("id")
+				val instances = partition.getElementsByTagName("Instance")
+
+				for (j : 0 .. instances.length-1) {
+					val instNode = instances.item(j)
+					val instance = instNode as Element
+					val instName = instance.getAttribute("id")
+					val vertex = network.getChild(instName)
+
+					if (vertex != null) {
+						tryToMap(vertex, partName)
+					} else {
+						OrccLogger::warnln("Try to map an unknown actor called " + instName)
+					}
+				}
+			}
+		} else {
+			OrccLogger::warnln("Wrong XCF file")
 		}
 	}
 
