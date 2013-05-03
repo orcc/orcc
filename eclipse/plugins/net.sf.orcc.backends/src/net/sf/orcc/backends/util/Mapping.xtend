@@ -34,6 +34,7 @@ import java.util.HashMap
 import java.util.List
 import java.util.Map
 import javax.xml.parsers.DocumentBuilderFactory
+import net.sf.orcc.OrccRuntimeException
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
@@ -74,7 +75,7 @@ class Mapping extends CommonPrinter {
 		this(network, map, false)
 	}
 
-	public new(Network network, String xcfFile) {
+	public new(Network network, File xcfFile) {
 		this(network)
 		computeFromFile(xcfFile)
 	}
@@ -84,7 +85,7 @@ class Mapping extends CommonPrinter {
 		OrccUtil::printFile(network.contentFile, xcfFile)
 	}
 
-	def void computeFromMap(Map<String, String> map, boolean processEmptyMap) {
+	def private void computeFromMap(Map<String, String> map, boolean processEmptyMap) {
 		i = 0
 		if (!map.values.forall[nullOrEmpty] || processEmptyMap) {
 			for (instance : network.children.actorInstances) {
@@ -104,7 +105,10 @@ class Mapping extends CommonPrinter {
 		}
 	}
 
-	def public void computeFromFile(String xcfFile) {
+	def private void computeFromFile(File xcfFile) {
+		if (!xcfFile.exists || !xcfFile.file)
+			throw new OrccRuntimeException("The XCF file does not exist.")
+
 		val builder = DocumentBuilderFactory::newInstance.newDocumentBuilder
 		val dom = builder.parse(xcfFile)
 		val configuration = dom.documentElement
@@ -134,7 +138,7 @@ class Mapping extends CommonPrinter {
 				}
 			}
 		} else {
-			OrccLogger::warnln("Wrong XCF file")
+			throw new OrccRuntimeException("Wrong XCF file")
 		}
 	}
 

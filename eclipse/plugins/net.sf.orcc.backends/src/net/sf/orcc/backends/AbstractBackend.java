@@ -152,6 +152,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	protected Map<String, String> mapping;
 	protected boolean balanceMapping;
+	protected boolean importXcfFile;
+	protected File xcfFile;
 	protected int processorNumber;
 
 	/**
@@ -788,6 +790,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 		balanceMapping = getAttribute("net.sf.orcc.backends.metricMapping",
 				false);
+		importXcfFile = getAttribute(BackendsConstants.IMPORT_XCF, false);
+		if (importXcfFile) {
+			xcfFile = new File(getAttribute(BackendsConstants.XCF_FILE, ""));
+		}
+
 		processorNumber = Integer.parseInt(getAttribute(
 				"net.sf.orcc.backends.processorsNumber", "0"));
 

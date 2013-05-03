@@ -126,6 +126,9 @@
                id="net.sf.orcc.backends.tta.fpga">
          </option>
          <option
+               id="net.sf.orcc.backends.importXCF">
+         </option>
+         <option
                id="net.sf.orcc.backends.metricMapping">
          </option>
          <option
@@ -254,6 +257,22 @@
                <optionRef
                      id="net.sf.orcc.core.xdfFile">
                </optionRef>
+            </checkBox>
+         </option>
+         <option
+               description="Whether Orcc should import the given XDF mapping"
+               id="net.sf.orcc.backends.importXCF"
+               name="Import XCF Mapping">
+            <checkBox>
+               <option
+                     description="The file that contains the actor mapping"
+                     id="net.sf.orcc.backends.xcfFile"
+                     name="XCF file">
+                 <browseFile
+                       folder="false"
+                       workspace="false">
+                 </browseFile>
+               </option>
             </checkBox>
          </option>
          <option
