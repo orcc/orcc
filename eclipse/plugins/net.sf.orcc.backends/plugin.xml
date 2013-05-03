@@ -213,7 +213,7 @@
 	                     id="Ring">
 	               </comboBoxItem>
 	               <comboBoxItem
-	                     id="Mesh">
+	                     id="Fully">
 	               </comboBoxItem>
             	</comboBox>
          		</option>
