@@ -641,7 +641,7 @@ void *monitor(void *data) {
 
 	// Set native actor in genetic mode
 	remove_fps_printing();
-	source_active_genetic();
+	source_activeGenetic();
 
 	// Initialize population
 	printf("\nGenerate initial population...\n\n");
@@ -658,7 +658,7 @@ void *monitor(void *data) {
 				monitoring->genetic_info);
 
 		// Start timer and counter
-		backup_partial_start_info();
+		backupPartialStartInfo();
 
 		// wakeup all threads
 		for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
@@ -671,9 +671,9 @@ void *monitor(void *data) {
 		}
 
 		// Stop timer and counter
-		backup_partial_end_info();
+		backupPartialEndInfo();
 
-		population->individuals[evalIndNb]->fps = compute_partial_fps();
+		population->individuals[evalIndNb]->fps = computePartialFps();
 
 		// Print evaluation results
 		printf("Evaluation of mapping %i = ", evalIndNb);
@@ -708,7 +708,6 @@ void *monitor(void *data) {
 
 		source_close();
 		clear_fifos();
-		initialize_instances();
 	}
 	write_mapping_footer(population, monitoring->genetic_info);
 	exit(0);

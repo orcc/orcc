@@ -210,11 +210,13 @@ class NetworkPrinter extends CTemplate {
 			extern int clean_cache(int size);
 			
 			void clear_fifos() {
-				«FOR connection : network.connections»
-					fifo_«connection.targetPort.type.doSwitch»_clear(&fifo_«connection.getAttribute("id")»);
+				«FOR connection : network.children.map[getAdapter(typeof(Entity)).outgoingPortMap.values.map[get(0)]].flatten»
+					fifo_«connection.targetPort.type.doSwitch»_clear(&fifo_«connection.<Object>getValueAsObject("idNoBcast")»);
 				«ENDFOR»
 			}
+			
 			static int timeout = 0;
+			
 			int is_timeout() {
 				return timeout;
 			}
@@ -281,11 +283,15 @@ class NetworkPrinter extends CTemplate {
 			
 			clear_cpu_set(cpuset);
 			
+			«IF !geneticAlgo»
 			for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
 				thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
 				set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 			}
-			«IF geneticAlgo»
+			«ELSE»
+				for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
+					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
+				}
 				thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
 			«ENDIF»
 			
@@ -350,6 +356,7 @@ class NetworkPrinter extends CTemplate {
 						semaphore_wait(sched->sem_thread);
 						timeout = 0;
 						start = clock ();
+						sched_init_actors(sched, &si);
 					}
 				«ENDIF»
 			}

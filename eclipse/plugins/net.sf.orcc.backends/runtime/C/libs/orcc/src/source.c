@@ -168,7 +168,7 @@ int source_is_stopped() {
 	return stop;
 }
 
-void source_active_genetic() {
+void source_activeGenetic() {
 	genetic = 1;
 }
 
