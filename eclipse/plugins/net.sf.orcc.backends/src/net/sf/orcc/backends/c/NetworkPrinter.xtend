@@ -145,7 +145,7 @@ class NetworkPrinter extends CTemplate {
 			#define POPULATION_SIZE 100
 			#define GENERATION_NB 20
 			
-			#define GROUPS_RATIO 0.8
+			#define GROUPS_RATIO 0
 			#define KEEP_RATIO 0.2
 			#define CROSSOVER_RATIO 0.8
 			
@@ -176,15 +176,11 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
-		// Actor initializers
+		// Actor functions
 		«FOR child : network.children»
-			extern void «child.label»_initialize();
-		«ENDFOR»
-		
-		/////////////////////////////////////////////////
-		// Action schedulers
-		«FOR child : network.children»
+			extern void «child.label»_initialize(struct schedinfo_s *si);
 			extern void «child.label»_scheduler(struct schedinfo_s *si);
+			«IF geneticAlgo»extern void «child.label»_reinitialize(struct schedinfo_s *si);«ENDIF»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
@@ -196,7 +192,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
 		«FOR child : network.children»
-			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
+			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «IF geneticAlgo»«child.label»_reinitialize«ELSE»NULL«ENDIF», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
@@ -356,7 +352,7 @@ class NetworkPrinter extends CTemplate {
 						semaphore_wait(sched->sem_thread);
 						timeout = 0;
 						start = clock ();
-						sched_init_actors(sched, &si);
+						sched_reinit_actors(sched, &si);
 					}
 				«ENDIF»
 			}

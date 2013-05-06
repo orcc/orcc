@@ -689,6 +689,10 @@ void *monitor(void *data) {
 					population->individuals[evalIndNb]->old_fps);
 		}
 
+		source_close();
+		//display_close();
+		clear_fifos();
+
 		evalIndNb++;
 
 		if (evalIndNb == monitoring->genetic_info->population_size) {
@@ -706,8 +710,7 @@ void *monitor(void *data) {
 		map_actors_on_threads(population->individuals[evalIndNb],
 				monitoring->genetic_info);
 
-		source_close();
-		clear_fifos();
+
 	}
 	write_mapping_footer(population, monitoring->genetic_info);
 	exit(0);

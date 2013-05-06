@@ -139,6 +139,18 @@ void sched_init_actors(struct scheduler_s *sched, struct schedinfo_s *si) {
 	
 }
 
+/**
+ * Re-initialize the actors mapped to the given scheduler.
+ */
+void sched_reinit_actors(struct scheduler_s *sched, struct schedinfo_s *si) {
+	int i;
+
+	for (i = 0; i < sched->num_actors; i++) {
+		sched->actors[i]->reinit_func(si);
+	}
+	
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Mapping functions
 ///////////////////////////////////////////////////////////////////////////////

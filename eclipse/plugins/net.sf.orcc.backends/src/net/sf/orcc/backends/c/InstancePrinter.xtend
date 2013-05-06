@@ -535,6 +535,32 @@ class InstancePrinter extends CTemplate {
 			// no read_end/write_end here!
 			return;
 		}
+		
+		«IF(geneticAlgo)»
+			void «name»_reinitialize(struct schedinfo_s *si) {
+				int i = 0;
+				«FOR variable : actor.stateVars»
+					«IF variable.assignable && variable.initialized»
+						«IF !variable.type.list»
+							«variable.indexedName» = «variable.initialValue.doSwitch»;
+						«ELSE»
+							memcpy(«variable.indexedName», «variable.indexedName»_backup, sizeof(«variable.indexedName»_backup));
+						«ENDIF»
+					«ENDIF»
+				«ENDFOR»
+				«IF actor.hasFsm»
+					/* Set initial state to current FSM state */
+					_FSM_state = my_state_«actor.fsm.initialState.name»;
+				«ENDIF»
+				«IF !actor.initializes.nullOrEmpty»
+					«actor.initializes.printActions»
+				«ENDIF»
+				
+			finished:
+				// no read_end/write_end here!
+				return;
+			}
+		«ENDIF»
 	'''
 	
 	def private checkConnectivy() {
@@ -706,6 +732,9 @@ class InstancePrinter extends CTemplate {
 				«ENDIF»
 			«ELSE»
 				static «variable.declare» = «variable.initialValue.doSwitch»;
+				«IF geneticAlgo»
+					static «variable.type.doSwitch» «variable.indexedName»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
+				«ENDIF»
 			«ENDIF»
 		«ELSE»
 			static «variable.declare»;

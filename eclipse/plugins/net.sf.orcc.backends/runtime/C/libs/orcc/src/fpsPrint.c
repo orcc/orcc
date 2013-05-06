@@ -56,10 +56,12 @@ void fpsPrintInit() {
 	startTime = SDL_GetTicks();
 	numPicturesDecoded = 0;
 	lastNumPic = 0;
-	atexit(print_fps_avg);
+	if(show_fps) {
+		atexit(print_fps_avg);
+	}
 
-	// For genetic algorithm
 	relativeStartTime = startTime;
+	// For genetic algorithm
 	partialStartTime = startTime;
 	partialNumPicturesStart = 0;
 }

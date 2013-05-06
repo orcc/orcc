@@ -274,3 +274,7 @@ void displayYUV_getEvent() {
 int displayYUV_getNbFrames() {
 	return nbFrames;
 }
+
+void display_close() {
+	SDL_Quit();
+}

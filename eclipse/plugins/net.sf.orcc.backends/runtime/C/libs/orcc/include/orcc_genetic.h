@@ -97,6 +97,7 @@ extern void backupPartialStartInfo();
 extern void backupPartialEndInfo();
 extern void activeFpsPrinting();
 extern void removeFpsPrinting();
+extern void display_close();
 
 // Source functions
 extern void source_activeGenetic();
