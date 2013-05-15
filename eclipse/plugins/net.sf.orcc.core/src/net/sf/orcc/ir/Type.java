@@ -115,4 +115,13 @@ public interface Type extends EObject {
 	 */
 	public boolean isVoid();
 
+	/**
+	 * Sets the size of this type. Does nothing for types that have no notion of
+	 * size, such as bool or void.
+	 * 
+	 * @param size
+	 *            the size of this type
+	 */
+	void setSize(int size);
+
 }

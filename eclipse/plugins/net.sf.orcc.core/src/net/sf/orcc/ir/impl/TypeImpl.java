@@ -109,4 +109,8 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 		return false;
 	}
 
+	@Override
+	public void setSize(int size) {
+	}
+
 }
