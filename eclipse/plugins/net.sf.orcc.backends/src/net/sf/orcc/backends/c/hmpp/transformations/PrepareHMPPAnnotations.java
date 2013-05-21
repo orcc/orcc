@@ -110,7 +110,9 @@ public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
 					ExprList variablesList = (ExprList) attribute.getAttribute(
 							"params").getContainedValue();
 
-					variablesList.getValue().add(exprVarGetter.getResult());
+					variablesList.getValue().add(
+							IrFactory.eINSTANCE.createExprVar(exprVarGetter
+									.getResult().getUse().getVariable()));
 
 				}
 			}
