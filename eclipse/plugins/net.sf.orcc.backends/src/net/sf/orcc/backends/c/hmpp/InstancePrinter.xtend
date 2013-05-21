@@ -40,7 +40,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	val hmppDirectives = newArrayList("codelet", "callsite", "group", "acquire",
 		"release", "advancedload", "delegatedstore", "resident")
+	/* Unused for now, but maybe useful later
 	val hmppcgDirectives = newArrayList("gridify")
+	*/
 	
 	new(Map<String, Object> options) {
 		super(options)
@@ -74,17 +76,18 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	override caseBlockFor(BlockFor block) '''
-		«FOR attr : block.attributes»
+		«FOR attr : block.attributes.filter[name.equals("gridify")]»
+			#pragma hmppcg gridify(«attr.getValueAsString("params")»)
+		«ENDFOR»
+		«FOR attr : block.attributes.filter[!name.equals("gridify")]»
 			«attr.printHmppPragma»
 		«ENDFOR»
 		«super.caseBlockFor(block)»
 	'''
 	
 	def private printHmppPragma(Attribute attr) {
-		val directiveType=
-			if(hmppDirectives.contains(attr.name)) "hmpp"
-			else if(hmppcgDirectives.contains(attr.name)) "hmppcg"
-			else return ""
+		if(!hmppDirectives.contains(attr.name))
+			return ""
 
 		var labels = ""
 			if(attr.hasAttribute("grp_label"))
@@ -95,6 +98,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val params = if(attr.hasAttribute("params"))
 			", " + attr.getValueAsString("params")
 
-		'''#pragma «directiveType»«labels» «attr.name»«params»'''
+		'''#pragma hmpp«labels» «attr.name»«params»'''
 	}
 }
