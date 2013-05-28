@@ -200,7 +200,7 @@ class ActorPrinter extends InstancePrinter {
 		{
 			«IF ! action.body.locals.empty»
 				«FOR local : action.body.locals»
-					«local.declare»
+					«local.declare»;
 				«ENDFOR»
 			«ENDIF»
 			«IF ! actor.stateVars.empty»
