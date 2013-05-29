@@ -28,8 +28,12 @@
  */
 package net.sf.orcc.backends.transform;
 
+import java.util.List;
+
+import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -40,11 +44,15 @@ import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.util.EcoreHelper;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  *
@@ -55,7 +63,7 @@ import net.sf.orcc.ir.util.IrUtil;
 public class ShortCircuitTransformation extends AbstractIrVisitor<Expression> {
 
 	private static IrFactory factory = IrFactory.eINSTANCE;
-
+	
 	public ShortCircuitTransformation() {
 		super(true);
 	}
@@ -71,6 +79,7 @@ public class ShortCircuitTransformation extends AbstractIrVisitor<Expression> {
 					IrUtil.copy(expr.getType()), "sc_expr");
 			ExprVar newExpr = factory.createExprVar(newVar);
 
+			// Binary expression is split into several BlockIf blocks
 			BlockIf newIf = factory.createBlockIf();
 			newIf.setCondition(expr.getE1());
 
@@ -86,7 +95,6 @@ public class ShortCircuitTransformation extends AbstractIrVisitor<Expression> {
 			blockFalse.add(assignFalse);
 			newIf.getElseBlocks().add(blockFalse);
 
-
 			if (expr.getOp() == OpBinary.LOGIC_AND) {
 				assignTrue.setValue(expr.getE2());
 				assignFalse.setValue(factory.createExprBool(false));
@@ -94,9 +102,26 @@ public class ShortCircuitTransformation extends AbstractIrVisitor<Expression> {
 				assignTrue.setValue(factory.createExprBool(true));
 				assignFalse.setValue(expr.getE2());
 			}
+						
+			Instruction containingInst = EcoreHelper.getContainerOfType(expr,
+					Instruction.class);
+			Block containingBlock = EcoreHelper.getContainerOfType(expr,
+					Block.class);
+			
+			// If the expression is contained in the condition of a BlockWhile, 
+			// the transformation block is also put at the end of this BlockWhile
+			if (containingInst == null && containingBlock.isBlockWhile()) {
+					List<Block> whileBlocks = ((BlockWhile) containingBlock)
+							.getBlocks();
+					whileBlocks.add(IrUtil.copy(newIf));
+			}
 
-			// TODO: Add blockIf to the right place
-
+			// In all cases, the transformation block is added before the expression location
+			IrUtil.addBlockBeforeExpr(expr, newIf);
+			
+			EcoreUtil.replace(expr, newExpr);
+			IrUtil.delete(expr);
+			
 			return newExpr;
 		}
 
