@@ -3,7 +3,7 @@
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.models/src" modelPluginID="net.sf.orcc.graph"
     templateDirectory="/net.sf.orcc.models/templates" dynamicTemplates="true" redirection=""
     modelName="Graph" codeFormatting="true" importerID="org.eclipse.emf.importer.java"
-    complianceLevel="6.0" copyrightFields="false" usedGenPackages="platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore">
+    complianceLevel="6.0" copyrightFields="false">
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Graph" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Graph.ecore#/">
@@ -12,10 +12,14 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Graph.ecore#//Graph/vertices"/>
     </genClasses>
     <genClasses ecoreClass="Graph.ecore#//Vertex">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Graph.ecore#//Vertex/incoming"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Vertex/label"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Vertex/number"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Graph.ecore#//Vertex/incoming"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Graph.ecore#//Vertex/outgoing"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference Graph.ecore#//Vertex/connecting"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference Graph.ecore#//Vertex/predecessors"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference Graph.ecore#//Vertex/successors"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference Graph.ecore#//Vertex/neighbors"/>
     </genClasses>
     <genClasses ecoreClass="Graph.ecore#//Edge">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Edge/label"/>
@@ -28,8 +32,9 @@
     <genClasses ecoreClass="Util.ecore#//Attribute">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Util.ecore#//Attribute/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Util.ecore#//Attribute/containedValue"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Util.ecore#//Attribute/pojoValue"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Util.ecore#//Attribute/objectValue"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Util.ecore#//Attribute/referencedValue"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Util.ecore#//Attribute/stringValue"/>
     </genClasses>
     <genClasses ecoreClass="Util.ecore#//Attributable">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Util.ecore#//Attributable/attributes"/>

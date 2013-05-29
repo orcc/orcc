@@ -156,6 +156,8 @@ public interface Var extends Attributable {
 	/**
 	 * <!-- begin-user-doc -->Returns <code>true</code> if this variable is
 	 * local.<!-- end-user-doc -->
+	 * 
+	 * @model changeable="false" derived="true" transient="true" volatile="true"
 	 */
 	boolean isLocal();
 

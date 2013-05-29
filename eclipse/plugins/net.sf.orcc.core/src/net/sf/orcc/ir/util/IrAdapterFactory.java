@@ -60,14 +60,13 @@ import org.eclipse.emf.ecore.EObject;
  * <!-- begin-user-doc --> The <b>Adapter Factory</b> for the model. It provides
  * an adapter <code>createXXX</code> method for each class of the model. <!--
  * end-user-doc -->
- * 
  * @see net.sf.orcc.ir.IrPackage
  * @generated
  */
 public class IrAdapterFactory extends AdapterFactoryImpl {
 	/**
-	 * The cached model package. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached model package.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected static IrPackage modelPackage;
@@ -301,9 +300,9 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	};
 
 	/**
-	 * Creates an instance of the adapter factory. <!-- begin-user-doc --> <!--
+	 * Creates an instance of the adapter factory.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public IrAdapterFactory() {
@@ -313,11 +312,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates an adapter for the <code>target</code>. <!-- begin-user-doc -->
+	 * Creates an adapter for the <code>target</code>.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
-	 * @param target
-	 *            the object to adapt.
+	 * @param target the object to adapt.
 	 * @return the adapter for the <code>target</code>.
 	 * @generated
 	 */
@@ -342,9 +340,9 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for the default case. <!-- begin-user-doc --> This
+	 * Creates a new adapter for the default case.
+	 * <!-- begin-user-doc --> This
 	 * default implementation returns null. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @generated
 	 */
@@ -368,12 +366,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.ExprBool <em>Expr Bool</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ExprBool <em>Expr Bool</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.ExprBool
 	 * @generated
@@ -413,12 +410,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.ExprInt <em>Expr Int</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ExprInt <em>Expr Int</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.ExprInt
 	 * @generated
@@ -428,12 +424,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.ExprList <em>Expr List</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ExprList <em>Expr List</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.ExprList
 	 * @generated
@@ -473,12 +468,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.ExprVar <em>Expr Var</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ExprVar <em>Expr Var</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.ExprVar
 	 * @generated
@@ -488,12 +482,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.Predicate <em>Predicate</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Predicate <em>Predicate</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.Predicate
 	 * @generated
@@ -518,12 +511,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.CfgNode <em>Cfg Node</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.CfgNode <em>Cfg Node</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.CfgNode
 	 * @generated
@@ -563,12 +555,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.graph.Vertex <em>Vertex</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.graph.Vertex <em>Vertex</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.graph.Vertex
 	 * @generated
@@ -578,12 +569,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.graph.Graph <em>Graph</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.graph.Graph <em>Graph</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.graph.Graph
 	 * @generated
@@ -608,12 +598,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.InstCall <em>Inst Call</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstCall <em>Inst Call</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.InstCall
 	 * @generated
@@ -623,12 +612,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.InstLoad <em>Inst Load</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstLoad <em>Inst Load</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.InstLoad
 	 * @generated
@@ -638,12 +626,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.InstPhi <em>Inst Phi</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstPhi <em>Inst Phi</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.InstPhi
 	 * @generated
@@ -713,12 +700,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.ArgByRef <em>Arg By Ref</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ArgByRef <em>Arg By Ref</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.ArgByRef
 	 * @generated
@@ -728,12 +714,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.ArgByVal <em>Arg By Val</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ArgByVal <em>Arg By Val</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.ArgByVal
 	 * @generated
@@ -743,12 +728,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.Procedure <em>Procedure</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Procedure <em>Procedure</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.Procedure
 	 * @generated
@@ -758,12 +742,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.Param <em>Param</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Param <em>Param</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.Param
 	 * @generated
@@ -773,12 +756,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.Block <em>Block</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Block <em>Block</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.Block
 	 * @generated
@@ -803,12 +785,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.BlockIf <em>Block If</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.BlockIf <em>Block If</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.BlockIf
 	 * @generated
@@ -848,12 +829,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.TypeBool <em>Type Bool</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeBool <em>Type Bool</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.TypeBool
 	 * @generated
@@ -878,12 +858,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.TypeInt <em>Type Int</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeInt <em>Type Int</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.TypeInt
 	 * @generated
@@ -893,12 +872,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.TypeList <em>Type List</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeList <em>Type List</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.TypeList
 	 * @generated
@@ -923,12 +901,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.TypeUint <em>Type Uint</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeUint <em>Type Uint</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.TypeUint
 	 * @generated
@@ -938,12 +915,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.TypeVoid <em>Type Void</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeVoid <em>Type Void</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.ir.TypeVoid
 	 * @generated
@@ -987,7 +963,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- begin-user-doc --> This implementation returns <code>true</code> if
 	 * the object is either the model's package or is an instance object of the
 	 * model. <!-- end-user-doc -->
-	 * 
 	 * @return whether this factory is applicable for the type of the object.
 	 * @generated
 	 */
