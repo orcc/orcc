@@ -190,4 +190,11 @@ public interface Entity extends Attributable, Adaptable {
 	 */
 	String getSimpleName();
 
+	/**
+	 * Updates this entity. This can be used to inform this entity that its
+	 * environment has changed and that it should update itself to reflect
+	 * that.
+	 */
+	void update();
+
 } // Entity
