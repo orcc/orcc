@@ -297,7 +297,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 		«IF (trgtPort != null)»
 			«IF !instance.outgoingPortMap.get(trgtPort).head.fifoName.toString.empty»
-				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write(«store.value.doSwitch»);
+				«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
 			«ENDIF»
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
