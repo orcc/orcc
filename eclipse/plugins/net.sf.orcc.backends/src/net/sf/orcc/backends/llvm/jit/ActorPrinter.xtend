@@ -287,18 +287,37 @@ class ActorPrinter extends InstancePrinter {
 	
 	def private moC_MD() {
 		val value =
-			if (actor.moC.CSDF) ''' , metadata «actor.moC.objectReference»'''
+			if (actor.moC.CSDF) ''' , metadata «"csdfmoc_hack_key".objectReference»'''
 			else if (actor.moC.quasiStatic) ''' , «(actor.moC as QSDFMoC).actions.join(", ")['''metadata «objectReference»''']»'''
 			else ""
 		'''
-			«actor.moC.objectReference» = metadata !{«actor.moC.MoCName_MD»«value»}
+			«actor.moC.objectReference» = metadata !{metadata !"«actor.moC.shortName»"«value»}
+
+			«IF actor.moC.CSDF»
+				«MoC_CSDF_MD(actor.moC as CSDFMoC)»
+			«ELSEIF actor.moC.quasiStatic»
+				«FOR action : (actor.moC as QSDFMoC).actions»
+					«action.objectReference» = metadata !{metadata «action.action_MD», metadata «((actor.moC as QSDFMoC).configurations.get(action) as CSDFMoC).objectReference»}
+
+					«MoC_CSDF_MD((actor.moC as QSDFMoC).configurations.get(action) as CSDFMoC)»
+				«ENDFOR»
+			«ENDIF»
 		'''
 	}
 
-	def private MoCName_MD(MoC moc) {
-		'''metadata !"«moc.shortName»"'''
+	def private MoC_CSDF_MD(CSDFMoC csdfmoc) {
+		val inPattern =
+			if (!csdfmoc.inputPattern.empty) '''metadata «csdfmoc.inputPattern.objectReference»'''
+			else "null"
+		val outPattern =
+			if (!csdfmoc.inputPattern.empty) '''metadata «csdfmoc.outputPattern.objectReference»'''
+			else "null"
+		'''
+			«"csdfmoc_hack_key".objectReference» = metadata !{i32 «csdfmoc.numberOfPhases» , «inPattern», «outPattern», metadata «csdfmoc.invocations.objectReference»}
+			«csdfmoc.invocations.objectReference» = metadata !{«csdfmoc.invocations.join(", ")['''metadata «action.objectReference»''']»}
+		'''
 	}
-		
+
 	def private pattern_MD(Pattern pattern) {
 		val numTokens =
 			if (pattern.numTokensMap != null) '''metadata «pattern.numTokensMap.objectReference»'''
