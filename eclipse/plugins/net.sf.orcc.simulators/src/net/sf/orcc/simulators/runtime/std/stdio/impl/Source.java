@@ -50,6 +50,7 @@ public class Source extends GenericSource {
 
 	private static RandomAccessFile in;
 
+	@Deprecated
 	private static int loopsCount;
 
 	public static void source_exit(BigInteger status) {
@@ -62,10 +63,12 @@ public class Source extends GenericSource {
 		return BigInteger.valueOf(nbLoops);
 	}
 
+	@Deprecated
 	public static Boolean source_isMaxLoopsReached() {
 		return loopsCount <= 0;
 	}
 
+	@Deprecated
 	public static void source_decrementNbLoops() {
 		--loopsCount;
 	}

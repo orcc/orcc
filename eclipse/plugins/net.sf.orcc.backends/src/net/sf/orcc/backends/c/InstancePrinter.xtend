@@ -33,6 +33,8 @@ import java.util.HashMap
 import java.util.List
 import java.util.Map
 import net.sf.orcc.OrccRuntimeException
+import net.sf.orcc.backends.ir.BlockFor
+import net.sf.orcc.backends.ir.InstTernary
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
@@ -98,9 +100,11 @@ class InstancePrinter extends CTemplate {
 	protected var Action currentAction;
 
 	/**
-	 * Default constructor, used only by another backend (when subclass)
+	 * Default constructor, used only by another backend (when subclass) which
+	 * not print instances but actors
 	 */
-	new() {
+	protected new() {
+		instance = null
 		fifoSize = 0
 	}
 	
@@ -386,6 +390,10 @@ class InstancePrinter extends CTemplate {
 				«FOR port : actor.outputs.filter[!native]»
 					write_end_«port.name»();
 				«ENDFOR»
+				«IF actor.inputs.nullOrEmpty && actor.outputs.nullOrEmpty »
+					// no read_end/write_end here!
+					return;
+				«ENDIF»
 			}
 		«ENDIF»
 	'''
@@ -527,6 +535,32 @@ class InstancePrinter extends CTemplate {
 			// no read_end/write_end here!
 			return;
 		}
+		
+		«IF(geneticAlgo)»
+			void «name»_reinitialize(struct schedinfo_s *si) {
+				int i = 0;
+				«FOR variable : actor.stateVars»
+					«IF variable.assignable && variable.initialized»
+						«IF !variable.type.list»
+							«variable.indexedName» = «variable.initialValue.doSwitch»;
+						«ELSE»
+							memcpy(«variable.indexedName», «variable.indexedName»_backup, sizeof(«variable.indexedName»_backup));
+						«ENDIF»
+					«ENDIF»
+				«ENDFOR»
+				«IF actor.hasFsm»
+					/* Set initial state to current FSM state */
+					_FSM_state = my_state_«actor.fsm.initialState.name»;
+				«ENDIF»
+				«IF !actor.initializes.nullOrEmpty»
+					«actor.initializes.printActions»
+				«ENDIF»
+				
+			finished:
+				// no read_end/write_end here!
+				return;
+			}
+		«ENDIF»
 	'''
 	
 	def private checkConnectivy() {
@@ -698,6 +732,9 @@ class InstancePrinter extends CTemplate {
 				«ENDIF»
 			«ELSE»
 				static «variable.declare» = «variable.initialValue.doSwitch»;
+				«IF geneticAlgo»
+					static «variable.type.doSwitch» «variable.indexedName»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
+				«ENDIF»
 			«ENDIF»
 		«ELSE»
 			static «variable.declare»;
@@ -775,6 +812,14 @@ class InstancePrinter extends CTemplate {
 			«instr.doSwitch»
 		«ENDFOR»
 	'''
+	
+	override caseBlockFor(BlockFor block) '''
+		for («block.init.join(", ")['''«toExpression»''']» ; «block.condition.doSwitch» ; «block.step.join(", ")['''«toExpression»''']») {
+			«FOR contentBlock : block.blocks»
+				«contentBlock.doSwitch»
+			«ENDFOR»
+		}
+	'''
 
 	/******************************************
 	 * 
@@ -826,7 +871,10 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 	
-		
+	override caseInstTernary(InstTernary inst) '''
+		«inst.target.variable.indexedName» = «inst.conditionValue.doSwitch» ? «inst.trueValue.doSwitch» : «inst.falseValue.doSwitch»;
+	'''
+
 	def protected getPort(Var variable) {
 		if(currentAction == null) {
 			null
@@ -849,7 +897,12 @@ class InstancePrinter extends CTemplate {
 		}
 	}	
 
-	
+	def private getInline() 
+		'''«IF profile»__attribute__((always_inline)) «ENDIF»'''
+
+	def private getNoInline() 
+		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
+
 	/******************************************
 	 * 
 	 * Old templateData initialization
@@ -864,17 +917,17 @@ class InstancePrinter extends CTemplate {
 			}
 		}
 	}
-	
+
 	def private buildTransitionPattern() {		
 		val fsm = actor.getFsm()
-		
+
 		if (fsm != null) {
 			for (state : fsm.getStates()) {
 				val pattern = DfFactory::eINSTANCE.createPattern()
-				
+
 				for (edge : state.getOutgoing()) { 
 					val actionPattern = (edge as Transition).getAction.getInputPattern()
-					
+
 					for (Port port : actionPattern.getPorts()) {
 						var numTokens = Math::max(pattern.getNumTokens(port), actionPattern.getNumTokens(port))
 						pattern.setNumTokens(port, numTokens)
@@ -884,11 +937,4 @@ class InstancePrinter extends CTemplate {
 			}
 		}
 	}
-	
-	def private getInline() 
-		'''«IF profile»__attribute__((always_inline)) «ENDIF»'''
-	
-	def private getNoInline() 
-		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
-
 }

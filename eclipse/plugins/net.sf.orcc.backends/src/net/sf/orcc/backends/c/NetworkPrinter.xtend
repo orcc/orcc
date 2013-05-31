@@ -145,7 +145,7 @@ class NetworkPrinter extends CTemplate {
 			#define POPULATION_SIZE 100
 			#define GENERATION_NB 20
 			
-			#define GROUPS_RATIO 0.8
+			#define GROUPS_RATIO 0
 			#define KEEP_RATIO 0.2
 			#define CROSSOVER_RATIO 0.8
 			
@@ -176,15 +176,11 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
-		// Actor initializers
+		// Actor functions
 		«FOR child : network.children»
-			extern void «child.label»_initialize();
-		«ENDFOR»
-		
-		/////////////////////////////////////////////////
-		// Action schedulers
-		«FOR child : network.children»
+			extern void «child.label»_initialize(struct schedinfo_s *si);
 			extern void «child.label»_scheduler(struct schedinfo_s *si);
+			«IF geneticAlgo»extern void «child.label»_reinitialize(struct schedinfo_s *si);«ENDIF»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
@@ -196,7 +192,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
 		«FOR child : network.children»
-			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
+			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «IF geneticAlgo»«child.label»_reinitialize«ELSE»NULL«ENDIF», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
@@ -210,11 +206,13 @@ class NetworkPrinter extends CTemplate {
 			extern int clean_cache(int size);
 			
 			void clear_fifos() {
-				«FOR connection : network.connections»
-					fifo_«connection.targetPort.type.doSwitch»_clear(&fifo_«connection.getAttribute("id")»);
+				«FOR connection : network.children.map[getAdapter(typeof(Entity)).outgoingPortMap.values.map[get(0)]].flatten»
+					fifo_«connection.targetPort.type.doSwitch»_clear(&fifo_«connection.<Object>getValueAsObject("idNoBcast")»);
 				«ENDFOR»
 			}
+			
 			static int timeout = 0;
+			
 			int is_timeout() {
 				return timeout;
 			}
@@ -271,7 +269,7 @@ class NetworkPrinter extends CTemplate {
 			
 			«IF !geneticAlgo»
 				for(i=0; i < mapping->number_of_threads; ++i){
-					sched_init(&schedulers[i], mapping->threads_ids[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
+					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
 				}
 			«ELSE»
 				for(i=0; i < THREAD_NB; ++i){
@@ -281,11 +279,15 @@ class NetworkPrinter extends CTemplate {
 			
 			clear_cpu_set(cpuset);
 			
+			«IF !geneticAlgo»
 			for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
 				thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
-				set_thread_affinity(cpuset, i, threads[i]);
+				set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 			}
-			«IF geneticAlgo»
+			«ELSE»
+				for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
+					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
+				}
 				thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
 			«ENDIF»
 			
@@ -350,6 +352,7 @@ class NetworkPrinter extends CTemplate {
 						semaphore_wait(sched->sem_thread);
 						timeout = 0;
 						start = clock ();
+						sched_reinit_actors(sched, &si);
 					}
 				«ENDIF»
 			}

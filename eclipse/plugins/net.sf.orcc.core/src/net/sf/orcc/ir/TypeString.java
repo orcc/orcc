@@ -46,14 +46,9 @@ public interface TypeString extends Type {
 	 * @return size of string type
 	 * @model
 	 */
-	public int getSize();
+	int getSize();
 
-	/**
-	 * Set the size of the string type.
-	 * 
-	 * @param size
-	 *            the size of the string type
-	 */
-	public void setSize(int size);
+	@Override
+	void setSize(int value);
 
 }

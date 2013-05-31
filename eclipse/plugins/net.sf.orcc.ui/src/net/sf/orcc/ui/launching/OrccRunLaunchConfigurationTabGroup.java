@@ -30,7 +30,6 @@ package net.sf.orcc.ui.launching;
 
 import net.sf.orcc.ui.launching.tabs.MappingTab;
 import net.sf.orcc.ui.launching.tabs.OptionsTab;
-import net.sf.orcc.ui.launching.tabs.ParametersTab;
 import net.sf.orcc.ui.launching.tabs.RunSettingsTab;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
@@ -49,9 +48,19 @@ public class OrccRunLaunchConfigurationTabGroup extends
 
 	@Override
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
+		/*
+		 * 2013-05-03: Parameters tab is removed from the list of tabs to
+		 * display on a Compile Run Configuration, since it does not provide
+		 * controls to add, edit and remove parameters. Furthermore, the method
+		 * to get these parameters from backends and their usage have never been
+		 * defined.
+		 * 
+		 * This tab can be reverted by simply re-add "new ParametersTab()" to
+		 * this list. ParametersTab class (in this package) is not removed.
+		 */
 		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
-				new RunSettingsTab(), new ParametersTab(), new OptionsTab(),
-				new MappingTab(), new CommonTab() };
+				new RunSettingsTab(), new OptionsTab(), new MappingTab(),
+				new CommonTab() };
 		setTabs(tabs);
 	}
 

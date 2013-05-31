@@ -57,7 +57,6 @@ import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Param;
@@ -318,12 +317,6 @@ public class ActorInterpreter extends IrSwitch<Object> {
 			return null;
 		}
 		return exprInterpreter.doSwitch(instr.getValue());
-	}
-
-	@Override
-	public Object caseInstSpecific(InstSpecific instr) {
-		throw new OrccRuntimeException(
-				"does not know how to interpret a specific instruction");
 	}
 
 	@Override

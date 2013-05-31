@@ -219,10 +219,6 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		super.eUnset(featureID);
 	}
 
-	/**
-	 * Return the dimensions of the TypeList as a List of Integer. An exception
-	 * is raised if one dimension is not an integer constant.
-	 */
 	@Override
 	public List<Integer> getDimensions() {
 		List<Integer> dimensions = new ArrayList<Integer>();
@@ -257,11 +253,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		}
 	}
 
-	/**
-	 * Returns the number of elements of this list type as an expression.
-	 * 
-	 * @return the number of elements of this list type as an expression
-	 */
+	@Override
 	public Expression getSizeExpr() {
 		return sizeExpr;
 	}
@@ -271,11 +263,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		return getSize() * getType().getSizeInBits();
 	}
 
-	/**
-	 * Returns a list of indexes that can be used inside a template.
-	 * 
-	 * @return a list of indexes corresponding to the list size
-	 */
+	@Override
 	public List<Integer> getSizeIterator() {
 		int s = getSize();
 		List<Integer> list = new ArrayList<Integer>(s);
@@ -286,12 +274,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		return list;
 	}
 
-	/**
-	 * Returns the type of the list
-	 * 
-	 * @return the type of the list
-	 * @generated
-	 */
+	@Override
 	public Type getType() {
 		return type;
 	}
@@ -301,23 +284,12 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		return true;
 	}
 
-	/**
-	 * Sets the number of elements of this list type.
-	 * 
-	 * @param size
-	 *            the number of elements of this list type
-	 */
+	@Override
 	public void setSize(int newSize) {
 		setSizeExpr(IrFactory.eINSTANCE.createExprInt(newSize));
 	}
 
-	/**
-	 * Sets the number of elements of this list type as an expression.
-	 * 
-	 * @param value
-	 *            the number of elements of this list type as an expression
-	 * @generated
-	 */
+	@Override
 	public void setSizeExpr(Expression newSizeExpr) {
 		if (newSizeExpr != sizeExpr) {
 			NotificationChain msgs = null;
@@ -337,13 +309,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 					IrPackage.TYPE_LIST__SIZE_EXPR, newSizeExpr, newSizeExpr));
 	}
 
-	/**
-	 * Sets the type of this list.
-	 * 
-	 * @param type
-	 *            element type
-	 * @generated
-	 */
+	@Override
 	public void setType(Type newType) {
 		if (newType != type) {
 			NotificationChain msgs = null;
@@ -367,4 +333,5 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	public String toString() {
 		return "List(type:" + getType() + ", size=" + getSize() + ")";
 	}
+
 }

@@ -40,13 +40,14 @@ public interface TypeFloat extends Type {
 	public static final String NAME = "float";
 
 	/**
-	 * Returns the value of the '<em><b>Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Size</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Size</em>' attribute isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Size</em>' attribute isn't clear, there really
+	 * should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Size</em>' attribute.
 	 * @see #setSize(int)
 	 * @see net.sf.orcc.ir.IrPackage#getTypeFloat_Size()
@@ -59,14 +60,7 @@ public interface TypeFloat extends Type {
 
 	boolean isHalf();
 
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.TypeFloat#getSize <em>Size</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Size</em>' attribute.
-	 * @see #getSize()
-	 * @generated
-	 */
+	@Override
 	void setSize(int value);
 
 }

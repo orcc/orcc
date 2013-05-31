@@ -14,7 +14,6 @@ import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.util.Attributable;
 
@@ -29,21 +28,22 @@ import org.eclipse.emf.ecore.util.Switch;
  * starting with the actual class of the object and proceeding up the
  * inheritance hierarchy until a non-null result is returned, which is the
  * result of the switch. <!-- end-user-doc -->
+ * 
  * @see net.sf.orcc.backends.ir.IrSpecificPackage
  * @generated
  */
 public class IrSpecificSwitch<T> extends Switch<T> {
 	/**
-	 * The cached model package
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached model package <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected static IrSpecificPackage modelPackage;
 
 	/**
-	 * Creates an instance of the switch.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates an instance of the switch. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public IrSpecificSwitch() {
@@ -66,10 +66,12 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Calls <code>caseXXX</code> for each class of the model until one returns a non null result; it yields that result.
-	 * <!-- begin-user-doc --> <!--
+	 * Calls <code>caseXXX</code> for each class of the model until one returns
+	 * a non null result; it yields that result. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * @return the first non-null result returned by a <code>caseXXX</code> call.
+	 * 
+	 * @return the first non-null result returned by a <code>caseXXX</code>
+	 *         call.
 	 * @generated
 	 */
 	@Override
@@ -78,62 +80,71 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 		case IrSpecificPackage.INST_ASSIGN_INDEX: {
 			InstAssignIndex instAssignIndex = (InstAssignIndex) theEObject;
 			T result = caseInstAssignIndex(instAssignIndex);
-			if (result == null)
-				result = caseInstSpecific(instAssignIndex);
-			if (result == null)
+			if (result == null) {
 				result = caseInstruction(instAssignIndex);
-			if (result == null)
+			}
+			if (result == null) {
 				result = caseAttributable(instAssignIndex);
-			if (result == null)
+			}
+			if (result == null) {
 				result = defaultCase(theEObject);
+			}
 			return result;
 		}
 		case IrSpecificPackage.INST_CAST: {
 			InstCast instCast = (InstCast) theEObject;
 			T result = caseInstCast(instCast);
-			if (result == null)
-				result = caseInstSpecific(instCast);
-			if (result == null)
+			if (result == null) {
 				result = caseInstruction(instCast);
-			if (result == null)
+			}
+			if (result == null) {
 				result = caseAttributable(instCast);
-			if (result == null)
+			}
+			if (result == null) {
 				result = defaultCase(theEObject);
+			}
 			return result;
 		}
 		case IrSpecificPackage.INST_TERNARY: {
 			InstTernary instTernary = (InstTernary) theEObject;
 			T result = caseInstTernary(instTernary);
-			if (result == null)
-				result = caseInstSpecific(instTernary);
-			if (result == null)
+			if (result == null) {
 				result = caseInstruction(instTernary);
-			if (result == null)
+			}
+			if (result == null) {
 				result = caseAttributable(instTernary);
-			if (result == null)
+			}
+			if (result == null) {
 				result = defaultCase(theEObject);
+			}
 			return result;
 		}
 		case IrSpecificPackage.BLOCK_FOR: {
 			BlockFor blockFor = (BlockFor) theEObject;
 			T result = caseBlockFor(blockFor);
-			if (result == null)
+			if (result == null) {
 				result = caseBlock(blockFor);
-			if (result == null)
+			}
+			if (result == null) {
 				result = caseAttributable(blockFor);
-			if (result == null)
+			}
+			if (result == null) {
 				result = defaultCase(theEObject);
+			}
 			return result;
 		}
 		case IrSpecificPackage.EXPR_NULL: {
 			ExprNull exprNull = (ExprNull) theEObject;
 			T result = caseExprNull(exprNull);
-			if (result == null)
+			if (result == null) {
 				result = caseExpression(exprNull);
-			if (result == null)
+			}
+			if (result == null) {
 				result = caseAttributable(exprNull);
-			if (result == null)
+			}
+			if (result == null) {
 				result = defaultCase(theEObject);
+			}
 			return result;
 		}
 		default:
@@ -142,12 +153,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Assign Index</em>'.
-	 * <!-- begin-user-doc --> This implementation
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>Inst Assign Index</em>'. <!-- begin-user-doc --> This implementation
 	 * returns null; returning a non-null result will terminate the switch. <!--
 	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Assign Index</em>'.
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>Inst Assign Index</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
@@ -156,12 +170,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Cast</em>'.
-	 * <!-- begin-user-doc --> This implementation returns
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>Inst Cast</em>'. <!-- begin-user-doc --> This implementation returns
 	 * null; returning a non-null result will terminate the switch. <!--
 	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Cast</em>'.
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>Inst Cast</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
@@ -170,12 +187,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Ternary</em>'.
-	 * <!-- begin-user-doc --> This implementation
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>Inst Ternary</em>'. <!-- begin-user-doc --> This implementation
 	 * returns null; returning a non-null result will terminate the switch. <!--
 	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Ternary</em>'.
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>Inst Ternary</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
@@ -184,13 +204,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Block For</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Block For</em>'.
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>Block For</em>'. <!-- begin-user-doc --> This implementation returns
+	 * null; returning a non-null result will terminate the switch. <!--
+	 * end-user-doc -->
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>Block For</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
@@ -199,13 +221,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Expr Null</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Expr Null</em>'.
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>Expr Null</em>'. <!-- begin-user-doc --> This implementation returns
+	 * null; returning a non-null result will terminate the switch. <!--
+	 * end-user-doc -->
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>Expr Null</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
@@ -214,12 +238,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Instruction</em>'.
-	 * <!-- begin-user-doc --> This implementation
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>Instruction</em>'. <!-- begin-user-doc --> This implementation
 	 * returns null; returning a non-null result will terminate the switch. <!--
 	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Instruction</em>'.
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>Instruction</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
@@ -228,27 +255,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Specific</em>'.
-	 * <!-- begin-user-doc --> This implementation
-	 * returns null; returning a non-null result will terminate the switch. <!--
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>Block</em>'. <!-- begin-user-doc --> This implementation returns
+	 * null; returning a non-null result will terminate the switch. <!--
 	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Specific</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseInstSpecific(InstSpecific object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Block</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Block</em>'.
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>Block</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
@@ -257,13 +272,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Expression</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Expression</em>'.
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>Expression</em>'. <!-- begin-user-doc --> This implementation returns
+	 * null; returning a non-null result will terminate the switch. <!--
+	 * end-user-doc -->
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>Expression</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
@@ -272,12 +289,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Attributable</em>'.
-	 * <!-- begin-user-doc --> This implementation
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>Attributable</em>'. <!-- begin-user-doc --> This implementation
 	 * returns null; returning a non-null result will terminate the switch. <!--
 	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Attributable</em>'.
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>Attributable</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
@@ -286,12 +306,15 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>EObject</em>'.
-	 * <!-- begin-user-doc --> This implementation returns
+	 * Returns the result of interpreting the object as an instance of '
+	 * <em>EObject</em>'. <!-- begin-user-doc --> This implementation returns
 	 * null; returning a non-null result will terminate the switch, but this is
 	 * the last case anyway. <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>EObject</em>'.
+	 * 
+	 * @param object
+	 *            the target of the switch.
+	 * @return the result of interpreting the object as an instance of '
+	 *         <em>EObject</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject)
 	 * @generated
 	 */

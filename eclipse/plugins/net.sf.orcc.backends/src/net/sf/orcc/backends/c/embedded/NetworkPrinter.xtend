@@ -162,9 +162,15 @@ class NetworkPrinter extends CTemplate {
 	
 	def private printStateVar(Var stateVar, Instance instance) '''
 		<edge source="«instance.name»" sourceport="«stateVar.name»_o" target="«instance.name»" targetport="«stateVar.name»_i">
-		    <data key="edge_prod">1</data>
-		    <data key="edge_delay">1</data>
-		    <data key="edge_cons">1</data>
+		    «IF stateVar.type.dimensionsExpr.empty»
+		    	<data key="edge_prod">1</data>
+		    	<data key="edge_delay">1</data>
+		    	<data key="edge_cons">1</data>
+		    «ELSE»
+		    	<data key="edge_prod">«stateVar.type.dimensions.head»</data>
+		    	<data key="edge_delay">«stateVar.type.dimensions.head»</data>
+		    	<data key="edge_cons">«stateVar.type.dimensions.head»</data>
+		    «ENDIF»
 		    <data key="data_type">«stateVar.type.doSwitch»</data>
 		</edge>
 	'''

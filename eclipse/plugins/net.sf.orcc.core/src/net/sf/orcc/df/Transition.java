@@ -40,31 +40,31 @@ import org.eclipse.emf.common.util.EList;
 public interface Transition extends Edge {
 
 	/**
-	 * Returns the value of the '<em><b>Actions</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Action}.
-	 * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->Returns the first action that is associated with
+	 * this transition, or <code>null</code> if there are no actions associated
+	 * with this transition. <!-- end-user-doc -->
+	 * 
+	 * @return the first action associated with this transition or
+	 *         <code>null</code>
+	 */
+	Action getAction();
+
+	/**
+	 * Returns the value of the '<em><b>Actions</b></em>' reference list. The
+	 * list contents are of type {@link net.sf.orcc.df.Action}. <!--
+	 * begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Actions</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Actions</em>' reference list.
 	 * @see net.sf.orcc.df.DfPackage#getTransition_Actions()
 	 * @model
 	 * @generated
 	 */
 	EList<Action> getActions();
-
-	/**
-	 * Returns the first action that is associated with this transition, or
-	 * <code>null</code> if there are no actions associated with this
-	 * transition.
-	 * 
-	 * @return the first action associated with this transition or
-	 *         <code>null</code>
-	 * @model
-	 */
-	Action getAction();
 
 	@Override
 	State getSource();

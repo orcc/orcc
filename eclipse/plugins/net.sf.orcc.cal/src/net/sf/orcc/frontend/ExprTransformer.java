@@ -199,6 +199,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 				calledProc.getName());
 		InstCall call = eINSTANCE.createInstCall(lineNumber, callTarget,
 				calledProc, parameters);
+		Util.transformAnnotations(call, exprCall.getAnnotations());
 		IrUtil.getLast(nodes).add(call);
 
 		// return expr

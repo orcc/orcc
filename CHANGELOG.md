@@ -1,17 +1,37 @@
+# Next release
+
+### Notable changes and features
+
+- Front-end:
+	* Annotations are allowed on a call instruction
+- Backends:
+	* [C] New option "-f <frames_count>" added to generated applications. It should replace "-l
+<loops_count>" in most cases.
+
+### Bugfixes
+
+- Front-end:
+	* Issue #44: Use of an annotation multiple time in the same scope cause editor to report
+a syntax error
+
+### Known problems
+
+### Misc
+
 # 1.3.0 March 2013
 
 ### Notable changes and features
 
-- Front-end : 
-	* Optimization of the generated intermediated representation by removing most of useless 
+- Front-end:
+	* Optimization of the generated intermediated representation by removing most of useless
 	memory copies.
 	* New CLI option to build only the actors needed by a given network instead of building
 	the whole project and all its dependancies.
-- Simulator :
+- Simulator:
 	* New option to generate files containing statistics and profiling data.
 	* Simulation runtime has been reworked. A simulation can now be properly stopped by clicking on
 	the red square in the console tab or by closing the display window.
-- Backends :
+- Backends:
 	* Mapping files (XCF) are always generated, even if there is no mapping set in the UI.
 	* New CLI options such as '-m2m' which applies the Multi2MonoToken transformation.
 	* [C] Global improvement in the readibility of the generated code.
@@ -22,25 +42,25 @@
 	* [TTA] Global performance improvement.
 	* [TTA] Support of caching feature to speed-up the TCE compilation.
 	* New 'High Level Synthesis' backend which uses Vivado toolset to generate HDL designs.
-	* New 'COMPA' backend which generates C source code, without any dependency to external 
+	* New 'COMPA' backend which generates C source code, without any dependency to external
 	libraries (SDL, pthreads, etc.). This backend can't compile classical applications, because
 	they use Display.cal and needs to link with SDL. This backend was needed by members of COMPA
 	research project (see http://compa-ietr.insa-rennes.fr)
-- User interface :
+- User interface:
 	* Improve code completion.
-	* Global improvement of the informations displayed by the compiler. The following levels of 
-	messages are available : DEBUG, TRACE, NOTICE, WARNING, SEVERE.
-- Classifier :
+	* Global improvement of the informations displayed by the compiler. The following levels of
+	messages are available: DEBUG, TRACE, NOTICE, WARNING, SEVERE.
+- Classifier:
 	* Supports now the Z3 solver v4.12+, the support of other solver is dropped.
 
 ### Bugfixes
 
-- User interface : 
+- User interface:
 	* When creating an instance in a graph, existing names are checked in case insensitive
 	mode to fix Microsoft Windows bug when printing source files.
 	* Graphiti does not crash anymore during the opening of an xdf containing errors.
 	* Fix NullPointerException occuring when a wrong XDF path is set.
-- Backends :
+- Backends:
 	* Disable threaded generation to fix random bugs in generated files (without performance lost).
 	* (TTA) Transform all boolean variables in i8 since TCE do not support boolean.
 	* Caching function: Only files different from existing ones are printed on disk.
@@ -77,30 +97,30 @@ backend).
 possible to deactivate this export, to not overwrite user-modified library.
 - LLVM/Jade backends: experimental support of floating point type.
 - TTA backend: 
-    * new interconnection mechanism between the processors.
-    * support simulation and profiling using ttanetsim (experimental branch of TCE).
-    * add option to choose the configuration of the processors between several predefined profiles.
-    * support the mapping of several actors on the same processor.
-- C/LLVM backend : Folder structure of generated application has changed. It is now
+	* new interconnection mechanism between the processors.
+	* support simulation and profiling using ttanetsim (experimental branch of TCE).
+	* add option to choose the configuration of the processors between several predefined profiles.
+	* support the mapping of several actors on the same processor.
+- C/LLVM backend: Folder structure of generated application has changed. It is now
   <pre>
-    /
-    |-bin/
-    |-build/
-    |-libs/
-    |  |-orcc/
-    |  |-roxml/
-    |  |-windows/
-    |-src
+	/
+	|-bin/
+	|-build/
+	|-libs/
+	|  |-orcc/
+	|  |-roxml/
+	|  |-windows/
+	|-src
   </pre>
-  CMake must be run from the root folder of the application (and not
-  from src/ anymore)
-  Final executable is now written in bin/ folder
+CMake must be run from the root folder of the application (and not from ```src``` anymore). Final executable
+is now written in ```bin``` folder
 - UI: Improve user experience by printing better error messages.
-	
+
 ### Bugfixes
 
 - UI: Removing an existing mapping was not possible without removing the runtime configuration.
-- Tools: The classifier, the action merger and the actor merger are (almost) working back and their performances have been improved.
+- Tools: The classifier, the action merger and the actor merger are (almost) working back and their
+performances have been improved.
 - Interpreter: working with imports within imports.
 - RoXML: Update to latest version to fix some parsing errors on Windows caused by CRLF for end of line.
 
@@ -146,7 +166,7 @@ possible to deactivate this export, to not overwrite user-modified library.
 - Deletion of the VHDL back-end (not maintained anymore).
 - Deletion of the C++ back-end (not used anymore).
 
-# 0.9.5 May 2012
+# 0.9.5 May 2011
 
 ### Notable changes and features
 

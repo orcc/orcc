@@ -37,7 +37,6 @@ import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -1075,8 +1074,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				.getEPackage(IrPackage.eNS_URI);
 		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
 				.getEPackage(GraphPackage.eNS_URI);
-		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
-				.getEPackage(EcorePackage.eNS_URI);
 		MocPackage theMocPackage = (MocPackage) EPackage.Registry.INSTANCE
 				.getEPackage(MocPackage.eNS_URI);
 
@@ -1151,8 +1148,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"arguments", null, 0, -1, Instance.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstance_Entity(), theEcorePackage.getEObject(),
-				null, "entity", null, 0, 1, Instance.class, !IS_TRANSIENT,
+		initEReference(getInstance_Entity(), ecorePackage.getEObject(), null,
+				"entity", null, 0, 1, Instance.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getInstance_Name(), ecorePackage.getEString(), "name",
@@ -1370,7 +1367,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(tagEClass, Tag.class, "Tag", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTag_Identifiers(), theEcorePackage.getEString(),
+		initEAttribute(getTag_Identifiers(), ecorePackage.getEString(),
 				"identifiers", null, 0, -1, Tag.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
@@ -1390,7 +1387,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPortToEIntegerObjectMapEntry_Value(),
-				theEcorePackage.getEIntegerObject(), "value", null, 0, 1,
+				ecorePackage.getEIntegerObject(), "value", null, 0, 1,
 				Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

@@ -15,6 +15,7 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.DfPackage.Literals;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Port;
@@ -149,7 +150,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	 */
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
-	private Map<String, Var> mapStateVars;
+	private Map<String, Var> mapVars;
 
 	/**
 	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
@@ -229,9 +230,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 	protected ActorImpl() {
 		super();
 
-		mapStateVars = new HashMap<String, Var>();
-
-		eAdapters().add(new MapAdapter());
+		mapVars = new HashMap<String, Var>();
+		eAdapters().add(new MapAdapter(mapVars, Literals.ACTOR__STATE_VARS));
 	}
 
 	/**
@@ -727,11 +727,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 
 	@Override
 	public Var getStateVar(String name) {
-		return mapStateVars.get(name);
-	}
-
-	public Map<String, Var> getStateVariablesMap() {
-		return mapStateVars;
+		return mapVars.get(name);
 	}
 
 	/**
@@ -746,7 +742,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 		}
 		return stateVars;
 	}
-	
+
 	/**
 	 * Add the given variable to {@link #actor}'s state variables and make its name
 	 * unique.

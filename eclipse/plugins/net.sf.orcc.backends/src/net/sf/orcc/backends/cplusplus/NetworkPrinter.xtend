@@ -53,7 +53,7 @@ class NetworkPrinter extends ExprAndTypePrinter {
 	
 	List<Interface> interfaces
 	
-	Network network
+	protected Network network
 	
 	new (Network network, Map<String, Object> options) {
 		entitiesPrinter = new EntitiesPrinter

@@ -78,6 +78,7 @@ import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
+import net.sf.orcc.tools.stats.StatisticsPrinter;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
@@ -232,6 +233,7 @@ public class CBackend extends AbstractBackend {
 		// print CMakeLists
 		OrccLogger.traceln("Printing CMake project files");
 		new CMakePrinter(network).printCMakeFiles(path);
+		new StatisticsPrinter().print(srcPath, network);
 
 		if (balanceMapping) {
 			// Solve load balancing using Metis. The 'mapping' variable should
@@ -240,7 +242,7 @@ public class CBackend extends AbstractBackend {
 					mapping);
 		}
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
-			new Mapping().print(srcPath, network, mapping);
+			new Mapping(network, mapping).print(srcPath);
 		}
 	}
 

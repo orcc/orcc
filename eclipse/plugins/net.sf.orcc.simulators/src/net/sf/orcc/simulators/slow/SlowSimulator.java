@@ -35,6 +35,7 @@ import static net.sf.orcc.OrccLaunchConstants.NO_DISPLAY;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.simulators.SimulatorsConstants.FRAMES_NUMBER;
 import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
 import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
 import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
@@ -242,6 +243,7 @@ public class SlowSimulator extends AbstractSimulator {
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
 		loopsNumber = getAttribute(LOOP_NUMBER, DEFAULT_NB_LOOPS);
+		GenericDisplay.nbFrames = getAttribute(FRAMES_NUMBER, DEFAULT_NB_FRAMES);
 
 		noDisplay = getAttribute(NO_DISPLAY, false);
 

@@ -117,6 +117,7 @@ public class XdfRenameParticipant extends RenameParticipant {
 		InputStream in = networkFile.getContents();
 		try {
 			String networkContents = OrccUtil.getContents(in);
+			in.close();
 			String name = "<XDF name=\"" + simpleName + "\"";
 			int offset = networkContents.indexOf(name);
 

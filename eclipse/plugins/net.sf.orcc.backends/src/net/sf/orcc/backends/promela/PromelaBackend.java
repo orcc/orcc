@@ -95,6 +95,7 @@ public class PromelaBackend extends AbstractBackend {
 		renameMap.put("max", "max_");
 		renameMap.put("min", "min_");
 		renameMap.put("select", "select_");
+		renameMap.put("len", "len_");
 	}
 
 	@Override

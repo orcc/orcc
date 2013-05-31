@@ -42,6 +42,7 @@ import net.sf.orcc.util.OrccUtil
  * Generate network as graphml file
  * 
  * @author Antoine Lorence
+ * @author Karol Desnos
  */
 class ActorPrinter extends InstancePrinter {
 	
@@ -67,7 +68,7 @@ class ActorPrinter extends InstancePrinter {
 			+ "src" + File::separator + actor.simpleName + ".c")
 		
 		if(needToWriteFile(cContent, cFile)) {
-			OrccUtil::printFile(idlContent, idlFile)
+			OrccUtil::printFile(cContent, cFile)
 		} else {
 			numFilesCached = numFilesCached + 1
 		}
@@ -101,7 +102,7 @@ class ActorPrinter extends InstancePrinter {
 	
 	def private printInterface (Action action, String inter) '''
 		interface «inter» {
-			void «actor.simpleName»_«action.name» («action.printParameters»);
+			void «actor.simpleName»_«action.name» («action.printIDLParameters»);
 		};
 	'''
 	
@@ -153,12 +154,12 @@ class ActorPrinter extends InstancePrinter {
 		«IF ! actor.initializes.empty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Initializes 
-			<! Not functional yet :
+			«/**! Not functional yet :
 			 In SDF classification, the token production obtained for an actor with an
 			 initialize action include the number of token produce by this initialize 
 			 action. This is not correct as the token produced by the initialize action
 			 are not produced during each execution of the actor, but only when the actor
-			 is instanciated !>
+			 is instanciated !*/»
 			«FOR init : actor.initializes»
 				«init.print»
 			«ENDFOR»
@@ -167,20 +168,30 @@ class ActorPrinter extends InstancePrinter {
 		
 	def private printParameters(Action action) {
 		val elements = new ArrayList<String>
-		elements.add(actor.parameters.join(", ", ['''in parameter «name»''']))
-		elements.add(action.inputPattern.ports.join(", ", ['''in «type.doSwitch» «name»''']))
-		elements.add(action.outputPattern.ports.join(", ", ['''out «type.doSwitch» «name»''']))
-		elements.add(actor.stateVars.join(", ", ['''in «type.doSwitch» «name»_i, out «type.doSwitch» «name»_o''']))
+		elements.add(actor.parameters.join(", ", ['''«declare»''']))
+		elements.add(action.inputPattern.ports.join(", ", ['''«type.doSwitch» *«it.name»''']))
+		elements.add(action.outputPattern.ports.join(", ", ['''«type.doSwitch» *«it.name»''']))
+		elements.add(actor.stateVars.join(", ", ['''«type.doSwitch» *«it.name»_i, «type.doSwitch» *«it.name»_o''']))
 		return elements.filter[ ! empty].join(", ")
 	}
+	
+	def private printIDLParameters(Action action) {
+		val elements = new ArrayList<String>
+		elements.add(actor.parameters.join(", ", ['''in parameter «it.name»''']))
+		elements.add(action.inputPattern.ports.join(", ", ['''in «type.doSwitch» «it.name»''']))
+		elements.add(action.outputPattern.ports.join(", ", ['''out «type.doSwitch» «it.name»''']))
+		elements.add(actor.stateVars.join(", ", ['''in «type.doSwitch» «it.name»_i, out «type.doSwitch» «it.name»_o''']))
+		return elements.filter[ ! empty].join(", ")
+	}
+	
 	
 		
 	def private printParameters(Procedure procedure) {
 		val elements = new ArrayList<String>
 		// TODO : if(actor.params.get(i).port) : print '*' before «name»
-		elements.add(actor.parameters.join(", ", ['''«type.doSwitch» «name»''']))
+		elements.add(actor.parameters.join(", ", ['''«type.doSwitch» «it.name»''']))
 		elements.add(procedure.parameters.join(", ", [variable.declare]))
-		elements.add(actor.stateVars.join(", ", ['''«type.doSwitch» *«name»_o''']))
+		elements.add(actor.stateVars.join(", ", ['''«type.doSwitch» *«it.name»_o''']))
 		return elements.filter[ ! empty].join(", ")
 	}
 	
@@ -189,13 +200,17 @@ class ActorPrinter extends InstancePrinter {
 		{
 			«IF ! action.body.locals.empty»
 				«FOR local : action.body.locals»
-					«local.declare»
+					«local.declare»;
 				«ENDFOR»
 			«ENDIF»
 			«IF ! actor.stateVars.empty»
-				// Initialize output stateVars and work on them
+				// Initialize stateVars and work on them
 				«FOR stateVar : actor.stateVars»
-					«stateVar.type.doSwitch» «stateVar.name» = *«stateVar.name»_i;
+					«IF stateVar.type.dimensionsExpr.empty»
+						«stateVar.declare» = *«stateVar.name»_i;
+					«ELSE»
+						«stateVar.type.doSwitch» *«stateVar.name» = «stateVar.name»_i;
+					«ENDIF»
 				«ENDFOR»
 			«ENDIF»
 		
@@ -209,11 +224,16 @@ class ActorPrinter extends InstancePrinter {
 		«IF ! actor.stateVars.empty»
 			// Write state Var to output buf
 			«FOR stateVar : actor.stateVars»
-				*«stateVar.name»_o = «stateVar.name»;
+				«IF stateVar.type.dimensionsExpr.empty»
+					*«stateVar.name»_o = «stateVar.name»;
+				«ELSE»
+					// Copy «stateVar.name» to output buffer
+					memcpy(«stateVar.name»_o,«stateVar.name», «stateVar.type.dimensions.head»);
+				«ENDIF»
 			«ENDFOR» 
 		«ENDIF»
 		«IF ret.value != null»
-			return «ret.value»;
+			return «ret.value.doSwitch»;
 		«ENDIF»
 	'''
 

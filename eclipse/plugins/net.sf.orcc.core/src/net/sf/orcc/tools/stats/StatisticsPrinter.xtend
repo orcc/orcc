@@ -31,8 +31,8 @@ package net.sf.orcc.tools.stats
 import java.io.File
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
+import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccUtil
 
 /**
@@ -43,7 +43,7 @@ import net.sf.orcc.util.OrccUtil
 class StatisticsPrinter {
 	
 	def print(String targetFolder, Network network) {
-		val file = new File(targetFolder + File::separator + "stats.csv")
+		val file = new File(targetFolder + File::separator + network.simpleName + ".csv")
 		OrccUtil::printFile(network.content, file)
 	}
 	
@@ -52,11 +52,8 @@ class StatisticsPrinter {
 		«network.stats»
 		
 		«childrenHeader»
-		«FOR instance : network.children.filter(typeof(Instance))»
-			«instance.stats»
-		«ENDFOR»
-		«FOR actor : network.children.filter(typeof(Actor))»
-			«actor.stats»
+		«FOR child : network.children»
+			«child.stats»
 		«ENDFOR»
 		
 		«connectionsHeader»
@@ -66,20 +63,18 @@ class StatisticsPrinter {
 	'''
 	
 	def protected getNetworkHeader() 
-		'''Name, Actors, Connections'''
+		'''Name, Package, Actors, Connections, SDF, CSDF, QSDF, KPN, DPN'''
 		
 	def protected getStats(Network network)
-		'''«network.name», «network.children.size», «network.connections.size»'''
+		// network.getPackage instead of network.package to allow Xtend < 2.4 to parse this file
+		'''«network.simpleName», «network.getPackage», «network.children.size», «network.connections.size», «network.moCs.filter[SDF].size», «network.moCs.filter[CSDF && !SDF].size», «network.moCs.filter[quasiStatic].size», «network.moCs.filter[KPN].size», «network.moCs.filter[DPN].size»'''
 	
 	def protected getChildrenHeader() 
-		'''Name, Incoming, Outgoing, Inputs, Outputs, Actions, MoC'''
+		'''Name, Incoming, Outgoing, Inputs, Outputs, Actions, FSM, MoC'''
 
-	def private getStats(Actor actor) 
-		'''«actor.name», «actor.incoming.size», «actor.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»'''
-	
-	def private getStats(Instance instance) {
-		val actor = instance.actor
-		'''«instance.name», «instance.incoming.size», «instance.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.moC»'''
+	def private getStats(Vertex v) {
+		val actor = v.getAdapter(typeof(Actor))
+		'''«v.label», «v.incoming.size», «v.outgoing.size», «actor.inputs.size», «actor.outputs.size», «actor.actions.size», «actor.hasFsm», «actor.moC?.shortName»'''
 	}
 	
 	def protected getConnectionsHeader() 
@@ -87,5 +82,9 @@ class StatisticsPrinter {
 	
 	def protected getStats(Connection conn) 
 		'''«conn.source.label», «conn.sourcePort.name», «conn.target.label», «conn.targetPort.name», «conn.size»'''
+
+	def private getMoCs(Network network) {
+		network.children.map[getAdapter(typeof(Actor))?.moC].filterNull
+	}
 
 }

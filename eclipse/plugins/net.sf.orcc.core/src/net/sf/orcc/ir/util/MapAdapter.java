@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, IETR/INSA of Rennes
+ * Copyright (c) 2011-2013, IETR/INSA of Rennes, Synflow SAS
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,20 +28,16 @@
  */
 package net.sf.orcc.ir.util;
 
-import static net.sf.orcc.ir.IrPackage.eINSTANCE;
-
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.impl.ActorImpl;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.ProcedureImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
+import org.eclipse.emf.ecore.EReference;
 
 /**
  * This class defines an adapter that maintains a map of variables from a list
@@ -52,21 +48,18 @@ import org.eclipse.emf.common.notify.impl.AdapterImpl;
  */
 public class MapAdapter extends AdapterImpl {
 
-	@SuppressWarnings("unchecked")
-	private void add(Notification notification, Object object) {
-		Map<? extends Object, ? extends Object> map;
-		Object key;
+	private final Map<String, Var> map;
 
-		Object feature = notification.getFeature();
-		if (feature == eINSTANCE.getProcedure_Locals()) {
-			map = ((ProcedureImpl) target).getLocalsMap();
-			key = ((Var) object).getIndexedName();
-			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == DfPackage.eINSTANCE.getActor_StateVars()) {
-			map = ((ActorImpl) target).getStateVariablesMap();
-			key = ((Var) object).getName();
-			((Map<Object, Object>) map).put(key, object);
-		}
+	private final EReference reference;
+
+	public MapAdapter(Map<String, Var> map, EReference reference) {
+		this.map = map;
+		this.reference = reference;
+	}
+
+	private void add(Object object) {
+		Var var = (Var) object;
+		map.put(var.getIndexedName(), var);
 	}
 
 	@Override
@@ -76,54 +69,45 @@ public class MapAdapter extends AdapterImpl {
 
 	@Override
 	public void notifyChanged(Notification notification) {
+		if (reference != notification.getFeature()) {
+			return;
+		}
+
 		switch (notification.getEventType()) {
 		case Notification.ADD:
-			add(notification, notification.getNewValue());
+			add(notification.getNewValue());
 			break;
 
 		case Notification.ADD_MANY: {
 			List<?> list = (List<?>) notification.getNewValue();
 			for (Object object : list) {
-				add(notification, object);
+				add(object);
 			}
 			break;
 		}
 
 		case Notification.MOVE: {
-			remove(notification, notification.getOldValue());
-			add(notification, notification.getNewValue());
+			remove(notification.getOldValue());
+			add(notification.getNewValue());
 			break;
 		}
 
 		case Notification.REMOVE:
-			remove(notification, notification.getOldValue());
+			remove(notification.getOldValue());
 			break;
 
 		case Notification.REMOVE_MANY: {
 			List<?> list = (List<?>) notification.getOldValue();
 			for (Object object : list) {
-				remove(notification, object);
+				remove(object);
 			}
 			break;
 		}
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void remove(Notification notification, Object object) {
-		Map<? extends Object, ? extends Object> map;
-		Object key;
-
-		Object feature = notification.getFeature();
-		if (feature == eINSTANCE.getProcedure_Locals()) {
-			map = ((ProcedureImpl) target).getLocalsMap();
-			key = ((Var) object).getIndexedName();
-			((Map<Object, Object>) map).remove(key);
-		} else if (feature == DfPackage.eINSTANCE.getActor_StateVars()) {
-			map = ((ActorImpl) target).getStateVariablesMap();
-			key = ((Var) object).getName();
-			((Map<Object, Object>) map).remove(key);
-		}
+	private void remove(Object object) {
+		map.remove(((Var) object).getIndexedName());
 	}
 
 }

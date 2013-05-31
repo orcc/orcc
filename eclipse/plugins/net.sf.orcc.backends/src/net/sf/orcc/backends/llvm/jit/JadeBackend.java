@@ -28,17 +28,12 @@
  */
 package net.sf.orcc.backends.llvm.jit;
 
-import static net.sf.orcc.OrccActivator.getDefault;
-import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
@@ -49,9 +44,8 @@ import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
-import net.sf.orcc.backends.util.BackendUtil;
-import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.Mapping;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
@@ -90,14 +84,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class JadeBackend extends AbstractBackend {
 
-	private boolean biteexact;
-	/**
-	 * Path of JadeToolbox executable
-	 */
-	private String jadeToolbox;
-	private String llvmGenMod;
-
-	private String optLevel;
+	private boolean bitAccurate;
 
 	private final Map<String, String> renameMap;
 
@@ -117,10 +104,7 @@ public class JadeBackend extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
-		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
-		biteexact = getAttribute("net.sf.orcc.backends.byteexact", false);
-		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
+		bitAccurate = getAttribute("net.sf.orcc.backends.llvm.jit.bitaccurate", false);
 	}
 
 	@Override
@@ -136,7 +120,7 @@ public class JadeBackend extends AbstractBackend {
 		new DfVisitor<Void>(new SSATransformation()).doSwitch(actor);
 		new DeadGlobalElimination().doSwitch(actor);
 
-		if (!biteexact) {
+		if (!bitAccurate) {
 			new TypeResizer(true, false, false, false).doSwitch(actor);
 		}
 
@@ -176,7 +160,6 @@ public class JadeBackend extends AbstractBackend {
 
 		// Finalize actor generation
 		OrccLogger.traceln("Finalize actors...");
-		finalizeActors(actors);
 	}
 
 	@Override
@@ -202,71 +185,12 @@ public class JadeBackend extends AbstractBackend {
 			e.printStackTrace();
 		}
 
-		new Mapping().print(path, network, mapping);
-	}
-
-	private void finalizeActors(List<Actor> actors) {
-		// Jade location has not been set
-		if (jadeToolbox.equals("")) {
-			if (!optLevel.equals("O0") || !llvmGenMod.equals("Assembly")) {
-				OrccLogger.warnln("For optimizing, generating bitcode or "
-						+ "archive, Jade Toolbox path must first be set in "
-						+ "window->Preference->Orcc");
-			}
-			return;
-		}
-
-		// JadeToolbox is required to finalize actors
-		runJadeToolBox(actors);
+		new Mapping(network, mapping).print(path);
 	}
 
 	@Override
 	protected boolean printActor(Actor actor) {
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		return new ActorPrinter(options).print(folder, actor) > 0;
-	}
-
-	private void runJadeToolBox(List<Actor> actors) {
-		List<String> cmdList = new ArrayList<String>();
-		cmdList.add(jadeToolbox);
-		cmdList.add("-" + optLevel);
-		cmdList.add("-L");
-		if (!path.endsWith(File.separator)) {
-			path = path + File.separator;
-		}
-		cmdList.add(path);
-
-		// Set generation mode
-		if (llvmGenMod.equals("Assembly")) {
-			cmdList.add("-S");
-		} else if (llvmGenMod.equals("Bitcode")) {
-			cmdList.add("-c");
-		} else if (llvmGenMod.equals("Archive")) {
-			cmdList.add("-a");
-		}
-
-		// Add list of package requiered
-		Set<String> packages = new HashSet<String>();
-		for (Actor actor : actors) {
-			String firstPackage = actor.getPackage();
-			int index = firstPackage.indexOf('.');
-			if (index != -1) {
-				firstPackage = firstPackage.substring(0, index);
-			}
-			packages.add(firstPackage);
-		}
-		cmdList.addAll(packages);
-
-		String[] cmd = cmdList.toArray(new String[] {});
-
-		// Launch application
-		try {
-			BackendUtil.startExec(this, cmd);
-		} catch (IOException e) {
-			OrccLogger.severeln("Jade toolbox error : ");
-			for (StackTraceElement elt : e.getStackTrace()) {
-				OrccLogger.traceln(elt.toString());
-			}
-		}
 	}
 }

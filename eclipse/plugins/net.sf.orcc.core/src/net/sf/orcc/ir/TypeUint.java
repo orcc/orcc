@@ -46,7 +46,7 @@ public interface TypeUint extends Type {
 	 * @return the size of this unsigned integer type
 	 * @model
 	 */
-	public int getSize();
+	int getSize();
 
 	/**
 	 * Returns true if this type must be represented with a "long".
@@ -55,12 +55,7 @@ public interface TypeUint extends Type {
 	 */
 	boolean isLong();
 
-	/**
-	 * Sets the size of this unsigned integer type.
-	 * 
-	 * @param size
-	 *            the size of this unsigned integer type
-	 */
-	public void setSize(int size);
+	@Override
+	void setSize(int value);
 
 }
