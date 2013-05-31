@@ -184,9 +184,9 @@ import net.sf.orcc.util.OrccUtil
 	«ENDIF»
 	
 	«FOR connection : instance.outgoingPortMap.values»
-		«IF !(connection.head.source instanceof Port) && (connection.head.target instanceof Port)»
+		
 				«connection.head.fifoName»_full_n <= '1';
-		«ENDIF»
+		
 	«ENDFOR»
 	
 	«IF (instance.outgoingPortMap.empty) && (instance.incomingPortMap.empty)»
@@ -305,7 +305,7 @@ import net.sf.orcc.util.OrccUtil
 	def printOutputWaveGen(Instance vertex, Connection connection) '''
 		if (not endfile (sim_file_«vertex.name»_«connection.sourcePort.name») and «connection.fifoName»_write = '1') then
 		count«connection.fifoName» := count«connection.fifoName» + 1;
-		 report "Number of inputs«connection.fifoName» = " & integer'image(count«connection.fifoName»);
+		 report "Number of outputs«connection.fifoName» = " & integer'image(count«connection.fifoName»);
 			readline(sim_file_«vertex.name»_«connection.sourcePort.name», line_number);
 			if (line_number'length > 0 and line_number(1) /= '/') then
 				read(line_number, input_bit);
@@ -324,11 +324,11 @@ import net.sf.orcc.util.OrccUtil
 				«IF connection.fifoType.bool»
 				if (input_bit = 1) then
 					assert («connection.fifoName»_din  = "1")
-					report "0" instead of "1"
+					report "0 instead of 1"
 					severity error;
 				else
 					assert («connection.fifoName»_din  = "0")
-					report "1" instead of "0"
+					report "1 instead of 0"
 					severity error;
 				end if;
 				«ENDIF»
