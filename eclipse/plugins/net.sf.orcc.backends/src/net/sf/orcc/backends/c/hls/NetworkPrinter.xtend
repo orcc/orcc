@@ -31,11 +31,8 @@ package net.sf.orcc.backends.c.hls
 import java.io.File
 import net.sf.orcc.util.OrccUtil
 import java.util.Map
-import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
-import net.sf.orcc.df.Port
-import net.sf.orcc.ir.TypeBool
+
 
 /**
  * Compile top Network c source code 
@@ -49,136 +46,23 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		super(network, options)
 	}
 
-	override getNetworkFileContent() '''
-		// Generated from "«network.name»"
-
-		#include <hls_stream.h>
-		using namespace hls;
-
-		typedef signed char i8;
-		typedef short i16;
-		typedef int i32;
-		typedef long long int i64;
-		
-		typedef unsigned char u8;
-		typedef unsigned short u16;
-		typedef unsigned int u32;
-		typedef unsigned long long int u64;
-		
-		/////////////////////////////////////////////////
-		// FIFO pointer assignments
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			«instance.assignFifo»
-		«ENDFOR»
-		
-		
-		
-		/////////////////////////////////////////////////
-		// Action initializes schedulers
-		
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm )»
-				void «instance.name»_initialize();
-			«ENDIF»
-		«ENDFOR»
-		
-		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			void «instance.name»_scheduler();
-		«ENDFOR»
-		
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// Main
-		int main() {
-			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-				«IF (!instance.actor.stateVars.empty) || (instance.actor.hasFsm )»
-					 «instance.name»_initialize();
-				«ENDIF»
-			«ENDFOR»
-			
-			while(1) {
-				«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-					«instance.name»_scheduler();
-				«ENDFOR»
-			}
-			return 0;
-		}
-	'''
-	
-	def getProjectFileContent() '''
-		<?xml version="1.0" encoding="UTF-8"?>
-		<project xmlns="com.autoesl.autopilot.project" top="main" projectType="C/C++">
-		  <files>
-		    <file name="src/«network.simpleName».c" sc="0" tb="false" cflags=""/>
-		    «FOR instance : network.children.filter(typeof(Instance))»
-		    	<file name="src/«instance.name».c" sc="0" tb="false" cflags=""/>
-		    «ENDFOR»
-		  </files>
-		  <solutions>
-		    <solution name="solution1" status="active"/>
-		  </solutions>
-		  <includePaths/>
-		  <libraryPaths/>
-		</project>
-	'''
-	
-	def assignFifo(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
-			«IF (!(connList.head.source instanceof Port) && !(connList.head.target instanceof Port))||(!(connList.head.source instanceof Port) && (connList.head.target instanceof Port))»
-				«printFifoAssignHLS(connList.head )»
-			«ENDIF»			
-		«ENDFOR»
-		«FOR connList : instance.incomingPortMap.values»
-			«IF ((connList.source instanceof Port) && !(connList.target instanceof Port))»
-				«printFifoAssignHLS(connList)»
-			«ENDIF»
-		«ENDFOR»
-	'''
-	
-	def printFifoAssignHLS(Connection connection) '''
-		stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
-	'''
-	
 	override print(String targetFolder) {
-		val i = super.print(targetFolder)
-		val contentProject = projectFileContent
-		val contentNetwork = networkFileContent
 		val contentVhdlTop = fifoFileContent
 		val contentSimPack = fifoSimPackContent
-		val contentTestBench = "int test() { return 0;}"
-		val projectFile = new File(targetFolder + File::separator + "vivado_hls.app")
-		val NetworkFile = new File(targetFolder + File::separator + network.simpleName + ".cpp")
 		val SimPackFile = new File(targetFolder + File::separator + "sim_package" + ".vhd")
-		val testBenchFile = new File(targetFolder + File::separator + "testBench" + ".cpp")
 		val FifoVhdlFile = new File(targetFolder + File::separator + "genericFifo" + ".vhd")
-		if(needToWriteFile(contentNetwork, NetworkFile)) {
-
-			OrccUtil::printFile(contentProject, projectFile)
-			OrccUtil::printFile(contentNetwork, NetworkFile)
-			OrccUtil::printFile(contentTestBench, testBenchFile)
+		if(needToWriteFile(contentVhdlTop, FifoVhdlFile)) {
 			OrccUtil::printFile(contentVhdlTop, FifoVhdlFile)
 			OrccUtil::printFile(contentSimPack, SimPackFile)
 
-			return i
+			return 0
 		} else {
-			return i + 1
+			return 1
 		}
-	}
-	
-	def fifoName(Connection connection)
-		'''myStream_«connection.getAttribute("id").objectValue»'''
-	
-	def fifoType(Connection connection) {
-		if (connection.sourcePort != null){	
-			connection.sourcePort.type
-		}else{
-			connection.targetPort.type
-		}
-	}
-		
-	override caseTypeBool(TypeBool type) 
-		'''bool'''
-		
+	}	
+	/*
+	 * Generic FIFO
+	 */
 	def fifoFileContent()'''
 		library ieee;
 		use ieee.std_logic_1164.all;
@@ -243,7 +127,9 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		   
 		end architecture;
 		'''
-		
+		/*
+		 * Sim Package
+		 */
 	def fifoSimPackContent()'''
 		library ieee;
 		use ieee.std_logic_1164.all;

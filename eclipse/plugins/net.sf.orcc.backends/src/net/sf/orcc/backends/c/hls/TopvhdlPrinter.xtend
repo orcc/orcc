@@ -140,14 +140,14 @@ import net.sf.orcc.util.OrccUtil
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
 				«connList.head.fifoName»_V_din <= top_«connList.head.fifoName»_din;
-				--top_«connList.head.fifoName»_full_n <= «connList.head.fifoName»_V_full_n;
+				top_«connList.head.fifoName»_full_n <= «connList.head.fifoName»_V_full_n;
 				«connList.head.fifoName»_V_write <= top_«connList.head.fifoName»_write;
 			«ENDIF»
 		«ENDFOR»
 		«FOR connList : instance.incomingPortMap.values»
 			«IF (connList.source instanceof Port) && !(connList.target instanceof Port) »
 				top_«connList.fifoName»_dout <= «connList.fifoName»_V_dout;
-				--top_«connList.fifoName»_empty_n <= «connList.fifoName»_V_empty_n;
+				top_«connList.fifoName»_empty_n <= «connList.fifoName»_V_empty_n;
 				«connList.fifoName»_V_read <= top_«connList.fifoName»_read;
 			«ENDIF»
 		«ENDFOR»
@@ -192,18 +192,20 @@ import net.sf.orcc.util.OrccUtil
 	
 	
 	def mappingComponentFifoSignal(Instance instance)'''
-		«FOR conList : instance.outgoingPortMap.values»
-			«printFifoMapping(conList.head)»
-		«ENDFOR»
+
+		
 		
 		«FOR connection : instance.incomingPortMap.values»
-			«IF (connection.source instanceof Port) && !(connection.target instanceof Port) »
-				«printFifoMapping(connection)»
+			«IF !(connection.source instanceof Port) && !(connection.target instanceof Port) »
+						«printFifoMapping(connection)»
 			«ENDIF»
+			
 		«ENDFOR»
+		
 	'''
 	
 	def printFifoMapping (Connection connection)'''
+	
 		«connection.fifoName»_V : FIFO_main_myStream
 				generic map (width => «connection.fifoType.sizeInBits - 1»)
 		port map (

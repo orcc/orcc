@@ -2,6 +2,16 @@
 
 ### Notable changes and features
 
+### Bugfixes
+
+### Known problems
+
+### Misc
+
+# 1.3.1 May 2013
+
+### Notable changes and features
+
 - Front-end:
 	* Annotations are allowed on a call instruction
 - Backends:
@@ -13,10 +23,6 @@
 - Front-end:
 	* Issue #44: Use of an annotation multiple time in the same scope cause editor to report
 a syntax error
-
-### Known problems
-
-### Misc
 
 # 1.3.0 March 2013
 
