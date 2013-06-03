@@ -51,7 +51,6 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
-import net.sf.orcc.moc.MoC
 import net.sf.orcc.moc.QSDFMoC
 import net.sf.orcc.util.OrccUtil
 
@@ -64,11 +63,11 @@ class ActorPrinter extends InstancePrinter {
 	
 	val List<Integer> objRefList = new ArrayList<Integer>
 	val List<Pattern> patternList = new ArrayList<Pattern>
-	
+
 	new(Map<String, Object> options) {
 		super(options)
 	}
-	
+
 	override protected print(String targetFolder) {
 		val content = fileContent
 		val file = new File(targetFolder + File::separator + actor.simpleName)
@@ -101,12 +100,12 @@ class ActorPrinter extends InstancePrinter {
 		// duplicated in the list
 		var id = objRefList.indexOf(object.hashCode)
 		if(id == -1) {
+			id = objRefList.size
 			objRefList.add(object.hashCode)
-			id = objRefList.size - 1
 		}
 		return '''!«id»'''
 	}
-	
+
 	override protected getFileContent() '''
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Generated from "«actor.name»"
@@ -171,9 +170,9 @@ class ActorPrinter extends InstancePrinter {
 		
 		«decl_MD»
 	'''
-	
+
 	def private decl_MD() '''
-		!source = !{«actor.file.fullPath.getObjectReference»}
+		!source = !{«actor.file.fullPath.objectReference»}
 		!name = !{«actor.name.objectReference»}
 		!action_scheduler = !{«actor.objectReference»}
 		«IF ! actor.inputs.empty»
@@ -188,7 +187,7 @@ class ActorPrinter extends InstancePrinter {
 		«IF ! actor.stateVars.empty»
 			!state_variables = !{«actor.stateVars.join(", ")[objectReference]»}
 		«ENDIF»
-		
+
 		«IF ! actor.procs.empty»
 			!procedures = !{«actor.procs.join(", ")[objectReference]»}
 		«ENDIF»
@@ -198,14 +197,14 @@ class ActorPrinter extends InstancePrinter {
 		«IF ! actor.actions.empty»
 			!actions = !{«actor.actions.join(", ")[objectReference]»}
 		«ENDIF»
-		
+
 		«IF actor.moC != null»
 			!MoC = !{«actor.moC.objectReference»}
 		«ENDIF»
-		
+
 		«actor.file.fullPath.objectReference» = metadata !{«actor.file.fullPath.toString.name_MD»}
 		«actor.name.objectReference» = metadata !{«actor.name.name_MD»}
-		
+
 		; Action-scheduler
 		«actionScheduler_MD»
 		«IF ! actor.inputs.empty»
@@ -260,22 +259,25 @@ class ActorPrinter extends InstancePrinter {
 				
 			«ENDFOR»
 		«ENDIF»
+
 		; Actions
 		«FOR action : actor.actions»
 			«action.action_MD»
 			
 		«ENDFOR»
+
 		; Patterns
 		«FOR pattern : patternList»
 			«pattern.pattern_MD»
 		«ENDFOR»
+
 		; Variables of patterns
-		«FOR pattern : patternList.filter[portToVarMap != null]»
+		«FOR pattern : patternList.filter[!portToVarMap.nullOrEmpty]»
 			«pattern.portToVarMap.objectReference» = metadata !{«pattern.ports.join(", ")['''metadata «objectReference»''']»}
 		«ENDFOR»
-		
+
 		; Number of tokens of patterns
-		«FOR pattern : patternList.filter[numTokensMap != null]»
+		«FOR pattern : patternList.filter[!numTokensMap.nullOrEmpty]»
 			«pattern.numTokensMap.objectReference» = metadata !{«pattern.ports.join(", ")['''metadata «objectReference», i32 «pattern.numTokensMap.get(it)»''']»}
 		«ENDFOR»
 		«IF actor.hasMoC»
@@ -284,7 +286,7 @@ class ActorPrinter extends InstancePrinter {
 			«moC_MD»
 		«ENDIF»
 	'''
-	
+
 	def private moC_MD() {
 		val value =
 			if (actor.moC.CSDF) ''' , metadata «"csdfmoc_hack_key".objectReference»'''
@@ -310,7 +312,7 @@ class ActorPrinter extends InstancePrinter {
 			if (!csdfmoc.inputPattern.empty) '''metadata «csdfmoc.inputPattern.objectReference»'''
 			else "null"
 		val outPattern =
-			if (!csdfmoc.inputPattern.empty) '''metadata «csdfmoc.outputPattern.objectReference»'''
+			if (!csdfmoc.outputPattern.empty) '''metadata «csdfmoc.outputPattern.objectReference»'''
 			else "null"
 		'''
 			«"csdfmoc_hack_key".objectReference» = metadata !{i32 «csdfmoc.numberOfPhases» , «inPattern», «outPattern», metadata «csdfmoc.invocations.objectReference»}
@@ -320,10 +322,10 @@ class ActorPrinter extends InstancePrinter {
 
 	def private pattern_MD(Pattern pattern) {
 		val numTokens =
-			if (pattern.numTokensMap != null) '''metadata «pattern.numTokensMap.objectReference»'''
+			if (!pattern.numTokensMap.nullOrEmpty) '''metadata «pattern.numTokensMap.objectReference»'''
 			else "null"
 		val variables =
-			if ( pattern.portToVarMap != null) '''metadata «pattern.portToVarMap.objectReference»'''
+			if (!pattern.portToVarMap.nullOrEmpty) '''metadata «pattern.portToVarMap.objectReference»'''
 			else "null"
 		'''
 			«pattern.objectReference» = metadata !{«numTokens», «variables»}
