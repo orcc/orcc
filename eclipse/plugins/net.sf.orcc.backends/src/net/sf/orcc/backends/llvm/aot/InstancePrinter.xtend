@@ -265,33 +265,33 @@ class InstancePrinter extends LLVMTemplate {
 			bb_outside_scheduler_start:
 				;; no read/write here!
 			«printActionLoop(actor.actionsOutsideFsm, true)»
-			
+
 			bb_outside_finished:
 				;; no read_end/write_end here!
 				ret void
 			}
 		«ENDIF»
-		
+
 		define void @«name»_scheduler() nounwind {
 		entry:
 			br label %bb_scheduler_start
-		
+
 		bb_scheduler_start:
 			«printCallStartTokenFunctions»
 			«actor.fsm.printFsmSwitch»
 			br label %bb_scheduler_start
-		
+
 		default:
 			; TODO: print error
 			br label %bb_scheduler_start
-		
+
 		«FOR state : actor.fsm.states»
 			«state.printTransition»
 		«ENDFOR»
-		
+
 		bb_waiting:
 			br label %bb_finished
-		
+
 		bb_finished:
 			«printCallEndTokenFunctions»
 			ret void
@@ -374,10 +374,10 @@ class InstancePrinter extends LLVMTemplate {
 
 		bb_scheduler_start:
 		«printActionLoop(actor.actionsOutsideFsm, false)»
-		
+
 		bb_waiting:
 			br label %bb_finished
-		
+
 		bb_finished:
 			«printCallEndTokenFunctions»
 			ret void
@@ -411,7 +411,7 @@ class InstancePrinter extends LLVMTemplate {
 					«val lastPort = outputPattern.ports.last»
 					;; Output pattern
 					«checkOutputPattern(action, outputPattern, null)»
-		
+
 					br i1 %has_valid_outputs_«lastPort.name»_«outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«name», label %bb_«name»_fire, label %bb«IF outsideFSM»_outside«ENDIF»_finished
 				«ELSE»
 					;; Empty output pattern
