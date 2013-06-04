@@ -412,7 +412,7 @@ class InstancePrinter extends LLVMTemplate {
 					;; Output pattern
 					«checkOutputPattern(action, outputPattern, null)»
 		
-					br i1 %has_valid_outputs_«lastPort.name»_«outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«name», label %bb_«name»_fire, label %bb_finished
+					br i1 %has_valid_outputs_«lastPort.name»_«outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«name», label %bb_«name»_fire, label %bb«IF outsideFSM»_outside«ENDIF»_finished
 				«ELSE»
 					;; Empty output pattern
 					
