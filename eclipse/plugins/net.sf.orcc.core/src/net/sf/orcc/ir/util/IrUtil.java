@@ -142,7 +142,7 @@ public class IrUtil {
 						.getContainingList(containingInst);
 				
 				BlockBasic blockBasic = IrFactory.eINSTANCE.createBlockBasic();
-				
+
 				// Split the basic block
 				blockBasic.getInstructions().addAll(instructions.subList(0, instructions.indexOf(containingInst)));
 				addBlockBeforeBlock(blockBasic, containingBlock);

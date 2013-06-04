@@ -81,6 +81,17 @@ public class ShortCircuitTransformation extends AbstractIrVisitor<Expression> {
 
 			// Binary expression is split into several BlockIf blocks
 			BlockIf newIf = factory.createBlockIf();
+			BlockBasic join = factory.createBlockBasic();
+			newIf.setJoinBlock(join);
+			
+			Instruction containingInst = EcoreHelper.getContainerOfType(expr,
+					Instruction.class);
+			Block containingBlock = EcoreHelper.getContainerOfType(expr,
+					Block.class);
+
+			// In all cases, the transformation block is added before the expression location
+			IrUtil.addBlockBeforeExpr(expr, newIf);
+
 			newIf.setCondition(expr.getE1());
 
 			BlockBasic blockTrue = factory.createBlockBasic();
@@ -94,7 +105,7 @@ public class ShortCircuitTransformation extends AbstractIrVisitor<Expression> {
 			assignFalse.setTarget(factory.createDef(newVar));
 			blockFalse.add(assignFalse);
 			newIf.getElseBlocks().add(blockFalse);
-
+			
 			if (expr.getOp() == OpBinary.LOGIC_AND) {
 				assignTrue.setValue(expr.getE2());
 				assignFalse.setValue(factory.createExprBool(false));
@@ -102,12 +113,7 @@ public class ShortCircuitTransformation extends AbstractIrVisitor<Expression> {
 				assignTrue.setValue(factory.createExprBool(true));
 				assignFalse.setValue(expr.getE2());
 			}
-						
-			Instruction containingInst = EcoreHelper.getContainerOfType(expr,
-					Instruction.class);
-			Block containingBlock = EcoreHelper.getContainerOfType(expr,
-					Block.class);
-			
+												
 			// If the expression is contained in the condition of a BlockWhile, 
 			// the transformation block is also put at the end of this BlockWhile
 			if (containingInst == null && containingBlock.isBlockWhile()) {
@@ -116,9 +122,6 @@ public class ShortCircuitTransformation extends AbstractIrVisitor<Expression> {
 					whileBlocks.add(IrUtil.copy(newIf));
 			}
 
-			// In all cases, the transformation block is added before the expression location
-			IrUtil.addBlockBeforeExpr(expr, newIf);
-			
 			EcoreUtil.replace(expr, newExpr);
 			IrUtil.delete(expr);
 			
