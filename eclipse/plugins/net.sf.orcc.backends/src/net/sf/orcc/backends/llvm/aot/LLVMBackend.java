@@ -44,6 +44,7 @@ import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
+import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Validator;
@@ -161,6 +162,7 @@ public class LLVMBackend extends AbstractBackend {
 		
 		visitors.add(new TypeResizer(true, true, false, false));
 		visitors.add(new StringTransformation());
+		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
 		visitors.add(new DfVisitor<Void>(new SSATransformation()));
 		visitors.add(new DeadGlobalElimination());
 		visitors.add(new DfVisitor<Void>(new DeadCodeElimination()));
