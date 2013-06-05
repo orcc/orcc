@@ -32,7 +32,6 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Unit;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.Adaptable;
 
 import org.eclipse.emf.ecore.EObject;
@@ -92,7 +91,7 @@ public class DfUtil {
 		if (eObject instanceof Unit) {
 			return ((Unit) eObject).getName();
 		} else {
-			return ((Vertex) eObject).getLabel();
+			return ((Adaptable) eObject).getAdapter(Entity.class).getName();
 		}
 	}
 
