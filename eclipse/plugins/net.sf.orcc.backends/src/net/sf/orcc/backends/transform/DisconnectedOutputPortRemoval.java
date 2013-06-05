@@ -30,31 +30,25 @@ package net.sf.orcc.backends.transform;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.emf.common.util.EList;
-
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-
 import net.sf.orcc.df.util.DfVisitor;
-
 import net.sf.orcc.ir.Def;
-
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Use;
-
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
+import org.eclipse.emf.common.util.EList;
+
 /**
- * This class defines a visitor that removes unconnected output ports
+ * Removes unconnected output ports from an actor. Also delete all instructions
+ * which use or set variables associated with these ports.
  * 
  * 
  * @author Mariem Abid
@@ -62,74 +56,58 @@ import net.sf.orcc.util.util.EcoreHelper;
  */
 public class DisconnectedOutputPortRemoval extends DfVisitor<Void> {
 
-	List<Port> discPorts = new ArrayList<Port>();
+	private List<Port> disconnectedOutputPorts = new ArrayList<Port>();
 
 	@Override
 	public Void caseInstance(Instance instance) {
 		if (instance.isActor()) {
-			EList<Port> outports = instance.getActor().getOutputs();
-			Map<Port, List<Connection>> outMap = instance.getOutgoingPortMap();
-			Set<Port> outgp = outMap.keySet();
-			discPorts = findDiscPorts(outports, outgp);
-			outports.removeAll(discPorts);
 			return super.caseActor(instance.getActor());
-		} else {
-			return super.caseInstance(instance);
-
 		}
+		return null;
 	}
 
 	@Override
 	public Void caseActor(Actor actor) {
+		disconnectedOutputPorts.clear();
 
-		// TODO Auto-generated method stub
 		EList<Port> outports = actor.getOutputs();
 
-		Map<Port, List<Connection>> outMap = actor.getOutgoingPortMap();
-		Set<Port> outgp = outMap.keySet();
+		Set<Port> connectedOutPorts = actor.getOutgoingPortMap().keySet();
 
-		discPorts = findDiscPorts(outports, outgp);
-		outports.removeAll(discPorts);
+		findDiscPorts(outports, connectedOutPorts);
+		outports.removeAll(disconnectedOutputPorts);
 
 		return super.caseActor(actor);
-
 	}
 
-	List<Port> findDiscPorts(EList<Port> outports, Set<Port> outgp) {
-		ListIterator<Port> it = outports.listIterator();
-		while (it.hasNext()) {
-			Port port = it.next();
-			if (!outgp.contains(port)) {
-				System.out.println(port.getName());
-				discPorts.add(port);
-
+	/**
+	 * Add all unconnectedPorts of the current Actor to disconnectedOutputPorts
+	 * member list
+	 * 
+	 * @param outports
+	 * @param connectedOutPorts
+	 */
+	private void findDiscPorts(EList<Port> outports, Set<Port> connectedOutPorts) {
+		for (Port portToCheck : outports) {
+			if (!connectedOutPorts.contains(portToCheck)) {
+				disconnectedOutputPorts.add(portToCheck);
 			}
-
 		}
-		return discPorts;
 	}
 
+	@Override
 	public Void casePattern(Pattern pattern) {
-		EList<Port> ports = pattern.getPorts();
+		EList<Port> patternPorts = pattern.getPorts();
 
-		for (Port discPort : discPorts) {
-			if (ports.contains(discPort)) {
+		for (Port discPort : disconnectedOutputPorts) {
+			if (patternPorts.contains(discPort)) {
 				Var varOfPort = pattern.getVariable(discPort);
-				System.out.println(varOfPort.getName());
-
 				removeDefUseInst(varOfPort);
-
 				IrUtil.delete(varOfPort);
-
 				pattern.remove(discPort);
-
-				// ports.remove(discPort);
-
 			}
 		}
-
 		return null;
-
 	}
 
 	private void removeDefUseInst(Var variable) {
