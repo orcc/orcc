@@ -39,7 +39,6 @@ import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.DfFactory
-import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
@@ -245,7 +244,6 @@ class InstancePrinter extends CTemplate {
 		«FOR port : actor.inputs»
 			static unsigned int index_«port.name»;
 			static unsigned int numTokens_«port.name»;
-			#define NUM_READERS_«port.name» «port.numReaders»
 			#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 			#define tokens_«port.name» «port.fullName»->contents
 			
@@ -398,11 +396,9 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 	
-	/******************************************
-	 * 
-	 * FSM
-	 *
-	 *****************************************/
+	//========================================
+	//                  FSM
+	//========================================
 	def protected printFsm() '''
 		«IF ! actor.actionsOutsideFsm.empty»
 			«inline»void «name»_outside_FSM_scheduler(struct schedinfo_s *si) {
@@ -564,15 +560,11 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	def private checkConnectivy() {
-		for(port : actor.inputs) {
-			if(incomingPortMap.get(port) == null) {
-				OrccLogger::noticeln("["+name+"] Input port "+port.name+" not connected.")
-			}
+		for(port : actor.inputs.filter[!inputConneted]) {
+			OrccLogger::noticeln("["+name+"] Input port "+port.name+" not connected.")
 		}
-		for(port : actor.outputs) {
-			if(outgoingPortMap.get(port) == null) {
-				OrccLogger::noticeln("["+name+"] Output port "+port.name+" not connected.")
-			}
+		for(port : actor.outputs.filter[!outputConnected]) {
+			OrccLogger::noticeln("["+name+"] Output port "+port.name+" not connected.")
 		}
 	}
 	
@@ -720,7 +712,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	// TODO : simplify this :
+	// TODO: simplify this
 	def protected declareStateVar(Var variable) '''
 		«variable.printAttributes»
 		«IF variable.initialized»
@@ -751,41 +743,27 @@ class InstancePrinter extends CTemplate {
 
 	def protected fullName(Port port)
 		'''«name»_«port.name»'''
-	
+
 	def private sizeOrDefaultSize(Connection conn) {
 		if(conn == null || conn.size == null) "SIZE"
 		else conn.size
 	}
-	
-	def private getNumReaders(Port port) {
-		if (incomingPortMap.get(port) == null) {
-			'''0'''
-		} else {
-			val predecessor = incomingPortMap.get(port).source.getAdapter(typeof(Entity))
-			val predecessorPort = incomingPortMap.get(port).sourcePort
-			'''«predecessor.outgoingPortMap.get(predecessorPort).size»'''
-		}
-	}
-	
+
 	def private printOpenFiles() '''
 		«FOR port : actor.inputs + actor.outputs»
 			file_«port.name» = fopen("«traceFolder»«File::separator.replace('\\', "\\\\")»«port.fullName».txt", "a");
 		«ENDFOR»
 	'''
-	
+
 	def private printCloseFiles() '''
 		«FOR port : actor.inputs + actor.outputs»
 			fclose(file_«port.name»);
 		«ENDFOR»
 	'''
-	
 
-
-	/******************************************
-	 * 
-	 * Blocks
-	 *
-	 *****************************************/
+	//========================================
+	//               Blocks
+	//========================================
 	override caseBlockIf(BlockIf block)'''
 		if («block.condition.doSwitch») {
 			«FOR thenBlock : block.thenBlocks»
@@ -821,11 +799,9 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	/******************************************
-	 * 
-	 * Instructions
-	 *
-	 *****************************************/
+	//========================================
+	//            Instructions
+	//========================================
 	override caseInstAssign(InstAssign inst) '''
 		«inst.target.variable.indexedName» = «inst.value.doSwitch»;
 	'''
@@ -841,7 +817,6 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 
-	
 	override caseInstStore(InstStore store) {
 		val trgtPort = store.target.variable.port
 		'''
@@ -856,7 +831,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 		'''
 	}
-	
+
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
 			printf(«call.arguments.printfArgs.join(", ")»);
@@ -864,7 +839,7 @@ class InstancePrinter extends CTemplate {
 			«IF call.target != null»«call.target.variable.indexedName» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
 		«ENDIF»
 	'''
-	
+
 	override caseInstReturn(InstReturn ret) '''
 		«IF ret.value != null»
 			return «ret.value.doSwitch»;
@@ -875,6 +850,9 @@ class InstancePrinter extends CTemplate {
 		«inst.target.variable.indexedName» = «inst.conditionValue.doSwitch» ? «inst.trueValue.doSwitch» : «inst.falseValue.doSwitch»;
 	'''
 
+	//========================================
+	//            Helper methods
+	//========================================
 	def protected getPort(Var variable) {
 		if(currentAction == null) {
 			null
@@ -902,12 +880,20 @@ class InstancePrinter extends CTemplate {
 
 	def private getNoInline() 
 		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
+	
+	def private isOutputConnected(Port port) {
+		// If the port has a list of output connections not defined or empty, returns false
+		!outgoingPortMap.get(port).nullOrEmpty
+	}
 
-	/******************************************
-	 * 
-	 * Old templateData initialization
-	 *
-	 *****************************************/		
+	def private isInputConneted(Port port) {
+		// If the port has an input connection, returns true
+		incomingPortMap.get(port) != null
+	}
+
+	//========================================
+	//   Old template data initialization
+	//========================================
 	def private buildInputPattern() {
 		for (action : actor.actionsOutsideFsm) {
 			val actionPattern = action.inputPattern
