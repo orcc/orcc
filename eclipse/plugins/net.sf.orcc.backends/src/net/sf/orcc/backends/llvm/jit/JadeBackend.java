@@ -53,6 +53,7 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
@@ -67,7 +68,6 @@ import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
@@ -190,7 +190,7 @@ public class JadeBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		String folder = path + File.separator + OrccUtil.getFolder(actor);
+		String folder = path + File.separator + DfUtil.getFolder(actor);
 		return new ActorPrinter(options).print(folder, actor) > 0;
 	}
 }

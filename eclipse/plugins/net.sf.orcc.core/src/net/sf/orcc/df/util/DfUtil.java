@@ -28,12 +28,12 @@
  */
 package net.sf.orcc.df.util;
 
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.Adaptable;
-import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -55,7 +55,30 @@ public class DfUtil {
 	 *         object
 	 */
 	public static String getFile(EObject eObject) {
-		return OrccUtil.getFile(getName(eObject));
+		return getFile(getName(eObject));
+	}
+
+	/**
+	 * Returns the file name that corresponds to the qualified name of the
+	 * actor/unit.
+	 * 
+	 * @param entity
+	 *            an actor/unit
+	 * @return the file name that corresponds to the qualified name of the actor
+	 */
+	public static String getFile(String name) {
+		return name.replace('.', '/');
+	}
+
+	/**
+	 * Returns the folder that corresponds to the package of the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @return the folder that corresponds to the package of the given actor
+	 */
+	public static String getFolder(Actor actor) {
+		return actor.getPackage().replace('.', '/');
 	}
 
 	/**

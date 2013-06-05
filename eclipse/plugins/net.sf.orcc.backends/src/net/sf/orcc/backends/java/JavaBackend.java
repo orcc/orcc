@@ -48,11 +48,11 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 
@@ -171,7 +171,7 @@ public class JavaBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		String folder = srcPath + File.separator + OrccUtil.getFolder(actor);
+		String folder = srcPath + File.separator + DfUtil.getFolder(actor);
 		return new ActorPrinter(actor, options).print(folder) > 0;
 	}
 
@@ -179,7 +179,7 @@ public class JavaBackend extends AbstractBackend {
 	protected boolean printInstance(Instance instance) {
 		if (!instance.hasAttribute("bcast")) {
 			String folder = srcPath + File.separator
-					+ OrccUtil.getFolder(instance.getActor());
+					+ DfUtil.getFolder(instance.getActor());
 			return new InstancePrinter(instance, options).printInstance(folder) > 0;
 		}
 		return false;
