@@ -32,7 +32,6 @@ import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
-import net.sf.orcc.df.Port
 import net.sf.orcc.util.OrccUtil
 
 /**

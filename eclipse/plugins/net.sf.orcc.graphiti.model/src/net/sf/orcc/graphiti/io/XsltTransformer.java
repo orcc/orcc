@@ -94,7 +94,6 @@ public class XsltTransformer {
 				"net.sf.saxon.TransformerFactoryImpl", null);
 		factory.setURIResolver(new URIResolver() {
 
-			@SuppressWarnings("resource")
 			@Override
 			public Source resolve(String href, String base)
 					throws TransformerException {

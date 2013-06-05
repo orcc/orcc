@@ -36,7 +36,6 @@ import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
-import net.sf.orcc.backends.transform.DivisionSubstitution;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.df.Actor;
