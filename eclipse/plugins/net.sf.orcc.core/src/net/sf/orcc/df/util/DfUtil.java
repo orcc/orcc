@@ -30,8 +30,10 @@ package net.sf.orcc.df.util;
 
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.Unit;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.Adaptable;
-import net.sf.orcc.util.util.EcoreHelper;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -42,6 +44,34 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public class DfUtil {
+
+	/**
+	 * Returns the file name that corresponds to the qualified name of the
+	 * actor/unit/network.
+	 * 
+	 * @param eObject
+	 *            an actor/unit/network
+	 * @return the file name that corresponds to the qualified name of the
+	 *         object
+	 */
+	public static String getFile(EObject eObject) {
+		return OrccUtil.getFile(getName(eObject));
+	}
+
+	/**
+	 * Returns the name of the given actor/unit/network.
+	 * 
+	 * @param eObject
+	 *            an actor/unit/network
+	 * @return the name of the actor/unit/network
+	 */
+	public static String getName(EObject eObject) {
+		if (eObject instanceof Unit) {
+			return ((Unit) eObject).getName();
+		} else {
+			return ((Vertex) eObject).getLabel();
+		}
+	}
 
 	/**
 	 * Returns the package of the given name, which is composed of all the
@@ -70,8 +100,7 @@ public class DfUtil {
 	 * @return the simple name of the object
 	 */
 	public static String getSimpleName(EObject eObject) {
-		String name = EcoreHelper.getFeature(eObject, "name");
-		return getSimpleName(name);
+		return getSimpleName(getName(eObject));
 	}
 
 	/**

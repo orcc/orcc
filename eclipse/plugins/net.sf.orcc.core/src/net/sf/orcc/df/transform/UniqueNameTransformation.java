@@ -34,7 +34,6 @@ import java.util.Map;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.util.util.EcoreHelper;
 
 /**
  * This class defines a transformation that updates the name of all entities of
@@ -62,13 +61,13 @@ public class UniqueNameTransformation extends DfSwitch<Void> {
 
 	@Override
 	public Void caseVertex(Vertex vertex) {
-		String id = EcoreHelper.getFeature(vertex, "name");
+		String id = vertex.getLabel();
 		Integer num = identifiers.get(id);
 		if (num == null) {
 			identifiers.put(id, 0);
 		} else {
 			num++;
-			EcoreHelper.setFeature(vertex, "name", id + "_" + num);
+			vertex.setLabel(id + "_" + num);
 			identifiers.put(id, num);
 		}
 

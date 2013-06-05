@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
@@ -337,12 +338,9 @@ public class IrUtil {
 			e.printStackTrace();
 		}
 
-		URI uri = URI.createPlatformResourceURI(
-				outputFolder
-						.getFullPath()
-						.append(OrccUtil.getFile((String) EcoreHelper
-								.getFeature(entity, "name")))
-						.addFileExtension("ir").toString(), true);
+		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
+				.append(DfUtil.getFile(entity)).addFileExtension("ir")
+				.toString(), true);
 		return serializeActor(set, uri, entity);
 	}
 
@@ -357,10 +355,8 @@ public class IrUtil {
 	 */
 	public static boolean serializeActor(ResourceSet set, String outputFolder,
 			EObject entity) {
-		String pathName = outputFolder
-				+ File.separator
-				+ OrccUtil.getFile((String) EcoreHelper.getFeature(entity,
-						"name")) + ".ir";
+		String pathName = outputFolder + File.separator
+				+ DfUtil.getFile(entity) + ".ir";
 		URI uri = URI.createFileURI(pathName);
 		return serializeActor(set, uri, entity);
 	}
