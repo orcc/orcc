@@ -356,8 +356,8 @@ public class FrontendCli implements IApplication {
 	 */
 	private void writeIrFile(IFile calFile, Map<String, IFile> qnameFileMap) {
 
-		Frontend.instance.setOutputFolder(OrccUtil.getOutputFolder(calFile
-				.getProject()));
+		IFolder outFolder = OrccUtil.getOutputFolder(calFile.getProject());
+		Frontend.instance.setOutputFolder(outFolder);
 
 		Resource resource = EcoreHelper.getResource(resourceSet, calFile);
 
@@ -377,11 +377,13 @@ public class FrontendCli implements IApplication {
 		}
 
 		if (astEntity.getUnit() != null) {
-			System.out.println("Unit : " + calFile.getName() + " from project "
-					+ calFile.getProject().getName());
+			System.out.println(" Unit: " + calFile.getName() + " from project "
+					+ calFile.getProject().getName() + " built in folder "
+					+ outFolder.toString());
 		} else {
-			System.out.println("Actor : " + calFile.getName()
-					+ " from project " + calFile.getProject().getName());
+			System.out.println("Actor: " + calFile.getName() + " from project "
+					+ calFile.getProject().getName() + " built in folder "
+					+ outFolder.toString());
 		}
 
 		// Really write Actor IR
