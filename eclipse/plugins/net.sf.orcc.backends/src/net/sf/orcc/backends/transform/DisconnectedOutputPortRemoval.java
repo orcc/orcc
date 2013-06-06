@@ -61,6 +61,15 @@ public class DisconnectedOutputPortRemoval extends DfVisitor<Void> {
 	@Override
 	public Void caseInstance(Instance instance) {
 		if (instance.isActor()) {
+
+			disconnectedOutputPorts.clear();
+
+			EList<Port> outports = instance.getActor().getOutputs();
+			Set<Port> connectedOutPorts = instance.getOutgoingPortMap()
+					.keySet();
+
+			findDiscPorts(outports, connectedOutPorts);
+
 			return super.caseActor(instance.getActor());
 		}
 		return null;
@@ -68,15 +77,13 @@ public class DisconnectedOutputPortRemoval extends DfVisitor<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
+
 		disconnectedOutputPorts.clear();
 
 		EList<Port> outports = actor.getOutputs();
-
 		Set<Port> connectedOutPorts = actor.getOutgoingPortMap().keySet();
 
 		findDiscPorts(outports, connectedOutPorts);
-		outports.removeAll(disconnectedOutputPorts);
-
 		return super.caseActor(actor);
 	}
 
