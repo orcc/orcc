@@ -356,9 +356,6 @@ public class FrontendCli implements IApplication {
 	 */
 	private void writeIrFile(IFile calFile, Map<String, IFile> qnameFileMap) {
 
-		IFolder outFolder = OrccUtil.getOutputFolder(calFile.getProject());
-		Frontend.instance.setOutputFolder(outFolder);
-
 		Resource resource = EcoreHelper.getResource(resourceSet, calFile);
 
 		// Current actor to build
@@ -375,6 +372,9 @@ public class FrontendCli implements IApplication {
 				writeIrFile(file, qnameFileMap);
 			}
 		}
+
+		IFolder outFolder = OrccUtil.getOutputFolder(calFile.getProject());
+		Frontend.instance.setOutputFolder(outFolder);
 
 		if (astEntity.getUnit() != null) {
 			System.out.println(" Unit: " + calFile.getName() + " from project "
