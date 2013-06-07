@@ -93,6 +93,17 @@ public class Source extends GenericSource {
 			throw new OrccRuntimeException(msg, e);
 		}
 	}
+	
+	public static BigInteger source_readByte(){
+		try {
+			return BigInteger.valueOf(in.read());
+		} catch (IOException e) {
+			String msg = "I/O error when reading file \"" + inputStimulus
+					+ "\"";
+			throw new OrccRuntimeException(msg, e);
+		}
+		
+	}
 
 	public static void source_rewind() {
 		try {
