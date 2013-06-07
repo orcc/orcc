@@ -394,8 +394,8 @@ def script (String path)'''
 	'''
 	
 	def directive (String path)'''
-	set_directive_pipeline «instance.name»_scheduler
-	set_directive_pipeline «instance.name»_outside_FSM_scheduler
+	set_directive_inline -region -recursive «instance.name»_scheduler
+	set_directive_inline -region -recursive «instance.name»_outside_FSM_scheduler
 	
 	'''
 }
