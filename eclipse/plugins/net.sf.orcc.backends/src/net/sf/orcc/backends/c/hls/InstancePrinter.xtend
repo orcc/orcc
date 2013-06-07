@@ -394,15 +394,8 @@ def script (String path)'''
 	'''
 	
 	def directive (String path)'''
-	#set_directives
-	#config_dataflow -default_channel fifo -fifo_depth «fifoSize»
-	#set_directive_pipeline «instance.name»_scheduler
-	«FOR action : instance.actor.actions»
-		#set_directive_pipeline «action.name»
-	«ENDFOR»
-	«FOR function : instance.actor.procs»
-		#set_directive_pipeline «function.name»
-	«ENDFOR»
-	#config_bind -effort high
+	set_directive_pipeline «instance.name»_scheduler
+	set_directive_pipeline «instance.name»_outside_FSM_scheduler
+	
 	'''
 }
