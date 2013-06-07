@@ -124,8 +124,8 @@ public class HLSBackend extends CBackend {
 
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new Multi2MonoToken());
-		transformations.add(new DisconnectedOutputPortRemoval());
-		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
+		
+		//transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 		//transformations.add(new DivisionSubstitution());//don't work for HEVC
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -158,7 +158,7 @@ public class HLSBackend extends CBackend {
 
 		new BroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
-		//new DisconnectedOutputPortRemoval().doSwitch(network);
+		new DisconnectedOutputPortRemoval().doSwitch(network);
 	}
 
 	@Override
