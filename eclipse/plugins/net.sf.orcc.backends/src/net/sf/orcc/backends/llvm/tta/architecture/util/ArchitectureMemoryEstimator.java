@@ -51,7 +51,7 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
  */
 public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
-	final double ERROR_MARGIN = 0.4;
+	final double ERROR_MARGIN = 0.3;
 
 	/**
 	 * The class defines a Network visitor used to evaluate the memory needs of
