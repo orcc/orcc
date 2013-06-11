@@ -101,24 +101,23 @@ public class XsltTransformer {
 					// What we are doing here is solving the "href" URI and get
 					// an InputStream from it.
 					IPath path = new Path(href);
-					InputStream is;
 
 					if (path.isAbsolute()) {
 						// absolute path, just opens it
-						is = new FileInputStream(path.toOSString());
+						return new StreamSource(new FileInputStream(path
+								.toOSString()));
 					} else {
 						// relative path, a file that is relative to the
 						// "folder" path in this bundle.
 						path = folder.append(path);
-						is = FileLocator.openStream(bundle, path, false);
+						return new StreamSource(FileLocator.openStream(bundle,
+								path, false));
 					}
 
-					return new StreamSource(is);
 				} catch (IOException e) {
 					throw new TransformerException(e);
 				}
 			}
-
 		});
 
 		InputStream is = FileLocator.openStream(bundle, path, false);
