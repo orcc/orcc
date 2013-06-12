@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.ir.util;
 
-import static net.sf.orcc.ir.IrFactory.eINSTANCE;
-
 import java.math.BigInteger;
 import java.util.Iterator;
 
@@ -330,7 +328,8 @@ public class TypeUtil {
 				eltLubType = TypeUtil.getLub(eltLubType, t2);
 			}
 
-			return eINSTANCE.createTypeList(expr.getSize(), eltLubType);
+			return IrFactory.eINSTANCE.createTypeList(expr.getSize(),
+					eltLubType);
 		}
 
 		return null;
