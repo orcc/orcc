@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.cal.services;
 
-import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -79,7 +77,6 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -290,8 +287,7 @@ public class Typer extends CalSwitch<Type> {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
 		Type t1 = getType(expression.getLeft());
 		Type t2 = getType(expression.getRight());
-		return getTypeBinary(op, t1, t2, expression,
-				eINSTANCE.getExpressionBinary_Operator(), -1);
+		return getTypeBinary(op, t1, t2);
 	}
 
 	@Override
@@ -520,8 +516,7 @@ public class Typer extends CalSwitch<Type> {
 	 *            feature
 	 * @return the type of the binary expression, or <code>null</code>
 	 */
-	private Type getTypeBinary(OpBinary op, Type t1, Type t2, EObject source,
-			EStructuralFeature feature, int index) {
+	private Type getTypeBinary(OpBinary op, Type t1, Type t2) {
 		if (t1 == null || t2 == null) {
 			return null;
 		}
