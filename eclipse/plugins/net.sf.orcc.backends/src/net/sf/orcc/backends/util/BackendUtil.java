@@ -69,7 +69,8 @@ public class BackendUtil {
 	 * @return the next power of 2 after the value
 	 */
 	public static long quantizeUp(long value) {
-		return value == 0 ? 0 : 64 - Long.numberOfLeadingZeros(value - 1);
+		double tmp = Math.log(value) / Math.log(2.0);
+		return (long) Math.pow(2, Math.ceil(tmp));
 	}
 
 	/**
