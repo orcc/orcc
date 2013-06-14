@@ -49,28 +49,25 @@ You may have to write your own application. The TTA backend should support any R
   - A folder *_generate* that is used by the 
   - And a folder for each processor that contains the hardware description of the processor and the software code executed on it. 
   - Some others files such as the VHDL description of the top-level element of the design.
-- Finish the generation by executing the *generate* script (``generate [options] input_directory``) that run the TCE tools. The following options are available:
-  - ``-c``, ``--compile=[options]``: Compile the application from the generated LLVM assembly code into TTA binary
-  - ``-g``, ``--generate=[options]``: Generate the VHDL files of the TTA processors
-  - ``-d``, ``--debug``: Debug mode, generate extra files and print additionnal information
+- Finish the generation by executing the *generate* script that runs the TCE tools. Basically, you can compile your application with the command ``./libs/generate -c .``. 
+More details about the *generate* script can be found with the help, ``./libs/generate -h``.
 
 ## Simulate an execution
 
-The execution of the system can be quickly evaluated thanks to a cycle-accurate simulator, called TTANetSim, included in TCE. TTANetSim allows two kinds of simulation :
+If your application has been succesfully compiled, the execution of the system can be quickly evaluated thanks to a cycle-accurate simulator, called TTANetSim, included in TCE. TTANetSim allows two kinds of simulation :
 - The simulation of the whole platform, which can be launched by the command ``ttanetsim -n [PNDF file]`` with an optional input file ``-i [input file]``.
 - The simulation of a single processor in a standalone way, which can be launched by the command ``ttanetsim -n [PNDF file] -t [processor name]``, in order to evaluate the processor independantly. If the execution of the simulated processor depends on input tokens coming from another processor, then the FIFO channel can be simulated using the *trace* files, generated from the C backend, that have to be located in the ``trace/`` folder.
-
-Obviously, we assume that you have compile the application before simulate it.
 
 ## Profile an application
 
 You can accuratly profile the execution of an application using TTANetSim, in order to get some feedback about the cost of your actors:
-- 
+- Generate the application with the **Profile** option activated.
+- Run the simulation in profiling mode ``ttanetsim -n [PNDF file] -p``, the simulation should produce some profiling data.
+- Make the profiling data compatible with KCacheGrind [this](http://tce.cs.tut.fi/user_manual/TCE/node41.html#SECTION00714100000000000000).
+- Open the new produced files with KCacheGrind to analyse it.
 
 ## Synthesis the design
 
+- Then, you could generate the hardware description of your platform using ``./libs/generate -g .``.
 After a successfull generation of the hardware platform, you can synthesised it for your FPGA using your favorite software (ISE, Quartus, etc).
 
-## FAQ
-
-- 
