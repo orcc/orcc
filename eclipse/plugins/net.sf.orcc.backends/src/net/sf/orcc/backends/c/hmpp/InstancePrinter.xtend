@@ -76,10 +76,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	override caseBlockFor(BlockFor block) '''
-		«FOR attr : block.attributes.filter[name.equals("gridify")]»
+		«FOR attr : block.attributes.filter[it.name.equals("gridify")]»
 			#pragma hmppcg gridify(«attr.getValueAsString("params")»)
 		«ENDFOR»
-		«FOR attr : block.attributes.filter[!name.equals("gridify")]»
+		«FOR attr : block.attributes.filter[!it.name.equals("gridify")]»
 			«attr.printHmppPragma»
 		«ENDFOR»
 		«super.caseBlockFor(block)»
