@@ -2,6 +2,8 @@
 
 The TTA backend implements a full co-synthesis flow to execute an RVC-CAL application on a highly configurable embedded multi-core platform based on [Transport-Trigger Architecture](http://en.wikipedia.org/wiki/Transport_triggered_architecture).
 
+The TTA backend being highly experimental, you may need to update Orcc to its last development revision. To do so, use the [nightly update site](http://orcc.sourceforge.net/nightly/).
+
 ## Start with Orcc
 
 We assume that you have already [installed Orcc](http://orcc.sourceforge.net/getting-started/install-orcc/). Since this co-synthesis flow is quite complex to use, we recommend you to start by familiarize yourself to Orcc with the following tutorials:
@@ -16,21 +18,38 @@ The TTA backend uses an open-source toolset, called [TTA-based Co-design Environ
 - Download a specific branch of the TCE using Bazaar `bzr branch lp:~elldekaa/tce/Multiprocessor`.
 - Install the TCE as described in the installation procedure available in tce/tce/INSTALL. Since the TCE has been downloaded from the version control, you have to do the optional step 'Creating the build scripts' before building the TCE.
 - Do not forget to check that your environment is correcty setting up by running ``tce-selftest -v``.
- 
+
+If you do not install LLVM and TCE in the default path, you may need to put them in your $PATH and $LD_LIBRARY_PATH, or add it yourself.
+
+```
+export PATH=/opt/llvm/bin:$PATH
+export PATH=/opt/tce/bin:$PATH
+export LD_LIBRARY_PATH=/opt/llvm/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=/opt/tce/lib:${LD_LIBRARY_PATH}
+```
+
+## Write your own RVC-CAL application
+
+You may have to write your own application. The TTA backend should support any RVC-CAL application, but the simulator currently supports only a subset of CAL native functions:
+- The basic printing function, ``print`` and ``println``.
+- Some functions to acces an input file from the simulator, check the actor ``fr.irisa.common.Source`` for an example. Be careful, you need to import the *Source* unit from the System project ``import std.stdio.Source.*;``.
+- A function to get the number of cycle that occurs since the beginning of the simulation ``print_cyclecount()``. You need to import the *Simulation* unit from the Reasearch project ``import fr.irisa.common.Simulation.*;``
+
 ## Co-design an application
 
 - Generate an application, such as the 'HelloWorld' your write in the tutorial, using the TTA backend of Orcc. Several options are available :
-  - **Mapping** :
-  - **Reduce interconnections network** :
-  - **Profile** :
-  - **FIFO size** :
+  - **Mapping** : Set up your own partioning using an input XCF file (you can set up using the graphical interface as well, check the mapping tab).
+  - **Reduce interconnections network** : Try to map the FIFO channels on the same memory to reduce the connectivity between processor.
+  - **Profile** : Forbid the inlining of the actions in order to evaluate their cost with profiling tools.
+  - **Debug** : Debugging mode, the *printing* is not removed... Be careful with the performance, since printing is costly on the TTA processors.
+  - **FIFO size** : Set up the size of the FIFO channels.
 - Check the generated folder, it should be organized as follow:
-  - A folder 'actors' that contains the translation of the actors in LLVM assembly, 
-  - A folder 'libs' that contains the files needed to finish the generation of the design. For instance, a useful python script called 'generate' that helps you to use the TCE.
-  - A folder '_generate' that is used by the 
+  - A folder *actors* that contains the translation of the actors in LLVM assembly, 
+  - A folder *libs* that contains the files needed to finish the generation of the design. For instance, a useful python script called 'generate' that helps you to use the TCE.
+  - A folder *_generate* that is used by the 
   - And a folder for each processor that contains the hardware description of the processor and the software code executed on it. 
   - Some others files such as the VHDL description of the top-level element of the design.
-- Finish the generation by executing the 'generate' script (``generate [options] input_directory``) that run the TCE tools. The following options are available:
+- Finish the generation by executing the *generate* script (``generate [options] input_directory``) that run the TCE tools. The following options are available:
   - ``-c``, ``--compile=[options]``: Compile the application from the generated LLVM assembly code into TTA binary
   - ``-g``, ``--generate=[options]``: Generate the VHDL files of the TTA processors
   - ``-d``, ``--debug``: Debug mode, generate extra files and print additionnal information
@@ -43,18 +62,15 @@ The execution of the system can be quickly evaluated thanks to a cycle-accurate 
 
 Obviously, we assume that you have compile the application before simulate it.
 
+## Profile an application
+
+You can accuratly profile the execution of an application using TTANetSim, in order to get some feedback about the cost of your actors:
+- 
+
 ## Synthesis the design
 
 After a successfull generation of the hardware platform, you can synthesised it for your FPGA using your favorite software (ISE, Quartus, etc).
 
 ## FAQ
 
-- The TTA backend being highly experimental, you may need to update Orcc to its last development revision. To do so, use the [nightly update site](http://orcc.sourceforge.net/nightly/).
-- If you do not install LLVM and TCE in the default path, be sure to have them in your $PATH and $LD_LIBRARY_PATH, or add it yourself.
-
-```
-export PATH=/opt/llvm/bin:$PATH
-export PATH=/opt/tce/bin:$PATH
-export LD_LIBRARY_PATH=/opt/llvm/lib:${LD_LIBRARY_PATH}
-export LD_LIBRARY_PATH=/opt/tce/lib:${LD_LIBRARY_PATH}
-```
+- 
