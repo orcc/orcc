@@ -55,6 +55,7 @@ More details about the *generate* script can be found with the help, ``./libs/ge
 ## Simulate an execution
 
 If your application has been succesfully compiled, the execution of the system can be quickly evaluated thanks to a cycle-accurate simulator, called TTANetSim, included in TCE. TTANetSim allows two kinds of simulation :
+- First, you need to help the simulator to localize the native functions using the command ``export TCE_OSAL_PATH=path/to/libs/opset``.
 - The simulation of the whole platform, which can be launched by the command ``ttanetsim -n [PNDF file]`` with an optional input file ``-i [input file]``.
 - The simulation of a single processor in a standalone way, which can be launched by the command ``ttanetsim -n [PNDF file] -t [processor name]``, in order to evaluate the processor independantly. If the execution of the simulated processor depends on input tokens coming from another processor, then the FIFO channel can be simulated using the *trace* files, generated from the C backend, that have to be located in the ``trace/`` folder.
 
@@ -62,12 +63,13 @@ If your application has been succesfully compiled, the execution of the system c
 
 You can accuratly profile the execution of an application using TTANetSim, in order to get some feedback about the cost of your actors:
 - Generate the application with the **Profile** option activated.
-- Run the simulation in profiling mode ``ttanetsim -n [PNDF file] -p``, the simulation should produce some profiling data.
+- Obviously, you have to recompile your application (``./libs/generate -c .``).
+- Run the simulation in profiling mode with ``-p`` option.
+- Since the simulation is probably never ending alone, you need to exit it manually using ``CTRL-C`` command then ``q`` and ``Enter``.
 - Make the profiling data compatible with KCacheGrind [this](http://tce.cs.tut.fi/user_manual/TCE/node41.html#SECTION00714100000000000000).
 - Open the new produced files with KCacheGrind to analyse it.
 
 ## Synthesis the design
 
-- Then, you could generate the hardware description of your platform using ``./libs/generate -g .``.
-After a successfull generation of the hardware platform, you can synthesised it for your FPGA using your favorite software (ISE, Quartus, etc).
+You can generate the hardware description of your platform using ``./libs/generate -g .``. After a successfull generation of the hardware platform, you can synthesised it for your FPGA using your favorite software (ISE, Quartus, etc). Keep in mind that native functions are not supported on the FPGA...
 
