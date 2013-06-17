@@ -114,12 +114,10 @@ class SwActorPrinter extends InstancePrinter {
 			«FOR port : action.inputPattern.ports.notNative»
 				«val connection = incomingPortMap.get(port)»
 				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port))»
-				call void @read_end_«port.name»_«connection.getSafeId(port)»()
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
 					«port.updateVar(connection, action.outputPattern.getNumTokens(port))»
-					call void @write_end_«port.name»_«connection.getSafeId(port)»()
 				«ENDFOR»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.filter[native]»
@@ -153,6 +151,5 @@ class SwActorPrinter extends InstancePrinter {
 		}
 		return irs
 	}
-	
-	override protected printCallEndTokenFunctions() ''''''
+
 }
