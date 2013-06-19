@@ -712,26 +712,25 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	// TODO: simplify this
-	def protected declareStateVar(Var variable) '''
-		«variable.printAttributes»
-		«IF variable.initialized»
-			«IF ! variable.assignable»
-				«IF ! variable.type.list»
-					#define «variable.name» «variable.initialValue.doSwitch»
-				«ELSE»
-					static const «variable.declare» = «variable.initialValue.doSwitch»;
-				«ENDIF»
-			«ELSE»
-				static «variable.declare» = «variable.initialValue.doSwitch»;
-				«IF geneticAlgo»
-					static «variable.type.doSwitch» «variable.indexedName»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
-				«ENDIF»
+	def protected declareStateVar(Var variable) {
+		val varDecl =
+			if(variable.initialized && !variable.assignable && !variable.type.list) {
+				'''#define «variable.name» «variable.initialValue.doSwitch»'''
+			} else {				
+				// else branch are important here, to avoid a null value in the list of concat terms 
+				val const = if(!variable.assignable) '''const ''' else ''''''
+				val init = if(variable.initialized) ''' = «variable.initialValue.doSwitch»''' else ''''''
+				
+				'''static «const»«variable.declare»«init»;'''
+			}
+		'''
+			«variable.printAttributes»
+			«varDecl»
+			«IF geneticAlgo && variable.initialized && variable.assignable»
+				static «variable.type.doSwitch» «variable.indexedName»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
 			«ENDIF»
-		«ELSE»
-			static «variable.declare»;
-		«ENDIF»
-	'''
+		'''
+	}
 	
 	def private getReaderId(Port port) {
 		if(incomingPortMap.containsKey(port)) {
