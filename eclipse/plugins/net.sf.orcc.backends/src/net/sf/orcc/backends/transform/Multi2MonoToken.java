@@ -1308,25 +1308,18 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private void verifVisitedActions(Action action, State source, State target) {
 		String actionName = action.getName();
-		if (visitedActionsNames.isEmpty()) {
-			// fill lists the first time
+		if (visitedActionsNames.contains(actionName)) {
+			// if action is visited then it is replaced by not transformed
+			// action
+			visitedRenameIndex++;
+			int visitedIndex = actionNamePosition(visitedActionsNames,
+					actionName);
+			Action updateAction = visitedActions.get(visitedIndex);
+			updateFSM(updateAction, action, source, target);
+		} else {
 			visitedActionsNames.add(actionName);
 			visitedActions.add(IrUtil.copy(action));
 			createActionsSet(action, source, target);
-		} else {
-			if (visitedActionsNames.contains(actionName)) {
-				// if action is visited then it is replaced by not transformed
-				// action
-				visitedRenameIndex++;
-				int visitedIndex = actionNamePosition(visitedActionsNames,
-						actionName);
-				Action updateAction = visitedActions.get(visitedIndex);
-				updateFSM(updateAction, action, source, target);
-			} else {
-				visitedActionsNames.add(actionName);
-				visitedActions.add(IrUtil.copy(action));
-				createActionsSet(action, source, target);
-			}
 		}
 	}
 
