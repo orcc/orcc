@@ -57,7 +57,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
@@ -1318,7 +1317,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			updateFSM(updateAction, action, source, target);
 		} else {
 			visitedActionsNames.add(actionName);
-			visitedActions.add(IrUtil.copy(action));
+			visitedActions.add(action);
 			createActionsSet(action, source, target);
 		}
 	}
