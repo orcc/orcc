@@ -56,7 +56,8 @@ import org.eclipse.emf.common.util.EMap
 
 class TceProcessorPrinter extends TTAPrinter {
 	
-	EMap<String, Implementation> hwDb;
+	EMap<String, Implementation> hwDb
+	final int MAX_ADDRESS = Integer::MAX_VALUE;
 	
 	new(EMap<String, Implementation> hwDb) {
 		this.hwDb = hwDb;
@@ -273,16 +274,27 @@ class TceProcessorPrinter extends TTAPrinter {
 		</socket>
 		'''
 	
-	def private getAdf(Memory addressSpace, Processor processor, boolean isRAM) 
+	def private getAdf(Memory addressSpace, Processor processor, boolean isRAM) {
+		val maxAddress = 
+			if(addressSpace.maxAddress < 0 || addressSpace.maxAddress > MAX_ADDRESS) {
+				OrccLogger::warnln("Address-space '" 
+					+ addressSpace.name + "' of " + processor.name 
+					+ " exceeds the maximal size."
+				)
+				MAX_ADDRESS
+			} else {
+				addressSpace.maxAddress
+			}
 		'''
 		<address-space name="«addressSpace.name»">
 			<width>«addressSpace.wordWidth»</width>
 			<min-address>«addressSpace.minAddress»</min-address>
-			<max-address>«addressSpace.maxAddress»</max-address>
+			<max-address>«maxAddress»</max-address>
 			<shared-memory>«addressSpace.shared»</shared-memory>
 			«IF(isRAM)»<numerical-id>«processor.memToAddrSpaceIdMap.get(addressSpace)»</numerical-id>«ENDIF»
 		</address-space>
 		'''
+	}
 		
 	def private getAdf(Segment segment) 
 		'''
