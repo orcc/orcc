@@ -253,11 +253,6 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	}
 
 	@Override
-	public boolean isCall() {
-		return true;
-	}
-
-	@Override
 	public boolean isInstCall() {
 		return true;
 	}

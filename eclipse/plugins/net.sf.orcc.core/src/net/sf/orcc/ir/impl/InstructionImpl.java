@@ -202,36 +202,6 @@ public abstract class InstructionImpl extends AttributableImpl implements
 	}
 
 	@Override
-	public boolean isAssign() {
-		return false;
-	}
-
-	@Override
-	public boolean isCall() {
-		return false;
-	}
-
-	@Override
-	public boolean isLoad() {
-		return false;
-	}
-
-	@Override
-	public boolean isPhi() {
-		return false;
-	}
-
-	@Override
-	public boolean isReturn() {
-		return false;
-	}
-
-	@Override
-	public boolean isStore() {
-		return false;
-	}
-
-	@Override
 	public boolean isInstAssign() {
 		return false;
 	}
