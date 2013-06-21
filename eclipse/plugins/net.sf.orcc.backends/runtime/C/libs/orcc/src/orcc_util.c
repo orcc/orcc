@@ -134,8 +134,8 @@ static const char *usage =
 	"-n                         Ensure that the display will not be initialized (useful on non-graphic terminals).\n"
 	"-o <reference file>        Check the output stream with a reference file (usually YUV).\n"
 	"-f <nb frames to decode>   Set the number of frames to decode before closing the application.\n"
-	"-l <nb input reading>      Set the number of times the input file is read before closing the application.\n";
-	"-g <output file>           Specify an output file for the genetic algorithm.\n"
+	"-l <nb input reading>      Set the number of times the input file is read before closing the application.\n"
+	"-g <output file>           Specify an output file for the genetic algorithm.\n";
 	// We need to document folowing options:
 	//"-w <file>                  TBD...\n"
 
