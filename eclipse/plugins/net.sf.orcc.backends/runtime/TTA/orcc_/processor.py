@@ -193,7 +193,7 @@ class Processor:
     def simulate(self):
         if len(self.inputs)>0 and len(self.outputs)>0:
             log_file = open(self.id+'.log', 'w')
-            print "Simulating %s" % self.id ,
+            print "Simulating %s" % self.id
             retcode=subprocess.call(["ttanetsim", "-n", "top.pndf", "-t", self.id], stdout=log_file)
             return retcode
         else:
