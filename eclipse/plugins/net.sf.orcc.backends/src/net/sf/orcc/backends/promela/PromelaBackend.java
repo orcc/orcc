@@ -89,13 +89,13 @@ public class PromelaBackend extends AbstractBackend {
 	 */
 	public PromelaBackend() {
 		renameMap = new HashMap<String, String>();
-		renameMap.put("abs", "abs_");
-		renameMap.put("getw", "getw_");
-		renameMap.put("index", "index_");
-		renameMap.put("max", "max_");
-		renameMap.put("min", "min_");
-		renameMap.put("select", "select_");
-		renameMap.put("len", "len_");
+		renameMap.put("abs", "abs_prml");
+		renameMap.put("getw", "getw_prml");
+		renameMap.put("index", "index_prml");
+		renameMap.put("max", "max_prml");
+		renameMap.put("min", "min_prml");
+		renameMap.put("select", "select_prml");
+		renameMap.put("len", "len_prml");
 	}
 
 	@Override

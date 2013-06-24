@@ -59,7 +59,7 @@ abstract class PromelaTemplate extends CTemplate {
 		'''int'''
 
 	override caseTypeUint(TypeUint type) 
-		'''uint'''
+		'''int'''
 
 	override caseTypeFloat(TypeFloat type) {
 		if (type.size == 64) '''double'''
