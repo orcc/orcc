@@ -57,7 +57,7 @@ import org.eclipse.emf.common.util.EMap
 class TceProcessorPrinter extends TTAPrinter {
 	
 	EMap<String, Implementation> hwDb
-	final int MAX_ADDRESS = Integer::MAX_VALUE;
+	val MAX_ADDRESS = Integer::MAX_VALUE;
 	
 	new(EMap<String, Implementation> hwDb) {
 		this.hwDb = hwDb;
