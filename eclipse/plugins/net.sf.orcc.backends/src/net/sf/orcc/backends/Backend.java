@@ -46,15 +46,6 @@ public interface Backend {
 	void compile();
 
 	/**
-	 * Export runtime library used by source produced. Should be overridden by
-	 * back-ends that produce code source which need third party libraries at
-	 * runtime.
-	 * 
-	 * @return <code>true</code> if the libraries were correctly exported
-	 */
-	boolean exportRuntimeLibrary();
-
-	/**
 	 * Register options set on eclipse "Run configuration" or command line to
 	 * use it while code generation process.
 	 * 

@@ -77,21 +77,21 @@ public class HLSBackend extends CBackend {
 	private String VHDLTestBenchPath;
 	private String coSimTestBenchPath;
 	private String commandPath;
-	
+
 	/**
 	 * Configuration mapping
 	 */
 	protected Map<String, List<Instance>> targetToInstancesMap;
-	
+
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		return false;
 	}
 
 	@Override
 	protected void doInitializeOptions() {
 		srcPath = path + File.separator + "HLSBackend";
-		VHDLTestBenchPath= srcPath + File.separator + "VHDLTestBENCH";
+		VHDLTestBenchPath = srcPath + File.separator + "VHDLTestBENCH";
 		coSimTestBenchPath = srcPath + File.separator + "coSimTestBench";
 		commandPath = srcPath + File.separator + "batchCommand";
 	}
@@ -122,9 +122,9 @@ public class HLSBackend extends CBackend {
 
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new Multi2MonoToken());
-		
-		//transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
-		//transformations.add(new DivisionSubstitution());//don't work for HEVC
+
+		// transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
+		// transformations.add(new DivisionSubstitution());//don't work for HEVC
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			if (debug) {
@@ -188,8 +188,7 @@ public class HLSBackend extends CBackend {
 		}
 
 		OrccLogger.trace("Printing network testbench... ");
-		if (new NetworkTestBenchPrinter(network, options)
-				.print(srcPath) > 0) {//VHDLTestBenchPath
+		if (new NetworkTestBenchPrinter(network, options).print(srcPath) > 0) {// VHDLTestBenchPath
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");

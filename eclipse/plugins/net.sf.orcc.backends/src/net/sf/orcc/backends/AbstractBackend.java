@@ -532,8 +532,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @return <code>true</code> if the libraries were correctly exported
 	 */
-	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		return false;
 	}
 
