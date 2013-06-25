@@ -122,22 +122,22 @@ static char *program;
 static const char *usage =
 	"\nUsage: %s [arguments]\n"
 	"Mandatory arguments:\n"
-	"-i <file>                  Input stimulus file.\n"
+	"-i <file>                  Specify an input file.\n"
+	"-d <directory>             Specify an input directory if the application requires several input files.\n"
 
 	"\nOptional arguments:\n"
-	"-n                         Ensure display will not be initialized (useful on non-graphic terminals).\n"
-	"-o <file>                  Output comparaison file.\n"
-	"-d <directory>             Directory containing input files (if application is multi-input.\n"
-	"-m <mapping file>          Xcf mapping file, to define actors/core mapping.\n"
-	// We need to document folowing options:
-	//"-w <file>                  TBD...\n"
-	//"-g <???>                   Output genetic: TBD...\n"
+	"-m <mapping file>          Define actors partitioning on multi-core platform using a mapping file following the XCF format.\n"
+	// "-t <trace directory>       Specify an output directory for the FIFO trace files.\n"
 
 	"\nOther specific arguments:\n"
-	"Depending on how the application has been designed, one of these arguments can be used. If none of them is set,\n"
-	"the application should not stop its execution itself.\n"
-	"-f <nb frames to decode>   Number of frames to decode before application close.\n"
-	"-l <nb input reading>      Number of times input stimulus is read before application close.\n";
+	"Depending on how the application has been designed, one of these arguments can be used.\n"
+	"-n                         Ensure that the display will not be initialized (useful on non-graphic terminals).\n"
+	"-o <reference file>        Check the output stream with a reference file (usually YUV).\n"
+	"-f <nb frames to decode>   Set the number of frames to decode before closing the application.\n"
+	"-l <nb input reading>      Set the number of times the input file is read before closing the application.\n"
+	"-g <output file>           Specify an output file for the genetic algorithm.\n";
+	// We need to document folowing options:
+	//"-w <file>                  TBD...\n"
 
 void print_usage() {
 	printf(usage, program);

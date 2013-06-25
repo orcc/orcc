@@ -95,8 +95,8 @@ int clean_cache(int size);
 extern float computePartialFps();
 extern void backupPartialStartInfo();
 extern void backupPartialEndInfo();
-extern void activeFpsPrinting();
-extern void removeFpsPrinting();
+extern void active_fps_printing();
+extern void remove_fps_printing();
 extern void display_close();
 
 // Source functions
