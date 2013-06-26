@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
@@ -110,6 +111,58 @@ public class IrUtil {
 		}
 	}
 
+	/**
+	 * Add the given block before the given expression. If the expression
+	 * is contained by an instruction in a basic block, this basic block is split to insert 
+	 * the block in the right place. Else the block is put after the previous block of the block
+	 * containing the expression.
+	 * Return <code>true</code> if the given instruction
+	 * has split the current basic block.
+	 *  
+	 * @param expression
+	 *            an expression
+	 * @param block
+	 *            the block to add before the given expression
+	 * @return <code>true</code> if the given block is added in the
+	 *         current block
+	 */
+	public static boolean addBlockBeforeExpr(Expression expression,
+			Block block) {
+		Instruction containingInst = EcoreHelper.getContainerOfType(expression,
+				Instruction.class);
+		Block containingBlock = EcoreHelper.getContainerOfType(expression,
+				Block.class);
+		if (containingInst != null) {
+			if (containingInst.isInstPhi() && isWhileJoinBlock(containingBlock)) {
+				BlockWhile blockWhile = EcoreHelper.getContainerOfType(
+						containingBlock, BlockWhile.class);
+				addBlockBeforeBlock(block, blockWhile);
+				return false;
+			} else {
+				List<Instruction> instructions = EcoreHelper
+						.getContainingList(containingInst);
+				
+				BlockBasic blockBasic = IrFactory.eINSTANCE.createBlockBasic();
+
+				// Split the basic block
+				blockBasic.getInstructions().addAll(instructions.subList(0, instructions.indexOf(containingInst)));
+				addBlockBeforeBlock(blockBasic, containingBlock);
+				addBlockBeforeBlock(block, containingBlock);
+				return true;
+			}
+		} else {
+			// The given expression is contained in the condition of If/While
+			addBlockBeforeBlock(block, containingBlock);
+			return false;
+		}
+	}
+	
+	private static void addBlockBeforeBlock(Block newBlock,
+			Block block) {
+		List<Block> blocks = EcoreHelper.getContainingList(block);
+		blocks.add(blocks.indexOf(block), newBlock);
+	}
+	
 	private static void addToPreviousBlockBasic(Block block,
 			Instruction instruction) {
 		List<Block> blocks = EcoreHelper.getContainingList(block);
@@ -337,19 +390,16 @@ public class IrUtil {
 			e.printStackTrace();
 		}
 
-		URI uri = URI.createPlatformResourceURI(
-				outputFolder
-						.getFullPath()
-						.append(OrccUtil.getFile((String) EcoreHelper
-								.getFeature(entity, "name")))
-						.addFileExtension("ir").toString(), true);
+		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
+				.append(DfUtil.getFile(entity)).addFileExtension("ir")
+				.toString(), true);
 		return serializeActor(set, uri, entity);
 	}
 
 	/**
 	 * Serializes the given entity to the given output folder.
 	 * 
-	 * @param outputFolder
+	 * @param outputFolderaddBlockBeforeExpr
 	 *            output folder
 	 * @param entity
 	 *            an entity
@@ -357,10 +407,8 @@ public class IrUtil {
 	 */
 	public static boolean serializeActor(ResourceSet set, String outputFolder,
 			EObject entity) {
-		String pathName = outputFolder
-				+ File.separator
-				+ OrccUtil.getFile((String) EcoreHelper.getFeature(entity,
-						"name")) + ".ir";
+		String pathName = outputFolder + File.separator
+				+ DfUtil.getFile(entity) + ".ir";
 		URI uri = URI.createFileURI(pathName);
 		return serializeActor(set, uri, entity);
 	}

@@ -473,4 +473,9 @@ public class EntityImpl extends AttributableImpl implements Entity {
 		return result.toString();
 	}
 
+	@Override
+	public void update() {
+		// sub-classes should override
+	}
+
 } // EntityImpl

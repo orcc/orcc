@@ -42,6 +42,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.DeadVariableRemoval;
+import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.DivisionSubstitution;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.Inliner;
@@ -51,9 +52,9 @@ import net.sf.orcc.backends.transform.ListFlattener;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -132,6 +133,7 @@ public class CBackend extends AbstractBackend {
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
+		transformations.add(new DisconnectedOutputPortRemoval());
 
 		// If "-t" option is passed to command line, apply additional
 		// transformations
@@ -240,7 +242,7 @@ public class CBackend extends AbstractBackend {
 					mapping);
 		}
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
-			new Mapping().print(srcPath, network, mapping);
+			new Mapping(network, mapping).print(srcPath);
 		}
 	}
 
@@ -251,7 +253,7 @@ public class CBackend extends AbstractBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		boolean exportLibrary = !getAttribute(NO_LIBRARY_EXPORT, false);
 
 		if (exportLibrary) {

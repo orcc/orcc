@@ -42,8 +42,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.df.Actor;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -318,29 +316,6 @@ public class OrccUtil {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Returns the file name that corresponds to the qualified name of the
-	 * actor/unit.
-	 * 
-	 * @param entity
-	 *            an actor/unit
-	 * @return the file name that corresponds to the qualified name of the actor
-	 */
-	public static String getFile(String name) {
-		return name.replace('.', '/');
-	}
-
-	/**
-	 * Returns the folder that corresponds to the package of the given actor.
-	 * 
-	 * @param actor
-	 *            an actor
-	 * @return the folder that corresponds to the package of the given actor
-	 */
-	public static String getFolder(Actor actor) {
-		return actor.getPackage().replace('.', '/');
 	}
 
 	/**

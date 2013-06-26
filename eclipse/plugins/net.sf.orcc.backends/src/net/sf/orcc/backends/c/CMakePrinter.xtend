@@ -36,7 +36,6 @@ import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate CMakeList.txt content
-
  * 
  * @author Antoine Lorence
  */

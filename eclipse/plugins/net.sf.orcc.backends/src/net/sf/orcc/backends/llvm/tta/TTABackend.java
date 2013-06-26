@@ -45,8 +45,10 @@ import net.sf.orcc.backends.llvm.tta.transform.ComplexHwOpDetector;
 import net.sf.orcc.backends.llvm.tta.transform.PrintRemoval;
 import net.sf.orcc.backends.llvm.tta.transform.StringTransformation;
 import net.sf.orcc.backends.transform.CastAdder;
+import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
+import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.FPGA;
@@ -143,7 +145,10 @@ public class TTABackend extends LLVMBackend {
 					+ "performance could appear due to printing call.");
 		}
 
+		visitors.add(new DisconnectedOutputPortRemoval());
+
 		visitors.add(new TypeResizer(true, true, false, true));
+		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
 		visitors.add(new DfVisitor<Void>(new SSATransformation()));
 		visitors.add(new StringTransformation());
 		visitors.add(new RenameTransformation(this.renameMap));
@@ -180,8 +185,11 @@ public class TTABackend extends LLVMBackend {
 		}
 
 		// Compute the actor mapping
-		computedMapping = new Mapping(true);
-		computedMapping.compute(network, mapping);
+		if (importXcfFile) {
+			computedMapping = new Mapping(network, xcfFile);
+		} else {
+			computedMapping = new Mapping(network, mapping, true);
+		}
 
 		// Build the design from the mapping
 		design = new ArchitectureBuilder().build(network, configuration,
@@ -199,7 +207,7 @@ public class TTABackend extends LLVMBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
 			OrccLogger.trace("Export library files into " + libPath + "... ");

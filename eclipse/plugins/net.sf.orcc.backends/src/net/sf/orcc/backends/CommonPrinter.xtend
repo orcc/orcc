@@ -36,6 +36,7 @@ import net.sf.orcc.util.OrccLogger
 import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
 import org.eclipse.emf.ecore.EObject
+import net.sf.orcc.ir.Procedure
 
 /**
  * Define commons methods for all backends printers
@@ -275,8 +276,15 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	/**
 	 * Filter ports, and return only thus which are not native as a list
 	 */
-	def protected getNotNative(List<Port> ports) {
+	def protected getNotNative(Iterable<? extends Port> ports) {
 		ports.filter[!native]
+	}
+	
+	/**
+	 * Filter procedures, and return only thus which are not native as a list
+	 */
+	def protected getNotNativeProcs(Iterable<? extends Procedure> procs) {
+		procs.filter[!native]
 	}
 	
 	/**

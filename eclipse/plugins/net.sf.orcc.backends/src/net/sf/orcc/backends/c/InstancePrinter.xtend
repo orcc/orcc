@@ -39,7 +39,6 @@ import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.DfFactory
-import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
@@ -228,8 +227,8 @@ class InstancePrinter extends CTemplate {
 		«ELSE»
 			«actor.printAttributes»
 		«ENDIF»
-		
 		«IF newSchedul»
+		
 			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
 		«ENDIF»
 		
@@ -237,81 +236,99 @@ class InstancePrinter extends CTemplate {
 		// Instance
 		extern struct actor_s «name»;
 		
-		////////////////////////////////////////////////////////////////////////////////
-		// Input FIFOs
-		«FOR port : actor.inputs»
-			«if (incomingPortMap.get(port) != null) "extern "»struct fifo_«port.type.doSwitch»_s *«port.fullName»;
-		«ENDFOR»
-		«FOR port : actor.inputs»
-			static unsigned int index_«port.name»;
-			static unsigned int numTokens_«port.name»;
-			#define NUM_READERS_«port.name» «port.numReaders»
-			#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
-			#define tokens_«port.name» «port.fullName»->contents
-			
-		«ENDFOR»
-		«IF enableTrace»
+		«IF !actor.inputs.nullOrEmpty»
+			////////////////////////////////////////////////////////////////////////////////
+			// Input FIFOs
 			«FOR port : actor.inputs»
-				FILE *file_«port.name»;
+				«if (incomingPortMap.get(port) != null) "extern "»struct fifo_«port.type.doSwitch»_s *«port.fullName»;
 			«ENDFOR»
-		«ENDIF»
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// Predecessors
-		«FOR port : actor.inputs»
-			«IF incomingPortMap.get(port) != null»
-				extern struct actor_s «incomingPortMap.get(port).source.label»;
-			«ENDIF»
-		«ENDFOR»
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// Output FIFOs
-		«FOR port : actor.outputs.filter[! native]»
-			extern struct fifo_«port.type.doSwitch»_s *«port.fullName»;
-		«ENDFOR»
-		«FOR port : actor.outputs.filter[! native]»
-			static unsigned int index_«port.name»;
-			static unsigned int numFree_«port.name»;
-			#define NUM_READERS_«port.name» «outgoingPortMap.get(port).size»
-			#define SIZE_«port.name» «outgoingPortMap.get(port).get(0).sizeOrDefaultSize»
-			#define tokens_«port.name» «port.fullName»->contents
 			
-		«ENDFOR»
-		«IF enableTrace»
-			«FOR port : actor.outputs»
-				FILE *file_«port.name»;
+			////////////////////////////////////////////////////////////////////////////////
+			// Input Fifo control variables 
+			«FOR port : actor.inputs»
+				static unsigned int index_«port.name»;
+				static unsigned int numTokens_«port.name»;
+				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
+				#define tokens_«port.name» «port.fullName»->contents
+				
 			«ENDFOR»
-		«ENDIF»
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// Successors
-		«FOR port : actor.outputs»
-			«FOR successor : outgoingPortMap.get(port)»
-				extern struct actor_s «successor.target.label»;
-			«ENDFOR»
-		«ENDFOR»
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// Parameter values of the instance
-		«IF instance != null»
-			«FOR arg : instance.arguments»
-				«IF arg.value.exprList»
-					static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
-				«ELSE»
-					#define «arg.variable.name» «arg.value.doSwitch»
+			«IF enableTrace»
+				////////////////////////////////////////////////////////////////////////////////
+				// Trace files declaration (in)
+				«FOR port : actor.inputs»
+					FILE *file_«port.name»;
+				«ENDFOR»
+				
+			«ENDIF»
+			////////////////////////////////////////////////////////////////////////////////
+			// Predecessors
+			«FOR port : actor.inputs»
+				«IF incomingPortMap.get(port) != null»
+					extern struct actor_s «incomingPortMap.get(port).source.label»;
 				«ENDIF»
 			«ENDFOR»
-		«ELSE»
-			«FOR variable : actor.parameters»
+
+		«ENDIF»
+		«IF !actor.outputs.filter[! native].nullOrEmpty»
+			////////////////////////////////////////////////////////////////////////////////
+			// Output FIFOs
+			«FOR port : actor.outputs.filter[! native]»
+				extern struct fifo_«port.type.doSwitch»_s *«port.fullName»;
+			«ENDFOR»
+			
+			////////////////////////////////////////////////////////////////////////////////
+			// Output Fifo control variables 
+			«FOR port : actor.outputs.filter[! native]»
+				static unsigned int index_«port.name»;
+				static unsigned int numFree_«port.name»;
+				#define NUM_READERS_«port.name» «outgoingPortMap.get(port).size»
+				#define SIZE_«port.name» «outgoingPortMap.get(port).get(0).sizeOrDefaultSize»
+				#define tokens_«port.name» «port.fullName»->contents
+				
+			«ENDFOR»
+			«IF enableTrace»
+				////////////////////////////////////////////////////////////////////////////////
+				// Trace files declaration (out)
+				«FOR port : actor.outputs.filter[! native]»
+					FILE *file_«port.name»;
+				«ENDFOR»
+
+			«ENDIF»
+			////////////////////////////////////////////////////////////////////////////////
+			// Successors
+			«FOR port : actor.outputs»
+				«FOR successor : outgoingPortMap.get(port)»
+					extern struct actor_s «successor.target.label»;
+				«ENDFOR»
+			«ENDFOR»
+
+		«ENDIF»
+		«IF (instance != null && !instance.arguments.nullOrEmpty) || !actor.parameters.nullOrEmpty»
+			////////////////////////////////////////////////////////////////////////////////
+			// Parameter values of the instance
+			«IF instance != null»
+				«FOR arg : instance.arguments»
+					«IF arg.value.exprList»
+						static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
+					«ELSE»
+						#define «arg.variable.name» «arg.value.doSwitch»
+					«ENDIF»
+				«ENDFOR»
+			«ELSE»
+				«FOR variable : actor.parameters»
+					«variable.declareStateVar»
+				«ENDFOR»
+			«ENDIF»
+			
+		«ENDIF»
+		«IF !actor.stateVars.nullOrEmpty»
+			////////////////////////////////////////////////////////////////////////////////
+			// State variables of the actor
+			«FOR variable : actor.stateVars»
 				«variable.declareStateVar»
 			«ENDFOR»
+			
 		«ENDIF»
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// State variables of the actor
-		«FOR variable : actor.stateVars»
-			«variable.declareStateVar»
-		«ENDFOR»
 		«IF actor.hasFsm»
 			////////////////////////////////////////////////////////////////////////////////
 			// Initial FSM state of the actor
@@ -328,6 +345,7 @@ class InstancePrinter extends CTemplate {
 			};
 			
 			static enum states _FSM_state;
+
 		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
@@ -335,7 +353,7 @@ class InstancePrinter extends CTemplate {
 			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]»);
 		«ENDFOR»
 		
-		«FOR proc : actor.procs.filter[!native]»
+		«FOR proc : actor.procs.notNativeProcs»
 			«proc.print»
 		«ENDFOR»
 		
@@ -351,7 +369,7 @@ class InstancePrinter extends CTemplate {
 			«port.readTokensFunctions»
 		«ENDFOR»
 		
-		«FOR port : actor.outputs.filter[!native]»
+		«FOR port : actor.outputs.notNative»
 			«port.writeTokensFunctions»
 		«ENDFOR»
 		
@@ -387,7 +405,7 @@ class InstancePrinter extends CTemplate {
 				«FOR port : actor.inputs»
 					read_end_«port.name»();
 				«ENDFOR»
-				«FOR port : actor.outputs.filter[!native]»
+				«FOR port : actor.outputs.notNative»
 					write_end_«port.name»();
 				«ENDFOR»
 				«IF actor.inputs.nullOrEmpty && actor.outputs.nullOrEmpty »
@@ -398,11 +416,9 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 	
-	/******************************************
-	 * 
-	 * FSM
-	 *
-	 *****************************************/
+	//========================================
+	//                  FSM
+	//========================================
 	def protected printFsm() '''
 		«IF ! actor.actionsOutsideFsm.empty»
 			«inline»void «name»_outside_FSM_scheduler(struct schedinfo_s *si) {
@@ -445,7 +461,7 @@ class InstancePrinter extends CTemplate {
 			«FOR port : actor.inputs»
 				read_end_«port.name»();
 			«ENDFOR»
-			«FOR port : actor.outputs.filter[!native]»
+			«FOR port : actor.outputs.notNative»
 				write_end_«port.name»();
 			«ENDFOR»
 		}
@@ -511,7 +527,7 @@ class InstancePrinter extends CTemplate {
 		«FOR port : actor.inputs»
 			read_«port.name»();
 		«ENDFOR»
-		«FOR port : actor.outputs.filter[!native]»
+		«FOR port : actor.outputs.notNative»
 			write_«port.name»();
 		«ENDFOR»
 	'''
@@ -535,18 +551,40 @@ class InstancePrinter extends CTemplate {
 			// no read_end/write_end here!
 			return;
 		}
+		
+		«IF(geneticAlgo)»
+			void «name»_reinitialize(struct schedinfo_s *si) {
+				int i = 0;
+				«FOR variable : actor.stateVars»
+					«IF variable.assignable && variable.initialized»
+						«IF !variable.type.list»
+							«variable.indexedName» = «variable.initialValue.doSwitch»;
+						«ELSE»
+							memcpy(«variable.indexedName», «variable.indexedName»_backup, sizeof(«variable.indexedName»_backup));
+						«ENDIF»
+					«ENDIF»
+				«ENDFOR»
+				«IF actor.hasFsm»
+					/* Set initial state to current FSM state */
+					_FSM_state = my_state_«actor.fsm.initialState.name»;
+				«ENDIF»
+				«IF !actor.initializes.nullOrEmpty»
+					«actor.initializes.printActions»
+				«ENDIF»
+				
+			finished:
+				// no read_end/write_end here!
+				return;
+			}
+		«ENDIF»
 	'''
 	
 	def private checkConnectivy() {
-		for(port : actor.inputs) {
-			if(incomingPortMap.get(port) == null) {
-				OrccLogger::noticeln("["+name+"] Input port "+port.name+" not connected.")
-			}
+		for(port : actor.inputs.filter[!inputConneted]) {
+			OrccLogger::noticeln("["+name+"] Input port "+port.name+" not connected.")
 		}
-		for(port : actor.outputs) {
-			if(outgoingPortMap.get(port) == null) {
-				OrccLogger::noticeln("["+name+"] Output port "+port.name+" not connected.")
-			}
+		for(port : actor.outputs.filter[!outputConnected]) {
+			OrccLogger::noticeln("["+name+"] Output port "+port.name+" not connected.")
 		}
 	}
 	
@@ -694,23 +732,25 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	// TODO : simplify this :
-	def protected declareStateVar(Var variable) '''
-		«variable.printAttributes»
-		«IF variable.initialized»
-			«IF ! variable.assignable»
-				«IF ! variable.type.list»
-					#define «variable.name» «variable.initialValue.doSwitch»
-				«ELSE»
-					static const «variable.declare» = «variable.initialValue.doSwitch»;
-				«ENDIF»
-			«ELSE»
-				static «variable.declare» = «variable.initialValue.doSwitch»;
+	def protected declareStateVar(Var variable) {
+		val varDecl =
+			if(variable.initialized && !variable.assignable && !variable.type.list) {
+				'''#define «variable.name» «variable.initialValue.doSwitch»'''
+			} else {				
+				// else branch are important here, to avoid a null value in the list of concat terms 
+				val const = if(!variable.assignable) '''const ''' else ''''''
+				val init = if(variable.initialized) ''' = «variable.initialValue.doSwitch»''' else ''''''
+				
+				'''static «const»«variable.declare»«init»;'''
+			}
+		'''
+			«variable.printAttributes»
+			«varDecl»
+			«IF geneticAlgo && variable.initialized && variable.assignable»
+				static «variable.type.doSwitch» «variable.indexedName»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
 			«ENDIF»
-		«ELSE»
-			static «variable.declare»;
-		«ENDIF»
-	'''
+		'''
+	}
 	
 	def private getReaderId(Port port) {
 		if(incomingPortMap.containsKey(port)) {
@@ -722,41 +762,27 @@ class InstancePrinter extends CTemplate {
 
 	def protected fullName(Port port)
 		'''«name»_«port.name»'''
-	
+
 	def private sizeOrDefaultSize(Connection conn) {
 		if(conn == null || conn.size == null) "SIZE"
 		else conn.size
 	}
-	
-	def private getNumReaders(Port port) {
-		if (incomingPortMap.get(port) == null) {
-			'''0'''
-		} else {
-			val predecessor = incomingPortMap.get(port).source.getAdapter(typeof(Entity))
-			val predecessorPort = incomingPortMap.get(port).sourcePort
-			'''«predecessor.outgoingPortMap.get(predecessorPort).size»'''
-		}
-	}
-	
+
 	def private printOpenFiles() '''
 		«FOR port : actor.inputs + actor.outputs»
 			file_«port.name» = fopen("«traceFolder»«File::separator.replace('\\', "\\\\")»«port.fullName».txt", "a");
 		«ENDFOR»
 	'''
-	
+
 	def private printCloseFiles() '''
 		«FOR port : actor.inputs + actor.outputs»
 			fclose(file_«port.name»);
 		«ENDFOR»
 	'''
-	
 
-
-	/******************************************
-	 * 
-	 * Blocks
-	 *
-	 *****************************************/
+	//========================================
+	//               Blocks
+	//========================================
 	override caseBlockIf(BlockIf block)'''
 		if («block.condition.doSwitch») {
 			«FOR thenBlock : block.thenBlocks»
@@ -792,11 +818,9 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	/******************************************
-	 * 
-	 * Instructions
-	 *
-	 *****************************************/
+	//========================================
+	//            Instructions
+	//========================================
 	override caseInstAssign(InstAssign inst) '''
 		«inst.target.variable.indexedName» = «inst.value.doSwitch»;
 	'''
@@ -812,7 +836,6 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 
-	
 	override caseInstStore(InstStore store) {
 		val trgtPort = store.target.variable.port
 		'''
@@ -827,7 +850,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 		'''
 	}
-	
+
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
 			printf(«call.arguments.printfArgs.join(", ")»);
@@ -835,7 +858,7 @@ class InstancePrinter extends CTemplate {
 			«IF call.target != null»«call.target.variable.indexedName» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
 		«ENDIF»
 	'''
-	
+
 	override caseInstReturn(InstReturn ret) '''
 		«IF ret.value != null»
 			return «ret.value.doSwitch»;
@@ -846,6 +869,9 @@ class InstancePrinter extends CTemplate {
 		«inst.target.variable.indexedName» = «inst.conditionValue.doSwitch» ? «inst.trueValue.doSwitch» : «inst.falseValue.doSwitch»;
 	'''
 
+	//========================================
+	//            Helper methods
+	//========================================
 	def protected getPort(Var variable) {
 		if(currentAction == null) {
 			null
@@ -873,12 +899,20 @@ class InstancePrinter extends CTemplate {
 
 	def private getNoInline() 
 		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
+	
+	def private isOutputConnected(Port port) {
+		// If the port has a list of output connections not defined or empty, returns false
+		!outgoingPortMap.get(port).nullOrEmpty
+	}
 
-	/******************************************
-	 * 
-	 * Old templateData initialization
-	 *
-	 *****************************************/		
+	def private isInputConneted(Port port) {
+		// If the port has an input connection, returns true
+		incomingPortMap.get(port) != null
+	}
+
+	//========================================
+	//   Old template data initialization
+	//========================================
 	def private buildInputPattern() {
 		for (action : actor.actionsOutsideFsm) {
 			val actionPattern = action.inputPattern

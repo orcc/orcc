@@ -169,7 +169,7 @@ public class YaceBackend extends AbstractBackend {
 	 */
 	public void printNetwork(Network network) {
 
-		new Mapping().print(path, network, mapping);
+		new Mapping(network, mapping).print(path);
 		NetworkPrinter printer = new NetworkPrinter(network, options);
 
 		printer.printNetwork(path);
@@ -178,7 +178,7 @@ public class YaceBackend extends AbstractBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			String target = path + File.separator + "libs";
 			OrccLogger

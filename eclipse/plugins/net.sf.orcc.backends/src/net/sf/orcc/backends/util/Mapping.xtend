@@ -33,12 +33,15 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import java.util.Map
+import javax.xml.parsers.DocumentBuilderFactory
+import net.sf.orcc.OrccRuntimeException
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.OrccUtil
+import org.w3c.dom.Element
 
 /**
  * Printer used to create the xcf file, containing information on
@@ -49,46 +52,93 @@ import net.sf.orcc.util.OrccUtil
  */
 class Mapping extends CommonPrinter {
 
+	var Network network
+
 	var Map<Vertex, String> invMapping
 	var Map<String, List<Vertex>> mapping
 	var List<Vertex> unmapped
 	var int i
-	var force = false
 
-	new() {
-		this.force = false
+	private new(Network network) {
+		this.network = network
+		this.mapping = new HashMap<String, List<Vertex>>
+		this.invMapping = new HashMap<Vertex, String>
+		this.unmapped = new ArrayList<Vertex>
 	}
 
-	new(boolean force) {
-		this.force = force
+	public new(Network network, Map<String, String> map, boolean processEmpty) {
+		this(network)
+		computeFromMap(map, processEmpty)
 	}
 
-	def print(String targetFolder, Network network, Map<String, String> initialMapping) {
+	public new(Network network, Map<String, String> map) {
+		this(network, map, false)
+	}
+
+	public new(Network network, File xcfFile) {
+		this(network)
+		computeFromFile(xcfFile)
+	}
+
+	def print(String targetFolder) {
 		val xcfFile = new File(targetFolder + File::separator + network.simpleName + ".xcf")
-
-		network.compute(initialMapping)
 		OrccUtil::printFile(network.contentFile, xcfFile)
 	}
 
-	def void compute(Network network, Map<String, String> initialMapping) {
-		mapping = new HashMap<String, List<Vertex>>
-		invMapping = new HashMap<Vertex, String>
-		unmapped = new ArrayList<Vertex>
+	def private void computeFromMap(Map<String, String> map, boolean processEmptyMap) {
 		i = 0
-		if (!initialMapping.values.forall[nullOrEmpty] || force) {
+		if (!map.values.forall[nullOrEmpty] || processEmptyMap) {
 			for (instance : network.children.actorInstances) {
-				instance.tryToMap(initialMapping.get(instance.hierarchicalName))
+				instance.tryToMap(map.get(instance.hierarchicalName))
 			}
 			for (actor : network.children.filter(typeof(Actor))) {
+
 				// In case of a composite actor, try to map it on a component referenced by its children
 				// FIXME: There is probably a better way to do this
 				if (actor.hasAttribute("mergedActors")) {
 					val clusteredActors = actor.<List<String>>getValueAsObject("mergedActors")
-					actor.tryToMap(clusteredActors.map(a|initialMapping.get(a)).findFirst[!nullOrEmpty])
+					actor.tryToMap(clusteredActors.map(a|map.get(a)).findFirst[!nullOrEmpty])
 				} else {
-					actor.tryToMap(initialMapping.get(network.name + "_" + actor.name))
+					actor.tryToMap(map.get(network.name + "_" + actor.name))
 				}
 			}
+		}
+	}
+
+	def private void computeFromFile(File xcfFile) {
+		if (!xcfFile.exists || !xcfFile.file)
+			throw new OrccRuntimeException("The XCF file does not exist.")
+
+		val builder = DocumentBuilderFactory::newInstance.newDocumentBuilder
+		val dom = builder.parse(xcfFile)
+		val configuration = dom.documentElement
+		configuration.normalize
+		val partitioning = configuration.getElementsByTagName("Partitioning").item(0) as Element
+
+		if (partitioning != null) {
+			val partitions = partitioning.getElementsByTagName("Partition")
+
+			for (i : 0 .. partitions.length-1) {
+				val partNode = partitions.item(i)
+				val partition = partNode as Element
+				val partName = partition.getAttribute("id")
+				val instances = partition.getElementsByTagName("Instance")
+
+				for (j : 0 .. instances.length-1) {
+					val instNode = instances.item(j)
+					val instance = instNode as Element
+					val instName = instance.getAttribute("id")
+					val vertex = network.getChild(instName)
+
+					if (vertex != null) {
+						tryToMap(vertex, partName)
+					} else {
+						OrccLogger::warnln("Try to map an unknown actor called " + instName)
+					}
+				}
+			}
+		} else {
+			throw new OrccRuntimeException("Wrong XCF file")
 		}
 	}
 
@@ -117,7 +167,7 @@ class Mapping extends CommonPrinter {
 				«ENDFOR»
 			</Partitioning>
 			
-			«otherStuff»
+			<!-- Other useful informations related to any element of the instanciated model can be printed here -->
 		</Configuration>
 	'''
 
@@ -127,10 +177,6 @@ class Mapping extends CommonPrinter {
 				<Instance id="«entity.label»"/>
 			«ENDFOR»
 		</Partition>
-	'''
-
-	def private otherStuff() '''
-		<!-- Other useful informations related to any element of the instanciated model can be printed here -->
 	'''
 
 	def getComponents() {

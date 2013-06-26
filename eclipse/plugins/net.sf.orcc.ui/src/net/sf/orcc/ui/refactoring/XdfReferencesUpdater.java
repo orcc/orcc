@@ -93,6 +93,7 @@ public class XdfReferencesUpdater {
 			for (IFile file : files) {
 				InputStream in = file.getContents();
 				String contents = OrccUtil.getContents(in);
+				in.close();
 				if (contents.contains(qualifiedName)) {
 					changedFiles.put(file, contents);
 					deltaFactory.change(file);

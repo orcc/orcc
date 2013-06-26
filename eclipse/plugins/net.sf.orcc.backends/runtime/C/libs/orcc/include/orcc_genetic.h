@@ -92,14 +92,15 @@ void monitor_init(struct monitor_s *monitoring, struct sync_s *sync,
 int clean_cache(int size);
 
 // Display functions
-extern float compute_partial_fps();
-extern void backup_partial_start_info();
-extern void backup_partial_end_info();
+extern float computePartialFps();
+extern void backupPartialStartInfo();
+extern void backupPartialEndInfo();
 extern void active_fps_printing();
 extern void remove_fps_printing();
+extern void display_close();
 
 // Source functions
-extern void source_active_genetic();
+extern void source_activeGenetic();
 extern void source_close();
 
 // Application functions

@@ -37,6 +37,13 @@ static unsigned int relativeStartTime;
 static int lastNumPic;
 static int numPicturesDecoded;
 
+static Uint32 partialStartTime;
+static Uint32 partialEndTime;
+static int partialNumPicturesStart;
+static int partialNumPicturesEnd;
+
+static int show_fps = 1;
+
 static void print_fps_avg(void) {
 	unsigned int endTime = SDL_GetTicks();
 
@@ -47,17 +54,23 @@ static void print_fps_avg(void) {
 
 void fpsPrintInit() {
 	startTime = SDL_GetTicks();
-	relativeStartTime = startTime;
 	numPicturesDecoded = 0;
 	lastNumPic = 0;
-	atexit(print_fps_avg);
+	if(show_fps) {
+		atexit(print_fps_avg);
+	}
+
+	relativeStartTime = startTime;
+	// For genetic algorithm
+	partialStartTime = startTime;
+	partialNumPicturesStart = 0;
 }
 
 void fpsPrintNewPicDecoded(void) {
 	unsigned int endTime;
 	numPicturesDecoded++;
 	endTime = SDL_GetTicks();
-	if ((endTime - relativeStartTime) / 1000.0f >= 5) {
+	if (show_fps && (endTime - relativeStartTime) / 1000.0f >= 5) {
 		printf("%f images/sec\n",
 				1000.0f * (float) (numPicturesDecoded - lastNumPic)
 						/ (float) (endTime - relativeStartTime));
@@ -65,4 +78,28 @@ void fpsPrintNewPicDecoded(void) {
 		relativeStartTime = endTime;
 		lastNumPic = numPicturesDecoded;
 	}
+}
+
+float computePartialFps() {
+	return 1000.0f
+			* (float) (partialNumPicturesEnd - partialNumPicturesStart)
+			/ (float) (partialEndTime - partialStartTime);
+}
+
+void backupPartialStartInfo() {
+	partialStartTime = SDL_GetTicks();
+	partialNumPicturesStart = partialNumPicturesEnd;
+}
+
+void backupPartialEndInfo() {
+	partialEndTime = SDL_GetTicks();
+	partialNumPicturesEnd = numPicturesDecoded;
+}
+
+void remove_fps_printing() {
+	show_fps = 0;
+}
+
+void active_fps_printing() {
+	show_fps = 1;
 }

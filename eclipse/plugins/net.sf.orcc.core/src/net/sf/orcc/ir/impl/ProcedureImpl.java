@@ -16,6 +16,7 @@ import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.IrPackage.Literals;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -168,8 +169,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		super();
 
 		mapLocals = new HashMap<String, Var>();
-
-		eAdapters().add(new MapAdapter());
+		eAdapters().add(new MapAdapter(mapLocals, Literals.PROCEDURE__LOCALS));
 	}
 
 	/**
@@ -440,10 +440,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 					IrPackage.PROCEDURE__LOCALS);
 		}
 		return locals;
-	}
-
-	public Map<String, Var> getLocalsMap() {
-		return mapLocals;
 	}
 
 	/**

@@ -37,14 +37,12 @@ public class PreferenceConstants {
 
 	public static final String P_JADE = "jadePath";
 
-	public static final String P_JADE_TOOLBOX = "jadeToolboxPath";
-
 	public static final String P_SOLVER = "solver";
 
 	public static final String P_SOLVER_OPTIONS = "solverOptions";
 
 	public static final String P_SOLVER_TYPE = "solverType";
-	
+
 	public static final String P_METIS = "metisPath";
 
 }

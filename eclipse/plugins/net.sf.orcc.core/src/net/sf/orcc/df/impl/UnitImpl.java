@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Unit;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.impl.AttributableImpl;
@@ -45,15 +46,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class UnitImpl extends AttributableImpl implements Unit {
 	/**
-	 * The cached value of the '{@link #getConstants() <em>Constants</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getConstants()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Var> constants;
-
-	/**
 	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -62,16 +54,6 @@ public class UnitImpl extends AttributableImpl implements Unit {
 	 * @ordered
 	 */
 	protected static final String FILE_NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String fileName = FILE_NAME_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -84,16 +66,6 @@ public class UnitImpl extends AttributableImpl implements Unit {
 	protected static final int LINE_NUMBER_EDEFAULT = 0;
 
 	/**
-	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected int lineNumber = LINE_NUMBER_EDEFAULT;
-
-	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -102,6 +74,35 @@ public class UnitImpl extends AttributableImpl implements Unit {
 	 * @ordered
 	 */
 	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getConstants() <em>Constants</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getConstants()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> constants;
+
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -322,22 +323,7 @@ public class UnitImpl extends AttributableImpl implements Unit {
 
 	@Override
 	public String getPackage() {
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return "";
-		} else {
-			return name.substring(0, index);
-		}
-	}
-
-	@Override
-	public String getSimpleName() {
-		int index = name.lastIndexOf('.');
-		String simpleName = name;
-		if (index != -1) {
-			simpleName = name.substring(index + 1);
-		}
-		return simpleName;
+		return DfUtil.getPackage(getName());
 	}
 
 	@Override
@@ -360,6 +346,11 @@ public class UnitImpl extends AttributableImpl implements Unit {
 					Procedure.class, this, DfPackage.UNIT__PROCEDURES);
 		}
 		return procedures;
+	}
+
+	@Override
+	public String getSimpleName() {
+		return DfUtil.getSimpleName(getName());
 	}
 
 	@Override

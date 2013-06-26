@@ -92,14 +92,6 @@ public interface TypeList extends Type {
 	Type getType();
 
 	/**
-	 * Sets the number of elements of this list type.
-	 * 
-	 * @param size
-	 *            the number of elements of this list type
-	 */
-	void setSize(int size);
-
-	/**
 	 * Sets the number of elements of this list type as an expression.
 	 * 
 	 * @param value

@@ -41,9 +41,11 @@ import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.transform.CastAdder;
+import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
+import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Validator;
@@ -158,9 +160,12 @@ public class LLVMBackend extends AbstractBackend {
 		if (convertMulti2Mono) {
 			visitors.add(new Multi2MonoToken());
 		}
-		
+
+		visitors.add(new DisconnectedOutputPortRemoval());
+
 		visitors.add(new TypeResizer(true, true, false, false));
 		visitors.add(new StringTransformation());
+		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
 		visitors.add(new DfVisitor<Void>(new SSATransformation()));
 		visitors.add(new DeadGlobalElimination());
 		visitors.add(new DfVisitor<Void>(new DeadCodeElimination()));
@@ -217,7 +222,7 @@ public class LLVMBackend extends AbstractBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			// Copy specific windows batch file
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {

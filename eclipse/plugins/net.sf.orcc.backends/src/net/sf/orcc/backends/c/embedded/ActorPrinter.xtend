@@ -200,13 +200,17 @@ class ActorPrinter extends InstancePrinter {
 		{
 			«IF ! action.body.locals.empty»
 				«FOR local : action.body.locals»
-					«local.declare»
+					«local.declare»;
 				«ENDFOR»
 			«ENDIF»
 			«IF ! actor.stateVars.empty»
-				// Initialize output stateVars and work on them
+				// Initialize stateVars and work on them
 				«FOR stateVar : actor.stateVars»
-					«stateVar.type.doSwitch» «stateVar.name» = *«stateVar.name»_i;
+					«IF stateVar.type.dimensionsExpr.empty»
+						«stateVar.declare» = *«stateVar.name»_i;
+					«ELSE»
+						«stateVar.type.doSwitch» *«stateVar.name» = «stateVar.name»_i;
+					«ENDIF»
 				«ENDFOR»
 			«ENDIF»
 		
@@ -220,7 +224,12 @@ class ActorPrinter extends InstancePrinter {
 		«IF ! actor.stateVars.empty»
 			// Write state Var to output buf
 			«FOR stateVar : actor.stateVars»
-				*«stateVar.name»_o = «stateVar.name»;
+				«IF stateVar.type.dimensionsExpr.empty»
+					*«stateVar.name»_o = «stateVar.name»;
+				«ELSE»
+					// Copy «stateVar.name» to output buffer
+					memcpy(«stateVar.name»_o,«stateVar.name», «stateVar.type.dimensions.head»);
+				«ENDIF»
 			«ENDFOR» 
 		«ENDIF»
 		«IF ret.value != null»

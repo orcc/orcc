@@ -102,6 +102,7 @@ void source_init() {
 
 long long source_open(char* fileName) {
 	char fullPathName[256];
+	FILE *file = NULL;
 
 	stop = 0;
 	nb = 0;
@@ -168,7 +169,7 @@ int source_is_stopped() {
 	return stop;
 }
 
-void source_active_genetic() {
+void source_activeGenetic() {
 	genetic = 1;
 }
 
