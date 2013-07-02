@@ -30,74 +30,161 @@
 package net.sf.orcc.backends.c.hmpp
 
 import java.util.Map
+import java.util.Set
 import net.sf.orcc.backends.ir.BlockFor
+import net.sf.orcc.df.Action
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Instance
+import net.sf.orcc.ir.ExprVar
 import net.sf.orcc.ir.InstCall
+import net.sf.orcc.ir.Procedure
+import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.Attribute
+import org.eclipse.emf.common.util.EList
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
-	
-	val hmppDirectives = newArrayList("codelet", "callsite", "group", "acquire",
-		"release", "advancedload", "delegatedstore", "resident")
-	/* Unused for now, but maybe useful later
-	val hmppcgDirectives = newArrayList("gridify")
-	*/
-	
+
 	new(Map<String, Object> options) {
 		super(options)
 	}
-		
-	def private filterBeforeAttributes(Iterable<Attribute> attributes) {
-		attributes.filter[!hasAttribute("after")]
-	}
-	def private filterAfterAttributes(Iterable<Attribute> attributes) {
-		attributes.filter[hasAttribute("after")]
+
+	override caseInstCall(InstCall call) '''
+		«call.printCallsite»
+		«super.caseInstCall(call)»
+	'''
+
+	override caseBlockFor(BlockFor block) '''
+		«block.printGridify»
+		«super.caseBlockFor(block)»
+	'''
+
+	override protected declareStateVar(Var variable) '''
+		«variable.printResident»
+		«super.declareStateVar(variable)»
+	'''
+
+	override protected declare(Procedure proc) '''
+		«proc.printCodelet»
+		«super.declare(proc)»
+	'''
+
+	override protected print(Action action) {
+		currentAction = action
+		val output = '''
+			static void «action.body.name»() {
+				«FOR variable : action.body.locals»
+					«variable.declare»;
+				«ENDFOR»
+
+				«action.body.printAdvancedload»
+
+				«FOR block : action.body.blocks»
+					«block.doSwitch»
+				«ENDFOR»
+
+				«action.body.printDelegatedstore»
+
+				«FOR port : action.inputPattern.ports»
+					index_«port.name» += «action.inputPattern.getNumTokens(port)»;
+				«ENDFOR»
+
+				«FOR port : action.outputPattern.ports»
+					index_«port.name» += «action.outputPattern.getNumTokens(port)»;
+				«ENDFOR»
+			}
+
+			«action.scheduler.print»
+
+		'''
+		currentAction = null
+		return output
 	}
 
-	override printAttributes(Attributable eobject) '''
-		«IF eobject instanceof Instance»
-			«(eobject as Instance).actor.printAttributes»
-		«ELSE»
-			«FOR attribute : eobject.attributes.filterBeforeAttributes»
-				«attribute.printHmppPragma»
+	override protected printAttributes(Attributable object) '''
+		«IF (object instanceof Instance || object instanceof Actor) && object.hasAttribute("group")»
+			«FOR grp : object.getAttribute("group").attributes.filterGroupsLabels»
+				«val params = grp.attributes»
+				#pragma hmpp «grp.name» group«params.join(", ", ", ", "")['''«it.name»=«stringValue»''']»
 			«ENDFOR»
 		«ENDIF»
 	'''
-	
-	override caseInstCall(InstCall call) '''
-		«FOR attr : call.attributes.filterBeforeAttributes»
-			«attr.printHmppPragma»
-		«ENDFOR»
-		«super.caseInstCall(call)»
-		«FOR attr : call.attributes.filterAfterAttributes»
-			«attr.printHmppPragma»
-		«ENDFOR»
-	'''
-	
-	override caseBlockFor(BlockFor block) '''
-		«FOR attr : block.attributes.filter[it.name.equals("gridify")]»
-			#pragma hmppcg gridify(«attr.getValueAsString("params")»)
-		«ENDFOR»
-		«FOR attr : block.attributes.filter[!it.name.equals("gridify")]»
-			«attr.printHmppPragma»
-		«ENDFOR»
-		«super.caseBlockFor(block)»
-	'''
-	
-	def private printHmppPragma(Attribute attr) {
-		if(!hmppDirectives.contains(attr.name))
-			return ""
 
-		var labels = ""
-			if(attr.hasAttribute("grp_label"))
-				labels = labels + " " + attr.getValueAsString("grp_label")
-			if(attr.hasAttribute("codelet_label"))
-				labels = labels + " " + attr.getValueAsString("codelet_label")
-			
-		val params = if(attr.hasAttribute("params"))
-			", " + attr.getValueAsString("params")
+	def private printResident(Var variable) '''
+		«IF variable.hasAttribute("resident")»
+			«FOR grp : variable.getAttribute("resident").attributes.filterGroupsLabels»
+				«val direction = grp.getValueAsString("direction")»
+				#pragma hmpp «grp.name» resident, args[::«variable.name»].io=«direction»
+			«ENDFOR»
+		«ENDIF»
+	'''
 
-		'''#pragma hmpp«labels» «attr.name»«params»'''
+	def private printGridify (BlockFor block) {
+		 if(block.hasAttribute("gridify")) {
+			val attrList = block.getAttribute("gridify").attributes
+			'''#pragma hmppcg gridify («attrList.join(",")['''«(containedValue as ExprVar).use.variable.name»''']»)'''
+		}
 	}
+
+	def private printCodelet(Procedure proc) '''
+		«IF proc.hasAttribute("codelet")»
+			«FOR grp : proc.getAttribute("codelet").attributes.filterGroupsLabels»
+				«FOR cdlt : grp.attributes.filterCodeletsLabels»
+					«val params = proc.getAttribute("codelet").attributes»
+					«val paramsString = params.filterNoGroupsLabels.join(", ", ", ", "")['''«it.name»=«stringValue»''']»
+
+					«val vars = cdlt.objectValue as Map<String, String>»
+					«val transferString = vars.entrySet.join(", ", ", ", "")['''args[«key»].io=«value»''']»
+					#pragma hmpp «grp.name» «cdlt.name» codelet«paramsString»«transferString»
+				«ENDFOR»
+			«ENDFOR»
+		«ENDIF»
+	'''
+
+	def private printCallsite(InstCall call) '''
+		«IF call.hasAttribute("callsite")»
+			«FOR grp : call.getAttribute("callsite").attributes.filterGroupsLabels»
+				«FOR cdlt : grp.attributes.filterCodeletsLabels»
+					#pragma hmpp «grp.name» «cdlt.name» callsite
+				«ENDFOR»
+			«ENDFOR»
+		«ENDIF»
+	'''
+
+	def private printDelegatedstore(Procedure procedure) '''
+		«IF procedure.hasAttribute("advancedload")»
+			«FOR grp : procedure.getAttribute("advancedload").attributes.filterGroupsLabels»
+				«FOR cdlt : grp.attributes.filterCodeletsLabels»
+					«FOR varName : cdlt.objectValue as Set<String>»
+						#pragma hmpp «grp.name» «cdlt.name» advancedload, args[::«varName»]
+					«ENDFOR»
+				«ENDFOR»
+			«ENDFOR»
+		«ENDIF»
+	'''
+
+	def private printAdvancedload(Procedure procedure) '''
+		«IF procedure.hasAttribute("delegatedstore")»
+			«FOR grp : procedure.getAttribute("delegatedstore").attributes.filterGroupsLabels»
+				«FOR cdlt : grp.attributes.filterCodeletsLabels»
+					«FOR varName : cdlt.objectValue as Set<String>»
+						#pragma hmpp «grp.name» «cdlt.name» delegatedstore, args[::«varName»]
+					«ENDFOR»
+				«ENDFOR»
+			«ENDFOR»
+		«ENDIF»
+	'''
+
+	def private filterGroupsLabels(EList<Attribute> attrs) {
+		attrs.filter[it.name.startsWith("<grp_")]
+	}
+
+	def private filterNoGroupsLabels(EList<Attribute> attrs) {
+		attrs.filter[!it.name.startsWith("<grp_")]
+	}
+
+	def private filterCodeletsLabels(EList<Attribute> attrs) {
+		attrs.filter[it.name.startsWith("cdlt_")]
+	}
+
 }

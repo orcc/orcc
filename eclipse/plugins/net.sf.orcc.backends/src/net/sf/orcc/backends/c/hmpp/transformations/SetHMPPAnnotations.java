@@ -28,21 +28,15 @@
  */
 package net.sf.orcc.backends.c.hmpp.transformations;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
@@ -52,12 +46,12 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.util.EcoreHelper;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
- * This class defines a HMMP annotations.
+ * This class adds annotations to some IR elements. These annotations are used
+ * later to produce valid HMPP pragmas.
  * 
  * @author Jérôme Gorin
+ * @author Antoine Lorence
  * 
  */
 public class SetHMPPAnnotations extends DfVisitor<Void> {
@@ -67,212 +61,313 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 	private class InnerSetHMPPAnnotations extends AbstractIrVisitor<Void> {
 
 		/**
-		 * Add hmpp "callsite" pragma for call instructions related to
-		 * procedures decorated with hmpp "codelet" pragma
+		 * This the entry point for this transformation. It visits InstCall
+		 * instances and check for ones having a "codelet" attribute. For these
+		 * ones, it run methods to add HMPP attributes to all IR elements which
+		 * needs.
 		 */
 		@Override
 		public Void caseInstCall(InstCall call) {
 			Procedure proc = call.getProcedure();
 
+			// Procedure referenced by this call instruction must be run on the
+			// graphic card using HMPP compiler
 			if (proc.hasAttribute("codelet")) {
 
-				Attribute codelet = proc.getAttribute("codelet");
-				// Set "codelet" label
-				if (codelet.hasAttribute("codelet_label")) {
-					setCodeletName(proc,
-							codelet.getValueAsString("codelet_label"));
-				} else {
-					codelet.setAttribute("codelet_label", getCodeletName(proc));
-				}
+				// This will set attributes for pragmas callsite, resident,
+				// advancedload, delegatedstore
+				setCallsiteAttribute(call, getGroupLabel(),
+						getCodeletLabel(proc));
 
-				// Set "codelet" missing parameters
-				setCodeletParameters(proc, codelet);
-
-				// Set "callsite" directive on call instruction
-				call.addAttribute("callsite");
-				call.getAttribute("callsite").setAttribute("grp_label",
-						getCodeletName(proc));
+				// This will set attributes for pragmas codelet, group
+				setCodeletAttribute(proc);
 			}
 
 			return null;
 		}
 
 		/**
-		 * Add missing parameters to a given codelet, according given proc
-		 * parameters type. Non scalars
+		 * Set <b>codelet</b> attribute to given <i>proc</i> and updates its
+		 * sub-attributes.
 		 * 
 		 * @param proc
-		 * @param codelet
 		 */
-		private void setCodeletParameters(Procedure proc, Attribute codelet) {
+		private void setCodeletAttribute(Procedure proc) {
 
-			// Explode existing codelet params as a list of String
-			List<String> cdltParams = Arrays.asList(codelet.getValueAsString(
-					"params").split(","));
+			Attribute codeletAttr = proc.getAttribute("codelet");
+			setGroupAttribute(getGroupLabel(), codeletAttr.getAttributes());
+
+			Attribute grp = addGroupLabel(codeletAttr, getGroupLabel());
+			Attribute cdlt = addCodeletLabel(grp, getCodeletLabel(proc));
+
+			Map<String, String> cdltParams = new HashMap<String, String>();
 
 			// Check if procedure parameter is not a scalar
 			for (Param param : proc.getParameters()) {
-				if (param.getVariable().getType().isList()) {
-					// TODO: classify arguments according to their usage: in /
-					// out / inout
-					String newCodeletParam = "args["
-							+ param.getVariable().getName() + "].io = inout";
+				Var var = param.getVariable();
+				if (var.getType().isList()) {
 
-					if (!cdltParams.contains(newCodeletParam)) {
-						cdltParams.add(newCodeletParam);
-					}
+					boolean in = isVarUsed(var, proc);
+					boolean out = isVarDefined(var, proc);
+					String direction = in ? "in" : "";
+					direction += out ? "out" : "";
+
+					cdltParams.put(var.getName(), direction);
 				}
 			}
 
-			// Restore codelets params by joining them with ", " separator
-			codelet.setAttribute("params", StringUtils.join(cdltParams, ", "));
-
+			cdlt.setObjectValue(cdltParams);
 		}
 
 		/**
-		 * If a BlockWhile has an hmppcg "gridify" attribute, it must be
-		 * consistent with variable names, even if they have been modified by
-		 * another transformation. That's why attribute stringValue is updated.
-		 */
-		@Override
-		public Void caseBlockWhile(BlockWhile blockWhile) {
-			super.caseBlockWhile(blockWhile);
-
-			if (blockWhile.hasAttribute("gridify")) {
-
-				Attribute gridify = blockWhile.getAttribute("gridify");
-
-				if (gridify.hasAttribute("params")
-						&& gridify.getAttribute("params").getContainedValue() != null) {
-
-					ExprList varList = (ExprList) gridify
-							.getAttribute("params").getContainedValue();
-
-					List<String> updatedVarNames = new ArrayList<String>();
-					for (Expression expr : varList.getValue()) {
-						if (expr instanceof ExprVar) {
-							updatedVarNames.add(((ExprVar) expr).getUse()
-									.getVariable().getName());
-						}
-					}
-
-					gridify.setAttribute("params",
-							StringUtils.join(updatedVarNames, ","));
-				}
-			}
-
-			return null;
-		}
-
-		/**
-		 * Add all pragmas needed to perform manual transfers (hmpp) on global
-		 * variables used in procedure defined in the actor and decorated with
-		 * codelet/callsite attribute. This method has to be fixed since it does
-		 * not produce valid HMPP pragmas. We don't want to delete it because
-		 * the code can be reused in a future version of the backend.
+		 * Add to given <i>call</i> a <b>callsite</b> attribute and add it a
+		 * group label as child, a codelet label as sub-child. Call necessary
+		 * methods to add other attributes to the call and the variables used
+		 * inside the procedure called.
 		 * 
 		 * @param call
-		 *            Call instruction decorated with an hmpp "callsite" pragma
+		 * @param grpLabel
+		 * @param cdltLabel
 		 */
-		@SuppressWarnings("unused")
-		private void createPersistentVars(InstCall call) {
-			Set<Var> persistentVar = new HashSet<Var>();
-			Procedure proc = call.getProcedure();
-			String codeletName = getCodeletName(proc);
+		private void setCallsiteAttribute(InstCall call, String grpLabel,
+				String cdltLabel) {
 
-			// Check if a state variable is persistent inside the procedure
+			Attribute callsite = call.getAttribute("callsite");
+			if (callsite == null) {
+				call.addAttribute("callsite");
+				callsite = call.getAttribute("callsite");
+			}
+			Attribute grp = addGroupLabel(callsite, grpLabel);
+			addCodeletLabel(grp, cdltLabel);
+
+			// Check for state variables used or defined inside the procedure
+			Procedure proc = call.getProcedure();
+			Set<String> inVars = new HashSet<String>();
+			Set<String> outVars = new HashSet<String>();
 			for (Var var : actor.getStateVars()) {
 				if (var.isAssignable()) {
-					for (Use use : var.getUses()) {
-						if (EcoreHelper
-								.getContainerOfType(use, Procedure.class)
-								.equals(proc)) {
-							persistentVar.add(var);
-						}
+
+					String direction = "";
+					if (isVarUsed(var, proc)) {
+						inVars.add(var.getName());
+						direction += "in";
 					}
-					for (Def def : var.getDefs()) {
-						if (EcoreHelper
-								.getContainerOfType(def, Procedure.class)
-								.equals(proc)) {
-							persistentVar.add(var);
-						}
+					if (isVarDefined(var, proc)) {
+						outVars.add(var.getName());
+						direction += "out";
+					}
+
+					if (!direction.isEmpty()) {
+						setResidentAttribute(var, grpLabel, direction);
 					}
 				}
 			}
 
-			// The codelet has no persistent variable
-			if (persistentVar.isEmpty()) {
-				return;
+			setAdvanceloadAttribute(call, cdltLabel, grpLabel, inVars);
+			setDelegatedstoreAttribute(call, cdltLabel, grpLabel, outVars);
+		}
+
+		/**
+		 * Add to given <i>call</i> a <b>advancedload</b> attribute and add it a
+		 * group label as child, a codelet label as sub-child. Given <i>vars</i>
+		 * are added to codelet label's objectValue to determine variables to
+		 * load after the call.
+		 * 
+		 * @param call
+		 * @param cdltLabel
+		 * @param grpLabel
+		 * @param vars
+		 */
+		private void setAdvanceloadAttribute(InstCall call, String cdltLabel,
+				String grpLabel, Set<String> vars) {
+
+			Procedure parentProc = EcoreHelper.getContainerOfType(call,
+					Procedure.class);
+
+			Attribute delStore = parentProc.getAttribute("advancedload");
+			if (delStore == null) {
+				parentProc.addAttribute("advancedload");
+				delStore = parentProc.getAttribute("advancedload");
 			}
 
-			// Set persistent process. Adds
-			// "#pragma hmpp <name> group, target=cuda, transfer=manual"
-			// before actor declaration
-			actor.addAttribute("group");
-			actor.getAttribute("group").setAttribute("grp_label", codeletName);
-			actor.getAttribute("group").setAttribute("params",
-					"target=cuda, transfer=manual");
+			Attribute grp = addGroupLabel(delStore, getGroupLabel());
+			Attribute cdlt = addCodeletLabel(grp,
+					getCodeletLabel(call.getProcedure()));
 
-			// Create acquire. Adds "#pragma hmpp <codeletName> acquire" before
-			// call instruction
-			actor.addAttribute("acquire");
-			actor.getAttribute("acquire").addAttribute("first");
-			actor.getAttribute("acquire")
-					.setAttribute("grp_label", codeletName);
+			cdlt.setObjectValue(vars);
+		}
 
-			// Create release. Adds "#pragma hmpp <codeletName> release" after
-			// call
-			actor.addAttribute("release");
-			actor.getAttribute("release").addAttribute("last");
-			actor.getAttribute("release")
-					.setAttribute("grp_label", codeletName);
+		/**
+		 * Add to given <i>call</i> a <b>delegatedstore</b> attribute and add it
+		 * a group label as child, a codelet label as sub-child. Given
+		 * <i>vars</i> are added to codelet label's objectValue to determine
+		 * variables to store before the call.
+		 * 
+		 * @param call
+		 * @param cdltLabel
+		 * @param grpLabel
+		 * @param vars
+		 */
+		private void setDelegatedstoreAttribute(InstCall call,
+				String cdltLabel, String grpLabel, Set<String> vars) {
 
-			for (Var var : persistentVar) {
-				// Set variable attribute. Adds
-				// "#pragma hmpp <codeleltName> resident, args[<var>].io=inout"
-				// before each variable declaration
+			Procedure parentProc = EcoreHelper.getContainerOfType(call,
+					Procedure.class);
+
+			Attribute delStore = parentProc.getAttribute("delegatedstore");
+			if (delStore == null) {
+				parentProc.addAttribute("delegatedstore");
+				delStore = parentProc.getAttribute("delegatedstore");
+			}
+
+			Attribute grp = addGroupLabel(delStore, getGroupLabel());
+			Attribute cdlt = addCodeletLabel(grp,
+					getCodeletLabel(call.getProcedure()));
+
+			cdlt.setObjectValue(vars);
+		}
+
+		/**
+		 * Add to current <i>actor</i> a <b>group</b> attribute and add it a
+		 * group label as child. Given <i>parameters</i> are added to group
+		 * label attribute's children.
+		 * 
+		 * @param grpLabel
+		 * @param params
+		 */
+		private void setGroupAttribute(String grpLabel,
+				Collection<Attribute> params) {
+
+			Attribute grpPragma = actor.getAttribute("group");
+			if (grpPragma == null) {
+				actor.addAttribute("group");
+				grpPragma = actor.getAttribute("group");
+			}
+
+			Attribute grp = addGroupLabel(grpPragma, grpLabel);
+			grp.getAttributes().addAll(params);
+		}
+
+		/**
+		 * Add to given <i>variable</i> a <b>resident</b> attribute and add it a
+		 * group label as child. Parameters are added to group label attribute's
+		 * children. The direction (in/out/inout) is currently the only
+		 * parameter supported. Value is given by <i>direction</i> parameter.
+		 * 
+		 * @param var
+		 * @param grpLabel
+		 * @param direction
+		 */
+		private void setResidentAttribute(Var var, String grpLabel,
+				String direction) {
+
+			Attribute resident = var.getAttribute("resident");
+			if (resident == null) {
 				var.addAttribute("resident");
-				var.getAttribute("resident").setAttribute("grp_label",
-						codeletName);
-				var.getAttribute("resident").setAttribute("params",
-						"args[" + var.getName() + "].io=inout");
+				resident = var.getAttribute("resident");
+			}
 
-				// Create advancedload. Adds
-				// "#pragma hmpp <codeletName> advancedload, args[<var>], hostdata="<var>""
-				// before call for each var
-				call.addAttribute("advancedload");
-				call.getAttribute("advancedload").setAttribute("grp_label",
-						codeletName);
-				call.getAttribute("advancedload").setAttribute(
-						"params",
-						"args[" + var.getName() + "], hostdata = \""
-								+ var.getName() + "\"");
+			Attribute grp = addGroupLabel(resident, grpLabel);
 
-				// Create delegatedstore. Adds
-				// "#pragma hmpp <codeletName> delegatedstore, args[<var>], hostdata="<var>""
-				// after call for each var
-				call.addAttribute("delegatedstore");
-				call.getAttribute("delegatedstore").addAttribute("after");
-				call.getAttribute("delegatedstore").setAttribute("grp_label",
-						codeletName);
-				call.getAttribute("delegatedstore").setAttribute(
-						"params",
-						"args[" + var.getName() + "], hostdata = \""
-								+ var.getName() + "\"");
+			grp.setAttribute("direction", direction);
+		}
+
+		/**
+		 * Add a group label to a given attribute
+		 * 
+		 * @param attribute
+		 * @param grpLabel
+		 *            The group label
+		 * @return The Attribute just created
+		 */
+		private Attribute addGroupLabel(Attribute attribute, String grpLabel) {
+			attribute.addAttribute(grpLabel);
+			return attribute.getAttribute(grpLabel);
+		}
+
+		/**
+		 * Add a codelet label to a given attribute
+		 * 
+		 * @param attribute
+		 * @param cdltLabel
+		 *            The codelet label
+		 * @return The Attribute just created
+		 */
+		private Attribute addCodeletLabel(Attribute attribute, String cdltLabel) {
+			attribute.addAttribute(cdltLabel);
+			return attribute.getAttribute(cdltLabel);
+		}
+
+		/**
+		 * Generate and returns a group label. This method is now used to ensure
+		 * the same name will be used everywhere. It should be modified when
+		 * HMPP backend will support having multiple groups defined in a file.
+		 * 
+		 * @return A default group label
+		 */
+		private String getGroupLabel() {
+			return "<grp_default>";
+		}
+
+		/**
+		 * Return the codelet label for this procedure. This method will NOT
+		 * update procedure to add missing attributes.
+		 * 
+		 * @param proc
+		 * @return
+		 */
+		private String getCodeletLabel(Procedure proc) {
+
+			if (codelets.containsKey(proc)) {
+				return codelets.get(proc);
+			} else if (proc.hasAttribute("codelet")
+					&& proc.getAttribute("codelet").hasAttribute(
+							"codelet_label")) {
+				String name = proc.getAttribute("codelet").getValueAsString(
+						"codelet_label");
+				codelets.put(proc, name);
+				return name;
+			} else {
+				String name = "cdlt_" + proc.getName();
+				codelets.put(proc, name);
+				return name;
 			}
 		}
 
-		private void setCodeletName(Procedure proc, String name) {
-			codelets.put(proc, name);
+		/**
+		 * Return true if the given variable is used in the given procedure.
+		 * (i.e. the given procedure contains uses on the variable)
+		 * 
+		 * @param var
+		 * @param proc
+		 * @return
+		 */
+		private boolean isVarUsed(Var var, Procedure proc) {
+			for (Use use : var.getUses()) {
+				if (EcoreHelper.getContainerOfType(use, Procedure.class)
+						.equals(proc)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
-		private String getCodeletName(Procedure proc) {
-			String name = codelets.get(proc);
-			if (name == null) {
-				name = "codeletlabel" + codelets.size();
-				setCodeletName(proc, name);
+		/**
+		 * Return true if the given variable is defined in the given procedure.
+		 * (i.e. the given procedure contains defs on the variable)
+		 * 
+		 * @param var
+		 * @param proc
+		 * @return
+		 */
+		private boolean isVarDefined(Var var, Procedure proc) {
+			for (Def def : var.getDefs()) {
+				if (EcoreHelper.getContainerOfType(def, Procedure.class)
+						.equals(proc)) {
+					return true;
+				}
 			}
-			return name;
+			return false;
 		}
 	}
 

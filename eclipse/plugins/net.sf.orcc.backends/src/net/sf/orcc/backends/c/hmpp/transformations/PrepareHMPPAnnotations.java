@@ -28,14 +28,10 @@
  */
 package net.sf.orcc.backends.c.hmpp.transformations;
 
-import java.util.Arrays;
-import java.util.List;
-
 import net.sf.orcc.ir.BlockWhile;
-import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.Attribute;
 
 /**
@@ -88,35 +84,26 @@ public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
 	public Void caseBlockWhile(BlockWhile blockWhile) {
 		super.caseBlockWhile(blockWhile);
 
-		Attribute attribute = blockWhile.getAttribute("gridify");
-		ExprVarGetter exprVarGetter = new ExprVarGetter();
+		if (blockWhile.hasAttribute("gridify")) {
 
-		if (attribute != null && attribute.hasAttribute("params")) {
+			Attribute gridifyAttr = blockWhile.getAttribute("gridify");
+			ExprVarGetter exprVarGetter = new ExprVarGetter();
 
-			List<String> varNames = Arrays.asList(attribute
-					.getAttribute("params").getStringValue().split(","));
+			for (Attribute subAttr : gridifyAttr.getAttributes()) {
 
-			for (String varName : varNames) {
+				String varName = subAttr.getName();
+
 				exprVarGetter.setVariableName(varName);
 				exprVarGetter.doSwitch(blockWhile);
 
-				if (exprVarGetter.getResult() != null) {
+				ExprVar result = exprVarGetter.getResult();
 
-					if (attribute.getAttribute("params").getContainedValue() == null) {
-
-						attribute.getAttribute("params").setContainedValue(
-								IrFactory.eINSTANCE.createExprList());
-					}
-					ExprList variablesList = (ExprList) attribute.getAttribute(
-							"params").getContainedValue();
-
-					variablesList.getValue().add(
-							IrFactory.eINSTANCE.createExprVar(exprVarGetter
-									.getResult().getUse().getVariable()));
-
+				if (result != null) {
+					ExprVar cpy = IrUtil.copy(result, false);
+					cpy.setAttribute("dbg", "FOCK");
+					subAttr.setContainedValue(cpy);
 				}
 			}
-
 		}
 
 		return null;
