@@ -350,7 +350,7 @@ class InstancePrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
 		«FOR proc : actor.procs»
-			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]»);
+			«proc.declare»
 		«ENDFOR»
 		
 		«FOR proc : actor.procs.notNativeProcs»
@@ -720,7 +720,6 @@ class InstancePrinter extends CTemplate {
 	}
 	
 	def protected print(Procedure proc) '''
-		«proc.printAttributes»
 		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]») {
 			«FOR variable : proc.locals»
 				«variable.declare»;
@@ -744,7 +743,6 @@ class InstancePrinter extends CTemplate {
 				'''static «const»«variable.declare»«init»;'''
 			}
 		'''
-			«variable.printAttributes»
 			«varDecl»
 			«IF geneticAlgo && variable.initialized && variable.assignable»
 				static «variable.type.doSwitch» «variable.indexedName»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
