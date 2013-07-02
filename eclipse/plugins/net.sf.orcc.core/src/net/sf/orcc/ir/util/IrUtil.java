@@ -112,22 +112,21 @@ public class IrUtil {
 	}
 
 	/**
-	 * Add the given block before the given expression. If the expression
-	 * is contained by an instruction in a basic block, this basic block is split to insert 
-	 * the block in the right place. Else the block is put after the previous block of the block
-	 * containing the expression.
-	 * Return <code>true</code> if the given instruction
-	 * has split the current basic block.
-	 *  
+	 * Add the given block before the given expression. If the expression is
+	 * contained by an instruction in a basic block, this basic block is split
+	 * to insert the block in the right place. Else the block is put after the
+	 * previous block of the block containing the expression. Return
+	 * <code>true</code> if the given instruction has split the current basic
+	 * block.
+	 * 
 	 * @param expression
 	 *            an expression
 	 * @param block
 	 *            the block to add before the given expression
-	 * @return <code>true</code> if the given block is added in the
-	 *         current block
+	 * @return <code>true</code> if the given block is added in the current
+	 *         block
 	 */
-	public static boolean addBlockBeforeExpr(Expression expression,
-			Block block) {
+	public static boolean addBlockBeforeExpr(Expression expression, Block block) {
 		Instruction containingInst = EcoreHelper.getContainerOfType(expression,
 				Instruction.class);
 		Block containingBlock = EcoreHelper.getContainerOfType(expression,
@@ -141,11 +140,13 @@ public class IrUtil {
 			} else {
 				List<Instruction> instructions = EcoreHelper
 						.getContainingList(containingInst);
-				
+
 				BlockBasic blockBasic = IrFactory.eINSTANCE.createBlockBasic();
 
 				// Split the basic block
-				blockBasic.getInstructions().addAll(instructions.subList(0, instructions.indexOf(containingInst)));
+				blockBasic.getInstructions().addAll(
+						instructions.subList(0,
+								instructions.indexOf(containingInst)));
 				addBlockBeforeBlock(blockBasic, containingBlock);
 				addBlockBeforeBlock(block, containingBlock);
 				return true;
@@ -156,13 +157,12 @@ public class IrUtil {
 			return false;
 		}
 	}
-	
-	private static void addBlockBeforeBlock(Block newBlock,
-			Block block) {
+
+	private static void addBlockBeforeBlock(Block newBlock, Block block) {
 		List<Block> blocks = EcoreHelper.getContainingList(block);
 		blocks.add(blocks.indexOf(block), newBlock);
 	}
-	
+
 	private static void addToPreviousBlockBasic(Block block,
 			Instruction instruction) {
 		List<Block> blocks = EcoreHelper.getContainingList(block);
@@ -174,29 +174,36 @@ public class IrUtil {
 	/**
 	 * Returns a deep copy of the given objects, and updates def/use chains.
 	 * 
-	 * @param copier
-	 *            a copier
 	 * @param eObjects
-	 *            a list of objects
+	 *            A Collection of objects
 	 * @return a deep copy of the given objects with def/use chains correctly
 	 *         updated
 	 */
 	public static <T extends EObject> Collection<T> copy(Collection<T> eObjects) {
-		return copy(new Copier(), eObjects);
+		return copy(new Copier(), eObjects, true);
 	}
 
 	/**
-	 * Returns a deep copy of the given objects, and updates def/use chains.
+	 * Returns a deep copy of the given objects, using the given Copier instance
+	 * and updates def/use chains. If <i>copyReferences</i> is set to true,
+	 * referenced objects will be duplicated in the same time their referrer
+	 * will be.
 	 * 
+	 * @param copier
+	 *            A Copier instance
 	 * @param eObjects
-	 *            a list of objects
+	 *            A Collection of objects
+	 * @param copyReferences
+	 *            Flag to control if references must be copied
 	 * @return a deep copy of the given objects with def/use chains correctly
 	 *         updated
 	 */
 	public static <T extends EObject> Collection<T> copy(Copier copier,
-			Collection<T> eObjects) {
+			Collection<T> eObjects, boolean copyReferences) {
 		Collection<T> result = copier.copyAll(eObjects);
-		copier.copyReferences();
+		if (copyReferences) {
+			copier.copyReferences();
+		}
 
 		TreeIterator<EObject> it = EcoreUtil.getAllContents(eObjects);
 		while (it.hasNext()) {
@@ -221,18 +228,66 @@ public class IrUtil {
 	}
 
 	/**
-	 * Returns a deep copy of the given object, and updates uses.
+	 * Returns a deep copy of the given object, and updates def/use chains.
+	 * 
+	 * @param eObject
+	 *            The EObject to copy
+	 * @return a deep copy of the given object with uses correctly updated
+	 */
+	public static <T extends EObject> T copy(T eObject) {
+		return copy(new Copier(), eObject);
+	}
+
+	/**
+	 * Returns a deep copy of the given object, using the given Copier instance
+	 * and updates def/use chains.
 	 * 
 	 * @param copier
-	 *            a copier
-	 * @param expression
-	 *            an expression
+	 *            A Copier instance
+	 * @param eObject
+	 *            The EObject to copy
 	 * @return a deep copy of the given object with uses correctly updated
 	 */
 	public static <T extends EObject> T copy(Copier copier, T eObject) {
+		return copy(copier, eObject, true);
+	}
+
+	/**
+	 * Returns a deep copy of the given object, and updates def/use chains. If
+	 * <i>copyReferences</i> is set to true, referenced objects will be
+	 * duplicated in the same time their referrer will be.
+	 * 
+	 * @param eObject
+	 *            The EObject to copy
+	 * @param copyReferences
+	 *            Flag to control if references must be copied
+	 * @return a deep copy of the given object with uses correctly updated
+	 */
+	public static <T extends EObject> T copy(T eObject, boolean copyReferences) {
+		return copy(new Copier(), eObject, copyReferences);
+	}
+
+	/**
+	 * Returns a deep copy of the given object, using the given Copier instance
+	 * and updates def/use chains. If <i>copyReferences</i> is set to true,
+	 * referenced objects will be duplicated in the same time their referrer
+	 * will be.
+	 * 
+	 * @param copier
+	 *            A Copier instance
+	 * @param eObject
+	 *            The EObject to copy
+	 * @param copyReferences
+	 *            Flag to control if references must be copied
+	 * @return a deep copy of the given object with uses correctly updated
+	 */
+	public static <T extends EObject> T copy(Copier copier, T eObject,
+			boolean copyReferences) {
 		@SuppressWarnings("unchecked")
 		T result = (T) copier.copy(eObject);
-		copier.copyReferences();
+		if (copyReferences) {
+			copier.copyReferences();
+		}
 
 		TreeIterator<EObject> it = EcoreUtil.getAllContents(eObject, true);
 		while (it.hasNext()) {
@@ -254,17 +309,6 @@ public class IrUtil {
 		}
 
 		return result;
-	}
-
-	/**
-	 * Returns a deep copy of the given object, and updates uses.
-	 * 
-	 * @param expression
-	 *            an expression
-	 * @return a deep copy of the given object with uses correctly updated
-	 */
-	public static <T extends EObject> T copy(T eObject) {
-		return copy(new Copier(), eObject);
 	}
 
 	/**
