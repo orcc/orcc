@@ -205,11 +205,15 @@ public class IrUtil {
 			if (object instanceof Def) {
 				Def def = (Def) object;
 				Def copyDef = (Def) copier.get(def);
-				copyDef.setVariable(def.getVariable());
+				if (copyDef.getVariable() == null) {
+					copyDef.setVariable(def.getVariable());
+				}
 			} else if (object instanceof Use) {
 				Use use = (Use) object;
 				Use copyUse = (Use) copier.get(use);
-				copyUse.setVariable(use.getVariable());
+				if (copyUse.getVariable() == null) {
+					copyUse.setVariable(use.getVariable());
+				}
 			}
 		}
 
