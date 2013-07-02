@@ -216,6 +216,10 @@ public class Inliner extends AbstractIrVisitor<Void> {
 				if (containedValue != null) {
 					doSwitch(containedValue);
 				}
+				EObject referencedValue = attribute.getReferencedValue();
+				if (referencedValue != null) {
+					doSwitch(referencedValue);
+				}
 			}
 			return null;
 		}
