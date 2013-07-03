@@ -151,7 +151,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 
-	def private printDelegatedstore(Procedure procedure) '''
+	def private printAdvancedload(Procedure procedure) '''
 		«IF procedure.hasAttribute("advancedload")»
 			«FOR grp : procedure.getAttribute("advancedload").attributes.filterGroupsLabels»
 				«FOR cdlt : grp.attributes.filterCodeletsLabels»
@@ -163,7 +163,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 
-	def private printAdvancedload(Procedure procedure) '''
+	def private printDelegatedstore(Procedure procedure) '''
 		«IF procedure.hasAttribute("delegatedstore")»
 			«FOR grp : procedure.getAttribute("delegatedstore").attributes.filterGroupsLabels»
 				«FOR cdlt : grp.attributes.filterCodeletsLabels»
