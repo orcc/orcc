@@ -77,13 +77,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					«variable.declare»;
 				«ENDFOR»
 
-				«action.body.printAdvancedload»
+			«action.body.printAdvancedload»
 
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
 				«ENDFOR»
 
-				«action.body.printDelegatedstore»
+			«action.body.printDelegatedstore»
 
 				«FOR port : action.inputPattern.ports»
 					index_«port.name» += «action.inputPattern.getNumTokens(port)»;
