@@ -42,6 +42,7 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.Attribute
 import org.eclipse.emf.common.util.EList
+import net.sf.orcc.ir.TypeList
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
@@ -114,7 +115,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF variable.hasAttribute("resident")»
 			«FOR grp : variable.getAttribute("resident").attributes.filterGroupsLabels»
 				«val direction = grp.getValueAsString("direction")»
-				#pragma hmpp «grp.name» resident, args[::«variable.name»].io=«direction»
+				«val sizeArg =
+					if(variable.type.list)
+						''', args[::«variable.name»].size={«(variable.type as TypeList).dimensions.join(",")»}'''
+					else ""»
+				#pragma hmpp «grp.name» resident, args[::«variable.name»].io=«direction»«sizeArg»
 			«ENDFOR»
 		«ENDIF»
 	'''
