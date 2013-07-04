@@ -74,13 +74,16 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 			// graphic card using HMPP compiler
 			if (proc.hasAttribute("codelet")) {
 
+				// This will set attributes for pragmas codelet, group (only
+				// once per procedure)
+				if (!codelets.containsKey(proc)) {
+					setCodeletAttribute(proc);
+				}
+
 				// This will set attributes for pragmas callsite, resident,
 				// advancedload, delegatedstore
 				setCallsiteAttribute(call, getGroupLabel(),
 						getCodeletLabel(proc));
-
-				// This will set attributes for pragmas codelet, group
-				setCodeletAttribute(proc);
 			}
 
 			return null;
@@ -107,10 +110,8 @@ public class SetHMPPAnnotations extends DfVisitor<Void> {
 				Var var = param.getVariable();
 				if (var.getType().isList()) {
 
-					boolean in = isVarUsed(var, proc);
-					boolean out = isVarDefined(var, proc);
-					String direction = in ? "in" : "";
-					direction += out ? "out" : "";
+					String direction = isVarUsed(var, proc) ? "in" : "";
+					direction += isVarDefined(var, proc) ? "out" : "";
 
 					cdltParams.put(var.getName(), direction);
 				}
