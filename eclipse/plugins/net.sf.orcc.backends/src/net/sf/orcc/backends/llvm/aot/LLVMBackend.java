@@ -163,7 +163,7 @@ public class LLVMBackend extends AbstractBackend {
 
 		visitors.add(new DisconnectedOutputPortRemoval());
 
-		visitors.add(new TypeResizer(true, true, false, false));
+		visitors.add(new TypeResizer(true, false, false, false));
 		visitors.add(new StringTransformation());
 		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
 		visitors.add(new DfVisitor<Void>(new SSATransformation()));
