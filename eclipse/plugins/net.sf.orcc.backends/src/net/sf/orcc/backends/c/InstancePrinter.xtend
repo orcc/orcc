@@ -464,6 +464,10 @@ class InstancePrinter extends CTemplate {
 			«FOR port : actor.outputs.notNative»
 				write_end_«port.name»();
 			«ENDFOR»
+			«IF actor.inputs.nullOrEmpty && actor.outputs.nullOrEmpty »
+				// compiler needs to have something after the 'finished' label
+				i = i;
+			«ENDIF»
 		}
 	'''
 	
