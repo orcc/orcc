@@ -75,16 +75,14 @@ import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.tools.stats.StatisticsPrinter;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -172,11 +170,8 @@ public class CBackend extends AbstractBackend {
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			if (debug) {
-				ResourceSet set = new ResourceSetImpl();
-				if (!IrUtil.serializeActor(set, srcPath, actor)) {
-					OrccLogger.warnln("Error with " + transformation
-							+ " on actor " + actor.getName());
-				}
+				OrccUtil.validateObject(transformation.toString() + " on "
+						+ actor.getName(), actor);
 			}
 		}
 	}

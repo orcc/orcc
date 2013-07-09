@@ -168,6 +168,9 @@ public class TTABackend extends LLVMBackend {
 
 		for (DfSwitch<?> transfo : visitors) {
 			transfo.doSwitch(network);
+			if (debug) {
+				OrccUtil.validateObject(transfo.toString(), network);
+			}
 		}
 
 		network.computeTemplateMaps();

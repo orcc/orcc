@@ -44,6 +44,7 @@ import net.sf.orcc.backends.promela.transform.NetworkStateDefExtractor;
 import net.sf.orcc.backends.promela.transform.PromelaAddPrefixToStateVar;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
 import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
+import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel;
 import net.sf.orcc.backends.promela.transform.PromelaTokenAnalyzer;
 import net.sf.orcc.backends.promela.transform.ScheduleBalanceEq;
 import net.sf.orcc.backends.promela.transform.Scheduler;
@@ -69,8 +70,6 @@ import net.sf.orcc.util.OrccLogger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 
-import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel;
-
 /**
  * This class defines a template-based PROMELA back-end.
  * 
@@ -85,11 +84,11 @@ public class PromelaBackend extends AbstractBackend {
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 	private PromelaSchedulingModel schedulingModel;
 	private ScheduleBalanceEq balanceEq;
-	
+
 	private final Map<String, String> renameMap;
 
 	private Set<Scheduler> actorSchedulers;
-	
+
 	/**
 	 * Creates a new instance of the Promela back-end. Initializes the
 	 * transformation hash map.
@@ -143,21 +142,21 @@ public class PromelaBackend extends AbstractBackend {
 		options.put("guards", guards);
 		options.put("priority", priority);
 		options.put("loadPeeks", loadPeeks);
-		
+
 		transformActors(network.getAllActors());
 
 		schedulingModel = new PromelaSchedulingModel(network);
-		
+
 		netStateDef = new NetworkStateDefExtractor(schedulingModel);
 		netStateDef.doSwitch(network);
-		
+
 		schedulingModel.printDependencyGraph();
 		actorSchedulers = new HashSet<Scheduler>();
-		
+
 		transformActorsAgain(network.getAllActors());
-		
+
 		printChildren(network);
-		
+
 		balanceEq = new ScheduleBalanceEq(actorSchedulers, network);
 
 		network.computeTemplateMaps();
@@ -168,7 +167,7 @@ public class PromelaBackend extends AbstractBackend {
 	protected boolean printActor(Actor instance) {
 		return new InstancePrinter(instance, options).printInstance(path) > 0;
 	}
-	
+
 	/**
 	 * Prints the given network.
 	 * 
@@ -181,14 +180,13 @@ public class PromelaBackend extends AbstractBackend {
 		new NetworkPrinter(network, options).print(path);
 		new SchedulePrinter(network, actorSchedulers).print(path);
 		new ScheduleInfoPrinter(network, balanceEq).print(path);
-		new ScriptPrinter(network).print(path); 
+		new ScriptPrinter(network).print(path);
 	}
-	
+
 	@Override
 	protected boolean exportRuntimeLibrary() {
 		String libsPath = path + File.separator + "pylibs";
-		OrccLogger.trace("Export libraries sources into " + libsPath
-				+ "... ");
+		OrccLogger.trace("Export libraries sources into " + libsPath + "... ");
 		if (copyFolderToFileSystem("/runtime/Promela/pylibs", libsPath, debug)) {
 			OrccLogger.traceRaw("OK" + "\n");
 			return true;
@@ -210,7 +208,8 @@ public class PromelaBackend extends AbstractBackend {
 			transformation.doSwitch(actor);
 		}
 		new PromelaTokenAnalyzer(netStateDef).doSwitch(actor);
-		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(netStateDef);
+		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
+				netStateDef);
 		actorScheduler.doSwitch(actor);
 		actorSchedulers.add(actorScheduler.getScheduler());
 	}

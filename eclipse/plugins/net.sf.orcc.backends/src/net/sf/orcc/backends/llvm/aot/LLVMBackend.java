@@ -68,15 +68,13 @@ import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * LLVM back-end.
@@ -184,14 +182,7 @@ public class LLVMBackend extends AbstractBackend {
 		for (DfSwitch<?> transfo : visitors) {
 			transfo.doSwitch(network);
 			if (debug) {
-				ResourceSet set = new ResourceSetImpl();
-				for (Actor actor : network.getAllActors()) {
-					if (actor.getFileName() != null
-							&& !IrUtil.serializeActor(set, srcPath, actor)) {
-						OrccLogger.warnln("Transformation " + transfo
-								+ " on actor " + actor.getName());
-					}
-				}
+				OrccUtil.validateObject(transfo.toString(), network);
 			}
 		}
 
