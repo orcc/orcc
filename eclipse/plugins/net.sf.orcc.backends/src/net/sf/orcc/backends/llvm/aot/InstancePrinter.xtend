@@ -257,9 +257,14 @@ class InstancePrinter extends LLVMTemplate {
 	def private schedulerWithFSM() '''
 		@_FSM_state = internal global i32 «stateToLabel.get(actor.fsm.initialState)»
 		
+		define void @«name»_scheduler() nounwind {
+		entry:
+			br label %bb_scheduler_start
+
+		bb_scheduler_start:
+			«printCallStartTokenFunctions»
 		«IF ! actor.actionsOutsideFsm.empty»
-			define void @«name»_outside_FSM_scheduler() nounwind {
-			entry:
+
 				br label %bb_outside_scheduler_start
 
 			bb_outside_scheduler_start:
@@ -267,17 +272,10 @@ class InstancePrinter extends LLVMTemplate {
 			«printActionLoop(actor.actionsOutsideFsm, true)»
 
 			bb_outside_finished:
-				;; no read_end/write_end here!
-				ret void
-			}
 		«ENDIF»
+			br label %bb_scheduler_switch
 
-		define void @«name»_scheduler() nounwind {
-		entry:
-			br label %bb_scheduler_start
-
-		bb_scheduler_start:
-			«printCallStartTokenFunctions»
+		bb_scheduler_switch:
 			«actor.fsm.printFsmSwitch»
 			br label %bb_scheduler_start
 
@@ -312,9 +310,6 @@ class InstancePrinter extends LLVMTemplate {
 	def private printTransition(State state) '''
 		; STATE «state.name»
 		bb_s_«state.name»:
-			«IF ! actor.actionsOutsideFsm.empty»
-				call void @«name»_outside_FSM_scheduler()
-			«ENDIF»
 		«FOR transition : state.outgoing.filter(typeof(Transition))»
 			«val action = transition.action»
 			«val actionName = action.name»
