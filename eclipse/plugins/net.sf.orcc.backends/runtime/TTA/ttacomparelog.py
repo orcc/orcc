@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2013, INSA
@@ -91,4 +92,4 @@ if len(args.log_files) <2:
 mergeAllFiles(args.log_files)
 
 # Generate a PDF file from HTML Summary
-# wkhtmltopdf tta_merge.html tta_merge.pdf
+wkhtmltopdf tta_merge.html tta_merge.pdf
