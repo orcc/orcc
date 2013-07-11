@@ -648,12 +648,20 @@ class InstancePrinter extends LLVMTemplate {
 		«connection.printExternalFifo(port)»
 	
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
-
+		@numFree_«name» = internal global i32 0
+		
 		define internal void @write_«name»() {
 		entry:
 			br label %write
 
 		write:
+			%wrIndex = load«prop» i32«addrSpace»* @fifo_«id»_wrIndex
+			%rdIndex = load«prop» i32«addrSpace»* @fifo_«id»_rdIndex
+			%size = load i32* @SIZE_«name»
+			%numTokens = sub i32 %wrIndex, %rdIndex
+			%getNumFree = sub i32 %size, %numTokens
+			%numFree = add i32 %wrIndex, %getNumFree
+			store i32 %numFree, i32* @numFree_«name»
 			ret void
 		}
 
