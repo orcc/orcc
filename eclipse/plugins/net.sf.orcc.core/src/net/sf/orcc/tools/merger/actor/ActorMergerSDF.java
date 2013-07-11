@@ -28,37 +28,24 @@
  */
 package net.sf.orcc.tools.merger.actor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.util.DfSwitch;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
-import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
@@ -76,169 +63,13 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Herve Yviquel
  * 
  */
-public class ActorMergerSDF extends DfSwitch<Actor> {
 
-	/**
-	 * This class defines a transformation to update the FIFO accesses.
-	 * 
-	 * @author Ghislain Roquier
-	 * 
-	 */
-	public class ActionUpdater extends AbstractIrVisitor<Void> {
+public class ActorMergerSDF extends ActorMergerBase {
 
-		private Procedure body;
+	SASLoopScheduler scheduler;
 
-		private Map<Var, Integer> loads;
-
-		private Pattern oldInputPattern;
-
-		private Pattern oldOutputPattern;
-
-		private Map<Var, Integer> stores;
-
-		/**
-		 * Create a new visitor able to update the FIFO accesses.
-		 * 
-		 * @param action
-		 *            the action containing the old patterns
-		 * @param body
-		 *            the procedure to update
-		 */
-		public ActionUpdater(Action action, Procedure body) {
-			this.body = body;
-			this.oldInputPattern = action.getInputPattern();
-			this.oldOutputPattern = action.getOutputPattern();
-		}
-
-		@Override
-		public Void caseInstLoad(InstLoad load) {
-			Use use = load.getSource();
-			Var var = use.getVariable();
-			Port port = oldInputPattern.getPort(var);
-			if (port != null) {
-				if (buffersMap.containsKey(port)) {
-					var = buffersMap.get(port);
-				} else {
-					var = inputPattern.getVariable(portsMap.get(port));
-				}
-				int cns = oldInputPattern.getNumTokens(port);
-				loads.put(var, cns);
-				use.setVariable(var);
-				List<Expression> indexes = load.getIndexes();
-				Expression e1 = irFactory.createExprVar(body.getLocal(var
-						.getName() + "_r"));
-				Expression e2 = IrUtil.copy(indexes.get(0));
-				Expression bop = irFactory.createExprBinary(e1, OpBinary.PLUS,
-						e2, e1.getType());
-				indexes.set(0, bop);
-			}
-			return null;
-		}
-
-		@Override
-		public Void caseInstReturn(InstReturn inst) {
-			IrUtil.delete(inst);
-			indexInst--;
-			return null;
-		}
-
-		@Override
-		public Void caseInstStore(InstStore store) {
-			Def def = store.getTarget();
-			Var var = def.getVariable();
-			Port port = oldOutputPattern.getPort(var);
-			if (port != null) {
-				if (buffersMap.containsKey(port)) {
-					var = buffersMap.get(port);
-				} else {
-					var = outputPattern.getVariable(portsMap.get(port));
-				}
-				int prd = oldOutputPattern.getNumTokens(port);
-				stores.put(var, prd);
-				def.setVariable(var);
-				Expression e1 = irFactory.createExprVar(body.getLocal(var
-						.getName() + "_w"));
-				Expression e2 = IrUtil.copy(store.getIndexes().get(0));
-				Expression bop = irFactory.createExprBinary(e1, OpBinary.PLUS,
-						e2, e1.getType());
-				store.getIndexes().set(0, bop);
-			}
-
-			port = oldInputPattern.getPort(var);
-			if (port != null) {
-				if (buffersMap.containsKey(port)) {
-					var = buffersMap.get(port);
-				} else {
-					var = inputPattern.getPortToVarMap()
-							.get(portsMap.get(port));
-				}
-				int cns = oldInputPattern.getNumTokens(port);
-				stores.put(var, cns);
-				def.setVariable(var);
-				Expression e1 = irFactory.createExprVar(body.getLocal(var
-						.getName() + "_r"));
-				Expression e2 = IrUtil.copy(store.getIndexes().get(0));
-				Expression bop = irFactory.createExprBinary(e1, OpBinary.PLUS,
-						e2, e1.getType());
-				store.getIndexes().set(0, bop);
-			}
-			return null;
-		}
-
-		@Override
-		public Void caseProcedure(Procedure procedure) {
-			loads = new HashMap<Var, Integer>();
-			stores = new HashMap<Var, Integer>();
-
-			super.caseProcedure(procedure);
-
-			// Update indexes
-			for (Map.Entry<Var, Integer> entry : loads.entrySet()) {
-				Var var = entry.getKey();
-				int cns = entry.getValue();
-
-				Var readVar = body.getLocal(var.getName() + "_r");
-				ExprBinary incr = irFactory.createExprBinary(
-						irFactory.createExprVar(readVar), OpBinary.PLUS,
-						irFactory.createExprInt(cns), readVar.getType());
-
-				InstAssign assign = irFactory.createInstAssign(readVar, incr);
-				procedure.getLast().add(assign);
-			}
-
-			for (Map.Entry<Var, Integer> entry : stores.entrySet()) {
-				Var var = entry.getKey();
-				int prd = entry.getValue();
-
-				Var readVar = body.getLocal(var.getName() + "_w");
-				ExprBinary incr = irFactory.createExprBinary(
-						irFactory.createExprVar(readVar), OpBinary.PLUS,
-						irFactory.createExprInt(prd), readVar.getType());
-
-				InstAssign assign = irFactory.createInstAssign(readVar, incr);
-				procedure.getLast().add(assign);
-			}
-
-			return null;
-		}
-
-	}
-
-	private static final DfFactory dfFactory = DfFactory.eINSTANCE;
-	private static final IrFactory irFactory = IrFactory.eINSTANCE;
-
-	private Map<Port, Var> buffersMap = new HashMap<Port, Var>();
-	private Copier copier;
-	private int depth;
-
-	private Pattern inputPattern;
-	private Pattern outputPattern;
-
-	private Map<Port, Port> portsMap = new HashMap<Port, Port>();
-
-	private SASLoopScheduler scheduler;
-	private Actor superActor;
-
+	protected int depth;
+	
 	/**
 	 * Creates a new merger for connected SDF actor.
 	 * 
@@ -247,6 +78,7 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 	 * @param copier
 	 *            the associated copier
 	 */
+	
 	public ActorMergerSDF(SASLoopScheduler scheduler, Copier copier) {
 		this.scheduler = scheduler;
 		this.copier = copier;
@@ -290,22 +122,8 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 			portsMap.put(connection.getSourcePort(), portCopy);
 		}
 
-		// Move variables and procedures
-		for (Vertex vertex : network.getChildren()) {
-			Actor actor = vertex.getAdapter(Actor.class);
-			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
-				if (!proc.isNative()) {
-					proc.setName(actor.getName() + "_" + proc.getName());
-				}
-				superActor.getProcs().add(proc);
-			}
-			for (Var var : new ArrayList<Var>(actor.getStateVars())) {
-				superActor.addStateVar(var);
-			}
-			for (Var param : new ArrayList<Var>(actor.getParameters())) {
-				superActor.addStateVar(param);
-			}
-		}
+		copyVariables(network);
+		copyProcedures(network);
 
 		// Create the merged action
 		inputPattern = dfFactory.createPattern();
@@ -330,83 +148,22 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 
 		Pattern peekPattern = dfFactory.createPattern();
 
-		Procedure scheduler = irFactory.createProcedure(
+		Procedure isSchedulable = irFactory.createProcedure(
 				"isSchedulable_mergedAction", 0, irFactory.createTypeBool());
-		scheduler.getLast().add(
+		isSchedulable.getLast().add(
 				irFactory.createInstReturn(irFactory.createExprBool(true)));
 
-		Procedure body = createBody();
+		Procedure body = createBody("mergedAction", scheduler.getMaxTokens(), scheduler.getDepth());
+		createStaticSchedule(body, (Schedule) scheduler.getSchedule(), body.getBlocks());
+		body.getLast().add(irFactory.createInstReturn());
 
 		Action action = dfFactory.createAction("mergedAction", inputPattern,
-				outputPattern, peekPattern, scheduler, body);
+				outputPattern, peekPattern, isSchedulable, body);
 
 		superActor.getActions().add(action);
 		superActor.getActionsOutsideFsm().add(action);
 
 		return superActor;
-	}
-
-	/**
-	 * Creates the body of the static action.
-	 * 
-	 * @return the body of the static action
-	 */
-	private Procedure createBody() {
-		Procedure body = irFactory.createProcedure("mergedAction", 0,
-				irFactory.createTypeVoid());
-
-		BlockBasic block = body.getLast();
-
-		// Create counters for inputs
-		for (Port port : superActor.getInputs()) {
-			Var readIdx = body.newTempLocalVariable(
-					irFactory.createTypeInt(32), port.getName() + "_r");
-			block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
-		}
-
-		// Create counters for outputs
-		for (Port port : superActor.getOutputs()) {
-			Var writeIdx = body.newTempLocalVariable(
-					irFactory.createTypeInt(32), port.getName() + "_w");
-			block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
-		}
-
-		int index = 0;
-		// Create buffers and counters for inner connections
-		for (Connection conn : scheduler.getMaxTokens().keySet()) {
-			String name = "buffer_" + index++;
-
-			// create inner buffer
-			int size = scheduler.getMaxTokens().get(conn);
-			Type eltType = conn.getSourcePort().getType();
-			Type type = irFactory.createTypeList(size, eltType);
-			Var buffer = body.newTempLocalVariable(type, name);
-
-			// create write counter
-			Var writeIdx = body.newTempLocalVariable(
-					irFactory.createTypeInt(32), name + "_w");
-			block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
-
-			// create read counter
-			Var readIdx = body.newTempLocalVariable(
-					irFactory.createTypeInt(32), name + "_r");
-			block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
-
-			buffersMap.put(conn.getSourcePort(), buffer);
-			buffersMap.put(conn.getTargetPort(), buffer);
-		}
-
-		// Add loop counter(s)
-		int i = 0;
-		do { // one loop var is required even if the schedule as a depth of 0
-			body.newTempLocalVariable(irFactory.createTypeInt(32), "idx_" + i);
-			i++;
-		} while (i < scheduler.getDepth());
-
-		createStaticSchedule(body, scheduler.getSchedule(), body.getBlocks());
-		body.getLast().add(irFactory.createInstReturn());
-
-		return body;
 	}
 
 	/**
@@ -426,19 +183,8 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 				Actor actor = iterand.getActor();
 				CSDFMoC moc = (CSDFMoC) actor.getMoC();
 				for (Invocation invocation : moc.getInvocations()) {
-					Action action = invocation.getAction();
-
-					// Copy local variable
-					for (Var var : new ArrayList<Var>(action.getBody()
-							.getLocals())) {
-						procedure.addLocal(var);
-					}
-
-					new ActionUpdater(action, procedure).doSwitch(action
-							.getBody());
-					blocks.addAll(action.getBody().getBlocks());
+					addActionToBody(procedure, IrUtil.copy(invocation.getAction()), blocks);
 				}
-
 			} else {
 				Schedule sched = iterand.getSchedule();
 				Var loopVar = procedure.getLocal("idx_" + depth);

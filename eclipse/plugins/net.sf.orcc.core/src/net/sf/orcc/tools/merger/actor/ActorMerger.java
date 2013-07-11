@@ -50,6 +50,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Matthieu Wipliez
  * @author Ghislain Roquier
  * @author Herve Yviquel
+ * @author Jani Boutellier
  * 
  */
 public class ActorMerger extends DfVisitor<Void> {
@@ -63,6 +64,8 @@ public class ActorMerger extends DfVisitor<Void> {
 	private Network network;
 
 	private List<String> mergedActors;
+	
+	private final String definitionFileName = "schedule.xml";
 
 	/**
 	 * Transforms the network to internalize the given list of vertices in their
@@ -74,7 +77,7 @@ public class ActorMerger extends DfVisitor<Void> {
 	 */
 	private Network transformNetwork(List<Vertex> vertices) {
 		Network subNetwork = dfFactory.createNetwork();
-		subNetwork.setName("cluster" + index);
+		subNetwork.setName(getRegionName(vertices));
 
 		List<Connection> newConnections = new ArrayList<Connection>();
 		List<Connection> oldConnections = new ArrayList<Connection>();
@@ -85,6 +88,27 @@ public class ActorMerger extends DfVisitor<Void> {
 			mergedActors.add(network.getName() + "_" + vertex.getLabel());
 		}
 
+		for (Vertex vertex : vertices) {
+			Actor actorCopy = ((Vertex)copier.get(vertex)).getAdapter(Actor.class);
+			OrccLogger.traceln(actorCopy.getName());
+
+			// There seems to be a problem in the copying performed above: input/output patterns are not copied correctly
+			// This is a dirty fix to the issue
+			DuplicateRemover duplicateRemover = new DuplicateRemover();
+			duplicateRemover.remove(actorCopy);
+		}
+
+		// Perform the renaming of ports to the superactor
+		for (Vertex vertex : vertices) {
+			Actor actorCopy = ((Vertex)copier.get(vertex)).getAdapter(Actor.class);
+			for (Port port : actorCopy.getInputs()) {
+				port.setName(actorCopy.getName() + "_" + port.getName());
+			}
+			for (Port port : actorCopy.getOutputs()) {
+				port.setName(actorCopy.getName() + "_" + port.getName());
+			}
+		}
+		
 		for (Connection connection : network.getConnections()) {
 			Vertex oldSrc = connection.getSource();
 			Vertex oldTgt = connection.getTarget();
@@ -104,7 +128,6 @@ public class ActorMerger extends DfVisitor<Void> {
 			} else if (!vertices.contains(oldSrc) && vertices.contains(oldTgt)) {
 				Vertex tgt = (Vertex) copier.get(oldTgt);
 				Port tgtPort = (Port) copier.get(connection.getTargetPort());
-				tgtPort.setName(tgt.getLabel() + "_" + tgtPort.getName());
 
 				caseActor(tgt.getAdapter(Actor.class));
 
@@ -123,7 +146,6 @@ public class ActorMerger extends DfVisitor<Void> {
 			} else if (vertices.contains(oldSrc) && !vertices.contains(oldTgt)) {
 				Vertex src = (Vertex) copier.get(oldSrc);
 				Port srcPort = (Port) copier.get(connection.getSourcePort());
-				srcPort.setName(src.getLabel() + "_" + srcPort.getName());
 
 				caseActor(src.getAdapter(Actor.class));
 
@@ -153,22 +175,63 @@ public class ActorMerger extends DfVisitor<Void> {
 
 		return subNetwork;
 	}
-
+	
+	/*
+	 * When static regions (= superactors) are imported from an XML file
+	 * the region name is piggybacked in a special "name vertex" that
+	 * is read here (if present) and deleted. For StaticRegionDetector
+	 * the basic naming scheme is used.
+	 */
+	
+	private String getRegionName(List<Vertex> vertices) {
+		for(Vertex vertex : vertices) {
+			if (vertex.hasAttribute("isNameVertex")) {
+				String regionName = vertex.getLabel();
+				vertices.remove(vertex);
+				return regionName;
+			}
+		}
+		return new String("cluster" + index);
+	}
+	
+	/*
+	 * If file "schedule.xml" is found in the user's home folder, that file
+	 * is used to define static regions and perform actor merging. If a file
+	 * under that name can not be opened, automatic merging is used.
+	 */
+	
 	@Override
 	public Void caseNetwork(Network network) {
+		String definitionFile = new String(System.getProperty("user.home") + "/" + definitionFileName);
+		boolean automatic = MergerUtil.testFilePresence(definitionFile);
 		this.network = network;
 
-		List<List<Vertex>> staticRegions = new StaticRegionDetector()
-				.analyze(network);
+		List<List<Vertex>> staticRegions;
+		if (!automatic) {
+			OrccLogger.traceln("Could not open " + definitionFile + " - performing automatic merging");
+			staticRegions = new StaticRegionDetector()
+			 				.analyze(network);
+		} else {
+			OrccLogger.traceln("Performing merging based on " + definitionFile);
+			MergerUtil.copyNumTokensToActionPorts(network.getVertices());
+			RegionParser regionParser = new RegionParser(definitionFile, network);
+			staticRegions = regionParser.parse();
+		}
 
+		OrccLogger.traceln(staticRegions.size() + " regions in total");
+		
 		for (List<Vertex> instances : staticRegions) {
 			copier = new Copier(true);
 			// transform the parent network and return the child network
 			Network subNetwork = transformNetwork(instances);
-			// create the static schedule of vertices
-			SASLoopScheduler scheduler = new SASLoopScheduler(subNetwork);
-			scheduler.schedule();
 
+			SASLoopScheduler scheduler = null;
+			if (!automatic) {
+				// create the static schedule of vertices
+				scheduler = new SASLoopScheduler(subNetwork);
+				scheduler.schedule();
+			}
+			
 			int actorcount = subNetwork.getChildren().size();
 			int fifocount = 0;
 			for (Connection conn : subNetwork.getConnections()) {
@@ -178,13 +241,18 @@ public class ActorMerger extends DfVisitor<Void> {
 				}
 			}
 
-			OrccLogger.traceln("Cluster" + index + " (" + actorcount
-					+ " actors, " + fifocount + " fifos" + ") => Schedule is "
-					+ scheduler.getSchedule());
+			OrccLogger.traceln(subNetwork.getName() + " (" + actorcount
+					+ " actors, " + fifocount + " fifos)");
 
 			// merge vertices inside a single actor
-			Actor superActor = new ActorMergerSDF(scheduler, copier)
-					.doSwitch(subNetwork);
+			Actor superActor;
+			if (!automatic) {
+				superActor = new ActorMergerSDF(scheduler, copier)
+									.doSwitch(subNetwork);
+			} else {
+				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile);
+				superActor = actorMerger.createMergedActor();
+			}
 			superActor.setAttribute("mergedActors", mergedActors);
 
 			network.add(superActor);
