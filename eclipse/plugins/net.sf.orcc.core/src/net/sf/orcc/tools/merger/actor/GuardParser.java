@@ -117,7 +117,7 @@ public class GuardParser {
 
 			ParseContinuation<Expression> contE = parseExprCont(node);
 			expressions.add(contE.getResult());
-			node = contE.getNode();
+
 			while (node != null) {
 				ParseContinuation<OpBinary> contO = parseExprBinaryOp(node);
 				OpBinary op = contO.getResult();
