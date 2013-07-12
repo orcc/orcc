@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2013, INSA
@@ -32,6 +33,7 @@
 import argparse
 import os
 import glob
+import subprocess
 
 def mergeFiles(file1,file2):
     destination = ".ttamerge_"+file2
@@ -91,4 +93,4 @@ if len(args.log_files) <2:
 mergeAllFiles(args.log_files)
 
 # Generate a PDF file from HTML Summary
-# wkhtmltopdf tta_merge.html tta_merge.pdf
+subprocess.call(["wkhtmltopdf", "tta_merge.html", "tta_merge.pdf"])

@@ -188,7 +188,7 @@ mv $SUMMARY_HTML $OUTPUT_TAG
 cp ~/tools/style.css $OUTPUT_TAG
 
 # Generate a PDF file from HTML Summary
-# wkhtmltopdf $OUTPUT_TAG/$SUMMARY_HTML $OUTPUT_TAG/$SUMMARY_PDF
+wkhtmltopdf $OUTPUT_TAG/$SUMMARY_HTML $OUTPUT_TAG/$SUMMARY_PDF
 
 # Show summary log in stdout
 echo ""
