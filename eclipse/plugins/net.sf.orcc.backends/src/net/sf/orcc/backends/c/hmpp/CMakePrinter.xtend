@@ -88,8 +88,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 
 		add_executable(«network.simpleName» ${filenames})
 		add_custom_command(TARGET «network.simpleName» POST_BUILD
-			COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/*.hmg.cu ${EXECUTABLE_OUTPUT_PATH}
-			COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/*.hmg ${EXECUTABLE_OUTPUT_PATH}
+			COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/*.hmg* ${EXECUTABLE_OUTPUT_PATH}
 		)
 
 		target_link_libraries(«network.simpleName» orcc)
