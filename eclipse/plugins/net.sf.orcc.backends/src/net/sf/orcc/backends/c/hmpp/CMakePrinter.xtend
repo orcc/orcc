@@ -54,11 +54,13 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		# Runtime libraries inclusion
 		set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
 
+		option(DONT_USE_HMPP 0)
 		# Hmpp compiler
-
-		find_program(HMPP_COMPILER hmpp)
-		if("${HMPP_COMPILER}" STREQUAL "HMPP_COMPILER-NOTFOUND")
-			message(FATAL_ERROR "HMPP compiler not found, please locate it manually by setting HMPP_COMPILER")
+		if(NOT DONT_USE_HMPP)
+			find_program(HMPP_COMPILER hmpp)
+			if("${HMPP_COMPILER}" STREQUAL "HMPP_COMPILER-NOTFOUND")
+				message(FATAL_ERROR "HMPP compiler not found, please locate it manually by setting HMPP_COMPILER")
+			endif()
 		endif()
 
 		«addLibrariesSubdirs»
@@ -79,17 +81,22 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 			«ENDFOR»
 		)
 
-		set(CMAKE_C_FLAGS "${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS}")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS}")
-		set(CMAKE_C_COMPILER ${HMPP_COMPILER})
-		set(CMAKE_CXX_COMPILER ${HMPP_COMPILER})
+		if(NOT DONT_USE_HMPP)
+			set(CMAKE_C_FLAGS "${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS}")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS}")
+			set(CMAKE_C_COMPILER ${HMPP_COMPILER})
+			set(CMAKE_CXX_COMPILER ${HMPP_COMPILER})
+		endif()
 
 		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
 
 		add_executable(«network.simpleName» ${filenames})
-		add_custom_command(TARGET «network.simpleName» POST_BUILD
-			COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/*.hmg* ${EXECUTABLE_OUTPUT_PATH}
-		)
+
+		if(NOT DONT_USE_HMPP)
+			add_custom_command(TARGET «network.simpleName» POST_BUILD
+				COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/*.hmg* ${EXECUTABLE_OUTPUT_PATH}
+			)
+		endif()
 
 		target_link_libraries(«network.simpleName» orcc)
 
