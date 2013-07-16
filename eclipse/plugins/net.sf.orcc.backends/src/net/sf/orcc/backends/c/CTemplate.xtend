@@ -50,6 +50,7 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.ir.Instruction
+import net.sf.orcc.ir.Procedure
 
 /*
  * Default C Printer
@@ -134,6 +135,11 @@ abstract class CTemplate extends CommonPrinter {
 	
 	def protected declare(Var variable)
 		'''«variable.type.doSwitch» «variable.indexedName»«variable.type.dimensionsExpr.printArrayIndexes»'''
+		
+	def protected declare(Procedure proc){
+		val modifier = if(proc.native) "extern" else "static"
+		'''«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]»);'''
+	}
 	
 	
 	/////////////////////////////////
