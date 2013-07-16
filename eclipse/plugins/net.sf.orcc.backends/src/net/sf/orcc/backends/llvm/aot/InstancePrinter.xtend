@@ -547,14 +547,14 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def protected loadVarInput(Port port, Connection connection) '''
 		«val prop = port.properties»
-		%local_index_«port.name»_«connection.getSafeId(port)» = load i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_rdIndex
-		%local_size_«port.name»_«connection.getSafeId(port)» = load i32* @SIZE_«port.name»_«connection.getSafeId(port)»
+		%local_index_«port.name»_«connection.getSafeId(port)» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_rdIndex
+		%local_size_«port.name»_«connection.getSafeId(port)» = load«prop» i32* @SIZE_«port.name»_«connection.getSafeId(port)»
 	'''
 	
 	def protected loadVarOutput(Port port, Connection connection) '''
 		«val prop = port.properties»
-		%local_index_«port.name»_«connection.getSafeId(port)» = load i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_wrIndex
-		%local_size_«port.name»_«connection.getSafeId(port)» = load i32* @SIZE_«port.name»_«connection.getSafeId(port)»
+		%local_index_«port.name»_«connection.getSafeId(port)» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_wrIndex
+		%local_size_«port.name»_«connection.getSafeId(port)» = load«prop» i32* @SIZE_«port.name»_«connection.getSafeId(port)»
 	'''
 	
 	def protected updateVarInput(Port port, Connection connection, Integer numTokens) '''
