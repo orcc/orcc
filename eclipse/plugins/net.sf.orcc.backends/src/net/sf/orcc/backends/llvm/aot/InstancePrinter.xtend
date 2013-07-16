@@ -239,7 +239,6 @@ class InstancePrinter extends LLVMTemplate {
 				«FOR init : actor.initializes»
 					call «init.body.returnType.doSwitch» @«init.body.name»()
 				«ENDFOR»
-				«printCallEndTokenFunctions»
 				ret void
 			}
 			
@@ -291,7 +290,6 @@ class InstancePrinter extends LLVMTemplate {
 			br label %bb_finished
 
 		bb_finished:
-			«printCallEndTokenFunctions»
 			ret void
 		}
 	'''
@@ -374,7 +372,6 @@ class InstancePrinter extends LLVMTemplate {
 			br label %bb_finished
 
 		bb_finished:
-			«printCallEndTokenFunctions»
 			ret void
 		}
 	'''
@@ -438,14 +435,12 @@ class InstancePrinter extends LLVMTemplate {
 		val firstPort = pattern.ports.notNative.head
 		val firstName = firstPort.name + "_" + incomingPortMap.get(firstPort).getSafeId(firstPort)
 		'''
-			%numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load«firstPort.properties» i32* @numTokens_«firstName»
-			%status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = sub i32 %numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», %local_rdIndex_«firstPort.name»_«incomingPortMap.get(firstPort).getSafeId(firstPort)»
+			%status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = sub i32 %numTokens_«firstName», %local_rdIndex_«firstName»
 			%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = icmp sge i32 %status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», «pattern.numTokensMap.get(firstPort)»
 			
 			«FOR port : pattern.ports.notNative.tail»
 				«val name = port.name + "_" + incomingPortMap.get(port).getSafeId(port)»
-				%numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @numTokens_«name»
-				%status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = sub i32 %numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», %local_rdIndex_«port.name»_«incomingPortMap.get(port).getSafeId(port)»
+				%status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = sub i32 %numTokens_«name», %local_rdIndex_«name»
 				%available_input_«stateName»«action.name»_«port.name» = icmp uge i32 %status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», «pattern.numTokensMap.get(port)»
 				%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(port)» = and i1 %has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(pattern.ports.get(pattern.ports.indexOf(port) - 1))», %available_input_«stateName»«action.name»_«port.name»
 				
@@ -481,32 +476,26 @@ class InstancePrinter extends LLVMTemplate {
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
 			«val prop = port.properties»
-			call void @read_«port.name»_«connection.getSafeId(port)»()
 			%local_wrIndex_«port.name»_«connection.getSafeId(port)» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_wrIndex
 			%local_rdIndex_«port.name»_«connection.getSafeId(port)» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_rdIndex
+			%getNumTokens_«port.name»_«connection.getSafeId(port)» = sub i32 %local_wrIndex_«port.name»_«connection.getSafeId(port)», %local_rdIndex_«port.name»_«connection.getSafeId(port)»
+			%numTokens_«port.name»_«connection.getSafeId(port)» = add i32 %local_rdIndex_«port.name»_«connection.getSafeId(port)», %getNumTokens_«port.name»_«connection.getSafeId(port)»
 		«ENDFOR»
 		«FOR port : actor.outputs.notNative»
 			«FOR connection : outgoingPortMap.get(port)»
 				«val prop = port.properties»
-				call void @write_«port.name»_«connection.getSafeId(port)»()
-				%local_wrIndex_«port.name»_«connection.getSafeId(port)» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_wrIndex
-				%local_rdIndex_«port.name»_«connection.getSafeId(port)» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_rdIndex
+				«val name = port.name + "_" + connection.getSafeId(port)»
+				%local_wrIndex_«name» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_wrIndex
+				%local_rdIndex_«name» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_rdIndex
+				%size_«name» = load i32* @SIZE_«name»
+				%numTokens_«name» = sub i32 %local_wrIndex_«name», %local_rdIndex_«name»
+				%getNumFree_«name» = sub i32 %size_«name», %numTokens_«name»
+				%numFree_«name» = add i32 %local_wrIndex_«name», %getNumFree_«name»
+				store i32 %numFree_«name», i32* @numFree_«name»
 			«ENDFOR»
 		«ENDFOR»
 	'''
 
-	def protected printCallEndTokenFunctions() '''
-		«FOR port : actor.inputs»
-			«val connection = incomingPortMap.get(port)»
-			call void @read_end_«port.name»_«connection.getSafeId(port)»()
-		«ENDFOR»
-		«FOR port : actor.outputs.notNative»
-			«FOR connection : outgoingPortMap.get(port)»
-				call void @write_end_«port.name»_«connection.getSafeId(port)»()
-			«ENDFOR»
-		«ENDFOR»
-	'''
-	
 	def protected print(Action action) '''
 		«val inputPattern = action.inputPattern»
 		«val outputPattern = action.outputPattern»
@@ -558,13 +547,13 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def protected loadVarInput(Port port, Connection connection) '''
 		«val prop = port.properties»
-		%local_index_«port.name»_«connection.getSafeId(port)» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_rdIndex
+		%local_index_«port.name»_«connection.getSafeId(port)» = load i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_rdIndex
 		%local_size_«port.name»_«connection.getSafeId(port)» = load i32* @SIZE_«port.name»_«connection.getSafeId(port)»
 	'''
 	
 	def protected loadVarOutput(Port port, Connection connection) '''
 		«val prop = port.properties»
-		%local_index_«port.name»_«connection.getSafeId(port)» = load«prop» i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_wrIndex
+		%local_index_«port.name»_«connection.getSafeId(port)» = load i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_wrIndex
 		%local_size_«port.name»_«connection.getSafeId(port)» = load i32* @SIZE_«port.name»_«connection.getSafeId(port)»
 	'''
 	
@@ -628,28 +617,6 @@ class InstancePrinter extends LLVMTemplate {
 		«connection.printExternalFifo(port)»
 	
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
-		@numTokens_«name» = internal global i32 0
-
-		define internal void @read_«name»() {
-		entry:
-			br label %read
-
-		read:
-			%rdIndex = load«prop» i32«addrSpace»* @fifo_«id»_rdIndex
-			%wrIndex = load«prop» i32«addrSpace»* @fifo_«id»_wrIndex
-			%getNumTokens = sub i32 %wrIndex, %rdIndex
-			%numTokens = add i32 %rdIndex, %getNumTokens
-			store i32 %numTokens, i32* @numTokens_«name»
-			ret void
-		}
-
-		define internal void @read_end_«name»() {
-		entry:
-			br label %read_end
-
-		read_end:
-			ret void
-		}
 	'''
 		
 	def private printOutput(Connection connection, Port port) '''
@@ -661,29 +628,6 @@ class InstancePrinter extends LLVMTemplate {
 	
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
 		@numFree_«name» = internal global i32 0
-		
-		define internal void @write_«name»() {
-		entry:
-			br label %write
-
-		write:
-			%wrIndex = load«prop» i32«addrSpace»* @fifo_«id»_wrIndex
-			%rdIndex = load«prop» i32«addrSpace»* @fifo_«id»_rdIndex
-			%size = load i32* @SIZE_«name»
-			%numTokens = sub i32 %wrIndex, %rdIndex
-			%getNumFree = sub i32 %size, %numTokens
-			%numFree = add i32 %wrIndex, %getNumFree
-			store i32 %numFree, i32* @numFree_«name»
-			ret void
-		}
-
-		define internal void @write_end_«name»() {
-		entry:
-			br label %write_end
-		
-		write_end:
-			ret void
-		}
 	'''
 	
 	/**
