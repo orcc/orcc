@@ -32,6 +32,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.backends.BackendsConstants;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.hmpp.transformations.CodeletInliner;
 import net.sf.orcc.backends.c.hmpp.transformations.ConstantRegisterCleaner;
@@ -67,9 +68,8 @@ public class HMPPBackend extends CBackend {
 	public void doInitializeOptions() {
 		super.doInitializeOptions();
 
-		// TODO : add this attribute key in the unified file
-		disableAnnotation = getAttribute(
-				"net.sf.orcc.backends.c.hmpp.disablePragma", false);
+		disableAnnotation = getAttribute(BackendsConstants.HMPP_NO_PRAGMAS,
+				false);
 
 		srcPath = path + File.separator + "src";
 	}
@@ -96,7 +96,7 @@ public class HMPPBackend extends CBackend {
 			transformation.doSwitch(actor);
 			ResourceSet set = new ResourceSetImpl();
 			if (debug && !IrUtil.serializeActor(set, path, actor)) {
-				System.out.println("oops " + transformation + " "
+				OrccLogger.warnln("Error with " + transformation + " on actor "
 						+ actor.getName());
 			}
 		}
