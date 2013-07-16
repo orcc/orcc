@@ -35,12 +35,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.CastArgFuncCall;
-
 import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
-import net.sf.orcc.backends.transform.Inliner;
-
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -53,7 +49,6 @@ import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
