@@ -43,6 +43,8 @@ std::string input_file;
 std::string write_file;
 
 int nbLoops = -1;
+int nbFrames = -1;
+
 
 GetOpt::GetOpt(int argc, char* argv[])
 {
@@ -78,4 +80,7 @@ void GetOpt::getOptions()
 	bool exists = this->getOptionAs<int>("l", nbLoops);
 	if(!exists)
 		nbLoops = -1;
+	exists = this->getOptionAs<int>("f", nbFrames);
+	if(!exists)
+		nbFrames = -1;
 }

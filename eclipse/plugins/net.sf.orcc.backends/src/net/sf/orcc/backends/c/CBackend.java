@@ -249,7 +249,7 @@ public class CBackend extends AbstractBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		boolean exportLibrary = !getAttribute(NO_LIBRARY_EXPORT, false);
 
 		if (exportLibrary) {

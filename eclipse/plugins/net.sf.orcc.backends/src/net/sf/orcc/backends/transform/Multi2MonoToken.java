@@ -57,7 +57,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
@@ -1308,25 +1307,18 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private void verifVisitedActions(Action action, State source, State target) {
 		String actionName = action.getName();
-		if (visitedActionsNames.isEmpty()) {
-			// fill lists the first time
-			visitedActionsNames.add(actionName);
-			visitedActions.add(IrUtil.copy(action));
-			createActionsSet(action, source, target);
+		if (visitedActionsNames.contains(actionName)) {
+			// if action is visited then it is replaced by not transformed
+			// action
+			visitedRenameIndex++;
+			int visitedIndex = actionNamePosition(visitedActionsNames,
+					actionName);
+			Action updateAction = visitedActions.get(visitedIndex);
+			updateFSM(updateAction, action, source, target);
 		} else {
-			if (visitedActionsNames.contains(actionName)) {
-				// if action is visited then it is replaced by not transformed
-				// action
-				visitedRenameIndex++;
-				int visitedIndex = actionNamePosition(visitedActionsNames,
-						actionName);
-				Action updateAction = visitedActions.get(visitedIndex);
-				updateFSM(updateAction, action, source, target);
-			} else {
-				visitedActionsNames.add(actionName);
-				visitedActions.add(IrUtil.copy(action));
-				createActionsSet(action, source, target);
-			}
+			visitedActionsNames.add(actionName);
+			visitedActions.add(action);
+			createActionsSet(action, source, target);
 		}
 	}
 

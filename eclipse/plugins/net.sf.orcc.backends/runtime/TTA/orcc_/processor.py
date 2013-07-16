@@ -90,7 +90,7 @@ class Processor:
         for actor in self.actors:
             sourceFiles.append(os.path.join(actorsPath, actor + ".ll"))
 
-        if not self.needRecompilation(self._tpefFile, sourceFiles + [self._adfFile]):
+        if not needRecompilation(self._tpefFile, sourceFiles + [self._adfFile]):
             return 0
 
         opt = args + ["-O3", "-o", self._tpefFile, "-a", self._adfFile]
@@ -192,7 +192,10 @@ class Processor:
 
     def simulate(self):
         if len(self.inputs)>0 and len(self.outputs)>0:
-            return subprocess.call(["ttanetsim", "-n", "top.pndf", "-t", self.id])
+            log_file = open(self.id+'.log', 'w')
+            print "Simulating %s" % self.id
+            retcode=subprocess.call(["ttanetsim", "-n", "top.pndf", "-t", self.id], stdout=log_file)
+            return retcode
         else:
             return 0
 
@@ -250,11 +253,12 @@ class Processor:
         result = template.substitute(path=genPath, id=self.id, width=self.irom.getWidth(), depth=self.irom.getDepth())
         open(os.path.join(genPath, self._xoeRomFile), "w").write(result)
 
-    def needRecompilation(self, tpefFile, depFiles):
-        if not os.path.exists(tpefFile):
+
+def needRecompilation(tpefFile, depFiles):
+    if not os.path.exists(tpefFile):
+        return True
+    t = os.path.getmtime(tpefFile)
+    for depFile in depFiles:
+        if os.path.getmtime(depFile) > t:
             return True
-        t = os.path.getmtime(tpefFile)
-        for depFile in depFiles:
-            if os.path.getmtime(depFile) > t:
-                return True
-        return False
+    return False

@@ -45,6 +45,7 @@ import net.sf.orcc.backends.llvm.tta.transform.ComplexHwOpDetector;
 import net.sf.orcc.backends.llvm.tta.transform.PrintRemoval;
 import net.sf.orcc.backends.llvm.tta.transform.StringTransformation;
 import net.sf.orcc.backends.transform.CastAdder;
+import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.ShortCircuitTransformation;
@@ -144,6 +145,8 @@ public class TTABackend extends LLVMBackend {
 					+ "performance could appear due to printing call.");
 		}
 
+		visitors.add(new DisconnectedOutputPortRemoval());
+
 		visitors.add(new TypeResizer(true, true, false, true));
 		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
 		visitors.add(new DfVisitor<Void>(new SSATransformation()));
@@ -204,7 +207,7 @@ public class TTABackend extends LLVMBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
 			OrccLogger.trace("Export library files into " + libPath + "... ");

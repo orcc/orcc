@@ -154,7 +154,7 @@ public class JavaBackend extends AbstractBackend {
 	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
 	 */
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			OrccLogger.trace("Export libraries sources into " + libsPath
 					+ "... ");
