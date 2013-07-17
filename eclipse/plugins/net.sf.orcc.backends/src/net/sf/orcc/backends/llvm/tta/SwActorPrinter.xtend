@@ -151,4 +151,5 @@ class SwActorPrinter extends InstancePrinter {
 		}
 		return irs
 	}
+
 }
