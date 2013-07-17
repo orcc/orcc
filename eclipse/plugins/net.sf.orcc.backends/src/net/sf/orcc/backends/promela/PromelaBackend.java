@@ -31,13 +31,16 @@ package net.sf.orcc.backends.promela;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.promela.transform.GuardsExtractor;
 import net.sf.orcc.backends.promela.transform.NetworkStateDefExtractor;
+import net.sf.orcc.backends.promela.transform.PromelaAddPrefixToStateVar;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
 import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
 import net.sf.orcc.backends.promela.transform.PromelaTokenAnalyzer;
@@ -59,6 +62,7 @@ import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
+import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
@@ -83,6 +87,8 @@ public class PromelaBackend extends AbstractBackend {
 	
 	private final Map<String, String> renameMap;
 
+	private Set<PromelaSchedulabilityTest> actorSchedulers;
+	
 	/**
 	 * Creates a new instance of the Promela back-end. Initializes the
 	 * transformation hash map.
@@ -130,7 +136,7 @@ public class PromelaBackend extends AbstractBackend {
 		new NetworkFlattener().doSwitch(network);
 
 		// Classify network
-		// new Classifier(getWriteListener()).doSwitch(network);
+		new Classifier().doSwitch(network);
 
 		options.put("guards", guards);
 		options.put("priority", priority);
@@ -145,6 +151,7 @@ public class PromelaBackend extends AbstractBackend {
 		
 		schedulingModel.printDependencyGraph();
 
+		actorSchedulers = new HashSet<PromelaSchedulabilityTest>();
 		transformInstances(network.getChildren());
 		printChildren(network);
 
@@ -167,24 +174,27 @@ public class PromelaBackend extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) {
 		new NetworkPrinter(network, options).print(path);
+		new SchedulePrinter(network, actorSchedulers).print(path);
 	}
 
 	private void transformInstance(Instance instance) {
 
 		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
-
 		transfos.add(new PromelaDeadGlobalElimination(netStateDef
 				.getVarsUsedInScheduling(), netStateDef
 				.getPortsUsedInScheduling()));
-		transfos.add(new GuardsExtractor(guards, priority, loadPeeks));
 		transfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
 		transfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 
 		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(instance.getActor());
 		}
+		new PromelaAddPrefixToStateVar().doSwitch(instance);
+		new GuardsExtractor(guards, priority, loadPeeks).doSwitch(instance);
 		new PromelaTokenAnalyzer(netStateDef).doSwitch(instance);
-		new PromelaSchedulabilityTest(netStateDef).doSwitch(instance);
+		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(netStateDef);
+		actorSchedulers.add(actorScheduler);
+		actorScheduler.doSwitch(instance);
 	}
 
 	private void transformInstances(EList<Vertex> vertices) {

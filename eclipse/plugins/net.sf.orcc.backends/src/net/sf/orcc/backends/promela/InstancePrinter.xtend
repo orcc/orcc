@@ -89,8 +89,15 @@ class InstancePrinter extends PromelaTemplate {
 	}
 	
 	def getInstanceFileContent() '''
-		/*state need to be global in order to reach it from never claims*/
+		/*state need to be global*/
 		int «instance.simpleName»_state;
+		
+		«IF ! instance.actor.stateVars.nullOrEmpty»
+			/* State variables */
+			«FOR stateVar : instance.actor.stateVars»
+				«stateVar.declareStateVar»
+			«ENDFOR»
+		«ENDIF»
 		
 		/* Process */
 		proctype «instance.simpleName»(«instance.actor.parameters.join(", ", [declare])») {
@@ -113,10 +120,7 @@ class InstancePrinter extends PromelaTemplate {
 			«ENDFOR»
 		
 			«IF ! instance.actor.stateVars.nullOrEmpty»
-				/* State variables */
-				«FOR stateVar : instance.actor.stateVars»
-					«stateVar.declareStateVar»
-				«ENDFOR»
+				/* State initialization */
 				«FOR stateVar : instance.actor.stateVars»
 					«stateVar.initializeStateVar»
 				«ENDFOR»
@@ -231,6 +235,9 @@ class InstancePrinter extends PromelaTemplate {
 				«instLoad.target.variable.name»_done = 0;
 			«ENDFOR»
 			
+			#ifdef PXML
+			printf("<iterand actor=\"«instance.simpleName»\" action=\"«action.name»\" repetitions=\"1\"/>\n");
+			#endif
 			#ifdef PNAME
 			printf("«instance.simpleName».«action.name»();\n");
 			#endif
@@ -364,11 +371,12 @@ class InstancePrinter extends PromelaTemplate {
 	}
 
 	override declare(Var variable) {
-		variable.declare("")	
+		variable.declare("")
 	}
 
-	def declare(Var variable, String nameSuffix)
+	def declare(Var variable, String nameSuffix) {
 		'''«variable.type.doSwitch» «variable.indexedName»«nameSuffix»«variable.type.dimensionsExpr.printArrayIndexes»'''
+	}
 	
 	override caseInstAssign(InstAssign assign) '''
 		«assign.target.variable.indexedName» = «assign.value.doSwitch»;
