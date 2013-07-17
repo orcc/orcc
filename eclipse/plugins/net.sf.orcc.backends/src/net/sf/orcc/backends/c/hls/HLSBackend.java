@@ -86,7 +86,7 @@ public class HLSBackend extends CBackend {
 	protected Map<String, List<Instance>> targetToInstancesMap;
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		return false;
 	}
 

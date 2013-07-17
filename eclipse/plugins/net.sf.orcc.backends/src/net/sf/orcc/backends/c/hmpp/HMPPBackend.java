@@ -123,7 +123,7 @@ public class HMPPBackend extends CBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		String target = path + File.separator + "libs";
 		OrccLogger.traceln("Export libraries sources into " + target + "... ");
 
