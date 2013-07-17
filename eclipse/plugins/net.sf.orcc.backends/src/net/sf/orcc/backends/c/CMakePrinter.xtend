@@ -41,7 +41,7 @@ import net.sf.orcc.util.OrccUtil
  */
 class CMakePrinter extends CommonPrinter {
 	
-	val Network network
+	protected val Network network
 	
 	new (Network network) {
 		this.network = network
@@ -55,7 +55,7 @@ class CMakePrinter extends CommonPrinter {
 		OrccUtil::printFile(srcCMakeContent, src)
 	}
 	
-	def private rootCMakeContent() '''
+	def protected rootCMakeContent() '''
 		# Generated from «network.simpleName»
 		
 		cmake_minimum_required (VERSION 2.6)
@@ -94,7 +94,7 @@ class CMakePrinter extends CommonPrinter {
 		add_subdirectory(${SRC_DIR})
 	'''
 
-	def private srcCMakeContent() '''
+	def protected srcCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		cmake_minimum_required (VERSION 2.6)
@@ -119,6 +119,5 @@ class CMakePrinter extends CommonPrinter {
 		if(NOT NO_EXTERNAL_DEPENDENCIES)
 			target_link_libraries(«network.simpleName» ${CMAKE_THREAD_LIBS_INIT})
 		endif(NOT NO_EXTERNAL_DEPENDENCIES)
-
 	'''
 }

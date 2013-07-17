@@ -163,7 +163,7 @@ public class LLVMBackend extends AbstractBackend {
 
 		visitors.add(new DisconnectedOutputPortRemoval());
 
-		visitors.add(new TypeResizer(true, true, false, false));
+		visitors.add(new TypeResizer(true, false, false, false));
 		visitors.add(new StringTransformation());
 		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
 		visitors.add(new DfVisitor<Void>(new SSATransformation()));
@@ -222,7 +222,7 @@ public class LLVMBackend extends AbstractBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			// Copy specific windows batch file
 			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {

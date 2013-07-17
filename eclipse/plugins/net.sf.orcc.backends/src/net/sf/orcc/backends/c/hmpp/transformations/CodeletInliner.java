@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the IRISA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,40 +26,27 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends;
+package net.sf.orcc.backends.c.hmpp.transformations;
 
-import java.util.Map;
-
-import org.eclipse.core.runtime.IProgressMonitor;
+import net.sf.orcc.backends.transform.Inliner;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
- * This interface defines a back-end.
+ * This class defines a transformation that inline functions and / or procedures
+ * called inside a codelet
  * 
- * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
-public interface Backend {
+public class CodeletInliner extends AbstractIrVisitor<Void> {
 
-	/**
-	 * Launches a compilation using the options provided to this back-end.
-	 */
-	void compile();
-
-	/**
-	 * Register options set on eclipse "Run configuration" or command line to
-	 * use it while code generation process.
-	 * 
-	 * @param options
-	 *            a map of string to object
-	 */
-	public void setOptions(Map<String, Object> options);
-
-	/**
-	 * Sets the progress monitor used by this back-end.
-	 * 
-	 * @param monitor
-	 *            a progress monitor
-	 */
-	void setProgressMonitor(IProgressMonitor monitor);
+	@Override
+	public Void caseProcedure(Procedure procedure) {
+		if (procedure.hasAttribute("codelet")) {
+			new Inliner(true, true).doSwitch(procedure);
+		}
+		return null;
+	}
 
 }

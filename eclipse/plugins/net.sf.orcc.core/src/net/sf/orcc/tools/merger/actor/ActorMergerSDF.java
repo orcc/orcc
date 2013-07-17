@@ -294,7 +294,9 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 		for (Vertex vertex : network.getChildren()) {
 			Actor actor = vertex.getAdapter(Actor.class);
 			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
-				proc.setName(actor.getName() + "_" + proc.getName());
+				if (!proc.isNative()) {
+					proc.setName(actor.getName() + "_" + proc.getName());
+				}
 				superActor.getProcs().add(proc);
 			}
 			for (Var var : new ArrayList<Var>(actor.getStateVars())) {

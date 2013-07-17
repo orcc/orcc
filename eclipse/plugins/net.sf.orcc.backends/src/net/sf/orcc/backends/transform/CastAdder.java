@@ -171,6 +171,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 
 	@Override
 	public Expression caseExprInt(ExprInt expr) {
+		expr.getType().setSize(parentType.getSizeInBits());
 		return expr;
 	}
 

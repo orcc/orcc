@@ -57,9 +57,11 @@ for i in $@
 done
 
 # Setting variables
-SUMMARY="summary_"$FREQUENCY"MHz_"$NBFRAME"frames.log"
-SUMMARY_CSV="summary_"$FREQUENCY"MHz_"$NBFRAME"frames.csv"
-SUMMARY_HTML="summary_"$FREQUENCY"MHz_"$NBFRAME"frames.html"
+SUMMARY="summary_"$FREQUENCY"MHz_"$NBFRAME"frames"
+SUMMARY_LOG=$SUMMARY".log"
+SUMMARY_CSV=$SUMMARY".csv"
+SUMMARY_HTML=$SUMMARY".html"
+SUMMARY_PDF=$SUMMARY".pdf"
 WORST_ACTOR=""
 WORST_FPS=10000
 SCALE=10
@@ -73,11 +75,11 @@ mkdir $OUTPUT_TAG
 echo "...Extracting informations from log files"
 
 # Summary log header
-echo "Summary results for " $OUTPUT_TAG > $SUMMARY
-echo ".....Frequency    = " $FREQUENCY >> $SUMMARY
-echo ".....Nb of frames = " $NBFRAME >> $SUMMARY
-echo ".....Calcul scale = " $SCALE >> $SUMMARY
-echo "" >> $SUMMARY
+echo "Summary results for " $OUTPUT_TAG > $SUMMARY_LOG
+echo ".....Frequency    = " $FREQUENCY >> $SUMMARY_LOG
+echo ".....Nb of frames = " $NBFRAME >> $SUMMARY_LOG
+echo ".....Calcul scale = " $SCALE >> $SUMMARY_LOG
+echo "" >> $SUMMARY_LOG
 
 echo "Actor,Cycle count,FPS@"$FREQUENCY"MHz,Status" > $SUMMARY_CSV
 
@@ -90,15 +92,37 @@ echo "  -->" >> $SUMMARY_HTML
 echo "  </style>" >> $SUMMARY_HTML
 echo "  </head>" >> $SUMMARY_HTML
 echo "	<body>" >> $SUMMARY_HTML
+# echo "	<h2>Summary results for " $OUTPUT_TAG "</h2>">> $SUMMARY_HTML
+# echo "		<table id=\"rounded-corner\">" >> $SUMMARY_HTML
+# echo "			<tbody>" >> $SUMMARY_HTML
+# echo "				<tr>" >> $SUMMARY_HTML
+# echo "					<td>Frequency</td>" >> $SUMMARY_HTML
+# echo "					<td class=\"num\">"$FREQUENCY"</td>" >> $SUMMARY_HTML
+# echo "				</tr>" >> $SUMMARY_HTML
+# echo "				<tr>" >> $SUMMARY_HTML
+# echo "					<td>Nb of frames</td>" >> $SUMMARY_HTML
+# echo "					<td class=\"num\">"$NBFRAME"</td>" >> $SUMMARY_HTML
+# echo "				</tr>" >> $SUMMARY_HTML
+# echo "				<tr>" >> $SUMMARY_HTML
+# echo "					<td>Calcul scale</td>" >> $SUMMARY_HTML
+# echo "					<td class=\"num\">"$SCALE"</td>" >> $SUMMARY_HTML
+# echo "				</tr>" >> $SUMMARY_HTML
+# echo "			</tbody>" >> $SUMMARY_HTML
+# echo "		</table>" >> $SUMMARY_HTML
 echo "		<table id=\"rounded-corner\">" >> $SUMMARY_HTML
 echo "			<thead>" >> $SUMMARY_HTML
 echo "				<tr>" >> $SUMMARY_HTML
-echo "					<th scope=\"col\" class=\"rounded-head-left\">Actor</th>" >> $SUMMARY_HTML
+echo "					<th scope=\"col\" class=\"rounded-head-left\"></th>" >> $SUMMARY_HTML
+echo "					<th scope=\"col\" colspan=3 class=\"rounded-head-right\">"$OUTPUT_TAG"</th>" >> $SUMMARY_HTML
+echo "				</tr>" >> $SUMMARY_HTML
+echo "				<tr>" >> $SUMMARY_HTML
+echo "					<th scope=\"col\">Actor</th>" >> $SUMMARY_HTML
 echo "					<th scope=\"col\">Cycle count</th>" >> $SUMMARY_HTML
 echo "					<th scope=\"col\">FPS@"$FREQUENCY"MHz</th>" >> $SUMMARY_HTML
-echo "					<th scope=\"col\" class=\"rounded-head-right\">Status</th>" >> $SUMMARY_HTML
+echo "					<th scope=\"col\">Status</th>" >> $SUMMARY_HTML
 echo "				</tr>" >> $SUMMARY_HTML
 echo "			</thead>" >> $SUMMARY_HTML
+echo "			<tbody>" >> $SUMMARY_HTML
 
 #Summary log
 for i in processor_*.log; 
@@ -124,32 +148,31 @@ for i in processor_*.log;
 	then 
 		OKKO="KO"
 	fi 
-	printf "%2s %42s   Cycle count = %9s    FPS@%2sMHz = %10s \n" "$OKKO" "$ACTOR_NAME" "$CYCLES" "$FREQUENCY" "$FPS" >> $SUMMARY;
+	printf "%2s %42s   Cycle count = %9s    FPS@%2sMHz = %10s \n" "$OKKO" "$ACTOR_NAME" "$CYCLES" "$FREQUENCY" "$FPS" >> $SUMMARY_LOG;
 	printf "%s,%s,%s,%s\n" "$ACTOR_NAME" "$CYCLES" "$FPS" "$OKKO" >> $SUMMARY_CSV;
-	echo "			<tbody>" >> $SUMMARY_HTML
 	echo "				<tr>" >> $SUMMARY_HTML
 	echo "					<td>"$ACTOR_NAME"</td>" >> $SUMMARY_HTML
 	echo "					<td class=\"num\">"$CYCLES"</td>" >> $SUMMARY_HTML
 	echo "					<td class=\"num\">"$FPS"</td>" >> $SUMMARY_HTML
 	if [ $NBERROR -gt 0 ]
 	then 
-		echo "					<td  class=\"ko\">"$OKKO"</td>" >> $SUMMARY_HTML
+		echo "					<td class=\"ko\">"$OKKO"</td>" >> $SUMMARY_HTML
 	else
-		echo "					<td  class=\"ok\">"$OKKO"</td>" >> $SUMMARY_HTML
+		echo "					<td class=\"ok\">"$OKKO"</td>" >> $SUMMARY_HTML
 	fi 
 	echo "				</tr>" >> $SUMMARY_HTML
-	echo "			</tbody>" >> $SUMMARY_HTML
 done
 
 # Summary log footer
-echo "Nb of actors OK = " `grep -c Error processor_*.log | grep ":0" | wc -l` >> $SUMMARY
-echo "Nb of actors KO = " `grep -c Error processor_*.log | grep -v ":0" | wc -l` >> $SUMMARY
-printf "Worst actor is : %s    with : %s FPS \n" "$WORST_ACTOR" "$WORST_FPS">> $SUMMARY
+echo "Nb of actors OK = " `grep -c Error processor_*.log | grep ":0" | wc -l` >> $SUMMARY_LOG
+echo "Nb of actors KO = " `grep -c Error processor_*.log | grep -v ":0" | wc -l` >> $SUMMARY_LOG
+printf "Worst actor is : %s    with : %s FPS \n" "$WORST_ACTOR" "$WORST_FPS">> $SUMMARY_LOG
 
+echo "			</tbody>" >> $SUMMARY_HTML
 echo "			<tfoot>" >> $SUMMARY_HTML
 echo "				<tr>" >> $SUMMARY_HTML
-echo "					<td colspan=\"3\" class=\"rounded-foot-left\">Worst actor : "$WORST_ACTOR " ("$WORST_FPS "FPS)</td>" >> $SUMMARY_HTML
-echo "					<td class=\"rounded-foot-right\">&nbsp;</td>" >> $SUMMARY_HTML
+echo "					<td class=\"rounded-foot-left\">Worst actor :</td>" >> $SUMMARY_HTML
+echo "					<td colspan=\"3\" class=\"rounded-foot-right\">"$WORST_ACTOR"</td>" >> $SUMMARY_HTML
 echo "				</tr>" >> $SUMMARY_HTML
 echo "			</tfoot>" >> $SUMMARY_HTML
 echo "		</table>" >> $SUMMARY_HTML
@@ -159,12 +182,15 @@ echo "</html>" >> $SUMMARY_HTML
 # Archiving logs
 echo "...Archiving in directory "$OUTPUT_TAG
 cp processor_*.log $OUTPUT_TAG
-mv $SUMMARY $OUTPUT_TAG
+mv $SUMMARY_LOG $OUTPUT_TAG
 mv $SUMMARY_CSV $OUTPUT_TAG
 mv $SUMMARY_HTML $OUTPUT_TAG
-#cp ~/tools/style.css $OUTPUT_TAG
+cp ~/tools/style.css $OUTPUT_TAG
+
+# Generate a PDF file from HTML Summary
+wkhtmltopdf $OUTPUT_TAG/$SUMMARY_HTML $OUTPUT_TAG/$SUMMARY_PDF
 
 # Show summary log in stdout
 echo ""
-cat $OUTPUT_TAG/$SUMMARY
+cat $OUTPUT_TAG/$SUMMARY_LOG
 exit 0
