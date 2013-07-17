@@ -556,13 +556,15 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 	
 	def protected updateVarInput(Port port, Connection connection, Integer numTokens) '''
+		«val prop = port.properties»
 		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
-		store i32 %new_index_«port.name»_«connection.getSafeId(port)», i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_rdIndex
+		store«prop» i32 %new_index_«port.name»_«connection.getSafeId(port)», i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_rdIndex
 	'''	
 
 	def protected updateVarOutput(Port port, Connection connection, Integer numTokens) '''
+		«val prop = port.properties»
 		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
-		store i32 %new_index_«port.name»_«connection.getSafeId(port)», i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_wrIndex
+		store«prop» i32 %new_index_«port.name»_«connection.getSafeId(port)», i32«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_wrIndex
 	'''	
 	
 	def protected print(Procedure procedure) '''
