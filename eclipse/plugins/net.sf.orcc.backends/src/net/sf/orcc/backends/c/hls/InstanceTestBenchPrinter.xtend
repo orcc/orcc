@@ -333,9 +333,9 @@ import net.sf.orcc.util.OrccUtil
 				«ENDIF»
 				
 			
-				 assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»)))
-				 report "on port «connection.fifoName» correct value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " equals :" & str(input_bit)
-				 severity note;
+				 --assert («connection.fifoName»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoType.sizeInBits»)))
+				 --report "on port «connection.fifoName» correct value computed : " & str(to_integer(signed(«connection.fifoName»_din))) & " equals :" & str(input_bit)
+				 --severity note;
 
 			end if;
 		end if;

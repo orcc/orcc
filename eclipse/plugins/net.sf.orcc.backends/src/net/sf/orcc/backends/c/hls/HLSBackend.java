@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
+import net.sf.orcc.backends.transform.CastArgFuncCall;
 import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.df.Actor;
@@ -47,6 +48,7 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
@@ -84,7 +86,7 @@ public class HLSBackend extends CBackend {
 	protected Map<String, List<Instance>> targetToInstancesMap;
 
 	@Override
-	protected boolean exportRuntimeLibrary() {
+	public boolean exportRuntimeLibrary() {
 		return false;
 	}
 
@@ -122,7 +124,7 @@ public class HLSBackend extends CBackend {
 
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new Multi2MonoToken());
-
+		transformations.add(new DfVisitor<Void>(new CastArgFuncCall()));
 		// transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 		// transformations.add(new DivisionSubstitution());//don't work for HEVC
 		for (DfSwitch<?> transformation : transformations) {
@@ -157,6 +159,7 @@ public class HLSBackend extends CBackend {
 		new BroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
 		new DisconnectedOutputPortRemoval().doSwitch(network);
+
 	}
 
 	@Override
