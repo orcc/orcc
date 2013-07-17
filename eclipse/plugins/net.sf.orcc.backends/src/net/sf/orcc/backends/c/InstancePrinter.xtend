@@ -80,7 +80,7 @@ class InstancePrinter extends CTemplate {
 	protected var Map<Port, Connection> incomingPortMap
 	protected var Map<Port, List<Connection>> outgoingPortMap
 	
-	protected var String name
+	protected var String entityName
 	
 	protected var boolean geneticAlgo = false
 	
@@ -171,10 +171,10 @@ class InstancePrinter extends CTemplate {
 		checkConnectivy
 		
 		val content = fileContent
-		val file = new File(targetFolder + File::separator + name + ".c")
+		val file = new File(targetFolder + File::separator + entityName + ".c")
 		
 		if(actor.native) {
-			OrccLogger::noticeln(name + " is native and not generated.")
+			OrccLogger::noticeln(entityName + " is native and not generated.")
 		} else if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)
 			return 0
@@ -185,11 +185,11 @@ class InstancePrinter extends CTemplate {
 	
 	def protected setInstance(Instance instance) {
 		if (!instance.isActor) {
-			throw new OrccRuntimeException("Instance " + name + " is not an Actor's instance")
+			throw new OrccRuntimeException("Instance " + entityName + " is not an Actor's instance")
 		}
 		
 		this.instance = instance
-		this.name = instance.name
+		this.entityName = instance.name
 		this.actor = instance.actor
 		this.attributable = instance
 		this.incomingPortMap = instance.incomingPortMap
@@ -200,7 +200,7 @@ class InstancePrinter extends CTemplate {
 	}
 	
 	def protected setActor(Actor actor) {
-		this.name = actor.name
+		this.entityName = actor.name
 		this.actor = actor
 		this.attributable = actor
 		this.incomingPortMap = actor.incomingPortMap
@@ -234,7 +234,7 @@ class InstancePrinter extends CTemplate {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Instance
-		extern struct actor_s «name»;
+		extern struct actor_s «entityName»;
 		
 		«IF !actor.inputs.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
@@ -386,7 +386,7 @@ class InstancePrinter extends CTemplate {
 		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
-			«noInline»void «name»_scheduler(struct schedinfo_s *si) {
+			«noInline»void «entityName»_scheduler(struct schedinfo_s *si) {
 				int i = 0;
 				si->ports = 0;
 			
@@ -421,7 +421,7 @@ class InstancePrinter extends CTemplate {
 	//========================================
 	def protected printFsm() '''
 		«IF ! actor.actionsOutsideFsm.empty»
-			«inline»void «name»_outside_FSM_scheduler(struct schedinfo_s *si) {
+			«inline»void «entityName»_outside_FSM_scheduler(struct schedinfo_s *si) {
 				int i = 0;
 				«actor.actionsOutsideFsm.printActionLoop»
 			finished:
@@ -430,7 +430,7 @@ class InstancePrinter extends CTemplate {
 			}
 		«ENDIF»
 		
-		«noInline»void «name»_scheduler(struct schedinfo_s *si) {
+		«noInline»void «entityName»_scheduler(struct schedinfo_s *si) {
 			int i = 0;
 		
 			«printCallTokensFunctions»
@@ -445,7 +445,7 @@ class InstancePrinter extends CTemplate {
 					goto l_«state.name»;
 			«ENDFOR»
 			default:
-				printf("unknown state in «name».c : %s\n", stateNames[_FSM_state]);
+				printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]);
 				wait_for_key();
 				exit(1);
 			}
@@ -474,11 +474,11 @@ class InstancePrinter extends CTemplate {
 	def protected printStateLabel(State state) '''
 	l_«state.name»:
 		«IF ! actor.actionsOutsideFsm.empty»
-			«name»_outside_FSM_scheduler(si);
+			«entityName»_outside_FSM_scheduler(si);
 			i += si->num_firings;
 		«ENDIF»
 		«IF state.outgoing.empty»
-			printf("Stuck in state "«state.name»" in «name»\n");
+			printf("Stuck in state "«state.name»" in «entityName»\n");
 			wait_for_key();
 			exit(1);
 		«ELSE»
@@ -519,9 +519,9 @@ class InstancePrinter extends CTemplate {
 	
 	def private printTransitionPatternPort(Port port, Pattern pattern) '''
 		if (numTokens_«port.name» - index_«port.name» < «pattern.getNumTokens(port)») {
-			if( ! «name».sched->round_robin || i > 0) {
+			if( ! «entityName».sched->round_robin || i > 0) {
 				«IF incomingPortMap.containsKey(port)»
-					sched_add_schedulable(«name».sched, &«incomingPortMap.get(port).source.label», RING_TOPOLOGY);
+					sched_add_schedulable(«entityName».sched, &«incomingPortMap.get(port).source.label», RING_TOPOLOGY);
 				«ENDIF»
 			}
 		}
@@ -541,7 +541,7 @@ class InstancePrinter extends CTemplate {
 			«init.print»
 		«ENDFOR»
 		
-		«inline»void «name»_initialize(struct schedinfo_s *si) {
+		«inline»void «entityName»_initialize(struct schedinfo_s *si) {
 			int i = 0;
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
@@ -557,7 +557,7 @@ class InstancePrinter extends CTemplate {
 		}
 		
 		«IF(geneticAlgo)»
-			void «name»_reinitialize(struct schedinfo_s *si) {
+			void «entityName»_reinitialize(struct schedinfo_s *si) {
 				int i = 0;
 				«FOR variable : actor.stateVars»
 					«IF variable.assignable && variable.initialized»
@@ -585,10 +585,10 @@ class InstancePrinter extends CTemplate {
 	
 	def private checkConnectivy() {
 		for(port : actor.inputs.filter[!inputConneted]) {
-			OrccLogger::noticeln("["+name+"] Input port "+port.name+" not connected.")
+			OrccLogger::noticeln("["+entityName+"] Input port "+port.name+" not connected.")
 		}
 		for(port : actor.outputs.filter[!outputConnected]) {
-			OrccLogger::noticeln("["+name+"] Output port "+port.name+" not connected.")
+			OrccLogger::noticeln("["+entityName+"] Output port "+port.name+" not connected.")
 		}
 	}
 	
@@ -637,8 +637,8 @@ class InstancePrinter extends CTemplate {
 		if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
 			stop = 1;
 			«IF newSchedul»
-				if( ! «name».sched->round_robin || i > 0) {
-					sched_add_schedulable(«name».sched, &«successor.target.label», RING_TOPOLOGY);
+				if( ! «entityName».sched->round_robin || i > 0) {
+					sched_add_schedulable(«entityName».sched, &«successor.target.label», RING_TOPOLOGY);
 				}
 			«ENDIF»
 		}
@@ -763,7 +763,7 @@ class InstancePrinter extends CTemplate {
 	}
 
 	def protected fullName(Port port)
-		'''«name»_«port.name»'''
+		'''«entityName»_«port.name»'''
 
 	def private sizeOrDefaultSize(Connection conn) {
 		if(conn == null || conn.size == null) "SIZE"
