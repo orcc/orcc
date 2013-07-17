@@ -61,7 +61,7 @@
                id="net.sf.orcc.backends.geneticAlgorithm">
          </option>
          <option
-               id="net.sf.orcc.backends.enableTraces">
+               id="net.sf.orcc.tracing.enable">
          </option>
          <option
                id="net.sf.orcc.backends.hmpp.disablePragma">
@@ -404,6 +404,13 @@
         description="Generate VTL for all actors"
         id="net.sf.orcc.backends.compileVTL"
         name="VTL Code Generation">
+     <checkBox></checkBox>
+  </option>
+  <option
+        defaultValue="false"
+        description="Do not print any HMPP pragma, only valid C code"
+        id="net.sf.orcc.backends.hmpp.disablePragma"
+        name="Disable HMPP pragmas">
      <checkBox></checkBox>
   </option>
    </extension>
