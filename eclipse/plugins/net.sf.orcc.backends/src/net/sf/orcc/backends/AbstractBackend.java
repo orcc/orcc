@@ -312,11 +312,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			return false;
 		} else {
 			if (!forceOverwrite) {
-				// Comute MD5 for in and out file, to check if out file neet to
-				// be written
+				// Compute MD5 for in and out files to check if out file need to
+				// be overwritten
 				try {
-					// Create a new Input stream to let original open for write
-					// action
+					// Create a new Input stream to keep original one open (used
+					// later to write data)
 					BufferedInputStream isIn = new BufferedInputStream(this
 							.getClass().getResourceAsStream(source));
 					FileInputStream isOut = new FileInputStream(fileOut);
@@ -330,7 +330,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 						mdIn.update(b);
 						isOut.read(b);
 						mdOut.update(b);
-
 					} while (isIn.available() > 0);
 
 					isIn.close();
@@ -425,8 +424,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			boolean result = true;
 
-			// XXX : Check if this test is still needed. It seems that libraries
-			// files & folders are always available as "file:" url
+			// Copy is performed from the jar plugin (i.e. orcc has been
+			// installed from an update site)
 			if (dirUrl.getProtocol().equals("jar")) {
 				// Copy folder from a jar
 				URI toto = new URI(dirUrl.getFile().split("!")[0]);
@@ -463,7 +462,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 				return result;
 
-			} else if (dirUrl.getProtocol().equals("file")) {
+			}
+			// Copy is performed directly from the source (i.e. user is probably
+			// a developer)
+			else if (dirUrl.getProtocol().equals("file")) {
 				// Copy folder from file system
 				File[] listDir = new File(dirUrl.getFile()).listFiles();
 
