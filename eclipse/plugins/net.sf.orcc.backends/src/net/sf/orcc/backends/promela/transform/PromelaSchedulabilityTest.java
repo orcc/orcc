@@ -869,6 +869,10 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		}
 	}
 	
+	public String getInstanceName() {
+		return instance.getName();
+	}
+	
 	public String printFSM() {
 		return scheduler.toString();
 	}

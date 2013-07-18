@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Åbo Akademi
+ * Copyright (c) 2011, Abo Akademi University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,10 +10,10 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the Abo Akademi University nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
- * about
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,6 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+ 
 package net.sf.orcc.backends.promela
 
 import java.io.File
@@ -77,8 +78,8 @@ class SchedulePrinter extends PromelaTemplate {
 	
 	def superActor(PromelaSchedulabilityTest actorSched) { 
 	'''
-		<superactor name="cluster_z">
-			<actor name="chipMapper_inst"/>
+		<superactor name="cluster_«actorSched.instanceName»">
+			<actor name="«actorSched.instanceName»"/>
 			«actorSched.printFSM»
 			«actorSched.printSchedule»
 		</superactor>
