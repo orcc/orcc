@@ -50,12 +50,12 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.Attribute;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
  * Replace BlockWhile by BlockFor when it is possible. Cfg must be built before
@@ -185,9 +185,9 @@ public class BlockForAdder extends DfVisitor<Void> {
 			Block lastBlock = blocks.get(blocks.size() - 1);
 
 			// Get the block immediately preceding while loop
-			
+
 			CfgNode joinNode = blockWhile.getJoinBlock().getCfgNode();
-			if(joinNode == null) {
+			if (joinNode == null) {
 				throw new OrccRuntimeException(
 						"Control Flow Graph must be built. Please apply the ControlFlowAnalyzer before BlockForAdder (actor : "
 								+ actor.getName() + ").");
@@ -241,10 +241,8 @@ public class BlockForAdder extends DfVisitor<Void> {
 			blockFor.getStep().addAll(stepInstrList);
 
 			// Copy attributes
-			Copier copier = new EcoreUtil.Copier();
 			for (Attribute attribute : blockWhile.getAttributes()) {
-				blockFor.getAttributes()
-						.add((Attribute) copier.copy(attribute));
+				blockFor.getAttributes().add(IrUtil.copy(attribute, false));
 			}
 
 			// Replace node

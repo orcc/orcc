@@ -114,7 +114,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«init.print»
 		«ENDFOR»
 		
-		void «name»_initialize() {
+		void «entityName»_initialize() {
 			int i = 0;
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */

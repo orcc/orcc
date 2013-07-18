@@ -184,7 +184,7 @@ class InstancePrinter extends LLVMTemplate {
 			«val connection = incomingPortMap.get(port)»
 			«connection.printInput(port)»
 		«ENDFOR»
-		
+
 		«FOR port : outputs»
 			«FOR connection : outgoingPortMap.get(port)»
 				«connection.printOutput(port)»
@@ -613,7 +613,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val addrSpace = connection.addrSpace»
 		«val prop = port.properties»
 		«connection.printExternalFifo(port)»
-	
+
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
 	'''
 		
@@ -623,7 +623,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val addrSpace = connection.addrSpace»
 		«val prop = port.properties»
 		«connection.printExternalFifo(port)»
-	
+
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
 		@numFree_«name» = internal global i32 0
 	'''
@@ -725,8 +725,12 @@ class InstancePrinter extends LLVMTemplate {
 		%«cast.target.variable.indexedName» = «cast.castOp» «cast.source.variable.castType» «cast.source.variable.print» to «cast.target.variable.castType»
 	'''
 
-	def private getCastOp(InstCast cast)
-		'''«IF cast.source.variable.type.list»bitcast«ELSEIF ! cast.extended»trunc«ELSEIF cast.signed»sext«ELSE»zext«ENDIF»'''
+	def private getCastOp(InstCast cast) {
+		if(cast.source.variable.type.list) '''bitcast'''
+		else if(!cast.extended) '''trunc'''
+		else if(cast.signed) '''sext'''
+		else '''zext'''
+	}
 
 	def private getCastType(Var variable)
 		'''«variable.type.doSwitch»«IF variable.type.list»*«ENDIF»'''
@@ -812,7 +816,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
-			call i32 (i8*, ...)* @printf(«call.arguments.join(", ")[printParameter((it as ArgByVal).value.type)]»)
+			call i32 (i8*, ...)* @printf(«call.arguments.join(", ")[printArgument((it as ArgByVal).value.type)]»)
 		«ELSE»
 			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
 		«ENDIF»
@@ -822,13 +826,13 @@ class InstancePrinter extends LLVMTemplate {
 		val paramList = new ArrayList<CharSequence>
 		if(params.size != 0) {
 			for (i : 0..params.size-1) {
-				paramList.add(printParameter(args.get(i), params.get(i).variable.type))
+				paramList.add(printArgument(args.get(i), params.get(i).variable.type))
 			}
 		}
 		return paramList
 	}
 
-	def protected printParameter(Arg arg, Type type) {
+	def protected printArgument(Arg arg, Type type) {
 		if (arg.byRef)
 			'''TODO'''
 		else if (type.string) {

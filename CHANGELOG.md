@@ -1,6 +1,8 @@
 # Next release
 
 ### Notable changes and features
+ - Backends:
+	* New experimental HMPP backend
 
 ### Bugfixes
 

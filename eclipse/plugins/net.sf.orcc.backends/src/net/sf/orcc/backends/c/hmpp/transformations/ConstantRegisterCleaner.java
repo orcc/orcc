@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the IRISA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,32 +26,52 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends;
+package net.sf.orcc.backends.c.hmpp.transformations;
+
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.ir.util.IrUtil;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * @author Antoine Lorence
+ * This class defines transformation for removing registers that store a
+ * constant
+ * 
+ * @author Jérôme Gorin
  * 
  */
-public class BackendsConstants {
+public class ConstantRegisterCleaner extends AbstractIrVisitor<Void> {
 
-	public static final String GENETIC_ALGORITHM = "net.sf.orcc.backends.geneticAlgorithm";
-	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
-	public static final String NEW_SCHEDULER_TOPOLOGY = "net.sf.orcc.backends.newScheduler.topology";
+	protected boolean changed;
 
-	public static enum Topology {
-		Ring, Mesh
+	@Override
+	public Void caseInstLoad(InstLoad load) {
+		Var source = load.getSource().getVariable();
+		if (source.isGlobal() && load.getIndexes().isEmpty()) {
+			Var target = load.getTarget().getVariable();
+			EList<Use> targetUses = target.getUses();
+			changed = true;
+			while (!targetUses.isEmpty()) {
+				targetUses.get(0).setVariable(source);
+			}
+			EcoreUtil.remove(target);
+			IrUtil.delete(load);
+		}
+
+		return null;
 	}
 
-	public static final String THREADS_NB = "net.sf.orcc.backends.processorsNumber";
-
-	public static final String CONVERT_MULTI2MONO = "net.sf.orcc.backends.multi2mono";
-	public static final String ADDITIONAL_TRANSFOS = "net.sf.orcc.backends.add_transfos";
-
-	public static final String PROFILE = "net.sf.orcc.backends.profile";
-
-	public static final String IMPORT_XCF = "net.sf.orcc.backends.importXCF";
-	public static final String XCF_FILE = "net.sf.orcc.backends.xcfFile";
-
-	public static final String HMPP_NO_PRAGMAS = "net.sf.orcc.backends.c.hmpp.disablePragma";
-
+	@Override
+	public Void caseProcedure(Procedure procedure) {
+		do {
+			changed = false;
+			super.caseProcedure(procedure);
+		} while (changed);
+		return null;
+	}
 }

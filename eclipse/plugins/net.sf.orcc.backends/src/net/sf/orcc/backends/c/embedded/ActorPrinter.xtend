@@ -169,18 +169,18 @@ class ActorPrinter extends InstancePrinter {
 	def private printParameters(Action action) {
 		val elements = new ArrayList<String>
 		elements.add(actor.parameters.join(", ", ['''«declare»''']))
-		elements.add(action.inputPattern.ports.join(", ", ['''«type.doSwitch» *«it.name»''']))
-		elements.add(action.outputPattern.ports.join(", ", ['''«type.doSwitch» *«it.name»''']))
-		elements.add(actor.stateVars.join(", ", ['''«type.doSwitch» *«it.name»_i, «type.doSwitch» *«it.name»_o''']))
+		elements.add(action.inputPattern.ports.join(", ", ['''«type.doSwitch» *«name»''']))
+		elements.add(action.outputPattern.ports.join(", ", ['''«type.doSwitch» *«name»''']))
+		elements.add(actor.stateVars.join(", ", ['''«type.doSwitch» *«name»_i, «type.doSwitch» *«name»_o''']))
 		return elements.filter[ ! empty].join(", ")
 	}
 	
 	def private printIDLParameters(Action action) {
 		val elements = new ArrayList<String>
-		elements.add(actor.parameters.join(", ", ['''in parameter «it.name»''']))
-		elements.add(action.inputPattern.ports.join(", ", ['''in «type.doSwitch» «it.name»''']))
-		elements.add(action.outputPattern.ports.join(", ", ['''out «type.doSwitch» «it.name»''']))
-		elements.add(actor.stateVars.join(", ", ['''in «type.doSwitch» «it.name»_i, out «type.doSwitch» «it.name»_o''']))
+		elements.add(actor.parameters.join(", ", ['''in parameter «name»''']))
+		elements.add(action.inputPattern.ports.join(", ", ['''in «type.doSwitch» «name»''']))
+		elements.add(action.outputPattern.ports.join(", ", ['''out «type.doSwitch» «name»''']))
+		elements.add(actor.stateVars.join(", ", ['''in «type.doSwitch» «name»_i, out «type.doSwitch» «name»_o''']))
 		return elements.filter[ ! empty].join(", ")
 	}
 	
@@ -189,9 +189,9 @@ class ActorPrinter extends InstancePrinter {
 	def private printParameters(Procedure procedure) {
 		val elements = new ArrayList<String>
 		// TODO : if(actor.params.get(i).port) : print '*' before «name»
-		elements.add(actor.parameters.join(", ", ['''«type.doSwitch» «it.name»''']))
+		elements.add(actor.parameters.join(", ", ['''«type.doSwitch» «name»''']))
 		elements.add(procedure.parameters.join(", ", [variable.declare]))
-		elements.add(actor.stateVars.join(", ", ['''«type.doSwitch» *«it.name»_o''']))
+		elements.add(actor.stateVars.join(", ", ['''«type.doSwitch» *«name»_o''']))
 		return elements.filter[ ! empty].join(", ")
 	}
 	

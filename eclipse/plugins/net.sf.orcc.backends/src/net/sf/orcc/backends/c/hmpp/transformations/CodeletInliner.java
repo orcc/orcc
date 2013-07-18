@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the IRISA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,32 +26,27 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends;
+package net.sf.orcc.backends.c.hmpp.transformations;
+
+import net.sf.orcc.backends.transform.Inliner;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
- * @author Antoine Lorence
+ * This class defines a transformation that inline functions and / or procedures
+ * called inside a codelet
+ * 
+ * @author Jérôme Gorin
  * 
  */
-public class BackendsConstants {
+public class CodeletInliner extends AbstractIrVisitor<Void> {
 
-	public static final String GENETIC_ALGORITHM = "net.sf.orcc.backends.geneticAlgorithm";
-	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
-	public static final String NEW_SCHEDULER_TOPOLOGY = "net.sf.orcc.backends.newScheduler.topology";
-
-	public static enum Topology {
-		Ring, Mesh
+	@Override
+	public Void caseProcedure(Procedure procedure) {
+		if (procedure.hasAttribute("codelet")) {
+			new Inliner(true, true).doSwitch(procedure);
+		}
+		return null;
 	}
-
-	public static final String THREADS_NB = "net.sf.orcc.backends.processorsNumber";
-
-	public static final String CONVERT_MULTI2MONO = "net.sf.orcc.backends.multi2mono";
-	public static final String ADDITIONAL_TRANSFOS = "net.sf.orcc.backends.add_transfos";
-
-	public static final String PROFILE = "net.sf.orcc.backends.profile";
-
-	public static final String IMPORT_XCF = "net.sf.orcc.backends.importXCF";
-	public static final String XCF_FILE = "net.sf.orcc.backends.xcfFile";
-
-	public static final String HMPP_NO_PRAGMAS = "net.sf.orcc.backends.c.hmpp.disablePragma";
 
 }
