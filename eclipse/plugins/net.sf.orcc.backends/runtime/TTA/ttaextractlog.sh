@@ -62,8 +62,6 @@ SUMMARY_LOG=$SUMMARY".log"
 SUMMARY_CSV=$SUMMARY".csv"
 SUMMARY_HTML=$SUMMARY".html"
 SUMMARY_PDF=$SUMMARY".pdf"
-WORST_ACTOR=""
-WORST_FPS=10000
 SCALE=10
 
 # Cleaning previous same summary
@@ -133,16 +131,10 @@ for i in processor_*.log;
 	CYCLES=${CHAINE2##*$CHAINE1};
 	# FPS @ 50MHz = Nb_frame / (CycleCount / 50 000 000)
 	FPS_RES=`echo "scale=$SCALE;$NBFRAME/($CYCLES/($FREQUENCY*1000000))"| bc`;
-	FPS=`printf "%.2f" "$FPS_RES"`;
+	FPS=`printf "%.2f" "${FPS_RES/\./,}"`;
 	FILE_NAME=`basename $i .log`;
 	PRE_NAME="processor_";
 	ACTOR_NAME=${FILE_NAME##*$PRE_NAME};
-	ISWORST=`echo "scale=$SCALE;$FPS<$WORST_FPS"| bc`;
-	if [ $ISWORST -eq 1 ]
-	then
-		WORST_ACTOR=$ACTOR_NAME;
-		WORST_FPS=$FPS;
-	fi
 	NBERROR=`grep -c Error $i`;
 	if [ $NBERROR -gt 0 ]
 	then 
@@ -166,13 +158,12 @@ done
 # Summary log footer
 echo "Nb of actors OK = " `grep -c Error processor_*.log | grep ":0" | wc -l` >> $SUMMARY_LOG
 echo "Nb of actors KO = " `grep -c Error processor_*.log | grep -v ":0" | wc -l` >> $SUMMARY_LOG
-printf "Worst actor is : %s    with : %s FPS \n" "$WORST_ACTOR" "$WORST_FPS">> $SUMMARY_LOG
 
 echo "			</tbody>" >> $SUMMARY_HTML
 echo "			<tfoot>" >> $SUMMARY_HTML
 echo "				<tr>" >> $SUMMARY_HTML
-echo "					<td class=\"rounded-foot-left\">Worst actor :</td>" >> $SUMMARY_HTML
-echo "					<td colspan=\"3\" class=\"rounded-foot-right\">"$WORST_ACTOR"</td>" >> $SUMMARY_HTML
+echo "					<td class=\"rounded-foot-left\"></td>" >> $SUMMARY_HTML
+echo "					<td colspan=\"3\" class=\"rounded-foot-right\"></td>" >> $SUMMARY_HTML
 echo "				</tr>" >> $SUMMARY_HTML
 echo "			</tfoot>" >> $SUMMARY_HTML
 echo "		</table>" >> $SUMMARY_HTML
