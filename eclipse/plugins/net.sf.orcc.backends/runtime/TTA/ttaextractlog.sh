@@ -26,6 +26,7 @@ OUTPUT_TAG="logs"
 FREQUENCY=50
 NBFRAME=10
 ERROR_MSG=""
+CSSFILE="$(dirname $0)"/style.css
 
 # Parameters parsing
 for i in $@
@@ -176,7 +177,7 @@ cp processor_*.log $OUTPUT_TAG
 mv $SUMMARY_LOG $OUTPUT_TAG
 mv $SUMMARY_CSV $OUTPUT_TAG
 mv $SUMMARY_HTML $OUTPUT_TAG
-cp ~/tools/style.css $OUTPUT_TAG
+cp $CSSFILE $OUTPUT_TAG
 
 # Generate a PDF file from HTML Summary
 wkhtmltopdf $OUTPUT_TAG/$SUMMARY_HTML $OUTPUT_TAG/$SUMMARY_PDF
