@@ -38,8 +38,8 @@ import java.util.Map;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.compa.transform.XdfExtender;
 import net.sf.orcc.backends.transform.Inliner;
-import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.Mapping;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -72,18 +72,11 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class COMPABackend extends CBackend {
 
-	/**
-	 * Path to target "src" folder
-	 */
-	private String srcPath;
-
 	@Override
 	protected void doInitializeOptions() {
 
 		new File(path + File.separator + "build").mkdirs();
 		new File(path + File.separator + "bin").mkdirs();
-
-		srcPath = path + File.separator + "src";
 	}
 
 	@Override

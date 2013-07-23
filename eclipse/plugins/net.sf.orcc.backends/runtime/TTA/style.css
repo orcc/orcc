@@ -1,0 +1,96 @@
+/* ------------------
+ styling for the tables 
+   ------------------   */
+
+
+body
+{
+	line-height: 1.6em;
+}
+
+#rounded-corner
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	margin: 45px;
+	width: 480px;
+	text-align: left;
+	border-collapse: collapse;
+}
+#rounded-corner thead th.rounded-head-left
+{
+	background: #b9c9fe;
+	border-radius: 20p;
+	-moz-border-radius-topleft: 10px;
+	border-top-left-radius: 10px;
+}
+#rounded-corner thead th.rounded-head-right
+{
+	background: #b9c9fe;
+	-moz-border-radius-topright: 10px;
+	border-top-right-radius: 10px;
+}
+#rounded-corner th
+{
+	padding: 8px;
+	font-weight: normal;
+	font-size: 13px;
+	color: #039;
+	background: #b9c9fe;
+	text-align: center;
+	white-space:nowrap;
+	font-weight : bold;
+}
+#rounded-corner td
+{
+	padding: 8px;
+	background: #e8edff;
+	border-top: 1px solid #fff;
+	color: #669;
+}
+#rounded-corner td.num
+{
+	padding: 8px;
+	background: #e8edff;
+	border-top: 1px solid #fff;
+	color: #669;
+	text-align: right;
+}
+#rounded-corner td.ok
+{
+	padding: 8px;
+	background: #4CC417;
+	border-top: 1px solid #fff;
+	font-weight : bold;
+	color: #FFFFFF;
+	text-align: center;
+}
+#rounded-corner td.ko
+{
+	padding: 8px;
+	background: #FF0000;
+	border-top: 1px solid #fff;
+	font-weight : bold;
+	color: #FFFFFF;
+	text-align: center;
+}
+#rounded-corner tfoot td.rounded-foot-left
+{
+	background: #b9c9fe;
+	-moz-border-radius-bottomleft: 10px;
+	border-bottom-left-radius: 10px;
+	font-weight : bold;
+}
+#rounded-corner tfoot td.rounded-foot-right
+{
+	background: #b9c9fe;
+	-moz-border-radius-bottomright: 10px;
+	border-bottom-right-radius: 10px;
+	font-weight : bold;
+	text-align: right;	
+}
+#rounded-corner tbody tr:hover td
+{
+	background: #d0dafd;
+	color: #000000;
+}

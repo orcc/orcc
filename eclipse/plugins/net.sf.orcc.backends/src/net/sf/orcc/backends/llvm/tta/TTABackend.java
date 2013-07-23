@@ -215,6 +215,10 @@ public class TTABackend extends LLVMBackend {
 				OrccLogger.traceRaw("OK" + "\n");
 				new File(libPath + File.separator + "generate")
 						.setExecutable(true);
+				new File(libPath + File.separator + "ttaextractlog.sh")
+						.setExecutable(true);
+				new File(libPath + File.separator + "ttacomparelog.py")
+				.setExecutable(true);
 				return true;
 			} else {
 				OrccLogger.warnRaw("Error" + "\n");

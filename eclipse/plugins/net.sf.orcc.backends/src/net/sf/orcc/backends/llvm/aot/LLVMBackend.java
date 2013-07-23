@@ -188,7 +188,7 @@ public class LLVMBackend extends AbstractBackend {
 				for (Actor actor : network.getAllActors()) {
 					if (actor.getFileName() != null
 							&& !IrUtil.serializeActor(set, srcPath, actor)) {
-						OrccLogger.warnln("Transformation" + transfo
+						OrccLogger.warnln("Transformation " + transfo
 								+ " on actor " + actor.getName());
 					}
 				}

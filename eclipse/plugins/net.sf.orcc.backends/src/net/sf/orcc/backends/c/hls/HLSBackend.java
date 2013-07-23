@@ -69,11 +69,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class HLSBackend extends CBackend {
 
 	/**
-	 * Path to target "src" folder
-	 */
-	private String srcPath;
-
-	/**
 	 * Path to target "testBench" folder
 	 */
 	private String VHDLTestBenchPath;
