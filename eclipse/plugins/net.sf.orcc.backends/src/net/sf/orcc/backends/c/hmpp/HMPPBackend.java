@@ -35,9 +35,11 @@ import java.util.List;
 import net.sf.orcc.backends.BackendsConstants;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.hmpp.transformations.CodeletInliner;
+import net.sf.orcc.backends.c.hmpp.transformations.ConstantRegisterCleaner;
 import net.sf.orcc.backends.c.hmpp.transformations.DisableAnnotations;
 import net.sf.orcc.backends.c.hmpp.transformations.PrepareHMPPAnnotations;
 import net.sf.orcc.backends.c.hmpp.transformations.SetHMPPAnnotations;
+import net.sf.orcc.backends.transform.BlockForAdder;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -77,8 +79,7 @@ public class HMPPBackend extends CBackend {
 
 		// Must be applied before CodeletInliner:
 		transformations.add(new DfVisitor<Void>(new PrepareHMPPAnnotations()));
-		// transformations.add(new DfVisitor<Void>(new
-		// ConstantRegisterCleaner()));
+		transformations.add(new DfVisitor<Void>(new ConstantRegisterCleaner()));
 
 		// Must be applied after PrepareHMPPAnnotations:
 		transformations.add(new DfVisitor<Void>(new CodeletInliner()));
@@ -86,7 +87,7 @@ public class HMPPBackend extends CBackend {
 		transformations.add(new SetHMPPAnnotations());
 
 		transformations.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
-		// transformations.add(new BlockForAdder());
+		transformations.add(new BlockForAdder());
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
