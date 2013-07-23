@@ -400,25 +400,12 @@ public class GuardParser {
 	}
 
 	private Instruction createPeekInstruction(Var target, Port port) {
+		Var indexVar = MergerUtil.createIndexVar(port);
 		return IrFactory.eINSTANCE.createInstLoad(target, IrFactory.eINSTANCE
 				.createVar(0,
 						IrFactory.eINSTANCE.createTypeList(1, port.getType()),
 						"tokens_" + port.getName(), true, 0),
-				createPeekIndex(port));
-	}
-
-	private List<Expression> createPeekIndex(Port port) {
-		Var sizeVar = IrFactory.eINSTANCE.createVar(0,
-				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
-				new String("SIZE_" + port.getName()), true, 0);
-		Var indexVar = IrFactory.eINSTANCE.createVar(0,
-				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
-				new String("index_" + port.getName()), true, 0);
-		List<Expression> indexExpression = new ArrayList<Expression>(1);
-		indexExpression.add(eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(indexVar), OpBinary.MOD,
-				IrFactory.eINSTANCE.createExprVar(sizeVar), port.getType()));
-		return indexExpression;
+				MergerUtil.createModuloIndex(port, indexVar));
 	}
 
 	private Expression parseSuperaction(Element element) {

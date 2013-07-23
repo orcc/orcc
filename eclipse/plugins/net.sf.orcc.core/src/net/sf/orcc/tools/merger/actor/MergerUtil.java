@@ -3,6 +3,7 @@ package net.sf.orcc.tools.merger.actor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.df.Action;
@@ -10,7 +11,11 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
-import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.Var;
 
 public class MergerUtil {
 
@@ -40,19 +45,6 @@ public class MergerUtil {
 		return null;
 	}
 
-	public static void copyNumTokensToActionPorts(List<Vertex> vertices) {
-		for (Vertex vertex : vertices) {
-			for (Action action : vertex.getAdapter(Actor.class).getActions()) {
-				for (Port port : action.getInputPattern().getPorts()) {
-					port.setNumTokensConsumed(action.getInputPattern().getNumTokens(port)); 
-				}			
-				for (Port port : action.getOutputPattern().getPorts()) {
-					port.setNumTokensProduced(action.getOutputPattern().getNumTokens(port)); 
-				}			
-			}
-		}
-	}
-
 	public static boolean testFilePresence(String fileName) {
 		try {
 			InputStream is = new FileInputStream(fileName);
@@ -61,6 +53,29 @@ public class MergerUtil {
 		} catch (IOException e) {
 			return false;
 		}
+	}
+
+	public static Var createIndexVar(Port port) {
+		return IrFactory.eINSTANCE.createVar(0,
+				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
+				new String("index_" + port.getName()), true, 0);
+	}
+
+	public static List<Expression> createModuloIndex(Port port, Var indexVar) {
+		Var sizeVar = IrFactory.eINSTANCE.createVar(0,
+				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
+				new String("SIZE_" + port.getName()), true, 0);
+		List<Expression> indexExpression = new ArrayList<Expression>(1);
+		indexExpression.add(IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprVar(indexVar), OpBinary.MOD,
+				IrFactory.eINSTANCE.createExprVar(sizeVar), port.getType()));
+		return indexExpression;
+	}
+	
+	public static Instruction createBinOpStore(Var variable, OpBinary operation, int constant) {
+		return IrFactory.eINSTANCE.createInstStore(variable, 
+				IrFactory.eINSTANCE.createExprBinary(IrFactory.eINSTANCE.createExprVar(variable), operation, 
+				IrFactory.eINSTANCE.createExprInt(constant), IrFactory.eINSTANCE.createTypeInt()));		
 	}
 	
 }

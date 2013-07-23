@@ -184,8 +184,9 @@ public class ScheduleParser {
 				Actor src = conn.getSource().getAdapter(Actor.class);
 				if (src != null) {
 					Connection connection = (Connection) edge;
-					int cns = connection.getTargetPort()
-							.getNumTokensConsumed();
+					Pattern inputPattern = iterand.getAction().getInputPattern();
+					Port targetPort = connection.getTargetPort();
+					int cns = inputPattern.getNumTokens(targetPort);
 					tokens.put(connection, tokens.get(connection) - cns);
 				}
 			}
@@ -194,13 +195,11 @@ public class ScheduleParser {
 				Connection conn = (Connection) edge;
 				Actor tgt = conn.getTarget().getAdapter(Actor.class);
 				if (tgt != null) {
-					Pattern outputPattern;
-					Port sourcePort;
 					Connection connection = (Connection) edge;
+					Pattern outputPattern = iterand.getAction().getOutputPattern();
+					Port sourcePort = connection.getSourcePort();
 					int current = tokens.get(connection);
 					int max = maxTokens.get(connection);
-					sourcePort = connection.getSourcePort();
-					outputPattern = iterand.getAction().getOutputPattern();
 					int prd = outputPattern.getNumTokens(sourcePort);
 					tokens.put(connection, current + prd);
 					maxTokens.put(connection, max + prd);

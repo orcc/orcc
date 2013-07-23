@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,12 +12,21 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.FSM;
-import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.ir.Block;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.Param;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.DomUtil;
 
@@ -41,40 +51,196 @@ public class ActorMergerQS extends ActorMergerBase {
 	private Network network;
 	
 	private String definitionFile;
+
+	public class ActionUpdater extends AbstractIrVisitor<Void> {
+
+		private Pattern oldInputPattern;
+
+		private Pattern oldOutputPattern;
+
+		/**
+		 * Create a new visitor able to update the FIFO accesses.
+		 * 
+		 * @param action
+		 *            the action containing the old patterns
+		 */
+		
+		public ActionUpdater(Action action) {
+			this.oldInputPattern = action.getInputPattern();
+			this.oldOutputPattern = action.getOutputPattern();
+		}
+
+		@Override
+		public Void caseInstLoad(InstLoad load) {
+			Port port = oldInputPattern.getPort(load.getSource().getVariable());
+			if (port != null) {
+				List<Expression> indexes = load.getIndexes();
+				String portName = port.getAttribute("shortName").getStringValue();
+				Expression e1 = irFactory.createExprVar(irFactory.createVar(irFactory.createTypeInt(32), "offset_" + portName, false, 0));
+				Expression e2 = IrUtil.copy(indexes.get(0));
+				Expression e3 = irFactory.createExprVar(irFactory.createVar(irFactory.createTypeInt(32), "SIZE_" + port.getName(), false, 0));
+				Expression bop = irFactory.createExprBinary(e1, OpBinary.PLUS,
+						e2, e1.getType());
+				if (!buffersMap.containsKey(port)) {
+					indexes.set(0, irFactory.createExprBinary(bop, OpBinary.MOD,
+							e3, e1.getType()));
+				} else {
+					indexes.set(0, bop);
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstStore(InstStore store) {
+			Port port = oldOutputPattern.getPort(store.getTarget().getVariable());
+			if (port != null) {
+				List<Expression> indexes = store.getIndexes();
+				String portName = port.getAttribute("shortName").getStringValue();
+				Expression e1 = irFactory.createExprVar(irFactory.createVar(irFactory.createTypeInt(32), "offset_" + portName, false, 0));
+				Expression e2 = IrUtil.copy(indexes.get(0));
+				Expression e3 = irFactory.createExprVar(irFactory.createVar(irFactory.createTypeInt(32), "SIZE_" + port.getName(), false, 0));
+				Expression bop = irFactory.createExprBinary(e1, OpBinary.PLUS,
+						e2, e1.getType());
+				if (!buffersMap.containsKey(port)) {
+					indexes.set(0, irFactory.createExprBinary(bop, OpBinary.MOD,
+							e3, e1.getType()));
+				} else {
+					indexes.set(0, bop);
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseProcedure(Procedure procedure) {
+			super.caseProcedure(procedure);
+			return null;
+		}
+	}
+	
+	private class ActionProcedureMap {
+
+		private class ActionProcedurePair {
+			Procedure procedure;
+			Action action;
+			
+			ActionProcedurePair(Action action, Procedure procedure) {
+				this.action = action;
+				this.procedure = procedure;
+			}
+			
+			Action getAction() {
+				return action;
+			}
+			
+			Procedure getProcedure() {
+				return procedure;
+			}
+		}
+		
+		private List<ActionProcedurePair> list; 
+		
+		/**
+		 * Keep track of actions that have been transformed to procedures.
+		 * 
+		 */
+		public ActionProcedureMap() {
+			this.list = new ArrayList<ActionProcedurePair>();
+		}
+		
+		public void add(Action action, Procedure procedure) {
+			list.add(new ActionProcedurePair(action, procedure));
+		}
+		
+		public Procedure getProcedure(Action action) {
+			for (ActionProcedurePair pair : list) {
+				if (pair.getAction().equals(action)) {
+					return pair.getProcedure();
+				}
+			}
+			return null;
+		}
+	}
+	
+	ActionProcedureMap correspondences;
 	
 	public ActorMergerQS(Network network, Copier copier, String definitionFile) {
 		this.network = network;
 		this.copier = copier;
 		this.definitionFile = definitionFile;
+		this.correspondences = new ActionProcedureMap();
 	}
 
 	public Actor createMergedActor() {
 		superActor = dfFactory.createActor();
 		buffersMap = new HashMap<Port, Var>();
-		portsMap = new HashMap<Port, Port>();
 		superActor.setName(network.getName());
 		superActor.setFsm(dfFactory.createFSM());
 
-		// Create input/output ports
-		for (Port port : network.getInputs()) {
-			Port portCopy = (Port) copier.copy(port);
-			Connection connection = (Connection) port.getOutgoing().get(0);
-			superActor.getInputs().add(portCopy);
-			portsMap.put(connection.getTargetPort(), portCopy);
-		}
-
-		for (Port port : network.getOutputs()) {
-			Port portCopy = (Port) copier.copy(port);
-			Connection connection = (Connection) port.getIncoming().get(0);
-			superActor.getOutputs().add(portCopy);
-			portsMap.put(connection.getSourcePort(), portCopy);
-		}
-
+		copyPorts(network);
 		copyVariables(network);
 		copyProcedures(network);
+		copyActions(network);
 		constructFSM();
+		modifyMemAccesses(network);
 
 		return superActor;
+	}
+	
+	private void copyPorts(Network network) {
+		// Create input/output ports
+		for (Port port : network.getInputs()) {
+			superActor.getInputs().add((Port)copier.copy(port));
+		}
+		for (Port port : network.getOutputs()) {
+			superActor.getOutputs().add((Port)copier.copy(port));
+		}
+	}
+
+	private void copyActions(Network network) {
+		// Transform actions into procedures
+		for (Vertex vertex : network.getChildren()) {
+			Actor actor = vertex.getAdapter(Actor.class);
+			for (Action action : actor.getActions()) {
+				Procedure actionCopy = IrUtil.copy(action.getBody());
+				actionCopy.setName(new String(actor.getName() + "_" + action.getName() + "_p"));
+				createParameters(actionCopy, action);
+				correspondences.add(action, actionCopy);
+				superActor.getProcs().add(actionCopy);
+			}
+		}
+	}
+
+	private void modifyMemAccesses(Network network) {
+		for (Vertex vertex : network.getChildren()) {
+			Actor actor = vertex.getAdapter(Actor.class);
+			for (Action action : actor.getActions()) {
+				new ActionUpdater(action).doSwitch(correspondences.getProcedure(action));
+			}
+		}
+	}
+
+	private void createParameters(Procedure procedure, Action action) {
+		Pattern inputPattern = action.getInputPattern();
+		for(Port port : inputPattern.getPorts()) {
+			createParameterPair(procedure, inputPattern.getVariable(port));
+		}
+		Pattern outputPattern = action.getOutputPattern();
+		for(Port port : outputPattern.getPorts()) {
+			createParameterPair(procedure, outputPattern.getVariable(port));
+		}
+	}
+	
+	private void createParameterPair(Procedure procedure, Var var) {
+		Param param = IrFactory.eINSTANCE.createParam(var);
+		param.setByRef(true);
+		procedure.getParameters().add(param);
+		param = IrFactory.eINSTANCE.createParam(IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createTypeInt(32),
+				"offset_" + var.getName(), true, 0));
+		param.setByRef(false);
+		procedure.getParameters().add(param);
 	}
 	
 	/**
@@ -83,7 +249,6 @@ public class ActorMergerQS extends ActorMergerBase {
 	 * @return the body of the static action
 	 */
 	private Action createSuperaction(String actionName) {
-
 		ScheduleParser scheduler = new ScheduleParser(definitionFile, network);
 		SuperAction superAction = scheduler.parse(network.getName(), actionName);
 		superAction.computePatterns(network);
@@ -94,8 +259,11 @@ public class ActorMergerQS extends ActorMergerBase {
 		GuardParser guardParser = new GuardParser(definitionFile, actionName, superActor);
 		guardParser.parse(network.getName(), actionName);
 		
-		Procedure body = createBody(actionName, scheduler.getMaxTokens(), scheduler.getDepth());
-		createStaticSchedule(body, scheduler.getSchedule(), body.getBlocks());
+		Procedure body = irFactory.createProcedure(actionName, 0,
+				irFactory.createTypeVoid());
+		createBuffers(body, scheduler.getMaxTokens());
+		createCounters(body, superAction);
+		createStaticSchedule(body, scheduler.getSchedule());
 		body.getLast().add(irFactory.createInstReturn());
 	
 		Action action = dfFactory.createAction(actionName, inputPattern,
@@ -106,37 +274,53 @@ public class ActorMergerQS extends ActorMergerBase {
 		return action;
 	}
 
+	private void createCounters(Procedure body, SuperAction action) {
+		// Create counters for inputs
+		for (Port port : action.getInputPattern().getPorts()) {
+			createCounter(body, port, "_r");
+		}
+		// Create counters for outputs
+		for (Port port : action.getOutputPattern().getPorts()) {
+			createCounter(body, port, "_w");
+		}
+	}
+	
+	private void createCounter(Procedure body, Port port, String suffix) {
+		Var readIdx = body.newTempLocalVariable(
+				irFactory.createTypeInt(32), port.getName() + suffix);
+		if (buffersMap.containsKey(port)) {
+			body.getLast().add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
+		} else {
+			body.getLast().add(irFactory.createInstAssign(readIdx, MergerUtil.createIndexVar(port)));
+		}
+	}
+
 	private void createInputPattern(SuperAction superAction) {
 		inputPattern = dfFactory.createPattern();
 		for (Port port : superActor.getInputs()) {
-			int portIndex = MergerUtil.findPort(superAction.getInputPattern().getPorts(), port.getName());
-			if(portIndex >= 0) {
-				int cns = superAction.getInputPattern().getPorts().get(portIndex).
-						getNumTokensConsumed();
-				inputPattern.setNumTokens(port, cns);
-				inputPattern.setVariable(port, irFactory.createVar(0, irFactory.createTypeList(cns,
-						EcoreUtil.copy(port.getType())), port.getName(), true));
-				port.setNumTokensConsumed(cns);
-			} else {
-				port.setNumTokensConsumed(0);
-			}
-		}	
+			port.setNumTokensConsumed(createPortPattern(inputPattern, 
+					superAction.getInputPattern(), port));
+		}
 	}
 
 	private void createOutputPattern(SuperAction superAction) {
 		outputPattern = dfFactory.createPattern();
 		for (Port port : superActor.getOutputs()) {
-			int portIndex = MergerUtil.findPort(superAction.getOutputPattern().getPorts(), port.getName());
-			if (portIndex >= 0) {
-				int prd = superAction.getOutputPattern().getPorts().get(portIndex).
-						getNumTokensProduced();
-				outputPattern.setNumTokens(port, prd);
-				outputPattern.setVariable(port, irFactory.createVar(0, irFactory.createTypeList(prd,
-						EcoreUtil.copy(port.getType())), port.getName(), true));
-				port.setNumTokensProduced(prd);
-			} else {
-				port.setNumTokensProduced(0);
-			}
+			port.setNumTokensProduced(createPortPattern(outputPattern, 
+					superAction.getOutputPattern(), port));
+		}
+	}
+
+	private int createPortPattern(Pattern targetPattern, Pattern sourcePattern, Port port) {
+		int portIndex = MergerUtil.findPort(sourcePattern.getPorts(), port.getName());
+		if (portIndex >= 0) {
+			int prd = sourcePattern.getNumTokens(sourcePattern.getPorts().get(portIndex));
+			targetPattern.setNumTokens(port, prd);
+			targetPattern.setVariable(port, irFactory.createVar(0, irFactory.createTypeList(prd,
+					EcoreUtil.copy(port.getType())), port.getName(), true));
+			return prd;
+		} else {
+			return 0;
 		}
 	}
 	
@@ -147,14 +331,52 @@ public class ActorMergerQS extends ActorMergerBase {
 	 *            the associated procedure
 	 * @param schedule
 	 *            the current schedule
-	 * @param blocks
-	 *            the current list of blocks
 	 */
-	private void createStaticSchedule(Procedure procedure, SuperAction schedule,
-			List<Block> blocks) {
+	private void createStaticSchedule(Procedure procedure, SuperAction schedule) {
 		for (ActionInvocation iterand : schedule.getActionInvocations()) {
-			addActionToBody(procedure, IrUtil.copy(iterand.getAction()), blocks);
+			List<Expression> procParams = new ArrayList<Expression>();
+			BlockBasic increments = IrFactory.eINSTANCE.createBlockBasic();
+			processInputs(increments, iterand.getAction(), procParams);
+			processOutputs(increments, iterand.getAction(), procParams);
+			Instruction instruction = IrFactory.eINSTANCE.createInstCall(
+					null, correspondences.getProcedure(iterand.getAction()), procParams);
+			BlockBasic block = procedure.getLast();
+			block.add(instruction);
+			procedure.getBlocks().add(block);
+			procedure.getBlocks().add(increments);
 		}
+	}
+
+	private void processInputs(BlockBasic increments, Action action, List<Expression> procParams) {
+		for(Port port : action.getInputPattern().getPorts()) {
+			processPort(increments, procParams, port, "_r", action.getInputPattern().getNumTokens(port));
+		}
+	}
+
+	private void processOutputs(BlockBasic increments, Action action, List<Expression> procParams) {
+		for(Port port : action.getOutputPattern().getPorts()) {
+			processPort(increments, procParams, port, "_w", action.getOutputPattern().getNumTokens(port));
+		}
+	}
+	
+	private void processPort(BlockBasic increments, List<Expression> procParams, Port port, String suffix, int tokenRate) {
+		Var memVar = null;
+		String indexVarName = null;
+		if (buffersMap.containsKey(port)) {
+			memVar = buffersMap.get(port);
+			indexVarName = memVar.getName() + suffix;
+		} else {
+			memVar = IrFactory.eINSTANCE.createVar(0,
+					IrFactory.eINSTANCE.createTypeList(1, port.getType()),
+					"tokens_" + port.getName(), true, 0);
+			indexVarName = port.getName() + suffix;
+		}
+		Var indexVar = IrFactory.eINSTANCE.createVar(0,
+				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
+				indexVarName, true, 0);
+		increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
+		procParams.add(IrFactory.eINSTANCE.createExprVar(memVar));
+		procParams.add(IrFactory.eINSTANCE.createExprVar(indexVar));
 	}
 	
 	private void constructFSM() {

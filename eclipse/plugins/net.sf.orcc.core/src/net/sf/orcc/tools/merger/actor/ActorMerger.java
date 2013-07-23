@@ -102,9 +102,13 @@ public class ActorMerger extends DfVisitor<Void> {
 		for (Vertex vertex : vertices) {
 			Actor actorCopy = ((Vertex)copier.get(vertex)).getAdapter(Actor.class);
 			for (Port port : actorCopy.getInputs()) {
+				port.addAttribute("shortName");
+				port.setAttribute("shortName", port.getName());
 				port.setName(actorCopy.getName() + "_" + port.getName());
 			}
 			for (Port port : actorCopy.getOutputs()) {
+				port.addAttribute("shortName");
+				port.setAttribute("shortName", port.getName());
 				port.setName(actorCopy.getName() + "_" + port.getName());
 			}
 		}
@@ -213,7 +217,6 @@ public class ActorMerger extends DfVisitor<Void> {
 			 				.analyze(network);
 		} else {
 			OrccLogger.traceln("Performing merging based on " + definitionFile);
-			MergerUtil.copyNumTokensToActionPorts(network.getVertices());
 			RegionParser regionParser = new RegionParser(definitionFile, network);
 			staticRegions = regionParser.parse();
 		}

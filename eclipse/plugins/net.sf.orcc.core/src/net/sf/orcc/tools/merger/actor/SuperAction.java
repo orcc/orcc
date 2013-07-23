@@ -54,37 +54,29 @@ public class SuperAction {
 	
 	public void computePatterns(Network subNetwork) {
 		for (ActionInvocation iterand : invocations) {
-			Pattern actionPattern = iterand.getAction().getInputPattern();
-			for (Port port : actionPattern.getPorts()) {
+			Pattern iterandPattern = iterand.getAction().getInputPattern();
+			for (Port port : iterandPattern.getPorts()) {
 				if (MergerUtil.findPort(subNetwork.getInputs(), port.getName()) >= 0) {
 					if (!inputPattern.contains(port)) {
 						inputPattern.getPorts().add(port);
-					} else {
-						int portIndex = MergerUtil.findPort(inputPattern.getPorts(), port.getName());
-						int actionPortIndex = MergerUtil.findPort(actionPattern.getPorts(), port.getName());
-						for (int i = 0; i < actionPattern.getPorts().size(); i++) {
-							int oldCns = inputPattern.getPorts().get(portIndex).getNumTokensConsumed();
-							int newCns = actionPattern.getPorts().get(actionPortIndex).getNumTokensConsumed();
-							inputPattern.getPorts().get(portIndex).setNumTokensConsumed(oldCns + newCns);
-						}
 					}
+					Port superactionPort = inputPattern.getPorts().get(
+							MergerUtil.findPort(inputPattern.getPorts(), port.getName()));
+					inputPattern.setNumTokens(superactionPort, 
+							inputPattern.getNumTokens(superactionPort) + iterandPattern.getNumTokens(port));
 				}
 			}
 
-			actionPattern = iterand.getAction().getOutputPattern();
-			for (Port port : actionPattern.getPorts()) {
+			iterandPattern = iterand.getAction().getOutputPattern();
+			for (Port port : iterandPattern.getPorts()) {
 				if (MergerUtil.findPort(subNetwork.getOutputs(), port.getName()) >= 0) {
 					if(!outputPattern.contains(port)) {
 						outputPattern.getPorts().add(port);
-					} else {
-						int portIndex = MergerUtil.findPort(outputPattern.getPorts(), port.getName());
-						int actionPortIndex = MergerUtil.findPort(actionPattern.getPorts(), port.getName());
-						for (int i = 0; i < actionPattern.getPorts().size(); i++) {
-							int oldPrd = outputPattern.getPorts().get(portIndex).getNumTokensProduced();
-							int newPrd = actionPattern.getPorts().get(actionPortIndex).getNumTokensProduced();
-							outputPattern.getPorts().get(portIndex).setNumTokensProduced(oldPrd + newPrd);
-						}
 					}
+					Port superactionPort = outputPattern.getPorts().get(
+							MergerUtil.findPort(outputPattern.getPorts(), port.getName()));
+					outputPattern.setNumTokens(superactionPort, 
+							outputPattern.getNumTokens(superactionPort) + iterandPattern.getNumTokens(port));
 				}
 			}
 		}
