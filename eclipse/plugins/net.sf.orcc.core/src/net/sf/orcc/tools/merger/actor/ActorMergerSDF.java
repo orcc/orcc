@@ -426,7 +426,7 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 				Actor actor = iterand.getActor();
 				CSDFMoC moc = (CSDFMoC) actor.getMoC();
 				for (Invocation invocation : moc.getInvocations()) {
-					Action action = invocation.getAction();
+					Action action = IrUtil.copy(invocation.getAction());
 
 					// Copy local variable
 					for (Var var : new ArrayList<Var>(action.getBody()
