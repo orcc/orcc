@@ -46,10 +46,10 @@ def usage():
     print ""
     print "Options:"
     print "-c, --compile=[options]  \t Compile the application from the generated LLVM assembly code into TTA binary"
-    print "-d, --debug \t\t\t Debug mode, generate extra files and print additionnal information"
+    print "-d, --debug \t\t\t Debug mode, generate extra files and print additional information"
     print "-g, --generate=[options] \t Generate the VHDL files of the TTA processors"
     print "-p, --profile \t\t\t Generate a text file containing all the results of the profiling (Need to have already the traces of the simulator)"
-    print "-s, --simulate \t\t\t Simulate each processor independantly from its execution trace"
+    print "-s, --simulate \t\t\t Simulate each processor independently from its execution trace"
     
 
 def compile(arg, debug, target):

@@ -301,7 +301,7 @@ public enum ProcessorConfiguration implements Enumerator {
 	public int getAluNb() {
 		switch (this) {
 		case CUSTOM:
-			return 4;
+			return 2;
 		case HUGE:
 			return 12;
 		case FAST:
@@ -322,14 +322,14 @@ public enum ProcessorConfiguration implements Enumerator {
 			return 18;
 		case STANDARD:
 		default:
-			return 2;
+			return 3;
 		}
 	}
 
 	public int getIntRfNb() {
 		switch (this) {
 		case CUSTOM:
-			return 4;
+			return 3;
 		case HUGE:
 			return 8;
 		case FAST:
@@ -380,7 +380,7 @@ public enum ProcessorConfiguration implements Enumerator {
 	public int getBoolRfSize() {
 		switch (this) {
 		case HUGE:
-			return 3;
+			return 6;
 		case FAST:
 			return 6;
 		case STANDARD:

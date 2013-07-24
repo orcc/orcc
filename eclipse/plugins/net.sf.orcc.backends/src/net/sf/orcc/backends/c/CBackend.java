@@ -100,7 +100,7 @@ public class CBackend extends AbstractBackend {
 	/**
 	 * Path to target "src" folder
 	 */
-	private String srcPath;
+	protected String srcPath;
 
 	@Override
 	protected void doInitializeOptions() {
@@ -232,9 +232,7 @@ public class CBackend extends AbstractBackend {
 			OrccLogger.traceRaw("Done\n");
 		}
 
-		// print CMakeLists
-		OrccLogger.traceln("Printing CMake project files");
-		new CMakePrinter(network).printCMakeFiles(path);
+		printCMake(network);
 		new StatisticsPrinter().print(srcPath, network);
 
 		if (balanceMapping) {
@@ -246,6 +244,12 @@ public class CBackend extends AbstractBackend {
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
 			new Mapping(network, mapping).print(srcPath);
 		}
+	}
+
+	protected void printCMake(Network network) {
+		// print CMakeLists
+		OrccLogger.traceln("Printing CMake project files");
+		new CMakePrinter(network).printCMakeFiles(path);
 	}
 
 	@Override

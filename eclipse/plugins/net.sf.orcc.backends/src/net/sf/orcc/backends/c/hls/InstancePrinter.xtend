@@ -384,7 +384,7 @@ def script (String path)'''
 	add_files ../«instance.name».cpp
 	add_files -tb ../coSimTestBench/«instance.name»TestBench.cpp
 	open_solution "solution"
-	set_part  {xc7v2000tlflg1925-2l}
+	set_part  {xc7vx330tffg1157-2}
 	create_clock -period 20
 	
 	source "directive_«instance.name».tcl"
@@ -395,7 +395,5 @@ def script (String path)'''
 	
 	def directive (String path)'''
 	set_directive_inline -region -recursive «instance.name»_scheduler
-	set_directive_inline -region -recursive «instance.name»_outside_FSM_scheduler
-	
 	'''
 }

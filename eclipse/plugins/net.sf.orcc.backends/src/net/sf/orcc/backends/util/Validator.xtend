@@ -107,7 +107,7 @@ class Validator {
 	}
 
 	def private static void checkConnectionSize(Connection connection, int numTokens, int size) {
-		if(numTokens >= connection.size?:size) {
+		if(connection != null && numTokens >= connection.size?:size) {
 			OrccLogger::warnln("Potential deadlock due to the size of ("
 				+ connection.source.label + "." + connection.sourcePort.name + " --> "
 				+ connection.target.label + "." + connection.targetPort.name + ")."
