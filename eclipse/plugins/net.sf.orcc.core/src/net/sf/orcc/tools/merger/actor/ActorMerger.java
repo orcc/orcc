@@ -60,7 +60,8 @@ public class ActorMerger extends DfVisitor<Void> {
 	private Copier copier;
 
 	private int index;
-
+	
+	private final String definitionFileName = "schedule.xml";
 	/**
 	 * Transforms the network to internalize the given list of vertices in their
 	 * own subnetwork and returns this subnetwork.
@@ -72,7 +73,7 @@ public class ActorMerger extends DfVisitor<Void> {
 	private Network getSubNetwork(Network network, List<Vertex> vertices) {
 		// extract the sub-network
 		Network subNetwork = IrUtil.copy(network);
-		subNetwork.setName("cluster" + index);
+		subNetwork.setName(getRegionName(vertices));
 
 		List<Vertex> verticesInSubNetwork = new ArrayList<Vertex>();
 		for (Vertex vertex : vertices) {
@@ -85,6 +86,21 @@ public class ActorMerger extends DfVisitor<Void> {
 				subNetwork.remove(vertex);
 			}
 		}
+		
+		// Perform the renaming of ports to the superactor
+		for (Vertex vertex : new ArrayList<Vertex>(subNetwork.getChildren())) {
+			Actor actorCopy = vertex.getAdapter(Actor.class);
+			for (Port port : actorCopy.getInputs()) {
+				port.addAttribute("shortName");
+				port.setAttribute("shortName", port.getName());
+				port.setName(actorCopy.getName() + "_" + port.getName());
+			}
+			for (Port port : actorCopy.getOutputs()) {
+				port.addAttribute("shortName");
+				port.setAttribute("shortName", port.getName());
+				port.setName(actorCopy.getName() + "_" + port.getName());
+			}
+		}
 
 		for (Vertex vertex : subNetwork.getChildren()) {
 			Actor actor = vertex.getAdapter(Actor.class);
@@ -93,8 +109,6 @@ public class ActorMerger extends DfVisitor<Void> {
 				unconnected.removeAll(actor.getIncomingPortMap().keySet());
 				for (Port input : unconnected) {
 					Port inputPort = EcoreUtil.copy(input);
-					inputPort.setName(vertex.getLabel() + "_"
-							+ inputPort.getName());
 					subNetwork.addInput(inputPort);
 					subNetwork.add(dfFactory.createConnection(inputPort, null,
 							vertex, input));
@@ -104,8 +118,6 @@ public class ActorMerger extends DfVisitor<Void> {
 				unconnected.removeAll(actor.getOutgoingPortMap().keySet());
 				for (Port output : unconnected) {
 					Port outputPort = EcoreUtil.copy(output);
-					outputPort.setName(vertex.getLabel() + "_"
-							+ outputPort.getName());
 					subNetwork.addOutput(outputPort);
 					subNetwork.add(dfFactory.createConnection(vertex, output,
 							outputPort, null));
@@ -142,7 +154,12 @@ public class ActorMerger extends DfVisitor<Void> {
 	
 	@Override
 	public Void caseNetwork(Network network) {
-		List<List<Vertex>> staticRegions = new StaticRegionDetector()
+		String definitionFile = new String(System.getProperty("user.home") + "/" + definitionFileName);
+		boolean automatic = MergerUtil.testFilePresence(definitionFile);
+		List<List<Vertex>> staticRegions;
+		if (!automatic) {
+			OrccLogger.traceln("Could not open " + definitionFile + " - performing automatic merging");
+			staticRegions = new StaticRegionDetector()
 				.analyze(network);
 		} else {
 			OrccLogger.traceln("Performing merging based on " + definitionFile);
@@ -174,9 +191,14 @@ public class ActorMerger extends DfVisitor<Void> {
 					+ " actors, " + fifocount + " fifos)");
 
 			// merge sub-network inside a single actor
-			Actor superActor = new ActorMergerSDF(scheduler, copier)
+			Actor superActor;
+			if (!automatic) {
+			superActor = new ActorMergerSDF(scheduler, copier)
 					.doSwitch(subNetwork);
-
+			} else {
+				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile);
+				superActor = actorMerger.createMergedActor();
+			}
 			// update the main network
 			network.add(superActor);
 
