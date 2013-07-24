@@ -372,7 +372,17 @@ public class ActorMergerSDF extends ActorMergerBase {
 				Actor actor = iterand.getActor();
 				CSDFMoC moc = (CSDFMoC) actor.getMoC();
 				for (Invocation invocation : moc.getInvocations()) {
-					addActionToBody(procedure, IrUtil.copy(invocation.getAction()), blocks);
+					Action action = IrUtil.copy(invocation.getAction());
+
+					// Copy local variable
+					for (Var var : new ArrayList<Var>(action.getBody()
+							.getLocals())) {
+						procedure.addLocal(var);
+					}
+
+					new ActionUpdater(action, procedure).doSwitch(action
+							.getBody());
+					blocks.addAll(action.getBody().getBlocks());
 				}
 			} else {
 				Schedule sched = iterand.getSchedule();
@@ -410,18 +420,4 @@ public class ActorMergerSDF extends ActorMergerBase {
 		}
 	}
 
-	private void addActionToBody(Procedure procedure, Action action,
-			List<Block> blocks) {
-		// Copy local variables
-		for (Var var : new ArrayList<Var>(action.getBody()
-				.getLocals())) {
-			procedure.addLocal(var);
-		}
-
-		new ActionUpdater(action, procedure).doSwitch(action
-				.getBody());
-		blocks.addAll(action.getBody().getBlocks());
-	}
-	
-	
 }
