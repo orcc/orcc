@@ -57,7 +57,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.SDFMoC;
 
@@ -80,7 +79,6 @@ public class ActorMergerSDF extends ActorMergerBase {
 	private int depth;
 
 	private Map<Port, Port> portsMap = new HashMap<Port, Port>();
-
 
 	/**
 	 * This class defines a transformation to update the FIFO accesses.
@@ -227,7 +225,7 @@ public class ActorMergerSDF extends ActorMergerBase {
 		}
 
 	}
-	
+
 	/**
 	 * Creates a new merger for connected SDF actor.
 	 * 
@@ -236,7 +234,7 @@ public class ActorMergerSDF extends ActorMergerBase {
 	 * @param copier
 	 *            the associated copier
 	 */
-	
+
 	public ActorMergerSDF(SASLoopScheduler scheduler, Copier copier) {
 		this.scheduler = scheduler;
 		this.copier = copier;
@@ -316,7 +314,8 @@ public class ActorMergerSDF extends ActorMergerBase {
 		createCounters(body);
 		createBuffers(body, scheduler.getMaxTokens());
 		createLoopCounters(body, scheduler.getDepth());
-		createStaticSchedule(body, (Schedule) scheduler.getSchedule(), body.getBlocks());
+		createStaticSchedule(body, (Schedule) scheduler.getSchedule(),
+				body.getBlocks());
 		body.getLast().add(irFactory.createInstReturn());
 
 		Action action = dfFactory.createAction("mergedAction", inputPattern,
@@ -327,7 +326,7 @@ public class ActorMergerSDF extends ActorMergerBase {
 
 		return superActor;
 	}
-	
+
 	private void createLoopCounters(Procedure body, int scheduleDepth) {
 		// Add loop counter(s)
 		int i = 0;
@@ -344,14 +343,16 @@ public class ActorMergerSDF extends ActorMergerBase {
 		for (Port port : superActor.getInputs()) {
 			Var readIdx = body.newTempLocalVariable(
 					irFactory.createTypeInt(32), port.getName() + "_r");
-			block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
+			block.add(irFactory.createInstAssign(readIdx,
+					irFactory.createExprInt(0)));
 		}
 
 		// Create counters for outputs
 		for (Port port : superActor.getOutputs()) {
 			Var writeIdx = body.newTempLocalVariable(
 					irFactory.createTypeInt(32), port.getName() + "_w");
-			block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
+			block.add(irFactory.createInstAssign(writeIdx,
+					irFactory.createExprInt(0)));
 		}
 	}
 
@@ -368,22 +369,16 @@ public class ActorMergerSDF extends ActorMergerBase {
 	private void createStaticSchedule(Procedure procedure, Schedule schedule,
 			List<Block> blocks) {
 		for (Iterand iterand : schedule.getIterands()) {
-			if (iterand.isActor()) {
-				Actor actor = iterand.getActor();
-				CSDFMoC moc = (CSDFMoC) actor.getMoC();
-				for (Invocation invocation : moc.getInvocations()) {
-					Action action = IrUtil.copy(invocation.getAction());
+			if (iterand.isAction()) {
+				Action action = IrUtil.copy(iterand.getAction());
 
-					// Copy local variable
-					for (Var var : new ArrayList<Var>(action.getBody()
-							.getLocals())) {
-						procedure.addLocal(var);
-					}
-
-					new ActionUpdater(action, procedure).doSwitch(action
-							.getBody());
-					blocks.addAll(action.getBody().getBlocks());
+				// Copy local variable
+				for (Var var : new ArrayList<Var>(action.getBody().getLocals())) {
+					procedure.addLocal(var);
 				}
+
+				new ActionUpdater(action, procedure).doSwitch(action.getBody());
+				blocks.addAll(action.getBody().getBlocks());
 			} else {
 				Schedule sched = iterand.getSchedule();
 				Var loopVar = procedure.getLocal("idx_" + depth);

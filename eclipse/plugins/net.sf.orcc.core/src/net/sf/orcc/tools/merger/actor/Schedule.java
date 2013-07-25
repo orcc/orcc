@@ -33,7 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Action;
 
 /**
  * This class defines a schedule. A schedule is composed of a header
@@ -66,14 +66,14 @@ public class Schedule {
 		this.iterands.addAll(iterands);
 	}
 
-	public Set<Actor> getActors() {
-		Set<Actor> actors = new LinkedHashSet<Actor>();
+	public Set<Action> getActions() {
+		Set<Action> actions = new LinkedHashSet<Action>();
 		LinkedList<Iterand> stack = new LinkedList<Iterand>(iterands);
 
 		while (!stack.isEmpty()) {
 			Iterand iterand = stack.pop();
-			if (iterand.isActor()) {
-				actors.add(iterand.getActor());
+			if (iterand.isAction()) {
+				actions.add(iterand.getAction());
 			} else {
 				Schedule schedule = iterand.getSchedule();
 				for (Iterand subIterand : schedule.getIterands()) {
@@ -81,7 +81,7 @@ public class Schedule {
 				}
 			}
 		}
-		return actors;
+		return actions;
 	}
 
 	public List<Iterand> getIterands() {

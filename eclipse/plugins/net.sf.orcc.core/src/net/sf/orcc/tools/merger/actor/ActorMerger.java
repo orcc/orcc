@@ -189,6 +189,8 @@ public class ActorMerger extends DfVisitor<Void> {
 
 			OrccLogger.traceln(subNetwork.getName() + " (" + actorcount
 					+ " actors, " + fifocount + " fifos)");
+			
+			OrccLogger.traceln("schedule" + scheduler.getSchedule());
 
 			// merge sub-network inside a single actor
 			Actor superActor;
