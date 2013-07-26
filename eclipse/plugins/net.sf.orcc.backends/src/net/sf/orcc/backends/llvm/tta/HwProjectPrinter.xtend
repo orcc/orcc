@@ -125,7 +125,7 @@ class HwProjectPrinter extends TTAPrinter {
 		set_global_assignment -name VHDL_FILE «processor.name»/tta/vhdl/«processor.name»_tl_globals_pkg.vhdl
 		set_global_assignment -name VHDL_FILE «processor.name»/tta/vhdl/«processor.name»_mem_constants_pkg.vhd
 		set_global_assignment -name VHDL_FILE «processor.name»/tta/vhdl/«processor.name».vhd
-		set_global_assignment -name VHDL_FILE «processor.name»/tta/vhdl/imem_mau_pkg.vhdl
+		set_global_assignment -name VHDL_FILE «processor.name»/tta/vhdl/«processor.name»_tl_imem_mau_pkg.vhdl
 		set_global_assignment -name VHDL_FILE «processor.name»/tta/gcu_ic/output_socket_«processor.buses.size»_1.vhdl
 		set_global_assignment -name VHDL_FILE «processor.name»/tta/gcu_ic/output_socket_1_1.vhdl
 		set_global_assignment -name VHDL_FILE «processor.name»/tta/gcu_ic/input_socket_«processor.buses.size».vhdl
@@ -273,7 +273,7 @@ class HwProjectPrinter extends TTAPrinter {
 		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>
-		<file xil_pn:name="«processor.name»/tta/vhdl/imem_mau_pkg.vhdl" xil_pn:type="FILE_VHDL">
+		<file xil_pn:name="«processor.name»/tta/vhdl/«processor.name»_tl_imem_mau_pkg.vhdl" xil_pn:type="FILE_VHDL">
 		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>

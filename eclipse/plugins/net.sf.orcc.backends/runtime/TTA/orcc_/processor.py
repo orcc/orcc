@@ -175,7 +175,7 @@ class Processor:
         else:
             os.remove(self.id + ".mif")
             os.remove(self.id + "_data.mif")
-        shutil.move("imem_mau_pkg.vhdl", vhdlPath)    
+        shutil.move(self.id + "_tl_imem_mau_pkg.vhdl", vhdlPath)
 
         # Clean working directory
         os.remove(self._bemFile)
