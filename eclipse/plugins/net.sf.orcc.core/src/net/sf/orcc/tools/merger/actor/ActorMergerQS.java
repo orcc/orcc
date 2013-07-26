@@ -250,19 +250,17 @@ public class ActorMergerQS extends ActorMergerBase {
 	 */
 	private Action createSuperaction(String actionName) {
 		ScheduleParser scheduler = new ScheduleParser(definitionFile, network);
-		SuperAction superAction = scheduler.parse(network.getName(), actionName);
-		superAction.computePatterns(network);
+		Schedule superAction = scheduler.parse(network.getName(), actionName);
+		Pattern inputPattern = computeScheduleInputPattern(network, superAction.getIterands());
+		Pattern outputPattern = computeScheduleOutputPattern(network, superAction.getIterands());
 
-		createInputPattern(superAction);
-		createOutputPattern(superAction);
-		
 		GuardParser guardParser = new GuardParser(definitionFile, actionName, superActor);
 		guardParser.parse(network.getName(), actionName);
 		
 		Procedure body = irFactory.createProcedure(actionName, 0,
 				irFactory.createTypeVoid());
 		createBuffers(body, scheduler.getMaxTokens());
-		createCounters(body, superAction);
+		createCounters(body, inputPattern, outputPattern);
 		createStaticSchedule(body, scheduler.getSchedule());
 		body.getLast().add(irFactory.createInstReturn());
 	
@@ -274,13 +272,57 @@ public class ActorMergerQS extends ActorMergerBase {
 		return action;
 	}
 
-	private void createCounters(Procedure body, SuperAction action) {
+	/*
+	 * Each superaction instance has an input and output pattern
+	 * that is visible to the actors neighboring its superactor. 
+	 * The pattern need to be determined from the invocations.
+	 */
+	
+	public Pattern computeScheduleInputPattern(Network subNetwork, List<Iterand> invocations) {
+		Pattern inputPattern = dfFactory.createPattern();
+		for (Iterand iterand : invocations) {
+			Pattern iterandPattern = iterand.getAction().getInputPattern();
+			for (Port port : iterandPattern.getPorts()) {
+				if (MergerUtil.findPort(subNetwork.getInputs(), port.getName()) >= 0) {
+					if (!inputPattern.contains(port)) {
+						inputPattern.getPorts().add(port);
+					}
+					Port superactionPort = inputPattern.getPorts().get(
+							MergerUtil.findPort(inputPattern.getPorts(), port.getName()));
+					inputPattern.setNumTokens(superactionPort, 
+							inputPattern.getNumTokens(superactionPort) + iterandPattern.getNumTokens(port));
+				}
+			}
+		}
+		return createInputPattern(inputPattern);
+	}
+
+	public Pattern computeScheduleOutputPattern(Network subNetwork, List<Iterand> invocations) {
+		Pattern outputPattern = dfFactory.createPattern();
+		for (Iterand iterand : invocations) {
+			Pattern iterandPattern = iterand.getAction().getOutputPattern();
+			for (Port port : iterandPattern.getPorts()) {
+				if (MergerUtil.findPort(subNetwork.getOutputs(), port.getName()) >= 0) {
+					if(!outputPattern.contains(port)) {
+						outputPattern.getPorts().add(port);
+					}
+					Port superactionPort = outputPattern.getPorts().get(
+							MergerUtil.findPort(outputPattern.getPorts(), port.getName()));
+					outputPattern.setNumTokens(superactionPort, 
+							outputPattern.getNumTokens(superactionPort) + iterandPattern.getNumTokens(port));
+				}
+			}
+		}
+		return createOutputPattern(outputPattern);
+	}
+
+	private void createCounters(Procedure body, Pattern inputPattern, Pattern outputPattern) {
 		// Create counters for inputs
-		for (Port port : action.getInputPattern().getPorts()) {
+		for (Port port : inputPattern.getPorts()) {
 			createCounter(body, port, "_r");
 		}
 		// Create counters for outputs
-		for (Port port : action.getOutputPattern().getPorts()) {
+		for (Port port : outputPattern.getPorts()) {
 			createCounter(body, port, "_w");
 		}
 	}
@@ -295,20 +337,22 @@ public class ActorMergerQS extends ActorMergerBase {
 		}
 	}
 
-	private void createInputPattern(SuperAction superAction) {
-		inputPattern = dfFactory.createPattern();
+	private Pattern createInputPattern(Pattern actionInputPattern) {
+		Pattern inputPattern = dfFactory.createPattern();
 		for (Port port : superActor.getInputs()) {
 			port.setNumTokensConsumed(createPortPattern(inputPattern, 
-					superAction.getInputPattern(), port));
+					actionInputPattern, port));
 		}
+		return inputPattern;
 	}
 
-	private void createOutputPattern(SuperAction superAction) {
-		outputPattern = dfFactory.createPattern();
+	private Pattern createOutputPattern(Pattern actionOutputPattern) {
+		Pattern outputPattern = dfFactory.createPattern();
 		for (Port port : superActor.getOutputs()) {
 			port.setNumTokensProduced(createPortPattern(outputPattern, 
-					superAction.getOutputPattern(), port));
+					actionOutputPattern, port));
 		}
+		return outputPattern;
 	}
 
 	private int createPortPattern(Pattern targetPattern, Pattern sourcePattern, Port port) {
@@ -332,8 +376,8 @@ public class ActorMergerQS extends ActorMergerBase {
 	 * @param schedule
 	 *            the current schedule
 	 */
-	private void createStaticSchedule(Procedure procedure, SuperAction schedule) {
-		for (ActionInvocation iterand : schedule.getActionInvocations()) {
+	private void createStaticSchedule(Procedure procedure, Schedule schedule) {
+		for (Iterand iterand : schedule.getIterands()) {
 			List<Expression> procParams = new ArrayList<Expression>();
 			BlockBasic increments = IrFactory.eINSTANCE.createBlockBasic();
 			processInputs(increments, iterand.getAction(), procParams);

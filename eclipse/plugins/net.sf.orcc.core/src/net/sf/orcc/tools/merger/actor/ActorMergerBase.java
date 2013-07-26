@@ -36,7 +36,6 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.graph.Vertex;
@@ -64,9 +63,6 @@ public class ActorMergerBase extends DfSwitch<Actor> {
 
 	protected Map<Port, Var> buffersMap = new HashMap<Port, Var>();
 	protected Copier copier;
-
-	protected Pattern inputPattern;
-	protected Pattern outputPattern;
 
 	protected Actor superActor;
 

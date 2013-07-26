@@ -33,7 +33,7 @@ public class ScheduleParser {
 
 	private Map<Connection, Integer> maxTokens;
 
-	private SuperAction schedule;
+	private Schedule schedule;
 
 	private String definitionFile;
 
@@ -44,10 +44,10 @@ public class ScheduleParser {
 	public ScheduleParser(String definitionFile, Network network) {
 		this.definitionFile = definitionFile;
 		this.network = network;
-		schedule = new SuperAction();
+		schedule = new Schedule();
 	}
 	
-	public SuperAction parse(String superactor, String superaction) {
+	public Schedule parse(String superactor, String superaction) {
 		try {
 			InputStream is = new FileInputStream(definitionFile);
 			Document document = DomUtil.parseDocument(is);
@@ -131,7 +131,7 @@ public class ScheduleParser {
 	private void addActorActionToSchedule(Actor actor, Action action, int rep) {
 		if ((actor != null) && (action != null)) {
 			for (int i = 0; i < rep; i++) {
-				schedule.add(new ActionInvocation(actor, action));
+				schedule.add(new Iterand(action));
 			}
 		}
 	}
@@ -149,7 +149,7 @@ public class ScheduleParser {
 	 * 
 	 * @return the pre-computed schedule
 	 */
-	public SuperAction getSchedule() {
+	public Schedule getSchedule() {
 		return schedule;
 	}
 
@@ -176,9 +176,9 @@ public class ScheduleParser {
 	/**
 	 * @param schedule
 	 */
-	private void computeMemoryBound(SuperAction schedule) {
-		for (ActionInvocation iterand : schedule.getActionInvocations()) {
-			Actor actor = iterand.getActor();
+	private void computeMemoryBound(Schedule schedule) {
+		for (Iterand iterand : schedule.getIterands()) {
+			Actor actor = locateActionOwner(iterand.getAction());
 			for (Edge edge : actor.getIncoming()) {
 				Connection conn = (Connection) edge;
 				Actor src = conn.getSource().getAdapter(Actor.class);
@@ -208,4 +208,15 @@ public class ScheduleParser {
 		}
 	}
 	
+	private Actor locateActionOwner(Action act) {
+		for (Actor actor : network.getAllActors()) {
+			for (Action action : actor.getActions()) {
+				if (act.equals(action)) {
+					return actor;
+				}
+			}
+		}
+		return null;
+	}
+
 }

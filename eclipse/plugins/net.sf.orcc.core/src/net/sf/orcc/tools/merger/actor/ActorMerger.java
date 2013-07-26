@@ -155,9 +155,9 @@ public class ActorMerger extends DfVisitor<Void> {
 	@Override
 	public Void caseNetwork(Network network) {
 		String definitionFile = new String(System.getProperty("user.home") + "/" + definitionFileName);
-		boolean automatic = MergerUtil.testFilePresence(definitionFile);
+		boolean fileExists = MergerUtil.testFilePresence(definitionFile);
 		List<List<Vertex>> staticRegions;
-		if (!automatic) {
+		if (!fileExists) {
 			OrccLogger.traceln("Could not open " + definitionFile + " - performing automatic merging");
 			staticRegions = new StaticRegionDetector()
 				.analyze(network);
@@ -174,7 +174,7 @@ public class ActorMerger extends DfVisitor<Void> {
 			Network subNetwork = getSubNetwork(network, instances);
 			// create the static schedule of vertices
 			SASLoopScheduler scheduler = null;
-			if (!automatic) {
+			if (!fileExists) {
 				scheduler = new SASLoopScheduler(subNetwork);
 				scheduler.schedule();
 			}
@@ -190,12 +190,11 @@ public class ActorMerger extends DfVisitor<Void> {
 			OrccLogger.traceln(subNetwork.getName() + " (" + actorcount
 					+ " actors, " + fifocount + " fifos)");
 			
-			OrccLogger.traceln("schedule" + scheduler.getSchedule());
-
 			// merge sub-network inside a single actor
 			Actor superActor;
-			if (!automatic) {
-			superActor = new ActorMergerSDF(scheduler, copier)
+			if (!fileExists) {
+				OrccLogger.traceln("schedule" + scheduler.getSchedule());
+				superActor = new ActorMergerSDF(scheduler, copier)
 					.doSwitch(subNetwork);
 			} else {
 				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile);

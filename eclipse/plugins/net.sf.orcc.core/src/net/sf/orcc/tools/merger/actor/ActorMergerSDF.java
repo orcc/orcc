@@ -80,6 +80,10 @@ public class ActorMergerSDF extends ActorMergerBase {
 
 	private Map<Port, Port> portsMap = new HashMap<Port, Port>();
 
+	protected Pattern inputPattern;
+
+	protected Pattern outputPattern;
+
 	/**
 	 * This class defines a transformation to update the FIFO accesses.
 	 * 
