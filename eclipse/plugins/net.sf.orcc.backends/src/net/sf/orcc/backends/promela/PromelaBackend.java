@@ -178,7 +178,6 @@ public class PromelaBackend extends AbstractBackend {
 	}
 
 	private void transformInstance(Instance instance) {
-
 		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
 		transfos.add(new PromelaDeadGlobalElimination(netStateDef
 				.getVarsUsedInScheduling(), netStateDef

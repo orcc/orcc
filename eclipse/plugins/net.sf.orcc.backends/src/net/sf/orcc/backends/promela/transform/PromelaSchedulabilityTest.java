@@ -149,10 +149,6 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					}
 				}
 			}
-			// step through FSM, which transitions belong to cycles
-			//for (State state : choiceStatesSet) {
-				//fsmPathSearch(state);
-			//}
 			// check for nondeterministic cycles in the fsm
 			for (State state : instance.getActor().getFsm().getStates()) {
 				fsmFindInputdepCycles(state);

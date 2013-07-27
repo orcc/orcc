@@ -22,7 +22,7 @@ public class PromelaAddPrefixToStateVar extends DfVisitor<Void> {
 	}
 
 	private void renameVariable(Var var) {
-		var.setName(instance.getSimpleName()+"_"+var.getName());
+		var.setName("state_var_"+instance.getSimpleName()+"_"+var.getName());
 	}
 
 	private void renameVariables(List<Var> variables) {
