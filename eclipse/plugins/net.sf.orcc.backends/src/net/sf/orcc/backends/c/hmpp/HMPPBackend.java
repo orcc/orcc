@@ -62,7 +62,6 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 public class HMPPBackend extends CBackend {
 
 	protected boolean disableAnnotation;
-	protected String srcPath;
 
 	@Override
 	public void doInitializeOptions() {
@@ -70,8 +69,6 @@ public class HMPPBackend extends CBackend {
 
 		disableAnnotation = getAttribute(BackendsConstants.HMPP_NO_PRAGMAS,
 				false);
-
-		srcPath = path + File.separator + "src";
 	}
 
 	@Override
@@ -95,7 +92,7 @@ public class HMPPBackend extends CBackend {
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			ResourceSet set = new ResourceSetImpl();
-			if (debug && !IrUtil.serializeActor(set, path, actor)) {
+			if (debug && !IrUtil.serializeActor(set, srcPath, actor)) {
 				OrccLogger.warnln("Error with " + transformation + " on actor "
 						+ actor.getName());
 			}

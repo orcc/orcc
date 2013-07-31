@@ -213,7 +213,15 @@ public class TTABackend extends LLVMBackend {
 			OrccLogger.trace("Export library files into " + libPath + "... ");
 			if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
-				new File(libPath + File.separator + "generate")
+				new File(libPath + File.separator + "ttanetgen")
+						.setExecutable(true);
+				new File(libPath + File.separator + "ttaextractlog.py")
+						.setExecutable(true);
+				new File(libPath + File.separator + "ttamergehtml.py")
+						.setExecutable(true);
+				new File(libPath + File.separator + "ttamergecsv.py")
+						.setExecutable(true);
+				new File(libPath + File.separator + "ttamerge.py")
 						.setExecutable(true);
 				return true;
 			} else {
@@ -319,7 +327,7 @@ public class TTABackend extends LLVMBackend {
 	 */
 	private void runPythonScript() {
 		List<String> cmdList = new ArrayList<String>();
-		cmdList.add(libPath + File.separator + "generate");
+		cmdList.add(libPath + File.separator + "ttanetgen");
 		cmdList.add("-cg");
 		if (debug) {
 			cmdList.add("--debug");

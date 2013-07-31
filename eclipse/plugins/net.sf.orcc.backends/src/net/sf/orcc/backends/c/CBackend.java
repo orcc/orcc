@@ -100,7 +100,7 @@ public class CBackend extends AbstractBackend {
 	/**
 	 * Path to target "src" folder
 	 */
-	private String srcPath;
+	protected String srcPath;
 
 	@Override
 	protected void doInitializeOptions() {

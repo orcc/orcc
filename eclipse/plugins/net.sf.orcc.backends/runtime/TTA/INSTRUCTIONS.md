@@ -49,8 +49,8 @@ You may have to write your own application. The TTA backend should support any R
   - A folder *_generate* that is used by the 
   - And a folder for each processor that contains the hardware description of the processor and the software code executed on it. 
   - Some others files such as the VHDL description of the top-level element of the design.
-- Finish the generation by executing the *generate* script that runs the TCE tools. Basically, you can compile your application with the command ``./libs/generate -c .``. 
-More details about the *generate* script can be found with the help, ``./libs/generate -h``.
+- Finish the generation by executing the *ttanetgen* script that runs the TCE tools. Basically, you can compile your application with the command ``./libs/ttanetgen -c .``. 
+More details about the *ttanetgen* script can be found with the help, ``./libs/ttanetgen -h``.
 
 ## Simulate an execution
 
@@ -63,7 +63,7 @@ If your application has been succesfully compiled, the execution of the system c
 
 You can accuratly profile the execution of an application using TTANetSim, in order to get some feedback about the cost of your actors:
 - Generate the application with the **Profile** option activated.
-- Obviously, you have to recompile your application (``./libs/generate -c .``).
+- Obviously, you have to recompile your application (``./libs/ttanetgen -c .``).
 - Run the simulation in profiling mode with ``-p`` option.
 - Since the simulation is probably never ending alone, you need to exit it manually using ``CTRL-C`` command then ``q`` and ``Enter``.
 - Make the profiling data compatible with KCacheGrind [this](http://tce.cs.tut.fi/user_manual/TCE/node41.html#SECTION00714100000000000000).
@@ -71,5 +71,5 @@ You can accuratly profile the execution of an application using TTANetSim, in or
 
 ## Synthesis the design
 
-You can generate the hardware description of your platform using ``./libs/generate -g .``. After a successfull generation of the hardware platform, you can synthesised it for your FPGA using your favorite software (ISE, Quartus, etc). Keep in mind that native functions are not supported on the FPGA...
+You can generate the hardware description of your platform using ``./libs/ttanetgen -g .``. After a successfull generation of the hardware platform, you can synthesised it for your FPGA using your favorite software (ISE, Quartus, etc). Keep in mind that native functions are not supported on the FPGA...
 
