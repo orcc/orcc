@@ -53,6 +53,7 @@ else(NO_EXTERNAL_DEPENDENCIES)
 		orcc/src/compareyuv.c
 		orcc/src/scheduler.c
 		orcc/src/display.c
+		orcc/src/audio.c
 		orcc/src/fpsPrint.c
 		orcc/src/genetic.c
 		orcc/src/thread.c

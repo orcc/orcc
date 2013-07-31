@@ -32,6 +32,7 @@ yace/include/timer.h
 yace/src/condition.cpp
 yace/src/config_parser.cpp
 yace/src/display.cpp
+yace/src/audio.cpp
 yace/src/ethernet.cpp
 yace/src/get_opt.cpp
 yace/src/mutex.cpp
