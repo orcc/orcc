@@ -89,7 +89,7 @@ class NetworkPrinter extends PromelaTemplate {
 			/*Start processes*/
 			atomic{
 				«FOR instance : network.children.filter(typeof(Instance))»
-					run «instance.simpleName»(/*init_state*/);
+					run «instance.simpleName»();
 				«ENDFOR»
 			}	
 		}

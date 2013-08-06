@@ -29,6 +29,7 @@
 
 package net.sf.orcc.backends.promela;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -175,6 +176,21 @@ public class PromelaBackend extends AbstractBackend {
 	private void printNetwork(Network network) {
 		new NetworkPrinter(network, options).print(path);
 		new SchedulePrinter(network, actorSchedulers).print(path);
+		new ScriptPrinter(network).print(path); 
+	}
+	
+	@Override
+	protected boolean exportRuntimeLibrary() {
+		String libsPath = path + File.separator + "pylibs";
+		OrccLogger.trace("Export libraries sources into " + libsPath
+				+ "... ");
+		if (copyFolderToFileSystem("/runtime/Promela/pylibs", libsPath, debug)) {
+			OrccLogger.traceRaw("OK" + "\n");
+			return true;
+		} else {
+			OrccLogger.warnRaw("Error" + "\n");
+			return false;
+		}
 	}
 
 	private void transformInstance(Instance instance) {
