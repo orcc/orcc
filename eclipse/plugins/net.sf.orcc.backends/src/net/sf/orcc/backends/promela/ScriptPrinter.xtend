@@ -32,7 +32,7 @@ package net.sf.orcc.backends.promela
 import java.io.File
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest
+import net.sf.orcc.df.Instance
 
 /**
  * Generated an initial schedule with only actor level scheduling completed 
@@ -64,66 +64,36 @@ class ScriptPrinter extends PromelaTemplate {
 	def getNetworkFileContent() '''
 		# Generated from "«network.name»"
 		
-		from subprocess import Popen, PIPE
-		from pylibs.modelchecking import modelchecker
-		import sys, getopt
+		from pylibs.modelchecking import ModelChecker
+		from pylibs.xmlformat import SchedulerXML, FSM, Transition
+		from pylibs.interaction import UserArgs
 		
+		uargs = UserArgs()
+		uargs.parseargs()
+		
+		actors=«network.children.filter(typeof(Instance)).join("(",", ", ")",['''«simpleName»'''])»
+		
+		scheduler=SchedulerXML(schedule_«network.simpleName».xml)
+		
+		mc = ModelChecker()
+		
+		if uargs.configure:
+			mc.simulate('main_«network.simpleName».pml')
+			endstate = mc.endstate
+			if uargs.outputfile == '':
+				print (endstate, "\n")
+			else:
+				f = open(uargs.outputfile, 'w')
+				f.write(endstate)
+				f.close()
 
-		inputfile = ''
-		outputfile = ''
-
-		try:
-			opts, args = getopt.getopt(sys.argv[1:],"hi:o:",["ifile=","ofile="])
-		except getopt.GetoptError:
-			print ('run_checker.py -i <inputfile> -o <outputfile>')
-			sys.exit(2)
-
-		for opt, arg in opts:
-			if opt == '-h':
-				print ('test.py -i <inputfile> -o <outputfile>')
-				sys.exit()
-			elif opt in ("-i", "--ifile"):
-				inputfile = arg
-			elif opt in ("-o", "--ofile"):
-				outputfile = arg
-
-		print ('Input file is: ', inputfile)
-		print ('Output file is: ', outputfile)
-
-
-		print ('\nAbout to perform scheduling in network:\n\t '+ "main_«network.simpleName».pml" +'\n')
-
-		if (len(sys.argv)>1):
-			configuration = sys.argv[1]
-			print ('\nUsing configuration '+configuration)
-		else:
-			print ('\nUsing initial state as configuration (specify desired configuration as argument)')
-
-		print("\n\nRuns Program to get Initial value of variables..\n")
-
-		mc = modelchecker()
-		mc.simulate('main_«network.simpleName».pml')
-		endstate = mc.endstate
-		if outputfile == '':
-			print (endstate, "\n")
-		else:
-			f = open(outputfile, 'w')
-			f.write(endstate)
-			f.close()
-		mc.generatemc('main_«network.simpleName».pml')
-		mc.compilemc()
-		mc.runmc()
+		if uargs.runchecker:
+			mc.generatemc('main_«network.simpleName».pml')
+			mc.compilemc()
+			mc.runmc()
+			#if mc.tracefound
+				#mc.simulatetrail('main_«network.simpleName».pml')
 	'''
 
-	
-	def superActor(PromelaSchedulabilityTest actorSched) { 
-	'''
-		<superactor name="cluster_«actorSched.instanceName»">
-			<actor name="«actorSched.instanceName»"/>
-			«actorSched.printFSM»
-			«actorSched.printSchedule»
-		</superactor>
-	'''
-	}
 	
 }

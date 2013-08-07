@@ -1,6 +1,6 @@
 from subprocess import Popen, PIPE
 
-class modelchecker(object):
+class ModelChecker(object):
     endstate=''
     returncode = None
     tracefound=False
@@ -11,7 +11,7 @@ class modelchecker(object):
         proc = Popen(['spin', filename], stdout=PIPE, universal_newlines=True)
         self.getoutput(proc)
     def getoutput(self, proc):
-        self.endstate = "//End State"
+        self.endstate = "//State:"
         for line in iter(proc.stdout):
             line = str(line.strip())
             if line.startswith("spin"):
