@@ -66,16 +66,24 @@ class ScriptPrinter extends PromelaTemplate {
 		
 		from pylibs.modelchecking import ModelChecker
 		from pylibs.xmlformat import SchedulerXML, FSM, Transition
-		from pylibs.interaction import UserArgs
+		from pylibs.interaction import UserArgs, Configuration
 		
 		uargs = UserArgs()
 		uargs.parseargs()
 		
-		actors=«network.children.filter(typeof(Instance)).join("(",", ", ")",['''«simpleName»'''])»
+		actors=«network.children.filter(typeof(Instance)).join("[",", ", "]",['''"«simpleName»"'''])»
 		
-		scheduler=SchedulerXML(schedule_«network.simpleName».xml)
+		conf=Configuration()
+		conf.loadconfiguration(actors)
+		
+		scheduler=SchedulerXML('schedule_«network.simpleName».xml')
 		
 		mc = ModelChecker()
+		
+		if uargs.removeactor is not None:
+			conf.removeactor(uargs.removeactor)
+			conf.saveconfiguration()
+			exit()
 		
 		if uargs.configure:
 			mc.simulate('main_«network.simpleName».pml')
