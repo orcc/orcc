@@ -5,10 +5,10 @@ class ModelChecker(object):
     returncode = None
     tracefound=False
     def simulatetrail(self, filename):
-        proc = Popen(['spin', '-t' '-DXML', filename], stdout=PIPE, universal_newlines=True)
+        proc = Popen(['spin', '-t', '-DXML', '-DMANAGED', filename], stdout=PIPE, universal_newlines=True)
         self.getoutput(proc)
     def simulate(self, filename):
-        proc = Popen(['spin', filename], stdout=PIPE, universal_newlines=True)
+        proc = Popen(['spin', '-DMANAGED', filename], stdout=PIPE, universal_newlines=True)
         self.getoutput(proc)
     def getoutput(self, proc):
         self.endstate = "//State:"
@@ -27,7 +27,7 @@ class ModelChecker(object):
         self.returncode = proc.returncode
     def generatemc(self, filename):
         print ("Generating model checker: spin -a -DXML ",filename)
-        proc = Popen(['spin', '-a', '-DXML', filename])
+        proc = Popen(['spin', '-a', '-DXML', '-DMANAGED', filename])
         proc.wait()
     def compilemc(self):
         print ("Compiling model checker: gcc -DCOLLAPSE -DVECTORS=100000 -o pan pan.c")

@@ -83,14 +83,25 @@ class NetworkPrinter extends PromelaTemplate {
 			#include "«instance.simpleName».pml"
 		«ENDFOR»
 		
+		int initdone=0
+		
+		proctype dummy() {
+		chan_0?initdone;}
+		
 		init {
 			/*Inputs here*/
-		
+			#ifdef MANAGED
+			#include "tmp_state.pml"
+			#endif
 			/*Start processes*/
 			atomic{
+				#ifdef MANAGED
+				#include "tmp_startactors.pml"
+				#else
 				«FOR instance : network.children.filter(typeof(Instance))»
 					run «instance.simpleName»();
 				«ENDFOR»
+				#endif
 			}	
 		}
 	'''

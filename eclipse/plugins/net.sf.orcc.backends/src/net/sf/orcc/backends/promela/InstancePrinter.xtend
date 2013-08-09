@@ -89,8 +89,14 @@ class InstancePrinter extends PromelaTemplate {
 	}
 	
 	def getInstanceFileContent() '''
-		/*state need to be global*/
-		int fsm_state_«instance.simpleName»;
+		«IF instance.actor.hasFsm»
+			/* States of the FSM */
+			«FOR i : 0..instance.actor.fsm.states.size-1»
+				int «instance.simpleName»_state_«instance.actor.fsm.states.get(i).name» = «i»;
+			«ENDFOR»
+			/* Initial State */
+			int fsm_state_«instance.simpleName» = «instance.simpleName»_state_«instance.actor.fsm.initialState.name»;
+		«ENDIF»
 		
 		«IF ! instance.actor.stateVars.nullOrEmpty»
 			/* State variables */
@@ -103,22 +109,15 @@ class InstancePrinter extends PromelaTemplate {
 		
 		/* Process */
 		proctype «instance.simpleName»(«instance.actor.parameters.join(", ", [declare])») {
-		
-			«IF instance.actor.hasFsm»
-				/* States of the FSM */
-				«FOR i : 0..instance.actor.fsm.states.size-1»
-					int state_«instance.actor.fsm.states.get(i).name» = «i»;
+
+			«IF ! instance.actor.stateVars.nullOrEmpty»
+				/* State variables */
+				«FOR stateVar : instance.actor.stateVars»
+					«IF !stateVar.assignable»
+						«stateVar.declareStateVar»
+					«ENDIF»
 				«ENDFOR»
 			«ENDIF»
-
-		«IF ! instance.actor.stateVars.nullOrEmpty»
-			/* State variables */
-			«FOR stateVar : instance.actor.stateVars»
-				«IF !stateVar.assignable»
-					«stateVar.declareStateVar»
-				«ENDIF»
-			«ENDFOR»
-		«ENDIF»
 		
 			/*peek variables*/
 			«FOR action : instance.actor.actions»
@@ -129,14 +128,7 @@ class InstancePrinter extends PromelaTemplate {
 					bool «inst.target.variable.name»_done = 0;
 				«ENDFOR»
 			«ENDFOR»
-		
-			«IF ! instance.actor.stateVars.nullOrEmpty»
-				/* State initialization */
-				«FOR stateVar : instance.actor.stateVars»
-					«stateVar.initializeStateVar»
-				«ENDFOR»
-			«ENDIF»
-			
+
 			«IF ! instance.arguments.nullOrEmpty»
 				/* Instance's arguments*/
 				«FOR arg : instance.arguments»
@@ -153,9 +145,6 @@ class InstancePrinter extends PromelaTemplate {
 			«ENDFOR»
 		
 			«IF instance.actor.hasFsm»
-				/* Initial State */
-				fsm_state_«instance.simpleName» = state_«instance.actor.fsm.initialState.name»;
-				
 				do
 				«FOR state : instance.actor.fsm.states»
 					«state.newState»
@@ -178,7 +167,7 @@ class InstancePrinter extends PromelaTemplate {
 	'''
 	
 	def newState(State state) '''
-		::	fsm_state_«instance.simpleName» == state_«state.name» -> {
+		::	fsm_state_«instance.simpleName» == «instance.simpleName»_state_«state.name» -> {
 			if
 			«FOR edge : state.outgoing»
 				«(edge as Transition).action.printPeekPattern»
@@ -240,7 +229,7 @@ class InstancePrinter extends PromelaTemplate {
 			
 			«action.outputPattern.outputPattern»
 			
-			fsm_state_«instance.simpleName» = state_«trans.target.name»;
+			fsm_state_«instance.simpleName» = «instance.simpleName»_state_«trans.target.name»;
 			
 			«FOR instLoad : loadPeeks.get(action)»
 				«instLoad.target.variable.name»_done = 0;
@@ -253,7 +242,7 @@ class InstancePrinter extends PromelaTemplate {
 			printf("«instance.simpleName».«action.name»();\n");
 			#endif
 			#ifdef PFSM
-			printf("state = state_«trans.target.name»;\n");
+			printf("state = «instance.simpleName»_state_«trans.target.name»;\n");
 			#endif
 			«IF ! instance.actor.stateVars.nullOrEmpty»
 				#ifdef PSTATE
@@ -361,25 +350,12 @@ class InstancePrinter extends PromelaTemplate {
 					«variable.declare» = «variable.initialValue.doSwitch.wrap»;
 				«ENDIF»
 			«ELSE»
-				«IF variable.type.list»
-					«variable.declare("_backup")» = «variable.initialValue.doSwitch.wrap»;
-				«ENDIF»
-				«variable.declare»;
+				«variable.declare» = «variable.initialValue.doSwitch.wrap»;
 			«ENDIF»
 		«ELSE»
-			«variable.declare»;
+			«variable.declare»=0;
 		«ENDIF»
 	'''
-
-	def initializeStateVar(Var variable) {
-		if(variable.assignable && variable.initialized) {
-			if( ! variable.type.list) {
-				'''«variable.name» = «variable.initialValue.doSwitch»;'''
-			} else {
-				'''//memcpy(«variable.name», «variable.name»_backup, sizeof(«variable.name»_backup));'''
-			}
-		}
-	}
 
 	override declare(Var variable) {
 		variable.declare("")

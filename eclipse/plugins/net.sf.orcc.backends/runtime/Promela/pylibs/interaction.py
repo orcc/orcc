@@ -7,9 +7,10 @@ class UserArgs():
     runchecker=False
     configure=False
     removeactor=None
+    setleader=None
     def parseargs(self):
         try:
-            opts, args = getopt.getopt(sys.argv[1:],"hsci:o:d:")
+            opts, args = getopt.getopt(sys.argv[1:],"hsci:o:d:l:")
         except getopt.GetoptError:
             self.printhelp()
             sys.exit(2)
@@ -28,6 +29,8 @@ class UserArgs():
                 self.configure=True
             elif opt in ("-d"):
                 self.removeactor=arg
+            elif opt in ("-l"):
+                self.setleader=arg
     def printhelp(self):
             print ("\nUsage:")
             print ('run_checker.py -i <inputfile> -o <outputfile>')
@@ -61,37 +64,7 @@ class UserArgs():
             proc.stderr.flush()
         return False
     
-class Configuration():
-    actors=None
-    actor=None
-    def __init__(self, filename='configuration.txt'):
-        self.filename=filename
-        open(self.filename, "a").close() # create it if it doesnt exist
-    def loadconfiguration(self, actors):
-        file=open(self.filename, 'r')
-        for line in file:
-            lst=line.strip().split()
-            if lst[0]=='actors':
-                self.actors=lst[1:len(lst)]
-            elif lst[0]=='actor':
-                self.actor=lst[1]
-        file.close()
-        if self.actors is None:
-            self.actors=actors
-        print(self.actors)
-    def saveconfiguration(self):
-        file=open(self.filename, "w")
-        tmp=['actors ']
-        tmp.extend(self.actors)
-        file.writelines(["%s " % item  for item in tmp])
-        file.close
-    def removeactor(self, actorname):
-        if actorname in self.actors:
-            self.actors.remove(actorname)
-            print ("Actor ", actorname, "deleted from configuration")
-        else:
-            print ("Actor ", actorname, "not in configuration")
+   
+    
 
-    
-    
     

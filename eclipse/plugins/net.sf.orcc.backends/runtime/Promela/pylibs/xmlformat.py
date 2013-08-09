@@ -4,10 +4,11 @@ import sys
 import xml.etree.ElementTree as et
 
 class Transition:
-    def __init__(self, src, dst, action):
+    def __init__(self, src, dst, action, tid):
         self.action=action
         self.src=src
         self.dst=dst
+        self.tid=tid
 
 class FSM:
     initial = None
@@ -26,58 +27,26 @@ class FSM:
                     newList.append(trans)
                     visited.append(trans.dst)
         self.transitions = newList
-        print ("\nInitial Scheduler for the composition:")
-        for trans in newList:
-            print ("\t", trans.action, " : ", trans.src, "->", trans.dst)
+    def printfsm(self):
+        print ("\nInitial scheduler for the composition:")
+        for trans in self.transitions:
+            print ("\t", "["+trans.tid+"]", trans.action, " : ", trans.src, "->", trans.dst)
 
 class SchedulerXML():
+    tid=0
     xmlfilename=None
     def __init__(self, xmlfilename):
         self.xmlfilename=xmlfilename
     def getactorfsm(self, actorname):
+        if actorname is None:
+            print ('Failed: No leader actor set. Use: -l<actor>')
+            sys.exit()
         tree = et.parse(self.xmlfilename)
         xfsm = tree.find(".//actor/[@name='"+actorname+"']../fsm")
         fsm = FSM(xfsm.get('initial'))
         for trans in xfsm.findall('transition'):
-            trans = Transition(trans.get('src'), trans.get('dst'), trans.get('action'))
-            fsm.addTransition(trans)
+            trns = Transition(trans.get('src'), trans.get('dst'), trans.get('action'), str(self.tid))
+            self.tid=self.tid+1
+            fsm.addTransition(trns)
         fsm.sortTransitions()
         return fsm
-
-
-
-#if (len(sys.argv)>1):
-#    print ('\nAbout to perform scheduling in network:\n\t '+ sys.argv[1]+'\n')
-#    filename = ('schedule_'+ sys.argv[1]+'.xml')
-#else:
-#    print ('Give code generated network name as first argument.\n')
-#    sys.exit()
-
-#if (len(sys.argv)>3):
-#    actorname = sys.argv[2]
-#    print ('Searching for schedules for the following Actors:')
-#    for i in range (2, len(sys.argv)):
-#        print ("\t", sys.argv[i])
-#else:
-#    print ('HINT: Give the Actors to compose, the lead actor as argument 2 followed by the other actors\n')
-#    sys.exit()
-
-
-
-
-#filename = 'sched_states.txt'
-
-#open(filename, "a").close() # create it if it doesnt exist
-
-#proc = subprocess.Popen(['spin', 'main_Acdc.pml'],stdout=subprocess.PIPE)
-
-#for line in iter(proc.stdout):
-#    print(str(line.rstrip()))
-#    proc.stdout.flush()
-
-#f = open(filename, 'r')
-#text = f.read()
-#f.close()
-#f = open(filename, 'w')
-#f.write(text + "\n abc")
-#f.close()

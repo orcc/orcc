@@ -71,7 +71,7 @@ abstract class PromelaTemplate extends CTemplate {
 
 	
 	override caseExprList(ExprList object)
-		'''1 /*{«object.value.join(", ")[doSwitch]»}*/'''
+		'''1'''/*{«object.value.join(", ")[doSwitch]»}*/
 		
 	override caseExprString(ExprString object)
 		'''"«object.doSwitch»"'''
