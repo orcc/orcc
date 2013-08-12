@@ -96,7 +96,7 @@ class NetworkPrinter extends PromelaTemplate {
 			/*Start processes*/
 			atomic{
 				#ifdef MANAGED
-				#include "tmp_startactors.pml"
+				#include "tmp_start_actors.pml"
 				#else
 				«FOR instance : network.children.filter(typeof(Instance))»
 					run «instance.simpleName»();
@@ -104,6 +104,9 @@ class NetworkPrinter extends PromelaTemplate {
 				#endif
 			}	
 		}
+		#ifdef MANAGED
+		#include "tmp_ltl_expr.pml"
+		#endif
 	'''
 
 	def allocateFifo(Connection connection) { 

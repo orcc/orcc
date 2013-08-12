@@ -67,7 +67,7 @@ class ScriptPrinter extends PromelaTemplate {
 		from pylibs.modelchecking import ModelChecker
 		from pylibs.xmlformat import SchedulerXML, FSM, Transition
 		from pylibs.interaction import UserArgs
-		from pylibs.schedconfig import Configuration, RunConfiguration
+		from pylibs.schedconfig import Configuration, RunConfiguration, StateDescription
 		
 		uargs = UserArgs()
 		uargs.parseargs()
@@ -89,29 +89,31 @@ class ScriptPrinter extends PromelaTemplate {
 		conf.saveconfiguration()
 
 		rc=RunConfiguration(conf)
-		rc.configure()
-		
-		scheduler=SchedulerXML('schedule_«network.simpleName».xml')
-		fsm=scheduler.getactorfsm(conf.leader)
-		fsm.printfsm()
 		
 		mc = ModelChecker()
 		
 		if uargs.configure:
+			scheduler=SchedulerXML('schedule_«network.simpleName».xml')
+			fsm=scheduler.getactorfsm(conf.leader)
+			fsm.printfsm()
+			fsm.savefsm('config_«network.simpleName»', 'scheduler.txt')
 			rc.confinitsearch()
 			mc.simulate('main_«network.simpleName».pml')
 			endstate = mc.endstate
-			if uargs.outputfile == '':
-				print (endstate, "\n")
-			else:
-				f = open(uargs.outputfile, 'w')
-				f.write(endstate)
-				f.close()
+			sd=StateDescription()
+			sd.fromstring(endstate)
+			sd.savestate('config_«network.simpleName»', 's0.txt')
 
 		if uargs.runchecker:
-			mc.generatemc('main_«network.simpleName».pml')
-			mc.compilemc()
-			mc.runmc()
+			fsm=FSM()
+			fsm.loadfsm('config_Acdc', 'scheduler.txt')
+			fsm.printfsm()
+			sd=StateDescription()
+			sd.loadstate('config_«network.simpleName»', 's0.txt')
+			rc.configure(sd)
+			#mc.generatemc('main_«network.simpleName».pml')
+			#mc.compilemc()
+			#mc.runmc()
 			#if mc.tracefound
 				#mc.simulatetrail('main_«network.simpleName».pml')
 	'''

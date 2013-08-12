@@ -35,7 +35,7 @@ class UserArgs():
             print ("\nUsage:")
             print ('run_checker.py -i <inputfile> -o <outputfile>')
             print ('run_checker.py -c', '(configure)')
-            print ('run_checker.py -s', '(run schedule search)')
+            print ('run_checker.py -s <id>', '(run schedule search)')
             print ('run_checker.py -d <instance_name>', '(delete actor from config)')
     def test(self):
         print("\nChecking if necessary tools are available:")

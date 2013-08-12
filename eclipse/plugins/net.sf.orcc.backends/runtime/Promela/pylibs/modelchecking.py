@@ -11,7 +11,7 @@ class ModelChecker(object):
         proc = Popen(['spin', '-DMANAGED', filename], stdout=PIPE, universal_newlines=True)
         self.getoutput(proc)
     def getoutput(self, proc):
-        self.endstate = "//State:"
+        self.endstate = ""
         for line in iter(proc.stdout):
             line = str(line.strip())
             if line.startswith("spin"):
@@ -19,7 +19,7 @@ class ModelChecker(object):
             elif line.find('[') >= 0: # skip lists
                 pass
             elif line.find('state_var_') >= 0 or line.find('fsm_state_') >= 0:
-                self.endstate += "\n" + line
+                self.endstate += line + ';\n'
             else:
                 pass
             proc.stdout.flush()
