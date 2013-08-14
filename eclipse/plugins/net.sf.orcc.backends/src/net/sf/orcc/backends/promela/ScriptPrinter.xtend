@@ -104,12 +104,18 @@ class ScriptPrinter extends PromelaTemplate {
 			sd.fromstring(endstate)
 			sd.savestate('config_«network.simpleName»', 's0.txt')
 
-		if uargs.runchecker:
+		if uargs.runchecker is not None:
 			fsm=FSM()
 			fsm.loadfsm('config_Acdc', 'scheduler.txt')
 			fsm.printfsm()
+			sched=fsm.gettransition(uargs.runchecker)
+			if sched.nsrc=='?':
+				print ('Error: The starting state for the requested schedule is still unknown')
+				exit()
+			print ("\nRunning schedule search for:\n"+sched.tostring())
+			statefile=sched.nsrc+'.txt'
 			sd=StateDescription()
-			sd.loadstate('config_«network.simpleName»', 's0.txt')
+			sd.loadstate('config_«network.simpleName»', statefile)
 			rc.configure(sd)
 			#mc.generatemc('main_«network.simpleName».pml')
 			#mc.compilemc()

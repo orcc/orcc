@@ -32,8 +32,8 @@ package net.sf.orcc.backends.promela
 import java.io.File
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest
 import java.util.Set
+import net.sf.orcc.backends.promela.transform.Scheduler
 
 /**
  * Generated an initial schedule with only actor level scheduling completed 
@@ -44,9 +44,9 @@ import java.util.Set
 class SchedulePrinter extends PromelaTemplate {
 	
 	val Network network;
-	val Set<PromelaSchedulabilityTest> actorSchedulers;
+	val Set<Scheduler> actorSchedulers;
 	
-	new(Network network, Set<PromelaSchedulabilityTest> actorSchedulers) {
+	new(Network network, Set<Scheduler> actorSchedulers) {
 		this.network = network
 		this.actorSchedulers = actorSchedulers
 	}
@@ -76,13 +76,35 @@ class SchedulePrinter extends PromelaTemplate {
 		
 	'''
 	
-	def superActor(PromelaSchedulabilityTest actorSched) { 
+	def superActor(Scheduler actorSched) { 
 	'''
-		<superactor name="cluster_«actorSched.instanceName»">
-			<actor name="«actorSched.instanceName»"/>
-			«actorSched.printFSM»
-			«actorSched.printSchedule»
+		<superactor name="cluster_«actorSched.instance.name»">
+			<actor name="«actorSched.instance.name»"/>
+			«actorSched.schedulerxml»
+			«actorSched.schedulesxml»
 		</superactor>
+	'''
+	}
+	
+	def schedulerxml(Scheduler scheduler) {
+	'''
+		<fsm initial="«scheduler.initialState»">
+		«FOR sched : scheduler.schedules»
+			<transition action="«sched.enablingAction»" dst="«sched.endState»" src="«sched.initState»"/>
+		«ENDFOR»
+		</fsm>
+	'''
+	}
+	
+	def schedulesxml(Scheduler scheduler){
+	'''
+		«FOR sched : scheduler.schedules»
+			<superaction name="«sched.initState»_«sched.enablingAction»" guard="NULL">
+			«FOR action : sched.sequence»
+				<iterand action="«action»" actor="«scheduler.instance.name»"/>
+			«ENDFOR»
+			</superaction>
+		«ENDFOR»
 	'''
 	}
 	

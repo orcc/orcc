@@ -45,6 +45,7 @@ import net.sf.orcc.backends.promela.transform.PromelaAddPrefixToStateVar;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
 import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
 import net.sf.orcc.backends.promela.transform.PromelaTokenAnalyzer;
+import net.sf.orcc.backends.promela.transform.Scheduler;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -88,7 +89,7 @@ public class PromelaBackend extends AbstractBackend {
 	
 	private final Map<String, String> renameMap;
 
-	private Set<PromelaSchedulabilityTest> actorSchedulers;
+	private Set<Scheduler> actorSchedulers;
 	
 	/**
 	 * Creates a new instance of the Promela back-end. Initializes the
@@ -152,7 +153,7 @@ public class PromelaBackend extends AbstractBackend {
 		
 		schedulingModel.printDependencyGraph();
 
-		actorSchedulers = new HashSet<PromelaSchedulabilityTest>();
+		actorSchedulers = new HashSet<Scheduler>();
 		transformInstances(network.getChildren());
 		printChildren(network);
 
@@ -208,8 +209,8 @@ public class PromelaBackend extends AbstractBackend {
 		new GuardsExtractor(guards, priority, loadPeeks).doSwitch(instance);
 		new PromelaTokenAnalyzer(netStateDef).doSwitch(instance);
 		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(netStateDef);
-		actorSchedulers.add(actorScheduler);
 		actorScheduler.doSwitch(instance);
+		actorSchedulers.add(actorScheduler.getScheduler());
 	}
 
 	private void transformInstances(EList<Vertex> vertices) {

@@ -4,13 +4,13 @@ from subprocess import Popen, PIPE
 class UserArgs():
     inputfile = ''
     outputfile = ''
-    runchecker=False
+    runchecker=None
     configure=False
     removeactor=None
     setleader=None
     def parseargs(self):
         try:
-            opts, args = getopt.getopt(sys.argv[1:],"hsci:o:d:l:")
+            opts, args = getopt.getopt(sys.argv[1:],"hs:ci:o:d:l:")
         except getopt.GetoptError:
             self.printhelp()
             sys.exit(2)
@@ -24,7 +24,7 @@ class UserArgs():
             elif opt in ("-o"):
                 outputfile = arg
             elif opt in ("-s"):
-                self.runchecker=True
+                self.runchecker=arg
             elif opt in ("-c"):
                 self.configure=True
             elif opt in ("-d"):

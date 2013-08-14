@@ -11,6 +11,9 @@ class Transition:
         self.tid=tid
         self.nsrc=nsrc #the state in the new scheduler
         self.ndst=ndst #the state in the new scheduler
+    def tostring(self):
+        return "\t["+self.tid+"] "+self.action+" : "+self.src+" -> "+self.dst+' : ('+self.nsrc+" -> "+ self.ndst+')'
+    
 
 class FSM:
     nrtrans=0
@@ -20,6 +23,10 @@ class FSM:
         self.initial = initial
     def addTransition(self, trans):
         self.transitions.append(trans)
+    def gettransition(self, transid):
+        for trans in self.transitions:
+            if trans.tid==transid:
+                return trans
     def sortTransitions(self):
         """Sorts such that scheduling always starts form a known state"""
         newList = []
@@ -35,9 +42,9 @@ class FSM:
                         nstateid+=1
         self.transitions = newList
     def printfsm(self):
-        print ("\nInitial scheduler for the composition:")
+        print ("\nCurrent scheduler for the composition:")
         for trans in self.transitions:
-            print ("\t", "["+trans.tid+"]", trans.action, " : ", trans.src, "->", trans.dst, '('+trans.nsrc, "->", trans.ndst+')')
+            print (trans.tostring())
     def savefsm(self, folder, filen):
         filename=folder+'/'+filen
         open(filename, "a").close()
