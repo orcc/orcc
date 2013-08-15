@@ -318,14 +318,10 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	private Map<String, Object> findPeekValues(State state, Action targetAction) {
 		List<Action> previous = new ArrayList<Action>();
-		List<Port> peekPorts = new ArrayList<Port>();
+		Set<Port> peekPorts = new HashSet<Port>();
 		for (Schedule schedule : scheduler.getSchedulesStartingAt(state)) {
 			Action action = schedule.getSequence().get(0);//only first actions of a schedule
-			for (Port port : action.getPeekPattern().getPorts()) {
-				if (!peekPorts.contains(port)) {
-					peekPorts.add(port);
-				}
-			}
+			peekPorts.addAll(action.getPeekPattern().getPorts());
 		}
 		if (peekPorts.isEmpty()) {
 			return new HashMap<String, Object>();
@@ -335,7 +331,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 			if (action == targetAction) {
 				GuardSatChecker checker = new GuardSatChecker(actor);
 				try {
-					configuration = checker.computeTokenValues(peekPorts,
+					configuration = checker.computeTokenValues(new ArrayList<Port>(peekPorts),
 							previous, targetAction);
 				} catch (OrccRuntimeException e) {
 					System.out.println(e.getMessage());
@@ -429,21 +425,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	private void generateScheduleInfo(Schedule schedule) {
 		State initState=schedule.getInitState();
-		//boolean hasVarLoop = false;
-		//boolean hasInputDep = false;
-		//boolean hasIIR = false;
+		Map<String, List<Object>> portReads = schedule.getPortReads();
+		Map<String, List<Object>> portWrites = schedule.getPortWrites();
 		
-		//for (Var var : actionGuardVarMap.get(schedule.getSequence().get(0))) {
-			//hasVarLoop = hasVarLoop(var) || hasVarLoop;
-			//hasInputDep = hasInputDep(var, true) || hasInputDep;
-			//hasIIR = hasVarLoop(var) && hasInputDep(var, true) || hasIIR;
-		//}
-		//System.out.println("Actor schedule starting at state "
-		//			+ initState.getName() + " with action "
-		//			+ schedule.getEnablingAction().getName());
-
-		Map<String, List<Object>> portReads = new HashMap<String, List<Object>>();
-		Map<String, List<Object>> portWrites = new HashMap<String, List<Object>>();
 		Map<String, Object> configuration = findPeekValues(initState, schedule.getEnablingAction());
 		Set<String> peekList = new HashSet<String>(configuration.keySet());
 		for (String key : configuration.keySet()) {
@@ -459,12 +443,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				if (peekPorts.contains(port)) {
 					if (getPeeksOfState(initState).contains(port)) {
 						System.out.print(" (peeked value, ");
-						System.out.print("only relevant for the guard: "
-								+ !portUsed + ") ");
+						System.out.print("only relevant for the guard: "+ !portUsed + ") ");
 					} else {
-						System.out
-								.print(" (not peek value, value used in scheduling: "
-										+ portUsed + ")");
+						System.out.print(" (not peek value, value used in scheduling: "+ portUsed + ")");
 					}
 					System.out.print("\n");
 				}

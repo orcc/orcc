@@ -45,6 +45,7 @@ class Configuration():
             print ("\nActor", actor, "was set as leader.")
         else:
             print ("\nWarning: Actor", actor, "not in configuration.")
+            exit()
     def printconfiguration(self):
         print ("\nCurrent configuration:")
         print ("\nLeader Actor: ", self.leader)

@@ -34,6 +34,7 @@ import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
 import java.util.Set
 import net.sf.orcc.backends.promela.transform.Scheduler
+import net.sf.orcc.backends.promela.transform.Schedule
 
 /**
  * Generated an initial schedule with only actor level scheduling completed 
@@ -90,7 +91,7 @@ class SchedulePrinter extends PromelaTemplate {
 	'''
 		<fsm initial="«scheduler.initialState»">
 		«FOR sched : scheduler.schedules»
-			<transition action="«sched.enablingAction»" dst="«sched.endState»" src="«sched.initState»"/>
+			<transition action="«sched.enablingActionName»" dst="«sched.endStateName»" src="«sched.initStateName»"/>
 		«ENDFOR»
 		</fsm>
 	'''
@@ -99,12 +100,42 @@ class SchedulePrinter extends PromelaTemplate {
 	def schedulesxml(Scheduler scheduler){
 	'''
 		«FOR sched : scheduler.schedules»
-			<superaction name="«sched.initState»_«sched.enablingAction»" guard="NULL">
+			<superaction name="«sched.initStateName»_«sched.enablingActionName»" guard="NULL">
 			«FOR action : sched.sequence»
 				<iterand action="«action»" actor="«scheduler.instance.name»"/>
 			«ENDFOR»
 			</superaction>
 		«ENDFOR»
+	'''
+	}
+	
+	def enablingActionName(Schedule schedule) {
+			'''
+		«IF schedule.enablingAction!=null»
+			«schedule.enablingAction.name»
+		«ELSE»
+			«schedule.sequence.get(0).name»
+		«ENDIF»
+	'''
+	}
+	
+	def initStateName(Schedule schedule) {
+	'''
+		«IF schedule.initState!=null»
+			«schedule.initState.name»
+		«ELSE»
+			one_state
+		«ENDIF»
+	'''
+	}
+
+	def endStateName(Schedule schedule) {
+	'''
+		«IF schedule.endState!=null»
+			«schedule.endState.name»
+		«ELSE»
+			one_state
+		«ENDIF»
 	'''
 	}
 	
