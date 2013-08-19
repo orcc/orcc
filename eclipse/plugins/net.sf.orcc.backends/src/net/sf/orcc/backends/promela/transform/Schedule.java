@@ -25,8 +25,10 @@ public class Schedule {
 	private Set<State> potentialChoiseStates = new HashSet<State>();
 
 	// The required input sequence for this schedule
-	private Map<String, List<Object>> portReads = new HashMap<String, List<Object>>();
+	private Map<String, List<Object>> portPeeks = new HashMap<String, List<Object>>();
 
+	private Map<String, List<Object>> portReads = new HashMap<String, List<Object>>();
+	
 	private Map<String, List<Object>> portWrites = new HashMap<String, List<Object>>();
 
 	public Schedule() {}
@@ -56,10 +58,14 @@ public class Schedule {
 		return nrLeaves;
 	}
 
+	public Map<String, List<Object>> getPortPeeks() {
+		return portPeeks;
+	}
+
 	public Map<String, List<Object>> getPortReads() {
 		return portReads;
 	}
-
+	
 	public Map<String, List<Object>> getPortWrites() {
 		return portWrites;
 	}

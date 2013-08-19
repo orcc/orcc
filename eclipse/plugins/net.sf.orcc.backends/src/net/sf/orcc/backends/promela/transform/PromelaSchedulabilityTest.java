@@ -230,7 +230,6 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 							scheduler.makeDummyFSM();
 							stopChecking=true;
 						}
-						//System.out.println("Null guard in state  " + interpreter.getFsmStateOrig());
 						break INTERP;
 					}
 				}
@@ -241,12 +240,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				stopChecking = areSchedulesComplete();
 			}
 		} while (!stopChecking);
-				
-		System.out.println(scheduler);
 		
 		for (Schedule s : scheduler.getSchedules()) {
 			generateScheduleInfo(s);
-			System.out.println(s);
 		}
 		
 		return null;
@@ -425,16 +421,16 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	private void generateScheduleInfo(Schedule schedule) {
 		State initState=schedule.getInitState();
+		Map<String, List<Object>> portPeeks = schedule.getPortPeeks();
 		Map<String, List<Object>> portReads = schedule.getPortReads();
 		Map<String, List<Object>> portWrites = schedule.getPortWrites();
 		
 		Map<String, Object> configuration = findPeekValues(initState, schedule.getEnablingAction());
-		Set<String> peekList = new HashSet<String>(configuration.keySet());
 		for (String key : configuration.keySet()) {
-			if (!portReads.containsKey(key)) {
-				portReads.put(key, new ArrayList<Object>());
+			if (!portPeeks.containsKey(key)) {
+				portPeeks.put(key, new ArrayList<Object>());
 			}
-			portReads.get(key).add(configuration.get(key));
+			portPeeks.get(key).add(configuration.get(key));
 		}
 		for (Action action : schedule.getSequence()) {
 			for (Port port : action.getInputPattern().getPorts()) {
@@ -452,11 +448,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				if (!portReads.containsKey(port.getName())) {
 					portReads.put(port.getName(), new ArrayList<Object>());
 				}
-				if (peekList.contains(port.getName())) { // if it is the peeked value..
-					peekList.remove(port.getName());
-				}else {
-					portReads.get(port.getName()).add(new Integer(0));
-				}
+				portReads.get(port.getName()).add(new Integer(0));
 			}
 		}
 		System.out.println("Schedule input: "+portReads);

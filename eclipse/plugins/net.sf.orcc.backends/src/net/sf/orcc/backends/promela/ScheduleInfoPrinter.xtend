@@ -32,9 +32,10 @@ package net.sf.orcc.backends.promela
 import java.io.File
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
-import java.util.Set
 import net.sf.orcc.backends.promela.transform.Scheduler
 import net.sf.orcc.backends.promela.transform.Schedule
+import net.sf.orcc.backends.promela.transform.ScheduleBalanceEq
+import net.sf.orcc.df.Instance
 
 /**
  * Generated an initial schedule with only actor level scheduling completed 
@@ -42,20 +43,20 @@ import net.sf.orcc.backends.promela.transform.Schedule
  * @author Johan Ersfolk
  * 
  */
-class SchedulePrinter extends PromelaTemplate {
+class ScheduleInfoPrinter extends PromelaTemplate {
 	
 	val Network network;
-	val Set<Scheduler> actorSchedulers;
+	val ScheduleBalanceEq balanceEq;
 	
-	new(Network network, Set<Scheduler> actorSchedulers) {
+	new(Network network, ScheduleBalanceEq balanceEq) {
 		this.network = network
-		this.actorSchedulers = actorSchedulers
+		this.balanceEq = balanceEq
 	}
 	
 	def print(String targetFolder) {
 		
 		val content = schedulerFileContent
-		val file = new File(targetFolder + File::separator + "schedule_" + network.simpleName + ".xml")
+		val file = new File(targetFolder + File::separator + "schedule_info_" + network.simpleName + ".xml")
 		
 		if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)
@@ -69,58 +70,69 @@ class SchedulePrinter extends PromelaTemplate {
 	'''
 		<!-- Generated from "«network.name»" -->
 		
-		<superactorlist>
-		«FOR actorScheduler : actorSchedulers»
-			«actorScheduler.superActor»
-		«ENDFOR»
-		</superactorlist>
+		<network>
+			«FOR instance : balanceEq.instances»
+				«instance.printInstance»
+			«ENDFOR»
+		</network>
 		
 	'''
 	
-	def superActor(Scheduler actorSched) { 
+	def printInstance(Instance instance) { 
 	'''
-		<superactor name="cluster_«actorSched.instance.name»">
-			<actor name="«actorSched.instance.name»"/>
-			«actorSched.schedulerxml»
-			«actorSched.schedulesxml»
-		</superactor>
-	'''
-	}
-	
-	def schedulerxml(Scheduler scheduler) {
-	'''
-		<fsm initial="«scheduler.initialState»">
-		«FOR sched : scheduler.schedules»
-			<transition action="«sched.enablingActionName»" dst="«sched.endStateName»" src="«sched.initStateName»"/>
-		«ENDFOR»
-		</fsm>
+		<actor name="«instance.name»">
+			«balanceEq.getScheduler(instance).schedulesxml»
+			<connections>
+			«instance.connections»
+			</connections>
+		</actor>
 	'''
 	}
 	
 	def schedulesxml(Scheduler scheduler){
 	'''
 		«FOR sched : scheduler.schedules»
-			<superaction name="«sched.initStateName»_«sched.enablingActionName»" guard="NULL">
-			«FOR action : sched.sequence»
-				<iterand action="«action»" actor="«scheduler.instance.name»"/>
-			«ENDFOR»
-			</superaction>
+			<schedule initstate="«sched.initStateName»" action="«sched.enablingActionName»">
+				«sched.rates»
+			</schedule>
 		«ENDFOR»
 	'''
 	}
 	
-	def scheduledatarates(Schedule schedule) {
+	def connections(Instance instance) {
 	'''
-		«schedule.enablingActionName»
+		«FOR port : instance.incomingPortMap.keySet»
+			«IF balanceEq.getSource(instance.incomingPortMap.get(port)) != null»
+				<input port="«port.name»" instance="«balanceEq.getSource(instance.incomingPortMap.get(port)).simpleName»"/>
+			«ELSE»
+				<input port="«port.name»" instance="NULL"/>
+			«ENDIF»
+		«ENDFOR»
+		«FOR port : instance.outgoingPortMap.keySet»
+			«FOR con : instance.outgoingPortMap.get(port)»
+				«IF balanceEq.getDestination(con) != null»
+					<output port="«port.name»" instance="«balanceEq.getDestination(con).simpleName»"/>
+				«ELSE»
+					<output port="«port.name»" instance="NULL"/>
+				«ENDIF»
+			«ENDFOR»
+		«ENDFOR»
+	'''
+	}
+	
+	def rates(Schedule schedule) {
+	'''
+		<rates>
 		«FOR port : schedule.portPeeks.keySet»
-				«port»=«schedule.portPeeks.get(port).get(0)»
+			<peek port="«port»" value="«schedule.portPeeks.get(port).get(0)»"/>
 		«ENDFOR»
 		«FOR port : schedule.portReads.keySet»
-			«port»=«schedule.portReads.get(port).size»
+			<read port="«port»" value="«schedule.portReads.get(port).size»"/>
 		«ENDFOR»
 		«FOR port : schedule.portWrites.keySet»
-			«port»=«schedule.portWrites.get(port).size»
+			<write port="«port»" value="«schedule.portWrites.get(port).size»"/>
 		«ENDFOR»
+		</rates>
 	'''
 	}
 	

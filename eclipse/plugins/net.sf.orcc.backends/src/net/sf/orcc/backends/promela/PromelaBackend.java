@@ -45,6 +45,7 @@ import net.sf.orcc.backends.promela.transform.PromelaAddPrefixToStateVar;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
 import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
 import net.sf.orcc.backends.promela.transform.PromelaTokenAnalyzer;
+import net.sf.orcc.backends.promela.transform.ScheduleBalanceEq;
 import net.sf.orcc.backends.promela.transform.Scheduler;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.df.Action;
@@ -86,6 +87,7 @@ public class PromelaBackend extends AbstractBackend {
 	private NetworkStateDefExtractor netStateDef;
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 	private PromelaSchedulingModel schedulingModel;
+	private ScheduleBalanceEq balanceEq;
 	
 	private final Map<String, String> renameMap;
 
@@ -156,6 +158,8 @@ public class PromelaBackend extends AbstractBackend {
 		actorSchedulers = new HashSet<Scheduler>();
 		transformInstances(network.getChildren());
 		printChildren(network);
+		
+		balanceEq = new ScheduleBalanceEq(actorSchedulers, network);
 
 		network.computeTemplateMaps();
 		printNetwork(network);
@@ -177,6 +181,7 @@ public class PromelaBackend extends AbstractBackend {
 	private void printNetwork(Network network) {
 		new NetworkPrinter(network, options).print(path);
 		new SchedulePrinter(network, actorSchedulers).print(path);
+		new ScheduleInfoPrinter(network, balanceEq).print(path);
 		new ScriptPrinter(network).print(path); 
 	}
 	
@@ -221,5 +226,4 @@ public class PromelaBackend extends AbstractBackend {
 			}
 		}
 	}
-
 }

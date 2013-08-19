@@ -50,7 +50,7 @@ class ScriptPrinter extends PromelaTemplate {
 	
 	def print(String targetFolder) {
 		
-		val content = networkFileContent
+		val content = scriptFileContent
 		val file = new File(targetFolder + File::separator + "run_checker_" + network.simpleName + ".py")
 		
 		if(needToWriteFile(content, file)) {
@@ -61,7 +61,8 @@ class ScriptPrinter extends PromelaTemplate {
 		}
 	}
 
-	def getNetworkFileContent() '''
+	def getScriptFileContent() {
+	'''
 		# Generated from "«network.name»"
 		
 		from pylibs.modelchecking import ModelChecker
@@ -123,6 +124,5 @@ class ScriptPrinter extends PromelaTemplate {
 			#if mc.tracefound
 				#mc.simulatetrail('main_«network.simpleName».pml')
 	'''
-
-	
+	}
 }
