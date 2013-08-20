@@ -51,6 +51,8 @@ public class ActorMergerQS extends ActorMergerBase {
 	private Network network;
 	
 	private String definitionFile;
+	
+	private List<Schedule> scheduleList;
 
 	public class ActionUpdater extends AbstractIrVisitor<Void> {
 
@@ -165,11 +167,12 @@ public class ActorMergerQS extends ActorMergerBase {
 	
 	ActionProcedureMap correspondences;
 	
-	public ActorMergerQS(Network network, Copier copier, String definitionFile) {
+	public ActorMergerQS(Network network, Copier copier, String definitionFile, List<Schedule> scheduleList) {
 		this.network = network;
 		this.copier = copier;
 		this.definitionFile = definitionFile;
 		this.correspondences = new ActionProcedureMap();
+		this.scheduleList = scheduleList;
 	}
 
 	public Actor createMergedActor() {
@@ -249,8 +252,9 @@ public class ActorMergerQS extends ActorMergerBase {
 	 * @return the body of the static action
 	 */
 	private Action createSuperaction(String actionName) {
-		ScheduleParser scheduler = new ScheduleParser(definitionFile, network);
-		Schedule superAction = scheduler.parse(network.getName(), actionName);
+		BufferSizer bufferSizer = new BufferSizer(network);
+		Schedule superAction = getSchedule(scheduleList, network.getName(), actionName);
+		
 		Pattern inputPattern = computeScheduleInputPattern(network, superAction.getIterands());
 		Pattern outputPattern = computeScheduleOutputPattern(network, superAction.getIterands());
 
@@ -259,9 +263,9 @@ public class ActorMergerQS extends ActorMergerBase {
 		
 		Procedure body = irFactory.createProcedure(actionName, 0,
 				irFactory.createTypeVoid());
-		createBuffers(body, scheduler.getMaxTokens());
+		createBuffers(body, bufferSizer.getMaxTokens(superAction));
 		createCounters(body, inputPattern, outputPattern);
-		createStaticSchedule(body, scheduler.getSchedule());
+		createStaticSchedule(body, superAction);
 		body.getLast().add(irFactory.createInstReturn());
 	
 		Action action = dfFactory.createAction(actionName, inputPattern,
@@ -272,6 +276,15 @@ public class ActorMergerQS extends ActorMergerBase {
 		return action;
 	}
 
+	private Schedule getSchedule(List<Schedule> scheduleList, String actorName, String actionName) {
+		for(Schedule schedule : scheduleList) {
+			if (actorName.equals(schedule.getOwner()) && actionName.equals(schedule.getName())) {
+				return schedule;
+			}
+		}
+		return null;
+	}
+	
 	/*
 	 * Each superaction instance has an input and output pattern
 	 * that is visible to the actors neighboring its superactor. 

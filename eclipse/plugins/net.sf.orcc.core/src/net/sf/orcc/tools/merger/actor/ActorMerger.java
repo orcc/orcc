@@ -178,6 +178,7 @@ public class ActorMerger extends DfVisitor<Void> {
 				scheduler = new SASLoopScheduler(subNetwork);
 				scheduler.schedule();
 			}
+			
 			int actorcount = subNetwork.getChildren().size();
 			int fifocount = 0;
 			for (Connection conn : subNetwork.getConnections()) {
@@ -197,7 +198,9 @@ public class ActorMerger extends DfVisitor<Void> {
 				superActor = new ActorMergerSDF(scheduler, copier)
 					.doSwitch(subNetwork);
 			} else {
-				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile);
+				ScheduleParser scheduleParser = new ScheduleParser(definitionFile, subNetwork);
+				List<Schedule> scheduleList = scheduleParser.parse(subNetwork.getName());
+				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile, scheduleList);
 				superActor = actorMerger.createMergedActor();
 			}
 			// update the main network

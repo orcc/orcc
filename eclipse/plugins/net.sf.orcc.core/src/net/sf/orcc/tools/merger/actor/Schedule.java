@@ -47,6 +47,10 @@ public class Schedule {
 
 	private int iterationCount;
 
+	private String owner;
+	
+	private String name;
+	
 	private LinkedList<Iterand> iterands;
 
 	public Schedule() {
@@ -56,6 +60,22 @@ public class Schedule {
 	public Schedule(Schedule schedule) {
 		this.setIterationCount(schedule.getIterationCount());
 		iterands = new LinkedList<Iterand>(schedule.getIterands());
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public void add(Iterand iterand) {

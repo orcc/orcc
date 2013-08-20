@@ -1,18 +1,15 @@
 package net.sf.orcc.tools.merger.actor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Pattern;
-import net.sf.orcc.df.Port;
-import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.DomUtil;
 
@@ -31,43 +28,42 @@ import org.w3c.dom.Node;
 
 public class ScheduleParser {
 
-	private Map<Connection, Integer> maxTokens;
-
-	private Schedule schedule;
+	private List<Schedule> scheduleList;
 
 	private String definitionFile;
 
 	private Network network;
-
-	private Map<Connection, Integer> tokens;
+	
+	private String superActorName;
 
 	public ScheduleParser(String definitionFile, Network network) {
 		this.definitionFile = definitionFile;
 		this.network = network;
-		schedule = new Schedule();
+		scheduleList = new ArrayList<Schedule>();
 	}
 	
-	public Schedule parse(String superactor, String superaction) {
+	public List<Schedule> parse(String name) {
+		superActorName = name;
 		try {
 			InputStream is = new FileInputStream(definitionFile);
 			Document document = DomUtil.parseDocument(is);
-			parseSuperactorList(document, superactor, superaction);
+			parseSuperactorList(document);
 			is.close();
-			return schedule;
+			return scheduleList;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	private void parseSuperactorList(Document doc, String superactor, String superaction) {
+	private void parseSuperactorList(Document doc) {
 		Element root = doc.getDocumentElement();
 		Node node = root.getFirstChild();
 		while (node != null) {
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element element = (Element) node;
-				if (node.getNodeName().equals("superactor") && (element.getAttribute("name").equals(superactor))) {
-					parseSuperactor(element, superaction);			
+				if (node.getNodeName().equals("superactor") && element.getAttribute("name").equals(superActorName)) {
+					parseSuperactor(element, element.getAttribute("name"));
 				} else {
 					// TODO: manage error
 				}
@@ -76,13 +72,17 @@ public class ScheduleParser {
 		}
 	}
 	
-	private void parseSuperactor(Element element, String superaction) {
+	private void parseSuperactor(Element element, String superactor) {
 		Node node = element.getFirstChild();
 		while (node != null) {
 			if (node instanceof Element) {
 				Element elt = (Element) node;
-				if (elt.getTagName().equals("superaction") && (elt.getAttribute("name").equals(superaction))) {
-					parseSuperaction(elt);			
+				if (elt.getTagName().equals("superaction")) {
+					Schedule schedule = new Schedule();
+					schedule.setName(elt.getAttribute("name"));
+					schedule.setOwner(superactor);
+					parseSuperaction(schedule, elt);
+					scheduleList.add(schedule);
 				} else {
 					// TODO: manage error
 				}
@@ -91,14 +91,14 @@ public class ScheduleParser {
 		}
 	}
 	
-	private void parseSuperaction(Element element) {
+	private void parseSuperaction(Schedule schedule, Element element) {
 		Node node = element.getFirstChild();
 		while (node != null) {
 			if (node instanceof Element) {
 				Element elt = (Element) node;
 				if (elt.getTagName().equals("iterand")) {
 					Actor actor = findActor(elt.getAttribute("actor")).getAdapter(Actor.class);
-					addActorActionToSchedule(actor, findAction(actor, elt.getAttribute("action")),
+					addActorActionToSchedule(schedule, actor, findAction(actor, elt.getAttribute("action")),
 							Integer.parseInt(elt.getAttribute("repetitions")));
 				}
 			}
@@ -128,95 +128,12 @@ public class ScheduleParser {
 		return null;
 	}
 
-	private void addActorActionToSchedule(Actor actor, Action action, int rep) {
+	private void addActorActionToSchedule(Schedule schedule, Actor actor, Action action, int rep) {
 		if ((actor != null) && (action != null)) {
 			for (int i = 0; i < rep; i++) {
 				schedule.add(new Iterand(action));
 			}
 		}
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getDepth() {
-		return 1;
-	}
-	
-	/**
-	 * Returns the scheduling computed by this scheduler.
-	 * 
-	 * @return the pre-computed schedule
-	 */
-	public Schedule getSchedule() {
-		return schedule;
-	}
-
-	/**
-	 * @return
-	 */
-	public Map<Connection, Integer> getMaxTokens() {
-		if (maxTokens == null) {
-			maxTokens = new HashMap<Connection, Integer>();
-			tokens = new HashMap<Connection, Integer>();
-
-			for (Connection connection : network.getConnections()) {
-				Actor src = connection.getSource().getAdapter(Actor.class);
-				Actor tgt = connection.getTarget().getAdapter(Actor.class);
-				if (src != null && tgt != null)
-					maxTokens.put(connection, 0);
-				tokens.put(connection, 0);
-			}
-			computeMemoryBound(schedule);
-		}
-		return maxTokens;
-	}
-
-	/**
-	 * @param schedule
-	 */
-	private void computeMemoryBound(Schedule schedule) {
-		for (Iterand iterand : schedule.getIterands()) {
-			Actor actor = locateActionOwner(iterand.getAction());
-			for (Edge edge : actor.getIncoming()) {
-				Connection conn = (Connection) edge;
-				Actor src = conn.getSource().getAdapter(Actor.class);
-				if (src != null) {
-					Connection connection = (Connection) edge;
-					Pattern inputPattern = iterand.getAction().getInputPattern();
-					Port targetPort = connection.getTargetPort();
-					int cns = inputPattern.getNumTokens(targetPort);
-					tokens.put(connection, tokens.get(connection) - cns);
-				}
-			}
-
-			for (Edge edge : actor.getOutgoing()) {
-				Connection conn = (Connection) edge;
-				Actor tgt = conn.getTarget().getAdapter(Actor.class);
-				if (tgt != null) {
-					Connection connection = (Connection) edge;
-					Pattern outputPattern = iterand.getAction().getOutputPattern();
-					Port sourcePort = connection.getSourcePort();
-					int current = tokens.get(connection);
-					int max = maxTokens.get(connection);
-					int prd = outputPattern.getNumTokens(sourcePort);
-					tokens.put(connection, current + prd);
-					maxTokens.put(connection, max + prd);
-				}
-			}
-		}
-	}
-	
-	private Actor locateActionOwner(Action act) {
-		for (Actor actor : network.getAllActors()) {
-			for (Action action : actor.getActions()) {
-				if (act.equals(action)) {
-					return actor;
-				}
-			}
-		}
-		return null;
 	}
 
 }
