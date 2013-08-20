@@ -66,9 +66,9 @@ class ScriptPrinter extends PromelaTemplate {
 		# Generated from "«network.name»"
 		
 		from pylibs.modelchecking import ModelChecker
-		from pylibs.xmlformat import SchedulerXML, FSM, Transition
+		from pylibs.scheduler import SchedulerXML, FSM, Transition
 		from pylibs.interaction import UserArgs
-		from pylibs.schedconfig import Configuration, RunConfiguration, StateDescription
+		from pylibs.schedconfig import Configuration, RunConfiguration, StateDescription, ChannelConfigXML
 		
 		uargs = UserArgs()
 		uargs.parseargs()
@@ -88,6 +88,9 @@ class ScriptPrinter extends PromelaTemplate {
 
 		conf.printconfiguration()
 		conf.saveconfiguration()
+		
+		cc=ChannelConfigXML('schedule_info_«network.simpleName».xml')
+		cc.findinputs(conf)
 
 		rc=RunConfiguration(conf)
 		

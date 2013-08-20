@@ -1,5 +1,5 @@
 import os, errno
-
+import xml.etree.ElementTree as et
 
 class Configuration():
     actors=None
@@ -105,4 +105,23 @@ class StateDescription(object):
         string=f.read()
         self.fromstring(string)
 
-    
+class ChannelConfigXML():
+    xmlfilename=None
+    partitioninput={}
+    channels=[]
+    def __init__(self, xmlfilename):
+        self.xmlfilename=xmlfilename
+    def findinputs(self, configuration):
+        tree = et.parse(self.xmlfilename)
+        for xactor in tree.findall('.//actor'):        
+            for xread in xactor.findall('.//input'):
+                self.channels.append(xactor.get('name')+'_'+xread.get('port'))
+                if xread.get('instance') not in configuration.actors:
+                    for xschedule in xactor.findall('.//schedule'):
+                        for xrates in xschedule.findall('.//rates'):
+                            for xpeek in xrates.findall('.//peek'):
+                                print ('peek',xpeek)
+                            for xread in xrates.findall('.//read'):
+                                print ('reed', xread)                    
+                    self.partitioninput[xactor.get('name')+'_'+xread.get('port')]= None
+        print(self.partitioninput)
