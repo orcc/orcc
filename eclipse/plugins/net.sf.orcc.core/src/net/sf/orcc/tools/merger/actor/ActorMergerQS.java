@@ -1,19 +1,14 @@
 package net.sf.orcc.tools.merger.actor;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.State;
-import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
@@ -28,14 +23,9 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.DomUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * This class merges actors based on a merging specification in
@@ -49,8 +39,6 @@ import org.w3c.dom.Node;
 public class ActorMergerQS extends ActorMergerBase {
 
 	private Network network;
-	
-	private String definitionFile;
 	
 	private List<Schedule> scheduleList;
 	
@@ -172,23 +160,22 @@ public class ActorMergerQS extends ActorMergerBase {
 	public ActorMergerQS(Network network, Copier copier, String definitionFile, List<Schedule> scheduleList, List<Action> guardList) {
 		this.network = network;
 		this.copier = copier;
-		this.definitionFile = definitionFile;
 		this.correspondences = new ActionProcedureMap();
 		this.scheduleList = scheduleList;
 		this.guardList = guardList;
 	}
 
-	public Actor createMergedActor() {
-		superActor = dfFactory.createActor();
+	public Actor createMergedActor(Actor actor, FSM fsm) {
+		superActor = actor;
 		buffersMap = new HashMap<Port, Var>();
 		superActor.setName(network.getName());
-		superActor.setFsm(dfFactory.createFSM());
+		superActor.setFsm(fsm);
 
 		copyPorts(network);
 		copyVariables(network);
 		copyProcedures(network);
 		copyActions(network);
-		constructFSM();
+		createSuperactions();
 		modifyMemAccesses(network);
 
 		return superActor;
@@ -248,13 +235,20 @@ public class ActorMergerQS extends ActorMergerBase {
 		param.setByRef(false);
 		procedure.getParameters().add(param);
 	}
-	
+
+	private void createSuperactions() {
+		for(Action action : superActor.getActions()) {
+			elaborateSuperaction(action);
+		}
+	}
+
 	/**
 	 * Creates the body of the static action.
 	 * 
 	 * @return the body of the static action
 	 */
-	private Action createSuperaction(String actionName) {
+	private void elaborateSuperaction(Action superaction) {
+		String actionName = superaction.getName();
 		BufferSizer bufferSizer = new BufferSizer(network);
 		Schedule superAction = getSchedule(scheduleList, network.getName(), actionName);
 
@@ -269,12 +263,12 @@ public class ActorMergerQS extends ActorMergerBase {
 		body.getLast().add(irFactory.createInstReturn());
 	
 		Action guard = getGuard(guardList, network.getName(), actionName);
-		Action action = dfFactory.createAction(actionName, inputPattern,
-				outputPattern, guard.getPeekPattern(), guard.getBody(), body);
-	
-		superActor.getActions().add(action);
-		
-		return action;
+
+		superaction.setBody(body);
+		superaction.setInputPattern(inputPattern);
+		superaction.setOutputPattern(outputPattern);
+		superaction.setPeekPattern(guard.getPeekPattern());
+		superaction.setScheduler(guard.getBody());
 	}
 
 	private Schedule getSchedule(List<Schedule> scheduleList, String actorName, String actionName) {
@@ -444,94 +438,6 @@ public class ActorMergerQS extends ActorMergerBase {
 		increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
 		procParams.add(IrFactory.eINSTANCE.createExprVar(memVar));
 		procParams.add(IrFactory.eINSTANCE.createExprVar(indexVar));
-	}
-	
-	private void constructFSM() {
-		try {
-			InputStream is = new FileInputStream(definitionFile);
-			Document document = DomUtil.parseDocument(is);
-			parseSuperactorList(document, network.getName());
-			is.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
-	}
-
-	private void parseSuperactorList(Document doc, String superactor) {
-		Element root = doc.getDocumentElement();
-		Node node = root.getFirstChild();
-		while (node != null) {
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element element = (Element) node;
-				if (node.getNodeName().equals("superactor") && (element.getAttribute("name").equals(superactor))) {
-					parseFSM(element);
-				} else {
-					// TODO: manage error
-				}
-			}
-			node = node.getNextSibling();
-		}
-	}
-
-	private void parseFSM(Element element) {
-		String initialStateName = null;
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node instanceof Element) {
-				Element elt = (Element) node;
-				if (node.getNodeName().equals("fsm")) {
-					initialStateName = elt.getAttribute("initial");
-					parseTransitions(elt);			
-				} else {
-					// TODO: manage error
-				}
-			}
-			node = node.getNextSibling();
-		}
-		setInitialState(initialStateName);
-	}
-
-	private void setInitialState(String initialState) {
-		State initial = MergerUtil.findState(superActor.getFsm(), initialState);
-		if (initial != null) {
-			superActor.getFsm().setInitialState(initial);
-		} else {
-			// TODO: manage error
-		}
-	}
-	
-	private void parseTransitions(Element element) {
-		Node node = element.getFirstChild();
-		while (node != null) {
-			if (node instanceof Element) {
-				Element elt = (Element) node;
-				if (elt.getTagName().equals("transition")) {
-					superActor.getFsm().addTransition(
-							addStateIfMissing(superActor.getFsm(), elt.getAttribute("src")), 
-							addSuperactionIfMissing(superActor, elt.getAttribute("action")), 
-							addStateIfMissing(superActor.getFsm(), elt.getAttribute("dst")));
-				}
-			}
-			node = node.getNextSibling();
-		}
-	}
-	
-	private Action addSuperactionIfMissing(Actor actor, String actionName) {
-		Action action = MergerUtil.findAction(actor, actionName);
-		if (action == null) {
-			action = createSuperaction(actionName);
-		}
-		return action;
-	}
-
-	private State addStateIfMissing(FSM fsm, String stateName) {
-		State state = MergerUtil.findState(superActor.getFsm(), stateName);
-		if(state == null) {
-			state = (State) dfFactory.createState();
-			state.setName(stateName);
-			fsm.getStates().add(state);
-		}
-		return state;
 	}
 
 }
