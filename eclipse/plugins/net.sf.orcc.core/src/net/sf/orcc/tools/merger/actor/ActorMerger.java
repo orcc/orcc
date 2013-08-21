@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
@@ -202,11 +201,8 @@ public class ActorMerger extends DfVisitor<Void> {
 				superActor = dfFactory.createActor();
 				SuperactorParser superactorParser = new SuperactorParser(subNetwork, superActor);
 				superactorParser.parse(definitionFile);
-				GuardParser guardParser = new GuardParser(definitionFile, subNetwork);
-				List<Action> guardList = guardParser.parse();
-				//FSMParser fsmParser = new FSMParser(definitionFile, superActor);
-				//FSM fsm = fsmParser.parse(subNetwork.getName());
-				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile, superactorParser.getScheduleList(), guardList);
+				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile,
+						superactorParser.getScheduleList(), superactorParser.getGuardList());
 				actorMerger.createMergedActor(superActor, superactorParser.getFSM());
 			}
 			// update the main network
