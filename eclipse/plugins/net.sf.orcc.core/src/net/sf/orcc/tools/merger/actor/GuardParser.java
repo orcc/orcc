@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.BinOpSeqParser;
 import net.sf.orcc.ir.Expression;
@@ -39,11 +40,9 @@ public class GuardParser {
 
 	private String definitionFile;
 
-	private Procedure scheduler;
+	private List<Action> guardList;
 
-	private Pattern peekPattern;
-
-	private Actor superActor;
+	private Network network;
 
 	private int peekCount;
 
@@ -59,6 +58,7 @@ public class GuardParser {
 	 */
 	private class ExprParser {
 
+		private Action thisGuard;
 		/**
 		 * Parses the given node as an expression and returns the matching
 		 * Expression expression.
@@ -68,7 +68,8 @@ public class GuardParser {
 		 *            to be, a DOM element named "Expr".
 		 * @return an expression
 		 */
-		public Expression parseExpr(Node node) {
+		public Expression parseExpr(Action thisGuard, Node node) {
+			this.thisGuard = thisGuard;
 			ParseContinuation<Expression> cont = parseExprCont(node);
 			Expression expr = cont.getResult();
 			if (expr == null) {
@@ -170,7 +171,7 @@ public class GuardParser {
 						ParseContinuation<OpUnary> cont = parseExprUnaryOp(node
 								.getFirstChild());
 						OpUnary op = cont.getResult();
-						Expression unaryExpr = parseExpr(cont.getNode());
+						Expression unaryExpr = parseExpr(thisGuard, cont.getNode());
 						expr = IrFactory.eINSTANCE.createExprUnary(op,
 								unaryExpr, null);
 						break;
@@ -178,21 +179,21 @@ public class GuardParser {
 						String name = elt.getAttribute("name");
 						// look up variable, in variables scope, and if not
 						// found in parameters scope
-						Var var = superActor.getStateVar(name);
+						Var var = findStateVar(network, name);
 						if (var == null) {
-							var = findPortVariable(name);
+							var = findPortVariable(network, name, thisGuard);
 						}
 
 						if (var == null) {
 							throw new OrccRuntimeException("In superactor \""
-									+ superActor.getName()
+									+ network.getName()
 									+ "\": unknown variable: \"" + name + "\"");
 						}
 						expr = IrFactory.eINSTANCE.createExprVar(var);
 						break;
 					} else {
 						throw new OrccRuntimeException("In network \""
-								+ superActor.getName()
+								+ network.getName()
 								+ "\": Unsupported Expr kind: \"" + kind + "\"");
 					}
 				}
@@ -236,7 +237,7 @@ public class GuardParser {
 			List<Expression> exprs = new ArrayList<Expression>();
 			while (node != null) {
 				if (node.getNodeName().equals("Expr")) {
-					exprs.add(parseExpr(node));
+					exprs.add(parseExpr(thisGuard, node));
 				}
 
 				node = node.getNextSibling();
@@ -323,47 +324,34 @@ public class GuardParser {
 
 	}
 
-	public GuardParser(String definitionFile, String actionName,
-			Actor superactor) {
+	public GuardParser(String definitionFile, Network network) {
 		this.definitionFile = definitionFile;
-		this.superActor = superactor;
-		this.scheduler = eINSTANCE.createProcedure("isSchedulable_"
-				+ actionName, 0, eINSTANCE.createTypeBool());
-		this.peekPattern = DfFactory.eINSTANCE.createPattern();
-		peekVariables = new ArrayList<Var>();
-		peekPorts = new ArrayList<Port>();
-		peekCount = 0;
+		this.network = network;
+		this.guardList = new ArrayList<Action>();
 	}
 
-	public void parse(String superactor, String superaction) {
+	public List<Action> parse() {
 		try {
 			InputStream is = new FileInputStream(definitionFile);
 			Document document = DomUtil.parseDocument(is);
-			parseSuperactorList(document, superactor, superaction);
+			parseSuperactorList(document);
 			is.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return guardList;
 	}
 
-	public Procedure getGuard() {
-		return scheduler;
-	}
-
-	public Pattern getPeekPattern() {
-		return peekPattern;
-	}
-
-	private void parseSuperactorList(Document doc, String superactor,
-			String superaction) {
+	private void parseSuperactorList(Document doc) {
 		Element root = doc.getDocumentElement();
 		Node node = root.getFirstChild();
 		while (node != null) {
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element element = (Element) node;
 				if (node.getNodeName().equals("superactor")
-						&& (element.getAttribute("name").equals(superactor))) {
-					parseSuperactor(element, superaction);
+						&& (element.getAttribute("name").equals(network.getName()))) {
+					parseSuperactor(element);
+
 				} else {
 					// TODO: manage error
 				}
@@ -372,17 +360,22 @@ public class GuardParser {
 		}
 	}
 
-	private void parseSuperactor(Element element, String superaction) {
+	private void parseSuperactor(Element element) {
 		Node node = element.getFirstChild();
 		while (node != null) {
 			if (node instanceof Element) {
 				Element elt = (Element) node;
-				if (node.getNodeName().equals("superaction")
-						&& (elt.getAttribute("name").equals(superaction))) {
-					Expression comparison = parseSuperaction(elt);
-					createPeekInstructions();
-					scheduler.getLast().add(
-							IrFactory.eINSTANCE.createInstReturn(comparison));
+				if (node.getNodeName().equals("superaction")) {
+					Action guard = DfFactory.eINSTANCE.createAction();
+					guard.setBody(eINSTANCE.createProcedure("isSchedulable_"
+							+ elt.getAttribute("name"), 0, eINSTANCE.createTypeBool()));
+					guard.setPeekPattern(DfFactory.eINSTANCE.createPattern());
+					parseSuperaction(elt, guard);
+					guard.addAttribute("actorName");
+					guard.setAttribute("actorName", network.getName());
+					guard.addAttribute("actionName");
+					guard.setAttribute("actionName", elt.getAttribute("name"));
+					guardList.add(guard);
 				} else {
 					// TODO: manage error
 				}
@@ -391,9 +384,9 @@ public class GuardParser {
 		}
 	}
 
-	private void createPeekInstructions() {
+	private void createPeekInstructions(Procedure guard) {
 		for (int i = 0; i < peekCount; i++) {
-			scheduler.getLast().add(
+			guard.getLast().add(
 					createPeekInstruction(peekVariables.get(i),
 							peekPorts.get(i)));
 		}
@@ -408,29 +401,34 @@ public class GuardParser {
 				MergerUtil.createModuloIndex(port, indexVar));
 	}
 
-	private Expression parseSuperaction(Element element) {
-		Expression guard = null;
+	private void parseSuperaction(Element element, Action guard) {
+		Expression guardExpression = null;
 		Node node = element.getFirstChild();
 		while (node != null) {
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element elt = (Element) node;
 				if (node.getNodeName().equals("guard")) {
-					guard = parseGuard(elt);
+					peekVariables = new ArrayList<Var>();
+					peekPorts = new ArrayList<Port>();
+					peekCount = 0;
+					guardExpression = parseGuard(guard, elt);
+					createPeekInstructions(guard.getBody());
 				}
 			}
 			node = node.getNextSibling();
 		}
-		if (guard == null) {
-			guard = IrFactory.eINSTANCE.createExprBool(true);
+		if (guardExpression == null) {
+			guardExpression = IrFactory.eINSTANCE.createExprBool(true);
 		}
-		return guard;
+		guard.getBody().getLast().add(
+				IrFactory.eINSTANCE.createInstReturn(guardExpression));
 	}
 
-	private Expression parseGuard(Element element) {
+	private Expression parseGuard(Action guard, Element element) {
 		Node node = element.getFirstChild();
 		while (node != null) {
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				return new ExprParser().parseExpr(node);
+				return new ExprParser().parseExpr(guard, node);
 			}
 
 			node = node.getNextSibling();
@@ -438,30 +436,43 @@ public class GuardParser {
 		return null;
 	}
 
-	private Var findPortVariable(String name) {
-		for (Port port : superActor.getInputs()) {
-			if (port.getName().equals(name)) {
-				return addToPeekList(port);
+	private Var findStateVar(Network network, String name) {
+		for (Actor actor : network.getAllActors()) {
+			for (Var var : actor.getStateVars()) {
+				if (var.getName().equals(name)) {
+					return var;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private Var findPortVariable(Network network, String name, Action guard) {
+		for (Actor actor : network.getAllActors()) {
+			for (Port port : actor.getInputs()) {
+				if (port.getName().equals(name)) {
+					return addToPeekList(guard, port);
+				}
 			}
 		}
 		return null;
 	}
 
-	private Var addToPeekList(Port port) {
-		createVariableIntroduction(port);
+	private Var addToPeekList(Action guard, Port port) {
+		createVariableIntroduction(guard, port);
 		Var peekVar = IrFactory.eINSTANCE.createVar(0,
 				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
 				new String(port.getName() + "_peek"), true, 0);
 		peekVariables.add(peekVar);
 		peekCount++;
 		peekPorts.add(port);
-		peekPattern.setNumTokens(port, 1);
-		peekPattern.setVariable(port, peekVar);
+		guard.getPeekPattern().setNumTokens(port, 1);
+		guard.getPeekPattern().setVariable(port, peekVar);
 		return peekVar;
 	}
 
-	private void createVariableIntroduction(Port port) {
-		scheduler.newTempLocalVariable(IrFactory.eINSTANCE.createTypeInt(32),
+	private void createVariableIntroduction(Action guard, Port port) {
+		guard.getBody().newTempLocalVariable(IrFactory.eINSTANCE.createTypeInt(32),
 				port.getName() + "_peek");
 	}
 

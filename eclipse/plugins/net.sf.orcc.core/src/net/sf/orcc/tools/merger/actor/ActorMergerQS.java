@@ -53,7 +53,9 @@ public class ActorMergerQS extends ActorMergerBase {
 	private String definitionFile;
 	
 	private List<Schedule> scheduleList;
-
+	
+	private List<Action> guardList;
+	
 	public class ActionUpdater extends AbstractIrVisitor<Void> {
 
 		private Pattern oldInputPattern;
@@ -167,12 +169,13 @@ public class ActorMergerQS extends ActorMergerBase {
 	
 	ActionProcedureMap correspondences;
 	
-	public ActorMergerQS(Network network, Copier copier, String definitionFile, List<Schedule> scheduleList) {
+	public ActorMergerQS(Network network, Copier copier, String definitionFile, List<Schedule> scheduleList, List<Action> guardList) {
 		this.network = network;
 		this.copier = copier;
 		this.definitionFile = definitionFile;
 		this.correspondences = new ActionProcedureMap();
 		this.scheduleList = scheduleList;
+		this.guardList = guardList;
 	}
 
 	public Actor createMergedActor() {
@@ -254,13 +257,10 @@ public class ActorMergerQS extends ActorMergerBase {
 	private Action createSuperaction(String actionName) {
 		BufferSizer bufferSizer = new BufferSizer(network);
 		Schedule superAction = getSchedule(scheduleList, network.getName(), actionName);
-		
+
 		Pattern inputPattern = computeScheduleInputPattern(network, superAction.getIterands());
 		Pattern outputPattern = computeScheduleOutputPattern(network, superAction.getIterands());
 
-		GuardParser guardParser = new GuardParser(definitionFile, actionName, superActor);
-		guardParser.parse(network.getName(), actionName);
-		
 		Procedure body = irFactory.createProcedure(actionName, 0,
 				irFactory.createTypeVoid());
 		createBuffers(body, bufferSizer.getMaxTokens(superAction));
@@ -268,8 +268,9 @@ public class ActorMergerQS extends ActorMergerBase {
 		createStaticSchedule(body, superAction);
 		body.getLast().add(irFactory.createInstReturn());
 	
+		Action guard = getGuard(guardList, network.getName(), actionName);
 		Action action = dfFactory.createAction(actionName, inputPattern,
-				outputPattern, guardParser.getPeekPattern(), guardParser.getGuard(), body);
+				outputPattern, guard.getPeekPattern(), guard.getBody(), body);
 	
 		superActor.getActions().add(action);
 		
@@ -280,6 +281,15 @@ public class ActorMergerQS extends ActorMergerBase {
 		for(Schedule schedule : scheduleList) {
 			if (actorName.equals(schedule.getOwner()) && actionName.equals(schedule.getName())) {
 				return schedule;
+			}
+		}
+		return null;
+	}
+
+	private Action getGuard(List<Action> guardList, String actorName, String actionName) {
+		for(Action guard : guardList) {
+			if (actorName.equals(guard.getAttribute("actorName").getStringValue()) && actionName.equals(guard.getAttribute("actionName").getStringValue())) {
+				return guard;
 			}
 		}
 		return null;
