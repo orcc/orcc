@@ -35,7 +35,6 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfVisitor;
@@ -201,14 +200,14 @@ public class ActorMerger extends DfVisitor<Void> {
 					.doSwitch(subNetwork);
 			} else {
 				superActor = dfFactory.createActor();
-				ScheduleParser scheduleParser = new ScheduleParser(definitionFile, subNetwork);
-				List<Schedule> scheduleList = scheduleParser.parse(subNetwork.getName());
+				SuperactorParser superactorParser = new SuperactorParser(subNetwork, superActor);
+				superactorParser.parse(definitionFile);
 				GuardParser guardParser = new GuardParser(definitionFile, subNetwork);
 				List<Action> guardList = guardParser.parse();
-				FSMParser fsmParser = new FSMParser(definitionFile, superActor);
-				FSM fsm = fsmParser.parse(subNetwork.getName());
-				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile, scheduleList, guardList);
-				actorMerger.createMergedActor(superActor, fsm);
+				//FSMParser fsmParser = new FSMParser(definitionFile, superActor);
+				//FSM fsm = fsmParser.parse(subNetwork.getName());
+				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile, superactorParser.getScheduleList(), guardList);
+				actorMerger.createMergedActor(superActor, superactorParser.getFSM());
 			}
 			// update the main network
 			network.add(superActor);
