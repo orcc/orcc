@@ -50,7 +50,6 @@ import net.sf.orcc.backends.promela.transform.Scheduler;
 import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
@@ -58,7 +57,6 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
@@ -69,7 +67,6 @@ import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel;
@@ -121,7 +118,8 @@ public class PromelaBackend extends AbstractBackend {
 		transfos.add(new DfVisitor<Void>(new Inliner(true, true)));
 		transfos.add(new RenameTransformation(renameMap));
 		transfos.add(new DfVisitor<Object>(new PhiRemoval()));
-
+		transfos.add(new PromelaAddPrefixToStateVar());
+		transfos.add(new GuardsExtractor(guards, priority, loadPeeks));
 		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(actor);
 		}
@@ -136,7 +134,7 @@ public class PromelaBackend extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		new BroadcastAdder().doSwitch(network);
 		// Instantiate and flattens network
-		new Instantiator(false).doSwitch(network);
+		new Instantiator(true).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
 		// Classify network
@@ -154,9 +152,10 @@ public class PromelaBackend extends AbstractBackend {
 		netStateDef.doSwitch(network);
 		
 		schedulingModel.printDependencyGraph();
-
 		actorSchedulers = new HashSet<Scheduler>();
-		transformInstances(network.getChildren());
+		
+		transformActorsAgain(network.getAllActors());
+		
 		printChildren(network);
 		
 		balanceEq = new ScheduleBalanceEq(actorSchedulers, network);
@@ -166,10 +165,10 @@ public class PromelaBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printInstance(Instance instance) {
+	protected boolean printActor(Actor instance) {
 		return new InstancePrinter(instance, options).printInstance(path) > 0;
 	}
-
+	
 	/**
 	 * Prints the given network.
 	 * 
@@ -199,7 +198,7 @@ public class PromelaBackend extends AbstractBackend {
 		}
 	}
 
-	private void transformInstance(Instance instance) {
+	private void transformActorAgain(Actor actor) {
 		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
 		transfos.add(new PromelaDeadGlobalElimination(netStateDef
 				.getVarsUsedInScheduling(), netStateDef
@@ -208,22 +207,18 @@ public class PromelaBackend extends AbstractBackend {
 		transfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 
 		for (DfSwitch<?> transformation : transfos) {
-			transformation.doSwitch(instance.getActor());
+			transformation.doSwitch(actor);
 		}
-		new PromelaAddPrefixToStateVar().doSwitch(instance);
-		new GuardsExtractor(guards, priority, loadPeeks).doSwitch(instance);
-		new PromelaTokenAnalyzer(netStateDef).doSwitch(instance);
+		new PromelaTokenAnalyzer(netStateDef).doSwitch(actor);
 		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(netStateDef);
-		actorScheduler.doSwitch(instance);
+		actorScheduler.doSwitch(actor);
 		actorSchedulers.add(actorScheduler.getScheduler());
 	}
 
-	private void transformInstances(EList<Vertex> vertices) {
+	private void transformActorsAgain(List<Actor> actors) {
 		OrccLogger.traceln("Transforming instances...");
-		for (Vertex v : vertices) {
-			if (v instanceof Instance) {
-				transformInstance((Instance) v);
-			}
+		for (Actor a : actors) {
+			transformActorAgain(a);
 		}
 	}
 }

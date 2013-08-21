@@ -10,7 +10,6 @@ import java.util.Set;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.graph.Edge;
@@ -30,10 +29,10 @@ public class Scheduler {
 
 	private Map<Action, Map<Var, Set<Var>>> localVarDep = new HashMap<Action, Map<Var, Set<Var>>>();
 
-	private Instance instance;
+	private Actor actor;
 
-	public Scheduler(Instance instance, FSM fsm) {
-		this.instance = instance;
+	public Scheduler(Actor actor, FSM fsm) {
+		this.actor = actor;
 		if (fsm != null) {
 			this.initialState = fsm.getInitialState();
 		}
@@ -98,8 +97,8 @@ public class Scheduler {
 		return initialState;
 	}
 
-	public Instance getInstance() {
-		return instance;
+	public Actor getActor() {
+		return actor;
 	}
 
 	public Set<Var> getLocalVarDep(Action action, Var var) {
@@ -146,7 +145,6 @@ public class Scheduler {
 	}
 
 	public void makeDummyFSM() {
-		Actor actor = this.instance.getActor();
 		schedules.clear();
 		if (actor.hasFsm()) {
 			for (State state : actor.getFsm().getStates()) {

@@ -32,7 +32,6 @@ package net.sf.orcc.backends.promela
 import java.io.File
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.df.Instance
 
 /**
  * Generated an initial schedule with only actor level scheduling completed 
@@ -73,7 +72,7 @@ class ScriptPrinter extends PromelaTemplate {
 		uargs = UserArgs()
 		uargs.parseargs()
 		
-		actors=«network.children.filter(typeof(Instance)).join("[",", ", "]",['''"«simpleName»"'''])»
+		actors=«network.allActors.join("[",", ", "]",['''"«simpleName»"'''])»
 		
 		conf=Configuration('config_«network.simpleName»', 'config.txt')
 		conf.loadconfiguration(actors)

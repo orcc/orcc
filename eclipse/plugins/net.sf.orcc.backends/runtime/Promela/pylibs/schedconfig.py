@@ -105,9 +105,31 @@ class StateDescription(object):
         string=f.read()
         self.fromstring(string)
 
+class InputSeq(object):
+    uglydic={}
+    def addpeek(self, actor, port, schedulestate, scheduleaction, value):
+        self.check(actor, port, schedulestate, scheduleaction)
+        self.uglydic[actor+port+schedulestate+scheduleaction].append(value)
+    def addread(self, actor, port, schedulestate, scheduleaction, value):
+        self.check(actor, port, schedulestate, scheduleaction)
+        nrpeek=len(self.uglydic[actor+port+schedulestate+scheduleaction])
+        self.uglydic[actor+port+schedulestate+scheduleaction].extend([0]*(int(value))-nrpeek)
+    def getseq(self, actor, port, schedulestate, scheduleaction, value):
+        if self.check(actor, port, schedulestate, scheduleaction):
+            return self.uglydic[actor+port+schedulestate+scheduleaction]
+        else:
+            return []
+    def check(self, actor, port, schedulestate, scheduleaction):
+        if not (actor+port+schedulestate+scheduleaction) in self.uglydic:
+            self.uglydic[actor+port+schedulestate+scheduleaction]=[]
+            return False
+        else:
+            return True
+    
+
 class ChannelConfigXML():
     xmlfilename=None
-    partitioninput={}
+    partitioninput=InputSeq()
     channels=[]
     def __init__(self, xmlfilename):
         self.xmlfilename=xmlfilename
@@ -116,12 +138,13 @@ class ChannelConfigXML():
         for xactor in tree.findall('.//actor'):        
             for xread in xactor.findall('.//input'):
                 self.channels.append(xactor.get('name')+'_'+xread.get('port'))
+                #check if port is input to partition
                 if xread.get('instance') not in configuration.actors:
                     for xschedule in xactor.findall('.//schedule'):
                         for xrates in xschedule.findall('.//rates'):
                             for xpeek in xrates.findall('.//peek'):
-                                print ('peek',xpeek)
+                                self.partitioninput.addpeek(xactor.get('name'), xpeek.get('port'), xschedule.get('initstate'),xschedule.get('action'),xpeek.get('value'))
                             for xread in xrates.findall('.//read'):
-                                print ('reed', xread)                    
-                    self.partitioninput[xactor.get('name')+'_'+xread.get('port')]= None
-        print(self.partitioninput)
+                                self.partitioninput.addpeek(xactor.get('name'), xread.get('port'), xschedule.get('initstate'),xschedule.get('action'),xread.get('value'))                    
+
+

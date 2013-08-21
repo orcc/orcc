@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfVisitor;
@@ -50,24 +50,8 @@ import net.sf.orcc.df.util.DfVisitor;
 
 public class PromelaTokenAnalyzer extends DfVisitor<Void> {
 
-	// private Set<Port> schedulingPorts;
-
-	// private NetworkStateDefExtractor netStateDef;
-
-	// private Map<Var, Action> localVarToAction = new HashMap<Var, Action>();
-
 	@Override
 	public Void caseAction(Action action) {
-		// for(Var var : action.getBody().getLocals()) {
-		// if (netStateDef.getVarsUsedInScheduling().contains(var)) {
-		// Set<Var> tc = new HashSet<Var>();
-		// netStateDef.getTransitiveClosure(var, tc);
-		// //System.out.println(var+ " -> " + tc);
-		// System.out.println("Action "+action.getName()+" contains var "+
-		// var.getName());
-		// localVarToAction.put(var, action);
-		// }
-		// }
 		Pattern pattern = action.getOutputPattern();
 		for (Port port : pattern.getPorts()) {
 			// if (schedulingPorts.contains(port)) {
@@ -91,12 +75,12 @@ public class PromelaTokenAnalyzer extends DfVisitor<Void> {
 	}
 
 	@Override
-	public Void caseInstance(Instance instance) {
-		for (Action action : instance.getActor().getActions()) {
+	public Void caseActor(Actor actor) {
+		for (Action action : actor.getActions()) {
 			doSwitch(action);
 		}
 		// Set the FIFO sizes according to the token consumtion/production
-		Map<Port, Connection> inMap = instance.getIncomingPortMap();
+		Map<Port, Connection> inMap = actor.getIncomingPortMap();
 		for (Port port : inMap.keySet()) {
 			Connection connection = inMap.get(port);
 			if (connection.getSize() == null
@@ -105,7 +89,7 @@ public class PromelaTokenAnalyzer extends DfVisitor<Void> {
 						port.getNumTokensConsumed());
 			}
 		}
-		Map<Port, List<Connection>> outMap = instance.getOutgoingPortMap();
+		Map<Port, List<Connection>> outMap = actor.getOutgoingPortMap();
 		for (Port port : outMap.keySet()) {
 			for (Connection connection : outMap.get(port)) {
 				if (connection.getSize() == null

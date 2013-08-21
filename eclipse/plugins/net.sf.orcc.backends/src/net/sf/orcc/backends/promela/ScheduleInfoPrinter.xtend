@@ -35,7 +35,7 @@ import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.backends.promela.transform.Scheduler
 import net.sf.orcc.backends.promela.transform.Schedule
 import net.sf.orcc.backends.promela.transform.ScheduleBalanceEq
-import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Actor
 
 /**
  * Generated an initial schedule with only actor level scheduling completed 
@@ -71,19 +71,19 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 		<!-- Generated from "«network.name»" -->
 		
 		<network>
-			«FOR instance : balanceEq.instances»
-				«instance.printInstance»
+			«FOR actor : balanceEq.actors»
+				«actor.printInstance»
 			«ENDFOR»
 		</network>
 		
 	'''
 	
-	def printInstance(Instance instance) { 
+	def printInstance(Actor actor) { 
 	'''
-		<actor name="«instance.name»">
-			«balanceEq.getScheduler(instance).schedulesxml»
+		<actor name="«actor.name»">
+			«balanceEq.getScheduler(actor).schedulesxml»
 			<connections>
-			«instance.connections»
+			«actor.connections»
 			</connections>
 		</actor>
 	'''
@@ -99,7 +99,7 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 	'''
 	}
 	
-	def connections(Instance instance) {
+	def connections(Actor instance) {
 	'''
 		«FOR port : instance.incomingPortMap.keySet»
 			«IF balanceEq.getSource(instance.incomingPortMap.get(port)) != null»

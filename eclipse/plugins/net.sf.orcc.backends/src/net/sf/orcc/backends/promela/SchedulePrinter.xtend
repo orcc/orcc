@@ -79,8 +79,8 @@ class SchedulePrinter extends PromelaTemplate {
 	
 	def superActor(Scheduler actorSched) { 
 	'''
-		<superactor name="cluster_«actorSched.instance.name»">
-			<actor name="«actorSched.instance.name»"/>
+		<superactor name="cluster_«actorSched.actor.name»">
+			<actor name="«actorSched.actor.name»"/>
 			«actorSched.schedulerxml»
 			«actorSched.schedulesxml»
 		</superactor>
@@ -102,7 +102,7 @@ class SchedulePrinter extends PromelaTemplate {
 		«FOR sched : scheduler.schedules»
 			<superaction name="«sched.initStateName»_«sched.enablingActionName»" guard="NULL">
 			«FOR action : sched.sequence»
-				<iterand action="«action»" actor="«scheduler.instance.name»"/>
+				<iterand action="«action»" actor="«scheduler.actor.name»"/>
 			«ENDFOR»
 			</superaction>
 		«ENDFOR»

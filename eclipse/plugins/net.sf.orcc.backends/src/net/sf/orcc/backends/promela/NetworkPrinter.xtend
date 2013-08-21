@@ -31,9 +31,9 @@ package net.sf.orcc.backends.promela
 import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.df.Actor
 
 /**
  * Compile top Network c source code 
@@ -79,8 +79,8 @@ class NetworkPrinter extends PromelaTemplate {
 		«ENDFOR»
 		
 		// Include the actors
-		«FOR instance : network.children.filter(typeof(Instance))»
-			#include "«instance.simpleName».pml"
+		«FOR actor : network.children.filter(typeof(Actor))»
+			#include "«actor.simpleName».pml"
 		«ENDFOR»
 		
 		int initdone=0
@@ -98,8 +98,8 @@ class NetworkPrinter extends PromelaTemplate {
 				#ifdef MANAGED
 				#include "tmp_start_actors.pml"
 				#else
-				«FOR instance : network.children.filter(typeof(Instance))»
-					run «instance.simpleName»();
+				«FOR actor : network.children.filter(typeof(Actor))»
+					run «actor.simpleName»();
 				«ENDFOR»
 				#endif
 			}	
@@ -123,10 +123,10 @@ class NetworkPrinter extends PromelaTemplate {
 	
 	def assignFifo(Connection connection) '''
 		«IF connection.sourcePort != null»
-			#define chan_«(connection.source as Instance).simpleName»_«connection.sourcePort.name» chan_«connection.<Object>getValueAsObject("id")»
+			#define chan_«(connection.source as Actor).simpleName»_«connection.sourcePort.name» chan_«connection.<Object>getValueAsObject("id")»
 		«ENDIF»
 		«IF connection.targetPort != null»
-			#define chan_«(connection.target as Instance).simpleName»_«connection.targetPort.name» chan_«connection.<Object>getValueAsObject("id")»
+			#define chan_«(connection.target as Actor).simpleName»_«connection.targetPort.name» chan_«connection.<Object>getValueAsObject("id")»
 		«ENDIF»
 	'''
 }

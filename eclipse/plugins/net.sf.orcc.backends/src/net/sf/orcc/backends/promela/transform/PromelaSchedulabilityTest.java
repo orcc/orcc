@@ -39,8 +39,8 @@ import java.util.Map;
 import java.util.Set;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
@@ -116,13 +116,13 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	}
 
 	@Override
-	public Void caseInstance(Instance instance) {
-		System.out.println("\n" + instance.getActor().getName());
-		this.actor = instance.getActor();
-		this.fsm = instance.getActor().getFsm();
-		this.scheduler = new Scheduler(instance, this.fsm);
+	public Void caseActor(Actor actor) {
+		System.out.println("\n Actor:" + actor.getName());
+		this.actor=actor;
+		this.fsm = actor.getFsm();
+		this.scheduler = new Scheduler(actor, this.fsm);
 		// find variables corresponding to input ports
-		for (Action action : instance.getActor().getActions()) {
+		for (Action action : actor.getActions()) {
 			inputPortVars.addAll(action.getInputPattern().getVariables());
 			for (Var var : action.getInputPattern().getVariables()) {
 				inputVarToPortMap.put(var, action.getInputPattern()
@@ -130,7 +130,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 			}
 		}
 		// how does actions affect scheduling
-		for (Action action : instance.getActor().getActions()) {
+		for (Action action : actor.getActions()) {
 			doSwitch(action);
 		}
 		((InnerIrVisitor)this.irVisitor).resolveDeps();
@@ -147,13 +147,13 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				}
 			}
 			// check for nondeterministic cycles in the fsm
-			for (State state : instance.getActor().getFsm().getStates()) {
+			for (State state : actor.getFsm().getStates()) {
 				fsmFindInputdepCycles(state);
 			}
-			if (!instance.getActor().getActionsOutsideFsm().isEmpty()) {
+			if (!actor.getActionsOutsideFsm().isEmpty()) {
 				System.out.println(" == Actor has actions outside FSM:");
 
-				for (Action action : instance.getActor().getActionsOutsideFsm()) {
+				for (Action action : actor.getActionsOutsideFsm()) {
 					if (!action.getInputPattern().isEmpty()) {
 						System.out.println("Input on port;"
 								+ action.getInputPattern());
@@ -461,8 +461,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					System.out.print(" -> Writes to control port: "
 						+ port.getName());
 					// how is it generated?
-					Var var = schedule.getEnablingAction().getOutputPattern()
-						.getVariable(port);
+					Var var = action.getOutputPattern().getVariable(port);
 					System.out.print(", scenario specific constant: "
 						+ !(hasVarLoop(var) || hasInputDep(var, true)));
 					// System.out.print(", loop " + hasVarLoop(var));
