@@ -75,7 +75,7 @@ import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel;
  * This class defines a template-based PROMELA back-end.
  * 
  * @author Ghislain Roquier
- * 
+ * @author Johan Ersfolk
  */
 public class PromelaBackend extends AbstractBackend {
 

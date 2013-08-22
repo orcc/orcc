@@ -38,11 +38,12 @@ import net.sf.orcc.backends.promela.transform.ScheduleBalanceEq
 import net.sf.orcc.df.Actor
 
 /**
- * Generated an initial schedule with only actor level scheduling completed 
+ * Prints the contents of the class ScheduleBalanceEq to an XML file 
  *  
  * @author Johan Ersfolk
  * 
  */
+ 
 class ScheduleInfoPrinter extends PromelaTemplate {
 	
 	val Network network;
@@ -119,6 +120,7 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 		«ENDFOR»
 	'''
 	}
+	
 	
 	def rates(Schedule schedule) {
 	'''
