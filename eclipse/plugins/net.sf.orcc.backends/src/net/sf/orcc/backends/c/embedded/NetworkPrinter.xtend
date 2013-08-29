@@ -38,6 +38,7 @@ import net.sf.orcc.df.Network
 import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.util.OrccLogger
 
 /**
  * Generate network as graphml file
@@ -45,29 +46,58 @@ import net.sf.orcc.util.OrccUtil
  * @author Antoine Lorence
  */
 class NetworkPrinter extends CTemplate {
-	
+
 	val Network network
-	
+
 	new(Network network) {
 		this.network = network
 	}
-	
+
 	def printNetwork(String targetFolder) {
-		
+
 		var numFilesCached = 0
 
-		val networkContent = networkContent
-		val graphmlFile = new File(targetFolder + File::separator + "Algo"
-			+ File::separator + network.name + ".graphml"
-		)
-		
-		if(needToWriteFile(networkContent, graphmlFile)) {
-			OrccUtil::printFile(networkContent, graphmlFile)
+		val csvFile = new File(targetFolder + File::separator + network.name + ".varSizes.csv")
+		val csvContent = sizesCSV
+		if(needToWriteFile(csvContent, csvFile)) {
+			OrccUtil::printFile(csvContent, csvFile)
 		} else {
 			numFilesCached = numFilesCached + 1
 		}
 		
+		val graphmlContent = networkContent
+		val graphmlFile = new File(targetFolder + File::separator + "Algo"
+			+ File::separator + network.name + ".graphml"
+		)
+
+		if(needToWriteFile(graphmlContent, graphmlFile)) {
+			OrccUtil::printFile(graphmlContent, graphmlFile)
+		} else {
+			numFilesCached = numFilesCached + 1
+		}
+
 		return numFilesCached
+	}
+
+	def private getSizesCSV() {
+		var keys = newArrayList("i64", "i32", "i16", "i8")
+		var values = newArrayList(8, 4, 2, 1)
+		for(instance : network.children.filter(typeof(Instance))) {
+			if(!instance.actor.stateVars.empty) {
+				keys.add('''«instance.actor.simpleName»_stateVars''')
+				val structSize = instance.actor.stateVars.fold(0, [total, v | total + v.type.sizeInBits])
+				if(structSize % 8 == 0) {
+					values.add(structSize / 8)
+				} else {
+					OrccLogger::warnln("State variables seems to have not been resized.")
+					values.add((structSize / 8) + 1)
+				}
+			}
+		}
+		'''
+			«keys.join(",")»
+			«values.join(",")»
+		'''
 	}
 
 	def private getNetworkContent() '''
@@ -115,7 +145,6 @@ class NetworkPrinter extends CTemplate {
 						«ENDFOR»
 					</data>
 			    «ENDIF»
-			    
 			    «FOR instance : network.children.filter(typeof(Instance))»
 			    	«instance.print»
 			    «ENDFOR»
@@ -125,7 +154,7 @@ class NetworkPrinter extends CTemplate {
 		    </graph>
 		</graphml>
 	'''
-	
+
 	def private print(Connection connection) '''
 		<edge source="«(connection.source as Instance).name»" sourceport="«connection.sourcePort.name»" target="«(connection.target as Instance).name»" targetport="«connection.targetPort.name»">
 		    <data key="edge_prod">«((connection.source as Instance).actor.moC as CSDFMoC).outputPattern.numTokensMap.get(connection.sourcePort)»</data>
@@ -134,7 +163,7 @@ class NetworkPrinter extends CTemplate {
 		    <data key="data_type">«connection.sourcePort.type.doSwitch»</data>
 		</edge>
 	'''
-	
+
 	def private printDelays(Connection connection) {
 		if (((connection.source as Instance).actor.moC as CSDFMoC).delayPattern.numTokensMap.containsKey(connection.sourcePort)) {
 			((connection.source as Instance).actor.moC as CSDFMoC).delayPattern.numTokensMap.get(connection.sourcePort)
@@ -159,7 +188,7 @@ class NetworkPrinter extends CTemplate {
 			«stateVar.printStateVar(instance)»
 		«ENDFOR»
 	'''
-	
+
 	def private printStateVar(Var stateVar, Instance instance) '''
 		<edge source="«instance.name»" sourceport="«stateVar.name»_o" target="«instance.name»" targetport="«stateVar.name»_i">
 		    «IF stateVar.type.dimensionsExpr.empty»
@@ -175,11 +204,9 @@ class NetworkPrinter extends CTemplate {
 		</edge>
 	'''
 
-	
 	def private print(Argument argument) '''
 		<data key="arguments">
 			<argument name="«argument.variable.name»" value="«argument.value.doSwitch»"/>
 		</data>
 	'''
-	
 }
