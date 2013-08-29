@@ -55,7 +55,7 @@ class NetworkPrinter extends CTemplate {
 	def printNetwork(String targetFolder) {
 		
 		var numFilesCached = 0
-		
+
 		val networkContent = networkContent
 		val graphmlFile = new File(targetFolder + File::separator + "Algo"
 			+ File::separator + network.name + ".graphml"
@@ -69,7 +69,7 @@ class NetworkPrinter extends CTemplate {
 		
 		return numFilesCached
 	}
-	
+
 	def private getNetworkContent() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 			<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
