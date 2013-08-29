@@ -83,16 +83,18 @@ class NetworkPrinter extends PromelaTemplate {
 			#include "«actor.simpleName».pml"
 		«ENDFOR»
 		
-		int initdone=0
+		int promela_prog_initiated=0
 		
 		proctype dummy() {
-		chan_0?initdone;}
+		chan_0?promela_prog_initiated;}
 		
 		init {
 			/*Inputs here*/
 			#ifdef MANAGED
 			#include "tmp_state.pml"
 			#endif
+			promela_prog_initiated==1;
+		
 			/*Start processes*/
 			atomic{
 				#ifdef MANAGED

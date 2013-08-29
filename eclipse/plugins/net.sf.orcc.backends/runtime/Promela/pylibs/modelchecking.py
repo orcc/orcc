@@ -42,7 +42,7 @@ class ModelChecker(object):
                 print(line)
             elif line.find('error') >= 0 :
                 self.tracefound=True
-                print ('Kukuuu ', line)
+                print (line)
             else:
                 print(line)
             proc.stdout.flush()

@@ -4,13 +4,14 @@ from subprocess import Popen, PIPE
 class UserArgs():
     inputfile = ''
     outputfile = ''
-    runchecker=None
+    runchecker=False
+    runcheckerid=None
     configure=False
     removeactor=None
     setleader=None
     def parseargs(self):
         try:
-            opts, args = getopt.getopt(sys.argv[1:],"hs:c:d:l:")
+            opts, args = getopt.getopt(sys.argv[1:],"hs:c:d:l:r")
         except getopt.GetoptError:
             self.printhelp()
             sys.exit(2)
@@ -20,7 +21,9 @@ class UserArgs():
                 self.test()
                 sys.exit()
             elif opt in ("-s"):
-                self.runchecker=arg
+                self.runcheckerid=arg
+            elif opt in ("-r"):
+                self.runchecker=True
             elif opt in ("-c"):
                 self.configure=True
                 self.setleader=arg
@@ -31,7 +34,8 @@ class UserArgs():
             print ('run_checker.py -h', '(show help)')
             print ('run_checker.py -d <instance_name>', '(delete actor from config)')
             print ('run_checker.py -c <instance_name>', '(configure according to actor)')
-            print ('run_checker.py -s <id>', '(run schedule search)')
+            print ('run_checker.py -s <sched id>', '(setup modelchecker for the schedule)')
+            print ('run_checker.py -r', '(run schedule search with the current config)')
     def test(self):
         print("\nChecking if necessary tools are available:")
         proc = Popen(['spin', '-v'], stdout=PIPE, stderr=PIPE, universal_newlines=True)

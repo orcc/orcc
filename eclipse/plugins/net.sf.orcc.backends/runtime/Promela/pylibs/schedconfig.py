@@ -60,7 +60,7 @@ class RunConfiguration(object):
     file3='tmp_ltl_expr.pml'
     def __init__(self, conf):
         self.conf=conf
-    def configure(self, statedesc):
+    def configure(self, statedesc, nextstate):
         open(self.file1, "a").close() # create the file for starting processes if it doesnt exist
         file=open(self.file1, "w")
         file.writelines(["run %s();\n" % item  for item in self.conf.actors])
@@ -72,7 +72,7 @@ class RunConfiguration(object):
         open(self.file3, "a").close() # create the file for ltl if it doesnt exist
         file=open(self.file3, "w")
         file.write("#define emptyBuffer (len(chan_0)==0 && len(chan_1)==0 && len(chan_2)==0 && len(chan_3)==0)\n")
-        file.write("ltl test {[]!(state == state_id) && emptyBuffer}\n")
+        file.write("ltl test {[]!((promela_prog_initiated==0 && fsm_state_"+self.conf.leader+"=="+self.conf.leader+"_state_"+nextstate+") && emptyBuffer)}\n")
         file.close()
     def confinitsearch(self):
         open(self.file1, "a").close() # create it if it doesnt exist
