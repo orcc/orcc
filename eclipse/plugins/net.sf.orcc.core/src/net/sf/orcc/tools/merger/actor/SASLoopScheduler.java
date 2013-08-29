@@ -29,15 +29,19 @@
 package net.sf.orcc.tools.merger.actor;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.graph.Edge;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.visit.ReversePostOrder;
 import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.Invocation;
+import net.sf.orcc.moc.MoC;
 
 /**
  * This class computes a single appearance schedule (SAS) with 1-level nested
@@ -87,32 +91,30 @@ public class SASLoopScheduler {
 	 */
 	private void computeMemoryBound(Schedule schedule) {
 		for (Iterand iterand : schedule.getIterands()) {
-			if (iterand.isActor()) {
-				Actor actor = iterand.getActor();
-				for (Edge edge : actor.getIncoming()) {
-					Connection conn = (Connection) edge;
-					Actor src = conn.getSource().getAdapter(Actor.class);
-					if (src != null) {
-						Connection connection = (Connection) edge;
-						int cns = connection.getTargetPort()
-								.getNumTokensConsumed();
-						tokens.put(connection, tokens.get(connection) - cns);
+			if (iterand.isAction()) {
+				Action action = iterand.getAction();
+				for (Port port : action.getInputPattern().getPorts()) {
+					Connection connection = ((Actor) action.eContainer())
+							.getIncomingPortMap().get(port);
+					if (connection.getSourcePort() != null) {
+						tokens.put(connection, tokens.get(connection)
+								- action.getInputPattern().getNumTokens(port));
 					}
 				}
 
-				for (Edge edge : actor.getOutgoing()) {
-					Connection conn = (Connection) edge;
-					Actor tgt = conn.getTarget().getAdapter(Actor.class);
-					if (tgt != null) {
-						Connection connection = (Connection) edge;
-						int current = tokens.get(connection);
-						int max = maxTokens.get(connection);
-						CSDFMoC moc = (CSDFMoC) actor.getMoC();
-						int prd = moc.getNumTokensProduced(connection
-								.getSourcePort());
-						tokens.put(connection, current + prd);
-						if (max < current + prd) {
-							maxTokens.put(connection, current + prd);
+				for (Port port : action.getOutputPattern().getPorts()) {
+
+					for (Connection connection : ((Actor) action.eContainer())
+							.getOutgoingPortMap().get(port)) {
+						if (connection.getTargetPort() != null) {
+							int current = tokens.get(connection);
+							int max = maxTokens.get(connection);
+							int prd = action.getOutputPattern().getNumTokens(
+									port);
+							tokens.put(connection, current + prd);
+							if (max < current + prd) {
+								maxTokens.put(connection, current + prd);
+							}
 						}
 					}
 				}
@@ -177,6 +179,45 @@ public class SASLoopScheduler {
 		return schedule;
 	}
 
+	private Schedule getScheduleFromCsdf(Actor actor, int repetition) {
+		Schedule schedule = new Schedule();
+		schedule.setIterationCount(repetition);
+		Iterator<Invocation> it = ((CSDFMoC) actor.getMoC()).getInvocations()
+				.iterator();
+
+		Invocation current = it.next();
+		int iterationCount = 1;
+		while (it.hasNext()) {
+			Action action = current.getAction();
+			Invocation next = it.next();
+			if (current.getAction().equals(next.getAction())) {
+				iterationCount++;
+			} else {
+				if (iterationCount == 1) {
+					schedule.add(new Iterand(action));
+				} else {
+					Schedule sub = new Schedule();
+					sub.setIterationCount(iterationCount);
+					sub.add(new Iterand(action));
+					schedule.add(new Iterand(sub));
+				}
+				iterationCount = 1;
+			}
+			current = next;
+		}
+
+		if (iterationCount == 1) {
+			schedule.add(new Iterand(current.getAction()));
+		} else {
+			Schedule sub = new Schedule();
+			sub.setIterationCount(iterationCount);
+			sub.add(new Iterand(current.getAction()));
+			schedule.add(new Iterand(sub));
+		}
+
+		return schedule;
+	}
+
 	/**
 	 * Schedules the given network in-place.
 	 */
@@ -190,13 +231,23 @@ public class SASLoopScheduler {
 			if (actor != null) {
 				int rep = repetitions.get(actor);
 				Iterand iterand = null;
+				MoC moc = actor.getMoC();
 				if (rep > 1) {
 					Schedule subSched = new Schedule();
 					subSched.setIterationCount(repetitions.get(actor));
-					subSched.add(new Iterand(actor));
+					if (moc.isSDF()) {
+						subSched.add(new Iterand(actor.getActions().get(0)));
+					} else {
+						subSched = getScheduleFromCsdf(actor,
+								repetitions.get(actor));
+					}
 					iterand = new Iterand(subSched);
 				} else {
-					iterand = new Iterand(actor);
+					if (moc.isSDF()) {
+						iterand = new Iterand(actor.getActions().get(0));
+					} else { // it's sdf
+						iterand = new Iterand(getScheduleFromCsdf(actor, 1));
+					}
 				}
 				schedule.add(iterand);
 			}

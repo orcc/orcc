@@ -64,11 +64,11 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	private Map<String, Object> configuration;
 
-	private Copier copier;
+	protected Copier copier;
 
-	private Action executedAction;
+	protected Action executedAction;
 
-	private Map<Action, Action> originalActions;
+	protected Map<Action, Action> originalActions;
 
 	private Actor originalActor;
 

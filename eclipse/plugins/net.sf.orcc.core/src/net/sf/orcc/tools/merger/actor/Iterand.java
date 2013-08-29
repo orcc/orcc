@@ -28,11 +28,11 @@
  */
 package net.sf.orcc.tools.merger.actor;
 
-import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Action;
 
 /**
  * This class defines an element of the body of a schedule. An iterand can be
- * either a vertex or another schedule.
+ * either an action or another schedule.
  * 
  * @author Ghislain Roquier
  * 
@@ -41,7 +41,7 @@ import net.sf.orcc.df.Actor;
 public class Iterand {
 
 	private enum Type {
-		SCHEDULE, ACTOR
+		SCHEDULE, ACTION
 	}
 
 	private Object contents;
@@ -53,32 +53,32 @@ public class Iterand {
 		type = Type.SCHEDULE;
 	}
 
-	public Iterand(Actor actor) {
-		contents = actor;
-		type = Type.ACTOR;
+	public Iterand(Action action) {
+		contents = action;
+		type = Type.ACTION;
 	}
 
 	public Schedule getSchedule() {
 		return (Schedule) contents;
 	}
 
-	public Actor getActor() {
-		return (Actor) contents;
+	public Action getAction() {
+		return (Action) contents;
 	}
 
 	public boolean isSchedule() {
 		return (type == Type.SCHEDULE);
 	}
 
-	public boolean isActor() {
-		return (type == Type.ACTOR);
+	public boolean isAction() {
+		return (type == Type.ACTION);
 	}
 
 	@Override
 	public String toString() {
 		Object obj;
-		if (isActor()) {
-			obj = ((Actor) contents).getName();
+		if (isAction()) {
+			obj = ((Action) contents).getName();
 		} else {
 			obj = contents;
 		}

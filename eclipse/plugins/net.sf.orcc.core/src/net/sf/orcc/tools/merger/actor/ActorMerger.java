@@ -50,6 +50,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Matthieu Wipliez
  * @author Ghislain Roquier
  * @author Herve Yviquel
+ * @author Jani Boutellier
  * 
  */
 public class ActorMerger extends DfVisitor<Void> {
@@ -59,7 +60,8 @@ public class ActorMerger extends DfVisitor<Void> {
 	private Copier copier;
 
 	private int index;
-
+	
+	private final String definitionFileName = "schedule.xml";
 	/**
 	 * Transforms the network to internalize the given list of vertices in their
 	 * own subnetwork and returns this subnetwork.
@@ -71,7 +73,7 @@ public class ActorMerger extends DfVisitor<Void> {
 	private Network getSubNetwork(Network network, List<Vertex> vertices) {
 		// extract the sub-network
 		Network subNetwork = IrUtil.copy(network);
-		subNetwork.setName("cluster" + index);
+		subNetwork.setName(getRegionName(vertices));
 
 		List<Vertex> verticesInSubNetwork = new ArrayList<Vertex>();
 		for (Vertex vertex : vertices) {
@@ -84,6 +86,21 @@ public class ActorMerger extends DfVisitor<Void> {
 				subNetwork.remove(vertex);
 			}
 		}
+		
+		// Perform the renaming of ports to the superactor
+		for (Vertex vertex : new ArrayList<Vertex>(subNetwork.getChildren())) {
+			Actor actorCopy = vertex.getAdapter(Actor.class);
+			for (Port port : actorCopy.getInputs()) {
+				port.addAttribute("shortName");
+				port.setAttribute("shortName", port.getName());
+				port.setName(actorCopy.getName() + "_" + port.getName());
+			}
+			for (Port port : actorCopy.getOutputs()) {
+				port.addAttribute("shortName");
+				port.setAttribute("shortName", port.getName());
+				port.setName(actorCopy.getName() + "_" + port.getName());
+			}
+		}
 
 		for (Vertex vertex : subNetwork.getChildren()) {
 			Actor actor = vertex.getAdapter(Actor.class);
@@ -92,8 +109,6 @@ public class ActorMerger extends DfVisitor<Void> {
 				unconnected.removeAll(actor.getIncomingPortMap().keySet());
 				for (Port input : unconnected) {
 					Port inputPort = EcoreUtil.copy(input);
-					inputPort.setName(vertex.getLabel() + "_"
-							+ inputPort.getName());
 					subNetwork.addInput(inputPort);
 					subNetwork.add(dfFactory.createConnection(inputPort, null,
 							vertex, input));
@@ -103,8 +118,6 @@ public class ActorMerger extends DfVisitor<Void> {
 				unconnected.removeAll(actor.getOutgoingPortMap().keySet());
 				for (Port output : unconnected) {
 					Port outputPort = EcoreUtil.copy(output);
-					outputPort.setName(vertex.getLabel() + "_"
-							+ outputPort.getName());
 					subNetwork.addOutput(outputPort);
 					subNetwork.add(dfFactory.createConnection(vertex, output,
 							outputPort, null));
@@ -115,19 +128,57 @@ public class ActorMerger extends DfVisitor<Void> {
 		return subNetwork;
 	}
 
+	/*
+	* When static regions (= superactors) are imported from an XML file
+	* the region name is piggybacked in a special "name vertex" that
+	* is read here (if present) and deleted. For StaticRegionDetector
+	* the basic naming scheme is used.
+	*/
+	
+	private String getRegionName(List<Vertex> vertices) {
+		for(Vertex vertex : vertices) {
+			if (vertex.hasAttribute("isNameVertex")) {
+				String regionName = vertex.getLabel();
+				vertices.remove(vertex);
+				return regionName;
+			}
+		}
+		return new String("cluster" + index);
+	}
+	
+	/*
+	* If file "schedule.xml" is found in the user's home folder, that file
+	* is used to define static regions and perform actor merging. If a file
+	* under that name can not be opened, automatic merging is used.
+	*/
+	
 	@Override
 	public Void caseNetwork(Network network) {
-		List<List<Vertex>> staticRegions = new StaticRegionDetector()
+		String definitionFile = new String(System.getProperty("user.home") + "/" + definitionFileName);
+		boolean fileExists = MergerUtil.testFilePresence(definitionFile);
+		List<List<Vertex>> staticRegions;
+		if (!fileExists) {
+			OrccLogger.traceln("Could not open " + definitionFile + " - performing automatic merging");
+			staticRegions = new StaticRegionDetector()
 				.analyze(network);
+		} else {
+			OrccLogger.traceln("Performing merging based on " + definitionFile);
+			RegionParser regionParser = new RegionParser(definitionFile, network);
+			staticRegions = regionParser.parse();
+		}
+		OrccLogger.traceln(staticRegions.size() + " regions in total");
 
 		for (List<Vertex> instances : staticRegions) {
 			copier = new Copier(true);
 			// return a copy of the sub-network
 			Network subNetwork = getSubNetwork(network, instances);
 			// create the static schedule of vertices
-			SASLoopScheduler scheduler = new SASLoopScheduler(subNetwork);
-			scheduler.schedule();
-
+			SASLoopScheduler scheduler = null;
+			if (!fileExists) {
+				scheduler = new SASLoopScheduler(subNetwork);
+				scheduler.schedule();
+			}
+			
 			int actorcount = subNetwork.getChildren().size();
 			int fifocount = 0;
 			for (Connection conn : subNetwork.getConnections()) {
@@ -137,14 +188,23 @@ public class ActorMerger extends DfVisitor<Void> {
 				}
 			}
 
-			OrccLogger.traceln("Cluster" + index + " (" + actorcount
-					+ " actors, " + fifocount + " fifos" + ") => Schedule is "
-					+ scheduler.getSchedule());
-
+			OrccLogger.traceln(subNetwork.getName() + " (" + actorcount
+					+ " actors, " + fifocount + " fifos)");
+			
 			// merge sub-network inside a single actor
-			Actor superActor = new ActorMergerSDF(scheduler, copier)
+			Actor superActor;
+			if (!fileExists) {
+				OrccLogger.traceln("schedule" + scheduler.getSchedule());
+				superActor = new ActorMergerSDF(scheduler, copier)
 					.doSwitch(subNetwork);
-
+			} else {
+				superActor = dfFactory.createActor();
+				SuperactorParser superactorParser = new SuperactorParser(subNetwork, superActor);
+				superactorParser.parse(definitionFile);
+				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile,
+						superactorParser.getScheduleList(), superactorParser.getGuardList());
+				actorMerger.createMergedActor(superActor, superactorParser.getFSM());
+			}
 			// update the main network
 			network.add(superActor);
 

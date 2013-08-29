@@ -32,21 +32,25 @@ package net.sf.orcc.backends.promela.transform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.tools.classifier.ActorState;
 import net.sf.orcc.tools.classifier.GuardSatChecker;
 
 /**
@@ -57,6 +61,8 @@ import net.sf.orcc.tools.classifier.GuardSatChecker;
  */
 
 public class PromelaSchedulabilityTest extends DfVisitor<Void> {
+	
+	private Scheduler scheduler;
 
 	private Set<Port> schedulingPorts;
 
@@ -65,8 +71,6 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	private Set<Transition> transitionsInCycle = new HashSet<Transition>();
 
 	private NetworkStateDefExtractor netStateDef;
-
-	private Map<Var, Action> localVarToAction = new HashMap<Var, Action>();
 
 	private Set<State> choiceStatesSet = new HashSet<State>();
 
@@ -81,37 +85,19 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	private Map<Var, Port> inputVarToPortMap = new HashMap<Var, Port>();
 
 	private FSM fsm;
-
+	
+	private Action action;
+	
 	public PromelaSchedulabilityTest(NetworkStateDefExtractor netStateDef) {
 		super();
 		this.netStateDef = netStateDef;
 		this.schedulingPorts = netStateDef.getPortsUsedInScheduling();
+		this.irVisitor = new InnerIrVisitor();
 	}
 
 	@Override
 	public Void caseAction(Action action) {
-		// identify the control output ports set by this action
-		Set<Port> controlOutputs = new HashSet<Port>();
-		for (Port port : action.getOutputPattern().getPorts()) {
-			if (schedulingPorts.contains(port)) {
-				controlOutputs.add(port);
-			}
-		}
-		// check how the control output is generated
-		for (Port port : controlOutputs) {
-			Var var = action.getOutputPattern().getVariable(port);
-			Set<Var> tc = new HashSet<Var>();
-			netStateDef.getTransitiveClosure(var, tc, true);
-			// depends on ??
-		}
-		//
-		for (Var var : action.getBody().getLocals()) {
-			if (netStateDef.getVarsUsedInScheduling().contains(var)) {
-				Set<Var> tc = new HashSet<Var>();
-				netStateDef.getTransitiveClosure(var, tc, true);
-				localVarToAction.put(var, action);
-			}
-		}
+		this.action = action;
 		// how is this action scheduled
 		Set<Var> guardVars = new HashSet<Var>();
 		actionGuardVarMap.put(action, guardVars);
@@ -125,29 +111,18 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				}
 			}
 		}
+		doSwitch(action.getBody());
 		return null;
 	}
 
 	@Override
-	public Void caseInstance(Instance instance) {
-		System.out.println("\n" + instance.getActor().getName());
-		this.actor = instance.getActor();
-		this.fsm = instance.getActor().getFsm();
-		if (fsm == null) {
-			return null;
-		}
-		// find states where actions are input dependent + initial state
-		choiceStatesSet.add(fsm.getInitialState());
-		for (State state : fsm.getStates()) {
-			for (Action action : fsm.getTargetActions(state)) {
-				if (!action.getPeekPattern().getPorts().isEmpty()) {
-					choiceStatesSet.add(state);
-					peekPorts.addAll(action.getPeekPattern().getPorts());
-				}
-			}
-		}
+	public Void caseActor(Actor actor) {
+		System.out.println("\n Actor:" + actor.getName());
+		this.actor=actor;
+		this.fsm = actor.getFsm();
+		this.scheduler = new Scheduler(actor, this.fsm);
 		// find variables corresponding to input ports
-		for (Action action : instance.getActor().getActions()) {
+		for (Action action : actor.getActions()) {
 			inputPortVars.addAll(action.getInputPattern().getVariables());
 			for (Var var : action.getInputPattern().getVariables()) {
 				inputVarToPortMap.put(var, action.getInputPattern()
@@ -155,90 +130,248 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 			}
 		}
 		// how does actions affect scheduling
-		for (Action action : instance.getActor().getActions()) {
+		for (Action action : actor.getActions()) {
 			doSwitch(action);
 		}
-		// step through FSM, which transitions belong to cycles
-		for (State state : choiceStatesSet) {
-			fsmCycleSearch(state);
-		}
-		// check for nondeterministic cycles in the fsm
-		for (State state : instance.getActor().getFsm().getStates()) {
-			fsmFindInputdepCycles(state);
-		}
-		// check the scenarios
-		for (State state : choiceStatesSet) {
-			fsmScenarioSearch(state);
-		}
-		if (instance.getActor().hasFsm()
-				&& !instance.getActor().getActionsOutsideFsm().isEmpty()) {
-			System.out.println(" == Actor has actions outside FSM:");
-
-			for (Action action : instance.getActor().getActionsOutsideFsm()) {
-				if (!action.getInputPattern().isEmpty()) {
-					System.out.println("Input on port;"
-							+ action.getInputPattern());
-				}
-				if (!action.getOutputPattern().isEmpty()) {
-					System.out.println("Output on port;"
-							+ action.getOutputPattern());
-				}
-				if (!action.getPeekPattern().isEmpty()) {
-					System.out.println("Peek on port;"
-							+ action.getPeekPattern());
+		((InnerIrVisitor)this.irVisitor).resolveDeps();
+		if (fsm != null) {
+			// find states where actions are input dependent + initial state
+			choiceStatesSet.add(fsm.getInitialState());
+			for (State state : fsm.getStates()) {
+				identifyChoiceStates(state);
+				for (Action action : fsm.getTargetActions(state)) {
+					if (!action.getPeekPattern().getPorts().isEmpty()) {
+						peekPorts.addAll(action.getPeekPattern().getPorts());
+						choiceStatesSet.add(state);
+					}
 				}
 			}
+			// check for nondeterministic cycles in the fsm
+			for (State state : actor.getFsm().getStates()) {
+				fsmFindInputdepCycles(state);
+			}
+			if (!actor.getActionsOutsideFsm().isEmpty()) {
+				System.out.println(" == Actor has actions outside FSM:");
+
+				for (Action action : actor.getActionsOutsideFsm()) {
+					if (!action.getInputPattern().isEmpty()) {
+						System.out.println("Input on port;"
+								+ action.getInputPattern());
+					}
+					if (!action.getOutputPattern().isEmpty()) {
+						System.out.println("Output on port;"
+								+ action.getOutputPattern());
+					}
+					if (!action.getPeekPattern().isEmpty()) {
+						System.out.println("Peek on port;"
+								+ action.getPeekPattern());
+					}
+				}
+			}
+
+		} else {
+			scheduler.addSchedule(new Schedule());
 		}
+		
+		
+		boolean stopChecking;
+		boolean nullGuardFound;
+		do {
+			if (fsm != null) {
+				scheduler.getSchedules().clear();
+				for (State state : choiceStatesSet) {
+					fsmPathSearch(state);
+				}
+			}
+			if (actor.hasMoC() && actor.getMoC().isDPN()) {
+				// this is time-dependent, stop the show
+				System.out.println("Actor " + actor.getSimpleName() + " is time-dependent, we skip it for now..");
+				scheduler.makeDummyFSM();
+				break;
+			}
+			stopChecking = false;
+			nullGuardFound = false;
+			scheduler.buildSchedulingCases();
+			
+			// Abstract interpretation Start----------------------------------------
+		
+			INTERP: for (List<Schedule> sl : scheduler.getScheduleCases()) {
+				PromelaAbstractInterpreter interpreter = new PromelaAbstractInterpreter(actor);
+				ActorState actorstate = new ActorState(interpreter.getActor());
+
+				final int MAX_PHASES = 1024;
+				//State initialState = interpreter.getFsmState();
+				for (int index = 0; index < sl.size(); index++) {
+					Schedule schedule = sl.get(index);
+					int nbPhases = 0;
+					try {
+						if (schedule.getEnablingAction() != null) {
+							interpreter.setNextPath(schedule.getEnablingAction());
+						}
+						do {
+							interpreter.schedule();
+							Action latest = interpreter.getExecutedAction();
+							if (index==sl.size()-1) {
+								schedule.getSequence().add(latest);
+							}
+							nbPhases++;
+						} while (((actor.hasFsm() && interpreter.getFsmStateOrig() != schedule.getEndState()) 
+								|| (!actor.hasFsm() && !actorstate.isInitialState())) 
+								&& nbPhases < MAX_PHASES);
+						if (!actor.hasFsm() && nbPhases == MAX_PHASES) {
+							scheduler.makeDummyFSM();
+							stopChecking=true;
+						}
+					}catch (OrccRuntimeException e){ //should only happen on native calls
+						if (actor.hasFsm()) {
+							choiceStatesSet.add(interpreter.getFsmStateOrig());
+							nullGuardFound=true;
+						} else {
+							scheduler.makeDummyFSM();
+							stopChecking=true;
+						}
+						break INTERP;
+					}
+				}
+			}
+		
+		// Abstract interpretation End----------------------------------------
+			if (!stopChecking && !nullGuardFound) {
+				stopChecking = areSchedulesComplete();
+			}
+		} while (!stopChecking);
+		
+		for (Schedule s : scheduler.getSchedules()) {
+			generateScheduleInfo(s);
+		}
+		
 		return null;
 	}
-
-	private void findPeekValues(State state, Action targetAction) {
-		List<Action> previous = new ArrayList<Action>();
-		List<Port> peekPorts = new ArrayList<Port>();
-		for (Action action : fsm.getTargetActions(state)) {
-			for (Port port : action.getPeekPattern().getPorts()) {
-				if (!peekPorts.contains(port)) {
-					peekPorts.add(port);
+	
+	private boolean areSchedulesComplete() {
+		// does the schedule itself reset the variables before it is used?
+		boolean allResolved = true;
+		for (Schedule schedule : scheduler.getSchedules()) {
+			for (State state : schedule.getPotentialChoiseStates()) {
+				Set<Var> guardFull = new HashSet<Var>();
+				Set<Var> guardDirect = new HashSet<Var>();
+				Set<Action> cActions = new HashSet<Action>();
+				// The set of variables that can have an impact on the guards on this state
+				for (Edge edge : state.getOutgoing()) {
+					cActions.add(((Transition)edge).getAction());
+					guardFull.addAll(actionGuardVarMap.get(((Transition)edge).getAction()));
+					guardDirect.addAll(actionGuardVarMap.get(((Transition)edge).getAction()));
+					Set<Var> temp = new HashSet<Var>();
+					for (Var g : guardFull) {
+						netStateDef.getTransitiveClosure(g, temp, true);
+					}
+					guardFull.addAll(temp);
+				}
+				removeLocalAndConstantVars(guardFull);
+				Set<Var> unresolvedVars = new HashSet<Var>(guardFull);
+				Set<Var> resolvedVars = new HashSet<Var>();
+				for (Action action : schedule.getSequence()) {
+					if (cActions.contains(action)) {break;}
+					for (Var gVar : guardFull) {
+						if (scheduler.getSchedVarReset().containsKey(gVar) 
+								&& scheduler.getSchedVarReset().get(gVar).contains(action)) {
+							unresolvedVars.remove(gVar);
+							resolvedVars.add(gVar);
+						}
+						// if the variable is updated from a var that is dirty, this variable is also dirty
+						if (scheduler.getSchedVarUpdate().containsKey(gVar)
+								&& scheduler.getSchedVarUpdate().get(gVar).contains(action)
+								&& resolvedVars.contains(gVar)){
+							Set<Var> temp = scheduler.getLocalVarDep(action, gVar);
+							for (Var depOn : temp) {
+								if (unresolvedVars.contains(depOn)) {
+									resolvedVars.remove(gVar);
+									unresolvedVars.add(gVar);
+								}
+							}
+						}
+					}
+				}
+				// now remove the scheduling vars not directly used in the guard
+				Iterator<Var> iter = unresolvedVars.iterator();
+				while (iter.hasNext()) {
+					if (!guardDirect.contains(iter.next())) {
+						iter.remove();
+					}
+				}
+				if (unresolvedVars.isEmpty()) {
+					schedule.getPotentialChoiseStates().remove(state);
 				}
 			}
+			if (!schedule.getPotentialChoiseStates().isEmpty()) {
+				choiceStatesSet.addAll(schedule.getPotentialChoiseStates());
+				allResolved=false;
+			} 
+		}
+		return allResolved;
+	}
+	
+
+	private Map<String, Object> findPeekValues(State state, Action targetAction) {
+		List<Action> previous = new ArrayList<Action>();
+		Set<Port> peekPorts = new HashSet<Port>();
+		for (Schedule schedule : scheduler.getSchedulesStartingAt(state)) {
+			Action action = schedule.getSequence().get(0);//only first actions of a schedule
+			peekPorts.addAll(action.getPeekPattern().getPorts());
 		}
 		if (peekPorts.isEmpty()) {
-			return;
+			return new HashMap<String, Object>();
 		}
+		Map<String, Object> configuration = null;
 		for (Action action : fsm.getTargetActions(state)) {
 			if (action == targetAction) {
 				GuardSatChecker checker = new GuardSatChecker(actor);
-				Map<String, Object> configuration = null;
 				try {
-					configuration = checker.computeTokenValues(peekPorts,
+					configuration = checker.computeTokenValues(new ArrayList<Port>(peekPorts),
 							previous, targetAction);
 				} catch (OrccRuntimeException e) {
 					System.out.println(e.getMessage());
 				}
-				System.out.println("Peek value: " + configuration);
 				break;
 			} else {
 				previous.add(action);
 			}
 		}
-		return;
+		return configuration;
 	}
 
-	private void fsmCycleSearch(State state) {
+	private Schedule currentSchedule = null;
+	
+	/**
+	 *  Identifies paths between input dependent states
+	 * @param state
+	 */
+	private void fsmPathSearch(State state) {
 		visitedStatesList.add(state);
 		for (Edge edge : state.getOutgoing()) {
 			Transition transition = (Transition) edge;
 			transitionSequenceList.add(transition);
-			// also visit the successor states
+			if (choiceStatesSet.contains(state)) {
+				currentSchedule = new Schedule(state, transition.getAction());
+				scheduler.addSchedule(currentSchedule);
+			} else if (state.getOutgoing().size() > 1) {
+				currentSchedule.addPotentialChoiseState(state);
+			}
+			// check successor states
 			State target = transition.getTarget();
 			if (choiceStatesSet.contains(target)) {
+				// this is not a cycle as it ends the current schedule
+				currentSchedule.setEndState(target);
+				currentSchedule.incNrLeaves();
+				
 			} else if (visitedStatesList.contains(target)) {
+				// non-input dependent cycle inside schedule
 				for (int i = visitedStatesList.indexOf(target); i < visitedStatesList
 						.size(); i++) {
 					transitionsInCycle.add(transitionSequenceList.get(i));
 				}
 			} else {
-				fsmCycleSearch(target);
+				fsmPathSearch(target);
 			}
 			transitionSequenceList.remove(transition);
 		}
@@ -246,6 +379,18 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		return;
 	}
 
+	private void identifyChoiceStates(State state) {
+		for (Edge edge : state.getOutgoing()) {
+			Transition transition = (Transition) edge;
+			for (Var var : actionGuardVarMap.get(transition.getAction())) {
+				if (hasInputDep(var, true)) {
+					choiceStatesSet.add(state);
+					return;
+				}
+			}
+		}
+	}
+	
 	private void fsmFindInputdepCycles(State state) {
 		boolean inputDep = false;
 		boolean cycle = false;
@@ -263,7 +408,6 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					inputPorts.addAll(getInputDep(var, true));
 				}
 			}
-
 		}
 		if (inputDep && cycle && choice) {
 			System.out.println("State: " + state.getName()
@@ -271,100 +415,72 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					+ inputPorts);
 		}
 	}
+	
 
-	private void fsmScenarioSearch(State state) {
-		boolean choiceState = choiceStatesSet.contains(state);
-		boolean hasVarLoop = false;
-		// boolean hasChoice = (state.getOutgoing().size() > 1) ? true : false;
-		boolean hasInputDep = false;
-		boolean hasIIR = false;
-		// boolean hasControlOutput = false;
-		for (Edge edge : state.getOutgoing()) {
-			Transition transition = (Transition) edge;
-			for (Var var : actionGuardVarMap.get(transition.getAction())) {
-				hasVarLoop = hasVarLoop(var) || hasVarLoop;
-				hasInputDep = hasInputDep(var, true) || hasInputDep;
-				hasIIR = hasVarLoop(var) && hasInputDep(var, true) || hasIIR;
+	
+
+	private void generateScheduleInfo(Schedule schedule) {
+		State initState=schedule.getInitState();
+		Map<String, List<Object>> portPeeks = schedule.getPortPeeks();
+		Map<String, List<Object>> portReads = schedule.getPortReads();
+		Map<String, List<Object>> portWrites = schedule.getPortWrites();
+		
+		Map<String, Object> configuration = findPeekValues(initState, schedule.getEnablingAction());
+		for (String key : configuration.keySet()) {
+			if (!portPeeks.containsKey(key)) {
+				portPeeks.put(key, new ArrayList<Object>());
 			}
-			if (choiceState) {
-				System.out.println("Scenario starting at state "
-						+ state.getName() + " with action "
-						+ transition.getAction().getName());
-			}
-			// System.out.println("State has choice " + hasChoice);
-			// System.out.println("Transition in cycle " +
-			// transitionsInCycle.contains(transition));
-			// System.out.println("Var Loop: " + hasVarLoop);
-			// System.out.println("Indirect input dep: " + hasInputDep);
-			// System.out.println("IIR: " + hasIIR);
-			// Follow what happens on PEEK Ports
-			for (Port port : transition.getAction().getInputPattern().getPorts()) {
+			portPeeks.get(key).add(configuration.get(key));
+		}
+		for (Action action : schedule.getSequence()) {
+			for (Port port : action.getInputPattern().getPorts()) {
 				boolean portUsed = netStateDef.getVarsUsedInScheduling()
-						.contains(
-								transition.getAction().getInputPattern()
-										.getVariable(port));
+						.contains(action.getInputPattern().getVariable(port));
 				if (peekPorts.contains(port)) {
-					System.out.print(" -> Reads control port: "
-							+ port.getName());
-					if (getPeeksOfState(state).contains(port)) {
+					if (getPeeksOfState(initState).contains(port)) {
 						System.out.print(" (peeked value, ");
-						System.out.print("only relevant for the guard: "
-								+ !portUsed + ") ");
+						System.out.print("only relevant for the guard: "+ !portUsed + ") ");
 					} else {
-						System.out
-								.print(" (not peek value, value used in scheduling: "
-										+ portUsed + ")");
+						System.out.print(" (not peek value, value used in scheduling: "+ portUsed + ")");
 					}
-					if (transitionsInCycle.contains(transition)) {
-						System.out.print("(X-times)");
-					}
-					findPeekValues(state, transition.getAction());
 					System.out.print("\n");
 				}
+				if (!portReads.containsKey(port.getName())) {
+					portReads.put(port.getName(), new ArrayList<Object>());
+				}
+				portReads.get(port.getName()).add(new Integer(0));
 			}
-			// Control tokens generation
-			for (Port port : transition.getAction().getOutputPattern()
-					.getPorts()) {
+		}
+		System.out.println("Schedule input: "+portReads);
+		System.out.print("\n");
+		// Control tokens generation
+		for (Action action : schedule.getSequence()) {
+			for (Port port : action.getOutputPattern().getPorts()) {
 				if (schedulingPorts.contains(port)) {
 					// hasControlOutput = true;
 					System.out.print(" -> Writes to control port: "
-							+ port.getName());
+						+ port.getName());
 					// how is it generated?
-					Var var = transition.getAction().getOutputPattern()
-							.getVariable(port);
+					Var var = action.getOutputPattern().getVariable(port);
 					System.out.print(", scenario specific constant: "
-							+ !(hasVarLoop(var) || hasInputDep(var, true)));
+						+ !(hasVarLoop(var) || hasInputDep(var, true)));
 					// System.out.print(", loop " + hasVarLoop(var));
 					if (hasInputDep(var, true)) {
 						System.out.print(", depends on input (through if:"
-								+ !hasInputDep(var, false) + ")");
+							+ !hasInputDep(var, false) + ")");
 					}
 					// System.out.print(", iir " + (hasVarLoop(var) &&
 					// hasInputDep(var, true)));
 					System.out.print("\n");
 				}
-			}
-			// System.out.println("Has control output " + hasControlOutput);
-			// also visit the successor states
-			State target = transition.getTarget();
-			if (choiceStatesSet.contains(target)) {
-				// System.out.println("Reached end of branch");
-				continue;
-			}
-			if (visitedStatesList.contains(target)) {
-				// System.out.println("Repetition branch detected");
-				continue;
-			}
-			visitedStatesList.add(state);
-			fsmScenarioSearch(target);
-
-			if (choiceStatesSet.contains(state)) {
-				visitedStatesList.clear(); // each scenario separately
-				System.out.println("");
+				if (!portWrites.containsKey(port.getName())) {
+					portWrites.put(port.getName(), new ArrayList<Object>());
+				}
+				portWrites.get(port.getName()).add(new Integer(0));
 			}
 		}
-		visitedStatesList.remove(state); // only keep track of predecessors
-		return;
+		System.out.println("Schedule output: "+portWrites);
+		System.out.print("\n");
 	}
 
 	Set<Port> getInputDep(Var var, boolean includeIfCond) {
@@ -403,5 +519,94 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	boolean hasVarLoop(Var var) {
 		return netStateDef.hasLoop(var);
 	}
-
+	
+	boolean isBasedOnConstants(Var var) {
+		Set<Var> tc = new HashSet<Var>();
+		netStateDef.getTransitiveClosure(var, tc, true);
+		for (Var v : tc) {
+			if (v.isLocal()) {
+				continue;
+			} else
+			if (netStateDef.getVariableDependency().containsKey(v)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	void removeLocalAndConstantVars(Set<Var> varSet) {
+		Iterator<Var> i = varSet.iterator();
+		while (i.hasNext()) {
+			Var v = i.next();
+			if (v.isLocal() || !v.isAssignable()) {
+				i.remove();
+			}
+		}
+	}
+	
+	private class InnerIrVisitor extends AbstractIrVisitor<Void> {
+		
+		private Map<InstStore, Var> instToVarMap = new HashMap<InstStore,Var>();
+		
+		private Map<InstStore, Action> instToActionMap = new HashMap<InstStore, Action>();
+		
+		private Map<InstStore, List<Var>> instToLocalsMap = new HashMap<InstStore, List<Var>>();
+		
+		public InnerIrVisitor() {
+			super(false); //only expressions of store
+		}
+		private List<Var> localVars;
+		
+		@Override
+		public Void caseInstStore(InstStore store) {
+			if (!netStateDef.getVarsUsedInScheduling().contains(store.getTarget().getVariable())) {
+				return null;
+			}
+			instToVarMap.put(store, store.getTarget().getVariable());
+			instToActionMap.put(store, action);
+			localVars = new ArrayList<Var>();
+			instToLocalsMap.put(store, localVars);
+			doSwitch(store.getValue());
+			return null;
+		}
+		
+		@Override
+		public Void caseExprVar(ExprVar var) {
+			localVars.add(var.getUse().getVariable());
+			return null;
+		}
+		
+		public void resolveDeps() {
+			for (InstStore inst : instToLocalsMap.keySet()) {
+				boolean hasLoop = false;
+				boolean isConstant = true;
+				Set<Var> localDep = new HashSet<Var>();
+				for (Var local : instToLocalsMap.get(inst)) {
+					if (hasVarLoop(local)) {
+						hasLoop = true;
+					}
+					if (!isBasedOnConstants(local)){
+						isConstant = false;
+					}
+					netStateDef.getActionLocalTransitiveClosure(local, localDep);
+				}
+				if (hasLoop) {
+					scheduler.addvarUpdate(inst.getTarget().getVariable(), instToActionMap.get(inst));
+				} 
+				if (isConstant) {
+					scheduler.addvarReset(inst.getTarget().getVariable(), instToActionMap.get(inst));
+				}
+				if (!hasLoop && !isConstant) {
+					//System.out.println("Found a scheduling variable which is updated through a action sequence, for now consider it is a pure update");
+					scheduler.addvarUpdate(inst.getTarget().getVariable(), instToActionMap.get(inst));
+				}
+				removeLocalAndConstantVars(localDep);
+				scheduler.addLocalVarDep(instToActionMap.get(inst), inst.getTarget().getVariable(), localDep);
+			}
+		}
+	}
+	
+	public Scheduler getScheduler() {
+		return scheduler;
+	}
 }

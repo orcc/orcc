@@ -8,7 +8,6 @@ import java.util.Set;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
@@ -27,14 +26,12 @@ public class PromelaSchedulingModel {
 
 	
 	
-	@SuppressWarnings("deprecation")
 	public PromelaSchedulingModel(Network network) {
-		for (Instance i : network.getInstances()) {
-			Actor a = i.getActor();
+		for (Actor a : network.getAllActors()) {
 			ActorModel am = new ActorModel(a);
 			actorModels.add(am);
 			actorToModelMap.put(a, am);
-			for (Edge e : i.getIncoming()) {
+			for (Edge e : a.getIncoming()) {
 				Connection c = (Connection)e;
 				LinkModel lm;
 				if (!connectiontoModelMap.containsKey(c)) {
@@ -46,7 +43,7 @@ public class PromelaSchedulingModel {
 				am.addInLink(lm, c.getTargetPort());
 				lm.setTarget(am);
 			}
-			for (Edge e : i.getOutgoing()) {
+			for (Edge e : a.getOutgoing()) {
 				Connection c = (Connection)e;
 				LinkModel lm;
 				if (!connectiontoModelMap.containsKey(c)) {
