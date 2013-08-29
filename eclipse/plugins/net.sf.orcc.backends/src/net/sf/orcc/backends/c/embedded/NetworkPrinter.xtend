@@ -35,10 +35,9 @@ import net.sf.orcc.df.Argument
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
-import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
-import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate network as graphml file
@@ -184,24 +183,14 @@ class NetworkPrinter extends CTemplate {
 				«ENDFOR»
 			«ENDIF»
 		</node>
-		«FOR stateVar : instance.actor.stateVars»
-			«stateVar.printStateVar(instance)»
-		«ENDFOR»
-	'''
-
-	def private printStateVar(Var stateVar, Instance instance) '''
-		<edge source="«instance.name»" sourceport="«stateVar.name»_o" target="«instance.name»" targetport="«stateVar.name»_i">
-		    «IF stateVar.type.dimensionsExpr.empty»
-		    	<data key="edge_prod">1</data>
-		    	<data key="edge_delay">1</data>
-		    	<data key="edge_cons">1</data>
-		    «ELSE»
-		    	<data key="edge_prod">«stateVar.type.dimensions.head»</data>
-		    	<data key="edge_delay">«stateVar.type.dimensions.head»</data>
-		    	<data key="edge_cons">«stateVar.type.dimensions.head»</data>
-		    «ENDIF»
-		    <data key="data_type">«stateVar.type.doSwitch»</data>
-		</edge>
+		«IF !instance.actor.stateVars.empty»
+			<edge source="«instance.name»" sourceport="stateVars_o" target="«instance.name»" targetport="stateVars_i">
+				<data key="edge_prod">1</data>
+				<data key="edge_delay">1</data>
+				<data key="edge_cons">1</data>
+			    <data key="data_type">struct StateVars *</data>
+			</edge>
+		«ENDIF»
 	'''
 
 	def private print(Argument argument) '''
