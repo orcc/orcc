@@ -90,6 +90,10 @@ class ActorPrinter extends InstancePrinter {
 			typedef unsigned long u32;
 			typedef unsigned long long u64;
 
+			«IF ! actor.stateVars.empty»
+				«printStateVarsStruct»
+			«ENDIF»
+
 			«IF ! actor.initializes.empty»
 				«printInterface(actor.initializes.head, "init")»
 			«ENDIF»
@@ -116,6 +120,12 @@ class ActorPrinter extends InstancePrinter {
 		#include "orcc_types.h"
 
 		«IF ! actor.procs.filter[! native].empty»
+			«IF ! actor.stateVars.empty»
+				////////////////////////////////////////////////////////////////////////////////
+				// State variables structure
+				«printStateVarsStruct»
+			«ENDIF»
+
 			////////////////////////////////////////////////////////////////////////////////
 			// Functions / procedures
 			«FOR procedure : actor.procs.filter[! native]»
@@ -132,7 +142,7 @@ class ActorPrinter extends InstancePrinter {
 
 					«IF ! actor.stateVars.empty»
 						«FOR stateVar : actor.stateVars»
-							«stateVar.type.doSwitch» «stateVar.name» = *«stateVar.name»_o;
+							«stateVar.type.doSwitch» «stateVar.name» = stateVars_o->«stateVar.name»;
 						«ENDFOR»
 					«ENDIF»
 
@@ -164,27 +174,41 @@ class ActorPrinter extends InstancePrinter {
 		«ENDIF»
 	'''
 
+	def private printStateVarsStruct() '''
+		struct StateVars {
+			«FOR stateVar : actor.stateVars»
+				«stateVar.type.doSwitch» «stateVar.name»;
+			«ENDFOR»
+		}
+	'''
+
 	def private printParameters(Action action) {
-		val elements = actor.parameters.map['''«declare»''']
+		var elements = actor.parameters.map['''«declare»''']
 					 + action.inputPattern.ports.map['''«type.doSwitch» *«name»''']
 					 + action.outputPattern.ports.map['''«type.doSwitch» *«name»''']
-					 + actor.stateVars.map['''«type.doSwitch» *«name»_i, «type.doSwitch» *«name»_o''']
+		if(!actor.stateVars.empty) {
+			elements = elements + newArrayList("struct StateVars *stateVars_i", "struct StateVars *stateVars_o")
+		}
 		return elements.filter[ ! empty].join(", ")
 	}
 
 	def private printIDLParameters(Action action) {
-		val elements = actor.parameters.map['''in parameter «name»''']
+		var elements = actor.parameters.map['''in parameter «name»''']
 					 + action.inputPattern.ports.map['''in «type.doSwitch» «name»''']
 					 + action.outputPattern.ports.map['''out «type.doSwitch» «name»''']
-					 + actor.stateVars.map['''in «type.doSwitch» «name»_i, out «type.doSwitch» «name»_o''']
+		if(!actor.stateVars.empty) {
+			elements = elements + newArrayList("in struct StateVars *stateVars_i", "out struct StateVars *stateVars_o")
+		}
 		return elements.filter[ ! empty].join(", ")
 	}
 
 	def private printParameters(Procedure procedure) {
-		// TODO : if(actor.params.get(i).port) : print '*' before «name»
-		val elements = actor.parameters.map['''«type.doSwitch» «name»''']
+		// TODO: if(actor.params.get(i).port) : print '*' before «name»
+		var elements = actor.parameters.map['''«type.doSwitch» «name»''']
 					 + procedure.parameters.map['''«variable.declare»''']
-					 + actor.stateVars.map['''«type.doSwitch» *«name»_o''']
+		if(!actor.stateVars.empty) {
+			elements = elements + newArrayList("struct StateVars *stateVars_o")
+		}
 		return elements.filter[ ! empty].join(", ")
 	}
 
@@ -200,9 +224,9 @@ class ActorPrinter extends InstancePrinter {
 				// Initialize stateVars and work on them
 				«FOR stateVar : actor.stateVars»
 					«IF stateVar.type.dimensionsExpr.empty»
-						«stateVar.declare» = *«stateVar.name»_i;
+						«stateVar.declare» = stateVars_i->«stateVar.name»;
 					«ELSE»
-						«stateVar.type.doSwitch» *«stateVar.name» = «stateVar.name»_i;
+						«stateVar.type.doSwitch» *«stateVar.name» = stateVars_i->«stateVar.name»;
 					«ENDIF»
 				«ENDFOR»
 			«ENDIF»
@@ -218,10 +242,10 @@ class ActorPrinter extends InstancePrinter {
 			// Write state Var to output buf
 			«FOR stateVar : actor.stateVars»
 				«IF stateVar.type.dimensionsExpr.empty»
-					*«stateVar.name»_o = «stateVar.name»;
+					stateVars_o->«stateVar.name» = «stateVar.name»;
 				«ELSE»
 					// Copy «stateVar.name» to output buffer
-					memcpy(«stateVar.name»_o,«stateVar.name», «stateVar.type.dimensions.head»);
+					memcpy(stateVars_o->«stateVar.name», «stateVar.name», «stateVar.type.dimensions.head»);
 				«ENDIF»
 			«ENDFOR» 
 		«ENDIF»
