@@ -337,6 +337,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				previous.add(action);
 			}
 		}
+		if (configuration==null) { //in case the solver was not available
+			configuration=new HashMap<String, Object>();
+		}
 		return configuration;
 	}
 
