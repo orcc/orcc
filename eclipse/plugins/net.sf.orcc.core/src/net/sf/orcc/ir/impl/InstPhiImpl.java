@@ -263,11 +263,6 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 		return true;
 	}
 
-	@Override
-	public boolean isPhi() {
-		return true;
-	}
-
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

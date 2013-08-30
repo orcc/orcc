@@ -67,22 +67,6 @@ public interface Instruction extends Attributable {
 	 * 
 	 * @return <code>true</code> if the instruction is an Assign
 	 */
-	@Deprecated
-	boolean isAssign();
-
-	/**
-	 * Returns <code>true</code> if the instruction is a Call.
-	 * 
-	 * @return <code>true</code> if the instruction is a Call
-	 */
-	@Deprecated
-	boolean isCall();
-
-	/**
-	 * Returns <code>true</code> if the instruction is an Assign.
-	 * 
-	 * @return <code>true</code> if the instruction is an Assign
-	 */
 	boolean isInstAssign();
 
 	/**
@@ -126,38 +110,6 @@ public interface Instruction extends Attributable {
 	 * @return <code>true</code> if the instruction is a Store
 	 */
 	boolean isInstStore();
-
-	/**
-	 * Returns <code>true</code> if the instruction is a Load.
-	 * 
-	 * @return <code>true</code> if the instruction is a Load
-	 */
-	@Deprecated
-	boolean isLoad();
-
-	/**
-	 * Returns <code>true</code> if the instruction is a Phi.
-	 * 
-	 * @return <code>true</code> if the instruction is a Phi
-	 */
-	@Deprecated
-	boolean isPhi();
-
-	/**
-	 * Returns <code>true</code> if the instruction is a Return.
-	 * 
-	 * @return <code>true</code> if the instruction is a Return
-	 */
-	@Deprecated
-	boolean isReturn();
-
-	/**
-	 * Returns <code>true</code> if the instruction is a Store.
-	 * 
-	 * @return <code>true</code> if the instruction is a Store
-	 */
-	@Deprecated
-	boolean isStore();
 
 	/**
 	 * Sets the line number of this instruction.

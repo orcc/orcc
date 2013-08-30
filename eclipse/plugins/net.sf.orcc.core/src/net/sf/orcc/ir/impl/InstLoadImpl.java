@@ -276,11 +276,6 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 		return false;
 	}
 
-	@Override
-	public boolean isLoad() {
-		return true;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

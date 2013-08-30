@@ -125,6 +125,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		public Void caseInstCall(InstCall call) {
 			if (call.hasResult()) {
 				addTargetVar(call.getTarget().getVariable());
+				if (call.getProcedure().isNative()) {varsFromNativeProcedures.add(call.getTarget().getVariable());}
 			}
 			return super.caseInstCall(call);
 		}
@@ -169,6 +170,10 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 
 	private Map<Port, Port> fifoTargetToSourceMap = new HashMap<Port, Port>();
 
+	public Set<Var> getVarsFromNativeProcedures() {
+		return varsFromNativeProcedures;
+	}
+
 	private boolean inIfCondition = false;
 
 	private boolean inWhileCondition = false;
@@ -193,6 +198,8 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 
 	private Set<Var> varsUsedInScheduling = new HashSet<Var>();
 
+	private Set<Var> varsFromNativeProcedures = new HashSet<Var>();
+	
 	private Set<Var> visited = new HashSet<Var>();
 
 	private PromelaSchedulingModel schedulingModel;
@@ -287,7 +294,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 				}
 			}
 			// for each variable mentioned in a guard, find input ports on which these depend
-			for (Var var : actor.getStateVars()) {
+			for (Var var : varsUsedInScheduling) {
 				visited.clear();
 				getTransitiveClosure(var, visited, true);
 				for (Var v : visited) {
@@ -313,7 +320,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 
 	@Override
 	public Void casePattern(Pattern pattern) {
-		// Only Peek patterns will end up here
+		// Only Peek patterns will end up here, however this is done on visit actor
 		inputPortsUsedInScheduling.addAll(pattern.getPorts());
 		varsUsedInScheduling.addAll(pattern.getVariables());
 		return null;
@@ -333,6 +340,21 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 				if (!transitiveClosure.contains(v)) {
 					transitiveClosure.add(v);
 					getTransitiveClosure(v, transitiveClosure, includeIfConditions);
+				}
+			}
+		}
+	}
+
+	public void getActionLocalTransitiveClosure(Var variable, Set<Var> transitiveClosure) {
+		Map<Var, Set<Var>> varDep = variableDependency;
+		if (varDep.containsKey(variable)) {
+			for (Var v : varDep.get(variable)) {
+				if (!transitiveClosure.contains(v)) {
+					transitiveClosure.add(v);
+					// We stop at global variables
+					if (v.isLocal()) {
+						getActionLocalTransitiveClosure(v, transitiveClosure);
+					}
 				}
 			}
 		}
@@ -367,7 +389,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 	private void identifyControlTokenPorts(Network network) {
 		for (Connection con : network.getConnections()) {
 			fifoTargetToSourceMap.put(con.getTargetPort(), con.getSourcePort());
-		}
+		}System.out.println(inputPortsUsedInScheduling);
 		Set<Port> temp = new HashSet<Port>();
 		while (true) {
 			for (Port port : inputPortsUsedInScheduling) {

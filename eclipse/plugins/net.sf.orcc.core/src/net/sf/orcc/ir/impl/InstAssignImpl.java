@@ -204,11 +204,6 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	}
 
 	@Override
-	public boolean isAssign() {
-		return true;
-	}
-
-	@Override
 	public boolean isInstAssign() {
 		return true;
 	}

@@ -36,12 +36,9 @@ import java.util.Map;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.util.DfSwitch;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
@@ -52,7 +49,6 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -61,7 +57,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.SDFMoC;
 
@@ -76,7 +71,18 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Herve Yviquel
  * 
  */
-public class ActorMergerSDF extends DfSwitch<Actor> {
+
+public class ActorMergerSDF extends ActorMergerBase {
+
+	SASLoopScheduler scheduler;
+
+	private int depth;
+
+	private Map<Port, Port> portsMap = new HashMap<Port, Port>();
+
+	protected Pattern inputPattern;
+
+	protected Pattern outputPattern;
 
 	/**
 	 * This class defines a transformation to update the FIFO accesses.
@@ -224,21 +230,6 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 
 	}
 
-	private static final DfFactory dfFactory = DfFactory.eINSTANCE;
-	private static final IrFactory irFactory = IrFactory.eINSTANCE;
-
-	private Map<Port, Var> buffersMap = new HashMap<Port, Var>();
-	private Copier copier;
-	private int depth;
-
-	private Pattern inputPattern;
-	private Pattern outputPattern;
-
-	private Map<Port, Port> portsMap = new HashMap<Port, Port>();
-
-	private SASLoopScheduler scheduler;
-	private Actor superActor;
-
 	/**
 	 * Creates a new merger for connected SDF actor.
 	 * 
@@ -247,6 +238,7 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 	 * @param copier
 	 *            the associated copier
 	 */
+
 	public ActorMergerSDF(SASLoopScheduler scheduler, Copier copier) {
 		this.scheduler = scheduler;
 		this.copier = copier;
@@ -290,22 +282,8 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 			portsMap.put(connection.getSourcePort(), portCopy);
 		}
 
-		// Move variables and procedures
-		for (Vertex vertex : network.getChildren()) {
-			Actor actor = vertex.getAdapter(Actor.class);
-			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
-				if (!proc.isNative()) {
-					proc.setName(actor.getName() + "_" + proc.getName());
-				}
-				superActor.getProcs().add(proc);
-			}
-			for (Var var : new ArrayList<Var>(actor.getStateVars())) {
-				superActor.addStateVar(var);
-			}
-			for (Var param : new ArrayList<Var>(actor.getParameters())) {
-				superActor.addStateVar(param);
-			}
-		}
+		copyVariables(network);
+		copyProcedures(network);
 
 		// Create the merged action
 		inputPattern = dfFactory.createPattern();
@@ -330,15 +308,22 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 
 		Pattern peekPattern = dfFactory.createPattern();
 
-		Procedure scheduler = irFactory.createProcedure(
+		Procedure isSchedulable = irFactory.createProcedure(
 				"isSchedulable_mergedAction", 0, irFactory.createTypeBool());
-		scheduler.getLast().add(
+		isSchedulable.getLast().add(
 				irFactory.createInstReturn(irFactory.createExprBool(true)));
 
-		Procedure body = createBody();
+		Procedure body = irFactory.createProcedure("mergedAction", 0,
+				irFactory.createTypeVoid());
+		createCounters(body);
+		createBuffers(body, scheduler.getMaxTokens());
+		createLoopCounters(body, scheduler.getDepth());
+		createStaticSchedule(body, (Schedule) scheduler.getSchedule(),
+				body.getBlocks());
+		body.getLast().add(irFactory.createInstReturn());
 
 		Action action = dfFactory.createAction("mergedAction", inputPattern,
-				outputPattern, peekPattern, scheduler, body);
+				outputPattern, peekPattern, isSchedulable, body);
 
 		superActor.getActions().add(action);
 		superActor.getActionsOutsideFsm().add(action);
@@ -346,67 +331,33 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 		return superActor;
 	}
 
-	/**
-	 * Creates the body of the static action.
-	 * 
-	 * @return the body of the static action
-	 */
-	private Procedure createBody() {
-		Procedure body = irFactory.createProcedure("mergedAction", 0,
-				irFactory.createTypeVoid());
+	private void createLoopCounters(Procedure body, int scheduleDepth) {
+		// Add loop counter(s)
+		int i = 0;
+		do { // one loop var is required even if the schedule as a depth of 0
+			body.newTempLocalVariable(irFactory.createTypeInt(32), "idx_" + i);
+			i++;
+		} while (i < scheduleDepth);
+	}
 
+	private void createCounters(Procedure body) {
 		BlockBasic block = body.getLast();
 
 		// Create counters for inputs
 		for (Port port : superActor.getInputs()) {
 			Var readIdx = body.newTempLocalVariable(
 					irFactory.createTypeInt(32), port.getName() + "_r");
-			block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
+			block.add(irFactory.createInstAssign(readIdx,
+					irFactory.createExprInt(0)));
 		}
 
 		// Create counters for outputs
 		for (Port port : superActor.getOutputs()) {
 			Var writeIdx = body.newTempLocalVariable(
 					irFactory.createTypeInt(32), port.getName() + "_w");
-			block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
+			block.add(irFactory.createInstAssign(writeIdx,
+					irFactory.createExprInt(0)));
 		}
-
-		int index = 0;
-		// Create buffers and counters for inner connections
-		for (Connection conn : scheduler.getMaxTokens().keySet()) {
-			String name = "buffer_" + index++;
-
-			// create inner buffer
-			int size = scheduler.getMaxTokens().get(conn);
-			Type eltType = conn.getSourcePort().getType();
-			Type type = irFactory.createTypeList(size, eltType);
-			Var buffer = body.newTempLocalVariable(type, name);
-
-			// create write counter
-			Var writeIdx = body.newTempLocalVariable(
-					irFactory.createTypeInt(32), name + "_w");
-			block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
-
-			// create read counter
-			Var readIdx = body.newTempLocalVariable(
-					irFactory.createTypeInt(32), name + "_r");
-			block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
-
-			buffersMap.put(conn.getSourcePort(), buffer);
-			buffersMap.put(conn.getTargetPort(), buffer);
-		}
-
-		// Add loop counter(s)
-		int i = 0;
-		do { // one loop var is required even if the schedule as a depth of 0
-			body.newTempLocalVariable(irFactory.createTypeInt(32), "idx_" + i);
-			i++;
-		} while (i < scheduler.getDepth());
-
-		createStaticSchedule(body, scheduler.getSchedule(), body.getBlocks());
-		body.getLast().add(irFactory.createInstReturn());
-
-		return body;
 	}
 
 	/**
@@ -422,23 +373,16 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 	private void createStaticSchedule(Procedure procedure, Schedule schedule,
 			List<Block> blocks) {
 		for (Iterand iterand : schedule.getIterands()) {
-			if (iterand.isActor()) {
-				Actor actor = iterand.getActor();
-				CSDFMoC moc = (CSDFMoC) actor.getMoC();
-				for (Invocation invocation : moc.getInvocations()) {
-					Action action = invocation.getAction();
+			if (iterand.isAction()) {
+				Action action = IrUtil.copy(iterand.getAction());
 
-					// Copy local variable
-					for (Var var : new ArrayList<Var>(action.getBody()
-							.getLocals())) {
-						procedure.addLocal(var);
-					}
-
-					new ActionUpdater(action, procedure).doSwitch(action
-							.getBody());
-					blocks.addAll(action.getBody().getBlocks());
+				// Copy local variable
+				for (Var var : new ArrayList<Var>(action.getBody().getLocals())) {
+					procedure.addLocal(var);
 				}
 
+				new ActionUpdater(action, procedure).doSwitch(action.getBody());
+				blocks.addAll(action.getBody().getBlocks());
 			} else {
 				Schedule sched = iterand.getSchedule();
 				Var loopVar = procedure.getLocal("idx_" + depth);
@@ -474,4 +418,5 @@ public class ActorMergerSDF extends DfSwitch<Actor> {
 			}
 		}
 	}
+
 }

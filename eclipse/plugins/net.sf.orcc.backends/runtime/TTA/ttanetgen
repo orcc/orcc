@@ -46,20 +46,21 @@ def usage():
     print ""
     print "Options:"
     print "-c, --compile=[options]  \t Compile the application from the generated LLVM assembly code into TTA binary"
-    print "-d, --debug \t\t\t Debug mode, generate extra files and print additionnal information"
+    print "-d, --debug \t\t\t Debug mode, generate extra files and print additional information"
     print "-g, --generate=[options] \t Generate the VHDL files of the TTA processors"
     print "-p, --profile \t\t\t Generate a text file containing all the results of the profiling (Need to have already the traces of the simulator)"
-    print "-s, --simulate \t\t\t Simulate each processor independantly from its execution trace"
+    print "-s, --simulate \t\t\t Simulate each processor independently from its execution trace"
+    print "--jobs=[nb] \t\t\t Number of concurrent jobs launched (only for compile and simulate modes)"
     
 
-def compile(arg, debug, target):
+def compile(arg, debug, target, nbJobs):
     start = time.time()
 
     print "*********************************************************************"
     print "* Compile the application for the TTA processors network"
     print "*********************************************************************"
 
-    design.compile(target, libPath, arg.split(), debug)
+    design.compile(target, libPath, arg.split(), debug, nbJobs)
 
     print "* Compilation of code for %d processors done in %f seconds." % (len(design.processors), time.time() - start)
 
@@ -79,53 +80,55 @@ def generate(arg, debug, target):
 def profile(target):
     design.profile(target)
     
-def simulate(target):
-    design.simulate()
+def simulate(target, nbJobs):
+    design.simulate(nbJobs)
 
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "hcgdpsx:v", ["help", "compile=", "generate=", "profile", "debug", "simulate"])
+    opts, args = getopt.getopt(sys.argv[1:], "hcgdpsx:v", ["help", "jobs=", "compile=", "generate=", "profile", "debug", "simulate"])
 except getopt.GetoptError, err:
-	print str(err)
-	usage()
-	sys.exit(2)
-	
+    print str(err)
+    usage()
+    sys.exit(2)
+    
 debug = False
+nbJobs = 1
 
 for o, a in opts:
-	if o in ("-d", "--debug"):
-		debug = True
-	if o in ("-h", "--help"):
-		usage()
-		sys.exit()
+    if o in ("--jobs"):
+        nbJobs = int(a)
+    elif o in ("-d", "--debug"):
+        debug = True
+    elif o in ("-h", "--help"):
+        usage()
+        sys.exit()
 
 if len(args) == 0:
-	sys.exit()
+    sys.exit()
 
 # Get useful path
 pathname = os.path.dirname(sys.argv[0])
 libPath = os.path.abspath(pathname)
 srcPath = os.path.abspath(args[0])
 tracePath = os.path.join(srcPath, "trace")
-	
+    
 sys.path.insert(0, libPath)
 sys.path.insert(0, srcPath)
 
 from informations_.informations import *
 
-
 try:
     for o, a in opts:
-    	if o in ("-c", "--compile"):
-    		compile(a, debug, srcPath)
+        if o in ("-c", "--compile"):
+            compile(a, debug, srcPath, nbJobs)
     
     for o, a in opts:
-    	if o in ("-g", "--generate"):
-    		generate(a, debug, srcPath)
+        if o in ("-g", "--generate"):
+            generate(a, debug, srcPath)
     
     for o, a in opts:
         if o in ("-s", "--simulate"):
-            simulate(srcPath)
+            simulate(srcPath, nbJobs)
             
     for o, a in opts:
         if o in ("-p", "--profile"):

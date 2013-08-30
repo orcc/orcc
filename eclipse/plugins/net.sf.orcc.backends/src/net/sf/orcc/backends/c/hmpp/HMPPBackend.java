@@ -47,11 +47,8 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccLogger;
-
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import net.sf.orcc.util.OrccUtil;
 
 /**
  * HMPP back-end.
@@ -62,7 +59,6 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 public class HMPPBackend extends CBackend {
 
 	protected boolean disableAnnotation;
-	protected String srcPath;
 
 	@Override
 	public void doInitializeOptions() {
@@ -70,8 +66,6 @@ public class HMPPBackend extends CBackend {
 
 		disableAnnotation = getAttribute(BackendsConstants.HMPP_NO_PRAGMAS,
 				false);
-
-		srcPath = path + File.separator + "src";
 	}
 
 	@Override
@@ -94,10 +88,9 @@ public class HMPPBackend extends CBackend {
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
-			ResourceSet set = new ResourceSetImpl();
-			if (debug && !IrUtil.serializeActor(set, path, actor)) {
-				OrccLogger.warnln("Error with " + transformation + " on actor "
-						+ actor.getName());
+			if (debug) {
+				OrccUtil.validateObject(transformation.toString() + " on "
+						+ actor.getName(), actor);
 			}
 		}
 

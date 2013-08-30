@@ -246,17 +246,15 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	@Override
 	public String toString() {
-		String retString = "Base : ";
-		retString += this.getClass().getName();
+		String transf;
 
-		retString += " / irVisitor : ";
-		if (irVisitor == null) {
-			retString += "null";
+		if (getClass() == DfVisitor.class && irVisitor != null) {
+			transf = irVisitor.getClass().getSimpleName();
 		} else {
-			retString += irVisitor.getClass().getName();
+			transf = getClass().getSimpleName();
 		}
 
-		return retString;
+		return transf;
 	}
 
 }

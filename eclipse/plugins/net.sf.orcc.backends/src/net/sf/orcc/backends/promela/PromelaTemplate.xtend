@@ -32,7 +32,6 @@ import net.sf.orcc.backends.c.CTemplate
 import net.sf.orcc.ir.ExprBool
 import net.sf.orcc.ir.ExprInt
 import net.sf.orcc.ir.ExprList
-import net.sf.orcc.ir.ExprString
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
 import net.sf.orcc.ir.TypeInt
@@ -71,11 +70,9 @@ abstract class PromelaTemplate extends CTemplate {
 
 	
 	override caseExprList(ExprList object)
-		'''1 /*{«object.value.join(", ")[doSwitch]»}*/'''
+		'''1'''/*{«object.value.join(", ")[doSwitch]»}*/
 		
-	override caseExprString(ExprString object)
-		'''"«object.doSwitch»"'''
-	
+
 	override caseExprInt(ExprInt object)
 		'''«object.value»«IF object.long»L«ENDIF»'''
 	

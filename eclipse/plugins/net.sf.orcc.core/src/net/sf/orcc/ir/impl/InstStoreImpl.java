@@ -250,11 +250,6 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 		return true;
 	}
 
-	@Override
-	public boolean isStore() {
-		return true;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

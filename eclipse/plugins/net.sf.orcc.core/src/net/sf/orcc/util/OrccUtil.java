@@ -52,6 +52,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.Diagnostician;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -571,6 +574,29 @@ public class OrccUtil {
 	}
 
 	/**
+	 * Run an external programs with the given commands list
+	 * 
+	 * @param cmdList
+	 *            the list of command containing the program and its arguments
+	 */
+	public static void runExternalProgram(List<String> cmdList) {
+		try {
+			ProcessBuilder builder = new ProcessBuilder(cmdList);
+			Process process = builder.start();
+			process.waitFor();
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					process.getInputStream()));
+			String line = new String();
+			while ((line = reader.readLine()) != null) {
+				OrccLogger.traceln(line);
+			}
+		} catch (Exception e) {
+			OrccLogger.severeln(e.getMessage());
+		}
+	}
+
+	/**
 	 * Sets the contents of the given file, creating it if it does not exist.
 	 * 
 	 * @param file
@@ -618,25 +644,37 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Run an external programs with the given commands list
+	 * Validate the given object according to the specification of its model.
+	 * Knowing that the object will be deeply inspected by the validator, this
+	 * method may be time consuming on top-level objects. This method is useful
+	 * to validate the OCL-based constraints and invariants that have been
+	 * specified in the model. The validation errors and warning are transmitted
+	 * directly to the OrccLogger.
 	 * 
-	 * @param cmdList
-	 *            the list of command containing the program and its arguments
+	 * @param headDiagMsg
+	 *            a message to preface all diagnostic message displayed by the
+	 *            logger
+	 * @param eObject
+	 *            the object to validate
+	 * @return <code>true</code>if the given object is valid, <code>false</code>
+	 *         otherwise
 	 */
-	public static void runExternalProgram(List<String> cmdList) {
-		try {
-			ProcessBuilder builder = new ProcessBuilder(cmdList);
-			Process process = builder.start();
-			process.waitFor();
-	
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					process.getInputStream()));
-			String line = new String();
-			while ((line = reader.readLine()) != null) {
-				OrccLogger.traceln(line);
+	public static boolean validateObject(String headDiagMsg, EObject eObject) {
+		Diagnostic diagnostic = Diagnostician.INSTANCE.validate(eObject);
+		if (diagnostic.getSeverity() == Diagnostic.ERROR
+				|| diagnostic.getSeverity() == Diagnostic.WARNING) {
+			for (Iterator<Diagnostic> i = diagnostic.getChildren().iterator(); i
+					.hasNext();) {
+				Diagnostic childDiagnostic = (Diagnostic) i.next();
+				switch (childDiagnostic.getSeverity()) {
+				case Diagnostic.ERROR:
+				case Diagnostic.WARNING:
+					OrccLogger.warnln(headDiagMsg + " :"
+							+ childDiagnostic.getMessage());
+				}
 			}
-		} catch (Exception e) {
-			OrccLogger.severeln(e.getMessage());
+			return false;
 		}
+		return true;
 	}
 }

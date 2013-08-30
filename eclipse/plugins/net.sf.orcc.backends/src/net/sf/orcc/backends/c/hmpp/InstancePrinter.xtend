@@ -106,7 +106,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF (object instanceof Instance || object instanceof Actor) && object.hasAttribute("group")»
 			«FOR grp : object.getAttribute("group").attributes.filterGroupsLabels»
 				«val params = grp.attributes»
-				#pragma hmpp «grp.name» group«params.join(", ", ", ", "")['''«it.name»=«stringValue»''']»
+				#pragma hmpp «grp.name» group«params.join(", ", ", ", "")['''«name»=«stringValue»''']»
 			«ENDFOR»
 		«ENDIF»
 	'''
@@ -136,7 +136,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«FOR grp : proc.getAttribute("codelet").attributes.filterGroupsLabels»
 				«FOR cdlt : grp.attributes.filterCodeletsLabels»
 					«val params = proc.getAttribute("codelet").attributes»
-					«val paramsString = params.filterNoGroupsLabels.join(", ", ", ", "")['''«it.name»=«stringValue»''']»
+					«val paramsString = params.filterNoGroupsLabels.join(", ", ", ", "")['''«name»=«stringValue»''']»
 
 					«val vars = cdlt.objectValue as Map<String, String>»
 					«val transferString = vars.entrySet.join(", ", ", ", "")['''args[«key»].io=«value»''']»

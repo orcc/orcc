@@ -36,6 +36,9 @@ import shutil
 import stat
 import sys
 import subprocess
+from multiprocessing import Process
+from multiprocessing import Queue
+import multiprocessing
 
 
 class Design:
@@ -45,18 +48,25 @@ class Design:
         self.processors = processors
         self.memories = memories
         self.targetAltera = targetAltera
+        self.sema = multiprocessing.BoundedSemaphore(value=1)
 
+    def compileMulti(self, proc, srcPath, libPath, args, debug):
+        self.sema.acquire()
+        print ">> Compile code of " + proc.id + "."
+        proc.compile(srcPath, libPath, args, debug)
+        self.sema.release()
+        return
 
-    def compile(self, srcPath, libPath, args, debug):
+    def compile(self, srcPath, libPath, args, debug, nbJobs):
+        self.sema = multiprocessing.BoundedSemaphore(value=nbJobs)
         os.putenv("TCE_OSAL_PATH", os.path.join(libPath, "opset"))
         retcode = subprocess.call(["buildopset", os.path.join(libPath, "opset", "orcc")])
 
         for processor in self.processors:
-            print ">> Compile code of " + processor.id + "."
-            retcode = processor.compile(srcPath, libPath, args, debug)
-            if retcode != 0: 
-                sys.exit(retcode)
-
+            p = multiprocessing.Process(target=self.compileMulti, args=(processor, srcPath, libPath, args, debug, ))
+            p.start()
+        for processor in self.processors:
+            p.join()
                 
     def profile(self, srcPath):
         f = open("profiling.txt", "w")
@@ -67,7 +77,6 @@ class Design:
             f.write(processor.profile(srcPath))
             f.write("\n\n\n")
         f.close()
-
 
     def generate(self, srcPath, libPath, args, debug):
         print "* Initialize the generation."
@@ -121,9 +130,17 @@ class Design:
         template = tempita.Template.from_filename(os.path.join(templatePath, "xco_ram_2p.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath, id="ram_2p", width=512, depth=32)
         open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
+    
+    def simulateMulti(self, proc):
+        self.sema.acquire()
+        proc.simulate()
+        self.sema.release()
+        return
 
-    def simulate(self):
+    def simulate(self, nbJobs):
+        self.sema = multiprocessing.BoundedSemaphore(value=nbJobs)
         for processor in self.processors:
-            retcode = processor.simulate()
-            if retcode != 0: 
-                sys.exit(retcode)
+            p = multiprocessing.Process(target=self.simulateMulti, args=(processor, ))
+            p.start()
+        for processor in self.processors:
+            p.join()

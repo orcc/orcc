@@ -50,6 +50,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Matthieu Wipliez
  * @author Ghislain Roquier
  * @author Herve Yviquel
+ * @author Jani Boutellier
  * 
  */
 public class ActorMerger extends DfVisitor<Void> {
@@ -59,11 +60,8 @@ public class ActorMerger extends DfVisitor<Void> {
 	private Copier copier;
 
 	private int index;
-
-	private Network network;
-
-	private List<String> mergedActors;
-
+	
+	private final String definitionFileName = "schedule.xml";
 	/**
 	 * Transforms the network to internalize the given list of vertices in their
 	 * own subnetwork and returns this subnetwork.
@@ -72,103 +70,115 @@ public class ActorMerger extends DfVisitor<Void> {
 	 *            a given list of vertices
 	 * @return the SDF/CSDF child network containing the list of vertices
 	 */
-	private Network transformNetwork(List<Vertex> vertices) {
-		Network subNetwork = dfFactory.createNetwork();
-		subNetwork.setName("cluster" + index);
+	private Network getSubNetwork(Network network, List<Vertex> vertices) {
+		// extract the sub-network
+		Network subNetwork = IrUtil.copy(network);
+		subNetwork.setName(getRegionName(vertices));
 
-		List<Connection> newConnections = new ArrayList<Connection>();
-		List<Connection> oldConnections = new ArrayList<Connection>();
-		mergedActors = new ArrayList<String>();
-
+		List<Vertex> verticesInSubNetwork = new ArrayList<Vertex>();
 		for (Vertex vertex : vertices) {
-			IrUtil.copy(copier, vertex);
-			mergedActors.add(network.getName() + "_" + vertex.getLabel());
+			Vertex is = subNetwork.getChild(vertex.getLabel());
+			verticesInSubNetwork.add(is);
 		}
 
-		for (Connection connection : network.getConnections()) {
-			Vertex oldSrc = connection.getSource();
-			Vertex oldTgt = connection.getTarget();
-
-			if (vertices.contains(oldSrc) && vertices.contains(oldTgt)) {
-				Vertex src = (Vertex) copier.get(oldSrc);
-				Vertex tgt = (Vertex) copier.get(oldTgt);
-				Port srcPort = (Port) copier.get(connection.getSourcePort());
-				Port tgtPort = (Port) copier.get(connection.getTargetPort());
-
-				subNetwork.add(dfFactory.createConnection(src, srcPort, tgt,
-						tgtPort, IrUtil.copy(connection.getAttributes())));
-				subNetwork.add(src);
-				subNetwork.add(tgt);
-
-				oldConnections.add(connection);
-			} else if (!vertices.contains(oldSrc) && vertices.contains(oldTgt)) {
-				Vertex tgt = (Vertex) copier.get(oldTgt);
-				Port tgtPort = (Port) copier.get(connection.getTargetPort());
-				tgtPort.setName(tgt.getLabel() + "_" + tgtPort.getName());
-
-				caseActor(tgt.getAdapter(Actor.class));
-
-				Port input = EcoreUtil.copy(tgtPort);
-				subNetwork.addInput(input);
-
-				subNetwork.add(dfFactory.createConnection(input, null, tgt,
-						tgtPort, IrUtil.copy(connection.getAttributes())));
-
-				// Add connection to the parent network
-				newConnections.add(dfFactory.createConnection(oldSrc,
-						connection.getSourcePort(), subNetwork, input,
-						IrUtil.copy(connection.getAttributes())));
-
-				oldConnections.add(connection);
-			} else if (vertices.contains(oldSrc) && !vertices.contains(oldTgt)) {
-				Vertex src = (Vertex) copier.get(oldSrc);
-				Port srcPort = (Port) copier.get(connection.getSourcePort());
-				srcPort.setName(src.getLabel() + "_" + srcPort.getName());
-
-				caseActor(src.getAdapter(Actor.class));
-
-				Port output = dfFactory.createPort(EcoreUtil.copy(srcPort));
-				subNetwork.addOutput(output);
-
-				subNetwork.add(dfFactory.createConnection(src, srcPort, output,
-						null, IrUtil.copy(connection.getAttributes())));
-
-				// Add connection to the parent network
-				newConnections.add(dfFactory.createConnection(subNetwork,
-						output, oldTgt, connection.getTargetPort(),
-						IrUtil.copy(connection.getAttributes())));
-
-				oldConnections.add(connection);
+		for (Vertex vertex : new ArrayList<Vertex>(subNetwork.getChildren())) {
+			if (!verticesInSubNetwork.contains(vertex)) {
+				subNetwork.remove(vertex);
 			}
-
+		}
+		
+		// Perform the renaming of ports to the superactor
+		for (Vertex vertex : new ArrayList<Vertex>(subNetwork.getChildren())) {
+			Actor actorCopy = vertex.getAdapter(Actor.class);
+			for (Port port : actorCopy.getInputs()) {
+				port.addAttribute("shortName");
+				port.setAttribute("shortName", port.getName());
+				port.setName(actorCopy.getName() + "_" + port.getName());
+			}
+			for (Port port : actorCopy.getOutputs()) {
+				port.addAttribute("shortName");
+				port.setAttribute("shortName", port.getName());
+				port.setName(actorCopy.getName() + "_" + port.getName());
+			}
 		}
 
-		for (Connection newConn : newConnections) {
-			network.add(newConn);
-		}
-		network.add(subNetwork);
+		for (Vertex vertex : subNetwork.getChildren()) {
+			Actor actor = vertex.getAdapter(Actor.class);
+			if (actor != null) {
+				List<Port> unconnected = new ArrayList<Port>(actor.getInputs());
+				unconnected.removeAll(actor.getIncomingPortMap().keySet());
+				for (Port input : unconnected) {
+					Port inputPort = EcoreUtil.copy(input);
+					subNetwork.addInput(inputPort);
+					subNetwork.add(dfFactory.createConnection(inputPort, null,
+							vertex, input));
+				}
 
-		network.removeVertices(vertices);
-		network.getChildren().removeAll(vertices);
+				unconnected = new ArrayList<Port>(actor.getOutputs());
+				unconnected.removeAll(actor.getOutgoingPortMap().keySet());
+				for (Port output : unconnected) {
+					Port outputPort = EcoreUtil.copy(output);
+					subNetwork.addOutput(outputPort);
+					subNetwork.add(dfFactory.createConnection(vertex, output,
+							outputPort, null));
+				}
+			}
+		}
 
 		return subNetwork;
 	}
 
+	/*
+	* When static regions (= superactors) are imported from an XML file
+	* the region name is piggybacked in a special "name vertex" that
+	* is read here (if present) and deleted. For StaticRegionDetector
+	* the basic naming scheme is used.
+	*/
+	
+	private String getRegionName(List<Vertex> vertices) {
+		for(Vertex vertex : vertices) {
+			if (vertex.hasAttribute("isNameVertex")) {
+				String regionName = vertex.getLabel();
+				vertices.remove(vertex);
+				return regionName;
+			}
+		}
+		return new String("cluster" + index);
+	}
+	
+	/*
+	* If file "schedule.xml" is found in the user's home folder, that file
+	* is used to define static regions and perform actor merging. If a file
+	* under that name can not be opened, automatic merging is used.
+	*/
+	
 	@Override
 	public Void caseNetwork(Network network) {
-		this.network = network;
-
-		List<List<Vertex>> staticRegions = new StaticRegionDetector()
+		String definitionFile = new String(System.getProperty("user.home") + "/" + definitionFileName);
+		boolean fileExists = MergerUtil.testFilePresence(definitionFile);
+		List<List<Vertex>> staticRegions;
+		if (!fileExists) {
+			OrccLogger.traceln("Could not open " + definitionFile + " - performing automatic merging");
+			staticRegions = new StaticRegionDetector()
 				.analyze(network);
+		} else {
+			OrccLogger.traceln("Performing merging based on " + definitionFile);
+			RegionParser regionParser = new RegionParser(definitionFile, network);
+			staticRegions = regionParser.parse();
+		}
+		OrccLogger.traceln(staticRegions.size() + " regions in total");
 
 		for (List<Vertex> instances : staticRegions) {
 			copier = new Copier(true);
-			// transform the parent network and return the child network
-			Network subNetwork = transformNetwork(instances);
+			// return a copy of the sub-network
+			Network subNetwork = getSubNetwork(network, instances);
 			// create the static schedule of vertices
-			SASLoopScheduler scheduler = new SASLoopScheduler(subNetwork);
-			scheduler.schedule();
-
+			SASLoopScheduler scheduler = null;
+			if (!fileExists) {
+				scheduler = new SASLoopScheduler(subNetwork);
+				scheduler.schedule();
+			}
+			
 			int actorcount = subNetwork.getChildren().size();
 			int fifocount = 0;
 			for (Connection conn : subNetwork.getConnections()) {
@@ -178,30 +188,55 @@ public class ActorMerger extends DfVisitor<Void> {
 				}
 			}
 
-			OrccLogger.traceln("Cluster" + index + " (" + actorcount
-					+ " actors, " + fifocount + " fifos" + ") => Schedule is "
-					+ scheduler.getSchedule());
-
-			// merge vertices inside a single actor
-			Actor superActor = new ActorMergerSDF(scheduler, copier)
+			OrccLogger.traceln(subNetwork.getName() + " (" + actorcount
+					+ " actors, " + fifocount + " fifos)");
+			
+			// merge sub-network inside a single actor
+			Actor superActor;
+			if (!fileExists) {
+				OrccLogger.traceln("schedule" + scheduler.getSchedule());
+				superActor = new ActorMergerSDF(scheduler, copier)
 					.doSwitch(subNetwork);
-			superActor.setAttribute("mergedActors", mergedActors);
-
-			network.add(superActor);
-			EcoreUtil.delete(subNetwork);
-
-			for (Connection connection : network.getConnections()) {
-				Port srcPort = (Port) copier.get(connection.getSourcePort());
-				if (srcPort != null) {
-					connection.setSource(superActor);
-					connection.setSourcePort(srcPort);
-				}
-				Port tgtPort = (Port) copier.get(connection.getTargetPort());
-				if (tgtPort != null) {
-					connection.setTarget(superActor);
-					connection.setTargetPort(tgtPort);
-				}
+			} else {
+				superActor = dfFactory.createActor();
+				SuperactorParser superactorParser = new SuperactorParser(subNetwork, superActor);
+				superactorParser.parse(definitionFile);
+				ActorMergerQS actorMerger = new ActorMergerQS(subNetwork, copier, definitionFile,
+						superactorParser.getScheduleList(), superactorParser.getGuardList());
+				actorMerger.createMergedActor(superActor, superactorParser.getFSM());
 			}
+			// update the main network
+			network.add(superActor);
+
+			List<Connection> newConnections = new ArrayList<Connection>();
+			for (Connection connection : network.getConnections()) {
+				Vertex src = connection.getSource();
+				Vertex tgt = connection.getTarget();
+
+				if (!instances.contains(src) && instances.contains(tgt)) {
+					Port tgtPort = superActor.getInput(connection.getTarget()
+							.getLabel()
+							+ "_"
+							+ connection.getTargetPort().getName());
+					// Add connection to the parent network
+					newConnections.add(dfFactory.createConnection(src,
+							connection.getSourcePort(), superActor, tgtPort));
+
+				} else if (instances.contains(src) && !instances.contains(tgt)) {
+					Port srcPort = superActor.getOutput(connection.getSource()
+							.getLabel()
+							+ "_"
+							+ connection.getSourcePort().getName());
+					// Add connection to the parent network
+					newConnections.add(dfFactory.createConnection(superActor,
+							srcPort, tgt, connection.getTargetPort()));
+
+				}
+
+			}
+			network.removeVertices(instances);
+			network.getChildren().removeAll(instances);
+			network.getEdges().addAll(newConnections);
 
 			index++;
 		}
