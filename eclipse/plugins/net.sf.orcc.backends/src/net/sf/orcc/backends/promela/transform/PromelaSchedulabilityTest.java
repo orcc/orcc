@@ -323,7 +323,13 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 			return new HashMap<String, Object>();
 		}
 		Map<String, Object> configuration = null;
-		for (Action action : fsm.getTargetActions(state)) {
+		List<Action> actions;
+		if (state!=null) {
+			actions = fsm.getTargetActions(state);
+		} else {
+			actions=actor.getActions();
+		}
+		for (Action action : actions) {
 			if (action == targetAction) {
 				GuardSatChecker checker = new GuardSatChecker(actor);
 				try {
