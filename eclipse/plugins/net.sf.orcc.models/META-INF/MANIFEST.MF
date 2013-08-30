@@ -14,10 +14,10 @@ Export-Package: net.sf.orcc.graph,
  net.sf.orcc.util,
  net.sf.orcc.util.impl,
  net.sf.orcc.util.util
-Require-Bundle: org.eclipse.core.runtime;visibility:=reexport;bundle-version="3.7.0",
- org.eclipse.emf.ecore;visibility:=reexport;bundle-version="2.7.0",
- org.eclipse.core.resources;visibility:=reexport;bundle-version="3.7.0",
- org.eclipse.xtext.xbase.lib,
- org.eclipse.xtend.lib
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0";visibility:=reexport,
+ org.eclipse.emf.ecore;bundle-version="2.7.0";visibility:=reexport,
+ org.eclipse.core.resources;bundle-version="3.7.0";visibility:=reexport,
+ org.eclipse.xtend.lib;bundle-version="2.4.0",
+ org.eclipse.xtext.xbase.lib;bundle-version="2.4.0"
 Bundle-ActivationPolicy: lazy
 
