@@ -60,7 +60,7 @@ class RunConfiguration(object):
     file3='tmp_ltl_expr.pml'
     def __init__(self, conf):
         self.conf=conf
-    def configure(self, statedesc, nextstate):
+    def configure(self, statedesc, inputseq, currstate, action, nextstate):
         open(self.file1, "a").close() # create the file for starting processes if it doesnt exist
         file=open(self.file1, "w")
         file.writelines(["run %s();\n" % item  for item in self.conf.actors])
@@ -68,11 +68,13 @@ class RunConfiguration(object):
         open(self.file2, "a").close() # create the file for vars if it doesnt exist
         file=open(self.file2, "w")
         file.write(statedesc.tostring())
+        file.write("\n//Inputs:\n")
+        file.write(inputseq.tostring(self.conf.leader, currstate, action))
         file.close
         open(self.file3, "a").close() # create the file for ltl if it doesnt exist
         file=open(self.file3, "w")
         file.write("#define emptyBuffer (len(chan_0)==0 && len(chan_1)==0 && len(chan_2)==0 && len(chan_3)==0)\n")
-        file.write("ltl test {[]!((promela_prog_initiated==0 && fsm_state_"+self.conf.leader+"=="+self.conf.leader+"_state_"+nextstate+") && emptyBuffer)}\n")
+        file.write("ltl test {[]!((promela_prog_initiated==1 && fsm_state_"+self.conf.leader+"=="+self.conf.leader+"_state_"+nextstate+") && emptyBuffer)}\n")
         file.close()
     def confinitsearch(self):
         open(self.file1, "a").close() # create it if it doesnt exist
@@ -106,26 +108,35 @@ class StateDescription(object):
         self.fromstring(string)
 
 class InputSeq(object):
-    uglydic={}
+    actortostates={}
     def addpeek(self, actor, port, schedulestate, scheduleaction, value):
         self.check(actor, port, schedulestate, scheduleaction)
-        self.uglydic[actor+port+schedulestate+scheduleaction].append(value)
+        self.actortostates[actor][schedulestate][scheduleaction][port].append(value)
     def addread(self, actor, port, schedulestate, scheduleaction, value):
         self.check(actor, port, schedulestate, scheduleaction)
-        nrpeek=len(self.uglydic[actor+port+schedulestate+scheduleaction])
-        self.uglydic[actor+port+schedulestate+scheduleaction].extend([0]*(int(value))-nrpeek)
+        nrpeek=len(self.actortostates[actor][schedulestate][scheduleaction][port])
+        self.actortostates[actor][schedulestate][scheduleaction][port].extend(['0']*((int(value))-nrpeek))
     def getseq(self, actor, port, schedulestate, scheduleaction, value):
         if self.check(actor, port, schedulestate, scheduleaction):
-            return self.uglydic[actor+port+schedulestate+scheduleaction]
+            return actortostates[actor][schedulestate][scheduleaction][port]
         else:
             return []
     def check(self, actor, port, schedulestate, scheduleaction):
-        if not (actor+port+schedulestate+scheduleaction) in self.uglydic:
-            self.uglydic[actor+port+schedulestate+scheduleaction]=[]
-            return False
-        else:
-            return True
-    
+        if actor not in self.actortostates:
+            self.actortostates[actor]={}
+        if schedulestate not in self.actortostates[actor]:
+            self.actortostates[actor][schedulestate]={}
+        if scheduleaction not in self.actortostates[actor][schedulestate]:
+            self.actortostates[actor][schedulestate][scheduleaction]={}
+        if port not in self.actortostates[actor][schedulestate][scheduleaction]:
+            self.actortostates[actor][schedulestate][scheduleaction][port]=[]
+    def tostring(self, actor, state, action):
+        s=""
+        for port in self.actortostates[actor][state][action]:
+            for val in self.actortostates[actor][state][action][port]:
+                s+=("chan_"+actor+"_"+port+"!"+val+";\n")
+        return s
+
 
 class ChannelConfigXML():
     xmlfilename=None
@@ -145,6 +156,7 @@ class ChannelConfigXML():
                             for xpeek in xrates.findall('.//peek'):
                                 self.partitioninput.addpeek(xactor.get('name'), xpeek.get('port'), xschedule.get('initstate'),xschedule.get('action'),xpeek.get('value'))
                             for xread in xrates.findall('.//read'):
-                                self.partitioninput.addpeek(xactor.get('name'), xread.get('port'), xschedule.get('initstate'),xschedule.get('action'),xread.get('value'))                    
+                                self.partitioninput.addread(xactor.get('name'), xread.get('port'), xschedule.get('initstate'),xschedule.get('action'),xread.get('value'))                    
+        return self.partitioninput
 
 

@@ -38,16 +38,15 @@ class ModelChecker(object):
         proc = Popen(['pan', '-E', '-n'], stdout=PIPE, universal_newlines=True)
         for line in iter(proc.stdout):
             line = str(line.strip())
-            if line.startswith("spin"):
-                print(line)
-            elif line.find('error') >= 0 :
+            if line.find('end state in claim reached') >= 0 :
                 self.tracefound=True
-                print (line)
+                print ("Pan:", line)
             else:
-                print(line)
+                print("Pan:", line)
             proc.stdout.flush()
         proc.wait()
         self.returncode = proc.returncode
+
     
     
 

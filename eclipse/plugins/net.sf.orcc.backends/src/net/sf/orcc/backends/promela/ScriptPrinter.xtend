@@ -88,8 +88,7 @@ class ScriptPrinter extends PromelaTemplate {
 		conf.printconfiguration()
 		conf.saveconfiguration()
 		
-		cc=ChannelConfigXML('schedule_info_«network.simpleName».xml')
-		cc.findinputs(conf)
+		ccx=ChannelConfigXML('schedule_info_«network.simpleName».xml')
 
 		rc=RunConfiguration(conf)
 		
@@ -119,16 +118,19 @@ class ScriptPrinter extends PromelaTemplate {
 			statefile=sched.nsrc+'.txt'
 			sd=StateDescription()
 			sd.loadstate('config_«network.simpleName»', statefile)
-			rc.configure(sd, sched.dst)
-			ccx=ChannelConfigXML('schedule_info_«network.simpleName».xml')
-			ccx.findinputs(conf)
+			inputs=ccx.findinputs(conf)
+			rc.configure(sd, inputs, sched.src, sched.action, sched.dst)
+
 		
 		if uargs.runchecker:
 			mc.generatemc('main_«network.simpleName».pml')
 			mc.compilemc()
 			mc.runmc()
-			#if mc.tracefound
-				#mc.simulatetrail('main_«network.simpleName».pml')
+			if mc.tracefound:
+				print ("\n\nSchedule found.")
+				mc.simulatetrail('main_«network.simpleName».pml')
+			else:
+				print ("\n\nSchedule was not found!!")
 	'''
 	}
 }
