@@ -57,7 +57,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
@@ -520,33 +519,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 					DfPackage.NETWORK__INPUTS);
 		}
 		return inputs;
-	}
-
-	@Override
-	@Deprecated
-	public Instance getInstance(String id) {
-		for (Instance instance : getInstances()) {
-			if (instance.getName().equals(id)) {
-				return instance;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * @return
-	 */
-	@Override
-	@Deprecated
-	public EList<Instance> getInstances() {
-		EList<Instance> list = new BasicEList<Instance>();
-		for (Vertex vertex : getChildren()) {
-			Instance instance = vertex.getAdapter(Instance.class);
-			if (instance != null) {
-				list.add(instance);
-			}
-		}
-		return list;
 	}
 
 	/**
