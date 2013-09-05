@@ -193,18 +193,6 @@ public interface Network extends Graph, Adaptable {
 	 */
 	EList<Port> getInputs();
 
-	@Deprecated
-	Instance getInstance(String id);
-
-	/**
-	 * Returns a list that contains all children that are adaptable to Instance.
-	 * 
-	 * @return a list of instances
-	 * @deprecated
-	 */
-	@Deprecated
-	EList<Instance> getInstances();
-
 	/**
 	 * Returns the list of instances of the given actor in the graph.
 	 * 
