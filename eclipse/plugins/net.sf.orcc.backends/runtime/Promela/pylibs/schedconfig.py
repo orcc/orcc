@@ -140,9 +140,10 @@ class InputSeq(object):
 
 class ChannelConfigXML():
     xmlfilename=None
-    partitioninput=InputSeq()
+    partitioninput=None
     channels=[]
     def __init__(self, xmlfilename):
+        self.partitioninput=InputSeq()
         self.xmlfilename=xmlfilename
     def findinputs(self, configuration):
         tree = et.parse(self.xmlfilename)

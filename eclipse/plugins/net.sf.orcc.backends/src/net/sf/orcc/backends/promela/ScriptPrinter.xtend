@@ -129,6 +129,7 @@ class ScriptPrinter extends PromelaTemplate {
 			if mc.tracefound:
 				print ("\n\nSchedule found.")
 				mc.simulatetrail('main_«network.simpleName».pml')
+				print(mc.schedxml)
 			else:
 				print ("\n\nSchedule was not found!!")
 	'''

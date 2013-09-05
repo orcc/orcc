@@ -93,7 +93,7 @@ class NetworkPrinter extends PromelaTemplate {
 			#ifdef MANAGED
 			#include "tmp_state.pml"
 			#endif
-			promela_prog_initiated==1;
+			promela_prog_initiated=1;
 		
 			/*Start processes*/
 			atomic{
