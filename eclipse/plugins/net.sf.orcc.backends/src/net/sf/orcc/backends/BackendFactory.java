@@ -28,15 +28,10 @@
  */
 package net.sf.orcc.backends;
 
-import static net.sf.orcc.OrccLaunchConstants.BACKEND;
-
-import java.util.Map;
-
 import net.sf.orcc.plugins.PluginFactory;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 
 /**
@@ -71,33 +66,6 @@ public class BackendFactory extends PluginFactory {
 				.getConfigurationElementsFor(Activator.PLUGIN_ID + ".backends");
 
 		parsePlugins(elements);
-	}
-
-	/**
-	 * Runs the back-end specified by the configuration.
-	 * 
-	 * @param monitor
-	 *            progress monitor
-	 * @param listener
-	 *            write listener
-	 * @param configuration
-	 *            launch configuration
-	 * @throws Exception
-	 * @deprecated will be removed in a future version. Please consider using
-	 *             {@link #getBackend} instead
-	 */
-	@Deprecated
-	public void runBackend(IProgressMonitor monitor, Map<String, Object> options)
-			throws Exception {
-		String backendName = (String) options.get(BACKEND);
-		Backend backend = (Backend) plugins.get(backendName);
-
-		backend.setProgressMonitor(monitor);
-
-		backend.setOptions(options);
-
-		// launches the compilation
-		backend.compile();
 	}
 
 	/**
