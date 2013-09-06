@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.cal.ui.editor.hover;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.ui.editor.hover.html.DefaultEObjectHoverProvider;
 
@@ -43,7 +42,8 @@ public class CalObjectHover extends DefaultEObjectHoverProvider {
 
 	@Override
 	protected String getFirstLine(EObject o) {
-		return "<b>" + StringEscapeUtils.escapeHtml(getLabel(o)) + "</b>";
+		String label = getLabel(o);
+		return (label != null) ? "<b>" + label + "</b>" : "";
 	}
 
 }
