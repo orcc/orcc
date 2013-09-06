@@ -192,7 +192,6 @@ Initialize returns AstAction:
 		variables += ValuedVariableDeclaration
 		(',' variables += ValuedVariableDeclaration)*)?
 	('do'
-		(variables += ValuedVariableDeclaration ';')*
 		(statements += Statement)*
 	)?
 	'end';
