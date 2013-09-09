@@ -85,9 +85,6 @@ class ScriptPrinter extends PromelaTemplate {
 		if uargs.setleader is not None:
 			conf.setleader(uargs.setleader)
 
-		conf.printconfiguration()
-		conf.saveconfiguration()
-		
 		ccx=ChannelConfigXML('schedule_info_«network.simpleName».xml')
 
 		rc=RunConfiguration(conf)
@@ -120,7 +117,7 @@ class ScriptPrinter extends PromelaTemplate {
 			sd.loadstate('config_«network.simpleName»', statefile)
 			inputs=ccx.findinputs(conf)
 			rc.configure(sd, inputs, sched.src, sched.action, sched.dst)
-
+			conf.setschedule(uargs.runcheckerid)
 		
 		if uargs.runchecker:
 			mc.generatemc('main_«network.simpleName».pml')
@@ -128,10 +125,24 @@ class ScriptPrinter extends PromelaTemplate {
 			mc.runmc()
 			if mc.tracefound:
 				print ("\n\nSchedule found.")
+				fsm=FSM()
+				fsm.loadfsm('config_Acdc', 'scheduler.txt')
 				mc.simulatetrail('main_«network.simpleName».pml')
-				print(mc.schedxml)
+				nsd=StateDescription()
+				nsd.fromstring(mc.endstate)
+				ns=nsd.isequalto('config_«network.simpleName»', fsm.getnstates())
+				if ns is None:
+					ns=fsm.getnewstatename()
+				sched=fsm.gettransition(conf.schedule)
+				sched.ndst=ns
+				fsm.savefsm('config_«network.simpleName»', 'scheduler.txt')
+				print (mc.schedxml)
+				fsm.printfsm()
 			else:
 				print ("\n\nSchedule was not found!!")
+		
+		conf.printconfiguration()
+		conf.saveconfiguration()
 	'''
 	}
 }

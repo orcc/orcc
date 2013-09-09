@@ -27,6 +27,16 @@ class FSM:
         for trans in self.transitions:
             if trans.tid==transid:
                 return trans
+    def getnstates(self):
+        lst=[]
+        for i in self.transitions:
+            if i.nsrc not in lst:
+                lst.append(i.nsrc)
+        return lst
+    def getnewstatename(self):
+        nr=len(self.getnstates())
+        name="s"+str(nr)
+        return name
     def sortTransitions(self):
         """Sorts such that scheduling always starts form a known state"""
         newList = []

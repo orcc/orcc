@@ -4,6 +4,7 @@ import xml.etree.ElementTree as et
 class Configuration():
     actors=None
     leader=None
+    schedule=None
     filename=""
     states=[]
     def __init__(self, folder, filename):
@@ -22,6 +23,8 @@ class Configuration():
                 self.actors=lst[1:len(lst)]
             elif lst[0]=='leader':
                 self.leader=lst[1]
+            elif lst[0]=='schedule':
+                self.schedule=lst[1]
         file.close()
         if self.actors is None:
             self.actors=actors
@@ -32,6 +35,8 @@ class Configuration():
         file.writelines(["%s " % item  for item in tmp])
         if self.leader is not None:
             file.write("\nleader " +self.leader)
+        if self.schedule is not None:
+            file.write("\nschedule " +self.schedule)
         file.close
     def removeactor(self, actorname):
         if actorname in self.actors:
@@ -46,10 +51,13 @@ class Configuration():
         else:
             print ("\nWarning: Actor", actor, "not in configuration.")
             exit()
+    def setschedule(self, scheduleid):
+        self.schedule=scheduleid
     def printconfiguration(self):
         print ("\nCurrent configuration:")
         print ("\nLeader Actor: ", self.leader)
         print("Actors:\t", "".join(["%s \n\t" % item for item in self.actors]))
+        print ("Setup for schedule with ID:", self.schedule,"\n\n")
 
 class RunConfiguration(object):
     name=None
@@ -85,7 +93,9 @@ class RunConfiguration(object):
         open(self.file3, "w").close() # create it if it doesnt exist
         
 class StateDescription(object):
-    state={}
+    state=None
+    def __init__(self):
+        self.state={}
     def fromstring(self, string):
         lst=string.split(';')
         for line in lst:
@@ -106,6 +116,19 @@ class StateDescription(object):
         f = open(folder+'/'+filename, 'r')
         string=f.read()
         self.fromstring(string)
+    def isequalto(self, folder, otherstates):
+        ret=None
+        sd=StateDescription()
+        for st in otherstates:
+            sd.loadstate(folder, st+'.txt')
+            issame=True
+            for elem in self.state.keys():
+                if not(self.state[elem] == sd.state[elem]):
+                    issame=False
+            if issame:
+                return st
+        return None
+    
 
 class InputSeq(object):
     actortostates={}
