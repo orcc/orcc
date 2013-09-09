@@ -126,7 +126,7 @@ class ScriptPrinter extends PromelaTemplate {
 			if mc.tracefound:
 				print ("\n\nSchedule found.")
 				fsm=FSM()
-				fsm.loadfsm('config_Acdc', 'scheduler.txt')
+				fsm.loadfsm('config_«network.simpleName»', 'scheduler.txt')
 				mc.simulatetrail('main_«network.simpleName».pml')
 				nsd=StateDescription()
 				nsd.fromstring(mc.endstate)
