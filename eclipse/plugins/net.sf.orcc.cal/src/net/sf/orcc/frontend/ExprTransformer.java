@@ -58,14 +58,17 @@ import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Procedure;
@@ -95,6 +98,8 @@ import org.eclipse.emf.ecore.EObject;
  * @author Hervé Yviquel
  */
 public class ExprTransformer extends CalSwitch<Expression> {
+
+	private static IrFactory factory = IrFactory.eINSTANCE;
 
 	private List<Expression> indexes;
 
@@ -167,14 +172,71 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	@Override
 	public Expression caseExpressionBinary(ExpressionBinary expression) {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		Expression e1 = new ExprTransformer(procedure, nodes)
-				.doSwitch(expression.getLeft());
-		Expression e2 = new ExprTransformer(procedure, nodes)
-				.doSwitch(expression.getRight());
+	
+		if (isEvaluableShortly(op)){
+		// Short-Circuit Transformation need to enclose all other transformations (ie index, call, etc..)
+		// in the ThenBlock/ElseBlock of its own transformation
+			BlockIf newIf = factory.createBlockIf();
+			BlockBasic join = factory.createBlockBasic();
+			newIf.setJoinBlock(join);
 
-		Expression value = eINSTANCE.createExprBinary(e1, op, e2,
-				Typer.getType(expression));
-		return storeExpr(expression, value);
+			BlockBasic blockTrue = factory.createBlockBasic();
+			InstAssign assignTrue = factory.createInstAssign();
+			
+			BlockBasic blockFalse = factory.createBlockBasic();
+			InstAssign assignFalse = factory.createInstAssign();
+
+			Expression e1 = new ExprTransformer(procedure, nodes)
+			.doSwitch(expression.getLeft());
+
+			nodes.add(newIf);
+			
+			Expression e2;
+			if (op == OpBinary.LOGIC_AND) {
+				e2 = new ExprTransformer(procedure, newIf.getThenBlocks())
+				.doSwitch(expression.getRight());
+			} else {
+				e2 = new ExprTransformer(procedure, newIf.getElseBlocks())
+				.doSwitch(expression.getRight());
+			}
+			
+			Expression value = eINSTANCE.createExprBinary(e1, op, e2,
+					Typer.getType(expression));
+				
+			Var newVar = procedure.newTempLocalVariable(
+					IrUtil.copy(value.getType()), "sc_expr");
+			ExprVar newExpr = factory.createExprVar(newVar);
+
+			assignTrue.setTarget(factory.createDef(newVar));
+			blockTrue.add(assignTrue);
+			newIf.getThenBlocks().add(blockTrue);
+
+			assignFalse.setTarget(factory.createDef(newVar));
+			blockFalse.add(assignFalse);
+			newIf.getElseBlocks().add(blockFalse);
+			
+			if (op == OpBinary.LOGIC_AND) {
+				assignTrue.setValue(e2);
+				assignFalse.setValue(factory.createExprBool(false));
+			} else if (op == OpBinary.LOGIC_OR) {
+				assignTrue.setValue(factory.createExprBool(true));
+				assignFalse.setValue(e2);
+			}
+												
+			newIf.setCondition(e1);
+			
+			return storeExpr(expression, newExpr);
+		} else {
+			Expression e1 = new ExprTransformer(procedure, nodes)
+			.doSwitch(expression.getLeft());
+			Expression e2 = new ExprTransformer(procedure, nodes)
+			.doSwitch(expression.getRight());
+	
+			Expression value = eINSTANCE.createExprBinary(e1, op, e2,
+			Typer.getType(expression));
+			
+			return storeExpr(expression, value);
+		}		
 	}
 
 	@Override
@@ -645,4 +707,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		}
 	}
 
+	private boolean isEvaluableShortly(OpBinary op) {
+		return op == OpBinary.LOGIC_AND || op == OpBinary.LOGIC_OR;
+	}
+	
 }
