@@ -153,11 +153,19 @@ class InputSeq(object):
             self.actortostates[actor][schedulestate][scheduleaction]={}
         if port not in self.actortostates[actor][schedulestate][scheduleaction]:
             self.actortostates[actor][schedulestate][scheduleaction][port]=[]
-    def tostring(self, actor, state, action):
+    def tostring(self, leader, state, action):
         s=""
-        for port in self.actortostates[actor][state][action]:
-            for val in self.actortostates[actor][state][action][port]:
-                s+=("chan_"+actor+"_"+port+"!"+val+";\n")
+        for actor in self.actortostates.keys():
+            if actor == leader:
+                for port in self.actortostates[actor][state][action]:
+                    for val in self.actortostates[actor][state][action][port]:
+                        s+=("chan_"+actor+"_"+port+"!"+val+";\n")
+            else:
+                for state in self.actortostates[actor]:
+                    for action in self.actortostates[actor][state]:
+                        for port in self.actortostates[actor][state][action]:
+                            for val in self.actortostates[actor][state][action][port]:
+                                s+=("chan_"+actor+"_"+port+"!"+val+";\n")
         return s
 
 
@@ -171,16 +179,18 @@ class ChannelConfigXML():
     def findinputs(self, configuration):
         tree = et.parse(self.xmlfilename)
         for xactor in tree.findall('.//actor'):        
-            for xread in xactor.findall('.//input'):
-                self.channels.append(xactor.get('name')+'_'+xread.get('port'))
+            for xinput in xactor.findall('.//input'):
+                self.channels.append(xactor.get('name')+'_'+xinput.get('port'))
                 #check if port is input to partition
-                if xread.get('instance') not in configuration.actors:
+                if xinput.get('instance') not in configuration.actors:
                     for xschedule in xactor.findall('.//schedule'):
                         for xrates in xschedule.findall('.//rates'):
                             for xpeek in xrates.findall('.//peek'):
-                                self.partitioninput.addpeek(xactor.get('name'), xpeek.get('port'), xschedule.get('initstate'),xschedule.get('action'),xpeek.get('value'))
+                                if xpeek.get('port') == xinput.get('port'):
+                                    self.partitioninput.addpeek(xactor.get('name'), xpeek.get('port'), xschedule.get('initstate'),xschedule.get('action'),xpeek.get('value'))
                             for xread in xrates.findall('.//read'):
-                                self.partitioninput.addread(xactor.get('name'), xread.get('port'), xschedule.get('initstate'),xschedule.get('action'),xread.get('value'))                    
+                                if xread.get('port') == xinput.get('port'):
+                                    self.partitioninput.addread(xactor.get('name'), xread.get('port'), xschedule.get('initstate'),xschedule.get('action'),xread.get('value'))                    
         return self.partitioninput
 
 

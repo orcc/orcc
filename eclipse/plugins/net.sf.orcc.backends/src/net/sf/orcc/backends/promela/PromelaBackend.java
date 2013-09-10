@@ -165,7 +165,7 @@ public class PromelaBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor instance) {
-		return new InstancePrinter(instance, options).printInstance(path) > 0;
+		return new InstancePrinter(instance, options, schedulingModel).printInstance(path) > 0;
 	}
 
 	/**

@@ -131,15 +131,22 @@ class ScriptPrinter extends PromelaTemplate {
 				nsd=StateDescription()
 				nsd.fromstring(mc.endstate)
 				ns=nsd.isequalto('config_«network.simpleName»', fsm.getnstates())
+				sched=fsm.gettransition(conf.schedule)
 				if ns is None:
 					ns=fsm.getnewstatename()
-				sched=fsm.gettransition(conf.schedule)
+					fsm.addnewnstate(sched.dst, ns)
+				nsd.savestate('config_«network.simpleName»', ns+'.txt')
 				sched.ndst=ns
+				sched.sequence=mc.schedxml
 				fsm.savefsm('config_«network.simpleName»', 'scheduler.txt')
-				print (mc.schedxml)
 				fsm.printfsm()
 			else:
 				print ("\n\nSchedule was not found!!")
+		
+		#if print:
+			#scheduler=SchedulerXML('schedule_«network.simpleName».xml')
+			#scheduler.savenewfsm(fsm, conf, 'schedule_«network.simpleName»_new.xml')
+				
 		
 		conf.printconfiguration()
 		conf.saveconfiguration()

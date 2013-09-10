@@ -31,6 +31,7 @@
 import java.io.File
 import java.util.List
 import java.util.Map
+import java.util.Set
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.State
@@ -48,6 +49,7 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.ecore.EObject
 import net.sf.orcc.df.Actor
+import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel
 
 /*
  * Compile Instance promela
@@ -58,14 +60,15 @@ import net.sf.orcc.df.Actor
 class InstancePrinter extends PromelaTemplate {
 	
 	val Actor actor
+	val Set<Var> schedulingVars
 	
 	val Map<Action, List<InstLoad>> loadPeeks
 	val Map<Action, List<Expression>> guards
 	val Map<EObject, List<Action>> priority
 	
-	new(Actor actor, Map<String, Object> options) {
-		
+	new(Actor actor, Map<String, Object> options, PromelaSchedulingModel schedulingModel) {
 		this.actor = actor
+		this.schedulingVars = schedulingModel.allSchedulingVars
 		
 		loadPeeks = options.get("loadPeeks") as Map<Action, List<InstLoad>>
 		guards = options.get("guards") as Map<Action, List<Expression>>
@@ -101,7 +104,7 @@ class InstancePrinter extends PromelaTemplate {
 		«IF ! actor.stateVars.nullOrEmpty»
 			/* State variables */
 			«FOR stateVar : actor.stateVars»
-				«IF stateVar.assignable»
+				«IF schedulingVars.contains(stateVar)»
 					«stateVar.declareStateVar»
 				«ENDIF»
 			«ENDFOR»
@@ -113,7 +116,7 @@ class InstancePrinter extends PromelaTemplate {
 			«IF ! actor.stateVars.nullOrEmpty»
 				/* State variables */
 				«FOR stateVar : actor.stateVars»
-					«IF !stateVar.assignable»
+					«IF !schedulingVars.contains(stateVar)»
 						«stateVar.declareStateVar»
 					«ENDIF»
 				«ENDFOR»
