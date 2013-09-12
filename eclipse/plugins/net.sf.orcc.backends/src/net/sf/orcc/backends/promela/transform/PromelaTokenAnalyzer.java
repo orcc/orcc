@@ -47,7 +47,7 @@ import net.sf.orcc.df.util.DfVisitor;
  * @author Johan Ersfolk
  * 
  */
-
+@ Deprecated
 public class PromelaTokenAnalyzer extends DfVisitor<Void> {
 
 	@Override

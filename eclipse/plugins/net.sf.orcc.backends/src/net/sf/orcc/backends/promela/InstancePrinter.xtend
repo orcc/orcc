@@ -273,15 +273,19 @@ class InstancePrinter extends PromelaTemplate {
 		'''«loadPeeks.get(action).join(" && ", " && ", "", ['''«target.variable.name»_done == 1'''])»'''
 
 	def inputChannelCheck(Pattern pattern) {
-		if( ! pattern.ports.nullOrEmpty) {
-			'''«pattern.ports.join("&& ", "\n&& ", "", ['''nempty(chan_«actor.simpleName»_«name»)'''])»'''
-		}
+	'''
+		«FOR port : pattern.ports»
+		&& len(chan_«actor.simpleName»_«port.name»)>=«pattern.getNumTokens(port)»
+		«ENDFOR»
+	'''	
 	}
 
 	def outputChannelCheck(Pattern pattern) {
-		if( ! pattern.ports.nullOrEmpty) {
-			'''«pattern.ports.join("&& ", "\n&& ", "", ['''nfull(chan_«actor.simpleName»_«name»)'''])»'''
-		}
+	'''
+		«FOR port : pattern.ports»
+		&& len(chan_«actor.simpleName»_«port.name»)<=«pattern.getNumTokens(port)»
+		«ENDFOR»
+	'''
 	}
 	
 	def inputPattern(Pattern pattern) '''

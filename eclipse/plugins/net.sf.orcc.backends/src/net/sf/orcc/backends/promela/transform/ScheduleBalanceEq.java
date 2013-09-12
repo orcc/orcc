@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
@@ -58,7 +59,7 @@ public class ScheduleBalanceEq {
 	
 	private Map<Actor, NodeInfo> instToNodeMap = new HashMap<Actor, ScheduleBalanceEq.NodeInfo>();
 	
-	private class NodeInfo {
+	public class NodeInfo {
 		Actor actor = null;
 		Set<ChannelInfo> inChannels = new HashSet<ChannelInfo>();
 		Set<ChannelInfo> outChannels = new HashSet<ChannelInfo>();
@@ -66,8 +67,7 @@ public class ScheduleBalanceEq {
 		//Map<NodeInfo, Set<Integer>> balance = new HashMap<NodeInfo, Set<Integer>>();
 	}
 	
-	@SuppressWarnings("unused")
-	private class ChannelInfo {
+	public class ChannelInfo {
 		NodeInfo srcNode = null;
 		NodeInfo dstNode = null;
 		Port sctPort = null;
@@ -75,6 +75,7 @@ public class ScheduleBalanceEq {
 		Connection connection = null;
 		Map<Schedule, Integer> nrReads=new HashMap<Schedule, Integer>();
 		Map<Schedule, Integer> nrWrites=new HashMap<Schedule, Integer>();
+		int smallestFifoSize=1;
 	}
 	
 	public Map<Schedule, Integer> getReads(Connection con) {
@@ -90,6 +91,7 @@ public class ScheduleBalanceEq {
 		this.network=network;
 		createTopology();
 		createChannelRates();
+		calculateSmallestSafeFifoSize();
 	}
 	
 	public Scheduler getScheduler(Actor a) {
@@ -148,6 +150,48 @@ public class ScheduleBalanceEq {
 			}
 		}
 	}
+	
+	private void calculateSmallestSafeFifoSize() {
+		for(ChannelInfo cInfo : conToChanMap.values()) {
+			Set<Integer> reads = new HashSet<Integer>();
+			Set<Integer> writes = new HashSet<Integer>();
+			if (cInfo.srcNode!=null) {
+				Actor actor = cInfo.srcNode.actor;
+				for (Action action : actor.getActions()) {
+					writes.add(action.getOutputPattern().getNumTokens(cInfo.sctPort));
+				}
+			}
+			if (cInfo.dstNode!=null) {
+				Actor actor = cInfo.dstNode.actor;
+				for (Action action : actor.getActions()) {
+					reads.add(action.getInputPattern().getNumTokens(cInfo.dstPort));
+				}
+			}
+			reads.remove(0);	//skip these
+			writes.remove(0);
+			reads.add(1);		//in case only connected to one actor
+			writes.add(1);
+			for (int r : reads) {
+				for (int w : writes) {
+					int lcm=lcm(r,w);
+					if (cInfo.smallestFifoSize<lcm) {
+						cInfo.smallestFifoSize=lcm;
+					}
+				}
+			}
+			cInfo.connection.setAttribute(Connection.BUFFER_SIZE, cInfo.smallestFifoSize);
+		}
+	}
+	
+	private int lcm(int i, int j) {
+	          int mi = i;
+	          int mj = j;
+	          while (mi != mj) {
+	              while (mi < mj) { mi += i; }
+	              while (mi > mj) { mj += j; }
+	          }  
+	          return mi;
+    }
 	
 	private void createTopology() {
 		for (Actor actor : network.getAllActors()) {

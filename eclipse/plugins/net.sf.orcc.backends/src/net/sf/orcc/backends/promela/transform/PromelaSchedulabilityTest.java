@@ -457,7 +457,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				if (!portReads.containsKey(port.getName())) {
 					portReads.put(port.getName(), new ArrayList<Object>());
 				}
-				portReads.get(port.getName()).add(new Integer(0));
+				for (int i=0; i<action.getInputPattern().getNumTokens(port); i++) {
+					portReads.get(port.getName()).add(new Integer(0));
+				}
 			}
 		}
 		System.out.println("Schedule input: "+portReads);
@@ -485,7 +487,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				if (!portWrites.containsKey(port.getName())) {
 					portWrites.put(port.getName(), new ArrayList<Object>());
 				}
-				portWrites.get(port.getName()).add(new Integer(0));
+				for (int i=0; i<action.getOutputPattern().getNumTokens(port); i++) {
+					portWrites.get(port.getName()).add(new Integer(0));
+				}
 			}
 		}
 		System.out.println("Schedule output: "+portWrites);

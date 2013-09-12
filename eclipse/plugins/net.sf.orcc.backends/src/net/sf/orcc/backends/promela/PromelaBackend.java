@@ -45,7 +45,6 @@ import net.sf.orcc.backends.promela.transform.PromelaAddPrefixToStateVar;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
 import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
 import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel;
-import net.sf.orcc.backends.promela.transform.PromelaTokenAnalyzer;
 import net.sf.orcc.backends.promela.transform.ScheduleBalanceEq;
 import net.sf.orcc.backends.promela.transform.Scheduler;
 import net.sf.orcc.backends.transform.Inliner;
@@ -207,7 +206,7 @@ public class PromelaBackend extends AbstractBackend {
 		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(actor);
 		}
-		new PromelaTokenAnalyzer(netStateDef).doSwitch(actor);
+		//new PromelaTokenAnalyzer(netStateDef).doSwitch(actor);
 		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
 				netStateDef);
 		actorScheduler.doSwitch(actor);
