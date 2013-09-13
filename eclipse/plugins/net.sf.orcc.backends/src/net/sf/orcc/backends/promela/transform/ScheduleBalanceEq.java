@@ -64,9 +64,9 @@ public class ScheduleBalanceEq {
 		Set<ChannelInfo> inChannels = new HashSet<ChannelInfo>();
 		Set<ChannelInfo> outChannels = new HashSet<ChannelInfo>();
 		Scheduler scheduler = null;
-		//Map<NodeInfo, Set<Integer>> balance = new HashMap<NodeInfo, Set<Integer>>();
+		//Map<Schedule, Map<NodeInfo, Map<Schedule, Set<Integer>>>> balance = new HashMap<Schedule, Map<NodeInfo, Map<Schedule, Set<Integer>>>>();
 	}
-	
+
 	public class ChannelInfo {
 		NodeInfo srcNode = null;
 		NodeInfo dstNode = null;
@@ -77,7 +77,7 @@ public class ScheduleBalanceEq {
 		Map<Schedule, Integer> nrWrites=new HashMap<Schedule, Integer>();
 		int smallestFifoSize=1;
 	}
-	
+
 	public Map<Schedule, Integer> getReads(Connection con) {
 		return conToChanMap.get(con).nrReads;
 	}
@@ -91,7 +91,9 @@ public class ScheduleBalanceEq {
 		this.network=network;
 		createTopology();
 		createChannelRates();
-		calculateSmallestSafeFifoSize();
+		calculateSmallestFifoSize();
+		//calculateNodeBalances();
+		calculatePortSizes();
 	}
 	
 	public Scheduler getScheduler(Actor a) {
@@ -151,7 +153,7 @@ public class ScheduleBalanceEq {
 		}
 	}
 	
-	private void calculateSmallestSafeFifoSize() {
+	private void calculateSmallestFifoSize() {
 		for(ChannelInfo cInfo : conToChanMap.values()) {
 			Set<Integer> reads = new HashSet<Integer>();
 			Set<Integer> writes = new HashSet<Integer>();
@@ -184,14 +186,44 @@ public class ScheduleBalanceEq {
 	}
 	
 	private int lcm(int i, int j) {
-	          int mi = i;
-	          int mj = j;
-	          while (mi != mj) {
-	              while (mi < mj) { mi += i; }
-	              while (mi > mj) { mj += j; }
-	          }  
-	          return mi;
-    }
+		int mi = i;
+		int mj = j;
+		while (mi != mj) {
+			while (mi < mj) { mi += i; }
+			while (mi > mj) { mj += j; }
+		}  
+		return mi;
+	}
+	
+	/*private void calculateNodeBalances() {
+		//step one, neighbors according to queues
+		for (ChannelInfo ci : conToChanMap.values()) {
+			for (Schedule s1 : ci.nrReads.keySet()) {
+				for (Schedule s2 : ci.nrWrites.keySet()) {
+					
+				}
+			}
+		}
+	}*/
+	
+	private void calculatePortSizes() {
+		for (Actor actor : network.getAllActors()) {
+			for (Action action : actor.getActions()) {
+				for (Port port : action.getInputPattern().getPorts()) {
+					int nr = action.getInputPattern().getNumTokens(port);
+					int curr = port.getNumTokensConsumed();
+					nr = Math.max(nr, curr);
+					port.setNumTokensConsumed(nr);
+				}
+				for (Port port : action.getOutputPattern().getPorts()) {
+					int nr = action.getOutputPattern().getNumTokens(port);
+					int curr = port.getNumTokensProduced();
+					nr = Math.max(nr, curr);
+					port.setNumTokensProduced(nr);
+				}
+			}
+		}
+	}
 	
 	private void createTopology() {
 		for (Actor actor : network.getAllActors()) {
@@ -233,8 +265,5 @@ public class ScheduleBalanceEq {
 		for (Scheduler scheduler : schedulers) {
 			instToNodeMap.get(scheduler.getActor()).scheduler=scheduler;
 		}
-
 	}
-	
-
 }

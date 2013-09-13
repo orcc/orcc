@@ -42,7 +42,7 @@ class ModelChecker(object):
         proc = Popen(['pan', '-E', '-n'], stdout=PIPE, universal_newlines=True)
         for line in iter(proc.stdout):
             line = str(line.strip())
-            if line.find('end state in claim reached') >= 0 :
+            if line.find('end state in claim reached') >= 0 or line.find('assertion violated') >= 0:
                 self.tracefound=True
                 print ("Pan:", line)
             else:

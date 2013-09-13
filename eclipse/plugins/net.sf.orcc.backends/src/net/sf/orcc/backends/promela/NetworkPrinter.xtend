@@ -112,7 +112,8 @@ class NetworkPrinter extends PromelaTemplate {
 	'''
 
 	def allocateFifo(Connection connection) { 
-		val size = if (connection.size != null) connection.size
+		val size = if (connection.sourcePort==null || connection.targetPort==null) 1000
+					else if (connection.size != null) connection.size
 					else "SIZE"
 		'''
 			«IF connection.sourcePort != null»

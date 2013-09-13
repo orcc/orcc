@@ -404,12 +404,12 @@ class InstancePrinter extends PromelaTemplate {
 	
 	override caseBlockIf(BlockIf blockIf) '''
 		if 
-		:: («blockIf.condition.doSwitch») ->
+		:: («blockIf.condition.doSwitch») -> skip;
 			«FOR block : blockIf.thenBlocks»
 				«block.doSwitch»
 			«ENDFOR»
 		«IF ! blockIf.elseBlocks.nullOrEmpty»
-		:: else ->
+		:: else -> skip;
 			«FOR block : blockIf.elseBlocks»
 				«block.doSwitch»
 			«ENDFOR»
@@ -420,7 +420,7 @@ class InstancePrinter extends PromelaTemplate {
 	
 	override caseBlockWhile(BlockWhile blockWhile) '''
 		do 
-		:: «blockWhile.condition.doSwitch» ->
+		:: «blockWhile.condition.doSwitch» -> skip;
 			«FOR block : blockWhile.blocks»
 				«block.doSwitch»
 			«ENDFOR»

@@ -36,6 +36,8 @@ import net.sf.orcc.backends.promela.transform.Scheduler
 import net.sf.orcc.backends.promela.transform.Schedule
 import net.sf.orcc.backends.promela.transform.ScheduleBalanceEq
 import net.sf.orcc.df.Actor
+import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Port
 
 /**
  * Prints the contents of the class ScheduleBalanceEq to an XML file 
@@ -104,23 +106,33 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 	'''
 		«FOR port : instance.incomingPortMap.keySet»
 			«IF balanceEq.getSource(instance.incomingPortMap.get(port)) != null»
-				<input port="«port.name»" instance="«balanceEq.getSource(instance.incomingPortMap.get(port)).simpleName»"/>
+				<input port="«port.name»" instance="«balanceEq.getSource(instance.incomingPortMap.get(port)).simpleName»" channelID="«port.connID(instance)»"/>
 			«ELSE»
-				<input port="«port.name»" instance="NULL"/>
+				<input port="«port.name»" instance="NULL" channelID="«port.connID(instance)»"/>
 			«ENDIF»
 		«ENDFOR»
 		«FOR port : instance.outgoingPortMap.keySet»
 			«FOR con : instance.outgoingPortMap.get(port)»
 				«IF balanceEq.getDestination(con) != null»
-					<output port="«port.name»" instance="«balanceEq.getDestination(con).simpleName»"/>
+					<output port="«port.name»" instance="«balanceEq.getDestination(con).simpleName»" channelID="«port.connID(instance)»"/>
 				«ELSE»
-					<output port="«port.name»" instance="NULL"/>
+					<output port="«port.name»" instance="NULL" channelID="«port.connID(instance)»"/>
 				«ENDIF»
 			«ENDFOR»
 		«ENDFOR»
 	'''
 	}
 	
+	def connID(Port port, Actor actor) {
+		if( actor.getIncomingPortMap().get(port)!=null) {
+			val Connection connection = (actor.getIncomingPortMap().get(port) as Connection)
+			'''chan_«connection.<Object>getValueAsObject("id")»'''
+		} else
+		if( ! actor.getOutgoingPortMap().get(port).nullOrEmpty) {
+			val Connection connection = (actor.getOutgoingPortMap().get(port).get(0) as Connection)
+			'''chan_«connection.<Object>getValueAsObject("id")»'''
+		}
+	}
 	
 	def rates(Schedule schedule) {
 	'''

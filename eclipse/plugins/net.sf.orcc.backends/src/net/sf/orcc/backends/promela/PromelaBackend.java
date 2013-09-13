@@ -154,9 +154,9 @@ public class PromelaBackend extends AbstractBackend {
 
 		transformActorsAgain(network.getAllActors());
 
-		printChildren(network);
-
 		balanceEq = new ScheduleBalanceEq(actorSchedulers, network);
+
+		printChildren(network);
 
 		network.computeTemplateMaps();
 		printNetwork(network);

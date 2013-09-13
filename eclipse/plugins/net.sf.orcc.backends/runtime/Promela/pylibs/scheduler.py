@@ -19,9 +19,11 @@ class Transition:
 class FSM:
     nrtrans=0
     initial = None
-    transitions = list()
+    transitions = None
     def __init__(self, initial=None):
         self.initial = initial
+        self.transitions=list()
+        self.nrtrans=0
     def addTransition(self, trans):
         self.transitions.append(trans)
     def gettransition(self, transid):

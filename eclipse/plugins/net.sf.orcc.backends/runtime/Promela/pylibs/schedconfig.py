@@ -153,12 +153,12 @@ class InputSeq(object):
             self.actortostates[actor][schedulestate][scheduleaction]={}
         if port not in self.actortostates[actor][schedulestate][scheduleaction]:
             self.actortostates[actor][schedulestate][scheduleaction][port]=[]
-    def tostring(self, leader, state, action):
+    def tostring(self, leader, lstate, laction):
         s=""
         for actor in self.actortostates.keys():
             if actor == leader:
-                for port in self.actortostates[actor][state][action]:
-                    for val in self.actortostates[actor][state][action][port]:
+                for port in self.actortostates[actor][lstate][laction]:
+                    for val in self.actortostates[actor][lstate][laction][port]:
                         s+=("chan_"+actor+"_"+port+"!"+val+";\n")
             else:
                 for state in self.actortostates[actor]:

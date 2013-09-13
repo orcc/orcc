@@ -389,7 +389,7 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 	private void identifyControlTokenPorts(Network network) {
 		for (Connection con : network.getConnections()) {
 			fifoTargetToSourceMap.put(con.getTargetPort(), con.getSourcePort());
-		}System.out.println(inputPortsUsedInScheduling);
+		}
 		Set<Port> temp = new HashSet<Port>();
 		while (true) {
 			for (Port port : inputPortsUsedInScheduling) {
