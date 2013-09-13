@@ -83,6 +83,7 @@ class InstancePrinter extends CTemplate {
 	protected var String entityName
 	
 	protected var boolean geneticAlgo = false
+	protected var boolean isVectorizable = false
 	
 	var boolean newSchedul = false
 	var boolean ringTopology = false
@@ -497,7 +498,15 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«trans.action.body.name»();
+				«IF isVectorizable && !trans.action.outputPattern.empty»
+					if (isVectorizable) {
+						«trans.action.body.name»_vectorizable();
+					} else {
+						«trans.action.body.name»();
+					}
+				«ELSE»
+					«trans.action.body.name»();
+				«ENDIF»
 				i++;
 				goto l_«trans.target.name»;
 			}«ENDFOR» else {
@@ -507,7 +516,9 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def protected printTransitionPattern(Pattern pattern) '''
+	def protected printTransitionPattern(Pattern pattern)  {
+		isVectorizable = false
+		'''
 		«IF newSchedul»
 			«FOR port : pattern.ports»
 				«printTransitionPatternPort(port, pattern)»
@@ -515,7 +526,8 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 		si->num_firings = i;
 		si->reason = starved;
-	'''
+		'''
+	}
 	
 	def private printTransitionPatternPort(Port port, Pattern pattern) '''
 		if (numTokens_«port.name» - index_«port.name» < «pattern.getNumTokens(port)») {
@@ -616,13 +628,17 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def protected printOutputPattern(Pattern pattern) '''
+	def protected printOutputPattern(Pattern pattern) {
+		isVectorizable = false
+		'''
 		int stop = 0;
+		int isVectorizable = 0;
 		«FOR port : pattern.ports»
 			«printOutputPatternsPort(pattern, port)»
 		«ENDFOR»
 		if (stop != 0) {
-	'''
+		'''
+	}
 	
 	def protected printOutputPatternsPort(Pattern pattern, Port port) {
 		var i = -1
@@ -633,7 +649,12 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 	
-	def protected printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
+	def protected printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) {
+		isVectorizable = pattern.getNumTokens(port) >= MIN_VECTORIZABLE
+		'''
+		«IF isVectorizable»
+			isVectorizable = «port.fullName»->read_inds[«id»] < «port.fullName»->write_ind;
+		«ENDIF»
 		if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
 			stop = 1;
 			«IF newSchedul»
@@ -642,7 +663,8 @@ class InstancePrinter extends CTemplate {
 				}
 			«ENDIF»
 		}
-	'''
+		'''
+	}
 
 	def protected checkInputPattern(Pattern pattern)
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.getNumTokens(port)» && «ENDFOR»'''
@@ -679,6 +701,61 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
+	def private isVectorizable(Action action) {
+		var bIsVetorizable = false
+		for (port : action.outputPattern.ports) {
+			bIsVetorizable = action.outputPattern.getNumTokens(port) >= MIN_VECTORIZABLE
+		}
+		return bIsVetorizable
+	}
+
+	def protected printVectorizable(Action action) {
+		isVectorizable = isVectorizable(action)
+		val output = '''
+		«IF isVectorizable»
+			static «inline»void «action.body.name»_vectorizable() {
+			«FOR variable : action.body.locals»
+				«variable.declare»;
+			«ENDFOR»
+
+			«FOR port : action.outputPattern.ports»					
+				«port.type.doSwitch» local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+			«ENDFOR»
+		
+			«FOR block : action.body.blocks»
+				«block.doSwitch»
+			«ENDFOR»
+		
+			«FOR port : action.inputPattern.ports»
+				«IF enableTrace»
+				{
+					int i;
+					for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
+						fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+					}
+				}
+				«ENDIF»
+				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
+			«ENDFOR»
+			
+			«FOR port : action.outputPattern.ports»
+				«IF enableTrace»
+					{
+						int i;
+						for (i = 0; i < «action.outputPattern.getNumTokens(port)»; i++) {
+							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+						}
+					}
+				«ENDIF»
+				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
+			«ENDFOR»
+			}
+		«ENDIF»			
+		'''
+		isVectorizable = false
+		return output
+	}
+	
 	def protected print(Action action) {
 		currentAction = action
 		val output = '''
@@ -716,10 +793,13 @@ class InstancePrinter extends CTemplate {
 				«ENDFOR»
 			}
 			
+			«action.printVectorizable»
+
 			«action.scheduler.print»
 			
 		'''
 		currentAction = null
+		isVectorizable = false
 		return output
 	}
 	
@@ -845,7 +925,11 @@ class InstancePrinter extends CTemplate {
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
+				«IF isVectorizable»
+					tokens_«trgtPort.name»[local_index_«trgtPort.name» + «store.indexes.head.doSwitch»] = «store.value.doSwitch»;
+				«ELSE»
+					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
+				«ENDIF»
 			«ENDIF»
 		«ELSE»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
