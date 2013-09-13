@@ -28,12 +28,14 @@
  */
 package net.sf.orcc.cal;
 
+import net.sf.orcc.cal.parser.impl.PatchedPartialParsingHelper;
 import net.sf.orcc.cal.services.CalLinkingService;
 import net.sf.orcc.cal.services.CalQualifiedNameProvider;
 
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingService;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.parser.antlr.IPartialParsingHelper;
 import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider;
 
 /**
@@ -60,4 +62,13 @@ public class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
 		return CalValueConverter.class;
 	}
 
+	/*
+	 * [2013-09-13 - alorence] This binding resolve an issue With Xtext 2.4.x.
+	 * It should be removed when the bug is fixed (planned for 2.5 release). See
+	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=416913 for more information
+	 */
+	@Override
+	public Class<? extends IPartialParsingHelper> bindIPartialParserHelper() {
+		return PatchedPartialParsingHelper.class;
+	}
 }
