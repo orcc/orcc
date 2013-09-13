@@ -620,7 +620,15 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«action.body.name»();
+				«IF isVectorizable && !action.outputPattern.empty»
+					if (isVectorizable) {
+						«action.body.name»_vectorizable();
+					} else {
+						«action.body.name»();
+					}
+				«ELSE»
+					«action.body.name»();
+				«ENDIF»
 				i++;
 			}«ENDFOR» else {
 			«inputPattern.printTransitionPattern»
@@ -653,7 +661,7 @@ class InstancePrinter extends CTemplate {
 		isVectorizable = pattern.getNumTokens(port) >= MIN_VECTORIZABLE
 		'''
 		«IF isVectorizable»
-			isVectorizable = «port.fullName»->read_inds[«id»] < «port.fullName»->write_ind;
+			isVectorizable = «port.fullName»->read_inds[«id»] > «port.fullName»->write_ind;
 		«ENDIF»
 		if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
 			stop = 1;
@@ -702,24 +710,40 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	def private isVectorizable(Action action) {
-		var bIsVetorizable = false
-		for (port : action.outputPattern.ports) {
-			bIsVetorizable = action.outputPattern.getNumTokens(port) >= MIN_VECTORIZABLE
+		var bIsVectorizable = false
+		for (port : action.inputPattern.ports) {
+			bIsVectorizable = isPortVectorizable(action.inputPattern, port)
 		}
-		return bIsVetorizable
+		for (port : action.outputPattern.ports) {
+			bIsVectorizable = isPortVectorizable(action.outputPattern, port)
+		}
+		return bIsVectorizable
+	}
+
+	def private isPortVectorizable(Pattern pattern, Port port) {
+		return pattern.getNumTokens(port) >= MIN_VECTORIZABLE
 	}
 
 	def protected printVectorizable(Action action) {
 		isVectorizable = isVectorizable(action)
 		val output = '''
 		«IF isVectorizable»
-			static «inline»void «action.body.name»_vectorizable() {
+		
+		static «inline»void «action.body.name»_vectorizable() {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
 
+			«FOR port : action.inputPattern.ports»	
+				«IF isPortVectorizable(action.inputPattern, port)»
+					«port.type.doSwitch» local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+				«ENDIF»
+			«ENDFOR»
+
 			«FOR port : action.outputPattern.ports»					
-				«port.type.doSwitch» local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+				«IF isPortVectorizable(action.outputPattern, port)»
+					«port.type.doSwitch» local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+				«ENDIF»
 			«ENDFOR»
 		
 			«FOR block : action.body.blocks»
@@ -749,7 +773,7 @@ class InstancePrinter extends CTemplate {
 				«ENDIF»
 				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
 			«ENDFOR»
-			}
+		}
 		«ENDIF»			
 		'''
 		isVectorizable = false
@@ -792,14 +816,12 @@ class InstancePrinter extends CTemplate {
 					index_«port.name» += «action.outputPattern.getNumTokens(port)»;
 				«ENDFOR»
 			}
-			
 			«action.printVectorizable»
 
 			«action.scheduler.print»
 			
 		'''
 		currentAction = null
-		isVectorizable = false
 		return output
 	}
 	
@@ -911,7 +933,11 @@ class InstancePrinter extends CTemplate {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«load.target.variable.indexedName» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
+				«IF isVectorizable && isPortVectorizable(currentAction.inputPattern, srcPort)»
+					«load.target.variable.indexedName» = tokens_«srcPort.name»[local_index_«srcPort.name» + «load.indexes.head.doSwitch»];
+				«ELSE»
+					«load.target.variable.indexedName» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
+				«ENDIF»
 			«ELSE»
 				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
@@ -925,7 +951,7 @@ class InstancePrinter extends CTemplate {
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF isVectorizable»
+				«IF isVectorizable && isPortVectorizable(currentAction.outputPattern, trgtPort)»
 					tokens_«trgtPort.name»[local_index_«trgtPort.name» + «store.indexes.head.doSwitch»] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
