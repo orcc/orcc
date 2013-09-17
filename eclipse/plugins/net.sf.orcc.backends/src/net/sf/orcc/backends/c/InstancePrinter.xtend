@@ -83,7 +83,7 @@ class InstancePrinter extends CTemplate {
 	protected var String entityName
 	
 	protected var boolean geneticAlgo = false
-	protected var boolean isVectorizable = false
+	protected var boolean isActionVectorizable = false
 	
 	var boolean newSchedul = false
 	var boolean ringTopology = false
@@ -486,9 +486,24 @@ class InstancePrinter extends CTemplate {
 			«state.printStateTransitions»
 		«ENDIF»
 	'''
-	
-	def protected printStateTransitions(State state) '''
-		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
+
+	def protected printVectorizationConditions(Action action) '''
+		int isVectorizable = 1;
+		«FOR port : action.inputPattern.ports»
+			«IF action.inputPattern.isPortVectorizable(port)»
+			isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
+			«ENDIF»
+		«ENDFOR»
+		«FOR port : action.outputPattern.ports»
+			«IF action.outputPattern.isPortVectorizable(port)»
+			isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
+			«ENDIF»
+		«ENDFOR»
+	'''
+		
+	def protected printStateTransition(State state, Transition trans) {
+		isActionVectorizable = isActionVectorizable(trans.action)		
+		val output = '''		
 			if («trans.action.inputPattern.checkInputPattern»isSchedulable_«trans.action.name»()) {
 				«IF !trans.action.outputPattern.empty»
 					«trans.action.outputPattern.printOutputPattern»
@@ -498,7 +513,8 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«IF isVectorizable && !trans.action.outputPattern.empty»
+				«IF isActionVectorizable && (!trans.action.outputPattern.empty || !trans.action.inputPattern.empty)»
+					«printVectorizationConditions(trans.action)»
 					if (isVectorizable) {
 						«trans.action.body.name»_vectorizable();
 					} else {
@@ -509,7 +525,15 @@ class InstancePrinter extends CTemplate {
 				«ENDIF»
 				i++;
 				goto l_«trans.target.name»;
-			}«ENDFOR» else {
+		'''
+		isActionVectorizable = false
+		return output
+	}	
+	
+	def protected printStateTransitions(State state) '''
+		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
+		«printStateTransition(state, trans)»
+		}«ENDFOR» else {
 			«transitionPattern.get(state).printTransitionPattern»
 			_FSM_state = my_state_«state.name»;
 			goto finished;
@@ -517,7 +541,6 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	def protected printTransitionPattern(Pattern pattern)  {
-		isVectorizable = false
 		'''
 		«IF newSchedul»
 			«FOR port : pattern.ports»
@@ -609,9 +632,10 @@ class InstancePrinter extends CTemplate {
 			«actions.printActions»
 		}
 	'''
-	
-	def protected printActions(Iterable<Action> actions) '''
-		«FOR action : actions SEPARATOR " else "»
+
+	def protected printAction(Action action) {
+		isActionVectorizable = isActionVectorizable(action)		
+		val output = '''		
 			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 				«IF !action.outputPattern.empty»
 					«action.outputPattern.printOutputPattern»
@@ -620,7 +644,8 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«IF isVectorizable && !action.outputPattern.empty»
+				«IF isActionVectorizable && (!action.outputPattern.empty || !action.inputPattern.empty)»
+					«printVectorizationConditions(action)»
 					if (isVectorizable) {
 						«action.body.name»_vectorizable();
 					} else {
@@ -630,6 +655,14 @@ class InstancePrinter extends CTemplate {
 					«action.body.name»();
 				«ENDIF»
 				i++;
+		'''
+		isActionVectorizable = false
+		return output
+	}	
+	
+	def protected printActions(Iterable<Action> actions) '''
+		«FOR action : actions SEPARATOR " else "»
+			«action.printAction»
 			}«ENDFOR» else {
 			«inputPattern.printTransitionPattern»
 			goto finished;
@@ -637,10 +670,8 @@ class InstancePrinter extends CTemplate {
 	'''
 	
 	def protected printOutputPattern(Pattern pattern) {
-		isVectorizable = false
 		'''
 		int stop = 0;
-		int isVectorizable = 0;
 		«FOR port : pattern.ports»
 			«printOutputPatternsPort(pattern, port)»
 		«ENDFOR»
@@ -658,11 +689,7 @@ class InstancePrinter extends CTemplate {
 	}
 	
 	def protected printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) {
-		isVectorizable = pattern.getNumTokens(port) >= MIN_VECTORIZABLE
 		'''
-		«IF isVectorizable»
-			isVectorizable = «port.fullName»->read_inds[«id»] > «port.fullName»->write_ind;
-		«ENDIF»
 		if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
 			stop = 1;
 			«IF newSchedul»
@@ -709,13 +736,13 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def private isVectorizable(Action action) {
+	def private isActionVectorizable(Action action) {
 		var bIsVectorizable = false
 		for (port : action.inputPattern.ports) {
-			bIsVectorizable = isPortVectorizable(action.inputPattern, port)
+			bIsVectorizable = bIsVectorizable || isPortVectorizable(action.inputPattern, port)
 		}
 		for (port : action.outputPattern.ports) {
-			bIsVectorizable = isPortVectorizable(action.outputPattern, port)
+			bIsVectorizable = bIsVectorizable || isPortVectorizable(action.outputPattern, port)
 		}
 		return bIsVectorizable
 	}
@@ -725,9 +752,9 @@ class InstancePrinter extends CTemplate {
 	}
 
 	def protected printVectorizable(Action action) {
-		isVectorizable = isVectorizable(action)
+		isActionVectorizable = isActionVectorizable(action)
 		val output = '''
-		«IF isVectorizable»
+		«IF isActionVectorizable»
 		
 		static «inline»void «action.body.name»_vectorizable() {
 			«FOR variable : action.body.locals»
@@ -736,13 +763,13 @@ class InstancePrinter extends CTemplate {
 
 			«FOR port : action.inputPattern.ports»	
 				«IF isPortVectorizable(action.inputPattern, port)»
-					«port.type.doSwitch» local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+					 unsigned int local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 				«ENDIF»
 			«ENDFOR»
 
 			«FOR port : action.outputPattern.ports»					
 				«IF isPortVectorizable(action.outputPattern, port)»
-					«port.type.doSwitch» local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+					unsigned int local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 				«ENDIF»
 			«ENDFOR»
 		
@@ -776,7 +803,7 @@ class InstancePrinter extends CTemplate {
 		}
 		«ENDIF»			
 		'''
-		isVectorizable = false
+		isActionVectorizable = false
 		return output
 	}
 	
@@ -933,8 +960,8 @@ class InstancePrinter extends CTemplate {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«IF isVectorizable && isPortVectorizable(currentAction.inputPattern, srcPort)»
-					«load.target.variable.indexedName» = tokens_«srcPort.name»[local_index_«srcPort.name» + «load.indexes.head.doSwitch»];
+				«IF isActionVectorizable && isPortVectorizable(currentAction.inputPattern, srcPort)»
+					«load.target.variable.indexedName» = tokens_«srcPort.name»[(local_index_«srcPort.name» + («load.indexes.head.doSwitch»))];
 				«ELSE»
 					«load.target.variable.indexedName» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
 				«ENDIF»
@@ -951,8 +978,8 @@ class InstancePrinter extends CTemplate {
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF isVectorizable && isPortVectorizable(currentAction.outputPattern, trgtPort)»
-					tokens_«trgtPort.name»[local_index_«trgtPort.name» + «store.indexes.head.doSwitch»] = «store.value.doSwitch»;
+				«IF isActionVectorizable && isPortVectorizable(currentAction.outputPattern, trgtPort)»
+					tokens_«trgtPort.name»[(local_index_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
 				«ENDIF»
