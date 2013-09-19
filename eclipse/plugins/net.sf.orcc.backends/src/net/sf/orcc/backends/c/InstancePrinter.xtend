@@ -763,13 +763,13 @@ class InstancePrinter extends CTemplate {
 
 			«FOR port : action.inputPattern.ports»	
 				«IF isPortVectorizable(action.inputPattern, port)»
-					 unsigned int local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+					 i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 				«ENDIF»
 			«ENDFOR»
 
 			«FOR port : action.outputPattern.ports»					
 				«IF isPortVectorizable(action.outputPattern, port)»
-					unsigned int local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+					i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 				«ENDIF»
 			«ENDFOR»
 		
