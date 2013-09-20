@@ -88,8 +88,30 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 			<connections>
 			«actor.connections»
 			</connections>
+			<state>
+			«balanceEq.getScheduler(actor).stateVarsInState»
+			</state>
 		</actor>
 	'''
+	}
+	
+	def stateVarsInState(Scheduler scheduler) {
+	'''
+	«FOR state : scheduler.stateToRelevantVars.keySet»
+	«IF state != null»
+	<fsmstate name='«state»'>
+		«FOR variable : scheduler.stateToRelevantVars.get(state)»
+		<variable name='«variable.name»'/>
+		«ENDFOR»
+	</fsmstate>
+	«ENDIF»
+	«ENDFOR»
+	<allstates>
+		«FOR variable : scheduler.schedulingVars»
+		<variable name='«variable.name»'/>
+		«ENDFOR»	
+	</allstates>
+	'''		
 	}
 	
 	def schedulesxml(Scheduler scheduler){

@@ -136,7 +136,7 @@ public class PromelaBackend extends AbstractBackend {
 		new NetworkFlattener().doSwitch(network);
 
 		// Classify network
-		new Classifier().doSwitch(network);
+		new Classifier(true).doSwitch(network);
 
 		options.put("guards", guards);
 		options.put("priority", priority);

@@ -42,11 +42,13 @@ class FSM:
         return name
     def addnewnstate(self, origstate, name):
         templist=list()
+        tempactions=list()
         for trans in self.transitions:
-            if trans.src == origstate:
+            if trans.src == origstate and trans.action not in tempactions:
                 ntrns = Transition(trans.src, trans.dst, trans.action, str(self.nrtrans), name)
                 self.nrtrans=self.nrtrans+1
                 templist.append(ntrns)
+                tempactions.append(trans.action)
         self.transitions.extend(templist)
     def sortTransitions(self):
         """Sorts such that scheduling always starts form a known state"""

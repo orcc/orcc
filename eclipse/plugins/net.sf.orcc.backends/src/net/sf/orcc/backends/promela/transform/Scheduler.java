@@ -29,6 +29,14 @@ public class Scheduler {
 
 	private Map<Action, Map<Var, Set<Var>>> localVarDep = new HashMap<Action, Map<Var, Set<Var>>>();
 
+	private Map<State, Set<Var>> stateToRelevantVars = new HashMap<State, Set<Var>>();
+	
+	private Set<Var> schedulingVars = null;
+	
+	public Set<Var> getSchedulingVars() {
+		return schedulingVars;
+	}
+
 	private Actor actor;
 
 	public Scheduler(Actor actor, FSM fsm) {
@@ -181,5 +189,13 @@ public class Scheduler {
 		}
 		s += "</fsm>\n";
 		return s;
+	}
+	
+	public Map<State, Set<Var>> getStateToRelevantVars() {
+		return stateToRelevantVars;
+	}
+
+	public void setSchedulingVars(Set<Var> stateVars) {
+		schedulingVars=stateVars;		
 	}
 }
