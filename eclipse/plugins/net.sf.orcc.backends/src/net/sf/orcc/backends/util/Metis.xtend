@@ -138,7 +138,7 @@ class Metis {
 	}
 	
 	def private parse(int partitionNumber, String path) {
-		val indexMap = vertexMap.inverse as BiMap<Integer, Vertex>
+		val indexMap = vertexMap.inverse
 		val mapping = new HashMap<String, String>
 		try{
 			// Open the file that is the first command line parameter

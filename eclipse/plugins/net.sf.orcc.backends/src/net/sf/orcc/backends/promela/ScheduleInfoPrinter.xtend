@@ -125,11 +125,11 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 	
 	def connID(Port port, Actor actor) {
 		if( actor.getIncomingPortMap().get(port)!=null) {
-			val Connection connection = (actor.getIncomingPortMap().get(port) as Connection)
+			val Connection connection = actor.getIncomingPortMap().get(port)
 			'''chan_«connection.<Object>getValueAsObject("id")»'''
 		} else
 		if( ! actor.getOutgoingPortMap().get(port).nullOrEmpty) {
-			val Connection connection = (actor.getOutgoingPortMap().get(port).get(0) as Connection)
+			val Connection connection = actor.getOutgoingPortMap().get(port).get(0)
 			'''chan_«connection.<Object>getValueAsObject("id")»'''
 		}
 	}

@@ -152,7 +152,7 @@ abstract class LLVMTemplate extends CommonPrinter {
 	}
 	
 	override caseExprVar(ExprVar expr) {
-		(expr as ExprVar).use.variable.print
+		expr.use.variable.print
 	}
 		
 	override caseExprList(ExprList exprList) {
