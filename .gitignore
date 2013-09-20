@@ -1,0 +1,8 @@
+# Build related folder
+build*/
+bin/
+
+# IDE config files
+*.user
+*.sublime-project
+*.sublime-workspace
