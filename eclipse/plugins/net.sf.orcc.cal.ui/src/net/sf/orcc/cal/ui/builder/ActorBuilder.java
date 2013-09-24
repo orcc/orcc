@@ -102,7 +102,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 		// store result of build
 		List<Unit> unitsBuilt = new ArrayList<Unit>();
-		Set<IResourceDescription> builtDescs = new HashSet<IResourceDescription>();
+		Set<IResourceDescription> builtResources = new HashSet<IResourceDescription>();
 
 		// build actors/units
 		currentResourceSet = context.getResourceSet();
@@ -111,7 +111,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			if (delta.getNew() != null) {
 				IResourceDescription desc = delta.getNew();
 				monitor.subTask(desc.getURI().lastSegment());
-				builtDescs.add(desc);
+				builtResources.add(desc);
 				EObject entity = build(desc);
 				if (entity instanceof Unit) {
 					unitsBuilt.add((Unit) entity);
@@ -128,7 +128,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		// entities
 		if (!unitsBuilt.isEmpty()) {
 			CacheManager.instance.unloadAllCaches();
-			buildDependentEntities(monitor, builtDescs, unitsBuilt);
+			buildDependentEntities(monitor, builtResources, unitsBuilt);
 		}
 
 		// to free up some memory
@@ -139,6 +139,15 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		monitor.done();
 	}
 
+	/**
+	 * Build the IR file corresponding to the given <i>desc</i>.
+	 * 
+	 * @param desc
+	 *            A resource description corresponding to a CAL file, containing
+	 *            code of an Actor or a Unit
+	 * @return
+	 * @throws CoreException
+	 */
 	private EObject build(IResourceDescription desc) throws CoreException {
 		// load resource and compile
 		Resource resource = currentResourceSet.getResource(desc.getURI(), true);
@@ -147,6 +156,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				AstEntity entity = (AstEntity) obj;
 				IFile file = EcoreHelper.getFile(resource);
 				if (hasErrors(file)) {
+					// Should we delete the corresponding file here ?
 					return null;
 				} else {
 					return Frontend.getEntity(entity);
@@ -157,6 +167,15 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		return null;
 	}
 
+	/**
+	 * Build all entities which depends on one of the units in the given
+	 * <i>units</i> list.
+	 * 
+	 * @param monitor
+	 * @param builtDescs
+	 * @param units
+	 * @throws CoreException
+	 */
 	private void buildDependentEntities(IProgressMonitor monitor,
 			Set<IResourceDescription> builtDescs, List<Unit> units)
 			throws CoreException {
@@ -185,6 +204,10 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		// build dependent descs
 		monitor.beginTask("Building dependencies", dependentDescs.size());
 		for (IResourceDescription desc : dependentDescs) {
+
+			if (monitor.isCanceled()) {
+				break;
+			}
 			monitor.subTask(desc.getURI().lastSegment());
 			build(desc);
 			monitor.worked(1);
@@ -205,7 +228,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		for (IMarker marker : markers) {
 			if (IMarker.SEVERITY_ERROR == marker.getAttribute(IMarker.SEVERITY,
 					IMarker.SEVERITY_INFO)) {
-				// an error => no compilation
 				return true;
 			}
 		}
