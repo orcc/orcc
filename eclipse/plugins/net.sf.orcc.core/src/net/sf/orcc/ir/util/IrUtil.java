@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.util;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -441,23 +440,6 @@ public class IrUtil {
 		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
 				.append(DfUtil.getFile(entity)).addFileExtension("ir")
 				.toString(), true);
-		return serializeActor(set, uri, entity);
-	}
-
-	/**
-	 * Serializes the given entity to the given output folder.
-	 * 
-	 * @param outputFolderaddBlockBeforeExpr
-	 *            output folder
-	 * @param entity
-	 *            an entity
-	 * @return <code>true</code> if the serialization succeeded
-	 */
-	public static boolean serializeActor(ResourceSet set, String outputFolder,
-			EObject entity) {
-		String pathName = outputFolder + File.separator
-				+ DfUtil.getFile(entity) + ".ir";
-		URI uri = URI.createFileURI(pathName);
 		return serializeActor(set, uri, entity);
 	}
 
