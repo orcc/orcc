@@ -71,8 +71,7 @@ class Vectorizable {
 			}
 		} 
 		
-		return false
-//		return bIsAlwaysVectorizable
+		return bIsAlwaysVectorizable
 	}
 	
 	def static private boolean setVectorizableAttributs(Action action, int nbActions) {
