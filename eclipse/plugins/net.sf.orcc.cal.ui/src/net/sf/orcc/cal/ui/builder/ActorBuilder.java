@@ -127,7 +127,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 		// find out and build all entities that import things from the built
 		// entities
-		if (!unitsBuilt.isEmpty()) {
+		if ((type == BuildType.INCREMENTAL || type == BuildType.RECOVERY)
+				&& !unitsBuilt.isEmpty()) {
 			CacheManager.instance.unloadAllCaches();
 			buildDependentEntities(monitor, builtResources, unitsBuilt);
 		}
