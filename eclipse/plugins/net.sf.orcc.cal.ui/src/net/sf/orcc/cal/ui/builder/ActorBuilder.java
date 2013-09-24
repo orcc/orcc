@@ -98,6 +98,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			// first refresh so that everything can be removed by delete
 			outputFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 			outputFolder.delete(true, null);
+			return;
 		}
 
 		// store result of build
