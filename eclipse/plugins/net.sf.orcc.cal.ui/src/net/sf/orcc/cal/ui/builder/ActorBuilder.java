@@ -74,6 +74,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	@Inject
 	private ResourceDescriptionsProvider provider;
 
+	private ResourceSet currentResourceSet;
+
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor)
 			throws CoreException {
@@ -103,14 +105,14 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		Set<IResourceDescription> builtDescs = new HashSet<IResourceDescription>();
 
 		// build actors/units
-		ResourceSet set = context.getResourceSet();
+		currentResourceSet = context.getResourceSet();
 		monitor.beginTask("Building actors", context.getDeltas().size());
 		for (Delta delta : context.getDeltas()) {
 			if (delta.getNew() != null) {
 				IResourceDescription desc = delta.getNew();
 				monitor.subTask(desc.getURI().lastSegment());
 				builtDescs.add(desc);
-				EObject entity = build(set, desc);
+				EObject entity = build(desc);
 				if (entity instanceof Unit) {
 					unitsBuilt.add((Unit) entity);
 				}
@@ -126,20 +128,20 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		// entities
 		if (!unitsBuilt.isEmpty()) {
 			CacheManager.instance.unloadAllCaches();
-			buildDependentEntities(monitor, set, builtDescs, unitsBuilt);
+			buildDependentEntities(monitor, builtDescs, unitsBuilt);
 		}
 
 		// to free up some memory
 		CacheManager.instance.unloadAllCaches();
 		Frontend.instance.getResourceSet().getResources().clear();
+		currentResourceSet = null;
 
 		monitor.done();
 	}
 
-	private EObject build(ResourceSet set, IResourceDescription desc)
-			throws CoreException {
+	private EObject build(IResourceDescription desc) throws CoreException {
 		// load resource and compile
-		Resource resource = set.getResource(desc.getURI(), true);
+		Resource resource = currentResourceSet.getResource(desc.getURI(), true);
 		for (EObject obj : resource.getContents()) {
 			if (obj.eClass().equals(CalPackage.eINSTANCE.getAstEntity())) {
 				AstEntity entity = (AstEntity) obj;
@@ -156,8 +158,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	}
 
 	private void buildDependentEntities(IProgressMonitor monitor,
-			ResourceSet set, Set<IResourceDescription> builtDescs,
-			List<Unit> units) throws CoreException {
+			Set<IResourceDescription> builtDescs, List<Unit> units)
+			throws CoreException {
 		IResourceDescriptions descs = provider.createResourceDescriptions();
 
 		Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
@@ -184,7 +186,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		monitor.beginTask("Building dependencies", dependentDescs.size());
 		for (IResourceDescription desc : dependentDescs) {
 			monitor.subTask(desc.getURI().lastSegment());
-			build(set, desc);
+			build(desc);
 			monitor.worked(1);
 		}
 	}
