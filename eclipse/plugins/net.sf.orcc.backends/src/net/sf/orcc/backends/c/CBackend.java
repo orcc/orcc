@@ -55,6 +55,7 @@ import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.backends.util.Validator;
+import net.sf.orcc.backends.util.Vectorizable;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -99,7 +100,7 @@ public class CBackend extends AbstractBackend {
 	 * Path to target "src" folder
 	 */
 	protected String srcPath;
-
+	
 	@Override
 	protected void doInitializeOptions() {
 		// Create empty folders
@@ -108,7 +109,7 @@ public class CBackend extends AbstractBackend {
 
 		srcPath = path + File.separator + "src";
 	}
-
+	
 	@Override
 	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
@@ -120,7 +121,7 @@ public class CBackend extends AbstractBackend {
 		replacementMap.put("select", "select_my_precious");
 		replacementMap.put("OUT", "OUT_my_precious");
 		replacementMap.put("IN", "IN_my_precious");
-
+		
 		if (mergeActions) {
 			new ActionMerger().doSwitch(actor);
 		}
@@ -174,6 +175,9 @@ public class CBackend extends AbstractBackend {
 						+ actor.getName(), actor);
 			}
 		}
+
+		// update "vectorizable" information
+		Vectorizable.setVectorizableAttributs(actor);
 	}
 
 	protected void doTransformNetwork(Network network) {
@@ -205,7 +209,7 @@ public class CBackend extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
-
+		
 		doTransformNetwork(network);
 
 		if (debug) {

@@ -55,4 +55,7 @@ public class BackendsConstants {
 	public static final String HMPP_NO_PRAGMAS = "net.sf.orcc.backends.c.hmpp.disablePragma";
 
 	public static final int MIN_VECTORIZABLE = 2;
+
+	public static final String VECTORIZABLE = "VECTORIZABLE";
+	public static final String ALWAYS_VECTORIZABLE = "ALWAYS_VECTORIZABLE";	
 }
