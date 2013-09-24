@@ -80,20 +80,20 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	public void build(IBuildContext context, IProgressMonitor monitor)
 			throws CoreException {
 		// only build Orcc projects
-		IProject project = context.getBuiltProject();
+		final IProject project = context.getBuiltProject();
 		if (!project.hasNature(OrccProjectNature.NATURE_ID)) {
 			return;
 		}
 
 		// set output folder
-		IFolder outputFolder = OrccUtil.getOutputFolder(project);
+		final IFolder outputFolder = OrccUtil.getOutputFolder(project);
 		if (outputFolder == null) {
 			return;
 		}
 		Frontend.instance.setOutputFolder(outputFolder);
 
 		// if build is cleaning, remove output folder completely
-		BuildType type = context.getBuildType();
+		final BuildType type = context.getBuildType();
 		if (type == BuildType.CLEAN) {
 			// first refresh so that everything can be removed by delete
 			outputFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -151,7 +151,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 */
 	private EObject build(IResourceDescription desc) throws CoreException {
 		// load resource and compile
-		Resource resource = currentResourceSet.getResource(desc.getURI(), true);
+		final Resource resource = currentResourceSet.getResource(desc.getURI(),
+				true);
 		for (EObject obj : resource.getContents()) {
 			if (obj.eClass().equals(CalPackage.eINSTANCE.getAstEntity())) {
 				AstEntity entity = (AstEntity) obj;
@@ -180,9 +181,10 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	private void buildDependentEntities(IProgressMonitor monitor,
 			Set<IResourceDescription> builtDescs, List<Unit> units)
 			throws CoreException {
-		IResourceDescriptions descs = provider.createResourceDescriptions();
+		final IResourceDescriptions descs = provider
+				.createResourceDescriptions();
 
-		Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
+		final Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
 		for (Unit unit : units) {
 			String unitQualifiedName = unit.getName().toLowerCase();
 
@@ -224,7 +226,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 * @throws CoreException
 	 */
 	private boolean hasErrors(IFile file) throws CoreException {
-		IMarker[] markers = file.findMarkers(EValidator.MARKER, true,
+		final IMarker[] markers = file.findMarkers(EValidator.MARKER, true,
 				IResource.DEPTH_INFINITE);
 		for (IMarker marker : markers) {
 			if (IMarker.SEVERITY_ERROR == marker.getAttribute(IMarker.SEVERITY,
