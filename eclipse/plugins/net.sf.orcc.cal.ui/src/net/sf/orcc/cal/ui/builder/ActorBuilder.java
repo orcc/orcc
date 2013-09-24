@@ -37,6 +37,7 @@ import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -98,7 +99,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		// store result of build
-		List<EObject> entities = new ArrayList<EObject>();
+		List<Unit> unitsBuilt = new ArrayList<Unit>();
 		Set<IResourceDescription> builtDescs = new HashSet<IResourceDescription>();
 
 		// build actors/units
@@ -110,8 +111,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				monitor.subTask(desc.getURI().lastSegment());
 				builtDescs.add(desc);
 				EObject entity = build(set, desc);
-				if (entity != null) {
-					entities.add(entity);
+				if (entity instanceof Unit) {
+					unitsBuilt.add((Unit) entity);
 				}
 			}
 
@@ -123,9 +124,9 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 		// find out and build all entities that import things from the built
 		// entities
-		if (!entities.isEmpty()) {
+		if (!unitsBuilt.isEmpty()) {
 			CacheManager.instance.unloadAllCaches();
-			buildDependentEntities(monitor, set, builtDescs, entities);
+			buildDependentEntities(monitor, set, builtDescs, unitsBuilt);
 		}
 
 		// to free up some memory
@@ -156,17 +157,17 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 	private void buildDependentEntities(IProgressMonitor monitor,
 			ResourceSet set, Set<IResourceDescription> builtDescs,
-			List<EObject> entities) throws CoreException {
+			List<Unit> units) throws CoreException {
 		IResourceDescriptions descs = provider.createResourceDescriptions();
 
 		Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
-		for (EObject entity : entities) {
-			String entityName = EcoreHelper.getFeature(entity, "name");
-			entityName = entityName.toLowerCase();
+		for (Unit unit : units) {
+			String unitQualifiedName = unit.getName().toLowerCase();
+
 			for (IResourceDescription desc : descs.getAllResourceDescriptions()) {
 				try {
 					for (QualifiedName name : desc.getImportedNames()) {
-						if (name.toString().startsWith(entityName)
+						if (name.toString().startsWith(unitQualifiedName)
 								&& !builtDescs.contains(desc)) {
 							// don't add if the description was just built
 							dependentDescs.add(desc);
