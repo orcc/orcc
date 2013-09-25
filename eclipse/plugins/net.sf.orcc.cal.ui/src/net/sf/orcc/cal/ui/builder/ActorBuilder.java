@@ -81,8 +81,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 	private ResourceSet currentResourceSet;
 
-	private IFolder outputFolder;
-
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor)
 			throws CoreException {
@@ -92,16 +90,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			return;
 		}
 
-		// set output folder
-		outputFolder = OrccUtil.getOutputFolder(project);
-		if (outputFolder == null) {
-			return;
-		}
-		Frontend.instance.setOutputFolder(outputFolder);
 
 		// if build is cleaning, remove output folder completely
 		final BuildType type = context.getBuildType();
 		if (type == BuildType.CLEAN) {
+			IFolder outputFolder = OrccUtil.getOutputFolder(project);
 			// first refresh so that everything can be removed by delete
 			outputFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 			outputFolder.delete(true, null);
@@ -192,6 +185,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	private void buildDependentEntities(IProgressMonitor monitor,
 			Set<IResourceDescription> builtDescs, List<Unit> units)
 			throws CoreException {
+
 		final IResourceDescriptions descs = provider
 				.createResourceDescriptions();
 
@@ -224,7 +218,10 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				break;
 			}
 			monitor.subTask(desc.getURI().lastSegment());
-			build(desc, monitor);
+			System.out.println("build " + desc.getURI().path());
+			EObject result = build(desc, monitor);
+			System.out.println("result: " + result == null ? "null" : result
+					.getClass());
 			monitor.worked(1);
 		}
 	}
@@ -268,18 +265,20 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 		// Resolve the URI of cal file against the workspace, and convert the
 		// IFile into an IPath to allow some transformations on it
-		IPath calFile = ResourcesPlugin.getWorkspace().getRoot()
-				.getFile(new Path(URI.decode(calURI.path())))
-				.getProjectRelativePath();
+		IFile calFile = ResourcesPlugin.getWorkspace().getRoot()
+				.getFile(new Path(URI.decode(calURI.path())));
+
+		IFolder outFolder = OrccUtil.getOutputFolder(calFile.getProject());
+		IPath calPath = calFile.getProjectRelativePath();
 
 		// Replace the firsts segments (<proj>/<src>)
 		// Replace "cal" extension by "ir"
-		IPath irPath = calFile
-				.removeFirstSegments(outputFolder.getFullPath().segmentCount())
+		IPath irPath = calPath
+				.removeFirstSegments(outFolder.getFullPath().segmentCount())
 				.removeFileExtension().addFileExtension("ir");
 
-		// Fint the corresponding file under the <proj>/bin folder
-		IFile irFile = outputFolder.getFile(irPath);
+		// Find the corresponding file under the <proj>/bin folder
+		IFile irFile = outFolder.getFile(irPath);
 
 		if (irFile.exists()) {
 			try {

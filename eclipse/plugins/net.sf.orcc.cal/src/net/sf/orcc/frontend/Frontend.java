@@ -40,7 +40,6 @@ import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.IrUtil;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -166,8 +165,6 @@ public class Frontend {
 		}
 	}
 
-	private IFolder outputFolder;
-
 	private final ResourceSet set = new ResourceSetImpl();
 
 	public ResourceSet getResourceSet() {
@@ -181,11 +178,6 @@ public class Frontend {
 	 *            an actor or unit
 	 */
 	public void serialize(EObject eObject) {
-		IrUtil.serializeActor(set, outputFolder, eObject);
+		IrUtil.serializeActor(set, eObject);
 	}
-
-	public void setOutputFolder(IFolder outputFolder) {
-		this.outputFolder = outputFolder;
-	}
-
 }

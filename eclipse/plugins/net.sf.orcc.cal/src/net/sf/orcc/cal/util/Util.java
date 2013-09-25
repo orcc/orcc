@@ -41,6 +41,9 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.util.Attributable;
 import net.sf.orcc.util.Attribute;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
@@ -164,5 +167,19 @@ public class Util {
 				annotationAttribute.setAttribute(arg.getName(), arg.getValue());
 			}
 		}
+	}
+
+	public static String getProjectName(AstActor entity) {
+		String entityPath = entity.eResource().getURI().toPlatformString(true);
+		IFile f = ResourcesPlugin.getWorkspace().getRoot()
+				.getFile(new Path(entityPath));
+		return f.getProject().getName();
+	}
+
+	public static String getProjectName(AstUnit entity) {
+		String entityPath = entity.eResource().getURI().toPlatformString(true);
+		IFile f = ResourcesPlugin.getWorkspace().getRoot()
+				.getFile(new Path(entityPath));
+		return f.getProject().getName();
 	}
 }
