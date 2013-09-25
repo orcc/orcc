@@ -57,5 +57,5 @@ public class BackendsConstants {
 	public static final int MIN_VECTORIZABLE = 2;
 
 	public static final String VECTORIZABLE = "VECTORIZABLE";
-	public static final String ALWAYS_VECTORIZABLE = "ALWAYS_VECTORIZABLE";	
+	public static final String VECTORIZABLE_ALWAYS = "VECTORIZABLE_ALWAYS";	
 }

@@ -490,12 +490,12 @@ class InstancePrinter extends CTemplate {
 	def protected printVectorizationConditions(Action action) '''
 		int isVectorizable = 1;
 		«FOR port : action.inputPattern.ports»
-			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE)»
+			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
 			isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
 			«ENDIF»
 		«ENDFOR»
 		«FOR port : action.outputPattern.ports»
-			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE)»
+			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
 			isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
 			«ENDIF»
 		«ENDFOR»
@@ -512,7 +512,7 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«IF trans.action.hasAttribute(ALWAYS_VECTORIZABLE)»
+				«IF trans.action.hasAttribute(VECTORIZABLE_ALWAYS)»
 					«trans.action.body.name»_vectorizable();
 				«ELSEIF trans.action.hasAttribute(VECTORIZABLE)»
 					«trans.action.printVectorizationConditions»
@@ -643,7 +643,7 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«IF action.hasAttribute(ALWAYS_VECTORIZABLE)»
+				«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
 					«action.body.name»_vectorizable();
 				«ELSEIF action.hasAttribute(VECTORIZABLE)»
 					«action.printVectorizationConditions»
@@ -795,12 +795,24 @@ class InstancePrinter extends CTemplate {
 	def protected print(Action action) {
 		currentAction = action
 		val output = '''
-			«IF !action.hasAttribute(ALWAYS_VECTORIZABLE)»
+			«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
 			static «inline»void «action.body.name»() {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
-			
+				
+				«FOR port : action.inputPattern.ports»	
+					«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
+					 i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+					«ENDIF»
+				«ENDFOR»
+				
+				«FOR port : action.outputPattern.ports»					
+					«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
+					i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+					«ENDIF»
+				«ENDFOR»
+
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
 				«ENDFOR»
@@ -947,7 +959,7 @@ class InstancePrinter extends CTemplate {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«IF isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + VECTORIZABLE)»
+				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + VECTORIZABLE)) || srcPort.hasAttribute(VECTORIZABLE_ALWAYS)»
 					«load.target.variable.indexedName» = tokens_«srcPort.name»[(local_index_«srcPort.name» + («load.indexes.head.doSwitch»))];
 				«ELSE»
 					«load.target.variable.indexedName» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
@@ -965,7 +977,7 @@ class InstancePrinter extends CTemplate {
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + VECTORIZABLE)»
+				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + VECTORIZABLE)) || trgtPort.hasAttribute(VECTORIZABLE_ALWAYS)»
 					tokens_«trgtPort.name»[(local_index_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;

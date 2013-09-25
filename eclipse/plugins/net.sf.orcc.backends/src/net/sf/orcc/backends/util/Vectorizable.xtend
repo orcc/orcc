@@ -36,6 +36,8 @@ import net.sf.orcc.df.Actor
 import static net.sf.orcc.backends.BackendsConstants.*
 import net.sf.orcc.df.Network
 import net.sf.orcc.ir.util.ValueUtil
+import org.eclipse.emf.common.util.EList
+import net.sf.orcc.util.Attribute
 
 /**
  * Class containing static methods useful to set potential vectorization information for each port
@@ -48,57 +50,88 @@ class Vectorizable {
 		return pattern.getNumTokens(port) >= MIN_VECTORIZABLE
 	}
 
-	def static private boolean setVectorizableAttributs( Pattern pattern, String actionName, Port port) {
+	def static private filterVectorizableAttributs(EList<Attribute> attrs) {
+		attrs.filter[it.name.endsWith("_" + VECTORIZABLE)]
+	}
+
+	def static private filterNotVectorizableAttributs(EList<Attribute> attrs) {
+		attrs.filter[it.name.endsWith("_NOT_" + VECTORIZABLE)]
+	}
+
+	def static private boolean setVectorizableAttributs(Pattern pattern, Port port, String actionName) {
 		var bIsVectorizable = isPortVectorizable(pattern, port)
 		
-		if (bIsVectorizable){
+		if (bIsVectorizable) {
 			port.addAttribute(actionName + "_" + VECTORIZABLE)
+			port.setAttribute(actionName + "_" + VECTORIZABLE, pattern.getNumTokens(port))
+		} else {
+			port.addAttribute(actionName + "_NOT_" + VECTORIZABLE)			
 		}
 		
 		return bIsVectorizable
 	}
 
-	def static private boolean isAlwaysVectorizable(Action action, int nbActions) {
-		var boolean bIsAlwaysVectorizable = false
+	def static private void setAlwaysVectorizableAttributs(Pattern pattern, Port port) {
+		val iNumToken = pattern.getNumTokens(port)
+		var bIsAlwaysVectorizable = pattern.isPortVectorizable(port) && ValueUtil.isPowerOfTwo(iNumToken)
 		
-		if (nbActions == 1) {
-			bIsAlwaysVectorizable = true
-			for (Port port : action.inputPattern.ports) {
-				bIsAlwaysVectorizable = bIsAlwaysVectorizable && ValueUtil.isPowerOfTwo(action.inputPattern.getNumTokens(port)) 
-			}
-			for (Port port : action.outputPattern.ports) {
-				bIsAlwaysVectorizable = bIsAlwaysVectorizable && ValueUtil.isPowerOfTwo(action.outputPattern.getNumTokens(port))
-			}
-		} 
+		if (bIsAlwaysVectorizable) {
+			bIsAlwaysVectorizable = bIsAlwaysVectorizable 
+				&& (port.attributes.filterVectorizableAttributs.size == 1) 
+				&& (port.attributes.filterNotVectorizableAttributs.size == 0) 
 		
-		return bIsAlwaysVectorizable
+			if (port.attributes.filterVectorizableAttributs.size > 1) {
+				for (Attribute attr : port.attributes.filterVectorizableAttributs) {
+					bIsAlwaysVectorizable = bIsAlwaysVectorizable && (attr.stringValue == iNumToken.toString())
+				}
+			}
+		}
+		
+		if (bIsAlwaysVectorizable) {
+			port.addAttribute(VECTORIZABLE_ALWAYS)			
+		}
 	}
 	
-	def static private boolean setVectorizableAttributs(Action action, int nbActions) {
+	def static private void setVectorizableAttributs(Action action) {
 		var boolean bIsVectorizable = false
 
 		for (Port port : action.inputPattern.ports) {
-			bIsVectorizable = action.inputPattern.setVectorizableAttributs(action.name, port) || bIsVectorizable
+			bIsVectorizable = action.inputPattern.setVectorizableAttributs(port, action.name) || bIsVectorizable
 		}
 		for (Port port : action.outputPattern.ports) {
-			bIsVectorizable = action.outputPattern.setVectorizableAttributs(action.name, port) || bIsVectorizable
+			bIsVectorizable = action.outputPattern.setVectorizableAttributs(port, action.name) || bIsVectorizable
 		}
 		
 		if (bIsVectorizable){
-			action.addAttribute(VECTORIZABLE)
-			
-			if (action.isAlwaysVectorizable(nbActions)){
-				action.addAttribute(ALWAYS_VECTORIZABLE)		
-			}
+			action.addAttribute(VECTORIZABLE)			
 		} 
+	}	
+
+	def static private void setAlwaysVectorizableAttributs(Action action) {
+		var boolean bIsAlwaysVectorizable = true
 		
-		return bIsVectorizable
+		for (Port port : action.inputPattern.ports) {
+			action.inputPattern.setAlwaysVectorizableAttributs(port)
+			bIsAlwaysVectorizable = bIsAlwaysVectorizable && port.hasAttribute(VECTORIZABLE_ALWAYS) 
+		}
+		for (Port port : action.outputPattern.ports) {
+			action.outputPattern.setAlwaysVectorizableAttributs(port)
+			bIsAlwaysVectorizable = bIsAlwaysVectorizable && port.hasAttribute(VECTORIZABLE_ALWAYS) 
+		}
+		
+		if (bIsAlwaysVectorizable){
+			action.addAttribute(VECTORIZABLE_ALWAYS)			
+		} 
 	}	
 
 	def static void setVectorizableAttributs(Actor actor) {
-		val nbActions = actor.actions.size
 		for (Action action : actor.actions) {
-			action.setVectorizableAttributs(nbActions)	
+			action.setVectorizableAttributs()	
+		}		
+		for (Action action : actor.actions) {
+			if (action.hasAttribute(VECTORIZABLE)){					
+				action.setAlwaysVectorizableAttributs()
+			} 			
 		}		
 	}	
 
