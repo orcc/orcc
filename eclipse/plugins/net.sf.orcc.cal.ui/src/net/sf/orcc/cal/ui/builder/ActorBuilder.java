@@ -39,6 +39,7 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.frontend.Frontend;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -47,8 +48,12 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -76,6 +81,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 	private ResourceSet currentResourceSet;
 
+	private IFolder outputFolder;
+
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor)
 			throws CoreException {
@@ -86,7 +93,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		// set output folder
-		final IFolder outputFolder = OrccUtil.getOutputFolder(project);
+		outputFolder = OrccUtil.getOutputFolder(project);
 		if (outputFolder == null) {
 			return;
 		}
@@ -113,10 +120,13 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				IResourceDescription desc = delta.getNew();
 				monitor.subTask(desc.getURI().lastSegment());
 				builtResources.add(desc);
-				EObject entity = build(desc);
+				EObject entity = build(desc, monitor);
 				if (entity instanceof Unit) {
 					unitsBuilt.add((Unit) entity);
 				}
+			} else {
+				// CAL file has been deleted, need to delete the IR file
+				deleteIr(delta.getOld(), monitor);
 			}
 
 			if (monitor.isCanceled()) {
@@ -150,7 +160,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 * @return
 	 * @throws CoreException
 	 */
-	private EObject build(IResourceDescription desc) throws CoreException {
+	private EObject build(IResourceDescription desc, IProgressMonitor monitor)
+			throws CoreException {
 		// load resource and compile
 		final Resource resource = currentResourceSet.getResource(desc.getURI(),
 				true);
@@ -159,14 +170,13 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				AstEntity entity = (AstEntity) obj;
 				IFile file = EcoreHelper.getFile(resource);
 				if (hasErrors(file)) {
-					// Should we delete the corresponding file here ?
+					deleteIr(desc, monitor);
 					return null;
 				} else {
 					return Frontend.getEntity(entity);
 				}
 			}
 		}
-
 		return null;
 	}
 
@@ -186,6 +196,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				.createResourceDescriptions();
 
 		final Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
+
 		for (Unit unit : units) {
 			String unitQualifiedName = unit.getName().toLowerCase();
 
@@ -213,7 +224,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				break;
 			}
 			monitor.subTask(desc.getURI().lastSegment());
-			build(desc);
+			build(desc, monitor);
 			monitor.worked(1);
 		}
 	}
@@ -237,5 +248,46 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Delete on the disk the IR file corresponding to the CAL file described by
+	 * the given description. This method only manipulate paths, so the given
+	 * description can reference a file already deleted on the filesystem. This
+	 * is useful to delete ir file when the original cal file has just been
+	 * deleted.
+	 * 
+	 * @param calResourceDescription
+	 *            A ResourceDescription for a CAL file
+	 * 
+	 */
+	private void deleteIr(IResourceDescription calResourceDescription,
+			IProgressMonitor monitor) {
+
+		URI calURI = calResourceDescription.getURI();
+
+		// Resolve the URI of cal file against the workspace, and convert the
+		// IFile into an IPath to allow some transformations on it
+		IPath calFile = ResourcesPlugin.getWorkspace().getRoot()
+				.getFile(new Path(URI.decode(calURI.path())))
+				.getProjectRelativePath();
+
+		// Replace the firsts segments (<proj>/<src>)
+		// Replace "cal" extension by "ir"
+		IPath irPath = calFile
+				.removeFirstSegments(outputFolder.getFullPath().segmentCount())
+				.removeFileExtension().addFileExtension("ir");
+
+		// Fint the corresponding file under the <proj>/bin folder
+		IFile irFile = outputFolder.getFile(irPath);
+
+		if (irFile.exists()) {
+			try {
+				irFile.delete(true, monitor);
+			} catch (CoreException e) {
+				OrccLogger.warnln("File " + irFile + " cannot be deleted: "
+						+ e.getMessage());
+			}
+		}
 	}
 }
