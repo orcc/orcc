@@ -150,9 +150,12 @@ class ScriptPrinter extends PromelaTemplate {
 			else:
 				print ("\n\nSchedule was not found!!")
 		
-		#if print:
-			#scheduler=SchedulerXML('schedule_«network.simpleName».xml')
-			#scheduler.savenewfsm(fsm, conf, 'schedule_«network.simpleName»_new.xml')
+		if uargs.printXML:
+			fsm=FSM()
+			fsm.loadfsm('config_Acdc', 'scheduler.txt')
+			fsm.savefsm('config_«network.simpleName»', 'scheduler.txt')
+			scheduler=SchedulerXML('schedule_«network.simpleName».xml')
+			scheduler.savenewfsm(fsm, conf, 'schedule_«network.simpleName»_new.xml', 'config_«network.simpleName»')
 				
 		
 		conf.printconfiguration()

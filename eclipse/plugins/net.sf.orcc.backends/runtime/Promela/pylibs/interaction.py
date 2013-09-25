@@ -10,9 +10,10 @@ class UserArgs():
     removeactor=None
     setleader=None
     findspecificstate=None
+    printXML=False
     def parseargs(self):
         try:
-            opts, args = getopt.getopt(sys.argv[1:],"hs:c:d:l:rf:")
+            opts, args = getopt.getopt(sys.argv[1:],"hs:c:d:l:rf:p")
         except getopt.GetoptError:
             self.printhelp()
             sys.exit(2)
@@ -32,6 +33,8 @@ class UserArgs():
                 self.removeactor=arg
             elif opt in ("-f"):
                 self.findspecificstate=arg
+            elif opt in ("-p"):
+                self.printXML=True
     def printhelp(self):
             print ("\nUsage:")
             print ('run_checker.py -h', '(show help)')
@@ -40,6 +43,7 @@ class UserArgs():
             print ('run_checker.py -s <sched id>', '(setup modelchecker for the schedule)')
             print ('run_checker.py -r', '(run schedule search with the current config)')
             print ('run_checker.py -f <state ID>', '(can be used with -c, to specify a specific state to find e.g. -f s0)')
+            print ('run_checker.py -p', '(print the new scheduler to a XML file)')
     def test(self):
         print("\nChecking if necessary tools are available:")
         proc = Popen(['spin', '-v'], stdout=PIPE, stderr=PIPE, universal_newlines=True)
