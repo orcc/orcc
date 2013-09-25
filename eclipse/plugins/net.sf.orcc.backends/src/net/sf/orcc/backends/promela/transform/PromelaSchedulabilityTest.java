@@ -245,14 +245,17 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 			generateScheduleInfo(s);
 		}
 		
+		whenIsVarPartOfState();
+		
 		return null;
 	}
 	
 	private boolean areSchedulesComplete() {
-		// does the schedule itself reset the variables before it is used?
+		// does the schedule itself reset the variables before they are used in guards?
 		boolean allResolved = true;
 		for (Schedule schedule : scheduler.getSchedules()) {
 			for (State state : schedule.getPotentialChoiseStates()) {
+				boolean resolved = true; // until proven guilty
 				Set<Var> guardFull = new HashSet<Var>();
 				Set<Var> guardDirect = new HashSet<Var>();
 				Set<Action> cActions = new HashSet<Action>();
@@ -268,38 +271,40 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					guardFull.addAll(temp);
 				}
 				removeLocalAndConstantVars(guardFull);
-				Set<Var> unresolvedVars = new HashSet<Var>(guardFull);
-				Set<Var> resolvedVars = new HashSet<Var>();
+				Set<Var> dirtyVars = new HashSet<Var>(guardFull);
+				Set<Var> cleanVars = new HashSet<Var>();
+				getAlwaysCleanVars(state);
+				// run through the sequence of actions and keep track of which variables are dirty or clean
 				for (Action action : schedule.getSequence()) {
-					if (cActions.contains(action)) {break;}
+					if (cActions.contains(action)) {
+						// the action belongs to the potential choice state, check if the guard has dirty vars
+						for (Var var : dirtyVars) {
+							if (guardDirect.contains(var)) {
+								resolved=false;
+							}
+						}
+					}
 					for (Var gVar : guardFull) {
 						if (scheduler.getSchedVarReset().containsKey(gVar) 
 								&& scheduler.getSchedVarReset().get(gVar).contains(action)) {
-							unresolvedVars.remove(gVar);
-							resolvedVars.add(gVar);
+							dirtyVars.remove(gVar);
+							cleanVars.add(gVar);
 						}
 						// if the variable is updated from a var that is dirty, this variable is also dirty
 						if (scheduler.getSchedVarUpdate().containsKey(gVar)
 								&& scheduler.getSchedVarUpdate().get(gVar).contains(action)
-								&& resolvedVars.contains(gVar)){
+								&& cleanVars.contains(gVar)){
 							Set<Var> temp = scheduler.getLocalVarDep(action, gVar);
 							for (Var depOn : temp) {
-								if (unresolvedVars.contains(depOn)) {
-									resolvedVars.remove(gVar);
-									unresolvedVars.add(gVar);
+								if (dirtyVars.contains(depOn)) {
+									cleanVars.remove(gVar);
+									dirtyVars.add(gVar);
 								}
 							}
 						}
 					}
 				}
-				// now remove the scheduling vars not directly used in the guard
-				Iterator<Var> iter = unresolvedVars.iterator();
-				while (iter.hasNext()) {
-					if (!guardDirect.contains(iter.next())) {
-						iter.remove();
-					}
-				}
-				if (unresolvedVars.isEmpty()) {
+				if (resolved) {
 					schedule.getPotentialChoiseStates().remove(state);
 				}
 			}
@@ -310,8 +315,62 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		}
 		return allResolved;
 	}
-	
 
+	private Set<Var> getAlwaysCleanVars(State state) {
+		// TODO return something real
+		return new HashSet<Var>();
+		
+	}
+
+	private void whenIsVarPartOfState() {
+		Map<State, Set<Var>> stateToVar = scheduler.getStateToRelevantVars(); 
+		Set<Var> stateVars = netStateDef.getSchedulingModel().getActorModel(actor).getLocalSchedulingVars();
+		scheduler.setSchedulingVars(stateVars);
+		removeLocalAndConstantVars(stateVars);
+		for (Schedule schedule : scheduler.getSchedules()) {
+			Set<Var> dirtyVars = new HashSet<Var>(stateVars);
+			Set<Var> cleanVars = new HashSet<Var>();
+			Set<Var> dirtyInGuard = new HashSet<Var>();
+			// run through the sequence of actions and keep track of which variables are dirty or clean
+			for (Action action : schedule.getSequence()) {
+				for (Var gVar : actionGuardVarMap.get(action)) {
+					if (dirtyVars.contains(gVar)) {
+						//definitely part of state
+						dirtyInGuard.add(gVar);
+					}
+				}
+				for (Var sVar : stateVars) {
+					if (scheduler.getSchedVarReset().containsKey(sVar) 
+							&& scheduler.getSchedVarReset().get(sVar).contains(action)) {
+						dirtyVars.remove(sVar);
+						cleanVars.add(sVar);
+					}
+					// if the variable is updated from a var that is dirty, this variable is also dirty
+					if (scheduler.getSchedVarUpdate().containsKey(sVar)
+							&& scheduler.getSchedVarUpdate().get(sVar).contains(action)
+							&& cleanVars.contains(sVar)){
+						Set<Var> temp = scheduler.getLocalVarDep(action, sVar);
+						for (Var depOn : temp) {
+							if (dirtyVars.contains(depOn)) {
+								cleanVars.remove(sVar);
+								dirtyVars.add(sVar);
+							}
+						}
+					}
+				}
+			}
+			if (!stateToVar.containsKey(schedule.getInitState())) {
+				stateToVar.put(schedule.getInitState(), new HashSet<Var>());
+			}
+			stateToVar.get(schedule.getInitState()).addAll(dirtyInGuard);
+			// the following could be made more less to improve the state reduction..
+			if (schedule.getInitState()!=schedule.getEndState()) {
+				// this schedule did not use the variable, if we get back to the same state, no harm has been done
+				stateToVar.get(schedule.getInitState()).addAll(dirtyVars);
+			}
+		}
+	}
+	
 	private Map<String, Object> findPeekValues(State state, Action targetAction) {
 		List<Action> previous = new ArrayList<Action>();
 		Set<Port> peekPorts = new HashSet<Port>();

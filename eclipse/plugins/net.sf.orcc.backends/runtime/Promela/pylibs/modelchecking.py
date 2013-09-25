@@ -20,7 +20,7 @@ class ModelChecker(object):
                 print(line)
             elif line.find('[') >= 0: # skip lists
                 pass
-            elif line.find('state_var_') >= 0 or line.find('fsm_state_') >= 0:
+            elif line.find('state_var_') >= 0 or line.find('_state_') >= 0:
                 self.endstate += line + ';\n'
             elif line.find('iterand') >= 0 :
                 self.schedxml += line + '\n'
@@ -30,12 +30,12 @@ class ModelChecker(object):
         proc.wait()
         self.returncode = proc.returncode
     def generatemc(self, filename):
-        print ("Generating model checker: spin -a -DXML ",filename)
+        print ("Generating model checker: spin -a -DXML -DMANAGED",filename)
         proc = Popen(['spin', '-a', '-DPXML', '-DMANAGED', filename])
         proc.wait()
     def compilemc(self):
-        print ("Compiling model checker: gcc -DCOLLAPSE -DVECTORS=100000 -o pan pan.c")
-        proc = Popen(['gcc', '-DCOLLAPSE', '-DVECTORSZ=100000', '-o', 'pan', 'pan.c'])
+        print ("Compiling model checker: gcc ... -o pan pan.c")
+        proc = Popen(['gcc', '-o2', '-DSAFETY', '-DCOLLAPSE', '-DVECTORSZ=100000', '-o', 'pan', 'pan.c'])
         proc.wait()
     def runmc(self):
         print ("Running model checker: pan -E -n")

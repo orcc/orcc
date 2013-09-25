@@ -68,7 +68,7 @@ class RunConfiguration(object):
     file3='tmp_ltl_expr.pml'
     def __init__(self, conf):
         self.conf=conf
-    def configure(self, statedesc, inputseq, currstate, action, nextstate):
+    def configure(self, statedesc, inputseq, currstate, action, nextstate, nextfsmstate):
         open(self.file1, "a").close() # create the file for starting processes if it doesnt exist
         file=open(self.file1, "w")
         file.writelines(["run %s();\n" % item  for item in self.conf.actors])
@@ -77,12 +77,13 @@ class RunConfiguration(object):
         file=open(self.file2, "w")
         file.write(statedesc.tostring())
         file.write("\n//Inputs:\n")
-        file.write(inputseq.tostring(self.conf.leader, currstate, action))
+        file.write(inputseq.tostring(currstate, action))
         file.close
         open(self.file3, "a").close() # create the file for ltl if it doesnt exist
         file=open(self.file3, "w")
-        file.write("#define emptyBuffer (len(chan_0)==0 && len(chan_1)==0 && len(chan_2)==0 && len(chan_3)==0)\n")
-        file.write("ltl test {[]!((promela_prog_initiated==1 && fsm_state_"+self.conf.leader+"=="+self.conf.leader+"_state_"+nextstate+") && emptyBuffer)}\n")
+        buffers='&&'.join(["len(chan_"+str(elem)+")==0" for elem in inputseq.channels])
+        file.write("#define emptyBuffer ("+buffers+")\n")
+        file.write(self.__ltl(inputseq, nextstate, nextfsmstate))
         file.close()
     def confinitsearch(self):
         open(self.file1, "a").close() # create it if it doesnt exist
@@ -91,11 +92,24 @@ class RunConfiguration(object):
         file.close()
         open(self.file2, "w").close() # create it if it doesnt exist
         open(self.file3, "w").close() # create it if it doesnt exist
+    def __ltl(self, inputseq, nextstate, actortostatesdic):
+        # the morefsmstates is of type {fsm_state_???:[state, state,..]}
+        s=  "ltl test {[]!(promela_prog_initiated==1 &&"
+        s+= "fsm_state_"+self.conf.leader+"=="+self.conf.leader+"_state_"+nextstate
+        for state in actortostatesdic.keys():
+            s+= "&& ("
+            s+='||'.join([state+"=="+val for val in actortostatesdic[state]])
+            s+=")"
+        s+= "&& emptyBuffer)}\n"
+        return s
+    
         
 class StateDescription(object):
     state=None
+    varfilter=None
     def __init__(self):
         self.state={}
+        self.varfilter=[]
     def fromstring(self, string):
         lst=string.split(';')
         for line in lst:
@@ -123,15 +137,45 @@ class StateDescription(object):
             sd.loadstate(folder, st+'.txt')
             issame=True
             for elem in self.state.keys():
-                if not(self.state[elem] == sd.state[elem]):
-                    issame=False
+                if elem not in self.varfilter:
+                    if not(self.state[elem] == sd.state[elem]):
+                        issame=False
             if issame:
                 return st
         return None
-    
+    def getfsmstates(self):
+        dic={}
+        for var in self.state.keys():
+            if var.find('fsm_state_') >= 0 :
+                dic[var]=[self.state[var]]
+        return dic
+    def setfilter(self, xmlfilename):
+        tree = et.parse(xmlfilename)
+        for xactor in tree.findall('.//actor'):
+            actorname=xactor.get('name')
+            temp=[]
+            # all vars for this actor
+            for allstate in xactor.findall('.//allstates'):
+                for xvar in allstate.findall('.//variable'):
+                    temp.append(xvar.get('name'))
+            # if a better description in found..
+            for xstate in xactor.findall('.//fsmstate'):
+                statename=xstate.get('name')
+                if "fsm_state_"+actorname in self.state.keys():
+                    if self.state["fsm_state_"+actorname]==self.state[actorname+"_state_"+statename]:
+                        adescribedstate=True
+                        if actorname+"_state_"+statename in self.state.keys():
+                            for xvar in xstate.findall('.//variable'):
+                                temp.remove(xvar.get('name'))
+                            self.varfilter.extend(temp)
+        print (actorname, self.varfilter)
 
 class InputSeq(object):
     actortostates={}
+    leaders=None
+    channels=None
+    def __init__(self):
+        self.channels=[]
     def addpeek(self, actor, port, schedulestate, scheduleaction, value):
         self.check(actor, port, schedulestate, scheduleaction)
         self.actortostates[actor][schedulestate][scheduleaction][port].append(value)
@@ -153,44 +197,60 @@ class InputSeq(object):
             self.actortostates[actor][schedulestate][scheduleaction]={}
         if port not in self.actortostates[actor][schedulestate][scheduleaction]:
             self.actortostates[actor][schedulestate][scheduleaction][port]=[]
-    def tostring(self, leader, lstate, laction):
+    def tostring(self, lstate, laction):
         s=""
         for actor in self.actortostates.keys():
-            if actor == leader:
-                for port in self.actortostates[actor][lstate][laction]:
-                    for val in self.actortostates[actor][lstate][laction][port]:
-                        s+=("chan_"+actor+"_"+port+"!"+val+";\n")
+            if actor in self.leaders:
+                if laction in self.actortostates[actor][lstate].keys():
+                    for port in self.actortostates[actor][lstate][laction]:
+                        for val in self.actortostates[actor][lstate][laction][port]:
+                            s+=("chan_"+actor+"_"+port+"!"+val+";\n")
             else:
                 for state in self.actortostates[actor]:
                     for action in self.actortostates[actor][state]:
                         for port in self.actortostates[actor][state][action]:
                             for val in self.actortostates[actor][state][action][port]:
                                 s+=("chan_"+actor+"_"+port+"!"+val+";\n")
+                                if actor+"_"+port in self.channels: # remove the data inputs
+                                    self.channels.remove(actor+"_"+port)
         return s
 
 
 class ChannelConfigXML():
     xmlfilename=None
     partitioninput=None
-    channels=[]
     def __init__(self, xmlfilename):
         self.partitioninput=InputSeq()
         self.xmlfilename=xmlfilename
     def findinputs(self, configuration):
+        self.partitioninput.leaders=[configuration.leader]
         tree = et.parse(self.xmlfilename)
         for xactor in tree.findall('.//actor'):        
             for xinput in xactor.findall('.//input'):
-                self.channels.append(xactor.get('name')+'_'+xinput.get('port'))
+                self.partitioninput.channels.append(xactor.get('name')+'_'+xinput.get('port'))
                 #check if port is input to partition
                 if xinput.get('instance') not in configuration.actors:
-                    for xschedule in xactor.findall('.//schedule'):
-                        for xrates in xschedule.findall('.//rates'):
-                            for xpeek in xrates.findall('.//peek'):
-                                if xpeek.get('port') == xinput.get('port'):
-                                    self.partitioninput.addpeek(xactor.get('name'), xpeek.get('port'), xschedule.get('initstate'),xschedule.get('action'),xpeek.get('value'))
-                            for xread in xrates.findall('.//read'):
-                                if xread.get('port') == xinput.get('port'):
-                                    self.partitioninput.addread(xactor.get('name'), xread.get('port'), xschedule.get('initstate'),xschedule.get('action'),xread.get('value'))                    
+                    if xactor.get('name').find('_bcast')>=0: #special case, check downstream
+                        for xoutput in xactor.findall('.//connections/output'):
+                            xother_actorID=xoutput.get('instance')
+                            channel=xoutput.get('channelID')
+                            if xother_actorID==configuration.leader:
+                                self.partitioninput.leaders.append(xactor.get('name'))
+                                xother_actor=tree.find(".//actor[@name='"+xother_actorID+"']")
+                                xother_input=xother_actor.find(".//connections/input[@channelID='"+channel+"']")
+                                self.__getrates(xother_actor, xother_input, xactor, xinput)
+                    else:
+                        self.__getrates(xactor, xinput, xactor, xinput)
         return self.partitioninput
+    def __getrates(self, xactor, xinput, aactor, ainput):
+        #x-args is where to look, a-args is where to place..
+        for xschedule in xactor.findall('.//schedule'):
+            for xrates in xschedule.findall('.//rates'):
+                for xpeek in xrates.findall('.//peek'):
+                    if xpeek.get('port') == xinput.get('port'):
+                        self.partitioninput.addpeek(aactor.get('name'), ainput.get('port'), xschedule.get('initstate'),xschedule.get('action'),xpeek.get('value'))
+                for xread in xrates.findall('.//read'):
+                    if xread.get('port') == xinput.get('port'):
+                        self.partitioninput.addread(aactor.get('name'), ainput.get('port'), xschedule.get('initstate'),xschedule.get('action'),xread.get('value'))
 
 

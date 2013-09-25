@@ -283,7 +283,7 @@ class InstancePrinter extends PromelaTemplate {
 	def outputChannelCheck(Pattern pattern) {
 	'''
 		«FOR port : pattern.ports»
-		&& len(chan_«actor.simpleName»_«port.name»)<=«pattern.getNumTokens(port)»
+		&& chan_«actor.simpleName»_«port.name»_SIZE - len(chan_«actor.simpleName»_«port.name»)>=«pattern.getNumTokens(port)»
 		«ENDFOR»
 	'''
 	}

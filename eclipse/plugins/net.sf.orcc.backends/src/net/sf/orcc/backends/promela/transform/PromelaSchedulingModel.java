@@ -79,6 +79,10 @@ public class PromelaSchedulingModel {
 	public void addVarUsedInScheduler(Actor a, Var var) {
 		actorToModelMap.get(a).addVarUsedByGuard(var);
 	}
+	
+	public ControlTokenActorModel getActorModel(Actor actor) {
+		return actorToModelMap.get(actor);
+	}
 
 	
 	/**

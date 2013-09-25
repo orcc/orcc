@@ -88,8 +88,30 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 			<connections>
 			«actor.connections»
 			</connections>
+			<state>
+			«balanceEq.getScheduler(actor).stateVarsInState»
+			</state>
 		</actor>
 	'''
+	}
+	
+	def stateVarsInState(Scheduler scheduler) {
+	'''
+	«FOR state : scheduler.stateToRelevantVars.keySet»
+	«IF state != null»
+	<fsmstate name='«state»'>
+		«FOR variable : scheduler.stateToRelevantVars.get(state)»
+		<variable name='«variable.name»'/>
+		«ENDFOR»
+	</fsmstate>
+	«ENDIF»
+	«ENDFOR»
+	<allstates>
+		«FOR variable : scheduler.schedulingVars»
+		<variable name='«variable.name»'/>
+		«ENDFOR»	
+	</allstates>
+	'''		
 	}
 	
 	def schedulesxml(Scheduler scheduler){
@@ -125,11 +147,11 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 	
 	def connID(Port port, Actor actor) {
 		if( actor.getIncomingPortMap().get(port)!=null) {
-			val Connection connection = (actor.getIncomingPortMap().get(port) as Connection)
+			val Connection connection = actor.getIncomingPortMap().get(port)
 			'''chan_«connection.<Object>getValueAsObject("id")»'''
 		} else
 		if( ! actor.getOutgoingPortMap().get(port).nullOrEmpty) {
-			val Connection connection = (actor.getOutgoingPortMap().get(port).get(0) as Connection)
+			val Connection connection = actor.getOutgoingPortMap().get(port).get(0)
 			'''chan_«connection.<Object>getValueAsObject("id")»'''
 		}
 	}

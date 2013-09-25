@@ -4,6 +4,7 @@ from pylibs.schedconfig import Configuration
 
 import xml.etree.ElementTree as et
 
+
 class Transition:
     sequence=None
     def __init__(self, src, dst, action, tid, nsrc='?', ndst='?'):
@@ -42,11 +43,13 @@ class FSM:
         return name
     def addnewnstate(self, origstate, name):
         templist=list()
+        tempactions=list()
         for trans in self.transitions:
-            if trans.src == origstate:
+            if trans.src == origstate and trans.action not in tempactions:
                 ntrns = Transition(trans.src, trans.dst, trans.action, str(self.nrtrans), name)
                 self.nrtrans=self.nrtrans+1
                 templist.append(ntrns)
+                tempactions.append(trans.action)
         self.transitions.extend(templist)
     def sortTransitions(self):
         """Sorts such that scheduling always starts form a known state"""
@@ -72,6 +75,14 @@ class FSM:
         file=open(filename, "w")
         file.writelines([item.tid+' '+item.action+' '+item.src+' '+item.dst+' '+item.nsrc+' '+item.ndst+'\n' for item in self.transitions])
         file.close()
+        # also in XML
+        filename=folder+'/'+'scheduler.xml'
+        open(filename, "a").close()
+        file=open(filename, "w")
+        file.write("<fsm initial='s0'>")
+        file.writelines(["<transition src='"+item.nsrc+"' dst='"+item.ndst+"' action='"+item.nsrc+"_"+item.src+"_"+item.action+"'/>\n" for item in self.transitions])
+        file.write("</fsm>")
+        # and the schedules
         for trans in self.transitions:
             if trans.sequence is not None:
                 filename=folder+'/sequence'+trans.tid+'.xml'
@@ -88,6 +99,7 @@ class FSM:
             self.addTransition(Transition(lst[2],lst[3],lst[1],lst[0],lst[4],lst[5]))
         file.close()
         self.nrtrans=len(self.transitions)
+    
 
 class SchedulerXML():
     xmlfilename=None
@@ -106,11 +118,27 @@ class SchedulerXML():
             fsm.addTransition(trns)
         fsm.sortTransitions()
         return fsm
-    def savenewfsm(self, fsm, conf, newfilename):
+    def savenewfsm(self, fsm, conf, newfilename, conffolder):
         tree = et.parse(self.xmlfilename)
-        xfsm = tree.find(".//actor/[@name='dcpred']")
-        fsm = FSM(xfsm.get('initial'))
-        for trans in xfsm.findall('transition'):
-            print (trans)
-        
-    
+        for xsuperactor in tree.findall('superactor'):
+            for xactor in xsuperactor.findall('actor'):
+                if xactor.get('name') == conf.leader:
+                    #remove all content, as we will replace it
+                    for xchild in xsuperactor.findall('actor'):
+                        xsuperactor.remove(xchild)
+                    for xchild in xsuperactor.findall('superaction'):
+                        xsuperactor.remove(xchild)
+                    for xchild in xsuperactor.findall('fsm'):
+                        xsuperactor.remove(xchild)
+                    #add new stuff
+                    for actor in conf.actors:
+                        elem = et.XML("<actor name='"+actor+"'/>")
+                        xsuperactor.append(elem)
+                    subtree = et.parse(conffolder+'/scheduler.xml')
+                    xsuperactor.append(subtree.getroot())
+                    for trans in fsm.transitions:
+                        subtree = et.parse(conffolder+'/sequence'+trans.tid+'.xml')
+                        xsuperactor.append(subtree.getroot())
+                elif xactor.get('name') in conf.actors:
+                    tree.getroot().remove(xsuperactor)
+        tree.write(newfilename)

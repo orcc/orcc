@@ -204,6 +204,10 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 
 	private PromelaSchedulingModel schedulingModel;
 	
+	public PromelaSchedulingModel getSchedulingModel() {
+		return schedulingModel;
+	}
+
 	public NetworkStateDefExtractor(PromelaSchedulingModel schedulingModel) {
 		this.irVisitor = new InnerIrVisitor();
 		this.schedulingModel = schedulingModel;

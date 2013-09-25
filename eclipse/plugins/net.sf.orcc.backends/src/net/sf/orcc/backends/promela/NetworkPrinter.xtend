@@ -68,6 +68,11 @@ class NetworkPrinter extends PromelaTemplate {
 		#define uint int
 		#define SIZE 1
 		
+		// FIFO sizes
+		«FOR connection : network.connections»
+			«connection.setSizesFifo»
+		«ENDFOR»
+
 		// FIFO allocation
 		«FOR connection : network.connections»
 			«connection.allocateFifo»
@@ -111,15 +116,26 @@ class NetworkPrinter extends PromelaTemplate {
 		#endif
 	'''
 
-	def allocateFifo(Connection connection) { 
+	def setSizesFifo(Connection connection) { 
 		val size = if (connection.sourcePort==null || connection.targetPort==null) 1000
 					else if (connection.size != null) connection.size
 					else "SIZE"
 		'''
 			«IF connection.sourcePort != null»
-				chan chan_«connection.<Object>getValueAsObject("id")» = [«size»] of {«connection.sourcePort.type.doSwitch»};
+			#define chan_«(connection.source as Actor).simpleName»_«connection.sourcePort.name»_SIZE «size»
+			«ENDIF»
+			«IF connection.targetPort != null»
+			#define chan_«(connection.target as Actor).simpleName»_«connection.targetPort.name»_SIZE «size»
+			«ENDIF»
+		'''
+	}
+
+	def allocateFifo(Connection connection) { 
+		'''
+			«IF connection.sourcePort != null»
+				chan chan_«connection.<Object>getValueAsObject("id")» = [chan_«(connection.source as Actor).simpleName»_«connection.sourcePort.name»_SIZE] of {«connection.sourcePort.type.doSwitch»};
 			«ELSE»
-				chan chan_«connection.<Object>getValueAsObject("id")» = [«size»] of {«connection.targetPort.type.doSwitch»};
+				chan chan_«connection.<Object>getValueAsObject("id")» = [chan_«(connection.target as Actor).simpleName»_«connection.targetPort.name»_SIZE] of {«connection.targetPort.type.doSwitch»};
 			«ENDIF»
 		'''
 	}
