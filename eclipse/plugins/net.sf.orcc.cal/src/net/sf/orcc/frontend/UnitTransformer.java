@@ -39,6 +39,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 
 /**
  * This class transforms an AST unit to its IR equivalent.
@@ -88,7 +89,7 @@ public class UnitTransformer extends CalSwitch<Unit> {
 		unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
 
 		// serialize unit and cache
-		Frontend.instance.serialize(unit);
+		IrUtil.serializeActor(astUnit.eResource().getResourceSet(), unit);
 
 		return unit;
 	}
