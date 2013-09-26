@@ -90,7 +90,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			return;
 		}
 
-
 		// if build is cleaning, remove output folder completely
 		final BuildType type = context.getBuildType();
 		if (type == BuildType.CLEAN) {
@@ -149,6 +148,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 * @param desc
 	 *            A resource description corresponding to a CAL file, containing
 	 *            code of an Actor or a Unit
+	 * @param monitor
+	 *            The monitor
 	 * @return
 	 * @throws CoreException
 	 */
@@ -178,7 +179,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 * 
 	 * @param monitor
 	 * @param builtDescs
+	 *            A set of all entities built until now. Each is represented by
+	 *            a ResourceDescription of the cal file
 	 * @param units
+	 *            A list of Units which has just been rebuilt. Actors depending
+	 *            on these units have to be rebuilt too
 	 * @throws CoreException
 	 */
 	private void buildDependentEntities(IProgressMonitor monitor,
@@ -190,21 +195,22 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 		final Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
 
+		Set<String> unitQNames = new HashSet<String>();
 		for (Unit unit : units) {
-			String unitQualifiedName = unit.getName().toLowerCase();
+			unitQNames.add(unit.getName().toLowerCase());
+		}
 
-			for (IResourceDescription desc : descs.getAllResourceDescriptions()) {
-				try {
-					for (QualifiedName name : desc.getImportedNames()) {
-						if (name.toString().startsWith(unitQualifiedName)
-								&& !builtDescs.contains(desc)) {
-							// don't add if the description was just built
-							dependentDescs.add(desc);
-						}
-					}
-				} catch (UnsupportedOperationException e) {
-					// getImportedNames() may be unsupported (even if the
-					// documentation does not indicate it...)
+		for (IResourceDescription desc : descs.getAllResourceDescriptions()) {
+			// Check only for descriptions that have not just been build
+			if (builtDescs.contains(desc) || dependentDescs.contains(desc)) {
+				continue;
+			}
+
+			for (QualifiedName importedElement : desc.getImportedNames()) {
+				if (unitQNames.contains(importedElement.skipLast(1).toString())) {
+					// We want to continue with the next desc
+					dependentDescs.add(desc);
+					break;
 				}
 			}
 		}
@@ -217,10 +223,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				break;
 			}
 			monitor.subTask(desc.getURI().lastSegment());
-			System.out.println("build " + desc.getURI().path());
-			EObject result = build(desc, monitor);
-			System.out.println("result: " + result == null ? "null" : result
-					.getClass());
+			build(desc, monitor);
 			monitor.worked(1);
 		}
 	}
