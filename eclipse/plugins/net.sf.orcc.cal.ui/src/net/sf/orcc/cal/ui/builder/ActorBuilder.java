@@ -37,7 +37,9 @@ import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.frontend.Frontend;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -45,10 +47,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -74,50 +79,46 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	@Inject
 	private ResourceDescriptionsProvider provider;
 
+	private ResourceSet currentResourceSet;
+
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor)
 			throws CoreException {
 		// only build Orcc projects
-		IProject project = context.getBuiltProject();
+		final IProject project = context.getBuiltProject();
 		if (!project.hasNature(OrccProjectNature.NATURE_ID)) {
-			if (project.hasNature("net.sf.orcc.ui.OrccNature")) {
-				migrateNature(project);
-			} else {
-				return;
-			}
-		}
-
-		// set output folder
-		IFolder outputFolder = OrccUtil.getOutputFolder(project);
-		if (outputFolder == null) {
 			return;
 		}
-		Frontend.instance.setOutputFolder(outputFolder);
 
 		// if build is cleaning, remove output folder completely
-		BuildType type = context.getBuildType();
+		final BuildType type = context.getBuildType();
 		if (type == BuildType.CLEAN) {
+			IFolder outputFolder = OrccUtil.getOutputFolder(project);
 			// first refresh so that everything can be removed by delete
 			outputFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 			outputFolder.delete(true, null);
+			return;
 		}
 
 		// store result of build
-		List<EObject> entities = new ArrayList<EObject>();
-		Set<IResourceDescription> builtDescs = new HashSet<IResourceDescription>();
+		List<Unit> unitsBuilt = new ArrayList<Unit>();
+		Set<IResourceDescription> builtResources = new HashSet<IResourceDescription>();
 
 		// build actors/units
-		ResourceSet set = context.getResourceSet();
+		currentResourceSet = context.getResourceSet();
 		monitor.beginTask("Building actors", context.getDeltas().size());
 		for (Delta delta : context.getDeltas()) {
 			if (delta.getNew() != null) {
 				IResourceDescription desc = delta.getNew();
 				monitor.subTask(desc.getURI().lastSegment());
-				builtDescs.add(desc);
-				EObject entity = build(set, desc);
-				if (entity != null) {
-					entities.add(entity);
+				builtResources.add(desc);
+				EObject entity = build(desc, monitor);
+				if (entity instanceof Unit) {
+					unitsBuilt.add((Unit) entity);
 				}
+			} else {
+				// CAL file has been deleted, need to delete the IR file
+				deleteIr(delta.getOld(), monitor);
 			}
 
 			if (monitor.isCanceled()) {
@@ -128,58 +129,88 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 		// find out and build all entities that import things from the built
 		// entities
-		if (!entities.isEmpty()) {
+		if ((type == BuildType.INCREMENTAL || type == BuildType.RECOVERY)
+				&& !unitsBuilt.isEmpty()) {
 			CacheManager.instance.unloadAllCaches();
-			buildDependentEntities(monitor, set, builtDescs, entities);
+			buildDependentEntities(monitor, builtResources, unitsBuilt);
 		}
 
 		// to free up some memory
 		CacheManager.instance.unloadAllCaches();
-		Frontend.instance.getResourceSet().getResources().clear();
+		currentResourceSet = null;
 
 		monitor.done();
 	}
 
-	private EObject build(ResourceSet set, IResourceDescription desc)
+	/**
+	 * Build the IR file corresponding to the given <i>desc</i>.
+	 * 
+	 * @param desc
+	 *            A resource description corresponding to a CAL file, containing
+	 *            code of an Actor or a Unit
+	 * @param monitor
+	 *            The monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	private EObject build(IResourceDescription desc, IProgressMonitor monitor)
 			throws CoreException {
 		// load resource and compile
-		Resource resource = set.getResource(desc.getURI(), true);
+		final Resource resource = currentResourceSet.getResource(desc.getURI(),
+				true);
 		for (EObject obj : resource.getContents()) {
 			if (obj.eClass().equals(CalPackage.eINSTANCE.getAstEntity())) {
 				AstEntity entity = (AstEntity) obj;
 				IFile file = EcoreHelper.getFile(resource);
 				if (hasErrors(file)) {
+					deleteIr(desc, monitor);
 					return null;
 				} else {
 					return Frontend.getEntity(entity);
 				}
 			}
 		}
-
 		return null;
 	}
 
+	/**
+	 * Build all entities which depends on one of the units in the given
+	 * <i>units</i> list.
+	 * 
+	 * @param monitor
+	 * @param builtDescs
+	 *            A set of all entities built until now. Each is represented by
+	 *            a ResourceDescription of the cal file
+	 * @param units
+	 *            A list of Units which has just been rebuilt. Actors depending
+	 *            on these units have to be rebuilt too
+	 * @throws CoreException
+	 */
 	private void buildDependentEntities(IProgressMonitor monitor,
-			ResourceSet set, Set<IResourceDescription> builtDescs,
-			List<EObject> entities) throws CoreException {
-		IResourceDescriptions descs = provider.createResourceDescriptions();
+			Set<IResourceDescription> builtDescs, List<Unit> units)
+			throws CoreException {
 
-		Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
-		for (EObject entity : entities) {
-			String entityName = EcoreHelper.getFeature(entity, "name");
-			entityName = entityName.toLowerCase();
-			for (IResourceDescription desc : descs.getAllResourceDescriptions()) {
-				try {
-					for (QualifiedName name : desc.getImportedNames()) {
-						if (name.toString().startsWith(entityName)
-								&& !builtDescs.contains(desc)) {
-							// don't add if the description was just built
-							dependentDescs.add(desc);
-						}
-					}
-				} catch (UnsupportedOperationException e) {
-					// getImportedNames() may be unsupported (even if the
-					// documentation does not indicate it...)
+		final IResourceDescriptions descs = provider
+				.createResourceDescriptions();
+
+		final Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
+
+		Set<String> unitQNames = new HashSet<String>();
+		for (Unit unit : units) {
+			unitQNames.add(unit.getName().toLowerCase());
+		}
+
+		for (IResourceDescription desc : descs.getAllResourceDescriptions()) {
+			// Check only for descriptions that have not just been build
+			if (builtDescs.contains(desc) || dependentDescs.contains(desc)) {
+				continue;
+			}
+
+			for (QualifiedName importedElement : desc.getImportedNames()) {
+				if (unitQNames.contains(importedElement.skipLast(1).toString())) {
+					// We want to continue with the next desc
+					dependentDescs.add(desc);
+					break;
 				}
 			}
 		}
@@ -187,8 +218,12 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		// build dependent descs
 		monitor.beginTask("Building dependencies", dependentDescs.size());
 		for (IResourceDescription desc : dependentDescs) {
+
+			if (monitor.isCanceled()) {
+				break;
+			}
 			monitor.subTask(desc.getURI().lastSegment());
-			build(set, desc);
+			build(desc, monitor);
 			monitor.worked(1);
 		}
 	}
@@ -202,12 +237,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 * @throws CoreException
 	 */
 	private boolean hasErrors(IFile file) throws CoreException {
-		IMarker[] markers = file.findMarkers(EValidator.MARKER, true,
+		final IMarker[] markers = file.findMarkers(EValidator.MARKER, true,
 				IResource.DEPTH_INFINITE);
 		for (IMarker marker : markers) {
 			if (IMarker.SEVERITY_ERROR == marker.getAttribute(IMarker.SEVERITY,
 					IMarker.SEVERITY_INFO)) {
-				// an error => no compilation
 				return true;
 			}
 		}
@@ -216,22 +250,45 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	}
 
 	/**
-	 * Migrates the old Orcc nature to the new one.
+	 * Delete on the disk the IR file corresponding to the CAL file described by
+	 * the given description. This method only manipulate paths, so the given
+	 * description can reference a file already deleted on the filesystem. This
+	 * is useful to delete ir file when the original cal file has just been
+	 * deleted.
 	 * 
-	 * @param project
-	 *            project affected
-	 * @throws CoreException
+	 * @param calResourceDescription
+	 *            A ResourceDescription for a CAL file
+	 * 
 	 */
-	private void migrateNature(IProject project) throws CoreException {
-		IProjectDescription desc = project.getDescription();
-		String[] natures = desc.getNatureIds();
-		for (int i = 0; i < natures.length; i++) {
-			if ("net.sf.orcc.ui.OrccNature".equals(natures[i])) {
-				natures[i] = OrccProjectNature.NATURE_ID;
+	private void deleteIr(IResourceDescription calResourceDescription,
+			IProgressMonitor monitor) {
+
+		URI calURI = calResourceDescription.getURI();
+
+		// Resolve the URI of cal file against the workspace, and convert the
+		// IFile into an IPath to allow some transformations on it
+		IFile calFile = ResourcesPlugin.getWorkspace().getRoot()
+				.getFile(new Path(URI.decode(calURI.path())));
+
+		IFolder outFolder = OrccUtil.getOutputFolder(calFile.getProject());
+		IPath calPath = calFile.getProjectRelativePath();
+
+		// Replace the firsts segments (<proj>/<src>)
+		// Replace "cal" extension by "ir"
+		IPath irPath = calPath
+				.removeFirstSegments(outFolder.getFullPath().segmentCount())
+				.removeFileExtension().addFileExtension("ir");
+
+		// Find the corresponding file under the <proj>/bin folder
+		IFile irFile = outFolder.getFile(irPath);
+
+		if (irFile.exists()) {
+			try {
+				irFile.delete(true, monitor);
+			} catch (CoreException e) {
+				OrccLogger.warnln("File " + irFile + " cannot be deleted: "
+						+ e.getMessage());
 			}
 		}
-		desc.setNatureIds(natures);
-		project.setDescription(desc, null);
 	}
-
 }

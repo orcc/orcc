@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.util;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +42,13 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
+import net.sf.orcc.util.Attributable;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -430,35 +432,29 @@ public class IrUtil {
 	 *            an entity
 	 * @return <code>true</code> if the serialization succeeded
 	 */
-	public static boolean serializeActor(ResourceSet set, IFolder outputFolder,
-			EObject entity) {
-		try {
-			OrccUtil.createFolder(outputFolder);
-		} catch (CoreException e) {
-			e.printStackTrace();
+	public static boolean serializeActor(ResourceSet set, EObject entity) {
+
+		if (entity instanceof Attributable) {
+			IProject p = ResourcesPlugin
+					.getWorkspace()
+					.getRoot()
+					.getProject(
+							((Attributable) entity).getValueAsString("project"));
+
+			IFolder outputFolder = OrccUtil.getOutputFolder(p);
+
+			try {
+				OrccUtil.createFolder(outputFolder);
+			} catch (CoreException e) {
+			}
+			URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
+					.append(DfUtil.getFile(entity)).addFileExtension("ir")
+					.toString(), true);
+
+			return serializeActor(set, uri, entity);
+
 		}
-
-		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
-				.append(DfUtil.getFile(entity)).addFileExtension("ir")
-				.toString(), true);
-		return serializeActor(set, uri, entity);
-	}
-
-	/**
-	 * Serializes the given entity to the given output folder.
-	 * 
-	 * @param outputFolderaddBlockBeforeExpr
-	 *            output folder
-	 * @param entity
-	 *            an entity
-	 * @return <code>true</code> if the serialization succeeded
-	 */
-	public static boolean serializeActor(ResourceSet set, String outputFolder,
-			EObject entity) {
-		String pathName = outputFolder + File.separator
-				+ DfUtil.getFile(entity) + ".ir";
-		URI uri = URI.createFileURI(pathName);
-		return serializeActor(set, uri, entity);
+		return false;
 	}
 
 	/**
@@ -474,8 +470,7 @@ public class IrUtil {
 			EObject entity) {
 		// check that the factory is registered
 		// (only happens in command-line mode)
-		// ...
-		// duck you command line :)
+		// FIXME: Is this still needed ?
 		Map<String, Object> extToFactoryMap = Resource.Factory.Registry.INSTANCE
 				.getExtensionToFactoryMap();
 		Object instance = extToFactoryMap.get("ir");

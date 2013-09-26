@@ -663,9 +663,8 @@ public class OrccUtil {
 		Diagnostic diagnostic = Diagnostician.INSTANCE.validate(eObject);
 		if (diagnostic.getSeverity() == Diagnostic.ERROR
 				|| diagnostic.getSeverity() == Diagnostic.WARNING) {
-			for (Iterator<Diagnostic> i = diagnostic.getChildren().iterator(); i
-					.hasNext();) {
-				Diagnostic childDiagnostic = (Diagnostic) i.next();
+			for (Diagnostic childDiag : diagnostic.getChildren()) {
+				Diagnostic childDiagnostic = childDiag;
 				switch (childDiagnostic.getSeverity()) {
 				case Diagnostic.ERROR:
 				case Diagnostic.WARNING:
