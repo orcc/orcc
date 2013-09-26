@@ -420,14 +420,29 @@ class InstancePrinter extends LLVMTemplate {
 				«ENDIF»
 			
 			bb_«name»_fire:
-				call void @«action.body.name» ()
-				
+			«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
+				call void @«action.body.name»_vectorizable()
+			«ELSEIF action.hasAttribute(VECTORIZABLE)»
+				br i1 
+			
+			bb_«name»_fire_vectorizable:
+				call void @«action.body.name»_vectorizable()
+				br label %bb_«name»_fire_ret
+
+			bb_«name»_fire_notvectorizable:
+				call void @«action.body.name»()
+				br label %bb_«name»_fire_ret
+			
+			bb_«name»_fire_ret:
+			«ELSE»
+				call void @«action.body.name»()
+			«ENDIF»		
 				«IF outsideFSM»
 					br label %bb_outside_scheduler_start
 				«ELSE»
 					br label %bb_scheduler_start
 				«ENDIF»
-			
+					
 			bb_«name»_unschedulable:
 		«ENDFOR»
 			«IF outsideFSM»
@@ -509,6 +524,43 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDFOR»
 		«ENDFOR»
 	'''
+
+	def protected printVectorizable(Action action) '''
+		«val isActionVectorizable = action.hasAttribute(VECTORIZABLE)»
+		«val inputPattern = action.inputPattern»
+		«val outputPattern = action.outputPattern»
+		«IF isActionVectorizable»
+				
+		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionProfile»noinline «ENDIF»nounwind {
+		entry:
+			«FOR local : action.body.locals»
+				«local.declare»
+			«ENDFOR»
+			«FOR port : inputPattern.ports.notNative»
+				«port.loadVar(incomingPortMap.get(port))»
+			«ENDFOR»
+			«FOR port : outputPattern.ports.notNative»
+				«FOR connection : outgoingPortMap.get(port)»
+					«port.loadVar(connection)»
+				«ENDFOR»
+			«ENDFOR»
+			br label %b«action.body.blocks.head.label»
+		
+		«FOR block : action.body.blocks»
+			«block.doSwitch»
+		«ENDFOR»
+			«FOR port : inputPattern.ports.notNative»
+				«port.updateVar(incomingPortMap.get(port), inputPattern.getNumTokens(port))»
+			«ENDFOR»
+			«FOR port : outputPattern.ports.notNative»
+				«FOR connection : outgoingPortMap.get(port)»
+					«port.updateVar(connection, outputPattern.getNumTokens(port))»
+				«ENDFOR»
+			«ENDFOR»
+			ret void
+		}
+		«ENDIF»			
+	'''
 	
 	def protected print(Action action) '''
 		«val inputPattern = action.inputPattern»
@@ -557,6 +609,7 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDFOR»
 			ret void
 		}
+		«action.printVectorizable»
 	'''
 	
 	def protected loadVar(Port port, Connection connection) '''
@@ -568,7 +621,7 @@ class InstancePrinter extends LLVMTemplate {
 		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
 		store i32 %new_index_«port.name»_«connection.getSafeId(port)», i32* @index_«port.name»_«connection.getSafeId(port)»
 	'''	
-	
+
 	def protected print(Procedure procedure) '''
 		«val parameters = procedure.parameters.join(", ")[argumentDeclaration]»
 		«IF procedure.native || procedure.blocks.nullOrEmpty»
