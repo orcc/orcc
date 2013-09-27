@@ -76,6 +76,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccLogger.OrccLevel;
 import net.sf.orcc.util.OrccUtil;
@@ -896,6 +897,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				try {
 					int size = Integer.parseInt(line.getOptionValue('s'));
 					optionMap.put(FIFO_SIZE, size);
+					if (!ValueUtil.isPowerOfTwo(size)) {
+						OrccLogger.severeln("FIFO size must be power of two.");
+						return IApplication.EXIT_OK;
+					}
 				} catch (NumberFormatException e) {
 					throw new ParseException("Expected integer as FIFO size");
 				}
