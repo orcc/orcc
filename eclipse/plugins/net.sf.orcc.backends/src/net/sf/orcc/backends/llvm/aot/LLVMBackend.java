@@ -204,7 +204,7 @@ public class LLVMBackend extends AbstractBackend {
 		doTransformNetwork(network);
 
 		// update "vectorizable" information
-//		Vectorizable.setVectorizableAttributs(network);
+		Vectorizable.setVectorizableAttributs(network);
 		
 		// print instances and entities
 		printChildren(network);
