@@ -270,7 +270,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		IFile calFile = ResourcesPlugin.getWorkspace().getRoot()
 				.getFile(new Path(URI.decode(calURI.path())));
 
-		IFolder outFolder = OrccUtil.getOutputFolder(calFile.getProject());
+		IProject p = calFile.getProject();
+		if (!p.isOpen()) {
+			return;
+		}
+		IFolder outFolder = OrccUtil.getOutputFolder(p);
 		IPath calPath = calFile.getProjectRelativePath();
 
 		// Replace the firsts segments (<proj>/<src>)
