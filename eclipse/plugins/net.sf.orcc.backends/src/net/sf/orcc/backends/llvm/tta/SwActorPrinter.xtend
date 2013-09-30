@@ -81,7 +81,7 @@ class SwActorPrinter extends InstancePrinter {
 				«local.declare»
 			«ENDFOR»
 			«FOR port : action.peekPattern.ports.notNative»
-				«port.loadVar(incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port), action.name)»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
 		
@@ -99,11 +99,11 @@ class SwActorPrinter extends InstancePrinter {
 				«action.outputPattern.getVariable(port).declare»
 			«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
-				«port.loadVar(incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port), action.name)»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
-					«port.loadVar(connection)»
+					«port.loadVar(connection, action.name)»
 				«ENDFOR»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
@@ -113,11 +113,11 @@ class SwActorPrinter extends InstancePrinter {
 		«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
 				«val connection = incomingPortMap.get(port)»
-				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port))»
+				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port), action.name)»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
-					«port.updateVar(connection, action.outputPattern.getNumTokens(port))»
+					«port.updateVar(connection, action.outputPattern.getNumTokens(port), action.name)»
 				«ENDFOR»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.filter[native]»

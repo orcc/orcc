@@ -357,8 +357,7 @@ class InstancePrinter extends LLVMTemplate {
 			«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
 					call void @«action.body.name»_vectorizable()
 			«ELSEIF action.hasAttribute(VECTORIZABLE)»
-				«action.printVectorizationConditions»
-					br label %bb_«extName»_fire_notvectorizable
+				«action.printVectorizationConditions(state)»
 				
 				bb_«extName»_fire_vectorizable:
 					call void @«action.body.name»_vectorizable()
@@ -404,19 +403,39 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	'''
 
-	def protected printVectorizationConditions(Action action) '''
-		«val name = action.name»
+	def protected printVectorizationConditions(Action action, State state) '''
+		«val stateName = if(state != null) '''«state.name»_''' else ""»
+		«val actionName = if(state != null) '''«state.name»_«action.name»''' else '''«action.name»'''»
+		«val portToIndexMap = portToIndexByPatternMap.get(action.inputPattern)»
+		«val connections = action.outputPattern.ports.notNative.map[outgoingPortMap.get(it)].flatten.toList»
 		«FOR port : action.inputPattern.ports»
 			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
-«««			%is_«name»_vectorizable_«index» = and i1 %is_«name»_vectorizable_«index-1», %is_«name»_«port.name»_vectorizable
+				«val extName = port.name + "_" + stateName + action.name + "_" + portToIndexMap.get(port)»
+					%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
+					%tmp_vect2_«extName» = add i32 %index_«extName», «action.inputPattern.numTokensMap.get(port)»
+					%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
+					%is_vectorizable_«extName» = icmp slt i32 %tmp_vect1_«extName», %tmp_vect3_«extName»
+					br i1 %is_vectorizable_«extName», label %next_vectorizable_«extName», label %bb_«actionName»_fire_notvectorizable
+				
+				next_vectorizable_«extName»:
 			«ENDIF»
-		«ENDFOR»
-		«FOR port : action.outputPattern.ports»
+		«ENDFOR»		
+		«FOR connection : connections»
+			«val port = connection.sourcePort»
+			«val name = port.name + "_" + connection.getSafeId(port)»
+			«val extName = name + "_" + stateName + action.name»
+			«val numTokens = action.outputPattern.numTokensMap.get(port)»
 			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
-«««			%is_«name»_vectorizable_«index» = and i1 %is_«name»_vectorizable_«index-1», %is_«name»_«port.name»_vectorizable
+					%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
+					%tmp_vect2_«extName» = add i32 %index_«extName», «numTokens»
+					%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
+					%is_vectorizable_«extName» = icmp slt i32 %tmp_vect1_«extName», %tmp_vect3_«extName»
+					br i1 %is_vectorizable_«extName», label %next_vectorizable_«extName», label %bb_«actionName»_fire_notvectorizable
+				
+				next_vectorizable_«extName»:
 			«ENDIF»
-		«ENDFOR»
-«««		br i1 %is_vectorizable_«index», label %bb_«name»_fire_vectorizable, label %bb_«name»_fire_notvectorizable
+		«ENDFOR»	
+			br label %bb_«actionName»_fire_vectorizable
 	'''
 	
 	def private printActionLoop(EList<Action> actions, boolean outsideFSM) '''
@@ -458,8 +477,7 @@ class InstancePrinter extends LLVMTemplate {
 			«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
 					call void @«action.body.name»_vectorizable()
 			«ELSEIF action.hasAttribute(VECTORIZABLE)»
-				«action.printVectorizationConditions»
-					br label %bb_«name»_fire_notvectorizable
+				«action.printVectorizationConditions(null)»
 				
 				bb_«name»_fire_vectorizable:
 					call void @«action.body.name»_vectorizable()
@@ -500,10 +518,6 @@ class InstancePrinter extends LLVMTemplate {
 			%size_«extName» = load i32* @SIZE_«firstName»
 			%status_«extName» = sub i32 %numTokens_«extName», %index_«extName»
 			%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = icmp sge i32 %status_«extName», «pattern.numTokensMap.get(firstPort)»
-			%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
-			%tmp_vect2_«extName» = add i32 %index_«extName», %numTokens_«extName»
-			%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
-			%is_vectorizable_«extName» = icmp slt i32 %tmp_vect1_«extName», %tmp_vect3_«extName»
 
 			«FOR port : pattern.ports.notNative.tail»
 				«val name = port.name + "_" + incomingPortMap.get(port).getSafeId(port)»
@@ -514,10 +528,6 @@ class InstancePrinter extends LLVMTemplate {
 				%status_«pExtName» = sub i32 %numTokens_«pExtName», %index_«pExtName»
 				%available_input_«stateName»«action.name»_«port.name» = icmp uge i32 %status_«pExtName», «pattern.numTokensMap.get(port)»
 				%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(port)» = and i1 %has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(pattern.ports.get(pattern.ports.indexOf(port) - 1))», %available_input_«stateName»«action.name»_«port.name»
-				%tmp_vect1_«pExtName» = urem i32 %index_«pExtName», %size_«pExtName»
-				%tmp_vect2_«pExtName» = add i32 %index_«pExtName», %numTokens_«pExtName»
-				%tmp_vect3_«pExtName» = urem i32 %tmp_vect2_«pExtName», %size_«pExtName»
-				%is_vectorizable_«pExtName» = icmp slt i32 %tmp_vect1_«pExtName», %tmp_vect3_«pExtName»
 				
 			«ENDFOR»
 		'''
@@ -537,10 +547,6 @@ class InstancePrinter extends LLVMTemplate {
 				%rdIndex_«extName» = load i32* @rdIndex_«name»
 				%tmp_«extName» = sub i32 %size_«extName», %index_«extName»
 				%status_«extName» = add i32 %tmp_«extName», %rdIndex_«extName»
-				%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
-				%tmp_vect2_«extName» = add i32 %index_«extName», «numTokens»
-				%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
-				%is_vectorizable_«extName» = icmp slt i32 %tmp_vect1_«extName», %tmp_vect3_«extName»
 				«IF !connection.equals(connections.head)»
 					«val lastConnection = connections.get(connections.indexOf(connection) - 1)»
 					«val lastName = lastConnection.sourcePort.name + "_" + lastConnection.getSafeId(lastConnection.sourcePort)»
