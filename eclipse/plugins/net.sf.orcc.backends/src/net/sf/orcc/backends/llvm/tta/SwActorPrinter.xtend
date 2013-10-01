@@ -41,6 +41,9 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.Arg
 import org.eclipse.emf.common.util.EList
 
+import static net.sf.orcc.backends.BackendsConstants.*
+
+
 class SwActorPrinter extends InstancePrinter {
 	
 	Processor processor;
@@ -74,6 +77,52 @@ class SwActorPrinter extends InstancePrinter {
 	
 	override protected printArchitecture() ''''''
 
+	override protected printVectorizable(Action action) {
+		isActionVectorizable = action.hasAttribute(VECTORIZABLE)
+		val output = '''
+		«IF isActionVectorizable»
+
+		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionProfile»noinline «ENDIF»nounwind {
+		entry:
+			«FOR local : action.body.locals»
+				«local.declare»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.filter[native]»
+				«action.outputPattern.getVariable(port).declare»
+			«ENDFOR»
+			«FOR port : action.inputPattern.ports.notNative»
+				«port.loadVar(incomingPortMap.get(port), action.name)»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.notNative»
+				«FOR connection : outgoingPortMap.get(port)»
+					«port.loadVar(connection, action.name)»
+				«ENDFOR»
+			«ENDFOR»
+			br label %b«action.body.blocks.head.label»
+		
+		«FOR block : action.body.blocks»
+			«block.doSwitch»
+		«ENDFOR»
+			«FOR port : action.inputPattern.ports.notNative»
+				«val connection = incomingPortMap.get(port)»
+				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port), action.name)»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.notNative»
+				«FOR connection : outgoingPortMap.get(port)»
+					«port.updateVar(connection, action.outputPattern.getNumTokens(port), action.name)»
+				«ENDFOR»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.filter[native]»
+				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
+			«ENDFOR»
+			ret void
+		}
+		«ENDIF»	
+		'''
+		isActionVectorizable = false
+		return output
+	}
+
 	override protected print(Action action) '''
 		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
 		entry:
@@ -89,7 +138,8 @@ class SwActorPrinter extends InstancePrinter {
 			«block.doSwitch»
 		«ENDFOR»
 		}
-		
+		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
+
 		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
@@ -125,6 +175,8 @@ class SwActorPrinter extends InstancePrinter {
 			«ENDFOR»
 			ret void
 		}
+		«ENDIF»
+		«action.printVectorizable»
 	'''
 	
 	override caseInstCall(InstCall call) '''
