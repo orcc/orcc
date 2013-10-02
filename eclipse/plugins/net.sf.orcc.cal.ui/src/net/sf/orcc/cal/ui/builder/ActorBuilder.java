@@ -137,6 +137,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 		// to free up some memory
 		CacheManager.instance.unloadAllCaches();
+		Frontend.instance.getResourceSet().getResources().clear();
 		currentResourceSet = null;
 
 		monitor.done();

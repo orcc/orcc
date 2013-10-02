@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstEntity;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Import;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccUtil;
@@ -59,7 +60,6 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -101,9 +101,14 @@ public class FrontendCli implements IApplication {
 		unorderedProjects = new ArrayList<IProject>();
 		workspace = ResourcesPlugin.getWorkspace();
 		isAutoBuildActivated = false;
-		resourceSet = new ResourceSetImpl();
 
 		CalStandaloneSetup.doSetup();
+
+		// Get the resource set used by Frontend
+		resourceSet = Frontend.instance.getResourceSet();
+		// Register the package to ensure it is available during loading.
+		resourceSet.getPackageRegistry().put(CalPackage.eNS_URI,
+				CalPackage.eINSTANCE);
 	}
 
 	private void disableAutoBuild() throws CoreException {
@@ -485,7 +490,6 @@ public class FrontendCli implements IApplication {
 
 			projectName = args[0];
 			baseProject = workspace.getRoot().getProject(projectName);
-
 			if (baseProject == null) {
 				System.err.println("Unable to find project " + projectName);
 				return IApplication.EXIT_RELAUNCH;

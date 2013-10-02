@@ -83,7 +83,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -425,7 +424,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		actor.getInitializes().addAll(initializes.getAllActions());
 
 		// serialize actor and cache
-		IrUtil.serializeActor(astActor.eResource().getResourceSet(), actor);
+		Frontend.instance.serialize(actor);
 
 		return actor;
 	}

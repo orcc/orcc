@@ -38,9 +38,12 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.Switch;
 import org.eclipse.xtext.EcoreUtil2;
 
@@ -51,6 +54,8 @@ import org.eclipse.xtext.EcoreUtil2;
  * 
  */
 public class Frontend {
+
+	public static final Frontend instance = new Frontend();
 
 	/**
 	 * Returns the IR of the given AST entity. If it does not exist, creates it.
@@ -158,5 +163,21 @@ public class Frontend {
 			Cache cache = CacheManager.instance.getCache(resource);
 			cache.getIrMap().put(astObject, irObject);
 		}
+	}
+
+	private final ResourceSet set = new ResourceSetImpl();
+
+	public ResourceSet getResourceSet() {
+		return set;
+	}
+
+	/**
+	 * Serializes the given actor or unit.
+	 * 
+	 * @param eObject
+	 *            an actor or unit
+	 */
+	public void serialize(EObject eObject) {
+		IrUtil.serializeActor(set, eObject);
 	}
 }
