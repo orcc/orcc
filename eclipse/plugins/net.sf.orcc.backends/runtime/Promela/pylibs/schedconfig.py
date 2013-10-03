@@ -134,6 +134,9 @@ class StateDescription(object):
         ret=None
         sd=StateDescription()
         for st in otherstates:
+            if not os.path.exists(folder+'/'+st+'.txt'):
+                # as the file does not exist, this state is not yet defined; so we define it
+                self.savestate(folder, st+'.txt')
             sd.loadstate(folder, st+'.txt')
             issame=True
             for elem in self.state.keys():
@@ -231,6 +234,7 @@ class ChannelConfigXML():
                 #check if port is input to partition
                 if xinput.get('instance') not in configuration.actors:
                     if xactor.get('name').find('_bcast')>=0: #special case, check downstream
+                        feeds_leader=False
                         for xoutput in xactor.findall('.//connections/output'):
                             xother_actorID=xoutput.get('instance')
                             channel=xoutput.get('channelID')
@@ -239,6 +243,9 @@ class ChannelConfigXML():
                                 xother_actor=tree.find(".//actor[@name='"+xother_actorID+"']")
                                 xother_input=xother_actor.find(".//connections/input[@channelID='"+channel+"']")
                                 self.__getrates(xother_actor, xother_input, xactor, xinput)
+                                feeds_leader=True
+                        if not feeds_leader:
+                            self.__getrates(xactor, xinput, xactor, xinput)
                     else:
                         self.__getrates(xactor, xinput, xactor, xinput)
         return self.partitioninput
