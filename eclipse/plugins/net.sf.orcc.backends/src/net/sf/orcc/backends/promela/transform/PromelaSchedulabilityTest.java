@@ -218,7 +218,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 						} while (((actor.hasFsm() && interpreter.getFsmStateOrig() != schedule.getEndState()) 
 								|| (!actor.hasFsm() && !actorstate.isInitialState())) 
 								&& nbPhases < MAX_PHASES);
-						if (!actor.hasFsm() && nbPhases == MAX_PHASES) {
+						if (nbPhases == MAX_PHASES) {
 							scheduler.makeDummyFSM();
 							stopChecking=true;
 						}

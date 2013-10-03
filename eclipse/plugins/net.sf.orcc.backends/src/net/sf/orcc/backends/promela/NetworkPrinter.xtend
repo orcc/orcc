@@ -83,12 +83,14 @@ class NetworkPrinter extends PromelaTemplate {
 			«connection.assignFifo»
 		«ENDFOR»
 		
+		int promela_prog_initiated=0;
+		
+		int promela_has_progress=0;
+		
 		// Include the actors
 		«FOR actor : network.children.filter(typeof(Actor))»
 			#include "«actor.simpleName».pml"
 		«ENDFOR»
-		
-		int promela_prog_initiated=0
 		
 		proctype dummy() {
 		chan_0?promela_prog_initiated;}

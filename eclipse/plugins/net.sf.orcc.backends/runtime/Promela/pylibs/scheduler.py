@@ -31,10 +31,10 @@ class FSM:
         for trans in self.transitions:
             if trans.tid==transid:
                 return trans
-    def getnstates(self):
+    def getnstates(self, dst_state):
         lst=[]
         for i in self.transitions:
-            if i.nsrc not in lst:
+            if i.nsrc not in lst and i.src==dst_state:
                 lst.append(i.nsrc)
         return lst
     def getnewstatename(self):

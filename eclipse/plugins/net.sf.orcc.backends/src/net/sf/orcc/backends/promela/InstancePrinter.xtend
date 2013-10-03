@@ -238,6 +238,8 @@ class InstancePrinter extends PromelaTemplate {
 				«instLoad.target.variable.name»_done = 0;
 			«ENDFOR»
 			
+			promela_has_progress=1;
+			
 			#ifdef PXML
 			printf("<iterand actor=\"«actor.simpleName»\" action=\"«action.name»\" repetitions=\"1\"/>\n");
 			#endif
@@ -332,7 +334,12 @@ class InstancePrinter extends PromelaTemplate {
 			«ENDFOR»
 			
 			«action.outputPattern.outputPattern»
-			
+
+			promela_has_progress=1;
+
+			#ifdef PXML
+			printf("<iterand actor=\"«actor.simpleName»\" action=\"«action.name»\" repetitions=\"1\"/>\n");
+			#endif			
 			#ifdef PNAME
 			printf("«actor.simpleName».«action.name»();\n");
 			#endif
