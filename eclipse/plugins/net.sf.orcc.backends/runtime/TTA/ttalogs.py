@@ -46,11 +46,14 @@ class ExtractLog:
         self.SUMMARY_PDF = tag + ".pdf"
         self.WORST_ACTOR = "None"
         self.WORST_FPS = 10000
+        self.TOTAL_CYCLES = 0
         self.TTA_DATA = list()
+        self.PIE_DATA = list()
         self.FREQUENCY = frequency
         self.NBFRAME = nb_frames
         self.TOKEN_CYCLE = ""
         self.TOKEN_ERROR = ""
+        self.MIN_WL_FOR_PIE = 5
 
     def performExtraction(self):
         print "*********************************************************************"
@@ -60,6 +63,7 @@ class ExtractLog:
         print "==> frequency= %d " % (self.FREQUENCY)
         print "==> nb of frames= %d " % (self.NBFRAME)
         self.extractData()
+        self.calculWorkload()
         self.logInTXT()
         self.logInCSV()
         self.logInHTML()
@@ -94,8 +98,20 @@ class ExtractLog:
                     self.WORST_ACTOR = ACTOR_NAME
                     self.WORST_FPS = FPS
 
+                self.TOTAL_CYCLES += CYCLES
                 self.TTA_DATA.append([ACTOR_NAME, str(CYCLES), str(FPS), STATUS])
                 self.TTA_DATA.sort()
+
+    def calculWorkload(self):
+        wl = list()
+        for actor in self.TTA_DATA:
+            rep = round((int(actor[1]) * 100) / int(self.TOTAL_CYCLES), 2)
+            actor.append(rep)
+            if rep > self.MIN_WL_FOR_PIE:
+                wl.append(actor)
+
+        self.PIE_DATA = sorted(wl, key=lambda actor: actor[4], reverse=True)
+
 
     def logInTXT(self):
         print "\n*********************************************************************"
@@ -110,9 +126,9 @@ class ExtractLog:
         # Body
         for actor in self.TTA_DATA:
             if actor[3] == "KO":
-                fd.write('{:>3} {:50} Cycle count = {:>10}    FPS = {:>7}\n'.format(actor[3], actor[0], actor[1], actor[2]));
+                fd.write('{:>3} {:60} Cycle count = {:>10}    FPS = {:>9}   Workload = {:>6}\n'.format(actor[3], actor[0], actor[1], actor[2], str(actor[4])));
             else:
-                fd.write('{:>3} {:50} Cycle count = {:>10}    FPS = {:>7}\n'.format("", actor[0], actor[1], actor[2]));
+                fd.write('{:>3} {:60} Cycle count = {:>10}    FPS = {:>9}   Workload = {:>6}\n'.format("", actor[0], actor[1], actor[2], str(actor[4])));
 
         # Footer
         fd.write("\nWorst actor is : " + self.WORST_ACTOR + "    with : " + str(self.WORST_FPS) + " FPS\n")
@@ -123,16 +139,75 @@ class ExtractLog:
         print "Generate CSV Summary file..." + self.SUMMARY_CSV
         fd = open(self.SUMMARY_CSV, 'w')
         # Header
-        fd.write("Actor;Cycle count;FPS@" + str(self.FREQUENCY) + "MHz;Status" + "\n")
+        fd.write("Actor;Cycle count;FPS@" + str(self.FREQUENCY) + "MHz;Workload;Status" + "\n")
         # TODO : Add output_tag information ?
 
         # Body
         for actor in self.TTA_DATA:
-            fd.write(actor[0] + ";" + actor[1] + ";" + actor[2] + ";" + actor[3] + "\n");
+            fd.write(actor[0] + ";" + actor[1] + ";" + actor[2].replace(".", ",") + ";" + str(actor[4]).replace(".", ",") + ";" + actor[3] + "\n");
 
         # Footer
         # TODO : Add worst actor ?
         fd.close()
+
+    def addPieInHTML(self, fd):
+        fd.write("  <div id=\"chart\"></div>" + "\n")
+
+        fd.write("  <script type=\"text/javascript\">" + "\n")
+        fd.write("      var queryString = '';" + "\n")
+        fd.write("      var dataUrl = '';" + "\n")
+
+        fd.write("      function onLoadCallback() {" + "\n")
+        fd.write("          if (dataUrl.length > 0) {" + "\n")
+        fd.write("              var query = new google.visualization.Query(dataUrl);" + "\n")
+        fd.write("              query.setQuery(queryString);" + "\n")
+        fd.write("              query.send(handleQueryResponse);" + "\n")
+        fd.write("          } else {" + "\n")
+        fd.write("              var dataTable = new google.visualization.DataTable();" + "\n")
+        fd.write("              dataTable.addRows(" + str(len(self.PIE_DATA) + 1) + ");" + "\n")
+
+        fd.write("              dataTable.addColumn('number');" + "\n")
+        i=0
+        valuesTxt=""
+        actorsTxt=""
+        othersWl=100
+        for actor in self.PIE_DATA:
+            fd.write("              dataTable.setValue(" + str(i) + ", 0, " + str(actor[4]) + ");" + "\n")
+            valuesTxt = valuesTxt + str(actor[4]) + ","
+            actorsTxt = actorsTxt + str(actor[4]) + "%   " + actor[0] + "|"
+            othersWl -= float(str(actor[4]))
+            i += 1
+
+        fd.write("              dataTable.setValue(" + str(i) + ", 0, " + str(othersWl) + ");" + "\n")
+        fd.write("              draw(dataTable);" + "\n")
+        fd.write("          }" + "\n")
+        fd.write("      }" + "\n")
+
+        fd.write("      function draw(dataTable) {" + "\n")
+        fd.write("          var vis = new google.visualization.ImageChart(document.getElementById('chart'));" + "\n")
+        fd.write("          var options = {" + "\n")
+        fd.write("             chs: '900x400'," + "\n")
+        fd.write("              cht: 'p3'," + "\n")
+        fd.write("              chco: 'FF9900'," + "\n")
+        fd.write("              chd: 't:" + valuesTxt + str(othersWl) + "'," + "\n")
+        fd.write("              chdl: '" + actorsTxt + "Others'," + "\n")
+        fd.write("              chl: '|||'" + "\n")
+        fd.write("          };" + "\n")
+        fd.write("          vis.draw(dataTable, options);" + "\n")
+        fd.write("      }" + "\n")
+
+        fd.write("      function handleQueryResponse(response) {" + "\n")
+        fd.write("          if (response.isError()) {" + "\n")
+        fd.write("              alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());" + "\n")
+        fd.write("              return;" + "\n")
+        fd.write("          }" + "\n")
+        fd.write("          draw(response.getDataTable());" + "\n")
+        fd.write("      }" + "\n")
+
+        fd.write("      google.load(\"visualization\", \"1\", {packages:[\"imagechart\"]});" + "\n")
+        fd.write("      google.setOnLoadCallback(onLoadCallback);" + "\n")
+
+        fd.write("  </script>" + "\n")
 
     def logInHTML(self):
         print "\n*********************************************************************"
@@ -146,18 +221,23 @@ class ExtractLog:
         fd.write("  @import url(\"style.css\");" + "\n")
         fd.write("  -->" + "\n")
         fd.write("  </style>" + "\n")
+        fd.write("  <script language=\"javascript\" src=\"http://www.google.com/jsapi\"></script>" + "\n")
         fd.write("  </head>" + "\n")
+
+        self.addPieInHTML(fd)
+
         fd.write("  <body>" + "\n")
         fd.write("      <table id=\"rounded-corner\">" + "\n")
         fd.write("          <thead>" + "\n")
         fd.write("              <tr>" + "\n")
         fd.write("                  <th scope=\"col\" class=\"rounded-head-left\"></th>" + "\n")
-        fd.write("                  <th scope=\"col\" colspan=3 class=\"rounded-head-right\">" + self.OUTPUT_TAG + "</th>" + "\n")
+        fd.write("                  <th scope=\"col\" colspan=4 class=\"rounded-head-right\">" + self.OUTPUT_TAG + "</th>" + "\n")
         fd.write("              </tr>" + "\n")
         fd.write("              <tr>" + "\n")
         fd.write("                  <th scope=\"col\">Actor</th>" + "\n")
         fd.write("                  <th scope=\"col\">Cycle count</th>" + "\n")
         fd.write("                  <th scope=\"col\">FPS@" + str(self.FREQUENCY) + "MHz</th>" + "\n")
+        fd.write("                  <th scope=\"col\">Workload</th>" + "\n")
         fd.write("                  <th scope=\"col\">Status</th>" + "\n")
         fd.write("              </tr>" + "\n")
         fd.write("          </thead>" + "\n")
@@ -169,6 +249,7 @@ class ExtractLog:
             fd.write("                  <td>" + actor[0] + "</td>"+ "\n")
             fd.write("                  <td class=\"num\">" + actor[1] + "</td>"+ "\n")
             fd.write("                  <td class=\"num\">" + actor[2] + "</td>"+ "\n")
+            fd.write("                  <td class=\"num\">" + str(actor[4]) + "</td>"+ "\n")
             if actor[3] ==  "KO":
                 fd.write("                  <td class=\"ko\">" + actor[3] + "</td>"+ "\n")
             else:
@@ -180,7 +261,7 @@ class ExtractLog:
         fd.write("          <tfoot>" + "\n")
         fd.write("              <tr>" + "\n")
         fd.write("                  <td class=\"rounded-foot-left\">Worst actor :</td>" + "\n")
-        fd.write("                  <td colspan=\"3\" class=\"rounded-foot-right\">" + self.WORST_ACTOR + "</td>" + "\n")
+        fd.write("                  <td colspan=\"4\" class=\"rounded-foot-right\">" + self.WORST_ACTOR + "</td>" + "\n")
         fd.write("              </tr>" + "\n")
         fd.write("          </tfoot>" + "\n")
         fd.write("      </table>" + "\n")
