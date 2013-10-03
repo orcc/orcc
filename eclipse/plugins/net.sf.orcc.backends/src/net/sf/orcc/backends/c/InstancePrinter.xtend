@@ -488,6 +488,7 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	def protected printVectorizationConditions(Action action) '''
+		{
 		int isVectorizable = 1;
 		«FOR port : action.inputPattern.ports»
 			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
@@ -523,6 +524,9 @@ class InstancePrinter extends CTemplate {
 					}
 				«ELSE»
 					«trans.action.body.name»();
+				«ENDIF»
+				«IF trans.action.hasAttribute(VECTORIZABLE) && !trans.action.hasAttribute(VECTORIZABLE_ALWAYS)»
+				}
 				«ENDIF»
 				i++;
 				goto l_«trans.target.name»;
@@ -654,6 +658,9 @@ class InstancePrinter extends CTemplate {
 					}
 				«ELSE»
 					«action.body.name»();
+				«ENDIF»
+				«IF action.hasAttribute(VECTORIZABLE) && !action.hasAttribute(VECTORIZABLE_ALWAYS)»
+				}
 				«ENDIF»
 				i++;
 		'''
