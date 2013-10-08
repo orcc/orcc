@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypes">
+      <diagramType
+            name="XDF Network"
+            type="xdf3"
+            id="net.sf.orcc.xdf.ui.XdfDiagramType">
+      </diagramType>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypeProviders">
+      <diagramTypeProvider
+            name="Orcc Diagram Type Provider"
+            class="net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider"
+            id="net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider">
+         <diagramType
+               id="net.sf.orcc.xdf.ui.XdfDiagramType">
+         </diagramType>
+      </diagramTypeProvider>
+   </extension>
+
+</plugin>
