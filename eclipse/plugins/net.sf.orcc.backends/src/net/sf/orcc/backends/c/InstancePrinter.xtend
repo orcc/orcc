@@ -492,12 +492,12 @@ class InstancePrinter extends CTemplate {
 			int isVectorizable = 1;
 			«FOR port : action.inputPattern.ports»
 				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
-				isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
+					isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
 				«ENDIF»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports»
 				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
-				isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
+					isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
 				«ENDIF»
 			«ENDFOR»
 	'''
@@ -649,16 +649,14 @@ class InstancePrinter extends CTemplate {
 					«action.body.name»_vectorizable();
 				«ELSEIF action.hasAttribute(VECTORIZABLE)»
 					«action.printVectorizationConditions»
-					if (isVectorizable) {
-						«action.body.name»_vectorizable();
-					} else {
-						«action.body.name»();
+						if (isVectorizable) {
+							«action.body.name»_vectorizable();
+						} else {
+							«action.body.name»();
+						}
 					}
 				«ELSE»
 					«action.body.name»();
-				«ENDIF»
-				«IF action.hasAttribute(VECTORIZABLE) && !action.hasAttribute(VECTORIZABLE_ALWAYS)»
-				}
 				«ENDIF»
 				i++;
 		'''
