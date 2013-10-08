@@ -30,18 +30,19 @@ package net.sf.orcc.xdf.ui.patterns;
 
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
+import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
+import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
-import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.func.IDirectEditing;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -73,7 +74,7 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 	private static String PROPERTY_ID = "XDF_ID";
 
 	private enum IDS {
-		LABEL, INPORTS_LIST, OUTPORTS_LIST
+		LABEL
 	};
 
 	public InstancePattern() {
@@ -83,6 +84,47 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 	@Override
 	public String getCreateName() {
 		return "Instance";
+	}
+
+	@Override
+	public boolean canDirectEdit(IDirectEditingContext context) {
+		boolean isText = context.getGraphicsAlgorithm() instanceof Text;
+
+		return isText && isExpectedPe(context.getPictogramElement(), IDS.LABEL);
+	}
+
+	@Override
+	public int getEditingType() {
+		return IDirectEditing.TYPE_TEXT;
+	}
+
+	@Override
+	public String getInitialValue(IDirectEditingContext context) {
+		Instance obj = (Instance) getBusinessObjectForPictogramElement(context
+				.getPictogramElement());
+		return obj.getName();
+	}
+
+	@Override
+	public void setValue(String value, IDirectEditingContext context) {
+		PictogramElement pe = context.getPictogramElement();
+		Instance obj = (Instance) getBusinessObjectForPictogramElement(pe);
+		obj.setName(value);
+
+		updatePictogramElement(pe);
+	}
+
+	@Override
+	public String checkValueValid(String value, IDirectEditingContext context) {
+		if (value.length() < 1) {
+			return "Please enter any text as Instance name.";
+		}
+		if (!value.matches("[a-zA-Z0-9_]+")) {
+			return "You can only use alphanumeric characters for Instance name";
+		}
+
+		// null -> value is valid
+		return null;
 	}
 
 	@Override
@@ -136,6 +178,9 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 		getDiagram().eResource().getContents().add(newInstance);
 
 		addGraphicalRepresentation(context, newInstance);
+
+		getFeatureProvider().getDirectEditingInfo().setActive(true);
+
 		return new Object[] { newInstance };
 	}
 
@@ -156,6 +201,13 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 		final IPeService peService = Graphiti.getPeService();
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		final IGaService gaService = Graphiti.getGaService();
+
+		final Instance addedDomainObject = (Instance) context.getNewObject();
+
+		// provide information to support direct-editing directly
+		// after object creation (must be activated additionally)
+		IDirectEditingInfo directEditingInfo = getFeatureProvider()
+				.getDirectEditingInfo();
 
 		// Create the container
 		final ContainerShape containerShape;
@@ -182,6 +234,12 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 
 			peService.setPropertyValue(shape, PROPERTY_ID, IDS.LABEL.name());
 
+			link(shape, addedDomainObject);
+
+			// set shape and graphics algorithm where the editor for
+			// direct editing shall be opened after object creation
+			directEditingInfo.setPictogramElement(shape);
+			directEditingInfo.setGraphicsAlgorithm(text);
 		}
 
 		{
@@ -193,8 +251,10 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 			line.setStyle(StyleUtil.getCommonStyle(getDiagram()));
 		}
 
+		// set container shape for direct editing after object creation
+		directEditingInfo.setMainPictogramElement(containerShape);
+
 		// We link graphical representation and domain model object
-		Instance addedDomainObject = (Instance) context.getNewObject();
 		link(containerShape, addedDomainObject);
 
 		return containerShape;
@@ -216,33 +276,25 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 	public boolean canLayout(ILayoutContext context) {
 		PictogramElement elt = context.getPictogramElement();
 		Object obj = getBusinessObjectForPictogramElement(elt);
-		return elt instanceof ContainerShape && obj instanceof Instance;
+		return obj instanceof Instance;
 	}
 
 	@Override
 	public boolean layout(ILayoutContext context) {
-		PictogramElement pictogramElement = context.getPictogramElement();
-		if (pictogramElement instanceof ContainerShape) {
-			ContainerShape containerShape = (ContainerShape) pictogramElement;
-			GraphicsAlgorithm outerGraphicsAlgorithm = containerShape
-					.getGraphicsAlgorithm();
-			if (outerGraphicsAlgorithm instanceof RoundedRectangle) {
-				RoundedRectangle roundedRectangle = (RoundedRectangle) outerGraphicsAlgorithm;
-				EList<Shape> children = containerShape.getChildren();
-				if (children.size() > 0) {
-					Shape shape = children.get(0);
-					GraphicsAlgorithm graphicsAlgorithm = shape
-							.getGraphicsAlgorithm();
-					if (graphicsAlgorithm instanceof Text) {
-						Graphiti.getGaLayoutService().setLocationAndSize(
-								graphicsAlgorithm, 0, 0,
-								roundedRectangle.getWidth(),
-								roundedRectangle.getHeight());
-						return true;
-					}
-				}
-			}
+		if (isExpectedPe(context.getPictogramElement(), IDS.LABEL)) {
+			Shape shape = (Shape) context.getPictogramElement();
+			Instance instance = (Instance) getBusinessObjectForPictogramElement(shape);
+
+			Text text = (Text) shape.getGraphicsAlgorithm();
+			text.setValue(instance.getName());
+			return true;
 		}
 		return false;
+	}
+
+	private boolean isExpectedPe(PictogramElement pe, IDS expectedType) {
+		String objectType = Graphiti.getPeService()
+				.getProperty(pe, PROPERTY_ID).getValue();
+		return expectedType.name().equals(objectType);
 	}
 }
