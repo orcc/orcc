@@ -32,9 +32,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.graphiti.mm.Property;
-import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -56,31 +53,5 @@ public class XdfUtil {
 		String path = object.eResource().getURI().toPlatformString(true);
 		return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path))
 				.getProject();
-	}
-
-	public static Shape getShapeFromProperty(ContainerShape container,
-			String key, String value) {
-		return getShapeFromProperty(container, key, value, true);
-	}
-
-	public static Shape getShapeFromProperty(ContainerShape container,
-			String key, String value, boolean recursive) {
-		for (Shape child : container.getChildren()) {
-			for (Property property : child.getProperties()) {
-				if (property.getKey().equals(key)) {
-					if (property.getValue().equals(value)) {
-						return child;
-					}
-				}
-			}
-			if (recursive && child instanceof ContainerShape) {
-				Shape subResult = getShapeFromProperty((ContainerShape) child,
-						key, value, true);
-				if (subResult != null) {
-					return subResult;
-				}
-			}
-		}
-		return null;
 	}
 }

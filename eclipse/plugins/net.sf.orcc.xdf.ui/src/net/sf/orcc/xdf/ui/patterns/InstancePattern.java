@@ -35,7 +35,6 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
-import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -62,12 +61,9 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
-import org.eclipse.graphiti.pattern.AbstractPattern;
-import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
-import org.eclipse.graphiti.services.IPeService;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.graphiti.ui.services.IUiLayoutService;
 
@@ -78,7 +74,7 @@ import org.eclipse.graphiti.ui.services.IUiLayoutService;
  * @author Antoine Lorence
  * 
  */
-public class InstancePattern extends AbstractPattern implements IPattern {
+public class InstancePattern extends AbstractPatternWithProperties {
 
 	private static int TOTAL_WIDTH = 120;
 	private static int TOTAL_HEIGHT = 140;
@@ -90,11 +86,10 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 
 	private int separator_size;
 
-	private static String PROPERTY_ID = "XDF_ID";
-
-	public enum IDS {
-		LABEL, INPUTS, OUTPUTS
-	};
+	private static String INSTANCE_ID = "INSTANCE";
+	private static String LABEL_ID = "LABEL";
+	private static String INPUTS_ID = "INPUTS_AREA";
+	private static String OUTPUTS_ID = "OUTPUTS_AREA";
 
 	public InstancePattern() {
 		super(null);
@@ -108,7 +103,7 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 	@Override
 	public boolean canDirectEdit(IDirectEditingContext context) {
 		boolean isText = context.getGraphicsAlgorithm() instanceof Text;
-		return isText && isExpectedPe(context.getPictogramElement(), IDS.LABEL);
+		return isText && isExpectedPe(context.getPictogramElement(), LABEL_ID);
 	}
 
 	@Override
@@ -216,7 +211,6 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 	@Override
 	public PictogramElement add(IAddContext context) {
 		final Diagram targetDiagram = (Diagram) context.getTargetContainer();
-		final IPeService peService = Graphiti.getPeService();
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		final IGaService gaService = Graphiti.getGaService();
 
@@ -250,7 +244,7 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 			text.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
 			gaService.setLocationAndSize(text, 0, 0, TOTAL_WIDTH, LABEL_HEIGHT);
 
-			peService.setPropertyValue(shape, PROPERTY_ID, IDS.LABEL.name());
+			setIdentifier(shape, LABEL_ID);
 
 			link(shape, addedDomainObject);
 
@@ -287,10 +281,11 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 					LABEL_HEIGHT + separator_size, PORTS_LIST_WIDTH,
 					TOTAL_HEIGHT - (LABEL_HEIGHT + separator_size));
 
-			peService.setPropertyValue(inShape, PROPERTY_ID, IDS.INPUTS.name());
-			peService.setPropertyValue(outShape, PROPERTY_ID,
-					IDS.OUTPUTS.name());
+			setIdentifier(inShape, INPUTS_ID);
+			setIdentifier(outShape, OUTPUTS_ID);
 		}
+
+		setIdentifier(containerShape, INSTANCE_ID);
 
 		// set container shape for direct editing after object creation
 		directEditingInfo.setMainPictogramElement(containerShape);
@@ -321,10 +316,10 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 		if (obj instanceof Instance) {
 			return true;
 		}
-		if (isExpectedPe(elt, IDS.INPUTS) || isExpectedPe(elt, IDS.OUTPUTS)) {
+		if (isExpectedPe(elt, INPUTS_ID) || isExpectedPe(elt, OUTPUTS_ID)) {
 			return true;
 		}
-		if (isExpectedPe(elt, IDS.LABEL)) {
+		if (isExpectedPe(elt, LABEL_ID)) {
 			return true;
 		}
 
@@ -333,7 +328,7 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 
 	@Override
 	public boolean layout(ILayoutContext context) {
-		if (isExpectedPe(context.getPictogramElement(), IDS.LABEL)) {
+		if (isExpectedPe(context.getPictogramElement(), LABEL_ID)) {
 			Shape shape = (Shape) context.getPictogramElement();
 			Instance instance = (Instance) getBusinessObjectForPictogramElement(shape);
 
@@ -356,7 +351,7 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 	 * @param pe
 	 */
 	public void cleanInputsPorts(ContainerShape cs) {
-		ContainerShape ctr = getContainer(cs, IDS.INPUTS);
+		ContainerShape ctr = getSubContainerShapeFromId(cs, INPUTS_ID);
 		List<Shape> copyList = new ArrayList<Shape>(ctr.getChildren());
 		for (Shape shape : copyList) {
 			EcoreUtil.delete(shape, true);
@@ -370,7 +365,7 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 	 * @param pe
 	 */
 	public void cleanOutputsPorts(ContainerShape cs) {
-		ContainerShape ctr = getContainer(cs, IDS.OUTPUTS);
+		ContainerShape ctr = getSubContainerShapeFromId(cs, OUTPUTS_ID);
 		List<Shape> copyList = new ArrayList<Shape>(ctr.getChildren());
 		for (Shape shape : copyList) {
 			EcoreUtil.delete(shape, true);
@@ -379,7 +374,7 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 	}
 
 	public void addInputsPorts(ContainerShape cs, EList<Port> ports) {
-		final ContainerShape portsCtr = getContainer(cs, IDS.INPUTS);
+		final ContainerShape portsCtr = getSubContainerShapeFromId(cs, INPUTS_ID);
 
 		// final IPeService peService = Graphiti.getPeService();
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -417,7 +412,7 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 	}
 
 	public void addOutputsPorts(ContainerShape cs, EList<Port> ports) {
-		final ContainerShape portsCtr = getContainer(cs, IDS.OUTPUTS);
+		final ContainerShape portsCtr = getSubContainerShapeFromId(cs, OUTPUTS_ID);
 
 		// final IPeService peService = Graphiti.getPeService();
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -455,16 +450,5 @@ public class InstancePattern extends AbstractPattern implements IPattern {
 		GraphicsAlgorithm portCtrGa = portsCtr.getGraphicsAlgorithm();
 		gaService.setSize(portCtrGa, portCtrGa.getWidth(), portCtrGa.getHeight());
 		updatePictogramElement(portsCtr);
-	}
-
-	private boolean isExpectedPe(PictogramElement pe, IDS expectedType) {
-		String objectType = Graphiti.getPeService()
-				.getProperty(pe, PROPERTY_ID).getValue();
-		return expectedType.name().equals(objectType);
-	}
-	
-	private ContainerShape getContainer(ContainerShape cs, IDS id) {
-		return (ContainerShape) XdfUtil.getShapeFromProperty(cs, PROPERTY_ID,
-				id.name());
 	}
 }
