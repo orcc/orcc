@@ -50,6 +50,7 @@ public class StyleUtil {
 			0, 0, 0);
 	private static final IColorConstant INSTANCE_FOREGROUND = new ColorConstant(
 			98, 131, 167);
+	private static final IColorConstant INSTANCEPORT_BACKGROUND = INSTANCE_FOREGROUND;
 
 	private static void setCommonTextValues(Diagram diagram,
 			IGaService gaService, Style style) {
@@ -98,6 +99,24 @@ public class StyleUtil {
 
 			gaService.setRenderingStyle(style,
 					PredefinedColoredAreas.getCopperWhiteGlossAdaptions());
+		}
+		return style;
+	}
+
+	public static Style getStyleForInstancePort(Diagram diagram) {
+		final String styleId = "INSTANCE-PORT";
+		IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		Style parentStyle = getCommonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			style.setFilled(true);
+			style.setLineVisible(false);
+			style.setBackground(gaService.manageColor(diagram,
+					INSTANCEPORT_BACKGROUND));
 		}
 		return style;
 	}
