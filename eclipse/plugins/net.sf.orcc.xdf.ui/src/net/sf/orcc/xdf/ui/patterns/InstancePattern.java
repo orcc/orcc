@@ -88,8 +88,8 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	private static int PORT_MARGIN = 2;
 
 	private final String INSTANCE_ID = "INSTANCE";
-	private final String LABEL_ID = "LABEL";
-	private final String SEP_ID = "SEPARATOR";
+	private final String LABEL_ID = "INSTANCE_LABEL";
+	private final String SEP_ID = "INSTANCE_SEPARATOR";
 	private final String INPUTS_ID = "INPUTS_AREA";
 	private final String OUTPUTS_ID = "OUTPUTS_AREA";
 	private final String[] validIds = { INSTANCE_ID, LABEL_ID, OUTPUTS_ID, INPUTS_ID };
@@ -197,6 +197,8 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	@Override
 	public Object[] create(ICreateContext context) {
 		Instance newInstance = null;
+		// TODO: allow to create from an eResource (dropped from project
+		// explorer)
 		if (true) {
 			newInstance = DfFactory.eINSTANCE.createInstance();
 		}
@@ -214,13 +216,10 @@ public class InstancePattern extends AbstractPatternWithProperties {
 
 	@Override
 	public boolean canAdd(IAddContext context) {
-		boolean canAdd = false;
 		if (context.getTargetContainer() instanceof Diagram) {
-			if (context.getNewObject() instanceof Instance) {
-				canAdd = true;
-			}
+			return isMainBusinessObjectApplicable(context.getNewObject());
 		}
-		return canAdd;
+		return false;
 	}
 
 	@Override

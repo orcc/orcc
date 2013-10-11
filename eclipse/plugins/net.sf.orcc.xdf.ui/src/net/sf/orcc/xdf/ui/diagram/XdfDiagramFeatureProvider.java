@@ -31,7 +31,9 @@ package net.sf.orcc.xdf.ui.diagram;
 import net.sf.orcc.xdf.ui.features.AddSimpleConnectionFeature;
 import net.sf.orcc.xdf.ui.features.CreateSimpleConnectionFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinmentFeature;
+import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
+import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
@@ -55,6 +57,8 @@ public class XdfDiagramFeatureProvider extends
 	public XdfDiagramFeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
 		addPattern(new InstancePattern());
+		addPattern(new InputNetworkPortPattern());
+		addPattern(new OutputNetworkPortPattern());
 	}
 
 	@Override

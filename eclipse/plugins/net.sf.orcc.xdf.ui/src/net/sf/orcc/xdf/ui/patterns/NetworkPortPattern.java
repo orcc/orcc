@@ -1,0 +1,203 @@
+/*
+ * Copyright (c) 2013, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+package net.sf.orcc.xdf.ui.patterns;
+
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.xdf.ui.styles.StyleUtil;
+
+import org.eclipse.graphiti.features.IDirectEditingInfo;
+import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.features.context.ICreateContext;
+import org.eclipse.graphiti.features.context.IDeleteContext;
+import org.eclipse.graphiti.features.context.IRemoveContext;
+import org.eclipse.graphiti.mm.algorithms.Polygon;
+import org.eclipse.graphiti.mm.algorithms.Rectangle;
+import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.services.IGaService;
+import org.eclipse.graphiti.services.IPeCreateService;
+
+/**
+ * This bastract class
+ * 
+ * @author alorence
+ * 
+ */
+abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
+
+	protected final int PORT_WIDTH = 34;
+	protected final int PORT_HEIGHT = (int) (PORT_WIDTH * 0.866);
+
+	private final String SHAPE_ID = "PORT_SHAPE";
+	private final String LABEL_ID = "PORT_LABEL";
+	private final String[] validIds = { getInOutIdentifier(), SHAPE_ID, LABEL_ID };
+
+	protected static String ATTRIBUTE_INOUT_IDENTIFIER = "port_identifier";
+
+	public NetworkPortPattern() {
+		super(null);
+	}
+
+	@Override
+	abstract public String getCreateName();
+
+	abstract protected Polygon getPortPolygon(Shape shape, IGaService gaService);
+
+	abstract protected String getInOutIdentifier();
+
+	@Override
+	protected String[] getValidIdentifiers() {
+		return validIds;
+	}
+
+	@Override
+	public boolean isMainBusinessObjectApplicable(Object object) {
+		if (object instanceof Port) {
+			Port port = (Port) object;
+			String attrrValue = port.getValueAsString(ATTRIBUTE_INOUT_IDENTIFIER);
+			if (getInOutIdentifier().equals(attrrValue)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	protected boolean isPatternRoot(PictogramElement pe) {
+		return super.isPatternControlled(pe)
+				|| isMainBusinessObjectApplicable(getBusinessObjectForPictogramElement(pe));
+	}
+
+	private void setInOutType(Port port) {
+		port.setAttribute(ATTRIBUTE_INOUT_IDENTIFIER, getInOutIdentifier());
+	}
+
+	/*
+	 * A port can't be removed from a graph. Instead it must be deleted.
+	 * 
+	 * @see
+	 * org.eclipse.graphiti.pattern.AbstractPattern#canRemove(org.eclipse.graphiti
+	 * .features.context.IRemoveContext)
+	 */
+	@Override
+	public boolean canRemove(IRemoveContext context) {
+		return false;
+	}
+
+	@Override
+	public boolean canDelete(IDeleteContext context) {
+		return true;
+	}
+
+	@Override
+	public boolean canCreate(ICreateContext context) {
+		return context.getTargetContainer() instanceof Diagram;
+	}
+
+	@Override
+	public Object[] create(ICreateContext context) {
+		Port newPort = DfFactory.eINSTANCE.createPort();
+		setInOutType(newPort);
+
+		// TODO: We must add the new port to an Xdf resource created
+		// earlier, instead of in the .diragram file directly
+		getDiagram().eResource().getContents().add(newPort);
+
+		addGraphicalRepresentation(context, newPort);
+
+
+		// getFeatureProvider().getDirectEditingInfo().setActive(true);
+
+		return new Object[] { newPort };
+	}
+
+	@Override
+	public boolean canAdd(IAddContext context) {
+		if (context.getTargetContainer() instanceof Diagram) {
+			return isMainBusinessObjectApplicable(context.getNewObject());
+		}
+		return false;
+	}
+
+	@Override
+	public PictogramElement add(IAddContext context) {
+		final Diagram targetDiagram = (Diagram) context.getTargetContainer();
+		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
+		final IGaService gaService = Graphiti.getGaService();
+
+		final Port addedDomainObject = (Port) context.getNewObject();
+
+		// provide information to support direct-editing directly
+		// after object creation (must be activated additionally)
+		IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
+
+		// Create the container
+		final ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
+		final Rectangle rect = gaService.createInvisibleRectangle(containerShape);
+		{
+			Shape shape = peCreateService.createShape(containerShape, false);
+			setIdentifier(shape, SHAPE_ID);
+			
+			Polygon polygon = getPortPolygon(shape, gaService);
+
+			link(shape, addedDomainObject);
+		}
+
+		{
+			Shape shape = peCreateService.createShape(containerShape, false);
+			final Text text = gaService.createPlainText(shape);
+			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+			text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+			text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
+			gaService.setLocationAndSize(text, 0, PORT_HEIGHT + 1, -1, -1);
+
+			setIdentifier(shape, LABEL_ID);
+
+			link(shape, addedDomainObject);
+
+			// set shape and graphics algorithm where the editor for
+			// direct editing shall be opened after object creation
+			directEditingInfo.setPictogramElement(shape);
+			directEditingInfo.setGraphicsAlgorithm(text);
+		}
+
+		setIdentifier(containerShape, getInOutIdentifier());
+
+		gaService.setLocationAndSize(rect, context.getX(), context.getY(), -1, -1);
+
+		return containerShape;
+	}
+
+}

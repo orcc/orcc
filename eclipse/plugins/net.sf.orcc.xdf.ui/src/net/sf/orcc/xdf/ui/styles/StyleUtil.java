@@ -133,6 +133,52 @@ public class StyleUtil {
 	}
 
 	/**
+	 * Return the style used for inputs ports displayed in the network
+	 * 
+	 * @param diagram
+	 * @return
+	 */
+	public static Style getStyleForInputPort(Diagram diagram) {
+		final String styleId = "INPUT-PORT";
+		IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		Style parentStyle = getCommonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			style.setFilled(true);
+			style.setLineVisible(false);
+			style.setBackground(gaService.manageColor(diagram, INSTANCEPORT_BACKGROUND));
+		}
+		return style;
+	}
+
+	/**
+	 * Return the style used for inputs ports displayed in the network
+	 * 
+	 * @param diagram
+	 * @return
+	 */
+	public static Style getStyleForOutputPort(Diagram diagram) {
+		final String styleId = "INPUT-PORT";
+		IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		Style parentStyle = getCommonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			style.setFilled(true);
+			style.setLineVisible(false);
+			style.setBackground(gaService.manageColor(diagram, INSTANCEPORT_BACKGROUND));
+		}
+		return style;
+	}
+
+	/**
 	 * Return the style used for the text displaying name of an Instance.
 	 * 
 	 * @param diagram
@@ -140,6 +186,22 @@ public class StyleUtil {
 	 */
 	public static Style getStyleForInstanceText(Diagram diagram) {
 		final String styleId = "INSTANCE-TEXT";
+		IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		Style parentStyle = getCommonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			setCommonTextValues(diagram, gaService, style);
+			style.setFont(gaService.manageDefaultFont(diagram, false, true));
+		}
+		return style;
+	}
+
+	public static Style getStyleForPortText(Diagram diagram) {
+		final String styleId = "PORT-TEXT";
 		IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
