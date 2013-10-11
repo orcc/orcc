@@ -1,10 +1,10 @@
 # Generated from Top_decoder_serial
 
-cmake_minimum_required (VERSION 2.6)
-
 set(filenames
-	mapping.c
+        mapping.c
+        orcc-graph.c
 )
 
-add_executable(orcc-map ${filenames})
+add_executable(orccmap ${filenames})
+target_link_libraries(orccmap roxml metis m)
 
