@@ -28,18 +28,13 @@
  */
 package net.sf.orcc.xdf.ui.diagram;
 
-import net.sf.orcc.xdf.ui.features.AddSimpleConnectionFeature;
-import net.sf.orcc.xdf.ui.features.CreateSimpleConnectionFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinmentFeature;
+import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
-import org.eclipse.graphiti.features.IAddFeature;
-import org.eclipse.graphiti.features.ICreateConnectionFeature;
-import org.eclipse.graphiti.features.context.IAddConnectionContext;
-import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
@@ -59,24 +54,7 @@ public class XdfDiagramFeatureProvider extends
 		addPattern(new InstancePattern());
 		addPattern(new InputNetworkPortPattern());
 		addPattern(new OutputNetworkPortPattern());
-	}
-
-	@Override
-	public ICreateConnectionFeature[] getCreateConnectionFeatures() {
-		return new ICreateConnectionFeature[] { new CreateSimpleConnectionFeature(
-				this) };
-	}
-
-	@Override
-	public IAddFeature getAddFeature(IAddContext context) {
-		// TODO: check for right domain object instances below
-		if (context instanceof IAddConnectionContext /*
-													 * && context.getNewObject()
-													 * instanceof Connection
-													 */) {
-			return new AddSimpleConnectionFeature(this);
-		}
-		return super.getAddFeature(context);
+		addConnectionPattern(new ConnectionPattern());
 	}
 	
 	@Override
