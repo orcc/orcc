@@ -46,20 +46,16 @@ import org.eclipse.graphiti.util.PredefinedColoredAreas;
  */
 public class StyleUtil {
 
-	private static final IColorConstant INSTANCE_TEXT_FOREGROUND = new ColorConstant(
-			0, 0, 0);
-	private static final IColorConstant INSTANCE_FOREGROUND = new ColorConstant(
-			98, 131, 167);
+	private static final IColorConstant INSTANCE_TEXT_FOREGROUND = new ColorConstant(0, 0, 0);
+	private static final IColorConstant INSTANCE_FOREGROUND = new ColorConstant(98, 131, 167);
 	private static final IColorConstant INSTANCEPORT_BACKGROUND = INSTANCE_FOREGROUND;
 
-	private static void setCommonTextValues(Diagram diagram,
-			IGaService gaService, Style style) {
+	private static void setCommonTextValues(Diagram diagram, IGaService gaService, Style style) {
 		style.setFilled(false);
 		style.setAngle(0);
 		style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 		style.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-		style.setForeground(gaService.manageColor(diagram,
-				INSTANCE_TEXT_FOREGROUND));
+		style.setForeground(gaService.manageColor(diagram, INSTANCE_TEXT_FOREGROUND));
 	}
 
 	private static void setCommonValues(Style style) {
@@ -106,11 +102,9 @@ public class StyleUtil {
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			style.setFilled(true);
-			style.setForeground(gaService.manageColor(diagram,
-					INSTANCE_FOREGROUND));
+			style.setForeground(gaService.manageColor(diagram, INSTANCE_FOREGROUND));
 
-			gaService.setRenderingStyle(style,
-					PredefinedColoredAreas.getCopperWhiteGlossAdaptions());
+			gaService.setRenderingStyle(style, PredefinedColoredAreas.getCopperWhiteGlossAdaptions());
 		}
 		return style;
 	}
@@ -133,8 +127,7 @@ public class StyleUtil {
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			style.setFilled(true);
 			style.setLineVisible(false);
-			style.setBackground(gaService.manageColor(diagram,
-					INSTANCEPORT_BACKGROUND));
+			style.setBackground(gaService.manageColor(diagram, INSTANCEPORT_BACKGROUND));
 		}
 		return style;
 	}
