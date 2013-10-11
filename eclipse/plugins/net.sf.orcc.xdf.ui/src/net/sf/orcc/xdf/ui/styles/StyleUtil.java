@@ -69,6 +69,12 @@ public class StyleUtil {
 		style.setTransparency(0.0);
 	}
 
+	/**
+	 * Return the style used for all elements with no specific style.
+	 * 
+	 * @param diagram
+	 * @return
+	 */
 	public static Style getCommonStyle(Diagram diagram) {
 		final String styleId = "COMMONSTYLE";
 		IGaService gaService = Graphiti.getGaService();
@@ -83,6 +89,12 @@ public class StyleUtil {
 		return style;
 	}
 
+	/**
+	 * Return the style used for Instance shapes.
+	 * 
+	 * @param diagram
+	 * @return
+	 */
 	public static Style getStyleForInstance(Diagram diagram) {
 		final String styleId = "INSTANCE";
 		IGaService gaService = Graphiti.getGaService();
@@ -103,6 +115,12 @@ public class StyleUtil {
 		return style;
 	}
 
+	/**
+	 * Return the style used for ports displayed inside an Instance Shape.
+	 * 
+	 * @param diagram
+	 * @return
+	 */
 	public static Style getStyleForInstancePort(Diagram diagram) {
 		final String styleId = "INSTANCE-PORT";
 		IGaService gaService = Graphiti.getGaService();
@@ -121,6 +139,12 @@ public class StyleUtil {
 		return style;
 	}
 
+	/**
+	 * Return the style used for the text displaying name of an Instance.
+	 * 
+	 * @param diagram
+	 * @return
+	 */
 	public static Style getStyleForInstanceText(Diagram diagram) {
 		final String styleId = "INSTANCE-TEXT";
 		IGaService gaService = Graphiti.getGaService();
@@ -133,22 +157,6 @@ public class StyleUtil {
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			setCommonTextValues(diagram, gaService, style);
 			style.setFont(gaService.manageDefaultFont(diagram, false, true));
-		}
-		return style;
-	}
-
-	public static Style getStyleForTextDecorator(Diagram diagram) {
-		final String styleId = "TEXT-DECORATOR-TEXT";
-		IGaService gaService = Graphiti.getGaService();
-
-		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
-		Style style = gaService.findStyle(parentStyle, styleId);
-
-		if (style == null) { // style not found - create new style
-			style = gaService.createPlainStyle(parentStyle, styleId);
-			setCommonTextValues(diagram, gaService, style);
-			style.setFont(gaService.manageDefaultFont(diagram, true, false));
 		}
 		return style;
 	}

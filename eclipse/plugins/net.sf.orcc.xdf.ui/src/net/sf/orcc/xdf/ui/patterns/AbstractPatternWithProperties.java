@@ -53,7 +53,9 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 		super(config);
 		peService = Graphiti.getPeService();
 	}
-	
+
+	abstract protected String[] getValidIdentifiers();
+
 	protected void setIdentifier(PictogramElement pe, String id) {
 		peService.setPropertyValue(pe, PROPERTY_ID, id);
 	}
@@ -71,18 +73,29 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 		return id.equals(getIdentifier(pe));
 	}
 
-	protected ContainerShape getSubContainerShapeFromId(ContainerShape cs, String id) {
+	protected Shape getSubShapeFromId(ContainerShape cs, String id) {
 		for (Shape child : cs.getChildren()) {
+			if (isExpectedPe(child, id)) {
+				return child;
+			}
 			if (child instanceof ContainerShape) {
-				if (isExpectedPe(child, id)) {
-					return (ContainerShape) child;
-				}
-				ContainerShape subResult = getSubContainerShapeFromId((ContainerShape) child, id);
+				Shape subResult = getSubShapeFromId((ContainerShape) child, id);
 				if (subResult != null) {
 					return subResult;
 				}
 			}
 		}
 		return null;
+	}
+
+	@Override
+	protected boolean isPatternControlled(PictogramElement pe) {
+		String idd = getIdentifier(pe);
+		for (String id : getValidIdentifiers()) {
+			if (id.equals(idd)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

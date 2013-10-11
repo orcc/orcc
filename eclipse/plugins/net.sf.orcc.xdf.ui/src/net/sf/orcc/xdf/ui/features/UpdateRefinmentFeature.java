@@ -151,7 +151,7 @@ public class UpdateRefinmentFeature extends AbstractCustomFeature {
 
 		ContainerShape instanceShape;
 		{
-			final PictogramElement clickedPe = context.getInnerPictogramElement();
+			final PictogramElement clickedPe = context.getPictogramElements()[0];
 			// We want to get the instance container shape
 			if (clickedPe.isActive()) {
 				// This this the shape we want to use
@@ -186,7 +186,7 @@ public class UpdateRefinmentFeature extends AbstractCustomFeature {
 		pattern.addInputsPorts(instanceShape, inputs);
 		pattern.addOutputsPorts(instanceShape, outputs);
 
-		updatePictogramElement(instanceShape);
+		layoutPictogramElement(instanceShape);
 	}
 
 	@Override
