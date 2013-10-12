@@ -29,6 +29,7 @@
 package net.sf.orcc.xdf.ui.patterns;
 
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 
@@ -36,7 +37,9 @@ import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
+import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
+import org.eclipse.graphiti.func.IDirectEditing;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -102,6 +105,31 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 	private void setInOutType(Port port) {
 		port.setAttribute(ATTRIBUTE_INOUT_IDENTIFIER, getInOutIdentifier());
+	}
+
+	@Override
+	public boolean canDirectEdit(IDirectEditingContext context) {
+		return isPatternControlled(context.getPictogramElement());
+	}
+
+	@Override
+	public int getEditingType() {
+		return IDirectEditing.TYPE_TEXT;
+	}
+
+	@Override
+	public String getInitialValue(IDirectEditingContext context) {
+		Port obj = (Port) getBusinessObjectForPictogramElement(context.getPictogramElement());
+		return obj.getName();
+	}
+
+	@Override
+	public void setValue(String value, IDirectEditingContext context) {
+		PictogramElement pe = context.getPictogramElement();
+		Port obj = (Port) getBusinessObjectForPictogramElement(pe);
+		obj.setName(value);
+
+		updatePictogramElement(pe);
 	}
 
 	/*
