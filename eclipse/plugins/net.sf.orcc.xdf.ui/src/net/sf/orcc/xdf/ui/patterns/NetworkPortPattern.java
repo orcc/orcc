@@ -38,7 +38,9 @@ import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
+import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
+import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.func.IDirectEditing;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
@@ -99,8 +101,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
-		return super.isPatternControlled(pe)
-				|| isMainBusinessObjectApplicable(getBusinessObjectForPictogramElement(pe));
+		return isExpectedPe(pe, getInOutIdentifier());
 	}
 
 	private void setInOutType(Port port) {
@@ -128,6 +129,10 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		PictogramElement pe = context.getPictogramElement();
 		Port obj = (Port) getBusinessObjectForPictogramElement(pe);
 		obj.setName(value);
+
+		if(!isPatternRoot(pe)) {
+			pe = (PictogramElement) pe.eContainer();
+		}
 
 		updatePictogramElement(pe);
 	}
@@ -209,7 +214,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 			text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
-			gaService.setLocationAndSize(text, 0, PORT_HEIGHT + 1, -1, -1);
+			gaService.setLocationAndSize(text, 0, PORT_WIDTH + 1, -1, -1);
 
 			setIdentifier(shape, LABEL_ID);
 
@@ -222,10 +227,48 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		}
 
 		setIdentifier(containerShape, getInOutIdentifier());
+		link(containerShape, addedDomainObject);
 
 		gaService.setLocationAndSize(rect, context.getX(), context.getY(), -1, -1);
 
 		return containerShape;
 	}
 
+	@Override
+	public boolean layout(ILayoutContext context) {
+		PictogramElement pe = context.getPictogramElement();
+
+		Text txt = null;
+		if (isPatternRoot(pe)) {
+			txt = (Text) getSubShapeFromId((ContainerShape) pe, LABEL_ID).getGraphicsAlgorithm();
+		} else if (isExpectedPe(pe, LABEL_ID)) {
+			txt = (Text) pe.getGraphicsAlgorithm();
+		}
+
+		if(txt != null) {
+			Graphiti.getGaService().setSize(txt, -1, -1);
+			return true;
+		}
+
+		return super.layout(context);
+	}
+
+	@Override
+	public boolean update(IUpdateContext context) {
+		PictogramElement pe = context.getPictogramElement();
+
+		Text txt = null;
+		if (isPatternRoot(pe)) {
+			txt = (Text) getSubShapeFromId((ContainerShape) pe, LABEL_ID).getGraphicsAlgorithm();
+		} else if (isExpectedPe(pe, LABEL_ID)) {
+			txt = (Text) pe.getGraphicsAlgorithm();
+		}
+
+		if(txt != null) {
+			Port port = (Port) getBusinessObjectForPictogramElement(pe);
+			txt.setValue(port.getName());
+			return true;
+		}
+		return super.update(context);
+	}
 }
