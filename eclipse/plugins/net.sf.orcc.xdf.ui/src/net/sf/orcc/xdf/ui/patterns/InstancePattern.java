@@ -36,6 +36,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
+import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -66,8 +67,6 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
-import org.eclipse.graphiti.ui.services.GraphitiUi;
-import org.eclipse.graphiti.ui.services.IUiLayoutService;
 
 /**
  * This class configure as most features as possible, relative to Instances that
@@ -378,7 +377,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			for (Shape child : ((ContainerShape) inPe).getChildren()) {
 				if (child.getGraphicsAlgorithm() instanceof Text) {
 					Text txt = (Text) child.getGraphicsAlgorithm();
-					txt.setWidth(getTextMinWidth(txt));
+					txt.setWidth(XdfUtil.getTextMinWidth(txt));
 
 					txt.setX(PORT_SIDE_WITH + PORT_MARGIN);
 				} else if (child.getGraphicsAlgorithm() instanceof Rectangle) {
@@ -395,7 +394,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			for (Shape child : ((ContainerShape) outPe).getChildren()) {
 				if (child.getGraphicsAlgorithm() instanceof Text) {
 					Text txt = (Text) child.getGraphicsAlgorithm();
-					txt.setWidth(getTextMinWidth(txt));
+					txt.setWidth(XdfUtil.getTextMinWidth(txt));
 
 					txt.setX(outWidth - (PORT_SIDE_WITH + PORT_MARGIN + txt.getWidth()));
 				} else if (child.getGraphicsAlgorithm() instanceof Rectangle) {
@@ -492,7 +491,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			rect.setStyle(StyleUtil.getStyleForInstancePort(getDiagram()));
 
 			// Calculate the size of a complete port line
-			int txtAndSquareHeight = Math.max(getTextMinHeight(txt), PORT_SIDE_WITH);
+			int txtAndSquareHeight = Math.max(XdfUtil.getTextMinHeight(txt), PORT_SIDE_WITH);
 
 			// Set properties on square displayed before text
 			gaService.setSize(rect, PORT_SIDE_WITH, PORT_SIDE_WITH);
@@ -533,7 +532,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			rect.setStyle(StyleUtil.getStyleForInstancePort(getDiagram()));
 
 			// Calculate the size of a complete port line
-			int txtAndSquareHeight = Math.max(getTextMinHeight(txt), PORT_SIDE_WITH);
+			int txtAndSquareHeight = Math.max(XdfUtil.getTextMinHeight(txt), PORT_SIDE_WITH);
 			// Calculate the required width for the area
 			int areaWidth = getPortsAreaMinWidth(portsCtr);
 
@@ -611,7 +610,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 		}
 
 		if (txt != null) {
-			int fullPortHeight = Math.max(getTextMinHeight(txt), PORT_SIDE_WITH);
+			int fullPortHeight = Math.max(XdfUtil.getTextMinHeight(txt), PORT_SIDE_WITH);
 			return nbPorts * (fullPortHeight + PORT_MARGIN) + PORT_MARGIN * 2;
 		}
 		return TOTAL_MIN_HEIGHT - LABEL_HEIGHT - SEPARATOR;
@@ -628,7 +627,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			if (child.getGraphicsAlgorithm() instanceof Text) {
 				// To resize width if needed
 				Text txt = (Text) child.getGraphicsAlgorithm();
-				int txtWidth = getTextMinWidth(txt);
+				int txtWidth = XdfUtil.getTextMinWidth(txt);
 
 				if (PORT_SIDE_WITH + PORT_MARGIN + txtWidth > minSize) {
 					minSize = PORT_SIDE_WITH + PORT_MARGIN + txtWidth;
@@ -636,29 +635,5 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			}
 		}
 		return minSize;
-	}
-
-	private int getTextMinWidth(Text text) {
-
-		final IUiLayoutService uiLayoutService = GraphitiUi.getUiLayoutService();
-		if (text.getFont() != null) {
-			return uiLayoutService.calculateTextSize(text.getValue(), text.getFont()).getWidth();
-		} else if (text.getStyle().getFont() != null) {
-			return uiLayoutService.calculateTextSize(text.getValue(), text.getStyle().getFont()).getWidth();
-		}
-
-		return -1;
-	}
-
-	private int getTextMinHeight(Text text) {
-
-		final IUiLayoutService uiLayoutService = GraphitiUi.getUiLayoutService();
-		if (text.getFont() != null) {
-			return uiLayoutService.calculateTextSize(text.getValue(), text.getFont()).getHeight();
-		} else if (text.getStyle().getFont() != null) {
-			return uiLayoutService.calculateTextSize(text.getValue(), text.getStyle().getFont()).getHeight();
-		}
-
-		return -1;
 	}
 }

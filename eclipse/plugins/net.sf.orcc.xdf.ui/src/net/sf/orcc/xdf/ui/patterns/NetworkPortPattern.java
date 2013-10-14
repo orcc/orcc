@@ -29,7 +29,6 @@
 package net.sf.orcc.xdf.ui.patterns;
 
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 
@@ -91,21 +90,21 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	public boolean isMainBusinessObjectApplicable(Object object) {
 		if (object instanceof Port) {
 			Port port = (Port) object;
-			String attrrValue = port.getValueAsString(ATTRIBUTE_INOUT_IDENTIFIER);
-			if (getInOutIdentifier().equals(attrrValue)) {
+			String attrValue = port.getValueAsString(ATTRIBUTE_INOUT_IDENTIFIER);
+			if (getInOutIdentifier().equals(attrValue)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
+	private void setInOutType(Port port) {
+		port.setAttribute(ATTRIBUTE_INOUT_IDENTIFIER, getInOutIdentifier());
+	}
+
 	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
 		return isExpectedPe(pe, getInOutIdentifier());
-	}
-
-	private void setInOutType(Port port) {
-		port.setAttribute(ATTRIBUTE_INOUT_IDENTIFIER, getInOutIdentifier());
 	}
 
 	@Override
@@ -130,7 +129,11 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		Port obj = (Port) getBusinessObjectForPictogramElement(pe);
 		obj.setName(value);
 
-		if(!isPatternRoot(pe)) {
+		// Update (and Layout) feature can be used with port top level shape
+		// (getInOutIdentifier()) or text (LABEL_ID). If the current pe is the
+		// shape, we must get one of the others to allow layout() and update()
+		// to be applied
+		if (isExpectedPe(pe, SHAPE_ID)) {
 			pe = (PictogramElement) pe.eContainer();
 		}
 
@@ -203,7 +206,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			Shape shape = peCreateService.createShape(containerShape, false);
 			setIdentifier(shape, SHAPE_ID);
 			
-			Polygon polygon = getPortPolygon(shape, gaService);
+			/* Polygon polygon = */getPortPolygon(shape, gaService);
 
 			link(shape, addedDomainObject);
 		}

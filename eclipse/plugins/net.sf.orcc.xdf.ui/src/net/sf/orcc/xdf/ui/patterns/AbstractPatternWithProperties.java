@@ -90,9 +90,9 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 
 	@Override
 	protected boolean isPatternControlled(PictogramElement pe) {
-		String idd = getIdentifier(pe);
-		for (String id : getValidIdentifiers()) {
-			if (id.equals(idd)) {
+		String peId = getIdentifier(pe);
+		for (String validId : getValidIdentifiers()) {
+			if (validId.equals(peId)) {
 				return true;
 			}
 		}

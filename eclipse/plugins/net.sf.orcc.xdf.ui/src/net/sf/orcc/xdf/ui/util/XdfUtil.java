@@ -32,6 +32,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.graphiti.ui.services.IUiLayoutService;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -53,5 +56,29 @@ public class XdfUtil {
 		String path = object.eResource().getURI().toPlatformString(true);
 		return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path))
 				.getProject();
+	}
+
+	public static int getTextMinWidth(Text text) {
+
+		final IUiLayoutService uiLayoutService = GraphitiUi.getUiLayoutService();
+		if (text.getFont() != null) {
+			return uiLayoutService.calculateTextSize(text.getValue(), text.getFont()).getWidth();
+		} else if (text.getStyle().getFont() != null) {
+			return uiLayoutService.calculateTextSize(text.getValue(), text.getStyle().getFont()).getWidth();
+		}
+
+		return -1;
+	}
+
+	public static int getTextMinHeight(Text text) {
+
+		final IUiLayoutService uiLayoutService = GraphitiUi.getUiLayoutService();
+		if (text.getFont() != null) {
+			return uiLayoutService.calculateTextSize(text.getValue(), text.getFont()).getHeight();
+		} else if (text.getStyle().getFont() != null) {
+			return uiLayoutService.calculateTextSize(text.getValue(), text.getStyle().getFont()).getHeight();
+		}
+
+		return -1;
 	}
 }
