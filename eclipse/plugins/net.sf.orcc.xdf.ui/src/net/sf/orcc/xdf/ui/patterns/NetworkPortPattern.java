@@ -173,8 +173,8 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 		addGraphicalRepresentation(context, newPort);
 
-
-		// getFeatureProvider().getDirectEditingInfo().setActive(true);
+		// activate direct editing after object creation
+		getFeatureProvider().getDirectEditingInfo().setActive(true);
 
 		return new Object[] { newPort };
 	}
@@ -217,7 +217,9 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 			text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
-			gaService.setLocationAndSize(text, 0, PORT_WIDTH + 1, -1, -1);
+			// We define an arbitrary width to text, allowing user to see chars
+			// when first direct editing port name
+			gaService.setLocationAndSize(text, 0, PORT_WIDTH + 1, 50, -1);
 
 			setIdentifier(shape, LABEL_ID);
 
@@ -229,6 +231,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			directEditingInfo.setGraphicsAlgorithm(text);
 		}
 
+		directEditingInfo.setMainPictogramElement(containerShape);
 		setIdentifier(containerShape, getInOutIdentifier());
 		link(containerShape, addedDomainObject);
 
