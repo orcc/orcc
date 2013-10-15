@@ -71,7 +71,6 @@ actor_t *findActorByNameInNetwork(char *name, network_t network) {
 mapping_t *allocate_mapping(int number_of_threads) {
     mapping_t *mapping = (mapping_t *) malloc(sizeof(mapping_t));
     mapping->number_of_threads = number_of_threads;
-    mapping->threads_affinities = (int*) malloc(number_of_threads * sizeof(int));
     mapping->partitions_of_actors = (actor_t ***) malloc(number_of_threads * sizeof(actor_t **));
     mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
     return mapping;
@@ -81,33 +80,105 @@ mapping_t *allocate_mapping(int number_of_threads) {
  * Releases memory of the given mapping structure.
  */
 void delete_mapping(mapping_t *mapping) {
-    int i;
-//    for (i = 0; i < mapping->number_of_threads; i++) {
-//        free(mapping->partitions_of_actors[i]);
-//    }
-    free(mapping->partitions_of_actors);
     free(mapping->partitions_size);
-    free(mapping->threads_affinities);
     free(mapping);
 }
 
-int setMappingFromMETIS(network_t network, idx_t *part, mapping_t *mapping) {
-    int ret, i;
+void swap_actors(actor_t **actors, int index1, int index2) {
+    char* tmpActorId;
+    int tmpProcessorId, tmpId;
+    double tmpWorkload;
 
-    printf("\n Setting mapping from METIS partition \n");
+    tmpActorId = actors[index1]->name;
+    actors[index1]->name = actors[index2]->name;
+    actors[index2]->name = tmpActorId;
+
+    tmpId = actors[index1]->id;
+    actors[index1]->id = actors[index2]->id;
+    actors[index2]->id = tmpId;
+
+    tmpProcessorId = actors[index1]->processorId;
+    actors[index1]->processorId = actors[index2]->processorId;
+    actors[index2]->processorId = tmpProcessorId;
+
+    tmpWorkload = actors[index1]->workload;
+    actors[index1]->workload = actors[index2]->workload;
+    actors[index2]->workload = tmpWorkload;
+}
+
+int sort_actors(actor_t **actors, int nb_actors) {
+    int i, j, ret;
+
+    printf("\n Sorting actors by Workload \n");
+
+    for (i = 0; i < nb_actors; i++) {
+        for (j = 0; j < nb_actors - i - 1; j++) {
+            if (actors[j]->workload <= actors[j+1]->workload) {
+                swap_actors(actors, j, j+1);
+            }
+        }
+    }
+
+    printf("The sorted list:\n");
+    for (i = 0; i < nb_actors; i++) {
+        printf("Actor[%d]\tid = %s\tworkload = %.2lf\n", i, actors[i]->name, actors[i]->workload);
+    }
+
+    return ret;
+}
+
+int runRoundRobinMapping(network_t *network, options_t opt, idx_t *part) {
+    int i, k, ret;
+    k = 0;
+
+    sort_actors(network->actors, network->nbActors);
+
+    printf("\n Setting mapping from Round Robin Mapping \n");
+
+    for (i = 0; i < network->nbActors; i++) {
+        network->actors[i]->processorId = k++;
+        part[i] = network->actors[i]->processorId;
+        // There must be something needing to be improved here, i.e. invert
+        // the direction of the distribution to have more balancing.
+        if (k >= opt.nb_processors)
+                k = 0;
+    }
+
+    for (i = 0; i < network->nbActors; i++) {
+        printf("Actor[%d]\tid = %s\tworkload = %.2lf\tprocessorId = %d\n",
+                                        i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processorId);
+    }
+
+    return ret;
+}
+
+int setMappingFromPartition(network_t *network, idx_t *part, mapping_t *mapping) {
+    int ret, i, j;
+    int *counter = (int*) malloc(mapping->number_of_threads * sizeof(int));
+
+    printf("\n Setting mapping  \n");
     for (i = 0; i < mapping->number_of_threads; i++) {
         mapping->partitions_size[i] = 0;
+        counter[i] = 0;
     }
-    for (i = 0; i < network.nbActors; i++) {
+    for (i = 0; i < network->nbActors; i++) {
         mapping->partitions_size[part[i]]++;
     }
     for (i = 0; i < mapping->number_of_threads; i++) {
         mapping->partitions_of_actors[i] = (actor_t **) malloc(mapping->partitions_size[i] * sizeof(actor_t *));
+        for (j=0; j < mapping->partitions_size[part[i]]; j++) {
+            mapping->partitions_of_actors[i][j] = (actor_t *) malloc(sizeof(actor_t));
+        }
     }
-    for (i = 0; i < network.nbActors; i++) {
-        mapping->partitions_of_actors[part[i]][mapping->partitions_size[part[i]]] = network.actors[i];
+    for (i = 0; i < network->nbActors; i++) {
+        mapping->partitions_of_actors[part[i]][counter[part[i]]] = network->actors[i];
+        counter[part[i]]++;
     }
 
+    // Update network too
+    for (i=0; i < network->nbActors; i++) {
+        network->actors[i]->processorId = part[i];
+    }
 
     for (i = 0; i < mapping->number_of_threads; i++) {
         printf("Part %d = %d  ", i, mapping->partitions_size[i]);
@@ -199,27 +270,30 @@ void delete_graph(adjacency_list *graph) {
     free(graph);
 }
 
-int doMapping(network_t network, options_t opt, mapping_t *mapping) {
-    int ret = 0;
+int doMapping(network_t *network, options_t opt, mapping_t *mapping) {
+    int i, ret = 0;
 
-    adjacency_list *graph = allocate_graph(network, (opt.strategy == ORCC_LB_OTHER)?TRUE:FALSE);
-    setGraphFromNetwork(graph, network);
+    adjacency_list *graph = allocate_graph(*network, (opt.strategy != ORCC_MS_METIS_REC && opt.strategy != ORCC_MS_METIS_KWAY)?TRUE:FALSE);
+    setGraphFromNetwork(graph, *network);
 
-    idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network.nbActors));
+    idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network->nbActors));
     switch (opt.strategy) {
-    case ORCC_LB_METIS_REC:
+    case ORCC_MS_METIS_REC:
         ret = runPartitionRecWithMETIS(*graph, opt, part);
-        setMappingFromMETIS(network, part, mapping);
         break;
-    case ORCC_LB_METIS_KWAY:
+    case ORCC_MS_METIS_KWAY:
         ret = runPartitionKwayWithMETIS(*graph, opt, part);
-        setMappingFromMETIS(network, part, mapping);
         break;
-    case ORCC_LB_OTHER:
+    case ORCC_MS_ROUND_ROBIN:
+        ret = runRoundRobinMapping(network, opt, part);
+        break;
+    case ORCC_MS_OTHER:
         break;
     default:
         break;
     }
+
+    setMappingFromPartition(network, part, mapping);
 
     free(part);
     delete_graph(graph);
@@ -361,7 +435,7 @@ int initNetwork(char* fileName, network_t *network) {
 }
 
 int loadNetwork(char *fileName, network_t *network) {
-    int ret, i;
+    int ret, i, size;
 
     ret = initNetwork(fileName, network);
 
@@ -382,13 +456,12 @@ int loadNetwork(char *fileName, network_t *network) {
         char* nodeName = roxml_get_name(actorNode, NULL, 0);
         if (strcmp(nodeName, "Instance") == 0) {
             node_t* nodeAttrActorId = roxml_get_attr(actorNode, "id", 0);
-            network->actors[i]->name = roxml_get_content(nodeAttrActorId, NULL, 0, NULL);
-
-            network->actors[i]->workload = 1;
-
+            network->actors[i]->name = roxml_get_content(nodeAttrActorId, NULL, 0, &size);
             network->actors[i]->id = i;
+            network->actors[i]->workload = 1;
+            network->actors[i]->processorId = 0;
 
-            printf("Actor[%d]\tid = %s\tworkload = %.2lf\n",
+            printf("Actor[%d]\tname = %s\tworkload = %.2lf\n",
                    i, network->actors[i]->name, network->actors[i]->workload);
         }
         else {
@@ -406,16 +479,14 @@ int loadNetwork(char *fileName, network_t *network) {
         char* nodeName = roxml_get_name(connectionNode, NULL, 0);
         if (strcmp(nodeName, "Connection") == 0) {
             node_t* nodeAttrActorSrc = roxml_get_attr(connectionNode, "src", 0);
-            char *src = roxml_get_content(nodeAttrActorSrc, NULL, 0, NULL);
+            char *src = roxml_get_content(nodeAttrActorSrc, NULL, 0, &size);
             network->connections[i]->src = findActorByNameInNetwork(src, *network);
 
             node_t* nodeAttrActorDst = roxml_get_attr(connectionNode, "dst", 0);
-            char *dst = roxml_get_content(nodeAttrActorDst, NULL, 0, NULL);
+            char *dst = roxml_get_content(nodeAttrActorDst, NULL, 0, &size);
             network->connections[i]->dst = findActorByNameInNetwork(dst, *network);
 
             network->connections[i]->workload = 1;
-
-            network->connections[i]->id = i;
 
             printf("Connection[%d]\tsrc = %s\tdst = %s\n",
                    i, network->connections[i]->src->name, network->connections[i]->dst->name);
@@ -454,19 +525,18 @@ int saveMapping(char* fileName, mapping_t *mapping) {
         exit(1);
     }
 
-//    /*! TODO */
-//    for (i = 0; i < mapping->number_of_threads; i++) {
-//        node_t* processorNode = roxml_add_node(partitionNode, 0, ROXML_ELM_NODE, "Partition", NULL);
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        node_t* processorNode = roxml_add_node(partitionNode, 0, ROXML_ELM_NODE, "Partition", NULL);
 
-//        char* procId = (char*) malloc(sizeof(int));
-//        sprintf(procId, "proc_%d", i+1);
-//        roxml_add_node(processorNode, 0, ROXML_ATTR_NODE, "id", procId);
+        char* procId = (char*) malloc(sizeof(int));
+        sprintf(procId, "proc_%d", i+1);
+        roxml_add_node(processorNode, 0, ROXML_ATTR_NODE, "id", procId);
 
-//        for (j = 0; j < mapping->partitions_size[i]; j++) {
-//            node_t* instanceNode = roxml_add_node(processorNode, 0, ROXML_ELM_NODE, "Instance", NULL);
-//            roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", mapping->partitions_of_actors[i][j]->name);
-//        }
-//    }
+        for (j = 0; j < mapping->partitions_size[i]; j++) {
+            node_t* instanceNode = roxml_add_node(processorNode, 0, ROXML_ELM_NODE, "Instance", NULL);
+            roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", mapping->partitions_of_actors[i][j]->name);
+        }
+    }
 
     roxml_commit_changes(rootNode, fileName, NULL, 1);
     roxml_close(rootNode);

@@ -33,11 +33,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Load Balancing strategy codes */
+/* Mapping strategy codes */
 typedef enum {
-  ORCC_LB_METIS_REC,
-  ORCC_LB_METIS_KWAY,
-  ORCC_LB_OTHER
+  ORCC_MS_METIS_REC,
+  ORCC_MS_METIS_KWAY,
+  ORCC_MS_ROUND_ROBIN,
+  ORCC_MS_OTHER
 } mappingstrategy_et;
 
 typedef int int32_t;
@@ -78,13 +79,13 @@ typedef struct options_s
 } options_t;
 
 typedef struct actor_s {
-    int id;
     char *name;
     double workload;
+    int id;
+    int processorId;
 } actor_t;
 
 typedef struct connection_s {
-    int id;
     actor_t *src;
     actor_t *dst;
     double workload;
@@ -100,7 +101,6 @@ typedef struct network_s
 
 typedef struct mapping_s {
     int number_of_threads;
-    int *threads_affinities;
     actor_t ***partitions_of_actors;
     int *partitions_size;
 } mapping_t;
@@ -145,7 +145,7 @@ adjacency_list *allocate_graph(network_t network, boolean is_directed);
 
 void delete_graph(adjacency_list *graph);
 
-int doMapping(network_t network, options_t opt, mapping_t *mapping);
+int doMapping(network_t *network, options_t opt, mapping_t *mapping);
 
 int setUndirectedGraphFromNetwork(adjacency_list *graph, network_t network);
 

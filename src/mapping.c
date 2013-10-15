@@ -63,18 +63,16 @@ int main (int argc, char **argv) {
     loadNetwork("/home/asanchez/tools/metis-directed-example.xdf", network);
 
     options_t opt;
-    opt.strategy = ORCC_LB_METIS_KWAY;
+    opt.strategy = ORCC_MS_METIS_KWAY;
     opt.nb_processors = 4;
     mapping_t *mapping = allocate_mapping(opt.nb_processors);
 
-    doMapping(*network, opt, mapping);
+    doMapping(network, opt, mapping);
 
-//    saveMapping("/home/asanchez/tools/partition.xml", mapping);
+    saveMapping("/home/asanchez/tools/partition.xml", mapping);
 
-//    delete_mapping(mapping);
-//    free(network->actors);
-//    free(network->connections);
-//    free(network);
+    delete_mapping(mapping);
+    free(network);
 
     exit (0);
 }
