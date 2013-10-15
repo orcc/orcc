@@ -38,7 +38,7 @@ typedef enum {
   ORCC_LB_METIS_REC,
   ORCC_LB_METIS_KWAY,
   ORCC_LB_OTHER
-} lbstrategy_et;
+} mappingstrategy_et;
 
 typedef int int32_t;
 
@@ -66,7 +66,49 @@ typedef struct adjacency_list
 
 	/* adjwgt : The weights of the edges */
 	int32_t *adjwgt;
+
+    int nb_vertex;
+    int nb_edges;
 } adjacency_list;
+
+typedef struct options_s
+{
+    int nb_processors;
+    mappingstrategy_et strategy;
+} options_t;
+
+typedef struct actor_s {
+    int id;
+    char *name;
+    double workload;
+} actor_t;
+
+typedef struct connection_s {
+    int id;
+    actor_t *src;
+    actor_t *dst;
+    double workload;
+} connection_t;
+
+typedef struct network_s
+{
+    actor_t **actors;
+    connection_t **connections;
+    int nbActors;
+    int nbConnections;
+} network_t;
+
+typedef struct mapping_s {
+    int number_of_threads;
+    int *threads_affinities;
+    actor_t ***partitions_of_actors;
+    int *partitions_size;
+} mapping_t;
+
+typedef struct mappings_set_s {
+    int size;
+    struct mapping_s **mappings;
+} mappings_set_t;
 
 /*
 * Function prototypes
@@ -81,20 +123,40 @@ typedef struct adjacency_list
 #define ORCC_API(type) type
 #endif
 
-/*
- *
-*/
-int runPartitionRecWithMETIS(adjacency_list al, int iProcessorNumber);
+boolean isDirected(adjacency_list al);
 
-/*
- *
-*/
-int runPartitionKwayWithMETIS(adjacency_list al, int iProcessorNumber);
+int addVertex(adjacency_list al);
 
-/*
- *
-*/
-ORCC_API(int) solveLoadBalancing(adjacency_list al, int iProcessorNumber, lbstrategy_et lbs);
+int addEdge(adjacency_list al);
 
+actor_t *findActorByNameInNetwork(char *name, network_t network);
+
+mapping_t *allocate_mapping(int number_of_threads);
+
+void delete_mapping(mapping_t *mapping);
+
+//int setMappingFromMETIS(network_t network, idx_t *part, mapping_t *mapping);
+
+//int runPartitionRecWithMETIS(adjacency_list graph, options_t opt, idx_t *part);
+
+//int runPartitionKwayWithMETIS(adjacency_list graph, options_t opt, idx_t *part);
+
+adjacency_list *allocate_graph(network_t network, boolean is_directed);
+
+void delete_graph(adjacency_list *graph);
+
+int doMapping(network_t network, options_t opt, mapping_t *mapping);
+
+int setUndirectedGraphFromNetwork(adjacency_list *graph, network_t network);
+
+int setGraphFromNetwork(adjacency_list *graph, network_t network);
+
+int initNetwork(char* fileName, network_t *network);
+
+int loadNetwork(char *fileName, network_t *network);
+
+int loadWeights(char *fileName, network_t *network);
+
+int saveMapping(char* fileName, mapping_t *mapping);
 
 #endif  /* _ORCC_GRAPH_H_ */

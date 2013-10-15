@@ -29,78 +29,447 @@
 
 #include "orcc-graph.h"
 #include "metis.h"
+#include "roxml.h"
 
 boolean isDirected(adjacency_list al) {
     return al.is_directed;
 }
 
 int addVertex(adjacency_list al) {
+    int ret = 0;
 
+    /*!TODO */
+
+    return ret;
 }
 
 int addEdge(adjacency_list al) {
+    int ret = 0;
 
+    /*!TODO */
+
+    return ret;
 }
 
-int runPartitionRecWithMETIS(adjacency_list al, int iProcessorNumber) {
-    int ret;
-    idx_t *objval;
-    idx_t *part;
+actor_t *findActorByNameInNetwork(char *name, network_t network) {
+    actor_t *ret = NULL;
 
-    ret = METIS_PartGraphRecursive(NULL, /* idx_t *nvtxs */
-                                   NULL, /*idx_t *ncon*/
-                                   al.xadj, /*idx_t *xadj*/
-                                   al.adjncy, /*idx_t *adjncy*/
-                                   al.vwgt, /*idx_t *vwgt*/
+    int i = 0;
+    while (i < network.nbActors && ret == NULL) {
+        if (strcmp(name, network.actors[i]->name) == 0) {
+            ret = network.actors[i];
+        }
+        i++;
+    }
+
+    return ret;
+}
+
+/**
+ * Creates a mapping structure.
+ */
+mapping_t *allocate_mapping(int number_of_threads) {
+    mapping_t *mapping = (mapping_t *) malloc(sizeof(mapping_t));
+    mapping->number_of_threads = number_of_threads;
+    mapping->threads_affinities = (int*) malloc(number_of_threads * sizeof(int));
+    mapping->partitions_of_actors = (actor_t ***) malloc(number_of_threads * sizeof(actor_t **));
+    mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
+    return mapping;
+}
+
+/**
+ * Releases memory of the given mapping structure.
+ */
+void delete_mapping(mapping_t *mapping) {
+    int i;
+//    for (i = 0; i < mapping->number_of_threads; i++) {
+//        free(mapping->partitions_of_actors[i]);
+//    }
+    free(mapping->partitions_of_actors);
+    free(mapping->partitions_size);
+    free(mapping->threads_affinities);
+    free(mapping);
+}
+
+int setMappingFromMETIS(network_t network, idx_t *part, mapping_t *mapping) {
+    int ret, i;
+
+    printf("\n Setting mapping from METIS partition \n");
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        mapping->partitions_size[i] = 0;
+    }
+    for (i = 0; i < network.nbActors; i++) {
+        mapping->partitions_size[part[i]]++;
+    }
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        mapping->partitions_of_actors[i] = (actor_t **) malloc(mapping->partitions_size[i] * sizeof(actor_t *));
+    }
+    for (i = 0; i < network.nbActors; i++) {
+        mapping->partitions_of_actors[part[i]][mapping->partitions_size[part[i]]] = network.actors[i];
+    }
+
+
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        printf("Part %d = %d  ", i, mapping->partitions_size[i]);
+    }
+
+    return ret;
+}
+
+int runPartitionRecWithMETIS(adjacency_list graph, options_t opt, idx_t *part) {
+    int ret, i;
+    idx_t ncon = 1;
+    idx_t objval;
+
+    printf("\n METIS Recursive Partition \n");
+    ret = METIS_PartGraphRecursive(&graph.nb_vertex, /* idx_t *nvtxs */
+                                   &ncon, /*idx_t *ncon*/
+                                   graph.xadj, /*idx_t *xadj*/
+                                   graph.adjncy, /*idx_t *adjncy*/
+                                   graph.vwgt, /*idx_t *vwgt*/
                                    NULL, /*idx_t *vsize*/
-                                   al.adjwgt, /*idx_t *adjwgt*/
-                                   &iProcessorNumber, /*idx_t *nparts*/
+                                   graph.adjwgt, /*idx_t *adjwgt*/
+                                   &opt.nb_processors, /*idx_t *nparts*/
                                    NULL, /*real t *tpwgts*/
                                    NULL, /*real t ubvec*/
                                    NULL, /*idx_t *options*/
-                                   objval, /*idx_t *objval*/
+                                   &objval, /*idx_t *objval*/
                                    part); /*idx_t *part*/
+
+    for (i = 0; i < graph.nb_vertex; i++) {
+        printf("%d ", part[i]);
+    }
+    printf("Edgecut = %d ", objval);
 
     return ret;
 }
 
-int runPartitionKwayWithMETIS(adjacency_list al, int iProcessorNumber) {
-    int ret;
-    idx_t *objval;
-    idx_t *part;
+int runPartitionKwayWithMETIS(adjacency_list graph, options_t opt, idx_t *part) {
+    int ret, i;
+    idx_t ncon = 1;
+    idx_t objval;
 
-    ret = METIS_PartGraphKway(NULL, /* idx_t *nvtxs */
-                              NULL, /*idx_t *ncon*/
-                              al.xadj, /*idx_t *xadj*/
-                              al.adjncy, /*idx_t *adjncy*/
-                              al.vwgt, /*idx_t *vwgt*/
+    printf("\n METIS KWay Partition \n");
+    ret = METIS_PartGraphKway(&graph.nb_vertex, /* idx_t *nvtxs */
+                              &ncon, /*idx_t *ncon*/
+                              graph.xadj, /*idx_t *xadj*/
+                              graph.adjncy, /*idx_t *adjncy*/
+                              graph.vwgt, /*idx_t *vwgt*/
                               NULL, /*idx_t *vsize*/
-                              al.adjwgt, /*idx_t *adjwgt*/
-                              &iProcessorNumber, /*idx_t *nparts*/
+                              graph.adjwgt, /*idx_t *adjwgt*/
+                              &opt.nb_processors, /*idx_t *nparts*/
                               NULL, /*real t *tpwgts*/
                               NULL, /*real t ubvec*/
                               NULL, /*idx_t *options*/
-                              objval, /*idx_t *objval*/
+                              &objval, /*idx_t *objval*/
                               part); /*idx_t *part*/
+
+    for (i = 0; i < graph.nb_vertex; i++) {
+        printf("%d ", part[i]);
+    }
+    printf("Edgecut = %d ", objval);
 
     return ret;
 }
 
-int solveLoadBalancing(adjacency_list al, int iProcessorNumber, lbstrategy_et lbs) {
+/**
+ * Creates a mapping structure.
+ */
+adjacency_list *allocate_graph(network_t network, boolean is_directed) {
+    adjacency_list *graph;
+    int mult = (is_directed == TRUE)?1:2;
+    graph = (adjacency_list*) malloc(sizeof(adjacency_list));
+    graph->xadj = (idx_t*) malloc(sizeof(idx_t) * (network.nbActors + 1));
+    graph->vwgt = (idx_t*) malloc(sizeof(idx_t) * (network.nbActors));
+    graph->adjncy = (idx_t*) malloc(sizeof(idx_t) * network.nbConnections * mult);
+    graph->adjwgt = (idx_t*) malloc(sizeof(idx_t) * network.nbConnections * mult);
+
+    graph->is_directed = is_directed;
+    return graph;
+}
+
+/**
+ * Releases memory of the given mapping structure.
+ */
+void delete_graph(adjacency_list *graph) {
+    free(graph->adjncy);
+    free(graph->adjwgt);
+    free(graph->vwgt);
+    free(graph->xadj);
+    free(graph);
+}
+
+int doMapping(network_t network, options_t opt, mapping_t *mapping) {
     int ret = 0;
 
-    switch (lbs) {
+    adjacency_list *graph = allocate_graph(network, (opt.strategy == ORCC_LB_OTHER)?TRUE:FALSE);
+    setGraphFromNetwork(graph, network);
+
+    idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network.nbActors));
+    switch (opt.strategy) {
     case ORCC_LB_METIS_REC:
-        ret = runPartitionRecWithMETIS(al, iProcessorNumber);
+        ret = runPartitionRecWithMETIS(*graph, opt, part);
+        setMappingFromMETIS(network, part, mapping);
         break;
     case ORCC_LB_METIS_KWAY:
-        ret = runPartitionKwayWithMETIS(al, iProcessorNumber);
+        ret = runPartitionKwayWithMETIS(*graph, opt, part);
+        setMappingFromMETIS(network, part, mapping);
         break;
     case ORCC_LB_OTHER:
         break;
     default:
         break;
     }
+
+    free(part);
+    delete_graph(graph);
+    return ret;
+}
+
+int setDirectedGraphFromNetwork(adjacency_list *graph, network_t network) {
+    int ret = 0;
+    int i, j, k = 0;
+
+    for (i = 0; i < network.nbActors; i++) {
+        graph->xadj[i] = k;
+        graph->vwgt[i] = network.actors[i]->workload;
+        for (j = 0; j < network.nbConnections; j++) {
+            if (network.connections[j]->src == network.actors[i]) {
+                graph->adjncy[k] = network.connections[j]->dst->id;
+                graph->adjwgt[k] = network.connections[j]->workload;
+                k++;
+            }
+        }
+    }
+
+    graph->xadj[network.nbActors] = network.nbConnections;
+    graph->nb_vertex = network.nbActors;
+    graph->nb_edges = network.nbConnections;
+
+    printf("\n DIRECTED \n");
+    for (i = 0; i < network.nbActors + 1; i++) {
+        printf("%d ", graph->xadj[i]);
+    }
+    printf("\n--------\n");
+    for (i = 0; i < network.nbConnections; i++) {
+        printf("%d ", graph->adjncy[i]);
+    }
+    graph->nb_vertex = network.nbActors;
+    graph->nb_edges = network.nbConnections;
+
+    return ret;
+}
+
+int setUndirectedGraphFromNetwork(adjacency_list *graph, network_t network) {
+    int ret = 0;
+    int i, j, k = 0;
+
+    for (i = 0; i < network.nbActors; i++) {
+        graph->xadj[i] = k;
+        graph->vwgt[i] = network.actors[i]->workload;
+        for (j = 0; j < network.nbConnections; j++) {
+            if (network.connections[j]->src == network.actors[i]) {
+                graph->adjncy[k] = network.connections[j]->dst->id;
+                graph->adjwgt[k] = network.connections[j]->workload;
+                k++;
+            } else if (network.connections[j]->dst == network.actors[i]) {
+                graph->adjncy[k] = network.connections[j]->src->id;
+                graph->adjwgt[k] = network.connections[j]->workload;
+                k++;
+            }
+        }
+    }
+
+    graph->xadj[network.nbActors] = network.nbConnections * 2;
+    graph->nb_vertex = network.nbActors;
+    graph->nb_edges = network.nbConnections;
+
+    printf("\n UNDIRECTED \n");
+    for (i = 0; i < network.nbActors + 1; i++) {
+        printf("%d ", graph->xadj[i]);
+    }
+    printf("\n--------\n");
+    for (i = 0; i < network.nbConnections * 2; i++) {
+        printf("%d ", graph->adjncy[i]);
+    }
+
+    return ret;
+}
+
+int setGraphFromNetwork(adjacency_list *graph, network_t network) {
+    int ret = 0;
+
+    if (isDirected(*graph) == TRUE) {
+        ret = setDirectedGraphFromNetwork(graph, network);
+    } else {
+        ret = setUndirectedGraphFromNetwork(graph, network);
+    }
+
+    return ret;
+}
+
+int initNetwork(char* fileName, network_t *network) {
+    int ret;
+
+    node_t* rootNode = roxml_load_doc(fileName);
+
+    if (rootNode == NULL) {
+        printf("Error: Cannot open input file.\n");
+        exit(1);
+    }
+
+    network->nbActors = 0;
+    network->nbConnections = 0;
+
+    while (1) {
+        node_t* actorNode = roxml_get_chld(rootNode, NULL, network->nbActors + network->nbConnections);
+
+        if (actorNode == NULL) {
+                break;
+        }
+
+        char* nodeName = roxml_get_name(actorNode, NULL, 0);
+        if (strcmp(nodeName, "Instance") == 0) {
+                network->nbActors++;
+        }
+        else if (strcmp(nodeName, "Connection") == 0) {
+                network->nbConnections++;
+        }
+        else {
+                break;
+        }
+    }
+
+    roxml_close(rootNode);
+
+    printf("Msg: Number of actors is: %d\n", network->nbActors);
+    printf("Msg: Number of connections is: %d\n", network->nbConnections);
+
+    int i = 0;
+    network->actors = (actor_t**) malloc(network->nbActors * sizeof(actor_t*));
+    network->connections = (connection_t**) malloc(network->nbConnections * sizeof(connection_t*));
+    for (i=0; i < network->nbConnections; i++) {
+        network->actors[i] = (actor_t*) malloc(sizeof(actor_t*));
+        network->connections[i] = (connection_t*) malloc(sizeof(connection_t*));
+    }
+    for (i=0; i < network->nbConnections; i++) {
+        network->connections[i]->src = (actor_t*) malloc(sizeof(actor_t));
+        network->connections[i]->dst = (actor_t*) malloc(sizeof(actor_t));
+    }
+
+    return ret;
+}
+
+int loadNetwork(char *fileName, network_t *network) {
+    int ret, i;
+
+    ret = initNetwork(fileName, network);
+
+    node_t* rootNode = roxml_load_doc(fileName);
+
+    if (rootNode == NULL) {
+        printf("Error: Cannot open input file.\n");
+        exit(1);
+    }
+
+    for (i = 0; i < network->nbActors; i++) {
+        node_t* actorNode = roxml_get_chld(rootNode, NULL, i);
+
+        if (actorNode == NULL) {
+            break;
+        }
+
+        char* nodeName = roxml_get_name(actorNode, NULL, 0);
+        if (strcmp(nodeName, "Instance") == 0) {
+            node_t* nodeAttrActorId = roxml_get_attr(actorNode, "id", 0);
+            network->actors[i]->name = roxml_get_content(nodeAttrActorId, NULL, 0, NULL);
+
+            network->actors[i]->workload = 1;
+
+            network->actors[i]->id = i;
+
+            printf("Actor[%d]\tid = %s\tworkload = %.2lf\n",
+                   i, network->actors[i]->name, network->actors[i]->workload);
+        }
+        else {
+            break;
+        }
+    }
+
+    for (i = 0; i < network->nbConnections; i++) {
+        node_t* connectionNode = roxml_get_chld(rootNode, NULL, i + network->nbActors);
+
+        if (connectionNode == NULL) {
+            break;
+        }
+
+        char* nodeName = roxml_get_name(connectionNode, NULL, 0);
+        if (strcmp(nodeName, "Connection") == 0) {
+            node_t* nodeAttrActorSrc = roxml_get_attr(connectionNode, "src", 0);
+            char *src = roxml_get_content(nodeAttrActorSrc, NULL, 0, NULL);
+            network->connections[i]->src = findActorByNameInNetwork(src, *network);
+
+            node_t* nodeAttrActorDst = roxml_get_attr(connectionNode, "dst", 0);
+            char *dst = roxml_get_content(nodeAttrActorDst, NULL, 0, NULL);
+            network->connections[i]->dst = findActorByNameInNetwork(dst, *network);
+
+            network->connections[i]->workload = 1;
+
+            network->connections[i]->id = i;
+
+            printf("Connection[%d]\tsrc = %s\tdst = %s\n",
+                   i, network->connections[i]->src->name, network->connections[i]->dst->name);
+
+        }
+        else {
+            break;
+        }
+    }
+
+    return ret;
+}
+
+int loadWeights(char *fileName, network_t *network) {
+
+}
+
+int saveMapping(char* fileName, mapping_t *mapping) {
+    int ret, i, j;
+
+    node_t* rootNode = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+    if (rootNode == NULL) {
+        printf("Error: Cannot create root node.\n");
+        exit(1);
+    }
+
+    node_t* configNode = roxml_add_node(rootNode, 0, ROXML_ELM_NODE, "Configuration", NULL);
+    if (configNode == NULL) {
+        printf("Error: Cannot create Configuration node.\n");
+        exit(1);
+    }
+
+    node_t* partitionNode = roxml_add_node(configNode, 0, ROXML_ELM_NODE, "Partitioning", NULL);
+    if (partitionNode == NULL) {
+        printf("Error: Cannot create Partition node.\n");
+        exit(1);
+    }
+
+//    /*! TODO */
+//    for (i = 0; i < mapping->number_of_threads; i++) {
+//        node_t* processorNode = roxml_add_node(partitionNode, 0, ROXML_ELM_NODE, "Partition", NULL);
+
+//        char* procId = (char*) malloc(sizeof(int));
+//        sprintf(procId, "proc_%d", i+1);
+//        roxml_add_node(processorNode, 0, ROXML_ATTR_NODE, "id", procId);
+
+//        for (j = 0; j < mapping->partitions_size[i]; j++) {
+//            node_t* instanceNode = roxml_add_node(processorNode, 0, ROXML_ELM_NODE, "Instance", NULL);
+//            roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", mapping->partitions_of_actors[i][j]->name);
+//        }
+//    }
+
+    roxml_commit_changes(rootNode, fileName, NULL, 1);
+    roxml_close(rootNode);
 
     return ret;
 }
