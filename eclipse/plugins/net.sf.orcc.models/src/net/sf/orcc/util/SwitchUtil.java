@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.util;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.Switch;
+
 /**
  * This class defines utility stuff for EMF-switch based code transformations.
  * 
@@ -45,5 +48,66 @@ public class SwitchUtil {
 	 * to use for non-cascading switch;
 	 */
 	public static final Void DONE = new Void();
+
+	/**
+	 * Checks the given objects with the given EMF switch, and returns <code>true</code> as soon as
+	 * the {@link Switch#doSwitch(EObject)} method returns true. Otherwise returns false. If an
+	 * object is null, returns false.
+	 * 
+	 * @param emfSwitch
+	 *            an EMF switch
+	 * @param eObjects
+	 *            a varargs array of objects
+	 * @return a boolean
+	 */
+	public static boolean check(Switch<Boolean> emfSwitch, EObject... eObjects) {
+		for (EObject eObject : eObjects) {
+			if (doSwitch(emfSwitch, eObject)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks the given objects with the given EMF switch, and returns <code>true</code> as soon as
+	 * the {@link Switch#doSwitch(EObject)} method returns true. Otherwise returns false. If an
+	 * object is null, returns false.
+	 * 
+	 * @param emfSwitch
+	 *            an EMF switch
+	 * @param eObjects
+	 *            an iterable of objects
+	 * @return a boolean
+	 */
+	public static boolean check(Switch<Boolean> emfSwitch, Iterable<? extends EObject> eObjects) {
+		for (EObject eObject : eObjects) {
+			if (doSwitch(emfSwitch, eObject)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean doSwitch(Switch<Boolean> emfSwitch, EObject eObject) {
+		if (eObject == null) {
+			return false;
+		}
+		return emfSwitch.doSwitch(eObject);
+	}
+
+	public static Void visit(Switch<Void> emfSwitch, EObject... eObjects) {
+		for (EObject eObject : eObjects) {
+			emfSwitch.doSwitch(eObject);
+		}
+		return DONE;
+	}
+
+	public static Void visit(Switch<Void> emfSwitch, Iterable<? extends EObject> eObjects) {
+		for (EObject eObject : eObjects) {
+			emfSwitch.doSwitch(eObject);
+		}
+		return DONE;
+	}
 
 }
