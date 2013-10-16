@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include "orcc-graph.h"
+#include "orccmap.h"
 
 int main (int argc, char **argv) {
     int c;

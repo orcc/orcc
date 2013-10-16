@@ -28,7 +28,7 @@
  */
 
 #include <assert.h>
-#include "orcc-graph.h"
+#include "orccmap.h"
 #include "roxml.h"
 
 trace_level_et trace_level = ORCC_TL_QUIET;

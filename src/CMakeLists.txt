@@ -2,7 +2,7 @@
 
 set(filenames
         mapping.c
-        orcc-graph.c
+        orccmap.c
 )
 
 add_executable(orccmap ${filenames})
