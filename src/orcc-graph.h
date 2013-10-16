@@ -32,6 +32,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "metis.h"
+
+/********************************************************************************************
+ *
+ * Enums et constants
+ *
+ ********************************************************************************************/
+
+typedef enum { FALSE, TRUE } boolean;
 
 /* Mapping strategy codes */
 typedef enum {
@@ -41,16 +50,45 @@ typedef enum {
   ORCC_MS_OTHER
 } mappingstrategy_et;
 
+/* Error codes */
+typedef enum {
+  ORCC_OK,
+  ORCC_ERR_XXXX1,
+  ORCC_ERR_XXXX2,
+  ORCC_ERR_METIS,
+  ORCC_ERR_SWAP_ACTORS
+} orccmap_error_et;
+
+/* Trace level */
+typedef enum {
+  ORCC_TL_QUIET,
+  ORCC_TL_VERBOSE,
+  ORCC_TL_DEBUG,
+  ORCC_TL_TRACES
+} trace_level_et;
+
+
+/********************************************************************************************
+ *
+ * Data structures
+ *
+ ********************************************************************************************/
+
 typedef int int32_t;
 
-typedef enum { FALSE, TRUE } boolean;
+/*
+ * Options for mapping
+ */
+typedef struct options_s
+{
+    int nb_processors;
+    mappingstrategy_et strategy;
+} options_t;
 
 /*
-* Graph data structures
-*
-*/
-
-/* The adjacency structure of the graph is stored using the compressed storage format (CSR) */
+ * The adjacency structure of the graph is stored using the compressed storage format (CSR)
+ * This structure is used by METIS only with undirected graphs
+ */
 typedef struct adjacency_list
 {
 	/* is_directed : True if the graph is directed, esle False */
@@ -68,52 +106,54 @@ typedef struct adjacency_list
 	/* adjwgt : The weights of the edges */
 	int32_t *adjwgt;
 
-    int nb_vertex;
+    int nb_vertices;
     int nb_edges;
 } adjacency_list;
 
-typedef struct options_s
-{
-    int nb_processors;
-    mappingstrategy_et strategy;
-} options_t;
-
+/*
+ * Actors are the vertices of orcc Networks
+ */
 typedef struct actor_s {
     char *name;
     double workload;
     int id;
-    int processorId;
+    int processor_id;
 } actor_t;
 
+/*
+ * Connections are the edges of orcc Networks
+ */
 typedef struct connection_s {
     actor_t *src;
     actor_t *dst;
     double workload;
 } connection_t;
 
-typedef struct network_s
-{
+/*
+ * Orcc Networks are directed graphs
+ */
+typedef struct network_s {
     actor_t **actors;
     connection_t **connections;
-    int nbActors;
-    int nbConnections;
+    int nb_actors;
+    int nb_connections;
 } network_t;
 
+/*
+ * Mapping structure store the mapping result
+ */
 typedef struct mapping_s {
     int number_of_threads;
     actor_t ***partitions_of_actors;
     int *partitions_size;
 } mapping_t;
 
-typedef struct mappings_set_s {
-    int size;
-    struct mapping_s **mappings;
-} mappings_set_t;
 
-/*
-* Function prototypes
-*
-*/
+/********************************************************************************************
+ *
+ * Exportable function prototypes
+ *
+ ********************************************************************************************/
 
 #ifdef _WINDLL
 #define ORCC_API(type) __declspec(dllexport) type __cdecl
@@ -123,40 +163,183 @@ typedef struct mappings_set_s {
 #define ORCC_API(type) type
 #endif
 
-boolean isDirected(adjacency_list al);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-int addVertex(adjacency_list al);
+ORCC_API(int) do_mapping(network_t *network, options_t opt, mapping_t *mapping);
 
-int addEdge(adjacency_list al);
+#ifdef __cplusplus
+}
+#endif
 
-actor_t *findActorByNameInNetwork(char *name, network_t network);
+/********************************************************************************************
+ *
+ * Orcc-Map utils functions
+ *
+ ********************************************************************************************/
 
-mapping_t *allocate_mapping(int number_of_threads);
+/**
+ * !TODO
+ */
+void print_orcc_error(orccmap_error_et error);
 
-void delete_mapping(mapping_t *mapping);
+/**
+ * !TODO
+ */
+void check_metis_error(rstatus_et error);
 
-//int setMappingFromMETIS(network_t network, idx_t *part, mapping_t *mapping);
+/**
+ * !TODO
+ */
+void check_orcc_error(orccmap_error_et error);
 
-//int runPartitionRecWithMETIS(adjacency_list graph, options_t opt, idx_t *part);
+/**
+ * !TODO
+ */
+boolean print_trace_block(trace_level_et level);
 
-//int runPartitionKwayWithMETIS(adjacency_list graph, options_t opt, idx_t *part);
+/**
+ * !TODO
+ */
+void print_orcc_trace(trace_level_et level, char *trace, ...);
 
+/**
+ * !TODO
+ */
+void set_trace_level(trace_level_et level);
+
+/********************************************************************************************
+ *
+ * Allocate / Delete / Init functions
+ *
+ ********************************************************************************************/
+
+/**
+ * Creates and init options structure.
+ */
+options_t *set_default_options();
+
+/**
+ * Releases memory of the given options structure.
+ */
+void delete_options(options_t *opt);
+
+/**
+ * Creates a graph CSR structure.
+ * If the graph is supposed to be undirected, each edge will appears 2 times.
+ */
 adjacency_list *allocate_graph(network_t network, boolean is_directed);
 
+/**
+ * Releases memory of the given graph CSR structure.
+ */
 void delete_graph(adjacency_list *graph);
 
-int doMapping(network_t *network, options_t opt, mapping_t *mapping);
+/**
+ * Creates a mapping structure.
+ */
+mapping_t *allocate_mapping(int number_of_threads);
 
-int setUndirectedGraphFromNetwork(adjacency_list *graph, network_t network);
+/**
+ * Releases memory of the given mapping structure.
+ */
+void delete_mapping(mapping_t *mapping);
 
-int setGraphFromNetwork(adjacency_list *graph, network_t network);
 
-int initNetwork(char* fileName, network_t *network);
+/********************************************************************************************
+ *
+ * Functions for Graph CSR data structure
+ *
+ ********************************************************************************************/
 
-int loadNetwork(char *fileName, network_t *network);
+/**
+ * !TODO
+ */
+boolean is_directed(adjacency_list al);
 
-int loadWeights(char *fileName, network_t *network);
+/**
+ * !TODO
+ */
+int set_directed_graph_from_network(adjacency_list *graph, network_t network);
 
-int saveMapping(char* fileName, mapping_t *mapping);
+/**
+ * !TODO
+ */
+int set_undirected_graph_from_network(adjacency_list *graph, network_t network);
+
+/**
+ * !TODO
+ */
+int set_graph_from_network(adjacency_list *graph, network_t network);
+
+/********************************************************************************************
+ *
+ * Functions for Network managing
+ *
+ ********************************************************************************************/
+
+/**
+ * !TODO
+ */
+actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
+
+/**
+ * !TODO
+ */
+int swap_actors(actor_t **actors, int index1, int index2);
+
+/**
+ * !TODO
+ */
+int sort_actors(actor_t **actors);
+
+/**
+ * !TODO
+ */
+int init_network(char* fileName, network_t *network);
+
+/**
+ * !TODO
+ */
+int load_network(char *fileName, network_t *network);
+
+/********************************************************************************************
+ *
+ * Functions for Mapping data structure
+ *
+ ********************************************************************************************/
+
+/**
+ * !TODO
+ */
+int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mapping);
+
+/**
+ * !TODO
+ */
+int save_mapping(char* fileName, mapping_t *mapping);
+
+/********************************************************************************************
+ *
+ * Mapping functions
+ *
+ ********************************************************************************************/
+
+/**
+ * !TODO
+ */
+int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part);
+
+/**
+ * !TODO
+ */
+int do_metis_kway_partition(network_t network, options_t opt, idx_t *part);
+
+/**
+ * !TODO
+ * @author Long Nguyen
+ */
+int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part);
 
 #endif  /* _ORCC_GRAPH_H_ */
