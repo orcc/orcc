@@ -62,7 +62,7 @@ public class SwitchUtil {
 	 */
 	public static boolean check(Switch<Boolean> emfSwitch, EObject... eObjects) {
 		for (EObject eObject : eObjects) {
-			if (doSwitch(emfSwitch, eObject)) {
+			if (doSwitchBoolean(emfSwitch, eObject)) {
 				return true;
 			}
 		}
@@ -82,30 +82,36 @@ public class SwitchUtil {
 	 */
 	public static boolean check(Switch<Boolean> emfSwitch, Iterable<? extends EObject> eObjects) {
 		for (EObject eObject : eObjects) {
-			if (doSwitch(emfSwitch, eObject)) {
+			if (doSwitchBoolean(emfSwitch, eObject)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private static boolean doSwitch(Switch<Boolean> emfSwitch, EObject eObject) {
+	private static boolean doSwitchBoolean(Switch<Boolean> emfSwitch, EObject eObject) {
 		if (eObject == null) {
 			return false;
 		}
 		return emfSwitch.doSwitch(eObject);
 	}
 
+	private static void doSwithVoid(Switch<Void> emfSwitch, EObject eObject) {
+		if (eObject != null) {
+			emfSwitch.doSwitch(eObject);
+		}
+	}
+
 	public static Void visit(Switch<Void> emfSwitch, EObject... eObjects) {
 		for (EObject eObject : eObjects) {
-			emfSwitch.doSwitch(eObject);
+			doSwithVoid(emfSwitch, eObject);
 		}
 		return DONE;
 	}
 
 	public static Void visit(Switch<Void> emfSwitch, Iterable<? extends EObject> eObjects) {
 		for (EObject eObject : eObjects) {
-			emfSwitch.doSwitch(eObject);
+			doSwithVoid(emfSwitch, eObject);
 		}
 		return DONE;
 	}
