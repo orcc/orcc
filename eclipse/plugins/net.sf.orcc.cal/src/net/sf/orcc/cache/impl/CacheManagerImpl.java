@@ -63,23 +63,23 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 	}
 
 	@Override
-	public <F extends EObject, T> T getOrCompute(F eObject,
+	public <F extends EObject, T> T getOrCompute(F astObject,
 			Switch<T> switchInst, EStructuralFeature featureMap) {
-		Resource resource = eObject.eResource();
+		Resource resource = astObject.eResource();
 		T result;
 		if (resource == null) {
-			result = switchInst.doSwitch(eObject);
+			result = switchInst.doSwitch(astObject);
 		} else {
 			Cache cache = getCache(resource);
 
 			@SuppressWarnings("unchecked")
 			EMap<EObject, T> map = (EMap<EObject, T>) cache.eGet(featureMap);
-			result = map.get(eObject);
+			result = map.get(astObject);
 
 			if (result == null) {
-				result = switchInst.doSwitch(eObject);
+				result = switchInst.doSwitch(astObject);
 				if (result != null) {
-					map.put(eObject, result);
+					map.put(astObject, result);
 				}
 			}
 		}
