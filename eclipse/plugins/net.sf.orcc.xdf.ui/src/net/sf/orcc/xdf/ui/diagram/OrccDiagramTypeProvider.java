@@ -29,6 +29,7 @@
 package net.sf.orcc.xdf.ui.diagram;
 
 import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
+import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 
 /**
  * Provide diagram types supported by Orcc. At the moment, the only one is Xdf.
@@ -38,8 +39,18 @@ import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
  */
 public class OrccDiagramTypeProvider extends AbstractDiagramTypeProvider {
 
+	private IToolBehaviorProvider[] toolBehaviorProviders;
+
 	public OrccDiagramTypeProvider() {
 		super();
 		setFeatureProvider(new XdfDiagramFeatureProvider(this));
+	}
+
+	@Override
+	public IToolBehaviorProvider[] getAvailableToolBehaviorProviders() {
+		if (toolBehaviorProviders == null) {
+			toolBehaviorProviders = new IToolBehaviorProvider[] { new XdfDiagramToolBehaviorProvider(this) };
+		}
+		return toolBehaviorProviders;
 	}
 }

@@ -277,4 +277,19 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		}
 		return super.update(context);
 	}
+
+	/**
+	 * Returns the PictogramElement to use as main element for displaying a
+	 * selection arount a port.
+	 * 
+	 * @param pe
+	 * @return
+	 */
+	public GraphicsAlgorithm getSelectionBorder(PictogramElement pe) {
+		if (isPatternRoot(pe)) {
+			return getSubShapeFromId((ContainerShape) pe, SHAPE_ID).getGraphicsAlgorithm();
+		}
+		return null;
+	}
+
 }
