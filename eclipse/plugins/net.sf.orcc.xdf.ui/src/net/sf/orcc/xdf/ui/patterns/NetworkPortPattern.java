@@ -64,8 +64,8 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
-	protected final int PORT_WIDTH = 34;
-	protected final int PORT_HEIGHT = (int) (PORT_WIDTH * 0.866);
+	protected final int PORT_HEIGHT = 34;
+	protected final int PORT_WIDTH = (int) (PORT_HEIGHT * 0.866);
 
 	private final String SHAPE_ID = "PORT_SHAPE";
 	private final String LABEL_ID = "PORT_LABEL";
@@ -226,7 +226,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
 			// We define an arbitrary width to text, allowing user to see chars
 			// when first direct editing port name
-			gaService.setLocationAndSize(text, 0, PORT_WIDTH + 4, 50, 10);
+			gaService.setLocationAndSize(text, 0, PORT_HEIGHT + 4, 50, 10);
 
 			setIdentifier(shape, LABEL_ID);
 			link(shape, addedDomainObject);
@@ -276,12 +276,12 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		Polygon poly = (Polygon) getPeFromIdentifier(pe, SHAPE_ID).getGraphicsAlgorithm();
 
 		int minTxtWidth = XdfUtil.getTextMinWidth(txt);
-		if (minTxtWidth > PORT_HEIGHT) {
+		if (minTxtWidth > PORT_WIDTH) {
 			txt.setWidth(minTxtWidth);
-			int xscale = (minTxtWidth - PORT_HEIGHT) / 2;
+			int xscale = (minTxtWidth - PORT_WIDTH) / 2;
 			poly.setX(xscale);
 		} else {
-			txt.setWidth(PORT_HEIGHT);
+			txt.setWidth(PORT_WIDTH);
 		}
 
 		return true;
