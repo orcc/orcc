@@ -49,6 +49,7 @@ public class StyleUtil {
 	private static final IColorConstant INSTANCE_TEXT_FOREGROUND = new ColorConstant(0, 0, 0);
 	private static final IColorConstant INSTANCE_FOREGROUND = new ColorConstant(98, 131, 167);
 	private static final IColorConstant INSTANCEPORT_BACKGROUND = INSTANCE_FOREGROUND;
+	private static final IColorConstant CONNECTION_COLOR = new ColorConstant(0, 0, 0);
 
 	private static void setCommonTextValues(Diagram diagram, IGaService gaService, Style style) {
 		style.setFilled(false);
@@ -174,6 +175,32 @@ public class StyleUtil {
 			style.setFilled(true);
 			style.setLineVisible(false);
 			style.setBackground(gaService.manageColor(diagram, INSTANCEPORT_BACKGROUND));
+		}
+		return style;
+	}
+
+	/**
+	 * Return the style used for connections.
+	 * 
+	 * @param diagram
+	 * @return
+	 */
+	public static Style getStyleForConnection(Diagram diagram) {
+		final String styleId = "CONNECTION";
+		IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		Style parentStyle = getCommonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			style.setFilled(false);
+			style.setLineVisible(true);
+			style.setLineWidth(1);
+			style.setForeground(gaService.manageColor(diagram, CONNECTION_COLOR));
+
+			gaService.setRenderingStyle(style, PredefinedColoredAreas.getCopperWhiteGlossAdaptions());
 		}
 		return style;
 	}
