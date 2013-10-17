@@ -42,14 +42,14 @@ trace_level_et trace_level = ORCC_TL_QUIET;
 void print_orcc_error(orccmap_error_et error) {
     char *msg;
     if (error != ORCC_OK) {
-        printf("\nORCC-MAP : ERROR : %s", msg);
+        fprintf(stderr,"\nOrcc-Map : ERROR : %s\n", msg);
     }
 }
 
 void check_metis_error(rstatus_et error) {
     if (error != METIS_OK) {
         print_orcc_error(ORCC_ERR_METIS);
-        printf("\t Code: %d", error);
+        fprintf(stderr,"\t Code: %d", error);
         exit(error);
     }
 }
@@ -68,6 +68,7 @@ boolean print_trace_block(trace_level_et level) {
 void print_orcc_trace(trace_level_et level, char *trace, ...) {
     assert(trace != NULL);
 
+    /*!TODO: Find a kind way to add formated string and values */
     if (level <= trace_level) {
         printf("\nORCC-MAP : %s", trace);
     }
@@ -88,7 +89,7 @@ void set_trace_level(trace_level_et level) {
  */
 options_t *set_default_options() {
     options_t *opt = (options_t*) malloc(sizeof(options_t));
-    opt->strategy = ORCC_MS_METIS_KWAY;
+    opt->strategy = ORCC_MS_ROUND_ROBIN;
     opt->nb_processors = 1;
 
     return opt;
@@ -160,6 +161,7 @@ boolean is_directed(adjacency_list al) {
 }
 
 int set_directed_graph_from_network(adjacency_list *graph, network_t network) {
+    assert(graph != NULL);
     int ret = ORCC_OK;
     int i, j, k = 0;
 
@@ -197,6 +199,7 @@ int set_directed_graph_from_network(adjacency_list *graph, network_t network) {
 }
 
 int set_undirected_graph_from_network(adjacency_list *graph, network_t network) {
+    assert(graph != NULL);
     int ret = ORCC_OK;
     int i, j, k = 0;
 
@@ -238,6 +241,7 @@ int set_undirected_graph_from_network(adjacency_list *graph, network_t network) 
 }
 
 int set_graph_from_network(adjacency_list *graph, network_t network) {
+    assert(graph != NULL);
     int ret = ORCC_OK;
 
     print_orcc_trace(ORCC_TL_TRACES, "Function : setGraphFromNetwork");
@@ -258,6 +262,8 @@ int set_graph_from_network(adjacency_list *graph, network_t network) {
  ********************************************************************************************/
 
 actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
+    assert(actors != NULL);
+    assert(name != NULL);
     actor_t *ret = NULL;
     int i = 0;
 
@@ -274,6 +280,7 @@ actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
 }
 
 int swap_actors(actor_t **actors, int index1, int index2) {
+    assert(actors != NULL);
     int ret = ORCC_OK;
     char* tmpActorId;
     int tmpProcessorId, tmpId;
@@ -306,6 +313,7 @@ int swap_actors(actor_t **actors, int index1, int index2) {
 }
 
 int sort_actors(actor_t **actors) {
+    assert(actors != NULL);
     int ret = ORCC_OK;
     int i, j;
 
@@ -325,6 +333,8 @@ int sort_actors(actor_t **actors) {
 }
 
 int init_network(char* fileName, network_t *network) {
+    assert(fileName != NULL);
+    assert(network != NULL);
     int ret = ORCC_OK;
     int i = 0;
 
@@ -344,18 +354,18 @@ int init_network(char* fileName, network_t *network) {
         node_t* actorNode = roxml_get_chld(rootNode, NULL, network->nb_actors + network->nb_connections);
 
         if (actorNode == NULL) {
-                break;
+            break;
         }
 
         char* nodeName = roxml_get_name(actorNode, NULL, 0);
         if (strcmp(nodeName, "Instance") == 0) {
-                network->nb_actors++;
+            network->nb_actors++;
         }
         else if (strcmp(nodeName, "Connection") == 0) {
-                network->nb_connections++;
+            network->nb_connections++;
         }
         else {
-                break;
+            break;
         }
     }
 
@@ -376,6 +386,8 @@ int init_network(char* fileName, network_t *network) {
 }
 
 int load_network(char *fileName, network_t *network) {
+    assert(fileName != NULL);
+    assert(network != NULL);
     int ret = ORCC_OK;
     int i;
 
@@ -459,6 +471,8 @@ int load_network(char *fileName, network_t *network) {
 }
 
 int load_weights(char *fileName, network_t *network) {
+    assert(fileName != NULL);
+    assert(network != NULL);
     int ret = ORCC_OK;
 
     print_orcc_trace(ORCC_TL_TRACES, "Function : load_weights");
@@ -474,6 +488,9 @@ int load_weights(char *fileName, network_t *network) {
  ********************************************************************************************/
 
 int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mapping) {
+    assert(network != NULL);
+    assert(part != NULL);
+    assert(mapping != NULL);
     int ret = ORCC_OK;
     int i, j;
     int *counter = (int*) malloc(mapping->number_of_threads * sizeof(int));
@@ -516,6 +533,8 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
 }
 
 int save_mapping(char* fileName, mapping_t *mapping) {
+    assert(fileName != NULL);
+    assert(mapping != NULL);
     int ret = ORCC_OK;
     int i, j;
 
@@ -555,7 +574,7 @@ int save_mapping(char* fileName, mapping_t *mapping) {
     roxml_commit_changes(rootNode, fileName, NULL, 1);
     roxml_close(rootNode);
 
-    print_orcc_trace(ORCC_TL_VERBOSE, "Mapping saved successfully");
+    print_orcc_trace(ORCC_TL_VERBOSE, "Mapping saved successfully\n");
     return ret;
 }
 
@@ -566,6 +585,7 @@ int save_mapping(char* fileName, mapping_t *mapping) {
  ********************************************************************************************/
 
 int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) {
+    assert(part != NULL);
     int ret = ORCC_OK;
     int i;
     idx_t ncon = 1;
@@ -598,6 +618,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
 }
 
 int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
+    assert(part != NULL);
     int ret = ORCC_OK;
     int i;
     idx_t ncon = 1;
@@ -630,6 +651,8 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
 }
 
 int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
+    assert(network != NULL);
+    assert(part != NULL);
     int ret = ORCC_OK;
     int i, k;
     k = 0;
@@ -645,20 +668,22 @@ int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
         // There must be something needing to be improved here, i.e. invert
         // the direction of the distribution to have more balancing.
         if (k >= opt.nb_processors)
-                k = 0;
+            k = 0;
     }
 
     if (print_trace_block(ORCC_TL_DEBUG) == TRUE) {
         print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : Round Robin result");
         for (i = 0; i < network->nb_actors; i++) {
             printf("\n\tActor[%d]\tname = %s\tworkload = %.2lf\tprocessorId = %d",
-                                            i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
+                   i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
         }
     }
     return ret;
 }
 
 int do_mapping(network_t *network, options_t opt, mapping_t *mapping) {
+    assert(network != NULL);
+    assert(mapping != NULL);
     int ret = ORCC_OK;
     idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network->nb_actors));
 
@@ -684,4 +709,27 @@ int do_mapping(network_t *network, options_t opt, mapping_t *mapping) {
 
     free(part);
     return ret;
+}
+
+void start_orcc_mapping(options_t *opt) {
+    assert(opt != NULL);
+    int ret = ORCC_OK;
+
+    network_t *network = (network_t*) malloc(sizeof(network_t));
+    mapping_t *mapping = allocate_mapping(opt->nb_processors);
+
+    print_orcc_trace(ORCC_TL_VERBOSE, "Starting Orcc-Map");
+    print_orcc_trace(ORCC_TL_VERBOSE, "  Nb of processors\t:");
+    print_orcc_trace(ORCC_TL_VERBOSE, "  Input file\t\t:");
+    print_orcc_trace(ORCC_TL_VERBOSE, "  Output file\t:");
+    print_orcc_trace(ORCC_TL_VERBOSE, "  Trace level\t:");
+
+    ret = load_network(opt->input_file, network);
+
+    ret = do_mapping(network, *opt, mapping);
+
+    ret = save_mapping(opt->output_file, mapping);
+
+    delete_mapping(mapping);
+    free(network);
 }

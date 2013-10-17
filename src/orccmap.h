@@ -44,27 +44,30 @@ typedef enum { FALSE, TRUE } boolean;
 
 /* Mapping strategy codes */
 typedef enum {
-  ORCC_MS_METIS_REC,
-  ORCC_MS_METIS_KWAY,
-  ORCC_MS_ROUND_ROBIN,
-  ORCC_MS_OTHER
+    ORCC_MS_METIS_REC,
+    ORCC_MS_METIS_KWAY,
+    ORCC_MS_ROUND_ROBIN,
+    ORCC_MS_OTHER
 } mappingstrategy_et;
 
 /* Error codes */
 typedef enum {
-  ORCC_OK,
-  ORCC_ERR_XXXX1,
-  ORCC_ERR_XXXX2,
-  ORCC_ERR_METIS,
-  ORCC_ERR_SWAP_ACTORS
+    ORCC_OK,
+    ORCC_ERR_BAD_ARGS,
+    ORCC_ERR_BAD_ARGS_NBPROC,
+    ORCC_ERR_BAD_ARGS_MS,
+    ORCC_ERR_BAD_ARGS_TRACES,
+    ORCC_ERR_MANDATORY_ARGS,
+    ORCC_ERR_METIS,
+    ORCC_ERR_SWAP_ACTORS
 } orccmap_error_et;
 
 /* Trace level */
 typedef enum {
-  ORCC_TL_QUIET,
-  ORCC_TL_VERBOSE,
-  ORCC_TL_DEBUG,
-  ORCC_TL_TRACES
+    ORCC_TL_QUIET,
+    ORCC_TL_VERBOSE,
+    ORCC_TL_DEBUG,
+    ORCC_TL_TRACES
 } trace_level_et;
 
 
@@ -83,6 +86,8 @@ typedef struct options_s
 {
     int nb_processors;
     mappingstrategy_et strategy;
+    char *input_file;
+    char *output_file;
 } options_t;
 
 /*
@@ -91,20 +96,20 @@ typedef struct options_s
  */
 typedef struct adjacency_list
 {
-	/* is_directed : True if the graph is directed, esle False */
+    /* is_directed : True if the graph is directed, esle False */
     boolean is_directed;
 
-	/* xadj : For each vertex i, xadj[i] gives the entry index in the array adjncy */
-	int32_t *xadj;
+    /* xadj : For each vertex i, xadj[i] gives the entry index in the array adjncy */
+    int32_t *xadj;
 
-	/* adjncy : For each vertex, its adjacency list is stored in consecutive locations in the array adjncy */
-	int32_t *adjncy;
+    /* adjncy : For each vertex, its adjacency list is stored in consecutive locations in the array adjncy */
+    int32_t *adjncy;
 
-	/* vwgt : The weights of the vertices */
-	int32_t *vwgt;
+    /* vwgt : The weights of the vertices */
+    int32_t *vwgt;
 
-	/* adjwgt : The weights of the edges */
-	int32_t *adjwgt;
+    /* adjwgt : The weights of the edges */
+    int32_t *adjwgt;
 
     int nb_vertices;
     int nb_edges;
@@ -341,5 +346,10 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part);
  * @author Long Nguyen
  */
 int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part);
+
+/**
+ * !TODO
+ */
+void start_orcc_mapping(options_t *opt);
 
 #endif  /* _ORCC_GRAPH_H_ */
