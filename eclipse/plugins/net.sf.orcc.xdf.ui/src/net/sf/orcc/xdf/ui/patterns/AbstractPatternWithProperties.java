@@ -122,19 +122,29 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 		return id.equals(getIdentifier(pe));
 	}
 
-	protected Shape getSubShapeFromId(ContainerShape cs, String id) {
-		for (Shape child : cs.getChildren()) {
-			if (isExpectedPe(child, id)) {
-				return child;
-			}
-			if (child instanceof ContainerShape) {
-				Shape subResult = getSubShapeFromId((ContainerShape) child, id);
-				if (subResult != null) {
-					return subResult;
+	/**
+	 * Search for a PictogramElement with given id as identifier. This method
+	 * check the given pe and its children recursively.
+	 * 
+	 * @param pe
+	 * @param id
+	 * @return A PictogramElement or null if it can't be found
+	 */
+	protected PictogramElement getPeFromIdentifier(PictogramElement pe, final String id) {
+
+		if (isExpectedPe(pe, id)) {
+			return pe;
+		}
+
+		if (pe instanceof ContainerShape) {
+			for (Shape child : ((ContainerShape) pe).getChildren()) {
+				PictogramElement childPe = getPeFromIdentifier(child, id);
+				if (childPe != null) {
+					return childPe;
 				}
 			}
 		}
+
 		return null;
 	}
-
 }

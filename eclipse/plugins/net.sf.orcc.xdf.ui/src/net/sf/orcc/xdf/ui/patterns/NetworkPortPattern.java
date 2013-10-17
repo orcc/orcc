@@ -269,8 +269,8 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	public boolean layout(ILayoutContext context) {
 		PictogramElement pe = context.getPictogramElement();
 
-		Text txt = (Text) getSubShapeFromId((ContainerShape) pe, LABEL_ID).getGraphicsAlgorithm();
-		Polygon poly = (Polygon) getSubShapeFromId((ContainerShape) pe, SHAPE_ID).getGraphicsAlgorithm();
+		Text txt = (Text) getPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
+		Polygon poly = (Polygon) getPeFromIdentifier(pe, SHAPE_ID).getGraphicsAlgorithm();
 
 		int minTxtWidth = XdfUtil.getTextMinWidth(txt);
 		if (minTxtWidth > PORT_HEIGHT) {
@@ -290,7 +290,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 		Text txt = null;
 		if (isPatternRoot(pe)) {
-			txt = (Text) getSubShapeFromId((ContainerShape) pe, LABEL_ID).getGraphicsAlgorithm();
+			txt = (Text) getPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
 		} else if (isExpectedPe(pe, LABEL_ID)) {
 			txt = (Text) pe.getGraphicsAlgorithm();
 		}
@@ -312,7 +312,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	 */
 	public GraphicsAlgorithm getSelectionBorder(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			return getSubShapeFromId((ContainerShape) pe, SHAPE_ID).getGraphicsAlgorithm();
+			return getPeFromIdentifier(pe, SHAPE_ID).getGraphicsAlgorithm();
 		}
 		return null;
 	}

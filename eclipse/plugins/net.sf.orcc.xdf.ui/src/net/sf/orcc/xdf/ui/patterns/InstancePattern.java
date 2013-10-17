@@ -366,13 +366,13 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			// int instHeight = pe.getGraphicsAlgorithm().getHeight();
 
 			// Update width for label and separator. Position still unchanged
-			GraphicsAlgorithm label = getSubShapeFromId((ContainerShape) pe, LABEL_ID).getGraphicsAlgorithm();
+			GraphicsAlgorithm label = getPeFromIdentifier( pe, LABEL_ID).getGraphicsAlgorithm();
 			label.setWidth(instWidth);
-			Polyline sep = (Polyline) getSubShapeFromId((ContainerShape) pe, SEP_ID).getGraphicsAlgorithm();
+			Polyline sep = (Polyline) getPeFromIdentifier(pe, SEP_ID).getGraphicsAlgorithm();
 			sep.getPoints().get(1).setX(instWidth);
 
 			// Inputs area. Position unchanged, width must be updated
-			Shape inPe = getSubShapeFromId((ContainerShape) pe, INPUTS_ID);
+			Shape inPe = (Shape) getPeFromIdentifier(pe, INPUTS_ID);
 			GraphicsAlgorithm inGa = inPe.getGraphicsAlgorithm();
 			for (Shape child : ((ContainerShape) inPe).getChildren()) {
 				if (child.getGraphicsAlgorithm() instanceof Text) {
@@ -388,7 +388,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			inGa.setWidth(getPortsAreaMinWidth(inPe));
 			inGa.setHeight(getPortsAreaMinHeight(inPe));
 
-			Shape outPe = getSubShapeFromId((ContainerShape) pe, OUTPUTS_ID);
+			Shape outPe = (Shape) getPeFromIdentifier(pe, OUTPUTS_ID);
 			GraphicsAlgorithm outGa = outPe.getGraphicsAlgorithm();
 			int outWidth = outGa.getWidth();
 			for (Shape child : ((ContainerShape) outPe).getChildren()) {
@@ -447,7 +447,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	 * @param pe
 	 */
 	public void cleanInputsPorts(ContainerShape cs) {
-		ContainerShape ctr = (ContainerShape) getSubShapeFromId(cs, INPUTS_ID);
+		ContainerShape ctr = (ContainerShape) getPeFromIdentifier(cs, INPUTS_ID);
 		List<Shape> copyList = new ArrayList<Shape>(ctr.getChildren());
 		for (Shape shape : copyList) {
 			EcoreUtil.delete(shape, true);
@@ -462,7 +462,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	 * @param pe
 	 */
 	public void cleanOutputsPorts(ContainerShape cs) {
-		ContainerShape ctr = (ContainerShape) getSubShapeFromId(cs, OUTPUTS_ID);
+		ContainerShape ctr = (ContainerShape) getPeFromIdentifier(cs, OUTPUTS_ID);
 		List<Shape> copyList = new ArrayList<Shape>(ctr.getChildren());
 		for (Shape shape : copyList) {
 			EcoreUtil.delete(shape, true);
@@ -471,7 +471,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	}
 
 	public void addInputsPorts(ContainerShape cs, EList<Port> ports) {
-		final ContainerShape portsCtr = (ContainerShape) getSubShapeFromId(cs, INPUTS_ID);
+		final ContainerShape portsCtr = (ContainerShape) getPeFromIdentifier(cs, INPUTS_ID);
 
 		// final IPeService peService = Graphiti.getPeService();
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -512,7 +512,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	}
 
 	public void addOutputsPorts(ContainerShape cs, EList<Port> ports) {
-		final ContainerShape portsCtr = (ContainerShape) getSubShapeFromId(cs, OUTPUTS_ID);
+		final ContainerShape portsCtr = (ContainerShape) getPeFromIdentifier(cs, OUTPUTS_ID);
 
 		// final IPeService peService = Graphiti.getPeService();
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -572,8 +572,8 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			return -1;
 		}
 
-		Shape inArea = getSubShapeFromId((ContainerShape) pe, INPUTS_ID);
-		Shape outArea = getSubShapeFromId((ContainerShape) pe, OUTPUTS_ID);
+		Shape inArea = (Shape) getPeFromIdentifier(pe, INPUTS_ID);
+		Shape outArea = (Shape) getPeFromIdentifier(pe, OUTPUTS_ID);
 
 		int portsAreaMinHeight = Math.max(getPortsAreaMinHeight(inArea), getPortsAreaMinHeight(outArea));
 		int newHeight = LABEL_HEIGHT + SEPARATOR + portsAreaMinHeight;
@@ -586,8 +586,8 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			return -1;
 		}
 
-		Shape inArea = getSubShapeFromId((ContainerShape) pe, INPUTS_ID);
-		Shape outArea = getSubShapeFromId((ContainerShape) pe, OUTPUTS_ID);
+		Shape inArea = (Shape) getPeFromIdentifier(pe, INPUTS_ID);
+		Shape outArea = (Shape) getPeFromIdentifier(pe, OUTPUTS_ID);
 
 		return getPortsAreaMinWidth(inArea) + getPortsAreaMinWidth(outArea) + PORTS_AREAS_SPACE;
 	}
