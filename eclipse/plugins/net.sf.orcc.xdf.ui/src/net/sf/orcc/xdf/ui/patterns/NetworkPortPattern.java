@@ -132,10 +132,9 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		Port obj = (Port) getBusinessObjectForPictogramElement(pe);
 		obj.setName(value);
 
-		// Update (and Layout) feature can be used with port top level shape
-		// (getInOutIdentifier()) or text (LABEL_ID). If the current pe is the
-		// shape, we must get one of the others to allow layout() and update()
-		// to be applied
+		// layout(pe) and update(pe) can oly be called with the root element.
+		// This method can be used on the shape or on the text label. Before
+		// requesting an update, we need to get the root element
 		if (!isPatternRoot(pe)) {
 			pe = (PictogramElement) pe.eContainer();
 		}
@@ -288,19 +287,15 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	public boolean update(IUpdateContext context) {
 		PictogramElement pe = context.getPictogramElement();
 
-		Text txt = null;
-		if (isPatternRoot(pe)) {
-			txt = (Text) getPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
-		} else if (isExpectedPe(pe, LABEL_ID)) {
-			txt = (Text) pe.getGraphicsAlgorithm();
+		if (!isPatternRoot(pe)) {
+			return false;
 		}
 
-		if(txt != null) {
-			Port port = (Port) getBusinessObjectForPictogramElement(pe);
-			txt.setValue(port.getName());
-			return true;
-		}
-		return super.update(context);
+		Text txt = (Text) getPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
+		Port port = (Port) getBusinessObjectForPictogramElement(pe);
+		txt.setValue(port.getName());
+
+		return true;
 	}
 
 	/**
