@@ -58,6 +58,13 @@ public class XdfUtil {
 				.getProject();
 	}
 
+	/**
+	 * Returns the minimal width needed to display the value of given Text with
+	 * its associated Font.
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public static int getTextMinWidth(Text text) {
 
 		final IUiLayoutService uiLayoutService = GraphitiUi.getUiLayoutService();
@@ -70,6 +77,13 @@ public class XdfUtil {
 		return -1;
 	}
 
+	/**
+	 * Returns the minimal height needed to display the value of given Text with
+	 * its associated Font.
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public static int getTextMinHeight(Text text) {
 
 		final IUiLayoutService uiLayoutService = GraphitiUi.getUiLayoutService();

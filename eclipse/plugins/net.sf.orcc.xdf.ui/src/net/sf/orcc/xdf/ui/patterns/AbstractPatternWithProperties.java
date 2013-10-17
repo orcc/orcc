@@ -54,13 +54,53 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 		peService = Graphiti.getPeService();
 	}
 
+	/**
+	 * This method must be implemented by subclasses to returns a list of all
+	 * identifiers set by it. This is mostly used to easily check if a subclass
+	 * can manage a PictogramElement by checking if its identifier is contained
+	 * in the returned list.
+	 * 
+	 * @see #isPatternControlled(PictogramElement)
+	 * @return The list of identifiers
+	 */
 	abstract protected String[] getValidIdentifiers();
 
+	/**
+	 * Check if the concrete class can manage the given PictogramElement.
+	 * 
+	 * @see #getValidIdentifiers()
+	 * @return true if the given pe is controlled by this class
+	 */
+	@Override
+	protected boolean isPatternControlled(PictogramElement pe) {
+		String peId = getIdentifier(pe);
+		for (String validId : getValidIdentifiers()) {
+			if (validId.equals(peId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Set the given id as an identifier to the given pe
+	 * 
+	 * @param pe
+	 *            The PictogramElement
+	 * @param id
+	 *            The value of the identifier to set on given pe
+	 */
 	protected void setIdentifier(PictogramElement pe, String id) {
 		peService.setPropertyValue(pe, PROPERTY_ID, id);
 	}
 
-	protected String getIdentifier(PictogramElement pe) {
+	/**
+	 * Get the identifier set on the given PictogramElement
+	 * 
+	 * @param pe
+	 * @return The identifier, or null if the given pe has no identifier set
+	 */
+	private String getIdentifier(PictogramElement pe) {
 		Property property = peService.getProperty(pe, PROPERTY_ID);
 		if (property == null) {
 			return null;
@@ -69,6 +109,15 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 		}
 	}
 
+	/**
+	 * Check if the given pe identifier has the given id set as identifier
+	 * 
+	 * @param pe
+	 *            The PictogramElement
+	 * @param id
+	 *            The identifier to check
+	 * @return true if the given pe identifier is equals to the given id value
+	 */
 	protected boolean isExpectedPe(PictogramElement pe, String id) {
 		return id.equals(getIdentifier(pe));
 	}
@@ -88,14 +137,4 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 		return null;
 	}
 
-	@Override
-	protected boolean isPatternControlled(PictogramElement pe) {
-		String peId = getIdentifier(pe);
-		for (String validId : getValidIdentifiers()) {
-			if (validId.equals(peId)) {
-				return true;
-			}
-		}
-		return false;
-	}
 }
