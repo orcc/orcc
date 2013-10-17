@@ -65,8 +65,12 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	}
 
 	@Override
-	public boolean canStartConnection(ICreateConnectionContext context) {
+	public String getCreateDescription() {
+		return "Add a connection between 2 ports";
+	}
 
+	@Override
+	public boolean canStartConnection(ICreateConnectionContext context) {
 		Anchor srcAnchor = context.getSourceAnchor();
 		Object obj = getBusinessObjectForPictogramElement(srcAnchor);
 		if (obj instanceof Port) {

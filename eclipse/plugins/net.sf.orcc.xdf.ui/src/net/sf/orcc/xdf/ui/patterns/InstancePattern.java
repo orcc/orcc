@@ -103,6 +103,11 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	}
 
 	@Override
+	public String getCreateDescription() {
+		return "Create a new instance, to encapsulate a network or an actor";
+	}
+
+	@Override
 	protected String[] getValidIdentifiers() {
 		return validIds;
 	}

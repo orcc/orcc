@@ -50,6 +50,11 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 	}
 
 	@Override
+	public String getCreateDescription() {
+		return "Create an input port directly in the network";
+	}
+
+	@Override
 	protected Polygon getPortPolygon(Shape shape, IGaService gaService) {
 		int[] points = { 0, PORT_HEIGHT / 2, PORT_WIDTH, 0, PORT_WIDTH, PORT_HEIGHT };
 		Polygon polygon = gaService.createPlainPolygon(shape, points);

@@ -50,6 +50,11 @@ public class OutputNetworkPortPattern extends NetworkPortPattern {
 	}
 
 	@Override
+	public String getCreateDescription() {
+		return "Create an ouput port directly in the network";
+	}
+
+	@Override
 	protected Polygon getPortPolygon(Shape shape, IGaService gaService) {
 		int[] points = { 0, 0, 0, PORT_HEIGHT, PORT_WIDTH, PORT_HEIGHT / 2 };
 		Polygon polygon = gaService.createPlainPolygon(shape, points);
