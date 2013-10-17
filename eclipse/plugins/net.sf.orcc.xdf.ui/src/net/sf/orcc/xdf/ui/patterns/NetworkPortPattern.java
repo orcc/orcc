@@ -142,6 +142,11 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		updatePictogramElement(pe);
 	}
 
+	@Override
+	public boolean stretchFieldToFitText() {
+		return true;
+	}
+
 	/*
 	 * A port can't be removed from a graph. Instead it must be deleted.
 	 * 
@@ -221,10 +226,9 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
 			// We define an arbitrary width to text, allowing user to see chars
 			// when first direct editing port name
-			gaService.setLocationAndSize(text, 0, PORT_WIDTH + 1, 50, -1);
+			gaService.setLocationAndSize(text, 0, PORT_WIDTH + 4, 50, 10);
 
 			setIdentifier(shape, LABEL_ID);
-
 			link(shape, addedDomainObject);
 
 			// set shape and graphics algorithm where the editor for
