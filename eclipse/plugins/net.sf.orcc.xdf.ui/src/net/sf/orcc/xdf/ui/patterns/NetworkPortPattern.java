@@ -31,6 +31,7 @@ package net.sf.orcc.xdf.ui.patterns;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
+import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -39,8 +40,10 @@ import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
+import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.func.IDirectEditing;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -133,7 +136,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		// (getInOutIdentifier()) or text (LABEL_ID). If the current pe is the
 		// shape, we must get one of the others to allow layout() and update()
 		// to be applied
-		if (isExpectedPe(pe, SHAPE_ID)) {
+		if (!isPatternRoot(pe)) {
 			pe = (PictogramElement) pe.eContainer();
 		}
 
@@ -236,27 +239,49 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		link(containerShape, addedDomainObject);
 
 		gaService.setLocationAndSize(rect, context.getX(), context.getY(), -1, -1);
+		layoutPictogramElement(containerShape);
 
 		return containerShape;
 	}
 
+	/**
+	 * @see NetworkPortPattern#layout(ILayoutContext)
+	 */
+	@Override
+	public boolean canResizeShape(IResizeShapeContext context) {
+		return false;
+	}
+
+	@Override
+	public boolean canLayout(ILayoutContext context) {
+		return isPatternRoot(context.getPictogramElement());
+	}
+
+	/**
+	 * Port can't be resized. In that particular case, layout() does everything
+	 * needed for a nice display. It adapts the size of text to its value and
+	 * ensures everything is always centered
+	 * 
+	 * @param context
+	 * @return
+	 */
 	@Override
 	public boolean layout(ILayoutContext context) {
 		PictogramElement pe = context.getPictogramElement();
 
-		Text txt = null;
-		if (isPatternRoot(pe)) {
-			txt = (Text) getSubShapeFromId((ContainerShape) pe, LABEL_ID).getGraphicsAlgorithm();
-		} else if (isExpectedPe(pe, LABEL_ID)) {
-			txt = (Text) pe.getGraphicsAlgorithm();
+		Text txt = (Text) getSubShapeFromId((ContainerShape) pe, LABEL_ID).getGraphicsAlgorithm();
+		Polygon poly = (Polygon) getSubShapeFromId((ContainerShape) pe, SHAPE_ID).getGraphicsAlgorithm();
+
+		int minTxtWidth = XdfUtil.getTextMinWidth(txt);
+		if (minTxtWidth > PORT_HEIGHT) {
+			txt.setWidth(minTxtWidth);
+			int xscale = (minTxtWidth - PORT_HEIGHT) / 2;
+			poly.setX(xscale);
+		} else {
+			txt.setWidth(PORT_HEIGHT);
 		}
 
-		if(txt != null) {
-			Graphiti.getGaService().setSize(txt, -1, -1);
-			return true;
-		}
-
-		return super.layout(context);
+		return true;
 	}
 
 	@Override
