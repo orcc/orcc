@@ -72,11 +72,13 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	@Override
 	public boolean canStartConnection(ICreateConnectionContext context) {
 		Anchor srcAnchor = context.getSourceAnchor();
-		Object obj = getBusinessObjectForPictogramElement(srcAnchor);
+		if (srcAnchor == null) {
+			return false;
+		}
+		Object obj = getBusinessObjectForPictogramElement(srcAnchor.getParent());
 		if (obj instanceof Port) {
 			return true;
 		}
-
 		return false;
 	}
 
@@ -84,7 +86,10 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	public boolean canCreate(ICreateConnectionContext context) {
 
 		Anchor tgtAnchor = context.getTargetAnchor();
-		Object obj = getBusinessObjectForPictogramElement(tgtAnchor);
+		if (tgtAnchor == null) {
+			return false;
+		}
+		Object obj = getBusinessObjectForPictogramElement(tgtAnchor.getParent());
 		if (obj instanceof Port) {
 			return true;
 		}
@@ -103,7 +108,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			// create new business object
 			net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection();
 
-			// TODO: set the in nd out vertex for this connection
+			// TODO: set the in and out vertex for this connection
 
 			// add connection for business object
 			AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(),

@@ -241,6 +241,8 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		setIdentifier(containerShape, getInOutIdentifier());
 		link(containerShape, addedDomainObject);
 
+		peCreateService.createChopboxAnchor(containerShape);
+
 		gaService.setLocationAndSize(rect, context.getX(), context.getY(), -1, -1);
 		layoutPictogramElement(containerShape);
 
