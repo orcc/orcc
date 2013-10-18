@@ -31,7 +31,25 @@
 #include "orccmap.h"
 #include "roxml.h"
 
-trace_level_et trace_level = ORCC_TL_QUIET;
+static verbose_level_et verbose_level = ORCC_VL_QUIET;
+
+static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
+    "",
+    "Bad arguments. Please check usage print.",
+    "Arg value for -n is not valide.",
+    "Arg value for -m is not valide.",
+    "Arg value for -v is not valide.",
+    "Mandatory argument missing. Please check usage print.",
+    "Cannot generate default output file name.",
+    "METIS error",
+    "Actors swap fails."
+};
+
+static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
+    "METIS Recursive",
+    "METIS Kway",
+    "Round Robin"
+};
 
 /********************************************************************************************
  *
@@ -40,10 +58,10 @@ trace_level_et trace_level = ORCC_TL_QUIET;
  ********************************************************************************************/
 
 void print_orcc_error(orccmap_error_et error) {
-    char *msg;
-    if (error != ORCC_OK) {
-        fprintf(stderr,"\nOrcc-Map : ERROR : %s\n", msg);
+    if (error != ORCC_OK && error < ORCC_ERR_SIZE) {
+        fprintf(stderr,"\nOrcc-Map : ERROR : %s", ORCC_ERRORS_TXT[error]);
     }
+
 }
 
 void check_metis_error(rstatus_et error) {
@@ -61,21 +79,21 @@ void check_orcc_error(orccmap_error_et error) {
     }
 }
 
-boolean print_trace_block(trace_level_et level) {
-    return (level<=trace_level)?TRUE:FALSE;
+boolean print_trace_block(verbose_level_et level) {
+    return (level<=verbose_level)?TRUE:FALSE;
 }
 
-void print_orcc_trace(trace_level_et level, char *trace, ...) {
+void print_orcc_trace(verbose_level_et level, char *trace, ...) {
     assert(trace != NULL);
 
-    /*!TODO: Find a kind way to add formated string and values */
-    if (level <= trace_level) {
+    /* !TODO: Find a kind way to add formated string and values */
+    if (level <= verbose_level) {
         printf("\nORCC-MAP : %s", trace);
     }
 }
 
-void set_trace_level(trace_level_et level) {
-    trace_level = level;
+void set_trace_level(verbose_level_et level) {
+    verbose_level = level;
 }
 
 /********************************************************************************************
@@ -165,8 +183,6 @@ int set_directed_graph_from_network(adjacency_list *graph, network_t network) {
     int ret = ORCC_OK;
     int i, j, k = 0;
 
-    print_orcc_trace(ORCC_TL_TRACES, "Function : set_directed_graph_from_network");
-
     for (i = 0; i < network.nb_actors; i++) {
         graph->xadj[i] = k;
         graph->vwgt[i] = network.actors[i]->workload;
@@ -183,13 +199,13 @@ int set_directed_graph_from_network(adjacency_list *graph, network_t network) {
     graph->nb_vertices = network.nb_actors;
     graph->nb_edges = network.nb_connections;
 
-    if (print_trace_block(ORCC_TL_DEBUG) == TRUE) {
-        print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : Directed graph data");
-        print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : CSR xadj : ");
+    if (print_trace_block(ORCC_VL_DEBUG) == TRUE) {
+        print_orcc_trace(ORCC_VL_DEBUG, "DEBUG : Directed graph data");
+        print_orcc_trace(ORCC_VL_DEBUG, "DEBUG : CSR xadj : ");
         for (i = 0; i < network.nb_actors + 1; i++) {
             printf("%d ", graph->xadj[i]);
         }
-        print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : CSR adjncy : ");
+        print_orcc_trace(ORCC_VL_DEBUG, "DEBUG : CSR adjncy : ");
         for (i = 0; i < network.nb_connections; i++) {
             printf("%d ", graph->adjncy[i]);
         }
@@ -202,8 +218,6 @@ int set_undirected_graph_from_network(adjacency_list *graph, network_t network) 
     assert(graph != NULL);
     int ret = ORCC_OK;
     int i, j, k = 0;
-
-    print_orcc_trace(ORCC_TL_TRACES, "Function : set_undirected_graph_from_network");
 
     for (i = 0; i < network.nb_actors; i++) {
         graph->xadj[i] = k;
@@ -225,13 +239,13 @@ int set_undirected_graph_from_network(adjacency_list *graph, network_t network) 
     graph->nb_vertices = network.nb_actors;
     graph->nb_edges = network.nb_connections;
 
-    if (print_trace_block(ORCC_TL_DEBUG) == TRUE) {
-        print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : Undirected graph data");
-        print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : CSR xadj : ");
+    if (print_trace_block(ORCC_VL_DEBUG) == TRUE) {
+        print_orcc_trace(ORCC_VL_DEBUG, "DEBUG : Undirected graph data");
+        print_orcc_trace(ORCC_VL_DEBUG, "DEBUG : CSR xadj : ");
         for (i = 0; i < network.nb_actors + 1; i++) {
             printf("%d ", graph->xadj[i]);
         }
-        print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : CSR adjncy : ");
+        print_orcc_trace(ORCC_VL_DEBUG, "DEBUG : CSR adjncy : ");
         for (i = 0; i < network.nb_connections * 2; i++) {
             printf("%d ", graph->adjncy[i]);
         }
@@ -243,8 +257,6 @@ int set_undirected_graph_from_network(adjacency_list *graph, network_t network) 
 int set_graph_from_network(adjacency_list *graph, network_t network) {
     assert(graph != NULL);
     int ret = ORCC_OK;
-
-    print_orcc_trace(ORCC_TL_TRACES, "Function : setGraphFromNetwork");
 
     if (is_directed(*graph) == TRUE) {
         ret = set_directed_graph_from_network(graph, network);
@@ -267,8 +279,6 @@ actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
     actor_t *ret = NULL;
     int i = 0;
 
-    print_orcc_trace(ORCC_TL_TRACES, "Function : find_actor_by_name");
-
     while (i < nb_actors && ret == NULL) {
         if (strcmp(name, actors[i]->name) == 0) {
             ret = actors[i];
@@ -286,8 +296,6 @@ int swap_actors(actor_t **actors, int index1, int index2) {
     int tmpProcessorId, tmpId;
     double tmpWorkload;
     int nb_actors = sizeof(actors)/sizeof(actor_t *);
-
-    print_orcc_trace(ORCC_TL_TRACES, "Function : swap_actors");
 
     if (index1 < nb_actors && index2 < nb_actors) {
         tmpActorId = actors[index1]->name;
@@ -319,8 +327,6 @@ int sort_actors(actor_t **actors) {
 
     int nb_actors = sizeof(actors)/sizeof(actor_t *);
 
-    print_orcc_trace(ORCC_TL_TRACES, "Function : sort_actors");
-
     for (i = 0; i < nb_actors; i++) {
         for (j = 0; j < nb_actors - i - 1; j++) {
             if (actors[j]->workload <= actors[j+1]->workload) {
@@ -337,8 +343,6 @@ int init_network(char* fileName, network_t *network) {
     assert(network != NULL);
     int ret = ORCC_OK;
     int i = 0;
-
-    print_orcc_trace(ORCC_TL_TRACES, "Function : init_network");
 
     node_t* rootNode = roxml_load_doc(fileName);
 
@@ -391,8 +395,6 @@ int load_network(char *fileName, network_t *network) {
     int ret = ORCC_OK;
     int i;
 
-    print_orcc_trace(ORCC_TL_TRACES, "Function : load_network");
-
     ret = init_network(fileName, network);
 
     node_t* rootNode = roxml_load_doc(fileName);
@@ -417,8 +419,8 @@ int load_network(char *fileName, network_t *network) {
             network->actors[i]->workload = 1;
             network->actors[i]->processor_id = 0;
 
-            if (print_trace_block(ORCC_TL_DEBUG) == TRUE) {
-                print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : Load ");
+            if (print_trace_block(ORCC_VL_DEBUG) == TRUE) {
+                print_orcc_trace(ORCC_VL_DEBUG, "DEBUG : Load ");
                 printf("Actor[%d]\tname = %s\tworkload = %.2lf",
                        i, network->actors[i]->name, network->actors[i]->workload);
             }
@@ -447,9 +449,9 @@ int load_network(char *fileName, network_t *network) {
 
             network->connections[i]->workload = 1;
 
-            if (print_trace_block(ORCC_TL_DEBUG) == TRUE) {
-                print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : Load ");
-                printf("Connection[%d]\tsrc = %s\tdst = %s",
+            if (print_trace_block(ORCC_VL_DEBUG) == TRUE) {
+                print_orcc_trace(ORCC_VL_DEBUG, "DEBUG : Load ");
+                printf("Connection[%d]\tsrc = %s\t  dst = %s",
                        i, network->connections[i]->src->name, network->connections[i]->dst->name);
             }
 
@@ -459,11 +461,11 @@ int load_network(char *fileName, network_t *network) {
         }
     }
 
-    if (print_trace_block(ORCC_TL_VERBOSE) == TRUE) {
-        print_orcc_trace(ORCC_TL_VERBOSE, "Network loaded successfully");
-        print_orcc_trace(ORCC_TL_VERBOSE, "Number of actors is : ");
+    if (print_trace_block(ORCC_VL_VERBOSE) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE, "Network loaded successfully");
+        print_orcc_trace(ORCC_VL_VERBOSE, "Number of actors is : ");
         printf("%d", network->nb_actors);
-        print_orcc_trace(ORCC_TL_VERBOSE, "Number of connections is : ");
+        print_orcc_trace(ORCC_VL_VERBOSE, "Number of connections is : ");
         printf("%d", network->nb_connections);
     }
 
@@ -474,8 +476,6 @@ int load_weights(char *fileName, network_t *network) {
     assert(fileName != NULL);
     assert(network != NULL);
     int ret = ORCC_OK;
-
-    print_orcc_trace(ORCC_TL_TRACES, "Function : load_weights");
 
     return ret;
 }
@@ -494,8 +494,6 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
     int ret = ORCC_OK;
     int i, j;
     int *counter = (int*) malloc(mapping->number_of_threads * sizeof(int));
-
-    print_orcc_trace(ORCC_TL_TRACES, "Function : set_mapping_from_partition");
 
     for (i = 0; i < mapping->number_of_threads; i++) {
         mapping->partitions_size[i] = 0;
@@ -520,8 +518,8 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
         network->actors[i]->processor_id = part[i];
     }
 
-    if (print_trace_block(ORCC_TL_VERBOSE) == TRUE) {
-        print_orcc_trace(ORCC_TL_VERBOSE, "Mapping result : ");
+    if (print_trace_block(ORCC_VL_VERBOSE) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE, "Mapping result : ");
         for (i = 0; i < mapping->number_of_threads; i++) {
             printf("\n\tPartition %d : %d actors =>", i+1, mapping->partitions_size[i]);
             for (j=0; j < mapping->partitions_size[i]; j++) {
@@ -538,7 +536,7 @@ int save_mapping(char* fileName, mapping_t *mapping) {
     int ret = ORCC_OK;
     int i, j;
 
-    print_orcc_trace(ORCC_TL_TRACES, "Function : save_mapping");
+    /* !TODO: if the output file already exists, backup of the file and advert the user */
 
     node_t* rootNode = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
     if (rootNode == NULL) {
@@ -574,7 +572,7 @@ int save_mapping(char* fileName, mapping_t *mapping) {
     roxml_commit_changes(rootNode, fileName, NULL, 1);
     roxml_close(rootNode);
 
-    print_orcc_trace(ORCC_TL_VERBOSE, "Mapping saved successfully\n");
+    print_orcc_trace(ORCC_VL_VERBOSE, "Mapping saved successfully\n");
     return ret;
 }
 
@@ -592,8 +590,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
     idx_t objval;
     adjacency_list *graph = allocate_graph(network, (opt.strategy != ORCC_MS_METIS_REC && opt.strategy != ORCC_MS_METIS_KWAY)?TRUE:FALSE);
 
-    print_orcc_trace(ORCC_TL_TRACES, "Function : do_metis_recursive_partition");
-    print_orcc_trace(ORCC_TL_VERBOSE, "Applying METIS Recursive partition for mapping");
+    print_orcc_trace(ORCC_VL_VERBOSE, "Applying METIS Recursive partition for mapping");
 
     ret = set_graph_from_network(graph, network);
     check_orcc_error(ret);
@@ -625,8 +622,7 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
     idx_t objval;
     adjacency_list *graph = allocate_graph(network, (opt.strategy != ORCC_MS_METIS_REC && opt.strategy != ORCC_MS_METIS_KWAY)?TRUE:FALSE);
 
-    print_orcc_trace(ORCC_TL_TRACES, "Function : do_metis_kway_partition");
-    print_orcc_trace(ORCC_TL_VERBOSE, "Applying METIS Kway partition for mapping");
+    print_orcc_trace(ORCC_VL_VERBOSE, "Applying METIS Kway partition for mapping");
 
     ret = set_graph_from_network(graph, network);
     check_orcc_error(ret);
@@ -657,8 +653,7 @@ int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
     int i, k;
     k = 0;
 
-    print_orcc_trace(ORCC_TL_TRACES, "Function : do_round_robbin_mapping");
-    print_orcc_trace(ORCC_TL_VERBOSE, "Applying Round Robin strategy for mapping");
+    print_orcc_trace(ORCC_VL_VERBOSE, "Applying Round Robin strategy for mapping");
 
     sort_actors(network->actors);
 
@@ -671,8 +666,8 @@ int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
             k = 0;
     }
 
-    if (print_trace_block(ORCC_TL_DEBUG) == TRUE) {
-        print_orcc_trace(ORCC_TL_DEBUG, "DEBUG : Round Robin result");
+    if (print_trace_block(ORCC_VL_DEBUG) == TRUE) {
+        print_orcc_trace(ORCC_VL_DEBUG, "DEBUG : Round Robin result");
         for (i = 0; i < network->nb_actors; i++) {
             printf("\n\tActor[%d]\tname = %s\tworkload = %.2lf\tprocessorId = %d",
                    i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
@@ -686,8 +681,6 @@ int do_mapping(network_t *network, options_t opt, mapping_t *mapping) {
     assert(mapping != NULL);
     int ret = ORCC_OK;
     idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network->nb_actors));
-
-    print_orcc_trace(ORCC_TL_TRACES, "Function : do_mapping");
 
     switch (opt.strategy) {
     case ORCC_MS_METIS_REC:
@@ -718,11 +711,19 @@ void start_orcc_mapping(options_t *opt) {
     network_t *network = (network_t*) malloc(sizeof(network_t));
     mapping_t *mapping = allocate_mapping(opt->nb_processors);
 
-    print_orcc_trace(ORCC_TL_VERBOSE, "Starting Orcc-Map");
-    print_orcc_trace(ORCC_TL_VERBOSE, "  Nb of processors\t:");
-    print_orcc_trace(ORCC_TL_VERBOSE, "  Input file\t\t:");
-    print_orcc_trace(ORCC_TL_VERBOSE, "  Output file\t:");
-    print_orcc_trace(ORCC_TL_VERBOSE, "  Trace level\t:");
+    if (print_trace_block(ORCC_VL_VERBOSE) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE, "Starting Orcc-Map");
+        print_orcc_trace(ORCC_VL_VERBOSE, "  Nb of processors\t: ");
+        printf("%d", opt->nb_processors);
+        print_orcc_trace(ORCC_VL_VERBOSE, "  Input file\t\t: ");
+        printf("%s", opt->input_file);
+        print_orcc_trace(ORCC_VL_VERBOSE, "  Output file\t: ");
+        printf("%s", opt->output_file);
+        print_orcc_trace(ORCC_VL_VERBOSE, "  Mapping strategy\t: ");
+        printf("%s", ORCC_STRATEGY_TXT[opt->strategy]);
+        print_orcc_trace(ORCC_VL_VERBOSE, "  Verbose level\t: ");
+        printf("%d", verbose_level);
+    }
 
     ret = load_network(opt->input_file, network);
 

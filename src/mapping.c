@@ -1,17 +1,17 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 #include <getopt.h>
 #include <assert.h>
 #include "orccmap.h"
 
 void print_usage() {
-    /*!TODO: Find a kind way to format this text */
+    /* !TODO: Find a kind way to format this text */
     char *IDENT = "    ";
 
     printf("\nUsage: orccmap [options] -n nbproc -i filename");
     printf("\n");
     printf("\nDescription:");
-    printf("\n%sTODODesc", IDENT);
+    printf("\n%sGenerates", IDENT);
 
     printf("\n");
     printf("\nRequired parameters:");
@@ -40,7 +40,6 @@ void print_usage() {
     printf("\n%s%sThe possible values are:", IDENT, IDENT);
     printf("\n%s%s%s1", IDENT, IDENT, IDENT);
     printf("\n%s%s%s2", IDENT, IDENT, IDENT);
-    printf("\n%s%s%s3", IDENT, IDENT, IDENT);
 
     printf("\n");
     printf("\n%s-h, --help", IDENT);
@@ -54,6 +53,7 @@ void set_nb_processors(char *arg_value, options_t *opt) {
     opt->nb_processors = atoi(arg_value);
     if (opt->nb_processors < 1) {
         print_orcc_error(ORCC_ERR_BAD_ARGS_NBPROC);
+        printf("\n");
         exit(ORCC_ERR_BAD_ARGS_NBPROC);
     }
 }
@@ -70,6 +70,7 @@ void set_mapping_strategy(char *arg_value, options_t *opt) {
         opt->strategy = ORCC_MS_ROUND_ROBIN;
     } else {
         print_orcc_error(ORCC_ERR_BAD_ARGS_MS);
+        printf("\n");
         exit(ORCC_ERR_BAD_ARGS_MS);
     }
 }
@@ -79,22 +80,37 @@ void set_verbose_level(char *arg_value, options_t *opt) {
     int trace_level = 0;
 
     if (arg_value == NULL) {
-        set_trace_level(ORCC_TL_VERBOSE);
+        set_trace_level(ORCC_VL_VERBOSE);
     } else {
         trace_level = atoi(arg_value);
-        if (trace_level < 1 || trace_level > ORCC_TL_TRACES-ORCC_TL_QUIET) {
-            print_orcc_error(ORCC_ERR_BAD_ARGS_TRACES);
-            exit(ORCC_ERR_BAD_ARGS_TRACES);
+        if (trace_level < 1 || trace_level > ORCC_VL_DEBUG-ORCC_VL_QUIET) {
+            print_orcc_error(ORCC_ERR_BAD_ARGS_VERBOSE);
+            printf("\n");
+            exit(ORCC_ERR_BAD_ARGS_VERBOSE);
         }
-        set_trace_level(ORCC_TL_QUIET+trace_level);
+        set_trace_level(ORCC_VL_QUIET+trace_level);
     }
 }
 
 void set_default_output_filename(char *arg_value, options_t *opt) {
     assert(arg_value != NULL);
     assert(opt != NULL);
+    char *pDot, *output;
 
-    opt->output_file = "optarg.xcf";
+    if (arg_value != NULL) {
+        output = (char *)malloc(strlen(arg_value)*sizeof(char));
+        strcpy(output, arg_value);
+        pDot = strrchr(output, '.');
+        if(pDot != NULL)
+            *pDot = '\0';
+        strcat(output, ".xcf");
+    } else {
+        print_orcc_error(ORCC_ERR_DEF_OUTPUT);
+        printf("\n");
+        exit(ORCC_ERR_DEF_OUTPUT);
+    }
+
+    opt->output_file = output;
 }
 
 int main (int argc, char **argv) {
@@ -150,12 +166,14 @@ int main (int argc, char **argv) {
     if (optind < argc) {
         print_orcc_error(ORCC_ERR_BAD_ARGS);
         while (optind < argc)
-            fprintf(stderr,"%s ", argv[optind++]);
+            fprintf(stderr," [%s]", argv[optind++]);
+        printf("\n");
         print_usage();
         exit(ORCC_ERR_BAD_ARGS);
     }
     if (!nFlag || !iFlag) {
         print_orcc_error(ORCC_ERR_MANDATORY_ARGS);
+        printf("\n");
         print_usage();
         exit(ORCC_ERR_MANDATORY_ARGS);
     }

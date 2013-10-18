@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include "metis.h"
 
+
 /********************************************************************************************
  *
  * Enums et constants
@@ -47,29 +48,31 @@ typedef enum {
     ORCC_MS_METIS_REC,
     ORCC_MS_METIS_KWAY,
     ORCC_MS_ROUND_ROBIN,
-    ORCC_MS_OTHER
+    ORCC_MS_OTHER,
+    ORCC_MS_SIZE /* only used for string tab declaration */
 } mappingstrategy_et;
 
 /* Error codes */
+/* !TODO : Add more errors */
 typedef enum {
-    ORCC_OK,
+    ORCC_OK = 0,
     ORCC_ERR_BAD_ARGS,
     ORCC_ERR_BAD_ARGS_NBPROC,
     ORCC_ERR_BAD_ARGS_MS,
-    ORCC_ERR_BAD_ARGS_TRACES,
+    ORCC_ERR_BAD_ARGS_VERBOSE,
     ORCC_ERR_MANDATORY_ARGS,
+    ORCC_ERR_DEF_OUTPUT,
     ORCC_ERR_METIS,
-    ORCC_ERR_SWAP_ACTORS
+    ORCC_ERR_SWAP_ACTORS,
+    ORCC_ERR_SIZE /* only used for string tab declaration */
 } orccmap_error_et;
 
-/* Trace level */
+/* Verbose level */
 typedef enum {
-    ORCC_TL_QUIET,
-    ORCC_TL_VERBOSE,
-    ORCC_TL_DEBUG,
-    ORCC_TL_TRACES
-} trace_level_et;
-
+    ORCC_VL_QUIET,
+    ORCC_VL_VERBOSE,
+    ORCC_VL_DEBUG
+} verbose_level_et;
 
 /********************************************************************************************
  *
@@ -202,17 +205,17 @@ void check_orcc_error(orccmap_error_et error);
 /**
  * !TODO
  */
-boolean print_trace_block(trace_level_et level);
+boolean print_trace_block(verbose_level_et level);
 
 /**
  * !TODO
  */
-void print_orcc_trace(trace_level_et level, char *trace, ...);
+void print_orcc_trace(verbose_level_et level, char *trace, ...);
 
 /**
  * !TODO
  */
-void set_trace_level(trace_level_et level);
+void set_trace_level(verbose_level_et level);
 
 /********************************************************************************************
  *
