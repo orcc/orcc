@@ -40,7 +40,6 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.promela.transform.GuardsExtractor;
-import net.sf.orcc.backends.promela.transform.NetworkStateDefExtractor;
 import net.sf.orcc.backends.promela.transform.PromelaAddPrefixToStateVar;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
 import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
@@ -79,7 +78,6 @@ public class PromelaBackend extends AbstractBackend {
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
-	private NetworkStateDefExtractor netStateDef;
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 	private PromelaSchedulingModel schedulingModel;
 	private ScheduleBalanceEq balanceEq;
@@ -146,9 +144,6 @@ public class PromelaBackend extends AbstractBackend {
 
 		schedulingModel = new PromelaSchedulingModel(network);
 
-		netStateDef = new NetworkStateDefExtractor(schedulingModel);
-		netStateDef.doSwitch(network);
-
 		schedulingModel.printDependencyGraph();
 		actorSchedulers = new HashSet<Scheduler>();
 
@@ -197,9 +192,9 @@ public class PromelaBackend extends AbstractBackend {
 
 	private void transformActorAgain(Actor actor) {
 		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
-		transfos.add(new PromelaDeadGlobalElimination(netStateDef
-				.getVarsUsedInScheduling(), netStateDef
-				.getPortsUsedInScheduling()));
+		transfos.add(new PromelaDeadGlobalElimination(
+				schedulingModel.getActorModel(actor).getAllReacableSchedulingVars(), 
+				schedulingModel.getActorModel(actor).getPortsUsedInScheduling()));
 		transfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
 		transfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 
@@ -208,7 +203,7 @@ public class PromelaBackend extends AbstractBackend {
 		}
 		//new PromelaTokenAnalyzer(netStateDef).doSwitch(actor);
 		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
-				netStateDef);
+				schedulingModel.getActorModel(actor));
 		actorScheduler.doSwitch(actor);
 		actorSchedulers.add(actorScheduler.getScheduler());
 	}

@@ -37,8 +37,14 @@ class FSM:
             if i.nsrc not in lst and i.src==dst_state:
                 lst.append(i.nsrc)
         return lst
+    def getnrstates(self):
+        lst=[]
+        for i in self.transitions:
+            if i.nsrc not in lst:
+                lst.append(i.nsrc)
+        return len(lst)
     def getnewstatename(self):
-        nr=len(self.getnstates())
+        nr=self.getnrstates()
         name="s"+str(nr)
         return name
     def addnewnstate(self, origstate, name):

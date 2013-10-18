@@ -63,6 +63,8 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
  * @author Johan Ersfolk
  * 
  */
+
+@Deprecated
 public class NetworkStateDefExtractor extends DfVisitor<Void> {
 
 	private class InnerIrVisitor extends AbstractIrVisitor<Void> {
@@ -125,7 +127,9 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		public Void caseInstCall(InstCall call) {
 			if (call.hasResult()) {
 				addTargetVar(call.getTarget().getVariable());
-				if (call.getProcedure().isNative()) {varsFromNativeProcedures.add(call.getTarget().getVariable());}
+				if (call.getProcedure().isNative()) {
+					varsFromNativeProcedures.add(call.getTarget().getVariable());
+				}
 			}
 			return super.caseInstCall(call);
 		}
@@ -140,7 +144,6 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 			if (inScheduler) {
 				// this might not be needed as 'casePattern' should do the same
 				varsUsedInScheduling.add(load.getSource().getVariable());
-				schedulingModel.addVarUsedInScheduler(actor, load.getSource().getVariable());
 			}
 			return null;
 		}
@@ -227,11 +230,9 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		for (Set<Var> s : whileConditionVars) {
 			variableDependency.get(target).addAll(s);
 			variableDependencyNoIf.get(target).addAll(s);
-			schedulingModel.addVarDep(actor, target, s, false);
 		}
 		for (Set<Var> s : ifConditionVars) {
 			variableDependency.get(target).addAll(s);
-			schedulingModel.addVarDep(actor, target, s, true);
 		}
 	}
 
@@ -245,7 +246,6 @@ public class NetworkStateDefExtractor extends DfVisitor<Void> {
 		}
 		variableDependency.get(target).add(source);
 		variableDependencyNoIf.get(target).add(source);
-		schedulingModel.addVarDep(actor, target, source);
 	}
 
 	void analyzeVarDeps() {
