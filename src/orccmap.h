@@ -70,8 +70,8 @@ typedef enum {
 /* Verbose level */
 typedef enum {
     ORCC_VL_QUIET,
-    ORCC_VL_VERBOSE,
-    ORCC_VL_DEBUG
+    ORCC_VL_VERBOSE_1,
+    ORCC_VL_VERBOSE_2
 } verbose_level_et;
 
 /********************************************************************************************
@@ -301,11 +301,6 @@ int swap_actors(actor_t **actors, int index1, int index2);
  * !TODO
  */
 int sort_actors(actor_t **actors);
-
-/**
- * !TODO
- */
-int init_network(char* fileName, network_t *network);
 
 /**
  * !TODO

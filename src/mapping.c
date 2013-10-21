@@ -80,10 +80,10 @@ void set_verbose_level(char *arg_value, options_t *opt) {
     int trace_level = 0;
 
     if (arg_value == NULL) {
-        set_trace_level(ORCC_VL_VERBOSE);
+        set_trace_level(ORCC_VL_VERBOSE_1);
     } else {
         trace_level = atoi(arg_value);
-        if (trace_level < 1 || trace_level > ORCC_VL_DEBUG-ORCC_VL_QUIET) {
+        if (trace_level < 1 || trace_level > ORCC_VL_VERBOSE_2-ORCC_VL_QUIET) {
             print_orcc_error(ORCC_ERR_BAD_ARGS_VERBOSE);
             printf("\n");
             exit(ORCC_ERR_BAD_ARGS_VERBOSE);
