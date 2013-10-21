@@ -64,13 +64,11 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	
 	private Scheduler scheduler;
 
-	private Set<Port> schedulingPorts;
-
 	private Set<Port> peekPorts = new HashSet<Port>();
 
 	private Set<Transition> transitionsInCycle = new HashSet<Transition>();
-
-	private NetworkStateDefExtractor netStateDef;
+	
+	private ControlTokenActorModel actorModel;
 
 	private Set<State> choiceStatesSet = new HashSet<State>();
 
@@ -88,10 +86,11 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	
 	private Action action;
 	
-	public PromelaSchedulabilityTest(NetworkStateDefExtractor netStateDef) {
+	public PromelaSchedulabilityTest(ControlTokenActorModel actorModel) {
 		super();
-		this.netStateDef = netStateDef;
-		this.schedulingPorts = netStateDef.getPortsUsedInScheduling();
+		//this.netStateDef = netStateDef;
+		this.actorModel=actorModel;
+		//this.schedulingPorts = netStateDef.getPortsUsedInScheduling();
 		this.irVisitor = new InnerIrVisitor();
 	}
 
@@ -104,7 +103,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		for (Var var : action.getScheduler().getLocals()) {
 			// find on which variables this scheduler depends
 			Set<Var> tc = new HashSet<Var>();
-			netStateDef.getTransitiveClosure(var, tc, true);
+			actorModel.getTransitiveClosure(var, tc, true);
 			for (Var v : tc) {
 				if (v.isGlobal()) {
 					guardVars.add(v);
@@ -266,7 +265,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					guardDirect.addAll(actionGuardVarMap.get(((Transition)edge).getAction()));
 					Set<Var> temp = new HashSet<Var>();
 					for (Var g : guardFull) {
-						netStateDef.getTransitiveClosure(g, temp, true);
+						actorModel.getTransitiveClosure(g, temp, true);
 					}
 					guardFull.addAll(temp);
 				}
@@ -324,7 +323,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	private void whenIsVarPartOfState() {
 		Map<State, Set<Var>> stateToVar = scheduler.getStateToRelevantVars(); 
-		Set<Var> stateVars = netStateDef.getSchedulingModel().getActorModel(actor).getLocalSchedulingVars();
+		Set<Var> stateVars = actorModel.getLocalSchedulingVars();
 		scheduler.setSchedulingVars(stateVars);
 		removeLocalAndConstantVars(stateVars);
 		for (Schedule schedule : scheduler.getSchedules()) {
@@ -502,7 +501,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		}
 		for (Action action : schedule.getSequence()) {
 			for (Port port : action.getInputPattern().getPorts()) {
-				boolean portUsed = netStateDef.getVarsUsedInScheduling()
+				boolean portUsed = actorModel.getAllReacableSchedulingVars()
 						.contains(action.getInputPattern().getVariable(port));
 				if (peekPorts.contains(port)) {
 					if (getPeeksOfState(initState).contains(port)) {
@@ -526,7 +525,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		// Control tokens generation
 		for (Action action : schedule.getSequence()) {
 			for (Port port : action.getOutputPattern().getPorts()) {
-				if (schedulingPorts.contains(port)) {
+				/*if (schedulingPorts.contains(port)) {
 					// hasControlOutput = true;
 					System.out.print(" -> Writes to control port: "
 						+ port.getName());
@@ -542,7 +541,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					// System.out.print(", iir " + (hasVarLoop(var) &&
 					// hasInputDep(var, true)));
 					System.out.print("\n");
-				}
+				}*/
 				if (!portWrites.containsKey(port.getName())) {
 					portWrites.put(port.getName(), new ArrayList<Object>());
 				}
@@ -558,7 +557,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	Set<Port> getInputDep(Var var, boolean includeIfCond) {
 		Set<Var> tc = new HashSet<Var>();
 		Set<Port> p = new HashSet<Port>();
-		netStateDef.getTransitiveClosure(var, tc, includeIfCond);
+		actorModel.getTransitiveClosure(var, tc, includeIfCond);
 		for (Var v : tc) {
 			if (inputPortVars.contains(v)) {
 				p.add(inputVarToPortMap.get(v));
@@ -578,7 +577,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	boolean hasInputDep(Var var, boolean includeIfCond) {
 		Set<Var> tc = new HashSet<Var>();
-		netStateDef.getTransitiveClosure(var, tc, includeIfCond);
+		actorModel.getTransitiveClosure(var, tc, includeIfCond);
 		boolean hasDep = false;
 		for (Var v : tc) {
 			if (inputPortVars.contains(v)) {
@@ -589,17 +588,17 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	}
 
 	boolean hasVarLoop(Var var) {
-		return netStateDef.hasLoop(var);
+		return actorModel.hasLoop(var);
 	}
 	
 	boolean isBasedOnConstants(Var var) {
 		Set<Var> tc = new HashSet<Var>();
-		netStateDef.getTransitiveClosure(var, tc, true);
+		actorModel.getTransitiveClosure(var, tc, true);
 		for (Var v : tc) {
 			if (v.isLocal()) {
 				continue;
 			} else
-			if (netStateDef.getVariableDependency().containsKey(v)) {
+			if (actorModel.getVariableDependency().containsKey(v)) {
 				return false;
 			}
 		}
@@ -631,7 +630,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		
 		@Override
 		public Void caseInstStore(InstStore store) {
-			if (!netStateDef.getVarsUsedInScheduling().contains(store.getTarget().getVariable())) {
+			if (!actorModel.getAllReacableSchedulingVars().contains(store.getTarget().getVariable())) {
 				return null;
 			}
 			instToVarMap.put(store, store.getTarget().getVariable());
@@ -660,7 +659,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					if (!isBasedOnConstants(local)){
 						isConstant = false;
 					}
-					netStateDef.getActionLocalTransitiveClosure(local, localDep);
+					actorModel.getTransitiveClosure(local, localDep, true);
 				}
 				if (hasLoop) {
 					scheduler.addvarUpdate(inst.getTarget().getVariable(), instToActionMap.get(inst));

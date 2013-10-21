@@ -66,17 +66,17 @@ public class Frontend {
 	 */
 	public static EObject getEntity(AstEntity entity) {
 		AstActor actor = entity.getActor();
-		EObject eObject;
+		EObject astObject;
 		Switch<? extends EObject> emfSwitch;
 		if (actor == null) {
-			eObject = entity.getUnit();
+			astObject = entity.getUnit();
 			emfSwitch = new UnitTransformer();
 		} else {
-			eObject = actor;
+			astObject = actor;
 			emfSwitch = new ActorTransformer();
 		}
 
-		return CacheManager.instance.getOrCompute(eObject, emfSwitch,
+		return CacheManager.instance.getOrCompute(astObject, emfSwitch,
 				CachePackage.eINSTANCE.getCache_IrMap());
 	}
 

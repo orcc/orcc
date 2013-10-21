@@ -193,7 +193,7 @@ import net.sf.orcc.util.OrccUtil
 	'''
 	
 	override caseInstAssign(InstAssign inst) '''
-		«inst.target.variable.name» = «inst.value.doSwitch»;
+		«inst.target.variable.indexedName» = «inst.value.doSwitch»;
 	'''
 	override caseInstCall(InstCall inst) {
 	if(inst.print) {
@@ -207,7 +207,7 @@ import net.sf.orcc.util.OrccUtil
 	}
 }
 	override caseInstLoad(InstLoad inst) '''
-		«inst.target.variable.indexedName» = «inst.source.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR»;
+		«inst.target.variable.indexedName» = «inst.source.variable.indexedName»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR»;
 	'''
 
 	override caseInstReturn(InstReturn inst) '''
@@ -215,7 +215,7 @@ import net.sf.orcc.util.OrccUtil
 	'''
 
 	override caseInstStore(InstStore inst) '''
-		«inst.target.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR» = «inst.value.doSwitch»;
+		«inst.target.variable.indexedName»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR» = «inst.value.doSwitch»;
 	'''
 	
 	def compilePort(Port port, Object nbReaders) '''
@@ -276,11 +276,11 @@ import net.sf.orcc.util.OrccUtil
 	'''
 	
 	def private varDecl(Var v) {
-		'''«v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»'''
+		'''«v.type.doSwitch» «v.indexedName»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»'''
 	}
 	
 	def private varDeclWithInit(Var v) {
-		'''«v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»«IF v.initialValue != null» = «v.initialValue.doSwitch»«ENDIF»'''
+		'''«v.type.doSwitch» «v.indexedName»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»«IF v.initialValue != null» = «v.initialValue.doSwitch»«ENDIF»'''
 	}
 	
 	def dispatch compileArg(ArgByRef arg) {

@@ -145,7 +145,7 @@ class NetworkPrinter extends ExprAndTypePrinter {
 			
 			std::map<std::string, Actor*> actors;
 			«FOR instance : network.children.filter(typeof(Instance))»
-				actors["«FOR seg : instance.hierarchicalId»/«seg»«ENDFOR»"] = inst_«instance.name»;
+				actors["«instance.name»"] = inst_«instance.name»;
 			«ENDFOR»
 
 			«FOR e : network.connections»
