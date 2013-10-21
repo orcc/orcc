@@ -88,7 +88,7 @@ void print_orcc_trace(verbose_level_et level, char *trace, ...) {
 
     /* !TODO: Find a kind way to add formated string and values */
     if (level <= verbose_level) {
-        printf("\nORCC-MAP : %s", trace);
+        printf("\nOrcc-Map : %s", trace);
     }
 }
 
