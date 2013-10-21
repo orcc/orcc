@@ -3,10 +3,17 @@
 ### Notable changes and features
  - Backends:
 	* New experimental HMPP backend
+	* Buffer size is checked when compiling with orcc. Size must be a power of 2.
+	* [C] Fifo optimizations to allow vectorization by compilers.
+	* [LLVM, TTA] Apply transformation removing disconnected output ports.
+	* [LLVM, TTA] Apply new short-circuit transformation.
+	* [LLVM] Support of 64 bits types.
+	* [TTA] New post treatment scripts for results analysis.
 
 ### Bugfixes
 
 ### Known problems
+- HEVC decoder build in release mode with LLVM Backend does not work.
 
 ### Misc
 
