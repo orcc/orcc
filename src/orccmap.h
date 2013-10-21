@@ -64,6 +64,10 @@ typedef enum {
     ORCC_ERR_DEF_OUTPUT,
     ORCC_ERR_METIS,
     ORCC_ERR_SWAP_ACTORS,
+    ORCC_ERR_ROXML_OPEN,
+    ORCC_ERR_ROXML_NODE_ROOT,
+    ORCC_ERR_ROXML_NODE_CONF,
+    ORCC_ERR_ROXML_NODE_PART,
     ORCC_ERR_SIZE /* only used for string tab declaration */
 } orccmap_error_et;
 
@@ -210,7 +214,7 @@ boolean print_trace_block(verbose_level_et level);
 /**
  * !TODO
  */
-void print_orcc_trace(verbose_level_et level, char *trace, ...);
+void print_orcc_trace(verbose_level_et level, const char *trace, ...);
 
 /**
  * !TODO
