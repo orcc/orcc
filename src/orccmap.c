@@ -289,13 +289,12 @@ actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
     return ret;
 }
 
-int swap_actors(actor_t **actors, int index1, int index2) {
+int swap_actors(actor_t **actors, int index1, int index2, int nb_actors) {
     assert(actors != NULL);
     int ret = ORCC_OK;
     char* tmpActorId;
     int tmpProcessorId, tmpId;
     double tmpWorkload;
-    int nb_actors = sizeof(actors)/sizeof(actor_t *);
 
     if (index1 < nb_actors && index2 < nb_actors) {
         tmpActorId = actors[index1]->name;
@@ -320,21 +319,26 @@ int swap_actors(actor_t **actors, int index1, int index2) {
     return ret;
 }
 
-int sort_actors(actor_t **actors) {
+int sort_actors(actor_t **actors, int nb_actors) {
     assert(actors != NULL);
     int ret = ORCC_OK;
     int i, j;
 
-    int nb_actors = sizeof(actors)/sizeof(actor_t *);
-
     for (i = 0; i < nb_actors; i++) {
         for (j = 0; j < nb_actors - i - 1; j++) {
             if (actors[j]->workload <= actors[j+1]->workload) {
-                swap_actors(actors, j, j+1);
+                swap_actors(actors, j, j+1, nb_actors);
             }
         }
     }
 
+    if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : The sorted list:");
+        for (i = 0; i < nb_actors; i++) {
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : ");
+            printf("Actor[%d]\tid = %s\tworkload = %.2lf", i, actors[i]->name, actors[i]->workload);
+        }
+    }
     return ret;
 }
 
@@ -397,8 +401,14 @@ int load_network(char *fileName, network_t *network) {
             node_t* nodeAttrActorId = roxml_get_attr(actorNode, "id", 0);
             network->actors[i]->name = roxml_get_content(nodeAttrActorId, NULL, 0, NULL);
             network->actors[i]->id = i;
-            network->actors[i]->workload = 1;
             network->actors[i]->processor_id = 0;
+
+            node_t* nodeAttrWorkload = roxml_get_attr(actorNode, "workload", 0);
+            if (nodeAttrWorkload != NULL) {
+                network->actors[i]->workload = atof(roxml_get_content(nodeAttrWorkload, NULL, 0, NULL));
+            } else {
+                network->actors[i]->workload = 1;
+            }
 
             if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
                 print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Load ");
@@ -652,7 +662,7 @@ int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying Round Robin strategy for mapping");
 
-    sort_actors(network->actors);
+    sort_actors(network->actors, network->nb_actors);
 
     for (i = 0; i < network->nb_actors; i++) {
         network->actors[i]->processor_id = k++;

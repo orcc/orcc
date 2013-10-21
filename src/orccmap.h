@@ -295,12 +295,12 @@ actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
 /**
  * !TODO
  */
-int swap_actors(actor_t **actors, int index1, int index2);
+int swap_actors(actor_t **actors, int index1, int index2, int nb_actors);
 
 /**
  * !TODO
  */
-int sort_actors(actor_t **actors);
+int sort_actors(actor_t **actors, int nb_actors);
 
 /**
  * !TODO
