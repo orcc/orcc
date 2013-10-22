@@ -36,11 +36,17 @@ import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
+import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
+import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.Connection;
+import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
+import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.AbstractConnectionPattern;
+import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
+import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
@@ -58,6 +64,37 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 public class ConnectionPattern extends AbstractConnectionPattern {
 
+	private enum PortDirection {
+		INPUT, OUTPUT
+	}
+	private enum PortType {
+		NETWORK_PORT, INSTANCE_PORT
+	}
+
+	private class PortInformation {
+		private final Port port;
+		private final PortDirection direction;
+		private final PortType type;
+
+		public PortInformation(Port port, PortDirection direction, PortType type) {
+			this.port = port;
+			this.direction = direction;
+			this.type = type;
+		}
+
+		public Port getPort() {
+			return port;
+		}
+
+		public PortDirection getDirection() {
+			return direction;
+		}
+
+		public PortType getType() {
+			return type;
+		}
+	}
+
 	@Override
 	public String getCreateName() {
 		return "Connection";
@@ -70,7 +107,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 	@Override
 	public boolean canStartConnection(ICreateConnectionContext context) {
-		final Port src = getPort(context.getSourceAnchor());
+		final PortInformation src = getPortInformations(context.getSourceAnchor());
 		if (src == null) {
 			return false;
 		}
@@ -80,34 +117,73 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	@Override
 	public boolean canCreate(ICreateConnectionContext context) {
 
-		final Port src = getPort(context.getSourceAnchor());
-		final Port trgt = getPort(context.getTargetAnchor());
+		final PortInformation src = getPortInformations(context.getSourceAnchor());
+		final PortInformation trgt = getPortInformations(context.getTargetAnchor());
 		if (src == null || trgt == null) {
 			return false;
 		}
+
+		// Disallow connection between 2 network ports
+		if (src.getType() == PortType.NETWORK_PORT && trgt.getType() == PortType.NETWORK_PORT) {
+			return false;
+		}
+
+		// Connection between instance ports are checked specifically
+		if (src.getType() == PortType.INSTANCE_PORT && trgt.getType() == PortType.INSTANCE_PORT) {
+
+			// User tries to connect 2 ports from the same instance
+			if (context.getSourcePictogramElement().eContainer() == context.getTargetPictogramElement().eContainer()) {
+				return false;
+			}
+
+			// User tries to connect incompatible ports directions
+			if (src.getDirection() == trgt.getDirection()) {
+				return false;
+			}
+		}
+
+		// net IN -> inst IN = OK
+		// net IN -> inst OUT = NOK
+		// net OUT -> inst OUT = OK
+		// net OUT -> inst IN = NOK
+		// etc.
+		if (src.getType() != trgt.getType()) {
+			if (src.getDirection() != trgt.getDirection()) {
+				return false;
+			}
+		}
+
+		// TODO: Check in an input port has not already a connection connected
+		// to it.
 		return true;
 	}
 
 	@Override
 	public Connection create(ICreateConnectionContext context) {
-		Connection newConnection = null;
-
-		// get EClasses which should be connected
-		Port sourcePort = getPort(context.getSourceAnchor());
-		Port targetPort = getPort(context.getTargetAnchor());
-
-		if (sourcePort != null && targetPort != null) {
-			// create new business object
-			net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection();
-
-			// TODO: set the in and out vertex for this connection
-
-			// add connection for business object
-			AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(),
-					context.getTargetAnchor());
-			addContext.setNewObject(dfConnection);
-			newConnection = (Connection) getFeatureProvider().addIfPossible(addContext);
+		// In some case, connection source and target need to be exchanged, to
+		// avoid arrow on the wrong side of the connection shape
+		final PortInformation src = getPortInformations(context.getSourceAnchor());
+		boolean needInverseSourceTarget = false;
+		if (src.getType() == PortType.NETWORK_PORT && src.getDirection() == PortDirection.OUTPUT) {
+			needInverseSourceTarget = true;
+		} else if (src.getType() == PortType.INSTANCE_PORT && src.getDirection() == PortDirection.INPUT) {
+			needInverseSourceTarget = true;
 		}
+
+		// Create connection context
+		final AddConnectionContext addContext;
+		if (needInverseSourceTarget) {
+			addContext = new AddConnectionContext(context.getTargetAnchor(), context.getSourceAnchor());
+		} else {
+			addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());
+		}
+
+		// Create new business object
+		final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection();
+		// TODO: set the in and out vertex for this connection
+
+		addContext.setNewObject(dfConnection);
+		Connection newConnection = (Connection) getFeatureProvider().addIfPossible(addContext);
 
 		return newConnection;
 	}
@@ -124,16 +200,20 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 	@Override
 	public PictogramElement add(IAddContext context) {
-		IAddConnectionContext addConContext = (IAddConnectionContext) context;
-		net.sf.orcc.df.Connection addedConnection = (net.sf.orcc.df.Connection) context.getNewObject();
-		IPeCreateService peCreateService = Graphiti.getPeCreateService();
+		final IAddConnectionContext addConContext = (IAddConnectionContext) context;
+		final net.sf.orcc.df.Connection addedConnection = (net.sf.orcc.df.Connection) context.getNewObject();
+		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
+		final IGaService gaService = Graphiti.getGaService();
 
 		// CONNECTION WITH POLYLINE
-		FreeFormConnection connection = peCreateService.createFreeFormConnection(getDiagram());
+		final FreeFormConnection connection = peCreateService.createFreeFormConnection(getDiagram());
 		connection.setStart(addConContext.getSourceAnchor());
 		connection.setEnd(addConContext.getTargetAnchor());
 
-		IGaService gaService = Graphiti.getGaService();
+		ConnectionDecorator cd;
+		cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+		createArrow(cd);
+
 		/* Polyline polyline = */gaService.createPolyline(connection);
 		StyleUtil.getStyleForConnection(getDiagram());
 
@@ -142,23 +222,42 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		return super.add(context);
 	}
 
-	private Port getPort(Anchor anchor) {
+	private PortInformation getPortInformations(Anchor anchor) {
 		if (anchor == null) {
 			return null;
 		}
 		// Instance port are linked directly to the anchor
 		Object obj = getBusinessObjectForPictogramElement(anchor);
 		if (obj instanceof Port) {
-			return (Port) obj;
+			FixPointAnchor fpAnchor = (FixPointAnchor) anchor;
+			// FIXME: a better detection of in/out port ?
+			PortDirection dir = fpAnchor.getLocation().getX() == 0 ? PortDirection.INPUT : PortDirection.OUTPUT;
+			PortInformation info = new PortInformation((Port) obj, dir, PortType.INSTANCE_PORT);
+			return info;
 		}
+
 		// Network ports are linked to the top level shape (anchor container)
 		obj = getBusinessObjectForPictogramElement(anchor.getParent());
 		if (obj instanceof Port) {
-			return (Port) obj;
+			// Retrieve the pattern corresponding to the current port
+			IPattern ipattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
+					.getPatternForPictogramElement(anchor.getParent());
+
+			// Check the type of this pattern to know the direction of the port
+			PortDirection dir = ipattern instanceof InputNetworkPortPattern ? PortDirection.INPUT
+					: PortDirection.OUTPUT;
+			PortInformation info = new PortInformation((Port) obj, dir, PortType.NETWORK_PORT);
+			return info;
 		}
 
 		// Anchor without port ? Maybe an error here...
 		return null;
 	}
 
+	private Polyline createArrow(GraphicsAlgorithmContainer gaContainer) {
+		IGaService gaService = Graphiti.getGaService();
+		Polyline polyline = gaService.createPolyline(gaContainer, new int[] { -15, 10, 0, 0, -15, -10 });
+		polyline.setStyle(StyleUtil.getStyleForConnection(getDiagram()));
+		return polyline;
+	}
 }

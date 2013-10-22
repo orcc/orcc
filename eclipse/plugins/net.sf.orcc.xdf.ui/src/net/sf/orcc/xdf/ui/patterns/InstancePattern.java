@@ -137,8 +137,9 @@ public class InstancePattern extends AbstractPatternWithProperties {
 				return true;
 			}
 
-			// In this case, we must ensure the network containing this port is
-			// NOT the network corresponding to the diagram
+			// TODO: In this case, we must ensure the network containing this
+			// port is NOT the network corresponding to the diagram. To do so,
+			// we need to have a Network instance created with the diagram
 		}
 		return object instanceof Instance;
 	}
