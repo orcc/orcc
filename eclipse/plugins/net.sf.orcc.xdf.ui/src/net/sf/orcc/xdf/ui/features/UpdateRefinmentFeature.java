@@ -29,7 +29,6 @@
 package net.sf.orcc.xdf.ui.features;
 
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.dialogs.EntitySelectionDialog;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
@@ -38,7 +37,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
@@ -141,14 +139,8 @@ public class UpdateRefinmentFeature extends AbstractCustomFeature {
 			return;
 		}
 
-		// Update the current instance with entity selected by user
-		instance.setEntity((EObject) entityDialog.getFirstResult());
-		// Inform editor that changes has been done in the model
-		hasDoneChanges = true;
-
 		// Now, we want to display ports of the selected entity in the instance
 		// shape (graphical representation of the Instance)
-
 		ContainerShape instanceShape;
 		{
 			final PictogramElement clickedPe = context.getPictogramElements()[0];
@@ -167,26 +159,10 @@ public class UpdateRefinmentFeature extends AbstractCustomFeature {
 				.getPatternForPictogramElement(instanceShape);
 		InstancePattern pattern = (InstancePattern) ipattern;
 
-		// Remove ports for this instance
-		pattern.cleanInputsPorts(instanceShape);
-		pattern.cleanOutputsPorts(instanceShape);
-
-		EList<Port> inputs, outputs;
-		if (instance.isActor()) {
-			inputs = instance.getActor().getInputs();
-			outputs = instance.getActor().getOutputs();
-		} else if (instance.isNetwork()) {
-			inputs = instance.getNetwork().getInputs();
-			outputs = instance.getNetwork().getOutputs();
-		} else {
-			// Error message ?
-			return;
-		}
-		// Add new ports to this instance
-		pattern.addInputsPorts(instanceShape, inputs);
-		pattern.addOutputsPorts(instanceShape, outputs);
-
-		layoutPictogramElement(instanceShape);
+		// Set refinement on selected instance
+		pattern.setInstanceRefinment(instanceShape, (EObject) entityDialog.getFirstResult());
+		// Inform editor that changes has been done in the model
+		hasDoneChanges = true;
 	}
 
 	@Override
