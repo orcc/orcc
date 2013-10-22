@@ -592,6 +592,8 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			portRect.setStyle(StyleUtil.getStyleForInstancePort(getDiagram()));
 			gaService.setLocationAndSize(portRect, 0, 0, PORT_SIDE_WITH, PORT_SIDE_WITH);
 
+			link(fpAnchor, port);
+
 			++i;
 		}
 	}

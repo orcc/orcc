@@ -71,29 +71,22 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 	@Override
 	public boolean canStartConnection(ICreateConnectionContext context) {
-		Anchor srcAnchor = context.getSourceAnchor();
-		if (srcAnchor == null) {
+		final Port src = getPort(context.getSourceAnchor());
+		if (src == null) {
 			return false;
 		}
-		Object obj = getBusinessObjectForPictogramElement(srcAnchor.getParent());
-		if (obj instanceof Port) {
-			return true;
-		}
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean canCreate(ICreateConnectionContext context) {
 
-		Anchor tgtAnchor = context.getTargetAnchor();
-		if (tgtAnchor == null) {
+		final Port src = getPort(context.getSourceAnchor());
+		final Port trgt = getPort(context.getTargetAnchor());
+		if (src == null || trgt == null) {
 			return false;
 		}
-		Object obj = getBusinessObjectForPictogramElement(tgtAnchor.getParent());
-		if (obj instanceof Port) {
-			return true;
-		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -149,6 +142,25 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		// create link and wire it
 		link(connection, addedConnection);
 		return super.add(context);
+	}
+
+	private Port getPort(Anchor anchor) {
+		if (anchor == null) {
+			return null;
+		}
+		// Instance port are linked directly to the anchor
+		Object obj = getBusinessObjectForPictogramElement(anchor);
+		if (obj instanceof Port) {
+			return (Port) obj;
+		}
+		// Network ports are linked to the top level shape (anchor container)
+		obj = getBusinessObjectForPictogramElement(anchor.getParent());
+		if (obj instanceof Port) {
+			return (Port) obj;
+		}
+
+		// Anchor without port ? Maybe an error here...
+		return null;
 	}
 
 }
