@@ -188,24 +188,27 @@ void delete_mapping(mapping_t *mapping) {
 void print_load_balancing(mapping_t *mapping) {
     assert(mapping != NULL);
     int i, j, nb_proc = 0;
-    double avgWeight = 0, maxWeight = 0, partWeight = 0;
+    double avgWeight = 0, partAvgWeight = 0, maxAvgWeight = 0;
+    double partWeight = 0, totalWeight = 0;
 
     for (i = 0; i < mapping->number_of_threads; i++) {
         partWeight = 0;
         for (j = 0; j < mapping->partitions_size[i]; j++) {
-            avgWeight += mapping->partitions_of_actors[i][j]->workload;
+            totalWeight += mapping->partitions_of_actors[i][j]->workload;
             partWeight += mapping->partitions_of_actors[i][j]->workload;
             nb_proc++;
         }
 
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "Weight of partition %d : %.2lf", i+1, partWeight);
-        if (maxWeight < partWeight)
-            maxWeight = partWeight;
+        partAvgWeight = ceil(partWeight / mapping->partitions_size[i]);
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "Partition %d average weight : %.2lf", i+1, partAvgWeight);
+        if (maxAvgWeight < partAvgWeight) {
+            maxAvgWeight = partAvgWeight;
+        }
     }
 
-    avgWeight = ceil(avgWeight / nb_proc);
-    print_orcc_trace(ORCC_VL_VERBOSE_2, "Average weight: %.2lf   Max weight: %.2lf", avgWeight, maxWeight);
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "Load balancing %.2lf", maxWeight/avgWeight);
+    avgWeight = ceil(totalWeight / nb_proc);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "Average weight: %.2lf   Max average weight: %.2lf", avgWeight, maxAvgWeight);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Load balancing %.2lf", maxAvgWeight/avgWeight);
 }
 
 void print_edge_cut(network_t *network) {
