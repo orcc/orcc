@@ -30,7 +30,6 @@ package net.sf.orcc.xdf.ui.patterns;
 
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
@@ -94,8 +93,8 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		Connection newConnection = null;
 
 		// get EClasses which should be connected
-		Port sourcePort = (Port) getBusinessObjectForPictogramElement(context.getSourceAnchor());
-		Port targetPort = (Port) getBusinessObjectForPictogramElement(context.getTargetAnchor());
+		Port sourcePort = getPort(context.getSourceAnchor());
+		Port targetPort = getPort(context.getTargetAnchor());
 
 		if (sourcePort != null && targetPort != null) {
 			// create new business object
@@ -116,8 +115,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	@Override
 	public boolean canAdd(IAddContext context) {
 		if (context instanceof IAddConnectionContext) {
-			OrccLogger.traceln(context.getNewObject().toString());
-			if (context.getNewObject() instanceof Connection) {
+			if (context.getNewObject() instanceof net.sf.orcc.df.Connection) {
 				return true;
 			}
 		}
@@ -127,7 +125,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	@Override
 	public PictogramElement add(IAddContext context) {
 		IAddConnectionContext addConContext = (IAddConnectionContext) context;
-		Connection addedConnection = (Connection) context.getNewObject();
+		net.sf.orcc.df.Connection addedConnection = (net.sf.orcc.df.Connection) context.getNewObject();
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 
 		// CONNECTION WITH POLYLINE
