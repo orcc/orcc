@@ -92,9 +92,7 @@ boolean print_trace_block(verbose_level_et level) {
 void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
     assert(trace != NULL);
 
-    /* Liste des arguments */
     va_list args;
-    /* Initialisation, à partir du dernier paramètre connu */
     va_start (args, trace);
 
     if (level <= verbose_level) {
@@ -102,7 +100,6 @@ void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
         vprintf(trace, args);
     }
 
-    /* Fermeture */
     va_end (args);
 }
 
@@ -212,23 +209,18 @@ void print_load_balancing(mapping_t *mapping) {
 }
 
 void print_edge_cut(network_t *network) {
-    int i, cut = 0;
+    int i, cut = 0, comm = 0;
 
     for (i = 0; i < network->nb_connections; i++) {
-        if (network->connections[i]->src->processor_id != network->connections[i]->dst->processor_id)
-            cut += network->connections[i]->workload;
+        if (network->connections[i]->src->processor_id != network->connections[i]->dst->processor_id) {
+            comm += network->connections[i]->workload;
+            cut++;
+        }
     }
 
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "Edgecut : %d", cut);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Edgecut : %d   Communication volume : %d", cut, comm);
 }
 
-void print_communication_volume(network_t *network) {
-    int i, comm = 0;
-
-    //!TODO: calculate communication volume
-
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "Communication volume : %d", comm);
-}
 
 
 /********************************************************************************************
@@ -487,7 +479,12 @@ int load_network(char *fileName, network_t *network) {
             char *dst = roxml_get_content(nodeAttrActorDst, NULL, 0, NULL);
             network->connections[i]->dst = find_actor_by_name(network->actors, dst, network->nb_actors);
 
-            network->connections[i]->workload = 1;
+            node_t* nodeAttrWorkload = roxml_get_attr(connectionNode, "workload", 0);
+            if (nodeAttrWorkload != NULL) {
+                network->connections[i]->workload = atof(roxml_get_content(nodeAttrWorkload, NULL, 0, NULL));
+            } else {
+                network->connections[i]->workload = 1;
+            }
 
             if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
                 print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Load Connection[%d]\tsrc = %s\t  dst = %s",

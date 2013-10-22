@@ -275,11 +275,6 @@ void print_load_balancing(mapping_t *mapping);
  */
 void print_edge_cut(network_t *network);
 
-/**
- * !TODO
- */
-void print_communication_volume(network_t *network);
-
 
 /********************************************************************************************
  *
