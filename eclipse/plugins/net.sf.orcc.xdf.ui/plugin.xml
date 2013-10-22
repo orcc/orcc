@@ -21,5 +21,21 @@
          </diagramType>
       </diagramTypeProvider>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            canFinishEarly="false"
+            category="net.sf.orcc.ui.OrccCategory"
+            class="net.sf.orcc.xdf.ui.wizards.NewNetworkWizard"
+            hasPages="true"
+            icon="icons/network.gif"
+            id="net.sf.orcc.ui.wizards.newNetworkWizard"
+            name="XDF Network (Graphiti)"
+            project="false">
+         <description>
+            Create a new network based on new Graphiti editor.
+         </description>
+      </wizard>
+   </extension>
 
 </plugin>

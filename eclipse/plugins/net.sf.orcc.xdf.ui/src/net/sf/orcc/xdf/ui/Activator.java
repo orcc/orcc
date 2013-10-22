@@ -43,6 +43,8 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 
+	public static String DIAGRAM_SUFFIX = "xdf2";
+
 	/**
 	 * The constructor
 	 */
