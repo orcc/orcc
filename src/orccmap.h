@@ -261,6 +261,28 @@ void delete_mapping(mapping_t *mapping);
 
 /********************************************************************************************
  *
+ * Functions for results printing
+ *
+ ********************************************************************************************/
+
+/**
+ * !TODO
+ */
+void print_load_balancing(mapping_t *mapping);
+
+/**
+ * !TODO
+ */
+void print_edge_cut(network_t *network);
+
+/**
+ * !TODO
+ */
+void print_communication_volume(network_t *network);
+
+
+/********************************************************************************************
+ *
  * Functions for Graph CSR data structure
  *
  ********************************************************************************************/

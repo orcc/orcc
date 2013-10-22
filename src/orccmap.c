@@ -29,6 +29,7 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#include <math.h>
 #include "orccmap.h"
 #include "roxml.h"
 
@@ -183,6 +184,55 @@ void delete_mapping(mapping_t *mapping) {
 
 /********************************************************************************************
  *
+ * Functions for results printing
+ *
+ ********************************************************************************************/
+
+void print_load_balancing(mapping_t *mapping) {
+    assert(mapping != NULL);
+    int i, j, nb_proc = 0;
+    double avgWeight = 0, maxWeight = 0, partWeight = 0;
+
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        partWeight = 0;
+        for (j = 0; j < mapping->partitions_size[i]; j++) {
+            avgWeight += mapping->partitions_of_actors[i][j]->workload;
+            partWeight += mapping->partitions_of_actors[i][j]->workload;
+            nb_proc++;
+        }
+
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "Weight of partition %d : %.2lf", i+1, partWeight);
+        if (maxWeight < partWeight)
+            maxWeight = partWeight;
+    }
+
+    avgWeight = ceil(avgWeight / nb_proc);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "Average weight: %.2lf   Max weight: %.2lf", avgWeight, maxWeight);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Load balancing %.2lf", maxWeight/avgWeight);
+}
+
+void print_edge_cut(network_t *network) {
+    int i, cut = 0;
+
+    for (i = 0; i < network->nb_connections; i++) {
+        if (network->connections[i]->src->processor_id != network->connections[i]->dst->processor_id)
+            cut += network->connections[i]->workload;
+    }
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Edgecut : %d", cut);
+}
+
+void print_communication_volume(network_t *network) {
+    int i, comm = 0;
+
+    //!TODO: calculate communication volume
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Communication volume : %d", comm);
+}
+
+
+/********************************************************************************************
+ *
  * Functions for Graph CSR data structure
  *
  ********************************************************************************************/
@@ -308,23 +358,12 @@ int swap_actors(actor_t **actors, int index1, int index2, int nb_actors) {
     char* tmpActorId;
     int tmpProcessorId, tmpId;
     double tmpWorkload;
+    actor_t *actor;
 
     if (index1 < nb_actors && index2 < nb_actors) {
-        tmpActorId = actors[index1]->name;
-        actors[index1]->name = actors[index2]->name;
-        actors[index2]->name = tmpActorId;
-
-        tmpId = actors[index1]->id;
-        actors[index1]->id = actors[index2]->id;
-        actors[index2]->id = tmpId;
-
-        tmpProcessorId = actors[index1]->processor_id;
-        actors[index1]->processor_id = actors[index2]->processor_id;
-        actors[index2]->processor_id = tmpProcessorId;
-
-        tmpWorkload = actors[index1]->workload;
-        actors[index1]->workload = actors[index2]->workload;
-        actors[index2]->workload = tmpWorkload;
+        actor = actors[index1];
+        actors[index1] = actors[index2];
+        actors[index1] = actor;
     } else {
         ret = ORCC_ERR_SWAP_ACTORS;
     }
@@ -423,7 +462,7 @@ int load_network(char *fileName, network_t *network) {
 
             if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
                 print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Load Actor[%d]\tname = %s\tworkload = %.2lf",
-                       i, network->actors[i]->name, network->actors[i]->workload);
+                                 i, network->actors[i]->name, network->actors[i]->workload);
             }
         }
         else {
@@ -452,7 +491,7 @@ int load_network(char *fileName, network_t *network) {
 
             if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
                 print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Load Connection[%d]\tsrc = %s\t  dst = %s",
-                       i, network->connections[i]->src->name, network->connections[i]->dst->name);
+                                 i, network->connections[i]->src->name, network->connections[i]->dst->name);
             }
 
         }
@@ -466,14 +505,6 @@ int load_network(char *fileName, network_t *network) {
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Number of actors is : %d", network->nb_actors);
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Number of connections is : %d", network->nb_connections);
     }
-
-    return ret;
-}
-
-int load_weights(char *fileName, network_t *network) {
-    assert(fileName != NULL);
-    assert(network != NULL);
-    int ret = ORCC_OK;
 
     return ret;
 }
@@ -516,6 +547,7 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
         network->actors[i]->processor_id = part[i];
     }
 
+    // Print results
     if (print_trace_block(ORCC_VL_VERBOSE_1) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Mapping result : ");
         for (i = 0; i < mapping->number_of_threads; i++) {
@@ -524,7 +556,11 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
                 print_orcc_trace(ORCC_VL_VERBOSE_1, "\t\t%s", mapping->partitions_of_actors[i][j]->name);
             }
         }
+
+        print_load_balancing(mapping);
+        print_edge_cut(network);
     }
+
     return ret;
 }
 
@@ -580,7 +616,6 @@ int save_mapping(char* fileName, mapping_t *mapping) {
 int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) {
     assert(part != NULL);
     int ret = ORCC_OK;
-    int i;
     idx_t ncon = 1;
     idx_t metis_opt[METIS_NOPTIONS];
     idx_t objval;
@@ -607,7 +642,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
                                    part); /*idx_t *part*/
     check_metis_error(ret);
 
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "METIS : Recursive partition edge-cut result : %d", objval);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "METIS Edgecut : %d", objval);
 
     delete_graph(graph);
     return ret;
@@ -616,7 +651,6 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
 int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
     assert(part != NULL);
     int ret = ORCC_OK;
-    int i;
     idx_t ncon = 1;
     idx_t metis_opt[METIS_NOPTIONS];
     idx_t objval;
@@ -643,7 +677,7 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
                               part); /*idx_t *part*/
     check_metis_error(ret);
 
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "METIS : K-way partition edge-cut result : %d", objval);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "METIS Edgecut : %d", objval);
 
     delete_graph(graph);
     return ret;
@@ -673,32 +707,40 @@ int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Round Robin result");
         for (i = 0; i < network->nb_actors; i++) {
             print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %.2lf\tprocessorId = %d",
-                   i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
+                             i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id+1);
         }
     }
+
     return ret;
 }
 
 int do_mapping(network_t *network, options_t opt, mapping_t *mapping) {
     assert(network != NULL);
     assert(mapping != NULL);
+    int i;
     int ret = ORCC_OK;
     idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network->nb_actors));
 
-    switch (opt.strategy) {
-    case ORCC_MS_METIS_REC:
-        ret = do_metis_recursive_partition(*network, opt, part);
-        break;
-    case ORCC_MS_METIS_KWAY:
-        ret = do_metis_kway_partition(*network, opt, part);
-        break;
-    case ORCC_MS_ROUND_ROBIN:
-        ret = do_round_robbin_mapping(network, opt, part);
-        break;
-    case ORCC_MS_OTHER:
-        break;
-    default:
-        break;
+    if (opt.nb_processors != 1) {
+        switch (opt.strategy) {
+        case ORCC_MS_METIS_REC:
+            ret = do_metis_recursive_partition(*network, opt, part);
+            break;
+        case ORCC_MS_METIS_KWAY:
+            ret = do_metis_kway_partition(*network, opt, part);
+            break;
+        case ORCC_MS_ROUND_ROBIN:
+            ret = do_round_robbin_mapping(network, opt, part);
+            break;
+        case ORCC_MS_OTHER:
+            break;
+        default:
+            break;
+        }
+    } else {
+        for (i = 0; i < network->nb_actors; i++) {
+            part[i] = network->actors[i]->processor_id;
+        }
     }
 
     set_mapping_from_partition(network, part, mapping);
