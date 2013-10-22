@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.xdf.ui.diagram;
 
+import net.sf.orcc.xdf.ui.features.LayoutDiagramFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinmentFeature;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
@@ -59,6 +60,6 @@ public class XdfDiagramFeatureProvider extends
 	
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new UpdateRefinmentFeature(this) };
+		return new ICustomFeature[] { new UpdateRefinmentFeature(this), new LayoutDiagramFeature(this) };
 	}
 }

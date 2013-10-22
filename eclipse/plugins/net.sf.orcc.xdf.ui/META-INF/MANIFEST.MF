@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.graphiti,
  org.eclipse.graphiti.ui,
  org.eclipse.graphiti.pattern,
- net.sf.orcc.core
+ net.sf.orcc.core,
+ org.eclipse.draw2d
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: net.sf.orcc.ui
