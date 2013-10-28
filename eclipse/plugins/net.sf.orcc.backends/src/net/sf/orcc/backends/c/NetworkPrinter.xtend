@@ -191,13 +191,8 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
-		// Declaration of a struct actor for each actor
-		«FOR child : network.children»
-			struct actor_s «child.label»;
-		«ENDFOR»
-
-		/////////////////////////////////////////////////
 		// Declaration of the actors array
+		
 		«FOR child : network.children»
 			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «IF geneticAlgo»«child.label»_reinitialize«ELSE»NULL«ENDIF», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0, 0.0};			
 		«ENDFOR»
@@ -207,7 +202,24 @@ class NetworkPrinter extends CTemplate {
 				&«child.label»
 			«ENDFOR»
 		};
+
+		/////////////////////////////////////////////////
+		// Declaration of the connections array
 		
+		«FOR connection : network.connections»
+			connection_t connection_«connection.source.label»_«connection.sourcePort.name»_«connection.target.label»_«connection.targetPort.name» = {&«connection.source.label», &«connection.target.label», 1};
+		«ENDFOR»
+		
+		connection_t *connections[] = {
+			«FOR connection : network.connections SEPARATOR ","»
+			    &connection_«connection.source.label»_«connection.sourcePort.name»_«connection.target.label»_«connection.targetPort.name»
+			«ENDFOR»
+		};
+		
+		/////////////////////////////////////////////////
+		// Declaration of the network
+		network_t network = {"«network.simpleName»", actors, connections, «network.allActors.size», «network.connections.size»};
+
 		«IF geneticAlgo»
 			extern int source_is_stopped();
 			extern int clean_cache(int size);
@@ -239,7 +251,7 @@ class NetworkPrinter extends CTemplate {
 		static void atexit_actions() {
 			«IF instrumentNetwork»
 				if (instrumentation_file != NULL) {
-					save_instrumentation(instrumentation_file, actors);
+					save_instrumentation(instrumentation_file, network);
 				}
 			«ENDIF»
 		}
@@ -354,20 +366,20 @@ class NetworkPrinter extends CTemplate {
 			while (1) {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
 				if(my_actor != NULL){
-				«IF instrumentNetwork»
-					if (instrumentation_file != NULL) {
-						tick_in = getticks();
-					}
-				«ENDIF»
+					«IF instrumentNetwork»
+						if (instrumentation_file != NULL) {
+							tick_in = getticks();
+						}
+					«ENDIF»
 					si.num_firings = 0;
 					my_actor->sched_func(&si);
-				«IF instrumentNetwork»
-					if (instrumentation_file != NULL) {
-						tick_out = getticks();
-						double diff_tick = elapsed(tick_out, tick_in);
-						my_actor->workload += diff_tick;
-					}
-				«ENDIF»
+					«IF instrumentNetwork»
+						if (instrumentation_file != NULL) {
+							tick_out = getticks();
+							double diff_tick = elapsed(tick_out, tick_in);
+							my_actor->workload += diff_tick;
+						}
+					«ENDIF»
 		#ifdef PRINT_FIRINGS
 					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 		#endif

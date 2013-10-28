@@ -292,7 +292,7 @@ struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
  * Save network's workloads from instrumentation to a file
  * that could be used for mapping.
  */
-void save_instrumentation(char* fileName, struct actor_s **actors) {
+void save_instrumentation(char* fileName, network_t network) {
     int i = 0;
     double total_workload = 0;
 
@@ -306,23 +306,27 @@ void save_instrumentation(char* fileName, struct actor_s **actors) {
         printf("ORCC_ERR_ROXML_NODE_CONF");
     }
     /*!TODO : get Network's name properly */
-    roxml_add_node(xdfNode, 0, ROXML_ATTR_NODE, "name", "Top_mpegh_part2_main");
+    roxml_add_node(xdfNode, 0, ROXML_ATTR_NODE, "name", network.name);
 
-    while (actors[i] != NULL) {
-        total_workload += actors[i]->workload;
-        i++;
+	for (i=0; i < network.nb_actors; i++) {
+        total_workload += network.actors[i]->workload;
     }
-    i = 0;
-    while (actors[i] != NULL) {
+	for (i=0; i < network.nb_actors; i++) {
         node_t* instanceNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Instance", NULL);
-        roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", actors[i]->name);
+        roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", network.actors[i]->name);
         char* workload = (char*) malloc(sizeof(double));
-        sprintf(workload, "%.2lf", actors[i]->workload*100/total_workload);
+        sprintf(workload, "%.2lf", network.actors[i]->workload*100/total_workload);
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "workload", workload);
-        i++;
     }
 
-    /*!TODO : connexions workloads */
+	for (i=0; i < network.nb_connections; i++) {
+        node_t* connectionNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Connection", NULL);
+        roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "src", network.connections[i]->src->name);
+        roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "dst", network.connections[i]->dst->name);
+        char* workload = (char*) malloc(sizeof(double));
+        sprintf(workload, "%.2lf", network.connections[i]->workload);
+        roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "workload", workload);
+    }
 
     roxml_commit_changes(rootNode, fileName, NULL, 1);
     roxml_close(rootNode);

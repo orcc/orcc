@@ -34,7 +34,10 @@
 
 #define MAX_ACTORS 1024
 
-struct actor_s {
+/*
+ * Actors are the vertices of orcc Networks
+ */
+typedef struct actor_s {
 	char *name;
 	int group; /** id of his group. */
 	void (*init_func)();
@@ -47,7 +50,27 @@ struct actor_s {
 	struct scheduler_s *sched; /** scheduler which execute this actor. */
 	int mapping; /** id of the processor core mapped to this actor. */
 	double workload; /** actor's workload gived by instrumention */
-};
+} actor_t;
+
+/*
+ * Connections are the edges of orcc Networks
+ */
+typedef struct connection_s {
+    actor_t *src;
+    actor_t *dst;
+    double workload;
+} connection_t;
+
+/*
+ * Orcc Networks are directed graphs
+ */
+typedef struct network_s {
+	char *name;
+    actor_t **actors;
+    connection_t **connections;
+    int nb_actors;
+    int nb_connections;
+} network_t;
 
 struct scheduler_s {
 	int id; /** Unique ID of this scheduler */
@@ -151,6 +174,6 @@ struct actor_s * find_actor(char *name, struct actor_s **actors,
  * Save network's workloads from instrumentation to a file
  * that could be used for mapping.
  */
-void save_instrumentation(char* fileName, struct actor_s **actors);
+void save_instrumentation(char* fileName, network_t network);
 
 #endif
