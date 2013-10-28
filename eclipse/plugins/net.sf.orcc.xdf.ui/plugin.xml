@@ -37,5 +37,11 @@
          </description>
       </wizard>
    </extension>
-
+   <extension
+      point="org.eclipse.emf.ecore.extension_parser">
+      <parser
+            class="net.sf.orcc.df.impl.XdfResourceFactoryImpl"
+            type="xdf2">
+      </parser>
+   </extension>
 </plugin>
