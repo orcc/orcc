@@ -29,8 +29,10 @@
 package net.sf.orcc.xdf.ui.patterns;
 
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
@@ -50,6 +52,7 @@ import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
+import org.eclipse.graphiti.services.ILinkService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
@@ -73,14 +76,20 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	}
 
 	private class PortInformation {
+		private final Vertex vertex;
 		private final Port port;
 		private final PortDirection direction;
 		private final PortType type;
 
-		public PortInformation(Port port, PortDirection direction, PortType type) {
+		public PortInformation(Vertex vertex, Port port, PortDirection direction, PortType type) {
+			this.vertex = vertex;
 			this.port = port;
 			this.direction = direction;
 			this.type = type;
+		}
+
+		public Vertex getVertex() {
+			return vertex;
 		}
 
 		public Port getPort() {
@@ -183,12 +192,12 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());
 		}
 
-		// Create new business object
-		final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection();
-
 		final PortInformation tgt = getPortInformations(context.getTargetAnchor());
-		Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
-		network.add(src.getPort(), tgt.getPort());
+		// Create new business object
+		final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection(src.getVertex(),
+				src.getPort(), tgt.getVertex(), tgt.getPort());
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		network.getConnections().add(dfConnection);
 
 		addContext.setNewObject(dfConnection);
 		Connection newConnection = (Connection) getFeatureProvider().addIfPossible(addContext);
@@ -230,7 +239,18 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		return super.add(context);
 	}
 
+	/**
+	 * Retrieve all information related to a port in a network/diagram. Build
+	 * corresponding PortInformation structure.
+	 * 
+	 * @param anchor
+	 *            The anchor corresponding to a port in a Network or an Instance
+	 * @return
+	 */
 	private PortInformation getPortInformations(Anchor anchor) {
+
+		ILinkService linkService = Graphiti.getLinkService();
+
 		if (anchor == null) {
 			return null;
 		}
@@ -240,7 +260,10 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			FixPointAnchor fpAnchor = (FixPointAnchor) anchor;
 			// FIXME: a better detection of in/out port ?
 			PortDirection dir = fpAnchor.getLocation().getX() == 0 ? PortDirection.INPUT : PortDirection.OUTPUT;
-			PortInformation info = new PortInformation((Port) obj, dir, PortType.INSTANCE_PORT);
+			Instance parentInstance = (Instance) linkService
+					.getBusinessObjectForLinkedPictogramElement(anchor
+					.getParent());
+			PortInformation info = new PortInformation(parentInstance, (Port) obj, dir, PortType.INSTANCE_PORT);
 			return info;
 		}
 
@@ -254,7 +277,10 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			// Check the type of this pattern to know the direction of the port
 			PortDirection dir = ipattern instanceof InputNetworkPortPattern ? PortDirection.INPUT
 					: PortDirection.OUTPUT;
-			PortInformation info = new PortInformation((Port) obj, dir, PortType.NETWORK_PORT);
+			Network network = (Network) linkService
+					.getBusinessObjectForLinkedPictogramElement((PictogramElement) anchor
+					.getParent().eContainer());
+			PortInformation info = new PortInformation(network, (Port) obj, dir, PortType.NETWORK_PORT);
 			return info;
 		}
 
