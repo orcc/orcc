@@ -81,6 +81,7 @@ class CMakePrinter extends CommonPrinter {
 		
 		# Runtime libraries inclusion
 		set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
+		set(CYCLE_INCLUDE_DIR ${LIBS_DIR}/cycle/include)
 		
 		«addLibrariesSubdirs»
 	'''
@@ -109,7 +110,7 @@ class CMakePrinter extends CommonPrinter {
 			«ENDFOR»
 		)
 
-		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
+		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${CYCLE_INCLUDE_DIR})
 
 		add_executable(«network.simpleName» ${filenames})
 

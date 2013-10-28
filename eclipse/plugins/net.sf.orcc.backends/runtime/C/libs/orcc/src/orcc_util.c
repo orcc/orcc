@@ -60,6 +60,9 @@ char *input_file;
 // output YUV file
 char *yuv_file;
 
+// instrumentation_file file
+char *instrumentation_file;
+
 // write file
 char *write_file;
 
@@ -135,8 +138,9 @@ static const char *usage =
 	"-o <reference file>        Check the output stream with a reference file (usually YUV).\n"
 	"-f <nb frames to decode>   Set the number of frames to decode before closing the application.\n"
 	"-l <nb input reading>      Set the number of times the input file is read before closing the application.\n"
-	"-g <output file>           Specify an output file for the genetic algorithm.\n";
-	// We need to document folowing options:
+    "-g <output file>           Specify an output file for the genetic algorithm.\n"
+    "-b <output file>           Specify an output file for instrumention.\n";
+    // We need to document folowing options:
 	//"-w <file>                  TBD...\n"
 
 void print_usage() {
@@ -149,7 +153,7 @@ void print_usage() {
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-	const char *ostr = "i:no:d:m:f:w:g:l:";
+    const char *ostr = "i:no:d:m:f:w:g:l:b:";
 	int c;
 
 	program = argv[0];
@@ -189,7 +193,10 @@ void init_orcc(int argc, char *argv[]) {
 		case 'w':
 			write_file = strdup(optarg);
 			break;
-		default:
+        case 'b':
+            instrumentation_file = strdup(optarg);
+            break;
+        default:
 			fprintf(stderr, "Skipping option -%c\n", c);
 			break;
 		}

@@ -46,6 +46,7 @@ struct actor_s {
 	int in_waiting; /** idem with the waiting list. */
 	struct scheduler_s *sched; /** scheduler which execute this actor. */
 	int mapping; /** id of the processor core mapped to this actor. */
+	double workload; /** actor's workload gived by instrumention */
 };
 
 struct scheduler_s {
@@ -145,5 +146,11 @@ struct mapping_s* map_actors(struct actor_s **actors, int actors_size);
  */
 struct actor_s * find_actor(char *name, struct actor_s **actors,
 		int actors_size);
+
+/**
+ * Save network's workloads from instrumentation to a file
+ * that could be used for mapping.
+ */
+void save_instrumentation(char* fileName, struct actor_s **actors);
 
 #endif
