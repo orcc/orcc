@@ -213,7 +213,15 @@ public class InstancePattern extends AbstractPatternWithProperties {
 
 	@Override
 	public boolean canCreate(ICreateContext context) {
-		return context.getTargetContainer() instanceof Diagram;
+		// We create the instance in a diagram
+		if (context.getTargetContainer() instanceof Diagram) {
+			// A network is associated to this diagram
+			Object bo = getBusinessObjectForPictogramElement(context.getTargetContainer());
+			if (bo instanceof Network) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -225,12 +233,15 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			newInstance = DfFactory.eINSTANCE.createInstance();
 		}
 
-		// TODO: We must add the new instance to an Xdf resource created
-		// earlier, instead of in the .diragram file directly
-		getDiagram().eResource().getContents().add(newInstance);
+		// Add the new Instance to the current Network
+		Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		network.add(newInstance);
 
+		// Request adding the shape to the diagram
 		addGraphicalRepresentation(context, newInstance);
 
+		// Activate direct editing on creation. A label input appear to allow
+		// user to type a name for the instance
 		getFeatureProvider().getDirectEditingInfo().setActive(true);
 
 		return new Object[] { newInstance };

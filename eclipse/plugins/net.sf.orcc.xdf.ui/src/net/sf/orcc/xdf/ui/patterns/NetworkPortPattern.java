@@ -29,6 +29,7 @@
 package net.sf.orcc.xdf.ui.patterns;
 
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
@@ -84,6 +85,8 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 	abstract protected String getInOutIdentifier();
 
+	abstract protected void addPortToNetwork(Port port, Network network);
+
 	@Override
 	protected String[] getValidIdentifiers() {
 		return validIds;
@@ -132,7 +135,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		Port obj = (Port) getBusinessObjectForPictogramElement(pe);
 		obj.setName(value);
 
-		// layout(pe) and update(pe) can oly be called with the root element.
+		// layout(pe) and update(pe) can only be called with the root element.
 		// This method can be used on the shape or on the text label. Before
 		// requesting an update, we need to get the root element
 		if (!isPatternRoot(pe)) {
@@ -166,17 +169,30 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 	@Override
 	public boolean canCreate(ICreateContext context) {
-		return context.getTargetContainer() instanceof Diagram;
+		// We create the instance in a diagram
+		if (context.getTargetContainer() instanceof Diagram) {
+			// A network is associated to this diagram
+			Object bo = getBusinessObjectForPictogramElement(context.getTargetContainer());
+			if (bo instanceof Network) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public Object[] create(ICreateContext context) {
+		// Create the Port instance
 		Port newPort = DfFactory.eINSTANCE.createPort();
-		setInOutType(newPort);
+		// Add the new Instance to the current Network
+		Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
 
-		// TODO: We must add the new port to an Xdf resource created
-		// earlier, instead of in the .diragram file directly
-		getDiagram().eResource().getContents().add(newPort);
+		// Add the newly created port to the network
+		addPortToNetwork(newPort, network);
+
+		// Configure property on port, to detect later if it is an input or an
+		// output one
+		setInOutType(newPort);
 
 		addGraphicalRepresentation(context, newPort);
 

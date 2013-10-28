@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.xdf.ui.patterns;
 
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 
 import org.eclipse.graphiti.mm.algorithms.Polygon;
@@ -65,5 +67,10 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 	@Override
 	protected String getInOutIdentifier() {
 		return INOUT_ID;
+	}
+
+	@Override
+	protected void addPortToNetwork(Port port, Network network) {
+		network.addInput(port);
 	}
 }

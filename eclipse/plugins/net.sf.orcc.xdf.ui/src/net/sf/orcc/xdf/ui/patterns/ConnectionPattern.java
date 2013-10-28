@@ -29,6 +29,7 @@
 package net.sf.orcc.xdf.ui.patterns;
 
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 
@@ -116,6 +117,10 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 	@Override
 	public boolean canCreate(ICreateConnectionContext context) {
+		// The current diagram has a Network attached
+		if (!(getBusinessObjectForPictogramElement(getDiagram()) instanceof Network)) {
+			return false;
+		}
 
 		final PortInformation src = getPortInformations(context.getSourceAnchor());
 		final PortInformation trgt = getPortInformations(context.getTargetAnchor());
@@ -180,7 +185,10 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 		// Create new business object
 		final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection();
-		// TODO: set the in and out vertex for this connection
+
+		final PortInformation tgt = getPortInformations(context.getTargetAnchor());
+		Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		network.add(src.getPort(), tgt.getPort());
 
 		addContext.setNewObject(dfConnection);
 		Connection newConnection = (Connection) getFeatureProvider().addIfPossible(addContext);
