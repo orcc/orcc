@@ -39,9 +39,6 @@ extern char *input_file;
 // output YUV file
 extern char *yuv_file;
 
-// instrumentation_file file
-extern char *instrumentation_file;
-
 // write file
 extern char *write_file;
 
