@@ -31,6 +31,7 @@ package net.sf.orcc.xdf.ui.patterns;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
@@ -132,8 +133,8 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	@Override
 	public void setValue(String value, IDirectEditingContext context) {
 		PictogramElement pe = context.getPictogramElement();
-		Port obj = (Port) getBusinessObjectForPictogramElement(pe);
-		obj.setName(value);
+		Port port = (Port) getBusinessObjectForPictogramElement(pe);
+		port.setName(value);
 
 		// layout(pe) and update(pe) can only be called with the root element.
 		// This method can be used on the shape or on the text label. Before
@@ -184,11 +185,11 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	public Object[] create(ICreateContext context) {
 		// Create the Port instance
 		Port newPort = DfFactory.eINSTANCE.createPort();
-		// Add the new Instance to the current Network
-		Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		// Set default type to i32 for the port
+		newPort.setType(IrFactory.eINSTANCE.createTypeInt(32));
 
 		// Add the newly created port to the network
-		addPortToNetwork(newPort, network);
+		addPortToNetwork(newPort, (Network) getBusinessObjectForPictogramElement(getDiagram()));
 
 		// Configure property on port, to detect later if it is an input or an
 		// output one
