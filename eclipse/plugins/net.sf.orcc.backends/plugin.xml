@@ -20,6 +20,9 @@
                id="net.sf.orcc.backends.geneticAlgorithm">
          </option>
          <option
+               id="net.sf.orcc.backends.instrumentNetwork">
+         </option>
+         <option
                id="net.sf.orcc.backends.metricMapping">
          </option>
          <option
@@ -255,6 +258,13 @@
             		<textBox></textBox>
          		</option>
             </checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Instrument network"
+               id="net.sf.orcc.backends.instrumentNetwork"
+               name="[BETA] Instrument network">
+            <checkBox></checkBox>
          </option>
          <option
                defaultValue="false"
