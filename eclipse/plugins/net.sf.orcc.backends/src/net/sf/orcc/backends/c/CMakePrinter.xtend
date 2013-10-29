@@ -95,9 +95,9 @@ class CMakePrinter extends CommonPrinter {
 			«ENDFOR»
 		)
 
-		add_executable(Top_mpeg4_part2_SP_decoder ${filenames})
+		add_executable(«network.simpleName» ${filenames})
 
 		# Build library without any external library required
-		target_link_libraries(Top_mpeg4_part2_SP_decoder orcc)
+		target_link_libraries(«network.simpleName» orcc)
 	'''
 }
