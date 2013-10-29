@@ -79,7 +79,7 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 		this.workbench = workbench;
 
 		WizardNewFileCreationPage page = new WizardNewFileCreationPage("filenameSelection", selection);
-		page.setFileExtension(Activator.DIAGRAM_SUFFIX);
+		page.setFileExtension(Activator.NETWORK_SUFFIX);
 		page.setDescription("Here is my description");
 
 		// Fill the page with a filename, if user selected one
@@ -119,7 +119,7 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 		Network network = DfFactory.eINSTANCE.createNetwork();
 		network.setName(networkName);
 		// Create a new diagram
-		Diagram diagram = Graphiti.getPeCreateService().createDiagram(Activator.DIAGRAM_SUFFIX, networkName, true);
+		Diagram diagram = Graphiti.getPeCreateService().createDiagram(Activator.DIAGRAM_TYPE, networkName, true);
 
 		// Link diagram to network
 		PictogramLink link = PictogramsFactory.eINSTANCE.createPictogramLink();
@@ -129,7 +129,7 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 		// Initialize URIs for diagram and xdf resources
 		IPath xdfPath = file.getFullPath();
 		URI xdfUri = URI.createPlatformResourceURI(xdfPath.toString(), true);
-		IPath diagramPath = xdfPath.removeFileExtension().addFileExtension("diagram");
+		IPath diagramPath = xdfPath.removeFileExtension().addFileExtension(Activator.DIAGRAM_SUFFIX);
 		URI diagramUri = URI.createPlatformResourceURI(diagramPath.toString(), true);
 
 		// Create a resource to store network content

@@ -6,7 +6,7 @@
          point="org.eclipse.graphiti.ui.diagramTypes">
       <diagramType
             name="XDF Network"
-            type="xdf2"
+            type="xdfDiagram"
             id="net.sf.orcc.xdf.ui.XdfDiagramType">
       </diagramType>
    </extension>
