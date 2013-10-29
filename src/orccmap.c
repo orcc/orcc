@@ -569,9 +569,9 @@ int save_mapping(char* fileName, mapping_t *mapping) {
 
     /* !TODO: if the output file already exists, backup of the file and advert the user */
 
-    node_t* rootNode = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+    node_t* rootNode = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\" encoding=\"UTF-8\"");
     if (rootNode == NULL) {
-        check_orcc_error(ORCC_ERR_ROXML_NODE_ROOT);
+        printf("ORCC_ERR_ROXML_NODE_ROOT");
     }
 
     node_t* configNode = roxml_add_node(rootNode, 0, ROXML_ELM_NODE, "Configuration", NULL);
@@ -588,7 +588,7 @@ int save_mapping(char* fileName, mapping_t *mapping) {
         node_t* processorNode = roxml_add_node(partitionNode, 0, ROXML_ELM_NODE, "Partition", NULL);
 
         char* procId = (char*) malloc(sizeof(int));
-        sprintf(procId, "proc_%d", i+1);
+        sprintf(procId, "%d", i);
         roxml_add_node(processorNode, 0, ROXML_ATTR_NODE, "id", procId);
 
         for (j = 0; j < mapping->partitions_size[i]; j++) {
