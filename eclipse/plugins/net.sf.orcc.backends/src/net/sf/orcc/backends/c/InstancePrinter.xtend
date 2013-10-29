@@ -358,6 +358,16 @@ class InstancePrinter extends CTemplate {
 
 		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
+		// Token functions
+		«FOR port : actor.inputs»
+			«port.readTokensFunctions»
+		«ENDFOR»
+
+		«FOR port : actor.outputs.notNative»
+			«port.writeTokensFunctions»
+		«ENDFOR»
+
+		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
 		«FOR proc : actor.procs»
 			«proc.declare»
@@ -371,16 +381,6 @@ class InstancePrinter extends CTemplate {
 		// Actions
 		«FOR action : actor.actions»
 			«action.print»
-		«ENDFOR»
-
-		////////////////////////////////////////////////////////////////////////////////
-		// Token functions
-		«FOR port : actor.inputs»
-			«port.readTokensFunctions»
-		«ENDFOR»
-
-		«FOR port : actor.outputs.notNative»
-			«port.writeTokensFunctions»
 		«ENDFOR»
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -784,6 +784,9 @@ class InstancePrinter extends CTemplate {
 				}
 				«ENDIF»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
+				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				read_end_«port.name»();
+				«ENDIF»
 				«IF instrumentNetwork»
 				if (instrumentation_file != NULL) {
 					tokens_«port.name»_workload += «action.inputPattern.getNumTokens(port)»;
@@ -801,6 +804,9 @@ class InstancePrinter extends CTemplate {
 					}
 				«ENDIF»
 				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
+				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				write_end_«port.name»();
+				«ENDIF»
 			«ENDFOR»
 		}
 		«ENDIF»
@@ -844,6 +850,10 @@ class InstancePrinter extends CTemplate {
 					}
 					«ENDIF»
 					index_«port.name» += «action.inputPattern.getNumTokens(port)»;
+
+					«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+					read_end_«port.name»();
+					«ENDIF»
 				«ENDFOR»
 
 				«FOR port : action.outputPattern.ports»
@@ -856,6 +866,10 @@ class InstancePrinter extends CTemplate {
 						}
 					«ENDIF»
 					index_«port.name» += «action.outputPattern.getNumTokens(port)»;
+
+					«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+					write_end_«port.name»();
+					«ENDIF»
 				«ENDFOR»
 			}
 			«ENDIF»
