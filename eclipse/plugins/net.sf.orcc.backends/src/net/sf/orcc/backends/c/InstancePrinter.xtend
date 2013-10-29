@@ -83,6 +83,7 @@ class InstancePrinter extends CTemplate {
 	protected var String entityName
 
 	protected var boolean geneticAlgo = false
+	protected var boolean instrumentNetwork = false
 	protected var boolean isActionVectorizable = false
 
 	var boolean newSchedul = false
@@ -117,6 +118,9 @@ class InstancePrinter extends CTemplate {
 
 		if (options.containsKey(GENETIC_ALGORITHM)) {
 			geneticAlgo = options.get(GENETIC_ALGORITHM) as Boolean
+		}
+		if (options.containsKey(INSTRUMENT_NETWORK)) {
+			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
 		}
 
 		if (options.containsKey(THREADS_NB)) {
@@ -251,7 +255,12 @@ class InstancePrinter extends CTemplate {
 				static unsigned int numTokens_«port.name»;
 				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
-
+				
+				«IF instrumentNetwork»
+					extern connection_t connection_«incomingPortMap.get(port).source.label»_«incomingPortMap.get(port).sourcePort.name»_«actor.name»_«port.name»;
+					#define tokens_«port.name»_workload connection_«incomingPortMap.get(port).source.label»_«incomingPortMap.get(port).sourcePort.name»_«actor.name»_«port.name».workload
+				«ENDIF»
+				
 			«ENDFOR»
 			«IF enableTrace»
 				////////////////////////////////////////////////////////////////////////////////
@@ -775,6 +784,11 @@ class InstancePrinter extends CTemplate {
 				}
 				«ENDIF»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
+				«IF instrumentNetwork»
+				if (instrumentation_file != NULL) {
+					tokens_«port.name»_workload += «action.inputPattern.getNumTokens(port)»;
+				}
+				«ENDIF»			
 			«ENDFOR»
 
 			«FOR port : action.outputPattern.ports»
