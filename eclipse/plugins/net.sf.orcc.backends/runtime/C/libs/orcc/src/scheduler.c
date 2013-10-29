@@ -319,12 +319,16 @@ void save_instrumentation(char* fileName, network_t network) {
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "workload", workload);
     }
 
-	for (i=0; i < network.nb_connections; i++) {
+    total_workload = 0;
+    for (i=0; i < network.nb_connections; i++) {
+        total_workload += network.connections[i]->workload;
+    }
+    for (i=0; i < network.nb_connections; i++) {
         node_t* connectionNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Connection", NULL);
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "src", network.connections[i]->src->name);
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "dst", network.connections[i]->dst->name);
         char* workload = (char*) malloc(sizeof(double));
-        sprintf(workload, "%.2lf", network.connections[i]->workload);
+        sprintf(workload, "%.2lf", 0.01+(network.connections[i]->workload*10000/total_workload));
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "workload", workload);
     }
 
