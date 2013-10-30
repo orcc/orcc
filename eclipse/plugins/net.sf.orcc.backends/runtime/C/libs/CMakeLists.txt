@@ -61,6 +61,7 @@ else()
 			orcc/src/fpsPrint.c
 			orcc/src/genetic.c
 			orcc/src/thread.c
+            orcc/src/orcc_open_hevc.c
 			# Headers
 			orcc/include/orcc_fifo.h
 			orcc/include/orcc_fifo_socket.h
@@ -72,6 +73,7 @@ else()
 			orcc/include/orcc_scheduler.inl
 			orcc/include/orcc_thread.h
 			orcc/include/socket.h
+            orcc/include/orcc_open_hevc.h
 		)
 
 		# Compile libraries
