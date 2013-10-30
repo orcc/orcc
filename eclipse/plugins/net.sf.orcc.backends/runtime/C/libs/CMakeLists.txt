@@ -14,7 +14,7 @@ set(orcc_sources
 # Build library without any external library required (SDL, pthread, etc)
 if(NO_EXTERNAL_DEPENDENCIES)
 
-	add_library (orcc STATIC ${orcc_sources})
+	add_library(orcc STATIC ${orcc_sources})
 
 # Build library with all features (require external libraries)
 else()
@@ -44,6 +44,15 @@ else()
 
 	# Try to find SDL on the user system
 	find_package(SDL REQUIRED)
+	
+	# To enable usage of SSE instructions, simply add a folder named "openHevc" or "libOpenHevc"
+	# directly in the libs folder. This folder must contain the *.lib file corresponding to libLibOpenHevcWrapper.dll
+	# You can put files under lib/x86 or lib/x64 according to the architecture.
+	# The OPEN_HEVC_ENABLE constant will be set automatically, to activate usage of these SSE instructions.
+    find_library(OpenHevc libLibOpenHevcWrapper PATHS ${CMAKE_CURRENT_SOURCE_DIR}/openHevc ${CMAKE_CURRENT_SOURCE_DIR}/libOpenHevc)
+    if(OpenHevc)
+        add_definitions(-DOPEN_HEVC_ENABLE)
+    endif()
 
 	if(SDL_FOUND)
 		include_directories(
@@ -78,9 +87,12 @@ else()
 
 		# Compile libraries
 		add_library(roxml STATIC ${roxml_sources})
-		add_library (orcc STATIC ${orcc_sources})
+		add_library(orcc STATIC ${orcc_sources})
 
 		# Do the linking
-		target_link_libraries(orcc roxml ${SDL_LIBRARY})
+        target_link_libraries(orcc roxml ${SDL_LIBRARY})
+        if(OpenHevc)
+            target_link_libraries(orcc ${OpenHevc})
+        endif()
 	endif()
 endif()
