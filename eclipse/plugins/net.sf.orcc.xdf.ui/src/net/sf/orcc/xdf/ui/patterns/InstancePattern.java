@@ -104,7 +104,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	private final String SEP_ID = "INSTANCE_SEPARATOR";
 	private final String INPUTS_ID = "INPUTS_AREA";
 	private final String OUTPUTS_ID = "OUTPUTS_AREA";
-	private final String[] validIds = { INSTANCE_ID, LABEL_ID, OUTPUTS_ID, INPUTS_ID };
+	private final String[] validIds = { INSTANCE_ID, LABEL_ID, SEP_ID, INPUTS_ID, OUTPUTS_ID };
 
 	private enum PortsType {
 		INPUTS, OUTPUTS
@@ -146,8 +146,20 @@ public class InstancePattern extends AbstractPatternWithProperties {
 
 	@Override
 	protected boolean isPatternControlled(PictogramElement pe) {
-		return super.isPatternControlled(pe)
-				|| isMainBusinessObjectApplicable(getBusinessObjectForPictogramElement(pe));
+
+		// If PE is one of the objects with a defined ID
+		if (super.isPatternControlled(pe)) {
+			return true;
+		}
+
+		// Port squares and texts are not directly identified, but texts are
+		// contained in OUTPUTS_ID or INPUTSS_ID and squares ports are contained
+		// in the top level shape
+		if (super.isPatternControlled((PictogramElement) pe.eContainer())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -465,7 +477,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			Text txt = (Text) pe.getGraphicsAlgorithm();
 			Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
 			if (!txt.getValue().equals(instance.getName())) {
-				return Reason.createTrueReason("The instance name has been updated outside of the diagram");
+				return Reason.createTrueReason("The instance name has been updated from outside diagram");
 			}
 		}
 
