@@ -120,6 +120,8 @@ options_t *set_default_options() {
     options_t *opt = (options_t*) malloc(sizeof(options_t));
     opt->strategy = ORCC_MS_ROUND_ROBIN;
     opt->nb_processors = 1;
+    opt->input_file = "";
+    opt->output_file = "";
 
     return opt;
 }
@@ -133,18 +135,19 @@ void delete_options(options_t *opt) {
 
 /**
  * Creates a graph CSR structure.
- * If the graph is supposed to be undirected, each edge will appears 2 times.
  */
-adjacency_list *allocate_graph(network_t network, boolean is_directed) {
+adjacency_list *allocate_graph(int nb_vertices, int nb_edges) {
     adjacency_list *graph;
-    int mult = (is_directed == TRUE)?1:2;
-    graph = (adjacency_list*) malloc(sizeof(adjacency_list));
-    graph->xadj = (idx_t*) malloc(sizeof(idx_t) * (network.nb_actors + 1));
-    graph->vwgt = (idx_t*) malloc(sizeof(idx_t) * (network.nb_actors));
-    graph->adjncy = (idx_t*) malloc(sizeof(idx_t) * network.nb_connections * mult);
-    graph->adjwgt = (idx_t*) malloc(sizeof(idx_t) * network.nb_connections * mult);
 
-    graph->is_directed = is_directed;
+    graph = (adjacency_list*) malloc(sizeof(adjacency_list));
+    graph->xadj = (idx_t*) malloc(sizeof(idx_t) * (nb_vertices + 1));
+    graph->vwgt = (idx_t*) malloc(sizeof(idx_t) * nb_vertices);
+    graph->adjncy = (idx_t*) malloc(sizeof(idx_t) * nb_edges);
+    graph->adjwgt = (idx_t*) malloc(sizeof(idx_t) * nb_edges);
+
+    graph->nb_edges = nb_edges;
+    graph->nb_vertices = nb_vertices;
+    graph->xadj[graph->nb_vertices] = graph->nb_edges;
     return graph;
 }
 
@@ -229,14 +232,21 @@ void print_edge_cut(network_t *network) {
  *
  ********************************************************************************************/
 
-boolean is_directed(adjacency_list al) {
-    return al.is_directed;
+void print_graph(adjacency_list *graph) {
+    assert(graph != NULL);
+    int i, j;
+    for (i = 0; i < graph->nb_vertices; i++) {
+        printf("\n %3d | %3d | ", i, graph->xadj[i+1] - graph->xadj[i]);
+        for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
+            printf("%3d:%d ", graph->adjncy[j], graph->adjwgt[j]);
+        }
+    }
 }
 
-int set_directed_graph_from_network(adjacency_list *graph, network_t network) {
-    assert(graph != NULL);
-    int ret = ORCC_OK;
+adjacency_list *set_graph_from_network(network_t network) {
     int i, j, k = 0;
+
+    adjacency_list *graph = allocate_graph(network.nb_actors, network.nb_connections);
 
     for (i = 0; i < network.nb_actors; i++) {
         graph->xadj[i] = k;
@@ -250,77 +260,101 @@ int set_directed_graph_from_network(adjacency_list *graph, network_t network) {
         }
     }
 
-    graph->xadj[network.nb_actors] = network.nb_connections;
-    graph->nb_vertices = network.nb_actors;
-    graph->nb_edges = network.nb_connections;
-
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Directed graph data");
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : CSR xadj : ");
-        for (i = 0; i < network.nb_actors + 1; i++) {
-            printf("%d ", graph->xadj[i]);
-        }
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : CSR adjncy : ");
-        for (i = 0; i < network.nb_connections; i++) {
-            printf("%d ", graph->adjncy[i]);
-        }
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : CSR Graph generated from Network :");
+        print_graph(graph);
     }
 
-    return ret;
+    return graph;
 }
 
-int set_undirected_graph_from_network(adjacency_list *graph, network_t network) {
+void check_graph_for_metis(adjacency_list *graph) {
     assert(graph != NULL);
-    int ret = ORCC_OK;
-    int i, j, k = 0;
+    int i, j, k;
+    int nbSelf = 0, nbNullEdgeWeight = 0, nbNullVerticeWeight = 0, nbDuplicateEdge = 0, nbUndirectedEdge = 0;
 
-    for (i = 0; i < network.nb_actors; i++) {
-        graph->xadj[i] = k;
-        graph->vwgt[i] = network.actors[i]->workload;
-        for (j = 0; j < network.nb_connections; j++) {
-            if (network.connections[j]->src == network.actors[i]) {
-                graph->adjncy[k] = network.connections[j]->dst->id;
-                graph->adjwgt[k] = network.connections[j]->workload;
-                k++;
-            } else if (network.connections[j]->dst == network.actors[i]) {
-                graph->adjncy[k] = network.connections[j]->src->id;
-                graph->adjwgt[k] = network.connections[j]->workload;
-                k++;
+    for (i = 0; i < graph->nb_vertices; i++) {
+        if (graph->vwgt[i] == 0) {
+            //TODO
+            nbNullVerticeWeight++;
+        }
+
+        for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
+            /* Remove self-edges */
+            if (graph->adjncy[j] == i) {
+                //TODO
+                nbSelf++;
+            }
+            if (graph->adjwgt[j] == 0) {
+                //TODO
+                nbNullEdgeWeight++;
+            }
+            for (k = graph->xadj[graph->adjncy[j]]; k < graph->xadj[graph->adjncy[j]+1]; k++) {
+                if (graph->adjncy[k] == i) {
+                    //TODO
+                    nbUndirectedEdge++;
+                }
+            }
+            for (k = graph->xadj[i]; k < graph->xadj[i+1]; k++) {
+                if ((j != k) && (graph->adjncy[k] == graph->adjncy[j])) {
+                    //TODO
+                    nbDuplicateEdge++;
+                }
             }
         }
     }
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Self-edges=%d   Duplicate edges=%d   Undirected edges=%d",nbSelf ,nbDuplicateEdge, nbUndirectedEdge);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Null weights vertices=%d   edges=%d",nbNullVerticeWeight ,nbNullEdgeWeight);
+}
 
-    graph->xadj[network.nb_actors] = network.nb_connections * 2;
-    graph->nb_vertices = network.nb_actors;
-    graph->nb_edges = network.nb_connections;
+
+/*************************************************************************
+ *
+ *      This function creates a graph whose topology is consistent with
+ *	    Metis' requirements that:
+ *	    - There are no self-edges.
+ *	    - It is undirected; i.e., (u,v) and (v,u) should be present and of the
+ *	      same weight.
+ *	    - The adjacency list should not contain multiple edges to the same
+ *	      other vertex.
+ *      - Weights are > 0
+ *
+ *	    Any of the above errors are fixed by performing the following operations:
+ *	    - Self-edges are removed.
+ *	    - The undirected graph is formed by the union of edges.
+ *      - One of the duplicate edges is selected.
+ *      - !TODO : If Weights <= 0 : what should we do ?
+ *
+ **************************************************************************/
+adjacency_list *fix_graph_for_metis(adjacency_list *graph) {
+    assert(graph != NULL);
+    int nb_edges = 0;
+    adjacency_list *metis_graph;
 
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Undirected graph data");
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : CSR xadj : ");
-        for (i = 0; i < network.nb_actors + 1; i++) {
-            printf("%d ", graph->xadj[i]);
-        }
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : CSR adjncy : ");
-        for (i = 0; i < network.nb_connections * 2; i++) {
-            printf("%d ", graph->adjncy[i]);
-        }
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixing CSR graph for Metis");
+        check_graph_for_metis(graph);
     }
 
-    return ret;
-}
+    nb_edges = graph->nb_edges;
 
-int set_graph_from_network(adjacency_list *graph, network_t network) {
-    assert(graph != NULL);
-    int ret = ORCC_OK;
+    metis_graph = allocate_graph(graph->nb_vertices, nb_edges);
+    arrayCopy(metis_graph->xadj, graph->xadj, graph->nb_vertices+1);
+    arrayCopy(metis_graph->vwgt, graph->vwgt, graph->nb_vertices);
+//    arrayCopy(metis_graph->adjncy, graph->adjncy, graph->nb_edges);
+//    arrayCopy(metis_graph->adjwgt, graph->adjwgt, graph->nb_edges);
 
-    if (is_directed(*graph) == TRUE) {
-        ret = set_directed_graph_from_network(graph, network);
-    } else {
-        ret = set_undirected_graph_from_network(graph, network);
+    //!TODO : fix edges here
+
+    if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixed CSR Graph for Metis :");
+        print_graph(metis_graph);
+        check_graph_for_metis(metis_graph);
     }
 
-    return ret;
+    return metis_graph;
 }
+
 
 /********************************************************************************************
  *
@@ -347,9 +381,6 @@ actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
 int swap_actors(actor_t **actors, int index1, int index2, int nb_actors) {
     assert(actors != NULL);
     int ret = ORCC_OK;
-    char* tmpActorId;
-    int tmpProcessorId, tmpId;
-    double tmpWorkload;
     actor_t *actor;
 
     if (index1 < nb_actors && index2 < nb_actors) {
@@ -379,7 +410,7 @@ int sort_actors(actor_t **actors, int nb_actors) {
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : The sorted list:");
         for (i = 0; i < nb_actors; i++) {
-            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tid = %s\tworkload = %.2lf", i, actors[i]->name, actors[i]->workload);
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tid = %s\tworkload = %d", i, actors[i]->name, actors[i]->workload);
         }
     }
     return ret;
@@ -447,13 +478,13 @@ int load_network(char *fileName, network_t *network) {
 
             node_t* nodeAttrWorkload = roxml_get_attr(actorNode, "workload", 0);
             if (nodeAttrWorkload != NULL) {
-                network->actors[i]->workload = atof(roxml_get_content(nodeAttrWorkload, NULL, 0, NULL));
+                network->actors[i]->workload = atoi(roxml_get_content(nodeAttrWorkload, NULL, 0, NULL));
             } else {
                 network->actors[i]->workload = 1;
             }
 
             if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
-                print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Load Actor[%d]\tname = %s\tworkload = %.2lf",
+                print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Load Actor[%d]\tname = %s\tworkload = %d",
                                  i, network->actors[i]->name, network->actors[i]->workload);
             }
         }
@@ -481,7 +512,7 @@ int load_network(char *fileName, network_t *network) {
 
             node_t* nodeAttrWorkload = roxml_get_attr(connectionNode, "workload", 0);
             if (nodeAttrWorkload != NULL) {
-                network->connections[i]->workload = atof(roxml_get_content(nodeAttrWorkload, NULL, 0, NULL));
+                network->connections[i]->workload = atoi(roxml_get_content(nodeAttrWorkload, NULL, 0, NULL));
             } else {
                 network->connections[i]->workload = 1;
             }
@@ -616,21 +647,24 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
     idx_t ncon = 1;
     idx_t metis_opt[METIS_NOPTIONS];
     idx_t objval;
-    adjacency_list *graph = allocate_graph(network, (opt.strategy != ORCC_MS_METIS_REC && opt.strategy != ORCC_MS_METIS_KWAY)?TRUE:FALSE);
+    adjacency_list *graph, *metis_graph;
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying METIS Recursive partition for mapping");
 
     METIS_SetDefaultOptions(metis_opt);
-    ret = set_graph_from_network(graph, network);
-    check_orcc_error(ret);
 
-    ret = METIS_PartGraphRecursive(&graph->nb_vertices, /* idx_t *nvtxs */
+    graph = set_graph_from_network(network);
+    metis_graph = fix_graph_for_metis(graph);
+    printf("\n");
+    exit(0);
+
+    ret = METIS_PartGraphRecursive(&metis_graph->nb_vertices, /* idx_t *nvtxs */
                                    &ncon, /*idx_t *ncon*/
-                                   graph->xadj, /*idx_t *xadj*/
-                                   graph->adjncy, /*idx_t *adjncy*/
-                                   graph->vwgt, /*idx_t *vwgt*/
+                                   metis_graph->xadj, /*idx_t *xadj*/
+                                   metis_graph->adjncy, /*idx_t *adjncy*/
+                                   metis_graph->vwgt, /*idx_t *vwgt*/
                                    NULL, /*idx_t *vsize*/
-                                   graph->adjwgt, /*idx_t *adjwgt*/
+                                   metis_graph->adjwgt, /*idx_t *adjwgt*/
                                    &opt.nb_processors, /*idx_t *nparts*/
                                    NULL, /*real t *tpwgts*/
                                    NULL, /*real t ubvec*/
@@ -642,6 +676,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
     print_orcc_trace(ORCC_VL_VERBOSE_2, "METIS Edgecut : %d", objval);
 
     delete_graph(graph);
+    delete_graph(metis_graph);
     return ret;
 }
 
@@ -651,13 +686,17 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
     idx_t ncon = 1;
     idx_t metis_opt[METIS_NOPTIONS];
     idx_t objval;
-    adjacency_list *graph = allocate_graph(network, (opt.strategy != ORCC_MS_METIS_REC && opt.strategy != ORCC_MS_METIS_KWAY)?TRUE:FALSE);
+    adjacency_list *graph, *metis_graph;
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying METIS Kway partition for mapping");
 
     METIS_SetDefaultOptions(metis_opt);
-    ret = set_graph_from_network(graph, network);
-    check_orcc_error(ret);
+    metis_opt[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; /* METIS_OBJTYPE_VOL or METIS_OBJTYPE_CUT */
+
+    graph = set_graph_from_network(network);
+    metis_graph = fix_graph_for_metis(graph);
+    printf("\n");
+    exit(0);
 
     ret = METIS_PartGraphKway(&graph->nb_vertices, /* idx_t *nvtxs */
                               &ncon, /*idx_t *ncon*/
@@ -703,8 +742,8 @@ int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Round Robin result");
         for (i = 0; i < network->nb_actors; i++) {
-            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %.2lf\tprocessorId = %d",
-                             i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id+1);
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %d\tprocessorId = %d",
+                             i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
         }
     }
 

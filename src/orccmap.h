@@ -34,6 +34,10 @@
 #include <stdlib.h>
 #include "metis.h"
 
+#define arrayCopy(DST,SRC,LEN) \
+            { size_t TMPSZ = sizeof(*(SRC)) * (LEN); \
+              if ( ((DST) = malloc(TMPSZ)) != NULL ) \
+                memcpy((DST), (SRC), TMPSZ); }
 
 /********************************************************************************************
  *
@@ -103,9 +107,6 @@ typedef struct options_s
  */
 typedef struct adjacency_list
 {
-    /* is_directed : True if the graph is directed, esle False */
-    boolean is_directed;
-
     /* xadj : For each vertex i, xadj[i] gives the entry index in the array adjncy */
     int32_t *xadj;
 
@@ -127,7 +128,7 @@ typedef struct adjacency_list
  */
 typedef struct actor_s {
     char *name;
-    double workload;
+    int workload;
     int id;
     int processor_id;
 } actor_t;
@@ -138,7 +139,7 @@ typedef struct actor_s {
 typedef struct connection_s {
     actor_t *src;
     actor_t *dst;
-    double workload;
+    int workload;
 } connection_t;
 
 /*
@@ -239,9 +240,8 @@ void delete_options(options_t *opt);
 
 /**
  * Creates a graph CSR structure.
- * If the graph is supposed to be undirected, each edge will appears 2 times.
  */
-adjacency_list *allocate_graph(network_t network, boolean is_directed);
+adjacency_list *allocate_graph(int nb_actors, int nb_edges);
 
 /**
  * Releases memory of the given graph CSR structure.
@@ -285,22 +285,23 @@ void print_edge_cut(network_t *network);
 /**
  * !TODO
  */
-boolean is_directed(adjacency_list al);
+void print_graph(adjacency_list *graph);
 
 /**
  * !TODO
  */
-int set_directed_graph_from_network(adjacency_list *graph, network_t network);
+adjacency_list *set_graph_from_network(network_t network);
 
 /**
  * !TODO
  */
-int set_undirected_graph_from_network(adjacency_list *graph, network_t network);
+void check_graph_for_metis(adjacency_list *graph);
 
 /**
  * !TODO
  */
-int set_graph_from_network(adjacency_list *graph, network_t network);
+adjacency_list *fix_graph_for_metis(adjacency_list *graph);
+
 
 /********************************************************************************************
  *
