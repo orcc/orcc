@@ -8,11 +8,15 @@ Bundle-Vendor: IETR/INSA Rennes
 Require-Bundle: net.sf.orcc.core,
  org.eclipse.ui,
  org.eclipse.ui.ide,
+ org.eclipse.ui.views.properties.tabbed,
+ org.eclipse.ui.workbench,
  org.eclipse.core.runtime,
  org.eclipse.graphiti,
  org.eclipse.graphiti.ui,
  org.eclipse.graphiti.pattern,
- org.eclipse.draw2d
+ org.eclipse.draw2d,
+ org.eclipse.gef,
+ org.eclipse.emf.transaction
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: net.sf.orcc.ui
