@@ -294,7 +294,7 @@ struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
  */
 void save_instrumentation(char* fileName, network_t network) {
     int i = 0;
-    double total_workload = 0;
+    long long  total_workload = 0;
 
     node_t* rootNode = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\" encoding=\"UTF-8\"");
     if (rootNode == NULL) {
@@ -315,7 +315,7 @@ void save_instrumentation(char* fileName, network_t network) {
         node_t* instanceNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Instance", NULL);
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", network.actors[i]->name);
         char* workload = (char*) malloc(sizeof(double));
-        sprintf(workload, "%.2lf", network.actors[i]->workload*100/total_workload);
+        sprintf(workload, "%d", 1+100*(int)network.actors[i]->workload*100/total_workload);
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "workload", workload);
     }
 
@@ -328,7 +328,7 @@ void save_instrumentation(char* fileName, network_t network) {
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "src", network.connections[i]->src->name);
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "dst", network.connections[i]->dst->name);
         char* workload = (char*) malloc(sizeof(double));
-        sprintf(workload, "%.2lf", 0.01+(network.connections[i]->workload*10000/total_workload));
+        sprintf(workload, "%d", 1+(int)(network.connections[i]->workload*100000/total_workload));
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "workload", workload);
     }
 
