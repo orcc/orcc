@@ -83,28 +83,28 @@ import org.eclipse.graphiti.services.IPeCreateService;
 public class InstancePattern extends AbstractPatternWithProperties {
 
 	// Minimal and default width for an instance shape
-	private static int TOTAL_MIN_WIDTH = 120;
+	private static final int TOTAL_MIN_WIDTH = 120;
 	// Minimal and default height for an instance shape
-	private static int TOTAL_MIN_HEIGHT = 140;
+	private static final int TOTAL_MIN_HEIGHT = 140;
 	// Height of instance label (displaying instance name)
-	private static int LABEL_HEIGHT = 40;
+	private static final int LABEL_HEIGHT = 40;
 	// Width of the line shape used as separator
-	private static int SEPARATOR = 1;
+	private static final int SEPARATOR = 1;
 
 	// Minimal space between input and output areas
-	private static int PORTS_AREAS_SPACE = 4;
+	private static final int PORTS_AREAS_SPACE = 4;
 	// Width of the square representing a port
-	private static int PORT_SIDE_WITH = 12;
+	private static final int PORT_SIDE_WITH = 12;
 	// Space set around a port square
-	private static int PORT_MARGIN = 2;
+	private static final int PORT_MARGIN = 2;
 
 	// Identifiers for important shape of an instance
-	private final String INSTANCE_ID = "INSTANCE";
-	private final String LABEL_ID = "INSTANCE_LABEL";
-	private final String SEP_ID = "INSTANCE_SEPARATOR";
-	private final String INPUTS_ID = "INPUTS_AREA";
-	private final String OUTPUTS_ID = "OUTPUTS_AREA";
-	private final String[] validIds = { INSTANCE_ID, LABEL_ID, SEP_ID, INPUTS_ID, OUTPUTS_ID };
+	private static final String INSTANCE_ID = "INSTANCE";
+	private static final String LABEL_ID = "INSTANCE_LABEL";
+	private static final String SEP_ID = "INSTANCE_SEPARATOR";
+	private static final String INPUTS_ID = "INPUTS_AREA";
+	private static final String OUTPUTS_ID = "OUTPUTS_AREA";
+	private static final String[] validIds = { INSTANCE_ID, LABEL_ID, SEP_ID, INPUTS_ID, OUTPUTS_ID };
 
 	private enum PortsType {
 		INPUTS, OUTPUTS
