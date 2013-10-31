@@ -39,7 +39,9 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IReason;
@@ -105,6 +107,8 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	private static final String INPUTS_ID = "INPUTS_AREA";
 	private static final String OUTPUTS_ID = "OUTPUTS_AREA";
 	private static final String[] validIds = { INSTANCE_ID, LABEL_ID, SEP_ID, INPUTS_ID, OUTPUTS_ID };
+
+	private static final String REFINEMENT_KEY = "refinment";
 
 	private enum PortsType {
 		INPUTS, OUTPUTS
@@ -520,6 +524,8 @@ public class InstancePattern extends AbstractPatternWithProperties {
 		// Set the current instance's entity
 		final Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
 		instance.setEntity(entity);
+		Graphiti.getPeService()
+				.setPropertyValue(pe, REFINEMENT_KEY, entity.eResource().getURI().toPlatformString(true));
 
 		final ContainerShape topLevelShape = (ContainerShape) pe;
 		final ContainerShape inCtrShape = (ContainerShape) getPeFromIdentifier(pe, INPUTS_ID);
@@ -755,5 +761,33 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			}
 		}
 		return minWidth;
+	}
+
+	/**
+	 * Return the name of the instance without using the business object
+	 * 
+	 * @param pe
+	 * @return
+	 */
+	public String getNameFromShape(PictogramElement pe) {
+		if (isPatternRoot(pe)) {
+			final PictogramElement txtShape = getPeFromIdentifier(pe, LABEL_ID);
+			final Text text = (Text) txtShape.getGraphicsAlgorithm();
+			return text.getValue();
+		}
+		return "";
+	}
+
+	public EObject getRefinementFromShape(PictogramElement pe) {
+		if (isPatternRoot(pe)) {
+			String plateforStringUri = Graphiti.getPeService().getPropertyValue(pe, REFINEMENT_KEY);
+			Resource res = XdfUtil.getCommonresourceSet().getResource(
+					URI.createPlatformResourceURI(plateforStringUri, true),
+					true);
+			if (res.getContents().size() > 0) {
+				return res.getContents().get(0);
+			}
+		}
+		return null;
 	}
 }

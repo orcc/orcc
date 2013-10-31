@@ -60,6 +60,10 @@ public class XdfUtil {
 
 	private static ResourceSet resourceSet = new ResourceSetImpl();
 
+	public static ResourceSet getCommonresourceSet() {
+		return resourceSet;
+	}
+
 	public static Shell getDefaultShell() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();

@@ -31,6 +31,7 @@ package net.sf.orcc.xdf.ui.features;
 import java.io.IOException;
 
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -38,6 +39,7 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.common.util.URI;
@@ -50,6 +52,9 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
+import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.ILinkService;
 
@@ -97,14 +102,9 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 		final Network network;
 		if (linkedBo == null || !(linkedBo instanceof Network)) {
-			try {
-				network = XdfUtil.createNetworkResource(xdfUri);
-			} catch (IOException e) {
-				OrccLogger.severeln("Unable to create the network resource " + xdfUri);
-				return false;
-			}
-			link(diagram, network);
-			hasDoneChanges = true;
+
+			hasDoneChanges = initializeNetworkFromDiagram(diagram);
+			return true;
 		} else {
 			network = (Network) linkedBo;
 
@@ -124,6 +124,36 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		}
 
 		hasDoneChanges |= updateContentsIfNeeded(network, diagram);
+
+		return true;
+	}
+
+	private boolean initializeNetworkFromDiagram(Diagram diagram) {
+		final URI diagramUri = diagram.eResource().getURI();
+		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(Activator.NETWORK_SUFFIX);
+
+		final Network network;
+		try {
+			network = XdfUtil.createNetworkResource(xdfUri);
+		} catch (IOException e) {
+			OrccLogger.severeln("Unable to create the network resource " + xdfUri);
+			return false;
+		}
+		link(diagram, network);
+
+		for (Shape shape : diagram.getChildren()) {
+			IPattern pattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
+					.getPatternForPictogramElement(shape);
+
+			if (pattern instanceof InstancePattern) {
+				InstancePattern instancePattern = (InstancePattern) pattern;
+				Instance instance = DfFactory.eINSTANCE.createInstance(instancePattern.getNameFromShape(shape),
+						instancePattern.getRefinementFromShape(shape));
+
+				network.add(instance);
+				link(shape, instance);
+			}
+		}
 
 		return true;
 	}
