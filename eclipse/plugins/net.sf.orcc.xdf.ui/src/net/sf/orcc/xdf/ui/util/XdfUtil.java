@@ -28,11 +28,24 @@
  */
 package net.sf.orcc.xdf.ui.util;
 
+import java.io.IOException;
+import java.util.Collections;
+
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.xdf.ui.Activator;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.graphiti.ui.services.IUiLayoutService;
 import org.eclipse.swt.widgets.Shell;
@@ -44,6 +57,8 @@ import org.eclipse.ui.PlatformUI;
  * 
  */
 public class XdfUtil {
+
+	private static ResourceSet resourceSet = new ResourceSetImpl();
 
 	public static Shell getDefaultShell() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
@@ -57,6 +72,39 @@ public class XdfUtil {
 		return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path))
 				.getProject();
 	}
+
+	public static Network createNetworkResource(URI uri) throws IOException {
+
+		// Compute the new network name
+		final String name = uri.trimFileExtension().lastSegment();
+
+		// Create the network
+		final Network network = DfFactory.eINSTANCE.createNetwork();
+		network.setName(name);
+
+		// Create the resource
+		Resource res = resourceSet.createResource(uri);
+		res.getContents().add(network);
+		res.save(Collections.EMPTY_MAP);
+
+		return network;
+	}
+
+	public static Diagram createDiagramResource(URI uri) throws IOException {
+		// Compute the new diagram name
+		final String name = uri.trimFileExtension().lastSegment();
+
+		// Create the diagram
+		final Diagram diagram = Graphiti.getPeCreateService().createDiagram(Activator.DIAGRAM_TYPE, name, true);
+
+		// Create the resource
+		Resource res = resourceSet.createResource(uri);
+		res.getContents().add(diagram);
+		res.save(Collections.EMPTY_MAP);
+
+		return diagram;
+	}
+
 
 	/**
 	 * Returns the minimal width needed to display the value of given Text with

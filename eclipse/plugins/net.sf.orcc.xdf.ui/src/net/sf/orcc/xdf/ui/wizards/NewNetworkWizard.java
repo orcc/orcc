@@ -29,22 +29,16 @@
 package net.sf.orcc.xdf.ui.wizards;
 
 import java.io.IOException;
-import java.util.Collections;
 
-import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.xdf.ui.Activator;
+import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramLink;
 import org.eclipse.graphiti.mm.pictograms.PictogramsFactory;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -112,42 +106,18 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 			return false;
 		}
 
-		// File name (without extension)
-		String networkName = file.getFullPath().removeFileExtension().lastSegment();
-
-		// Create a new network
-		Network network = DfFactory.eINSTANCE.createNetwork();
-		network.setName(networkName);
-		// Create a new diagram
-		Diagram diagram = Graphiti.getPeCreateService().createDiagram(Activator.DIAGRAM_TYPE, networkName, true);
-
-		// Link diagram to network
-		PictogramLink link = PictogramsFactory.eINSTANCE.createPictogramLink();
-		link.getBusinessObjects().add(network);
-		diagram.setLink(link);
-
-		// Initialize URIs for diagram and xdf resources
-		IPath xdfPath = file.getFullPath();
-		URI xdfUri = URI.createPlatformResourceURI(xdfPath.toString(), true);
-		IPath diagramPath = xdfPath.removeFileExtension().addFileExtension(Activator.DIAGRAM_SUFFIX);
-		URI diagramUri = URI.createPlatformResourceURI(diagramPath.toString(), true);
-
-		// Create a resource to store network content
-		// Obtain a new resource set
-		ResourceSet resourceSet = new ResourceSetImpl();
-
-		// Create resources
-		Resource xdfResource = resourceSet.createResource(xdfUri);
-		Resource diagramResource = resourceSet.createResource(diagramUri);
-
-		// Get the first model element and cast it to the right type, in my
-		// example everything is hierarchical included in this first node
-		xdfResource.getContents().add(network);
-		diagramResource.getContents().add(diagram);
+		URI xdfUri = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
+		URI diagramUri = xdfUri.trimFileExtension().appendFileExtension(Activator.DIAGRAM_SUFFIX);
 
 		try {
-			xdfResource.save(Collections.EMPTY_MAP);
-			diagramResource.save(Collections.EMPTY_MAP);
+
+			Network network = XdfUtil.createNetworkResource(xdfUri);
+			Diagram diagram = XdfUtil.createDiagramResource(diagramUri);
+
+			// Link diagram to network
+			PictogramLink link = PictogramsFactory.eINSTANCE.createPictogramLink();
+			link.getBusinessObjects().add(network);
+			diagram.setLink(link);
 		} catch (IOException e) {
 			return false;
 		}
