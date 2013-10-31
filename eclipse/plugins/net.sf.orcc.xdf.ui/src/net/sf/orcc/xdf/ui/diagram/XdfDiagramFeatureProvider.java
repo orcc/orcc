@@ -29,6 +29,7 @@
 package net.sf.orcc.xdf.ui.diagram;
 
 import net.sf.orcc.xdf.ui.features.LayoutDiagramFeature;
+import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinmentFeature;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
@@ -36,7 +37,9 @@ import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.ICustomContext;
+import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
 
@@ -61,5 +64,10 @@ public class XdfDiagramFeatureProvider extends
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
 		return new ICustomFeature[] { new UpdateRefinmentFeature(this), new LayoutDiagramFeature(this) };
+	}
+
+	@Override
+	protected IUpdateFeature getUpdateFeatureAdditional(IUpdateContext context) {
+		return new UpdateDiagramFeature(this);
 	}
 }

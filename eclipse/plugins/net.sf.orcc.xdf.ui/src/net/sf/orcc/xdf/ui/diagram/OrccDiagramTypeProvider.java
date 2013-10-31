@@ -53,4 +53,9 @@ public class OrccDiagramTypeProvider extends AbstractDiagramTypeProvider {
 		}
 		return toolBehaviorProviders;
 	}
+
+	@Override
+	public boolean isAutoUpdateAtStartup() {
+		return true;
+	}
 }
