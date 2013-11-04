@@ -30,7 +30,6 @@ package net.sf.orcc.xdf.ui.features;
 
 import java.io.IOException;
 
-import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -39,6 +38,8 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
+import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
+import net.sf.orcc.xdf.ui.patterns.ConnectionPattern.PortInformation;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
@@ -53,6 +54,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
+import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
@@ -127,7 +129,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 		hasDoneChanges |= updateContentsIfNeeded(network, diagram);
 
-		return true;
+		return hasDoneChanges;
 	}
 
 	private boolean initializeNetworkFromDiagram(Diagram diagram) {
@@ -144,32 +146,42 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		link(diagram, network);
 
 		for (Shape shape : diagram.getChildren()) {
-			IPattern pattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
+			final IPattern pattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
 					.getPatternForPictogramElement(shape);
 
 			if (pattern instanceof InstancePattern) {
-				InstancePattern instancePattern = (InstancePattern) pattern;
-				Instance instance = DfFactory.eINSTANCE.createInstance(instancePattern.getNameFromShape(shape),
+				final InstancePattern instancePattern = (InstancePattern) pattern;
+				final Instance instance = DfFactory.eINSTANCE.createInstance(instancePattern.getNameFromShape(shape),
 						instancePattern.getRefinementFromShape(shape));
 
 				network.add(instance);
 				link(shape, instance);
 			} else if (pattern instanceof InputNetworkPortPattern) {
-				InputNetworkPortPattern inPortPattern = (InputNetworkPortPattern) pattern;
-				Port port = DfFactory.eINSTANCE.createPort(inPortPattern.getTypeFromShape(shape),
+				final InputNetworkPortPattern inPortPattern = (InputNetworkPortPattern) pattern;
+				final Port port = DfFactory.eINSTANCE.createPort(inPortPattern.getTypeFromShape(shape),
 						inPortPattern.getNameFromShape(shape));
 
 				network.addInput(port);
 				link(shape, port);
 				shape.getLink().getBusinessObjects().add(port.getType());
 			} else if (pattern instanceof OutputNetworkPortPattern) {
-				OutputNetworkPortPattern outPortPattern = (OutputNetworkPortPattern) pattern;
-				Port port = DfFactory.eINSTANCE.createPort(outPortPattern.getTypeFromShape(shape),
+				final OutputNetworkPortPattern outPortPattern = (OutputNetworkPortPattern) pattern;
+				final Port port = DfFactory.eINSTANCE.createPort(outPortPattern.getTypeFromShape(shape),
 						outPortPattern.getNameFromShape(shape));
 
 				network.addOutput(port);
 				link(shape, port);
 				shape.getLink().getBusinessObjects().add(port.getType());
+			} else if (pattern instanceof ConnectionPattern) {
+				final ConnectionPattern connPattern = (ConnectionPattern) pattern;
+				final Connection connection = (Connection) shape;
+
+				final PortInformation src = connPattern.getPortInformations(connection.getStart());
+				final PortInformation tgt = connPattern.getPortInformations(connection.getEnd());
+
+				final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection(src.getVertex(), src.getPort(), tgt.getVertex(), tgt.getPort());
+				network.getConnections().add(dfConnection);
+				link(connection, dfConnection);
 			}
 		}
 
@@ -185,7 +197,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	 * 
 	 * @param network
 	 * @param diagram
-	 * @return
+	 * @return true if something has been modified
 	 */
 	private boolean updateContentsIfNeeded(Network network, Diagram diagram) {
 
@@ -204,11 +216,11 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			// TODO
 		}
 
-		for (Connection con : network.getConnections()) {
+		for (net.sf.orcc.df.Connection con : network.getConnections()) {
 			// TODO
 		}
 
-		return true;
+		return false;
 	}
 
 }

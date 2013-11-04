@@ -75,7 +75,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		NETWORK_PORT, INSTANCE_PORT
 	}
 
-	private class PortInformation {
+	public class PortInformation {
 		private final Vertex vertex;
 		private final Port port;
 		private final PortDirection direction;
@@ -248,7 +248,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	 *            The anchor corresponding to a port in a Network or an Instance
 	 * @return
 	 */
-	private PortInformation getPortInformations(Anchor anchor) {
+	public PortInformation getPortInformations(Anchor anchor) {
 
 		ILinkService linkService = Graphiti.getLinkService();
 
