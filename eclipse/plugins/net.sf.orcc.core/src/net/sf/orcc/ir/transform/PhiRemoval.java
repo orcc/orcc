@@ -126,6 +126,9 @@ public class PhiRemoval extends AbstractIrVisitor<Void> {
 		caseBlockBasic(join);
 		new PhiRemover().caseBlockBasic(join);
 
+		// visit inner blocks
+		doSwitch(block.getBlocks());
+
 		return null;
 	}
 
