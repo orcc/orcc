@@ -176,7 +176,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	public Connection create(ICreateConnectionContext context) {
 		// In some case, connection source and target need to be exchanged, to
 		// avoid arrow on the wrong side of the connection shape
-		final PortInformation src = getPortInformations(context.getSourceAnchor());
+		PortInformation src = getPortInformations(context.getSourceAnchor());
 		boolean needInverseSourceTarget = false;
 		if (src.getType() == PortType.NETWORK_PORT && src.getDirection() == PortDirection.OUTPUT) {
 			needInverseSourceTarget = true;
@@ -192,7 +192,8 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());
 		}
 
-		final PortInformation tgt = getPortInformations(context.getTargetAnchor());
+		src = getPortInformations(addContext.getSourceAnchor());
+		final PortInformation tgt = getPortInformations(addContext.getTargetAnchor());
 		// Create new business object
 		final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection(src.getVertex(),
 				src.getPort(), tgt.getVertex(), tgt.getPort());
