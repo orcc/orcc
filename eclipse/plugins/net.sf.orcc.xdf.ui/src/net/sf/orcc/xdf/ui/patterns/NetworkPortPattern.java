@@ -32,9 +32,11 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -185,8 +187,9 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	public Object[] create(ICreateContext context) {
 		// Create the Port instance
 		Port newPort = DfFactory.eINSTANCE.createPort();
+
 		// Set default type to i32 for the port
-		newPort.setType(IrFactory.eINSTANCE.createTypeInt(32));
+		newPort.setType(IrFactory.eINSTANCE.createTypeInt());
 
 		// Add the newly created port to the network
 		addPortToNetwork(newPort, (Network) getBusinessObjectForPictogramElement(getDiagram()));
@@ -257,6 +260,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		directEditingInfo.setMainPictogramElement(containerShape);
 		setIdentifier(containerShape, getInOutIdentifier());
 		link(containerShape, addedDomainObject);
+		containerShape.getLink().getBusinessObjects().add(addedDomainObject.getType());
 
 		peCreateService.createChopboxAnchor(containerShape);
 
@@ -333,6 +337,26 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			return getPeFromIdentifier(pe, SHAPE_ID).getGraphicsAlgorithm();
 		}
 		return null;
+	}
+
+	public Type getTypeFromShape(PictogramElement pe) {
+		if (isPatternRoot(pe)) {
+			pe.getLink().getBusinessObjects();
+			for (EObject businessObject : pe.getLink().getBusinessObjects()) {
+				if (businessObject instanceof Type) {
+					return (Type) businessObject;
+				}
+			}
+		}
+		return null;
+	}
+
+	public String getNameFromShape(PictogramElement pe) {
+		if (isPatternRoot(pe)) {
+			Text label = (Text) getPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
+			return label.getValue();
+		}
+		return "";
 	}
 
 }

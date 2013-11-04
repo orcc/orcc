@@ -39,7 +39,9 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
+import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
+import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.common.util.URI;
@@ -152,6 +154,22 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 				network.add(instance);
 				link(shape, instance);
+			} else if (pattern instanceof InputNetworkPortPattern) {
+				InputNetworkPortPattern inPortPattern = (InputNetworkPortPattern) pattern;
+				Port port = DfFactory.eINSTANCE.createPort(inPortPattern.getTypeFromShape(shape),
+						inPortPattern.getNameFromShape(shape));
+
+				network.addInput(port);
+				link(shape, port);
+				shape.getLink().getBusinessObjects().add(port.getType());
+			} else if (pattern instanceof OutputNetworkPortPattern) {
+				OutputNetworkPortPattern outPortPattern = (OutputNetworkPortPattern) pattern;
+				Port port = DfFactory.eINSTANCE.createPort(outPortPattern.getTypeFromShape(shape),
+						outPortPattern.getNameFromShape(shape));
+
+				network.addOutput(port);
+				link(shape, port);
+				shape.getLink().getBusinessObjects().add(port.getType());
 			}
 		}
 
@@ -163,7 +181,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	 * missing elements.
 	 * 
 	 * The network always has the higher priority to determinate which one is
-	 * outdated
+	 * out-of-date
 	 * 
 	 * @param network
 	 * @param diagram
