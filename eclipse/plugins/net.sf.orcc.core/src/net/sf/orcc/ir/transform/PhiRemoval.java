@@ -77,7 +77,8 @@ public class PhiRemoval extends AbstractIrVisitor<Void> {
 
 	@Override
 	public Void caseBlockBasic(BlockBasic block) {
-		return visit(this, block.getInstructions());
+		visit(this, block.getInstructions());
+		return null;
 	}
 
 	@Override
@@ -92,8 +93,10 @@ public class PhiRemoval extends AbstractIrVisitor<Void> {
 		caseBlockBasic(join);
 		new PhiRemover().caseBlockBasic(join);
 
-		visit(this, block.getThenBlocks());
-		return visit(this, block.getElseBlocks());
+		doSwitch(block.getThenBlocks());
+		doSwitch(block.getElseBlocks());
+
+		return null;
 	}
 
 	@Override
@@ -123,7 +126,7 @@ public class PhiRemoval extends AbstractIrVisitor<Void> {
 		caseBlockBasic(join);
 		new PhiRemover().caseBlockBasic(join);
 
-		return visit(this, block.getBlocks());
+		return null;
 	}
 
 	@Override
@@ -157,8 +160,7 @@ public class PhiRemoval extends AbstractIrVisitor<Void> {
 	public Void caseProcedure(Procedure procedure) {
 		localsToRemove = new ArrayList<Var>();
 
-		this.procedure = procedure;
-		visit(this, procedure.getBlocks());
+		super.caseProcedure(procedure);
 
 		for (Var local : localsToRemove) {
 			procedure.getLocals().remove(local);
