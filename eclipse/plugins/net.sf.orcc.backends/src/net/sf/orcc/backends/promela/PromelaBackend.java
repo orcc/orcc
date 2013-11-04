@@ -64,6 +64,7 @@ import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;

@@ -68,6 +68,7 @@ import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;

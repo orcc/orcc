@@ -60,6 +60,7 @@ import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
 
