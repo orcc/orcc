@@ -114,7 +114,7 @@ public class PromelaBackend extends AbstractBackend {
 		transfos.add(new UnitImporter());
 		transfos.add(new DfVisitor<Void>(new Inliner(true, true)));
 		transfos.add(new RenameTransformation(renameMap));
-		transfos.add(new DfVisitor<Object>(new PhiRemoval()));
+		transfos.add(new DfVisitor<Void>(new PhiRemoval()));
 		transfos.add(new PromelaAddPrefixToStateVar());
 		transfos.add(new GuardsExtractor(guards, priority, loadPeeks));
 		for (DfSwitch<?> transformation : transfos) {

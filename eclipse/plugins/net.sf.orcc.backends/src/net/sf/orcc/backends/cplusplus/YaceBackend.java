@@ -104,7 +104,7 @@ public class YaceBackend extends AbstractBackend {
 		if (!debug) {
 			transformations.add(new DeadGlobalElimination());
 			transformations.add(new DfVisitor<Void>(new SSATransformation()));
-			transformations.add(new DfVisitor<Object>(new PhiRemoval()));
+			transformations.add(new DfVisitor<Void>(new PhiRemoval()));
 			transformations.add(new DeadGlobalElimination());
 			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));

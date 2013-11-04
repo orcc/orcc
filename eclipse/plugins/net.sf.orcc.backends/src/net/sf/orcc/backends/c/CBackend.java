@@ -140,7 +140,7 @@ public class CBackend extends AbstractBackend {
 		if (getAttribute(ADDITIONAL_TRANSFOS, false)) {
 			transformations.add(new StoreOnceTransformation());
 			transformations.add(new DfVisitor<Void>(new SSATransformation()));
-			transformations.add(new DfVisitor<Object>(new PhiRemoval()));
+			transformations.add(new DfVisitor<Void>(new PhiRemoval()));
 			transformations.add(new Multi2MonoToken());
 			transformations.add(new DivisionSubstitution());
 			transformations.add(new ParameterImporter());
