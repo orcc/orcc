@@ -45,6 +45,8 @@ import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -53,6 +55,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -76,9 +79,13 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 	private boolean hasDoneChanges;
 
+	final private ResourceSet resourceSet;
+
 	public UpdateDiagramFeature(IFeatureProvider fp) {
 		super(fp);
 		hasDoneChanges = false;
+
+		resourceSet = new ResourceSetImpl();
 	}
 
 	@Override
@@ -102,25 +109,33 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 		final Network network;
 		if (linkedBo == null || !(linkedBo instanceof Network)) {
-
-			hasDoneChanges = initializeNetworkFromDiagram(diagram);
-			return hasDoneChanges;
+			if (ResourcesPlugin.getWorkspace().getRoot().exists(new Path(xdfUri.toPlatformString(true)))) {
+				network = (Network) resourceSet.getResource(xdfUri, true).getContents().get(0);
+				link(diagram, network);
+			} else {
+				hasDoneChanges = initializeNetworkFromDiagram(diagram);
+				return hasDoneChanges;
+			}
 		} else {
 			network = (Network) linkedBo;
+		}
 
-			final Resource xdfRes = network.eResource();
-			if (xdfRes == null || !xdfRes.getURI().equals(xdfUri)) {
-				// Particular case. The existing network is not contained in a
-				// resource, or its resource has a wrong URI. It can happen if
-				// the diagram has been moved or duplicated without the
-				// corresponding xdf. The Move/Rename participant should take
-				// care of that.
+		final Resource xdfRes = network.eResource();
+		if (xdfRes == null || !xdfRes.getURI().equals(xdfUri)) {
+			// Particular case. The existing network is not contained in a
+			// resource, or its resource has a wrong URI. It can happen if
+			// the diagram has been moved or duplicated without the
+			// corresponding xdf. The Move/Rename participant should take
+			// care of that.
 
-				final ResourceSet rs = new ResourceSetImpl();
-				final Resource res = rs.createResource(xdfUri);
-				res.getContents().add(EcoreUtil.copy(network));
-				hasDoneChanges = true;
-			}
+			final Resource res = resourceSet.createResource(xdfUri);
+			res.getContents().add(EcoreUtil.copy(network));
+			hasDoneChanges = true;
+		}
+
+		if (diagram.getChildren().size() == 0 && network.getChildren().size() > 0) {
+			hasDoneChanges |= initializeDiagramFromNetwork(network, diagram);
+			return hasDoneChanges;
 		}
 
 		hasDoneChanges |= updateContentsIfNeeded(network, diagram);
@@ -182,6 +197,34 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		}
 
 		return true;
+	}
+
+	private boolean initializeDiagramFromNetwork(Network network, Diagram diagram) {
+		for (Vertex vertex : network.getChildren()) {
+			if (vertex instanceof Instance) {
+				addBoToDiagram(diagram, vertex);
+			}
+		}
+		for (Port port : network.getInputs()) {
+			addBoToDiagram(diagram, port);
+		}
+		for (Port port : network.getOutputs()) {
+			addBoToDiagram(diagram, port);
+		}
+		for (net.sf.orcc.df.Connection con : network.getConnections()) {
+			addBoToDiagram(diagram, con);
+		}
+
+		return true;
+	}
+
+	private void addBoToDiagram(final Diagram diagram, final EObject bo) {
+		final AddContext addContext = new AddContext();
+		addContext.setTargetContainer(diagram);
+		addContext.setNewObject(bo);
+		addContext.setLocation(10, 10);
+
+		getFeatureProvider().addIfPossible(addContext);
 	}
 
 	/**
