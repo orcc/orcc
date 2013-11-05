@@ -29,6 +29,7 @@
 package net.sf.orcc.xdf.ui.wizards;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import net.sf.orcc.df.Network;
 import net.sf.orcc.xdf.ui.Activator;
@@ -118,6 +119,9 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 			PictogramLink link = PictogramsFactory.eINSTANCE.createPictogramLink();
 			link.getBusinessObjects().add(network);
 			diagram.setLink(link);
+
+			// Save again the diagram, to store the link in the .diagram file
+			diagram.eResource().save(Collections.EMPTY_MAP);
 		} catch (IOException e) {
 			return false;
 		}
