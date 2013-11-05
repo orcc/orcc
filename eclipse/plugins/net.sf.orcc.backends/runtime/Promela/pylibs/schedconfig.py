@@ -94,7 +94,7 @@ class RunConfiguration(object):
         open(self.file3, "w").close() # create it if it doesnt exist
     def __ltl(self, inputseq, nextstate, actortostatesdic):
         # the morefsmstates is of type {fsm_state_???:[state, state,..]}
-        s=  "ltl test {[]!(promela_prog_initiated==1 &&"
+        s=  "ltl test {[]!(promela_has_progress==1 &&"
         s+= "fsm_state_"+self.conf.leader+"=="+self.conf.leader+"_state_"+nextstate
         for state in actortostatesdic.keys():
             s+= "&& ("
