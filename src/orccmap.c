@@ -235,9 +235,9 @@ void print_edge_cut(network_t *network) {
 void print_graph(adjacency_list *graph) {
     assert(graph != NULL);
     int i, j;
-    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Src | nbEdges | Dest:weight ...");
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Src:weight | nbEdges | Dest:weight ...");
     for (i = 0; i < graph->nb_vertices; i++) {
-        printf("\n %3d | %3d | ", i, graph->xadj[i+1] - graph->xadj[i]);
+        printf("\n %3d:%d | %3d | ", i, graph->vwgt[i], graph->xadj[i+1] - graph->xadj[i]);
         for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
             printf("%3d:%d ", graph->adjncy[j], graph->adjwgt[j]);
         }
@@ -390,6 +390,7 @@ adjacency_list *fix_graph_for_metis(adjacency_list *graph) {
         check_graph_for_metis(metis_graph);
     }
 
+    free(edges);
     return metis_graph;
 }
 
@@ -704,7 +705,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
                                    &opt.nb_processors, /*idx_t *nparts*/
                                    NULL, /*real t *tpwgts*/
                                    NULL, /*real t ubvec*/
-                                   metis_opt, /*idx_t *options*/
+                                   NULL, /*idx_t *options*/
                                    &objval, /*idx_t *objval*/
                                    part); /*idx_t *part*/
     check_metis_error(ret);
@@ -742,7 +743,7 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
                               &opt.nb_processors, /*idx_t *nparts*/
                               NULL, /*real t *tpwgts*/
                               NULL, /*real t ubvec*/
-                              metis_opt, /*idx_t *options*/
+                              NULL, /*idx_t *options*/
                               &objval, /*idx_t *objval*/
                               part); /*idx_t *part*/
     check_metis_error(ret);
@@ -750,6 +751,7 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
     print_orcc_trace(ORCC_VL_VERBOSE_2, "METIS Edgecut : %d", objval);
 
     delete_graph(graph);
+    delete_graph(metis_graph);
     return ret;
 }
 
