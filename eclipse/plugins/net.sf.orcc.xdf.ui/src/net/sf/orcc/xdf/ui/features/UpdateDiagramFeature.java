@@ -59,8 +59,6 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.services.ILinkService;
 
 /**
  * This feature try to detect cases when a Diagram or a Network need to be
@@ -96,10 +94,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			return false;
 		}
 
-		final ILinkService linkService = Graphiti.getLinkService();
-
 		final Diagram diagram = (Diagram) context.getPictogramElement();
-		final EObject linkedBo = linkService.getBusinessObjectForLinkedPictogramElement(diagram);
+		final Object linkedBo = getBusinessObjectForPictogramElement(diagram);
 
 		final URI diagramUri = diagram.eResource().getURI();
 		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(Activator.NETWORK_SUFFIX);
@@ -108,7 +104,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		if (linkedBo == null || !(linkedBo instanceof Network)) {
 
 			hasDoneChanges = initializeNetworkFromDiagram(diagram);
-			return true;
+			return hasDoneChanges;
 		} else {
 			network = (Network) linkedBo;
 
