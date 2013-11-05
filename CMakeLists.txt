@@ -9,13 +9,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 find_package(METIS REQUIRED)
 
-# Libraries folder
-set(LIBS_DIR ${CMAKE_SOURCE_DIR}/libs)
-set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-
 include_directories(
-        ${LIBS_DIR}/roxml/include
+    libs/roxml/include
 )
 
-add_subdirectory(${LIBS_DIR})
-add_subdirectory(${SRC_DIR})
+# Compile required libs
+add_subdirectory(libs)
+# Compile application
+add_subdirectory(src)

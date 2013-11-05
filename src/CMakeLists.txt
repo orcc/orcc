@@ -1,4 +1,3 @@
-# Generated from Top_decoder_serial
 
 set(filenames
         mapping.c
