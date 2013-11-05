@@ -235,6 +235,7 @@ void print_edge_cut(network_t *network) {
 void print_graph(adjacency_list *graph) {
     assert(graph != NULL);
     int i, j;
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Src | nbEdges | Dest:weight ...");
     for (i = 0; i < graph->nb_vertices; i++) {
         printf("\n %3d | %3d | ", i, graph->xadj[i+1] - graph->xadj[i]);
         for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
@@ -304,7 +305,8 @@ void check_graph_for_metis(adjacency_list *graph) {
         }
     }
     print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Self-edges=%d   Duplicate edges=%d   Undirected edges=%d",nbSelf ,nbDuplicateEdge, nbUndirectedEdge);
-    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Null weights vertices=%d   edges=%d",nbNullVerticeWeight ,nbNullEdgeWeight);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Nb vertices with null weight = %d",nbNullVerticeWeight);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Nb edges with null weight = %d", nbNullEdgeWeight);
 }
 
 
@@ -319,32 +321,68 @@ void check_graph_for_metis(adjacency_list *graph) {
  *	      other vertex.
  *      - Weights are > 0
  *
- *	    Any of the above errors are fixed by performing the following operations:
+ *	    The above errors are fixed by performing the following operations:
  *	    - Self-edges are removed.
- *	    - The undirected graph is formed by the union of edges.
- *      - One of the duplicate edges is selected.
- *      - !TODO : If Weights <= 0 : what should we do ?
+ *	    - The undirected graph is formed by the union and merge of edges (adding weights)
+ *      - If Weights <= 0 : exit with explicit error message
+ *
+ *      A warning message will be printed if any fix has been required
  *
  **************************************************************************/
 adjacency_list *fix_graph_for_metis(adjacency_list *graph) {
     assert(graph != NULL);
     int nb_edges = 0;
     adjacency_list *metis_graph;
+    int i = 0, j = 0, k = 0;
+    int **edges;
 
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixing CSR graph for Metis");
         check_graph_for_metis(graph);
     }
 
-    nb_edges = graph->nb_edges;
+    /*
+     * Create a matrix (vertices*vertices) to :
+     *      - remove self-edges
+     *      - merge duplicated edges by adding their weights
+     *      - add (v,u) when (u,v) exists with same weight (making graph undirected)
+     *      - get the final number of edges
+     */
+    edges = (int **)malloc ( sizeof(int *)  *  graph->nb_vertices);
+    for (i = 0 ; i < graph->nb_vertices ; i++){
+        edges[i] = (int *)malloc (sizeof(int) * graph->nb_vertices);
+        memset(edges[i], -1, sizeof(int *) * graph->nb_vertices);
+    }
 
+    for (i = 0; i < graph->nb_vertices; i++) {
+        for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
+            /* First test prevents from self-edges */
+            if (graph->adjncy[j] != i) {
+                if (edges[i][graph->adjncy[j]] == -1) {
+                    nb_edges += 2;
+                    edges[i][graph->adjncy[j]] = graph->adjwgt[j];
+                    edges[graph->adjncy[j]][i] = graph->adjwgt[j];
+                } else {
+                    edges[i][graph->adjncy[j]] += graph->adjwgt[j];
+                    edges[graph->adjncy[j]][i] += graph->adjwgt[j];
+                }
+            }
+        }
+    }
+
+    /* Use previous matrix to set the fixed CSR graph for Metis */
     metis_graph = allocate_graph(graph->nb_vertices, nb_edges);
-    arrayCopy(metis_graph->xadj, graph->xadj, graph->nb_vertices+1);
     arrayCopy(metis_graph->vwgt, graph->vwgt, graph->nb_vertices);
-//    arrayCopy(metis_graph->adjncy, graph->adjncy, graph->nb_edges);
-//    arrayCopy(metis_graph->adjwgt, graph->adjwgt, graph->nb_edges);
-
-    //!TODO : fix edges here
+    for (i=0; i<metis_graph->nb_vertices; i++) {
+        metis_graph->xadj[i] = k;
+        for (j=0; j<metis_graph->nb_vertices; j++) {
+            if (edges[i][j] != -1) {
+                metis_graph->adjncy[k] = j;
+                metis_graph->adjwgt[k] = edges[i][j];
+                k++;
+            }
+        }
+    }
 
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixed CSR Graph for Metis :");
@@ -655,8 +693,6 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
 
     graph = set_graph_from_network(network);
     metis_graph = fix_graph_for_metis(graph);
-    printf("\n");
-    exit(0);
 
     ret = METIS_PartGraphRecursive(&metis_graph->nb_vertices, /* idx_t *nvtxs */
                                    &ncon, /*idx_t *ncon*/
@@ -695,16 +731,14 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
 
     graph = set_graph_from_network(network);
     metis_graph = fix_graph_for_metis(graph);
-    printf("\n");
-    exit(0);
 
-    ret = METIS_PartGraphKway(&graph->nb_vertices, /* idx_t *nvtxs */
+    ret = METIS_PartGraphKway(&metis_graph->nb_vertices, /* idx_t *nvtxs */
                               &ncon, /*idx_t *ncon*/
-                              graph->xadj, /*idx_t *xadj*/
-                              graph->adjncy, /*idx_t *adjncy*/
-                              graph->vwgt, /*idx_t *vwgt*/
+                              metis_graph->xadj, /*idx_t *xadj*/
+                              metis_graph->adjncy, /*idx_t *adjncy*/
+                              metis_graph->vwgt, /*idx_t *vwgt*/
                               NULL, /*idx_t *vsize*/
-                              graph->adjwgt, /*idx_t *adjwgt*/
+                              metis_graph->adjwgt, /*idx_t *adjwgt*/
                               &opt.nb_processors, /*idx_t *nparts*/
                               NULL, /*real t *tpwgts*/
                               NULL, /*real t ubvec*/
