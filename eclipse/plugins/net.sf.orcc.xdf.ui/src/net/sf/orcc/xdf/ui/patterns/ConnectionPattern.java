@@ -278,10 +278,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			// Check the type of this pattern to know the direction of the port
 			PortDirection dir = ipattern instanceof InputNetworkPortPattern ? PortDirection.INPUT
 					: PortDirection.OUTPUT;
-			Network network = (Network) linkService
-					.getBusinessObjectForLinkedPictogramElement((PictogramElement) anchor
-					.getParent().eContainer());
-			PortInformation info = new PortInformation(network, (Port) obj, dir, PortType.NETWORK_PORT);
+			PortInformation info = new PortInformation((Port) obj, null, dir, PortType.NETWORK_PORT);
 			return info;
 		}
 
