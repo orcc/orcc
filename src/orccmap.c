@@ -232,14 +232,13 @@ void print_edge_cut(network_t *network) {
  *
  ********************************************************************************************/
 
-void print_graph(adjacency_list *graph) {
-    assert(graph != NULL);
+void print_graph(adjacency_list graph) {
     int i, j;
     print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Src:weight | nbEdges | Dest:weight ...");
-    for (i = 0; i < graph->nb_vertices; i++) {
-        printf("\n %3d:%d | %3d | ", i, graph->vwgt[i], graph->xadj[i+1] - graph->xadj[i]);
-        for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
-            printf("%3d:%d ", graph->adjncy[j], graph->adjwgt[j]);
+    for (i = 0; i < graph.nb_vertices; i++) {
+        printf("\n %3d:%d | %3d | ", i, graph.vwgt[i], graph.xadj[i+1] - graph.xadj[i]);
+        for (j = graph.xadj[i]; j < graph.xadj[i+1]; j++) {
+            printf("%3d:%d ", graph.adjncy[j], graph.adjwgt[j]);
         }
     }
 }
@@ -263,41 +262,40 @@ adjacency_list *set_graph_from_network(network_t network) {
 
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : CSR Graph generated from Network :");
-        print_graph(graph);
+        print_graph(*graph);
     }
 
     return graph;
 }
 
-void check_graph_for_metis(adjacency_list *graph) {
-    assert(graph != NULL);
+void check_graph_for_metis(adjacency_list graph) {
     int i, j, k;
     int nbSelf = 0, nbNullEdgeWeight = 0, nbNullVerticeWeight = 0, nbDuplicateEdge = 0, nbUndirectedEdge = 0;
 
-    for (i = 0; i < graph->nb_vertices; i++) {
-        if (graph->vwgt[i] == 0) {
+    for (i = 0; i < graph.nb_vertices; i++) {
+        if (graph.vwgt[i] == 0) {
             //TODO
             nbNullVerticeWeight++;
         }
 
-        for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
+        for (j = graph.xadj[i]; j < graph.xadj[i+1]; j++) {
             /* Remove self-edges */
-            if (graph->adjncy[j] == i) {
+            if (graph.adjncy[j] == i) {
                 //TODO
                 nbSelf++;
             }
-            if (graph->adjwgt[j] == 0) {
+            if (graph.adjwgt[j] == 0) {
                 //TODO
                 nbNullEdgeWeight++;
             }
-            for (k = graph->xadj[graph->adjncy[j]]; k < graph->xadj[graph->adjncy[j]+1]; k++) {
-                if (graph->adjncy[k] == i) {
+            for (k = graph.xadj[graph.adjncy[j]]; k < graph.xadj[graph.adjncy[j]+1]; k++) {
+                if (graph.adjncy[k] == i) {
                     //TODO
                     nbUndirectedEdge++;
                 }
             }
-            for (k = graph->xadj[i]; k < graph->xadj[i+1]; k++) {
-                if ((j != k) && (graph->adjncy[k] == graph->adjncy[j])) {
+            for (k = graph.xadj[i]; k < graph.xadj[i+1]; k++) {
+                if ((j != k) && (graph.adjncy[k] == graph.adjncy[j])) {
                     //TODO
                     nbDuplicateEdge++;
                 }
@@ -329,8 +327,7 @@ void check_graph_for_metis(adjacency_list *graph) {
  *      A warning message will be printed if any fix has been required
  *
  **************************************************************************/
-adjacency_list *fix_graph_for_metis(adjacency_list *graph) {
-    assert(graph != NULL);
+adjacency_list *fix_graph_for_metis(adjacency_list graph) {
     int nb_edges = 0;
     adjacency_list *metis_graph;
     int i = 0, j = 0, k = 0;
@@ -348,31 +345,32 @@ adjacency_list *fix_graph_for_metis(adjacency_list *graph) {
      *      - add (v,u) when (u,v) exists with same weight (making graph undirected)
      *      - get the final number of edges
      */
-    edges = (int **)malloc ( sizeof(int *)  *  graph->nb_vertices);
-    for (i = 0 ; i < graph->nb_vertices ; i++){
-        edges[i] = (int *)malloc (sizeof(int) * graph->nb_vertices);
-        memset(edges[i], -1, sizeof(int *) * graph->nb_vertices);
+
+    edges = malloc(graph.nb_vertices * sizeof(*edges));
+    for(i=0 ; i < graph.nb_vertices ; i++){
+         edges[i] = malloc(graph.nb_vertices * sizeof(**edges) );
+         memset(edges[i], -1, sizeof(int) * graph.nb_vertices);
     }
 
-    for (i = 0; i < graph->nb_vertices; i++) {
-        for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
+    for (i = 0; i < graph.nb_vertices; i++) {
+        for (j = graph.xadj[i]; j < graph.xadj[i+1]; j++) {
             /* First test prevents from self-edges */
-            if (graph->adjncy[j] != i) {
-                if (edges[i][graph->adjncy[j]] == -1) {
+            if (graph.adjncy[j] != i) {
+                if (edges[i][graph.adjncy[j]] == -1) {
                     nb_edges += 2;
-                    edges[i][graph->adjncy[j]] = graph->adjwgt[j];
-                    edges[graph->adjncy[j]][i] = graph->adjwgt[j];
+                    edges[i][graph.adjncy[j]] = graph.adjwgt[j];
+                    edges[graph.adjncy[j]][i] = graph.adjwgt[j];
                 } else {
-                    edges[i][graph->adjncy[j]] += graph->adjwgt[j];
-                    edges[graph->adjncy[j]][i] += graph->adjwgt[j];
+                    edges[i][graph.adjncy[j]] += graph.adjwgt[j];
+                    edges[graph.adjncy[j]][i] += graph.adjwgt[j];
                 }
             }
         }
     }
 
     /* Use previous matrix to set the fixed CSR graph for Metis */
-    metis_graph = allocate_graph(graph->nb_vertices, nb_edges);
-    arrayCopy(metis_graph->vwgt, graph->vwgt, graph->nb_vertices);
+    metis_graph = allocate_graph(graph.nb_vertices, nb_edges);
+    arrayCopy(metis_graph->vwgt, graph.vwgt, graph.nb_vertices);
     for (i=0; i<metis_graph->nb_vertices; i++) {
         metis_graph->xadj[i] = k;
         for (j=0; j<metis_graph->nb_vertices; j++) {
@@ -386,8 +384,8 @@ adjacency_list *fix_graph_for_metis(adjacency_list *graph) {
 
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixed CSR Graph for Metis :");
-        print_graph(metis_graph);
-        check_graph_for_metis(metis_graph);
+        print_graph(*metis_graph);
+        check_graph_for_metis(*metis_graph);
     }
 
     free(edges);
@@ -589,7 +587,7 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
     assert(mapping != NULL);
     int ret = ORCC_OK;
     int i, j;
-    int *counter = (int*) malloc(mapping->number_of_threads * sizeof(int));
+    int *counter = malloc(mapping->number_of_threads * sizeof(counter));
 
     for (i = 0; i < mapping->number_of_threads; i++) {
         mapping->partitions_size[i] = 0;
@@ -628,6 +626,7 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
         print_edge_cut(network);
     }
 
+    free(counter);
     return ret;
 }
 
@@ -693,7 +692,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
     METIS_SetDefaultOptions(metis_opt);
 
     graph = set_graph_from_network(network);
-    metis_graph = fix_graph_for_metis(graph);
+    metis_graph = fix_graph_for_metis(*graph);
 
     ret = METIS_PartGraphRecursive(&metis_graph->nb_vertices, /* idx_t *nvtxs */
                                    &ncon, /*idx_t *ncon*/
@@ -705,7 +704,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
                                    &opt.nb_processors, /*idx_t *nparts*/
                                    NULL, /*real t *tpwgts*/
                                    NULL, /*real t ubvec*/
-                                   NULL, /*idx_t *options*/
+                                   metis_opt, /*idx_t *options*/
                                    &objval, /*idx_t *objval*/
                                    part); /*idx_t *part*/
     check_metis_error(ret);
@@ -731,7 +730,7 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
     metis_opt[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; /* METIS_OBJTYPE_VOL or METIS_OBJTYPE_CUT */
 
     graph = set_graph_from_network(network);
-    metis_graph = fix_graph_for_metis(graph);
+    metis_graph = fix_graph_for_metis(*graph);
 
     ret = METIS_PartGraphKway(&metis_graph->nb_vertices, /* idx_t *nvtxs */
                               &ncon, /*idx_t *ncon*/
@@ -743,7 +742,7 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
                               &opt.nb_processors, /*idx_t *nparts*/
                               NULL, /*real t *tpwgts*/
                               NULL, /*real t ubvec*/
-                              NULL, /*idx_t *options*/
+                              metis_opt, /*idx_t *options*/
                               &objval, /*idx_t *objval*/
                               part); /*idx_t *part*/
     check_metis_error(ret);

@@ -285,7 +285,7 @@ void print_edge_cut(network_t *network);
 /**
  * !TODO
  */
-void print_graph(adjacency_list *graph);
+void print_graph(adjacency_list graph);
 
 /**
  * !TODO
@@ -295,12 +295,12 @@ adjacency_list *set_graph_from_network(network_t network);
 /**
  * !TODO
  */
-void check_graph_for_metis(adjacency_list *graph);
+void check_graph_for_metis(adjacency_list graph);
 
 /**
  * !TODO
  */
-adjacency_list *fix_graph_for_metis(adjacency_list *graph);
+adjacency_list *fix_graph_for_metis(adjacency_list graph);
 
 
 /********************************************************************************************
