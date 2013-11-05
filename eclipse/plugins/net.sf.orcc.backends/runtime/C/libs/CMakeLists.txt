@@ -73,15 +73,12 @@ else()
             orcc/src/orcc_open_hevc.c
 			# Headers
 			orcc/include/orcc_fifo.h
-			orcc/include/orcc_fifo_socket.h
 			orcc/include/orcc_generic_fifo.h
 			orcc/include/orcc_generic_fifo.inl
-			orcc/include/orcc_generic_fifo_socket.h
 			orcc/include/orcc_genetic.h
 			orcc/include/orcc_scheduler.h
 			orcc/include/orcc_scheduler.inl
 			orcc/include/orcc_thread.h
-			orcc/include/socket.h
             orcc/include/orcc_open_hevc.h
 		)
 
