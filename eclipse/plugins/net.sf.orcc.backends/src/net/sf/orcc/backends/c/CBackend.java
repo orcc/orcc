@@ -53,7 +53,6 @@ import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.Vectorizable;
 import net.sf.orcc.df.Actor;
@@ -67,7 +66,6 @@ import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
-import net.sf.orcc.util.Void;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
@@ -83,6 +81,7 @@ import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.tools.stats.StatisticsPrinter;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -235,12 +234,6 @@ public class CBackend extends AbstractBackend {
 		printCMake(network);
 		new StatisticsPrinter().print(srcPath, network);
 
-		if (balanceMapping) {
-			// Solve load balancing using Metis. The 'mapping' variable should
-			// be the weightsMap, giving a weight to each actor/instance.
-			mapping = new Metis().partition(network, path, processorNumber,
-					mapping);
-		}
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
 			new Mapping(network, mapping).print(srcPath);
 		}

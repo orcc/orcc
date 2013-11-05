@@ -53,7 +53,6 @@ import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -180,13 +179,6 @@ public class TTABackend extends LLVMBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
-
-		if (balanceMapping) {
-			// Solve load balancing using Metis. The 'mapping' variable should
-			// be the weightsMap, giving a weight to each actor/instance.
-			mapping = new Metis().partition(network, path, processorNumber,
-					mapping);
-		}
 
 		// Compute the actor mapping
 		if (importXcfFile) {
