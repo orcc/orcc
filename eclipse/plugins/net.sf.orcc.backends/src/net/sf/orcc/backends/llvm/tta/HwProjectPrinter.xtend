@@ -196,10 +196,6 @@ class HwProjectPrinter extends TTAPrinter {
 		      <association xil_pn:name="BehavioralSimulation"/>
 		      <association xil_pn:name="Implementation"/>
 		    </file>
-		    <file xil_pn:name="share/vhdl/and_ior_xor.vhdl" xil_pn:type="FILE_VHDL">
-		      <association xil_pn:name="BehavioralSimulation"/>
-		      <association xil_pn:name="Implementation"/>
-		    </file>
 		    <file xil_pn:name="share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl" xil_pn:type="FILE_VHDL">
 		      <association xil_pn:name="BehavioralSimulation"/>
 		      <association xil_pn:name="Implementation"/>
@@ -274,6 +270,10 @@ class HwProjectPrinter extends TTAPrinter {
 		  <association xil_pn:name="Implementation"/>
 		</file>
 		<file xil_pn:name="«processor.name»/tta/vhdl/«processor.name»_tl_imem_mau_pkg.vhdl" xil_pn:type="FILE_VHDL">
+		  <association xil_pn:name="BehavioralSimulation"/>
+		  <association xil_pn:name="Implementation"/>
+		</file>
+		<file xil_pn:name="«processor.name»/tta/vhdl/«processor.name»_mem_constants_pkg.vhd" xil_pn:type="FILE_VHDL">
 		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>
