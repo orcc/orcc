@@ -302,6 +302,10 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			text.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
 			gaService.setLocationAndSize(text, 0, 0, TOTAL_MIN_WIDTH, LABEL_HEIGHT);
 
+			if (addedDomainObject.getName() != null) {
+				text.setValue(addedDomainObject.getName());
+			}
+
 			setIdentifier(shape, LABEL_ID);
 
 			link(shape, addedDomainObject);
@@ -351,6 +355,10 @@ public class InstancePattern extends AbstractPatternWithProperties {
 
 		// We link graphical representation and domain model object
 		link(containerShape, addedDomainObject);
+
+		if (addedDomainObject.getEntity() != null) {
+			setInstanceRefinment(containerShape, addedDomainObject.getEntity());
+		}
 
 		return containerShape;
 	}
