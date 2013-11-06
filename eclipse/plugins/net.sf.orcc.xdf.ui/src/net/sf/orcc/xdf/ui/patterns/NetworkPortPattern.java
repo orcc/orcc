@@ -75,7 +75,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	private final String LABEL_ID = "PORT_LABEL";
 	private final String[] validIds = { getInOutIdentifier(), SHAPE_ID, LABEL_ID };
 
-	protected static String ATTRIBUTE_INOUT_IDENTIFIER = "port_identifier";
+	public static String ATTRIBUTE_INOUT_IDENTIFIER = "port_identifier";
 
 	public NetworkPortPattern() {
 		super(null);
@@ -247,6 +247,10 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			// We define an arbitrary width to text, allowing user to see chars
 			// when first direct editing port name
 			gaService.setLocationAndSize(text, 0, PORT_HEIGHT + 4, 50, 10);
+
+			if (addedDomainObject.getName() != null) {
+				text.setValue(addedDomainObject.getName());
+			}
 
 			setIdentifier(shape, LABEL_ID);
 			link(shape, addedDomainObject);
