@@ -73,9 +73,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 	private final String SHAPE_ID = "PORT_SHAPE";
 	private final String LABEL_ID = "PORT_LABEL";
-	private final String[] validIds = { getInOutIdentifier(), SHAPE_ID, LABEL_ID };
-
-	public static String ATTRIBUTE_INOUT_IDENTIFIER = "port_identifier";
+	private final String[] validIds = { getPortIdentifier(), SHAPE_ID, LABEL_ID };
 
 	public NetworkPortPattern() {
 		super(null);
@@ -86,7 +84,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 	abstract protected Polygon getPortPolygon(Shape shape, IGaService gaService);
 
-	abstract protected String getInOutIdentifier();
+	abstract protected String getPortIdentifier();
 
 	abstract protected void addPortToNetwork(Port port, Network network);
 
@@ -96,24 +94,8 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	}
 
 	@Override
-	public boolean isMainBusinessObjectApplicable(Object object) {
-		if (object instanceof Port) {
-			Port port = (Port) object;
-			String attrValue = port.getValueAsString(ATTRIBUTE_INOUT_IDENTIFIER);
-			if (getInOutIdentifier().equals(attrValue)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void setInOutType(Port port) {
-		port.setAttribute(ATTRIBUTE_INOUT_IDENTIFIER, getInOutIdentifier());
-	}
-
-	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
-		return isExpectedPe(pe, getInOutIdentifier());
+		return isExpectedPe(pe, getPortIdentifier());
 	}
 
 	@Override
@@ -194,10 +176,6 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		// Add the newly created port to the network
 		addPortToNetwork(newPort, (Network) getBusinessObjectForPictogramElement(getDiagram()));
 
-		// Configure property on port, to detect later if it is an input or an
-		// output one
-		setInOutType(newPort);
-
 		addGraphicalRepresentation(context, newPort);
 
 		// activate direct editing after object creation
@@ -262,7 +240,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		}
 
 		directEditingInfo.setMainPictogramElement(containerShape);
-		setIdentifier(containerShape, getInOutIdentifier());
+		setIdentifier(containerShape, getPortIdentifier());
 		link(containerShape, addedDomainObject);
 		containerShape.getLink().getBusinessObjects().add(addedDomainObject.getType());
 
@@ -362,5 +340,4 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		}
 		return "";
 	}
-
 }

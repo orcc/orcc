@@ -31,6 +31,7 @@ package net.sf.orcc.xdf.ui.patterns;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
+import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -52,6 +53,14 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 	}
 
 	@Override
+	public boolean isMainBusinessObjectApplicable(Object obj) {
+		if (obj instanceof Port) {
+			return XdfUtil.isInputPort((Port) obj);
+		}
+		return false;
+	}
+
+	@Override
 	public String getCreateDescription() {
 		return "Create an input port directly in the network";
 	}
@@ -65,7 +74,7 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 	}
 
 	@Override
-	protected String getInOutIdentifier() {
+	protected String getPortIdentifier() {
 		return INOUT_ID;
 	}
 

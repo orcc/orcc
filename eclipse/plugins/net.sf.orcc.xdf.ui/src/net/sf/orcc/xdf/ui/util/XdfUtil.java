@@ -33,6 +33,8 @@ import java.util.Collections;
 
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Graph;
 import net.sf.orcc.xdf.ui.Activator;
 
 import org.eclipse.core.resources.IProject;
@@ -146,5 +148,31 @@ public class XdfUtil {
 		}
 
 		return -1;
+	}
+
+	public static boolean isInputPort(Port port) {
+		final Graph graph = port.getGraph();
+		if (graph != null && graph instanceof Network) {
+			Network network = (Network) graph;
+			for (Port p : network.getInputs()) {
+				if (p == port) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean isOutputPort(Port port) {
+		final Graph graph = port.getGraph();
+		if (graph != null && graph instanceof Network) {
+			Network network = (Network) graph;
+			for (Port p : network.getOutputs()) {
+				if (p == port) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
