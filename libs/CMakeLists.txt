@@ -1,4 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
 
 # Initialize source files list for roxml
 file(GLOB roxml_sources
