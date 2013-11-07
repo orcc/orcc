@@ -71,6 +71,7 @@ import net.sf.orcc.ir.transform.BlockCombine;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
@@ -166,6 +167,7 @@ public class CBackend extends AbstractBackend {
 
 			transformations.add(new DfVisitor<Expression>(new CastAdder(true,
 					true)));
+			transformations.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 		}
 
 		for (DfSwitch<?> transformation : transformations) {

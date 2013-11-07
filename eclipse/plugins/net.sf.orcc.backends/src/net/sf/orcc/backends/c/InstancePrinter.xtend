@@ -599,9 +599,9 @@ class InstancePrinter extends CTemplate {
 				«FOR variable : actor.stateVars»
 					«IF variable.assignable && variable.initialized»
 						«IF !variable.type.list»
-							«variable.indexedName» = «variable.initialValue.doSwitch»;
+							«variable.name» = «variable.initialValue.doSwitch»;
 						«ELSE»
-							memcpy(«variable.indexedName», «variable.indexedName»_backup, sizeof(«variable.indexedName»_backup));
+							memcpy(«variable.name», «variable.name»_backup, sizeof(«variable.name»_backup));
 						«ENDIF»
 					«ENDIF»
 				«ENDFOR»
@@ -880,7 +880,7 @@ class InstancePrinter extends CTemplate {
 		'''
 			«varDecl»
 			«IF geneticAlgo && variable.initialized && variable.assignable»
-				static «variable.type.doSwitch» «variable.indexedName»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
+				static «variable.type.doSwitch» «variable.name»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
 			«ENDIF»
 		'''
 	}
@@ -955,7 +955,7 @@ class InstancePrinter extends CTemplate {
 	//            Instructions
 	//========================================
 	override caseInstAssign(InstAssign inst) '''
-		«inst.target.variable.indexedName» = «inst.value.doSwitch»;
+		«inst.target.variable.name» = «inst.value.doSwitch»;
 	'''
 
 	override caseInstLoad(InstLoad load) {
@@ -963,12 +963,12 @@ class InstancePrinter extends CTemplate {
 		'''
 			«IF srcPort != null»
 				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + VECTORIZABLE)) || srcPort.hasAttribute(VECTORIZABLE_ALWAYS)»
-					«load.target.variable.indexedName» = tokens_«srcPort.name»[(local_index_«srcPort.name» + («load.indexes.head.doSwitch»))];
+					«load.target.variable.name» = tokens_«srcPort.name»[(local_index_«srcPort.name» + («load.indexes.head.doSwitch»))];
 				«ELSE»
-					«load.target.variable.indexedName» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
+					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
 				«ENDIF»
 			«ELSE»
-				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
+				«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
 		'''
 	}
@@ -996,7 +996,7 @@ class InstancePrinter extends CTemplate {
 		«IF call.print»
 			printf(«call.arguments.printfArgs.join(", ")»);
 		«ELSE»
-			«IF call.target != null»«call.target.variable.indexedName» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
+			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
 		«ENDIF»
 	'''
 
@@ -1007,7 +1007,7 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	override caseInstTernary(InstTernary inst) '''
-		«inst.target.variable.indexedName» = «inst.conditionValue.doSwitch» ? «inst.trueValue.doSwitch» : «inst.falseValue.doSwitch»;
+		«inst.target.variable.name» = «inst.conditionValue.doSwitch» ? «inst.trueValue.doSwitch» : «inst.falseValue.doSwitch»;
 	'''
 
 	//========================================
@@ -1029,7 +1029,7 @@ class InstancePrinter extends CTemplate {
 
 	def private printCallArg(Arg arg) {
 		if(arg.byRef) {
-			"&" + (arg as ArgByRef).use.variable.indexedName + (arg as ArgByRef).indexes.printArrayIndexes
+			"&" + (arg as ArgByRef).use.variable.name + (arg as ArgByRef).indexes.printArrayIndexes
 		} else {
 			(arg as ArgByVal).value.doSwitch
 		}

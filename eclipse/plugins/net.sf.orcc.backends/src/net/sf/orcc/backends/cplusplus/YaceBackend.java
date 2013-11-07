@@ -54,6 +54,7 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
@@ -105,6 +106,7 @@ public class YaceBackend extends AbstractBackend {
 			transformations.add(new DeadGlobalElimination());
 			transformations.add(new DfVisitor<Void>(new SSATransformation()));
 			transformations.add(new DfVisitor<Void>(new PhiRemoval()));
+			transformations.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 			transformations.add(new DeadGlobalElimination());
 			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));

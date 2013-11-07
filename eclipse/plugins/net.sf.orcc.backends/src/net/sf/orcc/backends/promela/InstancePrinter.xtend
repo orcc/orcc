@@ -428,11 +428,11 @@ class InstancePrinter extends PromelaTemplate {
 	}
 
 	def declare(Var variable, String nameSuffix) {
-		'''«variable.type.doSwitch» «variable.indexedName»«nameSuffix»«variable.type.dimensionsExpr.printArrayIndexes»'''
+		'''«variable.type.doSwitch» «variable.name»«nameSuffix»«variable.type.dimensionsExpr.printArrayIndexes»'''
 	}
 	
 	override caseInstAssign(InstAssign assign) '''
-		«assign.target.variable.indexedName» = «assign.value.doSwitch»;
+		«assign.target.variable.name» = «assign.value.doSwitch»;
 	'''
 
 	override caseInstCall(InstCall call) {
@@ -446,7 +446,7 @@ class InstancePrinter extends PromelaTemplate {
 	}
 	
 	override caseInstLoad(InstLoad load) '''
-		«load.target.variable.indexedName» = «load.source.variable.indexedName»«load.indexes.printArrayIndexes»;
+		«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 	'''
 	
 	override caseInstStore(InstStore store) '''

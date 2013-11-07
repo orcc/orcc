@@ -65,6 +65,7 @@ import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
@@ -179,6 +180,9 @@ public class LLVMBackend extends AbstractBackend {
 		visitors.add(new DfVisitor<Void>(new BlockCombine()));
 		visitors.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
 		visitors.add(new DfVisitor<Void>(new ListInitializer()));
+
+		// computes names of local variables
+		visitors.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 
 		for (DfSwitch<?> transfo : visitors) {
 			transfo.doSwitch(network);

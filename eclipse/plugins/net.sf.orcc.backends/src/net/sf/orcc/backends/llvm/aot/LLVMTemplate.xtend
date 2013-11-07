@@ -226,5 +226,5 @@ abstract class LLVMTemplate extends CommonPrinter {
 	}
 	
 	def protected print(Var variable)
-		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.indexedName»'''
+		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.name»'''
 }
