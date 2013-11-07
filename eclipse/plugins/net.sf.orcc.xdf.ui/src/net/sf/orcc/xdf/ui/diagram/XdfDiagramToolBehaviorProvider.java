@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.xdf.ui.diagram;
 
+import net.sf.orcc.df.Port;
+import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -53,6 +55,27 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 		}
 
 		return super.getSelectionBorder(pe);
+	}
+
+	/**
+	 * Graphiti use this method to check equality between 2 business objects.
+	 * For example, it is used to retrieve PictogramElements linked (from a
+	 * business object). The default implementation use EcoreUtil.equals(), but
+	 * this method returns true if 2 different objects have exactly the same
+	 * values for each attribute.
+	 * 
+	 * To avoid some bugs, we need to ensure comparison is done on objects
+	 * reference in some cases. More information:
+	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=335828
+	 * 
+	 * @see UpdateDiagramFeature#initializeDiagramFromNetwork
+	 */
+	@Override
+	public boolean equalsBusinessObjects(Object o1, Object o2) {
+		if (o1 instanceof Port && o2 instanceof Port) {
+			return o1 == o2;
+		}
+		return super.equalsBusinessObjects(o1, o2);
 	}
 
 }

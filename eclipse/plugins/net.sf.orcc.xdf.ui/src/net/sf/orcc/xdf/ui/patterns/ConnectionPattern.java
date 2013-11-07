@@ -228,8 +228,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		connection.setStart(addConContext.getSourceAnchor());
 		connection.setEnd(addConContext.getTargetAnchor());
 
-		ConnectionDecorator cd;
-		cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+		ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
 		createArrow(cd);
 
 		/* Polyline polyline = */gaService.createPolyline(connection);

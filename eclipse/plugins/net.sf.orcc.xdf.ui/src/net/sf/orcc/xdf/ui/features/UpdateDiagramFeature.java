@@ -29,6 +29,9 @@
 package net.sf.orcc.xdf.ui.features;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
@@ -55,13 +58,19 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
+import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
+import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.services.ILinkService;
 
 /**
  * This feature try to detect cases when a Diagram or a Network need to be
@@ -200,31 +209,92 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	}
 
 	private boolean initializeDiagramFromNetwork(Network network, Diagram diagram) {
+
+		final IFeatureProviderWithPatterns patternFP = (IFeatureProviderWithPatterns) getFeatureProvider();
+
+		final Map<Port, Anchor> inAnchors = new HashMap<Port, Anchor>();
+		final Map<Port, Anchor> outAnchors = new HashMap<Port, Anchor>();
+
 		for (Vertex vertex : network.getChildren()) {
 			if (vertex instanceof Instance) {
 				addBoToDiagram(diagram, vertex);
 			}
 		}
 		for (Port port : network.getInputs()) {
-			addBoToDiagram(diagram, port);
+			final PictogramElement shape = addBoToDiagram(diagram, port);
+			if (shape != null) {
+				final InputNetworkPortPattern pattern = (InputNetworkPortPattern) patternFP
+						.getPatternForPictogramElement(shape);
+				final Anchor anchor = pattern.getAnchor((AnchorContainer) shape);
+				if (anchor != null) {
+					inAnchors.put(port, anchor);
+				}
+			}
 		}
 		for (Port port : network.getOutputs()) {
-			addBoToDiagram(diagram, port);
+			final PictogramElement shape = addBoToDiagram(diagram, port);
+			if (shape != null) {
+				final OutputNetworkPortPattern pattern = (OutputNetworkPortPattern) patternFP
+						.getPatternForPictogramElement(shape);
+				final Anchor anchor = pattern.getAnchor((AnchorContainer) shape);
+				if (anchor != null) {
+					outAnchors.put(port, anchor);
+				}
+			}
 		}
 		for (net.sf.orcc.df.Connection con : network.getConnections()) {
-			addBoToDiagram(diagram, con);
+
+			Anchor srcAnchor = null, tgtAnchor = null;
+			final Vertex src = con.getSource();
+			final Vertex tgt = con.getTarget();
+
+			final ILinkService linkServ = Graphiti.getLinkService();
+
+			if (src instanceof Port) {
+				srcAnchor = inAnchors.get(src);
+			} else {
+				// To have the right list of linked pe, we have overridden
+				// DiagramToolBehaviorProvider.equalsBusinessObjects
+				final List<PictogramElement> peList = linkServ.getPictogramElements(diagram, con.getSourcePort());
+				for (final PictogramElement pe : peList) {
+					if (pe instanceof Anchor) {
+						srcAnchor = (Anchor) pe;
+						break;
+					}
+				}
+			}
+
+			if (tgt instanceof Port) {
+				tgtAnchor = outAnchors.get(tgt);
+			} else {
+				// To have the right list of linked pe, we have overridden
+				// DiagramToolBehaviorProvider.equalsBusinessObjects
+				final List<PictogramElement> peList = linkServ.getPictogramElements(diagram, con.getTargetPort());
+				for (final PictogramElement pe : peList) {
+					if (pe instanceof Anchor) {
+						tgtAnchor = (Anchor) pe;
+						break;
+					}
+				}
+			}
+
+			if (srcAnchor != null && tgtAnchor != null) {
+				final AddConnectionContext ctxt = new AddConnectionContext(srcAnchor, tgtAnchor);
+				ctxt.setNewObject(con);
+				getFeatureProvider().addIfPossible(ctxt);
+			}
 		}
 
 		return true;
 	}
 
-	private void addBoToDiagram(final Diagram diagram, final EObject bo) {
+	private PictogramElement addBoToDiagram(final Diagram diagram, final EObject bo) {
 		final AddContext addContext = new AddContext();
 		addContext.setTargetContainer(diagram);
 		addContext.setNewObject(bo);
 		addContext.setLocation(10, 10);
 
-		getFeatureProvider().addIfPossible(addContext);
+		return getFeatureProvider().addIfPossible(addContext);
 	}
 
 	/**

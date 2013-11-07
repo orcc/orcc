@@ -52,6 +52,8 @@ import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
+import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -339,5 +341,9 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			return label.getValue();
 		}
 		return "";
+	}
+
+	public Anchor getAnchor(AnchorContainer container) {
+		return Graphiti.getPeService().getChopboxAnchor(container);
 	}
 }
