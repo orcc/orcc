@@ -367,18 +367,14 @@ class NetworkPrinter extends CTemplate {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
 				if(my_actor != NULL){
 					«IF instrumentNetwork»
-						if (instrumentation_file != NULL) {
-							tick_in = getticks();
-						}
+						tick_in = getticks();
 					«ENDIF»
 					si.num_firings = 0;
 					my_actor->sched_func(&si);
 					«IF instrumentNetwork»
-						if (instrumentation_file != NULL) {
-							tick_out = getticks();
-							double diff_tick = elapsed(tick_out, tick_in);
-							my_actor->workload += diff_tick;
-						}
+						tick_out = getticks();
+						double diff_tick = elapsed(tick_out, tick_in);
+						my_actor->workload += diff_tick;
 					«ENDIF»
 		#ifdef PRINT_FIRINGS
 					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);

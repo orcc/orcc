@@ -788,9 +788,7 @@ class InstancePrinter extends CTemplate {
 				read_end_«port.name»();
 				«ENDIF»
 				«IF instrumentNetwork»
-				if (instrumentation_file != NULL) {
-					tokens_«port.name»_workload += «action.inputPattern.getNumTokens(port)»;
-				}
+				tokens_«port.name»_workload += «action.inputPattern.getNumTokens(port)»;
 				«ENDIF»			
 			«ENDFOR»
 
