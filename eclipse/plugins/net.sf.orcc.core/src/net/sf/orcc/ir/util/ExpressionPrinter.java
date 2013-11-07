@@ -126,7 +126,7 @@ public class ExpressionPrinter extends IrSwitch<String> {
 
 	@Override
 	public String caseExprVar(ExprVar expr) {
-		return expr.getUse().getVariable().getIndexedName();
+		return expr.getUse().getVariable().getName();
 	}
 
 	@Override

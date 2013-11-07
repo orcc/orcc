@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, IETR/INSA of Rennes, Synflow SAS
+ * Copyright (c) 2013, Synflow SAS
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,90 +26,31 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.util;
+package net.sf.orcc.ir.transform;
 
 import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
-
-import java.util.List;
-import java.util.Map;
-
-import net.sf.orcc.df.Actor;
+import static net.sf.orcc.util.SwitchUtil.DONE;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-
-import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.impl.AdapterImpl;
-import org.eclipse.emf.ecore.EReference;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.util.Void;
 
 /**
- * This class defines an adapter that maintains a map of variables from a list
- * of variables.
+ * This class defines an IR transformation that renames local variables when
+ * using SSA.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class MapAdapter extends AdapterImpl {
-
-	private final Map<String, Var> map;
-
-	private final EReference reference;
-
-	public MapAdapter(Map<String, Var> map, EReference reference) {
-		this.map = map;
-		this.reference = reference;
-	}
-
-	private void add(Object object) {
-		Var var = (Var) object;
-		map.put(getNameSSA(var), var);
-	}
+public class SSAVariableRenamer extends AbstractIrVisitor<Void> {
 
 	@Override
-	public boolean isAdapterForType(Object type) {
-		return (type == Actor.class || type == Procedure.class);
-	}
-
-	@Override
-	public void notifyChanged(Notification notification) {
-		if (reference != notification.getFeature()) {
-			return;
+	public Void caseProcedure(Procedure procedure) {
+		for (Var local : procedure.getLocals()) {
+			local.setName(getNameSSA(local));
 		}
 
-		switch (notification.getEventType()) {
-		case Notification.ADD:
-			add(notification.getNewValue());
-			break;
-
-		case Notification.ADD_MANY: {
-			List<?> list = (List<?>) notification.getNewValue();
-			for (Object object : list) {
-				add(object);
-			}
-			break;
-		}
-
-		case Notification.MOVE: {
-			remove(notification.getOldValue());
-			add(notification.getNewValue());
-			break;
-		}
-
-		case Notification.REMOVE:
-			remove(notification.getOldValue());
-			break;
-
-		case Notification.REMOVE_MANY: {
-			List<?> list = (List<?>) notification.getOldValue();
-			for (Object object : list) {
-				remove(object);
-			}
-			break;
-		}
-		}
-	}
-
-	private void remove(Object object) {
-		map.remove(getNameSSA((Var) object));
+		return DONE;
 	}
 
 }

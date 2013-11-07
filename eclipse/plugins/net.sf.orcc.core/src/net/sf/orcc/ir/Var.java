@@ -63,15 +63,6 @@ public interface Var extends Attributable {
 	int getIndex();
 
 	/**
-	 * Returns the indexed name of this variable, which is the name of the
-	 * variable concatenated with "_" and its index, or if index is 0 is the
-	 * name of variable.
-	 * 
-	 * @return the indexed name of this variable
-	 */
-	String getIndexedName();
-
-	/**
 	 * Returns the initial value of this variable as an expression. Only valid
 	 * for global variables.
 	 * 
