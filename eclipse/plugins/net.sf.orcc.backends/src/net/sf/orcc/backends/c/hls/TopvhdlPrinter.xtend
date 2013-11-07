@@ -156,7 +156,7 @@ import net.sf.orcc.util.OrccUtil
 	override print(String targetFolder) {
 		
 		val contentNetwork = networkFileContent
-		val NetworkFile = new File(targetFolder + File::separator + network.name+ "Top" + ".vhd")
+		val NetworkFile = new File(targetFolder + File::separator + "TopVHDL" + File::separator +network.name+ "Top" + ".vhd")
 		
 		if(needToWriteFile(contentNetwork, NetworkFile)) {
 			OrccUtil::printFile(contentNetwork, NetworkFile)
