@@ -200,6 +200,12 @@ class HwProjectPrinter extends TTAPrinter {
 		      <association xil_pn:name="BehavioralSimulation"/>
 		      <association xil_pn:name="Implementation"/>
 		    </file>
+		    «IF(!design.outputs.empty)»
+		    <file xil_pn:name="share/vhdl/stratix3_led_io_always_1.vhd" xil_pn:type="FILE_VHDL">
+		      <association xil_pn:name="BehavioralSimulation"/>
+		      <association xil_pn:name="Implementation"/>
+		    </file>
+		    «ENDIF»
 		
 		    <!--                  -->
 		    <!-- Other components.-->
