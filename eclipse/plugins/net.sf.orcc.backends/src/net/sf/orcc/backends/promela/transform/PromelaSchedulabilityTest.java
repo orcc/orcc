@@ -88,9 +88,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	
 	public PromelaSchedulabilityTest(ControlTokenActorModel actorModel) {
 		super();
-		//this.netStateDef = netStateDef;
 		this.actorModel=actorModel;
-		//this.schedulingPorts = netStateDef.getPortsUsedInScheduling();
 		this.irVisitor = new InnerIrVisitor();
 	}
 
@@ -116,7 +114,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
-		System.out.println("\n Actor:" + actor.getName());
+		//System.out.println("\n Sched test Actor:" + actor.getName());
 		this.actor=actor;
 		this.fsm = actor.getFsm();
 		this.scheduler = new Scheduler(actor, this.fsm);
@@ -191,16 +189,16 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 			stopChecking = false;
 			nullGuardFound = false;
 			scheduler.buildSchedulingCases();
-			
-			// Abstract interpretation Start----------------------------------------
-		
-			INTERP: for (List<Schedule> sl : scheduler.getScheduleCases()) {
-				PromelaAbstractInterpreter interpreter = new PromelaAbstractInterpreter(actor);
-				ActorState actorstate = new ActorState(interpreter.getActor());
 
-				final int MAX_PHASES = 1024;
+			// Abstract interpretation Start----------------------------------------
+
+			final int MAX_PHASES = 1024;
+			INTERP: for (List<Schedule> sl : scheduler.getScheduleCases()) {
 				//State initialState = interpreter.getFsmState();
 				for (int index = 0; index < sl.size(); index++) {
+					PromelaAbstractInterpreter interpreter = new PromelaAbstractInterpreter(actor);
+					ActorState actorstate = new ActorState(interpreter.getActor());
+					
 					Schedule schedule = sl.get(index);
 					int nbPhases = 0;
 					try {
@@ -233,7 +231,6 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					}
 				}
 			}
-		
 		// Abstract interpretation End----------------------------------------
 			if (!stopChecking && !nullGuardFound) {
 				stopChecking = areSchedulesComplete();
@@ -501,17 +498,6 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		}
 		for (Action action : schedule.getSequence()) {
 			for (Port port : action.getInputPattern().getPorts()) {
-				boolean portUsed = actorModel.getAllReacableSchedulingVars()
-						.contains(action.getInputPattern().getVariable(port));
-				if (peekPorts.contains(port)) {
-					if (getPeeksOfState(initState).contains(port)) {
-						System.out.print(" (peeked value, ");
-						System.out.print("only relevant for the guard: "+ !portUsed + ") ");
-					} else {
-						System.out.print(" (not peek value, value used in scheduling: "+ portUsed + ")");
-					}
-					System.out.print("\n");
-				}
 				if (!portReads.containsKey(port.getName())) {
 					portReads.put(port.getName(), new ArrayList<Object>());
 				}
@@ -520,28 +506,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				}
 			}
 		}
-		System.out.println("Schedule input: "+portReads);
-		System.out.print("\n");
 		// Control tokens generation
 		for (Action action : schedule.getSequence()) {
 			for (Port port : action.getOutputPattern().getPorts()) {
-				/*if (schedulingPorts.contains(port)) {
-					// hasControlOutput = true;
-					System.out.print(" -> Writes to control port: "
-						+ port.getName());
-					// how is it generated?
-					Var var = action.getOutputPattern().getVariable(port);
-					System.out.print(", scenario specific constant: "
-						+ !(hasVarLoop(var) || hasInputDep(var, true)));
-					// System.out.print(", loop " + hasVarLoop(var));
-					if (hasInputDep(var, true)) {
-						System.out.print(", depends on input (through if:"
-							+ !hasInputDep(var, false) + ")");
-					}
-					// System.out.print(", iir " + (hasVarLoop(var) &&
-					// hasInputDep(var, true)));
-					System.out.print("\n");
-				}*/
 				if (!portWrites.containsKey(port.getName())) {
 					portWrites.put(port.getName(), new ArrayList<Object>());
 				}
@@ -550,8 +517,6 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				}
 			}
 		}
-		System.out.println("Schedule output: "+portWrites);
-		System.out.print("\n");
 	}
 
 	Set<Port> getInputDep(Var var, boolean includeIfCond) {
@@ -605,7 +570,11 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		return true;
 	}
 	
-	void removeLocalAndConstantVars(Set<Var> varSet) {
+	/**
+	 * A helper method that is used to, from a set remove the variables that are either local to an action or a constant
+	 * @param varSet
+	 */
+	public static void removeLocalAndConstantVars(Set<Var> varSet) {
 		Iterator<Var> i = varSet.iterator();
 		while (i.hasNext()) {
 			Var v = i.next();

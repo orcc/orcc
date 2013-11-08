@@ -40,6 +40,7 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.promela.transform.GuardsExtractor;
+import net.sf.orcc.backends.promela.transform.IdentifyStatelessActors;
 import net.sf.orcc.backends.promela.transform.PromelaAddPrefixToStateVar;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
 import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
@@ -159,8 +160,8 @@ public class PromelaBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printActor(Actor instance) {
-		return new InstancePrinter(instance, options, schedulingModel).printInstance(path) > 0;
+	protected boolean printActor(Actor actor) {
+		return new InstancePrinter(actor, options, schedulingModel).printInstance(path) > 0;
 	}
 
 	/**
@@ -193,6 +194,7 @@ public class PromelaBackend extends AbstractBackend {
 
 	private void transformActorAgain(Actor actor) {
 		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
+		transfos.add(new IdentifyStatelessActors(schedulingModel.getActorModel(actor)));
 		transfos.add(new PromelaDeadGlobalElimination(
 				schedulingModel.getActorModel(actor).getAllReacableSchedulingVars(), 
 				schedulingModel.getActorModel(actor).getPortsUsedInScheduling()));
@@ -202,7 +204,6 @@ public class PromelaBackend extends AbstractBackend {
 		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(actor);
 		}
-		//new PromelaTokenAnalyzer(netStateDef).doSwitch(actor);
 		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
 				schedulingModel.getActorModel(actor));
 		actorScheduler.doSwitch(actor);

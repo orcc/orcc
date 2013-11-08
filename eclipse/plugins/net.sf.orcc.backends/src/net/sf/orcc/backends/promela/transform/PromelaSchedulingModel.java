@@ -69,7 +69,7 @@ public class PromelaSchedulingModel {
 
 	
 	/**
-	 * Rather long method that prints the model in dot format. Should at some point be replaced by something more neat.
+	 * Rather long method that prints the model in dot format. Should at some point be replaced xtend.
 	 */
 	public void printDependencyGraph() {
 		for (ControlTokenActorModel am : actorModels) {

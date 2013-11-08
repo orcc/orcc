@@ -80,14 +80,6 @@ public class VariableGraph extends DfVisitor<Void> {
 
 	private Set<Var> varsFromNativeProcedures = new HashSet<Var>();
 	
-	@SuppressWarnings("unused")
-	private class Dependency {
-		Var source;
-		Var target;
-		boolean isIf;
-		boolean isPort;
-	}
-	
 
 	public VariableGraph(Actor actor) {
 		this.irVisitor = new InnerIrVisitor();
@@ -284,6 +276,7 @@ public class VariableGraph extends DfVisitor<Void> {
 		public Void caseInstLoad(InstLoad load) {
 			addVariableDep(load.getTarget().getVariable(), load.getSource()
 					.getVariable());
+			addTargetVar(load.getTarget().getVariable());
 			for (Expression e : load.getIndexes()) {
 				doSwitch(e);
 			}
