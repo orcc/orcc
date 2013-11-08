@@ -174,6 +174,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		boolean stopChecking;
 		boolean nullGuardFound;
 		do {
+			System.out.println("Actor " +actor.getName());
 			if (fsm != null) {
 				scheduler.getSchedules().clear();
 				for (State state : choiceStatesSet) {
@@ -194,10 +195,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 			final int MAX_PHASES = 1024;
 			INTERP: for (List<Schedule> sl : scheduler.getScheduleCases()) {
-				//State initialState = interpreter.getFsmState();
+				PromelaAbstractInterpreter interpreter = new PromelaAbstractInterpreter(actor);
+				ActorState actorstate = new ActorState(interpreter.getActor());
 				for (int index = 0; index < sl.size(); index++) {
-					PromelaAbstractInterpreter interpreter = new PromelaAbstractInterpreter(actor);
-					ActorState actorstate = new ActorState(interpreter.getActor());
 					
 					Schedule schedule = sl.get(index);
 					int nbPhases = 0;
@@ -220,7 +220,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 							stopChecking=true;
 						}
 					}catch (OrccRuntimeException e){ //should only happen on native calls
-						if (actor.hasFsm()) {
+						if (actor.hasFsm() && interpreter.nullWasNormal()) {
 							choiceStatesSet.add(interpreter.getFsmStateOrig());
 							nullGuardFound=true;
 						} else {
@@ -236,7 +236,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				stopChecking = areSchedulesComplete();
 			}
 		} while (!stopChecking);
-		
+
 		for (Schedule s : scheduler.getSchedules()) {
 			generateScheduleInfo(s);
 		}
@@ -488,7 +488,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		Map<String, List<Object>> portPeeks = schedule.getPortPeeks();
 		Map<String, List<Object>> portReads = schedule.getPortReads();
 		Map<String, List<Object>> portWrites = schedule.getPortWrites();
-		
+
 		Map<String, Object> configuration = findPeekValues(initState, schedule.getEnablingAction());
 		for (String key : configuration.keySet()) {
 			if (!portPeeks.containsKey(key)) {
