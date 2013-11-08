@@ -65,8 +65,7 @@ def performBench():
     archiveLogs()
 
 def generateProfilingFiles():
-    print "\n*********************************************************************"
-    print "Generate profiling file for each sequence in " + SEQ_PATH
+    print "\nGenerate profiling file for each sequence in " + SEQ_PATH
     for fic in os.listdir(SEQ_PATH):
         if fic.endswith(HEVC_SEQ_FILTER+HEVC_SEQ_EXT) or fic.endswith(MPEG4_SEQ_EXT):
             SEQUENCE_NAME = fic[0:len(fic)-len(HEVC_SEQ_EXT)]
@@ -124,12 +123,10 @@ def extractFPS(nbProcs):
     fps_RR = "NaN"
     fps_MR = "NaN"
     fps_MK = "NaN"
-    print "\n*********************************************************************"
-    print "Extracting FPS from logs"
+    print "\n  * Extracting FPS from logs"
     for fic in os.listdir("."):
         if fic.count(MS_NM+DEFAULT_LOG_EXT):
             SEQUENCE_NAME = fic[len(FILE_HEAD):len(fic)-len(MS_NM)-len(DEFAULT_LOG_EXT)-1]
-            print "  * Processing on sequence : %s" % (SEQUENCE_NAME)
             fps = getFPS(fic)
             
             baseName = SEQUENCE_NAME + "_" + str(nbProcs) + "Procs" + "_"
@@ -146,8 +143,7 @@ def extractFPS(nbProcs):
     BENCH_DATA.sort()
 
 def logInTXT(nbProcs):
-    print "\n*********************************************************************"
-    print "Generate TXT Result file... " + SUMMARY_TXT
+    print "\n  * Generate TXT Result file... " + SUMMARY_TXT
     fd = open(SUMMARY_TXT, 'a')
     # Header
     fd.write("Summary results for " + OUTPUT_TAG + "\n")
@@ -188,8 +184,7 @@ def mergeFiles(file1,file2):
     return destination
 
 def mergeAllCSV():
-    print "*********************************************************************"
-    print "Merging CSV Files"
+    print "\nMerging CSV Files"
 
     files = list()
     for fs in os.listdir("."):
@@ -209,8 +204,7 @@ def mergeAllCSV():
        
 
 def logInCSV(nbProcs):
-    print "\n*********************************************************************"
-    print "Generate CSV Result file... " + OUTPUT_TAG + "_" + str(nbProcs) + "Procs" + ".csv"
+    print "\n  * Generate CSV Result file... " + OUTPUT_TAG + "_" + str(nbProcs) + "Procs" + ".csv"
     fd = open(OUTPUT_TAG + "_" + str(nbProcs) + "Procs" + ".csv", 'w')
     # Header
     fd.write("Nb of processors;;" + str(nbProcs) + ";;;;;\n")
@@ -226,8 +220,7 @@ def logInCSV(nbProcs):
     fd.close()
 
 def logInXML(nbProcs):
-    print "\n*********************************************************************"
-    print "Generate XML Result file... " + SUMMARY_XML
+    print "\n  * Generate XML Result file... " + SUMMARY_XML
     fd = open(SUMMARY_XML, 'w')
     # Header
     fd.write("<report name=\"{REPORT_NAME}\" categ=\"{CATEGORY_NAME}\">\n")
@@ -239,8 +232,7 @@ def logInXML(nbProcs):
     fd.close()
 
 def archiveLogs():
-    print "\n*********************************************************************"
-    print "Archiving all in directory " + OUTPUT_TAG
+    print "\nArchiving all in directory " + OUTPUT_TAG
     save = 0
     if os.path.exists(OUTPUT_TAG):
         backup = OUTPUT_TAG+"_"+str(save)
@@ -259,7 +251,7 @@ def archiveLogs():
 
 # Main
 # DEFAULT
-HEVC_SEQ_FILTER = "_qp32"
+HEVC_SEQ_FILTER = "KristenAndSara_1280x720_60_qp27"
 HEVC_SEQ_EXT = ".bin"
 MPEG4_SEQ_EXT = ".bit"
 DEFAULT_LOG_EXT = ".log"
