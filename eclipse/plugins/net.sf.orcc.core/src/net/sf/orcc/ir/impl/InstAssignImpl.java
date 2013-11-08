@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -257,7 +258,7 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	@Override
 	public String toString() {
 		return super.toString() + "Assign("
-				+ target.getVariable().getIndexedName() + ", "
+				+ getNameSSA(target.getVariable()) + ", "
 				+ new ExpressionPrinter().doSwitch(getValue()) + ")";
 	}
 } // InstAssignImpl

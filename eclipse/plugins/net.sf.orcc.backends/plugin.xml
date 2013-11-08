@@ -23,9 +23,6 @@
                id="net.sf.orcc.backends.instrumentNetwork">
          </option>
          <option
-               id="net.sf.orcc.backends.metricMapping">
-         </option>
-         <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
          <option
@@ -154,9 +151,6 @@
                id="net.sf.orcc.backends.importXCF">
          </option>
          <option
-               id="net.sf.orcc.backends.metricMapping">
-         </option>
-         <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
       </backend>
@@ -265,21 +259,6 @@
                id="net.sf.orcc.backends.instrumentNetwork"
                name="[BETA] Instrument network">
             <checkBox></checkBox>
-         </option>
-         <option
-               defaultValue="false"
-               description="Uses graph partitioning algorithm to find a balanced mapping of the actors on the processor cores"
-               id="net.sf.orcc.backends.metricMapping"
-               name="Metric-based actor mapping">
-            <checkBox>
-            	<option
-	               		defaultValue="1"
-	               		description="Specify the number of processor cores to use for the mapping"
-	               		id="net.sf.orcc.backends.processorsNumber"
-	               		name="Number of processor cores">
-            		<textBox></textBox>
-         		</option>
-            </checkBox>
          </option>
          <option
                description="Whether Orcc should compile the given hierarchical XDF network"

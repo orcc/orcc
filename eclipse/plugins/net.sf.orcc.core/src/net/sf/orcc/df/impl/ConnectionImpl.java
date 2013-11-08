@@ -249,13 +249,13 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(getSource());
+		builder.append(getSource().getLabel());
 		if (getSourcePort() != null) {
 			builder.append('.');
 			builder.append(getSourcePort().getName());
 		}
 		builder.append(" --> ");
-		builder.append(getTarget());
+		builder.append(getTarget().getLabel());
 		if (getTargetPort() != null) {
 			builder.append('.');
 			builder.append(getTargetPort().getName());

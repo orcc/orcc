@@ -122,13 +122,13 @@ class NetworkPrinter extends ExprAndTypePrinter {
 			options.getOptions();
 			
 			«FOR param : network.parameters»
-				«param.type.doSwitch» «param.indexedName»«FOR dim:param.type.dimensions»[«dim»]«ENDFOR»;
+				«param.type.doSwitch» «param.name»«FOR dim:param.type.dimensions»[«dim»]«ENDFOR»;
 			«ENDFOR»
 			
 			«FOR param : network.parameters»
-				if(!options.getOptionAs("«param.indexedName»", «param.indexedName»))
+				if(!options.getOptionAs("«param.name»", «param.name»))
 				{
-					std::cerr << "«param.indexedName» is not defined!" << std::endl;
+					std::cerr << "«param.name» is not defined!" << std::endl;
 					exit(-1);
 				}
 			«ENDFOR»

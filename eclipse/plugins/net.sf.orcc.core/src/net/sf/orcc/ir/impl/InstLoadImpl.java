@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.ir.impl;
 
+import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
+
 import java.util.Collection;
 
 import net.sf.orcc.ir.Def;
@@ -327,7 +329,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
 		builder.append("Load(")
-				.append(getTarget().getVariable().getIndexedName())
+				.append(getNameSSA(getTarget().getVariable()))
 				.append(", ").append(getSource().getVariable().getName());
 		for (Expression index : getIndexes()) {
 			builder.append("[");

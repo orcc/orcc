@@ -132,7 +132,7 @@ class SwActorPrinter extends InstancePrinter {
 		«val args = call.arguments»
 		«val parameters = call.procedure.parameters»
 		«IF call.procedure.native»
-			«IF target != null»%«target.variable.indexedName» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
+			«IF target != null»%«target.variable.name» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
 		«ELSE»
 			«super.caseInstCall(call)»
 		«ENDIF»

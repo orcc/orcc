@@ -12,6 +12,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.util.Void;
 
 public class TemplateInfoComputing extends AbstractIrVisitor<Void> {
 

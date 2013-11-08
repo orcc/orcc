@@ -57,31 +57,16 @@ class CMakePrinter extends CommonPrinter {
 	
 	def protected rootCMakeContent() '''
 		# Generated from «network.simpleName»
-		
-		cmake_minimum_required (VERSION 2.6)
-		
-		project («network.simpleName»)
-		
-		# Helps cmake to find where SDL libraries are saved (win32 only)
-		if(WIN32)
-			set(ENV{CMAKE_PREFIX_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/windows/SDL-*\;${CMAKE_CURRENT_SOURCE_DIR}/libs/windows/SDL_image-*)
-		endif(WIN32)
 
-		if(NOT NO_EXTERNAL_DEPENDENCIES)
-			# Required by osx
-			find_package(SDL REQUIRED)
-		endif(NOT NO_EXTERNAL_DEPENDENCIES)
-		
-		# Output folder
+		cmake_minimum_required (VERSION 2.6)
+
+		project («network.simpleName»)
+
+		# Configure ouput folder for generated binary
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 		
-		# Libraries folder
-		set(LIBS_DIR ${CMAKE_SOURCE_DIR}/libs)
-		set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-		
 		# Runtime libraries inclusion
-		set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
-		set(CYCLE_INCLUDE_DIR ${LIBS_DIR}/cycle/include)
+		include_directories(libs/orcc/include)
 		
 		«addLibrariesSubdirs»
 	'''
@@ -91,14 +76,14 @@ class CMakePrinter extends CommonPrinter {
 	 * for specific usages (other backends)
 	 */
 	def protected addLibrariesSubdirs() '''
-		add_subdirectory(${LIBS_DIR})
-		add_subdirectory(${SRC_DIR})
+		# Compile required libs
+		add_subdirectory(libs)
+		# Compile application
+		add_subdirectory(src)
 	'''
 
 	def protected srcCMakeContent() '''
 		# Generated from «network.simpleName»
-
-		cmake_minimum_required (VERSION 2.6)
 
 		set(filenames
 			«network.simpleName».c
@@ -110,15 +95,9 @@ class CMakePrinter extends CommonPrinter {
 			«ENDFOR»
 		)
 
-		include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${CYCLE_INCLUDE_DIR})
-
 		add_executable(«network.simpleName» ${filenames})
 
+		# Build library without any external library required
 		target_link_libraries(«network.simpleName» orcc)
-
-		# Build library without any external library required (SDL, pthread, etc)
-		if(NOT NO_EXTERNAL_DEPENDENCIES)
-			target_link_libraries(«network.simpleName» ${CMAKE_THREAD_LIBS_INIT})
-		endif(NOT NO_EXTERNAL_DEPENDENCIES)
 	'''
 }

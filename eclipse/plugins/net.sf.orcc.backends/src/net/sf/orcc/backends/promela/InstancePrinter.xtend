@@ -99,7 +99,14 @@ class InstancePrinter extends PromelaTemplate {
 			«ENDFOR»
 			/* Initial State */
 			int fsm_state_«actor.simpleName» = «actor.simpleName»_state_«actor.fsm.initialState.name»;
+		«ELSE»
+			int «actor.simpleName»_state_one_state = 0;
+			int fsm_state_«actor.simpleName»=«actor.simpleName»_state_one_state;
 		«ENDIF»
+		
+		int state_var_«actor.simpleName»_initialized=0;
+		
+		int promela_«actor.simpleName»_has_progress=0;
 		
 		«IF ! actor.stateVars.nullOrEmpty»
 			/* State variables */
@@ -146,7 +153,13 @@ class InstancePrinter extends PromelaTemplate {
 			«FOR port : actor.outputs»
 				«port.type.doSwitch» «port.name»[«port.numTokensProduced»];
 			«ENDFOR»
+			
+			int promela_io_index; // used for reading/writing multiple tokens
 		
+			/* Initializers */
+			«initializeFunction»
+			
+			/* Actions */
 			«IF actor.hasFsm»
 				do
 				«FOR state : actor.fsm.states»
@@ -169,6 +182,45 @@ class InstancePrinter extends PromelaTemplate {
 		}
 	'''
 	
+	def protected initializeFunction() '''
+		«IF ! actor.initializes.nullOrEmpty»
+			if
+			:: state_var_«actor.simpleName»_initialized==0 -> atomic {
+			«FOR init : actor.initializes»
+				/* Temp variables*/
+				«FOR local : init.body.locals»
+					«local.declare»;
+				«ENDFOR»
+				«init.inputPattern.inputPattern»
+			
+				«FOR block : init.body.blocks»
+					«block.doSwitch»
+				«ENDFOR»
+			
+				«init.outputPattern.outputPattern»
+				state_var_«actor.simpleName»_initialized=1;
+				
+				promela_has_progress=1;
+				promela_«actor.simpleName»_has_progress=1;
+				
+				#ifdef PXML
+				printf("<iterand actor=\"«actor.simpleName»\" action=\"«init.name»\" repetitions=\"1\"/>\n");
+				#endif
+				#ifdef PNAME
+				printf("«actor.simpleName».«init.name»();\n");
+				#endif
+				«IF ! actor.stateVars.nullOrEmpty»
+					#ifdef PSTATE
+					printf("«actor.stateVars.join(";", ['''«name»«type.dimensions.join("",["[0]"])»=%d'''])»\n\n", «actor.stateVars.join(", ", ['''«name»«type.dimensions.join(",",["[0]"])»'''])»);
+					#endif
+				«ENDIF»
+			«ENDFOR»
+			}
+			:: state_var_«actor.simpleName»_initialized==1 -> skip;
+			fi;
+		«ENDIF»
+	'''
+		
 	def newState(State state) '''
 		::	fsm_state_«actor.simpleName» == «actor.simpleName»_state_«state.name» -> {
 			if
@@ -219,7 +271,6 @@ class InstancePrinter extends PromelaTemplate {
 			«action.outputPattern.outputChannelCheck»
 			-> 
 			/* Temp variables*/
-			int promela_io_index; // used for reading/writing multiple tokens
 			«FOR local : action.body.locals»
 				«local.declare»;
 			«ENDFOR»
@@ -239,6 +290,7 @@ class InstancePrinter extends PromelaTemplate {
 			«ENDFOR»
 			
 			promela_has_progress=1;
+			promela_«actor.simpleName»_has_progress=1;
 			
 			#ifdef PXML
 			printf("<iterand actor=\"«actor.simpleName»\" action=\"«action.name»\" repetitions=\"1\"/>\n");
@@ -322,7 +374,6 @@ class InstancePrinter extends PromelaTemplate {
 			->
 			
 			/* Temp variables*/
-			int promela_io_index; // used for reading/writing multiple tokens
 			«FOR local : action.body.locals»
 				«local.declare»;
 			«ENDFOR»
@@ -336,6 +387,7 @@ class InstancePrinter extends PromelaTemplate {
 			«action.outputPattern.outputPattern»
 
 			promela_has_progress=1;
+			promela_«actor.simpleName»_has_progress=1;
 
 			#ifdef PXML
 			printf("<iterand actor=\"«actor.simpleName»\" action=\"«action.name»\" repetitions=\"1\"/>\n");
@@ -376,11 +428,11 @@ class InstancePrinter extends PromelaTemplate {
 	}
 
 	def declare(Var variable, String nameSuffix) {
-		'''«variable.type.doSwitch» «variable.indexedName»«nameSuffix»«variable.type.dimensionsExpr.printArrayIndexes»'''
+		'''«variable.type.doSwitch» «variable.name»«nameSuffix»«variable.type.dimensionsExpr.printArrayIndexes»'''
 	}
 	
 	override caseInstAssign(InstAssign assign) '''
-		«assign.target.variable.indexedName» = «assign.value.doSwitch»;
+		«assign.target.variable.name» = «assign.value.doSwitch»;
 	'''
 
 	override caseInstCall(InstCall call) {
@@ -394,7 +446,7 @@ class InstancePrinter extends PromelaTemplate {
 	}
 	
 	override caseInstLoad(InstLoad load) '''
-		«load.target.variable.indexedName» = «load.source.variable.indexedName»«load.indexes.printArrayIndexes»;
+		«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 	'''
 	
 	override caseInstStore(InstStore store) '''

@@ -30,6 +30,7 @@ package net.sf.orcc.backends.transform;
 
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.emf.ecore.EObject;
 

@@ -53,7 +53,6 @@ import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -71,6 +70,7 @@ import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
@@ -79,6 +79,7 @@ import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Void;
 
 /**
  * TTA back-end.
@@ -166,6 +167,9 @@ public class TTABackend extends LLVMBackend {
 		visitors.add(new DfVisitor<Void>(new ListInitializer()));
 		visitors.add(new DfVisitor<Void>(new TemplateInfoComputing()));
 
+		// computes names of local variables
+		visitors.add(new DfVisitor<Void>(new SSAVariableRenamer()));
+
 		for (DfSwitch<?> transfo : visitors) {
 			transfo.doSwitch(network);
 			if (debug) {
@@ -179,13 +183,6 @@ public class TTABackend extends LLVMBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
-
-		if (balanceMapping) {
-			// Solve load balancing using Metis. The 'mapping' variable should
-			// be the weightsMap, giving a weight to each actor/instance.
-			mapping = new Metis().partition(network, path, processorNumber,
-					mapping);
-		}
 
 		// Compute the actor mapping
 		if (importXcfFile) {

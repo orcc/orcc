@@ -23,7 +23,8 @@ class ModelChecker(object):
             elif line.find('state_var_') >= 0 or line.find('_state_') >= 0:
                 self.endstate += line + ';\n'
             elif line.find('iterand') >= 0 :
-                self.schedxml += line + '\n'
+                if line.find('_bcast') <0 :
+                    self.schedxml += line + '\n'
             else:
                 pass
             proc.stdout.flush()

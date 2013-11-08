@@ -73,7 +73,7 @@ class ExprAndTypePrinter extends CommonPrinter {
 
 	override caseExprUnary(ExprUnary expr) '''«expr.op.text»(«expr.expr.doSwitch»)'''
 
-	override caseExprVar(ExprVar expr) '''«expr.use.variable.indexedName»'''
+	override caseExprVar(ExprVar expr) '''«expr.use.variable.name»'''
 	
 	override caseTypeBool(TypeBool type)  '''bool'''
 	

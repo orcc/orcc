@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.util;
 
+import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
+
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +61,7 @@ public class MapAdapter extends AdapterImpl {
 
 	private void add(Object object) {
 		Var var = (Var) object;
-		map.put(var.getIndexedName(), var);
+		map.put(getNameSSA(var), var);
 	}
 
 	@Override
@@ -107,7 +109,7 @@ public class MapAdapter extends AdapterImpl {
 	}
 
 	private void remove(Object object) {
-		map.remove(((Var) object).getIndexedName());
+		map.remove(getNameSSA((Var) object));
 	}
 
 }

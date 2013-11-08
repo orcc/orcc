@@ -32,6 +32,7 @@ import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.util.Void;
 
 /**
  * Remove empty block from if and while block.

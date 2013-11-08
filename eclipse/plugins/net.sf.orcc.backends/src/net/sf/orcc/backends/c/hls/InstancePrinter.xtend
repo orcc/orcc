@@ -281,10 +281,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 			«IF (srcPort != null)» 
 				«IF !instance.incomingPortMap.get(srcPort).fifoName.toString.empty»
-				 	«instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
+				 	«instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.name»);
 				 «ENDIF»
 			«ELSE»
-				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
+				«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
 		'''
 		

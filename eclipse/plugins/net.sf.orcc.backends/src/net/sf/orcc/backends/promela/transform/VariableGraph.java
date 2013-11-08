@@ -141,6 +141,9 @@ public class VariableGraph extends DfVisitor<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
+		for (Action init : actor.getInitializes()) {
+			doSwitch(init);
+		}
 		for (Action action : actor.getActions()) {
 			doSwitch(action);
 		}

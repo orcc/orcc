@@ -33,6 +33,7 @@ import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 

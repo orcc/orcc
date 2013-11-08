@@ -78,29 +78,29 @@ class CMakePrinter extends CommonPrinter {
 	def private rootCMakeContent() '''
 		# Generated from «network.simpleName»
 		cmake_minimum_required (VERSION 2.6)
-		
-		set(CMAKE_C_COMPILER "clang")
-		
+
 		project («network.simpleName» C)
-		
-		# Parse libraries
-		add_subdirectory(libs)
-		
-		# Configure build types specific flags for clang
-		# set (CMAKE_C_FLAGS_RELEASE "-O4 -DNDEBUG")
-		if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-		    set(CLANG_FLAGS "")
-		else(${CMAKE_BUILD_TYPE})
+
+		# Default compiler must be clang
+		set(CMAKE_C_COMPILER "clang")
+		# Configure specific flags for clang (according to selected build type)
+		if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
 		    string(TOUPPER ${CMAKE_BUILD_TYPE} CMBT)
 		    set(CLANG_FLAGS ${CMAKE_C_FLAGS_${CMBT}})
 		endif()
-		
+
 		message(STATUS "Clang FLAGS : " ${CLANG_FLAGS})
 		separate_arguments(CLANG_FLAGS)
-		
+
 		# Output folder
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
-		
+
+		# Runtime libraries inclusion
+		include_directories(libs/orcc/include)
+
+		# Compile libraries
+		add_subdirectory(libs)
+		# Compile application
 		add_subdirectory(src)
 	'''
 	
@@ -109,9 +109,7 @@ class CMakePrinter extends CommonPrinter {
 	 */
 	def private srcCMakeContent() '''
 		# Generated from «network.simpleName»
-		
-		cmake_minimum_required (VERSION 2.6)
-		
+
 		set(«network.simpleName»_SRCS
 			«network.simpleName».ll
 			«FOR child : network.children»
@@ -123,7 +121,7 @@ class CMakePrinter extends CommonPrinter {
 		    string(REPLACE ".ll" ${CMAKE_C_OUTPUT_EXTENSION} _outfile ${_infile})
 		    set(_inpath ${CMAKE_CURRENT_SOURCE_DIR}/${_infile})
 		    set(_outpath ${CMAKE_CURRENT_BINARY_DIR}/${_outfile})
-		
+
 		    add_custom_command(
 		        OUTPUT ${_outpath}
 		        COMMAND ${CMAKE_C_COMPILER} ${CLANG_FLAGS} -c ${_inpath} -o ${_outpath}
@@ -132,9 +130,9 @@ class CMakePrinter extends CommonPrinter {
 		    )
 		    list(APPEND «network.simpleName»_OBJS ${_outpath})
 		endforeach()
-		
+
 		add_executable(«network.simpleName» ${«network.simpleName»_OBJS} ${«network.simpleName»_SRCS})
-		
+
 		set_target_properties(«network.simpleName» PROPERTIES LINKER_LANGUAGE C)
 		target_link_libraries(«network.simpleName» orcc ${SDL_LIBRARY})
 	'''

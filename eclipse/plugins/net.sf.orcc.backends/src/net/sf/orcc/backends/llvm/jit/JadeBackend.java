@@ -62,12 +62,14 @@ import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
@@ -140,6 +142,9 @@ public class JadeBackend extends AbstractBackend {
 		transfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
 		transfos.add(new DfVisitor<Void>(new ListInitializer()));
 		transfos.add(new DfVisitor<Void>(new TemplateInfoComputing()));
+
+		// computes names of local variables
+		transfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 
 		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(actor);
