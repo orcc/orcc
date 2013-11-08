@@ -168,7 +168,7 @@ void delete_graph(adjacency_list *graph) {
 mapping_t *allocate_mapping(int number_of_threads) {
     mapping_t *mapping = (mapping_t *) malloc(sizeof(mapping_t));
     mapping->number_of_threads = number_of_threads;
-    mapping->partitions_of_actors = (actor_t ***) malloc(number_of_threads * sizeof(actor_t **));
+    mapping->partitions_of_actors = malloc(number_of_threads * sizeof(*mapping->partitions_of_actors));
     mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
     return mapping;
 }
@@ -597,10 +597,7 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
         mapping->partitions_size[part[i]]++;
     }
     for (i = 0; i < mapping->number_of_threads; i++) {
-        mapping->partitions_of_actors[i] = (actor_t **) malloc(mapping->partitions_size[i] * sizeof(actor_t *));
-        for (j=0; j < mapping->partitions_size[part[i]]; j++) {
-            mapping->partitions_of_actors[i][j] = (actor_t *) malloc(sizeof(actor_t));
-        }
+        mapping->partitions_of_actors[i] = malloc(mapping->partitions_size[i] * sizeof(**mapping->partitions_of_actors));
     }
     for (i = 0; i < network->nb_actors; i++) {
         mapping->partitions_of_actors[part[i]][counter[part[i]]] = network->actors[i];
