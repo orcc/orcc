@@ -33,7 +33,7 @@
 
 void print_usage() {
     /* !TODO: Find a kind way to format this text */
-    char *IDENT = "    ";
+    char *INDENT = "    ";
 
     printf("\nUsage: orccmap [options] -n nbproc -i filename");
     printf("\n");
@@ -43,35 +43,35 @@ void print_usage() {
 
     printf("\n");
     printf("\nRequired parameters:");
-    printf("\n%s-n, --nb_processors <nbproc>", IDENT);
-    printf("\n%s%sThe number of processors (partitions).", IDENT, IDENT);
+    printf("\n%s-n, --nb_processors <nbproc>", INDENT);
+    printf("\n%s%sThe number of processors (partitions).", INDENT, INDENT);
     printf("\n");
-    printf("\n%s-i, --input_file <filename>", IDENT);
-    printf("\n%s%sThe name of the input file containing a network description.", IDENT, IDENT);
+    printf("\n%s-i, --input_file <filename>", INDENT);
+    printf("\n%s%sThe name of the input file containing a network description.", INDENT, INDENT);
 
     printf("\n");
     printf("\nOptional parameters:");
-    printf("\n%s-o, --output_file <filename>", IDENT);
-    printf("\n%s%sThe name of the output file.", IDENT, IDENT);
+    printf("\n%s-o, --output_file <filename>", INDENT);
+    printf("\n%s%sThe name of the output file.", INDENT, INDENT);
 
     printf("\n");
-    printf("\n%s-m, --mapping_strategy <strategy>", IDENT);
-    printf("\n%s%sThe strategy to apply to do the mapping.", IDENT, IDENT);
-    printf("\n%s%sThe possible values are: {Default : ROUND_ROBIN}", IDENT, IDENT);
-    printf("\n%s%s%sROUND_ROBIN", IDENT, IDENT, IDENT);
-    printf("\n%s%s%sMETIS_REC", IDENT, IDENT, IDENT);
-    printf("\n%s%s%sMETIS_KWAY", IDENT, IDENT, IDENT);
+    printf("\n%s-m, --mapping_strategy <strategy>", INDENT);
+    printf("\n%s%sThe strategy to apply to do the mapping.", INDENT, INDENT);
+    printf("\n%s%sThe possible values are: {Default : ROUND_ROBIN}", INDENT, INDENT);
+    printf("\n%s%s%sROUND_ROBIN", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sMETIS_REC", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sMETIS_KWAY", INDENT, INDENT, INDENT);
 
     printf("\n");
-    printf("\n%s-v, --verbose [level]", IDENT);
-    printf("\n%s%sPrint informations.", IDENT, IDENT);
-    printf("\n%s%sThe possible values are: {Default : 1}", IDENT, IDENT);
-    printf("\n%s%s%s1 : summary and results", IDENT, IDENT, IDENT);
-    printf("\n%s%s%s2 : debug informations", IDENT, IDENT, IDENT);
+    printf("\n%s-v, --verbose [level]", INDENT);
+    printf("\n%s%sPrint informations.", INDENT, INDENT);
+    printf("\n%s%sThe possible values are: {Default : 1}", INDENT, INDENT);
+    printf("\n%s%s%s1 : summary and results", INDENT, INDENT, INDENT);
+    printf("\n%s%s%s2 : debug informations", INDENT, INDENT, INDENT);
 
     printf("\n");
-    printf("\n%s-h, --help", IDENT);
-    printf("\n%s%sPrints this message.", IDENT, IDENT);
+    printf("\n%s-h, --help", INDENT);
+    printf("\n%s%sPrints this message.", INDENT, INDENT);
     printf("\n");
 }
 
