@@ -11,6 +11,7 @@ find_package(METIS REQUIRED)
 
 include_directories(
     libs/roxml/include
+    include
 )
 
 # Compile required libs

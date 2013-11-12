@@ -1,10 +1,12 @@
 
 set(libfilenames
-    orccmap.c
+    ../include/orccmap.h
+    mapping.h
+    mapping.c
 )
 
 set(exefilenames
-    mapping.c
+    orcc-map.c
 )
 
 # Compile library
