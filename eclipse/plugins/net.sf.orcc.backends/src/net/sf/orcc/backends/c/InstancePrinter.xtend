@@ -776,19 +776,19 @@ class InstancePrinter extends CTemplate {
 
 			«FOR port : action.inputPattern.ports»
 				«IF enableTrace»
-				{
-					int i;
-					for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
-						fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+					{
+						int i;
+						for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
+							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+						}
 					}
-				}
 				«ENDIF»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
 				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
-				read_end_«port.name»();
+					read_end_«port.name»();
 				«ENDIF»
 				«IF instrumentNetwork»
-				rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
+					rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
 				«ENDIF»			
 			«ENDFOR»
 
@@ -803,7 +803,7 @@ class InstancePrinter extends CTemplate {
 				«ENDIF»
 				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
 				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
-				write_end_«port.name»();
+					write_end_«port.name»();
 				«ENDIF»
 			«ENDFOR»
 		}
