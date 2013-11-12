@@ -27,56 +27,39 @@
  * SUCH DAMAGE.
  */
 
-#include <assert.h>
-#include <stdarg.h>
-#include "util.h"
+#ifndef _ORCCMAP_UTIL_H_
+#define _ORCCMAP_UTIL_H_
 
-/********************************************************************************************
- *
- * Orcc-Map utils functions
- *
- ********************************************************************************************/
+#include "mapping.h"
 
-void print_orcc_error(orccmap_error_et error) {
-    if (error != ORCC_OK && error < ORCC_ERR_SIZE) {
-        fprintf(stderr,"\nOrcc-Map : ERROR : %s", ORCC_ERRORS_TXT[error]);
-    }
+/**
+ * !TODO
+ */
+void print_orcc_error(orccmap_error_et error);
 
-}
+/**
+ * !TODO
+ */
+void check_metis_error(rstatus_et error);
 
-void check_metis_error(rstatus_et error) {
-    if (error != METIS_OK) {
-        print_orcc_error(ORCC_ERR_METIS);
-        fprintf(stderr,"\t Code: %d", error);
-        exit(error);
-    }
-}
+/**
+ * !TODO
+ */
+void check_orcc_error(orccmap_error_et error);
 
-void check_orcc_error(orccmap_error_et error) {
-    if (error != ORCC_OK) {
-        print_orcc_error(error);
-        exit(error);
-    }
-}
+/**
+ * !TODO
+ */
+boolean print_trace_block(verbose_level_et level);
 
-boolean print_trace_block(verbose_level_et level) {
-    return (level<=verbose_level)?TRUE:FALSE;
-}
+/**
+ * !TODO
+ */
+void print_orcc_trace(verbose_level_et level, const char *trace, ...);
 
-void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
-    assert(trace != NULL);
+/**
+ * !TODO
+ */
+void set_trace_level(verbose_level_et level);
 
-    va_list args;
-    va_start (args, trace);
-
-    if (level <= verbose_level) {
-        printf("\nOrcc-Map : ");
-        vprintf(trace, args);
-    }
-
-    va_end (args);
-}
-
-void set_trace_level(verbose_level_et level) {
-    verbose_level = level;
-}
+#endif  /* _ORCCMAP_UTIL_H_ */

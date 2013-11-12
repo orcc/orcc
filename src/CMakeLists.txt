@@ -4,15 +4,20 @@ set(libfilenames
     mapping.h
     mapping.c
     util.c
+    util.h
+    options.c
+    options.h
 )
 
 set(exefilenames
-    orcc-map.c
+    serialize.h
+    serialize.c
+    main.c
 )
 
 # Compile library
-add_library (orccmap ${libfilenames})
-target_link_libraries(orccmap roxml metis m)
+add_library(orccmap ${libfilenames})
+target_link_libraries(orccmap metis m)
 
 # Compile executable
 add_executable(orcc-map ${exefilenames})

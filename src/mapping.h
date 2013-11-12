@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCC_MAPPING_H_
-#define _ORCC_MAPPING_H_
+#ifndef _ORCCMAP_MAPPING_H_
+#define _ORCCMAP_MAPPING_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -78,36 +78,6 @@ static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
             { size_t TMPSZ = sizeof(*(SRC)) * (LEN); \
               if ( ((DST) = malloc(TMPSZ)) != NULL ) \
                 memcpy((DST), (SRC), TMPSZ); }
-
-/**
- * !TODO
- */
-void print_orcc_error(orccmap_error_et error);
-
-/**
- * !TODO
- */
-void check_metis_error(rstatus_et error);
-
-/**
- * !TODO
- */
-void check_orcc_error(orccmap_error_et error);
-
-/**
- * !TODO
- */
-boolean print_trace_block(verbose_level_et level);
-
-/**
- * !TODO
- */
-void print_orcc_trace(verbose_level_et level, const char *trace, ...);
-
-/**
- * !TODO
- */
-void set_trace_level(verbose_level_et level);
 
 /********************************************************************************************
  *
@@ -211,10 +181,6 @@ int swap_actors(actor_t **actors, int index1, int index2, int nb_actors);
  */
 int sort_actors(actor_t **actors, int nb_actors);
 
-/**
- * !TODO
- */
-int load_network(char *fileName, network_t *network);
 
 /********************************************************************************************
  *
@@ -227,10 +193,6 @@ int load_network(char *fileName, network_t *network);
  */
 int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mapping);
 
-/**
- * !TODO
- */
-int save_mapping(char* fileName, mapping_t *mapping);
 
 /********************************************************************************************
  *
@@ -254,9 +216,5 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part);
  */
 int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part);
 
-/**
- * !TODO
- */
-void start_orcc_mapping(options_t *opt);
 
-#endif  /* _ORCC_MAPPING_H_ */
+#endif  /* _ORCCMAP_MAPPING_H_ */

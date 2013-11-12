@@ -27,11 +27,9 @@
  * SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <string.h>
 #include <getopt.h>
 #include <assert.h>
-#include "mapping.c"
+#include "mapping.h"
 
 void print_usage() {
     /* !TODO: Find a kind way to format this text */
@@ -77,70 +75,28 @@ void print_usage() {
     printf("\n");
 }
 
-void set_nb_processors(char *arg_value, options_t *opt) {
-    assert(arg_value != NULL);
-
-    opt->nb_processors = atoi(arg_value);
-    if (opt->nb_processors < 1) {
-        print_orcc_error(ORCC_ERR_BAD_ARGS_NBPROC);
-        printf("\n");
-        exit(ORCC_ERR_BAD_ARGS_NBPROC);
-    }
-}
-
-void set_mapping_strategy(char *arg_value, options_t *opt) {
-    assert(arg_value != NULL);
+void start_orcc_mapping(options_t *opt) {
     assert(opt != NULL);
+    int ret = ORCC_OK;
 
-    if (strcmp(arg_value, "METIS_REC") == 0) {
-        opt->strategy = ORCC_MS_METIS_REC;
-    } else if (strcmp(arg_value, "METIS_KWAY") == 0) {
-        opt->strategy = ORCC_MS_METIS_KWAY;
-    } else if (strcmp(arg_value, "ROUND_ROBIN") == 0) {
-        opt->strategy = ORCC_MS_ROUND_ROBIN;
-    } else {
-        print_orcc_error(ORCC_ERR_BAD_ARGS_MS);
-        printf("\n");
-        exit(ORCC_ERR_BAD_ARGS_MS);
-    }
-}
+    network_t *network = (network_t*) malloc(sizeof(network_t));
+    mapping_t *mapping = allocate_mapping(opt->nb_processors);
 
-void set_verbose_level(char *arg_value, options_t *opt) {
-    assert(opt != NULL);
-    int trace_level = 0;
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Starting Orcc-Map");
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "  Nb of processors\t: %d", opt->nb_processors);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "  Input file\t\t: %s", opt->input_file);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "  Output file\t: %s", opt->output_file);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "  Mapping strategy\t: %s", ORCC_STRATEGY_TXT[opt->strategy]);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "  Verbose level\t: %d", verbose_level);
 
-    if (arg_value == NULL) {
-        set_trace_level(ORCC_VL_VERBOSE_1);
-    } else {
-        trace_level = atoi(arg_value);
-        if (trace_level < 1 || trace_level > ORCC_VL_VERBOSE_2-ORCC_VL_QUIET) {
-            print_orcc_error(ORCC_ERR_BAD_ARGS_VERBOSE);
-            printf("\n");
-            exit(ORCC_ERR_BAD_ARGS_VERBOSE);
-        }
-        set_trace_level(ORCC_VL_QUIET+trace_level);
-    }
-}
+    ret = load_network(opt->input_file, network);
 
-void set_default_output_filename(char *arg_value, options_t *opt) {
-    assert(arg_value != NULL);
-    assert(opt != NULL);
-    char *pDot, *output;
+    ret = do_mapping(network, *opt, mapping);
 
-    if (arg_value != NULL) {
-        output = (char *)malloc(strlen(arg_value)*sizeof(char));
-        strcpy(output, arg_value);
-        pDot = strrchr(output, '.');
-        if(pDot != NULL)
-            *pDot = '\0';
-        strcat(output, ".xcf");
-    } else {
-        print_orcc_error(ORCC_ERR_DEF_OUTPUT);
-        printf("\n");
-        exit(ORCC_ERR_DEF_OUTPUT);
-    }
+    ret = save_mapping(opt->output_file, mapping);
 
-    opt->output_file = output;
+    delete_mapping(mapping);
+    free(network);
 }
 
 int main (int argc, char **argv) {
