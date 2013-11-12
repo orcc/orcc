@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, INSA Rennes
+ * Copyright (c) 2013, INSA of Rennes
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@
  *   * Neither the name of INSA Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
- * about
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,6 +42,30 @@
  ********************************************************************************************/
 
 typedef enum { FALSE, TRUE } boolean;
+
+static verbose_level_et verbose_level = ORCC_VL_QUIET;
+
+static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
+    "",
+    "Bad arguments. Please check usage print.",
+    "Arg value for -n is not valide.",
+    "Arg value for -m is not valide.",
+    "Arg value for -v is not valide.",
+    "Mandatory argument missing. Please check usage print.",
+    "Cannot generate default output file name.",
+    "METIS error",
+    "Actors swap fails.",
+    "Cannot open input file.",
+    "Cannot create root node.",
+    "Cannot create Configuration node.",
+    "Cannot create Partition node."
+};
+
+static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
+    "METIS Recursive",
+    "METIS Kway",
+    "Round Robin"
+};
 
 
 /********************************************************************************************

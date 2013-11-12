@@ -3,6 +3,7 @@ set(libfilenames
     ../include/orccmap.h
     mapping.h
     mapping.c
+    util.c
 )
 
 set(exefilenames

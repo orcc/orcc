@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, INSA Rennes
+ * Copyright (c) 2013, INSA of Rennes
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@
  *   * Neither the name of INSA Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
- * about
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,84 +28,9 @@
  */
 
 #include <assert.h>
-#include <stdarg.h>
 #include <math.h>
 #include "mapping.h"
 #include "roxml.h"
-
-static verbose_level_et verbose_level = ORCC_VL_QUIET;
-
-static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
-    "",
-    "Bad arguments. Please check usage print.",
-    "Arg value for -n is not valide.",
-    "Arg value for -m is not valide.",
-    "Arg value for -v is not valide.",
-    "Mandatory argument missing. Please check usage print.",
-    "Cannot generate default output file name.",
-    "METIS error",
-    "Actors swap fails.",
-    "Cannot open input file.",
-    "Cannot create root node.",
-    "Cannot create Configuration node.",
-    "Cannot create Partition node."
-};
-
-static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
-    "METIS Recursive",
-    "METIS Kway",
-    "Round Robin"
-};
-
-/********************************************************************************************
- *
- * Orcc-Map utils functions
- *
- ********************************************************************************************/
-
-void print_orcc_error(orccmap_error_et error) {
-    if (error != ORCC_OK && error < ORCC_ERR_SIZE) {
-        fprintf(stderr,"\nOrcc-Map : ERROR : %s", ORCC_ERRORS_TXT[error]);
-    }
-
-}
-
-void check_metis_error(rstatus_et error) {
-    if (error != METIS_OK) {
-        print_orcc_error(ORCC_ERR_METIS);
-        fprintf(stderr,"\t Code: %d", error);
-        exit(error);
-    }
-}
-
-void check_orcc_error(orccmap_error_et error) {
-    if (error != ORCC_OK) {
-        print_orcc_error(error);
-        exit(error);
-    }
-}
-
-boolean print_trace_block(verbose_level_et level) {
-    return (level<=verbose_level)?TRUE:FALSE;
-}
-
-void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
-    assert(trace != NULL);
-
-    va_list args;
-    va_start (args, trace);
-
-    if (level <= verbose_level) {
-        printf("\nOrcc-Map : ");
-        vprintf(trace, args);
-    }
-
-    va_end (args);
-}
-
-void set_trace_level(verbose_level_et level) {
-    verbose_level = level;
-}
 
 /********************************************************************************************
  *
