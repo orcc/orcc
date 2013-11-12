@@ -257,8 +257,8 @@ class InstancePrinter extends CTemplate {
 				#define tokens_«port.name» «port.fullName»->contents
 				
 				«IF instrumentNetwork»
-					extern connection_t connection_«incomingPortMap.get(port).source.label»_«incomingPortMap.get(port).sourcePort.name»_«actor.name»_«port.name»;
-					#define tokens_«port.name»_workload connection_«incomingPortMap.get(port).source.label»_«incomingPortMap.get(port).sourcePort.name»_«actor.name»_«port.name».workload
+					extern connection_t connection_«entityName»_«port.name»;
+					#define rate_«port.name» connection_«entityName»_«port.name».workload
 				«ENDIF»
 				
 			«ENDFOR»
@@ -788,7 +788,7 @@ class InstancePrinter extends CTemplate {
 				read_end_«port.name»();
 				«ENDIF»
 				«IF instrumentNetwork»
-				tokens_«port.name»_workload += «action.inputPattern.getNumTokens(port)»;
+				rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
 				«ENDIF»			
 			«ENDFOR»
 

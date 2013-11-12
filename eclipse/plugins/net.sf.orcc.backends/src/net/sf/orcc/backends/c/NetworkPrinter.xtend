@@ -205,12 +205,12 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the connections array
 		
 		«FOR connection : network.connections»
-			connection_t connection_«connection.source.label»_«connection.sourcePort.name»_«connection.target.label»_«connection.targetPort.name» = {&«connection.source.label», &«connection.target.label», 1};
+			connection_t connection_«connection.target.label»_«connection.targetPort.name» = {&«connection.source.label», &«connection.target.label», 1};
 		«ENDFOR»
 		
 		connection_t *connections[] = {
 			«FOR connection : network.connections SEPARATOR ","»
-			    &connection_«connection.source.label»_«connection.sourcePort.name»_«connection.target.label»_«connection.targetPort.name»
+			    &connection_«connection.target.label»_«connection.targetPort.name»
 			«ENDFOR»
 		};
 		
