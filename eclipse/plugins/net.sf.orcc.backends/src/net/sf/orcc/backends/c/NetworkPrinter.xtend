@@ -141,9 +141,7 @@ class NetworkPrinter extends CTemplate {
 			#include "cycle.h"
 		«ENDIF»
 		
-		«IF geneticAlgo || threadsNb > 1»
-			#include "orcc_thread.h"
-		«ENDIF»
+		#include "orcc_thread.h"
 		«IF geneticAlgo»
 			#include "orcc_genetic.h"
 			#define THREAD_NB «threadsNb»
@@ -308,12 +306,12 @@ class NetworkPrinter extends CTemplate {
 			clear_cpu_set(cpuset);
 			
 			«IF !geneticAlgo»
-			for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
+			for(i=0 ; i < mapping->number_of_threads; i++){
 				thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
 				set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 			}
 			«ELSE»
-				for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
+				for(i=0 ; i < THREAD_NB; i++){
 					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
 				}
 				thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
@@ -350,6 +348,7 @@ class NetworkPrinter extends CTemplate {
 			int j;
 			«IF instrumentNetwork»
 				ticks tick_in, tick_out;
+				double diff_tick;
 			«ENDIF»
 			«IF geneticAlgo»
 				
@@ -371,7 +370,7 @@ class NetworkPrinter extends CTemplate {
 					my_actor->sched_func(&si);
 					«IF instrumentNetwork»
 						tick_out = getticks();
-						double diff_tick = elapsed(tick_out, tick_in);
+						diff_tick = elapsed(tick_out, tick_in);
 						my_actor->workload += diff_tick;
 					«ENDIF»
 		#ifdef PRINT_FIRINGS
