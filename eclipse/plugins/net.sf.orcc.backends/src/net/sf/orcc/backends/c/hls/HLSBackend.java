@@ -70,7 +70,6 @@ public class HLSBackend extends CBackend {
 	 * Path to target "testBench" folder
 	 */
 	private String VHDLTestBenchPath;
-	private String coSimTestBenchPath;
 	private String commandPath;
 
 	/**
@@ -87,7 +86,6 @@ public class HLSBackend extends CBackend {
 	protected void doInitializeOptions() {
 		srcPath = path + File.separator + "HLSBackend";
 		VHDLTestBenchPath = srcPath + File.separator + "UnitaryVHDLTestBENCH";
-		coSimTestBenchPath = srcPath + File.separator + "coSimTestBench";
 		commandPath = srcPath + File.separator + "batchCommand";
 	}
 
