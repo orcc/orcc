@@ -53,6 +53,7 @@ class NetworkPrinter extends CTemplate {
 	protected val int fifoSize;
 	
 	protected var boolean geneticAlgo = false
+	protected var boolean instrumentNetwork = false
 	var boolean ringTopology = false
 	
 	var boolean newSchedul = false
@@ -73,6 +74,9 @@ class NetworkPrinter extends CTemplate {
 
 		if (options.containsKey(GENETIC_ALGORITHM)) {
 			geneticAlgo = options.get(GENETIC_ALGORITHM) as Boolean
+		}
+		if (options.containsKey(INSTRUMENT_NETWORK)) {
+			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
 		}
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
@@ -133,6 +137,9 @@ class NetworkPrinter extends CTemplate {
 		#include "orcc_fifo.h"
 		#include "orcc_scheduler.h"
 		#include "orcc_util.h"
+		«IF instrumentNetwork»
+			#include "cycle.h"
+		«ENDIF»
 		
 		«IF geneticAlgo || threadsNb > 1»
 			#include "orcc_thread.h"
@@ -182,15 +189,10 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
-		// Declaration of a struct actor for each actor
-		«FOR child : network.children»
-			struct actor_s «child.label»;
-		«ENDFOR»
-
-		/////////////////////////////////////////////////
 		// Declaration of the actors array
+		
 		«FOR child : network.children»
-			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «IF geneticAlgo»«child.label»_reinitialize«ELSE»NULL«ENDIF», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
+			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «IF geneticAlgo»«child.label»_reinitialize«ELSE»NULL«ENDIF», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0, 0.0};			
 		«ENDFOR»
 		
 		struct actor_s *actors[] = {
@@ -198,7 +200,24 @@ class NetworkPrinter extends CTemplate {
 				&«child.label»
 			«ENDFOR»
 		};
+
+		/////////////////////////////////////////////////
+		// Declaration of the connections array
 		
+		«FOR connection : network.connections»
+			connection_t connection_«connection.target.label»_«connection.targetPort.name» = {&«connection.source.label», &«connection.target.label», 1};
+		«ENDFOR»
+		
+		connection_t *connections[] = {
+			«FOR connection : network.connections SEPARATOR ","»
+			    &connection_«connection.target.label»_«connection.targetPort.name»
+			«ENDFOR»
+		};
+		
+		/////////////////////////////////////////////////
+		// Declaration of the network
+		network_t network = {"«network.simpleName»", actors, connections, «network.allActors.size», «network.connections.size»};
+
 		«IF geneticAlgo»
 			extern int source_is_stopped();
 			extern int clean_cache(int size);
@@ -225,9 +244,20 @@ class NetworkPrinter extends CTemplate {
 		
 		«printLauncher»
 		
+		/////////////////////////////////////////////////
+		// Actions to do when exting properly
+		static void atexit_actions() {
+			«IF instrumentNetwork»
+				if (instrumentation_file != NULL) {
+					save_instrumentation(instrumentation_file, network);
+				}
+			«ENDIF»
+		}
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
+		    atexit(atexit_actions);
 			init_orcc(argc, argv);
 			
 			launcher();
@@ -318,6 +348,9 @@ class NetworkPrinter extends CTemplate {
 			struct actor_s *my_actor;
 			struct schedinfo_s si;
 			int j;
+			«IF instrumentNetwork»
+				ticks tick_in, tick_out;
+			«ENDIF»
 			«IF geneticAlgo»
 				
 				int i = 0;
@@ -325,14 +358,22 @@ class NetworkPrinter extends CTemplate {
 				semaphore_wait(sched->sem_thread);
 				start = clock ();
 			«ENDIF»
-			
+		
 			sched_init_actors(sched, &si);
 			
 			while (1) {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
 				if(my_actor != NULL){
+					«IF instrumentNetwork»
+						tick_in = getticks();
+					«ENDIF»
 					si.num_firings = 0;
 					my_actor->sched_func(&si);
+					«IF instrumentNetwork»
+						tick_out = getticks();
+						double diff_tick = elapsed(tick_out, tick_in);
+						my_actor->workload += diff_tick;
+					«ENDIF»
 		#ifdef PRINT_FIRINGS
 					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 		#endif

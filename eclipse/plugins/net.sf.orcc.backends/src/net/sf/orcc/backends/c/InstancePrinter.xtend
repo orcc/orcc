@@ -83,6 +83,7 @@ class InstancePrinter extends CTemplate {
 	protected var String entityName
 
 	protected var boolean geneticAlgo = false
+	protected var boolean instrumentNetwork = false
 	protected var boolean isActionVectorizable = false
 
 	var boolean newSchedul = false
@@ -117,6 +118,9 @@ class InstancePrinter extends CTemplate {
 
 		if (options.containsKey(GENETIC_ALGORITHM)) {
 			geneticAlgo = options.get(GENETIC_ALGORITHM) as Boolean
+		}
+		if (options.containsKey(INSTRUMENT_NETWORK)) {
+			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
 		}
 
 		if (options.containsKey(THREADS_NB)) {
@@ -251,7 +255,12 @@ class InstancePrinter extends CTemplate {
 				static unsigned int numTokens_«port.name»;
 				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
-
+				
+				«IF instrumentNetwork»
+					extern connection_t connection_«entityName»_«port.name»;
+					#define rate_«port.name» connection_«entityName»_«port.name».workload
+				«ENDIF»
+				
 			«ENDFOR»
 			«IF enableTrace»
 				////////////////////////////////////////////////////////////////////////////////
@@ -349,6 +358,16 @@ class InstancePrinter extends CTemplate {
 
 		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
+		// Token functions
+		«FOR port : actor.inputs»
+			«port.readTokensFunctions»
+		«ENDFOR»
+
+		«FOR port : actor.outputs.notNative»
+			«port.writeTokensFunctions»
+		«ENDFOR»
+
+		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
 		«FOR proc : actor.procs»
 			«proc.declare»
@@ -362,16 +381,6 @@ class InstancePrinter extends CTemplate {
 		// Actions
 		«FOR action : actor.actions»
 			«action.print»
-		«ENDFOR»
-
-		////////////////////////////////////////////////////////////////////////////////
-		// Token functions
-		«FOR port : actor.inputs»
-			«port.readTokensFunctions»
-		«ENDFOR»
-
-		«FOR port : actor.outputs.notNative»
-			«port.writeTokensFunctions»
 		«ENDFOR»
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -767,14 +776,20 @@ class InstancePrinter extends CTemplate {
 
 			«FOR port : action.inputPattern.ports»
 				«IF enableTrace»
-				{
-					int i;
-					for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
-						fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+					{
+						int i;
+						for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
+							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+						}
 					}
-				}
 				«ENDIF»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
+				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+					read_end_«port.name»();
+				«ENDIF»
+				«IF instrumentNetwork»
+					rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
+				«ENDIF»			
 			«ENDFOR»
 
 			«FOR port : action.outputPattern.ports»
@@ -787,6 +802,9 @@ class InstancePrinter extends CTemplate {
 					}
 				«ENDIF»
 				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
+				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+					write_end_«port.name»();
+				«ENDIF»
 			«ENDFOR»
 		}
 		«ENDIF»
@@ -830,6 +848,10 @@ class InstancePrinter extends CTemplate {
 					}
 					«ENDIF»
 					index_«port.name» += «action.inputPattern.getNumTokens(port)»;
+
+					«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+					read_end_«port.name»();
+					«ENDIF»
 				«ENDFOR»
 
 				«FOR port : action.outputPattern.ports»
@@ -842,6 +864,10 @@ class InstancePrinter extends CTemplate {
 						}
 					«ENDIF»
 					index_«port.name» += «action.outputPattern.getNumTokens(port)»;
+
+					«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+					write_end_«port.name»();
+					«ENDIF»
 				«ENDFOR»
 			}
 			«ENDIF»
