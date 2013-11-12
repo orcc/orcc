@@ -30,70 +30,14 @@
 #ifndef _ORCCMAP_MAPPING_H_
 #define _ORCCMAP_MAPPING_H_
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "metis.h"
 #include "orccmap.h"
-
-/********************************************************************************************
- *
- * Enums et constants
- *
- ********************************************************************************************/
-
-typedef enum { FALSE, TRUE } boolean;
-
-static verbose_level_et verbose_level = ORCC_VL_QUIET;
-
-static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
-    "",
-    "Bad arguments. Please check usage print.",
-    "Arg value for -n is not valide.",
-    "Arg value for -m is not valide.",
-    "Arg value for -v is not valide.",
-    "Mandatory argument missing. Please check usage print.",
-    "Cannot generate default output file name.",
-    "METIS error",
-    "Actors swap fails.",
-    "Cannot open input file.",
-    "Cannot create root node.",
-    "Cannot create Configuration node.",
-    "Cannot create Partition node."
-};
-
-static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
-    "METIS Recursive",
-    "METIS Kway",
-    "Round Robin"
-};
-
-
-/********************************************************************************************
- *
- * Orcc-Map utils functions
- *
- ********************************************************************************************/
-
-#define arrayCopy(DST,SRC,LEN) \
-            { size_t TMPSZ = sizeof(*(SRC)) * (LEN); \
-              if ( ((DST) = malloc(TMPSZ)) != NULL ) \
-                memcpy((DST), (SRC), TMPSZ); }
 
 /********************************************************************************************
  *
  * Allocate / Delete / Init functions
  *
  ********************************************************************************************/
-
-/**
- * Creates and init options structure.
- */
-options_t *set_default_options();
-
-/**
- * Releases memory of the given options structure.
- */
-void delete_options(options_t *opt);
 
 /**
  * Creates a graph CSR structure.
@@ -123,12 +67,13 @@ void delete_mapping(mapping_t *mapping);
  ********************************************************************************************/
 
 /**
- * !TODO
+ * Print to the stdout the load balancing resulting from the mapping.
  */
 void print_load_balancing(mapping_t *mapping);
 
 /**
- * !TODO
+ * Print to the stdout the edgecut resulting of the mapping. The function assumes that the
+ * mapping has been previously defined on the network.
  */
 void print_edge_cut(network_t *network);
 
@@ -140,22 +85,22 @@ void print_edge_cut(network_t *network);
  ********************************************************************************************/
 
 /**
- * !TODO
+ * Print to the stdout the given graph as an adjacency list.
  */
 void print_graph(adjacency_list graph);
 
 /**
- * !TODO
+ * Build an adjacency list from the given network.
  */
 adjacency_list *set_graph_from_network(network_t network);
 
 /**
- * !TODO
+ * Check the viability of the given graph for metis.
  */
 void check_graph_for_metis(adjacency_list graph);
 
 /**
- * !TODO
+ * Fix the given graph for metis.
  */
 adjacency_list *fix_graph_for_metis(adjacency_list graph);
 
@@ -169,15 +114,10 @@ adjacency_list *fix_graph_for_metis(adjacency_list graph);
 /**
  * !TODO
  */
-actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
-
-/**
- * !TODO
- */
 int swap_actors(actor_t **actors, int index1, int index2, int nb_actors);
 
 /**
- * !TODO
+ * Sort a list of actors
  */
 int sort_actors(actor_t **actors, int nb_actors);
 
@@ -189,7 +129,7 @@ int sort_actors(actor_t **actors, int nb_actors);
  ********************************************************************************************/
 
 /**
- * !TODO
+ * Build a mapping structure from metis partition
  */
 int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mapping);
 
@@ -201,17 +141,17 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
  ********************************************************************************************/
 
 /**
- * !TODO
+ * Apply actor mapping using metis recursive strategy
  */
 int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part);
 
 /**
- * !TODO
+ * Apply actor mapping using metis kway strategy
  */
 int do_metis_kway_partition(network_t network, options_t opt, idx_t *part);
 
 /**
- * !TODO
+ * Apply actor mapping using round-robin strategy
  * @author Long Nguyen
  */
 int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part);

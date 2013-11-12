@@ -29,34 +29,18 @@
 
 #include <assert.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "mapping.h"
-#include "roxml.h"
+#include "util.c"
 
 /********************************************************************************************
  *
  * Allocate / Delete / Init functions
  *
  ********************************************************************************************/
-
-/**
- * Creates and init options structure.
- */
-options_t *set_default_options() {
-    options_t *opt = (options_t*) malloc(sizeof(options_t));
-    opt->strategy = ORCC_MS_ROUND_ROBIN;
-    opt->nb_processors = 1;
-    opt->input_file = "";
-    opt->output_file = "";
-
-    return opt;
-}
-
-/**
- * Releases memory of the given options structure.
- */
-void delete_options(options_t *opt) {
-    free(opt);
-}
 
 /**
  * Creates a graph CSR structure.
@@ -233,25 +217,22 @@ void check_graph_for_metis(adjacency_list graph) {
 }
 
 
-/*************************************************************************
+/**
+ * Creates a graph whose topology is consistent with Metis' requirements that:
+ *	- There are no self-edges.
+ *	- It is undirected; i.e., (u,v) and (v,u) should be present and of the
+ *	same weight.
+ *	- The adjacency list should not contain multiple edges to the same
+ *	other vertex.
+ *  - Weights are > 0
  *
- *      This function creates a graph whose topology is consistent with
- *	    Metis' requirements that:
- *	    - There are no self-edges.
- *	    - It is undirected; i.e., (u,v) and (v,u) should be present and of the
- *	      same weight.
- *	    - The adjacency list should not contain multiple edges to the same
- *	      other vertex.
- *      - Weights are > 0
+ *	The above errors are fixed by performing the following operations:
+ *	- Self-edges are removed.
+ *	- The undirected graph is formed by the union and merge of edges (adding weights)
+ *  - If Weights <= 0 : exit with explicit error message
  *
- *	    The above errors are fixed by performing the following operations:
- *	    - Self-edges are removed.
- *	    - The undirected graph is formed by the union and merge of edges (adding weights)
- *      - If Weights <= 0 : exit with explicit error message
- *
- *      A warning message will be printed if any fix has been required
- *
- **************************************************************************/
+ *  A warning message will be printed if any fix has been required
+ */
 adjacency_list *fix_graph_for_metis(adjacency_list graph) {
     int nb_edges = 0;
     adjacency_list *metis_graph;
@@ -273,8 +254,8 @@ adjacency_list *fix_graph_for_metis(adjacency_list graph) {
 
     edges = malloc(graph.nb_vertices * sizeof(*edges));
     for(i=0 ; i < graph.nb_vertices ; i++){
-         edges[i] = malloc(graph.nb_vertices * sizeof(**edges) );
-         memset(edges[i], -1, sizeof(int) * graph.nb_vertices);
+        edges[i] = malloc(graph.nb_vertices * sizeof(**edges) );
+        memset(edges[i], -1, sizeof(int) * graph.nb_vertices);
     }
 
     for (i = 0; i < graph.nb_vertices; i++) {
@@ -323,22 +304,6 @@ adjacency_list *fix_graph_for_metis(adjacency_list graph) {
  * Functions for Network managing
  *
  ********************************************************************************************/
-
-actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
-    assert(actors != NULL);
-    assert(name != NULL);
-    actor_t *ret = NULL;
-    int i = 0;
-
-    while (i < nb_actors && ret == NULL) {
-        if (strcmp(name, actors[i]->name) == 0) {
-            ret = actors[i];
-        }
-        i++;
-    }
-
-    return ret;
-}
 
 int swap_actors(actor_t **actors, int index1, int index2, int nb_actors) {
     assert(actors != NULL);

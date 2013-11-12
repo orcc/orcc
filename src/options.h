@@ -30,7 +30,17 @@
 #ifndef _ORCCMAP_OPTIONS_H_
 #define _ORCCMAP_OPTIONS_H_
 
-#include "mapping.h"
+#include "orccmap.h"
+
+/**
+ * Creates and init options structure.
+ */
+options_t *set_default_options();
+
+/**
+ * Releases memory of the given options structure.
+ */
+void delete_options(options_t *opt);
 
 void set_nb_processors(char *arg_value, options_t *opt);
 void set_mapping_strategy(char *arg_value, options_t *opt);

@@ -36,6 +36,8 @@
  *
  ********************************************************************************************/
 
+typedef enum { FALSE, TRUE } boolean;
+
 /* Mapping strategy codes */
 typedef enum {
     ORCC_MS_METIS_REC,

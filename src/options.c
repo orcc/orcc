@@ -29,7 +29,29 @@
 
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "options.h"
+
+/**
+ * Creates and init options structure.
+ */
+options_t *set_default_options() {
+    options_t *opt = (options_t*) malloc(sizeof(options_t));
+    opt->strategy = ORCC_MS_ROUND_ROBIN;
+    opt->nb_processors = 1;
+    opt->input_file = "";
+    opt->output_file = "";
+
+    return opt;
+}
+
+/**
+ * Releases memory of the given options structure.
+ */
+void delete_options(options_t *opt) {
+    free(opt);
+}
 
 void set_nb_processors(char *arg_value, options_t *opt) {
     assert(arg_value != NULL);

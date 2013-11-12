@@ -29,7 +29,12 @@
 
 #include <getopt.h>
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "mapping.h"
+#include "serialize.h"
+#include "options.h"
+#include "util.h"
 
 void print_usage() {
     /* !TODO: Find a kind way to format this text */

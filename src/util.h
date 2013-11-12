@@ -30,7 +30,37 @@
 #ifndef _ORCCMAP_UTIL_H_
 #define _ORCCMAP_UTIL_H_
 
-#include "mapping.h"
+#include "orccmap.h"
+#include "metis.h"
+
+#define arrayCopy(DST,SRC,LEN) \
+            { size_t TMPSZ = sizeof(*(SRC)) * (LEN); \
+              if ( ((DST) = malloc(TMPSZ)) != NULL ) \
+                memcpy((DST), (SRC), TMPSZ); }
+
+static verbose_level_et verbose_level = ORCC_VL_QUIET;
+
+static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
+    "",
+    "Bad arguments. Please check usage print.",
+    "Arg value for -n is not valide.",
+    "Arg value for -m is not valide.",
+    "Arg value for -v is not valide.",
+    "Mandatory argument missing. Please check usage print.",
+    "Cannot generate default output file name.",
+    "METIS error",
+    "Actors swap fails.",
+    "Cannot open input file.",
+    "Cannot create root node.",
+    "Cannot create Configuration node.",
+    "Cannot create Partition node."
+};
+
+static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
+    "METIS Recursive",
+    "METIS Kway",
+    "Round Robin"
+};
 
 /**
  * !TODO
