@@ -1,9 +1,17 @@
 
-set(filenames
-        mapping.c
-        orccmap.c
+set(libfilenames
+    orccmap.c
 )
 
-add_executable(orccmap ${filenames})
+set(exefilenames
+    mapping.c
+)
+
+# Compile library
+add_library (orccmap ${libfilenames})
 target_link_libraries(orccmap roxml metis m)
+
+# Compile executable
+add_executable(orcc-map ${exefilenames})
+target_link_libraries(orcc-map orccmap roxml)
 
