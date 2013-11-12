@@ -33,12 +33,12 @@
 #include "mapping.h"
 
 /**
- * !TODO
+ * Load network structure from an XDF file.
  */
 int load_network(char *fileName, network_t *network);
 
 /**
- * !TODO
+ * Save mapping structure to XCF file.
  */
 int save_mapping(char* fileName, mapping_t *mapping);
 
