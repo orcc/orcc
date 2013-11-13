@@ -36,8 +36,6 @@
  *
  ********************************************************************************************/
 
-typedef enum { FALSE, TRUE } boolean;
-
 /* Mapping strategy codes */
 typedef enum {
     ORCC_MS_METIS_REC,
@@ -58,6 +56,8 @@ typedef enum {
     ORCC_ERR_MANDATORY_ARGS,
     ORCC_ERR_DEF_OUTPUT,
     ORCC_ERR_METIS,
+    ORCC_ERR_METIS_FIX_WEIGHTS,
+    ORCC_ERR_METIS_FIX_NEEDED,
     ORCC_ERR_SWAP_ACTORS,
     ORCC_ERR_ROXML_OPEN,
     ORCC_ERR_ROXML_NODE_ROOT,
@@ -79,78 +79,12 @@ typedef enum {
  *
  ********************************************************************************************/
 
-typedef int int32_t;
+typedef struct options_s options_t;
 
-/*
- * Options for mapping
- */
-typedef struct options_s
-{
-    int nb_processors;
-    mappingstrategy_et strategy;
-    char *input_file;
-    char *output_file;
-} options_t;
-
-/*
- * The adjacency structure of the graph is stored using the compressed storage format (CSR)
- * This structure is used by METIS only with undirected graphs
- */
-typedef struct adjacency_list
-{
-    /* xadj : For each vertex i, xadj[i] gives the entry index in the array adjncy */
-    int32_t *xadj;
-
-    /* adjncy : For each vertex, its adjacency list is stored in consecutive locations in the array adjncy */
-    int32_t *adjncy;
-
-    /* vwgt : The weights of the vertices */
-    int32_t *vwgt;
-
-    /* adjwgt : The weights of the edges */
-    int32_t *adjwgt;
-
-    int nb_vertices;
-    int nb_edges;
-} adjacency_list;
-
-/*
- * Actors are the vertices of orcc Networks
- */
-typedef struct actor_s {
-    char *name;
-    int workload;
-    int id;
-    int processor_id;
-} actor_t;
-
-/*
- * Connections are the edges of orcc Networks
- */
-typedef struct connection_s {
-    actor_t *src;
-    actor_t *dst;
-    int workload;
-} connection_t;
-
-/*
- * Orcc Networks are directed graphs
- */
-typedef struct network_s {
-    actor_t **actors;
-    connection_t **connections;
-    int nb_actors;
-    int nb_connections;
-} network_t;
-
-/*
- * Mapping structure store the mapping result
- */
-typedef struct mapping_s {
-    int number_of_threads;
-    actor_t ***partitions_of_actors;
-    int *partitions_size;
-} mapping_t;
+typedef struct actor_s actor_t;
+typedef struct connection_s connection_t;
+typedef struct network_s network_t;
+typedef struct mapping_s mapping_t;
 
 /********************************************************************************************
  *

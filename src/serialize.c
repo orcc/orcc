@@ -28,24 +28,12 @@
  */
 
 #include <assert.h>
+
 #include "serialize.h"
 #include "roxml.h"
-
-actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
-    assert(actors != NULL);
-    assert(name != NULL);
-    actor_t *ret = NULL;
-    int i = 0;
-
-    while (i < nb_actors && ret == NULL) {
-        if (strcmp(name, actors[i]->name) == 0) {
-            ret = actors[i];
-        }
-        i++;
-    }
-
-    return ret;
-}
+#include "util.h"
+#include "dataflow.h"
+#include "mapping.h"
 
 int load_network(char *fileName, network_t *network) {
     assert(fileName != NULL);

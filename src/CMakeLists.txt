@@ -4,6 +4,8 @@ set(library_filenames
     mapping.c
     util.c
     options.c
+    dataflow.c
+    graph.c
 )
 
 set(executable_filenames

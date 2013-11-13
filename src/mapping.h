@@ -31,23 +31,27 @@
 #define _ORCCMAP_MAPPING_H_
 
 #include "metis.h"
-#include "orccmap.h"
+
+typedef struct actor_s actor_t;
+typedef struct connection_s connection_t;
+typedef struct network_s network_t;
+
+typedef struct options_s options_t;
+
+/*
+ * Mapping structure store the mapping result
+ */
+typedef struct mapping_s {
+    int number_of_threads;
+    actor_t ***partitions_of_actors;
+    int *partitions_size;
+} mapping_t;
 
 /********************************************************************************************
  *
  * Allocate / Delete / Init functions
  *
  ********************************************************************************************/
-
-/**
- * Creates a graph CSR structure.
- */
-adjacency_list *allocate_graph(int nb_actors, int nb_edges);
-
-/**
- * Releases memory of the given graph CSR structure.
- */
-void delete_graph(adjacency_list *graph);
 
 /**
  * Creates a mapping structure.
@@ -76,33 +80,6 @@ void print_load_balancing(mapping_t *mapping);
  * mapping has been previously defined on the network.
  */
 void print_edge_cut(network_t *network);
-
-
-/********************************************************************************************
- *
- * Functions for Graph CSR data structure
- *
- ********************************************************************************************/
-
-/**
- * Print to the stdout the given graph as an adjacency list.
- */
-void print_graph(adjacency_list graph);
-
-/**
- * Build an adjacency list from the given network.
- */
-adjacency_list *set_graph_from_network(network_t network);
-
-/**
- * Check the viability of the given graph for metis.
- */
-int check_graph_for_metis(adjacency_list graph);
-
-/**
- * Fix the given graph for metis.
- */
-adjacency_list *fix_graph_for_metis(adjacency_list graph);
 
 
 /********************************************************************************************

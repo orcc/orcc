@@ -27,38 +27,69 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCCMAP_OPTIONS_H_
-#define _ORCCMAP_OPTIONS_H_
+#ifndef _ORCCMAP_GRAPH_H_
+#define _ORCCMAP_GRAPH_H_
 
-#include "orccmap.h"
-
-extern verbose_level_et verbose_level;
+typedef struct network_s network_t;
+typedef int int32_t;
 
 /*
- * Options for mapping
+ * The adjacency structure of the graph is stored using the compressed storage format (CSR)
+ * This structure is used by METIS only with undirected graphs
  */
-typedef struct options_s
+typedef struct adjacency_list
 {
-    int nb_processors;
-    mappingstrategy_et strategy;
-    char *input_file;
-    char *output_file;
-} options_t;
+    /* xadj : For each vertex i, xadj[i] gives the entry index in the array adjncy */
+    int32_t *xadj;
+
+    /* adjncy : For each vertex, its adjacency list is stored in consecutive locations in the array adjncy */
+    int32_t *adjncy;
+
+    /* vwgt : The weights of the vertices */
+    int32_t *vwgt;
+
+    /* adjwgt : The weights of the edges */
+    int32_t *adjwgt;
+
+    int nb_vertices;
+    int nb_edges;
+} adjacency_list;
+
 
 /**
- * Creates and init options structure.
+ * Creates a graph CSR structure.
  */
-options_t *set_default_options();
+adjacency_list *allocate_graph(int nb_actors, int nb_edges);
 
 /**
- * Releases memory of the given options structure.
+ * Releases memory of the given graph CSR structure.
  */
-void delete_options(options_t *opt);
+void delete_graph(adjacency_list *graph);
 
-void set_nb_processors(char *arg_value, options_t *opt);
-void set_mapping_strategy(char *arg_value, options_t *opt);
-void set_verbose_level(char *arg_value, options_t *opt);
-void set_default_output_filename(char *arg_value, options_t *opt);
-void set_trace_level(verbose_level_et level);
+/********************************************************************************************
+ *
+ * Functions for Graph CSR data structure
+ *
+ ********************************************************************************************/
 
-#endif  /* _ORCCMAP_OPTIONS_H_ */
+/**
+ * Print to the stdout the given graph as an adjacency list.
+ */
+void print_graph(adjacency_list graph);
+
+/**
+ * Build an adjacency list from the given network.
+ */
+adjacency_list *set_graph_from_network(network_t network);
+
+/**
+ * Check the viability of the given graph for metis.
+ */
+int check_graph_for_metis(adjacency_list graph);
+
+/**
+ * Fix the given graph for metis.
+ */
+adjacency_list *fix_graph_for_metis(adjacency_list graph);
+
+#endif

@@ -34,6 +34,8 @@
 #include "options.h"
 #include "metis.h"
 
+typedef enum { FALSE, TRUE } boolean;
+
 #define arrayCopy(DST,SRC,LEN) \
             { size_t TMPSZ = sizeof(*(SRC)) * (LEN); \
               if ( ((DST) = malloc(TMPSZ)) != NULL ) \

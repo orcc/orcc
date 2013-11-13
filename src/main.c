@@ -31,7 +31,9 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "mapping.h"
+#include "dataflow.h"
 #include "serialize.h"
 #include "options.h"
 #include "util.h"

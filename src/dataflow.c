@@ -27,38 +27,23 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCCMAP_OPTIONS_H_
-#define _ORCCMAP_OPTIONS_H_
+#include <stdlib.h>
+#include <assert.h>
 
-#include "orccmap.h"
+#include "dataflow.h"
 
-extern verbose_level_et verbose_level;
+actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
+    assert(actors != NULL);
+    assert(name != NULL);
+    actor_t *ret = NULL;
+    int i = 0;
 
-/*
- * Options for mapping
- */
-typedef struct options_s
-{
-    int nb_processors;
-    mappingstrategy_et strategy;
-    char *input_file;
-    char *output_file;
-} options_t;
+    while (i < nb_actors && ret == NULL) {
+        if (strcmp(name, actors[i]->name) == 0) {
+            ret = actors[i];
+        }
+        i++;
+    }
 
-/**
- * Creates and init options structure.
- */
-options_t *set_default_options();
-
-/**
- * Releases memory of the given options structure.
- */
-void delete_options(options_t *opt);
-
-void set_nb_processors(char *arg_value, options_t *opt);
-void set_mapping_strategy(char *arg_value, options_t *opt);
-void set_verbose_level(char *arg_value, options_t *opt);
-void set_default_output_filename(char *arg_value, options_t *opt);
-void set_trace_level(verbose_level_et level);
-
-#endif  /* _ORCCMAP_OPTIONS_H_ */
+    return ret;
+}

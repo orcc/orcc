@@ -27,38 +27,38 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCCMAP_OPTIONS_H_
-#define _ORCCMAP_OPTIONS_H_
-
-#include "orccmap.h"
-
-extern verbose_level_et verbose_level;
+#ifndef _ORCCMAP_DATAFLOW_H_
+#define _ORCCMAP_DATAFLOW_H_
 
 /*
- * Options for mapping
+ * Actors are the vertices of orcc Networks
  */
-typedef struct options_s
-{
-    int nb_processors;
-    mappingstrategy_et strategy;
-    char *input_file;
-    char *output_file;
-} options_t;
+typedef struct actor_s {
+    char *name;
+    int workload;
+    int id;
+    int processor_id;
+} actor_t;
 
-/**
- * Creates and init options structure.
+/*
+ * Connections are the edges of orcc Networks
  */
-options_t *set_default_options();
+typedef struct connection_s {
+    actor_t *src;
+    actor_t *dst;
+    int workload;
+} connection_t;
 
-/**
- * Releases memory of the given options structure.
+/*
+ * Orcc Networks are directed graphs
  */
-void delete_options(options_t *opt);
+typedef struct network_s {
+    actor_t **actors;
+    connection_t **connections;
+    int nb_actors;
+    int nb_connections;
+} network_t;
 
-void set_nb_processors(char *arg_value, options_t *opt);
-void set_mapping_strategy(char *arg_value, options_t *opt);
-void set_verbose_level(char *arg_value, options_t *opt);
-void set_default_output_filename(char *arg_value, options_t *opt);
-void set_trace_level(verbose_level_et level);
+actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
 
-#endif  /* _ORCCMAP_OPTIONS_H_ */
+#endif
