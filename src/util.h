@@ -48,6 +48,8 @@ static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
     "Mandatory argument missing. Please check usage print.",
     "Cannot generate default output file name.",
     "METIS error",
+    "The network is not compatible with Metis. Weights must be >= 0",
+    "The network is not compatible with Metis.",
     "Actors swap fails.",
     "Cannot open input file.",
     "Cannot create root node.",

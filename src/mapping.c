@@ -177,43 +177,47 @@ adjacency_list *set_graph_from_network(network_t network) {
     return graph;
 }
 
-void check_graph_for_metis(adjacency_list graph) {
+int check_graph_for_metis(adjacency_list graph) {
     int i, j, k;
-    int nbSelf = 0, nbNullEdgeWeight = 0, nbNullVerticeWeight = 0, nbDuplicateEdge = 0, nbUndirectedEdge = 0;
+    int nbSelf = 0, nbNullEdgeWeight = 0, nbNullVerticeWeight = 0, nbDuplicateEdge = 0, nbDirectedEdge = 0;
+    int ret = ORCC_OK;
 
     for (i = 0; i < graph.nb_vertices; i++) {
         if (graph.vwgt[i] == 0) {
-            //TODO
             nbNullVerticeWeight++;
         }
 
         for (j = graph.xadj[i]; j < graph.xadj[i+1]; j++) {
-            /* Remove self-edges */
             if (graph.adjncy[j] == i) {
-                //TODO
                 nbSelf++;
             }
             if (graph.adjwgt[j] == 0) {
-                //TODO
                 nbNullEdgeWeight++;
             }
-            for (k = graph.xadj[graph.adjncy[j]]; k < graph.xadj[graph.adjncy[j]+1]; k++) {
-                if (graph.adjncy[k] == i) {
-                    //TODO
-                    nbUndirectedEdge++;
-                }
-            }
+            // !TODO : count directed edges (ie : graph not undirected) */
+//            for (k = graph.xadj[graph.adjncy[j]]; k < graph.xadj[graph.adjncy[j]+1]; k++) {
+//                if (graph.adjncy[k] == i) {
+//                    nbDirectedEdge++;
+//                }
+//            }
             for (k = graph.xadj[i]; k < graph.xadj[i+1]; k++) {
                 if ((j != k) && (graph.adjncy[k] == graph.adjncy[j])) {
-                    //TODO
                     nbDuplicateEdge++;
                 }
             }
         }
     }
-    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Self-edges=%d   Duplicate edges=%d   Undirected edges=%d",nbSelf ,nbDuplicateEdge, nbUndirectedEdge);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Self-edges=%d   Duplicate edges=%d   Directed edges=%d",nbSelf ,nbDuplicateEdge, nbDirectedEdge);
     print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Nb vertices with null weight = %d",nbNullVerticeWeight);
     print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Nb edges with null weight = %d", nbNullEdgeWeight);
+
+    if (nbNullVerticeWeight + nbNullEdgeWeight > 0) {
+        ret = ORCC_ERR_METIS_FIX_WEIGHTS;
+    } else if (nbSelf + nbDirectedEdge + nbDuplicateEdge > 0) {
+        ret = ORCC_ERR_METIS_FIX_NEEDED;
+    }
+
+    return ret;
 }
 
 
@@ -238,10 +242,14 @@ adjacency_list *fix_graph_for_metis(adjacency_list graph) {
     adjacency_list *metis_graph;
     int i = 0, j = 0, k = 0;
     int **edges;
+    int ret = ORCC_OK;
 
-    if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixing CSR graph for Metis");
-        check_graph_for_metis(graph);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixing CSR graph for Metis");
+    ret = check_graph_for_metis(graph);
+    if (ret == ORCC_ERR_METIS_FIX_WEIGHTS) {
+        check_orcc_error(ret);
+    } else if (ret != ORCC_OK) {
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "WARNING : Corrections applied to the network for Metis conformance.");
     }
 
     /*
@@ -291,8 +299,9 @@ adjacency_list *fix_graph_for_metis(adjacency_list graph) {
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixed CSR Graph for Metis :");
         print_graph(*metis_graph);
-        check_graph_for_metis(*metis_graph);
     }
+    ret = check_graph_for_metis(*metis_graph);
+    check_orcc_error(ret);
 
     free(edges);
     return metis_graph;

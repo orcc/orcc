@@ -41,6 +41,7 @@
 
 void print_orcc_error(orccmap_error_et error) {
     if (error != ORCC_OK && error < ORCC_ERR_SIZE) {
+        printf("\n");
         fprintf(stderr,"\nOrcc-Map : ERROR : %s", ORCC_ERRORS_TXT[error]);
     }
 
@@ -50,6 +51,7 @@ void check_metis_error(rstatus_et error) {
     if (error != METIS_OK) {
         print_orcc_error(ORCC_ERR_METIS);
         fprintf(stderr,"\t Code: %d", error);
+        printf("\n");
         exit(error);
     }
 }
@@ -57,6 +59,7 @@ void check_metis_error(rstatus_et error) {
 void check_orcc_error(orccmap_error_et error) {
     if (error != ORCC_OK) {
         print_orcc_error(error);
+        printf("\n");
         exit(error);
     }
 }

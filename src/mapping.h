@@ -97,7 +97,7 @@ adjacency_list *set_graph_from_network(network_t network);
 /**
  * Check the viability of the given graph for metis.
  */
-void check_graph_for_metis(adjacency_list graph);
+int check_graph_for_metis(adjacency_list graph);
 
 /**
  * Fix the given graph for metis.
