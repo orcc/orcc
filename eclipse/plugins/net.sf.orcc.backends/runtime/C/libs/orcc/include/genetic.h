@@ -29,34 +29,33 @@
 #ifndef GENETIC_H
 #define GENETIC_H
 
-#include "scheduler.h"
-#include "dataflow.h"
-#include "thread.h"
-#include "mapping.h"
+typedef struct actor_s actor_t;
+typedef struct scheduler_s scheduler_t;
+typedef struct sync_s sync_t;
 
-struct monitor_s {
-	struct sync_s *sync;
-	struct genetic_s *genetic_info;
-};
-
-struct genetic_s {
+typedef struct genetic_s {
 	int population_size;
 	int generation_nb;
 	double keep_ratio;
 	double crossover_ratio;
-	struct actor_s **actors;
-	struct scheduler_s *schedulers;
+    actor_t **actors;
+    scheduler_t *schedulers;
 	int actors_nb;
 	int threads_nb;
 	int use_ring_topology;
-	struct actor_s ***groups_of_actors;
+    actor_t ***groups_of_actors;
 	int *groups_size;
 	int groups_nb;
 	double groups_ratio;
-};
+} genetic_t;
+
+typedef struct monitor_s {
+    sync_t *sync;
+    genetic_t *genetic_info;
+} monitor_t;
 
 typedef struct gene_s {
-	struct actor_s *actor;
+    actor_t *actor;
 	int mapped_core;
 } gene;
 
@@ -79,17 +78,16 @@ void *monitor(void *data);
 /**
  * Initialize the given genetic structure.
  */
-void genetic_init(struct genetic_s *genetic_info, int population_size,
+void genetic_init(genetic_t *genetic_info, int population_size,
 		int generation_nb, double keep_ratio, double crossover_ratio,
-		struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb,
+        actor_t **actors, scheduler_t *schedulers, int actors_nb,
 		int threads_nb, int use_ring_topology, int groups_nb,
 		double groups_ratio);
 
 /**
  * Initialize the given monitor structure.
  */
-void monitor_init(struct monitor_s *monitoring, struct sync_s *sync,
-		struct genetic_s *genetic_info);
+void monitor_init(monitor_t *monitoring, sync_t *sync, genetic_t *genetic_info);
 
 /**
  * Allocate and read a parameter-sized table to clean processor cache.

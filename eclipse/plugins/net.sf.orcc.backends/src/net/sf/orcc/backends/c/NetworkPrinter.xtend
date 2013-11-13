@@ -138,6 +138,7 @@ class NetworkPrinter extends CTemplate {
 		#include "scheduler.h"
 		#include "mapping.h"
 		#include "util.h"
+		#include "dataflow.h"
 		«IF instrumentNetwork»
 			#include "cycle.h"
 		«ENDIF»
@@ -182,19 +183,19 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Actor functions
 		«FOR child : network.children»
-			extern void «child.label»_initialize(struct schedinfo_s *si);
-			extern void «child.label»_scheduler(struct schedinfo_s *si);
-			«IF geneticAlgo»extern void «child.label»_reinitialize(struct schedinfo_s *si);«ENDIF»
+			extern void «child.label»_initialize(schedinfo_t *si);
+			extern void «child.label»_scheduler(schedinfo_t *si);
+			«IF geneticAlgo»extern void «child.label»_reinitialize(schedinfo_t *si);«ENDIF»
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
 		
 		«FOR child : network.children»
-			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «IF geneticAlgo»«child.label»_reinitialize«ELSE»NULL«ENDIF», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0, 0.0};			
+			actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «IF geneticAlgo»«child.label»_reinitialize«ELSE»NULL«ENDIF», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0, 0.0};			
 		«ENDFOR»
 		
-		struct actor_s *actors[] = {
+		actor_t *actors[] = {
 			«FOR child : network.children SEPARATOR ","»
 				&«child.label»
 			«ENDFOR»
@@ -275,19 +276,19 @@ class NetworkPrinter extends CTemplate {
 				thread_struct threads[MAX_THREAD_NB];
 				thread_id_struct threads_id[MAX_THREAD_NB];
 				
-				struct mapping_s *mapping = map_actors(actors, sizeof(actors) / sizeof(actors[0]));
-				struct scheduler_s *schedulers = (struct scheduler_s *) malloc(mapping->number_of_threads * sizeof(struct scheduler_s));
-				struct waiting_s *waiting_schedulables = (struct waiting_s *) malloc(mapping->number_of_threads * sizeof(struct waiting_s));
+				mapping_t *mapping = map_actors(actors, sizeof(actors) / sizeof(actors[0]));
+				scheduler_t *schedulers = (scheduler_t *) malloc(mapping->number_of_threads * sizeof(scheduler_t));
+				waiting_t *waiting_schedulables = (waiting_t *) malloc(mapping->number_of_threads * sizeof(waiting_t));
 			«ELSE»
 				thread_struct threads[THREAD_NB], thread_monitor;
 				thread_id_struct threads_id[THREAD_NB], thread_monitor_id;
 				
-				struct scheduler_s schedulers[THREAD_NB];
-				struct waiting_s waiting_schedulables[THREAD_NB];
+				scheduler_t schedulers[THREAD_NB];
+				waiting_t waiting_schedulables[THREAD_NB];
 				
-				struct sync_s sched_sync;
-				struct genetic_s genetic_info;
-				struct monitor_s monitoring;
+				sync_t sched_sync;
+				genetic_t genetic_info;
+				monitor_t monitoring;
 				
 				sync_init(&sched_sync);
 				genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB, «IF newSchedul»RING_TOPOLOGY«ELSE»0«ENDIF», «numberOfGroups», GROUPS_RATIO);
@@ -338,14 +339,14 @@ class NetworkPrinter extends CTemplate {
 	'''
 	
 	def protected printFifoAssign(String name, Port port, int fifoIndex) '''
-		struct fifo_«port.type.doSwitch»_s *«name»_«port.name» = &fifo_«fifoIndex»;
+		fifo_«port.type.doSwitch»_t *«name»_«port.name» = &fifo_«fifoIndex»;
 	'''
 
 	def protected printScheduler() '''
 		void *scheduler(void *data) {
-			struct scheduler_s *sched = (struct scheduler_s *) data;
-			struct actor_s *my_actor;
-			struct schedinfo_s si;
+			scheduler_t *sched = (scheduler_t *) data;
+			actor_t *my_actor;
+			schedinfo_t si;
 			int j;
 			«IF instrumentNetwork»
 				ticks tick_in, tick_out;

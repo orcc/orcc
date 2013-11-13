@@ -27,13 +27,14 @@
  * SUCH DAMAGE.
  */
 
+#include <stdlib.h>
+
 #include "dataflow.h"
 
 /**
  * Find actor by its name in the given table.
  */
-struct actor_s * find_actor(char *name, struct actor_s **actors,
-        int actors_size) {
+actor_t * find_actor(char *name, actor_t **actors, int actors_size) {
     int i;
     for (i = 0; i < actors_size; i++) {
         if (strcmp(name, actors[i]->name) == 0) {

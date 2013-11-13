@@ -29,17 +29,17 @@
 
 #include "serialize.h"
 #include "roxml.h"
+#include "mapping.h"
+#include "dataflow.h"
 
 /**
  * Generate some mapping structure from an XCF file.
  */
-struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
-        struct actor_s **actors, int actors_size) {
+mappings_set_t* compute_mappings_from_file(char *xcf_file, actor_t **actors, int actors_size) {
     int i, j, k, size;
     char *nb, *name;
     node_t *configuration, *partitioning, *partition, *instance, *attribute;
-    struct mappings_set_s *mappings_set = (struct mappings_set_s *) malloc(
-            sizeof(struct mappings_set_s));
+    mappings_set_t *mappings_set = (mappings_set_t *) malloc(sizeof(mappings_set_t));
 
     configuration = roxml_load_doc(xcf_file);
     if (configuration == NULL) {
@@ -48,8 +48,7 @@ struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
     }
 
     mappings_set->size = roxml_get_chld_nb(configuration);
-    mappings_set->mappings = (struct mapping_s **) malloc(
-            mappings_set->size * sizeof(struct mapping_s *));
+    mappings_set->mappings = (mapping_t **) malloc(mappings_set->size * sizeof(mapping_t *));
 
     for (i = 0; i < mappings_set->size; i++) {
         partitioning = roxml_get_chld(configuration, NULL, i);
@@ -69,9 +68,9 @@ struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
             mappings_set->mappings[i]->threads_affinities[j] = atoi(nb);
 
             mappings_set->mappings[i]->partitions_of_actors[j]
-                    = (struct actor_s **) malloc(
+                    = (actor_t **) malloc(
                             mappings_set->mappings[i]->partitions_size[j]
-                                    * sizeof(struct actor_s *));
+                                    * sizeof(actor_t *));
 
             for (k = 0; k < mappings_set->mappings[i]->partitions_size[j]; k++) {
                 instance = roxml_get_chld(partition, NULL, k);

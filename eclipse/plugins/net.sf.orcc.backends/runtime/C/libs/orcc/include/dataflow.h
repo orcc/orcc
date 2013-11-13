@@ -30,7 +30,8 @@
 #ifndef ORCC_DATAFLOW_H
 #define ORCC_DATAFLOW_H
 
-#include "scheduler.h"
+typedef struct scheduler_s scheduler_t;
+typedef struct schedinfo_s schedinfo_t;
 
 /*
  * Actors are the vertices of orcc Networks
@@ -40,7 +41,7 @@ typedef struct actor_s {
     int group; /** id of his group. */
     void (*init_func)();
     void (*reinit_func)();
-    void (*sched_func)(struct schedinfo_s *);
+    void (*sched_func)(schedinfo_t *);
     int num_inputs; /** number of input ports */
     int num_outputs; /** number of output ports */
     int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
@@ -73,7 +74,6 @@ typedef struct network_s {
 /**
  * Find actor by its name in the given table.
  */
-struct actor_s * find_actor(char *name, struct actor_s **actors,
-        int actors_size);
+actor_t * find_actor(char *name, actor_t **actors, int actors_size);
 
 #endif

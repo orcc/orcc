@@ -115,11 +115,11 @@
 #endif
 
 
-struct sync_s {
+typedef struct sync_s {
 	semaphore_struct sem_monitor;
 	int active_sync;
-};
+} sync_t;
 
-void sync_init(struct sync_s *sync);
+void sync_init(sync_t *sync);
 
 #endif

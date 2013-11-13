@@ -29,96 +29,102 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include "fifo.h"
 #include "thread.h"
-#include "dataflow.h"
+
+typedef struct actor_s actor_t;
 
 #define MAX_ACTORS 1024
 
-struct scheduler_s {
+typedef struct waiting_s {
+    actor_t *waiting_actors[MAX_ACTORS];
+    volatile unsigned int next_entry;
+    unsigned int next_waiting;
+} waiting_t;
+
+typedef struct scheduler_s {
 	int id; /** Unique ID of this scheduler */
 	int schedulers_nb;
 
 	/* Round robin */
 	int num_actors; /** number of actors managed by this scheduler */
-	struct actor_s **actors; /** static list of actors managed by this scheduler */
+    actor_t **actors; /** static list of actors managed by this scheduler */
 	int rr_next_schedulable; /** index of the next actor to schedule in last list */
 
 	/* Data demand/driven scheduler */
-	struct actor_s *schedulable[MAX_ACTORS]; /** dynamic list of the next actors to schedule */
+    actor_t *schedulable[MAX_ACTORS]; /** dynamic list of the next actors to schedule */
 	unsigned int ddd_next_entry; /** index of the next actor to schedule in last list */
 	unsigned int ddd_next_schedulable; /** index of next actor added in the list */
 
 	/* Multicore with data demand/driven scheduler */
 	int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
 	/* ring topology */
-	struct waiting_s *ring_waiting_schedulable; /** receiving list of some actors to schedule */
-	struct waiting_s *ring_sending_schedulable; /** sending list of some actors to schedule */
+    waiting_t *ring_waiting_schedulable; /** receiving list of some actors to schedule */
+    waiting_t *ring_sending_schedulable; /** sending list of some actors to schedule */
 	/* mesh topology */
-	struct waiting_s **mesh_waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
+    waiting_t **mesh_waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
 
 	/* Genetic algorithm */
-	struct sync_s *sync;
+    sync_t *sync;
 	semaphore_struct sem_thread;
-};
+} scheduler_t;
 
-struct waiting_s {
-	struct actor_s *waiting_actors[MAX_ACTORS];
-	volatile unsigned int next_entry;
-	unsigned int next_waiting;
-};
+typedef enum reasons {
+    starved,
+    full
+} reasons_t;
+
+typedef struct schedinfo_s {
+    int num_firings;
+    reasons_t reason;
+    int ports; /** contains a mask that indicate the ports affected */
+} schedinfo_t;
 
 /**
  * Initialize the given scheduler.
  */
-void sched_init(struct scheduler_s *sched, int id, int num_actors,
-		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
-		struct waiting_s *ring_sending_schedulable, int schedulers_nb,
-		struct sync_s *sync);
+void sched_init(scheduler_t *sched, int id, int num_actors, actor_t **actors, waiting_t *ring_waiting_schedulable,
+        waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);
 
 /**
  * Initialize the actors mapped to the given scheduler.
  */
-void sched_init_actors(struct scheduler_s *sched, struct schedinfo_s *si);
+void sched_init_actors(scheduler_t *sched, schedinfo_t *si);
 
 /**
  * Reinitialize the given scheduler.
  */
-void sched_reinit(struct scheduler_s *sched, int num_actors,
-		struct actor_s **actors, int use_ring_topology, int schedulers_nb);
+void sched_reinit(scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology, int schedulers_nb);
 
 /**
  * Returns the next actor in actors list.
  * This method is used by the round-robin scheduler.
  */
-struct actor_s *sched_get_next(struct scheduler_s *sched);
+actor_t *sched_get_next(scheduler_t *sched);
 
 /**
  * Add the actor to the schedulable or waiting list.
  * The list is chosen according to associate scheduler of the actor.
  */
-void sched_add_schedulable(struct scheduler_s *sched,
-		struct actor_s *actor, int use_ring_topology);
+void sched_add_schedulable(scheduler_t *sched, actor_t *actor, int use_ring_topology);
 
 /**
  * Add waited actors to the schedulable or waiting list.
  * The list is chosen according to associate scheduler of the actor.
  * This function use ring topology of communications.
  */
-void sched_add_ring_waiting_list(struct scheduler_s *sched);
+void sched_add_ring_waiting_list(scheduler_t *sched);
 
 /**
  * Add waited actors to the schedulable list.
  * This function use mesh topology of communications.
  */
-void sched_add_mesh_waiting_list(struct scheduler_s *sched);
+void sched_add_mesh_waiting_list(scheduler_t *sched);
 
 /**
  * Returns the next schedulable actor, or NULL if no actor is schedulable.
  * The actor is removed from the schedulable list.
  * This method is used by the data/demand driven scheduler.
  */
-struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
-		int use_ring_topology);
+actor_t *sched_get_next_schedulable(scheduler_t *sched, int use_ring_topology);
 
 #endif

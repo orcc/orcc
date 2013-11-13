@@ -31,17 +31,6 @@
 
 #include "types.h"
 
-enum reasons {
-	starved,
-	full
-};
-
-struct schedinfo_s {
-	int num_firings;
-	enum reasons reason;
-	int ports; /** contains a mask that indicate the ports affected */
-};
-
 // declare FIFO with a size equal to (size)
 #define DECLARE_FIFO(type, size, count, readersnb) static type array_##count[(size)]; \
 static unsigned int read_inds_##count[readersnb] = {0}; \
@@ -52,6 +41,9 @@ static struct FIFO_S(type) fifo_##count = { (size), array_##count, readersnb, re
 
 #define FIFO_S(T) FIFO_S_EXPAND(T)
 #define FIFO_S_EXPAND(T) fifo_##T##_s
+
+#define FIFO_T(T) FIFO_T_EXPAND(T)
+#define FIFO_T_EXPAND(T) fifo_##T##_t
 
 #define FIFO_GET_ROOM(T) FIFO_GET_ROOM_EXPAND(T)
 #define FIFO_GET_ROOM_EXPAND(T) fifo_ ## T ## _get_room

@@ -36,6 +36,9 @@
 #include "genetic.h"
 #include "util.h"
 #include "serialize.h"
+#include "scheduler.h"
+#include "dataflow.h"
+#include "mapping.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initializers

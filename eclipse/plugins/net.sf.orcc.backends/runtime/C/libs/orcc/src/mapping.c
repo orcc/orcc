@@ -27,14 +27,17 @@
  * SUCH DAMAGE.
  */
 
+#include <stdlib.h>
+
 #include "mapping.h"
 #include "util.h"
 #include "serialize.h"
+#include "dataflow.h"
 
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.
  */
-int find_mapped_core(struct mapping_s *mapping, struct actor_s *actor) {
+int find_mapped_core(mapping_t *mapping, actor_t *actor) {
     int i;
     for (i = 0; i < mapping->number_of_threads; i++) {
         if (find_actor(actor->name, mapping->partitions_of_actors[i],
@@ -48,13 +51,11 @@ int find_mapped_core(struct mapping_s *mapping, struct actor_s *actor) {
 /**
  * Creates a mapping structure.
  */
-struct mapping_s* allocate_mapping(int number_of_threads) {
-    struct mapping_s *mapping = (struct mapping_s *) malloc(
-            sizeof(struct mapping_s));
+mapping_t* allocate_mapping(int number_of_threads) {
+    mapping_t *mapping = (mapping_t *) malloc(sizeof(mapping_t));
     mapping->number_of_threads = number_of_threads;
     mapping->threads_affinities = (int*) malloc(number_of_threads * sizeof(int));
-    mapping->partitions_of_actors = (struct actor_s ***) malloc(
-            number_of_threads * sizeof(struct actor_s **));
+    mapping->partitions_of_actors = (actor_t ***) malloc(number_of_threads * sizeof(actor_t **));
     mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
     return mapping;
 }
@@ -62,7 +63,7 @@ struct mapping_s* allocate_mapping(int number_of_threads) {
 /**
  * Releases memory of the given mapping structure.
  */
-void delete_mapping(struct mapping_s* mapping, int clean_all) {
+void delete_mapping(mapping_t* mapping, int clean_all) {
     if (clean_all) {
         int i;
         for (i = 0; i < mapping->number_of_threads; i++) {
@@ -78,16 +79,15 @@ void delete_mapping(struct mapping_s* mapping, int clean_all) {
 /**
  * Computes a partitionment of actors on threads from an XML file given in parameter.
  */
-struct mapping_s* map_actors(struct actor_s **actors, int actors_size) {
+mapping_t* map_actors(actor_t **actors, int actors_size) {
     if (mapping_file == NULL) {
-        struct mapping_s *mapping = allocate_mapping(1);
+        mapping_t *mapping = allocate_mapping(1);
         mapping->threads_affinities[0] = 0;
         mapping->partitions_size[0] = actors_size;
         mapping->partitions_of_actors[0] = actors;
         return mapping;
     } else {
-        struct mappings_set_s *mappings_set = compute_mappings_from_file(
-                mapping_file, actors, actors_size);
+        mappings_set_t *mappings_set = compute_mappings_from_file(mapping_file, actors, actors_size);
         return mappings_set->mappings[0];
     }
 }

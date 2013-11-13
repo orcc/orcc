@@ -28,18 +28,15 @@
  * SUCH DAMAGE.
  */
 
-#include <string.h>
-#include <stdlib.h>
-
 /** lock free fifo ring buffer structure */
-struct FIFO_S(T) {
+typedef struct FIFO_S(T) {
 	unsigned int size; /** size of the ringbuffer */
 	T *contents; /** the memory containing the ringbuffer */
 	
 	unsigned int readers_nb; /** the number of fifo's readers */
 	unsigned int* read_inds; /** the current position of the reader */
 	unsigned int write_ind; /** the current position of the writer */
-};
+} FIFO_T(T);
 
 static unsigned int FIFO_HAS_TOKENS(T)(struct FIFO_S(T) *fifo, unsigned int reader_id, unsigned int n) {
     return fifo->write_ind - fifo->read_inds[reader_id] >= n;

@@ -30,8 +30,9 @@
 #ifndef ORCC_SERIALIZE_H
 #define ORCC_SERIALIZE_H
 
-#include "mapping.h"
-#include "dataflow.h"
+typedef struct actor_s actor_t;
+typedef struct network_s network_t;
+typedef struct mappings_set_s mappings_set_t;
 
 /**
  * Save network's workloads from instrumentation to a file
@@ -42,7 +43,6 @@ void save_instrumentation(char* fileName, network_t network);
 /**
  * Generate some mapping structure from an XCF file.
  */
-struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
-        struct actor_s **actors, int actors_size);
+mappings_set_t* compute_mappings_from_file(char *xcf_file, actor_t **actors, int actors_size);
 
 #endif

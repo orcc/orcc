@@ -32,6 +32,7 @@
 
 #include "scheduler.h"
 #include "util.h"
+#include "dataflow.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduling functions
@@ -40,10 +41,10 @@
 /**
  * Initializes the given scheduler.
  */
-void sched_init(struct scheduler_s *sched, int id, int num_actors,
-		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
-		struct waiting_s *ring_sending_schedulable, int schedulers_nb,
-		struct sync_s *sync) {
+void sched_init(scheduler_t *sched, int id, int num_actors,
+        actor_t **actors, waiting_t *ring_waiting_schedulable,
+        waiting_t *ring_sending_schedulable, int schedulers_nb,
+        sync_t *sync) {
 	int i;
 
 	sched->id = id;
@@ -72,11 +73,11 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 	sched->ring_sending_schedulable->next_entry = 0;
 	sched->ring_sending_schedulable->next_waiting = 0;
 
-	sched->mesh_waiting_schedulable = (struct waiting_s **) malloc(
-			schedulers_nb * sizeof(struct waiting_s *));
+    sched->mesh_waiting_schedulable = (waiting_t **) malloc(
+            schedulers_nb * sizeof(waiting_t *));
 	for (i = 0; i < schedulers_nb; i++) {
-		sched->mesh_waiting_schedulable[i] = (struct waiting_s *) malloc(
-				sizeof(struct waiting_s));
+        sched->mesh_waiting_schedulable[i] = (waiting_t *) malloc(
+                sizeof(waiting_t));
 		sched->mesh_waiting_schedulable[i]->next_entry = 0;
 		sched->mesh_waiting_schedulable[i]->next_waiting = 0;
 	}
@@ -88,8 +89,7 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 /**
  * Reinitialize the given scheduler with new actors list.
  */
-void sched_reinit(struct scheduler_s *sched, int num_actors,
-		struct actor_s **actors, int use_ring_topology, int schedulers_nb) {
+void sched_reinit(scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology, int schedulers_nb) {
 	int i;
 
 	if (sched->actors != NULL) {
@@ -127,7 +127,7 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 /**
  * Initialize the actors mapped to the given scheduler.
  */
-void sched_init_actors(struct scheduler_s *sched, struct schedinfo_s *si) {
+void sched_init_actors(scheduler_t *sched, schedinfo_t *si) {
 	int i;
 
 	for (i = 0; i < sched->num_actors; i++) {
@@ -139,7 +139,7 @@ void sched_init_actors(struct scheduler_s *sched, struct schedinfo_s *si) {
 /**
  * Re-initialize the actors mapped to the given scheduler.
  */
-void sched_reinit_actors(struct scheduler_s *sched, struct schedinfo_s *si) {
+void sched_reinit_actors(scheduler_t *sched, schedinfo_t *si) {
 	int i;
 
 	for (i = 0; i < sched->num_actors; i++) {
@@ -156,8 +156,8 @@ void sched_reinit_actors(struct scheduler_s *sched, struct schedinfo_s *si) {
  * Returns the next actor in actors list.
  * This method is used by the round-robin scheduler.
  */
-struct actor_s *sched_get_next(struct scheduler_s *sched) {
-	struct actor_s *actor;
+actor_t *sched_get_next(scheduler_t *sched) {
+    actor_t *actor;
 	if (sched->num_actors == 0) {
 		return NULL;
 	}
@@ -173,8 +173,7 @@ struct actor_s *sched_get_next(struct scheduler_s *sched) {
  * Add the actor to the schedulable or waiting list.
  * The list is chosen according to associate scheduler of the actor.
  */
-void sched_add_schedulable(struct scheduler_s *sched,
-		struct actor_s *actor, int use_ring_topology) {
+void sched_add_schedulable(scheduler_t *sched, actor_t *actor, int use_ring_topology) {
 	// only add the actor in the lists if it is not already there
 	// like a list.contains(actor) but in O(1) instead of O(n)
 	if (!actor->in_list) {
@@ -184,7 +183,7 @@ void sched_add_schedulable(struct scheduler_s *sched,
 			sched->ddd_next_entry++;
 		} else if (!actor->in_waiting) {
 			// this actor isn't launch by this scheduler so it is sent to the next one
-			struct waiting_s *send =
+            waiting_t *send =
 					use_ring_topology ? sched->ring_sending_schedulable
 							: actor->sched->mesh_waiting_schedulable[sched->id];
 			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
@@ -199,9 +198,9 @@ void sched_add_schedulable(struct scheduler_s *sched,
  * The list is chosen according to associate scheduler of the actor.
  * This function use ring topology of communications.
  */
-void sched_add_ring_waiting_list(struct scheduler_s *sched) {
-	struct actor_s *actor;
-	struct waiting_s *wait = sched->ring_waiting_schedulable;
+void sched_add_ring_waiting_list(scheduler_t *sched) {
+    actor_t *actor;
+    waiting_t *wait = sched->ring_waiting_schedulable;
 	while (wait->next_entry - wait->next_waiting >= 1) {
 		actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
 		if (sched == actor->sched) {
@@ -211,7 +210,7 @@ void sched_add_ring_waiting_list(struct scheduler_s *sched) {
 			sched->ddd_next_entry++;
 		} else {
 			// this actor isn't launch by this scheduler so it is sent to the next one
-			struct waiting_s *send = sched->ring_sending_schedulable;
+            waiting_t *send = sched->ring_sending_schedulable;
 			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
 			send->next_entry++;
 		}
@@ -223,11 +222,11 @@ void sched_add_ring_waiting_list(struct scheduler_s *sched) {
  * Add waited actors to the schedulable list.
  * This function use mesh topology of communications.
  */
-void sched_add_mesh_waiting_list(struct scheduler_s *sched) {
+void sched_add_mesh_waiting_list(scheduler_t *sched) {
 	int i;
-	struct actor_s *actor;
+    actor_t *actor;
 	for (i = 0; i < sched->schedulers_nb; i++) {
-		struct waiting_s *wait = sched->mesh_waiting_schedulable[i];
+        waiting_t *wait = sched->mesh_waiting_schedulable[i];
 		while (wait->next_entry - wait->next_waiting >= 1) {
 			actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
 			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
@@ -244,9 +243,8 @@ void sched_add_mesh_waiting_list(struct scheduler_s *sched) {
  * The actor is removed from the schedulable list.
  * This method is used by the data/demand driven scheduler.
  */
-struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
-		int use_ring_topology) {
-	struct actor_s *actor;
+actor_t *sched_get_next_schedulable(scheduler_t *sched, int use_ring_topology) {
+    actor_t *actor;
 	// check if other schedulers sent some schedulable actors
 	use_ring_topology ? sched_add_ring_waiting_list(sched)
 			: sched_add_mesh_waiting_list(sched);

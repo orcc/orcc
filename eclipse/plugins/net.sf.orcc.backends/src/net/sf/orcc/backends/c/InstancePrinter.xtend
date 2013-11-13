@@ -225,6 +225,7 @@ class InstancePrinter extends CTemplate {
 		#include "fifo.h"
 		#include "util.h"
 		#include "scheduler.h"
+		#include "dataflow.h"
 
 		#define SIZE «fifoSize»
 		«IF instance != null»
@@ -239,13 +240,13 @@ class InstancePrinter extends CTemplate {
 
 		////////////////////////////////////////////////////////////////////////////////
 		// Instance
-		extern struct actor_s «entityName»;
+		extern actor_t «entityName»;
 
 		«IF !actor.inputs.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
 			«FOR port : actor.inputs»
-				«if (incomingPortMap.get(port) != null) "extern "»struct fifo_«port.type.doSwitch»_s *«port.fullName»;
+				«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
 			«ENDFOR»
 
 			////////////////////////////////////////////////////////////////////////////////
@@ -274,7 +275,7 @@ class InstancePrinter extends CTemplate {
 			// Predecessors
 			«FOR port : actor.inputs»
 				«IF incomingPortMap.get(port) != null»
-					extern struct actor_s «incomingPortMap.get(port).source.label»;
+					extern actor_t «incomingPortMap.get(port).source.label»;
 				«ENDIF»
 			«ENDFOR»
 
@@ -283,7 +284,7 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// Output FIFOs
 			«FOR port : actor.outputs.filter[! native]»
-				extern struct fifo_«port.type.doSwitch»_s *«port.fullName»;
+				extern fifo_«port.type.doSwitch»_t *«port.fullName»;
 			«ENDFOR»
 
 			////////////////////////////////////////////////////////////////////////////////
@@ -308,7 +309,7 @@ class InstancePrinter extends CTemplate {
 			// Successors
 			«FOR port : actor.outputs»
 				«FOR successor : outgoingPortMap.get(port)»
-					extern struct actor_s «successor.target.label»;
+					extern actor_t «successor.target.label»;
 				«ENDFOR»
 			«ENDFOR»
 
@@ -396,7 +397,7 @@ class InstancePrinter extends CTemplate {
 		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
-			«noInline»void «entityName»_scheduler(struct schedinfo_s *si) {
+			«noInline»void «entityName»_scheduler(schedinfo_t *si) {
 				int i = 0;
 				si->ports = 0;
 
@@ -431,7 +432,7 @@ class InstancePrinter extends CTemplate {
 	//========================================
 	def protected printFsm() '''
 		«IF ! actor.actionsOutsideFsm.empty»
-			«inline»void «entityName»_outside_FSM_scheduler(struct schedinfo_s *si) {
+			«inline»void «entityName»_outside_FSM_scheduler(schedinfo_t *si) {
 				int i = 0;
 				«actor.actionsOutsideFsm.printActionLoop»
 			finished:
@@ -440,7 +441,7 @@ class InstancePrinter extends CTemplate {
 			}
 		«ENDIF»
 
-		«noInline»void «entityName»_scheduler(struct schedinfo_s *si) {
+		«noInline»void «entityName»_scheduler(schedinfo_t *si) {
 			int i = 0;
 
 			«printCallTokensFunctions»
@@ -587,7 +588,7 @@ class InstancePrinter extends CTemplate {
 			«init.print»
 		«ENDFOR»
 
-		«inline»void «entityName»_initialize(struct schedinfo_s *si) {
+		«inline»void «entityName»_initialize(schedinfo_t *si) {
 			int i = 0;
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
@@ -603,7 +604,7 @@ class InstancePrinter extends CTemplate {
 		}
 
 		«IF(geneticAlgo)»
-			void «entityName»_reinitialize(struct schedinfo_s *si) {
+			void «entityName»_reinitialize(schedinfo_t *si) {
 				int i = 0;
 				«FOR variable : actor.stateVars»
 					«IF variable.assignable && variable.initialized»

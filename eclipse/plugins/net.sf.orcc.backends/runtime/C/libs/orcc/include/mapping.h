@@ -30,38 +30,38 @@
 #ifndef ORCC_MAPPING_H
 #define ORCC_MAPPING_H
 
-#include "dataflow.h"
+typedef struct actor_s actor_t;
 
-struct mapping_s {
+typedef struct mapping_s {
     int number_of_threads;
     int *threads_affinities;
-    struct actor_s ***partitions_of_actors;
+    actor_t ***partitions_of_actors;
     int *partitions_size;
-};
+} mapping_t;
 
-struct mappings_set_s {
+typedef struct mappings_set_s {
     int size;
-    struct mapping_s **mappings;
-};
+    mapping_t **mappings;
+} mappings_set_t;
 
 /**
  * Create a mapping structure.
  */
-struct mapping_s* allocate_mapping(int number_of_threads);
+mapping_t* allocate_mapping(int number_of_threads);
 
 /**
  * Release memory of the given mapping structure.
  */
-void delete_mapping(struct mapping_s* mapping, int clean_all);
+void delete_mapping(mapping_t* mapping, int clean_all);
 
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.
  */
-int find_mapped_core(struct mapping_s *mapping, struct actor_s *actor);
+int find_mapped_core(mapping_t *mapping, actor_t *actor);
 
 /**
  * Compute a partitionment of actors on threads from an XML file given in parameter.
  */
-struct mapping_s* map_actors(struct actor_s **actors, int actors_size);
+mapping_t* map_actors(actor_t **actors, int actors_size);
 
 #endif
