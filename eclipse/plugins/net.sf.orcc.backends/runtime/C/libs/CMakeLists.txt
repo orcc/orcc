@@ -73,6 +73,7 @@ else()
 			orcc/src/thread.c
 			orcc/src/open_hevc.c
 			orcc/src/serialize.c
+			orcc/src/dataflow.c
 			# Headers
 			orcc/include/fifo.h
 			orcc/include/generic_fifo.h
@@ -82,6 +83,7 @@ else()
 			orcc/include/thread.h
 			orcc/include/open_hevc.h
 			orcc/include/serialize.h
+			orcc/include/dataflow.h
 		)
 
 		# Compile libraries

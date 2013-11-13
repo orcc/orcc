@@ -33,12 +33,9 @@
 #include <time.h>
 #include <string.h>
 
-#include "types.h"
 #include "genetic.h"
-#include "thread.h"
-#include "scheduler.h"
 #include "util.h"
-#include "mapping.h"
+#include "serialize.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initializers

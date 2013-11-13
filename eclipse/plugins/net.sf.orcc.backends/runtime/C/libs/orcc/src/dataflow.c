@@ -27,22 +27,18 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_SERIALIZE_H
-#define ORCC_SERIALIZE_H
-
-#include "mapping.h"
 #include "dataflow.h"
 
 /**
- * Save network's workloads from instrumentation to a file
- * that could be used for mapping.
+ * Find actor by its name in the given table.
  */
-void save_instrumentation(char* fileName, network_t network);
-
-/**
- * Generate some mapping structure from an XCF file.
- */
-struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
-        struct actor_s **actors, int actors_size);
-
-#endif
+struct actor_s * find_actor(char *name, struct actor_s **actors,
+        int actors_size) {
+    int i;
+    for (i = 0; i < actors_size; i++) {
+        if (strcmp(name, actors[i]->name) == 0) {
+            return actors[i];
+        }
+    }
+    return NULL;
+}

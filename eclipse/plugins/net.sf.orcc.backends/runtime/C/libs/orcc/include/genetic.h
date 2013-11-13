@@ -29,6 +29,11 @@
 #ifndef GENETIC_H
 #define GENETIC_H
 
+#include "scheduler.h"
+#include "dataflow.h"
+#include "thread.h"
+#include "mapping.h"
+
 struct monitor_s {
 	struct sync_s *sync;
 	struct genetic_s *genetic_info;

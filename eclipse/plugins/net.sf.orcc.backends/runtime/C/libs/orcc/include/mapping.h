@@ -30,7 +30,7 @@
 #ifndef ORCC_MAPPING_H
 #define ORCC_MAPPING_H
 
-#include "scheduler.h"
+#include "dataflow.h"
 
 struct mapping_s {
     int number_of_threads;
@@ -63,11 +63,5 @@ int find_mapped_core(struct mapping_s *mapping, struct actor_s *actor);
  * Compute a partitionment of actors on threads from an XML file given in parameter.
  */
 struct mapping_s* map_actors(struct actor_s **actors, int actors_size);
-
-/**
- * Find actor by its name in the given table.
- */
-struct actor_s * find_actor(char *name, struct actor_s **actors,
-        int actors_size);
 
 #endif

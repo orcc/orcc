@@ -29,21 +29,7 @@
 
 #include "mapping.h"
 #include "util.h"
-
-
-/**
- * Find actor by its name in the given table.
- */
-struct actor_s * find_actor(char *name, struct actor_s **actors,
-        int actors_size) {
-    int i;
-    for (i = 0; i < actors_size; i++) {
-        if (strcmp(name, actors[i]->name) == 0) {
-            return actors[i];
-        }
-    }
-    return NULL;
-}
+#include "serialize.h"
 
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.

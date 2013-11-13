@@ -18,7 +18,7 @@
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
  * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * LIABLE FOR ANY DIRECT, INDIREnum_inputsCT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
@@ -27,22 +27,53 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_SERIALIZE_H
-#define ORCC_SERIALIZE_H
+#ifndef ORCC_DATAFLOW_H
+#define ORCC_DATAFLOW_H
 
-#include "mapping.h"
-#include "dataflow.h"
+#include "scheduler.h"
+
+/*
+ * Actors are the vertices of orcc Networks
+ */
+typedef struct actor_s {
+    char *name;
+    int group; /** id of his group. */
+    void (*init_func)();
+    void (*reinit_func)();
+    void (*sched_func)(struct schedinfo_s *);
+    int num_inputs; /** number of input ports */
+    int num_outputs; /** number of output ports */
+    int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
+    int in_waiting; /** idem with the waiting list. */
+    struct scheduler_s *sched; /** scheduler which execute this actor. */
+    int mapping; /** id of the processor core mapped to this actor. */
+    double workload; /** actor's workload gived by instrumention */
+} actor_t;
+
+/*
+ * Connections are the edges of orcc Networks
+ */
+typedef struct connection_s {
+    actor_t *src;
+    actor_t *dst;
+    double workload;
+} connection_t;
+
+/*
+ * Orcc Networks are directed graphs
+ */
+typedef struct network_s {
+    char *name;
+    actor_t **actors;
+    connection_t **connections;
+    int nb_actors;
+    int nb_connections;
+} network_t;
 
 /**
- * Save network's workloads from instrumentation to a file
- * that could be used for mapping.
+ * Find actor by its name in the given table.
  */
-void save_instrumentation(char* fileName, network_t network);
-
-/**
- * Generate some mapping structure from an XCF file.
- */
-struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
-        struct actor_s **actors, int actors_size);
+struct actor_s * find_actor(char *name, struct actor_s **actors,
+        int actors_size);
 
 #endif

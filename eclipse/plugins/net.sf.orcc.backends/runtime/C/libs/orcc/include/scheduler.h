@@ -31,46 +31,9 @@
 
 #include "fifo.h"
 #include "thread.h"
+#include "dataflow.h"
 
 #define MAX_ACTORS 1024
-
-/*
- * Actors are the vertices of orcc Networks
- */
-typedef struct actor_s {
-	char *name;
-	int group; /** id of his group. */
-	void (*init_func)();
-	void (*reinit_func)();
-	void (*sched_func)(struct schedinfo_s *);
-	int num_inputs; /** number of input ports */
-	int num_outputs; /** number of output ports */
-	int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
-	int in_waiting; /** idem with the waiting list. */
-	struct scheduler_s *sched; /** scheduler which execute this actor. */
-	int mapping; /** id of the processor core mapped to this actor. */
-	double workload; /** actor's workload gived by instrumention */
-} actor_t;
-
-/*
- * Connections are the edges of orcc Networks
- */
-typedef struct connection_s {
-    actor_t *src;
-    actor_t *dst;
-    double workload;
-} connection_t;
-
-/*
- * Orcc Networks are directed graphs
- */
-typedef struct network_s {
-	char *name;
-    actor_t **actors;
-    connection_t **connections;
-    int nb_actors;
-    int nb_connections;
-} network_t;
 
 struct scheduler_s {
 	int id; /** Unique ID of this scheduler */
