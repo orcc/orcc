@@ -15,7 +15,7 @@
     #define DECLARE_ALIGNED(n,t,v)      t v
 #endif
 
-#include "orcc_types.h"
+#include "types.h"
 
 int openHEVCIsPresent();
 

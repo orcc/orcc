@@ -33,7 +33,7 @@
 #include <time.h>
 #include <string.h>
 
-#include "orcc_util.h"
+#include "util.h"
 
 // from APR
 /* Ignore Microsoft's interpretation of secure development

@@ -1,4 +1,4 @@
-#include "orcc_open_hevc.h"
+#include "open_hevc.h"
 
 int openHEVCIsPresent(){
 #ifdef OPEN_HEVC_ENABLE

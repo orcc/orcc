@@ -221,10 +221,10 @@ class InstancePrinter extends CTemplate {
 		#include <stdio.h>
 		#include <stdlib.h>
 
-		#include "orcc_types.h"
-		#include "orcc_fifo.h"
-		#include "orcc_util.h"
-		#include "orcc_scheduler.h"
+		#include "types.h"
+		#include "fifo.h"
+		#include "util.h"
+		#include "scheduler.h"
 
 		#define SIZE «fifoSize»
 		«IF instance != null»

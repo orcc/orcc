@@ -29,8 +29,8 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include "orcc_fifo.h"
-#include "orcc_thread.h"
+#include "fifo.h"
+#include "thread.h"
 
 #define MAX_ACTORS 1024
 
@@ -116,8 +116,6 @@ struct mappings_set_s {
 	int size;
 	struct mapping_s **mappings;
 };
-
-#include "orcc_scheduler.inl"
 
 /**
  * Initialize the given scheduler.

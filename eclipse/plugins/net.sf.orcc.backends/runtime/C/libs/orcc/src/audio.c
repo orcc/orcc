@@ -28,7 +28,7 @@
  */
  
 #include <SDL.h>
-#include "orcc_util.h"
+#include "util.h"
 
 #define AUDIO_BUFFER_SIZE 128000 * 64
 

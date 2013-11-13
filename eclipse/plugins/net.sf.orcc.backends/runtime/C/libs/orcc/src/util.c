@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "orcc_util.h"
+#include "util.h"
 
 // define to 1 if your system has the termios.h header
 #define HAS_TERMIOS 0

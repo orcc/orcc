@@ -37,4 +37,4 @@ struct FIFO_S(T) {
 	unsigned int write_ind; /** the current position of the writer */
 };
 
-#include "orcc_generic_fifo.inl"
+#include "generic_fifo.inl"

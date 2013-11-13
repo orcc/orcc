@@ -133,17 +133,17 @@ class NetworkPrinter extends CTemplate {
 		#define __USE_GNU
 		#endif
 		
-		#include "orcc_types.h"
-		#include "orcc_fifo.h"
-		#include "orcc_scheduler.h"
-		#include "orcc_util.h"
+		#include "types.h"
+		#include "fifo.h"
+		#include "scheduler.h"
+		#include "util.h"
 		«IF instrumentNetwork»
 			#include "cycle.h"
 		«ENDIF»
 		
-		#include "orcc_thread.h"
+		#include "thread.h"
 		«IF geneticAlgo»
-			#include "orcc_genetic.h"
+			#include "genetic.h"
 			#define THREAD_NB «threadsNb»
 			#define POPULATION_SIZE 100
 			#define GENERATION_NB 20

@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 
 
-#include "orcc_util.h"
+#include "util.h"
 
 // from APR
 /* Ignore Microsoft's interpretation of secure development
