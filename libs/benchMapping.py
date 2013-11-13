@@ -89,7 +89,7 @@ def performMappingWithStrategy(fic, nbProcs, Strategy):
   
     # Generate XCF file with Mapping Strategy
     # print "\tGenerate XCF file : %s" % (xcfFile)
-    proc = subprocess.call(["../bin/orccmap", "-n", str(nbProcs), "-v", "-i", pxdfFile, "-m", Strategy, "-o", xcfFile], stdout=log_file)
+    proc = subprocess.call(["../bin/orcc-map", "-n", str(nbProcs), "-v", "-i", pxdfFile, "-m", Strategy, "-o", xcfFile], stdout=log_file)
     # Log FPS with Mapping Strategy
     # print "\tRun sequence with mapping : %s" % (Strategy)
     proc = subprocess.call([DEFAULT_EXE, "-f", str(NBFRAME), "-n", "-i", os.path.join(SEQ_PATH, fic), "-m", xcfFile], stdout=log_file)
