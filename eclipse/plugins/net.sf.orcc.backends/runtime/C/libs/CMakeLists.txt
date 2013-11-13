@@ -74,7 +74,6 @@ else()
 			# Headers
 			orcc/include/fifo.h
 			orcc/include/generic_fifo.h
-			orcc/include/generic_fifo.inl
 			orcc/include/genetic.h
 			orcc/include/scheduler.h
 			orcc/include/thread.h
