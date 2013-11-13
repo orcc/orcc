@@ -78,7 +78,3 @@ void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
 
     va_end (args);
 }
-
-void set_trace_level(verbose_level_et level) {
-    verbose_level = level;
-}

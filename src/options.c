@@ -33,6 +33,8 @@
 #include <stdlib.h>
 #include "options.h"
 
+verbose_level_et verbose_level = ORCC_VL_QUIET;
+
 /**
  * Creates and init options structure.
  */
@@ -117,4 +119,8 @@ void set_default_output_filename(char *arg_value, options_t *opt) {
     }
 
     opt->output_file = output;
+}
+
+void set_trace_level(verbose_level_et level) {
+    verbose_level = level;
 }

@@ -31,14 +31,13 @@
 #define _ORCCMAP_UTIL_H_
 
 #include "orccmap.h"
+#include "options.h"
 #include "metis.h"
 
 #define arrayCopy(DST,SRC,LEN) \
             { size_t TMPSZ = sizeof(*(SRC)) * (LEN); \
               if ( ((DST) = malloc(TMPSZ)) != NULL ) \
                 memcpy((DST), (SRC), TMPSZ); }
-
-static verbose_level_et verbose_level = ORCC_VL_QUIET;
 
 static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
     "",
@@ -86,10 +85,5 @@ boolean print_trace_block(verbose_level_et level);
  * !TODO
  */
 void print_orcc_trace(verbose_level_et level, const char *trace, ...);
-
-/**
- * !TODO
- */
-void set_trace_level(verbose_level_et level);
 
 #endif  /* _ORCCMAP_UTIL_H_ */
