@@ -21,3 +21,9 @@ target_link_libraries(orccmap metis m)
 add_executable(orcc-map ${executable_filenames})
 target_link_libraries(orcc-map orccmap roxml)
 
+INSTALL(TARGETS orcc-map orccmap
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
