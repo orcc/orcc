@@ -6,7 +6,7 @@ Orcc-map is a library dedicated to the mapping of dynamic dataflow programs over
 Installation
 ------------
 
-First, download and install [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
+First, you have to download and install [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
 
 ```
 wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
@@ -20,7 +20,9 @@ Then, you can download and compile Orcc-map.
 
 ```
 git clone git@github.com:orcc/orcc-map.git
-cd orcc-map/build/
+cd orcc-map/
+mkdir build
+cd build/
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
