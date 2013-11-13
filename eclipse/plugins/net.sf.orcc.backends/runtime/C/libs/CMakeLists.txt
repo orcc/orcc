@@ -2,13 +2,13 @@ cmake_minimum_required (VERSION 2.6)
 
 # Orcc library files
 set(orcc_sources
-	orcc/src/accessFile.c
+	orcc/src/access_file.c
 	orcc/src/getopt.c
 	orcc/src/source.c
 	orcc/src/writer.c
-	orcc/src/orcc_util.c
-	orcc/include/orcc_util.h
-	orcc/include/orcc_types.h
+        orcc/src/util.c
+        orcc/include/util.h
+        orcc/include/types.h
 )
 
 # Build library without any external library required (SDL, pthread, etc)
@@ -67,19 +67,19 @@ else()
 			orcc/src/scheduler.c
 			orcc/src/display.c
 			orcc/src/audio.c
-			orcc/src/fpsPrint.c
+                        orcc/src/fps_print.c
 			orcc/src/genetic.c
 			orcc/src/thread.c
-            orcc/src/orcc_open_hevc.c
+                        orcc/src/open_hevc.c
 			# Headers
-			orcc/include/orcc_fifo.h
-			orcc/include/orcc_generic_fifo.h
-			orcc/include/orcc_generic_fifo.inl
-			orcc/include/orcc_genetic.h
-			orcc/include/orcc_scheduler.h
-			orcc/include/orcc_scheduler.inl
-			orcc/include/orcc_thread.h
-            orcc/include/orcc_open_hevc.h
+                        orcc/include/fifo.h
+                        orcc/include/generic_fifo.h
+                        orcc/include/generic_fifo.inl
+                        orcc/include/genetic.h
+                        orcc/include/scheduler.h
+                        orcc/include/scheduler.inl
+                        orcc/include/thread.h
+                        orcc/include/open_hevc.h
 		)
 
 		# Compile libraries
