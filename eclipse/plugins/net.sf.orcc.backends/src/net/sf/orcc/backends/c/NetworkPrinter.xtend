@@ -54,6 +54,7 @@ class NetworkPrinter extends CTemplate {
 	
 	protected var boolean geneticAlgo = false
 	protected var boolean instrumentNetwork = false
+	protected var boolean dynamicMapping = false
 	var boolean ringTopology = false
 	
 	var boolean newSchedul = false
@@ -77,6 +78,9 @@ class NetworkPrinter extends CTemplate {
 		}
 		if (options.containsKey(INSTRUMENT_NETWORK)) {
 			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
+		}
+		if (options.containsKey(DYNAMIC_MAPPING)) {
+			dynamicMapping = options.get(DYNAMIC_MAPPING) as Boolean
 		}
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
@@ -139,7 +143,7 @@ class NetworkPrinter extends CTemplate {
 		#include "mapping.h"
 		#include "util.h"
 		#include "dataflow.h"
-		«IF instrumentNetwork»
+		«IF instrumentNetwork || dynamicMapping»
 			#include "cycle.h"
 		«ENDIF»
 		
@@ -247,7 +251,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Actions to do when exting properly
 		static void atexit_actions() {
-			«IF instrumentNetwork»
+			«IF instrumentNetwork || dynamicMapping»
 				if (instrumentation_file != NULL) {
 					save_instrumentation(instrumentation_file, network);
 				}
@@ -275,6 +279,13 @@ class NetworkPrinter extends CTemplate {
 			«IF ! geneticAlgo»
 				thread_struct threads[MAX_THREAD_NB];
 				thread_id_struct threads_id[MAX_THREAD_NB];
+				«IF dynamicMapping»
+					sync_t sched_sync;
+					agent_t agent;
+					
+					sync_init(&sched_sync);
+					agent_init(&monitoring, &sync, &genetic_info);
+				«ENDIF»
 				
 				mapping_t *mapping = map_actors(actors, sizeof(actors) / sizeof(actors[0]));
 				scheduler_t *schedulers = (scheduler_t *) malloc(mapping->number_of_threads * sizeof(scheduler_t));
@@ -295,9 +306,13 @@ class NetworkPrinter extends CTemplate {
 				monitor_init(&monitoring, &sched_sync, &genetic_info);
 			«ENDIF»
 			
-			«IF !geneticAlgo»
+			«IF !geneticAlgo && !dynamicMapping»
 				for(i=0; i < mapping->number_of_threads; ++i){
 					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
+				}
+			«ELSEIF dynamicMapping»
+				for(i=0; i < nbthreads; ++i){
+					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % nbthreads], nbthreads, &sched_sync);
 				}
 			«ELSE»
 				for(i=0; i < THREAD_NB; ++i){
@@ -307,11 +322,17 @@ class NetworkPrinter extends CTemplate {
 			
 			clear_cpu_set(cpuset);
 			
-			«IF !geneticAlgo»
+			«IF !geneticAlgo && !dynamicMapping»
 			for(i=0 ; i < mapping->number_of_threads; i++){
 				thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
 				set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 			}
+			«ELSEIF dynamicMapping»
+				for(i=0 ; i < nbthreads; i++){
+					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
+					set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
+				}
+				thread_create(thread_agent, agent, monitoring, thread_monitor_id);
 			«ELSE»
 				for(i=0 ; i < THREAD_NB; i++){
 					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
@@ -324,6 +345,8 @@ class NetworkPrinter extends CTemplate {
 			}
 			«IF geneticAlgo»
 				thread_join(thread_monitor);
+			«ELSEIF dynamicMapping»
+				thread_join(thread_agent);
 			«ENDIF»
 		}
 	'''
@@ -348,7 +371,7 @@ class NetworkPrinter extends CTemplate {
 			actor_t *my_actor;
 			schedinfo_t si;
 			int j;
-			«IF instrumentNetwork»
+			«IF instrumentNetwork || dynamicMapping»
 				ticks tick_in, tick_out;
 				double diff_tick;
 			«ENDIF»
@@ -365,12 +388,12 @@ class NetworkPrinter extends CTemplate {
 			while (1) {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
 				if(my_actor != NULL){
-					«IF instrumentNetwork»
+					«IF instrumentNetwork || dynamicMapping»
 						tick_in = getticks();
 					«ENDIF»
 					si.num_firings = 0;
 					my_actor->sched_func(&si);
-					«IF instrumentNetwork»
+					«IF instrumentNetwork || dynamicMapping»
 						tick_out = getticks();
 						diff_tick = elapsed(tick_out, tick_in);
 						my_actor->workload += diff_tick;
@@ -393,6 +416,12 @@ class NetworkPrinter extends CTemplate {
 						timeout = 0;
 						start = clock ();
 						sched_reinit_actors(sched, &si);
+					}
+				«ENDIF»
+				«IF dynamicMapping»
+					if(needMapping()) {
+						semaphore_set(sched->sync->sem_monitor);
+						semaphore_wait(sched->sem_thread);
 					}
 				«ENDIF»
 			}
