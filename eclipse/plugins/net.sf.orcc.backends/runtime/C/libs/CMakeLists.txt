@@ -65,6 +65,7 @@ else()
 			orcc/src/compare.c
 			orcc/src/compareyuv.c
 			orcc/src/scheduler.c
+			orcc/src/mapping.c
 			orcc/src/display.c
 			orcc/src/audio.c
 			orcc/src/fps_print.c
@@ -77,6 +78,7 @@ else()
 			orcc/include/generic_fifo.h
 			orcc/include/genetic.h
 			orcc/include/scheduler.h
+			orcc/include/mapping.h
 			orcc/include/thread.h
 			orcc/include/open_hevc.h
 			orcc/include/serialize.h

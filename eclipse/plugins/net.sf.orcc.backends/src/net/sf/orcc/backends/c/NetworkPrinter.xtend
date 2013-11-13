@@ -136,6 +136,7 @@ class NetworkPrinter extends CTemplate {
 		#include "types.h"
 		#include "fifo.h"
 		#include "scheduler.h"
+		#include "mapping.h"
 		#include "util.h"
 		«IF instrumentNetwork»
 			#include "cycle.h"

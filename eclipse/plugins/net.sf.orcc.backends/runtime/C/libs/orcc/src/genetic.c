@@ -38,6 +38,7 @@
 #include "thread.h"
 #include "scheduler.h"
 #include "util.h"
+#include "mapping.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initializers

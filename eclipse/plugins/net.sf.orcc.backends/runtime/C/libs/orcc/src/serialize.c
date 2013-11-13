@@ -28,6 +28,7 @@
  */
 
 #include "serialize.h"
+#include "roxml.h"
 
 /**
  * Generate some mapping structure from an XCF file.
@@ -40,7 +41,7 @@ struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
     struct mappings_set_s *mappings_set = (struct mappings_set_s *) malloc(
             sizeof(struct mappings_set_s));
 
-    configuration = roxml_load_doc(mapping_file);
+    configuration = roxml_load_doc(xcf_file);
     if (configuration == NULL) {
         printf("I/O error when reading mapping file.\n");
         exit(1);

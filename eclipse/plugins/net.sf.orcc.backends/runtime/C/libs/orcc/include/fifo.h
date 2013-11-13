@@ -29,6 +29,8 @@
 #ifndef FIFO_H
 #define FIFO_H
 
+#include "types.h"
+
 enum reasons {
 	starved,
 	full

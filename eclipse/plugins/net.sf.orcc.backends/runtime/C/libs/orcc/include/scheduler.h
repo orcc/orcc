@@ -105,18 +105,6 @@ struct waiting_s {
 	unsigned int next_waiting;
 };
 
-struct mapping_s {
-	int number_of_threads;
-	int *threads_affinities;
-	struct actor_s ***partitions_of_actors;
-	int *partitions_size;
-};
-
-struct mappings_set_s {
-	int size;
-	struct mapping_s **mappings;
-};
-
 /**
  * Initialize the given scheduler.
  */
@@ -135,32 +123,6 @@ void sched_init_actors(struct scheduler_s *sched, struct schedinfo_s *si);
  */
 void sched_reinit(struct scheduler_s *sched, int num_actors,
 		struct actor_s **actors, int use_ring_topology, int schedulers_nb);
-
-/**
- * Create a mapping structure.
- */
-struct mapping_s* allocate_mapping(int number_of_threads);
-
-/**
- * Release memory of the given mapping structure.
- */
-void delete_mapping(struct mapping_s* mapping, int clean_all);
-
-/**
- * Give the id of the mapped core of the given actor in the given mapping structure.
- */
-int find_mapped_core(struct mapping_s *mapping, struct actor_s *actor);
-
-/**
- * Compute a partitionment of actors on threads from an XML file given in parameter.
- */
-struct mapping_s* map_actors(struct actor_s **actors, int actors_size);
-
-/**
- * Find actor by its name in the given table.
- */
-struct actor_s * find_actor(char *name, struct actor_s **actors,
-		int actors_size);
 
 /**
  * Returns the next actor in actors list.

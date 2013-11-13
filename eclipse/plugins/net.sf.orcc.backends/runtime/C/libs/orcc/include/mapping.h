@@ -27,21 +27,47 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_SERIALIZE_H
-#define ORCC_SERIALIZE_H
+#ifndef ORCC_MAPPING_H
+#define ORCC_MAPPING_H
 
-#include "mapping.h"
+#include "scheduler.h"
+
+struct mapping_s {
+    int number_of_threads;
+    int *threads_affinities;
+    struct actor_s ***partitions_of_actors;
+    int *partitions_size;
+};
+
+struct mappings_set_s {
+    int size;
+    struct mapping_s **mappings;
+};
 
 /**
- * Save network's workloads from instrumentation to a file
- * that could be used for mapping.
+ * Create a mapping structure.
  */
-void save_instrumentation(char* fileName, network_t network);
+struct mapping_s* allocate_mapping(int number_of_threads);
 
 /**
- * Generate some mapping structure from an XCF file.
+ * Release memory of the given mapping structure.
  */
-struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
-        struct actor_s **actors, int actors_size);
+void delete_mapping(struct mapping_s* mapping, int clean_all);
+
+/**
+ * Give the id of the mapped core of the given actor in the given mapping structure.
+ */
+int find_mapped_core(struct mapping_s *mapping, struct actor_s *actor);
+
+/**
+ * Compute a partitionment of actors on threads from an XML file given in parameter.
+ */
+struct mapping_s* map_actors(struct actor_s **actors, int actors_size);
+
+/**
+ * Find actor by its name in the given table.
+ */
+struct actor_s * find_actor(char *name, struct actor_s **actors,
+        int actors_size);
 
 #endif
