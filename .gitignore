@@ -2,6 +2,9 @@
 *.pyc
 *.opb
 
+# User-specific files
+*.user
+
 #Common rules for Eclipse projects
 # src-gen folders are ignored with a specific .gitignore inside each
 bin
