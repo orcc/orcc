@@ -152,12 +152,6 @@ void delete_mapping(struct mapping_s* mapping, int clean_all);
 int find_mapped_core(struct mapping_s *mapping, struct actor_s *actor);
 
 /**
- * Generate some mapping structure from an XCF file.
- */
-struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
-		struct actor_s **actors, int actors_size);
-
-/**
  * Compute a partitionment of actors on threads from an XML file given in parameter.
  */
 struct mapping_s* map_actors(struct actor_s **actors, int actors_size);
@@ -167,12 +161,6 @@ struct mapping_s* map_actors(struct actor_s **actors, int actors_size);
  */
 struct actor_s * find_actor(char *name, struct actor_s **actors,
 		int actors_size);
-
-/**
- * Save network's workloads from instrumentation to a file
- * that could be used for mapping.
- */
-void save_instrumentation(char* fileName, network_t network);
 
 /**
  * Returns the next actor in actors list.

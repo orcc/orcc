@@ -217,123 +217,17 @@ void delete_mapping(struct mapping_s* mapping, int clean_all) {
  * Computes a partitionment of actors on threads from an XML file given in parameter.
  */
 struct mapping_s* map_actors(struct actor_s **actors, int actors_size) {
-	if (mapping_file == NULL) {
-		struct mapping_s *mapping = allocate_mapping(1);
-		mapping->threads_affinities[0] = 0;
-		mapping->partitions_size[0] = actors_size;
-		mapping->partitions_of_actors[0] = actors;
-		return mapping;
-	} else {
-		struct mappings_set_s *mappings_set = compute_mappings_from_file(
-				mapping_file, actors, actors_size);
-		return mappings_set->mappings[0];
-	}
-}
-
-/**
- * Generate some mapping structure from an XCF file.
- */
-struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
-		struct actor_s **actors, int actors_size) {
-	int i, j, k, size;
-	char *nb, *name;
-	node_t *configuration, *partitioning, *partition, *instance, *attribute;
-	struct mappings_set_s *mappings_set = (struct mappings_set_s *) malloc(
-			sizeof(struct mappings_set_s));
-
-	configuration = roxml_load_doc(mapping_file);
-	if (configuration == NULL) {
-		printf("I/O error when reading mapping file.\n");
-		exit(1);
-	}
-
-	mappings_set->size = roxml_get_chld_nb(configuration);
-	mappings_set->mappings = (struct mapping_s **) malloc(
-			mappings_set->size * sizeof(struct mapping_s *));
-
-	for (i = 0; i < mappings_set->size; i++) {
-		partitioning = roxml_get_chld(configuration, NULL, i);
-		name = roxml_get_name(partitioning, NULL, 0);
-
-		mappings_set->mappings[i] = allocate_mapping(
-				roxml_get_chld_nb(partitioning));
-
-		for (j = 0; j < mappings_set->mappings[i]->number_of_threads; j++) {
-			partition = roxml_get_chld(partitioning, NULL, j);
-			name = roxml_get_name(partition, NULL, 0);
-			mappings_set->mappings[i]->partitions_size[j] = roxml_get_chld_nb(
-					partition);
-
-			attribute = roxml_get_attr(partition, "id", 0);
-			nb = roxml_get_content(attribute, NULL, 0, &size);
-			mappings_set->mappings[i]->threads_affinities[j] = atoi(nb);
-
-			mappings_set->mappings[i]->partitions_of_actors[j]
-					= (struct actor_s **) malloc(
-							mappings_set->mappings[i]->partitions_size[j]
-									* sizeof(struct actor_s *));
-
-			for (k = 0; k < mappings_set->mappings[i]->partitions_size[j]; k++) {
-				instance = roxml_get_chld(partition, NULL, k);
-				name = roxml_get_name(instance, NULL, 0);
-				attribute = roxml_get_attr(instance, "id", 0);
-				name = roxml_get_content(attribute, NULL, 0, &size);
-				mappings_set->mappings[i]->partitions_of_actors[j][k]
-						= find_actor(name, actors, actors_size);
-			}
-		}
-	}
-	roxml_close(configuration);
-
-	return mappings_set;
-}
-
-/**
- * Save network's workloads from instrumentation to a file
- * that could be used for mapping.
- */
-void save_instrumentation(char* fileName, network_t network) {
-    int i = 0;
-    double total_workload = 0;
-
-    node_t* rootNode = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\" encoding=\"UTF-8\"");
-    if (rootNode == NULL) {
-        printf("ORCC_ERR_ROXML_NODE_ROOT");
+    if (mapping_file == NULL) {
+        struct mapping_s *mapping = allocate_mapping(1);
+        mapping->threads_affinities[0] = 0;
+        mapping->partitions_size[0] = actors_size;
+        mapping->partitions_of_actors[0] = actors;
+        return mapping;
+    } else {
+        struct mappings_set_s *mappings_set = compute_mappings_from_file(
+                mapping_file, actors, actors_size);
+        return mappings_set->mappings[0];
     }
-
-    node_t* xdfNode = roxml_add_node(rootNode, 0, ROXML_ELM_NODE, "XDF", NULL);
-    if (xdfNode == NULL) {
-        printf("ORCC_ERR_ROXML_NODE_CONF");
-    }
-    /*!TODO : get Network's name properly */
-    roxml_add_node(xdfNode, 0, ROXML_ATTR_NODE, "name", network.name);
-
-	for (i=0; i < network.nb_actors; i++) {
-        total_workload += network.actors[i]->workload;
-    }
-	for (i=0; i < network.nb_actors; i++) {
-        node_t* instanceNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Instance", NULL);
-        roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", network.actors[i]->name);
-        char* workload = (char*) malloc(sizeof(workload));
-        sprintf(workload, "%.2lf", 1+network.actors[i]->workload*100/total_workload);
-        roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "workload", workload);
-    }
-
-    total_workload = 0;
-    for (i=0; i < network.nb_connections; i++) {
-        total_workload += network.connections[i]->workload;
-    }
-    for (i=0; i < network.nb_connections; i++) {
-        node_t* connectionNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Connection", NULL);
-        roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "src", network.connections[i]->src->name);
-        roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "dst", network.connections[i]->dst->name);
-        char* workload = (char*) malloc(sizeof(workload));
-        sprintf(workload, "%d", 1+(int)(network.connections[i]->workload*100000/total_workload));
-        roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "workload", workload);
-    }
-
-    roxml_commit_changes(rootNode, fileName, NULL, 1);
-    roxml_close(rootNode);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
