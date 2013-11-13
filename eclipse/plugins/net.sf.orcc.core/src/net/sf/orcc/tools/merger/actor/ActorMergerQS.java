@@ -8,6 +8,7 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.graph.Vertex;
@@ -398,7 +399,7 @@ public class ActorMergerQS extends ActorMergerBase {
 			List<Expression> procParams = new ArrayList<Expression>();
 			BlockBasic increments = IrFactory.eINSTANCE.createBlockBasic();
 			processInputs(increments, iterand.getAction(), procParams);
-			processOutputs(increments, iterand.getAction(), procParams);
+			processOutputs(procedure, increments, iterand.getAction(), procParams);
 			Instruction instruction = IrFactory.eINSTANCE.createInstCall(
 					null, correspondences.getProcedure(iterand.getAction()), procParams);
 			BlockBasic block = procedure.getLast();
@@ -410,34 +411,80 @@ public class ActorMergerQS extends ActorMergerBase {
 
 	private void processInputs(BlockBasic increments, Action action, List<Expression> procParams) {
 		for(Port port : action.getInputPattern().getPorts()) {
-			processPort(increments, procParams, port, "_r", action.getInputPattern().getNumTokens(port));
+			processPort(increments, procParams, port, false, action.getInputPattern().getNumTokens(port));
 		}
 	}
 
-	private void processOutputs(BlockBasic increments, Action action, List<Expression> procParams) {
-		for(Port port : action.getOutputPattern().getPorts()) {
-			processPort(increments, procParams, port, "_w", action.getOutputPattern().getNumTokens(port));
+	private void processOutputs(Procedure procedure, BlockBasic increments, Action action, List<Expression> procParams) {
+		for(Port source : action.getOutputPattern().getPorts()) {
+			processPort(increments, procParams, source, true, action.getOutputPattern().getNumTokens(source));
+			Actor sourceActor = MergerUtil.getOwningActor(network, action, source);
+			if(sourceActor.getOutgoingPortMap().get(source).size() > 1) {
+				for(Connection c : sourceActor.getOutgoingPortMap().get(source)) {
+					Port target = c.getTargetPort();
+					if (target != null) {
+						if (buffersMap.get(target) != buffersMap.get(source)) {
+							handleBroadcast(procedure, increments, target, buffersMap.get(source), action.getOutputPattern().getNumTokens(source), "_w");
+						}
+					}
+				}
+			}
 		}
 	}
 	
-	private void processPort(BlockBasic increments, List<Expression> procParams, Port port, String suffix, int tokenRate) {
+	private void processPort(BlockBasic increments, List<Expression> procParams, Port port, boolean write, int tokenRate) {
+		Var memVar = getBufferOrPortVariable(port, write);
+		Var indexVar = getBufferOrPortIndex(increments, port, tokenRate, write, memVar.getName());
+		procParams.add(IrFactory.eINSTANCE.createExprVar(memVar));
+		procParams.add(IrFactory.eINSTANCE.createExprVar(indexVar));
+	}
+
+	private void handleBroadcast(Procedure procedure, BlockBasic increments, Port port, Var source, int tokenRate, String suffix) {
+		addBroadCastCopyVar(procedure, increments, port, source, tokenRate);
+		Var memVar = getBufferOrPortVariable(port, true);
+		getBufferOrPortIndex(increments, port, tokenRate, true, memVar.getName());
+	}
+
+	private void addBroadCastCopyVar(Procedure procedure, BlockBasic increments, Port port, Var source, int tokenRate) {
+		Var tempVar = procedure.newTempLocalVariable(
+				port.getType(), port.getName() + "_tmp");
+		for(int i = 0; i < tokenRate; i++) {
+			increments.add(IrFactory.eINSTANCE.createInstLoad(tempVar, source, i));
+			increments.add(IrFactory.eINSTANCE.createInstStore(buffersMap.get(port), i, tempVar));
+		}
+	}
+	
+	private Var getBufferOrPortVariable(Port port, boolean write) {
 		Var memVar = null;
-		String indexVarName = null;
 		if (buffersMap.containsKey(port)) {
 			memVar = buffersMap.get(port);
-			indexVarName = memVar.getName() + suffix;
 		} else {
 			memVar = IrFactory.eINSTANCE.createVar(0,
 					IrFactory.eINSTANCE.createTypeList(1, port.getType()),
 					"tokens_" + port.getName(), true, 0);
+		}
+		return memVar;
+	}
+	
+	private Var getBufferOrPortIndex(BlockBasic increments, Port port, int tokenRate, boolean write, String memVarName) {
+		String indexVarName = null;
+		String suffix = null;
+		if (write) {
+			suffix = "_w";
+		} else {
+			suffix = "_r";
+		}
+		if (buffersMap.containsKey(port)) {
+			indexVarName = memVarName + suffix;
+		} else {
 			indexVarName = port.getName() + suffix;
 		}
 		Var indexVar = IrFactory.eINSTANCE.createVar(0,
 				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
 				indexVarName, true, 0);
 		increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
-		procParams.add(IrFactory.eINSTANCE.createExprVar(memVar));
-		procParams.add(IrFactory.eINSTANCE.createExprVar(indexVar));
+		return indexVar;
 	}
-
 }
+
+
