@@ -176,4 +176,38 @@ struct actor_s * find_actor(char *name, struct actor_s **actors,
  */
 void save_instrumentation(char* fileName, network_t network);
 
+/**
+ * Returns the next actor in actors list.
+ * This method is used by the round-robin scheduler.
+ */
+struct actor_s *sched_get_next(struct scheduler_s *sched);
+
+/**
+ * Add the actor to the schedulable or waiting list.
+ * The list is chosen according to associate scheduler of the actor.
+ */
+void sched_add_schedulable(struct scheduler_s *sched,
+		struct actor_s *actor, int use_ring_topology);
+
+/**
+ * Add waited actors to the schedulable or waiting list.
+ * The list is chosen according to associate scheduler of the actor.
+ * This function use ring topology of communications.
+ */
+void sched_add_ring_waiting_list(struct scheduler_s *sched);
+
+/**
+ * Add waited actors to the schedulable list.
+ * This function use mesh topology of communications.
+ */
+void sched_add_mesh_waiting_list(struct scheduler_s *sched);
+
+/**
+ * Returns the next schedulable actor, or NULL if no actor is schedulable.
+ * The actor is removed from the schedulable list.
+ * This method is used by the data/demand driven scheduler.
+ */
+struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
+		int use_ring_topology);
+
 #endif

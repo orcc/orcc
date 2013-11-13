@@ -335,3 +335,120 @@ void save_instrumentation(char* fileName, network_t network) {
     roxml_commit_changes(rootNode, fileName, NULL, 1);
     roxml_close(rootNode);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduling list
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns the next actor in actors list.
+ * This method is used by the round-robin scheduler.
+ */
+struct actor_s *sched_get_next(struct scheduler_s *sched) {
+	struct actor_s *actor;
+	if (sched->num_actors == 0) {
+		return NULL;
+	}
+	actor = sched->actors[sched->rr_next_schedulable];
+	sched->rr_next_schedulable++;
+	if (sched->rr_next_schedulable == sched->num_actors) {
+		sched->rr_next_schedulable = 0;
+	}
+	return actor;
+}
+
+/**
+ * Add the actor to the schedulable or waiting list.
+ * The list is chosen according to associate scheduler of the actor.
+ */
+void sched_add_schedulable(struct scheduler_s *sched,
+		struct actor_s *actor, int use_ring_topology) {
+	// only add the actor in the lists if it is not already there
+	// like a list.contains(actor) but in O(1) instead of O(n)
+	if (!actor->in_list) {
+		if (sched == actor->sched) {
+			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
+			actor->in_list = 1;
+			sched->ddd_next_entry++;
+		} else if (!actor->in_waiting) {
+			// this actor isn't launch by this scheduler so it is sent to the next one
+			struct waiting_s *send =
+					use_ring_topology ? sched->ring_sending_schedulable
+							: actor->sched->mesh_waiting_schedulable[sched->id];
+			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
+			actor->in_waiting = 1;
+			send->next_entry++;
+		}
+	}
+}
+
+/**
+ * Add waited actors to the schedulable or waiting list.
+ * The list is chosen according to associate scheduler of the actor.
+ * This function use ring topology of communications.
+ */
+void sched_add_ring_waiting_list(struct scheduler_s *sched) {
+	struct actor_s *actor;
+	struct waiting_s *wait = sched->ring_waiting_schedulable;
+	while (wait->next_entry - wait->next_waiting >= 1) {
+		actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
+		if (sched == actor->sched) {
+			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
+			actor->in_list = 1;
+			actor->in_waiting = 0;
+			sched->ddd_next_entry++;
+		} else {
+			// this actor isn't launch by this scheduler so it is sent to the next one
+			struct waiting_s *send = sched->ring_sending_schedulable;
+			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
+			send->next_entry++;
+		}
+		wait->next_waiting++;
+	}
+}
+
+/**
+ * Add waited actors to the schedulable list.
+ * This function use mesh topology of communications.
+ */
+void sched_add_mesh_waiting_list(struct scheduler_s *sched) {
+	int i;
+	struct actor_s *actor;
+	for (i = 0; i < sched->schedulers_nb; i++) {
+		struct waiting_s *wait = sched->mesh_waiting_schedulable[i];
+		while (wait->next_entry - wait->next_waiting >= 1) {
+			actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
+			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
+			actor->in_list = 1;
+			actor->in_waiting = 0;
+			sched->ddd_next_entry++;
+			wait->next_waiting++;
+		}
+	}
+}
+
+/**
+ * Returns the next schedulable actor, or NULL if no actor is schedulable.
+ * The actor is removed from the schedulable list.
+ * This method is used by the data/demand driven scheduler.
+ */
+struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
+		int use_ring_topology) {
+	struct actor_s *actor;
+	// check if other schedulers sent some schedulable actors
+	use_ring_topology ? sched_add_ring_waiting_list(sched)
+			: sched_add_mesh_waiting_list(sched);
+	if (sched->ddd_next_schedulable == sched->ddd_next_entry) {
+		// static actors list is used when schedulable list is empty
+		actor = sched_get_next(sched);
+		sched->round_robin = 1;
+	} else {
+		actor = sched->schedulable[sched->ddd_next_schedulable % MAX_ACTORS];
+		// actor is not a member of the list anymore
+		actor->in_list = 0;
+		sched->ddd_next_schedulable++;
+		sched->round_robin = 0;
+	}
+
+	return actor;
+}

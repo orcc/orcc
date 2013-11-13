@@ -6,9 +6,9 @@ set(orcc_sources
 	orcc/src/getopt.c
 	orcc/src/source.c
 	orcc/src/writer.c
-        orcc/src/util.c
-        orcc/include/util.h
-        orcc/include/types.h
+	orcc/src/util.c
+	orcc/include/util.h
+	orcc/include/types.h
 )
 
 # Build library without any external library required (SDL, pthread, etc)
@@ -67,19 +67,18 @@ else()
 			orcc/src/scheduler.c
 			orcc/src/display.c
 			orcc/src/audio.c
-                        orcc/src/fps_print.c
+            orcc/src/fps_print.c
 			orcc/src/genetic.c
 			orcc/src/thread.c
-                        orcc/src/open_hevc.c
+			orcc/src/open_hevc.c
 			# Headers
-                        orcc/include/fifo.h
-                        orcc/include/generic_fifo.h
-                        orcc/include/generic_fifo.inl
-                        orcc/include/genetic.h
-                        orcc/include/scheduler.h
-                        orcc/include/scheduler.inl
-                        orcc/include/thread.h
-                        orcc/include/open_hevc.h
+			orcc/include/fifo.h
+			orcc/include/generic_fifo.h
+			orcc/include/generic_fifo.inl
+			orcc/include/genetic.h
+			orcc/include/scheduler.h
+			orcc/include/thread.h
+			orcc/include/open_hevc.h
 		)
 
 		# Compile libraries
