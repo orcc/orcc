@@ -94,13 +94,15 @@ mappings_set_t* compute_mappings_from_file(char *xcf_file, actor_t **actors, int
 void save_instrumentation(char* fileName, network_t network) {
     int i = 0;
     double total_workload = 0;
+    node_t* rootNode;
+    node_t* xdfNode;
 
-    node_t* rootNode = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\" encoding=\"UTF-8\"");
+    rootNode = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\" encoding=\"UTF-8\"");
     if (rootNode == NULL) {
         printf("ORCC_ERR_ROXML_NODE_ROOT");
     }
 
-    node_t* xdfNode = roxml_add_node(rootNode, 0, ROXML_ELM_NODE, "XDF", NULL);
+    xdfNode = roxml_add_node(rootNode, 0, ROXML_ELM_NODE, "XDF", NULL);
     if (xdfNode == NULL) {
         printf("ORCC_ERR_ROXML_NODE_CONF");
     }
@@ -111,9 +113,12 @@ void save_instrumentation(char* fileName, network_t network) {
         total_workload += network.actors[i]->workload;
     }
     for (i=0; i < network.nb_actors; i++) {
-        node_t* instanceNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Instance", NULL);
+        node_t * instanceNode;
+        char * workload;
+
+        instanceNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Instance", NULL);
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", network.actors[i]->name);
-        char* workload = (char*) malloc(sizeof(workload));
+        workload = (char*) malloc(sizeof(workload));
         sprintf(workload, "%.2lf", 1+network.actors[i]->workload*100/total_workload);
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "workload", workload);
     }
@@ -123,10 +128,12 @@ void save_instrumentation(char* fileName, network_t network) {
         total_workload += network.connections[i]->workload;
     }
     for (i=0; i < network.nb_connections; i++) {
+        char* workload;
+
         node_t* connectionNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Connection", NULL);
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "src", network.connections[i]->src->name);
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "dst", network.connections[i]->dst->name);
-        char* workload = (char*) malloc(sizeof(workload));
+        workload = (char*) malloc(sizeof(workload));
         sprintf(workload, "%d", 1+(int)(network.connections[i]->workload*100000/total_workload));
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "workload", workload);
     }
