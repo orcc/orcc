@@ -253,6 +253,9 @@ public class ActorMergerQS extends ActorMergerBase {
 		BufferSizer bufferSizer = new BufferSizer(network);
 		Schedule superAction = getSchedule(scheduleList, network.getName(), actionName);
 
+		ScheduleAnalyzer analyzer = new ScheduleAnalyzer(network);
+		analyzer.analyze(superActor, superAction);
+
 		Pattern inputPattern = computeScheduleInputPattern(network, superAction.getIterands());
 		Pattern outputPattern = computeScheduleOutputPattern(network, superAction.getIterands());
 

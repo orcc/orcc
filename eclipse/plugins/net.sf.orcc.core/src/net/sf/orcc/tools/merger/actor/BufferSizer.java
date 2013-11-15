@@ -26,7 +26,7 @@ public class BufferSizer {
 
 	private Map<Connection, Integer> tokens;
 
-	private Network network;
+	protected Network network;
 
 	public BufferSizer(Network network) {
 		this.network = network;
