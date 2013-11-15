@@ -125,12 +125,14 @@ int check_graph_for_metis(adjacency_list graph) {
             if (graph.adjwgt[j] == 0) {
                 nbNullEdgeWeight++;
             }
-            // !TODO : count directed edges (ie : graph not undirected) */
-//            for (k = graph.xadj[graph.adjncy[j]]; k < graph.xadj[graph.adjncy[j]+1]; k++) {
-//                if (graph.adjncy[k] == i) {
-//                    nbDirectedEdge++;
-//                }
-//            }
+            // Count directed edges
+            boolean isDirected = TRUE;
+            for (k = graph.xadj[graph.adjncy[j]]; k < graph.xadj[graph.adjncy[j]+1]; k++) {
+                isDirected = isDirected && (graph.adjncy[k] != i);
+            }
+            if (isDirected == TRUE) {
+                nbDirectedEdge++;
+            }
             for (k = graph.xadj[i]; k < graph.xadj[i+1]; k++) {
                 if ((j != k) && (graph.adjncy[k] == graph.adjncy[j])) {
                     nbDuplicateEdge++;
