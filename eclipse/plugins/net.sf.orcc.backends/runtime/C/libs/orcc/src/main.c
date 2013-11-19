@@ -38,7 +38,7 @@
 #include "options.h"
 #include "trace.h"
 
-void print_usage() {
+void print_usage_orccmap() {
     /* !TODO: Find a kind way to format this text */
     char *INDENT = "    ";
 
@@ -147,7 +147,7 @@ int main (int argc, char **argv) {
             set_verbose_level(optarg, opt);
             break;
         case 'h':
-            print_usage();
+            print_usage_orccmap();
             exit (ORCC_OK);
             break;
         case '?':

@@ -15,7 +15,6 @@ else()
 
         include_directories(roxml/include)
         add_subdirectory(roxml)
-        add_subdirectory(map)
 
 endif()
 

@@ -3,12 +3,18 @@
 if(NO_EXTERNAL_DEPENDENCIES)
 
         # Orcc library files
+#include "orccmap.h"
+
         set(orcc_sources
                 src/access_file.c
                 src/getopt.c
                 src/source.c
                 src/writer.c
                 src/util.c
+                src/mapping.c
+                src/trace.c
+                src/options.c
+                src/graph.c
                 include/util.h
                 include/types.h
         )
@@ -17,6 +23,8 @@ if(NO_EXTERNAL_DEPENDENCIES)
 
 # Build library with all features (require external libraries)
 else()
+
+#include "orccmap.h"
 
         # Helps CMake to find SDL libraries (Windows only)
         if(WIN32)
@@ -59,14 +67,32 @@ else()
                     include/*.h
                 )
 
+                find_package(METIS REQUIRED)
+
                 # Compile libraries
                 add_library(orcc STATIC ${orcc_sources})
 
                 # Do the linking
-                target_link_libraries(orcc roxml ${SDL_LIBRARY})
+                target_link_libraries(orcc roxml ${SDL_LIBRARY} metis m)
                 if(OpenHevc)
                     target_link_libraries(orcc ${OpenHevc})
                 endif()
+
+                set(executable_filenames
+                    include/serialize.h
+                    src/serialize.c
+                    src/main.c
+                )
+
+                # Compile executable
+                add_executable(orcc-map ${executable_filenames})
+                target_link_libraries(orcc-map orcc roxml)
+
+                INSTALL(TARGETS orcc-map orcc
+                  RUNTIME DESTINATION bin
+                  LIBRARY DESTINATION lib
+                  ARCHIVE DESTINATION lib
+                )
         endif()
 
 endif()

@@ -282,7 +282,7 @@ static void map_actors_on_threads(individual *individual,
 				genetic_info->use_ring_topology, genetic_info->threads_nb);
 	}
 
-	delete_mapping(mapping, 0);
+    delete_mapping(mapping);
 }
 
 /**
@@ -371,7 +371,7 @@ static void write_mapping_individual(individual *ind, int pop_id, int ind_id,
 
 	fprintf(mappingFile, "\t</Partitioning>\n");
 
-	delete_mapping(mapping, 1);
+    delete_mapping(mapping);
 }
 
 /**

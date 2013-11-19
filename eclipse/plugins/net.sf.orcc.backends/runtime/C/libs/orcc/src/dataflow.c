@@ -28,6 +28,7 @@
  */
 
 #include <stdlib.h>
+#include <assert.h>
 
 #include "dataflow.h"
 
