@@ -45,6 +45,16 @@
                id="net.sf.orcc.dontExportLibrary">
          </option>
       </backend>
+       <backend
+            class="net.sf.orcc.backends.c.dal.DALBackend"
+            name="DAL">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.core.classify">
+         </option>
+      </backend>
       <backend
             class="net.sf.orcc.backends.c.hmpp.HMPPBackend"
             name="HMPP (experimental)">
@@ -532,6 +542,18 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.c.compa.COMPABackend">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="dal"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.c.dal.DALBackend">
          </run>
       </application>
    </extension>
