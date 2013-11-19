@@ -31,10 +31,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "orcc_types.h"
-#include "orcc_fifo.h"
-#include "orcc_util.h"
+#include "types.h"
+#include "fifo.h"
+#include "util.h"
 
 static char stop = 0;
 static int cnt = 0; 
@@ -71,12 +72,12 @@ int writer_open(char* fileName) {
 }
 
 void writer_writeNTokens(int writeFile, u8 *byte, unsigned short numTokens){
-	fwrite(byte,sizeof(u8), numTokens, (FILE*)writeFile);
+    fwrite((void*) byte,sizeof(u8), numTokens, (FILE*) (long) writeFile);
 }
 
 void writer_closeAndQuit(int writeFile){
 	if(writeFile != 0) {
-		fclose((FILE*)writeFile);
+        fclose((FILE*) (long) writeFile);
 		cnt--;
 		if(cnt==0) {
 			exit(0);
