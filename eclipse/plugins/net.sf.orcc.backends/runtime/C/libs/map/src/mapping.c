@@ -34,7 +34,7 @@
 #include <string.h>
 
 #include "mapping.h"
-#include "util.c"
+#include "util.h"
 #include "dataflow.h"
 #include "graph.h"
 

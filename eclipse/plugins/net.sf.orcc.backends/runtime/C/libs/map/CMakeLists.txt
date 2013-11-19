@@ -1,15 +1,14 @@
 cmake_minimum_required (VERSION 2.8)
 
-project (orcc-map)
-
 find_package(METIS REQUIRED)
-
-include_directories(
-    include
-)
 
 set(library_filenames
     include/orccmap.h
+    include/mapping.h
+    include/util.h
+    include/options.h
+    include/dataflow.h
+    include/graph.h
     src/mapping.c
     src/util.c
     src/options.c
@@ -18,6 +17,7 @@ set(library_filenames
 )
 
 set(executable_filenames
+    include/serialize.h
     src/serialize.c
     src/main.c
 )
