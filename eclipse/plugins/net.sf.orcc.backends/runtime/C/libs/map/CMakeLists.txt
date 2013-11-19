@@ -4,16 +4,11 @@ project (orcc-map)
 
 # Output folder
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules/)
-
 find_package(METIS REQUIRED)
 
 include_directories(
-    libs/roxml/include
     include
 )
 
-# Compile required libs
-add_subdirectory(libs)
 # Compile application
 add_subdirectory(src)

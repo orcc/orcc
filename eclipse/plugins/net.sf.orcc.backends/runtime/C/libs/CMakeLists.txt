@@ -1,5 +1,17 @@
 cmake_minimum_required (VERSION 2.6)
 
+project (orcc-lib)
+
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules/)
+
+include_directories(orcc/include)
+include_directories(roxml/include)
+
+add_subdirectory(roxml)
+add_subdirectory(orcc)
+add_subdirectory(map)
+
+
 # Orcc library files
 set(orcc_sources
 	orcc/src/access_file.c
