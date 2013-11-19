@@ -5,11 +5,8 @@ project (orcc-lib)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules/)
 
 include_directories(orcc/include)
-include_directories(roxml/include)
 
-add_subdirectory(roxml)
 add_subdirectory(orcc)
-add_subdirectory(map)
 
 
 # Orcc library files
@@ -30,11 +27,10 @@ if(NO_EXTERNAL_DEPENDENCIES)
 
 # Build library with all features (require external libraries)
 else()
-	# Initialize source files list for roxml
-	file(GLOB roxml_sources
-		roxml/src/*.c
-		roxml/include/*.h
-	)
+
+        include_directories(roxml/include)
+        add_subdirectory(roxml)
+        add_subdirectory(map)
 
 	# Helps CMake to find SDL libraries (Windows only)
 	if(WIN32)
@@ -98,8 +94,7 @@ else()
 			orcc/include/dataflow.h
 		)
 
-		# Compile libraries
-		add_library(roxml STATIC ${roxml_sources})
+                # Compile libraries
 		add_library(orcc STATIC ${orcc_sources})
 
 		# Do the linking
