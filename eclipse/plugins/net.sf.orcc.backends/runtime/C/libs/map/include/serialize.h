@@ -32,6 +32,8 @@
 
 typedef struct network_s network_t;
 typedef struct mapping_s mapping_t;
+typedef struct actor_s actor_t;
+typedef struct mappings_set_s mappings_set_t;
 
 /**
  * Load network structure from an XDF file.
@@ -42,5 +44,17 @@ int load_network(char *fileName, network_t *network);
  * Save mapping structure to XCF file.
  */
 int save_mapping(char* fileName, mapping_t *mapping);
+
+/**
+ * Save network's workloads from instrumentation to a file
+ * that could be used for mapping.
+ */
+void save_instrumentation(char* fileName, network_t network);
+
+/**
+ * Generate some mapping structure from an XCF file.
+ */
+mappings_set_t* compute_mappings_from_file(char *xcf_file, actor_t **actors, int actors_size);
+
 
 #endif  /* _ORCCMAP_SERIALIZE_H_ */

@@ -47,7 +47,8 @@ typedef struct actor_s {
     int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
     int in_waiting; /** idem with the waiting list. */
     struct scheduler_s *sched; /** scheduler which execute this actor. */
-    int mapping; /** id of the processor core mapped to this actor. */
+    int processor_id; /** id of the processor core mapped to this actor. */
+    int id;
     double workload; /** actor's workload gived by instrumention */
 } actor_t;
 
@@ -74,6 +75,6 @@ typedef struct network_s {
 /**
  * Find actor by its name in the given table.
  */
-actor_t * find_actor(char *name, actor_t **actors, int actors_size);
+actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
 
 #endif

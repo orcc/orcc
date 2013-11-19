@@ -31,15 +31,18 @@
 
 #include "dataflow.h"
 
-/**
- * Find actor by its name in the given table.
- */
-actor_t * find_actor(char *name, actor_t **actors, int actors_size) {
-    int i;
-    for (i = 0; i < actors_size; i++) {
+actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
+    assert(actors != NULL);
+    assert(name != NULL);
+    actor_t *ret = NULL;
+    int i = 0;
+
+    while (i < nb_actors && ret == NULL) {
         if (strcmp(name, actors[i]->name) == 0) {
-            return actors[i];
+            ret = actors[i];
         }
+        i++;
     }
-    return NULL;
+
+    return ret;
 }

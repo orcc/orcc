@@ -36,7 +36,7 @@
 #include "dataflow.h"
 #include "serialize.h"
 #include "options.h"
-#include "util.h"
+#include "trace.h"
 
 void print_usage() {
     /* !TODO: Find a kind way to format this text */

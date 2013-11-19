@@ -33,7 +33,7 @@
 
 #include "graph.h"
 #include "options.h"
-#include "util.h"
+#include "trace.h"
 #include "dataflow.h"
 
 /**

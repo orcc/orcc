@@ -34,15 +34,25 @@
 #include <string.h>
 
 #include "mapping.h"
-#include "util.h"
+#include "trace.h"
 #include "dataflow.h"
 #include "graph.h"
+#include "util.h"
+#include "serialize.h"
 
-/********************************************************************************************
- *
- * Allocate / Delete / Init functions
- *
- ********************************************************************************************/
+/**
+ * Give the id of the mapped core of the given actor in the given mapping structure.
+ */
+int find_mapped_core(mapping_t *mapping, actor_t *actor) {
+    int i;
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        if (find_actor_by_name(mapping->partitions_of_actors[i], actor->name,
+                mapping->partitions_size[i]) != NULL) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 /**
  * Creates a mapping structure.
@@ -61,6 +71,22 @@ mapping_t *allocate_mapping(int number_of_threads) {
 void delete_mapping(mapping_t *mapping) {
     free(mapping->partitions_size);
     free(mapping);
+}
+
+/**
+ * Computes a partitionment of actors on threads from an XML file given in parameter.
+ */
+mapping_t* map_actors(actor_t **actors, int actors_size) {
+    if (mapping_file == NULL) {
+        mapping_t *mapping = allocate_mapping(1);
+        mapping->threads_affinities[0] = 0;
+        mapping->partitions_size[0] = actors_size;
+        mapping->partitions_of_actors[0] = actors;
+        return mapping;
+    } else {
+        mappings_set_t *mappings_set = compute_mappings_from_file(mapping_file, actors, actors_size);
+        return mappings_set->mappings[0];
+    }
 }
 
 

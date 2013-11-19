@@ -32,20 +32,57 @@
 
 #include "metis.h"
 
-typedef struct actor_s actor_t;
-typedef struct connection_s connection_t;
-typedef struct network_s network_t;
-
+typedef struct sync_s sync_t;
 typedef struct options_s options_t;
+typedef struct scheduler_s scheduler_t;
+typedef struct network_s network_t;
+typedef struct actor_s actor_t;
 
 /*
  * Mapping structure store the mapping result
  */
 typedef struct mapping_s {
     int number_of_threads;
+    int *threads_affinities;
     actor_t ***partitions_of_actors;
     int *partitions_size;
 } mapping_t;
+
+typedef struct mappings_set_s {
+    int size;
+    mapping_t **mappings;
+} mappings_set_t;
+
+typedef struct agent_s {
+    sync_t *sync; /** Synchronization resources */
+    options_t *options; /** Mapping options */
+    scheduler_t *schedulers;
+    network_t *network;
+    int actors_nb;
+    int threads_nb;
+    int use_ring_topology;
+} agent_t;
+
+/**
+ * Main routine of the mapping agent.
+ */
+void *map(void *data);
+
+/**
+ * Initialize the given agent structure.
+ */
+void agent_init(agent_t *agent, sync_t *sync, options_t *options);
+
+/**
+ * Give the id of the mapped core of the given actor in the given mapping structure.
+ */
+int find_mapped_core(mapping_t *mapping, actor_t *actor);
+
+/**
+ * Compute a partitionment of actors on threads from an XML file given in parameter.
+ */
+mapping_t* map_actors(actor_t **actors, int actors_size);
+
 
 /********************************************************************************************
  *

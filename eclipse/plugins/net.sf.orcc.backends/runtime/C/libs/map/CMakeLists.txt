@@ -5,14 +5,12 @@ find_package(METIS REQUIRED)
 set(library_filenames
     include/orccmap.h
     include/mapping.h
-    include/util.h
+    include/trace.h
     include/options.h
-    include/dataflow.h
     include/graph.h
     src/mapping.c
-    src/util.c
+    src/trace.c
     src/options.c
-    src/dataflow.c
     src/graph.c
 )
 

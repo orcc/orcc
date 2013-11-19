@@ -27,38 +27,57 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCCMAP_DATAFLOW_H_
-#define _ORCCMAP_DATAFLOW_H_
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "trace.h"
 
-/*
- * Actors are the vertices of orcc Networks
- */
-typedef struct actor_s {
-    char *name;
-    int workload;
-    int id;
-    int processor_id;
-} actor_t;
+/********************************************************************************************
+ *
+ * Orcc-Map utils functions
+ *
+ ********************************************************************************************/
 
-/*
- * Connections are the edges of orcc Networks
- */
-typedef struct connection_s {
-    actor_t *src;
-    actor_t *dst;
-    int workload;
-} connection_t;
+void print_orcc_error(orccmap_error_et error) {
+    if (error != ORCC_OK && error < ORCC_ERR_SIZE) {
+        printf("\n");
+        fprintf(stderr,"\nOrcc-Map : ERROR : %s", ORCC_ERRORS_TXT[error]);
+    }
 
-/*
- * Orcc Networks are directed graphs
- */
-typedef struct network_s {
-    actor_t **actors;
-    connection_t **connections;
-    int nb_actors;
-    int nb_connections;
-} network_t;
+}
 
-actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
+void check_metis_error(rstatus_et error) {
+    if (error != METIS_OK) {
+        print_orcc_error(ORCC_ERR_METIS);
+        fprintf(stderr,"\t Code: %d", error);
+        printf("\n");
+        exit(error);
+    }
+}
 
-#endif
+void check_orcc_error(orccmap_error_et error) {
+    if (error != ORCC_OK) {
+        print_orcc_error(error);
+        printf("\n");
+        exit(error);
+    }
+}
+
+boolean print_trace_block(verbose_level_et level) {
+    return (level<=verbose_level)?TRUE:FALSE;
+}
+
+void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
+    assert(trace != NULL);
+
+    va_list args;
+    va_start (args, trace);
+
+    if (level <= verbose_level) {
+        printf("\nOrcc-Map : ");
+        vprintf(trace, args);
+    }
+
+    va_end (args);
+}
