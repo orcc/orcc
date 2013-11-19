@@ -54,10 +54,10 @@ else()
                 )
 
 
-file(GLOB orcc_sources
-    src/*.c
-    include/*.h
-)
+                file(GLOB orcc_sources
+                    src/*.c
+                    include/*.h
+                )
 
                 # Compile libraries
                 add_library(orcc STATIC ${orcc_sources})
