@@ -23,6 +23,9 @@
                id="net.sf.orcc.backends.instrumentNetwork">
          </option>
          <option
+               id="net.sf.orcc.backends.dynamicMapping">
+         </option>
+         <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
          <option
@@ -258,6 +261,13 @@
                description="Instrument network"
                id="net.sf.orcc.backends.instrumentNetwork"
                name="[BETA] Instrument network">
+            <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Experimental load balancing on multi-core platforms"
+               id="net.sf.orcc.backends.dynamicMapping"
+               name="[BETA] Dynamic mapping">
             <checkBox></checkBox>
          </option>
          <option
