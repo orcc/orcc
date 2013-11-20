@@ -117,7 +117,7 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 	def schedulesxml(Scheduler scheduler){
 	'''
 		«FOR sched : scheduler.schedules»
-			<schedule initstate="«sched.initStateName»" action="«sched.enablingActionName»">
+			<schedule initstate="«sched.initStateName»" action="«sched.initStateName»_«sched.enablingActionName»">
 				«sched.rates»
 			</schedule>
 		«ENDFOR»
