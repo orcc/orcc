@@ -146,6 +146,9 @@ class NetworkPrinter extends CTemplate {
 		«IF instrumentNetwork || dynamicMapping»
 			#include "cycle.h"
 		«ENDIF»
+		«IF dynamicMapping»
+			#include "options.h"
+		«ENDIF»
 		
 		#include "thread.h"
 		«IF geneticAlgo»
@@ -280,11 +283,14 @@ class NetworkPrinter extends CTemplate {
 				thread_struct threads[MAX_THREAD_NB];
 				thread_id_struct threads_id[MAX_THREAD_NB];
 				«IF dynamicMapping»
-					sync_t sched_sync;
+					thread_struct thread_agent;
+					thread_id_struct thread_agent_id;
+					sync_t sync;
 					agent_t agent;
+					options_t options;
 					
-					sync_init(&sched_sync);
-					agent_init(&monitoring, &sync, &genetic_info);
+					sync_init(&sync);
+					agent_init(&agent, &sync, &options);
 				«ENDIF»
 				
 				mapping_t *mapping = map_actors(actors, sizeof(actors) / sizeof(actors[0]));
@@ -311,8 +317,8 @@ class NetworkPrinter extends CTemplate {
 					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
 				}
 			«ELSEIF dynamicMapping»
-				for(i=0; i < nbthreads; ++i){
-					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % nbthreads], nbthreads, &sched_sync);
+				for(i=0; i < nbThreads; ++i){
+					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % nbThreads], nbThreads, &sync);
 				}
 			«ELSE»
 				for(i=0; i < THREAD_NB; ++i){
@@ -328,11 +334,11 @@ class NetworkPrinter extends CTemplate {
 				set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 			}
 			«ELSEIF dynamicMapping»
-				for(i=0 ; i < nbthreads; i++){
+				for(i=0 ; i < nbThreads; i++){
 					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
 					set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 				}
-				thread_create(thread_agent, agent, monitoring, thread_monitor_id);
+				thread_create(thread_agent, map, agent, thread_agent_id);
 			«ELSE»
 				for(i=0 ; i < THREAD_NB; i++){
 					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);

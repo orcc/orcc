@@ -64,6 +64,9 @@ extern int nbLoops;
 // Number of frames to display before closing application
 extern int nbFrames;
 
+// Number of executing threads to create
+extern int nbThreads;
+
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
 

@@ -73,6 +73,8 @@ void *map(void *data);
  */
 void agent_init(agent_t *agent, sync_t *sync, options_t *options);
 
+int needMapping();
+
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.
  */

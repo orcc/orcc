@@ -1,10 +1,8 @@
 
-# Build library without any external library required (SDL, pthread, etc)
-if(NO_EXTERNAL_DEPENDENCIES)
+
+if(NO_EXTERNAL_DEPENDENCIES) # Build library without any external library required (SDL, pthread, etc)
 
         # Orcc library files
-#include "orccmap.h"
-
         set(orcc_sources
                 src/access_file.c
                 src/getopt.c
@@ -21,10 +19,8 @@ if(NO_EXTERNAL_DEPENDENCIES)
 
         add_library(orcc STATIC ${orcc_sources})
 
-# Build library with all features (require external libraries)
-else()
 
-#include "orccmap.h"
+else() # Build library with all features (require external libraries)
 
         # Helps CMake to find SDL libraries (Windows only)
         if(WIN32)

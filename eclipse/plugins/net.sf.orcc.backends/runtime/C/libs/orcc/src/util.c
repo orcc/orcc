@@ -84,6 +84,9 @@ int nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
 // Nb frames to display
 int nbFrames = DEFAULT_INFINITE;
 
+// Number of executing threads to create
+int nbThreads = 1;
+
 // Pause function
 void wait_for_key() {
 #ifdef _WIN32
@@ -139,7 +142,8 @@ static const char *usage =
 	"-f <nb frames to decode>   Set the number of frames to decode before closing the application.\n"
 	"-l <nb input reading>      Set the number of times the input file is read before closing the application.\n"
     "-g <output file>           Specify an output file for the genetic algorithm.\n"
-    "-b <output file>           Specify an output file for instrumention.\n";
+    "-b <output file>           Specify an output file for instrumention.\n"
+    "-c <nb threads>            Set the number of executing threads to run.\n";
     // We need to document folowing options:
 	//"-w <file>                  TBD...\n"
 
@@ -153,7 +157,7 @@ void print_usage() {
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-    const char *ostr = "i:no:d:m:f:w:g:l:b:";
+    const char *ostr = "i:no:d:m:f:w:g:l:c:b:";
 	int c;
 
 	program = argv[0];
@@ -180,7 +184,10 @@ void init_orcc(int argc, char *argv[]) {
 			break;
 		case 'f':
 			nbFrames = strtoul(optarg, NULL, 10);
-			break;
+            break;
+        case 'c':
+            nbThreads = strtoul(optarg, NULL, 10);
+            break;
 		case 'm':
 			mapping_file = strdup(optarg);
 			break;

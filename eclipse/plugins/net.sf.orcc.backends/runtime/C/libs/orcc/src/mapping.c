@@ -380,3 +380,21 @@ int do_mapping(network_t *network, options_t opt, mapping_t *mapping) {
     free(part);
     return ret;
 }
+
+/**
+ * Main routine of the mapping agent.
+ */
+void *map(void *data) {
+
+}
+
+/**
+ * Initialize the given agent structure.
+ */
+void agent_init(agent_t *agent, sync_t *sync, options_t *options) {
+
+}
+
+int needMapping() {
+    return 0;
+}
