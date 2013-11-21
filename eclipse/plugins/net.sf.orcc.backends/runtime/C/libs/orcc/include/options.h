@@ -30,21 +30,20 @@
 #ifndef _ORCCMAP_OPTIONS_H_
 #define _ORCCMAP_OPTIONS_H_
 
-#include "mapping.h"
-#include "trace.h"
+#include "orcc.h"
 
 extern verbose_level_et verbose_level;
 
 /*
  * Options for mapping
  */
-typedef struct options_s
+struct options_s
 {
     int nb_processors;
     mappingstrategy_et strategy;
     char *input_file;
     char *output_file;
-} options_t;
+};
 
 /**
  * Creates and init options structure.

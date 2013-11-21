@@ -29,19 +29,18 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#include "orcc.h"
 #include "thread.h"
-
-typedef struct actor_s actor_t;
 
 #define MAX_ACTORS 1024
 
-typedef struct waiting_s {
+struct waiting_s {
     actor_t *waiting_actors[MAX_ACTORS];
     volatile unsigned int next_entry;
     unsigned int next_waiting;
-} waiting_t;
+};
 
-typedef struct scheduler_s {
+struct scheduler_s {
 	int id; /** Unique ID of this scheduler */
 	int schedulers_nb;
 
@@ -66,18 +65,18 @@ typedef struct scheduler_s {
 	/* Genetic algorithm */
     sync_t *sync;
 	semaphore_struct sem_thread;
-} scheduler_t;
+};
 
 typedef enum reasons {
     starved,
     full
 } reasons_t;
 
-typedef struct schedinfo_s {
+struct schedinfo_s {
     int num_firings;
     reasons_t reason;
     int ports; /** contains a mask that indicate the ports affected */
-} schedinfo_t;
+};
 
 /**
  * Initialize the given scheduler.

@@ -29,6 +29,8 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#include "orcc.h"
+
 #ifdef _WIN32
 	// ok here is some dark Windows magic
 	// we must define WIN32_LEAN_AND_MEAN here so that windows.h will NOT include winsock.h
@@ -115,10 +117,10 @@
 #endif
 
 
-typedef struct sync_s {
+struct sync_s {
 	semaphore_struct sem_monitor;
 	int active_sync;
-} sync_t;
+};
 
 void sync_init(sync_t *sync);
 

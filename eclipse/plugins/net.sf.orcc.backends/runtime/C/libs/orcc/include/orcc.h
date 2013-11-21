@@ -27,65 +27,59 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCCMAP_UTIL_H_
-#define _ORCCMAP_UTIL_H_
+#ifndef _ORCC_H_
+#define _ORCC_H_
 
-#include "orcc.h"
-#include "metis.h"
+typedef struct sync_s sync_t;
+typedef struct options_s options_t;
+typedef struct scheduler_s scheduler_t;
+typedef struct network_s network_t;
+typedef struct actor_s actor_t;
+typedef struct connection_s connection_t;
+typedef struct mapping_s mapping_t;
+typedef struct mappings_set_s mappings_set_t;
+typedef struct schedinfo_s schedinfo_t;
+typedef struct waiting_s waiting_t;
+typedef struct agent_s agent_t;
+typedef struct adjacency_list_s adjacency_list;
 
+typedef enum { FALSE, TRUE } boolean;
 
-#define arrayCopy(DST,SRC,LEN) \
-            { size_t TMPSZ = sizeof(*(SRC)) * (LEN); \
-              if ( ((DST) = malloc(TMPSZ)) != NULL ) \
-                memcpy((DST), (SRC), TMPSZ); }
+/* Error codes */
+/* !TODO : Add more errors */
+typedef enum {
+    ORCC_OK = 0,
+    ORCC_ERR_BAD_ARGS,
+    ORCC_ERR_BAD_ARGS_NBPROC,
+    ORCC_ERR_BAD_ARGS_MS,
+    ORCC_ERR_BAD_ARGS_VERBOSE,
+    ORCC_ERR_MANDATORY_ARGS,
+    ORCC_ERR_DEF_OUTPUT,
+    ORCC_ERR_METIS,
+    ORCC_ERR_METIS_FIX_WEIGHTS,
+    ORCC_ERR_METIS_FIX_NEEDED,
+    ORCC_ERR_SWAP_ACTORS,
+    ORCC_ERR_ROXML_OPEN,
+    ORCC_ERR_ROXML_NODE_ROOT,
+    ORCC_ERR_ROXML_NODE_CONF,
+    ORCC_ERR_ROXML_NODE_PART,
+    ORCC_ERR_SIZE /* only used for string tab declaration */
+} orccmap_error_et;
 
-static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
-    "",
-    "Bad arguments. Please check usage print.",
-    "Arg value for -n is not valide.",
-    "Arg value for -m is not valide.",
-    "Arg value for -v is not valide.",
-    "Mandatory argument missing. Please check usage print.",
-    "Cannot generate default output file name.",
-    "METIS error",
-    "The network is not compatible with Metis. Weights must be >= 0",
-    "The network is not compatible with Metis.",
-    "Actors swap fails.",
-    "Cannot open input file.",
-    "Cannot create root node.",
-    "Cannot create Configuration node.",
-    "Cannot create Partition node."
-};
+/* Verbose level */
+typedef enum {
+    ORCC_VL_QUIET,
+    ORCC_VL_VERBOSE_1,
+    ORCC_VL_VERBOSE_2
+} verbose_level_et;
 
-static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
-    "METIS Recursive",
-    "METIS Kway",
-    "Round Robin"
-};
+/* Mapping strategy codes */
+typedef enum {
+    ORCC_MS_METIS_REC,
+    ORCC_MS_METIS_KWAY,
+    ORCC_MS_ROUND_ROBIN,
+    ORCC_MS_OTHER,
+    ORCC_MS_SIZE /* only used for string tab declaration */
+} mappingstrategy_et;
 
-/**
- * !TODO
- */
-void print_orcc_error(orccmap_error_et error);
-
-/**
- * !TODO
- */
-void check_metis_error(rstatus_et error);
-
-/**
- * !TODO
- */
-void check_orcc_error(orccmap_error_et error);
-
-/**
- * !TODO
- */
-boolean print_trace_block(verbose_level_et level);
-
-/**
- * !TODO
- */
-void print_orcc_trace(verbose_level_et level, const char *trace, ...);
-
-#endif  /* _ORCCMAP_UTIL_H_ */
+#endif

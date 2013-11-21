@@ -30,13 +30,12 @@
 #ifndef ORCC_DATAFLOW_H
 #define ORCC_DATAFLOW_H
 
-typedef struct scheduler_s scheduler_t;
-typedef struct schedinfo_s schedinfo_t;
+#include "orcc.h"
 
 /*
  * Actors are the vertices of orcc Networks
  */
-typedef struct actor_s {
+struct actor_s {
     char *name;
     int group; /** id of his group. */
     void (*init_func)();
@@ -50,27 +49,27 @@ typedef struct actor_s {
     int processor_id; /** id of the processor core mapped to this actor. */
     int id;
     double workload; /** actor's workload gived by instrumention */
-} actor_t;
+};
 
 /*
  * Connections are the edges of orcc Networks
  */
-typedef struct connection_s {
+struct connection_s {
     actor_t *src;
     actor_t *dst;
     double workload;
-} connection_t;
+};
 
 /*
  * Orcc Networks are directed graphs
  */
-typedef struct network_s {
+struct network_s {
     char *name;
     actor_t **actors;
     connection_t **connections;
     int nb_actors;
     int nb_connections;
-} network_t;
+};
 
 /**
  * Find actor by its name in the given table.

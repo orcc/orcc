@@ -30,10 +30,7 @@
 #ifndef _ORCCMAP_SERIALIZE_H_
 #define _ORCCMAP_SERIALIZE_H_
 
-typedef struct network_s network_t;
-typedef struct mapping_s mapping_t;
-typedef struct actor_s actor_t;
-typedef struct mappings_set_s mappings_set_t;
+#include "orcc.h"
 
 /**
  * Load network structure from an XDF file.

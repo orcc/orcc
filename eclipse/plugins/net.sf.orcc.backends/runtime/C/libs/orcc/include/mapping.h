@@ -31,45 +31,31 @@
 #define _ORCCMAP_MAPPING_H_
 
 #include "metis.h"
-
-typedef struct sync_s sync_t;
-typedef struct options_s options_t;
-typedef struct scheduler_s scheduler_t;
-typedef struct network_s network_t;
-typedef struct actor_s actor_t;
-
-/* Mapping strategy codes */
-typedef enum {
-    ORCC_MS_METIS_REC,
-    ORCC_MS_METIS_KWAY,
-    ORCC_MS_ROUND_ROBIN,
-    ORCC_MS_OTHER,
-    ORCC_MS_SIZE /* only used for string tab declaration */
-} mappingstrategy_et;
+#include "orcc.h"
 
 /*
  * Mapping structure store the mapping result
  */
-typedef struct mapping_s {
+struct mapping_s {
     int number_of_threads;
     int *threads_affinities;
     actor_t ***partitions_of_actors;
     int *partitions_size;
-} mapping_t;
+};
 
-typedef struct mappings_set_s {
+struct mappings_set_s {
     int size;
     mapping_t **mappings;
-} mappings_set_t;
+};
 
-typedef struct agent_s {
+struct agent_s {
     sync_t *sync; /** Synchronization resources */
     options_t *options; /** Mapping options */
     scheduler_t **schedulers;
     network_t *network;
     mapping_t *mapping;
     int threads_nb;
-} agent_t;
+};
 
 /**
  * Main routine of the mapping agent.

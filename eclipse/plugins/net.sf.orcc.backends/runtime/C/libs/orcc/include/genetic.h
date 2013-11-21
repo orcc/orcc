@@ -29,9 +29,7 @@
 #ifndef GENETIC_H
 #define GENETIC_H
 
-typedef struct actor_s actor_t;
-typedef struct scheduler_s scheduler_t;
-typedef struct sync_s sync_t;
+#include "orcc.h"
 
 typedef struct genetic_s {
 	int population_size;

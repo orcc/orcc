@@ -30,14 +30,15 @@
 #ifndef _ORCCMAP_GRAPH_H_
 #define _ORCCMAP_GRAPH_H_
 
-typedef struct network_s network_t;
+#include "orcc.h"
+
 typedef int int32_t;
 
 /*
  * The adjacency structure of the graph is stored using the compressed storage format (CSR)
  * This structure is used by METIS only with undirected graphs
  */
-typedef struct adjacency_list
+struct adjacency_list_s
 {
     /* xadj : For each vertex i, xadj[i] gives the entry index in the array adjncy */
     int32_t *xadj;
@@ -53,7 +54,7 @@ typedef struct adjacency_list
 
     int nb_vertices;
     int nb_edges;
-} adjacency_list;
+};
 
 
 /**
