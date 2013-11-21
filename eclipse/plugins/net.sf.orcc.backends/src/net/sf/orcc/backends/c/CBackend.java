@@ -30,7 +30,6 @@ package net.sf.orcc.backends.c;
 
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
-import static net.sf.orcc.backends.BackendsConstants.GENETIC_ALGORITHM;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -235,10 +234,7 @@ public class CBackend extends AbstractBackend {
 
 		printCMake(network);
 		new StatisticsPrinter().print(srcPath, network);
-
-		if (!getAttribute(GENETIC_ALGORITHM, false)) {
-			new Mapping(network, mapping).print(srcPath);
-		}
+		new Mapping(network, mapping).print(srcPath);
 	}
 
 	protected void printCMake(Network network) {

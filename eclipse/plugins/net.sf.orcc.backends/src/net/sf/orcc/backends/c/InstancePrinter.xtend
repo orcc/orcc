@@ -82,7 +82,6 @@ class InstancePrinter extends CTemplate {
 
 	protected var String entityName
 
-	protected var boolean geneticAlgo = false
 	protected var boolean instrumentNetwork = false
 	protected var boolean isActionVectorizable = false
 
@@ -116,9 +115,6 @@ class InstancePrinter extends CTemplate {
 			fifoSize = 512
 		}
 
-		if (options.containsKey(GENETIC_ALGORITHM)) {
-			geneticAlgo = options.get(GENETIC_ALGORITHM) as Boolean
-		}
 		if (options.containsKey(INSTRUMENT_NETWORK)) {
 			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
 		}
@@ -129,8 +125,6 @@ class InstancePrinter extends CTemplate {
 			} else {
 				threadsNb = options.get(THREADS_NB) as Integer
 			}
-		} else if (geneticAlgo) {
-			OrccLogger::warnln("Genetic algorithm options has been checked, but THREADS_NB option is not set")
 		}
 
 		if (options.containsKey(NEW_SCHEDULER)) {
@@ -602,32 +596,6 @@ class InstancePrinter extends CTemplate {
 			// no read_end/write_end here!
 			return;
 		}
-
-		«IF(geneticAlgo)»
-			void «entityName»_reinitialize(schedinfo_t *si) {
-				int i = 0;
-				«FOR variable : actor.stateVars»
-					«IF variable.assignable && variable.initialized»
-						«IF !variable.type.list»
-							«variable.name» = «variable.initialValue.doSwitch»;
-						«ELSE»
-							memcpy(«variable.name», «variable.name»_backup, sizeof(«variable.name»_backup));
-						«ENDIF»
-					«ENDIF»
-				«ENDFOR»
-				«IF actor.hasFsm»
-					/* Set initial state to current FSM state */
-					_FSM_state = my_state_«actor.fsm.initialState.name»;
-				«ENDIF»
-				«IF !actor.initializes.nullOrEmpty»
-					«actor.initializes.printActions»
-				«ENDIF»
-
-			finished:
-				// no read_end/write_end here!
-				return;
-			}
-		«ENDIF»
 	'''
 
 	def private checkConnectivy() {
@@ -906,9 +874,6 @@ class InstancePrinter extends CTemplate {
 			}
 		'''
 			«varDecl»
-			«IF geneticAlgo && variable.initialized && variable.assignable»
-				static «variable.type.doSwitch» «variable.name»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
-			«ENDIF»
 		'''
 	}
 

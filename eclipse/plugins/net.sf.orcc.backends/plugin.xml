@@ -17,9 +17,6 @@
                id="net.sf.orcc.backends.newScheduler">
          </option>
          <option
-               id="net.sf.orcc.backends.geneticAlgorithm">
-         </option>
-         <option
                id="net.sf.orcc.backends.instrumentNetwork">
          </option>
          <option
@@ -59,9 +56,6 @@
          </option>
          <option
                id="net.sf.orcc.backends.newScheduler">
-         </option>
-         <option
-               id="net.sf.orcc.backends.geneticAlgorithm">
          </option>
          <option
                id="net.sf.orcc.tracing.enable">
@@ -238,21 +232,6 @@
 	                     id="Fully">
 	               </comboBoxItem>
             	</comboBox>
-         		</option>
-            </checkBox>
-         </option>
-         <option
-               defaultValue="false"
-               description="Uses an experimental genetic algorithm to search efficient mappings of the actors on the processor cores"
-               id="net.sf.orcc.backends.geneticAlgorithm"
-               name="[BROKEN] Search efficient mappings (Only on linux)">
-            <checkBox>
-            	<option
-	               		defaultValue="1"
-	               		description="Specify the number of CPU cores to use for the mapping"
-	               		id="net.sf.orcc.backends.processorsNumber"
-	               		name="Number of CPU cores">
-            		<textBox></textBox>
          		</option>
             </checkBox>
          </option>
