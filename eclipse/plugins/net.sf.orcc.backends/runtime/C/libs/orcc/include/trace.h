@@ -30,11 +30,39 @@
 #ifndef _ORCCMAP_UTIL_H_
 #define _ORCCMAP_UTIL_H_
 
-#include "orccmap.h"
-#include "options.h"
 #include "metis.h"
+#include "mapping.h"
 
 typedef enum { FALSE, TRUE } boolean;
+
+/* Error codes */
+/* !TODO : Add more errors */
+typedef enum {
+    ORCC_OK = 0,
+    ORCC_ERR_BAD_ARGS,
+    ORCC_ERR_BAD_ARGS_NBPROC,
+    ORCC_ERR_BAD_ARGS_MS,
+    ORCC_ERR_BAD_ARGS_VERBOSE,
+    ORCC_ERR_MANDATORY_ARGS,
+    ORCC_ERR_DEF_OUTPUT,
+    ORCC_ERR_METIS,
+    ORCC_ERR_METIS_FIX_WEIGHTS,
+    ORCC_ERR_METIS_FIX_NEEDED,
+    ORCC_ERR_SWAP_ACTORS,
+    ORCC_ERR_ROXML_OPEN,
+    ORCC_ERR_ROXML_NODE_ROOT,
+    ORCC_ERR_ROXML_NODE_CONF,
+    ORCC_ERR_ROXML_NODE_PART,
+    ORCC_ERR_SIZE /* only used for string tab declaration */
+} orccmap_error_et;
+
+/* Verbose level */
+typedef enum {
+    ORCC_VL_QUIET,
+    ORCC_VL_VERBOSE_1,
+    ORCC_VL_VERBOSE_2
+} verbose_level_et;
+
 
 #define arrayCopy(DST,SRC,LEN) \
             { size_t TMPSZ = sizeof(*(SRC)) * (LEN); \

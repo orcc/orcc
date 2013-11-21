@@ -42,6 +42,7 @@
 #include "metis.h"
 #include "thread.h"
 #include "scheduler.h"
+#include "options.h"
 
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.

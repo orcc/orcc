@@ -38,6 +38,15 @@ typedef struct scheduler_s scheduler_t;
 typedef struct network_s network_t;
 typedef struct actor_s actor_t;
 
+/* Mapping strategy codes */
+typedef enum {
+    ORCC_MS_METIS_REC,
+    ORCC_MS_METIS_KWAY,
+    ORCC_MS_ROUND_ROBIN,
+    ORCC_MS_OTHER,
+    ORCC_MS_SIZE /* only used for string tab declaration */
+} mappingstrategy_et;
+
 /*
  * Mapping structure store the mapping result
  */
@@ -176,6 +185,8 @@ int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part);
  * Apply the given mapping to the schedulers
  */
 void apply_mapping(mapping_t *mapping, scheduler_t **schedulers, int nbThreads);
+
+int do_mapping(network_t *network, options_t *opt, mapping_t *mapping);
 
 
 #endif  /* _ORCCMAP_MAPPING_H_ */

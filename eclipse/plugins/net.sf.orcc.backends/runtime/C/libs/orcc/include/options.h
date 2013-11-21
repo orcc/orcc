@@ -30,7 +30,8 @@
 #ifndef _ORCCMAP_OPTIONS_H_
 #define _ORCCMAP_OPTIONS_H_
 
-#include "orccmap.h"
+#include "mapping.h"
+#include "trace.h"
 
 extern verbose_level_et verbose_level;
 
