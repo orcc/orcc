@@ -26,8 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#ifndef _ORCC_SCHEDULER_H_
+#define _ORCC_SCHEDULER_H_
 
 #include "orcc.h"
 #include "thread.h"

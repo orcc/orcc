@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCCMAP_UTIL_H_
-#define _ORCCMAP_UTIL_H_
+#ifndef _ORCC_TRACE_H_
+#define _ORCC_TRACE_H_
 
 #include "orcc.h"
 #include "metis.h"
@@ -46,7 +46,7 @@ static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
     "Arg value for -m is not valide.",
     "Arg value for -v is not valide.",
     "Mandatory argument missing. Please check usage print.",
-    "Cannot generate default output file name.",
+    "Cannot generate deTHREAD_Hfault output file name.",
     "METIS error",
     "The network is not compatible with Metis. Weights must be >= 0",
     "The network is not compatible with Metis.",

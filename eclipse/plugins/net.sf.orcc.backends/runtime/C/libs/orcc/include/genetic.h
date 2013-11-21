@@ -26,8 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef GENETIC_H
-#define GENETIC_H
+#ifndef _ORCC_GENETIC_H_
+#define _ORCC_GENETIC_H_
 
 #include "orcc.h"
 

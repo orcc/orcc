@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_DATAFLOW_H
-#define ORCC_DATAFLOW_H
+#ifndef _ORCC_DATAFLOW_H_
+#define _ORCC_DATAFLOW_H_
 
 #include "orcc.h"
 

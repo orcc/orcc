@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCCMAP_MAPPING_H_
-#define _ORCCMAP_MAPPING_H_
+#ifndef _ORCC_MAPPING_H_
+#define _ORCC_MAPPING_H_
 
 #include "metis.h"
 #include "orcc.h"

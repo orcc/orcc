@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCCMAP_SERIALIZE_H_
-#define _ORCCMAP_SERIALIZE_H_
+#ifndef _ORCC_SERIALIZE_H_
+#define _ORCC_SERIALIZE_H_
 
 #include "orcc.h"
 

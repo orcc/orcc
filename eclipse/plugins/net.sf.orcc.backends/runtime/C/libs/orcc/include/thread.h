@@ -26,8 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef THREAD_H
-#define THREAD_H
+#ifndef _ORCC_THREAD_H_
+#define _ORCC_THREAD_H_
 
 #include "orcc.h"
 

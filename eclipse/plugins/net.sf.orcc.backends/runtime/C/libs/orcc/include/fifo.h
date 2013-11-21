@@ -26,8 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef FIFO_H
-#define FIFO_H
+#ifndef _ORCC_FIFO_H_
+#define _ORCC_FIFO_H_
 
 #include "types.h"
 

@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_UTIL_H
-#define ORCC_UTIL_H
+#ifndef _ORCC_UTIL_H_
+#define _ORCC_UTIL_H_
 
 // Directory for input files.
 extern char *input_directory;

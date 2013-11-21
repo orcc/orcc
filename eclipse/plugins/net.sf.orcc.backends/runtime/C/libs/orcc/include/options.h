@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCCMAP_OPTIONS_H_
-#define _ORCCMAP_OPTIONS_H_
+#ifndef _ORCC_OPTIONS_H_
+#define _ORCC_OPTIONS_H_
 
 #include "orcc.h"
 

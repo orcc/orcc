@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_OPEN_HEVC_H
-#define ORCC_OPEN_HEVC_H
+#ifndef _ORCC_OPEN_HEVC_H_
+#define _ORCC_OPEN_HEVC_H_
 
 #if defined(__ICC) && __ICC < 1200 || defined(__SUNPRO_C)
     #define DECLARE_ALIGNED(n,t,v)      t __attribute__ ((aligned (n))) v
