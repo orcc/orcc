@@ -37,6 +37,16 @@
 // Scheduling functions
 ///////////////////////////////////////////////////////////////////////////////
 
+global_scheduler_t *allocate_scheduler(int nb_schedulers) {
+    int i;
+    global_scheduler_t *g_scheduler = (global_scheduler_t*) malloc(sizeof(global_scheduler_t));
+    g_scheduler->schedulers = (local_scheduler_t**) malloc(nb_schedulers * sizeof(local_scheduler_t*));
+    for (i=0; i<nb_schedulers; i++) {
+        g_scheduler->schedulers[i] = (local_scheduler_t*) malloc(sizeof(local_scheduler_t));
+    }
+    return g_scheduler;
+}
+
 /**
  * Initializes the given scheduler.
  */
@@ -47,7 +57,7 @@ void sched_init(local_scheduler_t *sched, int id, int num_actors,
 	int i;
 
 	sched->id = id;
-	sched->schedulers_nb = schedulers_nb;
+    sched->nb_schedulers = schedulers_nb;
 
 	sched->num_actors = num_actors;
 	sched->actors = actors;
@@ -224,7 +234,7 @@ void sched_add_ring_waiting_list(local_scheduler_t *sched) {
 void sched_add_mesh_waiting_list(local_scheduler_t *sched) {
 	int i;
     actor_t *actor;
-	for (i = 0; i < sched->schedulers_nb; i++) {
+    for (i = 0; i < sched->nb_schedulers; i++) {
         waiting_t *wait = sched->mesh_waiting_schedulable[i];
 		while (wait->next_entry - wait->next_waiting >= 1) {
 			actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];

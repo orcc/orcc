@@ -34,15 +34,14 @@
 
 #define MAX_ACTORS 1024
 
-struct waiting_s {
-    actor_t *waiting_actors[MAX_ACTORS];
-    volatile unsigned int next_entry;
-    unsigned int next_waiting;
+struct global_scheduler_s {
+    local_scheduler_t **schedulers;
+    int nb_schedulers;
 };
 
 struct local_scheduler_s {
 	int id; /** Unique ID of this scheduler */
-	int schedulers_nb;
+    int nb_schedulers;
 
 	/* Round robin */
 	int num_actors; /** number of actors managed by this scheduler */
@@ -67,6 +66,12 @@ struct local_scheduler_s {
 	semaphore_struct sem_thread;
 };
 
+struct waiting_s {
+    actor_t *waiting_actors[MAX_ACTORS];
+    volatile unsigned int next_entry;
+    unsigned int next_waiting;
+};
+
 typedef enum reasons {
     starved,
     full
@@ -77,6 +82,9 @@ struct schedinfo_s {
     reasons_t reason;
     int ports; /** contains a mask that indicate the ports affected */
 };
+
+
+global_scheduler_t *allocate_scheduler(int nb_schedulers);
 
 /**
  * Initialize the given scheduler.
