@@ -37,7 +37,7 @@ typedef struct genetic_s {
 	double keep_ratio;
 	double crossover_ratio;
     actor_t **actors;
-    scheduler_t *schedulers;
+    local_scheduler_t *schedulers;
 	int actors_nb;
 	int threads_nb;
 	int use_ring_topology;
@@ -78,7 +78,7 @@ void *monitor(void *data);
  */
 void genetic_init(genetic_t *genetic_info, int population_size,
 		int generation_nb, double keep_ratio, double crossover_ratio,
-        actor_t **actors, scheduler_t *schedulers, int actors_nb,
+        actor_t **actors, local_scheduler_t *schedulers, int actors_nb,
 		int threads_nb, int use_ring_topology, int groups_nb,
 		double groups_ratio);
 

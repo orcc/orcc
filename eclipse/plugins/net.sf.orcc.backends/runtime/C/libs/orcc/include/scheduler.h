@@ -40,7 +40,7 @@ struct waiting_s {
     unsigned int next_waiting;
 };
 
-struct scheduler_s {
+struct local_scheduler_s {
 	int id; /** Unique ID of this scheduler */
 	int schedulers_nb;
 
@@ -81,49 +81,49 @@ struct schedinfo_s {
 /**
  * Initialize the given scheduler.
  */
-void sched_init(scheduler_t *sched, int id, int num_actors, actor_t **actors, waiting_t *ring_waiting_schedulable,
+void sched_init(local_scheduler_t *sched, int id, int num_actors, actor_t **actors, waiting_t *ring_waiting_schedulable,
         waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);
 
 /**
  * Initialize the actors mapped to the given scheduler.
  */
-void sched_init_actors(scheduler_t *sched, schedinfo_t *si);
+void sched_init_actors(local_scheduler_t *sched, schedinfo_t *si);
 
 /**
  * Reinitialize the given scheduler.
  */
-void sched_reinit(scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology, int schedulers_nb);
+void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology, int schedulers_nb);
 
 /**
  * Returns the next actor in actors list.
  * This method is used by the round-robin scheduler.
  */
-actor_t *sched_get_next(scheduler_t *sched);
+actor_t *sched_get_next(local_scheduler_t *sched);
 
 /**
  * Add the actor to the schedulable or waiting list.
  * The list is chosen according to associate scheduler of the actor.
  */
-void sched_add_schedulable(scheduler_t *sched, actor_t *actor, int use_ring_topology);
+void sched_add_schedulable(local_scheduler_t *sched, actor_t *actor, int use_ring_topology);
 
 /**
  * Add waited actors to the schedulable or waiting list.
  * The list is chosen according to associate scheduler of the actor.
  * This function use ring topology of communications.
  */
-void sched_add_ring_waiting_list(scheduler_t *sched);
+void sched_add_ring_waiting_list(local_scheduler_t *sched);
 
 /**
  * Add waited actors to the schedulable list.
  * This function use mesh topology of communications.
  */
-void sched_add_mesh_waiting_list(scheduler_t *sched);
+void sched_add_mesh_waiting_list(local_scheduler_t *sched);
 
 /**
  * Returns the next schedulable actor, or NULL if no actor is schedulable.
  * The actor is removed from the schedulable list.
  * This method is used by the data/demand driven scheduler.
  */
-actor_t *sched_get_next_schedulable(scheduler_t *sched, int use_ring_topology);
+actor_t *sched_get_next_schedulable(local_scheduler_t *sched, int use_ring_topology);
 
 #endif

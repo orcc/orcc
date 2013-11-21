@@ -45,7 +45,7 @@ struct actor_s {
     int num_outputs; /** number of output ports */
     int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
     int in_waiting; /** idem with the waiting list. */
-    struct scheduler_s *sched; /** scheduler which execute this actor. */
+    local_scheduler_t *sched; /** scheduler which execute this actor. */
     int processor_id; /** id of the processor core mapped to this actor. */
     int id;
     double workload; /** actor's workload gived by instrumention */

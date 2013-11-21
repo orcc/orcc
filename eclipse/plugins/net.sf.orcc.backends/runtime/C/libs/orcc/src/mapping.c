@@ -428,7 +428,7 @@ void resetMapping() {
 /**
  * Apply the given mapping to the schedulers
  */
-void apply_mapping(mapping_t *mapping, scheduler_t **schedulers, int nbThreads) {
+void apply_mapping(mapping_t *mapping, local_scheduler_t **schedulers, int nbThreads) {
     int i;
     for (i = 0; i < nbThreads; i++) {
         sched_reinit(schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0, nbThreads);
