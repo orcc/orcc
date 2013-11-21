@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "orcc.h"
 #include "mapping.h"
 #include "dataflow.h"
 #include "serialize.h"

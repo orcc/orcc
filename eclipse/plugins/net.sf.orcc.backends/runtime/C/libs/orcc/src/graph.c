@@ -32,7 +32,6 @@
 #include <string.h>
 
 #include "graph.h"
-#include "options.h"
 #include "trace.h"
 #include "dataflow.h"
 

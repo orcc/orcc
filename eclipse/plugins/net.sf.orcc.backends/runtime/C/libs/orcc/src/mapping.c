@@ -34,13 +34,10 @@
 #include <string.h>
 
 #include "mapping.h"
-#include "trace.h"
 #include "dataflow.h"
 #include "graph.h"
 #include "util.h"
 #include "serialize.h"
-#include "metis.h"
-#include "thread.h"
 #include "scheduler.h"
 #include "options.h"
 
