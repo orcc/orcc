@@ -39,56 +39,40 @@
 /**
  * Generate some mapping structure from an XCF file.
  */
-mappings_set_t* compute_mappings_from_file(char *xcf_file, actor_t **actors, int actors_size) {
+mapping_t* load_mapping(char *fileName, network_t *network) {
     int i, j, k, size;
     char *nb, *name;
     node_t *configuration, *partitioning, *partition, *instance, *attribute;
-    mappings_set_t *mappings_set = (mappings_set_t *) malloc(sizeof(mappings_set_t));
+    mapping_t *mapping;
 
-    configuration = roxml_load_doc(xcf_file);
-    if (configuration == NULL) {
-        printf("I/O error when reading mapping file.\n");
-        exit(1);
-    }
+    assert(fileName != NULL);
+    assert(network != NULL);
 
-    mappings_set->size = roxml_get_chld_nb(configuration);
-    mappings_set->mappings = (mapping_t **) malloc(mappings_set->size * sizeof(mapping_t *));
+    configuration = roxml_load_doc(fileName);
+    partitioning = roxml_get_chld(configuration, NULL, 0);
+    mapping = allocate_mapping(roxml_get_chld_nb(partitioning));
 
-    for (i = 0; i < mappings_set->size; i++) {
-        partitioning = roxml_get_chld(configuration, NULL, i);
-        name = roxml_get_name(partitioning, NULL, 0);
+    for (j = 0; j < mapping->number_of_threads; j++) {
+        partition = roxml_get_chld(partitioning, NULL, j);
+        name = roxml_get_name(partition, NULL, 0);
+        mapping->partitions_size[j] = roxml_get_chld_nb(partition);
 
-        mappings_set->mappings[i] = allocate_mapping(
-                roxml_get_chld_nb(partitioning));
+        attribute = roxml_get_attr(partition, "id", 0);
+        nb = roxml_get_content(attribute, NULL, 0, &size);
+        mapping->threads_affinities[j] = atoi(nb);
+        mapping->partitions_of_actors[j] = (actor_t **) malloc(mapping->partitions_size[j] * sizeof(actor_t *));
 
-        for (j = 0; j < mappings_set->mappings[i]->number_of_threads; j++) {
-            partition = roxml_get_chld(partitioning, NULL, j);
-            name = roxml_get_name(partition, NULL, 0);
-            mappings_set->mappings[i]->partitions_size[j] = roxml_get_chld_nb(
-                    partition);
-
-            attribute = roxml_get_attr(partition, "id", 0);
-            nb = roxml_get_content(attribute, NULL, 0, &size);
-            mappings_set->mappings[i]->threads_affinities[j] = atoi(nb);
-
-            mappings_set->mappings[i]->partitions_of_actors[j]
-                    = (actor_t **) malloc(
-                            mappings_set->mappings[i]->partitions_size[j]
-                                    * sizeof(actor_t *));
-
-            for (k = 0; k < mappings_set->mappings[i]->partitions_size[j]; k++) {
-                instance = roxml_get_chld(partition, NULL, k);
-                name = roxml_get_name(instance, NULL, 0);
-                attribute = roxml_get_attr(instance, "id", 0);
-                name = roxml_get_content(attribute, NULL, 0, &size);
-                mappings_set->mappings[i]->partitions_of_actors[j][k]
-                        = find_actor_by_name(actors, name, actors_size);
-            }
+        for (k = 0; k < mapping->partitions_size[j]; k++) {
+            instance = roxml_get_chld(partition, NULL, k);
+            name = roxml_get_name(instance, NULL, 0);
+            attribute = roxml_get_attr(instance, "id", 0);
+            name = roxml_get_content(attribute, NULL, 0, &size);
+            mapping->partitions_of_actors[j][k] = find_actor_by_name(network->actors, name, network->nb_actors);
         }
     }
     roxml_close(configuration);
 
-    return mappings_set;
+    return mapping;
 }
 
 /**

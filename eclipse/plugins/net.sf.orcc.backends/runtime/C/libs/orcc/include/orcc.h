@@ -38,7 +38,6 @@ typedef struct network_s network_t;
 typedef struct actor_s actor_t;
 typedef struct connection_s connection_t;
 typedef struct mapping_s mapping_t;
-typedef struct mappings_set_s mappings_set_t;
 typedef struct schedinfo_s schedinfo_t;
 typedef struct waiting_s waiting_t;
 typedef struct agent_s agent_t;

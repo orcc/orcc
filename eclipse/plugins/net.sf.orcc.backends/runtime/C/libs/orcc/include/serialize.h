@@ -51,7 +51,7 @@ void save_instrumentation(char* fileName, network_t network);
 /**
  * Generate some mapping structure from an XCF file.
  */
-mappings_set_t* compute_mappings_from_file(char *xcf_file, actor_t **actors, int actors_size);
+mapping_t* load_mapping(char *xcf_file, network_t *network);
 
 
 #endif  /* _ORCCMAP_SERIALIZE_H_ */

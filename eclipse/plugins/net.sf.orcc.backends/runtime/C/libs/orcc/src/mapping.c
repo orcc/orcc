@@ -77,16 +77,15 @@ void delete_mapping(mapping_t *mapping) {
 /**
  * Computes a partitionment of actors on threads from an XML file given in parameter.
  */
-mapping_t* map_actors(actor_t **actors, int actors_size) {
+mapping_t* map_actors(network_t *network) {
     if (mapping_file == NULL) {
         mapping_t *mapping = allocate_mapping(1);
         mapping->threads_affinities[0] = 0;
-        mapping->partitions_size[0] = actors_size;
-        mapping->partitions_of_actors[0] = actors;
+        mapping->partitions_size[0] = network->nb_actors;
+        mapping->partitions_of_actors[0] = network->actors;
         return mapping;
     } else {
-        mappings_set_t *mappings_set = compute_mappings_from_file(mapping_file, actors, actors_size);
-        return mappings_set->mappings[0];
+        return load_mapping(mapping_file, network);
     }
 }
 
