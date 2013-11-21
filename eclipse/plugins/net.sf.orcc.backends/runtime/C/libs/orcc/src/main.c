@@ -98,7 +98,7 @@ void start_orcc_mapping(options_t *opt) {
 
     ret = load_network(opt->input_file, network);
 
-    ret = do_mapping(network, *opt, mapping);
+    ret = do_mapping(network, opt, mapping);
 
     ret = save_mapping(opt->output_file, mapping);
 

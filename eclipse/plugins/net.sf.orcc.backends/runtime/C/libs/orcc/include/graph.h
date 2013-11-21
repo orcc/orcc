@@ -75,21 +75,21 @@ void delete_graph(adjacency_list *graph);
 /**
  * Print to the stdout the given graph as an adjacency list.
  */
-void print_graph(adjacency_list graph);
+void print_graph(adjacency_list *graph);
 
 /**
  * Build an adjacency list from the given network.
  */
-adjacency_list *set_graph_from_network(network_t network);
+adjacency_list *set_graph_from_network(network_t *network);
 
 /**
  * Check the viability of the given graph for metis.
  */
-int check_graph_for_metis(adjacency_list graph);
+int check_graph_for_metis(adjacency_list *graph);
 
 /**
  * Fix the given graph for metis.
  */
-adjacency_list *fix_graph_for_metis(adjacency_list graph);
+adjacency_list *fix_graph_for_metis(adjacency_list *graph);
 
 #endif

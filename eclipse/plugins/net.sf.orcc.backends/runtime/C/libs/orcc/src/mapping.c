@@ -40,6 +40,8 @@
 #include "util.h"
 #include "serialize.h"
 #include "metis.h"
+#include "thread.h"
+#include "scheduler.h"
 
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.
@@ -240,7 +242,7 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
  *
  ********************************************************************************************/
 
-int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) {
+int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part) {
     assert(part != NULL);
     int ret = ORCC_OK;
     idx_t ncon = 1;
@@ -253,7 +255,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
     METIS_SetDefaultOptions(metis_opt);
 
     graph = set_graph_from_network(network);
-    metis_graph = fix_graph_for_metis(*graph);
+    metis_graph = fix_graph_for_metis(graph);
 
     ret = METIS_PartGraphRecursive(&metis_graph->nb_vertices, /* idx_t *nvtxs */
                                    &ncon, /*idx_t *ncon*/
@@ -262,7 +264,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
                                    metis_graph->vwgt, /*idx_t *vwgt*/
                                    NULL, /*idx_t *vsize*/
                                    metis_graph->adjwgt, /*idx_t *adjwgt*/
-                                   &opt.nb_processors, /*idx_t *nparts*/
+                                   &opt->nb_processors, /*idx_t *nparts*/
                                    NULL, /*real t *tpwgts*/
                                    NULL, /*real t ubvec*/
                                    metis_opt, /*idx_t *options*/
@@ -277,7 +279,7 @@ int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part) 
     return ret;
 }
 
-int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
+int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part) {
     assert(part != NULL);
     int ret = ORCC_OK;
     idx_t ncon = 1;
@@ -291,7 +293,7 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
     metis_opt[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; /* METIS_OBJTYPE_VOL or METIS_OBJTYPE_CUT */
 
     graph = set_graph_from_network(network);
-    metis_graph = fix_graph_for_metis(*graph);
+    metis_graph = fix_graph_for_metis(graph);
 
     ret = METIS_PartGraphKway(&metis_graph->nb_vertices, /* idx_t *nvtxs */
                               &ncon, /*idx_t *ncon*/
@@ -300,7 +302,7 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
                               metis_graph->vwgt, /*idx_t *vwgt*/
                               NULL, /*idx_t *vsize*/
                               metis_graph->adjwgt, /*idx_t *adjwgt*/
-                              &opt.nb_processors, /*idx_t *nparts*/
+                              &opt->nb_processors, /*idx_t *nparts*/
                               NULL, /*real t *tpwgts*/
                               NULL, /*real t ubvec*/
                               metis_opt, /*idx_t *options*/
@@ -315,7 +317,7 @@ int do_metis_kway_partition(network_t network, options_t opt, idx_t *part) {
     return ret;
 }
 
-int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
+int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part) {
     assert(network != NULL);
     assert(part != NULL);
     int ret = ORCC_OK;
@@ -331,7 +333,7 @@ int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
         part[i] = network->actors[i]->processor_id;
         // There must be something needing to be improved here, i.e. invert
         // the direction of the distribution to have more balancing.
-        if (k >= opt.nb_processors)
+        if (k >= opt->nb_processors)
             k = 0;
     }
 
@@ -346,20 +348,20 @@ int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part) {
     return ret;
 }
 
-int do_mapping(network_t *network, options_t opt, mapping_t *mapping) {
+int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
     assert(network != NULL);
     assert(mapping != NULL);
     int i;
     int ret = ORCC_OK;
     idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network->nb_actors));
 
-    if (opt.nb_processors != 1) {
-        switch (opt.strategy) {
+    if (opt->nb_processors != 1) {
+        switch (opt->strategy) {
         case ORCC_MS_METIS_REC:
-            ret = do_metis_recursive_partition(*network, opt, part);
+            ret = do_metis_recursive_partition(network, opt, part);
             break;
         case ORCC_MS_METIS_KWAY:
-            ret = do_metis_kway_partition(*network, opt, part);
+            ret = do_metis_kway_partition(network, opt, part);
             break;
         case ORCC_MS_ROUND_ROBIN:
             ret = do_round_robbin_mapping(network, opt, part);

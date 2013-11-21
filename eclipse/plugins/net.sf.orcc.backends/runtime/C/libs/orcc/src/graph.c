@@ -72,29 +72,29 @@ void delete_graph(adjacency_list *graph) {
  *
  ********************************************************************************************/
 
-void print_graph(adjacency_list graph) {
+void print_graph(adjacency_list *graph) {
     int i, j;
     print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Src:weight | nbEdges | Dest:weight ...");
-    for (i = 0; i < graph.nb_vertices; i++) {
-        printf("\n %3d:%d | %3d | ", i, graph.vwgt[i], graph.xadj[i+1] - graph.xadj[i]);
-        for (j = graph.xadj[i]; j < graph.xadj[i+1]; j++) {
-            printf("%3d:%d ", graph.adjncy[j], graph.adjwgt[j]);
+    for (i = 0; i < graph->nb_vertices; i++) {
+        printf("\n %3d:%d | %3d | ", i, graph->vwgt[i], graph->xadj[i+1] - graph->xadj[i]);
+        for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
+            printf("%3d:%d ", graph->adjncy[j], graph->adjwgt[j]);
         }
     }
 }
 
-adjacency_list *set_graph_from_network(network_t network) {
+adjacency_list *set_graph_from_network(network_t *network) {
     int i, j, k = 0;
 
-    adjacency_list *graph = allocate_graph(network.nb_actors, network.nb_connections);
+    adjacency_list *graph = allocate_graph(network->nb_actors, network->nb_connections);
 
-    for (i = 0; i < network.nb_actors; i++) {
+    for (i = 0; i < network->nb_actors; i++) {
         graph->xadj[i] = k;
-        graph->vwgt[i] = network.actors[i]->workload;
-        for (j = 0; j < network.nb_connections; j++) {
-            if (network.connections[j]->src == network.actors[i]) {
-                graph->adjncy[k] = network.connections[j]->dst->id;
-                graph->adjwgt[k] = network.connections[j]->workload;
+        graph->vwgt[i] = network->actors[i]->workload;
+        for (j = 0; j < network->nb_connections; j++) {
+            if (network->connections[j]->src == network->actors[i]) {
+                graph->adjncy[k] = network->connections[j]->dst->id;
+                graph->adjwgt[k] = network->connections[j]->workload;
                 k++;
             }
         }
@@ -102,39 +102,39 @@ adjacency_list *set_graph_from_network(network_t network) {
 
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : CSR Graph generated from Network :");
-        print_graph(*graph);
+        print_graph(graph);
     }
 
     return graph;
 }
 
-int check_graph_for_metis(adjacency_list graph) {
+int check_graph_for_metis(adjacency_list *graph) {
     int i, j, k;
     int nbSelf = 0, nbNullEdgeWeight = 0, nbNullVerticeWeight = 0, nbDuplicateEdge = 0, nbDirectedEdge = 0;
     int ret = ORCC_OK;
 
-    for (i = 0; i < graph.nb_vertices; i++) {
-        if (graph.vwgt[i] == 0) {
+    for (i = 0; i < graph->nb_vertices; i++) {
+        if (graph->vwgt[i] == 0) {
             nbNullVerticeWeight++;
         }
 
-        for (j = graph.xadj[i]; j < graph.xadj[i+1]; j++) {
-            if (graph.adjncy[j] == i) {
+        for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
+            if (graph->adjncy[j] == i) {
                 nbSelf++;
             }
-            if (graph.adjwgt[j] == 0) {
+            if (graph->adjwgt[j] == 0) {
                 nbNullEdgeWeight++;
             }
             // Count directed edges
             boolean isDirected = TRUE;
-            for (k = graph.xadj[graph.adjncy[j]]; k < graph.xadj[graph.adjncy[j]+1]; k++) {
-                isDirected = isDirected && (graph.adjncy[k] != i);
+            for (k = graph->xadj[graph->adjncy[j]]; k < graph->xadj[graph->adjncy[j]+1]; k++) {
+                isDirected = isDirected && (graph->adjncy[k] != i);
             }
             if (isDirected == TRUE) {
                 nbDirectedEdge++;
             }
-            for (k = graph.xadj[i]; k < graph.xadj[i+1]; k++) {
-                if ((j != k) && (graph.adjncy[k] == graph.adjncy[j])) {
+            for (k = graph->xadj[i]; k < graph->xadj[i+1]; k++) {
+                if ((j != k) && (graph->adjncy[k] == graph->adjncy[j])) {
                     nbDuplicateEdge++;
                 }
             }
@@ -170,7 +170,7 @@ int check_graph_for_metis(adjacency_list graph) {
  *
  *  A warning message will be printed if any fix has been required
  */
-adjacency_list *fix_graph_for_metis(adjacency_list graph) {
+adjacency_list *fix_graph_for_metis(adjacency_list *graph) {
     int nb_edges = 0;
     adjacency_list *metis_graph;
     int i = 0, j = 0, k = 0;
@@ -193,31 +193,31 @@ adjacency_list *fix_graph_for_metis(adjacency_list graph) {
      *      - get the final number of edges
      */
 
-    edges = malloc(graph.nb_vertices * sizeof(*edges));
-    for(i=0 ; i < graph.nb_vertices ; i++){
-        edges[i] = malloc(graph.nb_vertices * sizeof(**edges) );
-        memset(edges[i], -1, sizeof(int) * graph.nb_vertices);
+    edges = malloc(graph->nb_vertices * sizeof(*edges));
+    for(i=0 ; i < graph->nb_vertices ; i++){
+        edges[i] = malloc(graph->nb_vertices * sizeof(**edges) );
+        memset(edges[i], -1, sizeof(int) * graph->nb_vertices);
     }
 
-    for (i = 0; i < graph.nb_vertices; i++) {
-        for (j = graph.xadj[i]; j < graph.xadj[i+1]; j++) {
+    for (i = 0; i < graph->nb_vertices; i++) {
+        for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
             /* First test prevents from self-edges */
-            if (graph.adjncy[j] != i) {
-                if (edges[i][graph.adjncy[j]] == -1) {
+            if (graph->adjncy[j] != i) {
+                if (edges[i][graph->adjncy[j]] == -1) {
                     nb_edges += 2;
-                    edges[i][graph.adjncy[j]] = graph.adjwgt[j];
-                    edges[graph.adjncy[j]][i] = graph.adjwgt[j];
+                    edges[i][graph->adjncy[j]] = graph->adjwgt[j];
+                    edges[graph->adjncy[j]][i] = graph->adjwgt[j];
                 } else {
-                    edges[i][graph.adjncy[j]] += graph.adjwgt[j];
-                    edges[graph.adjncy[j]][i] += graph.adjwgt[j];
+                    edges[i][graph->adjncy[j]] += graph->adjwgt[j];
+                    edges[graph->adjncy[j]][i] += graph->adjwgt[j];
                 }
             }
         }
     }
 
     /* Use previous matrix to set the fixed CSR graph for Metis */
-    metis_graph = allocate_graph(graph.nb_vertices, nb_edges);
-    arrayCopy(metis_graph->vwgt, graph.vwgt, graph.nb_vertices);
+    metis_graph = allocate_graph(graph->nb_vertices, nb_edges);
+    arrayCopy(metis_graph->vwgt, graph->vwgt, graph->nb_vertices);
     for (i=0; i<metis_graph->nb_vertices; i++) {
         metis_graph->xadj[i] = k;
         for (j=0; j<metis_graph->nb_vertices; j++) {
@@ -231,9 +231,9 @@ adjacency_list *fix_graph_for_metis(adjacency_list graph) {
 
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixed CSR Graph for Metis :");
-        print_graph(*metis_graph);
+        print_graph(metis_graph);
     }
-    ret = check_graph_for_metis(*metis_graph);
+    ret = check_graph_for_metis(metis_graph);
     check_orcc_error(ret);
 
     free(edges);

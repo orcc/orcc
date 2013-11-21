@@ -159,18 +159,18 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
 /**
  * Apply actor mapping using metis recursive strategy
  */
-int do_metis_recursive_partition(network_t network, options_t opt, idx_t *part);
+int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part);
 
 /**
  * Apply actor mapping using metis kway strategy
  */
-int do_metis_kway_partition(network_t network, options_t opt, idx_t *part);
+int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part);
 
 /**
  * Apply actor mapping using round-robin strategy
  * @author Long Nguyen
  */
-int do_round_robbin_mapping(network_t *network, options_t opt, idx_t *part);
+int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part);
 
 
 #endif  /* _ORCCMAP_MAPPING_H_ */

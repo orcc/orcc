@@ -104,7 +104,7 @@ typedef struct mapping_s mapping_t;
 extern "C" {
 #endif
 
-ORCC_API(int) do_mapping(network_t *network, options_t opt, mapping_t *mapping);
+ORCC_API(int) do_mapping(network_t *network, options_t *opt, mapping_t *mapping);
 
 #ifdef __cplusplus
 }
