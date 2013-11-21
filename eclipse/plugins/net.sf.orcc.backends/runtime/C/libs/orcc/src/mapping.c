@@ -387,7 +387,29 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
  * Main routine of the mapping agent.
  */
 void *map(void *data) {
+    agent_t *agent = (agent_t*) data;
+    int i;
 
+    while (1) {
+        // wait threads synchro
+        for (i = 0; i < agent->threads_nb; i++) {
+            semaphore_wait(agent->sync->sem_monitor);
+        }
+
+        printf("\nRemap...\n\n");
+
+        do_mapping(agent->network, agent->options, agent->mapping);
+        apply_mapping(agent->mapping, agent->schedulers, agent->threads_nb);
+
+        resetMapping();
+        // wakeup all threads
+        for (i = 0; i < agent->threads_nb; i++) {
+            semaphore_set(agent->schedulers[i]->sem_thread);
+        }
+
+    }
+
+    return 0;
 }
 
 /**
@@ -399,4 +421,18 @@ void agent_init(agent_t *agent, sync_t *sync, options_t *options) {
 
 int needMapping() {
     return 0;
+}
+
+void resetMapping() {
+
+}
+
+/**
+ * Apply the given mapping to the schedulers
+ */
+void apply_mapping(mapping_t *mapping, scheduler_t **schedulers, int nbThreads) {
+    int i;
+    for (i = 0; i < nbThreads; i++) {
+        sched_reinit(schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0, nbThreads);
+    }
 }

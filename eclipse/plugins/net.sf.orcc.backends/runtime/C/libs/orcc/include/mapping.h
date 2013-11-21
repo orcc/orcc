@@ -56,11 +56,10 @@ typedef struct mappings_set_s {
 typedef struct agent_s {
     sync_t *sync; /** Synchronization resources */
     options_t *options; /** Mapping options */
-    scheduler_t *schedulers;
+    scheduler_t **schedulers;
     network_t *network;
-    int actors_nb;
+    mapping_t *mapping;
     int threads_nb;
-    int use_ring_topology;
 } agent_t;
 
 /**
@@ -74,6 +73,7 @@ void *map(void *data);
 void agent_init(agent_t *agent, sync_t *sync, options_t *options);
 
 int needMapping();
+void resetMapping();
 
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.
@@ -171,6 +171,11 @@ int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part);
  * @author Long Nguyen
  */
 int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part);
+
+/**
+ * Apply the given mapping to the schedulers
+ */
+void apply_mapping(mapping_t *mapping, scheduler_t **schedulers, int nbThreads);
 
 
 #endif  /* _ORCCMAP_MAPPING_H_ */
