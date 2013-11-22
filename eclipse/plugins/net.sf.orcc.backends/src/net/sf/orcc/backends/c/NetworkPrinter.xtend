@@ -252,8 +252,8 @@ class NetworkPrinter extends CTemplate {
 				agent_init(&agent, &sync, &options);
 			«ENDIF»
 			
-			mapping_t *mapping = map_actors(actors, sizeof(actors) / sizeof(actors[0]));
-			scheduler_t *schedulers = (scheduler_t *) malloc(mapping->number_of_threads * sizeof(scheduler_t));
+			mapping_t *mapping = map_actors(&network);
+			local_scheduler_t *schedulers = (local_scheduler_t *) malloc(mapping->number_of_threads * sizeof(local_scheduler_t));
 			waiting_t *waiting_schedulables = (waiting_t *) malloc(mapping->number_of_threads * sizeof(waiting_t));
 		
 			«IF !dynamicMapping»
@@ -306,7 +306,7 @@ class NetworkPrinter extends CTemplate {
 
 	def protected printScheduler() '''
 		void *scheduler(void *data) {
-			scheduler_t *sched = (scheduler_t *) data;
+			local_scheduler_t *sched = (local_scheduler_t *) data;
 			actor_t *my_actor;
 			schedinfo_t si;
 			int j;
