@@ -224,6 +224,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 							choiceStatesSet.add(interpreter.getFsmStateOrig());
 							nullGuardFound=true;
 						} else {
+							System.out.println("Actor "+this.actor.getName()+" experienced a loop time-out!!\n\n");
 							scheduler.makeDummyFSM();
 							stopChecking=true;
 						}

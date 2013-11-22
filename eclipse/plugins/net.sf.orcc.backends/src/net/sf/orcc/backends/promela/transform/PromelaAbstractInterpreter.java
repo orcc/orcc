@@ -105,7 +105,7 @@ public class PromelaAbstractInterpreter extends AbstractInterpreter {
 				
 				condition = exprInterpreter.doSwitch(block.getCondition());
 				timeout++;
-				if (!ValueUtil.isBool(condition)||timeout<1000) {
+				if (!ValueUtil.isBool(condition)||timeout>1000) {
 					nullWasNormal=false;
 					throw new OrccRuntimeException(
 							"Condition not boolean at line "
