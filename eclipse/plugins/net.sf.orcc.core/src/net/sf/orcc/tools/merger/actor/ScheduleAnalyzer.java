@@ -58,20 +58,20 @@ public class ScheduleAnalyzer extends BufferSizer {
 
 	private void processInputs(Action action) {
 		for (Port port : action.getInputPattern().getPorts()) {
-			accessBuffer(port, false);
+			accessBuffer(port, false, action.getInputPattern().getNumTokens(port));
 		}
 	}
 
 	private void processOutputs(Action action) {
 		for (Port source : action.getOutputPattern().getPorts()) {
-			accessBuffer(source, true);
+			accessBuffer(source, true, action.getOutputPattern().getNumTokens(source));
 			Actor sourceActor = MergerUtil.getOwningActor(network, action, source);
 			if (sourceActor.getOutgoingPortMap().get(source).size() > 1) {
 				for (Connection c : sourceActor.getOutgoingPortMap().get(source)) {
 					Port target = c.getTargetPort();
 					if (target != null) {
 						if (buffersMap.get(target) != buffersMap.get(source)) {
-							accessBuffer(target, true);
+							accessBuffer(target, true, action.getOutputPattern().getNumTokens(source));
 						}
 					}
 				}
@@ -79,25 +79,25 @@ public class ScheduleAnalyzer extends BufferSizer {
 		}
 	}
 
-	private void accessBuffer(Port port, boolean write) {
+	private void accessBuffer(Port port, boolean write, int count) {
 		if (buffersMap.containsKey(port)) {
 			Var memVar = buffersMap.get(port);
 			if (write) {
-				incrementBufferAccess(memVar);
+				incrementBufferAccess(memVar, count);
 			} else {
-				decrementBufferAccess(memVar);
+				decrementBufferAccess(memVar, count);
 			}
 		}
 	}
 
-	private void incrementBufferAccess(Var var) {
+	private void incrementBufferAccess(Var var, int count) {
 		var.setAttribute("rwBalance", new Integer((
-				(Integer)var.getValueAsObject("rwBalance")).intValue() + 1));
+				(Integer)var.getValueAsObject("rwBalance")).intValue() + count));
 	}
 
-	private void decrementBufferAccess(Var var) {
+	private void decrementBufferAccess(Var var, int count) {
 		var.setAttribute("rwBalance", new Integer((
-				(Integer)var.getValueAsObject("rwBalance")).intValue() - 1));
+				(Integer)var.getValueAsObject("rwBalance")).intValue() - count));
 	}
 
 	private void checkBufferBalance(Actor superActor, Copier copier) {
