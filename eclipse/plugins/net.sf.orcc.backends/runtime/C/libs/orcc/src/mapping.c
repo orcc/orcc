@@ -63,6 +63,7 @@ mapping_t *allocate_mapping(int number_of_threads) {
     mapping->number_of_threads = number_of_threads;
     mapping->partitions_of_actors = malloc(number_of_threads * sizeof(*mapping->partitions_of_actors));
     mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
+    mapping->threads_affinities = (int*) malloc(number_of_threads * sizeof(int));
     return mapping;
 }
 
