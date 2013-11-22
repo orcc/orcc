@@ -49,18 +49,18 @@ struct agent_s {
     global_scheduler_t *scheduler;
     network_t *network;
     mapping_t *mapping;
-    int threads_nb;
+    int nb_threads;
 };
 
 /**
  * Main routine of the mapping agent.
  */
-void *map(void *data);
+void *agent_routine(void *data);
 
 /**
  * Initialize the given agent structure.
  */
-agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, mapping_t *mapping);
+agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads);
 
 int needMapping();
 void resetMapping();

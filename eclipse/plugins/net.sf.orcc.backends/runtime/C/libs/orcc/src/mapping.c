@@ -386,24 +386,24 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
 /**
  * Main routine of the mapping agent.
  */
-void *map(void *data) {
+void *agent_routine(void *data) {
     agent_t *agent = (agent_t*) data;
     int i;
 
     while (1) {
         // wait threads synchro
-        for (i = 0; i < agent->threads_nb; i++) {
+        for (i = 0; i < agent->nb_threads; i++) {
             semaphore_wait(agent->sync->sem_monitor);
         }
 
         printf("\nRemap...\n\n");
 
         do_mapping(agent->network, agent->options, agent->mapping);
-        apply_mapping(agent->mapping, agent->scheduler, agent->threads_nb);
+        apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);
 
         resetMapping();
         // wakeup all threads
-        for (i = 0; i < agent->threads_nb; i++) {
+        for (i = 0; i < agent->nb_threads; i++) {
             semaphore_set(agent->scheduler->schedulers[i]->sem_thread);
         }
 
@@ -415,13 +415,14 @@ void *map(void *data) {
 /**
  * Initialize the given agent structure.
  */
-agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, mapping_t *mapping) {
+agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads) {
     agent_t *agent = (agent_t *) malloc(sizeof(agent_t));
     agent->sync = sync;
     agent->options = options;
     agent->scheduler = scheduler;
     agent->network = network;
-    agent->mapping = mapping;
+    agent->mapping = allocate_mapping(nb_threads);
+    agent->nb_threads = nb_threads;
 }
 
 int needMapping() {

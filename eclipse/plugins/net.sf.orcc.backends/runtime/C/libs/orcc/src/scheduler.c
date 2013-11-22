@@ -102,10 +102,6 @@ void sched_init(local_scheduler_t *sched, int id, int num_actors,
 void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology, int schedulers_nb) {
 	int i;
 
-	if (sched->actors != NULL) {
-		free(sched->actors);
-	}
-
 	sched->actors = actors;
 	sched->num_actors = num_actors;
 	sched->rr_next_schedulable = 0;
