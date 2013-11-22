@@ -86,6 +86,9 @@ struct schedinfo_s {
 
 global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync);
 
+local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_schedulable,
+        waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);
+
 /**
  * Initialize the given scheduler.
  */

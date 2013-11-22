@@ -251,14 +251,12 @@ class NetworkPrinter extends CTemplate {
 				sync_init(&sync);
 			«ENDIF»
 			
-			global_scheduler_t *scheduler = allocate_scheduler(nb_threads, «IF dynamicMapping»&sync«ELSE»NULL«ENDIF»);
+			global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, «IF dynamicMapping»&sync«ELSE»NULL«ENDIF»);
 			«IF dynamicMapping»
 				agent_t *agent = agent_init(&sync, options, scheduler, &network, nb_threads);
 			«ENDIF»
 			
-			for(i=0; i < nb_threads; ++i){
-				sched_init(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i]);
-			}
+			global_scheduler_init(scheduler, mapping);
 			
 			clear_cpu_set(cpuset);
 			

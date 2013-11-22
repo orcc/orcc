@@ -423,6 +423,7 @@ agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *schedu
     agent->network = network;
     agent->mapping = allocate_mapping(nb_threads);
     agent->nb_threads = nb_threads;
+    return agent;
 }
 
 int needMapping() {

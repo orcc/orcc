@@ -39,27 +39,33 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync) {
-    int i,j;
+    int i;
     global_scheduler_t *sched = (global_scheduler_t*) malloc(sizeof(global_scheduler_t));
     waiting_t *waiting_schedulables = (waiting_t *) malloc(nb_schedulers * sizeof(waiting_t));
     sched->nb_schedulers = nb_schedulers;
     sched->schedulers = (local_scheduler_t**) malloc(nb_schedulers * sizeof(local_scheduler_t*));
     for (i = 0; i < nb_schedulers; i++) {
-        local_scheduler_t *l_sched = (local_scheduler_t*) malloc(sizeof(local_scheduler_t));
-
-        l_sched->id = i;
-        l_sched->nb_schedulers = nb_schedulers;
-        l_sched->ring_waiting_schedulable = &waiting_schedulables[i];
-        l_sched->ring_sending_schedulable = &waiting_schedulables[(i+1) % nb_schedulers];
-        l_sched->mesh_waiting_schedulable = (waiting_t **) malloc(nb_schedulers * sizeof(waiting_t *));
-        for (j = 0; j < nb_schedulers; j++) {
-            l_sched->mesh_waiting_schedulable[j] = (waiting_t *) malloc(sizeof(waiting_t));
-        }
-        l_sched->sync = sync;
-        semaphore_create(l_sched->sem_thread, 0);
-
-        sched->schedulers[i] = l_sched;
+        sched->schedulers[i] = allocate_local_scheduler(i, &waiting_schedulables[i], &waiting_schedulables[(i+1) % nb_schedulers], nb_schedulers, sync);
     }
+    return sched;
+}
+
+local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_schedulable,
+        waiting_t *ring_sending_schedulable, int nb_schedulers, sync_t *sync) {
+    int i;
+    local_scheduler_t *sched = (local_scheduler_t*) malloc(sizeof(local_scheduler_t));
+
+    sched->id = id;
+    sched->nb_schedulers = nb_schedulers;
+    sched->ring_waiting_schedulable = ring_waiting_schedulable;
+    sched->ring_sending_schedulable = ring_sending_schedulable;
+    sched->mesh_waiting_schedulable = (waiting_t **) malloc(nb_schedulers * sizeof(waiting_t *));
+    for (i = 0; i < nb_schedulers; i++) {
+        sched->mesh_waiting_schedulable[i] = (waiting_t *) malloc(sizeof(waiting_t));
+    }
+    sched->sync = sync;
+    semaphore_create(sched->sem_thread, 0);
+
     return sched;
 }
 
