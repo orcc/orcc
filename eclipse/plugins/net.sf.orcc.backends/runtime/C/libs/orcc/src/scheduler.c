@@ -40,6 +40,7 @@
 global_scheduler_t *allocate_scheduler(int nb_schedulers) {
     int i;
     global_scheduler_t *g_scheduler = (global_scheduler_t*) malloc(sizeof(global_scheduler_t));
+    g_scheduler->nb_schedulers = nb_schedulers;
     g_scheduler->schedulers = (local_scheduler_t**) malloc(nb_schedulers * sizeof(local_scheduler_t*));
     for (i=0; i<nb_schedulers; i++) {
         g_scheduler->schedulers[i] = (local_scheduler_t*) malloc(sizeof(local_scheduler_t));

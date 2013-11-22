@@ -79,15 +79,17 @@ void delete_mapping(mapping_t *mapping) {
  * Computes a partitionment of actors on threads from an XML file given in parameter.
  */
 mapping_t* map_actors(network_t *network) {
+    mapping_t *mapping;
     if (mapping_file == NULL) {
-        mapping_t *mapping = allocate_mapping(1);
+        mapping = allocate_mapping(1);
         mapping->threads_affinities[0] = 0;
         mapping->partitions_size[0] = network->nb_actors;
         mapping->partitions_of_actors[0] = network->actors;
         return mapping;
     } else {
-        return load_mapping(mapping_file, network);
+        mapping = load_mapping(mapping_file, network);
     }
+    return mapping;
 }
 
 
@@ -397,12 +399,12 @@ void *map(void *data) {
         printf("\nRemap...\n\n");
 
         do_mapping(agent->network, agent->options, agent->mapping);
-        apply_mapping(agent->mapping, agent->schedulers, agent->threads_nb);
+        apply_mapping(agent->mapping, agent->scheduler, agent->threads_nb);
 
         resetMapping();
         // wakeup all threads
         for (i = 0; i < agent->threads_nb; i++) {
-            semaphore_set(agent->schedulers[i]->sem_thread);
+            semaphore_set(agent->scheduler->schedulers[i]->sem_thread);
         }
 
     }
@@ -413,11 +415,11 @@ void *map(void *data) {
 /**
  * Initialize the given agent structure.
  */
-agent_t* agent_init(sync_t *sync, options_t *options, local_scheduler_t *schedulers, network_t *network, mapping_t *mapping) {
+agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, mapping_t *mapping) {
     agent_t *agent = (agent_t *) malloc(sizeof(agent_t));
     agent->sync = sync;
     agent->options = options;
-    agent->schedulers = schedulers;
+    agent->scheduler = scheduler;
     agent->network = network;
     agent->mapping = mapping;
 }
@@ -433,9 +435,9 @@ void resetMapping() {
 /**
  * Apply the given mapping to the schedulers
  */
-void apply_mapping(mapping_t *mapping, local_scheduler_t **schedulers, int nbThreads) {
+void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThreads) {
     int i;
     for (i = 0; i < nbThreads; i++) {
-        sched_reinit(schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0, nbThreads);
+        sched_reinit(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0, nbThreads);
     }
 }

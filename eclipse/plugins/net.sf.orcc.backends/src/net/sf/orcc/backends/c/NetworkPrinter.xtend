@@ -248,23 +248,22 @@ class NetworkPrinter extends CTemplate {
 				thread_id_struct thread_agent_id;
 				
 				sync_t sync;
-
 			«ENDIF»
 			
-			local_scheduler_t *schedulers = (local_scheduler_t *) malloc(mapping->number_of_threads * sizeof(local_scheduler_t));
+			global_scheduler_t *scheduler = allocate_scheduler(mapping->number_of_threads);
 			waiting_t *waiting_schedulables = (waiting_t *) malloc(mapping->number_of_threads * sizeof(waiting_t));
 		
 			«IF !dynamicMapping»
 				for(i=0; i < mapping->number_of_threads; ++i){
-					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
+					sched_init(scheduler->schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
 				}
 			«ELSEIF dynamicMapping»
 				options_t *options = set_options(ORCC_MS_ROUND_ROBIN, nbThreads);
 				sync_init(&sync);
-				agent_t *agent = agent_init(&sync, options, schedulers, &network, mapping);
+				agent_t *agent = agent_init(&sync, options, scheduler, &network, mapping);
 				
 				for(i=0; i < nbThreads; ++i){
-					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % nbThreads], nbThreads, &sync);
+					sched_init(scheduler->schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % nbThreads], nbThreads, &sync);
 				}
 			«ENDIF»
 			
@@ -272,12 +271,12 @@ class NetworkPrinter extends CTemplate {
 			
 			«IF !dynamicMapping»
 				for(i=0 ; i < mapping->number_of_threads; i++){
-					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
+					thread_create(threads[i], scheduler_routine, *scheduler->schedulers[i], threads_id[i]);
 					set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 				}
 			«ELSEIF dynamicMapping»
 				for(i=0 ; i < nbThreads; i++){
-					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
+					thread_create(threads[i], scheduler_routine, *scheduler->schedulers[i], threads_id[i]);
 					set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 				}
 				thread_create(thread_agent, map, agent, thread_agent_id);
@@ -307,7 +306,7 @@ class NetworkPrinter extends CTemplate {
 	'''
 
 	def protected printScheduler() '''
-		void *scheduler(void *data) {
+		void *scheduler_routine(void *data) {
 			local_scheduler_t *sched = (local_scheduler_t *) data;
 			actor_t *my_actor;
 			schedinfo_t si;

@@ -46,7 +46,7 @@ struct mapping_s {
 struct agent_s {
     sync_t *sync; /** Synchronization resources */
     options_t *options; /** Mapping options */
-    local_scheduler_t **schedulers;
+    global_scheduler_t *scheduler;
     network_t *network;
     mapping_t *mapping;
     int threads_nb;
@@ -60,7 +60,7 @@ void *map(void *data);
 /**
  * Initialize the given agent structure.
  */
-agent_t* agent_init(sync_t *sync, options_t *options, local_scheduler_t *schedulers, network_t *network, mapping_t *mapping);
+agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, mapping_t *mapping);
 
 int needMapping();
 void resetMapping();
@@ -165,7 +165,7 @@ int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part);
 /**
  * Apply the given mapping to the schedulers
  */
-void apply_mapping(mapping_t *mapping, local_scheduler_t **schedulers, int nbThreads);
+void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThreads);
 
 int do_mapping(network_t *network, options_t *opt, mapping_t *mapping);
 
