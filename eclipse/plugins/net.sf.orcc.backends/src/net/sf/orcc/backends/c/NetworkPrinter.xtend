@@ -239,9 +239,6 @@ class NetworkPrinter extends CTemplate {
 			mapping_t *mapping = map_actors(&network);
 			int nb_threads = «IF dynamicMapping»nbThreads«ELSE»mapping->number_of_threads«ENDIF»;
 			
-			global_scheduler_t *scheduler = allocate_scheduler(nb_threads);
-			waiting_t *waiting_schedulables = (waiting_t *) malloc(nb_threads * sizeof(waiting_t));
-			
 			cpu_set_t cpuset;
 			thread_struct threads[MAX_THREAD_NB];
 			thread_id_struct threads_id[MAX_THREAD_NB];
@@ -252,11 +249,15 @@ class NetworkPrinter extends CTemplate {
 				
 				options_t *options = set_options(ORCC_MS_ROUND_ROBIN, nb_threads);
 				sync_init(&sync);
+			«ENDIF»
+			
+			global_scheduler_t *scheduler = allocate_scheduler(nb_threads, «IF dynamicMapping»&sync«ELSE»NULL«ENDIF»);
+			«IF dynamicMapping»
 				agent_t *agent = agent_init(&sync, options, scheduler, &network, nb_threads);
 			«ENDIF»
 			
 			for(i=0; i < nb_threads; ++i){
-				sched_init(scheduler->schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % nbThreads], nbThreads, «IF dynamicMapping»&sync«ELSE»NULL«ENDIF»);
+				sched_init(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i]);
 			}
 			
 			clear_cpu_set(cpuset);

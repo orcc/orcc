@@ -84,13 +84,12 @@ struct schedinfo_s {
 };
 
 
-global_scheduler_t *allocate_scheduler(int nb_schedulers);
+global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync);
 
 /**
  * Initialize the given scheduler.
  */
-void sched_init(local_scheduler_t *sched, int id, int num_actors, actor_t **actors, waiting_t *ring_waiting_schedulable,
-        waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);
+void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors);
 
 /**
  * Initialize the actors mapped to the given scheduler.
@@ -100,7 +99,7 @@ void sched_init_actors(local_scheduler_t *sched, schedinfo_t *si);
 /**
  * Reinitialize the given scheduler.
  */
-void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology, int schedulers_nb);
+void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology);
 
 /**
  * Returns the next actor in actors list.

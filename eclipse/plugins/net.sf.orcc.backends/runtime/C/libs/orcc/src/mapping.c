@@ -439,6 +439,6 @@ void resetMapping() {
 void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThreads) {
     int i;
     for (i = 0; i < nbThreads; i++) {
-        sched_reinit(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0, nbThreads);
+        sched_reinit(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0);
     }
 }

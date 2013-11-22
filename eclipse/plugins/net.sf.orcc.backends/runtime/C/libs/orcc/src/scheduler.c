@@ -32,74 +32,77 @@
 
 #include "scheduler.h"
 #include "dataflow.h"
+#include "mapping.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduling functions
 ///////////////////////////////////////////////////////////////////////////////
 
-global_scheduler_t *allocate_scheduler(int nb_schedulers) {
-    int i;
-    global_scheduler_t *g_scheduler = (global_scheduler_t*) malloc(sizeof(global_scheduler_t));
-    g_scheduler->nb_schedulers = nb_schedulers;
-    g_scheduler->schedulers = (local_scheduler_t**) malloc(nb_schedulers * sizeof(local_scheduler_t*));
-    for (i=0; i<nb_schedulers; i++) {
-        g_scheduler->schedulers[i] = (local_scheduler_t*) malloc(sizeof(local_scheduler_t));
+global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync) {
+    int i,j;
+    global_scheduler_t *sched = (global_scheduler_t*) malloc(sizeof(global_scheduler_t));
+    waiting_t *waiting_schedulables = (waiting_t *) malloc(nb_schedulers * sizeof(waiting_t));
+    sched->nb_schedulers = nb_schedulers;
+    sched->schedulers = (local_scheduler_t**) malloc(nb_schedulers * sizeof(local_scheduler_t*));
+    for (i = 0; i < nb_schedulers; i++) {
+        local_scheduler_t *l_sched = (local_scheduler_t*) malloc(sizeof(local_scheduler_t));
+
+        l_sched->id = i;
+        l_sched->nb_schedulers = nb_schedulers;
+        l_sched->ring_waiting_schedulable = &waiting_schedulables[i];
+        l_sched->ring_sending_schedulable = &waiting_schedulables[(i+1) % nb_schedulers];
+        l_sched->mesh_waiting_schedulable = (waiting_t **) malloc(nb_schedulers * sizeof(waiting_t *));
+        for (j = 0; j < nb_schedulers; j++) {
+            l_sched->mesh_waiting_schedulable[j] = (waiting_t *) malloc(sizeof(waiting_t));
+        }
+        l_sched->sync = sync;
+        semaphore_create(l_sched->sem_thread, 0);
+
+        sched->schedulers[i] = l_sched;
     }
-    return g_scheduler;
+    return sched;
+}
+
+void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping) {
+    int i;
+    for (i = 0; i < sched->nb_schedulers; i++) {
+        local_scheduler_init(sched->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i]);
+    }
 }
 
 /**
  * Initializes the given scheduler.
  */
-void sched_init(local_scheduler_t *sched, int id, int num_actors,
-        actor_t **actors, waiting_t *ring_waiting_schedulable,
-        waiting_t *ring_sending_schedulable, int schedulers_nb,
-        sync_t *sync) {
-	int i;
+void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors) {
+    int i;
 
-	sched->id = id;
-    sched->nb_schedulers = schedulers_nb;
+    sched->num_actors = num_actors;
+    sched->actors = actors;
+    for (i = 0; i < num_actors; i++) {
+        actors[i]->sched = sched;
+        actors[i]->in_list = 0;
+        actors[i]->in_waiting = 0;
+    }
 
-	sched->num_actors = num_actors;
-	sched->actors = actors;
-	if (actors != NULL) {
-		for (i = 0; i < num_actors; i++) {
-			actors[i]->sched = sched;
-			actors[i]->in_list = 0;
-			actors[i]->in_waiting = 0;
-		}
-	}
-
+    sched->round_robin = 1;
 	sched->rr_next_schedulable = 0;
 	sched->ddd_next_entry = 0;
-	sched->ddd_next_schedulable = 0;
-
-	sched->round_robin = 1;
-
-	sched->ring_waiting_schedulable = ring_waiting_schedulable;
+    sched->ddd_next_schedulable = 0;
 	sched->ring_waiting_schedulable->next_entry = 0;
-	sched->ring_waiting_schedulable->next_waiting = 0;
-	sched->ring_sending_schedulable = ring_sending_schedulable;
+    sched->ring_waiting_schedulable->next_waiting = 0;
 	sched->ring_sending_schedulable->next_entry = 0;
 	sched->ring_sending_schedulable->next_waiting = 0;
 
-    sched->mesh_waiting_schedulable = (waiting_t **) malloc(
-            schedulers_nb * sizeof(waiting_t *));
-	for (i = 0; i < schedulers_nb; i++) {
-        sched->mesh_waiting_schedulable[i] = (waiting_t *) malloc(
-                sizeof(waiting_t));
+    for (i = 0; i < sched->nb_schedulers; i++) {
 		sched->mesh_waiting_schedulable[i]->next_entry = 0;
 		sched->mesh_waiting_schedulable[i]->next_waiting = 0;
 	}
-
-	sched->sync = sync;
-	semaphore_create(sched->sem_thread, 0);
 }
 
 /**
  * Reinitialize the given scheduler with new actors list.
  */
-void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology, int schedulers_nb) {
+void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology) {
 	int i;
 
 	sched->actors = actors;
@@ -114,7 +117,7 @@ void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, in
 	sched->ring_sending_schedulable->next_entry = 0;
 	sched->ring_sending_schedulable->next_waiting = 0;
 
-	for (i = 0; i < schedulers_nb; i++) {
+    for (i = 0; i < sched->nb_schedulers; i++) {
 		sched->mesh_waiting_schedulable[i]->next_entry = 0;
 		sched->mesh_waiting_schedulable[i]->next_waiting = 0;
 	}
