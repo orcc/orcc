@@ -322,7 +322,7 @@ class NetworkPrinter extends CTemplate {
 		#endif
 				}
 				«IF dynamicMapping»
-					if(needMapping()) {
+					if(my_actor == NULL || needMapping()) {
 						semaphore_set(sched->sync->sem_monitor);
 						semaphore_wait(sched->sem_thread);
 					}
