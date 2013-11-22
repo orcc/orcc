@@ -262,7 +262,7 @@ class NetworkPrinter extends CTemplate {
 			
 			for(i=0 ; i < nb_threads; i++){
 				thread_create(threads[i], scheduler_routine, *scheduler->schedulers[i], threads_id[i]);
-				set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
+				set_thread_affinity(cpuset, i, threads[i]);
 			}
 			«IF dynamicMapping»
 				thread_create(thread_agent, agent_routine, *agent, thread_agent_id);
