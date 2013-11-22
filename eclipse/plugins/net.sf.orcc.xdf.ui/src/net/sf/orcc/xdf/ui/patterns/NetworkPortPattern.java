@@ -72,6 +72,9 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 	protected final int PORT_HEIGHT = 34;
 	protected final int PORT_WIDTH = (int) (PORT_HEIGHT * 0.866);
+	private final int TEXT_PORT_SPACE = 4;
+	private final int TEXT_DEFAULT_WIDTH = 50;
+	private final int TEXT_DEFAULT_HEIGHT = 12;
 
 	private final String SHAPE_ID = "PORT_SHAPE";
 	private final String LABEL_ID = "PORT_LABEL";
@@ -208,7 +211,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 		// Create the container
 		final ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
-		final Rectangle rect = gaService.createInvisibleRectangle(containerShape);
+		final Rectangle topLevelInvisibleRect = gaService.createInvisibleRectangle(containerShape);
 		{
 			Shape shape = peCreateService.createShape(containerShape, false);
 			setIdentifier(shape, SHAPE_ID);
@@ -226,7 +229,8 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
 			// We define an arbitrary width to text, allowing user to see chars
 			// when first direct editing port name
-			gaService.setLocationAndSize(text, 0, PORT_HEIGHT + 4, 50, 10);
+			gaService.setLocationAndSize(text, 0, PORT_HEIGHT + TEXT_PORT_SPACE, TEXT_DEFAULT_WIDTH,
+					TEXT_DEFAULT_HEIGHT);
 
 			if (addedDomainObject.getName() != null) {
 				text.setValue(addedDomainObject.getName());
@@ -248,7 +252,9 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 		peCreateService.createChopboxAnchor(containerShape);
 
-		gaService.setLocationAndSize(rect, context.getX(), context.getY(), -1, -1);
+		gaService.setLocationAndSize(topLevelInvisibleRect, context.getX(), context.getY(),
+				Math.max(TEXT_DEFAULT_WIDTH, PORT_WIDTH), PORT_HEIGHT
+				+ TEXT_PORT_SPACE + TEXT_DEFAULT_HEIGHT);
 		layoutPictogramElement(containerShape);
 
 		return containerShape;
@@ -277,19 +283,22 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	 */
 	@Override
 	public boolean layout(ILayoutContext context) {
-		PictogramElement pe = context.getPictogramElement();
+		final PictogramElement topLevelPe = context.getPictogramElement();
 
-		Text txt = (Text) getPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
-		Polygon poly = (Polygon) getPeFromIdentifier(pe, SHAPE_ID).getGraphicsAlgorithm();
+		final Text txt = (Text) getPeFromIdentifier(topLevelPe, LABEL_ID).getGraphicsAlgorithm();
+		final Polygon poly = (Polygon) getPeFromIdentifier(topLevelPe, SHAPE_ID).getGraphicsAlgorithm();
 
-		int minTxtWidth = XdfUtil.getTextMinWidth(txt);
+		final int minTxtWidth = XdfUtil.getTextMinWidth(txt);
+		final int newTextWidth = Math.max(minTxtWidth, PORT_WIDTH);
+
 		if (minTxtWidth > PORT_WIDTH) {
-			txt.setWidth(minTxtWidth);
 			int xscale = (minTxtWidth - PORT_WIDTH) / 2;
 			poly.setX(xscale);
-		} else {
-			txt.setWidth(PORT_WIDTH);
 		}
+
+		// Set the new width for the port text
+		txt.setWidth(newTextWidth);
+		topLevelPe.getGraphicsAlgorithm().setWidth(newTextWidth);
 
 		return true;
 	}
