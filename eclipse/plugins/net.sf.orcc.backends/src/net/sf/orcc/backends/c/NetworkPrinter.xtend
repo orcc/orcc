@@ -237,6 +237,8 @@ class NetworkPrinter extends CTemplate {
 		static void launcher() {
 			int i;
 			
+			mapping_t *mapping = map_actors(&network);
+			
 			cpu_set_t cpuset;
 			
 			thread_struct threads[MAX_THREAD_NB];
@@ -244,15 +246,15 @@ class NetworkPrinter extends CTemplate {
 			«IF dynamicMapping»
 				thread_struct thread_agent;
 				thread_id_struct thread_agent_id;
+				
 				sync_t sync;
 				agent_t agent;
-				options_t options;
+				options_t *options = set_options(ORCC_MS_ROUND_ROBIN, nbThreads);
 				
 				sync_init(&sync);
-				agent_init(&agent, &sync, &options);
+				agent_init(&agent, &sync, options);
 			«ENDIF»
 			
-			mapping_t *mapping = map_actors(&network);
 			local_scheduler_t *schedulers = (local_scheduler_t *) malloc(mapping->number_of_threads * sizeof(local_scheduler_t));
 			waiting_t *waiting_schedulables = (waiting_t *) malloc(mapping->number_of_threads * sizeof(waiting_t));
 		

@@ -49,6 +49,7 @@ struct options_s
  * Creates and init options structure.
  */
 options_t *set_default_options();
+options_t *set_options(mappingstrategy_et strategy, int nb_processors);
 
 /**
  * Releases memory of the given options structure.
