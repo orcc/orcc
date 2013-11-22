@@ -36,6 +36,7 @@ static unsigned int startTime;
 static unsigned int relativeStartTime;
 static int lastNumPic;
 static int numPicturesDecoded;
+static int partialNumPicturesDecoded;
 
 static Uint32 partialStartTime;
 static Uint32 partialEndTime;
@@ -55,6 +56,7 @@ static void print_fps_avg(void) {
 void fpsPrintInit() {
 	startTime = SDL_GetTicks();
 	numPicturesDecoded = 0;
+    partialNumPicturesDecoded = 0;
 	lastNumPic = 0;
 	if(show_fps) {
 		atexit(print_fps_avg);
@@ -69,6 +71,7 @@ void fpsPrintInit() {
 void fpsPrintNewPicDecoded(void) {
 	unsigned int endTime;
 	numPicturesDecoded++;
+    partialNumPicturesDecoded++;
 	endTime = SDL_GetTicks();
 	if (show_fps && (endTime - relativeStartTime) / 1000.0f >= 5) {
 		printf("%f images/sec\n",
@@ -102,4 +105,12 @@ void remove_fps_printing() {
 
 void active_fps_printing() {
 	show_fps = 1;
+}
+
+int get_partialNumPicturesDecoded() {
+    return partialNumPicturesDecoded;
+}
+
+void reset_partialNumPicturesDecoded() {
+    partialNumPicturesDecoded = 0;
 }

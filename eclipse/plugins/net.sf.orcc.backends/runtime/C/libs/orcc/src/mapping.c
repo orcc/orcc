@@ -427,11 +427,11 @@ agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *schedu
 }
 
 int needMapping() {
-    return 0;
+    return get_partialNumPicturesDecoded() > 100;
 }
 
 void resetMapping() {
-
+    reset_partialNumPicturesDecoded();
 }
 
 /**
