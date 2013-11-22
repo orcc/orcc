@@ -248,11 +248,7 @@ class NetworkPrinter extends CTemplate {
 				thread_id_struct thread_agent_id;
 				
 				sync_t sync;
-				agent_t agent;
-				options_t *options = set_options(ORCC_MS_ROUND_ROBIN, nbThreads);
-				
-				sync_init(&sync);
-				agent_init(&agent, &sync, options);
+
 			«ENDIF»
 			
 			local_scheduler_t *schedulers = (local_scheduler_t *) malloc(mapping->number_of_threads * sizeof(local_scheduler_t));
@@ -263,6 +259,10 @@ class NetworkPrinter extends CTemplate {
 					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping->number_of_threads], mapping->number_of_threads, NULL);
 				}
 			«ELSEIF dynamicMapping»
+				options_t *options = set_options(ORCC_MS_ROUND_ROBIN, nbThreads);
+				sync_init(&sync);
+				agent_t *agent = agent_init(&sync, options, schedulers, &network, mapping);
+				
 				for(i=0; i < nbThreads; ++i){
 					sched_init(&schedulers[i], i, mapping->partitions_size[i], mapping->partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % nbThreads], nbThreads, &sync);
 				}

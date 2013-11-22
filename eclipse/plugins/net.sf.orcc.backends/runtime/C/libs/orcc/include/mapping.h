@@ -60,7 +60,7 @@ void *map(void *data);
 /**
  * Initialize the given agent structure.
  */
-void agent_init(agent_t *agent, sync_t *sync, options_t *options);
+agent_t* agent_init(sync_t *sync, options_t *options, local_scheduler_t *schedulers, network_t *network, mapping_t *mapping);
 
 int needMapping();
 void resetMapping();
