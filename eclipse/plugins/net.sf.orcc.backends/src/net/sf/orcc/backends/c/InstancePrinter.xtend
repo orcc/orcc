@@ -83,6 +83,7 @@ class InstancePrinter extends CTemplate {
 	protected var String entityName
 
 	protected var boolean instrumentNetwork = false
+	protected var boolean dynamicMapping = false
 	protected var boolean isActionVectorizable = false
 
 	var boolean newSchedul = false
@@ -117,6 +118,9 @@ class InstancePrinter extends CTemplate {
 
 		if (options.containsKey(INSTRUMENT_NETWORK)) {
 			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
+		}
+		if (options.containsKey(DYNAMIC_MAPPING)) {
+			dynamicMapping = options.get(DYNAMIC_MAPPING) as Boolean
 		}
 
 		if (options.containsKey(THREADS_NB)) {
@@ -251,7 +255,7 @@ class InstancePrinter extends CTemplate {
 				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
 				
-				«IF instrumentNetwork»
+				«IF instrumentNetwork || dynamicMapping»
 					extern connection_t connection_«entityName»_«port.name»;
 					#define rate_«port.name» connection_«entityName»_«port.name».workload
 				«ENDIF»
@@ -756,7 +760,7 @@ class InstancePrinter extends CTemplate {
 				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
 					read_end_«port.name»();
 				«ENDIF»
-				«IF instrumentNetwork»
+				«IF instrumentNetwork || dynamicMapping»
 					rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
 				«ENDIF»			
 			«ENDFOR»
