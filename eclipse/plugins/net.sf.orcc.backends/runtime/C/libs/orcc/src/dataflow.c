@@ -51,9 +51,9 @@ actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
 void reset_profiling(network_t *network) {
     int i;
     for (i = 0; i < network->nb_actors; i++) {
-        network->actors[i]->workload = 0;
+        network->actors[i]->workload = 1;
     }
     for (i = 0; i < network->nb_connections; i++) {
-        network->connections[i]->workload = 0;
+        network->connections[i]->workload = 1;
     }
 }
