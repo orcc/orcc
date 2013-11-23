@@ -76,4 +76,9 @@ struct network_s {
  */
 actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
 
+/**
+ * Reset profiling information for the given network.
+ */
+void reset_profiling(network_t *network);
+
 #endif

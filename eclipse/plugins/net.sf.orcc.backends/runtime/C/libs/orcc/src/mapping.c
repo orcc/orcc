@@ -401,6 +401,7 @@ void *agent_routine(void *data) {
         do_mapping(agent->network, agent->options, agent->mapping);
         apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);
 
+        reset_profiling(agent->network);
         resetMapping();
         // wakeup all threads
         for (i = 0; i < agent->nb_threads; i++) {
@@ -427,7 +428,7 @@ agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *schedu
 }
 
 int needMapping() {
-    return get_partialNumPicturesDecoded() > 100;
+    return get_partialNumPicturesDecoded() > 500;
 }
 
 void resetMapping() {
