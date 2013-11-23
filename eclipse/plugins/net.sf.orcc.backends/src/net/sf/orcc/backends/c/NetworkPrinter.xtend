@@ -247,7 +247,7 @@ class NetworkPrinter extends CTemplate {
 				thread_id_struct thread_agent_id;
 				sync_t sync;
 				
-				options_t *options = set_options(ORCC_MS_ROUND_ROBIN, nb_threads);
+				options_t *options = set_options(mapping_strategy, nb_threads);
 				sync_init(&sync);
 			«ENDIF»
 			

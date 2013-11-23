@@ -67,6 +67,9 @@ extern int nbFrames;
 // Number of executing threads to create
 extern int nbThreads;
 
+// Strategy for the actor mapping
+extern int mapping_strategy;
+
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
 
