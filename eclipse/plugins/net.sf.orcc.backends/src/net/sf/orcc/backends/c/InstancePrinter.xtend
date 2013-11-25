@@ -257,7 +257,7 @@ class InstancePrinter extends CTemplate {
 				
 				«IF instrumentNetwork || dynamicMapping»
 					extern connection_t connection_«entityName»_«port.name»;
-					#define rate_«port.name» connection_«entityName»_«port.name».workload
+					#define rate_«port.name» connection_«entityName»_«port.name».rate
 				«ENDIF»
 				
 			«ENDFOR»

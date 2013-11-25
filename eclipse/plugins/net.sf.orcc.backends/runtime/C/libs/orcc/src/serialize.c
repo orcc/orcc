@@ -98,7 +98,7 @@ void save_profiling(char* fileName, network_t* network) {
         node_t* instanceNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Instance", NULL);
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", network->actors[i]->name);
         char* workload = (char*) malloc(sizeof(workload));
-        sprintf(workload, "%.2lf", network->actors[i]->workload);
+        sprintf(workload, "%d", network->actors[i]->workload);
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "workload", workload);
     }
 
@@ -107,7 +107,7 @@ void save_profiling(char* fileName, network_t* network) {
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "src", network->connections[i]->src->name);
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "dst", network->connections[i]->dst->name);
         char* workload = (char*) malloc(sizeof(workload));
-        sprintf(workload, "%.2lf", network->connections[i]->workload);
+        sprintf(workload, "%d", network->connections[i]->workload);
         roxml_add_node(connectionNode, 0, ROXML_ATTR_NODE, "workload", workload);
     }
 

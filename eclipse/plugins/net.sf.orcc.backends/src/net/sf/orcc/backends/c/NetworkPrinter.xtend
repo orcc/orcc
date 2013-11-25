@@ -215,7 +215,7 @@ class NetworkPrinter extends CTemplate {
 		static void atexit_actions() {
 			«IF instrumentNetwork || dynamicMapping»
 				if (profiling_file != NULL) {
-					normalize_workload(&network);
+					compute_workloads(&network);
 					save_profiling(profiling_file, &network);
 				}
 			«ENDIF»
@@ -316,7 +316,7 @@ class NetworkPrinter extends CTemplate {
 					«IF instrumentNetwork || dynamicMapping»
 						tick_out = getticks();
 						diff_tick = elapsed(tick_out, tick_in);
-						my_actor->workload += diff_tick;
+						my_actor->ticks += diff_tick;
 					«ENDIF»
 		#ifdef PRINT_FIRINGS
 					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);

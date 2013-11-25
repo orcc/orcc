@@ -48,7 +48,8 @@ struct actor_s {
     local_scheduler_t *sched; /** scheduler which execute this actor. */
     int processor_id; /** id of the processor core mapped to this actor. */
     int id;
-    double workload; /** actor's workload gived by instrumention */
+    int workload; /** actor's workload */
+    double ticks; /** elapsed ticks obtained by profiling */
 };
 
 /*
@@ -57,7 +58,8 @@ struct actor_s {
 struct connection_s {
     actor_t *src;
     actor_t *dst;
-    double workload;
+    int workload; /** connections's workload */
+    long rate; /** communication rate obtained by profiling */
 };
 
 /*
@@ -83,6 +85,6 @@ void reset_profiling(network_t *network);
 
 network_t* allocate_network(int nb_actors, int nb_connections);
 
-void normalize_workload(network_t *network);
+void compute_workloads(network_t *network);
 
 #endif
