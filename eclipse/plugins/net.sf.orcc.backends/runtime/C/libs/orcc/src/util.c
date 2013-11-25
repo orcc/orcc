@@ -60,8 +60,8 @@ char *input_file;
 // output YUV file
 char *yuv_file;
 
-// instrumentation_file file
-char *instrumentation_file;
+// Profiling file
+char *profiling_file;
 
 // write file
 char *write_file;
@@ -208,7 +208,7 @@ void init_orcc(int argc, char *argv[]) {
 			write_file = strdup(optarg);
 			break;
         case 'b':
-            instrumentation_file = strdup(optarg);
+            profiling_file = strdup(optarg);
             break;
         default:
 			fprintf(stderr, "Skipping option -%c\n", c);

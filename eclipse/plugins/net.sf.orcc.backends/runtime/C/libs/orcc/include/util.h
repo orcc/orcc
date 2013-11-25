@@ -40,7 +40,7 @@ extern char *input_file;
 extern char *yuv_file;
 
 // instrumentation_file file
-extern char *instrumentation_file;
+extern char *profiling_file;
 
 // write file
 extern char *write_file;

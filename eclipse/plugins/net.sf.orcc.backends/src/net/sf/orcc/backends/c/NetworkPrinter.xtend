@@ -214,9 +214,9 @@ class NetworkPrinter extends CTemplate {
 		// Actions to do when exting properly
 		static void atexit_actions() {
 			«IF instrumentNetwork || dynamicMapping»
-				if (instrumentation_file != NULL) {
+				if (profiling_file != NULL) {
 					normalize_workload(&network);
-					save_instrumentation(instrumentation_file, network);
+					save_profiling(profiling_file, &network);
 				}
 			«ENDIF»
 		}

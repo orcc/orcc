@@ -46,7 +46,7 @@ int save_mapping(char* fileName, mapping_t *mapping);
  * Save network's workloads from instrumentation to a file
  * that could be used for mapping.
  */
-void save_instrumentation(char* fileName, network_t network);
+void save_profiling(char* fileName, network_t *network);
 
 /**
  * Generate some mapping structure from an XCF file.
