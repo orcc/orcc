@@ -35,7 +35,7 @@
 /**
  * Load network structure from an XDF file.
  */
-int load_network(char *fileName, network_t *network);
+network_t* load_network(char *fileName);
 
 /**
  * Save mapping structure to XCF file.

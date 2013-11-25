@@ -81,4 +81,6 @@ actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
  */
 void reset_profiling(network_t *network);
 
+network_t* allocate_network(int nb_actors, int nb_connections);
+
 #endif

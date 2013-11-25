@@ -48,6 +48,25 @@ actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
     return ret;
 }
 
+network_t* allocate_network(int nb_actors, int nb_connections) {
+    int i;
+    network_t *network = (network_t*) malloc(sizeof(network_t));
+
+    network->nb_actors = nb_actors;
+    network->nb_connections = nb_connections;
+    network->actors = (actor_t**) malloc(nb_actors * sizeof(actor_t*));
+    network->connections = (connection_t**) malloc(nb_connections * sizeof(connection_t*));
+
+    for (i=0; i < network->nb_connections; i++) {
+        network->connections[i] = (connection_t*) malloc(sizeof(connection_t));
+    }
+    for (i=0; i < network->nb_actors; i++) {
+        network->actors[i] = (actor_t*) malloc(sizeof(actor_t));
+    }
+
+    return network;
+}
+
 void reset_profiling(network_t *network) {
     int i;
     for (i = 0; i < network->nb_actors; i++) {

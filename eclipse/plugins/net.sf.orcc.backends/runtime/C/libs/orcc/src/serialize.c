@@ -123,11 +123,10 @@ void save_instrumentation(char* fileName, network_t network) {
     roxml_close(rootNode);
 }
 
-int load_network(char *fileName, network_t *network) {
+network_t* load_network(char *fileName) {
     assert(fileName != NULL);
-    assert(network != NULL);
-    int ret = ORCC_OK;
-    int i;
+    int i, nb_actors = 0, nb_connections = 0;
+    network_t *network;
 
     node_t* rootNode = roxml_load_doc(fileName);
 
@@ -135,11 +134,8 @@ int load_network(char *fileName, network_t *network) {
         check_orcc_error(ORCC_ERR_ROXML_OPEN);
     }
 
-    network->nb_actors = 0;
-    network->nb_connections = 0;
-
     while (1) {
-        node_t* actorNode = roxml_get_chld(rootNode, NULL, network->nb_actors + network->nb_connections);
+        node_t* actorNode = roxml_get_chld(rootNode, NULL, nb_actors + nb_connections);
 
         if (actorNode == NULL) {
             break;
@@ -147,26 +143,17 @@ int load_network(char *fileName, network_t *network) {
 
         char* nodeName = roxml_get_name(actorNode, NULL, 0);
         if (strcmp(nodeName, "Instance") == 0) {
-            network->nb_actors++;
+            nb_actors++;
         }
         else if (strcmp(nodeName, "Connection") == 0) {
-            network->nb_connections++;
+            nb_connections++;
         }
         else {
             break;
         }
     }
 
-    network->actors = (actor_t**) malloc(network->nb_actors * sizeof(actor_t*));
-    network->connections = (connection_t**) malloc(network->nb_connections * sizeof(connection_t*));
-    for (i=0; i < network->nb_connections; i++) {
-        network->actors[i] = (actor_t*) malloc(sizeof(actor_t*));
-        network->connections[i] = (connection_t*) malloc(sizeof(connection_t*));
-    }
-    for (i=0; i < network->nb_connections; i++) {
-        network->connections[i]->src = (actor_t*) malloc(sizeof(actor_t));
-        network->connections[i]->dst = (actor_t*) malloc(sizeof(actor_t));
-    }
+    network = allocate_network(nb_actors, nb_connections);
 
     print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Loading network");
     for (i = 0; i < network->nb_actors; i++) {
@@ -241,7 +228,7 @@ int load_network(char *fileName, network_t *network) {
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Number of connections is : %d", network->nb_connections);
     }
 
-    return ret;
+    return network;
 }
 
 int save_mapping(char* fileName, mapping_t *mapping) {
