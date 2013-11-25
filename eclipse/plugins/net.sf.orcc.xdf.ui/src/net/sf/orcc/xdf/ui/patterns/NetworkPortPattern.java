@@ -34,6 +34,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
+import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -58,17 +59,19 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.pattern.AbstractPattern;
+import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
- * This bastract class
+ * This abstract class
  * 
- * @author alorence
+ * @author Antoine Lorence
  * 
  */
-abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
+abstract public class NetworkPortPattern extends AbstractPattern implements IPattern {
 
 	protected final int PORT_HEIGHT = 34;
 	protected final int PORT_WIDTH = (int) (PORT_HEIGHT * 0.866);
@@ -78,7 +81,6 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 	private final String SHAPE_ID = "PORT_SHAPE";
 	private final String LABEL_ID = "PORT_LABEL";
-	private final String[] validIds = { getPortIdentifier(), SHAPE_ID, LABEL_ID };
 
 	public NetworkPortPattern() {
 		super(null);
@@ -94,13 +96,13 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	abstract protected void addPortToNetwork(Port port, Network network);
 
 	@Override
-	protected String[] getValidIdentifiers() {
-		return validIds;
+	protected boolean isPatternRoot(PictogramElement pe) {
+		return ShapePropertiesManager.isExpectedPe(pe, getPortIdentifier());
 	}
 
 	@Override
-	protected boolean isPatternRoot(PictogramElement pe) {
-		return isExpectedPe(pe, getPortIdentifier());
+	protected boolean isPatternControlled(PictogramElement pictogramElement) {
+		return false;
 	}
 
 	@Override
@@ -214,7 +216,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		final Rectangle topLevelInvisibleRect = gaService.createInvisibleRectangle(containerShape);
 		{
 			Shape shape = peCreateService.createShape(containerShape, false);
-			setIdentifier(shape, SHAPE_ID);
+			ShapePropertiesManager.setIdentifier(shape, SHAPE_ID);
 			
 			/* Polygon polygon = */getPortPolygon(shape, gaService);
 
@@ -236,7 +238,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 				text.setValue(addedDomainObject.getName());
 			}
 
-			setIdentifier(shape, LABEL_ID);
+			ShapePropertiesManager.setIdentifier(shape, LABEL_ID);
 			link(shape, addedDomainObject);
 
 			// set shape and graphics algorithm where the editor for
@@ -246,7 +248,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 		}
 
 		directEditingInfo.setMainPictogramElement(containerShape);
-		setIdentifier(containerShape, getPortIdentifier());
+		ShapePropertiesManager.setIdentifier(containerShape, getPortIdentifier());
 		link(containerShape, addedDomainObject);
 		containerShape.getLink().getBusinessObjects().add(addedDomainObject.getType());
 
@@ -285,8 +287,9 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	public boolean layout(ILayoutContext context) {
 		final PictogramElement topLevelPe = context.getPictogramElement();
 
-		final Text txt = (Text) getPeFromIdentifier(topLevelPe, LABEL_ID).getGraphicsAlgorithm();
-		final Polygon poly = (Polygon) getPeFromIdentifier(topLevelPe, SHAPE_ID).getGraphicsAlgorithm();
+		final Text txt = (Text) ShapePropertiesManager.findPeFromIdentifier(topLevelPe, LABEL_ID).getGraphicsAlgorithm();
+		final Polygon poly = (Polygon) ShapePropertiesManager.findPeFromIdentifier(topLevelPe, SHAPE_ID)
+				.getGraphicsAlgorithm();
 
 		final int minTxtWidth = XdfUtil.getTextMinWidth(txt);
 		final int newTextWidth = Math.max(minTxtWidth, PORT_WIDTH);
@@ -311,7 +314,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 			return false;
 		}
 
-		Text txt = (Text) getPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
+		Text txt = (Text) ShapePropertiesManager.findPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
 		Port port = (Port) getBusinessObjectForPictogramElement(pe);
 		txt.setValue(port.getName());
 
@@ -327,7 +330,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 	 */
 	public GraphicsAlgorithm getSelectionBorder(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			return getPeFromIdentifier(pe, SHAPE_ID).getGraphicsAlgorithm();
+			return ShapePropertiesManager.findPeFromIdentifier(pe, SHAPE_ID).getGraphicsAlgorithm();
 		}
 		return null;
 	}
@@ -346,7 +349,7 @@ abstract public class NetworkPortPattern extends AbstractPatternWithProperties {
 
 	public String getNameFromShape(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			Text label = (Text) getPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
+			Text label = (Text) ShapePropertiesManager.findPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
 			return label.getValue();
 		}
 		return "";

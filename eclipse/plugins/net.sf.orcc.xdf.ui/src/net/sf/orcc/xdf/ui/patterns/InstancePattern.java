@@ -37,6 +37,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
+import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.common.util.URI;
@@ -70,6 +71,7 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaLayoutService;
 import org.eclipse.graphiti.services.IGaService;
@@ -82,7 +84,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
  * @author Antoine Lorence
  * 
  */
-public class InstancePattern extends AbstractPatternWithProperties {
+public class InstancePattern extends AbstractPattern {
 
 	// Minimal and default width for an instance shape
 	private static final int TOTAL_MIN_WIDTH = 120;
@@ -101,12 +103,11 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	private static final int PORT_MARGIN = 2;
 
 	// Identifiers for important shape of an instance
-	private static final String INSTANCE_ID = "INSTANCE";
+	public static final String INSTANCE_ID = "INSTANCE";
 	private static final String LABEL_ID = "INSTANCE_LABEL";
 	private static final String SEP_ID = "INSTANCE_SEPARATOR";
 	private static final String INPUTS_ID = "INPUTS_AREA";
 	private static final String OUTPUTS_ID = "OUTPUTS_AREA";
-	private static final String[] validIds = { INSTANCE_ID, LABEL_ID, SEP_ID, INPUTS_ID, OUTPUTS_ID };
 
 	private static final String REFINEMENT_KEY = "refinment";
 
@@ -129,11 +130,6 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	}
 
 	@Override
-	protected String[] getValidIdentifiers() {
-		return validIds;
-	}
-
-	@Override
 	public boolean isMainBusinessObjectApplicable(Object object) {
 		if (object instanceof Port) {
 			Port port = (Port) object;
@@ -152,14 +148,14 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	protected boolean isPatternControlled(PictogramElement pe) {
 
 		// If PE is one of the objects with a defined ID
-		if (super.isPatternControlled(pe)) {
+		if (ShapePropertiesManager.isPatternControlled(pe)) {
 			return true;
 		}
 
 		// Port squares and texts are not directly identified, but texts are
 		// contained in OUTPUTS_ID or INPUTSS_ID and squares ports are contained
 		// in the top level shape
-		if (super.isPatternControlled((PictogramElement) pe.eContainer())) {
+		if (ShapePropertiesManager.isPatternControlled((PictogramElement) pe.eContainer())) {
 			return true;
 		}
 
@@ -168,13 +164,13 @@ public class InstancePattern extends AbstractPatternWithProperties {
 
 	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
-		return isExpectedPe(pe, INSTANCE_ID);
+		return ShapePropertiesManager.isExpectedPe(pe, INSTANCE_ID);
 	}
 
 	@Override
 	public boolean canDirectEdit(IDirectEditingContext context) {
 		boolean isText = context.getGraphicsAlgorithm() instanceof Text;
-		return isText && isExpectedPe(context.getPictogramElement(), LABEL_ID);
+		return isText && ShapePropertiesManager.isExpectedPe(context.getPictogramElement(), LABEL_ID);
 	}
 
 	@Override
@@ -296,6 +292,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 		{
 			// The text label for Instance name
 			final Shape shape = peCreateService.createShape(containerShape, false);
+
 			final Text text = gaService.createPlainText(shape);
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
@@ -306,7 +303,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 				text.setValue(addedDomainObject.getName());
 			}
 
-			setIdentifier(shape, LABEL_ID);
+			ShapePropertiesManager.setIdentifier(shape, LABEL_ID);
 
 			link(shape, addedDomainObject);
 
@@ -323,7 +320,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			Polyline line = gaService.createPlainPolyline(shape, xy);
 			line.setLineWidth(SEPARATOR);
 
-			setIdentifier(shape, SEP_ID);
+			ShapePropertiesManager.setIdentifier(shape, SEP_ID);
 		}
 
 		{
@@ -344,11 +341,11 @@ public class InstancePattern extends AbstractPatternWithProperties {
 			gaService.setLocationAndSize(outRect, TOTAL_MIN_WIDTH - portAreaLeftRightMargin - portAreaW, portAreaY,
 					portAreaW, portAreaH);
 
-			setIdentifier(inShape, INPUTS_ID);
-			setIdentifier(outShape, OUTPUTS_ID);
+			ShapePropertiesManager.setIdentifier(inShape, INPUTS_ID);
+			ShapePropertiesManager.setIdentifier(outShape, OUTPUTS_ID);
 		}
 
-		setIdentifier(containerShape, INSTANCE_ID);
+		ShapePropertiesManager.setIdentifier(containerShape, INSTANCE_ID);
 
 		// set container shape for direct editing after object creation
 		directEditingInfo.setMainPictogramElement(containerShape);
@@ -366,7 +363,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	@Override
 	public boolean canResizeShape(IResizeShapeContext context) {
 
-		if (!isExpectedPe(context.getPictogramElement(), INSTANCE_ID)) {
+		if (!ShapePropertiesManager.isExpectedPe(context.getPictogramElement(), INSTANCE_ID)) {
 			return false;
 		}
 		// Resize is always Ok for Instance. New size is set to minimal value
@@ -429,14 +426,14 @@ public class InstancePattern extends AbstractPatternWithProperties {
 		final int instanceWidth = pe.getGraphicsAlgorithm().getWidth();
 
 		// Update width for label and separator. Position still unchanged
-		final GraphicsAlgorithm label = getPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
+		final GraphicsAlgorithm label = ShapePropertiesManager.findPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
 		label.setWidth(instanceWidth);
-		final Polyline sep = (Polyline) getPeFromIdentifier(pe, SEP_ID).getGraphicsAlgorithm();
+		final Polyline sep = (Polyline) ShapePropertiesManager.findPeFromIdentifier(pe, SEP_ID).getGraphicsAlgorithm();
 		sep.getPoints().get(1).setX(instanceWidth);
 
 		{
 			// Inputs area. Position unchanged, size must be updated
-			final Shape portsPe = (Shape) getPeFromIdentifier(pe, INPUTS_ID);
+			final Shape portsPe = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, INPUTS_ID);
 			final GraphicsAlgorithm portsGa = portsPe.getGraphicsAlgorithm();
 
 			final int newAreaWidth = getPortsAreaMinWidth(portsPe);
@@ -452,7 +449,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 
 		{
 			// Outputs area, position and size need to be recalculated
-			final Shape portsPe = (Shape) getPeFromIdentifier(pe, OUTPUTS_ID);
+			final Shape portsPe = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, OUTPUTS_ID);
 			final GraphicsAlgorithm portsGa = portsPe.getGraphicsAlgorithm();
 
 			final int newAreaWidth = getPortsAreaMinWidth(portsPe);
@@ -485,7 +482,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	@Override
 	public IReason updateNeeded(IUpdateContext context) {
 		final PictogramElement pe = context.getPictogramElement();
-		if (isExpectedPe(pe, LABEL_ID)) {
+		if (ShapePropertiesManager.isExpectedPe(pe, LABEL_ID)) {
 			Text txt = (Text) pe.getGraphicsAlgorithm();
 			Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
 			if (!txt.getValue().equals(instance.getName())) {
@@ -500,7 +497,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	public boolean update(IUpdateContext context) {
 		PictogramElement pe = context.getPictogramElement();
 
-		if (isExpectedPe(pe, LABEL_ID)) {
+		if (ShapePropertiesManager.isExpectedPe(pe, LABEL_ID)) {
 			Shape shape = (Shape) pe;
 			Instance instance = (Instance) getBusinessObjectForPictogramElement(shape);
 
@@ -536,8 +533,8 @@ public class InstancePattern extends AbstractPatternWithProperties {
 				.setPropertyValue(pe, REFINEMENT_KEY, entity.eResource().getURI().toPlatformString(true));
 
 		final ContainerShape topLevelShape = (ContainerShape) pe;
-		final ContainerShape inCtrShape = (ContainerShape) getPeFromIdentifier(pe, INPUTS_ID);
-		final ContainerShape outCtrShape = (ContainerShape) getPeFromIdentifier(pe, OUTPUTS_ID);
+		final ContainerShape inCtrShape = (ContainerShape) ShapePropertiesManager.findPeFromIdentifier(pe, INPUTS_ID);
+		final ContainerShape outCtrShape = (ContainerShape) ShapePropertiesManager.findPeFromIdentifier(pe, OUTPUTS_ID);
 
 		// Clean inputs & outputs ports text
 		List<Shape> portsTxts = new ArrayList<Shape>(inCtrShape.getChildren());
@@ -587,8 +584,9 @@ public class InstancePattern extends AbstractPatternWithProperties {
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		final IGaService gaService = Graphiti.getGaService();
 
-		final ContainerShape portsCtrShape = (ContainerShape) (portType == PortsType.INPUTS ? getPeFromIdentifier(
-				topLevelShape, INPUTS_ID) : getPeFromIdentifier(topLevelShape, OUTPUTS_ID));
+		final ContainerShape portsCtrShape = (ContainerShape) (portType == PortsType.INPUTS ? ShapePropertiesManager
+				.findPeFromIdentifier(topLevelShape, INPUTS_ID) : ShapePropertiesManager.findPeFromIdentifier(
+				topLevelShape, OUTPUTS_ID));
 
 		final int currentAreaWidth = portsCtrShape.getGraphicsAlgorithm().getWidth();
 		final int portAreaY = LABEL_HEIGHT + SEPARATOR;
@@ -628,7 +626,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 
 			Rectangle portRect = gaService.createRectangle(fpAnchor);
 			portRect.setStyle(StyleUtil.getStyleForInstancePort(getDiagram()));
-			gaService.setLocationAndSize(portRect, 0, 0, PORT_SIDE_WITH, PORT_SIDE_WITH);
+			gaService.setLocationAndSize(portRect, 0, 0, PORT_SIDE_WITH + 6, PORT_SIDE_WITH + 6);
 
 			link(fpAnchor, port);
 
@@ -644,7 +642,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	 *            The instance pictogram element
 	 */
 	private void resizeShapeToMinimal(PictogramElement pe) {
-		if (!isExpectedPe(pe, INSTANCE_ID)) {
+		if (!ShapePropertiesManager.isExpectedPe(pe, INSTANCE_ID)) {
 			return;
 		}
 
@@ -664,12 +662,12 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	 * @return The height as integer
 	 */
 	private int getInstanceMinHeight(PictogramElement pe) {
-		if (!isExpectedPe(pe, INSTANCE_ID)) {
+		if (!ShapePropertiesManager.isExpectedPe(pe, INSTANCE_ID)) {
 			return -1;
 		}
 
-		Shape inArea = (Shape) getPeFromIdentifier(pe, INPUTS_ID);
-		Shape outArea = (Shape) getPeFromIdentifier(pe, OUTPUTS_ID);
+		Shape inArea = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, INPUTS_ID);
+		Shape outArea = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, OUTPUTS_ID);
 
 		int portsAreaMinHeight = Math.max(getPortsAreaMinHeight(inArea), getPortsAreaMinHeight(outArea));
 		int newHeight = LABEL_HEIGHT + SEPARATOR + portsAreaMinHeight;
@@ -689,12 +687,12 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	 * @return The width as integer
 	 */
 	private int getInstanceMinWidth(PictogramElement pe) {
-		if (!isExpectedPe(pe, INSTANCE_ID)) {
+		if (!ShapePropertiesManager.isExpectedPe(pe, INSTANCE_ID)) {
 			return -1;
 		}
 
-		Shape inArea = (Shape) getPeFromIdentifier(pe, INPUTS_ID);
-		Shape outArea = (Shape) getPeFromIdentifier(pe, OUTPUTS_ID);
+		Shape inArea = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, INPUTS_ID);
+		Shape outArea = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, OUTPUTS_ID);
 
 		return getPortsAreaMinWidth(inArea) + getPortsAreaMinWidth(outArea) + PORTS_AREAS_SPACE + 2
 				* (PORT_SIDE_WITH + PORT_MARGIN);
@@ -713,7 +711,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	 * @return The height as integer
 	 */
 	private int getPortsAreaMinHeight(PictogramElement pe) {
-		if (!isExpectedPe(pe, INPUTS_ID) && !isExpectedPe(pe, OUTPUTS_ID)) {
+		if (!ShapePropertiesManager.isExpectedPe(pe, INPUTS_ID) && !ShapePropertiesManager.isExpectedPe(pe, OUTPUTS_ID)) {
 			return -1;
 		}
 
@@ -750,7 +748,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	 * @return The width as integer
 	 */
 	private int getPortsAreaMinWidth(PictogramElement pe) {
-		if (!isExpectedPe(pe, INPUTS_ID) && !isExpectedPe(pe, OUTPUTS_ID)) {
+		if (!ShapePropertiesManager.isExpectedPe(pe, INPUTS_ID) && !ShapePropertiesManager.isExpectedPe(pe, OUTPUTS_ID)) {
 			return -1;
 		}
 
@@ -779,7 +777,7 @@ public class InstancePattern extends AbstractPatternWithProperties {
 	 */
 	public String getNameFromShape(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			final PictogramElement txtShape = getPeFromIdentifier(pe, LABEL_ID);
+			final PictogramElement txtShape = ShapePropertiesManager.findPeFromIdentifier(pe, LABEL_ID);
 			final Text text = (Text) txtShape.getGraphicsAlgorithm();
 			return text.getValue();
 		}

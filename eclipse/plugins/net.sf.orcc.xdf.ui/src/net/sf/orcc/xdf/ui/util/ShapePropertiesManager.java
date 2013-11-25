@@ -26,55 +26,39 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.xdf.ui.patterns;
+package net.sf.orcc.xdf.ui.util;
+
+import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
+import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 
 import org.eclipse.graphiti.mm.Property;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
-import org.eclipse.graphiti.pattern.AbstractPattern;
-import org.eclipse.graphiti.pattern.IPattern;
-import org.eclipse.graphiti.pattern.config.IPatternConfiguration;
 import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.services.IPeService;
 
 /**
+ * This class is a utility to manage common properties on shapes.
  * 
  * @author Antoine Lorence
  * 
  */
-abstract public class AbstractPatternWithProperties extends AbstractPattern implements IPattern {
+public class ShapePropertiesManager {
 
 	private static String PROPERTY_ID = "XDF_ID";
 
-	private final IPeService peService;
-
-	public AbstractPatternWithProperties(IPatternConfiguration config) {
-		super(config);
-		peService = Graphiti.getPeService();
-	}
-
-	/**
-	 * This method must be implemented by subclasses to returns a list of all
-	 * identifiers set by it. This is mostly used to easily check if a subclass
-	 * can manage a PictogramElement by checking if its identifier is contained
-	 * in the returned list.
-	 * 
-	 * @see #isPatternControlled(PictogramElement)
-	 * @return The list of identifiers
-	 */
-	abstract protected String[] getValidIdentifiers();
+	private static String[] validIdentifiers = { InstancePattern.INSTANCE_ID, InputNetworkPortPattern.INOUT_ID,
+			OutputNetworkPortPattern.INOUT_ID };
 
 	/**
 	 * Check if the concrete class can manage the given PictogramElement.
 	 * 
-	 * @see #getValidIdentifiers()
 	 * @return true if the given pe is controlled by this class
 	 */
-	@Override
-	protected boolean isPatternControlled(PictogramElement pe) {
-		String peId = getIdentifier(pe);
-		for (String validId : getValidIdentifiers()) {
+	public static boolean isPatternControlled(PictogramElement pe) {
+		final String peId = getIdentifier(pe);
+		for (String validId : validIdentifiers) {
 			if (validId.equals(peId)) {
 				return true;
 			}
@@ -90,8 +74,8 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 	 * @param id
 	 *            The value of the identifier to set on given pe
 	 */
-	protected void setIdentifier(PictogramElement pe, String id) {
-		peService.setPropertyValue(pe, PROPERTY_ID, id);
+	public static void setIdentifier(PictogramElement pe, String id) {
+		Graphiti.getPeService().setPropertyValue(pe, PROPERTY_ID, id);
 	}
 
 	/**
@@ -100,8 +84,8 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 	 * @param pe
 	 * @return The identifier, or null if the given pe has no identifier set
 	 */
-	private String getIdentifier(PictogramElement pe) {
-		Property property = peService.getProperty(pe, PROPERTY_ID);
+	public static String getIdentifier(PictogramElement pe) {
+		Property property = Graphiti.getPeService().getProperty(pe, PROPERTY_ID);
 		if (property == null) {
 			return null;
 		} else {
@@ -118,7 +102,7 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 	 *            The identifier to check
 	 * @return true if the given pe identifier is equals to the given id value
 	 */
-	protected boolean isExpectedPe(PictogramElement pe, String id) {
+	public static boolean isExpectedPe(PictogramElement pe, String id) {
 		return id.equals(getIdentifier(pe));
 	}
 
@@ -130,7 +114,7 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 	 * @param id
 	 * @return A PictogramElement or null if it can't be found
 	 */
-	protected PictogramElement getPeFromIdentifier(PictogramElement pe, final String id) {
+	public static PictogramElement findPeFromIdentifier(PictogramElement pe, final String id) {
 
 		if (isExpectedPe(pe, id)) {
 			return pe;
@@ -138,7 +122,7 @@ abstract public class AbstractPatternWithProperties extends AbstractPattern impl
 
 		if (pe instanceof ContainerShape) {
 			for (Shape child : ((ContainerShape) pe).getChildren()) {
-				PictogramElement childPe = getPeFromIdentifier(child, id);
+				PictogramElement childPe = findPeFromIdentifier(child, id);
 				if (childPe != null) {
 					return childPe;
 				}
