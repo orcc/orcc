@@ -162,13 +162,13 @@ int main (int argc, char **argv) {
         while (optind < argc)
             fprintf(stderr," [%s]", argv[optind++]);
         printf("\n");
-        print_usage();
+        print_usage_orccmap();
         exit(ORCC_ERR_BAD_ARGS);
     }
     if (!nFlag || !iFlag) {
         print_orcc_error(ORCC_ERR_MANDATORY_ARGS);
         printf("\n");
-        print_usage();
+        print_usage_orccmap();
         exit(ORCC_ERR_MANDATORY_ARGS);
     }
 
