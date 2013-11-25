@@ -174,7 +174,7 @@ int sort_actors(actor_t **actors, int nb_actors) {
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : The sorted list:");
         for (i = 0; i < nb_actors; i++) {
-            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tid = %s\tworkload = %d", i, actors[i]->name, actors[i]->workload);
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tid = %s\tworkload = %lf", i, actors[i]->name, actors[i]->workload);
         }
     }
     return ret;
@@ -340,7 +340,7 @@ int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part) {
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Round Robin result");
         for (i = 0; i < network->nb_actors; i++) {
-            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %d\tprocessorId = %d",
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %lf\tprocessorId = %d",
                              i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
         }
     }
