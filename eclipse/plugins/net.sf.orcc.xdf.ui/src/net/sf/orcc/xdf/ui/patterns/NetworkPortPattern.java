@@ -217,7 +217,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 		// provide information to support direct-editing directly
 		// after object creation (must be activated additionally)
-		IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
+		final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
 
 		// Create the container
 		final ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
@@ -295,9 +295,8 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	public boolean layout(ILayoutContext context) {
 		final PictogramElement topLevelPe = context.getPictogramElement();
 
-		final Text txt = (Text) ShapePropertiesManager.findPeFromIdentifier(topLevelPe, LABEL_ID).getGraphicsAlgorithm();
-		final Polygon poly = (Polygon) ShapePropertiesManager.findPeFromIdentifier(topLevelPe, SHAPE_ID)
-				.getGraphicsAlgorithm();
+		final Text txt = (Text) ShapePropertiesManager.findPcFromIdentifier(topLevelPe, LABEL_ID);
+		final Polygon poly = (Polygon) ShapePropertiesManager.findPcFromIdentifier(topLevelPe, SHAPE_ID);
 
 		final int minTxtWidth = XdfUtil.getTextMinWidth(txt);
 		final int newTextWidth = Math.max(minTxtWidth, PORT_WIDTH);
@@ -316,14 +315,14 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	@Override
 	public boolean update(IUpdateContext context) {
-		PictogramElement pe = context.getPictogramElement();
+		final PictogramElement pe = context.getPictogramElement();
 
 		if (!isPatternRoot(pe)) {
 			return false;
 		}
 
-		Text txt = (Text) ShapePropertiesManager.findPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
-		Port port = (Port) getBusinessObjectForPictogramElement(pe);
+		final Text txt = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
+		final Port port = (Port) getBusinessObjectForPictogramElement(pe);
 		txt.setValue(port.getName());
 
 		return true;
@@ -338,7 +337,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	 */
 	public GraphicsAlgorithm getSelectionBorder(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			return ShapePropertiesManager.findPeFromIdentifier(pe, SHAPE_ID).getGraphicsAlgorithm();
+			return (GraphicsAlgorithm) ShapePropertiesManager.findPcFromIdentifier(pe, SHAPE_ID);
 		}
 		return null;
 	}
@@ -357,7 +356,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	public String getNameFromShape(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			Text label = (Text) ShapePropertiesManager.findPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
+			final Text label = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
 			return label.getValue();
 		}
 		return "";

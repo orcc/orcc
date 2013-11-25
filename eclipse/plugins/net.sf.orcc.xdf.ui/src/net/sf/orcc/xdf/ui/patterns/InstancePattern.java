@@ -421,14 +421,14 @@ public class InstancePattern extends AbstractPattern {
 		final int instanceWidth = pe.getGraphicsAlgorithm().getWidth();
 
 		// Update width for label and separator. Position still unchanged
-		final GraphicsAlgorithm label = ShapePropertiesManager.findPeFromIdentifier(pe, LABEL_ID).getGraphicsAlgorithm();
+		final GraphicsAlgorithm label = (GraphicsAlgorithm) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
 		label.setWidth(instanceWidth);
-		final Polyline sep = (Polyline) ShapePropertiesManager.findPeFromIdentifier(pe, SEP_ID).getGraphicsAlgorithm();
+		final Polyline sep = (Polyline) ShapePropertiesManager.findPcFromIdentifier(pe, SEP_ID);
 		sep.getPoints().get(1).setX(instanceWidth);
 
 		{
 			// Inputs area. Position unchanged, size must be updated
-			final Shape portsPe = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, INPUTS_ID);
+			final Shape portsPe = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, INPUTS_ID);
 			final GraphicsAlgorithm portsGa = portsPe.getGraphicsAlgorithm();
 
 			final int newAreaWidth = getPortsAreaMinWidth(portsPe);
@@ -444,7 +444,7 @@ public class InstancePattern extends AbstractPattern {
 
 		{
 			// Outputs area, position and size need to be recalculated
-			final Shape portsPe = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, OUTPUTS_ID);
+			final Shape portsPe = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, OUTPUTS_ID);
 			final GraphicsAlgorithm portsGa = portsPe.getGraphicsAlgorithm();
 
 			final int newAreaWidth = getPortsAreaMinWidth(portsPe);
@@ -528,8 +528,8 @@ public class InstancePattern extends AbstractPattern {
 				.setPropertyValue(pe, REFINEMENT_KEY, entity.eResource().getURI().toPlatformString(true));
 
 		final ContainerShape topLevelShape = (ContainerShape) pe;
-		final ContainerShape inCtrShape = (ContainerShape) ShapePropertiesManager.findPeFromIdentifier(pe, INPUTS_ID);
-		final ContainerShape outCtrShape = (ContainerShape) ShapePropertiesManager.findPeFromIdentifier(pe, OUTPUTS_ID);
+		final ContainerShape inCtrShape = (ContainerShape) ShapePropertiesManager.findPcFromIdentifier(pe, INPUTS_ID);
+		final ContainerShape outCtrShape = (ContainerShape) ShapePropertiesManager.findPcFromIdentifier(pe, OUTPUTS_ID);
 
 		// Clean inputs & outputs ports text
 		List<Shape> portsTxts = new ArrayList<Shape>(inCtrShape.getChildren());
@@ -580,7 +580,7 @@ public class InstancePattern extends AbstractPattern {
 		final IGaService gaService = Graphiti.getGaService();
 
 		final ContainerShape portsCtrShape = (ContainerShape) (portType == PortsType.INPUTS ? ShapePropertiesManager
-				.findPeFromIdentifier(topLevelShape, INPUTS_ID) : ShapePropertiesManager.findPeFromIdentifier(
+				.findPcFromIdentifier(topLevelShape, INPUTS_ID) : ShapePropertiesManager.findPcFromIdentifier(
 				topLevelShape, OUTPUTS_ID));
 
 		final int currentAreaWidth = portsCtrShape.getGraphicsAlgorithm().getWidth();
@@ -661,8 +661,8 @@ public class InstancePattern extends AbstractPattern {
 			return -1;
 		}
 
-		Shape inArea = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, INPUTS_ID);
-		Shape outArea = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, OUTPUTS_ID);
+		Shape inArea = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, INPUTS_ID);
+		Shape outArea = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, OUTPUTS_ID);
 
 		int portsAreaMinHeight = Math.max(getPortsAreaMinHeight(inArea), getPortsAreaMinHeight(outArea));
 		int newHeight = LABEL_HEIGHT + SEPARATOR + portsAreaMinHeight;
@@ -686,8 +686,8 @@ public class InstancePattern extends AbstractPattern {
 			return -1;
 		}
 
-		Shape inArea = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, INPUTS_ID);
-		Shape outArea = (Shape) ShapePropertiesManager.findPeFromIdentifier(pe, OUTPUTS_ID);
+		Shape inArea = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, INPUTS_ID);
+		Shape outArea = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, OUTPUTS_ID);
 
 		return getPortsAreaMinWidth(inArea) + getPortsAreaMinWidth(outArea) + PORTS_AREAS_SPACE + 2
 				* (PORT_SIDE_WITH + PORT_MARGIN);
@@ -772,8 +772,7 @@ public class InstancePattern extends AbstractPattern {
 	 */
 	public String getNameFromShape(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			final PictogramElement txtShape = ShapePropertiesManager.findPeFromIdentifier(pe, LABEL_ID);
-			final Text text = (Text) txtShape.getGraphicsAlgorithm();
+			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
 			return text.getValue();
 		}
 		return "";
