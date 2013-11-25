@@ -48,6 +48,7 @@ import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.func.IDirectEditing;
+import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
@@ -58,7 +59,6 @@ import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
@@ -89,7 +89,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	@Override
 	abstract public String getCreateName();
 
-	abstract protected Polygon getPortPolygon(Shape shape, IGaService gaService);
+	abstract protected Polygon getPortPolygon(final GraphicsAlgorithmContainer shape, final IGaService gaService);
 
 	abstract protected String getPortIdentifier();
 
@@ -221,39 +221,35 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 		// Create the container
 		final ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
+		// The main container is an invisible rectangle
 		final Rectangle topLevelInvisibleRect = gaService.createInvisibleRectangle(containerShape);
-		{
-			Shape shape = peCreateService.createShape(containerShape, false);
-			ShapePropertiesManager.setIdentifier(shape, SHAPE_ID);
-			
-			/* Polygon polygon = */getPortPolygon(shape, gaService);
 
-			link(shape, addedDomainObject);
+		// Draw the port according to its direction
+		final Polygon polygon = getPortPolygon(topLevelInvisibleRect, gaService);
+		ShapePropertiesManager.setIdentifier(polygon, SHAPE_ID);
+
+		// Add the label of the port
+		final Text text = gaService.createPlainText(topLevelInvisibleRect);
+		ShapePropertiesManager.setIdentifier(text, LABEL_ID);
+
+		// Configure text properties
+		text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+		text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+		text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
+
+		// We define an arbitrary width to text, allowing user to see chars
+		// when first direct editing port name
+		gaService.setLocationAndSize(text, 0, PORT_HEIGHT + TEXT_PORT_SPACE, TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT);
+
+		// Initialize the port if domain object already exists
+		if (addedDomainObject.getName() != null) {
+			text.setValue(addedDomainObject.getName());
 		}
 
-		{
-			Shape shape = peCreateService.createShape(containerShape, false);
-			final Text text = gaService.createPlainText(shape);
-			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-			text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
-			text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
-			// We define an arbitrary width to text, allowing user to see chars
-			// when first direct editing port name
-			gaService.setLocationAndSize(text, 0, PORT_HEIGHT + TEXT_PORT_SPACE, TEXT_DEFAULT_WIDTH,
-					TEXT_DEFAULT_HEIGHT);
-
-			if (addedDomainObject.getName() != null) {
-				text.setValue(addedDomainObject.getName());
-			}
-
-			ShapePropertiesManager.setIdentifier(shape, LABEL_ID);
-			link(shape, addedDomainObject);
-
-			// set shape and graphics algorithm where the editor for
-			// direct editing shall be opened after object creation
-			directEditingInfo.setPictogramElement(shape);
-			directEditingInfo.setGraphicsAlgorithm(text);
-		}
+		// set shape and graphics algorithm where the editor for
+		// direct editing shall be opened after object creation
+		directEditingInfo.setPictogramElement(containerShape);
+		directEditingInfo.setGraphicsAlgorithm(text);
 
 		directEditingInfo.setMainPictogramElement(containerShape);
 		ShapePropertiesManager.setIdentifier(containerShape, getPortIdentifier());
@@ -263,8 +259,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		peCreateService.createChopboxAnchor(containerShape);
 
 		gaService.setLocationAndSize(topLevelInvisibleRect, context.getX(), context.getY(),
-				Math.max(TEXT_DEFAULT_WIDTH, PORT_WIDTH), PORT_HEIGHT
-				+ TEXT_PORT_SPACE + TEXT_DEFAULT_HEIGHT);
+				Math.max(TEXT_DEFAULT_WIDTH, PORT_WIDTH), PORT_HEIGHT + TEXT_PORT_SPACE + TEXT_DEFAULT_HEIGHT);
 		layoutPictogramElement(containerShape);
 
 		return containerShape;

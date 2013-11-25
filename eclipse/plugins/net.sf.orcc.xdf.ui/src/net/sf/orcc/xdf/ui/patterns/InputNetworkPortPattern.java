@@ -33,8 +33,8 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
-import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.IGaService;
 
 /**
@@ -53,7 +53,7 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 	}
 
 	@Override
-	public boolean isMainBusinessObjectApplicable(Object obj) {
+	public boolean isMainBusinessObjectApplicable(final Object obj) {
 		if (obj instanceof Port) {
 			return XdfUtil.isInputNetworkPort((Port) obj);
 		}
@@ -66,9 +66,9 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 	}
 
 	@Override
-	protected Polygon getPortPolygon(Shape shape, IGaService gaService) {
-		int[] points = { 0, PORT_HEIGHT / 2, PORT_WIDTH, 0, PORT_WIDTH, PORT_HEIGHT };
-		Polygon polygon = gaService.createPlainPolygon(shape, points);
+	protected Polygon getPortPolygon(final GraphicsAlgorithmContainer shape, final IGaService gaService) {
+		final int[] points = { 0, PORT_HEIGHT / 2, PORT_WIDTH, 0, PORT_WIDTH, PORT_HEIGHT };
+		final Polygon polygon = gaService.createPlainPolygon(shape, points);
 		polygon.setStyle(StyleUtil.getStyleForInputPort(getDiagram()));
 		return polygon;
 	}
@@ -79,7 +79,7 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 	}
 
 	@Override
-	protected void addPortToNetwork(Port port, Network network) {
+	protected void addPortToNetwork(final Port port, final Network network) {
 		network.addInput(port);
 	}
 }
