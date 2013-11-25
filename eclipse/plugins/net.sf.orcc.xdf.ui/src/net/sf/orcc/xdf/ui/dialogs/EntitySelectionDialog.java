@@ -42,6 +42,8 @@ import net.sf.orcc.xdf.ui.Activator;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -79,90 +81,83 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 		}
 	};
 
-	private static final String SETTINGS = EntitySelectionDialog.class
-			.getCanonicalName();
+	private class EntityListLabelProvider implements ILabelProvider {
 
-	private List<EObject> objects;
-	private ResourceSet emfResourceSet;
+		List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
+
+		@Override
+		public void removeListener(ILabelProviderListener listener) {
+			listeners.remove(listener);
+		}
+
+		@Override
+		public boolean isLabelProperty(Object element, String property) {
+			return false;
+		}
+
+		@Override
+		public void dispose() {
+		}
+
+		@Override
+		public void addListener(ILabelProviderListener listener) {
+			listeners.add(listener);
+		}
+
+		@Override
+		public String getText(Object element) {
+			String result = "null";
+			if (element instanceof EObject) {
+				EObject obj = (EObject) element;
+				if (obj.eClass().equals(DfPackage.eINSTANCE.getActor())) {
+					result = ((Actor) obj).getName();
+				} else if (obj.eClass().equals(DfPackage.eINSTANCE.getNetwork())) {
+					result = ((Network) obj).getName();
+				}
+			} else {
+				result = "BAD TYPE: " + element;
+			}
+			return result;
+		}
+
+		@Override
+		public Image getImage(Object element) {
+			if (element instanceof EObject) {
+				EObject obj = (EObject) element;
+				if (obj.eClass().equals(DfPackage.eINSTANCE.getActor())) {
+					return OrccUiActivator.getImage("icons/orcc.png");
+				} else if (obj.eClass().equals(DfPackage.eINSTANCE.getNetwork())) {
+					return OrccUiActivator.getImage("icons/network.gif");
+				}
+			}
+			return null;
+		}
+	};
+
+	private static final String SETTINGS = EntitySelectionDialog.class.getCanonicalName();
+
+	private final List<EObject> objects;
+	private final static ResourceSet emfResourceSet = new ResourceSetImpl();
 
 	/**
 	 * @param shell
 	 * @param multi
 	 * @throws CoreException
 	 */
-	public EntitySelectionDialog(Shell shell, IProject project)
-			throws CoreException {
+	public EntitySelectionDialog(Shell shell, IProject project) throws CoreException {
 		super(shell);
 
-		initializeLabelProviders();
+		setListLabelProvider(new EntityListLabelProvider());
 
 		objects = new ArrayList<EObject>();
-		emfResourceSet = new ResourceSetImpl();
 
 		// Compute the list of all source and ouput folders
-		List<IFolder> searchFolders = OrccUtil.getAllSourceFolders(project);
+		final List<IFolder> searchFolders = OrccUtil.getAllSourceFolders(project);
 		searchFolders.addAll(OrccUtil.getOutputFolders(project));
 
-		for (IFolder searchFolder : searchFolders) {
+		for (final IFolder searchFolder : searchFolders) {
 			fillEntitiesList(searchFolder);
 		}
-	}
-
-	private void initializeLabelProviders() {
-		setListLabelProvider(new ILabelProvider() {
-
-			List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
-
-			@Override
-			public void removeListener(ILabelProviderListener listener) {
-				listeners.remove(listener);
-			}
-
-			@Override
-			public boolean isLabelProperty(Object element, String property) {
-				return false;
-			}
-
-			@Override
-			public void dispose() {
-			}
-
-			@Override
-			public void addListener(ILabelProviderListener listener) {
-				listeners.add(listener);
-			}
-
-			@Override
-			public String getText(Object element) {
-				String result = "null";
-				if (element instanceof EObject) {
-					EObject obj = (EObject) element;
-					if (obj.eClass().equals(DfPackage.eINSTANCE.getActor())) {
-						result = ((Actor) obj).getName();
-					} else if (obj.eClass().equals(
-							DfPackage.eINSTANCE.getNetwork())) {
-						result = ((Network) obj).getName();
-					}
-				} else {
-					result = "BAD TYPE: " + element;
-				}
-				return result;
-			}
-
-			@Override
-			public Image getImage(Object element) {
-				if (element instanceof EObject) {
-					EObject obj = (EObject) element;
-					if (obj.eClass().equals(DfPackage.eINSTANCE.getActor())) {
-						return OrccUiActivator.getImage("icons/orcc.png");
-					} else if (obj.eClass().equals(
-							DfPackage.eINSTANCE.getNetwork())) {
-						return OrccUiActivator.getImage("icons/network.gif");
-					}
-				}
-				return null;
-			}
-		});
 	}
 
 	@Override
@@ -172,12 +167,10 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 
 	@Override
 	protected IDialogSettings getDialogSettings() {
-		IDialogSettings settings = Activator.getDefault().getDialogSettings()
-				.getSection(SETTINGS);
+		IDialogSettings settings = Activator.getDefault().getDialogSettings().getSection(SETTINGS);
 
 		if (settings == null) {
-			settings = Activator.getDefault().getDialogSettings()
-					.addNewSection(SETTINGS);
+			settings = Activator.getDefault().getDialogSettings().addNewSection(SETTINGS);
 		}
 		return settings;
 	}
@@ -204,9 +197,8 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 	}
 
 	@Override
-	protected void fillContentProvider(AbstractContentProvider contentProvider,
-			ItemsFilter itemsFilter, IProgressMonitor monitor)
-			throws CoreException {
+	protected void fillContentProvider(AbstractContentProvider contentProvider, ItemsFilter itemsFilter,
+			IProgressMonitor monitor) throws CoreException {
 
 		monitor.beginTask("Searching", objects.size());
 		for (EObject obj : objects) {
@@ -238,28 +230,44 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 	 * @throws CoreException
 	 */
 	private void fillEntitiesList(IFolder folder) throws CoreException {
+
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
 		for (IResource resource : folder.members()) {
 			if (resource.getType() == IResource.FOLDER) {
 				fillEntitiesList((IFolder) resource);
 			} else if (resource.getType() == IResource.FILE) {
-				String suffix = resource.getFullPath().getFileExtension();
-
+				final String suffix = resource.getFileExtension();
 				// Wee keep only cal Actors/Units and xdf networks
-				if (!"ir".equals(suffix) & !"xdf".equals(suffix)) {
+				if (!"ir".equals(suffix) && !"xdf".equals(suffix)) {
 					continue;
 				}
 
-				URI uri = URI.createPlatformResourceURI(resource.getFullPath()
-						.toString(), true);
+				final URI uri = URI.createPlatformResourceURI(resource.getFullPath().toString(), true);
 
-				Resource emfRes = emfResourceSet.getResource(uri, true);
-				// Do not try to read for invalid or empty files
-				if (emfRes.getContents().size() == 0) {
+				if (!root.exists(resource.getFullPath())) {
 					continue;
 				}
-				EObject eobject = emfRes.getContents().get(0);
 
-				EClass classz = eobject.eClass();
+				EObject eobject = null;
+				try {
+					// FIXME: if a Network has to be updated, it will not be
+					// stored to the final list
+					final Resource emfRes = emfResourceSet.getResource(uri, true);
+
+					// Do not try to read for invalid or empty files
+					if (emfRes == null || emfRes.getContents().size() == 0) {
+						continue;
+					}
+					eobject = emfRes.getContents().get(0);
+					if (eobject == null) {
+						continue;
+					}
+				} catch (NullPointerException e) {
+					continue;
+				}
+
+				final EClass classz = eobject.eClass();
 				if (classz == null) {
 					continue;
 				}
