@@ -150,11 +150,17 @@ public class XdfUtil {
 		return -1;
 	}
 
-	public static boolean isInputPort(Port port) {
+	/**
+	 * Check if the given port is contained in a Network in its inputs.
+	 * 
+	 * @param port
+	 * @return
+	 */
+	public static boolean isInputNetworkPort(final Port port) {
 		final Graph graph = port.getGraph();
 		if (graph != null && graph instanceof Network) {
-			Network network = (Network) graph;
-			for (Port p : network.getInputs()) {
+			final Network network = (Network) graph;
+			for (final Port p : network.getInputs()) {
 				if (p == port) {
 					return true;
 				}
@@ -163,11 +169,17 @@ public class XdfUtil {
 		return false;
 	}
 
-	public static boolean isOutputPort(Port port) {
+	/**
+	 * Check if the given port is contained in a Network in its outputs.
+	 * 
+	 * @param port
+	 * @return
+	 */
+	public static boolean isOutputNetworkPort(final Port port) {
 		final Graph graph = port.getGraph();
 		if (graph != null && graph instanceof Network) {
-			Network network = (Network) graph;
-			for (Port p : network.getOutputs()) {
+			final Network network = (Network) graph;
+			for (final Port p : network.getOutputs()) {
 				if (p == port) {
 					return true;
 				}

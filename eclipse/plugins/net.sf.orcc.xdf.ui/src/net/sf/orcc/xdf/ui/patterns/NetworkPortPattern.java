@@ -101,7 +101,15 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	}
 
 	@Override
-	protected boolean isPatternControlled(PictogramElement pictogramElement) {
+	protected boolean isPatternControlled(PictogramElement pe) {
+		final String identifier = ShapePropertiesManager.getIdentifier(pe);
+		final String[] validIds = { getPortIdentifier(), SHAPE_ID, LABEL_ID };
+		for (final String e : validIds) {
+			if (e.equals(identifier)) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 

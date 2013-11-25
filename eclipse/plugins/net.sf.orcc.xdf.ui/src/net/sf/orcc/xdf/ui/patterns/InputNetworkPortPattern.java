@@ -55,7 +55,7 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 	@Override
 	public boolean isMainBusinessObjectApplicable(Object obj) {
 		if (obj instanceof Port) {
-			return XdfUtil.isInputPort((Port) obj);
+			return XdfUtil.isInputNetworkPort((Port) obj);
 		}
 		return false;
 	}
