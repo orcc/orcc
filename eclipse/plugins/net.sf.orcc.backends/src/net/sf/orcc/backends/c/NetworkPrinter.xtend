@@ -175,7 +175,7 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the actors array
 		
 		«FOR child : network.children»
-			actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, 0, 0.0};			
+			actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, 0, «network.children.indexOf(child)», 1.0};			
 		«ENDFOR»
 		
 		actor_t *actors[] = {
