@@ -76,3 +76,21 @@ void reset_profiling(network_t *network) {
         network->connections[i]->workload = 1;
     }
 }
+
+void normalize_workload(network_t *network) {
+    int i;
+    double sum_actor_loads = 0;
+    double sum_conn_loads = 0;
+    for (i = 0; i < network->nb_actors; i++) {
+        sum_actor_loads += network->actors[i]->workload;
+    }
+    for (i = 0; i < network->nb_connections; i++) {
+        sum_conn_loads += network->connections[i]->workload;
+    }
+    for (i = 0; i < network->nb_actors; i++) {
+        network->actors[i]->workload = (network->actors[i]->workload / sum_actor_loads * 10000) + 1;
+    }
+    for (i = 0; i < network->nb_connections; i++) {
+        network->connections[i]->workload = (network->connections[i]->workload / sum_conn_loads * 10000) + 1;
+    }
+}

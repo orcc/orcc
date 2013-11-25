@@ -398,6 +398,7 @@ void *agent_routine(void *data) {
 
         printf("\nRemap...\n\n");
 
+        normalize_workload(agent->network);
         do_mapping(agent->network, agent->options, agent->mapping);
         apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);
 

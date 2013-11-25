@@ -83,4 +83,6 @@ void reset_profiling(network_t *network);
 
 network_t* allocate_network(int nb_actors, int nb_connections);
 
+void normalize_workload(network_t *network);
+
 #endif
