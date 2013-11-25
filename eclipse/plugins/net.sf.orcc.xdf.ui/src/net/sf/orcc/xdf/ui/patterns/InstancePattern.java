@@ -147,18 +147,13 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	protected boolean isPatternControlled(PictogramElement pe) {
 
-		// If PE is one of the objects with a defined ID
-		if (ShapePropertiesManager.isPatternControlled(pe)) {
-			return true;
+		final String identifier = ShapePropertiesManager.getIdentifier(pe);
+		final String[] validIds = { INSTANCE_ID, LABEL_ID, SEP_ID, INPUTS_ID, OUTPUTS_ID };
+		for (final String e : validIds) {
+			if(e.equals(identifier)) {
+				return true;
+			}
 		}
-
-		// Port squares and texts are not directly identified, but texts are
-		// contained in OUTPUTS_ID or INPUTSS_ID and squares ports are contained
-		// in the top level shape
-		if (ShapePropertiesManager.isPatternControlled((PictogramElement) pe.eContainer())) {
-			return true;
-		}
-
 		return false;
 	}
 

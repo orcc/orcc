@@ -28,11 +28,6 @@
  */
 package net.sf.orcc.xdf.ui.util;
 
-import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
-import net.sf.orcc.xdf.ui.patterns.InstancePattern;
-import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
-
-import org.eclipse.graphiti.mm.Property;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -46,28 +41,14 @@ import org.eclipse.graphiti.services.Graphiti;
  */
 public class ShapePropertiesManager {
 
-	private static String PROPERTY_ID = "XDF_ID";
+	private static String IDENTIFIER_KEY = "XDF_ID";
 
-	private static String[] validIdentifiers = { InstancePattern.INSTANCE_ID, InputNetworkPortPattern.INOUT_ID,
-			OutputNetworkPortPattern.INOUT_ID };
-
-	/**
-	 * Check if the concrete class can manage the given PictogramElement.
-	 * 
-	 * @return true if the given pe is controlled by this class
-	 */
-	public static boolean isPatternControlled(PictogramElement pe) {
-		final String peId = getIdentifier(pe);
-		for (String validId : validIdentifiers) {
-			if (validId.equals(peId)) {
-				return true;
-			}
-		}
-		return false;
-	}
+	private static String DIRECTION_KEY = "SHAPE_DIRECTION";
+	private static String INPUT = "input";
+	private static String OUTPUT = "output";
 
 	/**
-	 * Set the given id as an identifier to the given pe
+	 * Set the given id as identifier to the given pe
 	 * 
 	 * @param pe
 	 *            The PictogramElement
@@ -75,7 +56,7 @@ public class ShapePropertiesManager {
 	 *            The value of the identifier to set on given pe
 	 */
 	public static void setIdentifier(PictogramElement pe, String id) {
-		Graphiti.getPeService().setPropertyValue(pe, PROPERTY_ID, id);
+		Graphiti.getPeService().setPropertyValue(pe, IDENTIFIER_KEY, id);
 	}
 
 	/**
@@ -85,12 +66,7 @@ public class ShapePropertiesManager {
 	 * @return The identifier, or null if the given pe has no identifier set
 	 */
 	public static String getIdentifier(PictogramElement pe) {
-		Property property = Graphiti.getPeService().getProperty(pe, PROPERTY_ID);
-		if (property == null) {
-			return null;
-		} else {
-			return property.getValue();
-		}
+		return Graphiti.getPeService().getPropertyValue(pe, IDENTIFIER_KEY);
 	}
 
 	/**
@@ -122,7 +98,7 @@ public class ShapePropertiesManager {
 
 		if (pe instanceof ContainerShape) {
 			for (Shape child : ((ContainerShape) pe).getChildren()) {
-				PictogramElement childPe = findPeFromIdentifier(child, id);
+				final PictogramElement childPe = findPeFromIdentifier(child, id);
 				if (childPe != null) {
 					return childPe;
 				}
@@ -131,4 +107,19 @@ public class ShapePropertiesManager {
 
 		return null;
 	}
+
+	public static void setInput(PictogramElement pe) {
+		Graphiti.getPeService().setPropertyValue(pe, DIRECTION_KEY, INPUT);
+	}
+	public static boolean isInput(PictogramElement pe) {
+		return INPUT.equals(Graphiti.getPeService().getPropertyValue(pe, DIRECTION_KEY));
+	}
+
+	public static void setOutput(PictogramElement pe) {
+		Graphiti.getPeService().setPropertyValue(pe, DIRECTION_KEY, OUTPUT);
+	}
+	public static boolean isOutput(PictogramElement pe) {
+		return OUTPUT.equals(Graphiti.getPeService().getPropertyValue(pe, DIRECTION_KEY));
+	}
+
 }
