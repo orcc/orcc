@@ -159,13 +159,13 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
-		return ShapePropertiesManager.isExpectedPe(pe, INSTANCE_ID);
+		return ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID);
 	}
 
 	@Override
 	public boolean canDirectEdit(IDirectEditingContext context) {
 		boolean isText = context.getGraphicsAlgorithm() instanceof Text;
-		return isText && ShapePropertiesManager.isExpectedPe(context.getPictogramElement(), LABEL_ID);
+		return isText && ShapePropertiesManager.isExpectedPc(context.getPictogramElement(), LABEL_ID);
 	}
 
 	@Override
@@ -358,7 +358,7 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	public boolean canResizeShape(IResizeShapeContext context) {
 
-		if (!ShapePropertiesManager.isExpectedPe(context.getPictogramElement(), INSTANCE_ID)) {
+		if (!ShapePropertiesManager.isExpectedPc(context.getPictogramElement(), INSTANCE_ID)) {
 			return false;
 		}
 		// Resize is always Ok for Instance. New size is set to minimal value
@@ -477,7 +477,7 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	public IReason updateNeeded(IUpdateContext context) {
 		final PictogramElement pe = context.getPictogramElement();
-		if (ShapePropertiesManager.isExpectedPe(pe, LABEL_ID)) {
+		if (ShapePropertiesManager.isExpectedPc(pe, LABEL_ID)) {
 			Text txt = (Text) pe.getGraphicsAlgorithm();
 			Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
 			if (!txt.getValue().equals(instance.getName())) {
@@ -492,7 +492,7 @@ public class InstancePattern extends AbstractPattern {
 	public boolean update(IUpdateContext context) {
 		PictogramElement pe = context.getPictogramElement();
 
-		if (ShapePropertiesManager.isExpectedPe(pe, LABEL_ID)) {
+		if (ShapePropertiesManager.isExpectedPc(pe, LABEL_ID)) {
 			Shape shape = (Shape) pe;
 			Instance instance = (Instance) getBusinessObjectForPictogramElement(shape);
 
@@ -637,7 +637,7 @@ public class InstancePattern extends AbstractPattern {
 	 *            The instance pictogram element
 	 */
 	private void resizeShapeToMinimal(PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPe(pe, INSTANCE_ID)) {
+		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
 			return;
 		}
 
@@ -657,7 +657,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @return The height as integer
 	 */
 	private int getInstanceMinHeight(PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPe(pe, INSTANCE_ID)) {
+		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
 			return -1;
 		}
 
@@ -682,7 +682,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @return The width as integer
 	 */
 	private int getInstanceMinWidth(PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPe(pe, INSTANCE_ID)) {
+		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
 			return -1;
 		}
 
@@ -706,7 +706,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @return The height as integer
 	 */
 	private int getPortsAreaMinHeight(PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPe(pe, INPUTS_ID) && !ShapePropertiesManager.isExpectedPe(pe, OUTPUTS_ID)) {
+		if (!ShapePropertiesManager.isExpectedPc(pe, INPUTS_ID) && !ShapePropertiesManager.isExpectedPc(pe, OUTPUTS_ID)) {
 			return -1;
 		}
 
@@ -743,7 +743,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @return The width as integer
 	 */
 	private int getPortsAreaMinWidth(PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPe(pe, INPUTS_ID) && !ShapePropertiesManager.isExpectedPe(pe, OUTPUTS_ID)) {
+		if (!ShapePropertiesManager.isExpectedPc(pe, INPUTS_ID) && !ShapePropertiesManager.isExpectedPc(pe, OUTPUTS_ID)) {
 			return -1;
 		}
 

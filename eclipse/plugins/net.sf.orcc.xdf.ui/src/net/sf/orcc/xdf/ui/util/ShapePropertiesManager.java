@@ -80,7 +80,7 @@ public class ShapePropertiesManager {
 	 *            The identifier to check
 	 * @return true if the given pe identifier is equals to the given id value
 	 */
-	public static boolean isExpectedPe(final PropertyContainer pc, final String id) {
+	public static boolean isExpectedPc(final PropertyContainer pc, final String id) {
 		return id.equals(getIdentifier(pc));
 	}
 
@@ -97,7 +97,7 @@ public class ShapePropertiesManager {
 	 */
 	public static PropertyContainer findPcFromIdentifier(final PictogramElement pe, final String id) {
 
-		if (isExpectedPe(pe, id)) {
+		if (isExpectedPc(pe, id)) {
 			return pe;
 		}
 
@@ -131,7 +131,7 @@ public class ShapePropertiesManager {
 	 */
 	public static PropertyContainer findPcFromIdentifier(final GraphicsAlgorithm ga, final String id) {
 
-		if (isExpectedPe(ga, id)) {
+		if (isExpectedPc(ga, id)) {
 			return ga;
 		}
 

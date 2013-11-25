@@ -97,7 +97,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
-		return ShapePropertiesManager.isExpectedPe(pe, getPortIdentifier());
+		return ShapePropertiesManager.isExpectedPc(pe, getPortIdentifier());
 	}
 
 	@Override
