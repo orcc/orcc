@@ -97,13 +97,13 @@ public class BroadcastAdder extends DfSwitch<Void> {
 	public Void casePort(Port port) {
 		List<Edge> connections = new ArrayList<Edge>(port.getOutgoing());
 		if (connections.size() > 1) {
-			createBroadcast(network.getSimpleName(), port, connections, "copy");
+			createBroadcast(network.getSimpleName(), port, connections);
 		}
 		return null;
 	}
 
 	protected void createBroadcast(String id, Port port,
-			List<? extends Edge> outList, String actionName) {
+			List<? extends Edge> outList) {
 
 		// Add broadcast vertex
 		Actor bcast = dfFactory.createActor();
@@ -154,7 +154,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		}
 
 		// Create body of the broadcast
-		Procedure body = irFactory.createProcedure(actionName, 0,
+		Procedure body = irFactory.createProcedure("copy", 0,
 				irFactory.createTypeVoid());
 		Var tmpVar = body.newTempLocalVariable(IrUtil.copy(port.getType()),
 				"tmp");
@@ -168,12 +168,12 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		}
 
 		// Create the scheduler
-		Procedure scheduler = irFactory.createProcedure("isSchedulable_" + actionName,
+		Procedure scheduler = irFactory.createProcedure("isSchedulable_copy",
 				0, irFactory.createTypeBool());
 		BlockBasic block2 = IrUtil.getLast(scheduler.getBlocks());
 		block2.add(irFactory.createInstReturn(irFactory.createExprBool(true)));
 
-		Action copy = dfFactory.createAction(actionName, inputPattern,
+		Action copy = dfFactory.createAction("copy", inputPattern,
 				outputPattern, dfFactory.createPattern(), scheduler, body);
 
 		bcast.getActions().add(copy);
@@ -186,7 +186,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		for (Port srcPort : outMap.keySet()) {
 			List<Connection> outList = outMap.get(srcPort);
 			if (outList.size() > 1) {
-				createBroadcast(entity.getSimpleName(), srcPort, outList, "copy");
+				createBroadcast(entity.getSimpleName(), srcPort, outList);
 			}
 		}
 	}
