@@ -11,6 +11,7 @@ import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
+import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
@@ -44,7 +45,7 @@ public class DALBackend extends CBackend {
 		new NetworkFlattener().doSwitch(network);
 
 		OrccLogger.traceln("Adding broadcasts...");
-		new DALBroadcastAdder().doSwitch(network);
+		new BroadcastAdder().doSwitch(network);
 
 		OrccLogger.traceln("Instantiating actors...");
 		new Instantiator(true, fifoSize).doSwitch(network);
