@@ -62,6 +62,9 @@ public class DALBackend extends CBackend {
 		}
 
 		new ArgumentEvaluator().doSwitch(network);
+		
+		KPNValidator validator = new KPNValidator();
+		validator.validate(network);
 	}
 
 	@Override
