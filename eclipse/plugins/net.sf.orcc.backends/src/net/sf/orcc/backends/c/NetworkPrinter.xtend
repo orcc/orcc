@@ -269,7 +269,7 @@ class NetworkPrinter extends CTemplate {
 				thread_create(thread_agent, agent_routine, *agent, thread_agent_id);
 			«ENDIF»
 			
-			for(i=0 ; i < mapping->number_of_threads; i++){
+			for(i=0 ; i < nb_threads; i++){
 				thread_join(threads[i]);
 			}
 			«IF dynamicMapping»
