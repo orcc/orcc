@@ -104,7 +104,7 @@ mapping_t* map_actors(network_t *network) {
 void print_load_balancing(mapping_t *mapping) {
     assert(mapping != NULL);
     int i, j, nb_proc = 0;
-    double totalWeight = 0, avgWeight = 0, maxWeight = 0, partWeight = 0;
+    int totalWeight = 0, avgWeight = 0, maxWeight = 0, partWeight = 0;
 
     for (i = 0; i < mapping->number_of_threads; i++) {
         partWeight = 0;
@@ -114,14 +114,14 @@ void print_load_balancing(mapping_t *mapping) {
             nb_proc++;
         }
 
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "Weight of partition %d : %.2lf", i+1, partWeight);
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "Weight of partition %d : %d", i+1, partWeight);
         if (maxWeight < partWeight)
             maxWeight = partWeight;
     }
 
     avgWeight = (totalWeight / mapping->number_of_threads);
-    print_orcc_trace(ORCC_VL_VERBOSE_2, "Average weight: %.2lf   Max weight: %.2lf", avgWeight, maxWeight);
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "Load balancing %.2lf", maxWeight/avgWeight);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "Average weight: %d   Max weight: %d", avgWeight, maxWeight);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Load balancing %d", maxWeight/avgWeight);
 }
 
 void print_edge_cut(network_t *network) {
@@ -176,7 +176,7 @@ int sort_actors(actor_t **actors, int nb_actors) {
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : The sorted list:");
         for (i = 0; i < nb_actors; i++) {
-            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tid = %s\tworkload = %lf", i, actors[i]->name, actors[i]->workload);
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tid = %s\tworkload = %d", i, actors[i]->name, actors[i]->workload);
         }
     }
     return ret;
@@ -342,7 +342,7 @@ int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part) {
     if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Round Robin result");
         for (i = 0; i < network->nb_actors; i++) {
-            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %lf\tprocessorId = %d",
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %d\tprocessorId = %d",
                              i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
         }
     }
