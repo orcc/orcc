@@ -63,13 +63,13 @@ public class KPNValidator {
 			if (second.getNumTokensMap().get(port) != null) {
 				int secondTokenRate = second.getNumTokensMap().get(port);
 				if (firstTokenRate != secondTokenRate) {
-					OrccLogger.traceln("Warning: (" + actor.getName() + ") actions '" + firstAction.getName() + "' and '" + secondAction.getName() + "'");
-					OrccLogger.traceln("         have different token rate for port '" + port.getName() + "' Application may deadlock.");
+					OrccLogger.warnln("(" + actor.getName() + ") actions '" + firstAction.getName() + "' and '" + secondAction.getName() +
+							"'\n have different token rate for port '" + port.getName() + "' Application may deadlock.");
 				}
 			} else {
 				if (second.getNumTokensMap().size() > 0) {
-					OrccLogger.traceln("Warning: (" + actor.getName() + ") action '" + firstAction.getName() + "' reads port '"  + port.getName() + "'");
-					OrccLogger.traceln("         but action '"+ secondAction.getName() + "' does not. Application may deadlock.");
+					OrccLogger.warnln("(" + actor.getName() + ") action '" + firstAction.getName() + "' reads port '"  + port.getName() +
+							"'\n but action '"+ secondAction.getName() + "' does not. Application may deadlock.");
 				}
 			}
 		}
