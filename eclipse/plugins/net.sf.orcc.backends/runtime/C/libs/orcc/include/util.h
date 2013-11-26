@@ -64,11 +64,17 @@ extern int nbLoops;
 // Number of frames to display before closing application
 extern int nbFrames;
 
+// Number of frames to display before remapping application
+extern int nbProfiledFrames;
+
 // Number of executing threads to create
 extern int nbThreads;
 
 // Strategy for the actor mapping
 extern int mapping_strategy;
+
+// Repetition of the actor remapping
+extern int mapping_repetition;
 
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
@@ -86,6 +92,11 @@ void print_usage();
 #define DISPLAY_ENABLE 3
 
 #define DEFAULT_INFINITE -1
+
+#define DEFAULT_NB_PROFILED_FRAMES
+
+#define REMAP_ONCE 0
+#define REMAP_ALWAYS 1
 
 // specific to Microsoft Visual Studio
 // disable warnings about fopen

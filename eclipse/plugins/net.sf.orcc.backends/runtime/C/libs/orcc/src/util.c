@@ -90,12 +90,18 @@ int nbThreads = 1;
 // Strategy for the actor mapping
 int mapping_strategy = 0;
 
+// Number of frames to display before remapping application
+int nbProfiledFrames = 10;
+
+// Repetition of the actor remapping
+int mapping_repetition = REMAP_ONCE;
+
 // Pause function
 void wait_for_key() {
 #ifdef _WIN32
 	printf("Press a key to continue\n");
 	_getch();
-#else
+#elsemapping_repetition
 	#if HAS_TERMIOS
 		// the user has termios.h
 		struct termios oldT, newT;
@@ -146,7 +152,7 @@ static const char *usage =
 	"-l <nb input reading>      Set the number of times the input file is read before closing the application.\n"
     "-g <output file>           Specify an output file for the genetic algorithm.\n"
     "-b <output file>           Specify an output file for instrumention.\n"
-    "-c <nb threads>            Set the number of executing threads to run.\n"
+    "-c <nb threads>            Set the number of execut500ing threads to run.\n"
     "-s <mapping strategy>      Specify the strategy for the actor mapping";
     // We need to document folowing options:
 	//"-w <file>                  TBD...\n"
@@ -161,7 +167,7 @@ void print_usage() {
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-    const char *ostr = "i:no:d:m:f:w:g:l:c:s:b:";
+    const char *ostr = "i:no:d:m:f:w:g:l:r:ac:s:b:";
 	int c;
 
 	program = argv[0];
@@ -198,6 +204,12 @@ void init_orcc(int argc, char *argv[]) {
 		case 'm':
 			mapping_file = strdup(optarg);
 			break;
+        case 'r':
+            nbProfiledFrames = strtoul(optarg, NULL, 10);
+            break;
+        case 'a':
+            mapping_repetition = REMAP_ALWAYS;
+            break;
 		case 'n':
 			display_flags = DISPLAY_DISABLE;
 			break;

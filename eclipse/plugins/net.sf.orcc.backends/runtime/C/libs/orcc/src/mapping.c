@@ -41,6 +41,8 @@
 #include "scheduler.h"
 #include "options.h"
 
+int need_remap = TRUE;
+
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.
  */
@@ -402,8 +404,13 @@ void *agent_routine(void *data) {
         do_mapping(agent->network, agent->options, agent->mapping);
         apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);
 
-        reset_profiling(agent->network);
-        resetMapping();
+        if(mapping_repetition == REMAP_ALWAYS) {
+            reset_profiling(agent->network);
+            resetMapping();
+        } else {
+            need_remap = FALSE;
+        }
+
         // wakeup all threads
         for (i = 0; i < agent->nb_threads; i++) {
             semaphore_set(agent->scheduler->schedulers[i]->sem_thread);
@@ -429,7 +436,7 @@ agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *schedu
 }
 
 int needMapping() {
-    return get_partialNumPicturesDecoded() > 500;
+    return get_partialNumPicturesDecoded() > nbProfiledFrames && need_remap;
 }
 
 void resetMapping() {
