@@ -44,36 +44,36 @@ static av_clip_uint8(int a)
     else           return a;
 }
 
-void put_hevc_qpel_pixel_orcc(i16 _dst[2][3][64*64], u8 listIdx,
-u8 _src[3][71*71], u8 srcstride,
+void put_hevc_qpel_pixel_orcc(i16 _dst[2][64*64], u8 listIdx,
+u8 _src[71*71], u8 srcstride,
 u8 width, u8 height)
 {
 #ifdef OPEN_HEVC_ENABLE
-    u8  *src = &_src[0][3+3*srcstride];
-    i16 *dst = _dst[listIdx][0];
+    u8  *src = &_src[3+3*srcstride];
+    i16 *dst = _dst[listIdx];
 
     ff_hevc_put_hevc_qpel_pixels_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
 #endif
 }
 
-void put_hevc_epel_pixel_orcc(i16 _dst[2][3][64*64], u8 listIdx,
-u8 _src[3][71*71], u8 srcstride,
-u8 width, u8 height, i32 component)
+void put_hevc_epel_pixel_orcc(i16 _dst[2][64*64], u8 listIdx,
+u8 _src[71*71], u8 srcstride,
+u8 width, u8 height)
 {
 #ifdef OPEN_HEVC_ENABLE
-    u8  *src = &_src[component][1+1*srcstride];
-    i16 *dst = _dst[listIdx][component];
+    u8  *src = &_src[1+1*srcstride];
+    i16 *dst = _dst[listIdx];
     ff_hevc_put_hevc_epel_pixels_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
 #endif
 }
 
-void put_hevc_qpel_h_orcc(i16 _dst[2][3][64*64], u8 listIdx,
-u8 _src[3][71*71], u8 srcstride,
+void put_hevc_qpel_h_orcc(i16 _dst[2][64*64], u8 listIdx,
+u8 _src[71*71], u8 srcstride,
 i32 filterIdx,  u8 width, u8 height)
 {
 #ifdef OPEN_HEVC_ENABLE
-    u8  *src = &_src[0][3+3*srcstride];
-    i16 *dst = _dst[listIdx][0];
+    u8  *src = &_src[3+3*srcstride];
+    i16 *dst = _dst[listIdx];
 
     if(filterIdx == 1) {
         ff_hevc_put_hevc_qpel_h_1_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
@@ -85,13 +85,13 @@ i32 filterIdx,  u8 width, u8 height)
 #endif
 }
 
-void put_hevc_qpel_v_orcc(i16 _dst[2][3][64*64], u8 listIdx,
-u8 _src[3][71*71], u8 srcstride,
+void put_hevc_qpel_v_orcc(i16 _dst[2][64*64], u8 listIdx,
+u8 _src[71*71], u8 srcstride,
 i32 filterIdx,  u8 width, u8 height)
 {
 #ifdef OPEN_HEVC_ENABLE
-    u8  *src = &_src[0][3+3*srcstride];
-    i16 *dst = _dst[listIdx][0];
+    u8  *src = &_src[3+3*srcstride];
+    i16 *dst = _dst[listIdx];
 
     if(filterIdx == 1) {
         ff_hevc_put_hevc_qpel_v_1_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
@@ -103,37 +103,37 @@ i32 filterIdx,  u8 width, u8 height)
 #endif
 }
 
-void put_hevc_epel_h_orcc(i16 _dst[2][3][64*64], u8 listIdx,
-u8 _src[3][71*71], u8 srcstride,
-i32 filterIdx,  u8 width, u8 height, i32 component)
+void put_hevc_epel_h_orcc(i16 _dst[2][64*64], u8 listIdx,
+u8 _src[71*71], u8 srcstride,
+i32 filterIdx,  u8 width, u8 height)
 {
 #ifdef OPEN_HEVC_ENABLE
-    u8  *src = &_src[component][1+1*srcstride];
-    i16 *dst = _dst[listIdx][component];
+    u8  *src = &_src[1+1*srcstride];
+    i16 *dst = _dst[listIdx];
 
     ff_hevc_put_hevc_epel_h_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx, 0, 0);
 #endif
 }
 
-void put_hevc_epel_v_orcc(i16 _dst[2][3][64*64], u8 listIdx,
-u8 _src[3][71*71], u8 srcstride,
-i32 filterIdx,  u8 width, u8 height, i32 component)
+void put_hevc_epel_v_orcc(i16 _dst[2][64*64], u8 listIdx,
+u8 _src[71*71], u8 srcstride,
+i32 filterIdx,  u8 width, u8 height)
 {
 #ifdef OPEN_HEVC_ENABLE
-    u8  *src = &_src[component][1+1*srcstride];
-    i16 *dst = _dst[listIdx][component];
+    u8  *src = &_src[1+1*srcstride];
+    i16 *dst = _dst[listIdx];
 
     ff_hevc_put_hevc_epel_v_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0, filterIdx, 0);
 #endif
 }
 
-void put_hevc_qpel_hv_orcc(i16 _dst[2][3][64*64], u8 listIdx,
-u8 _src[3][71*71], u8 srcstride,
+void put_hevc_qpel_hv_orcc(i16 _dst[2][64*64], u8 listIdx,
+u8 _src[71*71], u8 srcstride,
 i32 filterIdx[2],  u8 width, u8 height)
 {
 #ifdef OPEN_HEVC_ENABLE
-    u8  *src = &_src[0][3+ 3*srcstride];
-    i16 *dst = _dst[listIdx][0];
+    u8  *src = &_src[3+ 3*srcstride];
+    i16 *dst = _dst[listIdx];
     DECLARE_ALIGNED(16, i16, mc_buffer[(64 + 7) * 64]);
 
     if(filterIdx[0] == 1) {
@@ -164,36 +164,36 @@ i32 filterIdx[2],  u8 width, u8 height)
 #endif
 }
 
-void put_hevc_epel_hv_orcc(i16 _dst[2][3][64*64], u8 listIdx,
-u8 _src[3][71*71], u8 srcstride,
-i32 filterIdx[2],  u8 width, u8 height, i32 component)
+void put_hevc_epel_hv_orcc(i16 _dst[2][64*64], u8 listIdx,
+u8 _src[71*71], u8 srcstride,
+i32 filterIdx[2],  u8 width, u8 height)
 {
 #ifdef OPEN_HEVC_ENABLE
-    u8  *src = &_src[component][1+1*srcstride];
-    i16 *dst = _dst[listIdx][component];
+    u8  *src = &_src[1+1*srcstride];
+    i16 *dst = _dst[listIdx];
     DECLARE_ALIGNED(16, i16, mc_buffer[(64 + 7) * 64]);
 
     ff_hevc_put_hevc_epel_hv_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1], &mc_buffer);
 #endif
 }
 
-void put_unweighted_pred_orcc(u8 _dst[2][3][64*64], i16 _src[2][3][64*64], u8 width, u8 height, u8 rdList, i32 component)
+void put_unweighted_pred_orcc(u8 _dst[2][64*64], i16 _src[2][64*64], u8 width, u8 height, u8 rdList)
 {
 #ifdef OPEN_HEVC_ENABLE
-    i16 *src = &_src[0][component];
-    u8 *dst = _dst[rdList][component];
+    i16 *src = &_src;
+    u8 *dst = _dst[rdList];
 
     ff_hevc_put_unweighted_pred_8_sse(dst, width + 1, src, width + 1, width + 1, height + 1);
 #endif
 }
 
 
-void put_unweighted_pred_avg_orcc(u8 _dst[2][3][64*64], i16 _src[2][3][64*64], u8 width, u8 height, i32 component)
+void put_unweighted_pred_avg_orcc(u8 _dst[2][64*64], i16 _src[2][64*64], u8 width, u8 height)
 {
 #ifdef OPEN_HEVC_ENABLE
-    i16 *src1 = &_src[0][component][0];
-    i16 *src2 = &_src[1][component][0];
-    u8 *dst = _dst[0][component][0];
+    i16 *src1 = &_src[0];
+    i16 *src2 = &_src[1];
+    u8 *dst = _dst[0];
 
     ff_hevc_put_weighted_pred_avg_8_sse(dst, width + 1, src1, src2, width + 1, width + 1, height + 1);
 #endif
