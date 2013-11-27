@@ -180,8 +180,10 @@ class InstanceCPrinter extends CTemplate {
 		«ENDIF»
 
 		«FOR port : actor.getInputs»
-			«port.createReadOverload»
-			«port.createPeekOverload»
+			«IF (port.hasAttribute("peekPort"))»
+				«port.createReadOverload»
+				«port.createPeekOverload»
+			«ENDIF»
 		«ENDFOR»
 
 		«FOR variable : actor.stateVars»
@@ -617,7 +619,11 @@ class InstanceCPrinter extends CTemplate {
 					«IF load.indexes.head.isExprBinary»					
 						«OrccLogger::warnln("(" + entityName + ")" + " port '" + srcPort.getName() + "' possibly read out-of-order")»
 					«ENDIF»
-					_DAL_read_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
+					«IF (srcPort.hasAttribute("peekPort"))»
+						_DAL_read_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
+					«ELSE»
+						DAL_read((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
+					«ENDIF»
 				«ENDIF»
 			«ELSE»
 				«IF load.source.variable.isGlobal == true && load.source.variable.assignable == true»

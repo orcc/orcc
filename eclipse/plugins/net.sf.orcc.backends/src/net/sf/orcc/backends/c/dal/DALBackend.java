@@ -3,6 +3,7 @@ package net.sf.orcc.backends.c.dal;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
@@ -63,6 +64,8 @@ public class DALBackend extends CBackend {
 		
 		KPNValidator validator = new KPNValidator();
 		validator.validate(network);
+		
+		labelPeekPorts(network);
 	}
 
 	@Override
@@ -96,16 +99,28 @@ public class DALBackend extends CBackend {
 
 	private void enumeratePorts(Network network) {
 		int index = 0;
-		for(Actor actor : network.getAllActors()) {
-			for(Port port : actor.getInputs()) {
+		for (Actor actor : network.getAllActors()) {
+			for (Port port : actor.getInputs()) {
 				port.setNumber(index++);
 			}
-			for(Port port : actor.getOutputs()) {
+			for (Port port : actor.getOutputs()) {
 				port.setNumber(index++);
 			}
 		}
 	}
 
+	private void labelPeekPorts(Network network) {
+		for (Actor actor : network.getAllActors()) {
+			for (Port port : actor.getInputs()) {
+				for (Action action : actor.getActions()) {
+					if (action.getPeekPattern().contains(port)) {
+						port.addAttribute("peekPort");
+					}
+				}
+			}
+		}
+	}
+	
 	@Override
 	protected boolean exportRuntimeLibrary() {
 		return true;
