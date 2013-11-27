@@ -77,7 +77,7 @@ void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
     va_start (args, trace);
 
     if (level <= verbose_level) {
-        printf("\nOrcc : ");
+        printf("\n");
         vprintf(trace, args);
     }
 
