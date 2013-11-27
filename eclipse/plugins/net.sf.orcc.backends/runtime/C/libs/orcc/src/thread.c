@@ -47,7 +47,8 @@ void set_realtime_priority() {
     // struct sched_param is used to store the scheduling priority
     struct sched_param params;
     // We'll set the priority to the maximum.
-    params.sched_priority = sched_get_priority_max(SCHED_FIFO);
+    //params.sched_priority = sched_get_priority_max(SCHED_FIFO);
+    params.sched_priority = 50;
 
     print_orcc_trace(ORCC_VL_VERBOSE_2, "Trying to set thread realtime prio = %d", params.sched_priority);
 
