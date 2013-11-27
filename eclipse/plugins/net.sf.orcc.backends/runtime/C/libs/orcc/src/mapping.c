@@ -231,6 +231,7 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
 
         print_load_balancing(mapping);
         print_edge_cut(network);
+        printf("\n");
     }
 
     free(counter);
@@ -409,6 +410,7 @@ void *agent_routine(void *data) {
             resetMapping();
         } else {
             need_remap = FALSE;
+            fpsPrintInit_mapping();
         }
 
         // wakeup all threads
