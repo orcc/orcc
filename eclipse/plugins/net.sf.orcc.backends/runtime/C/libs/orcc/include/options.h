@@ -32,8 +32,6 @@
 
 #include "orcc.h"
 
-extern verbose_level_et verbose_level;
-
 /*
  * Options for mapping
  */
@@ -60,6 +58,6 @@ void set_nb_processors(char *arg_value, options_t *opt);
 void set_mapping_strategy(char *arg_value, options_t *opt);
 void set_verbose_level(char *arg_value, options_t *opt);
 void set_default_output_filename(char *arg_value, options_t *opt);
-void set_trace_level(verbose_level_et level);
+
 
 #endif  /* _ORCCMAP_OPTIONS_H_ */

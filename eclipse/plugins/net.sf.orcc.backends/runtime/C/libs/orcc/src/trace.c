@@ -33,7 +33,12 @@
 #include <stdlib.h>
 
 #include "trace.h"
-#include "options.h"
+
+verbose_level_et verbose_level = ORCC_VL_QUIET;
+
+void set_trace_level(verbose_level_et level) {
+    verbose_level = level;
+}
 
 /********************************************************************************************
  *

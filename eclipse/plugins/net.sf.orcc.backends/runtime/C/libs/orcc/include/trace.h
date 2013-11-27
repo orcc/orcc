@@ -63,6 +63,10 @@ static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
     "Round Robin"
 };
 
+extern verbose_level_et verbose_level;
+
+void set_trace_level(verbose_level_et level);
+
 /**
  * !TODO
  */
