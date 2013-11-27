@@ -98,12 +98,14 @@ void compute_workloads(network_t *network) {
 
 void print_network(network_t *network) {
     int i;
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Network : ");
     for (i = 0; i < network->nb_actors; i++) {
-        print_orcc_trace(ORCC_VL_VERBOSE_1, "Actor[%d] = %s (workload = %d)",
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "\tActor[%d] = %s (workload = %d)",
                          i, network->actors[i]->name, network->actors[i]->workload);
     }
     for (i = 0; i < network->nb_connections; i++) {
-        print_orcc_trace(ORCC_VL_VERBOSE_1, "Connection[%d] = %s --> %s (workload = %d)",
-                             i, network->connections[i]->src->name, network->connections[i]->dst->name, network->connections[i]->workload);
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "\tConnection[%d] = %s --> %s (workload = %d)",
+                         i, network->connections[i]->src->name, network->connections[i]->dst->name,
+                         network->connections[i]->workload);
     }
 }
