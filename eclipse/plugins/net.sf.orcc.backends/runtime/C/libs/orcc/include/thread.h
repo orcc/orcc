@@ -80,6 +80,7 @@
 	
 #else
 	#include <pthread.h>
+    #include <sched.h>
 	#include <semaphore.h>
 	
 	// Thread
@@ -123,5 +124,7 @@ struct sync_s {
 };
 
 void sync_init(sync_t *sync);
+
+void set_realtime_priority();
 
 #endif

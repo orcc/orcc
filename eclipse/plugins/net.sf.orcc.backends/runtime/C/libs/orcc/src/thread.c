@@ -26,6 +26,10 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
+
+#include <stdio.h>
+
 #include "thread.h"
 
 void sync_init(sync_t *sync) {
@@ -33,6 +37,46 @@ void sync_init(sync_t *sync) {
 	sync->active_sync = 1;
 }
 
+
+void set_realtime_priority() {
+    int ret;
+
+    // We'll operate on the currently running thread.
+    pthread_t this_thread = pthread_self();
+
+    // struct sched_param is used to store the scheduling priority
+    struct sched_param params;
+    // We'll set the priority to the maximum.
+    params.sched_priority = sched_get_priority_max(SCHED_FIFO);
+
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "Trying to set thread realtime prio = %d", params.sched_priority);
+
+    // Attempt to set thread real-time priority to the SCHED_FIFO policy
+    ret = pthread_setschedparam(this_thread, SCHED_FIFO, &params);
+    if (ret != 0) {
+        // Print the error
+        printf("Unsuccessful in setting thread realtime prio\n");
+        return;
+    }
+
+    // Now verify the change in thread priority
+    int policy = 0;
+    ret = pthread_getschedparam(this_thread, &policy, &params);
+    if (ret != 0) {
+        printf("Couldn't retrieve real-time scheduling paramers\n");
+        return;
+    }
+
+    // Check the correct policy was applied
+    if(policy != SCHED_FIFO) {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "Scheduling is NOT SCHED_FIFO!");
+    } else {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "SCHED_FIFO OK");
+    }
+
+    // Print thread scheduling priority
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "Thread priority is %d", params.sched_priority);
+}
 
 
 

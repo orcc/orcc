@@ -303,6 +303,7 @@ class NetworkPrinter extends CTemplate {
 				double diff_tick;
 			«ENDIF»
 		
+			set_realtime_priority();
 			sched_init_actors(sched, &si);
 			
 			while (1) {
