@@ -226,6 +226,7 @@ void init_orcc(int argc, char *argv[]) {
             break;
         case 'v':
             set_trace_level(strtoul(optarg, NULL, 10));
+            break;
         default:
 			fprintf(stderr, "Skipping option -%c\n", c);
 			break;
