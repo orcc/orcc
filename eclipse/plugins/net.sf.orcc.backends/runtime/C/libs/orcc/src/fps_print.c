@@ -32,6 +32,8 @@
 #include <SDL.h>
 #include <time.h>
 
+#include "options.h"
+
 static unsigned int startTime;
 static unsigned int relativeStartTime;
 static int lastNumPic;
@@ -41,7 +43,7 @@ static int partialNumPicturesDecoded;
 static void print_fps_avg(void) {
 	unsigned int endTime = SDL_GetTicks();
 
-	printf("%i images in %f seconds: %f FPS\n", numPicturesDecoded,
+    print_orcc_trace(ORCC_VL_QUIET, "%i images in %f seconds: %f FPS\n", numPicturesDecoded,
 		(float) (endTime - startTime)/ 1000.0f,
 		1000.0f * (float) numPicturesDecoded / (float) (endTime -startTime));
 }
@@ -61,7 +63,7 @@ void fpsPrintNewPicDecoded(void) {
     partialNumPicturesDecoded++;
 	endTime = SDL_GetTicks();
     if ((endTime - relativeStartTime) / 1000.0f >= 5) {
-		printf("%f images/sec\n",
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "%f images/sec",
 				1000.0f * (float) (numPicturesDecoded - lastNumPic)
 						/ (float) (endTime - relativeStartTime));
 

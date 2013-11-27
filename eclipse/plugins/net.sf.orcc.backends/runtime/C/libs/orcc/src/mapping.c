@@ -399,8 +399,7 @@ void *agent_routine(void *data) {
             semaphore_wait(agent->sync->sem_monitor);
         }
 
-        printf("\nRemap...\n\n");
-
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "Remap the actors...");
         compute_workloads(agent->network);
         do_mapping(agent->network, agent->options, agent->mapping);
         apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);

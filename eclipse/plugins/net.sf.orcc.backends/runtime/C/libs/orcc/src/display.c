@@ -29,6 +29,7 @@
 
 #include "SDL.h"
 #include "util.h"
+#include "options.h"
 
 static SDL_Surface *m_screen;
 static SDL_Surface *m_image;
@@ -56,7 +57,7 @@ char displayYUV_getFlags(){
 }
 
 static void displayYUV_setSize(int width, int height) {
-	printf("set display to %ix%i\n", width, height);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "set display to %ix%i", width, height);
 
 	m_screen = SDL_SetVideoMode(width, height, 32, SDL_HWSURFACE);
 	if (m_screen == NULL) {
