@@ -35,17 +35,27 @@
 #include "options.h"
 
 static unsigned int startTime;
+static unsigned int mappingTime;
 static unsigned int relativeStartTime;
 static int lastNumPic;
 static int numPicturesDecoded;
+static int numAlreadyDecoded;
 static int partialNumPicturesDecoded;
 
-static void print_fps_avg(void) {
+static void print_fps_avg() {
 	unsigned int endTime = SDL_GetTicks();
 
     print_orcc_trace(ORCC_VL_QUIET, "%i images in %f seconds: %f FPS\n", numPicturesDecoded,
 		(float) (endTime - startTime)/ 1000.0f,
-		1000.0f * (float) numPicturesDecoded / (float) (endTime -startTime));
+        1000.0f * (float) numPicturesDecoded / (float) (endTime - startTime));
+}
+
+static void print_fps_mapping() {
+    unsigned int endTime = SDL_GetTicks();
+
+    print_orcc_trace(ORCC_VL_QUIET, "PostMapping : %i images in %f seconds: %f FPS", numPicturesDecoded - numAlreadyDecoded,
+        (float) (endTime - mappingTime)/ 1000.0f,
+        1000.0f * (float) (numPicturesDecoded - numAlreadyDecoded) / (float) (endTime - mappingTime));
 }
 
 void fpsPrintInit() {
@@ -53,9 +63,16 @@ void fpsPrintInit() {
 	numPicturesDecoded = 0;
     partialNumPicturesDecoded = 0;
 	lastNumPic = 0;
-	atexit(print_fps_avg);
+    atexit(print_fps_avg);
 	relativeStartTime = startTime;
 }
+
+void fpsPrintInit_mapping() {
+    mappingTime = SDL_GetTicks();
+    numAlreadyDecoded = numPicturesDecoded;
+    atexit(print_fps_mapping);
+}
+
 
 void fpsPrintNewPicDecoded(void) {
 	unsigned int endTime;
