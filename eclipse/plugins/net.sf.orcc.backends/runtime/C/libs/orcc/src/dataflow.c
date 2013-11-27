@@ -92,7 +92,7 @@ void compute_workloads(network_t *network) {
         network->actors[i]->workload = (int) (network->actors[i]->ticks / sum_actor_ticks * 10000) + 1;
     }
     for (i = 0; i < network->nb_connections; i++) {
-        network->connections[i]->workload = (int) (network->connections[i]->rate / sum_conn_rate * 10000) + 1;
+        network->connections[i]->workload = (int) (((float) network->connections[i]->rate) / sum_conn_rate * 10000) + 1;
     }
 }
 
