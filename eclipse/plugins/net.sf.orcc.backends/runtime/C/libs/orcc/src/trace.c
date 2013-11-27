@@ -71,8 +71,8 @@ void check_orcc_error(orccmap_error_et error) {
     }
 }
 
-boolean print_trace_block(verbose_level_et level) {
-    return (level<=verbose_level)?TRUE:FALSE;
+boolean check_verbosity(verbose_level_et level) {
+    return level<=verbose_level;
 }
 
 void print_orcc_trace(verbose_level_et level, const char *trace, ...) {

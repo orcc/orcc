@@ -37,6 +37,7 @@
 
 #include "util.h"
 #include "options.h"
+#include "trace.h"
 
 // define to 1 if your system has the termios.h header
 #define HAS_TERMIOS 0
@@ -170,7 +171,7 @@ void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
     const char *ostr = "i:no:d:m:f:w:g:l:r:ac:s:v:b:";
-	int c;
+    int c;
 
 	program = argv[0];
 	

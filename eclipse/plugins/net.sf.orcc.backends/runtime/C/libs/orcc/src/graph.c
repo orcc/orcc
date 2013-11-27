@@ -99,7 +99,7 @@ adjacency_list *set_graph_from_network(network_t *network) {
         }
     }
 
-    if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : CSR Graph generated from Network :");
         print_graph(graph);
     }
@@ -228,7 +228,7 @@ adjacency_list *fix_graph_for_metis(adjacency_list *graph) {
         }
     }
 
-    if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Fixed CSR Graph for Metis :");
         print_graph(metis_graph);
     }

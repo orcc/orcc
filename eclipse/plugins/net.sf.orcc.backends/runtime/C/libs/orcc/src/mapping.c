@@ -40,6 +40,8 @@
 #include "serialize.h"
 #include "scheduler.h"
 #include "options.h"
+#include "trace.h"
+#include "cycle.h"
 
 int need_remap = TRUE;
 
@@ -174,7 +176,7 @@ int sort_actors(actor_t **actors, int nb_actors) {
         }
     }
 
-    if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : The sorted list:");
         for (i = 0; i < nb_actors; i++) {
             print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tid = %s\tworkload = %d", i, actors[i]->name, actors[i]->workload);
@@ -219,25 +221,21 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
         network->actors[i]->processor_id = part[i];
     }
 
-    // Print results
-    if (print_trace_block(ORCC_VL_VERBOSE_1) == TRUE) {
-        print_orcc_trace(ORCC_VL_VERBOSE_1, "Mapping result : ");
-        for (i = 0; i < mapping->number_of_threads; i++) {
-            print_orcc_trace(ORCC_VL_VERBOSE_1, "\tPartition %d : %d actors", i+1, mapping->partitions_size[i]);
-            for (j=0; j < mapping->partitions_size[i]; j++) {
-                print_orcc_trace(ORCC_VL_VERBOSE_1, "\t\t%s", mapping->partitions_of_actors[i][j]->name);
-            }
-        }
-
-        print_load_balancing(mapping);
-        print_edge_cut(network);
-        printf("\n");
-    }
-
     free(counter);
     return ret;
 }
 
+void print_mapping(mapping_t *mapping) {
+    int i, j;
+    printf("\nMapping result : ");
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        printf("\n\tPartition %d : %d actors", i+1, mapping->partitions_size[i]);
+        for (j=0; j < mapping->partitions_size[i]; j++) {
+            printf("\n\t\t%s", mapping->partitions_of_actors[i][j]->name);
+        }
+    }
+    printf("\n");
+}
 
 
 /********************************************************************************************
@@ -341,7 +339,7 @@ int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part) {
             k = 0;
     }
 
-    if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Round Robin result");
         for (i = 0; i < network->nb_actors; i++) {
             print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %d\tprocessorId = %d",
@@ -358,10 +356,13 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
     int i;
     int ret = ORCC_OK;
     idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network->nb_actors));
+    ticks startTime, endTime;
 
-    if(verbose_level = ORCC_VL_VERBOSE_2) {
+    if(check_verbosity(ORCC_VL_VERBOSE_2)) {
         print_network(network);
     }
+
+    startTime = getticks();
 
     if (opt->nb_processors != 1) {
         switch (opt->strategy) {
@@ -385,7 +386,16 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
         }
     }
 
+    endTime = getticks();
+
     set_mapping_from_partition(network, part, mapping);
+
+    if(check_verbosity(ORCC_VL_VERBOSE_1)) {
+        print_mapping(mapping);
+        print_load_balancing(mapping);
+        print_edge_cut(network);
+        printf("\nMapping time : %2.lf\n", elapsed(endTime, startTime));
+    }
 
     free(part);
     return ret;
@@ -404,7 +414,7 @@ void *agent_routine(void *data) {
             semaphore_wait(agent->sync->sem_monitor);
         }
 
-        print_orcc_trace(ORCC_VL_VERBOSE_1, "Remap the actors...");
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "\nRemap the actors...\n");
         compute_workloads(agent->network);
         do_mapping(agent->network, agent->options, agent->mapping);
         apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);

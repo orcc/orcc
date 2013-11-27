@@ -169,7 +169,7 @@ network_t* load_network(char *fileName) {
                 network->actors[i]->workload = 1;
             }
 
-            if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
+            if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
                 print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Load Actor[%d]\tname = %s\tworkload = %d",
                                  i, network->actors[i]->name, network->actors[i]->workload);
             }
@@ -203,7 +203,7 @@ network_t* load_network(char *fileName) {
                 network->connections[i]->workload = 1;
             }
 
-            if (print_trace_block(ORCC_VL_VERBOSE_2) == TRUE) {
+            if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
                 print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Load Connection[%d]\tsrc = %s\t  dst = %s",
                                  i, network->connections[i]->src->name, network->connections[i]->dst->name);
             }
@@ -214,7 +214,7 @@ network_t* load_network(char *fileName) {
         }
     }
 
-    if (print_trace_block(ORCC_VL_VERBOSE_1) == TRUE) {
+    if (check_verbosity(ORCC_VL_VERBOSE_1) == TRUE) {
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Network loaded successfully");
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Number of actors is : %d", network->nb_actors);
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Number of connections is : %d", network->nb_connections);

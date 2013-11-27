@@ -85,7 +85,7 @@ void check_orcc_error(orccmap_error_et error);
 /**
  * !TODO
  */
-boolean print_trace_block(verbose_level_et level);
+boolean check_verbosity(verbose_level_et level);
 
 /**
  * !TODO

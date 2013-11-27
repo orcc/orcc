@@ -56,7 +56,7 @@ void set_realtime_priority() {
     ret = pthread_setschedparam(this_thread, SCHED_FIFO, &params);
     if (ret != 0) {
         // Print the error
-        printf("Unsuccessful in setting thread realtime prio\n");
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "Unsuccessful in setting thread realtime priority\n");
         return;
     }
 
@@ -64,15 +64,14 @@ void set_realtime_priority() {
     int policy = 0;
     ret = pthread_getschedparam(this_thread, &policy, &params);
     if (ret != 0) {
-        printf("Couldn't retrieve real-time scheduling paramers\n");
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "Couldn't retrieve real-time scheduling paramers\n");
         return;
     }
 
     // Check the correct policy was applied
     if(policy != SCHED_FIFO) {
         print_orcc_trace(ORCC_VL_VERBOSE_2, "Scheduling is NOT SCHED_FIFO!");
-    } else {
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "SCHED_FIFO OK");
+        return;
     }
 
     // Print thread scheduling priority
