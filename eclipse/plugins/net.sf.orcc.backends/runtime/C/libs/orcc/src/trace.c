@@ -44,7 +44,7 @@
 void print_orcc_error(orccmap_error_et error) {
     if (error != ORCC_OK && error < ORCC_ERR_SIZE) {
         printf("\n");
-        fprintf(stderr,"\nOrcc-Map : ERROR : %s", ORCC_ERRORS_TXT[error]);
+        fprintf(stderr,"\nOrcc : ERROR : %s", ORCC_ERRORS_TXT[error]);
     }
 
 }
@@ -77,7 +77,7 @@ void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
     va_start (args, trace);
 
     if (level <= verbose_level) {
-        printf("\nOrcc-Map : ");
+        printf("\nOrcc : ");
         vprintf(trace, args);
     }
 
