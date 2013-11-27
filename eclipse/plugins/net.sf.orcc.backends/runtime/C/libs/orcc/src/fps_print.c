@@ -51,6 +51,7 @@ void fpsPrintInit() {
 	numPicturesDecoded = 0;
     partialNumPicturesDecoded = 0;
 	lastNumPic = 0;
+	atexit(print_fps_avg);
 	relativeStartTime = startTime;
 }
 
