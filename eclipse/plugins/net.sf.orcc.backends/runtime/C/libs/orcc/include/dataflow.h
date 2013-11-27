@@ -87,4 +87,6 @@ network_t* allocate_network(int nb_actors, int nb_connections);
 
 void compute_workloads(network_t *network);
 
+void print_network(network_t *network);
+
 #endif

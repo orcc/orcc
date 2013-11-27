@@ -359,6 +359,10 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
     int ret = ORCC_OK;
     idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network->nb_actors));
 
+    if(verbose_level = ORCC_VL_VERBOSE_2) {
+        print_network(network);
+    }
+
     if (opt->nb_processors != 1) {
         switch (opt->strategy) {
         case ORCC_MS_METIS_REC:
