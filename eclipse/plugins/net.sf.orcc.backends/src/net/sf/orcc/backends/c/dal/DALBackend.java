@@ -1,10 +1,8 @@
 package net.sf.orcc.backends.c.dal;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.c.InstancePrinter;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
@@ -126,11 +124,6 @@ public class DALBackend extends CBackend {
 		successC = new InstanceCPrinter(options).print(srcPath, actor) > 0;
 		successH = new InstanceHPrinter(options).print(srcPath, actor) > 0;
 		return successC & successH;
-	}
-
-	@Override
-	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}
 
 }
