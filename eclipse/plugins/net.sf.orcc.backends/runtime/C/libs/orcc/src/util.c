@@ -36,6 +36,7 @@
 #include <string.h>
 
 #include "util.h"
+#include "options.h"
 
 // define to 1 if your system has the termios.h header
 #define HAS_TERMIOS 0
@@ -153,7 +154,8 @@ static const char *usage =
     "-g <output file>           Specify an output file for the genetic algorithm.\n"
     "-b <output file>           Specify an output file for instrumention.\n"
     "-c <nb threads>            Set the number of execut500ing threads to run.\n"
-    "-s <mapping strategy>      Specify the strategy for the actor mapping";
+    "-s <mapping strategy>      Specify the strategy for the actor mapping\n"
+    "-v <level>                 Set the verbosity";
     // We need to document folowing options:
 	//"-w <file>                  TBD...\n"
 
@@ -167,7 +169,7 @@ void print_usage() {
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-    const char *ostr = "i:no:d:m:f:w:g:l:r:ac:s:b:";
+    const char *ostr = "i:no:d:m:f:w:g:l:r:ac:s:v:b:";
 	int c;
 
 	program = argv[0];
@@ -222,6 +224,8 @@ void init_orcc(int argc, char *argv[]) {
         case 'b':
             profiling_file = strdup(optarg);
             break;
+        case 'v':
+            set_trace_level(strtoul(optarg, NULL, 10));
         default:
 			fprintf(stderr, "Skipping option -%c\n", c);
 			break;
