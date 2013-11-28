@@ -34,6 +34,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
+import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -42,6 +43,8 @@ import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
+import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
+import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
@@ -52,7 +55,6 @@ import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
-import org.eclipse.graphiti.services.ILinkService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
@@ -68,9 +70,10 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 public class ConnectionPattern extends AbstractConnectionPattern {
 
-	private enum PortDirection {
+	private enum Direction {
 		INPUT, OUTPUT
 	}
+
 	private enum PortType {
 		NETWORK_PORT, INSTANCE_PORT
 	}
@@ -78,10 +81,10 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	public class PortInformation {
 		private final Vertex vertex;
 		private final Port port;
-		private final PortDirection direction;
+		private final Direction direction;
 		private final PortType type;
 
-		public PortInformation(Vertex vertex, Port port, PortDirection direction, PortType type) {
+		public PortInformation(Vertex vertex, Port port, Direction direction, PortType type) {
 			this.vertex = vertex;
 			this.port = port;
 			this.direction = direction;
@@ -96,7 +99,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			return port;
 		}
 
-		public PortDirection getDirection() {
+		public Direction getDirection() {
 			return direction;
 		}
 
@@ -121,7 +124,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		if (src == null) {
 			return false;
 		}
-		return true;
+		return context.getSourceAnchor() != null;
 	}
 
 	@Override
@@ -167,9 +170,9 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			}
 		}
 
-		// TODO: Check in an input port has not already a connection connected
+		// TODO: Check if an input port has not already a connection connected
 		// to it.
-		return true;
+		return context.getSourceAnchor() != null && context.getTargetAnchor() != null;
 	}
 
 	@Override
@@ -178,9 +181,9 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		// avoid arrow on the wrong side of the connection shape
 		PortInformation src = getPortInformations(context.getSourceAnchor());
 		boolean needInverseSourceTarget = false;
-		if (src.getType() == PortType.NETWORK_PORT && src.getDirection() == PortDirection.OUTPUT) {
+		if (src.getType() == PortType.NETWORK_PORT && src.getDirection() == Direction.OUTPUT) {
 			needInverseSourceTarget = true;
-		} else if (src.getType() == PortType.INSTANCE_PORT && src.getDirection() == PortDirection.INPUT) {
+		} else if (src.getType() == PortType.INSTANCE_PORT && src.getDirection() == Direction.INPUT) {
 			needInverseSourceTarget = true;
 		}
 
@@ -240,51 +243,56 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	}
 
 	/**
-	 * Retrieve all information related to a port in a network/diagram. Build
+	 * Retrieve all information related to a port in a diagram. Build
 	 * corresponding PortInformation structure.
 	 * 
 	 * @param anchor
 	 *            The anchor corresponding to a port in a Network or an Instance
 	 * @return
 	 */
-	public PortInformation getPortInformations(Anchor anchor) {
-
-		ILinkService linkService = Graphiti.getLinkService();
-
+	public PortInformation getPortInformations(final Anchor anchor) {
 		if (anchor == null) {
 			return null;
 		}
-		// Instance port are linked directly to the anchor
-		Object obj = getBusinessObjectForPictogramElement(anchor);
-		if (obj instanceof Port) {
-			FixPointAnchor fpAnchor = (FixPointAnchor) anchor;
-			// FIXME: a better detection of in/out port ?
-			PortDirection dir = fpAnchor.getLocation().getX() == 0 ? PortDirection.INPUT : PortDirection.OUTPUT;
-			Instance parentInstance = (Instance) linkService
-					.getBusinessObjectForLinkedPictogramElement(anchor
-					.getParent());
-			PortInformation info = new PortInformation(parentInstance, (Port) obj, dir, PortType.INSTANCE_PORT);
-			return info;
-		}
 
-		// Network ports are linked to the top level shape (anchor container)
-		obj = getBusinessObjectForPictogramElement(anchor.getParent());
-		if (obj instanceof Port) {
+		if (anchor instanceof FixPointAnchor) {
+			// Instance port
+
+			final FixPointAnchor brAnchor = (FixPointAnchor) anchor;
+			final Port port = (Port) getBusinessObjectForPictogramElement(brAnchor);
+			final Direction direction = ShapePropertiesManager.isInput(brAnchor) ? Direction.INPUT : Direction.OUTPUT;
+			final Instance parentInstance = (Instance) getBusinessObjectForPictogramElement(brAnchor.getParent());
+
+			return new PortInformation(parentInstance, port, direction, PortType.INSTANCE_PORT);
+
+		} else if (anchor instanceof ChopboxAnchor) {
+			// Network port
+
+			final AnchorContainer container = anchor.getParent();
+			final Port port = (Port) getBusinessObjectForPictogramElement(container);
+
 			// Retrieve the pattern corresponding to the current port
-			IPattern ipattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
+			final IPattern ipattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
 					.getPatternForPictogramElement(anchor.getParent());
 
 			// Check the type of this pattern to know the direction of the port
-			PortDirection dir = ipattern instanceof InputNetworkPortPattern ? PortDirection.INPUT
-					: PortDirection.OUTPUT;
-			PortInformation info = new PortInformation((Port) obj, null, dir, PortType.NETWORK_PORT);
-			return info;
+			final Direction direction = ipattern instanceof InputNetworkPortPattern ? Direction.INPUT
+					: Direction.OUTPUT;
+
+			return new PortInformation(port, null, direction, PortType.NETWORK_PORT);
+
 		}
 
 		// Anchor without port ? Maybe an error here...
 		return null;
 	}
 
+	/**
+	 * Create the arrow to display on the target side of the connection
+	 * 
+	 * @param gaContainer
+	 * @return
+	 */
 	private Polyline createArrow(GraphicsAlgorithmContainer gaContainer) {
 		IGaService gaService = Graphiti.getGaService();
 		Polyline polyline = gaService.createPolyline(gaContainer, new int[] { -15, 10, 0, 0, -15, -10 });
