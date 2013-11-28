@@ -265,6 +265,8 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 					}
 				} catch (NullPointerException e) {
 					continue;
+				} catch (Exception e) {
+					continue;
 				}
 
 				final EClass classz = eobject.eClass();

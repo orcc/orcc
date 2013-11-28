@@ -74,6 +74,9 @@ public class XdfDiagramFeatureProvider extends
 		return new UpdateDiagramFeature(this);
 	}
 
+	/**
+	 * Forbids to move any anchor in the diagram
+	 */
 	@Override
 	public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
 		return new DefaultMoveAnchorFeature(this) {

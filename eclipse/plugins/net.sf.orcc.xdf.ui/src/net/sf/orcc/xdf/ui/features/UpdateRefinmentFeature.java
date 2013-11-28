@@ -141,7 +141,7 @@ public class UpdateRefinmentFeature extends AbstractCustomFeature {
 
 		// Now, we want to display ports of the selected entity in the instance
 		// shape (graphical representation of the Instance)
-		ContainerShape instanceShape;
+		final ContainerShape instanceShape;
 		{
 			final PictogramElement clickedPe = context.getPictogramElements()[0];
 			// We want to get the instance container shape
@@ -155,9 +155,9 @@ public class UpdateRefinmentFeature extends AbstractCustomFeature {
 		}
 
 		// We get the corresponding Pattern. It must be an InstancePattern
-		IPattern ipattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
+		final IPattern ipattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
 				.getPatternForPictogramElement(instanceShape);
-		InstancePattern pattern = (InstancePattern) ipattern;
+		final InstancePattern pattern = (InstancePattern) ipattern;
 
 		// Set refinement on selected instance
 		pattern.setInstanceRefinment(instanceShape, (EObject) entityDialog.getFirstResult());
