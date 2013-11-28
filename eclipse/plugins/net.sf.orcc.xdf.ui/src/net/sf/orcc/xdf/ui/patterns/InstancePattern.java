@@ -36,6 +36,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
@@ -51,6 +52,7 @@ import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
+import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
@@ -73,7 +75,6 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.services.IGaLayoutService;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
@@ -94,9 +95,8 @@ public class InstancePattern extends AbstractPattern {
 	private static final int LABEL_HEIGHT = 40;
 	// Width of the line shape used as separator
 	private static final int SEPARATOR = 1;
-
-	// Minimal space between input and output areas
-	private static final int PORTS_AREAS_SPACE = 4;
+	// Minimal space between an input and output port on the same line
+	private static final int PORTS_AREAS_SPACE = 10;
 	// Width of the square representing a port
 	private static final int PORT_SIDE_WITH = 12;
 	// Space set around a port square
@@ -106,12 +106,13 @@ public class InstancePattern extends AbstractPattern {
 	public static final String INSTANCE_ID = "INSTANCE";
 	private static final String LABEL_ID = "INSTANCE_LABEL";
 	private static final String SEP_ID = "INSTANCE_SEPARATOR";
-	private static final String INPUTS_ID = "INPUTS_AREA";
-	private static final String OUTPUTS_ID = "OUTPUTS_AREA";
+	public static final String PORT_ID = "INSTANCE_PORT";
+	private static final String PORT_TEXT_ID = "INSTANCE_PORT_TEXT";
+	private static final String PORT_NAME_KEY = "REF_PORT_NAME";
 
 	private static final String REFINEMENT_KEY = "refinment";
 
-	private enum PortsType {
+	private enum Direction {
 		INPUTS, OUTPUTS
 	}
 
@@ -132,27 +133,26 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	public boolean isMainBusinessObjectApplicable(Object object) {
 		if (object instanceof Port) {
-			Port port = (Port) object;
-			if (port.eContainer() instanceof Actor) {
+			final Port port = (Port) object;
+			final EObject ctr = port.eContainer();
+			if (ctr instanceof Actor) {
 				return true;
+			} else if (ctr instanceof Network) {
+				// In this case, we must ensure the network containing this
+				// port is NOT the network linked to the diagram.
+				return ctr != getBusinessObjectForPictogramElement(getDiagram());
 			}
-
-			// TODO: In this case, we must ensure the network containing this
-			// port is NOT the network corresponding to the diagram. To do so,
-			// we need to have a Network instance created with the diagram
 		}
 		return object instanceof Instance;
 	}
 
 	@Override
 	protected boolean isPatternControlled(PictogramElement pe) {
+		if (isPatternRoot(pe)) {
+			return true;
+		} else if (pe instanceof FixPointAnchor
+				&& (ShapePropertiesManager.isInput(pe) || ShapePropertiesManager.isOutput(pe))) {
 
-		final String identifier = ShapePropertiesManager.getIdentifier(pe);
-		final String[] validIds = { INSTANCE_ID, LABEL_ID, SEP_ID, INPUTS_ID, OUTPUTS_ID };
-		for (final String e : validIds) {
-			if(e.equals(identifier)) {
-				return true;
-			}
 		}
 		return false;
 	}
@@ -165,7 +165,8 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	public boolean canDirectEdit(IDirectEditingContext context) {
 		boolean isText = context.getGraphicsAlgorithm() instanceof Text;
-		return isText && ShapePropertiesManager.isExpectedPc(context.getPictogramElement(), LABEL_ID);
+		boolean isLabel = ShapePropertiesManager.isExpectedPc(context.getGraphicsAlgorithm(), LABEL_ID);
+		return isText && isLabel;
 	}
 
 	@Override
@@ -175,14 +176,14 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public String getInitialValue(IDirectEditingContext context) {
-		Instance obj = (Instance) getBusinessObjectForPictogramElement(context.getPictogramElement());
+		final Instance obj = (Instance) getBusinessObjectForPictogramElement(context.getPictogramElement());
 		return obj.getName();
 	}
 
 	@Override
 	public void setValue(String value, IDirectEditingContext context) {
-		PictogramElement pe = context.getPictogramElement();
-		Instance obj = (Instance) getBusinessObjectForPictogramElement(pe);
+		final PictogramElement pe = context.getPictogramElement();
+		final Instance obj = (Instance) getBusinessObjectForPictogramElement(pe);
 		obj.setName(value);
 
 		updatePictogramElement(pe);
@@ -201,12 +202,11 @@ public class InstancePattern extends AbstractPattern {
 		return null;
 	}
 
-	/*
+	/**
 	 * An instance can't be removed from a graph. Instead it must be deleted.
 	 * 
-	 * @see
-	 * org.eclipse.graphiti.pattern.AbstractPattern#canRemove(org.eclipse.graphiti
-	 * .features.context.IRemoveContext)
+	 * @see org.eclipse.graphiti.pattern.AbstractPattern#canRemove(org.eclipse.graphiti
+	 *      .features.context.IRemoveContext)
 	 */
 	@Override
 	public boolean canRemove(IRemoveContext context) {
@@ -223,8 +223,7 @@ public class InstancePattern extends AbstractPattern {
 		// We create the instance in a diagram
 		if (context.getTargetContainer() instanceof Diagram) {
 			// A network is associated to this diagram
-			Object bo = getBusinessObjectForPictogramElement(context.getTargetContainer());
-			if (bo instanceof Network) {
+			if (getBusinessObjectForPictogramElement(context.getTargetContainer()) instanceof Network) {
 				return true;
 			}
 		}
@@ -233,15 +232,14 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public Object[] create(ICreateContext context) {
-		Instance newInstance = null;
+		final Instance newInstance = DfFactory.eINSTANCE.createInstance();
+		newInstance.setName("");
+
 		// TODO: allow to create from an eResource (dropped from project
 		// explorer)
-		if (true) {
-			newInstance = DfFactory.eINSTANCE.createInstance();
-		}
 
 		// Add the new Instance to the current Network
-		Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
 		network.add(newInstance);
 
 		// Request adding the shape to the diagram
@@ -270,100 +268,65 @@ public class InstancePattern extends AbstractPattern {
 
 		final Instance addedDomainObject = (Instance) context.getNewObject();
 
+		// Create the container shape
+		final ContainerShape topLevelShape = peCreateService.createContainerShape(targetDiagram, true);
+		ShapePropertiesManager.setIdentifier(topLevelShape, INSTANCE_ID);
+
+		// Create the container graphic
+		final RoundedRectangle roundedRectangle = gaService.createPlainRoundedRectangle(topLevelShape, 5, 5);
+		roundedRectangle.setStyle(StyleUtil.getStyleForInstance(getDiagram()));
+		gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), TOTAL_MIN_WIDTH,
+				TOTAL_MIN_HEIGHT);
+
+		// The text label for Instance name
+		final Text text = gaService.createPlainText(roundedRectangle);
+		ShapePropertiesManager.setIdentifier(text, LABEL_ID);
+		// Set properties on instance label
+		text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+		text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+		text.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
+		gaService.setLocationAndSize(text, 0, 0, TOTAL_MIN_WIDTH, LABEL_HEIGHT);
+
+		if (addedDomainObject.getName() != null && !addedDomainObject.getName().isEmpty()) {
+			text.setValue(addedDomainObject.getName());
+		}
+
+		// The line separator
+		final int[] xy = { 0, LABEL_HEIGHT, TOTAL_MIN_WIDTH, LABEL_HEIGHT };
+		final Polyline line = gaService.createPlainPolyline(roundedRectangle, xy);
+		ShapePropertiesManager.setIdentifier(line, SEP_ID);
+		line.setLineWidth(SEPARATOR);
+
 		// provide information to support direct-editing directly
 		// after object creation (must be activated additionally)
 		final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
-
-		// Create the container
-		final ContainerShape containerShape;
-		{
-			containerShape = peCreateService.createContainerShape(targetDiagram, true);
-			final RoundedRectangle roundedRectangle = gaService.createPlainRoundedRectangle(containerShape, 5, 5);
-			roundedRectangle.setStyle(StyleUtil.getStyleForInstance(getDiagram()));
-			gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), TOTAL_MIN_WIDTH,
-					TOTAL_MIN_HEIGHT);
-		}
-
-		{
-			// The text label for Instance name
-			final Shape shape = peCreateService.createShape(containerShape, false);
-
-			final Text text = gaService.createPlainText(shape);
-			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-			text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
-			text.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
-			gaService.setLocationAndSize(text, 0, 0, TOTAL_MIN_WIDTH, LABEL_HEIGHT);
-
-			if (addedDomainObject.getName() != null) {
-				text.setValue(addedDomainObject.getName());
-			}
-
-			ShapePropertiesManager.setIdentifier(shape, LABEL_ID);
-
-			link(shape, addedDomainObject);
-
-			// set shape and graphics algorithm where the editor for
-			// direct editing shall be opened after object creation
-			directEditingInfo.setPictogramElement(shape);
-			directEditingInfo.setGraphicsAlgorithm(text);
-		}
-
-		{
-			// The line separator
-			final Shape shape = peCreateService.createShape(containerShape, false);
-			final int[] xy = { 0, LABEL_HEIGHT, TOTAL_MIN_WIDTH, LABEL_HEIGHT };
-			Polyline line = gaService.createPlainPolyline(shape, xy);
-			line.setLineWidth(SEPARATOR);
-
-			ShapePropertiesManager.setIdentifier(shape, SEP_ID);
-		}
-
-		{
-			// The containers for inputs and outputs ports
-			final ContainerShape inShape = peCreateService.createContainerShape(containerShape, false);
-			final Rectangle inRect = gaService.createInvisibleRectangle(inShape);
-			final ContainerShape outShape = peCreateService.createContainerShape(containerShape, false);
-			final Rectangle outRect = gaService.createInvisibleRectangle(outShape);
-
-			final int portAreaY = LABEL_HEIGHT + SEPARATOR;
-			final int portAreaLeftRightMargin = PORT_SIDE_WITH + PORT_MARGIN;
-			// Without content, sizes for in and out areas are the same
-			final int portAreaW = getPortsAreaMinWidth(inShape);
-			final int portAreaH = getPortsAreaMinHeight(inShape);
-
-			// Set sizes and location for both areas
-			gaService.setLocationAndSize(inRect, portAreaLeftRightMargin, portAreaY, portAreaW, portAreaH);
-			gaService.setLocationAndSize(outRect, TOTAL_MIN_WIDTH - portAreaLeftRightMargin - portAreaW, portAreaY,
-					portAreaW, portAreaH);
-
-			ShapePropertiesManager.setIdentifier(inShape, INPUTS_ID);
-			ShapePropertiesManager.setIdentifier(outShape, OUTPUTS_ID);
-		}
-
-		ShapePropertiesManager.setIdentifier(containerShape, INSTANCE_ID);
-
+		// set shape and graphics algorithm where the editor for
+		// direct editing shall be opened after object creation
+		directEditingInfo.setPictogramElement(topLevelShape);
+		directEditingInfo.setGraphicsAlgorithm(text);
 		// set container shape for direct editing after object creation
-		directEditingInfo.setMainPictogramElement(containerShape);
+		directEditingInfo.setMainPictogramElement(topLevelShape);
 
 		// We link graphical representation and domain model object
-		link(containerShape, addedDomainObject);
+		link(topLevelShape, addedDomainObject);
 
 		if (addedDomainObject.getEntity() != null) {
-			setInstanceRefinment(containerShape, addedDomainObject.getEntity());
+			setInstanceRefinment(topLevelShape, addedDomainObject.getEntity());
 		}
 
-		return containerShape;
+		return topLevelShape;
+	}
+
+	@Override
+	public boolean canMoveShape(IMoveShapeContext context) {
+		return isPatternRoot(context.getPictogramElement());
 	}
 
 	@Override
 	public boolean canResizeShape(IResizeShapeContext context) {
-
-		if (!ShapePropertiesManager.isExpectedPc(context.getPictogramElement(), INSTANCE_ID)) {
-			return false;
-		}
 		// Resize is always Ok for Instance. New size is set to minimal value
 		// when needed
-		return true;
+		return isPatternRoot(context.getPictogramElement());
 	}
 
 	@Override
@@ -372,11 +335,11 @@ public class InstancePattern extends AbstractPattern {
 		final PictogramElement pe = context.getPictogramElement();
 
 		final int oldWidth = pe.getGraphicsAlgorithm().getWidth();
-		final int newWidth = Math.max(context.getWidth(), getInstanceMinWidth(context.getPictogramElement()));
+		final int newWidth = Math.max(context.getWidth(), getInstanceMinWidth(pe));
 		pe.getGraphicsAlgorithm().setWidth(newWidth);
 
 		final int oldHeight = pe.getGraphicsAlgorithm().getHeight();
-		final int newHeight = Math.max(context.getHeight(), getInstanceMinHeight(context.getPictogramElement()));
+		final int newHeight = Math.max(context.getHeight(), getInstanceMinHeight(pe));
 		pe.getGraphicsAlgorithm().setHeight(newHeight);
 
 		// Recalculate position of the shape if direction is NORTH or EAST
@@ -395,92 +358,66 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean canLayout(ILayoutContext context) {
-		final PictogramElement pe = context.getPictogramElement();
-
-		if (isPatternControlled(pe)) {
-			return true;
-		}
-
-		return false;
+		return isPatternRoot(context.getPictogramElement());
 	}
 
 	/**
-	 * This function set position for all elements in an Instance Shape. It does
-	 * not change anything on Y position, but it moves all shapes according to
-	 * the current size of the top level shape
+	 * This function set position for all elements in an Instance Shape.
 	 */
 	@Override
 	public boolean layout(ILayoutContext context) {
-		final PictogramElement pe = context.getPictogramElement();
-		final IGaLayoutService gaLayoutService = Graphiti.getGaLayoutService();
+		final AnchorContainer instanceAc = (AnchorContainer) context.getPictogramElement();
+		final IGaService gaService = Graphiti.getGaService();
 
-		if (!isPatternRoot(pe)) {
+		if (!isPatternRoot(instanceAc)) {
 			return false;
 		}
 
-		final int instanceWidth = pe.getGraphicsAlgorithm().getWidth();
+		// Calculate the current size of the instance rectangle
+		final int instanceW = gaService.calculateSize(instanceAc.getGraphicsAlgorithm(), true).getWidth();
 
-		// Update width for label and separator. Position still unchanged
-		final GraphicsAlgorithm label = (GraphicsAlgorithm) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
-		label.setWidth(instanceWidth);
-		final Polyline sep = (Polyline) ShapePropertiesManager.findPcFromIdentifier(pe, SEP_ID);
-		sep.getPoints().get(1).setX(instanceWidth);
+		// Update label size and position
+		final Text label = (Text) ShapePropertiesManager.findPcFromIdentifier(instanceAc, LABEL_ID);
+		gaService.setLocationAndSize(label, 0, 0, instanceW, LABEL_HEIGHT);
 
-		{
-			// Inputs area. Position unchanged, size must be updated
-			final Shape portsPe = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, INPUTS_ID);
-			final GraphicsAlgorithm portsGa = portsPe.getGraphicsAlgorithm();
+		// Update separator points
+		final Polyline sep = (Polyline) ShapePropertiesManager.findPcFromIdentifier(instanceAc, SEP_ID);
+		for (final Point p : sep.getPoints()) {
+			p.setY(LABEL_HEIGHT);
+		}
+		sep.getPoints().get(1).setX(instanceW);
 
-			final int newAreaWidth = getPortsAreaMinWidth(portsPe);
-			gaLayoutService.setSize(portsGa, newAreaWidth, getPortsAreaMinHeight(portsPe));
-
-			for (Shape child : ((ContainerShape) portsPe).getChildren()) {
-				if (child.getGraphicsAlgorithm() instanceof Text) {
-					Text txt = (Text) child.getGraphicsAlgorithm();
-					txt.setWidth(newAreaWidth);
-				}
+		// ***********************
+		// Update ports
+		// ***********************
+		int inIndex = 0, outIndex = 0;
+		for (final Anchor anchor : instanceAc.getAnchors()) {
+			if (ShapePropertiesManager.isInput(anchor)) {
+				layoutPort((FixPointAnchor) anchor, inIndex++, instanceAc);
+			} else if (ShapePropertiesManager.isOutput(anchor)) {
+				layoutPort((FixPointAnchor) anchor, outIndex++, instanceAc);
 			}
 		}
-
-		{
-			// Outputs area, position and size need to be recalculated
-			final Shape portsPe = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, OUTPUTS_ID);
-			final GraphicsAlgorithm portsGa = portsPe.getGraphicsAlgorithm();
-
-			final int newAreaWidth = getPortsAreaMinWidth(portsPe);
-			gaLayoutService.setSize(portsGa, newAreaWidth, getPortsAreaMinHeight(portsPe));
-			portsGa.setX(instanceWidth - newAreaWidth - PORT_SIDE_WITH - PORT_MARGIN);
-
-			for (Shape child : ((ContainerShape) portsPe).getChildren()) {
-				if (child.getGraphicsAlgorithm() instanceof Text) {
-					Text txt = (Text) child.getGraphicsAlgorithm();
-					txt.setWidth(newAreaWidth);
-				}
-			}
-		}
-
-		{
-			// Ports square anchors. Only output ports location have to be
-			// recalculated
-			final AnchorContainer root = (AnchorContainer) pe;
-			for (Anchor anchor : root.getAnchors()) {
-				final Point location = ((FixPointAnchor) anchor).getLocation();
-				if (location.getX() != 0) {
-					location.setX(instanceWidth - PORT_SIDE_WITH);
-				}
-			}
-		}
-
 		return true;
+	}
+
+	@Override
+	public boolean canUpdate(IUpdateContext context) {
+		return ShapePropertiesManager.isExpectedPc(context.getPictogramElement(), INSTANCE_ID);
 	}
 
 	@Override
 	public IReason updateNeeded(IUpdateContext context) {
 		final PictogramElement pe = context.getPictogramElement();
-		if (ShapePropertiesManager.isExpectedPc(pe, LABEL_ID)) {
-			Text txt = (Text) pe.getGraphicsAlgorithm();
-			Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
-			if (!txt.getValue().equals(instance.getName())) {
+
+		if (ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
+			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
+			if (text == null) {
+				return Reason.createFalseReason("Label Not found !!");
+			}
+
+			final Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
+			if (!text.getValue().equals(instance.getName())) {
 				return Reason.createTrueReason("The instance name has been updated from outside diagram");
 			}
 		}
@@ -490,16 +427,19 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean update(IUpdateContext context) {
-		PictogramElement pe = context.getPictogramElement();
+		final PictogramElement pe = context.getPictogramElement();
 
-		if (ShapePropertiesManager.isExpectedPc(pe, LABEL_ID)) {
-			Shape shape = (Shape) pe;
-			Instance instance = (Instance) getBusinessObjectForPictogramElement(shape);
+		if (ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
+			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
+			if (text == null) {
+				return false;
+			}
 
-			Text text = (Text) shape.getGraphicsAlgorithm();
+			final Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
 			text.setValue(instance.getName());
 			return true;
 		}
+
 		return super.update(context);
 	}
 
@@ -510,11 +450,11 @@ public class InstancePattern extends AbstractPattern {
 	 * 
 	 * This method automatically update sizes and layouts for the content.
 	 * 
-	 * @param pe
+	 * @param instanceShape
 	 * @param entity
 	 */
-	public void setInstanceRefinment(PictogramElement pe, EObject entity) {
-		if (!isPatternRoot(pe)) {
+	public void setInstanceRefinment(final ContainerShape instanceShape, final EObject entity) {
+		if (!isPatternRoot(instanceShape)) {
 			return;
 		}
 		if (!(entity instanceof Actor || entity instanceof Network)) {
@@ -522,111 +462,151 @@ public class InstancePattern extends AbstractPattern {
 		}
 
 		// Set the current instance's entity
-		final Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
+		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instanceShape);
 		instance.setEntity(entity);
-		Graphiti.getPeService()
-				.setPropertyValue(pe, REFINEMENT_KEY, entity.eResource().getURI().toPlatformString(true));
+		Graphiti.getPeService().setPropertyValue(instanceShape, REFINEMENT_KEY,
+				entity.eResource().getURI().toPlatformString(true));
 
-		final ContainerShape topLevelShape = (ContainerShape) pe;
-		final ContainerShape inCtrShape = (ContainerShape) ShapePropertiesManager.findPcFromIdentifier(pe, INPUTS_ID);
-		final ContainerShape outCtrShape = (ContainerShape) ShapePropertiesManager.findPcFromIdentifier(pe, OUTPUTS_ID);
-
-		// Clean inputs & outputs ports text
-		List<Shape> portsTxts = new ArrayList<Shape>(inCtrShape.getChildren());
-		portsTxts.addAll(outCtrShape.getChildren());
-		for (Shape shape : portsTxts) {
-			EcoreUtil.delete(shape, true);
+		// Clean all ports anchors and graphics in the instance
+		final List<GraphicsAlgorithm> gaChildre = new ArrayList<GraphicsAlgorithm>(instanceShape.getGraphicsAlgorithm()
+				.getGraphicsAlgorithmChildren());
+		for(final GraphicsAlgorithm gaChild : gaChildre) {
+			if (gaChild instanceof Text
+					&& (ShapePropertiesManager.isInput(gaChild) || ShapePropertiesManager.isOutput(gaChild))) {
+				EcoreUtil.delete(gaChild, true);
+			}
 		}
-
-		// Clean ports anchors
-		List<Anchor> anchors = new ArrayList<Anchor>(((AnchorContainer) pe).getAnchors());
-		for (Anchor anchor : anchors) {
+		final List<Anchor> anchors = new ArrayList<Anchor>(((AnchorContainer) instanceShape).getAnchors());
+		for (final Anchor anchor : anchors) {
+			// EcoreUtil.delete(anchor.getReferencedGraphicsAlgorithm(), true);
 			EcoreUtil.delete(anchor, true);
 		}
+		// final List<Shape> children = new
+		// ArrayList<Shape>(instanceShape.getChildren());
+		// for (Shape child : children) {
+		// if (ShapePropertiesManager.isInput(child) ||
+		// ShapePropertiesManager.isOutput(child)) {
+		// EcoreUtil.delete(child, true);
+		// }
+		// }
 
 		// Add ports
 		if (instance.isActor()) {
-			addPorts(topLevelShape, instance.getActor().getInputs(), PortsType.INPUTS);
-			addPorts(topLevelShape, instance.getActor().getOutputs(), PortsType.OUTPUTS);
+			addPorts(instanceShape, instance.getActor().getInputs(), Direction.INPUTS);
+			addPorts(instanceShape, instance.getActor().getOutputs(), Direction.OUTPUTS);
 		} else {
-			addPorts(topLevelShape, instance.getNetwork().getInputs(), PortsType.INPUTS);
-			addPorts(topLevelShape, instance.getNetwork().getOutputs(), PortsType.OUTPUTS);
+			addPorts(instanceShape, instance.getNetwork().getInputs(), Direction.INPUTS);
+			addPorts(instanceShape, instance.getNetwork().getOutputs(), Direction.OUTPUTS);
 		}
 
 		// Resize to minimal size.
-		resizeShapeToMinimal(pe);
+		resizeShapeToMinimal(instanceShape);
 	}
 
 	/**
-	 * Add the given list of ports to the right area, according to the given
-	 * portType.
+	 * Add the given list of ports in the instance, according to the given
+	 * direction.
 	 * 
-	 * This method add port names to the area according to the right port type.
-	 * It also create FixPointAnchors as children if given topLevelShape, and
-	 * set position for each of these elements. Port texts locations are
-	 * relative to their respective ports area (input or output) when port
-	 * square are contained in their anchor, which is relative to the
-	 * topLevelShape
+	 * This method only create objects and append them to the right parent. The
+	 * layouting (setup of sizes and location) of each element is done in the
+	 * layout method. layout() is called explicitly or implicitly from some
+	 * methods.
 	 * 
-	 * @param topLevelShape
+	 * setInstanceRefinment() execute this method and apply a resize just after.
+	 * The layout() method is called from resizeShape() method.
+	 * 
+	 * @param instanceShape
 	 *            The instance shape
 	 * @param ports
 	 *            The list of ports
-	 * @param portType
+	 * @param direction
 	 *            The type of ports (inputs or outputs)
 	 */
-	private void addPorts(ContainerShape topLevelShape, List<Port> ports, PortsType portType) {
+	private void addPorts(final ContainerShape instanceShape, final List<Port> ports, final Direction direction) {
+
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		final IGaService gaService = Graphiti.getGaService();
 
-		final ContainerShape portsCtrShape = (ContainerShape) (portType == PortsType.INPUTS ? ShapePropertiesManager
-				.findPcFromIdentifier(topLevelShape, INPUTS_ID) : ShapePropertiesManager.findPcFromIdentifier(
-				topLevelShape, OUTPUTS_ID));
+		final GraphicsAlgorithm instanceGa = instanceShape.getGraphicsAlgorithm();
 
-		final int currentAreaWidth = portsCtrShape.getGraphicsAlgorithm().getWidth();
-		final int portAreaY = LABEL_HEIGHT + SEPARATOR;
+		int i = 0, j = 0;
+		for (final Port port : ports) {
 
-		final int portXPos;
-		final Orientation hOrientation;
+			// Create anchor
+			final FixPointAnchor fpAnchor = peCreateService.createFixPointAnchor(instanceShape);
+			fpAnchor.setUseAnchorLocationAsConnectionEndpoint(true);
+			ShapePropertiesManager.setIdentifier(fpAnchor, PORT_ID);
+			Graphiti.getPeService().setPropertyValue(fpAnchor, PORT_NAME_KEY, port.getName());
 
-		if (portType == PortsType.INPUTS) {
-			hOrientation = Orientation.ALIGNMENT_LEFT;
-			portXPos = 0;
-		} else {
-			hOrientation = Orientation.ALIGNMENT_RIGHT;
-			portXPos = topLevelShape.getGraphicsAlgorithm().getX() - PORT_SIDE_WITH;
-		}
+			// Create the square inside anchor
+			final Rectangle square = gaService.createRectangle(fpAnchor);
+			square.setStyle(StyleUtil.getStyleForInstancePort(getDiagram()));
 
-		int portYPos;
-		int i = 0;
-		for (Port port : ports) {
-			// Create text
-			Shape txtShape = peCreateService.createShape(portsCtrShape, false);
-			Text txt = gaService.createText(txtShape, port.getName());
+			// Create text as instance rectangle child
+			final Text txt = gaService.createText(instanceGa, port.getName());
 			txt.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
 			txt.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
-			txt.setHorizontalAlignment(hOrientation);
+			ShapePropertiesManager.setIdentifier(txt, PORT_TEXT_ID);
 
-			// Calculate the size of a complete port line
-			int txtAndSquareHeight = Math.max(XdfUtil.getTextMinHeight(txt), PORT_SIDE_WITH);
-			txt.setHeight(txtAndSquareHeight);
-
-			portYPos = i * (txtAndSquareHeight + PORT_MARGIN) + PORT_MARGIN;
-
-			// Set properties on port text
-			gaService.setLocationAndSize(txt, 0, portYPos, currentAreaWidth, txtAndSquareHeight);
-
-			FixPointAnchor fpAnchor = peCreateService.createFixPointAnchor(topLevelShape);
-			fpAnchor.setLocation(gaService.createPoint(portXPos, portYPos + portAreaY));
-
-			Rectangle portRect = gaService.createRectangle(fpAnchor);
-			portRect.setStyle(StyleUtil.getStyleForInstancePort(getDiagram()));
-			gaService.setLocationAndSize(portRect, 0, 0, PORT_SIDE_WITH + 6, PORT_SIDE_WITH + 6);
-
+			// Setup the linking with business object
 			link(fpAnchor, port);
 
-			++i;
+			// Configure direction of the port and alignment of texts
+			if (direction == Direction.INPUTS) {
+				ShapePropertiesManager.setInput(fpAnchor);
+				ShapePropertiesManager.setInput(txt);
+				txt.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
+				layoutPort(fpAnchor, i++, instanceShape);
+			} else {
+				ShapePropertiesManager.setOutput(fpAnchor);
+				ShapePropertiesManager.setOutput(txt);
+				txt.setHorizontalAlignment(Orientation.ALIGNMENT_RIGHT);
+				layoutPort(fpAnchor, j++, instanceShape);
+			}
 		}
+	}
+	
+	private void layoutPort(final FixPointAnchor anchor, final int index, final PictogramElement instancePe) {
+		final IGaService gaService = Graphiti.getGaService();
+		// The port square, visual representation of the anchor
+		final GraphicsAlgorithm square = anchor.getGraphicsAlgorithm();
+		// referenced port text
+		final GraphicsAlgorithm txt = getTextFromAnchor(anchor);
+
+		// Calculate the current size of the instance rectangle
+		final int instanceW = instancePe.getGraphicsAlgorithm().getWidth();
+		final int yScaleFromTop = LABEL_HEIGHT + SEPARATOR;
+		final int squareAndMargin = PORT_SIDE_WITH + PORT_MARGIN;
+
+		final int txtW = instanceW - squareAndMargin * 2;
+		final int txtH = 12;
+		final int txtX = squareAndMargin;
+		final int txtY = yScaleFromTop + PORT_MARGIN + index * (squareAndMargin);
+
+		final int anchorY = txtY + PORT_SIDE_WITH / 2;
+		final int squareY = -PORT_SIDE_WITH / 2;
+		
+		int anchorX, squareX;
+		if (ShapePropertiesManager.isInput(anchor)) {
+			anchorX = 0;
+			squareX = 0;
+		} else if (ShapePropertiesManager.isOutput(anchor)) {
+			anchorX = instanceW;
+			squareX = -PORT_SIDE_WITH;
+		} else {
+			OrccLogger.warnln("Anchor without \"direction\" property found.");
+			return;
+		}
+
+		// Text position is relative to its parent, the instance
+		// roundedRectangle (classical positioning)
+		gaService.setLocationAndSize(txt, txtX, txtY, txtW, txtH);
+		// FixPointAnchor references the txt object. Its location is
+		// relative to the text location
+		anchor.setLocation(gaService.createPoint(anchorX, anchorY));
+		// The square is the GA of the Anchor. Its position is calculated
+		// from the anchor's position
+		gaService.setLocationAndSize(square, squareX, squareY, PORT_SIDE_WITH, PORT_SIDE_WITH);
 	}
 
 	/**
@@ -636,12 +616,12 @@ public class InstancePattern extends AbstractPattern {
 	 * @param pe
 	 *            The instance pictogram element
 	 */
-	private void resizeShapeToMinimal(PictogramElement pe) {
+	private void resizeShapeToMinimal(final PictogramElement pe) {
 		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
 			return;
 		}
 
-		ResizeShapeContext ctxt = new ResizeShapeContext((Shape) pe);
+		final ResizeShapeContext ctxt = new ResizeShapeContext((Shape) pe);
 		ctxt.setWidth(getInstanceMinWidth(pe));
 		ctxt.setHeight(getInstanceMinHeight(pe));
 
@@ -653,115 +633,102 @@ public class InstancePattern extends AbstractPattern {
 	 * (between inputs and outputs ones)
 	 * 
 	 * @param pe
-	 *            The port area pictogram element
+	 *            The instance pictogram element
 	 * @return The height as integer
 	 */
-	private int getInstanceMinHeight(PictogramElement pe) {
+	private int getInstanceMinHeight(final PictogramElement pe) {
 		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
 			return -1;
 		}
 
-		Shape inArea = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, INPUTS_ID);
-		Shape outArea = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, OUTPUTS_ID);
+		final ContainerShape instanceShape = (ContainerShape) pe;
+		int inPorts = 0, outPorts = 0;
+		// Compute the number of inputs and outputs ports
+		for (final Anchor anchor : instanceShape.getAnchors()) {
+			if (ShapePropertiesManager.isInput(anchor)) {
+				++inPorts;
+			} else if (ShapePropertiesManager.isOutput(anchor)) {
+				++outPorts;
+			}
+		}
 
-		int portsAreaMinHeight = Math.max(getPortsAreaMinHeight(inArea), getPortsAreaMinHeight(outArea));
-		int newHeight = LABEL_HEIGHT + SEPARATOR + portsAreaMinHeight;
+		// Keep only the max
+		final int maxPorts = Math.max(inPorts, outPorts);
+		if (maxPorts == 0) {
+			return TOTAL_MIN_HEIGHT;
+		}
 
-		return Math.max(newHeight, TOTAL_MIN_HEIGHT);
+		// Calculate the total minimal height needed to display the longest
+		// ports list
+		for(final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
+			if (child instanceof Text
+					&& (ShapePropertiesManager.isInput(child) || ShapePropertiesManager.isOutput(child))) {
+				final Text exampleTxt = (Text) child;
+				final int newHeight = LABEL_HEIGHT + SEPARATOR + PORT_MARGIN + maxPorts
+						* (XdfUtil.getTextMinHeight(exampleTxt) + PORT_MARGIN);
+
+				// Return this max height only if it is superior the the generic
+				// minimal height for an instance
+				return Math.max(newHeight, TOTAL_MIN_HEIGHT);
+			}
+		}
+		// Should never happen
+		return TOTAL_MIN_HEIGHT;
 	}
 
 	/**
-	 * Calculate the minimal width needed to display all contents of an instance
-	 * shape.
-	 * 
-	 * This width is calculated from minimal sizes of both input an output ports
-	 * areas.
+	 * Calculate the minimal width needed to display all contents (ports) of an
+	 * instance shape.
 	 * 
 	 * @param pe
-	 *            The port area pictogram element
+	 *            The instance pictogram element
 	 * @return The width as integer
 	 */
-	private int getInstanceMinWidth(PictogramElement pe) {
+	private int getInstanceMinWidth(final PictogramElement pe) {
 		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
 			return -1;
 		}
 
-		Shape inArea = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, INPUTS_ID);
-		Shape outArea = (Shape) ShapePropertiesManager.findPcFromIdentifier(pe, OUTPUTS_ID);
+		final ContainerShape instanceShape = (ContainerShape) pe;
+		final int minWidthWithoutTexts = PORTS_AREAS_SPACE + (PORT_SIDE_WITH + PORT_MARGIN) * 2;
 
-		return getPortsAreaMinWidth(inArea) + getPortsAreaMinWidth(outArea) + PORTS_AREAS_SPACE + 2
-				* (PORT_SIDE_WITH + PORT_MARGIN);
-	}
+		final List<Text> inputs = new ArrayList<Text>();
+		final List<Text> outputs = new ArrayList<Text>();
 
-	/**
-	 * Calculate the minimal height needed to display all ports names in a port
-	 * area.
-	 * 
-	 * If the given pe does not contain any port text, the minimal size is
-	 * returned, calculated from the default sizes defined for an instance
-	 * shape.
-	 * 
-	 * @param pe
-	 *            The port area pictogram element
-	 * @return The height as integer
-	 */
-	private int getPortsAreaMinHeight(PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPc(pe, INPUTS_ID) && !ShapePropertiesManager.isExpectedPc(pe, OUTPUTS_ID)) {
-			return -1;
-		}
-
-		int nbPorts = 0;
-
-		Text txt = null;
-		for (Shape child : ((ContainerShape) pe).getChildren()) {
-			if (child.getGraphicsAlgorithm() instanceof Text) {
-				// To resize height if needed
-				++nbPorts;
-				// To resize width if needed
-				txt = (Text) child.getGraphicsAlgorithm();
+		// Collect the ports text instances in 2 separate maps
+		for (final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
+			if (child instanceof Text && ShapePropertiesManager.isInput(child)) {
+				inputs.add((Text) child);
+			} else if (child instanceof Text && ShapePropertiesManager.isOutput(child)) {
+				outputs.add((Text) child);
 			}
 		}
 
-		if (txt != null) {
-			int fullPortHeight = Math.max(XdfUtil.getTextMinHeight(txt), PORT_SIDE_WITH);
-			return nbPorts * (fullPortHeight + PORT_MARGIN) + PORT_MARGIN * 2;
-		}
-		return TOTAL_MIN_HEIGHT - LABEL_HEIGHT - SEPARATOR;
-	}
+		int maxTotalWidth = TOTAL_MIN_WIDTH;
+		final int nbCommonports = Math.min(inputs.size(), outputs.size());
 
-	/**
-	 * Calculate the minimal width needed to display the longest port name in a
-	 * port area.
-	 * 
-	 * If the given pe does not contain any port text, the minimal size is
-	 * returned, calculated from the default sizes defined for an instance
-	 * shape. If all ports name are shorter than the minimal, the minimal is
-	 * also returned.
-	 * 
-	 * @param pe
-	 *            The port area pictogram element
-	 * @return The width as integer
-	 */
-	private int getPortsAreaMinWidth(PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPc(pe, INPUTS_ID) && !ShapePropertiesManager.isExpectedPc(pe, OUTPUTS_ID)) {
-			return -1;
+		// Compute the longest space needed to display on the same line both
+		// input and output ports
+		for (int i = 0; i < nbCommonports; ++i) {
+			final int currentWidth = XdfUtil.getTextMinWidth(inputs.get(i)) + XdfUtil.getTextMinWidth(outputs.get(i))
+					+ minWidthWithoutTexts;
+			maxTotalWidth = Math.max(maxTotalWidth, currentWidth);
 		}
 
-		// Default minimal width for an ports area
-		int minWidth = (TOTAL_MIN_WIDTH - PORTS_AREAS_SPACE) / 2 - PORT_SIDE_WITH - PORT_MARGIN;
-
-		for (Shape child : ((ContainerShape) pe).getChildren()) {
-			if (child.getGraphicsAlgorithm() instanceof Text) {
-				// To resize width if needed
-				Text txt = (Text) child.getGraphicsAlgorithm();
-				int minTxtWidth = XdfUtil.getTextMinWidth(txt);
-
-				if (minTxtWidth > minWidth) {
-					minWidth = minTxtWidth;
-				}
+		// Do the same for lasts in/outputs ports
+		if (inputs.size() > outputs.size()) {
+			for (int i = nbCommonports; i < inputs.size(); ++i) {
+				final int currentWidth = XdfUtil.getTextMinWidth(inputs.get(i)) + minWidthWithoutTexts;
+				maxTotalWidth = Math.max(maxTotalWidth, currentWidth);
+			}
+		} else if (inputs.size() < outputs.size()) {
+			for (int i = nbCommonports; i < outputs.size(); ++i) {
+				final int currentWidth = XdfUtil.getTextMinWidth(outputs.get(i)) + minWidthWithoutTexts;
+				maxTotalWidth = Math.max(maxTotalWidth, currentWidth);
 			}
 		}
-		return minWidth;
+
+		return maxTotalWidth;
 	}
 
 	/**
@@ -770,7 +737,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @param pe
 	 * @return
 	 */
-	public String getNameFromShape(PictogramElement pe) {
+	public String getNameFromShape(final PictogramElement pe) {
 		if (isPatternRoot(pe)) {
 			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
 			return text.getValue();
@@ -778,16 +745,38 @@ public class InstancePattern extends AbstractPattern {
 		return "";
 	}
 
-	public EObject getRefinementFromShape(PictogramElement pe) {
+	public EObject getRefinementFromShape(final PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			String plateforStringUri = Graphiti.getPeService().getPropertyValue(pe, REFINEMENT_KEY);
-			Resource res = XdfUtil.getCommonresourceSet().getResource(
-					URI.createPlatformResourceURI(plateforStringUri, true),
-					true);
+			final String plateforStringUri = Graphiti.getPeService().getPropertyValue(pe, REFINEMENT_KEY);
+			final Resource res = XdfUtil.getCommonresourceSet().getResource(
+					URI.createPlatformResourceURI(plateforStringUri, true), true);
 			if (res.getContents().size() > 0) {
 				return res.getContents().get(0);
 			}
 		}
 		return null;
 	}
+
+	public Anchor getAnchorForPort(final PictogramElement instancePe, final Port port) {
+		if (isPatternRoot(instancePe)) {
+			final ContainerShape instanceShape = (ContainerShape) instancePe;
+			for (final Anchor anchor : instanceShape.getAnchors()) {
+				if (getBusinessObjectForPictogramElement(anchor).equals(port)) {
+					return anchor;
+				}
+			}
+		}
+		return null;
+	}
+
+	public Text getTextFromAnchor(final Anchor anchor) {
+		final String portName = Graphiti.getPeService().getPropertyValue(anchor, PORT_NAME_KEY);
+		for (final GraphicsAlgorithm gaChild : anchor.getParent().getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
+			if (gaChild instanceof Text && ((Text) gaChild).getValue().equals(portName)) {
+				return (Text) gaChild;
+			}
+		}
+		return null;
+	}
+
 }
