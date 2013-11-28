@@ -18,7 +18,9 @@ public class Schedule {
 	
 	private State endState = null;
 	
-	private int nrLeaves = 0;
+	private boolean scheduleDone = false;
+	
+	private Set<State> potentialEndStates = new HashSet<State>();
 	
 	private Action enablingAction = null;
 	
@@ -38,10 +40,22 @@ public class Schedule {
 		setEnablingAction(action);
 	}
 
+	public boolean isScheduleDone() {
+		return scheduleDone;
+	}
+
+	public void setScheduleDone(boolean scheduleDone) {
+		this.scheduleDone = scheduleDone;
+	}
+	
 	public void addPotentialChoiseState(State state) {
 		this.potentialChoiseStates.add(state);
 	}
 
+	public Set<State> getPotentialEndStates() {
+		return potentialEndStates;
+	}
+	
 	public Action getEnablingAction() {
 		return enablingAction;
 	}
@@ -55,7 +69,7 @@ public class Schedule {
 	}
 
 	public int getNrLeaves() {
-		return nrLeaves;
+		return potentialEndStates.size();
 	}
 
 	public Map<String, List<Object>> getPortPeeks() {
@@ -78,10 +92,6 @@ public class Schedule {
 		return sequence;
 	}
 
-	public void incNrLeaves() {
-		this.nrLeaves++;
-	}
-
 	public void setEnablingAction(Action enablingAction) {
 		this.enablingAction = enablingAction;
 	}
@@ -89,6 +99,11 @@ public class Schedule {
 	public void setEndState(State endState) {
 		this.endState = endState;
 	}
+	
+	public void addPotentialEndState(State endState) {
+		potentialEndStates.add(endState);
+	}
+
 
 	@Override
 	public String toString() {
