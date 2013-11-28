@@ -82,12 +82,20 @@ void set_mapping_strategy(char *arg_value, options_t *opt) {
     assert(arg_value != NULL);
     assert(opt != NULL);
 
-    if (strcmp(arg_value, "METIS_REC") == 0) {
+    if (strcmp(arg_value, "MR") == 0) {
         opt->strategy = ORCC_MS_METIS_REC;
-    } else if (strcmp(arg_value, "METIS_KWAY") == 0) {
+    } else if (strcmp(arg_value, "MK") == 0) {
         opt->strategy = ORCC_MS_METIS_KWAY;
-    } else if (strcmp(arg_value, "ROUND_ROBIN") == 0) {
+    } else if (strcmp(arg_value, "RR") == 0) {
         opt->strategy = ORCC_MS_ROUND_ROBIN;
+    } else if (strcmp(arg_value, "QM") == 0) {
+        opt->strategy = ORCC_MS_QM;
+    } else if (strcmp(arg_value, "WLB") == 0) {
+        opt->strategy = ORCC_MS_WLB;
+    } else if (strcmp(arg_value, "COW") == 0) {
+        opt->strategy = ORCC_MS_COWLB;
+    } else if (strcmp(arg_value, "KLR") == 0) {
+        opt->strategy = ORCC_MS_KRWLB;
     } else {
         print_orcc_error(ORCC_ERR_BAD_ARGS_MS);
         printf("\n");
@@ -132,5 +140,4 @@ void set_default_output_filename(char *arg_value, options_t *opt) {
 
     opt->output_file = output;
 }
-
 

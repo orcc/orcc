@@ -78,7 +78,10 @@ typedef enum {
     ORCC_MS_METIS_REC,
     ORCC_MS_METIS_KWAY,
     ORCC_MS_ROUND_ROBIN,
-    ORCC_MS_OTHER,
+    ORCC_MS_QM,
+    ORCC_MS_WLB,
+    ORCC_MS_COWLB,
+    ORCC_MS_KRWLB,
     ORCC_MS_SIZE /* only used for string tab declaration */
 } mappingstrategy_et;
 

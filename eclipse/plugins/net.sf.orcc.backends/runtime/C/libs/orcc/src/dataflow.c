@@ -71,6 +71,10 @@ network_t* allocate_network(int nb_actors, int nb_connections) {
 void reset_profiling(network_t *network) {
     int i;
     for (i = 0; i < network->nb_actors; i++) {
+        network->actors[i]->commCost = 0;
+        network->actors[i]->evaluated = 0;
+        network->actors[i]->triedProcId = 1;
+        network->actors[i]->processor_id = -1;
         network->actors[i]->ticks = 0;
     }
     for (i = 0; i < network->nb_connections; i++) {

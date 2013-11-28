@@ -96,6 +96,27 @@ mapping_t* map_actors(network_t *network) {
     return mapping;
 }
 
+/**
+ * Creates a mapping structure.
+ */
+processor_t* init_processors(int number_of_threads) {
+    int i;
+
+    processor_t* processors = (processor_t *) malloc(number_of_threads * sizeof(processor_t));
+    for (i = 0; i < number_of_threads; i++) {
+        processors[i].processor_id = i;
+        processors[i].utilization = 0;
+    }
+
+    return processors;
+}
+
+/**
+ * Releases memory of the given mapping structure.
+ */
+void delete_processors(processor_t *processors) {
+    free(processors);
+}
 
 /********************************************************************************************
  *
@@ -156,6 +177,8 @@ int swap_actors(actor_t **actors, int index1, int index2, int nb_actors) {
         actor = actors[index1];
         actors[index1] = actors[index2];
         actors[index1] = actor;
+        actors[index1]->id = index1;
+        actors[index2]->id = index2;
     } else {
         ret = ORCC_ERR_SWAP_ACTORS;
     }
@@ -245,6 +268,8 @@ void print_mapping(mapping_t *mapping) {
  ********************************************************************************************/
 
 int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part) {
+    assert(network != NULL);
+    assert(opt != NULL);
     assert(part != NULL);
     int ret = ORCC_OK;
     idx_t ncon = 1;
@@ -282,6 +307,8 @@ int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part
 }
 
 int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part) {
+    assert(network != NULL);
+    assert(opt != NULL);
     assert(part != NULL);
     int ret = ORCC_OK;
     idx_t ncon = 1;
@@ -319,8 +346,13 @@ int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part) {
     return ret;
 }
 
+/**
+ * Round Robin strategy
+ * @author Long Nguyen
+ */
 int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part) {
     assert(network != NULL);
+    assert(opt != NULL);
     assert(part != NULL);
     int ret = ORCC_OK;
     int i, k;
@@ -350,8 +382,12 @@ int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part) {
     return ret;
 }
 
+/**
+ * Entry point for all mapping strategies
+ */
 int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
     assert(network != NULL);
+    assert(opt != NULL);
     assert(mapping != NULL);
     int i;
     int ret = ORCC_OK;
@@ -375,8 +411,10 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
         case ORCC_MS_ROUND_ROBIN:
             ret = do_round_robbin_mapping(network, opt, part);
             break;
-        case ORCC_MS_OTHER:
-            break;
+        case ORCC_MS_QM:
+        case ORCC_MS_WLB:
+        case ORCC_MS_COWLB:
+        case ORCC_MS_KRWLB:
         default:
             break;
         }

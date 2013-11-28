@@ -160,7 +160,10 @@ network_t* load_network(char *fileName) {
             node_t* nodeAttrActorId = roxml_get_attr(actorNode, "id", 0);
             network->actors[i]->name = roxml_get_content(nodeAttrActorId, NULL, 0, NULL);
             network->actors[i]->id = i;
-            network->actors[i]->processor_id = 0;
+            network->actors[i]->processor_id = -1;
+            network->actors[i]->commCost = 0;
+            network->actors[i]->triedProcId = 1;
+            network->actors[i]->evaluated = 0;
 
             node_t* nodeAttrWorkload = roxml_get_attr(actorNode, "workload", 0);
             if (nodeAttrWorkload != NULL) {

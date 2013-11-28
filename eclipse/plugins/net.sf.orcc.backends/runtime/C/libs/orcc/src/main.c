@@ -66,9 +66,13 @@ void print_usage_orccmap() {
     printf("\n%s-m, --mapping_strategy <strategy>", INDENT);
     printf("\n%s%sThe strategy to apply to do the mapping.", INDENT, INDENT);
     printf("\n%s%sThe possible values are: {Default : ROUND_ROBIN}", INDENT, INDENT);
-    printf("\n%s%s%sROUND_ROBIN", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sMETIS_REC", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sMETIS_KWAY", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sMR\t: METIS Recursive graph partition mapping", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sMK\t: METIS KWay graph partition mapping", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sRR\t: A simple Round-Robin mapping", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sQM\t: Quick Mapping (Not yet available)", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sWLB\t: Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sCOW\t: Communication Optimized Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sKLR\t: Kernighan Lin Refinement Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
 
     printf("\n");
     printf("\n%s-v, --verbose [level]", INDENT);

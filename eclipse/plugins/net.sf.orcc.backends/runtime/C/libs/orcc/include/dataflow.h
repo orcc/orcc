@@ -48,6 +48,9 @@ struct actor_s {
     local_scheduler_t *sched; /** scheduler which execute this actor. */
     int processor_id; /** id of the processor core mapped to this actor. */
     int id;
+    int commCost;  /** Used by Quick Mapping algo */
+    int triedProcId;  /** Used by Quick Mapping algo */
+    int evaluated;  /** Used by KL algo */
     int workload; /** actor's workload */
     double ticks; /** elapsed ticks obtained by profiling */
 };

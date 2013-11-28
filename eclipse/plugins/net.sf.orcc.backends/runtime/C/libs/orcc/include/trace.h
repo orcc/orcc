@@ -60,7 +60,11 @@ static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
 static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
     "METIS Recursive",
     "METIS Kway",
-    "Round Robin"
+    "Round Robin",
+    "Quick Mapping",
+    "Weighted Load Balancing",
+    "Communication Optimized Load Balancing",
+    "Kernighan Lin Refinement Weighted Load Balancing"
 };
 
 extern verbose_level_et verbose_level;

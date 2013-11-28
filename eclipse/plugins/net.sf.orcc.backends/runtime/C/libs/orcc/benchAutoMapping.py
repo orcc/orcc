@@ -41,7 +41,7 @@ import time
 
 def performBench():
     print "*********************************************************************"
-    print "* ORCC Mapping Bench"
+    print "* ORCC Auto-Mapping Bench"
     print "*********************************************************************"
     print "==> Decoder : %s" % (DEFAULT_EXE)
     print "==> Sequences : %s" % (SEQ_PATH)
@@ -52,45 +52,29 @@ def performBench():
     else:
         minRange = NBPROC
 
-    generateProfilingFiles()
+    performMapping(1)
     for nbP in range(minRange,NBPROC+1):
         performMapping(nbP)
         extractFPS(nbP)
-        logInTXT(nbP)
         logInCSV(nbP)
-        # logInXML(nbP)
+#         logInTXT(nbP)
+#         logInXML(nbP)
         del BENCH_DATA[:]
 
     mergeAllCSV()
     archiveLogs()
 
-def generateProfilingFiles():
-    print "\nGenerate profiling file for each sequence in " + SEQ_PATH
-    for fic in os.listdir(SEQ_PATH):
-        if fic.endswith(HEVC_SEQ_FILTER+HEVC_SEQ_EXT) or fic.endswith(MPEG4_SEQ_EXT):
-            SEQUENCE_NAME = fic[0:len(fic)-len(HEVC_SEQ_EXT)]
-
-            print "  * Processing on sequence : %s" % (SEQUENCE_NAME)
-
-            pxdfFile = FILE_HEAD + SEQUENCE_NAME + ".pxdf"
-            log_file = open(FILE_HEAD + SEQUENCE_NAME + "_" + MS_NM  + DEFAULT_LOG_EXT, 'w')
-
-            proc = subprocess.call([DEFAULT_EXE, "-f", str(NBFRAME), "-n", "-i", os.path.join(SEQ_PATH, fic), "-b", pxdfFile], stdout=log_file)
-
-
 def performMappingWithStrategy(fic, nbProcs, Strategy):
     SEQUENCE_NAME = fic[0:len(fic)-len(DEFAULT_LOG_EXT)]
-    pxdfFile = FILE_HEAD + SEQUENCE_NAME + ".pxdf"
     baseName = FILE_HEAD + SEQUENCE_NAME + "_" + str(nbProcs) + "Procs"
-    xcfFile = baseName + "_" + Strategy + ".xcf"
-    log_file = open(baseName + "_" + Strategy  + DEFAULT_LOG_EXT, 'w')
+    
+    if nbProcs == 1:
+        log_file = open(baseName + DEFAULT_LOG_EXT, 'w')
+    else:
+        print "      => Applying mapping strategy : %s" % (MS_LIST[Strategy])
+        log_file = open(baseName + "_" + MS_LIST[Strategy]  + DEFAULT_LOG_EXT, 'w')
   
-    # Generate XCF file with Mapping Strategy
-    # print "\tGenerate XCF file : %s" % (xcfFile)
-    proc = subprocess.call(["../bin/orcc-map", "-n", str(nbProcs), "-v", "-i", pxdfFile, "-m", Strategy, "-o", xcfFile], stdout=log_file)
-    # Log FPS with Mapping Strategy
-    # print "\tRun sequence with mapping : %s" % (Strategy)
-    proc = subprocess.call([DEFAULT_EXE, "-f", str(NBFRAME), "-n", "-i", os.path.join(SEQ_PATH, fic), "-m", xcfFile], stdout=log_file)
+    proc = subprocess.call([DEFAULT_EXE, "-f", str(NBFRAME), "-n", "-v1", "-i", os.path.join(SEQ_PATH, fic), "-c", str(nbProcs), "-r100", "-s", str(Strategy)], stdout=log_file)
 
 
 def performMapping(nbProcs):
@@ -101,12 +85,14 @@ def performMapping(nbProcs):
             SEQUENCE_NAME = fic[0:len(fic)-len(HEVC_SEQ_EXT)]
 
             print "  * Processing on sequence : %s" % (SEQUENCE_NAME)
+            
+            if nbProcs == 1:
+                performMappingWithStrategy(fic, nbProcs, 0)
 
-            performMappingWithStrategy(fic, nbProcs, MS_RR)
-            performMappingWithStrategy(fic, nbProcs, MS_MR)
-            performMappingWithStrategy(fic, nbProcs, MS_MK)
-
-
+            else:
+                for strategy in range(0, len(MS_LIST)):
+                    performMappingWithStrategy(fic, nbProcs, strategy)
+            
 def getFPS(fic):
     fps = 0
     fp = open(fic)
@@ -116,27 +102,64 @@ def getFPS(fic):
     fp = fp.close()
     return round(float(fps), 2)
 
+def getFPSPostMapping(fic):
+    fps = 0
+    fp = open(fic)
+    for line in fp:
+        if line.count(TOKEN_FPS_POST_MAPPING) == 1:
+            fps = (line.split()[7])
+    fp = fp.close()
+    return round(float(fps), 2)
+
+def getLB(fic):
+    val = 0
+    fp = open(fic)
+    for line in fp:
+        if line.count(TOKEN_LB) == 1:
+            val = (line.split()[2])
+    fp = fp.close()
+    return round(float(val), 2)
+
+def getEC(fic):
+    val = 0
+    fp = open(fic)
+    for line in fp:
+        if line.count(TOKEN_EC) == 1:
+            val = (line.split()[2])
+    fp = fp.close()
+    return val
+
+def getCV(fic):
+    val = 0
+    fp = open(fic)
+    for line in fp:
+        if line.count(TOKEN_CV) == 1:
+            val = (line.split()[6])
+    fp = fp.close()
+    return val
+
 def extractFPS(nbProcs):
-    fps = "NaN"
-    fps_RR = "NaN"
-    fps_MR = "NaN"
-    fps_MK = "NaN"
     print "\n  * Extracting FPS from logs"
     for fic in os.listdir("."):
-        if fic.count(MS_NM+DEFAULT_LOG_EXT):
-            SEQUENCE_NAME = fic[len(FILE_HEAD):len(fic)-len(MS_NM)-len(DEFAULT_LOG_EXT)-1]
+        if fic.count("_1Procs"+DEFAULT_LOG_EXT):
+            SEQUENCE_NAME = fic[len(FILE_HEAD):len(fic)-len("_1Procs")-len(DEFAULT_LOG_EXT)]
             fps = getFPS(fic)
+            data_seq = list()
+            
+            data_seq.append(SEQUENCE_NAME)
+            data_seq.append(str(fps).replace(".", ","))
             
             baseName = SEQUENCE_NAME + "_" + str(nbProcs) + "Procs" + "_"
-            for fic in os.listdir("."):
-                if fic.count(baseName + MS_RR+ DEFAULT_LOG_EXT):
-                    fps_RR = getFPS(fic)
-                elif fic.count(baseName + MS_MR + DEFAULT_LOG_EXT):
-                    fps_MR = getFPS(fic)
-                elif fic.count(baseName + MS_MK + DEFAULT_LOG_EXT):
-                    fps_MK = getFPS(fic)
+            for strategy in MS_LIST:
+                log_file = "./" + FILE_HEAD + baseName + strategy + DEFAULT_LOG_EXT
+                fps_str = getFPSPostMapping(log_file)
+                data_seq.append(str(fps_str).replace(".", ","))
+                data_seq.append(str(round(fps_str/fps, 2)).replace(".", ","))
+                data_seq.append(str(getLB(log_file)).replace(".", ","))
+                data_seq.append(str(getEC(log_file)))
+                data_seq.append(str(getCV(log_file)))
 
-            BENCH_DATA.append([SEQUENCE_NAME, str(fps), str(fps_RR), str(round(fps_RR/fps, 2)), str(fps_MR), str(round(fps_MR/fps, 2)), str(fps_MK), str(round(fps_MK/fps, 2))])
+            BENCH_DATA.append(data_seq)
 
     BENCH_DATA.sort()
 
@@ -206,13 +229,18 @@ def logInCSV(nbProcs):
     fd = open(OUTPUT_TAG + "_" + str(nbProcs) + "Procs" + ".csv", 'w')
     # Header
     fd.write("Nb of processors;;" + str(nbProcs) + ";;;;;\n")
-    fd.write("Sequence;FPS;Round Robin;Acc;Metis Recursive;Acc;Metis Kway;Acc\n")
+    fd.write("Sequence;FPS")
+    for strategy in MS_LIST:
+        fd.write(";" + strategy + ";Acc")
+        fd.write(";LB;EC;CV")
+    fd.write("\n")
 
     # Body
     for bData in BENCH_DATA:
-        fd.write(bData[0] + ";" + bData[1].replace(".", ",") +  ";" + bData[2].replace(".", ",") + ";" + bData[3].replace(".", ",") + \
-        ";" + bData[4].replace(".", ",") + ";" + bData[5].replace(".", ",") +  ";" + bData[6].replace(".", ",") + ";" + bData[7].replace(".", ",") + "\n");
-
+        for iData in range(0, len(bData)):
+            fd.write(bData[iData] + ";");
+        fd.write("\n")
+          
     # Footer
     fd.write("\n")
     fd.close()
@@ -241,11 +269,9 @@ def archiveLogs():
         print "!! Making a backup of a directory with same name in " + backup
     os.mkdir(OUTPUT_TAG)
     os.system("mv " + FILE_HEAD+"*"+ DEFAULT_LOG_EXT + " " + OUTPUT_TAG)
-    os.system("mv " + FILE_HEAD+"*"+ ".pxdf" + " " + OUTPUT_TAG)
-    os.system("mv " + FILE_HEAD+"*"+ ".xcf" + " " + OUTPUT_TAG)
-    os.system("mv " + OUTPUT_TAG+"*"+ ".txt" + " " + OUTPUT_TAG)
     os.system("mv " + OUTPUT_TAG+"*"+ ".csv" + " " + OUTPUT_TAG)
-    os.system("mv " + OUTPUT_TAG+"*"+ ".xml" + " " + OUTPUT_TAG)
+#     os.system("mv " + OUTPUT_TAG+"*"+ ".txt" + " " + OUTPUT_TAG)
+#     os.system("mv " + OUTPUT_TAG+"*"+ ".xml" + " " + OUTPUT_TAG)
 
 # Main
 # DEFAULT
@@ -259,14 +285,15 @@ DEFAULT_NBPROC = 4
 DEFAULT_RANGE = False
 FILE_HEAD = "bench_"
 TOKEN_FPS = "FPS"
-MS_RR = "RR"
-MS_MR = "MR"
-MS_MK = "MK"
-MS_NM = "NO_MAPPING"
+TOKEN_FPS_POST_MAPPING = "PostMapping :"
+TOKEN_LB = "Load balancing"
+TOKEN_EC = "Edgecut :"
+TOKEN_CV = "Communication volume :"
+MS_LIST = ["MR", "MK", "RR"]
 BENCH_DATA = list()
 
 # Parse args
-parser = argparse.ArgumentParser(description='Open RVC-CAL Compiler - benchMapping - ??????')
+parser = argparse.ArgumentParser(description='Open RVC-CAL Compiler - benchAutoMapping - ??????')
 parser.add_argument('-d', dest='decoder_path', help='Path to your orcc decoder binary', required=True)
 parser.add_argument('-s', dest='sequences_path', help='Path to the directory containing the sequences', required=True)
 parser.add_argument('-n', dest='nb_procs', type=int, default=DEFAULT_NBPROC, help='Number of processors for mapping (default value = 4)')

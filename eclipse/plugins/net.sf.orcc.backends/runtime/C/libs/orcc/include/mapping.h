@@ -52,6 +52,11 @@ struct agent_s {
     int nb_threads;
 };
 
+typedef struct processor_s {
+    int processor_id;
+    int utilization;
+} processor_t;
+
 /**
  * Main routine of the mapping agent.
  */
