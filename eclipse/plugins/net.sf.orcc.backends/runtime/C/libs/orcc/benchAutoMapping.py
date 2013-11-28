@@ -81,8 +81,8 @@ def performMapping(nbProcs):
     print "\n*********************************************************************"
     print "Perform mapping for " + str(nbProcs) + " processors for each sequence in " + SEQ_PATH
     for fic in os.listdir(SEQ_PATH):
-        if fic.endswith(HEVC_SEQ_FILTER+HEVC_SEQ_EXT) or fic.endswith(MPEG4_SEQ_EXT):
-            SEQUENCE_NAME = fic[0:len(fic)-len(HEVC_SEQ_EXT)]
+        if fic.endswith(SEQ_EXT[0]) or fic.endswith(SEQ_EXT[1]) or fic.endswith(SEQ_EXT[2]):
+            SEQUENCE_NAME = fic[0:len(fic)-4]
 
             print "  * Processing on sequence : %s" % (SEQUENCE_NAME)
             
@@ -119,6 +119,15 @@ def getLB(fic):
             val = (line.split()[2])
     fp = fp.close()
     return round(float(val), 2)
+
+def getPART(fic):
+    val = 0
+    fp = open(fic)
+    for line in fp:
+        if line.count(TOKEN_LB) == 1 and line.count(TOKEN_PART) == 1:
+            val = (line.split()[4])
+    fp = fp.close()
+    return val
 
 def getEC(fic):
     val = 0
@@ -168,6 +177,7 @@ def extractFPS(nbProcs):
                 data_seq.append(str(getEC(log_file)))
                 data_seq.append(str(getCV(log_file)))
                 data_seq.append(str(getMT(log_file)))
+                data_seq.append(str(getPART(log_file)))
 
             BENCH_DATA.append(data_seq)
 
@@ -242,7 +252,7 @@ def logInCSV(nbProcs):
     fd.write("Sequence;FPS")
     for strategy in MS_LIST:
         fd.write(";" + strategy + ";Acc")
-        fd.write(";LB;EC;CV;MT")
+        fd.write(";LB;EC;CV;MT;Parts")
     fd.write("\n")
 
     # Body
@@ -285,9 +295,7 @@ def archiveLogs():
 
 # Main
 # DEFAULT
-HEVC_SEQ_FILTER = "_qp27"
-HEVC_SEQ_EXT = ".bin"
-MPEG4_SEQ_EXT = ".bit"
+SEQ_EXT = ["_qp27.bin", ".bit", ".m4v"]
 DEFAULT_LOG_EXT = ".log"
 DEFAULT_OUTPUT_TAG = "bench"
 DEFAULT_NBFRAME = 500
@@ -300,6 +308,7 @@ TOKEN_LB = "Load balancing"
 TOKEN_EC = "Edgecut :"
 TOKEN_CV = "Communication volume :"
 TOKEN_MT = "Mapping time :"
+TOKEN_PART = "partitions"
 MS_LIST = ["MR", "MKV", "MKC", "RR"]
 BENCH_DATA = list()
 

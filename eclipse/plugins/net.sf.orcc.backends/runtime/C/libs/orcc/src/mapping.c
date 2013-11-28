@@ -127,7 +127,7 @@ void delete_processors(processor_t *processors) {
 void print_load_balancing(mapping_t *mapping) {
     assert(mapping != NULL);
     int i, j, nb_proc = 0;
-    int totalWeight = 0, maxWeight = 0, partWeight = 0;
+    int totalWeight = 0, maxWeight = 0, partWeight = 0, nbPartitions = 0;
     double avgWeight = 0;
 
     for (i = 0; i < mapping->number_of_threads; i++) {
@@ -138,6 +138,10 @@ void print_load_balancing(mapping_t *mapping) {
             nb_proc++;
         }
 
+        if (mapping->partitions_size[i] > 0) {
+            nbPartitions++;
+        }
+
         print_orcc_trace(ORCC_VL_VERBOSE_2, "Weight of partition %d : %d", i+1, partWeight);
         if (maxWeight < partWeight)
             maxWeight = partWeight;
@@ -145,7 +149,7 @@ void print_load_balancing(mapping_t *mapping) {
 
     avgWeight = (totalWeight / mapping->number_of_threads);
     print_orcc_trace(ORCC_VL_VERBOSE_2, "Average weight: %.2lf   Max weight: %d", avgWeight, maxWeight);
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "Load balancing %.2lf", maxWeight/avgWeight);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Load balancing %.2lf on %d partitions", maxWeight/avgWeight, nbPartitions);
 }
 
 void print_edge_cut(network_t *network) {
