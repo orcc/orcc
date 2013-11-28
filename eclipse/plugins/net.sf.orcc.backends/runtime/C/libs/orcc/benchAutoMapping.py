@@ -138,6 +138,15 @@ def getCV(fic):
     fp = fp.close()
     return val
 
+def getMT(fic):
+    val = 0
+    fp = open(fic)
+    for line in fp:
+        if line.count(TOKEN_MT) == 1:
+            val = (line.split()[3])
+    fp = fp.close()
+    return val
+
 def extractFPS(nbProcs):
     print "\n  * Extracting FPS from logs"
     for fic in os.listdir("."):
@@ -158,6 +167,7 @@ def extractFPS(nbProcs):
                 data_seq.append(str(getLB(log_file)).replace(".", ","))
                 data_seq.append(str(getEC(log_file)))
                 data_seq.append(str(getCV(log_file)))
+                data_seq.append(str(getMT(log_file)))
 
             BENCH_DATA.append(data_seq)
 
@@ -232,7 +242,7 @@ def logInCSV(nbProcs):
     fd.write("Sequence;FPS")
     for strategy in MS_LIST:
         fd.write(";" + strategy + ";Acc")
-        fd.write(";LB;EC;CV")
+        fd.write(";LB;EC;CV;MT")
     fd.write("\n")
 
     # Body
@@ -289,7 +299,8 @@ TOKEN_FPS_POST_MAPPING = "PostMapping :"
 TOKEN_LB = "Load balancing"
 TOKEN_EC = "Edgecut :"
 TOKEN_CV = "Communication volume :"
-MS_LIST = ["MR", "MK", "RR"]
+TOKEN_MT = "Mapping time :"
+MS_LIST = ["MR", "MKV", "MKC", "RR"]
 BENCH_DATA = list()
 
 # Parse args

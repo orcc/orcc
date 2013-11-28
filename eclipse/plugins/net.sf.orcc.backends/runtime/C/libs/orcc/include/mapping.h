@@ -161,7 +161,7 @@ int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part
 /**
  * Apply actor mapping using metis kway strategy
  */
-int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part);
+int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part, idx_t mode);
 
 /**
  * Apply actor mapping using round-robin strategy

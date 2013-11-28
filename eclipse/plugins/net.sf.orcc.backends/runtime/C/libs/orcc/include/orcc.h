@@ -76,7 +76,8 @@ typedef enum {
 /* Mapping strategy codes */
 typedef enum {
     ORCC_MS_METIS_REC,
-    ORCC_MS_METIS_KWAY,
+    ORCC_MS_METIS_KWAY_CV,
+    ORCC_MS_METIS_KWAY_EC,
     ORCC_MS_ROUND_ROBIN,
     ORCC_MS_QM,
     ORCC_MS_WLB,

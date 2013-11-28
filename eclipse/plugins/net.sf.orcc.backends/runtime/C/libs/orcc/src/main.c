@@ -67,7 +67,8 @@ void print_usage_orccmap() {
     printf("\n%s%sThe strategy to apply to do the mapping.", INDENT, INDENT);
     printf("\n%s%sThe possible values are: {Default : ROUND_ROBIN}", INDENT, INDENT);
     printf("\n%s%s%sMR\t: METIS Recursive graph partition mapping", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sMK\t: METIS KWay graph partition mapping", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sMKCV\t: METIS KWay graph partition mapping (Optimize Communication volume)", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sMKEC\t: METIS KWay graph partition mapping (Optimize Edge-cut)", INDENT, INDENT, INDENT);
     printf("\n%s%s%sRR\t: A simple Round-Robin mapping", INDENT, INDENT, INDENT);
     printf("\n%s%s%sQM\t: Quick Mapping (Not yet available)", INDENT, INDENT, INDENT);
     printf("\n%s%s%sWLB\t: Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);

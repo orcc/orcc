@@ -59,7 +59,8 @@ static const char *ORCC_ERRORS_TXT[ORCC_ERR_SIZE] = {
 
 static const char *ORCC_STRATEGY_TXT[ORCC_MS_SIZE] = {
     "METIS Recursive",
-    "METIS Kway",
+    "METIS Kway (Comm Volume)",
+    "METIS Kway (Edge-cut)",
     "Round Robin",
     "Quick Mapping",
     "Weighted Load Balancing",
