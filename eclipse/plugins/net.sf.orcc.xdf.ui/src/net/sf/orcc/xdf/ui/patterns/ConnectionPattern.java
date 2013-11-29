@@ -41,6 +41,8 @@ import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
@@ -78,6 +80,12 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		NETWORK_PORT, INSTANCE_PORT
 	}
 
+	/**
+	 * Define a simple utility class to encapsulate all information about a
+	 * source or a target port.
+	 * 
+	 * @author Antoine Lorence
+	 */
 	public class PortInformation {
 		private final Vertex vertex;
 		private final Port port;
@@ -231,15 +239,31 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		connection.setStart(addConContext.getSourceAnchor());
 		connection.setEnd(addConContext.getTargetAnchor());
 
-		ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
-		createArrow(cd);
+		final Polyline polyline = gaService.createPolyline(connection);
+		final ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+		final GraphicsAlgorithm arrow = createArrow(cd);
 
-		/* Polyline polyline = */gaService.createPolyline(connection);
-		StyleUtil.getStyleForConnection(getDiagram());
+		polyline.setStyle(StyleUtil.getStyleForConnection(getDiagram()));
+		arrow.setStyle(StyleUtil.getStyleForConnection(getDiagram()));
 
 		// create link and wire it
 		link(connection, addedConnection);
 		return super.add(context);
+	}
+
+	/**
+	 * Create the arrow to display on the target side of the connection
+	 * 
+	 * @param gaContainer
+	 * @return
+	 */
+	private GraphicsAlgorithm createArrow(final GraphicsAlgorithmContainer gaContainer) {
+		final int w = 12, l = 5;
+		final int[] xy = new int[] { 2, 0, -w, l, -w, -l };
+		final Polygon figure = Graphiti.getGaService().createPolygon(gaContainer, xy);
+		figure.setLineVisible(false);
+
+		return figure;
 	}
 
 	/**
@@ -280,23 +304,9 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 					: Direction.OUTPUT;
 
 			return new PortInformation(port, null, direction, PortType.NETWORK_PORT);
-
 		}
 
 		// Anchor without port ? Maybe an error here...
 		return null;
-	}
-
-	/**
-	 * Create the arrow to display on the target side of the connection
-	 * 
-	 * @param gaContainer
-	 * @return
-	 */
-	private Polyline createArrow(GraphicsAlgorithmContainer gaContainer) {
-		IGaService gaService = Graphiti.getGaService();
-		Polyline polyline = gaService.createPolyline(gaContainer, new int[] { -15, 10, 0, 0, -15, -10 });
-		polyline.setStyle(StyleUtil.getStyleForConnection(getDiagram()));
-		return polyline;
 	}
 }

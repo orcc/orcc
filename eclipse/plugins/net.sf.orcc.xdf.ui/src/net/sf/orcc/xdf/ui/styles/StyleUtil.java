@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.xdf.ui.styles;
 
+import org.eclipse.graphiti.mm.algorithms.styles.Color;
 import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.algorithms.styles.Style;
@@ -195,12 +196,12 @@ public class StyleUtil {
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			style.setFilled(false);
+			style.setFilled(true);
 			style.setLineVisible(true);
-			style.setLineWidth(1);
-			style.setForeground(gaService.manageColor(diagram, CONNECTION_COLOR));
-
-			gaService.setRenderingStyle(style, PredefinedColoredAreas.getCopperWhiteGlossAdaptions());
+			style.setLineWidth(2);
+			final Color commonColor = gaService.manageColor(diagram, CONNECTION_COLOR);
+			style.setForeground(commonColor);
+			style.setBackground(commonColor);
 		}
 		return style;
 	}
