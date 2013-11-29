@@ -30,6 +30,7 @@ import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
+import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
@@ -79,6 +80,9 @@ class InstanceCPrinter extends CTemplate {
 		setInstance(instance)	
 		print(targetFolder)
 	}
+
+	override caseTypeBool(TypeBool type) 
+		'''u8'''
 	
 	/**
 	 * Print file content from a given actor
@@ -244,12 +248,13 @@ class InstanceCPrinter extends CTemplate {
 			«printFsm»
 		«ELSE»
 			int «entityName»_fire(DALProcess *_p) {
-				int i = 0;
-							
-				«actor.actionsOutsideFsm.printActionLoop»
+				int iter, i = 0;
+				for(iter = 0; iter < ITERATIONS; iter++) {			
+					«actor.actionsOutsideFsm.printActionLoop»
 				
 			finished:
-				
+					iter = iter;
+				}
 				return 0;
 			}
 		«ENDIF»
@@ -270,16 +275,16 @@ class InstanceCPrinter extends CTemplate {
 		«ENDIF»
 		
 		int «entityName»_fire(DALProcess *_p) {
-			int i = 0;
+			int iter, i = 0;
 		
-			// jump to FSM state 
-			switch (_p->local->_FSM_state) {
+			for(iter = 0; iter < ITERATIONS; iter++) {			
+				switch (_p->local->_FSM_state) {
 			«FOR state : actor.fsm.states»
-				case my_state_«state.name»:
-					goto l_«state.name»;
+					case my_state_«state.name»:
+						goto l_«state.name»;
 			«ENDFOR»
 			default:
-				printf("unknown state in «entityName».c\n");
+					printf("unknown state in «entityName».c\n");
 			}
 		
 			// FSM transitions
@@ -287,6 +292,8 @@ class InstanceCPrinter extends CTemplate {
 		«state.printStateLabel»
 			«ENDFOR»
 		finished:
+				iter = iter;
+			}
 			return 0;
 		}
 	'''

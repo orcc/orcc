@@ -10,6 +10,7 @@ import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
 import net.sf.orcc.ir.TypeList
+import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
@@ -58,6 +59,9 @@ class InstanceHPrinter extends CTemplate {
 		setInstance(instance)	
 		print(targetFolder)
 	}
+
+	override caseTypeBool(TypeBool type) 
+		'''u8'''
 	
 	/**
 	 * Print file content from a given actor
