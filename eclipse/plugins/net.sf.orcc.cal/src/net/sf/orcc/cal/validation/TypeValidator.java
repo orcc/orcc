@@ -83,7 +83,7 @@ import org.eclipse.xtext.validation.CheckType;
  */
 public class TypeValidator extends AbstractCalJavaValidator {
 
-	private TypePrinter printer;
+	private final TypePrinter printer;
 
 	public TypeValidator() {
 		printer = new TypePrinter();
@@ -639,6 +639,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	}
 
 	private String print(Type type) {
+		if (type == null) {
+			return "null";
+		}
 		return printer.doSwitch(type);
 	}
 
