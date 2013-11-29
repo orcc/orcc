@@ -374,14 +374,27 @@ class InstanceCPrinter extends CTemplate {
 		val output = '''
 
 			int «action.body.name»(DALProcess *_p) {
+				«FOR port : action.getInputPattern.getPorts»
+					«IF !(port.hasAttribute("peekPort"))»
+						«port.type.doSwitch» buffer_«port.name»[«action.inputPattern.getNumTokens(port)»];
+					«ENDIF»
+				«ENDFOR»
 				«FOR port : action.getOutputPattern.getPorts»
-					«port.type.doSwitch» tmp_«port.name»;
+					«port.type.doSwitch» buffer_«port.name»[«action.outputPattern.getNumTokens(port)»];
 				«ENDFOR»
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
+				«FOR port : action.getInputPattern.getPorts»
+					«IF !(port.hasAttribute("peekPort"))»
+						DAL_read((void*)PORT_«port.name», buffer_«port.name», sizeof(«port.type.doSwitch»)*«action.inputPattern.getNumTokens(port)», _p);
+					«ENDIF»
+				«ENDFOR»
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
+				«ENDFOR»
+				«FOR port : action.getOutputPattern.getPorts»
+					DAL_write((void*)PORT_«port.name», buffer_«port.name», sizeof(«port.type.doSwitch»)*«action.outputPattern.getNumTokens(port)», _p);
 				«ENDFOR»
 				return 0;
 			}
@@ -611,18 +624,12 @@ class InstanceCPrinter extends CTemplate {
 		'''
 			«IF srcPort != null»
 				«IF (currentAction?.peekPattern.contains(load.source.variable))»
-					«IF load.indexes.head.isExprBinary»					
-						«OrccLogger::warnln("(" + entityName + ")" + " port '" + srcPort.getName() + "' possibly peeked out-of-order")»
-					«ENDIF»
 					_DAL_peek_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
 				«ELSE»
-					«IF load.indexes.head.isExprBinary»					
-						«OrccLogger::warnln("(" + entityName + ")" + " port '" + srcPort.getName() + "' possibly read out-of-order")»
-					«ENDIF»
 					«IF (srcPort.hasAttribute("peekPort"))»
 						_DAL_read_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
 					«ELSE»
-						DAL_read((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
+						«load.target.variable.name» = buffer_«srcPort.name»[«load.indexes.head.doSwitch»];
 					«ENDIF»
 				«ENDIF»
 			«ELSE»
@@ -642,11 +649,7 @@ class InstanceCPrinter extends CTemplate {
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF store.indexes.head.isExprBinary»					
-					«OrccLogger::warnln("(" + entityName + ")" + " port '" + trgtPort.getName() + "' possibly written out-of-order")»
-				«ENDIF»
-				tmp_«trgtPort.name» = «store.value.doSwitch»;
-				DAL_write((void*)PORT_«trgtPort.name», &tmp_«trgtPort.name», sizeof(«trgtPort.type.doSwitch»), _p);
+				buffer_«trgtPort.name»[«store.indexes.head.doSwitch»] = «store.value.doSwitch»;
 			«ENDIF»
 		«ELSE»
 			«IF store.target.variable.isGlobal == true»
