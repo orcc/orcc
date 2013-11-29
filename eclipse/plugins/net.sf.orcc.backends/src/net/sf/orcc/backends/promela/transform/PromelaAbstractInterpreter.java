@@ -59,12 +59,13 @@ public class PromelaAbstractInterpreter extends AbstractInterpreter {
 				return false;
 			}
 		}
-		Object result = doSwitch(action.getScheduler());
+		/*Object result = doSwitch(action.getScheduler());
 		if (result == null) {
 			throw new OrccRuntimeException("could not determine if action "
 					+ action.toString() + " is schedulable");
 		}
-		return ValueUtil.isTrue(result);
+		return ValueUtil.isTrue(result);*/
+		return super.isSchedulable(action);
 	}
 	
 	public State getCurrChoiseState(Set<State> states) {
