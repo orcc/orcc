@@ -108,15 +108,15 @@ class OrccBench:
             shutil.move(self.OUTPUT_TAG, backup)
             print ("!! Making a backup of a directory with same name in " + backup)
         os.mkdir(self.OUTPUT_TAG)
-        os.system("mv " + FILE_HEAD + "*" + DEFAULT_LOG_EXT + " " + OUTPUT_TAG)
+        os.system("mv " + self.FILE_HEAD + "*" + self.DEFAULT_LOG_EXT + " " + self.OUTPUT_TAG)
         if self.logCSV:
-            os.system("mv " + OUTPUT_TAG + "*.csv " + OUTPUT_TAG)
+            os.system("mv " + self.OUTPUT_TAG + "*.csv " + self.OUTPUT_TAG)
         if self.logTXT:
-            os.system("mv " + OUTPUT_TAG + "*.txt " + OUTPUT_TAG)
+            os.system("mv " + self.OUTPUT_TAG + "*.txt " + self.OUTPUT_TAG)
         if self.logXML:
-            os.system("mv " + OUTPUT_TAG + "*.xml " + OUTPUT_TAG)
+            os.system("mv " + self.OUTPUT_TAG + "*.xml " + self.OUTPUT_TAG)
         if self.logHTML:
-            os.system("mv " + OUTPUT_TAG + "*.html " + OUTPUT_TAG)
+            os.system("mv " + self.OUTPUT_TAG + "*.html " + self.OUTPUT_TAG)
             shutil.copy(os.path.join(os.path.dirname(sys.argv[0]), "style.css"), self.OUTPUT_TAG)
 
 
@@ -244,40 +244,50 @@ class BenchAutoMapping(OrccBench):
 
                     self.benchData[SEQUENCE_NAME] = data
 
-    def logInCSVbyProcs(self, nbProcs):
-        print ("\n  * Generate CSV Result file... " + self.OUTPUT_TAG + "_" + str(nbProcs) + "Procs" + ".csv")
-        fd = open(self.OUTPUT_TAG + "_" + str(nbProcs) + "Procs" + ".csv", 'w')
-        # Header
-        fd.write("Nb of processors;;" + str(nbProcs) + "\n")
-        fd.write("Sequence;FPS")
-        for strategy in self.MS_LIST:
-            fd.write(";" + strategy + ";Acc")
-            fd.write(";LB;EC;CV;MT;Parts")
-        fd.write("\n")
-
-        # Body
-        for bData in self.benchData:
-            fd.write(bData + ";");
-            fd.write(str(self.benchData[bData][1].fps).replace(".", ",") + ";");
-            for strategy in self.MS_LIST:
-                data = self.benchData[bData][nbProcs][strategy]
-                fd.write(str(data.fps).replace(".", ",") + ";");
-                fd.write(str(data.speedUp).replace(".", ",") + ";");
-                fd.write(str(data.loadBalancing).replace(".", ",") + ";");
-                fd.write(str(data.edgeCut) + ";");
-                fd.write(str(data.communicationVolume) + ";");
-                fd.write(str(data.mappingTime) + ";");
-                fd.write(str(data.nbPartitions) + ";");
-            fd.write("\n")
-              
-        # Footer
-        fd.write("\n")
-        fd.close()
-
     def logInCSV(self):
-        for nbP in self.rangeProcs:
-            if nbP != 1:
-                self.logInCSVbyProcs(nbP)
+        print ("\n  * Generate CSV Result file... " + self.SUMMARY_CSV)
+        fd = open(self.SUMMARY_CSV, 'w')
+
+        for bData in self.benchData:
+            # Header
+            fd.write("Sequence;\n")
+            fd.write(bData + ";\n")
+            
+            for nbProcs in self.rangeProcs:
+                if nbProcs != 1:
+                    fd.write(";Nb procs;" + str(nbProcs) + ";;;;;;;")
+            fd.write("\n")
+
+            for nbProcs in self.rangeProcs:
+                if nbProcs != 1:
+                    fd.write(";Strategy;FPS;Acc;LB;EC;CV;MT;Parts;")
+            fd.write("\n")
+
+            for nbProcs in self.rangeProcs:
+                if nbProcs != 1:
+                    fd.write(";Ref;")                        
+                    fd.write(str(self.benchData[bData][1].fps).replace(".", ",") + ";;;;;;;")
+            fd.write("\n")
+
+            # Body
+            for strategy in self.MS_LIST:
+                for nbProcs in self.rangeProcs:
+                    if nbProcs != 1:
+                        data = self.benchData[bData][nbProcs][strategy]
+                        fd.write(";" + strategy + ";")
+                        fd.write(str(data.fps).replace(".", ",") + ";")
+                        fd.write(str(data.speedUp).replace(".", ",") + ";")
+                        fd.write(str(data.loadBalancing).replace(".", ",") + ";")
+                        fd.write(str(data.edgeCut) + ";")
+                        fd.write(str(data.communicationVolume) + ";")
+                        fd.write(str(data.mappingTime) + ";")
+                        fd.write(str(data.nbPartitions) + ";")
+                fd.write("\n")
+
+            # Footer
+            fd.write("\n\n")
+
+        fd.close()
 
 # Main
 # DEFAULT
