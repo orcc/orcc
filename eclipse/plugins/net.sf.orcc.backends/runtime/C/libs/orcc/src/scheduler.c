@@ -72,7 +72,11 @@ local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_sche
 void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping) {
     int i;
     for (i = 0; i < sched->nb_schedulers; i++) {
-        local_scheduler_init(sched->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i]);
+        if(i < mapping->number_of_threads) {
+            local_scheduler_init(sched->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i]);
+        } else {
+            local_scheduler_init(sched->schedulers[i], 0, NULL);
+        }
     }
 }
 
