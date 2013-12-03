@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.xdf.ui.diagram;
 
-import net.sf.orcc.xdf.ui.features.LayoutDiagramFeature;
 import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinmentFeature;
+import net.sf.orcc.xdf.ui.features.AutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
@@ -63,7 +63,7 @@ public class XdfDiagramFeatureProvider extends
 	
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new UpdateRefinmentFeature(this), new LayoutDiagramFeature(this) };
+		return new ICustomFeature[] { new UpdateRefinmentFeature(this), new AutoLayoutFeature(this) };
 	}
 
 	@Override
