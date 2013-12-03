@@ -33,24 +33,40 @@ import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
+import org.eclipse.graphiti.tb.IContextButtonPadData;
 
+/**
+ * Define some hacks to customize the way Graphiti works in general.
+ * 
+ * @author Antoine Lorence
+ * 
+ */
 public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
 	public XdfDiagramToolBehaviorProvider(IDiagramTypeProvider diagramTypeProvider) {
 		super(diagramTypeProvider);
 	}
 
+	/**
+	 * Change the selection border of a shape.
+	 * 
+	 * For a Network port, the selection must be displayed on the inner polygon.
+	 * 
+	 * For an Instance port, we want to select the whole instance when a user
+	 * click on a port shape.
+	 */
 	@Override
 	public GraphicsAlgorithm getSelectionBorder(PictogramElement pe) {
-
-		IPattern ipattern = ((IFeatureProviderWithPatterns) getFeatureProvider()).getPatternForPictogramElement(pe);
+		final IPattern ipattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
+				.getPatternForPictogramElement(pe);
 		if (ipattern instanceof NetworkPortPattern) {
-			NetworkPortPattern portPattern = (NetworkPortPattern) ipattern;
+			final NetworkPortPattern portPattern = (NetworkPortPattern) ipattern;
 			return portPattern.getSelectionBorder(pe);
 		}
 
@@ -76,6 +92,20 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 			return o1 == o2;
 		}
 		return super.equalsBusinessObjects(o1, o2);
+	}
+
+	/**
+	 * Display context menu button without "Remove" button
+	 * 
+	 * @param context
+	 * @return
+	 */
+	@Override
+	public IContextButtonPadData getContextButtonPad(IPictogramElementContext context) {
+		final IContextButtonPadData ret = super.getContextButtonPad(context);
+		// Do not display the Remove context button by default
+		setGenericContextButtons(ret, context.getPictogramElement(), CONTEXT_BUTTON_DELETE | CONTEXT_BUTTON_UPDATE);
+		return ret;
 	}
 
 }
