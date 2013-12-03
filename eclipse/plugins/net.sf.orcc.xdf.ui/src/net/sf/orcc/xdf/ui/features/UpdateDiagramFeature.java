@@ -30,7 +30,6 @@ package net.sf.orcc.xdf.ui.features;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.DfFactory;
@@ -69,8 +68,6 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.services.ILinkService;
 
 /**
  * This feature try to detect cases when a Diagram or a Network need to be
@@ -146,9 +143,6 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			hasDoneChanges |= initializeDiagramFromNetwork(network, diagram);
 			return hasDoneChanges;
 		}
-
-		hasDoneChanges |= updateContentsIfNeeded(network, diagram);
-
 		return hasDoneChanges;
 	}
 
@@ -208,16 +202,24 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		return true;
 	}
 
-	private boolean initializeDiagramFromNetwork(Network network, Diagram diagram) {
+	/**
+	 * 
+	 * @param network
+	 * @param diagram
+	 * @return
+	 */
+	private boolean initializeDiagramFromNetwork(final Network network, final Diagram diagram) {
 
 		final IFeatureProviderWithPatterns patternFP = (IFeatureProviderWithPatterns) getFeatureProvider();
 
 		final Map<Port, Anchor> inAnchors = new HashMap<Port, Anchor>();
 		final Map<Port, Anchor> outAnchors = new HashMap<Port, Anchor>();
+		final Map<Instance, PictogramElement> instances = new HashMap<Instance, PictogramElement>();
 
 		for (Vertex vertex : network.getChildren()) {
 			if (vertex instanceof Instance) {
-				addBoToDiagram(diagram, vertex);
+				final PictogramElement pe = addBoToDiagram(diagram, vertex);
+				instances.put((Instance) vertex, pe);
 			}
 		}
 		for (Port port : network.getInputs()) {
@@ -244,50 +246,50 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		}
 		for (net.sf.orcc.df.Connection con : network.getConnections()) {
 
-			Anchor srcAnchor = null, tgtAnchor = null;
-			final Vertex src = con.getSource();
-			final Vertex tgt = con.getTarget();
+			final Anchor srcAnchor, tgtAnchor;
 
-			final ILinkService linkServ = Graphiti.getLinkService();
-
-			if (src instanceof Port) {
-				srcAnchor = inAnchors.get(src);
+			final Vertex sourceVertex = con.getSource();
+			if (instances.containsKey(sourceVertex)) {
+				final PictogramElement instancePe = instances.get(sourceVertex);
+				final InstancePattern pattern = (InstancePattern) patternFP.getPatternForPictogramElement(instancePe);
+				srcAnchor = pattern.getAnchorForPort(instancePe, con.getSourcePort());
+			} else if (sourceVertex instanceof Port) {
+				srcAnchor = inAnchors.get(sourceVertex);
 			} else {
-				// To have the right list of linked pe, we have overridden
-				// DiagramToolBehaviorProvider.equalsBusinessObjects
-				final List<PictogramElement> peList = linkServ.getPictogramElements(diagram, con.getSourcePort());
-				for (final PictogramElement pe : peList) {
-					if (pe instanceof Anchor) {
-						srcAnchor = (Anchor) pe;
-						break;
-					}
-				}
+				srcAnchor = null;
 			}
 
-			if (tgt instanceof Port) {
-				tgtAnchor = outAnchors.get(tgt);
+			final Vertex tgtVertex = con.getTarget();
+			if (instances.containsKey(tgtVertex)) {
+				final PictogramElement instancePe = instances.get(tgtVertex);
+				final InstancePattern pattern = (InstancePattern) patternFP.getPatternForPictogramElement(instancePe);
+				tgtAnchor = pattern.getAnchorForPort(instancePe, con.getTargetPort());
+			} else if (tgtVertex instanceof Port) {
+				tgtAnchor = outAnchors.get(tgtVertex);
 			} else {
-				// To have the right list of linked pe, we have overridden
-				// DiagramToolBehaviorProvider.equalsBusinessObjects
-				final List<PictogramElement> peList = linkServ.getPictogramElements(diagram, con.getTargetPort());
-				for (final PictogramElement pe : peList) {
-					if (pe instanceof Anchor) {
-						tgtAnchor = (Anchor) pe;
-						break;
-					}
-				}
+				tgtAnchor = null;
 			}
 
 			if (srcAnchor != null && tgtAnchor != null) {
 				final AddConnectionContext ctxt = new AddConnectionContext(srcAnchor, tgtAnchor);
 				ctxt.setNewObject(con);
 				getFeatureProvider().addIfPossible(ctxt);
+			} else {
+				OrccLogger.warnln("Unable to retrieve the anchor corresponding to connection " + con);
 			}
 		}
 
 		return true;
 	}
 
+	/**
+	 * Add the given business object to the given diagram if the diagram has at
+	 * least a feature supporting the type of bo.
+	 * 
+	 * @param diagram
+	 * @param bo
+	 * @return
+	 */
 	private PictogramElement addBoToDiagram(final Diagram diagram, final EObject bo) {
 		final AddContext addContext = new AddContext();
 		addContext.setTargetContainer(diagram);
@@ -296,40 +298,4 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 		return getFeatureProvider().addIfPossible(addContext);
 	}
-
-	/**
-	 * Control both given diagram and network and detect if one or other has
-	 * missing elements.
-	 * 
-	 * The network always has the higher priority to determinate which one is
-	 * out-of-date
-	 * 
-	 * @param network
-	 * @param diagram
-	 * @return true if something has been modified
-	 */
-	private boolean updateContentsIfNeeded(Network network, Diagram diagram) {
-
-		for (Vertex vertex : network.getChildren()) {
-			if (vertex instanceof Instance) {
-				Instance instance = (Instance) vertex;
-				// TODO
-			}
-		}
-
-		for (Port port : network.getInputs()) {
-			// TODO
-		}
-
-		for (Port port : network.getOutputs()) {
-			// TODO
-		}
-
-		for (net.sf.orcc.df.Connection con : network.getConnections()) {
-			// TODO
-		}
-
-		return false;
-	}
-
 }
