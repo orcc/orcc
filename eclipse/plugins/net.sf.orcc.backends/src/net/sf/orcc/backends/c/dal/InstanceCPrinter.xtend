@@ -48,6 +48,7 @@ class InstanceCPrinter extends CTemplate {
 	protected var Instance instance
 	protected var Actor actor
 	protected var Attributable attributable
+	protected var int maxIter
 	protected var Map<Port, Connection> incomingPortMap
 	protected var Map<Port, List<Connection>> outgoingPortMap
 	
@@ -64,6 +65,7 @@ class InstanceCPrinter extends CTemplate {
 	 */
 	protected new() {
 		instance = null
+		maxIter = 0
 	}
 	
 	new(Map<String, Object> options) {		
@@ -139,12 +141,42 @@ class InstanceCPrinter extends CTemplate {
 		buildTransitionPattern
 	}
 	
-	def protected getFileContent() '''
+	def protected getFileContent() {
+		if (!actor.hasAttribute("variableInputPattern")) {
+			for (port : actor.getInputs()) {
+				if (port.getNumTokensConsumed() > maxIter) {
+					maxIter = port.getNumTokensConsumed()
+				}
+			}
+		}
+	'''
 		#include <stdio.h>
 		#include <string.h>
 		#include <stdlib.h>
 
 		#include "«entityName».h"
+
+		«IF (!actor.hasAttribute("variableInputPattern"))»
+			#define TMP_ITER (MAXBUFFER/«maxIter»)
+			#if TMP_ITER < 1  
+			  #define MAX_ITER 1
+			#else
+			  #define MAX_ITER TMP_ITER
+			#endif 
+
+			#define TOKEN_QUANTUM («FOR port : actor.getInputs»«port.getNumTokensConsumed()»+«ENDFOR»0) 
+			
+			void buffer_input(void *port, void *trg, int cnt, DALProcess *p) {
+				DAL_read(port, trg, cnt, p);
+			}
+		«ELSE»
+			«FOR port : actor.getInputs»
+				«IF (port.hasAttribute("peekPort"))»
+					«port.createReadOverload»
+					«port.createPeekOverload»
+				«ENDIF»
+			«ENDFOR»
+		«ENDIF»
 
 		«FOR variable : actor.getStateVars»
 			«IF variable.initialized && !variable.assignable && !variable.type.list»
@@ -182,13 +214,6 @@ class InstanceCPrinter extends CTemplate {
 			};
 			
 		«ENDIF»
-
-		«FOR port : actor.getInputs»
-			«IF (port.hasAttribute("peekPort"))»
-				«port.createReadOverload»
-				«port.createPeekOverload»
-			«ENDIF»
-		«ENDFOR»
 
 		«FOR variable : actor.stateVars»
 			«variable.declareConstStateVars»
@@ -242,17 +267,31 @@ class InstanceCPrinter extends CTemplate {
 
 		«actorScheduler»
 	'''
+	}
 	
 	def private actorScheduler() '''
 		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
 			int «entityName»_fire(DALProcess *_p) {
-				int iter, i = 0;
-				for(iter = 0; iter < ITERATIONS; iter++) {			
+				int iter = 0;
+				
+			«IF (actor.hasAttribute("variableInputPattern"))»
+				for(iter = 0; iter < ITERATIONS; iter++) {
+			«ELSE»
+				«FOR port : actor.getInputs»
+				«port.type.doSwitch» «port.getName()»_buffer[MAX_ITER*«port.getNumTokensConsumed()»];
+				int «port.getName()»_index = 0;
+				«ENDFOR»
+	
+				«FOR port : actor.getInputs»
+				buffer_input((void*)PORT_«port.getName()», «port.getName()»_buffer, sizeof(«port.type.doSwitch»)*MAX_ITER*«port.getNumTokensConsumed()», _p);
+				«ENDFOR»
+				while(MAX_ITER*TOKEN_QUANTUM - iter >= TOKEN_QUANTUM) {			
+			«ENDIF»
 					«actor.actionsOutsideFsm.printActionLoop»
 				
-			finished:
+				finished:
 					iter = iter;
 				}
 				return 0;
@@ -265,9 +304,12 @@ class InstanceCPrinter extends CTemplate {
 	//========================================
 	def private printFsm() '''
 		«IF ! actor.actionsOutsideFsm.empty»
-			«inline»void «entityName»_outside_FSM_scheduler(DALProcess *_p) {
-				int i = 0;
-				«actor.actionsOutsideFsm.printActionLoop»
+			«IF (actor.hasAttribute("variableInputPattern"))»
+				«inline»void «entityName»_outside_FSM_scheduler(DALProcess *_p) {
+			«ELSE»
+				«inline»void «entityName»_outside_FSM_scheduler(DALProcess *_p«FOR port : actor.getInputs», «port.type.doSwitch» *«port.getName()»_buffer, int *«port.getName()»_index«ENDFOR», int *iter) {
+			«ENDIF»
+				«actor.actionsOutsideFsm.printOutsideFSMActionLoop»
 			finished:
 				// no read_end/write_end here!
 				return;
@@ -275,22 +317,43 @@ class InstanceCPrinter extends CTemplate {
 		«ENDIF»
 		
 		int «entityName»_fire(DALProcess *_p) {
-			int iter, i = 0;
-		
+			int iter = 0;
+		«IF (actor.hasAttribute("variableInputPattern"))»
 			for(iter = 0; iter < ITERATIONS; iter++) {			
+		«ELSE»
+			«FOR port : actor.getInputs»
+			
+				«port.type.doSwitch» «port.getName()»_buffer[MAX_ITER*«port.getNumTokensConsumed()»];
+				int «port.getName()»_index = 0;
+			«ENDFOR»
+
+			«FOR port : actor.getInputs»
+			
+				buffer_input((void*)PORT_«port.getName()», «port.getName()»_buffer, sizeof(«port.type.doSwitch»)*MAX_ITER*«port.getNumTokensConsumed()», _p);
+			«ENDFOR»
+				while(MAX_ITER*TOKEN_QUANTUM - iter >= TOKEN_QUANTUM) {			
+		«ENDIF»
+		«IF ! actor.actionsOutsideFsm.empty»
+			«IF (actor.hasAttribute("variableInputPattern"))»
+				«entityName»_outside_FSM_scheduler(_p);
+			«ELSE»
+				«entityName»_outside_FSM_scheduler(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR», &iter);
+				if(MAX_ITER*TOKEN_QUANTUM - iter < TOKEN_QUANTUM) return 0;			
+			«ENDIF»
+		«ENDIF»
 				switch (_p->local->_FSM_state) {
-			«FOR state : actor.fsm.states»
-					case my_state_«state.name»:
-						goto l_«state.name»;
-			«ENDFOR»
-			default:
-					printf("unknown state in «entityName».c\n");
-			}
+		«FOR state : actor.fsm.states»
 		
-			// FSM transitions
-			«FOR state : actor.fsm.states»
-		«state.printStateLabel»
-			«ENDFOR»
+				case my_state_«state.name»:
+					goto l_«state.name»;
+		«ENDFOR»
+				default:
+					printf("unknown state in «entityName».c\n");
+		}
+		// FSM transitions
+		«FOR state : actor.fsm.states»
+	«state.printStateLabel»
+		«ENDFOR»
 		finished:
 				iter = iter;
 			}
@@ -300,9 +363,6 @@ class InstanceCPrinter extends CTemplate {
 	
 	def private printStateLabel(State state) '''
 	l_«state.name»:
-		«IF ! actor.actionsOutsideFsm.empty»
-			«entityName»_outside_FSM_scheduler(_p);
-		«ENDIF»
 		«IF state.outgoing.empty»
 			printf("Stuck in state "«state.name»" in «entityName»\n");
 		«ELSE»
@@ -312,9 +372,13 @@ class InstanceCPrinter extends CTemplate {
 	
 	def private printStateTransitions(State state) '''
 		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
-			if (isSchedulable_«trans.action.name»(_p)) {
-				«trans.action.body.name»(_p);
-				i++;
+			«IF (actor.hasAttribute("variableInputPattern"))»
+				if (isSchedulable_«trans.action.name»(_p)) {
+					«trans.action.body.name»(_p);
+			«ELSE»
+				if (isSchedulable_«trans.action.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR», &iter)) {
+					«trans.action.body.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR», &iter);
+			«ENDIF»
 				«IF !trans.target.name.equals(state.name)»
 				_p->local->_FSM_state = my_state_«trans.target.name»;
 				«ENDIF»
@@ -333,7 +397,6 @@ class InstanceCPrinter extends CTemplate {
 		«ENDFOR»
 		
 		«inline»void «entityName»_initialize(DALProcess *_p) {
-			int i = 0;
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
 				p->local->_FSM_state = my_state_«actor.fsm.initialState.name»;
@@ -363,12 +426,44 @@ class InstanceCPrinter extends CTemplate {
 			«actions.printActions»
 		}
 	'''
+
+	def private printOutsideFSMActionLoop(List<Action> actions) '''
+		«IF !actor.hasAttribute("variableInputPattern")» 
+			while (MAX_ITER*TOKEN_QUANTUM - iter[0] >= TOKEN_QUANTUM) {
+				«actions.printOutsideFSMActions»
+			}
+		«ELSE»
+			while (1) {
+				«actions.printOutsideFSMActions»
+			}
+		«ENDIF»
+ 	'''
 	
 	def private printActions(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
-			if (isSchedulable_«action.name»(_p)) {
-				«action.body.name»(_p);
-				i++;
+			«IF (actor.hasAttribute("variableInputPattern"))»
+				if (isSchedulable_«action.name»(_p)) {
+					«action.body.name»(_p);
+			«ELSE»
+				if (isSchedulable_«action.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR», &iter)) {
+					«action.body.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR», &iter);
+			«ENDIF»
+				goto finished;
+			}«ENDFOR» else {
+			«inputPattern.printTransitionPattern»
+			goto finished;
+		}
+	'''
+
+	def private printOutsideFSMActions(Iterable<Action> actions) '''
+		«FOR action : actions SEPARATOR " else "»
+			«IF (actor.hasAttribute("variableInputPattern"))»
+				if (isSchedulable_«action.name»(_p)) {
+					«action.body.name»(_p);
+			«ELSE»
+				if (isSchedulable_«action.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, «port.getName()»_index«ENDFOR», iter)) {
+					«action.body.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, «port.getName()»_index«ENDFOR», iter);
+			«ENDIF»
 				goto finished;
 			}«ENDFOR» else {
 			«inputPattern.printTransitionPattern»
@@ -380,9 +475,13 @@ class InstanceCPrinter extends CTemplate {
 		currentAction = action
 		val output = '''
 
-			int «action.body.name»(DALProcess *_p) {
+			«IF (actor.hasAttribute("variableInputPattern"))»
+				int «action.body.name»(DALProcess *_p) {
+			«ELSE»
+				int «action.body.name»(DALProcess *_p«FOR port : actor.getInputs», «port.type.doSwitch» *«port.getName()»_buffer, int *«port.getName()»_index«ENDFOR», int *iter) {
+			«ENDIF»
 				«FOR port : action.getInputPattern.getPorts»
-					«IF !(port.hasAttribute("peekPort"))»
+					«IF !(port.hasAttribute("peekPort")) && actor.hasAttribute("variableInputPattern")»
 						«port.type.doSwitch» buffer_«port.name»[«action.inputPattern.getNumTokens(port)»];
 					«ENDIF»
 				«ENDFOR»
@@ -393,7 +492,7 @@ class InstanceCPrinter extends CTemplate {
 					«variable.declare»;
 				«ENDFOR»
 				«FOR port : action.getInputPattern.getPorts»
-					«IF !(port.hasAttribute("peekPort"))»
+					«IF !(port.hasAttribute("peekPort")) && actor.hasAttribute("variableInputPattern")»
 						DAL_read((void*)PORT_«port.name», buffer_«port.name», sizeof(«port.type.doSwitch»)*«action.inputPattern.getNumTokens(port)», _p);
 					«ENDIF»
 				«ENDFOR»
@@ -406,7 +505,7 @@ class InstanceCPrinter extends CTemplate {
 				return 0;
 			}
 			
-			«action.scheduler.print»
+			«action.scheduler.printScheduler»
 
 		'''
 		currentAction = null
@@ -476,7 +575,11 @@ class InstanceCPrinter extends CTemplate {
 	'''}
 
 	def protected printScheduler(Procedure proc) '''
-		int «proc.name»(DALProcess *p) {
+		«IF (actor.hasAttribute("variableInputPattern"))»
+			int «proc.name»(DALProcess *_p) {
+		«ELSE»
+			int «proc.name»(DALProcess *_p«FOR port : actor.getInputs» ,«port.type.doSwitch» *«port.getName()»_buffer, int *«port.getName()»_index«ENDFOR», int *iter) {
+		«ENDIF»
 			«FOR variable : proc.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -631,12 +734,22 @@ class InstanceCPrinter extends CTemplate {
 		'''
 			«IF srcPort != null»
 				«IF (currentAction?.peekPattern.contains(load.source.variable))»
-					_DAL_peek_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
-				«ELSE»
-					«IF (srcPort.hasAttribute("peekPort"))»
-						_DAL_read_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
+					«IF !(actor.hasAttribute("variableInputPattern"))»
+						«load.target.variable.name» = «srcPort.name»_buffer[«srcPort.name»_index[0]];
 					«ELSE»
-						«load.target.variable.name» = buffer_«srcPort.name»[«load.indexes.head.doSwitch»];
+						_DAL_peek_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
+					«ENDIF»
+				«ELSE»
+					«IF !(actor.hasAttribute("variableInputPattern"))»
+						«load.target.variable.name» = «srcPort.name»_buffer[«srcPort.name»_index[0]];
+						«srcPort.name»_index[0] ++;
+						iter[0] ++;
+					«ELSE»
+						«IF (srcPort.hasAttribute("peekPort"))»
+							_DAL_read_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
+						«ELSE»
+							«load.target.variable.name» = buffer_«srcPort.name»[«load.indexes.head.doSwitch»];
+						«ENDIF»
 					«ENDIF»
 				«ENDIF»
 			«ELSE»
