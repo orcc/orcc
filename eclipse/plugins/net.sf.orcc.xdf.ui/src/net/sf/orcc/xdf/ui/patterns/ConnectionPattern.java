@@ -234,15 +234,18 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		final IGaService gaService = Graphiti.getGaService();
 
-		// CONNECTION WITH POLYLINE
+		// Create the connection
 		final FreeFormConnection connection = peCreateService.createFreeFormConnection(getDiagram());
 		connection.setStart(addConContext.getSourceAnchor());
 		connection.setEnd(addConContext.getTargetAnchor());
 
+		// Create the line corresponding to the connection
 		final Polyline polyline = gaService.createPolyline(connection);
 		final ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+		// Draw the arrow on the target side of the connection
 		final GraphicsAlgorithm arrow = createArrow(cd);
 
+		// Setup styles
 		polyline.setStyle(StyleUtil.getStyleForConnection(getDiagram()));
 		arrow.setStyle(StyleUtil.getStyleForConnection(getDiagram()));
 

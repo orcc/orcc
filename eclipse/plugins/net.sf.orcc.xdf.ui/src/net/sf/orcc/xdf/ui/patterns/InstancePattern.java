@@ -470,7 +470,7 @@ public class InstancePattern extends AbstractPattern {
 		// Clean all ports anchors and graphics in the instance
 		final List<GraphicsAlgorithm> gaChildre = new ArrayList<GraphicsAlgorithm>(instanceShape.getGraphicsAlgorithm()
 				.getGraphicsAlgorithmChildren());
-		for(final GraphicsAlgorithm gaChild : gaChildre) {
+		for (final GraphicsAlgorithm gaChild : gaChildre) {
 			if (gaChild instanceof Text
 					&& (ShapePropertiesManager.isInput(gaChild) || ShapePropertiesManager.isOutput(gaChild))) {
 				EcoreUtil.delete(gaChild, true);
@@ -565,7 +565,7 @@ public class InstancePattern extends AbstractPattern {
 			}
 		}
 	}
-	
+
 	private void layoutPort(final FixPointAnchor anchor, final int index, final PictogramElement instancePe) {
 		final IGaService gaService = Graphiti.getGaService();
 		// The port square, visual representation of the anchor
@@ -585,7 +585,7 @@ public class InstancePattern extends AbstractPattern {
 
 		final int anchorY = txtY + PORT_SIDE_WITH / 2;
 		final int squareY = -PORT_SIDE_WITH / 2;
-		
+
 		int anchorX, squareX;
 		if (ShapePropertiesManager.isInput(anchor)) {
 			anchorX = 0;
@@ -660,7 +660,7 @@ public class InstancePattern extends AbstractPattern {
 
 		// Calculate the total minimal height needed to display the longest
 		// ports list
-		for(final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
+		for (final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
 			if (child instanceof Text
 					&& (ShapePropertiesManager.isInput(child) || ShapePropertiesManager.isOutput(child))) {
 				final Text exampleTxt = (Text) child;
@@ -745,6 +745,13 @@ public class InstancePattern extends AbstractPattern {
 		return "";
 	}
 
+	/**
+	 * If the instance corresponding to the given PictogramElement has a
+	 * refinement defined (Actor or Network), returns it. If not, returns null.
+	 * 
+	 * @param pe
+	 * @return
+	 */
 	public EObject getRefinementFromShape(final PictogramElement pe) {
 		if (isPatternRoot(pe)) {
 			final String plateforStringUri = Graphiti.getPeService().getPropertyValue(pe, REFINEMENT_KEY);
@@ -757,6 +764,14 @@ public class InstancePattern extends AbstractPattern {
 		return null;
 	}
 
+	/**
+	 * Returns the FixPointAnchor associated with the given port in the instance
+	 * represented by the given PictogramElement.
+	 * 
+	 * @param instancePe
+	 * @param port
+	 * @return
+	 */
 	public Anchor getAnchorForPort(final PictogramElement instancePe, final Port port) {
 		if (isPatternRoot(instancePe)) {
 			final ContainerShape instanceShape = (ContainerShape) instancePe;
@@ -769,6 +784,13 @@ public class InstancePattern extends AbstractPattern {
 		return null;
 	}
 
+	/**
+	 * Returns the Text object used to display the port name. The object is
+	 * searched from the given anchor, which must represents an instance port.
+	 * 
+	 * @param anchor
+	 * @return
+	 */
 	public Text getTextFromAnchor(final Anchor anchor) {
 		final String portName = Graphiti.getPeService().getPropertyValue(anchor, PORT_NAME_KEY);
 		for (final GraphicsAlgorithm gaChild : anchor.getParent().getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {

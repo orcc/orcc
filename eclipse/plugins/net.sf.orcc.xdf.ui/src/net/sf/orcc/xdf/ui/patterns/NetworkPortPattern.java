@@ -62,6 +62,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.services.IGaLayoutService;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
@@ -288,7 +289,9 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	 */
 	@Override
 	public boolean layout(ILayoutContext context) {
+		final IGaLayoutService gaService = Graphiti.getGaLayoutService();
 		final PictogramElement topLevelPe = context.getPictogramElement();
+		final GraphicsAlgorithm topLevelGa = topLevelPe.getGraphicsAlgorithm();
 
 		final Text txt = (Text) ShapePropertiesManager.findPcFromIdentifier(topLevelPe, LABEL_ID);
 		final Polygon poly = (Polygon) ShapePropertiesManager.findPcFromIdentifier(topLevelPe, SHAPE_ID);
@@ -302,8 +305,12 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		}
 
 		// Set the new width for the port text
-		txt.setWidth(newTextWidth);
+		int hhh = XdfUtil.getTextMinHeight(txt);
+		gaService.setSize(txt, newTextWidth, hhh);
 		topLevelPe.getGraphicsAlgorithm().setWidth(newTextWidth);
+
+		gaService.setSize(topLevelGa, Math.max(newTextWidth, PORT_WIDTH), PORT_HEIGHT + TEXT_PORT_SPACE
+				+ TEXT_DEFAULT_HEIGHT);
 
 		return true;
 	}
@@ -325,7 +332,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	/**
 	 * Returns the PictogramElement to use as main element for displaying a
-	 * selection arount a port.
+	 * selection around a port.
 	 * 
 	 * @param pe
 	 * @return
@@ -337,6 +344,13 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		return null;
 	}
 
+	/**
+	 * Find and return the type associated with the Network port. This
+	 * information is stored in the linked objects.
+	 * 
+	 * @param pe
+	 * @return
+	 */
 	public Type getTypeFromShape(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
 			pe.getLink().getBusinessObjects();
@@ -349,7 +363,14 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		return null;
 	}
 
-	public String getNameFromShape(PictogramElement pe) {
+	/**
+	 * Return the name of the port, from information contained in graphical
+	 * representation only. If this port has no name, returns an empty String.
+	 * 
+	 * @param pe
+	 * @return
+	 */
+	public String getNameFromShape(final PictogramElement pe) {
 		if (isPatternRoot(pe)) {
 			final Text label = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
 			return label.getValue();
@@ -357,7 +378,13 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		return "";
 	}
 
-	public Anchor getAnchor(AnchorContainer container) {
+	/**
+	 * Retrieve the ChopboxAnchor for the port.
+	 * 
+	 * @param container
+	 * @return
+	 */
+	public Anchor getAnchor(final AnchorContainer container) {
 		return Graphiti.getPeService().getChopboxAnchor(container);
 	}
 }
