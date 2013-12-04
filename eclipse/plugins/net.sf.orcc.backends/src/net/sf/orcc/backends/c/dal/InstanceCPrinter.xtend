@@ -172,7 +172,8 @@ class InstanceCPrinter extends CTemplate {
 			}
 		«ELSE»
 			«FOR port : actor.getInputs»
-				«IF (port.hasAttribute("peekPort"))»
+				«IF port.hasAttribute("peekPort") && actor.hasAttribute("variableInputPattern")»
+					«port.createPeekPortInit»
 					«port.createReadOverload»
 					«port.createPeekOverload»
 				«ENDIF»
@@ -266,7 +267,9 @@ class InstanceCPrinter extends CTemplate {
 				_p->local->_io = NULL;
 			«ENDIF»
 			«FOR port : actor.getInputs»
-				_p->local->_fo_«port.name» = malloc(sizeof(«port.type.doSwitch»));
+				«IF port.hasAttribute("peekPort") && actor.hasAttribute("variableInputPattern")»
+					_p->local->_fo_filled_«port.name» = 0;
+				«ENDIF»
 			«ENDFOR»
 			«IF !actor.initializes.nullOrEmpty»
 				«FOR init : actor.initializes»
@@ -280,9 +283,6 @@ class InstanceCPrinter extends CTemplate {
 		}
 		
 		int «entityName»_finish(DALProcess *p) {
-			«FOR port : actor.getInputs»
-				free(p->local->_fo_«port.name»);
-			«ENDFOR»
 			return 0;
 		}
 
@@ -308,8 +308,13 @@ class InstanceCPrinter extends CTemplate {
 					int «port.getName()»_index = 0;
 				«ENDIF»
 			«ENDFOR»
+			«FOR port : actor.getInputs»
+				«IF port.hasAttribute("peekPort") && actor.hasAttribute("variableInputPattern")»
+					_DAL_«port.name»_initial((void*)PORT_«port.name», _p);
+				«ENDIF»
+			«ENDFOR»
 			«IF (actor.hasAttribute("variableInputPattern"))»
-				for(iter = 0; iter < ITERATIONS; iter++) {
+				for(iter = 0; iter < ITERATIONS; iter++)
 			«ELSE»
 				«FOR port : actor.getInputs»
 				«port.type.doSwitch» «port.getName()»_buffer[MAX_ITER*«port.getNumTokensConsumed()»];
@@ -319,8 +324,9 @@ class InstanceCPrinter extends CTemplate {
 				«FOR port : actor.getInputs»
 				buffer_input((void*)PORT_«port.getName()», «port.getName()»_buffer, sizeof(«port.type.doSwitch»)*MAX_ITER*«port.getNumTokensConsumed()», _p);
 				«ENDFOR»
-				while(MAX_ITER*TOKEN_QUANTUM - iter >= TOKEN_QUANTUM) {			
+				while(MAX_ITER*TOKEN_QUANTUM - iter >= TOKEN_QUANTUM)		
 			«ENDIF»
+				{
 					«actor.actionsOutsideFsm.printActionLoop»
 				
 				finished:
@@ -363,8 +369,13 @@ class InstanceCPrinter extends CTemplate {
 				int «port.getName()»_index = 0;
 			«ENDIF»
 		«ENDFOR»
+		«FOR port : actor.getInputs»
+			«IF port.hasAttribute("peekPort") && actor.hasAttribute("variableInputPattern")»
+				_DAL_«port.name»_initial((void*)PORT_«port.name», _p);
+			«ENDIF»
+		«ENDFOR»
 		«IF (actor.hasAttribute("variableInputPattern"))»
-			for(iter = 0; iter < ITERATIONS; iter++) {			
+			for(iter = 0; iter < ITERATIONS; iter++)			
 		«ELSE»
 			«FOR port : actor.getInputs»
 				«port.type.doSwitch» «port.getName()»_buffer[MAX_ITER*«port.getNumTokensConsumed()»];
@@ -374,8 +385,9 @@ class InstanceCPrinter extends CTemplate {
 			«FOR port : actor.getInputs»
 				buffer_input((void*)PORT_«port.getName()», «port.getName()»_buffer, sizeof(«port.type.doSwitch»)*MAX_ITER*«port.getNumTokensConsumed()», _p);
 			«ENDFOR»
-				while(MAX_ITER*TOKEN_QUANTUM - iter >= TOKEN_QUANTUM) {			
+				while(MAX_ITER*TOKEN_QUANTUM - iter >= TOKEN_QUANTUM)			
 		«ENDIF»
+		{
 		«IF ! actor.actionsOutsideFsm.empty»
 			«IF (actor.hasAttribute("variableInputPattern"))»
 				«entityName»_outside_FSM_scheduler(_p«FOR port : actor.getOutputs»«IF port.getNumTokensProduced() > 0», «port.getName()»_buffer, &«port.getName()»_index«ENDIF»«ENDFOR»);
@@ -710,32 +722,29 @@ class InstanceCPrinter extends CTemplate {
 		'''
 	}
 
-	def private createReadOverload(Port port)
+	def private createPeekPortInit(Port port)
 	'''
-		void _DAL_read_«port.name»(void *port, void *trg, int cnt, DALProcess *p) {
-			if(p->local->_fo_filled_«port.name» == 1) {
-				memcpy(trg, p->local->_fo_«port.name», cnt);
-				DAL_read(port, p->local->_fo_«port.name», cnt, p);
+		void _DAL_«port.name»_initial(void *port, DALProcess *p) {
+			if (p->local->_fo_filled_«port.name» == 1) {
 				return;
 			}
-			
-			DAL_read(port, trg, cnt, p);
+			DAL_read(port, &p->local->_fo_«port.name», sizeof(«port.type.doSwitch»), p);
+			p->local->_fo_filled_«port.name» = 1;
+		}
+	'''
+
+	def private createReadOverload(Port port)
+	'''
+		void _DAL_read_«port.name»(void *port, «port.type.doSwitch» *trg, DALProcess *p) {
+			trg[0] = p->local->_fo_«port.name»;
+			DAL_read(port, &p->local->_fo_«port.name», sizeof(«port.type.doSwitch»), p);
 		}
 	'''
 
 	def private createPeekOverload(Port port)
 	'''
-		void _DAL_peek_«port.name»(void *port, void *trg, int cnt, DALProcess *p) {
-			if (p->local->_fo_filled_«port.name» == 1) {
-				memcpy(trg, p->local->_fo_«port.name», cnt);
-				return;
-			}
-		
-			DAL_read(port, p->local->_fo_«port.name», cnt, p);
-		
-			p->local->_fo_filled_«port.name» = 1;
-		
-			memcpy(trg, p->local->_fo_«port.name», cnt);
+		void _DAL_peek_«port.name»(void *port, «port.type.doSwitch» *trg, DALProcess *p) {
+			trg[0] = p->local->_fo_«port.name»;
 		}
 	'''
 
@@ -792,7 +801,7 @@ class InstanceCPrinter extends CTemplate {
 					«IF !(actor.hasAttribute("variableInputPattern"))»
 						«load.target.variable.name» = «srcPort.name»_buffer[«srcPort.name»_index[0]];
 					«ELSE»
-						_DAL_peek_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
+						_DAL_peek_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», _p);
 					«ENDIF»
 				«ELSE»
 					«IF !(actor.hasAttribute("variableInputPattern"))»
@@ -801,7 +810,7 @@ class InstanceCPrinter extends CTemplate {
 						iter[0] ++;
 					«ELSE»
 						«IF (srcPort.hasAttribute("peekPort"))»
-							_DAL_read_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», sizeof(«srcPort.type.doSwitch»), _p);
+							_DAL_read_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», _p);
 						«ELSE»
 							«load.target.variable.name» = «srcPort.name»_buffer[«load.indexes.head.doSwitch»];
 						«ENDIF»

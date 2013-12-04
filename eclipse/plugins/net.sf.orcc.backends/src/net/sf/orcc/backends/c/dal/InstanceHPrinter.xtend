@@ -133,15 +133,17 @@ class InstanceHPrinter extends CTemplate {
 	«ENDIF»
 
 	typedef struct _local_states {
-	«IF !actor.stateVars.nullOrEmpty»
-		«FOR variable : actor.stateVars»
-			«variable.declareStateVar»
+		«IF !actor.stateVars.nullOrEmpty»
+			«FOR variable : actor.stateVars»
+				«variable.declareStateVar»
+			«ENDFOR»
+		«ENDIF»
+		«FOR port : actor.getInputs»
+			«IF port.hasAttribute("peekPort") && actor.hasAttribute("variableInputPattern")»
+				«port.type.doSwitch» _fo_«port.name»;
+				int _fo_filled_«port.name»;
+			«ENDIF»
 		«ENDFOR»
-	«ENDIF»
-	«FOR port : actor.getInputs»
-		void *_fo_«port.name»;
-		int _fo_filled_«port.name»;
-	«ENDFOR»
 		int _count;
 		int _FSM_state;
 	«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
