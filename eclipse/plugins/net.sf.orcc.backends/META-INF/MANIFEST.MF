@@ -9,7 +9,17 @@ Require-Bundle: org.apache.commons.cli;bundle-version="1.2.0",
  net.sf.orcc.core;bundle-version="1.3.0",
  com.google.guava,
  org.eclipse.xtext.xbase.lib,
- org.apache.commons.lang;bundle-version="2.6.0"
+ org.apache.commons.lang;bundle-version="2.6.0",
+ fr.irisa.cairn.gecos.model;bundle-version="1.0.0",
+ org.polymodel.prdg;bundle-version="1.0.0",
+ org.polymodel.dataflow;bundle-version="1.0.0",
+ fr.irisa.cairn.gecos.model.cdtfrontend;bundle-version="1.0.0",
+ fr.irisa.cairn.gecos.model.scop;bundle-version="1.0.0",
+ fr.irisa.cairn.gecos.model.scop.extractor;bundle-version="1.0.0",
+ fr.irisa.cairn.gecos.model.scop.generator.c;bundle-version="1.0.0",
+ fr.irisa.cairn.gecos.model.scop.scheduling;bundle-version="1.0.0",
+ fr.irisa.cairn.gecos.model.generator.c;bundle-version="1.0.0",
+ org.polymodel.scop.generator.c;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

@@ -40,6 +40,8 @@ import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
+import net.sf.orcc.backends.c.transform.ConstantRegisterCleaner;
+import net.sf.orcc.backends.transform.BlockForAdder;
 import net.sf.orcc.backends.transform.CastAdder;
 import net.sf.orcc.backends.transform.DeadVariableRemoval;
 import net.sf.orcc.backends.transform.DivisionSubstitution;
@@ -177,6 +179,13 @@ public class CBackend extends AbstractBackend {
 				}
 			}
 		}
+		
+		new DfVisitor<CfgNode>(new ControlFlowAnalyzer()).doSwitch(actor);
+		new DfVisitor<Void>(new ConstantRegisterCleaner()).doSwitch(actor);
+		new DfVisitor<CfgNode>(new ControlFlowAnalyzer()).doSwitch(actor);
+		new BlockForAdder().doSwitch(actor);
+		TestGeCosTransform.exec(actor);
+		
 	}
 
 	protected void doTransformNetwork(Network network) {
