@@ -28,10 +28,13 @@
  */
 package net.sf.orcc.xdf.ui.diagram;
 
+import net.sf.orcc.xdf.ui.features.InstanceDblClickFeature;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.context.IDoubleClickContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
+import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
@@ -85,4 +88,12 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 		return ret;
 	}
 
+	@Override
+	public ICustomFeature getDoubleClickFeature(IDoubleClickContext context) {
+		final ICustomFeature dblClickFeature = new InstanceDblClickFeature(getFeatureProvider());
+		if (dblClickFeature.canExecute(context)) {
+			return dblClickFeature;
+		}
+		return super.getDoubleClickFeature(context);
+	}
 }
