@@ -138,16 +138,21 @@ class Design:
         result = template.substitute(path=genPath, id="ram_2p", width=512, depth=32)
         open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
     
-    def simulateMulti(self, proc):
+    def simulateMulti(self, proc, results):
         self.sema.acquire()
-        proc.simulate()
+        retcode = proc.simulate()
+        results.append(retcode)
         self.sema.release()
-        return
 
     def simulate(self, nbJobs):
         self.sema = multiprocessing.BoundedSemaphore(value=nbJobs)
-        for processor in self.processors:
-            p = multiprocessing.Process(target=self.simulateMulti, args=(processor, ))
-            p.start()
-        for processor in self.processors:
-            p.join()
+        results = multiprocessing.Manager().list()
+        jobs = [multiprocessing.Process(target=self.simulateMulti, args=(processor, results)) 
+            for processor in self.processors]    
+        for job in jobs: job.start()
+        for job in jobs: job.join()
+        retcode = max(results)
+
+        if retcode != 0: 
+            raise Exception("Problem during the simulation")
+            
