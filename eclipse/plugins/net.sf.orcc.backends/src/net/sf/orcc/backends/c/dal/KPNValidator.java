@@ -47,6 +47,9 @@ public class KPNValidator {
 					port.setNumTokensConsumed(inputPattern.getNumTokensMap().get(port));
 				}
 			}
+			if (!actor.hasAttribute("variableInputPattern")) {
+				OrccLogger.traceln("Info: " + actor.getName() + " has a single input pattern");
+			}
 		}
 	}
 	
@@ -87,7 +90,6 @@ public class KPNValidator {
 					if (actorLevel) {
 						if (!actor.hasAttribute("variableInputPattern")) {
 							actor.addAttribute("variableInputPattern");
-							OrccLogger.traceln("Info: " + actor.getName() + " has varying input patterns");
 						}
 					} else {
 						OrccLogger.warnln("(" + actor.getName() + ") action '" + firstAction.getName() + "' reads port '"  + port.getName() +
