@@ -42,17 +42,10 @@
          class="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
          contributorClass="net.sf.orcc.xdf.ui.editors.XdfActionBarContributor"
          default="true"
-         extensions="xdf2"
+         extensions="xdf,diagram"
          icon="icons/network.gif"
          id="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
          name="Orcc Network Editor">
       </editor>
-   </extension>
-   <extension
-      point="org.eclipse.emf.ecore.extension_parser">
-      <parser
-            class="net.sf.orcc.df.impl.XdfResourceFactoryImpl"
-            type="xdf2">
-      </parser>
    </extension>
 </plugin>

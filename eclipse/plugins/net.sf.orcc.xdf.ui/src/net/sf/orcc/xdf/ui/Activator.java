@@ -43,7 +43,7 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 
-	public static String NETWORK_SUFFIX = "xdf2";
+	public static String NETWORK_SUFFIX = "xdf";
 	public static String DIAGRAM_SUFFIX = "diagram";
 	public static String DIAGRAM_TYPE = "xdfDiagram";
 
