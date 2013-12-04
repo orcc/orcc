@@ -64,7 +64,12 @@ public class DALBackend extends CBackend {
 		
 		KPNValidator validator = new KPNValidator();
 		validator.validate(network);
-		
+		validator.analyzeInputs(network);
+		validator.analyzeOutputs(network);
+
+		ActorOptimizer optimizer = new ActorOptimizer();
+		optimizer.optimizeOutput(network);
+
 		labelPeekPorts(network);
 	}
 
