@@ -32,4 +32,20 @@ public class ActorOptimizer {
 		}
 	}
 
+	// Disable actor input buffering for actors that
+	// naturally have a high input token rate
+	public void optimizeInput(Network network) {
+		for (Actor actor : network.getAllActors()) {
+			int maxRate = 0;
+			for (Port port : actor.getInputs()) {
+				if (port.getNumTokensConsumed() > maxRate)
+					maxRate = port.getNumTokensConsumed();
+			}
+			if (maxRate >= RATE_LIMIT) {
+				if (!actor.hasAttribute("variableInputPattern")) {
+					actor.addAttribute("variableInputPattern");
+				}
+			}
+		}
+	}
 }

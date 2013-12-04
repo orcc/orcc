@@ -157,6 +157,7 @@ class InstanceCPrinter extends CTemplate {
 		#include "«entityName».h"
 
 		«IF (!actor.hasAttribute("variableInputPattern"))»
+			«OrccLogger::traceln("Info: actor " + actor.getName + " inputs are buffered")»
 			#define TMP_ITER (MAX_IN_BUFFER/«maxIter»)
 			#if TMP_ITER < 1  
 			  #define MAX_ITER 1

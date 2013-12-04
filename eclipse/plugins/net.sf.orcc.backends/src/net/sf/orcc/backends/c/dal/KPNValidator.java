@@ -52,9 +52,6 @@ public class KPNValidator {
 					port.setNumTokensConsumed(inputPattern.getNumTokensMap().get(port));
 				}
 			}
-			if (!actor.hasAttribute("variableInputPattern")) {
-				OrccLogger.traceln("Info: " + actor.getName() + " has a single input pattern");
-			}
 		}
 	}
 	
