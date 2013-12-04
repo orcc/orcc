@@ -38,10 +38,12 @@ import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IMoveAnchorFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IMoveAnchorContext;
+import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.features.impl.DefaultMoveAnchorFeature;
@@ -87,5 +89,10 @@ public class XdfDiagramFeatureProvider extends
 				return false;
 			}
 		};
+	}
+
+	@Override
+	public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {
+		return getCreateConnectionFeatures();
 	}
 }
