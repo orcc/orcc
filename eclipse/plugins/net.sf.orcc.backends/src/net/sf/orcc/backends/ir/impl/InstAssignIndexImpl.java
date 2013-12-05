@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.backends.ir.impl;
 
+import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +17,7 @@ import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.impl.InstSpecificImpl;
+import net.sf.orcc.ir.impl.InstructionImpl;
 import net.sf.orcc.ir.util.ExpressionPrinter;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -33,19 +35,23 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getIndexes <em>Indexes</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getTarget <em>Target</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getListType <em>List Type</em>}</li>
+ * <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getIndexes <em>
+ * Indexes</em>}</li>
+ * <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getTarget <em>
+ * Target</em>}</li>
+ * <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getListType <em>
+ * List Type</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
-public class InstAssignIndexImpl extends InstSpecificImpl implements
+public class InstAssignIndexImpl extends InstructionImpl implements
 		InstAssignIndex {
 	/**
-	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getIndexes()
 	 * @generated
 	 * @ordered
@@ -53,8 +59,9 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 	protected EList<Expression> indexes;
 
 	/**
-	 * The cached value of the '{@link #getTarget() <em>Target</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTarget() <em>Target</em>}'
+	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTarget()
 	 * @generated
 	 * @ordered
@@ -62,8 +69,9 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 	protected Def target;
 
 	/**
-	 * The cached value of the '{@link #getListType() <em>List Type</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getListType() <em>List Type</em>}'
+	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getListType()
 	 * @generated
 	 * @ordered
@@ -72,6 +80,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected InstAssignIndexImpl() {
@@ -80,6 +89,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetListType(Type newListType,
@@ -91,16 +101,18 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 					Notification.SET,
 					IrSpecificPackage.INST_ASSIGN_INDEX__LIST_TYPE,
 					oldListType, newListType);
-			if (msgs == null)
+			if (msgs == null) {
 				msgs = notification;
-			else
+			} else {
 				msgs.add(notification);
+			}
 		}
 		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetTarget(Def newTarget,
@@ -112,16 +124,18 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 					Notification.SET,
 					IrSpecificPackage.INST_ASSIGN_INDEX__TARGET, oldTarget,
 					newTarget);
-			if (msgs == null)
+			if (msgs == null) {
 				msgs = notification;
-			else
+			} else {
 				msgs.add(notification);
+			}
 		}
 		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -139,6 +153,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -158,6 +173,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -175,6 +191,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -197,6 +214,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -206,6 +224,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -235,6 +254,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -248,6 +268,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -257,6 +278,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -270,60 +292,70 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setListType(Type newListType) {
 		if (newListType != listType) {
 			NotificationChain msgs = null;
-			if (listType != null)
+			if (listType != null) {
 				msgs = ((InternalEObject) listType)
 						.eInverseRemove(
 								this,
 								EOPPOSITE_FEATURE_BASE
 										- IrSpecificPackage.INST_ASSIGN_INDEX__LIST_TYPE,
 								null, msgs);
-			if (newListType != null)
+			}
+			if (newListType != null) {
 				msgs = ((InternalEObject) newListType)
 						.eInverseAdd(
 								this,
 								EOPPOSITE_FEATURE_BASE
 										- IrSpecificPackage.INST_ASSIGN_INDEX__LIST_TYPE,
 								null, msgs);
+			}
 			msgs = basicSetListType(newListType, msgs);
-			if (msgs != null)
+			if (msgs != null) {
 				msgs.dispatch();
-		} else if (eNotificationRequired())
+			}
+		} else if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrSpecificPackage.INST_ASSIGN_INDEX__LIST_TYPE,
 					newListType, newListType));
+		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setTarget(Def newTarget) {
 		if (newTarget != target) {
 			NotificationChain msgs = null;
-			if (target != null)
+			if (target != null) {
 				msgs = ((InternalEObject) target).eInverseRemove(this,
 						EOPPOSITE_FEATURE_BASE
 								- IrSpecificPackage.INST_ASSIGN_INDEX__TARGET,
 						null, msgs);
-			if (newTarget != null)
+			}
+			if (newTarget != null) {
 				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
 						EOPPOSITE_FEATURE_BASE
 								- IrSpecificPackage.INST_ASSIGN_INDEX__TARGET,
 						null, msgs);
+			}
 			msgs = basicSetTarget(newTarget, msgs);
-			if (msgs != null)
+			if (msgs != null) {
 				msgs.dispatch();
-		} else if (eNotificationRequired())
+			}
+		} else if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrSpecificPackage.INST_ASSIGN_INDEX__TARGET, newTarget,
 					newTarget));
+		}
 	}
 
 	@Override
@@ -331,7 +363,7 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
 		builder.append("AssignIndex(").append(
-				getTarget().getVariable().getIndexedName());
+				getNameSSA(getTarget().getVariable()));
 		for (Expression index : getIndexes()) {
 			builder.append("[");
 			builder.append(new ExpressionPrinter().doSwitch(index));

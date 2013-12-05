@@ -55,12 +55,7 @@ public interface TypeInt extends Type {
 	 */
 	boolean isLong();
 
-	/**
-	 * Sets the size of this integer type.
-	 * 
-	 * @param size
-	 *            the size of this integer type
-	 */
-	void setSize(int size);
+	@Override
+	void setSize(int value);
 
 }

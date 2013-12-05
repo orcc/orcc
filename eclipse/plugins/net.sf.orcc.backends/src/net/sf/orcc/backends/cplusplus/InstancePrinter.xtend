@@ -99,10 +99,10 @@ import net.sf.orcc.util.OrccUtil
 		class «instance.name»: public Actor
 		{
 		public:	
-			«instance.name»(«FOR arg : instance.arguments SEPARATOR ", "»«arg.variable.type.doSwitch» «arg.variable.indexedName»«FOR dim : arg.variable.type.dimensions»[«dim»]«ENDFOR»«ENDFOR»)
-				«FOR arg : instance.arguments BEFORE ":" SEPARATOR "\n,"»  «arg.variable.indexedName»(«arg.variable.indexedName»)«ENDFOR»
+			«instance.name»(«FOR arg : instance.arguments SEPARATOR ", "»«arg.variable.type.doSwitch» «arg.variable.name»«FOR dim : arg.variable.type.dimensions»[«dim»]«ENDFOR»«ENDFOR»)
+				«FOR arg : instance.arguments BEFORE ":" SEPARATOR "\n,"»  «arg.variable.name»(«arg.variable.name»)«ENDFOR»
 			{
-				«FOR v : actor.stateVars.filter(v|v.initialValue != null)»«compileArg(v.type, v.indexedName, v.initialValue)»«ENDFOR»
+				«FOR v : actor.stateVars.filter(v|v.initialValue != null)»«compileArg(v.type, v.name, v.initialValue)»«ENDFOR»
 				«IF actor.fsm != null»state_ = state_«actor.fsm.initialState.name»;«ENDIF»
 			}
 		
@@ -202,12 +202,12 @@ import net.sf.orcc.util.OrccUtil
 	'''
 	} else {
 	'''
-		«IF inst.target!=null»«inst.target.variable.indexedName» = «ENDIF»«inst.procedure.name»(«FOR arg : inst.getArguments SEPARATOR ", "»«arg.compileArg»«ENDFOR»);
+		«IF inst.target!=null»«inst.target.variable.name» = «ENDIF»«inst.procedure.name»(«FOR arg : inst.getArguments SEPARATOR ", "»«arg.compileArg»«ENDFOR»);
 	'''
 	}
 }
 	override caseInstLoad(InstLoad inst) '''
-		«inst.target.variable.indexedName» = «inst.source.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR»;
+		«inst.target.variable.name» = «inst.source.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR»;
 	'''
 
 	override caseInstReturn(InstReturn inst) '''

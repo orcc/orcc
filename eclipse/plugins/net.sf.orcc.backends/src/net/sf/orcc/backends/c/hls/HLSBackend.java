@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
+import net.sf.orcc.backends.transform.CastArgFuncCall;
 import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
-import net.sf.orcc.backends.transform.Inliner;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -50,15 +50,13 @@ import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transform.RenameTransformation;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -69,15 +67,9 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class HLSBackend extends CBackend {
 
 	/**
-	 * Path to target "src" folder
-	 */
-	private String srcPath;
-
-	/**
 	 * Path to target "testBench" folder
 	 */
 	private String VHDLTestBenchPath;
-	private String coSimTestBenchPath;
 	private String commandPath;
 
 	/**
@@ -86,14 +78,14 @@ public class HLSBackend extends CBackend {
 	protected Map<String, List<Instance>> targetToInstancesMap;
 
 	@Override
+	protected boolean exportRuntimeLibrary() {
+		return false;
+	}
+
+	@Override
 	protected void doInitializeOptions() {
-
-		new File(path + File.separator + "build").mkdirs();
-		new File(path + File.separator + "bin").mkdirs();
-
-		srcPath = path + File.separator + "src";
-		VHDLTestBenchPath = srcPath + File.separator + "VHDLTestBench";
-		coSimTestBenchPath = srcPath + File.separator + "coSimTestBench";
+		srcPath = path + File.separator + "HLSBackend";
+		VHDLTestBenchPath = srcPath + File.separator + "UnitaryVHDLTestBENCH";
 		commandPath = srcPath + File.separator + "batchCommand";
 	}
 
@@ -123,16 +115,14 @@ public class HLSBackend extends CBackend {
 
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new Multi2MonoToken());
-		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
-
+		transformations.add(new DfVisitor<Void>(new CastArgFuncCall()));
+		// transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
+		// transformations.add(new DivisionSubstitution());//don't work for HEVC
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			if (debug) {
-				ResourceSet set = new ResourceSetImpl();
-				if (!IrUtil.serializeActor(set, srcPath, actor)) {
-					OrccLogger.warnln("Error with " + transformation
-							+ " on actor " + actor.getName());
-				}
+				OrccUtil.validateObject(transformation.toString() + " on "
+						+ actor.getName(), actor);
 			}
 		}
 	}
@@ -157,6 +147,7 @@ public class HLSBackend extends CBackend {
 		new BroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
 		new DisconnectedOutputPortRemoval().doSwitch(network);
+
 	}
 
 	@Override
@@ -188,8 +179,7 @@ public class HLSBackend extends CBackend {
 		}
 
 		OrccLogger.trace("Printing network testbench... ");
-		if (new NetworkTestBenchPrinter(network, options)
-				.print(VHDLTestBenchPath) > 0) {
+		if (new NetworkTestBenchPrinter(network, options).print(srcPath) > 0) {// VHDLTestBenchPath
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
@@ -215,7 +205,7 @@ public class HLSBackend extends CBackend {
 	protected boolean printInstance(Instance instance) {
 		new InstanceTestBenchPrinter(options)
 				.print(VHDLTestBenchPath, instance);
-		new InstanceCosimPrinter(options).print(coSimTestBenchPath, instance);
+		new InstanceCosimPrinter(options).print(srcPath, instance);
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}
 }

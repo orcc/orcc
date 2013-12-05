@@ -195,15 +195,13 @@
   <eClassifiers xsi:type="ecore:EClass" name="ExprUnary" eSuperTypes="#//Guard">
     <eOperations name="isInverted" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eOperations name="isSimple" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="operator" eType="#//OpUnary"
-        defaultValueLiteral=""/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="operator" eType="#//OpUnary"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="term" eType="#//Term"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ExprBinary" eSuperTypes="#//Guard">
     <eOperations name="isOr" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eOperations name="isAnd" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="operator" eType="#//OpBinary"
-        defaultValueLiteral=""/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="operator" eType="#//OpBinary"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="e1" eType="#//ExprUnary"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="e2" eType="#//ExprUnary"/>
   </eClassifiers>

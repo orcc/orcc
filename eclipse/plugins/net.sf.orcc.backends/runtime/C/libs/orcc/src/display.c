@@ -28,7 +28,7 @@
  */
 
 #include "SDL.h"
-#include "orcc_util.h"
+#include "util.h"
 
 static SDL_Surface *m_screen;
 static SDL_Surface *m_image;
@@ -273,4 +273,8 @@ void displayYUV_getEvent() {
  */
 int displayYUV_getNbFrames() {
 	return nbFrames;
+}
+
+void display_close() {
+	SDL_Quit();
 }

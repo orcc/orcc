@@ -356,9 +356,6 @@ public class FrontendCli implements IApplication {
 	 */
 	private void writeIrFile(IFile calFile, Map<String, IFile> qnameFileMap) {
 
-		Frontend.instance.setOutputFolder(OrccUtil.getOutputFolder(calFile
-				.getProject()));
-
 		Resource resource = EcoreHelper.getResource(resourceSet, calFile);
 
 		// Current actor to build
@@ -376,12 +373,16 @@ public class FrontendCli implements IApplication {
 			}
 		}
 
+		IFolder outFolder = OrccUtil.getOutputFolder(calFile.getProject());
+
 		if (astEntity.getUnit() != null) {
-			System.out.println("Unit : " + calFile.getName() + " from project "
-					+ calFile.getProject().getName());
+			System.out.println(" Unit: " + calFile.getName() + " from project "
+					+ calFile.getProject().getName() + " built in folder "
+					+ outFolder.toString());
 		} else {
-			System.out.println("Actor : " + calFile.getName()
-					+ " from project " + calFile.getProject().getName());
+			System.out.println("Actor: " + calFile.getName() + " from project "
+					+ calFile.getProject().getName() + " built in folder "
+					+ outFolder.toString());
 		}
 
 		// Really write Actor IR
@@ -400,8 +401,6 @@ public class FrontendCli implements IApplication {
 	 */
 	private void writeIrFilesFromProject(IProject p,
 			Map<String, IFile> qnameFileMap) throws OrccException {
-
-		Frontend.instance.setOutputFolder(OrccUtil.getOutputFolder(p));
 
 		Map<String, Resource> resourceMap = new HashMap<String, Resource>();
 		ArrayList<String> orderedUnits = new ArrayList<String>();

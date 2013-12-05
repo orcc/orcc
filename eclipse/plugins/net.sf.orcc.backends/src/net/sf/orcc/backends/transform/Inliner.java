@@ -42,6 +42,7 @@ import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -49,7 +50,6 @@ import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Param;
@@ -58,8 +58,12 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.Attributable;
+import net.sf.orcc.util.Attribute;
+import net.sf.orcc.util.Void;
 import net.sf.orcc.util.util.EcoreHelper;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -89,6 +93,20 @@ public class Inliner extends AbstractIrVisitor<Void> {
 			Var var = exprVar.getUse().getVariable();
 			if (localToLocalsMap.containsKey(var)) {
 				exprVar.getUse().setVariable(localToLocalsMap.get(var));
+			}
+			return null;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * net.sf.orcc.ir.util.IrSwitch#caseExprList(net.sf.orcc.ir.ExprList)
+		 */
+		@Override
+		public Void caseExprList(ExprList object) {
+			for (Expression expression : object.getValue()) {
+				doSwitch(expression);
 			}
 			return null;
 		}
@@ -171,9 +189,9 @@ public class Inliner extends AbstractIrVisitor<Void> {
 		}
 
 		@Override
-		public Void caseInstSpecific(InstSpecific specific) {
-			if (specific instanceof InstTernary) {
-				InstTernary ternary = (InstTernary) specific;
+		public Void defaultCase(EObject object) {
+			if (object instanceof InstTernary) {
+				InstTernary ternary = (InstTernary) object;
 				Var var = ternary.getTarget().getVariable();
 				if (localToLocalsMap.containsKey(var)) {
 					ternary.getTarget().setVariable(localToLocalsMap.get(var));
@@ -181,6 +199,28 @@ public class Inliner extends AbstractIrVisitor<Void> {
 				doSwitch(ternary.getConditionValue());
 				doSwitch(ternary.getTrueValue());
 				doSwitch(ternary.getFalseValue());
+			}
+			return null;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see net.sf.orcc.ir.util.IrSwitch#caseAttributable(net.sf.orcc.util.
+		 * Attributable)
+		 */
+		@Override
+		public Void caseAttributable(Attributable object) {
+			for (Attribute attribute : object.getAttributes()) {
+				caseAttributable(attribute);
+				EObject containedValue = attribute.getContainedValue();
+				if (containedValue != null) {
+					doSwitch(containedValue);
+				}
+				EObject referencedValue = attribute.getReferencedValue();
+				if (referencedValue != null) {
+					doSwitch(referencedValue);
+				}
 			}
 			return null;
 		}

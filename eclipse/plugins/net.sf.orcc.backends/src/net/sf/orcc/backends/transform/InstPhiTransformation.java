@@ -35,12 +35,14 @@ import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstPhi;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.Void;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * 
@@ -84,9 +86,9 @@ public class InstPhiTransformation extends AbstractIrVisitor<Void> {
 	}
 
 	@Override
-	public Void caseInstSpecific(InstSpecific instSpecific) {
-		if (instSpecific instanceof InstTernary) {
-			InstTernary ternaryOperation = (InstTernary) instSpecific;
+	public Void defaultCase(EObject object) {
+		if (object instanceof InstTernary) {
+			InstTernary ternaryOperation = (InstTernary) object;
 			ternaryOperation.setConditionValue(clean(ternaryOperation
 					.getConditionValue()));
 			ternaryOperation

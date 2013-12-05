@@ -40,14 +40,15 @@ import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -124,8 +125,10 @@ public class InstTernaryAdder extends AbstractIrVisitor<Void> {
 	}
 
 	@Override
-	public Void caseInstSpecific(InstSpecific inst) {
-		newBasicBlock.add(IrUtil.copy(inst));
+	public Void defaultCase(EObject object) {
+		if (object instanceof Instruction) {
+			newBasicBlock.add((Instruction) IrUtil.copy(object));
+		}
 		return null;
 	}
 

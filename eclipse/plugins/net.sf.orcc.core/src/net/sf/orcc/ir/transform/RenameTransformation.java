@@ -113,7 +113,8 @@ public class RenameTransformation extends DfVisitor<Object> {
 	public Object caseActor(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
-
+		checkPorts(actor.getInputs());
+		checkPorts(actor.getOutputs());
 		return super.caseActor(actor);
 	}
 

@@ -36,6 +36,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.util.Void;
 
 /**
  * Check coherence between a list size and its number of initial values.

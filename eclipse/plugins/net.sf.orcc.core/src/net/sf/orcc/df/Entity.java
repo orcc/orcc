@@ -33,6 +33,7 @@ package net.sf.orcc.df;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attributable;
@@ -189,5 +190,13 @@ public interface Entity extends Attributable, Adaptable {
 	 * @return an unqualified name
 	 */
 	String getSimpleName();
+
+	/**
+	 * Updates this entity according to the given list of expressions.
+	 * 
+	 * @param expressions
+	 *            a list of expressions to instantiate this entity
+	 */
+	void update(List<Expression> expressions);
 
 } // Entity

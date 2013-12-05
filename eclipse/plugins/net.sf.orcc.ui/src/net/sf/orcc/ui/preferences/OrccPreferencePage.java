@@ -29,8 +29,6 @@
 package net.sf.orcc.ui.preferences;
 
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE;
-import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
-import static net.sf.orcc.preferences.PreferenceConstants.P_METIS;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_TYPE;
@@ -126,7 +124,6 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 
 		createJadeFieldEditors(parent);
 		createSolverFieldEditors(parent);
-		createMetisFieldEditors(parent);
 	}
 
 	/**
@@ -143,10 +140,8 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		group.setText("Jade");
 
 		addField(new FileFieldEditor(P_JADE, "Path of Jade executable:", group));
-		addField(new FileFieldEditor(P_JADE_TOOLBOX, "Path of Jade toolbox:",
-				group));
 	}
-	
+
 	/**
 	 * Creates a new solver selection listener, and add it to all children of
 	 * the radioComposite field. Also add a modify listener to the text control
@@ -156,8 +151,7 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		SelectionListener sel = new SolverSelectionListener();
 
 		final Control[] children = radioComposite.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			Control child = children[i];
+		for (Control child : children) {
 			if (child instanceof Button) {
 				Button button = (Button) child;
 				button.addSelectionListener(sel);
@@ -178,22 +172,6 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 			}
 
 		});
-	}
-
-	/**
-	 * Creates field editors for the Jade preferences.
-	 * 
-	 * @param parent
-	 *            parent composite
-	 */
-	private void createMetisFieldEditors(Composite parent) {
-		Group group = new Group(parent, SWT.NONE);
-		group.setFont(getFont());
-		group.setLayout(new GridLayout(3, false));
-		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		group.setText("Metis");
-
-		addField(new FileFieldEditor(P_METIS, "Path of Metis executable:", group));
 	}
 
 	/**

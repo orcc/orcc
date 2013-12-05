@@ -58,6 +58,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Void;
 
 /**
  * A simple loop unrolling transformation
@@ -69,9 +70,9 @@ public class LoopUnrolling extends AbstractIrVisitor<Void> {
 
 	private class InnerExpressionVisitor extends AbstractIrVisitor<Expression> {
 
-		private int idxLiteral;
+		private final int idxLiteral;
 
-		private Var index;
+		private final Var index;
 
 		public InnerExpressionVisitor(Var index, int idxLiteral) {
 			super(true);
@@ -151,7 +152,7 @@ public class LoopUnrolling extends AbstractIrVisitor<Void> {
 							.createInstAssign(target, unrolledValue);
 
 					int idxInst = assign.getBlock().indexOf(assign);
-					BlockBasic block = (BlockBasic) unrollBlocks.get(i);
+					BlockBasic block = unrollBlocks.get(i);
 					block.add(idxInst, instAssign);
 				}
 			}
@@ -202,7 +203,7 @@ public class LoopUnrolling extends AbstractIrVisitor<Void> {
 				instCall.getArguments().addAll(unrolledArguments);
 
 				int idxInst = call.getBlock().indexOf(call);
-				BlockBasic block = (BlockBasic) unrollBlocks.get(i);
+				BlockBasic block = unrollBlocks.get(i);
 				block.add(idxInst, instCall);
 			}
 
@@ -230,7 +231,7 @@ public class LoopUnrolling extends AbstractIrVisitor<Void> {
 				InstLoad instLoad = IrFactory.eINSTANCE.createInstLoad(target,
 						source, newIndexes);
 				int idxInst = load.getBlock().indexOf(load);
-				BlockBasic block = (BlockBasic) unrollBlocks.get(i);
+				BlockBasic block = unrollBlocks.get(i);
 				block.add(idxInst, instLoad);
 			}
 			return null;
@@ -258,7 +259,7 @@ public class LoopUnrolling extends AbstractIrVisitor<Void> {
 				InstStore instStore = IrFactory.eINSTANCE.createInstStore(
 						target, newIndexes, value);
 				int idxInst = store.getBlock().indexOf(store);
-				BlockBasic block = (BlockBasic) unrollBlocks.get(i);
+				BlockBasic block = unrollBlocks.get(i);
 				block.add(idxInst, instStore);
 			}
 			return null;

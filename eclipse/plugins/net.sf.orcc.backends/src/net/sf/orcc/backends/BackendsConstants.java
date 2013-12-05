@@ -35,6 +35,7 @@ package net.sf.orcc.backends;
 public class BackendsConstants {
 
 	public static final String GENETIC_ALGORITHM = "net.sf.orcc.backends.geneticAlgorithm";
+	public static final String INSTRUMENT_NETWORK = "net.sf.orcc.backends.instrumentNetwork";
 	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
 	public static final String NEW_SCHEDULER_TOPOLOGY = "net.sf.orcc.backends.newScheduler.topology";
 
@@ -46,7 +47,18 @@ public class BackendsConstants {
 
 	public static final String CONVERT_MULTI2MONO = "net.sf.orcc.backends.multi2mono";
 	public static final String ADDITIONAL_TRANSFOS = "net.sf.orcc.backends.add_transfos";
-	
+
 	public static final String PROFILE = "net.sf.orcc.backends.profile";
 
+	public static final String IMPORT_XCF = "net.sf.orcc.backends.importXCF";
+	public static final String XCF_FILE = "net.sf.orcc.backends.xcfFile";
+
+	public static final String HMPP_NO_PRAGMAS = "net.sf.orcc.backends.c.hmpp.disablePragma";
+
+	public static final int MIN_REPEAT_SIZE_RWEND = 2;
+
+	public static final int MIN_VECTORIZABLE = 2;
+
+	public static final String VECTORIZABLE = "VECTORIZABLE";
+	public static final String VECTORIZABLE_ALWAYS = "VECTORIZABLE_ALWAYS";	
 }

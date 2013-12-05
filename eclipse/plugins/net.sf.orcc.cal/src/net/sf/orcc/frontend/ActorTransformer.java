@@ -336,6 +336,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		Frontend.putMapping(astActor, actor);
 
 		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
+		actor.setAttribute("project", Util.getProjectName(astActor));
 
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);
@@ -354,6 +355,10 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		// functions
 		for (Function function : astActor.getFunctions()) {
+			String fnName = function.getName();
+			if ("print".equals(fnName) || "println".equals(fnName)) {
+				continue;
+			}
 			Procedure procedure = Frontend.getMapping(function, false);
 			actor.getProcs().add(procedure);
 		}

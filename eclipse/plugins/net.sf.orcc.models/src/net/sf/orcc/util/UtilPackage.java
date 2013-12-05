@@ -66,60 +66,6 @@ public interface UtilPackage extends EPackage {
 	int ATTRIBUTE = 0;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ATTRIBUTE__NAME = 0;
-
-	/**
-	 * The feature id for the '<em><b>Contained Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ATTRIBUTE__CONTAINED_VALUE = 1;
-
-	/**
-	 * The feature id for the '<em><b>Object Value</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ATTRIBUTE__OBJECT_VALUE = 2;
-
-	/**
-	 * The feature id for the '<em><b>Referenced Value</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ATTRIBUTE__REFERENCED_VALUE = 3;
-
-	/**
-	 * The feature id for the '<em><b>String Value</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ATTRIBUTE__STRING_VALUE = 4;
-
-	/**
-	 * The number of structural features of the '<em>Attribute</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ATTRIBUTE_FEATURE_COUNT = 5;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.util.impl.AttributableImpl <em>Attributable</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -146,6 +92,69 @@ public interface UtilPackage extends EPackage {
 	 * @ordered
 	 */
 	int ATTRIBUTABLE_FEATURE_COUNT = 1;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ATTRIBUTE__ATTRIBUTES = ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ATTRIBUTE__NAME = ATTRIBUTABLE_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Contained Value</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ATTRIBUTE__CONTAINED_VALUE = ATTRIBUTABLE_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Object Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ATTRIBUTE__OBJECT_VALUE = ATTRIBUTABLE_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Referenced Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ATTRIBUTE__REFERENCED_VALUE = ATTRIBUTABLE_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>String Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ATTRIBUTE__STRING_VALUE = ATTRIBUTABLE_FEATURE_COUNT + 4;
+
+	/**
+	 * The number of structural features of the '<em>Attribute</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ATTRIBUTE_FEATURE_COUNT = ATTRIBUTABLE_FEATURE_COUNT + 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.util.impl.AdaptableImpl <em>Adaptable</em>}' class.

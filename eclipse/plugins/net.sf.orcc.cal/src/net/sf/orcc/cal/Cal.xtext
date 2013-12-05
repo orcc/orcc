@@ -74,7 +74,6 @@ Function:
 		('var'
 			variables += ValuedVariableDeclaration
 			(',' variables += ValuedVariableDeclaration)*)? ':'
-		(variables += ValuedVariableDeclaration ';')*
 		expression=AstExpression
 	)?
 	'end';
@@ -91,7 +90,6 @@ AstProcedure:
 			variables += ValuedVariableDeclaration
 			(',' variables += ValuedVariableDeclaration)*)?
 		'begin'
-			(variables += ValuedVariableDeclaration ';')*
 			(statements += Statement)*
 	)?
 	'end';
@@ -177,7 +175,6 @@ AstAction:
 		variables += ValuedVariableDeclaration
 		(',' variables += ValuedVariableDeclaration)*)?
 	('do'
-		(variables += ValuedVariableDeclaration ';')*
 		(statements += Statement)*
 	)?
 	'end';
@@ -195,7 +192,6 @@ Initialize returns AstAction:
 		variables += ValuedVariableDeclaration
 		(',' variables += ValuedVariableDeclaration)*)?
 	('do'
-		(variables += ValuedVariableDeclaration ';')*
 		(statements += Statement)*
 	)?
 	'end';
@@ -295,6 +291,7 @@ ExpressionPostfix returns AstExpression:
     | '(' AstExpression ')';
 
 ExpressionCall:
+	(annotations += AstAnnotation)*
 	function=[Function|QualifiedName] '(' (parameters += AstExpression (',' parameters += AstExpression)*)? ')';
 
 ExpressionIndex:

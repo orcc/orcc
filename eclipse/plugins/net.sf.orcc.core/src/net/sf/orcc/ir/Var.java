@@ -63,15 +63,6 @@ public interface Var extends Attributable {
 	int getIndex();
 
 	/**
-	 * Returns the indexed name of this variable, which is the name of the
-	 * variable concatenated with "_" and its index, or if index is 0 is the
-	 * name of variable.
-	 * 
-	 * @return the indexed name of this variable
-	 */
-	String getIndexedName();
-
-	/**
 	 * Returns the initial value of this variable as an expression. Only valid
 	 * for global variables.
 	 * 
@@ -156,8 +147,17 @@ public interface Var extends Attributable {
 	/**
 	 * <!-- begin-user-doc -->Returns <code>true</code> if this variable is
 	 * local.<!-- end-user-doc -->
+	 * 
+	 * @model changeable="false" derived="true" transient="true" volatile="true"
 	 */
 	boolean isLocal();
+
+	/**
+	 * <!-- begin-user-doc -->Returns <code>true</code> if this variable is a
+	 * parameter of a procedure, i.e. if it is contained in a Param.<!--
+	 * end-user-doc -->
+	 */
+	boolean isParam();
 
 	/**
 	 * Returns true if this variable is used at least once.

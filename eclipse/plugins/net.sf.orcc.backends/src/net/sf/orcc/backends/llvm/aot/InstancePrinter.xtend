@@ -184,7 +184,7 @@ class InstancePrinter extends LLVMTemplate {
 			«val connection = incomingPortMap.get(port)»
 			«connection.printInput(port)»
 		«ENDFOR»
-		
+
 		«FOR port : outputs»
 			«FOR connection : outgoingPortMap.get(port)»
 				«connection.printOutput(port)»
@@ -265,33 +265,33 @@ class InstancePrinter extends LLVMTemplate {
 			bb_outside_scheduler_start:
 				;; no read/write here!
 			«printActionLoop(actor.actionsOutsideFsm, true)»
-			
+
 			bb_outside_finished:
 				;; no read_end/write_end here!
 				ret void
 			}
 		«ENDIF»
-		
+
 		define void @«name»_scheduler() nounwind {
 		entry:
 			br label %bb_scheduler_start
-		
+
 		bb_scheduler_start:
 			«printCallStartTokenFunctions»
 			«actor.fsm.printFsmSwitch»
 			br label %bb_scheduler_start
-		
+
 		default:
 			; TODO: print error
 			br label %bb_scheduler_start
-		
+
 		«FOR state : actor.fsm.states»
 			«state.printTransition»
 		«ENDFOR»
-		
+
 		bb_waiting:
 			br label %bb_finished
-		
+
 		bb_finished:
 			«printCallEndTokenFunctions»
 			ret void
@@ -374,10 +374,10 @@ class InstancePrinter extends LLVMTemplate {
 
 		bb_scheduler_start:
 		«printActionLoop(actor.actionsOutsideFsm, false)»
-		
+
 		bb_waiting:
 			br label %bb_finished
-		
+
 		bb_finished:
 			«printCallEndTokenFunctions»
 			ret void
@@ -411,8 +411,8 @@ class InstancePrinter extends LLVMTemplate {
 					«val lastPort = outputPattern.ports.last»
 					;; Output pattern
 					«checkOutputPattern(action, outputPattern, null)»
-		
-					br i1 %has_valid_outputs_«lastPort.name»_«outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«name», label %bb_«name»_fire, label %bb_finished
+
+					br i1 %has_valid_outputs_«lastPort.name»_«outgoingPortMap.get(lastPort).last.getSafeId(lastPort)»_«name», label %bb_«name»_fire, label %bb«IF outsideFSM»_outside«ENDIF»_finished
 				«ELSE»
 					;; Empty output pattern
 					
@@ -594,7 +594,7 @@ class InstancePrinter extends LLVMTemplate {
 		if(variable.global)
 			'''@«variable.name» = internal «IF variable.assignable»global«ELSE»constant«ENDIF» «variable.type.doSwitch» «variable.initialize»'''
 		else if(variable.type.list && ! castedList.contains(variable))
-			'''%«variable.indexedName» = alloca «variable.type.doSwitch»'''
+			'''%«variable.name» = alloca «variable.type.doSwitch»'''
 	}
 	
 	def protected initialize(Var variable) {
@@ -615,7 +615,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val addrSpace = connection.addrSpace»
 		«val prop = port.properties»
 		«connection.printExternalFifo(port)»
-	
+
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
 		@index_«name» = internal global i32 0
 		@numTokens_«name» = internal global i32 0
@@ -651,7 +651,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val addrSpace = connection.addrSpace»
 		«val prop = port.properties»
 		«connection.printExternalFifo(port)»
-	
+
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
 		@index_«name» = internal global i32 0
 		@rdIndex_«name» = internal global i32 0
@@ -779,17 +779,21 @@ class InstancePrinter extends LLVMTemplate {
 	def caseExprNull(ExprNull expr) '''null'''
 	
 	def caseInstCast(InstCast cast) '''
-		%«cast.target.variable.indexedName» = «cast.castOp» «cast.source.variable.castType» «cast.source.variable.print» to «cast.target.variable.castType»
+		%«cast.target.variable.name» = «cast.castOp» «cast.source.variable.castType» «cast.source.variable.print» to «cast.target.variable.castType»
 	'''
 
-	def private getCastOp(InstCast cast)
-		'''«IF cast.source.variable.type.list»bitcast«ELSEIF ! cast.extended»trunc«ELSEIF cast.signed»sext«ELSE»zext«ENDIF»'''
+	def private getCastOp(InstCast cast) {
+		if(cast.source.variable.type.list) '''bitcast'''
+		else if(!cast.extended) '''trunc'''
+		else if(cast.signed) '''sext'''
+		else '''zext'''
+	}
 
 	def private getCastType(Var variable)
 		'''«variable.type.doSwitch»«IF variable.type.list»*«ENDIF»'''
 	
 	override caseInstAssign(InstAssign assign) 
-		'''%«assign.target.variable.indexedName» = «assign.value.doSwitch»'''
+		'''%«assign.target.variable.name» = «assign.value.doSwitch»'''
 	
 	override caseInstPhi(InstPhi phi)
 		'''«phi.target.variable.print» = phi «phi.target.variable.type.doSwitch» «phi.phiPairs»'''
@@ -819,7 +823,7 @@ class InstancePrinter extends LLVMTemplate {
 				«IF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«FOR connection : outgoingPortMap.get(port)»
-						«printPortAccess(connection, port, variable, store.indexes, store)»
+						«printPortAccess(connection, port, variable, store.indexes.head, store)»
 						store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«connection.addrSpace»* «varName(variable, store)»_«connection.getSafeId(port)»
 					«ENDFOR»
 				«ELSE»
@@ -842,17 +846,17 @@ class InstancePrinter extends LLVMTemplate {
 				«IF action != null && action.inputPattern.contains(variable) && ! action.inputPattern.varToPortMap.get(variable).native»
 					«val port = action.inputPattern.varToPortMap.get(variable)»
 					«val connection = incomingPortMap.get(port)»
-					«printPortAccess(connection, port, variable, load.indexes, load)»
+					«printPortAccess(connection, port, variable, load.indexes.head, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSEIF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«val connection = outgoingPortMap.get(port).head»
-					«printPortAccess(connection, port, variable, load.indexes, load)»
+					«printPortAccess(connection, port, variable, load.indexes.head, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSEIF action != null && action.peekPattern.contains(variable)»
 					«val port = action.peekPattern.varToPortMap.get(variable)»
 					«val connection = incomingPortMap.get(port)»
-					«printPortAccess(connection, port, variable, load.indexes, load)»
+					«printPortAccess(connection, port, variable, load.indexes.head, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSE»
 					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "")[printIndex]»
@@ -869,9 +873,9 @@ class InstancePrinter extends LLVMTemplate {
 	
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
-			call i32 (i8*, ...)* @printf(«call.arguments.join(", ")[printParameter((it as ArgByVal).value.type)]»)
+			call i32 (i8*, ...)* @printf(«call.arguments.join(", ")[printArgument((it as ArgByVal).value.type)]»)
 		«ELSE»
-			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
+			«IF call.target != null»%«call.target.variable.name» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
 		«ENDIF»
 	'''
 	
@@ -879,13 +883,13 @@ class InstancePrinter extends LLVMTemplate {
 		val paramList = new ArrayList<CharSequence>
 		if(params.size != 0) {
 			for (i : 0..params.size-1) {
-				paramList.add(printParameter(args.get(i), params.get(i).variable.type))
+				paramList.add(printArgument(args.get(i), params.get(i).variable.type))
 			}
 		}
 		return paramList
 	}
 
-	def protected printParameter(Arg arg, Type type) {
+	def protected printArgument(Arg arg, Type type) {
 		if (arg.byRef)
 			'''TODO'''
 		else if (type.string) {
@@ -901,20 +905,22 @@ class InstancePrinter extends LLVMTemplate {
 		'''%«variable.name»_elt_«(procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>).get(instr)»'''
 	}
 
-	def private printPortAccess(Connection connection, Port port, Var variable, EList<Expression> indexes, Instruction instr) {
+	def private printPortAccess(Connection connection, Port port, Var variable, Expression index, Instruction instr) {
 		val procedure = EcoreHelper::getContainerOfType(instr, typeof(Procedure))
 		val accessMap = procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>
 		val accessId = accessMap.get(instr)
-		val needCast = indexes.head.type.sizeInBits != 32
-		val fifoName = port.name + "_" + connection.getSafeId(port)
-		val extName = variable.name + "_" + accessId + "_" + connection.getSafeId(port)
+		val indexSize = index.type.sizeInBits
+		val needCast = indexSize != 32 && !index.exprInt
+		val connId = connection.getSafeId(port)
+		val fifoName = port.name + "_" + connId
+		val extName = variable.name + "_" + accessId + "_" + connId
 		'''
 			«IF needCast»
-				%cast_index_«extName» = «IF indexes.head.type.sizeInBits < 32»zext«ELSE»trunc«ENDIF» «indexes.head.type.doSwitch» «indexes.head.doSwitch» to i32
+				%cast_index_«extName» = «IF indexSize < 32»zext«ELSE»trunc«ENDIF» «index.type.doSwitch» «index.doSwitch» to i32
 			«ENDIF»
-			%tmp_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«indexes.head.doSwitch»«ENDIF»
+			%tmp_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«index.doSwitch»«ENDIF»
 			%final_index_«extName» = urem i32 %tmp_index_«extName», %local_size_«fifoName»
-			«varName(variable, instr)»_«connection.getSafeId(port)» = getelementptr [«connection.safeSize» x «port.type.doSwitch»]«connection.addrSpace»* @fifo_«connection.getSafeId(port)»_content, i32 0, i32 %final_index_«extName»
+			«varName(variable, instr)»_«connId» = getelementptr [«connection.safeSize» x «port.type.doSwitch»]«connection.addrSpace»* @fifo_«connId»_content, i32 0, i32 %final_index_«extName»
 		'''
 	}
 	

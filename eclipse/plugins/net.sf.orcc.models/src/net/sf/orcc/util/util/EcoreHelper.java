@@ -292,8 +292,7 @@ public class EcoreHelper {
 	 *            an EObject
 	 * @return <code>true</code> if serialization succeeded
 	 */
-	public static <T extends EObject> boolean putEObject(ResourceSet set,
-			URI uri, T object) {
+	public static boolean putEObject(ResourceSet set, URI uri, EObject object) {
 		Resource resource = set.getResource(uri, false);
 		if (resource == null) {
 			resource = set.createResource(uri);

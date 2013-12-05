@@ -28,10 +28,11 @@
  */
 package net.sf.orcc.df.util;
 
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.util.Adaptable;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -42,6 +43,57 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public class DfUtil {
+
+	/**
+	 * Returns the file name that corresponds to the qualified name of the
+	 * actor/unit/network.
+	 * 
+	 * @param eObject
+	 *            an actor/unit/network
+	 * @return the file name that corresponds to the qualified name of the
+	 *         object
+	 */
+	public static String getFile(EObject eObject) {
+		return getFile(getName(eObject));
+	}
+
+	/**
+	 * Returns the file name that corresponds to the qualified name of the
+	 * actor/unit.
+	 * 
+	 * @param entity
+	 *            an actor/unit
+	 * @return the file name that corresponds to the qualified name of the actor
+	 */
+	public static String getFile(String name) {
+		return name.replace('.', '/');
+	}
+
+	/**
+	 * Returns the folder that corresponds to the package of the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @return the folder that corresponds to the package of the given actor
+	 */
+	public static String getFolder(Actor actor) {
+		return actor.getPackage().replace('.', '/');
+	}
+
+	/**
+	 * Returns the name of the given actor/unit/network.
+	 * 
+	 * @param eObject
+	 *            an actor/unit/network
+	 * @return the name of the actor/unit/network
+	 */
+	public static String getName(EObject eObject) {
+		if (eObject instanceof Unit) {
+			return ((Unit) eObject).getName();
+		} else {
+			return ((Adaptable) eObject).getAdapter(Entity.class).getName();
+		}
+	}
 
 	/**
 	 * Returns the package of the given name, which is composed of all the
@@ -70,8 +122,7 @@ public class DfUtil {
 	 * @return the simple name of the object
 	 */
 	public static String getSimpleName(EObject eObject) {
-		String name = EcoreHelper.getFeature(eObject, "name");
-		return getSimpleName(name);
+		return getSimpleName(getName(eObject));
 	}
 
 	/**

@@ -30,6 +30,7 @@ package net.sf.orcc.cal.services;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstTag;
@@ -91,4 +92,9 @@ public class CalQualifiedNameProvider extends
 		return getConverter().toQualifiedName(foreach.toString());
 	}
 
+	public QualifiedName qualifiedName(AstAnnotation annotation) {
+		return getConverter().toQualifiedName(
+				annotation.eContainer().toString())
+				.append(annotation.getName());
+	}
 }

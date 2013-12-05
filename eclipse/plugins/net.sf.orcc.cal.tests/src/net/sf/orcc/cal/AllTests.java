@@ -17,10 +17,8 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.ICommand;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
@@ -60,8 +58,6 @@ public class AllTests extends AbstractXtextTests {
 	private static final String projectName = "Tests";
 
 	private static final String projectPrefix = "/Tests/src/";
-
-	private IFolder outputFolder;
 
 	@Inject
 	private ParseHelper<AstEntity> parser;
@@ -111,7 +107,6 @@ public class AllTests extends AbstractXtextTests {
 			return null;
 		}
 
-		Frontend.instance.setOutputFolder(outputFolder);
 		return Frontend.getEntity(entity);
 	}
 
@@ -291,9 +286,6 @@ public class AllTests extends AbstractXtextTests {
 				e.printStackTrace();
 			}
 		}
-
-		// update output folder
-		outputFolder = OrccUtil.getOutputFolder(project);
 	}
 
 	@Test

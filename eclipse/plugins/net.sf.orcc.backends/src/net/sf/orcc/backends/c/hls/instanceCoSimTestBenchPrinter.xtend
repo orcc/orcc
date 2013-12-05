@@ -117,16 +117,19 @@ import net.sf.orcc.ir.TypeBool
 			«ENDFOR»
 			
 			// scheduler execution
-			for (i=0 ; i<1000 ; i++){
+			
 				«FOR port : instance.actor.inputs»
 					«IF instance.incomingPortMap.get(port) != null»
+					for (i=0 ; i<1000 ; i++){
 						if(!«instance.incomingPortMap.get(port).fifoName».full()){
 							«instance.incomingPortMap.get(port).fifoName».write(tab_«instance.incomingPortMap.get(port).fifoName»[counter_«instance.incomingPortMap.get(port).fifoName»]);
 							counter_«instance.incomingPortMap.get(port).fifoName» ++;
 						}
+					}
 					«ENDIF»
 				«ENDFOR»
-				
+			
+				for (i=0 ; i<1000 ; i++){
 				«instance.name»_scheduler();
 				
 				«FOR port : instance.actor.outputs.filter[! native]»
@@ -142,7 +145,7 @@ import net.sf.orcc.ir.TypeBool
 			// write results	
 			«FOR port : instance.actor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
-					fp=fopen("«instance.name»_«port.name».txt","r");
+					fp=fopen("gold_«instance.name»_«port.name».txt","w");
 					for (i=0 ; i<1000 ; i++){
 						tmp_«connection.fifoName»=tab_«connection.fifoName»[i];
 						fprintf(fp, "%d \n", tmp_«connection.fifoName»);
@@ -173,7 +176,7 @@ import net.sf.orcc.ir.TypeBool
 	'''	
 	override print(String targetFolder) {
 		val content = fileContent
-		val file = new File(targetFolder + File::separator + instance.name+ "_Csim_tb" + ".cpp")
+		val file = new File(targetFolder + File::separator + instance.name+ "TestBench" + ".cpp")//"_Csim_tb"
 		
 		if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)

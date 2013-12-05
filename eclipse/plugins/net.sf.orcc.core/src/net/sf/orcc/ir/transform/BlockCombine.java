@@ -33,6 +33,7 @@ import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -46,6 +47,16 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class BlockCombine extends AbstractIrVisitor<Void> {
 
 	private BlockBasic previous;
+
+	private Boolean combineJoinBlock;
+
+	public BlockCombine() {
+		combineJoinBlock = true;
+	}
+
+	public BlockCombine(Boolean combineJoinBlock) {
+		this.combineJoinBlock = combineJoinBlock;
+	}
 
 	@Override
 	public Void caseBlockBasic(BlockBasic block) {
@@ -76,8 +87,11 @@ public class BlockCombine extends AbstractIrVisitor<Void> {
 
 		// so that neither then nor else branch are linked to this join
 		// as a matter of fact, this also ensures correctness in nested ifs
+		// if combineJoinBlock is true
 		previous = null;
-		doSwitch(block.getJoinBlock());
+		if (combineJoinBlock) {
+			doSwitch(block.getJoinBlock());
+		}
 
 		// we do not set previous to null again, because join may be combined
 		// with next blocks (actually it needs to be).

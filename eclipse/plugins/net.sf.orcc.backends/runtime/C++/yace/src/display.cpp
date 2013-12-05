@@ -39,6 +39,7 @@ static SDL_Overlay *m_overlay;
 #include "timer.h"
 static Timer timer;
 #endif
+#include "get_opt.h"
 
 #ifndef NO_DISPLAY
 static void press_a_key(int code) {
@@ -136,6 +137,16 @@ void displayYUV_init()
 
 	atexit(SDL_Quit);
 #endif
+}
+
+/**
+ * @brief Return the number of frames the user want to decode before exiting the application.
+ * If user didn't use the -f flag, it returns -1 (DEFAULT_INFINITEà).
+ * @return The
+ */
+int displayYUV_getNbFrames() 
+{
+	return nbFrames;
 }
 
 unsigned char displayYUV_getFlags()

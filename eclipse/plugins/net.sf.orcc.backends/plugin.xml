@@ -20,7 +20,7 @@
                id="net.sf.orcc.backends.geneticAlgorithm">
          </option>
          <option
-               id="net.sf.orcc.backends.metricMapping">
+               id="net.sf.orcc.backends.instrumentNetwork">
          </option>
          <option
                id="net.sf.orcc.dontExportLibrary">
@@ -43,6 +43,28 @@
          </option>
          <option
                id="net.sf.orcc.dontExportLibrary">
+         </option>
+      </backend>
+      <backend
+            class="net.sf.orcc.backends.c.hmpp.HMPPBackend"
+            name="HMPP (experimental)">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.core.classify">
+         </option>
+         <option
+               id="net.sf.orcc.backends.newScheduler">
+         </option>
+         <option
+               id="net.sf.orcc.backends.geneticAlgorithm">
+         </option>
+         <option
+               id="net.sf.orcc.tracing.enable">
+         </option>
+         <option
+               id="net.sf.orcc.backends.hmpp.disablePragma">
          </option>
       </backend>
       <backend
@@ -76,19 +98,13 @@
             class="net.sf.orcc.backends.llvm.jit.JadeBackend"
             name="Jade">
          <option
-               id="net.sf.orcc.backends.llvmMode">
-         </option>
-         <option
-               id="net.sf.orcc.backends.optLevel">
-         </option>
-         <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
                id="net.sf.orcc.core.classify">
          </option>
          <option
-               id="net.sf.orcc.backends.byteexact">
+               id="net.sf.orcc.backends.llvm.jit.bitaccurate">
          </option>
       </backend>
       <backend
@@ -132,7 +148,7 @@
                id="net.sf.orcc.backends.tta.fpga">
          </option>
          <option
-               id="net.sf.orcc.backends.metricMapping">
+               id="net.sf.orcc.backends.importXCF">
          </option>
          <option
                id="net.sf.orcc.dontExportLibrary">
@@ -216,7 +232,7 @@
 	                     id="Ring">
 	               </comboBoxItem>
 	               <comboBoxItem
-	                     id="Mesh">
+	                     id="Fully">
 	               </comboBoxItem>
             	</comboBox>
          		</option>
@@ -239,18 +255,10 @@
          </option>
          <option
                defaultValue="false"
-               description="Uses graph partitioning algorithm to find a balanced mapping of the actors on the processor cores"
-               id="net.sf.orcc.backends.metricMapping"
-               name="Metric-based actor mapping">
-            <checkBox>
-            	<option
-	               		defaultValue="1"
-	               		description="Specify the number of processor cores to use for the mapping"
-	               		id="net.sf.orcc.backends.processorsNumber"
-	               		name="Number of processor cores">
-            		<textBox></textBox>
-         		</option>
-            </checkBox>
+               description="Instrument network"
+               id="net.sf.orcc.backends.instrumentNetwork"
+               name="[BETA] Instrument network">
+            <checkBox></checkBox>
          </option>
          <option
                description="Whether Orcc should compile the given hierarchical XDF network"
@@ -260,6 +268,22 @@
                <optionRef
                      id="net.sf.orcc.core.xdfFile">
                </optionRef>
+            </checkBox>
+         </option>
+         <option
+               description="Whether Orcc should import the given XDF mapping"
+               id="net.sf.orcc.backends.importXCF"
+               name="Import XCF Mapping">
+            <checkBox>
+               <option
+                     description="The file that contains the actor mapping"
+                     id="net.sf.orcc.backends.xcfFile"
+                     name="XCF file">
+                 <browseFile
+                       folder="false"
+                       workspace="false">
+                 </browseFile>
+               </option>
             </checkBox>
          </option>
          <option
@@ -294,46 +318,9 @@
             <checkBox></checkBox>
          </option>
          <option
-               defaultValue="Assembly"
-               description="Select a representation for the VTL"
-               id="net.sf.orcc.backends.llvmMode"
-               name="Generation mode:">
-            <comboBox>
-               <comboBoxItem
-                     id="Assembly">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="Bitcode">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="Archive">
-               </comboBoxItem>
-            </comboBox>
-         </option>
-         <option
-               defaultValue="O0"
-               description="Set level of optimization"
-               id="net.sf.orcc.backends.optLevel"
-               name="Optimization level:">
-            <comboBox>
-               <comboBoxItem
-                     id="O0">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="O1">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="O2">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="O3">
-               </comboBoxItem>
-            </comboBox>
-         </option>
-         <option
                defaultValue="false"
-               id="net.sf.orcc.backends.byteexact"
-               name="Generate byte exact code">
+               id="net.sf.orcc.backends.llvm.jit.bitaccurate"
+               name="Generate bit-accurate code">
             <checkBox></checkBox>
          </option>
          <option
@@ -406,6 +393,13 @@
         description="Generate VTL for all actors"
         id="net.sf.orcc.backends.compileVTL"
         name="VTL Code Generation">
+     <checkBox></checkBox>
+  </option>
+  <option
+        defaultValue="false"
+        description="Do not print any HMPP pragma, only valid C code"
+        id="net.sf.orcc.backends.hmpp.disablePragma"
+        name="Disable HMPP pragmas">
      <checkBox></checkBox>
   </option>
    </extension>
@@ -538,6 +532,18 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.c.compa.COMPABackend">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="hmpp"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.c.hmpp.HMPPBackend">
          </run>
       </application>
    </extension>

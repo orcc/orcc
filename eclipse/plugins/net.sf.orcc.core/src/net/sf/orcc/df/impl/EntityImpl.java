@@ -43,6 +43,7 @@ import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.impl.AttributableImpl;
@@ -471,6 +472,11 @@ public class EntityImpl extends AttributableImpl implements Entity {
 		result.append(outgoingPortMap);
 		result.append(')');
 		return result.toString();
+	}
+
+	@Override
+	public void update(List<Expression> expressions) {
+		// sub-classes should override
 	}
 
 } // EntityImpl

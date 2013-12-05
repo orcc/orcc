@@ -135,19 +135,12 @@ abstract class LLVMTemplate extends CommonPrinter {
 		val e1 = expr.e1
 		val e2 = expr.e2
 
-		val type = 
-			if (e1 instanceof ExprVar) {
-				(e1 as ExprVar).use.variable.type
-			} else if (e2 instanceof ExprVar) {
-				(e2 as ExprVar).use.variable.type
-			} else {
-				expr.type
-			}
+		val type = e1.type
 
 		signed = !type.uint
 		floating = type.float
 
-		'''«op.stringRepresentation» «type.doSwitch» «e1.doSwitch», «e2.doSwitch»'''
+		'''«op.stringRepresentation» «e1.type.doSwitch» «e1.doSwitch», «e2.doSwitch»'''
 	}
 	
 	override caseExprUnary(ExprUnary expr) {
@@ -159,7 +152,7 @@ abstract class LLVMTemplate extends CommonPrinter {
 	}
 	
 	override caseExprVar(ExprVar expr) {
-		(expr as ExprVar).use.variable.print
+		expr.use.variable.print
 	}
 		
 	override caseExprList(ExprList exprList) {
@@ -233,5 +226,5 @@ abstract class LLVMTemplate extends CommonPrinter {
 	}
 	
 	def protected print(Var variable)
-		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.indexedName»'''
+		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.name»'''
 }

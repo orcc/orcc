@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.cal.services;
 
-import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -72,14 +70,12 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -91,102 +87,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class Typer extends CalSwitch<Type> {
 
-	private static class Glb implements Unification {
 
-		public static Glb instance = new Glb();
-
-		@Override
-		public int getSize(Type t1, Type t2) {
-			return 0;
-		}
-
-		@Override
-		public Type getType(Type t1, Type t2) {
-			return TypeUtil.getGlb(t1, t2);
-		}
-
-	}
-
-	private static class Lub implements Unification {
-
-		public static Lub instance = new Lub();
-
-		protected Type type;
-
-		@Override
-		public int getSize(Type t1, Type t2) {
-			return 0;
-		}
-
-		@Override
-		public Type getType(Type t1, Type t2) {
-			type = TypeUtil.getLub(t1, t2);
-			return type;
-		}
-
-	}
-
-	private static class LubPlus1 extends Lub {
-
-		public static LubPlus1 instance = new LubPlus1();
-
-		@Override
-		public int getSize(Type t1, Type t2) {
-			return type == null ? 0 : type.getSizeInBits() + 1;
-		}
-
-	}
-
-	private static class LubSum extends Lub {
-
-		public static LubSum instance = new LubSum();
-
-		@Override
-		public int getSize(Type t1, Type t2) {
-			return t1.getSizeInBits() + t2.getSizeInBits();
-		}
-
-	}
-
-	private static class LubSumPow extends Lub {
-
-		public static LubSumPow instance = new LubSumPow();
-
-		@Override
-		public int getSize(Type t1, Type t2) {
-			int shift = t2.getSizeInBits();
-			if (shift >= 6) {
-				// limits type size to 64
-				shift = 6;
-			}
-			return t1.getSizeInBits() + (1 << shift) - 1;
-		}
-
-	}
-
-	private static class SignedLub extends Lub {
-
-		public static SignedLub instance = new SignedLub();
-
-		@Override
-		public Type getType(Type t1, Type t2) {
-			super.getType(t1, t2);
-			if (type.isUint()) {
-				type = IrFactory.eINSTANCE
-						.createTypeInt(type.getSizeInBits() + 1);
-			}
-			return type;
-		}
-
-	}
-
-	private static interface Unification {
-
-		int getSize(Type t1, Type t2);
-
-		Type getType(Type t1, Type t2);
-
-	}
 
 	/**
 	 * Returns the type of the given object using its URI.
@@ -290,8 +191,7 @@ public class Typer extends CalSwitch<Type> {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
 		Type t1 = getType(expression.getLeft());
 		Type t2 = getType(expression.getRight());
-		return getTypeBinary(op, t1, t2, expression,
-				eINSTANCE.getExpressionBinary_Operator(), -1);
+		return TypeUtil.getTypeBinary(op, t1, t2);
 	}
 
 	@Override
@@ -466,32 +366,7 @@ public class Typer extends CalSwitch<Type> {
 		return doSwitch(astType);
 	}
 
-	/**
-	 * Creates a new type based on the unification of t1 and t2, and clips its
-	 * size to {@link #maxSize}.
-	 * 
-	 * @param t1
-	 *            a type
-	 * @param t2
-	 *            a type
-	 * @param unification
-	 *            how to unify t1 and t2
-	 */
-	private Type createType(Type t1, Type t2, Unification unification) {
-		Type type = unification.getType(t1, t2);
-		int size = unification.getSize(t1, t2);
 
-		// only set the size if it is different than 0
-		if (size != 0) {
-			if (type.isInt()) {
-				((TypeInt) type).setSize(size);
-			} else if (type.isUint()) {
-				((TypeUint) type).setSize(size);
-			}
-		}
-
-		return type;
-	}
 
 	@Override
 	public Type doSwitch(EObject eObject) {
@@ -502,108 +377,6 @@ public class Typer extends CalSwitch<Type> {
 		return super.doSwitch(eObject);
 	}
 
-	/**
-	 * Returns the type of a binary expression whose left operand has type t1
-	 * and right operand has type t2, and whose operator is given.
-	 * 
-	 * TODO replace automatic int/uint to float casting with explicit casts
-	 * 
-	 * @param op
-	 *            operator
-	 * @param t1
-	 *            type of the first operand
-	 * @param t2
-	 *            type of the second operand
-	 * @param source
-	 *            source object
-	 * @param feature
-	 *            feature
-	 * @return the type of the binary expression, or <code>null</code>
-	 */
-	private Type getTypeBinary(OpBinary op, Type t1, Type t2, EObject source,
-			EStructuralFeature feature, int index) {
-		if (t1 == null || t2 == null) {
-			return null;
-		}
 
-		switch (op) {
-		case BITAND:
-			return createType(t1, t2, Glb.instance);
-
-		case BITOR:
-		case BITXOR:
-			return createType(t1, t2, Lub.instance);
-
-		case TIMES:
-			if ((t1.isInt() || t1.isUint()) && t2.isFloat()) {
-				return IrFactory.eINSTANCE.createTypeFloat(t2.getSizeInBits());
-			} else if ((t2.isInt() || t2.isUint()) && t1.isFloat()) {
-				return IrFactory.eINSTANCE.createTypeFloat(t1.getSizeInBits());
-			} else if (t1.isFloat() && t2.isFloat()){
-				return createType(t1, t2, Lub.instance);
-			}
-			return createType(t1, t2, LubSum.instance);
-
-		case MINUS:
-			if ((t1.isInt() || t1.isUint()) && t2.isFloat()) {
-				return IrFactory.eINSTANCE.createTypeFloat(t2.getSizeInBits());
-			} else if ((t2.isInt() || t2.isUint()) && t1.isFloat()) {
-				return IrFactory.eINSTANCE.createTypeFloat(t1.getSizeInBits());
-			} else if (t1.isFloat() && t2.isFloat()){
-				return createType(t1, t2, Lub.instance);
-			}
-			return createType(t1, t2, SignedLub.instance);
-
-		case PLUS:
-			if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
-				return IrFactory.eINSTANCE.createTypeString();
-			}
-			
-			if ((t1.isInt() || t1.isUint()) && t2.isFloat()) {
-				return IrFactory.eINSTANCE.createTypeFloat(t2.getSizeInBits());
-			} else if ((t2.isInt() || t2.isUint()) && t1.isFloat()) {
-				return IrFactory.eINSTANCE.createTypeFloat(t1.getSizeInBits());
-			} else if (t1.isFloat() && t2.isFloat()){
-				return createType(t1, t2, Lub.instance);
-			}
-			return createType(t1, t2, LubPlus1.instance);
-
-		case DIV:
-		case DIV_INT:
-			if ((t1.isInt() || t1.isUint()) && t2.isFloat()) {
-				return IrFactory.eINSTANCE.createTypeFloat(t2.getSizeInBits());
-			} else if ((t2.isInt() || t2.isUint()) && t1.isFloat()) {
-				return IrFactory.eINSTANCE.createTypeFloat(t1.getSizeInBits());
-			} else if (t1.isFloat() && t2.isFloat()){
-				return createType(t1, t2, Lub.instance);
-			}
-		case SHIFT_RIGHT:
-			return EcoreUtil.copy(t1);
-
-		case MOD:
-			return EcoreUtil.copy(t2);
-
-		case SHIFT_LEFT:
-			return createType(t1, t2, LubSumPow.instance);
-
-		case EQ:
-		case GE:
-		case GT:
-		case LE:
-		case LT:
-		case NE:
-			return IrFactory.eINSTANCE.createTypeBool();
-
-		case EXP:
-			return null;
-
-		case LOGIC_AND:
-		case LOGIC_OR:
-			return IrFactory.eINSTANCE.createTypeBool();
-
-		default:
-			return null;
-		}
-	}
 
 }

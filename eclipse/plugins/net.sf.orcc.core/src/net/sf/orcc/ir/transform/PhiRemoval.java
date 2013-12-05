@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.ir.transform;
 
+import static net.sf.orcc.util.SwitchUtil.DONE;
+import static net.sf.orcc.util.SwitchUtil.visit;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,11 +43,11 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.Void;
 import net.sf.orcc.util.util.EcoreHelper;
 
 /**
@@ -53,12 +56,12 @@ import net.sf.orcc.util.util.EcoreHelper;
  * @author Matthieu Wipliez
  * 
  */
-public class PhiRemoval extends AbstractIrVisitor<Object> {
+public class PhiRemoval extends AbstractIrVisitor<Void> {
 
-	private class PhiRemover extends AbstractIrVisitor<Object> {
+	private class PhiRemover extends AbstractIrVisitor<Void> {
 
 		@Override
-		public Object caseInstPhi(InstPhi phi) {
+		public Void caseInstPhi(InstPhi phi) {
 			IrUtil.delete(phi);
 			indexInst--;
 			return null;
@@ -73,35 +76,13 @@ public class PhiRemoval extends AbstractIrVisitor<Object> {
 	private BlockBasic targetBlock;
 
 	@Override
-	public Object caseInstPhi(InstPhi phi) {
-		Var target = phi.getTarget().getVariable();
-		ExprVar sourceExpr = (ExprVar) phi.getValues().get(phiIndex);
-		Var source = sourceExpr.getUse().getVariable();
-
-		// if source is a local variable with index = 0, we remove it from the
-		// procedure and translate the PHI by an assignment of 0 (zero) to
-		// target. Otherwise, we just create an assignment target = source.
-		Expression expr;
-		if (source.getIndex() == 0
-				&& source.eContainmentFeature() != IrPackage.eINSTANCE
-						.getProcedure_Parameters()) {
-			localsToRemove.add(source);
-			if (target.getType().isBool()) {
-				expr = IrFactory.eINSTANCE.createExprBool(false);
-			} else {
-				expr = IrFactory.eINSTANCE.createExprInt(0);
-			}
-		} else {
-			expr = IrFactory.eINSTANCE.createExprVar(source);
-		}
-
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, expr);
-		targetBlock.add(assign);
+	public Void caseBlockBasic(BlockBasic block) {
+		visit(this, block.getInstructions());
 		return null;
 	}
 
 	@Override
-	public Object caseBlockIf(BlockIf block) {
+	public Void caseBlockIf(BlockIf block) {
 		BlockBasic join = block.getJoinBlock();
 		targetBlock = IrUtil.getLast(block.getThenBlocks());
 		phiIndex = 0;
@@ -114,11 +95,12 @@ public class PhiRemoval extends AbstractIrVisitor<Object> {
 
 		doSwitch(block.getThenBlocks());
 		doSwitch(block.getElseBlocks());
+
 		return null;
 	}
 
 	@Override
-	public Object caseBlockWhile(BlockWhile block) {
+	public Void caseBlockWhile(BlockWhile block) {
 		List<Block> blocks = EcoreHelper.getContainingList(block);
 		// the block before the while.
 		if (indexBlock > 0) {
@@ -143,12 +125,42 @@ public class PhiRemoval extends AbstractIrVisitor<Object> {
 		phiIndex = 1;
 		caseBlockBasic(join);
 		new PhiRemover().caseBlockBasic(join);
+
+		// visit inner blocks
 		doSwitch(block.getBlocks());
+
 		return null;
 	}
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
+	public Void caseInstPhi(InstPhi phi) {
+		Var target = phi.getTarget().getVariable();
+		ExprVar sourceExpr = (ExprVar) phi.getValues().get(phiIndex);
+		Var source = sourceExpr.getUse().getVariable();
+
+		// if source is a local variable with index = 0, we remove it from the
+		// procedure and translate the PHI by an assignment of 0 (zero) to
+		// target. Otherwise, we just create an assignment target = source.
+		Expression expr;
+		if (source.getIndex() == 0 && !source.isParam()) {
+			localsToRemove.add(source);
+			if (target.getType().isBool()) {
+				expr = IrFactory.eINSTANCE.createExprBool(false);
+			} else {
+				expr = IrFactory.eINSTANCE.createExprInt(0);
+			}
+		} else {
+			expr = IrFactory.eINSTANCE.createExprVar(source);
+		}
+
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, expr);
+		targetBlock.add(assign);
+
+		return DONE;
+	}
+
+	@Override
+	public Void caseProcedure(Procedure procedure) {
 		localsToRemove = new ArrayList<Var>();
 
 		super.caseProcedure(procedure);
@@ -156,7 +168,8 @@ public class PhiRemoval extends AbstractIrVisitor<Object> {
 		for (Var local : localsToRemove) {
 			procedure.getLocals().remove(local);
 		}
-		return null;
+
+		return DONE;
 	}
 
 }

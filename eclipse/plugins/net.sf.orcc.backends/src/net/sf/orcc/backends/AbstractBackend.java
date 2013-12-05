@@ -41,6 +41,7 @@ import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.backends.BackendsConstants.INSTRUMENT_NETWORK;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
 import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
@@ -152,6 +153,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	protected Map<String, String> mapping;
 	protected boolean balanceMapping;
+	protected boolean importXcfFile;
+	protected File xcfFile;
 	protected int processorNumber;
 
 	/**
@@ -310,11 +313,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			return false;
 		} else {
 			if (!forceOverwrite) {
-				// Comute MD5 for in and out file, to check if out file neet to
-				// be written
+				// Compute MD5 for in and out files to check if out file need to
+				// be overwritten
 				try {
-					// Create a new Input stream to let original open for write
-					// action
+					// Create a new Input stream to keep original one open (used
+					// later to write data)
 					BufferedInputStream isIn = new BufferedInputStream(this
 							.getClass().getResourceAsStream(source));
 					FileInputStream isOut = new FileInputStream(fileOut);
@@ -328,7 +331,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 						mdIn.update(b);
 						isOut.read(b);
 						mdOut.update(b);
-
 					} while (isIn.available() > 0);
 
 					isIn.close();
@@ -423,8 +425,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			boolean result = true;
 
-			// XXX : Check if this test is still needed. It seems that libraries
-			// files & folders are always available as "file:" url
+			// Copy is performed from the jar plugin (i.e. orcc has been
+			// installed from an update site)
 			if (dirUrl.getProtocol().equals("jar")) {
 				// Copy folder from a jar
 				URI toto = new URI(dirUrl.getFile().split("!")[0]);
@@ -461,7 +463,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 				return result;
 
-			} else if (dirUrl.getProtocol().equals("file")) {
+			}
+			// Copy is performed directly from the source (i.e. user is probably
+			// a developer)
+			else if (dirUrl.getProtocol().equals("file")) {
 				// Copy folder from file system
 				File[] listDir = new File(dirUrl.getFile()).listFiles();
 
@@ -530,8 +535,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @return <code>true</code> if the libraries were correctly exported
 	 */
-	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		return false;
 	}
 
@@ -788,6 +792,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 		balanceMapping = getAttribute("net.sf.orcc.backends.metricMapping",
 				false);
+		importXcfFile = getAttribute(BackendsConstants.IMPORT_XCF, false);
+		if (importXcfFile) {
+			xcfFile = new File(getAttribute(BackendsConstants.XCF_FILE, ""));
+		}
+
 		processorNumber = Integer.parseInt(getAttribute(
 				"net.sf.orcc.backends.processorsNumber", "0"));
 
@@ -855,6 +864,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("m2m", "multi2mono", false,
 				"Transform high-level actors with multi-tokens actions"
 						+ " in low-level actors with mono-token actions");
+		options.addOption("i", "instrument", false, "(C) Allow network instrumentation for mapping");
 
 		// FIXME: choose independently the transformation to apply
 		options.addOption("t", "transfo_add", false,
@@ -923,6 +933,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
+			optionMap.put(INSTRUMENT_NETWORK, line.hasOption('i'));
 
 			// Set backend name in options map
 			String backend = this.getClass().getName();

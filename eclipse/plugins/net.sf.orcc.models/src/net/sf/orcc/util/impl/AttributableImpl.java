@@ -78,7 +78,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 			}
 		}
 
-		getAttributes().add(0, eINSTANCE.createAttribute(name));
+		getAttributes().add(eINSTANCE.createAttribute(name));
 	}
 
 	/**
@@ -180,6 +180,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EList<Attribute> getAttributes() {
 		if (attributes == null) {
 			attributes = new EObjectContainmentEList<Attribute>(
@@ -244,7 +245,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 		Attribute attribute = getAttribute(name);
 		if (attribute == null) {
 			attribute = eINSTANCE.createAttribute(name);
-			getAttributes().add(0, attribute);
+			getAttributes().add(attribute);
 		}
 		attribute.setEObjectValue(value);
 	}
@@ -254,7 +255,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 		Attribute attribute = getAttribute(name);
 		if (attribute == null) {
 			attribute = eINSTANCE.createAttribute(name);
-			getAttributes().add(0, attribute);
+			getAttributes().add(attribute);
 		}
 		attribute.setObjectValue(value);
 	}
@@ -264,7 +265,7 @@ public abstract class AttributableImpl extends EObjectImpl implements
 		Attribute attribute = getAttribute(name);
 		if (attribute == null) {
 			attribute = eINSTANCE.createAttribute(name);
-			getAttributes().add(0, attribute);
+			getAttributes().add(attribute);
 		}
 		attribute.setStringValue(value);
 	}

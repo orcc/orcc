@@ -150,7 +150,7 @@ public class OpenCLBackend extends AbstractBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		OrccLogger.trace("Exporting Run-Time sources into " + path + "... ");
 		if (copyFolderToFileSystem("/runtime/OpenCL", path, debug)) {
 			OrccLogger.traceRaw("OK" + "\n");

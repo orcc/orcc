@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, IRISA
+ * Copyright (c) 2013, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IRISA nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -38,8 +38,8 @@ import java.util.Map;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.compa.transform.XdfExtender;
 import net.sf.orcc.backends.transform.Inliner;
-import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.Mapping;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -52,16 +52,16 @@ import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transform.RenameTransformation;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -72,18 +72,11 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class COMPABackend extends CBackend {
 
-	/**
-	 * Path to target "src" folder
-	 */
-	private String srcPath;
-
 	@Override
 	protected void doInitializeOptions() {
 
 		new File(path + File.separator + "build").mkdirs();
 		new File(path + File.separator + "bin").mkdirs();
-
-		srcPath = path + File.separator + "src";
 	}
 
 	@Override
@@ -112,11 +105,8 @@ public class COMPABackend extends CBackend {
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			if (debug) {
-				ResourceSet set = new ResourceSetImpl();
-				if (!IrUtil.serializeActor(set, srcPath, actor)) {
-					OrccLogger.warnln("Error with " + transformation
-							+ " on actor " + actor.getName());
-				}
+				OrccUtil.validateObject(transformation.toString() + " on "
+						+ actor.getName(), actor);
 			}
 		}
 	}
@@ -189,7 +179,7 @@ public class COMPABackend extends CBackend {
 		}
 
 		OrccLogger.traceln("Print network meta-informations...");
-		new Mapping().print(srcPath, network, mapping);
+		new Mapping(network, mapping).print(srcPath);
 	}
 
 	@Override

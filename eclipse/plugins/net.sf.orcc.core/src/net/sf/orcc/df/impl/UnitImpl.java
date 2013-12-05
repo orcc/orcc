@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Unit;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.impl.AttributableImpl;
@@ -322,22 +323,7 @@ public class UnitImpl extends AttributableImpl implements Unit {
 
 	@Override
 	public String getPackage() {
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return "";
-		} else {
-			return name.substring(0, index);
-		}
-	}
-
-	@Override
-	public String getSimpleName() {
-		int index = name.lastIndexOf('.');
-		String simpleName = name;
-		if (index != -1) {
-			simpleName = name.substring(index + 1);
-		}
-		return simpleName;
+		return DfUtil.getPackage(getName());
 	}
 
 	@Override
@@ -360,6 +346,11 @@ public class UnitImpl extends AttributableImpl implements Unit {
 					Procedure.class, this, DfPackage.UNIT__PROCEDURES);
 		}
 		return procedures;
+	}
+
+	@Override
+	public String getSimpleName() {
+		return DfUtil.getSimpleName(getName());
 	}
 
 	@Override

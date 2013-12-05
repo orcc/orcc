@@ -49,7 +49,9 @@ import java.io.File
 	}
 
 	override getNetworkFileContent()'''
-		
+		PATH=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin;%PATH%;D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\msys\bin
+		set AUTOESL_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
+		set VIVADO_HLS_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
 		
 		if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
 		set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
@@ -59,18 +61,20 @@ import java.io.File
 		:START
 		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			cd ..\subProject_«instance.name»
-			%COMSPEC% /C vivado_hls -i -f script_«instance.name».tcl
+			cd ..
+			%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
+			%COMSPEC% /C vivado_hls -p subProject_«instance.name»
 		«ENDFOR»
 		
-		cd..
-		md generatedVHDL
-		copy %cd%\genericFifo.vhd %cd%\generatedVHDL
-		copy %cd%\«network.name»Top.vhd %cd%\generatedVHDL
-		copy %cd%\sim_package.vhd %cd%\generatedVHDL
-		copy %cd%\VHDLTestBench\«network.name»_TopTestBench.vhd %cd%\generatedVHDL
+		
+		
+		
+		copy %cd%\sim_package.vhd %cd%\TopVHDL
+
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			xcopy /s/y %cd%\subProject_«instance.name»\subProject\solution\syn\vhdl %cd%\generatedVHDL
+			copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\TopVHDL
+			copy %cd%\sim_package.vhd %cd%\subProject_«instance.name»\solution1\syn\vhdl
+			copy %cd%\UnitaryVHDLTestBENCH\«instance.name»TestBench.vhd %cd%\subProject_«instance.name»\solution1\syn\vhdl
 		«ENDFOR»
 	''' 
 	

@@ -45,13 +45,14 @@ import net.sf.orcc.backends.llvm.tta.transform.ComplexHwOpDetector;
 import net.sf.orcc.backends.llvm.tta.transform.PrintRemoval;
 import net.sf.orcc.backends.llvm.tta.transform.StringTransformation;
 import net.sf.orcc.backends.transform.CastAdder;
+import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
+import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -69,6 +70,7 @@ import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
@@ -77,6 +79,7 @@ import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Void;
 
 /**
  * TTA back-end.
@@ -143,7 +146,10 @@ public class TTABackend extends LLVMBackend {
 					+ "performance could appear due to printing call.");
 		}
 
+		visitors.add(new DisconnectedOutputPortRemoval());
+
 		visitors.add(new TypeResizer(true, true, false, true));
+		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
 		visitors.add(new DfVisitor<Void>(new SSATransformation()));
 		visitors.add(new StringTransformation());
 		visitors.add(new RenameTransformation(this.renameMap));
@@ -161,8 +167,14 @@ public class TTABackend extends LLVMBackend {
 		visitors.add(new DfVisitor<Void>(new ListInitializer()));
 		visitors.add(new DfVisitor<Void>(new TemplateInfoComputing()));
 
+		// computes names of local variables
+		visitors.add(new DfVisitor<Void>(new SSAVariableRenamer()));
+
 		for (DfSwitch<?> transfo : visitors) {
 			transfo.doSwitch(network);
+			if (debug) {
+				OrccUtil.validateObject(transfo.toString(), network);
+			}
 		}
 
 		network.computeTemplateMaps();
@@ -172,16 +184,12 @@ public class TTABackend extends LLVMBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
 
-		if (balanceMapping) {
-			// Solve load balancing using Metis. The 'mapping' variable should
-			// be the weightsMap, giving a weight to each actor/instance.
-			mapping = new Metis().partition(network, path, processorNumber,
-					mapping);
-		}
-
 		// Compute the actor mapping
-		computedMapping = new Mapping(true);
-		computedMapping.compute(network, mapping);
+		if (importXcfFile) {
+			computedMapping = new Mapping(network, xcfFile);
+		} else {
+			computedMapping = new Mapping(network, mapping, true);
+		}
 
 		// Build the design from the mapping
 		design = new ArchitectureBuilder().build(network, configuration,
@@ -199,13 +207,21 @@ public class TTABackend extends LLVMBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
 			OrccLogger.trace("Export library files into " + libPath + "... ");
 			if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
-				new File(libPath + File.separator + "generate")
+				new File(libPath + File.separator + "ttanetgen")
+						.setExecutable(true);
+				new File(libPath + File.separator + "ttaextractlog.py")
+						.setExecutable(true);
+				new File(libPath + File.separator + "ttamergehtml.py")
+						.setExecutable(true);
+				new File(libPath + File.separator + "ttamergecsv.py")
+						.setExecutable(true);
+				new File(libPath + File.separator + "ttamerge.py")
 						.setExecutable(true);
 				return true;
 			} else {
@@ -311,7 +327,7 @@ public class TTABackend extends LLVMBackend {
 	 */
 	private void runPythonScript() {
 		List<String> cmdList = new ArrayList<String>();
-		cmdList.add(libPath + File.separator + "generate");
+		cmdList.add(libPath + File.separator + "ttanetgen");
 		cmdList.add("-cg");
 		if (debug) {
 			cmdList.add("--debug");

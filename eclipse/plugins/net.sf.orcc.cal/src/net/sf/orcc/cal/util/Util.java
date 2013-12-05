@@ -38,10 +38,12 @@ import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.Variable;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.util.Attributable;
+import net.sf.orcc.util.Attribute;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
@@ -145,36 +147,39 @@ public class Util {
 	/**
 	 * Transforms the AST annotations to IR.
 	 * 
-	 * @param attr
+	 * @param eobject
 	 *            an attributable object
 	 * @param annotations
 	 *            a list of annotations
 	 */
-	public static void transformAnnotations(Attributable attr,
+	public static void transformAnnotations(Attributable eobject,
 			List<AstAnnotation> annotations) {
+
 		for (AstAnnotation astAnnotation : annotations) {
-			String name = astAnnotation.getName();
 
-			ExprList arguments = IrFactory.eINSTANCE.createExprList();
+			String annotationName = astAnnotation.getName();
+
+			eobject.addAttribute(annotationName);
+			Attribute annotationAttribute = eobject
+					.getAttribute(annotationName);
+
 			for (AnnotationArgument arg : astAnnotation.getArguments()) {
-				ExprList pair = IrFactory.eINSTANCE.createExprList();
-				pair.getValue().add(
-						IrFactory.eINSTANCE.createExprString(arg.getName()));
-
-				// Add value if exist
-				if (arg.getValue() != null) {
-					pair.getValue()
-							.add(IrFactory.eINSTANCE.createExprString(arg
-									.getValue()));
-				}
-				arguments.getValue().add(pair);
+				annotationAttribute.setAttribute(arg.getName(), arg.getValue());
 			}
-
-			if (arguments.getValue().isEmpty()) {
-				arguments = null;
-			}
-			attr.setAttribute(name, arguments);
 		}
 	}
 
+	public static String getProjectName(AstActor entity) {
+		String entityPath = entity.eResource().getURI().toPlatformString(true);
+		IFile f = ResourcesPlugin.getWorkspace().getRoot()
+				.getFile(new Path(entityPath));
+		return f.getProject().getName();
+	}
+
+	public static String getProjectName(AstUnit entity) {
+		String entityPath = entity.eResource().getURI().toPlatformString(true);
+		IFile f = ResourcesPlugin.getWorkspace().getRoot()
+				.getFile(new Path(entityPath));
+		return f.getProject().getName();
+	}
 }

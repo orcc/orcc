@@ -15,7 +15,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -33,7 +32,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public class AttributeImpl extends EObjectImpl implements Attribute {
+public class AttributeImpl extends AttributableImpl implements Attribute {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -64,8 +63,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 
 	/**
 	 * The default value of the '{@link #getObjectValue() <em>Object Value</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getObjectValue()
 	 * @generated
 	 * @ordered
@@ -74,8 +72,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 
 	/**
 	 * The cached value of the '{@link #getObjectValue() <em>Object Value</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getObjectValue()
 	 * @generated
 	 * @ordered
@@ -94,8 +91,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 
 	/**
 	 * The default value of the '{@link #getStringValue() <em>String Value</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getStringValue()
 	 * @generated
 	 * @ordered
@@ -104,8 +100,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 
 	/**
 	 * The cached value of the '{@link #getStringValue() <em>String Value</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getStringValue()
 	 * @generated
 	 * @ordered
@@ -274,6 +269,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EObject getContainedValue() {
 		return containedValue;
 	}
@@ -282,6 +278,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -290,6 +287,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EObject getReferencedValue() {
 		if (referencedValue != null && referencedValue.eIsProxy()) {
 			InternalEObject oldReferencedValue = (InternalEObject) referencedValue;
@@ -308,6 +306,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setContainedValue(EObject newContainedValue) {
 		if (newContainedValue != containedValue) {
 			NotificationChain msgs = null;
@@ -331,19 +330,19 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Object getObjectValue() {
 		return objectValue;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setObjectValue(Object newObjectValue) {
 		Object oldObjectValue = objectValue;
 		objectValue = newObjectValue;
@@ -357,6 +356,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
@@ -369,6 +369,7 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setReferencedValue(EObject newReferencedValue) {
 		EObject oldReferencedValue = referencedValue;
 		referencedValue = newReferencedValue;
@@ -379,19 +380,19 @@ public class AttributeImpl extends EObjectImpl implements Attribute {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getStringValue() {
 		return stringValue;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setStringValue(String newStringValue) {
 		String oldStringValue = stringValue;
 		stringValue = newStringValue;

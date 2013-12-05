@@ -8,6 +8,8 @@ import java.io.IOException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.List
+import net.sf.orcc.backends.ir.BlockFor
+import net.sf.orcc.backends.ir.InstTernary
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
@@ -30,8 +32,11 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.util.AbstractIrVisitor
+import net.sf.orcc.util.OrccLogger
 import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
+import org.eclipse.emf.ecore.EObject
+import net.sf.orcc.ir.Procedure
 
 /**
  * Define commons methods for all backends printers
@@ -225,7 +230,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	}
 	
 	override caseExprVar(ExprVar object) {
-		object.use.variable.indexedName
+		object.use.variable.name
 	}
 	
 	override caseExprList(ExprList expr) {
@@ -239,10 +244,51 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	}
 	
 	/**
+	 * The default case is useful to support code generation
+	 * for specific instructions
+	 */
+	override defaultCase(EObject object) {
+		if(object instanceof BlockFor) {
+			caseBlockFor(object as BlockFor)
+		} else if (object instanceof InstTernary) {
+			caseInstTernary(object as InstTernary)
+		}
+	}
+	
+	/**
+	 * Print specific BlockFor object.
+	 * @param block For block
+	 * @see #defaultCase(EObject object)
+	 */
+	def caseBlockFor(BlockFor block) {
+		OrccLogger::warnln("This application contains for loop, which is not yet supported. "+
+		"Please override caseBlockFor() method in the backend you are using.");
+		return ''''''
+	}
+	
+	/**
+	 * Print specific InstTernary object.
+	 * @param inst The ternary instruction
+	 * @see #defaultCase(EObject object)
+	 */
+	def caseInstTernary(InstTernary inst) {
+		OrccLogger::warnln("This application contains ternary instructions, which is not yet supported. "+
+		"Please override caseInstTernary() method in the backend you are using.");
+		return ''''''
+	}
+	
+	/**
 	 * Filter ports, and return only thus which are not native as a list
 	 */
-	def protected getNotNative(List<Port> ports) {
+	def protected getNotNative(Iterable<? extends Port> ports) {
 		ports.filter[!native]
+	}
+	
+	/**
+	 * Filter procedures, and return only thus which are not native as a list
+	 */
+	def protected getNotNativeProcs(Iterable<? extends Procedure> procs) {
+		procs.filter[!native]
 	}
 	
 	/**

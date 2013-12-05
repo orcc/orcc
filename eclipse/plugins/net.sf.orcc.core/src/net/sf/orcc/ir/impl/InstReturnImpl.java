@@ -157,11 +157,6 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 		return true;
 	}
 
-	@Override
-	public boolean isReturn() {
-		return true;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

@@ -51,6 +51,9 @@ extern std::string input_file;
 extern std::string write_file;
 extern std::string config_file;
 extern int nbLoops;
+// Number of frames to display before closing application
+extern int nbFrames;
+
 
 
 template<typename T>

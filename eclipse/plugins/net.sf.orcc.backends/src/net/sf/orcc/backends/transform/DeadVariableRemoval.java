@@ -29,8 +29,10 @@
 package net.sf.orcc.backends.transform;
 
 import net.sf.orcc.backends.ir.InstTernary;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.Void;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an extension of DeadVariableRemoval to remove variable
@@ -42,10 +44,16 @@ import net.sf.orcc.ir.Var;
 public class DeadVariableRemoval extends
 		net.sf.orcc.ir.transform.DeadVariableRemoval {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.orcc.ir.util.IrSwitch#defaultCase(org.eclipse.emf.ecore.EObject)
+	 */
 	@Override
-	public Void caseInstSpecific(InstSpecific specific) {
-		if (specific instanceof InstTernary) {
-			InstTernary ternaryOperation = (InstTernary) specific;
+	public Void defaultCase(EObject object) {
+		if (object instanceof InstTernary) {
+			InstTernary ternaryOperation = (InstTernary) object;
 
 			Var target = ternaryOperation.getTarget().getVariable();
 			if (target != null && !target.isUsed()) {
@@ -53,7 +61,6 @@ public class DeadVariableRemoval extends
 			}
 			return null;
 		}
-		return super.caseInstSpecific(specific);
+		return super.defaultCase(object);
 	}
-
 }

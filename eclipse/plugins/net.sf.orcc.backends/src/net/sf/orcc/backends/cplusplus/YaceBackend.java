@@ -54,10 +54,14 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
+import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
+import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
 
@@ -100,8 +104,13 @@ public class YaceBackend extends AbstractBackend {
 		transformations.add(new RenameTransformation(replacementMap));
 		if (!debug) {
 			transformations.add(new DeadGlobalElimination());
+			transformations.add(new DfVisitor<Void>(new SSATransformation()));
+			transformations.add(new DfVisitor<Void>(new PhiRemoval()));
+			transformations.add(new DfVisitor<Void>(new SSAVariableRenamer()));
+			transformations.add(new DeadGlobalElimination());
 			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
+			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 		}
 
 		for (DfSwitch<?> transformation : transformations) {
@@ -169,7 +178,7 @@ public class YaceBackend extends AbstractBackend {
 	 */
 	public void printNetwork(Network network) {
 
-		new Mapping().print(path, network, mapping);
+		new Mapping(network, mapping).print(path);
 		NetworkPrinter printer = new NetworkPrinter(network, options);
 
 		printer.printNetwork(path);
@@ -178,7 +187,7 @@ public class YaceBackend extends AbstractBackend {
 	}
 
 	@Override
-	public boolean exportRuntimeLibrary() {
+	protected boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			String target = path + File.separator + "libs";
 			OrccLogger
