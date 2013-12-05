@@ -294,14 +294,14 @@ public class InstancePattern extends AbstractPattern {
 		ShapePropertiesManager.setIdentifier(line, SEP_ID);
 		line.setLineWidth(SEPARATOR);
 
-		// provide information to support direct-editing directly
-		// after object creation (must be activated additionally)
+		// Configure direct editing
+		// 1- Get the IDirectEditingInfo object
 		final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
-		// set shape and graphics algorithm where the editor for
-		// direct editing shall be opened after object creation
+		// 2- These 2 members will be used to retrieve the pattern to call for
+		// direct editing
 		directEditingInfo.setPictogramElement(topLevelShape);
 		directEditingInfo.setGraphicsAlgorithm(text);
-		// set container shape for direct editing after object creation
+		// 3- This PictogramElement is used to locate input on the diagram
 		directEditingInfo.setMainPictogramElement(topLevelShape);
 
 		// We link graphical representation and domain model object

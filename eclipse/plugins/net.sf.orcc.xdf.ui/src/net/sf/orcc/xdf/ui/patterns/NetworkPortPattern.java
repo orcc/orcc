@@ -229,14 +229,13 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 		final Port addedDomainObject = (Port) context.getNewObject();
 
-		// provide information to support direct-editing directly
-		// after object creation (must be activated additionally)
-		final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
-
 		// Create the container
-		final ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
+		final ContainerShape topLevelShape = peCreateService.createContainerShape(targetDiagram, true);
+		ShapePropertiesManager.setIdentifier(topLevelShape, getPortIdentifier());
+		peCreateService.createChopboxAnchor(topLevelShape);
+
 		// The main container is an invisible rectangle
-		final Rectangle topLevelInvisibleRect = gaService.createInvisibleRectangle(containerShape);
+		final Rectangle topLevelInvisibleRect = gaService.createInvisibleRectangle(topLevelShape);
 
 		// Draw the port according to its direction
 		final Polygon polygon = getPortPolygon(topLevelInvisibleRect, gaService);
@@ -260,23 +259,25 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 			text.setValue(addedDomainObject.getName());
 		}
 
-		// set shape and graphics algorithm where the editor for
-		// direct editing shall be opened after object creation
-		directEditingInfo.setPictogramElement(containerShape);
+		// Configure direct editing
+		// 1- Get the IDirectEditingInfo object
+		final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
+		// 2- These 2 members will be used to retrieve the pattern to call for
+		// direct editing
+		directEditingInfo.setPictogramElement(topLevelShape);
 		directEditingInfo.setGraphicsAlgorithm(text);
+		// 3- This PictogramElement is used to locate input on the diagram
+		directEditingInfo.setMainPictogramElement(topLevelShape);
 
-		directEditingInfo.setMainPictogramElement(containerShape);
-		ShapePropertiesManager.setIdentifier(containerShape, getPortIdentifier());
-		link(containerShape, addedDomainObject);
-		containerShape.getLink().getBusinessObjects().add(addedDomainObject.getType());
+		link(topLevelShape, addedDomainObject);
+		// Add the port type as link to the shape. Will be used in
+		// getTypeFromShape()
+		topLevelShape.getLink().getBusinessObjects().add(addedDomainObject.getType());
 
-		peCreateService.createChopboxAnchor(containerShape);
+		gaService.setLocation(topLevelInvisibleRect, context.getX(), context.getY());
+		layoutPictogramElement(topLevelShape);
 
-		gaService.setLocationAndSize(topLevelInvisibleRect, context.getX(), context.getY(),
-				Math.max(TEXT_DEFAULT_WIDTH, PORT_WIDTH), PORT_HEIGHT + TEXT_PORT_SPACE + TEXT_DEFAULT_HEIGHT);
-		layoutPictogramElement(containerShape);
-
-		return containerShape;
+		return topLevelShape;
 	}
 
 	/**
@@ -318,8 +319,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		}
 
 		// Set the new width for the port text
-		int hhh = XdfUtil.getTextMinHeight(txt);
-		gaService.setSize(txt, newTextWidth, hhh);
+		gaService.setSize(txt, newTextWidth, XdfUtil.getTextMinHeight(txt));
 		topLevelPe.getGraphicsAlgorithm().setWidth(newTextWidth);
 
 		gaService.setSize(topLevelGa, Math.max(newTextWidth, PORT_WIDTH), PORT_HEIGHT + TEXT_PORT_SPACE
