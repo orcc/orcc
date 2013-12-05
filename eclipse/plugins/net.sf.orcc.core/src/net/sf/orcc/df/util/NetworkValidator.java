@@ -30,12 +30,13 @@ package net.sf.orcc.df.util;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
 
 /**
  * @author Herve Yviquel
- *
+ * 
  */
 public class NetworkValidator extends DfVisitor<Void> {
 
@@ -62,6 +63,17 @@ public class NetworkValidator extends DfVisitor<Void> {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Void caseInstance(Instance instance) {
+		if (instance.getEntity() == null) {
+			throw new OrccRuntimeException(
+					"The instance "
+							+ instance.getName()
+							+ " is invalid. Please check corresponding resource for errors, or rebuild the project.");
+		}
+		return super.caseInstance(instance);
 	}
 
 }

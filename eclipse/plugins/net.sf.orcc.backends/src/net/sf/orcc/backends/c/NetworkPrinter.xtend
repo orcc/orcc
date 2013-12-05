@@ -53,6 +53,7 @@ class NetworkPrinter extends CTemplate {
 	protected val int fifoSize;
 	
 	protected var boolean geneticAlgo = false
+	protected var boolean instrumentNetwork = false
 	var boolean ringTopology = false
 	
 	var boolean newSchedul = false
@@ -73,6 +74,9 @@ class NetworkPrinter extends CTemplate {
 
 		if (options.containsKey(GENETIC_ALGORITHM)) {
 			geneticAlgo = options.get(GENETIC_ALGORITHM) as Boolean
+		}
+		if (options.containsKey(INSTRUMENT_NETWORK)) {
+			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
 		}
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
@@ -129,18 +133,19 @@ class NetworkPrinter extends CTemplate {
 		#define __USE_GNU
 		#endif
 		
-		#include "SDL.h" //osx required
-		
-		#include "orcc_types.h"
-		#include "orcc_fifo.h"
-		#include "orcc_scheduler.h"
-		#include "orcc_util.h"
-		
-		«IF geneticAlgo || threadsNb > 1»
-			#include "orcc_thread.h"
+		#include "types.h"
+		#include "fifo.h"
+		#include "scheduler.h"
+		#include "mapping.h"
+		#include "util.h"
+		#include "dataflow.h"
+		«IF instrumentNetwork»
+			#include "cycle.h"
 		«ENDIF»
+		
+		#include "thread.h"
 		«IF geneticAlgo»
-			#include "orcc_genetic.h"
+			#include "genetic.h"
 			#define THREAD_NB «threadsNb»
 			#define POPULATION_SIZE 100
 			#define GENERATION_NB 20
@@ -178,29 +183,41 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Actor functions
 		«FOR child : network.children»
-			extern void «child.label»_initialize(struct schedinfo_s *si);
-			extern void «child.label»_scheduler(struct schedinfo_s *si);
-			«IF geneticAlgo»extern void «child.label»_reinitialize(struct schedinfo_s *si);«ENDIF»
+			extern void «child.label»_initialize(schedinfo_t *si);
+			extern void «child.label»_scheduler(schedinfo_t *si);
+			«IF geneticAlgo»extern void «child.label»_reinitialize(schedinfo_t *si);«ENDIF»
 		«ENDFOR»
 		
-		/////////////////////////////////////////////////
-		// Declaration of a struct actor for each actor
-		«FOR child : network.children»
-			struct actor_s «child.label»;
-		«ENDFOR»
-
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
+		
 		«FOR child : network.children»
-			struct actor_s «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «IF geneticAlgo»«child.label»_reinitialize«ELSE»NULL«ENDIF», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0};			
+			actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, «IF geneticAlgo»«child.label»_reinitialize«ELSE»NULL«ENDIF», «child.label»_scheduler, 0, 0, 0, 0, NULL, 0, 0.0};			
 		«ENDFOR»
 		
-		struct actor_s *actors[] = {
+		actor_t *actors[] = {
 			«FOR child : network.children SEPARATOR ","»
 				&«child.label»
 			«ENDFOR»
 		};
+
+		/////////////////////////////////////////////////
+		// Declaration of the connections array
 		
+		«FOR connection : network.connections»
+			connection_t connection_«connection.target.label»_«connection.targetPort.name» = {&«connection.source.label», &«connection.target.label», 1};
+		«ENDFOR»
+		
+		connection_t *connections[] = {
+			«FOR connection : network.connections SEPARATOR ","»
+			    &connection_«connection.target.label»_«connection.targetPort.name»
+			«ENDFOR»
+		};
+		
+		/////////////////////////////////////////////////
+		// Declaration of the network
+		network_t network = {"«network.simpleName»", actors, connections, «network.allActors.size», «network.connections.size»};
+
 		«IF geneticAlgo»
 			extern int source_is_stopped();
 			extern int clean_cache(int size);
@@ -227,9 +244,20 @@ class NetworkPrinter extends CTemplate {
 		
 		«printLauncher»
 		
+		/////////////////////////////////////////////////
+		// Actions to do when exting properly
+		static void atexit_actions() {
+			«IF instrumentNetwork»
+				if (instrumentation_file != NULL) {
+					save_instrumentation(instrumentation_file, network);
+				}
+			«ENDIF»
+		}
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
+		    atexit(atexit_actions);
 			init_orcc(argc, argv);
 			
 			launcher();
@@ -248,19 +276,19 @@ class NetworkPrinter extends CTemplate {
 				thread_struct threads[MAX_THREAD_NB];
 				thread_id_struct threads_id[MAX_THREAD_NB];
 				
-				struct mapping_s *mapping = map_actors(actors, sizeof(actors) / sizeof(actors[0]));
-				struct scheduler_s *schedulers = (struct scheduler_s *) malloc(mapping->number_of_threads * sizeof(struct scheduler_s));
-				struct waiting_s *waiting_schedulables = (struct waiting_s *) malloc(mapping->number_of_threads * sizeof(struct waiting_s));
+				mapping_t *mapping = map_actors(actors, sizeof(actors) / sizeof(actors[0]));
+				scheduler_t *schedulers = (scheduler_t *) malloc(mapping->number_of_threads * sizeof(scheduler_t));
+				waiting_t *waiting_schedulables = (waiting_t *) malloc(mapping->number_of_threads * sizeof(waiting_t));
 			«ELSE»
 				thread_struct threads[THREAD_NB], thread_monitor;
 				thread_id_struct threads_id[THREAD_NB], thread_monitor_id;
 				
-				struct scheduler_s schedulers[THREAD_NB];
-				struct waiting_s waiting_schedulables[THREAD_NB];
+				scheduler_t schedulers[THREAD_NB];
+				waiting_t waiting_schedulables[THREAD_NB];
 				
-				struct sync_s sched_sync;
-				struct genetic_s genetic_info;
-				struct monitor_s monitoring;
+				sync_t sched_sync;
+				genetic_t genetic_info;
+				monitor_t monitoring;
 				
 				sync_init(&sched_sync);
 				genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB, «IF newSchedul»RING_TOPOLOGY«ELSE»0«ENDIF», «numberOfGroups», GROUPS_RATIO);
@@ -280,12 +308,12 @@ class NetworkPrinter extends CTemplate {
 			clear_cpu_set(cpuset);
 			
 			«IF !geneticAlgo»
-			for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
+			for(i=0 ; i < mapping->number_of_threads; i++){
 				thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
 				set_thread_affinity(cpuset, mapping->threads_affinities[i], threads[i]);
 			}
 			«ELSE»
-				for(i=0 ; i < «if (geneticAlgo) "THREAD_NB" else "mapping->number_of_threads"» ; i++){
+				for(i=0 ; i < THREAD_NB; i++){
 					thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
 				}
 				thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
@@ -311,15 +339,19 @@ class NetworkPrinter extends CTemplate {
 	'''
 	
 	def protected printFifoAssign(String name, Port port, int fifoIndex) '''
-		struct fifo_«port.type.doSwitch»_s *«name»_«port.name» = &fifo_«fifoIndex»;
+		fifo_«port.type.doSwitch»_t *«name»_«port.name» = &fifo_«fifoIndex»;
 	'''
 
 	def protected printScheduler() '''
 		void *scheduler(void *data) {
-			struct scheduler_s *sched = (struct scheduler_s *) data;
-			struct actor_s *my_actor;
-			struct schedinfo_s si;
+			scheduler_t *sched = (scheduler_t *) data;
+			actor_t *my_actor;
+			schedinfo_t si;
 			int j;
+			«IF instrumentNetwork»
+				ticks tick_in, tick_out;
+				double diff_tick;
+			«ENDIF»
 			«IF geneticAlgo»
 				
 				int i = 0;
@@ -327,14 +359,22 @@ class NetworkPrinter extends CTemplate {
 				semaphore_wait(sched->sem_thread);
 				start = clock ();
 			«ENDIF»
-			
+		
 			sched_init_actors(sched, &si);
 			
 			while (1) {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
 				if(my_actor != NULL){
+					«IF instrumentNetwork»
+						tick_in = getticks();
+					«ENDIF»
 					si.num_firings = 0;
 					my_actor->sched_func(&si);
+					«IF instrumentNetwork»
+						tick_out = getticks();
+						diff_tick = elapsed(tick_out, tick_in);
+						my_actor->workload += diff_tick;
+					«ENDIF»
 		#ifdef PRINT_FIRINGS
 					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 		#endif

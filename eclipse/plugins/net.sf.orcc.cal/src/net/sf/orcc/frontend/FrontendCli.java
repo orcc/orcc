@@ -374,7 +374,6 @@ public class FrontendCli implements IApplication {
 		}
 
 		IFolder outFolder = OrccUtil.getOutputFolder(calFile.getProject());
-		Frontend.instance.setOutputFolder(outFolder);
 
 		if (astEntity.getUnit() != null) {
 			System.out.println(" Unit: " + calFile.getName() + " from project "
@@ -402,8 +401,6 @@ public class FrontendCli implements IApplication {
 	 */
 	private void writeIrFilesFromProject(IProject p,
 			Map<String, IFile> qnameFileMap) throws OrccException {
-
-		Frontend.instance.setOutputFolder(OrccUtil.getOutputFolder(p));
 
 		Map<String, Resource> resourceMap = new HashMap<String, Resource>();
 		ArrayList<String> orderedUnits = new ArrayList<String>();

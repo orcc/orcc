@@ -230,7 +230,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	}
 	
 	override caseExprVar(ExprVar object) {
-		object.use.variable.indexedName
+		object.use.variable.name
 	}
 	
 	override caseExprList(ExprList expr) {

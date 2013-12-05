@@ -33,11 +33,12 @@
 #include <time.h>
 #include <string.h>
 
-#include "orcc_types.h"
-#include "orcc_genetic.h"
-#include "orcc_thread.h"
-#include "orcc_scheduler.h"
-#include "orcc_util.h"
+#include "genetic.h"
+#include "util.h"
+#include "serialize.h"
+#include "scheduler.h"
+#include "dataflow.h"
+#include "mapping.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initializers

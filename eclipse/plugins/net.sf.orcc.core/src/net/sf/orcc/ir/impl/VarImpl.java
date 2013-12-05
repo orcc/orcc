@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.ir.impl;
 
+import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
+
 import java.util.Collection;
 
 import net.sf.orcc.df.Actor;
@@ -468,15 +470,6 @@ public class VarImpl extends AttributableImpl implements Var {
 		return index;
 	}
 
-	@Override
-	public String getIndexedName() {
-		if (index == 0) {
-			return name;
-		} else {
-			return name + "_" + index;
-		}
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -687,7 +680,7 @@ public class VarImpl extends AttributableImpl implements Var {
 		StringBuffer result = new StringBuffer();
 		result.append(type);
 		result.append(" ");
-		result.append(getIndexedName());
+		result.append(getNameSSA(this));
 		result.append(" <assignable: ");
 		result.append(assignable);
 		result.append(", global: ");

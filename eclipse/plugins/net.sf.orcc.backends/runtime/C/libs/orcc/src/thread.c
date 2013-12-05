@@ -26,9 +26,9 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "orcc_thread.h"
+#include "thread.h"
 
-void sync_init(struct sync_s *sync) {
+void sync_init(sync_t *sync) {
 	semaphore_create(sync->sem_monitor, 0);
 	sync->active_sync = 1;
 }

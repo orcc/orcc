@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Graphiti editor plug-in
 Bundle-SymbolicName: net.sf.orcc.graphiti.ui;singleton:=true
-Bundle-Version: 1.3.1.qualifier
+Bundle-Version: 1.4.0.qualifier
 Bundle-Activator: net.sf.orcc.graphiti.ui.GraphitiUiPlugin
-Require-Bundle: net.sf.orcc.graphiti.model;bundle-version="1.3.1",
+Require-Bundle: net.sf.orcc.graphiti.model;bundle-version="1.4.0";visibility:=reexport,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.gef,

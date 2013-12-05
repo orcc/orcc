@@ -40,7 +40,7 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.promela.transform.GuardsExtractor;
-import net.sf.orcc.backends.promela.transform.NetworkStateDefExtractor;
+import net.sf.orcc.backends.promela.transform.IdentifyStatelessActors;
 import net.sf.orcc.backends.promela.transform.PromelaAddPrefixToStateVar;
 import net.sf.orcc.backends.promela.transform.PromelaDeadGlobalElimination;
 import net.sf.orcc.backends.promela.transform.PromelaSchedulabilityTest;
@@ -65,6 +65,7 @@ import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
@@ -79,7 +80,6 @@ public class PromelaBackend extends AbstractBackend {
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
-	private NetworkStateDefExtractor netStateDef;
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 	private PromelaSchedulingModel schedulingModel;
 	private ScheduleBalanceEq balanceEq;
@@ -115,7 +115,7 @@ public class PromelaBackend extends AbstractBackend {
 		transfos.add(new UnitImporter());
 		transfos.add(new DfVisitor<Void>(new Inliner(true, true)));
 		transfos.add(new RenameTransformation(renameMap));
-		transfos.add(new DfVisitor<Object>(new PhiRemoval()));
+		transfos.add(new DfVisitor<Void>(new PhiRemoval()));
 		transfos.add(new PromelaAddPrefixToStateVar());
 		transfos.add(new GuardsExtractor(guards, priority, loadPeeks));
 		for (DfSwitch<?> transformation : transfos) {
@@ -146,9 +146,6 @@ public class PromelaBackend extends AbstractBackend {
 
 		schedulingModel = new PromelaSchedulingModel(network);
 
-		netStateDef = new NetworkStateDefExtractor(schedulingModel);
-		netStateDef.doSwitch(network);
-
 		schedulingModel.printDependencyGraph();
 		actorSchedulers = new HashSet<Scheduler>();
 
@@ -163,8 +160,8 @@ public class PromelaBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printActor(Actor instance) {
-		return new InstancePrinter(instance, options, schedulingModel).printInstance(path) > 0;
+	protected boolean printActor(Actor actor) {
+		return new InstancePrinter(actor, options, schedulingModel).printInstance(path) > 0;
 	}
 
 	/**
@@ -197,18 +194,18 @@ public class PromelaBackend extends AbstractBackend {
 
 	private void transformActorAgain(Actor actor) {
 		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
-		transfos.add(new PromelaDeadGlobalElimination(netStateDef
-				.getVarsUsedInScheduling(), netStateDef
-				.getPortsUsedInScheduling()));
+		transfos.add(new IdentifyStatelessActors(schedulingModel.getActorModel(actor)));
+		transfos.add(new PromelaDeadGlobalElimination(
+				schedulingModel.getActorModel(actor).getAllReacableSchedulingVars(), 
+				schedulingModel.getActorModel(actor).getPortsUsedInScheduling()));
 		transfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
 		transfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 
 		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(actor);
 		}
-		//new PromelaTokenAnalyzer(netStateDef).doSwitch(actor);
 		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
-				netStateDef);
+				schedulingModel.getActorModel(actor));
 		actorScheduler.doSwitch(actor);
 		actorSchedulers.add(actorScheduler.getScheduler());
 	}

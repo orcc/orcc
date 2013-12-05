@@ -8,6 +8,7 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.graph.Vertex;
@@ -23,6 +24,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -73,7 +75,7 @@ public class ActorMergerQS extends ActorMergerBase {
 				Expression e3 = irFactory.createExprVar(irFactory.createVar(irFactory.createTypeInt(32), "SIZE_" + port.getName(), false, 0));
 				Expression bop = irFactory.createExprBinary(e1, OpBinary.PLUS,
 						e2, e1.getType());
-				if (!buffersMap.containsKey(port)) {
+				if (!buffersMap.containsKey(port) || port.hasAttribute("externalized")) {
 					indexes.set(0, irFactory.createExprBinary(bop, OpBinary.MOD,
 							e3, e1.getType()));
 				} else {
@@ -94,7 +96,7 @@ public class ActorMergerQS extends ActorMergerBase {
 				Expression e3 = irFactory.createExprVar(irFactory.createVar(irFactory.createTypeInt(32), "SIZE_" + port.getName(), false, 0));
 				Expression bop = irFactory.createExprBinary(e1, OpBinary.PLUS,
 						e2, e1.getType());
-				if (!buffersMap.containsKey(port)) {
+				if (!buffersMap.containsKey(port) || port.hasAttribute("externalized")) {
 					indexes.set(0, irFactory.createExprBinary(bop, OpBinary.MOD,
 							e3, e1.getType()));
 				} else {
@@ -252,6 +254,9 @@ public class ActorMergerQS extends ActorMergerBase {
 		BufferSizer bufferSizer = new BufferSizer(network);
 		Schedule superAction = getSchedule(scheduleList, network.getName(), actionName);
 
+		ScheduleAnalyzer analyzer = new ScheduleAnalyzer(network);
+		analyzer.analyze(superActor, superAction, copier);
+
 		Pattern inputPattern = computeScheduleInputPattern(network, superAction.getIterands());
 		Pattern outputPattern = computeScheduleOutputPattern(network, superAction.getIterands());
 
@@ -288,6 +293,16 @@ public class ActorMergerQS extends ActorMergerBase {
 		}
 		return null;
 	}
+
+	private void addToPattern(Pattern pattern, Port port, int count) {
+		if (!pattern.contains(port)) {
+			pattern.getPorts().add(port);
+		}
+		Port superactionPort = pattern.getPorts().get(
+				MergerUtil.findPort(pattern.getPorts(), port.getName()));
+		pattern.setNumTokens(superactionPort, 
+				pattern.getNumTokens(superactionPort) + count);
+	}
 	
 	/*
 	 * Each superaction instance has an input and output pattern
@@ -301,13 +316,15 @@ public class ActorMergerQS extends ActorMergerBase {
 			Pattern iterandPattern = iterand.getAction().getInputPattern();
 			for (Port port : iterandPattern.getPorts()) {
 				if (MergerUtil.findPort(subNetwork.getInputs(), port.getName()) >= 0) {
-					if (!inputPattern.contains(port)) {
-						inputPattern.getPorts().add(port);
+					addToPattern(inputPattern, port, iterandPattern.getNumTokens(port));
+				} else {
+					int superActorPortIndex = MergerUtil.findPort(superActor.getInputs(), port.getName());
+					if (superActorPortIndex >= 0) {
+						Port superActorPort = superActor.getInputs().get(superActorPortIndex);
+						if (superActorPort.hasAttribute("externalized")) {
+							addToPattern(inputPattern, port, iterandPattern.getNumTokens(port));
+						}
 					}
-					Port superactionPort = inputPattern.getPorts().get(
-							MergerUtil.findPort(inputPattern.getPorts(), port.getName()));
-					inputPattern.setNumTokens(superactionPort, 
-							inputPattern.getNumTokens(superactionPort) + iterandPattern.getNumTokens(port));
 				}
 			}
 		}
@@ -320,13 +337,20 @@ public class ActorMergerQS extends ActorMergerBase {
 			Pattern iterandPattern = iterand.getAction().getOutputPattern();
 			for (Port port : iterandPattern.getPorts()) {
 				if (MergerUtil.findPort(subNetwork.getOutputs(), port.getName()) >= 0) {
-					if(!outputPattern.contains(port)) {
-						outputPattern.getPorts().add(port);
+					addToPattern(outputPattern, port, iterandPattern.getNumTokens(port));
+				} else {
+					int superActorPortIndex = MergerUtil.findPort(superActor.getOutputs(), port.getName());
+					if (superActorPortIndex >= 0) {
+						Port superActorPort = superActor.getOutputs().get(superActorPortIndex);
+						if (superActorPort.hasAttribute("externalized")) {
+							if (iterandPattern.getNumTokens(port) > 1) {
+								OrccLogger.traceln("Warning: " + port.getName() + " has multirate output");
+								OrccLogger.traceln("  multirate outputs are currently not supported");
+								OrccLogger.traceln("  for feedback FIFOs of merged actors. ");
+							}
+							addToPattern(outputPattern, port, iterandPattern.getNumTokens(port));
+						}
 					}
-					Port superactionPort = outputPattern.getPorts().get(
-							MergerUtil.findPort(outputPattern.getPorts(), port.getName()));
-					outputPattern.setNumTokens(superactionPort, 
-							outputPattern.getNumTokens(superactionPort) + iterandPattern.getNumTokens(port));
 				}
 			}
 		}
@@ -347,7 +371,7 @@ public class ActorMergerQS extends ActorMergerBase {
 	private void createCounter(Procedure body, Port port, String suffix) {
 		Var readIdx = body.newTempLocalVariable(
 				irFactory.createTypeInt(32), port.getName() + suffix);
-		if (buffersMap.containsKey(port)) {
+		if (buffersMap.containsKey(port) && !port.hasAttribute("externalized")) {
 			body.getLast().add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
 		} else {
 			body.getLast().add(irFactory.createInstAssign(readIdx, MergerUtil.createIndexVar(port)));
@@ -398,7 +422,7 @@ public class ActorMergerQS extends ActorMergerBase {
 			List<Expression> procParams = new ArrayList<Expression>();
 			BlockBasic increments = IrFactory.eINSTANCE.createBlockBasic();
 			processInputs(increments, iterand.getAction(), procParams);
-			processOutputs(increments, iterand.getAction(), procParams);
+			processOutputs(procedure, increments, iterand.getAction(), procParams);
 			Instruction instruction = IrFactory.eINSTANCE.createInstCall(
 					null, correspondences.getProcedure(iterand.getAction()), procParams);
 			BlockBasic block = procedure.getLast();
@@ -410,34 +434,80 @@ public class ActorMergerQS extends ActorMergerBase {
 
 	private void processInputs(BlockBasic increments, Action action, List<Expression> procParams) {
 		for(Port port : action.getInputPattern().getPorts()) {
-			processPort(increments, procParams, port, "_r", action.getInputPattern().getNumTokens(port));
+			processPort(increments, procParams, port, false, action.getInputPattern().getNumTokens(port));
 		}
 	}
 
-	private void processOutputs(BlockBasic increments, Action action, List<Expression> procParams) {
-		for(Port port : action.getOutputPattern().getPorts()) {
-			processPort(increments, procParams, port, "_w", action.getOutputPattern().getNumTokens(port));
+	private void processOutputs(Procedure procedure, BlockBasic increments, Action action, List<Expression> procParams) {
+		for(Port source : action.getOutputPattern().getPorts()) {
+			processPort(increments, procParams, source, true, action.getOutputPattern().getNumTokens(source));
+			Actor sourceActor = MergerUtil.getOwningActor(network, action, source);
+			if(sourceActor.getOutgoingPortMap().get(source).size() > 1) {
+				for(Connection c : sourceActor.getOutgoingPortMap().get(source)) {
+					Port target = c.getTargetPort();
+					if (target != null) {
+						if (buffersMap.get(target) != buffersMap.get(source)) {
+							handleBroadcast(procedure, increments, target, buffersMap.get(source), action.getOutputPattern().getNumTokens(source), "_w");
+						}
+					}
+				}
+			}
 		}
 	}
 	
-	private void processPort(BlockBasic increments, List<Expression> procParams, Port port, String suffix, int tokenRate) {
+	private void processPort(BlockBasic increments, List<Expression> procParams, Port port, boolean write, int tokenRate) {
+		Var memVar = getBufferOrPortVariable(port, write);
+		Var indexVar = getBufferOrPortIndex(increments, port, tokenRate, write, memVar.getName());
+		procParams.add(IrFactory.eINSTANCE.createExprVar(memVar));
+		procParams.add(IrFactory.eINSTANCE.createExprVar(indexVar));
+	}
+
+	private void handleBroadcast(Procedure procedure, BlockBasic increments, Port port, Var source, int tokenRate, String suffix) {
+		addBroadCastCopyVar(procedure, increments, port, source, tokenRate);
+		Var memVar = getBufferOrPortVariable(port, true);
+		getBufferOrPortIndex(increments, port, tokenRate, true, memVar.getName());
+	}
+
+	private void addBroadCastCopyVar(Procedure procedure, BlockBasic increments, Port port, Var source, int tokenRate) {
+		Var tempVar = procedure.newTempLocalVariable(
+				port.getType(), port.getName() + "_tmp");
+		for(int i = 0; i < tokenRate; i++) {
+			increments.add(IrFactory.eINSTANCE.createInstLoad(tempVar, source, i));
+			increments.add(IrFactory.eINSTANCE.createInstStore(buffersMap.get(port), i, tempVar));
+		}
+	}
+	
+	private Var getBufferOrPortVariable(Port port, boolean write) {
 		Var memVar = null;
-		String indexVarName = null;
-		if (buffersMap.containsKey(port)) {
+		if (buffersMap.containsKey(port) && !port.hasAttribute("externalized")) {
 			memVar = buffersMap.get(port);
-			indexVarName = memVar.getName() + suffix;
 		} else {
 			memVar = IrFactory.eINSTANCE.createVar(0,
 					IrFactory.eINSTANCE.createTypeList(1, port.getType()),
 					"tokens_" + port.getName(), true, 0);
+		}
+		return memVar;
+	}
+	
+	private Var getBufferOrPortIndex(BlockBasic increments, Port port, int tokenRate, boolean write, String memVarName) {
+		String indexVarName = null;
+		String suffix = null;
+		if (write) {
+			suffix = "_w";
+		} else {
+			suffix = "_r";
+		}
+		if (buffersMap.containsKey(port) && !port.hasAttribute("externalized")) {
+			indexVarName = memVarName + suffix;
+		} else {
 			indexVarName = port.getName() + suffix;
 		}
 		Var indexVar = IrFactory.eINSTANCE.createVar(0,
 				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
 				indexVarName, true, 0);
 		increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
-		procParams.add(IrFactory.eINSTANCE.createExprVar(memVar));
-		procParams.add(IrFactory.eINSTANCE.createExprVar(indexVar));
+		return indexVar;
 	}
-
 }
+
+

@@ -56,10 +56,10 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		#define __USE_GNU
 		#endif
 		
-		#include "orcc_types.h"
-		#include "orcc_fifo.h"
-		#include "orcc_scheduler.h"
-		#include "orcc_util.h"
+		#include "types.h"
+		#include "fifo.h"
+		#include "scheduler.h"
+		#include "util.h"
 		
 		#define SIZE «fifoSize»
 		// #define PRINT_FIRINGS

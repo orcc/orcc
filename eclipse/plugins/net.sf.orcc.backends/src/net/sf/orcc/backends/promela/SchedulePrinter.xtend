@@ -89,9 +89,9 @@ class SchedulePrinter extends PromelaTemplate {
 	
 	def schedulerxml(Scheduler scheduler) {
 	'''
-		<fsm initial="«scheduler.initialState»">
+		<fsm initial="«scheduler.initStateName»">
 		«FOR sched : scheduler.schedules»
-			<transition action="«sched.enablingActionName»" dst="«sched.endStateName»" src="«sched.initStateName»"/>
+			<transition action="«sched.initStateName»_«sched.enablingActionName»" dst="«sched.endStateName»" src="«sched.initStateName»"/>
 		«ENDFOR»
 		</fsm>
 	'''
@@ -100,9 +100,10 @@ class SchedulePrinter extends PromelaTemplate {
 	def schedulesxml(Scheduler scheduler){
 	'''
 		«FOR sched : scheduler.schedules»
-			<superaction name="«sched.initStateName»_«sched.enablingActionName»" guard="NULL">
+			<superaction name="«sched.initStateName»_«sched.enablingActionName»">
+				<guard></guard>
 			«FOR action : sched.sequence»
-				<iterand action="«action»" actor="«scheduler.actor.name»"/>
+				<iterand action="«action»" actor="«scheduler.actor.name»" repetitions="1"/>
 			«ENDFOR»
 			</superaction>
 		«ENDFOR»
@@ -134,6 +135,10 @@ class SchedulePrinter extends PromelaTemplate {
 
 	def endStateName(Schedule schedule) {
 	'''«IF schedule.endState!=null»«schedule.endState.name»«ELSE»one_state«ENDIF»'''
+	}
+
+	def initStateName(Scheduler scheduler) {
+	'''«IF scheduler.initialState!=null»«scheduler.initialState.name»«ELSE»one_state«ENDIF»'''
 	}
 	
 }

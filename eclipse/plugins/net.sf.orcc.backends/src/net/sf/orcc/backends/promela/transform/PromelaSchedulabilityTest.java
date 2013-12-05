@@ -64,13 +64,11 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	
 	private Scheduler scheduler;
 
-	private Set<Port> schedulingPorts;
-
 	private Set<Port> peekPorts = new HashSet<Port>();
 
 	private Set<Transition> transitionsInCycle = new HashSet<Transition>();
-
-	private NetworkStateDefExtractor netStateDef;
+	
+	private ControlTokenActorModel actorModel;
 
 	private Set<State> choiceStatesSet = new HashSet<State>();
 
@@ -88,10 +86,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	
 	private Action action;
 	
-	public PromelaSchedulabilityTest(NetworkStateDefExtractor netStateDef) {
+	public PromelaSchedulabilityTest(ControlTokenActorModel actorModel) {
 		super();
-		this.netStateDef = netStateDef;
-		this.schedulingPorts = netStateDef.getPortsUsedInScheduling();
+		this.actorModel=actorModel;
 		this.irVisitor = new InnerIrVisitor();
 	}
 
@@ -104,7 +101,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		for (Var var : action.getScheduler().getLocals()) {
 			// find on which variables this scheduler depends
 			Set<Var> tc = new HashSet<Var>();
-			netStateDef.getTransitiveClosure(var, tc, true);
+			actorModel.getTransitiveClosure(var, tc, true);
 			for (Var v : tc) {
 				if (v.isGlobal()) {
 					guardVars.add(v);
@@ -117,7 +114,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
-		System.out.println("\n Actor:" + actor.getName());
+		System.out.println("\n Sched-test Actor:" + actor.getName());
 		this.actor=actor;
 		this.fsm = actor.getFsm();
 		this.scheduler = new Scheduler(actor, this.fsm);
@@ -172,35 +169,39 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		} else {
 			scheduler.addSchedule(new Schedule());
 		}
-		
+		actorModel.clearCaches();
 		
 		boolean stopChecking;
-		boolean nullGuardFound;
+		boolean rerunNeeded;
+		boolean startFromFresh=true;
 		do {
-			if (fsm != null) {
-				scheduler.getSchedules().clear();
-				for (State state : choiceStatesSet) {
-					fsmPathSearch(state);
+			System.out.println("Scheduling Actor " +actor.getName());
+			if (startFromFresh) {
+				if (fsm != null) {
+					scheduler.getSchedules().clear();
+					for (State state : choiceStatesSet) {
+						fsmPathSearch(state);
+					}
+				}
+				if (actor.hasMoC() && actor.getMoC().isDPN()) {
+					// this is time-dependent, stop the show
+					System.out.println("Actor " + actor.getSimpleName() + " is time-dependent, we skip it for now..");
+					scheduler.makeDummyFSM();
+					break;
 				}
 			}
-			if (actor.hasMoC() && actor.getMoC().isDPN()) {
-				// this is time-dependent, stop the show
-				System.out.println("Actor " + actor.getSimpleName() + " is time-dependent, we skip it for now..");
-				scheduler.makeDummyFSM();
-				break;
-			}
+			startFromFresh = true;
 			stopChecking = false;
-			nullGuardFound = false;
-			scheduler.buildSchedulingCases();
+			rerunNeeded = false;
 			
+			scheduler.buildSchedulingCases();
+
 			// Abstract interpretation Start----------------------------------------
-		
+
+			final int MAX_PHASES = 1024;
 			INTERP: for (List<Schedule> sl : scheduler.getScheduleCases()) {
 				PromelaAbstractInterpreter interpreter = new PromelaAbstractInterpreter(actor);
 				ActorState actorstate = new ActorState(interpreter.getActor());
-
-				final int MAX_PHASES = 1024;
-				//State initialState = interpreter.getFsmState();
 				for (int index = 0; index < sl.size(); index++) {
 					Schedule schedule = sl.get(index);
 					int nbPhases = 0;
@@ -211,22 +212,31 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 						do {
 							interpreter.schedule();
 							Action latest = interpreter.getExecutedAction();
-							if (index==sl.size()-1) {
+							if (index==sl.size()-1 && !schedule.isScheduleDone()) {
 								schedule.getSequence().add(latest);
 							}
 							nbPhases++;
-						} while (((actor.hasFsm() && interpreter.getFsmStateOrig() != schedule.getEndState()) 
+						} while (((actor.hasFsm() && !schedule.getPotentialEndStates().contains(interpreter.getFsmStateOrig())) 
 								|| (!actor.hasFsm() && !actorstate.isInitialState())) 
 								&& nbPhases < MAX_PHASES);
-						if (!actor.hasFsm() && nbPhases == MAX_PHASES) {
+						if (nbPhases == MAX_PHASES) {
 							scheduler.makeDummyFSM();
 							stopChecking=true;
 						}
-					}catch (OrccRuntimeException e){ //should only happen on native calls
 						if (actor.hasFsm()) {
+							if (schedule.getEndState()==null && interpreter.getFsmStateOrig()!=actor.getFsm().getInitialState()) {
+								startFromFresh=false;
+								rerunNeeded=true;
+							}
+							schedule.setEndState(interpreter.getFsmStateOrig());
+						}
+						schedule.setScheduleDone(true);
+					}catch (OrccRuntimeException e){ //should only happen on native calls
+						if (actor.hasFsm() && interpreter.nullWasNormal()) {
 							choiceStatesSet.add(interpreter.getFsmStateOrig());
-							nullGuardFound=true;
+							rerunNeeded=true;
 						} else {
+							System.out.println("Actor "+this.actor.getName()+" experienced a loop time-out!!\n\n");
 							scheduler.makeDummyFSM();
 							stopChecking=true;
 						}
@@ -234,28 +244,29 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					}
 				}
 			}
-		
 		// Abstract interpretation End----------------------------------------
-			if (!stopChecking && !nullGuardFound) {
+			if (!stopChecking && !rerunNeeded) {
 				stopChecking = areSchedulesComplete();
 			}
 		} while (!stopChecking);
-		
+
 		for (Schedule s : scheduler.getSchedules()) {
 			generateScheduleInfo(s);
 		}
-		
+
 		whenIsVarPartOfState();
-		
+
 		return null;
 	}
 	
 	private boolean areSchedulesComplete() {
 		// does the schedule itself reset the variables before they are used in guards?
 		boolean allResolved = true;
+		Set<State> resolvedStates = new HashSet<State>();
 		for (Schedule schedule : scheduler.getSchedules()) {
 			for (State state : schedule.getPotentialChoiseStates()) {
 				boolean resolved = true; // until proven guilty
+				resolvedStates.clear();
 				Set<Var> guardFull = new HashSet<Var>();
 				Set<Var> guardDirect = new HashSet<Var>();
 				Set<Action> cActions = new HashSet<Action>();
@@ -266,7 +277,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					guardDirect.addAll(actionGuardVarMap.get(((Transition)edge).getAction()));
 					Set<Var> temp = new HashSet<Var>();
 					for (Var g : guardFull) {
-						netStateDef.getTransitiveClosure(g, temp, true);
+						actorModel.getTransitiveClosure(g, temp, true);
 					}
 					guardFull.addAll(temp);
 				}
@@ -305,9 +316,10 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					}
 				}
 				if (resolved) {
-					schedule.getPotentialChoiseStates().remove(state);
+					resolvedStates.add(state);
 				}
 			}
+			schedule.getPotentialChoiseStates().removeAll(resolvedStates);
 			if (!schedule.getPotentialChoiseStates().isEmpty()) {
 				choiceStatesSet.addAll(schedule.getPotentialChoiseStates());
 				allResolved=false;
@@ -324,7 +336,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	private void whenIsVarPartOfState() {
 		Map<State, Set<Var>> stateToVar = scheduler.getStateToRelevantVars(); 
-		Set<Var> stateVars = netStateDef.getSchedulingModel().getActorModel(actor).getLocalSchedulingVars();
+		Set<Var> stateVars = actorModel.getLocalSchedulingVars();
 		scheduler.setSchedulingVars(stateVars);
 		removeLocalAndConstantVars(stateVars);
 		for (Schedule schedule : scheduler.getSchedules()) {
@@ -429,8 +441,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 			State target = transition.getTarget();
 			if (choiceStatesSet.contains(target)) {
 				// this is not a cycle as it ends the current schedule
-				currentSchedule.setEndState(target);
-				currentSchedule.incNrLeaves();
+				currentSchedule.addPotentialEndState(target);
 				
 			} else if (visitedStatesList.contains(target)) {
 				// non-input dependent cycle inside schedule
@@ -492,7 +503,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		Map<String, List<Object>> portPeeks = schedule.getPortPeeks();
 		Map<String, List<Object>> portReads = schedule.getPortReads();
 		Map<String, List<Object>> portWrites = schedule.getPortWrites();
-		
+
 		Map<String, Object> configuration = findPeekValues(initState, schedule.getEnablingAction());
 		for (String key : configuration.keySet()) {
 			if (!portPeeks.containsKey(key)) {
@@ -502,17 +513,6 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		}
 		for (Action action : schedule.getSequence()) {
 			for (Port port : action.getInputPattern().getPorts()) {
-				boolean portUsed = netStateDef.getVarsUsedInScheduling()
-						.contains(action.getInputPattern().getVariable(port));
-				if (peekPorts.contains(port)) {
-					if (getPeeksOfState(initState).contains(port)) {
-						System.out.print(" (peeked value, ");
-						System.out.print("only relevant for the guard: "+ !portUsed + ") ");
-					} else {
-						System.out.print(" (not peek value, value used in scheduling: "+ portUsed + ")");
-					}
-					System.out.print("\n");
-				}
 				if (!portReads.containsKey(port.getName())) {
 					portReads.put(port.getName(), new ArrayList<Object>());
 				}
@@ -521,28 +521,9 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				}
 			}
 		}
-		System.out.println("Schedule input: "+portReads);
-		System.out.print("\n");
 		// Control tokens generation
 		for (Action action : schedule.getSequence()) {
 			for (Port port : action.getOutputPattern().getPorts()) {
-				if (schedulingPorts.contains(port)) {
-					// hasControlOutput = true;
-					System.out.print(" -> Writes to control port: "
-						+ port.getName());
-					// how is it generated?
-					Var var = action.getOutputPattern().getVariable(port);
-					System.out.print(", scenario specific constant: "
-						+ !(hasVarLoop(var) || hasInputDep(var, true)));
-					// System.out.print(", loop " + hasVarLoop(var));
-					if (hasInputDep(var, true)) {
-						System.out.print(", depends on input (through if:"
-							+ !hasInputDep(var, false) + ")");
-					}
-					// System.out.print(", iir " + (hasVarLoop(var) &&
-					// hasInputDep(var, true)));
-					System.out.print("\n");
-				}
 				if (!portWrites.containsKey(port.getName())) {
 					portWrites.put(port.getName(), new ArrayList<Object>());
 				}
@@ -551,14 +532,12 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				}
 			}
 		}
-		System.out.println("Schedule output: "+portWrites);
-		System.out.print("\n");
 	}
 
 	Set<Port> getInputDep(Var var, boolean includeIfCond) {
 		Set<Var> tc = new HashSet<Var>();
 		Set<Port> p = new HashSet<Port>();
-		netStateDef.getTransitiveClosure(var, tc, includeIfCond);
+		actorModel.getTransitiveClosure(var, tc, includeIfCond);
 		for (Var v : tc) {
 			if (inputPortVars.contains(v)) {
 				p.add(inputVarToPortMap.get(v));
@@ -578,7 +557,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	boolean hasInputDep(Var var, boolean includeIfCond) {
 		Set<Var> tc = new HashSet<Var>();
-		netStateDef.getTransitiveClosure(var, tc, includeIfCond);
+		actorModel.getTransitiveClosure(var, tc, includeIfCond);
 		boolean hasDep = false;
 		for (Var v : tc) {
 			if (inputPortVars.contains(v)) {
@@ -589,24 +568,28 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 	}
 
 	boolean hasVarLoop(Var var) {
-		return netStateDef.hasLoop(var);
+		return actorModel.hasLoop(var);
 	}
 	
 	boolean isBasedOnConstants(Var var) {
 		Set<Var> tc = new HashSet<Var>();
-		netStateDef.getTransitiveClosure(var, tc, true);
+		actorModel.getTransitiveClosure(var, tc, true);
 		for (Var v : tc) {
 			if (v.isLocal()) {
 				continue;
 			} else
-			if (netStateDef.getVariableDependency().containsKey(v)) {
+			if (actorModel.getVariableDependency().containsKey(v)) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
-	void removeLocalAndConstantVars(Set<Var> varSet) {
+	/**
+	 * A helper method that is used to, from a set remove the variables that are either local to an action or a constant
+	 * @param varSet
+	 */
+	public static void removeLocalAndConstantVars(Set<Var> varSet) {
 		Iterator<Var> i = varSet.iterator();
 		while (i.hasNext()) {
 			Var v = i.next();
@@ -631,7 +614,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		
 		@Override
 		public Void caseInstStore(InstStore store) {
-			if (!netStateDef.getVarsUsedInScheduling().contains(store.getTarget().getVariable())) {
+			if (!actorModel.getAllReacableSchedulingVars().contains(store.getTarget().getVariable())) {
 				return null;
 			}
 			instToVarMap.put(store, store.getTarget().getVariable());
@@ -660,7 +643,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					if (!isBasedOnConstants(local)){
 						isConstant = false;
 					}
-					netStateDef.getActionLocalTransitiveClosure(local, localDep);
+					actorModel.getTransitiveClosure(local, localDep, true);
 				}
 				if (hasLoop) {
 					scheduler.addvarUpdate(inst.getTarget().getVariable(), instToActionMap.get(inst));

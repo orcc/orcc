@@ -8,6 +8,7 @@ import java.util.List;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
@@ -41,6 +42,31 @@ public class MergerUtil {
 		for(State state : fsm.getStates()) {
 			if(state.getName().equals(stateName))
 				return state;
+		}
+		return null;
+	}
+	
+	/**
+	 * Locate actor that owns specified action and port
+	 * 
+	 * @param network
+	 *            the associated network
+	 * @param action
+	 *            the action used as a search criteria
+	 * @param port
+	 *            the port used as a search criteria
+	 */
+	public static Actor getOwningActor(Network network, Action action, Port port) {
+		for(Actor actor : network.getAllActors()) {
+			for(Action candidateAction : actor.getActions()) {
+				if (candidateAction.getName().equals(action.getName())) {
+					for(Port candidatePort : candidateAction.getOutputPattern().getPorts()) {
+						if(candidatePort.getName().equals(port.getName())) {
+							return actor;
+						}				
+					}
+				}
+			}
 		}
 		return null;
 	}

@@ -11,6 +11,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.tools.classifier.AbstractInterpreter;
 
@@ -58,12 +59,13 @@ public class PromelaAbstractInterpreter extends AbstractInterpreter {
 				return false;
 			}
 		}
-		Object result = doSwitch(action.getScheduler());
+		/*Object result = doSwitch(action.getScheduler());
 		if (result == null) {
 			throw new OrccRuntimeException("could not determine if action "
 					+ action.toString() + " is schedulable");
 		}
-		return ValueUtil.isTrue(result);
+		return ValueUtil.isTrue(result);*/
+		return super.isSchedulable(action);
 	}
 	
 	public State getCurrChoiseState(Set<State> states) {
@@ -86,5 +88,39 @@ public class PromelaAbstractInterpreter extends AbstractInterpreter {
 	public PromelaAbstractInterpreter(Actor actor) {
 		super(actor);
 	}
+	
+	@Override
+	public Object caseBlockWhile(BlockWhile block) {
+		int oldBranch = branch;
+		branch = 0;
+		doSwitch(block.getJoinBlock());
 
+		Object condition = exprInterpreter.doSwitch(block.getCondition());
+
+		int timeout=0;
+		if (ValueUtil.isBool(condition)) {
+			branch = 1;
+			while (ValueUtil.isTrue(condition)) {
+				doSwitch(block.getBlocks());
+				doSwitch(block.getJoinBlock());
+				
+				condition = exprInterpreter.doSwitch(block.getCondition());
+				timeout++;
+				if (!ValueUtil.isBool(condition)||timeout>1000) {
+					nullWasNormal=false;
+					throw new OrccRuntimeException(
+							"Condition not boolean at line "
+									+ block.getLineNumber() + "\n");
+				}
+			}
+		}
+		branch = oldBranch;
+		return null;
+	}
+	
+	private boolean nullWasNormal = true;
+	
+	public boolean nullWasNormal() {
+		return nullWasNormal;
+	}
 }

@@ -1,78 +1,99 @@
 cmake_minimum_required (VERSION 2.6)
 
-# Helps cmake to find where SDL libraries are saved (win32 only)
-if(WIN32)
-	set(ENV{CMAKE_PREFIX_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/windows/SDL-*\;${CMAKE_CURRENT_SOURCE_DIR}/windows/SDL_image-*)
-endif(WIN32)
-
-
-# Common include directories
-include_directories(
-	orcc/include
-)
-
-# Orcc library main files
-set(orcc_SRCS
-	orcc/src/accessFile.c
+# Orcc library files
+set(orcc_sources
+	orcc/src/access_file.c
 	orcc/src/getopt.c
 	orcc/src/source.c
 	orcc/src/writer.c
-	orcc/src/orcc_util.c
-)
-
-set(orcc_HDRS
-	orcc/include/orcc_util.h
-	orcc/include/orcc_types.h
+	orcc/src/util.c
+	orcc/include/util.h
+	orcc/include/types.h
 )
 
 # Build library without any external library required (SDL, pthread, etc)
 if(NO_EXTERNAL_DEPENDENCIES)
 
-	add_library (orcc STATIC ${orcc_SRCS} ${orcc_HDRS})
+	add_library(orcc STATIC ${orcc_sources})
 
 # Build library with all features (require external libraries)
-else(NO_EXTERNAL_DEPENDENCIES)
+else()
+	# Initialize source files list for roxml
+	file(GLOB roxml_sources
+		roxml/src/*.c
+		roxml/include/*.h
+	)
 
-	# Common packages required
+	# Helps CMake to find SDL libraries (Windows only)
+	if(WIN32)
+		# Detect current architecture. Depending on CMAKE_LIBRARY_ARCHITECTURE value,
+		# CMake will search in lib/x64 or lib/x86 sub-folders to find SDL.lib
+		if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+			set(CMAKE_LIBRARY_ARCHITECTURE "x64")
+		else()
+			set(CMAKE_LIBRARY_ARCHITECTURE "x86")
+		endif()
+		message(STATUS "Architecture: ${CMAKE_LIBRARY_ARCHITECTURE}")
+
+		# Configure additional paths to search for libraries
+		set(CMAKE_PREFIX_PATH
+			${CMAKE_PREFIX_PATH}
+			${CMAKE_CURRENT_SOURCE_DIR}/windows/SDL-*
+		)
+	endif()
+
+	# Try to find SDL on the user system
 	find_package(SDL REQUIRED)
-	find_package(SDL_image REQUIRED)
-	find_package(Threads REQUIRED)
+	
+	# To enable usage of SSE instructions, simply add a folder named "openHevc" or "libOpenHevc"
+	# directly in the libs folder. This folder must contain the *.lib file corresponding to libLibOpenHevcWrapper.dll
+	# You can put files under lib/x86 or lib/x64 according to the architecture.
+	# The OPEN_HEVC_ENABLE constant will be set automatically, to activate usage of these SSE instructions.
+    find_library(OpenHevc libLibOpenHevcWrapper PATHS ${CMAKE_CURRENT_SOURCE_DIR}/openHevc ${CMAKE_CURRENT_SOURCE_DIR}/libOpenHevc)
+    if(OpenHevc)
+        add_definitions(-DOPEN_HEVC_ENABLE)
+    endif()
 
-	include_directories(
-		${SDL_INCLUDE_DIR}
-		${SDLIMAGE_INCLUDE_DIR}
-		${THREADS_INCLUDE_DIR}
-		roxml/include
-	)
+	if(SDL_FOUND)
+		include_directories(
+			${SDL_INCLUDE_DIR}
+			roxml/include
+		)
+		# Add orcc files which depend on SDL and roxml
+		list(APPEND orcc_sources
+			# Source files
+			orcc/src/compare.c
+			orcc/src/compareyuv.c
+			orcc/src/scheduler.c
+			orcc/src/mapping.c
+			orcc/src/display.c
+			orcc/src/audio.c
+			orcc/src/fps_print.c
+			orcc/src/genetic.c
+			orcc/src/thread.c
+			orcc/src/open_hevc.c
+			orcc/src/serialize.c
+			orcc/src/dataflow.c
+			# Headers
+			orcc/include/fifo.h
+			orcc/include/generic_fifo.h
+			orcc/include/genetic.h
+			orcc/include/scheduler.h
+			orcc/include/mapping.h
+			orcc/include/thread.h
+			orcc/include/open_hevc.h
+			orcc/include/serialize.h
+			orcc/include/dataflow.h
+		)
 
-	file ( GLOB roxml_SRCS roxml/src/*.c )
-	add_library (roxml STATIC ${roxml_SRCS})
+		# Compile libraries
+		add_library(roxml STATIC ${roxml_sources})
+		add_library(orcc STATIC ${orcc_sources})
 
-	list(APPEND orcc_SRCS
-		orcc/src/compare.c
-		orcc/src/compareyuv.c
-		orcc/src/scheduler.c
-		orcc/src/display.c
-		orcc/src/audio.c
-		orcc/src/fpsPrint.c
-		orcc/src/genetic.c
-		orcc/src/thread.c
-	)
-
-	list(APPEND orcc_HDRS
-		orcc/include/orcc_fifo.h
-		orcc/include/orcc_fifo_socket.h
-		orcc/include/orcc_generic_fifo.h
-		orcc/include/orcc_generic_fifo.inl
-		orcc/include/orcc_generic_fifo_socket.h
-		orcc/include/orcc_genetic.h
-		orcc/include/orcc_scheduler.h
-		orcc/include/orcc_scheduler.inl
-		orcc/include/orcc_thread.h
-		orcc/include/socket.h
-	)
-
-	add_library (orcc STATIC ${orcc_SRCS} ${orcc_HDRS})
-	target_link_libraries(orcc roxml ${CMAKE_THREAD_LIBS_INIT} ${SDL_LIBRARY})
-
-endif(NO_EXTERNAL_DEPENDENCIES)
+		# Do the linking
+        target_link_libraries(orcc roxml ${SDL_LIBRARY})
+        if(OpenHevc)
+            target_link_libraries(orcc ${OpenHevc})
+        endif()
+	endif()
+endif()

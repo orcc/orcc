@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.util;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +41,15 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
+import net.sf.orcc.util.Attributable;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -65,50 +68,9 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class IrUtil {
 
-	/**
-	 * Add the given instruction before the given expression. If the expression
-	 * is contained by an instruction then the instruction to add is put
-	 * directly before, else the instruction is put to the previous block which
-	 * is created if needed. Return <code>true</code> if the given instruction
-	 * is added in the current block.
-	 * 
-	 * @param expression
-	 *            an expression
-	 * @param instruction
-	 *            the instruction to add before the given expression
-	 * @return <code>true</code> if the given instruction is added in the
-	 *         current block
-	 */
-	public static boolean addInstBeforeExpr(Expression expression,
-			Instruction instruction) {
-		Instruction containingInst = EcoreHelper.getContainerOfType(expression,
-				Instruction.class);
-		Block containingBlock = EcoreHelper.getContainerOfType(expression,
-				Block.class);
-		if (containingInst != null) {
-			if (containingInst.isInstPhi() && isWhileJoinBlock(containingBlock)) {
-				BlockWhile blockWhile = EcoreHelper.getContainerOfType(
-						containingBlock, BlockWhile.class);
-				addToPreviousBlockBasic(blockWhile, instruction);
-				return false;
-			} else {
-				List<Instruction> instructions = EcoreHelper
-						.getContainingList(containingInst);
-				instructions.add(instructions.indexOf(containingInst),
-						instruction);
-				return true;
-			}
-		} else {
-			// The given expression is contained in the condition of If/While
-			if (containingBlock.isBlockWhile()) {
-				BlockBasic joinBlock = ((BlockWhile) containingBlock)
-						.getJoinBlock();
-				joinBlock.add(instruction);
-			} else {
-				addToPreviousBlockBasic(containingBlock, instruction);
-			}
-			return false;
-		}
+	private static void addBlockBeforeBlock(Block newBlock, Block block) {
+		List<Block> blocks = EcoreHelper.getContainingList(block);
+		blocks.add(blocks.indexOf(block), newBlock);
 	}
 
 	/**
@@ -158,9 +120,50 @@ public class IrUtil {
 		}
 	}
 
-	private static void addBlockBeforeBlock(Block newBlock, Block block) {
-		List<Block> blocks = EcoreHelper.getContainingList(block);
-		blocks.add(blocks.indexOf(block), newBlock);
+	/**
+	 * Add the given instruction before the given expression. If the expression
+	 * is contained by an instruction then the instruction to add is put
+	 * directly before, else the instruction is put to the previous block which
+	 * is created if needed. Return <code>true</code> if the given instruction
+	 * is added in the current block.
+	 * 
+	 * @param expression
+	 *            an expression
+	 * @param instruction
+	 *            the instruction to add before the given expression
+	 * @return <code>true</code> if the given instruction is added in the
+	 *         current block
+	 */
+	public static boolean addInstBeforeExpr(Expression expression,
+			Instruction instruction) {
+		Instruction containingInst = EcoreHelper.getContainerOfType(expression,
+				Instruction.class);
+		Block containingBlock = EcoreHelper.getContainerOfType(expression,
+				Block.class);
+		if (containingInst != null) {
+			if (containingInst.isInstPhi() && isWhileJoinBlock(containingBlock)) {
+				BlockWhile blockWhile = EcoreHelper.getContainerOfType(
+						containingBlock, BlockWhile.class);
+				addToPreviousBlockBasic(blockWhile, instruction);
+				return false;
+			} else {
+				List<Instruction> instructions = EcoreHelper
+						.getContainingList(containingInst);
+				instructions.add(instructions.indexOf(containingInst),
+						instruction);
+				return true;
+			}
+		} else {
+			// The given expression is contained in the condition of If/While
+			if (containingBlock.isBlockWhile()) {
+				BlockBasic joinBlock = ((BlockWhile) containingBlock)
+						.getJoinBlock();
+				joinBlock.add(instruction);
+			} else {
+				addToPreviousBlockBasic(containingBlock, instruction);
+			}
+			return false;
+		}
 	}
 
 	private static void addToPreviousBlockBasic(Block block,
@@ -228,17 +231,6 @@ public class IrUtil {
 	}
 
 	/**
-	 * Returns a deep copy of the given object, and updates def/use chains.
-	 * 
-	 * @param eObject
-	 *            The EObject to copy
-	 * @return a deep copy of the given object with uses correctly updated
-	 */
-	public static <T extends EObject> T copy(T eObject) {
-		return copy(new Copier(), eObject);
-	}
-
-	/**
 	 * Returns a deep copy of the given object, using the given Copier instance
 	 * and updates def/use chains.
 	 * 
@@ -250,21 +242,6 @@ public class IrUtil {
 	 */
 	public static <T extends EObject> T copy(Copier copier, T eObject) {
 		return copy(copier, eObject, true);
-	}
-
-	/**
-	 * Returns a deep copy of the given object, and updates def/use chains. If
-	 * <i>copyReferences</i> is set to true, referenced objects will be
-	 * duplicated in the same time their referrer will be.
-	 * 
-	 * @param eObject
-	 *            The EObject to copy
-	 * @param copyReferences
-	 *            Flag to control if references must be copied
-	 * @return a deep copy of the given object with uses correctly updated
-	 */
-	public static <T extends EObject> T copy(T eObject, boolean copyReferences) {
-		return copy(new Copier(), eObject, copyReferences);
 	}
 
 	/**
@@ -309,6 +286,32 @@ public class IrUtil {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Returns a deep copy of the given object, and updates def/use chains.
+	 * 
+	 * @param eObject
+	 *            The EObject to copy
+	 * @return a deep copy of the given object with uses correctly updated
+	 */
+	public static <T extends EObject> T copy(T eObject) {
+		return copy(new Copier(), eObject);
+	}
+
+	/**
+	 * Returns a deep copy of the given object, and updates def/use chains. If
+	 * <i>copyReferences</i> is set to true, referenced objects will be
+	 * duplicated in the same time their referrer will be.
+	 * 
+	 * @param eObject
+	 *            The EObject to copy
+	 * @param copyReferences
+	 *            Flag to control if references must be copied
+	 * @return a deep copy of the given object with uses correctly updated
+	 */
+	public static <T extends EObject> T copy(T eObject, boolean copyReferences) {
+		return copy(new Copier(), eObject, copyReferences);
 	}
 
 	/**
@@ -388,6 +391,21 @@ public class IrUtil {
 		return block;
 	}
 
+	/**
+	 * Returns the name of the given local variable when using SSA.
+	 * 
+	 * @param local
+	 *            local variable
+	 * @return the local name
+	 */
+	public static String getNameSSA(Var local) {
+		if (local.getIndex() == 0) {
+			return local.getName();
+		} else {
+			return local.getName() + "_" + local.getIndex();
+		}
+	}
+
 	private static boolean isWhileJoinBlock(Block block) {
 		if (block.isBlockBasic()) {
 			BlockWhile blockWhile = EcoreHelper.getContainerOfType(block,
@@ -430,35 +448,29 @@ public class IrUtil {
 	 *            an entity
 	 * @return <code>true</code> if the serialization succeeded
 	 */
-	public static boolean serializeActor(ResourceSet set, IFolder outputFolder,
-			EObject entity) {
-		try {
-			OrccUtil.createFolder(outputFolder);
-		} catch (CoreException e) {
-			e.printStackTrace();
+	public static boolean serializeActor(ResourceSet set, EObject entity) {
+
+		if (entity instanceof Attributable) {
+			IProject p = ResourcesPlugin
+					.getWorkspace()
+					.getRoot()
+					.getProject(
+							((Attributable) entity).getValueAsString("project"));
+
+			IFolder outputFolder = OrccUtil.getOutputFolder(p);
+
+			try {
+				OrccUtil.createFolder(outputFolder);
+			} catch (CoreException e) {
+			}
+			URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
+					.append(DfUtil.getFile(entity)).addFileExtension("ir")
+					.toString(), true);
+
+			return serializeActor(set, uri, entity);
+
 		}
-
-		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
-				.append(DfUtil.getFile(entity)).addFileExtension("ir")
-				.toString(), true);
-		return serializeActor(set, uri, entity);
-	}
-
-	/**
-	 * Serializes the given entity to the given output folder.
-	 * 
-	 * @param outputFolderaddBlockBeforeExpr
-	 *            output folder
-	 * @param entity
-	 *            an entity
-	 * @return <code>true</code> if the serialization succeeded
-	 */
-	public static boolean serializeActor(ResourceSet set, String outputFolder,
-			EObject entity) {
-		String pathName = outputFolder + File.separator
-				+ DfUtil.getFile(entity) + ".ir";
-		URI uri = URI.createFileURI(pathName);
-		return serializeActor(set, uri, entity);
+		return false;
 	}
 
 	/**
@@ -474,8 +486,7 @@ public class IrUtil {
 			EObject entity) {
 		// check that the factory is registered
 		// (only happens in command-line mode)
-		// ...
-		// duck you command line :)
+		// FIXME: Is this still needed ?
 		Map<String, Object> extToFactoryMap = Resource.Factory.Registry.INSTANCE
 				.getExtensionToFactoryMap();
 		Object instance = extToFactoryMap.get("ir");

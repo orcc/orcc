@@ -105,7 +105,7 @@ class ScriptPrinter extends PromelaTemplate {
 
 		if uargs.runcheckerid is not None:
 			fsm=FSM()
-			fsm.loadfsm('config_Acdc', 'scheduler.txt')
+			fsm.loadfsm('config_«network.simpleName»', 'scheduler.txt')
 			fsm.printfsm()
 			sched=fsm.gettransition(uargs.runcheckerid)
 			if sched.nsrc=='?':
@@ -133,12 +133,12 @@ class ScriptPrinter extends PromelaTemplate {
 				print ("\n\nSchedule found.")
 				fsm=FSM()
 				fsm.loadfsm('config_«network.simpleName»', 'scheduler.txt')
+				sched=fsm.gettransition(conf.schedule)
 				mc.simulatetrail('main_«network.simpleName».pml')
 				nsd=StateDescription()
 				nsd.fromstring(mc.endstate)
 				nsd.setfilter('schedule_info_«network.simpleName».xml')
-				ns=nsd.isequalto('config_«network.simpleName»', fsm.getnstates())
-				sched=fsm.gettransition(conf.schedule)
+				ns=nsd.isequalto('config_«network.simpleName»', fsm.getnstates(sched.dst))
 				if ns is None:
 					ns=fsm.getnewstatename()
 					fsm.addnewnstate(sched.dst, ns)
@@ -152,7 +152,7 @@ class ScriptPrinter extends PromelaTemplate {
 		
 		if uargs.printXML:
 			fsm=FSM()
-			fsm.loadfsm('config_Acdc', 'scheduler.txt')
+			fsm.loadfsm('config_«network.simpleName»', 'scheduler.txt')
 			fsm.savefsm('config_«network.simpleName»', 'scheduler.txt')
 			scheduler=SchedulerXML('schedule_«network.simpleName».xml')
 			scheduler.savenewfsm(fsm, conf, 'schedule_«network.simpleName»_new.xml', 'config_«network.simpleName»')

@@ -63,30 +63,13 @@ public class PromelaSchedulingModel {
 		return variables;
 	}
 	
-	
-	public void addVarDep(Actor a, Var target, Var source) {
-		actorToModelMap.get(a).addVarDep(target, source);
-	}
-	
-	
-	public void addVarDep(Actor a, Var target, Set<Var> source, boolean isIfCondition) {
-		if(isIfCondition)return;
-		for (Var s : source) {
-			actorToModelMap.get(a).addVarDep(target, s);
-		}
-	}
-	
-	public void addVarUsedInScheduler(Actor a, Var var) {
-		actorToModelMap.get(a).addVarUsedByGuard(var);
-	}
-	
 	public ControlTokenActorModel getActorModel(Actor actor) {
 		return actorToModelMap.get(actor);
 	}
 
 	
 	/**
-	 * Rather long method that prints the model in dot format. Should at some point be replaced by something more neat.
+	 * Rather long method that prints the model in dot format. Should at some point be replaced xtend.
 	 */
 	public void printDependencyGraph() {
 		for (ControlTokenActorModel am : actorModels) {

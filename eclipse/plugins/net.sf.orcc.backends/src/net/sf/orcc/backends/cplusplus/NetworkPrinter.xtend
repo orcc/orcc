@@ -122,13 +122,13 @@ class NetworkPrinter extends ExprAndTypePrinter {
 			options.getOptions();
 			
 			«FOR param : network.parameters»
-				«param.type.doSwitch» «param.indexedName»«FOR dim:param.type.dimensions»[«dim»]«ENDFOR»;
+				«param.type.doSwitch» «param.name»«FOR dim:param.type.dimensions»[«dim»]«ENDFOR»;
 			«ENDFOR»
 			
 			«FOR param : network.parameters»
-				if(!options.getOptionAs("«param.indexedName»", «param.indexedName»))
+				if(!options.getOptionAs("«param.name»", «param.name»))
 				{
-					std::cerr << "«param.indexedName» is not defined!" << std::endl;
+					std::cerr << "«param.name» is not defined!" << std::endl;
 					exit(-1);
 				}
 			«ENDFOR»
@@ -145,7 +145,7 @@ class NetworkPrinter extends ExprAndTypePrinter {
 			
 			std::map<std::string, Actor*> actors;
 			«FOR instance : network.children.filter(typeof(Instance))»
-				actors["«FOR seg : instance.hierarchicalId»/«seg»«ENDFOR»"] = inst_«instance.name»;
+				actors["«instance.name»"] = inst_«instance.name»;
 			«ENDFOR»
 
 			«FOR e : network.connections»

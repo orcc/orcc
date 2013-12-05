@@ -34,6 +34,7 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.Void;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;

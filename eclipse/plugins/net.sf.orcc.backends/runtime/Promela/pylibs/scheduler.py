@@ -31,14 +31,20 @@ class FSM:
         for trans in self.transitions:
             if trans.tid==transid:
                 return trans
-    def getnstates(self):
+    def getnstates(self, dst_state):
+        lst=[]
+        for i in self.transitions:
+            if i.nsrc not in lst and i.src==dst_state:
+                lst.append(i.nsrc)
+        return lst
+    def getnrstates(self):
         lst=[]
         for i in self.transitions:
             if i.nsrc not in lst:
                 lst.append(i.nsrc)
-        return lst
+        return len(lst)
     def getnewstatename(self):
-        nr=len(self.getnstates())
+        nr=self.getnrstates()
         name="s"+str(nr)
         return name
     def addnewnstate(self, origstate, name):
@@ -88,7 +94,7 @@ class FSM:
                 filename=folder+'/sequence'+trans.tid+'.xml'
                 open(filename, "a").close()#create
                 file=open(filename, "w")
-                content="<superaction name='"+trans.nsrc+"_"+trans.src+"_"+trans.action+"' guard='NULL'>\n"+trans.sequence+"\n</superaction>"
+                content="<superaction name='"+trans.nsrc+"_"+trans.src+"_"+trans.action+"'>\n<guard/>"+trans.sequence+"\n</superaction>"
                 file.write(content)
                 file.close()
     def loadfsm(self, folder, filen):
@@ -132,8 +138,11 @@ class SchedulerXML():
                         xsuperactor.remove(xchild)
                     #add new stuff
                     for actor in conf.actors:
-                        elem = et.XML("<actor name='"+actor+"'/>")
-                        xsuperactor.append(elem)
+                        if actor.find('_bcast') >= 0:
+                            pass
+                        else:
+                            elem = et.XML("<actor name='"+actor+"'/>")
+                            xsuperactor.append(elem)
                     subtree = et.parse(conffolder+'/scheduler.xml')
                     xsuperactor.append(subtree.getroot())
                     for trans in fsm.transitions:

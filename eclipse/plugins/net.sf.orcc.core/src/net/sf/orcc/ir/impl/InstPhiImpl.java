@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.ir.impl;
 
+import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
+
 import java.util.Collection;
 
 import net.sf.orcc.ir.Def;
@@ -306,7 +308,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
 		builder.append("Phi(").append(
-				getTarget().getVariable().getIndexedName());
+				getNameSSA(getTarget().getVariable()));
 		for (Expression value : getValues()) {
 			builder.append(", ");
 			builder.append(new ExpressionPrinter().doSwitch(value));

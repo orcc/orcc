@@ -145,6 +145,24 @@ public class ActorMerger extends DfVisitor<Void> {
 		}
 		return new String("cluster" + index);
 	}
+
+	private boolean checkBroadcasts(Network network, List<Vertex> instances) {
+		for (Vertex srcVertex : instances) {
+			Actor src = srcVertex.getAdapter(Actor.class);
+			for (Port srcPort : src.getOutputs()) {
+				if (src.getOutgoingPortMap().get(srcPort).size() > 1) {
+					for (Connection connection : src.getOutgoingPortMap().get(srcPort)) {
+						if (!instances.contains(connection.getTarget())) {
+							OrccLogger.traceln("Warning: superactor port " + src.getName() + "_" + srcPort.getName() + " has broadcast FIFO");
+							OrccLogger.traceln("  with one end outside superactor. Skipping superactor generation.");
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
 	
 	/*
 	* If file "schedule.xml" is found in the user's home folder, that file
@@ -172,6 +190,10 @@ public class ActorMerger extends DfVisitor<Void> {
 			copier = new Copier(true);
 			// return a copy of the sub-network
 			Network subNetwork = getSubNetwork(network, instances);
+			
+			if(!checkBroadcasts(network, instances)) {
+				continue;
+			}
 			// create the static schedule of vertices
 			SASLoopScheduler scheduler = null;
 			if (!fileExists) {
@@ -232,7 +254,17 @@ public class ActorMerger extends DfVisitor<Void> {
 							srcPort, tgt, connection.getTargetPort()));
 
 				}
+			}
 
+			for (Port port : superActor.getOutputs()) {
+				if (port.hasAttribute("externalized")) {
+					int superActorPortIndex = MergerUtil.findPort(superActor.getInputs(),
+							port.getValueAsString("targetPort"));
+					if (superActorPortIndex >= 0) {
+						newConnections.add(dfFactory.createConnection(superActor,
+							port, superActor, superActor.getInputs().get(superActorPortIndex)));
+					}
+				}
 			}
 			network.removeVertices(instances);
 			network.getChildren().removeAll(instances);

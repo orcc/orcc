@@ -410,11 +410,11 @@ class ActorPrinter extends JavaTemplate {
 				if (inst.target.variable.type.list) (inst.target.variable.type as TypeList).innermostType.doSwitch
 				else inst.target.variable.type.doSwitch
 			'''
-			«inst.target.variable.indexedName» = («castType») («inst.value.doSwitch»);
+			«inst.target.variable.name» = («castType») («inst.value.doSwitch»);
 			'''
 		} else {
 			'''
-			«inst.target.variable.indexedName» = «inst.value.doSwitch»;
+			«inst.target.variable.name» = «inst.value.doSwitch»;
 			'''
 		}
 	}
@@ -447,7 +447,7 @@ class ActorPrinter extends JavaTemplate {
 			val cast = if (call.target.variable.type.sizeInBits < call.procedure.returnType.sizeInBits) {
 				'''(«call.target.variable.type.doSwitch») '''
 			}
-			'''«call.target.variable.indexedName» = «cast»'''
+			'''«call.target.variable.name» = «cast»'''
 		}
 		'''
 		«IF call.print»

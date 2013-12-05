@@ -94,7 +94,7 @@ class RunConfiguration(object):
         open(self.file3, "w").close() # create it if it doesnt exist
     def __ltl(self, inputseq, nextstate, actortostatesdic):
         # the morefsmstates is of type {fsm_state_???:[state, state,..]}
-        s=  "ltl test {[]!(promela_prog_initiated==1 &&"
+        s=  "ltl test {[]!(promela_has_progress==1 &&"
         s+= "fsm_state_"+self.conf.leader+"=="+self.conf.leader+"_state_"+nextstate
         for state in actortostatesdic.keys():
             s+= "&& ("
@@ -134,6 +134,9 @@ class StateDescription(object):
         ret=None
         sd=StateDescription()
         for st in otherstates:
+            if not os.path.exists(folder+'/'+st+'.txt'):
+                # as the file does not exist, this state is not yet defined; so we define it
+                self.savestate(folder, st+'.txt')
             sd.loadstate(folder, st+'.txt')
             issame=True
             for elem in self.state.keys():
@@ -227,20 +230,25 @@ class ChannelConfigXML():
         tree = et.parse(self.xmlfilename)
         for xactor in tree.findall('.//actor'):        
             for xinput in xactor.findall('.//input'):
-                self.partitioninput.channels.append(xactor.get('name')+'_'+xinput.get('port'))
-                #check if port is input to partition
-                if xinput.get('instance') not in configuration.actors:
-                    if xactor.get('name').find('_bcast')>=0: #special case, check downstream
-                        for xoutput in xactor.findall('.//connections/output'):
-                            xother_actorID=xoutput.get('instance')
-                            channel=xoutput.get('channelID')
-                            if xother_actorID==configuration.leader:
-                                self.partitioninput.leaders.append(xactor.get('name'))
-                                xother_actor=tree.find(".//actor[@name='"+xother_actorID+"']")
-                                xother_input=xother_actor.find(".//connections/input[@channelID='"+channel+"']")
-                                self.__getrates(xother_actor, xother_input, xactor, xinput)
-                    else:
-                        self.__getrates(xactor, xinput, xactor, xinput)
+                if xactor.get('name') in configuration.actors:
+                    self.partitioninput.channels.append(xactor.get('name')+'_'+xinput.get('port'))
+                    #check if port is input to partition
+                    if xinput.get('instance') not in configuration.actors:
+                        if xactor.get('name').find('_bcast')>=0: #special case, check downstream
+                            feeds_leader=False
+                            for xoutput in xactor.findall('.//connections/output'):
+                                xother_actorID=xoutput.get('instance')
+                                channel=xoutput.get('channelID')
+                                if xother_actorID==configuration.leader:
+                                    self.partitioninput.leaders.append(xactor.get('name'))
+                                    xother_actor=tree.find(".//actor[@name='"+xother_actorID+"']")
+                                    xother_input=xother_actor.find(".//connections/input[@channelID='"+channel+"']")
+                                    self.__getrates(xother_actor, xother_input, xactor, xinput)
+                                    feeds_leader=True
+                            if not feeds_leader:
+                                self.__getrates(xactor, xinput, xactor, xinput)
+                        else:
+                            self.__getrates(xactor, xinput, xactor, xinput)
         return self.partitioninput
     def __getrates(self, xactor, xinput, aactor, ainput):
         #x-args is where to look, a-args is where to place..

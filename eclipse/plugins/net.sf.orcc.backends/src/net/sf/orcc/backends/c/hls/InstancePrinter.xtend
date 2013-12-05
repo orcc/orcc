@@ -241,9 +241,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val scriptContent = script(targetFolder);
 		val directiveContent = directive(targetFolder);
 		val file = new File(targetFolder + File::separator + instance.name + ".cpp")
-		val scriptFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name + File::separator + "script_" + instance.name + ".tcl"
+		val scriptFile = new File(targetFolder+ File::separator+ "script_" + instance.name + ".tcl"
 		)
-		val directiveFile = new File(targetFolder+ File::separator+"subProject_"+ instance.name  + File::separator + "directive_" + instance.name + ".tcl")
+		val directiveFile = new File(targetFolder+ File::separator + "directive_" + instance.name + ".tcl")
 		
 		if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(scriptContent, scriptFile)
@@ -281,10 +281,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 			«IF (srcPort != null)» 
 				«IF !instance.incomingPortMap.get(srcPort).fifoName.toString.empty»
-				 	«instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.indexedName»);
+				 	«instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.name»);
 				 «ENDIF»
 			«ELSE»
-				«load.target.variable.indexedName» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
+				«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
 		'''
 		
@@ -379,17 +379,16 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 def script (String path)'''
 	
-	open_project subProject
+	open_project -reset subProject_«instance.name»
 	set_top «instance.name»_scheduler
-	add_files ../«instance.name».cpp
-	add_files -tb ../coSimTestBench/«instance.name»TestBench.cpp
-	open_solution "solution"
+	add_files «instance.name».cpp
+	add_files -tb «instance.name»TestBench.cpp
+	open_solution -reset "solution1"
 	set_part  {xc7vx330tffg1157-2}
 	create_clock -period 20
 	
-	source "directive_«instance.name».tcl"
+	
 	csynth_design
-	exit
 	exit
 	'''
 	

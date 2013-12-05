@@ -173,6 +173,16 @@ class SwActorPrinter extends InstancePrinter {
 			«FOR port : action.outputPattern.ports.filter[native]»
 				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
 			«ENDFOR»
+			
+			«FOR port : action.inputPattern.ports.notNative»
+				«val connection = incomingPortMap.get(port)»
+				call void @read_end_«port.name»_«connection.getSafeId(port)»()
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.notNative»
+				«FOR connection : outgoingPortMap.get(port)»
+					call void @write_end_«port.name»_«connection.getSafeId(port)»()
+				«ENDFOR»
+			«ENDFOR»
 			ret void
 		}
 		«ENDIF»
@@ -184,7 +194,7 @@ class SwActorPrinter extends InstancePrinter {
 		«val args = call.arguments»
 		«val parameters = call.procedure.parameters»
 		«IF call.procedure.native»
-			«IF target != null»%«target.variable.indexedName» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
+			«IF target != null»%«target.variable.name» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
 		«ELSE»
 			«super.caseInstCall(call)»
 		«ENDIF»

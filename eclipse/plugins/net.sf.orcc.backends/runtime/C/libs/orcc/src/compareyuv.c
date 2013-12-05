@@ -31,9 +31,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "orcc_types.h"
-#include "orcc_fifo.h"
-#include "orcc_util.h"
+#include "types.h"
+#include "fifo.h"
+#include "util.h"
 
 // from APR
 /* Ignore Microsoft's interpretation of secure development

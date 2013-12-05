@@ -33,6 +33,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.backends.llvm.tta.architecture.Memory
 
 class HwProjectPrinter extends TTAPrinter {
 	
@@ -172,6 +173,10 @@ class HwProjectPrinter extends TTAPrinter {
 			«FOR processor:design.processors»
 				«processor.xise»
 			«ENDFOR»
+			
+			«FOR memory: design.sharedMemories»
+				«memory.xise»
+			«ENDFOR»
 		
 		    <!--                   -->
 		    <!-- Shared components.-->
@@ -196,14 +201,16 @@ class HwProjectPrinter extends TTAPrinter {
 		      <association xil_pn:name="BehavioralSimulation"/>
 		      <association xil_pn:name="Implementation"/>
 		    </file>
-		    <file xil_pn:name="share/vhdl/and_ior_xor.vhdl" xil_pn:type="FILE_VHDL">
-		      <association xil_pn:name="BehavioralSimulation"/>
-		      <association xil_pn:name="Implementation"/>
-		    </file>
 		    <file xil_pn:name="share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl" xil_pn:type="FILE_VHDL">
 		      <association xil_pn:name="BehavioralSimulation"/>
 		      <association xil_pn:name="Implementation"/>
 		    </file>
+		    «IF(!design.outputs.empty)»
+		    <file xil_pn:name="share/vhdl/stratix3_led_io_always_1.vhd" xil_pn:type="FILE_VHDL">
+		      <association xil_pn:name="BehavioralSimulation"/>
+		      <association xil_pn:name="Implementation"/>
+		    </file>
+		    «ENDIF»
 		
 		    <!--                  -->
 		    <!-- Other components.-->
@@ -277,6 +284,10 @@ class HwProjectPrinter extends TTAPrinter {
 		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>
+		<file xil_pn:name="«processor.name»/tta/vhdl/«processor.name»_mem_constants_pkg.vhd" xil_pn:type="FILE_VHDL">
+		  <association xil_pn:name="BehavioralSimulation"/>
+		  <association xil_pn:name="Implementation"/>
+		</file>
 		<file xil_pn:name="«processor.name»/tta/gcu_ic/output_socket_«processor.buses.size»_1.vhdl" xil_pn:type="FILE_VHDL">
 		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
@@ -309,10 +320,29 @@ class HwProjectPrinter extends TTAPrinter {
 		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>
+		<file xil_pn:name="«processor.name»/tta/vhdl/irom_«processor.name».vhd" xil_pn:type="FILE_VHDL">
+		  <association xil_pn:name="BehavioralSimulation"/>
+		  <association xil_pn:name="Implementation"/>
+		</file>
 		<file xil_pn:name="«processor.name»/tta/vhdl/irom_«processor.name».ngc" xil_pn:type="FILE_NGC">
 		  <association xil_pn:name="Implementation"/>
 		</file>
+		<file xil_pn:name="«processor.name»/tta/vhdl/dram_«processor.name».vhd" xil_pn:type="FILE_VHDL">
+		  <association xil_pn:name="BehavioralSimulation"/>
+		  <association xil_pn:name="Implementation"/>
+		</file>
 		<file xil_pn:name="«processor.name»/tta/vhdl/dram_«processor.name».ngc" xil_pn:type="FILE_NGC">
+		  <association xil_pn:name="Implementation"/>
+		</file>
+		'''
+	
+	def private getXise(Memory memory)
+		'''
+		<file xil_pn:name="wrapper/dram_2p_«memory.name».ngc" xil_pn:type="FILE_NGC">
+		  <association xil_pn:name="Implementation"/>
+		</file>
+		<file xil_pn:name="wrapper/dram_2p_«memory.name».vhd" xil_pn:type="FILE_VHDL">
+		  <association xil_pn:name="BehavioralSimulation"/>
 		  <association xil_pn:name="Implementation"/>
 		</file>
 		'''

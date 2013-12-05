@@ -75,6 +75,13 @@ public class Scheduler {
 	}
 
 	public void buildSchedulingCases() {
+		/*for (Schedule schedule : schedules) {
+			if (schedule.getPotentialEndStates().size()==1) {
+				for (State state : schedule.getPotentialEndStates()) {
+					schedule.setEndState(state);
+				}
+			}
+		}*/
 		scheduleCases = new HashSet<List<Schedule>>();
 		Set<State> toVisit = new HashSet<State>();
 		toVisit.add(initialState);

@@ -134,7 +134,7 @@ class HwProcessorPrinter extends TTAPrinter {
 		  port (
 		    clka  : in  std_logic;
 		    addra : in  std_logic_vector(INSTRUCTIONADDRWIDTH-1 downto 0);
-		    douta : out std_logic_vector(INSTRUCTIONWIDTH-1 downto 0));
+		    douta : out std_logic_vector(IMEMWIDTHINMAUS*IMEMMAUWIDTH-1 downto 0));
 		end component;
 		
 		«ENDIF»
@@ -153,7 +153,7 @@ class HwProcessorPrinter extends TTAPrinter {
 		«ENDIF»
 		--
 		signal imem_addr          : std_logic_vector(IMEMADDRWIDTH-1 downto 0);
-		signal idata_wire         : std_logic_vector(INSTRUCTIONWIDTH-1 downto 0);
+		signal idata_wire         : std_logic_vector(IMEMWIDTHINMAUS*IMEMMAUWIDTH-1 downto 0);
 		--
 		«FOR edge : processor.incoming»
 			«val link = edge as Link»

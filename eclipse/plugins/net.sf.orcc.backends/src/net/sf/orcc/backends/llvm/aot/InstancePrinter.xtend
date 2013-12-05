@@ -720,7 +720,7 @@ class InstancePrinter extends LLVMTemplate {
 		if(variable.global)
 			'''@«variable.name» = internal «IF variable.assignable»global«ELSE»constant«ENDIF» «variable.type.doSwitch» «variable.initialize»'''
 		else if(variable.type.list && ! castedList.contains(variable))
-			'''%«variable.indexedName» = alloca «variable.type.doSwitch»'''
+			'''%«variable.name» = alloca «variable.type.doSwitch»'''
 	}
 	
 	def protected initialize(Var variable) {
@@ -905,7 +905,7 @@ class InstancePrinter extends LLVMTemplate {
 	def caseExprNull(ExprNull expr) '''null'''
 	
 	def caseInstCast(InstCast cast) '''
-		%«cast.target.variable.indexedName» = «cast.castOp» «cast.source.variable.castType» «cast.source.variable.print» to «cast.target.variable.castType»
+		%«cast.target.variable.name» = «cast.castOp» «cast.source.variable.castType» «cast.source.variable.print» to «cast.target.variable.castType»
 	'''
 
 	def private getCastOp(InstCast cast) {
@@ -919,7 +919,7 @@ class InstancePrinter extends LLVMTemplate {
 		'''«variable.type.doSwitch»«IF variable.type.list»*«ENDIF»'''
 	
 	override caseInstAssign(InstAssign assign) 
-		'''%«assign.target.variable.indexedName» = «assign.value.doSwitch»'''
+		'''%«assign.target.variable.name» = «assign.value.doSwitch»'''
 	
 	override caseInstPhi(InstPhi phi)
 		'''«phi.target.variable.print» = phi «phi.target.variable.type.doSwitch» «phi.phiPairs»'''
@@ -1001,7 +1001,7 @@ class InstancePrinter extends LLVMTemplate {
 		«IF call.print»
 			call i32 (i8*, ...)* @printf(«call.arguments.join(", ")[printArgument((it as ArgByVal).value.type)]»)
 		«ELSE»
-			«IF call.target != null»%«call.target.variable.indexedName» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
+			«IF call.target != null»%«call.target.variable.name» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
 		«ENDIF»
 	'''
 	
