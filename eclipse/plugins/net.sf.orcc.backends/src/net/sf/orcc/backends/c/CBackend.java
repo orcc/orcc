@@ -73,11 +73,12 @@ import net.sf.orcc.ir.transform.BlockCombine;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
-import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
@@ -184,7 +185,7 @@ public class CBackend extends AbstractBackend {
 		Vectorizable.setVectorizableAttributs(actor);
 
 		new DfVisitor<CfgNode>(new ControlFlowAnalyzer()).doSwitch(actor);
-		new DfVisitor<Void>(new ConstantRegisterCleaner()).doSwitch(actor);
+		new DfVisitor<java.lang.Void>(new ConstantRegisterCleaner()).doSwitch(actor);
 		new DfVisitor<CfgNode>(new ControlFlowAnalyzer()).doSwitch(actor);
 		new BlockForAdder().doSwitch(actor);
 		TestGeCosTransform.exec(actor);
