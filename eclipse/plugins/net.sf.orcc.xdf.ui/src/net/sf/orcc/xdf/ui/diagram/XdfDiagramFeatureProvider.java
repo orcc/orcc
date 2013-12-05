@@ -42,15 +42,16 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeature;
-import org.eclipse.graphiti.features.IMoveAnchorFeature;
+import org.eclipse.graphiti.features.IRemoveFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
-import org.eclipse.graphiti.features.context.IMoveAnchorContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
+import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
-import org.eclipse.graphiti.features.impl.DefaultMoveAnchorFeature;
+import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
 import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
 
 /**
@@ -83,18 +84,8 @@ public class XdfDiagramFeatureProvider extends
 	}
 
 	/**
-	 * Forbids to move any anchor in the diagram
+	 * Globally disable the ability to move anchors across shapes.
 	 */
-	@Override
-	public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
-		return new DefaultMoveAnchorFeature(this) {
-			@Override
-			public boolean canMoveAnchor(IMoveAnchorContext context) {
-				return false;
-			}
-		};
-	}
-
 	@Override
 	public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {
 		return getCreateConnectionFeatures();
@@ -106,5 +97,20 @@ public class XdfDiagramFeatureProvider extends
 			return new DropInstanceFromFileFeature(this);
 		}
 		return super.getAddFeature(context);
+	}
+
+	/**
+	 * We never want to remove elements from the diagram. We always want to
+	 * delete them. So it is useless to display the menu entry, the button in
+	 * the contextual palette. This feature is globally disabled
+	 */
+	@Override
+	public IRemoveFeature getRemoveFeature(IRemoveContext context) {
+		return new DefaultRemoveFeature(this) {
+			@Override
+			public boolean isAvailable(IContext context) {
+				return false;
+			}
+		};
 	}
 }

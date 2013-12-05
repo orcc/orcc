@@ -53,7 +53,6 @@ import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
-import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.context.impl.ResizeShapeContext;
@@ -200,17 +199,6 @@ public class InstancePattern extends AbstractPattern {
 
 		// null -> value is valid
 		return null;
-	}
-
-	/**
-	 * An instance can't be removed from a graph. Instead it must be deleted.
-	 * 
-	 * @see org.eclipse.graphiti.pattern.AbstractPattern#canRemove(org.eclipse.graphiti
-	 *      .features.context.IRemoveContext)
-	 */
-	@Override
-	public boolean canRemove(IRemoveContext context) {
-		return false;
 	}
 
 	@Override
