@@ -131,6 +131,19 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	}
 
 	@Override
+	public String checkValueValid(String value, IDirectEditingContext context) {
+		if (value.length() < 1) {
+			return "Please enter a text to name the Port.";
+		}
+		if (!value.matches("[a-zA-Z0-9_]+")) {
+			return "You can only use alphanumeric characters for Port name";
+		}
+
+		// null -> value is valid
+		return null;
+	}
+
+	@Override
 	public void setValue(String value, IDirectEditingContext context) {
 		PictogramElement pe = context.getPictogramElement();
 		Port port = (Port) getBusinessObjectForPictogramElement(pe);

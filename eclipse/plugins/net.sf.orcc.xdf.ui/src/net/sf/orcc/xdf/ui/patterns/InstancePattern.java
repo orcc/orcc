@@ -192,7 +192,7 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	public String checkValueValid(String value, IDirectEditingContext context) {
 		if (value.length() < 1) {
-			return "Please enter any text as Instance name.";
+			return "Please enter a text to name the Instance.";
 		}
 		if (!value.matches("[a-zA-Z0-9_]+")) {
 			return "You can only use alphanumeric characters for Instance name";
