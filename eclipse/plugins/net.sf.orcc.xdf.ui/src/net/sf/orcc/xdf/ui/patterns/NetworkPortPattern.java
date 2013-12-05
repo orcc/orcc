@@ -116,7 +116,9 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	@Override
 	public boolean canDirectEdit(IDirectEditingContext context) {
-		return isPatternControlled(context.getPictogramElement());
+		boolean isText = context.getGraphicsAlgorithm() instanceof Text;
+		boolean isLabel = ShapePropertiesManager.isExpectedPc(context.getGraphicsAlgorithm(), LABEL_ID);
+		return isText && isLabel;
 	}
 
 	@Override
