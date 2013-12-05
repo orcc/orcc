@@ -755,7 +755,7 @@ public class InstancePattern extends AbstractPattern {
 	public EObject getRefinementFromShape(final PictogramElement pe) {
 		if (isPatternRoot(pe)) {
 			final String plateforStringUri = Graphiti.getPeService().getPropertyValue(pe, REFINEMENT_KEY);
-			final Resource res = XdfUtil.getCommonresourceSet().getResource(
+			final Resource res = XdfUtil.getCommonResourceSet().getResource(
 					URI.createPlatformResourceURI(plateforStringUri, true), true);
 			if (res.getContents().size() > 0) {
 				return res.getContents().get(0);

@@ -62,7 +62,7 @@ public class XdfUtil {
 
 	private static ResourceSet resourceSet = new ResourceSetImpl();
 
-	public static ResourceSet getCommonresourceSet() {
+	public static ResourceSet getCommonResourceSet() {
 		return resourceSet;
 	}
 
@@ -72,7 +72,7 @@ public class XdfUtil {
 		return window.getShell();
 	}
 
-	public static IProject getproject(EObject object) {
+	public static IProject getProject(EObject object) {
 
 		String path = object.eResource().getURI().toPlatformString(true);
 		return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path))
