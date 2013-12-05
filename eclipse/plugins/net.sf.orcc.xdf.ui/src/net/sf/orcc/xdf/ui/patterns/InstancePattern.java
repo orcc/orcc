@@ -235,13 +235,6 @@ public class InstancePattern extends AbstractPattern {
 		final Instance newInstance = DfFactory.eINSTANCE.createInstance();
 		newInstance.setName("");
 
-		// TODO: allow to create from an eResource (dropped from project
-		// explorer)
-
-		// Add the new Instance to the current Network
-		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
-		network.add(newInstance);
-
 		// Request adding the shape to the diagram
 		addGraphicalRepresentation(context, newInstance);
 
@@ -267,6 +260,10 @@ public class InstancePattern extends AbstractPattern {
 		final IGaService gaService = Graphiti.getGaService();
 
 		final Instance addedDomainObject = (Instance) context.getNewObject();
+
+		// Add the new Instance to the current Network
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		network.add(addedDomainObject);
 
 		// Create the container shape
 		final ContainerShape topLevelShape = peCreateService.createContainerShape(targetDiagram, true);

@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.xdf.ui.diagram;
 
+import net.sf.orcc.xdf.ui.features.DropInstanceFromFileFeature;
 import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinmentFeature;
 import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
@@ -37,10 +38,13 @@ import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IMoveAnchorFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
+import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IMoveAnchorContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
@@ -94,5 +98,13 @@ public class XdfDiagramFeatureProvider extends
 	@Override
 	public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {
 		return getCreateConnectionFeatures();
+	}
+
+	@Override
+	public IAddFeature getAddFeature(IAddContext context) {
+		if (context.getNewObject() instanceof IFile) {
+			return new DropInstanceFromFileFeature(this);
+		}
+		return super.getAddFeature(context);
 	}
 }
