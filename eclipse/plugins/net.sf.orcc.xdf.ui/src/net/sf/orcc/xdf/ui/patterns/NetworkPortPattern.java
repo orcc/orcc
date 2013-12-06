@@ -286,9 +286,10 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		directEditingInfo.setMainPictogramElement(topLevelShape);
 
 		link(topLevelShape, addedDomainObject);
-		// Add the port type as link to the shape. Will be used in
-		// getTypeFromShape()
-		topLevelShape.getLink().getBusinessObjects().add(addedDomainObject.getType());
+		// TODO: port Type was linked here, but it is a bad idea since the type
+		// is contained by the port. Instead we should store port type as string
+		// in a property of the shape. Must be implemented when properties tabs
+		// will be available on the graph editor.
 
 		gaService.setLocation(topLevelInvisibleRect, context.getX(), context.getY());
 		layoutPictogramElement(topLevelShape);
@@ -379,7 +380,11 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	 * 
 	 * @param pe
 	 * @return
+	 * @deprecated This method will not work until the port type is stored as
+	 *             string in the shape and a type parser can be used to crete
+	 *             the Type object from this String
 	 */
+	@Deprecated
 	public Type getTypeFromShape(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
 			for (EObject businessObject : pe.getLink().getBusinessObjects()) {

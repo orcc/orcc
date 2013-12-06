@@ -44,6 +44,7 @@ import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern.PortInformation;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
+import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
@@ -68,6 +69,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
  * This feature try to detect cases when a Diagram or a Network need to be
@@ -119,24 +121,25 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 				network = (Network) resourceSet.getResource(xdfUri, true).getContents().get(0);
 				link(diagram, network);
 			} else {
-				hasDoneChanges = initializeNetworkFromDiagram(diagram);
-				return hasDoneChanges;
+				MessageDialog.openWarning(XdfUtil.getDefaultShell(), "Warning",
+						"This diagram has no network attached. It should not be used.");
+				return false;
 			}
 		} else {
 			network = (Network) linkedBo;
-		}
 
-		final Resource xdfRes = network.eResource();
-		if (xdfRes == null || !xdfRes.getURI().equals(xdfUri)) {
-			// Particular case. The existing network is not contained in a
-			// resource, or its resource has a wrong URI. It can happen if
-			// the diagram has been moved or duplicated without the
-			// corresponding xdf. The Move/Rename participant should take
-			// care of that.
+			final Resource linkedRes = network.eResource();
+			if (linkedRes == null || !linkedRes.getURI().equals(xdfUri)) {
+				// Particular case. The existing network is not contained in a
+				// resource, or its resource has a wrong URI. It can happen if
+				// the diagram has been moved or duplicated without the
+				// corresponding xdf. The Move/Rename participant should take
+				// care of that.
 
-			final Resource res = resourceSet.createResource(xdfUri);
-			res.getContents().add(EcoreUtil.copy(network));
-			hasDoneChanges = true;
+				final Resource res = resourceSet.createResource(xdfUri);
+				res.getContents().add(EcoreUtil.copy(network));
+				hasDoneChanges = true;
+			}
 		}
 
 		if (diagram.getChildren().size() == 0 && network.getChildren().size() > 0) {
@@ -146,6 +149,18 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		return hasDoneChanges;
 	}
 
+	/**
+	 * TODO: use this method when {@link NetworkPortPattern#getTypeFromShape}
+	 * will work
+	 * 
+	 * @param diagram
+	 * @return
+	 * @deprecated This method does not work for now. See
+	 *             {@link NetworkPortPattern#getTypeFromShape} for more
+	 *             information
+	 */
+	@SuppressWarnings("unused")
+	@Deprecated
 	private boolean initializeNetworkFromDiagram(Diagram diagram) {
 		final URI diagramUri = diagram.eResource().getURI();
 		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(Activator.NETWORK_SUFFIX);
@@ -193,7 +208,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 				final PortInformation src = connPattern.getPortInformations(connection.getStart());
 				final PortInformation tgt = connPattern.getPortInformations(connection.getEnd());
 
-				final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection(src.getVertex(), src.getPort(), tgt.getVertex(), tgt.getPort());
+				final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection(src.getVertex(),
+						src.getPort(), tgt.getVertex(), tgt.getPort());
 				network.getConnections().add(dfConnection);
 				link(connection, dfConnection);
 			}
