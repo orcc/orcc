@@ -251,7 +251,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 		// create link and wire it
 		link(connection, addedConnection);
-		return super.add(context);
+		return connection;
 	}
 
 	/**

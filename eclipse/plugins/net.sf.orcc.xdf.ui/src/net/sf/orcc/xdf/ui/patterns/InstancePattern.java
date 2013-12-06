@@ -45,6 +45,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -55,6 +56,8 @@ import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.features.context.impl.DeleteContext;
+import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.context.impl.ResizeShapeContext;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.func.IDirectEditing;
@@ -67,6 +70,7 @@ import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.algorithms.styles.Point;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
+import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
@@ -204,6 +208,27 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	public boolean canDelete(IDeleteContext context) {
 		return true;
+	}
+
+	/**
+	 * Delete all connections before deleting an instance
+	 */
+	@Override
+	public void preDelete(IDeleteContext mainContext) {
+		final PictogramElement pe = mainContext.getPictogramElement();
+		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
+			return;
+		}
+
+		final List<Connection> connections = Graphiti.getPeService().getAllConnections((AnchorContainer) pe);
+		for (Connection connection : connections) {
+			DeleteContext conDelContext = new DeleteContext(connection);
+			conDelContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
+			IDeleteFeature delFeature = getFeatureProvider().getDeleteFeature(conDelContext);
+			if (delFeature.canDelete(conDelContext)) {
+				delFeature.execute(conDelContext);
+			}
+		}
 	}
 
 	@Override

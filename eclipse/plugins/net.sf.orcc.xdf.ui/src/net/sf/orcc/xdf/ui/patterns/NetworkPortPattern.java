@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.xdf.ui.patterns;
 
+import java.util.List;
+
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -38,6 +40,7 @@ import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -46,6 +49,8 @@ import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.features.context.impl.DeleteContext;
+import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.func.IDirectEditing;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
@@ -55,6 +60,7 @@ import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
+import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -168,6 +174,27 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	@Override
 	public boolean canDelete(IDeleteContext context) {
 		return true;
+	}
+
+	/**
+	 * Delete all connections before deleting a port
+	 */
+	@Override
+	public void preDelete(IDeleteContext mainContext) {
+		final PictogramElement pe = mainContext.getPictogramElement();
+		if (!ShapePropertiesManager.isExpectedPc(pe, getPortIdentifier())) {
+			return;
+		}
+
+		final List<Connection> connections = Graphiti.getPeService().getAllConnections((AnchorContainer) pe);
+		for (Connection connection : connections) {
+			DeleteContext conDelContext = new DeleteContext(connection);
+			conDelContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
+			IDeleteFeature delFeature = getFeatureProvider().getDeleteFeature(conDelContext);
+			if (delFeature.canDelete(conDelContext)) {
+				delFeature.execute(conDelContext);
+			}
+		}
 	}
 
 	@Override
@@ -355,7 +382,6 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	 */
 	public Type getTypeFromShape(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			pe.getLink().getBusinessObjects();
 			for (EObject businessObject : pe.getLink().getBusinessObjects()) {
 				if (businessObject instanceof Type) {
 					return (Type) businessObject;
