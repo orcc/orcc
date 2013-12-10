@@ -70,6 +70,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
+import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
@@ -85,6 +86,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
  * 
  */
 public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
+
+	public static String GLOBAL_VERSION_KEY = "xdf_diagram_version";
+	public static String CURRENT_EDITOR_VERSION = "1";
 
 	private boolean hasDoneChanges;
 
@@ -148,6 +152,15 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			hasDoneChanges |= initializeDiagramFromNetwork(network, diagram);
 			return hasDoneChanges;
 		}
+
+		final String version = Graphiti.getPeService().getPropertyValue(diagram, GLOBAL_VERSION_KEY);
+		if (version == null) {
+			Graphiti.getPeService().setPropertyValue(diagram, GLOBAL_VERSION_KEY, CURRENT_EDITOR_VERSION);
+		}
+		// In future versions of this diagram editor, the diagram version should
+		// be checked here. This should be used to automatically update diagrams
+		// (styles, shapes tree, etc.) from an older to the current version of
+		// the editor.
 		return hasDoneChanges;
 	}
 
