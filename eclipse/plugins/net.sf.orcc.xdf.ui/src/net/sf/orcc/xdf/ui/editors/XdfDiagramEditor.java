@@ -30,21 +30,18 @@ package net.sf.orcc.xdf.ui.editors;
 
 import java.io.IOException;
 
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
-import org.eclipse.graphiti.ui.editor.EditorInputAdapter;
-import org.eclipse.graphiti.ui.editor.IDiagramEditorInput;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * This class customize the default diagram editor.
@@ -63,23 +60,26 @@ public class XdfDiagramEditor extends DiagramEditor {
 	}
 
 	/**
-	 * When user try to open a Xdf file directly, this overridden method try to
-	 * find the corresponding diagram. If the diagram can't be found, it is
-	 * created.
+	 * Default DiagramEditor class needs to be configured with a diagram input
+	 * file instead of a network one. If the user try to open a xdf file, this
+	 * overridden method modify the given input to set the diagram URI instead.
+	 * 
+	 * When this happen, if the diagram file does not exists, it is created (but
+	 * will remains empty until UpdateDiagramFeature will be applied)
 	 */
 	@Override
-	protected DiagramEditorInput convertToDiagramEditorInput(IEditorInput input) throws PartInitException {
+	protected void setInput(IEditorInput input) {
 
-		if (input instanceof IFileEditorInput) {
-			final IFileEditorInput fileInput = (IFileEditorInput) input;
+		if (input instanceof DiagramEditorInput) {
+			final DiagramEditorInput diagramEditorInput = (DiagramEditorInput) input;
 
 			// The input is an Xdf resource
-			if (Activator.NETWORK_SUFFIX.equals(fileInput.getFile().getFileExtension())) {
-				final IWorkspaceRoot workspaceRoot = fileInput.getFile().getWorkspace().getRoot();
+			if (Activator.NETWORK_SUFFIX.equals(diagramEditorInput.getUri().fileExtension())) {
+				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
-				final URI xdfUri = URI.createPlatformResourceURI(fileInput.getFile().getFullPath().toString(), true);
-				final URI diagramUri = xdfUri.trimFileExtension()
-						.appendFileExtension(Activator.DIAGRAM_SUFFIX);
+				final URI xdfUri = diagramEditorInput.getUri();
+				final URI diagramUri = xdfUri.trimFileExtension().appendFileExtension(Activator.DIAGRAM_SUFFIX);
+
 				final IPath diagramPath = new Path(diagramUri.toPlatformString(true));
 
 				// The diagram associated with the Xdf doesn't exists
@@ -89,19 +89,15 @@ public class XdfDiagramEditor extends DiagramEditor {
 						// UpdateDiagramFeature
 						XdfUtil.createDiagramResource(diagramUri);
 					} catch (IOException e) {
-						throw new PartInitException("Unable to create the diagram " + diagramUri); //$NON-NLS-1$
+						OrccLogger.severeln("Unable to create a diagram resource from the network file.");
 					}
 				}
 
-				input = new FileEditorInput(workspaceRoot.getFile(diagramPath));
+				diagramEditorInput.updateUri(diagramUri);
+				super.setInput(diagramEditorInput);
+				return;
 			}
 		}
-
-		final IEditorInput newInput = EditorInputAdapter.adaptToDiagramEditorInput(input);
-		if (!(newInput instanceof IDiagramEditorInput)) {
-			throw new PartInitException("Unknown editor input: " + input); //$NON-NLS-1$
-		}
-		return (DiagramEditorInput) newInput;
+		super.setInput(input);
 	}
-
 }

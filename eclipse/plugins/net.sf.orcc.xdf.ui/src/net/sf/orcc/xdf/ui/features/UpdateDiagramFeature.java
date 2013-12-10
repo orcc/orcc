@@ -48,14 +48,15 @@ import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
@@ -87,13 +88,9 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 	private boolean hasDoneChanges;
 
-	final private ResourceSet resourceSet;
-
 	public UpdateDiagramFeature(IFeatureProvider fp) {
 		super(fp);
 		hasDoneChanges = false;
-
-		resourceSet = new ResourceSetImpl();
 	}
 
 	@Override
@@ -109,15 +106,20 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			return false;
 		}
 
+		final EditingDomain editingDomain = getDiagramBehavior().getEditingDomain();
+		final ResourceSet resourceSet = editingDomain.getResourceSet();
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
 		final Diagram diagram = (Diagram) context.getPictogramElement();
 		final Object linkedBo = getBusinessObjectForPictogramElement(diagram);
 
 		final URI diagramUri = diagram.eResource().getURI();
 		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(Activator.NETWORK_SUFFIX);
 
+
 		final Network network;
 		if (linkedBo == null || !(linkedBo instanceof Network)) {
-			if (ResourcesPlugin.getWorkspace().getRoot().exists(new Path(xdfUri.toPlatformString(true)))) {
+			if (root.exists(new Path(xdfUri.toPlatformString(true)))) {
 				network = (Network) resourceSet.getResource(xdfUri, true).getContents().get(0);
 				link(diagram, network);
 			} else {
@@ -136,7 +138,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 				// corresponding xdf. The Move/Rename participant should take
 				// care of that.
 
-				final Resource res = resourceSet.createResource(xdfUri);
+				final Resource res = editingDomain.createResource(xdfUri.toString());
+				// final Resource res = resourceSet.createResource(xdfUri);
 				res.getContents().add(EcoreUtil.copy(network));
 				hasDoneChanges = true;
 			}
@@ -167,7 +170,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 		final Network network;
 		try {
-			network = XdfUtil.createNetworkResource(xdfUri);
+			network = XdfUtil.createNetworkResource(getDiagramBehavior().getEditingDomain().getResourceSet(), xdfUri);
 		} catch (IOException e) {
 			OrccLogger.severeln("Unable to create the network resource " + xdfUri);
 			return false;

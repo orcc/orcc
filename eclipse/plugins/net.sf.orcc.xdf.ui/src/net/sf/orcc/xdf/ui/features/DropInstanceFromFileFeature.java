@@ -39,7 +39,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
@@ -58,11 +57,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
  */
 public class DropInstanceFromFileFeature extends AbstractAddFeature {
 
-	final private ResourceSet resourceSet;
-
 	public DropInstanceFromFileFeature(IFeatureProvider fp) {
 		super(fp);
-		resourceSet = XdfUtil.getCommonResourceSet();
 	}
 
 	@Override
@@ -86,7 +82,7 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		}
 
 		final URI uri = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
-		final Resource resource = resourceSet.getResource(uri, true);
+		final Resource resource = getDiagramBehavior().getEditingDomain().getResourceSet().getResource(uri, true);
 		// Sometimes, XdfParser fails for some reasons
 		if (resource.getContents() == null) {
 			MessageDialog.openWarning(XdfUtil.getDefaultShell(), "Warning", "This file has some errors. You can't use it here.");

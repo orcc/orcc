@@ -62,25 +62,44 @@ public class XdfUtil {
 
 	private static ResourceSet resourceSet = new ResourceSetImpl();
 
-	public static ResourceSet getCommonResourceSet() {
-		return resourceSet;
-	}
-
 	public static Shell getDefaultShell() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
 		return window.getShell();
 	}
 
-	public static IProject getProject(EObject object) {
-
+	public static IProject getProject(final EObject object) {
 		String path = object.eResource().getURI().toPlatformString(true);
 		return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path))
 				.getProject();
 	}
 
-	public static Network createNetworkResource(URI uri) throws IOException {
+	/**
+	 * Create a resource from the given URI and append a new Network instance to
+	 * its contents. The default internal resourceSet is used.
+	 * 
+	 * @param uri
+	 * @return
+	 * @throws IOException
+	 * @see {@link #createNetworkResource(ResourceSet, URI)}
+	 */
+	public static Network createNetworkResource(final URI uri) throws IOException {
+		return createNetworkResource(resourceSet, uri);
+	}
 
+	/**
+	 * Create a resource from the given URI and append a new Network instance to
+	 * its contents. The resourceSet used must be authorized to write on the
+	 * disk. This means that the default EditingDomain's resourceSet must be
+	 * used in a write transaction (for example). If it is not possible, do not
+	 * provide a resourceSet, the default one will be used.
+	 * 
+	 * @param resourceSet
+	 * @param uri
+	 * @return The created network
+	 * @throws IOException
+	 */
+	public static Network createNetworkResource(final ResourceSet resourceSet, final URI uri) throws IOException {
 		// Compute the new network name
 		final String name = uri.trimFileExtension().lastSegment();
 
@@ -91,12 +110,38 @@ public class XdfUtil {
 		// Create the resource
 		Resource res = resourceSet.createResource(uri);
 		res.getContents().add(network);
+		res.setTrackingModification(true);
 		res.save(Collections.EMPTY_MAP);
 
 		return network;
 	}
 
-	public static Diagram createDiagramResource(URI uri) throws IOException {
+	/**
+	 * Create a resource from the given URI and append a new Diagram instance to
+	 * its contents. The default internal resourceSet is used.
+	 * 
+	 * @param uri
+	 * @return
+	 * @throws IOException
+	 * @see {@link #createDiagramResource(ResourceSet, URI)}
+	 */
+	public static Diagram createDiagramResource(final URI uri) throws IOException {
+		return createDiagramResource(resourceSet, uri);
+	}
+
+	/**
+	 * Create a resource from the given URI and append a new Diagram instance to
+	 * its contents. The resourceSet used must be authorized to write on the
+	 * disk. This means that the default EditingDomain's resourceSet must be
+	 * used in a write transaction (for example). If it is not possible, do not
+	 * provide a resourceSet, the default one will be used.
+	 * 
+	 * @param resourceSet
+	 * @param uri
+	 * @return The Diagram created
+	 * @throws IOException
+	 */
+	public static Diagram createDiagramResource(final ResourceSet resourceSet, final URI uri) throws IOException {
 		// Compute the new diagram name
 		final String name = uri.trimFileExtension().lastSegment();
 
@@ -106,11 +151,11 @@ public class XdfUtil {
 		// Create the resource
 		Resource res = resourceSet.createResource(uri);
 		res.getContents().add(diagram);
+		res.setTrackingModification(true);
 		res.save(Collections.EMPTY_MAP);
 
 		return diagram;
 	}
-
 
 	/**
 	 * Returns the minimal width needed to display the value of given Text with
