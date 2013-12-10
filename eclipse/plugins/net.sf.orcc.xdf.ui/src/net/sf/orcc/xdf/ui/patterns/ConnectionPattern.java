@@ -33,6 +33,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 
@@ -62,7 +63,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 /**
  * Implements a visible connection between 2 ports.
  * 
- * Each connection link an input and an output port. A port can be represented
+ * Each connection links an input and an output port. A port can be represented
  * by an Input or an Output port directly contained in the network, or a port in
  * an Instance. In the second case, the real port is a port contained in an
  * Actor or in a Network, depending on how the instance has been refined.
@@ -72,47 +73,78 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 public class ConnectionPattern extends AbstractConnectionPattern {
 
-	private enum Direction {
+	private enum PortKind {
 		INPUT, OUTPUT
 	}
 
-	private enum PortType {
-		NETWORK_PORT, INSTANCE_PORT
+	private enum PortContainer {
+		NETWORK, INSTANCE
+	}
+
+	private enum ConnectionSide {
+		SOURCE, TARGET
 	}
 
 	/**
 	 * Define a simple utility class to encapsulate all information about a
-	 * source or a target port.
+	 * source or a target port. It is used to check validity of a connection,
+	 * and to create the Connection instance to add in the Network.
 	 * 
 	 * @author Antoine Lorence
 	 */
 	public class PortInformation {
 		private final Vertex vertex;
 		private final Port port;
-		private final Direction direction;
-		private final PortType type;
+		private final PortKind kind;
+		private final PortContainer container;
 
-		public PortInformation(Vertex vertex, Port port, Direction direction, PortType type) {
+		public PortInformation(Vertex vertex, Port port, PortKind direction, PortContainer type) {
 			this.vertex = vertex;
 			this.port = port;
-			this.direction = direction;
-			this.type = type;
+			this.kind = direction;
+			this.container = type;
 		}
 
+		/**
+		 * Return the vertex associated to the port. For an Instance port, it is
+		 * the instance. For the current Network port, it is the port itself
+		 * 
+		 * @return
+		 */
 		public Vertex getVertex() {
 			return vertex;
 		}
 
+		/**
+		 * If the vertex is an instance, returns the Port of the refinement
+		 * (actor or network) of this instance. In case of a port in the current
+		 * Network, this method returns null.
+		 * 
+		 * @return
+		 */
 		public Port getPort() {
 			return port;
 		}
 
-		public Direction getDirection() {
-			return direction;
+		/**
+		 * Returns the port side (input or output)
+		 * 
+		 * @return
+		 */
+		public PortKind getKind() {
+			return kind;
 		}
 
-		public PortType getType() {
-			return type;
+		public PortContainer getContainer() {
+			return container;
+		}
+
+		public ConnectionSide getConnectionSide() {
+			if (container.equals(PortContainer.NETWORK)) {
+				return kind == PortKind.INPUT ? ConnectionSide.SOURCE : ConnectionSide.TARGET;
+			} else {
+				return kind == PortKind.INPUT ? ConnectionSide.TARGET : ConnectionSide.SOURCE;
+			}
 		}
 	}
 
@@ -128,11 +160,18 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 	@Override
 	public boolean canStartConnection(ICreateConnectionContext context) {
-		final PortInformation src = getPortInformations(context.getSourceAnchor());
+		final Anchor anchor = context.getSourceAnchor();
+		final PortInformation src = getPortInformations(anchor);
 		if (src == null) {
 			return false;
 		}
-		return context.getSourceAnchor() != null;
+
+		if (src.getConnectionSide() == ConnectionSide.TARGET) {
+			if (anchor.getIncomingConnections().size() > 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -149,61 +188,49 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		}
 
 		// Disallow connection between 2 network ports
-		if (src.getType() == PortType.NETWORK_PORT && trgt.getType() == PortType.NETWORK_PORT) {
+		if (src.getContainer() == PortContainer.NETWORK && trgt.getContainer() == PortContainer.NETWORK) {
 			return false;
 		}
 
-		// Connection between instance ports are checked specifically
-		if (src.getType() == PortType.INSTANCE_PORT && trgt.getType() == PortType.INSTANCE_PORT) {
-
-			// User tries to connect 2 ports from the same instance
-			if (context.getSourcePictogramElement().eContainer() == context.getTargetPictogramElement().eContainer()) {
-				return false;
-			}
-
-			// User tries to connect incompatible ports directions
-			if (src.getDirection() == trgt.getDirection()) {
-				return false;
-			}
+		// Check incompatible connections source/target
+		if (src.getConnectionSide() == trgt.getConnectionSide()) {
+			return false;
 		}
 
-		// net IN -> inst IN = OK
-		// net IN -> inst OUT = NOK
-		// net OUT -> inst OUT = OK
-		// net OUT -> inst IN = NOK
-		// etc.
-		if (src.getType() != trgt.getType()) {
-			if (src.getDirection() != trgt.getDirection()) {
+		// Check (for the target) if no connection is already targeting this
+		// port
+		if (src.getConnectionSide() == ConnectionSide.TARGET) {
+			if (context.getSourceAnchor().getIncomingConnections().size() > 0) {
 				return false;
 			}
+		} else if (trgt.getConnectionSide() == ConnectionSide.TARGET) {
+			if (context.getTargetAnchor().getIncomingConnections().size() > 0) {
+				return false;
+			}
+		} else {
+			OrccLogger.warnln("Oops, unknown error appear in ConnectionPattern. A connection cannot be created "
+					+ "between 2 sources or an bug may be fixed in the source code.");
+			return false;
 		}
 
-		// TODO: Check if an input port has not already a connection connected
-		// to it.
-		return context.getSourceAnchor() != null && context.getTargetAnchor() != null;
+		return true;
 	}
 
 	@Override
 	public Connection create(ICreateConnectionContext context) {
-		// In some case, connection source and target need to be exchanged, to
-		// avoid arrow on the wrong side of the connection shape
-		PortInformation src = getPortInformations(context.getSourceAnchor());
-		boolean needInverseSourceTarget = false;
-		if (src.getType() == PortType.NETWORK_PORT && src.getDirection() == Direction.OUTPUT) {
-			needInverseSourceTarget = true;
-		} else if (src.getType() == PortType.INSTANCE_PORT && src.getDirection() == Direction.INPUT) {
-			needInverseSourceTarget = true;
-		}
 
-		// Create connection context
+		PortInformation src = getPortInformations(context.getSourceAnchor());
 		final AddConnectionContext addContext;
-		if (needInverseSourceTarget) {
+		// Create connection context. In some case, connection source and target
+		// need to be exchanged, to avoid arrow on the wrong side of the
+		// connection shape
+		if (src.getConnectionSide() != ConnectionSide.SOURCE) {
 			addContext = new AddConnectionContext(context.getTargetAnchor(), context.getSourceAnchor());
+			src = getPortInformations(context.getTargetAnchor());
 		} else {
 			addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());
 		}
 
-		src = getPortInformations(addContext.getSourceAnchor());
 		final PortInformation tgt = getPortInformations(addContext.getTargetAnchor());
 		// Create new business object
 		final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection(src.getVertex(),
@@ -212,7 +239,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		network.getConnections().add(dfConnection);
 
 		addContext.setNewObject(dfConnection);
-		Connection newConnection = (Connection) getFeatureProvider().addIfPossible(addContext);
+		final Connection newConnection = (Connection) getFeatureProvider().addIfPossible(addContext);
 
 		return newConnection;
 	}
@@ -287,10 +314,10 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 			final FixPointAnchor brAnchor = (FixPointAnchor) anchor;
 			final Port port = (Port) getBusinessObjectForPictogramElement(brAnchor);
-			final Direction direction = ShapePropertiesManager.isInput(brAnchor) ? Direction.INPUT : Direction.OUTPUT;
+			final PortKind kind = ShapePropertiesManager.isInput(brAnchor) ? PortKind.INPUT : PortKind.OUTPUT;
 			final Instance parentInstance = (Instance) getBusinessObjectForPictogramElement(brAnchor.getParent());
 
-			return new PortInformation(parentInstance, port, direction, PortType.INSTANCE_PORT);
+			return new PortInformation(parentInstance, port, kind, PortContainer.INSTANCE);
 
 		} else if (anchor instanceof ChopboxAnchor) {
 			// Network port
@@ -302,11 +329,11 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			final IPattern ipattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
 					.getPatternForPictogramElement(anchor.getParent());
 
-			// Check the type of this pattern to know the direction of the port
-			final Direction direction = ipattern instanceof InputNetworkPortPattern ? Direction.INPUT
-					: Direction.OUTPUT;
+			// Check the type of this pattern to know the kind of the port
+			final PortKind kind = ipattern instanceof InputNetworkPortPattern ? PortKind.INPUT
+					: PortKind.OUTPUT;
 
-			return new PortInformation(port, null, direction, PortType.NETWORK_PORT);
+			return new PortInformation(port, null, kind, PortContainer.NETWORK);
 		}
 
 		// Anchor without port ? Maybe an error here...
