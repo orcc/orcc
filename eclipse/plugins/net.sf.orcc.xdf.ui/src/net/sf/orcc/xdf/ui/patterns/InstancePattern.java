@@ -376,22 +376,22 @@ public class InstancePattern extends AbstractPattern {
 	 */
 	@Override
 	public boolean layout(ILayoutContext context) {
-		final AnchorContainer instanceAc = (AnchorContainer) context.getPictogramElement();
+		final AnchorContainer instanceShape = (AnchorContainer) context.getPictogramElement();
 		final IGaService gaService = Graphiti.getGaService();
 
-		if (!isPatternRoot(instanceAc)) {
+		if (!isPatternRoot(instanceShape)) {
 			return false;
 		}
 
 		// Calculate the current size of the instance rectangle
-		final int instanceW = gaService.calculateSize(instanceAc.getGraphicsAlgorithm(), true).getWidth();
+		final int instanceW = gaService.calculateSize(instanceShape.getGraphicsAlgorithm(), true).getWidth();
 
 		// Update label size and position
-		final Text label = (Text) ShapePropertiesManager.findPcFromIdentifier(instanceAc, LABEL_ID);
+		final Text label = (Text) ShapePropertiesManager.findPcFromIdentifier(instanceShape, LABEL_ID);
 		gaService.setLocationAndSize(label, 0, 0, instanceW, LABEL_HEIGHT);
 
 		// Update separator points
-		final Polyline sep = (Polyline) ShapePropertiesManager.findPcFromIdentifier(instanceAc, SEP_ID);
+		final Polyline sep = (Polyline) ShapePropertiesManager.findPcFromIdentifier(instanceShape, SEP_ID);
 		for (final Point p : sep.getPoints()) {
 			p.setY(LABEL_HEIGHT);
 		}
@@ -401,11 +401,11 @@ public class InstancePattern extends AbstractPattern {
 		// Update ports
 		// ***********************
 		int inIndex = 0, outIndex = 0;
-		for (final Anchor anchor : instanceAc.getAnchors()) {
+		for (final Anchor anchor : instanceShape.getAnchors()) {
 			if (ShapePropertiesManager.isInput(anchor)) {
-				layoutPort((FixPointAnchor) anchor, inIndex++, instanceAc);
+				layoutPort((FixPointAnchor) anchor, inIndex++, instanceShape);
 			} else if (ShapePropertiesManager.isOutput(anchor)) {
-				layoutPort((FixPointAnchor) anchor, outIndex++, instanceAc);
+				layoutPort((FixPointAnchor) anchor, outIndex++, instanceShape);
 			}
 		}
 		return true;
@@ -574,19 +574,30 @@ public class InstancePattern extends AbstractPattern {
 		// The port square, visual representation of the anchor
 		final GraphicsAlgorithm square = anchor.getGraphicsAlgorithm();
 		// referenced port text
-		final GraphicsAlgorithm txt = getTextFromAnchor(anchor);
+		final Text txt = getTextFromAnchor(anchor);
 
 		// Calculate the current size of the instance rectangle
 		final int instanceW = instancePe.getGraphicsAlgorithm().getWidth();
-		final int yScaleFromTop = LABEL_HEIGHT + SEPARATOR;
+		final int yScaleFromTop = LABEL_HEIGHT + SEPARATOR + PORT_MARGIN;
 		final int squareAndMargin = PORT_SIDE_WITH + PORT_MARGIN;
 
-		final int txtW = instanceW - squareAndMargin * 2;
-		final int txtH = 12;
-		final int txtX = squareAndMargin;
-		final int txtY = yScaleFromTop + PORT_MARGIN + index * (squareAndMargin);
+		final int minTxtH = XdfUtil.getTextMinHeight(txt);
+		final int txtH, anchorScale;
+		// Height for text can change if style is updated. We need to
+		// recalculate correct position everytime
+		if (minTxtH > PORT_SIDE_WITH) {
+			txtH = minTxtH;
+			anchorScale = (minTxtH - PORT_SIDE_WITH) / 2 - minTxtH % 2;
+		} else {
+			txtH = PORT_SIDE_WITH;
+			anchorScale = 0;
+		}
 
-		final int anchorY = txtY + PORT_SIDE_WITH / 2;
+		final int txtW = instanceW - squareAndMargin * 2;
+		final int txtX = squareAndMargin;
+		final int txtY = yScaleFromTop + index * (squareAndMargin);
+
+		final int anchorY = txtY + anchorScale + PORT_SIDE_WITH / 2;
 		final int squareY = -PORT_SIDE_WITH / 2;
 
 		int anchorX, squareX;
@@ -645,36 +656,49 @@ public class InstancePattern extends AbstractPattern {
 		}
 
 		final ContainerShape instanceShape = (ContainerShape) pe;
-		int inPorts = 0, outPorts = 0;
+		int nbInPorts = 0, nbOutPorts = 0;
 		// Compute the number of inputs and outputs ports
 		for (final Anchor anchor : instanceShape.getAnchors()) {
 			if (ShapePropertiesManager.isInput(anchor)) {
-				++inPorts;
+				++nbInPorts;
 			} else if (ShapePropertiesManager.isOutput(anchor)) {
-				++outPorts;
+				++nbOutPorts;
 			}
 		}
 
 		// Keep only the max
-		final int maxPorts = Math.max(inPorts, outPorts);
-		if (maxPorts == 0) {
+		final int nbMaxPorts = Math.max(nbInPorts, nbOutPorts);
+		if (nbMaxPorts == 0) {
 			return TOTAL_MIN_HEIGHT;
 		}
 
 		// Calculate the total minimal height needed to display the longest
 		// ports list
+		int portLineHeight = 0;
 		for (final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
 			if (child instanceof Text
 					&& (ShapePropertiesManager.isInput(child) || ShapePropertiesManager.isOutput(child))) {
 				final Text exampleTxt = (Text) child;
-				final int newHeight = LABEL_HEIGHT + SEPARATOR + PORT_MARGIN + maxPorts
-						* (XdfUtil.getTextMinHeight(exampleTxt) + PORT_MARGIN);
 
-				// Return this max height only if it is superior the the generic
-				// minimal height for an instance
-				return Math.max(newHeight, TOTAL_MIN_HEIGHT);
+				final int minTxtH = XdfUtil.getTextMinHeight(exampleTxt);
+				if (minTxtH > PORT_SIDE_WITH) {
+					portLineHeight = minTxtH;
+				} else {
+					portLineHeight = PORT_SIDE_WITH;
+				}
+				break;
 			}
 		}
+
+		if (portLineHeight != 0) {
+			final int totalMinHeight = LABEL_HEIGHT + SEPARATOR + PORT_MARGIN + nbMaxPorts
+					* (portLineHeight + PORT_MARGIN) + PORT_MARGIN;
+
+			// Return this max height only if it is superior the the generic
+			// minimal height for an instance
+			return Math.max(totalMinHeight, TOTAL_MIN_HEIGHT);
+		}
+
 		// Should never happen
 		return TOTAL_MIN_HEIGHT;
 	}
