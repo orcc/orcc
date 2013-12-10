@@ -87,6 +87,15 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 
 		final URI uri = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
 		final Resource resource = resourceSet.getResource(uri, true);
+		// Sometimes, XdfParser fails for some reasons
+		if (resource.getContents() == null) {
+			MessageDialog.openWarning(XdfUtil.getDefaultShell(), "Warning", "This file has some errors. You can't use it here.");
+			return null;
+		} else if (resource.getContents().size() == 0) {
+			MessageDialog.openWarning(XdfUtil.getDefaultShell(), "Warning",
+					"No content found in this file, it is impossible to generate a refined Instance.");
+			return null;
+		}
 		final EObject eobject = resource.getContents().get(0);
 
 		if (eobject instanceof Unit) {
