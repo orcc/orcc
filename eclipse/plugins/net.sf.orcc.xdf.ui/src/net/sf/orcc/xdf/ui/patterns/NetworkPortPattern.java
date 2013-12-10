@@ -202,7 +202,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		// We create the instance in a diagram
 		if (context.getTargetContainer() instanceof Diagram) {
 			// A network is associated to this diagram
-			Object bo = getBusinessObjectForPictogramElement(context.getTargetContainer());
+			final Object bo = getBusinessObjectForPictogramElement(context.getTargetContainer());
 			if (bo instanceof Network) {
 				return true;
 			}
@@ -213,7 +213,9 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	@Override
 	public Object[] create(ICreateContext context) {
 		// Create the Port instance
-		Port newPort = DfFactory.eINSTANCE.createPort();
+		final Port newPort = DfFactory.eINSTANCE.createPort();
+		final int objectCpt = context.getTargetContainer().getChildren().size() + 1;
+		newPort.setName("port_" + objectCpt);
 
 		// Set default type to i32 for the port
 		newPort.setType(IrFactory.eINSTANCE.createTypeInt());

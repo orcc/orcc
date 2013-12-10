@@ -246,7 +246,8 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	public Object[] create(ICreateContext context) {
 		final Instance newInstance = DfFactory.eINSTANCE.createInstance();
-		newInstance.setName("");
+		final int objectCpt = context.getTargetContainer().getChildren().size() + 1;
+		newInstance.setName("instance_" + objectCpt);
 
 		// Request adding the shape to the diagram
 		addGraphicalRepresentation(context, newInstance);
@@ -297,7 +298,7 @@ public class InstancePattern extends AbstractPattern {
 		text.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
 		gaService.setLocationAndSize(text, 0, 0, TOTAL_MIN_WIDTH, LABEL_HEIGHT);
 
-		if (addedDomainObject.getName() != null && !addedDomainObject.getName().isEmpty()) {
+		if (addedDomainObject.getName() != null) {
 			text.setValue(addedDomainObject.getName());
 		}
 

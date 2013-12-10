@@ -100,7 +100,8 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		}
 
 		final Instance instance = DfFactory.eINSTANCE.createInstance();
-		instance.setName("");
+		final int objectCpt = context.getTargetContainer().getChildren().size() + 1;
+		instance.setName("instance_" + objectCpt);
 		instance.setEntity(eobject);
 
 		final AddContext addInstanceContext = new AddContext(context, instance);
