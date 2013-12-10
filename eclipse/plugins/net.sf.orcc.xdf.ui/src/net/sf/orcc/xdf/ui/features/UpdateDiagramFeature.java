@@ -139,7 +139,6 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 				// care of that.
 
 				final Resource res = editingDomain.createResource(xdfUri.toString());
-				// final Resource res = resourceSet.createResource(xdfUri);
 				res.getContents().add(EcoreUtil.copy(network));
 				hasDoneChanges = true;
 			}
