@@ -185,7 +185,7 @@ public class CBackend extends AbstractBackend {
 		Vectorizable.setVectorizableAttributs(actor);
 
 		new DfVisitor<CfgNode>(new ControlFlowAnalyzer()).doSwitch(actor);
-		new DfVisitor<java.lang.Void>(new ConstantRegisterCleaner()).doSwitch(actor);
+		new DfVisitor<Void>(new ConstantRegisterCleaner()).doSwitch(actor);
 		new DfVisitor<CfgNode>(new ControlFlowAnalyzer()).doSwitch(actor);
 		new BlockForAdder().doSwitch(actor);
 		TestGeCosTransform.exec(actor);

@@ -224,23 +224,24 @@ public class TestGeCosTransform {
 				OrccLogger.traceln("Actor has more than one action");
 			}
 			Attribute att = actor.getAttribute("gecos");
-			ExprList val = (ExprList)att.getContainedValue();
+			List<Attribute> val = att.getAttributes();
 			int numActors = 3;
 			int tileSize = 4;
-			if ( val.get(0).isExprList() ) {
-				ExprList list = (ExprList)val.get(0);
-				if ( list.get(1).isExprString() ) {
-					ExprString str = (ExprString)list.get(1);
-					tileSize = Integer.parseInt(str.getValue());
-				}
+			if ( val.get(0).getName().compareTo("tile") == 0 ) {
+				String str = val.get(0).getStringValue();
+				tileSize = Integer.parseInt(str);
 			}
-			if ( val.get(1).isExprList() ) {
+			if ( val.get(1).getName().compareTo("actors") == 0 ) {
+				String str = val.get(1).getStringValue();
+				numActors = Integer.parseInt(str);
+			}
+			/*if ( val.get(1).isExprList() ) {
 				ExprList list = (ExprList)val.get(1);
 				if ( list.get(1).isExprString() ) {
 					ExprString str = (ExprString)list.get(1);
 					numActors = Integer.parseInt(str.getValue());
 				}
-			}
+			}*/
 			String actorName = actor.getName();
 			
 			Action action = actor.getActions().get(0);
