@@ -33,13 +33,9 @@ import net.sf.orcc.xdf.ui.dialogs.EntitySelectionDialog;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -78,13 +74,6 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 	}
 
 	@Override
-	public boolean isAvailable(IContext context) {
-		// TODO Check cases for isAvailable/canExecute when ports
-		// will be available in the diagram
-		return super.isAvailable(context);
-	}
-
-	@Override
 	public boolean canExecute(final ICustomContext context) {
 
 		PictogramElement[] pes = context.getPictogramElements();
@@ -92,7 +81,7 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 			return false;
 		}
 
-		PictogramElement pe = pes[0];
+		final PictogramElement pe = pes[0];
 		if (getBusinessObjectForPictogramElement(pe) instanceof Instance) {
 			return true;
 		}
@@ -106,18 +95,11 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 	@Override
 	public void execute(final ICustomContext context) {
 
-		Instance instance = (Instance) getBusinessObjectForPictogramElement(context
-				.getPictogramElements()[0]);
+		final Instance instance = (Instance) getBusinessObjectForPictogramElement(context.getPictogramElements()[0]);
 
-		String path = instance.eResource().getURI().toPlatformString(true);
-		IProject project = ResourcesPlugin.getWorkspace().getRoot()
-				.getFile(new Path(path)).getProject();
-
-		EntitySelectionDialog entityDialog;
-
+		final EntitySelectionDialog entityDialog;
 		try {
-			entityDialog = new EntitySelectionDialog(XdfUtil.getDefaultShell(),
-					project);
+			entityDialog = new EntitySelectionDialog(XdfUtil.getDefaultShell(), XdfUtil.getProject(instance));
 		} catch (CoreException e) {
 			e.printStackTrace();
 			return;
@@ -132,8 +114,7 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 		// Allow blank pattern corresponding to '*'
 		entityDialog.setInitialPattern("**");
 
-		int returnCode = entityDialog.open();
-
+		final int returnCode = entityDialog.open();
 		if (returnCode == Dialog.CANCEL) {
 			hasDoneChanges = false;
 			return;
