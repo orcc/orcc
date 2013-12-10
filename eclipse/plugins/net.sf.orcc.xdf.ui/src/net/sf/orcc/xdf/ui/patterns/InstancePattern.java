@@ -113,7 +113,7 @@ public class InstancePattern extends AbstractPattern {
 	private static final String PORT_TEXT_ID = "INSTANCE_PORT_TEXT";
 	private static final String PORT_NAME_KEY = "REF_PORT_NAME";
 
-	private static final String REFINEMENT_KEY = "refinment";
+	private static final String REFINEMENT_KEY = "refinement";
 
 	private enum Direction {
 		INPUTS, OUTPUTS
@@ -321,7 +321,7 @@ public class InstancePattern extends AbstractPattern {
 		link(topLevelShape, addedDomainObject);
 
 		if (addedDomainObject.getEntity() != null) {
-			setInstanceRefinment(topLevelShape, addedDomainObject.getEntity());
+			setInstanceRefinement(topLevelShape, addedDomainObject.getEntity());
 		}
 
 		return topLevelShape;
@@ -463,7 +463,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @param instanceShape
 	 * @param entity
 	 */
-	public void setInstanceRefinment(final ContainerShape instanceShape, final EObject entity) {
+	public void setInstanceRefinement(final ContainerShape instanceShape, final EObject entity) {
 		if (!isPatternRoot(instanceShape)) {
 			return;
 		}
@@ -491,14 +491,6 @@ public class InstancePattern extends AbstractPattern {
 			// EcoreUtil.delete(anchor.getReferencedGraphicsAlgorithm(), true);
 			EcoreUtil.delete(anchor, true);
 		}
-		// final List<Shape> children = new
-		// ArrayList<Shape>(instanceShape.getChildren());
-		// for (Shape child : children) {
-		// if (ShapePropertiesManager.isInput(child) ||
-		// ShapePropertiesManager.isOutput(child)) {
-		// EcoreUtil.delete(child, true);
-		// }
-		// }
 
 		// Add ports
 		if (instance.isActor()) {
@@ -522,8 +514,9 @@ public class InstancePattern extends AbstractPattern {
 	 * layout method. layout() is called explicitly or implicitly from some
 	 * methods.
 	 * 
-	 * setInstanceRefinment() execute this method and apply a resize just after.
-	 * The layout() method is called from resizeShape() method.
+	 * {@link #setInstanceRefinement(ContainerShape, EObject)} executes this
+	 * method and apply a resize just after. The layout() method is called from
+	 * resizeShape() method.
 	 * 
 	 * @param instanceShape
 	 *            The instance shape

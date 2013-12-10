@@ -48,7 +48,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
  * This special feature allow user to drag a file from the project explorer and
- * drop it directly in the diagram. An instance is created with a refinment
+ * drop it directly in the diagram. An instance is created with a refinement
  * corresponding to the dropped entity. The user is automatically prompted for a
  * name to give to the instance newly created.
  * 

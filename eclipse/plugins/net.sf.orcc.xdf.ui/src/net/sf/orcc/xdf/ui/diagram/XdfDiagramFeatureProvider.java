@@ -30,7 +30,7 @@ package net.sf.orcc.xdf.ui.diagram;
 
 import net.sf.orcc.xdf.ui.features.DropInstanceFromFileFeature;
 import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
-import net.sf.orcc.xdf.ui.features.UpdateRefinmentFeature;
+import net.sf.orcc.xdf.ui.features.UpdateRefinementFeature;
 import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.layout.PolylineAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
@@ -74,7 +74,7 @@ public class XdfDiagramFeatureProvider extends
 	
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new UpdateRefinmentFeature(this), new OrthogonalAutoLayoutFeature(this),
+		return new ICustomFeature[] { new UpdateRefinementFeature(this), new OrthogonalAutoLayoutFeature(this),
 				new PolylineAutoLayoutFeature(this) };
 	}
 

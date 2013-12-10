@@ -57,19 +57,19 @@ import org.eclipse.jface.dialogs.Dialog;
  * @author Antoine Lorence
  * 
  */
-public class UpdateRefinmentFeature extends AbstractCustomFeature {
+public class UpdateRefinementFeature extends AbstractCustomFeature {
 
 	private final IPeService peService;
 	private boolean hasDoneChanges = false;
 
-	public UpdateRefinmentFeature(final IFeatureProvider fp) {
+	public UpdateRefinementFeature(final IFeatureProvider fp) {
 		super(fp);
 		peService = Graphiti.getPeService();
 	}
 
 	@Override
 	public String getName() {
-		return "Set/Update refinment";
+		return "Set/Update refinement";
 	}
 
 	@Override
@@ -160,7 +160,7 @@ public class UpdateRefinmentFeature extends AbstractCustomFeature {
 		final InstancePattern pattern = (InstancePattern) ipattern;
 
 		// Set refinement on selected instance
-		pattern.setInstanceRefinment(instanceShape, (EObject) entityDialog.getFirstResult());
+		pattern.setInstanceRefinement(instanceShape, (EObject) entityDialog.getFirstResult());
 		// Inform editor that changes has been done in the model
 		hasDoneChanges = true;
 	}
