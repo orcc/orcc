@@ -80,11 +80,22 @@ public class VariableGraph extends DfVisitor<Void> {
 
 	private Set<Var> varsFromNativeProcedures = new HashSet<Var>();
 	
+	private Map<Var, Set<Var>> tcCache = new HashMap<Var, Set<Var>>();
 
+	private Map<Var, Set<Var>> tcCacheNoIf = new HashMap<Var, Set<Var>>();
+	
+	private Set<Var> reachableSchedVarsCache = null;
+	
 	public VariableGraph(Actor actor) {
 		this.irVisitor = new InnerIrVisitor();
 		this.actor = actor;
 		doSwitch(actor);
+	}
+	
+	public void clearCaches() {
+		tcCache.clear();
+		tcCacheNoIf.clear();
+		reachableSchedVarsCache=null;
 	}
 
 	/*
@@ -159,13 +170,17 @@ public class VariableGraph extends DfVisitor<Void> {
 
 	public void getTransitiveClosure(Var variable, Set<Var> transitiveClosure, boolean includeIfConditions) {
 		Map<Var, Set<Var>> varDep = includeIfConditions ? variableDependency : variableDependencyNoIf;
-		if (varDep.containsKey(variable)) {
+		Map<Var, Set<Var>> cache = includeIfConditions ? tcCache : tcCacheNoIf;
+		if (cache.containsKey(variable)) {
+			transitiveClosure.addAll(cache.get(variable));
+		} else if (varDep.containsKey(variable)) {
 			for (Var v : varDep.get(variable)) {
 				if (!transitiveClosure.contains(v)) {
 					transitiveClosure.add(v);
 					getTransitiveClosure(v, transitiveClosure, includeIfConditions);
 				}
 			}
+			cache.put(variable, new HashSet<Var>(transitiveClosure));
 		}
 	}
 	
@@ -191,12 +206,16 @@ public class VariableGraph extends DfVisitor<Void> {
 	}
 
 	public Set<Var> getAllReacableSchedulingVars() {
+		if (reachableSchedVarsCache!=null) {
+			return reachableSchedVarsCache;
+		}
 		Set<Var> variables = new HashSet<Var>(localSchedulingVars);
 		for (Var v : localSchedulingVars) {
 			Set<Var> tc = new HashSet<Var>();
 			getTransitiveClosure(v, tc, true);
 			variables.addAll(tc);
 		}
+		reachableSchedVarsCache=variables;
 		return variables;
 	}
 	
