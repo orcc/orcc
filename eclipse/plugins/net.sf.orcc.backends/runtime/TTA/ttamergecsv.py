@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2013, INSA
+# Copyright (c) 2013, INSA Rennes
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -12,7 +12,7 @@
 #   * Redistributions in binary form must reproduce the above copyright notice,
 #     this list of conditions and the following disclaimer in the documentation
 #     and/or other materials provided with the distribution.
-#   * Neither the name of IRISA nor the names of its
+#   * Neither the name of INSA Rennes nor the names of its
 #     contributors may be used to endorse or promote products derived from this
 #     software without specific prior written permission.
 #
@@ -30,45 +30,12 @@
 #
 # @author Alexandre Sanchez
 
+from ttalogs import TtaMergeCsv
 import argparse
-import os
-import glob
-import subprocess
 
-def mergeCSVFiles(file1,file2):
-    destination = ".ttamerge_"+os.path.basename(file2)
-    fs1 = open(file1, 'r')
-    fs2 = open(file2, 'r')
-    fd = open(destination, 'w')
-    while 1:
-        txt1 = fs1.readline().rstrip('\n\r')
-        fistcol, sep, txt2 = fs2.readline().partition(';')
-        fd.write(txt1+";"+txt2)
-        if txt1 =='':
-            break
-    fs1.close()
-    fs2.close()
-    fd.close()
-    return destination
-
-def mergeAllCSVFiles(files):
-    print "*********************************************************************"
-    print "* Merge TTA logs CSV"
-    print "*********************************************************************"
-    fileBase = files[0].name
-    del files[0]
-    print "Merging " + fileBase,
-
-    for fs in files:
-        print "\n===> with " + fs.name
-        fileBase = mergeCSVFiles(fileBase,fs.name)
-
-    os.rename(fileBase, "tta_merge.csv")
-    for tmpfile in glob.glob('.ttamerge*.csv') :
-        os.remove( tmpfile ) 
-
+# Main
 parser = argparse.ArgumentParser()
-parser.add_argument('log_files', metavar='file', type=file, nargs='+',
+parser.add_argument('log_files', metavar='file', nargs='+',
     help='at least 2 csv files containing summary logs from ttaextractlog')
 args = parser.parse_args()
 
@@ -76,4 +43,6 @@ if len(args.log_files) <2:
     print ("! Error : At least 2 files must be given to process a merge")
     exit(1)
 
-mergeAllCSVFiles(args.log_files)
+# Begin
+ttam = TtaMergeCsv()
+ttam.mergeAllFiles(args.log_files)

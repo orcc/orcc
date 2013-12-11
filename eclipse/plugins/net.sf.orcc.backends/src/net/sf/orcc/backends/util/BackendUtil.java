@@ -91,34 +91,4 @@ public class BackendUtil {
 		}
 		return result;
 	}
-
-	/**
-	 * Compares version strings.
-	 * 
-	 * @return result of comparison, as integer : a negative value if left <
-	 *         right, a positive one if left > right or 0 if left == right
-	 */
-	public static int compareVersions(int[] left, int[] right) {
-		if (left == null) {
-			return -1;
-		}
-
-		int result = Integer.valueOf(left[0]).compareTo(right[0]);
-		if (result != 0) {
-			return result;
-		}
-
-		result = Integer.valueOf(left[1]).compareTo(right[1]);
-		if (result != 0) {
-			return result;
-		}
-
-		result = Integer.valueOf(left[2]).compareTo(right[2]);
-		if (result != 0) {
-			return result;
-		}
-
-		return Integer.valueOf(left[3]).compareTo(right[3]);
-	}
-
 }

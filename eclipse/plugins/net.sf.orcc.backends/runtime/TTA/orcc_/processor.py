@@ -129,9 +129,9 @@ class Processor:
             retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
         if retcode == 0: 
-            retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-f", "mif", "-o", "mif", self._adfFile])
+            retcode = subprocess.call(["generatebits", "-c", "MoveSlotDictionary.so", "-u", "ensure_programmability=yes", "-g", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-f", "mif", "-o", "mif", self._adfFile])
         if retcode == 0 and not targetAltera: 
-            retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])                
+            retcode = subprocess.call(["generatebits", "-c", "MoveSlotDictionary.so", "-u", "ensure_programmability=yes", "-g", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])                
 
         # Generate processor files
         self.irom = self._readMif(self.id + ".mif")
@@ -175,7 +175,11 @@ class Processor:
         else:
             os.remove(self.id + ".mif")
             os.remove(self.id + "_data.mif")
-        shutil.move("imem_mau_pkg.vhdl", vhdlPath)    
+        shutil.move(self.id + "_tl_imem_mau_pkg.vhdl", vhdlPath)
+
+        # Replace the standard idecompressor by the one using InstructionDictionary
+        os.remove(os.path.join(ttaPath, "gcu_ic", "idecompressor.vhdl"))
+        shutil.move("idecompressor.vhdl", os.path.join(ttaPath, "gcu_ic"))
 
         # Clean working directory
         os.remove(self._bemFile)

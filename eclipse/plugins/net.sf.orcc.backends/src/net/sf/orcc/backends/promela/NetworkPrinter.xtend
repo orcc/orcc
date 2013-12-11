@@ -31,9 +31,9 @@ package net.sf.orcc.backends.promela
 import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.df.Actor
 
 /**
  * Compile top Network c source code 
@@ -68,6 +68,11 @@ class NetworkPrinter extends PromelaTemplate {
 		#define uint int
 		#define SIZE 1
 		
+		// FIFO sizes
+		«FOR connection : network.connections»
+			«connection.setSizesFifo»
+		«ENDFOR»
+
 		// FIFO allocation
 		«FOR connection : network.connections»
 			«connection.allocateFifo»
@@ -78,41 +83,71 @@ class NetworkPrinter extends PromelaTemplate {
 			«connection.assignFifo»
 		«ENDFOR»
 		
+		int promela_prog_initiated=0;
+		
+		int promela_has_progress=0;
+		
 		// Include the actors
-		«FOR instance : network.children.filter(typeof(Instance))»
-			#include "«instance.simpleName».pml"
+		«FOR actor : network.children.filter(typeof(Actor))»
+			#include "«actor.simpleName».pml"
 		«ENDFOR»
+		
+		proctype dummy() {
+		chan_0?promela_prog_initiated;}
 		
 		init {
 			/*Inputs here*/
+			#ifdef MANAGED
+			#include "tmp_state.pml"
+			#endif
+			promela_prog_initiated=1;
 		
 			/*Start processes*/
 			atomic{
-				«FOR instance : network.children.filter(typeof(Instance))»
-					run «instance.simpleName»(/*init_state*/);
+				#ifdef MANAGED
+				#include "tmp_start_actors.pml"
+				#else
+				«FOR actor : network.children.filter(typeof(Actor))»
+					run «actor.simpleName»();
 				«ENDFOR»
+				#endif
 			}	
 		}
+		#ifdef MANAGED
+		#include "tmp_ltl_expr.pml"
+		#endif
 	'''
 
-	def allocateFifo(Connection connection) { 
-		val size = if (connection.size != null) connection.size
+	def setSizesFifo(Connection connection) { 
+		val size = if (connection.sourcePort==null || connection.targetPort==null) 1000
+					else if (connection.size != null) connection.size
 					else "SIZE"
 		'''
 			«IF connection.sourcePort != null»
-				chan chan_«connection.<Object>getValueAsObject("id")» = [«size»] of {«connection.sourcePort.type.doSwitch»};
+			#define chan_«(connection.source as Actor).simpleName»_«connection.sourcePort.name»_SIZE «size»
+			«ENDIF»
+			«IF connection.targetPort != null»
+			#define chan_«(connection.target as Actor).simpleName»_«connection.targetPort.name»_SIZE «size»
+			«ENDIF»
+		'''
+	}
+
+	def allocateFifo(Connection connection) { 
+		'''
+			«IF connection.sourcePort != null»
+				chan chan_«connection.<Object>getValueAsObject("id")» = [chan_«(connection.source as Actor).simpleName»_«connection.sourcePort.name»_SIZE] of {«connection.sourcePort.type.doSwitch»};
 			«ELSE»
-				chan chan_«connection.<Object>getValueAsObject("id")» = [«size»] of {«connection.targetPort.type.doSwitch»};
+				chan chan_«connection.<Object>getValueAsObject("id")» = [chan_«(connection.target as Actor).simpleName»_«connection.targetPort.name»_SIZE] of {«connection.targetPort.type.doSwitch»};
 			«ENDIF»
 		'''
 	}
 	
 	def assignFifo(Connection connection) '''
 		«IF connection.sourcePort != null»
-			#define chan_«(connection.source as Instance).simpleName»_«connection.sourcePort.name» chan_«connection.<Object>getValueAsObject("id")»
+			#define chan_«(connection.source as Actor).simpleName»_«connection.sourcePort.name» chan_«connection.<Object>getValueAsObject("id")»
 		«ENDIF»
 		«IF connection.targetPort != null»
-			#define chan_«(connection.target as Instance).simpleName»_«connection.targetPort.name» chan_«connection.<Object>getValueAsObject("id")»
+			#define chan_«(connection.target as Actor).simpleName»_«connection.targetPort.name» chan_«connection.<Object>getValueAsObject("id")»
 		«ENDIF»
 	'''
 }

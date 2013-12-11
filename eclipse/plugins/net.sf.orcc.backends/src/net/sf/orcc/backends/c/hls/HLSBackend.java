@@ -50,15 +50,13 @@ import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transform.RenameTransformation;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -72,7 +70,6 @@ public class HLSBackend extends CBackend {
 	 * Path to target "testBench" folder
 	 */
 	private String VHDLTestBenchPath;
-	private String coSimTestBenchPath;
 	private String commandPath;
 
 	/**
@@ -88,8 +85,7 @@ public class HLSBackend extends CBackend {
 	@Override
 	protected void doInitializeOptions() {
 		srcPath = path + File.separator + "HLSBackend";
-		VHDLTestBenchPath = srcPath + File.separator + "VHDLTestBENCH";
-		coSimTestBenchPath = srcPath + File.separator + "coSimTestBench";
+		VHDLTestBenchPath = srcPath + File.separator + "UnitaryVHDLTestBENCH";
 		commandPath = srcPath + File.separator + "batchCommand";
 	}
 
@@ -125,11 +121,8 @@ public class HLSBackend extends CBackend {
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			if (debug) {
-				ResourceSet set = new ResourceSetImpl();
-				if (!IrUtil.serializeActor(set, srcPath, actor)) {
-					OrccLogger.warnln("Error with " + transformation
-							+ " on actor " + actor.getName());
-				}
+				OrccUtil.validateObject(transformation.toString() + " on "
+						+ actor.getName(), actor);
 			}
 		}
 	}
@@ -212,7 +205,7 @@ public class HLSBackend extends CBackend {
 	protected boolean printInstance(Instance instance) {
 		new InstanceTestBenchPrinter(options)
 				.print(VHDLTestBenchPath, instance);
-		new InstanceCosimPrinter(options).print(coSimTestBenchPath, instance);
+		new InstanceCosimPrinter(options).print(srcPath, instance);
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
 	}
 }

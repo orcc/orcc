@@ -134,7 +134,7 @@ abstract class CTemplate extends CommonPrinter {
 
 	
 	def protected declare(Var variable)
-		'''«variable.type.doSwitch» «variable.indexedName»«variable.type.dimensionsExpr.printArrayIndexes»'''
+		'''«variable.type.doSwitch» «variable.name»«variable.type.dimensionsExpr.printArrayIndexes»'''
 		
 	def protected declare(Procedure proc){
 		val modifier = if(proc.native) "extern" else "static"

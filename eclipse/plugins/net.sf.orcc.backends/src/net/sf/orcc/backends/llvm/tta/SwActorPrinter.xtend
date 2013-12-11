@@ -41,6 +41,9 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.Arg
 import org.eclipse.emf.common.util.EList
 
+import static net.sf.orcc.backends.BackendsConstants.*
+
+
 class SwActorPrinter extends InstancePrinter {
 	
 	Processor processor;
@@ -74,23 +77,12 @@ class SwActorPrinter extends InstancePrinter {
 	
 	override protected printArchitecture() ''''''
 
-	override protected print(Action action) '''
-		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
-		entry:
-			«FOR local : action.scheduler.locals»
-				«local.declare»
-			«ENDFOR»
-			«FOR port : action.peekPattern.ports.notNative»
-				«port.loadVarInput(incomingPortMap.get(port))»
-			«ENDFOR»
-			br label %b«action.scheduler.blocks.head.label»
-		
-		«FOR block : action.scheduler.blocks»
-			«block.doSwitch»
-		«ENDFOR»
-		}
-		
-		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+	override protected printVectorizable(Action action) {
+		isActionVectorizable = action.hasAttribute(VECTORIZABLE)
+		val output = '''
+		«IF isActionVectorizable»
+
+		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionProfile»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
@@ -99,11 +91,11 @@ class SwActorPrinter extends InstancePrinter {
 				«action.outputPattern.getVariable(port).declare»
 			«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
-				«port.loadVarInput(incomingPortMap.get(port))»
+				«port.loadVarInput(incomingPortMap.get(port), action.name)»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
-					«port.loadVarOutput(connection)»
+					«port.loadVarOutput(connection, action.name)»
 				«ENDFOR»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
@@ -113,11 +105,11 @@ class SwActorPrinter extends InstancePrinter {
 		«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
 				«val connection = incomingPortMap.get(port)»
-				«port.updateVarInput(connection, action.inputPattern.numTokensMap.get(port))»
+				«port.updateVarInput(connection, action.inputPattern.numTokensMap.get(port), action.name)»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
-					«port.updateVarOutput(connection, action.outputPattern.getNumTokens(port))»
+					«port.updateVarOutput(connection, action.outputPattern.getNumTokens(port), action.name)»
 				«ENDFOR»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.filter[native]»
@@ -125,6 +117,66 @@ class SwActorPrinter extends InstancePrinter {
 			«ENDFOR»
 			ret void
 		}
+		«ENDIF»	
+		'''
+		isActionVectorizable = false
+		return output
+	}
+
+	override protected print(Action action) '''
+		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
+		entry:
+			«FOR local : action.scheduler.locals»
+				«local.declare»
+			«ENDFOR»
+			«FOR port : action.peekPattern.ports.notNative»
+				«port.loadVarInput(incomingPortMap.get(port), action.name)»
+			«ENDFOR»
+			br label %b«action.scheduler.blocks.head.label»
+		
+		«FOR block : action.scheduler.blocks»
+			«block.doSwitch»
+		«ENDFOR»
+		}
+		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
+
+		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+		entry:
+			«FOR local : action.body.locals»
+				«local.declare»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.filter[native]»
+				«action.outputPattern.getVariable(port).declare»
+			«ENDFOR»
+			«FOR port : action.inputPattern.ports.notNative»
+				«port.loadVarInput(incomingPortMap.get(port), action.name)»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.notNative»
+				«FOR connection : outgoingPortMap.get(port)»
+					«port.loadVarOutput(connection, action.name)»
+				«ENDFOR»
+			«ENDFOR»
+			br label %b«action.body.blocks.head.label»
+		
+		«FOR block : action.body.blocks»
+			«block.doSwitch»
+		«ENDFOR»
+			«FOR port : action.inputPattern.ports.notNative»
+				«val connection = incomingPortMap.get(port)»
+				«port.updateVarInput(connection, action.inputPattern.numTokensMap.get(port), action.name)»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.notNative»
+				«FOR connection : outgoingPortMap.get(port)»
+					«port.updateVarOutput(connection, action.outputPattern.getNumTokens(port), action.name)»
+				«ENDFOR»
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports.filter[native]»
+				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
+			«ENDFOR»
+			ret void
+		}
+		«ENDIF»
+		«action.printVectorizable»
 	'''
 	
 	override caseInstCall(InstCall call) '''
@@ -132,7 +184,7 @@ class SwActorPrinter extends InstancePrinter {
 		«val args = call.arguments»
 		«val parameters = call.procedure.parameters»
 		«IF call.procedure.native»
-			«IF target != null»%«target.variable.indexedName» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
+			«IF target != null»%«target.variable.name» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
 		«ELSE»
 			«super.caseInstCall(call)»
 		«ENDIF»

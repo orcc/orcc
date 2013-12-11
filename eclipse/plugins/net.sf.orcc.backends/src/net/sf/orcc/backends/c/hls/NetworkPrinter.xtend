@@ -50,7 +50,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		val contentVhdlTop = fifoFileContent
 		val contentSimPack = fifoSimPackContent
 		val SimPackFile = new File(targetFolder + File::separator + "sim_package" + ".vhd")
-		val FifoVhdlFile = new File(targetFolder + File::separator + "genericFifo" + ".vhd")
+		val FifoVhdlFile = new File(targetFolder + File::separator + "TopVHDL" + File::separator +"genericFifo" + ".vhd")
 		if(needToWriteFile(contentVhdlTop, FifoVhdlFile)) {
 			OrccUtil::printFile(contentVhdlTop, FifoVhdlFile)
 			OrccUtil::printFile(contentSimPack, SimPackFile)

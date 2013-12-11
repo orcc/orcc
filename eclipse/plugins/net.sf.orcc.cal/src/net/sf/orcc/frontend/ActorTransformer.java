@@ -336,6 +336,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		Frontend.putMapping(astActor, actor);
 
 		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
+		actor.setAttribute("project", Util.getProjectName(astActor));
 
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);

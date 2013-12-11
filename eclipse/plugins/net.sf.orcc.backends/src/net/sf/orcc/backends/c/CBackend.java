@@ -53,8 +53,8 @@ import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Metis;
 import net.sf.orcc.backends.util.Validator;
+import net.sf.orcc.backends.util.Vectorizable;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -71,20 +71,20 @@ import net.sf.orcc.ir.transform.BlockCombine;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.tools.stats.StatisticsPrinter;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -101,7 +101,7 @@ public class CBackend extends AbstractBackend {
 	 * Path to target "src" folder
 	 */
 	protected String srcPath;
-
+	
 	@Override
 	protected void doInitializeOptions() {
 		// Create empty folders
@@ -110,19 +110,20 @@ public class CBackend extends AbstractBackend {
 
 		srcPath = path + File.separator + "src";
 	}
-
+	
 	@Override
 	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
 		replacementMap.put("abs", "abs_my_precious");
 		replacementMap.put("getw", "getw_my_precious");
 		replacementMap.put("index", "index_my_precious");
+		replacementMap.put("log2", "log2_my_precious");
 		replacementMap.put("max", "max_my_precious");
 		replacementMap.put("min", "min_my_precious");
 		replacementMap.put("select", "select_my_precious");
 		replacementMap.put("OUT", "OUT_my_precious");
 		replacementMap.put("IN", "IN_my_precious");
-
+		
 		if (mergeActions) {
 			new ActionMerger().doSwitch(actor);
 		}
@@ -140,7 +141,7 @@ public class CBackend extends AbstractBackend {
 		if (getAttribute(ADDITIONAL_TRANSFOS, false)) {
 			transformations.add(new StoreOnceTransformation());
 			transformations.add(new DfVisitor<Void>(new SSATransformation()));
-			transformations.add(new DfVisitor<Object>(new PhiRemoval()));
+			transformations.add(new DfVisitor<Void>(new PhiRemoval()));
 			transformations.add(new Multi2MonoToken());
 			transformations.add(new DivisionSubstitution());
 			transformations.add(new ParameterImporter());
@@ -167,18 +168,19 @@ public class CBackend extends AbstractBackend {
 
 			transformations.add(new DfVisitor<Expression>(new CastAdder(true,
 					true)));
+			transformations.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 		}
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			if (debug) {
-				ResourceSet set = new ResourceSetImpl();
-				if (!IrUtil.serializeActor(set, srcPath, actor)) {
-					OrccLogger.warnln("Error with " + transformation
-							+ " on actor " + actor.getName());
-				}
+				OrccUtil.validateObject(transformation.toString() + " on "
+						+ actor.getName(), actor);
 			}
 		}
+
+		// update "vectorizable" information
+		Vectorizable.setVectorizableAttributs(actor);
 	}
 
 	protected void doTransformNetwork(Network network) {
@@ -210,7 +212,7 @@ public class CBackend extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
-
+		
 		doTransformNetwork(network);
 
 		if (debug) {
@@ -235,12 +237,6 @@ public class CBackend extends AbstractBackend {
 		printCMake(network);
 		new StatisticsPrinter().print(srcPath, network);
 
-		if (balanceMapping) {
-			// Solve load balancing using Metis. The 'mapping' variable should
-			// be the weightsMap, giving a weight to each actor/instance.
-			mapping = new Metis().partition(network, path, processorNumber,
-					mapping);
-		}
 		if (!getAttribute(GENETIC_ALGORITHM, false)) {
 			new Mapping(network, mapping).print(srcPath);
 		}

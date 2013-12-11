@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.backends.ir.impl;
 
+import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Def;
@@ -369,8 +370,8 @@ public class InstCastImpl extends InstructionImpl implements InstCast {
 	@Override
 	public String toString() {
 		return super.toString() + "Cast("
-				+ target.getVariable().getIndexedName() + ", "
-				+ source.getVariable().getIndexedName() + ")";
+				+ getNameSSA(target.getVariable()) + ", "
+				+ getNameSSA(source.getVariable()) + ")";
 	}
 
 } // InstCastImpl

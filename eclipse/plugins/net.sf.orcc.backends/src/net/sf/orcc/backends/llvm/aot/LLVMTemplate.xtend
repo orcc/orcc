@@ -152,7 +152,7 @@ abstract class LLVMTemplate extends CommonPrinter {
 	}
 	
 	override caseExprVar(ExprVar expr) {
-		(expr as ExprVar).use.variable.print
+		expr.use.variable.print
 	}
 		
 	override caseExprList(ExprList exprList) {
@@ -226,5 +226,5 @@ abstract class LLVMTemplate extends CommonPrinter {
 	}
 	
 	def protected print(Var variable)
-		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.indexedName»'''
+		'''«IF variable.global»@«ELSE»%«ENDIF»«variable.name»'''
 }

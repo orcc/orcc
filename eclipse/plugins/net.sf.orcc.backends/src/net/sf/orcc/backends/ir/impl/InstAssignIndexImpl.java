@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.backends.ir.impl;
 
+import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -361,7 +363,7 @@ public class InstAssignIndexImpl extends InstructionImpl implements
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
 		builder.append("AssignIndex(").append(
-				getTarget().getVariable().getIndexedName());
+				getNameSSA(getTarget().getVariable()));
 		for (Expression index : getIndexes()) {
 			builder.append("[");
 			builder.append(new ExpressionPrinter().doSwitch(index));

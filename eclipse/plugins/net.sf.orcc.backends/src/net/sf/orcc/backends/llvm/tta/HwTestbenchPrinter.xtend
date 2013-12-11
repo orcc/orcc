@@ -278,7 +278,7 @@ class HwTestbenchPrinter extends TTAPrinter {
 	def private getTcl(Processor processor)
 		'''
 		# Compile processor «processor.name»
-		vcom -93 -quiet -work work «processor.name»/tta/vhdl/imem_mau_pkg.vhdl
+		vcom -93 -quiet -work work «processor.name»/tta/vhdl/«processor.name»_tl_imem_mau_pkg.vhdl
 		vcom -93 -quiet -work work «processor.name»/tta/vhdl/«processor.name»_tl_globals_pkg.vhdl
 		vcom -93 -quiet -work work «processor.name»/tta/vhdl/«processor.name»_tl_params_pkg.vhdl
 		vcom -93 -quiet -work work «processor.name»/tta/vhdl/«processor.name»_mem_constants_pkg.vhd

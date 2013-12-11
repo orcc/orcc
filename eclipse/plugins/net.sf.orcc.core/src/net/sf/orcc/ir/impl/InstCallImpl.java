@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.ir.impl;
 
+import static net.sf.orcc.ir.util.IrUtil.getNameSSA;
+
 import java.util.Collection;
 
 import net.sf.orcc.ir.Arg;
@@ -253,11 +255,6 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	}
 
 	@Override
-	public boolean isCall() {
-		return true;
-	}
-
-	@Override
 	public boolean isInstCall() {
 		return true;
 	}
@@ -308,7 +305,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 		builder.append(super.toString());
 		builder.append("Call(");
 		if (getTarget() != null) {
-			builder.append(getTarget().getVariable().getIndexedName()).append(
+			builder.append(getNameSSA(getTarget().getVariable())).append(
 					", ");
 		}
 

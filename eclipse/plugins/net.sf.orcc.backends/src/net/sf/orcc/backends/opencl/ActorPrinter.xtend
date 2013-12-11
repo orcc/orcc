@@ -116,7 +116,7 @@ class ActorPrinter extends BasePrinter {
 		«instance.name»::«instance.name»(DeviceManager deviceManager)
 			:deviceManager(deviceManager)
 		{
-			«FOR v : actor.stateVars.filter(v|v.initialValue != null)»sv_«instance.name».«printArg(v.type, v.indexedName, v.initialValue)»«ENDFOR»
+			«FOR v : actor.stateVars.filter(v|v.initialValue != null)»sv_«instance.name».«printArg(v.type, v.name, v.initialValue)»«ENDFOR»
 		}
 		
 		«instance.name»::~«instance.name»(){
@@ -217,7 +217,7 @@ class ActorPrinter extends BasePrinter {
 	// Expressions
 	
 	override caseExprVar(ExprVar expr){
-		'''«IF expr.use.variable.global»«currentInstance.name».«ENDIF»«expr.use.variable.indexedName»'''
+		'''«IF expr.use.variable.global»«currentInstance.name».«ENDIF»«expr.use.variable.name»'''
 	} 
 	
 	// Procedure
@@ -239,7 +239,7 @@ class ActorPrinter extends BasePrinter {
 	
 	override caseInstLoad(InstLoad inst){ 
 		'''
-		«IF inst.target.variable.global»sv_«currentInstance.name».«ENDIF»«inst.target.variable.indexedName» = «IF inst.source.variable.global»sv_«currentInstance.name».«ENDIF»«inst.source.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR»;
+		«IF inst.target.variable.global»sv_«currentInstance.name».«ENDIF»«inst.target.variable.name» = «IF inst.source.variable.global»sv_«currentInstance.name».«ENDIF»«inst.source.variable.name»«FOR index : inst.indexes»[«index.doSwitch»]«ENDFOR»;
 		''' 
 	}
 	

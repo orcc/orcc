@@ -253,7 +253,7 @@ class HwDesignPrinter extends TTAPrinter {
 		
 	def private declare(Design design)
 		'''
-		«IF(fpga.xilinx)»
+		«IF(fpga.xilinx && !design.sharedMemories.nullOrEmpty)»
 			«val addrWidth = design.sharedMemories.get(0).addrWidth»
 			---------------------------------------------------------------------------
 			-- Components declaration
