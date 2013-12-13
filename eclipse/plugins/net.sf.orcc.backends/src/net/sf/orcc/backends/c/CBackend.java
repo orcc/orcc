@@ -116,6 +116,7 @@ public class CBackend extends AbstractBackend {
 		replacementMap.put("abs", "abs_my_precious");
 		replacementMap.put("getw", "getw_my_precious");
 		replacementMap.put("index", "index_my_precious");
+		replacementMap.put("log2", "log2_my_precious");
 		replacementMap.put("max", "max_my_precious");
 		replacementMap.put("min", "min_my_precious");
 		replacementMap.put("select", "select_my_precious");

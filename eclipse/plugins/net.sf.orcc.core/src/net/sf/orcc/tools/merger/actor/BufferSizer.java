@@ -26,7 +26,7 @@ public class BufferSizer {
 
 	private Map<Connection, Integer> tokens;
 
-	private Network network;
+	protected Network network;
 
 	public BufferSizer(Network network) {
 		this.network = network;
@@ -90,6 +90,11 @@ public class BufferSizer {
 	private Actor locateActionOwner(Action act) {
 		for (Actor actor : network.getAllActors()) {
 			for (Action action : actor.getActions()) {
+				if (act.equals(action)) {
+					return actor;
+				}
+			}
+			for (Action action : actor.getInitializes()) {
 				if (act.equals(action)) {
 					return actor;
 				}

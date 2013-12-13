@@ -114,7 +114,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
-		//System.out.println("\n Sched test Actor:" + actor.getName());
+		System.out.println("\n Sched-test Actor:" + actor.getName());
 		this.actor=actor;
 		this.fsm = actor.getFsm();
 		this.scheduler = new Scheduler(actor, this.fsm);
@@ -169,26 +169,31 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		} else {
 			scheduler.addSchedule(new Schedule());
 		}
-		
+		actorModel.clearCaches();
 		
 		boolean stopChecking;
-		boolean nullGuardFound;
+		boolean rerunNeeded;
+		boolean startFromFresh=true;
 		do {
-			System.out.println("Actor " +actor.getName());
-			if (fsm != null) {
-				scheduler.getSchedules().clear();
-				for (State state : choiceStatesSet) {
-					fsmPathSearch(state);
+			System.out.println("Scheduling Actor " +actor.getName());
+			if (startFromFresh) {
+				if (fsm != null) {
+					scheduler.getSchedules().clear();
+					for (State state : choiceStatesSet) {
+						fsmPathSearch(state);
+					}
+				}
+				if (actor.hasMoC() && actor.getMoC().isDPN()) {
+					// this is time-dependent, stop the show
+					System.out.println("Actor " + actor.getSimpleName() + " is time-dependent, we skip it for now..");
+					scheduler.makeDummyFSM();
+					break;
 				}
 			}
-			if (actor.hasMoC() && actor.getMoC().isDPN()) {
-				// this is time-dependent, stop the show
-				System.out.println("Actor " + actor.getSimpleName() + " is time-dependent, we skip it for now..");
-				scheduler.makeDummyFSM();
-				break;
-			}
+			startFromFresh = true;
 			stopChecking = false;
-			nullGuardFound = false;
+			rerunNeeded = false;
+			
 			scheduler.buildSchedulingCases();
 
 			// Abstract interpretation Start----------------------------------------
@@ -198,7 +203,6 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				PromelaAbstractInterpreter interpreter = new PromelaAbstractInterpreter(actor);
 				ActorState actorstate = new ActorState(interpreter.getActor());
 				for (int index = 0; index < sl.size(); index++) {
-					
 					Schedule schedule = sl.get(index);
 					int nbPhases = 0;
 					try {
@@ -208,22 +212,31 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 						do {
 							interpreter.schedule();
 							Action latest = interpreter.getExecutedAction();
-							if (index==sl.size()-1) {
+							if (index==sl.size()-1 && !schedule.isScheduleDone()) {
 								schedule.getSequence().add(latest);
 							}
 							nbPhases++;
-						} while (((actor.hasFsm() && interpreter.getFsmStateOrig() != schedule.getEndState()) 
+						} while (((actor.hasFsm() && !schedule.getPotentialEndStates().contains(interpreter.getFsmStateOrig())) 
 								|| (!actor.hasFsm() && !actorstate.isInitialState())) 
 								&& nbPhases < MAX_PHASES);
 						if (nbPhases == MAX_PHASES) {
 							scheduler.makeDummyFSM();
 							stopChecking=true;
 						}
+						if (actor.hasFsm()) {
+							if (schedule.getEndState()==null && interpreter.getFsmStateOrig()!=actor.getFsm().getInitialState()) {
+								startFromFresh=false;
+								rerunNeeded=true;
+							}
+							schedule.setEndState(interpreter.getFsmStateOrig());
+						}
+						schedule.setScheduleDone(true);
 					}catch (OrccRuntimeException e){ //should only happen on native calls
 						if (actor.hasFsm() && interpreter.nullWasNormal()) {
 							choiceStatesSet.add(interpreter.getFsmStateOrig());
-							nullGuardFound=true;
+							rerunNeeded=true;
 						} else {
+							System.out.println("Actor "+this.actor.getName()+" experienced a loop time-out!!\n\n");
 							scheduler.makeDummyFSM();
 							stopChecking=true;
 						}
@@ -232,7 +245,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 				}
 			}
 		// Abstract interpretation End----------------------------------------
-			if (!stopChecking && !nullGuardFound) {
+			if (!stopChecking && !rerunNeeded) {
 				stopChecking = areSchedulesComplete();
 			}
 		} while (!stopChecking);
@@ -240,18 +253,20 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 		for (Schedule s : scheduler.getSchedules()) {
 			generateScheduleInfo(s);
 		}
-		
+
 		whenIsVarPartOfState();
-		
+
 		return null;
 	}
 	
 	private boolean areSchedulesComplete() {
 		// does the schedule itself reset the variables before they are used in guards?
 		boolean allResolved = true;
+		Set<State> resolvedStates = new HashSet<State>();
 		for (Schedule schedule : scheduler.getSchedules()) {
 			for (State state : schedule.getPotentialChoiseStates()) {
 				boolean resolved = true; // until proven guilty
+				resolvedStates.clear();
 				Set<Var> guardFull = new HashSet<Var>();
 				Set<Var> guardDirect = new HashSet<Var>();
 				Set<Action> cActions = new HashSet<Action>();
@@ -301,9 +316,10 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 					}
 				}
 				if (resolved) {
-					schedule.getPotentialChoiseStates().remove(state);
+					resolvedStates.add(state);
 				}
 			}
+			schedule.getPotentialChoiseStates().removeAll(resolvedStates);
 			if (!schedule.getPotentialChoiseStates().isEmpty()) {
 				choiceStatesSet.addAll(schedule.getPotentialChoiseStates());
 				allResolved=false;
@@ -425,8 +441,7 @@ public class PromelaSchedulabilityTest extends DfVisitor<Void> {
 			State target = transition.getTarget();
 			if (choiceStatesSet.contains(target)) {
 				// this is not a cycle as it ends the current schedule
-				currentSchedule.setEndState(target);
-				currentSchedule.incNrLeaves();
+				currentSchedule.addPotentialEndState(target);
 				
 			} else if (visitedStatesList.contains(target)) {
 				// non-input dependent cycle inside schedule

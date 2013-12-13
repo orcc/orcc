@@ -50,23 +50,29 @@ class Design:
         self.targetAltera = targetAltera
         self.sema = multiprocessing.BoundedSemaphore(value=1)
 
-    def compileMulti(self, proc, srcPath, libPath, args, debug):
+    def compileMulti(self, proc, srcPath, libPath, args, debug, results):
         self.sema.acquire()
         print ">> Compile code of " + proc.id + "."
-        proc.compile(srcPath, libPath, args, debug)
+        retcode = proc.compile(srcPath, libPath, args, debug)
+        results.append(retcode)
         self.sema.release()
-        return
 
     def compile(self, srcPath, libPath, args, debug, nbJobs):
         self.sema = multiprocessing.BoundedSemaphore(value=nbJobs)
         os.putenv("TCE_OSAL_PATH", os.path.join(libPath, "opset"))
         retcode = subprocess.call(["buildopset", os.path.join(libPath, "opset", "orcc")])
 
-        for processor in self.processors:
-            p = multiprocessing.Process(target=self.compileMulti, args=(processor, srcPath, libPath, args, debug, ))
-            p.start()
-        for processor in self.processors:
-            p.join()
+        if retcode == 0:
+            results = multiprocessing.Manager().list()
+            jobs = [multiprocessing.Process(target=self.compileMulti, args=(processor, srcPath, libPath, args, debug, results)) 
+                for processor in self.processors]
+            for job in jobs: job.start()
+            for job in jobs: job.join()
+            retcode = max(results)
+
+        if retcode != 0: 
+            raise Exception("Problem during the compilation")
+
                 
     def profile(self, srcPath):
         f = open("profiling.txt", "w")
@@ -120,7 +126,8 @@ class Design:
             print ">> Generate " + processor.id + "."
             retcode = processor.generate(srcPath, libPath, args, debug, self.targetAltera)
             if retcode != 0: 
-                sys.exit(retcode)
+                raise Exception("Problem during the generation")
+                return;
                 
     def generateCgFiles(self, libPath, genPath):
         templatePath = os.path.join(libPath, "templates")
@@ -131,16 +138,21 @@ class Design:
         result = template.substitute(path=genPath, id="ram_2p", width=512, depth=32)
         open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
     
-    def simulateMulti(self, proc):
+    def simulateMulti(self, proc, results):
         self.sema.acquire()
-        proc.simulate()
+        retcode = proc.simulate()
+        results.append(retcode)
         self.sema.release()
-        return
 
     def simulate(self, nbJobs):
         self.sema = multiprocessing.BoundedSemaphore(value=nbJobs)
-        for processor in self.processors:
-            p = multiprocessing.Process(target=self.simulateMulti, args=(processor, ))
-            p.start()
-        for processor in self.processors:
-            p.join()
+        results = multiprocessing.Manager().list()
+        jobs = [multiprocessing.Process(target=self.simulateMulti, args=(processor, results)) 
+            for processor in self.processors]    
+        for job in jobs: job.start()
+        for job in jobs: job.join()
+        retcode = max(results)
+
+        if retcode != 0: 
+            raise Exception("Problem during the simulation")
+            
