@@ -52,26 +52,31 @@ else() # Build library with all features (require external libraries)
             add_definitions(-DOPEN_HEVC_ENABLE)
         endif()
 
+        find_package(METIS QUIET)
+        if(METIS_FOUND)
+            add_definitions(-DMETIS_ENABLE)
+        endif()
+
         if(SDL_FOUND)
                 include_directories(
                         ${SDL_INCLUDE_DIR}
                 )
-
 
                 file(GLOB orcc_sources
                     src/*.c
                     include/*.h
                 )
 
-                find_package(METIS REQUIRED)
-
                 # Compile libraries
                 add_library(orcc STATIC ${orcc_sources})
 
                 # Do the linking
-                target_link_libraries(orcc roxml ${SDL_LIBRARY} metis m)
+                target_link_libraries(orcc roxml ${SDL_LIBRARY})
                 if(OpenHevc)
                     target_link_libraries(orcc ${OpenHevc})
+                endif()
+                if(METIS_FOUND)
+                    target_link_libraries(orcc metis m)
                 endif()
 
                 set(executable_filenames

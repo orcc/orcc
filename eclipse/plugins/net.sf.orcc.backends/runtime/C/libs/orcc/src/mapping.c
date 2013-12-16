@@ -271,6 +271,7 @@ void print_mapping(mapping_t *mapping) {
  *
  ********************************************************************************************/
 
+#ifdef METIS_ENABLE
 int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part) {
     assert(network != NULL);
     assert(opt != NULL);
@@ -350,6 +351,7 @@ int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part, idx
     delete_graph(metis_graph);
     return ret;
 }
+#endif
 
 /**
  * Round Robin strategy
@@ -407,6 +409,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
 
     if (opt->nb_processors != 1) {
         switch (opt->strategy) {
+#ifdef METIS_ENABLE
         case ORCC_MS_METIS_REC:
             ret = do_metis_recursive_partition(network, opt, part);
             break;
@@ -416,6 +419,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
         case ORCC_MS_METIS_KWAY_EC:
             ret = do_metis_kway_partition(network, opt, part, METIS_OBJTYPE_VOL); /*TODO : should be METIS_OBJTYPE_CUT : Metis seem's to invert its options */
             break;
+#endif
         case ORCC_MS_ROUND_ROBIN:
             ret = do_round_robbin_mapping(network, opt, part);
             break;

@@ -54,6 +54,7 @@ void print_orcc_error(orccmap_error_et error) {
 
 }
 
+#ifdef METIS_ENABLE
 void check_metis_error(rstatus_et error) {
     if (error != METIS_OK) {
         print_orcc_error(ORCC_ERR_METIS);
@@ -62,6 +63,7 @@ void check_metis_error(rstatus_et error) {
         exit(error);
     }
 }
+#endif
 
 void check_orcc_error(orccmap_error_et error) {
     if (error != ORCC_OK) {

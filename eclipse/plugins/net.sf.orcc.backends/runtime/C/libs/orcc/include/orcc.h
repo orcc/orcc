@@ -30,6 +30,21 @@
 #ifndef _ORCC_H_
 #define _ORCC_H_
 
+#ifdef METIS_ENABLE
+#include "metis.h"
+#else
+
+#ifdef _MSC_VER
+#include <limits.h>
+typedef __int32 int32_t;
+#else
+#include <inttypes.h>
+#endif
+
+typedef int32_t idx_t;
+
+#endif
+
 typedef struct sync_s sync_t;
 typedef struct options_s options_t;
 typedef struct global_scheduler_s global_scheduler_t;

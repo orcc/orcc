@@ -31,8 +31,10 @@
 #define _ORCC_TRACE_H_
 
 #include "orcc.h"
-#include "metis.h"
 
+#ifdef METIS_ENABLE
+#include "metis.h"
+#endif
 
 #define arrayCopy(DST,SRC,LEN) \
             { size_t TMPSZ = sizeof(*(SRC)) * (LEN); \
@@ -77,10 +79,12 @@ void set_trace_level(verbose_level_et level);
  */
 void print_orcc_error(orccmap_error_et error);
 
+#ifdef METIS_ENABLE
 /**
  * !TODO
  */
 void check_metis_error(rstatus_et error);
+#endif
 
 /**
  * !TODO

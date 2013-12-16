@@ -30,7 +30,6 @@
 #ifndef _ORCC_MAPPING_H_
 #define _ORCC_MAPPING_H_
 
-#include "metis.h"
 #include "orcc.h"
 
 /*
@@ -146,12 +145,13 @@ int sort_actors(actor_t **actors, int nb_actors);
  */
 int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mapping);
 
-
 /********************************************************************************************
  *
  * Mapping functions
  *
  ********************************************************************************************/
+
+#ifdef METIS_ENABLE
 
 /**
  * Apply actor mapping using metis recursive strategy
@@ -162,6 +162,8 @@ int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part
  * Apply actor mapping using metis kway strategy
  */
 int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part, idx_t mode);
+
+#endif
 
 /**
  * Apply actor mapping using round-robin strategy
