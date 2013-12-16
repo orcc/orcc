@@ -91,7 +91,7 @@ class InstancePrinter extends LLVMTemplate {
 	val Map<State, Integer> stateToLabel = new HashMap<State, Integer>
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
-	protected var optionProfile = false
+	protected var optionInline = false
 	protected var optionArch = "x86_64"
 
 	protected var boolean isActionVectorizable = false
@@ -100,8 +100,8 @@ class InstancePrinter extends LLVMTemplate {
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {		
-		if(options.containsKey(PROFILE)){
-			optionProfile = options.get(PROFILE) as Boolean
+		if(options.containsKey(INLINE)){
+			optionInline = options.get(INLINE) as Boolean
 		}
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
@@ -431,7 +431,7 @@ class InstancePrinter extends LLVMTemplate {
 					%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
 					%is_vectorizable_«extName» = icmp slt i32 %tmp_vect1_«extName», %tmp_vect3_«extName»
 					br i1 %is_vectorizable_«extName», label %next_vectorizable_«extName», label %bb_«actionName»_fire_notvectorizable
-				
+
 				next_vectorizable_«extName»:
 			«ENDIF»
 		«ENDFOR»	
@@ -590,7 +590,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val outputPattern = action.outputPattern»
 		«IF isActionVectorizable»
 
-		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
@@ -644,7 +644,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
 
-		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
