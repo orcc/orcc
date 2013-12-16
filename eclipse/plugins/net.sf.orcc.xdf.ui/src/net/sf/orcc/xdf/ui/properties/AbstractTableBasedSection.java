@@ -29,9 +29,11 @@
 package net.sf.orcc.xdf.ui.properties;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.ui.forms.widgets.ColumnLayout;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -45,14 +47,24 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 
 	protected Table table;
 
+	protected Button addButton, removeButton;
+
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
 
-		final FillLayout filllayout = new FillLayout();
-		formBody.setLayout(filllayout);
+		final ColumnLayout colLayout = new ColumnLayout();
+		formBody.setLayout(colLayout);
 
 		table = new Table(formBody, SWT.BORDER);
 		table.setHeaderVisible(true);
+
+		final Composite buttonColumn = widgetFactory.createComposite(formBody);
+		final RowLayout buttonLayout = new RowLayout(SWT.VERTICAL);
+		buttonLayout.fill = true;
+		buttonColumn.setLayout(buttonLayout);
+
+		addButton = widgetFactory.createButton(buttonColumn, "Add", SWT.NONE);
+		removeButton = widgetFactory.createButton(buttonColumn, "Remove", SWT.NONE);
 	}
 }
