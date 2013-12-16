@@ -30,6 +30,7 @@ package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Network;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -45,12 +46,17 @@ public class NetworkMainSection extends AbstractGridBasedSection {
 	private Text networkName;
 
 	@Override
+	protected String getFormText() {
+		return "Network Properties";
+	}
+
+	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
 		super.createControls(parent, tabbedPropertySheetPage);
 
-		widgetFactory.createCLabel(parent, "Name:");
+		widgetFactory.createCLabel(formBody, "Name:");
 
-		networkName = widgetFactory.createText(parent, "");
+		networkName = widgetFactory.createText(formBody, "", SWT.BORDER);
 		networkName.setLayoutData(fillHorizontalData);
 		networkName.setEditable(false);
 	}

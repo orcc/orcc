@@ -30,6 +30,7 @@ package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Connection;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -41,15 +42,21 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  */
 public class ConnectionMainSection extends AbstractGridBasedSection {
+
 	private Text connectionSize;
+
+	@Override
+	protected String getFormText() {
+		return "Connection Properties";
+	}
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
 		super.createControls(parent, tabbedPropertySheetPage);
 
-		widgetFactory.createCLabel(parent, "Size:");
+		widgetFactory.createCLabel(formBody, "Size:");
 
-		connectionSize = widgetFactory.createText(parent, "");
+		connectionSize = widgetFactory.createText(formBody, "", SWT.BORDER);
 		connectionSize.setLayoutData(fillHorizontalData);
 		connectionSize.setEditable(false);
 	}

@@ -34,6 +34,11 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public class InstanceParametersSection extends AbstractTableBasedSection {
 
 	@Override
+	protected String getFormText() {
+		return "Instance Parameters";
+	}
+
+	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
 		super.createControls(parent, tabbedPropertySheetPage);
 	}

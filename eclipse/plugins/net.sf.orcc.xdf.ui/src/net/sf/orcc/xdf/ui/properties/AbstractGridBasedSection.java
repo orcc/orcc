@@ -41,9 +41,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * @author Antoine Lorence
  * 
  */
-public class AbstractGridBasedSection extends AbstractDiagramSection {
-
-	protected GridLayout gridLayout;
+public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 
 	protected GridData fillHorizontalData;
 
@@ -51,11 +49,11 @@ public class AbstractGridBasedSection extends AbstractDiagramSection {
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
 
-		gridLayout = new GridLayout(2, false);
+		final GridLayout gridLayout = new GridLayout(2, false);
 		fillHorizontalData = new GridData(SWT.FILL, SWT.BEGINNING, true, true);
 
 		// Set GridLayout as default for a properties section
-		parent.setLayout(gridLayout);
+		formBody.setLayout(gridLayout);
 	}
 
 }

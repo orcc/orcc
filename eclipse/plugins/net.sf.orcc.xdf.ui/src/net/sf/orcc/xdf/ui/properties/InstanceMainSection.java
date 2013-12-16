@@ -30,6 +30,7 @@ package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Instance;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -47,19 +48,24 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 	private Text part_name;
 
 	@Override
+	protected String getFormText() {
+		return "Instance Properties";
+	}
+
+	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
 		super.createControls(parent, tabbedPropertySheetPage);
 
-		widgetFactory.createCLabel(parent, "Name:");
-		instanceName = widgetFactory.createText(parent, "");
+		widgetFactory.createCLabel(formBody, "Name:");
+		instanceName = widgetFactory.createText(formBody, "", SWT.BORDER);
 		instanceName.setLayoutData(fillHorizontalData);
 
-		widgetFactory.createCLabel(parent, "Refinement:");
-		refinementValue = widgetFactory.createText(parent, "");
+		widgetFactory.createCLabel(formBody, "Refinement:");
+		refinementValue = widgetFactory.createText(formBody, "", SWT.BORDER);
 		refinementValue.setLayoutData(fillHorizontalData);
 
-		widgetFactory.createCLabel(parent, "Part. name:");
-		part_name = widgetFactory.createText(parent, "");
+		widgetFactory.createCLabel(formBody, "Part. name:");
+		part_name = widgetFactory.createText(formBody, "", SWT.BORDER);
 		part_name.setLayoutData(fillHorizontalData);
 	}
 

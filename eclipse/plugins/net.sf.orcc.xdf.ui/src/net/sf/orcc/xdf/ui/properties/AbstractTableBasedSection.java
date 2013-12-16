@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -39,7 +41,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * @author Antoine Lorence
  * 
  */
-public class AbstractTableBasedSection extends AbstractDiagramSection {
+abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 
 	protected Table table;
 
@@ -47,7 +49,10 @@ public class AbstractTableBasedSection extends AbstractDiagramSection {
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
 
-		table = new Table(parent, 0);
+		final FillLayout filllayout = new FillLayout();
+		formBody.setLayout(filllayout);
+
+		table = new Table(formBody, SWT.BORDER);
 		table.setHeaderVisible(true);
 	}
 }

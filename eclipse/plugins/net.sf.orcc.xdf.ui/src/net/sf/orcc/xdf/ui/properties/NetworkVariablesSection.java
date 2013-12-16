@@ -30,4 +30,9 @@ package net.sf.orcc.xdf.ui.properties;
 
 public class NetworkVariablesSection extends AbstractTableBasedSection {
 
+	@Override
+	protected String getFormText() {
+		return "Network Variables";
+	}
+
 }

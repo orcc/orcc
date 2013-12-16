@@ -35,6 +35,7 @@ import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
@@ -47,7 +48,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
  * @author Antoine Lorence
  * 
  */
-public class AbstractDiagramSection extends GFPropertySection implements ITabbedPropertyConstants {
+abstract public class AbstractDiagramSection extends GFPropertySection implements ITabbedPropertyConstants {
 
 	protected TabbedPropertySheetWidgetFactory widgetFactory;
 
@@ -55,11 +56,18 @@ public class AbstractDiagramSection extends GFPropertySection implements ITabbed
 
 	protected PictogramElement pictogramElement;
 
+	protected Composite formBody;
+
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
 
 		widgetFactory = getWidgetFactory();
+
+		final Form form = widgetFactory.createForm(parent);
+		form.setText(getFormText());
+		widgetFactory.decorateFormHeading(form);
+		formBody = form.getBody();
 	}
 
 	@Override
@@ -69,4 +77,6 @@ public class AbstractDiagramSection extends GFPropertySection implements ITabbed
 		pictogramElement = getSelectedPictogramElement();
 		businessObject = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
 	}
+
+	protected abstract String getFormText();
 }

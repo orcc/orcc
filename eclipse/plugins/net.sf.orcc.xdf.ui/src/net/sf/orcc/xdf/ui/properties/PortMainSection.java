@@ -30,6 +30,7 @@ package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Port;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -45,12 +46,17 @@ public class PortMainSection extends AbstractGridBasedSection {
 	private Text portName;
 
 	@Override
+	protected String getFormText() {
+		return "Port Properties";
+	}
+
+	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
 		super.createControls(parent, tabbedPropertySheetPage);
 
-		widgetFactory.createCLabel(parent, "Name:");
+		widgetFactory.createCLabel(formBody, "Name:");
 
-		portName = widgetFactory.createText(parent, "");
+		portName = widgetFactory.createText(formBody, "", SWT.BORDER);
 		portName.setLayoutData(fillHorizontalData);
 		portName.setEditable(false);
 	}

@@ -28,10 +28,18 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class NetworkParametersSection extends AbstractTableBasedSection {
+
+	@Override
+	protected String getFormText() {
+		return "Network Parameters";
+	}
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
