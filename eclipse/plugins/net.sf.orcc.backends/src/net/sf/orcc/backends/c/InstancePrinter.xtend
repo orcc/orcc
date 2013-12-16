@@ -93,7 +93,8 @@ class InstancePrinter extends CTemplate {
 	var String traceFolder
 	var int threadsNb = 1;
 
-	protected var profile = false
+	protected var inlineActors = false
+	protected var inlineActions = false
 
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
@@ -141,8 +142,11 @@ class InstancePrinter extends CTemplate {
 			enableTrace = options.get(ENABLE_TRACES) as Boolean
 			traceFolder = (options.get(TRACES_FOLDER) as String)?.replace('\\', "\\\\")
 		}
-		if(options.containsKey(PROFILE)){
-			profile = options.get(PROFILE) as Boolean
+		if(options.containsKey(INLINE)){
+			inlineActors = options.get(INLINE) as Boolean
+			if(options.containsKey(INLINE_NOTACTIONS)){
+				inlineActions = !options.get(INLINE_NOTACTIONS) as Boolean
+			}
 		}
 	}
 
@@ -726,7 +730,7 @@ class InstancePrinter extends CTemplate {
 		val output = '''
 		«IF isActionVectorizable»
 
-		static «inline»void «action.body.name»_vectorizable() {
+		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»_vectorizable() {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -790,7 +794,7 @@ class InstancePrinter extends CTemplate {
 		currentAction = action
 		val output = '''
 			«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
-			static «inline»void «action.body.name»() {
+			static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»() {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
@@ -1032,10 +1036,10 @@ class InstancePrinter extends CTemplate {
 	}
 
 	def private getInline()
-		'''«IF profile»__attribute__((always_inline)) «ENDIF»'''
+		'''«IF inlineActors»__attribute__((always_inline)) «ENDIF»'''
 
 	def private getNoInline()
-		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
+		'''«IF inlineActors»__attribute__((noinline)) «ENDIF»'''
 
 	def private isOutputConnected(Port port) {
 		// If the port has a list of output connections not defined or empty, returns false
