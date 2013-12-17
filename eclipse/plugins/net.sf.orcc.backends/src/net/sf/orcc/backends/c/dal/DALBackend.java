@@ -31,12 +31,18 @@ public class DALBackend extends CBackend {
 	 * Path to target "src" folder
 	 */
 	protected String srcPath;
-	
+	protected boolean outputBuffering;
+	protected boolean inputBuffering;
+
 	@Override
 	protected void doInitializeOptions() {
 		srcPath = path;
+		inputBuffering = getAttribute("net.sf.orcc.backends.c.dal.inputBuffering",
+				false);
+		outputBuffering = getAttribute("net.sf.orcc.backends.c.dal.outputBuffering",
+				false);
 	}
-
+	
 	protected void doTransformNetwork(Network network) {
 		OrccLogger.traceln("Instantiating network...");
 		new Instantiator(false, fifoSize).doSwitch(network);
@@ -68,8 +74,8 @@ public class DALBackend extends CBackend {
 		validator.analyzeOutputs(network);
 
 		ActorOptimizer optimizer = new ActorOptimizer();
-		optimizer.optimizeInput(network);
-		optimizer.optimizeOutput(network);
+		optimizer.optimizeInput(network, inputBuffering);
+		optimizer.optimizeOutput(network, outputBuffering);
 
 		labelPeekPorts(network);
 	}

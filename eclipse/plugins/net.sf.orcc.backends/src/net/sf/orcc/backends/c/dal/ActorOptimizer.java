@@ -17,14 +17,20 @@ public class ActorOptimizer {
 	
 	// Disable actor output buffering from actors that
 	// naturally have a high token rate
-	public void optimizeOutput(Network network) {
+	public void optimizeOutput(Network network, boolean outputBuffering) {
 		for (Actor actor : network.getAllActors()) {
-			int maxRate = 0;
-			for (Port port : actor.getOutputs()) {
-				if (port.getNumTokensProduced() > maxRate)
-					maxRate = port.getNumTokensProduced();
-			}
-			if (maxRate >= RATE_LIMIT) {
+			if (outputBuffering) {
+				int maxRate = 0;
+				for (Port port : actor.getOutputs()) {
+					if (port.getNumTokensProduced() > maxRate)
+						maxRate = port.getNumTokensProduced();
+				}
+				if (maxRate >= RATE_LIMIT) {
+					for (Port port : actor.getOutputs()) {
+						port.setNumTokensProduced(-1);
+					}
+				}
+			} else {
 				for (Port port : actor.getOutputs()) {
 					port.setNumTokensProduced(-1);
 				}
@@ -34,17 +40,21 @@ public class ActorOptimizer {
 
 	// Disable actor input buffering for actors that
 	// naturally have a high input token rate
-	public void optimizeInput(Network network) {
+	public void optimizeInput(Network network, boolean inputBuffering) {
 		for (Actor actor : network.getAllActors()) {
-			int maxRate = 0;
-			for (Port port : actor.getInputs()) {
-				if (port.getNumTokensConsumed() > maxRate)
-					maxRate = port.getNumTokensConsumed();
-			}
-			if (maxRate >= RATE_LIMIT) {
-				if (!actor.hasAttribute("variableInputPattern")) {
-					actor.addAttribute("variableInputPattern");
+			if (inputBuffering) {
+				int maxRate = 0;
+				for (Port port : actor.getInputs()) {
+					if (port.getNumTokensConsumed() > maxRate)
+						maxRate = port.getNumTokensConsumed();
 				}
+				if (maxRate >= RATE_LIMIT) {
+					if (!actor.hasAttribute("variableInputPattern")) {
+						actor.addAttribute("variableInputPattern");
+					}
+				}
+			} else {
+				actor.addAttribute("variableInputPattern");
 			}
 		}
 	}

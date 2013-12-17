@@ -54,6 +54,12 @@
          <option
                id="net.sf.orcc.core.classify">
          </option>
+         <option
+               id="net.sf.orcc.backends.c.dal.inputBuffering">
+         </option>
+         <option
+               id="net.sf.orcc.backends.c.dal.outputBuffering">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.hmpp.HMPPBackend"
@@ -412,6 +418,20 @@
         name="Disable HMPP pragmas">
      <checkBox></checkBox>
   </option>
+         <option
+               defaultValue="false"
+               description="Perform sample buffering on actor inputs"
+               id="net.sf.orcc.backends.c.dal.inputBuffering"
+               name="Input buffering">
+            <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Perform sample buffering on actor outputs"
+               id="net.sf.orcc.backends.c.dal.outputBuffering"
+               name="Output buffering">
+            <checkBox></checkBox>
+         </option>
    </extension>
    <extension
          id="c"
