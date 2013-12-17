@@ -51,7 +51,6 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.graphiti.ui.services.IUiLayoutService;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -63,9 +62,7 @@ public class XdfUtil {
 	private static ResourceSet resourceSet = new ResourceSetImpl();
 
 	public static Shell getDefaultShell() {
-		IWorkbenchWindow window = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow();
-		return window.getShell();
+		return PlatformUI.getWorkbench().getDisplay().getActiveShell();
 	}
 
 	public static IProject getProject(final EObject object) {
