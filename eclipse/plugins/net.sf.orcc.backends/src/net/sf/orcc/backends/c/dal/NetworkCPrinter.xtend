@@ -10,6 +10,7 @@ import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.backends.c.CTemplate
 
 import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.ir.Type
 
 /**
  * Generate and print process network description for DAL backend.
@@ -106,8 +107,21 @@ http://www.tik.ee.ethz.ch/~euretile/schema/processnetwork.xsd" name="«network.n
 		«ENDFOR»
 	'''
 	
+	def private int sizeOf(Type type) {
+		if (type.float) {
+			return 4
+		} else if (type.int || type.uint){
+			if (type.getSizeInBits() > 16) {
+				return 4
+			} else if (type.getSizeInBits() > 8) {
+				return 2
+			}
+		}
+		return 1
+	}
+	
 	def protected allocateFifo(Connection conn, int nbReaders) '''
-		<sw_channel type="fifo" size="«if (conn.size != null) conn.size else "SIZE"»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
+		<sw_channel type="fifo" size="«if (conn.size != null) conn.size*sizeOf(conn.getSourcePort().getType()) else "SIZE"»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
 			<port type="input" name="0"/>
 			<port type="output" name="1"/>
 		</sw_channel>
