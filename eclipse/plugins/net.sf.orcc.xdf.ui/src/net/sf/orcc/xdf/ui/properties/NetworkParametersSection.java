@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
+import net.sf.orcc.df.Network;
+import net.sf.orcc.ir.Var;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -108,9 +111,24 @@ public class NetworkParametersSection extends AbstractTableBasedSection {
 
 		final TableColumn nameColumn = new TableColumn(table, SWT.NONE);
 		nameColumn.setText("Name");
+	}
 
-		typeColumn.pack();
-		nameColumn.pack();
+	@Override
+	public void refresh() {
+		final Network network = (Network) businessObject;
+
+		table.removeAll();
+
+		for (final Var paramVar : network.getParameters()) {
+			// TODO: better method to convert Type into String ?
+			final String[] itemValues = { paramVar.getType().toString(), paramVar.getName() };
+			final TableItem item = new TableItem(table, SWT.NONE);
+			item.setText(itemValues);
+		}
+
+		for (final TableColumn column : table.getColumns()) {
+			column.pack();
+		}
 	}
 
 	@Override
