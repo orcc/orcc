@@ -28,11 +28,17 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
+import org.eclipse.swt.widgets.TableItem;
+
 public class NetworkVariablesSection extends AbstractTableBasedSection {
 
 	@Override
 	protected String getFormText() {
 		return "Network Variables";
+	}
+
+	@Override
+	void editTableItem(TableItem item) {
 	}
 
 }

@@ -28,12 +28,22 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
+import net.sf.orcc.xdf.ui.util.XdfUtil;
+
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.forms.widgets.ColumnLayout;
+import org.eclipse.ui.forms.widgets.ColumnLayoutData;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -45,9 +55,61 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  */
 abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 
+	/**
+	 * Default dialog used to edit a table row.
+	 * 
+	 * @author Antoine Lorence
+	 * 
+	 */
+	protected abstract class ItemEditor extends Dialog {
+
+		final private TableItem item;
+
+		/**
+		 * Initialize the dialog.
+		 * 
+		 * @param parentShell
+		 *            The parentShell
+		 * @param item
+		 */
+		protected ItemEditor(final TableItem item) {
+			super(XdfUtil.getDefaultShell());
+			this.item = item;
+		}
+
+		// Set a default DridLayout
+		@Override
+		protected Control createDialogArea(Composite parent) {
+			Composite container = (Composite) super.createDialogArea(parent);
+			container.setLayout(new GridLayout(2, false));
+			return container;
+		}
+
+		// Configure window title
+		@Override
+		protected void configureShell(Shell newShell) {
+			super.configureShell(newShell);
+			newShell.setText(getDialogTitle());
+		}
+
+		/**
+		 * 
+		 * @return The item this dialog is modifying
+		 */
+		public TableItem getItem() {
+			return item;
+		}
+
+		/**
+		 * 
+		 * @return The title of the dialog window
+		 */
+		abstract protected String getDialogTitle();
+	}
+
 	protected Table table;
 
-	protected Button addButton, removeButton;
+	protected Button addButton, removeButton, editButton;
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
@@ -58,6 +120,7 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 
 		table = new Table(formBody, SWT.BORDER);
 		table.setHeaderVisible(true);
+		table.setLayoutData(new ColumnLayoutData(200, 120));
 
 		final Composite buttonColumn = widgetFactory.createComposite(formBody);
 		final RowLayout buttonLayout = new RowLayout(SWT.VERTICAL);
@@ -66,5 +129,36 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 
 		addButton = widgetFactory.createButton(buttonColumn, "Add", SWT.NONE);
 		removeButton = widgetFactory.createButton(buttonColumn, "Remove", SWT.NONE);
+		editButton = widgetFactory.createButton(buttonColumn, "Edit", SWT.NONE);
+
+		addButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				editTableItem(new TableItem(table, SWT.NONE));
+			}
+		});
+		removeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final int index = table.getSelectionIndex();
+				if (index != -1) {
+					table.remove(index);
+				}
+			}
+		});
+		editButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final TableItem item = table.getSelection()[0];
+				editTableItem(item);
+			}
+		});
 	}
+
+	/**
+	 * Open a dialog which allow user to edit the fields
+	 * 
+	 * @param item
+	 */
+	abstract void editTableItem(final TableItem item);
 }

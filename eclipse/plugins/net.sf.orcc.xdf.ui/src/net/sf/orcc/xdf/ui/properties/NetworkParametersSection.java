@@ -28,13 +28,70 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class NetworkParametersSection extends AbstractTableBasedSection {
+
+	/**
+	 * Define the dialog used to edit a network parameter.
+	 * 
+	 * @author Antoine Lorence
+	 * 
+	 */
+	private class ParameterItemEditor extends ItemEditor {
+
+		private Text type;
+		private Text name;
+
+		protected ParameterItemEditor(final TableItem item) {
+			super(item);
+		}
+
+		@Override
+		protected String getDialogTitle() {
+			return "Edit parameter";
+		}
+
+		@Override
+		protected Control createDialogArea(Composite parent) {
+			final Composite container = (Composite) super.createDialogArea(parent);
+			final GridData fill = new GridData(SWT.FILL, SWT.FILL, true, true);
+
+			final Label typeLabel = new Label(container, SWT.NONE);
+			typeLabel.setText("Type:");
+
+			type = new Text(container, SWT.NONE);
+			type.setLayoutData(fill);
+
+			final Label nameLabel = new Label(container, SWT.NONE);
+			nameLabel.setText("Name:");
+
+			name = new Text(container, SWT.NONE);
+			name.setLayoutData(fill);
+
+			if (getItem() != null) {
+				type.setText(getItem().getText(0));
+				name.setText(getItem().getText(1));
+			}
+
+			return container;
+		}
+
+		@Override
+		protected void okPressed() {
+			getItem().setText(new String[] { type.getText(), name.getText() });
+			super.okPressed();
+		}
+	}
 
 	@Override
 	protected String getFormText() {
@@ -45,10 +102,24 @@ public class NetworkParametersSection extends AbstractTableBasedSection {
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
 		super.createControls(parent, tabbedPropertySheetPage);
 
+		final TableColumn typeColumn = new TableColumn(table, SWT.NONE);
+		typeColumn.setText("Type");
+		typeColumn.setWidth(80);
+
+		final TableColumn nameColumn = new TableColumn(table, SWT.NONE);
+		nameColumn.setText("Name");
+
+		typeColumn.pack();
+		nameColumn.pack();
 	}
 
 	@Override
-	public void refresh() {
+	void editTableItem(TableItem item) {
+		final ParameterItemEditor editor = new ParameterItemEditor(item);
 
+		editor.open();
+		if (Dialog.CANCEL == editor.getReturnCode()) {
+			return;
+		}
 	}
 }
