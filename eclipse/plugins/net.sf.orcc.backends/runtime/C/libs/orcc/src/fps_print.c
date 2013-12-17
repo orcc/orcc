@@ -80,7 +80,7 @@ void fpsPrintNewPicDecoded(void) {
     partialNumPicturesDecoded++;
 	endTime = SDL_GetTicks();
     if ((endTime - relativeStartTime) / 1000.0f >= 5) {
-        print_orcc_trace(ORCC_VL_VERBOSE_1, "%f images/sec",
+        printf("%f images/sec\n",
 				1000.0f * (float) (numPicturesDecoded - lastNumPic)
 						/ (float) (endTime - relativeStartTime));
 
