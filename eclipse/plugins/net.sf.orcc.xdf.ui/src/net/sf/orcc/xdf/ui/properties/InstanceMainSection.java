@@ -79,4 +79,16 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 
 		// TODO: get the "part name" value in the instance, and display it
 	}
+
+	@Override
+	protected void readValuesFromModels() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void writeValuesToModel() {
+		// TODO Auto-generated method stub
+
+	}
 }

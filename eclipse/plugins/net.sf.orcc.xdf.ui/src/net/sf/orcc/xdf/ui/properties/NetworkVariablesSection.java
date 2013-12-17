@@ -41,4 +41,16 @@ public class NetworkVariablesSection extends AbstractTableBasedSection {
 	void editTableItem(TableItem item) {
 	}
 
+	@Override
+	protected void readValuesFromModels() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void writeValuesToModel() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

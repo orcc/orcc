@@ -78,5 +78,19 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 		businessObject = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
 	}
 
+	@Override
+	public void aboutToBeShown() {
+		readValuesFromModels();
+	}
+
+	@Override
+	public void aboutToBeHidden() {
+		writeValuesToModel();
+	}
+
+	protected abstract void readValuesFromModels();
+
+	protected abstract void writeValuesToModel();
+
 	protected abstract String getFormText();
 }

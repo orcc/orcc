@@ -68,4 +68,16 @@ public class NetworkMainSection extends AbstractGridBasedSection {
 		final Network network = (Network) businessObject;
 		networkName.setText(network.getName());
 	}
+
+	@Override
+	protected void readValuesFromModels() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void writeValuesToModel() {
+		// TODO Auto-generated method stub
+
+	}
 }

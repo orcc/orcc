@@ -31,7 +31,6 @@ package net.sf.orcc.xdf.ui.properties;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Var;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -114,7 +113,13 @@ public class NetworkParametersSection extends AbstractTableBasedSection {
 	}
 
 	@Override
-	public void refresh() {
+	void editTableItem(TableItem item) {
+		final ParameterItemEditor editor = new ParameterItemEditor(item);
+		editor.open();
+	}
+
+	@Override
+	protected void readValuesFromModels() {
 		final Network network = (Network) businessObject;
 
 		table.removeAll();
@@ -125,19 +130,11 @@ public class NetworkParametersSection extends AbstractTableBasedSection {
 			final TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(itemValues);
 		}
-
-		for (final TableColumn column : table.getColumns()) {
-			column.pack();
-		}
 	}
 
 	@Override
-	void editTableItem(TableItem item) {
-		final ParameterItemEditor editor = new ParameterItemEditor(item);
+	protected void writeValuesToModel() {
+		// TODO Auto-generated method stub
 
-		editor.open();
-		if (Dialog.CANCEL == editor.getReturnCode()) {
-			return;
-		}
 	}
 }

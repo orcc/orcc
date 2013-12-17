@@ -47,4 +47,16 @@ public class InstanceParametersSection extends AbstractTableBasedSection {
 	@Override
 	void editTableItem(TableItem item) {
 	}
+
+	@Override
+	protected void readValuesFromModels() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void writeValuesToModel() {
+		// TODO Auto-generated method stub
+
+	}
 }

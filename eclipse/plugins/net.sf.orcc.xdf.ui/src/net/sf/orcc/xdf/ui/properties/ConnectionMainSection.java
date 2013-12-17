@@ -70,4 +70,16 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 			connectionSize.setText(connection.getSize().toString());
 		}
 	}
+
+	@Override
+	protected void readValuesFromModels() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void writeValuesToModel() {
+		// TODO Auto-generated method stub
+
+	}
 }

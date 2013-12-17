@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.forms.widgets.ColumnLayout;
 import org.eclipse.ui.forms.widgets.ColumnLayoutData;
@@ -153,6 +154,15 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 				editTableItem(item);
 			}
 		});
+	}
+
+	@Override
+	public void aboutToBeShown() {
+		super.aboutToBeShown();
+
+		for (final TableColumn column : table.getColumns()) {
+			column.pack();
+		}
 	}
 
 	/**

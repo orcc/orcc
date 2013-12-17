@@ -68,4 +68,16 @@ public class PortMainSection extends AbstractGridBasedSection {
 		final Port port = (Port) businessObject;
 		portName.setText(port.getName());
 	}
+
+	@Override
+	protected void readValuesFromModels() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void writeValuesToModel() {
+		// TODO Auto-generated method stub
+
+	}
 }
