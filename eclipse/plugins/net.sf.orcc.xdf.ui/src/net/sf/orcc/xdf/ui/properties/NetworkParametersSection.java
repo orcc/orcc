@@ -30,6 +30,7 @@ package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.TypePrinter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -121,12 +122,12 @@ public class NetworkParametersSection extends AbstractTableBasedSection {
 	@Override
 	protected void readValuesFromModels() {
 		final Network network = (Network) businessObject;
+		final TypePrinter typePrinter = new TypePrinter();
 
 		table.removeAll();
 
 		for (final Var paramVar : network.getParameters()) {
-			// TODO: better method to convert Type into String ?
-			final String[] itemValues = { paramVar.getType().toString(), paramVar.getName() };
+			final String[] itemValues = { typePrinter.doSwitch(paramVar.getType()), paramVar.getName() };
 			final TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(itemValues);
 		}
