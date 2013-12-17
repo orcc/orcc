@@ -39,6 +39,7 @@ void sync_init(sync_t *sync) {
 
 
 void set_realtime_priority() {
+    #ifdef __linux__
     int ret;
 
     // We'll operate on the currently running thread.
@@ -76,6 +77,7 @@ void set_realtime_priority() {
 
     // Print thread scheduling priority
     print_orcc_trace(ORCC_VL_VERBOSE_2, "Thread priority is %d", params.sched_priority);
+    #endif
 }
 
 
