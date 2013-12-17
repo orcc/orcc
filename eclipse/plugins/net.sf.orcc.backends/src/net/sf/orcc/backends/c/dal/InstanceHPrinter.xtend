@@ -147,7 +147,7 @@ class InstanceHPrinter extends CTemplate {
 		int _count;
 		int _FSM_state;
 	«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
-		FILE *_io;
+		void *_io;
 	«ENDIF»
 	} «entityName»_State;
 

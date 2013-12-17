@@ -282,7 +282,10 @@ class InstanceCPrinter extends CTemplate {
 			return 0;
 		}
 		
-		int «entityName»_finish(DALProcess *p) {
+		int «entityName»_finish(DALProcess *_p) {
+			«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
+				free(_p->local->_io);
+			«ENDIF»
 			return 0;
 		}
 
@@ -602,17 +605,12 @@ class InstanceCPrinter extends CTemplate {
 	}
 	
 	def protected declareProc(Procedure proc){
-		val modifier = "static"
 		var comma = ","
 		'''
 		«IF proc.getParameters().size() == 0»
 			«comma = ""»
 		«ENDIF»
-			«IF proc.native»
-				«modifier» int «proc.name»(DALProcess *_p«comma» «proc.parameters.join(", ")[variable.declare]»);
-			«ELSE»
-				«modifier» «proc.returnType.doSwitch» «proc.name»(DALProcess *_p«comma» «proc.parameters.join(", ")[variable.declare]»);
-			«ENDIF»
+		static «proc.returnType.doSwitch» «proc.name»(DALProcess *_p«comma» «proc.parameters.join(", ")[variable.declare]»);
 		'''
 	}
 
@@ -624,11 +622,11 @@ class InstanceCPrinter extends CTemplate {
 			«comma = ""»
 		«ENDIF»
 		«IF proc.native»
-			«inline» int «proc.name»(DALProcess *_p«comma» «proc.parameters.join(", ")[variable.declare]») {
+			static «proc.returnType.doSwitch» «proc.name»(DALProcess *_p«comma» «proc.parameters.join(", ")[variable.declare]») {
 				#include "«proc.name».def"
 			}
 		«ELSE»
-			«inline»«proc.returnType.doSwitch» «proc.name»(DALProcess *_p«comma» «proc.parameters.join(", ")[variable.declare]») {
+			static «proc.returnType.doSwitch» «proc.name»(DALProcess *_p«comma» «proc.parameters.join(", ")[variable.declare]») {
 				«FOR variable : proc.locals»
 					«variable.declare»;
 				«ENDFOR»
