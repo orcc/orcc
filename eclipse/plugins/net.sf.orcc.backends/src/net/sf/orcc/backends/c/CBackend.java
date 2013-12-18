@@ -138,7 +138,8 @@ public class CBackend extends AbstractBackend {
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new DisconnectedOutputPortRemoval());
-
+		//new Inliner(true, true);
+		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 		// If "-t" option is passed to command line, apply additional
 		// transformations
 		if (getAttribute(ADDITIONAL_TRANSFOS, false)) {
