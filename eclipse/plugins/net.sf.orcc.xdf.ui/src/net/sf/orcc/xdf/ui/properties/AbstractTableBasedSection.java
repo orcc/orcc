@@ -32,6 +32,8 @@ import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
@@ -152,6 +154,15 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 		editButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				final TableItem item = table.getSelection()[0];
+				editTableItem(item);
+				writeValuesInTransaction();
+			}
+		});
+
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
 				final TableItem item = table.getSelection()[0];
 				editTableItem(item);
 				writeValuesInTransaction();
