@@ -7,6 +7,7 @@ Bundle-Activator: net.sf.orcc.xdf.ui.Activator
 Bundle-Vendor: IETR/INSA Rennes
 Require-Bundle: net.sf.orcc.core,
  net.sf.orcc.ui,
+ net.sf.orcc.cal,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.views.properties.tabbed,
