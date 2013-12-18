@@ -154,8 +154,11 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 		editButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				final TableItem item = table.getSelection()[0];
-				editTableItem(item);
+				final TableItem[] selection = table.getSelection();
+				if (selection.length == 0) {
+					return;
+				}
+				editTableItem(selection[0]);
 				writeValuesInTransaction();
 			}
 		});
@@ -163,8 +166,11 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
-				final TableItem item = table.getSelection()[0];
-				editTableItem(item);
+				final TableItem[] selection = table.getSelection();
+				if (selection.length == 0) {
+					return;
+				}
+				editTableItem(selection[0]);
 				writeValuesInTransaction();
 			}
 		});
