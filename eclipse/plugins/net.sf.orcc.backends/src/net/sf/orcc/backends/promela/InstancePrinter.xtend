@@ -104,7 +104,11 @@ class InstancePrinter extends PromelaTemplate {
 			int fsm_state_«actor.simpleName»=«actor.simpleName»_state_one_state;
 		«ENDIF»
 		
-		int state_var_«actor.simpleName»_initialized=0;
+		«IF ! actor.initializes.nullOrEmpty»
+			int state_var_«actor.simpleName»_initialized=0;
+		«ELSE»
+			int state_var_«actor.simpleName»_initialized=1;
+		«ENDIF»
 		
 		int promela_«actor.simpleName»_has_progress=0;
 		

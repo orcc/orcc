@@ -131,11 +131,8 @@ public class PromelaBackend extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
 		new BroadcastAdder().doSwitch(network);
-		// Instantiate and flattens network
 		new Instantiator(true).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
-
-		// Classify network
 		new Classifier(true).doSwitch(network);
 
 		options.put("guards", guards);
