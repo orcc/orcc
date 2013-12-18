@@ -85,7 +85,16 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 
 	@Override
 	public void aboutToBeHidden() {
-		writeValuesToModel();
+
+		// Execute the method in a write transaction, because it will modify the
+		// models
+		final TransactionalEditingDomain editingDomain = getDiagramContainer().getDiagramBehavior().getEditingDomain();
+		editingDomain.getCommandStack().execute(new RecordingCommand(editingDomain) {
+			@Override
+			protected void doExecute() {
+				writeValuesToModel();
+			}
+		});
 	}
 
 	protected abstract void readValuesFromModels();
