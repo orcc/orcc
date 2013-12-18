@@ -89,12 +89,15 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	}
 
 	@Override
-	public void aboutToBeShown() {
+	public void refresh() {
 		readValuesFromModels();
 	}
 
-	@Override
-	public void aboutToBeHidden() {
+	/**
+	 * Executes {@link #writeValuesToModel()} inside a Command suitable for
+	 * transactional edition of domain models
+	 */
+	protected void writeValuesInTransaction() {
 
 		// Execute the method in a write transaction, because it will modify the
 		// models
