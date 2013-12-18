@@ -49,6 +49,7 @@ import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Validator;
+import net.sf.orcc.backends.util.Vectorizable;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -207,6 +208,9 @@ public class LLVMBackend extends AbstractBackend {
 
 		doTransformNetwork(network);
 
+		// update "vectorizable" information
+		Vectorizable.setVectorizableAttributs(network);
+		
 		// print instances and entities
 		printChildren(network);
 

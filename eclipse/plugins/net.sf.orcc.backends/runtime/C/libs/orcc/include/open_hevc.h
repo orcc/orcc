@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_OPEN_HEVC_H
-#define ORCC_OPEN_HEVC_H
+#ifndef _ORCC_OPEN_HEVC_H_
+#define _ORCC_OPEN_HEVC_H_
 
 #if defined(__ICC) && __ICC < 1200 || defined(__SUNPRO_C)
     #define DECLARE_ALIGNED(n,t,v)      t __attribute__ ((aligned (n))) v
@@ -85,4 +85,4 @@ void put_unweighted_pred_orcc(u8 _dst[2][64*64],
 void put_unweighted_pred_avg_orcc(u8 _dst[2][64*64],
   i16 _src[2][64*64], u8 width, u8 height);
 
-#endif
+#endif  /* _ORCC_OPEN_HEVC_H_ */

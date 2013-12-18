@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_UTIL_H
-#define ORCC_UTIL_H
+#ifndef _ORCC_UTIL_H_
+#define _ORCC_UTIL_H_
 
 // Directory for input files.
 extern char *input_directory;
@@ -40,7 +40,7 @@ extern char *input_file;
 extern char *yuv_file;
 
 // instrumentation_file file
-extern char *instrumentation_file;
+extern char *profiling_file;
 
 // write file
 extern char *write_file;
@@ -64,6 +64,18 @@ extern int nbLoops;
 // Number of frames to display before closing application
 extern int nbFrames;
 
+// Number of frames to display before remapping application
+extern int nbProfiledFrames;
+
+// Number of executing threads to create
+extern int nbThreads;
+
+// Strategy for the actor mapping
+extern int mapping_strategy;
+
+// Repetition of the actor remapping
+extern int mapping_repetition;
+
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
 
@@ -81,9 +93,14 @@ void print_usage();
 
 #define DEFAULT_INFINITE -1
 
+#define DEFAULT_NB_PROFILED_FRAMES
+
+#define REMAP_ONCE 0
+#define REMAP_ALWAYS 1
+
 // specific to Microsoft Visual Studio
 // disable warnings about fopen
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning (disable:4996)
 
-#endif
+#endif  /* _ORCC_UTIL_H_ */

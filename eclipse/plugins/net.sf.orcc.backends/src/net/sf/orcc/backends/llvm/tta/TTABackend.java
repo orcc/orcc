@@ -53,6 +53,7 @@ import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
+import net.sf.orcc.backends.util.Vectorizable;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -184,6 +185,9 @@ public class TTABackend extends LLVMBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
 
+		// update "vectorizable" information
+		Vectorizable.setVectorizableAttributs(network);
+		
 		// Compute the actor mapping
 		if (importXcfFile) {
 			computedMapping = new Mapping(network, xcfFile);

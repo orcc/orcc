@@ -27,16 +27,15 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_DATAFLOW_H
-#define ORCC_DATAFLOW_H
+#ifndef _ORCC_DATAFLOW_H_
+#define _ORCC_DATAFLOW_H_
 
-typedef struct scheduler_s scheduler_t;
-typedef struct schedinfo_s schedinfo_t;
+#include "orcc.h"
 
 /*
  * Actors are the vertices of orcc Networks
  */
-typedef struct actor_s {
+struct actor_s {
     char *name;
     int group; /** id of his group. */
     void (*init_func)();
@@ -46,34 +45,51 @@ typedef struct actor_s {
     int num_outputs; /** number of output ports */
     int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
     int in_waiting; /** idem with the waiting list. */
-    struct scheduler_s *sched; /** scheduler which execute this actor. */
-    int mapping; /** id of the processor core mapped to this actor. */
-    double workload; /** actor's workload gived by instrumention */
-} actor_t;
+    local_scheduler_t *sched; /** scheduler which execute this actor. */
+    int processor_id; /** id of the processor core mapped to this actor. */
+    int id;
+    int commCost;  /** Used by Quick Mapping algo */
+    int triedProcId;  /** Used by Quick Mapping algo */
+    int evaluated;  /** Used by KL algo */
+    int workload; /** actor's workload */
+    double ticks; /** elapsed ticks obtained by profiling */
+};
 
 /*
  * Connections are the edges of orcc Networks
  */
-typedef struct connection_s {
+struct connection_s {
     actor_t *src;
     actor_t *dst;
-    double workload;
-} connection_t;
+    int workload; /** connections's workload */
+    long rate; /** communication rate obtained by profiling */
+};
 
 /*
  * Orcc Networks are directed graphs
  */
-typedef struct network_s {
+struct network_s {
     char *name;
     actor_t **actors;
     connection_t **connections;
     int nb_actors;
     int nb_connections;
-} network_t;
+};
 
 /**
  * Find actor by its name in the given table.
  */
-actor_t * find_actor(char *name, actor_t **actors, int actors_size);
+actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
 
-#endif
+/**
+ * Reset profiling information for the given network.
+ */
+void reset_profiling(network_t *network);
+
+network_t* allocate_network(int nb_actors, int nb_connections);
+
+void compute_workloads(network_t *network);
+
+void print_network(network_t *network);
+
+#endif  /* _ORCC_DATAFLOW_H_ */

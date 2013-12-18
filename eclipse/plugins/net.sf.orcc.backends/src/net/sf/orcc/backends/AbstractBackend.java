@@ -41,9 +41,10 @@ import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
-import static net.sf.orcc.backends.BackendsConstants.INSTRUMENT_NETWORK;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
+import static net.sf.orcc.backends.BackendsConstants.DYNAMIC_MAPPING;
+import static net.sf.orcc.backends.BackendsConstants.INSTRUMENT_NETWORK;
 import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
@@ -77,6 +78,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccLogger.OrccLevel;
 import net.sf.orcc.util.OrccUtil;
@@ -864,7 +866,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("m2m", "multi2mono", false,
 				"Transform high-level actors with multi-tokens actions"
 						+ " in low-level actors with mono-token actions");
-		options.addOption("i", "instrument", false, "(C) Allow network instrumentation for mapping");
+		options.addOption("i", "instrument", false,
+				"(C) Allow network instrumentation for mapping");
+		options.addOption("dm", "dynamic-mapping", false,
+				"(C) Enable load balancing on multi-core platforms");
 
 		// FIXME: choose independently the transformation to apply
 		options.addOption("t", "transfo_add", false,
@@ -898,6 +903,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				try {
 					int size = Integer.parseInt(line.getOptionValue('s'));
 					optionMap.put(FIFO_SIZE, size);
+					if (!ValueUtil.isPowerOfTwo(size)) {
+						OrccLogger.severeln("FIFO size must be power of two.");
+						return IApplication.EXIT_OK;
+					}
 				} catch (NumberFormatException e) {
 					throw new ParseException("Expected integer as FIFO size");
 				}
@@ -934,6 +943,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 			optionMap.put(INSTRUMENT_NETWORK, line.hasOption('i'));
+			optionMap.put(DYNAMIC_MAPPING, line.hasOption("dm"));
 
 			// Set backend name in options map
 			String backend = this.getClass().getName();

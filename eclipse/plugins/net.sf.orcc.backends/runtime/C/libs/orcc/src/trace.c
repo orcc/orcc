@@ -27,31 +27,66 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCC_SERIALIZE_H_
-#define _ORCC_SERIALIZE_H_
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include "orcc.h"
+#include "trace.h"
 
-/**
- * Load network structure from an XDF file.
- */
-network_t* load_network(char *fileName);
+verbose_level_et verbose_level = ORCC_VL_QUIET;
 
-/**
- * Save mapping structure to XCF file.
- */
-int save_mapping(char* fileName, mapping_t *mapping);
+void set_trace_level(verbose_level_et level) {
+    verbose_level = level;
+}
 
-/**
- * Save network's workloads from instrumentation to a file
- * that could be used for mapping.
- */
-void save_profiling(char* fileName, network_t *network);
+/********************************************************************************************
+ *
+ * Orcc-Map utils functions
+ *
+ ********************************************************************************************/
 
-/**
- * Generate some mapping structure from an XCF file.
- */
-mapping_t* load_mapping(char *xcf_file, network_t *network);
+void print_orcc_error(orccmap_error_et error) {
+    if (error != ORCC_OK && error < ORCC_ERR_SIZE) {
+        printf("\n");
+        fprintf(stderr,"\nOrcc : ERROR : %s", ORCC_ERRORS_TXT[error]);
+    }
 
+}
 
-#endif  /* _ORCC_SERIALIZE_H_ */
+#ifdef METIS_ENABLE
+void check_metis_error(rstatus_et error) {
+    if (error != METIS_OK) {
+        print_orcc_error(ORCC_ERR_METIS);
+        fprintf(stderr,"\t Code: %d", error);
+        printf("\n");
+        exit(error);
+    }
+}
+#endif
+
+void check_orcc_error(orccmap_error_et error) {
+    if (error != ORCC_OK) {
+        print_orcc_error(error);
+        printf("\n");
+        exit(error);
+    }
+}
+
+boolean check_verbosity(verbose_level_et level) {
+    return level<=verbose_level;
+}
+
+void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
+    assert(trace != NULL);
+
+    va_list args;
+    va_start (args, trace);
+
+    if (level <= verbose_level) {
+        printf("\n");
+        vprintf(trace, args);
+    }
+
+    va_end (args);
+}

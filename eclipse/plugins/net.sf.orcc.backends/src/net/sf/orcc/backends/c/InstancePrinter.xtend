@@ -82,8 +82,8 @@ class InstancePrinter extends CTemplate {
 
 	protected var String entityName
 
-	protected var boolean geneticAlgo = false
 	protected var boolean instrumentNetwork = false
+	protected var boolean dynamicMapping = false
 	protected var boolean isActionVectorizable = false
 
 	var boolean newSchedul = false
@@ -93,7 +93,8 @@ class InstancePrinter extends CTemplate {
 	var String traceFolder
 	var int threadsNb = 1;
 
-	protected var profile = false
+	protected var inlineActors = false
+	protected var inlineActions = false
 
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
@@ -116,11 +117,11 @@ class InstancePrinter extends CTemplate {
 			fifoSize = 512
 		}
 
-		if (options.containsKey(GENETIC_ALGORITHM)) {
-			geneticAlgo = options.get(GENETIC_ALGORITHM) as Boolean
-		}
 		if (options.containsKey(INSTRUMENT_NETWORK)) {
 			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
+		}
+		if (options.containsKey(DYNAMIC_MAPPING)) {
+			dynamicMapping = options.get(DYNAMIC_MAPPING) as Boolean
 		}
 
 		if (options.containsKey(THREADS_NB)) {
@@ -129,8 +130,6 @@ class InstancePrinter extends CTemplate {
 			} else {
 				threadsNb = options.get(THREADS_NB) as Integer
 			}
-		} else if (geneticAlgo) {
-			OrccLogger::warnln("Genetic algorithm options has been checked, but THREADS_NB option is not set")
 		}
 
 		if (options.containsKey(NEW_SCHEDULER)) {
@@ -143,8 +142,11 @@ class InstancePrinter extends CTemplate {
 			enableTrace = options.get(ENABLE_TRACES) as Boolean
 			traceFolder = (options.get(TRACES_FOLDER) as String)?.replace('\\', "\\\\")
 		}
-		if(options.containsKey(PROFILE)){
-			profile = options.get(PROFILE) as Boolean
+		if(options.containsKey(INLINE)){
+			inlineActors = options.get(INLINE) as Boolean
+			if(options.containsKey(INLINE_NOTACTIONS)){
+				inlineActions = !options.get(INLINE_NOTACTIONS) as Boolean
+			}
 		}
 	}
 
@@ -257,9 +259,9 @@ class InstancePrinter extends CTemplate {
 				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
 				
-				«IF instrumentNetwork»
+				«IF instrumentNetwork || dynamicMapping»
 					extern connection_t connection_«entityName»_«port.name»;
-					#define rate_«port.name» connection_«entityName»_«port.name».workload
+					#define rate_«port.name» connection_«entityName»_«port.name».rate
 				«ENDIF»
 				
 			«ENDFOR»
@@ -602,32 +604,6 @@ class InstancePrinter extends CTemplate {
 			// no read_end/write_end here!
 			return;
 		}
-
-		«IF(geneticAlgo)»
-			void «entityName»_reinitialize(schedinfo_t *si) {
-				int i = 0;
-				«FOR variable : actor.stateVars»
-					«IF variable.assignable && variable.initialized»
-						«IF !variable.type.list»
-							«variable.name» = «variable.initialValue.doSwitch»;
-						«ELSE»
-							memcpy(«variable.name», «variable.name»_backup, sizeof(«variable.name»_backup));
-						«ENDIF»
-					«ENDIF»
-				«ENDFOR»
-				«IF actor.hasFsm»
-					/* Set initial state to current FSM state */
-					_FSM_state = my_state_«actor.fsm.initialState.name»;
-				«ENDIF»
-				«IF !actor.initializes.nullOrEmpty»
-					«actor.initializes.printActions»
-				«ENDIF»
-
-			finished:
-				// no read_end/write_end here!
-				return;
-			}
-		«ENDIF»
 	'''
 
 	def private checkConnectivy() {
@@ -754,7 +730,7 @@ class InstancePrinter extends CTemplate {
 		val output = '''
 		«IF isActionVectorizable»
 
-		static «inline»void «action.body.name»_vectorizable() {
+		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»_vectorizable() {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -788,7 +764,7 @@ class InstancePrinter extends CTemplate {
 				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
 					read_end_«port.name»();
 				«ENDIF»
-				«IF instrumentNetwork»
+				«IF instrumentNetwork || dynamicMapping»
 					rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
 				«ENDIF»			
 			«ENDFOR»
@@ -818,7 +794,7 @@ class InstancePrinter extends CTemplate {
 		currentAction = action
 		val output = '''
 			«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
-			static «inline»void «action.body.name»() {
+			static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»() {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
@@ -906,9 +882,6 @@ class InstancePrinter extends CTemplate {
 			}
 		'''
 			«varDecl»
-			«IF geneticAlgo && variable.initialized && variable.assignable»
-				static «variable.type.doSwitch» «variable.name»_backup«variable.type.dimensionsExpr.printArrayIndexes» = «variable.initialValue.doSwitch»;
-			«ENDIF»
 		'''
 	}
 
@@ -1063,10 +1036,10 @@ class InstancePrinter extends CTemplate {
 	}
 
 	def private getInline()
-		'''«IF profile»__attribute__((always_inline)) «ENDIF»'''
+		'''«IF inlineActors»__attribute__((always_inline)) «ENDIF»'''
 
 	def private getNoInline()
-		'''«IF profile»__attribute__((noinline)) «ENDIF»'''
+		'''«IF inlineActors»__attribute__((noinline)) «ENDIF»'''
 
 	def private isOutputConnected(Port port) {
 		// If the port has a list of output connections not defined or empty, returns false

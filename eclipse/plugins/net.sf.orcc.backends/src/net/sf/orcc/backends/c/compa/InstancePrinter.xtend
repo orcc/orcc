@@ -44,7 +44,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	new(Map<String, Object> options) {
 		super(options)
-		geneticAlgo = false
 	}
 	
 	override protected printStateLabel(State state) '''

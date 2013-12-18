@@ -36,6 +36,8 @@
 #include <string.h>
 
 #include "util.h"
+#include "options.h"
+#include "trace.h"
 
 // define to 1 if your system has the termios.h header
 #define HAS_TERMIOS 0
@@ -60,8 +62,8 @@ char *input_file;
 // output YUV file
 char *yuv_file;
 
-// instrumentation_file file
-char *instrumentation_file;
+// Profiling file
+char *profiling_file;
 
 // write file
 char *write_file;
@@ -84,12 +86,24 @@ int nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
 // Nb frames to display
 int nbFrames = DEFAULT_INFINITE;
 
+// Number of executing threads to create
+int nbThreads = 1;
+
+// Strategy for the actor mapping
+int mapping_strategy = 0;
+
+// Number of frames to display before remapping application
+int nbProfiledFrames = 10;
+
+// Repetition of the actor remapping
+int mapping_repetition = REMAP_ONCE;
+
 // Pause function
 void wait_for_key() {
 #ifdef _WIN32
 	printf("Press a key to continue\n");
 	_getch();
-#else
+#elsemapping_repetition
 	#if HAS_TERMIOS
 		// the user has termios.h
 		struct termios oldT, newT;
@@ -139,7 +153,10 @@ static const char *usage =
 	"-f <nb frames to decode>   Set the number of frames to decode before closing the application.\n"
 	"-l <nb input reading>      Set the number of times the input file is read before closing the application.\n"
     "-g <output file>           Specify an output file for the genetic algorithm.\n"
-    "-b <output file>           Specify an output file for instrumention.\n";
+    "-b <output file>           Specify an output file for instrumention.\n"
+    "-c <nb threads>            Set the number of execut500ing threads to run.\n"
+    "-s <mapping strategy>      Specify the strategy for the actor mapping\n"
+    "-v <level>                 Set the verbosity";
     // We need to document folowing options:
 	//"-w <file>                  TBD...\n"
 
@@ -153,8 +170,8 @@ void print_usage() {
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-    const char *ostr = "i:no:d:m:f:w:g:l:b:";
-	int c;
+    const char *ostr = "i:no:d:m:f:w:g:l:r:ac:s:v:b:";
+    int c;
 
 	program = argv[0];
 	
@@ -180,10 +197,22 @@ void init_orcc(int argc, char *argv[]) {
 			break;
 		case 'f':
 			nbFrames = strtoul(optarg, NULL, 10);
-			break;
+            break;
+        case 'c':
+            nbThreads = strtoul(optarg, NULL, 10);
+            break;
+        case 's':
+            mapping_strategy = strtoul(optarg, NULL, 10);
+            break;
 		case 'm':
 			mapping_file = strdup(optarg);
 			break;
+        case 'r':
+            nbProfiledFrames = strtoul(optarg, NULL, 10);
+            break;
+        case 'a':
+            mapping_repetition = REMAP_ALWAYS;
+            break;
 		case 'n':
 			display_flags = DISPLAY_DISABLE;
 			break;
@@ -194,7 +223,10 @@ void init_orcc(int argc, char *argv[]) {
 			write_file = strdup(optarg);
 			break;
         case 'b':
-            instrumentation_file = strdup(optarg);
+            profiling_file = strdup(optarg);
+            break;
+        case 'v':
+            set_trace_level(strtoul(optarg, NULL, 10));
             break;
         default:
 			fprintf(stderr, "Skipping option -%c\n", c);

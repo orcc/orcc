@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the INSA of Rennes nor the names of its
+ *   * Neither the name of INSA Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  *
@@ -27,12 +27,23 @@
  * SUCH DAMAGE.
  */
 
+#include <assert.h>
+#include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "mapping.h"
+#include "dataflow.h"
+#include "graph.h"
 #include "util.h"
 #include "serialize.h"
-#include "dataflow.h"
+#include "scheduler.h"
+#include "options.h"
+#include "trace.h"
+#include "cycle.h"
+
+int need_remap = TRUE;
 
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.
@@ -40,7 +51,7 @@
 int find_mapped_core(mapping_t *mapping, actor_t *actor) {
     int i;
     for (i = 0; i < mapping->number_of_threads; i++) {
-        if (find_actor(actor->name, mapping->partitions_of_actors[i],
+        if (find_actor_by_name(mapping->partitions_of_actors[i], actor->name,
                 mapping->partitions_size[i]) != NULL) {
             return i;
         }
@@ -51,43 +62,459 @@ int find_mapped_core(mapping_t *mapping, actor_t *actor) {
 /**
  * Creates a mapping structure.
  */
-mapping_t* allocate_mapping(int number_of_threads) {
+mapping_t *allocate_mapping(int number_of_threads) {
     mapping_t *mapping = (mapping_t *) malloc(sizeof(mapping_t));
     mapping->number_of_threads = number_of_threads;
-    mapping->threads_affinities = (int*) malloc(number_of_threads * sizeof(int));
-    mapping->partitions_of_actors = (actor_t ***) malloc(number_of_threads * sizeof(actor_t **));
+    mapping->partitions_of_actors = malloc(number_of_threads * sizeof(*mapping->partitions_of_actors));
     mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
+    mapping->threads_affinities = (int*) malloc(number_of_threads * sizeof(int));
     return mapping;
 }
 
 /**
  * Releases memory of the given mapping structure.
  */
-void delete_mapping(mapping_t* mapping, int clean_all) {
-    if (clean_all) {
-        int i;
-        for (i = 0; i < mapping->number_of_threads; i++) {
-            free(mapping->partitions_of_actors[i]);
-        }
-    }
-    free(mapping->partitions_of_actors);
+void delete_mapping(mapping_t *mapping) {
     free(mapping->partitions_size);
-    free(mapping->threads_affinities);
     free(mapping);
 }
 
 /**
  * Computes a partitionment of actors on threads from an XML file given in parameter.
  */
-mapping_t* map_actors(actor_t **actors, int actors_size) {
+mapping_t* map_actors(network_t *network) {
+    mapping_t *mapping;
     if (mapping_file == NULL) {
-        mapping_t *mapping = allocate_mapping(1);
+        mapping = allocate_mapping(1);
         mapping->threads_affinities[0] = 0;
-        mapping->partitions_size[0] = actors_size;
-        mapping->partitions_of_actors[0] = actors;
+        mapping->partitions_size[0] = network->nb_actors;
+        mapping->partitions_of_actors[0] = network->actors;
         return mapping;
     } else {
-        mappings_set_t *mappings_set = compute_mappings_from_file(mapping_file, actors, actors_size);
-        return mappings_set->mappings[0];
+        mapping = load_mapping(mapping_file, network);
+    }
+    return mapping;
+}
+
+/**
+ * Creates a mapping structure.
+ */
+processor_t* init_processors(int number_of_threads) {
+    int i;
+
+    processor_t* processors = (processor_t *) malloc(number_of_threads * sizeof(processor_t));
+    for (i = 0; i < number_of_threads; i++) {
+        processors[i].processor_id = i;
+        processors[i].utilization = 0;
+    }
+
+    return processors;
+}
+
+/**
+ * Releases memory of the given mapping structure.
+ */
+void delete_processors(processor_t *processors) {
+    free(processors);
+}
+
+/********************************************************************************************
+ *
+ * Functions for results printing
+ *
+ ********************************************************************************************/
+
+void print_load_balancing(mapping_t *mapping) {
+    assert(mapping != NULL);
+    int i, j, nb_proc = 0;
+    int totalWeight = 0, maxWeight = 0, partWeight = 0, nbPartitions = 0;
+    double avgWeight = 0;
+
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        partWeight = 0;
+        for (j = 0; j < mapping->partitions_size[i]; j++) {
+            totalWeight += mapping->partitions_of_actors[i][j]->workload;
+            partWeight += mapping->partitions_of_actors[i][j]->workload;
+            nb_proc++;
+        }
+
+        if (mapping->partitions_size[i] > 0) {
+            nbPartitions++;
+        }
+
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "Weight of partition %d : %d", i+1, partWeight);
+        if (maxWeight < partWeight)
+            maxWeight = partWeight;
+    }
+
+    avgWeight = (totalWeight / mapping->number_of_threads);
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "Average weight: %.2lf   Max weight: %d", avgWeight, maxWeight);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Load balancing %.2lf on %d partitions", maxWeight/avgWeight, nbPartitions);
+}
+
+void print_edge_cut(network_t *network) {
+    int i, cut = 0, comm = 0;
+
+    for (i = 0; i < network->nb_connections; i++) {
+        if (network->connections[i]->src->processor_id != network->connections[i]->dst->processor_id) {
+            comm += network->connections[i]->workload;
+            cut++;
+        }
+    }
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Edgecut : %d   Communication volume : %d", cut, comm);
+}
+
+
+/********************************************************************************************
+ *
+ * Functions for Network managing
+ *
+ ********************************************************************************************/
+
+int swap_actors(actor_t **actors, int index1, int index2, int nb_actors) {
+    assert(actors != NULL);
+    int ret = ORCC_OK;
+    actor_t *actor;
+
+    if (index1 < nb_actors && index2 < nb_actors) {
+        actor = actors[index1];
+        actors[index1] = actors[index2];
+        actors[index1] = actor;
+        actors[index1]->id = index1;
+        actors[index2]->id = index2;
+    } else {
+        ret = ORCC_ERR_SWAP_ACTORS;
+    }
+
+    return ret;
+}
+
+int sort_actors(actor_t **actors, int nb_actors) {
+    assert(actors != NULL);
+    int ret = ORCC_OK;
+    int i, j;
+
+    for (i = 0; i < nb_actors; i++) {
+        for (j = 0; j < nb_actors - i - 1; j++) {
+            if (actors[j]->workload <= actors[j+1]->workload) {
+                swap_actors(actors, j, j+1, nb_actors);
+            }
+        }
+    }
+
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : The sorted list:");
+        for (i = 0; i < nb_actors; i++) {
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tid = %s\tworkload = %d", i, actors[i]->name, actors[i]->workload);
+        }
+    }
+    return ret;
+}
+
+
+
+/********************************************************************************************
+ *
+ * Functions for Mapping data structure
+ *
+ ********************************************************************************************/
+
+int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mapping) {
+    assert(network != NULL);
+    assert(part != NULL);
+    assert(mapping != NULL);
+    int ret = ORCC_OK;
+    int i, j;
+    int *counter = malloc(mapping->number_of_threads * sizeof(counter));
+
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        mapping->partitions_size[i] = 0;
+        counter[i] = 0;
+    }
+    for (i = 0; i < network->nb_actors; i++) {
+        mapping->partitions_size[part[i]]++;
+    }
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        mapping->partitions_of_actors[i] = malloc(mapping->partitions_size[i] * sizeof(**mapping->partitions_of_actors));
+    }
+    for (i = 0; i < network->nb_actors; i++) {
+        mapping->partitions_of_actors[part[i]][counter[part[i]]] = network->actors[i];
+        counter[part[i]]++;
+    }
+
+    // Update network too
+    for (i=0; i < network->nb_actors; i++) {
+        network->actors[i]->processor_id = part[i];
+    }
+
+    free(counter);
+    return ret;
+}
+
+void print_mapping(mapping_t *mapping) {
+    int i, j;
+    printf("\nMapping result : ");
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        printf("\n\tPartition %d : %d actors", i+1, mapping->partitions_size[i]);
+        for (j=0; j < mapping->partitions_size[i]; j++) {
+            printf("\n\t\t%s", mapping->partitions_of_actors[i][j]->name);
+        }
+    }
+    printf("\n");
+}
+
+
+/********************************************************************************************
+ *
+ * Mapping functions
+ *
+ ********************************************************************************************/
+
+#ifdef METIS_ENABLE
+int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part) {
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(part != NULL);
+    int ret = ORCC_OK;
+    idx_t ncon = 1;
+    idx_t metis_opt[METIS_NOPTIONS];
+    idx_t objval;
+    adjacency_list *graph, *metis_graph;
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying METIS Recursive partition for mapping");
+
+    METIS_SetDefaultOptions(metis_opt);
+
+    graph = set_graph_from_network(network);
+    metis_graph = fix_graph_for_metis(graph);
+
+    ret = METIS_PartGraphRecursive(&metis_graph->nb_vertices, /* idx_t *nvtxs */
+                                   &ncon, /*idx_t *ncon*/
+                                   metis_graph->xadj, /*idx_t *xadj*/
+                                   metis_graph->adjncy, /*idx_t *adjncy*/
+                                   metis_graph->vwgt, /*idx_t *vwgt*/
+                                   NULL, /*idx_t *vsize*/
+                                   metis_graph->adjwgt, /*idx_t *adjwgt*/
+                                   &opt->nb_processors, /*idx_t *nparts*/
+                                   NULL, /*real t *tpwgts*/
+                                   NULL, /*real t ubvec*/
+                                   metis_opt, /*idx_t *options*/
+                                   &objval, /*idx_t *objval*/
+                                   part); /*idx_t *part*/
+    check_metis_error(ret);
+
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "METIS Edgecut : %d", objval);
+
+    delete_graph(graph);
+    delete_graph(metis_graph);
+    return ret;
+}
+
+int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part, idx_t mode) {
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(part != NULL);
+    int ret = ORCC_OK;
+    idx_t ncon = 1;
+    idx_t metis_opt[METIS_NOPTIONS];
+    idx_t objval;
+    adjacency_list *graph, *metis_graph;
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying METIS Kway partition for mapping");
+
+    METIS_SetDefaultOptions(metis_opt);
+    metis_opt[METIS_OPTION_OBJTYPE] = mode;
+    metis_opt[METIS_OPTION_CONTIG] = 0;  /* 0 or 1 */
+
+    graph = set_graph_from_network(network);
+    metis_graph = fix_graph_for_metis(graph);
+
+    ret = METIS_PartGraphKway(&metis_graph->nb_vertices, /* idx_t *nvtxs */
+                              &ncon, /*idx_t *ncon*/
+                              metis_graph->xadj, /*idx_t *xadj*/
+                              metis_graph->adjncy, /*idx_t *adjncy*/
+                              metis_graph->vwgt, /*idx_t *vwgt*/
+                              NULL, /*idx_t *vsize*/
+                              metis_graph->adjwgt, /*idx_t *adjwgt*/
+                              &opt->nb_processors, /*idx_t *nparts*/
+                              NULL, /*real t *tpwgts*/
+                              NULL, /*real t ubvec*/
+                              metis_opt, /*idx_t *options*/
+                              &objval, /*idx_t *objval*/
+                              part); /*idx_t *part*/
+    check_metis_error(ret);
+
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "METIS Edgecut : %d", objval);
+
+    delete_graph(graph);
+    delete_graph(metis_graph);
+    return ret;
+}
+#endif
+
+/**
+ * Round Robin strategy
+ * @author Long Nguyen
+ */
+int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part) {
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(part != NULL);
+    int ret = ORCC_OK;
+    int i, k;
+    k = 0;
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying Round Robin strategy for mapping");
+
+    sort_actors(network->actors, network->nb_actors);
+
+    for (i = 0; i < network->nb_actors; i++) {
+        network->actors[i]->processor_id = k++;
+        part[i] = network->actors[i]->processor_id;
+        // There must be something needing to be improved here, i.e. invert
+        // the direction of the distribution to have more balancing.
+        if (k >= opt->nb_processors)
+            k = 0;
+    }
+
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Round Robin result");
+        for (i = 0; i < network->nb_actors; i++) {
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %d\tprocessorId = %d",
+                             i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
+        }
+    }
+
+    return ret;
+}
+
+/**
+ * Entry point for all mapping strategies
+ */
+int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(mapping != NULL);
+    int i;
+    int ret = ORCC_OK;
+    idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network->nb_actors));
+    ticks startTime, endTime;
+
+    if(check_verbosity(ORCC_VL_VERBOSE_2)) {
+        print_network(network);
+    }
+
+    startTime = getticks();
+
+    if (opt->nb_processors != 1) {
+        switch (opt->strategy) {
+#ifdef METIS_ENABLE
+        case ORCC_MS_METIS_REC:
+            ret = do_metis_recursive_partition(network, opt, part);
+            break;
+        case ORCC_MS_METIS_KWAY_CV:
+            ret = do_metis_kway_partition(network, opt, part, METIS_OBJTYPE_CUT); /*TODO : should be METIS_OBJTYPE_VOL : Metis seem's to invert its options */
+            break;
+        case ORCC_MS_METIS_KWAY_EC:
+            ret = do_metis_kway_partition(network, opt, part, METIS_OBJTYPE_VOL); /*TODO : should be METIS_OBJTYPE_CUT : Metis seem's to invert its options */
+            break;
+#endif
+        case ORCC_MS_ROUND_ROBIN:
+            ret = do_round_robbin_mapping(network, opt, part);
+            break;
+        case ORCC_MS_QM:
+        case ORCC_MS_WLB:
+        case ORCC_MS_COWLB:
+        case ORCC_MS_KRWLB:
+        default:
+            break;
+        }
+    } else {
+        for (i = 0; i < network->nb_actors; i++) {
+            part[i] = network->actors[i]->processor_id;
+        }
+    }
+
+    endTime = getticks();
+
+    set_mapping_from_partition(network, part, mapping);
+
+    if(check_verbosity(ORCC_VL_VERBOSE_1)) {
+        print_mapping(mapping);
+        print_load_balancing(mapping);
+        print_edge_cut(network);
+        printf("\nMapping time : %2.lf\n", elapsed(endTime, startTime));
+    }
+
+    free(part);
+    return ret;
+}
+
+/**
+ * Main routine of the mapping agent.
+ */
+void *agent_routine(void *data) {
+    agent_t *agent = (agent_t*) data;
+    int i;
+
+    while (1) {
+        // wait threads synchro
+        for (i = 0; i < agent->nb_threads; i++) {
+            semaphore_wait(agent->sync->sem_monitor);
+        }
+
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "\nRemap the actors...\n");
+        compute_workloads(agent->network);
+        do_mapping(agent->network, agent->options, agent->mapping);
+        apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);
+
+        if(mapping_repetition == REMAP_ALWAYS) {
+            reset_profiling(agent->network);
+            resetMapping();
+        } else {
+            need_remap = FALSE;
+            fpsPrintInit_mapping();
+        }
+
+        // wakeup all threads
+        for (i = 0; i < agent->nb_threads; i++) {
+            semaphore_set(agent->scheduler->schedulers[i]->sem_thread);
+        }
+
+    }
+
+    return 0;
+}
+
+/**
+ * Initialize the given agent structure.
+ */
+agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads) {
+    agent_t *agent = (agent_t *) malloc(sizeof(agent_t));
+    agent->sync = sync;
+    agent->options = options;
+    agent->scheduler = scheduler;
+    agent->network = network;
+    agent->mapping = allocate_mapping(nb_threads);
+    agent->nb_threads = nb_threads;
+    return agent;
+}
+
+int needMapping() {
+    return get_partialNumPicturesDecoded() > nbProfiledFrames && need_remap && nbThreads > 1;
+}
+
+void resetMapping() {
+    reset_partialNumPicturesDecoded();
+}
+
+/**
+ * Apply the given mapping to the schedulers
+ */
+void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThreads) {
+    int i;
+    for (i = 0; i < nbThreads; i++) {
+        sched_reinit(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0);
     }
 }

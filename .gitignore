@@ -4,6 +4,8 @@
 
 # User-specific files
 *.user
+*.sublime-project
+*.sublime-workspace
 
 #Common rules for Eclipse projects
 # src-gen folders are ignored with a specific .gitignore inside each
