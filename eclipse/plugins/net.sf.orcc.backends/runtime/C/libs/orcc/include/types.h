@@ -40,4 +40,4 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long int u64;
 
-#endif
+#endif  /* _ORCC_TYPES_H_ */

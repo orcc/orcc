@@ -179,4 +179,4 @@ void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThre
 int do_mapping(network_t *network, options_t *opt, mapping_t *mapping);
 
 
-#endif  /* _ORCCMAP_MAPPING_H_ */
+#endif  /* _ORCC_MAPPING_H_ */

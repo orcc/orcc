@@ -93,4 +93,4 @@ int check_graph_for_metis(adjacency_list *graph);
  */
 adjacency_list *fix_graph_for_metis(adjacency_list *graph);
 
-#endif
+#endif  /* _ORCC_GRAPH_H_ */

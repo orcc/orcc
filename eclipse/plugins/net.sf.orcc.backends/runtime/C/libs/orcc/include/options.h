@@ -60,4 +60,4 @@ void set_verbose_level(char *arg_value, options_t *opt);
 void set_default_output_filename(char *arg_value, options_t *opt);
 
 
-#endif  /* _ORCCMAP_OPTIONS_H_ */
+#endif  /* _ORCC_OPTIONS_H_ */

@@ -73,7 +73,7 @@ typedef enum {
     ORCC_ERR_METIS,
     ORCC_ERR_METIS_FIX_WEIGHTS,
     ORCC_ERR_METIS_FIX_NEEDED,
-    ORCC_ERR_SWAP_ACTORS,
+    ORCC_ERR_SWAP_ACTORS,_ORCC_TYPES_H_
     ORCC_ERR_ROXML_OPEN,
     ORCC_ERR_ROXML_NODE_ROOT,
     ORCC_ERR_ROXML_NODE_CONF,
@@ -101,4 +101,4 @@ typedef enum {
     ORCC_MS_SIZE /* only used for string tab declaration */
 } mappingstrategy_et;
 
-#endif
+#endif  /* _ORCC_H_ */

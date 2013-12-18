@@ -136,4 +136,4 @@ void sched_add_mesh_waiting_list(local_scheduler_t *sched);
  */
 actor_t *sched_get_next_schedulable(local_scheduler_t *sched, int use_ring_topology);
 
-#endif
+#endif  /* _ORCC_SCHEDULER_H_ */

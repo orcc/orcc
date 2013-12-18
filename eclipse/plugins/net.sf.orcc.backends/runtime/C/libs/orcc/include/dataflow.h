@@ -92,4 +92,4 @@ void compute_workloads(network_t *network);
 
 void print_network(network_t *network);
 
-#endif
+#endif  /* _ORCC_DATAFLOW_H_ */

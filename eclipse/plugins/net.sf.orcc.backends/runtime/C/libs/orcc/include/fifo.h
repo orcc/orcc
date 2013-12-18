@@ -99,4 +99,4 @@ static struct FIFO_S(type) fifo_##count = { (size), array_##count, readersnb, re
 #include "generic_fifo.h"
 #undef T
 
-#endif
+#endif  /* _ORCC_FIFO_H_ */

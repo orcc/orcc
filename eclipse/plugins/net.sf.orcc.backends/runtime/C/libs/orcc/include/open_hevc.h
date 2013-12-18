@@ -85,4 +85,4 @@ void put_unweighted_pred_orcc(u8 _dst[2][64*64],
 void put_unweighted_pred_avg_orcc(u8 _dst[2][64*64],
   i16 _src[2][64*64], u8 width, u8 height);
 
-#endif
+#endif  /* _ORCC_OPEN_HEVC_H_ */

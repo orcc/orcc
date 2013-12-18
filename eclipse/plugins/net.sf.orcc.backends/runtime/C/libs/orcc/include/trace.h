@@ -101,4 +101,4 @@ boolean check_verbosity(verbose_level_et level);
  */
 void print_orcc_trace(verbose_level_et level, const char *trace, ...);
 
-#endif  /* _ORCCMAP_UTIL_H_ */
+#endif  /* _ORCC_TRACE_H_ */

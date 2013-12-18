@@ -103,4 +103,4 @@ void print_usage();
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning (disable:4996)
 
-#endif
+#endif  /* _ORCC_UTIL_H_ */

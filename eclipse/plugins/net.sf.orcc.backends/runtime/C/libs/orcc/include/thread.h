@@ -127,4 +127,4 @@ void sync_init(sync_t *sync);
 
 void set_realtime_priority();
 
-#endif
+#endif  /* _ORCC_THREAD_H_ */

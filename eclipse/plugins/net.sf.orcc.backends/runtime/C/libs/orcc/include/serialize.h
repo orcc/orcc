@@ -54,4 +54,4 @@ void save_profiling(char* fileName, network_t *network);
 mapping_t* load_mapping(char *xcf_file, network_t *network);
 
 
-#endif  /* _ORCCMAP_SERIALIZE_H_ */
+#endif  /* _ORCC_SERIALIZE_H_ */
