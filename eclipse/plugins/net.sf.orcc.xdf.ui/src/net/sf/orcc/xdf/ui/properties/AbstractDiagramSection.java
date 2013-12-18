@@ -28,7 +28,11 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
+import net.sf.orcc.ui.editor.PartialCalParser;
+
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
@@ -57,6 +61,12 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	protected PictogramElement pictogramElement;
 
 	protected Composite formBody;
+
+	protected final PartialCalParser calParser;
+
+	public AbstractDiagramSection() {
+		calParser = new PartialCalParser();
+	}
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {

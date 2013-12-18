@@ -31,7 +31,9 @@ package net.sf.orcc.xdf.ui.properties;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.TypePrinter;
+import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -135,7 +137,21 @@ public class NetworkParametersSection extends AbstractTableBasedSection {
 
 	@Override
 	protected void writeValuesToModel() {
-		// TODO Auto-generated method stub
+		final Network network = (Network) businessObject;
 
+		network.getParameters().clear();
+
+		for (final TableItem item : table.getItems()) {
+			final String typeText = item.getText(0);
+			final String nameText = item.getText(1);
+
+			final Var var = calParser.parseVariableDeclaration(typeText + " " + nameText);
+			if (var != null) {
+				network.getParameters().add(var);
+			} else {
+				MessageDialog.openError(XdfUtil.getDefaultShell(), "Syntax error",
+						"Values you entered could not be parsed");
+			}
+		}
 	}
 }
