@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
+import net.sf.orcc.df.Network;
 import net.sf.orcc.ui.editor.PartialCalParser;
 
 import org.eclipse.emf.ecore.EObject;
@@ -57,6 +58,7 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	protected TabbedPropertySheetWidgetFactory widgetFactory;
 
 	protected EObject businessObject;
+	protected Network currentNetwork;
 
 	protected PictogramElement pictogramElement;
 
@@ -86,6 +88,7 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 
 		pictogramElement = getSelectedPictogramElement();
 		businessObject = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
+		currentNetwork = (Network) Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getDiagram());
 	}
 
 	@Override

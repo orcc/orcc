@@ -95,6 +95,12 @@ public class PartialCalParser extends CalSwitch<EObject> {
 		declaredVars.put(var.getName(), var);
 	}
 
+	public void addDeclaredVars(final Iterable<Var> vars) {
+		for (final Var var : vars) {
+			declaredVars.put(var.getName(), var);
+		}
+	}
+
 	public boolean isVariableDeclaration(final String declString) {
 		final Reader reader = new StringReader(declString);
 		final IParseResult result = parser.parse(grammarAccess.getValuedVariableDeclarationRule(), reader);
@@ -291,7 +297,7 @@ public class PartialCalParser extends CalSwitch<EObject> {
 		// Get the already declared variable with the given name
 		final Var var = declaredVars.get(variableName);
 		if (var == null) {
-			throw new OrccRuntimeException("Unable to find " + variableName + " declaration.");
+			throw new OrccRuntimeException("Unable to find declaration for variable \"" + variableName + "\".");
 		}
 		return IrFactory.eINSTANCE.createExprVar(var);
 	}
