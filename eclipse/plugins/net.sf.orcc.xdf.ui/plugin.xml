@@ -81,8 +81,8 @@
       <propertyTab
             afterTab="net.sf.orcc.xdf.ui.tabs.MainInstance"
             category="net.sf.orcc.xdf.ui.editor.defaultCategory"
-            id="net.sf.orcc.xdf.ui.tabs.ParametersInstance"
-            label="Parameters">
+            id="net.sf.orcc.xdf.ui.tabs.ArgumentsInstance"
+            label="Arguments">
       </propertyTab>
        <propertyTab
              category="net.sf.orcc.xdf.ui.editor.defaultCategory"
@@ -122,10 +122,10 @@
             tab="net.sf.orcc.xdf.ui.tabs.MainInstance">
       </propertySection>
       <propertySection
-            class="net.sf.orcc.xdf.ui.properties.InstanceParametersSection"
+            class="net.sf.orcc.xdf.ui.properties.InstanceArgumentsSection"
             filter="net.sf.orcc.xdf.ui.properties.InstanceSectionFilter"
-            id="net.sf.orcc.xdf.ui.sections.instance.ParametersSection"
-            tab="net.sf.orcc.xdf.ui.tabs.ParametersInstance">
+            id="net.sf.orcc.xdf.ui.sections.instance.ArgumentsSection"
+            tab="net.sf.orcc.xdf.ui.tabs.ArgumentsInstance">
       </propertySection>
       <propertySection
             class="net.sf.orcc.xdf.ui.properties.PortMainSection"

@@ -54,26 +54,26 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
-public class InstanceParametersSection extends AbstractTableBasedSection {
+public class InstanceArgumentsSection extends AbstractTableBasedSection {
 
 	/**
-	 * Define the dialog used to edit a network parameter.
+	 * Define the dialog used to edit an instance argument.
 	 * 
 	 * @author Antoine Lorence
 	 * 
 	 */
-	private class ParameterItemEditor extends ItemEditor {
+	private class ArgumentItemEditor extends ItemEditor {
 
 		private Text name;
 		private Text value;
 
-		protected ParameterItemEditor(final TableItem item) {
+		protected ArgumentItemEditor(final TableItem item) {
 			super(item);
 		}
 
 		@Override
 		protected String getDialogTitle() {
-			return "Edit variable";
+			return "Edit argument";
 		}
 
 		@Override
@@ -110,7 +110,7 @@ public class InstanceParametersSection extends AbstractTableBasedSection {
 
 	@Override
 	protected String getFormText() {
-		return "Instance Parameters";
+		return "Instance Arguments";
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class InstanceParametersSection extends AbstractTableBasedSection {
 		super.createControls(parent, aTabbedPropertySheetPage);
 
 		final TableColumn nameColumn = new TableColumn(table, SWT.NONE);
-		nameColumn.setText("Parameter name");
+		nameColumn.setText("Argument name");
 		nameColumn.setWidth(100);
 
 		final TableColumn valueColumn = new TableColumn(table, SWT.NONE);
@@ -127,7 +127,7 @@ public class InstanceParametersSection extends AbstractTableBasedSection {
 
 	@Override
 	void editTableItem(TableItem item) {
-		final ParameterItemEditor editor = new ParameterItemEditor(item);
+		final ArgumentItemEditor editor = new ArgumentItemEditor(item);
 		editor.open();
 	}
 
@@ -150,7 +150,7 @@ public class InstanceParametersSection extends AbstractTableBasedSection {
 		final Instance instance = (Instance) businessObject;
 
 		// Only parameters of this instance's refinement (Actor or Network) can
-		// be used as param name
+		// be used as argument name
 		final EObject refinement = instance.getEntity();
 		List<Var> declaredVars = Collections.emptyList();
 		if (refinement instanceof Network) {
@@ -160,7 +160,7 @@ public class InstanceParametersSection extends AbstractTableBasedSection {
 		}
 
 		// Variables and parameters declared in the current network can be used
-		// as value for an instance parameter
+		// as value for an instance argument
 		calParser.addDeclaredVars(currentNetwork.getParameters());
 		calParser.addDeclaredVars(currentNetwork.getVariables());
 
