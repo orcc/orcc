@@ -26,8 +26,10 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef THREAD_H
-#define THREAD_H
+#ifndef _ORCC_THREAD_H_
+#define _ORCC_THREAD_H_
+
+#include "orcc.h"
 
 #ifdef _WIN32
 	// ok here is some dark Windows magic
@@ -78,6 +80,7 @@
 	
 #else
 	#include <pthread.h>
+    #include <sched.h>
 	#include <semaphore.h>
 	
 	// Thread
@@ -115,11 +118,13 @@
 #endif
 
 
-typedef struct sync_s {
+struct sync_s {
 	semaphore_struct sem_monitor;
 	int active_sync;
-} sync_t;
+};
 
 void sync_init(sync_t *sync);
 
-#endif
+void set_realtime_priority();
+
+#endif  /* _ORCC_THREAD_H_ */

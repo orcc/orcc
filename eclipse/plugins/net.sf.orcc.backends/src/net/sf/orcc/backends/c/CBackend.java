@@ -30,7 +30,6 @@ package net.sf.orcc.backends.c;
 
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
-import static net.sf.orcc.backends.BackendsConstants.GENETIC_ALGORITHM;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,9 +47,11 @@ import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.DivisionSubstitution;
 import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.Inliner;
+import net.sf.orcc.backends.transform.InlinerByAnnotation;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.InstTernaryAdder;
 import net.sf.orcc.backends.transform.ListFlattener;
+import net.sf.orcc.backends.transform.LoopUnrolling;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
@@ -138,8 +139,8 @@ public class CBackend extends AbstractBackend {
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
 		transformations.add(new DisconnectedOutputPortRemoval());
-		//new Inliner(true, true);
-		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
+		transformations.add(new DfVisitor<Void>(new InlinerByAnnotation()));
+		transformations.add(new DfVisitor<Void>(new LoopUnrolling()));
 		// If "-t" option is passed to command line, apply additional
 		// transformations
 		if (getAttribute(ADDITIONAL_TRANSFOS, false)) {
@@ -245,10 +246,7 @@ public class CBackend extends AbstractBackend {
 
 		printCMake(network);
 		new StatisticsPrinter().print(srcPath, network);
-
-		if (!getAttribute(GENETIC_ALGORITHM, false)) {
-			new Mapping(network, mapping).print(srcPath);
-		}
+		new Mapping(network, mapping).print(srcPath);
 	}
 
 	protected void printCMake(Network network) {

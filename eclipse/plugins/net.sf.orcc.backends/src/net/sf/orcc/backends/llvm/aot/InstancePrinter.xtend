@@ -91,15 +91,17 @@ class InstancePrinter extends LLVMTemplate {
 	val Map<State, Integer> stateToLabel = new HashMap<State, Integer>
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
-	protected var optionProfile = false
+	protected var optionInline = false
 	protected var optionArch = "x86_64"
+
+	protected var boolean isActionVectorizable = false
 	
 	/**
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {		
-		if(options.containsKey(PROFILE)){
-			optionProfile = options.get(PROFILE) as Boolean
+		if(options.containsKey(INLINE)){
+			optionInline = options.get(INLINE) as Boolean
 		}
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
@@ -352,9 +354,26 @@ class InstancePrinter extends LLVMTemplate {
 				«ENDIF»
 			
 			bb_«extName»_fire:
-				call void @«action.body.name» ()
+			«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
+					call void @«action.body.name»_vectorizable()
+			«ELSEIF action.hasAttribute(VECTORIZABLE)»
+				«action.printVectorizationConditions(state)»
+				
+				bb_«extName»_fire_vectorizable:
+					call void @«action.body.name»_vectorizable()
+					br label %bb_«extName»_fire_ret
+
+				bb_«extName»_fire_notvectorizable:
+					call void @«action.body.name»()
+					br label %bb_«extName»_fire_ret
+				
+				bb_«extName»_fire_ret:
+			«ELSE»
+					call void @«action.body.name»()
+			«ENDIF»		
 				
 				br label %bb_s_«transition.target.name»
+				
 			bb_«extName»_unschedulable:
 			
 		«ENDFOR»
@@ -382,6 +401,41 @@ class InstancePrinter extends LLVMTemplate {
 			«printCallEndTokenFunctions»
 			ret void
 		}
+	'''
+
+	def protected printVectorizationConditions(Action action, State state) '''
+		«val stateName = if(state != null) '''«state.name»_''' else ""»
+		«val actionName = if(state != null) '''«state.name»_«action.name»''' else '''«action.name»'''»
+		«val portToIndexMap = portToIndexByPatternMap.get(action.inputPattern)»
+		«val connections = action.outputPattern.ports.notNative.map[outgoingPortMap.get(it)].flatten.toList»
+		«FOR port : action.inputPattern.ports»
+			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
+				«val extName = port.name + "_" + stateName + action.name + "_" + portToIndexMap.get(port)»
+					%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
+					%tmp_vect2_«extName» = add i32 %index_«extName», «action.inputPattern.numTokensMap.get(port)»
+					%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
+					%is_vectorizable_«extName» = icmp slt i32 %tmp_vect1_«extName», %tmp_vect3_«extName»
+					br i1 %is_vectorizable_«extName», label %next_vectorizable_«extName», label %bb_«actionName»_fire_notvectorizable
+				
+				next_vectorizable_«extName»:
+			«ENDIF»
+		«ENDFOR»		
+		«FOR connection : connections»
+			«val port = connection.sourcePort»
+			«val name = port.name + "_" + connection.getSafeId(port)»
+			«val extName = name + "_" + stateName + action.name»
+			«val numTokens = action.outputPattern.numTokensMap.get(port)»
+			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
+					%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
+					%tmp_vect2_«extName» = add i32 %index_«extName», «numTokens»
+					%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
+					%is_vectorizable_«extName» = icmp slt i32 %tmp_vect1_«extName», %tmp_vect3_«extName»
+					br i1 %is_vectorizable_«extName», label %next_vectorizable_«extName», label %bb_«actionName»_fire_notvectorizable
+
+				next_vectorizable_«extName»:
+			«ENDIF»
+		«ENDFOR»	
+			br label %bb_«actionName»_fire_vectorizable
 	'''
 	
 	def private printActionLoop(EList<Action> actions, boolean outsideFSM) '''
@@ -420,14 +474,29 @@ class InstancePrinter extends LLVMTemplate {
 				«ENDIF»
 			
 			bb_«name»_fire:
-				call void @«action.body.name» ()
+			«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
+					call void @«action.body.name»_vectorizable()
+			«ELSEIF action.hasAttribute(VECTORIZABLE)»
+				«action.printVectorizationConditions(null)»
 				
+				bb_«name»_fire_vectorizable:
+					call void @«action.body.name»_vectorizable()
+					br label %bb_«name»_fire_ret
+
+				bb_«name»_fire_notvectorizable:
+					call void @«action.body.name»()
+					br label %bb_«name»_fire_ret
+				
+				bb_«name»_fire_ret:
+			«ELSE»
+					call void @«action.body.name»()
+			«ENDIF»		
 				«IF outsideFSM»
 					br label %bb_outside_scheduler_start
 				«ELSE»
 					br label %bb_scheduler_start
 				«ENDIF»
-			
+					
 			bb_«name»_unschedulable:
 		«ENDFOR»
 			«IF outsideFSM»
@@ -442,18 +511,22 @@ class InstancePrinter extends LLVMTemplate {
 		val portToIndexMap = portToIndexByPatternMap.get(pattern)
 		val firstPort = pattern.ports.notNative.head
 		val firstName = firstPort.name + "_" + incomingPortMap.get(firstPort).getSafeId(firstPort)
+		val extName = firstPort.name + "_" + stateName + action.name + "_" + portToIndexMap.get(firstPort)
 		'''
-			%numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @numTokens_«firstName»
-			%index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = load i32* @index_«firstName»
-			%status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = sub i32 %numTokens_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», %index_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)»
-			%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = icmp sge i32 %status_«firstPort.name»_«stateName»«action.name»_«portToIndexMap.get(firstPort)», «pattern.numTokensMap.get(firstPort)»
-			
+			%numTokens_«extName» = load i32* @numTokens_«firstName»
+			%index_«extName» = load i32* @index_«firstName»
+			%size_«extName» = load i32* @SIZE_«firstName»
+			%status_«extName» = sub i32 %numTokens_«extName», %index_«extName»
+			%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(firstPort)» = icmp sge i32 %status_«extName», «pattern.numTokensMap.get(firstPort)»
+
 			«FOR port : pattern.ports.notNative.tail»
 				«val name = port.name + "_" + incomingPortMap.get(port).getSafeId(port)»
-				%numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @numTokens_«name»
-				%index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = load i32* @index_«name»
-				%status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)» = sub i32 %numTokens_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», %index_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)»
-				%available_input_«stateName»«action.name»_«port.name» = icmp uge i32 %status_«port.name»_«stateName»«action.name»_«portToIndexMap.get(port)», «pattern.numTokensMap.get(port)»
+				«val pExtName = port.name + "_" + stateName + action.name + "_" + portToIndexMap.get(port)»
+				%numTokens_«pExtName» = load i32* @numTokens_«name»
+				%index_«pExtName» = load i32* @index_«name»
+				%size_«pExtName» = load i32* @SIZE_«name»
+				%status_«pExtName» = sub i32 %numTokens_«pExtName», %index_«pExtName»
+				%available_input_«stateName»«action.name»_«port.name» = icmp uge i32 %status_«pExtName», «pattern.numTokensMap.get(port)»
 				%has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(port)» = and i1 %has_valid_inputs_«stateName»«action.name»_«portToIndexMap.get(pattern.ports.get(pattern.ports.indexOf(port) - 1))», %available_input_«stateName»«action.name»_«port.name»
 				
 			«ENDFOR»
@@ -509,6 +582,47 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDFOR»
 		«ENDFOR»
 	'''
+
+	def protected printVectorizable(Action action) {
+		isActionVectorizable = action.hasAttribute(VECTORIZABLE)
+		val output = '''
+		«val inputPattern = action.inputPattern»
+		«val outputPattern = action.outputPattern»
+		«IF isActionVectorizable»
+
+		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionInline»noinline «ENDIF»nounwind {
+		entry:
+			«FOR local : action.body.locals»
+				«local.declare»
+			«ENDFOR»
+			«FOR port : inputPattern.ports.notNative»
+				«port.loadVar(incomingPortMap.get(port), action.body.name)»
+			«ENDFOR»
+			«FOR port : outputPattern.ports.notNative»
+				«FOR connection : outgoingPortMap.get(port)»
+					«port.loadVar(connection, action.body.name)»
+				«ENDFOR»
+			«ENDFOR»
+			br label %b«action.body.blocks.head.label»
+		
+		«FOR block : action.body.blocks»
+			«block.doSwitch»
+		«ENDFOR»
+			«FOR port : inputPattern.ports.notNative»
+				«port.updateVar(incomingPortMap.get(port), inputPattern.getNumTokens(port), action.body.name)»
+			«ENDFOR»
+			«FOR port : outputPattern.ports.notNative»
+				«FOR connection : outgoingPortMap.get(port)»
+					«port.updateVar(connection, outputPattern.getNumTokens(port), action.body.name)»
+				«ENDFOR»
+			«ENDFOR»
+			ret void
+		}
+		«ENDIF»	
+		'''
+		isActionVectorizable = false
+		return output
+	}
 	
 	def protected print(Action action) '''
 		«val inputPattern = action.inputPattern»
@@ -520,7 +634,7 @@ class InstancePrinter extends LLVMTemplate {
 				«local.declare»
 			«ENDFOR»
 			«FOR port : peekPattern.ports.notNative»
-				«port.loadVar(incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port), action.body.name)»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
 		
@@ -528,18 +642,19 @@ class InstancePrinter extends LLVMTemplate {
 			«block.doSwitch»
 		«ENDFOR»
 		}
-		
-		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
+
+		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
 			«ENDFOR»
 			«FOR port : inputPattern.ports.notNative»
-				«port.loadVar(incomingPortMap.get(port))»
+				«port.loadVar(incomingPortMap.get(port), action.body.name)»
 			«ENDFOR»
 			«FOR port : outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
-					«port.loadVar(connection)»
+					«port.loadVar(connection, action.body.name)»
 				«ENDFOR»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
@@ -548,27 +663,38 @@ class InstancePrinter extends LLVMTemplate {
 			«block.doSwitch»
 		«ENDFOR»
 			«FOR port : inputPattern.ports.notNative»
-				«port.updateVar(incomingPortMap.get(port), inputPattern.getNumTokens(port))»
+				«port.updateVar(incomingPortMap.get(port), inputPattern.getNumTokens(port), action.body.name)»
 			«ENDFOR»
 			«FOR port : outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
-					«port.updateVar(connection, outputPattern.getNumTokens(port))»
+					«port.updateVar(connection, outputPattern.getNumTokens(port), action.body.name)»
 				«ENDFOR»
 			«ENDFOR»
 			ret void
 		}
+		«ENDIF»
+		«action.printVectorizable»
 	'''
 	
-	def protected loadVar(Port port, Connection connection) '''
-		%local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
+	def protected loadVar(Port port, Connection connection, String actionName) '''
 		%local_size_«port.name»_«connection.getSafeId(port)» = load i32* @SIZE_«port.name»_«connection.getSafeId(port)»
+		«IF (isActionVectorizable && port.hasAttribute(actionName + "_" + VECTORIZABLE)) || port.hasAttribute(VECTORIZABLE_ALWAYS)»
+		%orig_local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
+		%local_index_«port.name»_«connection.getSafeId(port)» = urem i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», %local_size_«port.name»_«connection.getSafeId(port)»
+		«ELSE»
+		%local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
+		«ENDIF»
 	'''
 	
-	def protected updateVar(Port port, Connection connection, Integer numTokens) '''
+	def protected updateVar(Port port, Connection connection, Integer numTokens, String actionName) '''
+		«IF (isActionVectorizable && port.hasAttribute(actionName + "_" + VECTORIZABLE)) || port.hasAttribute(VECTORIZABLE_ALWAYS)»
+		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
+		«ELSE»
 		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
+		«ENDIF»
 		store i32 %new_index_«port.name»_«connection.getSafeId(port)», i32* @index_«port.name»_«connection.getSafeId(port)»
 	'''	
-	
+
 	def protected print(Procedure procedure) '''
 		«val parameters = procedure.parameters.join(", ")[argumentDeclaration]»
 		«IF procedure.native || procedure.blocks.nullOrEmpty»
@@ -823,7 +949,7 @@ class InstancePrinter extends LLVMTemplate {
 				«IF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«FOR connection : outgoingPortMap.get(port)»
-						«printPortAccess(connection, port, variable, store.indexes.head, store)»
+						«action.printPortAccess(connection, port, variable, store.indexes.head, store)»
 						store«port.properties» «innerType.doSwitch» «store.value.doSwitch», «innerType.doSwitch»«connection.addrSpace»* «varName(variable, store)»_«connection.getSafeId(port)»
 					«ENDFOR»
 				«ELSE»
@@ -846,17 +972,17 @@ class InstancePrinter extends LLVMTemplate {
 				«IF action != null && action.inputPattern.contains(variable) && ! action.inputPattern.varToPortMap.get(variable).native»
 					«val port = action.inputPattern.varToPortMap.get(variable)»
 					«val connection = incomingPortMap.get(port)»
-					«printPortAccess(connection, port, variable, load.indexes.head, load)»
+					«action.printPortAccess(connection, port, variable, load.indexes.head, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSEIF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«val connection = outgoingPortMap.get(port).head»
-					«printPortAccess(connection, port, variable, load.indexes.head, load)»
+					«action.printPortAccess(connection, port, variable, load.indexes.head, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSEIF action != null && action.peekPattern.contains(variable)»
 					«val port = action.peekPattern.varToPortMap.get(variable)»
 					«val connection = incomingPortMap.get(port)»
-					«printPortAccess(connection, port, variable, load.indexes.head, load)»
+					«action.printPortAccess(connection, port, variable, load.indexes.head, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSE»
 					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "")[printIndex]»
@@ -905,7 +1031,7 @@ class InstancePrinter extends LLVMTemplate {
 		'''%«variable.name»_elt_«(procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>).get(instr)»'''
 	}
 
-	def private printPortAccess(Connection connection, Port port, Var variable, Expression index, Instruction instr) {
+	def private printPortAccess(Action action, Connection connection, Port port, Var variable, Expression index, Instruction instr) {
 		val procedure = EcoreHelper::getContainerOfType(instr, typeof(Procedure))
 		val accessMap = procedure.getAttribute("accessMap").objectValue as Map<Instruction, Integer>
 		val accessId = accessMap.get(instr)
@@ -918,8 +1044,12 @@ class InstancePrinter extends LLVMTemplate {
 			«IF needCast»
 				%cast_index_«extName» = «IF indexSize < 32»zext«ELSE»trunc«ENDIF» «index.type.doSwitch» «index.doSwitch» to i32
 			«ENDIF»
-			%tmp_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«index.doSwitch»«ENDIF»
-			%final_index_«extName» = urem i32 %tmp_index_«extName», %local_size_«fifoName»
+			«IF (isActionVectorizable && port.hasAttribute(action.name + "_" + VECTORIZABLE)) || port.hasAttribute(VECTORIZABLE_ALWAYS)»
+				%final_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«index.doSwitch»«ENDIF»
+			«ELSE»
+				%tmp_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«index.doSwitch»«ENDIF»
+				%final_index_«extName» = urem i32 %tmp_index_«extName», %local_size_«fifoName»
+			«ENDIF»
 			«varName(variable, instr)»_«connId» = getelementptr [«connection.safeSize» x «port.type.doSwitch»]«connection.addrSpace»* @fifo_«connId»_content, i32 0, i32 %final_index_«extName»
 		'''
 	}

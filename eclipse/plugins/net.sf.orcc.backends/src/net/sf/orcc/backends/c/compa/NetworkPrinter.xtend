@@ -41,8 +41,6 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	
 	new(Network network, Map<String, Object> options) {
 		super(network, options)
-		
-		geneticAlgo = false
 	}
 	
 	override protected getNetworkFileContent() '''

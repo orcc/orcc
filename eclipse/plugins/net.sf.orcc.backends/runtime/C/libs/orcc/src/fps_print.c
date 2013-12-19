@@ -32,46 +32,55 @@
 #include <SDL.h>
 #include <time.h>
 
+#include "options.h"
+
 static unsigned int startTime;
+static unsigned int mappingTime;
 static unsigned int relativeStartTime;
 static int lastNumPic;
 static int numPicturesDecoded;
+static int numAlreadyDecoded;
+static int partialNumPicturesDecoded;
 
-static Uint32 partialStartTime;
-static Uint32 partialEndTime;
-static int partialNumPicturesStart;
-static int partialNumPicturesEnd;
-
-static int show_fps = 1;
-
-static void print_fps_avg(void) {
+static void print_fps_avg() {
 	unsigned int endTime = SDL_GetTicks();
 
-	printf("%i images in %f seconds: %f FPS\n", numPicturesDecoded,
+    print_orcc_trace(ORCC_VL_QUIET, "%i images in %f seconds: %f FPS\n", numPicturesDecoded,
 		(float) (endTime - startTime)/ 1000.0f,
-		1000.0f * (float) numPicturesDecoded / (float) (endTime -startTime));
+        1000.0f * (float) numPicturesDecoded / (float) (endTime - startTime));
+}
+
+static void print_fps_mapping() {
+    unsigned int endTime = SDL_GetTicks();
+
+    print_orcc_trace(ORCC_VL_QUIET, "PostMapping : %i images in %f seconds: %f FPS", numPicturesDecoded - numAlreadyDecoded,
+        (float) (endTime - mappingTime)/ 1000.0f,
+        1000.0f * (float) (numPicturesDecoded - numAlreadyDecoded) / (float) (endTime - mappingTime));
 }
 
 void fpsPrintInit() {
 	startTime = SDL_GetTicks();
 	numPicturesDecoded = 0;
+    partialNumPicturesDecoded = 0;
 	lastNumPic = 0;
-	if(show_fps) {
-		atexit(print_fps_avg);
-	}
-
+    atexit(print_fps_avg);
 	relativeStartTime = startTime;
-	// For genetic algorithm
-	partialStartTime = startTime;
-	partialNumPicturesStart = 0;
 }
+
+void fpsPrintInit_mapping() {
+    mappingTime = SDL_GetTicks();
+    numAlreadyDecoded = numPicturesDecoded;
+    atexit(print_fps_mapping);
+}
+
 
 void fpsPrintNewPicDecoded(void) {
 	unsigned int endTime;
 	numPicturesDecoded++;
+    partialNumPicturesDecoded++;
 	endTime = SDL_GetTicks();
-	if (show_fps && (endTime - relativeStartTime) / 1000.0f >= 5) {
-		printf("%f images/sec\n",
+    if ((endTime - relativeStartTime) / 1000.0f >= 5) {
+        printf("%f images/sec\n",
 				1000.0f * (float) (numPicturesDecoded - lastNumPic)
 						/ (float) (endTime - relativeStartTime));
 
@@ -80,26 +89,10 @@ void fpsPrintNewPicDecoded(void) {
 	}
 }
 
-float computePartialFps() {
-	return 1000.0f
-			* (float) (partialNumPicturesEnd - partialNumPicturesStart)
-			/ (float) (partialEndTime - partialStartTime);
+int get_partialNumPicturesDecoded() {
+    return partialNumPicturesDecoded;
 }
 
-void backupPartialStartInfo() {
-	partialStartTime = SDL_GetTicks();
-	partialNumPicturesStart = partialNumPicturesEnd;
-}
-
-void backupPartialEndInfo() {
-	partialEndTime = SDL_GetTicks();
-	partialNumPicturesEnd = numPicturesDecoded;
-}
-
-void remove_fps_printing() {
-	show_fps = 0;
-}
-
-void active_fps_printing() {
-	show_fps = 1;
+void reset_partialNumPicturesDecoded() {
+    partialNumPicturesDecoded = 0;
 }

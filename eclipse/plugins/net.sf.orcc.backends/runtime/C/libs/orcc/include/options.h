@@ -27,31 +27,37 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCC_SERIALIZE_H_
-#define _ORCC_SERIALIZE_H_
+#ifndef _ORCC_OPTIONS_H_
+#define _ORCC_OPTIONS_H_
 
 #include "orcc.h"
 
-/**
- * Load network structure from an XDF file.
+/*
+ * Options for mapping
  */
-network_t* load_network(char *fileName);
-
-/**
- * Save mapping structure to XCF file.
- */
-int save_mapping(char* fileName, mapping_t *mapping);
-
-/**
- * Save network's workloads from instrumentation to a file
- * that could be used for mapping.
- */
-void save_profiling(char* fileName, network_t *network);
+struct options_s
+{
+    int nb_processors;
+    mappingstrategy_et strategy;
+    char *input_file;
+    char *output_file;
+};
 
 /**
- * Generate some mapping structure from an XCF file.
+ * Creates and init options structure.
  */
-mapping_t* load_mapping(char *xcf_file, network_t *network);
+options_t *set_default_options();
+options_t *set_options(mappingstrategy_et strategy, int nb_processors);
+
+/**
+ * Releases memory of the given options structure.
+ */
+void delete_options(options_t *opt);
+
+void set_nb_processors(char *arg_value, options_t *opt);
+void set_mapping_strategy(char *arg_value, options_t *opt);
+void set_verbose_level(char *arg_value, options_t *opt);
+void set_default_output_filename(char *arg_value, options_t *opt);
 
 
-#endif  /* _ORCC_SERIALIZE_H_ */
+#endif  /* _ORCC_OPTIONS_H_ */

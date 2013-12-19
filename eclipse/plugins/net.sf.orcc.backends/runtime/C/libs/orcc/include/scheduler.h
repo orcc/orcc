@@ -26,24 +26,22 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#ifndef _ORCC_SCHEDULER_H_
+#define _ORCC_SCHEDULER_H_
 
+#include "orcc.h"
 #include "thread.h"
-
-typedef struct actor_s actor_t;
 
 #define MAX_ACTORS 1024
 
-typedef struct waiting_s {
-    actor_t *waiting_actors[MAX_ACTORS];
-    volatile unsigned int next_entry;
-    unsigned int next_waiting;
-} waiting_t;
+struct global_scheduler_s {
+    local_scheduler_t **schedulers;
+    int nb_schedulers;
+};
 
-typedef struct scheduler_s {
+struct local_scheduler_s {
 	int id; /** Unique ID of this scheduler */
-	int schedulers_nb;
+    int nb_schedulers;
 
 	/* Round robin */
 	int num_actors; /** number of actors managed by this scheduler */
@@ -66,65 +64,76 @@ typedef struct scheduler_s {
 	/* Genetic algorithm */
     sync_t *sync;
 	semaphore_struct sem_thread;
-} scheduler_t;
+};
+
+struct waiting_s {
+    actor_t *waiting_actors[MAX_ACTORS];
+    volatile unsigned int next_entry;
+    unsigned int next_waiting;
+};
 
 typedef enum reasons {
     starved,
     full
 } reasons_t;
 
-typedef struct schedinfo_s {
+struct schedinfo_s {
     int num_firings;
     reasons_t reason;
     int ports; /** contains a mask that indicate the ports affected */
-} schedinfo_t;
+};
+
+
+global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync);
+
+local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_schedulable,
+        waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);
 
 /**
  * Initialize the given scheduler.
  */
-void sched_init(scheduler_t *sched, int id, int num_actors, actor_t **actors, waiting_t *ring_waiting_schedulable,
-        waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);
+void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors);
 
 /**
  * Initialize the actors mapped to the given scheduler.
  */
-void sched_init_actors(scheduler_t *sched, schedinfo_t *si);
+void sched_init_actors(local_scheduler_t *sched, schedinfo_t *si);
 
 /**
  * Reinitialize the given scheduler.
  */
-void sched_reinit(scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology, int schedulers_nb);
+void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology);
 
 /**
  * Returns the next actor in actors list.
  * This method is used by the round-robin scheduler.
  */
-actor_t *sched_get_next(scheduler_t *sched);
+actor_t *sched_get_next(local_scheduler_t *sched);
 
 /**
  * Add the actor to the schedulable or waiting list.
  * The list is chosen according to associate scheduler of the actor.
  */
-void sched_add_schedulable(scheduler_t *sched, actor_t *actor, int use_ring_topology);
+void sched_add_schedulable(local_scheduler_t *sched, actor_t *actor, int use_ring_topology);
 
 /**
  * Add waited actors to the schedulable or waiting list.
  * The list is chosen according to associate scheduler of the actor.
  * This function use ring topology of communications.
  */
-void sched_add_ring_waiting_list(scheduler_t *sched);
+void sched_add_ring_waiting_list(local_scheduler_t *sched);
 
 /**
  * Add waited actors to the schedulable list.
  * This function use mesh topology of communications.
  */
-void sched_add_mesh_waiting_list(scheduler_t *sched);
+void sched_add_mesh_waiting_list(local_scheduler_t *sched);
 
 /**
  * Returns the next schedulable actor, or NULL if no actor is schedulable.
  * The actor is removed from the schedulable list.
  * This method is used by the data/demand driven scheduler.
  */
-actor_t *sched_get_next_schedulable(scheduler_t *sched, int use_ring_topology);
+actor_t *sched_get_next_schedulable(local_scheduler_t *sched, int use_ring_topology);
 
-#endif
+#endif  /* _ORCC_SCHEDULER_H_ */

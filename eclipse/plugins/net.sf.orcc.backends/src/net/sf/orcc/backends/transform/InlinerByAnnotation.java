@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, INSA of Rennes
+ * Copyright (c) 2013, Ecole Polytechnique Fédérale de Lausanne
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of INSA Rennes nor the names of its
+ *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  *
@@ -26,32 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+package net.sf.orcc.backends.transform;
 
-#ifndef _ORCC_SERIALIZE_H_
-#define _ORCC_SERIALIZE_H_
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.util.Void;
 
-#include "orcc.h"
+public class InlinerByAnnotation extends Inliner {
 
-/**
- * Load network structure from an XDF file.
- */
-network_t* load_network(char *fileName);
+	public InlinerByAnnotation() {
+		super(true, true);
+	}
 
-/**
- * Save mapping structure to XCF file.
- */
-int save_mapping(char* fileName, mapping_t *mapping);
+	@Override
+	public Void caseInstCall(InstCall call) {
 
-/**
- * Save network's workloads from instrumentation to a file
- * that could be used for mapping.
- */
-void save_profiling(char* fileName, network_t *network);
-
-/**
- * Generate some mapping structure from an XCF file.
- */
-mapping_t* load_mapping(char *xcf_file, network_t *network);
-
-
-#endif  /* _ORCC_SERIALIZE_H_ */
+		if (call.hasAttribute("inline") || call.getTarget() != null
+				&& call.getTarget().getVariable() != null
+				&& call.getTarget().getVariable().hasAttribute("inline")) {
+			return super.caseInstCall(call);
+		}
+		return null;
+	}
+}

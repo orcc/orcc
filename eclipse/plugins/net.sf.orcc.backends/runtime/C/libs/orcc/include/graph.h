@@ -27,31 +27,70 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCC_SERIALIZE_H_
-#define _ORCC_SERIALIZE_H_
+#ifndef _ORCC_GRAPH_H_
+#define _ORCC_GRAPH_H_
 
 #include "orcc.h"
 
-/**
- * Load network structure from an XDF file.
+typedef int int32_t;
+
+/*
+ * The adjacency structure of the graph is stored using the compressed storage format (CSR)
+ * This structure is used by METIS only with undirected graphs
  */
-network_t* load_network(char *fileName);
+struct adjacency_list_s
+{
+    /* xadj : For each vertex i, xadj[i] gives the entry index in the array adjncy */
+    int32_t *xadj;
+
+    /* adjncy : For each vertex, its adjacency list is stored in consecutive locations in the array adjncy */
+    int32_t *adjncy;
+
+    /* vwgt : The weights of the vertices */
+    int32_t *vwgt;
+
+    /* adjwgt : The weights of the edges */
+    int32_t *adjwgt;
+
+    int nb_vertices;
+    int nb_edges;
+};
+
 
 /**
- * Save mapping structure to XCF file.
+ * Creates a graph CSR structure.
  */
-int save_mapping(char* fileName, mapping_t *mapping);
+adjacency_list *allocate_graph(int nb_actors, int nb_edges);
 
 /**
- * Save network's workloads from instrumentation to a file
- * that could be used for mapping.
+ * Releases memory of the given graph CSR structure.
  */
-void save_profiling(char* fileName, network_t *network);
+void delete_graph(adjacency_list *graph);
+
+/********************************************************************************************
+ *
+ * Functions for Graph CSR data structure
+ *
+ ********************************************************************************************/
 
 /**
- * Generate some mapping structure from an XCF file.
+ * Print to the stdout the given graph as an adjacency list.
  */
-mapping_t* load_mapping(char *xcf_file, network_t *network);
+void print_graph(adjacency_list *graph);
 
+/**
+ * Build an adjacency list from the given network.
+ */
+adjacency_list *set_graph_from_network(network_t *network);
 
-#endif  /* _ORCC_SERIALIZE_H_ */
+/**
+ * Check the viability of the given graph for metis.
+ */
+int check_graph_for_metis(adjacency_list *graph);
+
+/**
+ * Fix the given graph for metis.
+ */
+adjacency_list *fix_graph_for_metis(adjacency_list *graph);
+
+#endif  /* _ORCC_GRAPH_H_ */

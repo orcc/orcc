@@ -28,18 +28,88 @@
  */
 
 #include <stdlib.h>
+#include <assert.h>
 
 #include "dataflow.h"
+#include "trace.h"
 
-/**
- * Find actor by its name in the given table.
- */
-actor_t * find_actor(char *name, actor_t **actors, int actors_size) {
-    int i;
-    for (i = 0; i < actors_size; i++) {
+actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
+    assert(actors != NULL);
+    assert(name != NULL);
+    actor_t *ret = NULL;
+    int i = 0;
+
+    while (i < nb_actors && ret == NULL) {
         if (strcmp(name, actors[i]->name) == 0) {
-            return actors[i];
+            ret = actors[i];
         }
+        i++;
     }
-    return NULL;
+
+    return ret;
+}
+
+network_t* allocate_network(int nb_actors, int nb_connections) {
+    int i;
+    network_t *network = (network_t*) malloc(sizeof(network_t));
+
+    network->nb_actors = nb_actors;
+    network->nb_connections = nb_connections;
+    network->actors = (actor_t**) malloc(nb_actors * sizeof(actor_t*));
+    network->connections = (connection_t**) malloc(nb_connections * sizeof(connection_t*));
+
+    for (i=0; i < network->nb_connections; i++) {
+        network->connections[i] = (connection_t*) malloc(sizeof(connection_t));
+    }
+    for (i=0; i < network->nb_actors; i++) {
+        network->actors[i] = (actor_t*) malloc(sizeof(actor_t));
+    }
+
+    return network;
+}
+
+void reset_profiling(network_t *network) {
+    int i;
+    for (i = 0; i < network->nb_actors; i++) {
+        network->actors[i]->commCost = 0;
+        network->actors[i]->evaluated = 0;
+        network->actors[i]->triedProcId = 1;
+        network->actors[i]->processor_id = -1;
+        network->actors[i]->ticks = 0;
+    }
+    for (i = 0; i < network->nb_connections; i++) {
+        network->connections[i]->rate = 0;
+    }
+}
+
+void compute_workloads(network_t *network) {
+    int i;
+    double sum_actor_ticks = 0;
+    long sum_conn_rate = 0;
+    for (i = 0; i < network->nb_actors; i++) {
+        sum_actor_ticks += network->actors[i]->ticks;
+    }
+    for (i = 0; i < network->nb_connections; i++) {
+        sum_conn_rate += network->connections[i]->rate;
+    }
+    for (i = 0; i < network->nb_actors; i++) {
+        network->actors[i]->workload = (int) (network->actors[i]->ticks / sum_actor_ticks * 10000) + 1;
+    }
+    for (i = 0; i < network->nb_connections; i++) {
+        network->connections[i]->workload = (int) (((float) network->connections[i]->rate) / sum_conn_rate * 10000) + 1;
+    }
+}
+
+void print_network(network_t *network) {
+    int i;
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Network : ");
+    for (i = 0; i < network->nb_actors; i++) {
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "\tActor[%d] = %s (workload = %d)",
+                         i, network->actors[i]->name, network->actors[i]->workload);
+    }
+    for (i = 0; i < network->nb_connections; i++) {
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "\tConnection[%d] = %s --> %s (workload = %d)",
+                         i, network->connections[i]->src->name, network->connections[i]->dst->name,
+                         network->connections[i]->workload);
+    }
 }

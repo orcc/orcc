@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_H
-#define ORCC_H
+#ifndef _ORCC_TYPES_H_
+#define _ORCC_TYPES_H_
 
 typedef signed char i8;
 typedef short i16;
@@ -40,4 +40,4 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long int u64;
 
-#endif
+#endif  /* _ORCC_TYPES_H_ */

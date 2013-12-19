@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the INSA of Rennes nor the names of its
+ *   * Neither the name of INSA Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  *
@@ -27,32 +27,47 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ORCC_MAPPING_H
-#define ORCC_MAPPING_H
+#ifndef _ORCC_MAPPING_H_
+#define _ORCC_MAPPING_H_
 
-typedef struct actor_s actor_t;
+#include "orcc.h"
 
-typedef struct mapping_s {
+/*
+ * Mapping structure store the mapping result
+ */
+struct mapping_s {
     int number_of_threads;
     int *threads_affinities;
     actor_t ***partitions_of_actors;
     int *partitions_size;
-} mapping_t;
+};
 
-typedef struct mappings_set_s {
-    int size;
-    mapping_t **mappings;
-} mappings_set_t;
+struct agent_s {
+    sync_t *sync; /** Synchronization resources */
+    options_t *options; /** Mapping options */
+    global_scheduler_t *scheduler;
+    network_t *network;
+    mapping_t *mapping;
+    int nb_threads;
+};
+
+typedef struct processor_s {
+    int processor_id;
+    int utilization;
+} processor_t;
 
 /**
- * Create a mapping structure.
+ * Main routine of the mapping agent.
  */
-mapping_t* allocate_mapping(int number_of_threads);
+void *agent_routine(void *data);
 
 /**
- * Release memory of the given mapping structure.
+ * Initialize the given agent structure.
  */
-void delete_mapping(mapping_t* mapping, int clean_all);
+agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads);
+
+int needMapping();
+void resetMapping();
 
 /**
  * Give the id of the mapped core of the given actor in the given mapping structure.
@@ -62,6 +77,106 @@ int find_mapped_core(mapping_t *mapping, actor_t *actor);
 /**
  * Compute a partitionment of actors on threads from an XML file given in parameter.
  */
-mapping_t* map_actors(actor_t **actors, int actors_size);
+mapping_t* map_actors(network_t *network);
+
+
+/********************************************************************************************
+ *
+ * Allocate / Delete / Init functions
+ *
+ ********************************************************************************************/
+
+/**
+ * Creates a mapping structure.
+ */
+mapping_t *allocate_mapping(int number_of_threads);
+
+/**
+ * Releases memory of the given mapping structure.
+ */
+void delete_mapping(mapping_t *mapping);
+
+
+/********************************************************************************************
+ *
+ * Functions for results printing
+ *
+ ********************************************************************************************/
+
+/**
+ * Print to the stdout the load balancing resulting from the mapping.
+ */
+void print_load_balancing(mapping_t *mapping);
+
+/**
+ * Print to the stdout the edgecut resulting of the mapping. The function assumes that the
+ * mapping has been previously defined on the network.
+ */
+void print_edge_cut(network_t *network);
+
+void print_mapping(mapping_t *mapping);
+
+
+/********************************************************************************************
+ *
+ * Functions for Network managing
+ *
+ ********************************************************************************************/
+
+/**
+ * !TODO
+ */
+int swap_actors(actor_t **actors, int index1, int index2, int nb_actors);
+
+/**
+ * Sort a list of actors
+ */
+int sort_actors(actor_t **actors, int nb_actors);
+
+
+/********************************************************************************************
+ *
+ * Functions for Mapping data structure
+ *
+ ********************************************************************************************/
+
+/**
+ * Build a mapping structure from metis partition
+ */
+int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mapping);
+
+/********************************************************************************************
+ *
+ * Mapping functions
+ *
+ ********************************************************************************************/
+
+#ifdef METIS_ENABLE
+
+/**
+ * Apply actor mapping using metis recursive strategy
+ */
+int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part);
+
+/**
+ * Apply actor mapping using metis kway strategy
+ */
+int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part, idx_t mode);
 
 #endif
+
+/**
+ * Apply actor mapping using round-robin strategy
+ * @author Long Nguyen
+ */
+int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part);
+
+/**
+ * Apply the given mapping to the schedulers
+ */
+void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThreads);
+
+int do_mapping(network_t *network, options_t *opt, mapping_t *mapping);
+
+
+#endif  /* _ORCC_MAPPING_H_ */

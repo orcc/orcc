@@ -52,7 +52,7 @@ u8 width, u8 height)
     u8  *src = &_src[3+3*srcstride];
     i16 *dst = _dst[listIdx];
 
-    ff_hevc_put_hevc_qpel_pixels_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
+    ff_hevc_put_hevc_qpel_pixels4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
 #endif
 }
 
@@ -63,7 +63,7 @@ u8 width, u8 height)
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[1+1*srcstride];
     i16 *dst = _dst[listIdx];
-    ff_hevc_put_hevc_epel_pixels_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
+    ff_hevc_put_hevc_epel_pixels4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
 #endif
 }
 
@@ -76,11 +76,11 @@ i32 filterIdx,  u8 width, u8 height)
     i16 *dst = _dst[listIdx];
 
     if(filterIdx == 1) {
-        ff_hevc_put_hevc_qpel_h_1_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
+        ff_hevc_put_hevc_qpel_h4_1_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
     }else if(filterIdx == 2){
-        ff_hevc_put_hevc_qpel_h_2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
+        ff_hevc_put_hevc_qpel_h4_2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
     }else{
-        ff_hevc_put_hevc_qpel_h_3_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
+        ff_hevc_put_hevc_qpel_h4_3_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
     }
 #endif
 }
@@ -94,11 +94,11 @@ i32 filterIdx,  u8 width, u8 height)
     i16 *dst = _dst[listIdx];
 
     if(filterIdx == 1) {
-        ff_hevc_put_hevc_qpel_v_1_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
+        ff_hevc_put_hevc_qpel_v4_1_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
     }else if(filterIdx == 2){
-        ff_hevc_put_hevc_qpel_v_2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
+        ff_hevc_put_hevc_qpel_v4_2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
     }else{
-        ff_hevc_put_hevc_qpel_v_3_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
+        ff_hevc_put_hevc_qpel_v4_3_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0);
     }
 #endif
 }
@@ -111,7 +111,7 @@ i32 filterIdx,  u8 width, u8 height)
     u8  *src = &_src[1+1*srcstride];
     i16 *dst = _dst[listIdx];
 
-    ff_hevc_put_hevc_epel_h_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx, 0, 0);
+    ff_hevc_put_hevc_epel_h4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx, 0, 0);
 #endif
 }
 
@@ -123,7 +123,7 @@ i32 filterIdx,  u8 width, u8 height)
     u8  *src = &_src[1+1*srcstride];
     i16 *dst = _dst[listIdx];
 
-    ff_hevc_put_hevc_epel_v_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0, filterIdx, 0);
+    ff_hevc_put_hevc_epel_v4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0, filterIdx, 0);
 #endif
 }
 
@@ -138,27 +138,27 @@ i32 filterIdx[2],  u8 width, u8 height)
 
     if(filterIdx[0] == 1) {
         if(filterIdx[1] == 1){
-            ff_hevc_put_hevc_qpel_h_1_v_1_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
+            ff_hevc_put_hevc_qpel_h4_1_v_1_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
         }else if(filterIdx[1] == 2){
-            ff_hevc_put_hevc_qpel_h_1_v_2_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
+            ff_hevc_put_hevc_qpel_h4_1_v_2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
         }else{
-            ff_hevc_put_hevc_qpel_h_1_v_3_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
+            ff_hevc_put_hevc_qpel_h4_1_v_3_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
         }
     }else if(filterIdx[0] == 2){
         if(filterIdx[1] == 1){
-            ff_hevc_put_hevc_qpel_h_2_v_1_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
+            ff_hevc_put_hevc_qpel_h4_2_v_1_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
         }else if(filterIdx[1] == 2){
-            ff_hevc_put_hevc_qpel_h_2_v_2_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
+            ff_hevc_put_hevc_qpel_h4_2_v_2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
         }else{
-            ff_hevc_put_hevc_qpel_h_2_v_3_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
+            ff_hevc_put_hevc_qpel_h4_2_v_3_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
         }
     }else{
         if(filterIdx[1] == 1){
-            ff_hevc_put_hevc_qpel_h_3_v_1_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
+            ff_hevc_put_hevc_qpel_h4_3_v_1_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
         }else if(filterIdx[1] == 2){
-            ff_hevc_put_hevc_qpel_h_3_v_2_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
+            ff_hevc_put_hevc_qpel_h4_3_v_2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
         }else{
-            ff_hevc_put_hevc_qpel_h_3_v_3_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
+            ff_hevc_put_hevc_qpel_h4_3_v_3_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, &mc_buffer);
         }
     }
 #endif
@@ -173,7 +173,7 @@ i32 filterIdx[2],  u8 width, u8 height)
     i16 *dst = _dst[listIdx];
     DECLARE_ALIGNED(16, i16, mc_buffer[(64 + 7) * 64]);
 
-    ff_hevc_put_hevc_epel_hv_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1], &mc_buffer);
+    ff_hevc_put_hevc_epel_hv4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1], &mc_buffer);
 #endif
 }
 

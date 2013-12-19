@@ -4,7 +4,6 @@ import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +25,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.DomUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -439,11 +439,12 @@ public class SuperactorParser {
 				return action;
 			}
 		}
-		for(Action action : actor.getActionsOutsideFsm()) {
+		for(Action action : actor.getInitializes()) {
 			if (action.getName().equals(id)) {
 				return action;
 			}
-		}
+		}							
+		OrccLogger.warnln("action " + id + " not found in actor " + actor.getName());
 		return null;
 	}
 
