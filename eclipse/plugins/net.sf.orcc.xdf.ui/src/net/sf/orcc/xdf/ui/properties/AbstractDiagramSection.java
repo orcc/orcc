@@ -39,6 +39,7 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -100,7 +101,7 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	 * Executes {@link #writeValuesToModel()} inside a Command suitable for
 	 * transactional edition of domain models
 	 */
-	protected void writeValuesInTransaction() {
+	protected void writeValuesInTransaction(final Widget widget) {
 
 		// Execute the method in a write transaction, because it will modify the
 		// models
@@ -108,14 +109,20 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 		editingDomain.getCommandStack().execute(new RecordingCommand(editingDomain) {
 			@Override
 			protected void doExecute() {
-				writeValuesToModel();
+				writeValuesToModel(widget);
 			}
 		});
 	}
 
 	protected abstract void readValuesFromModels();
 
-	protected abstract void writeValuesToModel();
+	/**
+	 * Read value from the given widget and write it to the corresponding emf
+	 * model.
+	 * 
+	 * @param widget
+	 */
+	protected abstract void writeValuesToModel(final Widget widget);
 
 	protected abstract String getFormText();
 }

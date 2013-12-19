@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class NetworkParametersSection extends AbstractTableBasedSection {
@@ -136,7 +137,7 @@ public class NetworkParametersSection extends AbstractTableBasedSection {
 	}
 
 	@Override
-	protected void writeValuesToModel() {
+	protected void writeValuesToModel(final Widget widget) {
 		final Network network = (Network) businessObject;
 
 		network.getParameters().clear();

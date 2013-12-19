@@ -138,7 +138,7 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				editTableItem(new TableItem(table, SWT.NONE));
-				writeValuesInTransaction();
+				writeValuesInTransaction(table);
 			}
 		});
 		removeButton.addSelectionListener(new SelectionAdapter() {
@@ -147,7 +147,7 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 				final int index = table.getSelectionIndex();
 				if (index != -1) {
 					table.remove(index);
-					writeValuesInTransaction();
+					writeValuesInTransaction(table);
 				}
 			}
 		});
@@ -159,7 +159,7 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 					return;
 				}
 				editTableItem(selection[0]);
-				writeValuesInTransaction();
+				writeValuesInTransaction(table);
 			}
 		});
 
@@ -171,7 +171,7 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 					return;
 				}
 				editTableItem(selection[0]);
-				writeValuesInTransaction();
+				writeValuesInTransaction(table);
 			}
 		});
 	}

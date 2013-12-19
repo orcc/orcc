@@ -33,6 +33,7 @@ import net.sf.orcc.df.Instance;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -87,7 +88,7 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 	}
 
 	@Override
-	protected void writeValuesToModel() {
+	protected void writeValuesToModel(final Widget widget) {
 		// TODO Auto-generated method stub
 
 	}

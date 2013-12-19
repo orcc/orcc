@@ -76,7 +76,7 @@ public class PortMainSection extends AbstractGridBasedSection {
 	}
 
 	@Override
-	protected void writeValuesToModel() {
+	protected void writeValuesToModel(final Widget widget) {
 		// TODO Auto-generated method stub
 
 	}

@@ -52,6 +52,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class InstanceArgumentsSection extends AbstractTableBasedSection {
@@ -146,7 +147,7 @@ public class InstanceArgumentsSection extends AbstractTableBasedSection {
 	}
 
 	@Override
-	protected void writeValuesToModel() {
+	protected void writeValuesToModel(final Widget widget) {
 		final Instance instance = (Instance) businessObject;
 
 		// Only parameters of this instance's refinement (Actor or Network) can

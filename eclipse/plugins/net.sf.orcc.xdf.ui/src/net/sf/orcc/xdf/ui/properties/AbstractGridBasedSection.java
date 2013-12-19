@@ -28,10 +28,15 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -45,6 +50,8 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 
 	protected GridData fillHorizontalData;
 
+	private boolean listenerSet = false;
+
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
@@ -56,4 +63,28 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 		formBody.setLayout(gridLayout);
 	}
 
+	@Override
+	public void setInput(IWorkbenchPart part, ISelection selection) {
+		super.setInput(part, selection);
+
+		if (listenerSet)
+			return;
+
+		for (final Control child : formBody.getChildren()) {
+			child.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusLost(FocusEvent e) {
+					writeValuesInTransaction(e.widget);
+				}
+			});
+		}
+
+		listenerSet = true;
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+		listenerSet = false;
+	}
 }
