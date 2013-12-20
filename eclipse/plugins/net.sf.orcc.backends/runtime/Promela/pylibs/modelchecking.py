@@ -34,13 +34,20 @@ class ModelChecker(object):
         print ("Generating model checker: spin -a -DXML -DMANAGED",filename)
         proc = Popen(['spin', '-a', '-DPXML', '-DMANAGED', filename])
         proc.wait()
-    def compilemc(self):
+    def compilemc(self, shortest=False):
         print ("Compiling model checker: gcc ... -o pan pan.c")
-        proc = Popen(['gcc', '-o2', '-DSAFETY', '-DCOLLAPSE', '-DVECTORSZ=100000', '-o', 'pan', 'pan.c'])
+        if shortest:
+            proc = Popen(['gcc', '-o2', '-DSAFETY', '-DCOLLAPSE', '-DVECTORSZ=100000', '-DREACH', '-o', 'pan', 'pan.c'])
+        else:
+            proc = Popen(['gcc', '-o2', '-DSAFETY', '-DCOLLAPSE', '-DVECTORSZ=100000', '-o', 'pan', 'pan.c'])
         proc.wait()
-    def runmc(self):
+    def runmc(self, shortest=False):
         print ("Running model checker: pan -E -n")
-        proc = Popen(['pan', '-E', '-n'], stdout=PIPE, universal_newlines=True)
+        if shortest:
+            command=['pan', '-E', '-n', '-I']
+        else:
+            command=['pan', '-E', '-n']
+        proc = Popen(command, stdout=PIPE, universal_newlines=True)
         for line in iter(proc.stdout):
             line = str(line.strip())
             if line.find('end state in claim reached') >= 0 or line.find('assertion violated') >= 0:
