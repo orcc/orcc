@@ -85,8 +85,8 @@ void reset_profiling(network_t *network) {
 
 void compute_workloads(network_t *network) {
     int i, j;
-    int sum_action_workloads = 0;
     double sum_actor_ticks = 0;
+    double sum_action_ticks = 0;
     long sum_conn_rate = 0;
     for (i = 0; i < network->nb_actors; i++) {
         sum_actor_ticks += network->actors[i]->ticks;
@@ -95,13 +95,13 @@ void compute_workloads(network_t *network) {
         sum_conn_rate += network->connections[i]->rate;
     }
     for (i = 0; i < network->nb_actors; i++) {
-    	sum_action_workloads = 0;
-        network->actors[i]->workload = (int) (network->actors[i]->ticks / sum_actor_ticks * 10000) + 1;
+    	sum_action_ticks = 0;
  	    for (j = 0; j < network->actors[i]->nb_actions; j++) {
 	        network->actors[i]->actions[j]->workload +=  (int) ceil(network->actors[i]->actions[j]->ticks / sum_actor_ticks * 10000);
-	        sum_action_workloads += network->actors[i]->actions[j]->workload;
+	        sum_action_ticks += network->actors[i]->actions[j]->ticks;
 	    }
-	    network->actors[i]->scheduler_workload = network->actors[i]->workload - sum_action_workloads;
+        network->actors[i]->workload = (int) (network->actors[i]->ticks / sum_actor_ticks * 10000) + 1;
+	    network->actors[i]->scheduler_workload = (int) (network->actors[i]->ticks - sum_action_ticks / sum_actor_ticks * 10000);
     }
     for (i = 0; i < network->nb_connections; i++) {
         network->connections[i]->workload = (int) (((float) network->connections[i]->rate) / sum_conn_rate * 10000) + 1;

@@ -34,7 +34,8 @@ package net.sf.orcc.backends;
  */
 public class BackendsConstants {
 
-	public static final String INSTRUMENT_NETWORK = "net.sf.orcc.backends.instrumentNetwork";
+	public static final String PROFILE_NETWORK = "net.sf.orcc.backends.profileNetwork";
+	public static final String PROFILE_ACTIONS = "net.sf.orcc.backends.profileNetwork.actions";
 	public static final String DYNAMIC_MAPPING = "net.sf.orcc.backends.dynamicMapping";
 	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
 	public static final String NEW_SCHEDULER_TOPOLOGY = "net.sf.orcc.backends.newScheduler.topology";

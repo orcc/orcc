@@ -43,7 +43,7 @@ network_t* load_network(char *fileName);
 int save_mapping(char* fileName, mapping_t *mapping);
 
 /**
- * Save network's workloads from instrumentation to a file
+ * Save network's workloads from profiling to a file
  * that could be used for mapping.
  */
 void save_profiling(char* fileName, network_t *network);

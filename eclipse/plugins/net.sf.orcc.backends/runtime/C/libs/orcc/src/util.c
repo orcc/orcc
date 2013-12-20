@@ -153,7 +153,7 @@ static const char *usage =
 	"-f <nb frames to decode>   Set the number of frames to decode before closing the application.\n"
 	"-l <nb input reading>      Set the number of times the input file is read before closing the application.\n"
     "-g <output file>           Specify an output file for the genetic algorithm.\n"
-    "-b <output file>           Specify an output file for instrumention.\n"
+    "-p <output file>           Specify an output file for profiling.\n"
     "-c <nb threads>            Set the number of execut500ing threads to run.\n"
     "-s <mapping strategy>      Specify the strategy for the actor mapping\n"
     "-v <level>                 Set the verbosity";
@@ -170,7 +170,7 @@ void print_usage() {
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-    const char *ostr = "i:no:d:m:f:w:g:l:r:ac:s:v:b:";
+    const char *ostr = "i:no:d:m:f:w:g:l:r:ac:s:v:p:";
     int c;
 
 	program = argv[0];
@@ -222,7 +222,7 @@ void init_orcc(int argc, char *argv[]) {
 		case 'w':
 			write_file = strdup(optarg);
 			break;
-        case 'b':
+        case 'p':
             profiling_file = strdup(optarg);
             break;
         case 'v':

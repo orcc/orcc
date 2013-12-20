@@ -39,7 +39,7 @@ extern char *input_file;
 // output YUV file
 extern char *yuv_file;
 
-// instrumentation_file file
+// profiling_file file
 extern char *profiling_file;
 
 // write file

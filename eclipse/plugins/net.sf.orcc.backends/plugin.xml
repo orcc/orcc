@@ -17,7 +17,7 @@
                id="net.sf.orcc.backends.newScheduler">
          </option>
          <option
-               id="net.sf.orcc.backends.instrumentNetwork">
+               id="net.sf.orcc.backends.profileNetwork">
          </option>
          <option
                id="net.sf.orcc.backends.dynamicMapping">
@@ -237,10 +237,18 @@
          </option>
          <option
                defaultValue="false"
-               description="Instrument network"
-               id="net.sf.orcc.backends.instrumentNetwork"
-               name="[BETA] Instrument network">
-            <checkBox></checkBox>
+               description="Network runtime profiling"
+               id="net.sf.orcc.backends.profileNetwork"
+               name="[BETA] Profile the network">
+            <checkBox>
+               <option
+                     defaultValue="false"
+                     description="Make the profiling of actions for deeper network profiling. (May reduce performances)"
+                     id="net.sf.orcc.backends.profileNetwork.actions"
+                     name="Profile the actions">
+                  <checkBox></checkBox>
+               </option>
+            </checkBox>
          </option>
          <option
                defaultValue="false"
