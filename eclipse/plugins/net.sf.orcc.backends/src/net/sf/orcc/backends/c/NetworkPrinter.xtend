@@ -40,6 +40,7 @@ import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
+import net.sf.orcc.df.Actor
 
 /**
  * Generate and print network source file for C backend.
@@ -165,6 +166,24 @@ class NetworkPrinter extends CTemplate {
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
+		// Declaration of the actions
+		
+		«FOR child : network.children»
+			«FOR act : child.getAdapter(typeof(Actor)).actions»
+				action_t action_«child.label»_«act.body.name» = {"«act.body.name»", 0, 0};			
+			«ENDFOR»
+		«ENDFOR»
+		
+		«FOR child : network.children»
+			action_t *«child.label»_actions[] = {
+				«FOR act : child.getAdapter(typeof(Actor)).actions SEPARATOR ","»
+					&action_«child.label»_«act.body.name»
+				«ENDFOR»
+			};
+			
+		«ENDFOR»
+		
+		/////////////////////////////////////////////////
 		// Actor functions
 		«FOR child : network.children»
 			extern void «child.label»_initialize(schedinfo_t *si);
@@ -175,7 +194,7 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the actors array
 		
 		«FOR child : network.children»
-			actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0};			
+			actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0};			
 		«ENDFOR»
 		
 		actor_t *actors[] = {

@@ -33,6 +33,15 @@
 #include "orcc.h"
 
 /*
+ * Actions
+ */
+struct action_s {
+    char *name;
+    int workload; /** action's workload */
+    double ticks; /** elapsed ticks obtained by profiling */
+};
+
+/*
  * Actors are the vertices of orcc Networks
  */
 struct actor_s {
@@ -53,6 +62,9 @@ struct actor_s {
     int evaluated;  /** Used by KL algo */
     int workload; /** actor's workload */
     double ticks; /** elapsed ticks obtained by profiling */
+    action_t **actions;
+    int nb_actions;
+    int scheduler_workload;
 };
 
 /*

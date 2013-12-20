@@ -80,7 +80,7 @@ mapping_t* load_mapping(char *fileName, network_t *network) {
  * that could be used for mapping.
  */
 void save_profiling(char* fileName, network_t* network) {
-    int i = 0;
+    int i = 0, j = 0;
 
     node_t* rootNode = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\" encoding=\"UTF-8\"");
     if (rootNode == NULL) {
@@ -99,7 +99,18 @@ void save_profiling(char* fileName, network_t* network) {
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", network->actors[i]->name);
         char* workload = (char*) malloc(sizeof(workload));
         sprintf(workload, "%d", network->actors[i]->workload);
+        char* scheduler_workload = (char*) malloc(sizeof(scheduler_workload));
+        sprintf(scheduler_workload, "%d", network->actors[i]->scheduler_workload);
         roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "workload", workload);
+        roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "schedulerWorkload", scheduler_workload);
+
+	    for (j=0; j < network->actors[i]->nb_actions; j++) {
+	        node_t* actionNode = roxml_add_node(instanceNode, 0, ROXML_ELM_NODE, "Action", NULL);
+	        roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "id", network->actors[i]->actions[j]->name);
+	        char* action_workload = (char*) malloc(sizeof(action_workload));
+	        sprintf(action_workload, "%d", network->actors[i]->actions[j]->workload);
+	        roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "workload", action_workload);
+	    }
     }
 
     for (i=0; i < network->nb_connections; i++) {

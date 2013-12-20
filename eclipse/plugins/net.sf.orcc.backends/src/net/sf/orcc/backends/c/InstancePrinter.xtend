@@ -228,6 +228,9 @@ class InstancePrinter extends CTemplate {
 		#include "util.h"
 		#include "scheduler.h"
 		#include "dataflow.h"
+		«IF instrumentNetwork || dynamicMapping»
+			#include "cycle.h"
+		«ENDIF»
 
 		#define SIZE «fifoSize»
 		«IF instance != null»
@@ -334,6 +337,16 @@ class InstancePrinter extends CTemplate {
 			«ENDIF»
 
 		«ENDIF»
+		«IF instrumentNetwork || dynamicMapping»
+			////////////////////////////////////////////////////////////////////////////////
+			// Action's workload for profiling
+			«FOR action : actor.actions»
+				extern action_t action_«actor.name»_«action.body.name»;
+				#define ticks_«action.body.name» action_«actor.name»_«action.body.name».ticks
+			«ENDFOR»		
+			
+		«ENDIF»
+		
 		«IF !actor.stateVars.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// State variables of the actor
@@ -383,7 +396,7 @@ class InstancePrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
 		«FOR action : actor.actions»
-			«action.print»
+			«action.print(false)»
 		«ENDFOR»
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -587,7 +600,7 @@ class InstancePrinter extends CTemplate {
 
 	def protected initializeFunction() '''
 		«FOR init : actor.initializes»
-			«init.print»
+			«init.print(true)»
 		«ENDFOR»
 
 		«inline»void «entityName»_initialize(schedinfo_t *si) {
@@ -735,6 +748,11 @@ class InstancePrinter extends CTemplate {
 				«variable.declare»;
 			«ENDFOR»
 
+			«IF instrumentNetwork || dynamicMapping»
+				ticks tick_in, tick_out;
+				double diff_tick;
+			«ENDIF»
+
 			«FOR port : action.inputPattern.ports»
 				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE)»
 					 i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
@@ -746,6 +764,10 @@ class InstancePrinter extends CTemplate {
 					i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 				«ENDIF»
 			«ENDFOR»
+
+			«IF instrumentNetwork || dynamicMapping»
+				tick_in = getticks();
+			«ENDIF»
 
 			«FOR block : action.body.blocks»
 				«block.doSwitch»
@@ -783,6 +805,11 @@ class InstancePrinter extends CTemplate {
 					write_end_«port.name»();
 				«ENDIF»
 			«ENDFOR»
+			«IF instrumentNetwork || dynamicMapping»
+				tick_out = getticks();
+				diff_tick = elapsed(tick_out, tick_in);
+				ticks_«action.body.name» += diff_tick;
+			«ENDIF»
 		}
 		«ENDIF»
 		'''
@@ -790,7 +817,7 @@ class InstancePrinter extends CTemplate {
 		return output
 	}
 
-	def protected print(Action action) {
+	def protected print(Action action, Boolean isInitialize) {
 		currentAction = action
 		val output = '''
 			«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
@@ -798,6 +825,11 @@ class InstancePrinter extends CTemplate {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
+
+				«IF !isInitialize && (instrumentNetwork || dynamicMapping)»
+					ticks tick_in, tick_out;
+					double diff_tick;
+				«ENDIF»
 
 				«FOR port : action.inputPattern.ports»
 					«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
@@ -811,6 +843,10 @@ class InstancePrinter extends CTemplate {
 					«ENDIF»
 				«ENDFOR»
 
+				«IF !isInitialize && (instrumentNetwork || dynamicMapping)»
+					tick_in = getticks();
+				«ENDIF»
+				
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
 				«ENDFOR»
@@ -846,6 +882,11 @@ class InstancePrinter extends CTemplate {
 					write_end_«port.name»();
 					«ENDIF»
 				«ENDFOR»
+				«IF !isInitialize && (instrumentNetwork || dynamicMapping)»
+					tick_out = getticks();
+					diff_tick = elapsed(tick_out, tick_in);
+					ticks_«action.body.name» += diff_tick;
+				«ENDIF»
 			}
 			«ENDIF»
 			«action.printVectorizable»
