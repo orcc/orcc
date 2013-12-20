@@ -37,7 +37,7 @@
  */
 struct action_s {
     char *name;
-    int workload; /** action's workload */
+    double workload; /** action's workload */
     double ticks; /** elapsed ticks obtained by profiling */
 };
 
@@ -64,7 +64,7 @@ struct actor_s {
     double ticks; /** elapsed ticks obtained by profiling */
     action_t **actions;
     int nb_actions;
-    int scheduler_workload;
+    double scheduler_workload;
 };
 
 /*

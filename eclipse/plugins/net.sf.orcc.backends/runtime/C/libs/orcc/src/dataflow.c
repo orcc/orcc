@@ -102,11 +102,11 @@ void compute_workloads(network_t *network) {
     for (i = 0; i < network->nb_actors; i++) {
     	sum_action_ticks = 0;
  	    for (j = 0; j < network->actors[i]->nb_actions; j++) {
-	        network->actors[i]->actions[j]->workload +=  (int) ceil(network->actors[i]->actions[j]->ticks / sum_actor_ticks * 10000);
+	        network->actors[i]->actions[j]->workload +=  (network->actors[i]->actions[j]->ticks / sum_actor_ticks * 10000);
 	        sum_action_ticks += network->actors[i]->actions[j]->ticks;
 	    }
         network->actors[i]->workload = (int) (network->actors[i]->ticks / sum_actor_ticks * 10000) + 1;
-	    network->actors[i]->scheduler_workload = (int) ((network->actors[i]->ticks - sum_action_ticks) / sum_actor_ticks * 10000);
+	    network->actors[i]->scheduler_workload = ((network->actors[i]->ticks - sum_action_ticks) / sum_actor_ticks * 10000);
     }
     for (i = 0; i < network->nb_connections; i++) {
         network->connections[i]->workload = (int) (((float) network->connections[i]->rate) / sum_conn_rate * 10000) + 1;
