@@ -390,6 +390,234 @@ int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part) {
 }
 
 /**
+ * Quick Mapping strategy
+ * @author Long Nguyen
+ */
+int get_processor_id_of_actor(network_t *network, int actorId) {
+    int i;
+
+    for (i = 0; i < network->nb_actors; i++) {
+        if (network->actors[i]->id == actorId) {
+            return network->actors[i]->processor_id;
+        }
+    }
+
+    return 0;
+}
+
+int do_quick_mapping(network_t *network, options_t *opt, idx_t *part) {
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(part != NULL);
+    int ret = ORCC_OK;
+	// TODO
+    return ret;
+}
+
+/**
+ * Weighted Load Balancing strategy
+ * @author Long Nguyen
+ */
+void assign_actor_to_min_utilized_processor(network_t *network, idx_t *part, processor_t *processors, int nb_processors, int actorIndex) {
+    assert(processors != NULL);
+    int i, minIndex = 0;
+
+    for (i = 0; i < nb_processors; i++) {
+        if (processors[i].utilization < processors[minIndex].utilization) {
+            minIndex = i;
+        }
+    }
+
+    network->actors[actorIndex]->processor_id = processors[minIndex].processor_id;
+    part[actorIndex] = network->actors[actorIndex]->processor_id;
+
+    processors[minIndex].utilization += network->actors[actorIndex]->workload;
+}
+
+int do_weighted_round_robin_mapping(network_t *network, options_t *opt, idx_t *part) {
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(part != NULL);
+    int ret = ORCC_OK;
+    int i;
+    processor_t *processors = init_processors(opt->nb_processors);
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying Weighted Load Balancing strategy for mapping");
+
+    sort_actors(network->actors, network->nb_actors);
+
+    for (i = 0; i < network->nb_actors; i++) {
+        assign_actor_to_min_utilized_processor(network, part, processors, opt->nb_processors, i);
+    }
+
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : WLB result");
+        for (i = 0; i < network->nb_actors; i++) {
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %d\tprocessorId = %d",
+                             i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
+        }
+    }
+
+    delete_processors(processors);
+    return ret;
+}
+
+/**
+ * Communication Optimized Weighted Load Balancing strategy
+ * @author Long Nguyen
+ */
+int find_min_utilized_processor(processor_t *processors, int nb_processors) {
+    assert(processors != NULL);
+	// TODO
+    return 0;
+}
+
+int calculate_comm_of_actor(network_t *network, processor_t *processors, int actorIndex, int procIndex) {
+    assert(processors != NULL);
+	// TODO
+    return 0;
+}
+
+int do_weighted_round_robin_comm_mapping(network_t *network, options_t *opt, idx_t *part) {
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(part != NULL);
+    int ret = ORCC_OK;
+	// TODO
+    return ret;
+}
+
+/**
+ * Kernighan Lin Refinement Weighted Load Balancing strategy
+ * @author Long Nguyen
+ */
+int get_gain_of_actor(network_t *network, processor_t *processors, int actorIndex, int commProcessorIndex) {
+    assert(processors != NULL);
+    int i, comm1, comm2;
+
+    comm1 = 0;
+    comm2 = 0;
+
+    for (i = 0; i < network->nb_connections; i++) {
+        if (network->connections[i]->src->id == network->actors[actorIndex]->id) {
+            if (get_processor_id_of_actor(network, network->connections[i]->dst->id) == network->actors[actorIndex]->processor_id) {
+                comm1 += network->connections[i]->workload;
+            }
+
+            if (get_processor_id_of_actor(network, network->connections[i]->dst->id) == processors[commProcessorIndex].processor_id) {
+                comm2 += network->connections[i]->workload;
+            }
+        }
+
+        if (network->connections[i]->dst->id == network->actors[actorIndex]->id) {
+            if (get_processor_id_of_actor(network, network->connections[i]->src->id) == network->actors[actorIndex]->processor_id) {
+                comm1 += network->connections[i]->workload;
+            }
+
+            if (get_processor_id_of_actor(network, network->connections[i]->src->id) == processors[commProcessorIndex].processor_id) {
+                comm2 += network->connections[i]->workload;
+            }
+        }
+    }
+
+    return (comm2 - comm1);
+}
+
+void optimize_communication(network_t *network, idx_t *part, processor_t *processors, int procIndex1, int procIndex2) {
+    assert(processors != NULL);
+    int index1, index2;
+
+    index1 = 0;
+    index2 = 0;
+
+    while(index1 < network->nb_actors && index2 < network->nb_actors) {
+        if (processors[procIndex1].utilization >= processors[procIndex2].utilization) {
+            if (index1 >= network->nb_actors) {
+                break;
+            }
+
+            while ((network->actors[index1]->evaluated == 1
+                || network->actors[index1]->processor_id != processors[procIndex1].processor_id)
+                    && index1 < network->nb_actors) {
+                index1++;
+            }
+            if (index1 < network->nb_actors) {
+                if (get_gain_of_actor(network, processors, index1, procIndex2) > 0) {
+                        network->actors[index1]->processor_id = processors[procIndex2].processor_id;
+                        part[index1] = network->actors[index1]->processor_id;
+                        processors[procIndex2].utilization += network->actors[index1]->workload;
+                        processors[procIndex1].utilization -= network->actors[index1]->workload;
+                        network->actors[index1]->evaluated = 1;
+                }
+
+                index1++;
+            }
+        }
+        else {
+            if (index2 >= network->nb_actors) {
+                break;
+            }
+
+            while ((network->actors[index2]->evaluated == 1
+                || network->actors[index2]->processor_id != processors[procIndex2].processor_id)
+                    && index2 < network->nb_actors) {
+                index2++;
+            }
+            if (index2 < network->nb_actors) {
+                if (get_gain_of_actor(network, processors, index2, procIndex1) > 0) {
+                        network->actors[index2]->processor_id = processors[procIndex1].processor_id;
+                        part[index2] = network->actors[index2]->processor_id;
+                        processors[procIndex1].utilization += network->actors[index2]->workload;
+                        processors[procIndex2].utilization -= network->actors[index2]->workload;
+                        network->actors[index2]->evaluated = 1;
+                }
+
+                index2 ++;
+            }
+        }
+    }
+}
+
+void do_KL_algorithm(network_t *network, idx_t *part, processor_t *processors, int nb_processors) {
+    assert(processors != NULL);
+    int i;
+
+    for (i = 0; i < nb_processors - 1; i += 2) {
+        optimize_communication(network, part, processors, i, i + 1);
+    }
+}
+
+int do_KLR_mapping(network_t *network, options_t *opt, idx_t *part) {
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(part != NULL);
+    int ret = ORCC_OK;
+    int i;
+    processor_t *processors = init_processors(opt->nb_processors);
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying Kernighan Lin Refinement Weighted strategy for mapping");
+
+    sort_actors(network->actors, network->nb_actors);
+
+    for (i = 0; i < network->nb_actors; i++) {
+        assign_actor_to_min_utilized_processor(network, part, processors, opt->nb_processors, i);
+    }
+
+    do_KL_algorithm(network, part, processors, opt->nb_processors);
+
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : KLRLB result");
+        for (i = 0; i < network->nb_actors; i++) {
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %d\tprocessorId = %d",
+                             i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
+        }
+    }
+
+    delete_processors(processors);
+    return ret;
+}
+
+/**
  * Entry point for all mapping strategies
  */
 int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
@@ -424,9 +652,17 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
             ret = do_round_robbin_mapping(network, opt, part);
             break;
         case ORCC_MS_QM:
+            ret = do_quick_mapping(network, opt, part);
+            break;
         case ORCC_MS_WLB:
+            ret = do_weighted_round_robin_mapping(network, opt, part);
+            break;
         case ORCC_MS_COWLB:
+            ret = do_weighted_round_robin_comm_mapping(network, opt, part);
+            break;
         case ORCC_MS_KRWLB:
+            ret = do_KLR_mapping(network, opt, part);
+            break;
         default:
             break;
         }

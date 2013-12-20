@@ -172,6 +172,37 @@ int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part, idx
 int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part);
 
 /**
+ * Quick Mapping strategy
+ * @author Long Nguyen
+ */
+int get_processor_id_of_actor(network_t *network, int actorId);
+int do_quick_mapping(network_t *network, options_t *opt, idx_t *part);
+
+/**
+ * Weighted Load Balancing strategy
+ * @author Long Nguyen
+ */
+void assign_actor_to_min_utilized_processor(network_t *network, idx_t *part, processor_t *processors, int nb_processors, int actorIndex);
+int do_weighted_round_robin_mapping(network_t *network, options_t *opt, idx_t *part);
+
+/**
+ * Communication Optimized Weighted Load Balancing strategy
+ * @author Long Nguyen
+ */
+int find_min_utilized_processor(processor_t *processors, int nb_processors);
+int calculate_comm_of_actor(network_t *network, processor_t *processors, int actorIndex, int procIndex);
+int do_weighted_round_robin_comm_mapping(network_t *network, options_t *opt, idx_t *part);
+
+/**
+ * Kernighan Lin Refinement Weighted Load Balancing strategy
+ * @author Long Nguyen
+ */
+int get_gain_of_actor(network_t *network, processor_t *processors, int actorIndex, int commProcessorIndex);
+void optimize_communication(network_t *network, idx_t *part, processor_t *processors, int procIndex1, int procIndex2);
+void do_KL_algorithm(network_t *network, idx_t *part, processor_t *processors, int nb_processors);
+int do_KLR_mapping(network_t *network, options_t *opt, idx_t *part);
+
+/**
  * Apply the given mapping to the schedulers
  */
 void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThreads);

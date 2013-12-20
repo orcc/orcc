@@ -71,9 +71,9 @@ void print_usage_orccmap() {
     printf("\n%s%s%sMKEC\t: METIS KWay graph partition mapping (Optimize Edge-cut)", INDENT, INDENT, INDENT);
     printf("\n%s%s%sRR\t: A simple Round-Robin mapping", INDENT, INDENT, INDENT);
     printf("\n%s%s%sQM\t: Quick Mapping (Not yet available)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sWLB\t: Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sWLB\t: Weighted Load Balancing", INDENT, INDENT, INDENT);
     printf("\n%s%s%sCOW\t: Communication Optimized Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sKLR\t: Kernighan Lin Refinement Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
+    printf("\n%s%s%sKLR\t: Kernighan Lin Refinement Weighted Load Balancing", INDENT, INDENT, INDENT);
 
     printf("\n");
     printf("\n%s-v, --verbose [level]", INDENT);
