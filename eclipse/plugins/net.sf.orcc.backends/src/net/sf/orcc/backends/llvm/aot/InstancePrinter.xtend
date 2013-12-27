@@ -184,12 +184,12 @@ class InstancePrinter extends LLVMTemplate {
 		; FIFOs
 		«FOR port : inputs»
 			«val connection = incomingPortMap.get(port)»
-			«connection.printInput(port)»
+			«connection.printExternalFifo(port)»
 		«ENDFOR»
 
 		«FOR port : outputs»
 			«FOR connection : outgoingPortMap.get(port)»
-				«connection.printOutput(port)»
+				«connection.printExternalFifo(port)»
 			«ENDFOR»
 		«ENDFOR»
 		
@@ -748,22 +748,6 @@ class InstancePrinter extends LLVMTemplate {
 		else if (variable.type.list) '''«variable.type.doSwitch»* noalias %«variable.name»'''
 		else '''«variable.type.doSwitch» %«variable.name»'''
 	}
-	
-	def private printInput(Connection connection, Port port) '''
-		«val id = connection.getSafeId(port)»
-		«val name = port.name + "_" + id»
-		«val addrSpace = connection.addrSpace»
-		«val prop = port.properties»
-		«connection.printExternalFifo(port)»
-	'''
-		
-	def private printOutput(Connection connection, Port port) '''
-		«val id = connection.getSafeId(port)»
-		«val name = port.name + "_" + id»
-		«val addrSpace = connection.addrSpace»
-		«val prop = port.properties»
-		«connection.printExternalFifo(port)»
-	'''
 	
 	/**
 	 * Returns an annotation describing the address space. 
