@@ -11,6 +11,11 @@ import net.sf.orcc.backends.c.CTemplate
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import net.sf.orcc.ir.Type
+import java.io.Writer
+import java.io.BufferedWriter
+import java.io.OutputStreamWriter
+import java.io.FileOutputStream
+import java.io.IOException
 
 /**
  * Generate and print process network description for DAL backend.
@@ -38,12 +43,28 @@ class NetworkCPrinter extends CTemplate {
 		
 		val content = networkFileContent
 		val file = new File(targetFolder + File::separator + "pn.xml")
-		
+		printFifoSize(targetFolder + File.separator + "src")
 		if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
+		}
+	}
+
+	def printFifoSize(String path) {
+		var Writer writer = null;
+		try {
+		    writer = new BufferedWriter(new OutputStreamWriter(
+		          new FileOutputStream(path + File.separator + "fifosize.h"), "utf-8"));
+		    writer.write("#define FIFO_SIZE " + fifoSize);
+		} catch (IOException ex) {
+		  // report
+		} finally {
+		   try {
+			   writer.close();
+		   } catch (Exception ex) 
+		   {}
 		}
 	}
 
