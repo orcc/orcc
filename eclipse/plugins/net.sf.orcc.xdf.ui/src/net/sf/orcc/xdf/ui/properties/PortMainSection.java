@@ -29,10 +29,16 @@
 package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.util.TypePrinter;
+import net.sf.orcc.ui.editor.PartialCalParser;
+import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -44,6 +50,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public class PortMainSection extends AbstractGridBasedSection {
 
 	private Text portName;
+	private Text portType;
 
 	@Override
 	protected String getFormText() {
@@ -58,26 +65,37 @@ public class PortMainSection extends AbstractGridBasedSection {
 
 		portName = widgetFactory.createText(formBody, "", SWT.BORDER);
 		portName.setLayoutData(fillHorizontalData);
-		portName.setEditable(false);
-	}
 
-	@Override
-	public void refresh() {
-		super.refresh();
+		widgetFactory.createCLabel(formBody, "Type:");
 
-		final Port port = (Port) businessObject;
-		portName.setText(port.getName());
+		portType = widgetFactory.createText(formBody, "", SWT.BORDER);
+		portType.setLayoutData(fillHorizontalData);
 	}
 
 	@Override
 	protected void readValuesFromModels() {
-		// TODO Auto-generated method stub
+		final Port port = (Port) businessObject;
+		final TypePrinter typePrinter = new TypePrinter();
 
+		portName.setText(port.getName());
+		portType.setText(typePrinter.doSwitch(port.getType()));
 	}
 
 	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		// TODO Auto-generated method stub
+		final Port port = (Port) businessObject;
+		final PartialCalParser parser = new PartialCalParser();
 
+		if (widget == portName) {
+			port.setName(portName.getText());
+		} else if (widget == portType) {
+			final Type type = parser.parseType(portType.getText());
+			if (type == null) {
+				MessageDialog.openError(XdfUtil.getDefaultShell(), "Syntax error",
+						"Unable to parse the type you entered.");
+			} else {
+				port.setType(type);
+			}
+		}
 	}
 }

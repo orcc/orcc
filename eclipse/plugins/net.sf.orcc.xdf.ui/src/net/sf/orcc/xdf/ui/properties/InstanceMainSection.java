@@ -63,17 +63,17 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 
 		widgetFactory.createCLabel(formBody, "Refinement:");
 		refinementValue = widgetFactory.createText(formBody, "", SWT.BORDER);
+		refinementValue.setEditable(false);
 		refinementValue.setLayoutData(fillHorizontalData);
 
 		widgetFactory.createCLabel(formBody, "Part. name:");
 		part_name = widgetFactory.createText(formBody, "", SWT.BORDER);
 		part_name.setLayoutData(fillHorizontalData);
+		part_name.setEditable(false);
 	}
 
 	@Override
-	public void refresh() {
-		super.refresh();
-
+	protected void readValuesFromModels() {
 		final Instance instance = (Instance) businessObject;
 		instanceName.setText(instance.getName());
 		refinementValue.setText(instance.getEntity().eResource().getURI().toString());
@@ -82,14 +82,15 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 	}
 
 	@Override
-	protected void readValuesFromModels() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		// TODO Auto-generated method stub
+		final Instance instance = (Instance) businessObject;
 
+		if (widget == instanceName) {
+			instance.setName(instanceName.getText());
+		} else if (widget == refinementValue) {
+
+		} else if (widget == part_name) {
+			// TODO: write the "part name" in the model
+		}
 	}
 }

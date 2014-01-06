@@ -29,7 +29,10 @@
 package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -59,13 +62,10 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 
 		connectionSize = widgetFactory.createText(formBody, "", SWT.BORDER);
 		connectionSize.setLayoutData(fillHorizontalData);
-		connectionSize.setEditable(false);
 	}
 
 	@Override
-	public void refresh() {
-		super.refresh();
-
+	protected void readValuesFromModels() {
 		final Connection connection = (Connection) businessObject;
 		if (connection.getSize() != null) {
 			connectionSize.setText(connection.getSize().toString());
@@ -73,14 +73,18 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 	}
 
 	@Override
-	protected void readValuesFromModels() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		// TODO Auto-generated method stub
-
+		final Connection connection = (Connection) businessObject;
+		if(widget == connectionSize) {
+			try {
+				final String sizeText = connectionSize.getText();
+				final Integer bufferSize = Integer.decode(sizeText);
+				connection.setAttribute(Connection.BUFFER_SIZE,
+						IrFactory.eINSTANCE.createExprInt(bufferSize));
+			} catch (NumberFormatException e) {
+				MessageDialog.openError(XdfUtil.getDefaultShell(), "Syntax error",
+						"Unable to parse the size you entered.");
+			}
+		}
 	}
 }

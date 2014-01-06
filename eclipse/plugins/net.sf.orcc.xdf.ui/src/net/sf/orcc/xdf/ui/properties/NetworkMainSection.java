@@ -63,22 +63,19 @@ public class NetworkMainSection extends AbstractGridBasedSection {
 	}
 
 	@Override
-	public void refresh() {
-		super.refresh();
-
+	protected void readValuesFromModels() {
 		final Network network = (Network) businessObject;
 		networkName.setText(network.getName());
 	}
 
 	@Override
-	protected void readValuesFromModels() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		// TODO Auto-generated method stub
+		final Network network = (Network) businessObject;
 
+		if (widget == networkName) {
+			// TODO: renaming a network must also rename both diagram and
+			// network files
+			network.setName(networkName.getText());
+		}
 	}
 }
