@@ -114,10 +114,13 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 		});
 	}
 
+	/**
+	 * Read values from EMF models and write it to the corresponding widget.
+	 */
 	protected abstract void readValuesFromModels();
 
 	/**
-	 * Read value from the given widget and write it to the corresponding emf
+	 * Read value from the given widget and write it to the corresponding EMF
 	 * model.
 	 * 
 	 * @param widget

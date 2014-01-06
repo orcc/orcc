@@ -28,7 +28,9 @@
  */
 package net.sf.orcc.xdf.ui.properties;
 
-import org.eclipse.jface.viewers.ISelection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -36,7 +38,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -52,6 +55,8 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 
 	private boolean listenerSet = false;
 
+	private final Map<Widget, Object> initialialValues = new HashMap<Widget, Object>();
+
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
@@ -64,17 +69,28 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 	}
 
 	@Override
-	public void setInput(IWorkbenchPart part, ISelection selection) {
-		super.setInput(part, selection);
+	public void refresh() {
+		super.refresh();
 
+		final Control[] widgetList = formBody.getChildren();
+
+		// Update initial values
+		for (final Control widget : widgetList) {
+			initialialValues.put(widget, getValue(widget));
+		}
+
+		// Set listeners if not already set
 		if (listenerSet)
 			return;
-
-		for (final Control child : formBody.getChildren()) {
-			child.addFocusListener(new FocusAdapter() {
+		for (final Control widget : widgetList) {
+			widget.addFocusListener(new FocusAdapter() {
 				@Override
 				public void focusLost(FocusEvent e) {
-					writeValuesInTransaction(e.widget);
+					final Widget widget = e.widget;
+					if (!getValue(widget).equals(initialialValues.get(widget))) {
+						writeValuesInTransaction(widget);
+						initialialValues.put(widget, getValue(widget));
+					}
 				}
 			});
 		}
@@ -86,5 +102,20 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 	public void dispose() {
 		super.dispose();
 		listenerSet = false;
+	}
+
+	/**
+	 * Return the value contained by a given widget. This method must be able to
+	 * read value from all widgets used across properties pages.
+	 * 
+	 * @param widget
+	 * @return The value
+	 */
+	protected Object getValue(Widget widget) {
+		if (widget instanceof Text) {
+			return ((Text) widget).getText();
+		}
+		// Implements this getter for other kind of widgets
+		return null;
 	}
 }
