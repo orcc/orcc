@@ -67,7 +67,7 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 
 	@Override
 	protected Polygon getPortPolygon(final GraphicsAlgorithmContainer shape, final IGaService gaService) {
-		final int[] points = { 0, PORT_HEIGHT / 2, PORT_WIDTH, 0, PORT_WIDTH, PORT_HEIGHT };
+		final int[] points = { 0, SHAPE_HEIGHT / 2, SHAPE_WIDTH, 0, SHAPE_WIDTH, SHAPE_HEIGHT };
 		final Polygon polygon = gaService.createPlainPolygon(shape, points);
 		polygon.setStyle(StyleUtil.getStyleForInputPort(getDiagram()));
 		return polygon;

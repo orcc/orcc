@@ -81,8 +81,8 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 abstract public class NetworkPortPattern extends AbstractPattern implements IPattern {
 
-	protected final int PORT_HEIGHT = 34;
-	protected final int PORT_WIDTH = (int) (PORT_HEIGHT * 0.866);
+	protected final int SHAPE_HEIGHT = 34;
+	protected final int SHAPE_WIDTH = (int) (SHAPE_HEIGHT * 0.866);
 	private final int TEXT_PORT_SPACE = 4;
 	private final int TEXT_DEFAULT_WIDTH = 50;
 	private final int TEXT_DEFAULT_HEIGHT = 12;
@@ -259,6 +259,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 		// Draw the port according to its direction
 		final Polygon polygon = getPortPolygon(topLevelInvisibleRect, gaService);
+		gaService.setSize(polygon, SHAPE_WIDTH, SHAPE_HEIGHT);
 		ShapePropertiesManager.setIdentifier(polygon, SHAPE_ID);
 
 		// Add the label of the port
@@ -272,7 +273,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 		// We define an arbitrary width to text, allowing user to see chars
 		// when first direct editing port name
-		gaService.setLocationAndSize(text, 0, PORT_HEIGHT + TEXT_PORT_SPACE, TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT);
+		gaService.setLocationAndSize(text, 0, SHAPE_HEIGHT + TEXT_PORT_SPACE, TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT);
 
 		// Initialize the port if domain object already exists
 		if (addedDomainObject.getName() != null) {
@@ -332,10 +333,10 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		final Polygon poly = (Polygon) ShapePropertiesManager.findPcFromIdentifier(topLevelPe, SHAPE_ID);
 
 		final int minTxtWidth = XdfUtil.getTextMinWidth(txt);
-		final int newTextWidth = Math.max(minTxtWidth, PORT_WIDTH);
+		final int newTextWidth = Math.max(minTxtWidth, SHAPE_WIDTH);
 
-		if (minTxtWidth > PORT_WIDTH) {
-			int xscale = (minTxtWidth - PORT_WIDTH) / 2;
+		if (minTxtWidth > SHAPE_WIDTH) {
+			int xscale = (minTxtWidth - SHAPE_WIDTH) / 2;
 			poly.setX(xscale);
 		}
 
@@ -343,7 +344,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		gaService.setSize(txt, newTextWidth, XdfUtil.getTextMinHeight(txt));
 		topLevelPe.getGraphicsAlgorithm().setWidth(newTextWidth);
 
-		gaService.setSize(topLevelGa, Math.max(newTextWidth, PORT_WIDTH), PORT_HEIGHT + TEXT_PORT_SPACE
+		gaService.setSize(topLevelGa, Math.max(newTextWidth, SHAPE_WIDTH), SHAPE_HEIGHT + TEXT_PORT_SPACE
 				+ TEXT_DEFAULT_HEIGHT);
 
 		return true;
