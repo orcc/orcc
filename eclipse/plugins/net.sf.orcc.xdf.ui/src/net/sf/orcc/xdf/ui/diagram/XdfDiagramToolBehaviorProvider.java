@@ -56,6 +56,9 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 	 * Change the selection border of a shape.
 	 * 
 	 * For a Network port, the selection must be displayed on the inner polygon.
+	 * We don't want to customize getClickArea(), because the default
+	 * implementation (everything inside the invisible rectangle) fits to our
+	 * needs.
 	 * 
 	 * For an Instance port, we want to select the whole instance when a user
 	 * click on a port shape.
