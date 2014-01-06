@@ -41,7 +41,6 @@ import net.sf.orcc.util.OrccUtil
 import static net.sf.orcc.OrccLaunchConstants.*
 import net.sf.orcc.df.Actor
 import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
  * Generate and print network source file for C backend.

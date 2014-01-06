@@ -64,8 +64,6 @@ import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
  * Generate and print instance source file for C backend.
@@ -402,7 +400,7 @@ class InstancePrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
 		«FOR action : actor.actions»
-			«action.print(false)»
+			«action.print()»
 		«ENDFOR»
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -606,7 +604,7 @@ class InstancePrinter extends CTemplate {
 
 	def protected initializeFunction() '''
 		«FOR init : actor.initializes»
-			«init.print(true)»
+			«init.print()»
 		«ENDFOR»
 
 		«inline»void «entityName»_initialize(schedinfo_t *si) {
@@ -823,7 +821,7 @@ class InstancePrinter extends CTemplate {
 		return output
 	}
 
-	def protected print(Action action, Boolean isInitialize) {
+	def protected print(Action action) {
 		currentAction = action
 		val output = '''
 			«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
@@ -832,7 +830,7 @@ class InstancePrinter extends CTemplate {
 					«variable.declare»;
 				«ENDFOR»
 
-				«IF !isInitialize && profileActions && profileNetwork»
+				«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
 					ticks tick_in, tick_out;
 					double diff_tick;
 				«ENDIF»
@@ -849,7 +847,7 @@ class InstancePrinter extends CTemplate {
 					«ENDIF»
 				«ENDFOR»
 
-				«IF !isInitialize && profileActions && profileNetwork»
+				«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
 					tick_in = getticks();
 				«ENDIF»
 				
@@ -888,7 +886,7 @@ class InstancePrinter extends CTemplate {
 					write_end_«port.name»();
 					«ENDIF»
 				«ENDFOR»
-				«IF !isInitialize && profileActions && profileNetwork»
+				«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
 					tick_out = getticks();
 					diff_tick = elapsed(tick_out, tick_in);
 					ticks_«action.body.name» += diff_tick;
