@@ -42,6 +42,7 @@ import net.sf.orcc.xdf.ui.util.XdfUtil;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
+import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
@@ -51,6 +52,7 @@ import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
+import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.func.IDirectEditing;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
@@ -345,6 +347,25 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 				+ TEXT_DEFAULT_HEIGHT);
 
 		return true;
+	}
+
+	@Override
+	public IReason updateNeeded(IUpdateContext context) {
+		final PictogramElement pe = context.getPictogramElement();
+
+		if (isPatternRoot(pe)) {
+			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
+			if (text == null) {
+				return Reason.createFalseReason("Label Not found !!");
+			}
+
+			final Port port = (Port) getBusinessObjectForPictogramElement(pe);
+			if (!text.getValue().equals(port)) {
+				return Reason.createTrueReason("The port name has been updated from outside diagram");
+			}
+		}
+
+		return super.updateNeeded(context);
 	}
 
 	@Override

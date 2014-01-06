@@ -421,7 +421,7 @@ public class InstancePattern extends AbstractPattern {
 	public IReason updateNeeded(IUpdateContext context) {
 		final PictogramElement pe = context.getPictogramElement();
 
-		if (ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
+		if (isPatternRoot(pe)) {
 			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
 			if (text == null) {
 				return Reason.createFalseReason("Label Not found !!");
