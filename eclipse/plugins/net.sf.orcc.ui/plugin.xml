@@ -606,4 +606,15 @@
          </enablement>
       </moveParticipant>
    </extension>
+   <extension point="org.eclipse.ui.editors">
+      <editor
+            class="net.sf.orcc.graphiti.ui.editors.GraphEditor"
+            contributorClass="net.sf.orcc.graphiti.ui.editors.GraphActionBarContributor"
+            default="false"
+            extensions="xdf"
+            icon="icons/network.gif"
+            id="net.sf.orcc.ui.editors.GraphEditor"
+            name="Orcc Network Editor (Old)">
+      </editor>
+   </extension>
 </plugin>
