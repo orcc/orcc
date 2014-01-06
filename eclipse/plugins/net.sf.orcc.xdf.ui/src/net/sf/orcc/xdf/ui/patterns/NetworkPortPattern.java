@@ -360,7 +360,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 			}
 
 			final Port port = (Port) getBusinessObjectForPictogramElement(pe);
-			if (!text.getValue().equals(port)) {
+			if (!text.getValue().equals(port.getName())) {
 				return Reason.createTrueReason("The port name has been updated from outside diagram");
 			}
 		}
