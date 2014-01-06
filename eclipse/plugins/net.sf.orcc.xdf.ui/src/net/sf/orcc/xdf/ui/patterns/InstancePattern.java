@@ -429,7 +429,7 @@ public class InstancePattern extends AbstractPattern {
 
 			final Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
 			if (!text.getValue().equals(instance.getName())) {
-				return Reason.createTrueReason("The instance name has been updated from outside diagram");
+				return Reason.createTrueReason("The instance name has been updated from outside of the diagram");
 			}
 		}
 
