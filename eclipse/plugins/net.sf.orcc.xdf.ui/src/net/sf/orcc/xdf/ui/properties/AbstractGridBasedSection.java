@@ -34,6 +34,8 @@ import java.util.Map;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -88,6 +90,18 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 				public void focusLost(FocusEvent e) {
 					final Widget widget = e.widget;
 					if (!getValue(widget).equals(initialialValues.get(widget))) {
+						writeValuesInTransaction(widget);
+						initialialValues.put(widget, getValue(widget));
+					}
+				}
+			});
+
+			widget.addTraverseListener(new TraverseListener() {
+				@Override
+				public void keyTraversed(TraverseEvent e) {
+					// User press the RETURN key
+					if(e.detail == SWT.TRAVERSE_RETURN) {
+						final Widget widget = e.widget;
 						writeValuesInTransaction(widget);
 						initialialValues.put(widget, getValue(widget));
 					}
