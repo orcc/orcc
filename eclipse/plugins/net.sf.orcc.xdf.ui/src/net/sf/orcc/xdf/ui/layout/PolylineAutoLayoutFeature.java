@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, IETR/INSA of Rennes
+ * Copyright (c) 2014, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
