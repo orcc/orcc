@@ -37,7 +37,7 @@ import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
 import de.cau.cs.kieler.kiml.options.EdgeRouting;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortConstraints;
-import de.cau.cs.kieler.kiml.ui.diagram.LayoutMapping;
+import de.cau.cs.kieler.kiml.service.LayoutMapping;
 import de.cau.cs.kieler.klay.layered.LayeredLayoutProvider;
 
 /**
@@ -87,6 +87,7 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 		final IWorkbenchPart wbPart = (IWorkbenchPart) getDiagramEditor();
 
 		final GraphitiDiagramLayoutManager manager = new GraphitiDiagramLayoutManager();
+
 		final LayoutMapping<PictogramElement> mapping = manager.buildLayoutGraph(wbPart, null);
 
 		preFixDiagramMapping(mapping);
