@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.xdf.ui.layout;
 
+import java.util.Map;
+
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
@@ -39,8 +41,6 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.ui.IWorkbenchPart;
-
-import com.google.common.collect.BiMap;
 
 import de.cau.cs.kieler.core.alg.BasicProgressMonitor;
 import de.cau.cs.kieler.core.kgraph.KGraphElement;
@@ -103,7 +103,7 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 
 		final LayoutMapping<PictogramElement> mapping = manager.buildLayoutGraph(wbPart, null);
 
-		preFixDiagramMapping(mapping);
+		preFixDiagramMapping(mapping.getLayoutGraph(), mapping.getGraphMap().inverse());
 
 		final LayeredLayoutProvider provider = new LayeredLayoutProvider();
 		provider.doLayout(mapping.getLayoutGraph(), new BasicProgressMonitor());
@@ -112,21 +112,19 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 		hasDoneChanges = true;
 	}
 
-	private void preFixDiagramMapping(final LayoutMapping<PictogramElement> mapping) {
-
-		final BiMap<PictogramElement, KGraphElement> invMap = mapping.getGraphMap().inverse();
+	private void preFixDiagramMapping(final KNode diagramNode, final Map<PictogramElement, KGraphElement> peKnodeMap) {
 
 		IPattern pattern;
 		for (final Shape shape : getDiagram().getChildren()) {
 			pattern = ((IFeatureProviderWithPatterns) getFeatureProvider()).getPatternForPictogramElement(shape);
 			if (pattern instanceof NetworkPortPattern) {
-				preFixNetworkPortNode((KNode) invMap.get(shape));
+				preFixNetworkPortNode((KNode) peKnodeMap.get(shape));
 			} else if (pattern instanceof InstancePattern) {
-				preFixInstanceNode((KNode) invMap.get(shape));
+				preFixInstanceNode((KNode) peKnodeMap.get(shape));
 			}
 		}
 
-		final KShapeLayout mappingShapeLayout = mapping.getLayoutGraph().getData(KShapeLayout.class);
+		final KShapeLayout mappingShapeLayout = diagramNode.getData(KShapeLayout.class);
 		if (mappingShapeLayout != null) {
 			mappingShapeLayout.setProperty(LayoutOptions.SPACING, 30.0f);
 			mappingShapeLayout.setProperty(LayoutOptions.EDGE_ROUTING, getEdgeRouter());
@@ -157,7 +155,3 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 		}
 	}
 }
-
-
-
-
