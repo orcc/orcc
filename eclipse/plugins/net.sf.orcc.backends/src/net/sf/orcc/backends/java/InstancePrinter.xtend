@@ -42,7 +42,7 @@ class InstancePrinter extends JavaTemplate {
 	}
 	
 	def printInstance(String targetFolder){
-		val ActorPrinter actorPrinter = new ActorPrinter(instance.actor, options)
+		val ActorPrinter actorPrinter = new ActorPrinter(instance.getActor, options)
 		actorPrinter.print(targetFolder);
 	}
 }

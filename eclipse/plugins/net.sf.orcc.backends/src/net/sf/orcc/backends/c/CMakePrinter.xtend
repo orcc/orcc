@@ -87,7 +87,7 @@ class CMakePrinter extends CommonPrinter {
 
 		set(filenames
 			«network.simpleName».c
-			«FOR child : network.children.actorInstances.filter[!actor.native]»
+			«FOR child : network.children.actorInstances.filter[!getActor.native]»
 				«child.label».c
 			«ENDFOR»
 			«FOR child : network.children.filter(typeof(Actor)).filter[!native]»
