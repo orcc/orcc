@@ -404,9 +404,14 @@ public class SuperactorParser {
 			if (node instanceof Element) {
 				Element elt = (Element) node;
 				if (elt.getTagName().equals("iterand")) {
-					Actor actor = findActor(elt.getAttribute("actor")).getAdapter(Actor.class);
-					addActorActionToSchedule(schedule, actor, findAction(actor, elt.getAttribute("action")),
-							Integer.parseInt(elt.getAttribute("repetitions")));
+					Vertex vertex = findActor(elt.getAttribute("actor"));
+					if (vertex != null) {
+						Actor actor = vertex.getAdapter(Actor.class);
+						addActorActionToSchedule(schedule, actor, findAction(actor, elt.getAttribute("action")),
+								Integer.parseInt(elt.getAttribute("repetitions")));
+					} else {
+						OrccLogger.warnln("unknown actor " + elt.getAttribute("actor") + " in schedule");
+					}
 				}
 				if (node.getNodeName().equals("guard")) {
 					guardExpression = parseGuard(guard, elt);

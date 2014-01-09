@@ -80,7 +80,7 @@ class Validator {
 			}
 		}
 		for (instance : network.children.filter(typeof(Instance)).filter[isActor]) {
-			val actor = instance.actor
+			val actor = instance.getActor
 			for (action : actor.actions + actor.initializes) {
 				checkInputRepeat(action.inputPattern, instance, size)
 				checkOutputRepeat(action.outputPattern, instance, size)

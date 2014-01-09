@@ -48,7 +48,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override protected printStateLabel(State state) '''
 		l_«state.name»:
-			«IF ! instance.actor.actionsOutsideFsm.empty»
+			«IF ! instance.getActor.actionsOutsideFsm.empty»
 				«instance.name»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF state.outgoing.empty»
@@ -85,22 +85,22 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 	
 	override protected actorScheduler() '''
-		«IF instance.actor.hasFsm»
+		«IF instance.getActor.hasFsm»
 			«printFsm»
 		«ELSE»
 			void «instance.name»_scheduler() {
 				int i = 0;
 				«printCallTokensFunctions»
-				«instance.actor.actionsOutsideFsm.printActionLoop»
+				«instance.getActor.actionsOutsideFsm.printActionLoop»
 				
 			finished:
-				«FOR port : instance.actor.inputs»
+				«FOR port : instance.getActor.inputs»
 					read_end_«port.name»();
 				«ENDFOR»
-				«FOR port : instance.actor.outputs.notNative»
+				«FOR port : instance.getActor.outputs.notNative»
 					write_end_«port.name»();
 				«ENDFOR»
-				«IF instance.actor.inputs.nullOrEmpty && instance.actor.outputs.nullOrEmpty »
+				«IF instance.getActor.inputs.nullOrEmpty && instance.getActor.outputs.nullOrEmpty »
 					// no read_end/write_end here!
 					return;
 				«ENDIF»
@@ -130,10 +130,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	override protected printFsm() '''
-		«IF ! instance.actor.actionsOutsideFsm.empty»
+		«IF ! instance.getActor.actionsOutsideFsm.empty»
 			void «instance.name»_outside_FSM_scheduler() {
 				int i = 0;
-				«instance.actor.actionsOutsideFsm.printActionLoop»
+				«instance.getActor.actionsOutsideFsm.printActionLoop»
 			finished:
 				// no read_end/write_end here!
 				return;
@@ -147,7 +147,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 			// jump to FSM state 
 			switch (_FSM_state) {
-			«FOR state : instance.actor.fsm.states»
+			«FOR state : instance.getActor.fsm.states»
 				case my_state_«state.name»:
 					goto l_«state.name»;
 			«ENDFOR»
@@ -158,14 +158,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			}
 		
 			// FSM transitions
-			«FOR state : instance.actor.fsm.states»
+			«FOR state : instance.getActor.fsm.states»
 		«state.printStateLabel»
 			«ENDFOR»
 		finished:
-			«FOR port : instance.actor.inputs»
+			«FOR port : instance.getActor.inputs»
 				read_end_«port.name»();
 			«ENDFOR»
-			«FOR port : instance.actor.outputs.filter[!native]»
+			«FOR port : instance.getActor.outputs.filter[!native]»
 				write_end_«port.name»();
 			«ENDFOR»
 		}

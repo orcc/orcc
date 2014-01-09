@@ -201,7 +201,7 @@ class InstancePrinter extends CTemplate {
 
 		this.instance = instance
 		this.entityName = instance.name
-		this.actor = instance.actor
+		this.actor = instance.getActor
 		this.attributable = instance
 		this.incomingPortMap = instance.incomingPortMap
 		this.outgoingPortMap = instance.outgoingPortMap

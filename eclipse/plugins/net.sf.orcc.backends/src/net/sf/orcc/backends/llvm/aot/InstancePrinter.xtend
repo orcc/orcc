@@ -151,7 +151,7 @@ class InstancePrinter extends LLVMTemplate {
 		
 		this.instance = instance
 		this.name = instance.name
-		this.actor = instance.actor
+		this.actor = instance.getActor
 		this.incomingPortMap = instance.incomingPortMap
 		this.outgoingPortMap = instance.outgoingPortMap
 
