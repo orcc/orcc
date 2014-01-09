@@ -66,9 +66,10 @@ class RunConfiguration(object):
     file1='tmp_start_actors.pml'
     file2='tmp_state.pml'
     file3='tmp_ltl_expr.pml'
+    file4='tmp_include_actors.pml'
     def __init__(self, conf):
         self.conf=conf
-    def configure(self, statedesc, inputseq, currstate, action, nextstate, nextfsmstate):
+    def configure(self, statedesc, inputseq, currstate, action, nextstate, nextfsmstate, initializers):
         open(self.file1, "a").close() # create the file for starting processes if it doesnt exist
         file=open(self.file1, "w")
         file.writelines(["run %s();\n" % item  for item in self.conf.actors])
@@ -83,7 +84,16 @@ class RunConfiguration(object):
         file=open(self.file3, "w")
         buffers='&&'.join(["len(chan_"+str(elem)+")==0" for elem in inputseq.channels])
         file.write("#define emptyBuffer ("+buffers+")\n")
+        if initializers:
+            initialized='&&'.join([initvar+"==1" for initvar in initializers])
+        else:
+            initialized="1"
+        file.write("#define initialized ("+initialized+")\n")
         file.write(self.__ltl(inputseq, nextstate, nextfsmstate))
+        file.close()
+        open(self.file4, "a").close() # create the file for starting processes if it doesnt exist
+        file=open(self.file4, "w")
+        file.writelines(["#include \"%s.pml\"\n" % item  for item in self.conf.actors])
         file.close()
     def confinitsearch(self):
         open(self.file1, "a").close() # create it if it doesnt exist
@@ -92,6 +102,9 @@ class RunConfiguration(object):
         file.close()
         open(self.file2, "w").close() # create it if it doesnt exist
         open(self.file3, "w").close() # create it if it doesnt exist
+        file=open(self.file4, "w")
+        file.writelines(["#include \"%s.pml\"\n" % item  for item in self.conf.actors])
+        file.close()
     def __ltl(self, inputseq, nextstate, actortostatesdic):
         # the morefsmstates is of type {fsm_state_???:[state, state,..]}
         s=  "ltl test {[]!(promela_has_progress==1 &&"
@@ -100,7 +113,7 @@ class RunConfiguration(object):
             s+= "&& ("
             s+='||'.join([state+"=="+val for val in actortostatesdic[state]])
             s+=")"
-        s+= "&& emptyBuffer)}\n"
+        s+= "&& emptyBuffer && initialized)}\n"
         return s
     
         
@@ -152,6 +165,14 @@ class StateDescription(object):
             if var.find('fsm_state_') >= 0 :
                 dic[var]=[self.state[var]]
         return dic
+    def getinitializers(self):
+        '''return the initializers which are zero'''
+        lst=[]
+        for var in self.state.keys():
+            if var.find('initialized') >= 0 :
+                if int(self.state[var])==0:
+                    lst.append(var)
+        return lst
     def setfilter(self, xmlfilename):
         tree = et.parse(xmlfilename)
         for xactor in tree.findall('.//actor'):

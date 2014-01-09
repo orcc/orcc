@@ -408,4 +408,9 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		return result.toString();
 	}
 
+	@Override
+	public String getSizeAsString() {
+		return getWordWidth() + " x " + getDepth();
+	}
+
 } // MemoryImpl

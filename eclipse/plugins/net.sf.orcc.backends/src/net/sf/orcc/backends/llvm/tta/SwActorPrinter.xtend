@@ -82,7 +82,7 @@ class SwActorPrinter extends InstancePrinter {
 		val output = '''
 		«IF isActionVectorizable»
 
-		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
@@ -140,7 +140,7 @@ class SwActorPrinter extends InstancePrinter {
 		}
 		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
 
-		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»

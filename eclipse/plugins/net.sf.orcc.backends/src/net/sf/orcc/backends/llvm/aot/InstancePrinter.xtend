@@ -91,7 +91,7 @@ class InstancePrinter extends LLVMTemplate {
 	val Map<State, Integer> stateToLabel = new HashMap<State, Integer>
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
-	protected var optionProfile = false
+	protected var optionInline = false
 	protected var optionArch = "x86_64"
 
 	protected var boolean isActionVectorizable = false
@@ -100,8 +100,8 @@ class InstancePrinter extends LLVMTemplate {
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {		
-		if(options.containsKey(PROFILE)){
-			optionProfile = options.get(PROFILE) as Boolean
+		if(options.containsKey(INLINE)){
+			optionInline = options.get(INLINE) as Boolean
 		}
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
@@ -151,7 +151,7 @@ class InstancePrinter extends LLVMTemplate {
 		
 		this.instance = instance
 		this.name = instance.name
-		this.actor = instance.actor
+		this.actor = instance.getActor
 		this.incomingPortMap = instance.incomingPortMap
 		this.outgoingPortMap = instance.outgoingPortMap
 
@@ -584,7 +584,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val outputPattern = action.outputPattern»
 		«IF isActionVectorizable»
 
-		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
@@ -638,7 +638,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
 
-		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionProfile»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»

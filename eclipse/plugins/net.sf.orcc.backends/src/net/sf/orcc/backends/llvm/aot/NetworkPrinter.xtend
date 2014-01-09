@@ -87,7 +87,7 @@ class NetworkPrinter extends LLVMTemplate {
 		
 		«FOR instance : network.children.actorInstances»
 			declare void @«instance.name»_scheduler()
-			«IF ! instance.actor.initializes.empty»
+			«IF ! instance.getActor.initializes.empty»
 				declare void @«instance.name»_initialize()
 			«ENDIF»
 		«ENDFOR»
@@ -105,7 +105,7 @@ class NetworkPrinter extends LLVMTemplate {
 		entry:
 			call void @init_orcc(i32 %argc, i8** %argv);
 			«FOR instance : network.children.actorInstances»
-				«IF ! instance.actor.initializes.empty»
+				«IF ! instance.getActor.initializes.empty»
 					call void @«instance.name»_initialize()
 				«ENDIF»
 			«ENDFOR»
