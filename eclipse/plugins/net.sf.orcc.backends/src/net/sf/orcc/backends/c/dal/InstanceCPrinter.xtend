@@ -35,6 +35,8 @@ import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.OrccUtil
 
+import static net.sf.orcc.OrccLaunchConstants.*
+
 /**
  * Generate and print actor source file for DAL backend.
  *  
@@ -48,8 +50,11 @@ class InstanceCPrinter extends CTemplate {
 	protected var Actor actor
 	protected var Attributable attributable
 	protected var int maxIter
+	protected var int maxOut
+	private var int tmpIter
 	protected var Map<Port, Connection> incomingPortMap
 	protected var Map<Port, List<Connection>> outgoingPortMap
+	protected var int fifoSize
 	
 	protected var String entityName
 		
@@ -69,6 +74,11 @@ class InstanceCPrinter extends CTemplate {
 	}
 	
 	new(Map<String, Object> options) {		
+		if (options.containsKey(FIFO_SIZE)) {
+			fifoSize = options.get(FIFO_SIZE) as Integer
+		} else {
+			fifoSize = 512
+		}
 	}
 	
 	override caseTypeBool(TypeBool type) 
@@ -117,22 +127,25 @@ class InstanceCPrinter extends CTemplate {
 		if (actor.getMoC() != null) {
 			isSDF = actor.getMoC().isSDF();
 		}
-		maxIter = 1;
+		maxIter = 1000000;
 		if (isSDF) {
 			for (port : actor.getInputs()) {
-				if (port.getNumTokensConsumed() > maxIter) {
-					maxIter = port.getNumTokensConsumed()
+				tmpIter = incomingPortMap.get(port).sizeOrDefaultSize / port.getNumTokensConsumed()
+				if (tmpIter < maxIter) {
+					maxIter = tmpIter
 				}
 			}
 			for (port : actor.getOutputs()) {
-				if (Math.abs(port.getNumTokensProduced()) > maxIter) {
-					maxIter = Math.abs(port.getNumTokensProduced())
+				tmpIter = outgoingPortMap.get(port).get(0).sizeOrDefaultSize / Math.abs(port.getNumTokensProduced())
+				if (tmpIter < maxIter) {
+					maxIter = tmpIter
 				}
 			}
 		} else if (!actor.hasAttribute("variableInputPattern")) {
 			for (port : actor.getInputs()) {
-				if (port.getNumTokensConsumed() > maxIter) {
-					maxIter = port.getNumTokensConsumed()
+				tmpIter = incomingPortMap.get(port).sizeOrDefaultSize / port.getNumTokensConsumed()
+				if (tmpIter < maxIter) {
+					maxIter = tmpIter
 				}
 			}
 		}
@@ -144,12 +157,11 @@ class InstanceCPrinter extends CTemplate {
 		#include "«entityName».h"
 
 		«IF (!actor.hasAttribute("variableInputPattern") || isSDF)»
-			#define TMP_ITER (FIFO_SIZE/«maxIter»)
-			#if TMP_ITER < 1  
-			  #define MAX_ITER 1
+			#ifdef ITER_«actor.getName»
+				#define MAX_ITER ITER_«actor.getName»
 			#else
-			  #define MAX_ITER TMP_ITER
-			#endif 
+				#define MAX_ITER «maxIter»
+			#endif
 		«ENDIF»
 		«IF (!actor.hasAttribute("variableInputPattern"))»
 			«OrccLogger::traceln("Info: actor " + actor.getName + " inputs are buffered")»
@@ -168,17 +180,14 @@ class InstanceCPrinter extends CTemplate {
 			«ENDFOR»
 		«ENDIF»
 
-		
 		«FOR port : actor.getOutputs»
 			«IF port.getNumTokensProduced() > 0»
 				«OrccLogger::traceln("Info: actor " + actor.getName + " output "+ port.getName +" is buffered")»
-				#define TMP_«port.getName()» (FIFO_SIZE/«port.getNumTokensProduced()»)*«port.getNumTokensProduced()»
-				#if «port.getNumTokensProduced()» > TMP_«port.getName()»  
-				  #define SZ_«port.getName()» «port.getNumTokensProduced()»
+				#ifdef BLOCKSZ_«actor.getName»_«port.getName»
+					#define SZ_«port.getName()» BLOCKSZ_«actor.getName»_«port.getName»
 				#else
-				  #define SZ_«port.getName()» TMP_«port.getName()»
-				#endif 
-					
+					#define SZ_«port.getName()» «(outgoingPortMap.get(port).get(0).sizeOrDefaultSize / Math.abs(port.getNumTokensProduced()))*Math.abs(port.getNumTokensProduced())»
+				#endif
 			«ENDIF»
 		«ENDFOR»
 		
@@ -816,7 +825,7 @@ class InstanceCPrinter extends CTemplate {
 					«ENDIF»
 				«ELSE»
 					«IF isSDF»
-						«load.target.variable.name» = «srcPort.name»_buffer[_i+«load.indexes.head.doSwitch»];
+						«load.target.variable.name» = «srcPort.name»_buffer[(_i*«srcPort.getNumTokensConsumed()»)+«load.indexes.head.doSwitch»];
 					«ELSE»
 						«IF !(actor.hasAttribute("variableInputPattern"))»
 							«load.target.variable.name» = «srcPort.name»_buffer[«srcPort.name»_index[0]];
@@ -849,7 +858,7 @@ class InstanceCPrinter extends CTemplate {
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
 				«IF isSDF»
-					«trgtPort.name»_buffer[_i+«store.indexes.head.doSwitch»] = «store.value.doSwitch»;
+					«trgtPort.name»_buffer[(_i*«Math.abs(trgtPort.getNumTokensProduced())»)+«store.indexes.head.doSwitch»] = «store.value.doSwitch»;
 				«ELSE»
 					«IF trgtPort.getNumTokensProduced() > 0»
 						«trgtPort.name»_buffer[«trgtPort.name»_index[0] + «store.indexes.head.doSwitch»] = «store.value.doSwitch»;
@@ -919,6 +928,11 @@ class InstanceCPrinter extends CTemplate {
 
 	def private getInline() 
 		''''''
+
+	def private sizeOrDefaultSize(Connection conn) {
+		if(conn == null || conn.size == null) fifoSize
+		else conn.size
+	}
 
 	def private isOutputConnected(Port port) {
 		// If the port has a list of output connections not defined or empty, returns false

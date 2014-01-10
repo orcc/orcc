@@ -76,7 +76,6 @@ public class DALBackend extends CBackend {
 		ActorOptimizer optimizer = new ActorOptimizer();
 		optimizer.optimizeInput(network, inputBuffering, fifoSize);
 		optimizer.optimizeOutput(network, outputBuffering, fifoSize);
-		optimizer.treatMoC(network, fifoSize);
 
 		labelPeekPorts(network);
 	}
