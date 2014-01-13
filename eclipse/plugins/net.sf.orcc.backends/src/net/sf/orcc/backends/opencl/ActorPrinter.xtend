@@ -64,7 +64,7 @@ class ActorPrinter extends BasePrinter {
 		// EPFL - OpenCL Backend
 		// --
 		// Date :  «dateFormat.format(date)»
-		// CAL Actor Header File: "«instance.actor.file»"
+		// CAL Actor Header File: "«instance.getActor.file»"
 		// Actor: «instance.simpleName»
 		// ////////////////////////////////////////////////////////////////////////////
 		#ifndef __«instance.name.toUpperCase»_HPP__
@@ -72,9 +72,9 @@ class ActorPrinter extends BasePrinter {
 		
 		
 		#include "CAL/DeviceManager.hpp"
-		«IF !instance.actor.stateVars.empty»
+		«IF !instance.getActor.stateVars.empty»
 		// «instance.name» state variables
-		«printStateVars(instance, instance.actor.stateVars)»
+		«printStateVars(instance, instance.getActor.stateVars)»
 		«ENDIF»
 		
 		class «instance.name»{
@@ -88,7 +88,7 @@ class ActorPrinter extends BasePrinter {
 			cl_uint schedule();
 		private:
 			DeviceManager deviceManager;
-			«IF !instance.actor.stateVars.empty»
+			«IF !instance.getActor.stateVars.empty»
 			«instance.name»_stateVars sv_«instance.name»;
 			«ENDIF»	
 		};
@@ -100,14 +100,14 @@ class ActorPrinter extends BasePrinter {
 	def printInstance(Instance instance)  {
 		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		var date = new Date();
-		var actor = instance.actor;
+		var actor = instance.getActor;
 		currentInstance = instance;
 		'''
 		// ////////////////////////////////////////////////////////////////////////////
 		// EPFL - OpenCL Backend
 		// --
 		// Date :  «dateFormat.format(date)»
-		// CAL Actor Source File: "«instance.actor.file»"
+		// CAL Actor Source File: "«instance.getActor.file»"
 		// Actor: «instance.simpleName»
 		// ////////////////////////////////////////////////////////////////////////////
 		#include "«instance.name».hpp"
@@ -134,14 +134,14 @@ class ActorPrinter extends BasePrinter {
 	def printKernel(Instance instance)  {
 		var dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		var date = new Date();
-		var actor = instance.actor;
+		var actor = instance.getActor;
 		currentInstance = instance;
 		'''
 		// ////////////////////////////////////////////////////////////////////////////
 		// EPFL - OpenCL Backend
 		// --
 		// Date :  «dateFormat.format(date)»
-		// CAL Actor Kernel File: "«instance.actor.file»"
+		// CAL Actor Kernel File: "«instance.getActor.file»"
 		// Actor: «instance.simpleName»
 		// ////////////////////////////////////////////////////////////////////////////
 		
@@ -150,11 +150,11 @@ class ActorPrinter extends BasePrinter {
 		
 		// The kernel
 		__kernel void «instance.simpleName»(
-			«IF !instance.actor.stateVars.empty»
+			«IF !instance.getActor.stateVars.empty»
 			__global «instance.name»_stateVars sv_«instance.name»,
 			«ENDIF»
-			«printPort(instance.actor.inputs,"pIn_","__global const")»
-			«printPort(instance.actor.outputs,"pOut_","__global")»
+			«printPort(instance.getActor.inputs,"pIn_","__global const")»
+			«printPort(instance.getActor.outputs,"pOut_","__global")»
 			)
 		{
 			int gid = get_global_id(0);
@@ -167,7 +167,7 @@ class ActorPrinter extends BasePrinter {
 		'''
 		«action.body.returnType.doSwitch» «action.body.name» (
 			int gid,
-			«IF !instance.actor.stateVars.empty»
+			«IF !instance.getActor.stateVars.empty»
 			«instance.name»_stateVars sv_«instance.name»,
 			«ENDIF»
 			«printPort(action.inputPattern.ports,"","")»

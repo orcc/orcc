@@ -29,7 +29,7 @@
                id="net.sf.orcc.tracing.enable">
          </option>
          <option
-               id="net.sf.orcc.backends.profile">
+               id="net.sf.orcc.backends.inline">
          </option>
       </backend>
       <backend
@@ -146,7 +146,7 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
-               id="net.sf.orcc.backends.profile">
+               id="net.sf.orcc.backends.inline">
          </option>
          <option
                id="net.sf.orcc.core.classify">
@@ -365,10 +365,18 @@
          </option>
          <option
                defaultValue="false"
-               description="Generate output files that can be used with profiling tools"
-               id="net.sf.orcc.backends.profile"
-               name="Enable profiling">
-            <checkBox></checkBox>
+               description="Force the inlining inside the actors to ease the profiling"
+               id="net.sf.orcc.backends.inline"
+               name="Inline all functions inside the actors">
+            <checkBox>
+               <option
+                     defaultValue="false"
+                     description="Prevent the inlining of actions for deeper profiling"
+                     id="net.sf.orcc.backends.inline.notActions"
+                     name="Do not inline the actions">
+                  <checkBox></checkBox>
+               </option>
+            </checkBox>
          </option>
          <option
                defaultValue="Standard"

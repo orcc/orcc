@@ -36,7 +36,7 @@ import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.df.Actor
 
 /**
- * Compile top Network c source code 
+ * Compile top Network Promela source code 
  *  
  * @author Antoine Lorence
  * 
@@ -88,9 +88,13 @@ class NetworkPrinter extends PromelaTemplate {
 		int promela_has_progress=0;
 		
 		// Include the actors
+		#ifdef MANAGED
+		#include "tmp_include_actors.pml"
+		#else
 		«FOR actor : network.children.filter(typeof(Actor))»
 			#include "«actor.simpleName».pml"
 		«ENDFOR»
+		#endif
 		
 		proctype dummy() {
 		chan_0?promela_prog_initiated;}

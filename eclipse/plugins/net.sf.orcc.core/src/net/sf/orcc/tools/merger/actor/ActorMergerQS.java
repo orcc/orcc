@@ -193,16 +193,23 @@ public class ActorMergerQS extends ActorMergerBase {
 		}
 	}
 
+	private void copyAction(String actorName, Action action) {
+		Procedure actionCopy = IrUtil.copy(action.getBody());
+		actionCopy.setName(new String(actorName + "_" + action.getName() + "_p"));
+		createParameters(actionCopy, action);
+		correspondences.add(action, actionCopy);
+		superActor.getProcs().add(actionCopy);
+	}
+	
 	private void copyActions(Network network) {
 		// Transform actions into procedures
 		for (Vertex vertex : network.getChildren()) {
 			Actor actor = vertex.getAdapter(Actor.class);
 			for (Action action : actor.getActions()) {
-				Procedure actionCopy = IrUtil.copy(action.getBody());
-				actionCopy.setName(new String(actor.getName() + "_" + action.getName() + "_p"));
-				createParameters(actionCopy, action);
-				correspondences.add(action, actionCopy);
-				superActor.getProcs().add(actionCopy);
+				copyAction(actor.getName(), action);
+			}
+			for (Action action : actor.getInitializes()) {
+				copyAction(actor.getName(), action);
 			}
 		}
 	}

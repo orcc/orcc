@@ -120,15 +120,15 @@ class ScriptPrinter extends PromelaTemplate {
 				next_state_file=uargs.findspecificstate+'.txt'
 				nsd=StateDescription()
 				nsd.loadstate('config_«network.simpleName»', next_state_file)
-				rc.configure(sd, inputs, sched.src, sched.action, sched.dst, nsd.getfsmstates())
+				rc.configure(sd, inputs, sched.src, sched.action, sched.dst, nsd.getfsmstates(), sd.getinitializers())
 			else:
-				rc.configure(sd, inputs, sched.src, sched.action, sched.dst, {})
+				rc.configure(sd, inputs, sched.src, sched.action, sched.dst, {}, sd.getinitializers())
 			conf.setschedule(uargs.runcheckerid)
 		
 		if uargs.runchecker:
 			mc.generatemc('main_«network.simpleName».pml')
-			mc.compilemc()
-			mc.runmc()
+			mc.compilemc(uargs.shortestPath)
+			mc.runmc(uargs.shortestPath)
 			if mc.tracefound:
 				print ("\n\nSchedule found.")
 				fsm=FSM()
@@ -155,7 +155,7 @@ class ScriptPrinter extends PromelaTemplate {
 			fsm.loadfsm('config_«network.simpleName»', 'scheduler.txt')
 			fsm.savefsm('config_«network.simpleName»', 'scheduler.txt')
 			scheduler=SchedulerXML('schedule_«network.simpleName».xml')
-			scheduler.savenewfsm(fsm, conf, 'schedule_«network.simpleName»_new.xml', 'config_«network.simpleName»')
+			scheduler.savenewfsm(fsm, conf, 'schedule_«network.simpleName».xml', 'config_«network.simpleName»')
 				
 		
 		conf.printconfiguration()

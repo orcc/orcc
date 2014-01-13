@@ -26,23 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+package net.sf.orcc.backends.transform;
 
-package net.sf.orcc.backends.java
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.util.Void;
 
-import java.util.Map
-import net.sf.orcc.df.Instance
+public class InlinerByAnnotation extends Inliner {
 
-class InstancePrinter extends JavaTemplate {
-	Instance instance
-	Map<String,Object> options
-	
-	new(Instance instance, Map<String,Object> options){
-		this.instance = instance
-		this.options = options
+	public InlinerByAnnotation() {
+		super(true, true);
 	}
-	
-	def printInstance(String targetFolder){
-		val ActorPrinter actorPrinter = new ActorPrinter(instance.getActor, options)
-		actorPrinter.print(targetFolder);
+
+	@Override
+	public Void caseInstCall(InstCall call) {
+		
+		if (call.hasAttribute("inline") || call.getTarget() != null
+				&& call.getTarget().getVariable() != null
+				&& call.getTarget().getVariable().hasAttribute("inline")) {
+			return super.caseInstCall(call);
+		}
+		return null;
 	}
 }

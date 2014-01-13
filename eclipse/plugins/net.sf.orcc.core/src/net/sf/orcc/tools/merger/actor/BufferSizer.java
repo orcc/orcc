@@ -94,6 +94,11 @@ public class BufferSizer {
 					return actor;
 				}
 			}
+			for (Action action : actor.getInitializes()) {
+				if (act.equals(action)) {
+					return actor;
+				}
+			}
 		}
 		return null;
 	}
