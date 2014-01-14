@@ -16,9 +16,11 @@ import net.sf.orcc.backends.c.CTemplate
 class NetworkMPrinter extends CTemplate {
 	
 	protected val Network network;
+	Map<String, String> mapping
 	
-	new(Network network, Map<String, Object> options) {
+	new(Network network, Map<String, String> map) {
 		this.network = network
+		this.mapping = map
 	}
 	
 	def print(String targetFolder) {
@@ -38,14 +40,17 @@ class NetworkMPrinter extends CTemplate {
 <?xml version="1.0" encoding="UTF-8"?>
 <mapping xmlns="http://www.tik.ee.ethz.ch/~euretile/schema/MAPPING" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://www.tik.ee.ethz.ch/~euretile/schema/MAPPING     http://www.tik.ee.ethz.ch/~euretile/schema/mapping.xsd" name="mapping1" processnetwork="APP1">
-
-		«FOR actor : network.getAllActors»
-			<binding name="«actor.name»"> 
-				<process name="«actor.name»"/> 
-				<processor name="core_2"/> 
+		«FOR vertex : network.children»
+			<binding name="«vertex.label»">
+				<process name="«vertex.label»"/>
+				«IF mapping.get(network.name + "_" + vertex.label).equals("")»
+					<processor name="core_2"/> 
+				«ELSE»
+					<processor name="«mapping.get(network.name + "_" + vertex.label)»"/>
+				«ENDIF»
 			</binding> 
 		«ENDFOR»
-		</mapping>
+</mapping>
 	'''
 	
 }

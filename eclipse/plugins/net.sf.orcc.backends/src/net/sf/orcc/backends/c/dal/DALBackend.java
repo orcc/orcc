@@ -141,7 +141,7 @@ public class DALBackend extends CBackend {
 	private boolean printNetwork(Network network, String srcPath) {
 		boolean successC, successM;
 		successC = new NetworkCPrinter(network, options).print(srcPath) > 0;		
-		successM = new NetworkMPrinter(network, options).print(srcPath) > 0;		
+		successM = new NetworkMPrinter(network, mapping).print(srcPath) > 0;		
 		return successC & successM;
 	}
 	
@@ -149,7 +149,7 @@ public class DALBackend extends CBackend {
 	protected boolean printActor(Actor actor) {
 		boolean successC, successH;
 		successC = new InstanceCPrinter(options).print(srcPath, actor) > 0;
-		successH = new InstanceHPrinter(options).print(srcPath, actor) > 0;
+		successH = new InstanceHPrinter().print(srcPath, actor) > 0;
 		return successC & successH;
 	}
 

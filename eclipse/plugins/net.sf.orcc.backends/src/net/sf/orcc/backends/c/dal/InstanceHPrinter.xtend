@@ -45,9 +45,6 @@ class InstanceHPrinter extends CTemplate {
 		instance = null
 	}
 	
-	new(Map<String, Object> options) {		
-	}
-	
 	/**
 	 * Print file content from a given instance
 	 * 
