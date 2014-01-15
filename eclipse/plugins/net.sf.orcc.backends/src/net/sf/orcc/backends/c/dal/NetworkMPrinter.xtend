@@ -43,10 +43,14 @@ class NetworkMPrinter extends CTemplate {
 		«FOR vertex : network.children»
 			<binding name="«vertex.label»">
 				<process name="«vertex.label»"/>
-				«IF mapping.get(network.name + "_" + vertex.label).equals("")»
-					<processor name="core_2"/> 
+				«IF mapping.get(network.name + "_" + vertex.label) != null»
+					«IF mapping.get(network.name + "_" + vertex.label).equals("")»
+						<processor name="core_2"/> 
+					«ELSE»
+						<processor name="«mapping.get(network.name + "_" + vertex.label)»"/>
+					«ENDIF»
 				«ELSE»
-					<processor name="«mapping.get(network.name + "_" + vertex.label)»"/>
+					<processor name="core_2"/> 
 				«ENDIF»
 			</binding> 
 		«ENDFOR»
