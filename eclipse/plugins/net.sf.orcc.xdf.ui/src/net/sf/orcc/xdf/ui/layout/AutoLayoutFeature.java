@@ -36,15 +36,19 @@ import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
+import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.ui.IWorkbenchPart;
 
 import de.cau.cs.kieler.core.alg.BasicProgressMonitor;
+import de.cau.cs.kieler.core.kgraph.KEdge;
 import de.cau.cs.kieler.core.kgraph.KGraphElement;
 import de.cau.cs.kieler.core.kgraph.KNode;
+import de.cau.cs.kieler.core.kgraph.KPort;
 import de.cau.cs.kieler.kiml.graphiti.GraphitiDiagramLayoutManager;
 import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
 import de.cau.cs.kieler.kiml.options.EdgeRouting;
@@ -100,7 +104,6 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 		final IWorkbenchPart wbPart = (IWorkbenchPart) getDiagramEditor();
 
 		final GraphitiDiagramLayoutManager manager = new GraphitiDiagramLayoutManager();
-
 		final LayoutMapping<PictogramElement> mapping = manager.buildLayoutGraph(wbPart, null);
 
 		preFixDiagramMapping(mapping.getLayoutGraph(), mapping.getGraphMap().inverse());
@@ -108,7 +111,7 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 		final LayeredLayoutProvider provider = new LayeredLayoutProvider();
 		provider.doLayout(mapping.getLayoutGraph(), new BasicProgressMonitor());
 
-		manager.applyLayout(mapping, false, 0);
+		applyLayout(mapping.getGraphMap().inverse());
 		hasDoneChanges = true;
 	}
 
@@ -153,5 +156,31 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 		if (ksl != null) {
 			ksl.setHeight(ksl.getHeight() + 20);
 		}
+	}
+
+	public void applyLayout(Map<PictogramElement, KGraphElement> map) {
+
+		for (Map.Entry<PictogramElement, KGraphElement> entry : map.entrySet()) {
+			final PictogramElement pe = entry.getKey();
+			final KGraphElement ge = entry.getValue();
+
+			if (ge instanceof KNode) {
+				applyLayoutOnNode(pe, (KNode) ge);
+			} else if (ge instanceof KEdge) {
+				// TODO
+			} else if (ge instanceof KPort) {
+				// We don't want to change ports position inside instances
+			}
+		}
+	}
+
+	private void applyLayoutOnNode(final PictogramElement pe, final KNode node) {
+		final KShapeLayout shapeLayout = node.getData(KShapeLayout.class);
+		final GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
+
+		final int x = Math.round(shapeLayout.getXpos());
+		final int y = Math.round(shapeLayout.getYpos());
+
+		Graphiti.getGaService().setLocation(ga, x, y);
 	}
 }
