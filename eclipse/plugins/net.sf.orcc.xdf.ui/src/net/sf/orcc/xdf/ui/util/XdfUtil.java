@@ -46,6 +46,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
@@ -162,15 +163,9 @@ public class XdfUtil {
 	 * @return
 	 */
 	public static int getTextMinWidth(Text text) {
-
 		final IUiLayoutService uiLayoutService = GraphitiUi.getUiLayoutService();
-		if (text.getFont() != null) {
-			return uiLayoutService.calculateTextSize(text.getValue(), text.getFont()).getWidth();
-		} else if (text.getStyle().getFont() != null) {
-			return uiLayoutService.calculateTextSize(text.getValue(), text.getStyle().getFont()).getWidth();
-		}
-
-		return -1;
+		final Font currentFont = Graphiti.getGaService().getFont(text, true);
+		return uiLayoutService.calculateTextSize(text.getValue(), currentFont).getWidth();
 	}
 
 	/**
@@ -181,15 +176,9 @@ public class XdfUtil {
 	 * @return
 	 */
 	public static int getTextMinHeight(Text text) {
-
 		final IUiLayoutService uiLayoutService = GraphitiUi.getUiLayoutService();
-		if (text.getFont() != null) {
-			return uiLayoutService.calculateTextSize(text.getValue(), text.getFont()).getHeight();
-		} else if (text.getStyle().getFont() != null) {
-			return uiLayoutService.calculateTextSize(text.getValue(), text.getStyle().getFont()).getHeight();
-		}
-
-		return -1;
+		final Font currentFont = Graphiti.getGaService().getFont(text, true);
+		return uiLayoutService.calculateTextSize(text.getValue(), currentFont).getHeight();
 	}
 
 	/**
