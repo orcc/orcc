@@ -91,7 +91,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			void «instance.name»_scheduler() {
 				int i = 0;
 				«printCallTokensFunctions»
-				«instance.getActor.actionsOutsideFsm.printActionLoop»
+				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
 				
 			finished:
 				«FOR port : instance.getActor.inputs»
@@ -120,7 +120,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
 			«ENDIF»
 			«IF !actor.initializes.nullOrEmpty»
-				«actor.initializes.printActions»
+				«actor.initializes.printActionsScheduling»
 			«ENDIF»
 			
 		finished:
@@ -133,7 +133,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF ! instance.getActor.actionsOutsideFsm.empty»
 			void «instance.name»_outside_FSM_scheduler() {
 				int i = 0;
-				«instance.getActor.actionsOutsideFsm.printActionLoop»
+				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
 			finished:
 				// no read_end/write_end here!
 				return;
@@ -171,7 +171,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	'''
 	
-	override protected printActions(Iterable<Action> actions) '''
+	override protected printActionsScheduling(Iterable<Action> actions) '''
 		// Action loop
 		«FOR action : actions SEPARATOR " else "»
 			if («inputPattern.checkInputPattern»isSchedulable_«action.name»()) {

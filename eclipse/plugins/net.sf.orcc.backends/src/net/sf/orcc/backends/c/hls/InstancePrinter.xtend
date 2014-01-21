@@ -155,7 +155,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					outFIFO_«instance.name».write(0);
 				}
 			«ENDIF»
-				«instance.getActor.actionsOutsideFsm.printActionLoop»
+				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
 				
 			finished:
 				return;
@@ -166,7 +166,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override printFsm() '''
 		«IF ! instance.getActor.actionsOutsideFsm.empty»
 			void «instance.name»_outside_FSM_scheduler() {
-				«instance.getActor.actionsOutsideFsm.printActionLoop»
+				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
 			finished:
 				return;
 			}
@@ -305,8 +305,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 	}
 	 
-	override printActionLoop(List<Action> actions) '''
-		«actions.printActions»
+	override printActionSchedulingLoop(List<Action> actions) '''
+		«actions.printActionsScheduling»
 	'''
 	
 	def fifoName(Connection connection) '''«IF connection != null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
@@ -335,7 +335,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			
 			static void initialize() {
 				
-				«instance.getActor.initializes.printActions»
+				«instance.getActor.initializes.printActionsScheduling»
 				
 			finished:
 				// no read_end/write_end here!
@@ -345,7 +345,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 	
-	override printActions(Iterable<Action> actions) '''
+	override printActionsScheduling(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
 			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 				if(1

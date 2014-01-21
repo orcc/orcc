@@ -425,7 +425,7 @@ class InstancePrinter extends CTemplate {
 					«printOpenFiles»
 				«ENDIF»
 
-				«actor.actionsOutsideFsm.printActionLoop»
+				«actor.actionsOutsideFsm.printActionSchedulingLoop»
 
 			finished:
 				«IF enableTrace»
@@ -453,7 +453,7 @@ class InstancePrinter extends CTemplate {
 		«IF ! actor.actionsOutsideFsm.empty»
 			«inline»void «entityName»_outside_FSM_scheduler(schedinfo_t *si) {
 				int i = 0;
-				«actor.actionsOutsideFsm.printActionLoop»
+				«actor.actionsOutsideFsm.printActionSchedulingLoop»
 			finished:
 				// no read_end/write_end here!
 				return;
@@ -614,7 +614,7 @@ class InstancePrinter extends CTemplate {
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
 			«ENDIF»
 			«IF !actor.initializes.nullOrEmpty»
-				«actor.initializes.printActions»
+				«actor.initializes.printActionsScheduling»
 			«ENDIF»
 
 		finished:
@@ -632,13 +632,13 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 
-	def protected printActionLoop(List<Action> actions) '''
+	def protected printActionSchedulingLoop(List<Action> actions) '''
 		while (1) {
-			«actions.printActions»
+			«actions.printActionsScheduling»
 		}
 	'''
 
-	def protected printAction(Action action) {
+	def protected printActionScheduling(Action action) {
 		val output = '''
 			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 				«IF !action.outputPattern.empty»
@@ -666,9 +666,9 @@ class InstancePrinter extends CTemplate {
 		return output
 	}
 
-	def protected printActions(Iterable<Action> actions) '''
+	def protected printActionsScheduling(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
-			«action.printAction»
+			«action.printActionScheduling»
 			}«ENDFOR» else {
 			«inputPattern.printTransitionPattern»
 			goto finished;
