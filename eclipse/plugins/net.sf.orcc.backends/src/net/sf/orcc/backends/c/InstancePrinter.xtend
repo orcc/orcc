@@ -757,15 +757,9 @@ class InstancePrinter extends CTemplate {
 				double diff_tick;
 			«ENDIF»
 
-			«FOR port : action.inputPattern.ports»
+			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
 				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE)»
 					 i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
-				«ENDIF»
-			«ENDFOR»
-
-			«FOR port : action.outputPattern.ports»
-				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE)»
-					i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 				«ENDIF»
 			«ENDFOR»
 
@@ -835,15 +829,9 @@ class InstancePrinter extends CTemplate {
 					double diff_tick;
 				«ENDIF»
 
-				«FOR port : action.inputPattern.ports»
+				«FOR port : action.inputPattern.ports + action.outputPattern.ports»
 					«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
-					 i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
-					«ENDIF»
-				«ENDFOR»
-
-				«FOR port : action.outputPattern.ports»
-					«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
-					i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
+					 	i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 					«ENDIF»
 				«ENDFOR»
 
