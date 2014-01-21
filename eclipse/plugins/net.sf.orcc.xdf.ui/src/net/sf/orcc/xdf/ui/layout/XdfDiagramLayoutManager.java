@@ -34,7 +34,10 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
+import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 
 import org.eclipse.emf.ecore.EObject;
@@ -75,6 +78,8 @@ public class XdfDiagramLayoutManager {
 	private final KNode diagramKNode;
 
 	private final Map<PictogramElement, KGraphElement> peKGraphMap;
+
+	private int xScale = 0;
 
 	/**
 	 * Build the KGraph/KNode structure from the given diagram.
@@ -201,26 +206,68 @@ public class XdfDiagramLayoutManager {
 
 	public void applyLayout() {
 
+		xScale = 0;
+
 		for (Map.Entry<PictogramElement, KGraphElement> entry : peKGraphMap.entrySet()) {
 			final PictogramElement pe = entry.getKey();
 			final KGraphElement ge = entry.getValue();
 
 			if (ge instanceof KNode) {
-				applyLayoutToNode(pe, (KNode) ge);
+				if (ShapePropertiesManager.isExpectedPc(pe, InstancePattern.INSTANCE_ID)) {
+					applyLayoutToInstanceNode(pe, (KNode) ge);
+				} else if (ShapePropertiesManager.isExpectedPc(pe, OutputNetworkPortPattern.INOUT_ID)
+						|| ShapePropertiesManager.isExpectedPc(pe, InputNetworkPortPattern.INOUT_ID)) {
+					applyLayoutToPortNode(pe, (KNode) ge);
+				}
 			} else if (ge instanceof KEdge) {
 				applyLayoutToConnection(pe, (KEdge) ge);
 			} else if (ge instanceof KPort) {
 				// We don't want to change ports position inside instances
 			}
 		}
+
+		// At least 1 port has a negative coordinate. We need to increase X
+		// coordinate of all objects
+		if (xScale != 0) {
+			for (Map.Entry<PictogramElement, KGraphElement> entry : peKGraphMap.entrySet()) {
+				if (entry.getValue() instanceof KNode) {
+					final GraphicsAlgorithm ga = entry.getKey().getGraphicsAlgorithm();
+					ga.setX(ga.getX() + xScale);
+				} else if (entry.getValue() instanceof KEdge && entry.getKey() instanceof FreeFormConnection) {
+					final FreeFormConnection connection = (FreeFormConnection) entry.getKey();
+					for (final Point point : connection.getBendpoints()) {
+						point.setX(point.getX() + xScale);
+					}
+				}
+			}
+		}
 	}
 
-	private void applyLayoutToNode(final PictogramElement pe, final KNode node) {
+	private void applyLayoutToInstanceNode(final PictogramElement pe, final KNode node) {
 		final KShapeLayout shapeLayout = node.getData(KShapeLayout.class);
 		final GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
 
 		final int x = Math.round(shapeLayout.getXpos());
 		final int y = Math.round(shapeLayout.getYpos());
+
+		Graphiti.getGaService().setLocation(ga, x, y);
+	}
+
+	private void applyLayoutToPortNode(final PictogramElement pe, final KNode node) {
+		final KShapeLayout shapeLayout = node.getData(KShapeLayout.class);
+		final GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
+
+		int x = Math.round(shapeLayout.getXpos());
+		int y = Math.round(shapeLayout.getYpos());
+
+		// If port text is larger than port shape, the external invisible
+		// rectangle X coordinate needs to be fixed
+		x -= (ga.getWidth() - NetworkPortPattern.SHAPE_WIDTH) / 2;
+
+		// The new coordinate is negative, we need to move all obects
+		if (x < 0) {
+			xScale = Math.max(xScale, -x);
+		}
 
 		Graphiti.getGaService().setLocation(ga, x, y);
 	}
