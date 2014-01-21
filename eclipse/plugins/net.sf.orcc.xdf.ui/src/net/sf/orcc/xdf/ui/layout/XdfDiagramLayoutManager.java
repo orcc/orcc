@@ -48,7 +48,6 @@ import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
-import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.services.Graphiti;
 
 import de.cau.cs.kieler.core.kgraph.KEdge;
@@ -60,13 +59,29 @@ import de.cau.cs.kieler.kiml.klayoutdata.KPoint;
 import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
 import de.cau.cs.kieler.kiml.util.KimlUtil;
 
+/**
+ * This class has 2 main functions.
+ * <ol>
+ * <li>Build a KGraph suitable for Kieler layout algorithm from an existing
+ * Diagram</li>
+ * <li>Transfer the computed layout to the diagram objects</li>
+ * </ol>
+ * 
+ * @author Antoine Lorence
+ * 
+ */
 public class XdfDiagramLayoutManager {
 
 	private final KNode diagramKNode;
 
 	private final Map<PictogramElement, KGraphElement> peKGraphMap;
 
-	XdfDiagramLayoutManager(final Diagram diagram, final IFeatureProviderWithPatterns fp) {
+	/**
+	 * Build the KGraph/KNode structure from the given diagram.
+	 * 
+	 * @param diagram
+	 */
+	XdfDiagramLayoutManager(final Diagram diagram) {
 		peKGraphMap = new HashMap<PictogramElement, KGraphElement>();
 
 		diagramKNode = KimlUtil.createInitializedNode();
@@ -93,10 +108,21 @@ public class XdfDiagramLayoutManager {
 		}
 	}
 
+	/**
+	 * Get the KNode object corresponding to the current Diagram
+	 * 
+	 * @return
+	 */
 	public KNode getTopLevelNode() {
 		return diagramKNode;
 	}
 
+	/**
+	 * Get the map which stores all correspondences between PictogramElements
+	 * and KGraphElement.
+	 * 
+	 * @return
+	 */
 	public Map<PictogramElement, KGraphElement> getPeKGraphMap() {
 		return peKGraphMap;
 	}
@@ -180,16 +206,16 @@ public class XdfDiagramLayoutManager {
 			final KGraphElement ge = entry.getValue();
 
 			if (ge instanceof KNode) {
-				applyLayoutOnNode(pe, (KNode) ge);
+				applyLayoutToNode(pe, (KNode) ge);
 			} else if (ge instanceof KEdge) {
-				applyLayoutOnConnection(pe, (KEdge) ge);
+				applyLayoutToConnection(pe, (KEdge) ge);
 			} else if (ge instanceof KPort) {
 				// We don't want to change ports position inside instances
 			}
 		}
 	}
 
-	private void applyLayoutOnNode(final PictogramElement pe, final KNode node) {
+	private void applyLayoutToNode(final PictogramElement pe, final KNode node) {
 		final KShapeLayout shapeLayout = node.getData(KShapeLayout.class);
 		final GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
 
@@ -199,7 +225,7 @@ public class XdfDiagramLayoutManager {
 		Graphiti.getGaService().setLocation(ga, x, y);
 	}
 
-	private void applyLayoutOnConnection(final PictogramElement pe, final KEdge edge) {
+	private void applyLayoutToConnection(final PictogramElement pe, final KEdge edge) {
 		final KEdgeLayout edgeLayout = edge.getData(KEdgeLayout.class);
 		final GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
 

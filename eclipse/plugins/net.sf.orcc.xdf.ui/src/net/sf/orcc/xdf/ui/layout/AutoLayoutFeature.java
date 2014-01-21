@@ -94,8 +94,7 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 	@Override
 	public void execute(ICustomContext ctxt) {
 
-		final XdfDiagramLayoutManager manager = new XdfDiagramLayoutManager(getDiagram(),
-				(IFeatureProviderWithPatterns) getFeatureProvider());
+		final XdfDiagramLayoutManager manager = new XdfDiagramLayoutManager(getDiagram());
 
 		preFixDiagramMapping(manager.getTopLevelNode(), manager.getPeKGraphMap());
 
