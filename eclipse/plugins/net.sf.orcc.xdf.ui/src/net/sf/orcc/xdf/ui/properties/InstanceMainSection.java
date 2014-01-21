@@ -76,7 +76,10 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 	protected void readValuesFromModels() {
 		final Instance instance = (Instance) businessObject;
 		instanceName.setText(instance.getName());
-		refinementValue.setText(instance.getEntity().eResource().getURI().toString());
+
+		if (instance.getEntity() != null) {
+			refinementValue.setText(instance.getEntity().eResource().getURI().toString());
+		}
 
 		// TODO: get the "part name" value in the instance, and display it
 	}
