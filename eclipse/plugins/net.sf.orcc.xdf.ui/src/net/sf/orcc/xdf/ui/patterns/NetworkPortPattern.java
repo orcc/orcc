@@ -155,7 +155,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	@Override
 	public void setValue(String value, IDirectEditingContext context) {
 		PictogramElement pe = context.getPictogramElement();
-		Port port = (Port) getBusinessObjectForPictogramElement(pe);
+		final Port port = (Port) getBusinessObjectForPictogramElement(pe);
 		port.setName(value);
 
 		// layout(pe) and update(pe) can only be called with the root element.
@@ -164,8 +164,6 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		if (!isPatternRoot(pe)) {
 			pe = (PictogramElement) pe.eContainer();
 		}
-
-		updatePictogramElement(pe);
 	}
 
 	@Override
@@ -380,6 +378,8 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		final Text txt = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
 		final Port port = (Port) getBusinessObjectForPictogramElement(pe);
 		txt.setValue(port.getName());
+
+		layoutPictogramElement(pe);
 
 		return true;
 	}
