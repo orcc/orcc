@@ -30,7 +30,9 @@ package net.sf.orcc.xdf.ui.layout;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 
+import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
 import de.cau.cs.kieler.kiml.options.EdgeRouting;
+import de.cau.cs.kieler.kiml.options.LayoutOptions;
 
 public class OrthogonalAutoLayoutFeature extends AutoLayoutFeature {
 
@@ -39,13 +41,14 @@ public class OrthogonalAutoLayoutFeature extends AutoLayoutFeature {
 	}
 
 	@Override
-	protected EdgeRouting getEdgeRouter() {
-		return EdgeRouting.ORTHOGONAL;
+	protected String getLayoutAlgorithmName() {
+		return "Orthogonal routing";
 	}
 
 	@Override
-	protected String getEdgeRouterName() {
-		return "Orthogonal";
-	}
+	protected void configureDiagramNode(KShapeLayout diagramLayout) {
+		super.configureDiagramNode(diagramLayout);
 
+		diagramLayout.setProperty(LayoutOptions.EDGE_ROUTING, EdgeRouting.ORTHOGONAL);
+	}
 }
