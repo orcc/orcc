@@ -46,21 +46,18 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.ui.IWorkbenchPart;
 
 import de.cau.cs.kieler.core.alg.BasicProgressMonitor;
 import de.cau.cs.kieler.core.kgraph.KEdge;
 import de.cau.cs.kieler.core.kgraph.KGraphElement;
 import de.cau.cs.kieler.core.kgraph.KNode;
 import de.cau.cs.kieler.core.kgraph.KPort;
-import de.cau.cs.kieler.kiml.graphiti.GraphitiDiagramLayoutManager;
 import de.cau.cs.kieler.kiml.klayoutdata.KEdgeLayout;
 import de.cau.cs.kieler.kiml.klayoutdata.KPoint;
 import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
 import de.cau.cs.kieler.kiml.options.EdgeRouting;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortConstraints;
-import de.cau.cs.kieler.kiml.service.LayoutMapping;
 import de.cau.cs.kieler.klay.layered.LayeredLayoutProvider;
 
 /**
@@ -106,18 +103,16 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 
 	@Override
 	public void execute(ICustomContext ctxt) {
-		@SuppressWarnings("deprecation")
-		final IWorkbenchPart wbPart = (IWorkbenchPart) getDiagramEditor();
 
-		final GraphitiDiagramLayoutManager manager = new GraphitiDiagramLayoutManager();
-		final LayoutMapping<PictogramElement> mapping = manager.buildLayoutGraph(wbPart, null);
+		final XdfDiagramLayoutManager manager = new XdfDiagramLayoutManager(getDiagram(),
+				(IFeatureProviderWithPatterns) getFeatureProvider());
 
-		preFixDiagramMapping(mapping.getLayoutGraph(), mapping.getGraphMap().inverse());
+		preFixDiagramMapping(manager.getTopLevelNode(), manager.getPeKGraphMap());
 
 		final LayeredLayoutProvider provider = new LayeredLayoutProvider();
-		provider.doLayout(mapping.getLayoutGraph(), new BasicProgressMonitor());
+		provider.doLayout(manager.getTopLevelNode(), new BasicProgressMonitor());
 
-		applyLayout(mapping.getGraphMap().inverse());
+		applyLayout(manager.getPeKGraphMap());
 		hasDoneChanges = true;
 	}
 
