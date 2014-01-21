@@ -73,15 +73,15 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 public class ConnectionPattern extends AbstractConnectionPattern {
 
-	private enum PortKind {
+	private static enum PortKind {
 		INPUT, OUTPUT
 	}
 
-	private enum PortContainer {
+	private static enum PortContainer {
 		NETWORK, INSTANCE
 	}
 
-	private enum ConnectionSide {
+	private static enum ConnectionSide {
 		SOURCE, TARGET
 	}
 

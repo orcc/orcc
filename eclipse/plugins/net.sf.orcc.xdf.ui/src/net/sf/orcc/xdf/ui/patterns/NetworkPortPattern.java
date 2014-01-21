@@ -81,14 +81,14 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 abstract public class NetworkPortPattern extends AbstractPattern implements IPattern {
 
-	protected final int SHAPE_HEIGHT = 34;
-	protected final int SHAPE_WIDTH = (int) (SHAPE_HEIGHT * 0.866);
-	private final int TEXT_PORT_SPACE = 4;
-	private final int TEXT_DEFAULT_WIDTH = 50;
-	private final int TEXT_DEFAULT_HEIGHT = 12;
+	public final static int SHAPE_HEIGHT = 34;
+	public final static int SHAPE_WIDTH = (int) (SHAPE_HEIGHT * 0.866);
+	private final static int TEXT_PORT_SPACE = 4;
+	private final static int TEXT_DEFAULT_WIDTH = 50;
+	private final static int TEXT_DEFAULT_HEIGHT = 12;
 
-	private final String SHAPE_ID = "PORT_SHAPE";
-	private final String LABEL_ID = "PORT_LABEL";
+	public static final String SHAPE_ID = "PORT_SHAPE";
+	private static final String LABEL_ID = "PORT_LABEL";
 
 	public NetworkPortPattern() {
 		super(null);
