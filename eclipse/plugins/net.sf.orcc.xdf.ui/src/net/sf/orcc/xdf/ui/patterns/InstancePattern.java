@@ -821,8 +821,10 @@ public class InstancePattern extends AbstractPattern {
 	 */
 	public Text getTextFromAnchor(final Anchor anchor) {
 		final String portName = Graphiti.getPeService().getPropertyValue(anchor, PORT_NAME_KEY);
+
 		for (final GraphicsAlgorithm gaChild : anchor.getParent().getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
-			if (gaChild instanceof Text && ((Text) gaChild).getValue().equals(portName)) {
+			if (gaChild instanceof Text && ShapePropertiesManager.isExpectedPc(gaChild, PORT_TEXT_ID)
+					&& ((Text) gaChild).getValue().equals(portName)) {
 				return (Text) gaChild;
 			}
 		}
