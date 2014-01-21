@@ -129,6 +129,18 @@ void wait_for_key() {
 #endif
 }
 
+void press_a_key(int code) {
+    char buf[2];
+    char *ptrBuff = NULL;
+
+    printf("Press a key to continue\n");
+    ptrBuff = fgets(buf, 2, stdin);
+    if (ptrBuff == NULL) {
+        fprintf(stderr, "error when using fgets\n");
+    }
+    exit(code);
+}
+
 // print APR error and exit
 void print_and_exit(const char *msg) {
 	wait_for_key();

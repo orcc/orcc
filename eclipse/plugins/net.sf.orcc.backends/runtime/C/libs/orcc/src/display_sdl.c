@@ -42,18 +42,6 @@ static int init = 0;
 static int x, y , onclick = 0;
 static SDL_Rect rect;
 
-static void press_a_key(int code) {
-	char buf[2];
-	char *ptrBuff = NULL;
-
-	printf("Press a key to continue\n");
-	ptrBuff = fgets(buf, 2, stdin);
-	if (ptrBuff == NULL) {
-		fprintf(stderr, "error when using fgets\n");
-	}
-	exit(code);
-}
-
 char displayYUV_getFlags(){
 	return display_flags;
 }
@@ -76,15 +64,15 @@ static void displayYUV_setSize(int width, int height) {
 	if (m_overlay == NULL) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 		press_a_key(-1);
-	}
+    }
 }
 
 void displayYUV_displayPicture(unsigned char *pictureBufferY,
                                unsigned char *pictureBufferU, unsigned char *pictureBufferV,
                                unsigned int   pictureWidth,   unsigned int   pictureHeight) {
 	static unsigned int lastWidth = 0;
-	static unsigned int lastHeight = 0;
-	SDL_Event event;
+    static unsigned int lastHeight = 0;
+    SDL_Event event;
 	//SDL_Rect rect = { 0, 0, pictureWidth, pictureHeight };
 	rect.x = 0;
 	rect.y = 0;
@@ -107,7 +95,7 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY,
 	memcpy(m_overlay->pixels[2], pictureBufferU, pictureWidth * pictureHeight / 4);
 
 	SDL_UnlockYUVOverlay(m_overlay);
-	SDL_DisplayYUVOverlay(m_overlay, &rect);
+    SDL_DisplayYUVOverlay(m_overlay, &rect);
 
 	/* Grab all the events off the queue. */
 	while (SDL_PollEvent(&event)) {
@@ -158,14 +146,14 @@ static void displayYUV444_setSize(int winWidth, int winHeight, int pictureWidth,
 	if (m_image == NULL) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 		press_a_key(-1);
-	}
+    }
 }
 
 /*******************************************************************************
  * displayYUV444_init
  ******************************************************************************/
 void displayYUV444_init(int winWidth, int winHeight, int pictureWidth, int pictureHeight) {
-	if (!init) {
+    if (!init) {
 		m_overlay = NULL;
 		init = 1;
 		// First, initialize SDL's video subsystem.
@@ -178,7 +166,7 @@ void displayYUV444_init(int winWidth, int winHeight, int pictureWidth, int pictu
 		displayYUV444_setSize(winWidth, winHeight, pictureWidth, pictureHeight);
 		x = 0;
 		y = 0;
-		onclick = 0;
+        onclick = 0;
 	}
 }
 
@@ -199,7 +187,7 @@ void  convertYUV444_to_RGB(unsigned char *pictureBufferY,
 						   unsigned int   pictureWidth, unsigned int pictureHeight) {
 	unsigned int h, w;
 	int red, green, blue;
-	int pixel, idx_pixel;
+    int pixel, idx_pixel;
 	SDL_PixelFormat *format = m_image->format;
 
 	for (h = 0; h < pictureHeight; h++) {
@@ -213,7 +201,7 @@ void  convertYUV444_to_RGB(unsigned char *pictureBufferY,
 					((clip255(blue)  << format->Bshift) & format->Bmask) ;
 			* (int *) &((char *)m_image->pixels)[idx_pixel * format->BytesPerPixel] = pixel;
 		}
-	}
+    }
 }
 
 /*******************************************************************************
@@ -222,7 +210,7 @@ void  convertYUV444_to_RGB(unsigned char *pictureBufferY,
 void displayYUV444_displayPicture(unsigned char *pictureBufferY,
 								  unsigned char *pictureBufferU, unsigned char *pictureBufferV,
 								  unsigned int   pictureWidth, unsigned int pictureHeight) {
-	rect.x = x;
+    rect.x = x;
 	rect.y = y;
 	rect.w = pictureWidth;
 	rect.h = pictureHeight;
@@ -230,7 +218,7 @@ void displayYUV444_displayPicture(unsigned char *pictureBufferY,
 	convertYUV444_to_RGB(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidth, pictureHeight);
 
 	SDL_BlitSurface(m_image, NULL, m_screen, &rect);
-	SDL_UpdateRects(m_screen, 1, &rect);
+    SDL_UpdateRects(m_screen, 1, &rect);
 }
 
 /*******************************************************************************

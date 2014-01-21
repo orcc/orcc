@@ -82,6 +82,8 @@ void init_orcc(int argc, char *argv[]);
 // pause function
 void wait_for_key();
 
+void press_a_key(int code);
+
 // print usage
 void print_usage();
 
