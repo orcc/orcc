@@ -45,7 +45,7 @@ import org.eclipse.graphiti.services.IGaService;
  */
 public class InputNetworkPortPattern extends NetworkPortPattern {
 
-	public static String INOUT_ID = "IN_PORT";
+	public static final String INOUT_ID = "IN_PORT";
 
 	@Override
 	public String getCreateName() {
