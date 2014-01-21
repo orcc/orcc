@@ -27,9 +27,11 @@
  * SUCH DAMAGE.
  */
 
-#include "SDL.h"
+#include <SDL.h>
+
 #include "util.h"
 #include "options.h"
+#include "trace.h"
 
 static SDL_Surface *m_screen;
 static SDL_Surface *m_image;

@@ -33,6 +33,8 @@
 #include <stdlib.h>
 
 #include "options.h"
+#include "trace.h"
+
 
 /**
  * Creates and init options structure.

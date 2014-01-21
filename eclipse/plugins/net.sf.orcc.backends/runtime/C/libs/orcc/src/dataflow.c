@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <string.h>
 
 #include "dataflow.h"
 #include "trace.h"
