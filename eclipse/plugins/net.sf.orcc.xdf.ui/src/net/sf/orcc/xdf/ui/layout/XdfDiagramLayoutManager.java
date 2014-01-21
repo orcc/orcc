@@ -31,6 +31,7 @@ package net.sf.orcc.xdf.ui.layout;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
@@ -38,11 +39,13 @@ import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.styles.Point;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
+import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
@@ -52,6 +55,8 @@ import de.cau.cs.kieler.core.kgraph.KEdge;
 import de.cau.cs.kieler.core.kgraph.KGraphElement;
 import de.cau.cs.kieler.core.kgraph.KNode;
 import de.cau.cs.kieler.core.kgraph.KPort;
+import de.cau.cs.kieler.kiml.klayoutdata.KEdgeLayout;
+import de.cau.cs.kieler.kiml.klayoutdata.KPoint;
 import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
 import de.cau.cs.kieler.kiml.util.KimlUtil;
 
@@ -166,5 +171,54 @@ public class XdfDiagramLayoutManager {
 		edge.setTargetPort(targetPort);
 
 		peKGraphMap.put(connection, edge);
+	}
+
+	public void applyLayout() {
+
+		for (Map.Entry<PictogramElement, KGraphElement> entry : peKGraphMap.entrySet()) {
+			final PictogramElement pe = entry.getKey();
+			final KGraphElement ge = entry.getValue();
+
+			if (ge instanceof KNode) {
+				applyLayoutOnNode(pe, (KNode) ge);
+			} else if (ge instanceof KEdge) {
+				applyLayoutOnConnection(pe, (KEdge) ge);
+			} else if (ge instanceof KPort) {
+				// We don't want to change ports position inside instances
+			}
+		}
+	}
+
+	private void applyLayoutOnNode(final PictogramElement pe, final KNode node) {
+		final KShapeLayout shapeLayout = node.getData(KShapeLayout.class);
+		final GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
+
+		final int x = Math.round(shapeLayout.getXpos());
+		final int y = Math.round(shapeLayout.getYpos());
+
+		Graphiti.getGaService().setLocation(ga, x, y);
+	}
+
+	private void applyLayoutOnConnection(final PictogramElement pe, final KEdge edge) {
+		final KEdgeLayout edgeLayout = edge.getData(KEdgeLayout.class);
+		final GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
+
+		// Check unsupported types
+		if (!(pe instanceof FreeFormConnection)) {
+			throw new OrccRuntimeException(pe.getClass() + " connection type is not supported.");
+		} else if (!(ga instanceof Polyline)) {
+			throw new OrccRuntimeException(ga.getClass() + " connection graphics type is not supported.");
+		}
+
+		final FreeFormConnection connection = (FreeFormConnection) pe;
+
+		// Reset existing bendpoints for this connection
+		connection.getBendpoints().clear();
+
+		for (final KPoint kpoint : edgeLayout.getBendPoints()) {
+			final Point point = Graphiti.getGaService().createPoint(Math.round(kpoint.getX()),
+					Math.round(kpoint.getY()));
+			connection.getBendpoints().add(point);
+		}
 	}
 }
