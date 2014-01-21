@@ -40,6 +40,7 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
+import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern.PortInformation;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
@@ -58,9 +59,11 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
@@ -234,6 +237,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	}
 
 	/**
+	 * Read the given network, create corresponding graphical representation of
+	 * Instance/Port/etc. and append them to the given diagram.
 	 * 
 	 * @param network
 	 * @param diagram
@@ -308,6 +313,12 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			} else {
 				OrccLogger.warnln("Unable to retrieve the anchor corresponding to connection " + con);
 			}
+		}
+
+		final IContext context = new CustomContext();
+		final OrthogonalAutoLayoutFeature layoutFeature = new OrthogonalAutoLayoutFeature(getFeatureProvider());
+		if (layoutFeature.canExecute(context)) {
+			layoutFeature.execute(context);
 		}
 
 		return true;
