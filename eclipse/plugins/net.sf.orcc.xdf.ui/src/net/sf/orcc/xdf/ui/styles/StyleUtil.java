@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.xdf.ui.styles;
 
-import org.eclipse.graphiti.mm.algorithms.styles.Color;
 import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.algorithms.styles.Style;
@@ -46,12 +45,20 @@ import org.eclipse.graphiti.util.PredefinedColoredAreas;
  * See chapters "Using Styles" and "Color Schemas" in tutorial for details.
  */
 public class StyleUtil {
+	// private static final IColorConstant GREEN = new ColorConstant(77, 201,
+	// 124);
+	// private static final IColorConstant YELLOW = new ColorConstant(224, 218,
+	// 74);
+	private static final IColorConstant BLACK = new ColorConstant(0, 0, 0);
+	// private static final IColorConstant WHITE = new ColorConstant(255, 255,
+	// 255);
+	private static final IColorConstant DARK_GREY = new ColorConstant(100, 100, 100);
+	// private static final IColorConstant LIGHT_GREY = new ColorConstant(200,
+	// 200, 200);
 
-	private static final IColorConstant INSTANCE_TEXT_FOREGROUND = new ColorConstant(0, 0, 0);
-	private static final IColorConstant INSTANCE_FOREGROUND = new ColorConstant(98, 131, 167);
-	private static final IColorConstant INSTANCEPORT_BACKGROUND = INSTANCE_FOREGROUND;
-	private static final IColorConstant CONNECTION_COLOR = new ColorConstant(0, 0, 0);
-	private static final IColorConstant INSTANCE_BACKGROUND = new ColorConstant(255, 255, 255);
+	private static final IColorConstant INSTANCE_FOREGROUND = BLACK;
+	private static final IColorConstant INSTANCEPORT_BACKGROUND = DARK_GREY;
+	private static final IColorConstant CONNECTION_COLOR = BLACK;
 
 	/**
 	 * Return the style used for all elements with no specific style.
@@ -70,7 +77,7 @@ public class StyleUtil {
 			style = gaService.createPlainStyle(diagram, styleId);
 			style.setLineStyle(LineStyle.SOLID);
 			style.setLineVisible(true);
-			style.setLineWidth(2);
+			style.setLineWidth(1);
 			style.setTransparency(0.0);
 		}
 		return style;
@@ -93,9 +100,6 @@ public class StyleUtil {
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			style.setFilled(true);
-			style.setForeground(gaService.manageColor(diagram, INSTANCE_FOREGROUND));
-			style.setBackground(gaService.manageColor(diagram, INSTANCE_BACKGROUND));
-
 			gaService.setRenderingStyle(style, PredefinedColoredAreas.getSilverWhiteGlossAdaptions());
 		}
 		return style;
@@ -111,7 +115,7 @@ public class StyleUtil {
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			gaService.setRenderingStyle(style, PredefinedColoredAreas.getBlueWhiteAdaptions());
+			gaService.setRenderingStyle(style, XdfGradients.networkGradient());
 		}
 		return style;
 	}
@@ -126,7 +130,7 @@ public class StyleUtil {
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			gaService.setRenderingStyle(style, PredefinedColoredAreas.getCopperWhiteGlossAdaptions());
+			gaService.setRenderingStyle(style, XdfGradients.actorGradient());
 		}
 		return style;
 	}
@@ -170,9 +174,9 @@ public class StyleUtil {
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			style.setFilled(true);
-			style.setLineVisible(false);
-			style.setBackground(gaService.manageColor(diagram, INSTANCEPORT_BACKGROUND));
+			style.setLineVisible(true);
+			style.setLineWidth(1);
+			gaService.setRenderingStyle(style, XdfGradients.inputPortGradient());
 		}
 		return style;
 	}
@@ -193,9 +197,9 @@ public class StyleUtil {
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			style.setFilled(true);
-			style.setLineVisible(false);
-			style.setBackground(gaService.manageColor(diagram, INSTANCEPORT_BACKGROUND));
+			style.setLineVisible(true);
+			style.setLineWidth(1);
+			gaService.setRenderingStyle(style, XdfGradients.outputPortGradient());
 		}
 		return style;
 	}
@@ -216,12 +220,9 @@ public class StyleUtil {
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			style.setFilled(true);
 			style.setLineVisible(true);
 			style.setLineWidth(2);
-			final Color commonColor = gaService.manageColor(diagram, CONNECTION_COLOR);
-			style.setForeground(commonColor);
-			style.setBackground(commonColor);
+			style.setForeground(gaService.manageColor(diagram, CONNECTION_COLOR));
 		}
 		return style;
 	}
@@ -239,7 +240,7 @@ public class StyleUtil {
 			style.setAngle(0);
 			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
-			style.setForeground(gaService.manageColor(diagram, INSTANCE_TEXT_FOREGROUND));
+			style.setForeground(gaService.manageColor(diagram, INSTANCE_FOREGROUND));
 			style.setFont(gaService.manageDefaultFont(diagram, false, false));
 		}
 		return style;
@@ -279,7 +280,7 @@ public class StyleUtil {
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			style.setFilled(false);
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
-			style.setForeground(gaService.manageColor(diagram, INSTANCE_TEXT_FOREGROUND));
+			style.setForeground(gaService.manageColor(diagram, INSTANCE_FOREGROUND));
 		}
 		return style;
 	}
