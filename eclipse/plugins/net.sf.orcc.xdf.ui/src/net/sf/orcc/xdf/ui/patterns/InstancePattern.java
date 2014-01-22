@@ -548,7 +548,7 @@ public class InstancePattern extends AbstractPattern {
 
 			// Create text as instance rectangle child
 			final Text txt = gaService.createPlainText(instanceGa, port.getName());
-			txt.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
+			txt.setStyle(StyleUtil.getStyleForInstancePortText(getDiagram()));
 			txt.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 			ShapePropertiesManager.setIdentifier(txt, PORT_TEXT_ID);
 

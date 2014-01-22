@@ -228,6 +228,23 @@ public class StyleUtil {
 		return style;
 	}
 
+	public static Style getStyleForInstancePortText(Diagram diagram) {
+		final String styleId = "INSTANCE-PORT-TEXT";
+		final IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		final Style parentStyle = getCommonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			style.setFilled(false);
+			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+			style.setForeground(gaService.manageColor(diagram, INSTANCE_TEXT_FOREGROUND));
+		}
+		return style;
+	}
+
 	public static Style getStyleForPortText(Diagram diagram) {
 		final String styleId = "PORT-TEXT";
 		IGaService gaService = Graphiti.getGaService();
