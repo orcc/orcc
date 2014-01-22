@@ -39,17 +39,6 @@
 #include "options.h"
 #include "trace.h"
 
-// define to 1 if your system has the termios.h header
-#define HAS_TERMIOS 0
-
-#ifdef _WIN32
-	#include <conio.h>
-#else
-	#if HAS_TERMIOS
-		#include <termios.h>
-	#endif
-#endif
-
 extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
