@@ -208,6 +208,7 @@ public class StyleUtil {
 			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 			style.setForeground(gaService.manageColor(diagram, INSTANCE_TEXT_FOREGROUND));
+			style.setFont(gaService.manageDefaultFont(diagram, false, false));
 		}
 		return style;
 	}
@@ -227,9 +228,10 @@ public class StyleUtil {
 
 		if (style == null) {
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			style.setFont(gaService.manageDefaultFont(diagram, false, true));
+			style.setFilled(false);
 			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+			style.setFont(gaService.manageFont(diagram, "Arial", 9, false, true));
 		}
 		return style;
 	}
@@ -259,7 +261,7 @@ public class StyleUtil {
 
 		if (style == null) {
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			style.setFont(gaService.manageDefaultFont(diagram, false, true));
+			style.setFilled(false);
 			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 		}
