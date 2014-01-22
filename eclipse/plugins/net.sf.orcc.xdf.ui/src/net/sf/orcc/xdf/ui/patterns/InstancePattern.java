@@ -285,7 +285,7 @@ public class InstancePattern extends AbstractPattern {
 
 		// Create the container graphic
 		final RoundedRectangle roundedRectangle = gaService.createPlainRoundedRectangle(topLevelShape, 5, 5);
-		roundedRectangle.setStyle(StyleUtil.getStyleForInstance(getDiagram()));
+		roundedRectangle.setStyle(StyleUtil.basicInstanceShape(getDiagram()));
 		gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), TOTAL_MIN_WIDTH,
 				TOTAL_MIN_HEIGHT);
 
@@ -293,9 +293,7 @@ public class InstancePattern extends AbstractPattern {
 		final Text text = gaService.createPlainText(roundedRectangle);
 		ShapePropertiesManager.setIdentifier(text, LABEL_ID);
 		// Set properties on instance label
-		text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-		text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
-		text.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
+		text.setStyle(StyleUtil.instanceText(getDiagram()));
 		gaService.setLocationAndSize(text, 0, 0, TOTAL_MIN_WIDTH, LABEL_HEIGHT);
 
 		if (addedDomainObject.getName() != null) {
@@ -479,9 +477,9 @@ public class InstancePattern extends AbstractPattern {
 				entity.eResource().getURI().toPlatformString(true));
 
 		// Clean all ports anchors and graphics in the instance
-		final List<GraphicsAlgorithm> gaChildre = new ArrayList<GraphicsAlgorithm>(instanceShape.getGraphicsAlgorithm()
+		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(instanceShape.getGraphicsAlgorithm()
 				.getGraphicsAlgorithmChildren());
-		for (final GraphicsAlgorithm gaChild : gaChildre) {
+		for (final GraphicsAlgorithm gaChild : gaChildren) {
 			if (gaChild instanceof Text
 					&& (ShapePropertiesManager.isInput(gaChild) || ShapePropertiesManager.isOutput(gaChild))) {
 				EcoreUtil.delete(gaChild, true);
@@ -497,9 +495,13 @@ public class InstancePattern extends AbstractPattern {
 		if (instance.isActor()) {
 			addPorts(instanceShape, instance.getActor().getInputs(), Direction.INPUTS);
 			addPorts(instanceShape, instance.getActor().getOutputs(), Direction.OUTPUTS);
+			// Update instance style
+			instanceShape.getGraphicsAlgorithm().setStyle(StyleUtil.actorInstanceShape(getDiagram()));
 		} else {
 			addPorts(instanceShape, instance.getNetwork().getInputs(), Direction.INPUTS);
 			addPorts(instanceShape, instance.getNetwork().getOutputs(), Direction.OUTPUTS);
+			// Update instance style
+			instanceShape.getGraphicsAlgorithm().setStyle(StyleUtil.networkInstanceShape(getDiagram()));
 		}
 
 		// Resize to minimal size.
@@ -543,13 +545,12 @@ public class InstancePattern extends AbstractPattern {
 			Graphiti.getPeService().setPropertyValue(fpAnchor, PORT_NAME_KEY, port.getName());
 
 			// Create the square inside anchor
-			final Rectangle square = gaService.createRectangle(fpAnchor);
-			square.setStyle(StyleUtil.getStyleForInstancePort(getDiagram()));
+			final Rectangle square = gaService.createPlainRectangle(fpAnchor);
+			square.setStyle(StyleUtil.instancePortShape(getDiagram()));
 
 			// Create text as instance rectangle child
-			final Text txt = gaService.createText(instanceGa, port.getName());
-			txt.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
-			txt.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+			final Text txt = gaService.createPlainText(instanceGa, port.getName());
+			txt.setStyle(StyleUtil.instancePortText(getDiagram()));
 			ShapePropertiesManager.setIdentifier(txt, PORT_TEXT_ID);
 
 			// Setup the linking with business object
@@ -577,8 +578,11 @@ public class InstancePattern extends AbstractPattern {
 		// referenced port text
 		final Text txt = getTextFromAnchor(anchor);
 
+		// Width of the instance border
+		int lineWidth = gaService.getLineWidth(instancePe.getGraphicsAlgorithm(), true);
 		// Calculate the current size of the instance rectangle
 		final int instanceW = instancePe.getGraphicsAlgorithm().getWidth();
+
 		final int yScaleFromTop = LABEL_HEIGHT + SEPARATOR + PORT_MARGIN;
 		final int squareAndMargin = PORT_SIDE_WITH + PORT_MARGIN;
 
@@ -606,7 +610,7 @@ public class InstancePattern extends AbstractPattern {
 			anchorX = 0;
 			squareX = 0;
 		} else if (ShapePropertiesManager.isOutput(anchor)) {
-			anchorX = instanceW;
+			anchorX = instanceW - lineWidth;
 			squareX = -PORT_SIDE_WITH;
 		} else {
 			OrccLogger.warnln("Anchor without \"direction\" property found.");

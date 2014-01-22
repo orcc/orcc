@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.xdf.ui.styles;
 
-import org.eclipse.graphiti.mm.algorithms.styles.Color;
 import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.algorithms.styles.Style;
@@ -46,26 +45,20 @@ import org.eclipse.graphiti.util.PredefinedColoredAreas;
  * See chapters "Using Styles" and "Color Schemas" in tutorial for details.
  */
 public class StyleUtil {
+	// private static final IColorConstant GREEN = new ColorConstant(77, 201,
+	// 124);
+	// private static final IColorConstant YELLOW = new ColorConstant(224, 218,
+	// 74);
+	private static final IColorConstant BLACK = new ColorConstant(0, 0, 0);
+	// private static final IColorConstant WHITE = new ColorConstant(255, 255,
+	// 255);
+	private static final IColorConstant DARK_GREY = new ColorConstant(100, 100, 100);
+	// private static final IColorConstant LIGHT_GREY = new ColorConstant(200,
+	// 200, 200);
 
-	private static final IColorConstant INSTANCE_TEXT_FOREGROUND = new ColorConstant(0, 0, 0);
-	private static final IColorConstant INSTANCE_FOREGROUND = new ColorConstant(98, 131, 167);
-	private static final IColorConstant INSTANCEPORT_BACKGROUND = INSTANCE_FOREGROUND;
-	private static final IColorConstant CONNECTION_COLOR = new ColorConstant(0, 0, 0);
-
-	private static void setCommonTextValues(Diagram diagram, IGaService gaService, Style style) {
-		style.setFilled(false);
-		style.setAngle(0);
-		style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-		style.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-		style.setForeground(gaService.manageColor(diagram, INSTANCE_TEXT_FOREGROUND));
-	}
-
-	private static void setCommonValues(Style style) {
-		style.setLineStyle(LineStyle.SOLID);
-		style.setLineVisible(true);
-		style.setLineWidth(2);
-		style.setTransparency(0.0);
-	}
+	private static final IColorConstant INSTANCE_FOREGROUND = BLACK;
+	private static final IColorConstant INSTANCEPORT_BACKGROUND = DARK_GREY;
+	private static final IColorConstant CONNECTION_COLOR = BLACK;
 
 	/**
 	 * Return the style used for all elements with no specific style.
@@ -73,16 +66,19 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getCommonStyle(Diagram diagram) {
-		final String styleId = "COMMONSTYLE";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style commonStyle(final Diagram diagram) {
+		final String styleId = "COMMON_GENERIC";
+		final IGaService gaService = Graphiti.getGaService();
 
 		// Is style already persisted?
 		Style style = gaService.findStyle(diagram, styleId);
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(diagram, styleId);
-			setCommonValues(style);
+			style.setLineStyle(LineStyle.SOLID);
+			style.setLineVisible(true);
+			style.setLineWidth(1);
+			style.setTransparency(0.0);
 		}
 		return style;
 	}
@@ -93,20 +89,48 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForInstance(Diagram diagram) {
+	public static Style basicInstanceShape(final Diagram diagram) {
 		final String styleId = "INSTANCE";
-		IGaService gaService = Graphiti.getGaService();
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = commonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			style.setFilled(true);
-			style.setForeground(gaService.manageColor(diagram, INSTANCE_FOREGROUND));
+			gaService.setRenderingStyle(style, PredefinedColoredAreas.getSilverWhiteGlossAdaptions());
+		}
+		return style;
+	}
 
-			gaService.setRenderingStyle(style, PredefinedColoredAreas.getCopperWhiteGlossAdaptions());
+	public static Style networkInstanceShape(final Diagram diagram) {
+		final String styleId = "NETWORK_INSTANCE";
+		final IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		final Style parentStyle = commonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			gaService.setRenderingStyle(style, XdfGradients.networkGradient());
+		}
+		return style;
+	}
+
+	public static Style actorInstanceShape(final Diagram diagram) {
+		final String styleId = "ACTOR_INSTANCE";
+		final IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		final Style parentStyle = commonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			gaService.setRenderingStyle(style, XdfGradients.actorGradient());
 		}
 		return style;
 	}
@@ -117,12 +141,12 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForInstancePort(Diagram diagram) {
-		final String styleId = "INSTANCE-PORT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style instancePortShape(final Diagram diagram) {
+		final String styleId = "INSTANCE_PORT";
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = commonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
@@ -140,19 +164,19 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForInputPort(Diagram diagram) {
-		final String styleId = "INPUT-PORT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style inputPortShape(final Diagram diagram) {
+		final String styleId = "INPUT_PORT";
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = commonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			style.setFilled(true);
-			style.setLineVisible(false);
-			style.setBackground(gaService.manageColor(diagram, INSTANCEPORT_BACKGROUND));
+			style.setLineVisible(true);
+			style.setLineWidth(1);
+			gaService.setRenderingStyle(style, XdfGradients.inputPortGradient());
 		}
 		return style;
 	}
@@ -163,19 +187,19 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForOutputPort(Diagram diagram) {
-		final String styleId = "INPUT-PORT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style outputPortShape(final Diagram diagram) {
+		final String styleId = "OUTPUT_PORT";
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = commonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			style.setFilled(true);
-			style.setLineVisible(false);
-			style.setBackground(gaService.manageColor(diagram, INSTANCEPORT_BACKGROUND));
+			style.setLineVisible(true);
+			style.setLineWidth(1);
+			gaService.setRenderingStyle(style, XdfGradients.outputPortGradient());
 		}
 		return style;
 	}
@@ -186,22 +210,38 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForConnection(Diagram diagram) {
+	public static Style connection(final Diagram diagram) {
 		final String styleId = "CONNECTION";
-		IGaService gaService = Graphiti.getGaService();
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = commonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			style.setFilled(true);
 			style.setLineVisible(true);
 			style.setLineWidth(2);
-			final Color commonColor = gaService.manageColor(diagram, CONNECTION_COLOR);
-			style.setForeground(commonColor);
-			style.setBackground(commonColor);
+			style.setForeground(gaService.manageColor(diagram, CONNECTION_COLOR));
+		}
+		return style;
+	}
+
+	private static Style commonTextStyle(final Diagram diagram) {
+		final String styleId = "COMMON_TEXT";
+		final IGaService gaService = Graphiti.getGaService();
+
+		// Is style already persisted?
+		Style style = gaService.findStyle(diagram, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(diagram, styleId);
+			style.setFilled(false);
+			style.setAngle(0);
+			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+			style.setForeground(gaService.manageColor(diagram, INSTANCE_FOREGROUND));
+			style.setFont(gaService.manageDefaultFont(diagram, false, false));
 		}
 		return style;
 	}
@@ -212,36 +252,52 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForInstanceText(Diagram diagram) {
-		final String styleId = "INSTANCE-TEXT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style instanceText(final Diagram diagram) {
+		final String styleId = "INSTANCE_TEXT";
+		final IGaService gaService = Graphiti.getGaService();
 
-		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = commonTextStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
-		if (style == null) { // style not found - create new style
+		if (style == null) {
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			setCommonTextValues(diagram, gaService, style);
-			style.setFont(gaService.manageDefaultFont(diagram, false, true));
+			style.setFilled(false);
+			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+			style.setFont(gaService.manageFont(diagram, "Arial", 9, false, true));
 		}
 		return style;
 	}
 
-	public static Style getStyleForPortText(Diagram diagram) {
-		final String styleId = "PORT-TEXT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style instancePortText(final Diagram diagram) {
+		final String styleId = "INSTANCE_PORT_TEXT";
+		final IGaService gaService = Graphiti.getGaService();
 
-		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = commonTextStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
-		if (style == null) { // style not found - create new style
+		if (style == null) {
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			setCommonTextValues(diagram, gaService, style);
-			style.setFont(gaService.manageDefaultFont(diagram, false, true));
+			style.setFilled(false);
+			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+			style.setForeground(gaService.manageColor(diagram, INSTANCE_FOREGROUND));
 		}
 		return style;
 	}
 
+	public static Style portText(final Diagram diagram) {
+		final String styleId = "PORT_TEXT";
+		final IGaService gaService = Graphiti.getGaService();
+
+		final Style parentStyle = commonTextStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) {
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			style.setFilled(false);
+			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+		}
+		return style;
+	}
 }
