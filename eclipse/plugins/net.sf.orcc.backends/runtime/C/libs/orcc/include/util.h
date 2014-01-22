@@ -48,9 +48,6 @@ extern char *write_file;
 // mapping file
 extern char *mapping_file;
 
-// output file of genetic algorithm
-extern char *output_genetic;
-
 // display flags
 extern char display_flags;
 

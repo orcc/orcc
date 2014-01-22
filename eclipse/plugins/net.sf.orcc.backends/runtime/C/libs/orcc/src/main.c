@@ -41,53 +41,40 @@
 extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
+static const char *usage =
+    "Orcc mapping tool -- See orcc.sf.net for more information\n"
+
+    "\nUsage: orccmap [options] -n nbproc -i filename\n"
+
+    "\nDescription:\n"
+    "Compute mappings of dataflow programs on multi-core platforms.\n"
+    "Various strategies based on profiling information can be used.\n"
+
+    "\nRequired parameters:\n"
+    "-n <nbproc>        Number of processor core.\n"
+    "-i <filename>      XML description of the dataflow network.\n"
+
+    "\nOptional parameters:\n"
+    "-o <filename>      Name of the output file.\n"
+    "-m <strategy>      Specify the mapping strategy.\n"
+    "   The possible values are: {Default : ROUND_ROBIN}\n"
+    "       MR   : METIS Recursive graph partition mapping\n"
+    "       MKCV : METIS KWay graph partition mapping (Optimize Communication volume)\n"
+    "       MKEC : METIS KWay graph partition mapping (Optimize Edge-cut)\n"
+    "       RR   : A simple Round-Robin mapping\n"
+    "       QM   : Quick Mapping (Not available)\n"
+    "       WLB  : Weighted Load Balancing\n"
+    "       COW  : Communication Optimized Weighted Load Balancing (Not available)\n"
+    "       KLR  : Kernighan Lin Refinement Weighted Load Balancing\n"
+    "-v <level>         Verbosity level\n"
+    "   The possible values are: {Default : 1}\n"
+    "       1 : summary and results\n"
+    "       2 : debug informations\n"
+    "-h                 Print this message.\n";
+
 void print_usage_orccmap() {
-    /* !TODO: Find a kind way to format this text */
-    char *INDENT = "    ";
-
-    printf("\nUsage: orccmap [options] -n nbproc -i filename");
-    printf("\n");
-    printf("\nDescription:");
-    printf("\nGenerates a xml file containing a partition of a given Orcc Network in a given number of partitions.");
-    printf("\nVarious mapping strategies can be used, all based on actors and connections weighs.");
-
-    printf("\n");
-    printf("\nRequired parameters:");
-    printf("\n%s-n <nbproc>", INDENT);
-    printf("\n%s%sThe number of processors (partitions).", INDENT, INDENT);
-    printf("\n");
-    printf("\n%s-i <filename>", INDENT);
-    printf("\n%s%sThe name of the input file containing a network description.", INDENT, INDENT);
-
-    printf("\n");
-    printf("\nOptional parameters:");
-    printf("\n%s-o <filename>", INDENT);
-    printf("\n%s%sThe name of the output file.", INDENT, INDENT);
-
-    printf("\n");
-    printf("\n%s-m <strategy>", INDENT);
-    printf("\n%s%sThe strategy to apply to do the mapping.", INDENT, INDENT);
-    printf("\n%s%sThe possible values are: {Default : ROUND_ROBIN}", INDENT, INDENT);
-    printf("\n%s%s%sMR\t: METIS Recursive graph partition mapping", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sMKCV\t: METIS KWay graph partition mapping (Optimize Communication volume)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sMKEC\t: METIS KWay graph partition mapping (Optimize Edge-cut)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sRR\t: A simple Round-Robin mapping", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sQM\t: Quick Mapping (Not yet available)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sWLB\t: Weighted Load Balancing", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sCOW\t: Communication Optimized Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sKLR\t: Kernighan Lin Refinement Weighted Load Balancing", INDENT, INDENT, INDENT);
-
-    printf("\n");
-    printf("\n%s-v [level]", INDENT);
-    printf("\n%s%sPrint informations.", INDENT, INDENT);
-    printf("\n%s%sThe possible values are: {Default : 1}", INDENT, INDENT);
-    printf("\n%s%s%s1 : summary and results", INDENT, INDENT, INDENT);
-    printf("\n%s%s%s2 : debug informations", INDENT, INDENT, INDENT);
-
-    printf("\n");
-    printf("\n%s-h", INDENT);
-    printf("\n%s%sPrints this message.", INDENT, INDENT);
-    printf("\n");
+    printf("%s", usage);
+    fflush(stdout);
 }
 
 void start_orcc_mapping(options_t *opt) {
