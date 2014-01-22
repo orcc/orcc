@@ -578,8 +578,11 @@ public class InstancePattern extends AbstractPattern {
 		// referenced port text
 		final Text txt = getTextFromAnchor(anchor);
 
+		// Width of the instance border
+		int lineWidth = gaService.getLineWidth(instancePe.getGraphicsAlgorithm(), true);
 		// Calculate the current size of the instance rectangle
 		final int instanceW = instancePe.getGraphicsAlgorithm().getWidth();
+
 		final int yScaleFromTop = LABEL_HEIGHT + SEPARATOR + PORT_MARGIN;
 		final int squareAndMargin = PORT_SIDE_WITH + PORT_MARGIN;
 
@@ -607,7 +610,7 @@ public class InstancePattern extends AbstractPattern {
 			anchorX = 0;
 			squareX = 0;
 		} else if (ShapePropertiesManager.isOutput(anchor)) {
-			anchorX = instanceW;
+			anchorX = instanceW - lineWidth;
 			squareX = -PORT_SIDE_WITH;
 		} else {
 			OrccLogger.warnln("Anchor without \"direction\" property found.");
