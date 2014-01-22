@@ -333,17 +333,13 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		final int minTxtWidth = XdfUtil.getTextMinWidth(txt);
 		final int newTextWidth = Math.max(minTxtWidth, SHAPE_WIDTH);
 
-		if (minTxtWidth > SHAPE_WIDTH) {
-			int xscale = (minTxtWidth - SHAPE_WIDTH) / 2;
-			poly.setX(xscale);
-		}
-
-		// Set the new width for the port text
+		// Update text width
 		gaService.setSize(txt, newTextWidth, XdfUtil.getTextMinHeight(txt));
-		topLevelPe.getGraphicsAlgorithm().setWidth(newTextWidth);
+		// Update top level invisible rectangle width
+		topLevelGa.setWidth(newTextWidth);
 
-		gaService.setSize(topLevelGa, Math.max(newTextWidth, SHAPE_WIDTH), SHAPE_HEIGHT + TEXT_PORT_SPACE
-				+ TEXT_DEFAULT_HEIGHT);
+		// Update position of polygon in the top level rectangle
+		gaService.setLocation(poly, (newTextWidth - SHAPE_WIDTH) / 2, 0);
 
 		return true;
 	}
