@@ -58,9 +58,9 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getCommonStyle(Diagram diagram) {
-		final String styleId = "COMMONSTYLE";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style getCommonStyle(final Diagram diagram) {
+		final String styleId = "COMMON_GENERIC";
+		final IGaService gaService = Graphiti.getGaService();
 
 		// Is style already persisted?
 		Style style = gaService.findStyle(diagram, styleId);
@@ -81,12 +81,12 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForInstance(Diagram diagram) {
+	public static Style getStyleForInstance(final Diagram diagram) {
 		final String styleId = "INSTANCE";
-		IGaService gaService = Graphiti.getGaService();
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = getCommonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
@@ -105,12 +105,12 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForInstancePort(Diagram diagram) {
-		final String styleId = "INSTANCE-PORT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style getStyleForInstancePort(final Diagram diagram) {
+		final String styleId = "INSTANCE_PORT";
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = getCommonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
@@ -128,12 +128,12 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForInputPort(Diagram diagram) {
-		final String styleId = "INPUT-PORT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style getStyleForInputPort(final Diagram diagram) {
+		final String styleId = "INPUT_PORT";
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = getCommonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
@@ -151,12 +151,12 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForOutputPort(Diagram diagram) {
-		final String styleId = "INPUT-PORT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style getStyleForOutputPort(final Diagram diagram) {
+		final String styleId = "OUTPUT_PORT";
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = getCommonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
@@ -174,12 +174,12 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForConnection(Diagram diagram) {
+	public static Style getStyleForConnection(final Diagram diagram) {
 		final String styleId = "CONNECTION";
-		IGaService gaService = Graphiti.getGaService();
+		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = getCommonStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
@@ -195,8 +195,8 @@ public class StyleUtil {
 	}
 
 	private static Style getCommonTextStyle(final Diagram diagram) {
-		final String styleId = "COMMONTEXTSTYLE";
-		IGaService gaService = Graphiti.getGaService();
+		final String styleId = "COMMON_TEXT";
+		final IGaService gaService = Graphiti.getGaService();
 
 		// Is style already persisted?
 		Style style = gaService.findStyle(diagram, styleId);
@@ -218,15 +218,14 @@ public class StyleUtil {
 	 * @param diagram
 	 * @return
 	 */
-	public static Style getStyleForInstanceText(Diagram diagram) {
-		final String styleId = "INSTANCE-TEXT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style getStyleForInstanceText(final Diagram diagram) {
+		final String styleId = "INSTANCE_TEXT";
+		final IGaService gaService = Graphiti.getGaService();
 
-		// this is a child style of the common-values-style
-		Style parentStyle = getCommonTextStyle(diagram);
+		final Style parentStyle = getCommonTextStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
-		if (style == null) { // style not found - create new style
+		if (style == null) {
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			style.setFont(gaService.manageDefaultFont(diagram, false, true));
 			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
@@ -235,15 +234,14 @@ public class StyleUtil {
 		return style;
 	}
 
-	public static Style getStyleForInstancePortText(Diagram diagram) {
-		final String styleId = "INSTANCE-PORT-TEXT";
+	public static Style getStyleForInstancePortText(final Diagram diagram) {
+		final String styleId = "INSTANCE_PORT_TEXT";
 		final IGaService gaService = Graphiti.getGaService();
 
-		// this is a child style of the common-values-style
 		final Style parentStyle = getCommonTextStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
-		if (style == null) { // style not found - create new style
+		if (style == null) {
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			style.setFilled(false);
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
@@ -252,15 +250,14 @@ public class StyleUtil {
 		return style;
 	}
 
-	public static Style getStyleForPortText(Diagram diagram) {
-		final String styleId = "PORT-TEXT";
-		IGaService gaService = Graphiti.getGaService();
+	public static Style getStyleForPortText(final Diagram diagram) {
+		final String styleId = "PORT_TEXT";
+		final IGaService gaService = Graphiti.getGaService();
 
-		// this is a child style of the common-values-style
-		Style parentStyle = getCommonTextStyle(diagram);
+		final Style parentStyle = getCommonTextStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
-		if (style == null) { // style not found - create new style
+		if (style == null) {
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			style.setFont(gaService.manageDefaultFont(diagram, false, true));
 			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
