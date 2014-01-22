@@ -64,6 +64,7 @@ import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
+import javax.sound.sampled.BooleanControl.Type
 
 /**
  * Generate and print instance source file for C backend.
@@ -741,135 +742,80 @@ class InstancePrinter extends CTemplate {
 			«ENDIF»
 		}
 	'''
+	
+	def private printCore(Action action, boolean isAligned) '''
+		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»«IF isAligned»_aligned«ENDIF»() {
+			«action.profileStart»
 
-	def private printCoreAligned(Action action) '''
-		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»_aligned() {
+			// Compute aligned port indexes
+			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
+				i32 index_aligned_«port.name» = index_«port.name» % SIZE_«port.name»;
+			«ENDFOR»
+			
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
-
-			«IF profileActions && profileNetwork»
-				ticks tick_in, tick_out;
-				double diff_tick;
-			«ENDIF»
-
-			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
-				«IF port.hasAttribute(action.name + "_" + ALIGNABLE)»
-					 i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
-				«ENDIF»
-			«ENDFOR»
-
-			«IF profileActions && profileNetwork»
-				tick_in = getticks();
-			«ENDIF»
-
+	
+			«writeTraces(action.inputPattern)»
+	
 			«FOR block : action.body.blocks»
 				«block.doSwitch»
 			«ENDFOR»
 
+			«writeTraces(action.outputPattern)»
+
+			// Update ports indexes
 			«FOR port : action.inputPattern.ports»
-				«IF enableTrace»
-					{
-						int i;
-						for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
-							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
-						}
-					}
-				«ENDIF»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
 				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
 					read_end_«port.name»();
 				«ENDIF»
-				«IF profileNetwork || dynamicMapping»
-					rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
-				«ENDIF»			
 			«ENDFOR»
-
 			«FOR port : action.outputPattern.ports»
-				«IF enableTrace»
-					{
-						int i;
-						for (i = 0; i < «action.outputPattern.getNumTokens(port)»; i++) {
-							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
-						}
-					}
-				«ENDIF»
 				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
 				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
 					write_end_«port.name»();
 				«ENDIF»
 			«ENDFOR»
-			«IF profileActions && profileNetwork»
-				tick_out = getticks();
-				diff_tick = elapsed(tick_out, tick_in);
-				ticks_«action.body.name» += diff_tick;
-			«ENDIF»
-		}
-	'''
-	
-	def private printCore(Action action) '''
-		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»() {
-			«FOR variable : action.body.locals»
-				«variable.declare»;
-			«ENDFOR»
-
-			«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
-				ticks tick_in, tick_out;
-				double diff_tick;
-			«ENDIF»
-
-			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
-				«IF port.hasAttribute(ALIGNED_ALWAYS)»
-				 	i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
-				«ENDIF»
-			«ENDFOR»
-
-			«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
-				tick_in = getticks();
-			«ENDIF»
 			
-			«FOR block : action.body.blocks»
-				«block.doSwitch»
-			«ENDFOR»
-
-			«FOR port : action.inputPattern.ports»
-				«IF enableTrace»
+			«action.profileEnd»
+		}
+	'''	
+	
+	def private writeTraces(Pattern pattern) '''
+		«IF enableTrace»
+			«FOR port : pattern.ports»
 				{
+					// Write traces
 					int i;
-					for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
+					for (i = 0; i < «pattern.getNumTokens(port)»; i++) {
 						fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
 					}
 				}
-				«ENDIF»
-				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
-
-				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
-				read_end_«port.name»();
-				«ENDIF»
 			«ENDFOR»
+		«ENDIF»
+	'''
+	
+	def private profileStart(Action action) '''
+		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
+			ticks tick_in = getticks();
+			ticks tick_out;
+			double diff_tick;
+		«ENDIF»
+	'''
 
-			«FOR port : action.outputPattern.ports»
-				«IF enableTrace»
-					{
-						int i;
-						for (i = 0; i < «action.outputPattern.getNumTokens(port)»; i++) {
-							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
-						}
-					}
-				«ENDIF»
-				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
-
-				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
-				write_end_«port.name»();
-				«ENDIF»
+	def private profileEnd(Action action) '''
+		«IF profileNetwork || dynamicMapping»
+			«FOR port : action.inputPattern.ports»
+				rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
 			«ENDFOR»
-			«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
-				tick_out = getticks();
-				diff_tick = elapsed(tick_out, tick_in);
-				ticks_«action.body.name» += diff_tick;
-			«ENDIF»
-		}
-	'''	
+		«ENDIF»
+		«IF profileActions && profileNetwork»
+			tick_out = getticks();
+			diff_tick = elapsed(tick_out, tick_in);
+			ticks_«action.name» += diff_tick;
+		«ENDIF»
+	'''
 
 	def protected print(Action action) {
 		currentAction = action
@@ -877,10 +823,10 @@ class InstancePrinter extends CTemplate {
 		'''
 		«action.scheduler.print»
 		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
-			«action.printCore»
+			«printCore(action, false)»
 		«ENDIF»
 		«IF isActionVectorizable = action.hasAttribute(ALIGNABLE)»
-			«action.printCoreAligned»
+			«printCore(action, true)»
 		«ENDIF»
 		'''
 	}
@@ -991,7 +937,7 @@ class InstancePrinter extends CTemplate {
 		'''
 			«IF srcPort != null»
 				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
-					«load.target.variable.name» = tokens_«srcPort.name»[(local_index_«srcPort.name» + («load.indexes.head.doSwitch»))];
+					«load.target.variable.name» = tokens_«srcPort.name»[(index_aligned_«srcPort.name» + («load.indexes.head.doSwitch»))];
 				«ELSE»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
 				«ENDIF»
@@ -1009,7 +955,7 @@ class InstancePrinter extends CTemplate {
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
 				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
-					tokens_«trgtPort.name»[(local_index_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
+					tokens_«trgtPort.name»[(index_aligned_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
 				«ENDIF»
