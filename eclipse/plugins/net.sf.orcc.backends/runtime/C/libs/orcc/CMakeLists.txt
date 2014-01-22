@@ -55,7 +55,7 @@ else()
         # Configure additional paths to search for libraries
         set(CMAKE_PREFIX_PATH
             ${CMAKE_PREFIX_PATH}
-            ${CMAKE_CURRENT_SOURCE_DIR}/windows/SDL-*
+            ${CMAKE_CURRENT_SOURCE_DIR}/../windows/SDL-*
         )
     endif()
 
