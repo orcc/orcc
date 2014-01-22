@@ -57,10 +57,9 @@ public class BackendsConstants {
 
 	public static final String HMPP_NO_PRAGMAS = "net.sf.orcc.backends.c.hmpp.disablePragma";
 
-	public static final int MIN_REPEAT_SIZE_RWEND = 2;
+	public static final int MIN_REPEAT_RWEND = 2;
+	public static final int MIN_REPEAT_ALIGNABLE = 2;
 
-	public static final int MIN_VECTORIZABLE = 2;
-
-	public static final String VECTORIZABLE = "VECTORIZABLE";
-	public static final String VECTORIZABLE_ALWAYS = "VECTORIZABLE_ALWAYS";	
+	public static final String ALIGNABLE = "ALIGNABLE";
+	public static final String ALIGNED_ALWAYS = "ALIGNED_ALWAYS";	
 }

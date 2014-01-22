@@ -33,11 +33,11 @@ import net.sf.orcc.df.Port
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 
-import static net.sf.orcc.backends.BackendsConstants.*
 import net.sf.orcc.df.Network
 import net.sf.orcc.ir.util.ValueUtil
 import org.eclipse.emf.common.util.EList
 import net.sf.orcc.util.Attribute
+import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
  * Class containing static methods useful to set potential vectorization information for each port
@@ -47,25 +47,25 @@ import net.sf.orcc.util.Attribute
  */
 class Vectorizable {
 	def static private boolean isPortVectorizable(Pattern pattern, Port port) {
-		return pattern.getNumTokens(port) >= MIN_VECTORIZABLE
+		return pattern.getNumTokens(port) >= MIN_REPEAT_ALIGNABLE
 	}
 
 	def static private filterVectorizableAttributs(EList<Attribute> attrs) {
-		attrs.filter[it.name.endsWith("_" + VECTORIZABLE)]
+		attrs.filter[it.name.endsWith("_" + ALIGNABLE)]
 	}
 
 	def static private filterNotVectorizableAttributs(EList<Attribute> attrs) {
-		attrs.filter[it.name.endsWith("_NOT_" + VECTORIZABLE)]
+		attrs.filter[it.name.endsWith("_NOT_" + ALIGNABLE)]
 	}
 
 	def static private boolean setVectorizableAttributs(Pattern pattern, Port port, String actionName) {
 		var bIsVectorizable = isPortVectorizable(pattern, port)
 		
 		if (bIsVectorizable) {
-			port.addAttribute(actionName + "_" + VECTORIZABLE)
-			port.setAttribute(actionName + "_" + VECTORIZABLE, pattern.getNumTokens(port))
+			port.addAttribute(actionName + "_" + ALIGNABLE)
+			port.setAttribute(actionName + "_" + ALIGNABLE, pattern.getNumTokens(port))
 		} else {
-			port.addAttribute(actionName + "_NOT_" + VECTORIZABLE)			
+			port.addAttribute(actionName + "_NOT_" + ALIGNABLE)			
 		}
 		
 		return bIsVectorizable
@@ -88,7 +88,7 @@ class Vectorizable {
 		}
 		
 		if (bIsAlwaysVectorizable) {
-			port.addAttribute(VECTORIZABLE_ALWAYS)			
+			port.addAttribute(ALIGNED_ALWAYS)			
 		}
 	}
 	
@@ -103,7 +103,7 @@ class Vectorizable {
 		}
 		
 		if (bIsVectorizable){
-			action.addAttribute(VECTORIZABLE)			
+			action.addAttribute(ALIGNABLE)			
 		} 
 	}	
 
@@ -112,15 +112,15 @@ class Vectorizable {
 		
 		for (Port port : action.inputPattern.ports) {
 			action.inputPattern.setAlwaysVectorizableAttributs(port)
-			bIsAlwaysVectorizable = bIsAlwaysVectorizable && port.hasAttribute(VECTORIZABLE_ALWAYS) 
+			bIsAlwaysVectorizable = bIsAlwaysVectorizable && port.hasAttribute(ALIGNED_ALWAYS) 
 		}
 		for (Port port : action.outputPattern.ports) {
 			action.outputPattern.setAlwaysVectorizableAttributs(port)
-			bIsAlwaysVectorizable = bIsAlwaysVectorizable && port.hasAttribute(VECTORIZABLE_ALWAYS) 
+			bIsAlwaysVectorizable = bIsAlwaysVectorizable && port.hasAttribute(ALIGNED_ALWAYS) 
 		}
 		
 		if (bIsAlwaysVectorizable){
-			action.addAttribute(VECTORIZABLE_ALWAYS)			
+			action.addAttribute(ALIGNED_ALWAYS)			
 		} 
 	}	
 
@@ -129,7 +129,7 @@ class Vectorizable {
 			action.setVectorizableAttributs()	
 		}		
 		for (Action action : actor.actions) {
-			if (action.hasAttribute(VECTORIZABLE)){					
+			if (action.hasAttribute(ALIGNABLE)){					
 				action.setAlwaysVectorizableAttributs()
 			} 			
 		}		

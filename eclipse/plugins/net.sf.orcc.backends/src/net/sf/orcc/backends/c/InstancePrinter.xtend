@@ -518,15 +518,15 @@ class InstancePrinter extends CTemplate {
 
 	def protected printVectorizationConditions(Action action) '''
 		{
-			int isVectorizable = 1;
+			int isAligned = 1;
 			«FOR port : action.inputPattern.ports»
-				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
-					isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
+				«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
+					isAligned = isAligned && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
 				«ENDIF»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports»
-				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
-					isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
+				«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
+					isAligned = isAligned && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
 				«ENDIF»
 			«ENDFOR»
 	'''
@@ -542,12 +542,12 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«IF trans.action.hasAttribute(VECTORIZABLE_ALWAYS)»
-					«trans.action.body.name»_vectorizable();
-				«ELSEIF trans.action.hasAttribute(VECTORIZABLE)»
+				«IF trans.action.hasAttribute(ALIGNED_ALWAYS)»
+					«trans.action.body.name»_aligned();
+				«ELSEIF trans.action.hasAttribute(ALIGNABLE)»
 					«trans.action.printVectorizationConditions»
-						if (isVectorizable) {
-							«trans.action.body.name»_vectorizable();
+						if (isAligned) {
+							«trans.action.body.name»_aligned();
 						} else {
 							«trans.action.body.name»();
 						}
@@ -648,12 +648,12 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
-					«action.body.name»_vectorizable();
-				«ELSEIF action.hasAttribute(VECTORIZABLE)»
+				«IF action.hasAttribute(ALIGNED_ALWAYS)»
+					«action.body.name»_aligned();
+				«ELSEIF action.hasAttribute(ALIGNABLE)»
 					«action.printVectorizationConditions»
-						if (isVectorizable) {
-							«action.body.name»_vectorizable();
+						if (isAligned) {
+							«action.body.name»_aligned();
 						} else {
 							«action.body.name»();
 						}
@@ -743,7 +743,7 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	def private printCoreAligned(Action action) '''
-		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»_vectorizable() {
+		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»_aligned() {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -754,7 +754,7 @@ class InstancePrinter extends CTemplate {
 			«ENDIF»
 
 			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
-				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE)»
+				«IF port.hasAttribute(action.name + "_" + ALIGNABLE)»
 					 i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 				«ENDIF»
 			«ENDFOR»
@@ -777,7 +777,7 @@ class InstancePrinter extends CTemplate {
 					}
 				«ENDIF»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
-				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
 					read_end_«port.name»();
 				«ENDIF»
 				«IF profileNetwork || dynamicMapping»
@@ -795,7 +795,7 @@ class InstancePrinter extends CTemplate {
 					}
 				«ENDIF»
 				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
-				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
 					write_end_«port.name»();
 				«ENDIF»
 			«ENDFOR»
@@ -819,7 +819,7 @@ class InstancePrinter extends CTemplate {
 			«ENDIF»
 
 			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
-				«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
+				«IF port.hasAttribute(ALIGNED_ALWAYS)»
 				 	i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 				«ENDIF»
 			«ENDFOR»
@@ -843,7 +843,7 @@ class InstancePrinter extends CTemplate {
 				«ENDIF»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
 
-				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
 				read_end_«port.name»();
 				«ENDIF»
 			«ENDFOR»
@@ -859,7 +859,7 @@ class InstancePrinter extends CTemplate {
 				«ENDIF»
 				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
 
-				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
 				write_end_«port.name»();
 				«ENDIF»
 			«ENDFOR»
@@ -876,10 +876,10 @@ class InstancePrinter extends CTemplate {
 		isActionVectorizable = false
 		'''
 		«action.scheduler.print»
-		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
+		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
 			«action.printCore»
 		«ENDIF»
-		«IF isActionVectorizable = action.hasAttribute(VECTORIZABLE)»
+		«IF isActionVectorizable = action.hasAttribute(ALIGNABLE)»
 			«action.printCoreAligned»
 		«ENDIF»
 		'''
@@ -990,7 +990,7 @@ class InstancePrinter extends CTemplate {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + VECTORIZABLE)) || srcPort.hasAttribute(VECTORIZABLE_ALWAYS)»
+				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
 					«load.target.variable.name» = tokens_«srcPort.name»[(local_index_«srcPort.name» + («load.indexes.head.doSwitch»))];
 				«ELSE»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
@@ -1008,7 +1008,7 @@ class InstancePrinter extends CTemplate {
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + VECTORIZABLE)) || trgtPort.hasAttribute(VECTORIZABLE_ALWAYS)»
+				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
 					tokens_«trgtPort.name»[(local_index_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;

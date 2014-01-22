@@ -43,7 +43,6 @@ import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.backends.BackendsConstants.*
 
-
 class SwActorPrinter extends InstancePrinter {
 	
 	Processor processor;
@@ -78,7 +77,7 @@ class SwActorPrinter extends InstancePrinter {
 	override protected printArchitecture() ''''''
 
 	override protected printVectorizable(Action action) {
-		isActionVectorizable = action.hasAttribute(VECTORIZABLE)
+		isActionVectorizable = action.hasAttribute(ALIGNABLE)
 		val output = '''
 		«IF isActionVectorizable»
 
@@ -138,7 +137,7 @@ class SwActorPrinter extends InstancePrinter {
 			«block.doSwitch»
 		«ENDFOR»
 		}
-		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
+		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
 
 		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
