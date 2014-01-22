@@ -52,8 +52,7 @@ static void displayYUV_setSize(int width, int height) {
 	m_screen = SDL_SetVideoMode(width, height, 32, SDL_HWSURFACE);
 	if (m_screen == NULL) {
 		fprintf(stderr, "Couldn't set %ix%ix24 video mode: %s\n", width,
-				height, SDL_GetError());
-		press_a_key(-1);
+                height, SDL_GetError());
 	}
 
 	if (m_overlay != NULL) {
@@ -62,8 +61,7 @@ static void displayYUV_setSize(int width, int height) {
 
 	m_overlay = SDL_CreateYUVOverlay(width, height, SDL_YV12_OVERLAY, m_screen);
 	if (m_overlay == NULL) {
-		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
-		press_a_key(-1);
+        fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
     }
 }
 
@@ -87,7 +85,7 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY,
 
 	if (SDL_LockYUVOverlay(m_overlay) < 0) {
 		fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
-		press_a_key(-1);
+        exit(-1);
 	}
 
 	memcpy(m_overlay->pixels[0], pictureBufferY, pictureWidth * pictureHeight);
@@ -116,7 +114,7 @@ void displayYUV_init() {
 		// First, initialize SDL's video subsystem.
 		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 			fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
-			press_a_key(-1);
+            exit(-1);
 		}
 
 		SDL_WM_SetCaption("display", NULL);
@@ -134,7 +132,7 @@ static void displayYUV444_setSize(int winWidth, int winHeight, int pictureWidth,
 	if (m_screen == NULL) {
 		fprintf(stderr, "Couldn't set %ix%ix24 video mode: %s\n", winWidth,
 				winHeight, SDL_GetError());
-		press_a_key(-1);
+        exit(-1);
 	}
 	if (m_image != NULL) {
 		SDL_FreeSurface(m_image);
@@ -145,7 +143,7 @@ static void displayYUV444_setSize(int winWidth, int winHeight, int pictureWidth,
 
 	if (m_image == NULL) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
-		press_a_key(-1);
+        exit(-1);
     }
 }
 
@@ -159,8 +157,8 @@ void displayYUV444_init(int winWidth, int winHeight, int pictureWidth, int pictu
 		// First, initialize SDL's video subsystem.
 		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 			fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
-			press_a_key(-1);
-		}
+            exit(-1);
+        }
 		SDL_WM_SetCaption("display", NULL);
 		atexit(SDL_Quit);
 		displayYUV444_setSize(winWidth, winHeight, pictureWidth, pictureHeight);

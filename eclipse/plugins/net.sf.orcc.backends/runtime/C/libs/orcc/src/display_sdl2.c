@@ -104,7 +104,6 @@ void displayYUV_init() {
         // First, initialize SDL's video subsystem.
         if (SDL_Init(SDL_INIT_VIDEO) < 0) {
             fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
-            press_a_key(-1);
         }
 
         atexit(SDL_Quit);
