@@ -742,11 +742,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def protected printVectorizable(Action action) {
-		isActionVectorizable = action.hasAttribute(VECTORIZABLE)
-		val output = '''
-		«IF isActionVectorizable»
-
+	def private printCoreAligned(Action action) '''
 		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»_vectorizable() {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
@@ -809,85 +805,84 @@ class InstancePrinter extends CTemplate {
 				ticks_«action.body.name» += diff_tick;
 			«ENDIF»
 		}
-		«ENDIF»
-		'''
-		isActionVectorizable = false
-		return output
-	}
+	'''
+	
+	def private printCore(Action action) '''
+		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»() {
+			«FOR variable : action.body.locals»
+				«variable.declare»;
+			«ENDFOR»
 
-	def protected print(Action action) {
-		currentAction = action
-		val output = '''
-			«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
-			static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»() {
-				«FOR variable : action.body.locals»
-					«variable.declare»;
-				«ENDFOR»
+			«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
+				ticks tick_in, tick_out;
+				double diff_tick;
+			«ENDIF»
 
-				«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
-					ticks tick_in, tick_out;
-					double diff_tick;
+			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
+				«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
+				 	i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
 				«ENDIF»
+			«ENDFOR»
 
-				«FOR port : action.inputPattern.ports + action.outputPattern.ports»
-					«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
-					 	i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
-					«ENDIF»
-				«ENDFOR»
+			«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
+				tick_in = getticks();
+			«ENDIF»
+			
+			«FOR block : action.body.blocks»
+				«block.doSwitch»
+			«ENDFOR»
 
-				«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
-					tick_in = getticks();
+			«FOR port : action.inputPattern.ports»
+				«IF enableTrace»
+				{
+					int i;
+					for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
+						fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+					}
+				}
 				«ENDIF»
-				
-				«FOR block : action.body.blocks»
-					«block.doSwitch»
-				«ENDFOR»
+				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
 
-				«FOR port : action.inputPattern.ports»
-					«IF enableTrace»
+				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				read_end_«port.name»();
+				«ENDIF»
+			«ENDFOR»
+
+			«FOR port : action.outputPattern.ports»
+				«IF enableTrace»
 					{
 						int i;
-						for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
+						for (i = 0; i < «action.outputPattern.getNumTokens(port)»; i++) {
 							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
 						}
 					}
-					«ENDIF»
-					index_«port.name» += «action.inputPattern.getNumTokens(port)»;
-
-					«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
-					read_end_«port.name»();
-					«ENDIF»
-				«ENDFOR»
-
-				«FOR port : action.outputPattern.ports»
-					«IF enableTrace»
-						{
-							int i;
-							for (i = 0; i < «action.outputPattern.getNumTokens(port)»; i++) {
-								fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
-							}
-						}
-					«ENDIF»
-					index_«port.name» += «action.outputPattern.getNumTokens(port)»;
-
-					«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
-					write_end_«port.name»();
-					«ENDIF»
-				«ENDFOR»
-				«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
-					tick_out = getticks();
-					diff_tick = elapsed(tick_out, tick_in);
-					ticks_«action.body.name» += diff_tick;
 				«ENDIF»
-			}
+				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
+
+				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				write_end_«port.name»();
+				«ENDIF»
+			«ENDFOR»
+			«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
+				tick_out = getticks();
+				diff_tick = elapsed(tick_out, tick_in);
+				ticks_«action.body.name» += diff_tick;
 			«ENDIF»
-			«action.printVectorizable»
+		}
+	'''	
 
-			«action.scheduler.print»
-
+	def protected print(Action action) {
+		currentAction = action
+		isActionVectorizable = false
 		'''
-		currentAction = null
-		return output
+		«action.scheduler.print»
+		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
+			«action.printCore»
+		«ENDIF»
+		«IF isActionVectorizable = action.hasAttribute(VECTORIZABLE)»
+			«action.printCoreAligned»
+		«ENDIF»
+		'''
 	}
 
 	def protected print(Procedure proc) '''
