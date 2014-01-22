@@ -89,11 +89,12 @@ void print_usage_orccmap() {
 }
 
 void start_orcc_mapping(options_t *opt) {
-    assert(opt != NULL);
     int ret = ORCC_OK;
-
-    mapping_t *mapping = allocate_mapping(opt->nb_processors);
+    mapping_t *mapping;
     network_t *network;
+    assert(opt != NULL);
+
+    mapping = allocate_mapping(opt->nb_processors);
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Starting Orcc-Map");
     print_orcc_trace(ORCC_VL_VERBOSE_1, "  Nb of processors\t: %d", opt->nb_processors);

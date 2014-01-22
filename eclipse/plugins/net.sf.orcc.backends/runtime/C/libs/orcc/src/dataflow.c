@@ -36,10 +36,10 @@
 #include "trace.h"
 
 actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors) {
-    assert(actors != NULL);
-    assert(name != NULL);
     actor_t *ret = NULL;
     int i = 0;
+    assert(actors != NULL);
+    assert(name != NULL);
 
     while (i < nb_actors && ret == NULL) {
         if (strcmp(name, actors[i]->name) == 0) {

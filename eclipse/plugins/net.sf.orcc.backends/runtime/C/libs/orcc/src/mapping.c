@@ -125,10 +125,10 @@ void delete_processors(processor_t *processors) {
  ********************************************************************************************/
 
 void print_load_balancing(mapping_t *mapping) {
-    assert(mapping != NULL);
     int i, j, nb_proc = 0;
     int totalWeight = 0, maxWeight = 0, partWeight = 0, nbPartitions = 0;
     double avgWeight = 0;
+    assert(mapping != NULL);
 
     for (i = 0; i < mapping->number_of_threads; i++) {
         partWeight = 0;
@@ -173,9 +173,9 @@ void print_edge_cut(network_t *network) {
  ********************************************************************************************/
 
 int swap_actors(actor_t **actors, int index1, int index2, int nb_actors) {
-    assert(actors != NULL);
     int ret = ORCC_OK;
     actor_t *actor;
+    assert(actors != NULL);
 
     if (index1 < nb_actors && index2 < nb_actors) {
         actor = actors[index1];
@@ -191,9 +191,9 @@ int swap_actors(actor_t **actors, int index1, int index2, int nb_actors) {
 }
 
 int sort_actors(actor_t **actors, int nb_actors) {
-    assert(actors != NULL);
     int ret = ORCC_OK;
     int i, j;
+    assert(actors != NULL);
 
     for (i = 0; i < nb_actors; i++) {
         for (j = 0; j < nb_actors - i - 1; j++) {
@@ -221,12 +221,14 @@ int sort_actors(actor_t **actors, int nb_actors) {
  ********************************************************************************************/
 
 int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mapping) {
+    int ret = ORCC_OK;
+    int i, j;
+    int *counter;
     assert(network != NULL);
     assert(part != NULL);
     assert(mapping != NULL);
-    int ret = ORCC_OK;
-    int i, j;
-    int *counter = malloc(mapping->number_of_threads * sizeof(counter));
+
+    counter = malloc(mapping->number_of_threads * sizeof(counter));
 
     for (i = 0; i < mapping->number_of_threads; i++) {
         mapping->partitions_size[i] = 0;
@@ -273,14 +275,14 @@ void print_mapping(mapping_t *mapping) {
 
 #ifdef METIS_ENABLE
 int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part) {
-    assert(network != NULL);
-    assert(opt != NULL);
-    assert(part != NULL);
     int ret = ORCC_OK;
     idx_t ncon = 1;
     idx_t metis_opt[METIS_NOPTIONS];
     idx_t objval;
     adjacency_list *graph, *metis_graph;
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(part != NULL);
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying METIS Recursive partition for mapping");
 
@@ -312,14 +314,14 @@ int do_metis_recursive_partition(network_t *network, options_t *opt, idx_t *part
 }
 
 int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part, idx_t mode) {
-    assert(network != NULL);
-    assert(opt != NULL);
-    assert(part != NULL);
     int ret = ORCC_OK;
     idx_t ncon = 1;
     idx_t metis_opt[METIS_NOPTIONS];
     idx_t objval;
     adjacency_list *graph, *metis_graph;
+    assert(network != NULL);
+    assert(opt != NULL);
+    assert(part != NULL);
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying METIS Kway partition for mapping");
 
@@ -358,12 +360,11 @@ int do_metis_kway_partition(network_t *network, options_t *opt, idx_t *part, idx
  * @author Long Nguyen
  */
 int do_round_robbin_mapping(network_t *network, options_t *opt, idx_t *part) {
+    int ret = ORCC_OK;
+    int i, k = 0;
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
-    int ret = ORCC_OK;
-    int i, k;
-    k = 0;
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying Round Robin strategy for mapping");
 
@@ -406,10 +407,10 @@ int get_processor_id_of_actor(network_t *network, int actorId) {
 }
 
 int do_quick_mapping(network_t *network, options_t *opt, idx_t *part) {
+    int ret = ORCC_OK;
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
-    int ret = ORCC_OK;
 	// TODO
     return ret;
 }
@@ -419,8 +420,10 @@ int do_quick_mapping(network_t *network, options_t *opt, idx_t *part) {
  * @author Long Nguyen
  */
 void assign_actor_to_min_utilized_processor(network_t *network, idx_t *part, processor_t *processors, int nb_processors, int actorIndex) {
-    assert(processors != NULL);
     int i, minIndex = 0;
+    assert(processors != NULL);
+    assert(part != NULL);
+    assert(processors != NULL);
 
     for (i = 0; i < nb_processors; i++) {
         if (processors[i].utilization < processors[minIndex].utilization) {
@@ -435,12 +438,14 @@ void assign_actor_to_min_utilized_processor(network_t *network, idx_t *part, pro
 }
 
 int do_weighted_round_robin_mapping(network_t *network, options_t *opt, idx_t *part) {
+    int ret = ORCC_OK;
+    int i;
+    processor_t *processors;
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
-    int ret = ORCC_OK;
-    int i;
-    processor_t *processors = init_processors(opt->nb_processors);
+
+    processors = init_processors(opt->nb_processors);
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying Weighted Load Balancing strategy for mapping");
 
@@ -479,10 +484,10 @@ int calculate_comm_of_actor(network_t *network, processor_t *processors, int act
 }
 
 int do_weighted_round_robin_comm_mapping(network_t *network, options_t *opt, idx_t *part) {
+    int ret = ORCC_OK;
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
-    int ret = ORCC_OK;
 	// TODO
     return ret;
 }
@@ -492,8 +497,9 @@ int do_weighted_round_robin_comm_mapping(network_t *network, options_t *opt, idx
  * @author Long Nguyen
  */
 int get_gain_of_actor(network_t *network, processor_t *processors, int actorIndex, int commProcessorIndex) {
-    assert(processors != NULL);
     int i, comm1, comm2;
+    assert(network != NULL);
+    assert(processors != NULL);
 
     comm1 = 0;
     comm2 = 0;
@@ -524,11 +530,10 @@ int get_gain_of_actor(network_t *network, processor_t *processors, int actorInde
 }
 
 void optimize_communication(network_t *network, idx_t *part, processor_t *processors, int procIndex1, int procIndex2) {
+    int index1 = 0, index2 = 0;
+    assert(network != NULL);
     assert(processors != NULL);
-    int index1, index2;
-
-    index1 = 0;
-    index2 = 0;
+    assert(part != NULL);
 
     while(index1 < network->nb_actors && index2 < network->nb_actors) {
         if (processors[procIndex1].utilization >= processors[procIndex2].utilization) {
@@ -579,8 +584,10 @@ void optimize_communication(network_t *network, idx_t *part, processor_t *proces
 }
 
 void do_KL_algorithm(network_t *network, idx_t *part, processor_t *processors, int nb_processors) {
-    assert(processors != NULL);
     int i;
+    assert(network != NULL);
+    assert(processors != NULL);
+    assert(part != NULL);
 
     for (i = 0; i < nb_processors - 1; i += 2) {
         optimize_communication(network, part, processors, i, i + 1);
@@ -588,12 +595,14 @@ void do_KL_algorithm(network_t *network, idx_t *part, processor_t *processors, i
 }
 
 int do_KLR_mapping(network_t *network, options_t *opt, idx_t *part) {
+    int ret = ORCC_OK;
+    int i;
+    processor_t *processors;
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
-    int ret = ORCC_OK;
-    int i;
-    processor_t *processors = init_processors(opt->nb_processors);
+
+    processors = init_processors(opt->nb_processors);
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying Kernighan Lin Refinement Weighted strategy for mapping");
 
@@ -621,13 +630,15 @@ int do_KLR_mapping(network_t *network, options_t *opt, idx_t *part) {
  * Entry point for all mapping strategies
  */
 int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
+    int i;
+    int ret = ORCC_OK;
+    idx_t *part;
+    ticks startTime, endTime;
     assert(network != NULL);
     assert(opt != NULL);
     assert(mapping != NULL);
-    int i;
-    int ret = ORCC_OK;
-    idx_t *part = (idx_t*) malloc(sizeof(idx_t) * (network->nb_actors));
-    ticks startTime, endTime;
+
+    part = (idx_t*) malloc(sizeof(idx_t) * (network->nb_actors));
 
     if(check_verbosity(ORCC_VL_VERBOSE_2)) {
         print_network(network);
@@ -693,6 +704,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
 void *agent_routine(void *data) {
     agent_t *agent = (agent_t*) data;
     int i;
+    assert(agent != NULL);
 
     while (1) {
         // wait threads synchro
@@ -750,6 +762,9 @@ void resetMapping() {
  */
 void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThreads) {
     int i;
+    assert(mapping != NULL);
+    assert(scheduler != NULL);
+
     for (i = 0; i < nbThreads; i++) {
         sched_reinit(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0);
     }

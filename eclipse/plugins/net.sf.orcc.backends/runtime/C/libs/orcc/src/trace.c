@@ -78,9 +78,9 @@ boolean check_verbosity(verbose_level_et level) {
 }
 
 void print_orcc_trace(verbose_level_et level, const char *trace, ...) {
+    va_list args;
     assert(trace != NULL);
 
-    va_list args;
     va_start (args, trace);
 
     if (level <= verbose_level) {

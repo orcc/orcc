@@ -103,7 +103,7 @@ void wait_for_key() {
 #ifdef _WIN32
 	printf("Press a key to continue\n");
 	_getch();
-#elsemapping_repetition
+#else
 	#if HAS_TERMIOS
 		// the user has termios.h
 		struct termios oldT, newT;
@@ -182,7 +182,7 @@ void print_usage() {
 void init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
-    const char *ostr = "i:no:d:m:f:w:g:l:r:ac:s:v:p:";
+    const char *ostr = "i:nho:d:m:f:w:g:l:r:ac:s:v:p:";
     int c;
 
 	program = argv[0];
@@ -191,9 +191,11 @@ void init_orcc(int argc, char *argv[]) {
 		switch (c) {
 		case '?': // BADCH
 			fprintf(stderr, "unknown argument\n");
+            print_usage();
 			exit(1);
 		case ':': // BADARG
 			fprintf(stderr, "missing argument\n");
+            print_usage();
 			exit(1);
 		case 'd':
 			input_directory = strdup(optarg);
@@ -240,8 +242,13 @@ void init_orcc(int argc, char *argv[]) {
         case 'v':
             set_trace_level(strtoul(optarg, NULL, 10));
             break;
+        case 'h':
+            print_usage();
+            break;
         default:
-			fprintf(stderr, "Skipping option -%c\n", c);
+            fprintf(stderr, "Unknown option -%c\n", c);
+            print_usage();
+            exit(1);
 			break;
 		}
 	}
