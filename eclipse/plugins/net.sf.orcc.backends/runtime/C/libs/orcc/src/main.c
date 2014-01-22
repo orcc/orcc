@@ -27,7 +27,6 @@
  * SUCH DAMAGE.
  */
 
-#include <getopt.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,6 +37,9 @@
 #include "serialize.h"
 #include "options.h"
 #include "trace.h"
+
+extern char *optarg;
+extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
 void print_usage_orccmap() {
     /* !TODO: Find a kind way to format this text */
@@ -51,19 +53,19 @@ void print_usage_orccmap() {
 
     printf("\n");
     printf("\nRequired parameters:");
-    printf("\n%s-n, --nb_processors <nbproc>", INDENT);
+    printf("\n%s-n <nbproc>", INDENT);
     printf("\n%s%sThe number of processors (partitions).", INDENT, INDENT);
     printf("\n");
-    printf("\n%s-i, --input_file <filename>", INDENT);
+    printf("\n%s-i <filename>", INDENT);
     printf("\n%s%sThe name of the input file containing a network description.", INDENT, INDENT);
 
     printf("\n");
     printf("\nOptional parameters:");
-    printf("\n%s-o, --output_file <filename>", INDENT);
+    printf("\n%s-o <filename>", INDENT);
     printf("\n%s%sThe name of the output file.", INDENT, INDENT);
 
     printf("\n");
-    printf("\n%s-m, --mapping_strategy <strategy>", INDENT);
+    printf("\n%s-m <strategy>", INDENT);
     printf("\n%s%sThe strategy to apply to do the mapping.", INDENT, INDENT);
     printf("\n%s%sThe possible values are: {Default : ROUND_ROBIN}", INDENT, INDENT);
     printf("\n%s%s%sMR\t: METIS Recursive graph partition mapping", INDENT, INDENT, INDENT);
@@ -76,14 +78,14 @@ void print_usage_orccmap() {
     printf("\n%s%s%sKLR\t: Kernighan Lin Refinement Weighted Load Balancing", INDENT, INDENT, INDENT);
 
     printf("\n");
-    printf("\n%s-v, --verbose [level]", INDENT);
+    printf("\n%s-v [level]", INDENT);
     printf("\n%s%sPrint informations.", INDENT, INDENT);
     printf("\n%s%sThe possible values are: {Default : 1}", INDENT, INDENT);
     printf("\n%s%s%s1 : summary and results", INDENT, INDENT, INDENT);
     printf("\n%s%s%s2 : debug informations", INDENT, INDENT, INDENT);
 
     printf("\n");
-    printf("\n%s-h, --help", INDENT);
+    printf("\n%s-h", INDENT);
     printf("\n%s%sPrints this message.", INDENT, INDENT);
     printf("\n");
 }
@@ -116,25 +118,20 @@ void start_orcc_mapping(options_t *opt) {
 int main (int argc, char **argv) {
     int nFlag, iFlag = 0;
     int c;
+    const char *ostr = "n:i:o:m:v::h";
 
     options_t *opt = set_default_options();
 
-    static struct option long_options[] =
-    {
-        {"nb_processors", required_argument, 0, 'n'},
-        {"input_file", required_argument, 0, 'i'},
-        {"output_file", required_argument, 0, 'o'},
-        {"mapping_strategy", required_argument, 0, 'm'},
-        {"verbose", optional_argument, 0, 'v'},
-        {"help", no_argument, 0, 'h'},
-        {0, 0, 0, 0}
-    };
-
-    /* getopt_long stores the option index here. */
-    int option_index = 0;
-
-    while ((c = getopt_long (argc, argv, "n:i:o:m:v::h", long_options, &option_index)) != -1)
+    while ((c = getopt(argc, argv, ostr)) != -1) {
         switch (c) {
+        case '?': // BADCH
+            print_orcc_error(ORCC_ERR_BAD_ARGS);
+            print_usage_orccmap();
+            exit(ORCC_ERR_BAD_ARGS);
+        case ':': // BADARG
+            print_orcc_error(ORCC_ERR_BAD_ARGS);
+            print_usage_orccmap();
+            exit(ORCC_ERR_BAD_ARGS);
         case 'n':
             nFlag = 1;
             set_nb_processors(optarg, opt);
@@ -155,27 +152,12 @@ int main (int argc, char **argv) {
             break;
         case 'h':
             print_usage_orccmap();
-            exit (ORCC_OK);
-            break;
-        case '?':
-            break;
+            exit(ORCC_OK);
         default:
-            abort();
+            print_orcc_error(ORCC_ERR_BAD_ARGS);
+            print_usage_orccmap();
+            exit(ORCC_ERR_BAD_ARGS);
         }
-
-    if (optind < argc) {
-        print_orcc_error(ORCC_ERR_BAD_ARGS);
-        while (optind < argc)
-            fprintf(stderr," [%s]", argv[optind++]);
-        printf("\n");
-        print_usage_orccmap();
-        exit(ORCC_ERR_BAD_ARGS);
-    }
-    if (!nFlag || !iFlag) {
-        print_orcc_error(ORCC_ERR_MANDATORY_ARGS);
-        printf("\n");
-        print_usage_orccmap();
-        exit(ORCC_ERR_MANDATORY_ARGS);
     }
 
     start_orcc_mapping(opt);

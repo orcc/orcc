@@ -190,13 +190,13 @@ void init_orcc(int argc, char *argv[]) {
 	while ((c = getopt(argc, argv, ostr)) != -1) {
 		switch (c) {
 		case '?': // BADCH
-			fprintf(stderr, "unknown argument\n");
+            print_orcc_error(ORCC_ERR_BAD_ARGS);
             print_usage();
-			exit(1);
+            exit(ORCC_ERR_BAD_ARGS);
 		case ':': // BADARG
-			fprintf(stderr, "missing argument\n");
+            print_orcc_error(ORCC_ERR_BAD_ARGS);
             print_usage();
-			exit(1);
+            exit(ORCC_ERR_BAD_ARGS);
 		case 'd':
 			input_directory = strdup(optarg);
 			break;
@@ -244,12 +244,11 @@ void init_orcc(int argc, char *argv[]) {
             break;
         case 'h':
             print_usage();
-            break;
+            exit(ORCC_OK);
         default:
-            fprintf(stderr, "Unknown option -%c\n", c);
+            print_orcc_error(ORCC_ERR_BAD_ARGS);
             print_usage();
-            exit(1);
-			break;
+            exit(ORCC_ERR_BAD_ARGS);
 		}
 	}
 }
