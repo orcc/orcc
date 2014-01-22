@@ -5,7 +5,6 @@ set(orcc_sources
     src/dataflow.c
     src/getopt.c
     src/graph.c
-    src/mult_writer.c
     src/options.c
     src/scheduler.c
     src/source.c
