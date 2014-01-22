@@ -477,9 +477,9 @@ public class InstancePattern extends AbstractPattern {
 				entity.eResource().getURI().toPlatformString(true));
 
 		// Clean all ports anchors and graphics in the instance
-		final List<GraphicsAlgorithm> gaChildre = new ArrayList<GraphicsAlgorithm>(instanceShape.getGraphicsAlgorithm()
+		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(instanceShape.getGraphicsAlgorithm()
 				.getGraphicsAlgorithmChildren());
-		for (final GraphicsAlgorithm gaChild : gaChildre) {
+		for (final GraphicsAlgorithm gaChild : gaChildren) {
 			if (gaChild instanceof Text
 					&& (ShapePropertiesManager.isInput(gaChild) || ShapePropertiesManager.isOutput(gaChild))) {
 				EcoreUtil.delete(gaChild, true);
@@ -495,9 +495,13 @@ public class InstancePattern extends AbstractPattern {
 		if (instance.isActor()) {
 			addPorts(instanceShape, instance.getActor().getInputs(), Direction.INPUTS);
 			addPorts(instanceShape, instance.getActor().getOutputs(), Direction.OUTPUTS);
+			// Update instance style
+			instanceShape.getGraphicsAlgorithm().setStyle(StyleUtil.getStyleForActorInstance(getDiagram()));
 		} else {
 			addPorts(instanceShape, instance.getNetwork().getInputs(), Direction.INPUTS);
 			addPorts(instanceShape, instance.getNetwork().getOutputs(), Direction.OUTPUTS);
+			// Update instance style
+			instanceShape.getGraphicsAlgorithm().setStyle(StyleUtil.getStyleForNetworkInstance(getDiagram()));
 		}
 
 		// Resize to minimal size.

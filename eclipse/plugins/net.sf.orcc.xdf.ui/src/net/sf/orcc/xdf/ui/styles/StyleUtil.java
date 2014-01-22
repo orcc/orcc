@@ -51,6 +51,7 @@ public class StyleUtil {
 	private static final IColorConstant INSTANCE_FOREGROUND = new ColorConstant(98, 131, 167);
 	private static final IColorConstant INSTANCEPORT_BACKGROUND = INSTANCE_FOREGROUND;
 	private static final IColorConstant CONNECTION_COLOR = new ColorConstant(0, 0, 0);
+	private static final IColorConstant INSTANCE_BACKGROUND = new ColorConstant(255, 255, 255);
 
 	/**
 	 * Return the style used for all elements with no specific style.
@@ -93,7 +94,38 @@ public class StyleUtil {
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			style.setFilled(true);
 			style.setForeground(gaService.manageColor(diagram, INSTANCE_FOREGROUND));
+			style.setBackground(gaService.manageColor(diagram, INSTANCE_BACKGROUND));
 
+			gaService.setRenderingStyle(style, PredefinedColoredAreas.getSilverWhiteGlossAdaptions());
+		}
+		return style;
+	}
+
+	public static Style getStyleForNetworkInstance(final Diagram diagram) {
+		final String styleId = "NETWORK_INSTANCE";
+		final IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		final Style parentStyle = getCommonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
+			gaService.setRenderingStyle(style, PredefinedColoredAreas.getBlueWhiteAdaptions());
+		}
+		return style;
+	}
+
+	public static Style getStyleForActorInstance(final Diagram diagram) {
+		final String styleId = "ACTOR_INSTANCE";
+		final IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		final Style parentStyle = getCommonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(parentStyle, styleId);
 			gaService.setRenderingStyle(style, PredefinedColoredAreas.getCopperWhiteGlossAdaptions());
 		}
 		return style;
