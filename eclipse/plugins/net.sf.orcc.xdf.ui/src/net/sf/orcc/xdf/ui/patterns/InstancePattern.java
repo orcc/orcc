@@ -543,11 +543,11 @@ public class InstancePattern extends AbstractPattern {
 			Graphiti.getPeService().setPropertyValue(fpAnchor, PORT_NAME_KEY, port.getName());
 
 			// Create the square inside anchor
-			final Rectangle square = gaService.createRectangle(fpAnchor);
+			final Rectangle square = gaService.createPlainRectangle(fpAnchor);
 			square.setStyle(StyleUtil.getStyleForInstancePort(getDiagram()));
 
 			// Create text as instance rectangle child
-			final Text txt = gaService.createText(instanceGa, port.getName());
+			final Text txt = gaService.createPlainText(instanceGa, port.getName());
 			txt.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
 			txt.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 			ShapePropertiesManager.setIdentifier(txt, PORT_TEXT_ID);
