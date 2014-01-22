@@ -273,8 +273,8 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		final GraphicsAlgorithm arrow = createArrow(cd);
 
 		// Setup styles
-		polyline.setStyle(StyleUtil.getStyleForConnection(getDiagram()));
-		arrow.setStyle(StyleUtil.getStyleForConnection(getDiagram()));
+		polyline.setStyle(StyleUtil.connection(getDiagram()));
+		arrow.setStyle(StyleUtil.connection(getDiagram()));
 
 		// create link and wire it
 		link(connection, addedConnection);

@@ -285,7 +285,7 @@ public class InstancePattern extends AbstractPattern {
 
 		// Create the container graphic
 		final RoundedRectangle roundedRectangle = gaService.createPlainRoundedRectangle(topLevelShape, 5, 5);
-		roundedRectangle.setStyle(StyleUtil.getStyleForInstance(getDiagram()));
+		roundedRectangle.setStyle(StyleUtil.basicInstanceShape(getDiagram()));
 		gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), TOTAL_MIN_WIDTH,
 				TOTAL_MIN_HEIGHT);
 
@@ -293,7 +293,7 @@ public class InstancePattern extends AbstractPattern {
 		final Text text = gaService.createPlainText(roundedRectangle);
 		ShapePropertiesManager.setIdentifier(text, LABEL_ID);
 		// Set properties on instance label
-		text.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
+		text.setStyle(StyleUtil.instanceText(getDiagram()));
 		gaService.setLocationAndSize(text, 0, 0, TOTAL_MIN_WIDTH, LABEL_HEIGHT);
 
 		if (addedDomainObject.getName() != null) {
@@ -496,12 +496,12 @@ public class InstancePattern extends AbstractPattern {
 			addPorts(instanceShape, instance.getActor().getInputs(), Direction.INPUTS);
 			addPorts(instanceShape, instance.getActor().getOutputs(), Direction.OUTPUTS);
 			// Update instance style
-			instanceShape.getGraphicsAlgorithm().setStyle(StyleUtil.getStyleForActorInstance(getDiagram()));
+			instanceShape.getGraphicsAlgorithm().setStyle(StyleUtil.actorInstanceShape(getDiagram()));
 		} else {
 			addPorts(instanceShape, instance.getNetwork().getInputs(), Direction.INPUTS);
 			addPorts(instanceShape, instance.getNetwork().getOutputs(), Direction.OUTPUTS);
 			// Update instance style
-			instanceShape.getGraphicsAlgorithm().setStyle(StyleUtil.getStyleForNetworkInstance(getDiagram()));
+			instanceShape.getGraphicsAlgorithm().setStyle(StyleUtil.networkInstanceShape(getDiagram()));
 		}
 
 		// Resize to minimal size.
@@ -546,11 +546,11 @@ public class InstancePattern extends AbstractPattern {
 
 			// Create the square inside anchor
 			final Rectangle square = gaService.createPlainRectangle(fpAnchor);
-			square.setStyle(StyleUtil.getStyleForInstancePort(getDiagram()));
+			square.setStyle(StyleUtil.instancePortShape(getDiagram()));
 
 			// Create text as instance rectangle child
 			final Text txt = gaService.createPlainText(instanceGa, port.getName());
-			txt.setStyle(StyleUtil.getStyleForInstancePortText(getDiagram()));
+			txt.setStyle(StyleUtil.instancePortText(getDiagram()));
 			ShapePropertiesManager.setIdentifier(txt, PORT_TEXT_ID);
 
 			// Setup the linking with business object

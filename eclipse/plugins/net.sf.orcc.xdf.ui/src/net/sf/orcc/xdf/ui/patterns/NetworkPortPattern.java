@@ -264,7 +264,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		ShapePropertiesManager.setIdentifier(text, LABEL_ID);
 
 		// Configure text properties
-		text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
+		text.setStyle(StyleUtil.portText(getDiagram()));
 
 		// We define an arbitrary width to text, allowing user to see chars
 		// when first direct editing port name
