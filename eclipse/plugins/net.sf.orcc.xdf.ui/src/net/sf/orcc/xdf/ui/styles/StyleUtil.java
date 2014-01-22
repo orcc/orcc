@@ -52,21 +52,6 @@ public class StyleUtil {
 	private static final IColorConstant INSTANCEPORT_BACKGROUND = INSTANCE_FOREGROUND;
 	private static final IColorConstant CONNECTION_COLOR = new ColorConstant(0, 0, 0);
 
-	private static void setCommonTextValues(Diagram diagram, IGaService gaService, Style style) {
-		style.setFilled(false);
-		style.setAngle(0);
-		style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-		style.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-		style.setForeground(gaService.manageColor(diagram, INSTANCE_TEXT_FOREGROUND));
-	}
-
-	private static void setCommonValues(Style style) {
-		style.setLineStyle(LineStyle.SOLID);
-		style.setLineVisible(true);
-		style.setLineWidth(2);
-		style.setTransparency(0.0);
-	}
-
 	/**
 	 * Return the style used for all elements with no specific style.
 	 * 
@@ -82,7 +67,10 @@ public class StyleUtil {
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(diagram, styleId);
-			setCommonValues(style);
+			style.setLineStyle(LineStyle.SOLID);
+			style.setLineVisible(true);
+			style.setLineWidth(2);
+			style.setTransparency(0.0);
 		}
 		return style;
 	}
@@ -206,6 +194,24 @@ public class StyleUtil {
 		return style;
 	}
 
+	private static Style getCommonTextStyle(final Diagram diagram) {
+		final String styleId = "COMMONTEXTSTYLE";
+		IGaService gaService = Graphiti.getGaService();
+
+		// Is style already persisted?
+		Style style = gaService.findStyle(diagram, styleId);
+
+		if (style == null) { // style not found - create new style
+			style = gaService.createPlainStyle(diagram, styleId);
+			style.setFilled(false);
+			style.setAngle(0);
+			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+			style.setForeground(gaService.manageColor(diagram, INSTANCE_TEXT_FOREGROUND));
+		}
+		return style;
+	}
+
 	/**
 	 * Return the style used for the text displaying name of an Instance.
 	 * 
@@ -217,16 +223,14 @@ public class StyleUtil {
 		IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		Style parentStyle = getCommonTextStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			setCommonTextValues(diagram, gaService, style);
 			style.setFont(gaService.manageDefaultFont(diagram, false, true));
 			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
-
 		}
 		return style;
 	}
@@ -236,7 +240,7 @@ public class StyleUtil {
 		final IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		final Style parentStyle = getCommonStyle(diagram);
+		final Style parentStyle = getCommonTextStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
@@ -253,12 +257,11 @@ public class StyleUtil {
 		IGaService gaService = Graphiti.getGaService();
 
 		// this is a child style of the common-values-style
-		Style parentStyle = getCommonStyle(diagram);
+		Style parentStyle = getCommonTextStyle(diagram);
 		Style style = gaService.findStyle(parentStyle, styleId);
 
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(parentStyle, styleId);
-			setCommonTextValues(diagram, gaService, style);
 			style.setFont(gaService.manageDefaultFont(diagram, false, true));
 			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
