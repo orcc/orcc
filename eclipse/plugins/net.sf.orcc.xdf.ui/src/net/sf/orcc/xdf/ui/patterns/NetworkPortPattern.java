@@ -332,9 +332,8 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 		// Update text width
 		gaService.setSize(txt, newTextWidth, XdfUtil.getTextMinHeight(txt));
-		// Update top level invisible rectangle width
-		topLevelGa.setWidth(newTextWidth);
-
+		// Update top level invisible rectangle size & position
+		gaService.setSize(topLevelGa, newTextWidth, SHAPE_HEIGHT + TEXT_PORT_SPACE + TEXT_DEFAULT_HEIGHT);
 		// Update position of polygon in the top level rectangle
 		gaService.setLocation(poly, (newTextWidth - SHAPE_WIDTH) / 2, 0);
 
