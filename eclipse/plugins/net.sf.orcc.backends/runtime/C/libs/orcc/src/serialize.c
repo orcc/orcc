@@ -40,7 +40,7 @@
  * Generate some mapping structure from an XCF file.
  */
 mapping_t* load_mapping(char *fileName, network_t *network) {
-    int i, j, k, size;
+    int i, j, size;
     char *nb, *name;
     node_t *configuration, *partitioning, *partition, *instance, *attribute;
     mapping_t *mapping;
@@ -52,22 +52,22 @@ mapping_t* load_mapping(char *fileName, network_t *network) {
     partitioning = roxml_get_chld(configuration, NULL, 0);
     mapping = allocate_mapping(roxml_get_chld_nb(partitioning));
 
-    for (j = 0; j < mapping->number_of_threads; j++) {
-        partition = roxml_get_chld(partitioning, NULL, j);
+    for (i = 0; i < mapping->number_of_threads; i++) {
+        partition = roxml_get_chld(partitioning, NULL, i);
         name = roxml_get_name(partition, NULL, 0);
-        mapping->partitions_size[j] = roxml_get_chld_nb(partition);
+        mapping->partitions_size[i] = roxml_get_chld_nb(partition);
 
         attribute = roxml_get_attr(partition, "id", 0);
         nb = roxml_get_content(attribute, NULL, 0, &size);
-        mapping->threads_affinities[j] = atoi(nb);
-        mapping->partitions_of_actors[j] = (actor_t **) malloc(mapping->partitions_size[j] * sizeof(actor_t *));
+        mapping->threads_affinities[i] = atoi(nb);
+        mapping->partitions_of_actors[i] = (actor_t **) malloc(mapping->partitions_size[i] * sizeof(actor_t *));
 
-        for (k = 0; k < mapping->partitions_size[j]; k++) {
-            instance = roxml_get_chld(partition, NULL, k);
+        for (j = 0; j < mapping->partitions_size[i]; j++) {
+            instance = roxml_get_chld(partition, NULL, j);
             name = roxml_get_name(instance, NULL, 0);
             attribute = roxml_get_attr(instance, "id", 0);
             name = roxml_get_content(attribute, NULL, 0, &size);
-            mapping->partitions_of_actors[j][k] = find_actor_by_name(network->actors, name, network->nb_actors);
+            mapping->partitions_of_actors[i][j] = find_actor_by_name(network->actors, name, network->nb_actors);
         }
     }
     roxml_close(configuration);
@@ -131,7 +131,8 @@ void save_profiling(char* fileName, network_t* network) {
 }
 
 network_t* load_network(char *fileName) {
-    int i, nb_actors = 0, nb_connections = 0;
+    int i;
+    int nb_actors = 0, nb_connections = 0;
     network_t *network;
     node_t* rootNode;
     assert(fileName != NULL);

@@ -50,6 +50,8 @@ int need_remap = TRUE;
  */
 int find_mapped_core(mapping_t *mapping, actor_t *actor) {
     int i;
+    assert(mapping != NULL);
+    assert(actor != NULL);
     for (i = 0; i < mapping->number_of_threads; i++) {
         if (find_actor_by_name(mapping->partitions_of_actors[i], actor->name,
                 mapping->partitions_size[i]) != NULL) {
@@ -63,7 +65,9 @@ int find_mapped_core(mapping_t *mapping, actor_t *actor) {
  * Creates a mapping structure.
  */
 mapping_t *allocate_mapping(int number_of_threads) {
-    mapping_t *mapping = (mapping_t *) malloc(sizeof(mapping_t));
+    mapping_t *mapping;
+    assert(number_of_threads > 0);
+    mapping = (mapping_t *) malloc(sizeof(mapping_t));
     mapping->number_of_threads = number_of_threads;
     mapping->partitions_of_actors = malloc(number_of_threads * sizeof(*mapping->partitions_of_actors));
     mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
@@ -75,6 +79,7 @@ mapping_t *allocate_mapping(int number_of_threads) {
  * Releases memory of the given mapping structure.
  */
 void delete_mapping(mapping_t *mapping) {
+    assert(mapping != NULL);
     free(mapping->partitions_size);
     free(mapping);
 }
@@ -84,10 +89,14 @@ void delete_mapping(mapping_t *mapping) {
  */
 mapping_t* map_actors(network_t *network) {
     mapping_t *mapping;
+    assert(network != NULL);
+
     if (mapping_file == NULL) {
+        // Create mapping with only one partition
         mapping = allocate_mapping(1);
         mapping->threads_affinities[0] = 0;
         mapping->partitions_size[0] = network->nb_actors;
+        // FIXME: Need a copy of the partition
         mapping->partitions_of_actors[0] = network->actors;
         return mapping;
     } else {
@@ -125,8 +134,9 @@ void delete_processors(processor_t *processors) {
  ********************************************************************************************/
 
 void print_load_balancing(mapping_t *mapping) {
-    int i, j, nb_proc = 0;
-    int totalWeight = 0, maxWeight = 0, partWeight = 0, nbPartitions = 0;
+    int i, j;
+    int nb_proc = 0, nbPartitions = 0;
+    int totalWeight = 0, maxWeight = 0, partWeight = 0;
     double avgWeight = 0;
     assert(mapping != NULL);
 
@@ -222,7 +232,7 @@ int sort_actors(actor_t **actors, int nb_actors) {
 
 int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mapping) {
     int ret = ORCC_OK;
-    int i, j;
+    int i;
     int *counter;
     assert(network != NULL);
     assert(part != NULL);
@@ -246,7 +256,7 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
     }
 
     // Update network too
-    for (i=0; i < network->nb_actors; i++) {
+    for (i = 0; i < network->nb_actors; i++) {
         network->actors[i]->processor_id = part[i];
     }
 
@@ -259,7 +269,7 @@ void print_mapping(mapping_t *mapping) {
     printf("\nMapping result : ");
     for (i = 0; i < mapping->number_of_threads; i++) {
         printf("\n\tPartition %d : %d actors", i+1, mapping->partitions_size[i]);
-        for (j=0; j < mapping->partitions_size[i]; j++) {
+        for (j = 0; j < mapping->partitions_size[i]; j++) {
             printf("\n\t\t%s", mapping->partitions_of_actors[i][j]->name);
         }
     }
@@ -630,7 +640,6 @@ int do_KLR_mapping(network_t *network, options_t *opt, idx_t *part) {
  * Entry point for all mapping strategies
  */
 int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
-    int i;
     int ret = ORCC_OK;
     idx_t *part;
     ticks startTime, endTime;
@@ -678,6 +687,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
             break;
         }
     } else {
+        int i;
         for (i = 0; i < network->nb_actors; i++) {
             part[i] = network->actors[i]->processor_id;
         }
@@ -703,10 +713,11 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
  */
 void *agent_routine(void *data) {
     agent_t *agent = (agent_t*) data;
-    int i;
     assert(agent != NULL);
 
     while (1) {
+        int i;
+
         // wait threads synchro
         for (i = 0; i < agent->nb_threads; i++) {
             semaphore_wait(agent->sync->sem_monitor);
