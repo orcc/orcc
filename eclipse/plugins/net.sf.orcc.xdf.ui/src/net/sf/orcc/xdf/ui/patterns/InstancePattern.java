@@ -293,8 +293,6 @@ public class InstancePattern extends AbstractPattern {
 		final Text text = gaService.createPlainText(roundedRectangle);
 		ShapePropertiesManager.setIdentifier(text, LABEL_ID);
 		// Set properties on instance label
-		text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-		text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 		text.setStyle(StyleUtil.getStyleForInstanceText(getDiagram()));
 		gaService.setLocationAndSize(text, 0, 0, TOTAL_MIN_WIDTH, LABEL_HEIGHT);
 
@@ -549,7 +547,6 @@ public class InstancePattern extends AbstractPattern {
 			// Create text as instance rectangle child
 			final Text txt = gaService.createPlainText(instanceGa, port.getName());
 			txt.setStyle(StyleUtil.getStyleForInstancePortText(getDiagram()));
-			txt.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 			ShapePropertiesManager.setIdentifier(txt, PORT_TEXT_ID);
 
 			// Setup the linking with business object

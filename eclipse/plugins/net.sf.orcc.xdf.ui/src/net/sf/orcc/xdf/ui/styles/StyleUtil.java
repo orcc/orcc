@@ -224,6 +224,9 @@ public class StyleUtil {
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			setCommonTextValues(diagram, gaService, style);
 			style.setFont(gaService.manageDefaultFont(diagram, false, true));
+			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+
 		}
 		return style;
 	}
@@ -257,6 +260,8 @@ public class StyleUtil {
 			style = gaService.createPlainStyle(parentStyle, styleId);
 			setCommonTextValues(diagram, gaService, style);
 			style.setFont(gaService.manageDefaultFont(diagram, false, true));
+			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 		}
 		return style;
 	}

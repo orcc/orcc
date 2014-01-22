@@ -59,7 +59,6 @@ import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
-import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.Connection;
@@ -265,8 +264,6 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		ShapePropertiesManager.setIdentifier(text, LABEL_ID);
 
 		// Configure text properties
-		text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-		text.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 		text.setStyle(StyleUtil.getStyleForPortText(getDiagram()));
 
 		// We define an arbitrary width to text, allowing user to see chars
