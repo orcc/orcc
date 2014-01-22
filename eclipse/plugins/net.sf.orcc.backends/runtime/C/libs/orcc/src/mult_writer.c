@@ -45,8 +45,7 @@ int writer_open(char* fileName) {
 	if (write_file == NULL) {
 		file = fopen(fileName, "wb");
 		if (file == NULL) {
-			fprintf(stderr, "could not open file \"%s\"\n", fileName);
-			wait_for_key();
+            fprintf(stderr, "could not open file \"%s\"\n", fileName);
 			exit(1);
 		}
 	}
@@ -60,8 +59,7 @@ int writer_open(char* fileName) {
 		strcat(fullPathName, fileName);
 		file = fopen(fullPathName, "wb");
 		if (file == NULL) {
-			fprintf(stderr, "could not open file \"%s\"\n", fullPathName);
-			wait_for_key();
+            fprintf(stderr, "could not open file \"%s\"\n", fullPathName);
 			exit(1);
 		}
 	}

@@ -51,8 +51,7 @@ static FILE        *cmpFile ;
 void compare_init() {
 	if (yuv_file == NULL) {
 		print_usage();
-		fprintf(stderr, "No compare file given!\n");
-		wait_for_key();
+        fprintf(stderr, "No compare file given!\n");
 		exit(1);
 	}
 	if (cmpFile == NULL) {

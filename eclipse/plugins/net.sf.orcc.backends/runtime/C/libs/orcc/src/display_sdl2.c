@@ -56,7 +56,6 @@ static void displayYUV_setSize(int width, int height) {
                     SDL_TEXTUREACCESS_STREAMING, width, height);
     if(pWindow1==NULL || pRenderer1==NULL || bmpTex1==NULL) {
         fprintf(stderr, "Could not open window1\n");
-        press_a_key(-1);
     }
 }
 

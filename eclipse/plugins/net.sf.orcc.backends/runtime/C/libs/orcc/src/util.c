@@ -95,49 +95,6 @@ int nbProfiledFrames = 10;
 // Repetition of the actor remapping
 int mapping_repetition = REMAP_ONCE;
 
-// Pause function
-void wait_for_key() {
-#ifdef _WIN32
-	printf("Press a key to continue\n");
-	_getch();
-#else
-	#if HAS_TERMIOS
-		// the user has termios.h
-		struct termios oldT, newT;
-		char c;
-
-		printf("Press a key to continue\n");
-
-		// save current terminal mode
-		ioctl(0, TCGETS, &oldT);
-
-		// echo off, echo newline off, canonical mode off, 
-		// extended input processing off, signal chars off
-		newT.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
-
-		ioctl(0, TCSETS, &newT); // set new terminal mode
-		read(0, &c, 1); // read 1 char at a time from stdin
-		ioctl(0, TCSETS, &oldT); // restore previous terminal mode
-	#else
-		// just revert to standard getc
-		printf("Press Enter to continue\n");
-		getc(stdin);
-	#endif
-#endif
-}
-
-void press_a_key(int code) {
-    char buf[2];
-    char *ptrBuff = NULL;
-
-    printf("Press a key to continue\n");
-    ptrBuff = fgets(buf, 2, stdin);
-    if (ptrBuff == NULL) {
-        fprintf(stderr, "error when using fgets\n");
-    }
-    exit(code);
-}
-
 
 static char *program;
 static const char *usage =
