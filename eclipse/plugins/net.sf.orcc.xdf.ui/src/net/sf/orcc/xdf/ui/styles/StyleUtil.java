@@ -223,6 +223,7 @@ public class StyleUtil {
 			style.setLineVisible(true);
 			style.setLineWidth(2);
 			style.setForeground(gaService.manageColor(diagram, CONNECTION_COLOR));
+			style.setBackground(gaService.manageColor(diagram, CONNECTION_COLOR));
 		}
 		return style;
 	}

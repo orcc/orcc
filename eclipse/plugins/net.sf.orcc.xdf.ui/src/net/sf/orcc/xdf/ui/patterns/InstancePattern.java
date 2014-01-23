@@ -93,13 +93,13 @@ public class InstancePattern extends AbstractPattern {
 	// Minimal and default width for an instance shape
 	private static final int TOTAL_MIN_WIDTH = 120;
 	// Minimal and default height for an instance shape
-	private static final int TOTAL_MIN_HEIGHT = 140;
+	private static final int TOTAL_MIN_HEIGHT = 80;
 	// Height of instance label (displaying instance name)
 	private static final int LABEL_HEIGHT = 40;
 	// Width of the line shape used as separator
 	private static final int SEPARATOR = 1;
 	// Minimal space between an input and output port on the same line
-	private static final int PORTS_AREAS_SPACE = 10;
+	private static final int PORTS_AREAS_SPACE = 14;
 	// Width of the square representing a port
 	private static final int PORT_SIDE_WITH = 12;
 	// Space set around a port square
@@ -477,8 +477,8 @@ public class InstancePattern extends AbstractPattern {
 				entity.eResource().getURI().toPlatformString(true));
 
 		// Clean all ports anchors and graphics in the instance
-		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(instanceShape.getGraphicsAlgorithm()
-				.getGraphicsAlgorithmChildren());
+		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(instanceShape
+				.getGraphicsAlgorithm().getGraphicsAlgorithmChildren());
 		for (final GraphicsAlgorithm gaChild : gaChildren) {
 			if (gaChild instanceof Text
 					&& (ShapePropertiesManager.isInput(gaChild) || ShapePropertiesManager.isOutput(gaChild))) {
@@ -578,8 +578,6 @@ public class InstancePattern extends AbstractPattern {
 		// referenced port text
 		final Text txt = getTextFromAnchor(anchor);
 
-		// Width of the instance border
-		int lineWidth = gaService.getLineWidth(instancePe.getGraphicsAlgorithm(), true);
 		// Calculate the current size of the instance rectangle
 		final int instanceW = instancePe.getGraphicsAlgorithm().getWidth();
 
@@ -600,18 +598,23 @@ public class InstancePattern extends AbstractPattern {
 
 		final int txtW = instanceW - squareAndMargin * 2;
 		final int txtX = squareAndMargin;
-		final int txtY = yScaleFromTop + index * (squareAndMargin);
+		final int txtY = yScaleFromTop + index * (txtH + PORT_MARGIN);
 
 		final int anchorY = txtY + anchorScale + PORT_SIDE_WITH / 2;
 		final int squareY = -PORT_SIDE_WITH / 2;
 
-		int anchorX, squareX;
+		int anchorX, squareX, squareW = PORT_SIDE_WITH;
 		if (ShapePropertiesManager.isInput(anchor)) {
 			anchorX = 0;
 			squareX = 0;
 		} else if (ShapePropertiesManager.isOutput(anchor)) {
-			anchorX = instanceW - lineWidth;
+			anchorX = instanceW;
 			squareX = -PORT_SIDE_WITH;
+			// Fix the size of outputs port, to take care of the instance border
+			// size. We can't change the X coordinate of the anchor or the
+			// square, or the orthogonal layout produce false path for some
+			// connections.
+			squareW += gaService.getLineWidth(instancePe.getGraphicsAlgorithm(), true);
 		} else {
 			OrccLogger.warnln("Anchor without \"direction\" property found.");
 			return;
@@ -625,7 +628,7 @@ public class InstancePattern extends AbstractPattern {
 		anchor.setLocation(gaService.createPoint(anchorX, anchorY));
 		// The square is the GA of the Anchor. Its position is calculated
 		// from the anchor's position
-		gaService.setLocationAndSize(square, squareX, squareY, PORT_SIDE_WITH, PORT_SIDE_WITH);
+		gaService.setLocationAndSize(square, squareX, squareY, squareW, PORT_SIDE_WITH);
 	}
 
 	/**
@@ -683,14 +686,7 @@ public class InstancePattern extends AbstractPattern {
 		for (final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
 			if (child instanceof Text
 					&& (ShapePropertiesManager.isInput(child) || ShapePropertiesManager.isOutput(child))) {
-				final Text exampleTxt = (Text) child;
-
-				final int minTxtH = XdfUtil.getTextMinHeight(exampleTxt);
-				if (minTxtH > PORT_SIDE_WITH) {
-					portLineHeight = minTxtH;
-				} else {
-					portLineHeight = PORT_SIDE_WITH;
-				}
+				portLineHeight = Math.max(XdfUtil.getTextMinHeight((Text) child), PORT_SIDE_WITH);
 				break;
 			}
 		}

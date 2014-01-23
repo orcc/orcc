@@ -289,7 +289,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 	 */
 	private GraphicsAlgorithm createArrow(final GraphicsAlgorithmContainer gaContainer) {
 		final int w = 12, l = 5;
-		final int[] xy = new int[] { 2, 0, -w, l, -w, -l };
+		final int[] xy = new int[] { 0, 0, -w, l, -w, -l };
 		final Polygon figure = Graphiti.getGaService().createPolygon(gaContainer, xy);
 		figure.setLineVisible(false);
 

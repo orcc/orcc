@@ -56,9 +56,7 @@ public class XdfGradients extends PredefinedColoredAreas {
 		final GradientColoredAreas gradientColoredAreas = StylesFactory.eINSTANCE.createGradientColoredAreas();
 		final EList<GradientColoredArea> gcas = gradientColoredAreas.getGradientColor();
 
-		addGradientColoredArea(gcas, "C3DF8C", 0, LocationType.LOCATION_TYPE_ABSOLUTE_START, "9FBF60", 4,
-				LocationType.LOCATION_TYPE_ABSOLUTE_START);
-		addGradientColoredArea(gcas, "9FBF60", 4, LocationType.LOCATION_TYPE_ABSOLUTE_START, "CBDFA2", 0,
+		addGradientColoredArea(gcas, "9FBF60", 0, LocationType.LOCATION_TYPE_ABSOLUTE_START, "CBDFA2", 0,
 				LocationType.LOCATION_TYPE_ABSOLUTE_END);
 
 		gradientColoredAreas.setStyleAdaption(IPredefinedRenderingStyle.STYLE_ADAPTATION_DEFAULT);
@@ -77,9 +75,7 @@ public class XdfGradients extends PredefinedColoredAreas {
 		final GradientColoredAreas gradientColoredAreas = StylesFactory.eINSTANCE.createGradientColoredAreas();
 		final EList<GradientColoredArea> gcas = gradientColoredAreas.getGradientColor();
 
-		addGradientColoredArea(gcas, "CBDFA2", 0, LocationType.LOCATION_TYPE_ABSOLUTE_START, "9FBF60", 4,
-				LocationType.LOCATION_TYPE_ABSOLUTE_END);
-		addGradientColoredArea(gcas, "9FBF60", 4, LocationType.LOCATION_TYPE_ABSOLUTE_END, "C3DF8C", 0,
+		addGradientColoredArea(gcas, "CBDFA2", 0, LocationType.LOCATION_TYPE_ABSOLUTE_START, "9FBF60", 0,
 				LocationType.LOCATION_TYPE_ABSOLUTE_END);
 
 		gradientColoredAreas.setStyleAdaption(IPredefinedRenderingStyle.STYLE_ADAPTATION_DEFAULT);
