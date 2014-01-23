@@ -477,7 +477,6 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 			default:
 				printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]);
-				wait_for_key();
 				exit(1);
 			}
 
@@ -510,7 +509,6 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 		«IF state.outgoing.empty»
 			printf("Stuck in state "«state.name»" in «entityName»\n");
-			wait_for_key();
 			exit(1);
 		«ELSE»
 			«state.printStateTransitions»
