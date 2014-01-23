@@ -64,7 +64,6 @@ import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
-import javax.sound.sampled.BooleanControl.Type
 
 /**
  * Generate and print instance source file for C backend.
