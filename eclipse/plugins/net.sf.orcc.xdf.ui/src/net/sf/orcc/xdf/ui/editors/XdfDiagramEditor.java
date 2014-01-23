@@ -42,6 +42,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.PartInitException;
 
 /**
  * This class customize the default diagram editor.
@@ -57,6 +58,12 @@ public class XdfDiagramEditor extends DiagramEditor {
 
 	public XdfDiagramEditor() {
 		super();
+	}
+
+	@Override
+	protected DiagramEditorInput convertToDiagramEditorInput(IEditorInput input) throws PartInitException {
+		final DiagramEditorInput origEditorInput = super.convertToDiagramEditorInput(input);
+		return new XdfEditorInput(origEditorInput.getUri(), origEditorInput.getProviderId());
 	}
 
 	/**

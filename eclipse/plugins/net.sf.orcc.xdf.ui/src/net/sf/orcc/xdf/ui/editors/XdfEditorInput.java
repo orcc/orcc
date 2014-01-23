@@ -26,79 +26,44 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.xdf.ui;
+package net.sf.orcc.xdf.ui.editors;
 
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.BundleContext;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.ui.part.FileEditorInput;
 
 /**
- * The activator class controls the plug-in life cycle
+ * This class implements a customized EditorInput. It inherits default
+ * DiagramEditorInput but override the {@link #equals(Object)} method to ensure
+ * the same tab will always be reused when a user open a network or a diagram
+ * file (*.xdf or *.diag).
+ * 
+ * @author Antoine Lorence
+ * 
  */
-public class Activator extends AbstractUIPlugin {
+public class XdfEditorInput extends DiagramEditorInput {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "net.sf.orcc.xdf.ui"; //$NON-NLS-1$
-
-	// The shared instance
-	private static Activator plugin;
-
-	public static String ACTOR_SUFFIX = "cal";
-	public static String IR_SUFFIX = "ir";
-	public static String NETWORK_SUFFIX = "xdf";
-	public static String DIAGRAM_SUFFIX = "xdfdiag";
-	public static String DIAGRAM_TYPE = "xdfDiagram";
-
-	/**
-	 * The constructor
-	 */
-	public Activator() {
+	public XdfEditorInput(URI diagramUri, String providerId) {
+		super(diagramUri, providerId);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
-	 */
 	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
+	public boolean equals(Object obj) {
+		final boolean originalResult = super.equals(obj);
+		if (originalResult) {
+			return true;
+		}
+
+		final URI otherURI;
+		if (obj instanceof FileEditorInput) {
+			otherURI = URI.createPlatformResourceURI(((FileEditorInput) obj).getFile().getFullPath().toString(), true);
+		} else if (obj instanceof DiagramEditorInput) {
+			otherURI = ((DiagramEditorInput) obj).getUri();
+		} else {
+			return false;
+		}
+
+		return getUri().trimFileExtension().trimFragment().equals(otherURI.trimFileExtension().trimFragment());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
-	 */
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
-
-	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
 }

@@ -42,7 +42,7 @@
          class="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
          contributorClass="net.sf.orcc.xdf.ui.editors.XdfActionBarContributor"
          default="true"
-         extensions="xdf,diagram"
+         extensions="xdf,xdfdiag"
          icon="icons/network.gif"
          id="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
          name="Orcc Network Editor">
