@@ -74,6 +74,7 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
@@ -320,6 +321,10 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		if (layoutFeature.canExecute(context)) {
 			layoutFeature.execute(context);
 		}
+
+		// Reset the buffered selection. Without this, the last object of the
+		// diagram will be selected at the first layout() call on any object
+		((DiagramBehavior) getDiagramBehavior()).setPictogramElementForSelection(null);
 
 		return true;
 	}
