@@ -29,17 +29,12 @@
 package net.sf.orcc.xdf.ui.wizards;
 
 import java.io.IOException;
-import java.util.Collections;
 
-import net.sf.orcc.df.Network;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.mm.pictograms.PictogramLink;
-import org.eclipse.graphiti.mm.pictograms.PictogramsFactory;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -65,7 +60,7 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 	public NewNetworkWizard() {
 		super();
 		// setNeedsProgressMonitor(true);
-		setWindowTitle("New XDF Network (tests)");
+		setWindowTitle("New XDF Network");
 	}
 
 	@Override
@@ -73,17 +68,18 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 
 		this.workbench = workbench;
 
-		WizardNewFileCreationPage page = new WizardNewFileCreationPage("filenameSelection", selection);
+		final WizardNewFileCreationPage page = new WizardNewFileCreationPage("filenameSelection", selection);
 		page.setFileExtension(Activator.NETWORK_SUFFIX);
-		page.setDescription("Here is my description");
+		page.setDescription("Select a parent resource and a name for your new network.");
+		page.setAllowExistingResources(false);
 
 		// Fill the page with a filename, if user selected one
 		if (!selection.isEmpty()) {
-			Object firstSel = selection.getFirstElement();
+			final Object firstSel = selection.getFirstElement();
 			if (firstSel instanceof IFile) {
-				IFile selectedFile = (IFile) firstSel;
-				String fileName = selectedFile.getName();
-				String ext = selectedFile.getFileExtension();
+				final IFile selectedFile = (IFile) firstSel;
+				final String fileName = selectedFile.getName();
+				final String ext = selectedFile.getFileExtension();
 				if (ext.isEmpty()) {
 					page.setFileName(fileName);
 				} else {
@@ -102,36 +98,25 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		final WizardNewFileCreationPage page = (WizardNewFileCreationPage) getPage("filenameSelection");
 		
-		IFile file = page.createNewFile();
+		final IFile file = page.createNewFile();
 		if (file == null) {
 			return false;
 		}
 
-		URI xdfUri = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
-		URI diagramUri = xdfUri.trimFileExtension().appendFileExtension(Activator.DIAGRAM_SUFFIX);
+		final URI xdfUri = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
 
 		try {
-
-			Network network = XdfUtil.createNetworkResource(xdfUri);
-			Diagram diagram = XdfUtil.createDiagramResource(diagramUri);
-
-			// Link diagram to network
-			PictogramLink link = PictogramsFactory.eINSTANCE.createPictogramLink();
-			link.getBusinessObjects().add(network);
-			diagram.setLink(link);
-
-			// Save again the diagram, to store the link in the .diagram file
-			diagram.eResource().save(Collections.EMPTY_MAP);
+			XdfUtil.createNetworkResource(xdfUri);
 		} catch (IOException e) {
 			return false;
 		}
 
 		// Open editor on new file.
-		IWorkbenchWindow dw = workbench.getActiveWorkbenchWindow();
+		final IWorkbenchWindow dw = workbench.getActiveWorkbenchWindow();
 		try {
 			if (dw != null) {
 				BasicNewResourceWizard.selectAndReveal(file, dw);
-				IWorkbenchPage activePage = dw.getActivePage();
+				final IWorkbenchPage activePage = dw.getActivePage();
 				if (activePage != null) {
 					IDE.openEditor(activePage, file, true);
 				}
