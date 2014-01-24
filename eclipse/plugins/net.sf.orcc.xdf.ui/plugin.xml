@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypes">
+      <diagramType
+            name="XDF Network"
+            type="xdfDiagram"
+            id="net.sf.orcc.xdf.ui.XdfDiagramType">
+      </diagramType>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypeProviders">
+      <diagramTypeProvider
+            name="Orcc Diagram Type Provider"
+            class="net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider"
+            id="net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider">
+         <diagramType
+               id="net.sf.orcc.xdf.ui.XdfDiagramType">
+         </diagramType>
+      </diagramTypeProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            canFinishEarly="false"
+            category="net.sf.orcc.ui.OrccCategory"
+            class="net.sf.orcc.xdf.ui.wizards.NewNetworkWizard"
+            hasPages="true"
+            icon="icons/network.gif"
+            id="net.sf.orcc.ui.wizards.newNetworkWizard"
+            name="XDF Network (Graphiti)"
+            project="false">
+         <description>
+            Create a new network based on new Graphiti editor.
+         </description>
+      </wizard>
+   </extension>
+   <extension point="org.eclipse.ui.editors">
+      <editor
+         class="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
+         contributorClass="net.sf.orcc.xdf.ui.editors.XdfActionBarContributor"
+         default="true"
+         extensions="xdf,xdfdiag"
+         icon="icons/network.gif"
+         id="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
+         name="Orcc Network Editor">
+      </editor>
+   </extension>
+  <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+    <propertyContributor contributorId="xdfDiagram.PropertyContributor">
+      <propertyCategory
+        category="net.sf.orcc.xdf.ui.editor.defaultCategory" />
+    </propertyContributor>
+  </extension>
+  <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+    <propertyTabs contributorId="xdfDiagram.PropertyContributor">
+       <propertyTab
+             category="net.sf.orcc.xdf.ui.editor.defaultCategory"
+             id="net.sf.orcc.xdf.ui.tabs.MainNetwork"
+             label="Main">
+       </propertyTab>
+      <propertyTab
+            afterTab="net.sf.orcc.xdf.ui.tabs.MainNetwork"
+            category="net.sf.orcc.xdf.ui.editor.defaultCategory"
+            id="net.sf.orcc.xdf.ui.tabs.ParametersNetwork"
+            label="Parameters">
+      </propertyTab>
+      <propertyTab
+            afterTab="net.sf.orcc.xdf.ui.tabs.ParametersNetwork"
+            category="net.sf.orcc.xdf.ui.editor.defaultCategory"
+            id="net.sf.orcc.xdf.ui.tabs.VariablesNetwork"
+            label="Variables">
+      </propertyTab>
+       <propertyTab
+             category="net.sf.orcc.xdf.ui.editor.defaultCategory"
+             id="net.sf.orcc.xdf.ui.tabs.MainInstance"
+             label="Main">
+       </propertyTab>
+      <propertyTab
+            afterTab="net.sf.orcc.xdf.ui.tabs.MainInstance"
+            category="net.sf.orcc.xdf.ui.editor.defaultCategory"
+            id="net.sf.orcc.xdf.ui.tabs.ArgumentsInstance"
+            label="Arguments">
+      </propertyTab>
+       <propertyTab
+             category="net.sf.orcc.xdf.ui.editor.defaultCategory"
+             id="net.sf.orcc.xdf.ui.tabs.MainPort"
+             label="Main">
+       </propertyTab>
+       <propertyTab
+             category="net.sf.orcc.xdf.ui.editor.defaultCategory"
+             id="net.sf.orcc.xdf.ui.tabs.MainConnection"
+             label="Main">
+       </propertyTab>
+    </propertyTabs>
+  </extension>
+  <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+    <propertySections contributorId="xdfDiagram.PropertyContributor">
+      <propertySection
+            class="net.sf.orcc.xdf.ui.properties.NetworkMainSection"
+            filter="net.sf.orcc.xdf.ui.properties.NetworkSectionFilter"
+            id="net.sf.orcc.xdf.ui.sections.network.MainSection"
+            tab="net.sf.orcc.xdf.ui.tabs.MainNetwork" />
+      <propertySection
+            class="net.sf.orcc.xdf.ui.properties.NetworkParametersSection"
+            filter="net.sf.orcc.xdf.ui.properties.NetworkSectionFilter"
+            id="net.sf.orcc.xdf.ui.sections.network.ParamatersSection"
+            tab="net.sf.orcc.xdf.ui.tabs.ParametersNetwork">
+      </propertySection>
+      <propertySection
+            class="net.sf.orcc.xdf.ui.properties.NetworkVariablesSection"
+            filter="net.sf.orcc.xdf.ui.properties.NetworkSectionFilter"
+            id="net.sf.orcc.xdf.ui.sections.network.VariablesSection"
+            tab="net.sf.orcc.xdf.ui.tabs.VariablesNetwork">
+      </propertySection>
+      <propertySection
+            class="net.sf.orcc.xdf.ui.properties.InstanceMainSection"
+            filter="net.sf.orcc.xdf.ui.properties.InstanceSectionFilter"
+            id="net.sf.orcc.xdf.ui.sections.instance.MainSection"
+            tab="net.sf.orcc.xdf.ui.tabs.MainInstance">
+      </propertySection>
+      <propertySection
+            class="net.sf.orcc.xdf.ui.properties.InstanceArgumentsSection"
+            filter="net.sf.orcc.xdf.ui.properties.InstanceSectionFilter"
+            id="net.sf.orcc.xdf.ui.sections.instance.ArgumentsSection"
+            tab="net.sf.orcc.xdf.ui.tabs.ArgumentsInstance">
+      </propertySection>
+      <propertySection
+            class="net.sf.orcc.xdf.ui.properties.PortMainSection"
+            filter="net.sf.orcc.xdf.ui.properties.PortSectionFilter"
+            id="net.sf.orcc.xdf.ui.sections.port.MainSection"
+            tab="net.sf.orcc.xdf.ui.tabs.MainPort">
+      </propertySection>
+      <propertySection
+            class="net.sf.orcc.xdf.ui.properties.ConnectionMainSection"
+            filter="net.sf.orcc.xdf.ui.properties.ConnectionSectionFilter"
+            id="net.sf.orcc.xdf.ui.sections.connection.MainSection"
+            tab="net.sf.orcc.xdf.ui.tabs.MainConnection">
+      </propertySection>
+    </propertySections>
+  </extension>
+</plugin>
