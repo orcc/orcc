@@ -29,8 +29,8 @@
             class="net.sf.orcc.xdf.ui.wizards.NewNetworkWizard"
             hasPages="true"
             icon="icons/network.gif"
-            id="net.sf.orcc.ui.wizards.newNetworkWizard"
-            name="XDF Network (Graphiti)"
+            id="net.sf.orcc.xdf.ui.wizards.newNetworkWizard"
+            name="XDF Network"
             project="false">
          <description>
             Create a new network based on new Graphiti editor.

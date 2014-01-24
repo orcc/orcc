@@ -477,19 +477,6 @@
             name="Project"
             project="true">
       </wizard>
-      <wizard
-            canFinishEarly="false"
-            category="net.sf.orcc.ui.OrccCategory"
-            class="net.sf.orcc.ui.NewNetworkWizard"
-            hasPages="true"
-            icon="icons/network.gif"
-            id="net.sf.orcc.ui.wizards.newNetworkWizard"
-            name="Network (XDF)"
-            project="false">
-         <description>
-            Create a new FU network.
-         </description>
-      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
