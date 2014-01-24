@@ -41,11 +41,11 @@
       <editor
          class="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
          contributorClass="net.sf.orcc.xdf.ui.editors.XdfActionBarContributor"
-         default="true"
+         default="false"
          extensions="xdf,xdfdiag"
          icon="icons/network.gif"
          id="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
-         name="Orcc Network Editor">
+         name="New Network Editor (Beta)">
       </editor>
    </extension>
   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
