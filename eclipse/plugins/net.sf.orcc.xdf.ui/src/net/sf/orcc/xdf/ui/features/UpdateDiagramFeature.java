@@ -154,17 +154,10 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 		if (diagram.getChildren().size() == 0 && network.getChildren().size() > 0) {
 			hasDoneChanges |= initializeDiagramFromNetwork(network, diagram);
-			return hasDoneChanges;
 		}
 
-		final String version = Graphiti.getPeService().getPropertyValue(diagram, GLOBAL_VERSION_KEY);
-		if (version == null) {
-			Graphiti.getPeService().setPropertyValue(diagram, GLOBAL_VERSION_KEY, CURRENT_EDITOR_VERSION);
-		}
-		// In future versions of this diagram editor, the diagram version should
-		// be checked here. This should be used to automatically update diagrams
-		// (styles, shapes tree, etc.) from an older to the current version of
-		// the editor.
+		updateVersion(diagram);
+
 		return hasDoneChanges;
 	}
 
@@ -344,5 +337,16 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		addContext.setLocation(10, 10);
 
 		return getFeatureProvider().addIfPossible(addContext);
+	}
+
+	private void updateVersion(final Diagram diagram) {
+		final String version = Graphiti.getPeService().getPropertyValue(diagram, GLOBAL_VERSION_KEY);
+		if (version == null) {
+			Graphiti.getPeService().setPropertyValue(diagram, GLOBAL_VERSION_KEY, CURRENT_EDITOR_VERSION);
+		}
+		// In future versions of this diagram editor, the diagram version should
+		// be checked here. This should be used to automatically update diagrams
+		// (styles, shapes tree, etc.) from an older to the current version of
+		// the editor.
 	}
 }
