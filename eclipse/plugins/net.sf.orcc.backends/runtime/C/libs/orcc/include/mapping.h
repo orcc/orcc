@@ -51,10 +51,10 @@ struct agent_s {
     int nb_threads;
 };
 
-typedef struct processor_s {
+typedef struct proc_info_s {
     int processor_id;
     int utilization;
-} processor_t;
+} proc_info_t;
 
 /**
  * Main routine of the mapping agent.
@@ -182,24 +182,24 @@ int do_quick_mapping(network_t *network, options_t *opt, idx_t *part);
  * Weighted Load Balancing strategy
  * @author Long Nguyen
  */
-void assign_actor_to_min_utilized_processor(network_t *network, idx_t *part, processor_t *processors, int nb_processors, int actorIndex);
+void assign_actor_to_min_utilized_processor(network_t *network, idx_t *part, proc_info_t *processors, int nb_processors, int actorIndex);
 int do_weighted_round_robin_mapping(network_t *network, options_t *opt, idx_t *part);
 
 /**
  * Communication Optimized Weighted Load Balancing strategy
  * @author Long Nguyen
  */
-int find_min_utilized_processor(processor_t *processors, int nb_processors);
-int calculate_comm_of_actor(network_t *network, processor_t *processors, int actorIndex, int procIndex);
+int find_min_utilized_processor(proc_info_t *processors, int nb_processors);
+int calculate_comm_of_actor(network_t *network, proc_info_t *processors, int actorIndex, int procIndex);
 int do_weighted_round_robin_comm_mapping(network_t *network, options_t *opt, idx_t *part);
 
 /**
  * Kernighan Lin Refinement Weighted Load Balancing strategy
  * @author Long Nguyen
  */
-int get_gain_of_actor(network_t *network, processor_t *processors, int actorIndex, int commProcessorIndex);
-void optimize_communication(network_t *network, idx_t *part, processor_t *processors, int procIndex1, int procIndex2);
-void do_KL_algorithm(network_t *network, idx_t *part, processor_t *processors, int nb_processors);
+int get_gain_of_actor(network_t *network, proc_info_t *processors, int actorIndex, int commProcessorIndex);
+void optimize_communication(network_t *network, idx_t *part, proc_info_t *processors, int procIndex1, int procIndex2);
+void do_KL_algorithm(network_t *network, idx_t *part, proc_info_t *processors, int nb_processors);
 int do_KLR_mapping(network_t *network, options_t *opt, idx_t *part);
 
 /**

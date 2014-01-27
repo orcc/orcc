@@ -112,10 +112,10 @@ mapping_t* map_actors(network_t *network) {
 /**
  * Creates a mapping structure.
  */
-processor_t* init_processors(int number_of_threads) {
+proc_info_t* init_processors(int number_of_threads) {
     int i;
 
-    processor_t* processors = (processor_t *) malloc(number_of_threads * sizeof(processor_t));
+    proc_info_t* processors = (proc_info_t *) malloc(number_of_threads * sizeof(proc_info_t));
     for (i = 0; i < number_of_threads; i++) {
         processors[i].processor_id = i;
         processors[i].utilization = 0;
@@ -127,7 +127,7 @@ processor_t* init_processors(int number_of_threads) {
 /**
  * Releases memory of the given mapping structure.
  */
-void delete_processors(processor_t *processors) {
+void delete_processors(proc_info_t *processors) {
     free(processors);
 }
 
@@ -433,7 +433,7 @@ int do_quick_mapping(network_t *network, options_t *opt, idx_t *part) {
  * Weighted Load Balancing strategy
  * @author Long Nguyen
  */
-void assign_actor_to_min_utilized_processor(network_t *network, idx_t *part, processor_t *processors, int nb_processors, int actorIndex) {
+void assign_actor_to_min_utilized_processor(network_t *network, idx_t *part, proc_info_t *processors, int nb_processors, int actorIndex) {
     int i, minIndex = 0;
     assert(processors != NULL);
     assert(part != NULL);
@@ -454,7 +454,7 @@ void assign_actor_to_min_utilized_processor(network_t *network, idx_t *part, pro
 int do_weighted_round_robin_mapping(network_t *network, options_t *opt, idx_t *part) {
     int ret = ORCC_OK;
     int i;
-    processor_t *processors;
+    proc_info_t *processors;
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
@@ -485,13 +485,13 @@ int do_weighted_round_robin_mapping(network_t *network, options_t *opt, idx_t *p
  * Communication Optimized Weighted Load Balancing strategy
  * @author Long Nguyen
  */
-int find_min_utilized_processor(processor_t *processors, int nb_processors) {
+int find_min_utilized_processor(proc_info_t *processors, int nb_processors) {
     assert(processors != NULL);
     // TODO
     return 0;
 }
 
-int calculate_comm_of_actor(network_t *network, processor_t *processors, int actorIndex, int procIndex) {
+int calculate_comm_of_actor(network_t *network, proc_info_t *processors, int actorIndex, int procIndex) {
     assert(processors != NULL);
     // TODO
     return 0;
@@ -510,7 +510,7 @@ int do_weighted_round_robin_comm_mapping(network_t *network, options_t *opt, idx
  * Kernighan Lin Refinement Weighted Load Balancing strategy
  * @author Long Nguyen
  */
-int get_gain_of_actor(network_t *network, processor_t *processors, int actorIndex, int commProcessorIndex) {
+int get_gain_of_actor(network_t *network, proc_info_t *processors, int actorIndex, int commProcessorIndex) {
     int i, comm1, comm2;
     assert(network != NULL);
     assert(processors != NULL);
@@ -543,7 +543,7 @@ int get_gain_of_actor(network_t *network, processor_t *processors, int actorInde
     return (comm2 - comm1);
 }
 
-void optimize_communication(network_t *network, idx_t *part, processor_t *processors, int procIndex1, int procIndex2) {
+void optimize_communication(network_t *network, idx_t *part, proc_info_t *processors, int procIndex1, int procIndex2) {
     int index1 = 0, index2 = 0;
     assert(network != NULL);
     assert(processors != NULL);
@@ -597,7 +597,7 @@ void optimize_communication(network_t *network, idx_t *part, processor_t *proces
     }
 }
 
-void do_KL_algorithm(network_t *network, idx_t *part, processor_t *processors, int nb_processors) {
+void do_KL_algorithm(network_t *network, idx_t *part, proc_info_t *processors, int nb_processors) {
     int i;
     assert(network != NULL);
     assert(processors != NULL);
@@ -611,7 +611,7 @@ void do_KL_algorithm(network_t *network, idx_t *part, processor_t *processors, i
 int do_KLR_mapping(network_t *network, options_t *opt, idx_t *part) {
     int ret = ORCC_OK;
     int i;
-    processor_t *processors;
+    proc_info_t *processors;
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
@@ -693,7 +693,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
     } else {
         int i;
         for (i = 0; i < network->nb_actors; i++) {
-            part[i] = network->actors[i]->processor_id;
+            part[i] = 0;
         }
     }
 
@@ -724,7 +724,7 @@ void *agent_routine(void *data) {
 
         // wait threads synchro
         for (i = 0; i < agent->nb_threads; i++) {
-            semaphore_wait(agent->sync->sem_monitor);
+            orcc_semaphore_wait(agent->sync->sem_monitor);
         }
 
         print_orcc_trace(ORCC_VL_VERBOSE_1, "\nRemap the actors...\n");
@@ -742,7 +742,7 @@ void *agent_routine(void *data) {
 
         // wakeup all threads
         for (i = 0; i < agent->nb_threads; i++) {
-            semaphore_set(agent->scheduler->schedulers[i]->sem_thread);
+            orcc_semaphore_set(agent->scheduler->schedulers[i]->sem_thread);
         }
 
     }
