@@ -525,6 +525,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		String name = variable.getName();
 		Var existing = getLocal(name);
 		int i = 0;
+		// TODO: maybe it is better to use index of a variable instead of
+		// managing the name directly here
 		while (existing != null) {
 			name = variable.getName() + i;
 			existing = getLocal(name);
