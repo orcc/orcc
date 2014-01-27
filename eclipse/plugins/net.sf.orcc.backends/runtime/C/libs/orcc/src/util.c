@@ -119,6 +119,12 @@ void print_usage() {
 	fflush(stdout);
 }
 
+#ifdef _MSC_VER
+void pause() {
+    system("pause");
+}
+#endif
+
 /////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
@@ -128,6 +134,10 @@ void init_orcc(int argc, char *argv[]) {
     int c;
 
 	program = argv[0];
+
+#ifdef _MSC_VER
+    atexit(&pause);
+#endif
 	
 	while ((c = getopt(argc, argv, ostr)) != -1) {
 		switch (c) {
