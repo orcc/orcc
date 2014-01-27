@@ -76,7 +76,7 @@ int nbFrames = DEFAULT_INFINITE;
 int nbThreads = 1;
 
 // Strategy for the actor mapping
-int mapping_strategy = 0;
+int mapping_strategy = ORCC_MS_WLB;
 
 // Number of frames to display before remapping application
 int nbProfiledFrames = 10;
