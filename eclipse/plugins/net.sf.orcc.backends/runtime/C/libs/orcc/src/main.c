@@ -83,8 +83,6 @@ void start_orcc_mapping(options_t *opt) {
     network_t *network;
     assert(opt != NULL);
 
-    mapping = allocate_mapping(opt->nb_processors);
-
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Starting Orcc-Map");
     print_orcc_trace(ORCC_VL_VERBOSE_1, "  Nb of processors\t: %d", opt->nb_processors);
     print_orcc_trace(ORCC_VL_VERBOSE_1, "  Input file\t\t: %s", opt->input_file);
@@ -93,9 +91,9 @@ void start_orcc_mapping(options_t *opt) {
     print_orcc_trace(ORCC_VL_VERBOSE_1, "  Verbose level\t: %d", verbose_level);
 
     network = load_network(opt->input_file);
+    mapping = allocate_mapping(opt->nb_processors, network->nb_actors);
 
     ret = do_mapping(network, opt, mapping);
-
     ret = save_mapping(opt->output_file, mapping);
 
     delete_mapping(mapping);

@@ -50,7 +50,7 @@ mapping_t* load_mapping(char *fileName, network_t *network) {
 
     configuration = roxml_load_doc(fileName);
     partitioning = roxml_get_chld(configuration, NULL, 0);
-    mapping = allocate_mapping(roxml_get_chld_nb(partitioning));
+    mapping = allocate_mapping(roxml_get_chld_nb(partitioning), network->nb_actors);
 
     for (i = 0; i < mapping->number_of_threads; i++) {
         partition = roxml_get_chld(partitioning, NULL, i);
@@ -60,7 +60,6 @@ mapping_t* load_mapping(char *fileName, network_t *network) {
         attribute = roxml_get_attr(partition, "id", 0);
         nb = roxml_get_content(attribute, NULL, 0, &size);
         mapping->threads_affinities[i] = atoi(nb);
-        mapping->partitions_of_actors[i] = (actor_t **) malloc(mapping->partitions_size[i] * sizeof(actor_t *));
 
         for (j = 0; j < mapping->partitions_size[i]; j++) {
             instance = roxml_get_chld(partition, NULL, j);

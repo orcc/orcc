@@ -89,7 +89,7 @@ mapping_t* map_actors(network_t *network);
 /**
  * Creates a mapping structure.
  */
-mapping_t *allocate_mapping(int number_of_threads);
+mapping_t *allocate_mapping(int nb_procs, int nb_actors);
 
 /**
  * Releases memory of the given mapping structure.

@@ -64,14 +64,19 @@ int find_mapped_core(mapping_t *mapping, actor_t *actor) {
 /**
  * Creates a mapping structure.
  */
-mapping_t *allocate_mapping(int number_of_threads) {
+mapping_t *allocate_mapping(int nb_procs, int nb_actors) {
+    int i;
     mapping_t *mapping;
-    assert(number_of_threads > 0);
+    assert(nb_procs > 0);
+    assert(nb_actors > 0);
     mapping = (mapping_t *) malloc(sizeof(mapping_t));
-    mapping->number_of_threads = number_of_threads;
-    mapping->partitions_of_actors = malloc(number_of_threads * sizeof(*mapping->partitions_of_actors));
-    mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
-    mapping->threads_affinities = (int*) malloc(number_of_threads * sizeof(int));
+    mapping->number_of_threads = nb_procs;
+    mapping->partitions_of_actors = (actor_t***) malloc(nb_procs * sizeof(actor_t**));
+    for(i = 0; i < nb_procs; i++) {
+        mapping->partitions_of_actors[i] = (actor_t**) malloc(nb_actors * sizeof(actor_t*));
+    }
+    mapping->partitions_size = (int*) malloc(nb_procs * sizeof(int));
+    mapping->threads_affinities = (int*) malloc(nb_procs * sizeof(int));
     return mapping;
 }
 
@@ -93,11 +98,10 @@ mapping_t* map_actors(network_t *network) {
 
     if (mapping_file == NULL) {
         // Create mapping with only one partition
-        mapping = allocate_mapping(1);
+        mapping = allocate_mapping(1, network->nb_actors);
         mapping->threads_affinities[0] = 0;
         mapping->partitions_size[0] = network->nb_actors;
-        // FIXME: Need a copy of the partition
-        mapping->partitions_of_actors[0] = network->actors;
+        memcpy(mapping->partitions_of_actors[0], network->actors, network->nb_actors * sizeof(actor_t*));
         return mapping;
     } else {
         mapping = load_mapping(mapping_file, network);
@@ -421,7 +425,7 @@ int do_quick_mapping(network_t *network, options_t *opt, idx_t *part) {
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
-	// TODO
+    // TODO
     return ret;
 }
 
@@ -483,13 +487,13 @@ int do_weighted_round_robin_mapping(network_t *network, options_t *opt, idx_t *p
  */
 int find_min_utilized_processor(processor_t *processors, int nb_processors) {
     assert(processors != NULL);
-	// TODO
+    // TODO
     return 0;
 }
 
 int calculate_comm_of_actor(network_t *network, processor_t *processors, int actorIndex, int procIndex) {
     assert(processors != NULL);
-	// TODO
+    // TODO
     return 0;
 }
 
@@ -498,7 +502,7 @@ int do_weighted_round_robin_comm_mapping(network_t *network, options_t *opt, idx
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
-	// TODO
+    // TODO
     return ret;
 }
 
@@ -755,7 +759,7 @@ agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *schedu
     agent->options = options;
     agent->scheduler = scheduler;
     agent->network = network;
-    agent->mapping = allocate_mapping(nb_threads);
+    agent->mapping = allocate_mapping(nb_threads, network->nb_actors);
     agent->nb_threads = nb_threads;
     return agent;
 }
