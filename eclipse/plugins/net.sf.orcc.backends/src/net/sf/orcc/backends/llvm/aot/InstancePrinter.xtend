@@ -72,20 +72,6 @@ import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.backends.BackendsConstants.*
 
 /*
  * Compile Instance llvm source code
