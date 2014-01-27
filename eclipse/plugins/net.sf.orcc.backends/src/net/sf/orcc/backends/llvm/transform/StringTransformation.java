@@ -109,12 +109,12 @@ public class StringTransformation extends DfVisitor<Void> {
 		 */
 		protected void transformPrint(InstCall call) {
 			String value = new String();
-			List<Arg> newParameters = new ArrayList<Arg>();
-			List<Arg> parameters = call.getArguments();
+			List<Arg> newArguments = new ArrayList<Arg>();
+			List<Arg> arguments = call.getArguments();
 
 			// Iterate though all the println arguments to provide an only
 			// string value
-			for (Arg arg : parameters) {
+			for (Arg arg : arguments) {
 				if (arg.isByVal()) {
 					Expression expr = ((ArgByVal) arg).getValue();
 					if (expr.isExprString()) {
@@ -153,18 +153,18 @@ public class StringTransformation extends DfVisitor<Void> {
 
 			Var variable = createStringVariable(value);
 			stateVars.add(variable);
-			newParameters.add(factory.createArgByVal(variable));
+			newArguments.add(factory.createArgByVal(variable));
 
-			for (Arg arg : parameters) {
+			for (Arg arg : arguments) {
 				if (arg.isByVal()) {
 					Expression expr = ((ArgByVal) arg).getValue();
 					if (!expr.isExprString()) {
-						newParameters.add(arg);
+						newArguments.add(arg);
 					}
 				}
 			}
-			parameters.clear();
-			parameters.addAll(newParameters);
+			arguments.clear();
+			arguments.addAll(newArguments);
 		}
 	}
 
