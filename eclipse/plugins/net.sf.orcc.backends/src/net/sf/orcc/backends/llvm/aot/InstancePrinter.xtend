@@ -426,6 +426,7 @@ class InstancePrinter extends LLVMTemplate {
 			«val extName = name + "_" + stateName + action.name»
 			«val numTokens = action.outputPattern.numTokensMap.get(port)»
 			«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
+				
 					%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
 					%tmp_vect2_«extName» = add i32 %index_«extName», «numTokens»
 					%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
