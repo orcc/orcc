@@ -143,6 +143,7 @@ class NetworkPrinter extends CTemplate {
 		#include "dataflow.h"
 		«IF profileNetwork || dynamicMapping»
 			#include "cycle.h"
+			#include "serialize.h"
 		«ENDIF»
 		«IF dynamicMapping»
 			#include "options.h"
@@ -276,14 +277,13 @@ class NetworkPrinter extends CTemplate {
 				thread_struct thread_agent;
 				thread_id_struct thread_agent_id;
 				sync_t sync;
-				
 				options_t *options = set_options(mapping_strategy, nb_threads);
-				sync_init(&sync);
 			«ENDIF»
 			
 			global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, «IF dynamicMapping»&sync«ELSE»NULL«ENDIF»);
 			«IF dynamicMapping»
 				agent_t *agent = agent_init(&sync, options, scheduler, &network, nb_threads);
+				sync_init(&sync);
 			«ENDIF»
 			
 			global_scheduler_init(scheduler, mapping);
