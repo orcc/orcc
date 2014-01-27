@@ -69,7 +69,7 @@ else()
             src/display_sdl2.c
         )
     else()
-        find_package(SDL QUIET)
+        find_package(SDL REQUIRED)
         if(SDL_FOUND)
             include_directories(
                 ${SDL_INCLUDE_DIR}
