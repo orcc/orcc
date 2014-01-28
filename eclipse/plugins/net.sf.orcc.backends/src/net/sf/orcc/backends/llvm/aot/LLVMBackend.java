@@ -218,7 +218,7 @@ public class LLVMBackend extends AbstractBackend {
 		OrccLogger.traceln("Printing network...");
 		new NetworkPrinter(network, options).print(srcPath);
 
-		new CMakePrinter(network, options).printFiles(path);
+		new CMakePrinter(network).printCMakeFiles(path);
 	}
 
 	@Override

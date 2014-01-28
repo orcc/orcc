@@ -28,54 +28,23 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
-import java.io.File
-import java.util.Map
-import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate CMakeList.txt content
  * 
  * @author Antoine Lorence
  */
-class CMakePrinter extends CommonPrinter {
-	
-	Network network;
+class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 
-	new(Network network, Map<String, Object> options) {
-		this.network = network;
-	}
-	
-	def printFiles(String targetFolder) {
-		
-		var int cachedFiles = 0
-				
-		var content = rootCMakeContent
-		var file = new File(targetFolder + File::separator + "CMakeLists.txt")
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-		} else {
-			cachedFiles = cachedFiles + 1
-		}
-		
-		content = srcCMakeContent
-		file = new File(targetFolder + File::separator + "src" + File::separator + "CMakeLists.txt")
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-		} else {
-			cachedFiles = cachedFiles + 1
-		}
-		
-		return cachedFiles
+	new(Network network) {
+		super(network);
 	}
 	
 	/**
 	 * Return CMakeList's content to write in the root target folder
 	 */
-	def private rootCMakeContent() '''
+	 override protected rootCMakeContent() '''
 		# Generated from «network.simpleName»
 		cmake_minimum_required (VERSION 2.6)
 
@@ -107,7 +76,7 @@ class CMakePrinter extends CommonPrinter {
 	/**
 	 * Return CMakeList's content to write in the src subdirectory
 	 */
-	def private srcCMakeContent() '''
+	override protected srcCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		set(«network.simpleName»_SRCS
