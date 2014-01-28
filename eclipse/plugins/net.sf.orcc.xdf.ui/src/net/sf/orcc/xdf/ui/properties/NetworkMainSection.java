@@ -60,6 +60,7 @@ public class NetworkMainSection extends AbstractGridBasedSection {
 		networkName = widgetFactory.createText(formBody, "", SWT.BORDER);
 		networkName.setLayoutData(fillHorizontalData);
 		networkName.setEditable(false);
+		networkName.setBackground(disabledFieldBGColor);
 	}
 
 	@Override

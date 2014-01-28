@@ -38,7 +38,10 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.forms.widgets.Form;
@@ -67,8 +70,11 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 
 	protected final PartialCalParser calParser;
 
+	protected final Color disabledFieldBGColor;
+
 	public AbstractDiagramSection() {
 		calParser = new PartialCalParser();
+		disabledFieldBGColor = new Color(Display.getCurrent(), new RGB(230, 230, 230));
 	}
 
 	@Override

@@ -64,12 +64,14 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 		widgetFactory.createCLabel(formBody, "Refinement:");
 		refinementValue = widgetFactory.createText(formBody, "", SWT.BORDER);
 		refinementValue.setEditable(false);
+		refinementValue.setBackground(disabledFieldBGColor);
 		refinementValue.setLayoutData(fillHorizontalData);
 
 		widgetFactory.createCLabel(formBody, "Part. name:");
 		part_name = widgetFactory.createText(formBody, "", SWT.BORDER);
 		part_name.setLayoutData(fillHorizontalData);
 		part_name.setEditable(false);
+		part_name.setBackground(disabledFieldBGColor);
 	}
 
 	@Override
