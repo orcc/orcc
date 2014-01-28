@@ -20,7 +20,6 @@ if(NO_EXTERNAL_DEPENDENCIES)
 
     add_library(orcc STATIC ${orcc_sources})
 
-
 # Build library with all features (require external libraries)
 else()
 
@@ -111,20 +110,20 @@ else()
         target_link_libraries(orcc metis m)
     endif()
 
-    set(executable_filenames
+    set(orccmap_sources
         include/serialize.h
         src/serialize.c
         src/main.c
     )
 
     # Compile executable
-    add_executable(orcc-map ${executable_filenames})
+    add_executable(orcc-map ${orccmap_sources})
     target_link_libraries(orcc-map orcc roxml)
 
     INSTALL(TARGETS orcc-map orcc
-      RUNTIME DESTINATION bin
-      LIBRARY DESTINATION lib
-      ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
     )
 
 endif()
