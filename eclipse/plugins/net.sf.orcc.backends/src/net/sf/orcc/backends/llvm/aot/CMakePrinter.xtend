@@ -79,10 +79,10 @@ class CMakePrinter extends CommonPrinter {
 		# Generated from «network.simpleName»
 		cmake_minimum_required (VERSION 2.6)
 
-		project («network.simpleName» C)
-
 		# Default compiler must be clang
 		set(CMAKE_C_COMPILER "clang")
+		project («network.simpleName» C)
+
 		# Configure specific flags for clang (according to selected build type)
 		if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
 		    string(TOUPPER ${CMAKE_BUILD_TYPE} CMBT)
