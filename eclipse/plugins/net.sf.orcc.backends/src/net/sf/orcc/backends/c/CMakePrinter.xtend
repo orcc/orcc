@@ -50,9 +50,15 @@ class CMakePrinter extends CommonPrinter {
 	def printCMakeFiles(String targetFolder) {
 		val root = new File(targetFolder + File::separator + "CMakeLists.txt")
 		val src = new File(targetFolder + File::separator + "src" + File::separator + "CMakeLists.txt")
+		val rootContent = rootCMakeContent
+		val srcContent = srcCMakeContent
 		
-		OrccUtil::printFile(rootCMakeContent, root)
-		OrccUtil::printFile(srcCMakeContent, src)
+		if(needToWriteFile(rootContent, root)) {
+			OrccUtil::printFile(rootContent, root)
+		}
+		if(needToWriteFile(srcContent, src)) {
+			OrccUtil::printFile(srcContent, src)
+		}
 	}
 	
 	def protected rootCMakeContent() '''
