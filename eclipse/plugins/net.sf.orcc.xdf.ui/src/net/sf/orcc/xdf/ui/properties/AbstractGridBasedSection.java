@@ -59,8 +59,12 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 
 	private final Map<Widget, Object> initialialValues = new HashMap<Widget, Object>();
 
+	/** See {@link #addHiddenTextFieldToForm(Composite)} javadoc for information */
+	private Text fake;
+
 	@Override
-	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
+	public void createControls(Composite parent,
+			TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
 
 		final GridLayout gridLayout = new GridLayout(2, false);
@@ -68,6 +72,8 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 
 		// Set GridLayout as default for a properties section
 		formBody.setLayout(gridLayout);
+
+		addHiddenTextFieldToForm(formBody);
 	}
 
 	@Override
@@ -79,6 +85,11 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 		// Update initial values
 		for (final Control widget : widgetList) {
 			initialialValues.put(widget, getValue(widget));
+		}
+
+		// Fix related to a bug. See addHiddenTextFieldToForm() javadoc
+		if (fake != null && !fake.isDisposed()) {
+			fake.setFocus();
 		}
 
 		// Set listeners if not already set
@@ -100,7 +111,7 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 				@Override
 				public void keyTraversed(TraverseEvent e) {
 					// User press the RETURN key
-					if(e.detail == SWT.TRAVERSE_RETURN) {
+					if (e.detail == SWT.TRAVERSE_RETURN) {
 						final Widget widget = e.widget;
 						writeValuesInTransaction(widget);
 						initialialValues.put(widget, getValue(widget));
@@ -131,5 +142,47 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 		}
 		// Implements this getter for other kind of widgets
 		return null;
+	}
+
+	/**
+	 * I need to apologies for that... Because of the Orcc issue #68 related to
+	 * the eclipse/SWT bug 383750, Mac OS users had problems when focusing on a
+	 * Text field different from the first on the page.
+	 * 
+	 * To avoid that, we create a hidden Text, and we ensure this text is
+	 * focused when refresh() method is called. With that trick, before user
+	 * click the first time on a field, this one has take the (wrong) value set
+	 * by SWT on first focus.
+	 * 
+	 * This awful workaround should be deleted if the bug 383750 on
+	 * bugs.eclipse.org is fixed.
+	 * 
+	 * @param formBody
+	 * @see <a
+	 *      href="https://github.com/orcc/orcc/issues/68">https://github.com/orcc/orcc/issues/68</a>
+	 * @see <a
+	 *      href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=383750">https://bugs.eclipse.org/bugs/show_bug.cgi?id=383750</a>
+	 */
+	private void addHiddenTextFieldToForm(final Composite formBody) {
+		// This fix applies only on Mac OS systems
+		if (!System.getProperty("os.name").startsWith("Mac OS")) {
+			return;
+		}
+
+		// The grid data used to reduce space of the fake Text field
+		final GridData hiddenData = new GridData(0, 0);
+		// It takes 2 columns spaces in the table
+		hiddenData.horizontalSpan = 2;
+
+		// The fake Text field
+		fake = widgetFactory.createText(formBody, "");
+		fake.setLayoutData(hiddenData);
+
+		// Here is the trick. To hide the fake Text field, we change top margin
+		// value to move the content up, and bottom margin to prevent from
+		// cropping the end of the table content. This is very bad, but it
+		// works.
+		((GridLayout) formBody.getLayout()).marginHeight = -5; // default was 5
+		((GridLayout) formBody.getLayout()).marginBottom = 10; // default was 0
 	}
 }
