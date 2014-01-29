@@ -114,6 +114,9 @@
                id="net.sf.orcc.backends.llvm.aot.targetTriple">
          </option>
          <option
+               id="net.sf.orcc.backends.llvm.aot.dataLayout">
+         </option>
+         <option
                id="net.sf.orcc.core.classify">
          </option>
          <option
@@ -391,6 +394,13 @@
 				description="Specify the target triple"
 				id="net.sf.orcc.backends.llvm.aot.targetTriple"
 				name="Target triple">
+			<textBox></textBox>
+		</option>
+		<option
+				defaultValue="e-p:64:64:64-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-s0:64:64-f80:128:128-n8:16:32:64-S128"
+				description="Specify the Data Layout"
+				id="net.sf.orcc.backends.llvm.aot.dataLayout"
+				name="Data Layout">
 			<textBox></textBox>
 		</option>
   <option

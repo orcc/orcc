@@ -92,6 +92,7 @@ class InstancePrinter extends LLVMTemplate {
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
 	protected var optionInline = false
+	protected var optionDatalayout = "e-p:64:64:64-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-s0:64:64-f80:128:128-n8:16:32:64-S128"
 	protected var optionArch = "x86_64"
 
 	protected var boolean isActionVectorizable = false
@@ -105,6 +106,9 @@ class InstancePrinter extends LLVMTemplate {
 		}
 		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
 			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
+		}
+		if(options.containsKey("net.sf.orcc.backends.llvm.aot.datdaLayout")){
+			optionDatalayout = options.get("net.sf.orcc.backends.llvm.aot.datdaLayout") as String
 		}
 	}
 	
@@ -174,6 +178,7 @@ class InstancePrinter extends LLVMTemplate {
 	def protected getFileContent() '''
 		«val inputs = actor.inputs.notNative»
 		«val outputs = actor.outputs.notNative»
+		«printDatalayout»
 		«printArchitecture»
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -254,6 +259,8 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDIF»
 	'''
 	
+	def protected printDatalayout() '''target datalayout = "«optionDatalayout»"'''
+
 	def protected printArchitecture() '''target triple = "«optionArch»"'''
 	
 	def private schedulerWithFSM() '''
