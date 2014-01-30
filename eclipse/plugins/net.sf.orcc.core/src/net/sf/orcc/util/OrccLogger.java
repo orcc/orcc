@@ -127,16 +127,6 @@ public class OrccLogger {
 
 	private static Logger logger;
 
-	/*
-	 * FIXME: Add Javadoc ! It is really important to keep everything logic and
-	 * make it simple to understand for everybody who needs to use it.
-	 */
-	public static void changeFormatter(Formatter formatter) {
-		for (Handler handler : getLogger().getHandlers()) {
-			handler.setFormatter(formatter);
-		}
-	}
-
 	/**
 	 * Register specific log Handler to display messages sent threw OrccLogger
 	 * with a default formatter. If this method is never called, the default
@@ -168,6 +158,59 @@ public class OrccLogger {
 		logger = newLog;
 
 		setLevel(OrccLevel.TRACE);
+	}
+
+	/**
+	 * Return the current logger, or a newly created one if it doesn't exists.
+	 * If it is created here, a default ConsoleHandler is used as Logger's
+	 * Handler.
+	 * 
+	 * @return
+	 */
+	private static Logger getLogger() {
+		if (logger == null) {
+			configureLoggerWithHandler(new ConsoleHandler());
+		}
+		return logger;
+	}
+
+	/*
+	 * FIXME: Add Javadoc !
+	 */
+	public static void hide(OrccLevel level) {
+		level.setLevel(Level.ALL);
+	}
+
+	/*
+	 * FIXME: Add Javadoc !
+	 */
+	public static void restoreLevels() {
+		for (OrccLevel level : OrccLevel.values()) {
+			level.setLevel(level.defaultLevel);
+		}
+	}
+
+	/*
+	 * FIXME: Add Javadoc !
+	 */
+	public static void changeFormatter(Formatter formatter) {
+		for (Handler handler : getLogger().getHandlers()) {
+			handler.setFormatter(formatter);
+		}
+	}
+
+	/**
+	 * Set the minimum level displayed. By default, OrccLogger display messages
+	 * from INFO level and highest. Call this method with DEBUG or ALL as
+	 * argument to display debug messages.
+	 * 
+	 * @param level
+	 */
+	public static void setLevel(OrccLevel level) {
+		getLogger().setLevel(level.getLevel());
+		for (Handler handler : getLogger().getHandlers()) {
+			handler.setLevel(level.getLevel());
+		}
 	}
 
 	/**
@@ -203,24 +246,6 @@ public class OrccLogger {
 	}
 
 	/**
-	 * Return the current logger, or a newly created one if it doesn't exists.
-	 * If it is created here, a default ConsoleHandler is used as Logger's
-	 * Handler.
-	 * 
-	 * @return
-	 */
-	private static Logger getLogger() {
-		if (logger == null) {
-			configureLoggerWithHandler(new ConsoleHandler());
-		}
-		return logger;
-	}
-
-	public static void hide(OrccLevel level) {
-		level.setLevel(Level.ALL);
-	}
-
-	/**
 	 * Display a notice message to current console.
 	 * 
 	 * @param message
@@ -250,26 +275,6 @@ public class OrccLogger {
 				content.toString());
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
-	}
-
-	public static void restoreLevels() {
-		for (OrccLevel level : OrccLevel.values()) {
-			level.setLevel(level.defaultLevel);
-		}
-	}
-
-	/**
-	 * Set the minimum level displayed. By default, OrccLogger display messages
-	 * from INFO level and highest. Call this method with DEBUG or ALL as
-	 * argument to display debug messages.
-	 * 
-	 * @param level
-	 */
-	public static void setLevel(OrccLevel level) {
-		getLogger().setLevel(level.getLevel());
-		for (Handler handler : getLogger().getHandlers()) {
-			handler.setLevel(level.getLevel());
-		}
 	}
 
 	/**
