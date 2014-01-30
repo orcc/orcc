@@ -31,6 +31,7 @@ package net.sf.orcc.xdf.ui.properties;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -165,7 +166,7 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 	 */
 	private void addHiddenTextFieldToForm(final Composite formBody) {
 		// This fix applies only on Mac OS systems
-		if (!System.getProperty("os.name").startsWith("Mac OS")) {
+		if (!Platform.getOS().equals(Platform.OS_MACOSX)) {
 			return;
 		}
 
