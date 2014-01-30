@@ -748,11 +748,11 @@ class InstancePrinter extends CTemplate {
 			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
 				i32 index_aligned_«port.name» = index_«port.name» % SIZE_«port.name»;
 			«ENDFOR»
-			
+
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
-	
+
 			«writeTraces(action.inputPattern)»
 	
 			«FOR block : action.body.blocks»
@@ -774,7 +774,7 @@ class InstancePrinter extends CTemplate {
 					write_end_«port.name»();
 				«ENDIF»
 			«ENDFOR»
-			
+
 			«action.profileEnd»
 		}
 	'''	
@@ -819,6 +819,7 @@ class InstancePrinter extends CTemplate {
 		isActionVectorizable = false
 		'''
 		«action.scheduler.print»
+		
 		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
 			«printCore(action, false)»
 		«ENDIF»
