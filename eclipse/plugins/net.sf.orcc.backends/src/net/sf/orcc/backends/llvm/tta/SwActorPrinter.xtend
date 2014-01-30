@@ -74,6 +74,8 @@ class SwActorPrinter extends InstancePrinter {
 		'''
 	}
 	
+	override protected printDatalayout() ''''''
+
 	override protected printArchitecture() ''''''
 
 	override protected printVectorizable(Action action) {
