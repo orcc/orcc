@@ -64,8 +64,8 @@ public class OrccLogger {
 			if (!(record.getParameters() != null
 					&& record.getParameters().length > 0 && record
 						.getParameters()[0].equals("-raw"))) {
-				Date date = new Date(record.getMillis());
-				DateFormat df = DateFormat.getTimeInstance();
+				final Date date = new Date(record.getMillis());
+				final DateFormat df = DateFormat.getTimeInstance();
 
 				output += df.format(date);
 				// Default printing for warn & severe
@@ -175,8 +175,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void debug(String message) {
-		getLogger().log(OrccLevel.DEBUG.getLevel(), message);
+	public static void debug(Object content) {
+		getLogger().log(OrccLevel.DEBUG.getLevel(), content.toString());
 	}
 
 	/**
@@ -185,8 +185,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void debugln(String message) {
-		debug(message + System.getProperty("line.separator"));
+	public static void debugln(Object content) {
+		debug(content + System.getProperty("line.separator"));
 	}
 
 	/**
@@ -195,8 +195,9 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void debugRaw(String message) {
-		LogRecord record = new LogRecord(OrccLevel.DEBUG.getLevel(), message);
+	public static void debugRaw(Object content) {
+		final LogRecord record = new LogRecord(OrccLevel.DEBUG.getLevel(),
+				content.toString());
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
@@ -224,8 +225,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void notice(String message) {
-		getLogger().log(OrccLevel.NOTICE.getLevel(), message);
+	public static void notice(Object content) {
+		getLogger().log(OrccLevel.NOTICE.getLevel(), content.toString());
 	}
 
 	/**
@@ -234,8 +235,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void noticeln(String message) {
-		notice(message + System.getProperty("line.separator"));
+	public static void noticeln(Object content) {
+		notice(content + System.getProperty("line.separator"));
 	}
 
 	/**
@@ -244,8 +245,9 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void noticeRaw(String message) {
-		LogRecord record = new LogRecord(OrccLevel.NOTICE.getLevel(), message);
+	public static void noticeRaw(Object content) {
+		final LogRecord record = new LogRecord(OrccLevel.NOTICE.getLevel(),
+				content.toString());
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
@@ -275,8 +277,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void severe(String message) {
-		getLogger().log(OrccLevel.SEVERE.getLevel(), message);
+	public static void severe(Object content) {
+		getLogger().log(OrccLevel.SEVERE.getLevel(), content.toString());
 	}
 
 	/**
@@ -285,8 +287,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void severeln(String message) {
-		severe(message + System.getProperty("line.separator"));
+	public static void severeln(Object content) {
+		severe(content + System.getProperty("line.separator"));
 	}
 
 	/**
@@ -295,8 +297,9 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void severeRaw(String message) {
-		LogRecord record = new LogRecord(OrccLevel.SEVERE.getLevel(), message);
+	public static void severeRaw(Object content) {
+		final LogRecord record = new LogRecord(OrccLevel.SEVERE.getLevel(),
+				content.toString());
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
@@ -306,8 +309,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void trace(String message) {
-		getLogger().log(OrccLevel.TRACE.getLevel(), message);
+	public static void trace(Object content) {
+		getLogger().log(OrccLevel.TRACE.getLevel(), content.toString());
 	}
 
 	/**
@@ -316,8 +319,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void traceln(String message) {
-		trace(message + System.getProperty("line.separator"));
+	public static void traceln(Object content) {
+		trace(content + System.getProperty("line.separator"));
 	}
 
 	/**
@@ -326,8 +329,9 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void traceRaw(String message) {
-		LogRecord record = new LogRecord(OrccLevel.TRACE.getLevel(), message);
+	public static void traceRaw(Object content) {
+		final LogRecord record = new LogRecord(OrccLevel.TRACE.getLevel(),
+				content.toString());
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
@@ -337,8 +341,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void warn(String message) {
-		getLogger().log(OrccLevel.WARNING.getLevel(), message);
+	public static void warn(Object content) {
+		getLogger().log(OrccLevel.WARNING.getLevel(), content.toString());
 	}
 
 	/**
@@ -347,8 +351,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void warnln(String message) {
-		warn(message + System.getProperty("line.separator"));
+	public static void warnln(Object content) {
+		warn(content + System.getProperty("line.separator"));
 	}
 
 	/**
@@ -357,8 +361,9 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void warnRaw(String message) {
-		LogRecord record = new LogRecord(OrccLevel.WARNING.getLevel(), message);
+	public static void warnRaw(Object content) {
+		LogRecord record = new LogRecord(OrccLevel.WARNING.getLevel(),
+				content.toString());
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
