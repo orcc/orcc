@@ -30,6 +30,7 @@ package net.sf.orcc.backends.llvm.aot
 
 import java.io.File
 import java.util.Map
+import net.sf.orcc.backends.BackendsConstants
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
@@ -43,18 +44,18 @@ import net.sf.orcc.util.OrccUtil
 class NetworkPrinter extends LLVMTemplate {
 	
 	Network network;
-	var optionArch = "x86_64"
-	var optionDatalayout = "e-p:64:64:64-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-s0:64:64-f80:128:128-n8:16:32:64-S128"
+	protected var optionDatalayout = BackendsConstants::LLVM_DEFAULT_TARGET_DATALAYOUT
+	protected var optionArch = BackendsConstants::LLVM_DEFAULT_TARGET_TRIPLE
 	
 	new(Network network, Map<String, Object> options){
 		super()
 		this.network = network
 		
-		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
-			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
+		if(options.containsKey(BackendsConstants::LLVM_TARGET_TRIPLE)){
+			optionArch = options.get(BackendsConstants::LLVM_TARGET_TRIPLE) as String
 		}
-		if(options.containsKey("net.sf.orcc.backends.llvm.aot.datdaLayout")){
-			optionDatalayout = options.get("net.sf.orcc.backends.llvm.aot.datdaLayout") as String
+		if(options.containsKey(BackendsConstants::LLVM_TARGET_DATALAYOUT)){
+			optionDatalayout = options.get(BackendsConstants::LLVM_TARGET_DATALAYOUT) as String
 		}
 	}
 		

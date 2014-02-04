@@ -72,6 +72,7 @@ import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.backends.BackendsConstants.*
+import net.sf.orcc.backends.BackendsConstants
 
 /*
  * Compile Instance llvm source code
@@ -92,8 +93,8 @@ class InstancePrinter extends LLVMTemplate {
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
 	protected var optionInline = false
-	protected var optionDatalayout = "e-p:64:64:64-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-s0:64:64-f80:128:128-n8:16:32:64-S128"
-	protected var optionArch = "x86_64"
+	protected var optionDatalayout = BackendsConstants::LLVM_DEFAULT_TARGET_DATALAYOUT
+	protected var optionArch = BackendsConstants::LLVM_DEFAULT_TARGET_TRIPLE
 
 	protected var boolean isActionVectorizable = false
 	
@@ -104,11 +105,11 @@ class InstancePrinter extends LLVMTemplate {
 		if(options.containsKey(INLINE)){
 			optionInline = options.get(INLINE) as Boolean
 		}
-		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
-			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
+		if(options.containsKey(BackendsConstants::LLVM_TARGET_TRIPLE)){
+			optionArch = options.get(BackendsConstants::LLVM_TARGET_TRIPLE) as String
 		}
-		if(options.containsKey("net.sf.orcc.backends.llvm.aot.datdaLayout")){
-			optionDatalayout = options.get("net.sf.orcc.backends.llvm.aot.datdaLayout") as String
+		if(options.containsKey(BackendsConstants::LLVM_TARGET_DATALAYOUT)){
+			optionDatalayout = options.get(BackendsConstants::LLVM_TARGET_DATALAYOUT) as String
 		}
 	}
 	
