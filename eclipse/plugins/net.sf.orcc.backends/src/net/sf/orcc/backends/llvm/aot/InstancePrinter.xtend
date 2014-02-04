@@ -72,6 +72,7 @@ import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.backends.BackendsConstants.*
+import net.sf.orcc.backends.BackendsConstants
 
 /*
  * Compile Instance llvm source code
@@ -92,7 +93,8 @@ class InstancePrinter extends LLVMTemplate {
 	val Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>
 	
 	protected var optionInline = false
-	protected var optionArch = "x86_64"
+	protected var optionDatalayout = BackendsConstants::LLVM_DEFAULT_TARGET_DATALAYOUT
+	protected var optionArch = BackendsConstants::LLVM_DEFAULT_TARGET_TRIPLE
 
 	protected var boolean isActionVectorizable = false
 	
@@ -103,8 +105,11 @@ class InstancePrinter extends LLVMTemplate {
 		if(options.containsKey(INLINE)){
 			optionInline = options.get(INLINE) as Boolean
 		}
-		if(options.containsKey("net.sf.orcc.backends.llvm.aot.targetTriple")){
-			optionArch = options.get("net.sf.orcc.backends.llvm.aot.targetTriple") as String
+		if(options.containsKey(BackendsConstants::LLVM_TARGET_TRIPLE)){
+			optionArch = options.get(BackendsConstants::LLVM_TARGET_TRIPLE) as String
+		}
+		if(options.containsKey(BackendsConstants::LLVM_TARGET_DATALAYOUT)){
+			optionDatalayout = options.get(BackendsConstants::LLVM_TARGET_DATALAYOUT) as String
 		}
 	}
 	
@@ -151,7 +156,7 @@ class InstancePrinter extends LLVMTemplate {
 		
 		this.instance = instance
 		this.name = instance.name
-		this.actor = instance.actor
+		this.actor = instance.getActor
 		this.incomingPortMap = instance.incomingPortMap
 		this.outgoingPortMap = instance.outgoingPortMap
 
@@ -174,6 +179,7 @@ class InstancePrinter extends LLVMTemplate {
 	def protected getFileContent() '''
 		«val inputs = actor.inputs.notNative»
 		«val outputs = actor.outputs.notNative»
+		«printDatalayout»
 		«printArchitecture»
 		
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -254,6 +260,8 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDIF»
 	'''
 	
+	def protected printDatalayout() '''target datalayout = "«optionDatalayout»"'''
+
 	def protected printArchitecture() '''target triple = "«optionArch»"'''
 	
 	def private schedulerWithFSM() '''
@@ -354,9 +362,9 @@ class InstancePrinter extends LLVMTemplate {
 				«ENDIF»
 			
 			bb_«extName»_fire:
-			«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
+			«IF action.hasAttribute(ALIGNED_ALWAYS)»
 					call void @«action.body.name»_vectorizable()
-			«ELSEIF action.hasAttribute(VECTORIZABLE)»
+			«ELSEIF action.hasAttribute(ALIGNABLE)»
 				«action.printVectorizationConditions(state)»
 				
 				bb_«extName»_fire_vectorizable:
@@ -409,7 +417,7 @@ class InstancePrinter extends LLVMTemplate {
 		«val portToIndexMap = portToIndexByPatternMap.get(action.inputPattern)»
 		«val connections = action.outputPattern.ports.notNative.map[outgoingPortMap.get(it)].flatten.toList»
 		«FOR port : action.inputPattern.ports»
-			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
+			«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
 				«val extName = port.name + "_" + stateName + action.name + "_" + portToIndexMap.get(port)»
 					%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
 					%tmp_vect2_«extName» = add i32 %index_«extName», «action.inputPattern.numTokensMap.get(port)»
@@ -425,7 +433,8 @@ class InstancePrinter extends LLVMTemplate {
 			«val name = port.name + "_" + connection.getSafeId(port)»
 			«val extName = name + "_" + stateName + action.name»
 			«val numTokens = action.outputPattern.numTokensMap.get(port)»
-			«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
+			«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
+				
 					%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
 					%tmp_vect2_«extName» = add i32 %index_«extName», «numTokens»
 					%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
@@ -474,9 +483,9 @@ class InstancePrinter extends LLVMTemplate {
 				«ENDIF»
 			
 			bb_«name»_fire:
-			«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
+			«IF action.hasAttribute(ALIGNED_ALWAYS)»
 					call void @«action.body.name»_vectorizable()
-			«ELSEIF action.hasAttribute(VECTORIZABLE)»
+			«ELSEIF action.hasAttribute(ALIGNABLE)»
 				«action.printVectorizationConditions(null)»
 				
 				bb_«name»_fire_vectorizable:
@@ -584,7 +593,7 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 
 	def protected printVectorizable(Action action) {
-		isActionVectorizable = action.hasAttribute(VECTORIZABLE)
+		isActionVectorizable = action.hasAttribute(ALIGNABLE)
 		val output = '''
 		«val inputPattern = action.inputPattern»
 		«val outputPattern = action.outputPattern»
@@ -642,7 +651,7 @@ class InstancePrinter extends LLVMTemplate {
 			«block.doSwitch»
 		«ENDFOR»
 		}
-		«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
+		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
 
 		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
@@ -678,7 +687,7 @@ class InstancePrinter extends LLVMTemplate {
 	
 	def protected loadVar(Port port, Connection connection, String actionName) '''
 		%local_size_«port.name»_«connection.getSafeId(port)» = load i32* @SIZE_«port.name»_«connection.getSafeId(port)»
-		«IF (isActionVectorizable && port.hasAttribute(actionName + "_" + VECTORIZABLE)) || port.hasAttribute(VECTORIZABLE_ALWAYS)»
+		«IF (isActionVectorizable && port.hasAttribute(actionName + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
 		%orig_local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
 		%local_index_«port.name»_«connection.getSafeId(port)» = urem i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», %local_size_«port.name»_«connection.getSafeId(port)»
 		«ELSE»
@@ -687,7 +696,7 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 	
 	def protected updateVar(Port port, Connection connection, Integer numTokens, String actionName) '''
-		«IF (isActionVectorizable && port.hasAttribute(actionName + "_" + VECTORIZABLE)) || port.hasAttribute(VECTORIZABLE_ALWAYS)»
+		«IF (isActionVectorizable && port.hasAttribute(actionName + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
 		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
 		«ELSE»
 		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
@@ -1044,7 +1053,7 @@ class InstancePrinter extends LLVMTemplate {
 			«IF needCast»
 				%cast_index_«extName» = «IF indexSize < 32»zext«ELSE»trunc«ENDIF» «index.type.doSwitch» «index.doSwitch» to i32
 			«ENDIF»
-			«IF (isActionVectorizable && port.hasAttribute(action.name + "_" + VECTORIZABLE)) || port.hasAttribute(VECTORIZABLE_ALWAYS)»
+			«IF (isActionVectorizable && port.hasAttribute(action.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
 				%final_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«index.doSwitch»«ENDIF»
 			«ELSE»
 				%tmp_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«index.doSwitch»«ENDIF»

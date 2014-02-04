@@ -82,7 +82,7 @@ import net.sf.orcc.util.OrccUtil
 	}
 	
 	def compileInstance()  {
-		val actor = instance.actor
+		val actor = instance.getActor
 		val connectedOutput = [ Port port | instance.outgoingPortMap.get(port) != null ]
 		'''
 		#ifndef __«instance.name.toUpperCase»_H__

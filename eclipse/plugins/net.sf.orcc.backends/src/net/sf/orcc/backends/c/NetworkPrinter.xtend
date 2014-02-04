@@ -39,6 +39,7 @@ import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.df.Actor
 import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
@@ -52,7 +53,8 @@ class NetworkPrinter extends CTemplate {
 	protected val Network network;
 	protected val int fifoSize;
 	
-	protected var boolean instrumentNetwork = false
+	protected var boolean profileNetwork = false
+	protected var boolean profileActions = false
 	protected var boolean dynamicMapping = false
 	var boolean ringTopology = false
 	
@@ -72,8 +74,11 @@ class NetworkPrinter extends CTemplate {
 			fifoSize = DEFAULT_FIFO_SIZE
 		}
 
-		if (options.containsKey(INSTRUMENT_NETWORK)) {
-			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
+		if (options.containsKey(PROFILE_NETWORK)) {
+			profileNetwork = options.get(PROFILE_NETWORK) as Boolean
+			if(options.containsKey(PROFILE_ACTIONS)){
+				profileActions = options.get(PROFILE_ACTIONS) as Boolean
+			}
 		}
 		if (options.containsKey(DYNAMIC_MAPPING)) {
 			dynamicMapping = options.get(DYNAMIC_MAPPING) as Boolean
@@ -136,8 +141,9 @@ class NetworkPrinter extends CTemplate {
 		#include "mapping.h"
 		#include "util.h"
 		#include "dataflow.h"
-		«IF instrumentNetwork || dynamicMapping»
+		«IF profileNetwork || dynamicMapping»
 			#include "cycle.h"
+			#include "serialize.h"
 		«ENDIF»
 		«IF dynamicMapping»
 			#include "options.h"
@@ -164,6 +170,26 @@ class NetworkPrinter extends CTemplate {
 			«child.assignFifo»
 		«ENDFOR»
 		
+		«IF profileActions && profileNetwork»
+			/////////////////////////////////////////////////
+			// Declaration of the actions
+			
+			«FOR child : network.children»
+				«FOR act : child.getAdapter(typeof(Actor)).actions»
+					action_t action_«child.label»_«act.body.name» = {"«act.body.name»", 0, 0};			
+				«ENDFOR»
+			«ENDFOR»
+			
+			«FOR child : network.children»
+				action_t *«child.label»_actions[] = {
+					«FOR act : child.getAdapter(typeof(Actor)).actions SEPARATOR ","»
+						&action_«child.label»_«act.body.name»
+					«ENDFOR»
+				};
+				
+			«ENDFOR»
+		«ENDIF»
+		
 		/////////////////////////////////////////////////
 		// Actor functions
 		«FOR child : network.children»
@@ -175,7 +201,11 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the actors array
 		
 		«FOR child : network.children»
-			actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0};			
+			«IF profileActions && profileNetwork»
+				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0};
+			«ELSE»
+				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, NULL, 0, 0};
+			«ENDIF»						
 		«ENDFOR»
 		
 		actor_t *actors[] = {
@@ -213,7 +243,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Actions to do when exting properly
 		static void atexit_actions() {
-			«IF instrumentNetwork || dynamicMapping»
+			«IF profileNetwork || dynamicMapping»
 				if (profiling_file != NULL) {
 					compute_workloads(&network);
 					save_profiling(profiling_file, &network);
@@ -241,39 +271,38 @@ class NetworkPrinter extends CTemplate {
 			int nb_threads = «IF dynamicMapping»nbThreads«ELSE»mapping->number_of_threads«ENDIF»;
 			
 			cpu_set_t cpuset;
-			thread_struct threads[MAX_THREAD_NB];
-			thread_id_struct threads_id[MAX_THREAD_NB];
+			orcc_thread_t threads[MAX_THREAD_NB];
+			orcc_thread_id_t threads_id[MAX_THREAD_NB];
 			«IF dynamicMapping»
-				thread_struct thread_agent;
-				thread_id_struct thread_agent_id;
+				orcc_thread_t thread_agent;
+				orcc_thread_id_t thread_agent_id;
 				sync_t sync;
-				
 				options_t *options = set_options(mapping_strategy, nb_threads);
-				sync_init(&sync);
 			«ENDIF»
 			
 			global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, «IF dynamicMapping»&sync«ELSE»NULL«ENDIF»);
 			«IF dynamicMapping»
 				agent_t *agent = agent_init(&sync, options, scheduler, &network, nb_threads);
+				sync_init(&sync);
 			«ENDIF»
 			
 			global_scheduler_init(scheduler, mapping);
 			
-			clear_cpu_set(cpuset);
+			orcc_clear_cpu_set(cpuset);
 			
 			for(i=0 ; i < nb_threads; i++){
-				thread_create(threads[i], scheduler_routine, *scheduler->schedulers[i], threads_id[i]);
-				set_thread_affinity(cpuset, i, threads[i]);
+				orcc_thread_create(threads[i], scheduler_routine, *scheduler->schedulers[i], threads_id[i]);
+				orcc_set_thread_affinity(cpuset, i, threads[i]);
 			}
 			«IF dynamicMapping»
-				thread_create(thread_agent, agent_routine, *agent, thread_agent_id);
+				orcc_thread_create(thread_agent, agent_routine, *agent, thread_agent_id);
 			«ENDIF»
 			
 			for(i=0 ; i < nb_threads; i++){
-				thread_join(threads[i]);
+				orcc_thread_join(threads[i]);
 			}
 			«IF dynamicMapping»
-				thread_join(thread_agent);
+				orcc_thread_join(thread_agent);
 			«ENDIF»
 		}
 	'''
@@ -298,7 +327,7 @@ class NetworkPrinter extends CTemplate {
 			actor_t *my_actor;
 			schedinfo_t si;
 			int j;
-			«IF instrumentNetwork || dynamicMapping»
+			«IF profileNetwork || dynamicMapping»
 				ticks tick_in, tick_out;
 				double diff_tick;
 			«ENDIF»
@@ -309,12 +338,12 @@ class NetworkPrinter extends CTemplate {
 			while (1) {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
 				if(my_actor != NULL){
-					«IF instrumentNetwork || dynamicMapping»
+					«IF profileNetwork || dynamicMapping»
 						tick_in = getticks();
 					«ENDIF»
 					si.num_firings = 0;
 					my_actor->sched_func(&si);
-					«IF instrumentNetwork || dynamicMapping»
+					«IF profileNetwork || dynamicMapping»
 						tick_out = getticks();
 						diff_tick = elapsed(tick_out, tick_in);
 						my_actor->ticks += diff_tick;
@@ -325,8 +354,8 @@ class NetworkPrinter extends CTemplate {
 				}
 				«IF dynamicMapping»
 					if(my_actor == NULL || needMapping()) {
-						semaphore_set(sched->sync->sem_monitor);
-						semaphore_wait(sched->sem_thread);
+						orcc_semaphore_set(sched->sync->sem_monitor);
+						orcc_semaphore_wait(sched->sem_thread);
 					}
 				«ENDIF»
 			}

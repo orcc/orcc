@@ -44,7 +44,8 @@ import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
 import static net.sf.orcc.backends.BackendsConstants.DYNAMIC_MAPPING;
-import static net.sf.orcc.backends.BackendsConstants.INSTRUMENT_NETWORK;
+import static net.sf.orcc.backends.BackendsConstants.PROFILE_NETWORK;
+import static net.sf.orcc.backends.BackendsConstants.PROFILE_ACTIONS;
 import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
@@ -866,8 +867,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("m2m", "multi2mono", false,
 				"Transform high-level actors with multi-tokens actions"
 						+ " in low-level actors with mono-token actions");
-		options.addOption("i", "instrument", false,
-				"(C) Allow network instrumentation for mapping");
+		options.addOption("pnet", "profile-network", false,
+				"(C) Allow network profiling for mapping");
+		options.addOption("pact", "profile-actions", false,
+				"(C) Allow actions profiling");
 		options.addOption("dm", "dynamic-mapping", false,
 				"(C) Enable load balancing on multi-core platforms");
 
@@ -942,7 +945,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
-			optionMap.put(INSTRUMENT_NETWORK, line.hasOption('i'));
+			optionMap.put(PROFILE_NETWORK, line.hasOption("pnet"));
+			optionMap.put(PROFILE_ACTIONS, line.hasOption("pact"));
 			optionMap.put(DYNAMIC_MAPPING, line.hasOption("dm"));
 
 			// Set backend name in options map

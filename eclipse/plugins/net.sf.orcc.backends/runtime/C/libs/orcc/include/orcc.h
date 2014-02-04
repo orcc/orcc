@@ -50,6 +50,7 @@ typedef struct options_s options_t;
 typedef struct global_scheduler_s global_scheduler_t;
 typedef struct local_scheduler_s local_scheduler_t;
 typedef struct network_s network_t;
+typedef struct action_s action_t;
 typedef struct actor_s actor_t;
 typedef struct connection_s connection_t;
 typedef struct mapping_s mapping_t;
@@ -73,7 +74,7 @@ typedef enum {
     ORCC_ERR_METIS,
     ORCC_ERR_METIS_FIX_WEIGHTS,
     ORCC_ERR_METIS_FIX_NEEDED,
-    ORCC_ERR_SWAP_ACTORS,_ORCC_TYPES_H_
+    ORCC_ERR_SWAP_ACTORS,
     ORCC_ERR_ROXML_OPEN,
     ORCC_ERR_ROXML_NODE_ROOT,
     ORCC_ERR_ROXML_NODE_CONF,

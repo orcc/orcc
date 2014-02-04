@@ -118,6 +118,7 @@ int check_graph_for_metis(adjacency_list *graph) {
         }
 
         for (j = graph->xadj[i]; j < graph->xadj[i+1]; j++) {
+            boolean isDirected = TRUE;
             if (graph->adjncy[j] == i) {
                 nbSelf++;
             }
@@ -125,7 +126,6 @@ int check_graph_for_metis(adjacency_list *graph) {
                 nbNullEdgeWeight++;
             }
             // Count directed edges
-            boolean isDirected = TRUE;
             for (k = graph->xadj[graph->adjncy[j]]; k < graph->xadj[graph->adjncy[j]+1]; k++) {
                 isDirected = isDirected && (graph->adjncy[k] != i);
             }

@@ -39,7 +39,7 @@ extern char *input_file;
 // output YUV file
 extern char *yuv_file;
 
-// instrumentation_file file
+// profiling_file file
 extern char *profiling_file;
 
 // write file
@@ -47,9 +47,6 @@ extern char *write_file;
 
 // mapping file
 extern char *mapping_file;
-
-// output file of genetic algorithm
-extern char *output_genetic;
 
 // display flags
 extern char display_flags;
@@ -78,9 +75,6 @@ extern int mapping_repetition;
 
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
-
-// pause function
-void wait_for_key();
 
 // print usage
 void print_usage();

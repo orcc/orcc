@@ -49,7 +49,7 @@ import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.Vectorizable;
+import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -66,9 +66,9 @@ import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
-import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
@@ -209,7 +209,7 @@ public class LLVMBackend extends AbstractBackend {
 		doTransformNetwork(network);
 
 		// update "vectorizable" information
-		Vectorizable.setVectorizableAttributs(network);
+		Alignable.setAlignability(network);
 		
 		// print instances and entities
 		printChildren(network);
@@ -218,7 +218,7 @@ public class LLVMBackend extends AbstractBackend {
 		OrccLogger.traceln("Printing network...");
 		new NetworkPrinter(network, options).print(srcPath);
 
-		new CMakePrinter(network, options).printFiles(path);
+		new CMakePrinter(network).printCMakeFiles(path);
 	}
 
 	@Override

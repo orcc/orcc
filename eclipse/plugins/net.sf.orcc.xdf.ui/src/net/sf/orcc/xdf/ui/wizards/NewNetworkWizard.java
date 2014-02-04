@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2013, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,15 +26,15 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui;
+package net.sf.orcc.xdf.ui.wizards;
 
-import net.sf.orcc.graphiti.GraphitiModelPlugin;
-import net.sf.orcc.graphiti.model.Configuration;
-import net.sf.orcc.graphiti.model.Graph;
-import net.sf.orcc.graphiti.model.ObjectType;
-import net.sf.orcc.graphiti.ui.wizards.WizardSaveGraphPage;
+import java.io.IOException;
+
+import net.sf.orcc.xdf.ui.Activator;
+import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -43,6 +43,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
@@ -50,55 +51,72 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
  * This class provides a wizard to create a new XDF network.
  * 
  * @author Matthieu Wipliez
+ * @author Antoine Lorence
  */
 public class NewNetworkWizard extends Wizard implements INewWizard {
-
-	private IStructuredSelection selection;
-
+	
 	private IWorkbench workbench;
 
-	/**
-	 * Creates a new wizard.
-	 */
 	public NewNetworkWizard() {
 		super();
-		setNeedsProgressMonitor(true);
-		setWindowTitle("New Network (XDF)");
-	}
-
-	@Override
-	public void addPages() {
-		WizardSaveGraphPage page = new WizardSaveGraphPage(selection);
-
-		Configuration configuration = GraphitiModelPlugin.getDefault()
-				.getConfiguration("XDF");
-		ObjectType type = configuration.getGraphType("XML Dataflow Network");
-
-		page.setGraph(new Graph(configuration, type, true));
-		page.setDescription("Create a new XDF network.");
-		addPage(page);
+		// setNeedsProgressMonitor(true);
+		setWindowTitle("New XDF Network");
 	}
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		this.selection = selection;
+
 		this.workbench = workbench;
+
+		final WizardNewFileCreationPage page = new WizardNewFileCreationPage("filenameSelection", selection);
+		page.setFileExtension(Activator.NETWORK_SUFFIX);
+		page.setDescription("Select a parent resource and a name for your new network.");
+		page.setAllowExistingResources(false);
+
+		// Fill the page with a filename, if user selected one
+		if (!selection.isEmpty()) {
+			final Object firstSel = selection.getFirstElement();
+			if (firstSel instanceof IFile) {
+				final IFile selectedFile = (IFile) firstSel;
+				final String fileName = selectedFile.getName();
+				final String ext = selectedFile.getFileExtension();
+				if (ext.isEmpty()) {
+					page.setFileName(fileName);
+				} else {
+					int idx = fileName.indexOf(ext);
+					if (idx > 0) {
+						page.setFileName(fileName.substring(0, idx - 1));
+					}
+				}
+			}
+		}
+
+		addPage(page);
 	}
 
 	@Override
 	public boolean performFinish() {
-		final WizardSaveGraphPage page = (WizardSaveGraphPage) getPage("saveGraph");
-		IFile file = page.createNewFile();
+		final WizardNewFileCreationPage page = (WizardNewFileCreationPage) getPage("filenameSelection");
+		
+		final IFile file = page.createNewFile();
 		if (file == null) {
 			return false;
 		}
 
+		final URI xdfUri = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
+
+		try {
+			XdfUtil.createNetworkResource(xdfUri);
+		} catch (IOException e) {
+			return false;
+		}
+
 		// Open editor on new file.
-		IWorkbenchWindow dw = workbench.getActiveWorkbenchWindow();
+		final IWorkbenchWindow dw = workbench.getActiveWorkbenchWindow();
 		try {
 			if (dw != null) {
 				BasicNewResourceWizard.selectAndReveal(file, dw);
-				IWorkbenchPage activePage = dw.getActivePage();
+				final IWorkbenchPage activePage = dw.getActivePage();
 				if (activePage != null) {
 					IDE.openEditor(activePage, file, true);
 				}
@@ -106,6 +124,7 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 		} catch (PartInitException e) {
 			MessageDialog.openError(dw.getShell(), "Problem opening editor",
 					e.getMessage());
+			return false;
 		}
 
 		return true;

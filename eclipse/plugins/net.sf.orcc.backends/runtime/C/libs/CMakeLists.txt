@@ -9,9 +9,8 @@ include_directories(orcc/include)
 if(NO_EXTERNAL_DEPENDENCIES)
 
 else() # Build library without any external library required (SDL, pthread, etc)
-        include_directories(roxml/include)
-        add_subdirectory(roxml)
-
+    include_directories(roxml/include)
+    add_subdirectory(roxml)
 endif()
 
 add_subdirectory(orcc)

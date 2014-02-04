@@ -63,7 +63,7 @@ struct local_scheduler_s {
 
 	/* Genetic algorithm */
     sync_t *sync;
-	semaphore_struct sem_thread;
+    orcc_semaphore_t sem_thread;
 };
 
 struct waiting_s {
@@ -85,6 +85,8 @@ struct schedinfo_s {
 
 
 global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync);
+
+void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping);
 
 local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_schedulable,
         waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);

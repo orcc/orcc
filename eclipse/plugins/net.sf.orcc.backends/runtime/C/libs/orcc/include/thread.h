@@ -42,15 +42,15 @@
 
 	// Thread
 	typedef long cpu_set_t;
-	#define thread_struct HANDLE
-	#define thread_id_struct DWORD
+    #define orcc_thread_t HANDLE
+    #define orcc_thread_id_t DWORD
 
-	#define clear_cpu_set(cpuset) cpuset = 0
+    #define orcc_clear_cpu_set(cpuset) cpuset = 0
 
 	/**
 	 * Sets the affinity of the given thread to the given processor.
 	 */
-	static void set_thread_affinity(cpu_set_t cpuset, int proc_num, thread_struct hThread) {
+    static void orcc_set_thread_affinity(cpu_set_t cpuset, int proc_num, orcc_thread_t hThread) {
 		DWORD_PTR dwThreadAffinityMask = 1 << proc_num;
 		SetThreadAffinityMask(hThread, dwThreadAffinityMask);
 	}
@@ -58,68 +58,81 @@
 	/**
 	 * Sets the affinity of this process to the given processor.
 	 */
-	static void set_this_process_affinity(cpu_set_t cpuset, int proc_num) {
+    static void orcc_set_this_process_affinity(cpu_set_t cpuset, int proc_num) {
 		HANDLE hProcess = GetCurrentProcess();
 		DWORD_PTR dwProcessAffinityMask = 1 << proc_num;
 		SetProcessAffinityMask(hProcess, dwProcessAffinityMask);
 	}
 	
-	#define thread_create(thread, function, argument, id) thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) function, (LPVOID) &(argument), 0, &(id))
-	#define thread_join(thread) WaitForSingleObject(thread, INFINITE)
+    #define orcc_thread_create(thread, function, argument, id) thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) function, (LPVOID) &(argument), 0, &(id))
+    #define orcc_thread_join(thread) WaitForSingleObject(thread, INFINITE)
 	
 	// Semaphore
 	#define MAX_SEM_COUNT 10
 	
-	#define semaphore_create(semaphore, number) semaphore = CreateSemaphore(NULL, number, MAX_SEM_COUNT, NULL)
-	#define semaphore_wait(semaphore) WaitForSingleObject(semaphore, INFINITE)
-	#define semaphore_set(semaphore) ReleaseSemaphore(semaphore, 1, NULL)
-	#define semaphore_destroy(semaphore) CloseHandle(semaphore)
+    #define orcc_semaphore_create(semaphore, number) semaphore = CreateSemaphore(NULL, number, MAX_SEM_COUNT, NULL)
+    #define orcc_semaphore_wait(semaphore) WaitForSingleObject(semaphore, INFINITE)
+    #define orcc_semaphore_set(semaphore) ReleaseSemaphore(semaphore, 1, NULL)
+    #define orcc_semaphore_destroy(semaphore) CloseHandle(semaphore)
 	
-	#define semaphore_struct HANDLE
+    #define orcc_semaphore_t HANDLE
 	
 	
 #else
 	#include <pthread.h>
-    #include <sched.h>
-	#include <semaphore.h>
+
+    #define orcc_thread_create(thread, function, argument, id) id = pthread_create(&(thread), NULL, function, (void *) &(argument))
+    #define orcc_thread_join(thread) pthread_join(thread, NULL);
+
+    #define orcc_thread_t pthread_t
+    #define orcc_thread_id_t int
 	
-	// Thread
 #ifdef __APPLE__
-	typedef long cpu_set_t;
-	#define clear_cpu_set(cpuset)
-	#define set_thread_affinity(cpuset, proc_num, thread)
-	#define set_this_process_affinity(cpuset, proc_num)
+
+    #include <mach/mach_traps.h>
+    #include <mach/semaphore.h>
+    #include <mach/task.h>
+    #include <mach/mach.h>
+
+    typedef long cpu_set_t;
+    #define orcc_clear_cpu_set(cpuset)
+    #define orcc_set_thread_affinity(cpuset, proc_num, thread)
+    #define orcc_set_this_process_affinity(cpuset, proc_num)
+
+    #define orcc_semaphore_create(semaphore, number) semaphore_create(mach_task_self(), &(semaphore), SYNC_POLICY_FIFO, (number))
+    #define orcc_semaphore_wait(semaphore) semaphore_wait(semaphore)
+    #define orcc_semaphore_set(semaphore) semaphore_signal(semaphore)
+    #define orcc_semaphore_destroy(semaphore) semaphore_destroy(mach_task_self(), &(semaphore))
+    #define orcc_semaphore_t semaphore_t
+
 #else
-	#define clear_cpu_set(cpuset) CPU_ZERO(&(cpuset))
-	#define set_thread_affinity(cpuset, proc_num, thread) {					\
-			CPU_SET(proc_num, &(cpuset));									\
-			pthread_setaffinity_np(thread, sizeof(cpu_set_t), &(cpuset));	\
-	}
-	#define set_this_process_affinity(cpuset, proc_num) {					\
-			CPU_SET(proc_num, &(cpuset));									\
-			sched_setaffinity(0, sizeof(cpu_set_t), &(cpuset));				\
-	}
+
+    #include <sched.h>
+    #include <semaphore.h>
+
+    #define orcc_clear_cpu_set(cpuset) CPU_ZERO(&(cpuset))
+    #define orcc_set_thread_affinity(cpuset, proc_num, thread) {					\
+            CPU_SET(proc_num, &(cpuset));									\
+            pthread_setaffinity_np(thread, sizeof(cpu_set_t), &(cpuset));	\
+    }
+    #define orcc_set_this_process_affinity(cpuset, proc_num) {					\
+            CPU_SET(proc_num, &(cpuset));									\
+            sched_setaffinity(0, sizeof(cpu_set_t), &(cpuset));				\
+    }
+
+    #define orcc_semaphore_create(semaphore, number) sem_init(&(semaphore), 0, (number))
+    #define orcc_semaphore_wait(semaphore) sem_wait(&(semaphore))
+    #define orcc_semaphore_set(semaphore) sem_post(&(semaphore))
+    #define orcc_semaphore_destroy(semaphore) sem_destroy(&(semaphore))
+    #define orcc_semaphore_t sem_t
+
 #endif
 
-	
-	#define thread_create(thread, function, argument, id) id = pthread_create(&(thread), NULL, function, (void *) &(argument))
-	#define thread_join(thread) pthread_join(thread, NULL);
-	
-	#define thread_struct pthread_t
-	#define thread_id_struct int
-	
-	// Semaphore
-	#define semaphore_create(semaphore, number) sem_init(&(semaphore), 0, (number))
-	#define semaphore_wait(semaphore) sem_wait(&(semaphore))
-	#define semaphore_set(semaphore) sem_post(&(semaphore))
-	#define semaphore_destroy(semaphore) sem_destroy(&(semaphore))
-	
-	#define semaphore_struct sem_t
 #endif
 
 
 struct sync_s {
-	semaphore_struct sem_monitor;
+    orcc_semaphore_t sem_monitor;
 	int active_sync;
 };
 

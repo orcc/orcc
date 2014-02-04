@@ -62,9 +62,9 @@ import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
-import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
@@ -175,6 +175,10 @@ public class JadeBackend extends AbstractBackend {
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
+
+		// If ports have been renamed in actors, the same transformation must be
+		// applied on network
+		new RenameTransformation(this.renameMap).doSwitch(network);
 
 		// print network
 		OrccLogger.traceln("Printing network...");

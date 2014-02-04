@@ -30,9 +30,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL.h>
-#include <time.h>
 
 #include "options.h"
+#include "trace.h"
 
 static unsigned int startTime;
 static unsigned int mappingTime;

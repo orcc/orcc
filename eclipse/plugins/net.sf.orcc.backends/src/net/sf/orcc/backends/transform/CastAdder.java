@@ -324,9 +324,8 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 						}
 
 						// target name and type are updated
-						Var target = IrUtil.copy(source);
+						Var target = procedure.newTempLocalVariable(targetType, "casted_32_" + source.getName());
 						target.setType(targetType);
-						target.setName(source.getName() + "_32");
 
 						// Update variable used in call parameter
 						((ExprVar) exprArg).getUse().setVariable(target);

@@ -461,17 +461,6 @@
             natureId="net.sf.orcc.core.nature">
       </image>
    </extension>
-   <extension point="org.eclipse.ui.editors">
-      <editor
-            class="net.sf.orcc.graphiti.ui.editors.GraphEditor"
-            contributorClass="net.sf.orcc.graphiti.ui.editors.GraphActionBarContributor"
-            default="true"
-            extensions="xdf"
-            icon="icons/network.gif"
-            id="net.sf.orcc.ui.editors.GraphEditor"
-            name="Orcc Network Editor">
-      </editor>
-   </extension>
    <extension
          point="org.eclipse.ui.newWizards">
       <category
@@ -487,19 +476,6 @@
             id="net.sf.orcc.ui.newOrccProject"
             name="Project"
             project="true">
-      </wizard>
-      <wizard
-            canFinishEarly="false"
-            category="net.sf.orcc.ui.OrccCategory"
-            class="net.sf.orcc.ui.NewNetworkWizard"
-            hasPages="true"
-            icon="icons/network.gif"
-            id="net.sf.orcc.ui.wizards.newNetworkWizard"
-            name="Network (XDF)"
-            project="false">
-         <description>
-            Create a new FU network.
-         </description>
       </wizard>
    </extension>
    <extension
@@ -616,5 +592,16 @@
             </adapt>
          </enablement>
       </moveParticipant>
+   </extension>
+   <extension point="org.eclipse.ui.editors">
+      <editor
+            class="net.sf.orcc.graphiti.ui.editors.GraphEditor"
+            contributorClass="net.sf.orcc.graphiti.ui.editors.GraphActionBarContributor"
+            default="true"
+            extensions="xdf"
+            icon="icons/network.gif"
+            id="net.sf.orcc.ui.editors.GraphEditor"
+            name="Orcc Network Editor">
+      </editor>
    </extension>
 </plugin>

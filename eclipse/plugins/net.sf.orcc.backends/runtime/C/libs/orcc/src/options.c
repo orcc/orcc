@@ -33,6 +33,8 @@
 #include <stdlib.h>
 
 #include "options.h"
+#include "trace.h"
+
 
 /**
  * Creates and init options structure.
@@ -106,8 +108,8 @@ void set_mapping_strategy(char *arg_value, options_t *opt) {
 }
 
 void set_verbose_level(char *arg_value, options_t *opt) {
-    assert(opt != NULL);
     int trace_level = 0;
+    assert(opt != NULL);
 
     if (arg_value == NULL) {
         set_trace_level(ORCC_VL_VERBOSE_1);
@@ -123,9 +125,9 @@ void set_verbose_level(char *arg_value, options_t *opt) {
 }
 
 void set_default_output_filename(char *arg_value, options_t *opt) {
+    char *pDot, *output;
     assert(arg_value != NULL);
     assert(opt != NULL);
-    char *pDot, *output;
 
     if (arg_value != NULL) {
         output = (char *)malloc(strlen(arg_value)*sizeof(char));

@@ -27,7 +27,6 @@
  * SUCH DAMAGE.
  */
 
-#include <getopt.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,61 +38,50 @@
 #include "options.h"
 #include "trace.h"
 
+extern char *optarg;
+extern int getopt(int nargc, char * const *nargv, const char *ostr);
+
+static const char *usage =
+    "Orcc mapping tool -- See orcc.sf.net for more information\n"
+
+    "\nUsage: orccmap [options] -n nbproc -i filename\n"
+
+    "\nDescription:\n"
+    "Compute mappings of dataflow programs on multi-core platforms.\n"
+    "Various strategies based on profiling information can be used.\n"
+
+    "\nRequired parameters:\n"
+    "-n <nbproc>        Number of processor core.\n"
+    "-i <filename>      XML description of the dataflow network.\n"
+
+    "\nOptional parameters:\n"
+    "-o <filename>      Name of the output file.\n"
+    "-m <strategy>      Specify the mapping strategy.\n"
+    "   The possible values are: {Default : ROUND_ROBIN}\n"
+    "       MR   : METIS Recursive graph partition mapping\n"
+    "       MKCV : METIS KWay graph partition mapping (Optimize Communication volume)\n"
+    "       MKEC : METIS KWay graph partition mapping (Optimize Edge-cut)\n"
+    "       RR   : A simple Round-Robin mapping\n"
+    "       QM   : Quick Mapping (Not available)\n"
+    "       WLB  : Weighted Load Balancing\n"
+    "       COW  : Communication Optimized Weighted Load Balancing (Not available)\n"
+    "       KLR  : Kernighan Lin Refinement Weighted Load Balancing\n"
+    "-v <level>         Verbosity level\n"
+    "   The possible values are: {Default : 1}\n"
+    "       1 : summary and results\n"
+    "       2 : debug informations\n"
+    "-h                 Print this message.\n";
+
 void print_usage_orccmap() {
-    /* !TODO: Find a kind way to format this text */
-    char *INDENT = "    ";
-
-    printf("\nUsage: orccmap [options] -n nbproc -i filename");
-    printf("\n");
-    printf("\nDescription:");
-    printf("\nGenerates a xml file containing a partition of a given Orcc Network in a given number of partitions.");
-    printf("\nVarious mapping strategies can be used, all based on actors and connections weighs.");
-
-    printf("\n");
-    printf("\nRequired parameters:");
-    printf("\n%s-n, --nb_processors <nbproc>", INDENT);
-    printf("\n%s%sThe number of processors (partitions).", INDENT, INDENT);
-    printf("\n");
-    printf("\n%s-i, --input_file <filename>", INDENT);
-    printf("\n%s%sThe name of the input file containing a network description.", INDENT, INDENT);
-
-    printf("\n");
-    printf("\nOptional parameters:");
-    printf("\n%s-o, --output_file <filename>", INDENT);
-    printf("\n%s%sThe name of the output file.", INDENT, INDENT);
-
-    printf("\n");
-    printf("\n%s-m, --mapping_strategy <strategy>", INDENT);
-    printf("\n%s%sThe strategy to apply to do the mapping.", INDENT, INDENT);
-    printf("\n%s%sThe possible values are: {Default : ROUND_ROBIN}", INDENT, INDENT);
-    printf("\n%s%s%sMR\t: METIS Recursive graph partition mapping", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sMKCV\t: METIS KWay graph partition mapping (Optimize Communication volume)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sMKEC\t: METIS KWay graph partition mapping (Optimize Edge-cut)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sRR\t: A simple Round-Robin mapping", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sQM\t: Quick Mapping (Not yet available)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sWLB\t: Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sCOW\t: Communication Optimized Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
-    printf("\n%s%s%sKLR\t: Kernighan Lin Refinement Weighted Load Balancing (Not yet available)", INDENT, INDENT, INDENT);
-
-    printf("\n");
-    printf("\n%s-v, --verbose [level]", INDENT);
-    printf("\n%s%sPrint informations.", INDENT, INDENT);
-    printf("\n%s%sThe possible values are: {Default : 1}", INDENT, INDENT);
-    printf("\n%s%s%s1 : summary and results", INDENT, INDENT, INDENT);
-    printf("\n%s%s%s2 : debug informations", INDENT, INDENT, INDENT);
-
-    printf("\n");
-    printf("\n%s-h, --help", INDENT);
-    printf("\n%s%sPrints this message.", INDENT, INDENT);
-    printf("\n");
+    printf("%s", usage);
+    fflush(stdout);
 }
 
 void start_orcc_mapping(options_t *opt) {
-    assert(opt != NULL);
     int ret = ORCC_OK;
-
-    mapping_t *mapping = allocate_mapping(opt->nb_processors);
+    mapping_t *mapping;
     network_t *network;
+    assert(opt != NULL);
 
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Starting Orcc-Map");
     print_orcc_trace(ORCC_VL_VERBOSE_1, "  Nb of processors\t: %d", opt->nb_processors);
@@ -103,9 +91,9 @@ void start_orcc_mapping(options_t *opt) {
     print_orcc_trace(ORCC_VL_VERBOSE_1, "  Verbose level\t: %d", verbose_level);
 
     network = load_network(opt->input_file);
+    mapping = allocate_mapping(opt->nb_processors, network->nb_actors);
 
     ret = do_mapping(network, opt, mapping);
-
     ret = save_mapping(opt->output_file, mapping);
 
     delete_mapping(mapping);
@@ -115,25 +103,20 @@ void start_orcc_mapping(options_t *opt) {
 int main (int argc, char **argv) {
     int nFlag, iFlag = 0;
     int c;
+    const char *ostr = "n:i:o:m:v::h";
 
     options_t *opt = set_default_options();
 
-    static struct option long_options[] =
-    {
-        {"nb_processors", required_argument, 0, 'n'},
-        {"input_file", required_argument, 0, 'i'},
-        {"output_file", required_argument, 0, 'o'},
-        {"mapping_strategy", required_argument, 0, 'm'},
-        {"verbose", optional_argument, 0, 'v'},
-        {"help", no_argument, 0, 'h'},
-        {0, 0, 0, 0}
-    };
-
-    /* getopt_long stores the option index here. */
-    int option_index = 0;
-
-    while ((c = getopt_long (argc, argv, "n:i:o:m:v::h", long_options, &option_index)) != -1)
+    while ((c = getopt(argc, argv, ostr)) != -1) {
         switch (c) {
+        case '?': // BADCH
+            print_orcc_error(ORCC_ERR_BAD_ARGS);
+            print_usage_orccmap();
+            exit(ORCC_ERR_BAD_ARGS);
+        case ':': // BADARG
+            print_orcc_error(ORCC_ERR_BAD_ARGS);
+            print_usage_orccmap();
+            exit(ORCC_ERR_BAD_ARGS);
         case 'n':
             nFlag = 1;
             set_nb_processors(optarg, opt);
@@ -154,27 +137,12 @@ int main (int argc, char **argv) {
             break;
         case 'h':
             print_usage_orccmap();
-            exit (ORCC_OK);
-            break;
-        case '?':
-            break;
+            exit(ORCC_OK);
         default:
-            abort();
+            print_orcc_error(ORCC_ERR_BAD_ARGS);
+            print_usage_orccmap();
+            exit(ORCC_ERR_BAD_ARGS);
         }
-
-    if (optind < argc) {
-        print_orcc_error(ORCC_ERR_BAD_ARGS);
-        while (optind < argc)
-            fprintf(stderr," [%s]", argv[optind++]);
-        printf("\n");
-        print_usage_orccmap();
-        exit(ORCC_ERR_BAD_ARGS);
-    }
-    if (!nFlag || !iFlag) {
-        print_orcc_error(ORCC_ERR_MANDATORY_ARGS);
-        printf("\n");
-        print_usage_orccmap();
-        exit(ORCC_ERR_MANDATORY_ARGS);
     }
 
     start_orcc_mapping(opt);

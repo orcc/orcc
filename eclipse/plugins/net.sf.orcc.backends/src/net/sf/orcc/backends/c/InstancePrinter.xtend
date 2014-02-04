@@ -82,7 +82,8 @@ class InstancePrinter extends CTemplate {
 
 	protected var String entityName
 
-	protected var boolean instrumentNetwork = false
+	protected var boolean profileNetwork = false
+	protected var boolean profileActions = false
 	protected var boolean dynamicMapping = false
 	protected var boolean isActionVectorizable = false
 
@@ -117,8 +118,11 @@ class InstancePrinter extends CTemplate {
 			fifoSize = 512
 		}
 
-		if (options.containsKey(INSTRUMENT_NETWORK)) {
-			instrumentNetwork = options.get(INSTRUMENT_NETWORK) as Boolean
+		if (options.containsKey(PROFILE_NETWORK)) {
+			profileNetwork = options.get(PROFILE_NETWORK) as Boolean
+			if(options.containsKey(PROFILE_ACTIONS)){
+				profileActions = options.get(PROFILE_ACTIONS) as Boolean
+			}
 		}
 		if (options.containsKey(DYNAMIC_MAPPING)) {
 			dynamicMapping = options.get(DYNAMIC_MAPPING) as Boolean
@@ -197,7 +201,7 @@ class InstancePrinter extends CTemplate {
 
 		this.instance = instance
 		this.entityName = instance.name
-		this.actor = instance.actor
+		this.actor = instance.getActor
 		this.attributable = instance
 		this.incomingPortMap = instance.incomingPortMap
 		this.outgoingPortMap = instance.outgoingPortMap
@@ -228,6 +232,9 @@ class InstancePrinter extends CTemplate {
 		#include "util.h"
 		#include "scheduler.h"
 		#include "dataflow.h"
+		«IF profileNetwork || dynamicMapping»
+			#include "cycle.h"
+		«ENDIF»
 
 		#define SIZE «fifoSize»
 		«IF instance != null»
@@ -259,7 +266,7 @@ class InstancePrinter extends CTemplate {
 				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
 				
-				«IF instrumentNetwork || dynamicMapping»
+				«IF profileNetwork || dynamicMapping»
 					extern connection_t connection_«entityName»_«port.name»;
 					#define rate_«port.name» connection_«entityName»_«port.name».rate
 				«ENDIF»
@@ -334,6 +341,16 @@ class InstancePrinter extends CTemplate {
 			«ENDIF»
 
 		«ENDIF»
+		«IF profileActions && profileNetwork»
+			////////////////////////////////////////////////////////////////////////////////
+			// Action's workload for profiling
+			«FOR action : actor.actions»
+				extern action_t action_«actor.name»_«action.body.name»;
+				#define ticks_«action.body.name» action_«actor.name»_«action.body.name».ticks
+			«ENDFOR»		
+			
+		«ENDIF»
+		
 		«IF !actor.stateVars.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// State variables of the actor
@@ -383,7 +400,7 @@ class InstancePrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
 		«FOR action : actor.actions»
-			«action.print»
+			«action.print()»
 		«ENDFOR»
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -408,7 +425,7 @@ class InstancePrinter extends CTemplate {
 					«printOpenFiles»
 				«ENDIF»
 
-				«actor.actionsOutsideFsm.printActionLoop»
+				«actor.actionsOutsideFsm.printActionSchedulingLoop»
 
 			finished:
 				«IF enableTrace»
@@ -436,7 +453,7 @@ class InstancePrinter extends CTemplate {
 		«IF ! actor.actionsOutsideFsm.empty»
 			«inline»void «entityName»_outside_FSM_scheduler(schedinfo_t *si) {
 				int i = 0;
-				«actor.actionsOutsideFsm.printActionLoop»
+				«actor.actionsOutsideFsm.printActionSchedulingLoop»
 			finished:
 				// no read_end/write_end here!
 				return;
@@ -459,7 +476,6 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 			default:
 				printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]);
-				wait_for_key();
 				exit(1);
 			}
 
@@ -492,7 +508,6 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 		«IF state.outgoing.empty»
 			printf("Stuck in state "«state.name»" in «entityName»\n");
-			wait_for_key();
 			exit(1);
 		«ELSE»
 			«state.printStateTransitions»
@@ -501,15 +516,15 @@ class InstancePrinter extends CTemplate {
 
 	def protected printVectorizationConditions(Action action) '''
 		{
-			int isVectorizable = 1;
+			int isAligned = 1;
 			«FOR port : action.inputPattern.ports»
-				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
-					isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
+				«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
+					isAligned = isAligned && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
 				«ENDIF»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports»
-				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE) && !port.hasAttribute(VECTORIZABLE_ALWAYS)»
-					isVectorizable = isVectorizable && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
+				«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
+					isAligned = isAligned && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
 				«ENDIF»
 			«ENDFOR»
 	'''
@@ -525,12 +540,12 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«IF trans.action.hasAttribute(VECTORIZABLE_ALWAYS)»
-					«trans.action.body.name»_vectorizable();
-				«ELSEIF trans.action.hasAttribute(VECTORIZABLE)»
+				«IF trans.action.hasAttribute(ALIGNED_ALWAYS)»
+					«trans.action.body.name»_aligned();
+				«ELSEIF trans.action.hasAttribute(ALIGNABLE)»
 					«trans.action.printVectorizationConditions»
-						if (isVectorizable) {
-							«trans.action.body.name»_vectorizable();
+						if (isAligned) {
+							«trans.action.body.name»_aligned();
 						} else {
 							«trans.action.body.name»();
 						}
@@ -587,7 +602,7 @@ class InstancePrinter extends CTemplate {
 
 	def protected initializeFunction() '''
 		«FOR init : actor.initializes»
-			«init.print»
+			«init.print()»
 		«ENDFOR»
 
 		«inline»void «entityName»_initialize(schedinfo_t *si) {
@@ -597,7 +612,7 @@ class InstancePrinter extends CTemplate {
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
 			«ENDIF»
 			«IF !actor.initializes.nullOrEmpty»
-				«actor.initializes.printActions»
+				«actor.initializes.printActionsScheduling»
 			«ENDIF»
 
 		finished:
@@ -615,13 +630,13 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 
-	def protected printActionLoop(List<Action> actions) '''
+	def protected printActionSchedulingLoop(List<Action> actions) '''
 		while (1) {
-			«actions.printActions»
+			«actions.printActionsScheduling»
 		}
 	'''
 
-	def protected printAction(Action action) {
+	def protected printActionScheduling(Action action) {
 		val output = '''
 			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 				«IF !action.outputPattern.empty»
@@ -631,12 +646,12 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
-				«IF action.hasAttribute(VECTORIZABLE_ALWAYS)»
-					«action.body.name»_vectorizable();
-				«ELSEIF action.hasAttribute(VECTORIZABLE)»
+				«IF action.hasAttribute(ALIGNED_ALWAYS)»
+					«action.body.name»_aligned();
+				«ELSEIF action.hasAttribute(ALIGNABLE)»
 					«action.printVectorizationConditions»
-						if (isVectorizable) {
-							«action.body.name»_vectorizable();
+						if (isAligned) {
+							«action.body.name»_aligned();
 						} else {
 							«action.body.name»();
 						}
@@ -649,9 +664,9 @@ class InstancePrinter extends CTemplate {
 		return output
 	}
 
-	def protected printActions(Iterable<Action> actions) '''
+	def protected printActionsScheduling(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
-			«action.printAction»
+			«action.printActionScheduling»
 			}«ENDFOR» else {
 			«inputPattern.printTransitionPattern»
 			goto finished;
@@ -724,137 +739,94 @@ class InstancePrinter extends CTemplate {
 			«ENDIF»
 		}
 	'''
+	
+	def private printCore(Action action, boolean isAligned) '''
+		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»«IF isAligned»_aligned«ENDIF»() {
+			«action.profileStart»
 
-	def protected printVectorizable(Action action) {
-		isActionVectorizable = action.hasAttribute(VECTORIZABLE)
-		val output = '''
-		«IF isActionVectorizable»
+			// Compute aligned port indexes
+			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
+				i32 index_aligned_«port.name» = index_«port.name» % SIZE_«port.name»;
+			«ENDFOR»
 
-		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»_vectorizable() {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
 
-			«FOR port : action.inputPattern.ports»
-				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE)»
-					 i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
-				«ENDIF»
-			«ENDFOR»
-
-			«FOR port : action.outputPattern.ports»
-				«IF port.hasAttribute(action.name + "_" + VECTORIZABLE)»
-					i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
-				«ENDIF»
-			«ENDFOR»
-
+			«writeTraces(action.inputPattern)»
+	
 			«FOR block : action.body.blocks»
 				«block.doSwitch»
 			«ENDFOR»
 
+			«writeTraces(action.outputPattern)»
+
+			// Update ports indexes
 			«FOR port : action.inputPattern.ports»
-				«IF enableTrace»
-					{
-						int i;
-						for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
-							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
-						}
-					}
-				«ENDIF»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
-				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
 					read_end_«port.name»();
 				«ENDIF»
-				«IF instrumentNetwork || dynamicMapping»
-					rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
-				«ENDIF»			
 			«ENDFOR»
-
 			«FOR port : action.outputPattern.ports»
-				«IF enableTrace»
-					{
-						int i;
-						for (i = 0; i < «action.outputPattern.getNumTokens(port)»; i++) {
-							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
-						}
-					}
-				«ENDIF»
 				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
-				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
+				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
 					write_end_«port.name»();
 				«ENDIF»
 			«ENDFOR»
+
+			«action.profileEnd»
 		}
+	'''	
+	
+	def private writeTraces(Pattern pattern) '''
+		«IF enableTrace»
+			«FOR port : pattern.ports»
+				{
+					// Write traces
+					int i;
+					for (i = 0; i < «pattern.getNumTokens(port)»; i++) {
+						fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+					}
+				}
+			«ENDFOR»
 		«ENDIF»
-		'''
-		isActionVectorizable = false
-		return output
-	}
+	'''
+	
+	def private profileStart(Action action) '''
+		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
+			ticks tick_in = getticks();
+			ticks tick_out;
+			double diff_tick;
+		«ENDIF»
+	'''
+
+	def private profileEnd(Action action) '''
+		«IF profileNetwork || dynamicMapping»
+			«FOR port : action.inputPattern.ports»
+				rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
+			«ENDFOR»
+		«ENDIF»
+		«IF profileActions && profileNetwork»
+			tick_out = getticks();
+			diff_tick = elapsed(tick_out, tick_in);
+			ticks_«action.name» += diff_tick;
+		«ENDIF»
+	'''
 
 	def protected print(Action action) {
 		currentAction = action
-		val output = '''
-			«IF !action.hasAttribute(VECTORIZABLE_ALWAYS)»
-			static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»() {
-				«FOR variable : action.body.locals»
-					«variable.declare»;
-				«ENDFOR»
-
-				«FOR port : action.inputPattern.ports»
-					«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
-					 i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
-					«ENDIF»
-				«ENDFOR»
-
-				«FOR port : action.outputPattern.ports»
-					«IF port.hasAttribute(VECTORIZABLE_ALWAYS)»
-					i32 local_index_«port.name» = index_«port.name» % SIZE_«port.name»;
-					«ENDIF»
-				«ENDFOR»
-
-				«FOR block : action.body.blocks»
-					«block.doSwitch»
-				«ENDFOR»
-
-				«FOR port : action.inputPattern.ports»
-					«IF enableTrace»
-					{
-						int i;
-						for (i = 0; i < «action.inputPattern.getNumTokens(port)»; i++) {
-							fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
-						}
-					}
-					«ENDIF»
-					index_«port.name» += «action.inputPattern.getNumTokens(port)»;
-
-					«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
-					read_end_«port.name»();
-					«ENDIF»
-				«ENDFOR»
-
-				«FOR port : action.outputPattern.ports»
-					«IF enableTrace»
-						{
-							int i;
-							for (i = 0; i < «action.outputPattern.getNumTokens(port)»; i++) {
-								fprintf(file_«port.name», "%«port.type.printfFormat»\n", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
-							}
-						}
-					«ENDIF»
-					index_«port.name» += «action.outputPattern.getNumTokens(port)»;
-
-					«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_SIZE_RWEND»
-					write_end_«port.name»();
-					«ENDIF»
-				«ENDFOR»
-			}
-			«ENDIF»
-			«action.printVectorizable»
-
-			«action.scheduler.print»
-
+		isActionVectorizable = false
 		'''
-		currentAction = null
-		return output
+		«action.scheduler.print»
+		
+		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
+			«printCore(action, false)»
+		«ENDIF»
+		«IF isActionVectorizable = action.hasAttribute(ALIGNABLE)»
+			«printCore(action, true)»
+		«ENDIF»
+		'''
 	}
 
 	def protected print(Procedure proc) '''
@@ -962,8 +934,8 @@ class InstancePrinter extends CTemplate {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + VECTORIZABLE)) || srcPort.hasAttribute(VECTORIZABLE_ALWAYS)»
-					«load.target.variable.name» = tokens_«srcPort.name»[(local_index_«srcPort.name» + («load.indexes.head.doSwitch»))];
+				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
+					«load.target.variable.name» = tokens_«srcPort.name»[(index_aligned_«srcPort.name» + («load.indexes.head.doSwitch»))];
 				«ELSE»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
 				«ENDIF»
@@ -980,8 +952,8 @@ class InstancePrinter extends CTemplate {
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + VECTORIZABLE)) || trgtPort.hasAttribute(VECTORIZABLE_ALWAYS)»
-					tokens_«trgtPort.name»[(local_index_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
+				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
+					tokens_«trgtPort.name»[(index_aligned_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
 				«ENDIF»

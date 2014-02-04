@@ -105,7 +105,7 @@ class NetworkPrinter extends JavaTemplate {
 			
 			// Declare broadcast
 			«FOR instance : network.children.filter(typeof(Instance)).filter[broadcast]»
-				private Broadcast<«instance.actor.getInput("input").type.doSwitch»> «instance.name»;
+				private Broadcast<«instance.getActor.getInput("input").type.doSwitch»> «instance.name»;
 			«ENDFOR»
 			
 			
@@ -115,12 +115,12 @@ class NetworkPrinter extends JavaTemplate {
 				
 				// Instantiate actors
 				«FOR instance : network.children.filter(typeof(Instance)).filter[!broadcast]»
-					«instance.name» = new «instance.actor.name»(«printArguments(instance.actor.parameters, instance.arguments)»);
+					«instance.name» = new «instance.getActor.name»(«printArguments(instance.getActor.parameters, instance.arguments)»);
 				«ENDFOR»
 				
 				// Instantiate broadcast
 				«FOR instance : network.children.filter(typeof(Instance)).filter[broadcast]»
-					«instance.name» = new Broadcast<«instance.actor.getInput("input").type.doSwitch»>(«instance.outgoing.size»);
+					«instance.name» = new Broadcast<«instance.getActor.getInput("input").type.doSwitch»>(«instance.outgoing.size»);
 				«ENDFOR»
 				
 				@SuppressWarnings("rawtypes")
@@ -136,7 +136,7 @@ class NetworkPrinter extends JavaTemplate {
 			@Override
 			public void schedule() {
 				«FOR instance : network.children.filter(typeof(Instance))»
-					«IF ! instance.actor?.initializes.empty »
+					«IF ! instance.getActor?.initializes.empty »
 					«instance.name».initialize();
 					«ENDIF»
 				«ENDFOR»
@@ -176,10 +176,10 @@ class NetworkPrinter extends JavaTemplate {
 	 * out ports called "output_x", it is a Broadcast actor
 	 */
 	def isBroadcast(Instance instance) {
-		if (instance.actor.getInput("input") == null) {
+		if (instance.getActor.getInput("input") == null) {
 			return false
 		}
-		for(port : instance.actor.outputs) {
+		for(port : instance.getActor.outputs) {
 			if ( ! port.name.startsWith("output_")) {
 				return false
 			}

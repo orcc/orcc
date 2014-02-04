@@ -28,16 +28,19 @@
 */
 
 // Author : Endri Bezati (endri.bezati@epfl.ch)
+// Author : Damien de Saint Jorre
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "types.h"
 #include "fifo.h"
 #include "util.h"
 
 FILE *F = NULL;
-static int cnt = 0; 
+static int cnt = 0;
+static char stop = 0;
 
 void Writer_init() {
 	
@@ -73,3 +76,55 @@ void Writer_close(){
 	fclose(F);
 	exit(666);
 }
+
+int writer_open(char* fileName) {
+    FILE* file = NULL;
+    if (write_file == NULL) {
+        file = fopen(fileName, "wb");
+        if (file == NULL) {
+            fprintf(stderr, "could not open file \"%s\"\n", fileName);
+            exit(1);
+        }
+    }
+    else {
+        char fullPathName[256];
+        if(strlen(fileName)+strlen(write_file)>=256) {
+            fprintf(stderr, "Path too long : input_directory : %s ; fileName : %s\n", write_file, fileName);
+            exit(-1);
+        }
+        strcpy(fullPathName, write_file);
+        strcat(fullPathName, fileName);
+        file = fopen(fullPathName, "wb");
+        if (file == NULL) {
+            fprintf(stderr, "could not open file \"%s\"\n", fullPathName);
+            exit(1);
+        }
+    }
+    stop = 0;
+    cnt++;
+
+    return (long)file;
+}
+
+void writer_writeNTokens(int writeFile, u8 *byte, unsigned short numTokens){
+    fwrite((void*) byte,sizeof(u8), numTokens, (FILE*) (long) writeFile);
+}
+
+void writer_closeAndQuit(int writeFile){
+    if(writeFile != 0) {
+        fclose((FILE*) (long) writeFile);
+        cnt--;
+        if(cnt==0) {
+            exit(0);
+        }
+    }
+}
+
+char writer_getStop() {
+    return stop;
+}
+
+void writer_setStop(char stopVal) {
+    stop = stopVal;
+}
+

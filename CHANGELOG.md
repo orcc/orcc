@@ -1,5 +1,8 @@
 # Next release
 ### Notable changes and features
+- Front-end:
+    * Floating-point type network ports now supported
+
 ### Bugfixes
 ### Known problems
 ### Misc

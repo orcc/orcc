@@ -37,6 +37,7 @@ import net.sf.orcc.ir.TypeFloat
 import net.sf.orcc.ir.TypeInt
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeUint
+import net.sf.orcc.ir.ExprFloat
 
 /*
  * Default C Printer
@@ -61,17 +62,18 @@ abstract class PromelaTemplate extends CTemplate {
 		'''int'''
 
 	override caseTypeFloat(TypeFloat type) {
-		if (type.size == 64) '''double'''
-		else '''float'''
+		'''int'''
 	}
 
 	override caseTypeList(TypeList typeList)
 		'''«typeList.innermostType.doSwitch»'''
 
+	override caseExprFloat(ExprFloat object) {
+		'''0''' // should never be used in Promela
+	}
 	
 	override caseExprList(ExprList object)
 		'''1'''/*{«object.value.join(", ")[doSwitch]»}*/
-		
 
 	override caseExprInt(ExprInt object)
 		'''«object.value»«IF object.long»L«ENDIF»'''

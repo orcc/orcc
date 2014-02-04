@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.util;
 
+import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.util.BackendUtil;
@@ -42,6 +43,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.util.OrccLogger;
 
 /**
  * The class defines an estimator of the quantity of memory needed by an design
@@ -107,7 +109,7 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 		public Long caseConnection(Connection connection) {
 			int bits = connection.getSize()
 					* getSize(connection.getSourcePort().getType()) + 2 * 32;
-			return (long) Math.ceil(bits + bits * ERROR_MARGIN);
+			return (long) Math.ceil(bits);
 		}
 
 		@Override
@@ -123,6 +125,28 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 	}
 
 	@Override
+	public Void caseDesign(Design design) {
+		long lramSize = 0, sramSize = 0;
+		OrccLogger.noticeln("****** Memory size estimation ******");
+		super.caseDesign(design);
+		OrccLogger.traceln("Size of shared RAMs (in bits)");
+		for(Memory smem : design.getSharedMemories()) {
+			OrccLogger.traceln(smem.getName() + " = " + smem.getSizeAsString());
+			sramSize += smem.getDepth() * smem.getWordWidth();
+		}
+		OrccLogger.traceln("Size of local RAMs (in bits)");
+		for(Processor processor : design.getProcessors()) {
+			Memory lram = processor.getLocalRAMs().get(0);
+			OrccLogger.traceln("Processor " + processor.getName() + " = " + lram.getSizeAsString());
+			lramSize += lram.getDepth() * lram.getWordWidth();
+		}
+		OrccLogger.traceln("Total size of shared RAM = " + sramSize / 8 + " Bytes");
+		OrccLogger.traceln("Total size of local RAM  = " + lramSize / 8 + " Bytes");
+		OrccLogger.noticeln("******************************");
+		return null;
+	}
+
+	@Override
 	public Void caseMemory(Memory buffer) {
 		int bits = 0;
 		for (Connection connection : buffer.getMappedConnections()) {
@@ -133,6 +157,8 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 		buffer.setMinAddress(0);
 		return null;
 	}
+
+
 
 	@Override
 	public Void caseProcessor(Processor processor) {
