@@ -30,7 +30,6 @@ package net.sf.orcc.simulators.runtime.std.video.impl;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
-import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
@@ -82,8 +81,6 @@ public class Display extends GenericDisplay {
 	 */
 	public static void clearAll() {
 		if (frame != null && frame.isVisible()) {
-			WindowEvent wev = new WindowEvent(frame, WindowEvent.WINDOW_CLOSING);
-			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
 			frame.setVisible(false);
 			frame.dispose();
 		}

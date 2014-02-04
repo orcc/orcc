@@ -53,6 +53,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.SwingUtilities;
+
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
@@ -257,6 +259,70 @@ public class SlowSimulator extends AbstractSimulator {
 		statusCode = 0;
 	}
 
+	/**
+	 * Kill simulator descriptors and close the display with associated objects
+	 * if necessary
+	 */
+	protected void killDescriptors() {
+		Runnable killer = new Runnable() {
+			public void run() {
+				SimulatorDescriptor.killDescriptors();
+				Display.clearAll();
+			}
+		};
+		SwingUtilities.invokeLater(killer);
+	}
+
+	@Override
+	public void run() {
+		try {
+			killDescriptors();
+
+			interpreters = new HashMap<Actor, ActorInterpreter>();
+
+			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
+			ResourceSet set = new ResourceSetImpl();
+			Network network = EcoreHelper.getEObject(set, file);
+
+			// full instantiation (no more instances)
+			new Instantiator(true, fifoSize).doSwitch(network);
+
+			// flattens network
+			new NetworkFlattener().doSwitch(network);
+
+			// if required, use the type sizer transformation
+			if (enableTypeResizer) {
+				new TypeResizer(typeResizer[0], typeResizer[1], typeResizer[2],
+						typeResizer[3]).doSwitch(network);
+			}
+
+			// create interpreters, connect network, initialize, and run
+			createInterpreters(network);
+			connectNetwork(network);
+			initializeNetwork(network);
+
+			SimulationEndOrigin returnStatus = runNetwork(network);
+
+			killDescriptors();
+
+			if (returnStatus == SimulationEndOrigin.EXTERNALSTOP) {
+				OrccLogger
+						.traceln("Simulation aborted (from application control).");
+			} else {
+				OrccLogger.traceln("End of simulation");
+				OrccLogger.traceln("Simulation returned status code "
+						+ statusCode);
+			}
+
+			if (profile) {
+				new ProfilingPrinter().print(profileFolder, network);
+			}
+		} finally {
+			// clean up to prevent memory leak
+			interpreters = null;
+		}
+	}
+
 	protected SimulationEndOrigin runNetwork(Network network) {
 		boolean hasExecuted;
 		do {
@@ -284,56 +350,5 @@ public class SlowSimulator extends AbstractSimulator {
 		} while (hasExecuted);
 
 		return SimulationEndOrigin.NORMALEND;
-	}
-
-	@Override
-	public void run() {
-		try {
-			SimulatorDescriptor.killDescriptors();
-			interpreters = new HashMap<Actor, ActorInterpreter>();
-
-			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
-			ResourceSet set = new ResourceSetImpl();
-			Network network = EcoreHelper.getEObject(set, file);
-
-			// full instantiation (no more instances)
-			new Instantiator(true, fifoSize).doSwitch(network);
-
-			// flattens network
-			new NetworkFlattener().doSwitch(network);
-
-			// if required, use the type sizer transformation
-			if (enableTypeResizer) {
-				new TypeResizer(typeResizer[0], typeResizer[1], typeResizer[2],
-						typeResizer[3]).doSwitch(network);
-			}
-
-			// create interpreters, connect network, initialize, and run
-			createInterpreters(network);
-			connectNetwork(network);
-			initializeNetwork(network);
-
-			SimulationEndOrigin returnStatus = runNetwork(network);
-
-			SimulatorDescriptor.killDescriptors();
-			// Close the display and associated objects if necessary
-			Display.clearAll();
-
-			if (returnStatus == SimulationEndOrigin.EXTERNALSTOP) {
-				OrccLogger
-						.traceln("Simulation aborted (from application control).");
-			} else {
-				OrccLogger.traceln("End of simulation");
-				OrccLogger.traceln("Simulation returned status code "
-						+ statusCode);
-			}
-
-			if (profile) {
-				new ProfilingPrinter().print(profileFolder, network);
-			}
-		} finally {
-			// clean up to prevent memory leak
-			interpreters = null;
-		}
 	}
 }
