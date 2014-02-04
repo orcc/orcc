@@ -22,6 +22,7 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectEList;
@@ -339,7 +340,8 @@ public class VertexImpl extends AttributableImpl implements Vertex {
 
 	@Override
 	public Graph getGraph() {
-		return (Graph) eContainer();
+		final EObject container = eContainer();
+		return container instanceof Graph ? (Graph) container : null;
 	}
 
 	@Override

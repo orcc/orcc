@@ -83,8 +83,8 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 
 				try {
 					// Get the backend instance
-					BackendFactory factory = BackendFactory.getInstance();
-					Backend backend = factory.getBackend(backendName);
+					Backend backend = BackendFactory.getInstance().getBackend(
+							backendName);
 
 					// Configure it with options set in "Run Config" panel by
 					// user
@@ -111,7 +111,7 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 				return Status.OK_STATUS;
 			}
 		};
-		
+
 		job.setUser(false);
 		job.schedule();
 	}

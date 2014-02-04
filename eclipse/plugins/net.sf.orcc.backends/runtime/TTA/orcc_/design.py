@@ -138,16 +138,20 @@ class Design:
         result = template.substitute(path=genPath, id="ram_2p", width=512, depth=32)
         open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
     
-    def simulateMulti(self, proc, results):
+    def simulateMulti(self, proc, results, args):
         self.sema.acquire()
-        retcode = proc.simulate()
+        retcode = proc.simulate(args)
         results.append(retcode)
         self.sema.release()
 
-    def simulate(self, nbJobs):
+    def simulate(self, nbJobs, args):
+        if args.count("-q") and nbJobs > 1:
+            print "Cannot use -q option in simulations when using more than one job."
+            return;
+
         self.sema = multiprocessing.BoundedSemaphore(value=nbJobs)
         results = multiprocessing.Manager().list()
-        jobs = [multiprocessing.Process(target=self.simulateMulti, args=(processor, results)) 
+        jobs = [multiprocessing.Process(target=self.simulateMulti, args=(processor, results, args)) 
             for processor in self.processors]    
         for job in jobs: job.start()
         for job in jobs: job.join()

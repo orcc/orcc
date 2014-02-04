@@ -36,13 +36,6 @@ int openHEVCIsPresent(){
     return 0;
 #endif
 }
-#define av_clip_pixel(a) av_clip_uint8(a)false
-
-static av_clip_uint8(int a)
-{
-    if (a&(~0xFF)) return (-a)>>31;
-    else           return a;
-}
 
 void put_hevc_qpel_pixel_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,

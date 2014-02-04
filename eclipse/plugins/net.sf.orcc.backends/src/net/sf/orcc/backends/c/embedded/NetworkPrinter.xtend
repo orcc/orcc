@@ -82,9 +82,9 @@ class NetworkPrinter extends CTemplate {
 		var keys = newArrayList("i64", "i32", "i16", "i8")
 		var values = newArrayList(8, 4, 2, 1)
 		for(instance : network.children.filter(typeof(Instance))) {
-			if(!instance.actor.stateVars.empty) {
-				keys.add('''«instance.actor.simpleName»_stateVars''')
-				val structSize = instance.actor.stateVars.fold(0, [total, v | total + v.type.sizeInBits])
+			if(!instance.getActor.stateVars.empty) {
+				keys.add('''«instance.getActor.simpleName»_stateVars''')
+				val structSize = instance.getActor.stateVars.fold(0, [total, v | total + v.type.sizeInBits])
 				if(structSize % 8 == 0) {
 					values.add(structSize / 8)
 				} else {
@@ -156,16 +156,16 @@ class NetworkPrinter extends CTemplate {
 
 	def private print(Connection connection) '''
 		<edge source="«(connection.source as Instance).name»" sourceport="«connection.sourcePort.name»" target="«(connection.target as Instance).name»" targetport="«connection.targetPort.name»">
-		    <data key="edge_prod">«((connection.source as Instance).actor.moC as CSDFMoC).outputPattern.numTokensMap.get(connection.sourcePort)»</data>
+		    <data key="edge_prod">«((connection.source as Instance).getActor.moC as CSDFMoC).outputPattern.numTokensMap.get(connection.sourcePort)»</data>
 		    <data key="edge_delay">«connection.printDelays»</data>
-		    <data key="edge_cons">«((connection.target as Instance).actor.moC as CSDFMoC).inputPattern.numTokensMap.get(connection.targetPort)»</data>
+		    <data key="edge_cons">«((connection.target as Instance).getActor.moC as CSDFMoC).inputPattern.numTokensMap.get(connection.targetPort)»</data>
 		    <data key="data_type">«connection.sourcePort.type.doSwitch»</data>
 		</edge>
 	'''
 
 	def private printDelays(Connection connection) {
-		if (((connection.source as Instance).actor.moC as CSDFMoC).delayPattern.numTokensMap.containsKey(connection.sourcePort)) {
-			((connection.source as Instance).actor.moC as CSDFMoC).delayPattern.numTokensMap.get(connection.sourcePort)
+		if (((connection.source as Instance).getActor.moC as CSDFMoC).delayPattern.numTokensMap.containsKey(connection.sourcePort)) {
+			((connection.source as Instance).getActor.moC as CSDFMoC).delayPattern.numTokensMap.get(connection.sourcePort)
 		} else {
 			"0"
 		}
@@ -173,8 +173,8 @@ class NetworkPrinter extends CTemplate {
 
 	def private print(Instance instance) '''
 		<node id="«instance.name»" kind="vertex">
-		<data key="graph_desc">../Code/IDL/«instance.actor.simpleName».idl</data>
-		<data key="name">«instance.actor.simpleName»</data>
+		<data key="graph_desc">../Code/IDL/«instance.getActor.simpleName».idl</data>
+		<data key="name">«instance.getActor.simpleName»</data>
 			«IF instance.arguments.empty»
 				<data key="arguments"/>
 			«ELSE»
@@ -183,7 +183,7 @@ class NetworkPrinter extends CTemplate {
 				«ENDFOR»
 			«ENDIF»
 		</node>
-		«IF !instance.actor.stateVars.empty»
+		«IF !instance.getActor.stateVars.empty»
 			<edge source="«instance.name»" sourceport="stateVars_o" target="«instance.name»" targetport="stateVars_i">
 				<data key="edge_prod">1</data>
 				<data key="edge_delay">1</data>

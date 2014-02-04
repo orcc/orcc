@@ -78,7 +78,7 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 	private void browseOutputFolder(Shell shell) {
 		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
 		dialog.setMessage("Select output folder:");
-		if (getFolderFromText()) {
+		if (outputIsFolder()) {
 			// set initial directory if it is valid
 			dialog.setFilterPath(textOutput.getText());
 		}
@@ -96,8 +96,7 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, true);
 		lbl.setLayoutData(data);
 
-		comboPlugin = new Combo(group, SWT.BORDER | SWT.DROP_DOWN
-				| SWT.READ_ONLY);
+		comboPlugin = new Combo(group, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
 		data = new GridData(SWT.LEFT, SWT.CENTER, false, true);
 		data.horizontalSpan = 2;
 		comboPlugin.setLayoutData(data);
@@ -160,19 +159,19 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 		BackendFactory factory = BackendFactory.getInstance();
 		for (String backend : factory.listPlugins()) {
 			List<Option> options = factory.getOptions(backend);
-			List<OptionWidget> widgets = OptionWidgetManager.createOptions(
-					this, options, groupOptions);
+			List<OptionWidget> widgets = OptionWidgetManager.createOptions(this, options, groupOptions);
 			optionWidgets.put(backend, widgets);
 		}
 	}
 
-	private boolean getFolderFromText() {
+	private boolean outputIsFolder() {
 		String value = textOutput.getText();
 		File file = new File(value);
-		if (file.isDirectory()) {
-			return true;
+
+		if (file.exists()) {
+			return file.isDirectory();
 		} else {
-			return false;
+			return true;
 		}
 	}
 
@@ -213,8 +212,8 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 			return false;
 		}
 
-		if (!getFolderFromText()) {
-			setErrorMessage("Given output path does not specify an existing folder");
+		if (!outputIsFolder()) {
+			setErrorMessage("Given output must be a folder");
 			return false;
 		}
 

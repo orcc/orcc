@@ -64,7 +64,7 @@ local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_sche
         sched->mesh_waiting_schedulable[i] = (waiting_t *) malloc(sizeof(waiting_t));
     }
     sched->sync = sync;
-    semaphore_create(sched->sem_thread, 0);
+    orcc_semaphore_create(sched->sem_thread, 0);
 
     return sched;
 }

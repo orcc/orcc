@@ -56,6 +56,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
@@ -481,6 +482,14 @@ public class XdfParser {
 								.evaluateAsInteger(expr);
 						return new ParseContinuation<Type>(node,
 								IrFactory.eINSTANCE.createTypeInt(size));
+					} else if (name.equals(TypeFloat.NAME)) {
+						Map<String, Entry> entries = parseTypeEntries(node
+								.getFirstChild());
+						Expression expr = parseTypeSize(entries);
+						int size = new ExpressionEvaluator()
+								.evaluateAsInteger(expr);
+						return new ParseContinuation<Type>(node,
+								IrFactory.eINSTANCE.createTypeFloat(size));
 					} else if (name.equals(TypeList.NAME)) {
 						return new ParseContinuation<Type>(node,
 								parseTypeList(node));

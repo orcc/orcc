@@ -51,9 +51,7 @@
 const int PRINT_SPEED = 0;
 
 static FILE *file = NULL;
-static int nb;
 static int stop;
-static int genetic = 0;
 static clock_t startTime;
 static unsigned int nbByteRead = 0;
 
@@ -73,13 +71,11 @@ void printSpeed(void) {
 
 // Called before any *_scheduler function.
 void source_init() {
-	stop = 0;
-	nb = 0;
+    stop = 0;
 
 	if (input_file == NULL) {
 		print_usage();
-		fprintf(stderr, "No input file given!\n");
-		wait_for_key();
+        fprintf(stderr, "No input file given!\n");
 		exit(1);
 	}
 
@@ -89,8 +85,7 @@ void source_init() {
 			input_file = "<null>";
 		}
 
-		fprintf(stderr, "could not open file \"%s\"\n", input_file);
-		wait_for_key();
+        fprintf(stderr, "could not open file \"%s\"\n", input_file);
 		exit(1);
 	}
 	if(PRINT_SPEED) {
@@ -104,13 +99,11 @@ long long source_open(char* fileName) {
 	char fullPathName[256];
 	FILE *file = NULL;
 
-	stop = 0;
-	nb = 0;
+    stop = 0;
 	if(input_directory == NULL) {
 		file = fopen(fileName, "rb");
 		if (file == NULL) {
-			fprintf(stderr, "could not open file \"%s\"\n", fileName);
-			wait_for_key();
+            fprintf(stderr, "could not open file \"%s\"\n", fileName);
 			exit(1);
 		}
 	}
@@ -123,8 +116,7 @@ long long source_open(char* fileName) {
 		strcat(fullPathName, fileName);
 		file = fopen(fullPathName, "rb");
 		if (file == NULL) {
-			fprintf(stderr, "could not open file \"%s\"\n", fullPathName);
-			wait_for_key();
+            fprintf(stderr, "could not open file \"%s\"\n", fullPathName);
 			exit(1);
 		}
 	}
@@ -169,21 +161,9 @@ int source_is_stopped() {
 	return stop;
 }
 
-void source_activeGenetic() {
-	genetic = 1;
-}
-
 void source_rewind() {
 	if(file != NULL) {
 		rewind(file);
-		if (genetic){
-			if(nb < LOOP_NUMBER) {
-				nb++;
-			}
-			else{
-				stop = 1;
-			}
-		}
 	}
 }
 
@@ -191,14 +171,6 @@ void source_rewindFd(long long fdVal) {
 	FILE* fd = (FILE*) fdVal;
 	if(fd != NULL) {
 		rewind(fd);
-		if (genetic){
-			if(nb < LOOP_NUMBER) {
-				nb++;
-			}
-			else{
-				stop = 1;
-			}
-		}
 	}
 }
 
@@ -223,14 +195,7 @@ unsigned int source_readByte(){
 		if (feof(file)) {
 			printf("warning\n");
 			rewind(file);
-			if (!genetic || (genetic && nb < LOOP_NUMBER)) {
-				n = fread(&buf, 1, 1, file);
-				nb++;
-			}
-			else{
-				n = fclose(file);
-				stop = 1;
-			}
+            n = fread(&buf, 1, 1, file);
 		}
 		else {
 			fprintf(stderr,"Problem when reading input file.\n");

@@ -57,7 +57,7 @@ import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.Vectorizable;
+import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -79,7 +79,6 @@ import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
-import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
@@ -183,8 +182,8 @@ public class CBackend extends AbstractBackend {
 						+ actor.getName(), actor);
 			}
 		}
-		// update "vectorizable" information
-		Vectorizable.setVectorizableAttributs(actor);
+		
+		Alignable.setAlignability(actor);
 
 		new DfVisitor<CfgNode>(new ControlFlowAnalyzer()).doSwitch(actor);
 		new DfVisitor<Void>(new ConstantRegisterCleaner()).doSwitch(actor);

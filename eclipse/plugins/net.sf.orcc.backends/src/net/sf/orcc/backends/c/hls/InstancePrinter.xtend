@@ -58,7 +58,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 	
 	override getFileContent() '''
-		// Source file is "«instance.actor.file»"
+		// Source file is "«instance.getActor.file»"
 		
 		#include <hls_stream.h>
 		using namespace hls;
@@ -87,7 +87,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Input FIFOS
-		«FOR port : instance.actor.inputs»
+		«FOR port : instance.getActor.inputs»
 			«IF instance.incomingPortMap.get(port) != null»
 				extern stream<«instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
 			«ENDIF»
@@ -95,13 +95,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Output FIFOs
-		«FOR port : instance.actor.outputs.filter[! native]»
+		«FOR port : instance.getActor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(port)»
 				extern stream<«connection.fifoTypeOut.doSwitch»> «connection.fifoName»;
 			«ENDFOR»
 		«ENDFOR»
 		
-		«IF instance.actor.outputs.empty»
+		«IF instance.getActor.outputs.empty»
 			extern stream<int> outFIFO_«instance.name»;
 		«ENDIF»
 		
@@ -110,33 +110,33 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// State variables of the actor
-		«FOR variable : instance.actor.stateVars»
+		«FOR variable : instance.getActor.stateVars»
 			«variable.declareStateVar»
 		«ENDFOR»
-		«IF instance.actor.hasFsm»
+		«IF instance.getActor.hasFsm»
 			////////////////////////////////////////////////////////////////////////////////
 			// Initial FSM state of the actor
 			enum states {
-				«FOR state : instance.actor.fsm.states SEPARATOR ","»
+				«FOR state : instance.getActor.fsm.states SEPARATOR ","»
 					my_state_«state.name»
 				«ENDFOR»
 			};
 			
-			static enum states _FSM_state = my_state_«instance.actor.fsm.initialState.name»;
+			static enum states _FSM_state = my_state_«instance.getActor.fsm.initialState.name»;
 		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
-		«FOR proc : instance.actor.procs»
+		«FOR proc : instance.getActor.procs»
 			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])»);
 		«ENDFOR»
 		
-		«FOR proc : instance.actor.procs.filter[!native]»
+		«FOR proc : instance.getActor.procs.filter[!native]»
 			«proc.print»
 		«ENDFOR»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
-		«FOR action : instance.actor.actions»
+		«FOR action : instance.getActor.actions»
 			«action.print»
 		«ENDFOR»
 		
@@ -146,16 +146,16 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		«IF instance.actor.hasFsm»
+		«IF instance.getActor.hasFsm»
 			«printFsm»
 		«ELSE»
 			void «instance.name»_scheduler() {		
-			«IF instance.actor.outputs.empty»
+			«IF instance.getActor.outputs.empty»
 				if (! outFIFO_«instance.name».full()){
 					outFIFO_«instance.name».write(0);
 				}
 			«ENDIF»
-				«instance.actor.actionsOutsideFsm.printActionLoop»
+				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
 				
 			finished:
 				return;
@@ -164,9 +164,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 		
 	override printFsm() '''
-		«IF ! instance.actor.actionsOutsideFsm.empty»
+		«IF ! instance.getActor.actionsOutsideFsm.empty»
 			void «instance.name»_outside_FSM_scheduler() {
-				«instance.actor.actionsOutsideFsm.printActionLoop»
+				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
 			finished:
 				return;
 			}
@@ -174,13 +174,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		void «instance.name»_scheduler() {
 			// jump to FSM state 
-			«IF instance.actor.outputs.empty»
+			«IF instance.getActor.outputs.empty»
 				if (! outFIFO_«instance.name».full()){
 					outFIFO_«instance.name».write(0);
 				}
 			«ENDIF»
 			switch (_FSM_state) {
-				«FOR state : instance.actor.fsm.states»
+				«FOR state : instance.getActor.fsm.states»
 					case my_state_«state.name»:
 						goto l_«state.name»;
 				«ENDFOR»
@@ -188,7 +188,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				goto finished;
 			}
 			// FSM transitions
-		«FOR state : instance.actor.fsm.states»
+		«FOR state : instance.getActor.fsm.states»
 			«state.printStateLabel»
 		«ENDFOR»
 		finished:
@@ -203,7 +203,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printStateLabel(State state) '''
 		l_«state.name»:
-			«IF ! instance.actor.actionsOutsideFsm.empty»
+			«IF ! instance.getActor.actionsOutsideFsm.empty»
 				«instance.name»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF !state.outgoing.empty»
@@ -305,8 +305,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 	}
 	 
-	override printActionLoop(List<Action> actions) '''
-		«actions.printActions»
+	override printActionSchedulingLoop(List<Action> actions) '''
+		«actions.printActionsScheduling»
 	'''
 	
 	def fifoName(Connection connection) '''«IF connection != null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
@@ -328,14 +328,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 	
 	override initializeFunction() '''
-		«IF ! instance.actor.initializes.empty»
-			«FOR init : instance.actor.initializes»
+		«IF ! instance.getActor.initializes.empty»
+			«FOR init : instance.getActor.initializes»
 				«init.print»
 			«ENDFOR»
 			
 			static void initialize() {
 				
-				«instance.actor.initializes.printActions»
+				«instance.getActor.initializes.printActionsScheduling»
 				
 			finished:
 				// no read_end/write_end here!
@@ -345,7 +345,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 	
-	override printActions(Iterable<Action> actions) '''
+	override printActionsScheduling(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
 			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
 				if(1

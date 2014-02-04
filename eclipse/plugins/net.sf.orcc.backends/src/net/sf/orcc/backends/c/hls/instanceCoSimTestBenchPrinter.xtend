@@ -68,7 +68,7 @@ import net.sf.orcc.ir.TypeBool
 		////////////////////////////////////////////////////////////////////////////////
 		// Input FIFOS
 		
-		«FOR port : instance.actor.inputs»
+		«FOR port : instance.getActor.inputs»
 			«IF instance.incomingPortMap.get(port) != null»
 				stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
 				int counter_«instance.incomingPortMap.get(port).fifoName»;
@@ -81,7 +81,7 @@ import net.sf.orcc.ir.TypeBool
 		////////////////////////////////////////////////////////////////////////////////
 		// Output FIFOs
 		
-		«FOR port : instance.actor.outputs.filter[! native]»
+		«FOR port : instance.getActor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(port)»
 				stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
 				int counter_«connection.fifoName»;
@@ -104,7 +104,7 @@ import net.sf.orcc.ir.TypeBool
 			int i;
 			int retval = 0;
 			// read data
-			«FOR port : instance.actor.inputs»
+			«FOR port : instance.getActor.inputs»
 				«IF instance.incomingPortMap.get(port) != null»
 					fp=fopen("«instance.name»_«port.name».txt","r");
 					for (i=0 ; i<1000 ; i++){
@@ -118,7 +118,7 @@ import net.sf.orcc.ir.TypeBool
 			
 			// scheduler execution
 			
-				«FOR port : instance.actor.inputs»
+				«FOR port : instance.getActor.inputs»
 					«IF instance.incomingPortMap.get(port) != null»
 					for (i=0 ; i<1000 ; i++){
 						if(!«instance.incomingPortMap.get(port).fifoName».full()){
@@ -132,7 +132,7 @@ import net.sf.orcc.ir.TypeBool
 				for (i=0 ; i<1000 ; i++){
 				«instance.name»_scheduler();
 				
-				«FOR port : instance.actor.outputs.filter[! native]»
+				«FOR port : instance.getActor.outputs.filter[! native]»
 					«FOR connection : instance.outgoingPortMap.get(port)»
 						if(!«connection.fifoName».empty()){
 							«connection.fifoName».read(tab_«connection.fifoName»[counter_«connection.fifoName»]);
@@ -143,7 +143,7 @@ import net.sf.orcc.ir.TypeBool
 			}
 			
 			// write results	
-			«FOR port : instance.actor.outputs.filter[! native]»
+			«FOR port : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
 					fp=fopen("gold_«instance.name»_«port.name».txt","w");
 					for (i=0 ; i<1000 ; i++){
@@ -156,7 +156,7 @@ import net.sf.orcc.ir.TypeBool
 			«ENDFOR»
 			
 			// comparison with reference (gold) files
-			«FOR port : instance.actor.outputs.filter[! native]»
+			«FOR port : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
 					retval += system("diff --brief -w «instance.name»_«port.name».txt gold_«instance.name»_«port.name».txt");
 				«ENDFOR»

@@ -209,6 +209,8 @@ public interface Memory extends Link {
 	 */
 	EList<Connection> getMappedConnections();
 
+	String getSizeAsString();
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

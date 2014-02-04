@@ -138,7 +138,10 @@ class BenchAutoMapping(OrccBench):
         self.TOKEN_PART = "partitions"
         self.DEFAULT_LOG_EXT = ".log"
         self.SEQ_EXT = ["_qp27.bin", ".bit", ".m4v"]
-        self.MS_LIST = ["MR", "MKV", "MKC", "RR", "QM", "WLB", "COWLB", "KRWLB"]
+        # self.MS_LIST = ["MR", "MKV", "MKC", "RR", "QM", "WLB", "COWLB", "KRWLB"]
+        self.MS_LIST = ["MR", "MKV", "MKC", "WLB", "COWLB"]
+        # self.NBS_LIST = ["0", "1", "2", "3", "4", "5", "6", "7"]
+        self.NBS_LIST = ["0", "1", "2", "5", "6"]
         self.logTXT = False
         self.logXML = False
         self.logHTML = False
@@ -177,7 +180,7 @@ class BenchAutoMapping(OrccBench):
             log_file = open(baseName + "_" + self.MS_LIST[Strategy]  + self.DEFAULT_LOG_EXT, 'w')
 
         try:
-            proc = subprocess.call([self.DEFAULT_EXE, "-f", str(self.NBFRAME), "-n", "-v1", "-i", os.path.join(self.SEQ_PATH, fic), "-c", str(nbProcs), "-r100", "-s", str(Strategy)], stdout=log_file, timeout=600)
+            proc = subprocess.call([self.DEFAULT_EXE, "-f", str(self.NBFRAME), "-n", "-v1", "-i", os.path.join(self.SEQ_PATH, fic), "-c", str(nbProcs), "-r100", "-s", str(self.NBS_LIST[Strategy])], stdout=log_file, timeout=600)
         except subprocess.TimeoutExpired:
             print("    => Timeout expired !")
 
