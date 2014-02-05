@@ -42,16 +42,24 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.IReconnectionFeature;
 import org.eclipse.graphiti.features.IRemoveFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
+import org.eclipse.graphiti.features.context.IReconnectionContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.features.context.impl.CreateConnectionContext;
+import org.eclipse.graphiti.features.context.impl.ReconnectionContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
+import org.eclipse.graphiti.features.impl.DefaultReconnectionFeature;
 import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
+import org.eclipse.graphiti.mm.pictograms.Connection;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
 
 /**
@@ -110,6 +118,47 @@ public class XdfDiagramFeatureProvider extends
 			@Override
 			public boolean isAvailable(IContext context) {
 				return false;
+			}
+		};
+	}
+
+	/**
+	 * We want to allow reconnection, even if an existing one is in a bad state.
+	 * If the source or target of a connection is a null or non-existing object,
+	 * we don't care this is this side the user wants to reconnect.
+	 * 
+	 * This method also prevent bad connection by reusing logic from
+	 * ConnectionPattern.canXXX methods
+	 */
+	@Override
+	public IReconnectionFeature getReconnectionFeature(
+			IReconnectionContext context) {
+		return new DefaultReconnectionFeature(this) {
+			@Override
+			public boolean canReconnect(IReconnectionContext context) {
+				final Anchor newAnchor = getNewAnchor(context);
+				final Connection connection = context.getConnection();
+
+				// Classical checks. Same as original method, without checking
+				// null value of start/end in the original connection
+				if ((connection == null) || (newAnchor == null)
+						|| (newAnchor.getParent() instanceof Diagram)) {
+					return false;
+				}
+
+				// Delegate to ConnectionPattern to decide if a reconnection can
+				// be performed or not
+				final ConnectionPattern conPattern = (ConnectionPattern) getConnectionPatterns().get(0);
+				final CreateConnectionContext ctxt = new CreateConnectionContext();
+				if (context.getReconnectType().equals(ReconnectionContext.RECONNECT_TARGET)) {
+					ctxt.setSourceAnchor(connection.getStart());
+					ctxt.setTargetAnchor(newAnchor);
+					return conPattern.canCreate(ctxt);
+				} else {
+					ctxt.setSourceAnchor(newAnchor);
+					ctxt.setTargetAnchor(connection.getEnd());
+					return conPattern.canStartConnection(ctxt);
+				}
 			}
 		};
 	}
