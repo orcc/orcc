@@ -70,6 +70,16 @@ import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 
 	private class EntityFilter extends ItemsFilter {
+
+		public EntityFilter() {
+			super();
+			// By default, we want to display the full list. We also want to
+			// search for all content ending with chars typed by user. That's
+			// why we prepend the pattern (characters typed by user) with a
+			// wildcard.
+			patternMatcher.setPattern("*" + patternMatcher.getPattern());
+		}
+
 		@Override
 		public boolean isConsistentItem(Object item) {
 			return true;

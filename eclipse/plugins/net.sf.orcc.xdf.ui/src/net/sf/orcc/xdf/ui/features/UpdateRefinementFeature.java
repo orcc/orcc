@@ -110,10 +110,6 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 				+ "in this Instance. You can filter "
 				+ "results with string patterns.");
 
-		// FIXME: Find why this is mandatory.
-		// Allow blank pattern corresponding to '*'
-		entityDialog.setInitialPattern("**");
-
 		final int returnCode = entityDialog.open();
 		if (returnCode == Dialog.CANCEL) {
 			hasDoneChanges = false;
