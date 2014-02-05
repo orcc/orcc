@@ -64,11 +64,22 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 
 /**
+ * Define a dialog used to display a list of all Actors/Network for the current
+ * project. The user can filter to find the one he wants. When the dialog is
+ * validated, 
+ * 
  * @author Antoine Lorence
  * 
  */
 public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 
+	/**
+	 * This class is provide filtering on elements from pattern typed by user in
+	 * the search field.
+	 * 
+	 * @author Antoine Lorence
+	 * 
+	 */
 	private class EntityFilter extends ItemsFilter {
 
 		public EntityFilter() {
@@ -91,6 +102,17 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 		}
 	};
 
+	/**
+	 * This provider is responsible of displaying the name of each item in the
+	 * list. In the EntitySelectionDialog, each element (Actor or Network) is
+	 * displayed by its qualified name. this is done using Network.getName() or
+	 * Actor.getName() method.
+	 * 
+	 * This class also provide an icon according to the type of element.
+	 * 
+	 * @author Antoine Lorence
+	 * 
+	 */
 	private class EntityListLabelProvider implements ILabelProvider {
 
 		List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
@@ -118,7 +140,7 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 		public String getText(Object element) {
 			String result = "null";
 			if (element instanceof EObject) {
-				EObject obj = (EObject) element;
+				final EObject obj = (EObject) element;
 				if (obj.eClass().equals(DfPackage.eINSTANCE.getActor())) {
 					result = ((Actor) obj).getName();
 				} else if (obj.eClass().equals(DfPackage.eINSTANCE.getNetwork())) {
@@ -177,7 +199,8 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 
 	@Override
 	protected IDialogSettings getDialogSettings() {
-		IDialogSettings settings = Activator.getDefault().getDialogSettings().getSection(SETTINGS);
+		IDialogSettings settings = Activator.getDefault().getDialogSettings()
+				.getSection(SETTINGS);
 
 		if (settings == null) {
 			settings = Activator.getDefault().getDialogSettings().addNewSection(SETTINGS);
@@ -197,6 +220,7 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 
 	@Override
 	protected Comparator<?> getItemsComparator() {
+		// Items are returned ordered alphabetically
 		return new Comparator<Object>() {
 
 			@Override
@@ -211,7 +235,7 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 			IProgressMonitor monitor) throws CoreException {
 
 		monitor.beginTask("Searching", objects.size());
-		for (EObject obj : objects) {
+		for (final EObject obj : objects) {
 			contentProvider.add(obj, itemsFilter);
 			monitor.worked(1);
 		}
@@ -222,7 +246,7 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 	public String getElementName(Object item) {
 		String result = "null";
 		if (item instanceof EObject) {
-			EObject obj = (EObject) item;
+			final EObject obj = (EObject) item;
 			if (obj.eClass().equals(DfPackage.eINSTANCE.getActor())) {
 				result = ((Actor) obj).getName();
 			} else if (obj.eClass().equals(DfPackage.eINSTANCE.getNetwork())) {
