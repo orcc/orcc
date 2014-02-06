@@ -71,7 +71,13 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		final IFile file = (IFile) context.getNewObject();
 		final String extension = file.getFileExtension();
 		if (extension.equals(Activator.NETWORK_SUFFIX) || extension.equals(Activator.ACTOR_SUFFIX)) {
-			return true;
+
+			final ContainerShape target = context.getTargetContainer();
+			if (target == getDiagram()
+					|| ShapePropertiesManager.isExpectedPc(target,
+							InstancePattern.INSTANCE_ID)) {
+				return true;
+			}
 		}
 
 		return false;
