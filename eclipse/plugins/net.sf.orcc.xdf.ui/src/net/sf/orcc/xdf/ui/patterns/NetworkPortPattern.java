@@ -172,6 +172,16 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	@Override
 	public boolean canDelete(IDeleteContext context) {
+		final int nbConnections = Graphiti
+				.getPeService()
+				.getAllConnections(
+						(AnchorContainer) context.getPictogramElement()).size();
+
+		// When user will be prompted, display the exact number of elements to
+		// delete
+		((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(true,
+				false, nbConnections + 1));
+
 		return true;
 	}
 
@@ -186,12 +196,15 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		}
 
 		final List<Connection> connections = Graphiti.getPeService().getAllConnections((AnchorContainer) pe);
-		for (Connection connection : connections) {
-			DeleteContext conDelContext = new DeleteContext(connection);
-			conDelContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
-			IDeleteFeature delFeature = getFeatureProvider().getDeleteFeature(conDelContext);
-			if (delFeature.canDelete(conDelContext)) {
-				delFeature.execute(conDelContext);
+		for (final Connection connection : connections) {
+			final DeleteContext context = new DeleteContext(connection);
+			// We don't want to prompt user for each connection deletion
+			context.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
+
+			final IDeleteFeature feature = getFeatureProvider()
+					.getDeleteFeature(context);
+			if (feature.canDelete(context)) {
+				feature.execute(context);
 			}
 		}
 	}
