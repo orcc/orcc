@@ -488,6 +488,12 @@ public class InstancePattern extends AbstractPattern {
 
 		// Set the current instance's entity
 		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instanceShape);
+
+		// Do not update refinement with the same entity
+		if (instance.getEntity() == entity) {
+			return;
+		}
+
 		instance.setEntity(entity);
 		Graphiti.getPeService().setPropertyValue(instanceShape, REFINEMENT_KEY,
 				entity.eResource().getURI().toPlatformString(true));
