@@ -19,6 +19,9 @@
          <diagramType
                id="net.sf.orcc.xdf.ui.XdfDiagramType">
          </diagramType>
+         <imageProvider
+               id="net.sf.orcc.xdf.ui.imageProvider">
+         </imageProvider>
       </diagramTypeProvider>
    </extension>
    <extension
@@ -140,5 +143,12 @@
             tab="net.sf.orcc.xdf.ui.tabs.MainConnection">
       </propertySection>
     </propertySections>
+  </extension>
+  <extension
+        point="org.eclipse.graphiti.ui.imageProviders">
+     <imageProvider
+           class="net.sf.orcc.xdf.ui.diagram.XdfImageProvider"
+           id="net.sf.orcc.xdf.ui.imageProvider">
+     </imageProvider>
   </extension>
 </plugin>
