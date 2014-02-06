@@ -588,7 +588,15 @@ public class InstancePattern extends AbstractPattern {
 		}
 		for (final Iterable<Connection> connectionList : outMap.values()) {
 			for (final Connection connection : connectionList) {
-				Graphiti.getPeService().deletePictogramElement(connection);
+				final DeleteContext context = new DeleteContext(connection);
+				// We don't want to prompt user for each connection deletion
+				context.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
+
+				final IDeleteFeature feature = getFeatureProvider()
+						.getDeleteFeature(context);
+				if (feature.canDelete(context)) {
+					feature.execute(context);
+				}
 				cptDeletedConnections++;
 			}
 		}
