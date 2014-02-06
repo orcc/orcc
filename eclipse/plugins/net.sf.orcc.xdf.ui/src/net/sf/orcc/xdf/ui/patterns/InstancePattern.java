@@ -487,17 +487,20 @@ public class InstancePattern extends AbstractPattern {
 			return;
 		}
 
-		// Set the current instance's entity
-		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instanceShape);
-
-		// Do not update refinement with the same entity
-		if (instance.getEntity() == entity) {
+		// Do not allow
+		final String existingRefinement = Graphiti.getPeService()
+				.getPropertyValue(instanceShape, REFINEMENT_KEY);
+		final String entityUri = entity.eResource().getURI()
+				.toPlatformString(true);
+		if (existingRefinement != null && existingRefinement.equals(entityUri)) {
 			return;
 		}
 
+		// Set the current instance's entity
+		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instanceShape);
 		instance.setEntity(entity);
 		Graphiti.getPeService().setPropertyValue(instanceShape, REFINEMENT_KEY,
-				entity.eResource().getURI().toPlatformString(true));
+				entityUri);
 
 		// Clean all ports anchors and graphics in the instance
 		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(instanceShape
