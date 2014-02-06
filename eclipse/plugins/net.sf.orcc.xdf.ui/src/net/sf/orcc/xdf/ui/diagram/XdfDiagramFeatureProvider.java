@@ -72,27 +72,37 @@ import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
 public class XdfDiagramFeatureProvider extends
 		DefaultFeatureProviderWithPatterns {
 
+	ICustomFeature[] customFeatures;
+	UpdateDiagramFeature updateFeature;
+	DropInstanceFromFileFeature dropInstanceFeature;
+
 	public XdfDiagramFeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
 		addPattern(new InstancePattern());
 		addPattern(new InputNetworkPortPattern());
 		addPattern(new OutputNetworkPortPattern());
 		addConnectionPattern(new ConnectionPattern());
+
+		customFeatures = new ICustomFeature[] {
+				new UpdateRefinementFeature(this),
+				new OrthogonalAutoLayoutFeature(this),
+				new PolylineAutoLayoutFeature(this) };
+		updateFeature = new UpdateDiagramFeature(this);
+		dropInstanceFeature = new DropInstanceFromFileFeature(this);
 	}
 	
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new UpdateRefinementFeature(this), new OrthogonalAutoLayoutFeature(this),
-				new PolylineAutoLayoutFeature(this) };
+		return customFeatures;
 	}
 
 	@Override
 	protected IUpdateFeature getUpdateFeatureAdditional(IUpdateContext context) {
-		return new UpdateDiagramFeature(this);
+		return updateFeature;
 	}
 
 	/**
-	 * Globally disable the ability to move anchors across shapes.
+	 * Implements creation of new connection by dragging instance port.
 	 */
 	@Override
 	public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {
@@ -102,7 +112,7 @@ public class XdfDiagramFeatureProvider extends
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
 		if (context.getNewObject() instanceof IFile) {
-			return new DropInstanceFromFileFeature(this);
+			return dropInstanceFeature;
 		}
 		return super.getAddFeature(context);
 	}

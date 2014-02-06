@@ -136,10 +136,9 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 				.getPatternForPictogramElement(instanceShape);
 		final InstancePattern pattern = (InstancePattern) ipattern;
 
-		// Set refinement on selected instance
-		pattern.setInstanceRefinement(instanceShape, (EObject) entityDialog.getFirstResult());
-		// Inform editor that changes has been done in the model
-		hasDoneChanges = true;
+		// Set refinement on selected instance.
+		hasDoneChanges = pattern.setInstanceRefinement(instanceShape,
+				(EObject) entityDialog.getFirstResult());
 	}
 
 	@Override

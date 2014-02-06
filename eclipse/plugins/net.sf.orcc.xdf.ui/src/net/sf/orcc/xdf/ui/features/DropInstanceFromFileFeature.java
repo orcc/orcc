@@ -61,6 +61,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
  */
 public class DropInstanceFromFileFeature extends AbstractAddFeature {
 
+	private boolean hasDoneChanges = false;
+
 	public DropInstanceFromFileFeature(IFeatureProvider fp) {
 		super(fp);
 	}
@@ -132,6 +134,7 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		final PictogramElement addedPe = getFeatureProvider().addIfPossible(addInstanceContext);
 
 		getFeatureProvider().getDirectEditingInfo().setActive(true);
+		hasDoneChanges = true;
 		return addedPe;
 	}
 
@@ -140,9 +143,14 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 
 		final InstancePattern pattern = (InstancePattern) ((IFeatureProviderWithPatterns) getFeatureProvider())
 				.getPatternForPictogramElement(instanceShape);
-		pattern.setInstanceRefinement(instanceShape, refinement);
 
+		hasDoneChanges = pattern.setInstanceRefinement(instanceShape,
+				refinement);
 		return instanceShape;
+	}
 
+	@Override
+	public boolean hasDoneChanges() {
+		return hasDoneChanges;
 	}
 }

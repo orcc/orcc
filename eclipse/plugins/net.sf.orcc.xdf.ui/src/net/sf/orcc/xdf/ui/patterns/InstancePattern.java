@@ -478,13 +478,15 @@ public class InstancePattern extends AbstractPattern {
 	 * 
 	 * @param instanceShape
 	 * @param entity
+	 * @return true if the refinement has been performed
 	 */
-	public void setInstanceRefinement(final ContainerShape instanceShape, final EObject entity) {
+	public boolean setInstanceRefinement(final ContainerShape instanceShape,
+			final EObject entity) {
 		if (!isPatternRoot(instanceShape)) {
-			return;
+			return false;
 		}
 		if (!(entity instanceof Actor || entity instanceof Network)) {
-			return;
+			return false;
 		}
 
 		// Do not allow
@@ -493,7 +495,7 @@ public class InstancePattern extends AbstractPattern {
 		final String entityUri = entity.eResource().getURI()
 				.toPlatformString(true);
 		if (existingRefinement != null && existingRefinement.equals(entityUri)) {
-			return;
+			return false;
 		}
 
 		// Set the current instance's entity
@@ -554,7 +556,7 @@ public class InstancePattern extends AbstractPattern {
 
 		// Check if auto-reconnections are necessary
 		if (inMap.isEmpty() && outMap.isEmpty()) {
-			return;
+			return true;
 		}
 
 		// Restore connections start or end from port name they were
@@ -616,6 +618,7 @@ public class InstancePattern extends AbstractPattern {
 		// Inform the user about what happened
 		MessageDialog.openInformation(XdfUtil.getDefaultShell(),
 				"Refinement update finished", infoMsg.toString());
+		return true;
 	}
 
 	/**
