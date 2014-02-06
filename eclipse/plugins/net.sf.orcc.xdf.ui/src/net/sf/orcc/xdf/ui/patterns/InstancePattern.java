@@ -344,7 +344,8 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean canMoveShape(IMoveShapeContext context) {
-		return isPatternRoot(context.getPictogramElement());
+		return isPatternRoot(context.getPictogramElement())
+				&& context.getTargetContainer() == getDiagram();
 	}
 
 	@Override
