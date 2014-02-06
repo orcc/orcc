@@ -43,12 +43,14 @@ public class XdfImageProvider extends AbstractImageProvider {
 
 	public static final String NETWORK = PREFIX + "network";
 	public static final String ACTOR = PREFIX + "actor";
+	public static final String CONNECTION = PREFIX + "connection";
 
 	@Override
 	protected void addAvailableImages() {
 
 		addImageFilePath(NETWORK, "icons/network.gif");
 		addImageFilePath(ACTOR, "icons/orcc.png");
+		addImageFilePath(CONNECTION, "icons/add_connection_20.png");
 
 	}
 

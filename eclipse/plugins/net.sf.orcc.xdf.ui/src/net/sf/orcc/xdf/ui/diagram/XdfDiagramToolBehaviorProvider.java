@@ -29,16 +29,23 @@
 package net.sf.orcc.xdf.ui.diagram;
 
 import net.sf.orcc.xdf.ui.features.InstanceDblClickFeature;
+import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.context.IDoubleClickContext;
+import org.eclipse.graphiti.features.context.IPictogramElementContext;
+import org.eclipse.graphiti.features.context.impl.CreateConnectionContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
+import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
+import org.eclipse.graphiti.tb.ContextButtonEntry;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
+import org.eclipse.graphiti.tb.IContextButtonPadData;
 
 /**
  * Define some hacks to customize the way Graphiti works in general.
@@ -82,5 +89,41 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 			return dblClickFeature;
 		}
 		return super.getDoubleClickFeature(context);
+	}
+
+	@Override
+	public IContextButtonPadData getContextButtonPad(
+			IPictogramElementContext context) {
+
+		final IContextButtonPadData data = super.getContextButtonPad(context);
+		final PictogramElement pe = context.getPictogramElement();
+		final IPattern pattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
+				.getPatternForPictogramElement(pe);
+
+		// We add a new button only on network ports
+		if (pattern instanceof InputNetworkPortPattern) {
+			final Anchor anchor = ((NetworkPortPattern) pattern)
+					.getAnchor((AnchorContainer) pe);
+
+			// Initialize the context for connection creation
+			final CreateConnectionContext ccc = new CreateConnectionContext();
+			ccc.setSourcePictogramElement(pe);
+			ccc.setSourceAnchor(anchor);
+
+			// Create the context button entry
+			final ContextButtonEntry button = new ContextButtonEntry(null,
+					context);
+			button.setText("Start connection");
+			button.setIconId(XdfImageProvider.CONNECTION);
+
+			// Add the create connection feature as D&D action on the button
+			button.addDragAndDropFeature(getFeatureProvider()
+					.getCreateConnectionFeatures()[0]);
+
+			// Add button to icons displayed on overlay
+			data.getDomainSpecificContextButtons().add(button);
+		}
+
+		return data;
 	}
 }
