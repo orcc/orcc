@@ -29,7 +29,9 @@
 package net.sf.orcc.xdf.ui.patterns;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
@@ -80,6 +82,7 @@ import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
  * This class configure as most features as possible, relative to Instances that
@@ -480,14 +483,33 @@ public class InstancePattern extends AbstractPattern {
 		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(instanceShape
 				.getGraphicsAlgorithm().getGraphicsAlgorithmChildren());
 		for (final GraphicsAlgorithm gaChild : gaChildren) {
-			if (gaChild instanceof Text
-					&& (ShapePropertiesManager.isInput(gaChild) || ShapePropertiesManager.isOutput(gaChild))) {
+			if (gaChild instanceof Text && ShapePropertiesManager.isExpectedPc(gaChild, PORT_TEXT_ID)) {
 				EcoreUtil.delete(gaChild, true);
 			}
 		}
+
+		// To perform reconnection later, we need to save which are connected to
+		// in and out anchors
+		final Map<String, Connection> inMap = new HashMap<String, Connection>();
+		final Map<String, Iterable<Connection>> outMap = new HashMap<String, Iterable<Connection>>();
+
+		// We will delete anchors IN the for loop, we need to copy the list
 		final List<Anchor> anchors = new ArrayList<Anchor>(((AnchorContainer) instanceShape).getAnchors());
 		for (final Anchor anchor : anchors) {
-			// EcoreUtil.delete(anchor.getReferencedGraphicsAlgorithm(), true);
+
+			final String portName = Graphiti.getPeService()
+					.getPropertyValue(anchor, PORT_NAME_KEY);
+			if (anchor.getIncomingConnections().size() >= 1) {
+				// Save incoming connections
+				inMap.put(portName, anchor.getIncomingConnections().get(0));
+			} else if (anchor.getOutgoingConnections().size() >= 1) {
+				// Create a copy of the current outgoing list
+				final List<Connection> conList = new ArrayList<Connection>(anchor
+						.getOutgoingConnections());
+				// Save outgoing connections
+				outMap.put(portName, conList);
+			}
+
 			EcoreUtil.delete(anchor, true);
 		}
 
@@ -506,6 +528,71 @@ public class InstancePattern extends AbstractPattern {
 
 		// Resize to minimal size.
 		resizeShapeToMinimal(instanceShape);
+
+		// Check if auto-reconnections are necessary
+		if (inMap.isEmpty() && outMap.isEmpty()) {
+			return;
+		}
+
+		// Restore connections start or end from port name they were
+		// connected to
+		int cptReconnectedTo = 0, cptReconnectedFrom = 0;
+		for (final Anchor anchor : instanceShape.getAnchors()) {
+			final String portName = Graphiti.getPeService().getPropertyValue(
+					anchor, PORT_NAME_KEY);
+			if (ShapePropertiesManager.isInput(anchor)
+					&& inMap.containsKey(portName)) {
+				inMap.remove(portName).setEnd(anchor);
+				cptReconnectedTo++;
+			} else if (ShapePropertiesManager.isOutput(anchor)
+					&& outMap.containsKey(portName)) {
+				for (final Connection connection : outMap.remove(portName)) {
+					connection.setStart(anchor);
+					cptReconnectedFrom++;
+				}
+			}
+		}
+
+		// Delete resulting connections. This will prevent diagram from being in
+		// a strange state, where some connections have a null source or
+		// target anchor.
+		int cptDeletedConnections = 0;
+		for (final Connection connection : inMap.values()) {
+			Graphiti.getPeService().deletePictogramElement(connection);
+			cptDeletedConnections++;
+		}
+		for (final Iterable<Connection> connectionList : outMap.values()) {
+			for (final Connection connection : connectionList) {
+				Graphiti.getPeService().deletePictogramElement(connection);
+				cptDeletedConnections++;
+			}
+		}
+
+		// Build a complete message to inform user about what happened exactly
+		final StringBuilder infoMsg = new StringBuilder();
+		infoMsg.append("The refinement for instance \""
+				+ instance.getSimpleName() + "\" has been updated.");
+		infoMsg.append('\n');
+
+		if (cptReconnectedTo > 0) {
+			infoMsg.append(cptReconnectedTo);
+			infoMsg.append(" connection(s) reconnected to input port(s).");
+			infoMsg.append('\n');
+		}
+		if (cptReconnectedFrom > 0) {
+			infoMsg.append(cptReconnectedFrom);
+			infoMsg.append(" connection(s) reconnected from output port(s).");
+			infoMsg.append('\n');
+		}
+		if (cptDeletedConnections > 0) {
+			infoMsg.append(cptDeletedConnections);
+			infoMsg.append(" connection(s) have been deleted from the network.");
+			infoMsg.append('\n');
+		}
+
+		// Inform the user about what happened
+		MessageDialog.openInformation(XdfUtil.getDefaultShell(),
+				"Refinement update finished", infoMsg.toString());
 	}
 
 	/**
