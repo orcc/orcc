@@ -33,6 +33,8 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.Activator;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
+import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -43,7 +45,9 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
@@ -75,8 +79,8 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 
 	@Override
 	public PictogramElement add(IAddContext context) {
-		IFile file = (IFile) context.getNewObject();
 
+		IFile file = (IFile) context.getNewObject();
 		if (Activator.ACTOR_SUFFIX.equals(file.getFileExtension())) {
 			file = OrccUtil.getFile(file.getProject(), OrccUtil.getQualifiedName(file), Activator.IR_SUFFIX);
 		}
@@ -99,8 +103,22 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 			return null;
 		}
 
+		final ContainerShape target = context.getTargetContainer();
+		if (target == getDiagram()) {
+			return addToDiagram(eobject, context);
+		} else if (ShapePropertiesManager.isExpectedPc(target,
+				InstancePattern.INSTANCE_ID)) {
+			return updateRefinement(target, eobject);
+		}
+
+		return null;
+	}
+
+	private PictogramElement addToDiagram(final EObject eobject,
+			final IAddContext context) {
+
 		final Instance instance = DfFactory.eINSTANCE.createInstance();
-		final int objectCpt = context.getTargetContainer().getChildren().size() + 1;
+		final int objectCpt = getDiagram().getChildren().size() + 1;
 		instance.setName("instance_" + objectCpt);
 		instance.setEntity(eobject);
 
@@ -111,4 +129,14 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		return addedPe;
 	}
 
+	private PictogramElement updateRefinement(
+			final ContainerShape instanceShape, final EObject refinement) {
+
+		final InstancePattern pattern = (InstancePattern) ((IFeatureProviderWithPatterns) getFeatureProvider())
+				.getPatternForPictogramElement(instanceShape);
+		pattern.setInstanceRefinement(instanceShape, refinement);
+
+		return instanceShape;
+
+	}
 }
