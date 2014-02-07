@@ -53,7 +53,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDIF»
 			«IF state.outgoing.empty»
 				printf("Stuck in state "«state.name»" in the instance «instance.name»\n");
-				wait_for_key();
 				exit(1);
 			«ELSE»
 				«state.printStateTransitions»
@@ -153,7 +152,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDFOR»
 			default:
 				printf("unknown state in «instance.name».c : %s\n", stateNames[_FSM_state]);
-				wait_for_key();
 				exit(1);
 			}
 		
