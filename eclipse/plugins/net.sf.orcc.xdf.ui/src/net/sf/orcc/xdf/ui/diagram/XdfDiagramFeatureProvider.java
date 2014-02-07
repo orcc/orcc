@@ -72,9 +72,9 @@ import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
 public class XdfDiagramFeatureProvider extends
 		DefaultFeatureProviderWithPatterns {
 
-	ICustomFeature[] customFeatures;
-	UpdateDiagramFeature updateFeature;
-	DropInstanceFromFileFeature dropInstanceFeature;
+	private final ICustomFeature[] customFeatures;
+	private final UpdateDiagramFeature updateFeature;
+	private final DropInstanceFromFileFeature dropInstanceFeature;
 
 	public XdfDiagramFeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
