@@ -69,6 +69,9 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 		final Connection connection = (Connection) businessObject;
 		if (connection.getSize() != null) {
 			connectionSize.setText(connection.getSize().toString());
+		} else {
+			// Reset field in case it was filled before
+			connectionSize.setText("");
 		}
 	}
 
