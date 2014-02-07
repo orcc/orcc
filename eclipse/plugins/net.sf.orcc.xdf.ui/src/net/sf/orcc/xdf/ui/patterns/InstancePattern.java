@@ -436,16 +436,83 @@ public class InstancePattern extends AbstractPattern {
 	public IReason updateNeeded(IUpdateContext context) {
 		final PictogramElement pe = context.getPictogramElement();
 
-		if (isPatternRoot(pe)) {
-			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
-			if (text == null) {
-				return Reason.createFalseReason("Label Not found !!");
-			}
+		if (!isPatternRoot(pe)) {
+			return Reason
+					.createFalseReason("Given PE is not an Instance shape");
+		}
 
-			final Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
-			if (!text.getValue().equals(instance.getName())) {
-				return Reason.createTrueReason("The instance name has been updated from outside of the diagram");
+		final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(
+				pe, LABEL_ID);
+		if (text == null) {
+			return Reason.createFalseReason("Label Not found !!");
+		}
+
+		final Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
+		if (!text.getValue().equals(instance.getName())) {
+			return Reason
+					.createTrueReason("The instance name has been updated from outside of the diagram");
+		}
+
+		final EObject entity = instance.getEntity();
+		if (entity == null) {
+			return Reason.createFalseReason();
+		}
+
+		// Compute list of in and out ports names
+		final List<String> inputsN = new ArrayList<String>(), outputsN = new ArrayList<String>();
+		for (final Anchor anchor : ((AnchorContainer) pe).getAnchors()) {
+			final String portName = Graphiti.getPeService().getPropertyValue(
+					anchor, PORT_NAME_KEY);
+			if(ShapePropertiesManager.isInput(anchor)) {
+				inputsN.add(portName);
+			} else if (ShapePropertiesManager.isOutput(anchor)) {
+				outputsN.add(portName);
 			}
+		}
+
+		final IReason portsUpdatedReason = Reason
+				.createTrueReason("The port order or their names have to be updated.");
+		if (entity instanceof Network) {
+			if (inputsN.size() != ((Network) entity).getInputs().size()
+					|| outputsN.size() != ((Network) entity).getOutputs()
+							.size()) {
+				return portsUpdatedReason;
+			}
+			for (int i = 0; i < inputsN.size(); ++i) {
+				final String portName = ((Network) entity).getInputs().get(i)
+						.getName();
+				if (!inputsN.get(i).equals(portName)) {
+					return portsUpdatedReason;
+				}
+			}
+			for (int i = 0; i < outputsN.size(); ++i) {
+				final String portName = ((Network) entity).getOutputs().get(i)
+						.getName();
+				if (!outputsN.get(i).equals(portName)) {
+					return portsUpdatedReason;
+				}
+			}
+		} else if (entity instanceof Actor) {
+			if (inputsN.size() != ((Actor) entity).getInputs().size()
+					|| outputsN.size() != ((Actor) entity).getOutputs().size()) {
+				return portsUpdatedReason;
+			}
+			for (int i = 0; i < inputsN.size(); ++i) {
+				final String portName = ((Actor) entity).getInputs().get(i)
+						.getName();
+				if (!inputsN.get(i).equals(portName)) {
+					return portsUpdatedReason;
+				}
+			}
+			for (int i = 0; i < outputsN.size(); ++i) {
+				final String portName = ((Actor) entity).getOutputs().get(i)
+						.getName();
+				if (!outputsN.get(i).equals(portName)) {
+					return portsUpdatedReason;
+				}
+			}
+		} else {
+			return Reason.createFalseReason("Unknown refinement type");
 		}
 
 		return super.updateNeeded(context);
@@ -463,6 +530,12 @@ public class InstancePattern extends AbstractPattern {
 
 			final Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
 			text.setValue(instance.getName());
+
+			// Force to update refinement, by invalidating the current
+			// refinement property on the shape
+			Graphiti.getPeService().setPropertyValue(pe, REFINEMENT_KEY, "");
+			setInstanceRefinement((ContainerShape) pe, instance.getEntity());
+
 			return true;
 		}
 
@@ -473,8 +546,21 @@ public class InstancePattern extends AbstractPattern {
 	 * Update the refinement (Instance or Network) for the instance linked to
 	 * the given pe. The input and output ports of the given entity are added to
 	 * the shape.
-	 * 
-	 * This method automatically update sizes and layouts for the content.
+	 * <p>
+	 * This method automatically updates sizes and layouts for the content. It
+	 * also try to reconnect existing connections to the right port, by
+	 * searching it from its name. If a connection cannot be automatically
+	 * reconnected, it is deleted from the network. The user is prompted with a
+	 * message dialog in that case.
+	 * </p>
+	 * <p>
+	 * If the instance linked to the given instanceShape has already a
+	 * refinement, the property REFINEMENT_KEY will be controlled, and the
+	 * method will do the refinement only if its value is different than the
+	 * given entity URI. If you want to force shape update without modifying the
+	 * entity to refine, simple change the REFINEMENT_KEY value before calling
+	 * this method.
+	 * </p>
 	 * 
 	 * @param instanceShape
 	 * @param entity
