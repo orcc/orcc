@@ -83,32 +83,36 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		/////////////////////////////////////////////////
 		// Action schedulers
 		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_scheduler();
+			extern int «instance.name»_scheduler();
 		«ENDFOR»
 
 		/////////////////////////////////////////////////
 		// Actor scheduler
 		static void scheduler() {
 			int stop = 0;
-			
+
 			«FOR instance : network.children.actorInstances»
 				«instance.name»_initialize();
 			«ENDFOR»
-			
+
+			int i;
 			while(!stop) {
+				i = 0;
 				«FOR instance : network.children.actorInstances»
-					«instance.name»_scheduler();
+					i += «instance.name»_scheduler();
 				«ENDFOR»
+
+				stop = stop || (i == 0);
 			}
 		}
-		
+
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
 			init_orcc(argc, argv);
-			
+
 			scheduler();
-			
+
 			printf("End of simulation !\n");
 			return compareErrors;
 		}

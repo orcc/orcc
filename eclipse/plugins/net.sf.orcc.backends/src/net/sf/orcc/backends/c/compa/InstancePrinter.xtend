@@ -49,7 +49,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override protected printStateLabel(State state) '''
 		l_«state.name»:
 			«IF ! instance.getActor.actionsOutsideFsm.empty»
-				«instance.name»_outside_FSM_scheduler();
+				i += «instance.name»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF state.outgoing.empty»
 				printf("Stuck in state "«state.name»" in the instance «instance.name»\n");
@@ -87,7 +87,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF instance.getActor.hasFsm»
 			«printFsm»
 		«ELSE»
-			void «instance.name»_scheduler() {
+			int «instance.name»_scheduler() {
 				int i = 0;
 				«printCallTokensFunctions»
 				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
@@ -103,6 +103,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					// no read_end/write_end here!
 					return;
 				«ENDIF»
+				return i;
 			}
 		«ENDIF»
 	'''
@@ -127,23 +128,23 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			return;
 		}
 	'''
-	
+
 	override protected printFsm() '''
 		«IF ! instance.getActor.actionsOutsideFsm.empty»
-			void «instance.name»_outside_FSM_scheduler() {
+			int «instance.name»_outside_FSM_scheduler() {
 				int i = 0;
 				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
 			finished:
 				// no read_end/write_end here!
-				return;
+				return i;
 			}
 		«ENDIF»
-		
-		void «instance.name»_scheduler() {
+
+		int «instance.name»_scheduler() {
 			int i = 0;
-		
+
 			«printCallTokensFunctions»
-		
+
 			// jump to FSM state 
 			switch (_FSM_state) {
 			«FOR state : instance.getActor.fsm.states»
@@ -154,7 +155,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				printf("unknown state in «instance.name».c : %s\n", stateNames[_FSM_state]);
 				exit(1);
 			}
-		
+
 			// FSM transitions
 			«FOR state : instance.getActor.fsm.states»
 		«state.printStateLabel»
@@ -166,6 +167,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«FOR port : instance.getActor.outputs.filter[!native]»
 				write_end_«port.name»();
 			«ENDFOR»
+			return i;
 		}
 	'''
 	
