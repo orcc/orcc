@@ -73,13 +73,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class COMPABackend extends CBackend {
 
 	@Override
-	protected void doInitializeOptions() {
-
-		new File(path + File.separator + "build").mkdirs();
-		new File(path + File.separator + "bin").mkdirs();
-	}
-
-	@Override
 	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
 		replacementMap.put("abs", "abs_my_precious");
