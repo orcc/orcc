@@ -80,7 +80,13 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 		instanceName.setText(instance.getName());
 
 		if (instance.getEntity() != null) {
-			refinementValue.setText(instance.getEntity().eResource().getURI().toString());
+			// Refresh sometimes happen while the IR file is rebuilding. In
+			// these cases, we do nothing. The next refresh will update this
+			// field (maybe :)
+			if (instance.getEntity().eResource() != null) {
+				refinementValue.setText(instance.getEntity().eResource()
+						.getURI().toString());
+			}
 		} else {
 			refinementValue.setText("Error: Unable to get refinement URI");
 		}
