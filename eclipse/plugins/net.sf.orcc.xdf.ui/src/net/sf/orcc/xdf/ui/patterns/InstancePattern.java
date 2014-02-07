@@ -690,23 +690,22 @@ public class InstancePattern extends AbstractPattern {
 		// Build a complete message to inform user about what happened exactly
 		final StringBuilder infoMsg = new StringBuilder();
 		infoMsg.append("The refinement for instance \""
-				+ instance.getSimpleName() + "\" has been updated.");
-		infoMsg.append('\n');
+				+ instance.getSimpleName() + "\" has been updated:").append('\n');
 
 		if (cptReconnectedTo > 0) {
-			infoMsg.append(cptReconnectedTo);
-			infoMsg.append(" connection(s) reconnected to input port(s).");
-			infoMsg.append('\n');
+			infoMsg.append(cptReconnectedTo)
+					.append(" connection(s) reconnected to input port(s).")
+					.append('\n');
 		}
 		if (cptReconnectedFrom > 0) {
-			infoMsg.append(cptReconnectedFrom);
-			infoMsg.append(" connection(s) reconnected from output port(s).");
-			infoMsg.append('\n');
+			infoMsg.append(cptReconnectedFrom)
+					.append(" connection(s) reconnected from output port(s).")
+					.append('\n');
 		}
 		if (cptDeletedConnections > 0) {
-			infoMsg.append(cptDeletedConnections);
-			infoMsg.append(" connection(s) have been deleted from the network.");
-			infoMsg.append('\n');
+			infoMsg.append(cptDeletedConnections)
+					.append(" connection(s) deleted from the network.")
+					.append('\n');
 		}
 
 		// Inform the user about what happened
