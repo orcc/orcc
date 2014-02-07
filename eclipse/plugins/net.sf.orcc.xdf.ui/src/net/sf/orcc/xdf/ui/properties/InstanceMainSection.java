@@ -88,7 +88,7 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 						.getURI().toString());
 			}
 		} else {
-			refinementValue.setText("Error: Unable to get refinement URI");
+			refinementValue.setText("");
 		}
 
 		// TODO: get the "part name" value in the instance, and display it
