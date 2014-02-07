@@ -231,7 +231,11 @@ public class XdfDiagramLayoutManager {
 		if (xScale != 0) {
 			for (Map.Entry<PictogramElement, KGraphElement> entry : peKGraphMap.entrySet()) {
 				if (entry.getValue() instanceof KNode) {
-					final GraphicsAlgorithm ga = entry.getKey().getGraphicsAlgorithm();
+					if (entry.getKey() instanceof Diagram) {
+						continue;
+					}
+					final GraphicsAlgorithm ga = entry.getKey()
+							.getGraphicsAlgorithm();
 					ga.setX(ga.getX() + xScale);
 				} else if (entry.getValue() instanceof KEdge && entry.getKey() instanceof FreeFormConnection) {
 					final FreeFormConnection connection = (FreeFormConnection) entry.getKey();
