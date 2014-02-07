@@ -53,9 +53,9 @@ import net.sf.orcc.backends.transform.LoopUnrolling;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
+import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -72,10 +72,10 @@ import net.sf.orcc.ir.transform.BlockCombine;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
-import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
@@ -124,6 +124,7 @@ public class CBackend extends AbstractBackend {
 		replacementMap.put("select", "select_my_precious");
 		replacementMap.put("OUT", "OUT_my_precious");
 		replacementMap.put("IN", "IN_my_precious");
+		replacementMap.put("SIZE", "SIZE_REPLACED");
 		
 		if (mergeActions) {
 			new ActionMerger().doSwitch(actor);
