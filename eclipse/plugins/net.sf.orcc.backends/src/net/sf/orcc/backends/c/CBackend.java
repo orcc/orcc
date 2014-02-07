@@ -115,15 +115,15 @@ public class CBackend extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
-		replacementMap.put("abs", "abs_my_precious");
-		replacementMap.put("getw", "getw_my_precious");
-		replacementMap.put("index", "index_my_precious");
-		replacementMap.put("log2", "log2_my_precious");
-		replacementMap.put("max", "max_my_precious");
-		replacementMap.put("min", "min_my_precious");
-		replacementMap.put("select", "select_my_precious");
-		replacementMap.put("OUT", "OUT_my_precious");
-		replacementMap.put("IN", "IN_my_precious");
+		replacementMap.put("abs", "abs_replaced");
+		replacementMap.put("getw", "getw_replaced");
+		replacementMap.put("index", "index_replaced");
+		replacementMap.put("log2", "log2_replaced");
+		replacementMap.put("max", "max_replaced");
+		replacementMap.put("min", "min_replaced");
+		replacementMap.put("select", "select_replaced");
+		replacementMap.put("OUT", "OUT_REPLACED");
+		replacementMap.put("IN", "IN_REPLACED");
 		replacementMap.put("SIZE", "SIZE_REPLACED");
 		
 		if (mergeActions) {
