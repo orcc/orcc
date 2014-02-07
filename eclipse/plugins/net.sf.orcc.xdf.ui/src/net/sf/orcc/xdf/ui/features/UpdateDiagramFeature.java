@@ -29,7 +29,9 @@
 package net.sf.orcc.xdf.ui.features;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.DfFactory;
@@ -124,7 +126,6 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		final URI diagramUri = diagram.eResource().getURI();
 		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(Activator.NETWORK_SUFFIX);
 
-
 		final Network network;
 		if (linkedBo == null || !(linkedBo instanceof Network)) {
 			if (root.exists(new Path(xdfUri.toPlatformString(true)))) {
@@ -151,6 +152,10 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 				hasDoneChanges = true;
 			}
 		}
+		
+		final List<String> updatedNetworkWarnings = new ArrayList<String>();
+
+		hasDoneChanges |= fixNetwork(network, updatedNetworkWarnings);
 
 		if (diagram.getChildren().size() == 0 && network.getChildren().size() > 0) {
 			hasDoneChanges |= initializeDiagramFromNetwork(network, diagram);
@@ -158,7 +163,67 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 		updateVersion(diagram);
 
+		// Display a synthesis message to user, to tell him what have been
+		// automatically modified in the diagram/network he just opened
+		if(updatedNetworkWarnings.size() > 0) {
+			final StringBuilder message = new StringBuilder("The network has been automatically updated:");
+			message.append('\n');
+
+			for(final String msg : updatedNetworkWarnings) {
+				message.append(msg).append('\n');
+			}
+			MessageDialog.openInformation(XdfUtil.getDefaultShell(), "Network update", message.toString());
+		}
+
 		return hasDoneChanges;
+	}
+
+	/**
+	 * Check the given network to detect potential issue, and fix them. For each
+	 * fixed issue, a message is appended to the given messagesList.
+	 * 
+	 * @param network
+	 * @param messagesList
+	 * @return true if something has been modified in the network
+	 */
+	private boolean fixNetwork(final Network network, final List<String> messagesList) {
+		// Check for null started or terminated connections. This can happen if
+		// a port, an instance or an instance port has been renamed from outside
+		final List<net.sf.orcc.df.Connection> toDelete = new ArrayList<net.sf.orcc.df.Connection>();
+		for(final net.sf.orcc.df.Connection connection : network.getConnections()) {
+			if(connection.getSource() == null || connection.getTarget() == null) {
+				toDelete.add(connection);
+				continue;
+			}
+			final Vertex sourceVertex = connection.getSource();
+			if(sourceVertex instanceof Instance) {
+				if (connection.getSourcePort() == null
+						|| connection.getSourcePort().getName() == null) {
+					toDelete.add(connection);
+					continue;
+				}
+			}
+
+			final Vertex targetVertex = connection.getTarget();
+			if(targetVertex instanceof Instance) {
+				if (connection.getTargetPort() == null
+						|| connection.getTargetPort().getName() == null) {
+					toDelete.add(connection);
+					continue;
+				}
+			}
+		}
+
+		if(toDelete.size() == 1){
+			messagesList.add("1 connection deleted from the network");
+		} else if(toDelete.size() > 1) {
+			messagesList.add(toDelete.size() + " connections deleted from the network");
+		}
+		for(final net.sf.orcc.df.Connection connection : toDelete) {
+			EcoreUtil.delete(connection, true);
+		}
+
+		return !toDelete.isEmpty();
 	}
 
 	/**
