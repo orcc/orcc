@@ -49,7 +49,8 @@ def usage():
     print "-d, --debug \t\t\t Debug mode, generate extra files and print additional information"
     print "-g, --generate=[options] \t Generate the VHDL files of the TTA processors"
     print "-p, --profile \t\t\t Generate a text file containing all the results of the profiling (Need to have already the traces of the simulator)"
-    print "-s, --simulate=[options] \t\t\t Simulate each processor independently from its execution trace"
+    print "-s, --simulate=[options] \t Simulate each processor independently from its execution trace"
+    print "-a, --analyse=[options] \t Generate files containing a synthesis of the simulation's results (Need to have already the traces of the simulator)"
     print "--jobs=[nb] \t\t\t Number of concurrent jobs launched (only for compile and simulate modes)"
     
 
@@ -79,13 +80,16 @@ def generate(arg, debug, target):
 
 def profile(target):
     design.profile(target)
-    
-def simulate(arg, target, nbJobs):
+
+def simulate(arg, nbJobs):
     design.simulate(nbJobs, arg.split())
+    
+def analyse(arg, target):
+    design.analyse(target, arg.split())
 
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hcgdpsx:v", ["help", "jobs=", "compile=", "generate=", "profile", "debug", "simulate="])
+    opts, args = getopt.getopt(sys.argv[1:], "hcgdpsa:v", ["help", "jobs=", "compile=", "generate=", "profile", "debug", "simulate=", "analyse="])
 except getopt.GetoptError, err:
     print str(err)
     usage()
@@ -128,8 +132,12 @@ try:
     
     for o, a in opts:
         if o in ("-s", "--simulate"):
-            simulate(a, srcPath, nbJobs)
+            simulate(a, nbJobs)
             
+    for o, a in opts:
+        if o in ("-a", "--analyse"):
+            analyse(a, srcPath)
+
     for o, a in opts:
         if o in ("-p", "--profile"):
             profile(srcPath)

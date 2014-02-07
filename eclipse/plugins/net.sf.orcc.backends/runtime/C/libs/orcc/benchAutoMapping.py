@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2013, INSA Rennes
+# Copyright (c) 2014, INSA Rennes
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,13 +31,10 @@
 # @author Alexandre Sanchez
 
 from __future__ import division
+from common.orccAnalyse import OrccAnalyse
 import os
-import glob
-import shutil
 import sys
-import subprocess
 import argparse
-import time
 
 class VideoBenchData:
     def __init__(self, sequence):
@@ -50,79 +47,9 @@ class VideoBenchData:
         self.mappingTime = 0
         self.nbPartitions = 0
 
-class OrccBench:
-    def __init__(self, tag):
-        self.SUMMARY_TXT = tag + ".txt"
-        self.SUMMARY_CSV = tag + ".csv"
-        self.SUMMARY_XML = tag + ".xml"
-        self.SUMMARY_HTML = tag + ".html"
-        self.OUTPUT_TAG = tag
-        self.logCSV = True
-        self.logTXT = True
-        self.logXML = True
-        self.logHTML = True
-
-    def start(self):
-        self.performBench()
-        self.extractData()
-        self.printData()
-        self.archiveLogs()
-
-    def performBench(self):
-        raise NotImplementedError
-
-    def extractData(self):
-        raise NotImplementedError
-
-    def logInTXT(self):
-        pass
-
-    def logInCSV(self):
-        pass
-
-    def logInXML(self):
-        pass
-
-    def logInHTML(self):
-        pass
-
-    def printData(self):
-        if self.logCSV:
-            self.logInCSV()
-        if self.logTXT:
-            self.logInTXT()
-        if self.logXML:
-            self.logInXML()
-        if self.logHTML:
-            self.logInHTML()
-
-    def archiveLogs(self):
-        print ("\n*********************************************************************")
-        print ("Archiving all in directory " + self.OUTPUT_TAG)
-        save = 0
-        if os.path.exists(self.OUTPUT_TAG):
-            backup = self.OUTPUT_TAG+"_"+str(save)
-            while os.path.exists(backup):
-                save += 1
-                backup = self.OUTPUT_TAG+"_"+str(save)
-            shutil.move(self.OUTPUT_TAG, backup)
-            print ("!! Making a backup of a directory with same name in " + backup)
-        os.mkdir(self.OUTPUT_TAG)
-        os.system("mv " + self.FILE_HEAD + "*" + self.DEFAULT_LOG_EXT + " " + self.OUTPUT_TAG)
-        if self.logCSV:
-            os.system("mv " + self.OUTPUT_TAG + "*.csv " + self.OUTPUT_TAG)
-        if self.logTXT:
-            os.system("mv " + self.OUTPUT_TAG + "*.txt " + self.OUTPUT_TAG)
-        if self.logXML:
-            os.system("mv " + self.OUTPUT_TAG + "*.xml " + self.OUTPUT_TAG)
-        if self.logHTML:
-            os.system("mv " + self.OUTPUT_TAG + "*.html " + self.OUTPUT_TAG)
-            shutil.copy(os.path.join(os.path.dirname(sys.argv[0]), "style.css"), self.OUTPUT_TAG)
-
-
-class BenchAutoMapping(OrccBench):
+class BenchAutoMapping(OrccAnalyse):
     def __init__(self, nb_procs, tag, nb_frames, decoder_path, sequences_path, bRange):
-        OrccBench.__init__(self, tag)
+        OrccAnalyse.__init__(self, tag)
         self.NBFRAME = nb_frames
         self.DEFAULT_EXE = decoder_path
         self.SEQ_PATH =  sequences_path
@@ -145,6 +72,7 @@ class BenchAutoMapping(OrccBench):
         self.logTXT = False
         self.logXML = False
         self.logHTML = False
+        self.logPDF = False
         self.benchData = {}
         self.rangeProcs = list()
 
@@ -248,7 +176,7 @@ class BenchAutoMapping(OrccBench):
                     self.benchData[SEQUENCE_NAME] = data
 
     def logInCSV(self):
-        print ("\n  * Generate CSV Result file... " + self.SUMMARY_CSV)
+        print ("\n  * Generate CSV Result file : " + self.SUMMARY_CSV)
         fd = open(self.SUMMARY_CSV, 'w')
 
         for bData in self.benchData:

@@ -38,6 +38,7 @@ import sys
 import subprocess
 from multiprocessing import Process
 from multiprocessing import Queue
+# from ttaanalyse import TTASimulationAnalyse
 import multiprocessing
 
 
@@ -160,3 +161,11 @@ class Design:
         if retcode != 0: 
             raise Exception("Problem during the simulation")
             
+    def analyse(self, args):
+        print "* Initialize the analysis."
+        # TODO: Better integration of ttaanalyse
+        scriptPath = os.path.join(os.path.dirname(sys.argv[0]), "ttaanalyse.py")
+        retcode = subprocess.call([scriptPath] + args)
+        
+        if retcode != 0: 
+            raise Exception("Problem during the analyse")

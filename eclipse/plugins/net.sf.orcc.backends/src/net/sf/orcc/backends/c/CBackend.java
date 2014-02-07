@@ -265,11 +265,22 @@ public class CBackend extends AbstractBackend {
 
 			copyFileToFilesystem("/runtime/C/README.txt", path + File.separator
 					+ "README.txt", debug);
-
+			
 			OrccLogger.trace("Export libraries sources into " + libsPath
 					+ "... ");
 			if (copyFolderToFileSystem("/runtime/C/libs", libsPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
+
+				new File(libsPath + File.separator + "orcc" + File.separator + "benchAutoMapping.py")
+						.setExecutable(true);
+				
+				String commonLibPath = libsPath + File.separator + "orcc" + File.separator + "common";
+				OrccLogger.trace("Export common library files into " + commonLibPath + "... ");
+				if (copyFolderToFileSystem("/runtime/common", commonLibPath, debug) == false) {
+					OrccLogger.warnRaw("Error" + "\n");
+					return false;
+				}
+
 				return true;
 			} else {
 				OrccLogger.warnRaw("Error" + "\n");

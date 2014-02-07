@@ -1,2 +1,8 @@
 eclipse.preferences.version=1
+encoding//runtime/TTA/ttaanalyse.py=utf-8
+encoding//runtime/TTA/ttalogs.py=utf-8
+encoding//runtime/TTA/ttamerge.py=utf-8
+encoding//runtime/TTA/ttamergehtml.py=utf-8
+encoding//runtime/common/orccAnalyse.py=utf-8
+encoding//runtime/common/simulationAnalyse.py=utf-8
 encoding/<project>=UTF-8

@@ -214,12 +214,20 @@ public class TTABackend extends LLVMBackend {
 	protected boolean exportRuntimeLibrary() {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
+			String commonLibPath = libPath + File.separator + "common";
+			
+			OrccLogger.trace("Export common library files into " + commonLibPath + "... ");
+			if (copyFolderToFileSystem("/runtime/common", commonLibPath, debug) == false) {
+				OrccLogger.warnRaw("Error" + "\n");
+				return false;
+			}
+						
 			OrccLogger.trace("Export library files into " + libPath + "... ");
 			if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
 				new File(libPath + File.separator + "ttanetgen")
 						.setExecutable(true);
-				new File(libPath + File.separator + "ttaextractlog.py")
+				new File(libPath + File.separator + "ttaanalyse.py")
 						.setExecutable(true);
 				new File(libPath + File.separator + "ttamergehtml.py")
 						.setExecutable(true);
