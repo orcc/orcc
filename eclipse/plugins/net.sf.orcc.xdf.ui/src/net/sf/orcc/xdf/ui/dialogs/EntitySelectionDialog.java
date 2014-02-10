@@ -115,7 +115,7 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 	 */
 	private class EntityListLabelProvider implements ILabelProvider {
 
-		List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
+		final List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
 
 		@Override
 		public void removeListener(ILabelProviderListener listener) {
@@ -307,9 +307,8 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 				if (classz == null) {
 					continue;
 				}
-				if (classz.equals(DfPackage.eINSTANCE.getNetwork())) {
-					objects.add(eobject);
-				} else if (classz.equals(DfPackage.eINSTANCE.getActor())) {
+				if (DfPackage.eINSTANCE.getNetwork().equals(classz)
+						|| DfPackage.eINSTANCE.getActor().equals(classz)) {
 					objects.add(eobject);
 				}
 			}

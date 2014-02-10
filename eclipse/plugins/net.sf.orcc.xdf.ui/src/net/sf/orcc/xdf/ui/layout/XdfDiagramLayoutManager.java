@@ -84,6 +84,9 @@ public class XdfDiagramLayoutManager {
 	/**
 	 * Build the KGraph/KNode structure from the given diagram.
 	 * 
+	 * This class should not be public but 'friend' and instanciated by an
+	 * AutoLayoutFeature subclass
+	 * 
 	 * @param diagram
 	 */
 	XdfDiagramLayoutManager(final Diagram diagram) {

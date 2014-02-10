@@ -114,6 +114,7 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 			final ContextButtonEntry button = new ContextButtonEntry(null,
 					context);
 			button.setText("Start connection");
+			button.setDescription("Drag to the target port to create a new connection");
 			button.setIconId(XdfImageProvider.CONNECTION);
 
 			// Add the create connection feature as D&D action on the button
