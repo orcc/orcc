@@ -100,7 +100,7 @@ class BenchAutoMapping(OrccAnalyse):
     def performMappingWithStrategy(self, fic, nbProcs, Strategy):
         SEQUENCE_NAME = fic[0:len(fic)-len(self.DEFAULT_LOG_EXT)]
         baseName = self.FILE_HEAD + SEQUENCE_NAME + "_" + str(nbProcs) + "Procs"
-        
+
         if nbProcs == 1:
             log_file = open(baseName + self.DEFAULT_LOG_EXT, 'w')
         else:
@@ -121,14 +121,14 @@ class BenchAutoMapping(OrccAnalyse):
                 SEQUENCE_NAME = fic[0:len(fic)-4]
 
                 print ("  * Processing on sequence : %s" % (SEQUENCE_NAME))
-                
+
                 if nbProcs == 1:
                     self.performMappingWithStrategy(fic, nbProcs, 0)
 
                 else:
                     for strategy in range(0, len(self.MS_LIST)):
                         self.performMappingWithStrategy(fic, nbProcs, strategy)
-                
+
     def extractData(self):
         print ("\n  * Extracting data from logs")
         for fic in os.listdir("."):
@@ -150,7 +150,7 @@ class BenchAutoMapping(OrccAnalyse):
                     else:
                         for strategy in self.MS_LIST:
                             log_file = "./" + self.FILE_HEAD + baseName + strategy + self.DEFAULT_LOG_EXT
-                            
+
                             data[nbP][strategy] = VideoBenchData(SEQUENCE_NAME)
 
                             fp = open(log_file)
@@ -183,7 +183,7 @@ class BenchAutoMapping(OrccAnalyse):
             # Header
             fd.write("Sequence;\n")
             fd.write(bData + ";\n")
-            
+
             for nbProcs in self.rangeProcs:
                 if nbProcs != 1:
                     fd.write(";Nb procs;" + str(nbProcs) + ";;;;;;;")
@@ -196,7 +196,7 @@ class BenchAutoMapping(OrccAnalyse):
 
             for nbProcs in self.rangeProcs:
                 if nbProcs != 1:
-                    fd.write(";Ref;")                        
+                    fd.write(";Ref;")
                     fd.write(str(self.benchData[bData][1].fps).replace(".", ",") + ";;;;;;;")
             fd.write("\n")
 
@@ -240,3 +240,4 @@ args = parser.parse_args()
 # Begin
 bench = BenchAutoMapping(args.nb_procs, args.output_tag, args.nb_frames, args.decoder_path, args.sequences_path, (args.range or DEFAULT_RANGE))
 bench.start()
+

@@ -265,27 +265,32 @@ public class CBackend extends AbstractBackend {
 
 			copyFileToFilesystem("/runtime/C/README.txt", path + File.separator
 					+ "README.txt", debug);
-			
+
 			OrccLogger.trace("Export libraries sources into " + libsPath
 					+ "... ");
-			if (copyFolderToFileSystem("/runtime/C/libs", libsPath, debug)) {
+			final boolean orccOk = copyFolderToFileSystem("/runtime/C/libs",
+					libsPath, debug);
+			if (orccOk) {
 				OrccLogger.traceRaw("OK" + "\n");
-
-				new File(libsPath + File.separator + "orcc" + File.separator + "benchAutoMapping.py")
-						.setExecutable(true);
-				
-				String commonLibPath = libsPath + File.separator + "orcc" + File.separator + "common";
-				OrccLogger.trace("Export common library files into " + commonLibPath + "... ");
-				if (copyFolderToFileSystem("/runtime/common", commonLibPath, debug) == false) {
-					OrccLogger.warnRaw("Error" + "\n");
-					return false;
-				}
-
-				return true;
+				new File(libsPath + File.separator + "orcc" + File.separator
+						+ "benchAutoMapping.py").setExecutable(true);
 			} else {
 				OrccLogger.warnRaw("Error" + "\n");
-				return false;
 			}
+
+			final String commonLibPath = libsPath + File.separator + "orcc"
+					+ File.separator + "common";
+			OrccLogger.trace("Export common library files into "
+					+ commonLibPath + "... ");
+			final boolean commonOk = copyFolderToFileSystem("/runtime/common",
+					commonLibPath, debug);
+			if (commonOk) {
+				OrccLogger.traceRaw("OK" + "\n");
+			} else {
+				OrccLogger.warnRaw("Error" + "\n");
+			}
+
+			return orccOk & commonOk;
 		}
 		return false;
 	}
