@@ -43,6 +43,14 @@
 #include "trace.h"
 #include "cycle.h"
 
+/*
+ * Functions declared in fps_print.c
+ * No header file is associated
+ */
+void fpsPrintInit_mapping();
+int get_partialNumPicturesDecoded();
+void reset_partialNumPicturesDecoded();
+
 int need_remap = TRUE;
 
 /**

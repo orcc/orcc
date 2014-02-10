@@ -29,7 +29,7 @@
 
 
 #include <stdio.h>
-
+#include "trace.h"
 #include "thread.h"
 
 void sync_init(sync_t *sync) {
