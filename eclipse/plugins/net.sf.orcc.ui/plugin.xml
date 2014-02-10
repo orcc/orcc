@@ -474,7 +474,7 @@
             hasPages="true"
             icon="icons/orcc.png"
             id="net.sf.orcc.ui.newOrccProject"
-            name="Project"
+            name="Orcc Project"
             project="true">
       </wizard>
    </extension>

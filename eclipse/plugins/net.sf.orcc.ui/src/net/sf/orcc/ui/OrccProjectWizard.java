@@ -34,9 +34,14 @@ import java.util.List;
 import net.sf.orcc.OrccProjectNature;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.xtext.ui.XtextProjectHelper;
@@ -91,6 +96,23 @@ public class OrccProjectWizard extends BasicNewProjectResourceWizard {
 			// updates the description and replaces the existing description
 			description.setBuildSpec(buildSpec.toArray(new ICommand[0]));
 			project.setDescription(description, null);
+
+			final IProgressMonitor monitor = new NullProgressMonitor();
+			// Create a new source folder
+			final IFolder src = project.getFolder("src");
+			src.create(true, false, monitor);
+			final IClasspathEntry srcEntry = JavaCore.newSourceEntry(src
+					.getFullPath());
+
+			// Get the JavaProject corresponding to the newly created project
+			final IJavaProject javaProject = JavaCore.create(project);
+			// Change the default first classpath entry
+			final IClasspathEntry[] entries = javaProject.getRawClasspath();
+			// was the project itself, now is the source folder freshly created
+			entries[0] = srcEntry;
+			// Update the classpath entries list
+			javaProject.setRawClasspath(entries, monitor);
+
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
