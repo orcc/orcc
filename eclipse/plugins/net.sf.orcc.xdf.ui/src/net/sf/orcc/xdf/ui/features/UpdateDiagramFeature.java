@@ -28,13 +28,11 @@
  */
 package net.sf.orcc.xdf.ui.features;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -43,11 +41,8 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
 import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
-import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
-import net.sf.orcc.xdf.ui.patterns.ConnectionPattern.PortInformation;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
-import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
@@ -69,12 +64,9 @@ import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
-import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
-import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -224,75 +216,6 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		}
 
 		return !toDelete.isEmpty();
-	}
-
-	/**
-	 * TODO: use this method when {@link NetworkPortPattern#getTypeFromShape}
-	 * will work
-	 * 
-	 * @param diagram
-	 * @return
-	 * @deprecated This method does not work for now. See
-	 *             {@link NetworkPortPattern#getTypeFromShape} for more
-	 *             information
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private boolean initializeNetworkFromDiagram(Diagram diagram) {
-		final URI diagramUri = diagram.eResource().getURI();
-		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(Activator.NETWORK_SUFFIX);
-
-		final Network network;
-		try {
-			network = XdfUtil.createNetworkResource(getDiagramBehavior().getEditingDomain().getResourceSet(), xdfUri);
-		} catch (IOException e) {
-			OrccLogger.severeln("Unable to create the network resource " + xdfUri);
-			return false;
-		}
-		link(diagram, network);
-
-		for (Shape shape : diagram.getChildren()) {
-			final IPattern pattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
-					.getPatternForPictogramElement(shape);
-
-			if (pattern instanceof InstancePattern) {
-				final InstancePattern instancePattern = (InstancePattern) pattern;
-				final Instance instance = DfFactory.eINSTANCE.createInstance(instancePattern.getNameFromShape(shape),
-						instancePattern.getRefinementFromShape(shape));
-
-				network.add(instance);
-				link(shape, instance);
-			} else if (pattern instanceof InputNetworkPortPattern) {
-				final InputNetworkPortPattern inPortPattern = (InputNetworkPortPattern) pattern;
-				final Port port = DfFactory.eINSTANCE.createPort(inPortPattern.getTypeFromShape(shape),
-						inPortPattern.getNameFromShape(shape));
-
-				network.addInput(port);
-				link(shape, port);
-				shape.getLink().getBusinessObjects().add(port.getType());
-			} else if (pattern instanceof OutputNetworkPortPattern) {
-				final OutputNetworkPortPattern outPortPattern = (OutputNetworkPortPattern) pattern;
-				final Port port = DfFactory.eINSTANCE.createPort(outPortPattern.getTypeFromShape(shape),
-						outPortPattern.getNameFromShape(shape));
-
-				network.addOutput(port);
-				link(shape, port);
-				shape.getLink().getBusinessObjects().add(port.getType());
-			} else if (pattern instanceof ConnectionPattern) {
-				final ConnectionPattern connPattern = (ConnectionPattern) pattern;
-				final Connection connection = (Connection) shape;
-
-				final PortInformation src = connPattern.getPortInformations(connection.getStart());
-				final PortInformation tgt = connPattern.getPortInformations(connection.getEnd());
-
-				final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection(src.getVertex(),
-						src.getPort(), tgt.getVertex(), tgt.getPort());
-				network.getConnections().add(dfConnection);
-				link(connection, dfConnection);
-			}
-		}
-
-		return true;
 	}
 
 	/**
