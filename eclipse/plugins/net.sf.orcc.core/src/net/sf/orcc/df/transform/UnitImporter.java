@@ -55,7 +55,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Matthieu Wipliez
  * 
  */
-public class UnitImporter extends DfVisitor<Object> {
+public class UnitImporter extends DfVisitor<Procedure> {
 
 	private Copier copier;
 
@@ -67,17 +67,17 @@ public class UnitImporter extends DfVisitor<Object> {
 		this.irVisitor = new InnerIrVisitor();
 	}
 
-	private class InnerIrVisitor extends AbstractIrVisitor<Object> {
+	private class InnerIrVisitor extends AbstractIrVisitor<Procedure> {
 		@Override
-		public Object caseInstCall(InstCall call) {
+		public Procedure caseInstCall(InstCall call) {
 			Procedure proc = call.getProcedure();
-			Procedure procInActor = (Procedure) doSwitch(proc);
+			Procedure procInActor = doSwitch(proc);
 			call.setProcedure(procInActor);
 			return null;
 		}
 
 		@Override
-		public Object caseInstLoad(InstLoad load) {
+		public Procedure caseInstLoad(InstLoad load) {
 			Use use = load.getSource();
 			Var var = use.getVariable();
 			if (var.eContainer() instanceof Unit) {
@@ -97,7 +97,7 @@ public class UnitImporter extends DfVisitor<Object> {
 		}
 
 		@Override
-		public Object caseProcedure(Procedure proc) {
+		public Procedure caseProcedure(Procedure proc) {
 			if (proc.eContainer() instanceof Unit) {
 				Procedure procInActor = (Procedure) copier.get(proc);
 				if (procInActor == null) {
@@ -127,7 +127,7 @@ public class UnitImporter extends DfVisitor<Object> {
 							}
 						} else if (object instanceof InstCall) {
 							InstCall innerCall = (InstCall) object;
-							Procedure copyProc = (Procedure) doSwitch(innerCall
+							Procedure copyProc = doSwitch(innerCall
 									.getProcedure());
 							InstCall copyCall = (InstCall) copier
 									.get(innerCall);
@@ -147,7 +147,7 @@ public class UnitImporter extends DfVisitor<Object> {
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
+	public Procedure caseActor(Actor actor) {
 		this.actor = actor;
 		this.copier = new EcoreUtil.Copier();
 		this.indexProc = 0;
