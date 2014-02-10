@@ -90,6 +90,10 @@ class CMakePrinter extends CommonPrinter {
 
 	def protected srcCMakeContent() '''
 		# Generated from «network.simpleName»
+		
+		if(OpenHevc)
+		    add_definitions(-DOPEN_HEVC_ENABLE)
+		endif()
 
 		set(filenames
 			«network.simpleName».c

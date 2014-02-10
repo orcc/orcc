@@ -829,8 +829,17 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 
-	def protected print(Procedure proc) '''
+	def protected print(Procedure proc) {
+		val isOptimizable = proc.hasAttribute(C_DIRECTIVE_OPTIMIZE);
+		val optCond = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("condition")
+		val optName = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("name")
+		'''
 		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]») {
+			«IF isOptimizable»
+				#ifdef «optCond»
+				«optName»(«proc.parameters.join(", ")[variable.name]»);
+				#else
+			«ENDIF»
 			«FOR variable : proc.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -838,8 +847,12 @@ class InstancePrinter extends CTemplate {
 			«FOR block : proc.blocks»
 				«block.doSwitch»
 			«ENDFOR»
+			«IF isOptimizable»
+				#endif // «optCond»
+			«ENDIF»
 		}
-	'''
+		'''
+	}
 
 	def protected declareStateVar(Var variable) {
 		val varDecl =
