@@ -81,14 +81,17 @@ public class UnitImporter extends DfVisitor<Procedure> {
 			Use use = load.getSource();
 			Var var = use.getVariable();
 			if (var.eContainer() instanceof Unit) {
-				Var varInActor = actor.getStateVar(var.getName());
+
+				final String actorVarName = ((Unit) var.eContainer())
+						.getSimpleName() + "_" + var.getName();
+				Var varInActor = actor.getStateVar(actorVarName);
 				if (varInActor == null) {
 					varInActor = (Var) copier.get(var);
 					if (varInActor == null) {
 						varInActor = (Var) copier.copy(var);
 						actor.getStateVars().add(indexVar++, varInActor);
+						varInActor.setName(actorVarName);
 					}
-
 				}
 				use.setVariable(varInActor);
 			}
@@ -99,10 +102,16 @@ public class UnitImporter extends DfVisitor<Procedure> {
 		@Override
 		public Procedure caseProcedure(Procedure proc) {
 			if (proc.eContainer() instanceof Unit) {
+				final String actorProcName = ((Unit) proc.eContainer())
+						.getSimpleName() + "_" + proc.getName();
 				Procedure procInActor = (Procedure) copier.get(proc);
 				if (procInActor == null) {
 					procInActor = (Procedure) copier.copy(proc);
-					proc.setAttribute("package", getPackage(proc.eContainer()));
+					procInActor.setAttribute("package",
+							getPackage(proc.eContainer()));
+					if (!procInActor.isNative()) {
+						procInActor.setName(actorProcName);
+					}
 					TreeIterator<EObject> it = EcoreUtil.getAllContents(proc,
 							true);
 					while (it.hasNext()) {
@@ -153,8 +162,8 @@ public class UnitImporter extends DfVisitor<Procedure> {
 		this.indexProc = 0;
 		this.indexVar = 0;
 
-		List<Procedure> procs2 = new ArrayList<Procedure>(actor.getProcs());
-		for (Procedure procedure : procs2) {
+		List<Procedure> procs = new ArrayList<Procedure>(actor.getProcs());
+		for (Procedure procedure : procs) {
 			doSwitch(procedure);
 		}
 
