@@ -30,11 +30,18 @@ package net.sf.orcc.xdf.ui.wizards;
 
 import java.io.IOException;
 
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -68,9 +75,39 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 
 		this.workbench = workbench;
 
-		final WizardNewFileCreationPage page = new WizardNewFileCreationPage("filenameSelection", selection);
+		final WizardNewFileCreationPage page = new WizardNewFileCreationPage(
+				"filenameSelection", selection) {
+			@Override
+			protected boolean validatePage() {
+				if (!super.validatePage()) {
+					return false;
+				}
+
+				final IPath path = this.getContainerFullPath();
+				final IResource member = ResourcesPlugin.getWorkspace()
+						.getRoot().findMember(path);
+				if (member instanceof IProject) {
+					setMessage("The network can't be created directly "
+							+ "in a project. Please select a source folder.",
+							DialogPage.ERROR);
+					return false;
+				} else if (member instanceof IFolder) {
+					for (final IFolder folder : OrccUtil
+							.getAllSourceFolders(member.getProject())) {
+						if (folder.equals(member)) {
+							return true;
+						}
+					}
+					setMessage("Target container must be a source folder",
+							DialogPage.ERROR);
+					return false;
+				}
+
+				return true;
+			}
+		};
 		page.setFileExtension(Activator.NETWORK_SUFFIX);
-		page.setDescription("Select a parent resource and a name for your new network.");
+		page.setDescription("Select a parent source folder and a name for the new network.");
 		page.setAllowExistingResources(false);
 
 		// Fill the page with a filename, if user selected one
