@@ -48,6 +48,7 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionCall;
 import net.sf.orcc.cal.cal.Function;
@@ -367,6 +368,88 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	}
 
 	/**
+	 * Display an error if the given name is already used as variable name in
+	 * the given actor. The given source and feature are used to provide an
+	 * error on the right element in the editor
+	 * 
+	 * @param entity
+	 * @param name
+	 * @param source
+	 * @param feature
+	 */
+	private void checkDuplicatesLitterals(final AstActor actor,
+			final String name, final EObject source,
+			final EStructuralFeature feature) {
+
+		for (final Variable var : actor.getStateVariables()) {
+			if (var.getName().equals(name) && var != source) {
+				error("A state variable is already declared with the name "
+						+ name, source, feature);
+				return;
+			}
+		}
+		for (final Variable var : actor.getParameters()) {
+			if (var.getName().equals(name) && var != source) {
+				error("A parameter is already declared with the name " + name,
+						source, feature);
+				return;
+			}
+		}
+		for (final AstProcedure proc : actor.getProcedures()) {
+			if (proc.getName().equals(name) && proc != source) {
+				error("A procedure is already declared with the name " + name,
+						source, feature);
+				return;
+			}
+		}
+		for (final Function func : actor.getFunctions()) {
+			if (func.getName().equals(name) && func != source) {
+				error("A function is already declared with the name " + name,
+						source, feature);
+				return;
+			}
+		}
+		return;
+	}
+
+	/**
+	 * Display an error if the given name is already used as variable name in
+	 * the given unit. The given source and feature are used to provide an error
+	 * on the right element in the editor
+	 * 
+	 * @param entity
+	 * @param name
+	 * @param source
+	 * @param feature
+	 */
+	private void checkDuplicatesLitterals(final AstUnit unit, final String name,
+			final EObject source, final EStructuralFeature feature) {
+
+		for (final Variable var : unit.getVariables()) {
+			if (var.getName().equals(name) && var != source) {
+				error("A variable is already declared with the name " + name,
+						source, feature);
+				return;
+			}
+		}
+		for (final AstProcedure proc : unit.getProcedures()) {
+			if (proc.getName().equals(name) && proc != source) {
+				error("A procedure is already declared with the name " + name,
+						source, feature);
+				return;
+			}
+		}
+		for (final Function func : unit.getFunctions()) {
+			if (func.getName().equals(name) && func != source) {
+				error("A function is already declared with the name " + name,
+						source, feature);
+				return;
+			}
+		}
+		return;
+	}
+
+	/**
 	 * Checks the given FSM using the given action list. This check is not
 	 * annotated because we need to build the action list, which is also useful
 	 * for checking the priorities, and we do not want to build that twice.
@@ -420,6 +503,15 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkFunction(Function function) {
 		checkInnerVarDecls(function, eINSTANCE.getFunction_Expression());
+
+		final EObject parent = function.eContainer();
+		if (parent instanceof AstActor) {
+			checkDuplicatesLitterals((AstActor) parent, function.getName(),
+					function, eINSTANCE.getFunction_Name());
+		} else if (parent instanceof AstUnit) {
+			checkDuplicatesLitterals((AstUnit) parent, function.getName(),
+					function, eINSTANCE.getFunction_Name());
+		}
 	}
 
 	@Check(CheckType.NORMAL)
@@ -580,6 +672,15 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkProcedure(AstProcedure procedure) {
 		checkInnerVarDecls(procedure, eINSTANCE.getAstProcedure_Statements());
+
+		final EObject parent = procedure.eContainer();
+		if (parent instanceof AstActor) {
+			checkDuplicatesLitterals((AstActor) parent, procedure.getName(),
+					procedure, eINSTANCE.getAstProcedure_Name());
+		} else if (parent instanceof AstUnit) {
+			checkDuplicatesLitterals((AstUnit) parent, procedure.getName(),
+					procedure, eINSTANCE.getAstProcedure_Name());
+		}
 	}
 
 	@Check(CheckType.NORMAL)
