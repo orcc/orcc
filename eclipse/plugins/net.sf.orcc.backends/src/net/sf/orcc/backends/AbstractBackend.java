@@ -340,7 +340,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					isOut.close();
 
 					byte[] in = mdIn.digest();
-					byte[] out = mdIn.digest();
+					byte[] out = mdOut.digest();
 
 					if (MessageDigest.isEqual(in, out)) {
 						// Target file is the same than input, don't need to
