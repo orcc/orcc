@@ -43,6 +43,7 @@ class OrccAnalyse:
         self.SUMMARY_XML = tag + ".xml"
         self.SUMMARY_HTML = tag + ".html"
         self.SUMMARY_PDF = tag + ".pdf"
+        self.SRC_DIR = "."
         self.PDF_TOOL = "wkhtmltopdf"
         self.PDF_TOOL_INSTALLED = shutil.which(self.PDF_TOOL)
         self.OUTPUT_TAG = tag
@@ -83,7 +84,7 @@ class OrccAnalyse:
 
     def logInPDF(self):
         print ("\n  * Generate PDF Result file : " + self.SUMMARY_PDF)
-        subprocess.call([self.PDF_TOOL, self.SUMMARY_HTML, self.SUMMARY_PDF])
+        subprocess.call([self.PDF_TOOL, os.path.join(self.SRC_DIR, self.SUMMARY_HTML), os.path.join(self.SRC_DIR, self.SUMMARY_PDF)])
 
     def printData(self):
         if self.logCSV:
@@ -93,7 +94,7 @@ class OrccAnalyse:
         if self.logXML:
             self.logInXML()
         if self.logHTML:
-            shutil.copy(os.path.join(os.path.join(os.path.dirname(sys.argv[0]), "common"), "style.css"), ".")
+            shutil.copy(os.path.join(os.path.join(os.path.dirname(sys.argv[0]), "common"), "style.css"), self.SRC_DIR)
             self.logInHTML()
         if self.logPDF and self.logHTML and self.PDF_TOOL_INSTALLED:
             self.logInPDF()
@@ -104,27 +105,28 @@ class OrccAnalyse:
 
     def archiveLogs(self):
         if self.ARCHIVE:
-            print ("\n  * Archiving all in directory : " + self.OUTPUT_TAG)
+            targetPath = os.path.join(self.SRC_DIR, self.OUTPUT_TAG)
+            print ("\n  * Archiving all in directory : " + targetPath)
             save = 0
-            if os.path.exists(self.OUTPUT_TAG):
-                backup = self.OUTPUT_TAG+"_"+str(save)
+            if os.path.exists(targetPath):
+                backup = targetPath+"_"+str(save)
                 while os.path.exists(backup):
                     save += 1
-                    backup = self.OUTPUT_TAG+"_"+str(save)
-                shutil.move(self.OUTPUT_TAG, backup)
+                    backup = targetPath+"_"+str(save)
+                shutil.move(targetPath, backup)
                 print ("    Warning: Making a backup of a directory with same name in " + backup)
-            os.mkdir(self.OUTPUT_TAG)
-            os.system("mv " + self.FILE_HEAD + "*" + self.DEFAULT_LOG_EXT + " " + self.OUTPUT_TAG)
+            os.mkdir(targetPath)
+            os.system("mv " + self.SRC_DIR + "/*" + self.DEFAULT_LOG_EXT + " " + targetPath)
             if self.logCSV:
-                os.system("mv " + self.OUTPUT_TAG + "*.csv " + self.OUTPUT_TAG)
+                os.system("mv " + self.SRC_DIR + "/*.csv " + targetPath)
             if self.logTXT:
-                os.system("mv " + self.OUTPUT_TAG + "*.txt " + self.OUTPUT_TAG)
+                os.system("mv " + self.SRC_DIR + "/*.txt " + targetPath)
             if self.logXML:
-                os.system("mv " + self.OUTPUT_TAG + "*.xml " + self.OUTPUT_TAG)
+                os.system("mv " + self.SRC_DIR + "/*.xml " + targetPath)
             if self.logPDF:
-                os.system("mv " + self.OUTPUT_TAG + "*.pdf " + self.OUTPUT_TAG)
+                os.system("mv " + self.SRC_DIR + "/*.pdf " + targetPath)
             if self.logHTML:
-                os.system("mv " + self.OUTPUT_TAG + "*.html " + self.OUTPUT_TAG)
-                os.system("mv style.css " + self.OUTPUT_TAG)
+                os.system("mv " + self.SRC_DIR + "/*.html " + targetPath)
+                os.system("mv " + os.path.join(self.SRC_DIR, "style.css") + " " + targetPath)
         else:
             print ("\n  * Not archiving ")

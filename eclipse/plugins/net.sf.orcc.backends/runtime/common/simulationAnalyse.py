@@ -84,14 +84,14 @@ class SimulationAnalyse(OrccAnalyse):
     def extractData(self):
         datal = list()
         print ("\n  * Extracting data from logs")
-        for fic in os.listdir("."):
+        for fic in os.listdir(self.SRC_DIR):
             if fic[len(fic)-4:len(fic)] == self.DEFAULT_LOG_EXT:
                 ACTOR_NAME = fic[len(self.FILE_HEAD):len(fic)-4]
                 data = SimulationData(ACTOR_NAME)
 
-                nbCycles = self.getNbCycles(fic)
+                nbCycles = self.getNbCycles(os.path.join(self.SRC_DIR, fic))
 
-                status = self.getStatus(fic)
+                status = self.getStatus(os.path.join(self.SRC_DIR, fic))
 
                 fps = self.calculFPS(nbCycles)
 
@@ -119,8 +119,8 @@ class SimulationAnalyse(OrccAnalyse):
         self.PIE_DATA = sorted(wl, key=lambda actor: actor.workload, reverse=True)
 
     def logInTXT(self):
-        print ("\n  * Generate TXT Result file : " + self.SUMMARY_TXT)
-        fd = open(self.SUMMARY_TXT, 'w')
+        print ("\n  * Generate TXT Result file : " + os.path.join(self.SRC_DIR, self.SUMMARY_TXT))
+        fd = open(os.path.join(self.SRC_DIR, self.SUMMARY_TXT), 'w')
         # Header
         fd.write("Summary results for " + self.OUTPUT_TAG + "\n")
         fd.write(".....Frequency    = " + str(self.FREQUENCY) + "\n")
@@ -139,8 +139,8 @@ class SimulationAnalyse(OrccAnalyse):
         fd.close()
 
     def logInCSV(self):
-        print ("\n  * Generate CSV Result file : " + self.SUMMARY_CSV)
-        fd = open(self.SUMMARY_CSV, 'w')
+        print ("\n  * Generate CSV Result file : " + os.path.join(self.SRC_DIR, self.SUMMARY_CSV))
+        fd = open(os.path.join(self.SRC_DIR, self.SUMMARY_CSV), 'w')
         # Header
         fd.write("Actor;Cycle count;FPS@" + str(self.FREQUENCY) + "MHz;Workload;Status" + "\n")
         # TODO : Add output_tag information ?
@@ -213,8 +213,8 @@ class SimulationAnalyse(OrccAnalyse):
         fd.write("  </script>" + "\n")
 
     def logInHTML(self):
-        print ("\n  * Generate HTML Result file : " + self.SUMMARY_HTML)
-        fd = open(self.SUMMARY_HTML, 'w')
+        print ("\n  * Generate HTML Result file : " + os.path.join(self.SRC_DIR, self.SUMMARY_HTML))
+        fd = open(os.path.join(self.SRC_DIR, self.SUMMARY_HTML), 'w')
         # Header
         fd.write("<html lang=\"fr\">" + "\n")
         fd.write("  <head>" + "\n")

@@ -194,11 +194,11 @@ class Processor:
         retcode = subprocess.call(["generate_cachegrind", self._tpefFile + ".trace"])
         return subprocess.check_output(["cgview", "-e", self._tpefFile + ".trace.cachegrind"])
 
-    def simulate(self, args):
+    def simulate(self, srcPath, args):
         if len(self.inputs)>0 and len(self.outputs)>0:
-            log_file = open(self.id+'.log', 'w')
+            log_file = open(os.path.join(srcPath, self.id +'.log'), 'w')
             print "Simulating %s" % self.id
-            retcode=subprocess.call(["ttanetsim"] + args + ["-n", "top.pndf", "-t", self.id], stdout=log_file)
+            retcode=subprocess.call(["ttanetsim"] + args + ["-n", os.path.join(srcPath, "top.pndf"), "-t", self.id], stdout=log_file)
             return retcode
         else:
             return 0

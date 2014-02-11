@@ -36,8 +36,9 @@ import sys
 import argparse
 
 class TTASimulationAnalyse(SimulationAnalyse):
-    def __init__(self, tag, frequency, nb_frames, bArchive):
+    def __init__(self, tag, frequency, nb_frames, bArchive, src_dir):
         SimulationAnalyse.__init__(self, tag, frequency, nb_frames)
+        self.SRC_DIR = src_dir
         self.TOKEN_CYCLE = "Cycle count = "
         self.TOKEN_ERROR = "Error"
         self.FILE_HEAD = "processor_"
@@ -70,6 +71,7 @@ class TTASimulationAnalyse(SimulationAnalyse):
 
 # Main
 DEFAULT_OUTPUT_TAG="logs"
+DEFAULT_SRC_DIR="."
 DEFAULT_FREQUENCY=1000
 DEFAULT_NBFRAME=10
 DEFAULT_ARCHIVE=False
@@ -80,8 +82,9 @@ parser.add_argument('-n', dest='nb_frames', type=int, default=DEFAULT_NBFRAME, h
 parser.add_argument('-f', dest='frequency', type=int, default=DEFAULT_FREQUENCY, help='Frequency in MHz (default value = 1000)')
 parser.add_argument('-o', dest='output_tag', default=DEFAULT_OUTPUT_TAG, help='Allow to tag extraction with a name')
 parser.add_argument('-a', dest='archive', action="store_true", help='Archive logs and result files after post-treatment')
+parser.add_argument('-s', dest='src_dir', default=DEFAULT_SRC_DIR, help='Directory where are the log files (default = ".")')
 args = parser.parse_args()
 
 # Begin
-ttasiman = TTASimulationAnalyse(args.output_tag, args.frequency, args.nb_frames, (args.archive or DEFAULT_ARCHIVE))
+ttasiman = TTASimulationAnalyse(args.output_tag, args.frequency, args.nb_frames, (args.archive or DEFAULT_ARCHIVE), args.src_dir)
 ttasiman.start()

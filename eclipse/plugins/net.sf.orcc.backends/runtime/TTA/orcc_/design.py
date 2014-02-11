@@ -139,20 +139,20 @@ class Design:
         result = template.substitute(path=genPath, id="ram_2p", width=512, depth=32)
         open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
     
-    def simulateMulti(self, proc, results, args):
+    def simulateMulti(self, srcPath, proc, results, args):
         self.sema.acquire()
-        retcode = proc.simulate(args)
+        retcode = proc.simulate(srcPath, args)
         results.append(retcode)
         self.sema.release()
 
-    def simulate(self, nbJobs, args):
+    def simulate(self, srcPath, nbJobs, args):
         if args.count("-q") and nbJobs > 1:
             print "Cannot use -q option in simulations when using more than one job."
             return;
 
         self.sema = multiprocessing.BoundedSemaphore(value=nbJobs)
         results = multiprocessing.Manager().list()
-        jobs = [multiprocessing.Process(target=self.simulateMulti, args=(processor, results, args)) 
+        jobs = [multiprocessing.Process(target=self.simulateMulti, args=(srcPath, processor, results, args)) 
             for processor in self.processors]    
         for job in jobs: job.start()
         for job in jobs: job.join()
@@ -161,11 +161,12 @@ class Design:
         if retcode != 0: 
             raise Exception("Problem during the simulation")
             
-    def analyse(self, args):
+    def analyse(self, srcPath, args):
         print "* Initialize the analysis."
-        # TODO: Better integration of ttaanalyse
         scriptPath = os.path.join(os.path.dirname(sys.argv[0]), "ttaanalyse.py")
-        retcode = subprocess.call([scriptPath] + args)
+        # TODO: Better integration of ttaanalyse
+        opt = args + ["-s", srcPath]
+        retcode = subprocess.call([scriptPath] + opt)
         
         if retcode != 0: 
             raise Exception("Problem during the analyse")

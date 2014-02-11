@@ -81,8 +81,8 @@ def generate(arg, debug, target):
 def profile(target):
     design.profile(target)
 
-def simulate(arg, nbJobs):
-    design.simulate(nbJobs, arg.split())
+def simulate(arg, nbJobs, target):
+    design.simulate(target, nbJobs, arg.split())
     
 def analyse(arg, target):
     design.analyse(target, arg.split())
@@ -132,7 +132,7 @@ try:
     
     for o, a in opts:
         if o in ("-s", "--simulate"):
-            simulate(a, nbJobs)
+            simulate(a, nbJobs, srcPath)
             
     for o, a in opts:
         if o in ("-a", "--analyse"):
