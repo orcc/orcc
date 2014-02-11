@@ -802,12 +802,12 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	def private profileEnd(Action action) '''
-		«IF profileNetwork || dynamicMapping»
+		«IF (profileNetwork || dynamicMapping) && !actor.initializes.contains(action)»
 			«FOR port : action.inputPattern.ports»
 				rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
 			«ENDFOR»
 		«ENDIF»
-		«IF profileActions && profileNetwork»
+		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
 			tick_out = getticks();
 			diff_tick = elapsed(tick_out, tick_in);
 			ticks_«action.name» += diff_tick;
