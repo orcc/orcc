@@ -41,6 +41,8 @@ import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
+import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
 import static net.sf.orcc.backends.BackendsConstants.DYNAMIC_MAPPING;
@@ -873,6 +875,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				"(C) Allow actions profiling");
 		options.addOption("dm", "dynamic-mapping", false,
 				"(C) Enable load balancing on multi-core platforms");
+		options.addOption("et", "enable-traces", true,
+				"(C) Enable tracing of the FIFOs in the given directory");
 
 		// FIXME: choose independently the transformation to apply
 		options.addOption("t", "transfo_add", false,
@@ -942,6 +946,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 						type.equals("2") || type.equals("3"));
 			}
 
+			if (line.hasOption("et")) {
+				optionMap.put(ENABLE_TRACES, true);
+				optionMap.put(TRACES_FOLDER, line.getOptionValue("et"));
+			}
+			
 			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
