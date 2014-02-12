@@ -101,7 +101,7 @@ except getopt.GetoptError, err:
     
 debug = False
 nbJobs = 1
-actorsKO = 0
+actorsKoInSimulation = 0
 
 for o, a in opts:
     if o in ("--jobs"):
