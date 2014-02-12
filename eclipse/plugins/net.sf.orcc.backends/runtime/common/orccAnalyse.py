@@ -199,7 +199,7 @@ class OrccAnalyse:
         fic.write("  </head>" + "\n")
 
     def addBodyInHTML(self, fic):
-        fic.write("  <body>" + "\n")        
+        fic.write("  <body>" + "\n")
         self.addPieInHTML(fic)
         self.addContentInHTMLBody(fic)
         fic.write("  </body>" + "\n")
@@ -220,9 +220,9 @@ class OrccAnalyse:
         if self.logPDF and self.logHTML and self.PDF_TOOL_INSTALLED:
             self.logInPDF()
         elif self.logPDF and not self.PDF_TOOL_INSTALLED:
-             print ("    Warning: Cannot generate PDF file because " + self.PDF_TOOL + " is not installed on your computer.")           
+             print ("    Warning: Cannot generate PDF file because " + self.PDF_TOOL + " is not installed on your computer.")
         elif self.logPDF and not self.logHTML:
-             print ("    Warning: Cannot generate PDF file if you do not generate HTML files.")           
+             print ("    Warning: Cannot generate PDF file if you do not generate HTML files.")
 
     def archiveLogs(self):
         if self.ARCHIVE:

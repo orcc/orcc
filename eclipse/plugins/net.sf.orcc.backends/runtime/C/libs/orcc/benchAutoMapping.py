@@ -240,4 +240,3 @@ args = parser.parse_args()
 # Begin
 bench = BenchAutoMapping(args.nb_procs, args.output_tag, args.nb_frames, args.decoder_path, args.sequences_path, (args.range or DEFAULT_RANGE))
 bench.start()
-
