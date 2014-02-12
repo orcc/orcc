@@ -87,6 +87,7 @@ else()
     find_library(OpenHevc libLibOpenHevcWrapper PATHS ${CMAKE_CURRENT_SOURCE_DIR}/openHevc ${CMAKE_CURRENT_SOURCE_DIR}/libOpenHevc)
     if(OpenHevc)
         add_definitions(-DOPEN_HEVC_ENABLE)
+        message(STATUS "Linking with libLibOpenHevcWrapper enabled. Library path: ${OpenHevc}")
     endif()
 
     find_package(METIS QUIET)
