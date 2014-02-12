@@ -120,153 +120,132 @@ class SimulationAnalyse(OrccAnalyse):
 
     def logInTXT(self):
         print ("\n  * Generate TXT Result file : " + os.path.join(self.SRC_DIR, self.SUMMARY_TXT))
-        fd = open(os.path.join(self.SRC_DIR, self.SUMMARY_TXT), 'w')
+        fic = open(os.path.join(self.SRC_DIR, self.SUMMARY_TXT), 'w')
         # Header
-        fd.write("Summary results for " + self.OUTPUT_TAG + "\n")
-        fd.write(".....Frequency    = " + str(self.FREQUENCY) + "\n")
-        fd.write(".....Nb of frames = " + str(self.NBFRAME) + "\n")
-        fd.write("\n")
+        fic.write("Summary results for " + self.OUTPUT_TAG + "\n")
+        fic.write(".....Frequency    = " + str(self.FREQUENCY) + "\n")
+        fic.write(".....Nb of frames = " + str(self.NBFRAME) + "\n")
+        fic.write("\n")
 
         # Body
         for actor in self.extractedData:
             if actor.status == "KO":
-                fd.write('{:>3} {:60} Cycle count = {:>10}    FPS = {:>9}   Workload = {:>6}\n'.format(actor.status, actor.actor_name, str(actor.cycles), str(actor.fps), str(actor.workload)));
+                fic.write('{:>3} {:60} Cycle count = {:>10}    FPS = {:>9}   Workload = {:>6}\n'.format(actor.status, actor.actor_name, str(actor.cycles), str(actor.fps), str(actor.workload)));
             else:
-                fd.write('{:>3} {:60} Cycle count = {:>10}    FPS = {:>9}   Workload = {:>6}\n'.format("", actor.actor_name, str(actor.cycles), str(actor.fps), str(actor.workload)));
+                fic.write('{:>3} {:60} Cycle count = {:>10}    FPS = {:>9}   Workload = {:>6}\n'.format("", actor.actor_name, str(actor.cycles), str(actor.fps), str(actor.workload)));
 
         # Footer
-        fd.write("\nWorst actor is : " + self.WORST_ACTOR + "    with : " + str(self.WORST_FPS) + " FPS\n")
-        fd.close()
+        fic.write("\nWorst actor is : " + self.WORST_ACTOR + "    with : " + str(self.WORST_FPS) + " FPS\n")
+        fic.close()
 
     def logInCSV(self):
         print ("\n  * Generate CSV Result file : " + os.path.join(self.SRC_DIR, self.SUMMARY_CSV))
-        fd = open(os.path.join(self.SRC_DIR, self.SUMMARY_CSV), 'w')
+        fic = open(os.path.join(self.SRC_DIR, self.SUMMARY_CSV), 'w')
         # Header
-        fd.write("Actor;Cycle count;FPS@" + str(self.FREQUENCY) + "MHz;Workload;Status" + "\n")
+        fic.write("Actor;Cycle count;FPS@" + str(self.FREQUENCY) + "MHz;Workload;Status" + "\n")
         # TODO : Add output_tag information ?
 
         # Body
         for actor in self.extractedData:
-            fd.write(actor.actor_name + ";" + str(actor.cycles) + ";" + str(actor.fps).replace(".", ",") + ";" + str(actor.workload).replace(".", ",") + ";" + actor.status + "\n");
+            fic.write(actor.actor_name + ";" + str(actor.cycles) + ";" + str(actor.fps).replace(".", ",") + ";" + str(actor.workload).replace(".", ",") + ";" + actor.status + "\n");
 
         # Footer
         # TODO : Add worst actor ?
-        fd.close()
+        fic.close()
 
-    def addPieInHTML(self, fd):
-        fd.write("  <div id=\"chart\"></div>" + "\n")
+    def addPieInHTML(self, fic):
+        fic.write("  <div id=\"chart\"></div>" + "\n")
 
-        fd.write("  <script type=\"text/javascript\">" + "\n")
-        fd.write("      var queryString = '';" + "\n")
-        fd.write("      var dataUrl = '';" + "\n")
+        fic.write("  <script type=\"text/javascript\">" + "\n")
+        fic.write("      var queryString = '';" + "\n")
+        fic.write("      var dataUrl = '';" + "\n")
 
-        fd.write("      function onLoadCallback() {" + "\n")
-        fd.write("          if (dataUrl.length > 0) {" + "\n")
-        fd.write("              var query = new google.visualization.Query(dataUrl);" + "\n")
-        fd.write("              query.setQuery(queryString);" + "\n")
-        fd.write("              query.send(handleQueryResponse);" + "\n")
-        fd.write("          } else {" + "\n")
-        fd.write("              var dataTable = new google.visualization.DataTable();" + "\n")
-        fd.write("              dataTable.addRows(" + str(len(self.PIE_DATA) + 1) + ");" + "\n")
+        fic.write("      function onLoadCallback() {" + "\n")
+        fic.write("          if (dataUrl.length > 0) {" + "\n")
+        fic.write("              var query = new google.visualization.Query(dataUrl);" + "\n")
+        fic.write("              query.setQuery(queryString);" + "\n")
+        fic.write("              query.send(handleQueryResponse);" + "\n")
+        fic.write("          } else {" + "\n")
+        fic.write("              var dataTable = new google.visualization.DataTable();" + "\n")
+        fic.write("              dataTable.addRows(" + str(len(self.PIE_DATA) + 1) + ");" + "\n")
 
-        fd.write("              dataTable.addColumn('number');" + "\n")
+        fic.write("              dataTable.addColumn('number');" + "\n")
         i=0
         valuesTxt=""
         actorsTxt=""
         othersWl=100
         for actor in self.PIE_DATA:
-            fd.write("              dataTable.setValue(" + str(i) + ", 0, " + str(actor.workload) + ");" + "\n")
+            fic.write("              dataTable.setValue(" + str(i) + ", 0, " + str(actor.workload) + ");" + "\n")
             valuesTxt = valuesTxt + str(actor.workload) + ","
             actorsTxt = actorsTxt + str(actor.workload) + "%   " + actor.actor_name + "|"
             othersWl -= float(str(actor.workload))
             i += 1
 
-        fd.write("              dataTable.setValue(" + str(i) + ", 0, " + str(othersWl) + ");" + "\n")
-        fd.write("              draw(dataTable);" + "\n")
-        fd.write("          }" + "\n")
-        fd.write("      }" + "\n")
+        fic.write("              dataTable.setValue(" + str(i) + ", 0, " + str(othersWl) + ");" + "\n")
+        fic.write("              draw(dataTable);" + "\n")
+        fic.write("          }" + "\n")
+        fic.write("      }" + "\n")
 
-        fd.write("      function draw(dataTable) {" + "\n")
-        fd.write("          var vis = new google.visualization.ImageChart(document.getElementById('chart'));" + "\n")
-        fd.write("          var options = {" + "\n")
-        fd.write("             chs: '900x400'," + "\n")
-        fd.write("              cht: 'p3'," + "\n")
-        fd.write("              chco: 'FF9900'," + "\n")
-        fd.write("              chd: 't:" + valuesTxt + str(othersWl) + "'," + "\n")
-        fd.write("              chdl: '" + actorsTxt + "Others'," + "\n")
-        fd.write("              chl: '|||'" + "\n")
-        fd.write("          };" + "\n")
-        fd.write("          vis.draw(dataTable, options);" + "\n")
-        fd.write("      }" + "\n")
+        fic.write("      function draw(dataTable) {" + "\n")
+        fic.write("          var vis = new google.visualization.ImageChart(document.getElementById('chart'));" + "\n")
+        fic.write("          var options = {" + "\n")
+        fic.write("             chs: '900x400'," + "\n")
+        fic.write("              cht: 'p3'," + "\n")
+        fic.write("              chco: 'FF9900'," + "\n")
+        fic.write("              chd: 't:" + valuesTxt + str(othersWl) + "'," + "\n")
+        fic.write("              chdl: '" + actorsTxt + "Others'," + "\n")
+        fic.write("              chl: '|||'" + "\n")
+        fic.write("          };" + "\n")
+        fic.write("          vis.draw(dataTable, options);" + "\n")
+        fic.write("      }" + "\n")
 
-        fd.write("      function handleQueryResponse(response) {" + "\n")
-        fd.write("          if (response.isError()) {" + "\n")
-        fd.write("              alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());" + "\n")
-        fd.write("              return;" + "\n")
-        fd.write("          }" + "\n")
-        fd.write("          draw(response.getDataTable());" + "\n")
-        fd.write("      }" + "\n")
+        fic.write("      function handleQueryResponse(response) {" + "\n")
+        fic.write("          if (response.isError()) {" + "\n")
+        fic.write("              alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());" + "\n")
+        fic.write("              return;" + "\n")
+        fic.write("          }" + "\n")
+        fic.write("          draw(response.getDataTable());" + "\n")
+        fic.write("      }" + "\n")
 
-        fd.write("      google.load(\"visualization\", \"1\", {packages:[\"imagechart\"]});" + "\n")
-        fd.write("      google.setOnLoadCallback(onLoadCallback);" + "\n")
+        fic.write("      google.load(\"visualization\", \"1\", {packages:[\"imagechart\"]});" + "\n")
+        fic.write("      google.setOnLoadCallback(onLoadCallback);" + "\n")
 
-        fd.write("  </script>" + "\n")
+        fic.write("  </script>" + "\n")
 
-    def logInHTML(self):
-        print ("\n  * Generate HTML Result file : " + os.path.join(self.SRC_DIR, self.SUMMARY_HTML))
-        fd = open(os.path.join(self.SRC_DIR, self.SUMMARY_HTML), 'w')
-        # Header
-        fd.write("<html lang=\"fr\">" + "\n")
-        fd.write("  <head>" + "\n")
-        fd.write("  <style type=\"text/css\">" + "\n")
-        fd.write("  <!--" + "\n")
-        fd.write("  @import url(\"style.css\");" + "\n")
-        fd.write("  -->" + "\n")
-        fd.write("  </style>" + "\n")
-        fd.write("  <script language=\"javascript\" src=\"http://www.google.com/jsapi\"></script>" + "\n")
-        fd.write("  </head>" + "\n")
+    def addContentInHTMLBody(self, fic):
+        fic.write("      <table id=\"rounded-corner\">" + "\n")
+        fic.write("          <thead>" + "\n")
+        fic.write("              <tr>" + "\n")
+        fic.write("                  <th scope=\"col\" class=\"rounded-head-left\"></th>" + "\n")
+        fic.write("                  <th scope=\"col\" colspan=4 class=\"rounded-head-right\">" + self.OUTPUT_TAG + "</th>" + "\n")
+        fic.write("              </tr>" + "\n")
+        fic.write("              <tr>" + "\n")
+        fic.write("                  <th scope=\"col\">Actor</th>" + "\n")
+        fic.write("                  <th scope=\"col\">Cycle count</th>" + "\n")
+        fic.write("                  <th scope=\"col\">FPS@" + str(self.FREQUENCY) + "MHz</th>" + "\n")
+        fic.write("                  <th scope=\"col\">Workload</th>" + "\n")
+        fic.write("                  <th scope=\"col\">Status</th>" + "\n")
+        fic.write("              </tr>" + "\n")
+        fic.write("          </thead>" + "\n")
+        fic.write("          <tbody>" + "\n")
 
-        self.addPieInHTML(fd)
-
-        fd.write("  <body>" + "\n")
-        fd.write("      <table id=\"rounded-corner\">" + "\n")
-        fd.write("          <thead>" + "\n")
-        fd.write("              <tr>" + "\n")
-        fd.write("                  <th scope=\"col\" class=\"rounded-head-left\"></th>" + "\n")
-        fd.write("                  <th scope=\"col\" colspan=4 class=\"rounded-head-right\">" + self.OUTPUT_TAG + "</th>" + "\n")
-        fd.write("              </tr>" + "\n")
-        fd.write("              <tr>" + "\n")
-        fd.write("                  <th scope=\"col\">Actor</th>" + "\n")
-        fd.write("                  <th scope=\"col\">Cycle count</th>" + "\n")
-        fd.write("                  <th scope=\"col\">FPS@" + str(self.FREQUENCY) + "MHz</th>" + "\n")
-        fd.write("                  <th scope=\"col\">Workload</th>" + "\n")
-        fd.write("                  <th scope=\"col\">Status</th>" + "\n")
-        fd.write("              </tr>" + "\n")
-        fd.write("          </thead>" + "\n")
-        fd.write("          <tbody>" + "\n")
-
-        # Body
         for actor in self.extractedData:
-            fd.write("              <tr>"+ "\n")
-            fd.write("                  <td>" + actor.actor_name + "</td>"+ "\n")
-            fd.write("                  <td class=\"num\">" + str(actor.cycles) + "</td>"+ "\n")
-            fd.write("                  <td class=\"num\">" + str(actor.fps) + "</td>"+ "\n")
-            fd.write("                  <td class=\"num\">" + str(actor.workload) + "</td>"+ "\n")
+            fic.write("              <tr>"+ "\n")
+            fic.write("                  <td>" + actor.actor_name + "</td>"+ "\n")
+            fic.write("                  <td class=\"num\">" + str(actor.cycles) + "</td>"+ "\n")
+            fic.write("                  <td class=\"num\">" + str(actor.fps) + "</td>"+ "\n")
+            fic.write("                  <td class=\"num\">" + str(actor.workload) + "</td>"+ "\n")
             if actor.status ==  "KO":
-                fd.write("                  <td class=\"ko\">" + actor.status + "</td>"+ "\n")
+                fic.write("                  <td class=\"ko\">" + actor.status + "</td>"+ "\n")
             else:
-                fd.write("                  <td class=\"ok\">" + actor.status + "</td>"+ "\n")
-            fd.write("              </tr>"+ "\n")
+                fic.write("                  <td class=\"ok\">" + actor.status + "</td>"+ "\n")
+            fic.write("              </tr>"+ "\n")
 
-        # Footer
-        fd.write("          </tbody>" + "\n")
-        fd.write("          <tfoot>" + "\n")
-        fd.write("              <tr>" + "\n")
-        fd.write("                  <td class=\"rounded-foot-left\">Worst actor :</td>" + "\n")
-        fd.write("                  <td colspan=\"4\" class=\"rounded-foot-right\">" + self.WORST_ACTOR + "</td>" + "\n")
-        fd.write("              </tr>" + "\n")
-        fd.write("          </tfoot>" + "\n")
-        fd.write("      </table>" + "\n")
-        fd.write("    </body>" + "\n")
-        fd.write("</html>" + "\n")
-        fd.close()
+        fic.write("          </tbody>" + "\n")
+        fic.write("          <tfoot>" + "\n")
+        fic.write("              <tr>" + "\n")
+        fic.write("                  <td class=\"rounded-foot-left\">Worst actor :</td>" + "\n")
+        fic.write("                  <td colspan=\"4\" class=\"rounded-foot-right\">" + self.WORST_ACTOR + "</td>" + "\n")
+        fic.write("              </tr>" + "\n")
+        fic.write("          </tfoot>" + "\n")
+        fic.write("      </table>" + "\n")
