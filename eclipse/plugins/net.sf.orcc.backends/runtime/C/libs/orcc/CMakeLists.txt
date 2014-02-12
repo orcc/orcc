@@ -86,8 +86,12 @@ else()
     # The OPEN_HEVC_ENABLE constant will be set automatically, to activate usage of these SSE instructions.
     find_library(OpenHevc libLibOpenHevcWrapper PATHS ${CMAKE_CURRENT_SOURCE_DIR}/openHevc ${CMAKE_CURRENT_SOURCE_DIR}/libOpenHevc)
     if(OpenHevc)
+        # Defines OPEN_HEVC_ENABLE constant for the current directory
         add_definitions(-DOPEN_HEVC_ENABLE)
-        message(STATUS "Linking with libLibOpenHevcWrapper enabled. Library path: ${OpenHevc}")
+        # Defines the constant in the root project directory, and its sub-directories
+        # This avoid need for OpenHevc stuff in generated application CMakeLists
+        set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS OPEN_HEVC_ENABLE)
+        message(STATUS "Linking against libLibOpenHevcWrapper enabled. Library path: ${OpenHevc}")
     endif()
 
     find_package(METIS QUIET)
