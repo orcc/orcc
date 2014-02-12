@@ -199,7 +199,17 @@ class Processor:
             log_file = open(os.path.join(srcPath, self.id +'.log'), 'w')
             print "Simulating %s" % self.id
             retcode=subprocess.call(["ttanetsim"] + args + ["-n", os.path.join(srcPath, "top.pndf"), "-t", self.id], stdout=log_file)
-            return retcode
+            log_file.close()
+
+            if retcode != 0:
+                print "   ===> Simulation of actor %s Fails" % self.id
+                return 2
+       
+            if 'Error' in open(os.path.join(srcPath, self.id +'.log'), 'r').read():
+                print "   ===> Actor %s is KO" % self.id
+                return 1
+            else:
+                return 0
         else:
             return 0
 

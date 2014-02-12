@@ -158,8 +158,10 @@ class Design:
         for job in jobs: job.join()
         retcode = max(results)
 
-        if retcode != 0: 
+        if retcode == 2: 
             raise Exception("Problem during the simulation")
+
+        return retcode
             
     def analyse(self, srcPath, args):
         print "* Initialize the analysis."

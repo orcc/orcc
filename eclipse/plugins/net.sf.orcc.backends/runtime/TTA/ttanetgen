@@ -86,7 +86,7 @@ def simulate(arg, nbJobs, target):
     print "* Simulate the application for the TTA processors network"
     print "*********************************************************************"
 
-    design.simulate(target, nbJobs, arg.split())
+    return design.simulate(target, nbJobs, arg.split())
     
 def analyse(arg, target):
     design.analyse(target, arg.split())
@@ -101,6 +101,7 @@ except getopt.GetoptError, err:
     
 debug = False
 nbJobs = 1
+actorsKO = 0
 
 for o, a in opts:
     if o in ("--jobs"):
@@ -136,7 +137,7 @@ try:
     
     for o, a in opts:
         if o in ("-s", "--simulate"):
-            simulate(a, nbJobs, srcPath)
+            actorsKoInSimulation = simulate(a, nbJobs, srcPath)
             
     for o, a in opts:
         if o in ("-a", "--analyse"):
@@ -145,6 +146,8 @@ try:
     for o, a in opts:
         if o in ("-p", "--profile"):
             profile(srcPath)
+
+    sys.exit(actorsKoInSimulation)
             
 except KeyboardInterrupt:
     print "Abort by user."
