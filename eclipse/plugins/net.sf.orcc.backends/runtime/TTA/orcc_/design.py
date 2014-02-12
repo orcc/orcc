@@ -165,8 +165,7 @@ class Design:
         print "* Initialize the analysis."
         scriptPath = os.path.join(os.path.dirname(sys.argv[0]), "ttaanalyse.py")
         # TODO: Better integration of ttaanalyse
-        opt = args + ["-s", srcPath]
-        retcode = subprocess.call([scriptPath] + opt)
+        retcode = subprocess.call([scriptPath, "-s", srcPath] + args)
         
         if retcode != 0: 
             raise Exception("Problem during the analyse")
