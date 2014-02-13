@@ -93,7 +93,7 @@ static const char *usage =
 
     "\nCommon arguments:\n"
     "-i <file>          Specify an input file.\n"
-    "-v <level>         Set the verbosity."
+    "-v <level>         Set the verbosity.\n"
     "-h                 Print this message.\n"
     // "-t <trace directory>       Specify an output directory for the FIFO trace files.\n"
 
