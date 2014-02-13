@@ -66,13 +66,9 @@ class Mapping extends CommonPrinter {
 		this.unmapped = new ArrayList<Vertex>
 	}
 
-	public new(Network network, Map<String, String> map, boolean processEmpty) {
-		this(network)
-		computeFromMap(map, processEmpty)
-	}
-
 	public new(Network network, Map<String, String> map) {
-		this(network, map, false)
+		this(network)
+		computeFromMap(map)
 	}
 
 	public new(Network network, File xcfFile) {
@@ -85,9 +81,9 @@ class Mapping extends CommonPrinter {
 		OrccUtil::printFile(network.contentFile, xcfFile)
 	}
 
-	def private void computeFromMap(Map<String, String> map, boolean processEmptyMap) {
+	def private void computeFromMap(Map<String, String> map) {
 		i = 0
-		if (!map.values.forall[nullOrEmpty] || processEmptyMap) {
+		if (!map.values.forall[nullOrEmpty]) {
 			for (instance : network.children.actorInstances) {
 				instance.tryToMap(map.get(instance.hierarchicalName))
 			}
@@ -101,6 +97,12 @@ class Mapping extends CommonPrinter {
 				} else {
 					actor.tryToMap(map.get(network.name + "_" + actor.name))
 				}
+			}
+		}
+		else
+		{
+			for (instance : network.children.actorInstances + network.children.filter(typeof(Actor))) {
+				unmapped.add(instance)
 			}
 		}
 	}

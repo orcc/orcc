@@ -192,7 +192,7 @@ public class TTABackend extends LLVMBackend {
 		if (importXcfFile) {
 			computedMapping = new Mapping(network, xcfFile);
 		} else {
-			computedMapping = new Mapping(network, mapping, true);
+			computedMapping = new Mapping(network, mapping);
 		}
 
 		// Build the design from the mapping
