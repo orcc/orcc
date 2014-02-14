@@ -54,9 +54,9 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		# Runtime libraries inclusion
 		set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
 
-		option(DONT_USE_HMPP 0)
+		option(USE_HMPP True)
 		# Hmpp compiler
-		if(NOT DONT_USE_HMPP)
+		if(USE_HMPP)
 			find_program(HMPP_COMPILER hmpp)
 			if("${HMPP_COMPILER}" STREQUAL "HMPP_COMPILER-NOTFOUND")
 				message(FATAL_ERROR "HMPP compiler not found, please locate it manually by setting HMPP_COMPILER")
@@ -81,7 +81,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 			«ENDFOR»
 		)
 
-		if(NOT DONT_USE_HMPP)
+		if(USE_HMPP)
 			set(CMAKE_C_FLAGS "${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS}")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS}")
 			set(CMAKE_C_COMPILER ${HMPP_COMPILER})
@@ -92,7 +92,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 
 		add_executable(«network.simpleName» ${filenames})
 
-		if(NOT DONT_USE_HMPP)
+		if(USE_HMPP)
 			add_custom_command(TARGET «network.simpleName» POST_BUILD
 				COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/*.hmg* ${EXECUTABLE_OUTPUT_PATH}
 			)
