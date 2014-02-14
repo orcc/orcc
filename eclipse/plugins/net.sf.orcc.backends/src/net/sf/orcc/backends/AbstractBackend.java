@@ -49,6 +49,7 @@ import static net.sf.orcc.backends.BackendsConstants.DYNAMIC_MAPPING;
 import static net.sf.orcc.backends.BackendsConstants.PROFILE_NETWORK;
 import static net.sf.orcc.backends.BackendsConstants.PROFILE_ACTIONS;
 import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
+import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.util.OrccUtil.getFile;
@@ -877,6 +878,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				"(C) Enable load balancing on multi-core platforms");
 		options.addOption("et", "enable-traces", true,
 				"(C) Enable tracing of the FIFOs in the given directory");
+		options.addOption("ttapc", "tta-processorconf", true,
+				"(TTA) Predefined configurations for the processors (Standard|Custom|Fast|Huge)");
 
 		// FIXME: choose independently the transformation to apply
 		options.addOption("t", "transfo_add", false,
@@ -951,6 +954,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				optionMap.put(TRACES_FOLDER, line.getOptionValue("et"));
 			}
 			
+			if (line.hasOption("ttapc")) {
+				String pc = line.getOptionValue("ttapc");
+				if (pc.equals("Standard") || pc.equals("Custom") || pc.equals("Fast") || pc.equals("Huge")) {
+					optionMap.put(TTA_PROCESSORS_CONFIGURATION, pc);					
+				} else {
+					OrccLogger.warnln("Unknown processors configuration for TTA. Standard configuration will be apply.");
+				}
+			}
+
 			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));

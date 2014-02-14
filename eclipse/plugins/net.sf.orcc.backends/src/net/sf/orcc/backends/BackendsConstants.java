@@ -68,5 +68,8 @@ public class BackendsConstants {
 	public static final String LLVM_TARGET_TRIPLE = "net.sf.orcc.backends.llvm.aot.targetTriple";
 	public static final String LLVM_DEFAULT_TARGET_TRIPLE = "x86_64";
 	
+	public static final String TTA_DEFAULT_PROCESSORS_CONFIGURATION = "Standard";
+	public static final String TTA_PROCESSORS_CONFIGURATION = "net.sf.orcc.backends.llvm.tta.configuration";
+
 	public static final String C_DIRECTIVE_OPTIMIZE = "optimize_c";
 }
