@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -179,9 +180,12 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	 * @return true if something has been modified in the network
 	 */
 	private boolean fixNetwork(final Network network, final List<String> messagesList) {
+		// In this list, we will store all invalid objects which needs to be
+		// deleted
+		final List<EObject> toDelete = new ArrayList<EObject>();
+
 		// Check for null started or terminated connections. This can happen if
 		// a port, an instance or an instance port has been renamed from outside
-		final List<net.sf.orcc.df.Connection> toDelete = new ArrayList<net.sf.orcc.df.Connection>();
 		for(final net.sf.orcc.df.Connection connection : network.getConnections()) {
 			if(connection.getSource() == null || connection.getTarget() == null) {
 				toDelete.add(connection);
@@ -211,11 +215,58 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		} else if(toDelete.size() > 1) {
 			messagesList.add(toDelete.size() + " connections deleted from the network");
 		}
-		for(final net.sf.orcc.df.Connection connection : toDelete) {
-			EcoreUtil.delete(connection, true);
+
+		boolean hasDoneChanges = !toDelete.isEmpty();
+
+		// Check for issues in network children (instances, ports)
+		for (final Vertex vertex : network.getChildren()) {
+			if (vertex instanceof Instance) {
+				hasDoneChanges |= fixInstance((Instance) vertex, toDelete,
+						messagesList);
+			}
+			// Check ports here, if needed
 		}
 
-		return !toDelete.isEmpty();
+		// Really delete wrong objects
+		for (final EObject eobject : toDelete) {
+			EcoreUtil.delete(eobject, true);
+		}
+
+		return hasDoneChanges;
+	}
+
+	/**
+	 * Check the given instance to detect potential issues, and fix them. For
+	 * each fixed instance, a message is appended to the given messagesList and
+	 * objects which needs to be deleted are appended to given list
+	 * <i>toDelete</i>.
+	 * 
+	 * @param instance
+	 * @param messagesList
+	 * @param todelete
+	 *            Objects to delete later.
+	 * @return true if something has been modified in the network
+	 */
+	private boolean fixInstance(final Instance instance,
+			final List<EObject> toDelete, final List<String> messagesList) {
+
+		boolean hasDoneChanges = false;
+
+		for (final Argument arg : instance.getArguments()) {
+			if (arg.getVariable() == null
+					|| arg.getVariable().getName() == null) {
+				toDelete.add(arg);
+				hasDoneChanges = true;
+			}
+		}
+
+		if (hasDoneChanges) {
+			messagesList.add(toDelete.size()
+					+ " argument(s) deleted from instance "
+					+ instance.getSimpleName());
+		}
+
+		return hasDoneChanges;
 	}
 
 	/**
