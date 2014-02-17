@@ -31,84 +31,137 @@
 
 void put_hevc_qpel_pixel_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-u8 width, u8 height)
+u8 _width, u8 _height)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[3+3*srcstride];
     i16 *dst = _dst[listIdx];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
 
-    ff_hevc_put_hevc_pel_pixels2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0, 0);
+    if(width == 16 || width == 32 || width == 64) {
+        ff_hevc_put_hevc_pel_pixels16_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+    } else if(width == 8 || width == 24) {
+        ff_hevc_put_hevc_pel_pixels8_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+    } else {
+        ff_hevc_put_hevc_pel_pixels4_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+    }
 #endif
 }
 
 void put_hevc_epel_pixel_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-u8 width, u8 height)
+u8 _width, u8 _height)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[1+1*srcstride];
     i16 *dst = _dst[listIdx];
-    ff_hevc_put_hevc_pel_pixels2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0, 0);
+    u8 width = _width + 1;
+    u8 height = _height + 1;
+
+    if(width == 16 || width == 32 || width == 64) {
+        ff_hevc_put_hevc_pel_pixels16_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+    } else if(width == 8 || width == 24) {
+        ff_hevc_put_hevc_pel_pixels8_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+    } else if(width == 4 || width == 12 || width == 20) {
+        ff_hevc_put_hevc_pel_pixels4_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+    } else {
+        ff_hevc_put_hevc_pel_pixels2_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+    }
 #endif
 }
 
 void put_hevc_qpel_h_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 width, u8 height)
+i32 filterIdx,  u8 _width, u8 _height)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[3+3*srcstride];
     i16 *dst = _dst[listIdx];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
 
-    ff_hevc_put_hevc_qpel_h4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx, 0);
+    if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
+        ff_hevc_put_hevc_qpel_h8_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+    } else {
+        ff_hevc_put_hevc_qpel_h4_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+    }
 #endif
 }
 
 void put_hevc_qpel_v_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 width, u8 height)
+i32 filterIdx,  u8 _width, u8 _height)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[3+3*srcstride];
     i16 *dst = _dst[listIdx];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
 
-    ff_hevc_put_hevc_qpel_v4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0, filterIdx);
+    if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
+        ff_hevc_put_hevc_qpel_v8_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+    } else {
+        ff_hevc_put_hevc_qpel_v4_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+    }
 #endif
 }
 
 void put_hevc_epel_h_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 width, u8 height)
+i32 filterIdx,  u8 _width, u8 _height)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[1+1*srcstride];
     i16 *dst = _dst[listIdx];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
 
-    ff_hevc_put_hevc_epel_h2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx, 0);
+    if(width == 8 || width == 16 || width == 24 || width == 32) {
+        ff_hevc_put_hevc_epel_h8_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+    } else if(width == 4 || width == 12) {
+        ff_hevc_put_hevc_epel_h4_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+    } else {
+        ff_hevc_put_hevc_epel_h2_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+    }
 #endif
 }
 
 void put_hevc_epel_v_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 width, u8 height)
+i32 filterIdx,  u8 _width, u8 _height)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[1+1*srcstride];
     i16 *dst = _dst[listIdx];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
 
-    ff_hevc_put_hevc_epel_v2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, 0, filterIdx);
+    if(width == 8 || width == 16 || width == 24 || width == 32) {
+        ff_hevc_put_hevc_epel_v8_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+    } else if(width == 4 || width == 12) {
+        ff_hevc_put_hevc_epel_v4_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+    } else {
+        ff_hevc_put_hevc_epel_v2_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+    }
 #endif
 }
 
 void put_hevc_qpel_hv_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-i32 filterIdx[2],  u8 width, u8 height)
+i32 filterIdx[2],  u8 _width, u8 _height)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[3+ 3*srcstride];
     i16 *dst = _dst[listIdx];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
 
-    ff_hevc_put_hevc_qpel_hv4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1]);
+    if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
+        ff_hevc_put_hevc_qpel_hv8_8_sse(dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
+    } else {
+        ff_hevc_put_hevc_qpel_hv4_8_sse(dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
+    }
 #endif
 }
 
@@ -120,28 +173,40 @@ i32 filterIdx[2],  u8 width, u8 height)
     u8  *src = &_src[1+1*srcstride];
     i16 *dst = _dst[listIdx];
 
-    ff_hevc_put_hevc_epel_hv2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1]);
+    if(width == 8 || width == 16 || width == 24 || width == 32) {
+        ff_hevc_put_hevc_epel_hv8_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1]);
+    } else if(width == 4 || width == 12) {
+        ff_hevc_put_hevc_epel_hv4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1]);
+    } else {
+        ff_hevc_put_hevc_epel_hv2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1]);
+    }
 #endif
 }
 
-void put_unweighted_pred_orcc(u8 _dst[2][64*64], i16 _src[2][64*64], u8 width, u8 height, u8 rdList)
+void put_unweighted_pred_orcc(u8 _dst[2][64*64], i16 _src[2][64*64],
+u8 _width, u8 _height, u8 rdList)
 {
 #ifdef OPEN_HEVC_ENABLE
     i16 *src = &_src;
     u8 *dst = _dst[rdList];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
 
-    ff_hevc_put_unweighted_pred4_8_sse(dst, width + 1, src, width + 1, width + 1, height + 1);
+    ff_hevc_put_unweighted_pred4_8_sse(dst, width, src, width, width, height);
 #endif
 }
 
 
-void put_unweighted_pred_avg_orcc(u8 _dst[2][64*64], i16 _src[2][64*64], u8 width, u8 height)
+void put_unweighted_pred_avg_orcc(u8 _dst[2][64*64], i16 _src[2][64*64],
+u8 _width, u8 _height)
 {
 #ifdef OPEN_HEVC_ENABLE
     i16 *src1 = &_src[0];
     i16 *src2 = &_src[1];
     u8 *dst = _dst[0];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
 
-    ff_hevc_put_weighted_pred_avg4_8_sse(dst, width + 1, src1, src2, width + 1, width + 1, height + 1);
+    ff_hevc_put_weighted_pred_avg4_8_sse(dst, width, src1, src2, width, width, height);
 #endif
 }
