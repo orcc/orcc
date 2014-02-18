@@ -46,7 +46,7 @@ char displayYUV_getFlags(){
 }
 
 static void displayYUV_setSize(int width, int height) {
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "set display to %ix%i\n", width, height);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "set display to %ix%i", width, height);
 
     // allocate window, renderer, texture
     pWindow1    = SDL_CreateWindow( "display", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,

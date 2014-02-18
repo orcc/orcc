@@ -278,14 +278,13 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
 
 void print_mapping(mapping_t *mapping) {
     int i, j;
-    printf("\nMapping result : ");
+    print_orcc_trace(ORCC_VL_VERBOSE_2, "Mapping result : ");
     for (i = 0; i < mapping->number_of_threads; i++) {
-        printf("\n\tPartition %d : %d actors", i+1, mapping->partitions_size[i]);
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "\tPartition %d : %d actors", i+1, mapping->partitions_size[i]);
         for (j = 0; j < mapping->partitions_size[i]; j++) {
-            printf("\n\t\t%s", mapping->partitions_of_actors[i][j]->name);
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "\t\t%s", mapping->partitions_of_actors[i][j]->name);
         }
     }
-    printf("\n");
 }
 
 
@@ -713,7 +712,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
         print_mapping(mapping);
         print_load_balancing(mapping);
         print_edge_cut(network);
-        printf("\nMapping time : %2.lf\n", elapsed(endTime, startTime));
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "Mapping time : %2.lf", elapsed(endTime, startTime));
     }
 
     free(part);
@@ -735,7 +734,7 @@ void *agent_routine(void *data) {
             orcc_semaphore_wait(agent->sync->sem_monitor);
         }
 
-        print_orcc_trace(ORCC_VL_VERBOSE_1, "\nRemap the actors...\n");
+        print_orcc_trace(ORCC_VL_VERBOSE_1, "Remap the actors...");
         compute_workloads(agent->network);
         do_mapping(agent->network, agent->options, agent->mapping);
         apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);

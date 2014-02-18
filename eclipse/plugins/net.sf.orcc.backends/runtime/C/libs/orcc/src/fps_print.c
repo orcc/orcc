@@ -45,7 +45,7 @@ static int partialNumPicturesDecoded;
 static void print_fps_avg() {
 	unsigned int endTime = SDL_GetTicks();
 
-    print_orcc_trace(ORCC_VL_QUIET, "%i images in %f seconds: %f FPS\n", numPicturesDecoded,
+    print_orcc_trace(ORCC_VL_QUIET, "%i images in %f seconds: %f FPS", numPicturesDecoded,
 		(float) (endTime - startTime)/ 1000.0f,
         1000.0f * (float) numPicturesDecoded / (float) (endTime - startTime));
 }
@@ -80,7 +80,7 @@ void fpsPrintNewPicDecoded(void) {
     partialNumPicturesDecoded++;
 	endTime = SDL_GetTicks();
     if ((endTime - relativeStartTime) / 1000.0f >= 5) {
-        printf("%f images/sec\n",
+        print_orcc_trace(ORCC_VL_QUIET, "%f images/sec",
 				1000.0f * (float) (numPicturesDecoded - lastNumPic)
 						/ (float) (endTime - relativeStartTime));
 

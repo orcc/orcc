@@ -288,6 +288,6 @@ int save_mapping(char* fileName, mapping_t *mapping) {
     roxml_commit_changes(rootNode, fileName, NULL, 1);
     roxml_close(rootNode);
 
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "Mapping saved successfully\n");
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Mapping saved successfully");
     return ret;
 }
