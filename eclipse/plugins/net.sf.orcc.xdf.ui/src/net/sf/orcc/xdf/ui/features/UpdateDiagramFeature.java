@@ -211,9 +211,9 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		}
 
 		if(toDelete.size() == 1){
-			messagesList.add("1 connection deleted from the network");
+			messagesList.add("1 connection deleted.");
 		} else if(toDelete.size() > 1) {
-			messagesList.add(toDelete.size() + " connections deleted from the network");
+			messagesList.add(toDelete.size() + " connections deleted.");
 		}
 
 		boolean hasDoneChanges = !toDelete.isEmpty();
@@ -263,7 +263,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		if (hasDoneChanges) {
 			messagesList.add(toDelete.size()
 					+ " argument(s) deleted from instance "
-					+ instance.getSimpleName());
+					+ instance.getSimpleName() + ".");
 		}
 
 		return hasDoneChanges;
