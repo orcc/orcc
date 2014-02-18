@@ -41,7 +41,7 @@ import org.eclipse.graphiti.services.Graphiti;
  * @author Antoine Lorence
  * 
  */
-public class ShapePropertiesManager {
+public class PropsUtil {
 
 	private static String IDENTIFIER_KEY = "XDF_ID";
 

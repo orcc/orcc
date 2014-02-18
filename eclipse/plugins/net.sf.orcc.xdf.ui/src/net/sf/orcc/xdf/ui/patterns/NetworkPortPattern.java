@@ -36,7 +36,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
-import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -104,12 +104,12 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
-		return ShapePropertiesManager.isExpectedPc(pe, getPortIdentifier());
+		return PropsUtil.isExpectedPc(pe, getPortIdentifier());
 	}
 
 	@Override
 	protected boolean isPatternControlled(PictogramElement pe) {
-		final String identifier = ShapePropertiesManager.getIdentifier(pe);
+		final String identifier = PropsUtil.getIdentifier(pe);
 		final String[] validIds = { getPortIdentifier(), SHAPE_ID, LABEL_ID };
 		for (final String e : validIds) {
 			if (e.equals(identifier)) {
@@ -123,7 +123,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	@Override
 	public boolean canDirectEdit(IDirectEditingContext context) {
 		boolean isText = context.getGraphicsAlgorithm() instanceof Text;
-		boolean isLabel = ShapePropertiesManager.isExpectedPc(context.getGraphicsAlgorithm(), LABEL_ID);
+		boolean isLabel = PropsUtil.isExpectedPc(context.getGraphicsAlgorithm(), LABEL_ID);
 		return isText && isLabel;
 	}
 
@@ -191,7 +191,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	@Override
 	public void preDelete(IDeleteContext mainContext) {
 		final PictogramElement pe = mainContext.getPictogramElement();
-		if (!ShapePropertiesManager.isExpectedPc(pe, getPortIdentifier())) {
+		if (!PropsUtil.isExpectedPc(pe, getPortIdentifier())) {
 			return;
 		}
 
@@ -261,7 +261,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 		// Create the container
 		final ContainerShape topLevelShape = peCreateService.createContainerShape(targetDiagram, true);
-		ShapePropertiesManager.setIdentifier(topLevelShape, getPortIdentifier());
+		PropsUtil.setIdentifier(topLevelShape, getPortIdentifier());
 		peCreateService.createChopboxAnchor(topLevelShape);
 
 		// The main container is an invisible rectangle
@@ -270,11 +270,11 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		// Draw the port according to its direction
 		final Polygon polygon = getPortPolygon(topLevelInvisibleRect, gaService);
 		gaService.setSize(polygon, SHAPE_WIDTH, SHAPE_HEIGHT);
-		ShapePropertiesManager.setIdentifier(polygon, SHAPE_ID);
+		PropsUtil.setIdentifier(polygon, SHAPE_ID);
 
 		// Add the label of the port
 		final Text text = gaService.createPlainText(topLevelInvisibleRect);
-		ShapePropertiesManager.setIdentifier(text, LABEL_ID);
+		PropsUtil.setIdentifier(text, LABEL_ID);
 
 		// Configure text properties
 		text.setStyle(StyleUtil.portText(getDiagram()));
@@ -337,8 +337,8 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		final PictogramElement topLevelPe = context.getPictogramElement();
 		final GraphicsAlgorithm topLevelGa = topLevelPe.getGraphicsAlgorithm();
 
-		final Text txt = (Text) ShapePropertiesManager.findPcFromIdentifier(topLevelPe, LABEL_ID);
-		final Polygon poly = (Polygon) ShapePropertiesManager.findPcFromIdentifier(topLevelPe, SHAPE_ID);
+		final Text txt = (Text) PropsUtil.findPcFromIdentifier(topLevelPe, LABEL_ID);
+		final Polygon poly = (Polygon) PropsUtil.findPcFromIdentifier(topLevelPe, SHAPE_ID);
 
 		final int minTxtWidth = XdfUtil.getTextMinWidth(txt);
 		final int newTextWidth = Math.max(minTxtWidth, SHAPE_WIDTH);
@@ -358,7 +358,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		final PictogramElement pe = context.getPictogramElement();
 
 		if (isPatternRoot(pe)) {
-			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
+			final Text text = (Text) PropsUtil.findPcFromIdentifier(pe, LABEL_ID);
 			if (text == null) {
 				return Reason.createFalseReason("Label Not found !!");
 			}
@@ -380,7 +380,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 			return false;
 		}
 
-		final Text txt = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
+		final Text txt = (Text) PropsUtil.findPcFromIdentifier(pe, LABEL_ID);
 		final Port port = (Port) getBusinessObjectForPictogramElement(pe);
 		txt.setValue(port.getName());
 
@@ -398,7 +398,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	 */
 	public GraphicsAlgorithm getSelectionBorder(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			return (GraphicsAlgorithm) ShapePropertiesManager.findPcFromIdentifier(pe, SHAPE_ID);
+			return (GraphicsAlgorithm) PropsUtil.findPcFromIdentifier(pe, SHAPE_ID);
 		}
 		return null;
 	}
@@ -434,7 +434,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	 */
 	public String getNameFromShape(final PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			final Text label = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
+			final Text label = (Text) PropsUtil.findPcFromIdentifier(pe, LABEL_ID);
 			return label.getValue();
 		}
 		return "";

@@ -46,7 +46,7 @@ import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
-import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -109,7 +109,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 
 		int cptInstances = 0;
 		for (final PictogramElement pe : selection) {
-			if (ShapePropertiesManager.isExpectedPc(pe,
+			if (PropsUtil.isExpectedPc(pe,
 					InstancePattern.INSTANCE_ID)) {
 				cptInstances++;
 			}
@@ -190,7 +190,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			final PictogramElement sourcePe = Graphiti.getLinkService()
 					.getPictogramElements(getDiagram(), connection.getSource())
 					.get(0);
-			if (ShapePropertiesManager.isExpectedPc(sourcePe,
+			if (PropsUtil.isExpectedPc(sourcePe,
 					InputNetworkPortPattern.INOUT_ID)) {
 				// Connection from a network port
 				final InputNetworkPortPattern spattern = (InputNetworkPortPattern) fp
@@ -207,7 +207,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			final PictogramElement targetPe = Graphiti.getLinkService()
 					.getPictogramElements(getDiagram(), connection.getTarget())
 					.get(0);
-			if (ShapePropertiesManager.isExpectedPc(targetPe,
+			if (PropsUtil.isExpectedPc(targetPe,
 					OutputNetworkPortPattern.INOUT_ID)) {
 				// Connection to a network port
 				final OutputNetworkPortPattern tpattern = (OutputNetworkPortPattern) fp

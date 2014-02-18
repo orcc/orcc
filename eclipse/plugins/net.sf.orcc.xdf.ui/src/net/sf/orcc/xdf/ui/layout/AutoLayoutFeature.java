@@ -33,7 +33,7 @@ import java.util.Map;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
-import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
@@ -108,7 +108,7 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 	private void configureLayout(final KNode diagramNode, final Map<PictogramElement, KGraphElement> peKnodeMap) {
 
 		for (final Shape shape : getDiagram().getChildren()) {
-			final String identifier = ShapePropertiesManager.getIdentifier(shape);
+			final String identifier = PropsUtil.getIdentifier(shape);
 			final KShapeLayout shapeLayout = ((KNode) peKnodeMap.get(shape)).getData(KShapeLayout.class);
 			if (InstancePattern.INSTANCE_ID.equals(identifier)) {
 				if (shapeLayout != null) {

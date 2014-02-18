@@ -40,7 +40,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
-import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.common.util.URI;
@@ -157,7 +157,7 @@ public class InstancePattern extends AbstractPattern {
 		if (isPatternRoot(pe)) {
 			return true;
 		} else if (pe instanceof FixPointAnchor
-				&& (ShapePropertiesManager.isInput(pe) || ShapePropertiesManager.isOutput(pe))) {
+				&& (PropsUtil.isInput(pe) || PropsUtil.isOutput(pe))) {
 
 		}
 		return false;
@@ -165,13 +165,13 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
-		return ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID);
+		return PropsUtil.isExpectedPc(pe, INSTANCE_ID);
 	}
 
 	@Override
 	public boolean canDirectEdit(IDirectEditingContext context) {
 		boolean isText = context.getGraphicsAlgorithm() instanceof Text;
-		boolean isLabel = ShapePropertiesManager.isExpectedPc(context.getGraphicsAlgorithm(), LABEL_ID);
+		boolean isLabel = PropsUtil.isExpectedPc(context.getGraphicsAlgorithm(), LABEL_ID);
 		return isText && isLabel;
 	}
 
@@ -229,7 +229,7 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	public void preDelete(IDeleteContext mainContext) {
 		final PictogramElement pe = mainContext.getPictogramElement();
-		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
+		if (!PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
 			return;
 		}
 
@@ -297,7 +297,7 @@ public class InstancePattern extends AbstractPattern {
 
 		// Create the container shape
 		final ContainerShape topLevelShape = peCreateService.createContainerShape(targetDiagram, true);
-		ShapePropertiesManager.setIdentifier(topLevelShape, INSTANCE_ID);
+		PropsUtil.setIdentifier(topLevelShape, INSTANCE_ID);
 
 		// Create the container graphic
 		final RoundedRectangle roundedRectangle = gaService.createPlainRoundedRectangle(topLevelShape, 5, 5);
@@ -307,7 +307,7 @@ public class InstancePattern extends AbstractPattern {
 
 		// The text label for Instance name
 		final Text text = gaService.createPlainText(roundedRectangle);
-		ShapePropertiesManager.setIdentifier(text, LABEL_ID);
+		PropsUtil.setIdentifier(text, LABEL_ID);
 		// Set properties on instance label
 		text.setStyle(StyleUtil.instanceText(getDiagram()));
 		gaService.setLocationAndSize(text, 0, 0, TOTAL_MIN_WIDTH, LABEL_HEIGHT);
@@ -319,7 +319,7 @@ public class InstancePattern extends AbstractPattern {
 		// The line separator
 		final int[] xy = { 0, LABEL_HEIGHT, TOTAL_MIN_WIDTH, LABEL_HEIGHT };
 		final Polyline line = gaService.createPlainPolyline(roundedRectangle, xy);
-		ShapePropertiesManager.setIdentifier(line, SEP_ID);
+		PropsUtil.setIdentifier(line, SEP_ID);
 		line.setLineWidth(SEPARATOR);
 
 		// Configure direct editing
@@ -404,11 +404,11 @@ public class InstancePattern extends AbstractPattern {
 		final int instanceW = gaService.calculateSize(instanceShape.getGraphicsAlgorithm(), true).getWidth();
 
 		// Update label size and position
-		final Text label = (Text) ShapePropertiesManager.findPcFromIdentifier(instanceShape, LABEL_ID);
+		final Text label = (Text) PropsUtil.findPcFromIdentifier(instanceShape, LABEL_ID);
 		gaService.setLocationAndSize(label, 0, 0, instanceW, LABEL_HEIGHT);
 
 		// Update separator points
-		final Polyline sep = (Polyline) ShapePropertiesManager.findPcFromIdentifier(instanceShape, SEP_ID);
+		final Polyline sep = (Polyline) PropsUtil.findPcFromIdentifier(instanceShape, SEP_ID);
 		for (final Point p : sep.getPoints()) {
 			p.setY(LABEL_HEIGHT);
 		}
@@ -419,9 +419,9 @@ public class InstancePattern extends AbstractPattern {
 		// ***********************
 		int inIndex = 0, outIndex = 0;
 		for (final Anchor anchor : instanceShape.getAnchors()) {
-			if (ShapePropertiesManager.isInput(anchor)) {
+			if (PropsUtil.isInput(anchor)) {
 				layoutPort((FixPointAnchor) anchor, inIndex++, instanceShape);
-			} else if (ShapePropertiesManager.isOutput(anchor)) {
+			} else if (PropsUtil.isOutput(anchor)) {
 				layoutPort((FixPointAnchor) anchor, outIndex++, instanceShape);
 			}
 		}
@@ -430,7 +430,7 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean canUpdate(IUpdateContext context) {
-		return ShapePropertiesManager.isExpectedPc(context.getPictogramElement(), INSTANCE_ID);
+		return PropsUtil.isExpectedPc(context.getPictogramElement(), INSTANCE_ID);
 	}
 
 	@Override
@@ -442,7 +442,7 @@ public class InstancePattern extends AbstractPattern {
 					.createFalseReason("Given PE is not an Instance shape");
 		}
 
-		final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(
+		final Text text = (Text) PropsUtil.findPcFromIdentifier(
 				pe, LABEL_ID);
 		if (text == null) {
 			return Reason.createFalseReason("Label Not found !!");
@@ -464,9 +464,9 @@ public class InstancePattern extends AbstractPattern {
 		for (final Anchor anchor : ((AnchorContainer) pe).getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
 					anchor, PORT_NAME_KEY);
-			if(ShapePropertiesManager.isInput(anchor)) {
+			if(PropsUtil.isInput(anchor)) {
 				inputsN.add(portName);
-			} else if (ShapePropertiesManager.isOutput(anchor)) {
+			} else if (PropsUtil.isOutput(anchor)) {
 				outputsN.add(portName);
 			}
 		}
@@ -523,8 +523,8 @@ public class InstancePattern extends AbstractPattern {
 	public boolean update(IUpdateContext context) {
 		final PictogramElement pe = context.getPictogramElement();
 
-		if (ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
-			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
+		if (PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
+			final Text text = (Text) PropsUtil.findPcFromIdentifier(pe, LABEL_ID);
 			if (text == null) {
 				return false;
 			}
@@ -607,7 +607,7 @@ public class InstancePattern extends AbstractPattern {
 		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(instanceShape
 				.getGraphicsAlgorithm().getGraphicsAlgorithmChildren());
 		for (final GraphicsAlgorithm gaChild : gaChildren) {
-			if (gaChild instanceof Text && ShapePropertiesManager.isExpectedPc(gaChild, PORT_TEXT_ID)) {
+			if (gaChild instanceof Text && PropsUtil.isExpectedPc(gaChild, PORT_TEXT_ID)) {
 				EcoreUtil.delete(gaChild, true);
 			}
 		}
@@ -666,11 +666,11 @@ public class InstancePattern extends AbstractPattern {
 		for (final Anchor anchor : instanceShape.getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
 					anchor, PORT_NAME_KEY);
-			if (ShapePropertiesManager.isInput(anchor)
+			if (PropsUtil.isInput(anchor)
 					&& inMap.containsKey(portName)) {
 				inMap.remove(portName).setEnd(anchor);
 				cptReconnectedTo++;
-			} else if (ShapePropertiesManager.isOutput(anchor)
+			} else if (PropsUtil.isOutput(anchor)
 					&& outMap.containsKey(portName)) {
 				for (final Connection connection : outMap.remove(portName)) {
 					connection.setStart(anchor);
@@ -762,7 +762,7 @@ public class InstancePattern extends AbstractPattern {
 			// Create anchor
 			final FixPointAnchor fpAnchor = peCreateService.createFixPointAnchor(instanceShape);
 			fpAnchor.setUseAnchorLocationAsConnectionEndpoint(true);
-			ShapePropertiesManager.setIdentifier(fpAnchor, PORT_ID);
+			PropsUtil.setIdentifier(fpAnchor, PORT_ID);
 			Graphiti.getPeService().setPropertyValue(fpAnchor, PORT_NAME_KEY, port.getName());
 
 			// Create the square inside anchor
@@ -772,20 +772,20 @@ public class InstancePattern extends AbstractPattern {
 			// Create text as instance rectangle child
 			final Text txt = gaService.createPlainText(instanceGa, port.getName());
 			txt.setStyle(StyleUtil.instancePortText(getDiagram()));
-			ShapePropertiesManager.setIdentifier(txt, PORT_TEXT_ID);
+			PropsUtil.setIdentifier(txt, PORT_TEXT_ID);
 
 			// Setup the linking with business object
 			link(fpAnchor, port);
 
 			// Configure direction of the port and alignment of texts
 			if (direction == Direction.INPUTS) {
-				ShapePropertiesManager.setInput(fpAnchor);
-				ShapePropertiesManager.setInput(txt);
+				PropsUtil.setInput(fpAnchor);
+				PropsUtil.setInput(txt);
 				txt.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
 				layoutPort(fpAnchor, i++, instanceShape);
 			} else {
-				ShapePropertiesManager.setOutput(fpAnchor);
-				ShapePropertiesManager.setOutput(txt);
+				PropsUtil.setOutput(fpAnchor);
+				PropsUtil.setOutput(txt);
 				txt.setHorizontalAlignment(Orientation.ALIGNMENT_RIGHT);
 				layoutPort(fpAnchor, j++, instanceShape);
 			}
@@ -825,10 +825,10 @@ public class InstancePattern extends AbstractPattern {
 		final int squareY = -PORT_SIDE_WITH / 2;
 
 		int anchorX, squareX, squareW = PORT_SIDE_WITH;
-		if (ShapePropertiesManager.isInput(anchor)) {
+		if (PropsUtil.isInput(anchor)) {
 			anchorX = 0;
 			squareX = 0;
-		} else if (ShapePropertiesManager.isOutput(anchor)) {
+		} else if (PropsUtil.isOutput(anchor)) {
 			anchorX = instanceW;
 			squareX = -PORT_SIDE_WITH;
 			// Fix the size of outputs port, to take care of the instance border
@@ -860,7 +860,7 @@ public class InstancePattern extends AbstractPattern {
 	 *            The instance pictogram element
 	 */
 	private void resizeShapeToMinimal(final PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
+		if (!PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
 			return;
 		}
 
@@ -880,7 +880,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @return The height as integer
 	 */
 	private int getInstanceMinHeight(final PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
+		if (!PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
 			return -1;
 		}
 
@@ -888,9 +888,9 @@ public class InstancePattern extends AbstractPattern {
 		int nbInPorts = 0, nbOutPorts = 0;
 		// Compute the number of inputs and outputs ports
 		for (final Anchor anchor : instanceShape.getAnchors()) {
-			if (ShapePropertiesManager.isInput(anchor)) {
+			if (PropsUtil.isInput(anchor)) {
 				++nbInPorts;
-			} else if (ShapePropertiesManager.isOutput(anchor)) {
+			} else if (PropsUtil.isOutput(anchor)) {
 				++nbOutPorts;
 			}
 		}
@@ -906,7 +906,7 @@ public class InstancePattern extends AbstractPattern {
 		int portLineHeight = 0;
 		for (final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
 			if (child instanceof Text
-					&& (ShapePropertiesManager.isInput(child) || ShapePropertiesManager.isOutput(child))) {
+					&& (PropsUtil.isInput(child) || PropsUtil.isOutput(child))) {
 				portLineHeight = Math.max(XdfUtil.getTextMinHeight((Text) child), PORT_SIDE_WITH);
 				break;
 			}
@@ -934,7 +934,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @return The width as integer
 	 */
 	private int getInstanceMinWidth(final PictogramElement pe) {
-		if (!ShapePropertiesManager.isExpectedPc(pe, INSTANCE_ID)) {
+		if (!PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
 			return -1;
 		}
 
@@ -946,9 +946,9 @@ public class InstancePattern extends AbstractPattern {
 
 		// Collect the ports text instances in 2 separate maps
 		for (final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
-			if (child instanceof Text && ShapePropertiesManager.isInput(child)) {
+			if (child instanceof Text && PropsUtil.isInput(child)) {
 				inputs.add((Text) child);
-			} else if (child instanceof Text && ShapePropertiesManager.isOutput(child)) {
+			} else if (child instanceof Text && PropsUtil.isOutput(child)) {
 				outputs.add((Text) child);
 			}
 		}
@@ -988,7 +988,7 @@ public class InstancePattern extends AbstractPattern {
 	 */
 	public String getNameFromShape(final PictogramElement pe) {
 		if (isPatternRoot(pe)) {
-			final Text text = (Text) ShapePropertiesManager.findPcFromIdentifier(pe, LABEL_ID);
+			final Text text = (Text) PropsUtil.findPcFromIdentifier(pe, LABEL_ID);
 			return text.getValue();
 		}
 		return "";
@@ -1044,7 +1044,7 @@ public class InstancePattern extends AbstractPattern {
 		final String portName = Graphiti.getPeService().getPropertyValue(anchor, PORT_NAME_KEY);
 
 		for (final GraphicsAlgorithm gaChild : anchor.getParent().getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
-			if (gaChild instanceof Text && ShapePropertiesManager.isExpectedPc(gaChild, PORT_TEXT_ID)
+			if (gaChild instanceof Text && PropsUtil.isExpectedPc(gaChild, PORT_TEXT_ID)
 					&& ((Text) gaChild).getValue().equals(portName)) {
 				return (Text) gaChild;
 			}

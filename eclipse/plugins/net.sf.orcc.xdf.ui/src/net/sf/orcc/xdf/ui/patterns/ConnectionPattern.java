@@ -35,7 +35,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
-import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -314,7 +314,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 			final FixPointAnchor brAnchor = (FixPointAnchor) anchor;
 			final Port port = (Port) getBusinessObjectForPictogramElement(brAnchor);
-			final PortKind kind = ShapePropertiesManager.isInput(brAnchor) ? PortKind.INPUT : PortKind.OUTPUT;
+			final PortKind kind = PropsUtil.isInput(brAnchor) ? PortKind.INPUT : PortKind.OUTPUT;
 			final Instance parentInstance = (Instance) getBusinessObjectForPictogramElement(brAnchor.getParent());
 
 			return new PortInformation(parentInstance, port, kind, PortContainer.INSTANCE);
