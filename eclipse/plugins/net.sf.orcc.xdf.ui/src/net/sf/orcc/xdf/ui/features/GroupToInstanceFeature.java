@@ -46,7 +46,10 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard;
 import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
+import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
+import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
+import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -61,6 +64,7 @@ import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
+import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
@@ -180,31 +184,37 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 		for (final Connection connection : toUpdateInDiagram) {
 
 			final Anchor sourceAnchor, targetAnchor;
-			final PictogramElement spe = Graphiti.getLinkService()
+			final PictogramElement sourcePe = Graphiti.getLinkService()
 					.getPictogramElements(getDiagram(), connection.getSource())
 					.get(0);
-			if (spe instanceof Anchor) {
+			if (ShapePropertiesManager.isExpectedPc(sourcePe,
+					InputNetworkPortPattern.INOUT_ID)) {
 				// Connection from a network port
-				sourceAnchor = (Anchor) spe;
+				final InputNetworkPortPattern spattern = (InputNetworkPortPattern) fp
+						.getPatternForPictogramElement(sourcePe);
+				sourceAnchor = spattern.getAnchor((AnchorContainer) sourcePe);
 			} else {
 				// Connection from an instance port
 				final InstancePattern spattern = (InstancePattern) fp
-						.getPatternForPictogramElement(spe);
-				sourceAnchor = spattern.getAnchorForPort(spe,
+						.getPatternForPictogramElement(sourcePe);
+				sourceAnchor = spattern.getAnchorForPort(sourcePe,
 						connection.getSourcePort());
 			}
 
-			final PictogramElement tpe = Graphiti.getLinkService()
+			final PictogramElement targetPe = Graphiti.getLinkService()
 					.getPictogramElements(getDiagram(), connection.getTarget())
 					.get(0);
-			if (tpe instanceof Anchor) {
+			if (ShapePropertiesManager.isExpectedPc(targetPe,
+					OutputNetworkPortPattern.INOUT_ID)) {
 				// Connection to a network port
-				targetAnchor = (Anchor) tpe;
+				final OutputNetworkPortPattern tpattern = (OutputNetworkPortPattern) fp
+						.getPatternForPictogramElement(targetPe);
+				targetAnchor = tpattern.getAnchor((AnchorContainer) targetPe);
 			} else {
 				// Connection to an instance port
 				final InstancePattern tpattern = (InstancePattern) fp
-						.getPatternForPictogramElement(tpe);
-				targetAnchor = tpattern.getAnchorForPort(tpe,
+						.getPatternForPictogramElement(targetPe);
+				targetAnchor = tpattern.getAnchorForPort(targetPe,
 						connection.getTargetPort());
 			}
 
