@@ -336,7 +336,8 @@ public class InstancePattern extends AbstractPattern {
 		link(topLevelShape, addedDomainObject);
 
 		if (addedDomainObject.getEntity() != null) {
-			setInstanceRefinement(topLevelShape, addedDomainObject.getEntity());
+			setInstanceRefinement(topLevelShape, addedDomainObject.getEntity(),
+					false);
 		}
 
 		return topLevelShape;
@@ -568,6 +569,18 @@ public class InstancePattern extends AbstractPattern {
 	 */
 	public boolean setInstanceRefinement(final ContainerShape instanceShape,
 			final EObject entity) {
+		return setInstanceRefinement(instanceShape, entity, true);
+	}
+
+	/**
+	 * @param instanceShape
+	 * @param entity
+	 * @param updateExistingConnections
+	 *            Will try to perform reconnection
+	 * @return
+	 */
+	protected boolean setInstanceRefinement(final ContainerShape instanceShape,
+			final EObject entity, boolean updateExistingConnections) {
 		if (!isPatternRoot(instanceShape)) {
 			return false;
 		}
@@ -575,7 +588,7 @@ public class InstancePattern extends AbstractPattern {
 			return false;
 		}
 
-		// Do not allow
+		// Do not allow refining on the same URI as before
 		final String existingRefinement = Graphiti.getPeService()
 				.getPropertyValue(instanceShape, REFINEMENT_KEY);
 		final String entityUri = entity.eResource().getURI()
@@ -599,29 +612,31 @@ public class InstancePattern extends AbstractPattern {
 			}
 		}
 
-		// To perform reconnection later, we need to save which are connected to
-		// in and out anchors
+		// To perform reconnection later, we need to save which are
+		// connected to in and out anchors
 		final Map<String, Connection> inMap = new HashMap<String, Connection>();
 		final Map<String, Iterable<Connection>> outMap = new HashMap<String, Iterable<Connection>>();
+		if (updateExistingConnections) {
+			// We will delete anchors IN the for loop, we need to copy the list
+			final List<Anchor> anchors = new ArrayList<Anchor>(
+					((AnchorContainer) instanceShape).getAnchors());
+			for (final Anchor anchor : anchors) {
 
-		// We will delete anchors IN the for loop, we need to copy the list
-		final List<Anchor> anchors = new ArrayList<Anchor>(((AnchorContainer) instanceShape).getAnchors());
-		for (final Anchor anchor : anchors) {
+				final String portName = Graphiti.getPeService()
+						.getPropertyValue(anchor, PORT_NAME_KEY);
+				if (anchor.getIncomingConnections().size() >= 1) {
+					// Save incoming connections
+					inMap.put(portName, anchor.getIncomingConnections().get(0));
+				} else if (anchor.getOutgoingConnections().size() >= 1) {
+					// Create a copy of the current outgoing list
+					final List<Connection> conList = new ArrayList<Connection>(
+							anchor.getOutgoingConnections());
+					// Save outgoing connections
+					outMap.put(portName, conList);
+				}
 
-			final String portName = Graphiti.getPeService()
-					.getPropertyValue(anchor, PORT_NAME_KEY);
-			if (anchor.getIncomingConnections().size() >= 1) {
-				// Save incoming connections
-				inMap.put(portName, anchor.getIncomingConnections().get(0));
-			} else if (anchor.getOutgoingConnections().size() >= 1) {
-				// Create a copy of the current outgoing list
-				final List<Connection> conList = new ArrayList<Connection>(anchor
-						.getOutgoingConnections());
-				// Save outgoing connections
-				outMap.put(portName, conList);
+				EcoreUtil.delete(anchor, true);
 			}
-
-			EcoreUtil.delete(anchor, true);
 		}
 
 		// Add ports
@@ -640,8 +655,8 @@ public class InstancePattern extends AbstractPattern {
 		// Resize to minimal size.
 		resizeShapeToMinimal(instanceShape);
 
-		// Check if auto-reconnections are necessary
-		if (inMap.isEmpty() && outMap.isEmpty()) {
+		// Check if auto-reconnections are necessary (or disabled)
+		if (!updateExistingConnections || (inMap.isEmpty() && outMap.isEmpty())) {
 			return true;
 		}
 
