@@ -29,7 +29,7 @@
 package net.sf.orcc.xdf.ui.diagram;
 
 import net.sf.orcc.xdf.ui.features.DropInstanceFromFileFeature;
-import net.sf.orcc.xdf.ui.features.GroupToInstanceFeature;
+import net.sf.orcc.xdf.ui.features.GroupInstancesFeature;
 import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinementFeature;
 import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
@@ -88,7 +88,7 @@ public class XdfDiagramFeatureProvider extends
 				new UpdateRefinementFeature(this),
 				new OrthogonalAutoLayoutFeature(this),
 				new PolylineAutoLayoutFeature(this),
-				new GroupToInstanceFeature(this) };
+				new GroupInstancesFeature(this) };
 		updateFeature = new UpdateDiagramFeature(this);
 		dropInstanceFeature = new DropInstanceFromFileFeature(this);
 	}

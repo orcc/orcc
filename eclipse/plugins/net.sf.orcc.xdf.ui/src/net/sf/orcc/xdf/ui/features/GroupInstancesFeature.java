@@ -78,11 +78,11 @@ import org.eclipse.ui.PlatformUI;
  * @author Antoine Lorence
  * 
  */
-public class GroupToInstanceFeature extends AbstractCustomFeature {
+public class GroupInstancesFeature extends AbstractCustomFeature {
 
 	private boolean hasDoneChanges;
 
-	public GroupToInstanceFeature(IFeatureProvider fp) {
+	public GroupInstancesFeature(IFeatureProvider fp) {
 		super(fp);
 		hasDoneChanges = false;
 	}
