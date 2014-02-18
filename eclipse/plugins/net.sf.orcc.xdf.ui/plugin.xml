@@ -29,7 +29,7 @@
       <wizard
             canFinishEarly="false"
             category="net.sf.orcc.ui.OrccCategory"
-            class="net.sf.orcc.xdf.ui.wizards.NewNetworkWizard"
+            class="net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard"
             hasPages="true"
             icon="icons/network.gif"
             id="net.sf.orcc.xdf.ui.wizards.newNetworkWizard"
