@@ -191,8 +191,6 @@ public class InstancePattern extends AbstractPattern {
 		final PictogramElement pe = context.getPictogramElement();
 		final Instance obj = (Instance) getBusinessObjectForPictogramElement(pe);
 		obj.setName(value);
-
-		updatePictogramElement(pe);
 	}
 
 	@Override
@@ -530,7 +528,12 @@ public class InstancePattern extends AbstractPattern {
 			}
 
 			final Instance instance = (Instance) getBusinessObjectForPictogramElement(pe);
-			text.setValue(instance.getName());
+			if (!instance.getName().equals(text.getValue())) {
+				text.setValue(instance.getName());
+				// Do not force refinement update in case of simply renaming
+				// instance
+				return true;
+			}
 
 			// Force to update refinement, by invalidating the current
 			// refinement property on the shape
@@ -576,10 +579,10 @@ public class InstancePattern extends AbstractPattern {
 	 * @param instanceShape
 	 * @param entity
 	 * @param updateExistingConnections
-	 *            Will try to perform reconnection
+	 *            Will try to perform reconnections
 	 * @return
 	 */
-	protected boolean setInstanceRefinement(final ContainerShape instanceShape,
+	private boolean setInstanceRefinement(final ContainerShape instanceShape,
 			final EObject entity, boolean updateExistingConnections) {
 		if (!isPatternRoot(instanceShape)) {
 			return false;
