@@ -82,9 +82,12 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 
 	private boolean hasDoneChanges;
 
+	private final Map<String, Integer> portNamesIndexes;
+
 	public GroupInstancesFeature(IFeatureProvider fp) {
 		super(fp);
 		hasDoneChanges = false;
+		portNamesIndexes = new HashMap<String, Integer>();
 	}
 
 	@Override
@@ -324,7 +327,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				// Create a new port
 				final Port p = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getTargetPort().getType()),
-						connection.getTargetPort().getName());
+						uniquePortName(connection.getTargetPort().getName()));
 				newNetwork.addInput(p);
 				// We will reconnect this connection when new instance will be
 				// created
@@ -344,7 +347,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				// Create a new port
 				final Port p = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getSourcePort().getType()),
-						connection.getSourcePort().getName());
+						uniquePortName(connection.getSourcePort().getName()));
 				newNetwork.addOutput(p);
 				// We will reconnect this connection when new instance will be
 				// created
@@ -392,6 +395,17 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		}
 
 		return newInstance;
+	}
+
+	private String uniquePortName(final String baseName) {
+		if (portNamesIndexes.containsKey(baseName)) {
+			final int index = portNamesIndexes.get(baseName) + 1;
+			portNamesIndexes.put(baseName, index);
+			return baseName + "_" + index;
+		} else {
+			portNamesIndexes.put(baseName, 0);
+			return baseName;
+		}
 	}
 
 	@Override
