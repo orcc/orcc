@@ -369,7 +369,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 
 		// Create the new instance
 		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
-				"newInstance", newNetwork);
+				"groupedInstances", newNetwork);
 		currentNetwork.add(newInstance);
 
 		// Update existing connections. Re-connect them to the new instance, on

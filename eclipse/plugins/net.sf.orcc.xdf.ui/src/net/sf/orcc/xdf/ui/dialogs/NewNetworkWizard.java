@@ -41,11 +41,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -77,6 +80,7 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 		super();
 		// setNeedsProgressMonitor(true);
 		setWindowTitle("New XDF Network");
+
 
 		this.openWhenFinished = openWhenFinished;
 		createdNetwork = null;
@@ -120,6 +124,19 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 				}
 
 				return true;
+			}
+
+			// We don't want "Advanced" section to be displayed.
+			@Override
+			protected void createAdvancedControls(Composite parent) {
+				// Does nothing, DO NOT REMOVE. Overwrides this annoying default
+				// method
+			}
+
+			// Idem
+			@Override
+			protected IStatus validateLinkedResource() {
+				return Status.OK_STATUS;
 			}
 		};
 		page.setFileExtension(Activator.NETWORK_SUFFIX);
