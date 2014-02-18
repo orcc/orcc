@@ -51,6 +51,7 @@ import net.sf.orcc.xdf.ui.util.XdfUtil;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
@@ -155,7 +156,8 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 			addContext.setNewObject(newInstance);
 			// We will run the layout at the end
 			addContext.setLocation(10, 10);
-			getFeatureProvider().addIfPossible(addContext);
+			final PictogramElement newInstancePe = getFeatureProvider()
+					.addIfPossible(addContext);
 
 			// Update connections to/from the new instance
 			for (final Connection connection : toUpdateInDiagram) {
@@ -215,6 +217,11 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 			if (layoutFeature.canExecute(layoutContext)) {
 				layoutFeature.execute(layoutContext);
 			}
+
+			final IDirectEditingInfo dei = getFeatureProvider()
+					.getDirectEditingInfo();
+			dei.setMainPictogramElement(newInstancePe);
+			dei.setActive(true);
 
 			hasDoneChanges = true;
 
