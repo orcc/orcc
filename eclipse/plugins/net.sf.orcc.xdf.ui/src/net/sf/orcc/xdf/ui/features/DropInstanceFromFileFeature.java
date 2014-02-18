@@ -75,9 +75,7 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		if (extension.equals(Activator.NETWORK_SUFFIX) || extension.equals(Activator.ACTOR_SUFFIX)) {
 
 			final ContainerShape target = context.getTargetContainer();
-			if (target == getDiagram()
-					|| PropsUtil.isExpectedPc(target,
-							InstancePattern.INSTANCE_ID)) {
+			if (target == getDiagram() || PropsUtil.isInstance(target)) {
 				return true;
 			}
 		}
@@ -114,8 +112,7 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		final ContainerShape target = context.getTargetContainer();
 		if (target == getDiagram()) {
 			return addToDiagram(eobject, context);
-		} else if (PropsUtil.isExpectedPc(target,
-				InstancePattern.INSTANCE_ID)) {
+		} else if (PropsUtil.isInstance(target)) {
 			return updateRefinement(target, eobject);
 		}
 

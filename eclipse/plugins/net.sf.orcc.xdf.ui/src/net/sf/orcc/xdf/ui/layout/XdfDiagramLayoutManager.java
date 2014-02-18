@@ -216,7 +216,7 @@ public class XdfDiagramLayoutManager {
 			final KGraphElement ge = entry.getValue();
 
 			if (ge instanceof KNode) {
-				if (PropsUtil.isExpectedPc(pe, InstancePattern.INSTANCE_ID)) {
+				if (PropsUtil.isInstance(pe)) {
 					applyLayoutToInstanceNode(pe, (KNode) ge);
 				} else if (PropsUtil.isExpectedPc(pe, OutputNetworkPortPattern.INOUT_ID)
 						|| PropsUtil.isExpectedPc(pe, InputNetworkPortPattern.INOUT_ID)) {

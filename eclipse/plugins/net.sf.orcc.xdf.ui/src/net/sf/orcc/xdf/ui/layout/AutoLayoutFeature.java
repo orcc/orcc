@@ -31,7 +31,6 @@ package net.sf.orcc.xdf.ui.layout;
 import java.util.Map;
 
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
-import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 
@@ -110,7 +109,7 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 		for (final Shape shape : getDiagram().getChildren()) {
 			final String identifier = PropsUtil.getIdentifier(shape);
 			final KShapeLayout shapeLayout = ((KNode) peKnodeMap.get(shape)).getData(KShapeLayout.class);
-			if (InstancePattern.INSTANCE_ID.equals(identifier)) {
+			if (PropsUtil.isInstance(shape)) {
 				if (shapeLayout != null) {
 					configureInstanceNode(shapeLayout);
 				}

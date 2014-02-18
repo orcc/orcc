@@ -109,8 +109,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 
 		int cptInstances = 0;
 		for (final PictogramElement pe : selection) {
-			if (PropsUtil.isExpectedPc(pe,
-					InstancePattern.INSTANCE_ID)) {
+			if (PropsUtil.isInstance(pe)) {
 				cptInstances++;
 			}
 		}

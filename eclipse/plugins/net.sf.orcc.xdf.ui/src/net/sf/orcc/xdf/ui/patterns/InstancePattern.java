@@ -109,7 +109,6 @@ public class InstancePattern extends AbstractPattern {
 	private static final int PORT_MARGIN = 2;
 
 	// Identifiers for important shape of an instance
-	public static final String INSTANCE_ID = "INSTANCE";
 	private static final String LABEL_ID = "INSTANCE_LABEL";
 	private static final String SEP_ID = "INSTANCE_SEPARATOR";
 	public static final String PORT_ID = "INSTANCE_PORT";
@@ -165,7 +164,7 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
-		return PropsUtil.isExpectedPc(pe, INSTANCE_ID);
+		return PropsUtil.isInstance(pe);
 	}
 
 	@Override
@@ -229,7 +228,7 @@ public class InstancePattern extends AbstractPattern {
 	@Override
 	public void preDelete(IDeleteContext mainContext) {
 		final PictogramElement pe = mainContext.getPictogramElement();
-		if (!PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
+		if (!PropsUtil.isInstance(pe)) {
 			return;
 		}
 
@@ -297,7 +296,7 @@ public class InstancePattern extends AbstractPattern {
 
 		// Create the container shape
 		final ContainerShape topLevelShape = peCreateService.createContainerShape(targetDiagram, true);
-		PropsUtil.setIdentifier(topLevelShape, INSTANCE_ID);
+		PropsUtil.setInstance(topLevelShape);
 
 		// Create the container graphic
 		final RoundedRectangle roundedRectangle = gaService.createPlainRoundedRectangle(topLevelShape, 5, 5);
@@ -430,7 +429,7 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean canUpdate(IUpdateContext context) {
-		return PropsUtil.isExpectedPc(context.getPictogramElement(), INSTANCE_ID);
+		return PropsUtil.isInstance(context.getPictogramElement());
 	}
 
 	@Override
@@ -523,7 +522,7 @@ public class InstancePattern extends AbstractPattern {
 	public boolean update(IUpdateContext context) {
 		final PictogramElement pe = context.getPictogramElement();
 
-		if (PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
+		if (PropsUtil.isInstance(pe)) {
 			final Text text = (Text) PropsUtil.findPcFromIdentifier(pe, LABEL_ID);
 			if (text == null) {
 				return false;
@@ -860,7 +859,7 @@ public class InstancePattern extends AbstractPattern {
 	 *            The instance pictogram element
 	 */
 	private void resizeShapeToMinimal(final PictogramElement pe) {
-		if (!PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
+		if (!PropsUtil.isInstance(pe)) {
 			return;
 		}
 
@@ -880,7 +879,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @return The height as integer
 	 */
 	private int getInstanceMinHeight(final PictogramElement pe) {
-		if (!PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
+		if (!PropsUtil.isInstance(pe)) {
 			return -1;
 		}
 
@@ -934,7 +933,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @return The width as integer
 	 */
 	private int getInstanceMinWidth(final PictogramElement pe) {
-		if (!PropsUtil.isExpectedPc(pe, INSTANCE_ID)) {
+		if (!PropsUtil.isInstance(pe)) {
 			return -1;
 		}
 

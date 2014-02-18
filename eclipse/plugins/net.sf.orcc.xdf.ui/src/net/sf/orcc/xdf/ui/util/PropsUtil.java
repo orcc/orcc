@@ -49,6 +49,8 @@ public class PropsUtil {
 	private static String INPUT = "input";
 	private static String OUTPUT = "output";
 
+	// Shapes identifiers
+	private static final String INSTANCE_ID = "INSTANCE";
 	/**
 	 * Set the given id as identifier to the given pe
 	 * 
@@ -143,6 +145,14 @@ public class PropsUtil {
 		}
 
 		return null;
+	}
+
+	public static void setInstance(final PropertyContainer pc) {
+		setIdentifier(pc, INSTANCE_ID);
+	}
+
+	public static boolean isInstance(final PropertyContainer pc) {
+		return isExpectedPc(pc, INSTANCE_ID);
 	}
 
 	public static void setInput(final PropertyContainer pc) {
