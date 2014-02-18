@@ -129,15 +129,15 @@ END_TRIGGER;
 END_OPERATION_WITH_STATE(SOURCE_DECREMENTNBLOOPS)
 
 //////////////////////////////////////////////////////////////////////////////
-// SOURCE_ISMAXLOOPSREACHED
+// DISPLAY_GETNBFRAMES
 //////////////////////////////////////////////////////////////////////////////
-OPERATION_WITH_STATE(SOURCE_ISMAXLOOPSREACHED, ORCC_FU)
+OPERATION(DISPLAY_GETNBFRAMES)
 
 TRIGGER
-    IO(2) = false;
+    IO(2) = NetworkSimulatorContext::numberOfFrames();
 END_TRIGGER;
 
-END_OPERATION_WITH_STATE(SOURCE_ISMAXLOOPSREACHED)
+END_OPERATION(DISPLAY_GETNBFRAMES)
 
 //////////////////////////////////////////////////////////////////////////////
 // DISPLAY_CHECKSUM

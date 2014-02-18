@@ -334,7 +334,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		functionUnit.setImplementation(name);
 
 		String[] oneInputOneOutputOps = { "source_readbyte",
-				"source_sizeoffile", "source_ismaxloopsreached" };
+				"source_sizeoffile", "display_getnbframes" };
 		String[] oneInputOps = { "source_init", "source_rewind",
 				"source_decrementnbloops", "print_cyclecount", "fpsprintinit",
 				"fpsprintnewpicdecoded" };
