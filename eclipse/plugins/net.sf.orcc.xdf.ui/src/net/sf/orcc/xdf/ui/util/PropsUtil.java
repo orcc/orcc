@@ -174,6 +174,10 @@ public class PropsUtil {
 		return isExpectedPc(pc, OUTPORT_ID);
 	}
 
+	public static boolean isPort(final PropertyContainer pc) {
+		return isInputPort(pc) || isOutputPort(pc);
+	}
+
 	public static void setInput(final PropertyContainer pc) {
 		Graphiti.getPeService().setPropertyValue(pc, DIRECTION_KEY, INPUT);
 	}

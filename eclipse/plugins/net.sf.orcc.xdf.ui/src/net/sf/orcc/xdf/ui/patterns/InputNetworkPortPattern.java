@@ -31,10 +31,13 @@ package net.sf.orcc.xdf.ui.patterns;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.IGaService;
 
 /**
@@ -44,8 +47,6 @@ import org.eclipse.graphiti.services.IGaService;
  * 
  */
 public class InputNetworkPortPattern extends NetworkPortPattern {
-
-	protected static final String INOUT_ID = "IN_PORT";
 
 	@Override
 	public String getCreateName() {
@@ -66,16 +67,21 @@ public class InputNetworkPortPattern extends NetworkPortPattern {
 	}
 
 	@Override
+	protected void setIdentifier(ContainerShape topLevelShape) {
+		PropsUtil.setInputPort(topLevelShape);
+	}
+
+	@Override
+	protected boolean checkIdentifier(PictogramElement pe) {
+		return PropsUtil.isInputPort(pe);
+	}
+
+	@Override
 	protected Polygon getPortPolygon(final GraphicsAlgorithmContainer shape, final IGaService gaService) {
 		final int[] points = { 0, SHAPE_HEIGHT / 2, SHAPE_WIDTH, 0, SHAPE_WIDTH, SHAPE_HEIGHT };
 		final Polygon polygon = gaService.createPlainPolygon(shape, points);
 		polygon.setStyle(StyleUtil.inputPortShape(getDiagram()));
 		return polygon;
-	}
-
-	@Override
-	protected String getPortIdentifier() {
-		return INOUT_ID;
 	}
 
 	@Override

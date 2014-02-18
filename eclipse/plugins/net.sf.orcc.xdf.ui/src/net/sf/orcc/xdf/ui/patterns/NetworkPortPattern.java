@@ -96,22 +96,28 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	@Override
 	abstract public String getCreateName();
 
-	abstract protected Polygon getPortPolygon(final GraphicsAlgorithmContainer shape, final IGaService gaService);
+	abstract protected void setIdentifier(ContainerShape topLevelShape);
 
-	abstract protected String getPortIdentifier();
+	abstract protected boolean checkIdentifier(PictogramElement pe);
+
+	abstract protected Polygon getPortPolygon(final GraphicsAlgorithmContainer shape, final IGaService gaService);
 
 	abstract protected void addPortToNetwork(Port port, Network network);
 
 	@Override
 	protected boolean isPatternRoot(PictogramElement pe) {
-		return PropsUtil.isExpectedPc(pe, getPortIdentifier());
+		return checkIdentifier(pe);
 	}
 
 	@Override
 	protected boolean isPatternControlled(PictogramElement pe) {
+
+		if (isPatternRoot(pe)) {
+			return true;
+		}
 		final String identifier = PropsUtil.getIdentifier(pe);
-		final String[] validIds = { getPortIdentifier(), SHAPE_ID, LABEL_ID };
-		for (final String e : validIds) {
+		final String[] otherIds = { SHAPE_ID, LABEL_ID };
+		for (final String e : otherIds) {
 			if (e.equals(identifier)) {
 				return true;
 			}
@@ -191,7 +197,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	@Override
 	public void preDelete(IDeleteContext mainContext) {
 		final PictogramElement pe = mainContext.getPictogramElement();
-		if (!PropsUtil.isExpectedPc(pe, getPortIdentifier())) {
+		if (!PropsUtil.isPort(pe)) {
 			return;
 		}
 
@@ -261,7 +267,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 		// Create the container
 		final ContainerShape topLevelShape = peCreateService.createContainerShape(targetDiagram, true);
-		PropsUtil.setIdentifier(topLevelShape, getPortIdentifier());
+		setIdentifier(topLevelShape);
 		peCreateService.createChopboxAnchor(topLevelShape);
 
 		// The main container is an invisible rectangle
