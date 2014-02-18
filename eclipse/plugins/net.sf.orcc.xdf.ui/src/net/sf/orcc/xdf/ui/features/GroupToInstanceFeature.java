@@ -41,9 +41,6 @@ import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard;
 import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
@@ -75,8 +72,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Group selected elements to create a new Network somewhere. Use this network
- * to create an instance refined on this network, to replace the selection.
+ * Group selected instances into a new Network located somewhere. Replace the
+ * selected instances by a new one, refined on the network created.
  * 
  * @author Antoine Lorence
  * 
@@ -92,7 +89,7 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 
 	@Override
 	public String getName() {
-		return "Group selection into new network instance";
+		return "Group selected instances into new network";
 	}
 
 	@Override
@@ -107,18 +104,21 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 			return false;
 		}
 
-		int elements = selection.length;
+		int cptInstances = 0;
 		for (final PictogramElement pe : selection) {
-			if (pe instanceof org.eclipse.graphiti.mm.pictograms.Connection) {
-				elements--;
+			if (ShapePropertiesManager.isExpectedPc(pe,
+					InstancePattern.INSTANCE_ID)) {
+				cptInstances++;
 			}
 		}
 
-		return elements >= 2;
+		return cptInstances >= 2;
 	}
 
 	@Override
 	public void execute(ICustomContext context) {
+
+		portNamesIndexes.clear();
 
 		final Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
 
@@ -147,11 +147,11 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 
 		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
 
-		final Set<Vertex> selection = new HashSet<Vertex>();
+		final Set<Instance> selection = new HashSet<Instance>();
 		for (final PictogramElement pe : context.getPictogramElements()) {
 			final Object selected = getBusinessObjectForPictogramElement(pe);
-			if (selected instanceof Instance || selected instanceof Port) {
-				selection.add((Vertex) selected);
+			if (selected instanceof Instance) {
+				selection.add((Instance) selected);
 			} else {
 				continue;
 			}
@@ -284,24 +284,18 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 	 */
 	private Instance updateNetworksAndCreateInstance(
 			final Network currentNetwork, final Network newNetwork,
-			final Set<Vertex> selection, final Set<Connection> toUpdateInDiagram)
-			throws IOException {
+			final Set<Instance> selection,
+			final Set<Connection> toUpdateInDiagram) throws IOException {
 
-		final Map<Vertex, Vertex> copies = new HashMap<Vertex, Vertex>();
+		final Map<Instance, Instance> copies = new HashMap<Instance, Instance>();
 		final Map<Connection, Port> toReconnectToTarget = new HashMap<Connection, Port>();
 		final Map<Connection, Port> toReconnectFromSource = new HashMap<Connection, Port>();
 
 		// Adds copies of selected objects to the new network
-		for (final Vertex originalVertex : selection) {
-			if (originalVertex instanceof Instance
-					|| originalVertex instanceof Port) {
-				final Vertex copy = EcoreUtil.copy(originalVertex);
-				copies.put(originalVertex, copy);
-				newNetwork.add(copy);
-			} else {
-				OrccLogger.warnln("Selection contains an invalid object type: "
-						+ originalVertex.getClass());
-			}
+		for (final Instance originalInstance : selection) {
+			final Instance copy = EcoreUtil.copy(originalInstance);
+			copies.put(originalInstance, copy);
+			newNetwork.add(copy);
 		}
 
 		// Manage connections
@@ -312,20 +306,15 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 					&& selection.contains(connection.getTarget())) {
 				final Connection copy = EcoreUtil.copy(connection);
 
-				final Vertex src = copies.get(connection.getSource());
-				final Vertex tgt = copies.get(connection.getTarget());
+				final Instance src = copies.get(connection.getSource());
+				final Instance tgt = copies.get(connection.getTarget());
 
 				copy.setSource(src);
 				copy.setTarget(tgt);
-
-				if (connection.getSourcePort() != null) {
-					copy.setSourcePort(src.getAdapter(Entity.class).getOutput(
-							connection.getSourcePort().getName()));
-				}
-				if (connection.getTargetPort() != null) {
-					copy.setTargetPort(tgt.getAdapter(Entity.class).getInput(
-							connection.getTargetPort().getName()));
-				}
+				copy.setSourcePort(src.getAdapter(Entity.class).getOutput(
+						connection.getSourcePort().getName()));
+				copy.setTargetPort(tgt.getAdapter(Entity.class).getInput(
+						connection.getTargetPort().getName()));
 
 				newNetwork.add(copy);
 			}
@@ -333,16 +322,19 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 			// selection
 			else if (selection.contains(connection.getTarget())) {
 				// Create a new port
-				final Port p = initializePort(connection.getTarget(),
-						connection.getTargetPort());
+				final Port p = DfFactory.eINSTANCE.createPort(
+						EcoreUtil.copy(connection.getTargetPort().getType()),
+						connection.getTargetPort().getName());
 				newNetwork.addInput(p);
 				// We will reconnect this connection when new instance will be
 				// created
 				toReconnectToTarget.put(connection, p);
 				// Create a new connection, ...
+				final Instance target = copies.get(connection.getTarget());
+				final Port targetPort = target.getAdapter(Entity.class)
+						.getInput(connection.getTargetPort().getName());
 				final Connection c = DfFactory.eINSTANCE.createConnection(p,
-						null, connection.getTarget(),
-						connection.getTargetPort());
+						null, target, targetPort);
 				// ... fully contained in the new network
 				newNetwork.add(c);
 			}
@@ -350,16 +342,20 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 			// selection
 			else if (selection.contains(connection.getSource())) {
 				// Create a new port
-				final Port p = initializePort(connection.getSource(),
-						connection.getSourcePort());
+				final Port p = DfFactory.eINSTANCE.createPort(
+						EcoreUtil.copy(connection.getSourcePort().getType()),
+						connection.getSourcePort().getName());
 				newNetwork.addOutput(p);
 				// We will reconnect this connection when new instance will be
 				// created
 				toReconnectFromSource.put(connection, p);
 				// Create a new connection, ...
+				final Instance source = copies.get(connection.getSource());
+				final Port sourcePort = source.getAdapter(Entity.class)
+						.getOutput(connection.getSourcePort().getName());
+
 				final Connection c = DfFactory.eINSTANCE.createConnection(
-						connection.getSource(), connection.getSourcePort(), p,
-						null);
+						source, sourcePort, p, null);
 				// ... fully contained in the new network
 				newNetwork.add(c);
 			}
@@ -396,35 +392,6 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 		}
 
 		return newInstance;
-	}
-
-	/**
-	 * 
-	 * @param vertex
-	 * @param port
-	 * @return
-	 */
-	private Port initializePort(final Vertex vertex, final Port port) {
-
-		final Type type;
-		if (vertex instanceof Port) {
-			type = ((Port) vertex).getType();
-		} else if (vertex instanceof Instance && port != null) {
-			type = port.getType();
-		} else {
-			return null;
-		}
-
-		final String name;
-		if (vertex instanceof Port) {
-			name = ((Port) vertex).getName();
-		} else if (vertex instanceof Instance && port != null) {
-			name = port.getName();
-		} else {
-			return null;
-		}
-
-		return DfFactory.eINSTANCE.createPort(type, name);
 	}
 
 	@Override
