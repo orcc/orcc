@@ -189,8 +189,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			final PictogramElement sourcePe = Graphiti.getLinkService()
 					.getPictogramElements(getDiagram(), connection.getSource())
 					.get(0);
-			if (PropsUtil.isExpectedPc(sourcePe,
-					InputNetworkPortPattern.INOUT_ID)) {
+			if (PropsUtil.isInputPort(sourcePe)) {
 				// Connection from a network port
 				final InputNetworkPortPattern spattern = (InputNetworkPortPattern) fp
 						.getPatternForPictogramElement(sourcePe);
@@ -206,8 +205,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			final PictogramElement targetPe = Graphiti.getLinkService()
 					.getPictogramElements(getDiagram(), connection.getTarget())
 					.get(0);
-			if (PropsUtil.isExpectedPc(targetPe,
-					OutputNetworkPortPattern.INOUT_ID)) {
+			if (PropsUtil.isOutputPort(targetPe)) {
 				// Connection to a network port
 				final OutputNetworkPortPattern tpattern = (OutputNetworkPortPattern) fp
 						.getPatternForPictogramElement(targetPe);

@@ -34,10 +34,7 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
-import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
-import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -218,8 +215,8 @@ public class XdfDiagramLayoutManager {
 			if (ge instanceof KNode) {
 				if (PropsUtil.isInstance(pe)) {
 					applyLayoutToInstanceNode(pe, (KNode) ge);
-				} else if (PropsUtil.isExpectedPc(pe, OutputNetworkPortPattern.INOUT_ID)
-						|| PropsUtil.isExpectedPc(pe, InputNetworkPortPattern.INOUT_ID)) {
+				} else if (PropsUtil.isOutputPort(pe)
+						|| PropsUtil.isInputPort(pe)) {
 					applyLayoutToPortNode(pe, (KNode) ge);
 				}
 			} else if (ge instanceof KEdge) {

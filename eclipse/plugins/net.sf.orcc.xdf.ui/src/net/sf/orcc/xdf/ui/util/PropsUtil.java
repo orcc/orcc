@@ -51,6 +51,9 @@ public class PropsUtil {
 
 	// Shapes identifiers
 	private static final String INSTANCE_ID = "INSTANCE";
+	private static final String INPORT_ID = "IN_PORT";
+	private static final String OUTPORT_ID = "OUT_PORT";
+
 	/**
 	 * Set the given id as identifier to the given pe
 	 * 
@@ -153,6 +156,22 @@ public class PropsUtil {
 
 	public static boolean isInstance(final PropertyContainer pc) {
 		return isExpectedPc(pc, INSTANCE_ID);
+	}
+
+	public static void setInputPort(final PropertyContainer pc) {
+		setIdentifier(pc, INPORT_ID);
+	}
+
+	public static boolean isInputPort(final PropertyContainer pc) {
+		return isExpectedPc(pc, INPORT_ID);
+	}
+
+	public static void setOutputPort(final PropertyContainer pc) {
+		setIdentifier(pc, OUTPORT_ID);
+	}
+
+	public static boolean isOutputPort(final PropertyContainer pc) {
+		return isExpectedPc(pc, OUTPORT_ID);
 	}
 
 	public static void setInput(final PropertyContainer pc) {
