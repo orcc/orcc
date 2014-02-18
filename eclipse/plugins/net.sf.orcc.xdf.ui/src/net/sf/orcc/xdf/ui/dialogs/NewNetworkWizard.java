@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.xdf.ui.wizards;
+package net.sf.orcc.xdf.ui.dialogs;
 
 import java.io.IOException;
 
