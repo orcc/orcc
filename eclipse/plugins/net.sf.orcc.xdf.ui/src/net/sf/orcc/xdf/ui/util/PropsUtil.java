@@ -41,13 +41,18 @@ import org.eclipse.graphiti.services.Graphiti;
  * @author Antoine Lorence
  * 
  */
-public class ShapePropertiesManager {
+public class PropsUtil {
 
 	private static String IDENTIFIER_KEY = "XDF_ID";
 
 	private static String DIRECTION_KEY = "SHAPE_DIRECTION";
 	private static String INPUT = "input";
 	private static String OUTPUT = "output";
+
+	// Shapes identifiers
+	private static final String INSTANCE_ID = "INSTANCE";
+	private static final String INPORT_ID = "IN_PORT";
+	private static final String OUTPORT_ID = "OUT_PORT";
 
 	/**
 	 * Set the given id as identifier to the given pe
@@ -145,20 +150,59 @@ public class ShapePropertiesManager {
 		return null;
 	}
 
-	public static void setInput(final PropertyContainer pc) {
+	// START Instance
+	public static void setInstance(final PropertyContainer pc) {
+		setIdentifier(pc, INSTANCE_ID);
+	}
+
+	public static boolean isInstance(final PropertyContainer pc) {
+		return isExpectedPc(pc, INSTANCE_ID);
+	}
+
+	public static void setInstanceInPort(final PropertyContainer pc) {
 		Graphiti.getPeService().setPropertyValue(pc, DIRECTION_KEY, INPUT);
 	}
 
-	public static boolean isInput(final PropertyContainer pc) {
-		return INPUT.equals(Graphiti.getPeService().getPropertyValue(pc, DIRECTION_KEY));
+	// Instance ports additional properties
+	public static boolean isInstanceInPort(final PropertyContainer pc) {
+		return INPUT.equals(Graphiti.getPeService().getPropertyValue(pc,
+				DIRECTION_KEY));
 	}
 
-	public static void setOutput(final PropertyContainer pc) {
+	public static void setInstanceOutPort(final PropertyContainer pc) {
 		Graphiti.getPeService().setPropertyValue(pc, DIRECTION_KEY, OUTPUT);
 	}
 
-	public static boolean isOutput(final PropertyContainer pc) {
-		return OUTPUT.equals(Graphiti.getPeService().getPropertyValue(pc, DIRECTION_KEY));
+	public static boolean isInstanceOutPort(final PropertyContainer pc) {
+		return OUTPUT.equals(Graphiti.getPeService().getPropertyValue(pc,
+				DIRECTION_KEY));
 	}
 
+	public static boolean isInstancePort(final PropertyContainer pc) {
+		return isInstanceInPort(pc) || isInstanceOutPort(pc);
+	}
+
+	// END Instance
+
+	// START Network Port
+	public static void setInputPort(final PropertyContainer pc) {
+		setIdentifier(pc, INPORT_ID);
+	}
+
+	public static boolean isInputPort(final PropertyContainer pc) {
+		return isExpectedPc(pc, INPORT_ID);
+	}
+
+	public static void setOutputPort(final PropertyContainer pc) {
+		setIdentifier(pc, OUTPORT_ID);
+	}
+
+	public static boolean isOutputPort(final PropertyContainer pc) {
+		return isExpectedPc(pc, OUTPORT_ID);
+	}
+
+	public static boolean isPort(final PropertyContainer pc) {
+		return isInputPort(pc) || isOutputPort(pc);
+	}
+	// END Network Port
 }

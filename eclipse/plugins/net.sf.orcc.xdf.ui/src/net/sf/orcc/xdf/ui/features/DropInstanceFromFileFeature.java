@@ -34,7 +34,7 @@ import net.sf.orcc.df.Unit;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
-import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -75,9 +75,7 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		if (extension.equals(Activator.NETWORK_SUFFIX) || extension.equals(Activator.ACTOR_SUFFIX)) {
 
 			final ContainerShape target = context.getTargetContainer();
-			if (target == getDiagram()
-					|| ShapePropertiesManager.isExpectedPc(target,
-							InstancePattern.INSTANCE_ID)) {
+			if (target == getDiagram() || PropsUtil.isInstance(target)) {
 				return true;
 			}
 		}
@@ -114,8 +112,7 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		final ContainerShape target = context.getTargetContainer();
 		if (target == getDiagram()) {
 			return addToDiagram(eobject, context);
-		} else if (ShapePropertiesManager.isExpectedPc(target,
-				InstancePattern.INSTANCE_ID)) {
+		} else if (PropsUtil.isInstance(target)) {
 			return updateRefinement(target, eobject);
 		}
 

@@ -34,11 +34,8 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
-import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
-import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
-import net.sf.orcc.xdf.ui.util.ShapePropertiesManager;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
@@ -168,7 +165,7 @@ public class XdfDiagramLayoutManager {
 	private void registerPort(final Shape portShape) {
 
 		final GraphicsAlgorithm topLevelInvisibleRect = portShape.getGraphicsAlgorithm();
-		final GraphicsAlgorithm portPolygon = (GraphicsAlgorithm) ShapePropertiesManager.findPcFromIdentifier(
+		final GraphicsAlgorithm portPolygon = (GraphicsAlgorithm) PropsUtil.findPcFromIdentifier(
 				topLevelInvisibleRect, NetworkPortPattern.SHAPE_ID);
 		final KNode portKNode = KimlUtil.createInitializedNode();
 
@@ -216,10 +213,10 @@ public class XdfDiagramLayoutManager {
 			final KGraphElement ge = entry.getValue();
 
 			if (ge instanceof KNode) {
-				if (ShapePropertiesManager.isExpectedPc(pe, InstancePattern.INSTANCE_ID)) {
+				if (PropsUtil.isInstance(pe)) {
 					applyLayoutToInstanceNode(pe, (KNode) ge);
-				} else if (ShapePropertiesManager.isExpectedPc(pe, OutputNetworkPortPattern.INOUT_ID)
-						|| ShapePropertiesManager.isExpectedPc(pe, InputNetworkPortPattern.INOUT_ID)) {
+				} else if (PropsUtil.isOutputPort(pe)
+						|| PropsUtil.isInputPort(pe)) {
 					applyLayoutToPortNode(pe, (KNode) ge);
 				}
 			} else if (ge instanceof KEdge) {
