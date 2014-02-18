@@ -30,6 +30,7 @@ package net.sf.orcc.xdf.ui.dialogs;
 
 import java.io.IOException;
 
+import net.sf.orcc.df.Network;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
@@ -61,13 +62,24 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
  * @author Antoine Lorence
  */
 public class NewNetworkWizard extends Wizard implements INewWizard {
-	
+
 	private IWorkbench workbench;
 
+	private final boolean openWhenFinished;
+
+	private Network createdNetwork;
+
 	public NewNetworkWizard() {
+		this(true);
+	}
+
+	public NewNetworkWizard(boolean openWhenFinished) {
 		super();
 		// setNeedsProgressMonitor(true);
 		setWindowTitle("New XDF Network");
+
+		this.openWhenFinished = openWhenFinished;
+		createdNetwork = null;
 	}
 
 	@Override
@@ -134,37 +146,42 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 	@Override
 	public boolean performFinish() {
 		final WizardNewFileCreationPage page = (WizardNewFileCreationPage) getPage("filenameSelection");
-		
+
 		final IFile file = page.createNewFile();
 		if (file == null) {
 			return false;
 		}
 
-		final URI xdfUri = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
+		final URI xdfUri = URI.createPlatformResourceURI(file.getFullPath()
+				.toString(), true);
 
 		try {
-			XdfUtil.createNetworkResource(xdfUri);
+			createdNetwork = XdfUtil.createNetworkResource(xdfUri);
 		} catch (IOException e) {
 			return false;
 		}
 
 		// Open editor on new file.
-		final IWorkbenchWindow dw = workbench.getActiveWorkbenchWindow();
-		try {
-			if (dw != null) {
-				BasicNewResourceWizard.selectAndReveal(file, dw);
-				final IWorkbenchPage activePage = dw.getActivePage();
-				if (activePage != null) {
-					IDE.openEditor(activePage, file, true);
+		if (openWhenFinished) {
+			final IWorkbenchWindow dw = workbench.getActiveWorkbenchWindow();
+			try {
+				if (dw != null) {
+					BasicNewResourceWizard.selectAndReveal(file, dw);
+					final IWorkbenchPage activePage = dw.getActivePage();
+					if (activePage != null) {
+						IDE.openEditor(activePage, file, true);
+					}
 				}
+			} catch (PartInitException e) {
+				MessageDialog.openError(dw.getShell(),
+						"Problem opening editor", e.getMessage());
+				return false;
 			}
-		} catch (PartInitException e) {
-			MessageDialog.openError(dw.getShell(), "Problem opening editor",
-					e.getMessage());
-			return false;
 		}
-
 		return true;
 	}
 
+	public Network getCreatedNetwork() {
+		return createdNetwork;
+	}
 }
