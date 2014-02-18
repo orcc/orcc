@@ -150,6 +150,7 @@ public class PropsUtil {
 		return null;
 	}
 
+	// START Instance
 	public static void setInstance(final PropertyContainer pc) {
 		setIdentifier(pc, INSTANCE_ID);
 	}
@@ -158,6 +159,32 @@ public class PropsUtil {
 		return isExpectedPc(pc, INSTANCE_ID);
 	}
 
+	public static void setInstanceInPort(final PropertyContainer pc) {
+		Graphiti.getPeService().setPropertyValue(pc, DIRECTION_KEY, INPUT);
+	}
+
+	// Instance ports additional properties
+	public static boolean isInstanceInPort(final PropertyContainer pc) {
+		return INPUT.equals(Graphiti.getPeService().getPropertyValue(pc,
+				DIRECTION_KEY));
+	}
+
+	public static void setInstanceOutPort(final PropertyContainer pc) {
+		Graphiti.getPeService().setPropertyValue(pc, DIRECTION_KEY, OUTPUT);
+	}
+
+	public static boolean isInstanceOutPort(final PropertyContainer pc) {
+		return OUTPUT.equals(Graphiti.getPeService().getPropertyValue(pc,
+				DIRECTION_KEY));
+	}
+
+	public static boolean isInstancePort(final PropertyContainer pc) {
+		return isInstanceInPort(pc) || isInstanceOutPort(pc);
+	}
+
+	// END Instance
+
+	// START Network Port
 	public static void setInputPort(final PropertyContainer pc) {
 		setIdentifier(pc, INPORT_ID);
 	}
@@ -177,21 +204,5 @@ public class PropsUtil {
 	public static boolean isPort(final PropertyContainer pc) {
 		return isInputPort(pc) || isOutputPort(pc);
 	}
-
-	public static void setInput(final PropertyContainer pc) {
-		Graphiti.getPeService().setPropertyValue(pc, DIRECTION_KEY, INPUT);
-	}
-
-	public static boolean isInput(final PropertyContainer pc) {
-		return INPUT.equals(Graphiti.getPeService().getPropertyValue(pc, DIRECTION_KEY));
-	}
-
-	public static void setOutput(final PropertyContainer pc) {
-		Graphiti.getPeService().setPropertyValue(pc, DIRECTION_KEY, OUTPUT);
-	}
-
-	public static boolean isOutput(final PropertyContainer pc) {
-		return OUTPUT.equals(Graphiti.getPeService().getPropertyValue(pc, DIRECTION_KEY));
-	}
-
+	// END Network Port
 }

@@ -314,7 +314,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 
 			final FixPointAnchor brAnchor = (FixPointAnchor) anchor;
 			final Port port = (Port) getBusinessObjectForPictogramElement(brAnchor);
-			final PortKind kind = PropsUtil.isInput(brAnchor) ? PortKind.INPUT : PortKind.OUTPUT;
+			final PortKind kind = PropsUtil.isInstanceInPort(brAnchor) ? PortKind.INPUT : PortKind.OUTPUT;
 			final Instance parentInstance = (Instance) getBusinessObjectForPictogramElement(brAnchor.getParent());
 
 			return new PortInformation(parentInstance, port, kind, PortContainer.INSTANCE);

@@ -111,7 +111,7 @@ public class InstancePattern extends AbstractPattern {
 	// Identifiers for important shape of an instance
 	private static final String LABEL_ID = "INSTANCE_LABEL";
 	private static final String SEP_ID = "INSTANCE_SEPARATOR";
-	public static final String PORT_ID = "INSTANCE_PORT";
+	private static final String PORT_ID = "INSTANCE_PORT";
 	private static final String PORT_TEXT_ID = "INSTANCE_PORT_TEXT";
 	private static final String PORT_NAME_KEY = "REF_PORT_NAME";
 
@@ -155,9 +155,8 @@ public class InstancePattern extends AbstractPattern {
 	protected boolean isPatternControlled(PictogramElement pe) {
 		if (isPatternRoot(pe)) {
 			return true;
-		} else if (pe instanceof FixPointAnchor
-				&& (PropsUtil.isInput(pe) || PropsUtil.isOutput(pe))) {
-
+		} else if (PropsUtil.isInstancePort(pe)) {
+			return true;
 		}
 		return false;
 	}
@@ -418,9 +417,9 @@ public class InstancePattern extends AbstractPattern {
 		// ***********************
 		int inIndex = 0, outIndex = 0;
 		for (final Anchor anchor : instanceShape.getAnchors()) {
-			if (PropsUtil.isInput(anchor)) {
+			if (PropsUtil.isInstanceInPort(anchor)) {
 				layoutPort((FixPointAnchor) anchor, inIndex++, instanceShape);
-			} else if (PropsUtil.isOutput(anchor)) {
+			} else if (PropsUtil.isInstanceOutPort(anchor)) {
 				layoutPort((FixPointAnchor) anchor, outIndex++, instanceShape);
 			}
 		}
@@ -463,9 +462,9 @@ public class InstancePattern extends AbstractPattern {
 		for (final Anchor anchor : ((AnchorContainer) pe).getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
 					anchor, PORT_NAME_KEY);
-			if(PropsUtil.isInput(anchor)) {
+			if(PropsUtil.isInstanceInPort(anchor)) {
 				inputsN.add(portName);
-			} else if (PropsUtil.isOutput(anchor)) {
+			} else if (PropsUtil.isInstanceOutPort(anchor)) {
 				outputsN.add(portName);
 			}
 		}
@@ -665,11 +664,11 @@ public class InstancePattern extends AbstractPattern {
 		for (final Anchor anchor : instanceShape.getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
 					anchor, PORT_NAME_KEY);
-			if (PropsUtil.isInput(anchor)
+			if (PropsUtil.isInstanceInPort(anchor)
 					&& inMap.containsKey(portName)) {
 				inMap.remove(portName).setEnd(anchor);
 				cptReconnectedTo++;
-			} else if (PropsUtil.isOutput(anchor)
+			} else if (PropsUtil.isInstanceOutPort(anchor)
 					&& outMap.containsKey(portName)) {
 				for (final Connection connection : outMap.remove(portName)) {
 					connection.setStart(anchor);
@@ -778,13 +777,13 @@ public class InstancePattern extends AbstractPattern {
 
 			// Configure direction of the port and alignment of texts
 			if (direction == Direction.INPUTS) {
-				PropsUtil.setInput(fpAnchor);
-				PropsUtil.setInput(txt);
+				PropsUtil.setInstanceInPort(fpAnchor);
+				PropsUtil.setInstanceInPort(txt);
 				txt.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
 				layoutPort(fpAnchor, i++, instanceShape);
 			} else {
-				PropsUtil.setOutput(fpAnchor);
-				PropsUtil.setOutput(txt);
+				PropsUtil.setInstanceOutPort(fpAnchor);
+				PropsUtil.setInstanceOutPort(txt);
 				txt.setHorizontalAlignment(Orientation.ALIGNMENT_RIGHT);
 				layoutPort(fpAnchor, j++, instanceShape);
 			}
@@ -824,10 +823,10 @@ public class InstancePattern extends AbstractPattern {
 		final int squareY = -PORT_SIDE_WITH / 2;
 
 		int anchorX, squareX, squareW = PORT_SIDE_WITH;
-		if (PropsUtil.isInput(anchor)) {
+		if (PropsUtil.isInstanceInPort(anchor)) {
 			anchorX = 0;
 			squareX = 0;
-		} else if (PropsUtil.isOutput(anchor)) {
+		} else if (PropsUtil.isInstanceOutPort(anchor)) {
 			anchorX = instanceW;
 			squareX = -PORT_SIDE_WITH;
 			// Fix the size of outputs port, to take care of the instance border
@@ -887,9 +886,9 @@ public class InstancePattern extends AbstractPattern {
 		int nbInPorts = 0, nbOutPorts = 0;
 		// Compute the number of inputs and outputs ports
 		for (final Anchor anchor : instanceShape.getAnchors()) {
-			if (PropsUtil.isInput(anchor)) {
+			if (PropsUtil.isInstanceInPort(anchor)) {
 				++nbInPorts;
-			} else if (PropsUtil.isOutput(anchor)) {
+			} else if (PropsUtil.isInstanceOutPort(anchor)) {
 				++nbOutPorts;
 			}
 		}
@@ -905,7 +904,7 @@ public class InstancePattern extends AbstractPattern {
 		int portLineHeight = 0;
 		for (final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
 			if (child instanceof Text
-					&& (PropsUtil.isInput(child) || PropsUtil.isOutput(child))) {
+					&& (PropsUtil.isInstanceInPort(child) || PropsUtil.isInstanceOutPort(child))) {
 				portLineHeight = Math.max(XdfUtil.getTextMinHeight((Text) child), PORT_SIDE_WITH);
 				break;
 			}
@@ -945,9 +944,9 @@ public class InstancePattern extends AbstractPattern {
 
 		// Collect the ports text instances in 2 separate maps
 		for (final GraphicsAlgorithm child : instanceShape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
-			if (child instanceof Text && PropsUtil.isInput(child)) {
+			if (child instanceof Text && PropsUtil.isInstanceInPort(child)) {
 				inputs.add((Text) child);
-			} else if (child instanceof Text && PropsUtil.isOutput(child)) {
+			} else if (child instanceof Text && PropsUtil.isInstanceOutPort(child)) {
 				outputs.add((Text) child);
 			}
 		}
