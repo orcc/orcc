@@ -104,9 +104,13 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 							DialogPage.ERROR);
 					return false;
 				} else if (member instanceof IFolder) {
-					for (final IFolder folder : OrccUtil
+					for (final IFolder sourceFolder : OrccUtil
 							.getAllSourceFolders(member.getProject())) {
-						if (folder.equals(member)) {
+
+						// Both are URI starting from project. We can compare
+						// their string representation
+						if (member.toString().startsWith(
+								sourceFolder.toString())) {
 							return true;
 						}
 					}

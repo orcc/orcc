@@ -44,12 +44,11 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard;
 import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -67,7 +66,9 @@ import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.ui.dialogs.SaveAsDialog;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Group selected elements to create a new Network somewhere. Use this network
@@ -115,16 +116,31 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 	@Override
 	public void execute(ICustomContext context) {
 
-		final SaveAsDialog dialog = new SaveAsDialog(XdfUtil.getDefaultShell());
+		final Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
+
+		// Create the wizard used to select name and location for the new
+		// network
+		final NewNetworkWizard wizard = new NewNetworkWizard(false);
+
+		// Initialize the wizard with the current package location
+		final StructuredSelection networkSelection = new StructuredSelection(
+				currentNetwork.getFile().getParent());
+		wizard.init(PlatformUI.getWorkbench(), networkSelection);
+
+		final WizardDialog dialog = new WizardDialog(XdfUtil.getDefaultShell(),
+				wizard);
 		dialog.open();
 		if (dialog.getReturnCode() != Dialog.OK) {
 			return;
 		}
 
-		// The path where the new network will be created
-		final IPath path = dialog.getResult();
+		// The new network
+		final Network newNetwork = wizard.getCreatedNetwork();
 
-		final Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		if (newNetwork == null) {
+			return;
+		}
+
 		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
 
 		final Set<Vertex> selection = new HashSet<Vertex>();
@@ -137,98 +153,92 @@ public class GroupToInstanceFeature extends AbstractCustomFeature {
 			}
 		}
 
+		// This set will be filled with connections which needs to be
+		// re-added to the diagram
+		final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
+		final Instance newInstance;
 		try {
-			// Create a new empty network under the URI choose by user
-			final Network newNetwork = XdfUtil.createNetworkResource(URI
-					.createPlatformResourceURI(path.toString(), true));
-
-			// This set will be filled with connections which needs to be
-			// re-added to the diagram
-			final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
 			// Update the current and the created network. Also create the new
 			// instance used to replace all selected elements
-			final Instance newInstance = updateNetworksAndCreateInstance(
-					currentNetwork, newNetwork, selection, toUpdateInDiagram);
-
-			// Adds it to the current network
-			final AddContext addContext = new AddContext();
-			addContext.setTargetContainer(getDiagram());
-			addContext.setNewObject(newInstance);
-			// We will run the layout at the end
-			addContext.setLocation(10, 10);
-			final PictogramElement newInstancePe = getFeatureProvider()
-					.addIfPossible(addContext);
-
-			// Update connections to/from the new instance
-			for (final Connection connection : toUpdateInDiagram) {
-
-				final Anchor sourceAnchor, targetAnchor;
-				final PictogramElement spe = Graphiti
-						.getLinkService()
-						.getPictogramElements(getDiagram(),
-								connection.getSource()).get(0);
-				if (spe instanceof Anchor) {
-					// Connection from a network port
-					sourceAnchor = (Anchor) spe;
-				} else {
-					// Connection from an instance port
-					final InstancePattern spattern = (InstancePattern) fp
-							.getPatternForPictogramElement(spe);
-					sourceAnchor = spattern.getAnchorForPort(spe,
-							connection.getSourcePort());
-				}
-
-				final PictogramElement tpe = Graphiti
-						.getLinkService()
-						.getPictogramElements(getDiagram(),
-								connection.getTarget()).get(0);
-				if (tpe instanceof Anchor) {
-					// Connection to a network port
-					targetAnchor = (Anchor) tpe;
-				} else {
-					// Connection to an instance port
-					final InstancePattern tpattern = (InstancePattern) fp
-							.getPatternForPictogramElement(tpe);
-					targetAnchor = tpattern.getAnchorForPort(tpe,
-							connection.getTargetPort());
-				}
-
-				final AddConnectionContext addConContext = new AddConnectionContext(
-						sourceAnchor, targetAnchor);
-				addConContext.setNewObject(connection);
-				getFeatureProvider().addIfPossible(addConContext);
-			}
-
-			// Finally remove from diagram useless elements. Inner connections
-			// are also deleted, since deleting an instance or a port from a
-			// diagram also clean related connections
-			for (final PictogramElement pe : context.getPictogramElements()) {
-				final IPattern pattern = fp.getPatternForPictogramElement(pe);
-				final DeleteContext delContext = new DeleteContext(pe);
-				delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false,
-						0));
-				pattern.delete(delContext);
-			}
-
-			// And layout the resulting diagram
-			final IContext layoutContext = new CustomContext();
-			final OrthogonalAutoLayoutFeature layoutFeature = new OrthogonalAutoLayoutFeature(
-					getFeatureProvider());
-			if (layoutFeature.canExecute(layoutContext)) {
-				layoutFeature.execute(layoutContext);
-			}
-
-			final IDirectEditingInfo dei = getFeatureProvider()
-					.getDirectEditingInfo();
-			dei.setMainPictogramElement(newInstancePe);
-			dei.setActive(true);
-
-			hasDoneChanges = true;
-
+			newInstance = updateNetworksAndCreateInstance(currentNetwork,
+					newNetwork, selection, toUpdateInDiagram);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
+
+		// Adds it to the current network
+		final AddContext addContext = new AddContext();
+		addContext.setTargetContainer(getDiagram());
+		addContext.setNewObject(newInstance);
+		// We will run the layout at the end
+		addContext.setLocation(10, 10);
+		final PictogramElement newInstancePe = getFeatureProvider()
+				.addIfPossible(addContext);
+
+		// Update connections to/from the new instance
+		for (final Connection connection : toUpdateInDiagram) {
+
+			final Anchor sourceAnchor, targetAnchor;
+			final PictogramElement spe = Graphiti.getLinkService()
+					.getPictogramElements(getDiagram(), connection.getSource())
+					.get(0);
+			if (spe instanceof Anchor) {
+				// Connection from a network port
+				sourceAnchor = (Anchor) spe;
+			} else {
+				// Connection from an instance port
+				final InstancePattern spattern = (InstancePattern) fp
+						.getPatternForPictogramElement(spe);
+				sourceAnchor = spattern.getAnchorForPort(spe,
+						connection.getSourcePort());
+			}
+
+			final PictogramElement tpe = Graphiti.getLinkService()
+					.getPictogramElements(getDiagram(), connection.getTarget())
+					.get(0);
+			if (tpe instanceof Anchor) {
+				// Connection to a network port
+				targetAnchor = (Anchor) tpe;
+			} else {
+				// Connection to an instance port
+				final InstancePattern tpattern = (InstancePattern) fp
+						.getPatternForPictogramElement(tpe);
+				targetAnchor = tpattern.getAnchorForPort(tpe,
+						connection.getTargetPort());
+			}
+
+			final AddConnectionContext addConContext = new AddConnectionContext(
+					sourceAnchor, targetAnchor);
+			addConContext.setNewObject(connection);
+			getFeatureProvider().addIfPossible(addConContext);
+		}
+
+		// Finally remove from diagram useless elements. Inner connections
+		// are also deleted, since deleting an instance or a port from a
+		// diagram also clean related connections
+		for (final PictogramElement pe : context.getPictogramElements()) {
+			final IPattern pattern = fp.getPatternForPictogramElement(pe);
+			final DeleteContext delContext = new DeleteContext(pe);
+			delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
+			pattern.delete(delContext);
+		}
+
+		// And layout the resulting diagram
+		final IContext layoutContext = new CustomContext();
+		final OrthogonalAutoLayoutFeature layoutFeature = new OrthogonalAutoLayoutFeature(
+				getFeatureProvider());
+		if (layoutFeature.canExecute(layoutContext)) {
+			layoutFeature.execute(layoutContext);
+		}
+
+		final IDirectEditingInfo dei = getFeatureProvider()
+				.getDirectEditingInfo();
+		dei.setMainPictogramElement(newInstancePe);
+		dei.setActive(true);
+
+		hasDoneChanges = true;
+
 	}
 
 	/**
