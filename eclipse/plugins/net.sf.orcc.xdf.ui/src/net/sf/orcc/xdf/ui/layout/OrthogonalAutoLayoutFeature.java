@@ -42,7 +42,7 @@ public class OrthogonalAutoLayoutFeature extends AutoLayoutFeature {
 
 	@Override
 	protected String getLayoutAlgorithmName() {
-		return "Orthogonal routing";
+		return "Orthogonal routing (default)";
 	}
 
 	@Override
