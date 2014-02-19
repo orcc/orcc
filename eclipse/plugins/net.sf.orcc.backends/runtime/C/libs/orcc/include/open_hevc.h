@@ -46,6 +46,8 @@
 
 #include "types.h"
 
+int openhevc_init_context();
+
 void put_hevc_epel_pixel_orcc(i16 _dst[2][64*64], u8 listIdx, u8 _src[71*71], u8 srcstride, u8 width, u8 height);
 
 void put_hevc_qpel_h_orcc(i16 _dst[2][64*64], u8 listIdx, u8 _src[71*71], u8 srcstride, i32 filterIdx,  u8 width, u8 height);
