@@ -75,7 +75,7 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 
 	@Override
 	public String getName() {
-		return "&Automatically layout Diagram (" + getLayoutAlgorithmName() + ")"; //$NON-NLS-1$
+		return getLayoutAlgorithmName(); //$NON-NLS-1$
 	}
 
 	@Override
