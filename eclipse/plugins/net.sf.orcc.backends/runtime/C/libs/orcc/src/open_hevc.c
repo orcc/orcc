@@ -210,3 +210,86 @@ u8 _width, u8 _height)
     ff_hevc_put_weighted_pred_avg4_8_sse(dst, width, src1, src2, width, width, height);
 #endif
 }
+
+void pred_planar_0_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size)
+{
+#ifdef OPEN_HEVC_ENABLE
+    u8 *src        = _src;
+    const u8 *top  = _top + 1;
+    const u8 *left = _left + 1;
+
+    pred_planar_0_8_sse(src, top, left, 64);
+#endif
+}
+void pred_planar_1_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size)
+{
+#ifdef OPEN_HEVC_ENABLE
+    u8 *src        = _src;
+    const u8 *top  = _top + 1;
+    const u8 *left = _left + 1;
+
+    pred_planar_1_8_sse(src, top, left, 64);
+#endif
+}
+
+void pred_planar_2_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size)
+{
+#ifdef OPEN_HEVC_ENABLE
+    u8 *src        = _src;
+    const u8 *top  = _top + 1;
+    const u8 *left = _left + 1;
+
+    pred_planar_2_8_sse(src, top, left, 64);
+#endif
+}
+
+void pred_planar_3_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size)
+{
+#ifdef OPEN_HEVC_ENABLE
+    u8 *src        = _src;
+    const u8 *top  = _top + 1;
+    const u8 *left = _left + 1;
+
+    pred_planar_3_8_sse(src, top, left, 64);
+#endif
+}
+
+void pred_angular_0_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size){
+#ifdef OPEN_HEVC_ENABLE
+	u8 *src        = _src;
+    const u8 *top  = _top + 1;
+    const u8 *left = _left + 1;
+
+	pred_angular_0_8_sse(src, top, left, 64, 0, mode);
+#endif
+}
+
+void pred_angular_1_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size){
+#ifdef OPEN_HEVC_ENABLE
+	u8 *src        = _src;
+    const u8 *top  = _top + 1;
+    const u8 *left = _left + 1;
+
+	pred_angular_1_8_sse(src, top, left, 64, 0, mode);
+#endif
+}
+
+void pred_angular_2_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size){
+#ifdef OPEN_HEVC_ENABLE
+	u8 *src        = _src;
+    const u8 *top  = _top + 1;
+    const u8 *left = _left + 1;
+
+	pred_angular_2_8_sse(src, top, left, 64, 0, mode);
+#endif
+}
+
+void pred_angular_3_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size){
+#ifdef OPEN_HEVC_ENABLE
+	u8 *src        = _src;
+    const u8 *top  = _top + 1;
+    const u8 *left = _left + 1;
+
+	pred_angular_3_8_sse(src, top, left, 64, 0, mode);
+#endif
+}

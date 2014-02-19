@@ -64,6 +64,22 @@ void put_unweighted_pred_orcc(u8 _dst[2][64*64], i16 _src[2][64*64], u8 width, u
 
 void put_unweighted_pred_avg_orcc(u8 _dst[2][64*64], i16 _src[2][64*64], u8 width, u8 height);
 
+void pred_planar_0_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size);
+
+void pred_planar_1_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size);
+
+void pred_planar_2_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size);
+
+void pred_planar_3_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size);
+
+void pred_angular_0_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size);
+
+void pred_angular_1_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size);
+
+void pred_angular_2_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size);
+
+void pred_angular_3_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size);
+
 
 
 
