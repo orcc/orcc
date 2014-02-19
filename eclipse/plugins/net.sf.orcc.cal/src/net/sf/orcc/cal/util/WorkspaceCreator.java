@@ -61,9 +61,9 @@ import org.eclipse.equinox.app.IApplicationContext;
  */
 public class WorkspaceCreator implements IApplication {
 
-	private IProgressMonitor progressMonitor;
-	private String nature;
-	private IWorkspace workspace;
+	private final IProgressMonitor progressMonitor;
+	private final String nature;
+	private final IWorkspace workspace;
 	private boolean isAutoBuildActivated;
 
 	public WorkspaceCreator() {
@@ -104,7 +104,7 @@ public class WorkspaceCreator implements IApplication {
 			OrccException {
 
 		if (!searchFolder.isDirectory()) {
-			throw new OrccException("Bad path to search project : "
+			throw new OrccException("Bad path to search project: "
 					+ searchFolder.getPath());
 		} else {
 			File[] children = searchFolder.listFiles();
@@ -160,8 +160,6 @@ public class WorkspaceCreator implements IApplication {
 
 				workspace.save(true, progressMonitor);
 
-				return IApplication.EXIT_OK;
-
 			} catch (CoreException e) {
 				System.err.println(e.getMessage());
 			} catch (OrccException e) {
@@ -171,16 +169,17 @@ public class WorkspaceCreator implements IApplication {
 			} finally {
 				try {
 					restoreAutoBuild();
+					return IApplication.EXIT_OK;
 				} catch (CoreException e) {
 					System.err.println(e.getMessage());
 				}
 			}
 		} else {
 			System.err
-					.println("Please add the path to a directory containing .project files.");
+					.println("Please add the path to a directories containing projects.");
 		}
 
-		return IApplication.EXIT_RELAUNCH;
+		return IApplication.EXIT_RESTART;
 	}
 
 	/*

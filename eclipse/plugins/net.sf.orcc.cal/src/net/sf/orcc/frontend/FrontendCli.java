@@ -90,10 +90,10 @@ import org.w3c.dom.NodeList;
  */
 public class FrontendCli implements IApplication {
 
-	private List<IProject> orderedProjects;
-	private List<IProject> unorderedProjects;
-	private ResourceSet resourceSet;
-	private IWorkspace workspace;
+	private final List<IProject> orderedProjects;
+	private final List<IProject> unorderedProjects;
+	private final ResourceSet resourceSet;
+	private final IWorkspace workspace;
 	private boolean isAutoBuildActivated;
 
 	public FrontendCli() {
@@ -262,7 +262,7 @@ public class FrontendCli implements IApplication {
 			}
 
 		} catch (CoreException e) {
-			throw new OrccException("Unable to get referenced projects"
+			throw new OrccException("Unable to get referenced projects "
 					+ currentProject.getName());
 		}
 
@@ -549,7 +549,6 @@ public class FrontendCli implements IApplication {
 			restoreAutoBuild();
 
 			workspace.save(true, new NullProgressMonitor());
-
 		} catch (OrccException oe) {
 			System.err.println(oe.getMessage());
 		} catch (CoreException ce) {
@@ -557,12 +556,13 @@ public class FrontendCli implements IApplication {
 		} finally {
 			try {
 				restoreAutoBuild();
+				return IApplication.EXIT_OK;
 			} catch (CoreException e) {
 				System.err.println(e.getMessage());
 			}
 		}
 
-		return IApplication.EXIT_OK;
+		return IApplication.EXIT_RESTART;
 	}
 
 	@Override
