@@ -29,6 +29,22 @@
 
 #include "open_hevc.h"
 
+#include "hevcpred.h"
+#include "hevcdsp.h"
+
+
+static HEVCPredContext hpc;
+static HEVCDSPContext hdc;
+
+int openhevc_init_context()
+{
+    ff_hevc_dsp_init(&hpc, 8);
+    ff_hevc_pred_init(&hpc, 8);
+
+    return 0;
+}
+
+
 void put_hevc_qpel_pixel_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
 u8 _width, u8 _height)
