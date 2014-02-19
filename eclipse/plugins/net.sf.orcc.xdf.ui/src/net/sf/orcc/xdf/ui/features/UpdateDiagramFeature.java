@@ -229,6 +229,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 		// Really delete wrong objects
 		for (final EObject eobject : toDelete) {
+			OrccLogger.noticeln("[" + eobject.getClass().getName() + "] "
+					+ eobject + " deleted.");
 			EcoreUtil.delete(eobject, true);
 		}
 
