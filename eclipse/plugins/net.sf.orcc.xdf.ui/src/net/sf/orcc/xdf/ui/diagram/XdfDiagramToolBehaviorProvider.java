@@ -28,11 +28,19 @@
  */
 package net.sf.orcc.xdf.ui.diagram;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.orcc.xdf.ui.features.GroupInstancesFeature;
 import net.sf.orcc.xdf.ui.features.InstanceDblClickFeature;
+import net.sf.orcc.xdf.ui.features.UpdateRefinementFeature;
+import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
+import net.sf.orcc.xdf.ui.layout.PolylineAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IDoubleClickContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.impl.CreateConnectionContext;
@@ -44,8 +52,10 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.tb.ContextButtonEntry;
+import org.eclipse.graphiti.tb.ContextMenuEntry;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
+import org.eclipse.graphiti.tb.IContextMenuEntry;
 
 /**
  * Define some hacks to customize the way Graphiti works in general.
@@ -126,5 +136,34 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 		}
 
 		return data;
+	}
+
+	/**
+	 * Customize context menu. CustomFeatures are created and arranged here.
+	 */
+	@Override
+	public IContextMenuEntry[] getContextMenu(ICustomContext context) {
+		final List<IContextMenuEntry> contextMenuEntries = new ArrayList<IContextMenuEntry>();
+		
+		ContextMenuEntry entry;
+
+		// 'Set/Update Refinement' menu entry
+		entry = new ContextMenuEntry(new UpdateRefinementFeature(getFeatureProvider()), context);
+		contextMenuEntries.add(entry);
+		
+		// 'Layout Diagram' menu entry
+		entry = new ContextMenuEntry(null, context);
+		entry.setText("Layout Diagram");
+		entry.add(new ContextMenuEntry(new OrthogonalAutoLayoutFeature(getFeatureProvider()), context));
+		entry.add(new ContextMenuEntry(new PolylineAutoLayoutFeature(getFeatureProvider()), context));
+		contextMenuEntries.add(entry);
+		
+		// 'Transformations' menu entry
+		entry = new ContextMenuEntry(null, context);
+		entry.setText("Transformations");
+		entry.add(new ContextMenuEntry(new GroupInstancesFeature(getFeatureProvider()), context));
+		contextMenuEntries.add(entry);
+		
+		return contextMenuEntries.toArray(NO_CONTEXT_MENU_ENTRIES);
 	}
 }

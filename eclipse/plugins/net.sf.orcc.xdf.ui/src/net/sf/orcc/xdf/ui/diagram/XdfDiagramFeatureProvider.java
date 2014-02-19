@@ -29,11 +29,7 @@
 package net.sf.orcc.xdf.ui.diagram;
 
 import net.sf.orcc.xdf.ui.features.DropInstanceFromFileFeature;
-import net.sf.orcc.xdf.ui.features.GroupInstancesFeature;
 import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
-import net.sf.orcc.xdf.ui.features.UpdateRefinementFeature;
-import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
-import net.sf.orcc.xdf.ui.layout.PolylineAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
@@ -73,7 +69,6 @@ import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
 public class XdfDiagramFeatureProvider extends
 		DefaultFeatureProviderWithPatterns {
 
-	private final ICustomFeature[] customFeatures;
 	private final UpdateDiagramFeature updateFeature;
 	private final DropInstanceFromFileFeature dropInstanceFeature;
 
@@ -84,18 +79,15 @@ public class XdfDiagramFeatureProvider extends
 		addPattern(new OutputNetworkPortPattern());
 		addConnectionPattern(new ConnectionPattern());
 
-		customFeatures = new ICustomFeature[] {
-				new UpdateRefinementFeature(this),
-				new OrthogonalAutoLayoutFeature(this),
-				new PolylineAutoLayoutFeature(this),
-				new GroupInstancesFeature(this) };
 		updateFeature = new UpdateDiagramFeature(this);
 		dropInstanceFeature = new DropInstanceFromFileFeature(this);
 	}
 	
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return customFeatures;
+		// Custom features are created in XdfDiagramToolBehaviorProvider. This allows to arrange
+		// these features in sub-menus
+		return super.getCustomFeatures(context);
 	}
 
 	@Override
