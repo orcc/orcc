@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCC_OPEN_HEVC_H_
-#define _ORCC_OPEN_HEVC_H_
+#ifndef _ORCC_OPENHEVC_H_
+#define _ORCC_OPENHEVC_H_
 
 #if defined(__ICC) && __ICC < 1200 || defined(__SUNPRO_C)
     #define DECLARE_ALIGNED(n,t,v)      t __attribute__ ((aligned (n))) v
@@ -63,4 +63,4 @@ void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i
 
 
 
-#endif  /* _ORCC_OPEN_HEVC_H_ */
+#endif  /* _ORCC_OPENHEVC_H_ */

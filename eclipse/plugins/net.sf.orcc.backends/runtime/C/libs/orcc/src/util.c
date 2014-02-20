@@ -138,7 +138,7 @@ void init_orcc(int argc, char *argv[]) {
 #ifdef _MSC_VER
     atexit(&pause);
 #endif
-#ifdef OPEN_HEVC_ENABLE
+#ifdef OPENHEVC_ENABLE
 	openhevc_init_context();
 #endif
 	while ((c = getopt(argc, argv, ostr)) != -1) {
