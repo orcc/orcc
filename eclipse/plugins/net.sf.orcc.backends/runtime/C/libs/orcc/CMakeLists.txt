@@ -59,44 +59,28 @@ else()
     # Try to find SDL on the user system
     find_package(SDL2 QUIET)
     if(SDL2_FOUND)
-        include_directories(
-            ${SDL2_INCLUDE_DIR}
-        )
-        set(orcc_sources
-            ${orcc_sources}
-            src/display_sdl2.c
-        )
+        include_directories(${SDL2_INCLUDE_DIR})
+        list(APPEND orcc_sources src/display_sdl2.c)
     else()
         find_package(SDL REQUIRED)
         if(SDL_FOUND)
-            include_directories(
-                ${SDL_INCLUDE_DIR}
-            )
-            set(orcc_sources
-                ${orcc_sources}
-                src/display_sdl.c
-            )
+            include_directories(${SDL_INCLUDE_DIR})
+            list(APPEND orcc_sources src/display_sdl.c)
         endif()
     endif()
 
-    option(USE_OPENHEVC "Try to find OpenHEVC library to link against" 0)
+    option(USE_OPENHEVC "Try to find OpenHEVC library and link against" 0)
     if(USE_OPENHEVC)
         find_package(OPENHEVC QUIET)
         if(OPENHEVC_FOUND)
-            include_directories(
-                ${OPENHEVC_INCLUDE_DIR}
-            )
-
+            include_directories(${OPENHEVC_INCLUDE_DIR})
             # Defines OPEN_HEVC_ENABLE constant for the current directory
             add_definitions(-DOPEN_HEVC_ENABLE)
             # Defines the constant in the root project directory, and its sub-directories
             # This avoid need for OpenHevc stuff in generated application CMakeLists
             set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS OPEN_HEVC_ENABLE)
 
-            set(orcc_sources
-                ${orcc_sources}
-                src/open_hevc.c
-            )
+            list(APPEND orcc_sources src/open_hevc.c)
             message(STATUS "Find OPENHEVC: ${OPENHEVC_LIBRARY}")
         else()
             message(STATUS "Cannot find OPENHEVC")
@@ -139,5 +123,4 @@ else()
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
     )
-
 endif()
