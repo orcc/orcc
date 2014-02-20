@@ -29,9 +29,27 @@
 
 #include "open_hevc.h"
 
-void put_hevc_qpel_pixel_orcc(i16 _dst[2][64*64], u8 listIdx,
+#include "hevcpred.h"
+#include "hevcdsp.h"
+
+
+static HEVCPredContext hevcPred;
+static HEVCDSPContext hevcDsp;
+
+int openhevc_init_context()
+{
+#ifdef OPEN_HEVC_ENABLE
+    ff_hevc_dsp_init(&hevcDsp, 8);
+    ff_hevc_pred_init(&hevcPred, 8);
+#endif
+
+    return 0;
+}
+
+
+void put_hevc_qpel_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height)
+u8 _width, u8 _height, i32 mx, i32 my)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[3+3*srcstride];
@@ -40,18 +58,18 @@ u8 _width, u8 _height)
     u8 height = _height + 1;
 
     if(width == 16 || width == 32 || width == 64) {
-        ff_hevc_put_hevc_pel_pixels16_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+        hevcDsp.put_hevc_qpel[2][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
     } else if(width == 8 || width == 24) {
-        ff_hevc_put_hevc_pel_pixels8_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+        hevcDsp.put_hevc_qpel[1][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
     } else {
-        ff_hevc_put_hevc_pel_pixels4_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+        hevcDsp.put_hevc_qpel[0][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
     }
 #endif
 }
 
-void put_hevc_epel_pixel_orcc(i16 _dst[2][64*64], u8 listIdx,
+void put_hevc_epel_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height)
+u8 _width, u8 _height, i32 mx, i32 my)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[1+1*srcstride];
@@ -60,13 +78,13 @@ u8 _width, u8 _height)
     u8 height = _height + 1;
 
     if(width == 16 || width == 32 || width == 64) {
-        ff_hevc_put_hevc_pel_pixels16_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+        hevcDsp.put_hevc_epel[3][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
     } else if(width == 8 || width == 24) {
-        ff_hevc_put_hevc_pel_pixels8_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+        hevcDsp.put_hevc_epel[2][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
     } else if(width == 4 || width == 12 || width == 20) {
-        ff_hevc_put_hevc_pel_pixels4_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+        hevcDsp.put_hevc_epel[1][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
     } else {
-        ff_hevc_put_hevc_pel_pixels2_8_sse(dst, width, src, srcstride, width, height, 0, 0);
+        hevcDsp.put_hevc_epel[0][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
     }
 #endif
 }
@@ -82,9 +100,9 @@ i32 filterIdx,  u8 _width, u8 _height)
     u8 height = _height + 1;
 
     if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
-        ff_hevc_put_hevc_qpel_h8_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+        hevcDsp.put_hevc_qpel[1][0][1](dst, width, src, srcstride, width, height, filterIdx, 0);
     } else {
-        ff_hevc_put_hevc_qpel_h4_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+        hevcDsp.put_hevc_qpel[0][0][1](dst, width, src, srcstride, width, height, filterIdx, 0);
     }
 #endif
 }
@@ -100,16 +118,17 @@ i32 filterIdx,  u8 _width, u8 _height)
     u8 height = _height + 1;
 
     if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
-        ff_hevc_put_hevc_qpel_v8_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+        hevcDsp.put_hevc_qpel[1][1][0](dst, width, src, srcstride, width, height, 0, filterIdx);
+
     } else {
-        ff_hevc_put_hevc_qpel_v4_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+        hevcDsp.put_hevc_qpel[0][1][0](dst, width, src, srcstride, width, height, 0, filterIdx);
     }
 #endif
 }
 
 void put_hevc_epel_h_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 _width, u8 _height)
+u8 _width, u8 _height, i32 mx, i32 my)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[1+1*srcstride];
@@ -118,18 +137,18 @@ i32 filterIdx,  u8 _width, u8 _height)
     u8 height = _height + 1;
 
     if(width == 8 || width == 16 || width == 24 || width == 32) {
-        ff_hevc_put_hevc_epel_h8_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+        hevcDsp.put_hevc_epel[2][0][1](dst, width, src, srcstride, width, height, mx, my);
     } else if(width == 4 || width == 12) {
-        ff_hevc_put_hevc_epel_h4_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+        hevcDsp.put_hevc_epel[1][0][1](dst, width, src, srcstride, width, height, mx, my);
     } else {
-        ff_hevc_put_hevc_epel_h2_8_sse(dst, width, src, srcstride, width, height, filterIdx, 0);
+        hevcDsp.put_hevc_epel[0][0][1](dst, width, src, srcstride, width, height, mx, my);
     }
 #endif
 }
 
 void put_hevc_epel_v_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 _width, u8 _height)
+u8 _width, u8 _height, i32 mx, i32 my)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[1+1*srcstride];
@@ -138,11 +157,11 @@ i32 filterIdx,  u8 _width, u8 _height)
     u8 height = _height + 1;
 
     if(width == 8 || width == 16 || width == 24 || width == 32) {
-        ff_hevc_put_hevc_epel_v8_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+        hevcDsp.put_hevc_epel[2][1][0](dst, width, src, srcstride, width, height, mx, my);
     } else if(width == 4 || width == 12) {
-        ff_hevc_put_hevc_epel_v4_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+        hevcDsp.put_hevc_epel[1][1][0](dst, width, src, srcstride, width, height, mx, my);
     } else {
-        ff_hevc_put_hevc_epel_v2_8_sse(dst, width, src, srcstride, width, height, 0, filterIdx);
+        hevcDsp.put_hevc_epel[0][1][0](dst, width, src, srcstride, width, height, mx, my);
     }
 #endif
 }
@@ -158,27 +177,29 @@ i32 filterIdx[2],  u8 _width, u8 _height)
     u8 height = _height + 1;
 
     if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
-        ff_hevc_put_hevc_qpel_hv8_8_sse(dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
+        hevcDsp.put_hevc_qpel[1][1][1](dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
     } else {
-        ff_hevc_put_hevc_qpel_hv4_8_sse(dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
+        hevcDsp.put_hevc_qpel[0][1][1](dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
     }
 #endif
 }
 
 void put_hevc_epel_hv_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
-i32 filterIdx[2],  u8 width, u8 height)
+u8 _width, u8 _height, i32 mx, i32 my)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8  *src = &_src[1+1*srcstride];
     i16 *dst = _dst[listIdx];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
 
     if(width == 8 || width == 16 || width == 24 || width == 32) {
-        ff_hevc_put_hevc_epel_hv8_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1]);
+        hevcDsp.put_hevc_epel[2][1][1](dst, width, src, srcstride, width, height, mx, my);
     } else if(width == 4 || width == 12) {
-        ff_hevc_put_hevc_epel_hv4_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1]);
+        hevcDsp.put_hevc_epel[1][1][1](dst, width, src, srcstride, width, height, mx, my);
     } else {
-        ff_hevc_put_hevc_epel_hv2_8_sse(dst, width + 1, src, srcstride, width + 1, height + 1, filterIdx[0], filterIdx[1]);
+        hevcDsp.put_hevc_epel[0][1][1](dst, width, src, srcstride, width, height, mx, my);
     }
 #endif
 }
@@ -192,10 +213,9 @@ u8 _width, u8 _height, u8 rdList)
     u8 width = _width + 1;
     u8 height = _height + 1;
 
-    ff_hevc_put_unweighted_pred4_8_sse(dst, width, src, width, width, height);
+    hevcDsp.put_unweighted_pred[0](dst, width, src, width, width, height);
 #endif
 }
-
 
 void put_unweighted_pred_avg_orcc(u8 _dst[2][64*64], i16 _src[2][64*64],
 u8 _width, u8 _height)
@@ -207,89 +227,27 @@ u8 _width, u8 _height)
     u8 width = _width + 1;
     u8 height = _height + 1;
 
-    ff_hevc_put_weighted_pred_avg4_8_sse(dst, width, src1, src2, width, width, height);
+    hevcDsp.put_weighted_pred_avg[0](dst, width, src1, src2, width, width, height);
 #endif
 }
 
-void pred_planar_0_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size)
+void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 log2size)
 {
 #ifdef OPEN_HEVC_ENABLE
     u8 *src        = _src;
     const u8 *top  = _top + 1;
     const u8 *left = _left + 1;
 
-    pred_planar_0_8_sse(src, top, left, 64);
-#endif
-}
-void pred_planar_1_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size)
-{
-#ifdef OPEN_HEVC_ENABLE
-    u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
-
-    pred_planar_1_8_sse(src, top, left, 64);
+    hevcPred.pred_planar[log2size - 2](src, top, left, stride);
 #endif
 }
 
-void pred_planar_2_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size)
-{
-#ifdef OPEN_HEVC_ENABLE
-    u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
-
-    pred_planar_2_8_sse(src, top, left, 64);
-#endif
-}
-
-void pred_planar_3_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 _size)
-{
-#ifdef OPEN_HEVC_ENABLE
-    u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
-
-    pred_planar_3_8_sse(src, top, left, 64);
-#endif
-}
-
-void pred_angular_0_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size){
+void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 log2size){
 #ifdef OPEN_HEVC_ENABLE
 	u8 *src        = _src;
     const u8 *top  = _top + 1;
     const u8 *left = _left + 1;
 
-	pred_angular_0_8_sse(src, top, left, 64, 0, mode);
-#endif
-}
-
-void pred_angular_1_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size){
-#ifdef OPEN_HEVC_ENABLE
-	u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
-
-	pred_angular_1_8_sse(src, top, left, 64, 0, mode);
-#endif
-}
-
-void pred_angular_2_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size){
-#ifdef OPEN_HEVC_ENABLE
-	u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
-
-	pred_angular_2_8_sse(src, top, left, 64, 0, mode);
-#endif
-}
-
-void pred_angular_3_8_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 _size){
-#ifdef OPEN_HEVC_ENABLE
-	u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
-
-	pred_angular_3_8_sse(src, top, left, 64, 0, mode);
+    hevcPred.pred_angular[log2size - 2](src, top, left, stride, idx, mode);
 #endif
 }

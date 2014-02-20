@@ -138,6 +138,8 @@ void init_orcc(int argc, char *argv[]) {
 #ifdef _MSC_VER
     atexit(&pause);
 #endif
+
+    openhevc_init_context();
 	
 	while ((c = getopt(argc, argv, ostr)) != -1) {
 		switch (c) {
