@@ -37,6 +37,7 @@ else()
         src/serialize.c
         src/thread.c
     )
+    set(orcc_additional_libraries)
 
     # Helps CMake to find SDL libraries (Windows only)
     if(WIN32)
@@ -61,11 +62,13 @@ else()
     if(SDL2_FOUND)
         include_directories(${SDL2_INCLUDE_DIR})
         list(APPEND orcc_sources src/display_sdl2.c)
+        list(APPEND orcc_additional_libraries ${SDL2_LIBRARY})
     else()
         find_package(SDL REQUIRED)
         if(SDL_FOUND)
             include_directories(${SDL_INCLUDE_DIR})
             list(APPEND orcc_sources src/display_sdl.c)
+            list(APPEND orcc_additional_libraries ${SDL_LIBRARY})
         endif()
     endif()
 
@@ -81,6 +84,7 @@ else()
             set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS OPEN_HEVC_ENABLE)
 
             list(APPEND orcc_sources src/open_hevc.c)
+            list(APPEND orcc_additional_libraries ${OPENHEVC_LIBRARY})
             message(STATUS "Find OPENHEVC: ${OPENHEVC_LIBRARY}")
         else()
             message(STATUS "Cannot find OPENHEVC")
@@ -90,30 +94,20 @@ else()
     find_package(METIS QUIET)
     if(METIS_FOUND)
         add_definitions(-DMETIS_ENABLE)
+        list(APPEND orcc_additional_libraries metis m)
     endif()
 
     # Compile libraries
     add_library(orcc STATIC ${orcc_sources} ${orcc_headers})
-
     # Do the linking
-    if(SDL2_FOUND)
-        target_link_libraries(orcc roxml ${SDL2_LIBRARY})
-    elseif(SDL_FOUND)
-        target_link_libraries(orcc roxml ${SDL_LIBRARY})
-    endif()
-    if(OPENHEVC_FOUND)
-        target_link_libraries(orcc ${OPENHEVC_LIBRARY})
-    endif()
-    if(METIS_FOUND)
-        target_link_libraries(orcc metis m)
-    endif()
+    target_link_libraries(orcc roxml ${orcc_additional_libraries})
 
+    # orcc-map
     set(orccmap_sources
         include/serialize.h
         src/serialize.c
         src/main.c
     )
-
     # Compile executable
     add_executable(orcc-map ${orccmap_sources})
     target_link_libraries(orcc-map orcc roxml)
