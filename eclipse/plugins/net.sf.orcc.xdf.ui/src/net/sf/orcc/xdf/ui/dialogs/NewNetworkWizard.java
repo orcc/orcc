@@ -129,14 +129,18 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 			// We don't want "Advanced" section to be displayed.
 			@Override
 			protected void createAdvancedControls(Composite parent) {
-				// Does nothing, DO NOT REMOVE. Overwrides this annoying default
-				// method
+				// Does nothing, DO NOT REMOVE. Overwrites link related stuff
 			}
 
-			// Idem
 			@Override
 			protected IStatus validateLinkedResource() {
+				// Does nothing, DO NOT REMOVE. Overwrites link related stuff
 				return Status.OK_STATUS;
+			}
+
+			@Override
+			protected void createLinkTarget() {
+				// Does nothing, DO NOT REMOVE. Overwrites link related stuff
 			}
 		};
 		page.setFileExtension(Activator.NETWORK_SUFFIX);
