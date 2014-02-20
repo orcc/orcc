@@ -79,25 +79,28 @@ else()
         endif()
     endif()
 
-    find_package(OPENHEVC QUIET)
-    if(OPENHEVC_FOUND)
-        include_directories(
-            ${OPENHEVC_INCLUDE_DIR}
-        )
+    option(USE_OPENHEVC "Try to find OpenHEVC library to link against" 0)
+    if(USE_OPENHEVC)
+        find_package(OPENHEVC QUIET)
+        if(OPENHEVC_FOUND)
+            include_directories(
+                ${OPENHEVC_INCLUDE_DIR}
+            )
 
-        # Defines OPEN_HEVC_ENABLE constant for the current directory
-        add_definitions(-DOPEN_HEVC_ENABLE)
-        # Defines the constant in the root project directory, and its sub-directories
-        # This avoid need for OpenHevc stuff in generated application CMakeLists
-        set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS OPEN_HEVC_ENABLE)
+            # Defines OPEN_HEVC_ENABLE constant for the current directory
+            add_definitions(-DOPEN_HEVC_ENABLE)
+            # Defines the constant in the root project directory, and its sub-directories
+            # This avoid need for OpenHevc stuff in generated application CMakeLists
+            set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS OPEN_HEVC_ENABLE)
 
-        set(orcc_sources
-            ${orcc_sources}
-            src/open_hevc.c
-        )
-        message(STATUS "Find OPENHEVC: ${OPENHEVC_LIBRARY}")
-    else()
-        message(STATUS "Cannot find OPENHEVC")
+            set(orcc_sources
+                ${orcc_sources}
+                src/open_hevc.c
+            )
+            message(STATUS "Find OPENHEVC: ${OPENHEVC_LIBRARY}")
+        else()
+            message(STATUS "Cannot find OPENHEVC")
+        endif()
     endif()
 
     find_package(METIS QUIET)
