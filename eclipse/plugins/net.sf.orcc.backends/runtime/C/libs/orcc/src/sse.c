@@ -201,7 +201,7 @@ void getCuSample_isInterRes_orcc(
  ***********************************************************************************************************************************/
 #define BORDER_SIZE 128
 
-void getCuPixDone_cal(
+void getCuPixDone_luma_orcc(
 	u8 pictureBuffer[17][2304][4352],
 	i8 lastIdx,
 	int xSize,
@@ -248,6 +248,68 @@ void getCuPixDone_cal(
     tmp_pictureBuffer0 = pictureBuffer[lastIdx][y][xSize + border_size - 1];
     pm128iPictureBuffer = (__m128i *) &pictureBuffer[lastIdx][y][border_size];
     pm128iPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][y][border_size + xSize + border_size];
+    m128iWord = _mm_set1_epi8(tmp_pictureBuffer);
+    m128iWord0 = _mm_set1_epi8(tmp_pictureBuffer0);
+    x = 0;
+    while (x <= iLoopCount) {
+      _mm_storeu_si128(pm128iPictureBuffer, m128iWord);
+      _mm_storeu_si128(pm128iPictureBuffer0, m128iWord0);
+      pm128iPictureBuffer++;
+      pm128iPictureBuffer0++;
+      x = x + 1;
+    }
+    y = y + 1;
+  }
+}
+
+
+void getCuPixDone_chroma_orcc(
+	u8 pictureBuffer[17][768][1280],
+	i8 lastIdx,
+	int xSize,
+	int ySize,
+	u16 border_size)
+{
+  int y, x;
+  u8 tmp_pictureBuffer;
+  u8 tmp_pictureBuffer0;
+
+  __m128i * __restrict pm128iPictureBuffer;
+  __m128i * __restrict pm128iPictureBuffer0;
+  __m128i * __restrict pm128iPictureBuffer1;
+  __m128i * __restrict pm128iPictureBuffer2;
+  __m128i m128iWord, m128iWord0;
+
+  int iLoopCount = (xSize >> 4) - 1;
+
+  y = 0;
+  while (y <= border_size - 1) {
+    pm128iPictureBuffer1 = (__m128i *) &pictureBuffer[lastIdx][border_size][border_size];
+    pm128iPictureBuffer2 = (__m128i *) &pictureBuffer[lastIdx][ySize + border_size - 1][border_size];
+    pm128iPictureBuffer  = (__m128i *) &pictureBuffer[lastIdx][y][border_size];
+    pm128iPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][y + ySize + border_size][border_size];
+    x = 0;
+    while (x <= iLoopCount) {
+      m128iWord = _mm_loadu_si128(pm128iPictureBuffer1);
+      m128iWord0 = _mm_loadu_si128(pm128iPictureBuffer2);
+      _mm_storeu_si128(pm128iPictureBuffer, m128iWord);
+      _mm_storeu_si128(pm128iPictureBuffer0, m128iWord0);
+      pm128iPictureBuffer1++;
+      pm128iPictureBuffer2++;
+      pm128iPictureBuffer++;
+      pm128iPictureBuffer0++;
+      x = x + 1;
+    }
+    y = y + 1;
+  }
+
+  iLoopCount = (border_size >> 4) - 1;
+  y = 0;
+  while (y <= ySize + 2 * border_size - 1) {
+    tmp_pictureBuffer = pictureBuffer[lastIdx][y][border_size];
+    tmp_pictureBuffer0 = pictureBuffer[lastIdx][y][xSize + border_size - 1];
+    pm128iPictureBuffer = (__m128i *) &pictureBuffer[lastIdx][y][0];
+    pm128iPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][y][0 + xSize + border_size];
     m128iWord = _mm_set1_epi8(tmp_pictureBuffer);
     m128iWord0 = _mm_set1_epi8(tmp_pictureBuffer0);
     x = 0;

@@ -72,8 +72,15 @@ void getCuSample_isInterRes_orcc(
 
 #define BORDER_SIZE 128
 
-void getCuPixDone_cal(
+void getCuPixDone_luma_orcc(
 	u8 pictureBuffer[17][2304][4352],
+	i8 lastIdx,
+	int xSize,
+	int ySize,
+	u16 border_size);
+
+void getCuPixDone_chroma_orcc(
+	u8 pictureBuffer[17][768][1280],
 	i8 lastIdx,
 	int xSize,
 	int ySize,
