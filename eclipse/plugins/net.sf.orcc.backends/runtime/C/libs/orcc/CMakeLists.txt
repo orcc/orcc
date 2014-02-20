@@ -85,16 +85,24 @@ else()
 
             list(APPEND orcc_sources src/open_hevc.c)
             list(APPEND orcc_additional_libraries ${OPENHEVC_LIBRARY})
-            message(STATUS "Find OPENHEVC: ${OPENHEVC_LIBRARY}")
+            message(STATUS "Find OpenHEVC: ${OPENHEVC_LIBRARY}")
         else()
-            message(STATUS "Cannot find OPENHEVC")
+            message(STATUS "Cannot find OpenHEVC")
         endif()
     endif()
 
-    find_package(METIS QUIET)
-    if(METIS_FOUND)
-        add_definitions(-DMETIS_ENABLE)
-        list(APPEND orcc_additional_libraries metis m)
+    option(USE_METIS "Try to find Metis library and link against" 0)
+    if(USE_METIS)
+        find_package(METIS QUIET)
+        if(METIS_FOUND)
+            # Defines METIS_ENABLE constant for the current directory
+            add_definitions(-DMETIS_ENABLE)
+
+            list(APPEND orcc_additional_libraries ${METIS_LIBRARY})
+            message(STATUS "Find Metis: ${METIS_LIBRARY}")
+        else()
+            message(STATUS "Cannot find Metis")
+        endif()
     endif()
 
     # Compile libraries
@@ -102,13 +110,12 @@ else()
     # Do the linking
     target_link_libraries(orcc roxml ${orcc_additional_libraries})
 
-    # orcc-map
+    # Build orcc-map as a standalone exectuable
     set(orccmap_sources
         include/serialize.h
         src/serialize.c
         src/main.c
     )
-    # Compile executable
     add_executable(orcc-map ${orccmap_sources})
     target_link_libraries(orcc-map orcc roxml)
 
