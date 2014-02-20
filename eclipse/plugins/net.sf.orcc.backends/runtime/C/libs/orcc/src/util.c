@@ -138,9 +138,9 @@ void init_orcc(int argc, char *argv[]) {
 #ifdef _MSC_VER
     atexit(&pause);
 #endif
-
-    openhevc_init_context();
-	
+#ifdef OPEN_HEVC_ENABLE
+	openhevc_init_context();
+#endif
 	while ((c = getopt(argc, argv, ostr)) != -1) {
 		switch (c) {
 		case '?': // BADCH

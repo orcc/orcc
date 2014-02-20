@@ -34,7 +34,6 @@ else()
         src/compareyuv.c
         src/fps_print.c
         src/mapping.c
-        src/open_hevc.c
         src/serialize.c
         src/thread.c
     )
@@ -92,6 +91,10 @@ else()
         # This avoid need for OpenHevc stuff in generated application CMakeLists
         set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS OPEN_HEVC_ENABLE)
 
+        set(orcc_sources
+            ${orcc_sources}
+            src/open_hevc.c
+        )
         message(STATUS "Find OPENHEVC: ${OPENHEVC_LIBRARY}")
     else()
         message(STATUS "Cannot find OPENHEVC")
