@@ -244,10 +244,10 @@ void getCuPixDone_luma_orcc(
   iLoopCount = (border_size >> 4) - 1;
   y = 0;
   while (y <= ySize + 2 * border_size - 1) {
-    tmp_pictureBuffer = pictureBuffer[lastIdx][y][border_size];
-    tmp_pictureBuffer0 = pictureBuffer[lastIdx][y][xSize + border_size - 1];
-    pm128iPictureBuffer = (__m128i *) &pictureBuffer[lastIdx][y][border_size];
-    pm128iPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][y][border_size + xSize + border_size];
+	tmp_pictureBuffer = pictureBuffer[lastIdx][y][border_size];
+	tmp_pictureBuffer0 = pictureBuffer[lastIdx][y][xSize + border_size - 1];
+	pm128iPictureBuffer = (__m128i *) &pictureBuffer[lastIdx][y][0];
+	pm128iPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][y][0 + xSize + border_size];
     m128iWord = _mm_set1_epi8(tmp_pictureBuffer);
     m128iWord0 = _mm_set1_epi8(tmp_pictureBuffer0);
     x = 0;
