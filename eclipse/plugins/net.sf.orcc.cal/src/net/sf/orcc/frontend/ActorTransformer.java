@@ -75,6 +75,7 @@ import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.OpBinary;
@@ -483,22 +484,28 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 *         variable
 	 */
 	private boolean needToBeCopied(AstExpression expr) {
-		// if the expression is not a variable, it cannot be used directly
+		// Expressions that are not variables cannot be used directly
 		if (!(expr instanceof ExpressionVariable)) {
 			return true;
 		}
-		// if it's a global variable, it have to be copied to the fifo
+		// Global variables have to be copied to the FIFO
 		Variable variable = ((ExpressionVariable) expr).getValue()
 				.getVariable();
 		if (Util.isGlobal(variable)) {
 			return true;
 		}
-		// if it's an input port variable, it have to be copied to the output
-		// fifo too
+		// Input port variables have to be copied as well
 		Var var = Frontend.getMapping(variable);
 		if (EcoreHelper.getContainerOfType(var, Pattern.class) != null) {
 			return true;
 		}
+		// Variables used by a procedure have to be copied as well
+		for(Use use: var.getUses()) {
+			if(EcoreHelper.getContainerOfType(use, InstCall.class) != null) {
+				return true;
+			}
+		}
+		
 		return false;
 	}
 
