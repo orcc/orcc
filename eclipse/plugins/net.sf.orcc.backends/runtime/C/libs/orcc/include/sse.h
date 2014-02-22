@@ -42,29 +42,42 @@
 /***********************************************************************************************************************************
  SelectCu 
  ***********************************************************************************************************************************/
-#define SCU_SIZE 16
+void copy_8_8_16_orcc(
+  u8 inputSample[16],
+  u8 outputSample[16]);
 
-void getCuSample_isIntra_orcc(
-  u8 tokens_IntraSample[SCU_SIZE],
-  i16 tokens_ResidualSample[SCU_SIZE],
-  u8 tokens_Sample[SCU_SIZE],
-  u8 scu_size);
-
-void getCuSample_isInter_orcc(
-  i16 tokens_InterSample[SCU_SIZE],
-  u8 interSamp[16][16][SCU_SIZE],
+void copy_8_8_16_output1616_orcc(
+  u8 inputSample[16],
+  u8 outputSample[16][16][16],
   u32 xIdx,
   u32 xOff,
   u32 yIdx,
-  u32 yOff,
-  u8 scu_size);
+  u32 yOff);
 
-void getCuSample_isInterRes_orcc(
-  u8 interSamp[16][16][SCU_SIZE],
-  i16 tokens_ResidualSample[SCU_SIZE],
-  u8 tokens_Sample[SCU_SIZE],
-  u16 interIdx[2],
-  u8 scu_size);
+void add_8_16_clip_8_orcc(
+  u8 predSample[8],
+  i16 resSample[8],
+  u8 Sample[8]);
+
+void add_8_16_clip_16_orcc(
+  u8 predSample[16],
+  i16 resSample[16],
+  u8 Sample[16]);
+
+void add_8_16_clip_24_orcc(
+  u8 predSample[24],
+  i16 resSample[24],
+  u8 Sample[24]);
+
+void add_8_16_clip_32_orcc(
+  u8 predSample[32],
+  i16 resSample[32],
+  u8 Sample[32]);
+
+void add_8_16_clip_64_orcc(
+  u8 predSample[64],
+  i16 resSample[64],
+  u8 Sample[64]);
 
 /***********************************************************************************************************************************
  DecodingPictureBuffer 

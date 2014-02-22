@@ -41,167 +41,145 @@
 
 #include "emmintrin.h"
 
+
 /***********************************************************************************************************************************
  SelectCu 
  ***********************************************************************************************************************************/
-#define SCU_SIZE 16
 
-void getCuSample_isIntra_orcc(
-    u8 tokens_IntraSample[SCU_SIZE],
-    i16 tokens_ResidualSample[SCU_SIZE],
-    u8 tokens_Sample[SCU_SIZE],
-    u8 scu_size)
-{
-  int i = 0;
-  u8 ucScuSize = scu_size;
-  u8 * __restrict pucTokensIntraSample = tokens_IntraSample;
-  i16 * __restrict psTokensResidualSample = tokens_ResidualSample;
-  u8 * __restrict pucTokensSample = tokens_Sample;
+#define SCU_SIZE_DIV16(H) (H >> 4)
+#define SCU_SIZE_MOD8(H) (H & 0x07)
 
-  __m128i * pm128iTokensIntraSample = (__m128i *) &pucTokensIntraSample[0];
-  __m128i m128itmp_IntraSample;
-  __m128i * pm128iTokensResidualSample = (__m128i *) &psTokensResidualSample[0];
-  __m128i m128itmp_ResidualSample;
-  __m128i m128itmp_add_i16_0, m128itmp_add_i16_1;
-  __m128i * pm128iTokensSample = (__m128i *) &pucTokensSample[0];
-  __m128i m128iZero = _mm_set1_epi16(0);
-
-  i = 0;
-  while (ucScuSize >= 16)
-  {
-    m128itmp_IntraSample = 
-      _mm_unpacklo_epi8( // 8 unsigned char --> 8 short
-      _mm_loadu_si128(pm128iTokensIntraSample + i), // 16 unsigned char
-      m128iZero); // 8 shorts
-    m128itmp_ResidualSample = _mm_loadu_si128(pm128iTokensResidualSample + i); // 8 short
-    m128itmp_add_i16_0 = _mm_add_epi16(m128itmp_IntraSample, m128itmp_ResidualSample); // 8 short
-
-    m128itmp_IntraSample = 
-      _mm_unpackhi_epi8( // 8 unsigned char --> 8 short
-      _mm_loadu_si128(pm128iTokensIntraSample + i), // 16 unsigned char (same as above)
-      m128iZero); // 8 shorts
-    m128itmp_ResidualSample = _mm_loadu_si128(pm128iTokensResidualSample + i + 1); // 8 short
-    m128itmp_add_i16_1 = _mm_add_epi16(m128itmp_IntraSample, m128itmp_ResidualSample); // 8 short
-
-    _mm_storeu_si128(pm128iTokensSample + (i >> 1), _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1)); // u8
-
-    ucScuSize -= 16;
-    i = i + 2;
-  }
-
-  if (ucScuSize == 8)
-  {
-    m128itmp_IntraSample = 
-      _mm_unpacklo_epi8( // 8 unsigned char --> 8 short
-      _mm_loadl_epi64(pm128iTokensIntraSample + (i >> 1)), // 8 unsigned char (lower 64 bits, higher set to 0)
-      m128iZero);
-    m128itmp_ResidualSample = _mm_loadu_si128(pm128iTokensResidualSample + i);
-    m128itmp_add_i16_0 = _mm_add_epi16(m128itmp_IntraSample, m128itmp_ResidualSample);
-
-    m128itmp_add_i16_1 = _mm_set1_epi16(0);
-
-    _mm_storel_epi64(pm128iTokensSample + (i >> 1), _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1)); // u8
-  }
+// copy 8-bits elements into a 8-bits array, for H elements
+#define COPY_8_8(H)                                                                                                                    \
+void copy_8_8_ ## H ## _orcc(                                                                                                          \
+  u8 inputSample[## H],                                                                                                                \
+  u8 outputSample[## H])                                                                                                               \
+{                                                                                                                                      \
+  int i = 0;                                                                                                                           \
+  __m128i * pm128iOutputSample = (__m128i *) &outputSample[0];                                                                         \
+  __m128i * pm128iInputSample = (__m128i *) &inputSample[0];                                                                           \
+  __m128i m128iInputSample;                                                                                                            \
+                                                                                                                                       \
+  i = 0;                                                                                                                               \
+  for (i = 0; i < SCU_SIZE_DIV16(## H); i++)                                                                                           \
+  {                                                                                                                                    \
+    m128iInputSample = _mm_loadu_si128(pm128iInputSample + i);                                                                         \
+    _mm_storeu_si128(pm128iOutputSample + i, m128iInputSample);                                                                        \
+  }                                                                                                                                    \
+                                                                                                                                       \
+  if (SCU_SIZE_MOD8(## H))                                                                                                             \
+  {                                                                                                                                    \
+    pm128iOutputSample = (__m128i *) &outputSample[## H - 8];                                                                          \
+    pm128iInputSample = (__m128i *) &inputSample[## H - 8];                                                                            \
+    m128iInputSample = _mm_loadl_epi64(pm128iInputSample);                                                                             \
+    _mm_storel_epi64(pm128iOutputSample, m128iInputSample);                                                                            \
+  }                                                                                                                                    \
 }
 
+// Declare more functions if needed
+COPY_8_8(16)
 
-void getCuSample_isInter_orcc(
-  i16 tokens_InterSample[SCU_SIZE],
-  u8 interSamp[16][16][SCU_SIZE],
-  u32 xIdx,
-  u32 xOff,
-  u32 yIdx,
-  u32 yOff,
-  u8 scu_size)
-{
-  int i = 0;
-  u8 ucScuSize = scu_size;
-  __m128i * pm128iInterSamp = (__m128i *) &interSamp[xIdx + xOff][yIdx + yOff][0];
-  __m128i * pm128iTokensInterSample = (__m128i *) &tokens_InterSample[0];
-  __m128i m128iTokensInterSample;
 
-  i = 0;
-  while (ucScuSize >= 16)
-  {
-    m128iTokensInterSample = _mm_loadu_si128(pm128iTokensInterSample + i);
-    _mm_storeu_si128(pm128iInterSamp + i, m128iTokensInterSample); // u8
-
-    ucScuSize -= 16;
-    i = i + 1;
-  }
-
-  if (ucScuSize == 8)
-  {
-    pm128iInterSamp = (__m128i *) &interSamp[xIdx][yIdx][scu_size - 8];
-    pm128iTokensInterSample = (__m128i *) &tokens_InterSample[scu_size - 8];
-    m128iTokensInterSample = _mm_loadl_epi64(pm128iTokensInterSample);
-    _mm_storel_epi64(pm128iInterSamp, m128iTokensInterSample); // u8
-  }
+// copy 8-bits elements into a 8-bits array, for J elements. Output array is HxK
+#define COPY_8_8_OUTPUT(H, K, J)                                                                                                       \
+void copy_8_8_ ## J ## _output ## H ## ## K ## _orcc(                                                                                         \
+  u8 inputSample[## J],                                                                                                                \
+  u8 outputSample[## H][## K][## J],                                                                                                   \
+  u32 xIdx,                                                                                                                            \
+  u32 xOff,                                                                                                                            \
+  u32 yIdx,                                                                                                                            \
+  u32 yOff)                                                                                                                            \
+{                                                                                                                                      \
+  copy_8_8_ ## J ## _orcc(                                                                                                             \
+	inputSample,                                                                                                                       \
+	outputSample[xIdx + xOff][yIdx + yOff]);                                                                                           \
 }
 
+// Declare more functions if needed
+COPY_8_8_OUTPUT(16, 16, 16)
 
-void getCuSample_isInterRes_orcc(
-  u8 interSamp[16][16][SCU_SIZE],
-  i16 tokens_ResidualSample[SCU_SIZE],
-  u8 tokens_Sample[SCU_SIZE],
-  u16 interIdx[2],
-  u8 scu_size)
-{
-  int i = 0;
-  u8 ucScuSize = scu_size;
 
-  __m128i * pm128iInterSamp = (__m128i *) &interSamp[interIdx[0]][interIdx[1]][0];
-  __m128i m128itmp_interSamp;
-  __m128i * pm128iTokensResidualSample = (__m128i *) &tokens_ResidualSample[0];
-  __m128i m128itmp_ResidualSample;
-  __m128i m128itmp_add_i16_0, m128itmp_add_i16_1;
-  __m128i * pm128iTokensSample = (__m128i *) &tokens_Sample[0];
-  __m128i m128iZero = _mm_set1_epi16(0);
-
-  i = 0;
-  while (ucScuSize >= 16)
-  {
-    m128itmp_interSamp = 
-      _mm_unpacklo_epi8( // 8 unsigned char --> 8 short
-      _mm_loadu_si128(pm128iInterSamp + i), // 16 unsigned char
-      m128iZero); // 8 shorts
-    m128itmp_ResidualSample = _mm_loadu_si128(pm128iTokensResidualSample + i); // 8 short
-    m128itmp_add_i16_0 = _mm_add_epi16(m128itmp_interSamp, m128itmp_ResidualSample); // 8 short
-
-    m128itmp_interSamp = 
-      _mm_unpackhi_epi8( // 8 unsigned char --> 8 short
-      _mm_loadu_si128(pm128iInterSamp + i), // 16 unsigned char
-      m128iZero); // 8 shorts
-    m128itmp_ResidualSample = _mm_loadu_si128(pm128iTokensResidualSample + i + 1); // 8 short
-    m128itmp_add_i16_1 = _mm_add_epi16(m128itmp_interSamp, m128itmp_ResidualSample); // 8 short
-
-    _mm_storeu_si128(pm128iTokensSample + (i >> 1), _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1)); // u8
-
-    ucScuSize -= 16;
-    i = i + 2;
-  }
-
-  if (ucScuSize == 8)
-  {
-    m128itmp_interSamp = 
-      _mm_unpacklo_epi8( // 8 unsigned char --> 8 short
-      _mm_loadl_epi64(pm128iInterSamp + (i >> 1)), // 8 unsigned char (lower 64 bits, higher set to 0)
-      m128iZero);
-    m128itmp_ResidualSample = _mm_loadu_si128(pm128iTokensResidualSample + i);
-    m128itmp_add_i16_0 = _mm_add_epi16(m128itmp_interSamp, m128itmp_ResidualSample);
-
-    m128itmp_add_i16_1 = _mm_set1_epi16(0);
-
-    _mm_storel_epi64(pm128iTokensSample + (i >> 1), _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1)); // u8
-  }
+// add 8-bits elements to 16-bits elements and clip, for H elements
+#define ADD_8_16_CLIP(H)                                                                                                               \
+void add_8_16_clip_ ## H ## _orcc(                                                                                                     \
+  u8 predSample[## H],                                                                                                                 \
+  i16 resSample[## H],                                                                                                                 \
+  u8 Sample[## H])                                                                                                                     \
+{                                                                                                                                      \
+  int i = 0;                                                                                                                           \
+                                                                                                                                       \
+  __m128i * pm128iPredSamp = (__m128i *) &predSample[0];                                                                               \
+  __m128i m128itmp_predSamp;                                                                                                           \
+  __m128i * pm128iResSample = (__m128i *) &resSample[0];                                                                               \
+  __m128i m128itmp_ResidualSample;                                                                                                     \
+  __m128i m128itmp_add_i16_0, m128itmp_add_i16_1;                                                                                      \
+  __m128i * pm128iSample = (__m128i *) &Sample[0];                                                                                     \
+  __m128i m128iZero = _mm_set1_epi16(0);                                                                                               \
+                                                                                                                                       \
+  for (i = 0; i < SCU_SIZE_DIV16(## H); i++)                                                                                           \
+  {                                                                                                                                    \
+    m128itmp_predSamp =                                                                                                                \
+      _mm_unpacklo_epi8(                                                                                                               \
+      _mm_loadu_si128(pm128iPredSamp + i),                                                                                             \
+      m128iZero);                                                                                                                      \
+    m128itmp_ResidualSample = _mm_loadu_si128(pm128iResSample + (i << 1));                                                             \
+    m128itmp_add_i16_0 = _mm_add_epi16(m128itmp_predSamp, m128itmp_ResidualSample);                                                    \
+                                                                                                                                       \
+    m128itmp_predSamp =                                                                                                                \
+      _mm_unpackhi_epi8(                                                                                                               \
+      _mm_loadu_si128(pm128iPredSamp + i),                                                                                             \
+      m128iZero);                                                                                                                      \
+    m128itmp_ResidualSample = _mm_loadu_si128(pm128iResSample + (i << 1) + 1);                                                         \
+    m128itmp_add_i16_1 = _mm_add_epi16(m128itmp_predSamp, m128itmp_ResidualSample);                                                    \
+                                                                                                                                       \
+    _mm_storeu_si128(pm128iSample + i, _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1));                                      \
+  }                                                                                                                                    \
+                                                                                                                                       \
+  if (SCU_SIZE_MOD8(## H))                                                                                                             \
+  {                                                                                                                                    \
+    m128itmp_predSamp =                                                                                                                \
+      _mm_unpacklo_epi8(                                                                                                               \
+      _mm_loadl_epi64(pm128iPredSamp + i),                                                                                             \
+      m128iZero);                                                                                                                      \
+    m128itmp_ResidualSample = _mm_loadu_si128(pm128iResSample + (i << 1));                                                             \
+    m128itmp_add_i16_0 = _mm_add_epi16(m128itmp_predSamp, m128itmp_ResidualSample);                                                    \
+                                                                                                                                       \
+    m128itmp_add_i16_1 = _mm_set1_epi16(0);                                                                                            \
+                                                                                                                                       \
+    _mm_storel_epi64(pm128iSample + i, _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1));                                      \
+  }                                                                                                                                    \
 }
+
+// Declare more functions if needed
+ADD_8_16_CLIP(8)
+ADD_8_16_CLIP(16)
+ADD_8_16_CLIP(24)
+ADD_8_16_CLIP(32)
+ADD_8_16_CLIP(64)
+
+// add 8-bits elements to 16-bits elements and clip, for ## J ## elements. Output array is HxK
+#define ADD_8_16_CLIP_PRED1616(H, K, J)                                                                                                \
+void add_8_16_clip_16_pred ## H ## ## K ## _orcc(                                                                                      \
+  u8 predSample[## H][## K][## J],                                                                                                     \
+  i16 resSample[## J],                                                                                                                 \
+  u8 Sample[## J],                                                                                                                     \
+  u16 idx0,                                                                                                                            \
+  u16 idx1)                                                                                                                            \
+{                                                                                                                                      \
+  add_8_16_clip_ ## J ## _orcc(                                                                                                        \
+	predSample[idx0][idx1],                                                                                                            \
+	resSample,                                                                                                                         \
+	Sample);                                                                                                                           \
+}
+
+// Declare more functions if needed
+ADD_8_16_CLIP_PRED1616(16, 16, 16)
 
 /***********************************************************************************************************************************
  DecodingPictureBuffer 
  ***********************************************************************************************************************************/
-#define BORDER_SIZE 128
 
-void getCuPixDone_luma_orcc(
+void fillBorder_luma_orcc(
 	u8 pictureBuffer[17][2304][4352],
 	i8 lastIdx,
 	int xSize,
@@ -263,7 +241,7 @@ void getCuPixDone_luma_orcc(
 }
 
 
-void getCuPixDone_chroma_orcc(
+void fillBorder_chroma_orcc(
 	u8 pictureBuffer[17][768][1280],
 	i8 lastIdx,
 	int xSize,
