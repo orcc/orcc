@@ -99,7 +99,7 @@ else()
             add_definitions(-DSSE_ENABLE)
             # Defines the constant in the root project directory, and its sub-directories
             # This avoid need for SSE stuff in generated application CMakeLists
-            set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS SSE_ENABLE)
+            set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS SSE_ENABLE APPEND)
 
             list(APPEND orcc_sources src/sse.c)
             list(APPEND orcc_sources include/sse.h)
