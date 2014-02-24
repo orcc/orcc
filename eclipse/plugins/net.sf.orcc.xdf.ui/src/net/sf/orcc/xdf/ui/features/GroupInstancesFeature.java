@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,6 +61,7 @@ import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
+import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -178,6 +180,13 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 
 		// Update connections to/from the new instance
 		for (final Connection connection : toUpdateInDiagram) {
+
+			// Delete the link, to avoid loosing the connection when instance will be deleted
+			final List<PictogramElement> pes = Graphiti.getLinkService().getPictogramElements(getDiagram(), connection);
+			for(PictogramElement linkedPe : pes) {
+				EcoreUtil.delete(linkedPe.getLink(), true);
+			}
+
 			final AddConnectionContext addConContext =
 					XdfUtil.getAddConnectionContext(fp, getDiagram(), connection);
 			addConContext.setNewObject(connection);
@@ -202,6 +211,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			layoutFeature.execute(layoutContext);
 		}
 
+		// Active direct editing on the freshly created instance
 		final IDirectEditingInfo dei = getFeatureProvider()
 				.getDirectEditingInfo();
 		dei.setMainPictogramElement(newInstancePe);
