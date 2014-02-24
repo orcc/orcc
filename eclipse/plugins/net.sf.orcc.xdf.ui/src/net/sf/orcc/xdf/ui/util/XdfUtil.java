@@ -198,14 +198,8 @@ public class XdfUtil {
 	 * @return
 	 */
 	public static boolean isInputNetworkPort(final Port port) {
-		final Graph graph = port.getGraph();
-		if (graph != null && graph instanceof Network) {
-			final Network network = (Network) graph;
-			for (final Port p : network.getInputs()) {
-				if (p == port) {
-					return true;
-				}
-			}
+		if(port.getGraph() != null) {
+			return ((Network) port.getGraph()).getInputs().contains(port);
 		}
 		return false;
 	}
@@ -217,14 +211,8 @@ public class XdfUtil {
 	 * @return
 	 */
 	public static boolean isOutputNetworkPort(final Port port) {
-		final Graph graph = port.getGraph();
-		if (graph != null && graph instanceof Network) {
-			final Network network = (Network) graph;
-			for (final Port p : network.getOutputs()) {
-				if (p == port) {
-					return true;
-				}
-			}
+		if(port.getGraph() != null) {
+			return ((Network) port.getGraph()).getOutputs().contains(port);
 		}
 		return false;
 	}
