@@ -50,65 +50,49 @@
 #define SCU_SIZE_MOD8(H) (H & 0x07)
 
 // copy 8-bits elements into a 8-bits array, for H elements
-#define COPY_8_8(H)                                                                                                                    \
-void copy_8_8_ ## H ## _orcc(                                                                                                          \
-  u8 inputSample[## H],                                                                                                                \
-  u8 outputSample[## H])                                                                                                               \
+#define COPY_8_8(H, J, K)                                                                                                              \
+void copy_8_8_ ## H ## _ ## J ## x ## K ## _orcc(                                                                                      \
+  u8 outputSample[J * K],                                                                                                              \
+  u8 inputSample[H],                                                                                                                   \
+  u32 idxBlkStride)                                                                                                                    \
 {                                                                                                                                      \
   int i = 0;                                                                                                                           \
-  __m128i * pm128iOutputSample = (__m128i *) &outputSample[0];                                                                         \
   __m128i * pm128iInputSample = (__m128i *) &inputSample[0];                                                                           \
+  __m128i * pm128iOutputSample = (__m128i *) &outputSample[idxBlkStride + 0];                                                          \
   __m128i m128iInputSample;                                                                                                            \
                                                                                                                                        \
   i = 0;                                                                                                                               \
-  for (i = 0; i < SCU_SIZE_DIV16(## H); i++)                                                                                           \
+  for (i = 0; i < SCU_SIZE_DIV16(H); i++)                                                                                              \
   {                                                                                                                                    \
     m128iInputSample = _mm_loadu_si128(pm128iInputSample + i);                                                                         \
     _mm_storeu_si128(pm128iOutputSample + i, m128iInputSample);                                                                        \
   }                                                                                                                                    \
                                                                                                                                        \
-  if (SCU_SIZE_MOD8(## H))                                                                                                             \
+  if (SCU_SIZE_MOD8(H))                                                                                                                \
   {                                                                                                                                    \
-    pm128iOutputSample = (__m128i *) &outputSample[## H - 8];                                                                          \
-    pm128iInputSample = (__m128i *) &inputSample[## H - 8];                                                                            \
+    pm128iOutputSample = (__m128i *) &outputSample[H - 8];                                                                             \
+    pm128iInputSample = (__m128i *) &inputSample[H - 8];                                                                               \
     m128iInputSample = _mm_loadl_epi64(pm128iInputSample);                                                                             \
     _mm_storel_epi64(pm128iOutputSample, m128iInputSample);                                                                            \
   }                                                                                                                                    \
 }
 
 // Declare more functions if needed
-COPY_8_8(16)
+COPY_8_8(16, 64, 64)
+COPY_8_8(16, 32, 32)
 
 
-// copy 8-bits elements into a 8-bits array, for J elements. Output array is HxK
-#define COPY_8_8_OUTPUT(H, K, J)                                                                                                       \
-void copy_8_8_ ## J ## _output ## H ## ## K ## _orcc(                                                                                         \
-  u8 inputSample[## J],                                                                                                                \
-  u8 outputSample[## H][## K][## J],                                                                                                   \
-  u32 xIdx,                                                                                                                            \
-  u32 xOff,                                                                                                                            \
-  u32 yIdx,                                                                                                                            \
-  u32 yOff)                                                                                                                            \
-{                                                                                                                                      \
-  copy_8_8_ ## J ## _orcc(                                                                                                             \
-	inputSample,                                                                                                                       \
-	outputSample[xIdx + xOff][yIdx + yOff]);                                                                                           \
-}
-
-// Declare more functions if needed
-COPY_8_8_OUTPUT(16, 16, 16)
-
-
-// add 8-bits elements to 16-bits elements and clip, for H elements
-#define ADD_8_16_CLIP(H)                                                                                                               \
-void add_8_16_clip_ ## H ## _orcc(                                                                                                     \
-  u8 predSample[## H],                                                                                                                 \
-  i16 resSample[## H],                                                                                                                 \
-  u8 Sample[## H])                                                                                                                     \
+// add 8-bits elements to 16-bits elements and clip, for H elements. First array (pred) is K * J.
+#define ADD_8_16_CLIP(H, K, J)                                                                                                         \
+void add_8_16_clip_ ## H ## _ ## K ## x ## J ## _orcc(                                                                                 \
+  u8 predSample[K * J],                                                                                                                \
+  i16 resSample[H],                                                                                                                    \
+  u8 Sample[H],                                                                                                                        \
+  u16 idxBlkStride)                                                                                                                    \
 {                                                                                                                                      \
   int i = 0;                                                                                                                           \
                                                                                                                                        \
-  __m128i * pm128iPredSamp = (__m128i *) &predSample[0];                                                                               \
+  __m128i * pm128iPredSamp = (__m128i *) &predSample[idxBlkStride + 0];                                                                \
   __m128i m128itmp_predSamp;                                                                                                           \
   __m128i * pm128iResSample = (__m128i *) &resSample[0];                                                                               \
   __m128i m128itmp_ResidualSample;                                                                                                     \
@@ -116,7 +100,7 @@ void add_8_16_clip_ ## H ## _orcc(                                              
   __m128i * pm128iSample = (__m128i *) &Sample[0];                                                                                     \
   __m128i m128iZero = _mm_set1_epi16(0);                                                                                               \
                                                                                                                                        \
-  for (i = 0; i < SCU_SIZE_DIV16(## H); i++)                                                                                           \
+  for (i = 0; i < SCU_SIZE_DIV16(H); i++)                                                                                              \
   {                                                                                                                                    \
     m128itmp_predSamp =                                                                                                                \
       _mm_unpacklo_epi8(                                                                                                               \
@@ -135,7 +119,7 @@ void add_8_16_clip_ ## H ## _orcc(                                              
     _mm_storeu_si128(pm128iSample + i, _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1));                                      \
   }                                                                                                                                    \
                                                                                                                                        \
-  if (SCU_SIZE_MOD8(## H))                                                                                                             \
+  if (SCU_SIZE_MOD8(H))                                                                                                                \
   {                                                                                                                                    \
     m128itmp_predSamp =                                                                                                                \
       _mm_unpacklo_epi8(                                                                                                               \
@@ -151,29 +135,15 @@ void add_8_16_clip_ ## H ## _orcc(                                              
 }
 
 // Declare more functions if needed
-ADD_8_16_CLIP(8)
-ADD_8_16_CLIP(16)
-ADD_8_16_CLIP(24)
-ADD_8_16_CLIP(32)
-ADD_8_16_CLIP(64)
+ADD_8_16_CLIP(  16,  1, 16)
+ADD_8_16_CLIP(  16, 64, 64)
+ADD_8_16_CLIP(  64, 64, 64)
+ADD_8_16_CLIP( 256, 64, 64)
+ADD_8_16_CLIP(1024, 64, 64)
 
-// add 8-bits elements to 16-bits elements and clip, for ## J ## elements. Output array is HxK
-#define ADD_8_16_CLIP_PRED1616(H, K, J)                                                                                                \
-void add_8_16_clip_16_pred ## H ## ## K ## _orcc(                                                                                      \
-  u8 predSample[## H][## K][## J],                                                                                                     \
-  i16 resSample[## J],                                                                                                                 \
-  u8 Sample[## J],                                                                                                                     \
-  u16 idx0,                                                                                                                            \
-  u16 idx1)                                                                                                                            \
-{                                                                                                                                      \
-  add_8_16_clip_ ## J ## _orcc(                                                                                                        \
-	predSample[idx0][idx1],                                                                                                            \
-	resSample,                                                                                                                         \
-	Sample);                                                                                                                           \
-}
-
-// Declare more functions if needed
-ADD_8_16_CLIP_PRED1616(16, 16, 16)
+ADD_8_16_CLIP(  16, 32, 32)
+ADD_8_16_CLIP(  64, 32, 32)
+ADD_8_16_CLIP( 256, 32, 32)
 
 /***********************************************************************************************************************************
  DecodingPictureBuffer 
