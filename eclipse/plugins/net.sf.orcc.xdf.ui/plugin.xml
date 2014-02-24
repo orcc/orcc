@@ -32,7 +32,7 @@
             class="net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard"
             hasPages="true"
             icon="icons/network.gif"
-            id="net.sf.orcc.xdf.ui.wizards.newNetworkWizard"
+            id="net.sf.orcc.xdf.ui.dialogs.newNetworkWizard"
             name="XDF Network"
             project="false">
          <description>
