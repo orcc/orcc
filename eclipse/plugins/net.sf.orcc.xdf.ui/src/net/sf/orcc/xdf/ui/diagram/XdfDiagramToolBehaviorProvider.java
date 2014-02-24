@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.xdf.ui.features.GroupInstancesFeature;
 import net.sf.orcc.xdf.ui.features.InstanceDblClickFeature;
+import net.sf.orcc.xdf.ui.features.UngroupNetworkFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinementFeature;
 import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.layout.PolylineAutoLayoutFeature;
@@ -162,6 +163,7 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 		entry = new ContextMenuEntry(null, context);
 		entry.setText("Transformations");
 		entry.add(new ContextMenuEntry(new GroupInstancesFeature(getFeatureProvider()), context));
+		entry.add(new ContextMenuEntry(new UngroupNetworkFeature(getFeatureProvider()), context));
 		contextMenuEntries.add(entry);
 		
 		return contextMenuEntries.toArray(NO_CONTEXT_MENU_ENTRIES);
