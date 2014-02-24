@@ -30,12 +30,17 @@ package net.sf.orcc.xdf.ui.util;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.graph.Graph;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
+import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
+import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -45,9 +50,14 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
+import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.graphiti.ui.services.IUiLayoutService;
@@ -217,5 +227,51 @@ public class XdfUtil {
 			}
 		}
 		return false;
+	}
+
+	public static AddConnectionContext getAddConnectionContext(final IFeatureProviderWithPatterns fp,
+			final Diagram diagram, final Connection connection) {
+		final Anchor sourceAnchor, targetAnchor;
+		final List<PictogramElement> sourcePes = Graphiti.getLinkService()
+				.getPictogramElements(diagram, connection.getSource());
+
+		if(sourcePes == null || sourcePes.isEmpty()) {
+			OrccLogger.warnln("[getAddConnectionContext] Source is not referenced in this network.");
+			return null;
+		}
+		final PictogramElement sourcePe = sourcePes.get(0);
+		if (PropsUtil.isInputPort(sourcePe)) {
+			// Connection from a network port
+			final InputNetworkPortPattern spattern = (InputNetworkPortPattern) fp
+					.getPatternForPictogramElement(sourcePe);
+			sourceAnchor = spattern.getAnchor((AnchorContainer) sourcePe);
+		} else {
+			// Connection from an instance port
+			final InstancePattern spattern = (InstancePattern) fp
+					.getPatternForPictogramElement(sourcePe);
+			sourceAnchor = spattern.getAnchorForPort(sourcePe,
+					connection.getSourcePort());
+		}
+
+		final List<PictogramElement> targetPes = Graphiti.getLinkService()
+				.getPictogramElements(diagram, connection.getTarget());
+		if(targetPes == null || targetPes.isEmpty()) {
+			return null;
+		}
+		final PictogramElement targetPe = targetPes.get(0);
+		if (PropsUtil.isOutputPort(targetPe)) {
+			// Connection to a network port
+			final OutputNetworkPortPattern tpattern = (OutputNetworkPortPattern) fp
+					.getPatternForPictogramElement(targetPe);
+			targetAnchor = tpattern.getAnchor((AnchorContainer) targetPe);
+		} else {
+			// Connection to an instance port
+			final InstancePattern tpattern = (InstancePattern) fp
+					.getPatternForPictogramElement(targetPe);
+			targetAnchor = tpattern.getAnchorForPort(targetPe,
+					connection.getTargetPort());
+		}
+
+		return new AddConnectionContext(sourceAnchor, targetAnchor);
 	}
 }

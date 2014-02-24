@@ -43,9 +43,6 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard;
 import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
-import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
-import net.sf.orcc.xdf.ui.patterns.InstancePattern;
-import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
@@ -60,12 +57,9 @@ import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
-import org.eclipse.graphiti.mm.pictograms.Anchor;
-import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -184,42 +178,8 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 
 		// Update connections to/from the new instance
 		for (final Connection connection : toUpdateInDiagram) {
-
-			final Anchor sourceAnchor, targetAnchor;
-			final PictogramElement sourcePe = Graphiti.getLinkService()
-					.getPictogramElements(getDiagram(), connection.getSource())
-					.get(0);
-			if (PropsUtil.isInputPort(sourcePe)) {
-				// Connection from a network port
-				final InputNetworkPortPattern spattern = (InputNetworkPortPattern) fp
-						.getPatternForPictogramElement(sourcePe);
-				sourceAnchor = spattern.getAnchor((AnchorContainer) sourcePe);
-			} else {
-				// Connection from an instance port
-				final InstancePattern spattern = (InstancePattern) fp
-						.getPatternForPictogramElement(sourcePe);
-				sourceAnchor = spattern.getAnchorForPort(sourcePe,
-						connection.getSourcePort());
-			}
-
-			final PictogramElement targetPe = Graphiti.getLinkService()
-					.getPictogramElements(getDiagram(), connection.getTarget())
-					.get(0);
-			if (PropsUtil.isOutputPort(targetPe)) {
-				// Connection to a network port
-				final OutputNetworkPortPattern tpattern = (OutputNetworkPortPattern) fp
-						.getPatternForPictogramElement(targetPe);
-				targetAnchor = tpattern.getAnchor((AnchorContainer) targetPe);
-			} else {
-				// Connection to an instance port
-				final InstancePattern tpattern = (InstancePattern) fp
-						.getPatternForPictogramElement(targetPe);
-				targetAnchor = tpattern.getAnchorForPort(targetPe,
-						connection.getTargetPort());
-			}
-
-			final AddConnectionContext addConContext = new AddConnectionContext(
-					sourceAnchor, targetAnchor);
+			final AddConnectionContext addConContext =
+					XdfUtil.getAddConnectionContext(fp, getDiagram(), connection);
 			addConContext.setNewObject(connection);
 			getFeatureProvider().addIfPossible(addConContext);
 		}
@@ -248,7 +208,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		dei.setActive(true);
 
 		hasDoneChanges = true;
-
 	}
 
 	/**
