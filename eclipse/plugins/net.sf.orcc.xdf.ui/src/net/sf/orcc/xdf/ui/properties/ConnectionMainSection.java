@@ -79,6 +79,10 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 	protected void writeValuesToModel(final Widget widget) {
 		final Connection connection = (Connection) businessObject;
 		if(widget == connectionSize) {
+			if (connectionSize.getText().isEmpty()) {
+				connection.removeAttribute(Connection.BUFFER_SIZE);
+				return;
+			}
 			try {
 				final String sizeText = connectionSize.getText();
 				final Integer bufferSize = Integer.decode(sizeText);
