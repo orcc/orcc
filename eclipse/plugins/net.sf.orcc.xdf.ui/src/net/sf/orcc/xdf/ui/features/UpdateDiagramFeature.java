@@ -254,16 +254,18 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 		boolean hasDoneChanges = false;
 
+		int errorCount = 0;
 		for (final Argument arg : instance.getArguments()) {
 			if (arg.getVariable() == null
 					|| arg.getVariable().getName() == null) {
 				toDelete.add(arg);
 				hasDoneChanges = true;
+				errorCount++;
 			}
 		}
 
 		if (hasDoneChanges) {
-			messagesList.add(toDelete.size()
+			messagesList.add(errorCount
 					+ " argument(s) deleted from instance "
 					+ instance.getSimpleName() + ".");
 		}
