@@ -73,12 +73,16 @@ class SimulationAnalyse(OrccAnalyse):
 
     def getStatus(self, fic):
         status = "OK"
-        fp = open(fic)
-        for line in fp:
-            if line.count(self.TOKEN_ERROR) == 1:
-                status = "KO"
-                break
-        fp = fp.close()
+        if os.path.getsize(fic) == 0:
+            status = "KO"
+        else:
+            fp = open(fic)
+            for line in fp:
+                if line.count(self.TOKEN_ERROR) == 1:
+                    status = "KO"
+                    break
+            fp = fp.close()
+
         return status
 
     def extractData(self):
