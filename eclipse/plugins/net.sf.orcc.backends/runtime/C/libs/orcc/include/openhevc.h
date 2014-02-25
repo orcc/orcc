@@ -60,7 +60,8 @@ void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i3
 
 void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 log2size);
 
-
+// DR 1402
+void put_weighted_pred_avg_orcc (i16 src[2][64*64], int _width, int _height, u8 dst[64*64]);
 
 
 #endif  /* _ORCC_OPENHEVC_H_ */

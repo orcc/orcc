@@ -110,7 +110,7 @@ void fillBorder_luma_orcc(
 	i8 lastIdx,
 	int xSize,
 	int ySize,
-	u16 border_size)
+	u16 border_size);
 
 void fillBorder_chroma_orcc(
 	u8 pictureBuffer[17][768][1280],
