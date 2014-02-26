@@ -102,7 +102,7 @@ class Validator {
 			}
 		}
 		for (subnetwork : network.allNetworks) {
-			checkMinimalFifoSize(subnetwork, size)
+			checkMinimalFifoSize(subnetwork, size, displayWarning)
 		}
 	}
 
