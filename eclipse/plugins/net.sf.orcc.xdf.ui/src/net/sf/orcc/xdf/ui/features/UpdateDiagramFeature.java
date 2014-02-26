@@ -79,8 +79,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
  */
 public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
-	public static String GLOBAL_VERSION_KEY = "xdf_diagram_version";
-	public static String CURRENT_EDITOR_VERSION = "1";
+	private static String GLOBAL_VERSION_KEY = "xdf_diagram_version";
+	private static String CURRENT_EDITOR_VERSION = "1";
 
 	private boolean hasDoneChanges;
 
@@ -328,7 +328,14 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		return getFeatureProvider().addIfPossible(addContext);
 	}
 
+	/**
+	 * Check if this diagram is outdated and update it according to the version
+	 * number stored in its properties.
+	 * 
+	 * @param diagram
+	 */
 	private void updateVersion(final Diagram diagram) {
+		// A new Diagram: set version to current
 		final String version = Graphiti.getPeService().getPropertyValue(diagram, GLOBAL_VERSION_KEY);
 		if (version == null) {
 			Graphiti.getPeService().setPropertyValue(diagram, GLOBAL_VERSION_KEY, CURRENT_EDITOR_VERSION);

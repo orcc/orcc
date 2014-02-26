@@ -46,6 +46,13 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
+/**
+ * This feature is used to open an Actor or an Instance in a new tab when user
+ * perform a double click on a refined instance.
+ * 
+ * @author Antoine Lorence
+ * 
+ */
 public class InstanceDblClickFeature extends AbstractCustomFeature {
 
 	public InstanceDblClickFeature(IFeatureProvider fp) {
