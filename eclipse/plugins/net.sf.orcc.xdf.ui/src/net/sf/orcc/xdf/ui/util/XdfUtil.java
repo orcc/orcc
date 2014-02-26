@@ -59,6 +59,7 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.services.ILinkService;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.graphiti.ui.services.IUiLayoutService;
 import org.eclipse.swt.widgets.Shell;
@@ -217,17 +218,45 @@ public class XdfUtil {
 		return false;
 	}
 
+	/**
+	 * Initialize an AddConnectionContext object from a network connection. This
+	 * connection must be contained in the network.
+	 * 
+	 * @param fp
+	 * @param diagram
+	 * @param connection
+	 * @return
+	 */
 	public static AddConnectionContext getAddConnectionContext(final IFeatureProviderWithPatterns fp,
 			final Diagram diagram, final Connection connection) {
-		final Anchor sourceAnchor, targetAnchor;
-		final List<PictogramElement> sourcePes = Graphiti.getLinkService()
-				.getPictogramElements(diagram, connection.getSource());
 
-		if(sourcePes == null || sourcePes.isEmpty()) {
-			OrccLogger.warnln("[getAddConnectionContext] Source is not referenced in this network.");
+		final ILinkService linkServ = Graphiti.getLinkService();
+
+		// retrieve the PictogramElement
+		final List<PictogramElement> sourcesPE = linkServ.getPictogramElements(
+				diagram, connection.getSource());
+		if (sourcesPE == null || sourcesPE.isEmpty()) {
+			OrccLogger
+					.warnln("[getAddConnectionContext] Unable to "
+							+ "retrieve the PictogramElement corresponding to the source "
+							+ connection.getSource() + ".");
 			return null;
 		}
-		final PictogramElement sourcePe = sourcePes.get(0);
+		final List<PictogramElement> targetsPE = linkServ.getPictogramElements(
+				diagram, connection.getTarget());
+		if (targetsPE == null || targetsPE.isEmpty()) {
+			OrccLogger
+					.warnln("[getAddConnectionContext] Unable to "
+							+ "retrieve the PictogramElement corresponding to the target "
+							+ connection.getTarget() + ".");
+			return null;
+		}
+
+		// source/target PictogramElement
+		final PictogramElement sourcePe = sourcesPE.get(0);
+		final PictogramElement targetPe = targetsPE.get(0);
+
+		final Anchor sourceAnchor, targetAnchor;
 		if (PropsUtil.isInputPort(sourcePe)) {
 			// Connection from a network port
 			final InputNetworkPortPattern spattern = (InputNetworkPortPattern) fp
@@ -241,12 +270,6 @@ public class XdfUtil {
 					connection.getSourcePort());
 		}
 
-		final List<PictogramElement> targetPes = Graphiti.getLinkService()
-				.getPictogramElements(diagram, connection.getTarget());
-		if(targetPes == null || targetPes.isEmpty()) {
-			return null;
-		}
-		final PictogramElement targetPe = targetPes.get(0);
 		if (PropsUtil.isOutputPort(targetPe)) {
 			// Connection to a network port
 			final OutputNetworkPortPattern tpattern = (OutputNetworkPortPattern) fp

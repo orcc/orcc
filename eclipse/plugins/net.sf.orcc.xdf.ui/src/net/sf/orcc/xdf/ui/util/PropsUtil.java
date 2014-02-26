@@ -189,6 +189,12 @@ public class PropsUtil {
 		setIdentifier(pc, INPORT_ID);
 	}
 
+	/**
+	 * Check if given pc is a network input port
+	 * 
+	 * @param pc
+	 * @return
+	 */
 	public static boolean isInputPort(final PropertyContainer pc) {
 		return isExpectedPc(pc, INPORT_ID);
 	}
@@ -197,10 +203,22 @@ public class PropsUtil {
 		setIdentifier(pc, OUTPORT_ID);
 	}
 
+	/**
+	 * Check if given pc is a network output port
+	 * 
+	 * @param pc
+	 * @return
+	 */
 	public static boolean isOutputPort(final PropertyContainer pc) {
 		return isExpectedPc(pc, OUTPORT_ID);
 	}
 
+	/**
+	 * Check if given pc is a network port (input or output)
+	 * 
+	 * @param pc
+	 * @return
+	 */
 	public static boolean isPort(final PropertyContainer pc) {
 		return isInputPort(pc) || isOutputPort(pc);
 	}
