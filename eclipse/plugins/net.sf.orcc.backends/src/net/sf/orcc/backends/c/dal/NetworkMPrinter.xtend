@@ -15,7 +15,7 @@ import net.sf.orcc.backends.c.CTemplate
  */
 class NetworkMPrinter extends CTemplate {
 	
-	protected val Network network;
+	Network network
 	Map<String, String> mapping
 	
 	new(Network network, Map<String, String> map) {
@@ -37,24 +37,24 @@ class NetworkMPrinter extends CTemplate {
 	}
 
 	def protected getNetworkFileContent() '''
-<?xml version="1.0" encoding="UTF-8"?>
-<mapping xmlns="http://www.tik.ee.ethz.ch/~euretile/schema/MAPPING" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  xsi:schemaLocation="http://www.tik.ee.ethz.ch/~euretile/schema/MAPPING     http://www.tik.ee.ethz.ch/~euretile/schema/mapping.xsd" name="mapping1" processnetwork="APP1">
-		«FOR vertex : network.children»
-			<binding name="«vertex.label»">
-				<process name="«vertex.label»"/>
-				«IF mapping.get(network.name + "_" + vertex.label) != null»
-					«IF mapping.get(network.name + "_" + vertex.label).equals("")»
-						<processor name="core_2"/> 
+		<?xml version="1.0" encoding="UTF-8"?>
+		<mapping xmlns="http://www.tik.ee.ethz.ch/~euretile/schema/MAPPING" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		  xsi:schemaLocation="http://www.tik.ee.ethz.ch/~euretile/schema/MAPPING     http://www.tik.ee.ethz.ch/~euretile/schema/mapping.xsd" name="mapping1" processnetwork="APP1">
+			«FOR vertex : network.children»
+				<binding name="«vertex.label»">
+					<process name="«vertex.label»"/>
+					«IF mapping.get(network.name + "_" + vertex.label) != null»
+						«IF mapping.get(network.name + "_" + vertex.label).equals("")»
+							<processor name="core_2"/> 
+						«ELSE»
+							<processor name="«mapping.get(network.name + "_" + vertex.label)»"/>
+						«ENDIF»
 					«ELSE»
-						<processor name="«mapping.get(network.name + "_" + vertex.label)»"/>
+						<processor name="core_2"/> 
 					«ENDIF»
-				«ELSE»
-					<processor name="core_2"/> 
-				«ENDIF»
-			</binding> 
-		«ENDFOR»
-</mapping>
+				</binding> 
+			«ENDFOR»
+		</mapping>
 	'''
 	
 }
