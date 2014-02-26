@@ -30,6 +30,7 @@ package net.sf.orcc.xdf.ui.diagram;
 
 import net.sf.orcc.xdf.ui.features.DropInstanceFromFileFeature;
 import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
+import net.sf.orcc.xdf.ui.layout.AutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
@@ -59,6 +60,10 @@ import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
 
+import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
+import de.cau.cs.kieler.kiml.options.EdgeRouting;
+import de.cau.cs.kieler.kiml.options.LayoutOptions;
+
 /**
  * This is a default class, from a new Graphiti project. It should be modified
  * to fit our needs.
@@ -71,6 +76,7 @@ public class XdfDiagramFeatureProvider extends
 
 	private final UpdateDiagramFeature updateFeature;
 	private final DropInstanceFromFileFeature dropInstanceFeature;
+	private final ICustomFeature[] layoutFeatures;
 
 	public XdfDiagramFeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
@@ -81,8 +87,52 @@ public class XdfDiagramFeatureProvider extends
 
 		updateFeature = new UpdateDiagramFeature(this);
 		dropInstanceFeature = new DropInstanceFromFileFeature(this);
+
+		final ICustomFeature orthogonal = new AutoLayoutFeature(this,
+				"Orthogonal routing (default)") {
+			@Override
+			protected void configureDiagramNode(KShapeLayout diagramLayout) {
+				super.configureDiagramNode(diagramLayout);
+
+				diagramLayout.setProperty(LayoutOptions.EDGE_ROUTING,
+						EdgeRouting.ORTHOGONAL);
+			}
+		};
+
+		final ICustomFeature polyline = new AutoLayoutFeature(this,
+				"Polyline routing") {
+			@Override
+			protected void configureDiagramNode(KShapeLayout diagramLayout) {
+				super.configureDiagramNode(diagramLayout);
+
+				diagramLayout.setProperty(LayoutOptions.EDGE_ROUTING,
+						EdgeRouting.POLYLINE);
+			}
+		};
+
+		// The first entry is the default
+		layoutFeatures = new ICustomFeature[] { orthogonal, polyline };
 	}
-	
+
+	/**
+	 * Return the default layout feature. It is the first in the layout features
+	 * array
+	 * 
+	 * @return
+	 */
+	public ICustomFeature getDefaultLayoutFeature() {
+		return layoutFeatures[0];
+	}
+
+	/**
+	 * Return the list of available layout features.
+	 * 
+	 * @return An array of ICustomFeatures
+	 */
+	public ICustomFeature[] getLayoutFeatures() {
+		return layoutFeatures;
+	}
+
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
 		// Custom features are created in XdfDiagramToolBehaviorProvider. This allows to arrange

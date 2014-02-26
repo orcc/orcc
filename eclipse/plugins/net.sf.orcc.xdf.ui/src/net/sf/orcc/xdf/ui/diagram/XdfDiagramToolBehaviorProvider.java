@@ -35,8 +35,6 @@ import net.sf.orcc.xdf.ui.features.GroupInstancesFeature;
 import net.sf.orcc.xdf.ui.features.InstanceDblClickFeature;
 import net.sf.orcc.xdf.ui.features.UngroupNetworkFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinementFeature;
-import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
-import net.sf.orcc.xdf.ui.layout.PolylineAutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
@@ -155,8 +153,12 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 		// 'Layout Diagram' menu entry
 		entry = new ContextMenuEntry(null, context);
 		entry.setText("Layout Diagram");
-		entry.add(new ContextMenuEntry(new OrthogonalAutoLayoutFeature(getFeatureProvider()), context));
-		entry.add(new ContextMenuEntry(new PolylineAutoLayoutFeature(getFeatureProvider()), context));
+
+		final ICustomFeature[] layoutFeatures = ((XdfDiagramFeatureProvider) getFeatureProvider())
+				.getLayoutFeatures();
+		for (final ICustomFeature layoutFeature : layoutFeatures) {
+			entry.add(new ContextMenuEntry(layoutFeature, context));
+		}
 		contextMenuEntries.add(entry);
 		
 		// 'Transformations' menu entry

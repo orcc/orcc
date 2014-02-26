@@ -57,16 +57,17 @@ import de.cau.cs.kieler.klay.layered.LayeredLayoutProvider;
  * @author Antoine Lorence
  * 
  */
-abstract class AutoLayoutFeature extends AbstractCustomFeature {
+public class AutoLayoutFeature extends AbstractCustomFeature {
 
 	private boolean hasDoneChanges;
 
-	public AutoLayoutFeature(IFeatureProvider fp) {
+	final private String layoutName;
+
+	public AutoLayoutFeature(IFeatureProvider fp, final String layoutName) {
 		super(fp);
 		hasDoneChanges = false;
+		this.layoutName = layoutName;
 	}
-
-	abstract protected String getLayoutAlgorithmName();
 
 	@Override
 	public String getDescription() {
@@ -75,7 +76,7 @@ abstract class AutoLayoutFeature extends AbstractCustomFeature {
 
 	@Override
 	public String getName() {
-		return getLayoutAlgorithmName(); //$NON-NLS-1$
+		return layoutName; //$NON-NLS-1$
 	}
 
 	@Override

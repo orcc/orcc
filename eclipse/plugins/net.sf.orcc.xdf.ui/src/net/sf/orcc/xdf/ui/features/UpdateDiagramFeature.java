@@ -41,7 +41,7 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
-import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
+import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
@@ -62,6 +62,7 @@ import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
@@ -353,7 +354,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		}
 
 		final IContext context = new CustomContext();
-		final OrthogonalAutoLayoutFeature layoutFeature = new OrthogonalAutoLayoutFeature(getFeatureProvider());
+		final ICustomFeature layoutFeature = ((XdfDiagramFeatureProvider) getFeatureProvider())
+				.getDefaultLayoutFeature();
 		if (layoutFeature.canExecute(context)) {
 			layoutFeature.execute(context);
 		}

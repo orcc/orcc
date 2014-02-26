@@ -40,7 +40,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.xdf.ui.layout.OrthogonalAutoLayoutFeature;
+import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
@@ -54,6 +54,7 @@ import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
+import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
@@ -249,8 +250,8 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 		
 		// And layout the resulting diagram
 		final IContext layoutContext = new CustomContext();
-		final OrthogonalAutoLayoutFeature layoutFeature = new OrthogonalAutoLayoutFeature(
-				getFeatureProvider());
+		final ICustomFeature layoutFeature = ((XdfDiagramFeatureProvider) getFeatureProvider())
+				.getDefaultLayoutFeature();
 		if (layoutFeature.canExecute(layoutContext)) {
 			layoutFeature.execute(layoutContext);
 		}
