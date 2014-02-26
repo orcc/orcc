@@ -91,6 +91,21 @@ else()
         endif()
     endif()
 
+    option(USE_SSE "Use SSE native functions if available" 1)
+    if(USE_SSE)
+        find_file(SSE sse.c src/)
+        if(SSE)
+            # Defines SSE_ENABLE constant for the current directory
+            add_definitions(-DSSE_ENABLE)
+            # Defines the constant in the root project directory, and its sub-directories
+            # This avoid need for SSE stuff in generated application CMakeLists
+            set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS SSE_ENABLE APPEND)
+
+            list(APPEND orcc_sources src/sse.c)
+            list(APPEND orcc_sources include/sse.h)
+        endif()
+    endif()
+
     option(USE_METIS "Try to find Metis library and link against" 0)
     if(USE_METIS)
         find_package(METIS QUIET)

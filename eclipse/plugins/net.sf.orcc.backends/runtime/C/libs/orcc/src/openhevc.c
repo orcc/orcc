@@ -209,6 +209,24 @@ u8 _width, u8 _height)
     hevcDsp.put_weighted_pred_avg[0](dst, width, src1, src2, width, width, height);
 }
 
+// DR 1402
+void put_weighted_pred_avg_orcc (i16 src[2][64*64], int _width, int _height, u8 dst[64*64])
+{
+  u8 width = _width + 1;
+  u8 height = _height + 1;
+
+  if (width == 16 || width == 32 || width == 64) {
+	  hevcDsp.put_weighted_pred_avg[2](dst, width,
+		  src[0], src[1], width, width, height);
+  } else if(width == 8 || width == 24) {
+	  hevcDsp.put_weighted_pred_avg[1](dst, width,
+		  src[0], src[1], width, width, height);
+  } else {
+	  hevcDsp.put_weighted_pred_avg[0](dst, width,
+		  src[0], src[1], width, width, height);
+  }
+}
+
 void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 log2size)
 {
     u8 *src        = _src;
