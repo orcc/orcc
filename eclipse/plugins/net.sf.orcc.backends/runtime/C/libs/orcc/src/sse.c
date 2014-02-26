@@ -47,7 +47,7 @@
  ***********************************************************************************************************************************/
 
 #define SCU_SIZE_DIV16(H) (H >> 4)
-#define SCU_SIZE_MOD8(H) (H & 0x07)
+#define SCU_SIZE_MOD16(H) (H & 0x0F)
 
 // copy 8-bits elements into a 8-bits array, for H elements
 #define COPY_8_8(H, J, K)                                                                                                              \
@@ -68,7 +68,7 @@ void copy_8_8_ ## H ## _ ## J ## x ## K ## _orcc(                               
     _mm_storeu_si128(pm128iOutputSample + i, m128iInputSample);                                                                        \
   }                                                                                                                                    \
                                                                                                                                        \
-  if (SCU_SIZE_MOD8(H))                                                                                                                \
+  if (SCU_SIZE_MOD16(H) == 8)                                                                                                                \
   {                                                                                                                                    \
     pm128iOutputSample = (__m128i *) &outputSample[H - 8];                                                                             \
     pm128iInputSample = (__m128i *) &inputSample[H - 8];                                                                               \
@@ -119,7 +119,7 @@ void add_8_16_clip_ ## H ## _ ## K ## x ## J ## _orcc(                          
     _mm_storeu_si128(pm128iSample + i, _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1));                                      \
   }                                                                                                                                    \
                                                                                                                                        \
-  if (SCU_SIZE_MOD8(H))                                                                                                                \
+  if (SCU_SIZE_MOD16(H) == 8)                                                                                                                \
   {                                                                                                                                    \
     m128itmp_predSamp =                                                                                                                \
       _mm_unpacklo_epi8(                                                                                                               \
@@ -136,14 +136,174 @@ void add_8_16_clip_ ## H ## _ ## K ## x ## J ## _orcc(                          
 
 // Declare more functions if needed
 ADD_8_16_CLIP(  16,  1, 16)
+ADD_8_16_CLIP(   8, 64, 64)
+
 ADD_8_16_CLIP(  16, 64, 64)
+ADD_8_16_CLIP(  32, 64, 64)
 ADD_8_16_CLIP(  64, 64, 64)
 ADD_8_16_CLIP( 256, 64, 64)
+
 ADD_8_16_CLIP(1024, 64, 64)
 
 ADD_8_16_CLIP(  16, 32, 32)
 ADD_8_16_CLIP(  64, 32, 32)
 ADD_8_16_CLIP( 256, 32, 32)
+
+static i32 clip_i32(i32 Value, i32 minVal, i32 maxVal) {
+	i32 tmp_if;
+
+	if (Value > maxVal) {
+		tmp_if = maxVal;
+	} else {
+		if (Value < minVal) {
+			tmp_if = minVal;
+		} else {
+			tmp_if = Value;
+		}
+	}
+	return tmp_if;
+}
+
+// For shared_memory
+void addClip_orcc(
+  u16 blkAddr[2],
+  u16 blkAddrChr[2],
+  u16 blkAddrRes[2],
+  u16 blkAddrResChr[2],
+  u32 intraIdx,
+  u32 idxRes,
+  u8 dbfIdx,
+  u8 numBlkSide,
+  i16 puAddr[2],
+  i16 puAddrChr[2],
+  u16 tuAddr[2],
+  u16 tuAddrChr[2],
+  u8 dbfPict[2][3][4096][2048],
+  u8 lumaPred[1024][64][64],
+  u8 chromaPred[1024][2][32][32],
+  i16 residual[8192][6144])
+{
+  u32 xOffDbf = puAddr[0] + blkAddr[0];
+  u32 yOffDbf = puAddr[1] + blkAddr[1];
+  u32 xOffLumaPred = tuAddr[0] + blkAddr[0];
+  u32 yOffLumaPred = tuAddr[1] + blkAddr[1];
+  u32 offRes = blkAddrRes[0] * 64 + blkAddrRes[1];
+
+  u32 xOffChrDbf = puAddrChr[0] + blkAddrChr[0];
+  u32 yOffChrDbf = puAddrChr[1] + blkAddrChr[1];
+  u32 xOffChrLumaPred = tuAddrChr[0] + blkAddrChr[0];
+  u32 yOffChrLumaPred = tuAddrChr[1] + blkAddrChr[1];
+  u32 offChrRes[3];
+  int x, y;
+  u32 compIdx = 0;
+
+  offChrRes[0] = 0;
+  offChrRes[1] = 64*64 + blkAddrResChr[0] * 32 + blkAddrResChr[1];
+  offChrRes[2] = 64*64 + 32*32 + blkAddrResChr[0] * 32 + blkAddrResChr[1];
+
+  switch (numBlkSide)
+  {
+    case 1:
+    {
+      for (x = 0; x < 4 * 1; x++)
+      {
+        for (y = 0; y < 4 * 1; y++)
+    	{
+    	  dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + y] =
+    	    clip_i32(lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred + y] +
+            residual[idxRes][offRes + x * 64 + y], 0, 255);
+        }
+      }
+      for (compIdx = 1; compIdx <= 2; compIdx++)
+      {
+        for (x = 0; x < 2 * 1; x++)
+        {
+          for (y = 0; y < 2 * 1; y++)
+          {
+            dbfPict[dbfIdx][compIdx][xOffChrDbf + x][yOffChrDbf + y] =
+              clip_i32(chromaPred[intraIdx][compIdx-1][xOffChrLumaPred + x]
+                [yOffChrLumaPred + y] + residual[idxRes][offChrRes[compIdx] +
+                x * 32 + y], 0, 255);
+          }
+        }
+      }
+      break;
+    }
+    case 2:
+      {
+        for (x = 0; x < 4 * 2; x++)
+        {
+          add_8_16_clip_8_64x64_orcc(
+            &lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred],
+            &residual[idxRes][offRes + x * 64 + 0],
+            &dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + 0],
+            0);
+        }
+        for (compIdx = 1; compIdx <= 2; compIdx++)
+        {
+          for (x = 0; x < 2 * 2; x++)
+          {
+            for (y = 0; y < 2 * 2; y++)
+            {
+              dbfPict[dbfIdx][compIdx][xOffChrDbf + x][yOffChrDbf + y] =
+                clip_i32(chromaPred[intraIdx][compIdx-1][xOffChrLumaPred + x]
+                  [yOffChrLumaPred + y] + residual[idxRes][offChrRes[compIdx] +
+                  x * 32 + y], 0, 255);
+            }
+          }
+        }
+        break;
+      }
+    case 4:
+      {
+        for (x = 0; x < 4 * 4; x++)
+        {
+          add_8_16_clip_16_64x64_orcc(
+            &lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred],
+            &residual[idxRes][offRes + x * 64 + 0],
+            &dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + 0],
+            0);
+        }
+        for (compIdx = 1; compIdx <= 2; compIdx++)
+        {
+          for (x = 0; x < 2 * 4; x++)
+          {
+            add_8_16_clip_8_64x64_orcc(
+              &chromaPred[intraIdx][compIdx - 1][xOffChrLumaPred + x][yOffChrLumaPred],
+              &residual[idxRes][offChrRes[compIdx] + x * 32 + 0],
+              &dbfPict[dbfIdx][compIdx][xOffChrDbf + x][yOffChrDbf + 0],
+              0);
+          }
+        }
+        break;
+      }
+    case 8:
+      {
+        for (x = 0; x < 4 * 8; x++)
+        {
+          add_8_16_clip_32_64x64_orcc(
+            &lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred],
+            &residual[idxRes][offRes + x * 64 + 0],
+            &dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + 0],
+            0);
+        }
+        for (compIdx = 1; compIdx <= 2; compIdx++)
+        {
+          for (x = 0; x < 2 * 8; x++)
+          {
+            add_8_16_clip_16_64x64_orcc(
+              &chromaPred[intraIdx][compIdx - 1][xOffChrLumaPred + x][yOffChrLumaPred],
+              &residual[idxRes][offChrRes[compIdx] + x * 32 + 0],
+              &dbfPict[dbfIdx][compIdx][xOffChrDbf + x][yOffChrDbf + 0],
+              0);
+          }
+        }
+        break;
+      }
+	default:
+	  break;
+  }
+}
 
 /***********************************************************************************************************************************
  DecodingPictureBuffer 

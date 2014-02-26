@@ -59,10 +59,22 @@ void add_8_16_clip_16_1x16_orcc(
   u8 Sample[16],
   u16 idxBlkStride);
 
+void add_8_16_clip_8_64x64_orcc(
+  u8 predSample[64 * 64],
+  i16 resSample[8],
+  u8 Sample[8],
+  u16 idxBlkStride);
+
 void add_8_16_clip_16_64x64_orcc(
   u8 predSample[64 * 64],
   i16 resSample[16],
   u8 Sample[16],
+  u16 idxBlkStride);
+
+void add_8_16_clip_32_64x64_orcc(
+  u8 predSample[64 * 64],
+  i16 resSample[32],
+  u8 Sample[32],
   u16 idxBlkStride);
 
 void add_8_16_clip_64_64x64_orcc(
@@ -100,6 +112,24 @@ void add_8_16_clip_256_32x32_orcc(
   i16 resSample[256],
   u8 Sample[256],
   u16 idxBlkStride);
+
+void addClip_orcc(
+  u16 blkAddr[2],
+  u16 blkAddrChr[2],
+  u16 blkAddrRes[2],
+  u16 blkAddrResChr[2],
+  u32 intraIdx,
+  u32 idxRes,
+  u8 dbfIdx,
+  u8 numBlkSide,
+  i16 puAddr[2],
+  i16 puAddrChr[2],
+  u16 tuAddr[2],
+  u16 tuAddrChr[2],
+  u8 dbfPict[2][3][4096][2048],
+  u8 lumaPred[1024][64][64],
+  u8 chromaPred[1024][2][32][32],
+  i16 residual[8192][6144]);
 
 /***********************************************************************************************************************************
  DecodingPictureBuffer 
