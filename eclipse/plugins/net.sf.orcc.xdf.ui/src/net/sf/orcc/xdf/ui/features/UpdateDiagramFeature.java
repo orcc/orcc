@@ -29,9 +29,7 @@
 package net.sf.orcc.xdf.ui.features;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Instance;
@@ -42,9 +40,6 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
-import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
-import net.sf.orcc.xdf.ui.patterns.InstancePattern;
-import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -64,11 +59,8 @@ import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
-import org.eclipse.graphiti.mm.pictograms.Anchor;
-import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -284,77 +276,29 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	 */
 	private boolean initializeDiagramFromNetwork(final Network network, final Diagram diagram) {
 
-		final IFeatureProviderWithPatterns patternFP = (IFeatureProviderWithPatterns) getFeatureProvider();
-
-		final Map<Port, Anchor> inAnchors = new HashMap<Port, Anchor>();
-		final Map<Port, Anchor> outAnchors = new HashMap<Port, Anchor>();
-		final Map<Instance, PictogramElement> instances = new HashMap<Instance, PictogramElement>();
+		final XdfDiagramFeatureProvider xdfFeatureProvider = (XdfDiagramFeatureProvider) getFeatureProvider();
 
 		for (Vertex vertex : network.getChildren()) {
 			if (vertex instanceof Instance) {
-				final PictogramElement pe = addBoToDiagram(diagram, vertex);
-				instances.put((Instance) vertex, pe);
+				addBoToDiagram(diagram, vertex);
 			}
 		}
 		for (Port port : network.getInputs()) {
-			final PictogramElement shape = addBoToDiagram(diagram, port);
-			if (shape != null) {
-				final InputNetworkPortPattern pattern = (InputNetworkPortPattern) patternFP
-						.getPatternForPictogramElement(shape);
-				final Anchor anchor = pattern.getAnchor((AnchorContainer) shape);
-				if (anchor != null) {
-					inAnchors.put(port, anchor);
-				}
-			}
+			addBoToDiagram(diagram, port);
 		}
 		for (Port port : network.getOutputs()) {
-			final PictogramElement shape = addBoToDiagram(diagram, port);
-			if (shape != null) {
-				final OutputNetworkPortPattern pattern = (OutputNetworkPortPattern) patternFP
-						.getPatternForPictogramElement(shape);
-				final Anchor anchor = pattern.getAnchor((AnchorContainer) shape);
-				if (anchor != null) {
-					outAnchors.put(port, anchor);
-				}
-			}
+			addBoToDiagram(diagram, port);
 		}
-		for (net.sf.orcc.df.Connection con : network.getConnections()) {
-
-			final Anchor srcAnchor, tgtAnchor;
-
-			final Vertex sourceVertex = con.getSource();
-			if (instances.containsKey(sourceVertex)) {
-				final PictogramElement instancePe = instances.get(sourceVertex);
-				final InstancePattern pattern = (InstancePattern) patternFP.getPatternForPictogramElement(instancePe);
-				srcAnchor = pattern.getAnchorForPort(instancePe, con.getSourcePort());
-			} else if (sourceVertex instanceof Port) {
-				srcAnchor = inAnchors.get(sourceVertex);
-			} else {
-				srcAnchor = null;
-			}
-
-			final Vertex tgtVertex = con.getTarget();
-			if (instances.containsKey(tgtVertex)) {
-				final PictogramElement instancePe = instances.get(tgtVertex);
-				final InstancePattern pattern = (InstancePattern) patternFP.getPatternForPictogramElement(instancePe);
-				tgtAnchor = pattern.getAnchorForPort(instancePe, con.getTargetPort());
-			} else if (tgtVertex instanceof Port) {
-				tgtAnchor = outAnchors.get(tgtVertex);
-			} else {
-				tgtAnchor = null;
-			}
-
-			if (srcAnchor != null && tgtAnchor != null) {
-				final AddConnectionContext ctxt = new AddConnectionContext(srcAnchor, tgtAnchor);
-				ctxt.setNewObject(con);
-				getFeatureProvider().addIfPossible(ctxt);
-			} else {
-				OrccLogger.warnln("Unable to retrieve the anchor corresponding to connection " + con);
-			}
+		for (net.sf.orcc.df.Connection connection : network.getConnections()) {
+			final AddConnectionContext ctxt = XdfUtil.getAddConnectionContext(
+					xdfFeatureProvider, getDiagram(), connection);
+			ctxt.setNewObject(connection);
+			getFeatureProvider().addIfPossible(ctxt);
 		}
 
+		// Layout the diagram
 		final IContext context = new CustomContext();
-		final ICustomFeature layoutFeature = ((XdfDiagramFeatureProvider) getFeatureProvider())
+		final ICustomFeature layoutFeature = xdfFeatureProvider
 				.getDefaultLayoutFeature();
 		if (layoutFeature.canExecute(context)) {
 			layoutFeature.execute(context);
