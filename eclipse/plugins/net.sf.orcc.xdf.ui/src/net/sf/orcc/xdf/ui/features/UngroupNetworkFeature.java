@@ -59,6 +59,12 @@ import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 
+/**
+ * Replace the selected instance by the content of the network it refined on.
+ * 
+ * @author Antoine Lorence
+ * 
+ */
 public class UngroupNetworkFeature extends AbstractCustomFeature {
 
 	private boolean hasDoneChanges;
@@ -70,7 +76,12 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 
 	@Override
 	public String getName() {
-		return "Instanciate";
+		return "Separate the network into new instances";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Replace this instance by the network content it is refined on.";
 	}
 
 	@Override
@@ -78,6 +89,16 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 		return super.isAvailable(context);
 	}
 
+	/*
+	 * This feature can be executed if user selected only 1 instance, and if
+	 * this instance is refined on a Network
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.graphiti.features.custom.AbstractCustomFeature#canExecute
+	 * (org.eclipse.graphiti.features.context.ICustomContext)
+	 */
 	@Override
 	public boolean canExecute(ICustomContext context) {
 

@@ -92,10 +92,25 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 	}
 
 	@Override
+	public String getDescription() {
+		return "Create a new network containing selected elements, and replace them with a new instance refined on this network.";
+	}
+
+	@Override
 	public boolean isAvailable(IContext context) {
 		return super.isAvailable(context);
 	}
 
+	/*
+	 * This feature can be executed if user selected at least 2 instances. If
+	 * other elements are selected (ports, connections) they will be ignored
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.graphiti.features.custom.AbstractCustomFeature#canExecute
+	 * (org.eclipse.graphiti.features.context.ICustomContext)
+	 */
 	@Override
 	public boolean canExecute(ICustomContext context) {
 		final PictogramElement[] selection = context.getPictogramElements();
