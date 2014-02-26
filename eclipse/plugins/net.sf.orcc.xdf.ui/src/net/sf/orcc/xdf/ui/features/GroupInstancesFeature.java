@@ -162,14 +162,17 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
 
 		final Set<Instance> selection = new HashSet<Instance>();
+		final Set<PictogramElement> peSelection = new HashSet<PictogramElement>();
 		for (final PictogramElement pe : context.getPictogramElements()) {
 			final Object selected = getBusinessObjectForPictogramElement(pe);
 			if (selected instanceof Instance) {
 				selection.add((Instance) selected);
+				peSelection.add(pe);
 			} else {
 				continue;
 			}
 		}
+
 
 		// This set will be filled with connections which needs to be
 		// re-added to the diagram
@@ -212,7 +215,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		// Finally remove from diagram useless elements. Inner connections
 		// are also deleted, since deleting an instance or a port from a
 		// diagram also clean related connections
-		for (final PictogramElement pe : context.getPictogramElements()) {
+		for (final PictogramElement pe : peSelection) {
 			final IPattern pattern = fp.getPatternForPictogramElement(pe);
 			final DeleteContext delContext = new DeleteContext(pe);
 			delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
