@@ -170,7 +170,7 @@ public class JadeBackend extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
 		Validator.checkTopLevel(network);
-		Validator.checkMinimalFifoSize(network, fifoSize);
+		Validator.checkMinimalFifoSize(network, fifoSize, false);
 
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
