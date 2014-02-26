@@ -64,6 +64,7 @@ import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
+import net.sf.orcc.ir.Expression
 
 /**
  * Generate and print instance source file for C backend.
@@ -86,6 +87,7 @@ class InstancePrinter extends CTemplate {
 	protected var boolean profileActions = false
 	protected var boolean dynamicMapping = false
 	protected var boolean isActionVectorizable = false
+	protected var boolean checkArrayInbounds = false
 
 	var boolean newSchedul = false
 	var boolean ringTopology = false
@@ -126,6 +128,9 @@ class InstancePrinter extends CTemplate {
 		}
 		if (options.containsKey(DYNAMIC_MAPPING)) {
 			dynamicMapping = options.get(DYNAMIC_MAPPING) as Boolean
+		}
+		if (options.containsKey(CHECK_ARRAY_INBOUNDS)) {
+			checkArrayInbounds = options.get(CHECK_ARRAY_INBOUNDS) as Boolean
 		}
 
 		if (options.containsKey(THREADS_NB)) {
@@ -226,6 +231,9 @@ class InstancePrinter extends CTemplate {
 
 		#include <stdio.h>
 		#include <stdlib.h>
+		«IF checkArrayInbounds»
+			#include <assert.h>
+		«ENDIF»
 
 		#include "types.h"
 		#include "fifo.h"
@@ -943,6 +951,16 @@ class InstancePrinter extends CTemplate {
 		«inst.target.variable.name» = «inst.value.doSwitch»;
 	'''
 
+	override checkArrayInbounds(List<Expression> exprList, List<Integer> dims) {
+		'''
+			«IF !exprList.empty»
+				«FOR i : 0 .. exprList.size - 1»
+					assert((«exprList.get(i).doSwitch») < «dims.get(i)»);
+				«ENDFOR»
+			«ENDIF»
+		'''
+	}
+
 	override caseInstLoad(InstLoad load) {
 		val srcPort = load.source.variable.getPort
 		'''
@@ -953,6 +971,9 @@ class InstancePrinter extends CTemplate {
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
 				«ENDIF»
 			«ELSE»
+				«IF checkArrayInbounds»
+					«load.indexes.checkArrayInbounds(load.source.variable.type.dimensions)»
+				«ENDIF»
 				«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
 		'''
@@ -972,6 +993,9 @@ class InstancePrinter extends CTemplate {
 				«ENDIF»
 			«ENDIF»
 		«ELSE»
+			«IF checkArrayInbounds»
+				«store.indexes.checkArrayInbounds(store.target.variable.type.dimensions)»
+			«ENDIF»
 			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
 		'''

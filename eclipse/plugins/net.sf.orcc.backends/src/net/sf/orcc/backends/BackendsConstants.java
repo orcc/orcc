@@ -37,6 +37,7 @@ public class BackendsConstants {
 	public static final String PROFILE_NETWORK = "net.sf.orcc.backends.profileNetwork";
 	public static final String PROFILE_ACTIONS = "net.sf.orcc.backends.profileNetwork.actions";
 	public static final String DYNAMIC_MAPPING = "net.sf.orcc.backends.dynamicMapping";
+	public static final String CHECK_ARRAY_INBOUNDS = "net.sf.orcc.backends.checkArrayInbounds";
 	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
 	public static final String NEW_SCHEDULER_TOPOLOGY = "net.sf.orcc.backends.newScheduler.topology";
 

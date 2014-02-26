@@ -23,6 +23,9 @@
                id="net.sf.orcc.backends.dynamicMapping">
          </option>
          <option
+               id="net.sf.orcc.backends.checkArrayInbounds">
+         </option>
+         <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
          <option
@@ -274,6 +277,13 @@
                description="Experimental load balancing on multi-core platforms"
                id="net.sf.orcc.backends.dynamicMapping"
                name="[BETA] Dynamic mapping">
+            <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Add C asserts to check array inbounds (need debug compilation)"
+               id="net.sf.orcc.backends.checkArrayInbounds"
+               name="Check array inbounds">
             <checkBox></checkBox>
          </option>
          <option
