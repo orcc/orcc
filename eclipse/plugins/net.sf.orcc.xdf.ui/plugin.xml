@@ -44,7 +44,7 @@
       <editor
          class="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
          contributorClass="net.sf.orcc.xdf.ui.editors.XdfActionBarContributor"
-         default="false"
+         default="true"
          extensions="xdf,xdfdiag"
          icon="icons/network.gif"
          id="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
