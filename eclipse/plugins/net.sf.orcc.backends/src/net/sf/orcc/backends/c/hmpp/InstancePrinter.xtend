@@ -32,17 +32,16 @@ package net.sf.orcc.backends.c.hmpp
 import java.util.Map
 import java.util.Set
 import net.sf.orcc.backends.ir.BlockFor
-import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Instance
 import net.sf.orcc.ir.ExprVar
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.Procedure
+import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.Attribute
 import org.eclipse.emf.common.util.EList
-import net.sf.orcc.ir.TypeList
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
@@ -70,36 +69,12 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«super.declare(proc)»
 	'''
 
-	override protected print(Action action) {
-		currentAction = action
-		val output = '''
-			static void «action.body.name»() {
-				«FOR variable : action.body.locals»
-					«variable.declare»;
-				«ENDFOR»
+	override protected beforeActionBody() {
+		currentAction.body.printAdvancedload
+	}
 
-			«action.body.printAdvancedload»
-
-				«FOR block : action.body.blocks»
-					«block.doSwitch»
-				«ENDFOR»
-
-			«action.body.printDelegatedstore»
-
-				«FOR port : action.inputPattern.ports»
-					index_«port.name» += «action.inputPattern.getNumTokens(port)»;
-				«ENDFOR»
-
-				«FOR port : action.outputPattern.ports»
-					index_«port.name» += «action.outputPattern.getNumTokens(port)»;
-				«ENDFOR»
-			}
-
-			«action.scheduler.print»
-
-		'''
-		currentAction = null
-		return output
+	override protected afterActionBody() {
+		currentAction.body.printDelegatedstore
 	}
 
 	override protected printAttributes(Attributable object) '''

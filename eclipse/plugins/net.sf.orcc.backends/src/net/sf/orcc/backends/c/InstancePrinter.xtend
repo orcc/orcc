@@ -762,11 +762,13 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 
 			«writeTraces(action.inputPattern)»
+			«beforeActionBody»
 
 			«FOR block : action.body.blocks»
 				«block.doSwitch»
 			«ENDFOR»
 
+			«afterActionBody»
 			«writeTraces(action.outputPattern)»
 
 			// Update ports indexes
@@ -785,7 +787,12 @@ class InstancePrinter extends CTemplate {
 
 			«action.profileEnd»
 		}
-	'''	
+	'''
+
+	// These 2 methods are used by HMPP backend to print code before the
+	// first line after after the last of an action body
+	def protected afterActionBody() ''''''
+	def protected beforeActionBody() ''''''
 	
 	def private writeTraces(Pattern pattern) '''
 		«IF enableTrace»
