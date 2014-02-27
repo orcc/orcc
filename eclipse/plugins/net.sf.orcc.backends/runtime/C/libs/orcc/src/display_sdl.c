@@ -32,7 +32,6 @@
 #include "util.h"
 #include "options.h"
 #include "trace.h"
-#include "types.h"
 
 static SDL_Surface *m_screen;
 static SDL_Surface *m_image;
@@ -68,7 +67,7 @@ static void displayYUV_setSize(int width, int height) {
 
 void displayYUV_displayPicture(unsigned char *pictureBufferY,
                                unsigned char *pictureBufferU, unsigned char *pictureBufferV,
-                               u16   pictureWidth,   u16   pictureHeight) {
+                               short   pictureWidth,   short   pictureHeight) {
 	static unsigned int lastWidth = 0;
     static unsigned int lastHeight = 0;
     SDL_Event event;
