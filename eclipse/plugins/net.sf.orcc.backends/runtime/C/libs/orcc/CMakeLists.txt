@@ -72,37 +72,27 @@ else()
         endif()
     endif()
 
-    option(USE_OPENHEVC "Try to find OpenHEVC library and link against" 0)
-    if(USE_OPENHEVC)
+    option(USE_SSE "Use SSE native functions if available" 0)
+    if(USE_SSE)
+        # Define SSE_ENABLE constant for the whole project to avoid
+        # its redefinition in the CMakeLists.txt of generated applications
+        add_definitions(-DSSE_ENABLE)
+        set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS SSE_ENABLE)
+
+        list(APPEND orcc_sources src/sse.c)
+
         find_package(OPENHEVC QUIET)
         if(OPENHEVC_FOUND)
-            include_directories(${OPENHEVC_INCLUDE_DIR})
-            # Defines OPEN_HEVC_ENABLE constant for the current directory
+            # Define OPEN_HEVC_ENABLE constant for the whole project
             add_definitions(-DOPENHEVC_ENABLE)
-            # Defines the constant in the root project directory, and its sub-directories
-            # This avoid need for OpenHevc stuff in generated application CMakeLists
-            set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS OPENHEVC_ENABLE)
+            set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS OPENHEVC_ENABLE APPEND)
 
+            include_directories(${OPENHEVC_INCLUDE_DIR})
             list(APPEND orcc_sources src/openhevc.c)
             list(APPEND orcc_additional_libraries ${OPENHEVC_LIBRARY})
             message(STATUS "Find OpenHEVC: ${OPENHEVC_LIBRARY}")
         else()
             message(STATUS "Cannot find OpenHEVC")
-        endif()
-    endif()
-
-    option(USE_SSE "Use SSE native functions if available" 1)
-    if(USE_SSE)
-        find_file(SSE sse.c src/)
-        if(SSE)
-            # Defines SSE_ENABLE constant for the current directory
-            add_definitions(-DSSE_ENABLE)
-            # Defines the constant in the root project directory, and its sub-directories
-            # This avoid need for SSE stuff in generated application CMakeLists
-            set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS SSE_ENABLE APPEND)
-
-            list(APPEND orcc_sources src/sse.c)
-            list(APPEND orcc_sources include/sse.h)
         endif()
     endif()
 
