@@ -115,18 +115,22 @@ else()
     # Do the linking
     target_link_libraries(orcc roxml ${orcc_additional_libraries})
 
-    # Build orcc-map as a standalone exectuable
-    set(orccmap_sources
-        include/serialize.h
-        src/serialize.c
-        src/main.c
-    )
-    add_executable(orcc-map ${orccmap_sources})
-    target_link_libraries(orcc-map orcc roxml)
+    option(BUILD_ORCCMAP "Build the mapping tool as a standalone executable" 0)
+    if(BUILD_ORCCMAP)
+        # Build orcc-map as a standalone exectuable
+        set(orccmap_sources
+            include/serialize.h
+            src/serialize.c
+            src/main.c
+        )
+        add_executable(orcc-map ${orccmap_sources})
+        target_link_libraries(orcc-map orcc roxml)
 
-    INSTALL(TARGETS orcc-map orcc
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-    )
+        INSTALL(TARGETS orcc-map orcc
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib
+        )
+    endif()
+
 endif()
