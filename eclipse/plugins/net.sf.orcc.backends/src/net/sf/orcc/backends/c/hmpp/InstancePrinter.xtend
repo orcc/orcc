@@ -44,7 +44,6 @@ import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.Attribute
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.OrccUtil
-import org.eclipse.emf.common.util.EList
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
@@ -172,11 +171,28 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF call.hasAttribute("callsite")»
 			«FOR grp : call.getAttribute("callsite").attributes.filterGroupsLabels»
 				«FOR cdlt : grp.attributes.filterCodeletsLabels»
-					#pragma hmpp «grp.name» «cdlt.name» callsite
+					«printSelector(grp, call.procedure.name)»
 				«ENDFOR»
 			«ENDFOR»
 		«ENDIF»
 	'''
+
+	def private printSelector(Attribute group, String procedureName) {
+		val selectorContent = '''
+			/* Group name chosen */
+			#pragma orcc2hmpp group=«group.name.replaceAll("<|>", "")»
+			/* Accelerator identifier */
+			#pragma orcc2hmpp GPU=1
+			#pragma hmpp «group.name» cdlt_«procedureName» callsite
+		'''
+		val selectorFileName = '''CODELET_CODE_«procedureName»_SELECTOR.c'''
+		val selectorFile = new File(srcFolder + File::separator + selectorFileName)
+		if(needToWriteFile(selectorContent, selectorFile)) {
+			OrccUtil::printFile(selectorContent, selectorFile)
+		}
+
+		'''#include "«selectorFileName»"'''
+	}
 
 	def private printAdvancedload(Procedure procedure) '''
 		«IF procedure.hasAttribute("advancedload")»
@@ -202,15 +218,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 
-	def private filterGroupsLabels(EList<Attribute> attrs) {
+	def private filterGroupsLabels(Iterable<Attribute> attrs) {
 		attrs.filter[it.name.startsWith("<grp_")]
 	}
 
-	def private filterNoGroupsLabels(EList<Attribute> attrs) {
+	def private filterNoGroupsLabels(Iterable<Attribute> attrs) {
 		attrs.filter[!it.name.startsWith("<grp_")]
 	}
 
-	def private filterCodeletsLabels(EList<Attribute> attrs) {
+	def private filterCodeletsLabels(Iterable<Attribute> attrs) {
 		attrs.filter[it.name.startsWith("cdlt_")]
 	}
 
