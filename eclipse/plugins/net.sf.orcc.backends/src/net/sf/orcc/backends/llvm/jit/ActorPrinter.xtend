@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2012, IETR/INSA of Rennes
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright notice,
  *     this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -56,11 +56,11 @@ import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate Jade content
- * 
+ *
  * @author Antoine Lorence
  */
 class ActorPrinter extends InstancePrinter {
-	
+
 	val List<Integer> objRefList = new ArrayList<Integer>
 	val List<Pattern> patternList = new ArrayList<Pattern>
 
@@ -71,7 +71,7 @@ class ActorPrinter extends InstancePrinter {
 	override protected print(String targetFolder) {
 		val content = fileContent
 		val file = new File(targetFolder + File::separator + actor.simpleName)
-		
+
 		if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)
 			return 0
@@ -79,7 +79,7 @@ class ActorPrinter extends InstancePrinter {
 			return 1
 		}
 	}
-	
+
 	override protected setActor(Actor actor) {
 		this.name = actor.name
 		this.actor = actor
@@ -90,7 +90,7 @@ class ActorPrinter extends InstancePrinter {
 
 	/**
 	 * Return the unique id associated with the given object, prepended with '!'
-	 * 
+	 *
 	 * @param object the object
 	 * @return unique reference to the given object
 	 */
@@ -109,8 +109,8 @@ class ActorPrinter extends InstancePrinter {
 	override protected getFileContent() '''
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Generated from "«actor.name»"
-		declare i32 @printf(i8* noalias , ...) nounwind 
-		
+		declare i32 @printf(i8* noalias , ...) nounwind
+
 		«IF ! actor.inputs.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Input FIFOs
@@ -118,7 +118,7 @@ class ActorPrinter extends InstancePrinter {
 				«input.fifo»
 			«ENDFOR»
 		«ENDIF»
-		
+
 		«IF ! actor.outputs.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Output FIFOs
@@ -126,7 +126,7 @@ class ActorPrinter extends InstancePrinter {
 				«output.fifo»
 			«ENDFOR»
 		«ENDIF»
-		
+
 		«IF ! actor.parameters.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Parameter values of the instance
@@ -134,7 +134,7 @@ class ActorPrinter extends InstancePrinter {
 				«param.actorParameter»
 			«ENDFOR»
 		«ENDIF»
-		
+
 		«IF ! actor.stateVars.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; State variables of the actor
@@ -142,32 +142,32 @@ class ActorPrinter extends InstancePrinter {
 				«variable.declare»
 			«ENDFOR»
 		«ENDIF»
-		
+
 		«IF ! actor.procs.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Functions/procedures
 			«FOR proc : actor.procs»
 				«proc.print»
-				
+
 			«ENDFOR»
 		«ENDIF»
-		
+
 		«IF ! actor.initializes.empty»
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			; Initializes
 			«FOR action : actor.initializes»
 				«action.print»
-				
+
 			«ENDFOR»
 		«ENDIF»
-		
+
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Actions
 		«FOR action : actor.actions»
 			«action.print»
-			
+
 		«ENDFOR»
-		
+
 		«decl_MD»
 	'''
 
@@ -208,7 +208,7 @@ class ActorPrinter extends InstancePrinter {
 		; Action-scheduler
 		«actionScheduler_MD»
 		«IF ! actor.inputs.empty»
-			
+
 			; Input ports
 			«FOR port : actor.inputs»
 				«port.objectReference» = metadata !{metadata «port.type.objectReference», «port.name.name_MD», «port.type.doSwitch»** «port.fifoVarName»}
@@ -216,7 +216,7 @@ class ActorPrinter extends InstancePrinter {
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.outputs.empty»
-			
+
 			; Output ports
 			«FOR port : actor.outputs»
 				«port.objectReference» = metadata !{metadata «port.type.objectReference», «port.name.name_MD», «port.type.doSwitch»** «port.fifoVarName»}
@@ -224,7 +224,7 @@ class ActorPrinter extends InstancePrinter {
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.parameters.empty»
-			
+
 			; Parameters
 			«FOR param : actor.parameters»
 				; «param.name»
@@ -234,7 +234,7 @@ class ActorPrinter extends InstancePrinter {
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.stateVars.empty»
-			
+
 			; State Variables
 			«FOR stateVar : actor.stateVars»
 				;; «stateVar.name»
@@ -245,25 +245,25 @@ class ActorPrinter extends InstancePrinter {
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.procs.empty»
-			
+
 			; Functions and procedures
 			«FOR proc : actor.procs»
 				«proc.objectReference» = metadata !{«proc.name.name_MD», «proc.procNative_MD», «proc.returnType.doSwitch»(«proc.parameters.join(", ")[argumentTypeDeclaration].wrap»)* @«proc.name»}
 			«ENDFOR»
 		«ENDIF»
 		«IF ! actor.initializes.empty»
-			
+
 			; Initializes
 			«FOR action : actor.initializes»
 				«action.action_MD»
-				
+
 			«ENDFOR»
 		«ENDIF»
 
 		; Actions
 		«FOR action : actor.actions»
 			«action.action_MD»
-			
+
 		«ENDFOR»
 
 		; Patterns
@@ -281,7 +281,7 @@ class ActorPrinter extends InstancePrinter {
 			«pattern.numTokensMap.objectReference» = metadata !{«pattern.ports.join(", ")['''metadata «objectReference», i32 «pattern.numTokensMap.get(it)»''']»}
 		«ENDFOR»
 		«IF actor.hasMoC»
-			
+
 			; MoC
 			«moC_MD»
 		«ENDIF»
@@ -331,7 +331,7 @@ class ActorPrinter extends InstancePrinter {
 			«pattern.objectReference» = metadata !{«numTokens», «variables»}
 		'''
 	}
-	
+
 	def private action_MD(Action action) {
 		val tag = if (action.tag.identifiers.empty) "null"
 				else '''metadata «action.tag.objectReference»'''
@@ -361,37 +361,37 @@ class ActorPrinter extends InstancePrinter {
 	def private procNative_MD(Procedure proc)
 		'''«IF proc.native»i1 1«ELSE»i1 0«ENDIF»'''
 
-	
+
 	def private varIndex_MD(Var variable)
 		'''i32 «variable.index»'''
-	
-	def private varAssignable_MD(Var variable) 
+
+	def private varAssignable_MD(Var variable)
 		'''i1 «IF variable.assignable»1«ELSE»0«ENDIF»'''
-	
+
 	def private varSize_MD(Type type)
 		'''«IF type.list»«(type as TypeList).dimensions.join(", ")['''i32 «it»''']»«ELSE»null«ENDIF»'''
-	
+
 	def private name_MD(String name)
 		'''metadata !"«name»"'''
-	
+
 	def private actionScheduler_MD() {
 		val outsideFSM = if ( ! actor.actionsOutsideFsm.empty) '''metadata «actor.actionsOutsideFsm.objectReference»''' else "null"
 		val fsm = if (actor.fsm != null) '''metadata «actor.fsm.objectReference»''' else "null"
 		'''
 			«actor.objectReference» = metadata !{«outsideFSM», «fsm»}
 			«IF ! actor.actionsOutsideFsm.empty»
-				
+
 				;; Actions outside FSM
 				«actor.actionsOutsideFsm.objectReference» = metadata !{«actor.actionsOutsideFsm.join(", ")['''metadata «objectReference»''']»}
 			«ENDIF»
 			«IF actor.fsm != null»
-				
+
 				;; FSM
 				«FSM_MD»
 			«ENDIF»
 		'''
 	}
-	
+
 	// In some case, «actor.fsm.transitions» can be the same object list than «actor.fsm.states.get(0).outgoing». We use «actor.name.concat("_transitions")» to prevent this
 	def private FSM_MD() '''
 		«actor.fsm.objectReference» = metadata !{«actor.fsm.initialState.name.name_MD», metadata «actor.fsm.states.objectReference», metadata «actor.name.concat("_transitions").objectReference»}
@@ -403,7 +403,7 @@ class ActorPrinter extends InstancePrinter {
 			«state.transition_MD»
 		«ENDFOR»
 	'''
-	
+
 	def private transition_MD(State state) '''
 		;;;; Transitions from «state.name»
 		«IF state.outgoing.empty»
@@ -427,7 +427,7 @@ class ActorPrinter extends InstancePrinter {
 			default: ""
 		}
 	}
-	
+
 	override caseInstLoad(InstLoad load) '''
 		«IF load.source.variable.type.list»
 			«load.source.variable.varName(load)» = getelementptr «load.source.variable.type.doSwitch»* «load.source.variable.print», i32 0«load.indexes.join(", ", ", ", "")[printIndex]»
@@ -436,7 +436,7 @@ class ActorPrinter extends InstancePrinter {
 			«load.target.variable.print» = load «load.source.variable.type.doSwitch»* «load.source.variable.print»
 		«ENDIF»
 	'''
-	
+
 	override caseInstStore(InstStore store) '''
 		«IF store.target.variable.type.list»
 			«store.target.variable.varName(store)» = getelementptr «store.target.variable.type.doSwitch»* «store.target.variable.print», i32 0«store.indexes.join(", ", ", ", "")[printIndex]»
@@ -445,14 +445,14 @@ class ActorPrinter extends InstancePrinter {
 			store «store.target.variable.type.doSwitch» «store.value.doSwitch», «store.target.variable.type.doSwitch»* «store.target.variable.print»
 		«ENDIF»
 	'''
-	
+
 	override caseInstReturn(InstReturn retInst) {
 		if(retInst.value == null)
 			'''ret void'''
 		else
 			'''ret «retInst.value.type.doSwitch» «retInst.value.doSwitch»'''
 	}
-	
+
 	override protected print(Action action) '''
 		define «action.scheduler.returnType.doSwitch» @«action.scheduler.name»(«action.scheduler.parameters.join(", ")[argumentDeclaration]») nounwind {
 		entry:
@@ -463,12 +463,12 @@ class ActorPrinter extends InstancePrinter {
 				«port.fifoVar(action.inputPattern.portToVarMap.get(port))»
 			«ENDFOR»
 			br label %b«action.scheduler.blocks.head.label»
-			
+
 		«FOR block : action.scheduler.blocks»
 			«block.doSwitch»
 		«ENDFOR»
 		}
-		
+
 		define void @«action.body.name»(«action.body.parameters.join(", ")[argumentDeclaration]») nounwind {
 		entry:
 			«FOR local : action.body.locals»
@@ -481,24 +481,24 @@ class ActorPrinter extends InstancePrinter {
 				«port.fifoVar(action.outputPattern.portToVarMap.get(port))»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
-		
+
 		«FOR block : action.body.blocks»
 			«block.doSwitch»
 		«ENDFOR»
 		}
 	'''
-	
+
 	def private actorParameter(Var variable)
 		'''@«variable.name» = global «variable.type.doSwitch» undef'''
 
-	
+
 	def private fifo(Port port) '''
 		«port.fifoVarName» = global «port.type.doSwitch»* null
 	'''
-	
+
 	def private fifoVarName(Port port)
 		'''@«port.name»_ptr'''
-	
+
 	def private fifoVar(Port port, Var variable) '''
 		%«variable.name»_ptr = load «port.type.doSwitch»** «port.fifoVarName»
 		%«variable.name» = bitcast «port.type.doSwitch»* %«variable.name»_ptr to «variable.type.doSwitch»*
@@ -528,12 +528,12 @@ class ActorPrinter extends InstancePrinter {
 			}
 		}
 	}
-	
+
 	def private compute(Pattern pattern) {
 		if( ! pattern.empty)
 			patternList.add(pattern)
 	}
-	
+
 	override protected computeCastedList() {
 		castedList.clear
 		for (variable : actor.eAllContents.toIterable.filter(typeof(Var))) {

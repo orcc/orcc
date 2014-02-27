@@ -527,12 +527,12 @@ class InstancePrinter extends CTemplate {
 			int isAligned = 1;
 			«FOR port : action.inputPattern.ports»
 				«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
-					isAligned = isAligned && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
+					isAligned &= ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.inputPattern.getNumTokens(port)») % SIZE_«port.name»));
 				«ENDIF»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports»
 				«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
-					isAligned = isAligned && ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
+					isAligned &= ((index_«port.name» % SIZE_«port.name») < ((index_«port.name» + «action.outputPattern.getNumTokens(port)») % SIZE_«port.name»));
 				«ENDIF»
 			«ENDFOR»
 	'''
@@ -760,7 +760,6 @@ class InstancePrinter extends CTemplate {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
-
 			«writeTraces(action.inputPattern)»
 			«beforeActionBody»
 
@@ -770,7 +769,6 @@ class InstancePrinter extends CTemplate {
 
 			«afterActionBody»
 			«writeTraces(action.outputPattern)»
-
 			// Update ports indexes
 			«FOR port : action.inputPattern.ports»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
@@ -794,8 +792,9 @@ class InstancePrinter extends CTemplate {
 	def protected afterActionBody() ''''''
 	def protected beforeActionBody() ''''''
 	
-	def private writeTraces(Pattern pattern) '''
-		«IF enableTrace»
+	def private writeTraces(Pattern pattern) {
+		if(!enableTrace) return ''''''
+		'''
 			«FOR port : pattern.ports»
 				{
 					// Write traces
@@ -805,8 +804,8 @@ class InstancePrinter extends CTemplate {
 					}
 				}
 			«ENDFOR»
-		«ENDIF»
-	'''
+		'''
+	}
 	
 	def private profileStart(Action action) '''
 		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
