@@ -96,9 +96,9 @@ else()
         endif()
     endif()
 
-    option(USE_METIS "Try to find Metis library and link against" 0)
+    option(USE_METIS "Use the Metis library for the actor mapping" 0)
     if(USE_METIS)
-        find_package(METIS QUIET)
+        find_package(METIS REQUIRED)
         if(METIS_FOUND)
             # Defines METIS_ENABLE constant for the current directory
             add_definitions(-DMETIS_ENABLE)
