@@ -236,7 +236,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 		final net.sf.orcc.df.Connection dfConnection = DfFactory.eINSTANCE.createConnection(src.getVertex(),
 				src.getPort(), tgt.getVertex(), tgt.getPort());
 		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
-		network.getConnections().add(dfConnection);
+		network.add(dfConnection);
 
 		addContext.setNewObject(dfConnection);
 		final Connection newConnection = (Connection) getFeatureProvider().addIfPossible(addContext);

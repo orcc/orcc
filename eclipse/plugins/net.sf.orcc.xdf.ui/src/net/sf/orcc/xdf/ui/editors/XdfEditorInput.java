@@ -49,8 +49,7 @@ public class XdfEditorInput extends DiagramEditorInput {
 
 	@Override
 	public boolean equals(Object obj) {
-		final boolean originalResult = super.equals(obj);
-		if (originalResult) {
+		if (super.equals(obj)) {
 			return true;
 		}
 

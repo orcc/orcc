@@ -173,7 +173,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			}
 		}
 
-
 		// This set will be filled with connections which needs to be
 		// re-added to the diagram
 		final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
@@ -222,7 +221,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			pattern.delete(delContext);
 		}
 
-		// And layout the resulting diagram
+		// Layout the resulting diagram
 		final IContext layoutContext = new CustomContext();
 		final ICustomFeature layoutFeature = ((XdfDiagramFeatureProvider) getFeatureProvider())
 				.getDefaultLayoutFeature();
@@ -230,7 +229,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			layoutFeature.execute(layoutContext);
 		}
 
-		// Active direct editing on the freshly created instance
+		// Finally, active direct editing on the freshly created instance
 		final IDirectEditingInfo dei = getFeatureProvider()
 				.getDirectEditingInfo();
 		dei.setMainPictogramElement(newInstancePe);

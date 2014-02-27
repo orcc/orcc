@@ -220,11 +220,14 @@ public class XdfUtil {
 
 	/**
 	 * Initialize an AddConnectionContext object from a network connection. This
-	 * connection must be contained in the network.
+	 * method does not add the given connection to the network.
 	 * 
 	 * @param fp
+	 *            The IFeatureProviderWithPatterns instance
 	 * @param diagram
+	 *            The diagram where the connection must be added
 	 * @param connection
+	 *            The connection
 	 * @return
 	 */
 	public static AddConnectionContext getAddConnectionContext(final IFeatureProviderWithPatterns fp,

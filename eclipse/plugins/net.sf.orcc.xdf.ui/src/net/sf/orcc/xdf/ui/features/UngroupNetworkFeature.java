@@ -168,7 +168,8 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 
 		// Merge connections:
 		// outerCon = connected from something in the current graph to an input of the instance
-		// innerCon = connected from a subNetwork input to something else (subNetwork too)
+		// innerCon = connected from a subNetwork input to something else (in
+		// subNetwork too)
 		for (final Port inPort : subNetwork.getInputs()) {
 
 			final Connection outerCon = instance.getIncomingPortMap().get(inPort);
@@ -186,14 +187,12 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 						outerCon.getSource(), outerCon.getSourcePort(),
 						target, targetPort);
 
-
 				// Delete the link, to avoid loosing the connection when instance will be deleted
 				final List<PictogramElement> pes = Graphiti.getLinkService().getPictogramElements(getDiagram(), outerCon);
 				for(PictogramElement linkedPe : pes) {
 					EcoreUtil.delete(linkedPe.getLink(), true);
 				}
 
-				thisNetwork.getConnections().remove(outerCon);
 				thisNetwork.add(c);
 
 				final AddConnectionContext addConContext = XdfUtil
@@ -231,7 +230,7 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 						EcoreUtil.delete(linkedPe.getLink(), true);
 					}
 
-					thisNetwork.getConnections().remove(outerCon);
+					thisNetwork.remove(outerCon);
 					thisNetwork.add(c);
 
 					final AddConnectionContext addConContext = XdfUtil
