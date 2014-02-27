@@ -29,6 +29,7 @@
  
 package net.sf.orcc.backends.c.hmpp
 
+import java.io.File
 import java.util.Map
 import java.util.Set
 import net.sf.orcc.backends.ir.BlockFor
@@ -41,12 +42,24 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.Attribute
+import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.common.util.EList
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	new(Map<String, Object> options) {
 		super(options)
+	}
+
+	/**
+	 * Will be used when we will print codelet
+	 * content in its own file
+	 */
+	private var String srcFolder = ""
+	override protected print(String targetFolder) {
+		srcFolder = targetFolder
+		super.print(targetFolder)
 	}
 
 	override caseInstCall(InstCall call) '''
@@ -75,6 +88,40 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override protected afterActionBody() {
 		currentAction.body.printDelegatedstore
+	}
+
+	override protected print(Procedure proc) {
+		// This method override only codelet printing
+		if(!proc.hasAttribute("codelet")) {
+			return super.print(proc)
+		}
+
+		if(srcFolder == null || srcFolder.empty) {
+			OrccLogger::severeln("[hmpp.InstancePrinter#print(Procedure)] srcFolder has not been defined")
+			return ''
+		}
+
+		val templateFileName = '''CODELET_CODE_«proc.name»_DEFAULT.c'''
+		val wrapperFileName  = '''CODELET_CODE_«proc.name»_GEN_WRAPPER.c'''
+
+		val wrapperContent = '''
+			#include "«templateFileName»"
+		'''
+		val wrapperFile = new File(srcFolder + File::separator + wrapperFileName)
+		if(needToWriteFile(wrapperContent, wrapperFile)) {
+			OrccUtil::printFile(wrapperContent, wrapperFile)
+		}
+
+		val templateContent = super.print(proc)
+		val templateFile = new File(srcFolder + File::separator + templateFileName)
+		if(needToWriteFile(templateContent, templateFile)) {
+			OrccUtil::printFile(templateContent, templateFile)
+		}
+
+		// Finally #include the wrapper instead of printing the procedure definition
+		'''
+			#include "«wrapperFileName»"
+		'''
 	}
 
 	override protected printAttributes(Attributable object) '''
