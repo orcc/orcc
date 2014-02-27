@@ -762,7 +762,7 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 
 			«writeTraces(action.inputPattern)»
-	
+
 			«FOR block : action.body.blocks»
 				«block.doSwitch»
 			«ENDFOR»
