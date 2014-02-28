@@ -186,15 +186,20 @@ u8 _width, u8 _height, i32 mx, i32 my)
     }
 }
 
-void put_unweighted_pred_orcc(u8 _dst[2][64*64], i16 _src[2][64*64],
-u8 _width, u8 _height, u8 rdList)
+void put_unweighted_pred_orcc(i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64])
 {
-    i16 *src = &_src;
-    u8 *dst = _dst[rdList];
+    i16 * src = _src[rdList];
+    u8 * dst = _dst;
     u8 width = _width + 1;
     u8 height = _height + 1;
 
-    hevcDsp.put_unweighted_pred[0](dst, width, src, width, width, height);
+    if(width == 8 || width == 16 || width == 24 || width == 32) {
+        hevcDsp.put_unweighted_pred[2](dst, width, src, width, width, height);
+      } else if(width == 4 || width == 12) {
+        hevcDsp.put_unweighted_pred[1](dst, width, src, width, width, height);
+      } else {
+        hevcDsp.put_unweighted_pred[0](dst, width, src, width, width, height);
+      }
 }
 
 void put_unweighted_pred_avg_orcc(u8 _dst[2][64*64], i16 _src[2][64*64],
