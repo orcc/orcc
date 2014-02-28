@@ -100,7 +100,6 @@ public class PrepareHMPPAnnotations extends AbstractIrVisitor<Void> {
 
 				if (result != null) {
 					ExprVar cpy = IrUtil.copy(result, false);
-					cpy.setAttribute("dbg", "FOCK");
 					subAttr.setContainedValue(cpy);
 				}
 			}

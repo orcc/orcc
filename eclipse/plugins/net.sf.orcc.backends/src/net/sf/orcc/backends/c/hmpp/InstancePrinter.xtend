@@ -29,6 +29,7 @@
  
 package net.sf.orcc.backends.c.hmpp
 
+import java.io.File
 import java.util.Map
 import java.util.Set
 import net.sf.orcc.backends.ir.BlockFor
@@ -41,12 +42,23 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.Attribute
-import org.eclipse.emf.common.util.EList
+import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	new(Map<String, Object> options) {
 		super(options)
+	}
+
+	/**
+	 * Will be used when we will print codelet
+	 * content in its own file
+	 */
+	private var String srcFolder = ""
+	override protected print(String targetFolder) {
+		srcFolder = targetFolder
+		super.print(targetFolder)
 	}
 
 	override caseInstCall(InstCall call) '''
@@ -75,6 +87,40 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override protected afterActionBody() {
 		currentAction.body.printDelegatedstore
+	}
+
+	override protected print(Procedure proc) {
+		// This method override only codelet printing
+		if(!proc.hasAttribute("codelet")) {
+			return super.print(proc)
+		}
+
+		if(srcFolder == null || srcFolder.empty) {
+			OrccLogger::severeln("[hmpp.InstancePrinter#print(Procedure)] srcFolder has not been defined")
+			return ''
+		}
+
+		val templateFileName = '''CODELET_CODE_«proc.name»_DEFAULT.c'''
+		val wrapperFileName  = '''CODELET_CODE_«proc.name»_GEN_WRAPPER.c'''
+
+		val wrapperContent = '''
+			#include "«templateFileName»"
+		'''
+		val wrapperFile = new File(srcFolder + File::separator + wrapperFileName)
+		if(needToWriteFile(wrapperContent, wrapperFile)) {
+			OrccUtil::printFile(wrapperContent, wrapperFile)
+		}
+
+		val templateContent = super.print(proc)
+		val templateFile = new File(srcFolder + File::separator + templateFileName)
+		if(needToWriteFile(templateContent, templateFile)) {
+			OrccUtil::printFile(templateContent, templateFile)
+		}
+
+		// Finally #include the wrapper instead of printing the procedure definition
+		'''
+			#include "«wrapperFileName»"
+		'''
 	}
 
 	override protected printAttributes(Attributable object) '''
@@ -125,11 +171,28 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF call.hasAttribute("callsite")»
 			«FOR grp : call.getAttribute("callsite").attributes.filterGroupsLabels»
 				«FOR cdlt : grp.attributes.filterCodeletsLabels»
-					#pragma hmpp «grp.name» «cdlt.name» callsite
+					«printSelector(grp, call.procedure.name)»
 				«ENDFOR»
 			«ENDFOR»
 		«ENDIF»
 	'''
+
+	def private printSelector(Attribute group, String procedureName) {
+		val selectorContent = '''
+			/* Group name chosen */
+			#pragma orcc2hmpp group=«group.name.replaceAll("<|>", "")»
+			/* Accelerator identifier */
+			#pragma orcc2hmpp GPU=1
+			#pragma hmpp «group.name» cdlt_«procedureName» callsite
+		'''
+		val selectorFileName = '''CODELET_CODE_«procedureName»_SELECTOR.c'''
+		val selectorFile = new File(srcFolder + File::separator + selectorFileName)
+		if(needToWriteFile(selectorContent, selectorFile)) {
+			OrccUtil::printFile(selectorContent, selectorFile)
+		}
+
+		'''#include "«selectorFileName»"'''
+	}
 
 	def private printAdvancedload(Procedure procedure) '''
 		«IF procedure.hasAttribute("advancedload")»
@@ -155,15 +218,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 
-	def private filterGroupsLabels(EList<Attribute> attrs) {
+	def private filterGroupsLabels(Iterable<Attribute> attrs) {
 		attrs.filter[it.name.startsWith("<grp_")]
 	}
 
-	def private filterNoGroupsLabels(EList<Attribute> attrs) {
+	def private filterNoGroupsLabels(Iterable<Attribute> attrs) {
 		attrs.filter[!it.name.startsWith("<grp_")]
 	}
 
-	def private filterCodeletsLabels(EList<Attribute> attrs) {
+	def private filterCodeletsLabels(Iterable<Attribute> attrs) {
 		attrs.filter[it.name.startsWith("cdlt_")]
 	}
 
