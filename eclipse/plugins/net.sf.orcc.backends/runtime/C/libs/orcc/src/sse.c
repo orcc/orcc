@@ -372,7 +372,7 @@ void fillBorder_luma_orcc(
 
 
 void fillBorder_chroma_orcc(
-	u8 pictureBuffer[17][768][1280],
+	u8 pictureBuffer[17][1280][2304],
 	i8 lastIdx,
 	int xSize,
 	int ySize,
