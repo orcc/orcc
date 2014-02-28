@@ -116,15 +116,6 @@ class SwActorPrinter extends InstancePrinter {
 			«FOR port : action.outputPattern.ports.filter[native]»
 				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
 			«ENDFOR»
-			«FOR port : action.inputPattern.ports.notNative»
-				«val connection = incomingPortMap.get(port)»
-				call void @read_end_«port.name»_«connection.getSafeId(port)»()
-			«ENDFOR»
-			«FOR port : action.outputPattern.ports.notNative»
-				«FOR connection : outgoingPortMap.get(port)»
-					call void @write_end_«port.name»_«connection.getSafeId(port)»()
-				«ENDFOR»
-			«ENDFOR»
 			ret void
 		}
 		«ENDIF»	
@@ -184,15 +175,6 @@ class SwActorPrinter extends InstancePrinter {
 				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
 			«ENDFOR»
 			
-			«FOR port : action.inputPattern.ports.notNative»
-				«val connection = incomingPortMap.get(port)»
-				call void @read_end_«port.name»_«connection.getSafeId(port)»()
-			«ENDFOR»
-			«FOR port : action.outputPattern.ports.notNative»
-				«FOR connection : outgoingPortMap.get(port)»
-					call void @write_end_«port.name»_«connection.getSafeId(port)»()
-				«ENDFOR»
-			«ENDFOR»
 			ret void
 		}
 		«ENDIF»

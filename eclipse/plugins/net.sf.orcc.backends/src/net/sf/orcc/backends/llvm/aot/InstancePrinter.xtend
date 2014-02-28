@@ -690,7 +690,7 @@ class InstancePrinter extends LLVMTemplate {
 		%orig_local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
 		%local_index_«port.name»_«connection.getSafeId(port)» = urem i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», %local_size_«port.name»_«connection.getSafeId(port)»
 		«ELSE»
-		%local_index_«port.name»_«connection.getSafeId(port)» = load «port.properties» i32* @index_«port.name»_«connection.getSafeId(port)»
+		%local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
 		«ENDIF»
 	'''
 
@@ -700,7 +700,7 @@ class InstancePrinter extends LLVMTemplate {
 		«ELSE»
 		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
 		«ENDIF»
-		store«port.properties» i32 %new_index_«port.name»_«connection.getSafeId(port)», i32* @index_«port.name»_«connection.getSafeId(port)»
+		store i32 %new_index_«port.name»_«connection.getSafeId(port)», i32* @index_«port.name»_«connection.getSafeId(port)»
 	'''
 
 	def protected print(Procedure procedure) '''
