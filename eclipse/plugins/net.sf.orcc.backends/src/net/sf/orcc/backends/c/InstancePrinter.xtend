@@ -88,7 +88,7 @@ class InstancePrinter extends CTemplate {
 	protected var boolean profileNetwork = false
 	protected var boolean profileActions = false
 	protected var boolean dynamicMapping = false
-	protected var boolean isActionVectorizable = false
+	protected var boolean isActionAligned = false
 	protected var boolean checkArrayInbounds = false
 
 	var boolean newSchedul = false
@@ -524,7 +524,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def protected printVectorizationConditions(Action action) '''
+	def protected printAlignmentConditions(Action action) '''
 		{
 			int isAligned = 1;
 			«FOR port : action.inputPattern.ports»
@@ -553,7 +553,7 @@ class InstancePrinter extends CTemplate {
 				«IF trans.action.hasAttribute(ALIGNED_ALWAYS)»
 					«trans.action.body.name»_aligned();
 				«ELSEIF trans.action.hasAttribute(ALIGNABLE)»
-					«trans.action.printVectorizationConditions»
+					«trans.action.printAlignmentConditions»
 						if (isAligned) {
 							«trans.action.body.name»_aligned();
 						} else {
@@ -659,7 +659,7 @@ class InstancePrinter extends CTemplate {
 				«IF action.hasAttribute(ALIGNED_ALWAYS)»
 					«action.body.name»_aligned();
 				«ELSEIF action.hasAttribute(ALIGNABLE)»
-					«action.printVectorizationConditions»
+					«action.printAlignmentConditions»
 						if (isAligned) {
 							«action.body.name»_aligned();
 						} else {
@@ -832,14 +832,14 @@ class InstancePrinter extends CTemplate {
 
 	def protected print(Action action) {
 		currentAction = action
-		isActionVectorizable = false
+		isActionAligned = false
 		'''
 		«action.scheduler.print»
 		
 		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
 			«printCore(action, false)»
 		«ENDIF»
-		«IF isActionVectorizable = action.hasAttribute(ALIGNABLE)»
+		«IF isActionAligned = action.hasAttribute(ALIGNABLE)»
 			«printCore(action, true)»
 		«ENDIF»
 		'''
@@ -973,7 +973,7 @@ class InstancePrinter extends CTemplate {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
+				«IF (isActionAligned && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_aligned_«srcPort.name» + («load.indexes.head.doSwitch»))];
 				«ELSE»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
@@ -994,7 +994,7 @@ class InstancePrinter extends CTemplate {
 			«IF trgtPort.native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
+				«IF (isActionAligned && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
 					tokens_«trgtPort.name»[(index_aligned_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
@@ -1029,7 +1029,7 @@ class InstancePrinter extends CTemplate {
 	
 	override caseExprVar(ExprVar expr) {
 		val port = expr.copyOf
-		if(port != null && isActionVectorizable){
+		if(port != null && isActionAligned){
 			// If the argument is just a local copy of input/output tokens
 			// use directly the FIFO when the tokens are aligned
 			'''&tokens_«port.name»[index_aligned_«port.name»]'''
