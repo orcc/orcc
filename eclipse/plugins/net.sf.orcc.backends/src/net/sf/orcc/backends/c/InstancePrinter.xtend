@@ -50,6 +50,8 @@ import net.sf.orcc.ir.ArgByVal
 import net.sf.orcc.ir.BlockBasic
 import net.sf.orcc.ir.BlockIf
 import net.sf.orcc.ir.BlockWhile
+import net.sf.orcc.ir.ExprVar
+import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.InstAssign
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.InstLoad
@@ -61,10 +63,10 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.util.util.EcoreHelper
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
-import net.sf.orcc.ir.Expression
 
 /**
  * Generate and print instance source file for C backend.
@@ -1024,6 +1026,17 @@ class InstancePrinter extends CTemplate {
 	override caseInstTernary(InstTernary inst) '''
 		«inst.target.variable.name» = «inst.conditionValue.doSwitch» ? «inst.trueValue.doSwitch» : «inst.falseValue.doSwitch»;
 	'''
+	
+	override caseExprVar(ExprVar expr) {
+		val port = expr.copyOf
+		if(port != null && isActionVectorizable){
+			// If the argument is just a local copy of input/output tokens
+			// use directly the FIFO when the tokens are aligned
+			'''&tokens_«port.name»[index_aligned_«port.name»]'''
+		} else {
+			expr.use.variable.name
+		}
+	}
 
 	//========================================
 	//            Helper methods
@@ -1040,6 +1053,23 @@ class InstancePrinter extends CTemplate {
 		} else {
 			null
 		}
+	}
+	
+	/**
+	 * Returns the port object in case the corresponding expression is 
+	 * just a straight copy of the tokens.
+	 * 
+	 * @param expr
+	 *            an expression
+	 * @return the corresponding port, or <code>null</code>
+	 */
+	def private copyOf(ExprVar expr) {
+		val action = EcoreHelper.getContainerOfType(expr, Action)
+		val variable = expr.use.variable
+		if(action == null || !expr.type.list || !variable.hasAttribute("copyOfTokens")) {
+			return null
+		}
+		return variable.getValueAsEObject("copyOfTokens") as Port
 	}
 
 	def private printCallArg(Arg arg) {
