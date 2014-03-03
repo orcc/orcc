@@ -57,6 +57,7 @@ import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Pattern;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
@@ -366,12 +367,16 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			if (target == null) {
 				if (expression.eContainer() instanceof StatementCall
 						&& procedure.eContainer() instanceof Action) {
-					if (((Action) procedure.eContainer()).getInputPattern()
-							.contains(var)) {
+					Pattern inputPattern = ((Action) procedure.eContainer())
+							.getInputPattern();
+					if (inputPattern.contains(var)) {
 						// Need to copy the list before using it in a procedure
 						target = procedure.newTempLocalVariable(var.getType(),
 								"local_" + var.getName());
 						copyList(var);
+						// Notice that is just a copy of the input data
+						target.setAttribute("copyOfTokens",
+								inputPattern.getPort(var));
 						return eINSTANCE.createExprVar(target);
 					}
 				}
