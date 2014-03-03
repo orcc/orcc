@@ -991,7 +991,7 @@ class InstancePrinter extends CTemplate {
 		val trgtPort = store.target.variable.port
 		'''
 		«IF trgtPort != null»
-			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
+			«IF trgtPort.native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
 				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
