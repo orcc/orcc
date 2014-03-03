@@ -227,20 +227,20 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	override caseExprUnary(ExprUnary expr)
 		'''«expr.op.stringRepresentation»«expr.expr.printExpr(Integer::MIN_VALUE, branch)»'''
 		
-	override caseExprFloat(ExprFloat object) {
-		String::valueOf(object.value)
+	override caseExprFloat(ExprFloat expr) {
+		String::valueOf(expr.value)
 	}
 	
-	override caseExprInt(ExprInt object) {
-		String::valueOf(object.value)
+	override caseExprInt(ExprInt expr) {
+		String::valueOf(expr.value)
 	}
 	
-	override caseExprBool(ExprBool object) {
-		String::valueOf(object.value)
+	override caseExprBool(ExprBool expr) {
+		String::valueOf(expr.value)
 	}
 	
-	override caseExprVar(ExprVar object) {
-		object.use.variable.name
+	override caseExprVar(ExprVar expr) {
+		expr.use.variable.name
 	}
 	
 	override caseExprList(ExprList expr) {
