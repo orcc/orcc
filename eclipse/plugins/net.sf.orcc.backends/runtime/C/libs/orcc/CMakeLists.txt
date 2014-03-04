@@ -113,6 +113,13 @@ else()
         endif()
     endif()
 
+    if(NOT MSV AND NOT CMAKE_CROSSCOMPILING)
+        # Optimize the compilation for the local processor architecture
+        add_definitions(-march=native)
+        # FIXME: Set the flag for the whole project
+        # set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_C_FLAGS -march=native APPEND)
+    endif()
+
     # Compile libraries
     add_library(orcc STATIC ${orcc_sources} ${orcc_headers})
     # Do the linking
