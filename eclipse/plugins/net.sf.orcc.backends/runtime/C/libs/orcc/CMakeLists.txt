@@ -79,7 +79,10 @@ else()
         add_definitions(-DSSE_ENABLE)
         set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS SSE_ENABLE)
 
-        list(APPEND orcc_sources src/sse.c)
+        list(APPEND orcc_sources
+            src/sse.c
+            src/hevc_idct_sse4.c
+        )
 
         find_package(OPENHEVC QUIET)
         if(OPENHEVC_FOUND)
@@ -100,7 +103,7 @@ else()
     if(USE_METIS)
         find_package(METIS REQUIRED)
         if(METIS_FOUND)
-            # Defines METIS_ENABLE constant for the current directory
+            # Define METIS_ENABLE constant for the current directory
             add_definitions(-DMETIS_ENABLE)
 
             list(APPEND orcc_additional_libraries ${METIS_LIBRARY})
