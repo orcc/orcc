@@ -43,6 +43,7 @@ class OrccAnalyse:
         self.SUMMARY_XML = tag + ".xml"
         self.SUMMARY_HTML = tag + ".html"
         self.SUMMARY_PDF = tag + ".pdf"
+        self.SUMMARY_PLOT = tag + "_report.csv"
         self.SRC_DIR = "."
         self.PDF_TOOL = "wkhtmltopdf"
         self.PDF_TOOL_INSTALLED = shutil.which(self.PDF_TOOL)
@@ -52,6 +53,7 @@ class OrccAnalyse:
         self.logXML = True
         self.logHTML = True
         self.logPDF = True
+        self.logPlotCSV = True
         self.ARCHIVE = True
 
     def start(self):
@@ -74,6 +76,9 @@ class OrccAnalyse:
         pass
 
     def logInCSV(self):
+        pass
+
+    def logInPlotReportCSV(self):
         pass
 
     def logInXML(self):
@@ -211,6 +216,8 @@ class OrccAnalyse:
     def printData(self):
         if self.logCSV:
             self.logInCSV()
+        if self.logPlotCSV:
+            self.logInPlotReportCSV()
         if self.logTXT:
             self.logInTXT()
         if self.logXML:
@@ -238,7 +245,7 @@ class OrccAnalyse:
                 print ("    Warning: Making a backup of a directory with same name in " + backup)
             os.mkdir(targetPath)
             os.system("mv " + self.SRC_DIR + "/*" + self.DEFAULT_LOG_EXT + " " + targetPath)
-            if self.logCSV:
+            if self.logCSV or self.logPlotCSV:
                 os.system("mv " + self.SRC_DIR + "/*.csv " + targetPath)
             if self.logTXT:
                 os.system("mv " + self.SRC_DIR + "/*.txt " + targetPath)

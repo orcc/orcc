@@ -142,6 +142,21 @@ class SimulationAnalyse(OrccAnalyse):
         fic.write("\nWorst actor is : " + self.WORST_ACTOR + "    with : " + str(self.WORST_FPS) + " FPS\n")
         fic.close()
 
+    def logInPlotReportCSV(self):
+        print ("\n  * Generate Plot CSV Report file for Jenkins : " + os.path.join(self.SRC_DIR, self.SUMMARY_PLOT))
+        fic = open(os.path.join(self.SRC_DIR, self.SUMMARY_PLOT), 'w')
+        # Header
+        for actor in self.extractedData:
+            fic.write(actor.actor_name + ";")
+        fic.write("\n")
+
+        # Body
+        for actor in self.extractedData:
+            fic.write(str(actor.fps) + ";");
+        fic.write("\n")
+
+        fic.close()
+
     def logInCSV(self):
         print ("\n  * Generate CSV Result file : " + os.path.join(self.SRC_DIR, self.SUMMARY_CSV))
         fic = open(os.path.join(self.SRC_DIR, self.SUMMARY_CSV), 'w')
