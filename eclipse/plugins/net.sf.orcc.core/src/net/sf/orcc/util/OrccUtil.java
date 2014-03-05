@@ -254,6 +254,28 @@ public class OrccUtil {
 	}
 
 	/**
+	 * Returns the list of IFolder containing:
+	 * <ul>
+	 * <li>Source folders of the given project</li>
+	 * <li>Source folders of the projects depending on the given project</li>
+	 * </ul>
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public static Set<IFolder> getAllDependingSourceFolders(
+			final IProject project) {
+		final Set<IFolder> srcFolders = new HashSet<IFolder>();
+		srcFolders.addAll(getSourceFolders(project));
+
+		for (final IProject dependingProject : getReferencingProjects(project)) {
+			srcFolders.addAll(getSourceFolders(dependingProject));
+		}
+
+		return srcFolders;
+	}
+
+	/**
 	 * Read the given stream and return its content as a String
 	 * 
 	 * @param stream
@@ -536,9 +558,11 @@ public class OrccUtil {
 		// Check all projects in the workspace root
 		for (final IProject wpProject : wpRoot.getProjects()) {
 			try {
-				// Keep only open Orcc projects
+				// Keep only open Orcc projects, different from the given
+				// project
 				if (!wpProject.isOpen()
-						|| !project.hasNature(OrccProjectNature.NATURE_ID)) {
+						|| !project.hasNature(OrccProjectNature.NATURE_ID)
+						|| wpProject == project) {
 					continue;
 				}
 				// Keep only valid Java projects
