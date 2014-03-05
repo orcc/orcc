@@ -39,8 +39,12 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import net.sf.orcc.OrccProjectNature;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -517,6 +521,46 @@ public class OrccUtil {
 		}
 
 		return srcFolders;
+	}
+
+	/**
+	 * Returns a list of projects which depends on the given project.
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public static Set<IProject> getReferencingProjects(final IProject project) {
+
+		final Set<IProject> result = new HashSet<IProject>();
+		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
+		// Check all projects in the workspace root
+		for (final IProject wpProject : wpRoot.getProjects()) {
+			try {
+				// Keep only open Orcc projects
+				if (!wpProject.isOpen()
+						|| !project.hasNature(OrccProjectNature.NATURE_ID)) {
+					continue;
+				}
+				// Keep only valid Java projects
+				final IJavaProject wpJavaProject = JavaCore.create(wpProject);
+				if (!wpJavaProject.exists()) {
+					// This should never happen
+					continue;
+				}
+				// Loop over all classpath entries of the wpJavaProject
+				for (final String requiredProject : wpJavaProject
+						.getRequiredProjectNames()) {
+					// The wpJavaProject require the given IProject
+					if (wpRoot.getProject(requiredProject).equals(project)) {
+						result.add(wpProject);
+					}
+				}
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return result;
 	}
 
 	/**
