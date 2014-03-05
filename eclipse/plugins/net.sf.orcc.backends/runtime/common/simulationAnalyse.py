@@ -49,7 +49,6 @@ class SimulationData:
 class SimulationAnalyse(OrccAnalyse):
     def __init__(self, tag, frequency, nb_frames):
         OrccAnalyse.__init__(self, tag)
-        self.logXML = False
         self.DEFAULT_LOG_EXT = ".log"
         self.FREQUENCY = frequency
         self.NBFRAME = nb_frames
@@ -140,6 +139,28 @@ class SimulationAnalyse(OrccAnalyse):
 
         # Footer
         fic.write("\nWorst actor is : " + self.WORST_ACTOR + "    with : " + str(self.WORST_FPS) + " FPS\n")
+        fic.close()
+
+    def logInXML(self):
+        print ("\n  * Generate XML Result file : " + os.path.join(self.SRC_DIR, self.SUMMARY_XML))
+        fic = open(os.path.join(self.SRC_DIR, self.SUMMARY_XML), 'w')
+
+        fic.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n");
+        fic.write("<report name=\"ActorsSimulationReport\" categ=\"OrccSimulationReports\">" + "\n");
+
+        for actor in self.extractedData:
+            if actor.status == "OK":
+                passed = "yes"
+            else:
+                passer = "no"
+            fic.write("    <test name=\"" + actor.actor_name + "\" executed=\"yes\">" + "\n");
+            fic.write("        <result>" + "\n");
+            fic.write("            <success passed=\"" + passed + "\" state=\"100\" hasTimedOut=\"false\" />" + "\n");
+            fic.write("            <performance unit=\"FPS\" mesure=\"" + str(actor.fps) + "\" isRelevant=\"true\" />" + "\n");
+            fic.write("        </result>" + "\n");
+            fic.write("    </test>" + "\n");
+        
+        fic.write("</report>" + "\n");
         fic.close()
 
     def logInCSV(self):

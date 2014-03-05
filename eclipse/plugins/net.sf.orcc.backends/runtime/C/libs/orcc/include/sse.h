@@ -39,12 +39,25 @@
 
 #include "types.h"
 
+
+#if defined(__ICC) && __ICC < 1200 || defined(__SUNPRO_C)
+    #define DECLARE_ALIGNED(n,t,v)      t __attribute__ ((aligned (n))) v
+#elif defined(__TI_COMPILER_VERSION__)
+    #define DECLARE_ALIGNED(n,t,v)                      \
+        AV_PRAGMA(DATA_ALIGN(v,n))                      \
+        t __attribute__((aligned(n))) v
+#elif defined(__GNUC__)
+    #define DECLARE_ALIGNED(n,t,v)      t __attribute__ ((aligned (n))) v
+#elif defined(_MSC_VER)
+    #define DECLARE_ALIGNED(n,t,v)      __declspec(align(n)) t v
+#else
+    #define DECLARE_ALIGNED(n,t,v)      t v
+#endif
+
 #include "emmintrin.h"
 #include "smmintrin.h"
 
-int sse_init_context();
-
-/***********************************************************************************************************************************
+int sse_init_context();/***********************************************************************************************************************************
  SelectCu 
  ***********************************************************************************************************************************/
 
