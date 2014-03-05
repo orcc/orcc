@@ -200,7 +200,7 @@ public class ChangesFactory {
 		final CompositeChange changes = new CompositeChange(changeTitle);
 
 		final List<IFile> files = OrccUtil.getAllFiles(suffix,
-				OrccUtil.getAllSourceFolders(project));
+				OrccUtil.getAllDependingSourceFolders(project));
 
 		for (final IFile file : files) {
 			changes.add(getReplacementChange(file, "replacement"));

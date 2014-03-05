@@ -263,9 +263,9 @@ public class OrccUtil {
 	 * @param project
 	 * @return
 	 */
-	public static Set<IFolder> getAllDependingSourceFolders(
+	public static List<IFolder> getAllDependingSourceFolders(
 			final IProject project) {
-		final Set<IFolder> srcFolders = new HashSet<IFolder>();
+		final List<IFolder> srcFolders = new ArrayList<IFolder>();
 		srcFolders.addAll(getSourceFolders(project));
 
 		for (final IProject dependingProject : getReferencingProjects(project)) {
