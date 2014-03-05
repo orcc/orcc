@@ -52,7 +52,7 @@ import org.eclipse.text.edits.ReplaceEdit;
  * @author Herve Yviquel
  * 
  */
-public class CalRenameParticipant extends RenameParticipant {
+public class OldCalRenameParticipant extends RenameParticipant {
 
 	private IFile actorFile;
 

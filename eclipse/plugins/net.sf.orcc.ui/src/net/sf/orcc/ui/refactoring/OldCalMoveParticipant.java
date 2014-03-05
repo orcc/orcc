@@ -54,7 +54,7 @@ import org.eclipse.text.edits.ReplaceEdit;
  * @author Matthieu Wipliez
  * 
  */
-public class CalMoveParticipant extends MoveParticipant {
+public class OldCalMoveParticipant extends MoveParticipant {
 
 	private IFile actorFile;
 
