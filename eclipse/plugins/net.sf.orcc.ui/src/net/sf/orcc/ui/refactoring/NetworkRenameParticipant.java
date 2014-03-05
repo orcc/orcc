@@ -120,12 +120,15 @@ public class NetworkRenameParticipant extends RenameParticipant {
 		final CompositeChange changes = new CompositeChange(
 				"Post-rename updates");
 
-		changes.add(new RenameResourceChange(originalDiagramPath, newBasename
-				+ '.' + DIAGRAM_SUFFIX));
+		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
+		if (wpRoot.exists(originalDiagramPath)) {
+			changes.add(new RenameResourceChange(originalDiagramPath,
+					newBasename + '.' + DIAGRAM_SUFFIX));
+		}
 		changes.add(getOtherNetworksContentChanges());
 		changes.add(getOtherDiagramsContentChanges());
 
-		return changes;
+		return changes.getChildren().length > 0 ? changes : null;
 	}
 
 	public Change getNetworkContentChanges() {
