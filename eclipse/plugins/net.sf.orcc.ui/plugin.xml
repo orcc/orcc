@@ -548,6 +548,20 @@
          </enablement>
       </renameParticipant>
       <renameParticipant
+            class="net.sf.orcc.ui.refactoring.DiagramRenameParticpant"
+            id="net.sf.orcc.ui.diagramRenameParticipant"
+            name="Diagram rename participant">
+         <enablement>
+            <adapt
+                  type="org.eclipse.core.resources.IFile">
+               <test
+                     property="org.eclipse.core.resources.extension"
+                     value="xdfdiag">
+               </test>
+            </adapt>
+         </enablement>
+      </renameParticipant>
+      <renameParticipant
             class="net.sf.orcc.ui.refactoring.CalRenameParticipant"
             id="net.sf.orcc.ui.calRenameParticipant"
             name="Cal rename participant">
