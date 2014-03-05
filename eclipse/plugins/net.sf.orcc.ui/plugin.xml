@@ -534,9 +534,9 @@
    <extension
          point="org.eclipse.ltk.core.refactoring.renameParticipants">
       <renameParticipant
-            class="net.sf.orcc.ui.refactoring.XdfRenameParticipant"
-            id="net.sf.orcc.ui.xdfRenameParticipant"
-            name="XDF rename participant">
+            class="net.sf.orcc.ui.refactoring.NetworkRenameParticipant"
+            id="net.sf.orcc.ui.networkRenameParticipant"
+            name="Network rename participant">
          <enablement>
             <adapt
                   type="org.eclipse.core.resources.IFile">
