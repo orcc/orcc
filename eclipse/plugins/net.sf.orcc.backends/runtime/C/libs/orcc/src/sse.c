@@ -39,12 +39,27 @@
 
 #include "sse.h"
 
-#include "emmintrin.h"
+void (*weighted_pred_mono[4])(
+        u8 denom,
+        i16 wlxFlag,
+        i16 olxFlag, i16 ol1Flag,
+        u8 *_dst, int _dststride,
+        i16 *src,
+        int srcstride,
+        int width, int height);
+
+int sse_init_context()
+{
+	weighted_pred_mono[0] = ff_hevc_weighted_pred_mono2_8_sse;
+	weighted_pred_mono[1] = ff_hevc_weighted_pred_mono4_8_sse;
+	weighted_pred_mono[2] = ff_hevc_weighted_pred_mono8_8_sse;
+	weighted_pred_mono[3] = ff_hevc_weighted_pred_mono16_8_sse;
+
+    return 0;
+}
 
 
-/***********************************************************************************************************************************
- SelectCu 
- ***********************************************************************************************************************************/
+/* SELECT_CU */
 
 #define SCU_SIZE_DIV16(H) (H >> 4)
 #define SCU_SIZE_MOD16(H) (H & 0x0F)
@@ -68,7 +83,7 @@ void copy_8_8_ ## H ## _ ## J ## x ## K ## _orcc(                               
     _mm_storeu_si128(pm128iOutputSample + i, m128iInputSample);                                                                        \
   }                                                                                                                                    \
                                                                                                                                        \
-  if (SCU_SIZE_MOD16(H) == 8)                                                                                                                \
+  if (SCU_SIZE_MOD16(H) == 8)                                                                                                          \
   {                                                                                                                                    \
     pm128iOutputSample = (__m128i *) &outputSample[H - 8];                                                                             \
     pm128iInputSample = (__m128i *) &inputSample[H - 8];                                                                               \
@@ -119,7 +134,7 @@ void add_8_16_clip_ ## H ## _ ## K ## x ## J ## _orcc(                          
     _mm_storeu_si128(pm128iSample + i, _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1));                                      \
   }                                                                                                                                    \
                                                                                                                                        \
-  if (SCU_SIZE_MOD16(H) == 8)                                                                                                                \
+  if (SCU_SIZE_MOD16(H) == 8)                                                                                                          \
   {                                                                                                                                    \
     m128itmp_predSamp =                                                                                                                \
       _mm_unpacklo_epi8(                                                                                                               \
@@ -305,9 +320,7 @@ void addClip_orcc(
   }
 }
 
-/***********************************************************************************************************************************
- DecodingPictureBuffer 
- ***********************************************************************************************************************************/
+/* DECODING PICTURE BUFFER */
 
 void fillBorder_luma_orcc(
 	u8 pictureBuffer[17][2304][4352],
@@ -430,4 +443,37 @@ void fillBorder_chroma_orcc(
     }
     y = y + 1;
   }
+}
+
+
+/* WEIGHTED PREDICTION */
+
+/* Log2CbSize in openHEVC */
+/* 1 -  3 -  5 -  7 - 11 - 15 - 23 - 31 - 47 - 63 --> _width
+   2 -  4 -  6 -  8 - 12 - 16 - 24 - 32 - 48 - 64 --> width
+   2 -  4 -  2 -  8 -  4 - 16 -  8 - 16 - 16 - 16 --> vector size
+   0 -  1 -  0 -  2 -  1 -  3 -  2 -  3 -  3 -  3 --> function id
+   */
+static const int lookup_tab_openhevc_function[64] = {
+   -1,  0, -1,  1, -1,  0, -1,  2,
+   -1, -1, -1,  1, -1, -1, -1,  3,
+   -1, -1, -1, -1, -1, -1, -1,  2,
+   -1, -1, -1, -1, -1, -1, -1,  3,
+   -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1,  3,
+   -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1,  3};
+
+void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
+		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64])
+{
+  i16 * src = _src[0];
+  u8 * dst = _dst;
+  u8 width = _width + 1;
+  u8 height = _height + 1;
+  int wX = weightCu[0] + weightCu[1];
+  int locLogWD = logWD - 14 + 8;
+  int idx = lookup_tab_openhevc_function[_width];
+
+  weighted_pred_mono[idx](locLogWD, wX, offsetCu[0], offsetCu[1], dst, width, src, width, width, height);
 }

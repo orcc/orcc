@@ -141,6 +141,9 @@ void init_orcc(int argc, char *argv[]) {
 #ifdef OPENHEVC_ENABLE
 	openhevc_init_context();
 #endif
+#ifdef SSE_ENABLE
+	sse_init_context();
+#endif // SSE_ENABLE
 	while ((c = getopt(argc, argv, ostr)) != -1) {
 		switch (c) {
 		case '?': // BADCH
