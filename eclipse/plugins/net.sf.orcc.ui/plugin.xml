@@ -579,9 +579,9 @@
    <extension
          point="org.eclipse.ltk.core.refactoring.moveParticipants">
       <moveParticipant
-            class="net.sf.orcc.ui.refactoring.XdfMoveParticipant"
-            id="net.sf.orcc.ui.xdfMoveParticipant"
-            name="XDF move participant">
+            class="net.sf.orcc.ui.refactoring.NetworkMoveParticipant"
+            id="net.sf.orcc.ui.networkMoveParticipant"
+            name="Network move participant">
          <enablement>
             <adapt
                   type="org.eclipse.core.resources.IFile">

@@ -31,6 +31,7 @@ package net.sf.orcc.ui.refactoring;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -41,31 +42,26 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
-import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
-import org.eclipse.ltk.core.refactoring.resource.RenameResourceChange;
+import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
+import org.eclipse.ltk.core.refactoring.resource.MoveResourceChange;
 
 /**
  * This class contribute to perform all updates needed when user trigger the
- * Rename refactoring on a network file (xdf).
+ * Move refactoring on a network file (xdf).
  * 
  * @author Antoine Lorence
  * 
  */
-public class NetworkRenameParticipant extends RenameParticipant {
-
-	public final static String DIAGRAM_SUFFIX = "xdfdiag";
-	public final static String NETWORK_SUFFIX = "xdf";
+public class NetworkMoveParticipant extends MoveParticipant {
 
 	private final ChangesFactory factory;
 
 	private IFile originalNetworkFile;
+	private IFolder destination;
+	private IPath newNetworkPath;
 	private IPath originalDiagramPath;
-	private String originalFilename;
-	private String originalBasename;
-	private String newFilename;
-	private String newBasename;
 
-	public NetworkRenameParticipant() {
+	public NetworkMoveParticipant() {
 		super();
 		factory = new ChangesFactory();
 	}
@@ -74,17 +70,12 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	protected boolean initialize(Object element) {
 		if (element instanceof IFile) {
 			originalNetworkFile = (IFile) element;
-			originalFilename = originalNetworkFile.getFullPath().toFile()
-					.getName();
-			originalBasename = originalFilename.substring(0,
-					originalFilename.lastIndexOf("." + NETWORK_SUFFIX));
-			newFilename = getArguments().getNewName();
-			newBasename = newFilename.substring(0,
-					newFilename.lastIndexOf("." + NETWORK_SUFFIX));
-
+			destination = (IFolder) getArguments().getDestination();
+			newNetworkPath = destination.getFile(originalNetworkFile.getName())
+					.getFullPath();
 			originalDiagramPath = originalNetworkFile.getFullPath()
-					.removeFileExtension().addFileExtension(DIAGRAM_SUFFIX);
-
+					.removeFileExtension()
+					.addFileExtension(NetworkRenameParticipant.DIAGRAM_SUFFIX);
 			return true;
 		}
 		return false;
@@ -92,7 +83,7 @@ public class NetworkRenameParticipant extends RenameParticipant {
 
 	@Override
 	public String getName() {
-		return "Network rename participant";
+		return "Network move participant";
 	}
 
 	@Override
@@ -102,92 +93,53 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	}
 
 	@Override
-	public Change createPreChange(IProgressMonitor pm) throws CoreException,
-			OperationCanceledException {
-
-		final CompositeChange changes = new CompositeChange(
-				"Pre-rename updates");
-		changes.add(getNetworkContentChanges());
-		changes.add(getDiagramContentChanges());
-
-		return changes.getChildren().length > 0 ? changes : null;
-	}
-
-	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
 
-		final CompositeChange changes = new CompositeChange(
-				"Post-rename updates");
-
+		final CompositeChange changes = new CompositeChange("Post-move updates");
 		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
 		if (wpRoot.exists(originalDiagramPath)) {
-			changes.add(new RenameResourceChange(originalDiagramPath,
-					newBasename + '.' + DIAGRAM_SUFFIX));
+			changes.add(new MoveResourceChange(wpRoot
+					.getFile(originalDiagramPath), destination));
 		}
+
 		changes.add(getOtherNetworksContentChanges());
 		changes.add(getOtherDiagramsContentChanges());
 
 		return changes.getChildren().length > 0 ? changes : null;
 	}
 
-	public Change getNetworkContentChanges() {
-		factory.clearReplacementMaps();
-
-		factory.addReplacement("<XDF name=\"" + originalBasename + "\">",
-				"<XDF name=\"" + newBasename + "\">");
-		return factory.getReplacementChange(originalNetworkFile,
-				"Update network name");
-	}
-
-	public Change getDiagramContentChanges() {
-
-		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
-		if (wpRoot.exists(originalDiagramPath)) {
-
-			factory.clearReplacementMaps();
-			factory.addReplacement(originalFilename + "#/", newFilename + "#/");
-			factory.addReplacement("name=\"" + originalBasename + "\"", "name=\""
-					+ newBasename + "\"");
-
-			final String title = "Update diagram content";
-			return factory.getReplacementChange(wpRoot.getFile(originalDiagramPath),
-					title);
-		}
-		return null;
-	}
-
 	public Change getOtherNetworksContentChanges() {
 
 		factory.clearReplacementMaps();
 
-		final IPath newFilePath = originalNetworkFile.getFullPath()
-				.removeLastSegments(1).append(newFilename);
 		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
-
 		final String oldQualifiedName = OrccUtil
 				.getQualifiedName(originalNetworkFile);
 		final String newQualifiedName = OrccUtil.getQualifiedName(wpRoot
-				.getFile(newFilePath));
+				.getFile(newNetworkPath));
 		factory.addReplacement("<Class name=\"" + oldQualifiedName + "\"/>",
 				"<Class name=\"" + newQualifiedName + "\"/>");
 
-		return factory.getReplacementChange(originalNetworkFile.getProject(),
-				NETWORK_SUFFIX, "Update network files");
+		return factory
+				.getReplacementChange(originalNetworkFile.getProject(),
+						NetworkRenameParticipant.NETWORK_SUFFIX,
+						"Update network files");
 	}
 
 	public Change getOtherDiagramsContentChanges() {
-
 		factory.clearReplacementMaps();
 
-		final String originalRefinement = originalNetworkFile.getFullPath().toString();
-		final String newRefinement = originalNetworkFile.getFullPath().removeLastSegments(1)
-				.append(newFilename).toString();
+		final String originalRefinement = originalNetworkFile.getFullPath()
+				.toString();
+		final String newRefinement = newNetworkPath.toString();
 
-		factory.addReplacement("key=\"refinement\" value=\"" + originalRefinement + "\"",
-				"key=\"refinement\" value=\"" + newRefinement + "\"");
+		factory.addReplacement("key=\"refinement\" value=\""
+				+ originalRefinement + "\"", "key=\"refinement\" value=\""
+				+ newRefinement + "\"");
 
 		return factory.getReplacementChange(originalNetworkFile.getProject(),
-				DIAGRAM_SUFFIX, "Update diagram files");
+						NetworkRenameParticipant.DIAGRAM_SUFFIX,
+						"Update diagram files");
 	}
 }
