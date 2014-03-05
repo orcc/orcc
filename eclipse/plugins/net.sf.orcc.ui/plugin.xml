@@ -606,5 +606,18 @@
             </adapt>
          </enablement>
       </moveParticipant>
+      <moveParticipant
+            class="net.sf.orcc.ui.refactoring.DiagramMoveParticipant"
+            id="net.sf.orcc.ui.diagramMoveParticipant"
+            name="Diagram move participant">
+         <enablement>
+            <adapt
+                  type="org.eclipse.core.resources.IFile">
+               <test
+                     property="org.eclipse.core.resources.extension"
+                     value="xdfdiag">
+               </test>
+            </adapt></enablement>
+      </moveParticipant>
    </extension>
 </plugin>
