@@ -140,27 +140,28 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			}
 		}
 		
-		final List<String> updatedNetworkWarnings = new ArrayList<String>();
-
-		hasDoneChanges |= fixNetwork(network, updatedNetworkWarnings);
-
 		if (diagram.getChildren().size() == 0 && network.getChildren().size() > 0) {
+			final List<String> updatedNetworkWarnings = new ArrayList<String>();
+
+			hasDoneChanges |= fixNetwork(network, updatedNetworkWarnings);
 			hasDoneChanges |= initializeDiagramFromNetwork(network, diagram);
+
+			// Display a synthesis message to user, to tell him what have been
+			// automatically modified in the diagram/network he just opened
+			if (updatedNetworkWarnings.size() > 0) {
+				final StringBuilder message = new StringBuilder(
+						"The network has been automatically updated:");
+				message.append('\n');
+
+				for (final String msg : updatedNetworkWarnings) {
+					message.append(msg).append('\n');
+				}
+				MessageDialog.openInformation(XdfUtil.getDefaultShell(),
+						"Network update", message.toString());
+			}
 		}
 
 		updateVersion(diagram);
-
-		// Display a synthesis message to user, to tell him what have been
-		// automatically modified in the diagram/network he just opened
-		if(updatedNetworkWarnings.size() > 0) {
-			final StringBuilder message = new StringBuilder("The network has been automatically updated:");
-			message.append('\n');
-
-			for(final String msg : updatedNetworkWarnings) {
-				message.append(msg).append('\n');
-			}
-			MessageDialog.openInformation(XdfUtil.getDefaultShell(), "Network update", message.toString());
-		}
 
 		return hasDoneChanges;
 	}
