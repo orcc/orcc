@@ -548,23 +548,10 @@ public class InstancePattern extends AbstractPattern {
 
 	/**
 	 * Update the refinement (Instance or Network) for the instance linked to
-	 * the given pe. The input and output ports of the given entity are added to
-	 * the shape.
-	 * <p>
-	 * This method automatically updates sizes and layouts for the content. It
-	 * also try to reconnect existing connections to the right port, by
-	 * searching it from its name. If a connection cannot be automatically
-	 * reconnected, it is deleted from the network. The user is prompted with a
-	 * message dialog in that case.
-	 * </p>
-	 * <p>
-	 * If the instance linked to the given instanceShape has already a
-	 * refinement, the property REFINEMENT_KEY will be controlled, and the
-	 * method will do the refinement only if its value is different than the
-	 * given entity URI. If you want to force shape update without modifying the
-	 * entity to refine, simple change the REFINEMENT_KEY value before calling
-	 * this method.
-	 * </p>
+	 * the given instanceShape. The input and output ports of the given entity
+	 * are added to the shape.
+	 * 
+	 * This method automatically updates sizes and layouts for the content.
 	 * 
 	 * @param instanceShape
 	 * @param entity
