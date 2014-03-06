@@ -39,8 +39,12 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import net.sf.orcc.OrccProjectNature;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -158,20 +162,30 @@ public class OrccUtil {
 		return newPath;
 	}
 
-	private static void findFiles(String fileExt, List<IFile> vtlFiles,
-			IFolder vtl) throws CoreException {
-		for (IResource resource : vtl.members()) {
+	/**
+	 * Search in given folder for files resources with given suffix, and add
+	 * them to the given files list
+	 * 
+	 * @param suffix
+	 * @param files
+	 * @param folder
+	 * @throws CoreException
+	 */
+	private static void findFiles(final String suffix,
+			final List<IFile> files, final IFolder folder) throws CoreException {
+		for (IResource resource : folder.members()) {
 			if (resource.getType() == IResource.FOLDER) {
-				findFiles(fileExt, vtlFiles, (IFolder) resource);
+				findFiles(suffix, files, (IFolder) resource);
 			} else if (resource.getType() == IResource.FILE
-					&& resource.getFileExtension().equals(fileExt)) {
-				vtlFiles.add((IFile) resource);
+					&& resource.getFileExtension().equals(suffix)) {
+				files.add((IFile) resource);
 			}
 		}
 	}
 
 	/**
-	 * Returns all the files with the given extension in the given folders.
+	 * Returns all the files with the given extension found in the given
+	 * folders.
 	 * 
 	 * @param srcFolders
 	 *            a list of folders
@@ -203,8 +217,11 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Returns the list of ALL source folders of the required projects as well
-	 * as of the given project as a list of absolute workspace paths.
+	 * Returns the list of IFolder containing:
+	 * <ul>
+	 * <li>Source folders of the given project</li>
+	 * <li>Source folders of the projects the given project depends on</li>
+	 * </ul>
 	 * 
 	 * @param project
 	 *            a project
@@ -236,15 +253,44 @@ public class OrccUtil {
 		return srcFolders;
 	}
 
-	public static String getContents(InputStream in) throws IOException {
+	/**
+	 * Returns the list of IFolder containing:
+	 * <ul>
+	 * <li>Source folders of the given project</li>
+	 * <li>Source folders of the projects depending on the given project</li>
+	 * </ul>
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public static List<IFolder> getAllDependingSourceFolders(
+			final IProject project) {
+		final List<IFolder> srcFolders = new ArrayList<IFolder>();
+		srcFolders.addAll(getSourceFolders(project));
+
+		for (final IProject dependingProject : getReferencingProjects(project)) {
+			srcFolders.addAll(getSourceFolders(dependingProject));
+		}
+
+		return srcFolders;
+	}
+
+	/**
+	 * Read the given stream and return its content as a String
+	 * 
+	 * @param stream
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getContents(InputStream stream) throws IOException {
 		StringBuilder builder = new StringBuilder();
-		int n = in.available();
+		int n = stream.available();
 		while (n > 0) {
 			byte[] bytes = new byte[n];
-			n = in.read(bytes);
+			n = stream.read(bytes);
 			String str = new String(bytes, 0, n);
 			builder.append(str);
-			n = in.available();
+			n = stream.available();
 		}
 
 		return builder.toString();
@@ -497,6 +543,48 @@ public class OrccUtil {
 		}
 
 		return srcFolders;
+	}
+
+	/**
+	 * Returns a list of projects which depends on the given project.
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public static Set<IProject> getReferencingProjects(final IProject project) {
+
+		final Set<IProject> result = new HashSet<IProject>();
+		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
+		// Check all projects in the workspace root
+		for (final IProject wpProject : wpRoot.getProjects()) {
+			try {
+				// Keep only open Orcc projects, different from the given
+				// project
+				if (!wpProject.isOpen()
+						|| !project.hasNature(OrccProjectNature.NATURE_ID)
+						|| wpProject == project) {
+					continue;
+				}
+				// Keep only valid Java projects
+				final IJavaProject wpJavaProject = JavaCore.create(wpProject);
+				if (!wpJavaProject.exists()) {
+					// This should never happen
+					continue;
+				}
+				// Loop over all classpath entries of the wpJavaProject
+				for (final String requiredProject : wpJavaProject
+						.getRequiredProjectNames()) {
+					// The wpJavaProject require the given IProject
+					if (wpRoot.getProject(requiredProject).equals(project)) {
+						result.add(wpProject);
+					}
+				}
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return result;
 	}
 
 	/**
