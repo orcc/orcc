@@ -71,15 +71,6 @@ u8 _width, u8 _height, i32 mx, i32 my)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width] - 1;
 
-    /*
-    if(width == 16 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_qpel[2][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 8 || width == 24) {
-        hevcDsp.put_hevc_qpel[1][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_qpel[0][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    }
-    */
     hevcDsp.put_hevc_qpel[idx][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
 }
 
@@ -93,17 +84,6 @@ u8 _width, u8 _height, i32 mx, i32 my)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width];
 
-    /*
-    if(width == 16 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_epel[3][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 8 || width == 24) {
-        hevcDsp.put_hevc_epel[2][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 4 || width == 12 || width == 20) {
-        hevcDsp.put_hevc_epel[1][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_epel[0][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    }
-    */
     hevcDsp.put_hevc_epel[idx][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
 }
 
@@ -117,13 +97,6 @@ i32 filterIdx,  u8 _width, u8 _height)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width] - 1;
 
-    /*
-    if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_qpel[1][0][1](dst, width, src, srcstride, width, height, filterIdx, 0);
-    } else {
-        hevcDsp.put_hevc_qpel[0][0][1](dst, width, src, srcstride, width, height, filterIdx, 0);
-    }
-    */
     hevcDsp.put_hevc_qpel[idx][0][1](dst, width, src, srcstride, width, height, filterIdx, 0);
 }
 
@@ -137,14 +110,6 @@ i32 filterIdx,  u8 _width, u8 _height)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width] - 1;
 
-    /*
-    if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_qpel[1][1][0](dst, width, src, srcstride, width, height, 0, filterIdx);
-
-    } else {
-        hevcDsp.put_hevc_qpel[0][1][0](dst, width, src, srcstride, width, height, 0, filterIdx);
-    }
-    */
     hevcDsp.put_hevc_qpel[idx][1][0](dst, width, src, srcstride, width, height, 0, filterIdx);
 }
 
@@ -158,15 +123,6 @@ u8 _width, u8 _height, i32 mx, i32 my)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width];
 
-    /*
-    if(width == 8 || width == 16 || width == 24 || width == 32) {
-        hevcDsp.put_hevc_epel[2][0][1](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 4 || width == 12) {
-        hevcDsp.put_hevc_epel[1][0][1](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_epel[0][0][1](dst, width, src, srcstride, width, height, mx, my);
-    }
-    */
     hevcDsp.put_hevc_epel[idx][0][1](dst, width, src, srcstride, width, height, mx, my);
 }
 
@@ -180,15 +136,6 @@ u8 _width, u8 _height, i32 mx, i32 my)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width];
 
-    /*
-    if(width == 8 || width == 16 || width == 24 || width == 32) {
-        hevcDsp.put_hevc_epel[2][1][0](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 4 || width == 12) {
-        hevcDsp.put_hevc_epel[1][1][0](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_epel[0][1][0](dst, width, src, srcstride, width, height, mx, my);
-    }
-    */
     hevcDsp.put_hevc_epel[idx][1][0](dst, width, src, srcstride, width, height, mx, my);
 }
 
@@ -202,13 +149,6 @@ i32 filterIdx[2],  u8 _width, u8 _height)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width] - 1;
 
-    /*
-    if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_qpel[1][1][1](dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
-    } else {
-        hevcDsp.put_hevc_qpel[0][1][1](dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
-    }
-    */
     hevcDsp.put_hevc_qpel[idx][1][1](dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
 }
 
@@ -222,15 +162,6 @@ u8 _width, u8 _height, i32 mx, i32 my)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width];
 
-    /*
-    if(width == 8 || width == 16 || width == 24 || width == 32) {
-        hevcDsp.put_hevc_epel[2][1][1](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 4 || width == 12) {
-        hevcDsp.put_hevc_epel[1][1][1](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_epel[0][1][1](dst, width, src, srcstride, width, height, mx, my);
-    }
-    */
     hevcDsp.put_hevc_epel[idx][1][1](dst, width, src, srcstride, width, height, mx, my);
 }
 

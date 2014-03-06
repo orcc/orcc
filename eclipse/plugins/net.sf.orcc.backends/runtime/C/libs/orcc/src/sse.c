@@ -494,3 +494,60 @@ void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
   }
 #endif // #ifdef __SSE4_1__
 }
+
+
+/* DISPLAY */
+
+#define INT_MAXIM(a, b)  ((a) > (b) ? (a) : (b))
+#define INT_MINIM(a, b)  ((a) < (b) ? (a) : (b))
+
+#define MAX_WIDTH 4096
+#define MAX_HEIGHT 2048
+
+#define DISPLAYYUV_CROP(H)                                                                                                             \
+void displayYUV_crop_ ## H ## _orcc(                                                                                                   \
+  u8 Bytes[H * H],                                                                                                                     \
+  u8 pictureBuffer[MAX_WIDTH * MAX_HEIGHT],                                                                                            \
+  u16 xMin,                                                                                                                            \
+  u16 xMax,                                                                                                                            \
+  u16 yMin,                                                                                                                            \
+  u16 yMax,                                                                                                                            \
+  u16 xIdx,                                                                                                                            \
+  u16 yIdx,                                                                                                                            \
+  u16 cropPicWth)                                                                                                                      \
+{                                                                                                                                      \
+  u16 xIdxMin = INT_MAXIM(xIdx, xMin);                                                                                                 \
+  u16 xIdxMax = INT_MINIM(xIdx + H - 1, xMax);                                                                                         \
+  u16 yIdxMin = INT_MAXIM(yIdx, yMin);                                                                                                 \
+  u16 yIdxMax = INT_MINIM(yIdx + H - 1, yMax);                                                                                         \
+  int x, y;                                                                                                                            \
+                                                                                                                                       \
+  __m128i * __restrict pm128iPictureBuffer = (__m128i *) &pictureBuffer[(yIdxMin - yMin) * cropPicWth + xIdxMin - xMin];               \
+  __m128i * __restrict pm128iPictureBuffer1 = (__m128i *) &Bytes[(yIdxMin - yIdx) * H + xIdxMin - xIdx];                               \
+  __m128i m128iWord;                                                                                                                   \
+                                                                                                                                       \
+  int iLoopCount = (xIdxMax - xIdxMin + 1) >> 4;                                                                                       \
+                                                                                                                                       \
+  for (y = yIdxMin; y < yIdxMax + 1; y++)                                                                                              \
+  {                                                                                                                                    \
+    pm128iPictureBuffer = (__m128i *) &pictureBuffer[(y - yMin) * cropPicWth + xIdxMin - xMin];                                        \
+    pm128iPictureBuffer1 = (__m128i *) &Bytes[(y - yIdx) *  H + xIdxMin - xIdx];                                                       \
+    for (x = 0; x < iLoopCount; x++)                                                                                                   \
+    {                                                                                                                                  \
+      m128iWord = _mm_loadu_si128(pm128iPictureBuffer1);                                                                               \
+      _mm_storeu_si128(pm128iPictureBuffer, m128iWord);                                                                                \
+      pm128iPictureBuffer++;                                                                                                           \
+      pm128iPictureBuffer1++;                                                                                                          \
+    }                                                                                                                                  \
+    for (x = xIdxMin + (iLoopCount << 4); x < xIdxMax + 1; x++)                                                                        \
+    {                                                                                                                                  \
+      pictureBuffer[(y - yMin) * cropPicWth + x - xMin] = Bytes[(y - yIdx) *  H + x - xIdx];                                           \
+    }                                                                                                                                  \
+  }                                                                                                                                    \
+}                                                                                                                                      \
+
+// Declare more functions if needed
+DISPLAYYUV_CROP(16)
+DISPLAYYUV_CROP(64)
+DISPLAYYUV_CROP( 8)
+DISPLAYYUV_CROP(32)
