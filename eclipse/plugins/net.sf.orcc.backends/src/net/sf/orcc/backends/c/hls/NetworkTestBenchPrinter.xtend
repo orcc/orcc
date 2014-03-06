@@ -108,7 +108,7 @@ import net.sf.orcc.util.OrccUtil
 	-- Configuration
 	signal count       : integer range 255 downto 0 := 0;
 		
-	constant PERIOD : time := 50 ns;
+	constant PERIOD : time := 20 ns;
 	constant DUTY_CYCLE : real := 0.5;
 	constant OFFSET : time := 100 ns;
 
@@ -165,7 +165,7 @@ import net.sf.orcc.util.OrccUtil
 	 «FOR connection : instance.incomingPortMap.values»
 	 «IF (connection.source instanceof Port
 			) && !(connection.target instanceof Port)»
-	   variable count«connection.fifoName»: integer:= 1;
+	   variable count«connection.fifoName»: integer:= 0;
 	   «ENDIF»
 	«ENDFOR»
 	«ENDFOR»
@@ -186,7 +186,7 @@ import net.sf.orcc.util.OrccUtil
 	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 	«FOR connection : instance.outgoingPortMap.values»
 	«IF !(connection.head.source instanceof Port) && (connection.head.target instanceof Port)»
-		variable count«connection.head.fifoName»: integer:= 1;
+		variable count«connection.head.fifoName»: integer:= 0;
 		«ENDIF»
 	«ENDFOR»
 	«ENDFOR»
@@ -375,7 +375,7 @@ import net.sf.orcc.util.OrccUtil
 				ap_start <= '1';      
 		end if;
 			elsif (endfile (sim_file_«instance.name»_«connection.targetPort.name»)) then
-				ap_start <= '0';
+				ap_start <= '1';
 				«connection.fifoName»_empty_n <= '0';
 			end if;
 		when others => null;

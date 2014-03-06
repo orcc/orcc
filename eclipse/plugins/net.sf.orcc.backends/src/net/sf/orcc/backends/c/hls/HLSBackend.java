@@ -114,7 +114,7 @@ public class HLSBackend extends CBackend {
 		transformations.add(new TypeResizer(true, true, true, false));
 
 		transformations.add(new RenameTransformation(replacementMap));
-		transformations.add(new Multi2MonoToken());
+		//transformations.add(new Multi2MonoToken());
 		transformations.add(new DfVisitor<Void>(new CastArgFuncCall()));
 		// transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 		// transformations.add(new DivisionSubstitution());//don't work for HEVC

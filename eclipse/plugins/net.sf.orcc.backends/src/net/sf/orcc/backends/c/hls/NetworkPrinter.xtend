@@ -33,7 +33,6 @@ import net.sf.orcc.util.OrccUtil
 import java.util.Map
 import net.sf.orcc.df.Network
 
-
 /**
  * Compile top Network c source code 
  *  
@@ -42,16 +41,17 @@ import net.sf.orcc.df.Network
  */
 class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 
-	new(Network network, Map<String,Object> options) {
+	new(Network network, Map<String, Object> options) {
 		super(network, options)
 	}
 
 	override print(String targetFolder) {
 		val contentVhdlTop = fifoFileContent
 		val contentSimPack = fifoSimPackContent
-		val SimPackFile = new File(targetFolder + File::separator + "sim_package" + ".vhd")
-		val FifoVhdlFile = new File(targetFolder + File::separator + "TopVHDL" + File::separator +"genericFifo" + ".vhd")
-		if(needToWriteFile(contentVhdlTop, FifoVhdlFile)) {
+		val SimPackFile = new File(targetFolder + File::separator + "TopVHDL" + File::separator + "sim_package" + ".vhd")
+		val FifoVhdlFile = new File(
+			targetFolder + File::separator + "TopVHDL" + File::separator + "ram_tab" + ".vhd")
+		if (needToWriteFile(contentVhdlTop, FifoVhdlFile)) {
 			OrccUtil::printFile(contentVhdlTop, FifoVhdlFile)
 			OrccUtil::printFile(contentSimPack, SimPackFile)
 
@@ -59,78 +59,66 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		} else {
 			return 1
 		}
-	}	
+	}
+
 	/*
 	 * Generic FIFO
 	 */
-	def fifoFileContent()'''
-		library ieee;
-		use ieee.std_logic_1164.all;
-		use ieee.std_logic_arith.all;
-		entity FIFO_main_myStream is 
-		    generic (
-		        width : integer := 15);
-		    port (
-		        clk : IN STD_LOGIC;
-		        reset : IN STD_LOGIC;
-		        if_empty_n : OUT STD_LOGIC;
-		        if_read : IN STD_LOGIC;
-		        if_dout : OUT STD_LOGIC_VECTOR(width downto 0);
-		        if_full_n : OUT STD_LOGIC;
-		        if_write : IN STD_LOGIC;
-		        if_din : IN STD_LOGIC_VECTOR(width downto 0));
-		end entity;
+	def fifoFileContent() '''
+		library ieee; 
+use ieee.std_logic_1164.all; 
+use ieee.std_logic_unsigned.all;
+entity ram_tab is 
+    generic(
+            dwidth     : integer := 32; 
+            awidth     : integer := 9; 
+            mem_size    : integer := 512
+    ); 
+    port (
+          addr0     : in std_logic_vector(awidth-1 downto 0); 
+          ce0       : in std_logic; 
+          q0        : out std_logic_vector(dwidth-1 downto 0);
+          addr1     : in std_logic_vector(awidth-1 downto 0); 
+          ce1       : in std_logic; 
+          d1        : in std_logic_vector(dwidth-1 downto 0); 
+          we1       : in std_logic; 
+          clk        : in std_logic 
+    ); 
+end entity; 
+architecture rtl of ram_tab is 
+type mem_array is array (0 to mem_size-1) of std_logic_vector (dwidth-1 downto 0); 
+shared variable ram : mem_array := (others=>(others=>'0'));
+begin 
+ p_memory_access_1: process (clk)  
+begin 
+    if (clk'event and clk = '1') then
+	
+        if (ce1 = '1') then 
+            if (we1 = '1') then 
+                ram(CONV_INTEGER(addr1)) := d1; 
+            end if;
+        end if;
 		
-		architecture rtl of FIFO_main_myStream is
-		    type memtype is array (0 to «fifoSize») of STD_LOGIC_VECTOR(width downto 0);
-		    signal mStorage : memtype;
-		    signal mInPtr  : UNSIGNED(«closestLog_2(fifoSize)»  downto 0) := (others => '0');
-		    signal mOutPtr : UNSIGNED(«closestLog_2(fifoSize)»  downto 0) := (others => '0');
-		    signal internal_empty_n, internal_full_n : STD_LOGIC;
-		    signal mFlag_nEF_hint : STD_LOGIC := '0';  -- 0: empty hint, 1: full hint
-		begin
-		    if_dout <= mStorage(CONV_INTEGER(mOutPtr));
-		    if_empty_n <= internal_empty_n;
-		    if_full_n <= internal_full_n;
-		
-		    internal_empty_n <= '0' when mInPtr = mOutPtr and mFlag_nEF_hint = '0' else '1';
-		    internal_full_n <= '0' when mInptr = mOutPtr and mFlag_nEF_hint = '1' else '1';
-		
-		    process (clk)
-		    begin
-		        if clk'event and clk = '1' then
-		            if reset = '1' then
-		                mInPtr <= (others => '0');
-		                mOutPtr <= (others => '0');
-		                mFlag_nEF_hint <= '0'; -- empty hint
-		            else
-		                if if_read = '1' and internal_empty_n = '1' then
-		                    if (mOutPtr = «fifoSize») then
-		                        mOutPtr <= (others => '0');
-		                        mFlag_nEF_hint <= not mFlag_nEF_hint;
-		                    else
-		                        mOutPtr <= mOutPtr + 1;
-		                    end if;
-		                end if;
-		                if if_write = '1' and internal_full_n = '1' then
-		                    mStorage(CONV_INTEGER(mInPtr)) <= if_din;
-		                    if (mInPtr = «fifoSize») then
-		                        mInPtr <= (others => '0');
-		                        mFlag_nEF_hint <= not mFlag_nEF_hint;
-		                    else
-		                        mInPtr <= mInPtr + 1;
-		                    end if;
-		                end if;
-		            end if;
-		        end if;
-		    end process;
-		   
-		end architecture;
+			
+    end if;
+   
+end process;
+p_memory_access_0: process (clk)  
+begin 
+    if (clk'event and clk = '1') then
+       if (ce0 = '1') then 
+            q0 <= ram(CONV_INTEGER(addr0)); 
+			
+       end if;
+    end if;
+end process;
+end rtl;
 		'''
-		/*
+
+	/*
 		 * Sim Package
 		 */
-	def fifoSimPackContent()'''
+	def fifoSimPackContent() '''
 		library ieee;
 		use ieee.std_logic_1164.all;
 		use std.textio.all;
@@ -375,7 +363,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		  
 		end sim_package;
 	'''
-	
+
 	def closestLog_2(int x) {
 		var p = 1;
 		var r = 0;
