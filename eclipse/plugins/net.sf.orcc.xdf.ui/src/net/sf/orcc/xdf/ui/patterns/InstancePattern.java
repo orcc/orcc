@@ -533,11 +533,7 @@ public class InstancePattern extends AbstractPattern {
 				return true;
 			}
 
-			// Force to update refinement, by invalidating the current
-			// refinement property on the shape
-			Graphiti.getPeService().setPropertyValue(pe, REFINEMENT_KEY, "");
 			setInstanceRefinement((ContainerShape) pe, instance.getEntity());
-
 			return true;
 		}
 
@@ -589,20 +585,12 @@ public class InstancePattern extends AbstractPattern {
 			return false;
 		}
 
-		// Do not allow refining on the same URI as before
-		final String existingRefinement = Graphiti.getPeService()
-				.getPropertyValue(instanceShape, REFINEMENT_KEY);
-		final String entityUri = entity.eResource().getURI()
-				.toPlatformString(true);
-		if (existingRefinement != null && existingRefinement.equals(entityUri)) {
-			return false;
-		}
-
 		// Set the current instance's entity
 		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instanceShape);
 		instance.setEntity(entity);
+		// Store the refinement URI in a property
 		Graphiti.getPeService().setPropertyValue(instanceShape, REFINEMENT_KEY,
-				entityUri);
+				entity.eResource().getURI().toPlatformString(true));
 
 		// To perform reconnection later, we need to save which are
 		// connected to in and out anchors
