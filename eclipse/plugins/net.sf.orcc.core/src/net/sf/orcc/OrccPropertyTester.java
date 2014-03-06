@@ -28,6 +28,8 @@
  */
 package net.sf.orcc;
 
+import net.sf.orcc.util.OrccUtil;
+
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -53,7 +55,7 @@ public class OrccPropertyTester extends PropertyTester {
 		} else if ("isXDF".equals(property)) {
 			if (receiver instanceof IFile) {
 				IFile file = (IFile) receiver;
-				return ("xdf".equals(file.getFileExtension()));
+				return (OrccUtil.NETWORK_SUFFIX.equals(file.getFileExtension()));
 			}
 		} else if ("isOrccProject".equals(property)) {
 			IProject project;

@@ -53,9 +53,6 @@ import org.eclipse.ltk.core.refactoring.resource.RenameResourceChange;
  */
 public class NetworkRenameParticipant extends RenameParticipant {
 
-	public final static String DIAGRAM_SUFFIX = "xdfdiag";
-	public final static String NETWORK_SUFFIX = "xdf";
-
 	private final ChangesFactory factory;
 
 	private IFile originalNetworkFile;
@@ -77,13 +74,15 @@ public class NetworkRenameParticipant extends RenameParticipant {
 			originalFilename = originalNetworkFile.getFullPath().toFile()
 					.getName();
 			originalBasename = originalFilename.substring(0,
-					originalFilename.lastIndexOf("." + NETWORK_SUFFIX));
+							originalFilename.lastIndexOf("."
+									+ OrccUtil.NETWORK_SUFFIX));
 			newFilename = getArguments().getNewName();
 			newBasename = newFilename.substring(0,
-					newFilename.lastIndexOf("." + NETWORK_SUFFIX));
+					newFilename.lastIndexOf("." + OrccUtil.NETWORK_SUFFIX));
 
 			originalDiagramPath = originalNetworkFile.getFullPath()
-					.removeFileExtension().addFileExtension(DIAGRAM_SUFFIX);
+					.removeFileExtension()
+					.addFileExtension(OrccUtil.DIAGRAM_SUFFIX);
 
 			return true;
 		}
@@ -123,7 +122,7 @@ public class NetworkRenameParticipant extends RenameParticipant {
 		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
 		if (wpRoot.exists(originalDiagramPath)) {
 			changes.add(new RenameResourceChange(originalDiagramPath,
-					newBasename + '.' + DIAGRAM_SUFFIX));
+					newBasename + '.' + OrccUtil.DIAGRAM_SUFFIX));
 		}
 		changes.add(getOtherNetworksContentChanges());
 		changes.add(getOtherDiagramsContentChanges());
@@ -173,7 +172,7 @@ public class NetworkRenameParticipant extends RenameParticipant {
 				"<Class name=\"" + newQualifiedName + "\"/>");
 
 		return factory.getReplacementChange(originalNetworkFile.getProject(),
-				NETWORK_SUFFIX, "Update network files");
+				OrccUtil.NETWORK_SUFFIX, "Update network files");
 	}
 
 	public Change getOtherDiagramsContentChanges() {
@@ -188,6 +187,6 @@ public class NetworkRenameParticipant extends RenameParticipant {
 				"key=\"refinement\" value=\"" + newRefinement + "\"");
 
 		return factory.getReplacementChange(originalNetworkFile.getProject(),
-				DIAGRAM_SUFFIX, "Update diagram files");
+				OrccUtil.DIAGRAM_SUFFIX, "Update diagram files");
 	}
 }

@@ -148,7 +148,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	 */
 	private class TreeEditingSupport extends EditingSupport {
 
-		private CellEditor editor;
+		private final CellEditor editor;
 
 		public TreeEditingSupport() {
 			super(viewer);
@@ -368,7 +368,8 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 				IProject project = root.getProject(name);
 				if (project.exists()) {
 					xdfFile = OrccUtil.getFile(project,
-							configuration.getAttribute(XDF_FILE, ""), "xdf");
+							configuration.getAttribute(XDF_FILE, ""),
+							OrccUtil.NETWORK_SUFFIX);
 				}
 			}
 		} catch (CoreException e) {

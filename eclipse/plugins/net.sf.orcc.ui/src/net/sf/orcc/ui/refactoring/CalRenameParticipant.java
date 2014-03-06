@@ -45,7 +45,6 @@ import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 
 public class CalRenameParticipant extends RenameParticipant {
-	private final String SUFFIX = "cal";
 
 	private final ChangesFactory factory;
 
@@ -70,9 +69,9 @@ public class CalRenameParticipant extends RenameParticipant {
 					.getName();
 			newFilename = getArguments().getNewName();
 			originalBasename = originalFilename.substring(0,
-					originalFilename.lastIndexOf("." + SUFFIX));
+					originalFilename.lastIndexOf("." + OrccUtil.CAL_SUFFIX));
 			newBasename = newFilename.substring(0,
-					newFilename.lastIndexOf("." + SUFFIX));
+					newFilename.lastIndexOf("." + OrccUtil.CAL_SUFFIX));
 
 			final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace()
 					.getRoot();
@@ -136,7 +135,7 @@ public class CalRenameParticipant extends RenameParticipant {
 
 		final String title = "Update network files";
 		return factory.getReplacementChange(originalFile.getProject(),
-				NetworkRenameParticipant.NETWORK_SUFFIX, title);
+				OrccUtil.NETWORK_SUFFIX, title);
 
 	}
 
@@ -144,7 +143,7 @@ public class CalRenameParticipant extends RenameParticipant {
 		factory.clearReplacementMaps();
 
 		final IFile irFile = OrccUtil.getFile(originalFile.getProject(),
-				OrccUtil.getQualifiedName(originalFile), "ir");
+				OrccUtil.getQualifiedName(originalFile), OrccUtil.IR_SUFFIX);
 
 		final String originalRefinement = irFile.getFullPath()
 				.toString();
@@ -157,7 +156,7 @@ public class CalRenameParticipant extends RenameParticipant {
 
 		final String title = "Update diagram files";
 		return factory.getReplacementChange(originalFile.getProject(),
-				NetworkRenameParticipant.DIAGRAM_SUFFIX, title);
+				OrccUtil.DIAGRAM_SUFFIX, title);
 	}
 
 	private Change getOtherCalContentUpdatesChanges() {
@@ -173,7 +172,7 @@ public class CalRenameParticipant extends RenameParticipant {
 
 		factory.addReplacement(importPattern, replacement);
 
-		return factory.getReplacementChange(originalFile.getProject(), SUFFIX,
-				"Update actors referencing this unit.");
+		return factory.getReplacementChange(originalFile.getProject(),
+				OrccUtil.CAL_SUFFIX, "Update actors referencing this unit.");
 	}
 }

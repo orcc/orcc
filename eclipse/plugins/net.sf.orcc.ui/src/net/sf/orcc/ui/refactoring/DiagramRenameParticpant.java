@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui.refactoring;
 
+import net.sf.orcc.util.OrccUtil;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -66,7 +68,7 @@ public class DiagramRenameParticpant extends RenameParticipant {
 
 			originalNetworkPath = originalDiagramFile.getFullPath()
 					.removeFileExtension()
-					.addFileExtension(NetworkRenameParticipant.NETWORK_SUFFIX);
+					.addFileExtension(OrccUtil.NETWORK_SUFFIX);
 
 			newDiagramFilename = getArguments().getNewName();
 
@@ -76,8 +78,8 @@ public class DiagramRenameParticpant extends RenameParticipant {
 				final IFile networkFile = wpRoot.getFile(originalNetworkPath);
 				networkRenameParticipant = new NetworkRenameParticipant();
 				newNetworkFilename = newDiagramFilename.replace("."
-						+ NetworkRenameParticipant.DIAGRAM_SUFFIX, "."
-						+ NetworkRenameParticipant.NETWORK_SUFFIX);
+						+ OrccUtil.DIAGRAM_SUFFIX, "."
+						+ OrccUtil.NETWORK_SUFFIX);
 
 				final RenameArguments renameArguments = new RenameArguments(
 						newNetworkFilename, true);

@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui.refactoring;
 
+import net.sf.orcc.util.OrccUtil;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -70,7 +72,7 @@ public class DiagramMoveParticipant extends MoveParticipant {
 			destination = (IFolder) getArguments().getDestination();
 			originalNetworkPath = originalDiagramFile.getFullPath()
 					.removeFileExtension()
-					.addFileExtension(NetworkRenameParticipant.NETWORK_SUFFIX);
+					.addFileExtension(OrccUtil.NETWORK_SUFFIX);
 
 			final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace()
 					.getRoot();

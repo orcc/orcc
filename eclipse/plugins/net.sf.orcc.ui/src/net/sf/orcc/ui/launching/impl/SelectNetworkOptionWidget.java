@@ -66,7 +66,8 @@ public class SelectNetworkOptionWidget extends TextBoxOptionWidget {
 	}
 
 	final protected boolean checkNetworkExists(IProject project, String name) {
-		IResource file = OrccUtil.getFile(project, name, "xdf");
+		IResource file = OrccUtil.getFile(project, name,
+				OrccUtil.NETWORK_SUFFIX);
 		return (file != null && file.exists());
 	}
 
@@ -142,7 +143,7 @@ public class SelectNetworkOptionWidget extends TextBoxOptionWidget {
 	 */
 	final protected String selectNetwork(IProject project, Shell shell) {
 		FilteredRefinementDialog dialog = new FilteredRefinementDialog(project,
-				shell, "xdf");
+				shell, OrccUtil.NETWORK_SUFFIX);
 		dialog.setTitle("Select network");
 		dialog.setMessage("&Select existing network:");
 		String refinement = text.getText();

@@ -195,9 +195,9 @@ public class FrontendCli implements IApplication {
 
 				} else if (resource.getType() == IResource.FILE
 						&& resource.getFileExtension() != null) {
-					if (resource.getFileExtension().equals("cal")
+					if (resource.getFileExtension().equals(OrccUtil.CAL_SUFFIX)
 							|| (includeNetworks && resource.getFileExtension()
-									.equals("xdf"))) {
+									.equals(OrccUtil.NETWORK_SUFFIX))) {
 						String packageName = resource.getProjectRelativePath()
 								.removeFirstSegments(1).removeFileExtension()
 								.toString().replace('/', '.');
@@ -317,7 +317,8 @@ public class FrontendCli implements IApplication {
 						if (qnameFileMap.containsKey(qualifiedName)) {
 
 							IFile file = qnameFileMap.get(qualifiedName);
-							if (file.getFileExtension().equals("xdf")) {
+							if (file.getFileExtension().equals(
+									OrccUtil.NETWORK_SUFFIX)) {
 								try {
 									writeIrFilesFromXdfContent(
 											new FileInputStream(file
@@ -498,7 +499,7 @@ public class FrontendCli implements IApplication {
 			if (args.length >= 2 && !args[1].isEmpty()) {
 
 				IFile networkFile = OrccUtil.getFile(baseProject, args[1],
-						"xdf");
+						OrccUtil.NETWORK_SUFFIX);
 				if (networkFile != null) {
 					try {
 						network = new FileInputStream(networkFile

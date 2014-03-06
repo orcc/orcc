@@ -52,8 +52,6 @@ import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
  */
 public class CalMoveParticipant extends MoveParticipant {
 
-	private final String SUFFIX = "cal";
-
 	private final ChangesFactory factory;
 
 	private IFile originalFile;
@@ -141,8 +139,8 @@ public class CalMoveParticipant extends MoveParticipant {
 		final String replacement = "import$1" + targetQualifiedName + "$2$4;";
 		factory.addReplacement(importPattern, replacement);
 
-		return factory.getReplacementChange(originalFile.getProject(), SUFFIX,
-				"Update actors referencing this unit.");
+		return factory.getReplacementChange(originalFile.getProject(),
+				OrccUtil.CAL_SUFFIX, "Update actors referencing this unit.");
 	}
 
 	private Change getNetworksContentUpdatesChanges() {
@@ -154,17 +152,15 @@ public class CalMoveParticipant extends MoveParticipant {
 		factory.addReplacement("<Class name=\"" + oldQualifiedName + "\"/>",
 				"<Class name=\"" + newQualifiedName + "\"/>");
 
-		return factory
-				.getReplacementChange(originalFile.getProject(),
-						NetworkRenameParticipant.NETWORK_SUFFIX,
-						"Update network files");
+		return factory.getReplacementChange(originalFile.getProject(),
+				OrccUtil.NETWORK_SUFFIX, "Update network files");
 	}
 
 	private Change getDiagramsContentUpdatesChanges() {
 		factory.clearReplacementMaps();
 
 		final IFile irFile = OrccUtil.getFile(originalFile.getProject(),
-				OrccUtil.getQualifiedName(originalFile), "ir");
+				OrccUtil.getQualifiedName(originalFile), OrccUtil.IR_SUFFIX);
 
 		final String originalRefinement = irFile.getFullPath().toString();
 
@@ -181,9 +177,7 @@ public class CalMoveParticipant extends MoveParticipant {
 				+ originalRefinement + "\"", "key=\"refinement\" value=\""
 				+ newRefinement + "\"");
 
-		return factory
-				.getReplacementChange(originalFile.getProject(),
-						NetworkRenameParticipant.DIAGRAM_SUFFIX,
-						"Update diagram files");
+		return factory.getReplacementChange(originalFile.getProject(),
+				OrccUtil.DIAGRAM_SUFFIX, "Update diagram files");
 	}
 }

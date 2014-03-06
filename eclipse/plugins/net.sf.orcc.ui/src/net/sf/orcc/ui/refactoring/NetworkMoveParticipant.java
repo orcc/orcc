@@ -75,7 +75,7 @@ public class NetworkMoveParticipant extends MoveParticipant {
 					.getFullPath();
 			originalDiagramPath = originalNetworkFile.getFullPath()
 					.removeFileExtension()
-					.addFileExtension(NetworkRenameParticipant.DIAGRAM_SUFFIX);
+					.addFileExtension(OrccUtil.DIAGRAM_SUFFIX);
 			return true;
 		}
 		return false;
@@ -121,10 +121,8 @@ public class NetworkMoveParticipant extends MoveParticipant {
 		factory.addReplacement("<Class name=\"" + oldQualifiedName + "\"/>",
 				"<Class name=\"" + newQualifiedName + "\"/>");
 
-		return factory
-				.getReplacementChange(originalNetworkFile.getProject(),
-						NetworkRenameParticipant.NETWORK_SUFFIX,
-						"Update network files");
+		return factory.getReplacementChange(originalNetworkFile.getProject(),
+				OrccUtil.NETWORK_SUFFIX, "Update network files");
 	}
 
 	public Change getOtherDiagramsContentChanges() {
@@ -139,7 +137,6 @@ public class NetworkMoveParticipant extends MoveParticipant {
 				+ newRefinement + "\"");
 
 		return factory.getReplacementChange(originalNetworkFile.getProject(),
-						NetworkRenameParticipant.DIAGRAM_SUFFIX,
-						"Update diagram files");
+				OrccUtil.DIAGRAM_SUFFIX, "Update diagram files");
 	}
 }

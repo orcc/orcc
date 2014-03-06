@@ -94,13 +94,14 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 		String qualifiedName = refinement.replace('.', '/');
 
 		// first try networks
-		IFile file = OrccUtil.getFile(project, qualifiedName, "xdf");
+		IFile file = OrccUtil.getFile(project, qualifiedName,
+				OrccUtil.NETWORK_SUFFIX);
 		if (file != null) {
 			return file;
 		}
 
 		// then actors
-		file = OrccUtil.getFile(project, qualifiedName, "cal");
+		file = OrccUtil.getFile(project, qualifiedName, OrccUtil.CAL_SUFFIX);
 		if (file != null) {
 			return file;
 		}
@@ -121,7 +122,7 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 		IProject project = getProject(vertex);
 
 		FilteredRefinementDialog dialog = new FilteredRefinementDialog(project,
-				shell, "cal");
+				shell, OrccUtil.CAL_SUFFIX);
 		dialog.setTitle("Select actor");
 		dialog.setMessage("&Select existing actor:");
 		String refinement = getRefinement(vertex);
@@ -149,7 +150,7 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 		IProject project = getProject(vertex);
 
 		FilteredRefinementDialog dialog = new FilteredRefinementDialog(project,
-				shell, "xdf");
+				shell, OrccUtil.NETWORK_SUFFIX);
 		dialog.setTitle("Select network");
 		dialog.setMessage("&Select existing network:");
 		String refinement = getRefinement(vertex);

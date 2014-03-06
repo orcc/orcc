@@ -52,6 +52,7 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
@@ -142,7 +143,8 @@ public class JadeSimulator extends AbstractSimulator {
 		// Get configuration attributes
 		stimulusFile = getAttribute(INPUT_STIMULUS, "");
 		vtlFolder = getAttribute(VTL_FOLDER, "");
-		xdfFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
+		xdfFile = getFile(project, getAttribute(XDF_FILE, ""),
+				OrccUtil.NETWORK_SUFFIX);
 		tracesFolder = getAttribute(TRACES_FOLDER, "");
 		refVideo = getAttribute(REFERENCE_FILE, "");
 		execJade = OrccActivator.getDefault().getPreference(P_JADE, "");
