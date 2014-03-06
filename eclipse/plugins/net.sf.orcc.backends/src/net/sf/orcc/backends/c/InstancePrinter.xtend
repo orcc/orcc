@@ -94,7 +94,7 @@ class InstancePrinter extends CTemplate {
 	var boolean newSchedul = false
 	var boolean ringTopology = false
 
-	var boolean enableTrace = false
+	protected var boolean enableTrace = false
 	var String traceFolder
 	var int threadsNb = 1;
 
@@ -240,9 +240,7 @@ class InstancePrinter extends CTemplate {
 		#include "types.h"
 		#include "fifo.h"
 		#include "util.h"
-		#ifndef __MICROBLAZE__
 		#include "scheduler.h"
-		#endif
 		#include "dataflow.h"
 		«IF profileNetwork || dynamicMapping»
 			#include "cycle.h"
@@ -720,7 +718,7 @@ class InstancePrinter extends CTemplate {
 	def protected checkInputPattern(Pattern pattern)
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.getNumTokens(port)» && «ENDFOR»'''
 
-	def private writeTokensFunctions(Port port) '''
+	def protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
 			index_«port.name» = «port.fullName»->write_ind;
 			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name»);
@@ -731,7 +729,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def private readTokensFunctions(Port port) '''
+	def protected readTokensFunctions(Port port) '''
 		static void read_«port.name»() {
 			«IF incomingPortMap.containsKey(port)»
 				index_«port.name» = «port.fullName»->read_inds[«port.readerId»];
@@ -899,7 +897,7 @@ class InstancePrinter extends CTemplate {
 	def protected fullName(Port port)
 		'''«entityName»_«port.name»'''
 
-	def private sizeOrDefaultSize(Connection conn) {
+	def protected sizeOrDefaultSize(Connection conn) {
 		if(conn == null || conn.size == null) "SIZE"
 		else conn.size
 	}
