@@ -147,6 +147,11 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 				.getPatternForPictogramElement(instanceShape);
 		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instanceShape);
 
+		// Do not re-apply the same refinement on the instance
+		if (refinement.equals(instance.getEntity())) {
+			return instanceShape;
+		}
+
 		final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
 		final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
 		pattern.saveConnections(instanceShape, incomingMap, outgoingMap);

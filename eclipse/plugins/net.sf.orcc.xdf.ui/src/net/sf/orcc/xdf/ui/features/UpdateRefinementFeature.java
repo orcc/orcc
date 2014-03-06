@@ -135,6 +135,12 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 			}
 		}
 
+		final EObject refinement = (EObject) entityDialog.getFirstResult();
+		// Do not re-apply the same refinement on the instance
+		if (refinement.equals(instance.getEntity())) {
+			return;
+		}
+
 		// We get the corresponding Pattern. It must be an InstancePattern
 		final IPattern ipattern = ((IFeatureProviderWithPatterns) getFeatureProvider())
 				.getPatternForPictogramElement(instanceShape);
@@ -145,7 +151,7 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 		final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
 		pattern.saveConnections(instanceShape, incomingMap, outgoingMap);
 		hasDoneChanges = pattern.setInstanceRefinement(instanceShape,
-				(EObject) entityDialog.getFirstResult());
+				refinement);
 		pattern.restoreConnections(instanceShape, incomingMap, outgoingMap,
 				"The refinement for instance \"" + instance.getSimpleName()
 						+ "\" has been updated:");
