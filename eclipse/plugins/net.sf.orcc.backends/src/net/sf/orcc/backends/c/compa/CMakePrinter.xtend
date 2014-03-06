@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.c.compa
 
 import net.sf.orcc.df.Network
+import net.sf.orcc.df.Actor
 
 class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 	
@@ -41,5 +42,24 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		set(NO_EXTERNAL_DEPENDENCIES True)
 		
 		«super.addLibrariesSubdirs»
+	'''
+	
+	override protected srcCMakeContent() '''
+		# Generated from «network.simpleName»
+
+		set(filenames
+«««			«network.simpleName».c
+			«FOR child : network.children.actorInstances.filter[!getActor.native]»
+				«child.label».c
+			«ENDFOR»
+			«FOR child : network.children.filter(typeof(Actor)).filter[!native]»
+				«child.label».c
+			«ENDFOR»
+		)
+
+		add_executable(«network.simpleName» ${filenames})
+
+		# Build library without any external library required
+		target_link_libraries(«network.simpleName» orcc)
 	'''
 }

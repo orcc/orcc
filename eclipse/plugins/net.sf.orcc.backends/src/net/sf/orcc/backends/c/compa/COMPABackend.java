@@ -151,12 +151,12 @@ public class COMPABackend extends CBackend {
 		printChildren(network);
 
 		// print network
-		OrccLogger.trace("Printing network... ");
-		if (new NetworkPrinter(network, options).print(srcPath) > 0) {
-			OrccLogger.traceRaw("Cached\n");
-		} else {
-			OrccLogger.traceRaw("Done\n");
-		}
+//		OrccLogger.trace("Printing network... ");
+//		if (new NetworkPrinter(network, options).print(srcPath) > 0) {
+//			OrccLogger.traceRaw("Cached\n");
+//		} else {
+//			OrccLogger.traceRaw("Done\n");
+//		}
 
 		new CMakePrinter(network).printCMakeFiles(path);
 
