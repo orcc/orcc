@@ -562,7 +562,7 @@
          </enablement>
       </renameParticipant>
       <renameParticipant
-            class="net.sf.orcc.ui.refactoring.OldCalRenameParticipant"
+            class="net.sf.orcc.ui.refactoring.CalRenameParticipant"
             id="net.sf.orcc.ui.calRenameParticipant"
             name="Cal rename participant">
          <enablement>
