@@ -54,10 +54,16 @@
     #define DECLARE_ALIGNED(n,t,v)      t v
 #endif
 
-#include "emmintrin.h"
-#include "smmintrin.h"
+#include <emmintrin.h>
+#ifdef __SSSE3__
+#include <tmmintrin.h>
+#endif
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+#endif
 
-int sse_init_context();/***********************************************************************************************************************************
+int sse_init_context();
+/***********************************************************************************************************************************
  SelectCu 
  ***********************************************************************************************************************************/
 
@@ -276,10 +282,12 @@ void ff_hevc_weighted_pred_mono ## H ## _ ## D ##_sse(                         \
     }                                                                          \
 }
 
+#ifdef __SSE4_1__
 WEIGHTED_PRED_MONO( 2, 8)
 WEIGHTED_PRED_MONO( 4, 8)
 WEIGHTED_PRED_MONO( 8, 8)
 WEIGHTED_PRED_MONO(16, 8)
+#endif // #ifdef __SSE4_1__
 
 void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
 		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64]);

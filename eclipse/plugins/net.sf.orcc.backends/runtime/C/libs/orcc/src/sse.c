@@ -50,10 +50,12 @@ void (*weighted_pred_mono[4])(
 
 int sse_init_context()
 {
+#ifdef __SSE4_1__
 	weighted_pred_mono[0] = ff_hevc_weighted_pred_mono2_8_sse;
 	weighted_pred_mono[1] = ff_hevc_weighted_pred_mono4_8_sse;
 	weighted_pred_mono[2] = ff_hevc_weighted_pred_mono8_8_sse;
 	weighted_pred_mono[3] = ff_hevc_weighted_pred_mono16_8_sse;
+#endif // #ifdef __SSE4_1__
 
     return 0;
 }
@@ -472,8 +474,23 @@ void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
   u8 width = _width + 1;
   u8 height = _height + 1;
   int wX = weightCu[0] + weightCu[1];
+  int oX;
   int locLogWD = logWD - 14 + 8;
   int idx = lookup_tab_openhevc_function[_width];
 
+#ifdef __SSE4_1__
   weighted_pred_mono[idx](locLogWD, wX, offsetCu[0], offsetCu[1], dst, width, src, width, width, height);
+#else // #ifdef __SSE4_1__
+  int x, y;
+  oX = offsetCu[0] + offsetCu[1] + 1;
+  locLogWD = logWD + 1;
+  for (y = 0; y < height; y++)
+  {
+	  for (x = 0; y < width; x++)
+	  {
+  	    src[x + y * (width + 1)] = ((src[x + y * (width + 1)]*wX + (oX << (locLogWD - 1))) >> locLogWD);
+        dst[x + y * (width + 1)] = clip_i32(src[x + y * (width + 1)], 0 , 255);
+	  }
+  }
+#endif // #ifdef __SSE4_1__
 }

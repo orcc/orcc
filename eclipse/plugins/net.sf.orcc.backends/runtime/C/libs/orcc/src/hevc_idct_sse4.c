@@ -11,7 +11,7 @@
 #include <smmintrin.h>
 #endif
 
-DECLARE_ALIGNED(16, static const int16_t, transform4x4_luma[8][8] )=
+DECLARE_ALIGNED(16, static const i16, transform4x4_luma[8][8] )=
 {
     {   29, +84, 29,  +84,  29, +84,  29, +84 },
     {  +74, +55, +74, +55, +74, +55, +74, +55 },
@@ -23,14 +23,14 @@ DECLARE_ALIGNED(16, static const int16_t, transform4x4_luma[8][8] )=
     {  -74, -29, -74, -29, -74, -29, -74, -29 }
 };
 
-DECLARE_ALIGNED( 16, static const int16_t, transform4x4[4][8] ) = {
+DECLARE_ALIGNED( 16, static const i16, transform4x4[4][8] ) = {
     { 64,  64, 64,  64, 64,  64, 64,  64 },
     { 64, -64, 64, -64, 64, -64, 64, -64 },
     { 83,  36, 83,  36, 83,  36, 83,  36 },
     { 36, -83, 36, -83, 36, -83, 36, -83 }
 };
 
-DECLARE_ALIGNED(16, static const int16_t, transform8x8[12][1][8] )=
+DECLARE_ALIGNED(16, static const i16, transform8x8[12][1][8] )=
 {
     {{  89,  75,  89,  75, 89,  75, 89,  75 }},
     {{  50,  18,  50,  18, 50,  18, 50,  18 }},
@@ -46,7 +46,7 @@ DECLARE_ALIGNED(16, static const int16_t, transform8x8[12][1][8] )=
     {{  36, -83,  36, -83, 36, -83, 36, -83 }}
 };
 
-DECLARE_ALIGNED(16, static const int16_t, transform16x16_1[4][8][8] )=
+DECLARE_ALIGNED(16, static const i16, transform16x16_1[4][8][8] )=
 {
     {/*1-3*/ /*2-6*/
         { 90,  87,  90,  87,  90,  87,  90,  87 },
@@ -86,7 +86,7 @@ DECLARE_ALIGNED(16, static const int16_t, transform16x16_1[4][8][8] )=
         {  87, -90,  87, -90,  87, -90,  87, -90 },
     }
 };
-DECLARE_ALIGNED(16, static const int16_t, transform16x16_2[2][4][8] )=
+DECLARE_ALIGNED(16, static const i16, transform16x16_2[2][4][8] )=
 {
     { /*2-6*/ /*4-12*/
         { 89,  75,  89,  75, 89,  75, 89,  75 },
@@ -101,7 +101,7 @@ DECLARE_ALIGNED(16, static const int16_t, transform16x16_2[2][4][8] )=
     }
 };
 
-DECLARE_ALIGNED(16, static const int16_t, transform16x16_3[2][2][8] )=
+DECLARE_ALIGNED(16, static const i16, transform16x16_3[2][2][8] )=
 {
     {/*4-12*/ /*8-24*/
         {  83,  36,  83,  36,  83,  36,  83,  36 },
@@ -113,7 +113,7 @@ DECLARE_ALIGNED(16, static const int16_t, transform16x16_3[2][2][8] )=
 };
 
 
-DECLARE_ALIGNED(16, static const int16_t, transform32x32[8][16][8] )=
+DECLARE_ALIGNED(16, static const i16, transform32x32[8][16][8] )=
 {
     { /*   1-3     */
         { 90,  90, 90,  90, 90,  90, 90,  90 },
@@ -257,9 +257,9 @@ DECLARE_ALIGNED(16, static const int16_t, transform32x32[8][16][8] )=
 #define shift_1st 7
 #define add_1st (1 << (shift_1st - 1))
 
-void ff_hevc_transform_skip_8_sse(uint8_t *_dst, int16_t *coeffs, ptrdiff_t _stride)
+void ff_hevc_transform_skip_8_sse(u8 *_dst, i16 *coeffs, ptrdiff_t _stride)
 {
-    uint8_t *dst = (uint8_t*)_dst;
+    u8 *dst = (u8*)_dst;
     ptrdiff_t stride = _stride;
     int shift = 5;
     int offset = 16;
@@ -296,29 +296,29 @@ void ff_hevc_transform_skip_8_sse(uint8_t *_dst, int16_t *coeffs, ptrdiff_t _str
 
     r3 = _mm_packus_epi16(r3, r4);
 
-    *((uint32_t *)(dst)) = _mm_cvtsi128_si32(r3);
+    *((u32 *)(dst)) = _mm_cvtsi128_si32(r3);
     dst+=stride;
-    *((uint32_t *)(dst)) = _mm_extract_epi32(r3, 1);
+    *((u32 *)(dst)) = _mm_extract_epi32(r3, 1);
     dst+=stride;
-    *((uint32_t *)(dst)) = _mm_extract_epi32(r3, 2);
+    *((u32 *)(dst)) = _mm_extract_epi32(r3, 2);
     dst+=stride;
-    *((uint32_t *)(dst)) = _mm_extract_epi32(r3, 3);
+    *((u32 *)(dst)) = _mm_extract_epi32(r3, 3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////
 #define INIT_8()                                                               \
-    uint8_t *dst = (uint8_t*) _dst;                                            \
+    u8 *dst = (u8*) _dst;                                            \
     ptrdiff_t stride = _stride
 #define INIT_10()                                                              \
-    uint16_t *dst = (uint16_t*) _dst;                                          \
+    u16 *dst = (u16*) _dst;                                          \
     ptrdiff_t stride = _stride>>1
 #define INIT8_8()                                                              \
-    uint8_t *p_dst;                                                            \
+    u8 *p_dst;                                                            \
     INIT_8()
 #define INIT8_10()                                                             \
-    uint16_t *p_dst;                                                           \
+    u16 *p_dst;                                                           \
     INIT_10()
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -381,10 +381,10 @@ void ff_hevc_transform_skip_8_sse(uint8_t *_dst, int16_t *coeffs, ptrdiff_t _str
     tmp0 = _mm_packus_epi16(tmp0, _mm_setzero_si128())
 #define ADD_AND_SAVE_4x8(dst, dst_stride, src)                                 \
     ADD_AND_SAVE_8(dst, dst_stride, src);                                      \
-    *((uint32_t *)(dst)) = _mm_cvtsi128_si32(tmp0);                            \
+    *((u32 *)(dst)) = _mm_cvtsi128_si32(tmp0);                            \
     dst += dst_stride
 #define SAVE_4x8(dst, dst_stride, src)                                         \
-    *((uint32_t *)(dst)) = _mm_cvtsi128_si32(src);                             \
+    *((u32 *)(dst)) = _mm_cvtsi128_si32(src);                             \
     dst += dst_stride
 #define ADD_AND_SAVE_8x8(dst, dst_stride, src)                                 \
     ADD_AND_SAVE_8(dst, dst_stride, src);                                      \
@@ -591,9 +591,9 @@ void ff_hevc_transform_skip_8_sse(uint8_t *_dst, int16_t *coeffs, ptrdiff_t _str
 
 #define TRANSFORM_LUMA_ADD(D)                                                  \
 void ff_hevc_transform_4x4_luma_add_ ## D ## _sse4(                            \
-        uint8_t *_dst, int16_t *coeffs, ptrdiff_t _stride) {                   \
-    uint8_t  shift = 7;                                                        \
-    int16_t *src = coeffs;                                                     \
+        u8 *_dst, i16 *coeffs, ptrdiff_t _stride) {                   \
+    u8  shift = 7;                                                        \
+    i16 *src = coeffs;                                                     \
     __m128i res0, res1, res2, res3;                                            \
     __m128i tmp0, tmp1, src0, src1, add;                                       \
     INIT_ ## D();                                                              \
@@ -698,8 +698,8 @@ TRANSFORM_LUMA_ADD( 10);
 
 #define TRANSFORM_ADD4x4(D)                                                    \
 void ff_hevc_transform_4x4_add_ ## D ## _sse4 (                                \
-    uint8_t *_dst, int16_t *coeffs, ptrdiff_t _stride) {                       \
-    int16_t *src    = coeffs;                                                  \
+    u8 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
+    i16 *src    = coeffs;                                                  \
     int      shift  = 7;                                                       \
     int      add    = 1 << (shift - 1);                                        \
     __m128i tmp0, tmp1, tmp2, tmp3;                                            \
@@ -712,11 +712,11 @@ void ff_hevc_transform_4x4_add_ ## D ## _sse4 (                                \
 }
 #define TRANSFORM_ADD8x8(D)                                                    \
 void ff_hevc_transform_8x8_add_ ## D ## _sse4 (                                \
-    uint8_t *_dst, int16_t *coeffs, ptrdiff_t _stride) {                       \
-    int16_t tmp[8*8];                                                          \
-    int16_t *src    = coeffs;                                                  \
-    int16_t *p_dst1 = tmp;                                                     \
-    int16_t *p_dst;                                                            \
+    u8 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
+    i16 tmp[8*8];                                                          \
+    i16 *src    = coeffs;                                                  \
+    i16 *p_dst1 = tmp;                                                     \
+    i16 *p_dst;                                                            \
     int      shift  = 7;                                                       \
     int      add    = 1 << (shift - 1);                                        \
     __m128i src0, src1, src2, src3;                                            \
@@ -811,14 +811,14 @@ TRANSFORM_ADD8x8( 8)
 ////////////////////////////////////////////////////////////////////////////////
 #define TRANSFORM_ADD2(H, D)                                                   \
 void ff_hevc_transform_ ## H ## x ## H ## _add_ ## D ## _sse4 (                \
-    uint8_t *_dst, int16_t *coeffs, ptrdiff_t _stride) {                       \
+    u8 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
     int i, j, k, add;                                                          \
     int      shift = 7;                                                        \
-    int16_t *src   = coeffs;                                                   \
-    int16_t  tmp[H*H];                                                         \
-    int16_t  tmp_2[H*H];                                                       \
-    int16_t  tmp_3[H*H];                                                       \
-    int16_t *p_dst, *p_tra = tmp_2;                                            \
+    i16 *src   = coeffs;                                                   \
+    i16  tmp[H*H];                                                         \
+    i16  tmp_2[H*H];                                                       \
+    i16  tmp_3[H*H];                                                       \
+    i16 *p_dst, *p_tra = tmp_2;                                            \
     __m128i src0, src1, src2, src3;                                            \
     __m128i tmp0, tmp1, tmp2, tmp3, tmp4;                                      \
     __m128i e0, e1, e2, e3, e4, e5, e6, e7;                                    \
