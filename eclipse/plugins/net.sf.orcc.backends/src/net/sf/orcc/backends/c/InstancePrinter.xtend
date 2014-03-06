@@ -240,7 +240,9 @@ class InstancePrinter extends CTemplate {
 		#include "types.h"
 		#include "fifo.h"
 		#include "util.h"
+		#ifndef __MICROBLAZE__
 		#include "scheduler.h"
+		#endif
 		#include "dataflow.h"
 		«IF profileNetwork || dynamicMapping»
 			#include "cycle.h"
