@@ -332,8 +332,7 @@ public class InstancePattern extends AbstractPattern {
 		link(topLevelShape, addedDomainObject);
 
 		if (addedDomainObject.getEntity() != null) {
-			setInstanceRefinement(topLevelShape, addedDomainObject.getEntity(),
-					false);
+			setInstanceRefinement(topLevelShape, addedDomainObject.getEntity());
 		}
 
 		return topLevelShape;
@@ -533,7 +532,14 @@ public class InstancePattern extends AbstractPattern {
 				return true;
 			}
 
-			setInstanceRefinement((ContainerShape) pe, instance.getEntity());
+			final ContainerShape instanceShape = (ContainerShape) pe;
+
+			final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
+			final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
+			saveConnections(instanceShape, incomingMap, outgoingMap);
+			setInstanceRefinement(instanceShape, instance.getEntity());
+			restoreConnections(instanceShape, incomingMap, outgoingMap,
+					instance.getName() + " has been updated:");
 			return true;
 		}
 
@@ -566,18 +572,6 @@ public class InstancePattern extends AbstractPattern {
 	 */
 	public boolean setInstanceRefinement(final ContainerShape instanceShape,
 			final EObject entity) {
-		return setInstanceRefinement(instanceShape, entity, true);
-	}
-
-	/**
-	 * @param instanceShape
-	 * @param entity
-	 * @param updateExistingConnections
-	 *            Will try to perform reconnections
-	 * @return
-	 */
-	private boolean setInstanceRefinement(final ContainerShape instanceShape,
-			final EObject entity, boolean updateExistingConnections) {
 		if (!isPatternRoot(instanceShape)) {
 			return false;
 		}
@@ -591,14 +585,6 @@ public class InstancePattern extends AbstractPattern {
 		// Store the refinement URI in a property
 		Graphiti.getPeService().setPropertyValue(instanceShape, REFINEMENT_KEY,
 				entity.eResource().getURI().toPlatformString(true));
-
-		// To perform reconnection later, we need to save which are
-		// connected to in and out anchors
-		final Map<String, Connection> inMap = new HashMap<String, Connection>();
-		final Map<String, Iterable<Connection>> outMap = new HashMap<String, Iterable<Connection>>();
-		if (updateExistingConnections) {
-			saveConnections(instanceShape, inMap, outMap);
-		}
 
 		// Clean all ports
 		final GraphicsAlgorithm instanceGa = instanceShape
@@ -633,16 +619,6 @@ public class InstancePattern extends AbstractPattern {
 		// Resize to minimal size.
 		resizeShapeToMinimal(instanceShape);
 
-		// Check if auto-reconnections are necessary (or disabled)
-		if (!updateExistingConnections || (inMap.isEmpty() && outMap.isEmpty())) {
-			return true;
-		}
-
-		final String infoMessage = "The refinement for instance \""
-				+ instance.getSimpleName() + "\" has been updated:";
-
-		restoreConnections(instanceShape, inMap, outMap, infoMessage);
-
 		return true;
 	}
 
@@ -657,7 +633,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @param incomingMap
 	 * @param outgoingMap
 	 */
-	private void saveConnections(final AnchorContainer instanceShape,
+	public void saveConnections(final AnchorContainer instanceShape,
 			final Map<String, Connection> incomingMap,
 			final Map<String, Iterable<Connection>> outgoingMap) {
 
@@ -694,7 +670,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @param outgoingMap
 	 * @param message
 	 */
-	private void restoreConnections(final AnchorContainer instanceShape,
+	public void restoreConnections(final AnchorContainer instanceShape,
 			final Map<String, Connection> incomingMap,
 			final Map<String, Iterable<Connection>> outgoingMap, final String message) {
 

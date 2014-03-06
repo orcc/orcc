@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.xdf.ui.features;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Unit;
@@ -44,6 +47,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
+import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
@@ -141,9 +145,16 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 
 		final InstancePattern pattern = (InstancePattern) ((IFeatureProviderWithPatterns) getFeatureProvider())
 				.getPatternForPictogramElement(instanceShape);
+		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instanceShape);
 
+		final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
+		final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
+		pattern.saveConnections(instanceShape, incomingMap, outgoingMap);
 		hasDoneChanges = pattern.setInstanceRefinement(instanceShape,
 				refinement);
+		pattern.restoreConnections(instanceShape, incomingMap, outgoingMap,
+				"The refinement for instance \"" + instance.getSimpleName()
+						+ "\" has been updated:");
 		return instanceShape;
 	}
 
