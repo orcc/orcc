@@ -593,7 +593,7 @@
          </enablement>
       </moveParticipant>
       <moveParticipant
-            class="net.sf.orcc.ui.refactoring.OldCalMoveParticipant"
+            class="net.sf.orcc.ui.refactoring.CalMoveParticipant"
             id="net.sf.orcc.ui.calMoveParticipant"
             name="Cal move participant">
          <enablement>

@@ -56,12 +56,12 @@ public class ChangesFactory {
 
 	final private ResourceSet resourceSet;
 
-	final private Map<String, String> regexpReplacements;
+	final private Map<Pattern, String> regexpReplacements;
 	final private Map<String, String> simpleReplacements;
 
 	public ChangesFactory() {
 		resourceSet = new ResourceSetImpl();
-		regexpReplacements = new HashMap<String, String>();
+		regexpReplacements = new HashMap<Pattern, String>();
 		simpleReplacements = new HashMap<String, String>();
 	}
 
@@ -69,7 +69,7 @@ public class ChangesFactory {
 		return resourceSet;
 	}
 
-	public void addRegexpReplacement(final String pattern,
+	public void addReplacement(final Pattern pattern,
 			final String replacement) {
 		regexpReplacements.put(pattern, replacement);
 	}
@@ -119,10 +119,10 @@ public class ChangesFactory {
 			return null;
 		}
 		String result = subject;
-		for (Map.Entry<String, String> replacement : regexpReplacements
+		for (Map.Entry<Pattern, String> replacement : regexpReplacements
 				.entrySet()) {
-			result = result.replaceAll(replacement.getKey(),
-					replacement.getValue());
+			result = replacement.getKey().matcher(result)
+					.replaceAll(replacement.getValue());
 		}
 
 		for (Map.Entry<String, String> replacement : simpleReplacements
@@ -143,9 +143,8 @@ public class ChangesFactory {
 	 */
 	private boolean contentNeedsUpdate(final String content) {
 
-		for (final String patternString : regexpReplacements.keySet()) {
-			final Pattern pattern = Pattern.compile(patternString);
-			if (pattern.matcher(content).matches()) {
+		for (final Pattern pattern : regexpReplacements.keySet()) {
+			if (pattern.matcher(content).find()) {
 				return true;
 			}
 		}
