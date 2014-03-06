@@ -37,7 +37,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.xdf.ui.Activator;
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
@@ -110,7 +110,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		final Object linkedBo = getBusinessObjectForPictogramElement(diagram);
 
 		final URI diagramUri = diagram.eResource().getURI();
-		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(Activator.NETWORK_SUFFIX);
+		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(
+				OrccUtil.NETWORK_SUFFIX);
 
 		final Network network;
 		if (linkedBo == null || !(linkedBo instanceof Network)) {

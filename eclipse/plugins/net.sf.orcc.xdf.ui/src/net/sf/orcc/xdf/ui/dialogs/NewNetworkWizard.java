@@ -32,7 +32,6 @@ import java.io.IOException;
 
 import net.sf.orcc.df.Network;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -143,7 +142,7 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 				// Does nothing, DO NOT REMOVE. Overwrites link related stuff
 			}
 		};
-		page.setFileExtension(Activator.NETWORK_SUFFIX);
+		page.setFileExtension(OrccUtil.NETWORK_SUFFIX);
 		page.setDescription("Select a parent source folder and a name for the new network.");
 		page.setAllowExistingResources(false);
 

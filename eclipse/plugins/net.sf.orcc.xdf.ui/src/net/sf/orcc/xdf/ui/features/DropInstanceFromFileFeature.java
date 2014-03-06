@@ -32,7 +32,6 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
@@ -72,7 +71,8 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		
 		final IFile file = (IFile) context.getNewObject();
 		final String extension = file.getFileExtension();
-		if (extension.equals(Activator.NETWORK_SUFFIX) || extension.equals(Activator.ACTOR_SUFFIX)) {
+		if (extension.equals(OrccUtil.NETWORK_SUFFIX)
+				|| extension.equals(OrccUtil.CAL_SUFFIX)) {
 
 			final ContainerShape target = context.getTargetContainer();
 			if (target == getDiagram() || PropsUtil.isInstance(target)) {
@@ -87,8 +87,9 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 	public PictogramElement add(IAddContext context) {
 
 		IFile file = (IFile) context.getNewObject();
-		if (Activator.ACTOR_SUFFIX.equals(file.getFileExtension())) {
-			file = OrccUtil.getFile(file.getProject(), OrccUtil.getQualifiedName(file), Activator.IR_SUFFIX);
+		if (OrccUtil.CAL_SUFFIX.equals(file.getFileExtension())) {
+			file = OrccUtil.getFile(file.getProject(),
+					OrccUtil.getQualifiedName(file), OrccUtil.IR_SUFFIX);
 		}
 
 		final URI uri = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
