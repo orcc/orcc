@@ -3,10 +3,7 @@
 set(orcc_sources
     src/access_file.c
     src/dataflow.c
-    src/getopt.c
-    src/graph.c
     src/options.c
-    src/scheduler.c
     src/source.c
     src/trace.c
     src/util.c
@@ -33,7 +30,10 @@ else()
         src/compare.c
         src/compareyuv.c
         src/fps_print.c
+    	src/graph.c
+    	src/getopt.c
         src/mapping.c
+    	src/scheduler.c
         src/serialize.c
         src/thread.c
     )
