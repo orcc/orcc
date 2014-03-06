@@ -69,9 +69,15 @@ import org.eclipse.jdt.core.JavaModelException;
  * This class contains utility methods for dealing with resources.
  * 
  * @author Matthieu Wipliez
+ * @author Antoine Lorence
  * 
  */
 public class OrccUtil {
+
+	public static final String IR_SUFFIX = "ir";
+	public static final String CAL_SUFFIX = "cal";
+	public static final String NETWORK_SUFFIX = "xdf";
+	public static final String DIAGRAM_SUFFIX = "xdfdiag";
 
 	/**
 	 * Creates a new file if needed and returns its path
