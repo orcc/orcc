@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.c.compa;
 
+import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,7 +73,63 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Antoine Lorence
  */
 public class COMPABackend extends CBackend {
+	
+	@Override
+	protected void doInitializeOptions() {
+//		// Create empty folders
+//		new File(path + File.separator + "build").mkdirs();
+//		new File(path + File.separator + "bin").mkdirs();
+//
+//		srcPath = path + File.separator + "src";
+	}
+	
+	
+	@Override
+	protected boolean exportRuntimeLibrary() {
+		boolean exportLibrary = !getAttribute(NO_LIBRARY_EXPORT, false);
 
+		if (exportLibrary) {
+			String libsPath = path + File.separator + "libs";
+
+//			// Copy specific windows batch file
+//			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+//				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
+//						path + File.separator + "run_cmake_with_VS_env.bat",
+//						debug);
+//			}
+//
+//			copyFileToFilesystem("/runtime/C/README.txt", path + File.separator
+//					+ "README.txt", debug);
+
+			OrccLogger.trace("Export libraries sources into " + libsPath
+					+ "... ");
+			final boolean orccOk = copyFolderToFileSystem("/runtime/COMPA/libs",
+					libsPath, debug);
+			if (orccOk) {
+				OrccLogger.traceRaw("OK" + "\n");
+				new File(libsPath + File.separator + "orcc" + File.separator
+						+ "benchAutoMapping.py").setExecutable(true);
+			} else {
+				OrccLogger.warnRaw("Error" + "\n");
+			}
+
+			final String commonLibPath = libsPath + File.separator + "orcc"
+					+ File.separator + "common";
+			OrccLogger.trace("Export common library files into "
+					+ commonLibPath + "... ");
+			final boolean commonOk = copyFolderToFileSystem("/runtime/common",
+					commonLibPath, debug);
+			if (commonOk) {
+				OrccLogger.traceRaw("OK" + "\n");
+			} else {
+				OrccLogger.warnRaw("Error" + "\n");
+			}
+
+			return orccOk & commonOk;
+		}
+		return false;
+	}
+	
 	@Override
 	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
@@ -177,6 +235,6 @@ public class COMPABackend extends CBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(options).print(srcPath, instance) > 0;
+		return new InstancePrinter(options).print(path + File.separator + instance.getSimpleName(), instance) > 0;
 	}
 }

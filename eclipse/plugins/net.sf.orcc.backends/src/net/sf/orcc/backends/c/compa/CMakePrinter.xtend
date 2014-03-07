@@ -30,6 +30,9 @@ package net.sf.orcc.backends.c.compa
 
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Actor
+import net.sf.orcc.df.Instance
+import java.io.File
+import net.sf.orcc.util.OrccUtil
 
 class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 	
@@ -41,7 +44,10 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		# Prevent usage of SDL or pthread libraries in library built
 		set(NO_EXTERNAL_DEPENDENCIES True)
 		
-		«super.addLibrariesSubdirs»
+		# Compile required libs
+		add_subdirectory(libs)
+		# Compile application
+		add_subdirectory(src)
 	'''
 	
 	override protected srcCMakeContent() '''
@@ -62,4 +68,64 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		# Build library without any external library required
 		target_link_libraries(«network.simpleName» orcc)
 	'''
+	
+	def protected srcCMakeContent(Instance instance) '''
+		# Generated from «instance.simpleName»
+
+		set(filenames
+			«instance.simpleName».c
+		)
+
+		add_executable(«instance.simpleName» ${filenames})
+
+		# Build library without any external library required
+		target_link_libraries(«instance.simpleName» orcc)
+	'''
+	
+	def protected rootCMakeContent(Instance instance) '''
+		# Generated from «instance.simpleName»
+
+		cmake_minimum_required (VERSION 2.6)
+
+		project («instance.simpleName»)
+
+«««		# Configure ouput folder for generated binary
+«««		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+		
+		# Runtime libraries inclusion
+		include_directories(../libs/orcc/include)
+		
+		set(filenames
+			«instance.simpleName».c
+		)
+		
+		add_executable(«instance.simpleName» ${filenames})
+		
+		# Link to orcc library.
+		add_library(orcc STATIC IMPORTED)
+		set_property(TARGET orcc PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../libs/orcc/liborcc.a)
+		TARGET_LINK_LIBRARIES(«instance.simpleName» orcc)
+	'''
+	
+	override printCMakeFiles(String targetFolder) {
+		var File root
+//		var File src
+//		var CharSequence srcContent
+		var CharSequence rootContent
+		
+		for (instance : network.children.actorInstances.filter[!getActor.native]) {
+			root		 = new File(targetFolder + File::separator + instance.simpleName + File::separator + "CMakeLists.txt")
+//			src			 = new File(targetFolder + File::separator + instance.simpleName + File::separator + "src" + File::separator + "CMakeLists.txt")
+//			srcContent	 = srcCMakeContent(instance)
+			rootContent	 = rootCMakeContent(instance)
+			
+			if(needToWriteFile(rootContent, root)) {
+				OrccUtil::printFile(rootContent, root)
+			}
+//			if(needToWriteFile(srcContent, src)) {
+//				OrccUtil::printFile(srcContent, src)
+//			}
+		}
+		return true;
+	}
 }

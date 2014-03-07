@@ -238,7 +238,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
 			«FOR port : actor.inputs»
-				«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
+				«IF (incomingPortMap.get(port) != null)»
+					fifo_«port.type.doSwitch»_t *«port.fullName»;
+				«ENDIF»
 			«ENDFOR»
 
 			////////////////////////////////////////////////////////////////////////////////
@@ -270,13 +272,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					extern actor_t «incomingPortMap.get(port).source.label»;
 				«ENDIF»
 			«ENDFOR»
-
 		«ENDIF»
+		
 		«IF !actor.outputs.filter[! native].nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Output FIFOs
 			«FOR port : actor.outputs.filter[! native]»
-				extern fifo_«port.type.doSwitch»_t *«port.fullName»;
+				fifo_«port.type.doSwitch»_t *«port.fullName»;
 			«ENDFOR»
 
 			////////////////////////////////////////////////////////////////////////////////
@@ -397,6 +399,16 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// main
 		«printMain»
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// TODO: ...think of this
+		void outbyte(){
+
+		}
+
+		void inbyte(){
+
+		}
 		
 	'''
 	
