@@ -241,7 +241,7 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	def printFifoMapping(Connection connection) '''
 		
 			«connection.ramName» : ram_tab
-					generic map (dwidth     => 32,
+					generic map (dwidth     => «connection.fifoType.sizeInBits»,
 					       awidth     => 9,
 					       mem_size   => 512)
 			port map (

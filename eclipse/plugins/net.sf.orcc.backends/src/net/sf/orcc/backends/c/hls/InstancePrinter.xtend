@@ -244,6 +244,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 	}
 
+	//&& (512 - «instance.outgoingPortMap.get(port).head.localwName» + «instance.outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)			
 	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
 	«IF instance.outgoingPortMap.get(port).head.targetPort == null»
 		«IF !instance.outgoingPortMap.get(port).head.fifoName.toString.empty»
@@ -251,9 +252,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	«ELSE»
 		&& (512 - «instance.outgoingPortMap.get(port).head.localwName» + «instance.outgoingPortMap.get(port).head.rName»[0] >= «pattern.
-		getNumTokens(port)»)			
+		getNumTokens(port)»)					
 	«ENDIF»'''
 
+	//«instance.incomingPortMap.get(port).wName»[0] - «instance.incomingPortMap.get(port).localrName» >= «pattern.getNumTokens(port)»  &&
 	override checkInputPattern(Pattern pattern) '''«FOR port : pattern.ports»
 		«IF instance.incomingPortMap.get(port).sourcePort == null»
 			«IF !instance.incomingPortMap.get(port).fifoName.toString.empty»
@@ -289,6 +291,16 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		currentAction = action
 		val output = '''
 			static void «instance.name»_«action.body.name»() {
+				«FOR port : instance.getActor.inputs»
+					«IF instance.incomingPortMap.get(port).sourcePort != null»
+						i32 «instance.incomingPortMap.get(port).maskName» = «instance.incomingPortMap.get(port).localrName» & 511;
+					«ENDIF»
+				«ENDFOR»
+				«FOR port : instance.getActor.outputs.filter[! native]»
+					«IF instance.outgoingPortMap.get(port).head.targetPort != null»
+						i32 «instance.outgoingPortMap.get(port).head.maskName» = «instance.outgoingPortMap.get(port).head.localwName» & 511;
+					«ENDIF»
+				«ENDFOR»
 				
 				«FOR variable : action.body.locals»
 					«variable.declare»;
@@ -296,6 +308,21 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
+				«ENDFOR»
+				
+				«FOR port : instance.getActor.inputs»
+					«IF instance.incomingPortMap.get(port).sourcePort != null»
+						«instance.incomingPortMap.get(port).localrName» = «instance.incomingPortMap.get(port).localrName»+«action.inputPattern.
+		getNumTokens(port)»;
+						«instance.incomingPortMap.get(port).rName»[0] = «instance.incomingPortMap.get(port).localrName»;
+					«ENDIF»
+				«ENDFOR»
+				«FOR port : instance.getActor.outputs.filter[! native]»
+					«IF instance.outgoingPortMap.get(port).head.targetPort != null»
+						«instance.outgoingPortMap.get(port).head.localwName» = «instance.outgoingPortMap.get(port).head.localwName» +«action.outputPattern.
+		getNumTokens(port)»;
+						«instance.outgoingPortMap.get(port).head.wName»[0] = «instance.outgoingPortMap.get(port).head.localwName»;
+					«ENDIF»
 				«ENDFOR»
 			}
 			
@@ -306,6 +333,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		return output
 	}
 
+	//i32 «instance.incomingPortMap.get(srcPort).maskName» = «instance.incomingPortMap.get(srcPort).localrName» & 511;
+	//«instance.incomingPortMap.get(srcPort).localrName» = «instance.incomingPortMap.get(srcPort).localrName»+1;
+	//«instance.incomingPortMap.get(srcPort).rName»[0] = «instance.incomingPortMap.get(srcPort).localrName»;
+	//«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[(«instance.incomingPortMap.get(srcPort).maskName»  + («load.indexes.head.doSwitch»))];
 	override caseInstLoad(InstLoad load) {
 		if (load.eContainer != null) {
 			val srcPort = load.source.variable.getPort
@@ -316,11 +347,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 							«instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.name»);
 						«ENDIF»
 					«ELSE»
-						i32 «instance.incomingPortMap.get(srcPort).maskName» = «instance.incomingPortMap.get(srcPort).localrName» & 511;
-						«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[«instance.incomingPortMap.get(
-					srcPort).maskName»];
-						«instance.incomingPortMap.get(srcPort).localrName» = «instance.incomingPortMap.get(srcPort).localrName»+1;
-						«instance.incomingPortMap.get(srcPort).rName»[0] = «instance.incomingPortMap.get(srcPort).localrName»;
+						
+						«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[(«instance.incomingPortMap.get(
+					srcPort).maskName»  + («load.indexes.head.doSwitch»))];
 					«ENDIF»
 				«ELSE»
 					«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
@@ -330,6 +359,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	}
 
+	//i32 «instance.outgoingPortMap.get(trgtPort).head.maskName» = «instance.outgoingPortMap.get(trgtPort).head.localwName» & 511;
+	//«instance.outgoingPortMap.get(trgtPort).head.localwName» = «instance.outgoingPortMap.get(trgtPort).head.localwName» +1;
+	//«instance.outgoingPortMap.get(trgtPort).head.wName»[0] = «instance.outgoingPortMap.get(trgtPort).head.localwName»;
+	//«instance.outgoingPortMap.get(trgtPort).head.ramName»[(«instance.outgoingPortMap.get(trgtPort).head.maskName» + («store.indexes.head.doSwitch»))]=«store.value.doSwitch»;
 	override caseInstStore(InstStore store) {
 		val trgtPort = store.target.variable.port
 		'''
@@ -339,12 +372,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 						«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
 					«ENDIF»
 				«ELSE»
-					i32 «instance.outgoingPortMap.get(trgtPort).head.maskName» = «instance.outgoingPortMap.get(trgtPort).head.
-				localwName» & 511;
-					«instance.outgoingPortMap.get(trgtPort).head.ramName»[«instance.outgoingPortMap.get(trgtPort).head.maskName»]=«store.
-				value.doSwitch»;
-					«instance.outgoingPortMap.get(trgtPort).head.localwName» = «instance.outgoingPortMap.get(trgtPort).head.localwName» +1;
-					«instance.outgoingPortMap.get(trgtPort).head.wName»[0] = «instance.outgoingPortMap.get(trgtPort).head.localwName»;
+					
+					«instance.outgoingPortMap.get(trgtPort).head.ramName»[(«instance.outgoingPortMap.get(trgtPort).head.maskName» + («store.
+				indexes.head.doSwitch»))]=«store.value.doSwitch»;
+					
 				«ENDIF»
 			«ELSE»
 				«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
