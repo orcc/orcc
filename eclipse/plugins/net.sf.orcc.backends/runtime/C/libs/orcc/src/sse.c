@@ -39,6 +39,15 @@
 
 #include "sse.h"
 
+/*****************************************************************************************************************/
+
+#define DPB_SIZE      17
+#define PICT_WIDTH  4096
+#define PICT_HEIGHT 2048
+#define BORDER_SIZE  128
+
+/*****************************************************************************************************************/
+
 void (*weighted_pred_mono[4])(
         u8 denom,
         i16 wlxFlag,
@@ -78,7 +87,6 @@ void copy_8_8_ ## H ## _ ## J ## x ## K ## _orcc(                               
   __m128i * pm128iOutputSample = (__m128i *) &outputSample[idxBlkStride + 0];                                                          \
   __m128i m128iInputSample;                                                                                                            \
                                                                                                                                        \
-  i = 0;                                                                                                                               \
   for (i = 0; i < SCU_SIZE_DIV16(H); i++)                                                                                              \
   {                                                                                                                                    \
     m128iInputSample = _mm_loadu_si128(pm128iInputSample + i);                                                                         \
@@ -86,17 +94,54 @@ void copy_8_8_ ## H ## _ ## J ## x ## K ## _orcc(                               
   }                                                                                                                                    \
                                                                                                                                        \
   if (SCU_SIZE_MOD16(H) == 8)                                                                                                          \
+  if (SCU_SIZE_MOD16(H) == 8)                                                                                                          \
   {                                                                                                                                    \
-    pm128iOutputSample = (__m128i *) &outputSample[H - 8];                                                                             \
-    pm128iInputSample = (__m128i *) &inputSample[H - 8];                                                                               \
-    m128iInputSample = _mm_loadl_epi64(pm128iInputSample);                                                                             \
-    _mm_storel_epi64(pm128iOutputSample, m128iInputSample);                                                                            \
+    m128iInputSample = _mm_loadl_epi64(pm128iInputSample + i);                                                                         \
+    _mm_storel_epi64(pm128iOutputSample + i, m128iInputSample);                                                                        \
   }                                                                                                                                    \
 }
 
 // Declare more functions if needed
-COPY_8_8(16, 64, 64)
-COPY_8_8(16, 32, 32)
+COPY_8_8(16, 64,   64)
+COPY_8_8(16, 32,   32)
+COPY_8_8(16,  1, 4352)
+COPY_8_8( 8,  1, 2304)
+
+// Variable number of elements to be copied
+#define COPY_8_8_VAR()                                                                                                                 \
+void copy_8_8_var_orcc(                                                                                                                \
+  u8 * outputSample,                                                                                                                   \
+  u8 * inputSample,                                                                                                                    \
+  u32 idxBlkStride,                                                                                                                    \
+  u8 size)                                                                                                                             \
+{                                                                                                                                      \
+  int i = 0;                                                                                                                           \
+  __m128i * pm128iInputSample = (__m128i *) &inputSample[idxBlkStride + 0];                                                            \
+  __m128i * pm128iOutputSample = (__m128i *) &outputSample[0];                                                                         \
+  __m128i m128iInputSample;                                                                                                            \
+  int size1 = SCU_SIZE_MOD16(size);                                                                                                    \
+  int x;                                                                                                                               \
+                                                                                                                                       \
+  for (i = 0; i < SCU_SIZE_DIV16(size); i++)                                                                                           \
+  {                                                                                                                                    \
+    m128iInputSample = _mm_loadu_si128(pm128iInputSample + i);                                                                         \
+    _mm_storeu_si128(pm128iOutputSample + i, m128iInputSample);                                                                        \
+  }                                                                                                                                    \
+                                                                                                                                       \
+  if (size1 > 7)                                                                                                                       \
+  {                                                                                                                                    \
+    m128iInputSample = _mm_loadl_epi64(pm128iInputSample + i);                                                                         \
+    _mm_storel_epi64(pm128iOutputSample + i, m128iInputSample);                                                                        \
+    size1 -= 8;                                                                                                                        \
+  }                                                                                                                                    \
+                                                                                                                                       \
+  for (x = size - size1; x < size; x++)                                                                                                \
+  {                                                                                                                                    \
+    outputSample[x] = inputSample[idxBlkStride + x];                                                                                   \
+  }                                                                                                                                    \
+}
+
+COPY_8_8_VAR()
 
 
 // add 8-bits elements to 16-bits elements and clip, for H elements. First array (pred) is K * J.
@@ -324,8 +369,70 @@ void addClip_orcc(
 
 /* DECODING PICTURE BUFFER */
 
+void copy_cu_dpb_luma_orcc(
+  u8 samp[256],
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
+  i32 xPixIdx,
+  i32 yPixIdx,
+  i8  lastIdx)
+{
+  int y;
+
+  for (y = 0; y < 16; y++)
+  {
+    copy_8_8_16_1x4352_orcc(
+      pictureBuffer[lastIdx][yPixIdx+y],
+      samp + y * 16,
+  	  xPixIdx);
+  }
+}
+
+void copy_cu_dpb_chroma_orcc(
+  u8 samp[64],
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT/2+2*BORDER_SIZE][PICT_WIDTH/2+2*BORDER_SIZE],
+  i32 xPixIdx,
+  i32 yPixIdx,
+  i8  lastIdx)
+{
+  int y;
+
+  for (y = 0; y < 8; y++)
+  {
+    copy_8_8_8_1x2304_orcc(
+      pictureBuffer[lastIdx][yPixIdx+y],
+      &samp[y * 8],
+  	  xPixIdx);
+  }
+}
+
+#define GETMVINFO_DPB_LUMA(H)                                                                                       \
+void getmvinfo_dpb_ ## H ## _luma_orcc(                                                                             \
+  u8 pictureBuffer[17][2304][4352],                                                                                 \
+  u8 RefCu[(H + 7) * (H + 7)],                                                                                      \
+  u8 idx,                                                                                                           \
+  u8 sideMax,                                                                                                       \
+  i32 xOffset,                                                                                                      \
+  i32 yOffset)                                                                                                      \
+{                                                                                                                   \
+  int y;                                                                                                            \
+                                                                                                                    \
+  for (y = 0; y < sideMax; y++)                                                                                     \
+  {                                                                                                                 \
+	copy_8_8_var_orcc(                                                                                              \
+      &RefCu[y * (sideMax)],                                                                                        \
+      pictureBuffer[idx][y+yOffset],                                                                                \
+      xOffset,                                                                                                      \
+  	  sideMax);                                                                                                     \
+  }                                                                                                                 \
+}
+
+GETMVINFO_DPB_LUMA(64)
+GETMVINFO_DPB_LUMA(32)
+GETMVINFO_DPB_LUMA(16)
+
+
 void fillBorder_luma_orcc(
-	u8 pictureBuffer[17][2304][4352],
+	u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
 	i8 lastIdx,
 	int xSize,
 	int ySize,
@@ -387,7 +494,7 @@ void fillBorder_luma_orcc(
 
 
 void fillBorder_chroma_orcc(
-	u8 pictureBuffer[17][1280][2304],
+	u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT/2+2*BORDER_SIZE][PICT_WIDTH/2+2*BORDER_SIZE],
 	i8 lastIdx,
 	int xSize,
 	int ySize,
