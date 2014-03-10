@@ -39,6 +39,15 @@
 
 #include "types.h"
 
+/*****************************************************************************************************************/
+
+#define DPB_SIZE      17
+#define PICT_WIDTH  4096
+#define PICT_HEIGHT 2048
+#define BORDER_SIZE  128
+
+/*****************************************************************************************************************/
+
 
 #if defined(__ICC) && __ICC < 1200 || defined(__SUNPRO_C)
     #define DECLARE_ALIGNED(n,t,v)      t __attribute__ ((aligned (n))) v
@@ -63,6 +72,7 @@
 #endif
 
 int sse_init_context();
+
 /***********************************************************************************************************************************
  SelectCu 
  ***********************************************************************************************************************************/
@@ -76,6 +86,22 @@ void copy_8_8_16_32x32_orcc(
   u8 outputSample[32 * 32],
   u8 inputSample[16],
   u32 idxBlkStride);
+
+void copy_8_8_16_1x4352_orcc(
+  u8 outputSample[1 * 4352],
+  u8 inputSample[16],
+  u32 idxBlkStride);
+
+void copy_8_8_8_1x2304_orcc(
+  u8 outputSample[1 * 2304],
+  u8 inputSample[16],
+  u32 idxBlkStride);
+
+void copy_8_8_var_orcc(
+  u8 * outputSample,
+  u8 * inputSample,
+  u32 idxBlkStride,
+  u8 size);
 
 void add_8_16_clip_16_1x16_orcc(
   u8 predSample[1 * 16],
@@ -158,6 +184,68 @@ void addClip_orcc(
 /***********************************************************************************************************************************
  DecodingPictureBuffer 
  ***********************************************************************************************************************************/
+
+void copy_cu_dpb_luma_orcc(
+  u8 samp[256],
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
+  i32 xPixIdx,
+  i32 yPixIdx,
+  i8  lastIdx);
+
+void copy_cu_dpb_chroma_orcc(
+  u8 samp[64],
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT/2+2*BORDER_SIZE][PICT_WIDTH/2+2*BORDER_SIZE],
+  i32 xPixIdx,
+  i32 yPixIdx,
+  i8  lastIdx);
+
+void getmvinfo_dpb_64_luma_orcc(
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
+  u8 RefCu[(64 + 7) * (64 + 7)],
+  u8 idx,
+  u8 sideMax,
+  i32 xOffset,
+  i32 yOffset);
+
+void getmvinfo_dpb_32_luma_orcc(
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
+  u8 RefCu[(32 + 7) * (32 + 7)],
+  u8 idx,
+  u8 sideMax,
+  i32 xOffset,
+  i32 yOffset);
+
+void getmvinfo_dpb_16_luma_orcc(
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
+  u8 RefCu[(16 + 7) * (16 + 7)],
+  u8 idx,
+  u8 sideMax,
+  i32 xOffset,
+  i32 yOffset);
+
+void getmvinfo_dpb_64_chroma_orcc(
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT/2+2*BORDER_SIZE][PICT_WIDTH/2+2*BORDER_SIZE],
+  u8 RefCu[(32 + 3) * (32 + 3)],
+  u8 idx,
+  u8 sideMax,
+  i32 xOffset,
+  i32 yOffset);
+
+void getmvinfo_dpb_32_chroma_orcc(
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT/2+2*BORDER_SIZE][PICT_WIDTH/2+2*BORDER_SIZE],
+  u8 RefCu[(16 + 3) * (16 + 3)],
+  u8 idx,
+  u8 sideMax,
+  i32 xOffset,
+  i32 yOffset);
+
+void getmvinfo_dpb_16_chroma_orcc(
+  u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT/2+2*BORDER_SIZE][PICT_WIDTH/2+2*BORDER_SIZE],
+  u8 RefCu[(8 + 3) * (8 + 3)],
+  u8 idx,
+  u8 sideMax,
+  i32 xOffset,
+  i32 yOffset);
 
 void fillBorder_luma_orcc(
 	u8 pictureBuffer[17][2304][4352],
