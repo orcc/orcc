@@ -142,7 +142,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Initializes
-		«initializeFunction»
+		«printInitialize»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
@@ -327,7 +327,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	}
 	
-	override initializeFunction() '''
+	override printInitialize() '''
 		«IF ! instance.getActor.initializes.empty»
 			«FOR init : instance.getActor.initializes»
 				«init.print»

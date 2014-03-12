@@ -83,7 +83,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// in COMPA backend
 	}
 	
-	override protected actorScheduler() '''
+	override protected printActorScheduler() '''
 		«IF instance.getActor.hasFsm»
 			«printFsm»
 		«ELSE»
@@ -108,7 +108,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 	
-	override initializeFunction() '''
+	override printInitialize() '''
 		«FOR init : actor.initializes»
 			«init.print»
 		«ENDFOR»

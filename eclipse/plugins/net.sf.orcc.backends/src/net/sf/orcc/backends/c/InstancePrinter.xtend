@@ -415,14 +415,14 @@ class InstancePrinter extends CTemplate {
 
 		////////////////////////////////////////////////////////////////////////////////
 		// Initializes
-		«initializeFunction»
+		«printInitialize»
 
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		«actorScheduler»
+		«printActorScheduler»
 	'''
 
-	def protected actorScheduler() '''
+	def protected printActorScheduler() '''
 		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
@@ -610,7 +610,7 @@ class InstancePrinter extends CTemplate {
 		«ENDFOR»
 	'''
 
-	def protected initializeFunction() '''
+	def protected printInitialize() '''
 		«FOR init : actor.initializes»
 			«init.print()»
 		«ENDFOR»
