@@ -869,6 +869,11 @@ class InstancePrinter extends CTemplate {
 		}
 		'''
 	}
+	
+	def protected declare(Procedure proc){
+		val modifier = if(proc.native) "extern" else "static"
+		'''«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]»);'''
+	}
 
 	def protected declareStateVar(Var variable) {
 		val varDecl =

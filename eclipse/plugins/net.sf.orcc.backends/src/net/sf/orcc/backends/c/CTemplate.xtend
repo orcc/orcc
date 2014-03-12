@@ -30,6 +30,7 @@ package net.sf.orcc.backends.c
 
 import java.util.LinkedList
 import java.util.List
+import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.ir.Arg
 import net.sf.orcc.ir.ArgByRef
 import net.sf.orcc.ir.ArgByVal
@@ -37,6 +38,7 @@ import net.sf.orcc.ir.ExprBinary
 import net.sf.orcc.ir.ExprBool
 import net.sf.orcc.ir.ExprInt
 import net.sf.orcc.ir.ExprString
+import net.sf.orcc.ir.Instruction
 import net.sf.orcc.ir.OpBinary
 import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeBool
@@ -48,9 +50,6 @@ import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
-import net.sf.orcc.backends.CommonPrinter
-import net.sf.orcc.ir.Instruction
-import net.sf.orcc.ir.Procedure
 
 /*
  * Default C Printer
@@ -59,94 +58,78 @@ import net.sf.orcc.ir.Procedure
  * 
  */
 abstract class CTemplate extends CommonPrinter {
-	
+
 	/////////////////////////////////
 	// Expressions
 	/////////////////////////////////
-	
 	override caseExprBinary(ExprBinary expr) {
 		val op = expr.op
-		var nextPrec =
-			if (op == OpBinary::SHIFT_LEFT || op == OpBinary::SHIFT_RIGHT) {
+		var nextPrec = if (op == OpBinary::SHIFT_LEFT || op == OpBinary::SHIFT_RIGHT) {
+
 				// special case, for shifts always put parentheses because compilers
 				// often issue warnings
 				Integer::MIN_VALUE;
 			} else {
 				op.precedence;
 			}
-		
-		val resultingExpr =
-			'''«expr.e1.printExpr(nextPrec, 0)» «op.stringRepresentation» «expr.e2.printExpr(nextPrec, 1)»'''
-		
-		if ( op.needsParentheses(precedence, branch)) {
+
+		val resultingExpr = '''«expr.e1.printExpr(nextPrec, 0)» «op.stringRepresentation» «expr.e2.printExpr(nextPrec, 1)»'''
+
+		if (op.needsParentheses(precedence, branch)) {
 			'''(«resultingExpr»)'''
 		} else {
 			resultingExpr
 		}
 	}
-	
+
 	override caseExprBool(ExprBool object) {
-		if (object.value) "1" else "0"
+		if(object.value) "1" else "0"
 	}
-	
+
 	override caseExprInt(ExprInt object) {
 		val longVal = object.value.longValue
-		if(longVal < Integer::MIN_VALUE || longVal > Integer::MAX_VALUE) {
+		if (longVal < Integer::MIN_VALUE || longVal > Integer::MAX_VALUE) {
 			'''«longVal»L'''
 		} else {
 			'''«longVal»'''
 		}
 	}
-	
+
 	override protected stringRepresentation(OpBinary op) {
 		if (op == OpBinary::DIV_INT)
 			"/"
 		else
 			super.stringRepresentation(op)
 	}
-	
+
 	/////////////////////////////////
 	// Types
 	/////////////////////////////////
-	override caseTypeBool(TypeBool type) 
-		'''i32'''
+	override caseTypeBool(TypeBool type) '''i32'''
 
-	override caseTypeInt(TypeInt type)
-		'''i«type.size»'''
+	override caseTypeInt(TypeInt type) '''i«type.size»'''
 
-	override caseTypeUint(TypeUint type) 
-		'''u«type.size»'''
+	override caseTypeUint(TypeUint type) '''u«type.size»'''
 
 	override caseTypeFloat(TypeFloat type) {
-		if (type.size == 64) '''double'''
-		else '''float'''
+		if (type.size == 64) '''double''' else '''float'''
 	}
 
-	override caseTypeString(TypeString type)
-		'''char *'''
+	override caseTypeString(TypeString type) '''char *'''
 
-	override caseTypeVoid(TypeVoid type)
-		'''void'''
-	
+	override caseTypeVoid(TypeVoid type) '''void'''
+
 	override caseTypeList(TypeList typeList)
 		//TODO : print sizes
-		'''«typeList.innermostType.doSwitch»'''
+	'''«typeList.innermostType.doSwitch»'''
 
-	
-	def protected declare(Var variable)
-		'''«variable.type.doSwitch» «variable.name»«variable.type.dimensionsExpr.printArrayIndexes»'''
-		
-	def protected declare(Procedure proc){
-		val modifier = if(proc.native) "extern" else "static"
-		'''«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]»);'''
-	}
-	
-	
+	def protected declare(Var variable) '''«variable.type.doSwitch» «variable.name»«variable.type.dimensionsExpr.
+		printArrayIndexes»'''
+
 	/////////////////////////////////
 	// Helpers
 	/////////////////////////////////
-	
-	 /**
+	/**
 	  * Print for a type, the corresponding formatted text to
 	  * use inside a printf() call.
 	  * @param type the type to print
@@ -157,7 +140,7 @@ abstract class CTemplate extends CommonPrinter {
 			case type.bool: "i"
 			case type.float: "f"
 			case type.int && (type as TypeInt).long: "lli"
-			case type.int:"i"
+			case type.int: "i"
 			case type.uint && (type as TypeUint).long: "llu"
 			case type.uint: "u"
 			case type.list: "p"
@@ -165,40 +148,38 @@ abstract class CTemplate extends CommonPrinter {
 			case type.void: "p"
 		}
 	}
-	
-		
+
 	def protected printfArgs(List<Arg> args) {
 		val finalArgs = new LinkedList<CharSequence>
 
 		val printfPattern = new StringBuilder
 		printfPattern.append('"')
-		
+
 		for (arg : args) {
-			
-			if(arg.byRef) {
+
+			if (arg.byRef) {
 				printfPattern.append("%" + (arg as ArgByRef).use.variable.type.printfFormat)
 				finalArgs.add((arg as ArgByRef).use.variable.name)
-			} else if((arg as ArgByVal).value.exprString) {
+			} else if ((arg as ArgByVal).value.exprString) {
 				printfPattern.append(((arg as ArgByVal).value as ExprString).value)
 			} else {
 				printfPattern.append("%" + (arg as ArgByVal).value.type.printfFormat)
 				finalArgs.add((arg as ArgByVal).value.doSwitch)
 			}
-			
+
 		}
 		printfPattern.append('"')
 		finalArgs.addFirst(printfPattern.toString)
 		return finalArgs
 	}
-	
+
 	/**
 	 * Print attributes for an Attributable object.
 	 * Do nothing on C backend, but is used by others.
 	 * @param object the object
 	 * @return comment block
 	 */
-	def protected printAttributes(Attributable object)
-		''''''
+	def protected printAttributes(Attributable object) ''''''
 
 	/**
 	 * This helper return a representation of a given instruction without
