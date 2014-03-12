@@ -111,7 +111,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// State variables of the actor
 		«FOR variable : instance.getActor.stateVars»
-			«variable.declareStateVar»
+			«variable.declare»
 		«ENDFOR»
 		«IF instance.getActor.hasFsm»
 			////////////////////////////////////////////////////////////////////////////////

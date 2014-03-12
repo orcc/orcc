@@ -346,7 +346,7 @@ class InstancePrinter extends CTemplate {
 				«ENDFOR»
 			«ELSE»
 				«FOR variable : actor.parameters»
-					«variable.declareStateVar»
+					«variable.declare»
 				«ENDFOR»
 			«ENDIF»
 
@@ -365,7 +365,7 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// State variables of the actor
 			«FOR variable : actor.stateVars»
-				«variable.declareStateVar»
+				«variable.declare»
 			«ENDFOR»
 
 		«ENDIF»
@@ -875,20 +875,19 @@ class InstancePrinter extends CTemplate {
 		'''«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]»);'''
 	}
 
-	def protected declareStateVar(Var variable) {
-		val varDecl =
-			if(variable.initialized && !variable.assignable && !variable.type.list) {
-				'''#define «variable.name» «variable.initialValue.doSwitch»'''
-			} else {
-				// else branch are important here, to avoid a null value in the list of concat terms
-				val const = if(!variable.assignable) '''const ''' else ''''''
-				val init = if(variable.initialized) ''' = «variable.initialValue.doSwitch»''' else ''''''
+	override protected declare(Var variable) {
+		if(variable.global && variable.initialized && !variable.assignable && !variable.type.list) {
+			'''#define «variable.name» «variable.initialValue.doSwitch»'''
+		} else {
+			val const = if(!variable.assignable && variable.global) "const "
+			val global = if(variable.global) "static "
+			val type = variable.type.doSwitch
+			val dims = variable.type.dimensionsExpr.printArrayIndexes
+			val init = if(variable.initialized) " = " + variable.initialValue.doSwitch
+			val end = if(variable.global) ";"
 
-				'''static «const»«variable.declare»«init»;'''
-			}
-		'''
-			«varDecl»
-		'''
+			'''«global»«const»«type» «variable.name»«dims»«init»«end»'''
+		}
 	}
 
 	def private getReaderId(Port port) {
