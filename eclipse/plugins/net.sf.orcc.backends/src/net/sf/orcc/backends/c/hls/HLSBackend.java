@@ -206,6 +206,9 @@ public class HLSBackend extends CBackend {
 		new InstanceTestBenchPrinter(options)
 				.print(VHDLTestBenchPath, instance);
 		new InstanceCosimPrinter(options).print(srcPath, instance);
+		new InstancePrinterCast(options).print(srcPath, instance);
+		new ActorTopVhdlPrinter(options).print(srcPath, instance);
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
+		
 	}
 }
