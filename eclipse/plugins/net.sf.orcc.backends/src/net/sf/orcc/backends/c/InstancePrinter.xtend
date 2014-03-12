@@ -1018,7 +1018,7 @@ class InstancePrinter extends CTemplate {
 		«IF call.print»
 			printf(«call.arguments.printfArgs.join(", ")»);
 		«ELSE»
-			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
+			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[print]»);
 		«ENDIF»
 	'''
 
@@ -1077,7 +1077,7 @@ class InstancePrinter extends CTemplate {
 		return variable.getValueAsEObject("copyOfTokens") as Port
 	}
 
-	def private printCallArg(Arg arg) {
+	def private print(Arg arg) {
 		if(arg.byRef) {
 			"&" + (arg as ArgByRef).use.variable.name + (arg as ArgByRef).indexes.printArrayIndexes
 		} else {
