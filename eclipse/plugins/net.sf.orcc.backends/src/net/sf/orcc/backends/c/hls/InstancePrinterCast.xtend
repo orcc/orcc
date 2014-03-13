@@ -34,6 +34,7 @@ import java.io.File
 import net.sf.orcc.df.Connection
 
 import java.util.Map
+import net.sf.orcc.df.Port
 
 /*
  * Compile Instance c source code
@@ -47,7 +48,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		super(options)
 	}
 
-	def getFileContentWrite() '''
+	def getFileContentWrite(Port port) '''
 		#include <hls_stream.h>
 		using namespace hls;
 		#include <stdio.h>
@@ -63,7 +64,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		typedef unsigned int u32;
 		typedef unsigned long long int u64;			
 		////////////////////////////////////////////////////////////////////////////////
-		«FOR port : instance.getActor.inputs»			
+		
 			// Input FIFOs
 			extern stream<«instance.incomingPortMap.get(port).fifoTypeOut.doSwitch»> «instance.incomingPortMap.get(port).
 			castfifoNameWrite»;
@@ -72,16 +73,13 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			extern unsigned int	«instance.incomingPortMap.get(port).wName»[1];
 			extern unsigned int	«instance.incomingPortMap.get(port).rName»[1];
 			unsigned int «instance.incomingPortMap.get(port).localwName»=0;					
-		«ENDFOR»				
+				
 		////////////////////////////////////////////////////////////////////////////////
-		«IF instance.getActor.outputs.empty»
-			extern stream<int> outFIFO_«instance.name»;
-		«ENDIF»
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
 		static void cast_«instance.name»_write_untagged_0() {
-			«FOR port : instance.getActor.inputs»			
-				«IF instance.incomingPortMap.get(port).sourcePort != null»
+			
 					i32 «instance.incomingPortMap.get(port).maskName» = «instance.incomingPortMap.get(port).localwName» & 511;
 					«instance.incomingPortMap.get(port).fifoTypeOut.doSwitch» tmp_«instance.incomingPortMap.get(port).sourcePort.name»;
 					«instance.incomingPortMap.get(port).castfifoNameWrite».read_nb(tmp_«instance.incomingPortMap.get(port).sourcePort.
@@ -90,8 +88,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			incomingPortMap.get(port).sourcePort.name» ;
 					«instance.incomingPortMap.get(port).localwName» = «instance.incomingPortMap.get(port).localwName» +1;
 					«instance.incomingPortMap.get(port).wName»[0] = «instance.incomingPortMap.get(port).localwName»;
-				«ENDIF»
-			«ENDFOR»	
+			
 		}
 		
 		static bool isSchedulable_untagged_0() {
@@ -104,8 +101,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
 		void cast_«instance.name»_write_scheduler() {		
-			«FOR port : instance.getActor.inputs»			
-				«IF instance.incomingPortMap.get(port).sourcePort != null»
+			
 					if (!«instance.incomingPortMap.get(port).castfifoNameWrite».empty() &&   
 					isSchedulable_untagged_0()) {
 					if(1
@@ -119,126 +115,158 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 					finished:
 					return;
 					}
-				«ENDIF»
-			«ENDFOR»	
+			
 	'''
 
-	def getFileContentRead() '''
-				
-				#include <hls_stream.h>
-				using namespace hls;
-				#include <stdio.h>
-				#include <stdlib.h>
-				
-				typedef signed char i8;
-				typedef short i16;
-				typedef int i32;
-				typedef long long int i64;
-				
-				typedef unsigned char u8;
-				typedef unsigned short u16;
-				typedef unsigned int u32;
-				typedef unsigned long long int u64;			
+	def getFileContentRead(Port portout) '''
+			
+			#include <hls_stream.h>
+			using namespace hls;
+			#include <stdio.h>
+			#include <stdlib.h>
+			
+			typedef signed char i8;
+			typedef short i16;
+			typedef int i32;
+			typedef long long int i64;
+			
+			typedef unsigned char u8;
+			typedef unsigned short u16;
+			typedef unsigned int u32;
+			typedef unsigned long long int u64;			
+			////////////////////////////////////////////////////////////////////////////////
+			
+		
+				// Input FIFOS
+				extern «instance.outgoingPortMap.get(portout).head.fifoTypeOut.doSwitch» «instance.outgoingPortMap.get(portout).
+			head.ramName»[512];
+				extern unsigned int «instance.outgoingPortMap.get(portout).head.wName»[1];
+				extern unsigned int «instance.outgoingPortMap.get(portout).head.rName»[1];
+				unsigned int «instance.outgoingPortMap.get(portout).head.localrName»=0;
+				// Output FIFOs
+				extern stream<«instance.outgoingPortMap.get(portout).head.fifoTypeOut.doSwitch»> «instance.outgoingPortMap.get(
+			portout).head.castfifoNameRead»;					
+		
 				////////////////////////////////////////////////////////////////////////////////
-							
-				«FOR portout : instance.getActor.outputs.filter[! native]»
-				«FOR connection : instance.outgoingPortMap.get(portout)»
-					// Input FIFOS
-					extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[512];
-					extern unsigned int «connection.wName»[1];
-					extern unsigned int «connection.rName»[1];
-					unsigned int «connection.localrName»=0;
-					// Output FIFOs
-					extern stream<«connection.fifoTypeOut.doSwitch»> «connection.castfifoNameRead»;					
-				«ENDFOR»
-				«ENDFOR»
-			////////////////////////////////////////////////////////////////////////////////
-			«IF instance.getActor.outputs.empty»
-			extern stream<int> outFIFO_«instance.name»;
-			«ENDIF»
-			////////////////////////////////////////////////////////////////////////////////
-			// Actions
-			static void cast_«instance.name»_read_untagged_0() {
-				«FOR port : instance.getActor.outputs.filter[! native]»
-					«IF instance.outgoingPortMap.get(port).head.targetPort != null»
-						i32 «instance.outgoingPortMap.get(port).head.maskName» = «instance.outgoingPortMap.get(port).head.localrName» & 511;
-						«instance.outgoingPortMap.get(port).head.fifoTypeOut.doSwitch» tmp_«instance.outgoingPortMap.get(port).head.
-						targetPort.name»;
-						tmp_«instance.outgoingPortMap.get(port).head.targetPort.name» = «instance.outgoingPortMap.get(port).head.ramName»[«instance.
-						outgoingPortMap.get(port).head.maskName»];
-						«instance.outgoingPortMap.get(port).head.castfifoNameRead».write_nb(tmp_«instance.outgoingPortMap.get(port).head.targetPort.name»);
-						«instance.outgoingPortMap.get(port).head.localrName» = «instance.outgoingPortMap.get(port).head.localrName» +1;
-						«instance.outgoingPortMap.get(port).head.rName»[0] = «instance.outgoingPortMap.get(port).head.localrName»;
-					«ENDIF»
-				«ENDFOR»
-			}
-			
-			static bool isSchedulable_untagged_0() {
-			bool result;
-			
-			result = 1;
-			return result;
-			}
-			////////////////////////////////////////////////////////////////////////////////
-			// Action scheduler
-			void cast_«instance.name»_read_scheduler() {		
-			«FOR portout : instance.getActor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(portout)»
-				«IF connection.targetPort != null»
-					if («connection.wName»[0] - «connection.localrName» >= 1  &&
-					isSchedulable_untagged_0()) {
-					if(1
-					&& (!«connection.castfifoNameRead».full())
-					){
-					cast_«instance.name»_read_untagged_0();
-					}
-					} else {
-					goto finished;
-					}		
-					finished:
-					return;
-					}
-				«ENDIF»
-			«ENDFOR»
-			«ENDFOR»
-			
+				// Actions
+				static void cast_«instance.name»_read_untagged_0() {
+				
+							i32 «instance.outgoingPortMap.get(portout).head.maskName» = «instance.outgoingPortMap.get(portout).head.
+			localrName» & 511;
+							«instance.outgoingPortMap.get(portout).head.fifoTypeOut.doSwitch» tmp_«instance.outgoingPortMap.get(portout).
+			head.targetPort.name»;
+							tmp_«instance.outgoingPortMap.get(portout).head.targetPort.name» = «instance.outgoingPortMap.get(portout).head.
+			ramName»[«instance.outgoingPortMap.get(portout).head.maskName»];
+							«instance.outgoingPortMap.get(portout).head.castfifoNameRead».write_nb(tmp_«instance.outgoingPortMap.get(portout).
+			head.targetPort.name»);
+							«instance.outgoingPortMap.get(portout).head.localrName» = «instance.outgoingPortMap.get(portout).head.localrName» +1;
+							«instance.outgoingPortMap.get(portout).head.rName»[0] = «instance.outgoingPortMap.get(portout).head.localrName»;
+				
+				}
+				
+				static bool isSchedulable_untagged_0() {
+				bool result;
+				
+				result = 1;
+				return result;
+				}
+				////////////////////////////////////////////////////////////////////////////////
+				// Action scheduler
+				void cast_«instance.name»_read_scheduler() {		
+						if («instance.outgoingPortMap.get(portout).head.wName»[0] - «instance.outgoingPortMap.get(portout).head.
+			localrName» >= 1  &&
+						isSchedulable_untagged_0()) {
+						if(1
+						&& (!«instance.outgoingPortMap.get(portout).head.castfifoNameRead».full())
+						){
+						cast_«instance.name»_read_untagged_0();
+						}
+						} else {
+						goto finished;
+						}		
+						finished:
+						return;
+						}
+				
 	'''
 
 	override print(String targetFolder) {
-		val contentRead = getFileContentRead
-		val fileRead = new File(targetFolder + File::separator + "cast_" + instance.name + "_read" + ".cpp")
-		val contentWrite = getFileContentWrite
-		val fileWrite = new File(targetFolder + File::separator + "cast_" + instance.name + "_write" + ".cpp")
-		
-		for (port : instance.getActor.inputs) {
-			if (instance.incomingPortMap.get(port).sourcePort == null) {
-				for (portout : instance.getActor.outputs.filter[! native]) {
-					for (connection : instance.outgoingPortMap.get(portout)) {
-						if (connection.targetPort == null) {
-						} else {
-							//stream+ram = ram+stream= read
-							OrccUtil::printFile(contentRead, fileRead)
-						}
-					}
-				}
-			} else {
-				//ram+stream=stream+ram= write
-				for (portout : instance.getActor.outputs.filter[! native]) {
-					for (connection : instance.outgoingPortMap.get(portout)) {
-						if (connection.targetPort == null) {
-							OrccUtil::printFile(contentWrite, fileWrite)
-						} else {
-							//ram+ram= read+write
-							OrccUtil::printFile(contentRead, fileRead)
-							OrccUtil::printFile(contentWrite, fileWrite)
-						}
-					}
+		for (portIN : instance.getActor.inputs) {
+			if (instance.incomingPortMap.get(portIN).sourcePort != null) {
+				OrccUtil::printFile(getFileContentWrite(portIN),
+					new File(
+						targetFolder + File::separator + "cast_" + instance.name + "_" +
+							instance.incomingPortMap.get(portIN).targetPort.name + "_write" + ".cpp"))
+
+			}
+		}
+		for (portout : instance.getActor.outputs.filter[! native]) {
+			for (connection : instance.outgoingPortMap.get(portout)) {
+				if (connection.targetPort != null) {
+					OrccUtil::printFile(getFileContentRead(portout),
+						new File(
+							targetFolder + File::separator + "cast_" + instance.name + instance.name + "_" +
+								instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read" + ".cpp"))
 				}
 			}
-			return 0
 		}
+		return 0
 
-
+	//			for (port : instance.getActor.inputs) {
+	//				if (instance.incomingPortMap.get(port).sourcePort == null) {
+	//					for (portout : instance.getActor.outputs.filter[! native]) {
+	//						for (connection : instance.outgoingPortMap.get(portout)) {
+	//							if (connection.targetPort == null) {
+	//							} else {
+	//	
+	//								//stream+ram = ram+stream= read
+	//								OrccUtil::printFile(getFileContentRead(portout),
+	//									new File(
+	//										targetFolder + File::separator + "cast_" + instance.name + instance.name + "_" +
+	//											instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read" + ".cpp"))
+	//	
+	//							}
+	//						}
+	//					}
+	//				} else {
+	//	
+	//					//ram+stream=stream+ram= write
+	//					for (portout : instance.getActor.outputs.filter[! native]) {
+	//						for (connection : instance.outgoingPortMap.get(portout)) {
+	//							if (connection.targetPort == null) {
+	//								for (portIN : instance.getActor.inputs) {
+	//									if (instance.incomingPortMap.get(portIN).sourcePort != null) {
+	//										OrccUtil::printFile(getFileContentWrite(portIN),
+	//											new File(
+	//												targetFolder + File::separator + "cast_" + instance.name + "_" +
+	//													instance.incomingPortMap.get(portIN).targetPort.name + "_write" + ".cpp"))
+	//									}
+	//	
+	//								}
+	//							} else {
+	//	
+	//								//ram+ram= read+write
+	//								for (portin : instance.getActor.inputs) {
+	//									if (instance.incomingPortMap.get(port).sourcePort == null) {
+	//	
+	//										OrccUtil::printFile(getFileContentWrite(portin),
+	//											new File(
+	//												targetFolder + File::separator + "cast_" + instance.name + "_" +
+	//													instance.incomingPortMap.get(port).targetPort.name + "_write" + ".cpp"))
+	//										OrccUtil::printFile(getFileContentRead(portout),
+	//											new File(
+	//												targetFolder + File::separator + "cast_" + instance.name + "_" +
+	//													instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read" +
+	//													".cpp"))
+	//									}
+	//								}
+	//	
+	//							}
+	//						}
+	//					}
+	//				}
+	//			}
+	//			return 0
 	}
 
 	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
