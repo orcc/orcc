@@ -36,6 +36,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "sse.h"
 
@@ -127,10 +128,7 @@ void copy_8_8_var_orcc(                                                         
     size1 -= 8;                                                                                                                        \
   }                                                                                                                                    \
                                                                                                                                        \
-  for (x = size - size1; x < size; x++)                                                                                                \
-  {                                                                                                                                    \
-    outputSample[x] = inputSample[idxBlkStride + x];                                                                                   \
-  }                                                                                                                                    \
+  memcpy(&outputSample[size - size1], &inputSample[idxBlkStride + size - size1], size1 * sizeof(u8));                                  \
 }
 
 COPY_8_8_VAR()
@@ -421,6 +419,7 @@ void getmvinfo_dpb_ ## H ## _luma_orcc(                                         
 GETMVINFO_DPB_LUMA(64)
 GETMVINFO_DPB_LUMA(32)
 GETMVINFO_DPB_LUMA(16)
+GETMVINFO_DPB_LUMA(8)
 
 #define GETMVINFO_DPB_CHROMA(H)                                                                                     \
 void getmvinfo_dpb_ ## H ## _chroma_orcc(                                                                           \
