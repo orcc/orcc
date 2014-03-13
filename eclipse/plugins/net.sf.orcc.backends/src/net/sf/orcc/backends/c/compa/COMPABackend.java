@@ -125,7 +125,17 @@ public class COMPABackend extends CBackend {
 				OrccLogger.warnRaw("Error" + "\n");
 			}
 
-			return orccOk & commonOk;
+			OrccLogger.trace("Export cmake modules into "
+					+ path + "... ");
+			final boolean cmakeModOk = copyFolderToFileSystem("/runtime/COMPA/cmake",
+					path, debug);
+			if (cmakeModOk) {
+				OrccLogger.traceRaw("OK" + "\n");
+			} else {
+				OrccLogger.warnRaw("Error" + "\n");
+			}
+			
+			return orccOk & commonOk & cmakeModOk;
 		}
 		return false;
 	}
