@@ -89,11 +89,18 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 
 		project («instance.simpleName»)
 
+		# Include the subdirectory where cmake modules can be found.
+		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+		
 «««		# Configure ouput folder for generated binary
 «««		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 		
+		# Tries to find the ORCC library.
+		find_package(LibORCC REQUIRED)
+	
 		# Runtime libraries inclusion
-		include_directories(../libs/orcc/include)
+		include_directories(${LibORCC_INCLUDE_DIRS})
+		set(LIBS ${LIBS} ${LibORCC_LIBRARIES})
 		
 		set(filenames
 			«instance.simpleName».c
@@ -102,9 +109,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		add_executable(«instance.simpleName» ${filenames})
 		
 		# Link to orcc library.
-		add_library(orcc STATIC IMPORTED)
-		set_property(TARGET orcc PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../libs/orcc/liborcc.a)
-		TARGET_LINK_LIBRARIES(«instance.simpleName» orcc)
+		TARGET_LINK_LIBRARIES(«instance.simpleName» ${LIBS})
 	'''
 	
 	override printCMakeFiles(String targetFolder) {
