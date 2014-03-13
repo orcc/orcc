@@ -152,14 +152,14 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				«FOR portout : instance.getActor.outputs.filter[! native]»
 					«FOR connection : instance.outgoingPortMap.get(portout)»
 						«IF connection.targetPort != null»
-								«instance.incomingPortMap.get(port).fifoName»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.get(
+								signal «instance.incomingPortMap.get(port).fifoName»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.get(
 			port).fifoTypeIn.sizeInBits - 1» downto 0);
-								«instance.incomingPortMap.get(port).fifoName»_V_empty_n :  STD_LOGIC;
-								«instance.incomingPortMap.get(port).fifoName»_V_read    :  STD_LOGIC;
+								signal «instance.incomingPortMap.get(port).fifoName»_V_empty_n :  STD_LOGIC;
+								signal «instance.incomingPortMap.get(port).fifoName»_V_read    :  STD_LOGIC;
 								
-								«connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
-								«connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
-								«connection.castfifoNameRead»_V_write  :  STD_LOGIC;
+								signal «connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
+								signal «connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
+								signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
 						«ENDIF»
 					«ENDFOR»
 				«ENDFOR»
@@ -167,24 +167,24 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				«FOR portout : instance.getActor.outputs.filter[! native]»
 					«FOR connection : instance.outgoingPortMap.get(portout)»
 						«IF connection.targetPort == null»
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.
+							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.
 			get(port).fifoTypeIn.sizeInBits - 1» downto 0);
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
+							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
+							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
 							
-							«instance.outgoingPortMap.get(portout).head.fifoName»_V_din    :  STD_LOGIC_VECTOR («instance.outgoingPortMap.
+							signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_din    :  STD_LOGIC_VECTOR («instance.outgoingPortMap.
 			get(portout).head.fifoTypeOut.sizeInBits - 1» downto 0);
-							«instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n :  STD_LOGIC;
-							«instance.outgoingPortMap.get(portout).head.fifoName»_V_write  :  STD_LOGIC;
+							signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n :  STD_LOGIC;
+							signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_write  :  STD_LOGIC;
 						«ELSE»
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.
+							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.
 			get(port).fifoTypeIn.sizeInBits - 1» downto 0);
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
+							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
+							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
 							
-							«connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
-							«connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
-							«connection.castfifoNameRead»_V_write  :  STD_LOGIC;
+							signal «connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
+							signal «connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
+							signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
 							
 						«ENDIF»
 					«ENDFOR»
@@ -424,30 +424,30 @@ variable count«connection.fifoName»: integer:= 0;
 
 	def printOutputFifoAssignHLS(Connection connection) '''
 		
-		«connection.fifoName»_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
-		«connection.fifoName»_full_n : IN STD_LOGIC;
-		«connection.fifoName»_write  : OUT STD_LOGIC;
+		«connection.fifoName»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
+		«connection.fifoName»_V_full_n : IN STD_LOGIC;
+		«connection.fifoName»_V_write  : OUT STD_LOGIC;
 	'''
 
 	def printInputFifoAssignHLS(Connection connection) '''
 		
-		«connection.fifoName»_dout   : IN STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
-		«connection.fifoName»_empty_n : IN STD_LOGIC;
-		«connection.fifoName»_read    : OUT STD_LOGIC;
+		«connection.fifoName»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
+		«connection.fifoName»_V_empty_n : IN STD_LOGIC;
+		«connection.fifoName»_V_read    : OUT STD_LOGIC;
 	'''
 
 	def printOutputSignalFifoAssignHLS(Connection connection) '''
 		
-		signal «connection.fifoName»_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0) := (others => '0');
-		signal «connection.fifoName»_full_n :  STD_LOGIC := '0';
-		signal «connection.fifoName»_write  :  STD_LOGIC := '0';
+		signal «connection.fifoName»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0) := (others => '0');
+		signal «connection.fifoName»_V_full_n :  STD_LOGIC := '0';
+		signal «connection.fifoName»_V_write  :  STD_LOGIC := '0';
 	'''
 
 	def printInputSignalFifoAssignHLS(Connection connection) '''
 		
-			signal «connection.fifoName»_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0) := (others => '0');
-			signal «connection.fifoName»_empty_n :  STD_LOGIC := '0';
-			signal «connection.fifoName»_read    :  STD_LOGIC := '0';
+			signal «connection.fifoName»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0) := (others => '0');
+			signal «connection.fifoName»_V_empty_n :  STD_LOGIC := '0';
+			signal «connection.fifoName»_V_read    :  STD_LOGIC := '0';
 	'''
 
 	def assignFifoFile(Instance instance) '''
@@ -479,15 +479,15 @@ variable count«connection.fifoName»: integer:= 0;
 	'''
 
 	def printOutputFifoMappingHLS(Connection connection) '''
-		«connection.fifoName»_din    => «connection.fifoName»_din,
-		«connection.fifoName»_full_n => «connection.fifoName»_full_n,
-		«connection.fifoName»_write  => «connection.fifoName»_write,
+		«connection.fifoName»_V_din    => «connection.fifoName»_V_din,
+		«connection.fifoName»_V_full_n => «connection.fifoName»_V_full_n,
+		«connection.fifoName»_V_write  => «connection.fifoName»_V_write,
 	'''
 
 	def printInputFifoMappingHLS(Connection connection) '''
-		«connection.fifoName»_dout    => «connection.fifoName»_dout,
-		«connection.fifoName»_empty_n => «connection.fifoName»_empty_n,
-		«connection.fifoName»_read    => «connection.fifoName»_read,
+		«connection.fifoName»_V_dout    => «connection.fifoName»_V_dout,
+		«connection.fifoName»_V_empty_n => «connection.fifoName»_V_empty_n,
+		«connection.fifoName»_V_read    => «connection.fifoName»_V_read,
 	'''
 
 
@@ -507,91 +507,90 @@ variable count«connection.fifoName»: integer:= 0;
 			if (line_number'length > 0 and line_number(1) /= '/') then
 				read(line_number, input_bit);
 				«IF connection.fifoTypeIn.int»
-					«Fname»_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoTypeIn.sizeInBits»));
+					«Fname»_V_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoTypeIn.sizeInBits»));
 				«ENDIF»
 				«IF connection.fifoTypeIn.uint»
-					«Fname»_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeIn.sizeInBits»));
+					«Fname»_V_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeIn.sizeInBits»));
 				«ENDIF»
 				«IF connection.fifoTypeIn.bool»
 					if (input_bit = 1) then 
-					«Fname»_dout  <= "1";
+					«Fname»_V_dout  <= "1";
 					else
-					«Fname»_dout  <= "0";
+					«Fname»_V_dout  <= "0";
 					end if;
 				«ENDIF»
-				«Fname»_empty_n <= '1';
+				«Fname»_V_empty_n <= '1';
 				ap_start <= '1';    
 				tb_FSM_bits <= CheckRead;
 			end if;
 		end if;
 		
 		when CheckRead =>
-		if (not endfile (sim_file_«instance.name»_«connection.targetPort.name»)) and «Fname»_read = '1' then
+		if (not endfile (sim_file_«instance.name»_«connection.targetPort.name»)) and «Fname»_V_read = '1' then
 		 count«Fname» := count«Fname» + 1;
 		 report "Number of inputs«Fname» = " & integer'image(count«Fname»);
-		 «Fname»_empty_n <= '0';
+		 «Fname»_V_empty_n <= '0';
 		 readline(sim_file_«instance.name»_«connection.targetPort.name», line_number);
 		 if (line_number'length > 0 and line_number(1) /= '/') then
 		 	read(line_number, input_bit);
 		 	«IF connection.fifoTypeIn.int»
-		 		«Fname»_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoTypeIn.sizeInBits»));
+		 		«Fname»_V_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoTypeIn.sizeInBits»));
 		 	«ENDIF»
 		 	«IF connection.fifoTypeIn.uint»
-		 		«Fname»_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeIn.sizeInBits»));
+		 		«Fname»_V_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeIn.sizeInBits»));
 		 	«ENDIF»
-		 	«Fname»_empty_n <= '1';
+		 	«Fname»_V_empty_n <= '1';
 		 	«IF connection.fifoTypeIn.bool»
 		 		if (input_bit = 1) then 
-		 		«Fname»_dout  <= "1";
+		 		«Fname»_V_dout  <= "1";
 		 		else
-		 		«Fname»_dout  <= "0";
+		 		«Fname»_V_dout  <= "0";
 		 		end if;
 		 	«ENDIF»
 		 	ap_start <= '1';      
 		end if;
 			elsif (endfile (sim_file_«instance.name»_«connection.targetPort.name»)) then
 				ap_start <= '1';
-				«Fname»_empty_n <= '0';
+				«Fname»_V_empty_n <= '0';
 			end if;
 		when others => null;
 		end case;
 	'''
 
 	def printOutputWaveGen(Instance vertex, Connection connection,CharSequence Fname) '''
-		if (not endfile (sim_file_«vertex.name»_«connection.sourcePort.name») and «Fname»_write = '1') then
-		count«Fname» := count«connection.fifoName» + 1;
+		if (not endfile (sim_file_«vertex.name»_«connection.sourcePort.name») and «Fname»_V_write = '1') then
+		count«Fname» := count«Fname» + 1;
 		 report "Number of outputs«Fname» = " & integer'image(count«Fname»);
 		 readline(sim_file_«vertex.name»_«connection.sourcePort.name», line_number);
 		 if (line_number'length > 0 and line_number(1) /= '/') then
 		 	read(line_number, input_bit);
 		 	«IF connection.fifoTypeOut.int»
-		 		assert («Fname»_din  = std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
-		 		-- report "on «Fname» incorrectly value computed : " & to_string(to_integer(to_signed(«connection.
-			fifoName»_din))) & " instead of :" & to_string(input_bit)
-		 		report "on port «connection.fifoName» incorrectly value computed : " & str(to_integer(signed(«Fname»_din))) & " instead of :" & str(input_bit)
+		 		assert («Fname»_V_din  = std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
+		 		-- report "on «Fname» incorrectly value computed : " & to_string(to_integer(to_signed(«Fname»_V_din))) & " instead of :" & to_string(input_bit)
+		 		report "on port «Fname» incorrectly value computed : " & str(to_integer(signed(«Fname»_V_din))) & " instead of :" & str(input_bit)
 		 		severity error;
 		 	«ENDIF»
 		 	«IF connection.fifoTypeOut.uint»
-		 		assert («Fname»_din  = std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeOut.sizeInBits»)))
-		 		-- report "on «Fname» incorrectly value computed : " & to_string(to_integer(to_unsigned(«Fname»_din))) & " instead of :" & to_string(input_bit)
-		 		report "on port «Fname» incorrectly value computed : " & str(to_integer(unsigned(«Fname»_din))) & " instead of :" & str(input_bit)
+		 		assert («Fname»_V_din  = std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeOut.sizeInBits»)))
+		 		-- report "on «Fname» incorrectly value computed : " & to_string(to_integer(to_unsigned(«Fname»_V_din))) & " instead of :" & to_string(input_bit)
+		 		report "on port «Fname» incorrectly value computed : " & str(to_integer(unsigned(«Fname»_V_din))) & " instead of :" & str(input_bit)
 		 		severity error;
 		 	«ENDIF»
 		 	«IF connection.fifoTypeOut.bool»
 		 		if (input_bit = 1) then
-		 			assert («Fname»_din  = "1")
+		 			assert («Fname»_V_din  = "1")
 		 			report "on port «Fname» 0 instead of 1"
 		 			severity error;
 		 		else
-		 			assert («Fname»_din  = "0")
+		 			assert («Fname»_V_din  = "0")
 		 			report "on port «Fname» 1 instead of 0"
 		 			severity error;
 		 		end if;
 		 	«ENDIF»
 		 	
 		 
-		 	--assert («Fname»_din /= std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
-		 	--report "on port «Fname» correct value computed : " & str(to_integer(signed(«Fname»_din))) & " equals :" & str(input_bit)
+		 	--assert («Fname»_V_din /= std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
+		 	--report "on port «Fname» correct value computed : " & str(to_integer(signed(«Fname»_V_din))) & " equals :" & str(input_bit)
 		 	--severity note;
 		
 			end if;
@@ -601,7 +600,7 @@ variable count«connection.fifoName»: integer:= 0;
 	def initOutputs(Instance instance) '''
 		«FOR connList : instance.outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«connList.head.fifoName»_full_n <= '1';
+				«connList.head.fifoName»_V_full_n <= '1';
 			«ENDIF»
 		«ENDFOR»
 	'''

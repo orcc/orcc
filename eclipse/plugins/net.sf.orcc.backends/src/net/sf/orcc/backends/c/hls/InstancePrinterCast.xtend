@@ -106,7 +106,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		void cast_«instance.name»_write_scheduler() {		
 			«FOR port : instance.getActor.inputs»			
 				«IF instance.incomingPortMap.get(port).sourcePort != null»
-					if (! «instance.incomingPortMap.get(port).castfifoNameWrite».empty()) &&   
+					if (!«instance.incomingPortMap.get(port).castfifoNameWrite».empty() &&   
 					isSchedulable_untagged_0()) {
 					if(1
 					&& (512 - «instance.incomingPortMap.get(port).localwName» + «instance.incomingPortMap.get(port).rName»[0] >= 1)
@@ -188,7 +188,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 					if («connection.wName»[0] - «connection.localrName» >= 1  &&
 					isSchedulable_untagged_0()) {
 					if(1
-					&& (! «connection.castfifoNameRead».full())
+					&& (!«connection.castfifoNameRead».full())
 					){
 					cast_«instance.name»_read_untagged_0();
 					}
