@@ -153,16 +153,16 @@ void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
 void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 log2size)
 {
     u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
+    u8 *top  = _top + 1;
+    u8 *left = _left + 1;
 
     hevcPred.pred_planar[log2size - 2](src, top, left, stride);
 }
 
 void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 log2size){
 	u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
+    u8 *top  = _top + 1;
+    u8 *left = _left + 1;
 
     hevcPred.pred_angular[log2size - 2](src, top, left, stride, idx, mode);
 }
