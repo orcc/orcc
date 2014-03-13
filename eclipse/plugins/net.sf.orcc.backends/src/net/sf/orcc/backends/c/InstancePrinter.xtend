@@ -67,6 +67,7 @@ import net.sf.orcc.util.util.EcoreHelper
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
+import net.sf.orcc.ir.Param
 
 /**
  * Generate and print instance source file for C backend.
@@ -850,7 +851,7 @@ class InstancePrinter extends CTemplate {
 		val optCond = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("condition")
 		val optName = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("name")
 		'''
-		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]») {
+		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]») {
 			«IF isOptimizable»
 				#ifdef «optCond»
 				«optName»(«proc.parameters.join(", ")[variable.name]»);
@@ -872,7 +873,7 @@ class InstancePrinter extends CTemplate {
 	
 	def protected declare(Procedure proc){
 		val modifier = if(proc.native) "extern" else "static"
-		'''«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]»);'''
+		'''«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]»);'''
 	}
 
 	override protected declare(Var variable) {
@@ -881,13 +882,18 @@ class InstancePrinter extends CTemplate {
 		} else {
 			val const = if(!variable.assignable && variable.global) "const "
 			val global = if(variable.global) "static "
-			val type = variable.type.doSwitch
+			val type = variable.type
 			val dims = variable.type.dimensionsExpr.printArrayIndexes
 			val init = if(variable.initialized) " = " + variable.initialValue.doSwitch
 			val end = if(variable.global) ";"
-
-			'''«global»«const»«type» «variable.name»«dims»«init»«end»'''
+			
+			'''«global»«const»«type.doSwitch» «variable.name»«dims»«init»«end»'''
 		}
+	}
+	
+	def protected declare(Param param) {
+		val variable = param.variable
+		'''«variable.type.doSwitch» «variable.name»«variable.type.dimensionsExpr.printArrayIndexes»'''
 	}
 
 	def private getReaderId(Port port) {
