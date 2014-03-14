@@ -41,7 +41,7 @@ Workflow {
 			fragment = grammarAccess.GrammarAccessFragment auto-inject {}
 
 			// Generate java classes for Ecore models
-			fragment = ecore.EcoreGeneratorFragment auto-inject {}
+			fragment = ecore.EMFGeneratorFragment auto-inject {}
 
 			// the serialization component
 			fragment = parseTreeConstructor.ParseTreeConstructorFragment auto-inject {}

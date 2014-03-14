@@ -534,15 +534,29 @@
    <extension
          point="org.eclipse.ltk.core.refactoring.renameParticipants">
       <renameParticipant
-            class="net.sf.orcc.ui.refactoring.XdfRenameParticipant"
-            id="net.sf.orcc.ui.xdfRenameParticipant"
-            name="XDF rename participant">
+            class="net.sf.orcc.ui.refactoring.NetworkRenameParticipant"
+            id="net.sf.orcc.ui.networkRenameParticipant"
+            name="Network rename participant">
          <enablement>
             <adapt
                   type="org.eclipse.core.resources.IFile">
                <test
                      property="org.eclipse.core.resources.extension"
                      value="xdf">
+               </test>
+            </adapt>
+         </enablement>
+      </renameParticipant>
+      <renameParticipant
+            class="net.sf.orcc.ui.refactoring.DiagramRenameParticpant"
+            id="net.sf.orcc.ui.diagramRenameParticipant"
+            name="Diagram rename participant">
+         <enablement>
+            <adapt
+                  type="org.eclipse.core.resources.IFile">
+               <test
+                     property="org.eclipse.core.resources.extension"
+                     value="xdfdiag">
                </test>
             </adapt>
          </enablement>
@@ -565,9 +579,9 @@
    <extension
          point="org.eclipse.ltk.core.refactoring.moveParticipants">
       <moveParticipant
-            class="net.sf.orcc.ui.refactoring.XdfMoveParticipant"
-            id="net.sf.orcc.ui.xdfMoveParticipant"
-            name="XDF move participant">
+            class="net.sf.orcc.ui.refactoring.NetworkMoveParticipant"
+            id="net.sf.orcc.ui.networkMoveParticipant"
+            name="Network move participant">
          <enablement>
             <adapt
                   type="org.eclipse.core.resources.IFile">
@@ -591,6 +605,19 @@
                </test>
             </adapt>
          </enablement>
+      </moveParticipant>
+      <moveParticipant
+            class="net.sf.orcc.ui.refactoring.DiagramMoveParticipant"
+            id="net.sf.orcc.ui.diagramMoveParticipant"
+            name="Diagram move participant">
+         <enablement>
+            <adapt
+                  type="org.eclipse.core.resources.IFile">
+               <test
+                     property="org.eclipse.core.resources.extension"
+                     value="xdfdiag">
+               </test>
+            </adapt></enablement>
       </moveParticipant>
    </extension>
 </plugin>

@@ -463,9 +463,10 @@ public class IrUtil {
 				OrccUtil.createFolder(outputFolder);
 			} catch (CoreException e) {
 			}
-			URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
-					.append(DfUtil.getFile(entity)).addFileExtension("ir")
-					.toString(), true);
+			URI uri = URI.createPlatformResourceURI(
+					outputFolder.getFullPath().append(DfUtil.getFile(entity))
+							.addFileExtension(OrccUtil.IR_SUFFIX).toString(),
+					true);
 
 			return serializeActor(set, uri, entity);
 
@@ -489,10 +490,10 @@ public class IrUtil {
 		// FIXME: Is this still needed ?
 		Map<String, Object> extToFactoryMap = Resource.Factory.Registry.INSTANCE
 				.getExtensionToFactoryMap();
-		Object instance = extToFactoryMap.get("ir");
+		Object instance = extToFactoryMap.get(OrccUtil.IR_SUFFIX);
 		if (instance == null) {
 			instance = new IrResourceFactoryImpl();
-			extToFactoryMap.put("ir", instance);
+			extToFactoryMap.put(OrccUtil.IR_SUFFIX, instance);
 		}
 
 		return EcoreHelper.putEObject(set, uri, entity);

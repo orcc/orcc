@@ -43,10 +43,6 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 
-	public static String ACTOR_SUFFIX = "cal";
-	public static String IR_SUFFIX = "ir";
-	public static String NETWORK_SUFFIX = "xdf";
-	public static String DIAGRAM_SUFFIX = "xdfdiag";
 	public static String DIAGRAM_TYPE = "xdfDiagram";
 
 	/**

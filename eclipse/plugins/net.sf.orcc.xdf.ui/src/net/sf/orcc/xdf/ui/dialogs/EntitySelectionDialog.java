@@ -273,7 +273,8 @@ public class EntitySelectionDialog extends FilteredItemsSelectionDialog {
 			} else if (resource.getType() == IResource.FILE) {
 				final String suffix = resource.getFileExtension();
 				// Wee keep only cal Actors/Units and xdf networks
-				if (!"ir".equals(suffix) && !"xdf".equals(suffix)) {
+				if (!OrccUtil.IR_SUFFIX.equals(suffix)
+						&& !OrccUtil.NETWORK_SUFFIX.equals(suffix)) {
 					continue;
 				}
 

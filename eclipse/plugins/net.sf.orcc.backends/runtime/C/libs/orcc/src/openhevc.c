@@ -44,6 +44,22 @@ int openhevc_init_context()
     return 0;
 }
 
+/* Log2CbSize in openHEVC */
+/* 1 -  3 -  5 -  7 - 11 - 15 - 23 - 31 - 47 - 63 --> _width
+   2 -  4 -  6 -  8 - 12 - 16 - 24 - 32 - 48 - 64 --> width
+   2 -  4 -  2 -  8 -  4 - 16 -  8 - 16 - 16 - 16 --> vector size
+   0 -  1 -  0 -  2 -  1 -  3 -  2 -  3 -  3 -  3 --> function id
+   */
+static const int lookup_tab_openhevc_function[64] = {
+   -1,  0, -1,  1, -1,  0, -1,  2,
+   -1, -1, -1,  1, -1, -1, -1,  3,
+   -1, -1, -1, -1, -1, -1, -1,  2,
+   -1, -1, -1, -1, -1, -1, -1,  3,
+   -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1,  3,
+   -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1,  3};
+
 
 void put_hevc_qpel_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
@@ -53,14 +69,9 @@ u8 _width, u8 _height, i32 mx, i32 my)
     i16 *dst = _dst[listIdx];
     u8 width = _width + 1;
     u8 height = _height + 1;
+    int idx = lookup_tab_openhevc_function[_width] - 1;
 
-    if(width == 16 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_qpel[2][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 8 || width == 24) {
-        hevcDsp.put_hevc_qpel[1][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_qpel[0][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    }
+    hevcDsp.put_hevc_qpel[idx][!!my][!!mx](dst, width, src, srcstride, height, mx, my, width);
 }
 
 void put_hevc_epel_orcc(i16 _dst[2][64*64], u8 listIdx,
@@ -71,120 +82,12 @@ u8 _width, u8 _height, i32 mx, i32 my)
     i16 *dst = _dst[listIdx];
     u8 width = _width + 1;
     u8 height = _height + 1;
+    int idx = lookup_tab_openhevc_function[_width];
 
-    if(width == 16 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_epel[3][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 8 || width == 24) {
-        hevcDsp.put_hevc_epel[2][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 4 || width == 12 || width == 20) {
-        hevcDsp.put_hevc_epel[1][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_epel[0][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
-    }
+    hevcDsp.put_hevc_epel[idx][!!my][!!mx](dst, width, src, srcstride, height, mx, my, width);
 }
 
-void put_hevc_qpel_h_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 _width, u8 _height)
-{
-    u8  *src = &_src[3+3*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-
-    if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_qpel[1][0][1](dst, width, src, srcstride, width, height, filterIdx, 0);
-    } else {
-        hevcDsp.put_hevc_qpel[0][0][1](dst, width, src, srcstride, width, height, filterIdx, 0);
-    }
-}
-
-void put_hevc_qpel_v_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 _width, u8 _height)
-{
-    u8  *src = &_src[3+3*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-
-    if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_qpel[1][1][0](dst, width, src, srcstride, width, height, 0, filterIdx);
-
-    } else {
-        hevcDsp.put_hevc_qpel[0][1][0](dst, width, src, srcstride, width, height, 0, filterIdx);
-    }
-}
-
-void put_hevc_epel_h_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height, i32 mx, i32 my)
-{
-    u8  *src = &_src[1+1*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-
-    if(width == 8 || width == 16 || width == 24 || width == 32) {
-        hevcDsp.put_hevc_epel[2][0][1](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 4 || width == 12) {
-        hevcDsp.put_hevc_epel[1][0][1](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_epel[0][0][1](dst, width, src, srcstride, width, height, mx, my);
-    }
-}
-
-void put_hevc_epel_v_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height, i32 mx, i32 my)
-{
-    u8  *src = &_src[1+1*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-
-    if(width == 8 || width == 16 || width == 24 || width == 32) {
-        hevcDsp.put_hevc_epel[2][1][0](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 4 || width == 12) {
-        hevcDsp.put_hevc_epel[1][1][0](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_epel[0][1][0](dst, width, src, srcstride, width, height, mx, my);
-    }
-}
-
-void put_hevc_qpel_hv_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-i32 filterIdx[2],  u8 _width, u8 _height)
-{
-    u8  *src = &_src[3+ 3*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-
-    if(width == 8 || width == 16 || width == 24 || width == 32 || width == 64) {
-        hevcDsp.put_hevc_qpel[1][1][1](dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
-    } else {
-        hevcDsp.put_hevc_qpel[0][1][1](dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
-    }
-}
-
-void put_hevc_epel_hv_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height, i32 mx, i32 my)
-{
-    u8  *src = &_src[1+1*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-
-    if(width == 8 || width == 16 || width == 24 || width == 32) {
-        hevcDsp.put_hevc_epel[2][1][1](dst, width, src, srcstride, width, height, mx, my);
-    } else if(width == 4 || width == 12) {
-        hevcDsp.put_hevc_epel[1][1][1](dst, width, src, srcstride, width, height, mx, my);
-    } else {
-        hevcDsp.put_hevc_epel[0][1][1](dst, width, src, srcstride, width, height, mx, my);
-    }
-}
+/* WEIGHTED PREDICTION */
 
 void put_unweighted_pred_orcc(i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64])
 {
@@ -192,59 +95,74 @@ void put_unweighted_pred_orcc(i16 _src[2][64*64], int _width, int _height, u8 rd
     u8 * dst = _dst;
     u8 width = _width + 1;
     u8 height = _height + 1;
+    int idx = lookup_tab_openhevc_function[_width];
 
-    if(width == 8 || width == 16 || width == 24 || width == 32) {
-        hevcDsp.put_unweighted_pred[2](dst, width, src, width, width, height);
-      } else if(width == 4 || width == 12) {
-        hevcDsp.put_unweighted_pred[1](dst, width, src, width, width, height);
-      } else {
-        hevcDsp.put_unweighted_pred[0](dst, width, src, width, width, height);
-      }
+    hevcDsp.put_unweighted_pred[idx](dst, width, src, width, width, height);
 }
 
-void put_unweighted_pred_avg_orcc(u8 _dst[2][64*64], i16 _src[2][64*64],
-u8 _width, u8 _height)
-{
-    i16 *src1 = &_src[0];
-    i16 *src2 = &_src[1];
-    u8 *dst = _dst[0];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-
-    hevcDsp.put_weighted_pred_avg[0](dst, width, src1, src2, width, width, height);
-}
-
-// DR 1402
 void put_weighted_pred_avg_orcc (i16 src[2][64*64], int _width, int _height, u8 dst[64*64])
 {
   u8 width = _width + 1;
   u8 height = _height + 1;
+  int idx = lookup_tab_openhevc_function[_width];
 
-  if (width == 16 || width == 32 || width == 64) {
-	  hevcDsp.put_weighted_pred_avg[2](dst, width,
-		  src[0], src[1], width, width, height);
-  } else if(width == 8 || width == 24) {
-	  hevcDsp.put_weighted_pred_avg[1](dst, width,
-		  src[0], src[1], width, width, height);
-  } else {
-	  hevcDsp.put_weighted_pred_avg[0](dst, width,
-		  src[0], src[1], width, width, height);
-  }
+  hevcDsp.put_weighted_pred_avg[idx](dst, width,
+    src[0], src[1], width, width, height);
 }
+
+void weighted_pred_orcc(int logWD, int weightCu[2], int offsetCu[2] ,
+		i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64])
+{
+  i16 * src = _src[rdList];
+  u8 * dst = _dst;
+  u8 width = _width + 1;
+  u8 height = _height + 1;
+  int wX = weightCu[rdList];
+  int oX = offsetCu[rdList];
+  int locLogWD = logWD - 14 + 8;
+  int idx = lookup_tab_openhevc_function[_width];
+
+  hevcDsp.weighted_pred[idx](locLogWD, wX, oX, dst, width, src, width, width, height);
+}
+
+void weighted_pred_avg_orcc(int logWD , int weightCu[2], int offsetCu[2] ,
+		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64])
+{
+  i16 * src = _src[0];
+  i16 * src1 = _src[1];
+  u8 * dst = _dst;
+  u8 width = _width + 1;
+  u8 height = _height + 1;
+  int w0 = weightCu[0];
+  int w1 = weightCu[1];
+  int o0 = offsetCu[0];
+  int o1 = offsetCu[1];
+  int locLogWD = logWD - 14 + 8;
+  int idx = lookup_tab_openhevc_function[_width];
+
+  hevcDsp.weighted_pred_avg[idx](locLogWD, w0, w1, o0, o1, dst, width, src, src1, width, width, height);
+}
+
+/* weighted_pred_mono implemented in sse.c */
+/*
+void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
+		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64]);
+*/
+
 
 void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 log2size)
 {
     u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
+    u8 *top  = _top + 1;
+    u8 *left = _left + 1;
 
     hevcPred.pred_planar[log2size - 2](src, top, left, stride);
 }
 
 void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 log2size){
 	u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
+    u8 *top  = _top + 1;
+    u8 *left = _left + 1;
 
     hevcPred.pred_angular[log2size - 2](src, top, left, stride, idx, mode);
 }

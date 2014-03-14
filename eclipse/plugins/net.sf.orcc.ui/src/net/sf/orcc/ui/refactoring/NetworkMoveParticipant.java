@@ -28,13 +28,14 @@
  */
 package net.sf.orcc.ui.refactoring;
 
-import java.util.regex.Pattern;
-
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -42,23 +43,25 @@ import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
+import org.eclipse.ltk.core.refactoring.resource.MoveResourceChange;
 
 /**
- * Perform updates when user trigger the move refactoring on a cal file (Actor
- * or Unit)
+ * This class contribute to perform all updates needed when user trigger the
+ * Move refactoring on a network file (xdf).
  * 
  * @author Antoine Lorence
  * 
  */
-public class CalMoveParticipant extends MoveParticipant {
+public class NetworkMoveParticipant extends MoveParticipant {
 
 	private final ChangesFactory factory;
 
-	private IFile originalFile;
-	private IFile destinationFile;
+	private IFile originalNetworkFile;
 	private IFolder destination;
+	private IPath newNetworkPath;
+	private IPath originalDiagramPath;
 
-	public CalMoveParticipant() {
+	public NetworkMoveParticipant() {
 		super();
 		factory = new ChangesFactory();
 	}
@@ -66,10 +69,13 @@ public class CalMoveParticipant extends MoveParticipant {
 	@Override
 	protected boolean initialize(Object element) {
 		if (element instanceof IFile) {
-			originalFile = (IFile) element;
+			originalNetworkFile = (IFile) element;
 			destination = (IFolder) getArguments().getDestination();
-
-			destinationFile = destination.getFile(originalFile.getName());
+			newNetworkPath = destination.getFile(originalNetworkFile.getName())
+					.getFullPath();
+			originalDiagramPath = originalNetworkFile.getFullPath()
+					.removeFileExtension()
+					.addFileExtension(OrccUtil.DIAGRAM_SUFFIX);
 			return true;
 		}
 		return false;
@@ -77,7 +83,7 @@ public class CalMoveParticipant extends MoveParticipant {
 
 	@Override
 	public String getName() {
-		return "Actor/Unit move particpant";
+		return "Network move participant";
 	}
 
 	@Override
@@ -87,97 +93,50 @@ public class CalMoveParticipant extends MoveParticipant {
 	}
 
 	@Override
-	public Change createPreChange(IProgressMonitor pm) throws CoreException,
-			OperationCanceledException {
-		final CompositeChange changes = new CompositeChange("Pre-move updates");
-		changes.add(getFileContentUpdatesChange());
-		return changes.getChildren().length > 0 ? changes : null;
-	}
-
-	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
 
 		final CompositeChange changes = new CompositeChange("Post-move updates");
-		changes.add(getNetworksContentUpdatesChanges());
-		changes.add(getDiagramsContentUpdatesChanges());
-		changes.add(getOtherCalContentUpdatesChanges());
+		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
+		if (wpRoot.exists(originalDiagramPath)) {
+			changes.add(new MoveResourceChange(wpRoot
+					.getFile(originalDiagramPath), destination));
+		}
+
+		changes.add(getOtherNetworksContentChanges());
+		changes.add(getOtherDiagramsContentChanges());
+
 		return changes.getChildren().length > 0 ? changes : null;
 	}
 
-	/**
-	 * Update the moved cal file
-	 * 
-	 * @return
-	 */
-	private Change getFileContentUpdatesChange() {
+	public Change getOtherNetworksContentChanges() {
+
 		factory.clearReplacementMaps();
 
-		final String originalPackage = OrccUtil
-				.getQualifiedPackage(originalFile);
-		final String destinationPackage = OrccUtil
-				.getQualifiedPackage(destinationFile);
-
-		final Pattern packagePattern = Pattern.compile("package(\\s+)"
-				+ originalPackage + "(\\s*);");
-		final String replacement = "package$1" + destinationPackage + "$2;";
-		factory.addReplacement(packagePattern, replacement);
-
-		return factory
-				.getReplacementChange(originalFile, "Update file content");
-	}
-
-	private Change getOtherCalContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
-		final String originalQualifiedName = OrccUtil
-				.getQualifiedName(originalFile);
-		final Pattern importPattern = Pattern.compile("import(\\s+)"
-				+ originalQualifiedName + "(\\.(\\*|\\w+))(\\s*);");
-		final String targetQualifiedName = OrccUtil
-				.getQualifiedName(destinationFile);
-		final String replacement = "import$1" + targetQualifiedName + "$2$4;";
-		factory.addReplacement(importPattern, replacement);
-
-		return factory.getReplacementChange(originalFile.getProject(),
-				OrccUtil.CAL_SUFFIX, "Update actors referencing this unit.");
-	}
-
-	private Change getNetworksContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
-		final String oldQualifiedName = OrccUtil.getQualifiedName(originalFile);
-		final String newQualifiedName = OrccUtil
-				.getQualifiedName(destinationFile);
+		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
+		final String oldQualifiedName = OrccUtil
+				.getQualifiedName(originalNetworkFile);
+		final String newQualifiedName = OrccUtil.getQualifiedName(wpRoot
+				.getFile(newNetworkPath));
 		factory.addReplacement("<Class name=\"" + oldQualifiedName + "\"/>",
 				"<Class name=\"" + newQualifiedName + "\"/>");
 
-		return factory.getReplacementChange(originalFile.getProject(),
+		return factory.getReplacementChange(originalNetworkFile.getProject(),
 				OrccUtil.NETWORK_SUFFIX, "Update network files");
 	}
 
-	private Change getDiagramsContentUpdatesChanges() {
+	public Change getOtherDiagramsContentChanges() {
 		factory.clearReplacementMaps();
 
-		final IFile irFile = OrccUtil.getFile(originalFile.getProject(),
-				OrccUtil.getQualifiedName(originalFile), OrccUtil.IR_SUFFIX);
-
-		final String originalRefinement = irFile.getFullPath().toString();
-
-		final String originalRelativeFolder = originalFile.getParent()
-				.getProjectRelativePath()
-				.removeFirstSegments(1).toString();
-		final String newRelativeFolder = destination.getProjectRelativePath()
-				.removeFirstSegments(1).toString();
-
-		final String newRefinement = originalRefinement.replace(
-				originalRelativeFolder, newRelativeFolder);
+		final String originalRefinement = originalNetworkFile.getFullPath()
+				.toString();
+		final String newRefinement = newNetworkPath.toString();
 
 		factory.addReplacement("key=\"refinement\" value=\""
 				+ originalRefinement + "\"", "key=\"refinement\" value=\""
 				+ newRefinement + "\"");
 
-		return factory.getReplacementChange(originalFile.getProject(),
+		return factory.getReplacementChange(originalNetworkFile.getProject(),
 				OrccUtil.DIAGRAM_SUFFIX, "Update diagram files");
 	}
 }

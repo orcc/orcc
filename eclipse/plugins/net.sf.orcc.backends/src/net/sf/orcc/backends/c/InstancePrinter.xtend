@@ -67,6 +67,7 @@ import net.sf.orcc.util.util.EcoreHelper
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
+import net.sf.orcc.ir.Param
 
 /**
  * Generate and print instance source file for C backend.
@@ -88,7 +89,7 @@ class InstancePrinter extends CTemplate {
 	protected var boolean profileNetwork = false
 	protected var boolean profileActions = false
 	protected var boolean dynamicMapping = false
-	protected var boolean isActionVectorizable = false
+	protected var boolean isActionAligned = false
 	protected var boolean checkArrayInbounds = false
 
 	var boolean newSchedul = false
@@ -346,7 +347,7 @@ class InstancePrinter extends CTemplate {
 				«ENDFOR»
 			«ELSE»
 				«FOR variable : actor.parameters»
-					«variable.declareStateVar»
+					«variable.declare»
 				«ENDFOR»
 			«ENDIF»
 
@@ -365,7 +366,7 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// State variables of the actor
 			«FOR variable : actor.stateVars»
-				«variable.declareStateVar»
+				«variable.declare»
 			«ENDFOR»
 
 		«ENDIF»
@@ -415,14 +416,14 @@ class InstancePrinter extends CTemplate {
 
 		////////////////////////////////////////////////////////////////////////////////
 		// Initializes
-		«initializeFunction»
+		«printInitialize»
 
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		«actorScheduler»
+		«printActorScheduler»
 	'''
 
-	def protected actorScheduler() '''
+	def protected printActorScheduler() '''
 		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
@@ -524,7 +525,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def protected printVectorizationConditions(Action action) '''
+	def protected printAlignmentConditions(Action action) '''
 		{
 			int isAligned = 1;
 			«FOR port : action.inputPattern.ports»
@@ -553,7 +554,7 @@ class InstancePrinter extends CTemplate {
 				«IF trans.action.hasAttribute(ALIGNED_ALWAYS)»
 					«trans.action.body.name»_aligned();
 				«ELSEIF trans.action.hasAttribute(ALIGNABLE)»
-					«trans.action.printVectorizationConditions»
+					«trans.action.printAlignmentConditions»
 						if (isAligned) {
 							«trans.action.body.name»_aligned();
 						} else {
@@ -610,7 +611,7 @@ class InstancePrinter extends CTemplate {
 		«ENDFOR»
 	'''
 
-	def protected initializeFunction() '''
+	def protected printInitialize() '''
 		«FOR init : actor.initializes»
 			«init.print()»
 		«ENDFOR»
@@ -659,7 +660,7 @@ class InstancePrinter extends CTemplate {
 				«IF action.hasAttribute(ALIGNED_ALWAYS)»
 					«action.body.name»_aligned();
 				«ELSEIF action.hasAttribute(ALIGNABLE)»
-					«action.printVectorizationConditions»
+					«action.printAlignmentConditions»
 						if (isAligned) {
 							«action.body.name»_aligned();
 						} else {
@@ -832,14 +833,14 @@ class InstancePrinter extends CTemplate {
 
 	def protected print(Action action) {
 		currentAction = action
-		isActionVectorizable = false
+		isActionAligned = false
 		'''
 		«action.scheduler.print»
 		
 		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
 			«printCore(action, false)»
 		«ENDIF»
-		«IF isActionVectorizable = action.hasAttribute(ALIGNABLE)»
+		«IF isActionAligned = action.hasAttribute(ALIGNABLE)»
 			«printCore(action, true)»
 		«ENDIF»
 		'''
@@ -850,7 +851,7 @@ class InstancePrinter extends CTemplate {
 		val optCond = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("condition")
 		val optName = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("name")
 		'''
-		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]») {
+		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]») {
 			«IF isOptimizable»
 				#ifdef «optCond»
 				«optName»(«proc.parameters.join(", ")[variable.name]»);
@@ -869,21 +870,30 @@ class InstancePrinter extends CTemplate {
 		}
 		'''
 	}
+	
+	def protected declare(Procedure proc){
+		val modifier = if(proc.native) "extern" else "static"
+		'''«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]»);'''
+	}
 
-	def protected declareStateVar(Var variable) {
-		val varDecl =
-			if(variable.initialized && !variable.assignable && !variable.type.list) {
-				'''#define «variable.name» «variable.initialValue.doSwitch»'''
-			} else {
-				// else branch are important here, to avoid a null value in the list of concat terms
-				val const = if(!variable.assignable) '''const ''' else ''''''
-				val init = if(variable.initialized) ''' = «variable.initialValue.doSwitch»''' else ''''''
-
-				'''static «const»«variable.declare»«init»;'''
-			}
-		'''
-			«varDecl»
-		'''
+	override protected declare(Var variable) {
+		if(variable.global && variable.initialized && !variable.assignable && !variable.type.list) {
+			'''#define «variable.name» «variable.initialValue.doSwitch»'''
+		} else {
+			val const = if(!variable.assignable && variable.global) "const "
+			val global = if(variable.global) "static "
+			val type = variable.type
+			val dims = variable.type.dimensionsExpr.printArrayIndexes
+			val init = if(variable.initialized) " = " + variable.initialValue.doSwitch
+			val end = if(variable.global) ";"
+			
+			'''«global»«const»«type.doSwitch» «variable.name»«dims»«init»«end»'''
+		}
+	}
+	
+	def protected declare(Param param) {
+		val variable = param.variable
+		'''«variable.type.doSwitch» «variable.name»«variable.type.dimensionsExpr.printArrayIndexes»'''
 	}
 
 	def private getReaderId(Port port) {
@@ -973,7 +983,7 @@ class InstancePrinter extends CTemplate {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
+				«IF (isActionAligned && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_aligned_«srcPort.name» + («load.indexes.head.doSwitch»))];
 				«ELSE»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
@@ -994,7 +1004,7 @@ class InstancePrinter extends CTemplate {
 			«IF trgtPort.native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
+				«IF (isActionAligned && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
 					tokens_«trgtPort.name»[(index_aligned_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
@@ -1013,7 +1023,7 @@ class InstancePrinter extends CTemplate {
 		«IF call.print»
 			printf(«call.arguments.printfArgs.join(", ")»);
 		«ELSE»
-			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
+			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[print]»);
 		«ENDIF»
 	'''
 
@@ -1029,7 +1039,7 @@ class InstancePrinter extends CTemplate {
 	
 	override caseExprVar(ExprVar expr) {
 		val port = expr.copyOf
-		if(port != null && isActionVectorizable){
+		if(port != null && isActionAligned){
 			// If the argument is just a local copy of input/output tokens
 			// use directly the FIFO when the tokens are aligned
 			'''&tokens_«port.name»[index_aligned_«port.name»]'''
@@ -1072,7 +1082,7 @@ class InstancePrinter extends CTemplate {
 		return variable.getValueAsEObject("copyOfTokens") as Port
 	}
 
-	def private printCallArg(Arg arg) {
+	def private print(Arg arg) {
 		if(arg.byRef) {
 			"&" + (arg as ArgByRef).use.variable.name + (arg as ArgByRef).indexes.printArrayIndexes
 		} else {

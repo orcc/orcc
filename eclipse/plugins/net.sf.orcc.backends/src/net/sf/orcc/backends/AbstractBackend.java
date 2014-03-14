@@ -34,21 +34,21 @@ import static net.sf.orcc.OrccLaunchConstants.CLASSIFY;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTIONS;
 import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
-import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
-import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
 import static net.sf.orcc.backends.BackendsConstants.DYNAMIC_MAPPING;
-import static net.sf.orcc.backends.BackendsConstants.PROFILE_NETWORK;
-import static net.sf.orcc.backends.BackendsConstants.PROFILE_ACTIONS;
 import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
+import static net.sf.orcc.backends.BackendsConstants.PROFILE_ACTIONS;
+import static net.sf.orcc.backends.BackendsConstants.PROFILE_NETWORK;
 import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
@@ -250,7 +250,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	final private void compileVTL() {
 		// lists actors
 		OrccLogger.traceln("Lists actors...");
-		List<IFile> vtlFiles = OrccUtil.getAllFiles("ir", vtlFolders);
+		List<IFile> vtlFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX,
+				vtlFolders);
 		doVtlCodeGeneration(vtlFiles);
 	}
 
@@ -790,7 +791,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
-		inputFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
+		inputFile = getFile(project, getAttribute(XDF_FILE, ""),
+				OrccUtil.NETWORK_SUFFIX);
 
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		debug = getAttribute(DEBUG_MODE, true);

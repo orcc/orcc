@@ -84,7 +84,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// in COMPA backend
 	}
 	
-	override protected actorScheduler() '''
+	override protected printActorScheduler() '''
 		«IF instance.getActor.hasFsm»
 			«printFsm»
 		«ELSE»
@@ -109,7 +109,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 	
-	override protected initializeFunction() '''
+	override printInitialize() '''
 		«FOR init : actor.initializes»
 			«init.print»
 		«ENDFOR»
@@ -321,7 +321,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«ENDFOR»
 			«ELSE»
 				«FOR variable : actor.parameters»
-					«variable.declareStateVar»
+					«variable.declare»
 				«ENDFOR»
 			«ENDIF»
 
@@ -340,7 +340,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			////////////////////////////////////////////////////////////////////////////////
 			// State variables of the actor
 			«FOR variable : actor.stateVars»
-				«variable.declareStateVar»
+				«variable.declare»
 			«ENDFOR»
 
 		«ENDIF»
@@ -390,11 +390,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 		////////////////////////////////////////////////////////////////////////////////
 		// Initializes
-		«initializeFunction»
+		«printInitialize»
 
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		«actorScheduler»
+		«printActorScheduler»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// main

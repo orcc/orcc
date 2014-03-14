@@ -282,7 +282,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		// Replace "cal" extension by "ir"
 		IPath irPath = calPath
 				.removeFirstSegments(outFolder.getFullPath().segmentCount())
-				.removeFileExtension().addFileExtension("ir");
+				.removeFileExtension().addFileExtension(OrccUtil.IR_SUFFIX);
 
 		// Find the corresponding file under the <proj>/bin folder
 		IFile irFile = outFolder.getFile(irPath);

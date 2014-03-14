@@ -30,20 +30,6 @@
 #ifndef _ORCC_OPENHEVC_H_
 #define _ORCC_OPENHEVC_H_
 
-#if defined(__ICC) && __ICC < 1200 || defined(__SUNPRO_C)
-    #define DECLARE_ALIGNED(n,t,v)      t __attribute__ ((aligned (n))) v
-#elif defined(__TI_COMPILER_VERSION__)
-    #define DECLARE_ALIGNED(n,t,v)                      \
-        AV_PRAGMA(DATA_ALIGN(v,n))                      \
-        t __attribute__((aligned(n))) v
-#elif defined(__GNUC__)
-    #define DECLARE_ALIGNED(n,t,v)      t __attribute__ ((aligned (n))) v
-#elif defined(_MSC_VER)
-    #define DECLARE_ALIGNED(n,t,v)      __declspec(align(n)) t v
-#else
-    #define DECLARE_ALIGNED(n,t,v)      t v
-#endif
-
 #include "types.h"
 
 int openhevc_init_context();
@@ -61,8 +47,15 @@ void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i3
 
 void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 log2size);
 
-// DR 1402
+/* WEIGHTED PREDICTION */
 void put_weighted_pred_avg_orcc (i16 src[2][64*64], int _width, int _height, u8 dst[64*64]);
 
+void weighted_pred_orcc(int logWD, int weightCu[2], int offsetCu[2] ,
+		i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64]);
 
+void weighted_pred_avg_orcc(int logWD , int weightCu[2], int offsetCu[2] ,
+		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64]);
+
+/* void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
+		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64]); */
 #endif  /* _ORCC_OPENHEVC_H_ */

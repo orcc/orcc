@@ -31,7 +31,7 @@ package net.sf.orcc.xdf.ui.editors;
 import java.io.IOException;
 
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.xdf.ui.Activator;
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -81,11 +81,13 @@ public class XdfDiagramEditor extends DiagramEditor {
 			final DiagramEditorInput diagramEditorInput = (DiagramEditorInput) input;
 
 			// The input is an Xdf resource
-			if (Activator.NETWORK_SUFFIX.equals(diagramEditorInput.getUri().fileExtension())) {
+			if (OrccUtil.NETWORK_SUFFIX.equals(diagramEditorInput.getUri()
+					.fileExtension())) {
 				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 				final URI xdfUri = diagramEditorInput.getUri();
-				final URI diagramUri = xdfUri.trimFileExtension().appendFileExtension(Activator.DIAGRAM_SUFFIX);
+				final URI diagramUri = xdfUri.trimFileExtension()
+						.appendFileExtension(OrccUtil.DIAGRAM_SUFFIX);
 
 				final IPath diagramPath = new Path(diagramUri.toPlatformString(true));
 

@@ -72,11 +72,12 @@ public class DefaultEntityResolverImpl implements EntityResolver {
 	@Override
 	public boolean resolve(Instance instance, String className) {
 		EObject proxy = null;
-		IFile file = OrccUtil.getFile(project, className, "ir");
+		IFile file = OrccUtil.getFile(project, className, OrccUtil.IR_SUFFIX);
 		if (file != null && file.exists()) {
 			proxy = DfFactory.eINSTANCE.createActor();
 		} else {
-			file = OrccUtil.getFile(project, className, "xdf");
+			file = OrccUtil
+					.getFile(project, className, OrccUtil.NETWORK_SUFFIX);
 			if (file != null && file.exists()) {
 				proxy = DfFactory.eINSTANCE.createNetwork();
 			} else {
