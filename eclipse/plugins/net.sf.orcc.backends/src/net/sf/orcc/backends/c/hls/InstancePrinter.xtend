@@ -246,13 +246,16 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	//&& (512 - «instance.outgoingPortMap.get(port).head.localwName» + «instance.outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)			
 	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
+					
 	«IF instance.outgoingPortMap.get(port).head.targetPort == null»
 		«IF !instance.outgoingPortMap.get(port).head.fifoName.toString.empty»
 			&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())
 		«ENDIF»
 	«ELSE»
+		
 		&& (512 - «instance.outgoingPortMap.get(port).head.localwName» + «instance.outgoingPortMap.get(port).head.rName»[0] >= «pattern.
-		getNumTokens(port)»)					
+		getNumTokens(port)»)	
+						
 	«ENDIF»'''
 
 	//«instance.incomingPortMap.get(port).wName»[0] - «instance.incomingPortMap.get(port).localrName» >= «pattern.getNumTokens(port)»  &&
@@ -292,19 +295,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val output = '''
 			static void «instance.name»_«action.body.name»() {
 				
-				«FOR portin : action.inputPattern.ports»					
-					«IF instance.incomingPortMap.get(portin).sourcePort != null»
-						i32 «instance.incomingPortMap.get(portin).maskName» = «instance.incomingPortMap.get(portin).localrName» & 511;
-					«ENDIF»					
-				«ENDFOR»
-								
-				«FOR portout : action.outputPattern.ports»
-					«IF instance.outgoingPortMap.get(portout).head.targetPort != null»
-						i32 «instance.outgoingPortMap.get(portout).head.maskName» = «instance.outgoingPortMap.get(portout).head.
-				localwName» & 511;
-					«ENDIF»
-					
-				«ENDFOR»				
+						
 				
 				«FOR variable : action.body.locals»
 					«variable.declare»;
@@ -341,6 +332,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«action.scheduler.print»
 			
 		'''
+		
 		currentAction = null
 		return output
 	}
@@ -360,8 +352,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 						«ENDIF»
 					«ELSE»
 						
-						«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[(«instance.incomingPortMap.get(
-					srcPort).maskName»  + («load.indexes.head.doSwitch»))];
+						«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[((«instance.incomingPortMap.get(srcPort).localrName» & 511)  + («load.indexes.head.doSwitch»))];
 					«ENDIF»
 				«ELSE»
 					«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
@@ -385,7 +376,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					«ENDIF»
 				«ELSE»
 					
-					«instance.outgoingPortMap.get(trgtPort).head.ramName»[(«instance.outgoingPortMap.get(trgtPort).head.maskName» + («store.
+					«instance.outgoingPortMap.get(trgtPort).head.ramName»[((«instance.outgoingPortMap.get(trgtPort).head.
+				localwName» & 511) + («store.
 				indexes.head.doSwitch»))]=«store.value.doSwitch»;
 					
 				«ENDIF»

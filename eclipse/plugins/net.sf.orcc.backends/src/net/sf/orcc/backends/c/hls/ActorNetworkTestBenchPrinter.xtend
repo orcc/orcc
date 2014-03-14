@@ -90,51 +90,36 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				
 				
 				
-				«FOR port : instance.getActor.inputs»			
+		
+		«FOR port : instance.getActor.inputs»			
 			«IF instance.incomingPortMap.get(port).sourcePort == null»
-				«FOR portout : instance.getActor.outputs.filter[! native]»
-					«FOR connection : instance.outgoingPortMap.get(portout)»
-						«IF connection.targetPort != null»
-								«instance.incomingPortMap.get(port).fifoName»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.get(
+				«instance.incomingPortMap.get(port).fifoName»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.get(
 			port).fifoTypeIn.sizeInBits - 1» downto 0);
-								«instance.incomingPortMap.get(port).fifoName»_V_empty_n : IN STD_LOGIC;
-								«instance.incomingPortMap.get(port).fifoName»_V_read    : OUT STD_LOGIC;
-								
-								«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
-								«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
-								«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
-						«ENDIF»
-					«ENDFOR»
-				«ENDFOR»
+				«instance.incomingPortMap.get(port).fifoName»_V_empty_n : IN STD_LOGIC;
+				«instance.incomingPortMap.get(port).fifoName»_V_read    : OUT STD_LOGIC;
 			«ELSE»
-				«FOR portout : instance.getActor.outputs.filter[! native]»
-					«FOR connection : instance.outgoingPortMap.get(portout)»
-						«IF connection.targetPort == null»
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.
+				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.
 			get(port).fifoTypeIn.sizeInBits - 1» downto 0);
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
-							
-							«instance.outgoingPortMap.get(portout).head.fifoName»_V_din    : OUT STD_LOGIC_VECTOR («instance.outgoingPortMap.
-			get(portout).head.fifoTypeOut.sizeInBits - 1» downto 0);
-							«instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n : IN STD_LOGIC;
-							«instance.outgoingPortMap.get(portout).head.fifoName»_V_write  : OUT STD_LOGIC;
-						«ELSE»
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.
-			get(port).fifoTypeIn.sizeInBits - 1» downto 0);
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
-							
-							«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
-							«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
-							«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
-							
-						«ENDIF»
-					«ENDFOR»
-				«ENDFOR»
-				
+				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
+				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
 			«ENDIF»
-				«ENDFOR»
+		«ENDFOR»
+		«FOR portout : instance.getActor.outputs.filter[! native]»
+			«FOR connection : instance.outgoingPortMap.get(portout)»
+				«IF connection.targetPort == null»
+					«instance.outgoingPortMap.get(portout).head.fifoName»_V_din    : OUT STD_LOGIC_VECTOR («instance.outgoingPortMap.
+			get(portout).head.fifoTypeOut.sizeInBits - 1» downto 0);
+					«instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n : IN STD_LOGIC;
+					«instance.outgoingPortMap.get(portout).head.fifoName»_V_write  : OUT STD_LOGIC;
+				«ELSE»
+					«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
+					«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
+					«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
+				«ENDIF»				
+			«ENDFOR»
+		«ENDFOR»
+		
+			
 				
 				ap_return : OUT STD_LOGIC_VECTOR (31 downto 0)
 			 );
@@ -147,51 +132,37 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				signal ap_idle :  STD_LOGIC;
 				signal ap_ready :  STD_LOGIC;
 				
-				«FOR port : instance.getActor.inputs»			
+					
+		
+		«FOR port : instance.getActor.inputs»			
 			«IF instance.incomingPortMap.get(port).sourcePort == null»
-				«FOR portout : instance.getActor.outputs.filter[! native]»
-					«FOR connection : instance.outgoingPortMap.get(portout)»
-						«IF connection.targetPort != null»
-								signal «instance.incomingPortMap.get(port).fifoName»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.get(
+				Signal «instance.incomingPortMap.get(port).fifoName»_V_dout   : STD_LOGIC_VECTOR («instance.incomingPortMap.get(
 			port).fifoTypeIn.sizeInBits - 1» downto 0);
-								signal «instance.incomingPortMap.get(port).fifoName»_V_empty_n :  STD_LOGIC;
-								signal «instance.incomingPortMap.get(port).fifoName»_V_read    :  STD_LOGIC;
-								
-								signal «connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
-								signal «connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
-								signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
-						«ENDIF»
-					«ENDFOR»
-				«ENDFOR»
+				Signal «instance.incomingPortMap.get(port).fifoName»_V_empty_n :  STD_LOGIC;
+				Signal «instance.incomingPortMap.get(port).fifoName»_V_read    :  STD_LOGIC;
 			«ELSE»
-				«FOR portout : instance.getActor.outputs.filter[! native]»
-					«FOR connection : instance.outgoingPortMap.get(portout)»
-						«IF connection.targetPort == null»
-							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.
+				Signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.
 			get(port).fifoTypeIn.sizeInBits - 1» downto 0);
-							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
-							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
-							
-							signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_din    :  STD_LOGIC_VECTOR («instance.outgoingPortMap.
-			get(portout).head.fifoTypeOut.sizeInBits - 1» downto 0);
-							signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n :  STD_LOGIC;
-							signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_write  :  STD_LOGIC;
-						«ELSE»
-							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.
-			get(port).fifoTypeIn.sizeInBits - 1» downto 0);
-							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
-							signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
-							
-							signal «connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
-							signal «connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
-							signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
-							
-						«ENDIF»
-					«ENDFOR»
-				«ENDFOR»
-				
+				Signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
+				Signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
 			«ENDIF»
-				«ENDFOR»
+		«ENDFOR»
+		«FOR portout : instance.getActor.outputs.filter[! native]»
+			«FOR connection : instance.outgoingPortMap.get(portout)»
+				«IF connection.targetPort == null»
+					Signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_din    :  STD_LOGIC_VECTOR («instance.outgoingPortMap.
+			get(portout).head.fifoTypeOut.sizeInBits - 1» downto 0);
+					Signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n :  STD_LOGIC;
+					«instance.outgoingPortMap.get(portout).head.fifoName»_V_write  :  STD_LOGIC;
+				«ELSE»
+					Signal «connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
+					Signal «connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
+					Signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
+				«ENDIF»				
+			«ENDFOR»
+		«ENDFOR»
+		
+			
 				
 				signal ap_return :  STD_LOGIC_VECTOR (31 downto 0):= (others => '0');
 				
@@ -225,57 +196,39 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				ap_done => ap_done,
 				ap_idle => ap_idle,
 				ap_ready =>ap_ready,
-				
 				«FOR port : instance.getActor.inputs»			
 			«IF instance.incomingPortMap.get(port).sourcePort == null»
-				«FOR portout : instance.getActor.outputs.filter[! native]»
-					«FOR connection : instance.outgoingPortMap.get(portout)»
-						«IF connection.targetPort != null»
-								«instance.incomingPortMap.get(port).fifoName»_V_dout  => «instance.incomingPortMap.get(port).fifoName»_V_dout,
+			«instance.incomingPortMap.get(port).fifoName»_V_dout  => «instance.incomingPortMap.get(port).fifoName»_V_dout,
 								«instance.incomingPortMap.get(port).fifoName»_V_empty_n => «instance.incomingPortMap.get(port).fifoName»_V_empty_n,
 								«instance.incomingPortMap.get(port).fifoName»_V_read    => «instance.incomingPortMap.get(port).fifoName»_V_read,
-								
-								«connection.castfifoNameRead»_V_din    => «connection.castfifoNameRead»_V_din,
-								«connection.castfifoNameRead»_V_full_n => «connection.castfifoNameRead»_V_full_n,
-								«connection.castfifoNameRead»_V_write  => «connection.castfifoNameRead»_V_write,
-						«ENDIF»
-					«ENDFOR»
-				«ENDFOR»
-			«ELSE»
-				«FOR portout : instance.getActor.outputs.filter[! native]»
-					«FOR connection : instance.outgoingPortMap.get(portout)»
-						«IF connection.targetPort == null»
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   => «instance.incomingPortMap.get(port).
+								«ELSE»
+								«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   => «instance.incomingPortMap.get(port).
 			castfifoNameWrite»_V_dout,
 							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n => «instance.incomingPortMap.get(port).
 			castfifoNameWrite»_V_empty_n,
 							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    => «instance.incomingPortMap.get(port).
 			castfifoNameWrite»_V_read,
-							
-							«instance.outgoingPortMap.get(portout).head.fifoName»_V_din    => «instance.outgoingPortMap.get(portout).head.
+				«ENDIF»
+					«ENDFOR»
+					
+					«FOR portout : instance.getActor.outputs.filter[! native]»
+					«FOR connection : instance.outgoingPortMap.get(portout)»
+						«IF connection.targetPort == null»
+						«instance.outgoingPortMap.get(portout).head.fifoName»_V_din    => «instance.outgoingPortMap.get(portout).head.
 			fifoName»_V_din,
 							«instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n => «instance.outgoingPortMap.get(portout).head.
 			fifoName»_V_full_n,
 							«instance.outgoingPortMap.get(portout).head.fifoName»_V_write  => «instance.outgoingPortMap.get(portout).head.
 			fifoName»_V_write,
-						«ELSE»
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   => «instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_dout,
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n => «instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_empty_n,
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    => «instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_read,
-							
-							«connection.castfifoNameRead»_V_din    => «connection.castfifoNameRead»_V_din,
-							«connection.castfifoNameRead»_V_full_n => «connection.castfifoNameRead»_V_full_n,
-							«connection.castfifoNameRead»_V_write  => «connection.castfifoNameRead»_V_write,
-							
-						«ENDIF»
+			«ELSE»
+				«connection.castfifoNameRead»_V_din    => «connection.castfifoNameRead»_V_din,
+								«connection.castfifoNameRead»_V_full_n => «connection.castfifoNameRead»_V_full_n,
+								«connection.castfifoNameRead»_V_write  => «connection.castfifoNameRead»_V_write,
+			«ENDIF»
 					«ENDFOR»
 				«ENDFOR»
 				
-			«ENDIF»
-				«ENDFOR»
+			
 				
 				ap_return => ap_return);
 				
@@ -364,30 +317,16 @@ variable count«connection.fifoName»: integer:= 0;
 		
 			
 			
-			
-					
-				«FOR port : instance.getActor.inputs»			
-			«IF instance.incomingPortMap.get(port).sourcePort == null»
-				«FOR portout : instance.getActor.outputs.filter[! native]»
+			«FOR portout : instance.getActor.outputs.filter[! native]»
 					«FOR connection : instance.outgoingPortMap.get(portout)»
 						«IF connection.targetPort != null»
-									«connection.castfifoNameRead»_V_full_n <= '1';						
+									«connection.castfifoNameRead»_V_full_n <= '1';				
+									«ELSE»		
+									«instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n <= '1';
 						«ENDIF»
 					«ENDFOR»
 				«ENDFOR»
-			«ELSE»
-				«FOR portout : instance.getActor.outputs.filter[! native]»
-					«FOR connection : instance.outgoingPortMap.get(portout)»
-						«IF connection.targetPort == null»	
-							«instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n <= '1';
-						«ELSE»
-							«connection.castfifoNameRead»_V_full_n <= '1';							
-						«ENDIF»
-					«ENDFOR»
-				«ENDFOR»
-				
-			«ENDIF»
-				«ENDFOR»
+			
 			
 			
 			
