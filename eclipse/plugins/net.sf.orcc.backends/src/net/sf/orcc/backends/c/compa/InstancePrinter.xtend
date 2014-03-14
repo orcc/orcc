@@ -34,6 +34,10 @@ import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
 import net.sf.orcc.df.Action
 import net.sf.orcc.ir.TypeList
+import net.sf.orcc.graph.Vertex
+import net.sf.orcc.df.Entity
+import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Port
 
 /**
  * Generate and print instance source file for COMPA backend.
@@ -234,6 +238,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Instance
 		extern actor_t «entityName»;
 
+		/////////////////////////////////////////////////
+		// FIFO allocations
+		«instance.allocateFifos»
+		
+		/////////////////////////////////////////////////
+		// FIFO pointer assignments
+		«instance.assignFifo»
+
 		«IF !actor.inputs.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
@@ -412,5 +424,28 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 	'''
 	
+	def protected allocateFifos(Vertex vertex) '''
+		«FOR connectionList : vertex.getAdapter(typeof(Entity)).outgoingPortMap.values»
+			«allocateFifo(connectionList.get(0), connectionList.size)»
+		«ENDFOR»
+	'''
+	
+	def protected allocateFifo(Connection conn, int nbReaders) '''
+		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
+	'''
+	
+	def protected assignFifo(Vertex vertex) '''
+		«FOR connList : vertex.getAdapter(typeof(Entity)).outgoingPortMap.values»
+			«printFifoAssign(connList.head.source.label, connList.head.sourcePort, connList.head.<Integer>getValueAsObject("idNoBcast"))»
+			«FOR conn : connList»
+				«printFifoAssign(conn.target.label, conn.targetPort, conn.<Integer>getValueAsObject("idNoBcast"))»
+			«ENDFOR»
+			
+		«ENDFOR»
+	'''
+	
+	def protected printFifoAssign(String name, Port port, int fifoIndex) '''
+		fifo_«port.type.doSwitch»_t *«name»_«port.name» = &fifo_«fifoIndex»;
+	'''
 }
 
