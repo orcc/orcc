@@ -101,37 +101,19 @@ COPY_8_8(16,  1, 4352)
 COPY_8_8( 8,  1, 2304)
 
 // Variable number of elements to be copied
-#define COPY_8_8_VAR()                                                                                                                 \
-void copy_8_8_var_orcc(                                                                                                                \
+#define MEMCPY(H)                                                                                                                      \
+void memcpy_ ## H ## _orcc(                                                                                                            \
   u8 * outputSample,                                                                                                                   \
   u8 * inputSample,                                                                                                                    \
   u32 idxBlkStride,                                                                                                                    \
   u8 size)                                                                                                                             \
 {                                                                                                                                      \
-  int i = 0;                                                                                                                           \
-  __m128i * pm128iInputSample = (__m128i *) &inputSample[idxBlkStride + 0];                                                            \
-  __m128i * pm128iOutputSample = (__m128i *) &outputSample[0];                                                                         \
-  __m128i m128iInputSample;                                                                                                            \
-  int size1 = SCU_SIZE_MOD16(size);                                                                                                    \
-  int x;                                                                                                                               \
-                                                                                                                                       \
-  for (i = 0; i < SCU_SIZE_DIV16(size); i++)                                                                                           \
-  {                                                                                                                                    \
-    m128iInputSample = _mm_loadu_si128(pm128iInputSample + i);                                                                         \
-    _mm_storeu_si128(pm128iOutputSample + i, m128iInputSample);                                                                        \
-  }                                                                                                                                    \
-                                                                                                                                       \
-  if (size1 > 7)                                                                                                                       \
-  {                                                                                                                                    \
-    m128iInputSample = _mm_loadl_epi64(pm128iInputSample + i);                                                                         \
-    _mm_storel_epi64(pm128iOutputSample + i, m128iInputSample);                                                                        \
-    size1 -= 8;                                                                                                                        \
-  }                                                                                                                                    \
-                                                                                                                                       \
-  memcpy(&outputSample[size - size1], &inputSample[idxBlkStride + size - size1], size1 * sizeof(u8));                                  \
+  memcpy(&outputSample[0], &inputSample[idxBlkStride + 0], size * sizeof(u ## H));                                                     \
 }
 
-COPY_8_8_VAR()
+MEMCPY( 8)
+MEMCPY(16)
+MEMCPY(32)
 
 
 // add 8-bits elements to 16-bits elements and clip, for H elements. First array (pred) is K * J.
@@ -408,9 +390,9 @@ void getmvinfo_dpb_ ## H ## _luma_orcc(                                         
                                                                                                                     \
   for (y = 0; y < sideMax; y++)                                                                                     \
   {                                                                                                                 \
-	copy_8_8_var_orcc(                                                                                              \
+	memcpy_8_orcc(                                                                                                  \
       &RefCu[y * (sideMax)],                                                                                        \
-      pictureBuffer[idx][y+yOffset],                                                                                \
+      pictureBuffer[idx][yOffset + y],                                                                              \
       xOffset,                                                                                                      \
   	  sideMax);                                                                                                     \
   }                                                                                                                 \
@@ -434,7 +416,7 @@ void getmvinfo_dpb_ ## H ## _chroma_orcc(                                       
                                                                                                                     \
   for (y = 0; y < sideMax; y++)                                                                                     \
   {                                                                                                                 \
-	copy_8_8_var_orcc(                                                                                              \
+	memcpy_8_orcc(                                                                                                  \
       &RefCu[y * (sideMax)],                                                                                        \
       pictureBuffer[idx][y+yOffset],                                                                                \
       xOffset,                                                                                                      \
@@ -464,14 +446,19 @@ void fillBorder_luma_orcc(
   __m128i * __restrict pm128iPictureBuffer2;
   __m128i m128iWord, m128iWord0;
 
+  u8 * pucPictureBuffer1 = &pictureBuffer[lastIdx][border_size][border_size];
+  u8 * pucPictureBuffer2 = &pictureBuffer[lastIdx][ySize + border_size - 1][border_size];
+  u8 * pucPictureBuffer  = (__m128i *) &pictureBuffer[lastIdx][0][border_size];
+  u8 * pucPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][0 + ySize + border_size][border_size];
+
   int iLoopCount = (xSize >> 4) - 1;
 
   y = 0;
   while (y <= border_size - 1) {
-    pm128iPictureBuffer1 = (__m128i *) &pictureBuffer[lastIdx][border_size][border_size];
-    pm128iPictureBuffer2 = (__m128i *) &pictureBuffer[lastIdx][ySize + border_size - 1][border_size];
-    pm128iPictureBuffer  = (__m128i *) &pictureBuffer[lastIdx][y][border_size];
-    pm128iPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][y + ySize + border_size][border_size];
+    pm128iPictureBuffer1 = (__m128i *) pucPictureBuffer1;
+    pm128iPictureBuffer2 = (__m128i *) pucPictureBuffer2;
+    pm128iPictureBuffer  = (__m128i *) pucPictureBuffer;
+    pm128iPictureBuffer0 = (__m128i *) pucPictureBuffer0;
     x = 0;
     while (x <= iLoopCount) {
       m128iWord = _mm_loadu_si128(pm128iPictureBuffer1);
@@ -484,16 +471,23 @@ void fillBorder_luma_orcc(
       pm128iPictureBuffer0++;
       x = x + 1;
     }
+    pucPictureBuffer += (PICT_WIDTH+2*BORDER_SIZE);
+    pucPictureBuffer0 += (PICT_WIDTH+2*BORDER_SIZE);
     y = y + 1;
   }
+
+  pucPictureBuffer1 = &pictureBuffer[lastIdx][0][border_size];
+  pucPictureBuffer2 = &pictureBuffer[lastIdx][0][xSize + border_size - 1];
+  pucPictureBuffer  = &pictureBuffer[lastIdx][0][0];
+  pucPictureBuffer0 = &pictureBuffer[lastIdx][0][0 + xSize + border_size];
 
   iLoopCount = (border_size >> 4) - 1;
   y = 0;
   while (y <= ySize + 2 * border_size - 1) {
-	tmp_pictureBuffer = pictureBuffer[lastIdx][y][border_size];
-	tmp_pictureBuffer0 = pictureBuffer[lastIdx][y][xSize + border_size - 1];
-	pm128iPictureBuffer = (__m128i *) &pictureBuffer[lastIdx][y][0];
-	pm128iPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][y][0 + xSize + border_size];
+	tmp_pictureBuffer = pucPictureBuffer1[0];
+	tmp_pictureBuffer0 = pucPictureBuffer2[0];
+	pm128iPictureBuffer = (__m128i *) &pucPictureBuffer[0];
+	pm128iPictureBuffer0 = (__m128i *) &pucPictureBuffer0[0];
     m128iWord = _mm_set1_epi8(tmp_pictureBuffer);
     m128iWord0 = _mm_set1_epi8(tmp_pictureBuffer0);
     x = 0;
@@ -504,6 +498,10 @@ void fillBorder_luma_orcc(
       pm128iPictureBuffer0++;
       x = x + 1;
     }
+    pucPictureBuffer1 += (PICT_WIDTH+2*BORDER_SIZE);
+    pucPictureBuffer2 += (PICT_WIDTH+2*BORDER_SIZE);
+    pucPictureBuffer += (PICT_WIDTH+2*BORDER_SIZE);
+    pucPictureBuffer0 += (PICT_WIDTH+2*BORDER_SIZE);
     y = y + 1;
   }
 }
@@ -526,14 +524,19 @@ void fillBorder_chroma_orcc(
   __m128i * __restrict pm128iPictureBuffer2;
   __m128i m128iWord, m128iWord0;
 
+  u8 * pucPictureBuffer1 = &pictureBuffer[lastIdx][border_size][border_size];
+  u8 * pucPictureBuffer2 = &pictureBuffer[lastIdx][ySize + border_size - 1][border_size];
+  u8 * pucPictureBuffer  = &pictureBuffer[lastIdx][0][border_size];
+  u8 * pucPictureBuffer0 = &pictureBuffer[lastIdx][0 + ySize + border_size][border_size];
+
   int iLoopCount = (xSize >> 4) - 1;
 
   y = 0;
   while (y <= border_size - 1) {
-    pm128iPictureBuffer1 = (__m128i *) &pictureBuffer[lastIdx][border_size][border_size];
-    pm128iPictureBuffer2 = (__m128i *) &pictureBuffer[lastIdx][ySize + border_size - 1][border_size];
-    pm128iPictureBuffer  = (__m128i *) &pictureBuffer[lastIdx][y][border_size];
-    pm128iPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][y + ySize + border_size][border_size];
+    pm128iPictureBuffer1 = pucPictureBuffer1;
+    pm128iPictureBuffer2 = pucPictureBuffer2;
+    pm128iPictureBuffer  = pucPictureBuffer;
+    pm128iPictureBuffer0 = pucPictureBuffer0;
     x = 0;
     while (x <= iLoopCount) {
       m128iWord = _mm_loadu_si128(pm128iPictureBuffer1);
@@ -546,16 +549,23 @@ void fillBorder_chroma_orcc(
       pm128iPictureBuffer0++;
       x = x + 1;
     }
+    pucPictureBuffer += (PICT_WIDTH/2+2*BORDER_SIZE);
+    pucPictureBuffer0 += (PICT_WIDTH/2+2*BORDER_SIZE);
     y = y + 1;
   }
+
+  pucPictureBuffer1 = &pictureBuffer[lastIdx][0][border_size];
+  pucPictureBuffer2 = &pictureBuffer[lastIdx][0][xSize + border_size - 1];
+  pucPictureBuffer  = &pictureBuffer[lastIdx][0][0];
+  pucPictureBuffer0 = &pictureBuffer[lastIdx][0][0 + xSize + border_size];
 
   iLoopCount = (border_size >> 4) - 1;
   y = 0;
   while (y <= ySize + 2 * border_size - 1) {
-    tmp_pictureBuffer = pictureBuffer[lastIdx][y][border_size];
-    tmp_pictureBuffer0 = pictureBuffer[lastIdx][y][xSize + border_size - 1];
-    pm128iPictureBuffer = (__m128i *) &pictureBuffer[lastIdx][y][0];
-    pm128iPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][y][0 + xSize + border_size];
+    tmp_pictureBuffer = pucPictureBuffer1[0];
+    tmp_pictureBuffer0 = pucPictureBuffer2[0];
+    pm128iPictureBuffer = (__m128i *) &pucPictureBuffer[0];
+    pm128iPictureBuffer0 = (__m128i *) &pucPictureBuffer0[0];
     m128iWord = _mm_set1_epi8(tmp_pictureBuffer);
     m128iWord0 = _mm_set1_epi8(tmp_pictureBuffer0);
     x = 0;
@@ -566,6 +576,10 @@ void fillBorder_chroma_orcc(
       pm128iPictureBuffer0++;
       x = x + 1;
     }
+    pucPictureBuffer1 += (PICT_WIDTH/2+2*BORDER_SIZE);
+    pucPictureBuffer2 += (PICT_WIDTH/2+2*BORDER_SIZE);
+    pucPictureBuffer += (PICT_WIDTH/2+2*BORDER_SIZE);
+    pucPictureBuffer0 += (PICT_WIDTH/2+2*BORDER_SIZE);
     y = y + 1;
   }
 }
@@ -644,17 +658,19 @@ void displayYUV_crop_ ## H ## _orcc(                                            
   u16 yIdxMin = INT_MAXIM(yIdx, yMin);                                                                                                 \
   u16 yIdxMax = INT_MINIM(yIdx + H - 1, yMax);                                                                                         \
   int x, y;                                                                                                                            \
+  int iPictureBufferOffset = (yIdxMin - yMin) * cropPicWth + xIdxMin - xMin;                                                           \
+  int iPictureBuffer1Offset = (yIdxMin - yIdx) * H + xIdxMin - xIdx;                                                                   \
                                                                                                                                        \
-  __m128i * __restrict pm128iPictureBuffer = (__m128i *) &pictureBuffer[(yIdxMin - yMin) * cropPicWth + xIdxMin - xMin];               \
-  __m128i * __restrict pm128iPictureBuffer1 = (__m128i *) &Bytes[(yIdxMin - yIdx) * H + xIdxMin - xIdx];                               \
+  __m128i * __restrict pm128iPictureBuffer = NULL;                                                                                     \
+  __m128i * __restrict pm128iPictureBuffer1 = NULL;                                                                                    \
   __m128i m128iWord;                                                                                                                   \
                                                                                                                                        \
   int iLoopCount = (xIdxMax - xIdxMin + 1) >> 4;                                                                                       \
                                                                                                                                        \
   for (y = yIdxMin; y < yIdxMax + 1; y++)                                                                                              \
   {                                                                                                                                    \
-    pm128iPictureBuffer = (__m128i *) &pictureBuffer[(y - yMin) * cropPicWth + xIdxMin - xMin];                                        \
-    pm128iPictureBuffer1 = (__m128i *) &Bytes[(y - yIdx) *  H + xIdxMin - xIdx];                                                       \
+    pm128iPictureBuffer = (__m128i *) &pictureBuffer[iPictureBufferOffset];                                                            \
+    pm128iPictureBuffer1 = (__m128i *) &Bytes[iPictureBuffer1Offset];                                                                  \
     for (x = 0; x < iLoopCount; x++)                                                                                                   \
     {                                                                                                                                  \
       m128iWord = _mm_loadu_si128(pm128iPictureBuffer1);                                                                               \
@@ -662,10 +678,12 @@ void displayYUV_crop_ ## H ## _orcc(                                            
       pm128iPictureBuffer++;                                                                                                           \
       pm128iPictureBuffer1++;                                                                                                          \
     }                                                                                                                                  \
-    for (x = xIdxMin + (iLoopCount << 4); x < xIdxMax + 1; x++)                                                                        \
+    for (x = (iLoopCount << 4); x < xIdxMax - xIdxMin + 1; x++)                                                                        \
     {                                                                                                                                  \
-      pictureBuffer[(y - yMin) * cropPicWth + x - xMin] = Bytes[(y - yIdx) *  H + x - xIdx];                                           \
+      pictureBuffer[iPictureBufferOffset + x] = Bytes[iPictureBuffer1Offset + x];                                                      \
     }                                                                                                                                  \
+    iPictureBufferOffset += cropPicWth;                                                                                                \
+    iPictureBuffer1Offset += H;                                                                                                        \
   }                                                                                                                                    \
 }                                                                                                                                      \
 
