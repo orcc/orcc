@@ -71,7 +71,7 @@ u8 _width, u8 _height, i32 mx, i32 my)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width] - 1;
 
-    hevcDsp.put_hevc_qpel[idx][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
+    hevcDsp.put_hevc_qpel[idx][!!my][!!mx](dst, width, src, srcstride, height, mx, my, width);
 }
 
 void put_hevc_epel_orcc(i16 _dst[2][64*64], u8 listIdx,
@@ -84,87 +84,8 @@ u8 _width, u8 _height, i32 mx, i32 my)
     u8 height = _height + 1;
     int idx = lookup_tab_openhevc_function[_width];
 
-    hevcDsp.put_hevc_epel[idx][!!my][!!mx](dst, width, src, srcstride, width, height, mx, my);
+    hevcDsp.put_hevc_epel[idx][!!my][!!mx](dst, width, src, srcstride, height, mx, my, width);
 }
-
-void put_hevc_qpel_h_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 _width, u8 _height)
-{
-    u8  *src = &_src[3+3*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-    int idx = lookup_tab_openhevc_function[_width] - 1;
-
-    hevcDsp.put_hevc_qpel[idx][0][1](dst, width, src, srcstride, width, height, filterIdx, 0);
-}
-
-void put_hevc_qpel_v_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-i32 filterIdx,  u8 _width, u8 _height)
-{
-    u8  *src = &_src[3+3*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-    int idx = lookup_tab_openhevc_function[_width] - 1;
-
-    hevcDsp.put_hevc_qpel[idx][1][0](dst, width, src, srcstride, width, height, 0, filterIdx);
-}
-
-void put_hevc_epel_h_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height, i32 mx, i32 my)
-{
-    u8  *src = &_src[1+1*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-    int idx = lookup_tab_openhevc_function[_width];
-
-    hevcDsp.put_hevc_epel[idx][0][1](dst, width, src, srcstride, width, height, mx, my);
-}
-
-void put_hevc_epel_v_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height, i32 mx, i32 my)
-{
-    u8  *src = &_src[1+1*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-    int idx = lookup_tab_openhevc_function[_width];
-
-    hevcDsp.put_hevc_epel[idx][1][0](dst, width, src, srcstride, width, height, mx, my);
-}
-
-void put_hevc_qpel_hv_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-i32 filterIdx[2],  u8 _width, u8 _height)
-{
-    u8  *src = &_src[3+ 3*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-    int idx = lookup_tab_openhevc_function[_width] - 1;
-
-    hevcDsp.put_hevc_qpel[idx][1][1](dst, width, src, srcstride, width, height, filterIdx[0], filterIdx[1]);
-}
-
-void put_hevc_epel_hv_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height, i32 mx, i32 my)
-{
-    u8  *src = &_src[1+1*srcstride];
-    i16 *dst = _dst[listIdx];
-    u8 width = _width + 1;
-    u8 height = _height + 1;
-    int idx = lookup_tab_openhevc_function[_width];
-
-    hevcDsp.put_hevc_epel[idx][1][1](dst, width, src, srcstride, width, height, mx, my);
-}
-
 
 /* WEIGHTED PREDICTION */
 
@@ -232,16 +153,16 @@ void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
 void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 log2size)
 {
     u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
+    u8 *top  = _top + 1;
+    u8 *left = _left + 1;
 
     hevcPred.pred_planar[log2size - 2](src, top, left, stride);
 }
 
 void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 log2size){
 	u8 *src        = _src;
-    const u8 *top  = _top + 1;
-    const u8 *left = _left + 1;
+    u8 *top  = _top + 1;
+    u8 *left = _left + 1;
 
     hevcPred.pred_angular[log2size - 2](src, top, left, stride, idx, mode);
 }

@@ -71,9 +71,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«super.caseBlockFor(block)»
 	'''
 
-	override protected declareStateVar(Var variable) '''
+	override protected declare(Var variable) '''
 		«variable.printResident»
-		«super.declareStateVar(variable)»
+		«super.declare(variable)»
 	'''
 
 	override protected declare(Procedure proc) '''

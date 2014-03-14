@@ -97,20 +97,6 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.java.JavaBackend"
-            name="Java">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
-         </option>
-         <option
-               id="net.sf.orcc.backends.compileVTL">
-         </option>
-         <option
-               id="net.sf.orcc.dontExportLibrary">
-         </option>
-         
-      </backend>
-      <backend
             class="net.sf.orcc.backends.llvm.jit.JadeBackend"
             name="Jade">
          <option
@@ -181,33 +167,13 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.c.embedded.CEmbeddedBackend"
-            name="CEmbedded">
+            class="net.sf.orcc.backends.c.preesm.PreesmBackend"
+            name="PREESM">
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
                id="net.sf.orcc.core.classify">
-         </option>
-      </backend>
-      <backend
-            class="net.sf.orcc.backends.cplusplus.YaceBackend"
-            name="C++">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
-         </option>
-         <option
-               id="net.sf.orcc.core.classify">
-         </option>
-         <option
-               id="net.sf.orcc.dontExportLibrary">
-         </option>         
-      </backend>
-      <backend
-            class="net.sf.orcc.backends.opencl.OpenCLBackend"
-            name="OpenCL (Experimental)">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
          </option>
       </backend>
    </extension>
@@ -471,30 +437,6 @@
       </application>
    </extension>
    <extension
-         id="cpp"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.cplusplus.YaceBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="java"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.java.JavaBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
          id="tta"
          point="org.eclipse.core.runtime.applications">
       <application
@@ -531,14 +473,14 @@
       </application>
    </extension>
    <extension
-         id="cembedded"
+         id="preesm"
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="singleton-global"
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.c.embedded.CEmbeddedBackend">
+               class="net.sf.orcc.backends.c.preesm.PreesmBackend">
          </run>
       </application>
    </extension>
@@ -563,18 +505,6 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.promela.PromelaBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="opencl"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.opencl.OpenCLBackend">
          </run>
       </application>
    </extension>

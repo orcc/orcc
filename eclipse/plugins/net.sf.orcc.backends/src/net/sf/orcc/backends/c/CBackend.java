@@ -286,6 +286,8 @@ public class CBackend extends AbstractBackend {
 					commonLibPath, debug);
 			if (commonOk) {
 				OrccLogger.traceRaw("OK" + "\n");
+				new File(commonLibPath + File.separator + "profilingAnalyse.py")
+				.setExecutable(true);
 			} else {
 				OrccLogger.warnRaw("Error" + "\n");
 			}
