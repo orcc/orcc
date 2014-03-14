@@ -97,20 +97,6 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.java.JavaBackend"
-            name="Java">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
-         </option>
-         <option
-               id="net.sf.orcc.backends.compileVTL">
-         </option>
-         <option
-               id="net.sf.orcc.dontExportLibrary">
-         </option>
-         
-      </backend>
-      <backend
             class="net.sf.orcc.backends.llvm.jit.JadeBackend"
             name="Jade">
          <option
@@ -454,18 +440,6 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.c.CBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="java"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.java.JavaBackend">
          </run>
       </application>
    </extension>
