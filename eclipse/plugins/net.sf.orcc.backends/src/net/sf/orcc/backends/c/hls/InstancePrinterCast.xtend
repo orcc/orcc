@@ -78,7 +78,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
-		static void cast_«instance.name»_write_untagged_0() {
+		static void cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_untagged_0() {
 			
 					i32 «instance.incomingPortMap.get(port).maskName» = «instance.incomingPortMap.get(port).localwName» & 511;
 					«instance.incomingPortMap.get(port).fifoTypeOut.doSwitch» tmp_«instance.incomingPortMap.get(port).sourcePort.name»;
@@ -100,14 +100,14 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		void cast_«instance.name»_write_scheduler() {		
+		void cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler() {		
 			
 					if (!«instance.incomingPortMap.get(port).castfifoNameWrite».empty() &&   
 					isSchedulable_untagged_0()) {
 					if(1
 					&& (512 - «instance.incomingPortMap.get(port).localwName» + «instance.incomingPortMap.get(port).rName»[0] >= 1)
 					){
-					cast_«instance.name»_write_untagged_0();
+					cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_untagged_0();
 					}
 					} else {
 					goto finished;
@@ -149,7 +149,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 				////////////////////////////////////////////////////////////////////////////////
 				// Actions
-				static void cast_«instance.name»_read_untagged_0() {
+				static void cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read_untagged_0() {
 				
 							i32 «instance.outgoingPortMap.get(portout).head.maskName» = «instance.outgoingPortMap.get(portout).head.
 			localrName» & 511;
@@ -172,14 +172,14 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 				}
 				////////////////////////////////////////////////////////////////////////////////
 				// Action scheduler
-				void cast_«instance.name»_read_scheduler() {		
+				void cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read_scheduler() {		
 						if («instance.outgoingPortMap.get(portout).head.wName»[0] - «instance.outgoingPortMap.get(portout).head.
 			localrName» >= 1  &&
 						isSchedulable_untagged_0()) {
 						if(1
 						&& (!«instance.outgoingPortMap.get(portout).head.castfifoNameRead».full())
 						){
-						cast_«instance.name»_read_untagged_0();
+						cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read_untagged_0();
 						}
 						} else {
 						goto finished;
@@ -197,18 +197,33 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 					new File(
 						targetFolder + File::separator + "cast_" + instance.name + "_" +
 							instance.incomingPortMap.get(portIN).targetPort.name + "_write" + ".cpp"))
+				OrccUtil::printFile(
+					script(targetFolder,
+						"cast_" + instance.name + "_" + instance.incomingPortMap.get(portIN).targetPort.name + "_write"),
+					new File(
+						targetFolder + File::separator + "script_" + "cast_" + instance.name + "_" +
+							instance.incomingPortMap.get(portIN).targetPort.name + "_write" + ".tcl"
+					))
 
 			}
 		}
 		for (portout : instance.getActor.outputs.filter[! native]) {
-			for (connection : instance.outgoingPortMap.get(portout)) {
-				if (connection.targetPort != null) {
+			//for (connection : instance.outgoingPortMap.get(portout)) {
+				if (instance.outgoingPortMap.get(portout).head.targetPort != null) {
 					OrccUtil::printFile(getFileContentRead(portout),
 						new File(
-							targetFolder + File::separator + "cast_" + instance.name + instance.name + "_" +
+							targetFolder + File::separator + "cast_" + instance.name + "_" +
 								instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read" + ".cpp"))
+					OrccUtil::printFile(
+						script(targetFolder,
+							"cast_" + instance.name + "_" +
+								instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read"),
+						new File(
+							targetFolder + File::separator + "script_" + "cast_" + instance.name + "_" +
+								instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read" + ".tcl"
+						))
 				}
-			}
+			//}
 		}
 		return 0
 
@@ -302,5 +317,20 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			connection.targetPort.type
 		}
 	}
+
+	def script(String path, String Instname) '''
+		
+		open_project -reset subProject_«Instname»
+		set_top «Instname»_scheduler
+		add_files «Instname».cpp
+		add_files -tb «Instname»TestBench.cpp
+		open_solution -reset "solution1"
+		set_part  {xc7vx330tffg1157-2}
+		create_clock -period 20
+		
+		
+		csynth_design
+		exit
+	'''
 
 }

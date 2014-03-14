@@ -291,16 +291,20 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		currentAction = action
 		val output = '''
 			static void «instance.name»_«action.body.name»() {
-				«FOR port : instance.getActor.inputs»
-					«IF instance.incomingPortMap.get(port).sourcePort != null»
-						i32 «instance.incomingPortMap.get(port).maskName» = «instance.incomingPortMap.get(port).localrName» & 511;
-					«ENDIF»
+				
+				«FOR portin : action.inputPattern.ports»					
+					«IF instance.incomingPortMap.get(portin).sourcePort != null»
+						i32 «instance.incomingPortMap.get(portin).maskName» = «instance.incomingPortMap.get(portin).localrName» & 511;
+					«ENDIF»					
 				«ENDFOR»
-				«FOR port : instance.getActor.outputs.filter[! native]»
-					«IF instance.outgoingPortMap.get(port).head.targetPort != null»
-						i32 «instance.outgoingPortMap.get(port).head.maskName» = «instance.outgoingPortMap.get(port).head.localwName» & 511;
+								
+				«FOR portout : action.outputPattern.ports»
+					«IF instance.outgoingPortMap.get(portout).head.targetPort != null»
+						i32 «instance.outgoingPortMap.get(portout).head.maskName» = «instance.outgoingPortMap.get(portout).head.
+				localwName» & 511;
 					«ENDIF»
-				«ENDFOR»
+					
+				«ENDFOR»				
 				
 				«FOR variable : action.body.locals»
 					«variable.declare»;
@@ -309,21 +313,29 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
 				«ENDFOR»
+			
+					«FOR portin1 : action.inputPattern.ports»
+					
+					«IF instance.incomingPortMap.get(portin1).sourcePort != null»
+						«instance.incomingPortMap.get(portin1).localrName» = «instance.incomingPortMap.get(portin1).localrName»+«action.
+				inputPattern.getNumTokens(portin1)»;
+						«instance.incomingPortMap.get(portin1).rName»[0] = «instance.incomingPortMap.get(portin1).localrName»;
+					«ENDIF»
+					
+					
+						«ENDFOR»
+			«FOR portout1 : action.outputPattern.ports»
+					«IF instance.outgoingPortMap.get(portout1).head.targetPort != null»
+						«instance.outgoingPortMap.get(portout1).head.localwName» = «instance.outgoingPortMap.get(portout1).head.localwName» +«action.
+				outputPattern.getNumTokens(portout1)»;
+						«instance.outgoingPortMap.get(portout1).head.wName»[0] = «instance.outgoingPortMap.get(portout1).head.localwName»;
+					«ENDIF»
+					
+					
+					
+				«ENDFOR»	
+			
 				
-				«FOR port : instance.getActor.inputs»
-					«IF instance.incomingPortMap.get(port).sourcePort != null»
-						«instance.incomingPortMap.get(port).localrName» = «instance.incomingPortMap.get(port).localrName»+«action.inputPattern.
-		getNumTokens(port)»;
-						«instance.incomingPortMap.get(port).rName»[0] = «instance.incomingPortMap.get(port).localrName»;
-					«ENDIF»
-				«ENDFOR»
-				«FOR port : instance.getActor.outputs.filter[! native]»
-					«IF instance.outgoingPortMap.get(port).head.targetPort != null»
-						«instance.outgoingPortMap.get(port).head.localwName» = «instance.outgoingPortMap.get(port).head.localwName» +«action.outputPattern.
-		getNumTokens(port)»;
-						«instance.outgoingPortMap.get(port).head.wName»[0] = «instance.outgoingPortMap.get(port).head.localwName»;
-					«ENDIF»
-				«ENDFOR»
 			}
 			
 			«action.scheduler.print»
