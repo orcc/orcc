@@ -14,8 +14,6 @@ Bundle-ClassPath: .
 Bundle-Activator: net.sf.orcc.backends.Activator
 Export-Package: net.sf.orcc.backends,
  net.sf.orcc.backends.c,
- net.sf.orcc.backends.cplusplus,
- net.sf.orcc.backends.cplusplus.entities,
  net.sf.orcc.backends.ir,
  net.sf.orcc.backends.ir.util,
  net.sf.orcc.backends.java,
