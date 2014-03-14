@@ -61,6 +61,8 @@ static const int lookup_tab_openhevc_function[64] = {
    -1, -1, -1, -1, -1, -1, -1,  3};
 
 
+/* INTER PREDICTION */
+
 void put_hevc_qpel_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
 u8 _width, u8 _height, i32 mx, i32 my)
@@ -144,11 +146,9 @@ void weighted_pred_avg_orcc(int logWD , int weightCu[2], int offsetCu[2] ,
 }
 
 /* weighted_pred_mono implemented in sse.c */
-/*
-void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
-		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64]);
-*/
 
+
+/* INTRA PREDICTION */
 
 void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 log2size)
 {
