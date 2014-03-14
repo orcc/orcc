@@ -167,8 +167,8 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.c.embedded.CEmbeddedBackend"
-            name="CEmbedded">
+            class="net.sf.orcc.backends.c.preesm.PreesmBackend"
+            name="PREESM">
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
@@ -473,14 +473,14 @@
       </application>
    </extension>
    <extension
-         id="cembedded"
+         id="preesm"
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="singleton-global"
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.c.embedded.CEmbeddedBackend">
+               class="net.sf.orcc.backends.c.preesm.PreesmBackend">
          </run>
       </application>
    </extension>

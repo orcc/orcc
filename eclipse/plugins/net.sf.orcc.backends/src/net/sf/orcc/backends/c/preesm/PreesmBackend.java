@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.embedded;
+package net.sf.orcc.backends.c.preesm;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ import org.eclipse.core.resources.IFile;
  * 
  * @author mpelcat
  */
-public class CEmbeddedBackend extends AbstractBackend {
+public class PreesmBackend extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {

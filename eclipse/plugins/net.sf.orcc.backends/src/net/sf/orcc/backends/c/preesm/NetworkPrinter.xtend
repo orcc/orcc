@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.backends.c.embedded
+package net.sf.orcc.backends.c.preesm
 
 import java.io.File
 import net.sf.orcc.backends.c.CTemplate
