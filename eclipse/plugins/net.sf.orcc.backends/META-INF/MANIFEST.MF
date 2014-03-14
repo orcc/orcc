@@ -18,7 +18,6 @@ Export-Package: net.sf.orcc.backends,
  net.sf.orcc.backends.ir.util,
  net.sf.orcc.backends.llvm.transform,
  net.sf.orcc.backends.llvm.tta.transform,
- net.sf.orcc.backends.opencl,
  net.sf.orcc.backends.transform,
  net.sf.orcc.backends.transform.ssa,
  net.sf.orcc.backends.util

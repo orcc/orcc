@@ -176,13 +176,6 @@
                id="net.sf.orcc.core.classify">
          </option>
       </backend>
-      <backend
-            class="net.sf.orcc.backends.opencl.OpenCLBackend"
-            name="OpenCL (Experimental)">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
-         </option>
-      </backend>
    </extension>
    <extension
          point="net.sf.orcc.core.options">
@@ -512,18 +505,6 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.promela.PromelaBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="opencl"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.opencl.OpenCLBackend">
          </run>
       </application>
    </extension>
