@@ -32,7 +32,7 @@
 #include "hevcpred.h"
 #include "hevcdsp.h"
 #include <smmintrin.h>
-#define __SSE4_1__
+
 
 static HEVCPredContext hevcPred;
 static HEVCDSPContext hevcDsp;
