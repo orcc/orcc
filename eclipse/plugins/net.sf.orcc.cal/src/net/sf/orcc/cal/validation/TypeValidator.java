@@ -453,6 +453,11 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
+		if (t1.isList() || t2.isList()) {
+			error("Binary operations on Lists are not supported", source,
+					feature);
+		}
+
 		switch (op) {
 		case BITAND:
 			if (!t1.isInt() && !t1.isUint()) {
@@ -500,14 +505,6 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			break;
 
 		case PLUS:
-			if (t1.isString() && t2.isList()) {
-				error("Cannot convert " + print(t2) + " to String", source,
-						feature, index);
-			}
-			if (t2.isString() && t1.isList()) {
-				error("Cannot convert " + print(t1) + " to String", source,
-						feature, index);
-			}
 			if (t1.isBool() && !t2.isString() || !t1.isString() && t2.isBool()) {
 				error("Addition is not defined for booleans", source, feature);
 			}
