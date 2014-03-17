@@ -3,6 +3,7 @@
 set(orcc_sources
     src/access_file.c
     src/dataflow.c
+    src/fifos.c
     src/options.c
     src/source.c
     src/trace.c
