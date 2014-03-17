@@ -57,6 +57,7 @@ import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
+import net.sf.orcc.ir.Param
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
@@ -67,7 +68,6 @@ import net.sf.orcc.util.util.EcoreHelper
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
-import net.sf.orcc.ir.Param
 
 /**
  * Generate and print instance source file for C backend.
@@ -633,10 +633,10 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	def private checkConnectivy() {
-		for(port : actor.inputs.filter[!inputConneted]) {
+		for(port : actor.inputs.filter[incomingPortMap.get(it) == null]) {
 			OrccLogger::noticeln("["+entityName+"] Input port "+port.name+" not connected.")
 		}
-		for(port : actor.outputs.filter[!outputConnected]) {
+		for(port : actor.outputs.filter[outgoingPortMap.get(it).nullOrEmpty]) {
 			OrccLogger::noticeln("["+entityName+"] Output port "+port.name+" not connected.")
 		}
 	}
@@ -1095,16 +1095,6 @@ class InstancePrinter extends CTemplate {
 
 	def private getNoInline()
 		'''«IF inlineActors»__attribute__((noinline)) «ENDIF»'''
-
-	def private isOutputConnected(Port port) {
-		// If the port has a list of output connections not defined or empty, returns false
-		!outgoingPortMap.get(port).nullOrEmpty
-	}
-
-	def private isInputConneted(Port port) {
-		// If the port has an input connection, returns true
-		incomingPortMap.get(port) != null
-	}
 
 	//========================================
 	//   Old template data initialization
