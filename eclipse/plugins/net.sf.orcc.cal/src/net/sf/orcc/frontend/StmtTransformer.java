@@ -58,6 +58,8 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.SwitchUtil;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
@@ -79,28 +81,26 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class PrintlnTransformer extends CalSwitch<Object> {
+	private class PrintlnTransformer extends CalSwitch<Void> {
 
-		private Object object;
-
-		private List<Expression> parameters;
+		private final List<Expression> parameters;
 
 		public PrintlnTransformer(List<Expression> parameters) {
 			this.parameters = parameters;
-			this.object = new Object();
 		}
 
 		@Override
-		public Object caseAstExpression(AstExpression astExpression) {
+		public Void caseAstExpression(
+				AstExpression astExpression) {
 			ExprTransformer transformer = new ExprTransformer(procedure, nodes);
 			Expression expression = transformer.doSwitch(astExpression);
 			parameters.add(expression);
-
-			return object;
+			return SwitchUtil.DONE;
 		}
 
 		@Override
-		public Object caseExpressionBinary(ExpressionBinary astExpression) {
+		public Void caseExpressionBinary(
+				ExpressionBinary astExpression) {
 			OpBinary op = OpBinary.getOperator(astExpression.getOperator());
 			if (op == OpBinary.PLUS) {
 				doSwitch(astExpression.getLeft());
@@ -110,20 +110,19 @@ public class StmtTransformer extends CalSwitch<EObject> {
 						.getRight());
 				parameters.add(expression);
 
-				return object;
+				return SwitchUtil.DONE;
 			}
 
-			// fall back to general case
-			return null;
+			return SwitchUtil.CASCADE;
 		}
 
 	}
 
-	private List<Block> nodes;
+	private final List<Block> nodes;
 
 	private Procedure print;
 
-	private Procedure procedure;
+	private final Procedure procedure;
 
 	/**
 	 * Creates a new AST to IR transformer, which will append instructions and
