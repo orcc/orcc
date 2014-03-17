@@ -153,7 +153,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 					Signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_din    :  STD_LOGIC_VECTOR («instance.outgoingPortMap.
 			get(portout).head.fifoTypeOut.sizeInBits - 1» downto 0);
 					Signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_full_n :  STD_LOGIC;
-					«instance.outgoingPortMap.get(portout).head.fifoName»_V_write  :  STD_LOGIC;
+					Signal «instance.outgoingPortMap.get(portout).head.fifoName»_V_write  :  STD_LOGIC;
 				«ELSE»
 					Signal «connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
 					Signal «connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
