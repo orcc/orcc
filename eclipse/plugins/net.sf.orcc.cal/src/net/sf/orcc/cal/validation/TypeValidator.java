@@ -166,7 +166,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
 		checkTypeBinary(op, Typer.getType(expression.getLeft()),
 				Typer.getType(expression.getRight()), expression,
-				eINSTANCE.getExpressionBinary_Operator(), -1);
+				eINSTANCE.getExpressionBinary_Operator());
 	}
 
 	@Check(CheckType.NORMAL)
@@ -178,7 +178,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		if (function.getParameters().size() != parameters.size()) {
 			error("function " + name + " takes "
 					+ function.getParameters().size() + " arguments.", call,
-					eINSTANCE.getExpressionCall_Function(), -1);
+					eINSTANCE.getExpressionCall_Function());
 			return;
 		}
 
@@ -205,7 +205,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		Type type = Typer.getType(expression.getCondition());
 		if (type == null || !type.isBool()) {
 			error("Cannot convert " + type + " to bool", expression,
-					eINSTANCE.getExpressionElsif_Condition(), -1);
+					eINSTANCE.getExpressionElsif_Condition());
 		}
 	}
 
@@ -214,7 +214,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		Type type = Typer.getType(expression.getCondition());
 		if (type == null || !type.isBool()) {
 			error("Cannot convert " + print(type) + " to bool", expression,
-					eINSTANCE.getExpressionIf_Condition(), -1);
+					eINSTANCE.getExpressionIf_Condition());
 		}
 
 		Type typeThen = Typer.getType(expression.getThen());
@@ -235,8 +235,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		type = TypeUtil.getLub(type, typeElse);
 		if (type == null) {
 			error("Type mismatch: cannot convert " + print(typeElse) + " to "
-					+ print(type), expression,
-					eINSTANCE.getExpressionIf_Else(), -1);
+					+ print(type), expression, eINSTANCE.getExpressionIf_Else());
 		}
 	}
 
@@ -258,7 +257,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 				}
 			} else {
 				error("Cannot convert " + print(type) + " to List", expression,
-						eINSTANCE.getExpressionIndex_Source(), -1);
+						eINSTANCE.getExpressionIndex_Source());
 			}
 			errorIdx++;
 		}
@@ -297,12 +296,12 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		case NUM_ELTS:
 			if (!type.isList()) {
 				error("Cannot convert " + print(type) + " to List", expression,
-						eINSTANCE.getExpressionUnary_Expression(), -1);
+						eINSTANCE.getExpressionUnary_Expression());
 			}
 			break;
 		default:
 			error("Unknown unary operator", expression,
-					eINSTANCE.getExpressionUnary_Expression(), -1);
+					eINSTANCE.getExpressionUnary_Expression());
 		}
 	}
 
@@ -319,7 +318,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		if (!TypeUtil.isConvertibleTo(expressionType, returnType)) {
 			error("Type mismatch: cannot convert from " + print(expressionType)
 					+ " to " + print(returnType), function,
-					eINSTANCE.getFunction_Expression(), -1);
+					eINSTANCE.getFunction_Expression());
 		}
 	}
 
@@ -352,7 +351,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			if (!TypeUtil.isConvertibleTo(type, targetType)) {
 				error("Type mismatch: cannot convert from " + print(type)
 						+ " to " + print(targetType), assign,
-						eINSTANCE.getStatementAssign_Value(), -1);
+						eINSTANCE.getStatementAssign_Value());
 			}
 		}
 	}
@@ -368,7 +367,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 				if (arguments.size() > 1) {
 					error("built-in procedure " + name
 							+ " takes at most one expression", call,
-							eINSTANCE.getStatementCall_Procedure(), -1);
+							eINSTANCE.getStatementCall_Procedure());
 				}
 			}
 
@@ -378,7 +377,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		if (procedure.getParameters().size() != arguments.size()) {
 			error("procedure " + name + " takes "
 					+ procedure.getParameters().size() + " arguments.", call,
-					eINSTANCE.getStatementCall_Procedure(), -1);
+					eINSTANCE.getStatementCall_Procedure());
 			return;
 		}
 
@@ -407,7 +406,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 				IrFactory.eINSTANCE.createTypeBool())) {
 			error("Type mismatch: cannot convert from " + print(type)
 					+ " to bool", elsIf,
-					eINSTANCE.getStatementElsif_Condition(), -1);
+					eINSTANCE.getStatementElsif_Condition());
 		}
 	}
 
@@ -429,7 +428,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 				IrFactory.eINSTANCE.createTypeBool())) {
 			error("Type mismatch: cannot convert from " + print(type)
 					+ " to bool", stmtWhile,
-					eINSTANCE.getStatementWhile_Condition(), -1);
+					eINSTANCE.getStatementWhile_Condition());
 		}
 	}
 
@@ -449,7 +448,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	 *            feature
 	 */
 	private void checkTypeBinary(OpBinary op, Type t1, Type t2, EObject source,
-			EStructuralFeature feature, int index) {
+			EStructuralFeature feature) {
 		if (t1 == null || t2 == null) {
 			return;
 		}
@@ -458,11 +457,11 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		case BITAND:
 			if (!t1.isInt() && !t1.isUint()) {
 				error("Cannot convert " + print(t1) + " to int/uint", source,
-						feature, index);
+						feature);
 			}
 			if (!t2.isInt() && !t2.isUint()) {
 				error("Cannot convert " + print(t2) + " to int/uint", source,
-						feature, index);
+						feature);
 			}
 			break;
 
@@ -470,33 +469,33 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		case BITXOR:
 			if (!t1.isInt() && !t1.isUint()) {
 				error("Cannot convert " + print(t1) + " to int/uint", source,
-						feature, index);
+						feature);
 			}
 			if (!t2.isInt() && !t2.isUint()) {
 				error("Cannot convert " + print(t2) + " to int/uint", source,
-						feature, index);
+						feature);
 			}
 			break;
 
 		case TIMES:
 			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
 				error("Cannot convert " + print(t1) + " to int/uint/float",
-						source, feature, index);
+						source, feature);
 			}
 			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
 				error("Cannot convert " + print(t2) + " to int/uint/float",
-						source, feature, index);
+						source, feature);
 			}
 			break;
 
 		case MINUS:
 			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
 				error("Cannot convert " + print(t1) + " to int/uint/float",
-						source, feature, index);
+						source, feature);
 			}
 			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
 				error("Cannot convert " + print(t2) + " to int/uint/float",
-						source, feature, index);
+						source, feature);
 			}
 			break;
 
@@ -510,8 +509,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 						feature, index);
 			}
 			if (t1.isBool() && !t2.isString() || !t1.isString() && t2.isBool()) {
-				error("Addition is not defined for booleans", source, feature,
-						index);
+				error("Addition is not defined for booleans", source, feature);
 			}
 			break;
 
@@ -520,33 +518,33 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		case SHIFT_RIGHT:
 			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
 				error("Cannot convert " + print(t1) + " to int/uint/float",
-						source, feature, index);
+						source, feature);
 			}
 			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
 				error("Cannot convert " + print(t2) + " to int/uint/float",
-						source, feature, index);
+						source, feature);
 			}
 			break;
 
 		case MOD:
 			if (!t1.isInt() && !t1.isUint()) {
 				error("Cannot convert " + print(t1) + " to int/uint", source,
-						feature, index);
+						feature);
 			}
 			if (!t2.isInt() && !t2.isUint()) {
 				error("Cannot convert " + print(t2) + " to int/uint", source,
-						feature, index);
+						feature);
 			}
 			break;
 
 		case SHIFT_LEFT:
 			if (!t1.isInt() && !t1.isUint()) {
 				error("Cannot convert " + print(t1) + " to int/uint", source,
-						feature, index);
+						feature);
 			}
 			if (!t2.isInt() && !t2.isUint()) {
 				error("Cannot convert " + print(t2) + " to int/uint", source,
-						feature, index);
+						feature);
 			}
 			break;
 
@@ -559,23 +557,23 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			Type type = TypeUtil.getLub(t1, t2);
 			if (type == null) {
 				error("Incompatible operand types " + print(t1) + " and "
-						+ print(t2), source, feature, index);
+						+ print(t2), source, feature);
 			}
 			break;
 
 		case EXP:
-			error("Operator ** not implemented", source, feature, index);
+			error("Operator ** not implemented", source, feature);
 			break;
 
 		case LOGIC_AND:
 		case LOGIC_OR:
 			if (!t1.isBool()) {
 				error("Cannot convert " + print(t1) + " to bool", source,
-						feature, index);
+						feature);
 			}
 			if (!t2.isBool()) {
 				error("Cannot convert " + print(t2) + " to bool", source,
-						feature, index);
+						feature);
 			}
 			break;
 
@@ -592,7 +590,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			if (value <= 0) {
 				error("This size must evaluate to a compile-time "
 						+ "constant greater than zero", type,
-						eINSTANCE.getAstTypeInt_Size(), -1);
+						eINSTANCE.getAstTypeInt_Size());
 			}
 		}
 	}
@@ -605,7 +603,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			if (value <= 0) {
 				error("This size must evaluate to a compile-time "
 						+ "constant greater than zero", type,
-						eINSTANCE.getAstTypeList_Size(), -1);
+						eINSTANCE.getAstTypeList_Size());
 			}
 		}
 	}
@@ -618,7 +616,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			if (value <= 0) {
 				error("This size must evaluate to a compile-time "
 						+ "constant greater than zero", type,
-						eINSTANCE.getAstTypeUint_Size(), -1);
+						eINSTANCE.getAstTypeUint_Size());
 			}
 		}
 	}
@@ -633,7 +631,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			if (!TypeUtil.isConvertibleTo(type, targetType)) {
 				error("Type mismatch: cannot convert from " + print(type)
 						+ " to " + print(targetType), variable,
-						eINSTANCE.getVariable_Value(), -1);
+						eINSTANCE.getVariable_Value());
 			}
 		}
 	}
