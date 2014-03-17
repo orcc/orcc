@@ -92,8 +92,8 @@ class InstancePrinter extends CTemplate {
 	protected var boolean isActionAligned = false
 	protected var boolean checkArrayInbounds = false
 
-	var boolean newSchedul = false
-	var boolean ringTopology = false
+	protected var boolean newSchedul = false
+	protected var boolean ringTopology = false
 
 	protected var boolean enableTrace = false
 	var String traceFolder
