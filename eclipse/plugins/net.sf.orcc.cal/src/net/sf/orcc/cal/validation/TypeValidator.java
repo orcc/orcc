@@ -361,11 +361,11 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	public void checkStatementCall(StatementCall call) {
 		AstProcedure procedure = call.getProcedure();
 		String name = procedure.getName();
-		List<AstExpression> parameters = call.getParameters();
+		List<AstExpression> arguments = call.getArguments();
 
 		if (procedure.eContainer() == null) {
 			if ("print".equals(name) || "println".equals(name)) {
-				if (parameters.size() > 1) {
+				if (arguments.size() > 1) {
 					error("built-in procedure " + name
 							+ " takes at most one expression", call,
 							eINSTANCE.getStatementCall_Procedure(), -1);
@@ -375,7 +375,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
-		if (procedure.getParameters().size() != parameters.size()) {
+		if (procedure.getParameters().size() != arguments.size()) {
 			error("procedure " + name + " takes "
 					+ procedure.getParameters().size() + " arguments.", call,
 					eINSTANCE.getStatementCall_Procedure(), -1);
@@ -383,7 +383,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		}
 
 		Iterator<Variable> itFormal = procedure.getParameters().iterator();
-		Iterator<AstExpression> itActual = parameters.iterator();
+		Iterator<AstExpression> itActual = arguments.iterator();
 		int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
 			Type formalType = Typer.getType(itFormal.next());
@@ -394,7 +394,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
 				error("Type mismatch: cannot convert from " + print(actualType)
 						+ " to " + print(formalType), call,
-						eINSTANCE.getStatementCall_Parameters(), index);
+						eINSTANCE.getStatementCall_Arguments(), index);
 			}
 			index++;
 		}

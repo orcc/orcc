@@ -175,7 +175,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// transform parameters
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
-				nodes, stmtCall.getParameters());
+				nodes, stmtCall.getArguments());
 
 		// add call
 		InstCall call = eINSTANCE.createInstCall(lineNumber, null, calledProc,
@@ -345,19 +345,19 @@ public class StmtTransformer extends CalSwitch<EObject> {
 				Frontend.getProcedures(entity).add(print);
 			}
 
-			List<AstExpression> astParameters = stmtCall.getParameters();
-			List<Expression> parameters = new ArrayList<Expression>(7);
-			if (!astParameters.isEmpty()) {
-				AstExpression astExpression = astParameters.get(0);
-				new PrintlnTransformer(parameters).doSwitch(astExpression);
+			List<AstExpression> astArguments = stmtCall.getArguments();
+			List<Expression> arguments = new ArrayList<Expression>(7);
+			if (!astArguments.isEmpty()) {
+				AstExpression astExpression = astArguments.get(0);
+				new PrintlnTransformer(arguments).doSwitch(astExpression);
 			}
 
 			if ("println".equals(name)) {
-				parameters.add(eINSTANCE.createExprString("\\n"));
+				arguments.add(eINSTANCE.createExprString("\\n"));
 			}
 
 			InstCall call = eINSTANCE.createInstCall(lineNumber, null, print,
-					parameters);
+					arguments);
 			IrUtil.getLast(nodes).add(call);
 		}
 	}
