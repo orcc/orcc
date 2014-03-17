@@ -53,6 +53,7 @@ import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
@@ -100,6 +101,8 @@ public class COMPABackend extends CBackend {
 //
 //			copyFileToFilesystem("/runtime/C/README.txt", path + File.separator
 //					+ "README.txt", debug);
+			
+			
 
 			OrccLogger.trace("Export libraries sources into " + libsPath
 					+ "... ");
@@ -127,7 +130,7 @@ public class COMPABackend extends CBackend {
 
 			OrccLogger.trace("Export cmake modules into "
 					+ path + "... ");
-			final boolean cmakeModOk = copyFolderToFileSystem("/runtime/COMPA/cmake",
+			final boolean cmakeModOk = copyFolderToFileSystem("/runtime/COMPA",
 					path, debug);
 			if (cmakeModOk) {
 				OrccLogger.traceRaw("OK" + "\n");
@@ -217,7 +220,15 @@ public class COMPABackend extends CBackend {
 
 		// print instances
 		printChildren(network);
-
+		
+		// Print fifo allocation file into the orcc lib source folder.
+		OrccLogger.trace("Printing the fifo allocation file... ");
+		if (new NetworkPrinter(network, options).printFifoFile(path + "/libs/orcc/src") > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+		OrccLogger.traceRaw("Done\n");
+		}
+			
 		// print network
 //		OrccLogger.trace("Printing network... ");
 //		if (new NetworkPrinter(network, options).print(srcPath) > 0) {
@@ -242,6 +253,7 @@ public class COMPABackend extends CBackend {
 		OrccLogger.traceln("Print network meta-informations...");
 		new Mapping(network, mapping).print(srcPath);
 	}
+
 
 	@Override
 	protected boolean printInstance(Instance instance) {
