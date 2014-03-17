@@ -249,7 +249,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		for (AstExpression index : indexes) {
 			Type subType = Typer.getType(index);
 			if (type != null && type.isList()) {
-				if (subType != null && (subType.isInt() || subType.isUint())) {
+				if (subType.isInt() || subType.isUint()) {
 					type = ((TypeList) type).getType();
 				} else {
 					error("index must be an integer", expression,
@@ -315,7 +315,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	private void checkReturnType(Function function) {
 		Type returnType = Typer.getType(function);
 		Type expressionType = Typer.getType(function.getExpression());
-		if (!TypeUtil.isConvertibleTo(expressionType, returnType)) {
+		if (!TypeUtil.isConvertibleTo(expressionType, returnType)
+				&& expressionType != null) {
 			error("Type mismatch: cannot convert from " + print(expressionType)
 					+ " to " + print(returnType), function,
 					eINSTANCE.getFunction_Expression());
@@ -348,7 +349,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		AstExpression value = assign.getValue();
 		if (value != null) {
 			Type type = Typer.getType(value);
-			if (!TypeUtil.isConvertibleTo(type, targetType)) {
+			if (!TypeUtil.isConvertibleTo(type, targetType) && type != null) {
 				error("Type mismatch: cannot convert from " + print(type)
 						+ " to " + print(targetType), assign,
 						eINSTANCE.getStatementAssign_Value());
@@ -390,7 +391,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			Type actualType = Typer.getType(expression);
 
 			// check types
-			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
+			if (!TypeUtil.isConvertibleTo(actualType, formalType)
+					&& actualType != null) {
 				error("Type mismatch: cannot convert from " + print(actualType)
 						+ " to " + print(formalType), call,
 						eINSTANCE.getStatementCall_Arguments(), index);
@@ -403,7 +405,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	public void checkStatementElsif(StatementElsif elsIf) {
 		Type type = Typer.getType(elsIf.getCondition());
 		if (!TypeUtil.isConvertibleTo(type,
-				IrFactory.eINSTANCE.createTypeBool())) {
+				IrFactory.eINSTANCE.createTypeBool())
+				&& type != null) {
 			error("Type mismatch: cannot convert from " + print(type)
 					+ " to bool", elsIf,
 					eINSTANCE.getStatementElsif_Condition());
@@ -414,7 +417,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	public void checkStatementIf(StatementIf stmtIf) {
 		Type type = Typer.getType(stmtIf.getCondition());
 		if (!TypeUtil.isConvertibleTo(type,
-				IrFactory.eINSTANCE.createTypeBool())) {
+				IrFactory.eINSTANCE.createTypeBool())
+				&& type != null) {
 			error("Type mismatch: cannot convert from " + print(type)
 					+ " to bool", stmtIf, eINSTANCE.getStatementIf_Condition(),
 					-1);
@@ -425,7 +429,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	public void checkStatementWhile(StatementWhile stmtWhile) {
 		Type type = Typer.getType(stmtWhile.getCondition());
 		if (!TypeUtil.isConvertibleTo(type,
-				IrFactory.eINSTANCE.createTypeBool())) {
+				IrFactory.eINSTANCE.createTypeBool())
+				&& type != null) {
 			error("Type mismatch: cannot convert from " + print(type)
 					+ " to bool", stmtWhile,
 					eINSTANCE.getStatementWhile_Condition());
