@@ -90,7 +90,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		project («instance.simpleName»)
 
 		# Include the subdirectory where cmake modules can be found.
-		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake/Modules/")
 		
 «««		# Configure ouput folder for generated binary
 «««		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
