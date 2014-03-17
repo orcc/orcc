@@ -46,7 +46,7 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 		super(options)
 	}
 
-	def getFileContentBatchWrite(Port port) '''
+	def getFileContentBatch() '''
 		PATH=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin;%PATH%;D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\msys\bin
 		set AUTOESL_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
 		set VIVADO_HLS_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
@@ -65,9 +65,12 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 					«IF instance.incomingPortMap.get(portIN).sourcePort != null»
 						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write.tcl
 					«ENDIF»
+				«ENDFOR»		
+				«FOR portout : instance.getActor.outputs.filter[! native]»			
+					«IF instance.outgoingPortMap.get(portout).head.targetPort != null»
+						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read.tcl					
+					«ENDIF»
 				«ENDFOR»
-		
-		
 		
 		copy %cd%\TopVHDL\sim_package.vhd %cd%\«instance.name»TopVHDL
 		copy %cd%\TopVHDL\ram_tab.vhd %cd%\«instance.name»TopVHDL
@@ -76,77 +79,33 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 			copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
 			
 			«FOR portIN : instance.getActor.inputs»
-					«IF instance.incomingPortMap.get(portIN).sourcePort != null»
-						copy %cd%\subProject_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
-					«ENDIF»
-				«ENDFOR»
-			
-		
-	'''
-
-	def getFileContentBatchRead(Port port) '''
-		PATH=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin;%PATH%;D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\msys\bin
-		set AUTOESL_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
-		set VIVADO_HLS_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
-		
-		if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
-		set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
-		goto START
-		:_NotX64
-		set COMSPEC=%WINDIR%\System32\cmd.exe
-		:START
-		
-			cd ..
-				
-			%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
+				«IF instance.incomingPortMap.get(portIN).sourcePort != null»
+					copy %cd%\subProject_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write\solution1\syn\vhdl %cd%\«instance.
+			name»TopVHDL
+				«ENDIF»
+			«ENDFOR»
 			«FOR portout : instance.getActor.outputs.filter[! native]»
 				
 					«IF instance.outgoingPortMap.get(portout).head.targetPort != null»
-					%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read.tcl
-					
-			«ENDIF»
-			«ENDFOR»
-		
-		
-		
-		copy %cd%\TopVHDL\sim_package.vhd %cd%\«instance.name»TopVHDL
-		copy %cd%\TopVHDL\ram_tab.vhd %cd%\«instance.name»TopVHDL
-		
-		
-			copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
-							
-				«FOR portout : instance.getActor.outputs.filter[! native]»
-				
-					«IF instance.outgoingPortMap.get(portout).head.targetPort != null»
-					copy %cd%\subProject_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
-					
-			«ENDIF»
+						copy %cd%\subProject_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read\solution1\syn\vhdl %cd%\«instance.
+			name»TopVHDL
+						
+				«ENDIF»
 			«ENDFOR»
 			
 		
 	'''
 
 	override print(String targetFolder) {
+		val contentNetwork = getFileContentBatch
+		val NetworkFile = new File(targetFolder + File::separator + "Command" + "_" + instance.name + ".bat")
 
-		for (portIN : instance.getActor.inputs) {
-			if (instance.incomingPortMap.get(portIN).sourcePort != null) {
-				OrccUtil::printFile(getFileContentBatchWrite(portIN),
-					new File(targetFolder + File::separator + "Command" + "_" + instance.name + ".bat"))
-
-			}
+		if (needToWriteFile(contentNetwork, NetworkFile)) {
+			OrccUtil::printFile(contentNetwork, NetworkFile)
+			return 0
+		} else {
+			return 1
 		}
-		for (portout : instance.getActor.outputs.filter[! native]) {
-
-			//for (connection : instance.outgoingPortMap.get(portout)) {
-			if (instance.outgoingPortMap.get(portout).head.targetPort != null) {
-				OrccUtil::printFile(getFileContentBatchRead(portout),
-					new File(targetFolder + File::separator + "Command" + "_" + instance.name + ".bat"))
-
-			}
-
-		//}
-		}
-		return 0
 	}
 
 }
