@@ -198,6 +198,7 @@ public class HLSBackend extends CBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
+	
 
 	}
 
@@ -209,6 +210,7 @@ public class HLSBackend extends CBackend {
 		new InstancePrinterCast(options).print(srcPath, instance);
 		new ActorTopVhdlPrinter(options).print(srcPath, instance);
 		new ActorNetworkTestBenchPrinter(options).print(srcPath, instance);
+		new UnitaryBatchCommandPrinter(options).print(commandPath, instance);
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
 		
 	}

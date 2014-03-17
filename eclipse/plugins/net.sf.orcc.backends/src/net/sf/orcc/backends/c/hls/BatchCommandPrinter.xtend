@@ -49,9 +49,9 @@ import java.io.File
 	}
 
 	override getNetworkFileContent()'''
-		PATH=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin;%PATH%;D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\msys\bin
-		set AUTOESL_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
-		set VIVADO_HLS_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
+		PATH=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin;%PATH%;D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\msys\bin
+		set AUTOESL_HOME=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin
+		set VIVADO_HLS_HOME=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin
 		
 		if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
 		set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
@@ -59,11 +59,11 @@ import java.io.File
 		:_NotX64
 		set COMSPEC=%WINDIR%\System32\cmd.exe
 		:START
-		
+		cd ..
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			cd ..
+			
 			%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
-			%COMSPEC% /C vivado_hls -p subProject_«instance.name»
+			
 		«ENDFOR»
 		
 		

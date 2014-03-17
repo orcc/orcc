@@ -245,18 +245,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 
 	//&& (512 - «instance.outgoingPortMap.get(port).head.localwName» + «instance.outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)			
-	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''
-					
-	«IF instance.outgoingPortMap.get(port).head.targetPort == null»
-		«IF !instance.outgoingPortMap.get(port).head.fifoName.toString.empty»
-			&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())
+	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''		
+		«IF outgoingPortMap.get(port).head.targetPort == null»
+			&& (! «outgoingPortMap.get(port).head.fifoName».full())
+		«ELSE»
+			&& (512 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)
 		«ENDIF»
-	«ELSE»
-		
-		&& (512 - «instance.outgoingPortMap.get(port).head.localwName» + «instance.outgoingPortMap.get(port).head.rName»[0] >= «pattern.
-		getNumTokens(port)»)	
-						
-	«ENDIF»'''
+	'''
 
 	//«instance.incomingPortMap.get(port).wName»[0] - «instance.incomingPortMap.get(port).localrName» >= «pattern.getNumTokens(port)»  &&
 	override checkInputPattern(Pattern pattern) '''«FOR port : pattern.ports»
@@ -456,6 +451,12 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
 			if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»()) {
+				«instance.name»_«transitions.action.body.name»();
+				_FSM_state = my_state_«transitions.target.name»;
+				goto finished;
+			
+			}
+			if (isSchedulable_«transitions.action.name»()«transitions.action.outputPattern.printOutputPattern») {
 				«instance.name»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;
