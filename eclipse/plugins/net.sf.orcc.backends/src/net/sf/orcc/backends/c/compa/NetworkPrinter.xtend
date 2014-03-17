@@ -30,6 +30,8 @@ package net.sf.orcc.backends.c.compa
 
 import java.util.Map
 import net.sf.orcc.df.Network
+import java.io.File
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate and print network source file for COMPA backend.
@@ -117,4 +119,39 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		}
 	'''
 
+	def printFifoFile(String targetFolder){
+		val content = fifoFileContent
+		val file = new File(targetFolder + File::separator + "fifos.c")
+		
+		if(needToWriteFile(content, file)) {
+			OrccUtil::printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
+	}
+
+
+	def private getFifoFileContent()'''
+		// Generated from "«network.name»"
+
+		#include "types.h"
+		#include "fifo.h"
+		
+		#define SIZE «fifoSize»
+		// #define PRINT_FIRINGS
+
+		/////////////////////////////////////////////////
+		// FIFO allocation
+		«FOR child : network.children»
+			«child.allocateFifos»
+		«ENDFOR»
+		
+		/////////////////////////////////////////////////
+		// FIFO pointer assignments
+		«FOR child : network.children»
+			«child.assignFifo»
+		«ENDFOR»		
+		
+	'''
 }
