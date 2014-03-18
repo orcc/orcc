@@ -75,7 +75,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 	/**
 	 * Creates a new AST to IR transformer, which will append instructions and
-	 * nodes to the given procedure.
+	 * blocks to the given procedure.
 	 * 
 	 * @param procedure
 	 *            a procedure
@@ -292,7 +292,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	}
 
 	/**
-	 * Transforms the given AST statements to IR instructions and/or nodes that
+	 * Transforms the given AST statements to IR instructions and/or blocks that
 	 * are added directly to the current {@link #procedure}.
 	 * 
 	 * @param statements

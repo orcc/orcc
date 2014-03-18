@@ -80,15 +80,15 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class transforms an AST expression into one or more IR instructions
- * and/or nodes, and returns an IR expression. The main idea is that an
+ * and/or blocks, and returns an IR expression. The main idea is that an
  * expression will assign to a target with indexes unless target is
  * <code>null</code>. So simple arithmetic (binary and unary) sub-expressions
  * are translated with target set to <code>null</code> to avoid further
  * assignments.
  * 
  * <p>
- * The assignments are appended to the given List of Node called
- * <code>nodes</code>. The Procedure passed as a parameter is used for lookup
+ * The assignments are appended to the given List of block called
+ * <code>blocks</code>. The Procedure passed as a parameter is used for lookup
  * and creation of local variables.
  * </p>
  * 
@@ -99,68 +99,68 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 	private List<Expression> indexes;
 
-	private List<Block> nodes;
+	private final List<Block> blocks;
 
-	private Procedure procedure;
+	private final Procedure procedure;
 
 	private Var target;
 
 	/**
-	 * Creates a new transformer with the given procedure and nodes, and with a
+	 * Creates a new transformer with the given procedure and blocks, and with a
 	 * <code>null</code> target. To be used as a last resort (or when the target
 	 * is unknown, e.g. condition of if and while statements, expression of a
 	 * function).
 	 * 
 	 * @param procedure
 	 *            procedure in which the expression is transformed
-	 * @param nodes
-	 *            a list of nodes to which instructions and other nodes may be
-	 *            appended. In general, this is a subset of the procedure's node
-	 *            list.
+	 * @param blocks
+	 *            a list of blocks to which instructions and other blocks may be
+	 *            appended. In general, this is a subset of the procedure's
+	 *            block list.
 	 */
-	public ExprTransformer(Procedure procedure, List<Block> nodes) {
-		this(procedure, nodes, null);
+	public ExprTransformer(Procedure procedure, List<Block> blocks) {
+		this(procedure, blocks, null);
 	}
 
 	/**
-	 * Creates a new transformer with the given procedure, nodes, and target. To
-	 * be used when the expression to be translated is to be assigned to the
+	 * Creates a new transformer with the given procedure, blocks, and target.
+	 * To be used when the expression to be translated is to be assigned to the
 	 * target without indexes.
 	 * 
 	 * @param procedure
 	 *            procedure in which the expression is transformed
-	 * @param nodes
-	 *            a list of nodes to which instructions and other nodes may be
-	 *            appended. In general, this is a subset of the procedure's node
-	 *            list.
+	 * @param blocks
+	 *            a list of blocks to which instructions and other blocks may be
+	 *            appended. In general, this is a subset of the procedure's
+	 *            block list.
 	 * @param target
 	 *            the variable to which the expression should be assigned
 	 */
-	public ExprTransformer(Procedure procedure, List<Block> nodes, Var target) {
-		this(procedure, nodes, target, null);
+	public ExprTransformer(Procedure procedure, List<Block> blocks, Var target) {
+		this(procedure, blocks, target, null);
 	}
 
 	/**
-	 * Creates a new transformer with the given procedure, nodes, target, and
+	 * Creates a new transformer with the given procedure, blocks, target, and
 	 * indexes. To be used when the expression to be translated is to be
 	 * assigned to the target with indexes.
 	 * 
 	 * @param procedure
 	 *            procedure in which the expression is transformed
-	 * @param nodes
-	 *            a list of nodes to which instructions and other nodes may be
-	 *            appended. In general, this is a subset of the procedure's node
-	 *            list.
+	 * @param blocks
+	 *            a list of blocks to which instructions and other blocks may be
+	 *            appended. In general, this is a subset of the procedure's
+	 *            block list.
 	 * @param target
 	 *            the variable to which the expression should be assigned
 	 * @param indexes
 	 *            a list of expression to use when creating assignments (Store
 	 *            instructions) to the target
 	 */
-	public ExprTransformer(Procedure procedure, List<Block> nodes, Var target,
+	public ExprTransformer(Procedure procedure, List<Block> blocks, Var target,
 			List<Expression> indexes) {
 		this.procedure = procedure;
-		this.nodes = nodes;
+		this.blocks = blocks;
 		this.target = target;
 		this.indexes = indexes;
 	}
@@ -168,9 +168,9 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	@Override
 	public Expression caseExpressionBinary(ExpressionBinary expression) {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		Expression e1 = new ExprTransformer(procedure, nodes)
+		Expression e1 = new ExprTransformer(procedure, blocks)
 				.doSwitch(expression.getLeft());
-		Expression e2 = new ExprTransformer(procedure, nodes)
+		Expression e2 = new ExprTransformer(procedure, blocks)
 				.doSwitch(expression.getRight());
 
 		Expression value = eINSTANCE.createExprBinary(e1, op, e2,
@@ -193,7 +193,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 		// transform parameters
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
-				nodes, exprCall.getParameters());
+				blocks, exprCall.getParameters());
 
 		// set call target and add call
 		Var callTarget = getScalar(calledProc.getReturnType(),
@@ -201,7 +201,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		InstCall call = eINSTANCE.createInstCall(lineNumber, callTarget,
 				calledProc, parameters);
 		Util.transformAnnotations(call, exprCall.getAnnotations());
-		IrUtil.getLast(nodes).add(call);
+		IrUtil.getLast(blocks).add(call);
 
 		// return expr
 		if (callTarget != target) {
@@ -215,16 +215,16 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	@Override
 	public Expression caseExpressionIf(ExpressionIf expression) {
 		int lineNumber = Util.getLocation(expression);
-		Expression condition = new ExprTransformer(procedure, nodes)
+		Expression condition = new ExprTransformer(procedure, blocks)
 				.doSwitch(expression.getCondition());
 
 		// transforms "then" statements and "else" statements
-		BlockIf node = eINSTANCE.createBlockIf();
-		node.setJoinBlock(eINSTANCE.createBlockBasic());
-		node.setLineNumber(lineNumber);
-		node.setCondition(condition);
+		BlockIf blockIf = eINSTANCE.createBlockIf();
+		blockIf.setJoinBlock(eINSTANCE.createBlockBasic());
+		blockIf.setLineNumber(lineNumber);
+		blockIf.setCondition(condition);
 
-		nodes.add(node);
+		blocks.add(blockIf);
 
 		Var ifTarget;
 		if (target == null) {
@@ -235,12 +235,12 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		}
 
 		// transforms "then" expression
-		new ExprTransformer(procedure, node.getThenBlocks(), ifTarget, indexes)
+		new ExprTransformer(procedure, blockIf.getThenBlocks(), ifTarget, indexes)
 				.doSwitch(expression.getThen());
 
 		// add elsif expressions
 		for (ExpressionElsif elsif : expression.getElsifs()) {
-			condition = new ExprTransformer(procedure, node.getElseBlocks())
+			condition = new ExprTransformer(procedure, blockIf.getElseBlocks())
 					.doSwitch(elsif.getCondition());
 
 			// creates inner if
@@ -252,12 +252,12 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			new ExprTransformer(procedure, innerIf.getThenBlocks(), ifTarget,
 					indexes).doSwitch(elsif.getThen());
 
-			// adds elsif to node's else nodes, and assign elsif to node
-			node.getElseBlocks().add(innerIf);
-			node = innerIf;
+			// adds elsif to block's else blocks, and assign elsif to block
+			blockIf.getElseBlocks().add(innerIf);
+			blockIf = innerIf;
 		}
 
-		new ExprTransformer(procedure, node.getElseBlocks(), ifTarget, indexes)
+		new ExprTransformer(procedure, blockIf.getElseBlocks(), ifTarget, indexes)
 				.doSwitch(expression.getElse());
 
 		// return expr
@@ -276,13 +276,13 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		Var var = Frontend.getMapping(variable);
 
 		List<Expression> indexes = AstIrUtil.transformExpressions(procedure,
-				nodes, expression.getIndexes());
+				blocks, expression.getIndexes());
 
 		// set load target and add load
 		Var loadTarget = getScalar(Typer.getType(expression), var.getName());
 		InstLoad load = eINSTANCE.createInstLoad(lineNumber, loadTarget, var,
 				indexes);
-		IrUtil.getLast(nodes).add(load);
+		IrUtil.getLast(blocks).add(load);
 
 		// return expr
 		if (loadTarget != target) {
@@ -350,7 +350,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			return Evaluator.getValue(expression);
 		}
 
-		Expression expr = new ExprTransformer(procedure, nodes)
+		Expression expr = new ExprTransformer(procedure, blocks)
 				.doSwitch(expression.getExpression());
 		Expression value = eINSTANCE.createExprUnary(op, expr,
 				Typer.getType(expression));
@@ -394,7 +394,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 								"local_" + global.getName());
 					}
 					InstLoad load = eINSTANCE.createInstLoad(var, global);
-					IrUtil.getLast(nodes).add(load);
+					IrUtil.getLast(blocks).add(load);
 				}
 			}
 
@@ -414,7 +414,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 */
 	private Expression copyList(Var var) {
 		TypeList typeList = (TypeList) target.getType();
-		List<Block> nodes = this.nodes;
+		List<Block> blocks = this.blocks;
 		List<BlockWhile> whiles = new ArrayList<BlockWhile>();
 		List<Var> loopVars = new ArrayList<Var>();
 		List<Expression> indexes = new ArrayList<Expression>();
@@ -425,31 +425,31 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			loopVars.add(loopVar);
 			InstAssign assign = eINSTANCE.createInstAssign(loopVar,
 					eINSTANCE.createExprInt(0));
-			IrUtil.getLast(nodes).add(assign);
+			IrUtil.getLast(blocks).add(assign);
 
 			// add index
 			indexes.add(eINSTANCE.createExprVar(loopVar));
 
-			// create while node
+			// create while block
 			Expression condition = eINSTANCE.createExprBinary(
 					eINSTANCE.createExprVar(loopVar), OpBinary.LT,
 					eINSTANCE.createExprInt(size), eINSTANCE.createTypeBool());
 
-			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
-			nodeWhile.setCondition(condition);
-			whiles.add(nodeWhile);
+			BlockWhile blockWhile = eINSTANCE.createBlockWhile();
+			blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
+			blockWhile.setCondition(condition);
+			whiles.add(blockWhile);
 
-			nodes.add(nodeWhile);
+			blocks.add(blockWhile);
 
-			nodes = nodeWhile.getBlocks();
+			blocks = blockWhile.getBlocks();
 		}
 
 		// load
 		Var loadTarget = procedure.newTempLocalVariable(
 				typeList.getInnermostType(), "local_" + var.getName());
 		InstLoad load = eINSTANCE.createInstLoad(0, loadTarget, var, indexes);
-		IrUtil.getLast(nodes).add(load);
+		IrUtil.getLast(blocks).add(load);
 
 		// store
 		if (this.indexes == null) {
@@ -459,7 +459,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		}
 		InstStore store = eINSTANCE.createInstStore(0, target, indexes,
 				eINSTANCE.createExprVar(loadTarget));
-		IrUtil.getLast(nodes).add(store);
+		IrUtil.getLast(blocks).add(store);
 
 		// add increments
 		int size = typeList.getDimensions().size();
@@ -503,7 +503,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 * indexes. Copies the indexes if necessary.
 	 * 
 	 * @param astObject
-	 *            an AST node used to get a location (line number)
+	 *            an AST block used to get a location (line number)
 	 * @param value
 	 *            an expression
 	 * @return <code>value</code> or <code>null</code>
@@ -541,7 +541,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			}
 		}
 
-		IrUtil.getLast(nodes).add(instruction);
+		IrUtil.getLast(blocks).add(instruction);
 		return null;
 	}
 
@@ -583,34 +583,34 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		indexes.add(index);
 
 		// build the loops
-		List<Block> nodes = this.nodes;
+		List<Block> blocks = this.blocks;
 		List<BlockWhile> whiles = new ArrayList<BlockWhile>();
 		for (Generator generator : generators) {
 			// assigns the loop variable its initial value
 			Var loopVar = Frontend.getMapping(generator.getVariable());
-			new ExprTransformer(procedure, nodes, loopVar).doSwitch(generator
+			new ExprTransformer(procedure, blocks, loopVar).doSwitch(generator
 					.getLower());
 
 			// condition
-			Expression higher = new ExprTransformer(procedure, nodes)
+			Expression higher = new ExprTransformer(procedure, blocks)
 					.doSwitch(generator.getHigher());
 			Expression condition = eINSTANCE.createExprBinary(
 					eINSTANCE.createExprVar(loopVar), OpBinary.LE, higher,
 					eINSTANCE.createTypeBool());
 
 			// create while
-			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
-			nodeWhile.setCondition(condition);
-			whiles.add(nodeWhile);
+			BlockWhile blockWhile = eINSTANCE.createBlockWhile();
+			blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
+			blockWhile.setCondition(condition);
+			whiles.add(blockWhile);
 
-			nodes.add(nodeWhile);
+			blocks.add(blockWhile);
 
-			nodes = nodeWhile.getBlocks();
+			blocks = blockWhile.getBlocks();
 		}
 
-		// translates the expression (add to the innermost nodes)
-		ExprTransformer tfer = new ExprTransformer(procedure, nodes, target,
+		// translates the expression (add to the innermost blocks)
+		ExprTransformer tfer = new ExprTransformer(procedure, blocks, target,
 				indexes);
 		for (AstExpression astExpression : expressions) {
 			tfer.doSwitch(astExpression);
@@ -643,7 +643,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			List<Expression> newIndexes = new ArrayList<Expression>(indexes);
 			newIndexes.add(eINSTANCE.createExprInt(i));
 
-			new ExprTransformer(procedure, nodes, target, newIndexes)
+			new ExprTransformer(procedure, blocks, target, newIndexes)
 					.doSwitch(expression);
 
 			i++;

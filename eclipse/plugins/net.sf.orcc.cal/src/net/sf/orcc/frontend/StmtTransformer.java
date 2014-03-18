@@ -58,19 +58,20 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.SwitchUtil;
+import net.sf.orcc.util.Void;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
 
 /**
  * This class transforms an AST statement into one or more IR instructions
- * and/or nodes. It returns null because it appends the instructions/nodes
- * directly to the {@link #nodes} field.
+ * and/or blocks. It returns null because it appends the instructions/blocks
+ * directly to the {@link #blocks} field.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class StmtTransformer extends CalSwitch<EObject> {
+public class StmtTransformer extends CalSwitch<Void> {
 
 	/**
 	 * This class transforms the expression passed to a print/println procedure
@@ -79,66 +80,65 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class PrintlnTransformer extends CalSwitch<Object> {
+	private class PrintlnTransformer extends CalSwitch<Void> {
 
-		private Object object;
-
-		private List<Expression> parameters;
+		private final List<Expression> parameters;
 
 		public PrintlnTransformer(List<Expression> parameters) {
 			this.parameters = parameters;
-			this.object = new Object();
 		}
 
 		@Override
-		public Object caseAstExpression(AstExpression astExpression) {
-			ExprTransformer transformer = new ExprTransformer(procedure, nodes);
+		public Void caseAstExpression(
+				AstExpression astExpression) {
+			ExprTransformer transformer = new ExprTransformer(procedure, blocks);
 			Expression expression = transformer.doSwitch(astExpression);
 			parameters.add(expression);
-
-			return object;
+			return SwitchUtil.DONE;
 		}
 
 		@Override
-		public Object caseExpressionBinary(ExpressionBinary astExpression) {
+		public Void caseExpressionBinary(
+				ExpressionBinary astExpression) {
 			OpBinary op = OpBinary.getOperator(astExpression.getOperator());
 			if (op == OpBinary.PLUS) {
 				doSwitch(astExpression.getLeft());
 				ExprTransformer transformer = new ExprTransformer(procedure,
-						nodes);
+						blocks);
 				Expression expression = transformer.doSwitch(astExpression
 						.getRight());
 				parameters.add(expression);
 
-				return object;
+				return SwitchUtil.DONE;
 			}
 
-			// fall back to general case
-			return null;
+			return SwitchUtil.CASCADE;
 		}
 
 	}
 
-	private List<Block> nodes;
+	private final List<Block> blocks;
 
 	private Procedure print;
 
-	private Procedure procedure;
+	private final Procedure procedure;
 
 	/**
 	 * Creates a new AST to IR transformer, which will append instructions and
-	 * nodes to the given procedure.
+	 * blocks to the given procedure.
 	 * 
 	 * @param procedure
 	 *            a procedure
+	 * @param blocks
+	 * 
 	 */
-	public StmtTransformer(Procedure procedure, List<Block> nodes) {
+	public StmtTransformer(Procedure procedure, List<Block> blocks) {
 		this.procedure = procedure;
-		this.nodes = nodes;
+		this.blocks = blocks;
 	}
 
 	@Override
-	public EObject caseStatementAssign(StatementAssign assign) {
+	public Void caseStatementAssign(StatementAssign assign) {
 		// get target
 		Variable variable = assign.getTarget().getVariable();
 		Var target = Frontend.getMapping(variable);
@@ -148,18 +148,18 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		if (assign.getIndexes().isEmpty()) {
 			indexes = null;
 		} else {
-			indexes = AstIrUtil.transformExpressions(procedure, nodes,
+			indexes = AstIrUtil.transformExpressions(procedure, blocks,
 					assign.getIndexes());
 		}
 
-		new ExprTransformer(procedure, nodes, target, indexes).doSwitch(assign
+		new ExprTransformer(procedure, blocks, target, indexes).doSwitch(assign
 				.getValue());
 
 		return null;
 	}
 
 	@Override
-	public EObject caseStatementCall(StatementCall stmtCall) {
+	public Void caseStatementCall(StatementCall stmtCall) {
 		int lineNumber = Util.getLocation(stmtCall);
 
 		// retrieve IR procedure
@@ -175,12 +175,12 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// transform parameters
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
-				nodes, stmtCall.getParameters());
+				blocks, stmtCall.getArguments());
 
 		// add call
 		InstCall call = eINSTANCE.createInstCall(lineNumber, null, calledProc,
 				parameters);
-		IrUtil.getLast(nodes).add(call);
+		IrUtil.getLast(blocks).add(call);
 
 		// Add annotations
 		Util.transformAnnotations(call, stmtCall.getAnnotations());
@@ -188,7 +188,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	}
 
 	@Override
-	public EObject caseStatementForeach(StatementForeach foreach) {
+	public Void caseStatementForeach(StatementForeach foreach) {
 		int lineNumber = Util.getLocation(foreach);
 
 		// creates loop variable and assigns it
@@ -196,30 +196,30 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		Var loopVar = AstIrUtil.getLocalByName(procedure, variable);
 
 		AstExpression astLower = foreach.getLower();
-		new ExprTransformer(procedure, nodes, loopVar).doSwitch(astLower);
+		new ExprTransformer(procedure, blocks, loopVar).doSwitch(astLower);
 
 		// condition
 		AstExpression astHigher = foreach.getHigher();
-		Expression higher = new ExprTransformer(procedure, nodes)
+		Expression higher = new ExprTransformer(procedure, blocks)
 				.doSwitch(astHigher);
 		Expression condition = eINSTANCE.createExprBinary(
 				eINSTANCE.createExprVar(loopVar), OpBinary.LE, higher,
 				eINSTANCE.createTypeBool());
 
 		// create while
-		BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-		nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
-		nodeWhile.setLineNumber(lineNumber);
-		nodeWhile.setCondition(condition);
+		BlockWhile blockWhile = eINSTANCE.createBlockWhile();
+		blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
+		blockWhile.setLineNumber(lineNumber);
+		blockWhile.setCondition(condition);
 
-		nodes.add(nodeWhile);
+		blocks.add(blockWhile);
 
 		// body
-		new StmtTransformer(procedure, nodeWhile.getBlocks()).doSwitch(foreach
+		new StmtTransformer(procedure, blockWhile.getBlocks()).doSwitch(foreach
 				.getStatements());
 
 		// add increment
-		BlockBasic block = IrUtil.getLast(nodeWhile.getBlocks());
+		BlockBasic block = IrUtil.getLast(blockWhile.getBlocks());
 		InstAssign assign = eINSTANCE.createInstAssign(lineNumber, loopVar,
 				eINSTANCE.createExprBinary(eINSTANCE.createExprVar(loopVar),
 						OpBinary.PLUS, eINSTANCE.createExprInt(1),
@@ -227,36 +227,36 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		block.add(assign);
 
 		// Add annotations
-		Util.transformAnnotations(nodeWhile, foreach.getAnnotations());
+		Util.transformAnnotations(blockWhile, foreach.getAnnotations());
 
 		return null;
 	}
 
 	@Override
-	public EObject caseStatementIf(StatementIf stmtIf) {
+	public Void caseStatementIf(StatementIf stmtIf) {
 		int lineNumber = Util.getLocation(stmtIf);
 
-		Expression condition = new ExprTransformer(procedure, nodes)
+		Expression condition = new ExprTransformer(procedure, blocks)
 				.doSwitch(stmtIf.getCondition());
 
 		// creates if and adds it to procedure
-		BlockIf node = eINSTANCE.createBlockIf();
-		node.setJoinBlock(eINSTANCE.createBlockBasic());
-		node.setLineNumber(lineNumber);
-		node.setCondition(condition);
+		BlockIf blockIf = eINSTANCE.createBlockIf();
+		blockIf.setJoinBlock(eINSTANCE.createBlockBasic());
+		blockIf.setLineNumber(lineNumber);
+		blockIf.setCondition(condition);
 
-		nodes.add(node);
+		blocks.add(blockIf);
 
 		// Add annotations
-		Util.transformAnnotations(node, stmtIf.getAnnotations());
+		Util.transformAnnotations(blockIf, stmtIf.getAnnotations());
 
 		// transforms "then" statements
-		new StmtTransformer(procedure, node.getThenBlocks()).doSwitch(stmtIf
+		new StmtTransformer(procedure, blockIf.getThenBlocks()).doSwitch(stmtIf
 				.getThen());
 
 		// add elsif statements
 		for (StatementElsif elsif : stmtIf.getElsifs()) {
-			condition = new ExprTransformer(procedure, node.getElseBlocks())
+			condition = new ExprTransformer(procedure, blockIf.getElseBlocks())
 					.doSwitch(elsif.getCondition());
 
 			// creates inner if
@@ -268,45 +268,45 @@ public class StmtTransformer extends CalSwitch<EObject> {
 			new StmtTransformer(procedure, innerIf.getThenBlocks())
 					.doSwitch(elsif.getThen());
 
-			// adds elsif to node's else nodes, and assign elsif to node
-			node.getElseBlocks().add(innerIf);
-			node = innerIf;
+			// adds elsif to blocks's else blocks, and assign elsif to block
+			blockIf.getElseBlocks().add(innerIf);
+			blockIf = innerIf;
 		}
 
-		// add else nodes to current if
-		new StmtTransformer(procedure, node.getElseBlocks()).doSwitch(stmtIf
+		// add else blocks to current if
+		new StmtTransformer(procedure, blockIf.getElseBlocks()).doSwitch(stmtIf
 				.getElse());
 
 		return null;
 	}
 
 	@Override
-	public EObject caseStatementWhile(StatementWhile stmtWhile) {
+	public Void caseStatementWhile(StatementWhile stmtWhile) {
 		int lineNumber = Util.getLocation(stmtWhile);
 
 		// to track the instructions created when condition was transformed
-		List<Block> tempNodes = new ArrayList<Block>();
-		ExprTransformer transformer = new ExprTransformer(procedure, tempNodes);
+		List<Block> tempBlocks = new ArrayList<Block>();
+		ExprTransformer transformer = new ExprTransformer(procedure, tempBlocks);
 		Expression condition = transformer.doSwitch(stmtWhile.getCondition());
 
 		// create the while
-		BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-		nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
-		nodeWhile.setLineNumber(lineNumber);
-		nodeWhile.setCondition(condition);
+		BlockWhile blockWhile = eINSTANCE.createBlockWhile();
+		blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
+		blockWhile.setLineNumber(lineNumber);
+		blockWhile.setCondition(condition);
 
 		// the body
-		new StmtTransformer(procedure, nodeWhile.getBlocks())
+		new StmtTransformer(procedure, blockWhile.getBlocks())
 				.doSwitch(stmtWhile.getStatements());
 
 		// copy instructions
-		nodeWhile.getBlocks().addAll(IrUtil.copy(tempNodes));
+		blockWhile.getBlocks().addAll(IrUtil.copy(tempBlocks));
 
-		nodes.addAll(tempNodes);
-		nodes.add(nodeWhile);
+		blocks.addAll(tempBlocks);
+		blocks.add(blockWhile);
 
 		// Add annotations
-		Util.transformAnnotations(nodeWhile, stmtWhile.getAnnotations());
+		Util.transformAnnotations(blockWhile, stmtWhile.getAnnotations());
 
 		return null;
 	}
@@ -345,20 +345,20 @@ public class StmtTransformer extends CalSwitch<EObject> {
 				Frontend.getProcedures(entity).add(print);
 			}
 
-			List<AstExpression> astParameters = stmtCall.getParameters();
-			List<Expression> parameters = new ArrayList<Expression>(7);
-			if (!astParameters.isEmpty()) {
-				AstExpression astExpression = astParameters.get(0);
-				new PrintlnTransformer(parameters).doSwitch(astExpression);
+			List<AstExpression> astArguments = stmtCall.getArguments();
+			List<Expression> arguments = new ArrayList<Expression>(7);
+			if (!astArguments.isEmpty()) {
+				AstExpression astExpression = astArguments.get(0);
+				new PrintlnTransformer(arguments).doSwitch(astExpression);
 			}
 
 			if ("println".equals(name)) {
-				parameters.add(eINSTANCE.createExprString("\\n"));
+				arguments.add(eINSTANCE.createExprString("\\n"));
 			}
 
 			InstCall call = eINSTANCE.createInstCall(lineNumber, null, print,
-					parameters);
-			IrUtil.getLast(nodes).add(call);
+					arguments);
+			IrUtil.getLast(blocks).add(call);
 		}
 	}
 
