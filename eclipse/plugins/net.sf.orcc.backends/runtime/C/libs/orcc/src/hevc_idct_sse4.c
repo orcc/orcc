@@ -309,20 +309,14 @@ void ff_hevc_transform_skip_8_sse(u8 *_dst, i16 *coeffs, ptrdiff_t _stride)
 //
 ////////////////////////////////////////////////////////////////////////////////
 #define INIT_8()                                                               \
-    u8 *dst = (u8*) _dst;                                            \
-    ptrdiff_t stride = _stride
-#define INIT_8_2()                                                               \
     i16 *dst = (i16*) _dst;                                            \
     ptrdiff_t stride = _stride
 #define INIT_10()                                                              \
     u16 *dst = (u16*) _dst;                                          \
     ptrdiff_t stride = _stride>>1
 #define INIT8_8()                                                              \
-    u8 *p_dst;                                                            \
-    INIT_8()
-#define INIT8_8_2()                                                              \
     i16 *p_dst;                                                            \
-    INIT_8_2()
+    INIT_8()
 #define INIT8_10()                                                             \
     u16 *p_dst;                                                           \
     INIT_10()
@@ -603,7 +597,7 @@ void ff_hevc_transform_4x4_luma_ ## D ## _sse4(                            \
     i16 *src = coeffs;                                                     \
     __m128i res0, res1, res2, res3;                                            \
     __m128i tmp0, tmp1, src0, src1, add;                                       \
-    INIT_ ## D ##_2();                                                              \
+    INIT_ ## D();                                                              \
     LOAD4x4(tmp, src);                                                         \
     COMPUTE_LUMA_ALL();                                                        \
     shift = 20 - D;                                                            \
@@ -709,7 +703,7 @@ void ff_hevc_transform_4x4_ ## D ## _sse4 (                                \
     int      add    = 1 << (shift - 1);                                        \
     __m128i tmp0, tmp1, tmp2, tmp3;                                            \
     __m128i e0, e1, e2, e3, e6, e7;                                            \
-    INIT_ ## D ##_2();                                                              \
+    INIT_ ## D();                                                              \
     TR_4_1(p_dst1, 4, src);                                                      \
     shift   = 20 - D;                                                          \
     add     = 1 << (shift - 1);                                                \
@@ -731,7 +725,7 @@ void ff_hevc_transform_8x8_ ## D ## _sse4 (                                \
     shift   = 20 - D;                                                          \
     add     = 1 << (shift - 1);                                                \
     {                                                                          \
-        INIT8_ ## D ##_2();                                                    \
+        INIT8_ ## D();                                                    \
         TR_8_2(dst, stride, tmp, D);                                           \
     }                                                                          \
 }
