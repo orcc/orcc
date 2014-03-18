@@ -61,7 +61,6 @@ import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.SwitchUtil;
 import net.sf.orcc.util.Void;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
 
 /**
@@ -72,7 +71,7 @@ import org.eclipse.xtext.EcoreUtil2;
  * @author Matthieu Wipliez
  * 
  */
-public class StmtTransformer extends CalSwitch<EObject> {
+public class StmtTransformer extends CalSwitch<Void> {
 
 	/**
 	 * This class transforms the expression passed to a print/println procedure
@@ -137,7 +136,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	}
 
 	@Override
-	public EObject caseStatementAssign(StatementAssign assign) {
+	public Void caseStatementAssign(StatementAssign assign) {
 		// get target
 		Variable variable = assign.getTarget().getVariable();
 		Var target = Frontend.getMapping(variable);
@@ -158,7 +157,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	}
 
 	@Override
-	public EObject caseStatementCall(StatementCall stmtCall) {
+	public Void caseStatementCall(StatementCall stmtCall) {
 		int lineNumber = Util.getLocation(stmtCall);
 
 		// retrieve IR procedure
@@ -187,7 +186,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	}
 
 	@Override
-	public EObject caseStatementForeach(StatementForeach foreach) {
+	public Void caseStatementForeach(StatementForeach foreach) {
 		int lineNumber = Util.getLocation(foreach);
 
 		// creates loop variable and assigns it
@@ -232,7 +231,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	}
 
 	@Override
-	public EObject caseStatementIf(StatementIf stmtIf) {
+	public Void caseStatementIf(StatementIf stmtIf) {
 		int lineNumber = Util.getLocation(stmtIf);
 
 		Expression condition = new ExprTransformer(procedure, nodes)
@@ -280,7 +279,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	}
 
 	@Override
-	public EObject caseStatementWhile(StatementWhile stmtWhile) {
+	public Void caseStatementWhile(StatementWhile stmtWhile) {
 		int lineNumber = Util.getLocation(stmtWhile);
 
 		// to track the instructions created when condition was transformed
