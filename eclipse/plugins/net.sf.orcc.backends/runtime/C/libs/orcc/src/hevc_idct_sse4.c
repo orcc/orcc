@@ -597,13 +597,13 @@ void ff_hevc_transform_skip_8_sse(u8 *_dst, i16 *coeffs, ptrdiff_t _stride)
     res1 = _mm_packs_epi32(res2, res3)
 
 #define TRANSFORM_LUMA_ADD(D)                                                  \
-void ff_hevc_transform_4x4_luma_add_ ## D ## _sse4(                            \
-        u8 *_dst, i16 *coeffs, ptrdiff_t _stride) {                   \
+void ff_hevc_transform_4x4_luma_ ## D ## _sse4(                            \
+        i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                   \
     u8  shift = 7;                                                        \
     i16 *src = coeffs;                                                     \
     __m128i res0, res1, res2, res3;                                            \
     __m128i tmp0, tmp1, src0, src1, add;                                       \
-    INIT_ ## D();                                                              \
+    INIT_ ## D ##_2();                                                              \
     LOAD4x4(tmp, src);                                                         \
     COMPUTE_LUMA_ALL();                                                        \
     shift = 20 - D;                                                            \
@@ -613,14 +613,12 @@ void ff_hevc_transform_4x4_luma_add_ ## D ## _sse4(                            \
     tmp1  = _mm_unpackhi_epi16(res2, res3);                                    \
     COMPUTE_LUMA_ALL();                                                        \
     TRANSPOSE4X4_16(res);                                                      \
-    ADD_AND_SAVE_4x ## D(dst, stride, res0);                                   \
-    ADD_AND_SAVE_4x ## D(dst, stride, _mm_srli_si128(res0, 8));                \
-    ADD_AND_SAVE_4x ## D(dst, stride, res1);                                   \
-    ADD_AND_SAVE_4x ## D(dst, stride, _mm_srli_si128(res1, 8));                \
+    SAVE_8x16(dst, stride, res0);                                   \
+    SAVE_8x16(dst, stride, res1);                                   \
 }
 
 TRANSFORM_LUMA_ADD( 8);
-TRANSFORM_LUMA_ADD( 10);
+//TRANSFORM_LUMA_ADD( 10);
 
 ////////////////////////////////////////////////////////////////////////////////
 // ff_hevc_transform_4x4_add_X_sse4
