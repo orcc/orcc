@@ -126,7 +126,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				signal top_«instance.incomingPortMap.get(port).fifoName»_V_empty_n :  STD_LOGIC;
 				signal top_«instance.incomingPortMap.get(port).fifoName»_V_read    :  STD_LOGIC;
 			«ELSE»
-				signal top_«instance.incomingPortMap.get(port).ramName»_address0    :  STD_LOGIC_VECTOR (8 downto 0);
+				signal top_«instance.incomingPortMap.get(port).ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
 				signal top_«instance.incomingPortMap.get(port).ramName»_ce0 :  STD_LOGIC;
 				signal top_«instance.incomingPortMap.get(port).ramName»_q0  :   STD_LOGIC_VECTOR («instance.incomingPortMap.get(
 			port).fifoType.sizeInBits - 1»  downto 0);
@@ -144,7 +144,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				signal top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
 				signal top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
 				
-				signal top_«instance.incomingPortMap.get(port).ramName»_address1    :  STD_LOGIC_VECTOR (8 downto 0);
+				signal top_«instance.incomingPortMap.get(port).ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
 				signal top_«instance.incomingPortMap.get(port).ramName»_ce1 :  STD_LOGIC;
 				signal top_«instance.incomingPortMap.get(port).ramName»_we1  :  STD_LOGIC;
 				signal top_«instance.incomingPortMap.get(port).ramName»_d1  :   STD_LOGIC_VECTOR («instance.incomingPortMap.get(
@@ -167,7 +167,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 							signal top_«connection.fifoName»_V_full_n :  STD_LOGIC;
 							signal top_«connection.fifoName»_V_write  :  STD_LOGIC;
 				«ELSE»
-					signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (8 downto 0);
+					signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
 								signal top_«connection.ramName»_ce1 :  STD_LOGIC;
 								signal top_«connection.ramName»_we1  :  STD_LOGIC;
 								signal top_«connection.ramName»_d1  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -185,7 +185,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 								signal top_«connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
 								signal top_«connection.castfifoNameRead»_V_write  :  STD_LOGIC;
 								
-								signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (8 downto 0);
+								signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
 								signal top_«connection.ramName»_ce0 :  STD_LOGIC;
 								signal top_«connection.ramName»_q0  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);	
 									
@@ -252,51 +252,37 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«FOR port : instance.getActor.inputs»			
 				«IF instance.incomingPortMap.get(port).sourcePort == null»
 					
-					
-					«FOR portout : instance.getActor.outputs.filter[! native]»
-						«FOR connection : instance.outgoingPortMap.get(portout)»
-							«IF connection.targetPort != null»
-								top_«instance.incomingPortMap.get(port).fifoName»_V_dout <= «instance.incomingPortMap.get(port).fifoName»_V_dout;
-								top_«instance.incomingPortMap.get(port).fifoName»_V_empty_n <= «instance.incomingPortMap.get(port).fifoName»_V_empty_n;
-								«instance.incomingPortMap.get(port).fifoName»_V_read <= top_«instance.incomingPortMap.get(port).fifoName»_V_read;
-								
-								«connection.castfifoNameRead»_V_din    <= top_«connection.castfifoNameRead»_V_din;
-								top_«connection.castfifoNameRead»_V_full_n <= «connection.castfifoNameRead»_V_full_n;
-								«connection.castfifoNameRead»_V_write <= top_«connection.castfifoNameRead»_V_write;
-							«ENDIF»
-						«ENDFOR»
-					«ENDFOR»
-				«ELSE»
-					«FOR portout : instance.getActor.outputs.filter[! native]»
-						«FOR connection : instance.outgoingPortMap.get(portout)»
-							«IF connection.targetPort == null»
-								«connection.fifoName»_V_din <= top_«connection.fifoName»_V_din;
-								top_«connection.fifoName»_V_full_n <= «connection.fifoName»_V_full_n;
-								«connection.fifoName»_V_write <= top_«connection.fifoName»_V_write;
-								
-								top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout <= «instance.incomingPortMap.get(port).
+					top_«instance.incomingPortMap.get(port).fifoName»_V_dout <= «instance.incomingPortMap.get(port).fifoName»_V_dout;
+					top_«instance.incomingPortMap.get(port).fifoName»_V_empty_n <= «instance.incomingPortMap.get(port).fifoName»_V_empty_n;
+					«instance.incomingPortMap.get(port).fifoName»_V_read <= top_«instance.incomingPortMap.get(port).fifoName»_V_read;
+				«ELSE»		
+					top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout <= «instance.incomingPortMap.get(port).
 			castfifoNameWrite»_V_dout;
 								top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n <= «instance.incomingPortMap.get(port).
 			castfifoNameWrite»_V_empty_n;
 								«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read <= top_«instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_read;
-							«ELSE»
-								«connection.castfifoNameRead»_V_din    <= top_«connection.castfifoNameRead»_V_din;
-								top_«connection.castfifoNameRead»_V_full_n <= «connection.castfifoNameRead»_V_full_n;
-								«connection.castfifoNameRead»_V_write <= top_«connection.castfifoNameRead»_V_write;
-								
-								top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout <= «instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_dout;
-								top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n <= «instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_empty_n;
-								«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read <= top_«instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_read;
-							«ENDIF»
-						«ENDFOR»
-					«ENDFOR»
-					
+			castfifoNameWrite»_V_read;	
 				«ENDIF»
-		«ENDFOR»
+			«ENDFOR»	
+			
+			
+				
+			«FOR portout : instance.getActor.outputs.filter[! native]»
+				«FOR connection : instance.outgoingPortMap.get(portout)»
+					«IF connection.targetPort != null»
+						
+						
+						«connection.castfifoNameRead»_V_din    <= top_«connection.castfifoNameRead»_V_din;
+						top_«connection.castfifoNameRead»_V_full_n <= «connection.castfifoNameRead»_V_full_n;
+						«connection.castfifoNameRead»_V_write <= top_«connection.castfifoNameRead»_V_write;
+						
+					«ELSE»		
+						«connection.fifoName»_V_din <= top_«connection.fifoName»_V_din;
+						top_«connection.fifoName»_V_full_n <= «connection.fifoName»_V_full_n;
+						«connection.fifoName»_V_write <= top_«connection.fifoName»_V_write;
+					«ENDIF»
+				«ENDFOR»
+			«ENDFOR»
 			
 			top_ap_start <= ap_start;
 			top_ap_clk <= ap_clk;
@@ -475,8 +461,8 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 			«connection.ramName» : ram_tab
 					generic map (dwidth     => «connection.fifoType.sizeInBits»,
-					       awidth     => 9,
-					       mem_size   => 512)
+					       awidth     => 13,
+					       mem_size   => 8192)
 			port map (
 				clk => top_ap_clk,
 				addr0 => top_«connection.ramName»_address0,
@@ -565,7 +551,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def printOutputRamSignalAssignHLS(Connection connection) '''
-		signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (8 downto 0);
+		signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
 		signal top_«connection.ramName»_ce1 :  STD_LOGIC;
 		signal top_«connection.ramName»_we1  :  STD_LOGIC;
 		signal top_«connection.ramName»_d1  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -582,7 +568,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def printInputRAMSignalAssignHLS(Connection connection) '''
-		signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (8 downto 0);
+		signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
 		signal top_«connection.ramName»_ce0 :  STD_LOGIC;
 		signal top_«connection.ramName»_q0  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 		
@@ -598,7 +584,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def printOutputRamAssignHLS(Connection connection) '''
-		«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR (8 downto 0);
+		«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
 		«connection.ramName»_ce0 : OUT STD_LOGIC;
 		«connection.ramName»_we0  : OUT STD_LOGIC;
 		«connection.ramName»_d0  : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -615,7 +601,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def printInputRAMAssignHLS(Connection connection) '''
-		«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (8 downto 0);
+		«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
 		«connection.ramName»_ce0 : OUT STD_LOGIC;
 		«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 		
@@ -672,7 +658,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«IF connection.targetPort != null»
 					component cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler IS
 					port (
-					«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (8 downto 0);
+					«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
 					«connection.ramName»_ce0 : OUT STD_LOGIC;
 					«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 					
@@ -704,7 +690,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«IF instance.incomingPortMap.get(port).sourcePort != null»
 				component cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler IS
 						port (
-						«instance.incomingPortMap.get(port).ramName»_address0    : OUT  STD_LOGIC_VECTOR (8 downto 0);
+						«instance.incomingPortMap.get(port).ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
 						«instance.incomingPortMap.get(port).ramName»_ce0 : OUT STD_LOGIC;
 						«instance.incomingPortMap.get(port).ramName»_we0  : OUT STD_LOGIC;
 						«instance.incomingPortMap.get(port).ramName»_d0  : OUT STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).

@@ -243,7 +243,7 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			«connection.ramName» : ram_tab
 					generic map (dwidth     => «connection.fifoType.sizeInBits»,
 					       awidth     => 9,
-					       mem_size   => 512)
+					       mem_size   => 8192)
 			port map (
 				clk => top_ap_clk,
 				addr0 => top_«connection.ramName»_address0,

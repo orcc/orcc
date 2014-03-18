@@ -69,7 +69,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			extern stream<«instance.incomingPortMap.get(port).fifoTypeOut.doSwitch»> «instance.incomingPortMap.get(port).
 			castfifoNameWrite»;
 			// Output FIFOS
-			extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[512];
+			extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[8192];
 			extern unsigned int	«instance.incomingPortMap.get(port).wName»[1];
 			extern unsigned int	«instance.incomingPortMap.get(port).rName»[1];
 			unsigned int «instance.incomingPortMap.get(port).localwName»=0;					
@@ -80,7 +80,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		// Actions
 		static void cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_untagged_0() {
 			
-					i32 «instance.incomingPortMap.get(port).maskName» = «instance.incomingPortMap.get(port).localwName» & 511;
+					i32 «instance.incomingPortMap.get(port).maskName» = «instance.incomingPortMap.get(port).localwName» & 8191;
 					«instance.incomingPortMap.get(port).fifoTypeOut.doSwitch» tmp_«instance.incomingPortMap.get(port).sourcePort.name»;
 					«instance.incomingPortMap.get(port).castfifoNameWrite».read_nb(tmp_«instance.incomingPortMap.get(port).sourcePort.
 			name»);
@@ -105,7 +105,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 					if (!«instance.incomingPortMap.get(port).castfifoNameWrite».empty() &&   
 					isSchedulable_untagged_0()) {
 					if(1
-					&& (512 - «instance.incomingPortMap.get(port).localwName» + «instance.incomingPortMap.get(port).rName»[0] >= 1)
+					&& (8192 - «instance.incomingPortMap.get(port).localwName» + «instance.incomingPortMap.get(port).rName»[0] >= 1)
 					){
 					cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_untagged_0();
 					}
@@ -139,7 +139,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 				// Input FIFOS
 				extern «instance.outgoingPortMap.get(portout).head.fifoTypeOut.doSwitch» «instance.outgoingPortMap.get(portout).
-			head.ramName»[512];
+			head.ramName»[8192];
 				extern unsigned int «instance.outgoingPortMap.get(portout).head.wName»[1];
 				extern unsigned int «instance.outgoingPortMap.get(portout).head.rName»[1];
 				unsigned int «instance.outgoingPortMap.get(portout).head.localrName»=0;
@@ -152,7 +152,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 				static void cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read_untagged_0() {
 				
 							i32 «instance.outgoingPortMap.get(portout).head.maskName» = «instance.outgoingPortMap.get(portout).head.
-			localrName» & 511;
+			localrName» & 8191;
 							«instance.outgoingPortMap.get(portout).head.fifoTypeOut.doSwitch» tmp_«instance.outgoingPortMap.get(portout).
 			head.targetPort.name»;
 							tmp_«instance.outgoingPortMap.get(portout).head.targetPort.name» = «instance.outgoingPortMap.get(portout).head.

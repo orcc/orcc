@@ -95,7 +95,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				extern stream<«instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»>	«instance.incomingPortMap.get(port).
 			fifoName»;
 			«ELSE»
-				extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[512];
+				extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[8192];
 				extern unsigned int	«instance.incomingPortMap.get(port).wName»[1];
 				extern unsigned int	«instance.incomingPortMap.get(port).rName»[1];
 				unsigned int «instance.incomingPortMap.get(port).localrName»=0;
@@ -111,7 +111,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					«IF connection.targetPort == null»
 						extern stream<«connection.fifoTypeOut.doSwitch»> «connection.fifoName»;
 					«ELSE»
-						extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[512];
+						extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[8192];
 						extern unsigned int «connection.wName»[1];
 						extern unsigned int «connection.rName»[1];
 						unsigned int «connection.localwName»=0;
@@ -249,7 +249,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF outgoingPortMap.get(port).head.targetPort == null»
 			&& (! «outgoingPortMap.get(port).head.fifoName».full())
 		«ELSE»
-			&& (512 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)
+			&& (8192 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)
 		«ENDIF»
 	'''
 
@@ -347,7 +347,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 						«ENDIF»
 					«ELSE»
 						
-						«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[((«instance.incomingPortMap.get(srcPort).localrName» & 511)  + («load.indexes.head.doSwitch»))];
+						«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[((«instance.incomingPortMap.get(srcPort).localrName» & 8191)  + («load.indexes.head.doSwitch»))];
 					«ENDIF»
 				«ELSE»
 					«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
@@ -372,7 +372,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«ELSE»
 					
 					«instance.outgoingPortMap.get(trgtPort).head.ramName»[((«instance.outgoingPortMap.get(trgtPort).head.
-				localwName» & 511) + («store.
+				localwName» & 8191) + («store.
 				indexes.head.doSwitch»))]=«store.value.doSwitch»;
 					
 				«ENDIF»
