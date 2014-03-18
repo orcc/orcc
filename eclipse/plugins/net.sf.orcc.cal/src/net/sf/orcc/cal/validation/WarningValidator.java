@@ -29,6 +29,9 @@
 package net.sf.orcc.cal.validation;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
+
+import java.util.List;
+
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstProcedure;
@@ -46,13 +49,25 @@ import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.EcoreUtil2;
+import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.CheckType;
+
+import com.google.inject.Inject;
 
 /**
  * This class describes a validator that computes warnings for an RVC-CAL
@@ -62,6 +77,9 @@ import org.eclipse.xtext.validation.CheckType;
  * 
  */
 public class WarningValidator extends AbstractCalJavaValidator {
+
+	@Inject
+	XtextResourceSet rs;
 
 	@Check(CheckType.NORMAL)
 	public void checkAstProcedure(final AstProcedure procedure) {
@@ -112,8 +130,84 @@ public class WarningValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
-	public void checkImport(Import import_) {
+	public void checkImport(Import theImport) {
+		final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace()
+				.getRoot();
 
+		final String importString = theImport.getImportedNamespace();
+		final int lastDotOffset = importString.lastIndexOf('.');
+		if (lastDotOffset == -1) {
+			error("Malformed import", eINSTANCE.getImport_ImportedNamespace());
+			return;
+		}
+		final String resourceQName = importString.substring(0, lastDotOffset);
+		final IPath resourcePath = new Path(resourceQName.replace('.', '/'))
+				.addFileExtension(OrccUtil.CAL_SUFFIX);
+
+		final IProject project = Util.getProject(theImport);
+		final List<IFolder> srcFolders = OrccUtil.getAllSourceFolders(project);
+		for (final IFolder folder : srcFolders) {
+			final IPath resourceFullPath = folder.getFullPath().append(
+					resourcePath);
+			if (workspace.exists(resourceFullPath)) {
+				final String importedElement = importString
+						.substring(lastDotOffset + 1);
+				checkImportedElement(resourceFullPath, importedElement, project);
+				return;
+			}
+		}
+
+		warning(resourceQName + " not found in the current project "
+				+ "and its dependencies",
+				eINSTANCE.getImport_ImportedNamespace());
+	}
+
+	private void checkImportedElement(final IPath path, final String element, final IProject project) {
+		// Check if imported entity is a valid resource
+		final Resource resource = rs.getResource(
+				URI.createPlatformResourceURI(path.toString(), true),
+				true);
+		if (resource == null || resource.getContents().size() == 0) {
+			warning(path.toString() + " is not a valid resource",
+					eINSTANCE.getImport_ImportedNamespace());
+			return;
+		}
+
+		// Check if imported entity is a unit
+		final EObject eObject = resource.getContents().get(0);
+		if (!(eObject instanceof AstEntity)
+				|| ((AstEntity) eObject).getUnit() == null) {
+			warning(path.toString() + " is not a Unit",
+					eINSTANCE.getImport_ImportedNamespace());
+
+			return;
+		}
+
+		// Imports ending with '*' are always considered OK (everything in the
+		// unit is imported)
+		if ("*".equals(element)) {
+			return;
+		}
+
+		// Check imported element
+		final AstUnit unit = ((AstEntity) eObject).getUnit();
+		for (final Function function : unit.getFunctions()) {
+			if (function.getName().equals(element)) {
+				return;
+			}
+		}
+		for (final AstProcedure procedure : unit.getProcedures()) {
+			if (procedure.getName().equals(element)) {
+				return;
+			}
+		}
+		for (final Variable variable : unit.getVariables()) {
+			if (variable.getName().equals(element)) {
+				return;
+			}
+		}
+		warning(element + " not found in " + path.toString(),
+				eINSTANCE.getImport_ImportedNamespace());
 	}
 
 	/**

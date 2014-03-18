@@ -42,6 +42,7 @@ import net.sf.orcc.util.Attributable;
 import net.sf.orcc.util.Attribute;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
@@ -169,17 +170,15 @@ public class Util {
 		}
 	}
 
-	public static String getProjectName(AstActor entity) {
-		String entityPath = entity.eResource().getURI().toPlatformString(true);
-		IFile f = ResourcesPlugin.getWorkspace().getRoot()
-				.getFile(new Path(entityPath));
-		return f.getProject().getName();
+	public static IProject getProject(final EObject object) {
+		final String objectPath = object.eResource().getURI()
+				.toPlatformString(true);
+		final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+				.getFile(new Path(objectPath));
+		return file.getProject();
 	}
 
-	public static String getProjectName(AstUnit entity) {
-		String entityPath = entity.eResource().getURI().toPlatformString(true);
-		IFile f = ResourcesPlugin.getWorkspace().getRoot()
-				.getFile(new Path(entityPath));
-		return f.getProject().getName();
+	public static String getProjectName(final EObject object) {
+		return getProject(object).getName();
 	}
 }
