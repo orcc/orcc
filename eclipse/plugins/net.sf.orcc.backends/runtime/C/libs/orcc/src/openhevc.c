@@ -60,6 +60,162 @@ static const int lookup_tab_openhevc_function[64] = {
    -1, -1, -1, -1, -1, -1, -1, -1,
    -1, -1, -1, -1, -1, -1, -1,  3};
 
+#if ARCH_X86_64
+#define STORE8(out, sstep_out)                                                 \
+    *((uint64_t *) &out[0*sstep_out]) =_mm_cvtsi128_si64(m10);                 \
+    *((uint64_t *) &out[1*sstep_out]) =_mm_extract_epi64(m10, 1);              \
+    *((uint64_t *) &out[2*sstep_out]) =_mm_cvtsi128_si64(m12);                 \
+    *((uint64_t *) &out[3*sstep_out]) =_mm_extract_epi64(m12, 1);              \
+    *((uint64_t *) &out[4*sstep_out]) =_mm_cvtsi128_si64(m11);                 \
+    *((uint64_t *) &out[5*sstep_out]) =_mm_extract_epi64(m11, 1);              \
+    *((uint64_t *) &out[6*sstep_out]) =_mm_cvtsi128_si64(m13);                 \
+    *((uint64_t *) &out[7*sstep_out]) =_mm_extract_epi64(m13, 1)
+#else
+#define STORE8(out, sstep_out)                                                 \
+    _mm_storel_epi64((__m128i*)&out[0*sstep_out], m10);                        \
+    _mm_storel_epi64((__m128i*)&out[2*sstep_out], m12);                        \
+    _mm_storel_epi64((__m128i*)&out[4*sstep_out], m11);                        \
+    _mm_storel_epi64((__m128i*)&out[6*sstep_out], m13);                        \
+    m10 = _mm_unpackhi_epi64(m10, m10);                                        \
+    m12 = _mm_unpackhi_epi64(m12, m12);                                        \
+    m11 = _mm_unpackhi_epi64(m11, m11);                                        \
+    m13 = _mm_unpackhi_epi64(m13, m13);                                        \
+    _mm_storel_epi64((__m128i*)&out[1*sstep_out], m10);                        \
+    _mm_storel_epi64((__m128i*)&out[3*sstep_out], m12);                        \
+    _mm_storel_epi64((__m128i*)&out[5*sstep_out], m11);                        \
+    _mm_storel_epi64((__m128i*)&out[7*sstep_out], m13)
+#endif
+#define STORE16(out, sstep_out)                                                \
+    _mm_storeu_si128((__m128i *) &out[0*sstep_out], m0);                       \
+    _mm_storeu_si128((__m128i *) &out[1*sstep_out], m1);                       \
+    _mm_storeu_si128((__m128i *) &out[2*sstep_out], m2);                       \
+    _mm_storeu_si128((__m128i *) &out[3*sstep_out], m3);                       \
+    _mm_storeu_si128((__m128i *) &out[4*sstep_out], m4);                       \
+    _mm_storeu_si128((__m128i *) &out[5*sstep_out], m5);                       \
+    _mm_storeu_si128((__m128i *) &out[6*sstep_out], m6);                       \
+    _mm_storeu_si128((__m128i *) &out[7*sstep_out], m7)
+
+#define TRANSPOSE4x4_8(in, sstep_in, out, sstep_out)                           \
+    {                                                                          \
+        __m128i m0  = _mm_loadl_epi64((__m128i *) &in[0*sstep_in]);            \
+        __m128i m1  = _mm_loadl_epi64((__m128i *) &in[1*sstep_in]);            \
+        __m128i m2  = _mm_loadl_epi64((__m128i *) &in[2*sstep_in]);            \
+        __m128i m3  = _mm_loadl_epi64((__m128i *) &in[3*sstep_in]);            \
+                                                                               \
+        __m128i m10 = _mm_unpacklo_epi8(m0, m1);                               \
+        __m128i m11 = _mm_unpacklo_epi8(m2, m3);                               \
+                                                                               \
+        m0  = _mm_unpacklo_epi16(m10, m11);                                    \
+                                                                               \
+        *((uint32_t *) (out+0*sstep_out)) =_mm_cvtsi128_si32(m0);              \
+        *((uint32_t *) (out+1*sstep_out)) =_mm_extract_epi32(m0, 1);           \
+        *((uint32_t *) (out+2*sstep_out)) =_mm_extract_epi32(m0, 2);           \
+        *((uint32_t *) (out+3*sstep_out)) =_mm_extract_epi32(m0, 3);           \
+    }
+#define TRANSPOSE8x8_8(in, sstep_in, out, sstep_out)                           \
+    {                                                                          \
+        __m128i m0  = _mm_loadl_epi64((__m128i *) &in[0*sstep_in]);            \
+        __m128i m1  = _mm_loadl_epi64((__m128i *) &in[1*sstep_in]);            \
+        __m128i m2  = _mm_loadl_epi64((__m128i *) &in[2*sstep_in]);            \
+        __m128i m3  = _mm_loadl_epi64((__m128i *) &in[3*sstep_in]);            \
+        __m128i m4  = _mm_loadl_epi64((__m128i *) &in[4*sstep_in]);            \
+        __m128i m5  = _mm_loadl_epi64((__m128i *) &in[5*sstep_in]);            \
+        __m128i m6  = _mm_loadl_epi64((__m128i *) &in[6*sstep_in]);            \
+        __m128i m7  = _mm_loadl_epi64((__m128i *) &in[7*sstep_in]);            \
+                                                                               \
+        __m128i m10 = _mm_unpacklo_epi8(m0, m1);                               \
+        __m128i m11 = _mm_unpacklo_epi8(m2, m3);                               \
+        __m128i m12 = _mm_unpacklo_epi8(m4, m5);                               \
+        __m128i m13 = _mm_unpacklo_epi8(m6, m7);                               \
+                                                                               \
+        m0  = _mm_unpacklo_epi16(m10, m11);                                    \
+        m1  = _mm_unpacklo_epi16(m12, m13);                                    \
+        m2  = _mm_unpackhi_epi16(m10, m11);                                    \
+        m3  = _mm_unpackhi_epi16(m12, m13);                                    \
+                                                                               \
+        m10 = _mm_unpacklo_epi32(m0 , m1 );                                    \
+        m11 = _mm_unpacklo_epi32(m2 , m3 );                                    \
+        m12 = _mm_unpackhi_epi32(m0 , m1 );                                    \
+        m13 = _mm_unpackhi_epi32(m2 , m3 );                                    \
+                                                                               \
+        STORE8(out, sstep_out);                                                \
+    }
+#define TRANSPOSE16x16_8(in, sstep_in, out, sstep_out)                        \
+    for (y = 0; y < sstep_in; y+=8)                                           \
+        for (x = 0; x < sstep_in; x+=8)                                       \
+            TRANSPOSE8x8_8((&in[y*sstep_in+x]), sstep_in, (&out[x*sstep_out+y]), sstep_out)
+#define TRANSPOSE32x32_8(in, sstep_in, out, sstep_out)                        \
+    for (y = 0; y < sstep_in; y+=8)                                           \
+        for (x = 0; x < sstep_in; x+=8)                                       \
+            TRANSPOSE8x8_8((&in[y*sstep_in+x]), sstep_in, (&out[x*sstep_out+y]), sstep_out)
+
+////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////
+#define TRANSPOSE4x4_10(in, sstep_in, out, sstep_out)                          \
+    {                                                                          \
+        __m128i m0  = _mm_loadl_epi64((__m128i *) &in[0*sstep_in]);            \
+        __m128i m1  = _mm_loadl_epi64((__m128i *) &in[1*sstep_in]);            \
+        __m128i m2  = _mm_loadl_epi64((__m128i *) &in[2*sstep_in]);            \
+        __m128i m3  = _mm_loadl_epi64((__m128i *) &in[3*sstep_in]);            \
+                                                                               \
+        __m128i m10 = _mm_unpacklo_epi16(m0, m1);                              \
+        __m128i m11 = _mm_unpacklo_epi16(m2, m3);                              \
+                                                                               \
+        m0  = _mm_unpacklo_epi32(m10, m11);                                    \
+        m1  = _mm_unpackhi_epi32(m10, m11);                                    \
+                                                                               \
+        _mm_storel_epi64((__m128i *) (out+0*sstep_out) , m0);                  \
+        _mm_storel_epi64((__m128i *) (out+1*sstep_out) , _mm_unpackhi_epi64(m0, m0));\
+        _mm_storel_epi64((__m128i *) (out+2*sstep_out) , m1);                  \
+        _mm_storel_epi64((__m128i *) (out+3*sstep_out) , _mm_unpackhi_epi64(m1, m1));\
+    }
+#define TRANSPOSE8x8_10(in, sstep_in, out, sstep_out)                          \
+    {                                                                          \
+        __m128i tmp0, tmp1, tmp2, tmp3, src0, src1, src2, src3;                \
+        __m128i m0  = _mm_loadu_si128((__m128i *) &in[0*sstep_in]);            \
+        __m128i m1  = _mm_loadu_si128((__m128i *) &in[1*sstep_in]);            \
+        __m128i m2  = _mm_loadu_si128((__m128i *) &in[2*sstep_in]);            \
+        __m128i m3  = _mm_loadu_si128((__m128i *) &in[3*sstep_in]);            \
+        __m128i m4  = _mm_loadu_si128((__m128i *) &in[4*sstep_in]);            \
+        __m128i m5  = _mm_loadu_si128((__m128i *) &in[5*sstep_in]);            \
+        __m128i m6  = _mm_loadu_si128((__m128i *) &in[6*sstep_in]);            \
+        __m128i m7  = _mm_loadu_si128((__m128i *) &in[7*sstep_in]);            \
+                                                                               \
+        tmp0 = _mm_unpacklo_epi16(m0, m1);                                     \
+        tmp1 = _mm_unpacklo_epi16(m2, m3);                                     \
+        tmp2 = _mm_unpacklo_epi16(m4, m5);                                     \
+        tmp3 = _mm_unpacklo_epi16(m6, m7);                                     \
+        src0 = _mm_unpacklo_epi32(tmp0, tmp1);                                 \
+        src1 = _mm_unpacklo_epi32(tmp2, tmp3);                                 \
+        src2 = _mm_unpackhi_epi32(tmp0, tmp1);                                 \
+        src3 = _mm_unpackhi_epi32(tmp2, tmp3);                                 \
+        tmp0 = _mm_unpackhi_epi16(m0, m1);                                     \
+        tmp1 = _mm_unpackhi_epi16(m2, m3);                                     \
+        tmp2 = _mm_unpackhi_epi16(m4, m5);                                     \
+        tmp3 = _mm_unpackhi_epi16(m6, m7);                                     \
+        m0   = _mm_unpacklo_epi64(src0 , src1);                                \
+        m1   = _mm_unpackhi_epi64(src0 , src1);                                \
+        m2   = _mm_unpacklo_epi64(src2 , src3);                                \
+        m3   = _mm_unpackhi_epi64(src2 , src3);                                \
+        src0 = _mm_unpacklo_epi32(tmp0, tmp1);                                 \
+        src1 = _mm_unpacklo_epi32(tmp2, tmp3);                                 \
+        src2 = _mm_unpackhi_epi32(tmp0, tmp1);                                 \
+        src3 = _mm_unpackhi_epi32(tmp2, tmp3);                                 \
+        m4   = _mm_unpacklo_epi64(src0 , src1);                                \
+        m5   = _mm_unpackhi_epi64(src0 , src1);                                \
+        m6   = _mm_unpacklo_epi64(src2 , src3);                                \
+        m7   = _mm_unpackhi_epi64(src2 , src3);                                \
+        STORE16(out, sstep_out);                                               \
+    }
+#define TRANSPOSE16x16_10(in, sstep_in, out, sstep_out)                        \
+    for (y = 0; y < sstep_in; y+=8)                                           \
+        for (x = 0; x < sstep_in; x+=8)                                       \
+            TRANSPOSE8x8_10((&in[y*sstep_in+x]), sstep_in, (&out[x*sstep_out+y]), sstep_out)
+#define TRANSPOSE32x32_10(in, sstep_in, out, sstep_out)                        \
+    for (y = 0; y < sstep_in; y+=8)                                           \
+        for (x = 0; x < sstep_in; x+=8)                                       \
+            TRANSPOSE8x8_10((&in[y*sstep_in+x]), sstep_in, (&out[x*sstep_out+y]), sstep_out)
 
 
 ////////////////////////////////////////////////////////////////////////////////
