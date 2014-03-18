@@ -82,17 +82,32 @@ COPY_8_8( 8,  1, 2304)
 // Variable number of elements to be copied
 #define MEMCPY(H)                                                                                                                      \
 void memcpy_ ## H ## _orcc(                                                                                                            \
-  u8 * outputSample,                                                                                                                   \
-  u8 * inputSample,                                                                                                                    \
-  u32 idxBlkStride,                                                                                                                    \
-  u8 size)                                                                                                                             \
+  u ## H * outputSample,                                                                                                               \
+  u ## H * inputSample,                                                                                                                \
+  u32 offsetOut,                                                                                                                       \
+  u32 offsetIn,                                                                                                                        \
+  int count)                                                                                                                           \
 {                                                                                                                                      \
-  memcpy(&outputSample[0], &inputSample[idxBlkStride + 0], size * sizeof(u ## H));                                                     \
+  memcpy(&outputSample[offsetOut], &inputSample[offsetIn], count * sizeof(u ## H));                                                    \
 }
 
 MEMCPY( 8)
 MEMCPY(16)
 MEMCPY(32)
+
+
+#define MEMSET(H)                                                                                                                      \
+void memset_ ## H ## _orcc(                                                                                                            \
+  u ## H * Sample,                                                                                                                     \
+  u8 value,                                                                                                                            \
+  int size)                                                                                                                            \
+{                                                                                                                                      \
+  memset(&Sample[0], value, size * sizeof(u ## H));                                                                                    \
+}
+
+MEMSET( 8)
+MEMSET(16)
+MEMSET(32)
 
 
 // add 8-bits elements to 16-bits elements and clip, for H elements. First array (pred) is K * J.
@@ -372,6 +387,7 @@ void getmvinfo_dpb_ ## H ## _luma_orcc(                                         
 	memcpy_8_orcc(                                                                                                  \
       &RefCu[y * (sideMax)],                                                                                        \
       pictureBuffer[idx][yOffset + y],                                                                              \
+      0,                                                                                                            \
       xOffset,                                                                                                      \
   	  sideMax);                                                                                                     \
   }                                                                                                                 \
@@ -398,6 +414,7 @@ void getmvinfo_dpb_ ## H ## _chroma_orcc(                                       
 	memcpy_8_orcc(                                                                                                  \
       &RefCu[y * (sideMax)],                                                                                        \
       pictureBuffer[idx][y+yOffset],                                                                                \
+      0,                                                                                                            \
       xOffset,                                                                                                      \
   	  sideMax);                                                                                                     \
   }                                                                                                                 \
@@ -427,8 +444,8 @@ void fillBorder_luma_orcc(
 
   u8 * pucPictureBuffer1 = &pictureBuffer[lastIdx][border_size][border_size];
   u8 * pucPictureBuffer2 = &pictureBuffer[lastIdx][ySize + border_size - 1][border_size];
-  u8 * pucPictureBuffer  = (__m128i *) &pictureBuffer[lastIdx][0][border_size];
-  u8 * pucPictureBuffer0 = (__m128i *) &pictureBuffer[lastIdx][0 + ySize + border_size][border_size];
+  u8 * pucPictureBuffer  = &pictureBuffer[lastIdx][0][border_size];
+  u8 * pucPictureBuffer0 = &pictureBuffer[lastIdx][0 + ySize + border_size][border_size];
 
   int iLoopCount = (xSize >> 4) - 1;
 
@@ -512,10 +529,10 @@ void fillBorder_chroma_orcc(
 
   y = 0;
   while (y <= border_size - 1) {
-    pm128iPictureBuffer1 = pucPictureBuffer1;
-    pm128iPictureBuffer2 = pucPictureBuffer2;
-    pm128iPictureBuffer  = pucPictureBuffer;
-    pm128iPictureBuffer0 = pucPictureBuffer0;
+    pm128iPictureBuffer1 = (__m128i *) pucPictureBuffer1;
+    pm128iPictureBuffer2 = (__m128i *) pucPictureBuffer2;
+    pm128iPictureBuffer  = (__m128i *) pucPictureBuffer;
+    pm128iPictureBuffer0 = (__m128i *) pucPictureBuffer0;
     x = 0;
     while (x <= iLoopCount) {
       m128iWord = _mm_loadu_si128(pm128iPictureBuffer1);
