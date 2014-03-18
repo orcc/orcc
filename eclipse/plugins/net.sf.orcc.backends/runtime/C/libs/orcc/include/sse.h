@@ -63,14 +63,6 @@
     #define DECLARE_ALIGNED(n,t,v)      t v
 #endif
 
-#include <emmintrin.h>
-#ifdef __SSSE3__
-#include <tmmintrin.h>
-#endif
-#ifdef __SSE4_1__
-#include <smmintrin.h>
-#endif
-
 int sse_init_context();
 
 /***********************************************************************************************************************************

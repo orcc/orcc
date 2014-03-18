@@ -2,10 +2,39 @@
 ### Notable changes and features
 - Front-end:
     * Floating-point type network ports now supported
+- Network editor has been entirely rewritten
+    * It can be used exactly in the same way as the original one
+    * It provides many new features (thanks to Graphiti SDK)
+      - Instance have different colors if it is not refined / refined on a network / an actor
+      - All ports are displayed when an instance is refined
+      - Automatic layout (2 different algorithms)
+      - Easy create connections: drag and drop from a port to another
+      - Easy create refined instances: drag and drop an actor/network from the project in the current network (this also can be used to update refinement of existing instance, see #77)
+      - Better control on properties definitions (variables, parameters, connection size, etc.). See #46
+    * More flexibility for future improvements, some exclusive features are already available:
+      - Automatically group selected instances in a new network. Selection is replaced by a new instance, refined on the network created.
+      - Automatically replace an instance refined on a network by the content of the network.
 
 ### Bugfixes
+- Front-end:
+    * Refactoring features (rename or move file) have been updated
+        - It works on Windows
+        - [#71] When a XDF file is renamed/moved, corrresponding xdfdiag file follow the modification
+        - [#1] Better check for names conflicts between functions, procedures, variables, parameters, etc.
+- Backends:
+    * [#56] Library files are not overwritten at code generation. Unmodified files are recompiled only if necessary
+- Network editor / User interface:
+    * [#13] List of proposed entity for refinement only contains Actors and Networks (not Units anymore)
+    * [#64] Network can be created only in a valid project's source folder
+
 ### Known problems
+- Refactoring: moving more than one file at a time could cause errors in updated files. Undo should always be available if errors appears. Moving files one by one should not cause any problem.
+
 ### Misc
+- Java, C++ and OpenCL backends has been removed. They were not maintained for a long time, and seemed to be unused.
+- SDL libraries exported for Windows users have been updated to 
+version 1.2.15. This fixes compile issues under x86_64 platforms (issue #12)
+- Useless dependencies to SDLImage have been removed
 
 # 1.4.0 October 2013
 

@@ -31,12 +31,17 @@
 
 #include "hevcpred.h"
 #include "hevcdsp.h"
+
+#include <emmintrin.h>
+#ifdef __SSSE3__
+#include <tmmintrin.h>
+#endif
+#ifdef __SSE4_1__
 #include <smmintrin.h>
-#define __SSE4_1__
+#endif
 
 static HEVCPredContext hevcPred;
 static HEVCDSPContext hevcDsp;
-
 
 
 /* Log2CbSize in openHEVC */
@@ -54,9 +59,6 @@ static const int lookup_tab_openhevc_function[64] = {
    -1, -1, -1, -1, -1, -1, -1,  3,
    -1, -1, -1, -1, -1, -1, -1, -1,
    -1, -1, -1, -1, -1, -1, -1,  3};
-
-
-#ifdef __SSE4_1__
 
 #if ARCH_X86_64
 #define STORE8(out, sstep_out)                                                 \
@@ -214,6 +216,7 @@ static const int lookup_tab_openhevc_function[64] = {
     for (y = 0; y < sstep_in; y+=8)                                           \
         for (x = 0; x < sstep_in; x+=8)                                       \
             TRANSPOSE8x8_10((&in[y*sstep_in+x]), sstep_in, (&out[x*sstep_out+y]), sstep_out)
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -639,6 +642,7 @@ static void pred_angular_ ## W ##_ ## D ## _sse(uint8_t *_src, const uint8_t *_t
     }                                                                          \
 }
 
+#ifdef __SSE4_1__
 PRED_ANGULAR( 4, 8)
 PRED_ANGULAR( 8, 8)
 PRED_ANGULAR(16, 8)
@@ -648,41 +652,6 @@ PRED_ANGULAR( 4,10)
 PRED_ANGULAR( 8,10)
 PRED_ANGULAR(16,10)
 PRED_ANGULAR(32,10)
-
-void local_pred_angular_0_8_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left,
-            ptrdiff_t _stride, int c_idx, int mode) {
-    pred_angular_4_8_sse(_src, _top, _left, _stride, c_idx, mode);
-}
-void local_pred_angular_1_8_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left,
-        ptrdiff_t _stride, int c_idx, int mode) {
-    pred_angular_8_8_sse(_src, _top, _left, _stride, c_idx, mode);
-}
-void local_pred_angular_2_8_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left,
-        ptrdiff_t _stride, int c_idx, int mode) {
-    pred_angular_16_8_sse(_src, _top, _left, _stride, c_idx, mode);
-}
-void local_pred_angular_3_8_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left,
-        ptrdiff_t _stride, int c_idx, int mode) {
-    pred_angular_32_8_sse(_src, _top, _left, _stride, c_idx, mode);
-}
-
-void local_pred_angular_0_10_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left,
-            ptrdiff_t _stride, int c_idx, int mode) {
-    pred_angular_4_10_sse(_src, _top, _left, _stride, c_idx, mode);
-}
-void local_pred_angular_1_10_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left,
-            ptrdiff_t _stride, int c_idx, int mode) {
-    pred_angular_8_10_sse(_src, _top, _left, _stride, c_idx, mode);
-}
-void local_pred_angular_2_10_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left,
-            ptrdiff_t _stride, int c_idx, int mode) {
-    pred_angular_16_10_sse(_src, _top, _left, _stride, c_idx, mode);
-}
-void local_pred_angular_3_10_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left,
-            ptrdiff_t _stride, int c_idx, int mode) {
-    pred_angular_32_10_sse(_src, _top, _left, _stride, c_idx, mode);
-}
-
 #endif
 
 int openhevc_init_context()
@@ -690,12 +659,11 @@ int openhevc_init_context()
 	ff_hevc_dsp_init(&hevcDsp, 8);
 	ff_hevc_pred_init(&hevcPred, 8);
 #ifdef __SSE4_1__
-	hevcPred.pred_angular[0] = local_pred_angular_0_8_sse; //removed because too little data = bad performance
-	hevcPred.pred_angular[1] = local_pred_angular_1_8_sse;
-	hevcPred.pred_angular[2] = local_pred_angular_2_8_sse;
-	hevcPred.pred_angular[3] = local_pred_angular_3_8_sse;
+    hevcPred.pred_angular[0] = (void *) pred_angular_4_8_sse; //removed because too little data = bad performance
+    hevcPred.pred_angular[1] = (void *) pred_angular_8_8_sse;
+    hevcPred.pred_angular[2] = (void *) pred_angular_16_8_sse;
+    hevcPred.pred_angular[3] = (void *) pred_angular_32_8_sse;
 #endif
-
 	return 0;
 }
 

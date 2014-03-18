@@ -216,7 +216,7 @@ StatementAssign:
 StatementCall:
 	(annotations += AstAnnotation)*
 	procedure=[AstProcedure|QualifiedName]
-	'(' (parameters += AstExpression (',' parameters += AstExpression)*)? ')' ';';
+	'(' (arguments += AstExpression (',' arguments += AstExpression)*)? ')' ';';
 
 StatementForeach:
 	(annotations += AstAnnotation)*
