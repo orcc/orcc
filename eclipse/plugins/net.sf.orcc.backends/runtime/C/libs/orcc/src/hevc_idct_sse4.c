@@ -257,6 +257,7 @@ DECLARE_ALIGNED(16, static const i16, transform32x32[8][16][8] )=
 #define shift_1st 7
 #define add_1st (1 << (shift_1st - 1))
 
+#ifdef __SSE4_1__
 void ff_hevc_transform_skip_8_sse(u8 *_dst, i16 *coeffs, ptrdiff_t _stride)
 {
     u8 *dst = (u8*)_dst;
@@ -304,6 +305,7 @@ void ff_hevc_transform_skip_8_sse(u8 *_dst, i16 *coeffs, ptrdiff_t _stride)
     dst+=stride;
     *((u32 *)(dst)) = _mm_extract_epi32(r3, 3);
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 //
