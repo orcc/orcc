@@ -853,7 +853,7 @@ class InstancePrinter extends CTemplate {
 		'''
 		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]») {
 			«IF isOptimizable»
-				#ifdef «optCond»
+				#if «optCond»
 				«optName»(«proc.parameters.join(", ")[variable.name]»);
 				#else
 			«ENDIF»
