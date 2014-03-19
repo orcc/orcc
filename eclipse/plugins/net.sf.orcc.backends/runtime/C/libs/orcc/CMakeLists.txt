@@ -104,7 +104,7 @@ else()
         endif()
     endif()
 
-    if(NOT MSV AND NOT CMAKE_CROSSCOMPILING)
+    if(NOT MSVC AND NOT CMAKE_CROSSCOMPILING)
         # Optimize the compilation for the local processor architecture
         list(APPEND additional_definitions -march=native)
     endif()
