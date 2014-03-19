@@ -12,3 +12,5 @@ if(NOT NO_EXTERNAL_DEPENDENCIES)
 endif()
 
 add_subdirectory(orcc)
+
+set(additional_definitions ${additional_definitions} PARENT_SCOPE)
