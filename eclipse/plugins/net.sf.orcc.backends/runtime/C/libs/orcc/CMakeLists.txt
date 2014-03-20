@@ -78,6 +78,8 @@ else()
         list(APPEND orcc_sources
             src/sse.c
             src/hevc_idct_sse4.c
+            src/hevc_intra_pred_sse.c
+            src/hevc_mc_sse.c
         )
 
         find_package(OPENHEVC QUIET)
