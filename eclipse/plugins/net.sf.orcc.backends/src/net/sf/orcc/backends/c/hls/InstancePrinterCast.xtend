@@ -48,7 +48,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		super(options)
 	}
 
-	def getFileContentWrite(Port port) '''
+	def getFileContentWrite(Connection conn) '''
 		#include <hls_stream.h>
 		using namespace hls;
 		#include <stdio.h>
@@ -64,30 +64,42 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		typedef unsigned int u32;
 		typedef unsigned long long int u64;			
 		////////////////////////////////////////////////////////////////////////////////
-		
+		«IF conn.fifoTypeIn.bool»
 			// Input FIFOs
-			extern stream<«instance.incomingPortMap.get(port).fifoTypeOut.doSwitch»> «instance.incomingPortMap.get(port).
+			extern stream<«conn.fifoTypeIn»> «conn.
 			castfifoNameWrite»;
 			// Output FIFOS
-			extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[8192];
-			extern unsigned int	«instance.incomingPortMap.get(port).wName»[1];
-			extern unsigned int	«instance.incomingPortMap.get(port).rName»[1];
-			unsigned int «instance.incomingPortMap.get(port).localwName»=0;					
-				
+			extern «conn.fifoTypeIn»	«conn.ramName»[8192];
+			extern unsigned int	«conn.wName»[1];
+			extern unsigned int	«conn.rName»[1];
+			unsigned int «conn.localwName»=0;					
+		«ELSE»
+			// Input FIFOs
+			extern stream<«conn.fifoTypeIn.doSwitch»> «conn.
+			castfifoNameWrite»;
+			// Output FIFOS
+			extern «conn.fifoTypeIn.doSwitch»	«conn.ramName»[8192];
+			extern unsigned int	«conn.wName»[1];
+			extern unsigned int	«conn.rName»[1];
+			unsigned int «conn.localwName»=0;	
+		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
-		static void cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_untagged_0() {
+		static void cast_«instance.name»_«conn.targetPort.name»_write_untagged_0() {
 			
-					i32 «instance.incomingPortMap.get(port).maskName» = «instance.incomingPortMap.get(port).localwName» & 8191;
-					«instance.incomingPortMap.get(port).fifoTypeOut.doSwitch» tmp_«instance.incomingPortMap.get(port).sourcePort.name»;
-					«instance.incomingPortMap.get(port).castfifoNameWrite».read_nb(tmp_«instance.incomingPortMap.get(port).sourcePort.
+					i32 «conn.maskName» = «conn.localwName» & 8191;
+					«IF conn.fifoTypeIn.bool»
+					«conn.fifoTypeIn» tmp_«conn.sourcePort.name»;
+					«ELSE»
+					«conn.fifoTypeIn.doSwitch» tmp_«conn.sourcePort.name»;
+						«ENDIF»
+					«conn.castfifoNameWrite».read_nb(tmp_«conn.sourcePort.
 			name»);
-					«instance.incomingPortMap.get(port).ramName»[«instance.incomingPortMap.get(port).maskName»]=tmp_«instance.
-			incomingPortMap.get(port).sourcePort.name» ;
-					«instance.incomingPortMap.get(port).localwName» = «instance.incomingPortMap.get(port).localwName» +1;
-					«instance.incomingPortMap.get(port).wName»[0] = «instance.incomingPortMap.get(port).localwName»;
+					«conn.ramName»[«conn.maskName»]=tmp_«conn.sourcePort.name» ;
+					«conn.localwName» = «conn.localwName» +1;
+					«conn.wName»[0] = «conn.localwName»;
 			
 		}
 		
@@ -100,14 +112,14 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		void cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler() {		
+		void cast_«instance.name»_«conn.targetPort.name»_write_scheduler() {		
 			
-					if (!«instance.incomingPortMap.get(port).castfifoNameWrite».empty() &&   
+					if (!«conn.castfifoNameWrite».empty() &&   
 					isSchedulable_untagged_0()) {
 					if(1
-					&& (8192 - «instance.incomingPortMap.get(port).localwName» + «instance.incomingPortMap.get(port).rName»[0] >= 1)
+					&& (8192 - «conn.localwName» + «conn.rName»[0] >= 1)
 					){
-					cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_untagged_0();
+					cast_«instance.name»_«conn.targetPort.name»_write_untagged_0();
 					}
 					} else {
 					goto finished;
@@ -118,7 +130,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			
 	'''
 
-	def getFileContentRead(Port portout) '''
+	def getFileContentRead(Connection connOut) '''
 			
 			#include <hls_stream.h>
 			using namespace hls;
@@ -136,31 +148,37 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			typedef unsigned long long int u64;			
 			////////////////////////////////////////////////////////////////////////////////
 			
-		
+		«IF connOut.fifoTypeOut.bool»
 				// Input FIFOS
-				extern «instance.outgoingPortMap.get(portout).head.fifoTypeOut.doSwitch» «instance.outgoingPortMap.get(portout).
-			head.ramName»[8192];
-				extern unsigned int «instance.outgoingPortMap.get(portout).head.wName»[1];
-				extern unsigned int «instance.outgoingPortMap.get(portout).head.rName»[1];
-				unsigned int «instance.outgoingPortMap.get(portout).head.localrName»=0;
+				extern «connOut.fifoTypeOut» «connOut.ramName»[8192];
+				extern unsigned int «connOut.wName»[1];
+				extern unsigned int «connOut.rName»[1];
+				unsigned int «connOut.localrName»=0;
 				// Output FIFOs
-				extern stream<«instance.outgoingPortMap.get(portout).head.fifoTypeOut.doSwitch»> «instance.outgoingPortMap.get(
-			portout).head.castfifoNameRead»;					
-		
+				extern stream<«connOut.fifoTypeOut»> «connOut.castfifoNameRead»;					
+		«ELSE»
+			// Input FIFOS
+				extern «connOut.fifoTypeOut.doSwitch» «connOut.ramName»[8192];
+				extern unsigned int «connOut.wName»[1];
+				extern unsigned int «connOut.rName»[1];
+				unsigned int «connOut.localrName»=0;
+				// Output FIFOs
+				extern stream<«connOut.fifoTypeOut.doSwitch»> «connOut.castfifoNameRead»;	
+		«ENDIF»
 				////////////////////////////////////////////////////////////////////////////////
 				// Actions
-				static void cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read_untagged_0() {
+				static void cast_«instance.name»_«connOut.sourcePort.name»_read_untagged_0() {
 				
-							i32 «instance.outgoingPortMap.get(portout).head.maskName» = «instance.outgoingPortMap.get(portout).head.
-			localrName» & 8191;
-							«instance.outgoingPortMap.get(portout).head.fifoTypeOut.doSwitch» tmp_«instance.outgoingPortMap.get(portout).
-			head.targetPort.name»;
-							tmp_«instance.outgoingPortMap.get(portout).head.targetPort.name» = «instance.outgoingPortMap.get(portout).head.
-			ramName»[«instance.outgoingPortMap.get(portout).head.maskName»];
-							«instance.outgoingPortMap.get(portout).head.castfifoNameRead».write_nb(tmp_«instance.outgoingPortMap.get(portout).
-			head.targetPort.name»);
-							«instance.outgoingPortMap.get(portout).head.localrName» = «instance.outgoingPortMap.get(portout).head.localrName» +1;
-							«instance.outgoingPortMap.get(portout).head.rName»[0] = «instance.outgoingPortMap.get(portout).head.localrName»;
+							i32 «connOut.maskName» = «connOut.localrName» & 8191;
+							«IF connOut.fifoTypeOut.bool»
+							«connOut.fifoTypeOut» tmp_«connOut.targetPort.name»;
+							«ELSE»
+							«connOut.fifoTypeOut.doSwitch» tmp_«connOut.targetPort.name»;
+							«ENDIF»
+							tmp_«connOut.targetPort.name» = «connOut.ramName»[«connOut.maskName»];
+							«connOut.castfifoNameRead».write_nb(tmp_«connOut.targetPort.name»);
+							«connOut.localrName» = «connOut.localrName» +1;
+							«connOut.rName»[0] = «connOut.localrName»;
 				
 				}
 				
@@ -172,14 +190,13 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 				}
 				////////////////////////////////////////////////////////////////////////////////
 				// Action scheduler
-				void cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read_scheduler() {		
-						if («instance.outgoingPortMap.get(portout).head.wName»[0] - «instance.outgoingPortMap.get(portout).head.
-			localrName» >= 1  &&
+				void cast_«instance.name»_«connOut.sourcePort.name»_read_scheduler() {		
+						if («connOut.wName»[0] - «connOut.localrName» >= 1  &&
 						isSchedulable_untagged_0()) {
 						if(1
-						&& (!«instance.outgoingPortMap.get(portout).head.castfifoNameRead».full())
+						&& (!«connOut.castfifoNameRead».full())
 						){
-						cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read_untagged_0();
+						cast_«instance.name»_«connOut.sourcePort.name»_read_untagged_0();
 						}
 						} else {
 						goto finished;
@@ -193,7 +210,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 	override print(String targetFolder) {
 		for (portIN : instance.getActor.inputs) {
 			if (instance.incomingPortMap.get(portIN).sourcePort != null) {
-				OrccUtil::printFile(getFileContentWrite(portIN),
+				OrccUtil::printFile(getFileContentWrite(instance.incomingPortMap.get(portIN)),
 					new File(
 						targetFolder + File::separator + "cast_" + instance.name + "_" +
 							instance.incomingPortMap.get(portIN).targetPort.name + "_write" + ".cpp"))
@@ -210,7 +227,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		for (portout : instance.getActor.outputs.filter[! native]) {
 			//for (connection : instance.outgoingPortMap.get(portout)) {
 				if (instance.outgoingPortMap.get(portout).head.targetPort != null) {
-					OrccUtil::printFile(getFileContentRead(portout),
+					OrccUtil::printFile(getFileContentRead(instance.outgoingPortMap.get(portout).head),
 						new File(
 							targetFolder + File::separator + "cast_" + instance.name + "_" +
 								instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read" + ".cpp"))
@@ -301,19 +318,20 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 	def rName(Connection connection) '''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
 	def maskName(Connection connection) '''«IF connection != null»mask_«connection.getAttribute("id").objectValue»«ENDIF»'''
-
-	def fifoTypeOut(Connection connection) {
-		if (connection.sourcePort == null) {
-			connection.targetPort.type
-		} else {
+def fifoTypeOut(Connection connection) {
+	
+		if (connection.targetPort == null) {
 			connection.sourcePort.type
+		} else {
+			connection.targetPort.type
 		}
 	}
 
 	def fifoTypeIn(Connection connection) {
-		if (connection.targetPort == null) {
+			if (connection.sourcePort == null) {
 			connection.sourcePort.type
 		} else {
+			
 			connection.targetPort.type
 		}
 	}

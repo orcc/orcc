@@ -450,18 +450,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
-			if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»()) {
+			if («transitions.action.inputPattern.checkInputPattern» isSchedulable_«transitions.action.name»() «transitions.action.outputPattern.printOutputPattern») {
 				«instance.name»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;
+				}
 			
-			}
-			if (isSchedulable_«transitions.action.name»()«transitions.action.outputPattern.printOutputPattern») {
-				«instance.name»_«transitions.action.body.name»();
-				_FSM_state = my_state_«transitions.target.name»;
-				goto finished;
 			
-			}
 		«ENDFOR»
 		else {
 			_FSM_state = my_state_«state.name»;
