@@ -28,9 +28,12 @@
  */
 package net.sf.orcc.backends.c.compa
 
-import java.util.Map
-import net.sf.orcc.df.Network
 import java.io.File
+import java.util.Map
+import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Entity
+import net.sf.orcc.df.Network
+import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccUtil
 
 /**
@@ -40,6 +43,7 @@ import net.sf.orcc.util.OrccUtil
  * 
  */
 class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
+	int memoryBaseAddr = 0x40000000
 	
 	new(Network network, Map<String, Object> options) {
 		super(network, options)
@@ -154,4 +158,14 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		«ENDFOR»		
 		
 	'''
+	
+	 override protected allocateFifo(Connection conn, int nbReaders) {
+	  val size = if (conn.size != null) conn.size else fifoSize
+	  val bufferAddr = memoryBaseAddr
+	  val indicesAddr = memoryBaseAddr + size
+	  memoryBaseAddr = indicesAddr + nbReaders
+	  '''
+	   fifo_«conn.sourcePort.type.doSwitch»_t fifo_«conn.<Object>getValueAsObject("idNoBcast")» = {«size», («conn.sourcePort.type.doSwitch» *) «String.format("0x%x", bufferAddr)», «nbReaders», (unsigned int *) «String.format("0x%x", indicesAddr)», 0};
+	  '''
+	 }
 }
