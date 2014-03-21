@@ -90,16 +90,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			
 			
 			«FOR port : instance.getActor.inputs»
-			«val connection = instance.incomingPortMap.get(port)»
-			«IF connection.sourcePort == null»
-				extern stream<«instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»>	«instance.incomingPortMap.get(port).
-			fifoName»;
-			«ELSE»
 				extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[8192];
 				extern unsigned int	«instance.incomingPortMap.get(port).wName»[1];
 				extern unsigned int	«instance.incomingPortMap.get(port).rName»[1];
-				unsigned int «instance.incomingPortMap.get(port).localrName»=0;
-			«ENDIF»
+				unsigned int «instance.incomingPortMap.get(port).localrName»=0;		
 			«ENDFOR»
 			
 		
@@ -107,15 +101,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			////////////////////////////////////////////////////////////////////////////////
 			// Output FIFOs
 			«FOR port : instance.getActor.outputs.filter[! native]»
-				«FOR connection : instance.outgoingPortMap.get(port)»
-					«IF connection.targetPort == null»
-						extern stream<«connection.fifoTypeOut.doSwitch»> «connection.fifoName»;
-					«ELSE»
+				«FOR connection : instance.outgoingPortMap.get(port)»					
 						extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[8192];
 						extern unsigned int «connection.wName»[1];
 						extern unsigned int «connection.rName»[1];
-						unsigned int «connection.localwName»=0;
-					«ENDIF»
+						unsigned int «connection.localwName»=0;				
 				«ENDFOR»
 			«ENDFOR»
 			
@@ -246,23 +236,17 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	//&& (512 - «instance.outgoingPortMap.get(port).head.localwName» + «instance.outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)			
 	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''		
-		«IF outgoingPortMap.get(port).head.targetPort == null»
-			&& (! «outgoingPortMap.get(port).head.fifoName».full())
-		«ELSE»
+		
 			&& (8192 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)
-		«ENDIF»
+		
 	'''
 
 	//«instance.incomingPortMap.get(port).wName»[0] - «instance.incomingPortMap.get(port).localrName» >= «pattern.getNumTokens(port)»  &&
 	override checkInputPattern(Pattern pattern) '''«FOR port : pattern.ports»
-		«IF instance.incomingPortMap.get(port).sourcePort == null»
-			«IF !instance.incomingPortMap.get(port).fifoName.toString.empty»
-				!«instance.incomingPortMap.get(port).fifoName».empty() &&
-			«ENDIF»
-		«ELSE»
+		
 			«instance.incomingPortMap.get(port).wName»[0] - «instance.incomingPortMap.get(port).localrName» >= «pattern.
 		getNumTokens(port)»  &&
-		«ENDIF»
+		
 	«ENDFOR»'''
 
 	override print(String targetFolder) {
@@ -302,20 +286,20 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			
 					«FOR portin1 : action.inputPattern.ports»
 					
-					«IF instance.incomingPortMap.get(portin1).sourcePort != null»
+					
 						«instance.incomingPortMap.get(portin1).localrName» = «instance.incomingPortMap.get(portin1).localrName»+«action.
 				inputPattern.getNumTokens(portin1)»;
 						«instance.incomingPortMap.get(portin1).rName»[0] = «instance.incomingPortMap.get(portin1).localrName»;
-					«ENDIF»
+					
 					
 					
 						«ENDFOR»
 			«FOR portout1 : action.outputPattern.ports»
-					«IF instance.outgoingPortMap.get(portout1).head.targetPort != null»
+					
 						«instance.outgoingPortMap.get(portout1).head.localwName» = «instance.outgoingPortMap.get(portout1).head.localwName» +«action.
 				outputPattern.getNumTokens(portout1)»;
 						«instance.outgoingPortMap.get(portout1).head.wName»[0] = «instance.outgoingPortMap.get(portout1).head.localwName»;
-					«ENDIF»
+					
 					
 					
 					
@@ -341,14 +325,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			val srcPort = load.source.variable.getPort
 			'''
 				«IF (srcPort != null)» 
-					«IF instance.incomingPortMap.get(srcPort).sourcePort == null»
-						«IF !instance.incomingPortMap.get(srcPort).fifoName.toString.empty»
-							«instance.incomingPortMap.get(srcPort).fifoName».read_nb(«load.target.variable.name»);
-						«ENDIF»
-					«ELSE»
+					
 						
 						«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[((«instance.incomingPortMap.get(srcPort).localrName» & 8191)  + («load.indexes.head.doSwitch»))];
-					«ENDIF»
+					
 				«ELSE»
 					«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
 				«ENDIF»
@@ -365,17 +345,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val trgtPort = store.target.variable.port
 		'''
 			«IF (trgtPort != null)»
-				«IF instance.outgoingPortMap.get(trgtPort).head.targetPort == null»
-					«IF !instance.outgoingPortMap.get(trgtPort).head.fifoName.toString.empty»
-						«instance.outgoingPortMap.get(trgtPort).head.fifoName».write_nb(«store.value.doSwitch»);
-					«ENDIF»
-				«ELSE»
+				
 					
 					«instance.outgoingPortMap.get(trgtPort).head.ramName»[((«instance.outgoingPortMap.get(trgtPort).head.
 				localwName» & 8191) + («store.
 				indexes.head.doSwitch»))]=«store.value.doSwitch»;
-					
-				«ENDIF»
 			«ELSE»
 				«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 			«ENDIF»
@@ -415,7 +389,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			connection.targetPort.type
 		}
 	}
-
+	
 	override initializeFunction() '''
 		«IF ! instance.getActor.initializes.empty»
 			«FOR init : instance.getActor.initializes»

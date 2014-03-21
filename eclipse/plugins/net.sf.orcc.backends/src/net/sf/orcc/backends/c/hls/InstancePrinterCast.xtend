@@ -64,21 +64,21 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		typedef unsigned int u32;
 		typedef unsigned long long int u64;			
 		////////////////////////////////////////////////////////////////////////////////
-		«IF conn.fifoTypeIn.bool»
+		«IF conn.fifoType.bool»
 			// Input FIFOs
-			extern stream<«conn.fifoTypeIn»> «conn.
+			extern stream<«conn.fifoType»> «conn.
 			castfifoNameWrite»;
 			// Output FIFOS
-			extern «conn.fifoTypeIn»	«conn.ramName»[8192];
+			extern «conn.fifoType»	«conn.ramName»[8192];
 			extern unsigned int	«conn.wName»[1];
 			extern unsigned int	«conn.rName»[1];
 			unsigned int «conn.localwName»=0;					
 		«ELSE»
 			// Input FIFOs
-			extern stream<«conn.fifoTypeIn.doSwitch»> «conn.
+			extern stream<«conn.fifoType.doSwitch»> «conn.
 			castfifoNameWrite»;
 			// Output FIFOS
-			extern «conn.fifoTypeIn.doSwitch»	«conn.ramName»[8192];
+			extern «conn.fifoType.doSwitch»	«conn.ramName»[8192];
 			extern unsigned int	«conn.wName»[1];
 			extern unsigned int	«conn.rName»[1];
 			unsigned int «conn.localwName»=0;	
@@ -90,14 +90,14 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		static void cast_«instance.name»_«conn.targetPort.name»_write_untagged_0() {
 			
 					i32 «conn.maskName» = «conn.localwName» & 8191;
-					«IF conn.fifoTypeIn.bool»
-					«conn.fifoTypeIn» tmp_«conn.sourcePort.name»;
+					«IF conn.fifoType.bool»
+					«conn.fifoType» tmp_«conn.sourcePort.name»;
 					«ELSE»
-					«conn.fifoTypeIn.doSwitch» tmp_«conn.sourcePort.name»;
+					«conn.fifoType.doSwitch» tmp_«conn.targetPort.name»;
 						«ENDIF»
-					«conn.castfifoNameWrite».read_nb(tmp_«conn.sourcePort.
+					«conn.castfifoNameWrite».read_nb(tmp_«conn.targetPort.
 			name»);
-					«conn.ramName»[«conn.maskName»]=tmp_«conn.sourcePort.name» ;
+					«conn.ramName»[«conn.maskName»]=tmp_«conn.targetPort.name» ;
 					«conn.localwName» = «conn.localwName» +1;
 					«conn.wName»[0] = «conn.localwName»;
 			
@@ -148,35 +148,35 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			typedef unsigned long long int u64;			
 			////////////////////////////////////////////////////////////////////////////////
 			
-		«IF connOut.fifoTypeOut.bool»
+		«IF connOut.fifoType.bool»
 				// Input FIFOS
-				extern «connOut.fifoTypeOut» «connOut.ramName»[8192];
+				extern «connOut.fifoType» «connOut.ramName»[8192];
 				extern unsigned int «connOut.wName»[1];
 				extern unsigned int «connOut.rName»[1];
 				unsigned int «connOut.localrName»=0;
 				// Output FIFOs
-				extern stream<«connOut.fifoTypeOut»> «connOut.castfifoNameRead»;					
+				extern stream<«connOut.fifoType»> «connOut.castfifoNameRead»;					
 		«ELSE»
 			// Input FIFOS
-				extern «connOut.fifoTypeOut.doSwitch» «connOut.ramName»[8192];
+				extern «connOut.fifoType.doSwitch» «connOut.ramName»[8192];
 				extern unsigned int «connOut.wName»[1];
 				extern unsigned int «connOut.rName»[1];
 				unsigned int «connOut.localrName»=0;
 				// Output FIFOs
-				extern stream<«connOut.fifoTypeOut.doSwitch»> «connOut.castfifoNameRead»;	
+				extern stream<«connOut.fifoType.doSwitch»> «connOut.castfifoNameRead»;	
 		«ENDIF»
 				////////////////////////////////////////////////////////////////////////////////
 				// Actions
 				static void cast_«instance.name»_«connOut.sourcePort.name»_read_untagged_0() {
 				
 							i32 «connOut.maskName» = «connOut.localrName» & 8191;
-							«IF connOut.fifoTypeOut.bool»
-							«connOut.fifoTypeOut» tmp_«connOut.targetPort.name»;
+							«IF connOut.fifoType.bool»
+							«connOut.fifoType» tmp_«connOut.targetPort.name»;
 							«ELSE»
-							«connOut.fifoTypeOut.doSwitch» tmp_«connOut.targetPort.name»;
+							«connOut.fifoType.doSwitch» tmp_«connOut.sourcePort.name»;
 							«ENDIF»
-							tmp_«connOut.targetPort.name» = «connOut.ramName»[«connOut.maskName»];
-							«connOut.castfifoNameRead».write_nb(tmp_«connOut.targetPort.name»);
+							tmp_«connOut.sourcePort.name» = «connOut.ramName»[«connOut.maskName»];
+							«connOut.castfifoNameRead».write_nb(tmp_«connOut.sourcePort.name»);
 							«connOut.localrName» = «connOut.localrName» +1;
 							«connOut.rName»[0] = «connOut.localrName»;
 				
@@ -209,7 +209,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override print(String targetFolder) {
 		for (portIN : instance.getActor.inputs) {
-			if (instance.incomingPortMap.get(portIN).sourcePort != null) {
+			
 				OrccUtil::printFile(getFileContentWrite(instance.incomingPortMap.get(portIN)),
 					new File(
 						targetFolder + File::separator + "cast_" + instance.name + "_" +
@@ -222,11 +222,11 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 							instance.incomingPortMap.get(portIN).targetPort.name + "_write" + ".tcl"
 					))
 
-			}
+		
 		}
 		for (portout : instance.getActor.outputs.filter[! native]) {
 			//for (connection : instance.outgoingPortMap.get(portout)) {
-				if (instance.outgoingPortMap.get(portout).head.targetPort != null) {
+			
 					OrccUtil::printFile(getFileContentRead(instance.outgoingPortMap.get(portout).head),
 						new File(
 							targetFolder + File::separator + "cast_" + instance.name + "_" +
@@ -239,7 +239,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 							targetFolder + File::separator + "script_" + "cast_" + instance.name + "_" +
 								instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read" + ".tcl"
 						))
-				}
+				
 			//}
 		}
 		return 0
@@ -335,7 +335,13 @@ def fifoTypeOut(Connection connection) {
 			connection.targetPort.type
 		}
 	}
-
+def fifoType(Connection connection) {
+		if (connection.sourcePort != null) {
+			connection.sourcePort.type
+		} else {
+			connection.targetPort.type
+		}
+	}
 	def script(String path, String Instname) '''
 		
 		open_project -reset subProject_«Instname»
