@@ -2,11 +2,10 @@
 
 find_path(LibORCC_INCLUDE_DIR orcc.h 
 		HINTS ${CMAKE_SOURCE_DIR} ../libs/orcc/include)
-
 set(LibORCC_INCLUDE_DIRS ${LibORCC_INCLUDE_DIR} )
 
 find_library(LibORCC_LIBRARY orcc 
-		HINTS ${CMAKE_SOURCE_DIR} ../libs/orcc)
+		HINTS ${CMAKE_BINARY_DIR} ../libs/orcc)
 set(LibORCC_LIBRARIES ${LibORCC_LIBRARY} )
 
 include(FindPackageHandleStandardArgs)
