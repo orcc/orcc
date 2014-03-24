@@ -269,7 +269,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		// Resolve the URI of cal file against the workspace, and convert the
 		// IFile into an IPath to allow some transformations on it
 		IFile calFile = ResourcesPlugin.getWorkspace().getRoot()
-				.getFile(new Path(URI.decode(calURI.path())));
+				.getFile(new Path(calURI.toPlatformString(true)));
 
 		IProject p = calFile.getProject();
 		if (!p.isOpen()) {
@@ -278,11 +278,9 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		IFolder outFolder = OrccUtil.getOutputFolder(p);
 		IPath calPath = calFile.getProjectRelativePath();
 
-		// Replace the firsts segments (<proj>/<src>)
-		// Replace "cal" extension by "ir"
-		IPath irPath = calPath
-				.removeFirstSegments(outFolder.getFullPath().segmentCount())
-				.removeFileExtension().addFileExtension(OrccUtil.IR_SUFFIX);
+		// Replace the first segment (<src>) and replace "cal" extension by "ir"
+		IPath irPath = calPath.removeFirstSegments(1).removeFileExtension()
+				.addFileExtension(OrccUtil.IR_SUFFIX);
 
 		// Find the corresponding file under the <proj>/bin folder
 		IFile irFile = outFolder.getFile(irPath);

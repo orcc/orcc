@@ -32,17 +32,17 @@
 #include "hevcpred.h"
 #include "hevcdsp.h"
 
+#include <emmintrin.h>
+#ifdef __SSSE3__
+#include <tmmintrin.h>
+#endif
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+#endif
 
 static HEVCPredContext hevcPred;
 static HEVCDSPContext hevcDsp;
 
-int openhevc_init_context()
-{
-    ff_hevc_dsp_init(&hevcDsp, 8);
-    ff_hevc_pred_init(&hevcPred, 8);
-
-    return 0;
-}
 
 /* Log2CbSize in openHEVC */
 /* 1 -  3 -  5 -  7 - 11 - 15 - 23 - 31 - 47 - 63 --> _width
@@ -60,6 +60,12 @@ static const int lookup_tab_openhevc_function[64] = {
    -1, -1, -1, -1, -1, -1, -1, -1,
    -1, -1, -1, -1, -1, -1, -1,  3};
 
+int openhevc_init_context()
+{
+	ff_hevc_dsp_init(&hevcDsp, 8);
+	ff_hevc_pred_init(&hevcPred, 8);
+	return 0;
+}
 
 void put_hevc_qpel_orcc(i16 _dst[2][64*64], u8 listIdx,
 u8 _src[71*71], u8 srcstride,
@@ -157,12 +163,4 @@ void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i3
     u8 *left = _left + 1;
 
     hevcPred.pred_planar[log2size - 2](src, top, left, stride);
-}
-
-void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 idx, u8 mode, i32 log2size){
-	u8 *src        = _src;
-    u8 *top  = _top + 1;
-    u8 *left = _left + 1;
-
-    hevcPred.pred_angular[log2size - 2](src, top, left, stride, idx, mode);
 }

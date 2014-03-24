@@ -394,8 +394,8 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseStatementCall(StatementCall call) {
-		for (AstExpression parameter : call.getParameters()) {
-			doSwitch(parameter);
+		for (AstExpression argument : call.getArguments()) {
+			doSwitch(argument);
 		}
 
 		return null;

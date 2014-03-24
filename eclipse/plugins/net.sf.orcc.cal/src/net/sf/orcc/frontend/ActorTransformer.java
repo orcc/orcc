@@ -197,20 +197,20 @@ public class ActorTransformer extends CalSwitch<Actor> {
 							loopVar.getType()));
 			block.add(assign);
 
-			// create while node
+			// create while block
 			Expression condition = eINSTANCE
 					.createExprBinary(eINSTANCE.createExprVar(loopVar),
 							OpBinary.LT, eINSTANCE.createExprInt(repeat),
 							eINSTANCE.createTypeBool());
-			List<Block> nodes = new ArrayList<Block>(1);
-			nodes.add(block);
+			List<Block> blocks = new ArrayList<Block>(1);
+			blocks.add(block);
 
-			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
-			nodeWhile.setCondition(condition);
-			nodeWhile.getBlocks().addAll(nodes);
+			BlockWhile blockWhile = eINSTANCE.createBlockWhile();
+			blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
+			blockWhile.setCondition(condition);
+			blockWhile.getBlocks().addAll(blocks);
 
-			procedure.getBlocks().add(nodeWhile);
+			procedure.getBlocks().add(blockWhile);
 		}
 	}
 
@@ -309,18 +309,18 @@ public class ActorTransformer extends CalSwitch<Actor> {
 							loopVar.getType()));
 			block.add(assign);
 
-			// create while node
+			// create while block
 			Expression condition = eINSTANCE
 					.createExprBinary(eINSTANCE.createExprVar(loopVar),
 							OpBinary.LT, eINSTANCE.createExprInt(repeat),
 							eINSTANCE.createTypeBool());
 
-			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
-			nodeWhile.setCondition(condition);
-			nodeWhile.getBlocks().add(block);
+			BlockWhile blockWhile = eINSTANCE.createBlockWhile();
+			blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
+			blockWhile.setCondition(condition);
+			blockWhile.getBlocks().add(block);
 
-			procedure.getBlocks().add(nodeWhile);
+			procedure.getBlocks().add(blockWhile);
 		}
 	}
 

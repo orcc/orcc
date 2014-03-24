@@ -71,6 +71,9 @@ class CMakePrinter extends CommonPrinter {
 		# Configure ouput folder for generated binary
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 		
+		# Definitions configured and used in subdirectories
+		set(additional_definitions)
+		
 		# Runtime libraries inclusion
 		include_directories(libs/orcc/include)
 		
@@ -101,6 +104,7 @@ class CMakePrinter extends CommonPrinter {
 			«ENDFOR»
 		)
 
+		add_definitions(${additional_definitions})
 		add_executable(«network.simpleName» ${filenames})
 
 		# Build library without any external library required

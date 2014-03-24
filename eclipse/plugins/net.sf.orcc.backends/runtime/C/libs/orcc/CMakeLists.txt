@@ -74,22 +74,17 @@ else()
 
     option(USE_SSE "Use SSE native functions if available" 0)
     if(USE_SSE)
-        # Define SSE_ENABLE constant for the whole project to avoid
-        # its redefinition in the CMakeLists.txt of generated applications
-        add_definitions(-DSSE_ENABLE)
-        set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS SSE_ENABLE)
-
+        list(APPEND additional_definitions -DSSE_ENABLE)
         list(APPEND orcc_sources
             src/sse.c
             src/hevc_idct_sse4.c
+            src/hevc_intra_pred_sse.c
+            src/hevc_mc_sse.c
         )
 
         find_package(OPENHEVC QUIET)
         if(OPENHEVC_FOUND)
-            # Define OPEN_HEVC_ENABLE constant for the whole project
-            add_definitions(-DOPENHEVC_ENABLE)
-            set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS OPENHEVC_ENABLE APPEND)
-
+            list(APPEND additional_definitions -DOPENHEVC_ENABLE)
             include_directories(${OPENHEVC_INCLUDE_DIR})
             list(APPEND orcc_sources src/openhevc.c)
             list(APPEND orcc_additional_libraries ${OPENHEVC_LIBRARY})
@@ -103,9 +98,7 @@ else()
     if(USE_METIS)
         find_package(METIS REQUIRED)
         if(METIS_FOUND)
-            # Define METIS_ENABLE constant for the current directory
-            add_definitions(-DMETIS_ENABLE)
-
+            list(APPEND additional_definitions -DMETIS_ENABLE)
             list(APPEND orcc_additional_libraries ${METIS_LIBRARY})
             message(STATUS "Find Metis: ${METIS_LIBRARY}")
         else()
@@ -113,13 +106,12 @@ else()
         endif()
     endif()
 
-    if(NOT MSV AND NOT CMAKE_CROSSCOMPILING)
+    if(NOT MSVC AND NOT CMAKE_CROSSCOMPILING)
         # Optimize the compilation for the local processor architecture
-        add_definitions(-march=native)
-        # FIXME: Set the flag for the whole project
-        # set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY COMPILE_C_FLAGS -march=native APPEND)
+        list(APPEND additional_definitions -march=native)
     endif()
 
+    add_definitions(${additional_definitions})
     # Compile libraries
     add_library(orcc STATIC ${orcc_sources} ${orcc_headers})
     # Do the linking
@@ -144,3 +136,6 @@ else()
     endif()
 
 endif()
+
+
+set(additional_definitions ${additional_definitions} PARENT_SCOPE)

@@ -28,7 +28,9 @@
  */
 package net.sf.orcc.tools.classifier;
 
+import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.moc.MocFactory.eINSTANCE;
+import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +76,7 @@ import org.eclipse.core.runtime.CoreException;
 public class Classifier extends DfVisitor<Void> {
 
 	private boolean internalizeGuards;
+	private boolean hasSolver;
 
 	public Classifier() {
 		this(false);
@@ -81,6 +84,11 @@ public class Classifier extends DfVisitor<Void> {
 
 	public Classifier(boolean internalizeGuards) {
 		this.internalizeGuards = internalizeGuards;
+		this.hasSolver = !getDefault().getPreference(P_SOLVER, "").isEmpty();
+		if (!hasSolver) {
+			OrccLogger.noticeln("The classifier cannot check "
+					+ "time-dependency since no SMT solver is setup.");
+		}
 	}
 
 	/**
@@ -94,6 +102,9 @@ public class Classifier extends DfVisitor<Void> {
 	 *         compatible
 	 */
 	private boolean areGuardsCompatible(Action previous, Action action) {
+		if (!hasSolver) {
+			return true;
+		}
 		GuardSatChecker checker = new GuardSatChecker(actor);
 		try {
 			if (checker.checkSat(previous, action)) {

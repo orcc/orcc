@@ -33,8 +33,8 @@ import java.util.List;
 
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.Variable;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
@@ -77,19 +77,19 @@ public class AstIrUtil {
 
 	/**
 	 * Transforms the given AST expressions to a list of IR expressions. In the
-	 * process nodes may be created and added to the current {@link #procedure},
-	 * since many RVC-CAL expressions are expressed with IR statements.
+	 * process blocks may be created and added to the current {@link #procedure}
+	 * , since many RVC-CAL expressions are expressed with IR statements.
 	 * 
 	 * @param expressions
 	 *            a list of AST expressions
 	 * @return a list of IR expressions
 	 */
 	public static List<Expression> transformExpressions(Procedure procedure,
-			List<Block> nodes, List<AstExpression> expressions) {
+			List<Block> blocks, List<AstExpression> expressions) {
 		int length = expressions.size();
 		List<Expression> irExpressions = new ArrayList<Expression>(length);
 		for (AstExpression expression : expressions) {
-			ExprTransformer transformer = new ExprTransformer(procedure, nodes);
+			ExprTransformer transformer = new ExprTransformer(procedure, blocks);
 			irExpressions.add(transformer.doSwitch(expression));
 		}
 		return irExpressions;

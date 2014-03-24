@@ -1,6 +1,7 @@
 # General ignore patterns
 *.pyc
 *.opb
+.DS_Store
 
 # User-specific files
 *.user
