@@ -117,6 +117,7 @@ public class CBackend extends AbstractBackend {
 		Map<String, String> replacementMap = new HashMap<String, String>();
 		replacementMap.put("abs", "abs_replaced");
 		replacementMap.put("getw", "getw_replaced");
+		replacementMap.put("exit", "exit_replaced");
 		replacementMap.put("index", "index_replaced");
 		replacementMap.put("log2", "log2_replaced");
 		replacementMap.put("max", "max_replaced");
