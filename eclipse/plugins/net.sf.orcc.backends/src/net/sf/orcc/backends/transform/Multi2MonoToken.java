@@ -32,7 +32,6 @@ package net.sf.orcc.backends.transform;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.orcc.backends.util.BackendUtil;
@@ -886,13 +885,13 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	private int OptimalBufferSize(Port port) {
 		int size = 0;
 		int optimalSize = 0;
-		List<Action> actions = new ArrayList<Action>(actor.getActions());
-		for (Action action : actions) {
-			for (Entry<Port, Integer> entry : action.getInputPattern()
-					.getNumTokensMap().entrySet()) {
-				if (entry.getKey() == port) {
-					if (entry.getValue() > size) {
-						size = entry.getValue();
+		for (Action action : actor.getActions()) {
+			Pattern inputPattern = action.getInputPattern();
+			for (Port input : inputPattern.getPorts()) {
+				if (input == port) {
+					int numTokens = inputPattern.getNumTokens(input);
+					if (numTokens > size) {
+						size = numTokens;
 					}
 				}
 			}
@@ -934,9 +933,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	private void scanInputs(Action action) {
 
-		for (Entry<Port, Integer> entry : action.getInputPattern()
-				.getNumTokensMap().entrySet()) {
-
+		for (Port port : action.getInputPattern().getPorts()) {
 			Var untagBuffer = irFactory.createVar(0, entryType, "buffer", true);
 			Var untagReadIndex = irFactory.createVar(0,
 					irFactory.createTypeInt(32), "UntagReadIndex", true,
@@ -945,9 +942,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 					irFactory.createTypeInt(32), "UntagWriteIndex", true,
 					irFactory.createExprInt(0));
 
-			numTokens = entry.getValue();
+			numTokens = action.getInputPattern().getNumTokens(port);
 			inputIndex = inputIndex + 100;
-			port = entry.getKey();
 			int bufferSize = OptimalBufferSize(port);
 			entryType = port.getType();
 
@@ -1005,9 +1001,9 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 *            name of the target state of the action in the actor fsm
 	 */
 	private void scanOutputs(Action action, State sourceState, State targetState) {
-		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
-				.getNumTokensMap().entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
+		for (Port verifPort : action.getOutputPattern().getPorts()) {
+			int verifNumTokens = action.getOutputPattern().getNumTokens(
+					verifPort);
 			if (verifNumTokens > 1) {
 				String writeName = "newStateWrite" + action.getName();
 				State writeState = dfFactory.createState(writeName);
@@ -1015,12 +1011,10 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 
 				fsm.replaceTarget(sourceState, action, writeState);
 
-				for (Entry<Port, Integer> entry : action.getOutputPattern()
-						.getNumTokensMap().entrySet()) {
+				for (Port port : action.getOutputPattern().getPorts()) {
 
-					numTokens = entry.getValue();
+					numTokens = action.getOutputPattern().getNumTokens(port);
 					outputIndex = outputIndex + 100;
-					port = entry.getKey();
 					entryType = port.getType();
 					String counterName = action.getName() + "NewWriteCounter"
 							+ outputIndex;
@@ -1068,10 +1062,9 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 *            action containing the inputs to check
 	 */
 	private void scanUntaggedInputs(Action action) {
-		for (Entry<Port, Integer> verifEntry : action.getInputPattern()
-				.getNumTokensMap().entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
-			Port verifPort = verifEntry.getKey();
+		for (Port verifPort : action.getInputPattern().getPorts()) {
+			int verifNumTokens = action.getInputPattern().getNumTokens(
+					verifPort);
 			Type entryType = verifPort.getType();
 			int bufferSize = OptimalBufferSize(verifPort);
 			if (inputPorts.contains(verifPort)) {
@@ -1139,27 +1132,25 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	 */
 	@SuppressWarnings("unused")
 	private void scanUntaggedOutputs(Action action) {
-		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
-				.getNumTokensMap().entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
+		for (Port verifPort : action.getOutputPattern().getPorts()) {
+			int verifNumTokens = action.getOutputPattern().getNumTokens(
+					verifPort);
 			if (verifNumTokens > 1) {
-				for (Entry<Port, Integer> entry : action.getOutputPattern()
-						.getNumTokensMap().entrySet()) {
-					numTokens = entry.getValue();
-					Port verifPort = entry.getKey();
-					String name = "TokensToSend" + verifPort.getName();
+				for (Port port : action.getOutputPattern().getPorts()) {
+					numTokens = action.getOutputPattern().getNumTokens(port);
+					String name = "TokensToSend" + port.getName();
 					Var tokensToSend = createCounter(name);
 					Expression condition = irFactory.createExprBinary(
 							irFactory.createExprVar(tokensToSend), OpBinary.GT,
 							irFactory.createExprInt(0),
 							irFactory.createTypeBool());
-					String actionName = "untaggedWrite_" + verifPort.getName();
+					String actionName = "untaggedWrite_" + port.getName();
 					Action untaggedWrite = createAction(condition, actionName);
 					Pattern pattern = untaggedWrite.getOutputPattern();
-					pattern.setNumTokens(verifPort, 1);
-					Var OUTPUT = irFactory.createVar(0, verifPort.getType(),
-							verifPort.getName() + "OUTPUT", true, 0);
-					pattern.setVariable(verifPort, OUTPUT);
+					pattern.setNumTokens(port, 1);
+					Var OUTPUT = irFactory.createVar(0, port.getType(),
+							port.getName() + "OUTPUT", true, 0);
+					pattern.setVariable(port, OUTPUT);
 					// add instruction: tokensToSend = tokensToSend - 1 ;
 					Var numTokenToSend = irFactory.createVar(0,
 							irFactory.createTypeInt(32), "numTokensToSend",
@@ -1216,9 +1207,9 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	private void updateFSM(Action action, Action oldAction, State source,
 			State target) {
 		List<Action> actions = actor.getActions();
-		for (Entry<Port, Integer> verifEntry : action.getInputPattern()
-				.getNumTokensMap().entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
+		for (Port verifPort : action.getInputPattern().getPorts()) {
+			int verifNumTokens = action.getInputPattern().getNumTokens(
+					verifPort);
 			if (verifNumTokens > 1) {
 				repeatInput = true;
 				Transition transition = dfFactory.createTransition(source,
@@ -1230,9 +1221,9 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			inputIndex = 0;
 		}
 
-		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
-				.getNumTokensMap().entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
+		for (Port verifPort : action.getOutputPattern().getPorts()) {
+			int verifNumTokens = action.getOutputPattern().getNumTokens(
+					verifPort);
 			if (verifNumTokens > 1) {
 
 				String updateWriteName = "newStateWrite" + action.getName()
@@ -1245,10 +1236,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 				oldAction.getOutputPattern().clear();
 
 				visitedRenameIndex++;
-				for (Entry<Port, Integer> entry : action.getOutputPattern()
-						.getNumTokensMap().entrySet()) {
+				for (Port port : action.getOutputPattern().getPorts()) {
 					outputIndex = outputIndex + 100;
-					port = entry.getKey();
 
 					String writeName = action.getName() + port.getName()
 							+ "_NewWrite";
