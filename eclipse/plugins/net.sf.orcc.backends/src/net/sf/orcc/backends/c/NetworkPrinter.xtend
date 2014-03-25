@@ -175,15 +175,15 @@ class NetworkPrinter extends CTemplate {
 			// Declaration of the actions
 			
 			«FOR child : network.children»
-				«FOR act : child.getAdapter(typeof(Actor)).actions»
-					action_t action_«child.label»_«act.body.name» = {"«act.body.name»", 0, 0};			
+				«FOR action : child.getAdapter(typeof(Actor)).actions»
+					action_t action_«child.label»_«action.name» = {"«action.name»", 0, 0};			
 				«ENDFOR»
 			«ENDFOR»
 			
 			«FOR child : network.children»
 				action_t *«child.label»_actions[] = {
-					«FOR act : child.getAdapter(typeof(Actor)).actions SEPARATOR ","»
-						&action_«child.label»_«act.body.name»
+					«FOR action : child.getAdapter(typeof(Actor)).actions SEPARATOR ","»
+						&action_«child.label»_«action.name»
 					«ENDFOR»
 				};
 				

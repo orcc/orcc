@@ -356,9 +356,9 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// Action's workload for profiling
 			«FOR action : actor.actions»
-				extern action_t action_«actor.name»_«action.body.name»;
-				#define ticks_«action.body.name» action_«actor.name»_«action.body.name».ticks
-			«ENDFOR»		
+				extern action_t action_«actor.name»_«action.name»;
+				#define ticks_«action.name» action_«actor.name»_«action.name».ticks
+			«ENDFOR»
 			
 		«ENDIF»
 		
