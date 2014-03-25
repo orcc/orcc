@@ -163,16 +163,6 @@ public interface DfPackage extends EPackage {
 	int TRANSITION = 12;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl
-	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToEIntegerObjectMapEntry()
-	 * @generated
-	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 13;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
@@ -1432,31 +1422,41 @@ public interface DfPackage extends EPackage {
 	int TRANSITION_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Key</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToExpressionMapEntryImpl <em>Port To Expression Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.PortToExpressionMapEntryImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToExpressionMapEntry()
 	 * @generated
-	 * @ordered
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = 0;
+	int PORT_TO_EXPRESSION_MAP_ENTRY = 13;
 
 	/**
-	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = 1;
+	int PORT_TO_EXPRESSION_MAP_ENTRY__KEY = 0;
 
 	/**
-	 * The number of structural features of the '<em>Port To EInteger Object Map Entry</em>' class.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Value</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY_FEATURE_COUNT = 2;
+	int PORT_TO_EXPRESSION_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>Port To Expression Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_EXPRESSION_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference. <!--
@@ -2253,36 +2253,38 @@ public interface DfPackage extends EPackage {
 	EReference getTransition_Actions();
 
 	/**
-	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To Expression Map Entry</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Port To EInteger Object Map Entry</em>'.
+	 * @return the meta object for class '<em>Port To Expression Map Entry</em>'.
 	 * @see java.util.Map.Entry
 	 * @model keyType="net.sf.orcc.df.Port"
-	 *        valueDataType="org.eclipse.emf.ecore.EIntegerObject"
+	 *        valueType="net.sf.orcc.ir.Expression" valueContainment="true"
 	 * @generated
 	 */
-	EClass getPortToEIntegerObjectMapEntry();
+	EClass getPortToExpressionMapEntry();
 
 	/**
 	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Key</em>'.
 	 * @see java.util.Map.Entry
-	 * @see #getPortToEIntegerObjectMapEntry()
+	 * @see #getPortToExpressionMapEntry()
 	 * @generated
 	 */
-	EReference getPortToEIntegerObjectMapEntry_Key();
+	EReference getPortToExpressionMapEntry_Key();
 
 	/**
-	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Value</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * Returns the meta object for the containment reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Value</em>'.
 	 * @see java.util.Map.Entry
-	 * @see #getPortToEIntegerObjectMapEntry()
+	 * @see #getPortToExpressionMapEntry()
 	 * @generated
 	 */
-	EAttribute getPortToEIntegerObjectMapEntry_Value();
+	EReference getPortToExpressionMapEntry_Value();
 
 	/**
 	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
@@ -3009,33 +3011,33 @@ public interface DfPackage extends EPackage {
 		EReference TRANSITION__ACTIONS = eINSTANCE.getTransition_Actions();
 
 		/**
-		 * The meta object literal for the '
-		 * {@link net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl
-		 * <em>Port To EInteger Object Map Entry</em>}' class. <!--
-		 * begin-user-doc --> <!-- end-user-doc -->
-		 * 
-		 * @see net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl
-		 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToEIntegerObjectMapEntry()
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.PortToExpressionMapEntryImpl <em>Port To Expression Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.PortToExpressionMapEntryImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToExpressionMapEntry()
 		 * @generated
 		 */
-		EClass PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = eINSTANCE
-				.getPortToEIntegerObjectMapEntry();
+		EClass PORT_TO_EXPRESSION_MAP_ENTRY = eINSTANCE
+				.getPortToExpressionMapEntry();
 
 		/**
 		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = eINSTANCE
-				.getPortToEIntegerObjectMapEntry_Key();
+		EReference PORT_TO_EXPRESSION_MAP_ENTRY__KEY = eINSTANCE
+				.getPortToExpressionMapEntry_Key();
 
 		/**
-		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Value</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = eINSTANCE
-				.getPortToEIntegerObjectMapEntry_Value();
+		EReference PORT_TO_EXPRESSION_MAP_ENTRY__VALUE = eINSTANCE
+				.getPortToExpressionMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.

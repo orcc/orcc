@@ -117,10 +117,11 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	private EClass transitionEClass = null;
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass portToEIntegerObjectMapEntryEClass = null;
+	private EClass portToExpressionMapEntryEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -747,28 +748,31 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getPortToEIntegerObjectMapEntry() {
-		return portToEIntegerObjectMapEntryEClass;
+	public EClass getPortToExpressionMapEntry() {
+		return portToExpressionMapEntryEClass;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getPortToEIntegerObjectMapEntry_Key() {
-		return (EReference) portToEIntegerObjectMapEntryEClass
+	public EReference getPortToExpressionMapEntry_Key() {
+		return (EReference) portToExpressionMapEntryEClass
 				.getEStructuralFeatures().get(0);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getPortToEIntegerObjectMapEntry_Value() {
-		return (EAttribute) portToEIntegerObjectMapEntryEClass
+	public EReference getPortToExpressionMapEntry_Value() {
+		return (EReference) portToExpressionMapEntryEClass
 				.getEStructuralFeatures().get(1);
 	}
 
@@ -1021,11 +1025,11 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		transitionEClass = createEClass(TRANSITION);
 		createEReference(transitionEClass, TRANSITION__ACTIONS);
 
-		portToEIntegerObjectMapEntryEClass = createEClass(PORT_TO_EINTEGER_OBJECT_MAP_ENTRY);
-		createEReference(portToEIntegerObjectMapEntryEClass,
-				PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY);
-		createEAttribute(portToEIntegerObjectMapEntryEClass,
-				PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE);
+		portToExpressionMapEntryEClass = createEClass(PORT_TO_EXPRESSION_MAP_ENTRY);
+		createEReference(portToExpressionMapEntryEClass,
+				PORT_TO_EXPRESSION_MAP_ENTRY__KEY);
+		createEReference(portToExpressionMapEntryEClass,
+				PORT_TO_EXPRESSION_MAP_ENTRY__VALUE);
 
 		portToVarMapEntryEClass = createEClass(PORT_TO_VAR_MAP_ENTRY);
 		createEReference(portToVarMapEntryEClass, PORT_TO_VAR_MAP_ENTRY__KEY);
@@ -1339,8 +1343,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEClass(patternEClass, Pattern.class, "Pattern", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getPattern_NumTokensMap(),
-				this.getPortToEIntegerObjectMapEntry(), null, "numTokensMap",
-				null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE,
+				this.getPortToExpressionMapEntry(), null, "numTokensMap", null,
+				0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getPattern_Ports(), this.getPort(), null, "ports", null,
@@ -1379,17 +1383,18 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(portToEIntegerObjectMapEntryEClass, Map.Entry.class,
-				"PortToEIntegerObjectMapEntry", !IS_ABSTRACT, !IS_INTERFACE,
+		initEClass(portToExpressionMapEntryEClass, Map.Entry.class,
+				"PortToExpressionMapEntry", !IS_ABSTRACT, !IS_INTERFACE,
 				!IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getPortToEIntegerObjectMapEntry_Key(), this.getPort(),
-				null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT,
+		initEReference(getPortToExpressionMapEntry_Key(), this.getPort(), null,
+				"key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPortToEIntegerObjectMapEntry_Value(),
-				ecorePackage.getEIntegerObject(), "value", null, 0, 1,
+		initEReference(getPortToExpressionMapEntry_Value(),
+				theIrPackage.getExpression(), null, "value", null, 0, 1,
 				Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 
 		initEClass(portToVarMapEntryEClass, Map.Entry.class,
 				"PortToVarMapEntry", !IS_ABSTRACT, !IS_INTERFACE,

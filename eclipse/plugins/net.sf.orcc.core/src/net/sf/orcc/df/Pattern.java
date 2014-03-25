@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.util.EList;
@@ -81,7 +82,7 @@ public interface Pattern extends EObject {
 	 * @return the number of tokens map
 	 * @model keyType="Port" valueType="Integer"
 	 */
-	EMap<Port, Integer> getNumTokensMap();
+	EMap<Port, Expression> getNumTokensMap();
 
 	/**
 	 * Returns the port that corresponds to the given variable.
@@ -183,6 +184,16 @@ public interface Pattern extends EObject {
 	 *            number of tokens produced (or consumed) by the given port
 	 */
 	void setNumTokens(Port port, int numTokens);
+
+	/**
+	 * Sets the number of tokens produced (or consumed) by the given port.
+	 * 
+	 * @param port
+	 *            a port
+	 * @param numTokens
+	 *            number of tokens produced (or consumed) by the given port
+	 */
+	void setNumTokens(Port port, Expression numTokens);
 
 	/**
 	 * Sets the variable that contains tokens produced (or consumed) by the

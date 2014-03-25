@@ -26,6 +26,7 @@ import net.sf.orcc.df.Unit;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attributable;
@@ -238,10 +239,10 @@ public class DfSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: {
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY: {
 			@SuppressWarnings("unchecked")
-			Map.Entry<Port, Integer> portToEIntegerObjectMapEntry = (Map.Entry<Port, Integer>) theEObject;
-			T result = casePortToEIntegerObjectMapEntry(portToEIntegerObjectMapEntry);
+			Map.Entry<Port, Expression> portToExpressionMapEntry = (Map.Entry<Port, Expression>) theEObject;
+			T result = casePortToExpressionMapEntry(portToExpressionMapEntry);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -500,17 +501,17 @@ public class DfSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Port To EInteger Object Map Entry</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Port To Expression Map Entry</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Port To EInteger Object Map Entry</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Port To Expression Map Entry</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
+	public T casePortToExpressionMapEntry(Map.Entry<Port, Expression> object) {
 		return null;
 	}
 

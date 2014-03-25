@@ -121,8 +121,8 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			return createTag();
 		case DfPackage.TRANSITION:
 			return createTransition();
-		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY:
-			return (EObject) createPortToEIntegerObjectMapEntry();
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY:
+			return (EObject) createPortToExpressionMapEntry();
 		case DfPackage.PORT_TO_VAR_MAP_ENTRY:
 			return (EObject) createPortToVarMapEntry();
 		case DfPackage.VAR_TO_PORT_MAP_ENTRY:
@@ -424,15 +424,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
-		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
-		return portToEIntegerObjectMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Map.Entry<Port, Var> createPortToVarMapEntry() {
 		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
 		return portToVarMapEntry;
@@ -491,6 +482,16 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Transition createTransition() {
 		TransitionImpl transition = new TransitionImpl();
 		return transition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Port, Expression> createPortToExpressionMapEntry() {
+		PortToExpressionMapEntryImpl portToExpressionMapEntry = new PortToExpressionMapEntryImpl();
+		return portToExpressionMapEntry;
 	}
 
 	@Override

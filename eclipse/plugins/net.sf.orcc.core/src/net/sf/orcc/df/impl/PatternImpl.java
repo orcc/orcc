@@ -12,7 +12,10 @@ import java.util.Iterator;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.ExpressionEvaluator;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -53,7 +56,7 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 * @generated
 	 * @ordered
 	 */
-	protected EMap<Port, Integer> numTokensMap;
+	protected EMap<Port, Expression> numTokensMap;
 	/**
 	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -283,7 +286,8 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public int getNumTokens(Port port) {
-		Integer numTokens = getNumTokensMap().get(port);
+		Integer numTokens = new ExpressionEvaluator()
+				.evaluateAsInteger(getNumTokensMap().get(port));
 		if (numTokens == null) {
 			return 0;
 		}
@@ -294,11 +298,11 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EMap<Port, Integer> getNumTokensMap() {
+	public EMap<Port, Expression> getNumTokensMap() {
 		if (numTokensMap == null) {
-			numTokensMap = new EcoreEMap<Port, Integer>(
-					DfPackage.Literals.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY,
-					PortToEIntegerObjectMapEntryImpl.class, this,
+			numTokensMap = new EcoreEMap<Port, Expression>(
+					DfPackage.Literals.PORT_TO_EXPRESSION_MAP_ENTRY,
+					PortToExpressionMapEntryImpl.class, this,
 					DfPackage.PATTERN__NUM_TOKENS_MAP);
 		}
 		return numTokensMap;
@@ -418,9 +422,16 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	}
 
 	@Override
-	public void setNumTokens(Port port, int numTokens) {
+	public void setNumTokens(Port port, Expression numTokens) {
 		checkPortPresence(port);
 		getNumTokensMap().put(port, numTokens);
+	}
+
+	@Override
+	public void setNumTokens(Port port, int numTokens) {
+		checkPortPresence(port);
+		getNumTokensMap().put(port,
+				IrFactory.eINSTANCE.createExprInt(numTokens));
 	}
 
 	@Override
