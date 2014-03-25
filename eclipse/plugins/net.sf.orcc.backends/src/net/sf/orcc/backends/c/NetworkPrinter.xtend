@@ -255,11 +255,12 @@ class NetworkPrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
+		    «beforeMain»
 		    atexit(atexit_actions);
 			init_orcc(argc, argv);
 			
 			launcher();
-			
+			«afterMain»
 			printf("End of simulation !\n");
 			return compareErrors;
 		}
@@ -375,5 +376,9 @@ class NetworkPrinter extends CTemplate {
 	
 	// This method can be override by other backends to print additional includes
 	def protected printAdditionalIncludes() ''''''
+	// This method can be override by other backends in case of calling additional 
+	// functions before and after the Main function
+	def protected afterMain() ''''''
+	def protected beforeMain() ''''''
 	
 }
