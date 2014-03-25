@@ -106,7 +106,7 @@ class SwActorPrinter extends InstancePrinter {
 		«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
 				«val connection = incomingPortMap.get(port)»
-				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port), action.name)»
+				«port.updateVar(connection, action.inputPattern.getNumTokens(port), action.name)»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
@@ -164,7 +164,7 @@ class SwActorPrinter extends InstancePrinter {
 		«ENDFOR»
 			«FOR port : action.inputPattern.ports.notNative»
 				«val connection = incomingPortMap.get(port)»
-				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port), action.name)»
+				«port.updateVar(connection, action.inputPattern.getNumTokens(port), action.name)»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»

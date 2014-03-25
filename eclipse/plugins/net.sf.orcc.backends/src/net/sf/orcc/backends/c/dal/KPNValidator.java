@@ -62,7 +62,7 @@ public class KPNValidator {
 			} else {
 				Pattern inputPattern = actor.getActions().get(0).getInputPattern();
 				for(Port port : inputPattern.getPorts()) {
-					port.setNumTokensConsumed(inputPattern.getNumTokensMap().get(port));
+					port.setNumTokensConsumed(inputPattern.getNumTokens(port));
 				}
 			}
 		}
@@ -75,7 +75,7 @@ public class KPNValidator {
 			} else {
 				Pattern outputPattern = actor.getActions().get(0).getOutputPattern();
 				for(Port port : outputPattern.getPorts()) {
-					port.setNumTokensProduced(outputPattern.getNumTokensMap().get(port));
+					port.setNumTokensProduced(outputPattern.getNumTokens(port));
 				}
 			}
 		}
@@ -110,10 +110,10 @@ public class KPNValidator {
 		Pattern first = firstAction.getInputPattern();
 		Pattern second = secondAction.getInputPattern();
 		for(Port port : first.getPorts()) {
-			int firstTokenRate = first.getNumTokensMap().get(port);
+			int firstTokenRate = first.getNumTokens(port);
 			port.setNumTokensConsumed(firstTokenRate);
 			if (second.getNumTokensMap().get(port) != null) {
-				int secondTokenRate = second.getNumTokensMap().get(port);
+				int secondTokenRate = second.getNumTokens(port);
 				if (firstTokenRate != secondTokenRate) {
 					if (!actorLevel) {
 						OrccLogger.warnln("(" + actor.getName() + ") actions '" + firstAction.getName() + "' and '" + secondAction.getName() +
@@ -151,10 +151,10 @@ public class KPNValidator {
 		Pattern first = firstAction.getOutputPattern();
 		Pattern second = secondAction.getOutputPattern();
 		for(Port port : first.getPorts()) {
-			int firstTokenRate = first.getNumTokensMap().get(port);
+			int firstTokenRate = first.getNumTokens(port);
 			port.setNumTokensProduced(firstTokenRate);
 			if (second.getNumTokensMap().get(port) != null) {
-				int secondTokenRate = second.getNumTokensMap().get(port);
+				int secondTokenRate = second.getNumTokens(port);
 				if (firstTokenRate != secondTokenRate) {
 					OrccLogger.traceln("Info: " + actor.getName() + " port " + port.getName() + " has a variable output rate");
 					port.setNumTokensProduced(-1);
