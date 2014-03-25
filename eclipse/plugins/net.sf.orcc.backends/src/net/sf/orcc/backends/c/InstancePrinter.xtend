@@ -234,6 +234,7 @@ class InstancePrinter extends CTemplate {
 
 		#include <stdio.h>
 		#include <stdlib.h>
+		«printAdditionalIncludes»
 		«IF checkArrayInbounds»
 			#include <assert.h>
 		«ENDIF»
@@ -794,6 +795,9 @@ class InstancePrinter extends CTemplate {
 	// first line after after the last of an action body
 	def protected afterActionBody() ''''''
 	def protected beforeActionBody() ''''''
+	
+	// This method can be override by other backends to print additional includes
+	def protected printAdditionalIncludes() ''''''
 	
 	def private writeTraces(Pattern pattern) {
 		if(!enableTrace) return ''''''

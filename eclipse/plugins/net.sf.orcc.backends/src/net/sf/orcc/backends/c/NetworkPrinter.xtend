@@ -130,6 +130,7 @@ class NetworkPrinter extends CTemplate {
 		#include <locale.h>
 		#include <stdio.h>
 		#include <stdlib.h>
+		«printAdditionalIncludes»
 		
 		#ifndef _WIN32
 		#define __USE_GNU
@@ -371,5 +372,8 @@ class NetworkPrinter extends CTemplate {
 	def protected allocateFifo(Connection conn, int nbReaders) '''
 		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 	'''
+	
+	// This method can be override by other backends to print additional includes
+	def protected printAdditionalIncludes() ''''''
 	
 }
