@@ -36,7 +36,6 @@ import net.sf.orcc.simulators.Simulator;
 import net.sf.orcc.simulators.SimulatorFactory;
 import net.sf.orcc.ui.console.OrccUiConsoleHandler;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccLogger.OrccLevel;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -65,9 +64,9 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		// set the log level
 		if (mode.equals("debug")
 				|| configuration.getAttribute(DEBUG_MODE, false)) {
-			OrccLogger.setLevel(OrccLevel.ALL);
+			OrccLogger.setLevel(OrccLogger.ALL);
 		} else {
-			OrccLogger.setLevel(OrccLevel.NOTICE);
+			OrccLogger.setLevel(OrccLogger.NOTICE);
 		}
 
 		Job job = new Job("Simulation job") {
@@ -131,8 +130,7 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 									+ " simulation error: "
 									+ builder.toString());
 				} finally {
-					OrccLogger.restoreLevels();
-					OrccLogger.setLevel(OrccLevel.ALL);
+ 					OrccLogger.setLevel(OrccLogger.ALL);
 				}
 
 				return returnStatus;

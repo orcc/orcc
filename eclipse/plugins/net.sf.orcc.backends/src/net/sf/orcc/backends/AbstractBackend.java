@@ -84,7 +84,6 @@ import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccLogger.OrccLevel;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -827,7 +826,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		if (debug) {
-			OrccLogger.setLevel(OrccLevel.DEBUG);
+			OrccLogger.setLevel(OrccLogger.DEBUG);
 			OrccLogger.debugln("Debug mode is enabled");
 		}
 
