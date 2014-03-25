@@ -481,7 +481,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 *            number of tokens
 	 * @return the local array created
 	 */
-	private Var createPortVariable(int lineNumber, Port port, int numTokens) {
+	private Var createPortVariable(int lineNumber, Port port,
+			Expression numTokens) {
 		// create the variable to hold the tokens
 		return eINSTANCE.createVar(lineNumber,
 				eINSTANCE.createTypeList(numTokens, port.getType()),
@@ -737,18 +738,28 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			port = Frontend.instance.getMapping(pattern.getPort());
 			totalConsumption = pattern.getValues().size();
 		}
+		Expression totalConsumptionExpr = eINSTANCE
+				.createExprInt(totalConsumption);
 
 		// evaluates token consumption
 		int repeat = 1;
 		if (astRepeat != null) {
 			repeat = Evaluator.getIntValue(astRepeat);
-			totalConsumption *= repeat;
+			Expression exprRepeat = new ExprTransformer(null, null)
+					.doSwitch(astRepeat);
+			if (totalConsumption > 1) {
+				totalConsumptionExpr = eINSTANCE.createExprBinary(
+						totalConsumptionExpr, OpBinary.TIMES, exprRepeat,
+						eINSTANCE.createTypeInt());
+			} else {
+				totalConsumptionExpr = exprRepeat;
+			}
 		}
-		irPattern.setNumTokens(port, totalConsumption);
+		irPattern.setNumTokens(port, totalConsumptionExpr);
 
 		// create port variable
 		Var variable = createPortVariable(procedure.getLineNumber(), port,
-				totalConsumption);
+				totalConsumptionExpr);
 		irPattern.setVariable(port, variable);
 
 		// load/store tokens (depending on the type of pattern)
