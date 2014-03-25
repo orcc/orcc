@@ -30,19 +30,17 @@ package net.sf.orcc.backends.transform;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.util.EcoreHelper;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -50,27 +48,25 @@ import org.eclipse.emf.common.util.EList;
  * Removes unconnected output ports from an actor. Also delete all instructions
  * which use or set variables associated with these ports.
  * 
- * 
  * @author Mariem Abid
  * 
  */
 public class DisconnectedOutputPortRemoval extends DfVisitor<Void> {
 
-	private List<Port> disconnectedOutputPorts = new ArrayList<Port>();
+	private List<Port> disconnectedOutputs;
 
 	@Override
 	public Void caseInstance(Instance instance) {
 		if (instance.isActor()) {
+			EList<Port> outputs = instance.getActor().getOutputs();
+			disconnectedOutputs = getDisconnectedOutputs(outputs,
+					instance.getOutgoingPortMap());
 
-			disconnectedOutputPorts.clear();
-
-			EList<Port> outports = instance.getActor().getOutputs();
-			Set<Port> connectedOutPorts = instance.getOutgoingPortMap()
-					.keySet();
-
-			findDiscPorts(outports, connectedOutPorts);
-			outports.removeAll(disconnectedOutputPorts);
-
+			for (Port port : disconnectedOutputs) {
+				outputs.remove(port);
+				OrccLogger.noticeln("[" + instance.getName() + "] Port "
+						+ port.getName() + " not connected.");
+			}
 			return super.caseActor(instance.getActor());
 		}
 		return null;
@@ -78,64 +74,43 @@ public class DisconnectedOutputPortRemoval extends DfVisitor<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
+		EList<Port> outputs = actor.getOutputs();
+		disconnectedOutputs = getDisconnectedOutputs(outputs,
+				actor.getOutgoingPortMap());
 
-		disconnectedOutputPorts.clear();
-
-		EList<Port> outports = actor.getOutputs();
-		Set<Port> connectedOutPorts = actor.getOutgoingPortMap().keySet();
-
-		findDiscPorts(outports, connectedOutPorts);
-		outports.removeAll(disconnectedOutputPorts);
-		
-		return super.caseActor(actor);
-	}
-
-	/**
-	 * Add all unconnectedPorts of the current Actor to disconnectedOutputPorts
-	 * member list
-	 * 
-	 * @param outports
-	 * @param connectedOutPorts
-	 */
-	private void findDiscPorts(EList<Port> outports, Set<Port> connectedOutPorts) {
-		for (Port portToCheck : outports) {
-			if (!connectedOutPorts.contains(portToCheck)) {
-				disconnectedOutputPorts.add(portToCheck);
-			}
+		for (Port port : disconnectedOutputs) {
+			outputs.remove(port);
+			OrccLogger.noticeln("[" + actor.getName() + "] Port "
+					+ port.getName() + " not connected.");
 		}
+
+		return super.caseActor(actor);
 	}
 
 	@Override
 	public Void casePattern(Pattern pattern) {
-		EList<Port> patternPorts = pattern.getPorts();
-
-		for (Port discPort : disconnectedOutputPorts) {
-			if (patternPorts.contains(discPort)) {
-				Var varOfPort = pattern.getVariable(discPort);
-				removeDefUseInst(varOfPort);
-				IrUtil.delete(varOfPort);
-				pattern.remove(discPort);
+		for (Port port : disconnectedOutputs) {
+			if (pattern.getPorts().contains(port)) {
+				Var portVar = pattern.getVariable(port);
+				IrUtil.removeInstrRelated(portVar);
+				IrUtil.delete(portVar);
+				pattern.remove(port);
 			}
 		}
 		return null;
 	}
 
-	private void removeDefUseInst(Var variable) {
-		List<Def> definitions = variable.getDefs();
-		while (!definitions.isEmpty()) {
-			Def def = definitions.get(0);
-			Instruction instruction = EcoreHelper.getContainerOfType(def,
-					Instruction.class);
-			IrUtil.delete(instruction);
+	private List<Port> getDisconnectedOutputs(List<Port> outputs,
+			Map<Port, List<Connection>> outgoingPortMap) {
+		List<Port> disconnectedOutputs = new ArrayList<Port>();
+
+		for (Port port : outputs) {
+			if (!outgoingPortMap.containsKey(port)) {
+				disconnectedOutputs.add(port);
+			}
 		}
 
-		List<Use> uses = variable.getUses();
-		while (!uses.isEmpty()) {
-			Use use = uses.get(0);
-			Instruction instruction = EcoreHelper.getContainerOfType(use,
-					Instruction.class);
-			IrUtil.delete(instruction);
-		}
-
+		return disconnectedOutputs;
 	}
+
 }

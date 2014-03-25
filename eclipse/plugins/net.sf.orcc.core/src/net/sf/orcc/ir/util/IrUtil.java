@@ -428,6 +428,31 @@ public class IrUtil {
 	}
 
 	/**
+	 * Removes all the instructions that use or define the given variable. The
+	 * method does not remove the variable itself.
+	 * 
+	 * @param variable
+	 *            a variable
+	 */
+	public static void removeInstrRelated(Var variable) {
+		List<Def> definitions = variable.getDefs();
+		while (!definitions.isEmpty()) {
+			Def def = definitions.get(0);
+			Instruction instruction = EcoreHelper.getContainerOfType(def,
+					Instruction.class);
+			IrUtil.delete(instruction);
+		}
+
+		List<Use> uses = variable.getUses();
+		while (!uses.isEmpty()) {
+			Use use = uses.get(0);
+			Instruction instruction = EcoreHelper.getContainerOfType(use,
+					Instruction.class);
+			IrUtil.delete(instruction);
+		}
+	}
+
+	/**
 	 * Removes the uses present in the given object.
 	 * 
 	 * @param eObject
