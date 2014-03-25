@@ -389,6 +389,9 @@ class InstancePrinter extends CTemplate {
 			static enum states _FSM_state;
 
 		«ENDIF»
+		
+		«additionalDeclarations»
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// Token functions
 		«FOR port : actor.inputs»
@@ -796,6 +799,8 @@ class InstancePrinter extends CTemplate {
 	def protected afterActionBody() ''''''
 	def protected beforeActionBody() ''''''
 	
+	// This method can be override by other backends to print additional declarations 
+	def protected additionalDeclarations() ''''''
 	// This method can be override by other backends to print additional includes
 	def protected printAdditionalIncludes() ''''''
 	
@@ -814,7 +819,7 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 	
-	def private profileStart(Action action) '''
+	def protected profileStart(Action action) '''
 		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
 			ticks tick_in = getticks();
 			ticks tick_out;
@@ -822,7 +827,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def private profileEnd(Action action) '''
+	def protected profileEnd(Action action) '''
 		«IF (profileNetwork || dynamicMapping) && !actor.initializes.contains(action)»
 			«FOR port : action.inputPattern.ports»
 				rate_«port.name» += «action.inputPattern.getNumTokens(port)»;

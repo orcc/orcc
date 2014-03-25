@@ -191,6 +191,8 @@ class NetworkPrinter extends CTemplate {
 			«ENDFOR»
 		«ENDIF»
 		
+		«additionalDeclarations»
+		
 		/////////////////////////////////////////////////
 		// Actor functions
 		«FOR child : network.children»
@@ -250,13 +252,15 @@ class NetworkPrinter extends CTemplate {
 					save_profiling(profiling_file, &network);
 				}
 			«ENDIF»
+			«additionalAtExitActions»
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
 		    «beforeMain»
-		    atexit(atexit_actions);
+		
+			atexit(atexit_actions);
 			init_orcc(argc, argv);
 			
 			launcher();
@@ -376,6 +380,13 @@ class NetworkPrinter extends CTemplate {
 	
 	// This method can be override by other backends to print additional includes
 	def protected printAdditionalIncludes() ''''''
+	
+	// This method can be override by other backends to print additional declarations 
+	def protected additionalDeclarations() ''''''
+	
+	// This method can be override by other backends to print additional statements
+	// when the program is terminating
+	def protected additionalAtExitActions()''''''
 	// This method can be override by other backends in case of calling additional 
 	// functions before and after the Main function
 	def protected afterMain() ''''''
