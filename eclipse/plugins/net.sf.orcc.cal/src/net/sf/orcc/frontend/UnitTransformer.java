@@ -48,6 +48,12 @@ import net.sf.orcc.ir.Var;
  */
 public class UnitTransformer extends CalSwitch<Unit> {
 
+	final StructTransformer structTransformer;
+
+	public UnitTransformer() {
+		structTransformer = new StructTransformer();
+	}
+
 	/**
 	 * Transforms the given AST unit to an IR unit.
 	 * 
@@ -68,23 +74,25 @@ public class UnitTransformer extends CalSwitch<Unit> {
 
 		// constants
 		for (Variable variable : astUnit.getVariables()) {
-			Var var = Frontend.getMapping(variable, false);
+			final Var var = (Var) structTransformer.doSwitch(variable);
 			unit.getConstants().add(var);
 		}
 
 		// functions
 		for (Function function : astUnit.getFunctions()) {
-			Procedure procedure = Frontend.getMapping(function, false);
+			final Procedure procedure = (Procedure) structTransformer
+					.doSwitch(function);
 			unit.getProcedures().add(procedure);
 		}
 
 		// procedures
 		for (AstProcedure astProcedure : astUnit.getProcedures()) {
-			Procedure procedure = Frontend.getMapping(astProcedure, false);
+			final Procedure procedure = (Procedure) structTransformer
+					.doSwitch(astProcedure);
 			unit.getProcedures().add(procedure);
 		}
 
-		AstEntity entity = (AstEntity) astUnit.eContainer();
+		final AstEntity entity = (AstEntity) astUnit.eContainer();
 		unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
 
 		return unit;
