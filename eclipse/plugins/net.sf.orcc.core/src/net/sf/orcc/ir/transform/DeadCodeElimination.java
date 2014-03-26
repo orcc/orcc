@@ -54,18 +54,6 @@ import net.sf.orcc.util.util.EcoreHelper;
  */
 public class DeadCodeElimination extends AbstractIrVisitor<Void> {
 
-	private void addBlocks(List<Block> blocks, BlockBasic join, int index) {
-		indexBlock--;
-		List<Block> parentBlocks = EcoreHelper.getContainingList(join);
-		parentBlocks.remove(indexBlock);
-
-		int size = blocks.size();
-		parentBlocks.addAll(indexBlock, blocks);
-
-		parentBlocks.add(indexBlock + size, join);
-		replacePhis(join, index);
-	}
-
 	@Override
 	public Void caseBlockIf(BlockIf block) {
 		Expression condition = block.getCondition();
@@ -78,6 +66,18 @@ public class DeadCodeElimination extends AbstractIrVisitor<Void> {
 		}
 
 		return null;
+	}
+
+	private void addBlocks(List<Block> blocks, BlockBasic join, int index) {
+		indexBlock--;
+		List<Block> parentBlocks = EcoreHelper.getContainingList(join);
+		parentBlocks.remove(indexBlock);
+
+		int size = blocks.size();
+		parentBlocks.addAll(indexBlock, blocks);
+
+		parentBlocks.add(indexBlock + size, join);
+		replacePhis(join, index);
 	}
 
 	private void replacePhis(BlockBasic joinBlock, int index) {
