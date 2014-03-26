@@ -48,6 +48,8 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
@@ -59,6 +61,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.SwitchUtil;
 import net.sf.orcc.util.Void;
 
@@ -119,8 +122,6 @@ public class StmtTransformer extends CalSwitch<Void> {
 	}
 
 	private final List<Block> blocks;
-
-	private Procedure print;
 
 	private final Procedure procedure;
 
@@ -339,15 +340,8 @@ public class StmtTransformer extends CalSwitch<Void> {
 		int lineNumber = Util.getLocation(stmtCall);
 		String name = stmtCall.getProcedure().getName();
 		if ("print".equals(name) || "println".equals(name)) {
-			if (print == null) {
-				print = eINSTANCE.createProcedure("print", lineNumber,
-						eINSTANCE.createTypeVoid());
-				print.setNative(true);
-
-				AstEntity entity = EcoreUtil2.getContainerOfType(stmtCall,
-						AstEntity.class);
-				Frontend.getProcedures(entity).add(print);
-			}
+			Procedure print = getOrCreatePrint(EcoreUtil2.getContainerOfType(
+					stmtCall, AstEntity.class));
 
 			List<AstExpression> astArguments = stmtCall.getArguments();
 			List<Expression> arguments = new ArrayList<Expression>(7);
@@ -360,10 +354,54 @@ public class StmtTransformer extends CalSwitch<Void> {
 				arguments.add(eINSTANCE.createExprString("\\n"));
 			}
 
-			InstCall call = eINSTANCE.createInstCall(lineNumber, null, print,
-					arguments);
+			final InstCall call = eINSTANCE.createInstCall(lineNumber, null,
+					print, arguments);
 			IrUtil.getLast(blocks).add(call);
 		}
 	}
 
+	/**
+	 * Try to find a print procedure stored in the entity corresponding to the
+	 * given AstEntity. If it does not exists, creates it and adds it to the
+	 * entity procedures list. In any case, returns the print procedure.
+	 * 
+	 * @param astEntity
+	 * @return
+	 */
+	private Procedure getOrCreatePrint(AstEntity astEntity) {
+
+		final List<Procedure> procedureList;
+		Procedure print;
+		if (astEntity.getActor() != null) {
+			final Actor actor = Frontend
+					.getMapping(astEntity.getActor(), false);
+			procedureList = actor.getProcs();
+			print = actor.getProcedure("print");
+		} else if (astEntity.getUnit() != null) {
+			final Unit unit = Frontend
+					.getMapping(astEntity.getUnit(), false);
+			procedureList = unit.getProcedures();
+			print = unit.getProcedure("print");
+		} else {
+			OrccLogger.severeln("BAD ");
+			return eINSTANCE.createProcedure("print", 0,
+					eINSTANCE.createTypeVoid());
+		}
+
+		// We found it, return
+		if (print != null) {
+			return print;
+		}
+
+		// It is the first time print is called in this entity, create a new
+		// print procedure
+		print = eINSTANCE.createProcedure("print", 0,
+				eINSTANCE.createTypeVoid());
+		print.setNative(true);
+
+		// Add to the actor / unit procedures list
+		procedureList.add(print);
+
+		return print;
+	}
 }
