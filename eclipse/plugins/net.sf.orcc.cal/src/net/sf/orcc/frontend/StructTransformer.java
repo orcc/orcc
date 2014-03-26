@@ -35,7 +35,6 @@ import java.util.List;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Statement;
 import net.sf.orcc.cal.cal.Variable;
@@ -45,7 +44,6 @@ import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.State;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
@@ -144,13 +142,6 @@ public class StructTransformer extends CalSwitch<EObject> {
 		addReturn(procedure, null);
 
 		return procedure;
-	}
-
-	@Override
-	public EObject caseAstState(AstState astState) {
-		State state = DfFactory.eINSTANCE.createState(astState.getName());
-		Frontend.putMapping(astState, state);
-		return state;
 	}
 
 	/**

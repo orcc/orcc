@@ -66,7 +66,7 @@ public class FSMBuilder {
 
 	private Map<Action, Integer> actionRank;
 
-	private DirectedGraph<AstState, UniqueEdge> graph;
+	private final DirectedGraph<AstState, UniqueEdge> graph;
 
 	/**
 	 * Creates a FSM builder.
@@ -149,7 +149,10 @@ public class FSMBuilder {
 		// add IR states mapped from AST states
 		FSM fsm = DfFactory.eINSTANCE.createFSM();
 		for (AstState astState : graph.vertexSet()) {
-			State state = (State) Frontend.getMapping(astState, false);
+
+			State state = DfFactory.eINSTANCE.createState(astState.getName());
+			Frontend.putMapping(astState, state);
+
 			fsm.getStates().add(state);
 		}
 
