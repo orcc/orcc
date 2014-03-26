@@ -195,5 +195,11 @@
             id="org.eclipse.xtext.ui.compare.DefaultViewerCreator">
       </viewer>
    </extension>
+   <extension
+         point="org.eclipse.xtext.builder.participant">
+      <participant
+            class="net.sf.orcc.cal.ui.CalExecutableExtensionFactory:org.eclipse.xtext.builder.IXtextBuilderParticipant">
+      </participant>
+   </extension>
 
 </plugin>
