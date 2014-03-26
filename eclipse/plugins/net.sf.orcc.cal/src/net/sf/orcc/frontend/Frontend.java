@@ -138,6 +138,9 @@ public class Frontend {
 		if (resource != null) {
 			Cache cache = CacheManager.instance.getCache(resource);
 			cache.getIrMap().put(astObject, irObject);
+		} else {
+			OrccLogger.warnln("Try to put object not contained in a resource: "
+					+ astObject);
 		}
 	}
 }
