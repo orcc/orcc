@@ -60,6 +60,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -105,7 +106,7 @@ public class FrontendCli implements IApplication {
 		CalStandaloneSetup.doSetup();
 
 		// Get the resource set used by Frontend
-		resourceSet = Frontend.instance.getResourceSet();
+		resourceSet = new ResourceSetImpl();
 		// Register the package to ensure it is available during loading.
 		resourceSet.getPackageRegistry().put(CalPackage.eNS_URI,
 				CalPackage.eINSTANCE);

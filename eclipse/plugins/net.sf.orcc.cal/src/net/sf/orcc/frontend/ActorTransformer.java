@@ -212,9 +212,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		actor.getActions().addAll(actions.getAllActions());
 		actor.getInitializes().addAll(initializes.getAllActions());
 
-		// serialize actor and cache
-		Frontend.instance.serialize(actor);
-
 		return actor;
 	}
 

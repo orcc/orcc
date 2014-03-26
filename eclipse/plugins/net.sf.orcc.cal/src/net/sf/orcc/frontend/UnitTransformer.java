@@ -87,9 +87,6 @@ public class UnitTransformer extends CalSwitch<Unit> {
 		AstEntity entity = (AstEntity) astUnit.eContainer();
 		unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
 
-		// serialize unit and cache
-		Frontend.instance.serialize(unit);
-
 		return unit;
 	}
 
