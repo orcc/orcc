@@ -118,6 +118,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	@Override
 	public Actor caseAstActor(AstActor astActor) {
+
+		untaggedCount = 0;
+
 		Actor actor = DfFactory.eINSTANCE.createActor();
 		Frontend.putMapping(astActor, actor);
 
