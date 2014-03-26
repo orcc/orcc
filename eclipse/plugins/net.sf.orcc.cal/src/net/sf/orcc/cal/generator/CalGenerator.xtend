@@ -28,7 +28,14 @@
  */
 package net.sf.orcc.cal.generator
 
+import java.io.ByteArrayOutputStream
+import net.sf.orcc.cal.cal.AstEntity
+import net.sf.orcc.frontend.ActorTransformer
+import net.sf.orcc.frontend.UnitTransformer
 import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.util.OrccUtil
+import org.eclipse.core.resources.ResourcesPlugin
+import org.eclipse.core.runtime.Path
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.IFileSystemAccess
 import org.eclipse.xtext.generator.IGenerator
@@ -40,14 +47,61 @@ import org.eclipse.xtext.generator.IGenerator
  */
 class CalGenerator implements IGenerator {
 
-	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
+	private ActorTransformer actorTransformer = new ActorTransformer
+	private UnitTransformer unitTransformer = new UnitTransformer
 
-		OrccLogger::traceln("build " + resource.URI)
+	override void doGenerate(Resource calResource, IFileSystemAccess fsa) {
+		fsa.generateFile(calResource.irRelativePath, calResource.entity.serialize)
+	}
 
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(typeof(Greeting))
-//				.map[name]
-//				.join(', '))
+	/**
+	 * Returns a serialized version of the given AStEntity
+	 * 
+	 */
+	def serialize(AstEntity astEntity) {
+		val entity =
+			if (astEntity.unit != null) {
+				unitTransformer.doSwitch(astEntity.unit)
+			} else if (astEntity.actor != null) {
+				actorTransformer.doSwitch(astEntity.actor)
+			} else {
+				null
+			}
+
+		if (entity == null) {
+			OrccLogger.warnln("Unable to transform the CAL content")
+			return ""
+		}
+
+		val resource = astEntity.eResource.resourceSet.createResource(OrccUtil::getIrUri(astEntity.eResource.URI))
+		resource.contents.add(entity)
+
+		val outputStream = new ByteArrayOutputStream
+		resource.save(outputStream, newHashMap)
+
+		outputStream.toString
+	}
+
+	/**
+	 * Return the AstEntity contained in the given resource
+	 */
+	def private getEntity(Resource calResource) {
+		calResource.contents.head as AstEntity
+	}
+
+	/**
+	 * Returns the path where IR file corresponding to given calResource should be stored.
+	 * Important: the returned path is relative to the output folder (not the project)
+	 * 
+	 * @param calResource An EMF resource representing a CAL file
+	 * @return Path of the IR file as String
+	 */
+	def private getIrRelativePath(Resource calResource) {
+		val path = new Path(calResource.URI.toPlatformString(true))
+		val file = ResourcesPlugin.workspace.root.getFile(path)
+		file.projectRelativePath.removeFirstSegments(1) // Remove folder (src) part
+			.removeFileExtension						// Remove suffix (cal)
+			.addFileExtension(OrccUtil.IR_SUFFIX) 		// Add the new suffix (ir)
+			.toString									// Returns the string representation of the path
 	}
 }
