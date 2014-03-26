@@ -38,6 +38,7 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -101,8 +102,14 @@ public class Frontend {
 
 		// no need to put the mapping back because the AstTransformer does it
 		// that's also why we don't use getOrCompute
-		EObject irObject = internalGetMapping(eObject);
+		EObject irObject = null;
+		if (eObject.eResource() != null) {
+			Cache cache = CacheManager.instance.getCache(eObject.eResource());
+			irObject = cache.getIrMap().get(eObject);
+		}
+
 		if (irObject == null) {
+			OrccLogger.warnln("* " + eObject + " is missing from cache");
 			irObject = new StructTransformer().doSwitch(eObject);
 		}
 
@@ -118,23 +125,6 @@ public class Frontend {
 		} else {
 			return null;
 		}
-	}
-
-	/**
-	 * Returns the IR equivalent of the given AST object using its URI.
-	 * 
-	 * @param eObject
-	 *            an AST object
-	 * @return the IR equivalent of the given object
-	 */
-	private static EObject internalGetMapping(EObject eObject) {
-		Resource resource = eObject.eResource();
-		if (resource != null) {
-			Cache cache = CacheManager.instance.getCache(resource);
-			return cache.getIrMap().get(eObject);
-		}
-
-		return null;
 	}
 
 	/**
