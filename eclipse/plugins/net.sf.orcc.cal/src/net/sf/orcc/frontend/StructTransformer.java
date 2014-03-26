@@ -118,12 +118,13 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 */
 	@Override
 	public Procedure caseAstProcedure(AstProcedure astProcedure) {
-		String name = astProcedure.getName();
-		int lineNumber = Util.getLocation(astProcedure);
 
-		// create procedure
-		procedure = eINSTANCE.createProcedure(name, lineNumber,
-				eINSTANCE.createTypeVoid());
+		// Get existing procedure
+		procedure = Frontend.getMapping(astProcedure, false);
+		// Set attributes
+		procedure.setName(astProcedure.getName());
+		procedure.setLineNumber(Util.getLocation(astProcedure));
+		procedure.setReturnType(eINSTANCE.createTypeVoid());
 
 		// set native flag
 		if (Util.hasAnnotation("native", astProcedure.getAnnotations())) {
@@ -162,12 +163,13 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 */
 	@Override
 	public Procedure caseFunction(Function function) {
-		String name = function.getName();
-		int lineNumber = Util.getLocation(function);
-		Type type = Typer.getType(function);
 
-		// create procedure
-		procedure = eINSTANCE.createProcedure(name, lineNumber, type);
+		// Get existing procedure
+		procedure = Frontend.getMapping(function, false);
+		// Set attributes
+		procedure.setName(function.getName());
+		procedure.setLineNumber(Util.getLocation(function));
+		procedure.setReturnType(Typer.getType(function));
 
 		// set native flag
 		if (Util.hasAnnotation("native", function.getAnnotations())) {

@@ -78,6 +78,7 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -145,18 +146,25 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			actor.getStateVars().add(var);
 		}
 
-		// functions
+		// Create empty stubs for functions and procedures
+		// This tip will allow to call a function/procedure declared later
 		for (Function function : astActor.getFunctions()) {
-			final Procedure procedure = (Procedure) structTransformer
-					.doSwitch(function);
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure();
+			Frontend.putMapping(function, procedure);
+			actor.getProcs().add(procedure);
+		}
+		for (AstProcedure astProcedure : astActor.getProcedures()) {
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure();
+			Frontend.putMapping(astProcedure, procedure);
 			actor.getProcs().add(procedure);
 		}
 
-		// procedures
+		// Really transform functions / procedures
+		for (Function function : astActor.getFunctions()) {
+			structTransformer.doSwitch(function);
+		}
 		for (AstProcedure astProcedure : astActor.getProcedures()) {
-			final Procedure procedure = (Procedure) structTransformer
-					.doSwitch(astProcedure);
-			actor.getProcs().add(procedure);
+			structTransformer.doSwitch(astProcedure);
 		}
 
 		// transform ports

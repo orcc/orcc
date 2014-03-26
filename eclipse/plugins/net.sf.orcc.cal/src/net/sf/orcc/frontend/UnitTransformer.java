@@ -37,6 +37,7 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Unit;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
@@ -78,19 +79,27 @@ public class UnitTransformer extends CalSwitch<Unit> {
 			unit.getConstants().add(var);
 		}
 
-		// functions
+		// Create empty stubs for functions and procedures
+		// This tip will allow to call a function/procedure declared later
 		for (Function function : astUnit.getFunctions()) {
-			final Procedure procedure = (Procedure) structTransformer
-					.doSwitch(function);
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure();
+			Frontend.putMapping(function, procedure);
+			unit.getProcedures().add(procedure);
+		}
+		for (AstProcedure astProcedure : astUnit.getProcedures()) {
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure();
+			Frontend.putMapping(astProcedure, procedure);
 			unit.getProcedures().add(procedure);
 		}
 
-		// procedures
-		for (AstProcedure astProcedure : astUnit.getProcedures()) {
-			final Procedure procedure = (Procedure) structTransformer
-					.doSwitch(astProcedure);
-			unit.getProcedures().add(procedure);
+		// Really transform functions / procedures
+		for (Function function : astUnit.getFunctions()) {
+			structTransformer.doSwitch(function);
 		}
+		for (AstProcedure astProcedure : astUnit.getProcedures()) {
+			structTransformer.doSwitch(astProcedure);
+		}
+
 
 		final AstEntity entity = (AstEntity) astUnit.eContainer();
 		unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
