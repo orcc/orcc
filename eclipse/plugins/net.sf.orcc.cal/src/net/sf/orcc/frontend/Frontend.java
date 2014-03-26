@@ -28,16 +28,11 @@
  */
 package net.sf.orcc.frontend;
 
-import java.util.List;
-
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Unit;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.EObject;
@@ -113,17 +108,6 @@ public class Frontend {
 		}
 
 		return (T) irObject;
-	}
-
-	public static List<Procedure> getProcedures(AstEntity astEntity) {
-		EObject entity = getEntity(astEntity);
-		if (entity instanceof Actor) {
-			return ((Actor) entity).getProcs();
-		} else if (entity instanceof Unit) {
-			return ((Unit) entity).getProcedures();
-		} else {
-			return null;
-		}
 	}
 
 	/**
