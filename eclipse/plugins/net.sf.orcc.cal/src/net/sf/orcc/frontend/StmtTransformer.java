@@ -46,6 +46,7 @@ import net.sf.orcc.cal.cal.StatementIf;
 import net.sf.orcc.cal.cal.StatementWhile;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
@@ -193,7 +194,10 @@ public class StmtTransformer extends CalSwitch<Void> {
 
 		// creates loop variable and assigns it
 		Variable variable = foreach.getVariable();
-		Var loopVar = AstIrUtil.getLocalByName(procedure, variable);
+
+		Var loopVar = procedure.newTempLocalVariable(Typer.getType(variable),
+				variable.getName());
+		Frontend.putMapping(variable, loopVar);
 
 		AstExpression astLower = foreach.getLower();
 		new ExprTransformer(procedure, blocks, loopVar).doSwitch(astLower);
