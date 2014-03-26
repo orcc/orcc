@@ -110,6 +110,112 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	}
 
 	/**
+	 * Transforms the given AST Actor to an IR actor.
+	 * 
+	 * @param astActor
+	 *            the AST of the actor
+	 * @return the actor in IR form
+	 */
+	@Override
+	public Actor caseAstActor(AstActor astActor) {
+		Actor actor = DfFactory.eINSTANCE.createActor();
+		Frontend.putMapping(astActor, actor);
+
+		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
+		actor.setAttribute("project", Util.getProjectName(astActor));
+
+		int lineNumber = Util.getLocation(astActor);
+		actor.setLineNumber(lineNumber);
+
+		// parameters
+		for (Variable variable : astActor.getParameters()) {
+			Var var = Frontend.getMapping(variable, false);
+			actor.getParameters().add(var);
+		}
+
+		// state variables
+		for (Variable variable : astActor.getStateVariables()) {
+			Var var = Frontend.getMapping(variable, false);
+			actor.getStateVars().add(var);
+		}
+
+		// functions
+		for (Function function : astActor.getFunctions()) {
+			String fnName = function.getName();
+			if ("print".equals(fnName) || "println".equals(fnName)) {
+				continue;
+			}
+			Procedure procedure = Frontend.getMapping(function, false);
+			actor.getProcs().add(procedure);
+		}
+
+		// procedures
+		for (AstProcedure astProcedure : astActor.getProcedures()) {
+			Procedure procedure = Frontend.getMapping(astProcedure, false);
+			actor.getProcs().add(procedure);
+		}
+
+		// transform ports
+		for (AstPort astPort : astActor.getInputs()) {
+			Port port = Frontend.getMapping(astPort, false);
+			actor.getInputs().add(port);
+		}
+		for (AstPort astPort : astActor.getOutputs()) {
+			Port port = Frontend.getMapping(astPort, false);
+			actor.getOutputs().add(port);
+		}
+
+		// transform actions
+		ActionList actions = transformActions(astActor.getActions());
+
+		// transform initializes
+		ActionList initializes = transformActions(astActor.getInitializes());
+
+		// sort actions by priority
+		ActionSorter sorter = new ActionSorter(actions);
+		ActionList sortedActions = sorter.applyPriority(astActor
+				.getPriorities());
+
+		// transform FSM
+		ScheduleFsm schedule = astActor.getScheduleFsm();
+		RegExp scheduleRegExp = astActor.getScheduleRegExp();
+		if (schedule == null && scheduleRegExp == null) {
+			actor.getActionsOutsideFsm().addAll(sortedActions.getAllActions());
+		} else {
+			FSM fsm = null;
+			if (schedule != null) {
+				FSMBuilder builder = new FSMBuilder();
+				fsm = builder.buildFSM(schedule.getContents(), sortedActions);
+
+				// set initial state
+				AstState initialState = schedule.getInitialState();
+				State state = (State) Frontend.getMapping(initialState, false);
+				fsm.setInitialState(state);
+			} else {
+				RegExpConverter converter = new RegExpConverter(scheduleRegExp);
+				fsm = converter.convert(sortedActions);
+			}
+
+			actor.getActionsOutsideFsm().addAll(
+					sortedActions.getUntaggedActions());
+			actor.setFsm(fsm);
+		}
+
+		// create IR actor
+		AstEntity entity = (AstEntity) astActor.eContainer();
+		actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
+		actor.setNative(Util.hasAnnotation("native", entity.getAnnotations()));
+		Util.transformAnnotations(actor, entity.getAnnotations());
+		actor.getActions().addAll(actions.getAllActions());
+		actor.getInitializes().addAll(initializes.getAllActions());
+
+		// serialize actor and cache
+		Frontend.instance.serialize(actor);
+
+		return actor;
+	}
+
+	/**
 	 * Loads tokens from the data that was read and put in portVariable.
 	 * 
 	 * @param portVariable
@@ -325,112 +431,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	}
 
 	/**
-	 * Transforms the given AST Actor to an IR actor.
-	 * 
-	 * @param astActor
-	 *            the AST of the actor
-	 * @return the actor in IR form
-	 */
-	@Override
-	public Actor caseAstActor(AstActor astActor) {
-		Actor actor = DfFactory.eINSTANCE.createActor();
-		Frontend.putMapping(astActor, actor);
-
-		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
-		actor.setAttribute("project", Util.getProjectName(astActor));
-
-		int lineNumber = Util.getLocation(astActor);
-		actor.setLineNumber(lineNumber);
-
-		// parameters
-		for (Variable variable : astActor.getParameters()) {
-			Var var = Frontend.getMapping(variable, false);
-			actor.getParameters().add(var);
-		}
-
-		// state variables
-		for (Variable variable : astActor.getStateVariables()) {
-			Var var = Frontend.getMapping(variable, false);
-			actor.getStateVars().add(var);
-		}
-
-		// functions
-		for (Function function : astActor.getFunctions()) {
-			String fnName = function.getName();
-			if ("print".equals(fnName) || "println".equals(fnName)) {
-				continue;
-			}
-			Procedure procedure = Frontend.getMapping(function, false);
-			actor.getProcs().add(procedure);
-		}
-
-		// procedures
-		for (AstProcedure astProcedure : astActor.getProcedures()) {
-			Procedure procedure = Frontend.getMapping(astProcedure, false);
-			actor.getProcs().add(procedure);
-		}
-
-		// transform ports
-		for (AstPort astPort : astActor.getInputs()) {
-			Port port = Frontend.getMapping(astPort, false);
-			actor.getInputs().add(port);
-		}
-		for (AstPort astPort : astActor.getOutputs()) {
-			Port port = Frontend.getMapping(astPort, false);
-			actor.getOutputs().add(port);
-		}
-
-		// transform actions
-		ActionList actions = transformActions(astActor.getActions());
-
-		// transform initializes
-		ActionList initializes = transformActions(astActor.getInitializes());
-
-		// sort actions by priority
-		ActionSorter sorter = new ActionSorter(actions);
-		ActionList sortedActions = sorter.applyPriority(astActor
-				.getPriorities());
-
-		// transform FSM
-		ScheduleFsm schedule = astActor.getScheduleFsm();
-		RegExp scheduleRegExp = astActor.getScheduleRegExp();
-		if (schedule == null && scheduleRegExp == null) {
-			actor.getActionsOutsideFsm().addAll(sortedActions.getAllActions());
-		} else {
-			FSM fsm = null;
-			if (schedule != null) {
-				FSMBuilder builder = new FSMBuilder();
-				fsm = builder.buildFSM(schedule.getContents(), sortedActions);
-
-				// set initial state
-				AstState initialState = schedule.getInitialState();
-				State state = (State) Frontend.getMapping(initialState, false);
-				fsm.setInitialState(state);
-			} else {
-				RegExpConverter converter = new RegExpConverter(scheduleRegExp);
-				fsm = converter.convert(sortedActions);
-			}
-
-			actor.getActionsOutsideFsm().addAll(
-					sortedActions.getUntaggedActions());
-			actor.setFsm(fsm);
-		}
-
-		// create IR actor
-		AstEntity entity = (AstEntity) astActor.eContainer();
-		actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
-		actor.setNative(Util.hasAnnotation("native", entity.getAnnotations()));
-		Util.transformAnnotations(actor, entity.getAnnotations());
-		actor.getActions().addAll(actions.getAllActions());
-		actor.getInitializes().addAll(initializes.getAllActions());
-
-		// serialize actor and cache
-		Frontend.instance.serialize(actor);
-
-		return actor;
-	}
-
-	/**
 	 * Creates the test for schedulability of the given action.
 	 * 
 	 * @param astAction
@@ -500,12 +500,12 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			return true;
 		}
 		// Variables used by a procedure have to be copied as well
-		for(Use use: var.getUses()) {
-			if(EcoreHelper.getContainerOfType(use, InstCall.class) != null) {
+		for (Use use : var.getUses()) {
+			if (EcoreHelper.getContainerOfType(use, InstCall.class) != null) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
