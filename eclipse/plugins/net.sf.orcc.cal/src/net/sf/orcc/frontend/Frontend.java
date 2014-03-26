@@ -43,7 +43,6 @@ import net.sf.orcc.util.OrccLogger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.Switch;
-import org.eclipse.xtext.EcoreUtil2;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -95,9 +94,9 @@ public class Frontend {
 	public static <T extends EObject> T getMapping(EObject eObject,
 			boolean require) {
 		if (require) {
-			AstEntity entity = EcoreUtil2.getContainerOfType(eObject,
-					AstEntity.class);
-			getEntity(entity);
+			// AstEntity entity = EcoreUtil2.getContainerOfType(eObject,
+			// AstEntity.class);
+			// getEntity(entity);
 		}
 
 		// no need to put the mapping back because the AstTransformer does it
