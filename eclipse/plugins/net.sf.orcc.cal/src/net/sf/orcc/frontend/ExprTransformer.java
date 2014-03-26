@@ -235,8 +235,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		}
 
 		// transforms "then" expression
-		new ExprTransformer(procedure, blockIf.getThenBlocks(), ifTarget, indexes)
-				.doSwitch(expression.getThen());
+		new ExprTransformer(procedure, blockIf.getThenBlocks(), ifTarget,
+				indexes).doSwitch(expression.getThen());
 
 		// add elsif expressions
 		for (ExpressionElsif elsif : expression.getElsifs()) {
@@ -257,8 +257,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			blockIf = innerIf;
 		}
 
-		new ExprTransformer(procedure, blockIf.getElseBlocks(), ifTarget, indexes)
-				.doSwitch(expression.getElse());
+		new ExprTransformer(procedure, blockIf.getElseBlocks(), ifTarget,
+				indexes).doSwitch(expression.getElse());
 
 		// return expr
 		if (target == null) {
@@ -373,7 +373,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 						// Need to copy the list before using it in a procedure
 						target = procedure.newTempLocalVariable(var.getType(),
 								"local_" + var.getName());
-						copyList(var);
+						copyList(var, true);
 						// Notice that is just a copy of the input data
 						target.setAttribute("copyOfTokens",
 								inputPattern.getPort(var));
@@ -382,7 +382,15 @@ public class ExprTransformer extends CalSwitch<Expression> {
 				}
 				return eINSTANCE.createExprVar(var);
 			} else {
-				return copyList(var);
+				if (var.hasAttribute("copyOfTokens")) {
+					Pattern outputPattern = ((Action) procedure.eContainer())
+							.getOutputPattern();
+					var.setAttribute("copyOfTokens",
+							outputPattern.getPort(target));
+					return copyList(var, true);
+				} else {
+					return copyList(var, false);
+				}
 			}
 		} else {
 			if (procedure != null) {
@@ -412,7 +420,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 *            a variable of type list.
 	 * @return <code>null</code>
 	 */
-	private Expression copyList(Var var) {
+	private Expression copyList(Var var, boolean removable) {
 		TypeList typeList = (TypeList) target.getType();
 		List<Block> blocks = this.blocks;
 		List<BlockWhile> whiles = new ArrayList<BlockWhile>();
@@ -443,6 +451,10 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			blocks.add(blockWhile);
 
 			blocks = blockWhile.getBlocks();
+			
+			if(removable) {
+				blockWhile.addAttribute("removableCopy");
+			}
 		}
 
 		// load

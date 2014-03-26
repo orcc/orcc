@@ -952,13 +952,17 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	override caseBlockWhile(BlockWhile blockWhile)'''
-		while («blockWhile.condition.doSwitch») {
-			«FOR block : blockWhile.blocks»
-				«block.doSwitch»
-			«ENDFOR»
+	override caseBlockWhile(BlockWhile blockWhile) {
+		if(!isActionAligned || !blockWhile.hasAttribute("removableCopy")){
+			'''
+			while («blockWhile.condition.doSwitch») {
+				«FOR block : blockWhile.blocks»
+					«block.doSwitch»
+				«ENDFOR»
+			}
+			'''
 		}
-	'''
+	}
 
 	override caseBlockBasic(BlockBasic block) '''
 		«FOR instr : block.instructions»

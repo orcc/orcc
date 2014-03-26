@@ -502,6 +502,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		// Variables used by a procedure have to be copied as well
 		for(Use use: var.getUses()) {
 			if(EcoreHelper.getContainerOfType(use, InstCall.class) != null) {
+				var.addAttribute("copyOfTokens");
 				return true;
 			}
 		}
