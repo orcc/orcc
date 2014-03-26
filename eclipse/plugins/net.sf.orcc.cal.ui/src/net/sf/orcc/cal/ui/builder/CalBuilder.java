@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, IETR/INSA of Rennes
+ * Copyright (c) 2014, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,35 +26,37 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal.ui;
+package net.sf.orcc.cal.ui.builder;
 
-import net.sf.orcc.cal.ui.editor.hover.CalObjectHover;
+import net.sf.orcc.cal.generator.CalGenerator;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.xtext.builder.IXtextBuilderParticipant;
-import org.eclipse.xtext.resource.ILocationInFileProvider;
-import org.eclipse.xtext.ui.editor.hover.IEObjectHoverProvider;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.xtext.builder.BuilderParticipant;
+import org.eclipse.xtext.generator.IGenerator;
 
 /**
- * This class extends the default abstract CAL UI module to define customized
- * services.
+ * Hack the default BuilderParticipant to call methods at the beginning and the
+ * end of a build.
+ * 
+ * @author Antoine Lorence
+ * 
  */
-public class CalUiModule extends net.sf.orcc.cal.ui.AbstractCalUiModule {
-
-	public CalUiModule(AbstractUIPlugin plugin) {
-		super(plugin);
-	}
-
-	public Class<? extends IEObjectHoverProvider> bindIEObjectHoverProvider() {
-		return CalObjectHover.class;
-	}
-
-	public Class<? extends ILocationInFileProvider> bindILocationInFileProvider() {
-		return CalLocationProvider.class;
-	}
+public class CalBuilder extends BuilderParticipant {
 
 	@Override
-	public Class<? extends IXtextBuilderParticipant> bindIXtextBuilderParticipant() {
-		return net.sf.orcc.cal.ui.builder.CalBuilder.class;
+	public void build(IBuildContext context, IProgressMonitor monitor)
+			throws CoreException {
+
+		final IGenerator generator = getGenerator();
+		if (generator instanceof CalGenerator) {
+			((CalGenerator) generator).beforeBuild();
+		}
+
+		super.build(context, monitor);
+
+		if (generator instanceof CalGenerator) {
+			((CalGenerator) generator).afterBuild();
+		}
 	}
 }

@@ -50,6 +50,9 @@ class CalGenerator implements IGenerator {
 	private ActorTransformer actorTransformer = new ActorTransformer
 	private UnitTransformer unitTransformer = new UnitTransformer
 
+	def beforeBuild() {
+	}
+
 	override void doGenerate(Resource calResource, IFileSystemAccess fsa) {
 		fsa.generateFile(calResource.irRelativePath, calResource.entity.serialize)
 	}
@@ -103,5 +106,8 @@ class CalGenerator implements IGenerator {
 			.removeFileExtension						// Remove suffix (cal)
 			.addFileExtension(OrccUtil.IR_SUFFIX) 		// Add the new suffix (ir)
 			.toString									// Returns the string representation of the path
+	}
+
+	def afterBuild() {
 	}
 }
