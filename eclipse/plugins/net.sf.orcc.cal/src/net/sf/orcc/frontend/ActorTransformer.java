@@ -103,10 +103,13 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	private int untaggedCount;
 
+	final StructTransformer structTransformer;
+
 	/**
 	 * Creates a new AST to IR transformation.
 	 */
 	public ActorTransformer() {
+		structTransformer = new StructTransformer();
 	}
 
 	/**
@@ -132,39 +135,37 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		// parameters
 		for (Variable variable : astActor.getParameters()) {
-			Var var = Frontend.getMapping(variable, false);
+			final Var var = (Var) structTransformer.doSwitch(variable);
 			actor.getParameters().add(var);
 		}
 
 		// state variables
 		for (Variable variable : astActor.getStateVariables()) {
-			Var var = Frontend.getMapping(variable, false);
+			final Var var = (Var) structTransformer.doSwitch(variable);
 			actor.getStateVars().add(var);
 		}
 
 		// functions
 		for (Function function : astActor.getFunctions()) {
-			String fnName = function.getName();
-			if ("print".equals(fnName) || "println".equals(fnName)) {
-				continue;
-			}
-			Procedure procedure = Frontend.getMapping(function, false);
+			final Procedure procedure = (Procedure) structTransformer
+					.doSwitch(function);
 			actor.getProcs().add(procedure);
 		}
 
 		// procedures
 		for (AstProcedure astProcedure : astActor.getProcedures()) {
-			Procedure procedure = Frontend.getMapping(astProcedure, false);
+			final Procedure procedure = (Procedure) structTransformer
+					.doSwitch(astProcedure);
 			actor.getProcs().add(procedure);
 		}
 
 		// transform ports
 		for (AstPort astPort : astActor.getInputs()) {
-			Port port = Frontend.getMapping(astPort, false);
+			final Port port = (Port) structTransformer.doSwitch(astPort);
 			actor.getInputs().add(port);
 		}
 		for (AstPort astPort : astActor.getOutputs()) {
-			Port port = Frontend.getMapping(astPort, false);
+			final Port port = (Port) structTransformer.doSwitch(astPort);
 			actor.getOutputs().add(port);
 		}
 
@@ -208,7 +209,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		AstEntity entity = (AstEntity) astActor.eContainer();
 		actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
 		actor.setNative(Util.hasAnnotation("native", entity.getAnnotations()));
+
 		Util.transformAnnotations(actor, entity.getAnnotations());
+
 		actor.getActions().addAll(actions.getAllActions());
 		actor.getInitializes().addAll(initializes.getAllActions());
 
