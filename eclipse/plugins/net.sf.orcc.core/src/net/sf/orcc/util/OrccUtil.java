@@ -79,6 +79,8 @@ public class OrccUtil {
 	public static final String NETWORK_SUFFIX = "xdf";
 	public static final String DIAGRAM_SUFFIX = "xdfdiag";
 
+	public static final String PROJECT_OUTPUT_DIR = "bin";
+
 	/**
 	 * Creates a new file if needed and returns its path
 	 * 
@@ -382,19 +384,7 @@ public class OrccUtil {
 	 *         none is found
 	 */
 	public static IFolder getOutputFolder(IProject project) {
-		IJavaProject javaProject = JavaCore.create(project);
-		if (!javaProject.exists()) {
-			return null;
-		}
-
-		IPath path;
-		try {
-			path = javaProject.getOutputLocation();
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			return root.getFolder(path);
-		} catch (JavaModelException e) {
-			return null;
-		}
+		return project.getFolder(PROJECT_OUTPUT_DIR);
 	}
 
 	/**
