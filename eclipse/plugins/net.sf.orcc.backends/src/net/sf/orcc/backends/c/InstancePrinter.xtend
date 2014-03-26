@@ -622,6 +622,7 @@ class InstancePrinter extends CTemplate {
 
 		«inline»void «entityName»_initialize(schedinfo_t *si) {
 			int i = 0;
+			«additionalInitializes»
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
@@ -629,7 +630,7 @@ class InstancePrinter extends CTemplate {
 			«IF !actor.initializes.nullOrEmpty»
 				«actor.initializes.printActionsScheduling»
 			«ENDIF»
-
+			
 		finished:
 			// no read_end/write_end here!
 			return;
@@ -799,6 +800,8 @@ class InstancePrinter extends CTemplate {
 	def protected afterActionBody() ''''''
 	def protected beforeActionBody() ''''''
 	
+	// This method can be override by other backends to print additional initializations 
+	def protected additionalInitializes()''''''
 	// This method can be override by other backends to print additional declarations 
 	def protected additionalDeclarations() ''''''
 	// This method can be override by other backends to print additional includes
