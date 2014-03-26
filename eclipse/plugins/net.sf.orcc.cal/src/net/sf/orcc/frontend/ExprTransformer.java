@@ -189,7 +189,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		int lineNumber = Util.getLocation(exprCall);
 
 		// retrieve IR procedure
-		Procedure calledProc = Frontend.getMapping(exprCall.getFunction());
+		Procedure calledProc = Frontend
+				.getMapping(exprCall.getFunction(), true);
 
 		// transform parameters
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
@@ -273,7 +274,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		// we always load in this case
 		int lineNumber = Util.getLocation(expression);
 		Variable variable = expression.getSource().getVariable();
-		Var var = Frontend.getMapping(variable);
+		Var var = Frontend.getMapping(variable, true);
 
 		List<Expression> indexes = AstIrUtil.transformExpressions(procedure,
 				blocks, expression.getIndexes());
@@ -360,7 +361,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	@Override
 	public Expression caseExpressionVariable(ExpressionVariable expression) {
 		Variable variable = expression.getValue().getVariable();
-		Var var = Frontend.getMapping(variable);
+		Var var = Frontend.getMapping(variable, true);
 
 		Expression value;
 		if (var.getType().isList()) {
@@ -587,7 +588,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		List<BlockWhile> whiles = new ArrayList<BlockWhile>();
 		for (Generator generator : generators) {
 			// assigns the loop variable its initial value
-			Var loopVar = Frontend.getMapping(generator.getVariable());
+			Var loopVar = Frontend.getMapping(generator.getVariable(), true);
 			new ExprTransformer(procedure, blocks, loopVar).doSwitch(generator
 					.getLower());
 
@@ -620,7 +621,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		int i = 0;
 		for (Generator generator : generators) {
 			int lineNumber = Util.getLocation(generator);
-			Var loopVar = Frontend.getMapping(generator.getVariable());
+			Var loopVar = Frontend.getMapping(generator.getVariable(), true);
 			IrUtil.getLast(whiles.get(i).getBlocks()).add(
 					eINSTANCE.createInstAssign(lineNumber, loopVar, eINSTANCE
 							.createExprBinary(eINSTANCE.createExprVar(loopVar),

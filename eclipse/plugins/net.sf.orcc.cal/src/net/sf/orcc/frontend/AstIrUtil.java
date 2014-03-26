@@ -58,7 +58,7 @@ public class AstIrUtil {
 	public static Var getLocalByName(Procedure procedure, Variable variable) {
 		Var var = procedure.getLocal(variable.getName());
 		if (var == null) {
-			var = Frontend.getMapping(variable);
+			var = Frontend.getMapping(variable, true);
 			procedure.getLocals().add(var);
 		} else {
 			Frontend.putMapping(variable, var);

@@ -61,6 +61,7 @@ public class Frontend {
 	 *            an AST entity
 	 * @return the IR of the given AST entity
 	 */
+	@Deprecated
 	public static EObject getEntity(AstEntity entity) {
 		AstActor actor = entity.getActor();
 		EObject astObject;
@@ -75,17 +76,6 @@ public class Frontend {
 
 		return CacheManager.instance.getOrCompute(astObject, emfSwitch,
 				CachePackage.eINSTANCE.getCache_IrMap());
-	}
-
-	/**
-	 * Returns the IR equivalent of the AST object.
-	 * 
-	 * @param eObject
-	 *            an AST object
-	 * @return the IR equivalent of the AST object
-	 */
-	public static <T extends EObject> T getMapping(EObject eObject) {
-		return getMapping(eObject, true);
 	}
 
 	/**

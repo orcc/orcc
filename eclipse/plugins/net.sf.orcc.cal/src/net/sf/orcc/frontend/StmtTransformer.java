@@ -141,7 +141,7 @@ public class StmtTransformer extends CalSwitch<Void> {
 	public Void caseStatementAssign(StatementAssign assign) {
 		// get target
 		Variable variable = assign.getTarget().getVariable();
-		Var target = Frontend.getMapping(variable);
+		Var target = Frontend.getMapping(variable, true);
 
 		// transform indexes and value
 		List<Expression> indexes;
@@ -171,7 +171,7 @@ public class StmtTransformer extends CalSwitch<Void> {
 		}
 
 		// retrieve IR procedure
-		Procedure calledProc = Frontend.getMapping(astProcedure);
+		Procedure calledProc = Frontend.getMapping(astProcedure, true);
 
 		// transform parameters
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
