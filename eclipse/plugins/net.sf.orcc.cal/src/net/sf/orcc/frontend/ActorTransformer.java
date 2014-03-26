@@ -54,6 +54,7 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
+import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.df.Action;
@@ -149,12 +150,14 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		// Create empty stubs for functions and procedures
 		// This tip will allow to call a function/procedure declared later
 		for (Function function : astActor.getFunctions()) {
-			final Procedure procedure = IrFactory.eINSTANCE.createProcedure();
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+					function.getName(), 0, Typer.getType(function));
 			Frontend.putMapping(function, procedure);
 			actor.getProcs().add(procedure);
 		}
 		for (AstProcedure astProcedure : astActor.getProcedures()) {
-			final Procedure procedure = IrFactory.eINSTANCE.createProcedure();
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+					astProcedure.getName(), 0, Typer.getType(astProcedure));
 			Frontend.putMapping(astProcedure, procedure);
 			actor.getProcs().add(procedure);
 		}

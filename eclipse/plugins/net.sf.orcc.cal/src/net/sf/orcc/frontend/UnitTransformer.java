@@ -34,6 +34,7 @@ import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Unit;
@@ -82,12 +83,14 @@ public class UnitTransformer extends CalSwitch<Unit> {
 		// Create empty stubs for functions and procedures
 		// This tip will allow to call a function/procedure declared later
 		for (Function function : astUnit.getFunctions()) {
-			final Procedure procedure = IrFactory.eINSTANCE.createProcedure();
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+					function.getName(), 0, Typer.getType(function));
 			Frontend.putMapping(function, procedure);
 			unit.getProcedures().add(procedure);
 		}
 		for (AstProcedure astProcedure : astUnit.getProcedures()) {
-			final Procedure procedure = IrFactory.eINSTANCE.createProcedure();
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+					astProcedure.getName(), 0, Typer.getType(astProcedure));
 			Frontend.putMapping(astProcedure, procedure);
 			unit.getProcedures().add(procedure);
 		}
