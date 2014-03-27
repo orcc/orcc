@@ -38,6 +38,8 @@
 struct action_s {
     char *name;
     double workload; /** action's workload */
+    double min_workload; /** action's min workload */
+    double max_workload; /** action's max workload */
     double ticks; /** elapsed ticks obtained by profiling */
 };
 
@@ -65,6 +67,7 @@ struct actor_s {
     action_t **actions;
     int nb_actions;
     double scheduler_workload;
+    char *class_name;
 };
 
 /*

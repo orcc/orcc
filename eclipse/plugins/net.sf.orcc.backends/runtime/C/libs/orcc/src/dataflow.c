@@ -82,6 +82,8 @@ void reset_profiling(network_t *network) {
         for (j = 0; j < network->actors[i]->nb_actions; j++) {
             network->actors[i]->actions[j]->ticks = 0;
             network->actors[i]->actions[j]->workload = 0;
+            network->actors[i]->actions[j]->min_workload = -1;
+            network->actors[i]->actions[j]->max_workload = -1;
         }
     }
     for (i = 0; i < network->nb_connections; i++) {

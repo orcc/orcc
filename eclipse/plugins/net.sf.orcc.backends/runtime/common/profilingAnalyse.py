@@ -79,8 +79,8 @@ class ProfilingAnalyse(OrccAnalyse):
         # Load XML into tree structure
         tree = parse(self.input_file)
 
-        #Find all <Instance> (ie actors)
-        actors_list = tree.getElementsByTagName('Instance')
+        #Find all <actor>
+        actors_list = tree.getElementsByTagName('actor')
         
         for actor in actors_list:
             dataActor = ProfilingData()
@@ -92,7 +92,7 @@ class ProfilingAnalyse(OrccAnalyse):
                 dataScheduler.name = "scheduler"
                 dataScheduler.workload = float(actor.attributes.getNamedItem('schedulerWorkload').nodeValue)
                 dataActionList.append(dataScheduler)
-            for action in actor.getElementsByTagName('Action'):
+            for action in actor.getElementsByTagName('action'):
                 dataAction = ProfilingData()
                 dataAction.name = action.attributes.getNamedItem('id').nodeValue
                 dataAction.workload = float(action.attributes.getNamedItem('workload').nodeValue)

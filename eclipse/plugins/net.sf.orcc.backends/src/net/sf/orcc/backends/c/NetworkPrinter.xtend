@@ -177,10 +177,9 @@ class NetworkPrinter extends CTemplate {
 			
 			«FOR child : network.children»
 				«FOR action : child.getAdapter(typeof(Actor)).actions»
-					action_t action_«child.label»_«action.name» = {"«action.name»", 0, 0};			
+					action_t action_«child.label»_«action.name» = {"«action.name»", 0, -1, -1, 0};			
 				«ENDFOR»
 			«ENDFOR»
-			
 			«FOR child : network.children»
 				action_t *«child.label»_actions[] = {
 					«FOR action : child.getAdapter(typeof(Actor)).actions SEPARATOR ","»
@@ -205,9 +204,9 @@ class NetworkPrinter extends CTemplate {
 		
 		«FOR child : network.children»
 			«IF profileActions && profileNetwork»
-				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0};
+				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0, "«child.getAdapter(typeof(Actor)).getFile().getProjectRelativePath().removeFirstSegments(1).removeFileExtension().toString().replace("/", ".")»"};
 			«ELSE»
-				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, NULL, 0, 0};
+				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, NULL, 0, 0, ""};
 			«ENDIF»						
 		«ENDFOR»
 		
