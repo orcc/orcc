@@ -31,9 +31,7 @@ package net.sf.orcc.backends.c.compa
 import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Network
-import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccUtil
 
 /**
@@ -61,7 +59,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		#endif
 		
 		#include "types.h"
-		#include "fifo.h"
+		#include "fifoAllocations.h"
 		#include "util.h"
 		
 		#define SIZE «fifoSize»
@@ -125,7 +123,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 
 	def printFifoFile(String targetFolder){
 		val content = fifoFileContent
-		val file = new File(targetFolder + File::separator + "fifos.c")
+		val file = new File(targetFolder + File::separator + "fifoAllocations.h")
 		
 		if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)

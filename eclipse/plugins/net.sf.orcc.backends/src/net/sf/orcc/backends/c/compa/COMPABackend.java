@@ -222,7 +222,7 @@ public class COMPABackend extends CBackend {
 		
 		// Print fifo allocation file into the orcc lib source folder.
 		OrccLogger.trace("Printing the fifo allocation file... ");
-		if (new NetworkPrinter(network, options).printFifoFile(path + "/libs/orcc/src") > 0) {
+		if (new NetworkPrinter(network, options).printFifoFile(path + "/libs/orcc/include") > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 		OrccLogger.traceRaw("Done\n");
