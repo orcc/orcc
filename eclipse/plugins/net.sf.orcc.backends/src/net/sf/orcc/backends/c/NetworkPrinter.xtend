@@ -177,7 +177,7 @@ class NetworkPrinter extends CTemplate {
 			
 			«FOR child : network.children»
 				«FOR action : child.getAdapter(typeof(Actor)).actions»
-					action_t action_«child.label»_«action.name» = {"«action.name»", 0, -1, -1, 0};			
+					action_t action_«child.label»_«action.name» = {"«action.name»", 0, 0, -1, -1, -1, 0};			
 				«ENDFOR»
 			«ENDFOR»
 			«FOR child : network.children»

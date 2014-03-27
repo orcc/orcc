@@ -38,9 +38,11 @@
 struct action_s {
     char *name;
     double workload; /** action's workload */
-    double min_workload; /** action's min workload */
-    double max_workload; /** action's max workload */
     double ticks; /** elapsed ticks obtained by profiling */
+    double min_ticks; /** elapsed min ticks obtained by profiling */
+    double avg_ticks; /** elapsed average ticks obtained by profiling */
+    double max_ticks; /** elapsed max ticks obtained by profiling */
+    int firings; /** nb of firings for profiling */
 };
 
 /*

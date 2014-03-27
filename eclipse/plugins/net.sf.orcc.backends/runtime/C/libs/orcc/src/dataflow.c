@@ -81,9 +81,11 @@ void reset_profiling(network_t *network) {
         network->actors[i]->scheduler_workload = 0;
         for (j = 0; j < network->actors[i]->nb_actions; j++) {
             network->actors[i]->actions[j]->ticks = 0;
+            network->actors[i]->actions[j]->min_ticks = -1;
+            network->actors[i]->actions[j]->avg_ticks = -1;
+            network->actors[i]->actions[j]->max_ticks = -1;
             network->actors[i]->actions[j]->workload = 0;
-            network->actors[i]->actions[j]->min_workload = -1;
-            network->actors[i]->actions[j]->max_workload = -1;
+            network->actors[i]->actions[j]->firings = 0;
         }
     }
     for (i = 0; i < network->nb_connections; i++) {
@@ -106,6 +108,9 @@ void compute_workloads(network_t *network) {
     	sum_action_ticks = 0;
  	    for (j = 0; j < network->actors[i]->nb_actions; j++) {
 	        network->actors[i]->actions[j]->workload +=  (network->actors[i]->actions[j]->ticks / sum_actor_ticks * 10000);
+            if (network->actors[i]->actions[j]->firings > 0) {
+                network->actors[i]->actions[j]->avg_ticks = network->actors[i]->actions[j]->ticks / network->actors[i]->actions[j]->firings;
+            }
 	        sum_action_ticks += network->actors[i]->actions[j]->ticks;
 	    }
         network->actors[i]->workload = (int) (network->actors[i]->ticks / sum_actor_ticks * 10000) + 1;

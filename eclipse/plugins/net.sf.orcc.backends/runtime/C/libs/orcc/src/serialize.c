@@ -108,18 +108,24 @@ void save_profiling(char* fileName, network_t* network) {
 
         for (j=0; j < network->actors[i]->nb_actions; j++) {
             node_t* actionNode = roxml_add_node(instanceNode, 0, ROXML_ELM_NODE, "action", NULL);
-            char* action_workload = (char*) malloc(10*sizeof(char));
+            char* action_workload = (char*) malloc(20*sizeof(char));
 
             roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "id", network->actors[i]->actions[j]->name);
             sprintf(action_workload, "%.3lf", network->actors[i]->actions[j]->workload);
             roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "workload", action_workload);
-            if (network->actors[i]->actions[j]->min_workload >= 0 && network->actors[i]->actions[j]->min_workload != network->actors[i]->actions[j]->workload) {
-                sprintf(action_workload, "%.3lf", network->actors[i]->actions[j]->min_workload);
-                roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "workload-min", action_workload);
-            }
-            if (network->actors[i]->actions[j]->max_workload >= 0 && network->actors[i]->actions[j]->max_workload != network->actors[i]->actions[j]->workload) {
-                sprintf(action_workload, "%.3lf", network->actors[i]->actions[j]->max_workload);
-                roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "workload-max", action_workload);
+            if (network->actors[i]->actions[j]->firings > 0) {
+                sprintf(action_workload, "%.0lf", network->actors[i]->actions[j]->avg_ticks);
+                roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "clockcycles", action_workload);
+                if (network->actors[i]->actions[j]->min_ticks != network->actors[i]->actions[j]->avg_ticks) {
+                    sprintf(action_workload, "%.0lf", network->actors[i]->actions[j]->min_ticks);
+                    roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "clockcycles-min", action_workload);
+                }
+                if (network->actors[i]->actions[j]->max_ticks != network->actors[i]->actions[j]->avg_ticks) {
+                    sprintf(action_workload, "%.0lf", network->actors[i]->actions[j]->max_ticks);
+                    roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "clockcycles-max", action_workload);
+                }
+                sprintf(action_workload, "%d", network->actors[i]->actions[j]->firings);
+                roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "firings", action_workload);
             }
             free(action_workload);
         }
