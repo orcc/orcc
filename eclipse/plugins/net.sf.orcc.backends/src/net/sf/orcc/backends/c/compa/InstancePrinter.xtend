@@ -34,6 +34,7 @@ import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
 import net.sf.orcc.ir.TypeList
+import net.sf.orcc.df.Port
 
 /**
  * Generate and print instance source file for COMPA backend.
@@ -196,7 +197,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			int i;
 			int stop = 0;
 			
-			init_orcc(argc, argv);
+		    init_platform();
+«««			init_orcc(argc, argv);
 
 			«entityName»_initialize();
 
@@ -205,11 +207,24 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				i += «entityName»_scheduler();
 				stop = stop || (i == 0);
 			}
-			printf("End of simulation !\n");
+			print("End of simulation !\n");
+			
+			cleanup_platform();
+			
 			return compareErrors;
 		}
 	'''
 	
+		override protected writeTokensFunctions(Port port) '''
+		static void write_«port.name»() {
+			index_«port.name» = (*«port.fullName»->write_ind);
+			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name»);
+		}
+
+		static void write_end_«port.name»() {
+			(*«port.fullName»->write_ind) = index_«port.name»;
+		}
+	'''
 	
 	override protected getFileContent() '''
 		// Source file is "«actor.file»"
@@ -221,9 +236,17 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 
 		#include "types.h"
-		#include "fifo.h"
+		#include "fifoAllocations.h"
 		#include "util.h"
 		#include "dataflow.h"
+		
+		#include "platform.h"
+		#include "xparameters.h"
+		
+		void print(char *str);
+		void inbyte(){
+		}
+
 		«IF profileNetwork || dynamicMapping»
 			#include "cycle.h"
 		«ENDIF»
@@ -238,7 +261,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
 		«ENDIF»
 
-		#define SIZE «fifoSize»
+«««		#define SIZE «fifoSize»
 
 «««		////////////////////////////////////////////////////////////////////////////////
 «««		// Instance
@@ -406,17 +429,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// main
 		«printMain»
-		
-		////////////////////////////////////////////////////////////////////////////////
-		// TODO: ...think of this
-		void outbyte(){
 
-		}
-
-		void inbyte(){
-
-		}
-		
 	'''
 }
 
