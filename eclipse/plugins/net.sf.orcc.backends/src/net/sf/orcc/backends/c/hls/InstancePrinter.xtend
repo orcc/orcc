@@ -447,7 +447,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		add_files «instance.name».cpp
 		add_files -tb «instance.name»TestBench.cpp
 		open_solution -reset "solution1"
-		set_part  {xc7vx330tffg1157-2}
+		set_part  {xc7vx330tffg1157-1}
 		create_clock -period 20
 		
 		
