@@ -33,7 +33,9 @@ import java.util.HashSet
 import net.sf.orcc.cache.CacheManager
 import net.sf.orcc.cal.cal.AstEntity
 import net.sf.orcc.cal.cal.Import
+import net.sf.orcc.df.Unit
 import net.sf.orcc.frontend.ActorTransformer
+import net.sf.orcc.frontend.Frontend
 import net.sf.orcc.frontend.UnitTransformer
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.OrccUtil
@@ -56,6 +58,7 @@ class CalGenerator implements IGenerator {
 	private val ActorTransformer actorTransformer
 	private val UnitTransformer unitTransformer
 	private val HashSet<Resource> builtResources
+	private val HashSet<Resource> loadedResources
 
 	private var IProject currentProject
 	private var ResourceSet resourceSet
@@ -64,6 +67,7 @@ class CalGenerator implements IGenerator {
 		actorTransformer = new ActorTransformer
 		unitTransformer = new UnitTransformer
 		builtResources = newHashSet
+		loadedResources = newHashSet
 	}
 
 	def beforeBuild(IProject project, ResourceSet rs) {
@@ -78,8 +82,15 @@ class CalGenerator implements IGenerator {
 		val irSubPath = calResource.irRelativePath
 
 		val astEntity = calResource.entity
-		for(resource : astEntity.importedResource) {
-			doGenerate(resource, fsa)
+		val toImport = astEntity.importedResource.filter[
+			!(builtResources.contains(it) || loadedResources.contains(it))
+		]
+		for(importedResource : toImport) {
+			if(importedResource.isInSameProject(calResource)) {
+				importedResource.doGenerate(fsa)
+			} else {
+				importedResource.loadMappings
+			}
 		}
 
 		fsa.generateFile(irSubPath, calResource.entity.serialize)
@@ -113,6 +124,40 @@ class CalGenerator implements IGenerator {
 		resource.save(outputStream, newHashMap)
 
 		outputStream.toString
+	}
+
+	/**
+	 * 
+	 */
+	private def loadMappings(Resource resource) {
+		val astEntity = resource.entity
+		val irResource = resourceSet.getResource((OrccUtil::getIrUri(astEntity.eResource.URI)), true)
+		val unit = irResource.contents.head as Unit
+		val astUnit = astEntity.unit
+
+		for(astConstant : astUnit.variables) {
+			val irConstant = unit.getConstant(astConstant.name)
+			Frontend::putMapping(astConstant, irConstant)
+		}
+
+		for(function : astUnit.functions) {
+			val procedure = unit.getProcedure(function.name)
+			Frontend::putMapping(function, procedure)
+		}
+
+		for(astProcedure : astUnit.procedures) {
+			val procedure = unit.getProcedure(astProcedure.name)
+			Frontend::putMapping(astProcedure, procedure)
+		}
+
+		loadedResources.add(resource)
+	}
+
+	/**
+	 * Check if given resources URIs point in the same project
+	 */
+	private def isInSameProject(Resource a, Resource b) {
+		a.URI.segment(1).equals(b.URI.segment(1))
 	}
 
 	/**
@@ -167,6 +212,7 @@ class CalGenerator implements IGenerator {
 
 	def afterBuild() {
 		builtResources.clear
+		loadedResources.clear
 		CacheManager.instance.unloadAllCaches();
 	}
 }
