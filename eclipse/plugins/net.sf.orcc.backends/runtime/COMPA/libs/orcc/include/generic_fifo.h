@@ -35,21 +35,21 @@ typedef struct FIFO_S(T) {
 	
 	unsigned int readers_nb; /** the number of fifo's readers */
 	unsigned int* read_inds; /** the current position of the reader */
-	unsigned int write_ind; /** the current position of the writer */
+	unsigned int* write_ind; /** the current position of the writer */
 } FIFO_T(T);
 
-static unsigned int FIFO_HAS_TOKENS(T)(struct FIFO_S(T) *fifo, unsigned int reader_id, unsigned int n) {
-    return fifo->write_ind - fifo->read_inds[reader_id] >= n;
+unsigned int FIFO_HAS_TOKENS(T)(struct FIFO_S(T) *fifo, unsigned int reader_id, unsigned int n) {
+    return (*fifo->write_ind) - fifo->read_inds[reader_id] >= n;
 }
 
-static unsigned int FIFO_GET_NUM_TOKENS(T)(struct FIFO_S(T) *fifo, unsigned int reader_id) {
-    return fifo->write_ind - fifo->read_inds[reader_id];
+unsigned int FIFO_GET_NUM_TOKENS(T)(struct FIFO_S(T) *fifo, unsigned int reader_id) {
+    return (*fifo->write_ind) - fifo->read_inds[reader_id];
 }
 
-static unsigned int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_readers, unsigned int n) {
+unsigned int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_readers, unsigned int n) {
     unsigned int i;
     for(i = 0; i < num_readers; i++) {
-        if (fifo->size + 1 - (fifo->write_ind - fifo->read_inds[i]) <= n) {
+        if (fifo->size + 1 - ((*fifo->write_ind) - fifo->read_inds[i]) <= n) {
             return 0;
         }
     }
@@ -57,19 +57,19 @@ static unsigned int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_re
     return 1;
 }
 
-static unsigned int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_readers) {
+unsigned int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_readers) {
     unsigned int i;
     unsigned int max_num_tokens = 0;
 
     for (i = 0; i < num_readers; i++) {
-        unsigned int num_tokens = fifo->write_ind - fifo->read_inds[i];
+        unsigned int num_tokens = (*fifo->write_ind) - fifo->read_inds[i];
         max_num_tokens = max_num_tokens > num_tokens ? max_num_tokens : num_tokens;
     }
 
     return fifo->size - max_num_tokens;
 }
 
-static void FIFO_CLEAR(T)(struct FIFO_S(T) *fifo) {
+void FIFO_CLEAR(T)(struct FIFO_S(T) *fifo) {
     unsigned int i;
     fifo->write_ind = 0;
     for (i = 0; i < fifo->readers_nb; i++) {
@@ -77,13 +77,13 @@ static void FIFO_CLEAR(T)(struct FIFO_S(T) *fifo) {
     }
 }
 
-static T FIFO_READ(T)(struct FIFO_S(T) *fifo, unsigned int reader_id) {
+T FIFO_READ(T)(struct FIFO_S(T) *fifo, unsigned int reader_id) {
     T value = fifo->contents[fifo->read_inds[reader_id] & (fifo->size - 1)];
     fifo->read_inds[reader_id]++;
     return value;
 }
 
-static void FIFO_WRITE(T)(struct FIFO_S(T) *fifo, T value) {
-    fifo->contents[fifo->write_ind & (fifo->size - 1)] = value;
+void FIFO_WRITE(T)(struct FIFO_S(T) *fifo, T value) {
+    fifo->contents[(*fifo->write_ind) & (fifo->size - 1)] = value;
     fifo->write_ind++;
 }
