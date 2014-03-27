@@ -29,14 +29,20 @@
 package net.sf.orcc.cal.generator
 
 import java.io.ByteArrayOutputStream
+import java.util.HashSet
+import net.sf.orcc.cache.CacheManager
 import net.sf.orcc.cal.cal.AstEntity
+import net.sf.orcc.cal.cal.Import
 import net.sf.orcc.frontend.ActorTransformer
 import net.sf.orcc.frontend.UnitTransformer
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.OrccUtil
+import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.Path
+import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.xtext.generator.IFileSystemAccess
 import org.eclipse.xtext.generator.IGenerator
 
@@ -47,14 +53,38 @@ import org.eclipse.xtext.generator.IGenerator
  */
 class CalGenerator implements IGenerator {
 
-	private ActorTransformer actorTransformer = new ActorTransformer
-	private UnitTransformer unitTransformer = new UnitTransformer
+	private val ActorTransformer actorTransformer
+	private val UnitTransformer unitTransformer
+	private val HashSet<Resource> builtResources
 
-	def beforeBuild() {
+	private var IProject currentProject
+	private var ResourceSet resourceSet
+
+	new() {
+		actorTransformer = new ActorTransformer
+		unitTransformer = new UnitTransformer
+		builtResources = newHashSet
+	}
+
+	def beforeBuild(IProject project, ResourceSet rs) {
+		currentProject = project
+		resourceSet = rs
 	}
 
 	override void doGenerate(Resource calResource, IFileSystemAccess fsa) {
-		fsa.generateFile(calResource.irRelativePath, calResource.entity.serialize)
+
+		if(builtResources.contains(calResource)) return
+
+		val irSubPath = calResource.irRelativePath
+
+		val astEntity = calResource.entity
+		for(resource : astEntity.importedResource) {
+			doGenerate(resource, fsa)
+		}
+
+		fsa.generateFile(irSubPath, calResource.entity.serialize)
+
+		builtResources.add(calResource)
 	}
 
 	/**
@@ -108,6 +138,35 @@ class CalGenerator implements IGenerator {
 			.toString									// Returns the string representation of the path
 	}
 
+	private def getImportedResource(AstEntity astEntity) {
+		val dependingResource = newHashSet
+		for(imp : astEntity.imports) {
+			val calFile = imp.getExistingCalFile
+			if(calFile != null) {
+				dependingResource.add(
+					resourceSet.getResource(URI.createPlatformResourceURI(calFile.fullPath.toString, true), true)
+				)
+			}
+		}
+		return dependingResource
+	}
+
+	def getExistingCalFile(Import imported) {
+		val lastDotIndex = imported.importedNamespace.lastIndexOf('.')
+		val unitQualifiedName = imported.importedNamespace.substring(0, lastDotIndex)
+		val unitPath = new Path(unitQualifiedName.replace('.','/')).addFileExtension(OrccUtil::CAL_SUFFIX)
+
+		for (folder : OrccUtil::getAllSourceFolders(currentProject)) {
+			val ifile = folder.getFile(unitPath)
+			if(ifile.exists) {
+				return ifile
+			}
+		}
+		return null
+	}
+
 	def afterBuild() {
+		builtResources.clear
+		CacheManager.instance.unloadAllCaches();
 	}
 }

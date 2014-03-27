@@ -50,7 +50,8 @@ public class CalBuilder extends BuilderParticipant {
 
 		final IGenerator generator = getGenerator();
 		if (generator instanceof CalGenerator) {
-			((CalGenerator) generator).beforeBuild();
+			((CalGenerator) generator).beforeBuild(context.getBuiltProject(),
+					context.getResourceSet());
 		}
 
 		super.build(context, monitor);
