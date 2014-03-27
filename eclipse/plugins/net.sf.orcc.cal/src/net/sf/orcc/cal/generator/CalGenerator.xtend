@@ -52,57 +52,105 @@ import org.eclipse.xtext.generator.IGenerator
  * Generates code from your model files on save.
  * 
  * see http://www.eclipse.org/Xtext/documentation.html#TutorialCodeGeneration
+ * 
+ * This class is used by Xtext to build IR file. The default BuilderParticipant has been
+ * extended (see net.sf.orcc.cal.ui.builder.CalBuilder) to add calls to beforeBuild() and afterBuild().
+ * These functions are used to manage dependency at the beginning and the end of a build session. A build
+ * session build all file in a specific project. There is no way to know which project has been built before,
+ * or if other project will be build after.
+ * 
+ * This generator class try to manage as quick as possible references between CAL Actors / Units.
+ * It must deal with references between files in the same project or in other projects.
+ * 
+ * For each file to build, this class check Units it import. If it is an import from the same project,
+ * the import is built before the current file. If it is an import from another project, we assume
+ * this project is up-to-date, and we load mappings between AST/IR objects in the frontend.
+ * 
+ * @author Antoine Lorence
  */
 class CalGenerator implements IGenerator {
 
-	private val ActorTransformer actorTransformer
-	private val UnitTransformer unitTransformer
-	private val HashSet<Resource> builtResources
-	private val HashSet<Resource> loadedResources
+	// These class will be used to transform AST objects into IR equivalent
+	private val actorTransformer = new ActorTransformer
+	private val unitTransformer = new UnitTransformer
+
+	// Will contain the list of resources built in the current session
+	private val HashSet<Resource> builtResources = newHashSet
+	// Will contain a list of resources already loaded in Frontend in the current session
+	private val HashSet<Resource> loadedResources = newHashSet
 
 	private var IProject currentProject
 	private var ResourceSet resourceSet
 
-	new() {
-		actorTransformer = new ActorTransformer
-		unitTransformer = new UnitTransformer
-		builtResources = newHashSet
-		loadedResources = newHashSet
-	}
-
+	/**
+	 * Start a build session. This method is called by net.sf.orcc.cal.ui.builder.CalBuilder
+	 * each time a build is triggered for a specific project.
+	 * 
+	 * Please note that when user perform a Clean on more that one project, this method will
+	 * be called as many times as projects to clean.
+	 * 
+	 * Default Xtext implementation of BuilderParticipant ensure projects will be built in
+	 * the right order.
+	 */
 	def beforeBuild(IProject project, ResourceSet rs) {
 		currentProject = project
 		resourceSet = rs
+
+		builtResources.clear
+		loadedResources.clear
 	}
 
+	/**
+	 * Generate the IR file corresponding to the given calResource. If the given
+	 * resource depends on other resources (Units), this method ensures:
+	 * <ol>
+	 * <li>All objects in the imported resource will be available in CacheManager</li>
+	 * <li>We will not try to transform/serialize the imported resource if it is not absolutely necessary</li>
+	 * </ol>
+	 * 
+	 * This method is called by net.sf.orcc.cal.ui.builder.CalBuilder
+	 */
 	override void doGenerate(Resource calResource, IFileSystemAccess fsa) {
 
+		// We already built this resource in the same session, do not need
+		// to do it again !
 		if(builtResources.contains(calResource)) return
 
 		val irSubPath = calResource.irRelativePath
 
 		val astEntity = calResource.entity
+		// Build a list of resources we need to have registered in frontend
+		// before doing the serialization
 		val toImport = astEntity.importedResource.filter[
 			!(builtResources.contains(it) || loadedResources.contains(it))
 		]
+
 		for(importedResource : toImport) {
+			// The imported resource is in the same project. We need to transform
+			// and serialize it before the given calResource
 			if(importedResource.isInSameProject(calResource)) {
 				importedResource.doGenerate(fsa)
-			} else {
+			}
+			// The imported resource is in another project. If Xtext did its job correctly,
+			// this project was built in a previous session. Since Frontend has been cleaned
+			// at the end of this session, we have to load its objects again.
+			else {
 				importedResource.loadMappings
 			}
 		}
 
+		// Write in the IR file the content of the transformed AstEntity
 		fsa.generateFile(irSubPath, calResource.entity.serialize)
 
+		// Ensure we will not do it again in the same session
 		builtResources.add(calResource)
 	}
 
 	/**
-	 * Returns a serialized version of the given AStEntity
-	 * 
+	 * Returns a EMF serialized version of the given AstEntity
 	 */
 	private def serialize(AstEntity astEntity) {
+		// Transform the AstEntity into an Actor or a Unit
 		val entity =
 			if (astEntity.unit != null) {
 				unitTransformer.doSwitch(astEntity.unit)
@@ -112,22 +160,26 @@ class CalGenerator implements IGenerator {
 				null
 			}
 
+		// Check errors...
 		if (entity == null) {
 			OrccLogger.warnln("Unable to transform the CAL content")
 			return ""
 		}
 
-		val resource = astEntity.eResource.resourceSet.createResource(OrccUtil::getIrUri(astEntity.eResource.URI))
+		// Associate a resource to the current entity
+		val resource = resourceSet.createResource(OrccUtil::getIrUri(astEntity.eResource.URI))
 		resource.contents.add(entity)
 
+		// Serialize in a simple String in memory
 		val outputStream = new ByteArrayOutputStream
 		resource.save(outputStream, newHashMap)
 
+		// Simply return the serialized content
 		outputStream.toString
 	}
 
 	/**
-	 * 
+	 * Load content from the given AstEntity (unit) resource into the Frontend
 	 */
 	private def loadMappings(Resource resource) {
 		val astEntity = resource.entity
@@ -183,6 +235,9 @@ class CalGenerator implements IGenerator {
 			.toString									// Returns the string representation of the path
 	}
 
+	/**
+	 * Return a list of all resources imported in the given AstEntity
+	 */
 	private def getImportedResource(AstEntity astEntity) {
 		val dependingResource = newHashSet
 		for(imp : astEntity.imports) {
@@ -196,6 +251,10 @@ class CalGenerator implements IGenerator {
 		return dependingResource
 	}
 
+	/**
+	 * If the given import is valid, return the corresponding CAL file.
+	 * If not, this method returns null.
+	 */
 	private def getExistingCalFile(Import imported) {
 		val lastDotIndex = imported.importedNamespace.lastIndexOf('.')
 		val unitQualifiedName = imported.importedNamespace.substring(0, lastDotIndex)
@@ -210,9 +269,14 @@ class CalGenerator implements IGenerator {
 		return null
 	}
 
+	/**
+	 * Perform cleans needed by the end of a session.
+	 */
 	def afterBuild() {
+		// We need to flush all Caches, because it can explode the memory consumption...
+		CacheManager.instance.unloadAllCaches();
+		// The current build session ends, reset the sets
 		builtResources.clear
 		loadedResources.clear
-		CacheManager.instance.unloadAllCaches();
 	}
 }
