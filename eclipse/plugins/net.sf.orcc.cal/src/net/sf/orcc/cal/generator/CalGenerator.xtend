@@ -91,7 +91,7 @@ class CalGenerator implements IGenerator {
 	 * Returns a serialized version of the given AStEntity
 	 * 
 	 */
-	def serialize(AstEntity astEntity) {
+	private def serialize(AstEntity astEntity) {
 		val entity =
 			if (astEntity.unit != null) {
 				unitTransformer.doSwitch(astEntity.unit)
@@ -118,7 +118,7 @@ class CalGenerator implements IGenerator {
 	/**
 	 * Return the AstEntity contained in the given resource
 	 */
-	def private getEntity(Resource calResource) {
+	private def getEntity(Resource calResource) {
 		calResource.contents.head as AstEntity
 	}
 
@@ -129,7 +129,7 @@ class CalGenerator implements IGenerator {
 	 * @param calResource An EMF resource representing a CAL file
 	 * @return Path of the IR file as String
 	 */
-	def private getIrRelativePath(Resource calResource) {
+	private def getIrRelativePath(Resource calResource) {
 		val path = new Path(calResource.URI.toPlatformString(true))
 		val file = ResourcesPlugin.workspace.root.getFile(path)
 		file.projectRelativePath.removeFirstSegments(1) // Remove folder (src) part
@@ -151,7 +151,7 @@ class CalGenerator implements IGenerator {
 		return dependingResource
 	}
 
-	def getExistingCalFile(Import imported) {
+	private def getExistingCalFile(Import imported) {
 		val lastDotIndex = imported.importedNamespace.lastIndexOf('.')
 		val unitQualifiedName = imported.importedNamespace.substring(0, lastDotIndex)
 		val unitPath = new Path(unitQualifiedName.replace('.','/')).addFileExtension(OrccUtil::CAL_SUFFIX)
