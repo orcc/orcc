@@ -55,6 +55,9 @@ public class BackendsConstants {
 
 	public static final String IMPORT_XCF = "net.sf.orcc.backends.importXCF";
 	public static final String XCF_FILE = "net.sf.orcc.backends.xcfFile";
+	
+	public static final String IMPORT_BXDF = "net.sf.orcc.backends.importBXDF";
+	public static final String BXDF_FILE = "net.sf.orcc.backends.bxdfFile";
 
 	public static final String HMPP_NO_PRAGMAS = "net.sf.orcc.backends.c.hmpp.disablePragma";
 
