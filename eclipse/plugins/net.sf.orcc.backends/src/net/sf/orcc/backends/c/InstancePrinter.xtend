@@ -362,6 +362,7 @@ class InstancePrinter extends CTemplate {
 				#define ticks_«action.name» action_«actor.name»_«action.name».ticks
 				#define ticks_min_«action.name» action_«actor.name»_«action.name».min_ticks
 				#define ticks_max_«action.name» action_«actor.name»_«action.name».max_ticks
+				#define ticks_variance_«action.name» action_«actor.name»_«action.name».variance_ticks				
 			«ENDFOR»
 			
 		«ENDIF»
@@ -849,6 +850,7 @@ class InstancePrinter extends CTemplate {
 				ticks_max_«action.name» = diff_tick;
 			}
 			ticks_«action.name» += diff_tick;
+			ticks_variance_«action.name» += diff_tick*diff_tick;
 			firings_«action.name» ++;			
 		«ENDIF»
 	'''

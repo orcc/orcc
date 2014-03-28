@@ -39,9 +39,10 @@ struct action_s {
     char *name;
     double workload; /** action's workload */
     double ticks; /** elapsed ticks obtained by profiling */
-    double min_ticks; /** elapsed min ticks obtained by profiling */
-    double avg_ticks; /** elapsed average ticks obtained by profiling */
-    double max_ticks; /** elapsed max ticks obtained by profiling */
+    double min_ticks; /** elapsed min clockcycles obtained by profiling */
+    double avg_ticks; /** elapsed average clockcycles obtained by profiling */
+    double max_ticks; /** elapsed max clockcycles obtained by profiling */
+    double variance_ticks; /** elapsed clockcycles variance obtained by profiling */
     int firings; /** nb of firings for profiling */
 };
 
@@ -70,6 +71,9 @@ struct actor_s {
     int nb_actions;
     double scheduler_workload;
     char *class_name;
+    int firings; /** nb of firings for profiling */
+    int switches; /** nb of switches for profiling */
+    int misses; /** nb of misses for profiling */
 };
 
 /*

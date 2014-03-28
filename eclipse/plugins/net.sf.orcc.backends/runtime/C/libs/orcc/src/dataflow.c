@@ -79,11 +79,15 @@ void reset_profiling(network_t *network) {
         network->actors[i]->processor_id = -1;
         network->actors[i]->ticks = 0;
         network->actors[i]->scheduler_workload = 0;
+        network->actors[i]->firings = 0;
+        network->actors[i]->switches = 0;
+        network->actors[i]->misses = 0;
         for (j = 0; j < network->actors[i]->nb_actions; j++) {
             network->actors[i]->actions[j]->ticks = 0;
             network->actors[i]->actions[j]->min_ticks = -1;
             network->actors[i]->actions[j]->avg_ticks = -1;
             network->actors[i]->actions[j]->max_ticks = -1;
+            network->actors[i]->actions[j]->variance_ticks = 0;
             network->actors[i]->actions[j]->workload = 0;
             network->actors[i]->actions[j]->firings = 0;
         }
@@ -110,6 +114,8 @@ void compute_workloads(network_t *network) {
 	        network->actors[i]->actions[j]->workload +=  (network->actors[i]->actions[j]->ticks / sum_actor_ticks * 10000);
             if (network->actors[i]->actions[j]->firings > 0) {
                 network->actors[i]->actions[j]->avg_ticks = network->actors[i]->actions[j]->ticks / network->actors[i]->actions[j]->firings;
+                network->actors[i]->firings += network->actors[i]->actions[j]->firings;
+                network->actors[i]->actions[j]->variance_ticks = (network->actors[i]->actions[j]->variance_ticks/network->actors[i]->actions[j]->firings)-(network->actors[i]->actions[j]->avg_ticks*network->actors[i]->actions[j]->avg_ticks);
             }
 	        sum_action_ticks += network->actors[i]->actions[j]->ticks;
 	    }
