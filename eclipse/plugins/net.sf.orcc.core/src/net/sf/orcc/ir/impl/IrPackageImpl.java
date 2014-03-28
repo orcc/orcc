@@ -1686,6 +1686,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Add supertypes to classes
 		procedureEClass.getESuperTypes().add(theUtilPackage.getAttributable());
+		paramEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		blockEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		blockBasicEClass.getESuperTypes().add(this.getBlock());
 		blockIfEClass.getESuperTypes().add(this.getBlock());
@@ -1698,6 +1699,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		instPhiEClass.getESuperTypes().add(this.getInstruction());
 		instReturnEClass.getESuperTypes().add(this.getInstruction());
 		instStoreEClass.getESuperTypes().add(this.getInstruction());
+		argEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		argByRefEClass.getESuperTypes().add(this.getArg());
 		argByValEClass.getESuperTypes().add(this.getArg());
 		expressionEClass.getESuperTypes().add(theUtilPackage.getAttributable());

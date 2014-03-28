@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.ecore.EObject;
+import net.sf.orcc.util.Attributable;
 
 /**
  * <!-- begin-user-doc --> This class defines an argument of a Call instruction.<!-- end-user-doc --> 
@@ -38,7 +38,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  * @generated
  */
-public interface Arg extends EObject {
+public interface Arg extends Attributable {
 
 	/**
 	 * Returns <code>true</code> if this argument is passed by reference.

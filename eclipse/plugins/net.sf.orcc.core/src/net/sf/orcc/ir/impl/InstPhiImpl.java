@@ -307,8 +307,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
-		builder.append("Phi(").append(
-				getNameSSA(getTarget().getVariable()));
+		builder.append("Phi(").append(getNameSSA(getTarget().getVariable()));
 		for (Expression value : getValues()) {
 			builder.append(", ");
 			builder.append(new ExpressionPrinter().doSwitch(value));

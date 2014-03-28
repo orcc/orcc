@@ -500,13 +500,15 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			return true;
 		}
 		// Variables used by a procedure have to be copied as well
-		for(Use use: var.getUses()) {
-			if(EcoreHelper.getContainerOfType(use, InstCall.class) != null) {
+		for (Use use : var.getUses()) {
+			if (EcoreHelper.getContainerOfType(use, InstCall.class) != null) {
+				// Mark the variable as a local copy of port variable to allow
+				// later optimizations (at backend-level)
 				var.addAttribute("copyOfTokens");
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 

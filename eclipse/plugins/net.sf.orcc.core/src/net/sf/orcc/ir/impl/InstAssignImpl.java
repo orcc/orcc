@@ -257,8 +257,7 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 
 	@Override
 	public String toString() {
-		return super.toString() + "Assign("
-				+ getNameSSA(target.getVariable()) + ", "
-				+ new ExpressionPrinter().doSwitch(getValue()) + ")";
+		return super.toString() + "Assign(" + getNameSSA(target.getVariable())
+				+ ", " + new ExpressionPrinter().doSwitch(getValue()) + ")";
 	}
 } // InstAssignImpl

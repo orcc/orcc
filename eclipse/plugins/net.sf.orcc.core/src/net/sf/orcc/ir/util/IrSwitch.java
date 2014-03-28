@@ -756,6 +756,8 @@ public class IrSwitch<T> extends Switch<T> {
 			Param param = (Param) theEObject;
 			T result = caseParam(param);
 			if (result == null)
+				result = caseAttributable(param);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -880,6 +882,8 @@ public class IrSwitch<T> extends Switch<T> {
 			Arg arg = (Arg) theEObject;
 			T result = caseArg(arg);
 			if (result == null)
+				result = caseAttributable(arg);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -889,6 +893,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseArg(argByRef);
 			if (result == null)
+				result = caseAttributable(argByRef);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -897,6 +903,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseArgByVal(argByVal);
 			if (result == null)
 				result = caseArg(argByVal);
+			if (result == null)
+				result = caseAttributable(argByVal);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
