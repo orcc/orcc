@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.ecore.EObject;
+import net.sf.orcc.util.Attributable;
 
 /**
  * This class defines a parameter.
@@ -36,7 +36,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * @model
  */
-public interface Param extends EObject {
+public interface Param extends Attributable {
 
 	/**
 	 * Returns the variable declaration associated with this parameter.

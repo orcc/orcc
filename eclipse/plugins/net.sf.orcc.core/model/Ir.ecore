@@ -16,7 +16,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="cfg" eType="#//Cfg" containment="true"
         resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Param">
+  <eClassifiers xsi:type="ecore:EClass" name="Param" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="byRef" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
@@ -94,7 +94,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Expression"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Arg" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Arg" abstract="true" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable"/>
   <eClassifiers xsi:type="ecore:EClass" name="ArgByRef" eSuperTypes="#//Arg">
     <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
         eType="#//Expression" containment="true" resolveProxies="false"/>

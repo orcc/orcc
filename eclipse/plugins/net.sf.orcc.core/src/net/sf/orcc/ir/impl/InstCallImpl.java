@@ -305,8 +305,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 		builder.append(super.toString());
 		builder.append("Call(");
 		if (getTarget() != null) {
-			builder.append(getNameSSA(getTarget().getVariable())).append(
-					", ");
+			builder.append(getNameSSA(getTarget().getVariable())).append(", ");
 		}
 
 		builder.append(getProcedure().getName());

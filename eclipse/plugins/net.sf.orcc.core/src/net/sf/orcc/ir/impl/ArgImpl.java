@@ -8,10 +8,9 @@ package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.util.impl.AttributableImpl;
 
 import org.eclipse.emf.ecore.EClass;
-
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc -->
@@ -22,7 +21,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public abstract class ArgImpl extends EObjectImpl implements Arg {
+public abstract class ArgImpl extends AttributableImpl implements Arg {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
