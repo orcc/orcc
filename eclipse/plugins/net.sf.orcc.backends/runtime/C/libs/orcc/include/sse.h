@@ -175,9 +175,9 @@ void addClip_orcc(
   u8 chromaPred[1024][2][32][32],
   i16 residual[8192][6144]);
 
-/***********************************************************************************************************************************
- DecodingPictureBuffer 
- ***********************************************************************************************************************************/
+/*************************/
+/* DecodingPictureBuffer */
+/*************************/
 
 void copy_cu_dpb_luma_orcc(
   u8 samp[256],
@@ -255,9 +255,16 @@ void fillBorder_chroma_orcc(
 	int ySize,
 	u16 border_size);
 
-void ff_hevc_weighted_pred_mono2_8_sse(u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
-void ff_hevc_weighted_pred_mono4_8_sse(u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
-void ff_hevc_weighted_pred_mono8_8_sse(u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+
+/***********************/
+/* Weighted Prediction */
+/***********************/
+
+/* Weighted Pred Mono */
+
+void ff_hevc_weighted_pred_mono2_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_mono4_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_mono8_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
 void ff_hevc_weighted_pred_mono16_8_sse(u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
 
 void (*weighted_pred_mono[4])(
@@ -272,6 +279,116 @@ void (*weighted_pred_mono[4])(
 void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
 		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64]);
 
+
+/* put_unweighted_predz_zscan */
+
+void ff_hevc_put_unweighted_pred_zscan2_2_8_sse (u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_put_unweighted_pred_zscan4_4_8_sse (u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_put_unweighted_pred_zscan8_4_8_sse (u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_put_unweighted_pred_zscan16_4_8_sse(u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_put_unweighted_pred_zscan4_2_8_sse (u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_put_unweighted_pred_zscan8_2_8_sse (u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_put_unweighted_pred_zscan16_2_8_sse(u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+
+void (*put_unweighted_pred_zscan[2][4])(
+        u8 *_dst, int _dststride,
+        i16 *src,
+        int srcstride,
+        int width, int height);
+
+void put_unweighted_pred_zscan_orcc (i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64], int iComp);
+
+
+/* put_weighted_pred_avg_zscan */
+
+void ff_hevc_put_weighted_pred_avg_zscan2_2_8_sse (u8 *_dst, int _dststride, i16 * src1, i16 * src, int srcstride, int width, int height);
+void ff_hevc_put_weighted_pred_avg_zscan4_4_8_sse (u8 *_dst, int _dststride, i16 * src1, i16 * src, int srcstride, int width, int height);
+void ff_hevc_put_weighted_pred_avg_zscan8_4_8_sse (u8 *_dst, int _dststride, i16 * src1, i16 * src, int srcstride, int width, int height);
+void ff_hevc_put_weighted_pred_avg_zscan16_4_8_sse (u8 *_dst, int _dststride, i16 * src1, i16 * src, int srcstride, int width, int height);
+void ff_hevc_put_weighted_pred_avg_zscan4_2_8_sse (u8 *_dst, int _dststride, i16 * src1, i16 * src, int srcstride, int width, int height);
+void ff_hevc_put_weighted_pred_avg_zscan8_2_8_sse (u8 *_dst, int _dststride, i16 * src1, i16 * src, int srcstride, int width, int height);
+void ff_hevc_put_weighted_pred_avg_zscan16_2_8_sse (u8 *_dst, int _dststride, i16 * src1, i16 * src, int srcstride, int width, int height);
+
+void (*put_weighted_pred_avg_zscan[2][4])(
+		u8 *_dst, int _dststride,
+		i16 * src1,
+		i16 * src,
+		int srcstride,
+		int width, int height);
+
+void put_weighted_pred_avg_zscan_orcc (i16 src[2][64*64], int width, int height, u8 dst[64*64], int iComp);
+
+
+/* weighted_pred_zscan */
+
+void ff_hevc_weighted_pred_zscan2_2_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_zscan4_4_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_zscan8_4_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_zscan16_4_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_zscan4_2_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_zscan8_2_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_zscan16_2_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+
+void (*weighted_pred_zscan[2][4])(
+		u8 denom,
+		i16 wlxFlag, i16 olxFlag,
+		u8 *_dst, int _dststride,
+		i16 *src, int srcstride,
+		int width, int height);
+
+void weighted_pred_zscan_orcc (int logWD, int weightCu[2], int offsetCu[2], i16 src[2][64*64], int width, int height, u8 rdList, u8 dst[64*64], int iComp);
+
+
+/* weighted_pred_avg_zscan */
+
+void ff_hevc_weighted_pred_avg_zscan2_2_8_sse (u8 denom, i16 wlxFlag, i16 wl1Flag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src1, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_avg_zscan4_4_8_sse (u8 denom, i16 wlxFlag, i16 wl1Flag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src1, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_avg_zscan8_4_8_sse (u8 denom, i16 wlxFlag, i16 wl1Flag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src1, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_avg_zscan16_4_8_sse(u8 denom, i16 wlxFlag, i16 wl1Flag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src1, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_avg_zscan4_2_8_sse (u8 denom, i16 wlxFlag, i16 wl1Flag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src1, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_avg_zscan8_2_8_sse (u8 denom, i16 wlxFlag, i16 wl1Flag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src1, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_avg_zscan16_2_8_sse(u8 denom, i16 wlxFlag, i16 wl1Flag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src1, i16 *src, int srcstride, int width, int height);
+
+void (*weighted_pred_avg_zscan[2][4])(
+        u8 denom,
+        i16 wlxFlag, i16 wl1Flag,
+        i16 olxFlag, i16 ol1Flag,
+        u8 *_dst, int _dststride,
+        i16 *src1, i16 *src,
+        int srcstride,
+        int width, int height);
+
+void weighted_pred_avg_zscan_orcc (int logWD , int weightCu[2], int offsetCu[2], i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64], int iComp);
+
+
+/* weighted_pred_mono_zscan */
+
+void ff_hevc_weighted_pred_mono_zscan2_2_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_mono_zscan4_4_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_mono_zscan8_4_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_mono_zscan16_4_8_sse(u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_mono_zscan4_2_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_mono_zscan8_2_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+void ff_hevc_weighted_pred_mono_zscan16_2_8_sse(u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
+
+void (*weighted_pred_mono_zscan[2][4])(
+        u8 denom,
+        i16 wlxFlag,
+        i16 olxFlag, i16 ol1Flag,
+        u8 *_dst, int _dststride,
+        i16 *src,
+        int srcstride,
+        int width, int height);
+
+void weighted_pred_mono_zscan_orcc (int logWD , int weightCu[2], int offsetCu[2],
+		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64], int iComp);
+
+
+/********************/
+/* Intra Prediction */
+/********************/
+
+/* pred_angular */
 
 void pred_angular_4_8_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left, ptrdiff_t stride, int c_idx, int mode);
 void pred_angular_8_8_sse(uint8_t *_src, const uint8_t *_top, const uint8_t *_left, ptrdiff_t stride, int c_idx, int mode);

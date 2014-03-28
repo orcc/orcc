@@ -141,7 +141,7 @@ void init_orcc(int argc, char *argv[]) {
 #ifdef OPENHEVC_ENABLE
 	openhevc_init_context();
 #endif
-#ifdef SSE_ENABLE
+#if defined (SSE_ENABLE) && defined (__SSE2__)
 	sse_init_context();
 #endif // SSE_ENABLE
 	while ((c = getopt(argc, argv, ostr)) != -1) {
