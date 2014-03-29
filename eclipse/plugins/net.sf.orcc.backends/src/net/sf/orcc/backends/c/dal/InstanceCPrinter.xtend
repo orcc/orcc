@@ -629,17 +629,19 @@ class InstanceCPrinter extends CTemplate {
 	def protected declareProc(Procedure proc){
 		var comma = ","
 		'''
+		«IF proc.name != "print"»
 		«IF proc.getParameters().size() == 0»
 			«comma = ""»
 		«ENDIF»
 		static «proc.returnType.doSwitch» «proc.name»(DALProcess *_p«comma» «proc.parameters.join(", ")[variable.declare]»);
+		«ENDIF»
 		'''
 	}
 
 	def private print(Procedure proc) {
 		var comma = ","
 	'''
-		«IF proc != null»
+		«IF proc != null && proc.name !="print"»
 		«IF proc.getParameters().size() == 0»
 			«comma = ""»
 		«ENDIF»
