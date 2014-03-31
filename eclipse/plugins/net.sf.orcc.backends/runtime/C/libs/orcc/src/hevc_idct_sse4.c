@@ -256,9 +256,9 @@ DECLARE_ALIGNED(16, static const i16, transform32x32[8][16][8] )=
 #define add_1st (1 << (shift_1st - 1))
 
 #ifdef __SSE4_1__
-void ff_hevc_transform_skip_8_sse(u8 *_dst, i16 *coeffs, ptrdiff_t _stride)
+void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
 {
-    u8 *dst = (u8*)_dst;
+    i16 *dst = (i16*)_dst;
     ptrdiff_t stride = _stride;
     int shift = 5;
     int offset = 16;
@@ -277,31 +277,8 @@ void ff_hevc_transform_skip_8_sse(u8 *_dst, i16 *coeffs, ptrdiff_t _stride)
     r0 = _mm_srai_epi16(r0, shift);
     r1 = _mm_srai_epi16(r1, shift);
 
-    r3 = _mm_loadl_epi64((__m128i*)(dst));
-    r4 = _mm_loadl_epi64((__m128i*)(dst + stride));
-    r5 = _mm_loadl_epi64((__m128i*)(dst + 2 * stride));
-    r6 = _mm_loadl_epi64((__m128i*)(dst + 3 * stride));
-
-    r3 = _mm_unpacklo_epi8(r3, r9);
-    r4 = _mm_unpacklo_epi8(r4, r9);
-    r5 = _mm_unpacklo_epi8(r5, r9);
-    r6 = _mm_unpacklo_epi8(r6, r9);
-    r3 = _mm_unpacklo_epi64(r3, r4);
-    r4 = _mm_unpacklo_epi64(r5, r6);
-
-
-    r3 = _mm_adds_epi16(r3, r0);
-    r4 = _mm_adds_epi16(r4, r1);
-
-    r3 = _mm_packus_epi16(r3, r4);
-
-    *((u32 *)(dst)) = _mm_cvtsi128_si32(r3);
-    dst+=stride;
-    *((u32 *)(dst)) = _mm_extract_epi32(r3, 1);
-    dst+=stride;
-    *((u32 *)(dst)) = _mm_extract_epi32(r3, 2);
-    dst+=stride;
-    *((u32 *)(dst)) = _mm_extract_epi32(r3, 3);
+    _mm_store_si128((__m128i*)(dst    ), r0);
+    _mm_store_si128((__m128i*)(dst + 8), r1);
 }
 #endif
 
