@@ -196,8 +196,8 @@ public class InstancePattern extends AbstractPattern {
 		if (value.length() < 1) {
 			return "Please enter a text to name the Instance.";
 		}
-		if (!value.matches("[a-zA-Z0-9_]+")) {
-			return "You can only use alphanumeric characters for Instance name";
+		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]+")) {
+			return "Instance name must start with a letter, and contains only alphanumeric characters";
 		}
 
 		// null -> value is valid
