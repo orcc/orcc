@@ -160,10 +160,11 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	 override protected allocateFifo(Connection conn, int nbReaders) {
 	  val size = if (conn.size != null) conn.size else fifoSize
 	  val bufferAddr = memoryBaseAddr
-	  val indicesAddr = memoryBaseAddr + size
-	  memoryBaseAddr = indicesAddr + nbReaders
+	  val rdIndicesAddr = memoryBaseAddr + size
+	  val wrIndexAddr = rdIndicesAddr + nbReaders * 4
+	  memoryBaseAddr = wrIndexAddr + 4
 	  '''
-	   fifo_«conn.sourcePort.type.doSwitch»_t fifo_«conn.<Object>getValueAsObject("idNoBcast")» = {«size», («conn.sourcePort.type.doSwitch» *) «String.format("0x%x", bufferAddr)», «nbReaders», (unsigned int *) «String.format("0x%x", indicesAddr)», 0};
+	   fifo_«conn.sourcePort.type.doSwitch»_t fifo_«conn.<Object>getValueAsObject("idNoBcast")» = {«size», («conn.sourcePort.type.doSwitch» *) «String.format("0x%x", bufferAddr)», «nbReaders», (unsigned int *) «String.format("0x%x", rdIndicesAddr)», (unsigned int *) «String.format("0x%x", wrIndexAddr)»};
 	  '''
 	 }
 }
