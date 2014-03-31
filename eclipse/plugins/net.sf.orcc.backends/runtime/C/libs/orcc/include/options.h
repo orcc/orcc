@@ -38,7 +38,7 @@
 struct options_s
 {
     int nb_processors;
-    mappingstrategy_et strategy;
+    mappingstrategy_et mapping_strategy;
     char *input_file;
     char *output_file;
 };

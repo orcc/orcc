@@ -667,7 +667,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
     startTime = getticks();
 
     if (opt->nb_processors != 1) {
-        switch (opt->strategy) {
+        switch (opt->mapping_strategy) {
 #ifdef METIS_ENABLE
         case ORCC_MS_METIS_REC:
             ret = do_metis_recursive_partition(network, opt, part);
