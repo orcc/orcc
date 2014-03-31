@@ -264,7 +264,6 @@ class NetworkPrinter extends CTemplate {
 			
 			launcher();
 			«afterMain»
-			printf("End of simulation !\n");
 			return compareErrors;
 		}
 	'''
