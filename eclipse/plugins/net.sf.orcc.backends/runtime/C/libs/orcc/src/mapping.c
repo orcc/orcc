@@ -772,7 +772,7 @@ agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *schedu
 }
 
 int needMapping() {
-    return get_partialNumPicturesDecoded() > nbProfiledFrames && need_remap && nbThreads > 1;
+    return get_partialNumPicturesDecoded() > nbProfiledFrames && need_remap;
 }
 
 void resetMapping() {

@@ -42,6 +42,7 @@ struct global_scheduler_s {
 struct local_scheduler_s {
 	int id; /** Unique ID of this scheduler */
     int nb_schedulers;
+    options_t *opt;
 
 	/* Round robin */
 	int num_actors; /** number of actors managed by this scheduler */
@@ -86,7 +87,7 @@ struct schedinfo_s {
 
 global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync);
 
-void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping);
+void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, options_t *opt);
 
 local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_schedulable,
         waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);
@@ -94,7 +95,7 @@ local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_sche
 /**
  * Initialize the given scheduler.
  */
-void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors);
+void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, options_t *opt);
 
 /**
  * Initialize the actors mapped to the given scheduler.

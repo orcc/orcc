@@ -257,22 +257,22 @@ class NetworkPrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
-		    «beforeMain»
-		
-			atexit(atexit_actions);
-			init_orcc(argc, argv);
+			 «beforeMain»
 			
-			launcher();
+			options_t *opt = init_orcc(argc, argv);
+			atexit(atexit_actions);
+			
+			launcher(opt);
 			«afterMain»
 			return compareErrors;
 		}
 	'''
 
 	def protected printLauncher() '''
-		static void launcher() {
+		static void launcher(options_t *opt) {
 			int i;
 			mapping_t *mapping = map_actors(&network);
-			int nb_threads = «IF dynamicMapping»nbThreads«ELSE»mapping->number_of_threads«ENDIF»;
+			int nb_threads = «IF dynamicMapping»opt->nb_processors«ELSE»mapping->number_of_threads«ENDIF»;
 			
 			cpu_set_t cpuset;
 			orcc_thread_t threads[MAX_THREAD_NB];
@@ -281,16 +281,15 @@ class NetworkPrinter extends CTemplate {
 				orcc_thread_t thread_agent;
 				orcc_thread_id_t thread_agent_id;
 				sync_t sync;
-				options_t *options = set_options(mapping_strategy, nb_threads);
 			«ENDIF»
 			
 			global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, «IF dynamicMapping»&sync«ELSE»NULL«ENDIF»);
 			«IF dynamicMapping»
-				agent_t *agent = agent_init(&sync, options, scheduler, &network, nb_threads);
+				agent_t *agent = agent_init(&sync, opt, scheduler, &network, nb_threads);
 				sync_init(&sync);
 			«ENDIF»
 			
-			global_scheduler_init(scheduler, mapping);
+			global_scheduler_init(scheduler, mapping, opt);
 			
 			orcc_clear_cpu_set(cpuset);
 			
@@ -361,7 +360,7 @@ class NetworkPrinter extends CTemplate {
 		#endif
 				}
 				«IF dynamicMapping»
-					if(my_actor == NULL || needMapping()) {
+					if(my_actor == NULL || (needMapping() && sched->opt->nb_processors > 1)) {
 						orcc_semaphore_set(sched->sync->sem_monitor);
 						orcc_semaphore_wait(sched->sem_thread);
 					}

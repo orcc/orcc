@@ -30,6 +30,8 @@
 #ifndef _ORCC_UTIL_H_
 #define _ORCC_UTIL_H_
 
+#include "orcc.h"
+
 // Directory for input files.
 extern char *input_directory;
 
@@ -64,17 +66,11 @@ extern int nbFrames;
 // Number of frames to display before remapping application
 extern int nbProfiledFrames;
 
-// Number of executing threads to create
-extern int nbThreads;
-
-// Strategy for the actor mapping
-extern int mapping_strategy;
-
 // Repetition of the actor remapping
 extern int mapping_repetition;
 
 // initialize APR and parse command-line options
-void init_orcc(int argc, char *argv[]);
+options_t* init_orcc(int argc, char *argv[]);
 
 // print usage
 void print_usage();
