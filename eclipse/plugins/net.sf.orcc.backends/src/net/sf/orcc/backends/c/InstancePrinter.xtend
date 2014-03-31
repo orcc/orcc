@@ -103,7 +103,8 @@ class InstancePrinter extends CTemplate {
 	var String traceFolder
 	
 	var boolean isActionAligned = false
-
+	
+	var boolean debugActor = false
 
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
@@ -209,6 +210,7 @@ class InstancePrinter extends CTemplate {
 		this.incomingPortMap = instance.incomingPortMap
 		this.outgoingPortMap = instance.outgoingPortMap
 
+		setDebug
 		buildInputPattern
 		buildTransitionPattern
 	}
@@ -220,6 +222,7 @@ class InstancePrinter extends CTemplate {
 		this.incomingPortMap = actor.incomingPortMap
 		this.outgoingPortMap = actor.outgoingPortMap
 
+		setDebug
 		buildInputPattern
 		buildTransitionPattern
 	}
@@ -767,6 +770,9 @@ class InstancePrinter extends CTemplate {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
+			«IF debugActor»
+				printf("-- «entityName»: «action.name»«IF isAligned» (aligned)«ENDIF»\n");
+			«ENDIF»
 			«writeTraces(action.inputPattern)»
 			«beforeActionBody»
 
@@ -1118,6 +1124,10 @@ class InstancePrinter extends CTemplate {
 
 	def private getNoInline()
 		'''«IF inlineActors»__attribute__((noinline)) «ENDIF»'''
+		
+	def private setDebug() {
+		debugActor = actor.hasAttribute("DEBUG")
+	}
 
 	//========================================
 	//   Old template data initialization
