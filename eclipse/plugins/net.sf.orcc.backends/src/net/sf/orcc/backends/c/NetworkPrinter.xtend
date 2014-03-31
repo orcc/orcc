@@ -58,7 +58,7 @@ class NetworkPrinter extends CTemplate {
 	protected var boolean dynamicMapping = false
 	var boolean ringTopology = false
 	
-	var boolean newSchedul = false
+	protected var boolean newSchedul = false
 	
 	var int threadsNb = 1;
 	
