@@ -177,8 +177,8 @@ public class OrccUtil {
 	 * @param folder
 	 * @throws CoreException
 	 */
-	private static void findFiles(final String suffix,
-			final List<IFile> files, final IFolder folder) throws CoreException {
+	private static void findFiles(final String suffix, final List<IFile> files,
+			final IFolder folder) throws CoreException {
 		for (IResource resource : folder.members()) {
 			if (resource.getType() == IResource.FOLDER) {
 				findFiles(suffix, files, (IFolder) resource);
@@ -187,6 +187,28 @@ public class OrccUtil {
 				files.add((IFile) resource);
 			}
 		}
+	}
+
+	/**
+	 * Returns the list of IFolder containing:
+	 * <ul>
+	 * <li>Source folders of the given project</li>
+	 * <li>Source folders of the projects depending on the given project</li>
+	 * </ul>
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public static List<IFolder> getAllDependingSourceFolders(
+			final IProject project) {
+		final List<IFolder> srcFolders = new ArrayList<IFolder>();
+		srcFolders.addAll(getSourceFolders(project));
+
+		for (final IProject dependingProject : getReferencingProjects(project)) {
+			srcFolders.addAll(getSourceFolders(dependingProject));
+		}
+
+		return srcFolders;
 	}
 
 	/**
@@ -254,28 +276,6 @@ public class OrccUtil {
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
-		}
-
-		return srcFolders;
-	}
-
-	/**
-	 * Returns the list of IFolder containing:
-	 * <ul>
-	 * <li>Source folders of the given project</li>
-	 * <li>Source folders of the projects depending on the given project</li>
-	 * </ul>
-	 * 
-	 * @param project
-	 * @return
-	 */
-	public static List<IFolder> getAllDependingSourceFolders(
-			final IProject project) {
-		final List<IFolder> srcFolders = new ArrayList<IFolder>();
-		srcFolders.addAll(getSourceFolders(project));
-
-		for (final IProject dependingProject : getReferencingProjects(project)) {
-			srcFolders.addAll(getSourceFolders(dependingProject));
 		}
 
 		return srcFolders;
@@ -520,38 +520,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Returns the list of source folders of the given project as a list of
-	 * absolute workspace paths.
-	 * 
-	 * @param project
-	 *            a project
-	 * @return a list of absolute workspace paths
-	 */
-	public static List<IFolder> getSourceFolders(IProject project) {
-		List<IFolder> srcFolders = new ArrayList<IFolder>();
-
-		IJavaProject javaProject = JavaCore.create(project);
-		if (!javaProject.exists()) {
-			return srcFolders;
-		}
-
-		// iterate over package roots
-		try {
-			for (IPackageFragmentRoot root : javaProject
-					.getPackageFragmentRoots()) {
-				IResource resource = root.getCorrespondingResource();
-				if (resource != null && resource.getType() == IResource.FOLDER) {
-					srcFolders.add((IFolder) resource);
-				}
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
-		return srcFolders;
-	}
-
-	/**
 	 * Returns a list of projects which depends on the given project.
 	 * 
 	 * @param project
@@ -591,6 +559,38 @@ public class OrccUtil {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Returns the list of source folders of the given project as a list of
+	 * absolute workspace paths.
+	 * 
+	 * @param project
+	 *            a project
+	 * @return a list of absolute workspace paths
+	 */
+	public static List<IFolder> getSourceFolders(IProject project) {
+		List<IFolder> srcFolders = new ArrayList<IFolder>();
+
+		IJavaProject javaProject = JavaCore.create(project);
+		if (!javaProject.exists()) {
+			return srcFolders;
+		}
+
+		// iterate over package roots
+		try {
+			for (IPackageFragmentRoot root : javaProject
+					.getPackageFragmentRoots()) {
+				IResource resource = root.getCorrespondingResource();
+				if (resource != null && resource.getType() == IResource.FOLDER) {
+					srcFolders.add((IFolder) resource);
+				}
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
+		return srcFolders;
 	}
 
 	/**
@@ -637,6 +637,42 @@ public class OrccUtil {
 		}
 
 		return builder.toString();
+	}
+
+	/**
+	 * Checks if the String contains only unicode digits. A decimal point is not
+	 * a unicode digit and returns false. <code>null</code> will return <code>false</code>.
+	 * An empty String (length()=0) will return <code>true</code>.
+	 * 
+	 * NOTE: method taken from the apache common lang library (scb)
+	 * 
+	 * <pre>
+	 *      StringUtils.isNumeric(null)   = false
+	 *      StringUtils.isNumeric("")     = true
+	 *      StringUtils.isNumeric("  ")   = false
+	 *      StringUtils.isNumeric("123")  = true
+	 *      StringUtils.isNumeric("12 3") = false
+	 *      StringUtils.isNumeric("ab2c") = false
+	 *      StringUtils.isNumeric("12-3") = false
+	 *      StringUtils.isNumeric("12.3") = false
+	 * </pre>
+	 * 
+	 * @param str
+	 *            the String to check, may be <code>null</code>
+	 * @return if only contains digits, and is non-<code>null</code>
+	 */
+	public static boolean isNumeric(final String str) {
+		if (str == null || str.isEmpty()) {
+			return false;
+		}
+
+		final int sz = str.length();
+		for (int i = 0; i < sz; i++) {
+			if (Character.isDigit(str.charAt(i)) == false) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

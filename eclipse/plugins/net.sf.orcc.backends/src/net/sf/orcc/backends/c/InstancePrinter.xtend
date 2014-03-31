@@ -234,6 +234,7 @@ class InstancePrinter extends CTemplate {
 
 		#include <stdio.h>
 		#include <stdlib.h>
+		«printAdditionalIncludes»
 		«IF checkArrayInbounds»
 			#include <assert.h>
 		«ENDIF»
@@ -356,9 +357,13 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// Action's workload for profiling
 			«FOR action : actor.actions»
-				extern action_t action_«actor.name»_«action.body.name»;
-				#define ticks_«action.body.name» action_«actor.name»_«action.body.name».ticks
-			«ENDFOR»		
+				extern action_t action_«actor.name»_«action.name»;
+				#define firings_«action.name» action_«actor.name»_«action.name».firings
+				#define ticks_«action.name» action_«actor.name»_«action.name».ticks
+				#define ticks_min_«action.name» action_«actor.name»_«action.name».min_ticks
+				#define ticks_max_«action.name» action_«actor.name»_«action.name».max_ticks
+				#define ticks_variance_«action.name» action_«actor.name»_«action.name».variance_ticks				
+			«ENDFOR»
 			
 		«ENDIF»
 		
@@ -388,6 +393,9 @@ class InstancePrinter extends CTemplate {
 			static enum states _FSM_state;
 
 		«ENDIF»
+		
+		«additionalDeclarations»
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// Token functions
 		«FOR port : actor.inputs»
@@ -618,6 +626,7 @@ class InstancePrinter extends CTemplate {
 
 		«inline»void «entityName»_initialize(schedinfo_t *si) {
 			int i = 0;
+			«additionalInitializes»
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
@@ -625,7 +634,7 @@ class InstancePrinter extends CTemplate {
 			«IF !actor.initializes.nullOrEmpty»
 				«actor.initializes.printActionsScheduling»
 			«ENDIF»
-
+			
 		finished:
 			// no read_end/write_end here!
 			return;
@@ -795,6 +804,13 @@ class InstancePrinter extends CTemplate {
 	def protected afterActionBody() ''''''
 	def protected beforeActionBody() ''''''
 	
+	// This method can be override by other backends to print additional initializations 
+	def protected additionalInitializes()''''''
+	// This method can be override by other backends to print additional declarations 
+	def protected additionalDeclarations() ''''''
+	// This method can be override by other backends to print additional includes
+	def protected printAdditionalIncludes() ''''''
+	
 	def private writeTraces(Pattern pattern) {
 		if(!enableTrace) return ''''''
 		'''
@@ -810,7 +826,7 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 	
-	def private profileStart(Action action) '''
+	def protected profileStart(Action action) '''
 		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
 			ticks tick_in = getticks();
 			ticks tick_out;
@@ -818,7 +834,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def private profileEnd(Action action) '''
+	def protected profileEnd(Action action) '''
 		«IF (profileNetwork || dynamicMapping) && !actor.initializes.contains(action)»
 			«FOR port : action.inputPattern.ports»
 				rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
@@ -827,7 +843,15 @@ class InstancePrinter extends CTemplate {
 		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
 			tick_out = getticks();
 			diff_tick = elapsed(tick_out, tick_in);
+			if (ticks_min_«action.name» > diff_tick || ticks_min_«action.name» < 0) {
+				ticks_min_«action.name» = diff_tick;
+			}
+			if (ticks_max_«action.name» < diff_tick || ticks_max_«action.name» < 0) {
+				ticks_max_«action.name» = diff_tick;
+			}
 			ticks_«action.name» += diff_tick;
+			ticks_variance_«action.name» += diff_tick*diff_tick;
+			firings_«action.name» ++;			
 		«ENDIF»
 	'''
 
@@ -940,13 +964,17 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	override caseBlockWhile(BlockWhile blockWhile)'''
-		while («blockWhile.condition.doSwitch») {
-			«FOR block : blockWhile.blocks»
-				«block.doSwitch»
-			«ENDFOR»
+	override caseBlockWhile(BlockWhile blockWhile) {
+		if(!isActionAligned || !blockWhile.hasAttribute("removableCopy")){
+			'''
+			while («blockWhile.condition.doSwitch») {
+				«FOR block : blockWhile.blocks»
+					«block.doSwitch»
+				«ENDFOR»
+			}
+			'''
 		}
-	'''
+	}
 
 	override caseBlockBasic(BlockBasic block) '''
 		«FOR instr : block.instructions»

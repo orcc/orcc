@@ -56,6 +56,11 @@ public class OrccLogger {
 	 */
 	private static class DefaultOrccFormatter extends Formatter {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
+		 */
 		@Override
 		public String format(LogRecord record) {
 
@@ -69,13 +74,11 @@ public class OrccLogger {
 
 				output += df.format(date);
 				// Default printing for warn & severe
-				if (record.getLevel().intValue() > OrccLevel.NOTICE.intValue()) {
+				if (record.getLevel().intValue() > NOTICE.intValue()) {
 					output += " " + record.getLevel();
-				} else if (record.getLevel().intValue() == OrccLevel.NOTICE
-						.intValue()) {
+				} else if (record.getLevel().intValue() == NOTICE.intValue()) {
 					output += " NOTICE";
-				} else if (record.getLevel().intValue() == OrccLevel.DEBUG
-						.intValue()) {
+				} else if (record.getLevel().intValue() == DEBUG.intValue()) {
 					output += " DEBUG";
 				}
 				output += " : ";
@@ -86,51 +89,20 @@ public class OrccLogger {
 
 	}
 
-	/*
-	 * FIXME: Add Javadoc ! It is really important to keep everything logic and
-	 * make it simple to understand for everybody who needs to use it.
-	 */
-	public static enum OrccLevel {
-		/** */
-		SEVERE(Level.SEVERE),
-		/** */
-		WARNING(Level.WARNING),
-		/** */
-		NOTICE(Level.INFO),
-		/** */
-		TRACE(Level.FINE),
-		/** */
-		DEBUG(Level.FINER),
-		/** */
-		ALL(Level.FINEST);
+	public final static Level SEVERE = Level.SEVERE;
+	public final static Level WARNING = Level.WARNING;
+	public final static Level NOTICE = Level.INFO;
+	public final static Level TRACE = Level.FINE;
+	public final static Level DEBUG = Level.FINER;
 
-		private Level level;
-		private Level defaultLevel;
-
-		private OrccLevel(Level level) {
-			this.level = level;
-			this.defaultLevel = level;
-		}
-
-		private Level getLevel() {
-			return level;
-		}
-
-		public int intValue() {
-			return level.intValue();
-		}
-
-		private void setLevel(Level level) {
-			this.level = level;
-		}
-	}
+	public final static Level ALL = Level.ALL;
 
 	private static Logger logger;
 
 	/**
-	 * Register specific log Handler to display messages sent threw OrccLogger
-	 * with a default formatter. If this method is never called, the default
-	 * Handler will be {@link java.util.logging.ConsoleHandler}
+	 * This method is the same as
+	 * {@link #configureLoggerWithHandler(Handler, Formatter)}, but the
+	 * {@link DefaultOrccFormatter} is used as default {@link Formatter}.
 	 * 
 	 * @param handler
 	 */
@@ -141,7 +113,7 @@ public class OrccLogger {
 	/**
 	 * Register specific log Handler to display messages sent threw OrccLogger
 	 * with a given {@link Formatter}. If this method is never called, the
-	 * default Handler will be {@link java.util.logging.ConsoleHandler}
+	 * default Handler will be {@link java.util.logging.ConsoleHandler}.
 	 * 
 	 * @param handler
 	 * @param formatter
@@ -157,7 +129,38 @@ public class OrccLogger {
 
 		logger = newLog;
 
-		setLevel(OrccLevel.TRACE);
+		setLevel(TRACE);
+	}
+
+	/**
+	 * Display a debug message to current console.
+	 * 
+	 * @param message
+	 */
+	public static void debug(String message) {
+		getLogger().log(DEBUG, message);
+	}
+
+	/**
+	 * Display a debug message to current console, appended with a line
+	 * separator character.
+	 * 
+	 * @param message
+	 */
+	public static void debugln(String message) {
+		debug(message + System.getProperty("line.separator"));
+	}
+
+	/**
+	 * Display a debug message on the current console, without any prepended
+	 * string (time or level info).
+	 * 
+	 * @param message
+	 */
+	public static void debugRaw(String message) {
+		LogRecord record = new LogRecord(DEBUG, message);
+		record.setParameters(new Object[] { "-raw" });
+		getLogger().log(record);
 	}
 
 	/**
@@ -174,29 +177,35 @@ public class OrccLogger {
 		return logger;
 	}
 
-	/*
-	 * FIXME: Add Javadoc !
+	/**
+	 * Display a notice message to current console.
+	 * 
+	 * @param message
 	 */
-	public static void hide(OrccLevel level) {
-		level.setLevel(Level.ALL);
+	public static void notice(String message) {
+		getLogger().log(NOTICE, message);
 	}
 
-	/*
-	 * FIXME: Add Javadoc !
+	/**
+	 * Display a notice message to current console, appended with a line
+	 * separator character.
+	 * 
+	 * @param message
 	 */
-	public static void restoreLevels() {
-		for (OrccLevel level : OrccLevel.values()) {
-			level.setLevel(level.defaultLevel);
-		}
+	public static void noticeln(String message) {
+		notice(message + System.getProperty("line.separator"));
 	}
 
-	/*
-	 * FIXME: Add Javadoc !
+	/**
+	 * Display a notice message on the current console, without any prepended
+	 * string (time or level info).
+	 * 
+	 * @param message
 	 */
-	public static void changeFormatter(Formatter formatter) {
-		for (Handler handler : getLogger().getHandlers()) {
-			handler.setFormatter(formatter);
-		}
+	public static void noticeRaw(String message) {
+		LogRecord record = new LogRecord(NOTICE, message);
+		record.setParameters(new Object[] { "-raw" });
+		getLogger().log(record);
 	}
 
 	/**
@@ -206,75 +215,11 @@ public class OrccLogger {
 	 * 
 	 * @param level
 	 */
-	public static void setLevel(OrccLevel level) {
-		getLogger().setLevel(level.getLevel());
+	public static void setLevel(Level level) {
+		getLogger().setLevel(level);
 		for (Handler handler : getLogger().getHandlers()) {
-			handler.setLevel(level.getLevel());
+			handler.setLevel(level);
 		}
-	}
-
-	/**
-	 * Display a debug message to current console.
-	 * 
-	 * @param message
-	 */
-	public static void debug(Object content) {
-		getLogger().log(OrccLevel.DEBUG.getLevel(), content.toString());
-	}
-
-	/**
-	 * Display a debug message to current console, appended with a line
-	 * separator character.
-	 * 
-	 * @param message
-	 */
-	public static void debugln(Object content) {
-		debug(content + System.getProperty("line.separator"));
-	}
-
-	/**
-	 * Display a debug message on the current console, without any prepended
-	 * string (time or level info).
-	 * 
-	 * @param message
-	 */
-	public static void debugRaw(Object content) {
-		final LogRecord record = new LogRecord(OrccLevel.DEBUG.getLevel(),
-				content.toString());
-		record.setParameters(new Object[] { "-raw" });
-		getLogger().log(record);
-	}
-
-	/**
-	 * Display a notice message to current console.
-	 * 
-	 * @param message
-	 */
-	public static void notice(Object content) {
-		getLogger().log(OrccLevel.NOTICE.getLevel(), content.toString());
-	}
-
-	/**
-	 * Display a notice message to current console, appended with a line
-	 * separator character.
-	 * 
-	 * @param message
-	 */
-	public static void noticeln(Object content) {
-		notice(content + System.getProperty("line.separator"));
-	}
-
-	/**
-	 * Display a notice message on the current console, without any prepended
-	 * string (time or level info).
-	 * 
-	 * @param message
-	 */
-	public static void noticeRaw(Object content) {
-		final LogRecord record = new LogRecord(OrccLevel.NOTICE.getLevel(),
-				content.toString());
-		record.setParameters(new Object[] { "-raw" });
-		getLogger().log(record);
 	}
 
 	/**
@@ -282,8 +227,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void severe(Object content) {
-		getLogger().log(OrccLevel.SEVERE.getLevel(), content.toString());
+	public static void severe(String message) {
+		getLogger().log(SEVERE, message);
 	}
 
 	/**
@@ -292,8 +237,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void severeln(Object content) {
-		severe(content + System.getProperty("line.separator"));
+	public static void severeln(String message) {
+		severe(message + System.getProperty("line.separator"));
 	}
 
 	/**
@@ -302,9 +247,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void severeRaw(Object content) {
-		final LogRecord record = new LogRecord(OrccLevel.SEVERE.getLevel(),
-				content.toString());
+	public static void severeRaw(String message) {
+		LogRecord record = new LogRecord(SEVERE, message);
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
@@ -314,8 +258,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void trace(Object content) {
-		getLogger().log(OrccLevel.TRACE.getLevel(), content.toString());
+	public static void trace(String message) {
+		getLogger().log(TRACE, message);
 	}
 
 	/**
@@ -324,8 +268,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void traceln(Object content) {
-		trace(content + System.getProperty("line.separator"));
+	public static void traceln(String message) {
+		trace(message + System.getProperty("line.separator"));
 	}
 
 	/**
@@ -334,9 +278,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void traceRaw(Object content) {
-		final LogRecord record = new LogRecord(OrccLevel.TRACE.getLevel(),
-				content.toString());
+	public static void traceRaw(String message) {
+		LogRecord record = new LogRecord(TRACE, message);
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}
@@ -346,8 +289,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void warn(Object content) {
-		getLogger().log(OrccLevel.WARNING.getLevel(), content.toString());
+	public static void warn(String message) {
+		getLogger().log(WARNING, message);
 	}
 
 	/**
@@ -356,8 +299,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void warnln(Object content) {
-		warn(content + System.getProperty("line.separator"));
+	public static void warnln(String message) {
+		warn(message + System.getProperty("line.separator"));
 	}
 
 	/**
@@ -366,9 +309,8 @@ public class OrccLogger {
 	 * 
 	 * @param message
 	 */
-	public static void warnRaw(Object content) {
-		LogRecord record = new LogRecord(OrccLevel.WARNING.getLevel(),
-				content.toString());
+	public static void warnRaw(String message) {
+		LogRecord record = new LogRecord(WARNING, message);
 		record.setParameters(new Object[] { "-raw" });
 		getLogger().log(record);
 	}

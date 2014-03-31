@@ -58,6 +58,7 @@ import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
@@ -235,8 +236,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		}
 
 		// transforms "then" expression
-		new ExprTransformer(procedure, blockIf.getThenBlocks(), ifTarget, indexes)
-				.doSwitch(expression.getThen());
+		new ExprTransformer(procedure, blockIf.getThenBlocks(), ifTarget,
+				indexes).doSwitch(expression.getThen());
 
 		// add elsif expressions
 		for (ExpressionElsif elsif : expression.getElsifs()) {
@@ -257,8 +258,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			blockIf = innerIf;
 		}
 
-		new ExprTransformer(procedure, blockIf.getElseBlocks(), ifTarget, indexes)
-				.doSwitch(expression.getElse());
+		new ExprTransformer(procedure, blockIf.getElseBlocks(), ifTarget,
+				indexes).doSwitch(expression.getElse());
 
 		// return expr
 		if (target == null) {
@@ -365,24 +366,49 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		Expression value;
 		if (var.getType().isList()) {
 			if (target == null) {
-				if (expression.eContainer() instanceof StatementCall
-						&& procedure.eContainer() instanceof Action) {
-					Pattern inputPattern = ((Action) procedure.eContainer())
+				EObject exprContainer = expression.eContainer();
+				EObject procContainer = procedure.eContainer();
+				// Check if the list variable need to be copied locally (when
+				// the variable represents input data and is used as procedure
+				// argument). Then, annotate the IR to allow optimizations at
+				// back-end level.
+				if (exprContainer instanceof StatementCall
+						&& procContainer instanceof Action) {
+					Pattern inputPattern = ((Action) procContainer)
 							.getInputPattern();
 					if (inputPattern.contains(var)) {
-						// Need to copy the list before using it in a procedure
 						target = procedure.newTempLocalVariable(var.getType(),
 								"local_" + var.getName());
-						copyList(var);
-						// Notice that is just a copy of the input data
-						target.setAttribute("copyOfTokens",
-								inputPattern.getPort(var));
+						copyList(var, true);
+
+						// Mark the variable as a local copy of input data and
+						// reference the associated port.
+						Port port = inputPattern.getPort(var);
+						target.setAttribute("copyOfTokens", port);
+
 						return eINSTANCE.createExprVar(target);
 					}
 				}
 				return eINSTANCE.createExprVar(var);
 			} else {
-				return copyList(var);
+				Expression expr;
+				// Check if the variable has been marked before by the
+				// ActorTransformer as an optimizable copy of output variable
+				// (when it used as procedure argument). Then, annotate the IR
+				// to allow optimizations at back-end level.
+				if (var.hasAttribute("copyOfTokens")) {
+					expr = copyList(var, true);
+
+					// Mark the variable as a local copy of output data and
+					// reference the associated port.
+					Pattern outputPattern = ((Action) procedure.eContainer())
+							.getOutputPattern();
+					var.setAttribute("copyOfTokens",
+							outputPattern.getPort(target));
+				} else {
+					expr = copyList(var, false);
+				}
+				return expr;
 			}
 		} else {
 			if (procedure != null) {
@@ -410,9 +436,12 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 * 
 	 * @param var
 	 *            a variable of type list.
+	 * @param removable
+	 *            true if the copy can be removed when the FIFO is accessed
+	 *            directly (according to the backend)
 	 * @return <code>null</code>
 	 */
-	private Expression copyList(Var var) {
+	private Expression copyList(Var var, boolean removable) {
 		TypeList typeList = (TypeList) target.getType();
 		List<Block> blocks = this.blocks;
 		List<BlockWhile> whiles = new ArrayList<BlockWhile>();
@@ -443,6 +472,10 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			blocks.add(blockWhile);
 
 			blocks = blockWhile.getBlocks();
+
+			if (removable) {
+				blockWhile.addAttribute("removableCopy");
+			}
 		}
 
 		// load

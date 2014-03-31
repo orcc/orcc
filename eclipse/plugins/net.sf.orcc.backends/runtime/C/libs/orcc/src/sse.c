@@ -40,12 +40,17 @@
 
 #include "sse.h"
 
+#ifdef __SSE2__
 #include <emmintrin.h>
-#ifdef __SSSE3__
+#endif
+#ifdef __SSE3__
 #include <tmmintrin.h>
 #endif
 #ifdef __SSE4_1__
 #include <smmintrin.h>
+#endif
+#ifdef __AVX_2__
+#include <immintrin.h>
 #endif
 
 /*****************************************************************************************************************/
@@ -81,11 +86,13 @@ void copy_8_8_ ## H ## _ ## J ## x ## K ## _orcc(                               
   }                                                                                                                                    \
 }
 
+#ifdef __SSE2__
 // Declare more functions if needed
 COPY_8_8(16, 64,   64)
 COPY_8_8(16, 32,   32)
 COPY_8_8(16,  1, 4352)
 COPY_8_8( 8,  1, 2304)
+#endif
 
 // Variable number of elements to be copied
 #define MEMCPY(H)                                                                                                                      \
@@ -170,6 +177,7 @@ void add_8_16_clip_ ## H ## _ ## K ## x ## J ## _orcc(                          
   }                                                                                                                                    \
 }
 
+#ifdef __SSE2__
 // Declare more functions if needed
 ADD_8_16_CLIP(  16,  1, 16)
 ADD_8_16_CLIP(   8, 64, 64)
@@ -184,6 +192,7 @@ ADD_8_16_CLIP(1024, 64, 64)
 ADD_8_16_CLIP(  16, 32, 32)
 ADD_8_16_CLIP(  64, 32, 32)
 ADD_8_16_CLIP( 256, 32, 32)
+#endif
 
 static i32 clip_i32(i32 Value, i32 minVal, i32 maxVal) {
 	i32 tmp_if;
@@ -432,7 +441,7 @@ GETMVINFO_DPB_CHROMA(64)
 GETMVINFO_DPB_CHROMA(32)
 GETMVINFO_DPB_CHROMA(16)
 
-
+#ifdef __SSE2__
 void fillBorder_luma_orcc(
 	u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
 	i8 lastIdx,
@@ -587,7 +596,7 @@ void fillBorder_chroma_orcc(
     y = y + 1;
   }
 }
-
+#endif
 
 /* DISPLAY */
 
@@ -643,11 +652,53 @@ void displayYUV_crop_ ## H ## _orcc(                                            
   }                                                                                                                                    \
 }                                                                                                                                      \
 
+#ifdef __SSE2__
 // Declare more functions if needed
 DISPLAYYUV_CROP(16)
 DISPLAYYUV_CROP(64)
 DISPLAYYUV_CROP( 8)
 DISPLAYYUV_CROP(32)
+#endif
+
+/* Gather non-contiguous elements from memory */
+
+#ifdef __SSE2__
+void gather32_4x4_orcc(
+  u8 * outputSample,
+  u8 * inputSample,
+  u16 offsetOut,
+  u16 offsetIn,
+  u8 strideOut,
+  u8 strideIn)
+{
+  __m128i * __restrict pm128iOutputSample = (__m128i *) &outputSample[0];
+#if !defined __AVX_2__
+  u8 * pucInputSample = &inputSample[offsetIn];
+  __m128i * __restrict pm128iInputSample;
+  __m128i m128iWord0, m128iWord1, m128iWord2, m128iWord3;
+  int i0, i1, i2, i3;
+
+  m128iWord0 = _mm_loadu_si128((__m128i *) &pucInputSample[0 * strideIn]);
+  m128iWord1 = _mm_loadu_si128((__m128i *) &pucInputSample[1 * strideIn]);
+  m128iWord2 = _mm_loadu_si128((__m128i *) &pucInputSample[2 * strideIn]);
+  m128iWord3 = _mm_loadu_si128((__m128i *) &pucInputSample[3 * strideIn]);
+
+  i0 = _mm_cvtsi128_si32(m128iWord0);
+  i1 = _mm_cvtsi128_si32(m128iWord1);
+  i2 = _mm_cvtsi128_si32(m128iWord2);
+  i3 = _mm_cvtsi128_si32(m128iWord3);
+
+  m128iWord0 = _mm_setr_epi32(i0, i1, i2, i3);
+#else // !defined __AVX_2__
+  int scale = strideIn >> 2;
+  __m128i m128iWord0;
+  __m128i vindex = _mm_setr_epi32(0, 1 * scale, 2 * scale, 3 * scale);
+  m128iWord0 = _mm_i32gather_epi32((int const *) &inputSample[offsetIn], vindex, 1);
+#endif // !defined __AVX_2__
+
+  _mm_storeu_si128(pm128iOutputSample, m128iWord0);
+}
+#endif
 
 
 int sse_init_context()
@@ -662,7 +713,59 @@ int sse_init_context()
     pred_angular[1] = pred_angular_8_8_sse;
     pred_angular[2] = pred_angular_16_8_sse;
     pred_angular[3] = pred_angular_32_8_sse;
-#endif // #ifdef __SSE4_1__
+
+    /* Luma */
+    put_unweighted_pred_zscan[0][0] = ff_hevc_put_unweighted_pred_zscan2_2_8_sse;
+    put_unweighted_pred_zscan[0][1] = ff_hevc_put_unweighted_pred_zscan4_4_8_sse;
+    put_unweighted_pred_zscan[0][2] = ff_hevc_put_unweighted_pred_zscan8_4_8_sse;
+    put_unweighted_pred_zscan[0][3] = ff_hevc_put_unweighted_pred_zscan16_4_8_sse;
+
+    put_weighted_pred_avg_zscan[0][0] = ff_hevc_put_weighted_pred_avg_zscan2_2_8_sse;
+    put_weighted_pred_avg_zscan[0][1] = ff_hevc_put_weighted_pred_avg_zscan4_4_8_sse;
+    put_weighted_pred_avg_zscan[0][2] = ff_hevc_put_weighted_pred_avg_zscan8_4_8_sse;
+    put_weighted_pred_avg_zscan[0][3] = ff_hevc_put_weighted_pred_avg_zscan16_4_8_sse;
+
+    weighted_pred_zscan[0][0] = ff_hevc_weighted_pred_zscan2_2_8_sse;
+    weighted_pred_zscan[0][1] = ff_hevc_weighted_pred_zscan4_4_8_sse;
+    weighted_pred_zscan[0][2] = ff_hevc_weighted_pred_zscan8_4_8_sse;
+    weighted_pred_zscan[0][3] = ff_hevc_weighted_pred_zscan16_4_8_sse;
+
+    weighted_pred_avg_zscan[0][0] = ff_hevc_weighted_pred_avg_zscan2_2_8_sse;
+    weighted_pred_avg_zscan[0][1] = ff_hevc_weighted_pred_avg_zscan4_4_8_sse;
+    weighted_pred_avg_zscan[0][2] = ff_hevc_weighted_pred_avg_zscan8_4_8_sse;
+    weighted_pred_avg_zscan[0][3] = ff_hevc_weighted_pred_avg_zscan16_4_8_sse;
+
+    weighted_pred_mono_zscan[0][0] = ff_hevc_weighted_pred_mono_zscan2_2_8_sse;
+    weighted_pred_mono_zscan[0][1] = ff_hevc_weighted_pred_mono_zscan4_4_8_sse;
+    weighted_pred_mono_zscan[0][2] = ff_hevc_weighted_pred_mono_zscan8_4_8_sse;
+    weighted_pred_mono_zscan[0][3] = ff_hevc_weighted_pred_mono_zscan16_4_8_sse;
+
+    /* Chroma */
+    put_unweighted_pred_zscan[1][0] = ff_hevc_put_unweighted_pred_zscan2_2_8_sse;
+    put_unweighted_pred_zscan[1][1] = ff_hevc_put_unweighted_pred_zscan4_2_8_sse;
+    put_unweighted_pred_zscan[1][2] = ff_hevc_put_unweighted_pred_zscan8_2_8_sse;
+    put_unweighted_pred_zscan[1][3] = ff_hevc_put_unweighted_pred_zscan16_2_8_sse;
+
+    put_weighted_pred_avg_zscan[1][0] = ff_hevc_put_weighted_pred_avg_zscan2_2_8_sse;
+    put_weighted_pred_avg_zscan[1][1] = ff_hevc_put_weighted_pred_avg_zscan4_2_8_sse;
+    put_weighted_pred_avg_zscan[1][2] = ff_hevc_put_weighted_pred_avg_zscan8_2_8_sse;
+    put_weighted_pred_avg_zscan[1][3] = ff_hevc_put_weighted_pred_avg_zscan16_2_8_sse;
+
+    weighted_pred_zscan[1][0] = ff_hevc_weighted_pred_zscan2_2_8_sse;
+    weighted_pred_zscan[1][1] = ff_hevc_weighted_pred_zscan4_2_8_sse;
+    weighted_pred_zscan[1][2] = ff_hevc_weighted_pred_zscan8_2_8_sse;
+    weighted_pred_zscan[1][3] = ff_hevc_weighted_pred_zscan16_2_8_sse;
+
+    weighted_pred_avg_zscan[1][0] = ff_hevc_weighted_pred_avg_zscan2_2_8_sse;
+    weighted_pred_avg_zscan[1][1] = ff_hevc_weighted_pred_avg_zscan4_2_8_sse;
+    weighted_pred_avg_zscan[1][2] = ff_hevc_weighted_pred_avg_zscan8_2_8_sse;
+    weighted_pred_avg_zscan[1][3] = ff_hevc_weighted_pred_avg_zscan16_2_8_sse;
+
+    weighted_pred_mono_zscan[1][0] = ff_hevc_weighted_pred_mono_zscan2_2_8_sse;
+    weighted_pred_mono_zscan[1][1] = ff_hevc_weighted_pred_mono_zscan4_2_8_sse;
+    weighted_pred_mono_zscan[1][2] = ff_hevc_weighted_pred_mono_zscan8_2_8_sse;
+    weighted_pred_mono_zscan[1][3] = ff_hevc_weighted_pred_mono_zscan16_2_8_sse;
+#endif
 
     return 0;
 }

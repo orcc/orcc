@@ -149,12 +149,6 @@ void weighted_pred_avg_orcc(int logWD , int weightCu[2], int offsetCu[2] ,
   hevcDsp.weighted_pred_avg[idx](locLogWD, w0, w1, o0, o1, dst, width, src, src1, width, width, height);
 }
 
-/* weighted_pred_mono implemented in sse.c */
-/*
-void weighted_pred_mono_orcc (int logWD , int weightCu[2], int offsetCu[2],
-		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64]);
-*/
-
 
 void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i32 log2size)
 {

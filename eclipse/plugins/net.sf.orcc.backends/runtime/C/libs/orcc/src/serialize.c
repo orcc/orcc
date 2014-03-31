@@ -87,31 +87,55 @@ void save_profiling(char* fileName, network_t* network) {
         printf("ORCC_ERR_ROXML_NODE_ROOT");
     }
 
-    xdfNode = roxml_add_node(rootNode, 0, ROXML_ELM_NODE, "XDF", NULL);
+    xdfNode = roxml_add_node(rootNode, 0, ROXML_ELM_NODE, "network", NULL);
     if (xdfNode == NULL) {
         printf("ORCC_ERR_ROXML_NODE_CONF");
     }
     /*!TODO : get Network's name properly */
-    roxml_add_node(xdfNode, 0, ROXML_ATTR_NODE, "name", network->name);
+    roxml_add_node(xdfNode, 0, ROXML_ATTR_NODE, "id", network->name);
 
     for (i=0; i < network->nb_actors; i++) {
-        node_t* instanceNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "Instance", NULL);
+        node_t* actorNode = roxml_add_node(xdfNode, 0, ROXML_ELM_NODE, "actor", NULL);
         char* workload = (char*) malloc(10*sizeof(char));
         char* scheduler_workload = (char*) malloc(10*sizeof(char));
 
-        roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", network->actors[i]->name);
+        roxml_add_node(actorNode, 0, ROXML_ATTR_NODE, "id", network->actors[i]->name);
         sprintf(workload, "%d", network->actors[i]->workload);
         sprintf(scheduler_workload, "%.3lf", network->actors[i]->scheduler_workload);
-        roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "workload", workload);
-        roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "schedulerWorkload", scheduler_workload);
+        roxml_add_node(actorNode, 0, ROXML_ATTR_NODE, "workload", workload);
+        roxml_add_node(actorNode, 0, ROXML_ATTR_NODE, "schedulerWorkload", scheduler_workload);
+        roxml_add_node(actorNode, 0, ROXML_ATTR_NODE, "actor-class", network->actors[i]->class_name);
+
+        sprintf(workload, "%d", network->actors[i]->firings);
+        roxml_add_node(actorNode, 0, ROXML_ATTR_NODE, "firings", workload);
+        sprintf(workload, "%d", network->actors[i]->switches);
+        roxml_add_node(actorNode, 0, ROXML_ATTR_NODE, "switches", workload);
+        sprintf(workload, "%d", network->actors[i]->misses);
+        roxml_add_node(actorNode, 0, ROXML_ATTR_NODE, "misses", workload);
 
         for (j=0; j < network->actors[i]->nb_actions; j++) {
-            node_t* actionNode = roxml_add_node(instanceNode, 0, ROXML_ELM_NODE, "Action", NULL);
-            char* action_workload = (char*) malloc(10*sizeof(char));
+            node_t* actionNode = roxml_add_node(actorNode, 0, ROXML_ELM_NODE, "action", NULL);
+            char* action_workload = (char*) malloc(20*sizeof(char));
 
             roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "id", network->actors[i]->actions[j]->name);
             sprintf(action_workload, "%.3lf", network->actors[i]->actions[j]->workload);
             roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "workload", action_workload);
+            if (network->actors[i]->actions[j]->firings > 0) {
+                sprintf(action_workload, "%.0lf", network->actors[i]->actions[j]->avg_ticks);
+                roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "clockcycles", action_workload);
+                if (network->actors[i]->actions[j]->min_ticks != network->actors[i]->actions[j]->avg_ticks) {
+                    sprintf(action_workload, "%.0lf", network->actors[i]->actions[j]->min_ticks);
+                    roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "clockcycles-min", action_workload);
+                }
+                if (network->actors[i]->actions[j]->max_ticks != network->actors[i]->actions[j]->avg_ticks) {
+                    sprintf(action_workload, "%.0lf", network->actors[i]->actions[j]->max_ticks);
+                    roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "clockcycles-max", action_workload);
+                }
+                sprintf(action_workload, "%.1lf", network->actors[i]->actions[j]->variance_ticks);
+                roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "clockcycles-variance", action_workload);
+                sprintf(action_workload, "%d", network->actors[i]->actions[j]->firings);
+                roxml_add_node(actionNode, 0, ROXML_ATTR_NODE, "firings", action_workload);
+            }
             free(action_workload);
         }
         free(workload);
@@ -155,7 +179,7 @@ network_t* load_network(char *fileName) {
         }
 
         nodeName = roxml_get_name(actorNode, NULL, 0);
-        if (strcmp(nodeName, "Instance") == 0) {
+        if (strcmp(nodeName, "actor") == 0) {
             nb_actors++;
         }
         else if (strcmp(nodeName, "Connection") == 0) {
@@ -178,7 +202,7 @@ network_t* load_network(char *fileName) {
         }
 
         nodeName = roxml_get_name(actorNode, NULL, 0);
-        if (strcmp(nodeName, "Instance") == 0) {
+        if (strcmp(nodeName, "actor") == 0) {
             node_t* nodeAttrActorId = roxml_get_attr(actorNode, "id", 0);
             node_t* nodeAttrWorkload = roxml_get_attr(actorNode, "workload", 0);
 
@@ -284,8 +308,8 @@ int save_mapping(char* fileName, mapping_t *mapping) {
         roxml_add_node(processorNode, 0, ROXML_ATTR_NODE, "id", procId);
 
         for (j = 0; j < mapping->partitions_size[i]; j++) {
-            node_t* instanceNode = roxml_add_node(processorNode, 0, ROXML_ELM_NODE, "Instance", NULL);
-            roxml_add_node(instanceNode, 0, ROXML_ATTR_NODE, "id", mapping->partitions_of_actors[i][j]->name);
+            node_t* actorNode = roxml_add_node(processorNode, 0, ROXML_ELM_NODE, "actor", NULL);
+            roxml_add_node(actorNode, 0, ROXML_ATTR_NODE, "id", mapping->partitions_of_actors[i][j]->name);
         }
     }
 

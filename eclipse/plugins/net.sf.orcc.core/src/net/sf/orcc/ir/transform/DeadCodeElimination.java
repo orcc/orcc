@@ -43,6 +43,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.util.SwitchUtil;
 import net.sf.orcc.util.Void;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -54,21 +55,9 @@ import net.sf.orcc.util.util.EcoreHelper;
  */
 public class DeadCodeElimination extends AbstractIrVisitor<Void> {
 
-	private void addBlocks(List<Block> blocks, BlockBasic join, int index) {
-		indexBlock--;
-		List<Block> parentBlocks = EcoreHelper.getContainingList(join);
-		parentBlocks.remove(indexBlock);
-
-		int size = blocks.size();
-		parentBlocks.addAll(indexBlock, blocks);
-
-		parentBlocks.add(indexBlock + size, join);
-		replacePhis(join, index);
-	}
-
 	@Override
 	public Void caseBlockIf(BlockIf block) {
-		Expression condition = block.getCondition();
+		final Expression condition = block.getCondition();
 		if (condition.isExprBool()) {
 			if (((ExprBool) condition).isValue()) {
 				addBlocks(block.getThenBlocks(), block.getJoinBlock(), 0);
@@ -77,7 +66,27 @@ public class DeadCodeElimination extends AbstractIrVisitor<Void> {
 			}
 		}
 
-		return null;
+		// We want to apply the transformation on following blocks
+		return SwitchUtil.CASCADE;
+	}
+
+	/**
+	 * Add the given blocks to the blocks list containing this if block
+	 * 
+	 * @param blocks
+	 * @param join
+	 * @param index
+	 */
+	private void addBlocks(List<Block> blocks, BlockBasic join, int index) {
+		List<Block> parentBlocks = EcoreHelper.getContainingList((BlockIf) join
+				.eContainer());
+		parentBlocks.remove(indexBlock);
+
+		int size = blocks.size();
+		parentBlocks.addAll(indexBlock, blocks);
+
+		parentBlocks.add(indexBlock + size, join);
+		replacePhis(join, index);
 	}
 
 	private void replacePhis(BlockBasic joinBlock, int index) {

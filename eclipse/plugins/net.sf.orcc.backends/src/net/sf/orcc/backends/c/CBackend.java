@@ -30,6 +30,8 @@ package net.sf.orcc.backends.c;
 
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
+import static net.sf.orcc.backends.BackendsConstants.BXDF_FILE;
+import static net.sf.orcc.backends.BackendsConstants.IMPORT_BXDF;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -78,6 +80,7 @@ import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
+import net.sf.orcc.tools.mapping.XmlBufferSizeConfiguration;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.tools.stats.StatisticsPrinter;
@@ -102,7 +105,7 @@ public class CBackend extends AbstractBackend {
 	 * Path to target "src" folder
 	 */
 	protected String srcPath;
-	
+
 	@Override
 	protected void doInitializeOptions() {
 		// Create empty folders
@@ -111,12 +114,13 @@ public class CBackend extends AbstractBackend {
 
 		srcPath = path + File.separator + "src";
 	}
-	
+
 	@Override
 	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
 		replacementMap.put("abs", "abs_replaced");
 		replacementMap.put("getw", "getw_replaced");
+		replacementMap.put("exit", "exit_replaced");
 		replacementMap.put("index", "index_replaced");
 		replacementMap.put("log2", "log2_replaced");
 		replacementMap.put("max", "max_replaced");
@@ -125,7 +129,7 @@ public class CBackend extends AbstractBackend {
 		replacementMap.put("OUT", "OUT_REPLACED");
 		replacementMap.put("IN", "IN_REPLACED");
 		replacementMap.put("SIZE", "SIZE_REPLACED");
-		
+
 		if (mergeActions) {
 			new ActionMerger().doSwitch(actor);
 		}
@@ -205,6 +209,12 @@ public class CBackend extends AbstractBackend {
 
 		new CBroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
+
+		// if required, load the buffer size from the mapping file
+		if (getAttribute(IMPORT_BXDF, false)) {
+			File f = new File(getAttribute(BXDF_FILE, ""));
+			new XmlBufferSizeConfiguration().load(f, network);
+		}
 	}
 
 	@Override
@@ -216,7 +226,7 @@ public class CBackend extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
-		
+
 		doTransformNetwork(network);
 
 		if (debug) {
@@ -287,7 +297,7 @@ public class CBackend extends AbstractBackend {
 			if (commonOk) {
 				OrccLogger.traceRaw("OK" + "\n");
 				new File(commonLibPath + File.separator + "profilingAnalyse.py")
-				.setExecutable(true);
+						.setExecutable(true);
 			} else {
 				OrccLogger.warnRaw("Error" + "\n");
 			}

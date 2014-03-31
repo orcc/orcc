@@ -130,6 +130,7 @@ class NetworkPrinter extends CTemplate {
 		#include <locale.h>
 		#include <stdio.h>
 		#include <stdlib.h>
+		«printAdditionalIncludes»
 		
 		#ifndef _WIN32
 		#define __USE_GNU
@@ -175,20 +176,21 @@ class NetworkPrinter extends CTemplate {
 			// Declaration of the actions
 			
 			«FOR child : network.children»
-				«FOR act : child.getAdapter(typeof(Actor)).actions»
-					action_t action_«child.label»_«act.body.name» = {"«act.body.name»", 0, 0};			
+				«FOR action : child.getAdapter(typeof(Actor)).actions»
+					action_t action_«child.label»_«action.name» = {"«action.name»", 0, 0, -1, -1, -1, 0, 0};			
 				«ENDFOR»
 			«ENDFOR»
-			
 			«FOR child : network.children»
 				action_t *«child.label»_actions[] = {
-					«FOR act : child.getAdapter(typeof(Actor)).actions SEPARATOR ","»
-						&action_«child.label»_«act.body.name»
+					«FOR action : child.getAdapter(typeof(Actor)).actions SEPARATOR ","»
+						&action_«child.label»_«action.name»
 					«ENDFOR»
 				};
 				
 			«ENDFOR»
 		«ENDIF»
+		
+		«additionalDeclarations»
 		
 		/////////////////////////////////////////////////
 		// Actor functions
@@ -202,9 +204,9 @@ class NetworkPrinter extends CTemplate {
 		
 		«FOR child : network.children»
 			«IF profileActions && profileNetwork»
-				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0};
+				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0, "«child.getAdapter(typeof(Actor)).getFile().getProjectRelativePath().removeFirstSegments(1).removeFileExtension().toString().replace("/", ".")»", 0, 0, 0};
 			«ELSE»
-				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, NULL, 0, 0};
+				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, NULL, 0, 0, "", 0, 0, 0};
 			«ENDIF»						
 		«ENDFOR»
 		
@@ -229,7 +231,7 @@ class NetworkPrinter extends CTemplate {
 		
 		/////////////////////////////////////////////////
 		// Declaration of the network
-		network_t network = {"«network.simpleName»", actors, connections, «network.allActors.size», «network.connections.size»};
+		network_t network = {"«network.name»", actors, connections, «network.allActors.size», «network.connections.size»};
 
 		/////////////////////////////////////////////////
 		// Actor scheduler
@@ -249,16 +251,19 @@ class NetworkPrinter extends CTemplate {
 					save_profiling(profiling_file, &network);
 				}
 			«ENDIF»
+			«additionalAtExitActions»
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
-		    atexit(atexit_actions);
+		    «beforeMain»
+		
+			atexit(atexit_actions);
 			init_orcc(argc, argv);
 			
 			launcher();
-			
+			«afterMain»
 			printf("End of simulation !\n");
 			return compareErrors;
 		}
@@ -347,6 +352,10 @@ class NetworkPrinter extends CTemplate {
 						tick_out = getticks();
 						diff_tick = elapsed(tick_out, tick_in);
 						my_actor->ticks += diff_tick;
+						my_actor->switches++;
+						if (si.num_firings == 0) {
+							my_actor->misses++;
+						}
 					«ENDIF»
 		#ifdef PRINT_FIRINGS
 					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
@@ -371,5 +380,19 @@ class NetworkPrinter extends CTemplate {
 	def protected allocateFifo(Connection conn, int nbReaders) '''
 		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 	'''
+	
+	// This method can be override by other backends to print additional includes
+	def protected printAdditionalIncludes() ''''''
+	
+	// This method can be override by other backends to print additional declarations 
+	def protected additionalDeclarations() ''''''
+	
+	// This method can be override by other backends to print additional statements
+	// when the program is terminating
+	def protected additionalAtExitActions()''''''
+	// This method can be override by other backends in case of calling additional 
+	// functions before and after the Main function
+	def protected afterMain() ''''''
+	def protected beforeMain() ''''''
 	
 }

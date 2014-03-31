@@ -34,6 +34,9 @@
          <option
                id="net.sf.orcc.backends.inline">
          </option>
+         <option
+               id="net.sf.orcc.backends.importBXDF">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.compa.COMPABackend"
@@ -422,6 +425,23 @@
                id="net.sf.orcc.backends.c.dal.outputBuffering"
                name="Output buffering">
             <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Whether Orcc should import the given xml buffer size configuration file"
+               id="net.sf.orcc.backends.importBXDF"
+               name="Import the BXDF Mapping">
+            <checkBox>
+               <option
+                     description="The file that contains the buffer size mapping configuration"
+                     id="net.sf.orcc.backends.bxdfFile"
+                     name="BXDF File">
+                  <browseFile
+                        folder="false"
+                        workspace="false">
+                  </browseFile>
+               </option>
+            </checkBox>
          </option>
    </extension>
    <extension

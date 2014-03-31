@@ -1341,13 +1341,22 @@ public interface IrPackage extends EPackage {
 	int PARAM = 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PARAM__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Variable</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PARAM__VARIABLE = 0;
+	int PARAM__VARIABLE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>By Ref</b></em>' attribute.
@@ -1356,7 +1365,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PARAM__BY_REF = 1;
+	int PARAM__BY_REF = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Param</em>' class.
@@ -1365,7 +1374,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PARAM_FEATURE_COUNT = 2;
+	int PARAM_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.BlockImpl <em>Block</em>}' class.
@@ -2003,13 +2012,22 @@ public interface IrPackage extends EPackage {
 	int ARG = 13;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ARG__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
 	 * The number of structural features of the '<em>Arg</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ARG_FEATURE_COUNT = 0;
+	int ARG_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ArgByRefImpl <em>Arg By Ref</em>}' class.
@@ -2020,6 +2038,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	int ARG_BY_REF = 14;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ARG_BY_REF__ATTRIBUTES = ARG__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -2057,6 +2084,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	int ARG_BY_VAL = 15;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ARG_BY_VAL__ATTRIBUTES = ARG__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
