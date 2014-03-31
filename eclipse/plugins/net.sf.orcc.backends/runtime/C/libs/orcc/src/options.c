@@ -84,14 +84,16 @@ void set_mapping_strategy(char *arg_value, options_t *opt) {
     assert(arg_value != NULL);
     assert(opt != NULL);
 
-    if (strcmp(arg_value, "MR") == 0) {
+    if (strcmp(arg_value, "RR") == 0) {
+        opt->strategy = ORCC_MS_ROUND_ROBIN;
+#ifdef METIS_ENABLE
+    } else if (strcmp(arg_value, "MR") == 0) {
         opt->strategy = ORCC_MS_METIS_REC;
     } else if (strcmp(arg_value, "MKCV") == 0) {
         opt->strategy = ORCC_MS_METIS_KWAY_CV;
     } else if (strcmp(arg_value, "MKEC") == 0) {
         opt->strategy = ORCC_MS_METIS_KWAY_EC;
-    } else if (strcmp(arg_value, "RR") == 0) {
-        opt->strategy = ORCC_MS_ROUND_ROBIN;
+#endif /* METIS_ENABLE */
     } else if (strcmp(arg_value, "QM") == 0) {
         opt->strategy = ORCC_MS_QM;
     } else if (strcmp(arg_value, "WLB") == 0) {

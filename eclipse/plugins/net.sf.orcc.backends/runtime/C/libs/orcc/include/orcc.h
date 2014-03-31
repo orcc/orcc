@@ -91,9 +91,11 @@ typedef enum {
 
 /* Mapping strategy codes */
 typedef enum {
+#ifdef METIS_ENABLE
     ORCC_MS_METIS_REC,
     ORCC_MS_METIS_KWAY_CV,
     ORCC_MS_METIS_KWAY_EC,
+#endif /* METIS_ENABLE */
     ORCC_MS_ROUND_ROBIN,
     ORCC_MS_QM,
     ORCC_MS_WLB,

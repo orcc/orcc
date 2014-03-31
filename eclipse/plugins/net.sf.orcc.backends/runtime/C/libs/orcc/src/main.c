@@ -58,9 +58,11 @@ static const char *usage =
     "-o <filename>      Name of the output file.\n"
     "-m <strategy>      Specify the mapping strategy.\n"
     "   The possible values are: {Default : ROUND_ROBIN}\n"
+#ifdef METIS_ENABLE
     "       MR   : METIS Recursive graph partition mapping\n"
     "       MKCV : METIS KWay graph partition mapping (Optimize Communication volume)\n"
     "       MKEC : METIS KWay graph partition mapping (Optimize Edge-cut)\n"
+#endif /* METIS_ENABLE */
     "       RR   : A simple Round-Robin mapping\n"
     "       QM   : Quick Mapping (Not available)\n"
     "       WLB  : Weighted Load Balancing\n"
