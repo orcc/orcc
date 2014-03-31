@@ -127,10 +127,9 @@ public class COMPABackend extends CBackend {
 				OrccLogger.warnRaw("Error" + "\n");
 			}
 
-			OrccLogger.trace("Export cmake modules into "
-					+ path + "... ");
-			final boolean cmakeModOk = copyFolderToFileSystem("/runtime/COMPA",
-					path, debug);
+			final String cmakeModPath = path + File.separator + "cmake";
+			OrccLogger.trace("Export cmake modules into " + cmakeModPath + "... ");
+			final boolean cmakeModOk = copyFolderToFileSystem("/runtime/COMPA/cmake", cmakeModPath, debug);
 			if (cmakeModOk) {
 				OrccLogger.traceRaw("OK" + "\n");
 			} else {
@@ -220,7 +219,7 @@ public class COMPABackend extends CBackend {
 		// print instances
 		printChildren(network);
 		
-		// Print fifo allocation file into the orcc lib source folder.
+		// Print fifo allocation file into the orcc lib include folder.
 		OrccLogger.trace("Printing the fifo allocation file... ");
 		if (new NetworkPrinter(network, options).printFifoFile(path + "/libs/orcc/include") > 0) {
 			OrccLogger.traceRaw("Cached\n");
@@ -256,6 +255,15 @@ public class COMPABackend extends CBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
+		// Copy Xilinx platform specific files into the instance source folder.
+		OrccLogger.trace("Copying Xilinx platform files... ");
+		final boolean xilFilesOk = copyFolderToFileSystem("/runtime/COMPA/xilinx",	path + File.separator + instance.getSimpleName(), debug);
+		if (xilFilesOk) {
+			OrccLogger.traceRaw("OK" + "\n");
+		} else {
+			OrccLogger.warnRaw("Error" + "\n");
+		}
+		
 		return new InstancePrinter(options).print(path + File.separator + instance.getSimpleName(), instance) > 0;
 	}
 }

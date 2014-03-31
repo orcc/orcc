@@ -209,8 +209,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			}
 			print("End of simulation !\n");
 			
-			cleanup_platform();
-			
 			return compareErrors;
 		}
 	'''

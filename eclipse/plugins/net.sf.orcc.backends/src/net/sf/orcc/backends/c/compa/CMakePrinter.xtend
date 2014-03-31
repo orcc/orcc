@@ -28,10 +28,9 @@
  */
 package net.sf.orcc.backends.c.compa
 
-import net.sf.orcc.df.Network
-import net.sf.orcc.df.Actor
-import net.sf.orcc.df.Instance
 import java.io.File
+import net.sf.orcc.df.Instance
+import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
 
 class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
@@ -40,47 +39,47 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		super(network)
 	}
 	
-	override public addLibrariesSubdirs() '''
-		# Prevent usage of SDL or pthread libraries in library built
-		set(NO_EXTERNAL_DEPENDENCIES True)
-		
-		# Compile required libs
-		add_subdirectory(libs)
-		# Compile application
-		add_subdirectory(src)
-	'''
+//	override public addLibrariesSubdirs() '''
+//		# Prevent usage of SDL or pthread libraries in library built
+//		set(NO_EXTERNAL_DEPENDENCIES True)
+//		
+//		# Compile required libs
+//		add_subdirectory(libs)
+//		# Compile application
+//		add_subdirectory(src)
+//	'''
+//	
+//	override protected srcCMakeContent() '''
+//		# Generated from «network.simpleName»
+//
+//		set(filenames
+//«««			«network.simpleName».c
+//			«FOR child : network.children.actorInstances.filter[!getActor.native]»
+//				«child.label».c
+//			«ENDFOR»
+//			«FOR child : network.children.filter(typeof(Actor)).filter[!native]»
+//				«child.label».c
+//			«ENDFOR»
+//		)
+//
+//		add_executable(«network.simpleName» ${filenames})
+//
+//		# Build library without any external library required
+//		target_link_libraries(«network.simpleName» orcc)
+//	'''
 	
-	override protected srcCMakeContent() '''
-		# Generated from «network.simpleName»
-
-		set(filenames
-«««			«network.simpleName».c
-			«FOR child : network.children.actorInstances.filter[!getActor.native]»
-				«child.label».c
-			«ENDFOR»
-			«FOR child : network.children.filter(typeof(Actor)).filter[!native]»
-				«child.label».c
-			«ENDFOR»
-		)
-
-		add_executable(«network.simpleName» ${filenames})
-
-		# Build library without any external library required
-		target_link_libraries(«network.simpleName» orcc)
-	'''
-	
-	def protected srcCMakeContent(Instance instance) '''
-		# Generated from «instance.simpleName»
-
-		set(filenames
-			«instance.simpleName».c
-		)
-
-		add_executable(«instance.simpleName» ${filenames})
-
-		# Build library without any external library required
-		target_link_libraries(«instance.simpleName» orcc)
-	'''
+//	def protected srcCMakeContent(Instance instance) '''
+//		# Generated from «instance.simpleName»
+//
+//		set(filenames
+//			«instance.simpleName».c
+//		)
+//
+//		add_executable(«instance.simpleName» ${filenames})
+//
+//		# Build library without any external library required
+//		target_link_libraries(«instance.simpleName» orcc)
+//	'''
 	
 	def protected rootCMakeContent(Instance instance) '''
 		# Generated from «instance.simpleName»
@@ -97,19 +96,23 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		
 		# Tries to find the ORCC library.
 		find_package(LibORCC REQUIRED)
+
+		# Tries to find the Xilinx libraries.
+		find_package(LibXil REQUIRED)
 	
 		# Runtime libraries inclusion
-		include_directories(${LibORCC_INCLUDE_DIRS})
-		set(LIBS ${LIBS} ${LibORCC_LIBRARIES})
+		include_directories(${LibORCC_INCLUDE_DIRS} ${LibXil_INCLUDE_DIRS})
+		set(LIBS ${LIBS} ${LibORCC_LIBRARIES} ${LibXil_LIBRARIES})
 		
 		set(filenames
 			«instance.simpleName».c
+			platform.c
 		)
 		
-		add_executable(«instance.simpleName» ${filenames})
+		add_executable(«instance.simpleName».elf ${filenames})
 		
 		# Link to orcc library.
-		TARGET_LINK_LIBRARIES(«instance.simpleName» ${LIBS})
+		TARGET_LINK_LIBRARIES(«instance.simpleName».elf ${LIBS})
 	'''
 	
 	override printCMakeFiles(String targetFolder) {
