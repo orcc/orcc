@@ -86,21 +86,24 @@ class InstancePrinter extends CTemplate {
 
 	protected var String entityName
 
-	protected var boolean profileNetwork = false
-	protected var boolean profileActions = false
-	protected var boolean dynamicMapping = false
-	protected var boolean isActionAligned = false
-	protected var boolean checkArrayInbounds = false
-
+	var boolean profileNetwork = false
+	var boolean profileActions = false
+	
+	var boolean inlineActors = false
+	var boolean inlineActions = false
+	
+	var boolean dynamicMapping = false
+	
+	var boolean checkArrayInbounds = false
+	
 	var boolean newSchedul = false
 	var boolean ringTopology = false
-
+	
 	var boolean enableTrace = false
 	var String traceFolder
-	var int threadsNb = 1;
+	
+	var boolean isActionAligned = false
 
-	protected var inlineActors = false
-	protected var inlineActions = false
 
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
@@ -134,14 +137,6 @@ class InstancePrinter extends CTemplate {
 		}
 		if (options.containsKey(CHECK_ARRAY_INBOUNDS)) {
 			checkArrayInbounds = options.get(CHECK_ARRAY_INBOUNDS) as Boolean
-		}
-
-		if (options.containsKey(THREADS_NB)) {
-			if(options.get(THREADS_NB) instanceof String) {
-				threadsNb = Integer::valueOf(options.get(THREADS_NB) as String)
-			} else {
-				threadsNb = options.get(THREADS_NB) as Integer
-			}
 		}
 
 		if (options.containsKey(NEW_SCHEDULER)) {
