@@ -104,7 +104,7 @@ mapping_t* map_actors(network_t *network) {
     mapping_t *mapping;
     assert(network != NULL);
 
-    if (mapping_file == NULL) {
+    if (opt->mapping_input_file == NULL) {
         // Create mapping with only one partition
         mapping = allocate_mapping(1, network->nb_actors);
         mapping->threads_affinities[0] = 0;
@@ -112,7 +112,7 @@ mapping_t* map_actors(network_t *network) {
         memcpy(mapping->partitions_of_actors[0], network->actors, network->nb_actors * sizeof(actor_t*));
         return mapping;
     } else {
-        mapping = load_mapping(mapping_file, network);
+        mapping = load_mapping(opt->mapping_input_file, network);
     }
     return mapping;
 }
@@ -667,7 +667,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
     startTime = getticks();
 
     if (opt->nb_processors != 1) {
-        switch (opt->strategy) {
+        switch (opt->mapping_strategy) {
 #ifdef METIS_ENABLE
         case ORCC_MS_METIS_REC:
             ret = do_metis_recursive_partition(network, opt, part);
@@ -739,7 +739,7 @@ void *agent_routine(void *data) {
         do_mapping(agent->network, agent->options, agent->mapping);
         apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);
 
-        if(mapping_repetition == REMAP_ALWAYS) {
+        if(opt->mapping_repetition == REMAP_ALWAYS) {
             reset_profiling(agent->network);
             resetMapping();
         } else {
@@ -772,7 +772,7 @@ agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *schedu
 }
 
 int needMapping() {
-    return get_partialNumPicturesDecoded() > nbProfiledFrames && need_remap && nbThreads > 1;
+    return get_partialNumPicturesDecoded() > opt->nbProfiledFrames && need_remap;
 }
 
 void resetMapping() {

@@ -34,6 +34,7 @@
 #include "types.h"
 #include "fifo.h"
 #include "util.h"
+#include "options.h"
 
 // from APR
 /* Ignore Microsoft's interpretation of secure development
@@ -102,14 +103,14 @@ void compareYUV_init()
 	struct stat st;
 
 	//Fix me!! Dirty but it's the only way for the moment.
-	if (yuv_file == NULL) {
+    if (opt->yuv_file == NULL) {
 		useCompare = 0;
 		return;
 	}
 	useCompare = 1;
-	ptrFile = fopen(yuv_file, "rb");
+    ptrFile = fopen(opt->yuv_file, "rb");
 	if (ptrFile == NULL) {
-		fprintf(stderr, "Cannot open yuv_file concatenated input file '%s' for reading\n", yuv_file);
+        fprintf(stderr, "Cannot open yuv_file concatenated input file '%s' for reading\n", opt->yuv_file);
 		exit(-1);
 	}
 

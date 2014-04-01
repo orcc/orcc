@@ -37,10 +37,26 @@
  */
 struct options_s
 {
-    int nb_processors;
-    mappingstrategy_et strategy;
     char *input_file;
-    char *output_file;
+    char *input_directory;               // Directory for input files.
+
+    /* Video specific option */
+    char display_flags;                  // Display flags
+    int nbLoops;                         // (Deprecated) Number of times the input file is read
+    int nbFrames;                        // Number of frames to display before closing application
+    char *yuv_file;                      // Reference YUV file
+
+    /* Actor mapping */
+    char *mapping_input_file;            // Predefined mapping configuration
+    char *mapping_output_file;           //
+    mappingstrategy_et mapping_strategy; // Strategy for the actor mapping
+    int nb_processors;
+    int nbProfiledFrames;                // Number of frames to display before remapping application
+    int mapping_repetition;              // Repetition of the actor remapping
+
+
+    char *profiling_file; // profiling file
+    char *write_file; // write file
 };
 
 /**

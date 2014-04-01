@@ -30,51 +30,15 @@
 #ifndef _ORCC_UTIL_H_
 #define _ORCC_UTIL_H_
 
-// Directory for input files.
-extern char *input_directory;
+#include "orcc.h"
 
-// input file
-extern char *input_file;
-
-// output YUV file
-extern char *yuv_file;
-
-// profiling_file file
-extern char *profiling_file;
-
-// write file
-extern char *write_file;
-
-// mapping file
-extern char *mapping_file;
-
-// display flags
-extern char display_flags;
+extern options_t *opt;
 
 // compute number of errors in the program
 extern int compareErrors;
 
-// Number of times the input file is read
-// Deprecated, will be removed in the future
-extern int nbLoops;
-
-// Number of frames to display before closing application
-extern int nbFrames;
-
-// Number of frames to display before remapping application
-extern int nbProfiledFrames;
-
-// Number of executing threads to create
-extern int nbThreads;
-
-// Strategy for the actor mapping
-extern int mapping_strategy;
-
-// Repetition of the actor remapping
-extern int mapping_repetition;
-
 // initialize APR and parse command-line options
-void init_orcc(int argc, char *argv[]);
+options_t* init_orcc(int argc, char *argv[]);
 
 // print usage
 void print_usage();

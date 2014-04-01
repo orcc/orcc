@@ -34,6 +34,7 @@
 
 #include "options.h"
 #include "trace.h"
+#include "util.h"
 
 
 /**
@@ -41,10 +42,16 @@
  */
 options_t *set_default_options() {
     options_t *opt = (options_t*) malloc(sizeof(options_t));
-    opt->strategy = ORCC_MS_ROUND_ROBIN;
+    opt->mapping_strategy = ORCC_MS_ROUND_ROBIN;
     opt->nb_processors = 1;
     opt->input_file = "";
-    opt->output_file = "";
+    opt->mapping_output_file = "";
+    opt->nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
+    opt->nbFrames = DEFAULT_INFINITE;
+    opt->nbProfiledFrames = 10;
+    opt->mapping_repetition = REMAP_ONCE;
+    opt->input_directory = NULL;
+    opt->display_flags = DISPLAY_ENABLE;
 
     return opt;
 }
@@ -54,10 +61,10 @@ options_t *set_default_options() {
  */
 options_t *set_options(mappingstrategy_et strategy, int nb_processors) {
     options_t *opt = (options_t*) malloc(sizeof(options_t));
-    opt->strategy = strategy;
+    opt->mapping_strategy = strategy;
     opt->nb_processors = nb_processors;
     opt->input_file = "";
-    opt->output_file = "";
+    opt->mapping_output_file = "";
 
     return opt;
 }
@@ -84,22 +91,24 @@ void set_mapping_strategy(char *arg_value, options_t *opt) {
     assert(arg_value != NULL);
     assert(opt != NULL);
 
-    if (strcmp(arg_value, "MR") == 0) {
-        opt->strategy = ORCC_MS_METIS_REC;
+    if (strcmp(arg_value, "RR") == 0) {
+        opt->mapping_strategy = ORCC_MS_ROUND_ROBIN;
+#ifdef METIS_ENABLE
+    } else if (strcmp(arg_value, "MR") == 0) {
+        opt->mapping_strategy = ORCC_MS_METIS_REC;
     } else if (strcmp(arg_value, "MKCV") == 0) {
-        opt->strategy = ORCC_MS_METIS_KWAY_CV;
+        opt->mapping_strategy = ORCC_MS_METIS_KWAY_CV;
     } else if (strcmp(arg_value, "MKEC") == 0) {
-        opt->strategy = ORCC_MS_METIS_KWAY_EC;
-    } else if (strcmp(arg_value, "RR") == 0) {
-        opt->strategy = ORCC_MS_ROUND_ROBIN;
+        opt->mapping_strategy = ORCC_MS_METIS_KWAY_EC;
+#endif /* METIS_ENABLE */
     } else if (strcmp(arg_value, "QM") == 0) {
-        opt->strategy = ORCC_MS_QM;
+        opt->mapping_strategy = ORCC_MS_QM;
     } else if (strcmp(arg_value, "WLB") == 0) {
-        opt->strategy = ORCC_MS_WLB;
+        opt->mapping_strategy = ORCC_MS_WLB;
     } else if (strcmp(arg_value, "COW") == 0) {
-        opt->strategy = ORCC_MS_COWLB;
+        opt->mapping_strategy = ORCC_MS_COWLB;
     } else if (strcmp(arg_value, "KLR") == 0) {
-        opt->strategy = ORCC_MS_KRWLB;
+        opt->mapping_strategy = ORCC_MS_KRWLB;
     } else {
         print_orcc_error(ORCC_ERR_BAD_ARGS_MS);
         printf("\n");
@@ -142,6 +151,6 @@ void set_default_output_filename(char *arg_value, options_t *opt) {
         exit(ORCC_ERR_DEF_OUTPUT);
     }
 
-    opt->output_file = output;
+    opt->mapping_output_file = output;
 }
 

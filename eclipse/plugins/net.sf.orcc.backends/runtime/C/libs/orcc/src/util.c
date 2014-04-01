@@ -42,47 +42,11 @@
 extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
-// Directory for input files.
-char *input_directory = NULL;
-
-// input file
-char *input_file;
-
-// output YUV file
-char *yuv_file;
-
-// Profiling file
-char *profiling_file;
-
-// write file
-char *write_file;
-
-// mapping file
-char *mapping_file;
-
-// deactivate display
-char display_flags = DISPLAY_ENABLE;
 
 // compute number of errors in the program
 int compareErrors = 0;
 
-// Nb times the input file is read
-int nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
-
-// Nb frames to display
-int nbFrames = DEFAULT_INFINITE;
-
-// Number of executing threads to create
-int nbThreads = 1;
-
-// Strategy for the actor mapping
-int mapping_strategy = ORCC_MS_WLB;
-
-// Number of frames to display before remapping application
-int nbProfiledFrames = 10;
-
-// Repetition of the actor remapping
-int mapping_repetition = REMAP_ONCE;
+options_t *opt;
 
 
 static char *program;
@@ -94,6 +58,9 @@ static const char *usage =
     "\nCommon arguments:\n"
     "-i <file>          Specify an input file.\n"
     "-v <level>         Set the verbosity.\n"
+    "   The possible values are: {Default : 1}\n"
+    "       1 : summary and results\n"
+    "       2 : debug informations\n"
     "-h                 Print this message.\n"
     // "-t <trace directory>       Specify an output directory for the FIFO trace files.\n"
 
@@ -103,10 +70,19 @@ static const char *usage =
     "-o <file>          Check the output stream with the reference file specified in argument (usually YUV).\n"
 
     "\nRuntime arguments:\n"
+    "-p <file>          Filename to write the profiling information.\n"
     "-m <file>          Define a predefined actor mapping on multi-core platforms using the given XML file.\n"
     "-c <nb cores>      Specify the number of processor cores to use.\n"
     "-s <strategy>      Specify the run-time actor mapping strategy.\n"
-    "-p <file>          Filename to write the profiling information.\n"
+    "   The possible values are: {Default : ROUND_ROBIN}\n"
+#ifdef METIS_ENABLE
+    "       MR   : METIS Recursive graph partition mapping\n"
+    "       MKCV : METIS KWay graph partition mapping (Optimize Communication volume)\n"
+    "       MKEC : METIS KWay graph partition mapping (Optimize Edge-cut)\n"
+#endif /* METIS_ENABLE */
+    "       RR   : A simple Round-Robin mapping\n"
+    "       WLB  : Weighted Load Balancing\n"
+    "       KLR  : Kernighan Lin Refinement Weighted Load Balancing\n"
 
     "\nOther specific arguments:\n"
 	"Depending on how the application has been designed, one of these arguments can be used.\n"
@@ -127,11 +103,13 @@ void pause() {
 
 /////////////////////////////////////
 // initializes APR and parses options
-void init_orcc(int argc, char *argv[]) {
+options_t* init_orcc(int argc, char *argv[]) {
 	// every command line option must be followed by ':' if it takes an
 	// argument, and '::' if this argument is optional
     const char *ostr = "i:no:d:m:f:w:l:r:ac:s:v:p:h";
     int c;
+
+    opt = set_default_options();
 
 	program = argv[0];
 
@@ -144,6 +122,7 @@ void init_orcc(int argc, char *argv[]) {
 #if defined (SSE_ENABLE) && defined (__SSE2__)
 	sse_init_context();
 #endif // SSE_ENABLE
+
 	while ((c = getopt(argc, argv, ostr)) != -1) {
 		switch (c) {
 		case '?': // BADCH
@@ -155,46 +134,46 @@ void init_orcc(int argc, char *argv[]) {
             print_usage();
             exit(ORCC_ERR_BAD_ARGS);
 		case 'd':
-			input_directory = strdup(optarg);
+            opt->input_directory = strdup(optarg);
             break;
 		case 'i':
-			input_file = strdup(optarg);
+            opt->input_file = strdup(optarg);
 			break;
 		case 'l':
-			nbLoops = strtoul(optarg, NULL, 10);
+            opt->nbLoops = strtoul(optarg, NULL, 10);
 			break;
 		case 'f':
-			nbFrames = strtoul(optarg, NULL, 10);
+            opt->nbFrames = strtoul(optarg, NULL, 10);
             break;
         case 'c':
-            nbThreads = strtoul(optarg, NULL, 10);
+            set_nb_processors(optarg, opt);
             break;
         case 's':
-            mapping_strategy = strtoul(optarg, NULL, 10);
+            set_mapping_strategy(optarg, opt);
             break;
 		case 'm':
-			mapping_file = strdup(optarg);
+            opt->mapping_input_file = strdup(optarg);
 			break;
         case 'r':
-            nbProfiledFrames = strtoul(optarg, NULL, 10);
+            opt->nbProfiledFrames = strtoul(optarg, NULL, 10);
             break;
         case 'a':
-            mapping_repetition = REMAP_ALWAYS;
+            opt->mapping_repetition = REMAP_ALWAYS;
             break;
 		case 'n':
-			display_flags = DISPLAY_DISABLE;
+            opt->display_flags = DISPLAY_DISABLE;
 			break;
 		case 'o':
-			yuv_file = strdup(optarg);
+            opt->yuv_file = strdup(optarg);
 			break;
 		case 'w':
-			write_file = strdup(optarg);
+            opt->write_file = strdup(optarg);
 			break;
         case 'p':
-            profiling_file = strdup(optarg);
+            opt->profiling_file = strdup(optarg);
             break;
         case 'v':
-            set_trace_level(strtoul(optarg, NULL, 10));
+            set_verbose_level(optarg, opt);
             break;
         case 'h':
             print_usage();
@@ -205,4 +184,6 @@ void init_orcc(int argc, char *argv[]) {
             exit(ORCC_ERR_BAD_ARGS);
 		}
 	}
+
+    return opt;
 }

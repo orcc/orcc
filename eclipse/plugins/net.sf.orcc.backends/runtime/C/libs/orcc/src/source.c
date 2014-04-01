@@ -34,6 +34,7 @@
 #include <string.h>
 
 #include "util.h"
+#include "options.h"
 
 // from APR
 /* Ignore Microsoft's interpretation of secure development
@@ -73,26 +74,26 @@ void printSpeed(void) {
 void source_init() {
     stop = 0;
 
-	if (input_file == NULL) {
+    if (opt->input_file == NULL) {
 		print_usage();
         fprintf(stderr, "No input file given!\n");
 		exit(1);
 	}
 
-	file = fopen(input_file, "rb");
+    file = fopen(opt->input_file, "rb");
 	if (file == NULL) {
-		if (input_file == NULL) {
-			input_file = "<null>";
+        if (opt->input_file == NULL) {
+            opt->input_file = "<null>";
 		}
 
-        fprintf(stderr, "could not open file \"%s\"\n", input_file);
+        fprintf(stderr, "could not open file \"%s\"\n", opt->input_file);
 		exit(1);
 	}
 	if(PRINT_SPEED) {
 		atexit(printSpeed);
 	}
 	startTime = clock();
-	loopsCount = nbLoops;
+    loopsCount = opt->nbLoops;
 }
 
 long long source_open(char* fileName) {
@@ -100,7 +101,7 @@ long long source_open(char* fileName) {
 	FILE *file = NULL;
 
     stop = 0;
-	if(input_directory == NULL) {
+    if(opt->input_directory == NULL) {
 		file = fopen(fileName, "rb");
 		if (file == NULL) {
             fprintf(stderr, "could not open file \"%s\"\n", fileName);
@@ -108,11 +109,11 @@ long long source_open(char* fileName) {
 		}
 	}
 	else {
-		if(strlen(fileName)+strlen(input_directory)>=256) {
-			fprintf(stderr, "Path too long : input_directory : %s ; fileName : %s\n", input_directory, fileName);
+        if(strlen(fileName)+strlen(opt->input_directory)>=256) {
+            fprintf(stderr, "Path too long : input_directory : %s ; fileName : %s\n", opt->input_directory, fileName);
 			exit(-1);
 		}
-		strcpy(fullPathName, input_directory);
+        strcpy(fullPathName, opt->input_directory);
 		strcat(fullPathName, fileName);
 		file = fopen(fullPathName, "rb");
 		if (file == NULL) {
@@ -125,13 +126,13 @@ long long source_open(char* fileName) {
 		atexit(printSpeed);
 	}
 	startTime = clock();
-	loopsCount = nbLoops;
+    loopsCount = opt->nbLoops;
 	return (long long)file;
 }
 
 unsigned int source_getNbLoop(void)
 {
-	return nbLoops;
+    return opt->nbLoops;
 }
 
 void source_exit(int exitCode)
@@ -235,5 +236,5 @@ void source_decrementNbLoops(){
 
 // This function is deprecated and will be removed in the future. Please don't use it anymore.
 int source_isMaxLoopsReached(){
-	return nbLoops != DEFAULT_INFINITE && loopsCount <= 0;
+    return opt->nbLoops != DEFAULT_INFINITE && loopsCount <= 0;
 }

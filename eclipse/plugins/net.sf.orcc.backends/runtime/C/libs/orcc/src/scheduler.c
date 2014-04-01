@@ -69,13 +69,13 @@ local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_sche
     return sched;
 }
 
-void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping) {
+void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, options_t *opt) {
     int i;
     for (i = 0; i < sched->nb_schedulers; i++) {
         if(i < mapping->number_of_threads) {
-            local_scheduler_init(sched->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i]);
+            local_scheduler_init(sched->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], opt);
         } else {
-            local_scheduler_init(sched->schedulers[i], 0, NULL);
+            local_scheduler_init(sched->schedulers[i], 0, NULL, opt);
         }
     }
 }
@@ -83,9 +83,10 @@ void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping) {
 /**
  * Initializes the given scheduler.
  */
-void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors) {
+void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, options_t *opt) {
     int i;
 
+    sched->opt = opt;
     sched->num_actors = num_actors;
     sched->actors = actors;
     for (i = 0; i < num_actors; i++) {

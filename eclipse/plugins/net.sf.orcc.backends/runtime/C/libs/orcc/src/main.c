@@ -58,9 +58,11 @@ static const char *usage =
     "-o <filename>      Name of the output file.\n"
     "-m <strategy>      Specify the mapping strategy.\n"
     "   The possible values are: {Default : ROUND_ROBIN}\n"
+#ifdef METIS_ENABLE
     "       MR   : METIS Recursive graph partition mapping\n"
     "       MKCV : METIS KWay graph partition mapping (Optimize Communication volume)\n"
     "       MKEC : METIS KWay graph partition mapping (Optimize Edge-cut)\n"
+#endif /* METIS_ENABLE */
     "       RR   : A simple Round-Robin mapping\n"
     "       QM   : Quick Mapping (Not available)\n"
     "       WLB  : Weighted Load Balancing\n"
@@ -86,15 +88,15 @@ void start_orcc_mapping(options_t *opt) {
     print_orcc_trace(ORCC_VL_VERBOSE_1, "Starting Orcc-Map");
     print_orcc_trace(ORCC_VL_VERBOSE_1, "  Nb of processors\t: %d", opt->nb_processors);
     print_orcc_trace(ORCC_VL_VERBOSE_1, "  Input file\t\t: %s", opt->input_file);
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "  Output file\t: %s", opt->output_file);
-    print_orcc_trace(ORCC_VL_VERBOSE_1, "  Mapping strategy\t: %s", ORCC_STRATEGY_TXT[opt->strategy]);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "  Output file\t: %s", opt->mapping_output_file);
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "  Mapping strategy\t: %s", ORCC_STRATEGY_TXT[opt->mapping_strategy]);
     print_orcc_trace(ORCC_VL_VERBOSE_1, "  Verbose level\t: %d", verbose_level);
 
     network = load_network(opt->input_file);
     mapping = allocate_mapping(opt->nb_processors, network->nb_actors);
 
     ret = do_mapping(network, opt, mapping);
-    ret = save_mapping(opt->output_file, mapping);
+    ret = save_mapping(opt->mapping_output_file, mapping);
 
     delete_mapping(mapping);
     free(network);
@@ -127,7 +129,7 @@ int main (int argc, char **argv) {
             set_default_output_filename(optarg, opt);
             break;
         case 'o':
-            opt->output_file = optarg;
+            opt->mapping_output_file = optarg;
             break;
         case 'm':
             set_mapping_strategy(optarg, opt);
