@@ -32,9 +32,9 @@
  * Lock-free and cache-efficient implementation
  * Supports 1 producer - N consumers
  */
-typedef struct FIFO_S(T) {
-    const unsigned int size;                /** Size of the ringbuffer */
-    const unsigned int readers_nb;          /** Number of readers */
+typedef struct {
+    const int size;                         /** Size of the ringbuffer */
+    const int nb_readers;                   /** Number of readers */
     volatile char padding0[CACHELINE_SIZE]; /** Memory padding */
     T *contents;                            /** Buffer containing the FIFO's elements */
     volatile char padding1[CACHELINE_SIZE]; /** Memory padding */
@@ -44,52 +44,19 @@ typedef struct FIFO_S(T) {
     volatile char padding3[CACHELINE_SIZE]; /** Memory padding */
 } FIFO_T(T);
 
-static unsigned int FIFO_HAS_TOKENS(T)(struct FIFO_S(T) *fifo, unsigned int reader_id, unsigned int n) {
-    return fifo->write_ind - fifo->read_inds[reader_id] >= n;
-}
-
-static unsigned int FIFO_GET_NUM_TOKENS(T)(struct FIFO_S(T) *fifo, unsigned int reader_id) {
+static int FIFO_GET_NUM_TOKENS(T)(FIFO_T(T) *fifo, int reader_id) {
     return fifo->write_ind - fifo->read_inds[reader_id];
 }
 
-static unsigned int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_readers, unsigned int n) {
-    unsigned int i;
-    for(i = 0; i < num_readers; i++) {
-        if (fifo->size + 1 - (fifo->write_ind - fifo->read_inds[i]) <= n) {
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-static unsigned int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_readers) {
-    unsigned int i;
-    unsigned int max_num_tokens = 0;
+static int FIFO_GET_ROOM(T)(FIFO_T(T) *fifo, int num_readers) {
+    int i;
+    int num_tokens, max_num_tokens = 0;
 
     for (i = 0; i < num_readers; i++) {
-        unsigned int num_tokens = fifo->write_ind - fifo->read_inds[i];
+        num_tokens = fifo->write_ind - fifo->read_inds[i];
         max_num_tokens = max_num_tokens > num_tokens ? max_num_tokens : num_tokens;
     }
 
     return fifo->size - max_num_tokens;
 }
 
-static void FIFO_CLEAR(T)(struct FIFO_S(T) *fifo) {
-    unsigned int i;
-    fifo->write_ind = 0;
-    for (i = 0; i < fifo->readers_nb; i++) {
-        fifo->read_inds[i] = 0;
-    }
-}
-
-static T FIFO_READ(T)(struct FIFO_S(T) *fifo, unsigned int reader_id) {
-    T value = fifo->contents[fifo->read_inds[reader_id] & (fifo->size - 1)];
-    fifo->read_inds[reader_id]++;
-    return value;
-}
-
-static void FIFO_WRITE(T)(struct FIFO_S(T) *fifo, T value) {
-    fifo->contents[fifo->write_ind & (fifo->size - 1)] = value;
-    fifo->write_ind++;
-}

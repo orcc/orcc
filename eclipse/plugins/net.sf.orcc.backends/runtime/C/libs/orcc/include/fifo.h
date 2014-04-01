@@ -38,13 +38,7 @@
 // Declare the FIFO structure with a size equal to (size)
 #define DECLARE_FIFO(type, size, count, readersnb) static type array_##count[(size)]; \
 static unsigned int read_inds_##count[readersnb] = {0}; \
-static struct FIFO_S(type) fifo_##count = { (size), readersnb, {0}, array_##count, {0}, read_inds_##count, {0}, 0, {0}};
-
-#define FIFO_CLEAR(T) FIFO_CLEAR_EXPAND(T)
-#define FIFO_CLEAR_EXPAND(T) fifo_ ## T ## _clear
-
-#define FIFO_S(T) FIFO_S_EXPAND(T)
-#define FIFO_S_EXPAND(T) fifo_##T##_s
+static FIFO_T(type) fifo_##count = { (size), readersnb, {0}, array_##count, {0}, read_inds_##count, {0}, 0, {0}};
 
 #define FIFO_T(T) FIFO_T_EXPAND(T)
 #define FIFO_T_EXPAND(T) fifo_##T##_t
@@ -52,20 +46,8 @@ static struct FIFO_S(type) fifo_##count = { (size), readersnb, {0}, array_##coun
 #define FIFO_GET_ROOM(T) FIFO_GET_ROOM_EXPAND(T)
 #define FIFO_GET_ROOM_EXPAND(T) fifo_ ## T ## _get_room
 
-#define FIFO_HAS_ROOM(T) FIFO_HAS_ROOM_EXPAND(T)
-#define FIFO_HAS_ROOM_EXPAND(T) fifo_ ## T ## _has_room
-
-#define FIFO_HAS_TOKENS(T) FIFO_HAS_TOKENS_EXPAND(T)
-#define FIFO_HAS_TOKENS_EXPAND(T) fifo_ ## T ## _has_tokens
-
 #define FIFO_GET_NUM_TOKENS(T) FIFO_GET_NUM_TOKENS_EXPAND(T)
 #define FIFO_GET_NUM_TOKENS_EXPAND(T) fifo_ ## T ## _get_num_tokens
-
-#define FIFO_READ(T) FIFO_READ_EXPAND(T)
-#define FIFO_READ_EXPAND(T) fifo_ ## T ## _read_1
-
-#define FIFO_WRITE(T) FIFO_WRITE_EXPAND(T)
-#define FIFO_WRITE_EXPAND(T) fifo_ ## T ## _write_1
 
 /* Define structure and methods for all types thanks to macro expansion */
 
