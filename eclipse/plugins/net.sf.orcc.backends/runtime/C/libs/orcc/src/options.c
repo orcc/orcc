@@ -44,8 +44,9 @@ options_t *set_default_options() {
     options_t *opt = (options_t*) malloc(sizeof(options_t));
     opt->mapping_strategy = ORCC_MS_ROUND_ROBIN;
     opt->nb_processors = 1;
-    opt->input_file = "";
-    opt->mapping_output_file = "";
+    opt->input_file = NULL;
+    opt->mapping_output_file = NULL;
+    opt->mapping_input_file = NULL;
     opt->nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
     opt->nbFrames = DEFAULT_INFINITE;
     opt->nbProfiledFrames = 10;
