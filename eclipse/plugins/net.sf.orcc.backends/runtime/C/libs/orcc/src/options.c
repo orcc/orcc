@@ -47,6 +47,7 @@ options_t *set_default_options() {
     opt->input_file = NULL;
     opt->mapping_output_file = NULL;
     opt->mapping_input_file = NULL;
+    opt->enable_dynamic_mapping = FALSE;
     opt->nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
     opt->nbFrames = DEFAULT_INFINITE;
     opt->nbProfiledFrames = 10;

@@ -113,6 +113,9 @@ mapping_t* map_actors(network_t *network) {
         return mapping;
     } else {
         mapping = load_mapping(opt->mapping_input_file, network);
+        if(mapping->number_of_threads > opt->nb_processors){
+            opt->nb_processors = mapping->number_of_threads;
+        }
     }
     return mapping;
 }
@@ -772,7 +775,7 @@ agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *schedu
 }
 
 int needMapping() {
-    return get_partialNumPicturesDecoded() > opt->nbProfiledFrames && need_remap;
+    return get_partialNumPicturesDecoded() > opt->nbProfiledFrames && need_remap && opt->enable_dynamic_mapping;
 }
 
 void resetMapping() {

@@ -335,7 +335,7 @@ class NetworkPrinter extends CTemplate {
 		#endif
 				}
 				
-				if(my_actor == NULL || (needMapping() && sched->opt->nb_processors > 1)) {
+				if(my_actor == NULL || needMapping()) {
 					orcc_semaphore_set(sched->sync->sem_monitor);
 					orcc_semaphore_wait(sched->sem_thread);
 				}

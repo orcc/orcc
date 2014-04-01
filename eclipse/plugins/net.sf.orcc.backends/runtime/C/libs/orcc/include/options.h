@@ -49,11 +49,11 @@ struct options_s
     /* Actor mapping */
     char *mapping_input_file;            // Predefined mapping configuration
     char *mapping_output_file;           //
-    mappingstrategy_et mapping_strategy; // Strategy for the actor mapping
     int nb_processors;
+    boolean enable_dynamic_mapping;
+    mappingstrategy_et mapping_strategy; // Strategy for the actor mapping
     int nbProfiledFrames;                // Number of frames to display before remapping application
     int mapping_repetition;              // Repetition of the actor remapping
-
 
     char *profiling_file; // profiling file
     char *write_file; // write file

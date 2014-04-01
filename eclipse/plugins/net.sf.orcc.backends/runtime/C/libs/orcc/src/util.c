@@ -147,6 +147,7 @@ options_t* init_orcc(int argc, char *argv[]) {
             break;
         case 'c':
             set_nb_processors(optarg, opt);
+            opt->enable_dynamic_mapping = TRUE;
             break;
         case 's':
             set_mapping_strategy(optarg, opt);
