@@ -45,10 +45,8 @@ import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
-import static net.sf.orcc.backends.BackendsConstants.DYNAMIC_MAPPING;
 import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
-import static net.sf.orcc.backends.BackendsConstants.PROFILE_ACTIONS;
-import static net.sf.orcc.backends.BackendsConstants.PROFILE_NETWORK;
+import static net.sf.orcc.backends.BackendsConstants.PROFILE;
 import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
@@ -871,15 +869,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("m2m", "multi2mono", false,
 				"Transform high-level actors with multi-tokens actions"
 						+ " in low-level actors with mono-token actions");
-		options.addOption("pnet", "profile-network", false,
-				"(C) Allow network profiling for mapping");
-		options.addOption("pact", "profile-actions", false,
-				"(C) Allow actions profiling");
-		options.addOption("dm", "dynamic-mapping", false,
-				"(C) Enable load balancing on multi-core platforms");
+		options.addOption("prof", "profile", false, "(C) Enable profiling");
 		options.addOption("et", "enable-traces", true,
 				"(C) Enable tracing of the FIFOs in the given directory");
-		options.addOption("ttapc", "tta-processorconf", true,
+		options.addOption(
+				"ttapc",
+				"tta-processorconf",
+				true,
 				"(TTA) Predefined configurations for the processors (Standard|Custom|Fast|Huge)");
 
 		// FIXME: choose independently the transformation to apply
@@ -954,22 +950,22 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				optionMap.put(ENABLE_TRACES, true);
 				optionMap.put(TRACES_FOLDER, line.getOptionValue("et"));
 			}
-			
+
 			if (line.hasOption("ttapc")) {
 				String pc = line.getOptionValue("ttapc");
-				if (pc.equals("Standard") || pc.equals("Custom") || pc.equals("Fast") || pc.equals("Huge")) {
-					optionMap.put(TTA_PROCESSORS_CONFIGURATION, pc);					
+				if (pc.equals("Standard") || pc.equals("Custom")
+						|| pc.equals("Fast") || pc.equals("Huge")) {
+					optionMap.put(TTA_PROCESSORS_CONFIGURATION, pc);
 				} else {
-					OrccLogger.warnln("Unknown processors configuration for TTA. Standard configuration will be apply.");
+					OrccLogger
+							.warnln("Unknown processors configuration for TTA. Standard configuration will be apply.");
 				}
 			}
 
 			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
-			optionMap.put(PROFILE_NETWORK, line.hasOption("pnet"));
-			optionMap.put(PROFILE_ACTIONS, line.hasOption("pact"));
-			optionMap.put(DYNAMIC_MAPPING, line.hasOption("dm"));
+			optionMap.put(PROFILE, line.hasOption("pact"));
 
 			// Set backend name in options map
 			String backend = this.getClass().getName();

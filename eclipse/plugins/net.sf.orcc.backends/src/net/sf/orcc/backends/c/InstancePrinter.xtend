@@ -86,13 +86,10 @@ class InstancePrinter extends CTemplate {
 
 	protected var String entityName
 
-	var boolean profileNetwork = false
-	var boolean profileActions = false
+	var boolean profile = false
 	
 	var boolean inlineActors = false
 	var boolean inlineActions = false
-	
-	var boolean dynamicMapping = false
 	
 	var boolean checkArrayInbounds = false
 	
@@ -127,14 +124,8 @@ class InstancePrinter extends CTemplate {
 			fifoSize = 512
 		}
 
-		if (options.containsKey(PROFILE_NETWORK)) {
-			profileNetwork = options.get(PROFILE_NETWORK) as Boolean
-			if(options.containsKey(PROFILE_ACTIONS)){
-				profileActions = options.get(PROFILE_ACTIONS) as Boolean
-			}
-		}
-		if (options.containsKey(DYNAMIC_MAPPING)) {
-			dynamicMapping = options.get(DYNAMIC_MAPPING) as Boolean
+		if(options.containsKey(PROFILE)){
+			profile = options.get(PROFILE) as Boolean
 		}
 		if (options.containsKey(CHECK_ARRAY_INBOUNDS)) {
 			checkArrayInbounds = options.get(CHECK_ARRAY_INBOUNDS) as Boolean
@@ -242,9 +233,7 @@ class InstancePrinter extends CTemplate {
 		#include "util.h"
 		#include "scheduler.h"
 		#include "dataflow.h"
-		«IF profileNetwork || dynamicMapping»
-			#include "cycle.h"
-		«ENDIF»
+		#include "cycle.h"
 
 		#define SIZE «fifoSize»
 		«IF instance != null»
@@ -276,10 +265,8 @@ class InstancePrinter extends CTemplate {
 				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
 				
-				«IF profileNetwork || dynamicMapping»
-					extern connection_t connection_«entityName»_«port.name»;
-					#define rate_«port.name» connection_«entityName»_«port.name».rate
-				«ENDIF»
+				extern connection_t connection_«entityName»_«port.name»;
+				#define rate_«port.name» connection_«entityName»_«port.name».rate
 				
 			«ENDFOR»
 			«IF enableTrace»
@@ -351,7 +338,7 @@ class InstancePrinter extends CTemplate {
 			«ENDIF»
 
 		«ENDIF»
-		«IF profileActions && profileNetwork»
+		«IF profile»
 			////////////////////////////////////////////////////////////////////////////////
 			// Action's workload for profiling
 			«FOR action : actor.actions»
@@ -828,7 +815,7 @@ class InstancePrinter extends CTemplate {
 	}
 	
 	def protected profileStart(Action action) '''
-		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
+		«IF profile && !actor.initializes.contains(action)»
 			ticks tick_in = getticks();
 			ticks tick_out;
 			double diff_tick;
@@ -836,12 +823,12 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	def protected profileEnd(Action action) '''
-		«IF (profileNetwork || dynamicMapping) && !actor.initializes.contains(action)»
+		«IF !actor.initializes.contains(action)»
 			«FOR port : action.inputPattern.ports»
 				rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
 			«ENDFOR»
 		«ENDIF»
-		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
+		«IF profile && !actor.initializes.contains(action)»
 			tick_out = getticks();
 			diff_tick = elapsed(tick_out, tick_in);
 			if (ticks_min_«action.name» > diff_tick || ticks_min_«action.name» < 0) {
@@ -852,7 +839,7 @@ class InstancePrinter extends CTemplate {
 			}
 			ticks_«action.name» += diff_tick;
 			ticks_variance_«action.name» += diff_tick*diff_tick;
-			firings_«action.name» ++;			
+			firings_«action.name» ++;
 		«ENDIF»
 	'''
 

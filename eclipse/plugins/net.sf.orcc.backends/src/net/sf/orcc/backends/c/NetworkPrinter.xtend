@@ -53,9 +53,7 @@ class NetworkPrinter extends CTemplate {
 	protected val Network network;
 	protected val int fifoSize;
 	
-	protected var boolean profileNetwork = false
-	protected var boolean profileActions = false
-	protected var boolean dynamicMapping = false
+	protected var boolean profile = false
 	var boolean ringTopology = false
 	
 	protected var boolean newSchedul = false
@@ -74,14 +72,8 @@ class NetworkPrinter extends CTemplate {
 			fifoSize = DEFAULT_FIFO_SIZE
 		}
 
-		if (options.containsKey(PROFILE_NETWORK)) {
-			profileNetwork = options.get(PROFILE_NETWORK) as Boolean
-			if(options.containsKey(PROFILE_ACTIONS)){
-				profileActions = options.get(PROFILE_ACTIONS) as Boolean
-			}
-		}
-		if (options.containsKey(DYNAMIC_MAPPING)) {
-			dynamicMapping = options.get(DYNAMIC_MAPPING) as Boolean
+		if(options.containsKey(PROFILE)){
+			profile = options.get(PROFILE) as Boolean
 		}
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
@@ -142,13 +134,10 @@ class NetworkPrinter extends CTemplate {
 		#include "mapping.h"
 		#include "util.h"
 		#include "dataflow.h"
-		«IF profileNetwork || dynamicMapping»
-			#include "cycle.h"
-			#include "serialize.h"
-		«ENDIF»
-		«IF dynamicMapping»
-			#include "options.h"
-		«ENDIF»
+
+		#include "cycle.h"
+		#include "serialize.h"
+		#include "options.h"
 		
 		#include "thread.h"
 		#define MAX_THREAD_NB 10
@@ -171,7 +160,7 @@ class NetworkPrinter extends CTemplate {
 			«child.assignFifo»
 		«ENDFOR»
 		
-		«IF profileActions && profileNetwork»
+		«IF profile»
 			/////////////////////////////////////////////////
 			// Declaration of the actions
 			
@@ -203,7 +192,7 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the actors array
 		
 		«FOR child : network.children»
-			«IF profileActions && profileNetwork»
+			«IF profile»
 				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0, "«child.getAdapter(typeof(Actor)).getFile().getProjectRelativePath().removeFirstSegments(1).removeFileExtension().toString().replace("/", ".")»", 0, 0, 0};
 			«ELSE»
 				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, NULL, 0, 0, "", 0, 0, 0};
@@ -245,12 +234,10 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Actions to do when exting properly
 		static void atexit_actions() {
-			«IF profileNetwork || dynamicMapping»
-				if (opt->profiling_file != NULL) {
-					compute_workloads(&network);
-					save_profiling(opt->profiling_file, &network);
-				}
-			«ENDIF»
+			if (opt->profiling_file != NULL) {
+				compute_workloads(&network);
+				save_profiling(opt->profiling_file, &network);
+			}
 			«additionalAtExitActions»
 		}
 		
@@ -272,22 +259,18 @@ class NetworkPrinter extends CTemplate {
 		static void launcher(options_t *opt) {
 			int i;
 			mapping_t *mapping = map_actors(&network);
-			int nb_threads = «IF dynamicMapping»opt->nb_processors«ELSE»mapping->number_of_threads«ENDIF»;
+			int nb_threads = opt->nb_processors;
 			
 			cpu_set_t cpuset;
 			orcc_thread_t threads[MAX_THREAD_NB];
 			orcc_thread_id_t threads_id[MAX_THREAD_NB];
-			«IF dynamicMapping»
-				orcc_thread_t thread_agent;
-				orcc_thread_id_t thread_agent_id;
-				sync_t sync;
-			«ENDIF»
+			orcc_thread_t thread_agent;
+			orcc_thread_id_t thread_agent_id;
+			sync_t sync;
 			
-			global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, «IF dynamicMapping»&sync«ELSE»NULL«ENDIF»);
-			«IF dynamicMapping»
-				agent_t *agent = agent_init(&sync, opt, scheduler, &network, nb_threads);
-				sync_init(&sync);
-			«ENDIF»
+			global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, &sync);
+			agent_t *agent = agent_init(&sync, opt, scheduler, &network, nb_threads);
+			sync_init(&sync);
 			
 			global_scheduler_init(scheduler, mapping, opt);
 			
@@ -297,16 +280,12 @@ class NetworkPrinter extends CTemplate {
 				orcc_thread_create(threads[i], scheduler_routine, *scheduler->schedulers[i], threads_id[i]);
 				orcc_set_thread_affinity(cpuset, i, threads[i]);
 			}
-			«IF dynamicMapping»
-				orcc_thread_create(thread_agent, agent_routine, *agent, thread_agent_id);
-			«ENDIF»
+			orcc_thread_create(thread_agent, agent_routine, *agent, thread_agent_id);
 			
 			for(i=0 ; i < nb_threads; i++){
 				orcc_thread_join(threads[i]);
 			}
-			«IF dynamicMapping»
-				orcc_thread_join(thread_agent);
-			«ENDIF»
+			orcc_thread_join(thread_agent);
 		}
 	'''
 	
@@ -330,10 +309,8 @@ class NetworkPrinter extends CTemplate {
 			actor_t *my_actor;
 			schedinfo_t si;
 			int j;
-			«IF profileNetwork || dynamicMapping»
-				ticks tick_in, tick_out;
-				double diff_tick;
-			«ENDIF»
+			ticks tick_in, tick_out;
+			double diff_tick;
 		
 			set_realtime_priority();
 			sched_init_actors(sched, &si);
@@ -341,30 +318,27 @@ class NetworkPrinter extends CTemplate {
 			while (1) {
 				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
 				if(my_actor != NULL){
-					«IF profileNetwork || dynamicMapping»
-						tick_in = getticks();
-					«ENDIF»
+					tick_in = getticks();
 					si.num_firings = 0;
+					
 					my_actor->sched_func(&si);
-					«IF profileNetwork || dynamicMapping»
-						tick_out = getticks();
-						diff_tick = elapsed(tick_out, tick_in);
-						my_actor->ticks += diff_tick;
-						my_actor->switches++;
-						if (si.num_firings == 0) {
-							my_actor->misses++;
-						}
-					«ENDIF»
+					
+					tick_out = getticks();
+					diff_tick = elapsed(tick_out, tick_in);
+					my_actor->ticks += diff_tick;
+					my_actor->switches++;
+					if (si.num_firings == 0) {
+						my_actor->misses++;
+					}
 		#ifdef PRINT_FIRINGS
 					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 		#endif
 				}
-				«IF dynamicMapping»
-					if(my_actor == NULL || (needMapping() && sched->opt->nb_processors > 1)) {
-						orcc_semaphore_set(sched->sync->sem_monitor);
-						orcc_semaphore_wait(sched->sem_thread);
-					}
-				«ENDIF»
+				
+				if(my_actor == NULL || (needMapping() && sched->opt->nb_processors > 1)) {
+					orcc_semaphore_set(sched->sync->sem_monitor);
+					orcc_semaphore_wait(sched->sem_thread);
+				}
 			}
 		}
 	'''

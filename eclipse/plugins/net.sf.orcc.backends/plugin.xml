@@ -17,10 +17,7 @@
                id="net.sf.orcc.backends.newScheduler">
          </option>
          <option
-               id="net.sf.orcc.backends.profileNetwork">
-         </option>
-         <option
-               id="net.sf.orcc.backends.dynamicMapping">
+               id="net.sf.orcc.backends.profile">
          </option>
          <option
                id="net.sf.orcc.backends.checkArrayInbounds">
@@ -226,28 +223,13 @@
          		</option>
             </checkBox>
          </option>
-         <option
-               defaultValue="false"
-               description="Network runtime profiling"
-               id="net.sf.orcc.backends.profileNetwork"
-               name="[BETA] Profile the network">
-            <checkBox>
-               <option
-                     defaultValue="false"
-                     description="Make the profiling of actions for deeper network profiling. (May reduce performances)"
-                     id="net.sf.orcc.backends.profileNetwork.actions"
-                     name="Profile the actions">
-                  <checkBox></checkBox>
-               </option>
-            </checkBox>
-         </option>
-         <option
-               defaultValue="false"
-               description="Experimental load balancing on multi-core platforms"
-               id="net.sf.orcc.backends.dynamicMapping"
-               name="[BETA] Dynamic mapping">
-            <checkBox></checkBox>
-         </option>
+		 <option
+		       defaultValue="false"
+		       description="Enable runtime profiling (May reduce the performance)."
+		       id="net.sf.orcc.backends.profile"
+		       name="[BETA] Profile the application">
+		    <checkBox></checkBox>
+		 </option>
          <option
                defaultValue="false"
                description="Add C asserts to check array inbounds (need debug compilation)"
