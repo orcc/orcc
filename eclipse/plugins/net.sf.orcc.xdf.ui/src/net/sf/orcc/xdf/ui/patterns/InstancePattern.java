@@ -676,6 +676,23 @@ public class InstancePattern extends AbstractPattern {
 			}
 		}
 
+		// Specific case. If a port has been renamed, any existing connection
+		// from/to this port became invalid. The DF connection linked to the
+		// graphiti FreeFormConnection is not contained in the current network,
+		// since the proxy URI used contains port names. In that case, we must
+		// check invalid connections in the current network to delete them.
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		final List<net.sf.orcc.df.Connection> connectionsCopy = new ArrayList<net.sf.orcc.df.Connection>(
+				network.getConnections());
+		for (net.sf.orcc.df.Connection dfConnection : connectionsCopy) {
+			final Port src = dfConnection.getSourcePort();
+			final Port tgt = dfConnection.getTargetPort();
+			if ((src != null && src.eIsProxy())
+					|| (tgt != null && tgt.eIsProxy())) {
+				EcoreUtil.delete(dfConnection);
+			}
+		}
+
 		// Build a complete message to inform user about what happened exactly
 		final StringBuilder infoMsg = new StringBuilder();
 		infoMsg.append(message).append('\n');
