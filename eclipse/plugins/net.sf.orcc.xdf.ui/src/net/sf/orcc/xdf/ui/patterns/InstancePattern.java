@@ -35,6 +35,7 @@ import java.util.Map;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -449,66 +450,41 @@ public class InstancePattern extends AbstractPattern {
 					.createTrueReason("The instance name has been updated from outside of the diagram");
 		}
 
-		final EObject entity = instance.getEntity();
-		if (entity == null) {
-			return Reason.createFalseReason();
-		}
-
 		// Compute list of in and out ports names
-		final List<String> inputsN = new ArrayList<String>(), outputsN = new ArrayList<String>();
+		final List<String> inNames = new ArrayList<String>(), outNames = new ArrayList<String>();
 		for (final Anchor anchor : ((AnchorContainer) pe).getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
 					anchor, PORT_NAME_KEY);
 			if(PropsUtil.isInstanceInPort(anchor)) {
-				inputsN.add(portName);
+				inNames.add(portName);
 			} else if (PropsUtil.isInstanceOutPort(anchor)) {
-				outputsN.add(portName);
+				outNames.add(portName);
 			}
+		}
+
+		final Entity entity = instance.getAdapter(Entity.class);
+		if (entity == null) {
+			return Reason.createFalseReason("Unknown error");
 		}
 
 		final IReason portsUpdatedReason = Reason
 				.createTrueReason("The port order or their names have to be updated.");
-		if (entity instanceof Network) {
-			if (inputsN.size() != ((Network) entity).getInputs().size()
-					|| outputsN.size() != ((Network) entity).getOutputs()
-							.size()) {
+
+		if (inNames.size() != entity.getInputs().size()
+				|| outNames.size() != entity.getOutputs().size()) {
+			return portsUpdatedReason;
+		}
+		for (int i = 0; i < inNames.size(); ++i) {
+			final String portName = entity.getInputs().get(i).getName();
+			if (!inNames.get(i).equals(portName)) {
 				return portsUpdatedReason;
 			}
-			for (int i = 0; i < inputsN.size(); ++i) {
-				final String portName = ((Network) entity).getInputs().get(i)
-						.getName();
-				if (!inputsN.get(i).equals(portName)) {
-					return portsUpdatedReason;
-				}
-			}
-			for (int i = 0; i < outputsN.size(); ++i) {
-				final String portName = ((Network) entity).getOutputs().get(i)
-						.getName();
-				if (!outputsN.get(i).equals(portName)) {
-					return portsUpdatedReason;
-				}
-			}
-		} else if (entity instanceof Actor) {
-			if (inputsN.size() != ((Actor) entity).getInputs().size()
-					|| outputsN.size() != ((Actor) entity).getOutputs().size()) {
+		}
+		for (int i = 0; i < outNames.size(); ++i) {
+			final String portName = entity.getOutputs().get(i).getName();
+			if (!outNames.get(i).equals(portName)) {
 				return portsUpdatedReason;
 			}
-			for (int i = 0; i < inputsN.size(); ++i) {
-				final String portName = ((Actor) entity).getInputs().get(i)
-						.getName();
-				if (!inputsN.get(i).equals(portName)) {
-					return portsUpdatedReason;
-				}
-			}
-			for (int i = 0; i < outputsN.size(); ++i) {
-				final String portName = ((Actor) entity).getOutputs().get(i)
-						.getName();
-				if (!outputsN.get(i).equals(portName)) {
-					return portsUpdatedReason;
-				}
-			}
-		} else {
-			return Reason.createFalseReason("Unknown refinement type");
 		}
 
 		return super.updateNeeded(context);
