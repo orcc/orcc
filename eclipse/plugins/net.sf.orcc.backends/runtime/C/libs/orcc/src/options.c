@@ -34,6 +34,7 @@
 
 #include "options.h"
 #include "trace.h"
+#include "util.h"
 
 
 /**
@@ -44,7 +45,13 @@ options_t *set_default_options() {
     opt->mapping_strategy = ORCC_MS_ROUND_ROBIN;
     opt->nb_processors = 1;
     opt->input_file = "";
-    opt->output_file = "";
+    opt->mapping_output_file = "";
+    opt->nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
+    opt->nbFrames = DEFAULT_INFINITE;
+    opt->nbProfiledFrames = 10;
+    opt->mapping_repetition = REMAP_ONCE;
+    opt->input_directory = NULL;
+    opt->display_flags = DISPLAY_ENABLE;
 
     return opt;
 }
@@ -57,7 +64,7 @@ options_t *set_options(mappingstrategy_et strategy, int nb_processors) {
     opt->mapping_strategy = strategy;
     opt->nb_processors = nb_processors;
     opt->input_file = "";
-    opt->output_file = "";
+    opt->mapping_output_file = "";
 
     return opt;
 }
@@ -144,6 +151,6 @@ void set_default_output_filename(char *arg_value, options_t *opt) {
         exit(ORCC_ERR_DEF_OUTPUT);
     }
 
-    opt->output_file = output;
+    opt->mapping_output_file = output;
 }
 

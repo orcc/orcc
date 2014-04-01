@@ -43,7 +43,7 @@ static int x, y , onclick = 0;
 static SDL_Rect rect;
 
 char displayYUV_getFlags(){
-	return display_flags;
+    return opt->display_flags;
 }
 
 static void displayYUV_setSize(int width, int height) {
@@ -259,7 +259,7 @@ void displayYUV_getEvent() {
  * @return The
  */
 int displayYUV_getNbFrames() {
-	return nbFrames;
+    return opt->nbFrames;
 }
 
 void display_close() {

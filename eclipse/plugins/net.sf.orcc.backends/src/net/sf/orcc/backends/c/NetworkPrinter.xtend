@@ -246,9 +246,9 @@ class NetworkPrinter extends CTemplate {
 		// Actions to do when exting properly
 		static void atexit_actions() {
 			«IF profileNetwork || dynamicMapping»
-				if (profiling_file != NULL) {
+				if (opt->profiling_file != NULL) {
 					compute_workloads(&network);
-					save_profiling(profiling_file, &network);
+					save_profiling(opt->profiling_file, &network);
 				}
 			«ENDIF»
 			«additionalAtExitActions»

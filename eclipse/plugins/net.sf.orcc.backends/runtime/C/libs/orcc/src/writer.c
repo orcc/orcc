@@ -37,6 +37,7 @@
 #include "types.h"
 #include "fifo.h"
 #include "util.h"
+#include "options.h"
 
 FILE *F = NULL;
 static int cnt = 0;
@@ -44,20 +45,20 @@ static char stop = 0;
 
 void Writer_init() {
 	
-	if (write_file == NULL) {
+    if (opt->write_file == NULL) {
 		print_usage();
 		fprintf(stderr, "No write file given!\n");
 		//wait_for_key();
 		exit(1);
 	}
 
-	F = fopen(write_file, "wb");
+    F = fopen(opt->write_file, "wb");
 	if (F == NULL) {
-		if (write_file == NULL) {
-			write_file = "<null>";
+        if (opt->write_file == NULL) {
+            opt->write_file = "<null>";
 		}
 
-		fprintf(stderr, "could not open file \"%s\"\n", write_file);
+        fprintf(stderr, "could not open file \"%s\"\n", opt->write_file);
 		//wait_for_key();
 		exit(1);
 	}else{
@@ -79,7 +80,7 @@ void Writer_close(){
 
 int writer_open(char* fileName) {
     FILE* file = NULL;
-    if (write_file == NULL) {
+    if (opt->write_file == NULL) {
         file = fopen(fileName, "wb");
         if (file == NULL) {
             fprintf(stderr, "could not open file \"%s\"\n", fileName);
@@ -88,11 +89,11 @@ int writer_open(char* fileName) {
     }
     else {
         char fullPathName[256];
-        if(strlen(fileName)+strlen(write_file)>=256) {
-            fprintf(stderr, "Path too long : input_directory : %s ; fileName : %s\n", write_file, fileName);
+        if(strlen(fileName)+strlen(opt->write_file)>=256) {
+            fprintf(stderr, "Path too long : input_directory : %s ; fileName : %s\n", opt->write_file, fileName);
             exit(-1);
         }
-        strcpy(fullPathName, write_file);
+        strcpy(fullPathName, opt->write_file);
         strcat(fullPathName, fileName);
         file = fopen(fullPathName, "wb");
         if (file == NULL) {

@@ -42,41 +42,11 @@
 extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
-// Directory for input files.
-char *input_directory = NULL;
-
-// input file
-char *input_file;
-
-// output YUV file
-char *yuv_file;
-
-// Profiling file
-char *profiling_file;
-
-// write file
-char *write_file;
-
-// mapping file
-char *mapping_file;
-
-// deactivate display
-char display_flags = DISPLAY_ENABLE;
 
 // compute number of errors in the program
 int compareErrors = 0;
 
-// Nb times the input file is read
-int nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
-
-// Nb frames to display
-int nbFrames = DEFAULT_INFINITE;
-
-// Number of frames to display before remapping application
-int nbProfiledFrames = 10;
-
-// Repetition of the actor remapping
-int mapping_repetition = REMAP_ONCE;
+options_t *opt;
 
 
 static char *program;
@@ -139,7 +109,7 @@ options_t* init_orcc(int argc, char *argv[]) {
     const char *ostr = "i:no:d:m:f:w:l:r:ac:s:v:p:h";
     int c;
 
-    options_t *opt = set_default_options();
+    opt = set_default_options();
 
 	program = argv[0];
 
@@ -164,16 +134,16 @@ options_t* init_orcc(int argc, char *argv[]) {
             print_usage();
             exit(ORCC_ERR_BAD_ARGS);
 		case 'd':
-			input_directory = strdup(optarg);
+            opt->input_directory = strdup(optarg);
             break;
 		case 'i':
-			input_file = strdup(optarg);
+            opt->input_file = strdup(optarg);
 			break;
 		case 'l':
-			nbLoops = strtoul(optarg, NULL, 10);
+            opt->nbLoops = strtoul(optarg, NULL, 10);
 			break;
 		case 'f':
-			nbFrames = strtoul(optarg, NULL, 10);
+            opt->nbFrames = strtoul(optarg, NULL, 10);
             break;
         case 'c':
             set_nb_processors(optarg, opt);
@@ -182,25 +152,25 @@ options_t* init_orcc(int argc, char *argv[]) {
             set_mapping_strategy(optarg, opt);
             break;
 		case 'm':
-			mapping_file = strdup(optarg);
+            opt->mapping_input_file = strdup(optarg);
 			break;
         case 'r':
-            nbProfiledFrames = strtoul(optarg, NULL, 10);
+            opt->nbProfiledFrames = strtoul(optarg, NULL, 10);
             break;
         case 'a':
-            mapping_repetition = REMAP_ALWAYS;
+            opt->mapping_repetition = REMAP_ALWAYS;
             break;
 		case 'n':
-			display_flags = DISPLAY_DISABLE;
+            opt->display_flags = DISPLAY_DISABLE;
 			break;
 		case 'o':
-			yuv_file = strdup(optarg);
+            opt->yuv_file = strdup(optarg);
 			break;
 		case 'w':
-			write_file = strdup(optarg);
+            opt->write_file = strdup(optarg);
 			break;
         case 'p':
-            profiling_file = strdup(optarg);
+            opt->profiling_file = strdup(optarg);
             break;
         case 'v':
             set_verbose_level(optarg, opt);

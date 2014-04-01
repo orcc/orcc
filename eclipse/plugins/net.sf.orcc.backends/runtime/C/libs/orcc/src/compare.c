@@ -33,6 +33,7 @@
 
 
 #include "util.h"
+#include "options.h"
 
 // from APR
 /* Ignore Microsoft's interpretation of secure development
@@ -49,19 +50,19 @@ static FILE        *cmpFile ;
 
 // Called before any *_scheduler function.
 void compare_init() {
-	if (yuv_file == NULL) {
+    if (opt->yuv_file == NULL) {
 		print_usage();
         fprintf(stderr, "No compare file given!\n");
 		exit(1);
 	}
 	if (cmpFile == NULL) {
-		cmpFile = fopen(yuv_file, "rb");
+        cmpFile = fopen(opt->yuv_file, "rb");
 	}
 	if (cmpFile == NULL) {
-		if (yuv_file == NULL) {
-			yuv_file = "<null>";
+        if (opt->yuv_file == NULL) {
+            opt->yuv_file = "<null>";
 		}
-        fprintf(stderr, "could not open file \"%s\"\n", yuv_file);
+        fprintf(stderr, "could not open file \"%s\"\n", opt->yuv_file);
 		exit(1);
 	}
 }
