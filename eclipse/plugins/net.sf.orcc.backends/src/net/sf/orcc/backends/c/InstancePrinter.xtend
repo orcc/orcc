@@ -257,7 +257,7 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
 			«FOR port : actor.inputs»
-				«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
+				«if (incomingPortMap.get(port) != null) "extern "»fifo_«port.type.doSwitch»_t *«port.fullName»;
 			«ENDFOR»
 
 			////////////////////////////////////////////////////////////////////////////////
@@ -268,7 +268,7 @@ class InstancePrinter extends CTemplate {
 				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
 				
-				extern connection_t connection_«entityName»_«port.name»;
+				«if (incomingPortMap.get(port) != null) "extern "»connection_t connection_«entityName»_«port.name»;
 				#define rate_«port.name» connection_«entityName»_«port.name».rate
 				
 			«ENDFOR»
