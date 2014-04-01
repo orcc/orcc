@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2014, IETR/INSA of Rennes
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright notice,
  *     this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,14 +13,13 @@
  *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
  * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCL#include <string.h>
-#include <stdlib.h>UDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
@@ -28,14 +27,21 @@
  * SUCH DAMAGE.
  */
 
-/** lock free fifo ring buffer structure */
+/**
+ * Ring-buffer FIFO structure
+ * Lock-free and cache-efficient implementation
+ * Supports 1 producer - N consumers
+ */
 typedef struct FIFO_S(T) {
-	unsigned int size; /** size of the ringbuffer */
-	T *contents; /** the memory containing the ringbuffer */
-	
-	unsigned int readers_nb; /** the number of fifo's readers */
-	unsigned int* read_inds; /** the current position of the reader */
-	unsigned int write_ind; /** the current position of the writer */
+    const unsigned int size;                /** Size of the ringbuffer */
+    const unsigned int readers_nb;          /** Number of readers */
+    volatile char padding0[CACHELINE_SIZE]; /** Memory padding */
+    T *contents;                            /** Buffer containing the FIFO's elements */
+    volatile char padding1[CACHELINE_SIZE]; /** Memory padding */
+    unsigned int* read_inds;                /** Current reading positions */
+    volatile char padding2[CACHELINE_SIZE]; /** Memory padding */
+    unsigned int write_ind;                 /** Current writing position */
+    volatile char padding3[CACHELINE_SIZE]; /** Memory padding */
 } FIFO_T(T);
 
 static unsigned int FIFO_HAS_TOKENS(T)(struct FIFO_S(T) *fifo, unsigned int reader_id, unsigned int n) {

@@ -31,10 +31,14 @@
 
 #include "types.h"
 
-// declare FIFO with a size equal to (size)
+#ifndef CACHELINE_SIZE
+#define CACHELINE_SIZE 64 // Standard size for x86 processors
+#endif
+
+// Declare the FIFO structure with a size equal to (size)
 #define DECLARE_FIFO(type, size, count, readersnb) static type array_##count[(size)]; \
 static unsigned int read_inds_##count[readersnb] = {0}; \
-static struct FIFO_S(type) fifo_##count = { (size), array_##count, readersnb, read_inds_##count, 0 };
+static struct FIFO_S(type) fifo_##count = { (size), readersnb, {0}, array_##count, {0}, read_inds_##count, {0}, 0, {0}};
 
 #define FIFO_CLEAR(T) FIFO_CLEAR_EXPAND(T)
 #define FIFO_CLEAR_EXPAND(T) fifo_ ## T ## _clear
@@ -62,6 +66,8 @@ static struct FIFO_S(type) fifo_##count = { (size), array_##count, readersnb, re
 
 #define FIFO_WRITE(T) FIFO_WRITE_EXPAND(T)
 #define FIFO_WRITE_EXPAND(T) fifo_ ## T ## _write_1
+
+/* Define structure and methods for all types thanks to macro expansion */
 
 #define T i8
 #include "generic_fifo.h"
