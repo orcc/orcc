@@ -234,6 +234,9 @@ class InstancePrinter extends CTemplate {
 		#include "scheduler.h"
 		#include "dataflow.h"
 		#include "cycle.h"
+		«IF profile»
+			#include "profiling.h"
+		«ENDIF»
 
 		#define SIZE «fifoSize»
 		«IF instance != null»
@@ -343,11 +346,7 @@ class InstancePrinter extends CTemplate {
 			// Action's workload for profiling
 			«FOR action : actor.actions»
 				extern action_t action_«actor.name»_«action.name»;
-				#define firings_«action.name» action_«actor.name»_«action.name».firings
-				#define ticks_«action.name» action_«actor.name»_«action.name».ticks
-				#define ticks_min_«action.name» action_«actor.name»_«action.name».min_ticks
-				#define ticks_max_«action.name» action_«actor.name»_«action.name».max_ticks
-				#define ticks_variance_«action.name» action_«actor.name»_«action.name».variance_ticks				
+				#define action_«action.name» action_«actor.name»_«action.name»
 			«ENDFOR»
 			
 		«ENDIF»
@@ -831,15 +830,8 @@ class InstancePrinter extends CTemplate {
 		«IF profile && !actor.initializes.contains(action)»
 			tick_out = getticks();
 			diff_tick = elapsed(tick_out, tick_in);
-			if (ticks_min_«action.name» > diff_tick || ticks_min_«action.name» < 0) {
-				ticks_min_«action.name» = diff_tick;
-			}
-			if (ticks_max_«action.name» < diff_tick || ticks_max_«action.name» < 0) {
-				ticks_max_«action.name» = diff_tick;
-			}
-			ticks_«action.name» += diff_tick;
-			ticks_variance_«action.name» += diff_tick*diff_tick;
-			firings_«action.name» ++;
+			update_ticks_stats(&action_«action.name», diff_tick);
+			action_«action.name».firings++;
 		«ENDIF»
 	'''
 

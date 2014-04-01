@@ -36,6 +36,7 @@ else()
         src/mapping.c
         src/serialize.c
         src/thread.c
+        src/profiling.c
     )
     set(orcc_additional_libraries)
 
