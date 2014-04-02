@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.frontend;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -43,9 +44,11 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Import;
 import net.sf.orcc.util.DomUtil;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -91,17 +94,28 @@ import org.w3c.dom.NodeList;
  */
 public class FrontendCli implements IApplication {
 
+	private final String USAGE = "Usage : \n"
+			+ "net.sf.orcc.cal.cli <project> [<network>]";
+
 	private final List<IProject> orderedProjects;
 	private final List<IProject> unorderedProjects;
 	private final ResourceSet resourceSet;
 	private final IWorkspace workspace;
 	private boolean isAutoBuildActivated;
 
+	private IProject project;
+	private File networkFile;
+	private final String networkName;
+
 	public FrontendCli() {
 		orderedProjects = new ArrayList<IProject>();
 		unorderedProjects = new ArrayList<IProject>();
 		workspace = ResourcesPlugin.getWorkspace();
 		isAutoBuildActivated = false;
+
+		project = null;
+		networkFile = null;
+		networkName = "";
 
 		CalStandaloneSetup.doSetup();
 
@@ -114,46 +128,13 @@ public class FrontendCli implements IApplication {
 
 	@Override
 	public Object start(IApplicationContext context) {
-		String[] args = (String[]) context.getArguments().get(
+
+		final String[] args = (String[]) context.getArguments().get(
 				IApplicationContext.APPLICATION_ARGS);
 
-		String projectName = "";
-		IProject baseProject = null;
-		InputStream network = null;
-		String networkName = "";
-
-		if (args.length >= 1) {
-
-			System.out.print("Command line arguments are \"");
-			for (String arg : args) {
-				System.out.print(arg + " ");
-			}
-			System.out.println("\"");
-
-			projectName = args[0];
-			baseProject = workspace.getRoot().getProject(projectName);
-			if (baseProject == null) {
-				System.err.println("Unable to find project " + projectName);
-				return IApplication.EXIT_RELAUNCH;
-			}
-
-			if (args.length >= 2 && !args[1].isEmpty()) {
-
-				IFile networkFile = OrccUtil.getFile(baseProject, args[1],
-						OrccUtil.NETWORK_SUFFIX);
-				if (networkFile != null) {
-					try {
-						network = new FileInputStream(networkFile
-								.getLocationURI().getPath());
-						networkName = args[1];
-					} catch (FileNotFoundException e) {
-						network = null;
-					}
-				}
-			}
-		} else {
-			System.err.println("Usage : \n"
-					+ "net.sf.orcc.cal.cli <project> [<network>]");
+		if (!parseCommandLine(args)) {
+			// parseCommandLine already displayed an error message before
+			// returning false
 			return IApplication.EXIT_RELAUNCH;
 		}
 
@@ -162,15 +143,16 @@ public class FrontendCli implements IApplication {
 			// plugins to be launched
 			disableAutoBuild();
 
-			System.out.print("Setup " + projectName + " as working project ");
-			storeProjectToCompile(baseProject);
+			System.out.print("Setup " + project.getName() + " as working project ");
+			storeProjectToCompile(project);
 			System.out.println("Done");
 
-			if (network == null) {
+			if (networkFile == null) {
 				for (IProject project : orderedProjects) {
 					writeIrFilesFromProject(project, getAllFiles(project));
 				}
 			} else {
+				final InputStream networkStream = new FileInputStream(networkFile);
 				Map<String, IFile> allFiles = new HashMap<String, IFile>();
 				for (IProject project : orderedProjects) {
 					allFiles.putAll(getAllFiles(project, true));
@@ -183,7 +165,7 @@ public class FrontendCli implements IApplication {
 				System.out
 						.println("-----------------------------------------------");
 
-				writeIrFilesFromXdfContent(network, allFiles);
+				writeIrFilesFromXdfContent(networkStream, allFiles);
 			}
 			System.out.println("Done");
 
@@ -195,6 +177,8 @@ public class FrontendCli implements IApplication {
 			System.err.println(oe.getMessage());
 		} catch (CoreException ce) {
 			System.err.println(ce.getMessage());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} finally {
 			try {
 				restoreAutoBuild();
@@ -222,6 +206,42 @@ public class FrontendCli implements IApplication {
 			desc.setAutoBuilding(true);
 			workspace.setDescription(desc);
 		}
+	}
+
+	/**
+	 * Parse the command line and initialize the project to wotk with. If a
+	 * network qualified name is passed in cli arguments, initialize the
+	 * networkFile class member.
+	 * 
+	 * @param args
+	 * @return
+	 */
+	private boolean parseCommandLine(final String[] args) {
+
+		if (args.length == 0) {
+			OrccLogger.severeln("Unable to parse command line arguments");
+			OrccLogger.traceln(USAGE);
+			return false;
+		}
+
+		OrccLogger.traceln("Command line arguments are \""
+				+ StringUtils.join(args, ' ') + "\"");
+
+		final String projectName = args[0];
+		project = workspace.getRoot().getProject(projectName);
+		if (project == null) {
+			OrccLogger.severeln("Unable to find the project " + projectName);
+			OrccLogger.traceln(USAGE);
+			return false;
+		}
+
+		if (args.length >= 2 && !args[1].isEmpty()) {
+			final IFile ifile = OrccUtil.getFile(project, args[1],
+					OrccUtil.NETWORK_SUFFIX);
+			networkFile = new File(ifile.getFullPath().toString());
+		}
+
+		return true;
 	}
 
 	/**
