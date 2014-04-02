@@ -33,7 +33,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -66,8 +68,9 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.xtext.diagnostics.Severity;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.util.CancelIndicator;
@@ -97,8 +100,6 @@ public class FrontendCli implements IApplication {
 	private final String USAGE = "Usage : \n"
 			+ "net.sf.orcc.cal.cli <project> [<network>]";
 
-	private final List<IProject> orderedProjects;
-	private final List<IProject> unorderedProjects;
 	private final ResourceSet resourceSet;
 	private final IWorkspace workspace;
 	private boolean isAutoBuildActivated;
@@ -108,8 +109,6 @@ public class FrontendCli implements IApplication {
 	private final String networkName;
 
 	public FrontendCli() {
-		orderedProjects = new ArrayList<IProject>();
-		unorderedProjects = new ArrayList<IProject>();
 		workspace = ResourcesPlugin.getWorkspace();
 		isAutoBuildActivated = false;
 
@@ -139,13 +138,21 @@ public class FrontendCli implements IApplication {
 		}
 
 		try {
-			// IMPORTANT : Disable auto-building, because it requires xtext UI
+			// IMPORTANT : Disable auto-building, because it requires Xtext UI
 			// plugins to be launched
 			disableAutoBuild();
 
-			System.out.print("Setup " + project.getName() + " as working project ");
-			storeProjectToCompile(project);
-			System.out.println("Done");
+			// Get the projects to compile in the right order
+			OrccLogger.traceln("Setup " + project.getName() + " as working project ");
+			final Collection<IProject> orderedProjects = getOrderedProjects(project);
+
+			// Check for missing output folders in project
+			for (final IProject proj : orderedProjects) {
+				final IFolder outDir = OrccUtil.getOutputFolder(proj);
+				if (!outDir.exists()) {
+					outDir.create(true, true, new NullProgressMonitor());
+				}
+			}
 
 			if (networkFile == null) {
 				for (IProject project : orderedProjects) {
@@ -242,6 +249,35 @@ public class FrontendCli implements IApplication {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Return a Collection containing all projects required to build the given
+	 * project. The collection is sorted in the correct build order: the given
+	 * project will be the last in the resulting Collection.
+	 * 
+	 * @param project
+	 * @return
+	 * @throws JavaModelException
+	 */
+	private Collection<IProject> getOrderedProjects(final IProject project)
+			throws JavaModelException {
+		final Collection<IProject> projects = new LinkedHashSet<IProject>();
+
+		final IJavaProject javaProject = JavaCore.create(project);
+		if (javaProject == null) {
+			OrccLogger.severeln("");
+			return projects;
+		}
+
+		for (final String required : javaProject.getRequiredProjectNames()) {
+			final IProject proj = OrccUtil.workspaceRoot().getProject(required);
+			projects.addAll(getOrderedProjects(proj));
+		}
+
+		projects.add(project);
+
+		return projects;
 	}
 
 	/**
@@ -343,55 +379,6 @@ public class FrontendCli implements IApplication {
 	private Map<String, IFile> getAllFiles(IContainer container)
 			throws OrccException {
 		return getAllFiles(container, false);
-	}
-
-	/**
-	 * Add currentProject dependencies to an orderedList of projects to compile,
-	 * then add currentProject itself. This method should not run in infinite
-	 * loop if projects dependencies are cycling.
-	 * 
-	 * @param currentProject
-	 * @throws OrccException
-	 * @throws CoreException
-	 */
-	private void storeProjectToCompile(IProject currentProject)
-			throws OrccException, CoreException {
-		unorderedProjects.add(currentProject);
-
-		try {
-
-			IClasspathEntry[] classpathEntries = JavaCore
-					.create(currentProject).getRawClasspath();
-
-			for (IClasspathEntry cpEntry : classpathEntries) {
-
-				// Check for projects referenced in build path
-				if (cpEntry.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
-
-					IProject projectInClasspath = workspace.getRoot()
-							.getProject(cpEntry.getPath().toString());
-
-					if (!unorderedProjects.contains(projectInClasspath)) {
-						storeProjectToCompile(projectInClasspath);
-					}
-				}
-			}
-
-		} catch (CoreException e) {
-			throw new OrccException("Unable to get referenced projects "
-					+ currentProject.getName());
-		}
-
-		// This function is recursive, and projects referenced in classpath have
-		// been stored, so adding the current project now ensure order is right
-		if (!orderedProjects.contains(currentProject)) {
-			orderedProjects.add(currentProject);
-
-			IFolder outputDir = OrccUtil.getOutputFolder(currentProject);
-			if (!outputDir.exists()) {
-				outputDir.create(true, true, new NullProgressMonitor());
-			}
-		}
 	}
 
 	/**
