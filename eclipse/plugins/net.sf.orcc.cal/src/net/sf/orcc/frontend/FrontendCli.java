@@ -175,10 +175,9 @@ public class FrontendCli implements IApplication {
 					resourcesMap.put(project, resources);
 				}
 			} else {
-				final InputStream networkStream = new FileInputStream(networkFile);
-				Map<String, IFile> allFiles = new HashMap<String, IFile>();
-				for (IProject project : orderedProjects) {
-					allFiles.putAll(getAllFiles(project, true));
+				final Map<String, IFile> allFiles = new HashMap<String, IFile>();
+				for (final IProject project : orderedProjects) {
+					allFiles.putAll(getAllFiles(project));
 				}
 
 				System.out
@@ -188,7 +187,10 @@ public class FrontendCli implements IApplication {
 				System.out
 						.println("-----------------------------------------------");
 
+				final InputStream networkStream = new FileInputStream(
+						networkFile);
 				writeIrFilesFromXdfContent(networkStream, allFiles);
+
 			}
 
 			final CalGenerator calGenerator = (CalGenerator) injector
@@ -356,48 +358,34 @@ public class FrontendCli implements IApplication {
 	}
 
 	/**
-	 * Get all actors, units and, if includeNetworks == true, network files from
-	 * container (IProject or IFolder) and all its subfolders. Index is the
-	 * qualified name corresponding to the file.
+	 * Get all actors, units and network files from container (IProject or
+	 * IFolder) and all its subfolders. IFile instances are indexed by their
+	 * qualified name.
 	 * 
 	 * @param container
 	 *            instance of IProject or IFolder to search in
-	 * @param includeNetworks
-	 *            set to true to include xdf files in the returned map
 	 * @return a map of qualified names / IFile descriptors
 	 * @throws OrccException
+	 * @throws CoreException
 	 */
-	private Map<String, IFile> getAllFiles(IContainer container,
-			boolean includeNetworks) throws OrccException {
+	private Map<String, IFile> getAllFiles(final IContainer container)
+			throws OrccException, CoreException {
 
-		Map<String, IFile> calFiles = new HashMap<String, IFile>();
-		IResource[] members = null;
-		try {
-			members = container.members();
+		final Map<String, IFile> calFiles = new HashMap<String, IFile>();
+		for (final IResource resource : container.members()) {
 
-			for (IResource resource : members) {
+			if (resource.getType() == IResource.FOLDER) {
+				calFiles.putAll(getAllFiles((IFolder) resource));
 
-				if (resource.getType() == IResource.FOLDER) {
+			} else if (resource.getType() == IResource.FILE) {
 
-					calFiles.putAll(getAllFiles((IFolder) resource,
-							includeNetworks));
-
-				} else if (resource.getType() == IResource.FILE
-						&& resource.getFileExtension() != null) {
-					if (resource.getFileExtension().equals(OrccUtil.CAL_SUFFIX)
-							|| (includeNetworks && resource.getFileExtension()
-									.equals(OrccUtil.NETWORK_SUFFIX))) {
-						String packageName = resource.getProjectRelativePath()
-								.removeFirstSegments(1).removeFileExtension()
-								.toString().replace('/', '.');
-						calFiles.put(packageName, (IFile) resource);
-					}
-
+				final String suffix = resource.getFileExtension();
+				if (OrccUtil.CAL_SUFFIX.equals(suffix)
+						|| (OrccUtil.NETWORK_SUFFIX.equals(suffix))) {
+					final IFile ifile = (IFile) resource;
+					calFiles.put(OrccUtil.getQualifiedName(ifile), ifile);
 				}
 			}
-		} catch (CoreException e) {
-			throw new OrccException("Unable to get members of IContainer "
-					+ container.getName());
 		}
 
 		return calFiles;
