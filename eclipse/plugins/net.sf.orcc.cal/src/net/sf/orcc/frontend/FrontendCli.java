@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
@@ -61,7 +60,6 @@ import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
@@ -406,21 +404,6 @@ public class FrontendCli implements IApplication {
 	}
 
 	/**
-	 * Get all actors and units files from container (IProject or IFolder) and
-	 * all its subfolders. Index is the qualified name corresponding to the
-	 * file. In this default implementation, xdf files are not included in the
-	 * resulting map
-	 * 
-	 * @param container
-	 * @return
-	 * @throws OrccException
-	 */
-	private Map<String, IFile> getAllFiles(IContainer container)
-			throws OrccException {
-		return getAllFiles(container, false);
-	}
-
-	/**
 	 * Write IR files for all instance's children of a gived network
 	 * 
 	 * @param networkContent
@@ -533,84 +516,6 @@ public class FrontendCli implements IApplication {
 			Frontend.getEntity(astEntity);
 		}
 
-	}
-
-	/**
-	 * Write IR files for all cla corresponding files of a project
-	 * 
-	 * @param p
-	 *            project to compile
-	 * @throws OrccException
-	 */
-	private void writeIrFilesFromProject(IProject p,
-			Map<String, IFile> qnameFileMap) throws OrccException {
-
-		Map<String, Resource> resourceMap = new HashMap<String, Resource>();
-		ArrayList<String> orderedUnits = new ArrayList<String>();
-
-		System.out.println("-----------------------------");
-		System.out.println("Building project " + p.getName());
-		System.out.println("-----------------------------");
-
-		// Save list of units qualified names and map of qualified name /
-		// entities
-		for (Entry<String, IFile> entry : qnameFileMap.entrySet()) {
-
-			Resource resource = EcoreHelper.getResource(resourceSet,
-					entry.getValue());
-			AstEntity entity = (AstEntity) resource.getContents().get(0);
-
-			resourceMap.put(entry.getKey(), resource);
-
-			if (entity.getUnit() != null) {
-				orderedUnits.add(entry.getKey());
-			}
-		}
-
-		// Reorder unit list, to ensure units depending on others are built
-		// after it/them
-		ArrayList<String> tempUnitList = new ArrayList<String>();
-		tempUnitList.addAll(orderedUnits);
-
-		for (String curUnitQName : tempUnitList) {
-
-			// Get imports for the current unit
-			EList<Import> imports = ((AstEntity) resourceMap.get(curUnitQName)
-					.getContents().get(0)).getImports();
-
-			for (Import i : imports) {
-				String importedNamespace = i.getImportedNamespace();
-				String importQName = importedNamespace.substring(0,
-						importedNamespace.lastIndexOf('.'));
-
-				// Move the needed unit just before the current one
-				if (orderedUnits.contains(importQName)) {
-					orderedUnits.remove(importQName);
-					orderedUnits.add(orderedUnits.indexOf(curUnitQName),
-							importQName);
-				}
-			}
-		}
-
-		// Build units, and remove them from the resource map
-		for (String unitQName : orderedUnits) {
-			System.out.println("Unit : " + unitQName);
-
-			Resource resource = resourceMap.remove(unitQName);
-			if (!hasErrors(resource)) {
-				Frontend.getEntity((AstEntity) resource.getContents().get(0));
-			}
-		}
-
-		// Build actors
-		for (String actorQName : resourceMap.keySet()) {
-			System.out.println("Actor : " + actorQName);
-
-			Resource resource = resourceMap.get(actorQName);
-			if (!hasErrors(resource)) {
-				Frontend.getEntity((AstEntity) resource.getContents().get(0));
-			}
-		}
 	}
 
 	@Override
