@@ -43,8 +43,8 @@ import java.util.Map.Entry;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Import;
+import net.sf.orcc.cal.generator.CalGenerator;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
@@ -62,16 +62,18 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.xtext.diagnostics.Severity;
+import org.eclipse.xtext.generator.IGenerator;
+import org.eclipse.xtext.generator.JavaIoFileSystemAccess;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.util.CancelIndicator;
 import org.eclipse.xtext.validation.CheckMode;
@@ -81,6 +83,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.google.inject.Injector;
 
 /**
  * This class defines an RVC-CAL command line version of the frontend. It should
@@ -108,7 +112,13 @@ public class FrontendCli implements IApplication {
 	private File networkFile;
 	private final String networkName;
 
+	final Injector injector;
+
 	public FrontendCli() {
+
+		injector = new CalStandaloneSetup()
+				.createInjectorAndDoEMFRegistration();
+
 		workspace = ResourcesPlugin.getWorkspace();
 		isAutoBuildActivated = false;
 
@@ -116,13 +126,8 @@ public class FrontendCli implements IApplication {
 		networkFile = null;
 		networkName = "";
 
-		CalStandaloneSetup.doSetup();
-
 		// Get the resource set used by Frontend
-		resourceSet = new ResourceSetImpl();
-		// Register the package to ensure it is available during loading.
-		resourceSet.getPackageRegistry().put(CalPackage.eNS_URI,
-				CalPackage.eINSTANCE);
+		resourceSet = injector.getInstance(ResourceSet.class);
 	}
 
 	@Override
@@ -154,9 +159,22 @@ public class FrontendCli implements IApplication {
 				}
 			}
 
+			final Map<IProject, List<Resource>> resourcesMap = new HashMap<IProject, List<Resource>>();
 			if (networkFile == null) {
-				for (IProject project : orderedProjects) {
-					writeIrFilesFromProject(project, getAllFiles(project));
+				for (final IProject project : orderedProjects) {
+					final List<Resource> resources = new ArrayList<Resource>();
+
+					final List<IFile> files = OrccUtil.getAllFiles(
+							OrccUtil.CAL_SUFFIX,
+							OrccUtil.getSourceFolders(project));
+
+					for (final IFile file : files) {
+						final URI uri = URI.createPlatformResourceURI(file
+								.getFullPath().toString(), true);
+						resources.add(resourceSet.getResource(uri, true));
+					}
+
+					resourcesMap.put(project, resources);
 				}
 			} else {
 				final InputStream networkStream = new FileInputStream(networkFile);
@@ -174,11 +192,32 @@ public class FrontendCli implements IApplication {
 
 				writeIrFilesFromXdfContent(networkStream, allFiles);
 			}
-			System.out.println("Done");
+
+			final CalGenerator calGenerator = (CalGenerator) injector
+					.getInstance(IGenerator.class);
+			final JavaIoFileSystemAccess fsa = injector
+					.getInstance(JavaIoFileSystemAccess.class);
+
+			for (final IProject project : orderedProjects) {
+
+				OrccLogger.traceln("+-------------------");
+				OrccLogger.traceln("| " + project.getName());
+				OrccLogger.traceln("+-------------------");
+
+				fsa.setOutputPath(OrccUtil.getOutputFolder(project)
+						.getLocation().toString());
+				calGenerator.beforeBuild(project, resourceSet);
+				for (final Resource res : resourcesMap.get(project)) {
+					calGenerator.doGenerate(res, fsa);
+					OrccLogger.traceln("Build " + res.getURI().toString());
+				}
+				calGenerator.afterBuild();
+			}
 
 			// If needed, restore autoBuild config state in eclipse config file
 			restoreAutoBuild();
 
+			OrccLogger.traceln("Build ends");
 			workspace.save(true, new NullProgressMonitor());
 		} catch (OrccException oe) {
 			System.err.println(oe.getMessage());
