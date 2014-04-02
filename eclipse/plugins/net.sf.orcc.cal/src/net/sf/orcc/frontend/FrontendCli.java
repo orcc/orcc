@@ -112,6 +112,101 @@ public class FrontendCli implements IApplication {
 				CalPackage.eINSTANCE);
 	}
 
+	@Override
+	public Object start(IApplicationContext context) {
+		String[] args = (String[]) context.getArguments().get(
+				IApplicationContext.APPLICATION_ARGS);
+
+		String projectName = "";
+		IProject baseProject = null;
+		InputStream network = null;
+		String networkName = "";
+
+		if (args.length >= 1) {
+
+			System.out.print("Command line arguments are \"");
+			for (String arg : args) {
+				System.out.print(arg + " ");
+			}
+			System.out.println("\"");
+
+			projectName = args[0];
+			baseProject = workspace.getRoot().getProject(projectName);
+			if (baseProject == null) {
+				System.err.println("Unable to find project " + projectName);
+				return IApplication.EXIT_RELAUNCH;
+			}
+
+			if (args.length >= 2 && !args[1].isEmpty()) {
+
+				IFile networkFile = OrccUtil.getFile(baseProject, args[1],
+						OrccUtil.NETWORK_SUFFIX);
+				if (networkFile != null) {
+					try {
+						network = new FileInputStream(networkFile
+								.getLocationURI().getPath());
+						networkName = args[1];
+					} catch (FileNotFoundException e) {
+						network = null;
+					}
+				}
+			}
+		} else {
+			System.err.println("Usage : \n"
+					+ "net.sf.orcc.cal.cli <project> [<network>]");
+			return IApplication.EXIT_RELAUNCH;
+		}
+
+		try {
+			// IMPORTANT : Disable auto-building, because it requires xtext UI
+			// plugins to be launched
+			disableAutoBuild();
+
+			System.out.print("Setup " + projectName + " as working project ");
+			storeProjectToCompile(baseProject);
+			System.out.println("Done");
+
+			if (network == null) {
+				for (IProject project : orderedProjects) {
+					writeIrFilesFromProject(project, getAllFiles(project));
+				}
+			} else {
+				Map<String, IFile> allFiles = new HashMap<String, IFile>();
+				for (IProject project : orderedProjects) {
+					allFiles.putAll(getAllFiles(project, true));
+				}
+
+				System.out
+						.println("-----------------------------------------------");
+				System.out.println("Building needed files for network "
+						+ networkName);
+				System.out
+						.println("-----------------------------------------------");
+
+				writeIrFilesFromXdfContent(network, allFiles);
+			}
+			System.out.println("Done");
+
+			// If needed, restore autoBuild config state in eclipse config file
+			restoreAutoBuild();
+
+			workspace.save(true, new NullProgressMonitor());
+		} catch (OrccException oe) {
+			System.err.println(oe.getMessage());
+		} catch (CoreException ce) {
+			System.err.println(ce.getMessage());
+		} finally {
+			try {
+				restoreAutoBuild();
+				return IApplication.EXIT_OK;
+			} catch (CoreException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+
+		return IApplication.EXIT_RESTART;
+	}
+
 	private void disableAutoBuild() throws CoreException {
 		IWorkspaceDescription desc = workspace.getDescription();
 		if (desc.isAutoBuilding()) {
@@ -470,101 +565,6 @@ public class FrontendCli implements IApplication {
 				Frontend.getEntity((AstEntity) resource.getContents().get(0));
 			}
 		}
-	}
-
-	@Override
-	public Object start(IApplicationContext context) {
-		String[] args = (String[]) context.getArguments().get(
-				IApplicationContext.APPLICATION_ARGS);
-
-		String projectName = "";
-		IProject baseProject = null;
-		InputStream network = null;
-		String networkName = "";
-
-		if (args.length >= 1) {
-
-			System.out.print("Command line arguments are \"");
-			for (String arg : args) {
-				System.out.print(arg + " ");
-			}
-			System.out.println("\"");
-
-			projectName = args[0];
-			baseProject = workspace.getRoot().getProject(projectName);
-			if (baseProject == null) {
-				System.err.println("Unable to find project " + projectName);
-				return IApplication.EXIT_RELAUNCH;
-			}
-
-			if (args.length >= 2 && !args[1].isEmpty()) {
-
-				IFile networkFile = OrccUtil.getFile(baseProject, args[1],
-						OrccUtil.NETWORK_SUFFIX);
-				if (networkFile != null) {
-					try {
-						network = new FileInputStream(networkFile
-								.getLocationURI().getPath());
-						networkName = args[1];
-					} catch (FileNotFoundException e) {
-						network = null;
-					}
-				}
-			}
-		} else {
-			System.err.println("Usage : \n"
-					+ "net.sf.orcc.cal.cli <project> [<network>]");
-			return IApplication.EXIT_RELAUNCH;
-		}
-
-		try {
-			// IMPORTANT : Disable auto-building, because it requires xtext UI
-			// plugins to be launched
-			disableAutoBuild();
-
-			System.out.print("Setup " + projectName + " as working project ");
-			storeProjectToCompile(baseProject);
-			System.out.println("Done");
-
-			if (network == null) {
-				for (IProject project : orderedProjects) {
-					writeIrFilesFromProject(project, getAllFiles(project));
-				}
-			} else {
-				Map<String, IFile> allFiles = new HashMap<String, IFile>();
-				for (IProject project : orderedProjects) {
-					allFiles.putAll(getAllFiles(project, true));
-				}
-
-				System.out
-						.println("-----------------------------------------------");
-				System.out.println("Building needed files for network "
-						+ networkName);
-				System.out
-						.println("-----------------------------------------------");
-
-				writeIrFilesFromXdfContent(network, allFiles);
-			}
-			System.out.println("Done");
-
-			// If needed, restore autoBuild config state in eclipse config file
-			restoreAutoBuild();
-
-			workspace.save(true, new NullProgressMonitor());
-		} catch (OrccException oe) {
-			System.err.println(oe.getMessage());
-		} catch (CoreException ce) {
-			System.err.println(ce.getMessage());
-		} finally {
-			try {
-				restoreAutoBuild();
-				return IApplication.EXIT_OK;
-			} catch (CoreException e) {
-				System.err.println(e.getMessage());
-			}
-		}
-
-		return IApplication.EXIT_RESTART;
 	}
 
 	@Override
