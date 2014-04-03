@@ -55,6 +55,7 @@ options_t *set_default_options() {
     opt->input_directory = NULL;
     opt->display_flags = DISPLAY_ENABLE;
     opt->yuv_file = NULL;
+    opt->profiling_file = NULL;
 
     return opt;
 }
