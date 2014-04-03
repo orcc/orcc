@@ -73,6 +73,7 @@ class CMakePrinter extends CommonPrinter {
 		
 		# Definitions configured and used in subdirectories
 		set(additional_definitions)
+		set(extra_includes)
 		
 		# Runtime libraries inclusion
 		include_directories(libs/orcc/include)
@@ -87,6 +88,7 @@ class CMakePrinter extends CommonPrinter {
 	def protected addLibrariesSubdirs() '''
 		# Compile required libs
 		add_subdirectory(libs)
+		
 		# Compile application
 		add_subdirectory(src)
 	'''
@@ -103,7 +105,9 @@ class CMakePrinter extends CommonPrinter {
 				«child.label».c
 			«ENDFOR»
 		)
-
+		
+		
+		include_directories(${extra_includes})
 		add_definitions(${additional_definitions})
 		add_executable(«network.simpleName» ${filenames})
 
