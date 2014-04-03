@@ -281,36 +281,6 @@ public class EcoreHelper {
 	}
 
 	/**
-	 * Puts the given EObject in the resource that belongs to the given resource
-	 * set as identified by the given URI.
-	 * 
-	 * @param set
-	 *            a resource set
-	 * @param uri
-	 *            URI of a resource
-	 * @param object
-	 *            an EObject
-	 * @return <code>true</code> if serialization succeeded
-	 */
-	public static boolean putEObject(ResourceSet set, URI uri, EObject object) {
-		Resource resource = set.getResource(uri, false);
-		if (resource == null) {
-			resource = set.createResource(uri);
-		} else {
-			resource.getContents().clear();
-		}
-
-		resource.getContents().add(object);
-		try {
-			resource.save(null);
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	/**
 	 * Finds the feature of the given object that has the given name, and sets
 	 * its value in the given object to the given value.
 	 * 
