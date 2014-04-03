@@ -30,9 +30,7 @@ package net.sf.orcc.ir.util;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
@@ -42,20 +40,10 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
-import net.sf.orcc.util.Attributable;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
@@ -463,65 +451,4 @@ public class IrUtil {
 			use.setVariable(null);
 		}
 	}
-
-	/**
-	 * Serializes the given entity to the given output folder.
-	 * 
-	 * @param outputFolder
-	 *            an IFolder of the workspace
-	 * @param entity
-	 *            an entity
-	 * @return <code>true</code> if the serialization succeeded
-	 */
-	public static boolean serializeActor(ResourceSet set, EObject entity) {
-
-		if (entity instanceof Attributable) {
-			IProject p = ResourcesPlugin
-					.getWorkspace()
-					.getRoot()
-					.getProject(
-							((Attributable) entity).getValueAsString("project"));
-
-			IFolder outputFolder = OrccUtil.getOutputFolder(p);
-
-			try {
-				OrccUtil.createFolder(outputFolder);
-			} catch (CoreException e) {
-			}
-			URI uri = URI.createPlatformResourceURI(
-					outputFolder.getFullPath().append(DfUtil.getFile(entity))
-							.addFileExtension(OrccUtil.IR_SUFFIX).toString(),
-					true);
-
-			return serializeActor(set, uri, entity);
-
-		}
-		return false;
-	}
-
-	/**
-	 * Serializes the given entity to the given URI.
-	 * 
-	 * @param uri
-	 *            URI
-	 * @param entity
-	 *            an entity
-	 * @return <code>true</code> if the serialization succeeded
-	 */
-	private static boolean serializeActor(ResourceSet set, URI uri,
-			EObject entity) {
-		// check that the factory is registered
-		// (only happens in command-line mode)
-		// FIXME: Is this still needed ?
-		Map<String, Object> extToFactoryMap = Resource.Factory.Registry.INSTANCE
-				.getExtensionToFactoryMap();
-		Object instance = extToFactoryMap.get(OrccUtil.IR_SUFFIX);
-		if (instance == null) {
-			instance = new IrResourceFactoryImpl();
-			extToFactoryMap.put(OrccUtil.IR_SUFFIX, instance);
-		}
-
-		return EcoreHelper.putEObject(set, uri, entity);
-	}
-
 }
