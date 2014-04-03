@@ -45,7 +45,6 @@ import net.sf.orcc.df.util.XdfConstants;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IContainer;
@@ -60,6 +59,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.equinox.app.IApplication;
@@ -159,8 +159,7 @@ public class FrontendCli implements IApplication {
 							OrccUtil.getSourceFolders(project));
 
 					for (final IFile file : files) {
-						resourcesMap.put(project,
-								EcoreHelper.getResource(resourceSet, file));
+						resourcesMap.put(project, getResource(file));
 					}
 				}
 			} else {
@@ -302,6 +301,12 @@ public class FrontendCli implements IApplication {
 		return projects;
 	}
 
+	private Resource getResource(final IFile file) {
+		final URI uri = URI.createPlatformResourceURI(file.getFullPath()
+				.toString(), true);
+		return resourceSet.getResource(uri, true);
+	}
+
 	/**
 	 * Get all actors, units and network files from container (IProject or
 	 * IFolder) and all its subfolders. IFile instances are indexed by their
@@ -372,8 +377,7 @@ public class FrontendCli implements IApplication {
 								storeReferencedActors(file, workspaceMap, files);
 							} else {
 								storeImportedResources(file, files);
-								files.put(file.getProject(), EcoreHelper
-										.getResource(resourceSet, file));
+								files.put(file.getProject(), getResource(file));
 							}
 						}
 					}
@@ -385,8 +389,8 @@ public class FrontendCli implements IApplication {
 	private void storeImportedResources(final IFile calFile,
 			final Multimap<IProject, Resource> resultMap) {
 
-		final AstEntity astEntity = EcoreHelper
-				.getEObject(resourceSet, calFile);
+		final AstEntity astEntity = (AstEntity) getResource(calFile)
+				.getContents().get(0);
 		final EList<Import> imports = astEntity.getImports();
 		for (final Import imp : imports) {
 
@@ -400,8 +404,7 @@ public class FrontendCli implements IApplication {
 			// The imported file can import files itself
 			storeImportedResources(importedFile, resultMap);
 
-			resultMap.put(importedFile.getProject(),
-					EcoreHelper.getResource(resourceSet, calFile));
+			resultMap.put(importedFile.getProject(), getResource(importedFile));
 		}
 	}
 
