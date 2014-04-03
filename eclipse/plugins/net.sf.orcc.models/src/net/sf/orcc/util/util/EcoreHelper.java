@@ -29,7 +29,6 @@
  */
 package net.sf.orcc.util.util;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
