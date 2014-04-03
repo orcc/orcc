@@ -54,6 +54,7 @@ options_t *set_default_options() {
     opt->mapping_repetition = REMAP_ONCE;
     opt->input_directory = NULL;
     opt->display_flags = DISPLAY_ENABLE;
+    opt->yuv_file = NULL;
 
     return opt;
 }
