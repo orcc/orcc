@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
@@ -46,27 +45,7 @@ import net.sf.orcc.ir.Var;
  * 
  */
 public class AstIrUtil {
-	
-	/**
-	 * Returns the IR equivalent of the given AST variable using its name. This
-	 * method is intended for generators/foreach loops.
-	 * 
-	 * @param variable
-	 *            a local variable
-	 * @return the IR equivalent of the given AST variable
-	 */
-	public static Var getLocalByName(Procedure procedure, Variable variable) {
-		Var var = procedure.getLocal(variable.getName());
-		if (var == null) {
-			var = Frontend.getMapping(variable);
-			procedure.getLocals().add(var);
-		} else {
-			Frontend.putMapping(variable, var);
-		}
 
-		return var;
-	}
-	
 	public static boolean isLocal(Var variable) {
 		return variable.hasAttribute("local") || variable.isLocal();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, IETR/INSA of Rennes
+ * Copyright (c) 2014, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,35 +26,41 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal.ui;
+package net.sf.orcc.cal.generator;
 
-import net.sf.orcc.cal.ui.editor.hover.CalObjectHover;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.xtext.builder.IXtextBuilderParticipant;
-import org.eclipse.xtext.resource.ILocationInFileProvider;
-import org.eclipse.xtext.ui.editor.hover.IEObjectHoverProvider;
+import net.sf.orcc.util.OrccUtil;
+
+import org.eclipse.xtext.generator.IFileSystemAccess;
+import org.eclipse.xtext.generator.IOutputConfigurationProvider;
+import org.eclipse.xtext.generator.OutputConfiguration;
 
 /**
- * This class extends the default abstract CAL UI module to define customized
- * services.
+ * Configure the ouput for IR files generated from CAL
+ * 
+ * @author Antoine Lorence
+ * 
  */
-public class CalUiModule extends net.sf.orcc.cal.ui.AbstractCalUiModule {
-
-	public CalUiModule(AbstractUIPlugin plugin) {
-		super(plugin);
-	}
-
-	public Class<? extends IEObjectHoverProvider> bindIEObjectHoverProvider() {
-		return CalObjectHover.class;
-	}
-
-	public Class<? extends ILocationInFileProvider> bindILocationInFileProvider() {
-		return CalLocationProvider.class;
-	}
+public class CalOutputConfigurationProvider implements
+		IOutputConfigurationProvider {
 
 	@Override
-	public Class<? extends IXtextBuilderParticipant> bindIXtextBuilderParticipant() {
-		return net.sf.orcc.cal.ui.builder.CalBuilder.class;
+	public Set<OutputConfiguration> getOutputConfigurations() {
+
+		final OutputConfiguration defaultOutput = new OutputConfiguration(
+				IFileSystemAccess.DEFAULT_OUTPUT);
+		defaultOutput.setDescription("Output Folder");
+		defaultOutput.setOutputDirectory("./" + OrccUtil.PROJECT_OUTPUT_DIR);
+		defaultOutput.setOverrideExistingResources(true);
+		defaultOutput.setCreateOutputDirectory(true);
+		defaultOutput.setCleanUpDerivedResources(true);
+		defaultOutput.setSetDerivedProperty(true);
+
+		final Set<OutputConfiguration> result = new HashSet<OutputConfiguration>();
+		result.add(defaultOutput);
+
+		return result;
 	}
 }

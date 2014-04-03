@@ -34,9 +34,11 @@ import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Unit;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
@@ -47,6 +49,12 @@ import net.sf.orcc.ir.Var;
  * 
  */
 public class UnitTransformer extends CalSwitch<Unit> {
+
+	final StructTransformer structTransformer;
+
+	public UnitTransformer() {
+		structTransformer = new StructTransformer();
+	}
 
 	/**
 	 * Transforms the given AST unit to an IR unit.
@@ -68,27 +76,36 @@ public class UnitTransformer extends CalSwitch<Unit> {
 
 		// constants
 		for (Variable variable : astUnit.getVariables()) {
-			Var var = Frontend.getMapping(variable, false);
+			final Var var = (Var) structTransformer.doSwitch(variable);
 			unit.getConstants().add(var);
 		}
 
-		// functions
+		// Create empty stubs for functions and procedures
+		// This tip will allow to call a function/procedure declared later
 		for (Function function : astUnit.getFunctions()) {
-			Procedure procedure = Frontend.getMapping(function, false);
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+					function.getName(), 0, Typer.getType(function));
+			Frontend.putMapping(function, procedure);
 			unit.getProcedures().add(procedure);
 		}
-
-		// procedures
 		for (AstProcedure astProcedure : astUnit.getProcedures()) {
-			Procedure procedure = Frontend.getMapping(astProcedure, false);
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+					astProcedure.getName(), 0, Typer.getType(astProcedure));
+			Frontend.putMapping(astProcedure, procedure);
 			unit.getProcedures().add(procedure);
 		}
 
-		AstEntity entity = (AstEntity) astUnit.eContainer();
-		unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
+		// Really transform functions / procedures
+		for (Function function : astUnit.getFunctions()) {
+			structTransformer.doSwitch(function);
+		}
+		for (AstProcedure astProcedure : astUnit.getProcedures()) {
+			structTransformer.doSwitch(astProcedure);
+		}
 
-		// serialize unit and cache
-		Frontend.instance.serialize(unit);
+
+		final AstEntity entity = (AstEntity) astUnit.eContainer();
+		unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
 
 		return unit;
 	}

@@ -57,6 +57,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.Diagnostician;
 import org.eclipse.jdt.core.IJavaProject;
@@ -78,6 +79,17 @@ public class OrccUtil {
 	public static final String CAL_SUFFIX = "cal";
 	public static final String NETWORK_SUFFIX = "xdf";
 	public static final String DIAGRAM_SUFFIX = "xdfdiag";
+
+	public static final String PROJECT_OUTPUT_DIR = "bin";
+
+	private static IWorkspaceRoot workspaceRoot;
+
+	public static IWorkspaceRoot workspaceRoot() {
+		if (workspaceRoot == null) {
+			workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		}
+		return workspaceRoot;
+	}
 
 	/**
 	 * Creates a new file if needed and returns its path
@@ -382,19 +394,7 @@ public class OrccUtil {
 	 *         none is found
 	 */
 	public static IFolder getOutputFolder(IProject project) {
-		IJavaProject javaProject = JavaCore.create(project);
-		if (!javaProject.exists()) {
-			return null;
-		}
-
-		IPath path;
-		try {
-			path = javaProject.getOutputLocation();
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			return root.getFolder(path);
-		} catch (JavaModelException e) {
-			return null;
-		}
+		return project.getFolder(PROJECT_OUTPUT_DIR);
 	}
 
 	/**
@@ -805,5 +805,26 @@ public class OrccUtil {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Compute the URI of an IR file corresponding to the given cal file URI
+	 * 
+	 * @param calUri
+	 * @return
+	 */
+	public static URI getIrUri(final URI calUri) {
+		// Get the given URI as IFile instance
+		final IFile file = workspaceRoot().getFile(
+				new Path(calUri.toPlatformString(true)));
+		// Get the path relative to project source folder, update suffix
+		final IPath sourceRelativePath = file.getProjectRelativePath()
+				.removeFirstSegments(1).removeFileExtension()
+				.addFileExtension(IR_SUFFIX);
+		// Build the IR path, from project output folder
+		final IPath irPath = getOutputFolder(file.getProject()).getFile(
+				sourceRelativePath).getFullPath();
+
+		return URI.createPlatformResourceURI(irPath.toString(), true);
 	}
 }

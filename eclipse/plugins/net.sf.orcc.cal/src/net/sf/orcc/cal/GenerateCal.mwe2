@@ -70,6 +70,12 @@ Workflow {
 			fragment = exporting.QualifiedNamesFragment auto-inject {}
 			fragment = builder.BuilderIntegrationFragment auto-inject {}
 
+			// generator API
+			fragment = generator.GeneratorFragment {
+				generateMwe = false
+				generateJavaMain = false
+			}
+
 			// formatter API 
 			fragment = formatting.FormatterFragment auto-inject {}
 

@@ -592,7 +592,10 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		Expression index = null;
 		for (Generator generator : generators) {
 			Variable variable = generator.getVariable();
-			Var loopVar = AstIrUtil.getLocalByName(procedure, variable);
+
+			Var loopVar = procedure.newTempLocalVariable(
+					Typer.getType(variable), variable.getName());
+			Frontend.putMapping(variable, loopVar);
 
 			int lower = Evaluator.getIntValue(generator.getLower());
 			Expression thisIndex = eINSTANCE.createExprVar(loopVar);

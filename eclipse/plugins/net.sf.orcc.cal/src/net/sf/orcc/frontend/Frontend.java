@@ -28,68 +28,21 @@
  */
 package net.sf.orcc.frontend;
 
-import java.util.List;
-
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
-import net.sf.orcc.cache.CachePackage;
-import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Unit;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.Switch;
-import org.eclipse.xtext.EcoreUtil2;
 
 /**
  * This class defines an RVC-CAL front-end.
  * 
  * @author Matthieu Wipliez
+ * @author Antoine Lorence
  * 
  */
 public class Frontend {
-
-	public static final Frontend instance = new Frontend();
-
-	/**
-	 * Returns the IR of the given AST entity. If it does not exist, creates it.
-	 * 
-	 * @param entity
-	 *            an AST entity
-	 * @return the IR of the given AST entity
-	 */
-	public static EObject getEntity(AstEntity entity) {
-		AstActor actor = entity.getActor();
-		EObject astObject;
-		Switch<? extends EObject> emfSwitch;
-		if (actor == null) {
-			astObject = entity.getUnit();
-			emfSwitch = new UnitTransformer();
-		} else {
-			astObject = actor;
-			emfSwitch = new ActorTransformer();
-		}
-
-		return CacheManager.instance.getOrCompute(astObject, emfSwitch,
-				CachePackage.eINSTANCE.getCache_IrMap());
-	}
-
-	/**
-	 * Returns the IR equivalent of the AST object.
-	 * 
-	 * @param eObject
-	 *            an AST object
-	 * @return the IR equivalent of the AST object
-	 */
-	public static <T extends EObject> T getMapping(EObject eObject) {
-		return getMapping(eObject, true);
-	}
 
 	/**
 	 * Returns the IR mapping equivalent of the AST object. If
@@ -104,50 +57,22 @@ public class Frontend {
 	 * @return the IR equivalent of the AST object
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends EObject> T getMapping(EObject eObject,
-			boolean require) {
-		if (require) {
-			AstEntity entity = EcoreUtil2.getContainerOfType(eObject,
-					AstEntity.class);
-			getEntity(entity);
-		}
-
+	public static <T extends EObject> T getMapping(EObject eObject) {
 		// no need to put the mapping back because the AstTransformer does it
 		// that's also why we don't use getOrCompute
-		EObject irObject = internalGetMapping(eObject);
+		EObject irObject = null;
+		if (eObject.eResource() != null) {
+			final Cache cache = CacheManager.instance.getCache(eObject
+					.eResource());
+			irObject = cache.getIrMap().get(eObject);
+		}
+
 		if (irObject == null) {
+			OrccLogger.warnln("* " + eObject + " is missing from cache");
 			irObject = new StructTransformer().doSwitch(eObject);
 		}
 
 		return (T) irObject;
-	}
-
-	public static List<Procedure> getProcedures(AstEntity astEntity) {
-		EObject entity = getEntity(astEntity);
-		if (entity instanceof Actor) {
-			return ((Actor) entity).getProcs();
-		} else if (entity instanceof Unit) {
-			return ((Unit) entity).getProcedures();
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Returns the IR equivalent of the given AST object using its URI.
-	 * 
-	 * @param eObject
-	 *            an AST object
-	 * @return the IR equivalent of the given object
-	 */
-	private static EObject internalGetMapping(EObject eObject) {
-		Resource resource = eObject.eResource();
-		if (resource != null) {
-			Cache cache = CacheManager.instance.getCache(resource);
-			return cache.getIrMap().get(eObject);
-		}
-
-		return null;
 	}
 
 	/**
@@ -162,22 +87,9 @@ public class Frontend {
 		if (resource != null) {
 			Cache cache = CacheManager.instance.getCache(resource);
 			cache.getIrMap().put(astObject, irObject);
+		} else {
+			OrccLogger.warnln("Try to put object not contained in a resource: "
+					+ astObject);
 		}
-	}
-
-	private final ResourceSet set = new ResourceSetImpl();
-
-	public ResourceSet getResourceSet() {
-		return set;
-	}
-
-	/**
-	 * Serializes the given actor or unit.
-	 * 
-	 * @param eObject
-	 *            an actor or unit
-	 */
-	public void serialize(EObject eObject) {
-		IrUtil.serializeActor(set, eObject);
 	}
 }

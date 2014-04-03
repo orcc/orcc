@@ -36,14 +36,18 @@ package net.sf.orcc.df.util;
  */
 public interface XdfConstants {
 
-	String CUSTOM = "Custom";
+	final public String CUSTOM = "Custom";
 
-	String FLAG = "Flag";
+	final public String FLAG = "Flag";
 
-	String STRING = "String";
+	final public String STRING = "String";
 
-	String TYPE = "Type";
+	final public String TYPE = "Type";
 
-	String VALUE = "Value";
+	final public String VALUE = "Value";
+
+	final public String INSTANCE_TAG = "Instance";
+	final public String CLASS_TAG = "Class";
+	final public String NAME_ATTR = "name";
 
 }

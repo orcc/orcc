@@ -66,7 +66,7 @@ public class FSMBuilder {
 
 	private Map<Action, Integer> actionRank;
 
-	private DirectedGraph<AstState, UniqueEdge> graph;
+	private final DirectedGraph<AstState, UniqueEdge> graph;
 
 	/**
 	 * Creates a FSM builder.
@@ -149,7 +149,10 @@ public class FSMBuilder {
 		// add IR states mapped from AST states
 		FSM fsm = DfFactory.eINSTANCE.createFSM();
 		for (AstState astState : graph.vertexSet()) {
-			State state = (State) Frontend.getMapping(astState, false);
+
+			State state = DfFactory.eINSTANCE.createState(astState.getName());
+			Frontend.putMapping(astState, state);
+
 			fsm.getStates().add(state);
 		}
 
@@ -167,7 +170,7 @@ public class FSMBuilder {
 		for (AstState astSource : astFsm.getStates()) {
 			Map<Action, State> targets = getTargets(astSource, actionList);
 
-			State source = (State) Frontend.getMapping(astSource, false);
+			State source = (State) Frontend.getMapping(astSource);
 			addTransitions(fsm, source, targets);
 		}
 
@@ -197,7 +200,7 @@ public class FSMBuilder {
 		Set<UniqueEdge> edges = graph.outgoingEdgesOf(source);
 		for (UniqueEdge edge : edges) {
 			AstState astTarget = graph.getEdgeTarget(edge);
-			State target = (State) Frontend.getMapping(astTarget, false);
+			State target = (State) Frontend.getMapping(astTarget);
 
 			Tag tag = (Tag) edge.getObject();
 			List<Action> actions = actionList.getTaggedActions(tag);

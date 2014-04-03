@@ -35,7 +35,6 @@ import java.util.List;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Statement;
 import net.sf.orcc.cal.cal.Variable;
@@ -45,7 +44,6 @@ import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.State;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
@@ -118,12 +116,13 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 */
 	@Override
 	public Procedure caseAstProcedure(AstProcedure astProcedure) {
-		String name = astProcedure.getName();
-		int lineNumber = Util.getLocation(astProcedure);
 
-		// create procedure
-		procedure = eINSTANCE.createProcedure(name, lineNumber,
-				eINSTANCE.createTypeVoid());
+		// Get existing procedure
+		procedure = Frontend.getMapping(astProcedure);
+		// Set attributes
+		procedure.setName(astProcedure.getName());
+		procedure.setLineNumber(Util.getLocation(astProcedure));
+		procedure.setReturnType(eINSTANCE.createTypeVoid());
 
 		// set native flag
 		if (Util.hasAnnotation("native", astProcedure.getAnnotations())) {
@@ -145,13 +144,6 @@ public class StructTransformer extends CalSwitch<EObject> {
 		return procedure;
 	}
 
-	@Override
-	public EObject caseAstState(AstState astState) {
-		State state = DfFactory.eINSTANCE.createState(astState.getName());
-		Frontend.putMapping(astState, state);
-		return state;
-	}
-
 	/**
 	 * Transforms and adds a mapping from the given AST function to an IR
 	 * procedure.
@@ -162,12 +154,13 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 */
 	@Override
 	public Procedure caseFunction(Function function) {
-		String name = function.getName();
-		int lineNumber = Util.getLocation(function);
-		Type type = Typer.getType(function);
 
-		// create procedure
-		procedure = eINSTANCE.createProcedure(name, lineNumber, type);
+		// Get existing procedure
+		procedure = Frontend.getMapping(function);
+		// Set attributes
+		procedure.setName(function.getName());
+		procedure.setLineNumber(Util.getLocation(function));
+		procedure.setReturnType(Typer.getType(function));
 
 		// set native flag
 		if (Util.hasAnnotation("native", function.getAnnotations())) {
