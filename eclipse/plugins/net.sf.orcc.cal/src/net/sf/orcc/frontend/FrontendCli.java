@@ -28,11 +28,8 @@
  */
 package net.sf.orcc.frontend;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -44,10 +41,10 @@ import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Import;
 import net.sf.orcc.cal.generator.CalGenerator;
+import net.sf.orcc.df.util.XdfConstants;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IContainer;
@@ -57,31 +54,28 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.xtext.diagnostics.Severity;
 import org.eclipse.xtext.generator.IGenerator;
 import org.eclipse.xtext.generator.JavaIoFileSystemAccess;
-import org.eclipse.xtext.resource.XtextResource;
-import org.eclipse.xtext.util.CancelIndicator;
-import org.eclipse.xtext.validation.CheckMode;
-import org.eclipse.xtext.validation.IResourceValidator;
-import org.eclipse.xtext.validation.Issue;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Injector;
 
 /**
@@ -107,8 +101,7 @@ public class FrontendCli implements IApplication {
 	private boolean isAutoBuildActivated;
 
 	private IProject project;
-	private File networkFile;
-	private final String networkName;
+	private IFile networkFile;
 
 	final Injector injector;
 
@@ -122,7 +115,6 @@ public class FrontendCli implements IApplication {
 
 		project = null;
 		networkFile = null;
-		networkName = "";
 
 		// Get the resource set used by Frontend
 		resourceSet = injector.getInstance(ResourceSet.class);
@@ -140,6 +132,7 @@ public class FrontendCli implements IApplication {
 			return IApplication.EXIT_RELAUNCH;
 		}
 
+		// The IR generation process starts now
 		try {
 			// IMPORTANT : Disable auto-building, because it requires Xtext UI
 			// plugins to be launched
@@ -157,22 +150,17 @@ public class FrontendCli implements IApplication {
 				}
 			}
 
-			final Map<IProject, List<Resource>> resourcesMap = new HashMap<IProject, List<Resource>>();
+			final Multimap<IProject, Resource> resourcesMap = HashMultimap
+					.create();
 			if (networkFile == null) {
 				for (final IProject project : orderedProjects) {
-					final List<Resource> resources = new ArrayList<Resource>();
-
 					final List<IFile> files = OrccUtil.getAllFiles(
 							OrccUtil.CAL_SUFFIX,
 							OrccUtil.getSourceFolders(project));
 
 					for (final IFile file : files) {
-						final URI uri = URI.createPlatformResourceURI(file
-								.getFullPath().toString(), true);
-						resources.add(resourceSet.getResource(uri, true));
+						resourcesMap.put(project, getResource(file));
 					}
-
-					resourcesMap.put(project, resources);
 				}
 			} else {
 				final Map<String, IFile> allFiles = new HashMap<String, IFile>();
@@ -180,17 +168,7 @@ public class FrontendCli implements IApplication {
 					allFiles.putAll(getAllFiles(project));
 				}
 
-				System.out
-						.println("-----------------------------------------------");
-				System.out.println("Building needed files for network "
-						+ networkName);
-				System.out
-						.println("-----------------------------------------------");
-
-				final InputStream networkStream = new FileInputStream(
-						networkFile);
-				writeIrFilesFromXdfContent(networkStream, allFiles);
-
+				storeReferencedActors(networkFile, allFiles, resourcesMap);
 			}
 
 			final CalGenerator calGenerator = (CalGenerator) injector
@@ -214,17 +192,22 @@ public class FrontendCli implements IApplication {
 				calGenerator.afterBuild();
 			}
 
-			// If needed, restore autoBuild config state in eclipse config file
+			// If needed, restore autoBuild state in eclipse config file
 			restoreAutoBuild();
 
-			OrccLogger.traceln("Build ends");
+			workspace.getRoot().refreshLocal(IWorkspaceRoot.DEPTH_INFINITE,
+					new NullProgressMonitor());
 			workspace.save(true, new NullProgressMonitor());
+			OrccLogger.traceln("Build ends");
+
 		} catch (OrccException oe) {
 			System.err.println(oe.getMessage());
 		} catch (CoreException ce) {
 			System.err.println(ce.getMessage());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		} catch (Exception eee) {
+			eee.printStackTrace();
 		} finally {
 			try {
 				restoreAutoBuild();
@@ -255,7 +238,7 @@ public class FrontendCli implements IApplication {
 	}
 
 	/**
-	 * Parse the command line and initialize the project to wotk with. If a
+	 * Parse the command line and initialize the project to work with. If a
 	 * network qualified name is passed in cli arguments, initialize the
 	 * networkFile class member.
 	 * 
@@ -282,9 +265,8 @@ public class FrontendCli implements IApplication {
 		}
 
 		if (args.length >= 2 && !args[1].isEmpty()) {
-			final IFile ifile = OrccUtil.getFile(project, args[1],
+			networkFile = OrccUtil.getFile(project, args[1],
 					OrccUtil.NETWORK_SUFFIX);
-			networkFile = new File(ifile.getFullPath().toString());
 		}
 
 		return true;
@@ -319,42 +301,10 @@ public class FrontendCli implements IApplication {
 		return projects;
 	}
 
-	/**
-	 * Control if resource has errors
-	 * 
-	 * @param resource
-	 *            to check
-	 * @return true if errors were found in resource
-	 */
-	private boolean hasErrors(Resource resource) {
-
-		boolean hasErrors = false;
-
-		// contains linking errors
-		List<Diagnostic> errors = resource.getErrors();
-		if (!errors.isEmpty()) {
-			for (Diagnostic error : errors) {
-				System.err.println(error);
-			}
-			hasErrors = true;
-		}
-
-		// validates (unique names and CAL validator)
-		IResourceValidator v = ((XtextResource) resource)
-				.getResourceServiceProvider().getResourceValidator();
-		List<Issue> issues = v.validate(resource, CheckMode.ALL,
-				CancelIndicator.NullImpl);
-
-		for (Issue issue : issues) {
-			if (issue.getSeverity() == Severity.ERROR) {
-				System.err.println(issue.toString());
-				hasErrors = true;
-			} else {
-				System.out.println(issue.toString());
-			}
-		}
-
-		return hasErrors;
+	private Resource getResource(final IFile file) {
+		final URI uri = URI.createPlatformResourceURI(file.getFullPath()
+				.toString(), true);
+		return resourceSet.getResource(uri, true);
 	}
 
 	/**
@@ -391,65 +341,44 @@ public class FrontendCli implements IApplication {
 		return calFiles;
 	}
 
-	/**
-	 * Write IR files for all instance's children of a gived network
-	 * 
-	 * @param networkContent
-	 *            the input stream of xdf file content
-	 * @param qnameFileMap
-	 */
-	private void writeIrFilesFromXdfContent(InputStream networkContent,
-			Map<String, IFile> qnameFileMap) {
+	private void storeReferencedActors(final IFile netFile,
+			final Map<String, IFile> workspaceMap,
+			final Multimap<IProject, Resource> files)
+			throws FileNotFoundException {
 
-		Document document = DomUtil.parseDocument(networkContent);
+		final Document document = DomUtil.parseDocument(new FileInputStream(
+				netFile.getLocation().toFile()));
+		final Element root = document.getDocumentElement();
 
-		Element root = document.getDocumentElement();
+		final NodeList children = root.getChildNodes();
+		for (int i = 0; i < children.getLength(); ++i) {
+			final Node child = children.item(i);
+			if (child.getNodeType() != Node.ELEMENT_NODE) {
+				// Only ELEMENT nodes in XDF file
+				continue;
+			}
 
-		NodeList rootChildren = root.getChildNodes();
-		for (int i = 0; i < rootChildren.getLength(); ++i) {
+			final Element tag = (Element) child;
+			if (tag.getNodeName().equals(XdfConstants.INSTANCE_TAG)) {
+				final NodeList instChildren = tag.getChildNodes();
+				for (int j = 0; j < instChildren.getLength(); ++j) {
+					final Node instChild = instChildren.item(j);
+					if(instChild.getNodeType() != Node.ELEMENT_NODE) continue;
 
-			Node rootChild = rootChildren.item(i);
+					final Element classElement = (Element) instChild;
+					if (classElement.getNodeName().equals(XdfConstants.CLASS_TAG)) {
+						final String qualifiedName = classElement
+								.getAttribute(XdfConstants.NAME_ATTR);
 
-			if (rootChild.getNodeType() == Node.ELEMENT_NODE
-					&& ((Element) rootChild).getNodeName().equals("Instance")) {
-
-				Element instanceElt = (Element) rootChild;
-
-				NodeList instanceChildren = instanceElt.getChildNodes();
-				for (int j = 0; j < instanceChildren.getLength(); ++j) {
-
-					Node instanceChild = instanceChildren.item(j);
-
-					if (instanceChild.getNodeType() == Node.ELEMENT_NODE
-							&& ((Element) instanceChild).getNodeName().equals(
-									"Class")) {
-
-						String qualifiedName = ((Element) instanceChild)
-								.getAttribute("name");
-
-						if (qnameFileMap.containsKey(qualifiedName)) {
-
-							IFile file = qnameFileMap.get(qualifiedName);
+						if (workspaceMap.containsKey(qualifiedName)) {
+							final IFile file = workspaceMap.get(qualifiedName);
 							if (file.getFileExtension().equals(
 									OrccUtil.NETWORK_SUFFIX)) {
-								try {
-									writeIrFilesFromXdfContent(
-											new FileInputStream(file
-													.getLocationURI().getPath()),
-											qnameFileMap);
-								} catch (FileNotFoundException e) {
-									System.err
-											.println("Unable to open file corresponding to "
-													+ qualifiedName);
-								}
+								storeReferencedActors(file, workspaceMap, files);
 							} else {
-								writeIrFile(qnameFileMap.get(qualifiedName),
-										qnameFileMap);
+								storeImportedResources(file, files);
+								files.put(file.getProject(), getResource(file));
 							}
-						} else {
-							System.err
-									.println(qualifiedName
-											+ " does not exists in the current workspace");
 						}
 					}
 				}
@@ -457,53 +386,26 @@ public class FrontendCli implements IApplication {
 		}
 	}
 
-	/**
-	 * Write the IR file corresponding to a *.cal one (Unit or Actor). This
-	 * method search for imported Units, and ensure they are all build before
-	 * doing the job for the current file
-	 * 
-	 * @param calFile
-	 *            the file to build
-	 * @param qnameFileMap
-	 *            a map with all known xdf and cal files of the workspace,
-	 *            indexed from their qualified name
-	 */
-	private void writeIrFile(IFile calFile, Map<String, IFile> qnameFileMap) {
+	private void storeImportedResources(final IFile calFile,
+			final Multimap<IProject, Resource> resultMap) {
 
-		Resource resource = EcoreHelper.getResource(resourceSet, calFile);
+		final AstEntity astEntity = (AstEntity) getResource(calFile)
+				.getContents().get(0);
+		final EList<Import> imports = astEntity.getImports();
+		for (final Import imp : imports) {
 
-		// Current actor to build
-		AstEntity astEntity = (AstEntity) resource.getContents().get(0);
+			final String namespace = imp.getImportedNamespace();
+			final String qname = namespace.substring(0,
+					namespace.lastIndexOf('.'));
 
-		for (Import importedQName : astEntity.getImports()) {
-			String nameSpace = importedQName.getImportedNamespace();
-			String importedUnit = nameSpace.substring(0,
-					nameSpace.lastIndexOf('.'));
+			final IFile importedFile = OrccUtil.getFile(project, qname,
+					OrccUtil.CAL_SUFFIX);
 
-			if (qnameFileMap.containsKey(importedUnit)) {
-				IFile file = qnameFileMap.remove(importedUnit);
+			// The imported file can import files itself
+			storeImportedResources(importedFile, resultMap);
 
-				writeIrFile(file, qnameFileMap);
-			}
+			resultMap.put(importedFile.getProject(), getResource(importedFile));
 		}
-
-		IFolder outFolder = OrccUtil.getOutputFolder(calFile.getProject());
-
-		if (astEntity.getUnit() != null) {
-			System.out.println(" Unit: " + calFile.getName() + " from project "
-					+ calFile.getProject().getName() + " built in folder "
-					+ outFolder.toString());
-		} else {
-			System.out.println("Actor: " + calFile.getName() + " from project "
-					+ calFile.getProject().getName() + " built in folder "
-					+ outFolder.toString());
-		}
-
-		// Really write Actor IR
-		if (!hasErrors(resource)) {
-			Frontend.getEntity(astEntity);
-		}
-
 	}
 
 	@Override
