@@ -72,7 +72,7 @@ class CMakePrinter extends CommonPrinter {
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 		
 		# Definitions configured and used in subdirectories
-		set(additional_definitions)
+		set(extra_definitions)
 		set(extra_includes)
 		
 		# Runtime libraries inclusion
@@ -108,7 +108,7 @@ class CMakePrinter extends CommonPrinter {
 		
 		
 		include_directories(${extra_includes})
-		add_definitions(${additional_definitions})
+		add_definitions(${extra_definitions})
 		add_executable(«network.simpleName» ${filenames})
 
 		# Build library without any external library required

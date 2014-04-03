@@ -13,5 +13,5 @@ endif()
 
 add_subdirectory(orcc)
 
-set(additional_definitions ${additional_definitions} PARENT_SCOPE)
+set(extra_definitions ${extra_definitions} PARENT_SCOPE)
 set(extra_includes ${extra_includes} PARENT_SCOPE)

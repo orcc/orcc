@@ -38,7 +38,7 @@ else()
         src/thread.c
         src/profiling.c
     )
-    set(orcc_additional_libraries)
+    set(extra_libraries)
 
     # Helps CMake to find SDL libraries (Windows only)
     if(WIN32)
@@ -63,19 +63,19 @@ else()
     if(SDL2_FOUND)
         list(APPEND extra_includes ${SDL2_INCLUDE_DIR})
         list(APPEND orcc_sources src/display_sdl2.c)
-        list(APPEND orcc_additional_libraries ${SDL2_LIBRARY})
+        list(APPEND extra_libraries ${SDL2_LIBRARY})
     else()
         find_package(SDL REQUIRED)
         if(SDL_FOUND)
             list(APPEND extra_includes ${SDL_INCLUDE_DIR})
             list(APPEND orcc_sources src/display_sdl.c)
-            list(APPEND orcc_additional_libraries ${SDL_LIBRARY})
+            list(APPEND extra_libraries ${SDL_LIBRARY})
         endif()
     endif()
 
     option(USE_SSE "Use SSE native functions if available" 0)
     if(USE_SSE)
-        list(APPEND additional_definitions -DSSE_ENABLE)
+        list(APPEND extra_definitions -DSSE_ENABLE)
         list(APPEND orcc_sources
             src/sse.c
             src/hevc_idct_sse4.c
@@ -85,9 +85,9 @@ else()
 
         find_package(OPENHEVC QUIET)
         if(OPENHEVC_FOUND)
-            list(APPEND additional_definitions -DOPENHEVC_ENABLE)
+            list(APPEND extra_definitions -DOPENHEVC_ENABLE)
             list(APPEND orcc_sources src/openhevc.c)
-            list(APPEND orcc_additional_libraries ${OPENHEVC_LIBRARY})
+            list(APPEND extra_libraries ${OPENHEVC_LIBRARY})
             list(APPEND extra_includes ${OPENHEVC_INCLUDE_DIR})
             message(STATUS "Find OpenHEVC: ${OPENHEVC_LIBRARY}")
         else()
@@ -97,8 +97,8 @@ else()
 
     find_package(METIS QUIET)
     if(METIS_FOUND)
-        list(APPEND additional_definitions -DMETIS_ENABLE)
-        list(APPEND orcc_additional_libraries ${METIS_LIBRARY})
+        list(APPEND extra_definitions -DMETIS_ENABLE)
+        list(APPEND extra_libraries ${METIS_LIBRARY})
         list(APPEND extra_includes ${METIS_INCLUDE_DIR})
         message(STATUS "Find Metis: ${METIS_LIBRARY}")
     else()
@@ -107,15 +107,15 @@ else()
 
     if(NOT MSVC AND NOT CMAKE_CROSSCOMPILING)
         # Optimize the compilation for the local processor architecture
-        list(APPEND additional_definitions -march=native)
+        list(APPEND extra_definitions -march=native)
     endif()
 
     include_directories(${extra_includes})
-    add_definitions(${additional_definitions})
+    add_definitions(${extra_definitions})
     # Compile libraries
     add_library(orcc STATIC ${orcc_sources} ${orcc_headers})
     # Do the linking
-    target_link_libraries(orcc roxml ${orcc_additional_libraries})
+    target_link_libraries(orcc roxml ${extra_libraries})
 
     option(BUILD_ORCCMAP "Build the mapping tool as a standalone executable" 0)
     if(BUILD_ORCCMAP)
@@ -138,5 +138,5 @@ else()
 endif()
 
 
-set(additional_definitions ${additional_definitions} PARENT_SCOPE)
+set(extra_definitions ${extra_definitions} PARENT_SCOPE)
 set(extra_includes ${extra_includes} PARENT_SCOPE)
