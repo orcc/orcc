@@ -69,7 +69,6 @@ public class UnitTransformer extends CalSwitch<Unit> {
 		Frontend.putMapping(astUnit, unit);
 
 		unit.setFileName(astUnit.eResource().getURI().toPlatformString(true));
-		unit.setAttribute("project", Util.getProjectName(astUnit));
 
 		int lineNumber = Util.getLocation(astUnit);
 		unit.setLineNumber(lineNumber);
