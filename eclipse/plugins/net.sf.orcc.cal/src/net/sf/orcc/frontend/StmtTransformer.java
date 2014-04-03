@@ -143,7 +143,7 @@ public class StmtTransformer extends CalSwitch<Void> {
 	public Void caseStatementAssign(StatementAssign assign) {
 		// get target
 		Variable variable = assign.getTarget().getVariable();
-		Var target = Frontend.getMapping(variable, true);
+		Var target = Frontend.getMapping(variable);
 
 		// transform indexes and value
 		List<Expression> indexes;
@@ -173,7 +173,7 @@ public class StmtTransformer extends CalSwitch<Void> {
 		}
 
 		// retrieve IR procedure
-		Procedure calledProc = Frontend.getMapping(astProcedure, true);
+		Procedure calledProc = Frontend.getMapping(astProcedure);
 
 		// transform parameters
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
@@ -373,17 +373,15 @@ public class StmtTransformer extends CalSwitch<Void> {
 		final List<Procedure> procedureList;
 		Procedure print;
 		if (astEntity.getActor() != null) {
-			final Actor actor = Frontend
-					.getMapping(astEntity.getActor(), false);
+			final Actor actor = Frontend.getMapping(astEntity.getActor());
 			procedureList = actor.getProcs();
 			print = actor.getProcedure("print");
 		} else if (astEntity.getUnit() != null) {
-			final Unit unit = Frontend
-					.getMapping(astEntity.getUnit(), false);
+			final Unit unit = Frontend.getMapping(astEntity.getUnit());
 			procedureList = unit.getProcedures();
 			print = unit.getProcedure("print");
 		} else {
-			OrccLogger.severeln("BAD ");
+			OrccLogger.severeln("The AstEntity type is undefined");
 			return eINSTANCE.createProcedure("print", 0,
 					eINSTANCE.createTypeVoid());
 		}

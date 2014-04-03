@@ -204,7 +204,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 				// set initial state
 				AstState initialState = schedule.getInitialState();
-				State state = (State) Frontend.getMapping(initialState, false);
+				State state = (State) Frontend.getMapping(initialState);
 				fsm.setInitialState(state);
 			} else {
 				RegExpConverter converter = new RegExpConverter(scheduleRegExp);
@@ -256,7 +256,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				indexes.add(eINSTANCE.createExprInt(i));
 				int lineNumber = portVariable.getLineNumber();
 
-				Var irToken = Frontend.getMapping(token, true);
+				Var irToken = Frontend.getMapping(token);
 				InstLoad load = eINSTANCE.createInstLoad(lineNumber, irToken,
 						portVariable, indexes);
 				procedure.getLast().add(load);
@@ -299,7 +299,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 						portVariable, indexes);
 				block.add(load);
 
-				Var irToken = Frontend.getMapping(token, true);
+				Var irToken = Frontend.getMapping(token);
 
 				indexes = new ArrayList<Expression>(1);
 				indexes.add(eINSTANCE.createExprVar(loopVar));
@@ -368,7 +368,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			// use directly the port variable
 			Variable variable = ((ExpressionVariable) values.get(0)).getValue()
 					.getVariable();
-			Var old = Frontend.getMapping(variable, true);
+			Var old = Frontend.getMapping(variable);
 			// replace the use/def of the old variable without moving the new
 			// one from its containing pattern
 			for (Def def : new ArrayList<Def>(old.getDefs())) {
@@ -509,7 +509,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			return true;
 		}
 		// Input port variables have to be copied as well
-		Var var = Frontend.getMapping(variable, true);
+		Var var = Frontend.getMapping(variable);
 		if (EcoreHelper.getContainerOfType(var, Pattern.class) != null) {
 			return true;
 		}
@@ -726,12 +726,12 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		if (astPattern instanceof InputPattern) {
 			InputPattern pattern = ((InputPattern) astPattern);
 			astRepeat = pattern.getRepeat();
-			port = Frontend.getMapping(pattern.getPort(), true);
+			port = Frontend.getMapping(pattern.getPort());
 			totalConsumption = pattern.getTokens().size();
 		} else {
 			OutputPattern pattern = ((OutputPattern) astPattern);
 			astRepeat = pattern.getRepeat();
-			port = Frontend.getMapping(pattern.getPort(), true);
+			port = Frontend.getMapping(pattern.getPort());
 			totalConsumption = pattern.getValues().size();
 		}
 

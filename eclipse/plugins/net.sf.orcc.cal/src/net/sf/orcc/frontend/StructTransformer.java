@@ -118,7 +118,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	public Procedure caseAstProcedure(AstProcedure astProcedure) {
 
 		// Get existing procedure
-		procedure = Frontend.getMapping(astProcedure, false);
+		procedure = Frontend.getMapping(astProcedure);
 		// Set attributes
 		procedure.setName(astProcedure.getName());
 		procedure.setLineNumber(Util.getLocation(astProcedure));
@@ -156,7 +156,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	public Procedure caseFunction(Function function) {
 
 		// Get existing procedure
-		procedure = Frontend.getMapping(function, false);
+		procedure = Frontend.getMapping(function);
 		// Set attributes
 		procedure.setName(function.getName());
 		procedure.setLineNumber(Util.getLocation(function));

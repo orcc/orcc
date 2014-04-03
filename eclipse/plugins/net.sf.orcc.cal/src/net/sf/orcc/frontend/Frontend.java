@@ -30,48 +30,19 @@ package net.sf.orcc.frontend;
 
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
-import net.sf.orcc.cache.CachePackage;
-import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.util.Switch;
 
 /**
  * This class defines an RVC-CAL front-end.
  * 
  * @author Matthieu Wipliez
+ * @author Antoine Lorence
  * 
  */
 public class Frontend {
-
-	public static final Frontend instance = new Frontend();
-
-	/**
-	 * Returns the IR of the given AST entity. If it does not exist, creates it.
-	 * 
-	 * @param entity
-	 *            an AST entity
-	 * @return the IR of the given AST entity
-	 */
-	@Deprecated
-	public static EObject getEntity(AstEntity entity) {
-		AstActor actor = entity.getActor();
-		EObject astObject;
-		Switch<? extends EObject> emfSwitch;
-		if (actor == null) {
-			astObject = entity.getUnit();
-			emfSwitch = new UnitTransformer();
-		} else {
-			astObject = actor;
-			emfSwitch = new ActorTransformer();
-		}
-
-		return CacheManager.instance.getOrCompute(astObject, emfSwitch,
-				CachePackage.eINSTANCE.getCache_IrMap());
-	}
 
 	/**
 	 * Returns the IR mapping equivalent of the AST object. If
@@ -86,19 +57,13 @@ public class Frontend {
 	 * @return the IR equivalent of the AST object
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends EObject> T getMapping(EObject eObject,
-			boolean require) {
-		if (require) {
-			// AstEntity entity = EcoreUtil2.getContainerOfType(eObject,
-			// AstEntity.class);
-			// getEntity(entity);
-		}
-
+	public static <T extends EObject> T getMapping(EObject eObject) {
 		// no need to put the mapping back because the AstTransformer does it
 		// that's also why we don't use getOrCompute
 		EObject irObject = null;
 		if (eObject.eResource() != null) {
-			Cache cache = CacheManager.instance.getCache(eObject.eResource());
+			final Cache cache = CacheManager.instance.getCache(eObject
+					.eResource());
 			irObject = cache.getIrMap().get(eObject);
 		}
 
