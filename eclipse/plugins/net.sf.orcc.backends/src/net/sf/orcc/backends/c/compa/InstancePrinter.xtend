@@ -91,7 +91,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				int i = 0;
 				«printCallTokensFunctions»
 				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
-				
+
 			finished:
 				«FOR port : instance.getActor.inputs»
 					read_end_«port.name»();
@@ -145,7 +145,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 			«printCallTokensFunctions»
 
-			// jump to FSM state 
+			// jump to FSM state
 			switch (_FSM_state) {
 			«FOR state : instance.getActor.fsm.states»
 				case my_state_«state.name»:

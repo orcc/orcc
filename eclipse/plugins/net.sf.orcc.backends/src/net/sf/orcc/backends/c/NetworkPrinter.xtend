@@ -104,10 +104,10 @@ class NetworkPrinter extends CTemplate {
 	 * @return 1 if file was cached, 0 if file was printed
 	 */
 	def print(String targetFolder) {
-		
+
 		val content = networkFileContent
 		val file = new File(targetFolder + File::separator + network.simpleName + ".c")
-		
+
 		if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)
 			return 0
@@ -123,11 +123,11 @@ class NetworkPrinter extends CTemplate {
 		#include <stdio.h>
 		#include <stdlib.h>
 		«printAdditionalIncludes»
-		
+
 		#ifndef _WIN32
 		#define __USE_GNU
 		#endif
-		
+
 		#include "types.h"
 		#include "fifo.h"
 		#include "scheduler.h"
@@ -138,13 +138,13 @@ class NetworkPrinter extends CTemplate {
 		#include "cycle.h"
 		#include "serialize.h"
 		#include "options.h"
-		
+
 		#include "thread.h"
 		#define MAX_THREAD_NB 10
 		«IF newSchedul»
 			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
 		«ENDIF»
-		
+
 		#define SIZE «fifoSize»
 		// #define PRINT_FIRINGS
 
@@ -153,13 +153,13 @@ class NetworkPrinter extends CTemplate {
 		«FOR child : network.children»
 			«child.allocateFifos»
 		«ENDFOR»
-		
+
 		/////////////////////////////////////////////////
 		// FIFO pointer assignments
 		«FOR child : network.children»
 			«child.assignFifo»
 		«ENDFOR»
-		
+
 		«IF profile»
 			/////////////////////////////////////////////////
 			// Declaration of the actions
@@ -178,19 +178,18 @@ class NetworkPrinter extends CTemplate {
 				
 			«ENDFOR»
 		«ENDIF»
-		
+
 		«additionalDeclarations»
-		
+
 		/////////////////////////////////////////////////
 		// Actor functions
 		«FOR child : network.children»
 			extern void «child.label»_initialize(schedinfo_t *si);
 			extern void «child.label»_scheduler(schedinfo_t *si);
 		«ENDFOR»
-		
+
 		/////////////////////////////////////////////////
 		// Declaration of the actors array
-		
 		«FOR child : network.children»
 			«IF profile»
 				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0, "«child.getAdapter(typeof(Actor)).getFile().getProjectRelativePath().removeFirstSegments(1).removeFileExtension().toString().replace("/", ".")»", 0, 0, 0};
@@ -198,7 +197,7 @@ class NetworkPrinter extends CTemplate {
 				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, NULL, 0, 0, "", 0, 0, 0};
 			«ENDIF»						
 		«ENDFOR»
-		
+
 		actor_t *actors[] = {
 			«FOR child : network.children SEPARATOR ","»
 				&«child.label»
@@ -207,17 +206,16 @@ class NetworkPrinter extends CTemplate {
 
 		/////////////////////////////////////////////////
 		// Declaration of the connections array
-		
 		«FOR connection : network.connections»
 			connection_t connection_«connection.target.label»_«connection.targetPort.name» = {&«connection.source.label», &«connection.target.label», 0, 0};
 		«ENDFOR»
-		
+
 		connection_t *connections[] = {
 			«FOR connection : network.connections SEPARATOR ","»
 			    &connection_«connection.target.label»_«connection.targetPort.name»
 			«ENDFOR»
 		};
-		
+
 		/////////////////////////////////////////////////
 		// Declaration of the network
 		network_t network = {"«network.name»", actors, connections, «network.allActors.size», «network.connections.size»};
@@ -225,7 +223,7 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Actor scheduler
 		«printScheduler»
-		
+
 		/////////////////////////////////////////////////
 		// Initializer and launcher
 		

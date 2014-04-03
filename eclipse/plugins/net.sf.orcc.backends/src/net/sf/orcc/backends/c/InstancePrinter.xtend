@@ -618,7 +618,7 @@ class InstancePrinter extends CTemplate {
 			«IF !actor.initializes.nullOrEmpty»
 				«actor.initializes.printActionsScheduling»
 			«ENDIF»
-			
+
 		finished:
 			// no read_end/write_end here!
 			return;
