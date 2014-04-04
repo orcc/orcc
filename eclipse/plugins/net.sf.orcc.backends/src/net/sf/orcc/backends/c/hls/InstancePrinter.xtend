@@ -90,7 +90,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			
 			
 			«FOR port : instance.getActor.inputs»
-				extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[8192];
+				extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[4096];
 				extern unsigned int	«instance.incomingPortMap.get(port).wName»[1];
 				extern unsigned int	«instance.incomingPortMap.get(port).rName»[1];
 				unsigned int «instance.incomingPortMap.get(port).localrName»=0;		
@@ -102,7 +102,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			// Output FIFOs
 			«FOR port : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»					
-						extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[8192];
+						extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[4096];
 						extern unsigned int «connection.wName»[1];
 						extern unsigned int «connection.rName»[1];
 						unsigned int «connection.localwName»=0;				
@@ -237,7 +237,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	//&& (512 - «instance.outgoingPortMap.get(port).head.localwName» + «instance.outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)			
 	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''		
 		
-			&& (8192 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)
+			&& (4096 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)
 		
 	'''
 

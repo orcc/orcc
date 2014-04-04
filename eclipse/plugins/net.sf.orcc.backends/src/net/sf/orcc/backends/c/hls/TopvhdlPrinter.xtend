@@ -117,7 +117,7 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 				component cast_«instance.
 			name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write_scheduler IS
 					port (
-						«instance.incomingPortMap.get(portIN).ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
+						«instance.incomingPortMap.get(portIN).ramName»_address0    : OUT  STD_LOGIC_VECTOR (11 downto 0);
 						«instance.incomingPortMap.get(portIN).ramName»_ce0 : OUT STD_LOGIC;
 						«instance.incomingPortMap.get(portIN).ramName»_we0  : OUT STD_LOGIC;
 						«instance.incomingPortMap.get(portIN).ramName»_d0  : OUT STD_LOGIC_VECTOR («instance.incomingPortMap.get(portIN).
@@ -152,7 +152,7 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 				«IF connection.targetPort == null»
 					component cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler IS
 					port (
-					«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
+					«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (11 downto 0);
 					«connection.ramName»_ce0 : OUT STD_LOGIC;
 					«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 					
@@ -402,8 +402,8 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		
 			«connection.ramName» : ram_tab
 					generic map (dwidth     => «connection.fifoType.sizeInBits»,
-					       awidth     => 13,
-					       mem_size   => 8192)
+					       awidth     => 12,
+					       mem_size   => 4096)
 			port map (
 				clk => top_ap_clk,
 				addr0 => top_«connection.ramName»_address0,
@@ -494,7 +494,7 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	'''
 
 	def printOutputRamSignalAssignHLS(Connection connection) '''
-		signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
+		signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (11 downto 0);
 		signal top_«connection.ramName»_ce1 :  STD_LOGIC;
 		signal top_«connection.ramName»_we1  :  STD_LOGIC;
 		signal top_«connection.ramName»_d1  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -511,7 +511,7 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	'''
 
 	def printInputRAMSignalAssignHLS(Connection connection) '''
-		signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
+		signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (11 downto 0);
 		signal top_«connection.ramName»_ce0 :  STD_LOGIC;
 		signal top_«connection.ramName»_q0  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 		
@@ -527,7 +527,7 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	'''
 
 	def printOutputRamAssignHLS(Connection connection) '''
-		«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
+		«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR (11 downto 0);
 		«connection.ramName»_ce0 : OUT STD_LOGIC;
 		«connection.ramName»_we0  : OUT STD_LOGIC;
 		«connection.ramName»_d0  : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -544,7 +544,7 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	'''
 
 	def printInputRAMAssignHLS(Connection connection) '''
-		«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
+		«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (11 downto 0);
 		«connection.ramName»_ce0 : OUT STD_LOGIC;
 		«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 		

@@ -69,7 +69,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			extern stream<«conn.fifoType»> «conn.
 			castfifoNameWrite»;
 			// Output FIFOS
-			extern «conn.fifoType»	«conn.ramName»[8192];
+			extern «conn.fifoType»	«conn.ramName»[4096];
 			extern unsigned int	«conn.wName»[1];
 			extern unsigned int	«conn.rName»[1];
 			unsigned int «conn.localwName»=0;					
@@ -78,7 +78,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			extern stream<«conn.fifoType.doSwitch»> «conn.
 			castfifoNameWrite»;
 			// Output FIFOS
-			extern «conn.fifoType.doSwitch»	«conn.ramName»[8192];
+			extern «conn.fifoType.doSwitch»	«conn.ramName»[4096];
 			extern unsigned int	«conn.wName»[1];
 			extern unsigned int	«conn.rName»[1];
 			unsigned int «conn.localwName»=0;	
@@ -117,7 +117,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 					if (!«conn.castfifoNameWrite».empty() &&   
 					isSchedulable_untagged_0()) {
 					if(1
-					&& (8192 - «conn.localwName» + «conn.rName»[0] >= 1)
+					&& (4096 - «conn.localwName» + «conn.rName»[0] >= 1)
 					){
 					cast_«instance.name»_«conn.targetPort.name»_write_untagged_0();
 					}
@@ -150,7 +150,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			
 		«IF connOut.fifoType.bool»
 				// Input FIFOS
-				extern «connOut.fifoType» «connOut.ramName»[8192];
+				extern «connOut.fifoType» «connOut.ramName»[4096];
 				extern unsigned int «connOut.wName»[1];
 				extern unsigned int «connOut.rName»[1];
 				unsigned int «connOut.localrName»=0;
@@ -158,7 +158,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 				extern stream<«connOut.fifoType»> «connOut.castfifoNameRead»;					
 		«ELSE»
 			// Input FIFOS
-				extern «connOut.fifoType.doSwitch» «connOut.ramName»[8192];
+				extern «connOut.fifoType.doSwitch» «connOut.ramName»[4096];
 				extern unsigned int «connOut.wName»[1];
 				extern unsigned int «connOut.rName»[1];
 				unsigned int «connOut.localrName»=0;

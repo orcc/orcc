@@ -71,8 +71,8 @@ use ieee.std_logic_unsigned.all;
 entity ram_tab is 
     generic(
             dwidth     : integer := 32; 
-            awidth     : integer := 13; 
-            mem_size    : integer := 8192
+            awidth     : integer := 12; 
+            mem_size    : integer := 4096
     ); 
     port (
           addr0     : in std_logic_vector(awidth-1 downto 0); 
