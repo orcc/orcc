@@ -127,7 +127,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		untaggedCount = 0;
 
 		Actor actor = DfFactory.eINSTANCE.createActor();
-		Frontend.putMapping(astActor, actor);
+		Frontend.instance.putMapping(astActor, actor);
 
 		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
 
@@ -151,13 +151,13 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		for (Function function : astActor.getFunctions()) {
 			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
 					function.getName(), 0, Typer.getType(function));
-			Frontend.putMapping(function, procedure);
+			Frontend.instance.putMapping(function, procedure);
 			actor.getProcs().add(procedure);
 		}
 		for (AstProcedure astProcedure : astActor.getProcedures()) {
 			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
 					astProcedure.getName(), 0, Typer.getType(astProcedure));
-			Frontend.putMapping(astProcedure, procedure);
+			Frontend.instance.putMapping(astProcedure, procedure);
 			actor.getProcs().add(procedure);
 		}
 
@@ -203,7 +203,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 				// set initial state
 				AstState initialState = schedule.getInitialState();
-				State state = (State) Frontend.getMapping(initialState);
+				State state = (State) Frontend.instance
+						.getMapping(initialState);
 				fsm.setInitialState(state);
 			} else {
 				RegExpConverter converter = new RegExpConverter(scheduleRegExp);
@@ -255,7 +256,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				indexes.add(eINSTANCE.createExprInt(i));
 				int lineNumber = portVariable.getLineNumber();
 
-				Var irToken = Frontend.getMapping(token);
+				Var irToken = Frontend.instance.getMapping(token);
 				InstLoad load = eINSTANCE.createInstLoad(lineNumber, irToken,
 						portVariable, indexes);
 				procedure.getLast().add(load);
@@ -264,7 +265,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			}
 		} else if (tokens.size() == 1) {
 			Variable token = tokens.get(0);
-			Frontend.putMapping(token, portVariable);
+			Frontend.instance.putMapping(token, portVariable);
 		} else {
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
@@ -298,7 +299,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 						portVariable, indexes);
 				block.add(load);
 
-				Var irToken = Frontend.getMapping(token);
+				Var irToken = Frontend.instance.getMapping(token);
 
 				indexes = new ArrayList<Expression>(1);
 				indexes.add(eINSTANCE.createExprVar(loopVar));
@@ -367,7 +368,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			// use directly the port variable
 			Variable variable = ((ExpressionVariable) values.get(0)).getValue()
 					.getVariable();
-			Var old = Frontend.getMapping(variable);
+			Var old = Frontend.instance.getMapping(variable);
 			// replace the use/def of the old variable without moving the new
 			// one from its containing pattern
 			for (Def def : new ArrayList<Def>(old.getDefs())) {
@@ -376,7 +377,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			for (Use use : new ArrayList<Use>(old.getUses())) {
 				use.setVariable(portVariable);
 			}
-			Frontend.putMapping(variable, portVariable);
+			Frontend.instance.putMapping(variable, portVariable);
 			EcoreUtil.remove(old);
 		} else {
 			// creates loop variable and initializes it
@@ -508,7 +509,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			return true;
 		}
 		// Input port variables have to be copied as well
-		Var var = Frontend.getMapping(variable);
+		Var var = Frontend.instance.getMapping(variable);
 		if (EcoreHelper.getContainerOfType(var, Pattern.class) != null) {
 			return true;
 		}
@@ -728,12 +729,12 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		if (astPattern instanceof InputPattern) {
 			InputPattern pattern = ((InputPattern) astPattern);
 			astRepeat = pattern.getRepeat();
-			port = Frontend.getMapping(pattern.getPort());
+			port = Frontend.instance.getMapping(pattern.getPort());
 			totalConsumption = pattern.getTokens().size();
 		} else {
 			OutputPattern pattern = ((OutputPattern) astPattern);
 			astRepeat = pattern.getRepeat();
-			port = Frontend.getMapping(pattern.getPort());
+			port = Frontend.instance.getMapping(pattern.getPort());
 			totalConsumption = pattern.getValues().size();
 		}
 

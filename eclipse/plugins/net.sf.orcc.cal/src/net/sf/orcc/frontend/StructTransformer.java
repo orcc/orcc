@@ -102,7 +102,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Type type = EcoreUtil.copy(Typer.getType(astPort));
 		Port port = DfFactory.eINSTANCE.createPort(type, astPort.getName(),
 				Util.hasAnnotation("native", astPort.getAnnotations()));
-		Frontend.putMapping(astPort, port);
+		Frontend.instance.putMapping(astPort, port);
 		return port;
 	}
 
@@ -118,7 +118,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	public Procedure caseAstProcedure(AstProcedure astProcedure) {
 
 		// Get existing procedure
-		procedure = Frontend.getMapping(astProcedure);
+		procedure = Frontend.instance.getMapping(astProcedure);
 		// Set attributes
 		procedure.setName(astProcedure.getName());
 		procedure.setLineNumber(Util.getLocation(astProcedure));
@@ -133,7 +133,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Util.transformAnnotations(procedure, astProcedure.getAnnotations());
 
 		// add mapping now (in case this procedure is recursive)
-		Frontend.putMapping(astProcedure, procedure);
+		Frontend.instance.putMapping(astProcedure, procedure);
 
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());
@@ -156,7 +156,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	public Procedure caseFunction(Function function) {
 
 		// Get existing procedure
-		procedure = Frontend.getMapping(function);
+		procedure = Frontend.instance.getMapping(function);
 		// Set attributes
 		procedure.setName(function.getName());
 		procedure.setLineNumber(Util.getLocation(function));
@@ -171,7 +171,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Util.transformAnnotations(procedure, function.getAnnotations());
 
 		// add mapping now (in case this function is recursive)
-		Frontend.putMapping(function, procedure);
+		Frontend.instance.putMapping(function, procedure);
 
 		transformParameters(function.getParameters());
 		transformLocalVariables(function.getVariables());
@@ -221,7 +221,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Var var = eINSTANCE.createVar(lineNumber, type, name, assignable,
 				initialValue);
 		Util.transformAnnotations(var, variable.getAnnotations());
-		Frontend.putMapping(variable, var);
+		Frontend.instance.putMapping(variable, var);
 
 		return var;
 	}
@@ -251,7 +251,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 			AstIrUtil.unsetLocal(local);
 		}
 
-		Frontend.putMapping(variable, local);
+		Frontend.instance.putMapping(variable, local);
 		return local;
 	}
 

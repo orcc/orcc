@@ -44,6 +44,14 @@ import org.eclipse.emf.ecore.resource.Resource;
  */
 public class Frontend {
 
+	public static final Frontend instance = new Frontend();
+
+	/**
+	 * Set constructor to private, to ensure it will always used as Singleton
+	 */
+	private Frontend() {
+	}
+
 	/**
 	 * Returns the IR mapping equivalent of the AST object. If
 	 * <code>require</code> is <code>true</code>, first make sure that the IR of
@@ -57,7 +65,7 @@ public class Frontend {
 	 * @return the IR equivalent of the AST object
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends EObject> T getMapping(EObject eObject) {
+	public <T extends EObject> T getMapping(EObject eObject) {
 		// no need to put the mapping back because the AstTransformer does it
 		// that's also why we don't use getOrCompute
 		EObject irObject = null;
@@ -82,7 +90,7 @@ public class Frontend {
 	 *            an AST object
 	 * @return the IR equivalent of the given object
 	 */
-	public static void putMapping(EObject astObject, EObject irObject) {
+	public void putMapping(EObject astObject, EObject irObject) {
 		Resource resource = astObject.eResource();
 		if (resource != null) {
 			Cache cache = CacheManager.instance.getCache(resource);

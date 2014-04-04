@@ -143,7 +143,7 @@ public class StmtTransformer extends CalSwitch<Void> {
 	public Void caseStatementAssign(StatementAssign assign) {
 		// get target
 		Variable variable = assign.getTarget().getVariable();
-		Var target = Frontend.getMapping(variable);
+		Var target = Frontend.instance.getMapping(variable);
 
 		// transform indexes and value
 		List<Expression> indexes;
@@ -173,7 +173,7 @@ public class StmtTransformer extends CalSwitch<Void> {
 		}
 
 		// retrieve IR procedure
-		Procedure calledProc = Frontend.getMapping(astProcedure);
+		Procedure calledProc = Frontend.instance.getMapping(astProcedure);
 
 		// transform parameters
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
@@ -198,7 +198,7 @@ public class StmtTransformer extends CalSwitch<Void> {
 
 		Var loopVar = procedure.newTempLocalVariable(Typer.getType(variable),
 				variable.getName());
-		Frontend.putMapping(variable, loopVar);
+		Frontend.instance.putMapping(variable, loopVar);
 
 		AstExpression astLower = foreach.getLower();
 		new ExprTransformer(procedure, blocks, loopVar).doSwitch(astLower);
@@ -373,11 +373,12 @@ public class StmtTransformer extends CalSwitch<Void> {
 		final List<Procedure> procedureList;
 		Procedure print;
 		if (astEntity.getActor() != null) {
-			final Actor actor = Frontend.getMapping(astEntity.getActor());
+			final Actor actor = Frontend.instance.getMapping(astEntity
+					.getActor());
 			procedureList = actor.getProcs();
 			print = actor.getProcedure("print");
 		} else if (astEntity.getUnit() != null) {
-			final Unit unit = Frontend.getMapping(astEntity.getUnit());
+			final Unit unit = Frontend.instance.getMapping(astEntity.getUnit());
 			procedureList = unit.getProcedures();
 			print = unit.getProcedure("print");
 		} else {

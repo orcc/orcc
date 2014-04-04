@@ -151,7 +151,7 @@ public class FSMBuilder {
 		for (AstState astState : graph.vertexSet()) {
 
 			State state = DfFactory.eINSTANCE.createState(astState.getName());
-			Frontend.putMapping(astState, state);
+			Frontend.instance.putMapping(astState, state);
 
 			fsm.getStates().add(state);
 		}
@@ -170,7 +170,7 @@ public class FSMBuilder {
 		for (AstState astSource : astFsm.getStates()) {
 			Map<Action, State> targets = getTargets(astSource, actionList);
 
-			State source = (State) Frontend.getMapping(astSource);
+			State source = Frontend.instance.getMapping(astSource);
 			addTransitions(fsm, source, targets);
 		}
 
@@ -200,7 +200,7 @@ public class FSMBuilder {
 		Set<UniqueEdge> edges = graph.outgoingEdgesOf(source);
 		for (UniqueEdge edge : edges) {
 			AstState astTarget = graph.getEdgeTarget(edge);
-			State target = (State) Frontend.getMapping(astTarget);
+			State target = Frontend.instance.getMapping(astTarget);
 
 			Tag tag = (Tag) edge.getObject();
 			List<Action> actions = actionList.getTaggedActions(tag);

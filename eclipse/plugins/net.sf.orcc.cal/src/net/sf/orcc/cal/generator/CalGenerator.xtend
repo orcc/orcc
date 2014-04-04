@@ -189,17 +189,17 @@ class CalGenerator implements IGenerator {
 
 		for(astConstant : astUnit.variables) {
 			val irConstant = unit.getConstant(astConstant.name)
-			Frontend::putMapping(astConstant, irConstant)
+			Frontend::instance.putMapping(astConstant, irConstant)
 		}
 
 		for(function : astUnit.functions) {
 			val procedure = unit.getProcedure(function.name)
-			Frontend::putMapping(function, procedure)
+			Frontend::instance.putMapping(function, procedure)
 		}
 
 		for(astProcedure : astUnit.procedures) {
 			val procedure = unit.getProcedure(astProcedure.name)
-			Frontend::putMapping(astProcedure, procedure)
+			Frontend::instance.putMapping(astProcedure, procedure)
 		}
 
 		loadedResources.add(resource)

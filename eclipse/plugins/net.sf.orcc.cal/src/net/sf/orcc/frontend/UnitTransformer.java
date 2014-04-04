@@ -66,7 +66,7 @@ public class UnitTransformer extends CalSwitch<Unit> {
 	@Override
 	public Unit caseAstUnit(AstUnit astUnit) {
 		Unit unit = DfFactory.eINSTANCE.createUnit();
-		Frontend.putMapping(astUnit, unit);
+		Frontend.instance.putMapping(astUnit, unit);
 
 		unit.setFileName(astUnit.eResource().getURI().toPlatformString(true));
 
@@ -84,13 +84,13 @@ public class UnitTransformer extends CalSwitch<Unit> {
 		for (Function function : astUnit.getFunctions()) {
 			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
 					function.getName(), 0, Typer.getType(function));
-			Frontend.putMapping(function, procedure);
+			Frontend.instance.putMapping(function, procedure);
 			unit.getProcedures().add(procedure);
 		}
 		for (AstProcedure astProcedure : astUnit.getProcedures()) {
 			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
 					astProcedure.getName(), 0, Typer.getType(astProcedure));
-			Frontend.putMapping(astProcedure, procedure);
+			Frontend.instance.putMapping(astProcedure, procedure);
 			unit.getProcedures().add(procedure);
 		}
 
