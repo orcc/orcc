@@ -106,7 +106,7 @@ public class ScheduleAnalyzer extends BufferSizer {
 				Var buffer = buffersMap.get(port);
 				if (buffer != null) {
 					if (queryBufferAccess(buffer) > 0) {
-						OrccLogger.traceln("Info: assumed feedback starting from "
+						OrccLogger.traceln("Info: generating internal FIFO starting from "
 								+ port.getName());
 						externalizeConnection(superActor, actor, port, copier);
 					}
@@ -125,9 +125,9 @@ public class ScheduleAnalyzer extends BufferSizer {
 	private void externalizeConnection(Actor superActor, Actor actor, 
 			Port port, Copier copier) {
 		if (actor.getOutgoingPortMap().get(port).size() > 1) {
-			OrccLogger.traceln("Warning: could not externalize connection starting from port"
+			OrccLogger.warnln("could not externalize connection starting from port"
 					+ port.getName());
-			OrccLogger.traceln(port.getName() + " as it is a broadcast");
+			OrccLogger.warnln(port.getName() + " as it is a broadcast");
 			return;
 		}
 		Connection connection = actor.getOutgoingPortMap().get(port).get(0);

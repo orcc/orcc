@@ -351,9 +351,9 @@ public class ActorMergerQS extends ActorMergerBase {
 						Port superActorPort = superActor.getOutputs().get(superActorPortIndex);
 						if (superActorPort.hasAttribute("externalized")) {
 							if (iterandPattern.getNumTokens(port) > 1) {
-								OrccLogger.traceln("Warning: " + port.getName() + " has multirate output");
-								OrccLogger.traceln("  multirate outputs are currently not supported");
-								OrccLogger.traceln("  for feedback FIFOs of merged actors. ");
+								OrccLogger.warnln(port.getName() + " has multirate output");
+								OrccLogger.warnln("multirate outputs are currently not supported");
+								OrccLogger.warnln("for internal FIFOs of merged actors. ");
 							}
 							addToPattern(outputPattern, port, iterandPattern.getNumTokens(port));
 						}
