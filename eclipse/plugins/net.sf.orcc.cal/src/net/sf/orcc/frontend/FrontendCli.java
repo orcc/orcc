@@ -80,11 +80,11 @@ import com.google.inject.Injector;
 
 /**
  * This class defines an RVC-CAL command line version of the frontend. It should
- * be used with the folowing command-line, when all plugins are loaded by
+ * be used with the following command-line, when all plugins are installed in
  * eclipse :
  * 
  * <pre>
- * eclipse -application net.sf.orcc.cal.cli -data &lt;workspacePath&gt; &lt;projectName&gt;
+ * eclipse -application net.sf.orcc.cal.cli -data &lt;workspacePath&gt; &lt;projectName&gt; [&lt;network&gt;]
  * </pre>
  * 
  * @author Matthieu Wipliez
@@ -93,12 +93,13 @@ import com.google.inject.Injector;
  */
 public class FrontendCli implements IApplication {
 
+	// Display the command line usage of this application
 	private final String USAGE = "Usage : \n"
 			+ "net.sf.orcc.cal.cli <project> [<network>]";
 
 	private final ResourceSet resourceSet;
 	private final IWorkspace workspace;
-	private boolean isAutoBuildActivated;
+	private boolean wasAutoBuildEnabled;
 
 	private IProject project;
 	private IFile networkFile;
@@ -111,7 +112,7 @@ public class FrontendCli implements IApplication {
 				.createInjectorAndDoEMFRegistration();
 
 		workspace = ResourcesPlugin.getWorkspace();
-		isAutoBuildActivated = false;
+		wasAutoBuildEnabled = false;
 
 		project = null;
 		networkFile = null;
@@ -152,23 +153,30 @@ public class FrontendCli implements IApplication {
 
 			final Multimap<IProject, Resource> resourcesMap = HashMultimap
 					.create();
+			// Classical full build, store all files for each projects
 			if (networkFile == null) {
 				for (final IProject project : orderedProjects) {
+					// Get all CAL files of the project
 					final List<IFile> files = OrccUtil.getAllFiles(
 							OrccUtil.CAL_SUFFIX,
 							OrccUtil.getSourceFolders(project));
 
+					// Store these files to build them later
 					for (final IFile file : files) {
 						resourcesMap.put(project, getResource(file));
 					}
 				}
-			} else {
+			}
+			// Specific build. We only write IR needed to build the network referenced on command line
+			else {
+				// Compute the list of all xdf and cal files in required projects. Store all these files
+				// in a map, indexed by their qualified name
 				final Map<String, IFile> allFiles = new HashMap<String, IFile>();
 				for (final IProject project : orderedProjects) {
 					allFiles.putAll(getAllFiles(project));
 				}
 
-				storeReferencedActors(networkFile, allFiles, resourcesMap);
+				storeReferencedEntities(networkFile, allFiles, resourcesMap);
 			}
 
 			final CalGenerator calGenerator = (CalGenerator) injector
@@ -200,8 +208,6 @@ public class FrontendCli implements IApplication {
 			workspace.save(true, new NullProgressMonitor());
 			OrccLogger.traceln("Build ends");
 
-		} catch (OrccException oe) {
-			System.err.println(oe.getMessage());
 		} catch (CoreException ce) {
 			System.err.println(ce.getMessage());
 		} catch (FileNotFoundException e) {
@@ -220,18 +226,29 @@ public class FrontendCli implements IApplication {
 		return IApplication.EXIT_RESTART;
 	}
 
+	/**
+	 * Configure the current workbench to disable auto-building. If it was
+	 * enabled, set wasAutoBuildEnabled to true to re-enable it later.
+	 * 
+	 * @throws CoreException
+	 */
 	private void disableAutoBuild() throws CoreException {
-		IWorkspaceDescription desc = workspace.getDescription();
+		final IWorkspaceDescription desc = workspace.getDescription();
 		if (desc.isAutoBuilding()) {
-			isAutoBuildActivated = true;
+			wasAutoBuildEnabled = true;
 			desc.setAutoBuilding(false);
 			workspace.setDescription(desc);
 		}
 	}
 
+	/**
+	 * If auto-building was enabled, restore its state.
+	 * 
+	 * @throws CoreException
+	 */
 	private void restoreAutoBuild() throws CoreException {
-		if (isAutoBuildActivated) {
-			IWorkspaceDescription desc = workspace.getDescription();
+		if (wasAutoBuildEnabled) {
+			final IWorkspaceDescription desc = workspace.getDescription();
 			desc.setAutoBuilding(true);
 			workspace.setDescription(desc);
 		}
@@ -240,7 +257,7 @@ public class FrontendCli implements IApplication {
 	/**
 	 * Parse the command line and initialize the project to work with. If a
 	 * network qualified name is passed in cli arguments, initialize the
-	 * networkFile class member.
+	 * networkFile member.
 	 * 
 	 * @param args
 	 * @return
@@ -256,10 +273,9 @@ public class FrontendCli implements IApplication {
 		OrccLogger.traceln("Command line arguments are \""
 				+ StringUtils.join(args, ' ') + "\"");
 
-		final String projectName = args[0];
-		project = workspace.getRoot().getProject(projectName);
+		project = workspace.getRoot().getProject(args[0]);
 		if (project == null) {
-			OrccLogger.severeln("Unable to find the project " + projectName);
+			OrccLogger.severeln("Unable to find the project " + args[0]);
 			OrccLogger.traceln(USAGE);
 			return false;
 		}
@@ -267,6 +283,9 @@ public class FrontendCli implements IApplication {
 		if (args.length >= 2 && !args[1].isEmpty()) {
 			networkFile = OrccUtil.getFile(project, args[1],
 					OrccUtil.NETWORK_SUFFIX);
+			if(networkFile == null) {
+				OrccLogger.severeln("Unable to find the network " + args[1]);
+			}
 		}
 
 		return true;
@@ -287,7 +306,7 @@ public class FrontendCli implements IApplication {
 
 		final IJavaProject javaProject = JavaCore.create(project);
 		if (javaProject == null) {
-			OrccLogger.severeln("");
+			OrccLogger.severeln("Project " + project.getName() + " is not a Java project.");
 			return projects;
 		}
 
@@ -301,7 +320,24 @@ public class FrontendCli implements IApplication {
 		return projects;
 	}
 
+	/**
+	 * <p>
+	 * Returns the EMF resource corresponding to the given file. The file must
+	 * exists in the workspace.
+	 * </p>
+	 * 
+	 * <p>
+	 * Returned resource is fully loaded (it should not contains proxy objects)
+	 * </p>
+	 * 
+	 * @param file
+	 * @return A loaded EMF resource
+	 */
 	private Resource getResource(final IFile file) {
+		if(!file.exists()) {
+			OrccLogger.severeln("File " + file.getFullPath().toString() + " does not exists !");
+			return null;
+		}
 		final URI uri = URI.createPlatformResourceURI(file.getFullPath()
 				.toString(), true);
 		return resourceSet.getResource(uri, true);
@@ -341,7 +377,7 @@ public class FrontendCli implements IApplication {
 		return calFiles;
 	}
 
-	private void storeReferencedActors(final IFile netFile,
+	private void storeReferencedEntities(final IFile netFile,
 			final Map<String, IFile> workspaceMap,
 			final Multimap<IProject, Resource> files)
 			throws FileNotFoundException {
@@ -374,9 +410,12 @@ public class FrontendCli implements IApplication {
 							final IFile file = workspaceMap.get(qualifiedName);
 							if (file.getFileExtension().equals(
 									OrccUtil.NETWORK_SUFFIX)) {
-								storeReferencedActors(file, workspaceMap, files);
+								// Run this method on the sub-network
+								storeReferencedEntities(file, workspaceMap, files);
 							} else {
+								// Store the imports of the CAL actor
 								storeImportedResources(file, files);
+								// Store the CAL Actor itself
 								files.put(file.getProject(), getResource(file));
 							}
 						}
@@ -386,6 +425,13 @@ public class FrontendCli implements IApplication {
 		}
 	}
 
+	/**
+	 * Stores in given <em>resultMap</em> all Units files imported by the given
+	 * <em>calFile</em>.
+	 * 
+	 * @param calFile
+	 * @param resultMap
+	 */
 	private void storeImportedResources(final IFile calFile,
 			final Multimap<IProject, Resource> resultMap) {
 
@@ -408,6 +454,9 @@ public class FrontendCli implements IApplication {
 		}
 	}
 
+	/**
+	 * Unused
+	 */
 	@Override
 	public void stop() {
 	}

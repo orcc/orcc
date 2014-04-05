@@ -36,7 +36,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 
 /**
- * This class defines an RVC-CAL front-end.
+ * This class defines an RVC-CAL front-end. Is is mainly used to manage links
+ * between AST objects and their IR equivalent.
  * 
  * @author Matthieu Wipliez
  * @author Antoine Lorence
@@ -53,45 +54,57 @@ public class Frontend {
 	}
 
 	/**
-	 * Returns the IR mapping equivalent of the AST object. If
-	 * <code>require</code> is <code>true</code>, first make sure that the IR of
-	 * the given AST object's containing entity exists.
+	 * <p>
+	 * Returns the IR mapping equivalent of the AST object.
+	 * </p>
 	 * 
-	 * @param eObject
+	 * <p>
+	 * This method will first try to retrieve the IR object in cache. If it is
+	 * impossible, a {@link StructTransformer} will be used to generate the IR
+	 * equivalent of AST object. In that case, a warning will be displayed,
+	 * since this situation should <b>not</b> happen.
+	 * </p>
+	 * 
+	 * @param astObject
 	 *            an AST object
-	 * @param require
-	 *            if <code>true</code>, first get the IR of the object's
-	 *            containing entity
-	 * @return the IR equivalent of the AST object
+	 * @return the IR equivalent of the given AST object
+	 * @see Frontend#putMapping(EObject, EObject)
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends EObject> T getMapping(EObject eObject) {
-		// no need to put the mapping back because the AstTransformer does it
-		// that's also why we don't use getOrCompute
+	public <T extends EObject> T getMapping(final EObject astObject) {
 		EObject irObject = null;
-		if (eObject.eResource() != null) {
-			final Cache cache = CacheManager.instance.getCache(eObject
+		if (astObject.eResource() != null) {
+			final Cache cache = CacheManager.instance.getCache(astObject
 					.eResource());
-			irObject = cache.getIrMap().get(eObject);
+			irObject = cache.getIrMap().get(astObject);
 		}
 
 		if (irObject == null) {
-			OrccLogger.warnln("* " + eObject + " is missing from cache");
-			irObject = new StructTransformer().doSwitch(eObject);
+			OrccLogger.warnln("* " + astObject + " is missing from cache");
+			// AST -> IR transformation. putMapping() is called in the
+			// transformer, we don't need to call it now.
+			irObject = new StructTransformer().doSwitch(astObject);
 		}
 
 		return (T) irObject;
 	}
 
 	/**
-	 * Returns the IR equivalent of the given AST object using its URI.
+	 * <p>Store (in cache) a link between an AST object and its IR equivalent.</p>
 	 * 
-	 * @param eObject
+	 * <p>This mechanism avoid to transform twice the same object. It is also
+	 * useful to set references to variables, procedures, functions, etc.
+	 * References in AST model are kept in the IR model. It is mandatory to have
+	 * a consistent model to avoid exception when the IR will be serialized.</p>
+	 * 
+	 * @param astObject
 	 *            an AST object
-	 * @return the IR equivalent of the given object
+	 * @param irObject
+	 *            an equivalent IR object
+	 * @see #getMapping(EObject)
 	 */
-	public void putMapping(EObject astObject, EObject irObject) {
-		Resource resource = astObject.eResource();
+	public void putMapping(final EObject astObject, final EObject irObject) {
+		final Resource resource = astObject.eResource();
 		if (resource != null) {
 			Cache cache = CacheManager.instance.getCache(resource);
 			cache.getIrMap().put(astObject, irObject);
