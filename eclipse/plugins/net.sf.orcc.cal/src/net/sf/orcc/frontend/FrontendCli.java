@@ -36,7 +36,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Import;
@@ -47,11 +46,9 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -173,7 +170,15 @@ public class FrontendCli implements IApplication {
 				// in a map, indexed by their qualified name
 				final Map<String, IFile> allFiles = new HashMap<String, IFile>();
 				for (final IProject project : orderedProjects) {
-					allFiles.putAll(getAllFiles(project));
+					final List<IFolder> folders = OrccUtil.getAllSourceFolders(project);
+					final List<IFile> networks = OrccUtil.getAllFiles(OrccUtil.NETWORK_SUFFIX, folders);
+					for(final IFile file : networks) {
+						allFiles.put(OrccUtil.getQualifiedName(file), file);
+					}
+					final List<IFile> entities = OrccUtil.getAllFiles(OrccUtil.CAL_SUFFIX, folders);
+					for(final IFile file : entities) {
+						allFiles.put(OrccUtil.getQualifiedName(file), file);
+					}
 				}
 
 				storeReferencedEntities(networkFile, allFiles, resourcesMap);
@@ -344,39 +349,27 @@ public class FrontendCli implements IApplication {
 	}
 
 	/**
-	 * Get all actors, units and network files from container (IProject or
-	 * IFolder) and all its subfolders. IFile instances are indexed by their
-	 * qualified name.
+	 * <p>
+	 * Parse the given <em>netFile</em> network file, and use the given
+	 * <em>workspaceMap</em> to build a list of actors it references.
+	 * </p>
 	 * 
-	 * @param container
-	 *            instance of IProject or IFolder to search in
-	 * @return a map of qualified names / IFile descriptors
-	 * @throws OrccException
-	 * @throws CoreException
+	 * <p>
+	 * Fill the given <em>files</em> Multimap with all actors referenced in the
+	 * network (and its sub-networks) and all units imported in these actors.
+	 * Each Multimap entry is indexed by the project where the corresponding
+	 * IFile is stored.
+	 * </p>
+	 * 
+	 * @param netFile
+	 *            An IFile instance, containing a XDF network
+	 * @param workspaceMap
+	 *            A map of all workspace files, indexed by their qualified name
+	 * @param files
+	 *            The resulting Multimap, containing all files needed to build
+	 *            the network, indexed by the project of each file.
+	 * @throws FileNotFoundException
 	 */
-	private Map<String, IFile> getAllFiles(final IContainer container)
-			throws OrccException, CoreException {
-
-		final Map<String, IFile> calFiles = new HashMap<String, IFile>();
-		for (final IResource resource : container.members()) {
-
-			if (resource.getType() == IResource.FOLDER) {
-				calFiles.putAll(getAllFiles((IFolder) resource));
-
-			} else if (resource.getType() == IResource.FILE) {
-
-				final String suffix = resource.getFileExtension();
-				if (OrccUtil.CAL_SUFFIX.equals(suffix)
-						|| (OrccUtil.NETWORK_SUFFIX.equals(suffix))) {
-					final IFile ifile = (IFile) resource;
-					calFiles.put(OrccUtil.getQualifiedName(ifile), ifile);
-				}
-			}
-		}
-
-		return calFiles;
-	}
-
 	private void storeReferencedEntities(final IFile netFile,
 			final Map<String, IFile> workspaceMap,
 			final Multimap<IProject, Resource> files)
