@@ -32,11 +32,13 @@ import java.util.Collections;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstState;
+import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.CalPackage;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtext.nodemodel.INode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.resource.DefaultLocationInFileProvider;
 import org.eclipse.xtext.util.ITextRegion;
 
@@ -65,6 +67,11 @@ public class CalLocationProvider extends DefaultLocationInFileProvider {
 		if (obj instanceof AstState) {
 			final INode stateNode = (INode) ((AstState) obj).getNode();
 			return createRegion(Collections.singletonList(stateNode), query);
+
+		} else if (obj instanceof AstTransition) {
+			final INode transitionNode = NodeModelUtils.getNode(obj);
+			return createRegion(Collections.singletonList(transitionNode),
+					query);
 		}
 		return super.getTextRegion(obj, isSignificant);
 	}
