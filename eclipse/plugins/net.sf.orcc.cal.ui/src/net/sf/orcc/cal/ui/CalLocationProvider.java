@@ -52,6 +52,11 @@ public class CalLocationProvider extends DefaultLocationInFileProvider {
 
 	@Override
 	protected EStructuralFeature getIdentifierFeature(EObject obj) {
+		// The AstTag is a reference in an AstAction, and this reference is not
+		// named 'name' or 'id'. By default, Xtext will select the first ':'
+		// char just after the tag if an action is selected in the "Outline"
+		// tab. We must configure the AstTag as default identifier for any
+		// action
 		if (obj instanceof AstAction) {
 			return CalPackage.eINSTANCE.getAstAction_Tag();
 		}
