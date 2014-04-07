@@ -28,8 +28,7 @@
  */
 package net.sf.orcc.cal.ui;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstState;
@@ -37,9 +36,9 @@ import net.sf.orcc.cal.cal.CalPackage;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.resource.DefaultLocationInFileProvider;
+import org.eclipse.xtext.util.ITextRegion;
 
 /**
  * This class provides location for the objects of the AST.
@@ -53,35 +52,20 @@ public class CalLocationProvider extends DefaultLocationInFileProvider {
 	protected EStructuralFeature getIdentifierFeature(EObject obj) {
 		if (obj instanceof AstAction) {
 			return CalPackage.eINSTANCE.getAstAction_Tag();
-		} else {
-			return super.getIdentifierFeature(obj);
 		}
+
+		return super.getIdentifierFeature(obj);
 	}
 
 	@Override
-	protected List<INode> getLocationNodes(EObject obj) {
+	protected ITextRegion getTextRegion(EObject obj, boolean isSignificant) {
+		final RegionDescription query = isSignificant ? RegionDescription.SIGNIFICANT
+				: RegionDescription.FULL;
+
 		if (obj instanceof AstState) {
-			List<INode> result = new ArrayList<INode>();
-			Object astStateNode = ((AstState) obj).getNode();
-			if (astStateNode instanceof INode) {
-				result.add((INode) astStateNode);
-			}
-			return result;
-		} else {
-			return super.getLocationNodes(obj);
+			final INode stateNode = (INode) ((AstState) obj).getNode();
+			return createRegion(Collections.singletonList(stateNode), query);
 		}
-
-	}
-
-	@Override
-	protected ICompositeNode findNodeFor(EObject semanticObject) {
-		ICompositeNode node = super.findNodeFor(semanticObject);
-		if (node == null && semanticObject instanceof AstState) {
-			AstState obj = (AstState) semanticObject;
-			return obj.getNode() instanceof INode ? ((INode) obj.getNode())
-					.getParent() : null;
-		} else {
-			return node;
-		}
+		return super.getTextRegion(obj, isSignificant);
 	}
 }
