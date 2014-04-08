@@ -29,6 +29,7 @@
 package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -92,6 +93,21 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 		}
 
 		// TODO: get the "part name" value in the instance, and display it
+	}
+
+	@Override
+	protected String checkValueValid(Widget widget) {
+
+		if (widget == instanceName) {
+			final InstancePattern pattern = getPattern(
+					getSelectedPictogramElement(),
+					InstancePattern.class);
+			if (pattern != null) {
+				return pattern.checkValueValid(instanceName.getText(), null);
+			}
+		}
+
+		return null;
 	}
 
 	@Override

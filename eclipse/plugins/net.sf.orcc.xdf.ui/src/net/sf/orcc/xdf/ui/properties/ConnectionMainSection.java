@@ -76,6 +76,27 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 	}
 
 	@Override
+	protected String checkValueValid(Widget widget) {
+
+		if (widget == connectionSize && !connectionSize.getText().isEmpty()) {
+			try {
+				Integer size = Integer.parseInt(connectionSize.getText());
+				if (size <= 0) {
+					return "Size must be a positive integer";
+				}
+				// Check if size is a power of 2:
+				else if ((size & (size - 1)) != 0) {
+					// It is not a power of 2
+					return "Size must be a power of 2";
+				}
+			} catch (NumberFormatException e) {
+				return "Unable to parse this size. Please use only integer characters.";
+			}
+		}
+		return null;
+	}
+
+	@Override
 	protected void writeValuesToModel(final Widget widget) {
 		final Connection connection = (Connection) getSelectedBusinessObject();
 		if(widget == connectionSize) {
@@ -85,7 +106,7 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 			}
 			try {
 				final String sizeText = connectionSize.getText();
-				final Integer bufferSize = Integer.decode(sizeText);
+				final Integer bufferSize = Integer.parseInt(sizeText);
 				connection.setAttribute(Connection.BUFFER_SIZE,
 						IrFactory.eINSTANCE.createExprInt(bufferSize));
 			} catch (NumberFormatException e) {
