@@ -73,10 +73,12 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	protected final PartialCalParser calParser;
 
 	protected final Color disabledFieldBGColor;
+	protected final Color errorColor;
 
 	public AbstractDiagramSection() {
 		calParser = new PartialCalParser();
 		disabledFieldBGColor = new Color(Display.getCurrent(), new RGB(230, 230, 230));
+		errorColor = new Color(Display.getCurrent(), new RGB(242, 152, 152));
 	}
 
 	@Override
@@ -157,6 +159,17 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	 * @param widget
 	 */
 	protected abstract void writeValuesToModel(final Widget widget);
+
+	/**
+	 * Check if the value in the given widget is valid. If not, returns a
+	 * message explaining why. If it is valid, this method must return null
+	 * 
+	 * @param widget
+	 * @return null if given widget value is valid, an error message instead
+	 */
+	protected String checkValueValid(final Widget widget) {
+		return null;
+	}
 
 	protected abstract String getFormText();
 }
