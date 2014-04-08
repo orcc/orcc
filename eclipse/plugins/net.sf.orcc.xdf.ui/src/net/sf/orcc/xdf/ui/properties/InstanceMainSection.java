@@ -29,6 +29,7 @@
 package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -76,7 +77,7 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 
 	@Override
 	protected void readValuesFromModels() {
-		final Instance instance = (Instance) businessObject;
+		final Instance instance = (Instance) getSelectedBusinessObject();
 		instanceName.setText(instance.getName());
 
 		if (instance.getEntity() != null) {
@@ -95,8 +96,23 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 	}
 
 	@Override
+	protected String checkValueValid(Widget widget) {
+
+		if (widget == instanceName) {
+			final InstancePattern pattern = getPattern(
+					getSelectedPictogramElement(),
+					InstancePattern.class);
+			if (pattern != null) {
+				return pattern.checkValueValid(instanceName.getText(), null);
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Instance instance = (Instance) businessObject;
+		final Instance instance = (Instance) getSelectedBusinessObject();
 
 		if (widget == instanceName) {
 			instance.setName(instanceName.getText());

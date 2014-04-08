@@ -138,7 +138,7 @@ public class NetworkVariablesSection extends AbstractTableBasedSection {
 
 	@Override
 	protected void readValuesFromModels() {
-		final Network network = (Network) businessObject;
+		final Network network = (Network) getSelectedBusinessObject();
 		final TypePrinter typePrinter = new TypePrinter();
 		final ExpressionPrinter exprPrinter = new ExpressionPrinter();
 
@@ -154,7 +154,7 @@ public class NetworkVariablesSection extends AbstractTableBasedSection {
 
 	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Network network = (Network) businessObject;
+		final Network network = (Network) getSelectedBusinessObject();
 
 		// Declare parameters which can be referenced by this variable
 		calParser.setDeclaredVars(network.getParameters());

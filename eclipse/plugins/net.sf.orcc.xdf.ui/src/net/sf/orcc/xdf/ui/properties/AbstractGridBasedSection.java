@@ -35,6 +35,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
@@ -97,11 +99,14 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 		if (listenerSet)
 			return;
 		for (final Control widget : widgetList) {
+
 			widget.addFocusListener(new FocusAdapter() {
 				@Override
 				public void focusLost(FocusEvent e) {
 					final Widget widget = e.widget;
-					if (!getValue(widget).equals(initialialValues.get(widget))) {
+					if (checkValueValid(e.widget) == null
+							&& !getValue(widget).equals(
+									initialialValues.get(widget))) {
 						writeValuesInTransaction(widget);
 						initialialValues.put(widget, getValue(widget));
 					}
@@ -112,13 +117,35 @@ public abstract class AbstractGridBasedSection extends AbstractDiagramSection {
 				@Override
 				public void keyTraversed(TraverseEvent e) {
 					// User press the RETURN key
-					if (e.detail == SWT.TRAVERSE_RETURN) {
+					if (e.detail == SWT.TRAVERSE_RETURN
+							&& checkValueValid(e.widget) == null) {
 						final Widget widget = e.widget;
 						writeValuesInTransaction(widget);
 						initialialValues.put(widget, getValue(widget));
 					}
 				}
 			});
+
+			if (widget instanceof Text) {
+				widget.addKeyListener(new KeyListener() {
+
+					@Override
+					public void keyReleased(KeyEvent e) {
+						final String validMsg = checkValueValid(e.widget);
+						if (validMsg != null) {
+							widget.setBackground(errorColor);
+							widget.setToolTipText(validMsg);
+						} else {
+							widget.setBackground(null);
+							widget.setToolTipText(null);
+						}
+					}
+
+					@Override
+					public void keyPressed(KeyEvent e) {
+					}
+				});
+			}
 		}
 
 		listenerSet = true;
