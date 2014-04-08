@@ -12,8 +12,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.util.OrccLogger;
 
-import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
-
 /**
  * This analyzes a given schedule to discover
  * feedback edges (FIFOs).
@@ -30,13 +28,13 @@ public class ScheduleAnalyzer extends BufferSizer {
 		super(network);
 	}
 	
-	public void analyze(Actor superActor, Schedule schedule, Copier copier) {
+	public void analyze(Actor superActor, Schedule schedule) {
 		createBuffers(getMaxTokens(schedule));
 		for (Iterand iterand : schedule.getIterands()) {
 			processInputs(iterand.getAction());
 			processOutputs(iterand.getAction());
 		}
-		checkBufferBalance(superActor, copier);
+		checkBufferBalance(superActor);
 	}
 
 	private void createBuffers(Map<Connection, Integer> maxTokens) {
@@ -100,7 +98,7 @@ public class ScheduleAnalyzer extends BufferSizer {
 				(Integer)var.getValueAsObject("rwBalance")).intValue() - count));
 	}
 
-	private void checkBufferBalance(Actor superActor, Copier copier) {
+	private void checkBufferBalance(Actor superActor) {
 		for (Actor actor : network.getAllActors()) {
 			for (Port port : actor.getOutputs()) {
 				Var buffer = buffersMap.get(port);
@@ -108,7 +106,7 @@ public class ScheduleAnalyzer extends BufferSizer {
 					if (queryBufferAccess(buffer) > 0) {
 						OrccLogger.traceln("Info: generating internal FIFO starting from "
 								+ port.getName());
-						externalizeConnection(superActor, actor, port, copier);
+						externalizeConnection(superActor, actor, port);
 					}
 				}
 			}
@@ -123,7 +121,7 @@ public class ScheduleAnalyzer extends BufferSizer {
 	}
 
 	private void externalizeConnection(Actor superActor, Actor actor, 
-			Port port, Copier copier) {
+			Port port) {
 		if (actor.getOutgoingPortMap().get(port).size() > 1) {
 			OrccLogger.warnln("could not externalize connection starting from port"
 					+ port.getName());
@@ -132,36 +130,31 @@ public class ScheduleAnalyzer extends BufferSizer {
 		}
 		Connection connection = actor.getOutgoingPortMap().get(port).get(0);
 		// this is the 'port' of 'actor'
-		copyOutputPortIfNotFound(superActor, actor, connection.getSourcePort(), 
-				copier, connection.getTargetPort());
+		copyOutputPortIfNotFound(superActor, actor, connection.getSourcePort());
 		// this is the remote port of another actor
 		copyInputPortIfNotFound(superActor, 
 				connection.getTarget().getAdapter(Actor.class),
-				connection.getTargetPort(), copier);
+				connection.getTargetPort());
 	}
 	
 	private void copyInputPortIfNotFound(Actor superActor, Actor actor, 
-			Port port, Copier copier) {
+			Port port) {
 		for (Port in : superActor.getInputs()) {
 			if (in.getName().equals(port.getName())) {
 				return;
 			}
 		}
 		port.addAttribute("externalized");
-		superActor.getInputs().add((Port)copier.copy(port));
 	}
 
 	private void copyOutputPortIfNotFound(Actor superActor, Actor actor, 
-			Port port, Copier copier, Port target) {
+			Port port) {
 		for (Port out : superActor.getOutputs()) {
 			if (out.getName().equals(port.getName())) {
 				return;
 			}
 		}
 		port.addAttribute("externalized");
-		port.addAttribute("targetPort");
-		port.setAttribute("targetPort", target.getName());
-		superActor.getOutputs().add((Port)copier.copy(port));
 	}
 	
 }
