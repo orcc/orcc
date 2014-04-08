@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.xdf.ui.features.GroupInstancesFeature;
 import net.sf.orcc.xdf.ui.features.InstanceDblClickFeature;
+import net.sf.orcc.xdf.ui.features.OpenPropertiesFeature;
 import net.sf.orcc.xdf.ui.features.UngroupNetworkFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinementFeature;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
@@ -167,7 +168,11 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 		entry.add(new ContextMenuEntry(new GroupInstancesFeature(getFeatureProvider()), context));
 		entry.add(new ContextMenuEntry(new UngroupNetworkFeature(getFeatureProvider()), context));
 		contextMenuEntries.add(entry);
-		
+
+		entry = new ContextMenuEntry(new OpenPropertiesFeature(
+				getFeatureProvider()), context);
+		contextMenuEntries.add(entry);
+
 		return contextMenuEntries.toArray(NO_CONTEXT_MENU_ENTRIES);
 	}
 }
