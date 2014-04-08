@@ -45,10 +45,19 @@
          class="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
          contributorClass="net.sf.orcc.xdf.ui.editors.XdfActionBarContributor"
          default="true"
-         extensions="xdf,xdfdiag"
-         icon="icons/network.gif"
+         extensions="xdfdiag"
+         icon="icons/FatCow_Icons16x16/page_white_paint.png"
          id="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
-         name="New Network Editor (Beta)">
+         name="Diagram Editor">
+      </editor>
+      <editor
+            class="net.sf.orcc.xdf.ui.editors.XdfDiagramEditor"
+            contributorClass="net.sf.orcc.xdf.ui.editors.XdfActionBarContributor"
+            default="true"
+            extensions="xdf"
+            icon="icons/network.gif"
+            id="net.sf.orcc.xdf.ui.editors.XdfNetworkEditor"
+            name="Network Editor">
       </editor>
    </extension>
   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
