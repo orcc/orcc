@@ -66,7 +66,7 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 
 	@Override
 	protected void readValuesFromModels() {
-		final Connection connection = (Connection) businessObject;
+		final Connection connection = (Connection) getSelectedBusinessObject();
 		if (connection.getSize() != null) {
 			connectionSize.setText(connection.getSize().toString());
 		} else {
@@ -77,7 +77,7 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 
 	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Connection connection = (Connection) businessObject;
+		final Connection connection = (Connection) getSelectedBusinessObject();
 		if(widget == connectionSize) {
 			if (connectionSize.getText().isEmpty()) {
 				connection.removeAttribute(Connection.BUFFER_SIZE);

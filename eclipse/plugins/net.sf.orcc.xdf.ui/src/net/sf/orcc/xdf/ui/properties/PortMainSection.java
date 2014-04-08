@@ -74,7 +74,7 @@ public class PortMainSection extends AbstractGridBasedSection {
 
 	@Override
 	protected void readValuesFromModels() {
-		final Port port = (Port) businessObject;
+		final Port port = (Port) getSelectedBusinessObject();
 		final TypePrinter typePrinter = new TypePrinter();
 
 		portName.setText(port.getName());
@@ -83,7 +83,7 @@ public class PortMainSection extends AbstractGridBasedSection {
 
 	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Port port = (Port) businessObject;
+		final Port port = (Port) getSelectedBusinessObject();
 		final PartialCalParser parser = new PartialCalParser();
 
 		if (widget == portName) {

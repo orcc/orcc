@@ -35,6 +35,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
+import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.jface.viewers.ISelection;
@@ -51,7 +53,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 /**
  * This is a base class for all property sections in Xdf diagram editor. It
- * configure some mamber variables and set the current PictogramElement and
+ * configure some member variables and set the current PictogramElement and
  * business object for all subclasses.
  * 
  * @author Antoine Lorence
@@ -61,10 +63,10 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 
 	protected TabbedPropertySheetWidgetFactory widgetFactory;
 
-	protected EObject businessObject;
-	protected Network currentNetwork;
-
-	protected PictogramElement pictogramElement;
+	private EObject businessObject;
+	private Network currentNetwork;
+	private PictogramElement pictogramElement;
+	private IFeatureProviderWithPatterns featureProvider;
 
 	protected Composite formBody;
 
@@ -96,6 +98,29 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 		pictogramElement = getSelectedPictogramElement();
 		businessObject = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
 		currentNetwork = (Network) Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getDiagram());
+		featureProvider = (IFeatureProviderWithPatterns) getDiagramTypeProvider().getFeatureProvider();
+	}
+
+	//=============
+	// Getters
+	//=============
+	protected EObject getSelectedBusinessObject() {
+		return businessObject;
+	}
+	protected Network getCurrentNetwork() {
+		return currentNetwork;
+	}
+	protected IFeatureProviderWithPatterns getFeatureProvider() {
+		return featureProvider;
+	}
+	protected <T extends IPattern> T getPattern(final PictogramElement pe,
+			final Class<T> patternType) {
+		final IPattern pattern = getFeatureProvider()
+				.getPatternForPictogramElement(pe);
+		if (patternType.isInstance(pattern)) {
+			return patternType.cast(pattern);
+		}
+		return null;
 	}
 
 	@Override
@@ -107,7 +132,7 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	 * Executes {@link #writeValuesToModel()} inside a Command suitable for
 	 * transactional edition of domain models
 	 */
-	protected void writeValuesInTransaction(final Widget widget) {
+	final protected void writeValuesInTransaction(final Widget widget) {
 
 		// Execute the method in a write transaction, because it will modify the
 		// models
