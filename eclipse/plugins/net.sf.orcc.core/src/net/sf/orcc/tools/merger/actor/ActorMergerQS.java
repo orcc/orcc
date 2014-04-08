@@ -24,7 +24,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -350,11 +349,6 @@ public class ActorMergerQS extends ActorMergerBase {
 					if (superActorPortIndex >= 0) {
 						Port superActorPort = superActor.getOutputs().get(superActorPortIndex);
 						if (superActorPort.hasAttribute("externalized")) {
-							if (iterandPattern.getNumTokens(port) > 1) {
-								OrccLogger.warnln(port.getName() + " has multirate output");
-								OrccLogger.warnln("multirate outputs are currently not supported");
-								OrccLogger.warnln("for internal FIFOs of merged actors. ");
-							}
 							addToPattern(outputPattern, port, iterandPattern.getNumTokens(port));
 						}
 					}
