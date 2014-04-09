@@ -24,12 +24,15 @@ public class ScheduleAnalyzer extends BufferSizer {
 
 	protected Map<Port, Var> buffersMap = new HashMap<Port, Var>();
 
+	int totalBalance = 0;
+	
 	public ScheduleAnalyzer(Network network) {
 		super(network);
 	}
 	
 	public void analyze(Actor superActor, Schedule schedule) {
 		createBuffers(getMaxTokens(schedule));
+		createBuffers(getMinTokens(schedule));
 		for (Iterand iterand : schedule.getIterands()) {
 			processInputs(iterand.getAction());
 			processOutputs(iterand.getAction());
@@ -41,7 +44,7 @@ public class ScheduleAnalyzer extends BufferSizer {
 		int index = 0;
 		for (Connection conn : maxTokens.keySet()) {
 			int size = maxTokens.get(conn);
-			if (size > 0) {
+			if (size != 0) {
 				String name = "buffer_" + index++;
 				Var buffer = IrFactory.eINSTANCE.createVar(
 						IrFactory.eINSTANCE.createTypeList(size,
@@ -91,11 +94,13 @@ public class ScheduleAnalyzer extends BufferSizer {
 	private void incrementBufferAccess(Var var, int count) {
 		var.setAttribute("rwBalance", new Integer((
 				(Integer)var.getValueAsObject("rwBalance")).intValue() + count));
+		totalBalance += count;
 	}
 
 	private void decrementBufferAccess(Var var, int count) {
 		var.setAttribute("rwBalance", new Integer((
 				(Integer)var.getValueAsObject("rwBalance")).intValue() - count));
+		totalBalance -= count;
 	}
 
 	private void checkBufferBalance(Actor superActor) {
