@@ -66,17 +66,6 @@ public class ScheduleAnalyzer extends BufferSizer {
 	private void processOutputs(Action action) {
 		for (Port source : action.getOutputPattern().getPorts()) {
 			accessBuffer(source, true, action.getOutputPattern().getNumTokens(source));
-			Actor sourceActor = MergerUtil.getOwningActor(network, action, source);
-			if (sourceActor.getOutgoingPortMap().get(source).size() > 1) {
-				for (Connection c : sourceActor.getOutgoingPortMap().get(source)) {
-					Port target = c.getTargetPort();
-					if (target != null) {
-						if (buffersMap.get(target) != buffersMap.get(source)) {
-							accessBuffer(target, true, action.getOutputPattern().getNumTokens(source));
-						}
-					}
-				}
-			}
 		}
 	}
 
@@ -127,12 +116,6 @@ public class ScheduleAnalyzer extends BufferSizer {
 
 	private void externalizeConnection(Actor superActor, Actor actor, 
 			Port port) {
-		if (actor.getOutgoingPortMap().get(port).size() > 1) {
-			OrccLogger.warnln("could not externalize connection starting from port"
-					+ port.getName());
-			OrccLogger.warnln(port.getName() + " as it is a broadcast");
-			return;
-		}
 		Connection connection = actor.getOutgoingPortMap().get(port).get(0);
 		// this is the 'port' of 'actor'
 		copyOutputPortIfNotFound(superActor, actor, connection.getSourcePort());

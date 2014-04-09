@@ -469,7 +469,7 @@ public class ActorMergerQS extends ActorMergerBase {
 			List<Expression> procParams = new ArrayList<Expression>();
 			BlockBasic increments = IrFactory.eINSTANCE.createBlockBasic();
 			processInputs(increments, iterand.getAction(), procParams);
-			processOutputs(procedure, increments, iterand.getAction(), procParams);
+			processOutputs(increments, iterand.getAction(), procParams);
 			Instruction instruction = IrFactory.eINSTANCE.createInstCall(
 					null, correspondences.getProcedure(iterand.getAction()), procParams);
 			BlockBasic block = procedure.getLast();
@@ -485,20 +485,9 @@ public class ActorMergerQS extends ActorMergerBase {
 		}
 	}
 
-	private void processOutputs(Procedure procedure, BlockBasic increments, Action action, List<Expression> procParams) {
+	private void processOutputs(BlockBasic increments, Action action, List<Expression> procParams) {
 		for(Port source : action.getOutputPattern().getPorts()) {
 			processPort(increments, procParams, source, true, action.getOutputPattern().getNumTokens(source));
-			Actor sourceActor = MergerUtil.getOwningActor(network, action, source);
-			if(sourceActor.getOutgoingPortMap().get(source).size() > 1) {
-				for(Connection c : sourceActor.getOutgoingPortMap().get(source)) {
-					Port target = c.getTargetPort();
-					if (target != null) {
-						if (buffersMap.get(target) != buffersMap.get(source)) {
-							handleBroadcast(procedure, increments, target, buffersMap.get(source), action.getOutputPattern().getNumTokens(source), "_w");
-						}
-					}
-				}
-			}
 		}
 	}
 	
@@ -509,21 +498,6 @@ public class ActorMergerQS extends ActorMergerBase {
 		procParams.add(IrFactory.eINSTANCE.createExprVar(indexVar));
 	}
 
-	private void handleBroadcast(Procedure procedure, BlockBasic increments, Port port, Var source, int tokenRate, String suffix) {
-		addBroadCastCopyVar(procedure, increments, port, source, tokenRate);
-		Var memVar = getBufferOrPortVariable(port, true);
-		getBufferOrPortIndex(increments, port, tokenRate, true, memVar.getName());
-	}
-
-	private void addBroadCastCopyVar(Procedure procedure, BlockBasic increments, Port port, Var source, int tokenRate) {
-		Var tempVar = procedure.newTempLocalVariable(
-				port.getType(), port.getName() + "_tmp");
-		for(int i = 0; i < tokenRate; i++) {
-			increments.add(IrFactory.eINSTANCE.createInstLoad(tempVar, source, i));
-			increments.add(IrFactory.eINSTANCE.createInstStore(buffersMap.get(port), i, tempVar));
-		}
-	}
-	
 	private Var getBufferOrPortVariable(Port port, boolean write) {
 		Var memVar = null;
 		if (buffersMap.containsKey(port)) {
