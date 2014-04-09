@@ -51,7 +51,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -208,23 +207,27 @@ public class FrontendCli implements IApplication {
 			// If needed, restore autoBuild state in eclipse config file
 			restoreAutoBuild();
 
-			workspace.getRoot().refreshLocal(IWorkspaceRoot.DEPTH_INFINITE,
-					new NullProgressMonitor());
+			OrccLogger.traceln("Saving workspace");
 			workspace.save(true, new NullProgressMonitor());
-			OrccLogger.traceln("Build ends");
 
-		} catch (CoreException ce) {
-			System.err.println(ce.getMessage());
-		} catch (FileNotFoundException e) {
+			OrccLogger.traceln("End of frontend execution");
+
+		} catch (CoreException e) {
+			OrccLogger.severeln(e.getMessage());
 			e.printStackTrace();
-		} catch (Exception eee) {
-			eee.printStackTrace();
+		} catch (FileNotFoundException e) {
+			OrccLogger.severeln(e.getMessage());
+			e.printStackTrace();
+		} catch (Exception e) {
+			OrccLogger.severeln(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			try {
 				restoreAutoBuild();
 				return IApplication.EXIT_OK;
 			} catch (CoreException e) {
-				System.err.println(e.getMessage());
+				OrccLogger.severeln(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 
