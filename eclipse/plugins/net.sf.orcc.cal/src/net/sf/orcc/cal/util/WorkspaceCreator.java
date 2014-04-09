@@ -34,6 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccProjectNature;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -64,7 +65,7 @@ public class WorkspaceCreator implements IApplication {
 	private final IProgressMonitor progressMonitor;
 	private final String nature;
 	private final IWorkspace workspace;
-	private boolean isAutoBuildActivated;
+	private boolean wasAutoBuildEnabled;
 
 	public WorkspaceCreator() {
 		progressMonitor = new NullProgressMonitor();
@@ -72,21 +73,38 @@ public class WorkspaceCreator implements IApplication {
 		nature = OrccProjectNature.NATURE_ID;
 
 		workspace = ResourcesPlugin.getWorkspace();
-		isAutoBuildActivated = false;
+		wasAutoBuildEnabled = false;
 	}
 
+	/**
+	 * Configure the current workbench to disable auto-building. If it was
+	 * enabled, set wasAutoBuildEnabled to true to re-enable it later.
+	 * 
+	 * @throws CoreException
+	 */
 	private void disableAutoBuild() throws CoreException {
-		IWorkspaceDescription desc = workspace.getDescription();
+		// IWorkspace.getDescription() returns a copy. We need to extract,
+		// modify and set it to the current workspace.
+		final IWorkspaceDescription desc = workspace.getDescription();
 		if (desc.isAutoBuilding()) {
-			isAutoBuildActivated = true;
+			wasAutoBuildEnabled = true;
 			desc.setAutoBuilding(false);
 			workspace.setDescription(desc);
 		}
 	}
 
+	/**
+	 * If auto-building was enabled, restore its state.
+	 * 
+	 * @throws CoreException
+	 */
 	private void restoreAutoBuild() throws CoreException {
-		if (isAutoBuildActivated) {
-			IWorkspaceDescription desc = workspace.getDescription();
+		// IWorkspace.getDescription() returns a copy. We need to extract,
+		// modify and set it to the current workspace.
+		final IWorkspaceDescription desc = workspace.getDescription();
+		if (wasAutoBuildEnabled) {
+			OrccLogger.traceln("Re-enable auto-building");
+			wasAutoBuildEnabled = false;
 			desc.setAutoBuilding(true);
 			workspace.setDescription(desc);
 		}
@@ -113,20 +131,24 @@ public class WorkspaceCreator implements IApplication {
 					searchForProjects(child);
 				} else if (child.getName().equals(
 						IProjectDescription.DESCRIPTION_FILE_NAME)) {
-					IPath projectFile = new Path(child.getAbsolutePath());
+					IPath projectPath = new Path(child.getAbsolutePath());
 
 					IProjectDescription description = workspace
-							.loadProjectDescription(projectFile);
+							.loadProjectDescription(projectPath);
 
 					if (description.hasNature(nature)) {
 						IProject project = workspace.getRoot().getProject(
 								description.getName());
 
-						if (!project.exists()) {
+						if (project.exists()) {
+							OrccLogger.traceln("Project already registered, "
+									+ "nothing to do: " + project.getName());
+						} else {
 							project.create(description, progressMonitor);
 							project.open(progressMonitor);
 
-							System.out.println(project.getName());
+							OrccLogger.traceln("New project registered: "
+									+ project.getName());
 						}
 					}
 				}
@@ -153,9 +175,9 @@ public class WorkspaceCreator implements IApplication {
 				disableAutoBuild();
 
 				File searchPath = new File(args[0]).getCanonicalFile();
-				System.out.println("Register projects from "
-						+ searchPath.getAbsolutePath() + " to workspace "
-						+ workspace.getRoot().getLocation());
+				OrccLogger.traceln("Register projects from \""
+						+ searchPath.getAbsolutePath() + "\" to workspace \""
+						+ workspace.getRoot().getLocation() + "\"");
 				searchForProjects(searchPath);
 
 				workspace.save(true, progressMonitor);
@@ -165,22 +187,29 @@ public class WorkspaceCreator implements IApplication {
 				Thread.sleep(2000);
 
 			} catch (CoreException e) {
-				System.err.println(e.getMessage());
+				OrccLogger.severeln(e.getMessage());
+				e.printStackTrace();
 			} catch (OrccException e) {
-				System.err.println(e.getMessage());
+				OrccLogger.severeln(e.getMessage());
+				e.printStackTrace();
 			} catch (IOException e) {
-				System.err.println(e.getMessage());
+				OrccLogger.severeln(e.getMessage());
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				OrccLogger.severeln(e.getMessage());
+				e.printStackTrace();
 			} finally {
 				try {
 					restoreAutoBuild();
 					return IApplication.EXIT_OK;
 				} catch (CoreException e) {
-					System.err.println(e.getMessage());
+					OrccLogger.severeln(e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		} else {
-			System.err
-					.println("Please add the path to a directories containing projects.");
+			OrccLogger
+					.severeln("Please add the path to a directories containing projects.");
 		}
 
 		return IApplication.EXIT_RESTART;
