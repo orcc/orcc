@@ -39,6 +39,7 @@ import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
@@ -199,6 +200,15 @@ public class InstancePattern extends AbstractPattern {
 		}
 		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]+")) {
 			return "Instance name must start with a letter, and contains only alphanumeric characters";
+		}
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		for (final Vertex vertex : network.getVertices()) {
+			if (vertex.getLabel().equals(value)) {
+				final String vertexType = vertex instanceof Instance ? "an instance"
+						: "a port";
+				return "The network already contains a vertex of the same name ("
+						+ vertexType + ")";
+			}
 		}
 
 		// null -> value is valid

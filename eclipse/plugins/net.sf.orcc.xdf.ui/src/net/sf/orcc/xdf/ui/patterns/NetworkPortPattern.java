@@ -31,8 +31,10 @@ package net.sf.orcc.xdf.ui.patterns;
 import java.util.List;
 
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
@@ -73,7 +75,11 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
- * This abstract class
+ * This class is the common part for Network port management. Concrete
+ * implementations handle specific cases for input and output ports.
+ * 
+ * @see InputNetworkPortPattern
+ * @see OutputNetworkPortPattern
  * 
  * @author Antoine Lorence
  * 
@@ -151,6 +157,15 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		}
 		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]+")) {
 			return "Port name must start with a letter, and contains only alphanumeric characters";
+		}
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		for (final Vertex vertex : network.getVertices()) {
+			if (vertex.getLabel().equals(value)) {
+				final String vertexType = vertex instanceof Instance ? "an instance"
+						: "a port";
+				return "The network already contains a vertex of the same name ("
+						+ vertexType + ")";
+			}
 		}
 
 		// null -> value is valid
