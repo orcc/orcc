@@ -56,9 +56,16 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 public class EcoreHelper {
 
 	/**
-	 * Returns the container of <code>ele</code> with the given type, or
-	 * <code>null</code> if no such container exists. This method has been
-	 * copied from the EcoreUtil2 class of Xtext.
+	 * <p>
+	 * Returns the closest container of given <code>ele</code> with the given
+	 * type, or <code>null</code> if no such container exists. This method has
+	 * been copied from the EcoreUtil2 class of Xtext.
+	 * </p>
+	 * 
+	 * <p>
+	 * <b> If you can access to Ecoreutil2.getContainerOfType(), use it instead
+	 * of this method.</b>
+	 * </p>
 	 * 
 	 * @param <T>
 	 *            type parameter
@@ -68,16 +75,11 @@ public class EcoreHelper {
 	 *            the type of the container
 	 * @return the container of <code>ele</code> with the given type
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T extends EObject> T getContainerOfType(EObject ele,
 			Class<T> type) {
-		if (type.isAssignableFrom(ele.getClass())) {
-			return (T) ele;
-		}
-
-		if (ele.eContainer() != null) {
-			return getContainerOfType(ele.eContainer(), type);
-		}
+		for (EObject e = ele; e != null; e = e.eContainer())
+			if (type.isInstance(e))
+				return type.cast(e);
 
 		return null;
 	}
