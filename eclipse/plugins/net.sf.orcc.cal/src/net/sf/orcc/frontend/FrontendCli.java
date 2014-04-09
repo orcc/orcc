@@ -204,9 +204,6 @@ public class FrontendCli implements IApplication {
 				calGenerator.afterBuild();
 			}
 
-			// If needed, restore autoBuild state in eclipse config file
-			restoreAutoBuild();
-
 			OrccLogger.traceln("Saving workspace");
 			workspace.save(true, new NullProgressMonitor());
 

@@ -160,6 +160,10 @@ public class WorkspaceCreator implements IApplication {
 
 				workspace.save(true, progressMonitor);
 
+				// More time to ensure workspace will
+				// be completely saved
+				Thread.sleep(2000);
+
 			} catch (CoreException e) {
 				System.err.println(e.getMessage());
 			} catch (OrccException e) {
