@@ -207,17 +207,22 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean canDelete(IDeleteContext context) {
-		final int nbConnections = Graphiti
-				.getPeService()
-				.getAllConnections(
-						(AnchorContainer) context.getPictogramElement()).size();
+		// A grouped selection also affect instance ports (even if it is not
+		// visible). We only allow to delete an instance, not its ports.
+		if (context.getPictogramElement() instanceof AnchorContainer) {
+			final AnchorContainer pe = (AnchorContainer) context
+					.getPictogramElement();
+			final int nbConnections = Graphiti.getPeService()
+					.getAllConnections(pe).size();
+			// When user will be prompted, display the exact number of elements
+			// to
+			// delete
+			((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(
+					true, false, nbConnections + 1));
 
-		// When user will be prompted, display the exact number of elements to
-		// delete
-		((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(true,
-				false, nbConnections + 1));
-
-		return true;
+			return true;
+		}
+		return false;
 	}
 
 	/**
