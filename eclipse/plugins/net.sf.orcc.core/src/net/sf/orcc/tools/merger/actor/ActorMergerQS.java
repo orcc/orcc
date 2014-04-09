@@ -526,7 +526,11 @@ public class ActorMergerQS extends ActorMergerBase {
 		Var indexVar = IrFactory.eINSTANCE.createVar(0,
 				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
 				indexVarName, true, 0);
-		increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
+		if (buffersMap.containsKey(port)) {
+			if (buffersMap.get(port).getType().getDimensions().get(0) > 1) {
+				increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
+			}
+		}
 		return indexVar;
 	}
 }
