@@ -50,6 +50,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
@@ -219,23 +220,32 @@ public class XdfUtil {
 	}
 
 	/**
-	 * Initialize an AddConnectionContext object from a network connection. This
-	 * method does not add the given connection to the network.
+	 * <p>
+	 * Initialize a ready to use AddConnectionContext object from a network
+	 * connection. This method does not add the given connection to the network.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned IAddConnectionContext is ready to use. The business object
+	 * has been set to the given connection and the target container has been
+	 * set to the given diagram.
+	 * </p>
 	 * 
 	 * @param fp
 	 *            The IFeatureProviderWithPatterns instance
 	 * @param diagram
-	 *            The diagram where the connection must be added
+	 *            The diagram where the connection will be added
 	 * @param connection
 	 *            The connection
 	 * @return
 	 */
-	public static AddConnectionContext getAddConnectionContext(final IFeatureProviderWithPatterns fp,
+	public static IAddConnectionContext getAddConnectionContext(
+			final IFeatureProviderWithPatterns fp,
 			final Diagram diagram, final Connection connection) {
 
 		final ILinkService linkServ = Graphiti.getLinkService();
 
-		// retrieve the PictogramElement
+		// retrieve the source and target PictogramElements
 		final List<PictogramElement> sourcesPE = linkServ.getPictogramElements(
 				diagram, connection.getSource());
 		if (sourcesPE == null || sourcesPE.isEmpty()) {
@@ -286,6 +296,10 @@ public class XdfUtil {
 					connection.getTargetPort());
 		}
 
-		return new AddConnectionContext(sourceAnchor, targetAnchor);
+		final AddConnectionContext result = new AddConnectionContext(
+				sourceAnchor, targetAnchor);
+		result.setTargetContainer(diagram);
+		result.setNewObject(connection);
+		return result;
 	}
 }

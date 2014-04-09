@@ -215,8 +215,7 @@ public class InstancePattern extends AbstractPattern {
 			final int nbConnections = Graphiti.getPeService()
 					.getAllConnections(pe).size();
 			// When user will be prompted, display the exact number of elements
-			// to
-			// delete
+			// to delete
 			((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(
 					true, false, nbConnections + 1));
 

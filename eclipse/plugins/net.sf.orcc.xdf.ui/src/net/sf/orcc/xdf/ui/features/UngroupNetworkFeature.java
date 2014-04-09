@@ -46,9 +46,9 @@ import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
-import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
@@ -162,9 +162,8 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 				thisNetwork.add(newConnection);
 
 				// Really add the connection
-				final AddConnectionContext addConContext = XdfUtil
+				final IAddConnectionContext addConContext = XdfUtil
 						.getAddConnectionContext(fp, getDiagram(), newConnection);
-				addConContext.setNewObject(newConnection);
 				getFeatureProvider().addIfPossible(addConContext);
 			}
 		}
@@ -195,9 +194,8 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 				thisNetwork.add(c);
 
 				// Really add the connection
-				final AddConnectionContext addConContext = XdfUtil
+				final IAddConnectionContext addConContext = XdfUtil
 						.getAddConnectionContext(fp, getDiagram(), c);
-				addConContext.setNewObject(c);
 				getFeatureProvider().addIfPossible(addConContext);
 			}
 		}
@@ -230,9 +228,8 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 					thisNetwork.add(c);
 
 					// Really add the connection
-					final AddConnectionContext addConContext = XdfUtil
+					final IAddConnectionContext addConContext = XdfUtil
 							.getAddConnectionContext(fp, getDiagram(), c);
-					addConContext.setNewObject(c);
 					getFeatureProvider().addIfPossible(addConContext);
 				}
 			}
