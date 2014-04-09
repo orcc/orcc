@@ -377,7 +377,7 @@ public class ActorMergerQS extends ActorMergerBase {
 
 				if (!conn.hasAttribute("bufferCreated")) {
 					// create actor-level buffer
-					int size = maxTokens.get(conn);
+					int size = conn.getSize();
 					if (size > 0) {
 						String name = "buffer_" + conn.getSourcePort().getName() + "_" + conn.getTargetPort().getName();
 						Type eltType = conn.getSourcePort().getType();
