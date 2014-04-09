@@ -235,6 +235,16 @@ public class ActorMerger extends DfVisitor<Void> {
 				}
 			}
 
+			for (Port port : superActor.getOutputs()) {
+				if (port.hasAttribute("externalFifo")) {
+					int superActorPortIndex = MergerUtil.findPort(superActor.getInputs(),
+							port.getValueAsString("targetPort"));
+					if (superActorPortIndex >= 0) {
+						newConnections.add(dfFactory.createConnection(superActor,
+							port, superActor, superActor.getInputs().get(superActorPortIndex)));
+					}
+				}
+			}
 			network.removeVertices(instances);
 			network.getChildren().removeAll(instances);
 			network.getEdges().addAll(newConnections);

@@ -76,7 +76,7 @@ public class ActorMergerQS extends ActorMergerBase {
 				Expression e3 = irFactory.createExprVar(irFactory.createVar(irFactory.createTypeInt(32), "SIZE_" + port.getName(), false, 0));
 				Expression bop = irFactory.createExprBinary(e1, OpBinary.PLUS,
 						e2, e1.getType());
-				if (!buffersMap.containsKey(port)) {
+				if (!buffersMap.containsKey(port) || port.hasAttribute("externalFifo")) {
 					indexes.set(0, irFactory.createExprBinary(bop, OpBinary.MOD,
 							e3, e1.getType()));
 				} else if (port.hasAttribute("externalized")) {
@@ -101,7 +101,7 @@ public class ActorMergerQS extends ActorMergerBase {
 				Expression e3 = irFactory.createExprVar(irFactory.createVar(irFactory.createTypeInt(32), "SIZE_" + port.getName(), false, 0));
 				Expression bop = irFactory.createExprBinary(e1, OpBinary.PLUS,
 						e2, e1.getType());
-				if (!buffersMap.containsKey(port)) {
+				if (!buffersMap.containsKey(port) || port.hasAttribute("externalFifo")) {
 					indexes.set(0, irFactory.createExprBinary(bop, OpBinary.MOD,
 							e3, e1.getType()));
 				} else if (port.hasAttribute("externalized")) {
@@ -266,12 +266,14 @@ public class ActorMergerQS extends ActorMergerBase {
 	 * @return the body of the static action
 	 */
 	private void elaborateSuperaction(Action superaction) {
+		boolean useFullFifos = true;
 		String actionName = superaction.getName();
 		BufferSizer bufferSizer = new BufferSizer(network);
 		Schedule superAction = getSchedule(scheduleList, network.getName(), actionName);
 
-		ScheduleAnalyzer analyzer = new ScheduleAnalyzer(network);
+		ScheduleAnalyzer analyzer = new ScheduleAnalyzer(network, copier);
 		analyzer.analyze(superActor, superAction);
+		analyzer.markInternalFifos(superActor, useFullFifos);
 
 		Pattern inputPattern = computeScheduleInputPattern(network, superAction.getIterands());
 		Pattern outputPattern = computeScheduleOutputPattern(network, superAction.getIterands());
@@ -279,7 +281,9 @@ public class ActorMergerQS extends ActorMergerBase {
 		Procedure body = irFactory.createProcedure(actionName, 0,
 				irFactory.createTypeVoid());
 		createBuffers(body, bufferSizer.getMaxTokens(superAction));
-		createFeedbackBuffers(bufferSizer.getMaxTokens(superAction));
+		if (!useFullFifos) {
+			createFeedbackBuffers(bufferSizer.getMaxTokens(superAction));
+		}
 		createCounters(body, inputPattern, outputPattern);
 		createStaticSchedule(body, superAction);
 		body.getLast().add(irFactory.createInstReturn());
@@ -500,7 +504,7 @@ public class ActorMergerQS extends ActorMergerBase {
 
 	private Var getBufferOrPortVariable(Port port, boolean write) {
 		Var memVar = null;
-		if (buffersMap.containsKey(port)) {
+		if (buffersMap.containsKey(port) && !port.hasAttribute("externalFifo")) {
 			memVar = buffersMap.get(port);
 		} else {
 			memVar = IrFactory.eINSTANCE.createVar(0,
@@ -526,7 +530,9 @@ public class ActorMergerQS extends ActorMergerBase {
 		Var indexVar = IrFactory.eINSTANCE.createVar(0,
 				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
 				indexVarName, true, 0);
-		if (buffersMap.containsKey(port)) {
+		if (port.hasAttribute("externalFifo")) {
+			increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
+		} else if (buffersMap.containsKey(port)) {
 			if (buffersMap.get(port).getType().getDimensions().get(0) > 1) {
 				increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
 			}
