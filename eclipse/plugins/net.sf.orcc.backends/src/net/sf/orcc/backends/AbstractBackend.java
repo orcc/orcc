@@ -967,7 +967,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
-			optionMap.put(PROFILE, line.hasOption("pact"));
+			optionMap.put(PROFILE, line.hasOption("prof"));
 
 			// Set backend name in options map
 			String backend = this.getClass().getName();
