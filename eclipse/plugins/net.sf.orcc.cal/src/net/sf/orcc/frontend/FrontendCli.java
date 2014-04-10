@@ -41,6 +41,7 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Import;
 import net.sf.orcc.cal.generator.CalGenerator;
 import net.sf.orcc.df.util.XdfConstants;
+import net.sf.orcc.util.CommandLineUtil;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
@@ -50,7 +51,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -124,7 +124,7 @@ public class FrontendCli implements IApplication {
 				IApplicationContext.APPLICATION_ARGS);
 
 		if (!parseCommandLine(args)) {
-			// parseCommandLine already displayed an error message before
+			// parseCommandLine() already displayed an error message before
 			// returning false
 			return IApplication.EXIT_RELAUNCH;
 		}
@@ -133,7 +133,7 @@ public class FrontendCli implements IApplication {
 		try {
 			// IMPORTANT : Disable auto-building, because it requires Xtext UI
 			// plugins to be launched
-			disableAutoBuild();
+			wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild();
 
 			// Get the projects to compile in the right order
 			OrccLogger.traceln("Setup " + project.getName()
@@ -225,7 +225,10 @@ public class FrontendCli implements IApplication {
 		} finally {
 			try {
 
-				restoreAutoBuild();
+				if (wasAutoBuildEnabled) {
+					CommandLineUtil.enableAutoBuild();
+					wasAutoBuildEnabled = false;
+				}
 
 				OrccLogger.traceln("End of frontend execution");
 				return IApplication.EXIT_OK;
@@ -237,40 +240,6 @@ public class FrontendCli implements IApplication {
 		}
 
 		return IApplication.EXIT_RESTART;
-	}
-
-	/**
-	 * Configure the current workbench to disable auto-building. If it was
-	 * enabled, set wasAutoBuildEnabled to true to re-enable it later.
-	 * 
-	 * @throws CoreException
-	 */
-	private void disableAutoBuild() throws CoreException {
-		// IWorkspace.getDescription() returns a copy. We need to extract,
-		// modify and set it to the current workspace.
-		final IWorkspaceDescription desc = workspace.getDescription();
-		if (desc.isAutoBuilding()) {
-			wasAutoBuildEnabled = true;
-			desc.setAutoBuilding(false);
-			workspace.setDescription(desc);
-		}
-	}
-
-	/**
-	 * If auto-building was enabled, restore its state.
-	 * 
-	 * @throws CoreException
-	 */
-	private void restoreAutoBuild() throws CoreException {
-		// IWorkspace.getDescription() returns a copy. We need to extract,
-		// modify and set it to the current workspace.
-		final IWorkspaceDescription desc = workspace.getDescription();
-		if (wasAutoBuildEnabled) {
-			OrccLogger.traceln("Re-enable auto-building");
-			wasAutoBuildEnabled = false;
-			desc.setAutoBuilding(true);
-			workspace.setDescription(desc);
-		}
 	}
 
 	/**

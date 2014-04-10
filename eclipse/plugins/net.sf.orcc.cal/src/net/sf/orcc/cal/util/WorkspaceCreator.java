@@ -34,12 +34,12 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccProjectNature;
+import net.sf.orcc.util.CommandLineUtil;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -74,40 +74,6 @@ public class WorkspaceCreator implements IApplication {
 
 		workspace = ResourcesPlugin.getWorkspace();
 		wasAutoBuildEnabled = false;
-	}
-
-	/**
-	 * Configure the current workbench to disable auto-building. If it was
-	 * enabled, set wasAutoBuildEnabled to true to re-enable it later.
-	 * 
-	 * @throws CoreException
-	 */
-	private void disableAutoBuild() throws CoreException {
-		// IWorkspace.getDescription() returns a copy. We need to extract,
-		// modify and set it to the current workspace.
-		final IWorkspaceDescription desc = workspace.getDescription();
-		if (desc.isAutoBuilding()) {
-			wasAutoBuildEnabled = true;
-			desc.setAutoBuilding(false);
-			workspace.setDescription(desc);
-		}
-	}
-
-	/**
-	 * If auto-building was enabled, restore its state.
-	 * 
-	 * @throws CoreException
-	 */
-	private void restoreAutoBuild() throws CoreException {
-		// IWorkspace.getDescription() returns a copy. We need to extract,
-		// modify and set it to the current workspace.
-		final IWorkspaceDescription desc = workspace.getDescription();
-		if (wasAutoBuildEnabled) {
-			OrccLogger.traceln("Re-enable auto-building");
-			wasAutoBuildEnabled = false;
-			desc.setAutoBuilding(true);
-			workspace.setDescription(desc);
-		}
 	}
 
 	/**
@@ -172,7 +138,8 @@ public class WorkspaceCreator implements IApplication {
 		if (args.length == 1) {
 
 			try {
-				disableAutoBuild();
+
+				wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild();
 
 				File searchPath = new File(args[0]).getCanonicalFile();
 				OrccLogger.traceln("Register projects from \""
@@ -181,10 +148,6 @@ public class WorkspaceCreator implements IApplication {
 				searchForProjects(searchPath);
 
 				workspace.save(true, progressMonitor);
-
-				// More time to ensure workspace will
-				// be completely saved
-				Thread.sleep(2000);
 
 			} catch (CoreException e) {
 				OrccLogger.severeln(e.getMessage());
@@ -195,12 +158,12 @@ public class WorkspaceCreator implements IApplication {
 			} catch (IOException e) {
 				OrccLogger.severeln(e.getMessage());
 				e.printStackTrace();
-			} catch (InterruptedException e) {
-				OrccLogger.severeln(e.getMessage());
-				e.printStackTrace();
 			} finally {
 				try {
-					restoreAutoBuild();
+					if (wasAutoBuildEnabled) {
+						CommandLineUtil.enableAutoBuild();
+						wasAutoBuildEnabled = false;
+					}
 					return IApplication.EXIT_OK;
 				} catch (CoreException e) {
 					OrccLogger.severeln(e.getMessage());
