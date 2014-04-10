@@ -51,9 +51,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -134,10 +137,13 @@ public class FrontendCli implements IApplication {
 			// IMPORTANT : Disable auto-building, because it requires Xtext UI
 			// plugins to be launched
 			wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild(workspace);
+			// Refresh...
+			workspace.getRoot().refreshLocal(IWorkspaceRoot.DEPTH_INFINITE,
+					new NullProgressMonitor());
 
 			// Get the projects to compile in the right order
 			OrccLogger.traceln("Setup " + project.getName()
-					+ " as working project ");
+					+ " as working project");
 			final Collection<IProject> orderedProjects = getOrderedProjects(project);
 
 			// Check for missing output folders in project
@@ -210,9 +216,23 @@ public class FrontendCli implements IApplication {
 				calGenerator.afterBuild();
 			}
 
+			// Avoid warning messages of type "The workspace exited
+			// with unsaved changes in the previous session" the next
+			// time an IApplication (FrontendCli) will be launched
+			// This method can be called ONLY if auto-building has
+			// been disabled
 			OrccLogger.traceln("Saving workspace");
+			workspace.getRoot().refreshLocal(IWorkspaceRoot.DEPTH_INFINITE,
+					new NullProgressMonitor());
 			workspace.save(true, new NullProgressMonitor());
 
+			final IJobManager manager = Job.getJobManager();
+			int i = 0;
+			while (!manager.isIdle()) {
+				OrccLogger.traceln(++i + " Waiting for the"
+						+ " completion of jobs currently running");
+				Thread.sleep(500);
+			}
 		} catch (CoreException e) {
 			OrccLogger.severeln(e.getMessage());
 			e.printStackTrace();
