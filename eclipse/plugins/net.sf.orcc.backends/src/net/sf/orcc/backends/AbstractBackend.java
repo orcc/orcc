@@ -81,7 +81,6 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ValueUtil;
-import net.sf.orcc.util.CommandLineUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -100,7 +99,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -843,7 +841,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
-		boolean wasAutoBuildEnabled = false;
 		Options options = new Options();
 		Option opt;
 
@@ -981,13 +978,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 			}
 			optionMap.put(BACKEND, backend);
-
-			wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild();
 			try {
 
 				setOptions(optionMap);
-
 				compile();
+				return IApplication.EXIT_OK;
 
 			} catch (OrccRuntimeException e) {
 
@@ -996,7 +991,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 				OrccLogger.severeln(backend
 						+ " backend could not generate code (" + e.getCause()
-						+ ")");
+						+ ")[OrccRuntimeException]");
 
 			} catch (Exception e) {
 
@@ -1005,7 +1000,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 				OrccLogger.severeln(backend
 						+ " backend could not generate code (" + e.getCause()
-						+ ")");
+						+ ")[Exception]");
 
 				e.printStackTrace();
 			}
@@ -1014,16 +1009,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			printUsage(context, options, uoe.getLocalizedMessage());
 		} catch (ParseException exp) {
 			printUsage(context, options, exp.getLocalizedMessage());
-		} finally {
-			try {
-				if (wasAutoBuildEnabled) {
-					CommandLineUtil.enableAutoBuild();
-				}
-				return IApplication.EXIT_OK;
-			} catch (CoreException e) {
-				OrccLogger.severeln(e.getMessage());
-				e.printStackTrace();
-			}
 		}
 		return IApplication.EXIT_RELAUNCH;
 	}
