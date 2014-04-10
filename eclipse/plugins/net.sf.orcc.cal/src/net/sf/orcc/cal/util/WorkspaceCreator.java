@@ -141,7 +141,9 @@ public class WorkspaceCreator implements IApplication {
 
 				wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild();
 
-				File searchPath = new File(args[0]).getCanonicalFile();
+				final String path = args[0].replace("~",
+						System.getProperty("user.home"));
+				File searchPath = new File(path).getCanonicalFile();
 				OrccLogger.traceln("Register projects from \""
 						+ searchPath.getAbsolutePath() + "\" to workspace \""
 						+ workspace.getRoot().getLocation() + "\"");
