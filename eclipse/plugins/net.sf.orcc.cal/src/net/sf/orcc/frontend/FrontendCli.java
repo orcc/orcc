@@ -133,7 +133,7 @@ public class FrontendCli implements IApplication {
 		try {
 			// IMPORTANT : Disable auto-building, because it requires Xtext UI
 			// plugins to be launched
-			wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild();
+			wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild(workspace);
 
 			// Get the projects to compile in the right order
 			OrccLogger.traceln("Setup " + project.getName()
@@ -226,7 +226,7 @@ public class FrontendCli implements IApplication {
 			try {
 
 				if (wasAutoBuildEnabled) {
-					CommandLineUtil.enableAutoBuild();
+					CommandLineUtil.enableAutoBuild(workspace);
 					wasAutoBuildEnabled = false;
 				}
 

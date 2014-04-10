@@ -68,6 +68,7 @@ public class WorkspaceCreator implements IApplication {
 	private boolean wasAutoBuildEnabled;
 
 	public WorkspaceCreator() {
+
 		progressMonitor = new NullProgressMonitor();
 
 		nature = OrccProjectNature.NATURE_ID;
@@ -112,7 +113,6 @@ public class WorkspaceCreator implements IApplication {
 						} else {
 							project.create(description, progressMonitor);
 							project.open(progressMonitor);
-
 							OrccLogger.traceln("New project registered: "
 									+ project.getName());
 						}
@@ -139,7 +139,8 @@ public class WorkspaceCreator implements IApplication {
 
 			try {
 
-				wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild();
+				wasAutoBuildEnabled = CommandLineUtil
+						.disableAutoBuild(workspace);
 
 				final String path = args[0].replace("~",
 						System.getProperty("user.home"));
@@ -163,7 +164,7 @@ public class WorkspaceCreator implements IApplication {
 			} finally {
 				try {
 					if (wasAutoBuildEnabled) {
-						CommandLineUtil.enableAutoBuild();
+						CommandLineUtil.enableAutoBuild(workspace);
 						wasAutoBuildEnabled = false;
 					}
 					return IApplication.EXIT_OK;
