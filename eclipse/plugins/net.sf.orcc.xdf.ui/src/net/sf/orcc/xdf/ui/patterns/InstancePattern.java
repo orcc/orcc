@@ -39,6 +39,7 @@ import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
@@ -200,6 +201,15 @@ public class InstancePattern extends AbstractPattern {
 		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]+")) {
 			return "Instance name must start with a letter, and contains only alphanumeric characters";
 		}
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		for (final Vertex vertex : network.getVertices()) {
+			if (vertex.getLabel().equals(value)) {
+				final String vertexType = vertex instanceof Instance ? "an instance"
+						: "a port";
+				return "The network already contains a vertex of the same name ("
+						+ vertexType + ")";
+			}
+		}
 
 		// null -> value is valid
 		return null;
@@ -207,17 +217,21 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean canDelete(IDeleteContext context) {
-		final int nbConnections = Graphiti
-				.getPeService()
-				.getAllConnections(
-						(AnchorContainer) context.getPictogramElement()).size();
+		// A grouped selection also affect instance ports (even if it is not
+		// visible). We only allow to delete an instance, not its ports.
+		if (context.getPictogramElement() instanceof AnchorContainer) {
+			final AnchorContainer pe = (AnchorContainer) context
+					.getPictogramElement();
+			final int nbConnections = Graphiti.getPeService()
+					.getAllConnections(pe).size();
+			// When user will be prompted, display the exact number of elements
+			// to delete
+			((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(
+					true, false, nbConnections + 1));
 
-		// When user will be prompted, display the exact number of elements to
-		// delete
-		((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(true,
-				false, nbConnections + 1));
-
-		return true;
+			return true;
+		}
+		return false;
 	}
 
 	/**

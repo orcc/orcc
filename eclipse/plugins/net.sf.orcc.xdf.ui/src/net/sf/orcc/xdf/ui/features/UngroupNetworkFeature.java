@@ -46,9 +46,9 @@ import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
-import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
@@ -58,7 +58,6 @@ import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
-import org.eclipse.graphiti.services.Graphiti;
 
 /**
  * Replace the selected instance by the content of the network it refined on.
@@ -143,7 +142,8 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 				getFeatureProvider().addIfPossible(addCtxt);
 			}
 		}
-		
+
+		// Re-generate connections between subNetwork instances
 		for(final Connection connection : subNetwork.getConnections()) {
 			// The connection is between 2 instances
 			// Connections from/to a network port are analyzed later
@@ -157,11 +157,13 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 				final Connection newConnection = DfFactory.eINSTANCE.createConnection(
 						source, sourcePort, target, targetPort);
 
+				// We will 'add' a new Connection to a diagram (not create it,
+				// in Graphiti context). It must exists in the current network
 				thisNetwork.add(newConnection);
 
-				final AddConnectionContext addConContext = XdfUtil
+				// Really add the connection
+				final IAddConnectionContext addConContext = XdfUtil
 						.getAddConnectionContext(fp, getDiagram(), newConnection);
-				addConContext.setNewObject(newConnection);
 				getFeatureProvider().addIfPossible(addConContext);
 			}
 		}
@@ -187,17 +189,13 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 						outerCon.getSource(), outerCon.getSourcePort(),
 						target, targetPort);
 
-				// Delete the link, to avoid loosing the connection when instance will be deleted
-				final List<PictogramElement> pes = Graphiti.getLinkService().getPictogramElements(getDiagram(), outerCon);
-				for(PictogramElement linkedPe : pes) {
-					EcoreUtil.delete(linkedPe.getLink(), true);
-				}
-
+				// We will 'add' a new Connection to a diagram (not create it,
+				// in Graphiti context). It must exists in the current network
 				thisNetwork.add(c);
 
-				final AddConnectionContext addConContext = XdfUtil
+				// Really add the connection
+				final IAddConnectionContext addConContext = XdfUtil
 						.getAddConnectionContext(fp, getDiagram(), c);
-				addConContext.setNewObject(c);
 				getFeatureProvider().addIfPossible(addConContext);
 			}
 		}
@@ -224,24 +222,25 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 							source, sourcePort,
 							outerCon.getTarget(), outerCon.getTargetPort());
 
-					// Delete the link, to avoid loosing the connection when instance will be deleted
-					final List<PictogramElement> pes = Graphiti.getLinkService().getPictogramElements(getDiagram(), outerCon);
-					for(PictogramElement linkedPe : pes) {
-						EcoreUtil.delete(linkedPe.getLink(), true);
-					}
-
-					thisNetwork.remove(outerCon);
+					// We will 'add' a new Connection to a diagram (not create
+					// it, in Graphiti context). It must exists in the current
+					// network
 					thisNetwork.add(c);
 
-					final AddConnectionContext addConContext = XdfUtil
+					// Really add the connection
+					final IAddConnectionContext addConContext = XdfUtil
 							.getAddConnectionContext(fp, getDiagram(), c);
-					addConContext.setNewObject(c);
 					getFeatureProvider().addIfPossible(addConContext);
 				}
 			}
 		}
 
-		// Remove the selected instance from the current network
+		// Delete the selected instance PictogramElement from the current
+		// diagram. This will also delete:
+		// - The linked Instance from the Network
+		// - The FreeFormConnections from/to this instance
+		// - The corresponding net.sf.orcc.df.Connection instances from the
+		// network
 		final IPattern pattern = fp.getPatternForPictogramElement(instancePe);
 		final DeleteContext delContext = new DeleteContext(instancePe);
 		delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
