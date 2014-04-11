@@ -40,6 +40,7 @@ import net.sf.orcc.util.OrccLogger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -68,6 +69,7 @@ public class WorkspaceCreator implements IApplication {
 	private boolean wasAutoBuildEnabled;
 
 	public WorkspaceCreator() {
+
 		progressMonitor = new NullProgressMonitor();
 
 		nature = OrccProjectNature.NATURE_ID;
@@ -112,7 +114,6 @@ public class WorkspaceCreator implements IApplication {
 						} else {
 							project.create(description, progressMonitor);
 							project.open(progressMonitor);
-
 							OrccLogger.traceln("New project registered: "
 									+ project.getName());
 						}
@@ -139,14 +140,24 @@ public class WorkspaceCreator implements IApplication {
 
 			try {
 
-				wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild();
+				wasAutoBuildEnabled = CommandLineUtil
+						.disableAutoBuild(workspace);
 
-				File searchPath = new File(args[0]).getCanonicalFile();
+				final String path = args[0].replace("~",
+						System.getProperty("user.home"));
+				File searchPath = new File(path).getCanonicalFile();
 				OrccLogger.traceln("Register projects from \""
 						+ searchPath.getAbsolutePath() + "\" to workspace \""
 						+ workspace.getRoot().getLocation() + "\"");
 				searchForProjects(searchPath);
 
+				// Avoid warning messages of type "The workspace exited
+				// with unsaved changes in the previous session" the next
+				// time an IApplication (FrontendCli) will be launched
+				// This method can be called ONLY if auto-building has
+				// been disabled
+				workspace.getRoot().refreshLocal(IWorkspaceRoot.DEPTH_INFINITE,
+						progressMonitor);
 				workspace.save(true, progressMonitor);
 
 			} catch (CoreException e) {
@@ -161,7 +172,7 @@ public class WorkspaceCreator implements IApplication {
 			} finally {
 				try {
 					if (wasAutoBuildEnabled) {
-						CommandLineUtil.enableAutoBuild();
+						CommandLineUtil.enableAutoBuild(workspace);
 						wasAutoBuildEnabled = false;
 					}
 					return IApplication.EXIT_OK;

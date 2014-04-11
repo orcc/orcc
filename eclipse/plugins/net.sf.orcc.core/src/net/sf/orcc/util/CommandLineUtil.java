@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.util;
 
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 
 /**
@@ -48,15 +48,15 @@ public class CommandLineUtil {
 	 *         disabled
 	 * @throws CoreException
 	 */
-	public static boolean disableAutoBuild() throws CoreException {
+	public static boolean disableAutoBuild(final IWorkspace wp)
+			throws CoreException {
 		// IWorkspace.getDescription() returns a copy. We need to extract,
 		// modify and set it to the current workspace.
-		final IWorkspaceDescription desc = ResourcesPlugin.getWorkspace()
-				.getDescription();
-		if (desc.isAutoBuilding()) {
+		final IWorkspaceDescription desc = wp.getDescription();
+		if (wp.isAutoBuilding()) {
 			OrccLogger.debugln("Disbale auto-building");
 			desc.setAutoBuilding(false);
-			ResourcesPlugin.getWorkspace().setDescription(desc);
+			wp.setDescription(desc);
 			return true;
 		}
 
@@ -68,13 +68,13 @@ public class CommandLineUtil {
 	 * 
 	 * @throws CoreException
 	 */
-	public static void enableAutoBuild() throws CoreException {
+	public static void enableAutoBuild(final IWorkspace wp)
+			throws CoreException {
 		OrccLogger.debugln("Re-enable auto-building");
 		// IWorkspace.getDescription() returns a copy. We need to extract,
 		// modify and set it to the current workspace.
-		final IWorkspaceDescription desc = ResourcesPlugin.getWorkspace()
-				.getDescription();
+		final IWorkspaceDescription desc = wp.getDescription();
 		desc.setAutoBuilding(true);
-		ResourcesPlugin.getWorkspace().setDescription(desc);
+		wp.setDescription(desc);
 	}
 }
