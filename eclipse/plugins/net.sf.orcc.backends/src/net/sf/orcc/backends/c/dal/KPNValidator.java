@@ -3,7 +3,9 @@ package net.sf.orcc.backends.c.dal;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.tools.classifier.GuardSatChecker;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Action;
@@ -18,9 +20,20 @@ import net.sf.orcc.df.Network;
  * of a network.
  * 
  * @author Jani Boutellier
+ * @author James Guthrie
  * 
  */
 public class KPNValidator {
+
+	private boolean checkGuards;
+
+	public KPNValidator(){
+		this.checkGuards = false;
+	}
+
+	public KPNValidator(boolean checkGuards){
+		this.checkGuards = checkGuards;
+	}
 
 	public void validate(Network network) {
 		for (Actor actor : network.getAllActors()) {
@@ -115,8 +128,19 @@ public class KPNValidator {
 							actor.addAttribute("variableInputPattern");
 						}
 					} else {
-						OrccLogger.warnln("(" + actor.getName() + ") action '" + firstAction.getName() + "' reads port '"  + port.getName() +
-								"'\n but action '"+ secondAction.getName() + "' does not. Application may deadlock.");
+						boolean sat = true;
+						if (this.checkGuards) {
+							try {
+								GuardSatChecker checker = new GuardSatChecker(actor);
+								sat = checker.checkSat(firstAction, secondAction);
+							} catch(OrccRuntimeException e){
+								OrccLogger.warnln("Satisfiability check failed: '" + e.getMessage() + "'");
+							}
+						}
+						if (sat) {
+							OrccLogger.warnln("(" + actor.getName() + ") action '" + firstAction.getName() + "' reads port '"  + port.getName() +
+									"'\n but action '"+ secondAction.getName() + "' does not. Application may deadlock.");
+						}
 					}
 				}
 			}
