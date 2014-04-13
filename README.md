@@ -83,4 +83,11 @@ The current status of the existing back-ends is summed up in the following table
     <td>N/A</td>
     <td>OK</td>
   </tr>
+  <tr>
+    <th>DAL</th>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+  </tr>
 </table>
