@@ -818,9 +818,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					"orcc");
 			tempOrccDir.mkdir();
 			outputFolder = tempOrccDir.getAbsolutePath();
-		} else if (outputFolder.startsWith("~")) {
-			outputFolder = outputFolder.replace("~",
-					System.getProperty("user.home"));
+		} else {
+			outputFolder = OrccUtil.resolveFromHome(outputFolder);
 		}
 
 		if (debug) {

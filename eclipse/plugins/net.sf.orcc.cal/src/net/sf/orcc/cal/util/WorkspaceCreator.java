@@ -36,6 +36,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.util.CommandLineUtil;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -144,8 +145,7 @@ public class WorkspaceCreator implements IApplication {
 				wasAutoBuildEnabled = CommandLineUtil
 						.disableAutoBuild(workspace);
 
-				final String path = args[0].replace("~",
-						System.getProperty("user.home"));
+				final String path = OrccUtil.resolveFromHome(args[0]);
 				File searchPath = new File(path).getCanonicalFile();
 				OrccLogger.traceln("Register projects from \""
 						+ searchPath.getAbsolutePath() + "\" to workspace \""
