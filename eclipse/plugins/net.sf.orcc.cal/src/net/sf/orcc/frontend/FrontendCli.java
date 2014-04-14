@@ -241,8 +241,8 @@ public class FrontendCli implements IApplication {
 			final IJobManager manager = Job.getJobManager();
 			int i = 0;
 			while (!manager.isIdle()) {
-				OrccLogger.traceln(++i + " Waiting for completion"
-						+ " of currently running jobs");
+				OrccLogger.traceln("Waiting for completion of"
+						+ " currently running jobs - " + ++i);
 				Thread.sleep(500);
 			}
 		} catch (CoreException e) {
