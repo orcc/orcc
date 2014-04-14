@@ -47,6 +47,12 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Appender;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -106,6 +112,15 @@ public class FrontendCli implements IApplication {
 	final Injector injector;
 
 	public FrontendCli() {
+
+		// Configure Log4j to output logs in System.out console (used in Xtext
+		// framework)
+		final Layout l = new PatternLayout(
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		final Appender a = new ConsoleAppender(l, ConsoleAppender.SYSTEM_OUT);
+		Logger.getRootLogger().addAppender(a);
+		// Default level to Info, reduces amount of messages displayed
+		Logger.getRootLogger().setLevel(Level.INFO);
 
 		injector = new CalStandaloneSetup()
 				.createInjectorAndDoEMFRegistration();
