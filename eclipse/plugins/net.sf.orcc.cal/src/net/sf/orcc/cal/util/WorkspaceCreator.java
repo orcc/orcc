@@ -46,6 +46,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -157,6 +159,14 @@ public class WorkspaceCreator implements IApplication {
 				// been disabled
 				workspace.save(true, progressMonitor);
 
+				final IJobManager manager = Job.getJobManager();
+				int i = 0;
+				while (!manager.isIdle()) {
+					OrccLogger.traceln("Waiting for completion of"
+							+ " currently running jobs - " + ++i);
+					Thread.sleep(500);
+				}
+
 			} catch (CoreException e) {
 				OrccLogger.severeln(e.getMessage());
 				e.printStackTrace();
@@ -164,6 +174,9 @@ public class WorkspaceCreator implements IApplication {
 				OrccLogger.severeln(e.getMessage());
 				e.printStackTrace();
 			} catch (IOException e) {
+				OrccLogger.severeln(e.getMessage());
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				OrccLogger.severeln(e.getMessage());
 				e.printStackTrace();
 			} finally {
