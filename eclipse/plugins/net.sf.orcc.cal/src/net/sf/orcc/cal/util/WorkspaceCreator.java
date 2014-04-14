@@ -40,7 +40,6 @@ import net.sf.orcc.util.OrccLogger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -156,8 +155,6 @@ public class WorkspaceCreator implements IApplication {
 				// time an IApplication (FrontendCli) will be launched
 				// This method can be called ONLY if auto-building has
 				// been disabled
-				workspace.getRoot().refreshLocal(IWorkspaceRoot.DEPTH_INFINITE,
-						progressMonitor);
 				workspace.save(true, progressMonitor);
 
 			} catch (CoreException e) {
