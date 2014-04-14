@@ -51,26 +51,24 @@ static HEVCDSPContext hevcDsp;
    0 -  1 -  0 -  2 -  1 -  3 -  2 -  3 -  3 -  3 --> function id
    */
 static const int lookup_tab_openhevc_function[65] = {
-   -1, -1,  0, -1,  1, -1,  2, -1,
-    3, -1, -1,  1,  4, -1, -1, -1,
-    5, -1, -1, -1, -1, -1, -1, -1,
-    6, -1, -1, -1, -1, -1, -1, -1,
-    7, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-    8, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-    9};
+    -1, -1,  0, -1,  1, -1,  2, -1,
+     3, -1, -1,  1,  4, -1, -1, -1,
+     5, -1, -1, -1, -1, -1, -1, -1,
+     6, -1, -1, -1, -1, -1, -1, -1,
+     7, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1,
+     8, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1,
+     9};
 
 int openhevc_init_context()
 {
-	ff_hevc_dsp_init(&hevcDsp, 8);
-	ff_hevc_pred_init(&hevcPred, 8);
-	return 0;
+    ff_hevc_dsp_init(&hevcDsp, 8);
+    ff_hevc_pred_init(&hevcPred, 8);
+    return 0;
 }
 
-void put_hevc_qpel_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height, i32 mx, i32 my)
+void put_hevc_qpel_orcc(i16 _dst[2][64*64], u8 listIdx, u8 _src[71*71], u8 srcstride, u8 _width, u8 _height, i32 mx, i32 my)
 {
     u8  *src = &_src[3+3*srcstride];
     i16 *dst = _dst[listIdx];
@@ -81,9 +79,7 @@ u8 _width, u8 _height, i32 mx, i32 my)
     hevcDsp.put_hevc_qpel[idx][!!my][!!mx](dst, width, src, srcstride, height, mx, my, width);
 }
 
-void put_hevc_epel_orcc(i16 _dst[2][64*64], u8 listIdx,
-u8 _src[71*71], u8 srcstride,
-u8 _width, u8 _height, i32 mx, i32 my)
+void put_hevc_epel_orcc(i16 _dst[2][64*64], u8 listIdx, u8 _src[71*71], u8 srcstride, u8 _width, u8 _height, i32 mx, i32 my)
 {
     u8  *src = &_src[1+1*srcstride];
     i16 *dst = _dst[listIdx];
@@ -109,45 +105,42 @@ void put_unweighted_pred_orcc(i16 _src[2][64*64], int _width, int _height, u8 rd
 
 void put_weighted_pred_avg_orcc (i16 src[2][64*64], int _width, int _height, u8 dst[64*64])
 {
-  u8 width = _width + 1;
-  u8 height = _height + 1;
-  int idx = lookup_tab_openhevc_function[width];
+    u8 width = _width + 1;
+    u8 height = _height + 1;
+    int idx = lookup_tab_openhevc_function[width];
 
-  hevcDsp.put_weighted_pred_avg[idx](dst, width,
-    src[0], src[1], width, width, height);
+    hevcDsp.put_weighted_pred_avg[idx](dst, width, src[0], src[1], width, width, height);
 }
 
-void weighted_pred_orcc(int logWD, int weightCu[2], int offsetCu[2] ,
-		i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64])
+void weighted_pred_orcc(int logWD, int weightCu[2], int offsetCu[2], i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64])
 {
-  i16 * src = _src[rdList];
-  u8 * dst = _dst;
-  u8 width = _width + 1;
-  u8 height = _height + 1;
-  int wX = weightCu[rdList];
-  int oX = offsetCu[rdList];
-  int locLogWD = logWD - 14 + 8;
-  int idx = lookup_tab_openhevc_function[width];
+    i16 * src = _src[rdList];
+    u8 * dst = _dst;
+    u8 width = _width + 1;
+    u8 height = _height + 1;
+    int wX = weightCu[rdList];
+    int oX = offsetCu[rdList];
+    int locLogWD = logWD - 14 + 8;
+    int idx = lookup_tab_openhevc_function[width];
 
-  hevcDsp.weighted_pred[idx](locLogWD, wX, oX, dst, width, src, width, width, height);
+    hevcDsp.weighted_pred[idx](locLogWD, wX, oX, dst, width, src, width, width, height);
 }
 
-void weighted_pred_avg_orcc(int logWD , int weightCu[2], int offsetCu[2] ,
-		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64])
+void weighted_pred_avg_orcc(int logWD , int weightCu[2], int offsetCu[2], i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64])
 {
-  i16 * src = _src[0];
-  i16 * src1 = _src[1];
-  u8 * dst = _dst;
-  u8 width = _width + 1;
-  u8 height = _height + 1;
-  int w0 = weightCu[0];
-  int w1 = weightCu[1];
-  int o0 = offsetCu[0];
-  int o1 = offsetCu[1];
-  int locLogWD = logWD - 14 + 8;
-  int idx = lookup_tab_openhevc_function[width];
+    i16 * src = _src[0];
+    i16 * src1 = _src[1];
+    u8 * dst = _dst;
+    u8 width = _width + 1;
+    u8 height = _height + 1;
+    int w0 = weightCu[0];
+    int w1 = weightCu[1];
+    int o0 = offsetCu[0];
+    int o1 = offsetCu[1];
+    int locLogWD = logWD - 14 + 8;
+    int idx = lookup_tab_openhevc_function[width];
 
-  hevcDsp.weighted_pred_avg[idx](locLogWD, w0, w1, o0, o1, dst, width, src, src1, width, width, height);
+    hevcDsp.weighted_pred_avg[idx](locLogWD, w0, w1, o0, o1, dst, width, src, src1, width, width, height);
 }
 
 
