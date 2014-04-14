@@ -216,35 +216,16 @@ public class InstancePattern extends AbstractPattern {
 	}
 
 	@Override
-	public boolean canDelete(IDeleteContext context) {
-		// A grouped selection also affect instance ports (even if it is not
-		// visible). We only allow to delete an instance, not its ports.
-		if (context.getPictogramElement() instanceof AnchorContainer) {
-			final AnchorContainer pe = (AnchorContainer) context
-					.getPictogramElement();
-			final int nbConnections = Graphiti.getPeService()
-					.getAllConnections(pe).size();
-			// When user will be prompted, display the exact number of elements
-			// to delete
-			((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(
-					true, false, nbConnections + 1));
-
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Delete all connections before deleting an instance
-	 */
-	@Override
-	public void preDelete(IDeleteContext mainContext) {
+	public void delete(IDeleteContext mainContext) {
 		final PictogramElement pe = mainContext.getPictogramElement();
 		if (!PropsUtil.isInstance(pe)) {
 			return;
 		}
 
-		final List<Connection> connections = Graphiti.getPeService().getAllConnections((AnchorContainer) pe);
+		// Before deleting an instance, delete all connections from / to this
+		// instance. Also delete the corresponding df.Connection objects linked
+		final List<Connection> connections = Graphiti.getPeService()
+				.getAllConnections((AnchorContainer) pe);
 		for (final Connection connection : connections) {
 			final DeleteContext context = new DeleteContext(connection);
 			// We don't want to prompt user for each connection deletion
@@ -253,9 +234,10 @@ public class InstancePattern extends AbstractPattern {
 			final IDeleteFeature feature = getFeatureProvider()
 					.getDeleteFeature(context);
 			if (feature.canDelete(context)) {
-				feature.execute(context);
+				feature.delete(context);
 			}
 		}
+		super.delete(mainContext);
 	}
 
 	@Override
