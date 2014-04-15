@@ -28,11 +28,8 @@
  */
 package net.sf.orcc.xdf.ui.editors;
 
-import net.sf.orcc.xdf.ui.Activator;
-
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.part.FileEditorInput;
 
 /**
@@ -48,11 +45,6 @@ public class XdfEditorInput extends DiagramEditorInput {
 
 	public XdfEditorInput(URI diagramUri, String providerId) {
 		super(diagramUri, providerId);
-	}
-
-	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return Activator.getImageDescriptor("icons/network.gif");
 	}
 
 	@Override
