@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
+import java.util.Map
 import net.sf.orcc.OrccRuntimeException
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Connection
@@ -49,6 +50,7 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
+import net.sf.orcc.OrccLaunchConstants
 
 /*
  * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
@@ -61,11 +63,18 @@ abstract class LLVMTemplate extends CommonPrinter {
 	var Type currentType = null
 	var signed = false
 	var floating = false
-	
-	new(){
+
+	val Integer defaultFifoSize;
+
+	new (Map<String, Object> options) {
 		super()
+		if(options.containsKey(OrccLaunchConstants.FIFO_SIZE)) {
+			defaultFifoSize = options.get(OrccLaunchConstants.FIFO_SIZE) as Integer 
+		} else {
+			defaultFifoSize = OrccLaunchConstants.DEFAULT_FIFO_SIZE
+		}
 	}
-	
+
 	/////////////////////////////////
 	// Expressions
 	/////////////////////////////////
