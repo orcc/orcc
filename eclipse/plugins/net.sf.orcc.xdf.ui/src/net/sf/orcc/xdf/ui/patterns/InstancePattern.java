@@ -49,7 +49,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -60,8 +59,6 @@ import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
-import org.eclipse.graphiti.features.context.impl.DeleteContext;
-import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.context.impl.ResizeShapeContext;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.func.IDirectEditing;
@@ -216,28 +213,12 @@ public class InstancePattern extends AbstractPattern {
 	}
 
 	@Override
-	public void delete(IDeleteContext mainContext) {
-		final PictogramElement pe = mainContext.getPictogramElement();
-		if (!PropsUtil.isInstance(pe)) {
-			return;
+	public void preDelete(IDeleteContext context) {
+		final PictogramElement pe = context.getPictogramElement();
+		if (pe instanceof AnchorContainer) {
+			XdfUtil.deleteConnections(getFeatureProvider(),
+					(AnchorContainer) pe);
 		}
-
-		// Before deleting an instance, delete all connections from / to this
-		// instance. Also delete the corresponding df.Connection objects linked
-		final List<Connection> connections = Graphiti.getPeService()
-				.getAllConnections((AnchorContainer) pe);
-		for (final Connection connection : connections) {
-			final DeleteContext context = new DeleteContext(connection);
-			// We don't want to prompt user for each connection deletion
-			context.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
-
-			final IDeleteFeature feature = getFeatureProvider()
-					.getDeleteFeature(context);
-			if (feature.canDelete(context)) {
-				feature.delete(context);
-			}
-		}
-		super.delete(mainContext);
 	}
 
 	@Override

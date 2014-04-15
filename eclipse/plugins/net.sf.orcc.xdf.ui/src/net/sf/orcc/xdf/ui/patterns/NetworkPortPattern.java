@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.xdf.ui.patterns;
 
-import java.util.List;
-
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -42,7 +40,6 @@ import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -52,8 +49,6 @@ import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
-import org.eclipse.graphiti.features.context.impl.DeleteContext;
-import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.func.IDirectEditing;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
@@ -63,7 +58,6 @@ import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
-import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -192,28 +186,12 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	}
 
 	@Override
-	public void delete(IDeleteContext mainContext) {
-		final PictogramElement pe = mainContext.getPictogramElement();
-		if (!PropsUtil.isPort(pe)) {
-			return;
+	public void preDelete(IDeleteContext context) {
+		final PictogramElement pe = context.getPictogramElement();
+		if (pe instanceof AnchorContainer) {
+			XdfUtil.deleteConnections(getFeatureProvider(),
+					(AnchorContainer) pe);
 		}
-
-		// Before deleting a port, delete all connections from / to it.
-		// Also delete the corresponding df.Connection objects linked
-		final List<Connection> connections = Graphiti.getPeService()
-				.getAllConnections((AnchorContainer) pe);
-		for (final Connection connection : connections) {
-			final DeleteContext context = new DeleteContext(connection);
-			// We don't want to prompt user for each connection deletion
-			context.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
-
-			final IDeleteFeature feature = getFeatureProvider()
-					.getDeleteFeature(context);
-			if (feature.canDelete(context)) {
-				feature.delete(context);
-			}
-		}
-		super.delete(mainContext);
 	}
 
 	@Override

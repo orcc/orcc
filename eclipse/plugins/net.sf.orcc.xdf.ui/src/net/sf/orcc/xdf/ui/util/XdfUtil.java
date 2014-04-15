@@ -50,8 +50,12 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.graphiti.features.IDeleteFeature;
+import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
+import org.eclipse.graphiti.features.context.impl.DeleteContext;
+import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
@@ -301,5 +305,31 @@ public class XdfUtil {
 		result.setTargetContainer(diagram);
 		result.setNewObject(connection);
 		return result;
+	}
+
+	/**
+	 * If the given AnchorContainer has graphiti connections from / to itself,
+	 * this method delete all these connections as well the business
+	 * df.Connections linked
+	 * 
+	 * @param fp
+	 *            The current FeatureProvider instance
+	 * @param ac
+	 *            An anchor container, typically an Instance or a NetworkPort
+	 *            shape
+	 */
+	public static void deleteConnections(final IFeatureProvider fp,
+			final AnchorContainer ac) {
+		final List<org.eclipse.graphiti.mm.pictograms.Connection> connections = Graphiti
+				.getPeService().getAllConnections(ac);
+		for (final org.eclipse.graphiti.mm.pictograms.Connection connection : connections) {
+			final DeleteContext delCtxt = new DeleteContext(connection);
+			delCtxt.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
+
+			final IDeleteFeature delFeature = fp.getDeleteFeature(delCtxt);
+			if (delFeature.canDelete(delCtxt)) {
+				delFeature.delete(delCtxt);
+			}
+		}
 	}
 }
