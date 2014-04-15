@@ -225,13 +225,11 @@ abstract class LLVMTemplate extends CommonPrinter {
 	 *****************************************/
 	
 	def protected getSafeId(Connection connection, Port port) {
-		if(connection != null) connection.getAttribute("id").objectValue
-		else port.name
+		connection?.getAttribute("id")?.objectValue ?: port.name
 	}
 
 	def protected getSafeSize(Connection connection) {
-		if(connection != null) connection.size.toString
-		else "512"
+		connection?.size?.toString ?: defaultFifoSize.toString
 	}
 	
 	def protected print(Var variable)
