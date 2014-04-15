@@ -195,12 +195,15 @@ public class InstancePattern extends AbstractPattern {
 		if (value.length() < 1) {
 			return "Please enter a text to name the Instance.";
 		}
-		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]+")) {
+		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]*")) {
 			return "Instance name must start with a letter, and contains only alphanumeric characters";
 		}
 		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		final Object currentVertex = getBusinessObjectForPictogramElement(context
+				.getPictogramElement());
 		for (final Vertex vertex : network.getVertices()) {
-			if (vertex.getLabel().equals(value)) {
+			if (!vertex.equals(currentVertex)
+					&& vertex.getLabel().equals(value)) {
 				final String vertexType = vertex instanceof Instance ? "an instance"
 						: "a port";
 				return "The network already contains a vertex of the same name ("
