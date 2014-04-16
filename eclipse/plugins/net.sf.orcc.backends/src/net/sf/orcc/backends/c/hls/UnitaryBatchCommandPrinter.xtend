@@ -47,9 +47,9 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 	}
 
 	def getFileContentBatch() '''
-		PATH=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin;%PATH%;D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\msys\bin
-		set AUTOESL_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
-		set VIVADO_HLS_HOME=D:\Users\mabid\2013.3\Xilinx\Vivado_HLS\2013.3\bin
+		PATH=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin;%PATH%;D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\msys\bin
+		set AUTOESL_HOME=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin
+		set VIVADO_HLS_HOME=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin
 		
 		if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
 		set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
@@ -62,14 +62,14 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 				
 			%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
 				«FOR portIN : instance.getActor.inputs»
-					«IF instance.incomingPortMap.get(portIN).sourcePort != null»
+					
 						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write.tcl
-					«ENDIF»
+					
 				«ENDFOR»		
 				«FOR portout : instance.getActor.outputs.filter[! native]»			
-					«IF instance.outgoingPortMap.get(portout).head.targetPort != null»
+					
 						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read.tcl					
-					«ENDIF»
+					
 				«ENDFOR»
 		
 		copy %cd%\TopVHDL\sim_package.vhd %cd%\«instance.name»TopVHDL
@@ -79,18 +79,18 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 			copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
 			
 			«FOR portIN : instance.getActor.inputs»
-				«IF instance.incomingPortMap.get(portIN).sourcePort != null»
+				
 					copy %cd%\subProject_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write\solution1\syn\vhdl %cd%\«instance.
 			name»TopVHDL
-				«ENDIF»
+				
 			«ENDFOR»
 			«FOR portout : instance.getActor.outputs.filter[! native]»
 				
-					«IF instance.outgoingPortMap.get(portout).head.targetPort != null»
+					
 						copy %cd%\subProject_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read\solution1\syn\vhdl %cd%\«instance.
 			name»TopVHDL
 						
-				«ENDIF»
+				
 			«ENDFOR»
 			
 		
