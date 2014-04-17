@@ -41,6 +41,7 @@ import net.sf.orcc.util.OrccUtil
  * 
  */
 class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
+//	int memoryBaseAddr = 0x30000000
 	int memoryBaseAddr = 0x40000000
 	
 	new(Network network, Map<String, Object> options) {
@@ -58,35 +59,34 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		#define __USE_GNU
 		#endif
 		
-		#include "types.h"
 		#include "fifoAllocations.h"
 		#include "util.h"
 		
-		#define SIZE «fifoSize»
-		// #define PRINT_FIRINGS
-
-		/////////////////////////////////////////////////
-		// FIFO allocation
-		«FOR vertice : network.children.actorInstances»
-			«vertice.allocateFifos»
-		«ENDFOR»
-		
-		/////////////////////////////////////////////////
-		// FIFO pointer assignments
-		«FOR instance : network.children.actorInstances»
-			«instance.assignFifo»
-		«ENDFOR»
+«««		#define SIZE «fifoSize»
+«««		// #define PRINT_FIRINGS
+«««
+«««		/////////////////////////////////////////////////
+«««		// FIFO allocation
+«««		«FOR vertice : network.children.actorInstances»
+«««			«vertice.allocateFifos»
+«««		«ENDFOR»
+«««		
+«««		/////////////////////////////////////////////////
+«««		// FIFO pointer assignments
+«««		«FOR instance : network.children.actorInstances»
+«««			«instance.assignFifo»
+«««		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// Action initializes
-		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_initialize();
+		«FOR child : network.children»
+			extern void «child.label»_initialize();
 		«ENDFOR»
 		
 		/////////////////////////////////////////////////
 		// Action schedulers
-		«FOR instance : network.children.actorInstances»
-			extern int «instance.name»_scheduler();
+		«FOR child : network.children»
+			extern int «child.label»_scheduler();
 		«ENDFOR»
 
 		/////////////////////////////////////////////////
@@ -94,15 +94,15 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		static void scheduler() {
 			int stop = 0;
 
-			«FOR instance : network.children.actorInstances»
-				«instance.name»_initialize();
+			«FOR child : network.children»
+				«child.label»_initialize();
 			«ENDFOR»
 
 			int i;
 			while(!stop) {
 				i = 0;
-				«FOR instance : network.children.actorInstances»
-					i += «instance.name»_scheduler();
+				«FOR child : network.children»
+					i += «child.label»_scheduler();
 				«ENDFOR»
 
 				stop = stop || (i == 0);

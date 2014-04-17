@@ -43,18 +43,20 @@ import net.sf.orcc.df.Port
  * 
  */
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {	
+	private boolean printMain
 	
-	new(Map<String, Object> options) {
+	new(Map<String, Object> options, boolean printTop) {
 		super(options)
+		printMain = !printTop
 	}
 	
 	override protected printStateLabel(State state) '''
 		l_«state.name»:
-			«IF ! instance.getActor.actionsOutsideFsm.empty»
-				i += «instance.name»_outside_FSM_scheduler();
+			«IF ! actor.actionsOutsideFsm.empty»
+				i += «entityName»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF state.outgoing.empty»
-				printf("Stuck in state "«state.name»" in the instance «instance.name»\n");
+				xil_printf("Stuck in state "«state.name»" in the instance «entityName»\n");
 				exit(1);
 			«ELSE»
 				«state.printStateTransitions»
@@ -86,22 +88,22 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 	
 	override protected printActorScheduler() '''
-		«IF instance.getActor.hasFsm»
+		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
-			int «instance.name»_scheduler() {
+			int «entityName»_scheduler() {
 				int i = 0;
 				«printCallTokensFunctions»
-				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
+				«actor.actionsOutsideFsm.printActionSchedulingLoop»
 				
 			finished:
-				«FOR port : instance.getActor.inputs»
+				«FOR port : actor.inputs»
 					read_end_«port.name»();
 				«ENDFOR»
-				«FOR port : instance.getActor.outputs.notNative»
+				«FOR port : actor.outputs.notNative»
 					write_end_«port.name»();
 				«ENDFOR»
-				«IF instance.getActor.inputs.nullOrEmpty && instance.getActor.outputs.nullOrEmpty »
+				«IF actor.inputs.nullOrEmpty && actor.outputs.nullOrEmpty »
 					// no read_end/write_end here!
 					return;
 				«ENDIF»
@@ -132,41 +134,41 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	override protected printFsm() '''
-		«IF ! instance.getActor.actionsOutsideFsm.empty»
-			int «instance.name»_outside_FSM_scheduler() {
+		«IF ! actor.actionsOutsideFsm.empty»
+			int «entityName»_outside_FSM_scheduler() {
 				int i = 0;
-				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
+				«actor.actionsOutsideFsm.printActionSchedulingLoop»
 			finished:
 				// no read_end/write_end here!
 				return i;
 			}
 		«ENDIF»
 
-		int «instance.name»_scheduler() {
+		int «entityName»_scheduler() {
 			int i = 0;
 
 			«printCallTokensFunctions»
 
 			// jump to FSM state 
 			switch (_FSM_state) {
-			«FOR state : instance.getActor.fsm.states»
+			«FOR state : actor.fsm.states»
 				case my_state_«state.name»:
 					goto l_«state.name»;
 			«ENDFOR»
 			default:
-				printf("unknown state in «instance.name».c : %s\n", stateNames[_FSM_state]);
+				xil_printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]);
 				exit(1);
 			}
 
 			// FSM transitions
-			«FOR state : instance.getActor.fsm.states»
+			«FOR state : actor.fsm.states»
 		«state.printStateLabel»
 			«ENDFOR»
 		finished:
-			«FOR port : instance.getActor.inputs»
+			«FOR port : actor.inputs»
 				read_end_«port.name»();
 			«ENDFOR»
-			«FOR port : instance.getActor.outputs.filter[!native]»
+			«FOR port : actor.outputs.filter[!native]»
 				write_end_«port.name»();
 			«ENDFOR»
 			return i;
@@ -207,7 +209,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				i += «entityName»_scheduler();
 				stop = stop || (i == 0);
 			}
-			print("End of simulation !\n");
+			xil_printf("End of simulation !\n");
 			
 			return compareErrors;
 		}
@@ -233,18 +235,17 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			#include <assert.h>
 		«ENDIF»
 
-		#include "types.h"
-		#include "fifoAllocations.h"
+		«IF printMain»
+			#include "fifoAllocations.h"
+		«ELSE»
+			#include "fifo.h"
+		«ENDIF»
 		#include "util.h"
 		#include "dataflow.h"
 		
 		#include "platform.h"
 		#include "xparameters.h"
 		
-		void print(char *str);
-		void inbyte(){
-		}
-
 		«IF profileNetwork || dynamicMapping»
 			#include "cycle.h"
 		«ENDIF»
@@ -261,16 +262,20 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 «««		#define SIZE «fifoSize»
 
-«««		////////////////////////////////////////////////////////////////////////////////
-«««		// Instance
-«««		extern actor_t «entityName»;
+		«IF printMain != true»
+			////////////////////////////////////////////////////////////////////////////////
+			// Instance
+			extern actor_t «entityName»;
+		«ENDIF»
+		
 		«IF !actor.inputs.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
-			«FOR port : actor.inputs»
-				«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
-			«ENDFOR»
-
+			«IF printMain != true»
+				«FOR port : actor.inputs»
+					«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
+				«ENDFOR»
+			«ENDIF»
 			////////////////////////////////////////////////////////////////////////////////
 			// Input Fifo control variables
 			«FOR port : actor.inputs»
@@ -305,10 +310,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF !actor.outputs.filter[! native].nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Output FIFOs
-			«FOR port : actor.outputs.filter[! native]»
-				extern fifo_«port.type.doSwitch»_t *«port.fullName»;
-			«ENDFOR»
-
+			«IF printMain != true»
+				«FOR port : actor.outputs.filter[! native]»
+					extern fifo_«port.type.doSwitch»_t *«port.fullName»;
+				«ENDFOR»
+			«ENDIF»
 			////////////////////////////////////////////////////////////////////////////////
 			// Output Fifo control variables
 			«FOR port : actor.outputs.filter[! native]»
@@ -424,10 +430,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Action scheduler
 		«printActorScheduler»
 		
-		////////////////////////////////////////////////////////////////////////////////
-		// main
-		«printMain»
-
+		«IF printMain»
+			////////////////////////////////////////////////////////////////////////////////
+			// main
+			«printMain»
+		«ENDIF»
 	'''
 }
 
