@@ -784,15 +784,9 @@ class InstancePrinter extends CTemplate {
 			// Update ports indexes
 			«FOR port : action.inputPattern.ports»
 				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
-				«IF action.inputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
-					read_end_«port.name»();
-				«ENDIF»
 			«ENDFOR»
 			«FOR port : action.outputPattern.ports»
 				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
-				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
-					write_end_«port.name»();
-				«ENDIF»
 			«ENDFOR»
 
 			«action.profileEnd»
