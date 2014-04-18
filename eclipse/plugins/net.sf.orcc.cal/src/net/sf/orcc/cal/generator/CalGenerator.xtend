@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.generator
 
+import com.google.inject.Inject
+import com.google.inject.Provider
 import java.io.ByteArrayOutputStream
 import java.util.HashSet
 import net.sf.orcc.cache.CacheManager
@@ -80,7 +82,11 @@ class CalGenerator implements IGenerator {
 	private val HashSet<Resource> loadedResources = newHashSet
 
 	private var IProject currentProject
-	private var ResourceSet resourceSet
+	private var ResourceSet calResourceSet
+	private var ResourceSet irResourceSet
+
+	@Inject
+	private var Provider<ResourceSet> rsProvider
 
 	/**
 	 * Start a build session. This method is called by net.sf.orcc.cal.ui.builder.CalBuilder
@@ -94,10 +100,11 @@ class CalGenerator implements IGenerator {
 	 */
 	def beforeBuild(IProject project, ResourceSet rs) {
 		currentProject = project
-		resourceSet = rs
-
 		builtResources.clear
 		loadedResources.clear
+
+		calResourceSet = rs
+		irResourceSet = rsProvider.get
 	}
 
 	/**
@@ -112,11 +119,19 @@ class CalGenerator implements IGenerator {
 	 */
 	override void doGenerate(Resource calResource, IFileSystemAccess fsa) {
 
-		// We already built this resource in the same session, do not need
-		// to do it again !
-		if(builtResources.contains(calResource)) return
-
 		val irSubPath = calResource.irRelativePath
+
+		val irUri = OrccUtil::getIrUri(calResource.URI)
+
+		var irResource =
+			if(builtResources.contains(calResource)) {
+				builtResources.remove(calResource)
+				val result = irResourceSet.getResource(irUri, true)
+				result.contents.clear
+				result // return the Resource to store in 'irResource' value
+			} else {
+				irResourceSet.createResource(irUri)
+			}
 
 		val astEntity = calResource.entity
 		// Build a list of resources we need to have registered in frontend
@@ -140,7 +155,7 @@ class CalGenerator implements IGenerator {
 		}
 
 		// Write in the IR file the content of the transformed AstEntity
-		fsa.generateFile(irSubPath, calResource.entity.serialize)
+		fsa.generateFile(irSubPath, calResource.entity.serialize(irResource))
 
 		// Ensure we will not do it again in the same session
 		builtResources.add(calResource)
@@ -149,7 +164,7 @@ class CalGenerator implements IGenerator {
 	/**
 	 * Returns a EMF serialized version of the given AstEntity
 	 */
-	private def serialize(AstEntity astEntity) {
+	private def serialize(AstEntity astEntity, Resource irResource) {
 		// Transform the AstEntity into an Actor or a Unit
 		val entity =
 			if (astEntity.unit != null) {
@@ -166,13 +181,12 @@ class CalGenerator implements IGenerator {
 			return ""
 		}
 
-		// Associate a resource to the current entity
-		val resource = resourceSet.createResource(OrccUtil::getIrUri(astEntity.eResource.URI))
-		resource.contents.add(entity)
+		// Associate the current entity to its resource
+		irResource.contents.add(entity)
 
 		// Serialize in a simple String in memory
 		val outputStream = new ByteArrayOutputStream
-		resource.save(outputStream, newHashMap)
+		irResource.save(outputStream, newHashMap)
 
 		// Simply return the serialized content
 		outputStream.toString
@@ -182,10 +196,9 @@ class CalGenerator implements IGenerator {
 	 * Load content from the given AstEntity (unit) resource into the Frontend
 	 */
 	private def loadMappings(Resource resource) {
-		val astEntity = resource.entity
-		val irResource = resourceSet.getResource((OrccUtil::getIrUri(astEntity.eResource.URI)), true)
+		val irResource = irResourceSet.getResource(OrccUtil::getIrUri(resource.URI), true)
 		val unit = irResource.contents.head as Unit
-		val astUnit = astEntity.unit
+		val astUnit = resource.entity.unit
 
 		for(astConstant : astUnit.variables) {
 			val irConstant = unit.getConstant(astConstant.name)
@@ -244,7 +257,7 @@ class CalGenerator implements IGenerator {
 			val calFile = imp.getExistingCalFile
 			if(calFile != null) {
 				dependingResource.add(
-					resourceSet.getResource(URI.createPlatformResourceURI(calFile.fullPath.toString, true), true)
+					calResourceSet.getResource(URI.createPlatformResourceURI(calFile.fullPath.toString, true), true)
 				)
 			}
 		}
