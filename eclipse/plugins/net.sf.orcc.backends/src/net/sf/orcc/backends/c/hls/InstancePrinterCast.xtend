@@ -349,7 +349,7 @@ def fifoType(Connection connection) {
 		add_files «Instname».cpp
 		add_files -tb «Instname»TestBench.cpp
 		open_solution -reset "solution1"
-		set_part  {xc7vx330tffg1157-1}
+		set_part  {xc7v2000tflg1925-1}
 		create_clock -period 20
 		
 		
