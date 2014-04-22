@@ -135,7 +135,6 @@ class NetworkPrinter extends CTemplate {
 		#include "util.h"
 		#include "dataflow.h"
 
-		#include "cycle.h"
 		#include "serialize.h"
 		#include "options.h"
 
@@ -146,7 +145,6 @@ class NetworkPrinter extends CTemplate {
 		«ENDIF»
 
 		#define SIZE «fifoSize»
-		// #define PRINT_FIRINGS
 
 		/////////////////////////////////////////////////
 		// FIFO allocation
@@ -219,10 +217,6 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Declaration of the network
 		network_t network = {"«network.name»", actors, connections, «network.allActors.size», «network.connections.size»};
-
-		/////////////////////////////////////////////////
-		// Actor scheduler
-		«printScheduler»
 
 		/////////////////////////////////////////////////
 		// Initializer and launcher
@@ -300,46 +294,6 @@ class NetworkPrinter extends CTemplate {
 	
 	def protected printFifoAssign(String name, Port port, int fifoIndex) '''
 		fifo_«port.type.doSwitch»_t *«name»_«port.name» = &fifo_«fifoIndex»;
-	'''
-
-	def protected printScheduler() '''
-		void *scheduler_routine(void *data) {
-			local_scheduler_t *sched = (local_scheduler_t *) data;
-			actor_t *my_actor;
-			schedinfo_t si;
-			int j;
-			ticks tick_in, tick_out;
-			double diff_tick;
-		
-			set_realtime_priority();
-			sched_init_actors(sched, &si);
-			
-			while (1) {
-				my_actor = sched_get_next_schedulable(sched);
-				if(my_actor != NULL){
-					tick_in = getticks();
-					si.num_firings = 0;
-					
-					my_actor->sched_func(&si);
-					
-					tick_out = getticks();
-					diff_tick = elapsed(tick_out, tick_in);
-					my_actor->ticks += diff_tick;
-					my_actor->switches++;
-					if (si.num_firings == 0) {
-						my_actor->misses++;
-					}
-		#ifdef PRINT_FIRINGS
-					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
-		#endif
-				}
-				
-				if(my_actor == NULL || needMapping()) {
-					orcc_semaphore_set(sched->sync->sem_monitor);
-					orcc_semaphore_wait(sched->sem_thread);
-				}
-			}
-		}
 	'''
 
 	def protected allocateFifos(Vertex vertex) '''

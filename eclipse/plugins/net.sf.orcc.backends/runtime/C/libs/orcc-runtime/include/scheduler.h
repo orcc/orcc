@@ -146,4 +146,6 @@ void sched_add_ring_waiting_list(local_scheduler_t *sched);
  */
 void sched_add_mesh_waiting_list(local_scheduler_t *sched);
 
+void *scheduler_routine(void *data);
+
 #endif  /* _ORCC_SCHEDULER_H_ */
