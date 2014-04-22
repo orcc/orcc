@@ -65,7 +65,8 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
 		# Runtime libraries inclusion
-		include_directories(libs/orcc/include)
+		include_directories(libs/orcc-native/include)
+		include_directories(libs/orcc-runtime/include)
 
 		# Compile libraries
 		add_subdirectory(libs)
@@ -103,6 +104,6 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		add_executable(«network.simpleName» ${«network.simpleName»_OBJS} ${«network.simpleName»_SRCS})
 
 		set_target_properties(«network.simpleName» PROPERTIES LINKER_LANGUAGE C)
-		target_link_libraries(«network.simpleName» orcc ${SDL_LIBRARY})
+		target_link_libraries(«network.simpleName» orcc-runtime orcc-native ${SDL_LIBRARY})
 	'''
 }

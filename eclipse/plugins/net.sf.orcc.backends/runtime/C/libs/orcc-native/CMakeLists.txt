@@ -1,44 +1,29 @@
 
 # Orcc library files
-set(orcc_sources
+set(orcc_native_sources
     src/access_file.c
-    src/dataflow.c
-    src/getopt.c
-    src/graph.c
-    src/options.c
-    src/scheduler.c
     src/source.c
-    src/trace.c
-    src/util.c
     src/writer.c
-    include/util.h
-    include/types.h
 )
 
 # Build library without any external library required (SDL, pthread, etc)
 if(NO_EXTERNAL_DEPENDENCIES)
 
-    add_library(orcc STATIC ${orcc_sources})
+    add_library(orcc-native STATIC ${orcc_native_sources})
 
 # Build library with all features (require external libraries)
 else()
 
-    file(GLOB orcc_headers
+    file(GLOB orcc_native_headers
         include/*.h
     )
 
-    set(orcc_sources
-        ${orcc_sources}
+    list(APPEND orcc_native_sources
         src/audio.c
         src/compare.c
         src/compareyuv.c
         src/fps_print.c
-        src/mapping.c
-        src/serialize.c
-        src/thread.c
-        src/profiling.c
     )
-    set(extra_libraries)
 
     # Helps CMake to find SDL libraries (Windows only)
     if(WIN32)
@@ -62,21 +47,21 @@ else()
     find_package(SDL2 QUIET)
     if(SDL2_FOUND)
         list(APPEND extra_includes ${SDL2_INCLUDE_DIR})
-        list(APPEND orcc_sources src/display_sdl2.c)
         list(APPEND extra_libraries ${SDL2_LIBRARY})
+        list(APPEND orcc_native_sources src/display_sdl2.c)
     else()
         find_package(SDL REQUIRED)
         if(SDL_FOUND)
             list(APPEND extra_includes ${SDL_INCLUDE_DIR})
-            list(APPEND orcc_sources src/display_sdl.c)
             list(APPEND extra_libraries ${SDL_LIBRARY})
+            list(APPEND orcc_native_sources src/display_sdl.c)
         endif()
     endif()
 
     option(USE_SSE "Use SSE native functions if available" 0)
     if(USE_SSE)
         list(APPEND extra_definitions -DSSE_ENABLE)
-        list(APPEND orcc_sources
+        list(APPEND orcc_native_sources
             src/sse.c
             src/hevc_idct_sse4.c
             src/hevc_intra_pred_sse.c
@@ -86,7 +71,7 @@ else()
         find_package(OPENHEVC QUIET)
         if(OPENHEVC_FOUND)
             list(APPEND extra_definitions -DOPENHEVC_ENABLE)
-            list(APPEND orcc_sources src/openhevc.c)
+            list(APPEND orcc_native_sources src/openhevc.c)
             list(APPEND extra_libraries ${OPENHEVC_LIBRARY})
             list(APPEND extra_includes ${OPENHEVC_INCLUDE_DIR})
             message(STATUS "Find OpenHEVC: ${OPENHEVC_LIBRARY}")
@@ -95,48 +80,19 @@ else()
         endif()
     endif()
 
-    find_package(METIS QUIET)
-    if(METIS_FOUND)
-        list(APPEND extra_definitions -DMETIS_ENABLE)
-        list(APPEND extra_libraries ${METIS_LIBRARY})
-        list(APPEND extra_includes ${METIS_INCLUDE_DIR})
-        message(STATUS "Find Metis: ${METIS_LIBRARY}")
-    else()
-        message(STATUS "Cannot find Metis")
-    endif()
-
-    if(NOT MSVC AND NOT CMAKE_CROSSCOMPILING)
-        # Optimize the compilation for the local processor architecture
-        list(APPEND extra_definitions -march=native)
-    endif()
-
     include_directories(${extra_includes})
     add_definitions(${extra_definitions})
     # Compile libraries
-    add_library(orcc STATIC ${orcc_sources} ${orcc_headers})
-    # Do the linking
-    target_link_libraries(orcc roxml ${extra_libraries})
-
-    option(BUILD_ORCCMAP "Build the mapping tool as a standalone executable" 0)
-    if(BUILD_ORCCMAP)
-        # Build orcc-map as a standalone exectuable
-        set(orccmap_sources
-            include/serialize.h
-            src/serialize.c
-            src/main.c
-        )
-        add_executable(orcc-map ${orccmap_sources})
-        target_link_libraries(orcc-map orcc roxml)
-
-        INSTALL(TARGETS orcc-map orcc
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION lib
-            ARCHIVE DESTINATION lib
-        )
-    endif()
+    add_library(orcc-native STATIC ${orcc_native_sources} ${orcc_native_headers})
 
 endif()
 
+# Do the linking
+target_link_libraries(orcc-native orcc-runtime ${extra_libraries})
+
+install(TARGETS orcc-native
+    ARCHIVE DESTINATION lib
+)
 
 set(extra_definitions ${extra_definitions} PARENT_SCOPE)
 set(extra_includes ${extra_includes} PARENT_SCOPE)

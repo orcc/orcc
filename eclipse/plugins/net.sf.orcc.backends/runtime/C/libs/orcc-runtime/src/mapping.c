@@ -42,6 +42,7 @@
 #include "options.h"
 #include "trace.h"
 #include "cycle.h"
+#include "thread.h"
 
 /*
  * Functions declared in fps_print.c
