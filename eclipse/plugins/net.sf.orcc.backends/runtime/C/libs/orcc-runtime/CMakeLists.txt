@@ -12,14 +12,8 @@ set(orcc_runtime_sources
     include/types.h
 )
 
-# Build library without any external library required (SDL, pthread, etc)
-if(NO_EXTERNAL_DEPENDENCIES)
-
-    add_library(orcc-runtime STATIC ${orcc_runtime_sources})
-    target_link_libraries(orcc-runtime orcc-native ${extra_libraries})
-
-# Build library with all features (require external libraries)
-else()
+# Build library with all features (require thread, etc)
+if(NOT NO_EXTERNAL_DEPENDENCIES)
 
     file(GLOB orcc_runtime_headers
         include/*.h
@@ -46,14 +40,14 @@ else()
         message(STATUS "Cannot find Metis")
     endif()
 
-    include_directories(${extra_includes})
-    add_definitions(${extra_definitions})
-    # Compile libraries
-    add_library(orcc-runtime STATIC ${orcc_runtime_sources} ${orcc_runtime_headers})
-    # Do the linking
-    target_link_libraries(orcc-runtime orcc-native ${extra_libraries})
-
 endif()
+
+include_directories(${extra_includes})
+add_definitions(${extra_definitions})
+# Compile libraries
+add_library(orcc-runtime STATIC ${orcc_runtime_sources} ${orcc_runtime_headers})
+# Do the linking
+target_link_libraries(orcc-runtime orcc-native ${extra_libraries})
 
 install(TARGETS orcc-runtime
     ARCHIVE DESTINATION lib

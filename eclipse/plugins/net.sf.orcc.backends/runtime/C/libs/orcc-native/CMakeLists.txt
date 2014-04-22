@@ -6,13 +6,8 @@ set(orcc_native_sources
     src/writer.c
 )
 
-# Build library without any external library required (SDL, pthread, etc)
-if(NO_EXTERNAL_DEPENDENCIES)
-
-    add_library(orcc-native STATIC ${orcc_native_sources})
-
-# Build library with all features (require external libraries)
-else()
+# Build library with all features (require SDL)
+if(NOT NO_EXTERNAL_DEPENDENCIES)
 
     file(GLOB orcc_native_headers
         include/*.h
@@ -80,13 +75,12 @@ else()
         endif()
     endif()
 
-    include_directories(${extra_includes})
-    add_definitions(${extra_definitions})
-    # Compile libraries
-    add_library(orcc-native STATIC ${orcc_native_sources} ${orcc_native_headers})
-
 endif()
 
+include_directories(${extra_includes})
+add_definitions(${extra_definitions})
+# Compile libraries
+add_library(orcc-native STATIC ${orcc_native_sources} ${orcc_native_headers})
 # Do the linking
 target_link_libraries(orcc-native orcc-runtime ${extra_libraries})
 
