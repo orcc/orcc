@@ -1,4 +1,7 @@
 #!/bin/sh
+# Remove 'import' statement in all cal files in the given folder
+# Update old initializer list Statements to their new form
+# This script is kept for history, but should not be used
 if [ $# -ne 1 ]; then
   echo "$0 <path with .cal files>"
   exit 1

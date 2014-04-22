@@ -1,4 +1,7 @@
 #!/bin/sh
+# In cal files found in the given folder, replace usage of some builtin functions
+# by their equivalent in CAL operators
+# This script is kept for history, but should not be used
 if [ $# -ne 1 ]; then
   echo "$0 <path with .cal files>"
   exit 1

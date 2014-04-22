@@ -1,6 +1,18 @@
 #!/bin/sh
+# Will execute fromdos command on files in the given folder,
+# to replace CR+LF line endings (windows) by LF (linux / macos)
+# Only some interesting files types will be updated, see below
 
-ORCCDIR="$( cd "$( dirname "$0" )/../.." && pwd )"
+if [ $# -ne 1 ]; then
+  echo "$0 <path with .cal files>"
+  exit 1
+fi
+
+path=$1
+if [ ! -e $path ] || [ ! -d $path ]; then
+  echo "path must exist and be a directory"
+  exit 1
+fi
 
 find ${ORCCDIR} -name "*.java" -exec "fromdos" {} ";"
 find ${ORCCDIR} -name "*.xtend" -exec "fromdos" {} ";"
