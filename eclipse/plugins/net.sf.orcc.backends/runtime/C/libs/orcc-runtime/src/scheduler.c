@@ -34,6 +34,7 @@
 #include "dataflow.h"
 #include "mapping.h"
 #include "cycle.h"
+#include "options.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduling functions
@@ -334,3 +335,34 @@ void *scheduler_routine(void *data) {
     }
 }
 
+void launcher(options_t *opt, network_t *network) {
+    int i;
+    mapping_t *mapping = map_actors(network);
+    int nb_threads = opt->nb_processors;
+
+    cpu_set_t cpuset;
+    orcc_thread_t threads[MAX_THREAD_NB];
+    orcc_thread_id_t threads_id[MAX_THREAD_NB];
+    orcc_thread_t thread_agent;
+    orcc_thread_id_t thread_agent_id;
+    sync_t sync;
+
+    global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, &sync);
+    agent_t *agent = agent_init(&sync, opt, scheduler, network, nb_threads);
+    sync_init(&sync);
+
+    global_scheduler_init(scheduler, mapping, opt);
+
+    orcc_clear_cpu_set(cpuset);
+
+    for(i=0 ; i < nb_threads; i++){
+        orcc_thread_create(threads[i], scheduler_routine, *scheduler->schedulers[i], threads_id[i]);
+        orcc_set_thread_affinity(cpuset, i, threads[i]);
+    }
+    orcc_thread_create(thread_agent, agent_routine, *agent, thread_agent_id);
+
+    for(i=0 ; i < nb_threads; i++){
+        orcc_thread_join(threads[i]);
+    }
+    orcc_thread_join(thread_agent);
+}

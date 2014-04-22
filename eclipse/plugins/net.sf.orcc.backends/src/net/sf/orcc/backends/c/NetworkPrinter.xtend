@@ -124,25 +124,13 @@ class NetworkPrinter extends CTemplate {
 		#include <stdlib.h>
 		«printAdditionalIncludes»
 
-		#ifndef _WIN32
-		#define __USE_GNU
-		#endif
-
 		#include "types.h"
 		#include "fifo.h"
-		#include "scheduler.h"
-		#include "mapping.h"
 		#include "util.h"
 		#include "dataflow.h"
-
 		#include "serialize.h"
 		#include "options.h"
-
-		#include "thread.h"
-		#define MAX_THREAD_NB 10
-		«IF newSchedul»
-			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
-		«ENDIF»
+		#include "scheduler.h"
 
 		#define SIZE «fifoSize»
 
@@ -217,11 +205,6 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Declaration of the network
 		network_t network = {"«network.name»", actors, connections, «network.allActors.size», «network.connections.size»};
-
-		/////////////////////////////////////////////////
-		// Initializer and launcher
-		
-		«printLauncher»
 		
 		/////////////////////////////////////////////////
 		// Actions to do when exting properly
@@ -242,43 +225,9 @@ class NetworkPrinter extends CTemplate {
 			atexit(atexit_actions);
 			set_scheduling_strategy(«IF !newSchedul»"RR"«ELSEIF ringTopology»"DDR"«ELSE»"DDF"«ENDIF», opt);
 			
-			launcher(opt);
+			launcher(opt, &network);
 			«afterMain»
 			return compareErrors;
-		}
-	'''
-
-	def protected printLauncher() '''
-		static void launcher(options_t *opt) {
-			int i;
-			mapping_t *mapping = map_actors(&network);
-			int nb_threads = opt->nb_processors;
-			
-			cpu_set_t cpuset;
-			orcc_thread_t threads[MAX_THREAD_NB];
-			orcc_thread_id_t threads_id[MAX_THREAD_NB];
-			orcc_thread_t thread_agent;
-			orcc_thread_id_t thread_agent_id;
-			sync_t sync;
-			
-			global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, &sync);
-			agent_t *agent = agent_init(&sync, opt, scheduler, &network, nb_threads);
-			sync_init(&sync);
-			
-			global_scheduler_init(scheduler, mapping, opt);
-			
-			orcc_clear_cpu_set(cpuset);
-			
-			for(i=0 ; i < nb_threads; i++){
-				orcc_thread_create(threads[i], scheduler_routine, *scheduler->schedulers[i], threads_id[i]);
-				orcc_set_thread_affinity(cpuset, i, threads[i]);
-			}
-			orcc_thread_create(thread_agent, agent_routine, *agent, thread_agent_id);
-			
-			for(i=0 ; i < nb_threads; i++){
-				orcc_thread_join(threads[i]);
-			}
-			orcc_thread_join(thread_agent);
 		}
 	'''
 	

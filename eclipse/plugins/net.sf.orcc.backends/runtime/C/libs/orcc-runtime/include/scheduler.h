@@ -148,4 +148,6 @@ void sched_add_mesh_waiting_list(local_scheduler_t *sched);
 
 void *scheduler_routine(void *data);
 
+void launcher(options_t *opt, network_t *network);
+
 #endif  /* _ORCC_SCHEDULER_H_ */

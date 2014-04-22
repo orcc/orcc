@@ -31,6 +31,12 @@
 
 #include "orcc.h"
 
+#ifndef _WIN32
+#define __USE_GNU
+#endif
+
+#define MAX_THREAD_NB 10
+
 #ifdef _WIN32
 	// ok here is some dark Windows magic
 	// we must define WIN32_LEAN_AND_MEAN here so that windows.h will NOT include winsock.h
@@ -106,7 +112,6 @@
     #define orcc_semaphore_t semaphore_t
 
 #else
-
     #include <sched.h>
     #include <semaphore.h>
 
