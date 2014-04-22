@@ -242,10 +242,11 @@ class NetworkPrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
-			 «beforeMain»
+			«beforeMain»
 			
 			options_t *opt = init_orcc(argc, argv);
 			atexit(atexit_actions);
+			set_scheduling_strategy(«IF !newSchedul»"RR"«ELSEIF ringTopology»"DDR"«ELSE»"DDF"«ENDIF», opt);
 			
 			launcher(opt);
 			«afterMain»
@@ -314,7 +315,7 @@ class NetworkPrinter extends CTemplate {
 			sched_init_actors(sched, &si);
 			
 			while (1) {
-				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
+				my_actor = sched_get_next_schedulable(sched);
 				if(my_actor != NULL){
 					tick_in = getticks();
 					si.num_firings = 0;

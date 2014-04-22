@@ -43,6 +43,7 @@ struct local_scheduler_s {
 	int id; /** Unique ID of this scheduler */
     int nb_schedulers;
     options_t *opt;
+    schedstrategy_et strategy; /** Scheduling strategy */
 
 	/* Round robin */
 	int num_actors; /** number of actors managed by this scheduler */
@@ -107,11 +108,24 @@ void sched_init_actors(local_scheduler_t *sched, schedinfo_t *si);
  */
 void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology);
 
+
+/**
+ * Returns the next schedulable actor.
+ */
+actor_t *sched_get_next_schedulable(local_scheduler_t *sched);
+
 /**
  * Returns the next actor in actors list.
  * This method is used by the round-robin scheduler.
  */
-actor_t *sched_get_next(local_scheduler_t *sched);
+actor_t *sched_get_next_rr(local_scheduler_t *sched);
+
+/**
+ * Returns the next schedulable actor, or NULL if no actor is schedulable.
+ * The actor is removed from the schedulable list.
+ * This method is used by the data/demand driven scheduler.
+ */
+actor_t *sched_get_next_ddd(local_scheduler_t *sched);
 
 /**
  * Add the actor to the schedulable or waiting list.
@@ -131,12 +145,5 @@ void sched_add_ring_waiting_list(local_scheduler_t *sched);
  * This function use mesh topology of communications.
  */
 void sched_add_mesh_waiting_list(local_scheduler_t *sched);
-
-/**
- * Returns the next schedulable actor, or NULL if no actor is schedulable.
- * The actor is removed from the schedulable list.
- * This method is used by the data/demand driven scheduler.
- */
-actor_t *sched_get_next_schedulable(local_scheduler_t *sched, int use_ring_topology);
 
 #endif  /* _ORCC_SCHEDULER_H_ */

@@ -89,6 +89,14 @@ typedef enum {
     ORCC_VL_VERBOSE_2
 } verbose_level_et;
 
+/* Scheduling strategy codes */
+typedef enum {
+    ORCC_SS_ROUND_ROBIN,
+    ORCC_SS_RING_DD_DRIVEN, /* data-driven & demand-driven with ring-connected topology */
+    ORCC_SS_FULL_DD_DRIVEN, /* data-driven & demand-driven with full-connected topology */
+    ORCC_SS_SIZE /* only used for string tab declaration */
+} schedstrategy_et;
+
 /* Mapping strategy codes */
 typedef enum {
 #ifdef METIS_ENABLE

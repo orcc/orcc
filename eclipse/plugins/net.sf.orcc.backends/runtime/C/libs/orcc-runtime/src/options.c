@@ -120,6 +120,23 @@ void set_mapping_strategy(char *arg_value, options_t *opt) {
     }
 }
 
+void set_scheduling_strategy(char *arg_value, options_t *opt) {
+    assert(arg_value != NULL);
+    assert(opt != NULL);
+
+    if (strcmp(arg_value, "RR") == 0) {
+        opt->sched_strategy = ORCC_SS_ROUND_ROBIN;
+    } else if (strcmp(arg_value, "DDF") == 0) {
+        opt->sched_strategy = ORCC_SS_FULL_DD_DRIVEN;
+    } else if (strcmp(arg_value, "DDR") == 0) {
+        opt->sched_strategy = ORCC_MS_METIS_KWAY_CV;
+    } else {
+        print_orcc_error(ORCC_ERR_BAD_ARGS_MS);
+        printf("\n");
+        exit(ORCC_ERR_BAD_ARGS_MS);
+    }
+}
+
 void set_verbose_level(char *arg_value, options_t *opt) {
     int trace_level = 0;
     assert(opt != NULL);

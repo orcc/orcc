@@ -33,7 +33,7 @@
 #include "orcc.h"
 
 /*
- * Options for mapping
+ * Options of the application runtime
  */
 struct options_s
 {
@@ -45,6 +45,9 @@ struct options_s
     int nbLoops;                         // (Deprecated) Number of times the input file is read
     int nbFrames;                        // Number of frames to display before closing application
     char *yuv_file;                      // Reference YUV file
+
+    /* Actor scheduling */
+    schedstrategy_et sched_strategy;     // Strategy for the actor scheduling
 
     /* Actor mapping */
     char *mapping_input_file;            // Predefined mapping configuration

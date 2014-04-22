@@ -172,11 +172,20 @@ void sched_reinit_actors(local_scheduler_t *sched, schedinfo_t *si) {
 // Scheduling list
 ///////////////////////////////////////////////////////////////////////////////
 
+
+actor_t *sched_get_next_schedulable(local_scheduler_t *sched) {
+    if(sched->strategy == ORCC_SS_ROUND_ROBIN) {
+        return sched_get_next_rr(sched);
+    } else {
+        return sched_get_next_ddd(sched);
+    }
+}
+
 /**
  * Returns the next actor in actors list.
  * This method is used by the round-robin scheduler.
  */
-actor_t *sched_get_next(local_scheduler_t *sched) {
+actor_t *sched_get_next_rr(local_scheduler_t *sched) {
     actor_t *actor;
 	if (sched->num_actors == 0) {
 		return NULL;
@@ -187,6 +196,32 @@ actor_t *sched_get_next(local_scheduler_t *sched) {
 		sched->rr_next_schedulable = 0;
 	}
 	return actor;
+}
+
+/**
+ * Returns the next schedulable actor, or NULL if no actor is schedulable.
+ * The actor is removed from the schedulable list.
+ * This method is used by the data/demand driven scheduler.
+ */
+actor_t *sched_get_next_ddd(local_scheduler_t *sched) {
+    actor_t *actor;
+    // check if other schedulers sent some schedulable actors
+    sched->strategy == ORCC_SS_RING_DD_DRIVEN ?
+                sched_add_ring_waiting_list(sched)
+              : sched_add_mesh_waiting_list(sched);
+    if (sched->ddd_next_schedulable == sched->ddd_next_entry) {
+        // static actors list is used when schedulable list is empty
+        actor = sched_get_next_rr(sched);
+        sched->round_robin = 1;
+    } else {
+        actor = sched->schedulable[sched->ddd_next_schedulable % MAX_ACTORS];
+        // actor is not a member of the list anymore
+        actor->in_list = 0;
+        sched->ddd_next_schedulable++;
+        sched->round_robin = 0;
+    }
+
+    return actor;
 }
 
 /**
@@ -203,9 +238,9 @@ void sched_add_schedulable(local_scheduler_t *sched, actor_t *actor, int use_rin
 			sched->ddd_next_entry++;
 		} else if (!actor->in_waiting) {
 			// this actor isn't launch by this scheduler so it is sent to the next one
-            waiting_t *send =
-					use_ring_topology ? sched->ring_sending_schedulable
-							: actor->sched->mesh_waiting_schedulable[sched->id];
+            waiting_t *send = sched->strategy ==
+                    use_ring_topology ? sched->ring_sending_schedulable
+                            : actor->sched->mesh_waiting_schedulable[sched->id];
 			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
 			actor->in_waiting = 1;
 			send->next_entry++;
@@ -258,27 +293,4 @@ void sched_add_mesh_waiting_list(local_scheduler_t *sched) {
 	}
 }
 
-/**
- * Returns the next schedulable actor, or NULL if no actor is schedulable.
- * The actor is removed from the schedulable list.
- * This method is used by the data/demand driven scheduler.
- */
-actor_t *sched_get_next_schedulable(local_scheduler_t *sched, int use_ring_topology) {
-    actor_t *actor;
-	// check if other schedulers sent some schedulable actors
-	use_ring_topology ? sched_add_ring_waiting_list(sched)
-			: sched_add_mesh_waiting_list(sched);
-	if (sched->ddd_next_schedulable == sched->ddd_next_entry) {
-		// static actors list is used when schedulable list is empty
-		actor = sched_get_next(sched);
-		sched->round_robin = 1;
-	} else {
-		actor = sched->schedulable[sched->ddd_next_schedulable % MAX_ACTORS];
-		// actor is not a member of the list anymore
-		actor->in_list = 0;
-		sched->ddd_next_schedulable++;
-		sched->round_robin = 0;
-	}
 
-	return actor;
-}
