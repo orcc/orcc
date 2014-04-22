@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- From orcc_src : ant -f orcc/contrib/scripts/javadoc.xml -Declipse.dir=/opt/eclipse-juno -Dplugins.dir=autobuild/build.dir.testing/plugins -Ddest.dir=javadoc -->
+<!-- From orcc_src : ant -f orcc/contrib/scripts/javadoc.xml -Declipse.dir=/opt/eclipse -Dplugins.dir=autobuild/build.dir.testing/plugins -Ddest.dir=javadoc -->
 
 <project default="javadoc">
 	<!-- This ant build file use "ant-contrib" library. See http://ant-contrib.sourceforge.net/
