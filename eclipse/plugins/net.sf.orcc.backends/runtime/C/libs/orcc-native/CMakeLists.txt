@@ -4,6 +4,8 @@ set(orcc_native_sources
     src/access_file.c
     src/source.c
     src/writer.c
+    src/native.c
+    include/native.h
 )
 
 # Build library with all features (require SDL)

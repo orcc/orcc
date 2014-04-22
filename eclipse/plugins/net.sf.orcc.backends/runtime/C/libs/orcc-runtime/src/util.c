@@ -38,6 +38,7 @@
 #include "util.h"
 #include "options.h"
 #include "trace.h"
+#include "native.h"
 
 extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
@@ -116,12 +117,7 @@ options_t* init_orcc(int argc, char *argv[]) {
 #ifdef _MSC_VER
     atexit(&pause);
 #endif
-#ifdef OPENHEVC_ENABLE
-	openhevc_init_context();
-#endif
-#if defined (SSE_ENABLE) && defined (__SSE2__)
-	sse_init_context();
-#endif // SSE_ENABLE
+    init_native_context();
 
 	while ((c = getopt(argc, argv, ostr)) != -1) {
 		switch (c) {
