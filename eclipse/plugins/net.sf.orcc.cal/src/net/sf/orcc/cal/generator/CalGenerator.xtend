@@ -77,9 +77,8 @@ class CalGenerator implements IGenerator {
 	private val actorTransformer = new ActorTransformer
 	private val unitTransformer = new UnitTransformer
 
-	// Will contain the list of resources built in the current session
-	private val HashSet<Resource> builtResources = newHashSet
-	// Will contain a list of resources already loaded in Frontend in the current session
+	// Will contain the list of resources known by Frontend (it has mapping
+	// for these resources)
 	private val HashSet<Resource> loadedResources = newHashSet
 
 	private var IProject currentProject
@@ -101,7 +100,6 @@ class CalGenerator implements IGenerator {
 	 */
 	def beforeBuild(IProject project, ResourceSet rs) {
 		currentProject = project
-		builtResources.clear
 		loadedResources.clear
 
 		calResourceSet = rs
@@ -126,21 +124,18 @@ class CalGenerator implements IGenerator {
 		// that, because if this resource is kept in derived list in BuilderParticipant, the IR corresponding
 		// to this resource will be deleted. This bug is relatively difficult to understand.
 		// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=433199 for more information
-		if(builtResources.contains(calResource)) {
+		if(loadedResources.contains(calResource)) {
 			fsa.generateFile(irSubPath, (fsa as AbstractFileSystemAccess2).readTextFile(irSubPath))
 			return
 		}
 
-		val astEntity = calResource.entity
-		// Build a list of resources we need to have registered in frontend
+		// Build a list of resources we need to have registered in Frontend
 		// before doing the serialization
-		val toImport = astEntity.importedResource.filter[
-			!(builtResources.contains(it) || loadedResources.contains(it))
-		]
+		val toImport = calResource.entity.importedResource.filter[!loadedResources.contains(it)]
 
 		for(importedResource : toImport) {
 			// The imported resource is in the same project. We need to transform
-			// and serialize it before the given calResource
+			// and serialize it BEFORE the calResource
 			if(importedResource.isInSameProject(calResource)) {
 				importedResource.doGenerate(fsa)
 			}
@@ -156,7 +151,7 @@ class CalGenerator implements IGenerator {
 		fsa.generateFile(irSubPath, calResource.serialize)
 
 		// Ensure we will not do it again in the same session
-		builtResources.add(calResource)
+		loadedResources.add(calResource)
 	}
 
 	/**
@@ -214,7 +209,6 @@ class CalGenerator implements IGenerator {
 			val procedure = unit.getProcedure(astProcedure.name)
 			Frontend::instance.putMapping(astProcedure, procedure)
 		}
-
 		loadedResources.add(calResource)
 	}
 
@@ -289,7 +283,6 @@ class CalGenerator implements IGenerator {
 		// We need to flush all Caches, because it can explode the memory consumption...
 		CacheManager.instance.unloadAllCaches();
 		// The current build session ends, reset the sets
-		builtResources.clear
 		loadedResources.clear
 	}
 }
