@@ -129,7 +129,7 @@ void set_scheduling_strategy(char *arg_value, options_t *opt) {
     } else if (strcmp(arg_value, "DDF") == 0) {
         opt->sched_strategy = ORCC_SS_FULL_DD_DRIVEN;
     } else if (strcmp(arg_value, "DDR") == 0) {
-        opt->sched_strategy = ORCC_MS_METIS_KWAY_CV;
+        opt->sched_strategy = ORCC_SS_RING_DD_DRIVEN;
     } else {
         print_orcc_error(ORCC_ERR_BAD_ARGS_MS);
         printf("\n");
