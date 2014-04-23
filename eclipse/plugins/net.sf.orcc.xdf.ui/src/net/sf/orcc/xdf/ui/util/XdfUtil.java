@@ -334,7 +334,7 @@ public class XdfUtil {
 	 * 
 	 * @param fp
 	 *            The current FeatureProvider instance
-	 * @param cc
+	 * @param c
 	 *            A connection pictogram (FreeFormConnection or any other class
 	 *            derived from Connection)
 	 */

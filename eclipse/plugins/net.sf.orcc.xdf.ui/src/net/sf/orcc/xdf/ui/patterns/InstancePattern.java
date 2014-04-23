@@ -656,11 +656,17 @@ public class InstancePattern extends AbstractPattern {
 			}
 		}
 
-		// Specific case. If a port has been renamed, any existing connection
-		// from/to this port became invalid. The DF connection linked to the
-		// graphiti FreeFormConnection is not contained in the current network,
-		// since the proxy URI used contains port names. In that case, we must
-		// check invalid connections in the current network to delete them.
+		// Specific case: if this method is executed by update() after a port
+		// renaming outside the diagram editor, the previous block has not
+		// completely deleted invalid connections.
+		// The linked net.sf.orcc.sf.Connection has an URI relative to its
+		// container (Actor or Network). This URI uses the source / target port
+		// name. But at this point, the port name doesn't exists anymore. The
+		// businessObject linked from diagram connection pictogram became a
+		// proxy when the old port has been removed from the diagram.
+		// To completely delete invalid connections from the network, we must
+		// check for invalid objects in source port or target port of each
+		// connection.
 		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
 		final List<net.sf.orcc.df.Connection> connectionsCopy = new ArrayList<net.sf.orcc.df.Connection>(
 				network.getConnections());
