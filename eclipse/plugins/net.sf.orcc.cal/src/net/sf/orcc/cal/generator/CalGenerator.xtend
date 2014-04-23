@@ -49,6 +49,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.xtext.generator.IFileSystemAccess
 import org.eclipse.xtext.generator.IGenerator
+import org.eclipse.xtext.generator.AbstractFileSystemAccess2
 
 /**
  * Generates code from your model files on save.
@@ -121,17 +122,14 @@ class CalGenerator implements IGenerator {
 
 		val irSubPath = calResource.irRelativePath
 
-		val irUri = OrccUtil::getIrUri(calResource.URI)
-
-		var irResource =
-			if(builtResources.contains(calResource)) {
-				builtResources.remove(calResource)
-				val result = irResourceSet.getResource(irUri, true)
-				result.contents.clear
-				result // return the Resource to store in 'irResource' value
-			} else {
-				irResourceSet.createResource(irUri)
-			}
+		// In some very specific cases, a single resource is built twice or more. We can't simply ignore
+		// that, because if this resource is kept in derived list in BuilderParticipant, the IR corresponding
+		// to this resource will be deleted. This bug is relatively difficult to understand.
+		// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=433199 for more information
+		if(builtResources.contains(calResource)) {
+			fsa.generateFile(irSubPath, (fsa as AbstractFileSystemAccess2).readTextFile(irSubPath))
+			return
+		}
 
 		val astEntity = calResource.entity
 		// Build a list of resources we need to have registered in frontend
@@ -155,7 +153,7 @@ class CalGenerator implements IGenerator {
 		}
 
 		// Write in the IR file the content of the transformed AstEntity
-		fsa.generateFile(irSubPath, calResource.entity.serialize(irResource))
+		fsa.generateFile(irSubPath, calResource.serialize)
 
 		// Ensure we will not do it again in the same session
 		builtResources.add(calResource)
@@ -164,7 +162,8 @@ class CalGenerator implements IGenerator {
 	/**
 	 * Returns a EMF serialized version of the given AstEntity
 	 */
-	private def serialize(AstEntity astEntity, Resource irResource) {
+	private def serialize(Resource calResource) {
+		val astEntity = calResource.entity
 		// Transform the AstEntity into an Actor or a Unit
 		val entity =
 			if (astEntity.unit != null) {
@@ -181,6 +180,7 @@ class CalGenerator implements IGenerator {
 			return ""
 		}
 
+		val irResource = irResourceSet.createResource(OrccUtil::getIrUri(calResource.URI))
 		// Associate the current entity to its resource
 		irResource.contents.add(entity)
 
@@ -195,10 +195,10 @@ class CalGenerator implements IGenerator {
 	/**
 	 * Load content from the given AstEntity (unit) resource into the Frontend
 	 */
-	private def loadMappings(Resource resource) {
-		val irResource = irResourceSet.getResource(OrccUtil::getIrUri(resource.URI), true)
+	private def loadMappings(Resource calResource) {
+		val irResource = irResourceSet.getResource(OrccUtil::getIrUri(calResource.URI), true)
 		val unit = irResource.contents.head as Unit
-		val astUnit = resource.entity.unit
+		val astUnit = calResource.entity.unit
 
 		for(astConstant : astUnit.variables) {
 			val irConstant = unit.getConstant(astConstant.name)
@@ -215,7 +215,7 @@ class CalGenerator implements IGenerator {
 			Frontend::instance.putMapping(astProcedure, procedure)
 		}
 
-		loadedResources.add(resource)
+		loadedResources.add(calResource)
 	}
 
 	/**
