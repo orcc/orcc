@@ -309,8 +309,8 @@ public class XdfUtil {
 
 	/**
 	 * If the given AnchorContainer has graphiti connections from / to itself,
-	 * this method delete all these connections as well the business
-	 * df.Connections linked
+	 * this method delete all these connections as well the business objects
+	 * (net.sf.orcc.df.Connection) linked
 	 * 
 	 * @param fp
 	 *            The current FeatureProvider instance
@@ -320,16 +320,36 @@ public class XdfUtil {
 	 */
 	public static void deleteConnections(final IFeatureProvider fp,
 			final AnchorContainer ac) {
+		// Make a copy of all connections, because we will delete them entirely
 		final List<org.eclipse.graphiti.mm.pictograms.Connection> connections = Graphiti
 				.getPeService().getAllConnections(ac);
 		for (final org.eclipse.graphiti.mm.pictograms.Connection connection : connections) {
-			final DeleteContext delCtxt = new DeleteContext(connection);
-			delCtxt.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
-
-			final IDeleteFeature delFeature = fp.getDeleteFeature(delCtxt);
-			if (delFeature.canDelete(delCtxt)) {
-				delFeature.delete(delCtxt);
-			}
+			deleteConnection(fp, connection);
 		}
+	}
+
+	/**
+	 * Delete the given connection as well its net.sf.orcc.df.Connection linked
+	 * (its business object)
+	 * 
+	 * @param fp
+	 *            The current FeatureProvider instance
+	 * @param cc
+	 *            A connection pictogram (FreeFormConnection or any other class
+	 *            derived from Connection)
+	 */
+	public static boolean deleteConnection(final IFeatureProvider fp,
+			final org.eclipse.graphiti.mm.pictograms.Connection c) {
+		// Initialize the delete context
+		final DeleteContext delCtxt = new DeleteContext(c);
+		delCtxt.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
+
+		// Silently execute deletion (user will not be asked before deletion)
+		final IDeleteFeature delFeature = fp.getDeleteFeature(delCtxt);
+		if (delFeature.canDelete(delCtxt)) {
+			delFeature.delete(delCtxt);
+			return true;
+		}
+		return false;
 	}
 }

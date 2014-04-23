@@ -623,7 +623,7 @@ public class InstancePattern extends AbstractPattern {
 		}
 
 		// Restore connections start or end from port name they were
-		// connected to
+		// connected to.
 		int cptReconnectedTo = 0, cptReconnectedFrom = 0;
 		for (final Anchor anchor : instanceShape.getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
@@ -646,12 +646,12 @@ public class InstancePattern extends AbstractPattern {
 		// target anchor.
 		int cptDeletedConnections = 0;
 		for (final Connection connection : incomingMap.values()) {
-			Graphiti.getPeService().deletePictogramElement(connection);
+			XdfUtil.deleteConnection(getFeatureProvider(), connection);
 			cptDeletedConnections++;
 		}
 		for (final Iterable<Connection> connectionList : outgoingMap.values()) {
 			for (final Connection connection : connectionList) {
-				Graphiti.getPeService().deletePictogramElement(connection);
+				XdfUtil.deleteConnection(getFeatureProvider(), connection);
 				cptDeletedConnections++;
 			}
 		}
