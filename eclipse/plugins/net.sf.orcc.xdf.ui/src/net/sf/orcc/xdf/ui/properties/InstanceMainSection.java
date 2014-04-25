@@ -100,10 +100,10 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 
 		if (widget == instanceName) {
 			final InstancePattern pattern = getPattern(
-					getSelectedPictogramElement(),
-					InstancePattern.class);
+					getSelectedPictogramElement(), InstancePattern.class);
 			if (pattern != null) {
-				return pattern.checkValueValid(instanceName.getText(), null);
+				return pattern.checkValueValid(instanceName.getText(),
+						(Instance) getSelectedBusinessObject());
 			}
 		}
 

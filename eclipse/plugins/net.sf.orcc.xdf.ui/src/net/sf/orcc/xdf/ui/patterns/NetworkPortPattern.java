@@ -146,6 +146,12 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	@Override
 	public String checkValueValid(String value, IDirectEditingContext context) {
+		final Port port = (Port) getBusinessObjectForPictogramElement(context
+				.getPictogramElement());
+		return checkValueValid(value, port);
+	}
+
+	public String checkValueValid(final String value, final Port port) {
 		if (value.length() < 1) {
 			return "Please enter a text to name the Port.";
 		}
@@ -153,18 +159,14 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 			return "Port name must start with a letter, and contains only alphanumeric characters";
 		}
 		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
-		final Object currentVertex = getBusinessObjectForPictogramElement(context
-				.getPictogramElement());
 		for (final Vertex vertex : network.getVertices()) {
-			if (!vertex.equals(currentVertex)
-					&& vertex.getLabel().equals(value)) {
+			if (!vertex.equals(port) && vertex.getLabel().equals(value)) {
 				final String vertexType = vertex instanceof Instance ? "an instance"
 						: "a port";
 				return "The network already contains a vertex of the same name ("
 						+ vertexType + ")";
 			}
 		}
-
 		// null -> value is valid
 		return null;
 	}

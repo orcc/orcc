@@ -192,6 +192,12 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public String checkValueValid(String value, IDirectEditingContext context) {
+		final Instance instance = (Instance) getBusinessObjectForPictogramElement(context
+				.getPictogramElement());
+		return checkValueValid(value, instance);
+	}
+
+	public String checkValueValid(final String value, final Instance instance) {
 		if (value.length() < 1) {
 			return "Please enter a text to name the Instance.";
 		}
@@ -199,11 +205,8 @@ public class InstancePattern extends AbstractPattern {
 			return "Instance name must start with a letter, and contains only alphanumeric characters";
 		}
 		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
-		final Object currentVertex = getBusinessObjectForPictogramElement(context
-				.getPictogramElement());
 		for (final Vertex vertex : network.getVertices()) {
-			if (!vertex.equals(currentVertex)
-					&& vertex.getLabel().equals(value)) {
+			if (!vertex.equals(instance) && vertex.getLabel().equals(value)) {
 				final String vertexType = vertex instanceof Instance ? "an instance"
 						: "a port";
 				return "The network already contains a vertex of the same name ("

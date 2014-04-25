@@ -89,7 +89,8 @@ public class PortMainSection extends AbstractGridBasedSection {
 			final NetworkPortPattern pattern = getPattern(
 					getSelectedPictogramElement(), NetworkPortPattern.class);
 			if (pattern != null) {
-				return pattern.checkValueValid(portName.getText(), null);
+				return pattern.checkValueValid(portName.getText(),
+						(Port) getSelectedBusinessObject());
 			}
 		} else if (widget == portType) {
 			final Type type = calParser.parseType(portType.getText());
