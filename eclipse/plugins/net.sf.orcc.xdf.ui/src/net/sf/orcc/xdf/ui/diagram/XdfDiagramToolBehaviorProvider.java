@@ -94,11 +94,7 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 
 	@Override
 	public ICustomFeature getDoubleClickFeature(IDoubleClickContext context) {
-		final ICustomFeature dblClickFeature = new InstanceDblClickFeature(getFeatureProvider());
-		if (dblClickFeature.canExecute(context)) {
-			return dblClickFeature;
-		}
-		return super.getDoubleClickFeature(context);
+		return new InstanceDblClickFeature(getFeatureProvider());
 	}
 
 	@Override
