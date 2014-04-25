@@ -30,12 +30,12 @@ package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ui.editor.PartialCalParser;
+import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
@@ -66,7 +66,7 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	private EObject businessObject;
 	private Network currentNetwork;
 	private PictogramElement pictogramElement;
-	private IFeatureProviderWithPatterns featureProvider;
+	private XdfDiagramFeatureProvider featureProvider;
 
 	protected Composite formBody;
 
@@ -100,7 +100,8 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 		pictogramElement = getSelectedPictogramElement();
 		businessObject = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
 		currentNetwork = (Network) Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getDiagram());
-		featureProvider = (IFeatureProviderWithPatterns) getDiagramTypeProvider().getFeatureProvider();
+		featureProvider = (XdfDiagramFeatureProvider) getDiagramTypeProvider()
+				.getFeatureProvider();
 	}
 
 	//=============
@@ -112,7 +113,8 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	protected Network getCurrentNetwork() {
 		return currentNetwork;
 	}
-	protected IFeatureProviderWithPatterns getFeatureProvider() {
+
+	protected XdfDiagramFeatureProvider getFeatureProvider() {
 		return featureProvider;
 	}
 	protected <T extends IPattern> T getPattern(final PictogramElement pe,

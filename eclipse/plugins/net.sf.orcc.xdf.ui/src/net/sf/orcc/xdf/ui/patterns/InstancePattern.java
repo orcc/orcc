@@ -188,6 +188,8 @@ public class InstancePattern extends AbstractPattern {
 		final PictogramElement pe = context.getPictogramElement();
 		final Instance obj = (Instance) getBusinessObjectForPictogramElement(pe);
 		obj.setName(value);
+
+		updatePictogramElement(pe);
 	}
 
 	@Override
@@ -409,7 +411,7 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean canUpdate(IUpdateContext context) {
-		return PropsUtil.isInstance(context.getPictogramElement());
+		return isPatternRoot(context.getPictogramElement());
 	}
 
 	@Override

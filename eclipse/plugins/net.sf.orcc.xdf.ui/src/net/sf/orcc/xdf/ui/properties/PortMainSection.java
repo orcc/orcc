@@ -34,6 +34,7 @@ import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.ui.editor.PartialCalParser;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
+import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -108,6 +109,9 @@ public class PortMainSection extends AbstractGridBasedSection {
 
 		if (widget == portName) {
 			port.setName(portName.getText());
+			final UpdateContext context = new UpdateContext(
+					getSelectedPictogramElement());
+			getFeatureProvider().updateIfPossible(context);
 		} else if (widget == portType) {
 			final Type type = calParser.parseType(portType.getText());
 			if (type != null) {

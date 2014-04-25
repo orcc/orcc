@@ -177,12 +177,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		final Port port = (Port) getBusinessObjectForPictogramElement(pe);
 		port.setName(value);
 
-		// layout(pe) and update(pe) can only be called with the root element.
-		// This method can be used on the shape or on the text label. Before
-		// requesting an update, we need to get the root element
-		if (!isPatternRoot(pe)) {
-			pe = (PictogramElement) pe.eContainer();
-		}
+		updatePictogramElement(pe);
 	}
 
 	@Override

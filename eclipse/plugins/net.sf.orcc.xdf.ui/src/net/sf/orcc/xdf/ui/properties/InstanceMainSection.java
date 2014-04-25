@@ -31,6 +31,7 @@ package net.sf.orcc.xdf.ui.properties;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 
+import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -116,6 +117,9 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 
 		if (widget == instanceName) {
 			instance.setName(instanceName.getText());
+			final UpdateContext context = new UpdateContext(
+					getSelectedPictogramElement());
+			getFeatureProvider().updateIfPossible(context);
 		} else if (widget == refinementValue) {
 
 		} else if (widget == part_name) {
