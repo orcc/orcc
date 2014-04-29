@@ -48,6 +48,7 @@ import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
@@ -59,6 +60,7 @@ import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
+import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
@@ -76,7 +78,7 @@ import org.eclipse.ui.PlatformUI;
  * @author Antoine Lorence
  * 
  */
-public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
+public class GroupInstancesFeature extends AbstractCustomFeature {
 
 	private boolean hasDoneChanges;
 
@@ -98,11 +100,6 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 	@Override
 	public String getDescription() {
 		return "Create a new network containing selected elements, and replace them with a new instance refined on this network.";
-	}
-
-	@Override
-	protected String getJobName() {
-		return "Group Instances";
 	}
 
 	@Override
@@ -138,6 +135,11 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 	}
 
 	@Override
+	public void execute(ICustomContext context) {
+		beforeJobExecution();
+		execute(context, new NullProgressMonitor());
+	}
+
 	protected void beforeJobExecution() {
 		portNamesIndexes.clear();
 
@@ -163,7 +165,6 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 		newNetwork = wizard.getCreatedNetwork();
 	}
 
-	@Override
 	protected void execute(ICustomContext context,
 			IProgressMonitor parentMonitor) {
 

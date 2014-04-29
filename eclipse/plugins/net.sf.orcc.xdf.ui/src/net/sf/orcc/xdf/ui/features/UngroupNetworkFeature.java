@@ -45,6 +45,7 @@ import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -55,6 +56,7 @@ import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
+import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
@@ -66,7 +68,7 @@ import org.eclipse.graphiti.pattern.IPattern;
  * @author Antoine Lorence
  * 
  */
-public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
+public class UngroupNetworkFeature extends AbstractCustomFeature {
 
 	private boolean hasDoneChanges;
 
@@ -83,11 +85,6 @@ public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
 	@Override
 	public String getDescription() {
 		return "Replace this instance by the network content it is refined on.";
-	}
-
-	@Override
-	protected String getJobName() {
-		return "Ungroup Network";
 	}
 
 	@Override
@@ -124,6 +121,10 @@ public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
 	}
 
 	@Override
+	public void execute(ICustomContext context) {
+		execute(context, new NullProgressMonitor());
+	}
+
 	public void execute(ICustomContext context, IProgressMonitor parentMonitor) {
 		final PictogramElement instancePe = context.getPictogramElements()[0];
 		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instancePe);
@@ -288,5 +289,4 @@ public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
 	public boolean hasDoneChanges() {
 		return hasDoneChanges;
 	}
-
 }
