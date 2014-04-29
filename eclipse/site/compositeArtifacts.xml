@@ -4,8 +4,7 @@
   <properties size='1'>
     <property name='p2.timestamp' value='1292789185346'/>
   </properties>
-  <children size='2'>
-    <child location='http://graphiti-editor.sourceforge.net/eclipse/'/>
+  <children size='1'>
     <child location='http://orcc.sourceforge.net/eclipse/updates/'/>
   </children>
 </repository>
