@@ -117,8 +117,15 @@ public class XdfUtil {
 		// Compute the new network name
 		final String name = uri.trimFileExtension().lastSegment();
 
+		final String fileName;
+		if (uri.isPlatform()) {
+			fileName = uri.toPlatformString(true);
+		} else {
+			fileName = uri.toString();
+		}
+
 		// Create the network
-		final Network network = DfFactory.eINSTANCE.createNetwork();
+		final Network network = DfFactory.eINSTANCE.createNetwork(fileName);
 		network.setName(name);
 
 		// Create the resource
