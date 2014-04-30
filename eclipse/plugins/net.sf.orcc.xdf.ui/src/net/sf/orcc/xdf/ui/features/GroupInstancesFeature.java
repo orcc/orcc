@@ -438,7 +438,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		if (portNamesIndexes.containsKey(baseName)) {
 			final int index = portNamesIndexes.get(baseName) + 1;
 			portNamesIndexes.put(baseName, index);
-			return baseName + "_" + index;
+			return uniquePortName(baseName + "_" + index);
 		} else {
 			portNamesIndexes.put(baseName, 0);
 			return baseName;
