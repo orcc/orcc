@@ -114,8 +114,6 @@ public class XdfUtil {
 	 * @throws IOException
 	 */
 	public static Network createNetworkResource(final ResourceSet resourceSet, final URI uri) throws IOException {
-		// Compute the new network name
-		final String name = uri.trimFileExtension().lastSegment();
 
 		final String fileName;
 		if (uri.isPlatform()) {
@@ -126,12 +124,16 @@ public class XdfUtil {
 
 		// Create the network
 		final Network network = DfFactory.eINSTANCE.createNetwork(fileName);
-		network.setName(name);
+
+		// Compute the new network name
+		final Path networkPath = new Path(uri.trimFileExtension().path());
+		// 3 first segments are resource/<PROJECT>/src
+		network.setName(networkPath.removeFirstSegments(3).toString()
+				.replace('/', '.'));
 
 		// Create the resource
 		Resource res = resourceSet.createResource(uri);
 		res.getContents().add(network);
-		res.setTrackingModification(true);
 		res.save(Collections.EMPTY_MAP);
 
 		return network;
