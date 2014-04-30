@@ -176,102 +176,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		// re-added to the diagram
 		final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
 		final Instance newInstance;
-		try {
-			// Update the current and the created network. Also create the new
-			// instance used to replace all selected elements
-			newInstance = updateNetworksAndCreateInstance(currentNetwork,
-					newNetwork, selection, toUpdateInDiagram);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-
-		// Adds it to the current network
-		final AddContext addContext = new AddContext();
-		addContext.setTargetContainer(getDiagram());
-		addContext.setNewObject(newInstance);
-		// We will run the layout at the end
-		addContext.setLocation(10, 10);
-		final PictogramElement newInstancePe = getFeatureProvider()
-				.addIfPossible(addContext);
-
-		// Update connections to/from the new instance
-		for (final Connection connection : toUpdateInDiagram) {
-
-			// Delete the link, to avoid loosing the connection when instance will be deleted
-			final List<PictogramElement> pes = Graphiti.getLinkService().getPictogramElements(getDiagram(), connection);
-			for(PictogramElement linkedPe : pes) {
-				EcoreUtil.delete(linkedPe.getLink(), true);
-			}
-
-			final IAddConnectionContext addConContext =
-					XdfUtil.getAddConnectionContext(fp, getDiagram(), connection);
-			getFeatureProvider().addIfPossible(addConContext);
-		}
-
-		// Finally remove from diagram useless elements. Inner connections
-		// are also deleted, since deleting an instance or a port from a
-		// diagram also clean related connections
-		for (final PictogramElement pe : peSelection) {
-			final IPattern pattern = fp.getPatternForPictogramElement(pe);
-			final DeleteContext delContext = new DeleteContext(pe);
-			delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
-			pattern.delete(delContext);
-		}
-
-		// Layout the resulting diagram
-		final IContext layoutContext = new CustomContext();
-		final ICustomFeature layoutFeature = ((XdfDiagramFeatureProvider) getFeatureProvider())
-				.getDefaultLayoutFeature();
-		if (layoutFeature.canExecute(layoutContext)) {
-			layoutFeature.execute(layoutContext);
-		}
-
-		// Finally, active direct editing on the newly created instance
-		final IDirectEditingInfo dei = getFeatureProvider()
-				.getDirectEditingInfo();
-		dei.setMainPictogramElement(newInstancePe);
-		dei.setActive(true);
-
-		hasDoneChanges = true;
-	}
-
-	/**
-	 * <p>
-	 * Here is the magic. In this function, both current and new network are
-	 * updated to reflect changes of this feature.
-	 * </p>
-	 * 
-	 * <p>
-	 * All vertices (ports/instances) selected by user are duplicated. Copies
-	 * are added to the new network, originals are removed from the current
-	 * network. If selection cut connections in the current diagram, new ports
-	 * are created and correctly connected in the new network. They are also
-	 * updated to connect to the right port on the new instance.
-	 * </p>
-	 * 
-	 * <p>
-	 * This function modify networks only. It does not update corresponding
-	 * diagrams.
-	 * </p>
-	 * 
-	 * @param currentNetwork
-	 *            The network user is working on
-	 * @param newNetwork
-	 *            The network created to contains elements selected by user
-	 * @param selection
-	 *            Vertices selected.
-	 * @param toUpdateInDiagram
-	 *            A set of connections. Needs to adds all these connections to
-	 *            the current diagram
-	 * @return The instance created
-	 * @throws IOException
-	 */
-	private Instance updateNetworksAndCreateInstance(
-			final Network currentNetwork, final Network newNetwork,
-			final Set<Instance> selection,
-			final Set<Connection> toUpdateInDiagram)
-			throws IOException {
 
 		final Map<Instance, Instance> copies = new HashMap<Instance, Instance>();
 		final Map<Connection, Port> toReconnectToTarget = new HashMap<Connection, Port>();
@@ -350,12 +254,16 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		}
 
 		// Save the new network on the disk
-		newNetwork.eResource().save(Collections.EMPTY_MAP);
+		try {
+			newNetwork.eResource().save(Collections.EMPTY_MAP);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		final String instanceName = uniqueVertexName(currentNetwork,
 				"groupedInstances");
 		// Create the new instance
-		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
+		newInstance = DfFactory.eINSTANCE.createInstance(
 				instanceName, newNetwork);
 		currentNetwork.add(newInstance);
 
@@ -381,7 +289,54 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			toUpdateInDiagram.add(connection);
 		}
 
-		return newInstance;
+		// Adds it to the current network
+		final AddContext addContext = new AddContext();
+		addContext.setTargetContainer(getDiagram());
+		addContext.setNewObject(newInstance);
+		// We will run the layout at the end
+		addContext.setLocation(10, 10);
+		final PictogramElement newInstancePe = getFeatureProvider()
+				.addIfPossible(addContext);
+
+		// Update connections to/from the new instance
+		for (final Connection connection : toUpdateInDiagram) {
+
+			// Delete the link, to avoid loosing the connection when instance will be deleted
+			final List<PictogramElement> pes = Graphiti.getLinkService().getPictogramElements(getDiagram(), connection);
+			for(PictogramElement linkedPe : pes) {
+				EcoreUtil.delete(linkedPe.getLink(), true);
+			}
+
+			final IAddConnectionContext addConContext =
+					XdfUtil.getAddConnectionContext(fp, getDiagram(), connection);
+			getFeatureProvider().addIfPossible(addConContext);
+		}
+
+		// Finally remove from diagram useless elements. Inner connections
+		// are also deleted, since deleting an instance or a port from a
+		// diagram also clean related connections
+		for (final PictogramElement pe : peSelection) {
+			final IPattern pattern = fp.getPatternForPictogramElement(pe);
+			final DeleteContext delContext = new DeleteContext(pe);
+			delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
+			pattern.delete(delContext);
+		}
+
+		// Layout the resulting diagram
+		final IContext layoutContext = new CustomContext();
+		final ICustomFeature layoutFeature = ((XdfDiagramFeatureProvider) getFeatureProvider())
+				.getDefaultLayoutFeature();
+		if (layoutFeature.canExecute(layoutContext)) {
+			layoutFeature.execute(layoutContext);
+		}
+
+		// Finally, active direct editing on the newly created instance
+		final IDirectEditingInfo dei = getFeatureProvider()
+				.getDirectEditingInfo();
+		dei.setMainPictogramElement(newInstancePe);
+		dei.setActive(true);
+
+		hasDoneChanges = true;
 	}
 
 	/**
