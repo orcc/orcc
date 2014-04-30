@@ -189,8 +189,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
 
 		final Map<Instance, Instance> copyMap = new HashMap<Instance, Instance>();
-		final Map<Connection, Port> toReconnectToTarget = new HashMap<Connection, Port>();
-		final Map<Connection, Port> toReconnectFromSource = new HashMap<Connection, Port>();
 
 		// Duplicate each selected Instance and adds it to the new Network
 		for (final Instance originalInstance : selectedInstances) {
@@ -198,6 +196,13 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			copyMap.put(originalInstance, copy);
 			newNetwork.add(copy);
 		}
+
+		// Create the new instance
+		final String instanceName = uniqueVertexName(currentNetwork,
+				"groupedInstances");
+		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
+				instanceName, newNetwork);
+		currentNetwork.add(newInstance);
 
 		// Manage connections
 		for (final Connection connection : currentNetwork.getConnections()) {
@@ -222,77 +227,49 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			// 2 - Cut connection: connected TO a vertex contained in the
 			// selection
 			else if (selectedInstances.contains(connection.getTarget())) {
-				// Create a new port
-				final Port p = DfFactory.eINSTANCE.createPort(
+				// Create a new input Port in the new Network
+				final Port newInputPort = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getTargetPort().getType()),
 						uniqueVertexName(newNetwork, connection.getTargetPort()
 								.getName()));
-				newNetwork.addInput(p);
-				// We will reconnect this connection when new instance will be
-				// created
-				toReconnectToTarget.put(connection, p);
-				// Create a new connection, ...
+				newNetwork.addInput(newInputPort);
+
+				// Create a Connection in the new Network
 				final Instance target = copyMap.get(connection.getTarget());
 				final Port targetPort = target.getAdapter(Entity.class)
 						.getInput(connection.getTargetPort().getName());
-				final Connection c = DfFactory.eINSTANCE.createConnection(p,
-						null, target, targetPort);
-				// ... fully contained in the new network
-				newNetwork.add(c);
+				newNetwork.add(DfFactory.eINSTANCE.createConnection(newInputPort, null,
+						target, targetPort));
+
+				// Update this Connection target: the new Instance, on the right
+				// input Port
+				connection.setTarget(newInstance);
+				connection.setTargetPort(newInputPort);
+				toUpdateInDiagram.add(connection);
 			}
 			// 3 - Cut connections: connected FROM a vertex contained in the
 			// selection
 			else if (selectedInstances.contains(connection.getSource())) {
 				// Create a new port
-				final Port p = DfFactory.eINSTANCE.createPort(
+				final Port newOutputPort = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getSourcePort().getType()),
 						uniqueVertexName(newNetwork, connection.getSourcePort()
 								.getName()));
-				newNetwork.addOutput(p);
-				// We will reconnect this connection when new instance will be
-				// created
-				toReconnectFromSource.put(connection, p);
-				// Create a new connection, ...
+				newNetwork.addOutput(newOutputPort);
+
+				// Create a Connection in the new Network
 				final Instance source = copyMap.get(connection.getSource());
 				final Port sourcePort = source.getAdapter(Entity.class)
 						.getOutput(connection.getSourcePort().getName());
+				newNetwork.add(DfFactory.eINSTANCE.createConnection(source,
+						sourcePort, newOutputPort, null));
 
-				final Connection c = DfFactory.eINSTANCE.createConnection(
-						source, sourcePort, p, null);
-				// ... fully contained in the new network
-				newNetwork.add(c);
+				// Update this Connection source: the new Instance, on the right
+				// output Port
+				connection.setSource(newInstance);
+				connection.setSourcePort(newOutputPort);
+				toUpdateInDiagram.add(connection);
 			}
-		}
-
-
-		final String instanceName = uniqueVertexName(currentNetwork,
-				"groupedInstances");
-
-		// Create the new instance
-		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
-				instanceName, newNetwork);
-		currentNetwork.add(newInstance);
-
-		// Update existing connections. Re-connect them to the new instance, on
-		// the right port
-		for (final Map.Entry<Connection, Port> entry : toReconnectToTarget
-				.entrySet()) {
-			final Connection connection = entry.getKey();
-			final Port targetPort = entry.getValue();
-
-			connection.setTarget(newInstance);
-			connection.setTargetPort(targetPort);
-			toUpdateInDiagram.add(connection);
-		}
-
-		for (final Map.Entry<Connection, Port> entry : toReconnectFromSource
-				.entrySet()) {
-			final Connection connection = entry.getKey();
-			final Port sourcePort = entry.getValue();
-
-			connection.setSource(newInstance);
-			connection.setSourcePort(sourcePort);
-			toUpdateInDiagram.add(connection);
 		}
 
 		// Adds it to the current network
