@@ -48,9 +48,6 @@ import net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -82,8 +79,6 @@ import org.eclipse.ui.PlatformUI;
 public class GroupInstancesFeature extends AbstractCustomFeature {
 
 	private boolean hasDoneChanges;
-
-	private Network newNetwork;
 
 	public GroupInstancesFeature(IFeatureProvider fp) {
 		super(fp);
@@ -132,13 +127,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		return cptInstances >= 2;
 	}
 
-	@Override
-	public void execute(ICustomContext context) {
-		beforeJobExecution();
-		execute(context, new NullProgressMonitor());
-	}
-
-	protected void beforeJobExecution() {
+	protected Network selectNewNetworkResource() {
 		final Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
 
 		// Create the wizard used to select name and location for the new
@@ -154,24 +143,22 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				wizard);
 		dialog.open();
 		if (dialog.getReturnCode() != Dialog.OK) {
-			return;
+			return null;
 		}
 
 		// The new network
-		newNetwork = wizard.getCreatedNetwork();
+		return wizard.getCreatedNetwork();
 	}
 
-	protected void execute(ICustomContext context,
-			IProgressMonitor parentMonitor) {
-
+	@Override
+	public void execute(ICustomContext context) {
+		Network newNetwork = selectNewNetworkResource();
 		if (newNetwork == null) {
 			return;
 		}
 
 		final Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
 		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
-
-		final SubMonitor monitor = SubMonitor.convert(parentMonitor, 140);
 
 		final Set<Instance> selection = new HashSet<Instance>();
 		final Set<PictogramElement> peSelection = new HashSet<PictogramElement>();
@@ -185,8 +172,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			}
 		}
 
-		monitor.worked(10);
-
 		// This set will be filled with connections which needs to be
 		// re-added to the diagram
 		final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
@@ -195,8 +180,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			// Update the current and the created network. Also create the new
 			// instance used to replace all selected elements
 			newInstance = updateNetworksAndCreateInstance(currentNetwork,
-					newNetwork, selection, toUpdateInDiagram,
-					monitor.newChild(50));
+					newNetwork, selection, toUpdateInDiagram);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -211,12 +195,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		final PictogramElement newInstancePe = getFeatureProvider()
 				.addIfPossible(addContext);
 
-		monitor.worked(10);
-
-		SubMonitor loopProgress = monitor.newChild(30).setWorkRemaining(
-				toUpdateInDiagram.size());
-		monitor.setTaskName("Update existing connections");
-
 		// Update connections to/from the new instance
 		for (final Connection connection : toUpdateInDiagram) {
 
@@ -229,13 +207,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			final IAddConnectionContext addConContext =
 					XdfUtil.getAddConnectionContext(fp, getDiagram(), connection);
 			getFeatureProvider().addIfPossible(addConContext);
-
-			loopProgress.worked(1);
 		}
-
-		loopProgress = monitor.newChild(30)
-				.setWorkRemaining(peSelection.size());
-		monitor.setTaskName("Delete useless elements");
 
 		// Finally remove from diagram useless elements. Inner connections
 		// are also deleted, since deleting an instance or a port from a
@@ -245,11 +217,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			final DeleteContext delContext = new DeleteContext(pe);
 			delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
 			pattern.delete(delContext);
-
-			loopProgress.worked(1);
 		}
-
-		monitor.setTaskName("Lay out the diagram");
 
 		// Layout the resulting diagram
 		final IContext layoutContext = new CustomContext();
@@ -259,13 +227,11 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			layoutFeature.execute(layoutContext);
 		}
 
-		// Finally, active direct editing on the freshly created instance
+		// Finally, active direct editing on the newly created instance
 		final IDirectEditingInfo dei = getFeatureProvider()
 				.getDirectEditingInfo();
 		dei.setMainPictogramElement(newInstancePe);
 		dei.setActive(true);
-
-		monitor.worked(10);
 
 		hasDoneChanges = true;
 	}
@@ -304,28 +270,19 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 	private Instance updateNetworksAndCreateInstance(
 			final Network currentNetwork, final Network newNetwork,
 			final Set<Instance> selection,
-			final Set<Connection> toUpdateInDiagram, final SubMonitor monitor)
+			final Set<Connection> toUpdateInDiagram)
 			throws IOException {
 
 		final Map<Instance, Instance> copies = new HashMap<Instance, Instance>();
 		final Map<Connection, Port> toReconnectToTarget = new HashMap<Connection, Port>();
 		final Map<Connection, Port> toReconnectFromSource = new HashMap<Connection, Port>();
 
-		monitor.setWorkRemaining(100);
-
-		SubMonitor loopProgress = monitor.newChild(20).setWorkRemaining(
-				selection.size());
 		// Adds copies of selected objects to the new network
 		for (final Instance originalInstance : selection) {
 			final Instance copy = EcoreUtil.copy(originalInstance);
 			copies.put(originalInstance, copy);
 			newNetwork.add(copy);
-
-			loopProgress.worked(1);
 		}
-
-		loopProgress = monitor.newChild(40).setWorkRemaining(
-				currentNetwork.getConnections().size());
 
 		// Manage connections
 		for (final Connection connection : currentNetwork.getConnections()) {
@@ -390,14 +347,10 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				// ... fully contained in the new network
 				newNetwork.add(c);
 			}
-
-			loopProgress.worked(1);
 		}
 
 		// Save the new network on the disk
 		newNetwork.eResource().save(Collections.EMPTY_MAP);
-
-		monitor.worked(20);
 
 		final String instanceName = uniqueVertexName(currentNetwork,
 				"groupedInstances");
@@ -405,8 +358,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
 				instanceName, newNetwork);
 		currentNetwork.add(newInstance);
-
-		monitor.worked(10);
 
 		// Update existing connections. Re-connect them to the new instance, on
 		// the right port
@@ -429,8 +380,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			connection.setSourcePort(sourcePort);
 			toUpdateInDiagram.add(connection);
 		}
-
-		monitor.worked(10);
 
 		return newInstance;
 	}
