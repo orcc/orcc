@@ -42,6 +42,7 @@ import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 import net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
@@ -82,14 +83,11 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 
 	private boolean hasDoneChanges;
 
-	private final Map<String, Integer> portNamesIndexes;
-
 	private Network newNetwork;
 
 	public GroupInstancesFeature(IFeatureProvider fp) {
 		super(fp);
 		hasDoneChanges = false;
-		portNamesIndexes = new HashMap<String, Integer>();
 	}
 
 	@Override
@@ -141,8 +139,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 	}
 
 	protected void beforeJobExecution() {
-		portNamesIndexes.clear();
-
 		final Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
 
 		// Create the wizard used to select name and location for the new
@@ -324,6 +320,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			final Instance copy = EcoreUtil.copy(originalInstance);
 			copies.put(originalInstance, copy);
 			newNetwork.add(copy);
+
 			loopProgress.worked(1);
 		}
 
@@ -356,7 +353,8 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				// Create a new port
 				final Port p = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getTargetPort().getType()),
-						uniquePortName(connection.getTargetPort().getName()));
+						uniqueVertexName(newNetwork, connection.getTargetPort()
+								.getName()));
 				newNetwork.addInput(p);
 				// We will reconnect this connection when new instance will be
 				// created
@@ -376,7 +374,8 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				// Create a new port
 				final Port p = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getSourcePort().getType()),
-						uniquePortName(connection.getSourcePort().getName()));
+						uniqueVertexName(newNetwork, connection.getSourcePort()
+								.getName()));
 				newNetwork.addOutput(p);
 				// We will reconnect this connection when new instance will be
 				// created
@@ -400,7 +399,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 
 		monitor.worked(20);
 
-		final String instanceName = uniqueInstanceName(currentNetwork,
+		final String instanceName = uniqueVertexName(currentNetwork,
 				"groupedInstances");
 		// Create the new instance
 		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
@@ -436,28 +435,32 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		return newInstance;
 	}
 
-	private String uniquePortName(final String baseName) {
-		if (portNamesIndexes.containsKey(baseName)) {
-			final int index = portNamesIndexes.get(baseName) + 1;
-			portNamesIndexes.put(baseName, index);
-			return uniquePortName(baseName + "_" + index);
-		} else {
-			portNamesIndexes.put(baseName, 0);
-			return baseName;
+	/**
+	 * Check if the given network contains a vertex (instance or port) with the
+	 * given base name. If yes, return a new unique name formed from the given
+	 * base and a numeric suffix. If not, returns the given base.
+	 * 
+	 * @param network
+	 *            The network to check for existing vertex with the given name
+	 * @param base
+	 *            The base name to assign to a new vertex
+	 * @return A unique name to assign to a new Instance / Port in the given
+	 *         network
+	 */
+	private String uniqueVertexName(final Network network, final String base) {
+		final Set<String> existingNames = new HashSet<String>();
+		for (Vertex vertex : network.getVertices()) {
+			existingNames.add(vertex.getLabel());
 		}
-	}
 
-	private String uniqueInstanceName(final Network network, final String base) {
-		if (network.getChild(base) == null) {
+		if (!existingNames.contains(base)) {
 			return base;
 		} else {
 			int index = 0;
-			String uniqueName;
-			do {
-				uniqueName = base + '_' + index;
+			while (existingNames.contains(base + '_' + index)) {
 				++index;
-			} while (network.getChild(uniqueName) != null);
-			return uniqueName;
+			}
+			return base + '_' + index;
 		}
 	}
 
