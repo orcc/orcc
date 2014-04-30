@@ -44,6 +44,7 @@ import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -127,9 +128,9 @@ public class InstanceArgumentsSection extends AbstractTableBasedSection {
 	}
 
 	@Override
-	void editTableItem(TableItem item) {
+	boolean editTableItem(TableItem item) {
 		final ArgumentItemEditor editor = new ArgumentItemEditor(item);
-		editor.open();
+		return editor.open() == Window.OK;
 	}
 
 	@Override
