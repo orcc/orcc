@@ -400,9 +400,11 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 
 		monitor.worked(20);
 
+		final String instanceName = uniqueInstanceName(currentNetwork,
+				"groupedInstances");
 		// Create the new instance
 		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
-				"groupedInstances", newNetwork);
+				instanceName, newNetwork);
 		currentNetwork.add(newInstance);
 
 		monitor.worked(10);
@@ -442,6 +444,20 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		} else {
 			portNamesIndexes.put(baseName, 0);
 			return baseName;
+		}
+	}
+
+	private String uniqueInstanceName(final Network network, final String base) {
+		if (network.getChild(base) == null) {
+			return base;
+		} else {
+			int index = 0;
+			String uniqueName;
+			do {
+				uniqueName = base + '_' + index;
+				++index;
+			} while (network.getChild(uniqueName) != null);
+			return uniqueName;
 		}
 	}
 
