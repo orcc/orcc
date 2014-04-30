@@ -43,15 +43,16 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 import net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
@@ -167,8 +168,6 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		// The current network, where the selected content will be replaced by a
 		// new instance
 		final Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
-		// Current IFeatureProvider
-		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
 
 		// Configure lists of selected Instances and PictogramElements. If user
 		// selected Ports or Connections, they are ignored
@@ -184,27 +183,31 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			}
 		}
 
-		// This set will be filled with connections which needs to be
-		// re-added to the diagram
-		final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
-
+		// This will store the mapping between original instances and their copy
+		// in the new Network
 		final Map<Instance, Instance> copyMap = new HashMap<Instance, Instance>();
 
-		// Duplicate each selected Instance and adds it to the new Network
+		// Copy each selected Instance into the new Network
 		for (final Instance originalInstance : selectedInstances) {
 			final Instance copy = EcoreUtil.copy(originalInstance);
 			copyMap.put(originalInstance, copy);
 			newNetwork.add(copy);
 		}
 
-		// Create the new instance
+		// Create the new Instance
 		final String instanceName = uniqueVertexName(currentNetwork,
 				"groupedInstances");
 		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
 				instanceName, newNetwork);
 		currentNetwork.add(newInstance);
 
-		// Manage connections
+		// This set will be filled with connections which needs to be
+		// re-added to the diagram
+		final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
+
+		// Manage Connections in the current Network. Connections will NOT be
+		// deleted, only updated, so it is not mandatory to make a copy before
+		// looping on the list
 		for (final Connection connection : currentNetwork.getConnections()) {
 			// 1 - Inner connection: connect 2 vertex both contained in the
 			// selection
@@ -227,7 +230,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			// 2 - Cut connection: connected TO a vertex contained in the
 			// selection
 			else if (selectedInstances.contains(connection.getTarget())) {
-				// Create a new input Port in the new Network
+				// Create an input Port in the new Network
 				final Port newInputPort = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getTargetPort().getType()),
 						uniqueVertexName(newNetwork, connection.getTargetPort()
@@ -245,12 +248,13 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				// input Port
 				connection.setTarget(newInstance);
 				connection.setTargetPort(newInputPort);
+
 				toUpdateInDiagram.add(connection);
 			}
 			// 3 - Cut connections: connected FROM a vertex contained in the
 			// selection
 			else if (selectedInstances.contains(connection.getSource())) {
-				// Create a new port
+				// Create an output Port in the new Network
 				final Port newOutputPort = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getSourcePort().getType()),
 						uniqueVertexName(newNetwork, connection.getSourcePort()
@@ -268,11 +272,16 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				// output Port
 				connection.setSource(newInstance);
 				connection.setSourcePort(newOutputPort);
+
 				toUpdateInDiagram.add(connection);
 			}
 		}
 
-		// Adds it to the current network
+		// Now the new Network is up-to-date. In particular, it contains all its
+		// Ports. We can add the new Instance refined on this Network in the
+		// current Diagram. Doing this now allows to have Anchors for Instance
+		// Port available. These Anchors will be used to update existing
+		// FreeFormConnections
 		final AddContext addContext = new AddContext();
 		addContext.setTargetContainer(getDiagram());
 		addContext.setNewObject(newInstance);
@@ -281,18 +290,41 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		final PictogramElement newInstancePe = getFeatureProvider()
 				.addIfPossible(addContext);
 
-		// Update connections to/from the new instance
+		// Get the instancePattern
+		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
+		final InstancePattern instancePattern = (InstancePattern) fp
+				.getPatternForPictogramElement(newInstancePe);
+
+		// We can update graphiti Connections to start or end from/to the newly
+		// added Instance
 		for (final Connection connection : toUpdateInDiagram) {
-
-			// Delete the link, to avoid loosing the connection when instance will be deleted
-			final List<PictogramElement> pes = Graphiti.getLinkService().getPictogramElements(getDiagram(), connection);
-			for(PictogramElement linkedPe : pes) {
-				EcoreUtil.delete(linkedPe.getLink(), true);
+			final List<PictogramElement> pictogramElements = Graphiti
+					.getLinkService().getPictogramElements(getDiagram(),
+							connection);
+			if (newInstance.equals(connection.getTarget())) {
+				// Update the PE connection(s) target
+				// (org.eclipse.graphiti.mm.pictograms.Connection#setEnd())
+				for (final PictogramElement pe : pictogramElements) {
+					if (pe instanceof org.eclipse.graphiti.mm.pictograms.Connection) {
+						org.eclipse.graphiti.mm.pictograms.Connection peConnection = (org.eclipse.graphiti.mm.pictograms.Connection) pe;
+						peConnection.setEnd(instancePattern.getAnchorForPort(
+								newInstancePe, connection.getTargetPort()));
+					}
+				}
+			} else if (newInstance.equals(connection.getSource())) {
+				// Update the PE connection(s) source
+				// (org.eclipse.graphiti.mm.pictograms.Connection#setStart())
+				for (final PictogramElement pe : pictogramElements) {
+					if (pe instanceof org.eclipse.graphiti.mm.pictograms.Connection) {
+						org.eclipse.graphiti.mm.pictograms.Connection peConnection = (org.eclipse.graphiti.mm.pictograms.Connection) pe;
+						peConnection.setStart(instancePattern.getAnchorForPort(
+								newInstancePe, connection.getSourcePort()));
+					}
+				}
+			} else {
+				OrccLogger.severeln("Some connections will not be updated. "
+						+ "This is an error in the code. Please report a bug.");
 			}
-
-			final IAddConnectionContext addConContext =
-					XdfUtil.getAddConnectionContext(fp, getDiagram(), connection);
-			getFeatureProvider().addIfPossible(addConContext);
 		}
 
 		// Finally remove from diagram useless elements. Inner connections
