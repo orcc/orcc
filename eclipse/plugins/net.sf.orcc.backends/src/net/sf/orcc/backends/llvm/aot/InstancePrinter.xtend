@@ -102,6 +102,7 @@ class InstancePrinter extends LLVMTemplate {
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {
+		super(options)
 		if(options.containsKey(INLINE)){
 			optionInline = options.get(INLINE) as Boolean
 		}

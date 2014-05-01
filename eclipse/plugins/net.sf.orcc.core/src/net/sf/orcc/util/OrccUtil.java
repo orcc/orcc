@@ -827,4 +827,28 @@ public class OrccUtil {
 
 		return URI.createPlatformResourceURI(irPath.toString(), true);
 	}
+
+	/**
+	 * If the given path starts with '~' char, returns a copy after replacing
+	 * the character by the current user HOME directory.
+	 * 
+	 * In other cases, return the given path.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String resolveFromHome(final String path) {
+
+		if (path == null || path.isEmpty()) {
+			return path;
+		}
+
+		if (path.charAt(0) == '~') {
+			final StringBuilder builder = new StringBuilder(
+					System.getProperty("user.home"));
+			builder.append(File.separatorChar).append(path.substring(1));
+			return builder.toString();
+		}
+		return path;
+	}
 }

@@ -818,9 +818,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					"orcc");
 			tempOrccDir.mkdir();
 			outputFolder = tempOrccDir.getAbsolutePath();
-		} else if (outputFolder.startsWith("~")) {
-			outputFolder = outputFolder.replace("~",
-					System.getProperty("user.home"));
+		} else {
+			outputFolder = OrccUtil.resolveFromHome(outputFolder);
 		}
 
 		if (debug) {
@@ -841,7 +840,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
-
 		Options options = new Options();
 		Option opt;
 
@@ -965,7 +963,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
-			optionMap.put(PROFILE, line.hasOption("pact"));
+			optionMap.put(PROFILE, line.hasOption("prof"));
 
 			// Set backend name in options map
 			String backend = this.getClass().getName();
@@ -979,12 +977,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 			}
 			optionMap.put(BACKEND, backend);
-
 			try {
-				setOptions(optionMap);
 
+				setOptions(optionMap);
 				compile();
 				return IApplication.EXIT_OK;
+
 			} catch (OrccRuntimeException e) {
 
 				if (e.getMessage() != null && !e.getMessage().isEmpty()) {
@@ -992,7 +990,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 				OrccLogger.severeln(backend
 						+ " backend could not generate code (" + e.getCause()
-						+ ")");
+						+ ")[OrccRuntimeException]");
 
 			} catch (Exception e) {
 
@@ -1001,11 +999,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 				OrccLogger.severeln(backend
 						+ " backend could not generate code (" + e.getCause()
-						+ ")");
+						+ ")[Exception]");
 
 				e.printStackTrace();
 			}
-			return IApplication.EXIT_RELAUNCH;
 
 		} catch (UnrecognizedOptionException uoe) {
 			printUsage(context, options, uoe.getLocalizedMessage());
@@ -1032,5 +1029,4 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			doTransformActor(actor);
 		}
 	}
-
 }

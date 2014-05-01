@@ -209,7 +209,7 @@ public class ConnectionPattern extends AbstractConnectionPattern {
 			}
 		} else {
 			OrccLogger.warnln("Oops, unknown error appear in ConnectionPattern. A connection cannot be created "
-					+ "between 2 sources or an bug may be fixed in the source code.");
+							+ "between 2 sources or a bug may be fixed in the source code.");
 			return false;
 		}
 

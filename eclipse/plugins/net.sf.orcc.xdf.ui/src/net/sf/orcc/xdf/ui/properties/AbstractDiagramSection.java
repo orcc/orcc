@@ -30,11 +30,13 @@ package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ui.editor.PartialCalParser;
+import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.jface.viewers.ISelection;
@@ -51,7 +53,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 /**
  * This is a base class for all property sections in Xdf diagram editor. It
- * configure some mamber variables and set the current PictogramElement and
+ * configure some member variables and set the current PictogramElement and
  * business object for all subclasses.
  * 
  * @author Antoine Lorence
@@ -61,20 +63,22 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 
 	protected TabbedPropertySheetWidgetFactory widgetFactory;
 
-	protected EObject businessObject;
-	protected Network currentNetwork;
-
-	protected PictogramElement pictogramElement;
+	private EObject businessObject;
+	private Network currentNetwork;
+	private PictogramElement pictogramElement;
+	private XdfDiagramFeatureProvider featureProvider;
 
 	protected Composite formBody;
 
 	protected final PartialCalParser calParser;
 
 	protected final Color disabledFieldBGColor;
+	protected final Color errorColor;
 
 	public AbstractDiagramSection() {
 		calParser = new PartialCalParser();
 		disabledFieldBGColor = new Color(Display.getCurrent(), new RGB(230, 230, 230));
+		errorColor = new Color(Display.getCurrent(), new RGB(242, 152, 152));
 	}
 
 	@Override
@@ -96,6 +100,31 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 		pictogramElement = getSelectedPictogramElement();
 		businessObject = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
 		currentNetwork = (Network) Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getDiagram());
+		featureProvider = (XdfDiagramFeatureProvider) getDiagramTypeProvider()
+				.getFeatureProvider();
+	}
+
+	//=============
+	// Getters
+	//=============
+	protected EObject getSelectedBusinessObject() {
+		return businessObject;
+	}
+	protected Network getCurrentNetwork() {
+		return currentNetwork;
+	}
+
+	protected XdfDiagramFeatureProvider getFeatureProvider() {
+		return featureProvider;
+	}
+	protected <T extends IPattern> T getPattern(final PictogramElement pe,
+			final Class<T> patternType) {
+		final IPattern pattern = getFeatureProvider()
+				.getPatternForPictogramElement(pe);
+		if (patternType.isInstance(pattern)) {
+			return patternType.cast(pattern);
+		}
+		return null;
 	}
 
 	@Override
@@ -107,7 +136,7 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	 * Executes {@link #writeValuesToModel()} inside a Command suitable for
 	 * transactional edition of domain models
 	 */
-	protected void writeValuesInTransaction(final Widget widget) {
+	final protected void writeValuesInTransaction(final Widget widget) {
 
 		// Execute the method in a write transaction, because it will modify the
 		// models
@@ -132,6 +161,17 @@ abstract public class AbstractDiagramSection extends GFPropertySection implement
 	 * @param widget
 	 */
 	protected abstract void writeValuesToModel(final Widget widget);
+
+	/**
+	 * Check if the value in the given widget is valid. If not, returns a
+	 * message explaining why. If it is valid, this method must return null
+	 * 
+	 * @param widget
+	 * @return null if given widget value is valid, an error message instead
+	 */
+	protected String checkValueValid(final Widget widget) {
+		return null;
+	}
 
 	protected abstract String getFormText();
 }

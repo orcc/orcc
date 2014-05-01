@@ -134,7 +134,7 @@ public class InstanceArgumentsSection extends AbstractTableBasedSection {
 
 	@Override
 	protected void readValuesFromModels() {
-		final Instance instance = (Instance) businessObject;
+		final Instance instance = (Instance) getSelectedBusinessObject();
 		final ExpressionPrinter exprPrinter = new ExpressionPrinter();
 
 		table.removeAll();
@@ -148,7 +148,7 @@ public class InstanceArgumentsSection extends AbstractTableBasedSection {
 
 	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Instance instance = (Instance) businessObject;
+		final Instance instance = (Instance) getSelectedBusinessObject();
 
 		// Only parameters of this instance's refinement (Actor or Network) can
 		// be used as argument name
@@ -162,8 +162,8 @@ public class InstanceArgumentsSection extends AbstractTableBasedSection {
 
 		// Variables and parameters declared in the current network can be used
 		// as value for an instance argument
-		calParser.addDeclaredVars(currentNetwork.getParameters());
-		calParser.addDeclaredVars(currentNetwork.getVariables());
+		calParser.addDeclaredVars(getCurrentNetwork().getParameters());
+		calParser.addDeclaredVars(getCurrentNetwork().getVariables());
 
 		instance.getArguments().clear();
 

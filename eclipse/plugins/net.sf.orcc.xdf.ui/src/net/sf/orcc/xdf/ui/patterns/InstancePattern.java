@@ -39,6 +39,7 @@ import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
@@ -48,7 +49,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -59,8 +59,6 @@ import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
-import org.eclipse.graphiti.features.context.impl.DeleteContext;
-import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.context.impl.ResizeShapeContext;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.func.IDirectEditing;
@@ -190,15 +188,32 @@ public class InstancePattern extends AbstractPattern {
 		final PictogramElement pe = context.getPictogramElement();
 		final Instance obj = (Instance) getBusinessObjectForPictogramElement(pe);
 		obj.setName(value);
+
+		updatePictogramElement(pe);
 	}
 
 	@Override
 	public String checkValueValid(String value, IDirectEditingContext context) {
+		final Instance instance = (Instance) getBusinessObjectForPictogramElement(context
+				.getPictogramElement());
+		return checkValueValid(value, instance);
+	}
+
+	public String checkValueValid(final String value, final Instance instance) {
 		if (value.length() < 1) {
 			return "Please enter a text to name the Instance.";
 		}
-		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]+")) {
+		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]*")) {
 			return "Instance name must start with a letter, and contains only alphanumeric characters";
+		}
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		for (final Vertex vertex : network.getVertices()) {
+			if (!vertex.equals(instance) && vertex.getLabel().equals(value)) {
+				final String vertexType = vertex instanceof Instance ? "an instance"
+						: "a port";
+				return "The network already contains a vertex of the same name ("
+						+ vertexType + ")";
+			}
 		}
 
 		// null -> value is valid
@@ -206,41 +221,11 @@ public class InstancePattern extends AbstractPattern {
 	}
 
 	@Override
-	public boolean canDelete(IDeleteContext context) {
-		final int nbConnections = Graphiti
-				.getPeService()
-				.getAllConnections(
-						(AnchorContainer) context.getPictogramElement()).size();
-
-		// When user will be prompted, display the exact number of elements to
-		// delete
-		((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(true,
-				false, nbConnections + 1));
-
-		return true;
-	}
-
-	/**
-	 * Delete all connections before deleting an instance
-	 */
-	@Override
-	public void preDelete(IDeleteContext mainContext) {
-		final PictogramElement pe = mainContext.getPictogramElement();
-		if (!PropsUtil.isInstance(pe)) {
-			return;
-		}
-
-		final List<Connection> connections = Graphiti.getPeService().getAllConnections((AnchorContainer) pe);
-		for (final Connection connection : connections) {
-			final DeleteContext context = new DeleteContext(connection);
-			// We don't want to prompt user for each connection deletion
-			context.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
-
-			final IDeleteFeature feature = getFeatureProvider()
-					.getDeleteFeature(context);
-			if (feature.canDelete(context)) {
-				feature.execute(context);
-			}
+	public void preDelete(IDeleteContext context) {
+		final PictogramElement pe = context.getPictogramElement();
+		if (pe instanceof AnchorContainer) {
+			XdfUtil.deleteConnections(getFeatureProvider(),
+					(AnchorContainer) pe);
 		}
 	}
 
@@ -426,7 +411,7 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean canUpdate(IUpdateContext context) {
-		return PropsUtil.isInstance(context.getPictogramElement());
+		return isPatternRoot(context.getPictogramElement());
 	}
 
 	@Override
@@ -643,7 +628,7 @@ public class InstancePattern extends AbstractPattern {
 		}
 
 		// Restore connections start or end from port name they were
-		// connected to
+		// connected to.
 		int cptReconnectedTo = 0, cptReconnectedFrom = 0;
 		for (final Anchor anchor : instanceShape.getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
@@ -666,21 +651,27 @@ public class InstancePattern extends AbstractPattern {
 		// target anchor.
 		int cptDeletedConnections = 0;
 		for (final Connection connection : incomingMap.values()) {
-			Graphiti.getPeService().deletePictogramElement(connection);
+			XdfUtil.deleteConnection(getFeatureProvider(), connection);
 			cptDeletedConnections++;
 		}
 		for (final Iterable<Connection> connectionList : outgoingMap.values()) {
 			for (final Connection connection : connectionList) {
-				Graphiti.getPeService().deletePictogramElement(connection);
+				XdfUtil.deleteConnection(getFeatureProvider(), connection);
 				cptDeletedConnections++;
 			}
 		}
 
-		// Specific case. If a port has been renamed, any existing connection
-		// from/to this port became invalid. The DF connection linked to the
-		// graphiti FreeFormConnection is not contained in the current network,
-		// since the proxy URI used contains port names. In that case, we must
-		// check invalid connections in the current network to delete them.
+		// Specific case: if this method is executed by update() after a port
+		// renaming outside the diagram editor, the previous block has not
+		// completely deleted invalid connections.
+		// The linked net.sf.orcc.sf.Connection has an URI relative to its
+		// container (Actor or Network). This URI uses the source / target port
+		// name. But at this point, the port name doesn't exists anymore. The
+		// businessObject linked from diagram connection pictogram became a
+		// proxy when the old port has been removed from the diagram.
+		// To completely delete invalid connections from the network, we must
+		// check for invalid objects in source port or target port of each
+		// connection.
 		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
 		final List<net.sf.orcc.df.Connection> connectionsCopy = new ArrayList<net.sf.orcc.df.Connection>(
 				network.getConnections());

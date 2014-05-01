@@ -43,12 +43,12 @@ import net.sf.orcc.util.OrccUtil
  */
 class NetworkPrinter extends LLVMTemplate {
 	
-	Network network;
+	val Network network;
 	protected var optionDatalayout = BackendsConstants::LLVM_DEFAULT_TARGET_DATALAYOUT
 	protected var optionArch = BackendsConstants::LLVM_DEFAULT_TARGET_TRIPLE
 	
 	new(Network network, Map<String, Object> options){
-		super()
+		super(options)
 		this.network = network
 		
 		if(options.containsKey(BackendsConstants::LLVM_TARGET_TRIPLE)){
@@ -82,7 +82,7 @@ class NetworkPrinter extends LLVMTemplate {
 		declare void @init_orcc(i32 %argc, i8** %argv)
 		
 		«FOR conn : network.connections»
-			@fifo_«conn.getAttribute("id").objectValue»_content = global [«conn.size» x «conn.sourcePort.type.doSwitch»] zeroinitializer
+			@fifo_«conn.getAttribute("id").objectValue»_content = global [«conn.safeSize» x «conn.sourcePort.type.doSwitch»] zeroinitializer
 			@fifo_«conn.getAttribute("id").objectValue»_rdIndex = global i32 zeroinitializer
 			@fifo_«conn.getAttribute("id").objectValue»_wrIndex = global i32 zeroinitializer
 			

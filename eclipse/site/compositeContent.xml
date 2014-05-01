@@ -1,11 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?compositeMetadataRepository version='1.0.0'?>
-<repository name='Orcc Composite Repository' type='org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepository' version='1.0.0'>
+<repository name='Orcc Repository' type='org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepository' version='1.0.0'>
   <properties size='1'>
     <property name='p2.timestamp' value='1292789185346'/>
   </properties>
-  <children size='2'>
-    <child location='http://graphiti-editor.sourceforge.net/eclipse/'/>
+  <children size='1'>
     <child location='http://orcc.sourceforge.net/eclipse/updates/'/>
   </children>
 </repository>

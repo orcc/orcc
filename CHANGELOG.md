@@ -1,40 +1,72 @@
 # Next release
 ### Notable changes and features
+### Bugfixes
+### Known issues
+
+# 2.0.0 April 29, 2014
+### Notable changes and features
 - Front-end:
     * Floating-point type network ports now supported
-- Network editor has been entirely rewritten
-    * It can be used exactly in the same way as the original one
-    * It provides many new features (thanks to Graphiti SDK)
-      - Instance have different colors if it is not refined / refined on a network / an actor
-      - All ports are displayed when an instance is refined
-      - Automatic layout (2 different algorithms)
-      - Easy create connections: drag and drop from a port to another
-      - Easy create refined instances: drag and drop an actor/network from the project in the current network (this also can be used to update refinement of existing instance, see #77)
-      - Better control on properties definitions (variables, parameters, connection size, etc.). See #46
-    * More flexibility for future improvements, some exclusive features are already available:
-      - Automatically group selected instances in a new network. Selection is replaced by a new instance, refined on the network created.
-      - Automatically replace an instance refined on a network by the content of the network.
+- User interface:
+    * New network editor based on Eclipse Graphiti SDK. It can be used exactly in the same way as the original one but provides more flexibility for future improvements. Some exclusive features are already available:
+        - Instances have different colors if assigned to networks, actors, or nothing.
+        - All ports are displayed when an instance is refined.
+        - Automatic layout (2 different algorithms).
+        - Easy creation of connections: Drag and drop from a port to another
+        - Easy creation of refined instances: Drag and drop an actor/network from the project to the current network (this also can be used to update refinement of existing instance, see #77).
+        - Better control on properties definitions (variables, parameters, connection size, etc.) [#46].
+        - Automatically group a set of selected instances in a new network. Selection is replaced by a new instance, refined on the newly created network, with all connections updated.
+        - Automatically replace an instance refined on a network by the content of the network (all instances and connections).
+    * CAL editor:
+        - Warning on useless imports of units.
+    * Miscellaneous
+        - A default 'src' folder is created in each new Orcc project.
+- Back-ends:
+    * [C] Profiling capabilities (actors workload, communication, firings) thanks to code instrumentation: Generate an XML file that can be pretty printed afterwards.
+    * [C] Dynamic mapping of actors on multi-core processors (different strategies are available). Mapping algorithms can also be used as independant program called Orcc-map.
+    * [C] Global optimization of the generated code:
+        - Avoid copy of tokens into local variables that are used as procedure arguments when FIFO accesses are aligned.
+    * [C] Optimization of multi-core communications thanks to cache-efficient FIFO implementations.
+    * [C] Easy kernel optimization using annotation in CAL code. This has been tested using SSE kernels in the HEVC decoder.
+    * [C] Experimental debugging features:
+        - Use "@DEBUG" annotation on actor header to display its internal scheduling during the execution.
+        - Add option to find array out-of-bounds accesses using asserts.
+    * [C/Simulator] Enable easy configuration of FIFO size thanks to an XML file (known as BXDF).
+    * [C] Runtime library improvements:
+        - Easy import of external libraries (Metis and OpenHEVC).
+        - Use data structure representing dataflow-related information.
+    * [TTA] Display estimation of actor memory consumption during code generation.
+    * [TTA] Add support of code compressor to reduce memory consumption.
+    * [Promela] Better, stronger and faster.
+    * New DAL backend inheriting from the C backend has been added: This backend targets the Distributed Application Layer, a manycore-oriented programming framework developed at ETH Zürich.
 
 ### Bugfixes
 - Front-end:
     * Refactoring features (rename or move file) have been updated
-        - It works on Windows
-        - [#71] When a XDF file is renamed/moved, corrresponding xdfdiag file follow the modification
+        - Work on Windows
+        - [#71] When a .xdf file is renamed/moved, corrresponding .xdfdiag file follow the modification.
         - [#1] Better check for names conflicts between functions, procedures, variables, parameters, etc.
+    * [#59] Fix the use of output list variables as procedure arguments.
 - Backends:
-    * [#56] Library files are not overwritten at code generation. Unmodified files are recompiled only if necessary
+    * [#56] Library files are not overwritten at code generation. Unmodified files are recompiled only if necessary.
+    * [TTA, LLVM] [#83] Add support of self-loop actors.
 - Network editor / User interface:
-    * [#13] List of proposed entity for refinement only contains Actors and Networks (not Units anymore)
-    * [#64] Network can be created only in a valid project's source folder
+    * [#13] List of proposed entity for refinement only contains Actors and Networks (without Units anymore).
+    * [#64] Network can be created only in a valid project's source folder.
 
-### Known problems
-- Refactoring: moving more than one file at a time could cause errors in updated files. Undo should always be available if errors appears. Moving files one by one should not cause any problem.
+### Known issues
+- Refactoring: Moving more than one file at a time could cause errors in updated files. Undo should always be available if errors appears. Moving files one by one should work as expected.
+- Using sub-list as procedure argument produces wrong code.
 
-### Misc
-- Java, C++ and OpenCL backends has been removed. They were not maintained for a long time, and seemed to be unused.
-- SDL libraries exported for Windows users have been updated to 
-version 1.2.15. This fixes compile issues under x86_64 platforms (issue #12)
-- Useless dependencies to SDLImage have been removed
+### Miscellaneous
+- Java, C++ and OpenCL backends have been removed. They were not maintained for a long time, and seemed to be unused.
+- SDL library:
+    * Exported library for Windows has been updated to version 1.2.15, fixing compilation issues under x86_64 platforms [#12].
+    * Useless dependencies to SDLImage have been removed.
+    * Experimental support of SDL2 has been added
+- Clean C runtime library:
+    * Remove the actor mapping based on genetic algorithm.
+    * Remove unfinished soket-based FIFO implementation.
 
 # 1.4.0 October 2013
 
@@ -42,7 +74,7 @@ version 1.2.15. This fixes compile issues under x86_64 platforms (issue #12)
 - Backends:
     * New experimental HMPP backend
     * Buffer size is checked when compiling with orcc. Size must be a power of 2.
-    * [C] Fifo optimizations to allow vectorization by compilers.
+    * [C] FIFO optimizations to allow vectorization by compilers.
     * [LLVM, TTA] Apply transformation removing disconnected output ports.
     * [LLVM, TTA] Apply new short-circuit transformation.
     * [LLVM] Support of 64 bits types.
@@ -56,7 +88,7 @@ version 1.2.15. This fixes compile issues under x86_64 platforms (issue #12)
     * [#9] When an Actor or a Unit contains errors, the corresponding IR file is deleted. In that case,
 running a backend stops with an error message.
 
-### Known problems
+### Known issues
 - HEVC decoder built in release mode with LLVM Backend does not work.
 
 
@@ -134,7 +166,7 @@ installed to use Orcc. Separate Graphiti-editor plugin is not needed anymore.
 - All backends use now Xtend instead of StringTemplate to print code.
 - Deletion of the XLIM back-end (replaced by Xronos).
 
-### Known problems
+### Known issues
 
 - Declaration of a variable outside the explicit 'var' declaration blocks.
 - Wrong classification in case of complex data dependant behavior or floating points types usage.

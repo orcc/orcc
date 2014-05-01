@@ -52,9 +52,9 @@ import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
+import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -72,9 +72,9 @@ import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
-import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
@@ -318,7 +318,7 @@ public class TTABackend extends LLVMBackend {
 				tta, processorPath);
 
 		// Print assembly code of actor-scheduler
-		cached += new SwProcessorPrinter().print(tta, processorPath);
+		cached += new SwProcessorPrinter(options).print(tta, processorPath);
 
 		return cached;
 	}

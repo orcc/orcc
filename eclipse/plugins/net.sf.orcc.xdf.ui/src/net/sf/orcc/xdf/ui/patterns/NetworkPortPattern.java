@@ -28,11 +28,11 @@
  */
 package net.sf.orcc.xdf.ui.patterns;
 
-import java.util.List;
-
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
@@ -40,7 +40,6 @@ import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -50,8 +49,6 @@ import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
-import org.eclipse.graphiti.features.context.impl.DeleteContext;
-import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.func.IDirectEditing;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
@@ -61,7 +58,6 @@ import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
-import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -73,7 +69,11 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
- * This abstract class
+ * This class is the common part for Network port management. Concrete
+ * implementations handle specific cases for input and output ports.
+ * 
+ * @see InputNetworkPortPattern
+ * @see OutputNetworkPortPattern
  * 
  * @author Antoine Lorence
  * 
@@ -146,13 +146,27 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	@Override
 	public String checkValueValid(String value, IDirectEditingContext context) {
+		final Port port = (Port) getBusinessObjectForPictogramElement(context
+				.getPictogramElement());
+		return checkValueValid(value, port);
+	}
+
+	public String checkValueValid(final String value, final Port port) {
 		if (value.length() < 1) {
 			return "Please enter a text to name the Port.";
 		}
-		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]+")) {
+		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]*")) {
 			return "Port name must start with a letter, and contains only alphanumeric characters";
 		}
-
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		for (final Vertex vertex : network.getVertices()) {
+			if (!vertex.equals(port) && vertex.getLabel().equals(value)) {
+				final String vertexType = vertex instanceof Instance ? "an instance"
+						: "a port";
+				return "The network already contains a vertex of the same name ("
+						+ vertexType + ")";
+			}
+		}
 		// null -> value is valid
 		return null;
 	}
@@ -163,12 +177,7 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		final Port port = (Port) getBusinessObjectForPictogramElement(pe);
 		port.setName(value);
 
-		// layout(pe) and update(pe) can only be called with the root element.
-		// This method can be used on the shape or on the text label. Before
-		// requesting an update, we need to get the root element
-		if (!isPatternRoot(pe)) {
-			pe = (PictogramElement) pe.eContainer();
-		}
+		updatePictogramElement(pe);
 	}
 
 	@Override
@@ -177,41 +186,11 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 	}
 
 	@Override
-	public boolean canDelete(IDeleteContext context) {
-		final int nbConnections = Graphiti
-				.getPeService()
-				.getAllConnections(
-						(AnchorContainer) context.getPictogramElement()).size();
-
-		// When user will be prompted, display the exact number of elements to
-		// delete
-		((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(true,
-				false, nbConnections + 1));
-
-		return true;
-	}
-
-	/**
-	 * Delete all connections before deleting a port
-	 */
-	@Override
-	public void preDelete(IDeleteContext mainContext) {
-		final PictogramElement pe = mainContext.getPictogramElement();
-		if (!PropsUtil.isPort(pe)) {
-			return;
-		}
-
-		final List<Connection> connections = Graphiti.getPeService().getAllConnections((AnchorContainer) pe);
-		for (final Connection connection : connections) {
-			final DeleteContext context = new DeleteContext(connection);
-			// We don't want to prompt user for each connection deletion
-			context.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
-
-			final IDeleteFeature feature = getFeatureProvider()
-					.getDeleteFeature(context);
-			if (feature.canDelete(context)) {
-				feature.execute(context);
-			}
+	public void preDelete(IDeleteContext context) {
+		final PictogramElement pe = context.getPictogramElement();
+		if (pe instanceof AnchorContainer) {
+			XdfUtil.deleteConnections(getFeatureProvider(),
+					(AnchorContainer) pe);
 		}
 	}
 

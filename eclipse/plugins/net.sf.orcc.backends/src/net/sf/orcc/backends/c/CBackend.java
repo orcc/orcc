@@ -62,6 +62,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
+import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
@@ -192,6 +193,9 @@ public class CBackend extends AbstractBackend {
 	}
 
 	protected void doTransformNetwork(Network network) {
+		if (mergeActors) {
+			new BroadcastAdder().doSwitch(network);
+		}
 		OrccLogger.traceln("Instantiating...");
 		new Instantiator(true, fifoSize).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
@@ -205,9 +209,10 @@ public class CBackend extends AbstractBackend {
 		if (mergeActors) {
 			OrccLogger.traceln("Merging of actors...");
 			new ActorMerger().doSwitch(network);
+		} else {
+			new CBroadcastAdder().doSwitch(network); 
 		}
 
-		new CBroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
 
 		// if required, load the buffer size from the mapping file

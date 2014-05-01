@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.generator
 
+import com.google.inject.Inject
+import com.google.inject.Provider
 import java.io.ByteArrayOutputStream
 import java.util.HashSet
 import net.sf.orcc.cache.CacheManager
@@ -47,6 +49,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.xtext.generator.IFileSystemAccess
 import org.eclipse.xtext.generator.IGenerator
+import org.eclipse.xtext.generator.AbstractFileSystemAccess2
 
 /**
  * Generates code from your model files on save.
@@ -74,13 +77,16 @@ class CalGenerator implements IGenerator {
 	private val actorTransformer = new ActorTransformer
 	private val unitTransformer = new UnitTransformer
 
-	// Will contain the list of resources built in the current session
-	private val HashSet<Resource> builtResources = newHashSet
-	// Will contain a list of resources already loaded in Frontend in the current session
+	// Will contain the list of resources known by Frontend (it has mapping
+	// for these resources)
 	private val HashSet<Resource> loadedResources = newHashSet
 
 	private var IProject currentProject
-	private var ResourceSet resourceSet
+	private var ResourceSet calResourceSet
+	private var ResourceSet irResourceSet
+
+	@Inject
+	private var Provider<ResourceSet> rsProvider
 
 	/**
 	 * Start a build session. This method is called by net.sf.orcc.cal.ui.builder.CalBuilder
@@ -94,10 +100,10 @@ class CalGenerator implements IGenerator {
 	 */
 	def beforeBuild(IProject project, ResourceSet rs) {
 		currentProject = project
-		resourceSet = rs
-
-		builtResources.clear
 		loadedResources.clear
+
+		calResourceSet = rs
+		irResourceSet = rsProvider.get
 	}
 
 	/**
@@ -112,22 +118,24 @@ class CalGenerator implements IGenerator {
 	 */
 	override void doGenerate(Resource calResource, IFileSystemAccess fsa) {
 
-		// We already built this resource in the same session, do not need
-		// to do it again !
-		if(builtResources.contains(calResource)) return
-
 		val irSubPath = calResource.irRelativePath
 
-		val astEntity = calResource.entity
-		// Build a list of resources we need to have registered in frontend
+		// In some very specific cases, a single resource is built twice or more. We can't simply ignore
+		// that, because if this resource is kept in derived list in BuilderParticipant, the IR corresponding
+		// to this resource will be deleted. This bug is relatively difficult to understand.
+		// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=433199 for more information
+		if(loadedResources.contains(calResource)) {
+			fsa.generateFile(irSubPath, (fsa as AbstractFileSystemAccess2).readTextFile(irSubPath))
+			return
+		}
+
+		// Build a list of resources we need to have registered in Frontend
 		// before doing the serialization
-		val toImport = astEntity.importedResource.filter[
-			!(builtResources.contains(it) || loadedResources.contains(it))
-		]
+		val toImport = calResource.entity.importedResource.filter[!loadedResources.contains(it)]
 
 		for(importedResource : toImport) {
 			// The imported resource is in the same project. We need to transform
-			// and serialize it before the given calResource
+			// and serialize it BEFORE the calResource
 			if(importedResource.isInSameProject(calResource)) {
 				importedResource.doGenerate(fsa)
 			}
@@ -140,16 +148,17 @@ class CalGenerator implements IGenerator {
 		}
 
 		// Write in the IR file the content of the transformed AstEntity
-		fsa.generateFile(irSubPath, calResource.entity.serialize)
+		fsa.generateFile(irSubPath, calResource.serialize)
 
 		// Ensure we will not do it again in the same session
-		builtResources.add(calResource)
+		loadedResources.add(calResource)
 	}
 
 	/**
 	 * Returns a EMF serialized version of the given AstEntity
 	 */
-	private def serialize(AstEntity astEntity) {
+	private def serialize(Resource calResource) {
+		val astEntity = calResource.entity
 		// Transform the AstEntity into an Actor or a Unit
 		val entity =
 			if (astEntity.unit != null) {
@@ -166,13 +175,13 @@ class CalGenerator implements IGenerator {
 			return ""
 		}
 
-		// Associate a resource to the current entity
-		val resource = resourceSet.createResource(OrccUtil::getIrUri(astEntity.eResource.URI))
-		resource.contents.add(entity)
+		val irResource = irResourceSet.createResource(OrccUtil::getIrUri(calResource.URI))
+		// Associate the current entity to its resource
+		irResource.contents.add(entity)
 
 		// Serialize in a simple String in memory
 		val outputStream = new ByteArrayOutputStream
-		resource.save(outputStream, newHashMap)
+		irResource.save(outputStream, newHashMap)
 
 		// Simply return the serialized content
 		outputStream.toString
@@ -181,11 +190,10 @@ class CalGenerator implements IGenerator {
 	/**
 	 * Load content from the given AstEntity (unit) resource into the Frontend
 	 */
-	private def loadMappings(Resource resource) {
-		val astEntity = resource.entity
-		val irResource = resourceSet.getResource((OrccUtil::getIrUri(astEntity.eResource.URI)), true)
+	private def loadMappings(Resource calResource) {
+		val irResource = irResourceSet.getResource(OrccUtil::getIrUri(calResource.URI), true)
 		val unit = irResource.contents.head as Unit
-		val astUnit = astEntity.unit
+		val astUnit = calResource.entity.unit
 
 		for(astConstant : astUnit.variables) {
 			val irConstant = unit.getConstant(astConstant.name)
@@ -201,8 +209,7 @@ class CalGenerator implements IGenerator {
 			val procedure = unit.getProcedure(astProcedure.name)
 			Frontend::instance.putMapping(astProcedure, procedure)
 		}
-
-		loadedResources.add(resource)
+		loadedResources.add(calResource)
 	}
 
 	/**
@@ -244,7 +251,7 @@ class CalGenerator implements IGenerator {
 			val calFile = imp.getExistingCalFile
 			if(calFile != null) {
 				dependingResource.add(
-					resourceSet.getResource(URI.createPlatformResourceURI(calFile.fullPath.toString, true), true)
+					calResourceSet.getResource(URI.createPlatformResourceURI(calFile.fullPath.toString, true), true)
 				)
 			}
 		}
@@ -276,7 +283,6 @@ class CalGenerator implements IGenerator {
 		// We need to flush all Caches, because it can explode the memory consumption...
 		CacheManager.instance.unloadAllCaches();
 		// The current build session ends, reset the sets
-		builtResources.clear
 		loadedResources.clear
 	}
 }

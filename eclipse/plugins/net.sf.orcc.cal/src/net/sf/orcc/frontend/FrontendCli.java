@@ -41,20 +41,28 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Import;
 import net.sf.orcc.cal.generator.CalGenerator;
 import net.sf.orcc.df.util.XdfConstants;
+import net.sf.orcc.util.CommandLineUtil;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Appender;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -105,6 +113,15 @@ public class FrontendCli implements IApplication {
 
 	public FrontendCli() {
 
+		// Configure Log4j to output logs in System.out console (used in Xtext
+		// framework)
+		final Layout l = new PatternLayout(
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		final Appender a = new ConsoleAppender(l, ConsoleAppender.SYSTEM_OUT);
+		Logger.getRootLogger().addAppender(a);
+		// Default level to Info, reduces amount of messages displayed
+		Logger.getRootLogger().setLevel(Level.INFO);
+
 		injector = new CalStandaloneSetup()
 				.createInjectorAndDoEMFRegistration();
 
@@ -125,7 +142,7 @@ public class FrontendCli implements IApplication {
 				IApplicationContext.APPLICATION_ARGS);
 
 		if (!parseCommandLine(args)) {
-			// parseCommandLine already displayed an error message before
+			// parseCommandLine() already displayed an error message before
 			// returning false
 			return IApplication.EXIT_RELAUNCH;
 		}
@@ -134,10 +151,11 @@ public class FrontendCli implements IApplication {
 		try {
 			// IMPORTANT : Disable auto-building, because it requires Xtext UI
 			// plugins to be launched
-			disableAutoBuild();
+			wasAutoBuildEnabled = CommandLineUtil.disableAutoBuild(workspace);
 
 			// Get the projects to compile in the right order
-			OrccLogger.traceln("Setup " + project.getName() + " as working project ");
+			OrccLogger.traceln("Setup " + project.getName()
+					+ " as working project");
 			final Collection<IProject> orderedProjects = getOrderedProjects(project);
 
 			// Check for missing output folders in project
@@ -164,19 +182,24 @@ public class FrontendCli implements IApplication {
 					}
 				}
 			}
-			// Specific build. We only write IR needed to build the network referenced on command line
+			// Specific build. We only write IR needed to build the network
+			// referenced on command line
 			else {
-				// Compute the list of all xdf and cal files in required projects. Store all these files
+				// Compute the list of all xdf and cal files in required
+				// projects. Store all these files
 				// in a map, indexed by their qualified name
 				final Map<String, IFile> allFiles = new HashMap<String, IFile>();
 				for (final IProject project : orderedProjects) {
-					final List<IFolder> folders = OrccUtil.getAllSourceFolders(project);
-					final List<IFile> networks = OrccUtil.getAllFiles(OrccUtil.NETWORK_SUFFIX, folders);
-					for(final IFile file : networks) {
+					final List<IFolder> folders = OrccUtil
+							.getAllSourceFolders(project);
+					final List<IFile> networks = OrccUtil.getAllFiles(
+							OrccUtil.NETWORK_SUFFIX, folders);
+					for (final IFile file : networks) {
 						allFiles.put(OrccUtil.getQualifiedName(file), file);
 					}
-					final List<IFile> entities = OrccUtil.getAllFiles(OrccUtil.CAL_SUFFIX, folders);
-					for(final IFile file : entities) {
+					final List<IFile> entities = OrccUtil.getAllFiles(
+							OrccUtil.CAL_SUFFIX, folders);
+					for (final IFile file : entities) {
 						allFiles.put(OrccUtil.getQualifiedName(file), file);
 					}
 				}
@@ -205,58 +228,50 @@ public class FrontendCli implements IApplication {
 				calGenerator.afterBuild();
 			}
 
-			// If needed, restore autoBuild state in eclipse config file
-			restoreAutoBuild();
-
+			// Avoid warning messages of type "The workspace exited
+			// with unsaved changes in the previous session" the next
+			// time an IApplication (FrontendCli) will be launched
+			// This method can be called ONLY if auto-building has
+			// been disabled
+			OrccLogger.traceln("Saving workspace");
 			workspace.getRoot().refreshLocal(IWorkspaceRoot.DEPTH_INFINITE,
 					new NullProgressMonitor());
 			workspace.save(true, new NullProgressMonitor());
-			OrccLogger.traceln("Build ends");
 
-		} catch (CoreException ce) {
-			System.err.println(ce.getMessage());
-		} catch (FileNotFoundException e) {
+			final IJobManager manager = Job.getJobManager();
+			int i = 0;
+			while (!manager.isIdle()) {
+				OrccLogger.traceln("Waiting for completion of"
+						+ " currently running jobs - " + ++i);
+				Thread.sleep(500);
+			}
+		} catch (CoreException e) {
+			OrccLogger.severeln(e.getMessage());
 			e.printStackTrace();
-		} catch (Exception eee) {
-			eee.printStackTrace();
+		} catch (FileNotFoundException e) {
+			OrccLogger.severeln(e.getMessage());
+			e.printStackTrace();
+		} catch (Exception e) {
+			OrccLogger.severeln(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			try {
-				restoreAutoBuild();
+
+				if (wasAutoBuildEnabled) {
+					CommandLineUtil.enableAutoBuild(workspace);
+					wasAutoBuildEnabled = false;
+				}
+
+				OrccLogger.traceln("End of frontend execution");
 				return IApplication.EXIT_OK;
+
 			} catch (CoreException e) {
-				System.err.println(e.getMessage());
+				OrccLogger.severeln(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 
 		return IApplication.EXIT_RESTART;
-	}
-
-	/**
-	 * Configure the current workbench to disable auto-building. If it was
-	 * enabled, set wasAutoBuildEnabled to true to re-enable it later.
-	 * 
-	 * @throws CoreException
-	 */
-	private void disableAutoBuild() throws CoreException {
-		final IWorkspaceDescription desc = workspace.getDescription();
-		if (desc.isAutoBuilding()) {
-			wasAutoBuildEnabled = true;
-			desc.setAutoBuilding(false);
-			workspace.setDescription(desc);
-		}
-	}
-
-	/**
-	 * If auto-building was enabled, restore its state.
-	 * 
-	 * @throws CoreException
-	 */
-	private void restoreAutoBuild() throws CoreException {
-		if (wasAutoBuildEnabled) {
-			final IWorkspaceDescription desc = workspace.getDescription();
-			desc.setAutoBuilding(true);
-			workspace.setDescription(desc);
-		}
 	}
 
 	/**
@@ -288,7 +303,7 @@ public class FrontendCli implements IApplication {
 		if (args.length >= 2 && !args[1].isEmpty()) {
 			networkFile = OrccUtil.getFile(project, args[1],
 					OrccUtil.NETWORK_SUFFIX);
-			if(networkFile == null) {
+			if (networkFile == null) {
 				OrccLogger.severeln("Unable to find the network " + args[1]);
 			}
 		}
@@ -311,7 +326,8 @@ public class FrontendCli implements IApplication {
 
 		final IJavaProject javaProject = JavaCore.create(project);
 		if (javaProject == null) {
-			OrccLogger.severeln("Project " + project.getName() + " is not a Java project.");
+			OrccLogger.severeln("Project " + project.getName()
+					+ " is not a Java project.");
 			return projects;
 		}
 
@@ -339,8 +355,9 @@ public class FrontendCli implements IApplication {
 	 * @return A loaded EMF resource
 	 */
 	private Resource getResource(final IFile file) {
-		if(!file.exists()) {
-			OrccLogger.severeln("File " + file.getFullPath().toString() + " does not exists !");
+		if (!file.exists()) {
+			OrccLogger.severeln("File " + file.getFullPath().toString()
+					+ " does not exists !");
 			return null;
 		}
 		final URI uri = URI.createPlatformResourceURI(file.getFullPath()
@@ -392,10 +409,12 @@ public class FrontendCli implements IApplication {
 				final NodeList instChildren = tag.getChildNodes();
 				for (int j = 0; j < instChildren.getLength(); ++j) {
 					final Node instChild = instChildren.item(j);
-					if(instChild.getNodeType() != Node.ELEMENT_NODE) continue;
+					if (instChild.getNodeType() != Node.ELEMENT_NODE)
+						continue;
 
 					final Element classElement = (Element) instChild;
-					if (classElement.getNodeName().equals(XdfConstants.CLASS_TAG)) {
+					if (classElement.getNodeName().equals(
+							XdfConstants.CLASS_TAG)) {
 						final String qualifiedName = classElement
 								.getAttribute(XdfConstants.NAME_ATTR);
 
@@ -404,7 +423,8 @@ public class FrontendCli implements IApplication {
 							if (file.getFileExtension().equals(
 									OrccUtil.NETWORK_SUFFIX)) {
 								// Run this method on the sub-network
-								storeReferencedEntities(file, workspaceMap, files);
+								storeReferencedEntities(file, workspaceMap,
+										files);
 							} else {
 								// Store the imports of the CAL actor
 								storeImportedResources(file, files);

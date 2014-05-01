@@ -28,13 +28,10 @@
  */
 package net.sf.orcc.xdf.ui.features;
 
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
@@ -61,33 +58,28 @@ public class InstanceDblClickFeature extends AbstractCustomFeature {
 
 	@Override
 	public boolean canExecute(ICustomContext context) {
-		if (context.getPictogramElements().length == 1) {
-			final PictogramElement pe = context.getPictogramElements()[0];
-			final EObject eobject = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-			if (eobject instanceof Instance) {
-				return ((Instance) eobject).getEntity() != null;
-			}
+		final PictogramElement pe = context.getInnerPictogramElement();
+		final EObject eobject = Graphiti.getLinkService()
+				.getBusinessObjectForLinkedPictogramElement(pe);
+		if (eobject instanceof Instance) {
+			return ((Instance) eobject).getEntity() != null;
 		}
 		return super.canExecute(context);
 	}
 
 	@Override
 	public void execute(ICustomContext context) {
-		final PictogramElement pe = context.getPictogramElements()[0];
+		final PictogramElement pe = context.getInnerPictogramElement();
 		final Instance instance = (Instance) Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-
-		final EObject entity = instance.getEntity();
-		if (entity == null) {
-			OrccLogger.warnln("No entity to open");
-			return;
-		}
 		
 		IFile file;
-		if (entity instanceof Actor) {
-			file = ((Actor) entity).getFile();
+		if (instance.isActor()) {
+			file = instance.getActor().getFile();
+		} else if (instance.isNetwork()) {
+			file = instance.getNetwork().getFile();
 		} else {
-			file = ResourcesPlugin.getWorkspace().getRoot()
-					.getFile(new Path(entity.eResource().getURI().toPlatformString(true)));
+			OrccLogger.severeln("Invalid instance");
+			return;
 		}
 		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- From orcc_src : ant -f orcc/contrib/scripts/javadoc.xml -Declipse.dir=/opt/eclipse -Dplugins.dir=autobuild/build.dir.testing/plugins -Ddest.dir=javadoc -->
+
+<project default="javadoc">
+	<!-- This ant build file use "ant-contrib" library. See http://ant-contrib.sourceforge.net/
+	or simply install it with your system package manager -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
+	<target name="javadoc">
+		<if>
+			<not>
+				<and>
+					<isset property="plugins.dir" />
+					<isset property="dest.dir" />
+				</and>
+			</not>
+			<then>
+				<fail>You must specify properties plugins.dir and dest.dir</fail>
+			</then>
+		</if>
+
+		<!-- Set the date format to use in Javadoc title -->
+		<tstamp/>
+		<javadoc
+			doctitle="Orcc documentation (generated ${TODAY})"
+			Windowtitle="Generated Orcc documentation"
+			destdir="${dest.dir}"
+			splitindex="true"
+			nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.7"
+			access="public" author="true" use="true" version="true">
+				<fileset dir="${plugins.dir}" defaultexcludes="yes">
+					<include name="net.sf.orcc*/src/**/*.java" />
+					<include name="net.sf.orcc*/src-gen/**/*.java" />
+					<include name="net.sf.orcc*/xtend-gen/**/*.java" />
+				</fileset>
+		</javadoc>
+	</target>
+</project>

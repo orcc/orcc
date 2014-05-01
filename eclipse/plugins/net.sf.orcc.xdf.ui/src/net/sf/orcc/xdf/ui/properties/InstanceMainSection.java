@@ -29,7 +29,9 @@
 package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 
+import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -76,7 +78,7 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 
 	@Override
 	protected void readValuesFromModels() {
-		final Instance instance = (Instance) businessObject;
+		final Instance instance = (Instance) getSelectedBusinessObject();
 		instanceName.setText(instance.getName());
 
 		if (instance.getEntity() != null) {
@@ -95,11 +97,29 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 	}
 
 	@Override
+	protected String checkValueValid(Widget widget) {
+
+		if (widget == instanceName) {
+			final InstancePattern pattern = getPattern(
+					getSelectedPictogramElement(), InstancePattern.class);
+			if (pattern != null) {
+				return pattern.checkValueValid(instanceName.getText(),
+						(Instance) getSelectedBusinessObject());
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Instance instance = (Instance) businessObject;
+		final Instance instance = (Instance) getSelectedBusinessObject();
 
 		if (widget == instanceName) {
 			instance.setName(instanceName.getText());
+			final UpdateContext context = new UpdateContext(
+					getSelectedPictogramElement());
+			getFeatureProvider().updateIfPossible(context);
 		} else if (widget == refinementValue) {
 
 		} else if (widget == part_name) {

@@ -28,3 +28,4 @@ plugin.xml_gen
 # Update site specific patterns
 eclipse/site/updates/features/
 eclipse/site/updates/plugins/
+eclipse/site/.htaccess

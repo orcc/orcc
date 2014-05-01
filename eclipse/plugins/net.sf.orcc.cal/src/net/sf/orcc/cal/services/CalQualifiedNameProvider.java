@@ -54,12 +54,15 @@ public class CalQualifiedNameProvider extends
 
 	public QualifiedName qualifiedName(AstAction action) {
 		AstTag tag = action.getTag();
+		QualifiedName result = getFullyQualifiedName(action.eContainer());
 		if (tag == null) {
-			return getConverter().toQualifiedName(action.toString());
+			result = result.append(getConverter().toQualifiedName(
+					action.toString()));
+		} else {
+			result = result.append(getConverter().toQualifiedName(
+					OrccUtil.toString(tag.getIdentifiers(), ".")));
 		}
-
-		return getConverter().toQualifiedName(
-				OrccUtil.toString(tag.getIdentifiers(), "."));
+		return result;
 	}
 
 	public QualifiedName qualifiedName(AstActor actor) {
@@ -76,7 +79,15 @@ public class CalQualifiedNameProvider extends
 	}
 
 	public QualifiedName qualifiedName(AstTag tag) {
-		return null;
+
+		QualifiedName container = getFullyQualifiedName(tag.eContainer());
+		if (container == null) {
+			container = getConverter().toQualifiedName(
+					tag.eContainer().toString());
+		}
+		final QualifiedName qtag = getConverter().toQualifiedName(
+				OrccUtil.toString(tag.getIdentifiers(), "."));
+		return container.append(qtag);
 	}
 
 	public QualifiedName qualifiedName(AstUnit unit) {

@@ -611,16 +611,23 @@ class InstancePrinter extends CTemplate {
 		«inline»void «entityName»_initialize(schedinfo_t *si) {
 			int i = 0;
 			«additionalInitializes»
+			«printCallTokensFunctions»
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
 			«ENDIF»
-			«IF !actor.initializes.nullOrEmpty»
-				«actor.initializes.printActionsScheduling»
-			«ENDIF»
-
+			«FOR initialize : actor.initializes»
+				if(«initialize.scheduler.name»()) {
+					«initialize.name»();
+				}
+			«ENDFOR»
 		finished:
-			// no read_end/write_end here!
+			«FOR port : actor.inputs»
+				read_end_«port.name»();
+			«ENDFOR»
+			«FOR port : actor.outputs.notNative»
+				write_end_«port.name»();
+			«ENDFOR»
 			return;
 		}
 	'''

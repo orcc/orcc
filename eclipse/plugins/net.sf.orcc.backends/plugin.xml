@@ -63,6 +63,9 @@
          <option
                id="net.sf.orcc.backends.c.dal.outputBuffering">
          </option>
+         <option
+               id="net.sf.orcc.backends.c.dal.checkGuards">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.hmpp.HMPPBackend"
@@ -410,6 +413,13 @@
          </option>
          <option
                defaultValue="false"
+               description="Check actors action guards to better identify non-determinism"
+               id="net.sf.orcc.backends.c.dal.checkGuards"
+               name="Check Guards">
+            <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
                description="Whether Orcc should import the given xml buffer size configuration file"
                id="net.sf.orcc.backends.importBXDF"
                name="Import the BXDF Mapping">
@@ -507,18 +517,6 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.promela.PromelaBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="compa"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.c.compa.COMPABackend">
          </run>
       </application>
    </extension>

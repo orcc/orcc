@@ -70,7 +70,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 	@Override
 	public Void caseInstance(Instance instance) {
 		handle(instance);
-		return null;
+		return doSwitch(instance.getEntity());
 	}
 
 	@Override

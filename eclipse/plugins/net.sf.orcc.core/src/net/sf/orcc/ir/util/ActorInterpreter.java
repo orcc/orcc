@@ -423,7 +423,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 							Procedure.class).getName();
 				}
 
-				OrccLogger.warnln("[signed overflow/underflow] "
+				OrccLogger.debugln("[signed overflow/underflow] "
 						+ actor.getName() + ":" + container + " line: "
 						+ instruction.getLineNumber());
 			}

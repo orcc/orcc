@@ -124,7 +124,7 @@ public class NetworkParametersSection extends AbstractTableBasedSection {
 
 	@Override
 	protected void readValuesFromModels() {
-		final Network network = (Network) businessObject;
+		final Network network = (Network) getSelectedBusinessObject();
 		final TypePrinter typePrinter = new TypePrinter();
 
 		table.removeAll();
@@ -138,7 +138,7 @@ public class NetworkParametersSection extends AbstractTableBasedSection {
 
 	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Network network = (Network) businessObject;
+		final Network network = (Network) getSelectedBusinessObject();
 
 		network.getParameters().clear();
 

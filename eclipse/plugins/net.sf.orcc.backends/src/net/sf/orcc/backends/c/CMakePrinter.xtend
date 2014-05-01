@@ -76,7 +76,8 @@ class CMakePrinter extends CommonPrinter {
 		set(extra_includes)
 		
 		# Runtime libraries inclusion
-		include_directories(libs/orcc/include)
+		include_directories(libs/orcc-native/include)
+		include_directories(libs/orcc-runtime/include)
 		
 		«addLibrariesSubdirs»
 	'''
@@ -112,6 +113,6 @@ class CMakePrinter extends CommonPrinter {
 		add_executable(«network.simpleName» ${filenames})
 
 		# Build library without any external library required
-		target_link_libraries(«network.simpleName» orcc)
+		target_link_libraries(«network.simpleName» orcc-native orcc-runtime)
 	'''
 }

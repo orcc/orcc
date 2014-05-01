@@ -61,14 +61,6 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 	public void launch(final ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
 
-		// set the log level
-		if (mode.equals("debug")
-				|| configuration.getAttribute(DEBUG_MODE, false)) {
-			OrccLogger.setLevel(OrccLogger.ALL);
-		} else {
-			OrccLogger.setLevel(OrccLogger.NOTICE);
-		}
-
 		Job job = new Job("Simulation job") {
 
 			Simulator currentSimulator;
@@ -76,7 +68,6 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 			@SuppressWarnings("unchecked")
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-
 				String simulatorName = "unknown";
 				try {
 					simulatorName = configuration.getAttribute(SIMULATOR, "");
@@ -130,7 +121,7 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 									+ " simulation error: "
 									+ builder.toString());
 				} finally {
- 					OrccLogger.setLevel(OrccLogger.ALL);
+					OrccLogger.setLevel(OrccLogger.ALL);
 				}
 
 				return returnStatus;
@@ -152,7 +143,17 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		// Configure the logger with the console attached to the process
 		OrccLogger.configureLoggerWithHandler(new OrccUiConsoleHandler(
 				DebugUITools.getConsole(process)));
-		
+
+		// set the log level
+		if (mode.equals("debug")
+				|| configuration.getAttribute(DEBUG_MODE, false)) {
+			OrccLogger.setLevel(OrccLogger.ALL);
+
+		} else {
+			OrccLogger.setLevel(OrccLogger.NOTICE);
+		}
+
+		// schedule the simulator job
 		job.setUser(false);
 		job.schedule();
 	}

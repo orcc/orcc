@@ -52,9 +52,9 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
-import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
@@ -292,9 +292,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			addBoToDiagram(diagram, port);
 		}
 		for (net.sf.orcc.df.Connection connection : network.getConnections()) {
-			final AddConnectionContext ctxt = XdfUtil.getAddConnectionContext(
+			final IAddConnectionContext ctxt = XdfUtil.getAddConnectionContext(
 					xdfFeatureProvider, getDiagram(), connection);
-			ctxt.setNewObject(connection);
 			getFeatureProvider().addIfPossible(ctxt);
 		}
 

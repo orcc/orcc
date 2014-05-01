@@ -124,29 +124,15 @@ class NetworkPrinter extends CTemplate {
 		#include <stdlib.h>
 		«printAdditionalIncludes»
 
-		#ifndef _WIN32
-		#define __USE_GNU
-		#endif
-
 		#include "types.h"
 		#include "fifo.h"
-		#include "scheduler.h"
-		#include "mapping.h"
 		#include "util.h"
 		#include "dataflow.h"
-
-		#include "cycle.h"
 		#include "serialize.h"
 		#include "options.h"
-
-		#include "thread.h"
-		#define MAX_THREAD_NB 10
-		«IF newSchedul»
-			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
-		«ENDIF»
+		#include "scheduler.h"
 
 		#define SIZE «fifoSize»
-		// #define PRINT_FIRINGS
 
 		/////////////////////////////////////////////////
 		// FIFO allocation
@@ -219,15 +205,6 @@ class NetworkPrinter extends CTemplate {
 		/////////////////////////////////////////////////
 		// Declaration of the network
 		network_t network = {"«network.name»", actors, connections, «network.allActors.size», «network.connections.size»};
-
-		/////////////////////////////////////////////////
-		// Actor scheduler
-		«printScheduler»
-
-		/////////////////////////////////////////////////
-		// Initializer and launcher
-		
-		«printLauncher»
 		
 		/////////////////////////////////////////////////
 		// Actions to do when exting properly
@@ -242,48 +219,15 @@ class NetworkPrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
-			 «beforeMain»
+			«beforeMain»
 			
 			options_t *opt = init_orcc(argc, argv);
 			atexit(atexit_actions);
+			set_scheduling_strategy(«IF !newSchedul»"RR"«ELSEIF ringTopology»"DDR"«ELSE»"DDF"«ENDIF», opt);
 			
-			launcher(opt);
+			launcher(opt, &network);
 			«afterMain»
 			return compareErrors;
-		}
-	'''
-
-	def protected printLauncher() '''
-		static void launcher(options_t *opt) {
-			int i;
-			mapping_t *mapping = map_actors(&network);
-			int nb_threads = opt->nb_processors;
-			
-			cpu_set_t cpuset;
-			orcc_thread_t threads[MAX_THREAD_NB];
-			orcc_thread_id_t threads_id[MAX_THREAD_NB];
-			orcc_thread_t thread_agent;
-			orcc_thread_id_t thread_agent_id;
-			sync_t sync;
-			
-			global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, &sync);
-			agent_t *agent = agent_init(&sync, opt, scheduler, &network, nb_threads);
-			sync_init(&sync);
-			
-			global_scheduler_init(scheduler, mapping, opt);
-			
-			orcc_clear_cpu_set(cpuset);
-			
-			for(i=0 ; i < nb_threads; i++){
-				orcc_thread_create(threads[i], scheduler_routine, *scheduler->schedulers[i], threads_id[i]);
-				orcc_set_thread_affinity(cpuset, i, threads[i]);
-			}
-			orcc_thread_create(thread_agent, agent_routine, *agent, thread_agent_id);
-			
-			for(i=0 ; i < nb_threads; i++){
-				orcc_thread_join(threads[i]);
-			}
-			orcc_thread_join(thread_agent);
 		}
 	'''
 	
@@ -299,46 +243,6 @@ class NetworkPrinter extends CTemplate {
 	
 	def protected printFifoAssign(String name, Port port, int fifoIndex) '''
 		fifo_«port.type.doSwitch»_t *«name»_«port.name» = &fifo_«fifoIndex»;
-	'''
-
-	def protected printScheduler() '''
-		void *scheduler_routine(void *data) {
-			local_scheduler_t *sched = (local_scheduler_t *) data;
-			actor_t *my_actor;
-			schedinfo_t si;
-			int j;
-			ticks tick_in, tick_out;
-			double diff_tick;
-		
-			set_realtime_priority();
-			sched_init_actors(sched, &si);
-			
-			while (1) {
-				my_actor = sched_get_next«IF newSchedul»_schedulable(sched, RING_TOPOLOGY)«ELSE»(sched)«ENDIF»;
-				if(my_actor != NULL){
-					tick_in = getticks();
-					si.num_firings = 0;
-					
-					my_actor->sched_func(&si);
-					
-					tick_out = getticks();
-					diff_tick = elapsed(tick_out, tick_in);
-					my_actor->ticks += diff_tick;
-					my_actor->switches++;
-					if (si.num_firings == 0) {
-						my_actor->misses++;
-					}
-		#ifdef PRINT_FIRINGS
-					printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
-		#endif
-				}
-				
-				if(my_actor == NULL || needMapping()) {
-					orcc_semaphore_set(sched->sync->sem_monitor);
-					orcc_semaphore_wait(sched->sem_thread);
-				}
-			}
-		}
 	'''
 
 	def protected allocateFifos(Vertex vertex) '''

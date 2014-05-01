@@ -30,6 +30,7 @@ package net.sf.orcc.xdf.ui.editors;
 
 import java.io.IOException;
 
+import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
@@ -41,6 +42,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 
@@ -64,6 +66,11 @@ public class XdfDiagramEditor extends DiagramEditor {
 	protected DiagramEditorInput convertToDiagramEditorInput(IEditorInput input) throws PartInitException {
 		final DiagramEditorInput origEditorInput = super.convertToDiagramEditorInput(input);
 		return new XdfEditorInput(origEditorInput.getUri(), origEditorInput.getProviderId());
+	}
+
+	@Override
+	public Image getTitleImage() {
+		return OrccUiActivator.getImage("icons/network.gif");
 	}
 
 	/**

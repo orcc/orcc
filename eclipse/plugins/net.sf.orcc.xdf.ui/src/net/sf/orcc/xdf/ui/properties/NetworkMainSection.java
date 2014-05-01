@@ -65,13 +65,13 @@ public class NetworkMainSection extends AbstractGridBasedSection {
 
 	@Override
 	protected void readValuesFromModels() {
-		final Network network = (Network) businessObject;
+		final Network network = (Network) getSelectedBusinessObject();
 		networkName.setText(network.getName());
 	}
 
 	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Network network = (Network) businessObject;
+		final Network network = (Network) getSelectedBusinessObject();
 
 		if (widget == networkName) {
 			// TODO: renaming a network must also rename both diagram and

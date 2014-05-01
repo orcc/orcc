@@ -116,11 +116,14 @@ public class CalRenameParticipant extends RenameParticipant {
 	private Change getFileContentUpdatesChange() {
 		factory.clearReplacementMaps();
 
-		final Pattern actorUnitPattern = Pattern
-				.compile("(actor|unit)(\\s+)"+originalBasename+"(\\s*)\\(");
-		final String actorUnitNameReplacement = "$1$2" + newBasename + "$3(";
+		final Pattern actor = Pattern.compile("actor(\\s+)" + originalBasename
+				+ "(\\s*)\\(");
+		factory.addReplacement(actor, "actor$1" + newBasename + "$2" + '(');
 
-		factory.addReplacement(actorUnitPattern, actorUnitNameReplacement);
+		final Pattern unit = Pattern.compile("unit(\\s+)" + originalBasename
+				+ "(\\s*):");
+		factory.addReplacement(unit, "unit$1" + newBasename + "$2" + ':');
+
 		return factory
 				.getReplacementChange(originalFile, "Update file content");
 	}
