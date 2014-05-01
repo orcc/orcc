@@ -496,9 +496,9 @@
     ref[16] = src1[15]
 #define PRED_ANGULAR_STORE1_32_8()                                             \
     r0 = _mm_loadu_si128((__m128i*) (src1-1));                                 \
-    _mm_store_si128((__m128i *) ref, r0);                                      \
+    _mm_storeu_si128((__m128i *) ref, r0);                                      \
     r0 = _mm_loadu_si128((__m128i*) (src1+15));                                \
-    _mm_store_si128((__m128i *) (ref + 16), r0);                               \
+    _mm_storeu_si128((__m128i *) (ref + 16), r0);                               \
     ref[32] = src1[31]
 
 #define PRED_ANGULAR_STORE1_4_10()                                             \
@@ -507,23 +507,23 @@
     ref[4] = src1[3]
 #define PRED_ANGULAR_STORE1_8_10()                                             \
     r0 = _mm_loadu_si128((__m128i*) (&src1[-1]));                              \
-    _mm_store_si128((__m128i *) ref, r0);                                      \
+    _mm_storeu_si128((__m128i *) ref, r0);                                      \
     ref[8] = src1[7]
 #define PRED_ANGULAR_STORE1_16_10()                                            \
     r0 = _mm_loadu_si128((__m128i*) (&src1[-1]));                              \
-    _mm_store_si128((__m128i *) ref, r0);                                      \
+    _mm_storeu_si128((__m128i *) ref, r0);                                      \
     r0 = _mm_loadu_si128((__m128i*) (&src1[7]));                               \
-    _mm_store_si128((__m128i *) (&ref[8]), r0);                                \
+    _mm_storeu_si128((__m128i *) (&ref[8]), r0);                                \
     ref[16] = src1[15]
 #define PRED_ANGULAR_STORE1_32_10()                                            \
     r0 = _mm_loadu_si128((__m128i*) (&src1[-1]));                              \
-    _mm_store_si128((__m128i *) ref, r0);                                      \
+    _mm_storeu_si128((__m128i *) ref, r0);                                      \
     r0 = _mm_loadu_si128((__m128i*) (&src1[7]));                               \
-    _mm_store_si128((__m128i *) (&ref[ 8]), r0);                               \
+    _mm_storeu_si128((__m128i *) (&ref[ 8]), r0);                               \
     r0 = _mm_loadu_si128((__m128i*) (&src1[15]));                              \
-    _mm_store_si128((__m128i *) (&ref[16]), r0);                               \
+    _mm_storeu_si128((__m128i *) (&ref[16]), r0);                               \
     r0 = _mm_loadu_si128((__m128i*) (&src1[23]));                              \
-    _mm_store_si128((__m128i *) (&ref[24]), r0);                               \
+    _mm_storeu_si128((__m128i *) (&ref[24]), r0);                               \
     ref[32] = src1[31]
 
 #define PRED_ANGULAR_WAR()                                                     \
