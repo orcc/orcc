@@ -41,6 +41,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
@@ -55,9 +56,11 @@ import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
+import org.eclipse.graphiti.services.Graphiti;
 
 /**
  * Replace the selected instance by the content of the network it refined on.
@@ -127,6 +130,8 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
 
 		final Map<Instance, Instance> copies = new HashMap<Instance, Instance>();
+		final Map<Instance, PictogramElement> peMap = new HashMap<Instance, PictogramElement>();
+
 		// Copy content of sub network in this network
 		for (final Vertex vertex : subNetwork.getChildren()) {
 
@@ -139,7 +144,10 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 				addCtxt.setLocation(10, 10);
 				addCtxt.setNewObject(subInstance);
 				addCtxt.setTargetContainer(getDiagram());
-				getFeatureProvider().addIfPossible(addCtxt);
+				final PictogramElement pe = getFeatureProvider().addIfPossible(addCtxt);
+				if(pe != null) {
+					peMap.put(subInstance, pe);
+				}
 			}
 		}
 
@@ -200,6 +208,9 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 			}
 		}
 
+		final InstancePattern instancePattern = (InstancePattern) ((IFeatureProviderWithPatterns) getFeatureProvider())
+				.getPatternForPictogramElement(instancePe);
+
 		// Merge connections:
 		// outerCons = connected from an output of the instance to something in the current graph
 		// innerCon = connected from something to an output in the subNetwork
@@ -218,19 +229,24 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 					final Instance source = copies.get(innerCon.getSource());
 					final Port sourcePort = source.getAdapter(Entity.class).getOutput(innerCon.getSourcePort().getName());
 
-					final Connection c = DfFactory.eINSTANCE.createConnection(
-							source, sourcePort,
-							outerCon.getTarget(), outerCon.getTargetPort());
+					// Update this network connection with the new source
+					// instance
+					outerCon.setSource(source);
+					outerCon.setSourcePort(sourcePort);
 
-					// We will 'add' a new Connection to a diagram (not create
-					// it, in Graphiti context). It must exists in the current
-					// network
-					thisNetwork.add(c);
-
-					// Really add the connection
-					final IAddConnectionContext addConContext = XdfUtil
-							.getAddConnectionContext(fp, getDiagram(), c);
-					getFeatureProvider().addIfPossible(addConContext);
+					// Update this diagram connection with the new start anchor
+					final List<PictogramElement> linkedPes = Graphiti
+							.getLinkService().getPictogramElements(
+									getDiagram(), outerCon);
+					for (final PictogramElement pe : linkedPes) {
+						if (pe instanceof org.eclipse.graphiti.mm.pictograms.Connection) {
+							final Anchor anchor = instancePattern
+									.getAnchorForPort(peMap.get(source),
+											sourcePort);
+							((org.eclipse.graphiti.mm.pictograms.Connection) pe)
+									.setStart(anchor);
+						}
+					}
 				}
 			}
 		}
