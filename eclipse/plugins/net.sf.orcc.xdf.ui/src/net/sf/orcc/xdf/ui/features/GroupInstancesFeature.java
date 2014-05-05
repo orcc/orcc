@@ -32,10 +32,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
@@ -43,6 +45,10 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 import net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard;
@@ -50,6 +56,7 @@ import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -183,23 +190,51 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			}
 		}
 
+		// Create an Instance refined on the new Network
+		final String instanceName = uniqueVertexName(currentNetwork,
+				"groupedInstances");
+		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
+				instanceName, newNetwork);
+		currentNetwork.add(newInstance);
+
 		// This will store the mapping between original instances and their copy
 		// in the new Network
 		final Map<Instance, Instance> copyMap = new HashMap<Instance, Instance>();
 
 		// Copy each selected Instance into the new Network
 		for (final Instance originalInstance : selectedInstances) {
-			final Instance copy = EcoreUtil.copy(originalInstance);
-			copyMap.put(originalInstance, copy);
-			newNetwork.add(copy);
-		}
+			final Instance copyInstance = IrUtil.copy(originalInstance);
+			copyMap.put(originalInstance, copyInstance);
+			newNetwork.add(copyInstance);
 
-		// Create the new Instance
-		final String instanceName = uniqueVertexName(currentNetwork,
-				"groupedInstances");
-		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
-				instanceName, newNetwork);
-		currentNetwork.add(newInstance);
+			// IrUtil.copy() duplicated all arguments, and set their Use objects
+			// to original variables, owned by the current network
+			for (Argument arg : copyInstance.getArguments()) {
+
+				for (Iterator<EObject> it = arg.eAllContents(); it.hasNext();) {
+					final EObject childEObject = it.next();
+
+					if (childEObject instanceof ExprVar) {
+
+						final ExprVar exprVar = (ExprVar) childEObject;
+						final Var varOrig = exprVar.getUse().getVariable();
+
+						// Create a copy of the original variable (owned by
+						// currentNetwork)
+						final Var varCopy = EcoreUtil.copy(varOrig);
+						// The newNetwork must contains this copy
+						newNetwork.getParameters().add(varCopy);
+						exprVar.getUse().setVariable(varCopy);
+
+						final ExprVar newExprVar = IrFactory.eINSTANCE
+								.createExprVar(varOrig);
+						final Argument newArg = DfFactory.eINSTANCE
+								.createArgument(varCopy, newExprVar);
+						newInstance.getArguments().add(newArg);
+					}
+				}
+			}
+		}
 
 		// This set will be filled with connections which needs to be
 		// re-added to the diagram
@@ -345,7 +380,7 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			layoutFeature.execute(layoutContext);
 		}
 
-		// Save the new network on the disk
+		// Save the new Network on the disk
 		try {
 			newNetwork.eResource().save(Collections.EMPTY_MAP);
 		} catch (IOException e) {
