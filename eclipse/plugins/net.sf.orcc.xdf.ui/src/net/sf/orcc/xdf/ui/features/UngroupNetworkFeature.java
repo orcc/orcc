@@ -29,9 +29,11 @@
 package net.sf.orcc.xdf.ui.features;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
@@ -40,12 +42,16 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IContext;
@@ -132,11 +138,16 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 		final Map<Instance, Instance> copies = new HashMap<Instance, Instance>();
 		final Map<Instance, PictogramElement> peMap = new HashMap<Instance, PictogramElement>();
 
+		// Copy subNetwork variables into the current network
+		for (Var variable : subNetwork.getVariables()) {
+			thisNetwork.getVariables().add(IrUtil.copy(variable));
+		}
+
 		// Copy content of sub network in this network
 		for (final Vertex vertex : subNetwork.getChildren()) {
 
 			if (vertex instanceof Instance) {
-				final Instance subInstance = EcoreUtil.copy((Instance) vertex);
+				final Instance subInstance = IrUtil.copy((Instance) vertex);
 
 				copies.put((Instance) vertex, subInstance);
 
@@ -147,6 +158,34 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 				final PictogramElement pe = getFeatureProvider().addIfPossible(addCtxt);
 				if(pe != null) {
 					peMap.put(subInstance, pe);
+				}
+
+				// Update subInstance argument variable use
+				for (Argument arg : subInstance.getArguments()) {
+					for (Iterator<EObject> it = arg.eAllContents(); it
+							.hasNext();) {
+						final EObject childEObject = it.next();
+
+						if (childEObject instanceof ExprVar) {
+							final ExprVar exprVar = (ExprVar) childEObject;
+							final String varName = exprVar.getUse().getVariable().getName();
+
+							Var theVar = thisNetwork.getVariable(varName);
+							if (theVar == null) {
+								theVar = thisNetwork.getParameter(varName);
+							}
+							if (theVar == null) {
+								OrccLogger
+										.severeln("Unable to retrieve the variable "
+												+ varName
+												+ " in the current network. Its is used in a "
+												+ instance.getName()
+												+ "'s argument");
+							} else {
+								exprVar.getUse().setVariable(theVar);
+							}
+						}
+					}
 				}
 			}
 		}
