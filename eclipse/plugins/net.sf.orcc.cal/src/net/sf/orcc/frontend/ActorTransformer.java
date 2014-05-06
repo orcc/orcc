@@ -53,7 +53,6 @@ import net.sf.orcc.cal.cal.ScheduleFsm;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
@@ -86,6 +85,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -242,28 +242,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	private void actionLoadTokens(StructTransformer transformer,
 			Procedure procedure, Var portVariable, List<Variable> tokens,
-			int repeat) {
-		if (repeat == 1) {
-			int i = 0;
-
-			for (Variable token : tokens) {
-				// declare a fresh new variable here because we can have one in
-				// the body and one in the scheduler
-				Var local = (Var) transformer.doSwitch(token);
-				procedure.getLocals().add(local);
-
-				List<Expression> indexes = new ArrayList<Expression>(1);
-				indexes.add(eINSTANCE.createExprInt(i));
-				int lineNumber = portVariable.getLineNumber();
-
-				Var irToken = Frontend.instance.getMapping(token);
-				InstLoad load = eINSTANCE.createInstLoad(lineNumber, irToken,
-						portVariable, indexes);
-				procedure.getLast().add(load);
-
-				i++;
-			}
-		} else if (tokens.size() == 1) {
+			Expression repeat) {
+		if (tokens.size() == 1) {
 			Variable token = tokens.get(0);
 			Frontend.instance.putMapping(token, portVariable);
 		} else {
@@ -320,7 +300,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			// create while block
 			Expression condition = eINSTANCE
 					.createExprBinary(eINSTANCE.createExprVar(loopVar),
-							OpBinary.LT, eINSTANCE.createExprInt(repeat),
+							OpBinary.LT, IrUtil.copy(repeat),
 							eINSTANCE.createTypeBool());
 			List<Block> blocks = new ArrayList<Block>(1);
 			blocks.add(block);
@@ -347,19 +327,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	private void actionStoreTokens(StructTransformer transformer,
 			Procedure procedure, Var portVariable, List<AstExpression> values,
-			int repeat) {
-		if (repeat == 1) {
-			int i = 0;
-
-			for (AstExpression value : values) {
-				List<Expression> indexes = new ArrayList<Expression>(1);
-				indexes.add(eINSTANCE.createExprInt(i));
-
-				new ExprTransformer(procedure, procedure.getBlocks(),
-						portVariable, indexes).doSwitch(value);
-				i++;
-			}
-		} else if (values.size() == 1 && needToBeCopied(values.get(0))) {
+			Expression repeat) {
+		if (values.size() == 1 && needToBeCopied(values.get(0))) {
 			// assign the expression to a new variable
 			AstExpression value = values.get(0);
 			new ExprTransformer(procedure, procedure.getBlocks(), portVariable)
@@ -432,7 +401,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			// create while block
 			Expression condition = eINSTANCE
 					.createExprBinary(eINSTANCE.createExprVar(loopVar),
-							OpBinary.LT, eINSTANCE.createExprInt(repeat),
+							OpBinary.LT, IrUtil.copy(repeat),
 							eINSTANCE.createTypeBool());
 
 			BlockWhile blockWhile = eINSTANCE.createBlockWhile();
@@ -742,11 +711,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				.createExprInt(totalConsumption);
 
 		// evaluates token consumption
-		int repeat = 1;
+		Expression exprRepeat;
 		if (astRepeat != null) {
-			repeat = Evaluator.getIntValue(astRepeat);
-			Expression exprRepeat = new ExprTransformer(null, null)
-					.doSwitch(astRepeat);
+			exprRepeat = new ExprTransformer(null, null).doSwitch(astRepeat);
 			if (totalConsumption > 1) {
 				totalConsumptionExpr = eINSTANCE.createExprBinary(
 						totalConsumptionExpr, OpBinary.TIMES, exprRepeat,
@@ -754,6 +721,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			} else {
 				totalConsumptionExpr = exprRepeat;
 			}
+		}
+		else {
+			exprRepeat = eINSTANCE.createExprInt(1);
 		}
 		irPattern.setNumTokens(port, totalConsumptionExpr);
 
@@ -766,11 +736,11 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		if (astPattern instanceof InputPattern) {
 			InputPattern pattern = (InputPattern) astPattern;
 			List<Variable> tokens = pattern.getTokens();
-			actionLoadTokens(transformer, procedure, variable, tokens, repeat);
+			actionLoadTokens(transformer, procedure, variable, tokens, exprRepeat);
 		} else {
 			OutputPattern pattern = (OutputPattern) astPattern;
 			List<AstExpression> values = pattern.getValues();
-			actionStoreTokens(transformer, procedure, variable, values, repeat);
+			actionStoreTokens(transformer, procedure, variable, values, exprRepeat);
 		}
 	}
 
