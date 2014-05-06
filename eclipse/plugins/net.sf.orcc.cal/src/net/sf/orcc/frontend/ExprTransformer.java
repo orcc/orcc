@@ -443,67 +443,81 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 * @return <code>null</code>
 	 */
 	private Expression copyList(Var var, boolean removable) {
-		TypeList typeList = (TypeList) target.getType();
-		List<Block> blocks = this.blocks;
-		List<BlockWhile> whiles = new ArrayList<BlockWhile>();
-		List<Var> loopVars = new ArrayList<Var>();
-		List<Expression> indexes = new ArrayList<Expression>();
-		for (Expression sizeExpr : typeList.getDimensionsExpr()) {
-			// add loop variable
-			Var loopVar = procedure.newTempLocalVariable(
-					eINSTANCE.createTypeInt(32), "idx_" + var.getName());
-			loopVars.add(loopVar);
-			InstAssign assign = eINSTANCE.createInstAssign(loopVar,
-					eINSTANCE.createExprInt(0));
-			IrUtil.getLast(blocks).add(assign);
+		Type targetType = target.getType();
+		if (targetType.isList()) {
+			TypeList typeList = (TypeList) target.getType();
+			List<Block> blocks = this.blocks;
+			List<BlockWhile> whiles = new ArrayList<BlockWhile>();
+			List<Var> loopVars = new ArrayList<Var>();
+			List<Expression> indexes = new ArrayList<Expression>();
+			for (Expression sizeExpr : typeList.getDimensionsExpr()) {
+				// add loop variable
+				Var loopVar = procedure.newTempLocalVariable(
+						eINSTANCE.createTypeInt(32), "idx_" + var.getName());
+				loopVars.add(loopVar);
+				InstAssign assign = eINSTANCE.createInstAssign(loopVar,
+						eINSTANCE.createExprInt(0));
+				IrUtil.getLast(blocks).add(assign);
 
-			// add index
-			indexes.add(eINSTANCE.createExprVar(loopVar));
+				// add index
+				indexes.add(eINSTANCE.createExprVar(loopVar));
 
-			// create while block
-			Expression condition = eINSTANCE.createExprBinary(
-					eINSTANCE.createExprVar(loopVar), OpBinary.LT,
-					sizeExpr, eINSTANCE.createTypeBool());
+				// create while block
+				Expression condition = eINSTANCE.createExprBinary(
+						eINSTANCE.createExprVar(loopVar), OpBinary.LT,
+						sizeExpr, eINSTANCE.createTypeBool());
 
-			BlockWhile blockWhile = eINSTANCE.createBlockWhile();
-			blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
-			blockWhile.setCondition(condition);
-			whiles.add(blockWhile);
+				BlockWhile blockWhile = eINSTANCE.createBlockWhile();
+				blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
+				blockWhile.setCondition(condition);
+				whiles.add(blockWhile);
 
-			blocks.add(blockWhile);
+				blocks.add(blockWhile);
 
-			blocks = blockWhile.getBlocks();
+				blocks = blockWhile.getBlocks();
 
-			if (removable) {
-				blockWhile.addAttribute("removableCopy");
+				if (removable) {
+					blockWhile.addAttribute("removableCopy");
+				}
 			}
-		}
 
-		// load
-		Var loadTarget = procedure.newTempLocalVariable(
-				typeList.getInnermostType(), "local_" + var.getName());
-		InstLoad load = eINSTANCE.createInstLoad(0, loadTarget, var, indexes);
-		IrUtil.getLast(blocks).add(load);
+			// load
+			Var loadTarget = procedure.newTempLocalVariable(
+					typeList.getInnermostType(), "local_" + var.getName());
+			InstLoad load = eINSTANCE.createInstLoad(0, loadTarget, var,
+					indexes);
+			IrUtil.getLast(blocks).add(load);
 
-		// store
-		if (this.indexes == null) {
-			indexes = new ArrayList<Expression>(IrUtil.copy(indexes));
+			// store
+			if (this.indexes == null) {
+				indexes = new ArrayList<Expression>(IrUtil.copy(indexes));
+			} else {
+				indexes = this.indexes;
+			}
+			InstStore store = eINSTANCE.createInstStore(0, target, indexes,
+					eINSTANCE.createExprVar(loadTarget));
+			IrUtil.getLast(blocks).add(store);
+
+			// add increments
+			int size = typeList.getDimensionsExpr().size();
+			for (int i = 0; i < size; i++) {
+				Var loopVar = loopVars.get(i);
+				IrUtil.getLast(whiles.get(i).getBlocks()).add(
+						eINSTANCE.createInstAssign(loopVar, eINSTANCE
+								.createExprBinary(
+										eINSTANCE.createExprVar(loopVar),
+										OpBinary.PLUS,
+										eINSTANCE.createExprInt(1),
+										eINSTANCE.createTypeInt(32))));
+			}
 		} else {
-			indexes = this.indexes;
-		}
-		InstStore store = eINSTANCE.createInstStore(0, target, indexes,
-				eINSTANCE.createExprVar(loadTarget));
-		IrUtil.getLast(blocks).add(store);
-
-		// add increments
-		int size = typeList.getDimensionsExpr().size();
-		for (int i = 0; i < size; i++) {
-			Var loopVar = loopVars.get(i);
-			IrUtil.getLast(whiles.get(i).getBlocks()).add(
-					eINSTANCE.createInstAssign(loopVar, eINSTANCE
-							.createExprBinary(eINSTANCE.createExprVar(loopVar),
-									OpBinary.PLUS, eINSTANCE.createExprInt(1),
-									eINSTANCE.createTypeInt(32))));
+			Var loadTarget = procedure.newTempLocalVariable(targetType,
+					"local_" + var.getName());
+			InstLoad load = eINSTANCE.createInstLoad(loadTarget, var, 0);
+			IrUtil.getLast(blocks).add(load);
+			InstAssign assign = eINSTANCE.createInstAssign(target,
+					eINSTANCE.createExprVar(loadTarget));
+			IrUtil.getLast(blocks).add(assign);
 		}
 
 		return null;
