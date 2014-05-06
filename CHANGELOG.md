@@ -1,6 +1,9 @@
 # Next release
 ### Notable changes and features
 ### Bugfixes
+- Network editor
+    + Grouping/ungrouping instances in a Network now manage correctly arguments and parameters
+    + Conflicts in created vertex names when grouping instances are now checked and resolved smoothly
 ### Known issues
 
 # 2.0.0 April 29, 2014
