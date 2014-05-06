@@ -448,7 +448,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		List<BlockWhile> whiles = new ArrayList<BlockWhile>();
 		List<Var> loopVars = new ArrayList<Var>();
 		List<Expression> indexes = new ArrayList<Expression>();
-		for (int size : typeList.getDimensions()) {
+		for (Expression sizeExpr : typeList.getDimensionsExpr()) {
 			// add loop variable
 			Var loopVar = procedure.newTempLocalVariable(
 					eINSTANCE.createTypeInt(32), "idx_" + var.getName());
@@ -463,7 +463,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			// create while block
 			Expression condition = eINSTANCE.createExprBinary(
 					eINSTANCE.createExprVar(loopVar), OpBinary.LT,
-					eINSTANCE.createExprInt(size), eINSTANCE.createTypeBool());
+					sizeExpr, eINSTANCE.createTypeBool());
 
 			BlockWhile blockWhile = eINSTANCE.createBlockWhile();
 			blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
@@ -496,7 +496,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		IrUtil.getLast(blocks).add(store);
 
 		// add increments
-		int size = typeList.getDimensions().size();
+		int size = typeList.getDimensionsExpr().size();
 		for (int i = 0; i < size; i++) {
 			Var loopVar = loopVars.get(i);
 			IrUtil.getLast(whiles.get(i).getBlocks()).add(
