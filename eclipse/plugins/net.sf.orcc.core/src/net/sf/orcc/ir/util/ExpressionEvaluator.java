@@ -55,6 +55,8 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public class ExpressionEvaluator extends IrSwitch<Object> {
+	
+	private static ExpressionEvaluator INSTANCE = new ExpressionEvaluator();
 
 	private TypeList typeList;
 
@@ -183,8 +185,8 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 	 * @throws OrccRuntimeException
 	 *             if the expression cannot be evaluated as an integer
 	 */
-	public int evaluateAsInteger(Expression expr) {
-		Object value = doSwitch(expr);
+	public static int evaluateAsInteger(Expression expr) {
+		Object value = INSTANCE.doSwitch(expr);
 		if (ValueUtil.isInt(value)) {
 			return ((BigInteger) value).intValue();
 		}

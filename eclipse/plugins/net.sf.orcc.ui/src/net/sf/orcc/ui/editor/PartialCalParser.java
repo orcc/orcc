@@ -200,7 +200,7 @@ public class PartialCalParser extends CalSwitch<EObject> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new ExpressionEvaluator().evaluateAsInteger((Expression) doSwitch(astSize));
+			size = ExpressionEvaluator.evaluateAsInteger((Expression) doSwitch(astSize));
 		}
 		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
@@ -225,7 +225,7 @@ public class PartialCalParser extends CalSwitch<EObject> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new ExpressionEvaluator().evaluateAsInteger((Expression) doSwitch(astSize));
+			size = ExpressionEvaluator.evaluateAsInteger((Expression) doSwitch(astSize));
 		}
 
 		return IrFactory.eINSTANCE.createTypeUint(size);

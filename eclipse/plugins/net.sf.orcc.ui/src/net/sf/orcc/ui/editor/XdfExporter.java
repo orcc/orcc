@@ -322,8 +322,7 @@ public class XdfExporter extends CalSwitch<Object> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new ExpressionEvaluator()
-					.evaluateAsInteger((Expression) doSwitch(astSize));
+			size = ExpressionEvaluator.evaluateAsInteger((Expression) doSwitch(astSize));
 		}
 		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
@@ -348,8 +347,7 @@ public class XdfExporter extends CalSwitch<Object> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new ExpressionEvaluator()
-					.evaluateAsInteger((Expression) doSwitch(astSize));
+			size = ExpressionEvaluator.evaluateAsInteger((Expression) doSwitch(astSize));
 		}
 
 		return IrFactory.eINSTANCE.createTypeUint(size);

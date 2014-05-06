@@ -562,7 +562,7 @@ public class ValueUtil {
 	public static boolean isPowerOfTwo(Expression expr) {
 		int n;
 		try {
-			n = new ExpressionEvaluator().evaluateAsInteger(expr);
+			n = ExpressionEvaluator.evaluateAsInteger(expr);
 		} catch (Exception e) {
 			return false;
 		}

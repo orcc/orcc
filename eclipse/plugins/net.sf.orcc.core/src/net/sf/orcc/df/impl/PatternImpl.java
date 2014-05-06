@@ -286,7 +286,7 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public int getNumTokens(Port port) {
-		Integer numTokens = new ExpressionEvaluator()
+		Integer numTokens = ExpressionEvaluator
 				.evaluateAsInteger(getNumTokensMap().get(port));
 		if (numTokens == null) {
 			return 0;

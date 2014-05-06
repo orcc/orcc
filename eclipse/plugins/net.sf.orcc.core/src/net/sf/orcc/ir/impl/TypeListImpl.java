@@ -249,7 +249,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 			return -1;
 		} else {
 			// Evaluate the expression.
-			return new ExpressionEvaluator().evaluateAsInteger(sizeExpr);
+			return ExpressionEvaluator.evaluateAsInteger(sizeExpr);
 		}
 	}
 

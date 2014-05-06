@@ -478,16 +478,14 @@ public class XdfParser {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
 						Expression expr = parseTypeSize(entries);
-						int size = new ExpressionEvaluator()
-								.evaluateAsInteger(expr);
+						int size = ExpressionEvaluator.evaluateAsInteger(expr);
 						return new ParseContinuation<Type>(node,
 								IrFactory.eINSTANCE.createTypeInt(size));
 					} else if (name.equals(TypeFloat.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
 						Expression expr = parseTypeSize(entries);
-						int size = new ExpressionEvaluator()
-								.evaluateAsInteger(expr);
+						int size = ExpressionEvaluator.evaluateAsInteger(expr);
 						return new ParseContinuation<Type>(node,
 								IrFactory.eINSTANCE.createTypeFloat(size));
 					} else if (name.equals(TypeList.NAME)) {
@@ -500,8 +498,7 @@ public class XdfParser {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
 						Expression expr = parseTypeSize(entries);
-						int size = new ExpressionEvaluator()
-								.evaluateAsInteger(expr);
+						int size = ExpressionEvaluator.evaluateAsInteger(expr);
 
 						TypeUint type = IrFactory.eINSTANCE.createTypeUint();
 						type.setSize(size);
@@ -580,7 +577,7 @@ public class XdfParser {
 			}
 			Type type = entry.getEntryAsType();
 
-			int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+			int size = ExpressionEvaluator.evaluateAsInteger(expr);
 			return IrFactory.eINSTANCE.createTypeList(size, type);
 		}
 
