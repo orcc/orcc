@@ -534,7 +534,7 @@ class InstancePrinter extends CTemplate {
 
 	def protected printStateTransition(State state, Transition trans) {
 		val output = '''
-			if («trans.action.inputPattern.checkInputPattern»isSchedulable_«trans.action.name»()) {
+			if («trans.action.inputPattern.checkInputPattern»«trans.action.scheduler.name»()) {
 				«IF !trans.action.outputPattern.empty»
 					«trans.action.outputPattern.printOutputPattern»
 						_FSM_state = my_state_«state.name»;
@@ -649,7 +649,7 @@ class InstancePrinter extends CTemplate {
 
 	def protected printActionScheduling(Action action) {
 		val output = '''
-			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+			if («action.inputPattern.checkInputPattern»«action.scheduler.name»()) {
 				«IF !action.outputPattern.empty»
 					«action.outputPattern.printOutputPattern»
 						si->num_firings = i;

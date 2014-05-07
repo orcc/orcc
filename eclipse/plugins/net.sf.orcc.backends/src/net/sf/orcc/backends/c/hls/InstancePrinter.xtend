@@ -347,7 +347,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printActionsScheduling(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
-			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+			if («action.inputPattern.checkInputPattern»«action.scheduler.name»()) {
 				if(1
 				«IF action.outputPattern != null»
 					«action.outputPattern.printOutputPattern»
@@ -361,7 +361,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
-			if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»()) {
+			if («transitions.action.inputPattern.checkInputPattern»«transitions.action.scheduler.name»()) {
 				«instance.name»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;
