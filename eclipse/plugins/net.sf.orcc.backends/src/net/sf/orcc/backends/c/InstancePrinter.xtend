@@ -611,7 +611,9 @@ class InstancePrinter extends CTemplate {
 		«inline»void «entityName»_initialize(schedinfo_t *si) {
 			int i = 0;
 			«additionalInitializes»
-			«printCallTokensFunctions»
+			«FOR port : actor.outputs.notNative»
+				write_«port.name»();
+			«ENDFOR»
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
@@ -622,9 +624,6 @@ class InstancePrinter extends CTemplate {
 				}
 			«ENDFOR»
 		finished:
-			«FOR port : actor.inputs»
-				read_end_«port.name»();
-			«ENDFOR»
 			«FOR port : actor.outputs.notNative»
 				write_end_«port.name»();
 			«ENDFOR»
