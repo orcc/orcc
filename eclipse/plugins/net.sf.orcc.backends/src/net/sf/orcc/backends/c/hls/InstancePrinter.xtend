@@ -210,14 +210,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«printStateTransitions(state)»
 			«ENDIF»
 	'''
-	
+
 	override printOutputPattern(Pattern pattern) '''
 		«FOR port : pattern.ports» 
 			«printOutputPatternsPort(pattern, port)»
 		«ENDFOR»
 	'''
-	
-	override printOutputPatternsPort(Pattern pattern, Port port) {
+
+	def printOutputPatternsPort(Pattern pattern, Port port) {
 		var i = -1 '''
 		«FOR successor : instance.outgoingPortMap.get(port)»
 			 «printOutputPatternPort(pattern, port, successor, i = i + 1)»
@@ -225,7 +225,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	}
 	
-	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) 
+	def printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) 
 	'''«IF !instance.outgoingPortMap.get(port).head.fifoName.toString.empty»
 	&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())«ENDIF»'''
 	

@@ -683,37 +683,23 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def protected printOutputPattern(Pattern pattern) {
-		'''
+	def protected printOutputPattern(Pattern outputPattern) '''
 		int stop = 0;
-		«FOR port : pattern.ports»
-			«printOutputPatternsPort(pattern, port)»
+		«FOR outPort : outputPattern.ports»
+			«var i = -1»
+			«FOR connection : outgoingPortMap.get(outPort)»
+				if («outputPattern.getNumTokens(outPort)» > SIZE_«outPort.name» - index_«outPort.name» + «outPort.fullName»->read_inds[«i = i + 1»]) {
+					stop = 1;
+					«IF newSchedul»
+						if( ! «entityName».sched->round_robin || i > 0) {
+							sched_add_schedulable(«entityName».sched, &«connection.target.label», RING_TOPOLOGY);
+						}
+					«ENDIF»
+				}
+			«ENDFOR»
 		«ENDFOR»
 		if (stop != 0) {
-		'''
-	}
-
-	def protected printOutputPatternsPort(Pattern pattern, Port port) {
-		var i = -1
-		'''
-			«FOR successor : outgoingPortMap.get(port)»
-				«printOutputPatternPort(pattern, port, successor, i = i + 1)»
-			«ENDFOR»
-		'''
-	}
-
-	def protected printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) {
-		'''
-		if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
-			stop = 1;
-			«IF newSchedul»
-				if( ! «entityName».sched->round_robin || i > 0) {
-					sched_add_schedulable(«entityName».sched, &«successor.target.label», RING_TOPOLOGY);
-				}
-			«ENDIF»
-		}
-		'''
-	}
+	'''
 
 	def protected checkInputPattern(Pattern pattern)
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.getNumTokens(port)» && «ENDFOR»'''
