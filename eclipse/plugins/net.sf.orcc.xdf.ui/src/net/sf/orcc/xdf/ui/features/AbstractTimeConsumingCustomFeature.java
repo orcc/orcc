@@ -81,22 +81,15 @@ public abstract class AbstractTimeConsumingCustomFeature extends
 			IProgressMonitor monitor);
 
 	/**
-	 * Used to configure the name of created Job
-	 * 
-	 * @return The desired job name
-	 */
-	protected abstract String getJobName();
-
-	/**
-	 * Callback launched just before job scheduling, and can be used by
-	 * subclasses. Default implementation is empty.
+	 * Callback executed just before job scheduling, in the Feature execution
+	 * Thread. Default implementation is empty.
 	 */
 	protected void beforeJobExecution() {
 	}
 
 	/**
-	 * Callback launched immediately after job execution, and can be used by
-	 * subclasses. Default implementation is empty.
+	 * Callback launched immediately after job execution in the Job Thread.
+	 * Default implementation is empty.
 	 */
 	protected void afterJobExecution() {
 	}
@@ -110,14 +103,15 @@ public abstract class AbstractTimeConsumingCustomFeature extends
 	 * @return The Job instance
 	 */
 	protected Job initializeJob(final ICustomContext context) {
-		return new Job(getJobName()) {
+		return new Job(getName()) {
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
-				TransactionalEditingDomain editDomain = TransactionUtil
+				final TransactionalEditingDomain editDomain = TransactionUtil
 						.getEditingDomain(getDiagram());
 
-				RecordingCommand command = new RecordingCommand(editDomain) {
+				final RecordingCommand command = new RecordingCommand(
+						editDomain, getName()) {
 
 					private IStatus result = null;
 
@@ -139,7 +133,16 @@ public abstract class AbstractTimeConsumingCustomFeature extends
 					}
 				};
 
+				// Execute (synchrnously) the defined command in a proper EMF
+				// transaction
 				editDomain.getCommandStack().execute(command);
+
+				// Update the diagram dirtiness state
+				getDiagramBehavior().getDiagramContainer().updateDirtyState();
+
+				// Callback
+				afterJobExecution();
+
 				return (IStatus) command.getResult().iterator().next();
 			}
 		};
@@ -174,8 +177,11 @@ public abstract class AbstractTimeConsumingCustomFeature extends
 
 		// Job is run
 		job.schedule();
+	}
 
-		// Callback
-		afterJobExecution();
+	// Prevent sub-classes from overriding this method
+	@Override
+	final public boolean hasDoneChanges() {
+		return false;
 	}
 }
