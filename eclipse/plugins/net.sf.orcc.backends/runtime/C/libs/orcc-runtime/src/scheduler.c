@@ -88,7 +88,6 @@ void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, option
 void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, options_t *opt) {
     int i;
 
-    sched->opt = opt;
     sched->num_actors = num_actors;
     sched->actors = actors;
     for (i = 0; i < num_actors; i++) {
@@ -140,9 +139,6 @@ void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, in
 		actors[i]->sched = sched;
 		actors[i]->in_list = 0;
 		actors[i]->in_waiting = 0;
-		if (!strcmp(actors[i]->name, "source")) {
-			sched_add_schedulable(sched, actors[i], use_ring_topology);
-		}
 	}
 
 }
@@ -155,18 +151,6 @@ void sched_init_actors(local_scheduler_t *sched, schedinfo_t *si) {
 
 	for (i = 0; i < sched->num_actors; i++) {
 		sched->actors[i]->init_func(si);
-	}
-	
-}
-
-/**
- * Re-initialize the actors mapped to the given scheduler.
- */
-void sched_reinit_actors(local_scheduler_t *sched, schedinfo_t *si) {
-	int i;
-
-	for (i = 0; i < sched->num_actors; i++) {
-		sched->actors[i]->reinit_func(si);
 	}
 	
 }

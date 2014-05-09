@@ -42,7 +42,6 @@ struct global_scheduler_s {
 struct local_scheduler_s {
 	int id; /** Unique ID of this scheduler */
     int nb_schedulers;
-    options_t *opt;
     schedstrategy_et strategy; /** Scheduling strategy */
 
 	/* Round robin */
@@ -102,12 +101,6 @@ void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **ac
  * Initialize the actors mapped to the given scheduler.
  */
 void sched_init_actors(local_scheduler_t *sched, schedinfo_t *si);
-
-/**
- * Reinitialize the given scheduler.
- */
-void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology);
-
 
 /**
  * Returns the next schedulable actor.

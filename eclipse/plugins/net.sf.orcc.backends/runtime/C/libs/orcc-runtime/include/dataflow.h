@@ -53,7 +53,6 @@ struct actor_s {
     char *name;
     int group; /** id of his group. */
     void (*init_func)();
-    void (*reinit_func)();
     void (*sched_func)(schedinfo_t *);
     int num_inputs; /** number of input ports */
     int num_outputs; /** number of output ports */
