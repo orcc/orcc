@@ -97,6 +97,7 @@ void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **ac
         actors[i]->in_waiting = 0;
     }
 
+    sched->strategy = opt->sched_strategy;
     sched->round_robin = 1;
 	sched->rr_next_schedulable = 0;
 	sched->ddd_next_entry = 0;
