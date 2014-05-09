@@ -61,19 +61,6 @@ options_t *set_default_options() {
 }
 
 /**
- * Creates and init options structure.
- */
-options_t *set_options(mappingstrategy_et strategy, int nb_processors) {
-    options_t *opt = (options_t*) malloc(sizeof(options_t));
-    opt->mapping_strategy = strategy;
-    opt->nb_processors = nb_processors;
-    opt->input_file = "";
-    opt->mapping_output_file = "";
-
-    return opt;
-}
-
-/**
  * Releases memory of the given options structure.
  */
 void delete_options(options_t *opt) {
