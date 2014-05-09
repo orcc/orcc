@@ -9,6 +9,7 @@ package net.sf.orcc.df.impl;
 import java.util.Collection;
 import java.util.Iterator;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
@@ -286,10 +287,10 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public int getNumTokens(Port port) {
-		Integer numTokens = ExpressionEvaluator
-				.evaluateAsInteger(getNumTokensMap().get(port));
-		if (numTokens == null) {
-			return 0;
+		int numTokens = -1;
+		try {
+			numTokens = ExpressionEvaluator.evaluateAsInteger(getNumTokensMap().get(port));
+		} catch(OrccRuntimeException e) {
 		}
 		return numTokens;
 	}
