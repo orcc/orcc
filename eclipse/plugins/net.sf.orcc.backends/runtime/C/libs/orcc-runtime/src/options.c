@@ -42,7 +42,9 @@
  */
 options_t *set_default_options() {
     options_t *opt = (options_t*) malloc(sizeof(options_t));
+    opt->sched_strategy = ORCC_SS_ROUND_ROBIN;
     opt->mapping_strategy = ORCC_MS_ROUND_ROBIN;
+    opt->mapping_repetition = REMAP_ONCE;
     opt->nb_processors = 1;
     opt->input_file = NULL;
     opt->mapping_output_file = NULL;
@@ -51,7 +53,6 @@ options_t *set_default_options() {
     opt->nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
     opt->nbFrames = DEFAULT_INFINITE;
     opt->nbProfiledFrames = 10;
-    opt->mapping_repetition = REMAP_ONCE;
     opt->input_directory = NULL;
     opt->display_flags = DISPLAY_ENABLE;
     opt->yuv_file = NULL;
