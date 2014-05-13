@@ -14,7 +14,6 @@ import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
@@ -26,6 +25,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -269,30 +269,28 @@ public class ActorMergerQS extends ActorMergerBase {
 		boolean useFullFifos = true;
 		String actionName = superaction.getName();
 		BufferSizer bufferSizer = new BufferSizer(network);
-		Schedule superAction = getSchedule(scheduleList, network.getName(), actionName);
+		Schedule schedule = getSchedule(scheduleList, network.getName(), actionName);
 
 		ScheduleAnalyzer analyzer = new ScheduleAnalyzer(network, copier);
-		analyzer.analyze(superActor, superAction);
+		analyzer.analyze(superActor, schedule);
 		analyzer.markInternalFifos(superActor, useFullFifos);
 
-		Pattern inputPattern = computeScheduleInputPattern(network, superAction.getIterands());
-		Pattern outputPattern = computeScheduleOutputPattern(network, superAction.getIterands());
-
-		Procedure body = irFactory.createProcedure(actionName, 0,
-				irFactory.createTypeVoid());
-		createBuffers(body, bufferSizer.getMaxTokens(superAction));
-		if (!useFullFifos) {
-			createFeedbackBuffers(bufferSizer.getMaxTokens(superAction));
-		}
-		createCounters(body, inputPattern, outputPattern);
-		createStaticSchedule(body, superAction);
-		body.getLast().add(irFactory.createInstReturn());
-	
-		Action guard = getGuard(guardList, network.getName(), actionName);
-
-		superaction.setBody(body);
+		Pattern inputPattern = computeScheduleInputPattern(network, schedule.getIterands());
+		Pattern outputPattern = computeScheduleOutputPattern(network, schedule.getIterands());
 		superaction.setInputPattern(inputPattern);
 		superaction.setOutputPattern(outputPattern);
+
+		superaction.setBody(irFactory.createProcedure(actionName, 0,
+				irFactory.createTypeVoid()));
+		createBuffers(superaction.getBody(), bufferSizer.getMaxTokens(schedule));
+		if (!useFullFifos) {
+			createFeedbackBuffers(bufferSizer.getMaxTokens(schedule));
+		}
+		createPortVarCounters(superaction.getBody(), inputPattern, outputPattern);
+		createStaticSchedule(superaction.getBody(), schedule);
+		superaction.getBody().getLast().add(irFactory.createInstReturn());
+		Action guard = getGuard(guardList, network.getName(), actionName);
+
 		superaction.setPeekPattern(guard.getPeekPattern());
 		superaction.setScheduler(guard.getBody());
 	}
@@ -408,22 +406,22 @@ public class ActorMergerQS extends ActorMergerBase {
 		}
 	}
 	
-	private void createCounters(Procedure body, Pattern inputPattern, Pattern outputPattern) {
+	private void createPortVarCounters(Procedure body, Pattern inputPattern, Pattern outputPattern) {
 		// Create counters for inputs
 		for (Port port : inputPattern.getPorts()) {
-			createCounter(body, port, "_r");
+			createPortVarCounter(body, port, "_r");
 		}
 		// Create counters for outputs
 		for (Port port : outputPattern.getPorts()) {
-			createCounter(body, port, "_w");
+			createPortVarCounter(body, port, "_w");
 		}
 	}
 	
-	private void createCounter(Procedure body, Port port, String suffix) {
+	private void createPortVarCounter(Procedure body, Port port, String suffix) {
 		Var readIdx = body.newTempLocalVariable(
 				irFactory.createTypeInt(32), port.getName() + suffix);
 		if (buffersMap.containsKey(port) && !port.hasAttribute("externalized")) {
-			body.getLast().add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
+			readIdx.setInitialValue(irFactory.createExprInt(0));
 		} else {
 			body.getLast().add(irFactory.createInstAssign(readIdx, MergerUtil.createIndexVar(port)));
 		}
@@ -471,38 +469,48 @@ public class ActorMergerQS extends ActorMergerBase {
 	private void createStaticSchedule(Procedure procedure, Schedule schedule) {
 		for (Iterand iterand : schedule.getIterands()) {
 			List<Expression> procParams = new ArrayList<Expression>();
-			BlockBasic increments = IrFactory.eINSTANCE.createBlockBasic();
-			processInputs(increments, iterand.getAction(), procParams);
-			processOutputs(increments, iterand.getAction(), procParams);
+			List<Instruction> increments = new ArrayList<Instruction>();
+			processInputs(increments, iterand.getAction(), procParams,
+					procedure.getLocals());
+			processOutputs(increments, iterand.getAction(), procParams,
+					procedure.getLocals());
 			Instruction instruction = IrFactory.eINSTANCE.createInstCall(
-					null, correspondences.getProcedure(iterand.getAction()), procParams);
-			BlockBasic block = procedure.getLast();
-			block.add(instruction);
-			procedure.getBlocks().add(block);
-			procedure.getBlocks().add(increments);
+					null, correspondences.getProcedure(iterand.getAction()),
+					procParams);
+			procedure.getLast().add(instruction);
+			for(Instruction incr : increments) {
+				procedure.getLast().add(incr);
+			}
 		}
 	}
 
-	private void processInputs(BlockBasic increments, Action action, List<Expression> procParams) {
+	private void processInputs(List<Instruction> increments, Action action,
+			List<Expression> procParams, List<Var> locals) {
 		for(Port port : action.getInputPattern().getPorts()) {
-			processPort(increments, procParams, port, false, action.getInputPattern().getNumTokens(port));
+			processPort(increments, procParams, port, "_r",
+					action.getInputPattern().getNumTokens(port), locals);
 		}
 	}
 
-	private void processOutputs(BlockBasic increments, Action action, List<Expression> procParams) {
+	private void processOutputs(List<Instruction> increments, Action action,
+			List<Expression> procParams, List<Var> locals) {
 		for(Port source : action.getOutputPattern().getPorts()) {
-			processPort(increments, procParams, source, true, action.getOutputPattern().getNumTokens(source));
+			processPort(increments, procParams, source, "_w",
+					action.getOutputPattern().getNumTokens(source), locals);
 		}
 	}
 	
-	private void processPort(BlockBasic increments, List<Expression> procParams, Port port, boolean write, int tokenRate) {
-		Var memVar = getBufferOrPortVariable(port, write);
-		Var indexVar = getBufferOrPortIndex(increments, port, tokenRate, write, memVar.getName());
+	private void processPort(List<Instruction> increments,
+			List<Expression> procParams, Port port, String suffix,
+			int tokenRate, List<Var> locals) {
+		Var memVar = getBufferOrPortVariable(port);
+		Var indexVar = getBufferOrPortIndex(increments, port, tokenRate,
+				suffix, memVar.getName(), locals);
 		procParams.add(IrFactory.eINSTANCE.createExprVar(memVar));
 		procParams.add(IrFactory.eINSTANCE.createExprVar(indexVar));
 	}
 
-	private Var getBufferOrPortVariable(Port port, boolean write) {
+	private Var getBufferOrPortVariable(Port port) {
 		Var memVar = null;
 		if (buffersMap.containsKey(port) && !port.hasAttribute("externalFifo")) {
 			memVar = buffersMap.get(port);
@@ -514,22 +522,27 @@ public class ActorMergerQS extends ActorMergerBase {
 		return memVar;
 	}
 	
-	private Var getBufferOrPortIndex(BlockBasic increments, Port port, int tokenRate, boolean write, String memVarName) {
-		String indexVarName = null;
-		String suffix = null;
-		if (write) {
-			suffix = "_w";
-		} else {
-			suffix = "_r";
+	private Var findVariable(List<Var> varlist, String name) {
+		for (Var var : varlist) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
 		}
+		OrccLogger.warnln("ActorMergerQS::findVariable() could not find " + name);
+		return null;
+	}
+	
+	private Var getBufferOrPortIndex(List<Instruction> increments, Port port,
+			int tokenRate, String suffix, String memVarName,
+			List<Var> locals) {
+		String indexVarName = null;
+		Var indexVar = null;
 		if (buffersMap.containsKey(port)) {
 			indexVarName = memVarName + suffix;
 		} else {
 			indexVarName = port.getName() + suffix;
 		}
-		Var indexVar = IrFactory.eINSTANCE.createVar(0,
-				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
-				indexVarName, true, 0);
+		indexVar = findVariable(locals, indexVarName);
 		
 		if (buffersMap.containsKey(port)) {
 			if (buffersMap.get(port).getType().getDimensions().get(0) != 1) {
