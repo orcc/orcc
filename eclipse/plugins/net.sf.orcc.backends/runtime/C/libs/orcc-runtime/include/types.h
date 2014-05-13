@@ -40,4 +40,6 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long int u64;
 
+static i32 castBoolToInt(i32 a){return a;}
+
 #endif  /* _ORCC_TYPES_H_ */
