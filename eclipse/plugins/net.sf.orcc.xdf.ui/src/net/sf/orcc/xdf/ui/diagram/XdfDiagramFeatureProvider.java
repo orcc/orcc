@@ -242,7 +242,8 @@ public class XdfDiagramFeatureProvider extends
 						final Port port = (Port) getBusinessObjectForPictogramElement(newAnchor);
 						dfConnection.setSourcePort(port);
 					} else {
-						OrccLogger.severeln("ERROR");
+						OrccLogger
+								.severeln("Unable to get the new source type.");
 					}
 				} else {
 					if (PropsUtil.isOutputPort(newAnchor.getParent())) {
@@ -254,9 +255,9 @@ public class XdfDiagramFeatureProvider extends
 						final Port port = (Port) getBusinessObjectForPictogramElement(newAnchor);
 						dfConnection.setTargetPort(port);
 					} else {
-						OrccLogger.severeln("ERROR");
+						OrccLogger
+								.severeln("Unable to get the new target type.");
 					}
-
 				}
 			}
 		};
