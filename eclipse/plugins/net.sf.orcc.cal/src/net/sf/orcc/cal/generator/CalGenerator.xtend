@@ -124,6 +124,8 @@ class CalGenerator implements IGenerator {
 		// that, because if this resource is kept in derived list in BuilderParticipant, the IR corresponding
 		// to this resource will be deleted. This bug is relatively difficult to understand.
 		// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=433199 for more information
+		// Update: apparently, a fix for this bug has been pushed and will be available with Xtext v2.6. The
+		// following test may be removed when Xtext 2.6 will be the default version used
 		if(loadedResources.contains(calResource)) {
 			fsa.generateFile(irSubPath, (fsa as AbstractFileSystemAccess2).readTextFile(irSubPath))
 			return
