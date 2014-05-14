@@ -507,7 +507,8 @@ public class ActorMergerQS extends ActorMergerBase {
 		Var indexVar = getBufferOrPortIndex(increments, port, tokenRate,
 				suffix, memVar.getName(), locals);
 		procParams.add(IrFactory.eINSTANCE.createExprVar(memVar));
-		procParams.add(IrFactory.eINSTANCE.createExprVar(indexVar));
+		procParams.add(IrFactory.eINSTANCE.createExprInt(indexVar.getLineNumber()));
+		indexVar.setLineNumber(indexVar.getLineNumber()+tokenRate);
 	}
 
 	private Var getBufferOrPortVariable(Port port) {
@@ -543,14 +544,6 @@ public class ActorMergerQS extends ActorMergerBase {
 			indexVarName = port.getName() + suffix;
 		}
 		indexVar = findVariable(locals, indexVarName);
-		
-		if (buffersMap.containsKey(port)) {
-			if (buffersMap.get(port).getType().getDimensions().get(0) != 1) {
-				increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
-			}
-		} else {
-			increments.add(MergerUtil.createBinOpStore(indexVar, OpBinary.PLUS, tokenRate));
-		}
 		return indexVar;
 	}
 }

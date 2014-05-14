@@ -87,11 +87,13 @@ public class ActorMergerBase extends DfSwitch<Actor> {
 					Var writeIdx = body.newTempLocalVariable(
 							irFactory.createTypeInt(32), name + "_w");
 					block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
+					writeIdx.setLineNumber(0);
 		
 					// create read counter
 					Var readIdx = body.newTempLocalVariable(
 							irFactory.createTypeInt(32), name + "_r");
 					block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
+					readIdx.setLineNumber(0);
 		
 					buffersMap.put(conn.getSourcePort(), buffer);
 					buffersMap.put(conn.getTargetPort(), buffer);
