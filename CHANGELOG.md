@@ -4,6 +4,7 @@
 - Network editor
     + Grouping/ungrouping instances in a Network now manage correctly arguments and parameters
     + Conflicts in created vertex names when grouping instances are now checked and resolved smoothly
+    + [#104] Updating the target or the source of an existing connection now updates properly the XDF file
 ### Known issues
 
 # 2.0.0 April 29, 2014
