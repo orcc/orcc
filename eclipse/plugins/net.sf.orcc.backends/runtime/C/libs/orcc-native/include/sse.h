@@ -405,3 +405,40 @@ void (*pred_angular[4])(
 void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129],
         i32 stride, i32 idx, u8 mode, i32 log2size);
 
+/* xIT */
+
+void ff_hevc_transform0_4x4_2_8_zscan_sse4 (
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 offset);
+
+void ff_hevc_transform0_4x4_4_8_zscan_sse4 (
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 offset);
+
+void (* ff_hevc_transform0_4x4_8_zscan_sse4_orcc[2])(
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 offset);
+
+void ff_hevc_transform0_8x8_2_8_zscan_sse4 (
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride);
+
+void ff_hevc_transform0_8x8_4_8_zscan_sse4 (
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride);
+
+void (* ff_hevc_transform0_8x8_8_zscan_sse4_orcc[2])(
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride);
+
+void ff_hevc_transform0_16x16_2_8_zscan_sse4 (
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride);
+
+void ff_hevc_transform0_16x16_4_8_zscan_sse4 (
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride);
+
+void (* ff_hevc_transform0_16x16_8_zscan_sse4_orcc[2])(
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride);
+
+void ff_hevc_transform0_32x32_2_8_zscan_sse4 (
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride);
+
+void ff_hevc_transform0_32x32_4_8_zscan_sse4 (
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride);
+
+void (* ff_hevc_transform0_32x32_8_zscan_sse4_orcc[2])(
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride);

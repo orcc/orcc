@@ -765,6 +765,19 @@ int sse_init_context()
     weighted_pred_mono_zscan[1][1] = ff_hevc_weighted_pred_mono_zscan4_2_8_sse;
     weighted_pred_mono_zscan[1][2] = ff_hevc_weighted_pred_mono_zscan8_2_8_sse;
     weighted_pred_mono_zscan[1][3] = ff_hevc_weighted_pred_mono_zscan16_2_8_sse;
+
+    /* xIT */
+    ff_hevc_transform0_4x4_8_zscan_sse4_orcc[0] = ff_hevc_transform0_4x4_2_8_zscan_sse4;
+    ff_hevc_transform0_4x4_8_zscan_sse4_orcc[1] = ff_hevc_transform0_4x4_4_8_zscan_sse4;
+
+    ff_hevc_transform0_8x8_8_zscan_sse4_orcc[0] = ff_hevc_transform0_8x8_2_8_zscan_sse4;
+    ff_hevc_transform0_8x8_8_zscan_sse4_orcc[1] = ff_hevc_transform0_8x8_4_8_zscan_sse4;
+
+    ff_hevc_transform0_16x16_8_zscan_sse4_orcc[0] = ff_hevc_transform0_16x16_2_8_zscan_sse4;
+    ff_hevc_transform0_16x16_8_zscan_sse4_orcc[1] = ff_hevc_transform0_16x16_4_8_zscan_sse4;
+
+    ff_hevc_transform0_32x32_8_zscan_sse4_orcc[0] = ff_hevc_transform0_32x32_2_8_zscan_sse4;
+    ff_hevc_transform0_32x32_8_zscan_sse4_orcc[1] = ff_hevc_transform0_32x32_4_8_zscan_sse4;
 #endif
 
     return 0;
