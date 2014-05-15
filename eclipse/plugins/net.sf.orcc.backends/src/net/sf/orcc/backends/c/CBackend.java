@@ -210,7 +210,7 @@ public class CBackend extends AbstractBackend {
 			OrccLogger.traceln("Merging of actors...");
 			new ActorMerger().doSwitch(network);
 		} else {
-			new CBroadcastAdder().doSwitch(network); 
+			new CBroadcastAdder().doSwitch(network);
 		}
 
 		new ArgumentEvaluator().doSwitch(network);
@@ -287,21 +287,22 @@ public class CBackend extends AbstractBackend {
 					libsPath, debug);
 			if (orccOk) {
 				OrccLogger.traceRaw("OK" + "\n");
-				new File(libsPath + File.separator + "orcc" + File.separator
-						+ "benchAutoMapping.py").setExecutable(true);
 			} else {
 				OrccLogger.warnRaw("Error" + "\n");
 			}
 
-			final String commonLibPath = libsPath + File.separator + "orcc"
-					+ File.separator + "common";
-			OrccLogger.trace("Export common library files into "
-					+ commonLibPath + "... ");
-			final boolean commonOk = copyFolderToFileSystem("/runtime/common",
-					commonLibPath, debug);
+			String scriptsPath = path + File.separator + "scripts";
+			OrccLogger.trace("Export scripts into " + scriptsPath + "... ");
+			
+			boolean commonOk = copyFolderToFileSystem(
+					"/runtime/common/scripts", scriptsPath, debug)
+					&& copyFolderToFileSystem("/runtime/C/scripts",
+							scriptsPath, debug);
 			if (commonOk) {
 				OrccLogger.traceRaw("OK" + "\n");
-				new File(commonLibPath + File.separator + "profilingAnalyse.py")
+				new File(scriptsPath + File.separator + "profilingAnalyse.py")
+						.setExecutable(true);
+				new File(scriptsPath + File.separator + "benchAutoMapping.py")
 						.setExecutable(true);
 			} else {
 				OrccLogger.warnRaw("Error" + "\n");
