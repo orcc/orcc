@@ -280,306 +280,7 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
     _mm_storeu_si128((__m128i*)(dst + 8), r1);
 }
 
-/* Zscan var */
 
-#define ZSCAN_VAR0(H, dst)                                                       \
-    u ## H  * pu ## H ## Dst = (u ## H  *) dst
-
-#define ZSCAN_VAR_2(dst)                                                       \
-    ZSCAN_VAR0(32, dst)
-
-#define ZSCAN_VAR_4(dst)                                                       \
-    ZSCAN_VAR0(64, dst)
-
-/* Load */
-
-#define LOAD4x4_16(dst, src, x)                                              \
-    dst[x] = _mm_loadu_si128((__m128i *) &src[x * 8]);                     \
-    dst[x + 1] = _mm_loadu_si128((__m128i *) &src[(x + 1) * 8])
-
-#define LOAD8x8_16(dst, src, x)                                              \
-	LOAD4x4_16(dst, src, x);                                                 \
-	LOAD4x4_16(dst, src, x + 2);                                             \
-	LOAD4x4_16(dst, src, x + 4);                                             \
-	LOAD4x4_16(dst, src, x + 6)
-#define LOAD16x16_16(dst, src, x)                                               \
-	LOAD8x8_16(dst, src, x);                                                 \
-	LOAD8x8_16(dst, src, x + 8);                                             \
-	LOAD8x8_16(dst, src, x + 16);                                            \
-	LOAD8x8_16(dst, src, x + 24)
-#define LOAD32x32_16(dst, src, x)                                          \
-	LOAD16x16_16(dst, src, x);                                               \
-	LOAD16x16_16(dst, src, x + 32);                                          \
-	LOAD16x16_16(dst, src, x + 64);                                          \
-	LOAD16x16_16(dst, src, x + 96)
-
-/* Add */
-
-#define ADD4x4_16(dst, x)                                                   \
-    dst[x]     = _mm_adds_epi16(dst[x], rB);                            \
-    dst[x + 1] = _mm_adds_epi16(dst[x + 1], rB)
-#define ADD8x8_16(dst, x)                                                   \
-	ADD4x4_16(dst, x);                                                    \
-	ADD4x4_16(dst, x + 2);                                                \
-	ADD4x4_16(dst, x + 4);                                                \
-	ADD4x4_16(dst, x + 6)
-#define ADD16x16_16(dst, x)                                                \
-	ADD8x8_16(dst, x);                                                     \
-	ADD8x8_16(dst, x + 8);                                                 \
-	ADD8x8_16(dst, x + 16);                                                \
-	ADD8x8_16(dst, x + 24)
-#define ADD32x32_16(dst, x)                                                \
-	ADD16x16_16(dst, x);                                                     \
-	ADD16x16_16(dst, x + 32);                                                \
-	ADD16x16_16(dst, x + 64);                                                \
-	ADD16x16_16(dst, x + 96)
-
-/* Shift */
-
-#define SHIFT4x4_16(dst, x)                                                 \
-    dst[x]     = _mm_srai_epi16(dst[x], shift);                            \
-    dst[x + 1] = _mm_srai_epi16(dst[x + 1], shift)
-#define SHIFT8x8_16(dst, x)                                                 \
-	SHIFT4x4_16(dst, x);                                                  \
-	SHIFT4x4_16(dst, x + 2);                                              \
-	SHIFT4x4_16(dst, x + 4);                                              \
-	SHIFT4x4_16(dst, x + 6)
-#define SHIFT16x16_16(dst, x)                                                \
-	SHIFT8x8_16(dst, x);                                                   \
-	SHIFT8x8_16(dst, x + 8);                                               \
-	SHIFT8x8_16(dst, x + 16);                                              \
-	SHIFT8x8_16(dst, x + 24)
-#define SHIFT32x32_16(dst, x)                                                \
-	SHIFT16x16_16(dst, x);                                                   \
-	SHIFT16x16_16(dst, x + 32);                                              \
-	SHIFT16x16_16(dst, x + 64);                                              \
-	SHIFT16x16_16(dst, x + 96)
-
-/* Store */
-
-// Luma
-
-int zscanTab8_4[16] =
-{
-   0,  4,
-   1,  5,
-   2,  6,
-   3,  7,
-   8, 12,
-   9, 13,
-  10, 14,
-  11, 15
-};
-
-int zscanTab16_4[64] =
-{
-   0,  4, 16, 20,
-   1,  5, 17, 21,
-   2,  6, 18, 22,
-   3,  7, 19, 23,
-   8, 12, 24, 28,
-   9, 13, 25, 29,
-  10, 14, 26, 30,
-  11, 15, 27, 31,
-  32, 36, 48, 52,
-  33, 37, 49, 53,
-  34, 38, 50, 54,
-  37, 39, 51, 55,
-  40, 44, 56, 60,
-  41, 45, 57, 61,
-  42, 46, 58, 62,
-  43, 47, 59, 63
-};
-
-int zscanTab32_4[256] =
-{
-   0,   4,  16,  20,  64,  68,  80,  84,
-   1,   5,  17,  21,  65,  69,  81,  85,
-   2,   6,  18,  22,  66,  70,  82,  86,
-   3,   7,  19,  23,  67,  71,  83,  87,
-   8,  12,  24,  28,  72,  76,  88,  92,
-   9,  13,  25,  29,  73,  77,  89,  93,
-  10,  14,  26,  30,  74,  78,  90,  94,
-  11,  15,  27,  31,  75,  79,  91,  95,
-  32,  36,  48,  52,  96, 100, 112, 116,
-  33,  37,  49,  53,  97, 101, 113, 117,
-  34,  38,  50,  54,  98, 102, 114, 118,
-  37,  39,  51,  55, 101, 103, 115, 119,
-  40,  44,  56,  60, 104, 108, 120, 124,
-  41,  45,  57,  61, 105, 109, 121, 125,
-  42,  46,  58,  62, 106, 110, 122, 126,
-  43,  47,  59,  63, 107, 111, 123, 127,
- 128, 132, 144, 148, 192, 196, 208, 212,
- 129, 133, 145, 149, 193, 197, 209, 213,
- 130, 134, 146, 150, 194, 198, 210, 214,
- 131, 135, 147, 151, 195, 199, 211, 215,
- 136, 140, 152, 156, 200, 204, 216, 220,
- 137, 141, 153, 157, 201, 205, 217, 221,
- 138, 142, 154, 158, 202, 206, 218, 222,
- 139, 143, 155, 159, 203, 207, 219, 223,
- 160, 164, 176, 180, 224, 228, 240, 244,
- 161, 165, 177, 181, 225, 229, 241, 245,
- 162, 166, 178, 182, 226, 230, 242, 246,
- 165, 167, 179, 183, 229, 231, 243, 247,
- 168, 172, 184, 188, 232, 236, 248, 252,
- 169, 173, 185, 189, 233, 237, 249, 253,
- 170, 174, 186, 190, 234, 238, 250, 254,
- 171, 175, 187, 191, 235, 239, 251, 255
-};
-
-int zscanTab4_2[8] =
-{
-   0,  2,
-   1,  3,
-   4,  6,
-   5,  7
-};
-
-int zscanTab8_2[32] =
-{
-   0,  2,  8, 10,
-   1,  3,  9, 11,
-   4,  6, 12, 14,
-   5,  7, 13, 15,
-  16, 18, 24, 26,
-  17, 19, 25, 27,
-  20, 22, 28, 30,
-  21, 23, 29, 31
-};
-
-int zscanTab16_2[128] =
-{
-   0,   2,   8,  10,  32,  34,  40,  42,
-   1,   3,   9,  11,  33,  35,  41,  43,
-   4,   6,  12,  14,  36,  38,  44,  46,
-   5,   7,  13,  15,  37,  39,  45,  47,
-  16,  18,  24,  26,  48,  50,  56,  58,
-  17,  19,  25,  27,  49,  51,  57,  59,
-  20,  22,  28,  30,  52,  54,  60,  62,
-  21,  23,  29,  31,  53,  55,  61,  63,
-
-  64,  66,  72,  74,  96,  98, 104, 106,
-  65,  67,  73,  75,  97,  99, 105, 107,
-  68,  70,  76,  78, 100, 102, 108, 110,
-  69,  71,  77,  79, 101, 103, 109, 111,
-  80,  82,  88,  90, 112, 114, 120, 122,
-  81,  83,  89,  91, 113, 115, 121, 123,
-  84,  86,  92,  94, 116, 118, 124, 126,
-  85,  87,  93,  95, 117, 119, 125, 127
-};
-
-#define STORE4_4_16(src)                                                           \
-	_mm_storeu_si128((__m128i*)(dst    ), src[0]);                                 \
-    _mm_storeu_si128((__m128i*)(dst + 8), src[1])
-
-#if ARCH_X86_64
-#define STORE8_4_16(src)                                                          \
-    for (i = 0; i < 8; i++)                                                                    \
-	{                                                                                                     \
-      pu64Dst[zscanTab8_4[(i << 1) + 0]] = _mm_extract_epi64(src[i], 0);                       \
-      pu64Dst[zscanTab8_4[(i << 1) + 1]] = _mm_extract_epi64(src[i], 1);                       \
-	}
-
-#define STORE16_4_16(src)                                                          \
-	for (i = 0; i < 32; i++)                                                                    \
-	{                                                                                                     \
-	  pu64Dst[zscanTab16_4[(i << 1) + 0]] = _mm_extract_epi64(src[i], 0);                       \
-	  pu64Dst[zscanTab16_4[(i << 1) + 1]] = _mm_extract_epi64(src[i], 1);                       \
-	}
-
-#define STORE32_4_16(src)                                                          \
-	for (i = 0; i < 128; i++)                                                                    \
-	{                                                                                                     \
-	  pu64Dst[zscanTab32_4[(i << 1) + 0]] = _mm_extract_epi64(src[i], 0);                       \
-	  pu64Dst[zscanTab32_4[(i << 1) + 1]] = _mm_extract_epi64(src[i], 1);                       \
-	}
-#else // ARCH_X86_64
-#define STORE8_4_16(src)                                                          \
-    for (i = 0; i < 8; i++)                                                                    \
-	{                                                                                                     \
-    	_mm_storel_epi64((__m128i*) &pu64Dst[zscanTab8_4[(i << 1) + 0]], src[i]);                       \
-    	src[i] = _mm_unpackhi_epi64(src[i], src[i]);                                                       \
-        _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab8_4[(i << 1) + 1]], src[i]);                       \
-	}
-
-#define STORE16_4_16(src)                                                          \
-	for (i = 0; i < 32; i++)                                                                    \
-	{                                                                                                     \
-	  _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab16_4[(i << 1) + 0]], src[i]);                       \
-	  src[i] = _mm_unpackhi_epi64(src[i], src[i]);                                                       \
-	  _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab16_4[(i << 1) + 1]], src[i]);                       \
-	}
-
-#define STORE32_4_16(src)                                                          \
-	for (i = 0; i < 128; i++)                                                                    \
-	{                                                                                                     \
-	  _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab32_4[(i << 1) + 0]], src[i]);                       \
-	  src[i] = _mm_unpackhi_epi64(src[i], src[i]);                                                       \
-	  _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab32_4[(i << 1) + 1]], src[i]);                       \
-    }
-#endif // ARCH_X86_XX
-
-// Chroma
-
-#define STORE4_2_16(src)                                                  \
-    for (i = 0; i < 2; i++)                                                                    \
-	{                                                                               \
-	  pu32Dst[zscanTab4_2[(i << 2) + 0]] = _mm_extract_epi32(src[i], 0);                       \
-      pu32Dst[zscanTab4_2[(i << 2) + 1]] = _mm_extract_epi32(src[i], 1);                       \
-      pu32Dst[zscanTab4_2[(i << 2) + 2]] = _mm_extract_epi32(src[i], 2);                       \
-      pu32Dst[zscanTab4_2[(i << 2) + 3]] = _mm_extract_epi32(src[i], 3);                       \
-    }
-
-#define STORE8_2_16(src)                                                  \
-    for (i = 0; i < 8; i++)                                                                    \
-	{                                                                               \
-	  pu32Dst[zscanTab8_2[(i << 2) + 0]] = _mm_extract_epi32(src[i], 0);                       \
-	  pu32Dst[zscanTab8_2[(i << 2) + 1]] = _mm_extract_epi32(src[i], 1);                       \
-	  pu32Dst[zscanTab8_2[(i << 2) + 2]] = _mm_extract_epi32(src[i], 2);                       \
-	  pu32Dst[zscanTab8_2[(i << 2) + 3]] = _mm_extract_epi32(src[i], 3);                       \
-	}
-
-#define STORE16_2_16(src)                                                  \
-	for (i = 0; i < 32; i++)                                                                    \
-	{                                                                              \
-	  pu32Dst[zscanTab16_2[(i << 2) + 0]] = _mm_extract_epi32(src[i], 0);                       \
-      pu32Dst[zscanTab16_2[(i << 2) + 1]] = _mm_extract_epi32(src[i], 1);                       \
-      pu32Dst[zscanTab16_2[(i << 2) + 2]] = _mm_extract_epi32(src[i], 2);                       \
-      pu32Dst[zscanTab16_2[(i << 2) + 3]] = _mm_extract_epi32(src[i], 3);                       \
-    }
-
-#define TRANSFORM_SKIP_ZSCAN(H, K, D)                                                                     \
-void ff_hevc_transform_skip_ ## H ## _ ## K ## _zscan_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 blkOffset)      \
-{                                                                                                         \
-    i16 *dst = (i16*) (_dst + blkOffset);                                                                                \
-    ptrdiff_t stride = _stride;                                                                           \
-    int shift = 5;                                                                                        \
-    int offset = 16;                                                                                      \
-    __m128i r[(H * H) >> 3];                                                                              \
-    __m128i rA, rB;                                                                              \
-    int i;                                                                                                \
-                                                                                                          \
-    ZSCAN_VAR_ ## K (dst);                                                                                   \
-                                                                                                          \
-    rA = _mm_setzero_si128();                                                                             \
-    rB = _mm_set1_epi16(offset);                                                                          \
-                                                                                                          \
-    LOAD ## H ## x ## H ## _ ## D ## (r, coeffs, 0);                                                           \
-    ADD ## H ## x ## H ## _ ## D ## (r, 0);                                                                    \
-    SHIFT ## H ## x ## H ## _ ## D ## (r, 0);                                                                  \
-                                                                                                          \
-    STORE ## H ## _ ## K ## _ ## D(r);                                                                         \
-}
-
-// Luma
-TRANSFORM_SKIP_ZSCAN(4,  4, 16);
-TRANSFORM_SKIP_ZSCAN(8,  4, 16);
-TRANSFORM_SKIP_ZSCAN(16, 4, 16);
-TRANSFORM_SKIP_ZSCAN(32, 4, 16);
-// Chroma
-TRANSFORM_SKIP_ZSCAN(4,  2, 16);
-TRANSFORM_SKIP_ZSCAN(8,  2, 16);
-TRANSFORM_SKIP_ZSCAN(16,  2, 16);
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -873,10 +574,10 @@ TRANSFORM_SKIP_ZSCAN(16,  2, 16);
     res1 = _mm_packs_epi32(res2, res3)
 
 #define TRANSFORM_LUMA_ADD(D)                                                  \
-void ff_hevc_transform_4x4_luma_ ## D ## _sse4(                            \
-        i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                   \
-    u8  shift = 7;                                                        \
-    i16 *src = coeffs;                                                     \
+void ff_hevc_transform_4x4_luma_ ## D ## _sse4(                                \
+        i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                           \
+    u8  shift = 7;                                                             \
+    i16 *src = coeffs;                                                         \
     __m128i res0, res1, res2, res3;                                            \
     __m128i tmp0, tmp1, src0, src1, add;                                       \
     INIT_ ## D();                                                              \
@@ -889,8 +590,8 @@ void ff_hevc_transform_4x4_luma_ ## D ## _sse4(                            \
     tmp1  = _mm_unpackhi_epi16(res2, res3);                                    \
     COMPUTE_LUMA_ALL();                                                        \
     TRANSPOSE4X4_16(res);                                                      \
-    SAVE_8x16(dst, stride, res0);                                   \
-    SAVE_8x16(dst, stride, res1);                                   \
+    SAVE_8x16(dst, stride, res0);                                              \
+    SAVE_8x16(dst, stride, res1);                                              \
 }
 
 TRANSFORM_LUMA_ADD( 8);
@@ -1128,6 +829,307 @@ TRANSFORM_ADD2(32,  8);
 
 /* Zscan */
 
+/* Zscan var */
+
+#define ZSCAN_VAR0(H, dst)                                                       \
+    u ## H  * pu ## H ## Dst = (u ## H  *) dst
+
+#define ZSCAN_VAR_2(dst)                                                       \
+    ZSCAN_VAR0(32, dst)
+
+#define ZSCAN_VAR_4(dst)                                                       \
+    ZSCAN_VAR0(64, dst)
+
+/* Load */
+
+#define LOAD4x4_8(dst, src, x)                                              \
+    dst[x] = _mm_loadu_si128((__m128i *) &src[x * 8]);                     \
+    dst[x + 1] = _mm_loadu_si128((__m128i *) &src[(x + 1) * 8])
+
+#define LOAD8x8_8(dst, src, x)                                              \
+	LOAD4x4_8(dst, src, x);                                                 \
+	LOAD4x4_8(dst, src, x + 2);                                             \
+	LOAD4x4_8(dst, src, x + 4);                                             \
+	LOAD4x4_8(dst, src, x + 6)
+#define LOAD16x16_8(dst, src, x)                                               \
+	LOAD8x8_8(dst, src, x);                                                 \
+	LOAD8x8_8(dst, src, x + 8);                                             \
+	LOAD8x8_8(dst, src, x + 16);                                            \
+	LOAD8x8_8(dst, src, x + 24)
+#define LOAD32x32_8(dst, src, x)                                          \
+	LOAD16x16_8(dst, src, x);                                               \
+	LOAD16x16_8(dst, src, x + 32);                                          \
+	LOAD16x16_8(dst, src, x + 64);                                          \
+	LOAD16x16_8(dst, src, x + 96)
+
+/* Add */
+
+#define ADD4x4_8(dst, x)                                                   \
+    dst[x]     = _mm_adds_epi16(dst[x], rB);                            \
+    dst[x + 1] = _mm_adds_epi16(dst[x + 1], rB)
+#define ADD8x8_8(dst, x)                                                   \
+	ADD4x4_8(dst, x);                                                    \
+	ADD4x4_8(dst, x + 2);                                                \
+	ADD4x4_8(dst, x + 4);                                                \
+	ADD4x4_8(dst, x + 6)
+#define ADD16x16_8(dst, x)                                                \
+	ADD8x8_8(dst, x);                                                     \
+	ADD8x8_8(dst, x + 8);                                                 \
+	ADD8x8_8(dst, x + 16);                                                \
+	ADD8x8_8(dst, x + 24)
+#define ADD32x32_8(dst, x)                                                \
+	ADD16x16_8(dst, x);                                                     \
+	ADD16x16_8(dst, x + 32);                                                \
+	ADD16x16_8(dst, x + 64);                                                \
+	ADD16x16_8(dst, x + 96)
+
+/* Shift */
+
+#define SHIFT4x4_8(dst, x)                                                 \
+    dst[x]     = _mm_srai_epi16(dst[x], shift);                            \
+    dst[x + 1] = _mm_srai_epi16(dst[x + 1], shift)
+#define SHIFT8x8_8(dst, x)                                                 \
+	SHIFT4x4_8(dst, x);                                                  \
+	SHIFT4x4_8(dst, x + 2);                                              \
+	SHIFT4x4_8(dst, x + 4);                                              \
+	SHIFT4x4_8(dst, x + 6)
+#define SHIFT16x16_8(dst, x)                                                \
+	SHIFT8x8_8(dst, x);                                                   \
+	SHIFT8x8_8(dst, x + 8);                                               \
+	SHIFT8x8_8(dst, x + 16);                                              \
+	SHIFT8x8_8(dst, x + 24)
+#define SHIFT32x32_8(dst, x)                                                \
+	SHIFT16x16_8(dst, x);                                                   \
+	SHIFT16x16_8(dst, x + 32);                                              \
+	SHIFT16x16_8(dst, x + 64);                                              \
+	SHIFT16x16_8(dst, x + 96)
+
+/* Store */
+
+// Luma
+
+int zscanTab8_4[16] =
+{
+   0,  4,
+   1,  5,
+   2,  6,
+   3,  7,
+   8, 12,
+   9, 13,
+  10, 14,
+  11, 15
+};
+
+int zscanTab16_4[64] =
+{
+   0,  4, 16, 20,
+   1,  5, 17, 21,
+   2,  6, 18, 22,
+   3,  7, 19, 23,
+   8, 12, 24, 28,
+   9, 13, 25, 29,
+  10, 14, 26, 30,
+  11, 15, 27, 31,
+  32, 36, 48, 52,
+  33, 37, 49, 53,
+  34, 38, 50, 54,
+  37, 39, 51, 55,
+  40, 44, 56, 60,
+  41, 45, 57, 61,
+  42, 46, 58, 62,
+  43, 47, 59, 63
+};
+
+int zscanTab32_4[256] =
+{
+   0,   4,  16,  20,  64,  68,  80,  84,
+   1,   5,  17,  21,  65,  69,  81,  85,
+   2,   6,  18,  22,  66,  70,  82,  86,
+   3,   7,  19,  23,  67,  71,  83,  87,
+   8,  12,  24,  28,  72,  76,  88,  92,
+   9,  13,  25,  29,  73,  77,  89,  93,
+  10,  14,  26,  30,  74,  78,  90,  94,
+  11,  15,  27,  31,  75,  79,  91,  95,
+  32,  36,  48,  52,  96, 100, 112, 116,
+  33,  37,  49,  53,  97, 101, 113, 117,
+  34,  38,  50,  54,  98, 102, 114, 118,
+  37,  39,  51,  55, 101, 103, 115, 119,
+  40,  44,  56,  60, 104, 108, 120, 124,
+  41,  45,  57,  61, 105, 109, 121, 125,
+  42,  46,  58,  62, 106, 110, 122, 126,
+  43,  47,  59,  63, 107, 111, 123, 127,
+ 128, 132, 144, 148, 192, 196, 208, 212,
+ 129, 133, 145, 149, 193, 197, 209, 213,
+ 130, 134, 146, 150, 194, 198, 210, 214,
+ 131, 135, 147, 151, 195, 199, 211, 215,
+ 136, 140, 152, 156, 200, 204, 216, 220,
+ 137, 141, 153, 157, 201, 205, 217, 221,
+ 138, 142, 154, 158, 202, 206, 218, 222,
+ 139, 143, 155, 159, 203, 207, 219, 223,
+ 160, 164, 176, 180, 224, 228, 240, 244,
+ 161, 165, 177, 181, 225, 229, 241, 245,
+ 162, 166, 178, 182, 226, 230, 242, 246,
+ 165, 167, 179, 183, 229, 231, 243, 247,
+ 168, 172, 184, 188, 232, 236, 248, 252,
+ 169, 173, 185, 189, 233, 237, 249, 253,
+ 170, 174, 186, 190, 234, 238, 250, 254,
+ 171, 175, 187, 191, 235, 239, 251, 255
+};
+
+int zscanTab4_2[8] =
+{
+   0,  2,
+   1,  3,
+   4,  6,
+   5,  7
+};
+
+int zscanTab8_2[32] =
+{
+   0,  2,  8, 10,
+   1,  3,  9, 11,
+   4,  6, 12, 14,
+   5,  7, 13, 15,
+  16, 18, 24, 26,
+  17, 19, 25, 27,
+  20, 22, 28, 30,
+  21, 23, 29, 31
+};
+
+int zscanTab16_2[128] =
+{
+   0,   2,   8,  10,  32,  34,  40,  42,
+   1,   3,   9,  11,  33,  35,  41,  43,
+   4,   6,  12,  14,  36,  38,  44,  46,
+   5,   7,  13,  15,  37,  39,  45,  47,
+  16,  18,  24,  26,  48,  50,  56,  58,
+  17,  19,  25,  27,  49,  51,  57,  59,
+  20,  22,  28,  30,  52,  54,  60,  62,
+  21,  23,  29,  31,  53,  55,  61,  63,
+
+  64,  66,  72,  74,  96,  98, 104, 106,
+  65,  67,  73,  75,  97,  99, 105, 107,
+  68,  70,  76,  78, 100, 102, 108, 110,
+  69,  71,  77,  79, 101, 103, 109, 111,
+  80,  82,  88,  90, 112, 114, 120, 122,
+  81,  83,  89,  91, 113, 115, 121, 123,
+  84,  86,  92,  94, 116, 118, 124, 126,
+  85,  87,  93,  95, 117, 119, 125, 127
+};
+
+#define STORE4_4_8(src)                                                           \
+	_mm_storeu_si128((__m128i*)(dst    ), src[0]);                                 \
+    _mm_storeu_si128((__m128i*)(dst + 8), src[1])
+
+#if ARCH_X86_64
+#define STORE8_4_8(src)                                                          \
+    for (i = 0; i < 8; i++)                                                                    \
+	{                                                                                                     \
+      pu64Dst[zscanTab8_4[(i << 1) + 0]] = _mm_extract_epi64(src[i], 0);                       \
+      pu64Dst[zscanTab8_4[(i << 1) + 1]] = _mm_extract_epi64(src[i], 1);                       \
+	}
+
+#define STORE16_4_8(src)                                                          \
+	for (i = 0; i < 32; i++)                                                                    \
+	{                                                                                                     \
+	  pu64Dst[zscanTab16_4[(i << 1) + 0]] = _mm_extract_epi64(src[i], 0);                       \
+	  pu64Dst[zscanTab16_4[(i << 1) + 1]] = _mm_extract_epi64(src[i], 1);                       \
+	}
+
+#define STORE32_4_8(src)                                                          \
+	for (i = 0; i < 128; i++)                                                                    \
+	{                                                                                                     \
+	  pu64Dst[zscanTab32_4[(i << 1) + 0]] = _mm_extract_epi64(src[i], 0);                       \
+	  pu64Dst[zscanTab32_4[(i << 1) + 1]] = _mm_extract_epi64(src[i], 1);                       \
+	}
+#else // ARCH_X86_64
+#define STORE8_4_8(src)                                                          \
+    for (i = 0; i < 8; i++)                                                                    \
+	{                                                                                                     \
+    	_mm_storel_epi64((__m128i*) &pu64Dst[zscanTab8_4[(i << 1) + 0]], src[i]);                       \
+    	src[i] = _mm_unpackhi_epi64(src[i], src[i]);                                                       \
+        _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab8_4[(i << 1) + 1]], src[i]);                       \
+	}
+
+#define STORE16_4_8(src)                                                          \
+	for (i = 0; i < 32; i++)                                                                    \
+	{                                                                                                     \
+	  _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab16_4[(i << 1) + 0]], src[i]);                       \
+	  src[i] = _mm_unpackhi_epi64(src[i], src[i]);                                                       \
+	  _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab16_4[(i << 1) + 1]], src[i]);                       \
+	}
+
+#define STORE32_4_8(src)                                                          \
+	for (i = 0; i < 128; i++)                                                                    \
+	{                                                                                                     \
+	  _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab32_4[(i << 1) + 0]], src[i]);                       \
+	  src[i] = _mm_unpackhi_epi64(src[i], src[i]);                                                       \
+	  _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab32_4[(i << 1) + 1]], src[i]);                       \
+    }
+#endif // ARCH_X86_XX
+
+// Chroma
+
+#define STORE4_2_8(src)                                                  \
+    for (i = 0; i < 2; i++)                                                                    \
+	{                                                                               \
+	  pu32Dst[zscanTab4_2[(i << 2) + 0]] = _mm_extract_epi32(src[i], 0);                       \
+      pu32Dst[zscanTab4_2[(i << 2) + 1]] = _mm_extract_epi32(src[i], 1);                       \
+      pu32Dst[zscanTab4_2[(i << 2) + 2]] = _mm_extract_epi32(src[i], 2);                       \
+      pu32Dst[zscanTab4_2[(i << 2) + 3]] = _mm_extract_epi32(src[i], 3);                       \
+    }
+
+#define STORE8_2_8(src)                                                  \
+    for (i = 0; i < 8; i++)                                                                    \
+	{                                                                               \
+	  pu32Dst[zscanTab8_2[(i << 2) + 0]] = _mm_extract_epi32(src[i], 0);                       \
+	  pu32Dst[zscanTab8_2[(i << 2) + 1]] = _mm_extract_epi32(src[i], 1);                       \
+	  pu32Dst[zscanTab8_2[(i << 2) + 2]] = _mm_extract_epi32(src[i], 2);                       \
+	  pu32Dst[zscanTab8_2[(i << 2) + 3]] = _mm_extract_epi32(src[i], 3);                       \
+	}
+
+#define STORE16_2_8(src)                                                  \
+	for (i = 0; i < 32; i++)                                                                    \
+	{                                                                              \
+	  pu32Dst[zscanTab16_2[(i << 2) + 0]] = _mm_extract_epi32(src[i], 0);                       \
+      pu32Dst[zscanTab16_2[(i << 2) + 1]] = _mm_extract_epi32(src[i], 1);                       \
+      pu32Dst[zscanTab16_2[(i << 2) + 2]] = _mm_extract_epi32(src[i], 2);                       \
+      pu32Dst[zscanTab16_2[(i << 2) + 3]] = _mm_extract_epi32(src[i], 3);                       \
+    }
+
+#define TRANSFORM_SKIP_ZSCAN(H, K, D)                                                                     \
+void ff_hevc_transform_skip_ ## H ## _ ## K ## _zscan_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 blkOffset)      \
+{                                                                                                         \
+    i16 *dst = (i16*) (_dst + blkOffset);                                                                                \
+    ptrdiff_t stride = _stride;                                                                           \
+    int shift = 5;                                                                                        \
+    int offset = 16;                                                                                      \
+    __m128i r[(H * H) >> 3];                                                                              \
+    __m128i rA, rB;                                                                              \
+    int i;                                                                                                \
+                                                                                                          \
+    ZSCAN_VAR_ ## K (dst);                                                                                   \
+                                                                                                          \
+    rA = _mm_setzero_si128();                                                                             \
+    rB = _mm_set1_epi16(offset);                                                                          \
+                                                                                                          \
+    LOAD ## H ## x ## H ## _ ## D (r, coeffs, 0);                                                           \
+    ADD ## H ## x ## H ## _ ## D (r, 0);                                                                    \
+    SHIFT ## H ## x ## H ## _ ## D (r, 0);                                                                  \
+                                                                                                          \
+    STORE ## H ## _ ## K ## _ ## D(r);                                                                         \
+}
+
+// Luma
+TRANSFORM_SKIP_ZSCAN(4,  4, 8);
+TRANSFORM_SKIP_ZSCAN(8,  4, 8);
+TRANSFORM_SKIP_ZSCAN(16, 4, 8);
+TRANSFORM_SKIP_ZSCAN(32, 4, 8);
+// Chroma
+TRANSFORM_SKIP_ZSCAN(4,  2, 8);
+TRANSFORM_SKIP_ZSCAN(8,  2, 8);
+TRANSFORM_SKIP_ZSCAN(16,  2, 8);
+
 #define ASSIGN_ZSCAN(dst, dst_stride, src, assign)                           \
     assign(src)
 
@@ -1143,12 +1145,12 @@ TRANSFORM_ADD2(32,  8);
     SCALE_4x32(e0, e1, e0, e1, e2, e3);                                        \
     TRANSPOSE4X4_16_S_ZSCAN(dst, dst_stride, e, assign)
 
-#define SAVE4_4_16(src)                                                           \
+#define SAVE4_4_8(src)                                                           \
 	_mm_storeu_si128((__m128i*)(dst    ), src ## 0 );                                 \
     _mm_storeu_si128((__m128i*)(dst + 8), src ## 1 )
 
 #if ARCH_X86_64
-#define SAVE8_4_16(src)                                                          \
+#define SAVE8_4_8(src)                                                          \
     pu64Dst[zscanTab8_4[(0 << 1) + 0]] = _mm_extract_epi64(src ## 0 , 0);         \
     pu64Dst[zscanTab8_4[(0 << 1) + 1]] = _mm_extract_epi64(src ## 0 , 1);         \
     pu64Dst[zscanTab8_4[(1 << 1) + 0]] = _mm_extract_epi64(src ## 1 , 0);         \
@@ -1166,7 +1168,7 @@ TRANSFORM_ADD2(32,  8);
     pu64Dst[zscanTab8_4[(7 << 1) + 0]] = _mm_extract_epi64(src ## 7 , 0);         \
     pu64Dst[zscanTab8_4[(7 << 1) + 1]] = _mm_extract_epi64(src ## 7 , 1)
 #else // ARCH_X86_64
-#define SAVE8_4_16(src)                                                          \
+#define SAVE8_4_8(src)                                                          \
     _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab8_4[0]], src ## 0 );                       \
     src ## 0  = _mm_unpackhi_epi64(src ## 0 , src ## 0 );                                             \
     _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab8_4[1]], src ## 0 );                       \
@@ -1200,7 +1202,7 @@ TRANSFORM_ADD2(32,  8);
     _mm_storel_epi64((__m128i*) &pu64Dst[zscanTab8_4[15]], src ## 7 )
 #endif // ARCH_X86_64
 
-#define SAVE4_2_16(src)                                                  \
+#define SAVE4_2_8(src)                                                  \
 	  pu32Dst[zscanTab4_2[0]] = _mm_extract_epi32(src ## 0 , 0);                       \
       pu32Dst[zscanTab4_2[1]] = _mm_extract_epi32(src ## 0 , 1);                       \
       pu32Dst[zscanTab4_2[2]] = _mm_extract_epi32(src ## 0 , 2);                       \
@@ -1210,7 +1212,7 @@ TRANSFORM_ADD2(32,  8);
       pu32Dst[zscanTab4_2[6]] = _mm_extract_epi32(src ## 1 , 2);                       \
       pu32Dst[zscanTab4_2[7]] = _mm_extract_epi32(src ## 1 , 3)
 
-#define SAVE8_2_16(src)                                                  \
+#define SAVE8_2_8(src)                                                  \
 	  pu32Dst[zscanTab8_2[0]] = _mm_extract_epi32(src ## 0, 0);                       \
 	  pu32Dst[zscanTab8_2[1]] = _mm_extract_epi32(src ## 0, 1);                       \
 	  pu32Dst[zscanTab8_2[2]] = _mm_extract_epi32(src ## 0, 2);                       \
@@ -1244,65 +1246,89 @@ TRANSFORM_ADD2(32,  8);
 	  pu32Dst[zscanTab8_2[30]] = _mm_extract_epi32(src ## 7, 2);                       \
 	  pu32Dst[zscanTab8_2[31]] = _mm_extract_epi32(src ## 7, 3)
 
-#define TR_4_2_ZSCAN( dst, dst_stride, src, K, D) TR_4_ZSCAN( dst, dst_stride, src,  4, loadu_EMPTY, SAVE4_ ## K ## _16)
+#define TRANSFORM_LUMA_ZSCAN(D)                                                  \
+void ff_hevc_transform_4x4_luma_ ## D ## _zscan_sse4(                                \
+        i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 offset) {               \
+    u8  shift = 7;                                                             \
+    i16 *src = coeffs;                                                         \
+    __m128i res0, res1, res2, res3;                                            \
+    __m128i tmp0, tmp1, src0, src1, add;                                       \
+    INIT_OFFSET_ ## D(offset);                                                 \
+    LOAD4x4(tmp, src);                                                         \
+    COMPUTE_LUMA_ALL();                                                        \
+    shift = 20 - D;                                                            \
+    res2  = _mm_unpacklo_epi16(res0, res1);                                    \
+    res3  = _mm_unpackhi_epi16(res0, res1);                                    \
+    tmp0  = _mm_unpacklo_epi16(res2, res3);                                    \
+    tmp1  = _mm_unpackhi_epi16(res2, res3);                                    \
+    COMPUTE_LUMA_ALL();                                                        \
+    TRANSPOSE4X4_16(res);                                                      \
+    SAVE_8x16(dst, stride, res0);                                              \
+    SAVE_8x16(dst, stride, res1);                                              \
+}
 
-#define TRANSFORM0_4x4_ZSCAN(K, D)                                                    \
-void ff_hevc_transform0_4x4_ ## K ## _ ## D ## _zscan_sse4 (                                \
-    i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 offset) {                       \
-    i16 *src    = coeffs;                                                  \
-    int      shift  = 7;                                                       \
-    int      add    = 1 << (shift - 1);                                        \
-    __m128i tmp0, tmp1, tmp2, tmp3;                                            \
-    __m128i e0, e1, e2, e3, e6, e7;                                            \
-    INIT_OFFSET_ ## D(offset);                                                              \
-    ZSCAN_VAR_ ## K(dst);                                                \
-    TR_4_1(p_dst1, 4, src);                                                      \
-    shift   = 20 - D;                                                          \
-    add     = 1 << (shift - 1);                                                \
-    TR_4_2_ZSCAN(dst, stride, tmp, K, D);                                               \
+TRANSFORM_LUMA_ZSCAN( 8);
+//TRANSFORM_LUMA_ZSCAN( 10);
+
+#define TR_4_2_ZSCAN( dst, dst_stride, src, K, D) TR_4_ZSCAN( dst, dst_stride, src,  4, loadu_EMPTY, SAVE4_ ## K ## _8)
+
+#define TRANSFORM0_4x4_ZSCAN(K, D)                                                     \
+void ff_hevc_transform0_4x4_ ## K ## _ ## D ## _zscan_sse4 (                           \
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 offset) {                            \
+    i16 *src    = coeffs;                                                              \
+    int      shift  = 7;                                                               \
+    int      add    = 1 << (shift - 1);                                                \
+    __m128i tmp0, tmp1, tmp2, tmp3;                                                    \
+    __m128i e0, e1, e2, e3, e6, e7;                                                    \
+    INIT_OFFSET_ ## D(offset);                                                         \
+    ZSCAN_VAR_ ## K(dst);                                                              \
+    TR_4_1(p_dst1, 4, src);                                                            \
+    shift   = 20 - D;                                                                  \
+    add     = 1 << (shift - 1);                                                        \
+    TR_4_2_ZSCAN(dst, stride, tmp, K, D);                                              \
 }
 
 TRANSFORM0_4x4_ZSCAN(4, 8)
 TRANSFORM0_4x4_ZSCAN(2, 8)
 
-#define TRANSFORM_4x4_ZSCAN(D)                                                    \
-void ff_hevc_transform_4x4_ ## D ## _zscan_sse4 (                                \
-    i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 offset) {                       \
-  ff_hevc_transform0_4x4_ ## D ## _zscan_sse4_orcc[_stride >> 1](                 \
-	_dst, coeffs, _stride, offset);                  \
+#define TRANSFORM_4x4_ZSCAN(D)                                                         \
+void ff_hevc_transform_4x4_ ## D ## _zscan_sse4 (                                      \
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 offset) {                            \
+  ff_hevc_transform0_4x4_ ## D ## _zscan_sse4_orcc[_stride >> 1](                      \
+	_dst, coeffs, _stride, offset);                                                    \
 }
 
 TRANSFORM_4x4_ZSCAN(8)
 
 
 #define TRANSPOSE8X8_16_S_ZSCAN(dst, dst_stride, src, assign)                        \
-    TRANSPOSE8X8_16(src);                                                      \
+    TRANSPOSE8X8_16(src);                                                            \
     ASSIGN_ZSCAN(dst, dst_stride, src, assign)
 
-#define TR_8_2_ZSCAN( dst, dst_stride, src, K, D)                          \
-  TR_8(dst, dst_stride, src, 8, SCALE8x8_2x32_WRAPPER);                    \
-  TRANSPOSE8X8_16_S_ZSCAN(dst, dst_stride, e, SAVE8_ ## K ## _16)
+#define TR_8_2_ZSCAN( dst, dst_stride, src, K, D)                                    \
+  TR_8(dst, dst_stride, src, 8, SCALE8x8_2x32_WRAPPER);                              \
+  TRANSPOSE8X8_16_S_ZSCAN(dst, dst_stride, e, SAVE8_ ## K ## _8)
 
-#define TRANSFORM0_8x8_ZSCAN(K, D)                                                    \
-void ff_hevc_transform0_8x8_ ## K ## _ ## D ## _zscan_sse4 (                                \
-    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
-    i16 tmp[8*8];                                                          \
-    i16 *src    = coeffs;                                                  \
-    i16 *p_dst1 = tmp;                                                     \
-    i16 *p_dst;                                                            \
-    int      shift  = 7;                                                       \
-    int      add    = 1 << (shift - 1);                                        \
-    __m128i src0, src1, src2, src3;                                            \
-    __m128i tmp0, tmp1, tmp2, tmp3;                                            \
-    __m128i e0, e1, e2, e3, e4, e5, e6, e7;                                    \
-    TR_8_1(p_dst1, 8, src);                                                    \
-    shift   = 20 - D;                                                          \
-    add     = 1 << (shift - 1);                                                \
-    {                                                                          \
-        INIT8_ ## D();                                                    \
-        ZSCAN_VAR_ ## K(dst);                                                \
-        TR_8_2_ZSCAN(dst, stride, tmp, K, D);                                           \
-    }                                                                          \
+#define TRANSFORM0_8x8_ZSCAN(K, D)                                                   \
+void ff_hevc_transform0_8x8_ ## K ## _ ## D ## _zscan_sse4 (                         \
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                                     \
+    i16 tmp[8*8];                                                                    \
+    i16 *src    = coeffs;                                                            \
+    i16 *p_dst1 = tmp;                                                               \
+    i16 *p_dst;                                                                      \
+    int      shift  = 7;                                                             \
+    int      add    = 1 << (shift - 1);                                              \
+    __m128i src0, src1, src2, src3;                                                  \
+    __m128i tmp0, tmp1, tmp2, tmp3;                                                  \
+    __m128i e0, e1, e2, e3, e4, e5, e6, e7;                                          \
+    TR_8_1(p_dst1, 8, src);                                                          \
+    shift   = 20 - D;                                                                \
+    add     = 1 << (shift - 1);                                                      \
+    {                                                                                \
+        INIT8_ ## D();                                                               \
+        ZSCAN_VAR_ ## K(dst);                                                        \
+        TR_8_2_ZSCAN(dst, stride, tmp, K, D);                                        \
+    }                                                                                \
 }
 
 TRANSFORM0_8x8_ZSCAN(4, 8)
@@ -1328,34 +1354,36 @@ TRANSFORM_8x8_ZSCAN(8)
     e7  = _mm_loadu_si128((__m128i *) &in[7*sstep_in]);                         \
     TRANSPOSE8X8_16_S_ZSCAN(out, sstep_out, e, assign)
 
-#define TRANSFORM0_2_ZSCAN(H, K, D)                                                   \
-void ff_hevc_transform0_ ## H ## x ## H ## _ ## K ## _ ## D ## _sse4 (                \
-    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
-    int i, j, k, add;                                                          \
-    int      shift = 7;                                                        \
-    i16 *src   = coeffs;                                                   \
-    i16  tmp[H*H];                                                         \
-    i16  tmp_2[H*H];                                                       \
-    i16  tmp_3[H*H];                                                       \
-    i16 *p_dst, *p_tra = tmp_2;                                            \
-    __m128i src0, src1, src2, src3;                                            \
-    __m128i tmp0, tmp1, tmp2, tmp3, tmp4;                                      \
-    __m128i e0, e1, e2, e3, e4, e5, e6, e7;                                    \
-    for (k = 0; k < 2; k++) {                                                  \
-        add   = 1 << (shift - 1);                                              \
-        for (i = 0; i < H; i+=8) {                                             \
-            p_dst = tmp + i;                                                   \
-            TR_ ## H ## _1(p_dst, H, src);                                     \
-            src   += 8;                                                        \
-            for (j = 0; j < H; j+=8) {                                         \
-               ZSCAN_VAR_ ## K ((&p_tra[i*H + j]));                            \
-               TRANSPOSE8x8_16_LS_ZSCAN((&p_tra[i*H+j]), H, (&tmp[j*H+i]), H, SAVE8_ ## K ## _16);\
-            }                                                                  \
-        }                                                                      \
-        src   = tmp_2;                                                         \
-        p_tra = _dst;                                                         \
-        shift = 20 - D;                                                        \
-    }    \
+#define TRANSFORM_STEP(H, K, D, assign, transpose)                                                                 \
+  add = 1 << (shift - 1);                                                                                          \
+  for (i = 0; i < H; i += 8) {                                                                                     \
+    p_dst = tmp + i;                                                                                               \
+    TR_ ## H ## _1(p_dst, H, src);                                                                                 \
+    src += 8;                                                                                                      \
+    for (j = 0; j < H; j += 8) {                                                                                   \
+    	ZSCAN_VAR_ ## K ((&p_tra[(i & 0x0F) * 16 + (i >> 4) * (16 * 32) + (j & 0x0F) * 8 + (j >> 4) * 256]));   \
+      transpose((&p_tra[i * H + j]), H, (&tmp[j * H + i]), H, assign);                                             \
+    }                                                                                                              \
+  }                                                                                                                \
+  src = tmp_2;                                                                                                     \
+  p_tra = _dst;                                                                                                    \
+  shift = 20 - D
+
+#define TRANSFORM0_2_ZSCAN(H, K, D)                                                      \
+void ff_hevc_transform0_ ## H ## x ## H ## _ ## K ## _ ## D ## _zscan_sse4 (             \
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                                         \
+    int i, j, k, add;                                                                    \
+    int      shift = 7;                                                                  \
+    i16 *src   = coeffs;                                                                 \
+    i16  tmp[H*H];                                                                       \
+    i16  tmp_2[H*H];                                                                     \
+    i16  tmp_3[H*H];                                                                     \
+    i16 *p_dst, *p_tra = tmp_2;                                                          \
+    __m128i src0, src1, src2, src3;                                                      \
+    __m128i tmp0, tmp1, tmp2, tmp3, tmp4;                                                \
+    __m128i e0, e1, e2, e3, e4, e5, e6, e7;                                              \
+    TRANSFORM_STEP(H, K, D, SAVE_8x16_2, TRANSPOSE8x8_16_LS);                            \
+    TRANSFORM_STEP(H, K, D, SAVE8_ ## K ## _8, TRANSPOSE8x8_16_LS_ZSCAN);               \
 }
 
 TRANSFORM0_2_ZSCAN(16, 4, 8);
@@ -1368,11 +1396,11 @@ TRANSFORM0_2_ZSCAN(32, 4, 8);
 TRANSFORM0_2_ZSCAN(32, 2, 8);
 // TRANSFORM0_2_ZSCAN(32, 2, 10);
 
-#define TRANSFORM_2_ZSCAN(H, D)                                                    \
-void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _zscan_sse4 (                                \
-    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
-  ff_hevc_transform0_ ## H ## x ## H ## _ ## D ## _zscan_sse4_orcc[_stride >> 2](                 \
-	_dst, coeffs, _stride);                  \
+#define TRANSFORM_2_ZSCAN(H, D)                                                         \
+void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _zscan_sse4 (                       \
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                                        \
+  ff_hevc_transform0_ ## H ## x ## H ## _ ## D ## _zscan_sse4_orcc[_stride >> 2](       \
+	_dst, coeffs, _stride);                                                             \
 }
 
 TRANSFORM_2_ZSCAN(16,  8);
