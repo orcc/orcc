@@ -316,7 +316,7 @@ public class ActorMergerSDF extends ActorMergerBase {
 		Procedure body = irFactory.createProcedure("mergedAction", 0,
 				irFactory.createTypeVoid());
 		createCounters(body);
-		createBuffers(body, scheduler.getMaxTokens());
+		createBuffers(body, scheduler.getMaxTokens(), true);
 		createLoopCounters(body, scheduler.getDepth());
 		createStaticSchedule(body, (Schedule) scheduler.getSchedule(),
 				body.getBlocks());
