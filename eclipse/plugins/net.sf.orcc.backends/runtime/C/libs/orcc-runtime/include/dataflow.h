@@ -51,7 +51,6 @@ struct action_s {
  */
 struct actor_s {
     char *name;
-    int group; /** id of his group. */
     void (*init_func)();
     void (*sched_func)(schedinfo_t *);
     int num_inputs; /** number of input ports */
