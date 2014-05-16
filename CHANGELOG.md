@@ -1,5 +1,6 @@
 # Next release
 ### Notable changes and features
+
 ### Bugfixes
 - Network editor
     + Grouping/ungrouping instances in a Network now manage correctly arguments and parameters
@@ -7,7 +8,9 @@
     + [#104] Updating the target or the source of an existing connection now updates properly the XDF file
 - Back-ends
     + [#99] Performance of the data-driven/demand-driven scheduler
+
 ### Known issues
+
 ### Miscellaneous
 - Back-ends
     + [C] Improve scripts extraction
