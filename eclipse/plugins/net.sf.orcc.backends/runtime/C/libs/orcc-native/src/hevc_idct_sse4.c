@@ -1105,6 +1105,7 @@ int zscanTab16_2[128] =
       pu32Dst[zscanTab16_2[(i << 2) + 3]] = _mm_extract_epi32(src[i], 3);                       \
     }
 
+#ifdef __SSE4_1__
 #define TRANSFORM_SKIP_ZSCAN(H, K, D)                                                                     \
 void ff_hevc_transform_skip_ ## H ## _ ## K ## _zscan_sse(i16 *_dst, i16 *coeffs)      \
 {                                                                                                         \
@@ -1136,6 +1137,7 @@ TRANSFORM_SKIP_ZSCAN(32, 4, 8);
 TRANSFORM_SKIP_ZSCAN(4,  2, 8);
 TRANSFORM_SKIP_ZSCAN(8,  2, 8);
 TRANSFORM_SKIP_ZSCAN(16,  2, 8);
+#endif // #ifdef __SSE4_1__
 
 #define ASSIGN_ZSCAN(dst, dst_stride, src, assign)                           \
     assign(src)
