@@ -44,8 +44,11 @@ import multiprocessing
 
 class Design:
 
-    def __init__(self, name, processors, memories, targetAltera):
+    def __init__(self, name, processors, memories, targetAltera, family, device, package):
         self.name = name
+        self.family = family
+        self.device = device
+        self.package = package
         self.processors = processors
         self.memories = memories
         self.targetAltera = targetAltera
@@ -102,7 +105,7 @@ class Design:
 
             templatePath = os.path.join(libPath, "templates")
             template = tempita.Template.from_filename(os.path.join(templatePath, "cg_project.template"), namespace={}, encoding=None)
-            result = template.substitute(path=cgPath)
+            result = template.substitute(path=cgPath, family=self.family, device=self.device, package=self.package)
             open(os.path.join(cgPath, "cg_project.cgp"), "w").write(result)
 
             for memory in self.memories:
@@ -112,7 +115,7 @@ class Design:
                 xoeRamFile = id + ".xoe"
 
                 template = tempita.Template.from_filename(os.path.join(templatePath, "xco_ram_2p.template"), namespace={}, encoding=None)
-                result = template.substitute(path=cgPath, id=memory.getName(), width=memory.getWidth(), depth=memory.getDepth())
+                result = template.substitute(path=cgPath, id=memory.getName(), width=memory.getWidth(), depth=memory.getDepth(), bm_vers=memory.getVersion())
                 open(os.path.join(cgPath, xoeRamFile), "w").write(result)
 
                 retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, xoeRamFile), "-p", os.path.join(cgPath, "cg_project.cgp")])
@@ -133,10 +136,10 @@ class Design:
     def generateCgFiles(self, libPath, genPath):
         templatePath = os.path.join(libPath, "templates")
         template = tempita.Template.from_filename(os.path.join(templatePath, "cg_project.template"), namespace={}, encoding=None)
-        result = template.substitute(path=genPath)
+        result = template.substitute(path=genPath, family=self.family, device=self.device, package=self.package)
         open(os.path.join(genPath, "cg_project.cgp"), "w").write(result)
         template = tempita.Template.from_filename(os.path.join(templatePath, "xco_ram_2p.template"), namespace={}, encoding=None)
-        result = template.substitute(path=genPath, id="ram_2p", width=512, depth=32)
+        result = template.substitute(path=genPath, id="ram_2p", width=512, depth=32, bm_vers=memory.getVersion())
         open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
     
     def simulateMulti(self, srcPath, proc, results, args):

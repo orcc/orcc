@@ -308,6 +308,9 @@
                   id="Virtex6 (xc6vlx240t)">
                </comboBoxItem>
                <comboBoxItem
+                  id="ZedBoard (xc7z020)">
+               </comboBoxItem>
+               <comboBoxItem
                   id="Others">
                </comboBoxItem>
             </comboBox>

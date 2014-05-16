@@ -81,14 +81,14 @@ class PyDesignPrinter extends TTAPrinter {
 		]
 		
 		## Network initialization
-		design = Design("«design.name»", processors, memories, «IF(fpga.altera)»True«ELSE»False«ENDIF»)
+		design = Design("«design.name»", processors, memories, «IF(fpga.altera)»True«ELSE»False«ENDIF», "«fpga.family»", "«fpga.device»", "«fpga.package»")
 		'''
 		
 	def private getPython(Processor processor)
-		'''Processor("«processor.name»", «processor.name»_instances, «processor.name»_inputs, «processor.name»_outputs, «processor.usePrint»)'''
+		'''Processor("«processor.name»", «processor.name»_instances, «processor.name»_inputs, «processor.name»_outputs, «processor.usePrint», "«fpga.family»", "«fpga.device»", "«fpga.package»")'''
 	
 	def private getPython(Memory memory)
-		'''Memory("«memory.name»", 32, «memory.depth/4»)'''
+		'''Memory("«memory.name»", 32, «memory.depth/4», "«fpga.version»")'''
 		
 	def private getPython(Port port, int index) 
 		'''Port("«port.label»", «index»«IF(port.native)», True, «port.size»«ENDIF»)'''
