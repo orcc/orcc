@@ -4,10 +4,18 @@ project (orcc-lib)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
 
-if(NOT MSVC AND NOT CMAKE_CROSSCOMPILING)
+include(OptimizeForArchitecture)
+
+if(NOT CMAKE_CROSSCOMPILING)
     # Optimize the compilation for the local processor architecture
-    list(APPEND extra_definitions -march=native)
+    OptimizeForArchitecture()
+
+    if(NOT MSVC)
+        list(APPEND extra_definitions -march=native)
+    endif()
 endif()
+
+configure_file(config.h.in config.h)
 
 if(NOT NO_EXTERNAL_DEPENDENCIES)
     include_directories(roxml/include)
