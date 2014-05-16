@@ -285,17 +285,17 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
 ////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////
-#define INIT_8()                                                               \
-    i16 *dst = (i16*) _dst;                                            \
+#define INIT_8()                                                                \
+    i16 *dst = (i16*) _dst;                                                     \
     ptrdiff_t stride = _stride
-#define INIT_10()                                                              \
-    u16 *dst = (u16*) _dst;                                          \
+#define INIT_10()                                                               \
+    u16 *dst = (u16*) _dst;                                                     \
     ptrdiff_t stride = _stride>>1
-#define INIT8_8()                                                              \
-    i16 *p_dst;                                                            \
+#define INIT8_8()                                                               \
+    i16 *p_dst;                                                                 \
     INIT_8()
-#define INIT8_10()                                                             \
-    u16 *p_dst;                                                           \
+#define INIT8_10()                                                              \
+    u16 *p_dst;                                                                 \
     INIT_10()
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
 ////////////////////////////////////////////////////////////////////////////////
 #define LOAD_EMPTY(dst, src)
 #define LOAD4x4(dst, src)                                                      \
-    dst ## 0 = _mm_load_si128((__m128i *) &src[0]);                           \
+    dst ## 0 = _mm_load_si128((__m128i *) &src[0]);                            \
     dst ## 1 = _mm_load_si128((__m128i *) &src[8])
 #define LOAD4x4_STEP(dst, src, sstep)                                          \
     tmp0 = _mm_loadl_epi64((__m128i *) &src[0 * sstep]);                       \
@@ -313,25 +313,25 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
     dst ## 0 = _mm_unpacklo_epi16(tmp0, tmp2);                                 \
     dst ## 1 = _mm_unpacklo_epi16(tmp1, tmp3)
 #define LOAD8x8_E(dst, src, sstep)                                             \
-    dst ## 0 = _mm_load_si128((__m128i *) &src[0 * sstep]);                   \
-    dst ## 1 = _mm_load_si128((__m128i *) &src[1 * sstep]);                   \
-    dst ## 2 = _mm_load_si128((__m128i *) &src[2 * sstep]);                   \
+    dst ## 0 = _mm_load_si128((__m128i *) &src[0 * sstep]);                    \
+    dst ## 1 = _mm_load_si128((__m128i *) &src[1 * sstep]);                    \
+    dst ## 2 = _mm_load_si128((__m128i *) &src[2 * sstep]);                    \
     dst ## 3 = _mm_load_si128((__m128i *) &src[3 * sstep])
 #define LOAD8x8_O(dst, src, sstep)                                             \
-    tmp0 = _mm_load_si128((__m128i *) &src[1 * sstep]);                       \
-    tmp1 = _mm_load_si128((__m128i *) &src[3 * sstep]);                       \
-    tmp2 = _mm_load_si128((__m128i *) &src[5 * sstep]);                       \
-    tmp3 = _mm_load_si128((__m128i *) &src[7 * sstep]);                       \
+    tmp0 = _mm_load_si128((__m128i *) &src[1 * sstep]);                        \
+    tmp1 = _mm_load_si128((__m128i *) &src[3 * sstep]);                        \
+    tmp2 = _mm_load_si128((__m128i *) &src[5 * sstep]);                        \
+    tmp3 = _mm_load_si128((__m128i *) &src[7 * sstep]);                        \
     dst ## 0 = _mm_unpacklo_epi16(tmp0, tmp1);                                 \
     dst ## 1 = _mm_unpackhi_epi16(tmp0, tmp1);                                 \
     dst ## 2 = _mm_unpacklo_epi16(tmp2, tmp3);                                 \
     dst ## 3 = _mm_unpackhi_epi16(tmp2, tmp3)
 #define LOAD16x16_O(dst, src, sstep)                                           \
     LOAD8x8_O(dst, src, sstep);                                                \
-    tmp0 = _mm_load_si128((__m128i *) &src[ 9 * sstep]);                      \
-    tmp1 = _mm_load_si128((__m128i *) &src[11 * sstep]);                      \
-    tmp2 = _mm_load_si128((__m128i *) &src[13 * sstep]);                      \
-    tmp3 = _mm_load_si128((__m128i *) &src[15 * sstep]);                      \
+    tmp0 = _mm_load_si128((__m128i *) &src[ 9 * sstep]);                       \
+    tmp1 = _mm_load_si128((__m128i *) &src[11 * sstep]);                       \
+    tmp2 = _mm_load_si128((__m128i *) &src[13 * sstep]);                       \
+    tmp3 = _mm_load_si128((__m128i *) &src[15 * sstep]);                       \
     dst ## 4 = _mm_unpacklo_epi16(tmp0, tmp1);                                 \
     dst ## 5 = _mm_unpackhi_epi16(tmp0, tmp1);                                 \
     dst ## 6 = _mm_unpacklo_epi16(tmp2, tmp3);                                 \
@@ -348,8 +348,8 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
 #define SAVE_8x16(dst, dst_stride, src)                                        \
     _mm_store_si128((__m128i *) dst, src);                                     \
     dst += 8
-#define SAVE_8x16_2(dst, dst_stride, src)                                        \
-    _mm_store_si128((__m128i *) dst, src);                                    \
+#define SAVE_8x16_2(dst, dst_stride, src)                                      \
+    _mm_store_si128((__m128i *) dst, src);                                     \
     dst += dst_stride
 #define SAVE_8x32(dst, dst_stride, src0, src1, idx)                            \
     _mm_store_si128((__m128i *) &dst[idx*dst_stride]  , src0);                 \
@@ -361,17 +361,17 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
     tmp0 = _mm_packus_epi16(tmp0, _mm_setzero_si128())
 #define ADD_AND_SAVE_4x8(dst, dst_stride, src)                                 \
     ADD_AND_SAVE_8(dst, dst_stride, src);                                      \
-    *((u32 *)(dst)) = _mm_cvtsi128_si32(tmp0);                            \
+    *((u32 *)(dst)) = _mm_cvtsi128_si32(tmp0);                                 \
     dst += dst_stride
 #define SAVE_4x8(dst, dst_stride, src)                                         \
-    *((u32 *)(dst)) = _mm_cvtsi128_si32(src);                             \
+    *((u32 *)(dst)) = _mm_cvtsi128_si32(src);                                  \
     dst += dst_stride
 #define ADD_AND_SAVE_8x8(dst, dst_stride, src)                                 \
     ADD_AND_SAVE_8(dst, dst_stride, src);                                      \
     _mm_storel_epi64((__m128i *) dst, tmp0);                                   \
     dst += dst_stride
-#define SAVE_8x8(dst, dst_stride, src)                                   \
-    _mm_storel_epi64((__m128i *) dst, src);                                   \
+#define SAVE_8x8(dst, dst_stride, src)                                         \
+    _mm_storel_epi64((__m128i *) dst, src);                                    \
     dst += dst_stride
 #define ADD_AND_SAVE_10(dst, dst_stride, src)                                  \
     tmp0 = _mm_add_epi16(src, tmp0);                                           \
@@ -384,26 +384,26 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
     _mm_storel_epi64((__m128i *) dst, tmp0);                                   \
     dst += dst_stride
 #define ADD_AND_SAVE_8x10(dst, dst_stride, src)                                \
-    tmp0 = _mm_load_si128((__m128i *) dst);                                   \
+    tmp0 = _mm_load_si128((__m128i *) dst);                                    \
     ADD_AND_SAVE_10(dst, dst_stride, src);                                     \
-    _mm_store_si128((__m128i *) dst, tmp0);                                   \
+    _mm_store_si128((__m128i *) dst, tmp0);                                    \
     dst += dst_stride
-#define ADD_AND_SAVE_16x8(dst, dst_stride, src)                               \
-    tmp0 = _mm_load_si128((__m128i *) dst);                                   \
-    tmp2 = _mm_load_si128((__m128i *) src);                                   \
-    tmp3 = _mm_load_si128((__m128i *) &src[8]);                               \
+#define ADD_AND_SAVE_16x8(dst, dst_stride, src)                                \
+    tmp0 = _mm_load_si128((__m128i *) dst);                                    \
+    tmp2 = _mm_load_si128((__m128i *) src);                                    \
+    tmp3 = _mm_load_si128((__m128i *) &src[8]);                                \
     tmp1 = _mm_unpackhi_epi8(tmp0, _mm_setzero_si128());                       \
     tmp0 = _mm_unpacklo_epi8(tmp0, _mm_setzero_si128());                       \
     tmp1 = _mm_add_epi16(tmp1, tmp3);                                          \
     tmp0 = _mm_add_epi16(tmp0, tmp2);                                          \
     tmp0 = _mm_packus_epi16(tmp0, tmp1);                                       \
-    _mm_store_si128((__m128i *) dst, tmp0);                                   \
+    _mm_store_si128((__m128i *) dst, tmp0);                                    \
     dst += dst_stride
 #define ADD_AND_SAVE_16x10(dst, dst_stride, src)                               \
-    tmp0 = _mm_load_si128((__m128i *) dst);                                   \
-    tmp1 = _mm_load_si128((__m128i *) &dst[8]);                               \
-    tmp2 = _mm_load_si128((__m128i *) src);                                   \
-    tmp3 = _mm_load_si128((__m128i *) &src[8]);                               \
+    tmp0 = _mm_load_si128((__m128i *) dst);                                    \
+    tmp1 = _mm_load_si128((__m128i *) &dst[8]);                                \
+    tmp2 = _mm_load_si128((__m128i *) src);                                    \
+    tmp3 = _mm_load_si128((__m128i *) &src[8]);                                \
     tmp0 = _mm_add_epi16(tmp0, tmp2);                                          \
     tmp1 = _mm_add_epi16(tmp1, tmp3);                                          \
     tmp2 = _mm_set1_epi16(0x03ff);                                             \
@@ -411,8 +411,8 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
     tmp1 = _mm_max_epi16(tmp1, _mm_setzero_si128());                           \
     tmp0 = _mm_min_epi16(tmp0, tmp2);                                          \
     tmp1 = _mm_min_epi16(tmp1, tmp2);                                          \
-    _mm_store_si128((__m128i *) dst, tmp0);                                   \
-    _mm_store_si128((__m128i *) &dst[8], tmp1);                               \
+    _mm_store_si128((__m128i *) dst, tmp0);                                    \
+    _mm_store_si128((__m128i *) &dst[8], tmp1);                                \
     dst += dst_stride
 
 #define ASSIGN2(dst, dst_stride, src0, src1, assign)                           \
@@ -502,39 +502,39 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
     SCALE8x8_2x32(dst0, src0, src1);                                           \
     SCALE8x8_2x32(dst1, src2, src3)
 #define SCALE16x16_2x32(dst, dst_stride, src0, src1, j)                        \
-    e0   = _mm_load_si128((__m128i *) &o16[j*8+0]);                           \
-    e7   = _mm_load_si128((__m128i *) &o16[j*8+4]);                           \
+    e0   = _mm_load_si128((__m128i *) &o16[j*8+0]);                            \
+    e7   = _mm_load_si128((__m128i *) &o16[j*8+4]);                            \
     tmp4 = _mm_add_epi32(src0, e0);                                            \
     src0 = _mm_sub_epi32(src0, e0);                                            \
     e0   = _mm_add_epi32(src1, e7);                                            \
     src1 = _mm_sub_epi32(src1, e7);                                            \
     SCALE_4x32(e0, e7, tmp4, e0, src0, src1);                                  \
-    _mm_store_si128((__m128i *) &dst[dst_stride*(             j)]  , e0);     \
+    _mm_store_si128((__m128i *) &dst[dst_stride*(             j)]  , e0);      \
     _mm_store_si128((__m128i *) &dst[dst_stride*(dst_stride-1-j)]  , e7)
 
 #define SCALE32x32_2x32(dst, dst_stride, j)                                    \
-    e0   = _mm_load_si128((__m128i *) &e32[j*16+0]);                          \
-    e1   = _mm_load_si128((__m128i *) &e32[j*16+4]);                          \
-    e4   = _mm_load_si128((__m128i *) &o32[j*16+0]);                          \
-    e5   = _mm_load_si128((__m128i *) &o32[j*16+4]);                          \
+    e0   = _mm_load_si128((__m128i *) &e32[j*16+0]);                           \
+    e1   = _mm_load_si128((__m128i *) &e32[j*16+4]);                           \
+    e4   = _mm_load_si128((__m128i *) &o32[j*16+0]);                           \
+    e5   = _mm_load_si128((__m128i *) &o32[j*16+4]);                           \
     tmp0 = _mm_add_epi32(e0, e4);                                              \
     tmp1 = _mm_add_epi32(e1, e5);                                              \
     tmp2 = _mm_sub_epi32(e1, e5);                                              \
     tmp3 = _mm_sub_epi32(e0, e4);                                              \
     SCALE_4x32(tmp0, tmp1, tmp0, tmp1, tmp3, tmp2);                            \
-    _mm_store_si128((__m128i *) &dst[dst_stride*i+0]  , tmp0);                \
+    _mm_store_si128((__m128i *) &dst[dst_stride*i+0]  , tmp0);                 \
     _mm_store_si128((__m128i *) &dst[dst_stride*(dst_stride-1-i)+0]  , tmp1)
 
-#define SAVE16x16_2x32(dst, dst_stride, src0, src1, j)                        \
-    e0   = _mm_load_si128((__m128i *) &o16[j*8+0]);                           \
-    e7   = _mm_load_si128((__m128i *) &o16[j*8+4]);                           \
+#define SAVE16x16_2x32(dst, dst_stride, src0, src1, j)                         \
+    e0   = _mm_load_si128((__m128i *) &o16[j*8+0]);                            \
+    e7   = _mm_load_si128((__m128i *) &o16[j*8+4]);                            \
     tmp4 = _mm_add_epi32(src0, e0);                                            \
     src0 = _mm_sub_epi32(src0, e0);                                            \
     e0   = _mm_add_epi32(src1, e7);                                            \
     src1 = _mm_sub_epi32(src1, e7);                                            \
-    _mm_store_si128((__m128i *) &dst[dst_stride*(             j)]  , tmp4);   \
-    _mm_store_si128((__m128i *) &dst[dst_stride*(             j)+4], e0);     \
-    _mm_store_si128((__m128i *) &dst[dst_stride*(dst_stride-1-j)]  , src0);   \
+    _mm_store_si128((__m128i *) &dst[dst_stride*(             j)]  , tmp4);    \
+    _mm_store_si128((__m128i *) &dst[dst_stride*(             j)+4], e0);      \
+    _mm_store_si128((__m128i *) &dst[dst_stride*(dst_stride-1-j)]  , src0);    \
     _mm_store_si128((__m128i *) &dst[dst_stride*(dst_stride-1-j)+4], src1)
 
 
@@ -549,8 +549,8 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
 // ff_hevc_transform_4x4_luma_add_X_sse4
 ////////////////////////////////////////////////////////////////////////////////
 #define COMPUTE_LUMA(dst , idx)                                                \
-    tmp0 = _mm_load_si128((__m128i *) (transform4x4_luma[idx  ]));            \
-    tmp1 = _mm_load_si128((__m128i *) (transform4x4_luma[idx+1]));            \
+    tmp0 = _mm_load_si128((__m128i *) (transform4x4_luma[idx  ]));             \
+    tmp1 = _mm_load_si128((__m128i *) (transform4x4_luma[idx+1]));             \
     tmp0 = _mm_madd_epi16(src0, tmp0);                                         \
     tmp1 = _mm_madd_epi16(src1, tmp1);                                         \
     dst  = _mm_add_epi32(tmp0, tmp1);                                          \
@@ -568,10 +568,10 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
     res1 = _mm_packs_epi32(res2, res3)
 
 #define TRANSFORM_LUMA_ADD(D)                                                  \
-void ff_hevc_transform_4x4_luma_ ## D ## _sse4(                            \
-        i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                   \
-    u8  shift = 7;                                                        \
-    i16 *src = coeffs;                                                     \
+void ff_hevc_transform_4x4_luma_ ## D ## _sse4(                                \
+        i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                           \
+    u8  shift = 7;                                                             \
+    i16 *src = coeffs;                                                         \
     __m128i res0, res1, res2, res3;                                            \
     __m128i tmp0, tmp1, src0, src1, add;                                       \
     INIT_ ## D();                                                              \
@@ -584,8 +584,8 @@ void ff_hevc_transform_4x4_luma_ ## D ## _sse4(                            \
     tmp1  = _mm_unpackhi_epi16(res2, res3);                                    \
     COMPUTE_LUMA_ALL();                                                        \
     TRANSPOSE4X4_16(res);                                                      \
-    SAVE_8x16(dst, stride, res0);                                   \
-    SAVE_8x16(dst, stride, res1);                                   \
+    SAVE_8x16(dst, stride, res0);                                              \
+    SAVE_8x16(dst, stride, res1);                                              \
 }
 
 TRANSFORM_LUMA_ADD( 8);
@@ -661,7 +661,7 @@ TRANSFORM_LUMA_ADD( 8);
     assign(dst, dst_stride, e3, tmp0, tmp1, 3);                                \
     assign(dst, dst_stride, e4, tmp2, tmp3, 4);                                \
 
-#define TR_8_1( dst, dst_stride, src)                                         \
+#define TR_8_1( dst, dst_stride, src)                                          \
     TR_8( dst, dst_stride, src,  8, SCALE8x8_2x32_WRAPPER);                    \
     TRANSPOSE8x8_16_S(dst, dst_stride, e, SAVE_8x16)
 #define TR_8_2( dst, dst_stride, src, D)                                       \
@@ -673,26 +673,26 @@ TRANSFORM_LUMA_ADD( 8);
 ////////////////////////////////////////////////////////////////////////////////
 
 #define TRANSFORM_ADD4x4(D)                                                    \
-void ff_hevc_transform_4x4_ ## D ## _sse4 (                                \
-    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
-    i16 *src    = coeffs;                                                  \
+void ff_hevc_transform_4x4_ ## D ## _sse4 (                                    \
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                               \
+    i16 *src    = coeffs;                                                      \
     int      shift  = 7;                                                       \
     int      add    = 1 << (shift - 1);                                        \
     __m128i tmp0, tmp1, tmp2, tmp3;                                            \
     __m128i e0, e1, e2, e3, e6, e7;                                            \
     INIT_ ## D();                                                              \
-    TR_4_1(p_dst1, 4, src);                                                      \
+    TR_4_1(p_dst1, 4, src);                                                    \
     shift   = 20 - D;                                                          \
     add     = 1 << (shift - 1);                                                \
     TR_4_2(dst, stride, tmp, D);                                               \
 }
 #define TRANSFORM_ADD8x8(D)                                                    \
-void ff_hevc_transform_8x8_ ## D ## _sse4 (                                \
-    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
-    i16 tmp[8*8];                                                          \
-    i16 *src    = coeffs;                                                  \
-    i16 *p_dst1 = tmp;                                                     \
-    i16 *p_dst;                                                            \
+void ff_hevc_transform_8x8_ ## D ## _sse4 (                                    \
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                               \
+    i16 tmp[8*8];                                                              \
+    i16 *src    = coeffs;                                                      \
+    i16 *p_dst1 = tmp;                                                         \
+    i16 *p_dst;                                                                \
     int      shift  = 7;                                                       \
     int      add    = 1 << (shift - 1);                                        \
     __m128i src0, src1, src2, src3;                                            \
@@ -702,7 +702,7 @@ void ff_hevc_transform_8x8_ ## D ## _sse4 (                                \
     shift   = 20 - D;                                                          \
     add     = 1 << (shift - 1);                                                \
     {                                                                          \
-        INIT8_ ## D();                                                    \
+        INIT8_ ## D();                                                         \
         TR_8_2(dst, stride, tmp, D);                                           \
     }                                                                          \
 }
@@ -716,7 +716,7 @@ TRANSFORM_ADD8x8( 8)
 ////////////////////////////////////////////////////////////////////////////////
 // ff_hevc_transform_16x16_add_X_sse4
 ////////////////////////////////////////////////////////////////////////////////
-#define TR_COMPUTE16x16(dst1, dst2,src0, src1, src2, src3, i, j)              \
+#define TR_COMPUTE16x16(dst1, dst2,src0, src1, src2, src3, i, j)               \
     TR_COMPUTE_TRANFORM(dst1, dst2,src0, src1, src2, src3, i, j, transform16x16_1)
 #define TR_COMPUTE16x16_FIRST(j)                                               \
     TR_COMPUTE16x16(src0, src1, e0, e1, e2, e3, 0, j)
@@ -744,7 +744,7 @@ TRANSFORM_ADD8x8( 8)
 ////////////////////////////////////////////////////////////////////////////////
 // ff_hevc_transform_32x32_add_X_sse4
 ////////////////////////////////////////////////////////////////////////////////
-#define TR_COMPUTE32x32(dst1, dst2,src0, src1, src2, src3, i, j)              \
+#define TR_COMPUTE32x32(dst1, dst2,src0, src1, src2, src3, i, j)               \
     TR_COMPUTE_TRANFORM(dst1, dst2, src0, src1, src2, src3, i, j, transform32x32)
 #define TR_COMPUTE32x32_FIRST(i, j)                                            \
     TR_COMPUTE32x32(tmp0, tmp1, e0, e1, e2, e3, i, j);                         \
@@ -787,15 +787,15 @@ TRANSFORM_ADD8x8( 8)
 // ff_hevc_transform_XxX_add_X_sse4
 ////////////////////////////////////////////////////////////////////////////////
 #define TRANSFORM_ADD2(H, D)                                                   \
-void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _sse4 (                \
-    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
+void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _sse4 (                    \
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                               \
     int i, j, k, add;                                                          \
     int      shift = 7;                                                        \
-    i16 *src   = coeffs;                                                   \
-    i16  tmp[H*H];                                                         \
-    i16  tmp_2[H*H];                                                       \
-    i16  tmp_3[H*H];                                                       \
-    i16 *p_dst, *p_tra = tmp_2;                                            \
+    i16 *src   = coeffs;                                                       \
+    i16  tmp[H*H];                                                             \
+    i16  tmp_2[H*H];                                                           \
+    i16  tmp_3[H*H];                                                           \
+    i16 *p_dst, *p_tra = tmp_2;                                                \
     __m128i src0, src1, src2, src3;                                            \
     __m128i tmp0, tmp1, tmp2, tmp3, tmp4;                                      \
     __m128i e0, e1, e2, e3, e4, e5, e6, e7;                                    \
@@ -810,7 +810,7 @@ void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _sse4 (                \
             }                                                                  \
         }                                                                      \
         src   = tmp_2;                                                         \
-        p_tra = _dst;                                                         \
+        p_tra = _dst;                                                          \
         shift = 20 - D;                                                        \
     }    \
 }

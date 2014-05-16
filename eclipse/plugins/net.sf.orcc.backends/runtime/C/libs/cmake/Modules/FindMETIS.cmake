@@ -20,29 +20,29 @@
 # CMAKE_INCLUDE_PATH to modify the search paths.
 
 SET(METIS_SEARCH_PATHS
-        ~/Library/Frameworks
-        /Library/Frameworks
-        /usr/local
-        /usr
-        /sw # Fink
-        /opt/local # DarwinPorts
-        /opt/csw # Blastwave
-        /opt
+    ~/Library/Frameworks
+    /Library/Frameworks
+    /usr/local
+    /usr
+    /sw # Fink
+    /opt/local # DarwinPorts
+    /opt/csw # Blastwave
+    /opt
 )
 
 FIND_PATH(METIS_INCLUDE_DIR metis.h
-        HINTS
-        $ENV{METISDIR}
-        PATH_SUFFIXES include/METIS include
-        PATHS ${METIS_SEARCH_PATHS}
+    HINTS
+    $ENV{METISDIR}
+    PATH_SUFFIXES include/METIS include
+    PATHS ${METIS_SEARCH_PATHS}
 )
 
 FIND_LIBRARY(METIS_LIBRARY_TEMP
-        NAMES metis
-        HINTS
-        $ENV{METISDIR}
-        PATH_SUFFIXES lib64 lib
-        PATHS ${METIS_SEARCH_PATHS}
+    NAMES metis
+    HINTS
+    $ENV{METISDIR}
+    PATH_SUFFIXES lib64 lib
+    PATHS ${METIS_SEARCH_PATHS}
 )
 
 # MinGW needs an additional library mwindows
@@ -51,18 +51,18 @@ IF(MINGW)
 ENDIF(MINGW)
 
 IF(METIS_LIBRARY_TEMP)
-        # Metis needs an additional library m
-        SET(METIS_LIBRARY_TEMP ${METIS_LIBRARY_TEMP} m)
+    # Metis needs an additional library m
+    SET(METIS_LIBRARY_TEMP ${METIS_LIBRARY_TEMP} m)
 
-        # For MinGW library
-        IF(MINGW)
-                SET(METIS_LIBRARY_TEMP ${MINGW32_LIBRARY} ${METIS_LIBRARY_TEMP})
-        ENDIF(MINGW)
+    # For MinGW library
+    IF(MINGW)
+            SET(METIS_LIBRARY_TEMP ${MINGW32_LIBRARY} ${METIS_LIBRARY_TEMP})
+    ENDIF(MINGW)
 
-        # Set the final string here so the GUI reflects the final state.
-        SET(METIS_LIBRARY ${METIS_LIBRARY_TEMP} CACHE STRING "Where the METIS Library can be found")
-        # Set the temp variable to INTERNAL so it is not seen in the CMake GUI
-        SET(METIS_LIBRARY_TEMP "${METIS_LIBRARY_TEMP}" CACHE INTERNAL "")
+    # Set the final string here so the GUI reflects the final state.
+    SET(METIS_LIBRARY ${METIS_LIBRARY_TEMP} CACHE STRING "Where the METIS Library can be found")
+    # Set the temp variable to INTERNAL so it is not seen in the CMake GUI
+    SET(METIS_LIBRARY_TEMP "${METIS_LIBRARY_TEMP}" CACHE INTERNAL "")
 ENDIF(METIS_LIBRARY_TEMP)
 
 INCLUDE(FindPackageHandleStandardArgs)

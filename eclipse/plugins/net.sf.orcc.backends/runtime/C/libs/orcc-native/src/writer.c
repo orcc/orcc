@@ -44,38 +44,38 @@ static int cnt = 0;
 static char stop = 0;
 
 void Writer_init() {
-	
+    
     if (opt->write_file == NULL) {
-		print_usage();
-		fprintf(stderr, "No write file given!\n");
-		//wait_for_key();
-		exit(1);
-	}
+        print_usage();
+        fprintf(stderr, "No write file given!\n");
+        //wait_for_key();
+        exit(1);
+    }
 
     F = fopen(opt->write_file, "wb");
-	if (F == NULL) {
+    if (F == NULL) {
         if (opt->write_file == NULL) {
             opt->write_file = "<null>";
-		}
+        }
 
         fprintf(stderr, "could not open file \"%s\"\n", opt->write_file);
-		//wait_for_key();
-		exit(1);
-	}else{
-		fseek(F,0,SEEK_SET);	
-	}
+        //wait_for_key();
+        exit(1);
+    }else{
+        fseek(F,0,SEEK_SET);    
+    }
 }
 
 void Writer_write(u8 byte){
 
-	fseek(F,sizeof(u8)*cnt,SEEK_SET);
-	fwrite(&byte,sizeof(u8),1,F);
-	cnt++;	
+    fseek(F,sizeof(u8)*cnt,SEEK_SET);
+    fwrite(&byte,sizeof(u8),1,F);
+    cnt++;    
 }
 
 void Writer_close(){
-	fclose(F);
-	exit(666);
+    fclose(F);
+    exit(666);
 }
 
 int writer_open(char* fileName) {

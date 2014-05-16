@@ -40,25 +40,25 @@ struct global_scheduler_s {
 };
 
 struct local_scheduler_s {
-	int id; /** Unique ID of this scheduler */
+    int id; /** Unique ID of this scheduler */
     int nb_schedulers;
     schedstrategy_et strategy; /** Scheduling strategy */
 
-	/* Round robin */
-	int num_actors; /** number of actors managed by this scheduler */
+    /* Round robin */
+    int num_actors; /** number of actors managed by this scheduler */
     actor_t **actors; /** static list of actors managed by this scheduler */
-	int rr_next_schedulable; /** index of the next actor to schedule in last list */
+    int rr_next_schedulable; /** index of the next actor to schedule in last list */
 
-	/* Data demand/driven scheduler */
+    /* Data demand/driven scheduler */
     actor_t *schedulable[MAX_ACTORS]; /** dynamic list of the next actors to schedule */
-	unsigned int ddd_next_entry; /** index of the next actor to schedule in last list */
-	unsigned int ddd_next_schedulable; /** index of next actor added in the list */
+    unsigned int ddd_next_entry; /** index of the next actor to schedule in last list */
+    unsigned int ddd_next_schedulable; /** index of next actor added in the list */
 
-	/* Multicore with data demand/driven scheduler */
+    /* Multicore with data demand/driven scheduler */
     int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
     waiting_t **waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
 
-	/* Genetic algorithm */
+    /* Genetic algorithm */
     sync_t *sync;
     orcc_semaphore_t sem_thread;
 };

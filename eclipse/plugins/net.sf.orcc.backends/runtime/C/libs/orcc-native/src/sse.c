@@ -195,18 +195,18 @@ ADD_8_16_CLIP( 256, 32, 32)
 #endif
 
 static i32 clip_i32(i32 Value, i32 minVal, i32 maxVal) {
-	i32 tmp_if;
+    i32 tmp_if;
 
-	if (Value > maxVal) {
-		tmp_if = maxVal;
-	} else {
-		if (Value < minVal) {
-			tmp_if = minVal;
-		} else {
-			tmp_if = Value;
-		}
-	}
-	return tmp_if;
+    if (Value > maxVal) {
+        tmp_if = maxVal;
+    } else {
+        if (Value < minVal) {
+            tmp_if = minVal;
+        } else {
+            tmp_if = Value;
+        }
+    }
+    return tmp_if;
 }
 
 // For shared_memory
@@ -253,9 +253,9 @@ void addClip_orcc(
       for (x = 0; x < 4 * 1; x++)
       {
         for (y = 0; y < 4 * 1; y++)
-    	{
-    	  dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + y] =
-    	    clip_i32(lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred + y] +
+        {
+          dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + y] =
+            clip_i32(lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred + y] +
             residual[idxRes][offRes + x * 64 + y], 0, 255);
         }
       }
@@ -345,8 +345,8 @@ void addClip_orcc(
         }
         break;
       }
-	default:
-	  break;
+    default:
+      break;
   }
 }
 
@@ -366,7 +366,7 @@ void copy_cu_dpb_luma_orcc(
     copy_8_8_16_1x4352_orcc(
       pictureBuffer[lastIdx][yPixIdx+y],
       samp + y * 16,
-  	  xPixIdx);
+        xPixIdx);
   }
 }
 
@@ -384,7 +384,7 @@ void copy_cu_dpb_chroma_orcc(
     copy_8_8_8_1x2304_orcc(
       pictureBuffer[lastIdx][yPixIdx+y],
       &samp[y * 8],
-  	  xPixIdx);
+        xPixIdx);
   }
 }
 
@@ -401,12 +401,12 @@ void getmvinfo_dpb_ ## H ## _luma_orcc(                                         
                                                                                                                     \
   for (y = 0; y < sideMax; y++)                                                                                     \
   {                                                                                                                 \
-	memcpy_8_orcc(                                                                                                  \
+    memcpy_8_orcc(                                                                                                  \
       &RefCu[y * (sideMax)],                                                                                        \
       pictureBuffer[idx][yOffset + y],                                                                              \
       0,                                                                                                            \
       xOffset,                                                                                                      \
-  	  sideMax);                                                                                                     \
+        sideMax);                                                                                                     \
   }                                                                                                                 \
 }
 
@@ -428,12 +428,12 @@ void getmvinfo_dpb_ ## H ## _chroma_orcc(                                       
                                                                                                                     \
   for (y = 0; y < sideMax; y++)                                                                                     \
   {                                                                                                                 \
-	memcpy_8_orcc(                                                                                                  \
+    memcpy_8_orcc(                                                                                                  \
       &RefCu[y * (sideMax)],                                                                                        \
       pictureBuffer[idx][y+yOffset],                                                                                \
       0,                                                                                                            \
       xOffset,                                                                                                      \
-  	  sideMax);                                                                                                     \
+        sideMax);                                                                                                     \
   }                                                                                                                 \
 }
 
@@ -443,11 +443,11 @@ GETMVINFO_DPB_CHROMA(16)
 
 #ifdef __SSE2__
 void fillBorder_luma_orcc(
-	u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
-	i8 lastIdx,
-	int xSize,
-	int ySize,
-	u16 border_size)
+    u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
+    i8 lastIdx,
+    int xSize,
+    int ySize,
+    u16 border_size)
 {
   int y, x;
   u8 tmp_pictureBuffer;
@@ -497,10 +497,10 @@ void fillBorder_luma_orcc(
   iLoopCount = (border_size >> 4) - 1;
   y = 0;
   while (y <= ySize + 2 * border_size - 1) {
-	tmp_pictureBuffer = pucPictureBuffer1[0];
-	tmp_pictureBuffer0 = pucPictureBuffer2[0];
-	pm128iPictureBuffer = (__m128i *) &pucPictureBuffer[0];
-	pm128iPictureBuffer0 = (__m128i *) &pucPictureBuffer0[0];
+    tmp_pictureBuffer = pucPictureBuffer1[0];
+    tmp_pictureBuffer0 = pucPictureBuffer2[0];
+    pm128iPictureBuffer = (__m128i *) &pucPictureBuffer[0];
+    pm128iPictureBuffer0 = (__m128i *) &pucPictureBuffer0[0];
     m128iWord = _mm_set1_epi8(tmp_pictureBuffer);
     m128iWord0 = _mm_set1_epi8(tmp_pictureBuffer0);
     x = 0;
@@ -521,11 +521,11 @@ void fillBorder_luma_orcc(
 
 
 void fillBorder_chroma_orcc(
-	u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT/2+2*BORDER_SIZE][PICT_WIDTH/2+2*BORDER_SIZE],
-	i8 lastIdx,
-	int xSize,
-	int ySize,
-	u16 border_size)
+    u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT/2+2*BORDER_SIZE][PICT_WIDTH/2+2*BORDER_SIZE],
+    i8 lastIdx,
+    int xSize,
+    int ySize,
+    u16 border_size)
 {
   int y, x;
   u8 tmp_pictureBuffer;
