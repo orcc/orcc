@@ -1098,10 +1098,9 @@ int zscanTab16_2[128] =
     }
 
 #define TRANSFORM_SKIP_ZSCAN(H, K, D)                                                                     \
-void ff_hevc_transform_skip_ ## H ## _ ## K ## _zscan_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 blkOffset)      \
+void ff_hevc_transform_skip_ ## H ## _ ## K ## _zscan_sse(i16 *_dst, i16 *coeffs)      \
 {                                                                                                         \
-    i16 *dst = (i16*) (_dst + blkOffset);                                                                                \
-    ptrdiff_t stride = _stride;                                                                           \
+    i16 *dst = (i16*) _dst;                                                                                \
     int shift = 5;                                                                                        \
     int offset = 16;                                                                                      \
     __m128i r[(H * H) >> 3];                                                                              \
