@@ -94,7 +94,6 @@ class InstancePrinter extends CTemplate {
 	var boolean checkArrayInbounds = false
 	
 	var boolean newSchedul = false
-	var boolean ringTopology = false
 	
 	var boolean enableTrace = false
 	var String traceFolder
@@ -133,9 +132,6 @@ class InstancePrinter extends CTemplate {
 
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
-		}
-		if (options.containsKey(NEW_SCHEDULER_TOPOLOGY)) {
-			ringTopology = options.get(NEW_SCHEDULER_TOPOLOGY).equals("Ring")
 		}
 		if (options.containsKey(ENABLE_TRACES)) {
 			enableTrace = options.get(ENABLE_TRACES) as Boolean
@@ -243,10 +239,6 @@ class InstancePrinter extends CTemplate {
 			«instance.printAttributes»
 		«ELSE»
 			«actor.printAttributes»
-		«ENDIF»
-		«IF newSchedul»
-
-			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
 		«ENDIF»
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -588,7 +580,7 @@ class InstancePrinter extends CTemplate {
 		if (numTokens_«port.name» - index_«port.name» < «pattern.getNumTokens(port)») {
 			if( ! «entityName».sched->round_robin || i > 0) {
 				«IF incomingPortMap.containsKey(port)»
-					sched_add_schedulable(«entityName».sched, &«incomingPortMap.get(port).source.label», RING_TOPOLOGY);
+					sched_add_schedulable(«entityName».sched, &«incomingPortMap.get(port).source.label»);
 				«ENDIF»
 			}
 		}
@@ -692,7 +684,7 @@ class InstancePrinter extends CTemplate {
 					stop = 1;
 					«IF newSchedul»
 						if( ! «entityName».sched->round_robin || i > 0) {
-							sched_add_schedulable(«entityName».sched, &«connection.target.label», RING_TOPOLOGY);
+							sched_add_schedulable(«entityName».sched, &«connection.target.label»);
 						}
 					«ENDIF»
 				}

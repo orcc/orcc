@@ -53,9 +53,7 @@ class NetworkPrinter extends CTemplate {
 	protected val Network network;
 	protected val int fifoSize;
 	
-	protected var boolean profile = false
-	var boolean ringTopology = false
-	
+	protected var boolean profile = false	
 	protected var boolean newSchedul = false
 	
 	var int threadsNb = 1;
@@ -77,9 +75,6 @@ class NetworkPrinter extends CTemplate {
 		}
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
-		}
-		if (options.containsKey(NEW_SCHEDULER_TOPOLOGY) ) {
-			ringTopology = options.get(NEW_SCHEDULER_TOPOLOGY).equals("Ring")
 		}
 		if (options.containsKey(THREADS_NB)) {
 			if(options.get(THREADS_NB) instanceof String) {
@@ -223,7 +218,7 @@ class NetworkPrinter extends CTemplate {
 			
 			options_t *opt = init_orcc(argc, argv);
 			atexit(atexit_actions);
-			set_scheduling_strategy(«IF !newSchedul»"RR"«ELSEIF ringTopology»"DDR"«ELSE»"DDF"«ENDIF», opt);
+			set_scheduling_strategy(«IF !newSchedul»"RR"«ELSE»"DD"«ENDIF», opt);
 			
 			launcher(opt, &network);
 			«afterMain»

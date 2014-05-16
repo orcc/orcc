@@ -55,12 +55,8 @@ struct local_scheduler_s {
 	unsigned int ddd_next_schedulable; /** index of next actor added in the list */
 
 	/* Multicore with data demand/driven scheduler */
-	int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
-	/* ring topology */
-    waiting_t *ring_waiting_schedulable; /** receiving list of some actors to schedule */
-    waiting_t *ring_sending_schedulable; /** sending list of some actors to schedule */
-	/* mesh topology */
-    waiting_t **mesh_waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
+    int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
+    waiting_t **waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
 
 	/* Genetic algorithm */
     sync_t *sync;
@@ -89,8 +85,7 @@ global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync);
 
 void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, options_t *opt);
 
-local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_schedulable,
-        waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);
+local_scheduler_t *allocate_local_scheduler(int id, int schedulers_nb, sync_t *sync);
 
 /**
  * Initialize the given scheduler.
@@ -121,23 +116,10 @@ actor_t *sched_get_next_rr(local_scheduler_t *sched);
 actor_t *sched_get_next_ddd(local_scheduler_t *sched);
 
 /**
- * Add the actor to the schedulable or waiting list.
- * The list is chosen according to associate scheduler of the actor.
- */
-void sched_add_schedulable(local_scheduler_t *sched, actor_t *actor, int use_ring_topology);
-
-/**
- * Add waited actors to the schedulable or waiting list.
- * The list is chosen according to associate scheduler of the actor.
- * This function use ring topology of communications.
- */
-void sched_add_ring_waiting_list(local_scheduler_t *sched);
-
-/**
  * Add waited actors to the schedulable list.
- * This function use mesh topology of communications.
+ * Use a fully connected topology of communications.
  */
-void sched_add_mesh_waiting_list(local_scheduler_t *sched);
+void sched_add_waiting_list(local_scheduler_t *sched);
 
 void *scheduler_routine(void *data);
 
