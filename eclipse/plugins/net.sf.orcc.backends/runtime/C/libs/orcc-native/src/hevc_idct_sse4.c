@@ -9,12 +9,12 @@
 #include <smmintrin.h>
 #endif
 
-#if defined(__GNUC__)
-    #define _MM_STORE_SI128      _mm_store_si128
-    #define _MM_LOAD_SI128       _mm_load_si128
-#elif defined(_MSC_VER)
-    #define _MM_STORE_SI128      _mm_storeu_si128
-    #define _MM_LOAD_SI128       _mm_loadu_si128
+#if defined(_MSC_VER)
+#define _MM_STORE_SI128      _mm_storeu_si128
+#define _MM_LOAD_SI128       _mm_loadu_si128
+#else
+#define _MM_STORE_SI128      _mm_store_si128
+#define _MM_LOAD_SI128       _mm_load_si128
 #endif
 
 DECLARE_ALIGNED(16, static const i16, transform4x4_luma[8][8] )=
@@ -315,7 +315,7 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
 ////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////
-#define loadu_EMPTY(dst, src)
+#define LOAD_EMPTY(dst, src)
 #define LOAD4x4(dst, src)                                                      \
     dst ## 0 = _MM_LOAD_SI128((__m128i *) &src[0]);                           \
     dst ## 1 = _MM_LOAD_SI128((__m128i *) &src[8])
@@ -351,7 +351,7 @@ void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
     dst ## 6 = _mm_unpacklo_epi16(tmp2, tmp3);                                 \
     dst ## 7 = _mm_unpackhi_epi16(tmp2, tmp3)
 
-#define loadu_8x32(dst, dst_stride, src0, src1, idx)                            \
+#define LOAD_8x32(dst, dst_stride, src0, src1, idx)                            \
     src0 = _MM_LOAD_SI128((__m128i *) &dst[idx*dst_stride]);                   \
     src1 = _MM_LOAD_SI128((__m128i *) &dst[idx*dst_stride+4])
 
@@ -1277,7 +1277,7 @@ void ff_hevc_transform_4x4_luma_ ## D ## _zscan_sse4(                           
 TRANSFORM_LUMA_ZSCAN( 8);
 //TRANSFORM_LUMA_ZSCAN( 10);
 
-#define TR_4_2_ZSCAN( dst, dst_stride, src, K, D) TR_4_ZSCAN( dst, dst_stride, src,  4, loadu_EMPTY, SAVE4_ ## K ## _8)
+#define TR_4_2_ZSCAN( dst, dst_stride, src, K, D) TR_4_ZSCAN( dst, dst_stride, src,  4, LOAD_EMPTY, SAVE4_ ## K ## _8)
 
 #define TRANSFORM0_4x4_ZSCAN(K, D)                                                     \
 void ff_hevc_transform0_4x4_ ## K ## _ ## D ## _zscan_sse4 (                           \

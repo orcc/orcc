@@ -10,12 +10,10 @@
 #include <smmintrin.h>
 #endif
 
-#if defined(__GNUC__)
-    #define _MM_STORE_SI128      _mm_store_si128
-    #define _MM_LOAD_SI128       _mm_load_si128
-#elif defined(_MSC_VER)
-    #define _MM_STORE_SI128      _mm_storeu_si128
-    #define _MM_LOAD_SI128       _mm_loadu_si128
+#if defined(_MSC_VER)
+#define _MM_STORE_SI128      _mm_storeu_si128
+#else
+#define _MM_STORE_SI128      _mm_store_si128
 #endif
 
 
@@ -45,14 +43,14 @@
     _mm_storel_epi64((__m128i*)&out[7*sstep_out], m13)
 #endif
 #define STORE16(out, sstep_out)                                                \
-    _MM_STORE_SI128((__m128i *) &out[0*sstep_out], m0);                       \
-    _MM_STORE_SI128((__m128i *) &out[1*sstep_out], m1);                       \
-    _MM_STORE_SI128((__m128i *) &out[2*sstep_out], m2);                       \
-    _MM_STORE_SI128((__m128i *) &out[3*sstep_out], m3);                       \
-    _MM_STORE_SI128((__m128i *) &out[4*sstep_out], m4);                       \
-    _MM_STORE_SI128((__m128i *) &out[5*sstep_out], m5);                       \
-    _MM_STORE_SI128((__m128i *) &out[6*sstep_out], m6);                       \
-    _MM_STORE_SI128((__m128i *) &out[7*sstep_out], m7)
+    _mm_storeu_si128((__m128i *) &out[0*sstep_out], m0);                       \
+    _mm_storeu_si128((__m128i *) &out[1*sstep_out], m1);                       \
+    _mm_storeu_si128((__m128i *) &out[2*sstep_out], m2);                       \
+    _mm_storeu_si128((__m128i *) &out[3*sstep_out], m3);                       \
+    _mm_storeu_si128((__m128i *) &out[4*sstep_out], m4);                       \
+    _mm_storeu_si128((__m128i *) &out[5*sstep_out], m5);                       \
+    _mm_storeu_si128((__m128i *) &out[6*sstep_out], m6);                       \
+    _mm_storeu_si128((__m128i *) &out[7*sstep_out], m7)
 
 #define TRANSPOSE4x4_8(in, sstep_in, out, sstep_out)                           \
     {                                                                          \
@@ -132,14 +130,14 @@
 #define TRANSPOSE8x8_10(in, sstep_in, out, sstep_out)                          \
     {                                                                          \
         __m128i tmp0, tmp1, tmp2, tmp3, src0, src1, src2, src3;                \
-        __m128i m0  = _MM_LOAD_SI128((__m128i *) &in[0*sstep_in]);            \
-        __m128i m1  = _MM_LOAD_SI128((__m128i *) &in[1*sstep_in]);            \
-        __m128i m2  = _MM_LOAD_SI128((__m128i *) &in[2*sstep_in]);            \
-        __m128i m3  = _MM_LOAD_SI128((__m128i *) &in[3*sstep_in]);            \
-        __m128i m4  = _MM_LOAD_SI128((__m128i *) &in[4*sstep_in]);            \
-        __m128i m5  = _MM_LOAD_SI128((__m128i *) &in[5*sstep_in]);            \
-        __m128i m6  = _MM_LOAD_SI128((__m128i *) &in[6*sstep_in]);            \
-        __m128i m7  = _MM_LOAD_SI128((__m128i *) &in[7*sstep_in]);            \
+        __m128i m0  = _mm_loadu_si128((__m128i *) &in[0*sstep_in]);            \
+        __m128i m1  = _mm_loadu_si128((__m128i *) &in[1*sstep_in]);            \
+        __m128i m2  = _mm_loadu_si128((__m128i *) &in[2*sstep_in]);            \
+        __m128i m3  = _mm_loadu_si128((__m128i *) &in[3*sstep_in]);            \
+        __m128i m4  = _mm_loadu_si128((__m128i *) &in[4*sstep_in]);            \
+        __m128i m5  = _mm_loadu_si128((__m128i *) &in[5*sstep_in]);            \
+        __m128i m6  = _mm_loadu_si128((__m128i *) &in[6*sstep_in]);            \
+        __m128i m7  = _mm_loadu_si128((__m128i *) &in[7*sstep_in]);            \
                                                                                \
         tmp0 = _mm_unpacklo_epi16(m0, m1);                                     \
         tmp1 = _mm_unpacklo_epi16(m2, m3);                                     \
@@ -183,7 +181,7 @@
 #define ANGULAR_COMPUTE_8(W)                                                   \
     for (x = 0; x < W; x += 8) {                                               \
         r3 = _mm_set1_epi16((fact << 8) + (32 - fact));                        \
-        r1 = _MM_LOAD_SI128((__m128i*)(&ref[x+idx+1]));                       \
+        r1 = _mm_loadu_si128((__m128i*)(&ref[x+idx+1]));                       \
         r0 = _mm_srli_si128(r1, 1);                                            \
         r1 = _mm_unpacklo_epi8(r1, r0);                                        \
         r1 = _mm_maddubs_epi16(r1, r3);                                        \
@@ -196,7 +194,7 @@
 
 #define ANGULAR_COMPUTE4_8()                                                   \
     r3 = _mm_set1_epi16((fact << 8) + (32 - fact));                            \
-    r1 = _MM_LOAD_SI128((__m128i*)(&ref[idx+1]));                             \
+    r1 = _mm_loadu_si128((__m128i*)(&ref[idx+1]));                             \
     r0 = _mm_srli_si128(r1, 1);                                                \
     r1 = _mm_unpacklo_epi8(r1, r0);                                            \
     r1 = _mm_maddubs_epi16(r1, r3);                                            \
@@ -215,16 +213,16 @@
     r1 = _mm_loadl_epi64((__m128i*) &ref[idx+1]);                              \
     _mm_storel_epi64((__m128i *) p_src, r1)
 #define ANGULAR_COMPUTE_ELSE16_8()                                             \
-    r1 = _MM_LOAD_SI128((__m128i*) &ref[idx+1]);                              \
-    _MM_STORE_SI128((__m128i *) p_src, r1)
+    r1 = _mm_loadu_si128((__m128i*) &ref[idx+1]);                              \
+    _mm_storeu_si128((__m128i *) p_src, r1)
 #define ANGULAR_COMPUTE_ELSE32_8()                                             \
-    r1 = _MM_LOAD_SI128((__m128i*) &ref[idx+1]);                              \
-    _MM_STORE_SI128((__m128i *) p_src ,r1);                                   \
-    r1 = _MM_LOAD_SI128((__m128i*) &ref[idx+17]);                             \
-    _MM_STORE_SI128((__m128i *)&p_src[16] ,r1)
+    r1 = _mm_loadu_si128((__m128i*) &ref[idx+1]);                              \
+    _mm_storeu_si128((__m128i *) p_src ,r1);                                   \
+    r1 = _mm_loadu_si128((__m128i*) &ref[idx+17]);                             \
+    _mm_storeu_si128((__m128i *)&p_src[16] ,r1)
 
 #define CLIP_PIXEL(src1, src2)                                                 \
-    r3  = _MM_LOAD_SI128((__m128i*)src1);                                     \
+    r3  = _mm_loadu_si128((__m128i*)src1);                                     \
     r1  = _mm_set1_epi16(src1[-1]);                                            \
     r2  = _mm_set1_epi16(src2[0]);                                             \
     r0  = _mm_unpacklo_epi8(r3,_mm_setzero_si128());                           \
@@ -308,7 +306,7 @@
     CLIP_PIXEL(src2, src1);                                                    \
     CLIP_PIXEL_HI();                                                           \
     r0  = _mm_packus_epi16(r0, r3);                                            \
-    _MM_STORE_SI128((__m128i*) _src , r0)
+    _mm_storeu_si128((__m128i*) _src , r0)
 #define CLIP_PIXEL2_32_8()
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -317,7 +315,7 @@
 #define ANGULAR_COMPUTE_10(W)                                                  \
     for (x = 0; x < W; x += 4) {                                               \
         r3 = _mm_set1_epi32((fact << 16) + (32 - fact));                       \
-        r1 = _MM_LOAD_SI128((__m128i*)(&ref[x+idx+1]));                       \
+        r1 = _mm_loadu_si128((__m128i*)(&ref[x+idx+1]));                       \
         r0 = _mm_srli_si128(r1, 2);                                            \
         r1 = _mm_unpacklo_epi16(r1, r0);                                       \
         r1 = _mm_madd_epi16(r1, r3);                                           \
@@ -333,8 +331,8 @@
 
 #define ANGULAR_COMPUTE_ELSE_10(W)                                             \
     for (x = 0; x < W; x += 8) {                                               \
-        r1 = _MM_LOAD_SI128((__m128i*)(&ref[x+idx+1]));                       \
-        _MM_STORE_SI128((__m128i *) &p_src[x], r1);                           \
+        r1 = _mm_loadu_si128((__m128i*)(&ref[x+idx+1]));                       \
+        _mm_storeu_si128((__m128i *) &p_src[x], r1);                           \
     }
 
 #define ANGULAR_COMPUTE_ELSE4_10()                                             \
@@ -346,14 +344,14 @@
 #define ANGULAR_COMPUTE_ELSE32_10()     ANGULAR_COMPUTE_ELSE_10(32)
 
 #define CLIP_PIXEL_10()                                                        \
-    r0  = _MM_LOAD_SI128((__m128i*)src2);                                     \
+    r0  = _mm_loadu_si128((__m128i*)src2);                                     \
     r1  = _mm_set1_epi16(src2[-1]);                                            \
     r2  = _mm_set1_epi16(src1[0]);                                             \
     r0  = _mm_subs_epi16(r0, r1);                                              \
     r0  = _mm_srai_epi16(r0, 1);                                               \
     r0  = _mm_add_epi16(r0, r2)
 #define CLIP_PIXEL_HI_10()                                                     \
-    r3  = _MM_LOAD_SI128((__m128i*)&src2[8]);                                 \
+    r3  = _mm_loadu_si128((__m128i*)&src2[8]);                                 \
     r3  = _mm_subs_epi16(r3, r1);                                              \
     r3  = _mm_srai_epi16(r3, 1);                                               \
     r3  = _mm_add_epi16(r3, r2)
@@ -430,7 +428,7 @@
     CLIP_PIXEL_10();                                                           \
     r0  = _mm_max_epi16(r0, _mm_setzero_si128());                              \
     r0  = _mm_min_epi16(r0, _mm_set1_epi16(0x03ff));                           \
-    _MM_STORE_SI128((__m128i*) _src    , r0)
+    _mm_storeu_si128((__m128i*) _src    , r0)
 #define CLIP_PIXEL2_16_10()                                                    \
     CLIP_PIXEL_10();                                                           \
     CLIP_PIXEL_HI_10();                                                        \
@@ -438,8 +436,8 @@
     r0  = _mm_min_epi16(r0, _mm_set1_epi16(0x03ff));                           \
     r3  = _mm_max_epi16(r3, _mm_setzero_si128());                              \
     r3  = _mm_min_epi16(r3, _mm_set1_epi16(0x03ff));                           \
-    _MM_STORE_SI128((__m128i*) p_out    , r0);                                \
-    _MM_STORE_SI128((__m128i*) &p_out[8], r3);
+    _mm_storeu_si128((__m128i*) p_out    , r0);                                \
+    _mm_storeu_si128((__m128i*) &p_out[8], r3);
 
 #define CLIP_PIXEL2_32_10()
 
@@ -499,13 +497,13 @@
     _mm_storel_epi64((__m128i *) ref, r0);                                     \
     ref[8] = src1[7]
 #define PRED_ANGULAR_STORE1_16_8()                                             \
-    r0 = _MM_LOAD_SI128((__m128i*) (src1-1));                                 \
-    _MM_STORE_SI128((__m128i *) ref, r0);                                     \
+    r0 = _mm_loadu_si128((__m128i*) (src1-1));                                 \
+    _mm_storeu_si128((__m128i *) ref, r0);                                     \
     ref[16] = src1[15]
 #define PRED_ANGULAR_STORE1_32_8()                                             \
-    r0 = _MM_LOAD_SI128((__m128i*) (src1-1));                                 \
+    r0 = _mm_loadu_si128((__m128i*) (src1-1));                                 \
     _MM_STORE_SI128((__m128i *) ref, r0);                                      \
-    r0 = _MM_LOAD_SI128((__m128i*) (src1+15));                                \
+    r0 = _mm_loadu_si128((__m128i*) (src1+15));                                \
     _MM_STORE_SI128((__m128i *) (ref + 16), r0);                               \
     ref[32] = src1[31]
 
@@ -514,23 +512,23 @@
     _mm_storel_epi64((__m128i *) ref, r0);                                     \
     ref[4] = src1[3]
 #define PRED_ANGULAR_STORE1_8_10()                                             \
-    r0 = _MM_LOAD_SI128((__m128i*) (&src1[-1]));                              \
+    r0 = _mm_loadu_si128((__m128i*) (&src1[-1]));                              \
     _MM_STORE_SI128((__m128i *) ref, r0);                                      \
     ref[8] = src1[7]
 #define PRED_ANGULAR_STORE1_16_10()                                            \
-    r0 = _MM_LOAD_SI128((__m128i*) (&src1[-1]));                              \
+    r0 = _mm_loadu_si128((__m128i*) (&src1[-1]));                              \
     _MM_STORE_SI128((__m128i *) ref, r0);                                      \
-    r0 = _MM_LOAD_SI128((__m128i*) (&src1[7]));                               \
+    r0 = _mm_loadu_si128((__m128i*) (&src1[7]));                               \
     _MM_STORE_SI128((__m128i *) (&ref[8]), r0);                                \
     ref[16] = src1[15]
 #define PRED_ANGULAR_STORE1_32_10()                                            \
-    r0 = _MM_LOAD_SI128((__m128i*) (&src1[-1]));                              \
+    r0 = _mm_loadu_si128((__m128i*) (&src1[-1]));                              \
     _MM_STORE_SI128((__m128i *) ref, r0);                                      \
-    r0 = _MM_LOAD_SI128((__m128i*) (&src1[7]));                               \
+    r0 = _mm_loadu_si128((__m128i*) (&src1[7]));                               \
     _MM_STORE_SI128((__m128i *) (&ref[ 8]), r0);                               \
-    r0 = _MM_LOAD_SI128((__m128i*) (&src1[15]));                              \
+    r0 = _mm_loadu_si128((__m128i*) (&src1[15]));                              \
     _MM_STORE_SI128((__m128i *) (&ref[16]), r0);                               \
-    r0 = _MM_LOAD_SI128((__m128i*) (&src1[23]));                              \
+    r0 = _mm_loadu_si128((__m128i*) (&src1[23]));                              \
     _MM_STORE_SI128((__m128i *) (&ref[24]), r0);                               \
     ref[32] = src1[31]
 
