@@ -86,14 +86,14 @@ static const char *usage =
     "       KLR  : Kernighan Lin Refinement Weighted Load Balancing\n"
 
     "\nOther specific arguments:\n"
-	"Depending on how the application has been designed, one of these arguments can be used.\n"
+    "Depending on how the application has been designed, one of these arguments can be used.\n"
     "-l <nb loops>      Set the number of readings of the input file before exiting.\n"
     "-d <directory>     Set the path when multiple input files are required.\n"
     "-w <file>          Specify a file to write the output stream.\n";
 
 void print_usage() {
-	printf(usage, program);
-	fflush(stdout);
+    printf(usage, program);
+    fflush(stdout);
 }
 
 #ifdef _MSC_VER
@@ -105,40 +105,40 @@ void pause() {
 /////////////////////////////////////
 // initializes APR and parses options
 options_t* init_orcc(int argc, char *argv[]) {
-	// every command line option must be followed by ':' if it takes an
-	// argument, and '::' if this argument is optional
+    // every command line option must be followed by ':' if it takes an
+    // argument, and '::' if this argument is optional
     const char *ostr = "i:no:d:m:f:w:l:r:ac:s:v:p:h";
     int c;
 
     opt = set_default_options();
 
-	program = argv[0];
+    program = argv[0];
 
 #ifdef _MSC_VER
     atexit(&pause);
 #endif
     init_native_context();
 
-	while ((c = getopt(argc, argv, ostr)) != -1) {
-		switch (c) {
-		case '?': // BADCH
+    while ((c = getopt(argc, argv, ostr)) != -1) {
+        switch (c) {
+        case '?': // BADCH
             print_orcc_error(ORCC_ERR_BAD_ARGS);
             print_usage();
             exit(ORCC_ERR_BAD_ARGS);
-		case ':': // BADARG
+        case ':': // BADARG
             print_orcc_error(ORCC_ERR_BAD_ARGS);
             print_usage();
             exit(ORCC_ERR_BAD_ARGS);
-		case 'd':
+        case 'd':
             opt->input_directory = strdup(optarg);
             break;
-		case 'i':
+        case 'i':
             opt->input_file = strdup(optarg);
-			break;
-		case 'l':
+            break;
+        case 'l':
             opt->nbLoops = strtoul(optarg, NULL, 10);
-			break;
-		case 'f':
+            break;
+        case 'f':
             opt->nbFrames = strtoul(optarg, NULL, 10);
             break;
         case 'c':
@@ -148,24 +148,24 @@ options_t* init_orcc(int argc, char *argv[]) {
         case 's':
             set_mapping_strategy(optarg, opt);
             break;
-		case 'm':
+        case 'm':
             opt->mapping_input_file = strdup(optarg);
-			break;
+            break;
         case 'r':
             opt->nbProfiledFrames = strtoul(optarg, NULL, 10);
             break;
         case 'a':
             opt->mapping_repetition = REMAP_ALWAYS;
             break;
-		case 'n':
+        case 'n':
             opt->display_flags = DISPLAY_DISABLE;
-			break;
-		case 'o':
+            break;
+        case 'o':
             opt->yuv_file = strdup(optarg);
-			break;
-		case 'w':
+            break;
+        case 'w':
             opt->write_file = strdup(optarg);
-			break;
+            break;
         case 'p':
             opt->profiling_file = strdup(optarg);
             break;
@@ -179,8 +179,8 @@ options_t* init_orcc(int argc, char *argv[]) {
             print_orcc_error(ORCC_ERR_BAD_ARGS);
             print_usage();
             exit(ORCC_ERR_BAD_ARGS);
-		}
-	}
+        }
+    }
 
     return opt;
 }

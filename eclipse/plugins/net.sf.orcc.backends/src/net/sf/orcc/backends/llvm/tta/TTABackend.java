@@ -108,7 +108,8 @@ public class TTABackend extends LLVMBackend {
 		fpga = FPGA.builder(getAttribute("net.sf.orcc.backends.tta.fpga",
 				"Stratix III (EP3SL150F1152C2)"));
 		configuration = ProcessorConfiguration.getByName(getAttribute(
-				"net.sf.orcc.backends.llvm.tta.configuration", TTA_DEFAULT_PROCESSORS_CONFIGURATION));
+				"net.sf.orcc.backends.llvm.tta.configuration",
+				TTA_DEFAULT_PROCESSORS_CONFIGURATION));
 		reduceConnections = getAttribute(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
 	}
@@ -188,7 +189,7 @@ public class TTABackend extends LLVMBackend {
 
 		// update "vectorizable" information
 		Alignable.setAlignability(network);
-		
+
 		// Compute the actor mapping
 		if (importXcfFile) {
 			computedMapping = new Mapping(network, xcfFile);
@@ -197,7 +198,8 @@ public class TTABackend extends LLVMBackend {
 		}
 
 		// Build the design from the mapping
-		OrccLogger.traceln("TTA Architecture configuration setted to : " + configuration.getName());
+		OrccLogger.traceln("TTA Architecture configuration setted to : "
+				+ configuration.getName());
 		design = new ArchitectureBuilder().build(network, configuration,
 				computedMapping, reduceConnections);
 
@@ -217,13 +219,15 @@ public class TTABackend extends LLVMBackend {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
 			String commonLibPath = libPath + File.separator + "common";
-			
-			OrccLogger.trace("Export common library files into " + commonLibPath + "... ");
-			if (copyFolderToFileSystem("/runtime/common", commonLibPath, debug) == false) {
+
+			OrccLogger.trace("Export common library files into "
+					+ commonLibPath + "... ");
+			if (copyFolderToFileSystem("/runtime/common/scripts",
+					commonLibPath, debug) == false) {
 				OrccLogger.warnRaw("Error" + "\n");
 				return false;
 			}
-						
+
 			OrccLogger.trace("Export library files into " + libPath + "... ");
 			if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");

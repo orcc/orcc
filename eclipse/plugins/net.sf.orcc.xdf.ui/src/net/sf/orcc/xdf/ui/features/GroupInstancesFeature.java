@@ -56,6 +56,8 @@ import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
@@ -66,7 +68,6 @@ import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
-import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
@@ -84,13 +85,12 @@ import org.eclipse.ui.PlatformUI;
  * @author Antoine Lorence
  * 
  */
-public class GroupInstancesFeature extends AbstractCustomFeature {
+public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 
-	private boolean hasDoneChanges;
+	private Network newNetwork;
 
 	public GroupInstancesFeature(IFeatureProvider fp) {
 		super(fp);
-		hasDoneChanges = false;
 	}
 
 	@Override
@@ -165,9 +165,13 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 	}
 
 	@Override
-	public void execute(ICustomContext context) {
+	protected void beforeJobExecution() {
 		// The network to fill with selected content
-		final Network newNetwork = selectNewNetworkResource();
+		newNetwork = selectNewNetworkResource();
+	}
+
+	@Override
+	public void execute(ICustomContext context, IProgressMonitor parentMonitor) {
 		if (newNetwork == null) {
 			return;
 		}
@@ -190,6 +194,9 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			}
 		}
 
+		final SubMonitor monitor = SubMonitor.convert(parentMonitor, 100);
+		monitor.newChild(5);
+
 		// Create an Instance refined on the new Network
 		final String instanceName = uniqueVertexName(currentNetwork,
 				"groupedInstances");
@@ -197,12 +204,17 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				instanceName, newNetwork);
 		currentNetwork.add(newInstance);
 
+		SubMonitor loopProgress = monitor.newChild(5).setWorkRemaining(
+				selectedInstances.size());
+		monitor.setTaskName("Initialization");
+
 		// This will store the mapping between original instances and their copy
 		// in the new Network
 		final Map<Instance, Instance> copyMap = new HashMap<Instance, Instance>();
 
 		// Copy each selected Instance into the new Network
 		for (final Instance originalInstance : selectedInstances) {
+			loopProgress.newChild(1);
 			final Instance copyInstance = IrUtil.copy(originalInstance);
 			copyMap.put(originalInstance, copyInstance);
 			newNetwork.add(copyInstance);
@@ -240,10 +252,17 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		// re-added to the diagram
 		final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
 
+		loopProgress = monitor.newChild(5).setWorkRemaining(
+				currentNetwork.getConnections().size());
+		monitor.setTaskName("Update current network connections");
+
 		// Manage Connections in the current Network. Connections will NOT be
 		// deleted, only updated, so it is not mandatory to make a copy before
 		// looping on the list
 		for (final Connection connection : currentNetwork.getConnections()) {
+
+			loopProgress.newChild(1);
+
 			// 1 - Inner connection: connect 2 vertex both contained in the
 			// selection
 			if (selectedInstances.contains(connection.getSource())
@@ -312,6 +331,9 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			}
 		}
 
+		monitor.newChild(5);
+		monitor.setTaskName("Add the new instance");
+
 		// Now the new Network is up-to-date. In particular, it contains all its
 		// Ports. We can add the new Instance refined on this Network in the
 		// current Diagram. Doing this now allows to have Anchors for Instance
@@ -330,9 +352,16 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		final InstancePattern instancePattern = (InstancePattern) fp
 				.getPatternForPictogramElement(newInstancePe);
 
+		loopProgress = monitor.newChild(5).setWorkRemaining(
+				toUpdateInDiagram.size());
+		monitor.setTaskName("Update FreeFormConnections");
+
 		// We can update graphiti Connections to start or end from/to the newly
 		// added Instance
 		for (final Connection connection : toUpdateInDiagram) {
+
+			loopProgress.newChild(1);
+
 			final List<PictogramElement> pictogramElements = Graphiti
 					.getLinkService().getPictogramElements(getDiagram(),
 							connection);
@@ -362,15 +391,22 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			}
 		}
 
+		loopProgress = monitor.newChild(60).setWorkRemaining(selectedPe.size());
+		monitor.setTaskName("Delete selected instances");
+
 		// Finally remove from diagram useless elements. Inner connections
 		// are also deleted, since deleting an instance or a port from a
 		// diagram also clean related connections
 		for (final PictogramElement pe : selectedPe) {
+			loopProgress.newChild(1);
 			final IPattern pattern = fp.getPatternForPictogramElement(pe);
 			final DeleteContext delContext = new DeleteContext(pe);
 			delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
 			pattern.delete(delContext);
 		}
+
+		monitor.newChild(10);
+		monitor.setTaskName("Lay out the diagram");
 
 		// Layout the resulting diagram
 		final IContext layoutContext = new CustomContext();
@@ -380,6 +416,9 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			layoutFeature.execute(layoutContext);
 		}
 
+		monitor.newChild(10);
+		monitor.setTaskName("Save all");
+
 		// Save the new Network on the disk
 		try {
 			newNetwork.eResource().save(Collections.EMPTY_MAP);
@@ -387,13 +426,13 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			e.printStackTrace();
 		}
 
+		monitor.done();
+
 		// Finally, active direct editing on the newly created instance
 		final IDirectEditingInfo dei = getFeatureProvider()
 				.getDirectEditingInfo();
 		dei.setMainPictogramElement(newInstancePe);
 		dei.setActive(true);
-
-		hasDoneChanges = true;
 	}
 
 	/**
@@ -423,10 +462,5 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			}
 			return base + '_' + index;
 		}
-	}
-
-	@Override
-	public boolean hasDoneChanges() {
-		return hasDoneChanges;
 	}
 }

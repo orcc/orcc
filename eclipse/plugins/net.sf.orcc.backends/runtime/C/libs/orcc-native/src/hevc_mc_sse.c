@@ -333,7 +333,7 @@ void ff_hevc_put_unweighted_pred_zscan ## H ## _ ## K ## _ ## D ##_sse(        \
   WEIGHTED_INIT_0(H, D);                                                       \
   ZSCAN_VAR_ ## K ();                                                          \
   for (y = 0; y < height; y++) {                                               \
-	zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                    \
+    zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                    \
     for (x = 0; x < width; x += H) {                                           \
       WEIGHTED_LOAD ## H();                                                    \
       WEIGHTED_COMPUTE ## H ## _0(D);                                          \
@@ -375,7 +375,7 @@ void ff_hevc_put_weighted_pred_avg_zscan ## H ## _ ## K ## _ ## D ##_sse(      \
     WEIGHTED_INIT_2(H, D);                                                     \
     ZSCAN_VAR_ ## K ();                                                        \
     for (y = 0; y < height; y++) {                                             \
-    	zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                \
+        zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                \
         for (x = 0; x < width; x += H) {                                       \
             WEIGHTED_LOAD ## H();                                              \
             WEIGHTED_COMPUTE ## H ## _2(D);                                    \
@@ -419,7 +419,7 @@ void ff_hevc_weighted_pred_zscan ## H ## _ ## K ## _ ## D ##_sse(              \
     WEIGHTED_INIT_1(H, D);                                                     \
     ZSCAN_VAR_ ## K ();                                                        \
     for (y = 0; y < height; y++) {                                             \
-    	zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                \
+        zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                \
         for (x = 0; x < width; x += H) {                                       \
             WEIGHTED_LOAD ## H();                                              \
             WEIGHTED_COMPUTE ## H ## _1(D);                                    \
@@ -465,7 +465,7 @@ void ff_hevc_weighted_pred_avg_zscan ## H ## _ ## K ## _ ## D ##_sse(          \
     WEIGHTED_INIT_3(H, D);                                                     \
     ZSCAN_VAR_ ## K ();                                                        \
     for (y = 0; y < height; y++) {                                             \
-    	zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                \
+        zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                \
         for (x = 0; x < width; x += H) {                                       \
             WEIGHTED_LOAD ## H();                                              \
             WEIGHTED_COMPUTE ## H ## _3(D);                                    \
@@ -505,7 +505,7 @@ void ff_hevc_weighted_pred_mono_zscan ## H ## _ ## K ## _ ## D ##_sse(         \
     WEIGHTED_INIT_4(H, D);                                                     \
     ZSCAN_VAR_ ## K ();                                                        \
     for (y = 0; y < height; y++) {                                             \
-    	zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                \
+        zScanIdx = ((y & (K - 1))) + (y >> (K >> 1)) * (width);                \
         for (x = 0; x < width; x += H) {                                       \
             WEIGHTED_LOAD ## H();                                              \
             WEIGHTED_COMPUTE ## H ## _4(D);                                    \
@@ -578,7 +578,7 @@ void put_weighted_pred_avg_zscan_orcc (i16 src[2][64*64], int _width, int _heigh
 }
 
 void weighted_pred_zscan_orcc (int logWD, int weightCu[2], int offsetCu[2],
-	i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64], int iComp)
+    i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64], int iComp)
 {
   i16 * src = _src[rdList];
   u8 * dst = _dst;
@@ -593,7 +593,7 @@ void weighted_pred_zscan_orcc (int logWD, int weightCu[2], int offsetCu[2],
 }
 
 void weighted_pred_avg_zscan_orcc(int logWD , int weightCu[2], int offsetCu[2],
-		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64], int iComp)
+        i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64], int iComp)
 {
   i16 * src = _src[0];
   i16 * src1 = _src[1];

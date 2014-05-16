@@ -155,16 +155,16 @@ int check_graph_for_metis(adjacency_list *graph) {
 
 /**
  * Creates a graph whose topology is consistent with Metis' requirements that:
- *	- There are no self-edges.
- *	- It is undirected; i.e., (u,v) and (v,u) should be present and of the
- *	same weight.
- *	- The adjacency list should not contain multiple edges to the same
- *	other vertex.
+ *    - There are no self-edges.
+ *    - It is undirected; i.e., (u,v) and (v,u) should be present and of the
+ *    same weight.
+ *    - The adjacency list should not contain multiple edges to the same
+ *    other vertex.
  *  - Weights are > 0
  *
- *	The above errors are fixed by performing the following operations:
- *	- Self-edges are removed.
- *	- The undirected graph is formed by the union and merge of edges (adding weights)
+ *    The above errors are fixed by performing the following operations:
+ *    - Self-edges are removed.
+ *    - The undirected graph is formed by the union and merge of edges (adding weights)
  *  - If Weights <= 0 : exit with explicit error message
  *
  *  A warning message will be printed if any fix has been required

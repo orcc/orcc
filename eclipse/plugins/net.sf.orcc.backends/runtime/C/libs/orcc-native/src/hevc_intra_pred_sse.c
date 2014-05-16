@@ -542,7 +542,7 @@
     PRED_ANGULAR_WAR();                                                        \
     __m128i r2
 #define PRED_ANGULAR_WAR8_8()                                                  \
-    PRED_ANGULAR_WAR4_8();                                                       \
+    PRED_ANGULAR_WAR4_8();                                                     \
     int x
 #define PRED_ANGULAR_WAR16_8()                                                 \
     PRED_ANGULAR_WAR8_8()

@@ -50,9 +50,9 @@ void pred_angular_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i
 void put_weighted_pred_avg_orcc (i16 src[2][64*64], int _width, int _height, u8 dst[64*64]);
 
 void weighted_pred_orcc(int logWD, int weightCu[2], int offsetCu[2] ,
-		i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64]);
+        i16 _src[2][64*64], int _width, int _height, u8 rdList, u8 _dst[64*64]);
 
 void weighted_pred_avg_orcc(int logWD , int weightCu[2], int offsetCu[2] ,
-		i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64]);
+        i16 _src[2][64*64], int _width, int _height, u8 _dst[64*64]);
 
 #endif  /* _ORCC_OPENHEVC_H_ */

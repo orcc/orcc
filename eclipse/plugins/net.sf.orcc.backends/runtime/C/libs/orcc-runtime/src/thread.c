@@ -34,7 +34,7 @@
 
 void sync_init(sync_t *sync) {
     orcc_semaphore_create(sync->sem_monitor, 0);
-	sync->active_sync = 1;
+    sync->active_sync = 1;
 }
 
 

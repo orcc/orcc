@@ -51,6 +51,8 @@ import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
@@ -60,7 +62,6 @@ import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
-import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -74,13 +75,10 @@ import org.eclipse.graphiti.services.Graphiti;
  * @author Antoine Lorence
  * 
  */
-public class UngroupNetworkFeature extends AbstractCustomFeature {
-
-	private boolean hasDoneChanges;
+public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
 
 	public UngroupNetworkFeature(IFeatureProvider fp) {
 		super(fp);
-		hasDoneChanges = false;
 	}
 
 	@Override
@@ -127,7 +125,7 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 	}
 
 	@Override
-	public void execute(ICustomContext context) {
+	public void execute(ICustomContext context, IProgressMonitor parentMonitor) {
 		final PictogramElement instancePe = context.getPictogramElements()[0];
 		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instancePe);
 		final Network subNetwork = instance.getNetwork();
@@ -137,6 +135,10 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 
 		final Map<Instance, Instance> copies = new HashMap<Instance, Instance>();
 		final Map<Instance, PictogramElement> peMap = new HashMap<Instance, PictogramElement>();
+
+		final SubMonitor monitor = SubMonitor.convert(parentMonitor, 100);
+		monitor.newChild(5);
+		monitor.setTaskName("Initialization");
 
 		// Copy subNetwork variables into the current network
 		for (Var variable : subNetwork.getVariables()) {
@@ -190,8 +192,15 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 			}
 		}
 
+		SubMonitor loopProgress = monitor.newChild(20).setWorkRemaining(
+				subNetwork.getConnections().size());
+		monitor.setTaskName("Update connections");
+
 		// Re-generate connections between subNetwork instances
 		for(final Connection connection : subNetwork.getConnections()) {
+
+			loopProgress.newChild(1);
+
 			// The connection is between 2 instances
 			// Connections from/to a network port are analyzed later
 			if(connection.getSourcePort() != null && connection.getTargetPort() != null) {
@@ -215,11 +224,16 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 			}
 		}
 
+		loopProgress.setWorkRemaining(subNetwork.getInputs().size()
+				+ subNetwork.getOutputs().size());
+
 		// Merge connections:
 		// outerCon = connected from something in the current graph to an input of the instance
 		// innerCon = connected from a subNetwork input to something else (in
 		// subNetwork too)
 		for (final Port inPort : subNetwork.getInputs()) {
+
+			loopProgress.newChild(1);
 
 			final Connection outerCon = instance.getIncomingPortMap().get(inPort);
 			if (outerCon == null) {
@@ -254,6 +268,8 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 		// outerCons = connected from an output of the instance to something in the current graph
 		// innerCon = connected from something to an output in the subNetwork
 		for (final Port outPort : subNetwork.getOutputs()) {
+
+			loopProgress.newChild(1);
 
 			final List<Connection> outerCons = instance.getOutgoingPortMap()
 					.get(outPort);
@@ -290,6 +306,9 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 			}
 		}
 
+		monitor.newChild(70);
+		monitor.setTaskName("Delete useless network instance");
+
 		// Delete the selected instance PictogramElement from the current
 		// diagram. This will also delete:
 		// - The linked Instance from the Network
@@ -301,6 +320,9 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 		delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
 		pattern.delete(delContext);
 		
+		monitor.newChild(5);
+		monitor.setTaskName("Lay out the diagram");
+
 		// And layout the resulting diagram
 		final IContext layoutContext = new CustomContext();
 		final ICustomFeature layoutFeature = ((XdfDiagramFeatureProvider) getFeatureProvider())
@@ -308,11 +330,7 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 		if (layoutFeature.canExecute(layoutContext)) {
 			layoutFeature.execute(layoutContext);
 		}
-		hasDoneChanges = true;
-	}
 
-	@Override
-	public boolean hasDoneChanges() {
-		return hasDoneChanges;
+		monitor.done();
 	}
 }

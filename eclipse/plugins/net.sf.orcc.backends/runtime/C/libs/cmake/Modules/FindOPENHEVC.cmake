@@ -20,29 +20,29 @@
 # CMAKE_INCLUDE_PATH to modify the search paths.
 
 SET(OPENHEVC_SEARCH_PATHS
-	~/Library/Frameworks
-	/Library/Frameworks
-	/usr/local
-	/usr
-	/sw # Fink
-	/opt/local # DarwinPorts
-	/opt/csw # Blastwave
-	/opt
+    ~/Library/Frameworks
+    /Library/Frameworks
+    /usr/local
+    /usr
+    /sw # Fink
+    /opt/local # DarwinPorts
+    /opt/csw # Blastwave
+    /opt
 )
 
 FIND_PATH(OPENHEVC_INCLUDE_DIR openHevcWrapper.h
-	HINTS
-	$ENV{OPENHEVCDIR}
-	PATH_SUFFIXES include/OPENHEVC include
-	PATHS ${OPENHEVC_SEARCH_PATHS}
+    HINTS
+    $ENV{OPENHEVCDIR}
+    PATH_SUFFIXES include/OPENHEVC include
+    PATHS ${OPENHEVC_SEARCH_PATHS}
 )
 
 FIND_LIBRARY(OPENHEVC_LIBRARY_TEMP
-        NAMES LibOpenHevcWrapper
-	HINTS
-	$ENV{OPENHEVCDIR}
-	PATH_SUFFIXES lib64 lib
-	PATHS ${OPENHEVC_SEARCH_PATHS}
+    NAMES LibOpenHevcWrapper
+    HINTS
+    $ENV{OPENHEVCDIR}
+    PATH_SUFFIXES lib64 lib
+    PATHS ${OPENHEVC_SEARCH_PATHS}
 )
 
 # OPENHEVC may require threads on your system.
@@ -50,31 +50,31 @@ FIND_LIBRARY(OPENHEVC_LIBRARY_TEMP
 # frameworks may already provide it.
 # But for non-OSX systems, I will use the CMake Threads package.
 IF(NOT APPLE)
-	FIND_PACKAGE(Threads)
+    FIND_PACKAGE(Threads)
 ENDIF(NOT APPLE)
 
 # MinGW needs an additional library mwindows
 IF(MINGW)
-	SET(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
+    SET(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
 ENDIF(MINGW)
 
 IF(OPENHEVC_LIBRARY_TEMP)
-	# For threads, as mentioned Apple doesn't need this.
-	# In fact, there seems to be a problem if I used the Threads package
-	# and try using this line, so I'm just skipping it entirely for OS X.
-	IF(NOT APPLE)
-		SET(OPENHEVC_LIBRARY_TEMP ${OPENHEVC_LIBRARY_TEMP} ${CMAKE_THREAD_LIBS_INIT})
-	ENDIF(NOT APPLE)
+    # For threads, as mentioned Apple doesn't need this.
+    # In fact, there seems to be a problem if I used the Threads package
+    # and try using this line, so I'm just skipping it entirely for OS X.
+    IF(NOT APPLE)
+        SET(OPENHEVC_LIBRARY_TEMP ${OPENHEVC_LIBRARY_TEMP} ${CMAKE_THREAD_LIBS_INIT})
+    ENDIF(NOT APPLE)
 
-	# For MinGW library
-	IF(MINGW)
-		SET(OPENHEVC_LIBRARY_TEMP ${MINGW32_LIBRARY} ${OPENHEVC_LIBRARY_TEMP})
-	ENDIF(MINGW)
+    # For MinGW library
+    IF(MINGW)
+        SET(OPENHEVC_LIBRARY_TEMP ${MINGW32_LIBRARY} ${OPENHEVC_LIBRARY_TEMP})
+    ENDIF(MINGW)
 
-	# Set the final string here so the GUI reflects the final state.
-	SET(OPENHEVC_LIBRARY ${OPENHEVC_LIBRARY_TEMP} CACHE STRING "Where the OPENHEVC Library can be found")
-	# Set the temp variable to INTERNAL so it is not seen in the CMake GUI
-	SET(OPENHEVC_LIBRARY_TEMP "${OPENHEVC_LIBRARY_TEMP}" CACHE INTERNAL "")
+    # Set the final string here so the GUI reflects the final state.
+    SET(OPENHEVC_LIBRARY ${OPENHEVC_LIBRARY_TEMP} CACHE STRING "Where the OPENHEVC Library can be found")
+    # Set the temp variable to INTERNAL so it is not seen in the CMake GUI
+    SET(OPENHEVC_LIBRARY_TEMP "${OPENHEVC_LIBRARY_TEMP}" CACHE INTERNAL "")
 ENDIF(OPENHEVC_LIBRARY_TEMP)
 
 INCLUDE(FindPackageHandleStandardArgs)

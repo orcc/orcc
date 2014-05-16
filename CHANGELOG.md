@@ -1,10 +1,19 @@
 # Next release
 ### Notable changes and features
+
 ### Bugfixes
 - Network editor
     + Grouping/ungrouping instances in a Network now manage correctly arguments and parameters
     + Conflicts in created vertex names when grouping instances are now checked and resolved smoothly
+    + [#104] Updating the target or the source of an existing connection now updates properly the XDF file
+- Back-ends
+    + [#99] Performance of the data-driven/demand-driven scheduler
+
 ### Known issues
+
+### Miscellaneous
+- Back-ends
+    + [C] Improve scripts extraction
 
 # 2.0.0 April 29, 2014
 ### Notable changes and features

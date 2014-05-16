@@ -1,30 +1,17 @@
 /*
+ * <copyright>
+ *
  * Copyright (c) 2014, IETR/INSA of Rennes
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
- *     contributors may be used to endorse or promote products derived from this
- *     software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    SAP AG - initial API, implementation and documentation
+ *
+ * </copyright>
+ *
  */
 package net.sf.orcc.xdf.ui.features;
 
@@ -52,8 +39,8 @@ import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
  * run in a Job, and can use the associated IProgressMonitor
  * </p>
  * <p>
- * This is useful to indicate user the job is running, but eclipse is not
- * crashing
+ * This is useful to indicate to user that the job is running, but eclipse is
+ * not crashing
  * </p>
  * 
  * @author Antoine Lorence
@@ -81,22 +68,15 @@ public abstract class AbstractTimeConsumingCustomFeature extends
 			IProgressMonitor monitor);
 
 	/**
-	 * Used to configure the name of created Job
-	 * 
-	 * @return The desired job name
-	 */
-	protected abstract String getJobName();
-
-	/**
-	 * Callback launched just before job scheduling, and can be used by
-	 * subclasses. Default implementation is empty.
+	 * Callback executed just before job scheduling, in the Feature execution
+	 * Thread. Default implementation is empty.
 	 */
 	protected void beforeJobExecution() {
 	}
 
 	/**
-	 * Callback launched immediately after job execution, and can be used by
-	 * subclasses. Default implementation is empty.
+	 * Callback launched immediately after job execution in the Job Thread.
+	 * Default implementation is empty.
 	 */
 	protected void afterJobExecution() {
 	}
@@ -110,14 +90,15 @@ public abstract class AbstractTimeConsumingCustomFeature extends
 	 * @return The Job instance
 	 */
 	protected Job initializeJob(final ICustomContext context) {
-		return new Job(getJobName()) {
+		return new Job(getName()) {
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
-				TransactionalEditingDomain editDomain = TransactionUtil
+				final TransactionalEditingDomain editDomain = TransactionUtil
 						.getEditingDomain(getDiagram());
 
-				RecordingCommand command = new RecordingCommand(editDomain) {
+				final RecordingCommand command = new RecordingCommand(
+						editDomain, getName()) {
 
 					private IStatus result = null;
 
@@ -139,7 +120,16 @@ public abstract class AbstractTimeConsumingCustomFeature extends
 					}
 				};
 
+				// Execute (synchrnously) the defined command in a proper EMF
+				// transaction
 				editDomain.getCommandStack().execute(command);
+
+				// Update the diagram dirtiness state
+				getDiagramBehavior().getDiagramContainer().updateDirtyState();
+
+				// Callback
+				afterJobExecution();
+
 				return (IStatus) command.getResult().iterator().next();
 			}
 		};
@@ -174,8 +164,11 @@ public abstract class AbstractTimeConsumingCustomFeature extends
 
 		// Job is run
 		job.schedule();
+	}
 
-		// Callback
-		afterJobExecution();
+	// Prevent sub-classes from overriding this method
+	@Override
+	final public boolean hasDoneChanges() {
+		return false;
 	}
 }

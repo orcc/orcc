@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.xdf.ui.diagram;
 
+import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.features.DropInstanceFromFileFeature;
 import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 import net.sf.orcc.xdf.ui.layout.AutoLayoutFeature;
@@ -35,6 +38,7 @@ import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -212,6 +216,48 @@ public class XdfDiagramFeatureProvider extends
 					ctxt.setSourceAnchor(newAnchor);
 					ctxt.setTargetAnchor(connection.getEnd());
 					return conPattern.canStartConnection(ctxt);
+				}
+			}
+
+			@Override
+			public void postReconnect(IReconnectionContext context) {
+
+				// On reconnection, we have to update the business model object
+				// source or target
+				final net.sf.orcc.df.Connection dfConnection = (net.sf.orcc.df.Connection) getBusinessObjectForPictogramElement(context
+						.getConnection());
+				final Anchor newAnchor = context.getNewAnchor();
+				final Vertex vertex = (Vertex) getBusinessObjectForPictogramElement(newAnchor
+						.getParent());
+
+				if (context.getReconnectType().equals(
+						ReconnectionContext.RECONNECT_SOURCE)) {
+
+					if (PropsUtil.isInputPort(newAnchor.getParent())) {
+						dfConnection.setSource(vertex);
+						dfConnection.setSourcePort(null);
+
+					} else if (PropsUtil.isInstanceOutPort(newAnchor)) {
+						dfConnection.setSource(vertex);
+						final Port port = (Port) getBusinessObjectForPictogramElement(newAnchor);
+						dfConnection.setSourcePort(port);
+					} else {
+						OrccLogger
+								.severeln("Unable to get the new source type.");
+					}
+				} else {
+					if (PropsUtil.isOutputPort(newAnchor.getParent())) {
+						dfConnection.setTarget(vertex);
+						dfConnection.setTargetPort(null);
+
+					} else if (PropsUtil.isInstanceInPort(newAnchor)) {
+						dfConnection.setTarget(vertex);
+						final Port port = (Port) getBusinessObjectForPictogramElement(newAnchor);
+						dfConnection.setTargetPort(port);
+					} else {
+						OrccLogger
+								.severeln("Unable to get the new target type.");
+					}
 				}
 			}
 		};

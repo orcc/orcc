@@ -42,7 +42,9 @@
  */
 options_t *set_default_options() {
     options_t *opt = (options_t*) malloc(sizeof(options_t));
+    opt->sched_strategy = ORCC_SS_ROUND_ROBIN;
     opt->mapping_strategy = ORCC_MS_ROUND_ROBIN;
+    opt->mapping_repetition = REMAP_ONCE;
     opt->nb_processors = 1;
     opt->input_file = NULL;
     opt->mapping_output_file = NULL;
@@ -51,24 +53,10 @@ options_t *set_default_options() {
     opt->nbLoops = DEFAULT_INFINITE; // -1: infinite loop.
     opt->nbFrames = DEFAULT_INFINITE;
     opt->nbProfiledFrames = 10;
-    opt->mapping_repetition = REMAP_ONCE;
     opt->input_directory = NULL;
     opt->display_flags = DISPLAY_ENABLE;
     opt->yuv_file = NULL;
     opt->profiling_file = NULL;
-
-    return opt;
-}
-
-/**
- * Creates and init options structure.
- */
-options_t *set_options(mappingstrategy_et strategy, int nb_processors) {
-    options_t *opt = (options_t*) malloc(sizeof(options_t));
-    opt->mapping_strategy = strategy;
-    opt->nb_processors = nb_processors;
-    opt->input_file = "";
-    opt->mapping_output_file = "";
 
     return opt;
 }
@@ -126,10 +114,8 @@ void set_scheduling_strategy(char *arg_value, options_t *opt) {
 
     if (strcmp(arg_value, "RR") == 0) {
         opt->sched_strategy = ORCC_SS_ROUND_ROBIN;
-    } else if (strcmp(arg_value, "DDF") == 0) {
-        opt->sched_strategy = ORCC_SS_FULL_DD_DRIVEN;
-    } else if (strcmp(arg_value, "DDR") == 0) {
-        opt->sched_strategy = ORCC_SS_RING_DD_DRIVEN;
+    } else if (strcmp(arg_value, "DD") == 0) {
+        opt->sched_strategy = ORCC_SS_DD_DRIVEN;
     } else {
         print_orcc_error(ORCC_ERR_BAD_ARGS_MS);
         printf("\n");

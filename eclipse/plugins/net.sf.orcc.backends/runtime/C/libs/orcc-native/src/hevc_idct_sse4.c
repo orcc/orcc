@@ -263,7 +263,7 @@ DECLARE_ALIGNED(16, static const i16, transform32x32[8][16][8] )=
 #define shift_1st 7
 #define add_1st (1 << (shift_1st - 1))
 
-#if 1 // def __SSE4_1__
+#ifdef __SSE4_1__
 void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
 {
     i16 *dst = (i16*)_dst;
@@ -638,7 +638,7 @@ TRANSFORM_LUMA_ADD( 8);
     TRANSPOSE4X4_16_S(dst, dst_stride, e, assign)                              \
 
 #define TR_4_1( dst, dst_stride, src)    TR_4( dst, dst_stride, src,  4, LOAD4x4, ASSIGN_EMPTY)
-#define TR_4_2( dst, dst_stride, src, D) TR_4( dst, dst_stride, src,  4, loadu_EMPTY, SAVE_8x16)
+#define TR_4_2( dst, dst_stride, src, D) TR_4( dst, dst_stride, src,  4, LOAD_EMPTY, SAVE_8x16)
 
 ////////////////////////////////////////////////////////////////////////////////
 // ff_hevc_transform_8x8_add_X_sse4
@@ -784,7 +784,7 @@ TRANSFORM_ADD8x8( 8)
         }                                                                      \
         LOAD16x16_O(e, (&in[16*sstep]), sstep);                                \
         for (i = 0; i < 16; i++) {                                             \
-            loadu_8x32(o32, 16, src0, src1, i);                                 \
+            LOAD_8x32(o32, 16, src0, src1, i);                                 \
             TR_COMPUTE32x32_FIRST(4, i);                                       \
             TR_COMPUTE32x32_NEXT(6, i);                                        \
             SAVE_8x32(o32, 16, src0, src1, i);                                 \

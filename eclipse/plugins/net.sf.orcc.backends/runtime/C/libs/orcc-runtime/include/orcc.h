@@ -92,8 +92,7 @@ typedef enum {
 /* Scheduling strategy codes */
 typedef enum {
     ORCC_SS_ROUND_ROBIN,
-    ORCC_SS_RING_DD_DRIVEN, /* data-driven & demand-driven with ring-connected topology */
-    ORCC_SS_FULL_DD_DRIVEN, /* data-driven & demand-driven with full-connected topology */
+    ORCC_SS_DD_DRIVEN, /* data-driven & demand-driven */
     ORCC_SS_SIZE /* only used for string tab declaration */
 } schedstrategy_et;
 

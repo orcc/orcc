@@ -210,14 +210,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«printStateTransitions(state)»
 			«ENDIF»
 	'''
-	
+
 	override printOutputPattern(Pattern pattern) '''
 		«FOR port : pattern.ports» 
 			«printOutputPatternsPort(pattern, port)»
 		«ENDFOR»
 	'''
-	
-	override printOutputPatternsPort(Pattern pattern, Port port) {
+
+	def printOutputPatternsPort(Pattern pattern, Port port) {
 		var i = -1 '''
 		«FOR successor : instance.outgoingPortMap.get(port)»
 			 «printOutputPatternPort(pattern, port, successor, i = i + 1)»
@@ -225,7 +225,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	}
 	
-	override printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) 
+	def printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) 
 	'''«IF !instance.outgoingPortMap.get(port).head.fifoName.toString.empty»
 	&& (! «instance.outgoingPortMap.get(port).head.fifoName».full())«ENDIF»'''
 	
@@ -347,7 +347,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printActionsScheduling(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
-			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+			if («action.inputPattern.checkInputPattern»«action.scheduler.name»()) {
 				if(1
 				«IF action.outputPattern != null»
 					«action.outputPattern.printOutputPattern»
@@ -361,7 +361,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
-			if («transitions.action.inputPattern.checkInputPattern»isSchedulable_«transitions.action.name»()) {
+			if («transitions.action.inputPattern.checkInputPattern»«transitions.action.scheduler.name»()) {
 				«instance.name»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;
