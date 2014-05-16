@@ -41,7 +41,7 @@ public class FPGA {
 	}
 
 	public enum Family {
-		STRATIX3, VIRTEX5, VIRTEX6;
+		STRATIX3, VIRTEX5, VIRTEX6, ZEDBOARD;
 
 		@Override
 		public String toString() {
@@ -52,6 +52,8 @@ public class FPGA {
 				return "virtex5";
 			case VIRTEX6:
 				return "virtex6";
+			case ZEDBOARD:
+				return "zynq";
 			default:
 				return "Unknown serie";
 			}
@@ -63,7 +65,10 @@ public class FPGA {
 			return new FPGA(Brand.ALTERA, Family.STRATIX3, "EP3SL150F1152C2");
 		} else if (name.equals("Virtex6 (xc6vlx240t)")) {
 			return new FPGA(Brand.XILINX, Family.VIRTEX6, "xc6vlx240t",
-					"ff1156");
+					"ff1156", "6.3");
+		} else if (name.equals("ZedBoard (xc7z020)")) {
+			return new FPGA(Brand.XILINX, Family.ZEDBOARD, "xc7z020",
+					"clg484", "7.3");
 		} else {
 			return new FPGA(Brand.OTHER);
 		}
@@ -72,6 +77,7 @@ public class FPGA {
 	private Brand brand;
 	private String device;
 	private String pack;
+	private String version;
 	private Family family;
 
 	public FPGA(Brand brand) {
@@ -84,8 +90,15 @@ public class FPGA {
 		this.device = model;
 	}
 
-	public FPGA(Brand brand, Family serie, String model, String pack) {
-		this(brand, serie, model);
+	public FPGA(Brand brand, Family serie, String model, String version) {
+		this(brand);
+		this.family = serie;
+		this.device = model;
+		this.version = version;
+	}
+
+	public FPGA(Brand brand, Family serie, String model, String pack, String version) {
+		this(brand, serie, model, version);
 		this.pack = pack;
 	}
 
@@ -95,6 +108,10 @@ public class FPGA {
 
 	public String getPackage() {
 		return pack;
+	}
+
+	public String getVersion() {
+		return version;
 	}
 
 	public Family getFamily() {

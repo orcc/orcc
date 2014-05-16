@@ -5,7 +5,7 @@
 ##############################################################
 #
 # BEGIN Select
-SELECT Block_Memory_Generator xilinx.com:ip:blk_mem_gen:6.3
+SELECT Block_Memory_Generator xilinx.com:ip:blk_mem_gen:{{bm_vers}}
 # END Select
 # BEGIN Parameters
 CSET additional_inputs_for_power_estimation=false
