@@ -31,22 +31,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "orcc.h"
 #include "types.h"
-#include "fifo.h"
 #include "util.h"
 #include "options.h"
-
-// from APR
-/* Ignore Microsoft's interpretation of secure development
-* and the POSIX string handling API
-*/
-
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-#ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-#pragma warning(disable: 4996)
-#endif
 
 static FILE        *ptrFile ;
 static unsigned int fileSize;

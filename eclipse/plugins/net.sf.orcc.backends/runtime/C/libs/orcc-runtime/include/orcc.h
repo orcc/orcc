@@ -45,6 +45,17 @@ typedef int32_t idx_t;
 
 #endif
 
+// from APR
+/* Ignore Microsoft's interpretation of secure development
+* and the POSIX string handling API
+*/
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#pragma warning(disable: 4996)
+#endif
+
 typedef struct sync_s sync_t;
 typedef struct options_s options_t;
 typedef struct global_scheduler_s global_scheduler_t;
