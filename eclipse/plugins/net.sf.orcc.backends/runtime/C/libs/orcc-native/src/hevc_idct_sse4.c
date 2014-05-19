@@ -1109,7 +1109,6 @@ int zscanTab16_2[128] =
       pu32Dst[zscanTab16_2[(i << 2) + 3]] = _mm_extract_epi32(src[i], 3);                       \
     }
 
-#ifdef __SSE4_1__
 #define TRANSFORM_SKIP_ZSCAN(H, K, D)                                                                     \
 void ff_hevc_transform_skip_ ## H ## _ ## K ## _zscan_sse(i16 *_dst, i16 *coeffs)      \
 {                                                                                                         \
@@ -1132,6 +1131,7 @@ void ff_hevc_transform_skip_ ## H ## _ ## K ## _zscan_sse(i16 *_dst, i16 *coeffs
     STORE ## H ## _ ## K ## _ ## D(r);                                                                         \
 }
 
+#if HAVE_SSE4
 // Luma
 TRANSFORM_SKIP_ZSCAN(4,  4, 8);
 TRANSFORM_SKIP_ZSCAN(8,  4, 8);
@@ -1141,7 +1141,7 @@ TRANSFORM_SKIP_ZSCAN(32, 4, 8);
 TRANSFORM_SKIP_ZSCAN(4,  2, 8);
 TRANSFORM_SKIP_ZSCAN(8,  2, 8);
 TRANSFORM_SKIP_ZSCAN(16,  2, 8);
-#endif // #ifdef __SSE4_1__
+#endif // HAVE_SSE4
 
 #define ASSIGN_ZSCAN(dst, dst_stride, src, assign)                           \
     assign(src)
@@ -1399,6 +1399,7 @@ void ff_hevc_transform0_ ## H ## x ## H ## _ ## K ## _ ## D ## _zscan_sse4 (    
     TRANSFORM_STEP(H, K, D, SAVE8_ ## K ## _8, TRANSPOSE8x8_16_LS_ZSCAN);               \
 }
 
+#if HAVE_SSE4
 TRANSFORM0_2_ZSCAN(16, 4, 8);
 // TRANSFORM0_2_ZSCAN(16, 4, 10);
 TRANSFORM0_2_ZSCAN(16, 2, 8);
@@ -1408,6 +1409,7 @@ TRANSFORM0_2_ZSCAN(32, 4, 8);
 // TRANSFORM0_2_ZSCAN(32, 4, 10);
 TRANSFORM0_2_ZSCAN(32, 2, 8);
 // TRANSFORM0_2_ZSCAN(32, 2, 10);
+#endif // HAVE_SSE4
 
 #define TRANSFORM_2_ZSCAN(H, D)                                                         \
 void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _zscan_sse4 (                       \

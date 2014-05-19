@@ -345,7 +345,7 @@ void ff_hevc_put_unweighted_pred_zscan ## H ## _ ## K ## _ ## D ##_sse(        \
   }                                                                            \
 }
 
-#ifdef HAVE_SSE4
+#if HAVE_SSE4
 PUT_UNWEIGHTED_PRED_ZSCAN( 2,  2,  8)
 PUT_UNWEIGHTED_PRED_ZSCAN( 4,  2,  8)
 PUT_UNWEIGHTED_PRED_ZSCAN( 8,  2,  8)
@@ -389,7 +389,7 @@ void ff_hevc_put_weighted_pred_avg_zscan ## H ## _ ## K ## _ ## D ##_sse(      \
 }
 
 
-#ifdef HAVE_SSE4
+#if HAVE_SSE4
 PUT_WEIGHTED_PRED_AVG_ZSCAN(2,  2,  8)
 PUT_WEIGHTED_PRED_AVG_ZSCAN(4,  2,  8)
 PUT_WEIGHTED_PRED_AVG_ZSCAN(8,  2,  8)
@@ -431,7 +431,7 @@ void ff_hevc_weighted_pred_zscan ## H ## _ ## K ## _ ## D ##_sse(              \
     }                                                                          \
 }
 
-#ifdef HAVE_SSE4
+#if HAVE_SSE4
 WEIGHTED_PRED_ZSCAN( 2,  2,  8)
 WEIGHTED_PRED_ZSCAN( 4,  2,  8)
 WEIGHTED_PRED_ZSCAN( 8,  2,  8)
@@ -478,7 +478,7 @@ void ff_hevc_weighted_pred_avg_zscan ## H ## _ ## K ## _ ## D ##_sse(          \
     }                                                                          \
 }
 
-#ifdef HAVE_SSE4
+#if HAVE_SSE4
 WEIGHTED_PRED_AVG_ZSCAN( 2, 2, 8)
 WEIGHTED_PRED_AVG_ZSCAN( 4, 2, 8)
 WEIGHTED_PRED_AVG_ZSCAN( 8, 2, 8)
