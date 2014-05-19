@@ -22,8 +22,11 @@ if(NOT NO_EXTERNAL_DEPENDENCIES)
     add_subdirectory(roxml)
 endif()
 
-include_directories(orcc-runtime/include)
-include_directories(orcc-native/include)
+include_directories(
+    ${PROJECT_BINARY_DIR} # to find config.h
+    orcc-runtime/include
+    orcc-native/include
+)
 
 add_subdirectory(orcc-runtime)
 add_subdirectory(orcc-native)

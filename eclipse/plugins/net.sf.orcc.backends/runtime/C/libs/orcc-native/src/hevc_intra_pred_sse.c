@@ -1,12 +1,14 @@
 #include "sse.h"
 
-#ifdef __SSE2__
+#include "config.h"
+
+#if HAVE_SSE2
 #include <emmintrin.h>
 #endif
-#ifdef __SSSE3__
+#if HAVE_SSE3
 #include <tmmintrin.h>
 #endif
-#ifdef __SSE4_1__
+#if HAVE_SSE4
 #include <smmintrin.h>
 #endif
 
@@ -599,7 +601,7 @@ void pred_angular_ ## W ##_ ## D ## _sse(uint8_t *_src, const uint8_t *_top,   \
     }                                                                          \
 }
 
-#ifdef __SSE4_1__
+#if HAVE_SSE4
 PRED_ANGULAR( 4, 8)
 PRED_ANGULAR( 8, 8)
 PRED_ANGULAR(16, 8)

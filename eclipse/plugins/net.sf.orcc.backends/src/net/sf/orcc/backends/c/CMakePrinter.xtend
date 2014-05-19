@@ -76,8 +76,11 @@ class CMakePrinter extends CommonPrinter {
 		set(extra_includes)
 		
 		# Runtime libraries inclusion
-		include_directories(libs/orcc-native/include)
-		include_directories(libs/orcc-runtime/include)
+		include_directories(
+			${PROJECT_BINARY_DIR}/libs # to find config.h
+			libs/orcc-native/include
+			libs/orcc-runtime/include
+		)
 		
 		«addLibrariesSubdirs»
 	'''

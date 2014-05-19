@@ -31,12 +31,15 @@
 
 #include "hevcpred.h"
 #include "hevcdsp.h"
+#include "config.h"
 
+#if HAVE_SSE2
 #include <emmintrin.h>
-#ifdef __SSSE3__
+#endif
+#if HAVE_SSE3
 #include <tmmintrin.h>
 #endif
-#ifdef __SSE4_1__
+#if HAVE_SSE4
 #include <smmintrin.h>
 #endif
 

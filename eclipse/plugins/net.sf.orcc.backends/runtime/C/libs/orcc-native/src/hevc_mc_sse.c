@@ -1,12 +1,14 @@
 #include "sse.h"
 
-#ifdef __SSE2__
+#include "config.h"
+
+#if HAVE_SSE2
 #include <emmintrin.h>
 #endif
-#ifdef __SSE3__
+#if HAVE_SSE3
 #include <tmmintrin.h>
 #endif
-#ifdef __SSE4_1__
+#if HAVE_SSE4
 #include <smmintrin.h>
 #endif
 
@@ -289,12 +291,12 @@ void ff_hevc_weighted_pred_mono ## H ## _ ## D ##_sse(                         \
     }                                                                          \
 }
 
-#ifdef __SSE4_1__
+#if HAVE_SSE4
 WEIGHTED_PRED_MONO( 2, 8)
 WEIGHTED_PRED_MONO( 4, 8)
 WEIGHTED_PRED_MONO( 8, 8)
 WEIGHTED_PRED_MONO(16, 8)
-#endif // #ifdef __SSE4_1__
+#endif // #ifdef HAVE_SSE4
 
 
 /* Weighted Pred Zscan */
@@ -343,7 +345,7 @@ void ff_hevc_put_unweighted_pred_zscan ## H ## _ ## K ## _ ## D ##_sse(        \
   }                                                                            \
 }
 
-#ifdef __SSE4_1__
+#ifdef HAVE_SSE4
 PUT_UNWEIGHTED_PRED_ZSCAN( 2,  2,  8)
 PUT_UNWEIGHTED_PRED_ZSCAN( 4,  2,  8)
 PUT_UNWEIGHTED_PRED_ZSCAN( 8,  2,  8)
@@ -387,7 +389,7 @@ void ff_hevc_put_weighted_pred_avg_zscan ## H ## _ ## K ## _ ## D ##_sse(      \
 }
 
 
-#ifdef __SSE4_1__
+#ifdef HAVE_SSE4
 PUT_WEIGHTED_PRED_AVG_ZSCAN(2,  2,  8)
 PUT_WEIGHTED_PRED_AVG_ZSCAN(4,  2,  8)
 PUT_WEIGHTED_PRED_AVG_ZSCAN(8,  2,  8)
@@ -429,7 +431,7 @@ void ff_hevc_weighted_pred_zscan ## H ## _ ## K ## _ ## D ##_sse(              \
     }                                                                          \
 }
 
-#ifdef __SSE4_1__
+#ifdef HAVE_SSE4
 WEIGHTED_PRED_ZSCAN( 2,  2,  8)
 WEIGHTED_PRED_ZSCAN( 4,  2,  8)
 WEIGHTED_PRED_ZSCAN( 8,  2,  8)
@@ -476,7 +478,7 @@ void ff_hevc_weighted_pred_avg_zscan ## H ## _ ## K ## _ ## D ##_sse(          \
     }                                                                          \
 }
 
-#ifdef __SSE4_1__
+#ifdef HAVE_SSE4
 WEIGHTED_PRED_AVG_ZSCAN( 2, 2, 8)
 WEIGHTED_PRED_AVG_ZSCAN( 4, 2, 8)
 WEIGHTED_PRED_AVG_ZSCAN( 8, 2, 8)
@@ -515,7 +517,7 @@ void ff_hevc_weighted_pred_mono_zscan ## H ## _ ## K ## _ ## D ##_sse(         \
     }                                                                          \
 }
 
-#ifdef __SSE4_1__
+#if HAVE_SSE4
 WEIGHTED_PRED_MONO_ZSCAN( 2,  2,  8)
 WEIGHTED_PRED_MONO_ZSCAN( 4,  2,  8)
 WEIGHTED_PRED_MONO_ZSCAN( 8,  2,  8)
@@ -523,7 +525,7 @@ WEIGHTED_PRED_MONO_ZSCAN(16,  2,  8)
 WEIGHTED_PRED_MONO_ZSCAN( 4,  4,  8)
 WEIGHTED_PRED_MONO_ZSCAN( 8,  4,  8)
 WEIGHTED_PRED_MONO_ZSCAN(16,  4,  8)
-#endif // #ifdef __SSE4_1__
+#endif // HAVE_SSE4
 
 
 /* Log2CbSize in openHEVC */

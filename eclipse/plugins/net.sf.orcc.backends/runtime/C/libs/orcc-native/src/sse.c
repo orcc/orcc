@@ -40,16 +40,18 @@
 
 #include "sse.h"
 
-#ifdef __SSE2__
+#include "config.h"
+
+#if HAVE_SSE2
 #include <emmintrin.h>
 #endif
-#ifdef __SSE3__
+#if HAVE_SSE3
 #include <tmmintrin.h>
 #endif
-#ifdef __SSE4_1__
+#if HAVE_SSE4
 #include <smmintrin.h>
 #endif
-#ifdef __AVX_2__
+#if HAVE_AVX2
 #include <immintrin.h>
 #endif
 
@@ -86,7 +88,7 @@ void copy_8_8_ ## H ## _ ## J ## x ## K ## _orcc(                               
   }                                                                                                                                    \
 }
 
-#ifdef __SSE2__
+#if HAVE_SSE2
 // Declare more functions if needed
 COPY_8_8(16, 64,   64)
 COPY_8_8(16, 32,   32)
@@ -177,7 +179,7 @@ void add_8_16_clip_ ## H ## _ ## K ## x ## J ## _orcc(                          
   }                                                                                                                                    \
 }
 
-#ifdef __SSE2__
+#if HAVE_SSE2
 // Declare more functions if needed
 ADD_8_16_CLIP(  16,  1, 16)
 ADD_8_16_CLIP(   8, 64, 64)
@@ -441,7 +443,7 @@ GETMVINFO_DPB_CHROMA(64)
 GETMVINFO_DPB_CHROMA(32)
 GETMVINFO_DPB_CHROMA(16)
 
-#ifdef __SSE2__
+#if HAVE_SSE2
 void fillBorder_luma_orcc(
     u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
     i8 lastIdx,
@@ -652,7 +654,7 @@ void displayYUV_crop_ ## H ## _orcc(                                            
   }                                                                                                                                    \
 }                                                                                                                                      \
 
-#ifdef __SSE2__
+#if HAVE_SSE2
 // Declare more functions if needed
 DISPLAYYUV_CROP(16)
 DISPLAYYUV_CROP(64)
@@ -662,7 +664,7 @@ DISPLAYYUV_CROP(32)
 
 /* Gather non-contiguous elements from memory */
 
-#ifdef __SSE2__
+#if HAVE_SSE2
 void gather32_4x4_orcc(
   u8 * outputSample,
   u8 * inputSample,
@@ -672,7 +674,7 @@ void gather32_4x4_orcc(
   u8 strideIn)
 {
   __m128i * __restrict pm128iOutputSample = (__m128i *) &outputSample[0];
-#if !defined __AVX_2__
+#if !HAVE_AVX2
   u8 * pucInputSample = &inputSample[offsetIn];
   __m128i * __restrict pm128iInputSample;
   __m128i m128iWord0, m128iWord1, m128iWord2, m128iWord3;
@@ -689,12 +691,12 @@ void gather32_4x4_orcc(
   i3 = _mm_cvtsi128_si32(m128iWord3);
 
   m128iWord0 = _mm_setr_epi32(i0, i1, i2, i3);
-#else // !defined __AVX_2__
+#else // !HAVE_AVX2
   int scale = strideIn >> 2;
   __m128i m128iWord0;
   __m128i vindex = _mm_setr_epi32(0, 1 * scale, 2 * scale, 3 * scale);
   m128iWord0 = _mm_i32gather_epi32((int const *) &inputSample[offsetIn], vindex, 1);
-#endif // !defined __AVX_2__
+#endif // !defined HAVE_AVX2
 
   _mm_storeu_si128(pm128iOutputSample, m128iWord0);
 }
@@ -703,7 +705,7 @@ void gather32_4x4_orcc(
 
 int sse_init_context()
 {
-#ifdef __SSE4_1__
+#if HAVE_SSE4
     weighted_pred_mono[0] = ff_hevc_weighted_pred_mono2_8_sse;
     weighted_pred_mono[1] = ff_hevc_weighted_pred_mono4_8_sse;
     weighted_pred_mono[2] = ff_hevc_weighted_pred_mono8_8_sse;

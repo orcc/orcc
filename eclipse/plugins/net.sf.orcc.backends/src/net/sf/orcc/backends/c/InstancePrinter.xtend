@@ -223,6 +223,7 @@ class InstancePrinter extends CTemplate {
 		«IF checkArrayInbounds»
 			#include <assert.h>
 		«ENDIF»
+		#include "config.h"
 
 		#include "types.h"
 		#include "fifo.h"
