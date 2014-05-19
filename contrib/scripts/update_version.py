@@ -59,8 +59,8 @@ def main():
             basePattern = 'Bundle-Version: %s.qualifier'
             simpleReplace(filepath, basePattern % current, basePattern % new)
 
-            basePattern = 'net.sf.orcc.([a-zA-Z.]+);bundle-version="%s"(,|;)'   % current
-            replacement = 'net.sf.orcc.\\1;bundle-version="%s"\\2'              % new
+            basePattern = '(net\.sf\.orcc|org\.xronos)\.([a-zA-Z.]+);bundle-version="%s"(,|;|)' % current
+            replacement = '\\1.\\2;bundle-version="%s"\\3' % new
             regExpReplace(filepath, basePattern, replacement)
 
 def simpleReplace(filepath, pattern, subst):
@@ -96,4 +96,5 @@ if __name__ == "__main__":
     setupCommandLine()
     main()
     print("All replacements have been performed. If you updated Orcc version number,")
-    print("don't forget to apply this script on Xronos too")
+    print("don't forget to apply this script on Xronos too.")
+    print("Before pushing changes, please verify this script worked correctly.")
