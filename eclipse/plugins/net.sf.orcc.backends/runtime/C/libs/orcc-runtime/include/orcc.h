@@ -59,7 +59,9 @@ typedef struct waiting_s waiting_t;
 typedef struct agent_s agent_t;
 typedef struct adjacency_list_s adjacency_list;
 
-typedef enum { FALSE, TRUE } boolean;
+typedef int boolean;
+#define TRUE  1
+#define FALSE 0
 
 /* Error codes */
 /* !TODO : Add more errors */
