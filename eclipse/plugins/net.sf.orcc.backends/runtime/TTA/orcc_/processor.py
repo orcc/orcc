@@ -230,7 +230,7 @@ class Processor:
                 depth = content[2]
                 depth = depth[:len(depth) - 1]
         
-        return Memory(fileName, int(width), int(depth))
+        return Memory(fileName, int(width), int(depth), "")
 
     def _readAdf(self, fileName):
         adf = parse(fileName)
@@ -240,7 +240,7 @@ class Processor:
                 minAddress = int(node.getElementsByTagName("min-address")[0].childNodes[0].nodeValue)
                 maxAddress = int(node.getElementsByTagName("max-address")[0].childNodes[0].nodeValue)
                 depth = int((maxAddress - minAddress) / 4)
-        return Memory(fileName, width, depth)
+        return Memory(fileName, width, depth, "")
         
     def _hasNativePort(self):
         for input in self.inputs:
