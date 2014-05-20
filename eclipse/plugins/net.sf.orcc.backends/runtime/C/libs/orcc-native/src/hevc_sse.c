@@ -38,7 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sse.h"
+#include "hevc_sse.h"
 
 #include "config.h"
 

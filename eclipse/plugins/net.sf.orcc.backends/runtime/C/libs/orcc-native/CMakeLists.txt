@@ -69,7 +69,7 @@ if(NOT NO_EXTERNAL_DEPENDENCIES)
         message(STATUS "Enable SSE optimizations")
         list(APPEND extra_definitions -DSSE_ENABLE)
         list(APPEND orcc_native_sources
-            src/sse.c
+            src/hevc_sse.c
             src/hevc_idct_sse4.c
             src/hevc_intra_pred_sse.c
             src/hevc_mc_sse.c
@@ -77,7 +77,7 @@ if(NOT NO_EXTERNAL_DEPENDENCIES)
 
         if(OPENHEVC_FOUND)
             list(APPEND extra_definitions -DOPENHEVC_ENABLE)
-            list(APPEND orcc_native_sources src/openhevc.c)
+            list(APPEND orcc_native_sources src/openhevc_sse.c)
             list(APPEND extra_libraries ${OPENHEVC_LIBRARY})
         endif()
     endif()
