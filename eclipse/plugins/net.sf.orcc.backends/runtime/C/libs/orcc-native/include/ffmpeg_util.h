@@ -27,11 +27,13 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ORCC_OPENHEVC_SOURCE_H_
-#define _ORCC_OPENHEVC_SOURCE_H_
+#ifndef _ORCC_FFMPEG_UTIL_H_
+#define _ORCC_FFMPEG_UTIL_H_
 
 #include "types.h"
 
+void ffmpeg_initSource();
+void ffmpeg_closeSource();
+void ffmpeg_readFrame(u8 data[2][100000], int size[2][1], int index);
 
-
-#endif  /* _ORCC_OPENHEVC_SOURCE_H_ */
+#endif  /* _ORCC_FFMPEG_UTIL_H_ */
