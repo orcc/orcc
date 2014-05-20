@@ -28,8 +28,8 @@
  */
 
 #include "native.h"
-#include "openhevc.h"
-#include "sse.h"
+#include "openhevc_sse.h"
+#include "hevc_sse.h"
 
 
 int init_native_context()

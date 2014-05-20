@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "openhevc.h"
+#include "openhevc_sse.h"
 
 #include "hevcpred.h"
 #include "hevcdsp.h"

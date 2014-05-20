@@ -1,5 +1,5 @@
 
-#include "sse.h"
+#include "hevc_sse.h"
 
 #include "config.h"
 
@@ -1235,7 +1235,7 @@ TRANSFORM_SKIP_ZSCAN(16,  2, 8);
 	  pu32Dst[zscanTab8_2[6]] = _mm_extract_epi32(src ## 1, 2);                       \
 	  pu32Dst[zscanTab8_2[7]] = _mm_extract_epi32(src ## 1, 3);                       \
 	  pu32Dst[zscanTab8_2[8]] = _mm_extract_epi32(src ## 2, 0);                       \
-	  pu32Dst[zscanTab8_2[9]] = _mm_extract_epi32(src ## 2, 1);                       \
+      pu32Dst[zscanTab8_2[9]] = _mm_extract_epi32(src ## 2, 1);                       \
 	  pu32Dst[zscanTab8_2[10]] = _mm_extract_epi32(src ## 2, 2);                       \
 	  pu32Dst[zscanTab8_2[11]] = _mm_extract_epi32(src ## 2, 3);                       \
 	  pu32Dst[zscanTab8_2[12]] = _mm_extract_epi32(src ## 3, 0);                       \
@@ -1300,19 +1300,19 @@ void ff_hevc_transform0_4x4_ ## K ## _ ## D ## _zscan_sse4 (                    
     add     = 1 << (shift - 1);                                                        \
     TR_4_2_ZSCAN(dst, stride, tmp, K, D);                                              \
 }
-
-TRANSFORM0_4x4_ZSCAN(4, 8)
-TRANSFORM0_4x4_ZSCAN(2, 8)
-
 #define TRANSFORM_4x4_ZSCAN(D)                                                         \
 void ff_hevc_transform_4x4_ ## D ## _zscan_sse4 (                                      \
     i16 *_dst, i16 *coeffs, ptrdiff_t _stride, u8 offset) {                            \
   ff_hevc_transform0_4x4_ ## D ## _zscan_sse4_orcc[_stride >> 1](                      \
-	_dst, coeffs, _stride, offset);                                                    \
+    _dst, coeffs, _stride, offset);                                                    \
 }
 
-TRANSFORM_4x4_ZSCAN(8)
+#if HAVE_SSE4
+TRANSFORM0_4x4_ZSCAN(4, 8)
+TRANSFORM0_4x4_ZSCAN(2, 8)
 
+TRANSFORM_4x4_ZSCAN(8)
+#endif // HAVE_SSE4
 
 #define TRANSPOSE8X8_16_S_ZSCAN(dst, dst_stride, src, assign)                        \
     TRANSPOSE8X8_16(src);                                                            \
@@ -1344,17 +1344,19 @@ void ff_hevc_transform0_8x8_ ## K ## _ ## D ## _zscan_sse4 (                    
     }                                                                                \
 }
 
-TRANSFORM0_8x8_ZSCAN(4, 8)
-TRANSFORM0_8x8_ZSCAN(2, 8)
-
 #define TRANSFORM_8x8_ZSCAN(D)                                                    \
 void ff_hevc_transform_8x8_ ## D ## _zscan_sse4 (                                \
     i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
   ff_hevc_transform0_8x8_ ## D ## _zscan_sse4_orcc[_stride >> 2](                 \
-	_dst, coeffs, _stride);                  \
+    _dst, coeffs, _stride);                  \
 }
 
+#if HAVE_SSE4
+TRANSFORM0_8x8_ZSCAN(4, 8)
+TRANSFORM0_8x8_ZSCAN(2, 8)
+
 TRANSFORM_8x8_ZSCAN(8)
+#endif // HAVE_SSE4
 
 #define TRANSPOSE8x8_16_LS_ZSCAN(out, sstep_out, in, sstep_in, assign)               \
     e0  = _MM_LOAD_SI128((__m128i *) &in[0*sstep_in]);                         \
@@ -1399,6 +1401,13 @@ void ff_hevc_transform0_ ## H ## x ## H ## _ ## K ## _ ## D ## _zscan_sse4 (    
     TRANSFORM_STEP(H, K, D, SAVE8_ ## K ## _8, TRANSPOSE8x8_16_LS_ZSCAN);               \
 }
 
+#define TRANSFORM_2_ZSCAN(H, D)                                                         \
+void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _zscan_sse4 (                       \
+    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                                        \
+  ff_hevc_transform0_ ## H ## x ## H ## _ ## D ## _zscan_sse4_orcc[_stride >> 2](       \
+    _dst, coeffs, _stride);                                                             \
+}
+
 #if HAVE_SSE4
 TRANSFORM0_2_ZSCAN(16, 4, 8);
 // TRANSFORM0_2_ZSCAN(16, 4, 10);
@@ -1409,17 +1418,9 @@ TRANSFORM0_2_ZSCAN(32, 4, 8);
 // TRANSFORM0_2_ZSCAN(32, 4, 10);
 TRANSFORM0_2_ZSCAN(32, 2, 8);
 // TRANSFORM0_2_ZSCAN(32, 2, 10);
-#endif // HAVE_SSE4
-
-#define TRANSFORM_2_ZSCAN(H, D)                                                         \
-void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _zscan_sse4 (                       \
-    i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                                        \
-  ff_hevc_transform0_ ## H ## x ## H ## _ ## D ## _zscan_sse4_orcc[_stride >> 2](       \
-	_dst, coeffs, _stride);                                                             \
-}
 
 TRANSFORM_2_ZSCAN(16,  8);
 // TRANSFORM_2_ZSCAN(16, 10);
-
 TRANSFORM_2_ZSCAN(32,  8);
 // TRANSFORM_2_ZSCAN(32, 10);
+#endif // HAVE_SSE4

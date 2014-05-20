@@ -12,7 +12,7 @@
 
 	<groupId>net.sf.orcc</groupId>
 	<artifactId>orcc-parent</artifactId>
-	<version>2.0.0.qualifier</version>
+	<version>2.0.2.qualifier</version>
 	<packaging>pom</packaging>
 
 	<modules>

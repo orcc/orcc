@@ -34,8 +34,6 @@
  * @author Daniele Renzi (EPFL) <daniele.renzi@epfl.ch>
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
 

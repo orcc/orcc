@@ -33,19 +33,9 @@
 #include <time.h>
 #include <string.h>
 
+#include "orcc.h"
 #include "util.h"
 #include "options.h"
-
-// from APR
-/* Ignore Microsoft's interpretation of secure development
- * and the POSIX string handling API
- */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-#ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-#pragma warning(disable: 4996)
-#endif
 
 #define LOOP_NUMBER 1
 
