@@ -94,7 +94,7 @@ class InstanceTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		-- Configuration
 		signal count       : integer range 255 downto 0 := 0;
 			
-		constant PERIOD : time := 20 ns;
+		constant PERIOD : time := 50 ns;
 		constant DUTY_CYCLE : real := 0.5;
 		constant OFFSET : time := 100 ns;
 		
