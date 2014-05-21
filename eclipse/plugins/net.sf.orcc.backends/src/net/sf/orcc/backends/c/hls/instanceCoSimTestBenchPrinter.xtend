@@ -28,12 +28,11 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.util.Map
-
-import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.df.Connection
 import java.io.File
+import java.util.Map
+import net.sf.orcc.df.Connection
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.util.OrccUtil
 
 /**
  * generates testbench for for vivado co-simulation

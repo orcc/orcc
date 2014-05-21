@@ -28,13 +28,10 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.util.OrccUtil
 import java.io.File
-
-import net.sf.orcc.df.Connection
-
 import java.util.Map
-import net.sf.orcc.df.Port
+import net.sf.orcc.df.Connection
+import net.sf.orcc.util.OrccUtil
 
 /*
  * Compile Instance c source code

@@ -28,11 +28,9 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.util.OrccUtil
-import java.util.Map
-
 import java.io.File
-import net.sf.orcc.df.Port
+import java.util.Map
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Compile top Network c source code 

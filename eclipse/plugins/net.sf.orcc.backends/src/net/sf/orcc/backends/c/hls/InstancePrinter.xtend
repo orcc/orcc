@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.util.OrccUtil
 import java.io.File
 import java.util.List
+import java.util.Map
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Pattern
@@ -41,7 +41,7 @@ import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeList
-import java.util.Map
+import net.sf.orcc.util.OrccUtil
 
 /*
  * Compile Instance c source code

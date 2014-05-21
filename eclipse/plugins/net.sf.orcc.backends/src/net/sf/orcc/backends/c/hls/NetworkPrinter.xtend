@@ -29,9 +29,9 @@
 package net.sf.orcc.backends.c.hls
 
 import java.io.File
-import net.sf.orcc.util.OrccUtil
 import java.util.Map
 import net.sf.orcc.df.Network
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Compile top Network c source code 
