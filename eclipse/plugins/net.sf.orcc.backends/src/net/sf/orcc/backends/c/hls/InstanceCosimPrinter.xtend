@@ -144,7 +144,7 @@ import net.sf.orcc.util.OrccUtil
 			// write results	
 			«FOR port : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
-					fp=fopen("«instance.name»_«port.name».txt","w");
+					fp=fopen("gold_«instance.name»_«port.name».txt","w");
 					for (i=0 ; i<1000 ; i++){
 						tmp_«connection.fifoName»=tab_«connection.fifoName»[i];
 						fprintf(fp, "%d \n", tmp_«connection.fifoName»);
