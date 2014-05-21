@@ -65,24 +65,20 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		«FOR port : instance.getActor.inputs»			
 			
-				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.
-			get(port).fifoType.sizeInBits - 1» downto 0);
-				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
-				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
+			«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoType.sizeInBits - 1» downto 0);
+			«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
+			«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
 			
 		«ENDFOR»
 		«FOR portout : instance.getActor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(portout)»
 				
-					«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
-					«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
-					«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
-						
+				«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
+				«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
+				«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
+				
 			«ENDFOR»
 		«ENDFOR»
-		
-			
-		
 		
 		
 		
@@ -108,79 +104,76 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		-- FIFO Instantiation
 		
-		«FOR port : instance.getActor.inputs»			
+		«FOR port : instance.getActor.inputs»
 			
-				signal top_«instance.incomingPortMap.get(port).ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
-				signal top_«instance.incomingPortMap.get(port).ramName»_ce0 :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).ramName»_q0  :   STD_LOGIC_VECTOR («instance.incomingPortMap.get(
-			port).fifoType.sizeInBits - 1»  downto 0);
-				
-				signal top_«instance.incomingPortMap.get(port).wName»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
-				signal top_«instance.incomingPortMap.get(port).wName»_ce0 :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).wName»_q0  :   STD_LOGIC_VECTOR (31  downto 0);
-				
-				signal top_«instance.incomingPortMap.get(port).rName»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
-				signal top_«instance.incomingPortMap.get(port).rName»_ce0 :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).rName»_we0  :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).rName»_d0  :   STD_LOGIC_VECTOR (31  downto 0);
-				signal top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.
-			incomingPortMap.get(port).fifoType.sizeInBits - 1»  downto 0);
-				signal top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
-				
-				signal top_«instance.incomingPortMap.get(port).ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
-				signal top_«instance.incomingPortMap.get(port).ramName»_ce1 :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).ramName»_we1  :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).ramName»_d1  :   STD_LOGIC_VECTOR («instance.incomingPortMap.get(
-			port).fifoType.sizeInBits - 1»  downto 0);
-				
-				signal top_«instance.incomingPortMap.get(port).wName»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
-				signal top_«instance.incomingPortMap.get(port).wName»_ce1 :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).wName»_we1  :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).wName»_d1  :   STD_LOGIC_VECTOR (31  downto 0);
-				
-				signal top_«instance.incomingPortMap.get(port).rName»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
-				signal top_«instance.incomingPortMap.get(port).rName»_ce1 :  STD_LOGIC;
-				signal top_«instance.incomingPortMap.get(port).rName»_q1  :   STD_LOGIC_VECTOR (31  downto 0);
+			signal top_«instance.incomingPortMap.get(port).ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
+			signal top_«instance.incomingPortMap.get(port).ramName»_ce0 :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).ramName»_q0  :   STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoType.sizeInBits - 1»  downto 0);
 			
+			signal top_«instance.incomingPortMap.get(port).wName»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
+			signal top_«instance.incomingPortMap.get(port).wName»_ce0 :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).wName»_q0  :   STD_LOGIC_VECTOR (31  downto 0);
+			
+			signal top_«instance.incomingPortMap.get(port).rName»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
+			signal top_«instance.incomingPortMap.get(port).rName»_ce0 :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).rName»_we0  :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).rName»_d0  :   STD_LOGIC_VECTOR (31  downto 0);
+			signal top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoType.sizeInBits - 1»  downto 0);
+			signal top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
+			
+			signal top_«instance.incomingPortMap.get(port).ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
+			signal top_«instance.incomingPortMap.get(port).ramName»_ce1 :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).ramName»_we1  :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).ramName»_d1  :   STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoType.sizeInBits - 1»  downto 0);
+			
+			signal top_«instance.incomingPortMap.get(port).wName»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
+			signal top_«instance.incomingPortMap.get(port).wName»_ce1 :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).wName»_we1  :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).wName»_d1  :   STD_LOGIC_VECTOR (31  downto 0);
+			
+			signal top_«instance.incomingPortMap.get(port).rName»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
+			signal top_«instance.incomingPortMap.get(port).rName»_ce1 :  STD_LOGIC;
+			signal top_«instance.incomingPortMap.get(port).rName»_q1  :   STD_LOGIC_VECTOR (31  downto 0);
+
 		«ENDFOR»
 		«FOR portout : instance.getActor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(portout)»
 				
-					signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
-								signal top_«connection.ramName»_ce1 :  STD_LOGIC;
-								signal top_«connection.ramName»_we1  :  STD_LOGIC;
-								signal top_«connection.ramName»_d1  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
-								
-								signal top_«connection.wName»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
-								signal top_«connection.wName»_ce1 :  STD_LOGIC;
-								signal top_«connection.wName»_we1  :  STD_LOGIC;
-								signal top_«connection.wName»_d1  :   STD_LOGIC_VECTOR (31  downto 0);
-								
-								signal top_«connection.rName»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
-								signal top_«connection.rName»_ce1 :  STD_LOGIC;
-								signal top_«connection.rName»_q1  :   STD_LOGIC_VECTOR (31  downto 0);
-								
-								signal top_«connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
-								signal top_«connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
-								signal top_«connection.castfifoNameRead»_V_write  :  STD_LOGIC;
-								
-								signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
-								signal top_«connection.ramName»_ce0 :  STD_LOGIC;
-								signal top_«connection.ramName»_q0  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);	
-									
-								signal top_«connection.wName»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
-								signal top_«connection.wName»_ce0 :  STD_LOGIC;
-								signal top_«connection.wName»_q0  :   STD_LOGIC_VECTOR (31  downto 0);		
-								
-								signal top_«connection.rName»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
-								signal top_«connection.rName»_ce0 :  STD_LOGIC;
-								signal top_«connection.rName»_we0  :  STD_LOGIC;
-								signal top_«connection.rName»_d0  :   STD_LOGIC_VECTOR (31  downto 0);
-						
+				signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
+				signal top_«connection.ramName»_ce1 :  STD_LOGIC;
+				signal top_«connection.ramName»_we1  :  STD_LOGIC;
+				signal top_«connection.ramName»_d1  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
+				
+				signal top_«connection.wName»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
+				signal top_«connection.wName»_ce1 :  STD_LOGIC;
+				signal top_«connection.wName»_we1  :  STD_LOGIC;
+				signal top_«connection.wName»_d1  :   STD_LOGIC_VECTOR (31  downto 0);
+				
+				signal top_«connection.rName»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
+				signal top_«connection.rName»_ce1 :  STD_LOGIC;
+				signal top_«connection.rName»_q1  :   STD_LOGIC_VECTOR (31  downto 0);
+				
+				signal top_«connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
+				signal top_«connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
+				signal top_«connection.castfifoNameRead»_V_write  :  STD_LOGIC;
+				
+				signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
+				signal top_«connection.ramName»_ce0 :  STD_LOGIC;
+				signal top_«connection.ramName»_q0  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);	
+					
+				signal top_«connection.wName»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
+				signal top_«connection.wName»_ce0 :  STD_LOGIC;
+				signal top_«connection.wName»_q0  :   STD_LOGIC_VECTOR (31  downto 0);		
+				
+				signal top_«connection.rName»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
+				signal top_«connection.rName»_ce0 :  STD_LOGIC;
+				signal top_«connection.rName»_we0  :  STD_LOGIC;
+				signal top_«connection.rName»_d0  :   STD_LOGIC_VECTOR (31  downto 0);
+
 			«ENDFOR»
 		«ENDFOR»
-			
+
 		
 		-- ----------------------------------------------------------------------------------
 		-- Components of the Network
@@ -208,47 +201,43 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		       clk        : in std_logic 
 		 ); 
 		end component; 
+		
 		begin
 		
-		«FOR port : instance.getActor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(port)»
-				
+			«FOR port : instance.getActor.outputs.filter[! native]»
+				«FOR connection : instance.outgoingPortMap.get(port)»
+					
 					«printFifoMapping(connection)»
+					
+				«ENDFOR»
+			«ENDFOR»
+			«FOR port : instance.getActor.inputs»
+
+				«printFifoMapping(instance.incomingPortMap.get(port))»
 				
 			«ENDFOR»
-		«ENDFOR»
-		«FOR port : instance.getActor.inputs»			
-			
-				«printFifoMapping(instance.incomingPortMap.get(port))»
-			
-		«ENDFOR»
-		«instance.mappingComponentSignal»
+			«instance.mappingComponentSignal»
 		
-		---------------------------------------------------------------------------
-		-- Network Ports Instantiation 
-		---------------------------------------------------------------------------
-		
+			---------------------------------------------------------------------------
+			-- Network Ports Instantiation 
+			---------------------------------------------------------------------------
+			
 		
 			«FOR port : instance.getActor.inputs»			
 				
-					top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout <= «instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_dout;
-								top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n <= «instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_empty_n;
-								«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read <= top_«instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_read;	
+				top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout <= «instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout;
+				top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n <= «instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n;
+				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read <= top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read;	
 				
 			«ENDFOR»	
-			
-			
-				
+
 			«FOR portout : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(portout)»
-					
-						«connection.castfifoNameRead»_V_din <= top_«connection.castfifoNameRead»_V_din;
-						top_«connection.castfifoNameRead»_V_full_n <= «connection.castfifoNameRead»_V_full_n;
-						«connection.castfifoNameRead»_V_write <= top_«connection.castfifoNameRead»_V_write;
-					
+				
+					«connection.castfifoNameRead»_V_din <= top_«connection.castfifoNameRead»_V_din;
+					top_«connection.castfifoNameRead»_V_full_n <= «connection.castfifoNameRead»_V_full_n;
+					«connection.castfifoNameRead»_V_write <= top_«connection.castfifoNameRead»_V_write;
+				
 				«ENDFOR»
 			«ENDFOR»
 			
@@ -277,7 +266,6 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	override print(String targetFolder) {
-
 		val contentNetwork = ActorTopFileContent
 		val NetworkFile = new File(
 			targetFolder + File::separator + instance.name + "TopVHDL" + File::separator + instance.name + "Top" +
@@ -296,35 +284,35 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		port map(
 			«FOR connList : instance.outgoingPortMap.values»
 				
-					«connList.head.ramName»_address0 => top_«connList.head.ramName»_address1,
-					«connList.head.ramName»_ce0 => top_«connList.head.ramName»_ce1,
-					«connList.head.ramName»_we0 => top_«connList.head.ramName»_we1,
-					«connList.head.ramName»_d0 => top_«connList.head.ramName»_d1,
-					
-					«connList.head.wName»_address0 => top_«connList.head.wName»_address1,
-					«connList.head.wName»_ce0 => top_«connList.head.wName»_ce1,
-					«connList.head.wName»_we0 => top_«connList.head.wName»_we1,
-					«connList.head.wName»_d0 => top_«connList.head.wName»_d1,
-					
-					«connList.head.rName»_address0 => top_«connList.head.rName»_address1,
-					«connList.head.rName»_ce0 => top_«connList.head.rName»_ce1,
-					«connList.head.rName»_q0 => top_«connList.head.rName»_q1,
+				«connList.head.ramName»_address0 => top_«connList.head.ramName»_address1,
+				«connList.head.ramName»_ce0 => top_«connList.head.ramName»_ce1,
+				«connList.head.ramName»_we0 => top_«connList.head.ramName»_we1,
+				«connList.head.ramName»_d0 => top_«connList.head.ramName»_d1,
+				
+				«connList.head.wName»_address0 => top_«connList.head.wName»_address1,
+				«connList.head.wName»_ce0 => top_«connList.head.wName»_ce1,
+				«connList.head.wName»_we0 => top_«connList.head.wName»_we1,
+				«connList.head.wName»_d0 => top_«connList.head.wName»_d1,
+				
+				«connList.head.rName»_address0 => top_«connList.head.rName»_address1,
+				«connList.head.rName»_ce0 => top_«connList.head.rName»_ce1,
+				«connList.head.rName»_q0 => top_«connList.head.rName»_q1,
 						
 			«ENDFOR»
 			«FOR connList : instance.incomingPortMap.values»
 				
-					«connList.ramName»_address0 => top_«connList.ramName»_address0,
-					«connList.ramName»_ce0 => top_«connList.ramName»_ce0,
-					«connList.ramName»_q0 => top_«connList.ramName»_q0,
-					
-					«connList.wName»_address0 => top_«connList.wName»_address0,
-					«connList.wName»_ce0 => top_«connList.wName»_ce0,
-					«connList.wName»_q0 => top_«connList.wName»_q0,
-					
-					«connList.rName»_address0 => top_«connList.rName»_address0,
-					«connList.rName»_ce0 => top_«connList.rName»_ce0,
-					«connList.rName»_we0 => top_«connList.rName»_we0,
-					«connList.rName»_d0 => top_«connList.rName»_d0,
+				«connList.ramName»_address0 => top_«connList.ramName»_address0,
+				«connList.ramName»_ce0 => top_«connList.ramName»_ce0,
+				«connList.ramName»_q0 => top_«connList.ramName»_q0,
+				
+				«connList.wName»_address0 => top_«connList.wName»_address0,
+				«connList.wName»_ce0 => top_«connList.wName»_ce0,
+				«connList.wName»_q0 => top_«connList.wName»_q0,
+				
+				«connList.rName»_address0 => top_«connList.rName»_address0,
+				«connList.rName»_ce0 => top_«connList.rName»_ce0,
+				«connList.rName»_we0 => top_«connList.rName»_we0,
+				«connList.rName»_d0 => top_«connList.rName»_d0,
 				
 			«ENDFOR»
 			
@@ -334,79 +322,74 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			ap_done => top_ap_done,
 			ap_idle => top_ap_idle,
 			ap_ready => top_ap_ready
-			);
-			«FOR port : instance.getActor.outputs.filter[! native]»
-				«FOR connection : instance.outgoingPortMap.get(port)»
-					
-						call_cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler : component cast_«instance.
-			name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler
-						port map(
-						«connection.ramName»_address0 => top_«connection.ramName»_address0, 
-						«connection.ramName»_ce0 => top_«connection.ramName»_ce0,
-						«connection.ramName»_q0  => top_«connection.ramName»_q0,
-						
-						«connection.wName»_address0 => top_«connection.wName»_address0,
-						«connection.wName»_ce0 => top_«connection.wName»_ce0,
-						«connection.wName»_q0  => top_«connection.wName»_q0,
-						
-						«connection.rName»_address0 => top_«connection.rName»_address0,
-						«connection.rName»_ce0 => top_«connection.rName»_ce0,
-						«connection.rName»_we0  => top_«connection.rName»_we0,
-						«connection.rName»_d0  => top_«connection.rName»_d0,
-						
-						«connection.castfifoNameRead»_V_din    => top_«connection.castfifoNameRead»_V_din,
-						«connection.castfifoNameRead»_V_full_n => top_«connection.castfifoNameRead»_V_full_n,
-						«connection.castfifoNameRead»_V_write  => top_«connection.castfifoNameRead»_V_write,
-							
-							ap_start => top_ap_start,
-							ap_clk => top_ap_clk,
-							ap_rst => top_ap_rst,
-							ap_done => top_ap_done,
-							ap_idle => top_ap_idle,
-							ap_ready => top_ap_ready);
-						
-					
-				«ENDFOR»
-			«ENDFOR»
-			«FOR port : instance.getActor.inputs»			
+		);
+		
+		«FOR port : instance.getActor.outputs.filter[! native]»
+			«FOR connection : instance.outgoingPortMap.get(port)»
 				
-					call_cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler :component cast_«instance.
-			name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler
-							port map(
-							«instance.incomingPortMap.get(port).ramName»_address0   => top_«instance.incomingPortMap.get(port).ramName»_address1,
-							«instance.incomingPortMap.get(port).ramName»_ce0 => top_«instance.incomingPortMap.get(port).ramName»_ce1,
-							«instance.incomingPortMap.get(port).ramName»_we0 => top_«instance.incomingPortMap.get(port).ramName»_we1,
-							«instance.incomingPortMap.get(port).ramName»_d0  => top_«instance.incomingPortMap.get(port).ramName»_d1,
-							
-							«instance.incomingPortMap.get(port).wName»_address0  => top_«instance.incomingPortMap.get(port).wName»_address1,
-							«instance.incomingPortMap.get(port).wName»_ce0 => top_«instance.incomingPortMap.get(port).wName»_ce1,
-							«instance.incomingPortMap.get(port).wName»_we0  => top_«instance.incomingPortMap.get(port).wName»_we1,
-							«instance.incomingPortMap.get(port).wName»_d0  => top_«instance.incomingPortMap.get(port).wName»_d1,
-							
-							«instance.incomingPortMap.get(port).rName»_address0   => top_«instance.incomingPortMap.get(port).rName»_address1,
-							«instance.incomingPortMap.get(port).rName»_ce0 => top_«instance.incomingPortMap.get(port).rName»_ce1,
-							«instance.incomingPortMap.get(port).rName»_q0  => top_«instance.incomingPortMap.get(port).rName»_q1,
-									
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   => top_«instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_dout,
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n => top_«instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_empty_n,
-							«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    => top_«instance.incomingPortMap.get(port).
-			castfifoNameWrite»_V_read,
-								ap_start => top_ap_start,
-									ap_clk => top_ap_clk,
-									ap_rst => top_ap_rst,
-									ap_done => top_ap_done,
-									ap_idle => top_ap_idle,
-									ap_ready => top_ap_ready);
-								
-
+				call_cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler : component cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler
+				port map(
+					«connection.ramName»_address0 => top_«connection.ramName»_address0, 
+					«connection.ramName»_ce0 => top_«connection.ramName»_ce0,
+					«connection.ramName»_q0  => top_«connection.ramName»_q0,
+					
+					«connection.wName»_address0 => top_«connection.wName»_address0,
+					«connection.wName»_ce0 => top_«connection.wName»_ce0,
+					«connection.wName»_q0  => top_«connection.wName»_q0,
+					
+					«connection.rName»_address0 => top_«connection.rName»_address0,
+					«connection.rName»_ce0 => top_«connection.rName»_ce0,
+					«connection.rName»_we0  => top_«connection.rName»_we0,
+					«connection.rName»_d0  => top_«connection.rName»_d0,
+					
+					«connection.castfifoNameRead»_V_din    => top_«connection.castfifoNameRead»_V_din,
+					«connection.castfifoNameRead»_V_full_n => top_«connection.castfifoNameRead»_V_full_n,
+					«connection.castfifoNameRead»_V_write  => top_«connection.castfifoNameRead»_V_write,
+					
+					ap_start => top_ap_start,
+					ap_clk => top_ap_clk,
+					ap_rst => top_ap_rst,
+					ap_done => top_ap_done,
+					ap_idle => top_ap_idle,
+					ap_ready => top_ap_ready
+				);
+				
 			«ENDFOR»
+		«ENDFOR»
+		«FOR port : instance.getActor.inputs»			
+			
+			call_cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler :component cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler
+			port map(
+				«instance.incomingPortMap.get(port).ramName»_address0   => top_«instance.incomingPortMap.get(port).ramName»_address1,
+				«instance.incomingPortMap.get(port).ramName»_ce0 => top_«instance.incomingPortMap.get(port).ramName»_ce1,
+				«instance.incomingPortMap.get(port).ramName»_we0 => top_«instance.incomingPortMap.get(port).ramName»_we1,
+				«instance.incomingPortMap.get(port).ramName»_d0  => top_«instance.incomingPortMap.get(port).ramName»_d1,
+				
+				«instance.incomingPortMap.get(port).wName»_address0  => top_«instance.incomingPortMap.get(port).wName»_address1,
+				«instance.incomingPortMap.get(port).wName»_ce0 => top_«instance.incomingPortMap.get(port).wName»_ce1,
+				«instance.incomingPortMap.get(port).wName»_we0  => top_«instance.incomingPortMap.get(port).wName»_we1,
+				«instance.incomingPortMap.get(port).wName»_d0  => top_«instance.incomingPortMap.get(port).wName»_d1,
+				
+				«instance.incomingPortMap.get(port).rName»_address0   => top_«instance.incomingPortMap.get(port).rName»_address1,
+				«instance.incomingPortMap.get(port).rName»_ce0 => top_«instance.incomingPortMap.get(port).rName»_ce1,
+				«instance.incomingPortMap.get(port).rName»_q0  => top_«instance.incomingPortMap.get(port).rName»_q1,
+				
+				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   => top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout,
+				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n => top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n,
+				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    => top_«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read,
+				
+				ap_start => top_ap_start,
+				ap_clk => top_ap_clk,
+				ap_rst => top_ap_rst,
+				ap_done => top_ap_done,
+				ap_idle => top_ap_idle,
+				ap_ready => top_ap_ready
+			);
+			
+		«ENDFOR»
 	'''
 
 	def mappingComponentFifoSignal(Instance instance) '''
-		
-		
 		
 		«FOR connection : instance.incomingPortMap.values»
 			«IF !(connection.source instanceof Port) && !(connection.target instanceof Port)»
@@ -419,48 +402,54 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	def printFifoMapping(Connection connection) '''
 		
-			«connection.ramName» : ram_tab
-					generic map (dwidth     => «connection.fifoType.sizeInBits»,
-					       awidth     => 13,
-					       mem_size   => 8192)
-			port map (
-				clk => top_ap_clk,
-				addr0 => top_«connection.ramName»_address0,
-				ce0 => top_«connection.ramName»_ce0,
-				q0 => top_«connection.ramName»_q0,
-				addr1 => top_«connection.ramName»_address1,
-				ce1 => top_«connection.ramName»_ce1,
-				we1 => top_«connection.ramName»_we1,
-				d1 => top_«connection.ramName»_d1
-			);
-			«connection.rName» : ram_tab
-					generic map (dwidth     => 32,
-					       awidth     => 1,
-					       mem_size   => 1)
-			port map (
-				clk => top_ap_clk,
-				addr0 => top_«connection.rName»_address1,
-				ce0 => top_«connection.rName»_ce1,
-				q0 => top_«connection.rName»_q1,
-				addr1 => top_«connection.rName»_address0,
-				ce1 => top_«connection.rName»_ce0,
-				we1 => top_«connection.rName»_we0,
-				d1 => top_«connection.rName»_d0
-			);
-			«connection.wName» : ram_tab
-					generic map (dwidth     => 32,
-					       awidth     => 1,
-					       mem_size   => 1)
-			port map (
-				clk => top_ap_clk,
-				addr0 => top_«connection.wName»_address0,
-				ce0 => top_«connection.wName»_ce0,
-				q0 => top_«connection.wName»_q0,
-				addr1 => top_«connection.wName»_address1,
-				ce1 => top_«connection.wName»_ce1,
-				we1 => top_«connection.wName»_we1,
-				d1 => top_«connection.wName»_d1
-			);
+		«connection.ramName» : ram_tab
+		generic map (
+			dwidth     => «connection.fifoType.sizeInBits»,
+			awidth     => 13,
+			mem_size   => 8192
+		)
+		port map (
+			clk => top_ap_clk,
+			addr0 => top_«connection.ramName»_address0,
+			ce0 => top_«connection.ramName»_ce0,
+			q0 => top_«connection.ramName»_q0,
+			addr1 => top_«connection.ramName»_address1,
+			ce1 => top_«connection.ramName»_ce1,
+			we1 => top_«connection.ramName»_we1,
+			d1 => top_«connection.ramName»_d1
+		);
+		«connection.rName» : ram_tab
+		generic map (
+			dwidth     => 32,
+			awidth     => 1,
+			mem_size   => 1
+		)
+		port map (
+			clk => top_ap_clk,
+			addr0 => top_«connection.rName»_address1,
+			ce0 => top_«connection.rName»_ce1,
+			q0 => top_«connection.rName»_q1,
+			addr1 => top_«connection.rName»_address0,
+			ce1 => top_«connection.rName»_ce0,
+			we1 => top_«connection.rName»_we0,
+			d1 => top_«connection.rName»_d0
+		);
+		«connection.wName» : ram_tab
+		generic map (
+			dwidth     => 32,
+		    awidth     => 1,
+		    mem_size   => 1
+		)
+		port map (
+			clk => top_ap_clk,
+			addr0 => top_«connection.wName»_address0,
+			ce0 => top_«connection.wName»_ce0,
+			q0 => top_«connection.wName»_q0,
+			addr1 => top_«connection.wName»_address1,
+			ce1 => top_«connection.wName»_ce1,
+			we1 => top_«connection.wName»_we1,
+			d1 => top_«connection.wName»_d1
+		);
 	'''
 
 	def assignFifo(Instance instance) '''
@@ -590,54 +579,56 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	def declareComponentSignal(Instance instance) '''
 		component «instance.name»_scheduler IS
-		port (
-			«FOR connList : instance.outgoingPortMap.values»
-				
-					«printOutputRamAssignHLS(connList.head)»
-				
-			«ENDFOR»
-			«FOR connList : instance.incomingPortMap.values»
-				
-					«printInputRAMAssignHLS(connList)»
-				
-			«ENDFOR»
-			
-			ap_clk : IN STD_LOGIC;
-			ap_rst : IN STD_LOGIC;
-			ap_start : IN STD_LOGIC;
-			ap_done : OUT STD_LOGIC;
-			ap_idle : OUT STD_LOGIC;
-			ap_ready : OUT STD_LOGIC);
-		end component;
-		«FOR port : instance.getActor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(port)»
-				
-				component cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler IS
-				port (
-				«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
-				«connection.ramName»_ce0 : OUT STD_LOGIC;
-				«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
-				
-				«connection.wName»_address0    : OUT STD_LOGIC_VECTOR (0 downto 0);
-				«connection.wName»_ce0 : OUT STD_LOGIC;
-				«connection.wName»_q0  : IN  STD_LOGIC_VECTOR (31  downto 0);
-				
-				«connection.rName»_address0    :OUT  STD_LOGIC_VECTOR (0 downto 0);
-				«connection.rName»_ce0 : OUT STD_LOGIC;
-				«connection.rName»_we0  : OUT STD_LOGIC;
-				«connection.rName»_d0  : OUT  STD_LOGIC_VECTOR (31  downto 0);
-				
-				«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
-				«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
-				«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
-				
+			port (
+				«FOR connList : instance.outgoingPortMap.values»
+					
+						«printOutputRamAssignHLS(connList.head)»
+					
+				«ENDFOR»
+				«FOR connList : instance.incomingPortMap.values»
+					
+						«printInputRAMAssignHLS(connList)»
+					
+				«ENDFOR»
 				
 				ap_clk : IN STD_LOGIC;
 				ap_rst : IN STD_LOGIC;
 				ap_start : IN STD_LOGIC;
 				ap_done : OUT STD_LOGIC;
 				ap_idle : OUT STD_LOGIC;
-				ap_ready : OUT STD_LOGIC);
+				ap_ready : OUT STD_LOGIC
+			);
+		end component;
+		«FOR port : instance.getActor.outputs.filter[! native]»
+			«FOR connection : instance.outgoingPortMap.get(port)»
+				
+				component cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler IS
+					port (
+						«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
+						«connection.ramName»_ce0 : OUT STD_LOGIC;
+						«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
+						
+						«connection.wName»_address0    : OUT STD_LOGIC_VECTOR (0 downto 0);
+						«connection.wName»_ce0 : OUT STD_LOGIC;
+						«connection.wName»_q0  : IN  STD_LOGIC_VECTOR (31  downto 0);
+						
+						«connection.rName»_address0    :OUT  STD_LOGIC_VECTOR (0 downto 0);
+						«connection.rName»_ce0 : OUT STD_LOGIC;
+						«connection.rName»_we0  : OUT STD_LOGIC;
+						«connection.rName»_d0  : OUT  STD_LOGIC_VECTOR (31  downto 0);
+						
+						«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
+						«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
+						«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
+						
+						
+						ap_clk : IN STD_LOGIC;
+						ap_rst : IN STD_LOGIC;
+						ap_start : IN STD_LOGIC;
+						ap_done : OUT STD_LOGIC;
+						ap_idle : OUT STD_LOGIC;
+						ap_ready : OUT STD_LOGIC
+					);
 				end component;
 				
 			«ENDFOR»
@@ -645,7 +636,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«FOR port : instance.getActor.inputs»			
 
 			component cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler IS
-					port (
+				port (
 					«instance.incomingPortMap.get(port).ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
 					«instance.incomingPortMap.get(port).ramName»_ce0 : OUT STD_LOGIC;
 					«instance.incomingPortMap.get(port).ramName»_we0  : OUT STD_LOGIC;
@@ -663,36 +654,42 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoType.sizeInBits - 1» downto 0);
 					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
 					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
-							
-							
-							ap_clk : IN STD_LOGIC;
-							ap_rst : IN STD_LOGIC;
-							ap_start : IN STD_LOGIC;
-							ap_done : OUT STD_LOGIC;
-							ap_idle : OUT STD_LOGIC;
-							ap_ready : OUT STD_LOGIC);
-							end component;
+
+					ap_clk : IN STD_LOGIC;
+					ap_rst : IN STD_LOGIC;
+					ap_start : IN STD_LOGIC;
+					ap_done : OUT STD_LOGIC;
+					ap_idle : OUT STD_LOGIC;
+					ap_ready : OUT STD_LOGIC
+				);
+			end component;
 
 		«ENDFOR»
 	'''
 
-	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
-		objectValue»_write«ENDIF»'''
+	def castfifoNameWrite(Connection connection) 
+		'''«IF connection != null»myStream_cast_«connection.getAttribute("id").objectValue»_write«ENDIF»'''
 
-	def castfifoNameRead(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
-		objectValue»_read«ENDIF»'''
+	def castfifoNameRead(Connection connection) 
+		'''«IF connection != null»myStream_cast_«connection.getAttribute("id").objectValue»_read«ENDIF»'''
 
-	def fifoName(Connection connection) '''myStream_«connection.getAttribute("id").objectValue»'''
+	def fifoName(Connection connection) 
+		'''myStream_«connection.getAttribute("id").objectValue»'''
 
-	def ramName(Connection connection) '''«IF connection != null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def ramName(Connection connection) 
+		'''«IF connection != null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def wName(Connection connection) '''«IF connection != null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def wName(Connection connection) 
+		'''«IF connection != null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localwName(Connection connection) '''«IF connection != null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localwName(Connection connection) 
+		'''«IF connection != null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localrName(Connection connection) '''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localrName(Connection connection) 
+		'''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def rName(Connection connection) '''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def rName(Connection connection) 
+		'''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
 	def fifoType(Connection connection) {
 		if (connection.sourcePort != null) {
