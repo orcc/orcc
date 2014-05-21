@@ -50,7 +50,12 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.graphiti.features.IDeleteFeature;
+import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
+import org.eclipse.graphiti.features.context.impl.DeleteContext;
+import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
@@ -109,17 +114,26 @@ public class XdfUtil {
 	 * @throws IOException
 	 */
 	public static Network createNetworkResource(final ResourceSet resourceSet, final URI uri) throws IOException {
-		// Compute the new network name
-		final String name = uri.trimFileExtension().lastSegment();
+
+		final String fileName;
+		if (uri.isPlatform()) {
+			fileName = uri.toPlatformString(true);
+		} else {
+			fileName = uri.toString();
+		}
 
 		// Create the network
-		final Network network = DfFactory.eINSTANCE.createNetwork();
-		network.setName(name);
+		final Network network = DfFactory.eINSTANCE.createNetwork(fileName);
+
+		// Compute the new network name
+		final Path networkPath = new Path(uri.trimFileExtension().path());
+		// 3 first segments are resource/<PROJECT>/src
+		network.setName(networkPath.removeFirstSegments(3).toString()
+				.replace('/', '.'));
 
 		// Create the resource
 		Resource res = resourceSet.createResource(uri);
 		res.getContents().add(network);
-		res.setTrackingModification(true);
 		res.save(Collections.EMPTY_MAP);
 
 		return network;
@@ -219,23 +233,32 @@ public class XdfUtil {
 	}
 
 	/**
-	 * Initialize an AddConnectionContext object from a network connection. This
-	 * method does not add the given connection to the network.
+	 * <p>
+	 * Initialize a ready to use AddConnectionContext object from a network
+	 * connection. This method does not add the given connection to the network.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned IAddConnectionContext is ready to use. The business object
+	 * has been set to the given connection and the target container has been
+	 * set to the given diagram.
+	 * </p>
 	 * 
 	 * @param fp
 	 *            The IFeatureProviderWithPatterns instance
 	 * @param diagram
-	 *            The diagram where the connection must be added
+	 *            The diagram where the connection will be added
 	 * @param connection
 	 *            The connection
 	 * @return
 	 */
-	public static AddConnectionContext getAddConnectionContext(final IFeatureProviderWithPatterns fp,
+	public static IAddConnectionContext getAddConnectionContext(
+			final IFeatureProviderWithPatterns fp,
 			final Diagram diagram, final Connection connection) {
 
 		final ILinkService linkServ = Graphiti.getLinkService();
 
-		// retrieve the PictogramElement
+		// retrieve the source and target PictogramElements
 		final List<PictogramElement> sourcesPE = linkServ.getPictogramElements(
 				diagram, connection.getSource());
 		if (sourcesPE == null || sourcesPE.isEmpty()) {
@@ -286,6 +309,56 @@ public class XdfUtil {
 					connection.getTargetPort());
 		}
 
-		return new AddConnectionContext(sourceAnchor, targetAnchor);
+		final AddConnectionContext result = new AddConnectionContext(
+				sourceAnchor, targetAnchor);
+		result.setTargetContainer(diagram);
+		result.setNewObject(connection);
+		return result;
+	}
+
+	/**
+	 * If the given AnchorContainer has graphiti connections from / to itself,
+	 * this method delete all these connections as well the business objects
+	 * (net.sf.orcc.df.Connection) linked
+	 * 
+	 * @param fp
+	 *            The current FeatureProvider instance
+	 * @param ac
+	 *            An anchor container, typically an Instance or a NetworkPort
+	 *            shape
+	 */
+	public static void deleteConnections(final IFeatureProvider fp,
+			final AnchorContainer ac) {
+		// Make a copy of all connections, because we will delete them entirely
+		final List<org.eclipse.graphiti.mm.pictograms.Connection> connections = Graphiti
+				.getPeService().getAllConnections(ac);
+		for (final org.eclipse.graphiti.mm.pictograms.Connection connection : connections) {
+			deleteConnection(fp, connection);
+		}
+	}
+
+	/**
+	 * Delete the given connection as well its net.sf.orcc.df.Connection linked
+	 * (its business object)
+	 * 
+	 * @param fp
+	 *            The current FeatureProvider instance
+	 * @param c
+	 *            A connection pictogram (FreeFormConnection or any other class
+	 *            derived from Connection)
+	 */
+	public static boolean deleteConnection(final IFeatureProvider fp,
+			final org.eclipse.graphiti.mm.pictograms.Connection c) {
+		// Initialize the delete context
+		final DeleteContext delCtxt = new DeleteContext(c);
+		delCtxt.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
+
+		// Silently execute deletion (user will not be asked before deletion)
+		final IDeleteFeature delFeature = fp.getDeleteFeature(delCtxt);
+		if (delFeature.canDelete(delCtxt)) {
+			delFeature.delete(delCtxt);
+			return true;
+		}
+		return false;
 	}
 }

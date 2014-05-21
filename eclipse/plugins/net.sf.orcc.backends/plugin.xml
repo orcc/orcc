@@ -17,10 +17,7 @@
                id="net.sf.orcc.backends.newScheduler">
          </option>
          <option
-               id="net.sf.orcc.backends.profileNetwork">
-         </option>
-         <option
-               id="net.sf.orcc.backends.dynamicMapping">
+               id="net.sf.orcc.backends.profile">
          </option>
          <option
                id="net.sf.orcc.backends.checkArrayInbounds">
@@ -33,6 +30,9 @@
          </option>
          <option
                id="net.sf.orcc.backends.inline">
+         </option>
+         <option
+               id="net.sf.orcc.backends.importBXDF">
          </option>
       </backend>
       <backend
@@ -62,6 +62,9 @@
          </option>
          <option
                id="net.sf.orcc.backends.c.dal.outputBuffering">
+         </option>
+         <option
+               id="net.sf.orcc.backends.c.dal.checkGuards">
          </option>
       </backend>
       <backend
@@ -95,20 +98,6 @@
          <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
-      </backend>
-      <backend
-            class="net.sf.orcc.backends.java.JavaBackend"
-            name="Java">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
-         </option>
-         <option
-               id="net.sf.orcc.backends.compileVTL">
-         </option>
-         <option
-               id="net.sf.orcc.dontExportLibrary">
-         </option>
-         
       </backend>
       <backend
             class="net.sf.orcc.backends.llvm.jit.JadeBackend"
@@ -181,33 +170,13 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.c.embedded.CEmbeddedBackend"
-            name="CEmbedded">
+            class="net.sf.orcc.backends.c.preesm.PreesmBackend"
+            name="PREESM">
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
                id="net.sf.orcc.core.classify">
-         </option>
-      </backend>
-      <backend
-            class="net.sf.orcc.backends.cplusplus.YaceBackend"
-            name="C++">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
-         </option>
-         <option
-               id="net.sf.orcc.core.classify">
-         </option>
-         <option
-               id="net.sf.orcc.dontExportLibrary">
-         </option>         
-      </backend>
-      <backend
-            class="net.sf.orcc.backends.opencl.OpenCLBackend"
-            name="OpenCL (Experimental)">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
          </option>
       </backend>
    </extension>
@@ -240,45 +209,15 @@
                description="Uses an experimental scheduler instead of using the default round-robin scheduler"
                id="net.sf.orcc.backends.newScheduler"
                name="Use a smarter scheduler">
-            <checkBox>
-	            <option
-	               defaultValue="Ring"
-	               description="Select a communication topology between actor schedulers"
-	               id="net.sf.orcc.backends.newScheduler.topology"
-	               name="Communication topology between actor schedulers:">
-	            <comboBox>
-	               <comboBoxItem
-	                     id="Ring">
-	               </comboBoxItem>
-	               <comboBoxItem
-	                     id="Fully">
-	               </comboBoxItem>
-            	</comboBox>
-         		</option>
-            </checkBox>
+		    <checkBox></checkBox>
          </option>
-         <option
-               defaultValue="false"
-               description="Network runtime profiling"
-               id="net.sf.orcc.backends.profileNetwork"
-               name="[BETA] Profile the network">
-            <checkBox>
-               <option
-                     defaultValue="false"
-                     description="Make the profiling of actions for deeper network profiling. (May reduce performances)"
-                     id="net.sf.orcc.backends.profileNetwork.actions"
-                     name="Profile the actions">
-                  <checkBox></checkBox>
-               </option>
-            </checkBox>
-         </option>
-         <option
-               defaultValue="false"
-               description="Experimental load balancing on multi-core platforms"
-               id="net.sf.orcc.backends.dynamicMapping"
-               name="[BETA] Dynamic mapping">
-            <checkBox></checkBox>
-         </option>
+		 <option
+		       defaultValue="false"
+		       description="Enable runtime profiling (May reduce the performance)."
+		       id="net.sf.orcc.backends.profile"
+		       name="[BETA] Profile the application">
+		    <checkBox></checkBox>
+		 </option>
          <option
                defaultValue="false"
                description="Add C asserts to check array inbounds (need debug compilation)"
@@ -369,6 +308,9 @@
                   id="Virtex6 (xc6vlx240t)">
                </comboBoxItem>
                <comboBoxItem
+                  id="ZedBoard (xc7z020)">
+               </comboBoxItem>
+               <comboBoxItem
                   id="Others">
                </comboBoxItem>
             </comboBox>
@@ -457,6 +399,30 @@
                name="Output buffering">
             <checkBox></checkBox>
          </option>
+         <option
+               defaultValue="false"
+               description="Check actors action guards to better identify non-determinism"
+               id="net.sf.orcc.backends.c.dal.checkGuards"
+               name="Check Guards">
+            <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Whether Orcc should import the given xml buffer size configuration file"
+               id="net.sf.orcc.backends.importBXDF"
+               name="Import the BXDF Mapping">
+            <checkBox>
+               <option
+                     description="The file that contains the buffer size mapping configuration"
+                     id="net.sf.orcc.backends.bxdfFile"
+                     name="BXDF File">
+                  <browseFile
+                        folder="false"
+                        workspace="false">
+                  </browseFile>
+               </option>
+            </checkBox>
+         </option>
    </extension>
    <extension
          id="c"
@@ -467,30 +433,6 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.c.CBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="cpp"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.cplusplus.YaceBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="java"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.java.JavaBackend">
          </run>
       </application>
    </extension>
@@ -531,14 +473,14 @@
       </application>
    </extension>
    <extension
-         id="cembedded"
+         id="preesm"
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="singleton-global"
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.c.embedded.CEmbeddedBackend">
+               class="net.sf.orcc.backends.c.preesm.PreesmBackend">
          </run>
       </application>
    </extension>
@@ -563,30 +505,6 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.promela.PromelaBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="opencl"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.opencl.OpenCLBackend">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="compa"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.c.compa.COMPABackend">
          </run>
       </application>
    </extension>

@@ -102,6 +102,7 @@ class InstancePrinter extends LLVMTemplate {
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {
+		super(options)
 		if(options.containsKey(INLINE)){
 			optionInline = options.get(INLINE) as Boolean
 		}
@@ -188,6 +189,20 @@ class InstancePrinter extends LLVMTemplate {
 
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; FIFOs
+		
+		«FOR port : inputs»
+			«val connection = incomingPortMap.get(port)»
+			«connection.printExternalFifo(port)»
+		«ENDFOR»
+
+		«FOR port : outputs»
+			«FOR connection : outgoingPortMap.get(port)»
+				«IF !incomingPortMap.values.contains(connection)»
+					«connection.printExternalFifo(port)»
+				«ENDIF»
+			«ENDFOR»
+		«ENDFOR»
+		
 		«FOR port : inputs»
 			«val connection = incomingPortMap.get(port)»
 			«connection.printInput(port)»
@@ -748,7 +763,6 @@ class InstancePrinter extends LLVMTemplate {
 		«val name = port.name + "_" + id»
 		«val addrSpace = connection.addrSpace»
 		«val prop = port.properties»
-		«connection.printExternalFifo(port)»
 
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
 		@index_«name» = internal global i32 0
@@ -784,7 +798,6 @@ class InstancePrinter extends LLVMTemplate {
 		«val name = port.name + "_" + id»
 		«val addrSpace = connection.addrSpace»
 		«val prop = port.properties»
-		«connection.printExternalFifo(port)»
 
 		@SIZE_«name» = internal constant i32 «connection.safeSize»
 		@index_«name» = internal global i32 0

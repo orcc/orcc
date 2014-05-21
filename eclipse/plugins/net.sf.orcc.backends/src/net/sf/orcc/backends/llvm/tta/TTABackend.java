@@ -52,9 +52,9 @@ import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
+import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -72,9 +72,9 @@ import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
 import net.sf.orcc.ir.transform.DeadGlobalElimination;
 import net.sf.orcc.ir.transform.DeadVariableRemoval;
-import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
+import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
@@ -108,7 +108,8 @@ public class TTABackend extends LLVMBackend {
 		fpga = FPGA.builder(getAttribute("net.sf.orcc.backends.tta.fpga",
 				"Stratix III (EP3SL150F1152C2)"));
 		configuration = ProcessorConfiguration.getByName(getAttribute(
-				"net.sf.orcc.backends.llvm.tta.configuration", TTA_DEFAULT_PROCESSORS_CONFIGURATION));
+				"net.sf.orcc.backends.llvm.tta.configuration",
+				TTA_DEFAULT_PROCESSORS_CONFIGURATION));
 		reduceConnections = getAttribute(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
 	}
@@ -188,7 +189,7 @@ public class TTABackend extends LLVMBackend {
 
 		// update "vectorizable" information
 		Alignable.setAlignability(network);
-		
+
 		// Compute the actor mapping
 		if (importXcfFile) {
 			computedMapping = new Mapping(network, xcfFile);
@@ -197,7 +198,8 @@ public class TTABackend extends LLVMBackend {
 		}
 
 		// Build the design from the mapping
-		OrccLogger.traceln("TTA Architecture configuration setted to : " + configuration.getName());
+		OrccLogger.traceln("TTA Architecture configuration setted to : "
+				+ configuration.getName());
 		design = new ArchitectureBuilder().build(network, configuration,
 				computedMapping, reduceConnections);
 
@@ -217,13 +219,15 @@ public class TTABackend extends LLVMBackend {
 		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			libPath = path + File.separator + "libs";
 			String commonLibPath = libPath + File.separator + "common";
-			
-			OrccLogger.trace("Export common library files into " + commonLibPath + "... ");
-			if (copyFolderToFileSystem("/runtime/common", commonLibPath, debug) == false) {
+
+			OrccLogger.trace("Export common library files into "
+					+ commonLibPath + "... ");
+			if (copyFolderToFileSystem("/runtime/common/scripts",
+					commonLibPath, debug) == false) {
 				OrccLogger.warnRaw("Error" + "\n");
 				return false;
 			}
-						
+
 			OrccLogger.trace("Export library files into " + libPath + "... ");
 			if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
 				OrccLogger.traceRaw("OK" + "\n");
@@ -318,7 +322,7 @@ public class TTABackend extends LLVMBackend {
 				tta, processorPath);
 
 		// Print assembly code of actor-scheduler
-		cached += new SwProcessorPrinter().print(tta, processorPath);
+		cached += new SwProcessorPrinter(options).print(tta, processorPath);
 
 		return cached;
 	}

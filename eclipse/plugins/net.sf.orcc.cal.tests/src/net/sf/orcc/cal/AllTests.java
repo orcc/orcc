@@ -11,7 +11,8 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.frontend.Frontend;
+import net.sf.orcc.frontend.ActorTransformer;
+import net.sf.orcc.frontend.UnitTransformer;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -68,6 +69,58 @@ public class AllTests extends AbstractXtextTests {
 	@Inject
 	private IResourceServiceProvider serviceProvider;
 
+	@Override
+	@Before
+	public void setUp() {
+		try {
+			super.setUp();
+			with(CalStandaloneSetup.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject project = root.getProject(projectName);
+		if (!project.exists()) {
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			try {
+				IProjectDescription description = workspace
+						.newProjectDescription(projectName);
+
+				String[] natures = description.getNatureIds();
+				String[] newNatures = new String[natures.length + 2];
+
+				// add new natures
+				System.arraycopy(natures, 0, newNatures, 2, natures.length);
+				newNatures[0] = OrccProjectNature.NATURE_ID;
+				newNatures[1] = JavaCore.NATURE_ID;
+				description.setNatureIds(newNatures);
+
+				project.create(description, null);
+
+				// retrieves the up-to-date description
+				project.open(null);
+				description = project.getDescription();
+
+				// filters out the Java builder
+				ICommand[] commands = description.getBuildSpec();
+				List<ICommand> buildSpec = new ArrayList<ICommand>(
+						commands.length);
+				for (ICommand command : commands) {
+					if (!JavaCore.BUILDER_ID.equals(command.getBuilderName())) {
+						buildSpec.add(command);
+					}
+				}
+
+				// updates the description and replaces the existing description
+				description.setBuildSpec(buildSpec.toArray(new ICommand[0]));
+				project.setDescription(description, null);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	/**
 	 * Parses, validates, compiles, and interprets the actor defined in the file
 	 * whose name is given. Then matches the output of the interpreter with the
@@ -107,7 +160,12 @@ public class AllTests extends AbstractXtextTests {
 			return null;
 		}
 
-		return Frontend.getEntity(entity);
+		if (entity.getActor() != null) {
+			return new ActorTransformer().doSwitch(entity.getActor());
+		} else if (entity.getUnit() != null) {
+			return new UnitTransformer().doSwitch(entity.getActor());
+		}
+		return null;
 	}
 
 	/**
@@ -234,58 +292,6 @@ public class AllTests extends AbstractXtextTests {
 	@Test
 	public void passExecWhile() throws Exception {
 		assertExecution("idx is 60", prefix + "pass/CodegenWhile.cal");
-	}
-
-	@Override
-	@Before
-	public void setUp() {
-		try {
-			super.setUp();
-			with(CalStandaloneSetup.class);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IProject project = root.getProject(projectName);
-		if (!project.exists()) {
-			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			try {
-				IProjectDescription description = workspace
-						.newProjectDescription(projectName);
-
-				String[] natures = description.getNatureIds();
-				String[] newNatures = new String[natures.length + 2];
-
-				// add new natures
-				System.arraycopy(natures, 0, newNatures, 2, natures.length);
-				newNatures[0] = OrccProjectNature.NATURE_ID;
-				newNatures[1] = JavaCore.NATURE_ID;
-				description.setNatureIds(newNatures);
-
-				project.create(description, null);
-
-				// retrieves the up-to-date description
-				project.open(null);
-				description = project.getDescription();
-
-				// filters out the Java builder
-				ICommand[] commands = description.getBuildSpec();
-				List<ICommand> buildSpec = new ArrayList<ICommand>(
-						commands.length);
-				for (ICommand command : commands) {
-					if (!JavaCore.BUILDER_ID.equals(command.getBuilderName())) {
-						buildSpec.add(command);
-					}
-				}
-
-				// updates the description and replaces the existing description
-				description.setBuildSpec(buildSpec.toArray(new ICommand[0]));
-				project.setDescription(description, null);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	@Test

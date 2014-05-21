@@ -35,13 +35,6 @@ The current status of the existing back-ends is summed up in the following table
     <td>OK</td>
   </tr>
   <tr>
-    <th>C++</th>
-    <td>OK</td>
-    <td>NOK</td>
-    <td>NOK</td>
-    <td>N/A</td>
-  </tr>
-  <tr>
     <th>HLS</th>
     <td>OK</td>
     <td>NOK</td>
@@ -56,13 +49,6 @@ The current status of the existing back-ends is summed up in the following table
     <td>N/A</td>
   </tr>
   <tr>
-    <th>Java</th>
-    <td>N/A</td>
-    <td>N/A</td>
-    <td>N/A</td>
-    <td>N/A</td>
-  </tr>
-  <tr>
     <th>LLVM</th>
     <td>OK</td>
     <td>OK</td>
@@ -70,15 +56,8 @@ The current status of the existing back-ends is summed up in the following table
     <td>N/A</td>
   </tr>
   <tr>
-    <th>OpenCL</th>
-    <td>N/A</td>
-    <td>N/A</td>
-    <td>N/A</td>
-    <td>N/A</td>
-  </tr>
-  <tr>
     <th>Promela</th>
-    <td>N/A</td>
+    <td>OK</td>
     <td>N/A</td>
     <td>N/A</td>
     <td>N/A</td>
@@ -94,7 +73,7 @@ The current status of the existing back-ends is summed up in the following table
     <th>TTA</th>
     <td>OK</td>
     <td>NOK</td>
-    <td>NOK</td>
+    <td>OK</td>
     <td>N/A</td>
   </tr>
   <tr>
@@ -103,5 +82,12 @@ The current status of the existing back-ends is summed up in the following table
     <td>NOK</td>
     <td>N/A</td>
     <td>OK</td>
+  </tr>
+  <tr>
+    <th>DAL</th>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
   </tr>
 </table>

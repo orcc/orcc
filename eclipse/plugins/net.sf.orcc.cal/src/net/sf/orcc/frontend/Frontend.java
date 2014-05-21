@@ -28,29 +28,19 @@
  */
 package net.sf.orcc.frontend;
 
-import java.util.List;
-
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
-import net.sf.orcc.cache.CachePackage;
-import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Unit;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.Switch;
-import org.eclipse.xtext.EcoreUtil2;
 
 /**
- * This class defines an RVC-CAL front-end.
+ * This class defines an RVC-CAL front-end. Is is mainly used to manage links
+ * between AST objects and their IR equivalent.
  * 
  * @author Matthieu Wipliez
+ * @author Antoine Lorence
  * 
  */
 public class Frontend {
@@ -58,126 +48,69 @@ public class Frontend {
 	public static final Frontend instance = new Frontend();
 
 	/**
-	 * Returns the IR of the given AST entity. If it does not exist, creates it.
-	 * 
-	 * @param entity
-	 *            an AST entity
-	 * @return the IR of the given AST entity
+	 * Set constructor to private, to ensure it will always used as Singleton
 	 */
-	public static EObject getEntity(AstEntity entity) {
-		AstActor actor = entity.getActor();
-		EObject astObject;
-		Switch<? extends EObject> emfSwitch;
-		if (actor == null) {
-			astObject = entity.getUnit();
-			emfSwitch = new UnitTransformer();
-		} else {
-			astObject = actor;
-			emfSwitch = new ActorTransformer();
-		}
-
-		return CacheManager.instance.getOrCompute(astObject, emfSwitch,
-				CachePackage.eINSTANCE.getCache_IrMap());
+	private Frontend() {
 	}
 
 	/**
-	 * Returns the IR equivalent of the AST object.
+	 * <p>
+	 * Returns the IR mapping equivalent of the AST object.
+	 * </p>
 	 * 
-	 * @param eObject
-	 *            an AST object
-	 * @return the IR equivalent of the AST object
-	 */
-	public static <T extends EObject> T getMapping(EObject eObject) {
-		return getMapping(eObject, true);
-	}
-
-	/**
-	 * Returns the IR mapping equivalent of the AST object. If
-	 * <code>require</code> is <code>true</code>, first make sure that the IR of
-	 * the given AST object's containing entity exists.
+	 * <p>
+	 * This method will first try to retrieve the IR object in cache. If it is
+	 * impossible, a {@link StructTransformer} will be used to generate the IR
+	 * equivalent of AST object. In that case, a warning will be displayed,
+	 * since this situation should <b>not</b> happen.
+	 * </p>
 	 * 
-	 * @param eObject
+	 * @param astObject
 	 *            an AST object
-	 * @param require
-	 *            if <code>true</code>, first get the IR of the object's
-	 *            containing entity
-	 * @return the IR equivalent of the AST object
+	 * @return the IR equivalent of the given AST object
+	 * @see Frontend#putMapping(EObject, EObject)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends EObject> T getMapping(EObject eObject,
-			boolean require) {
-		if (require) {
-			AstEntity entity = EcoreUtil2.getContainerOfType(eObject,
-					AstEntity.class);
-			getEntity(entity);
+	public <T extends EObject> T getMapping(final EObject astObject) {
+		EObject irObject = null;
+		if (astObject.eResource() != null) {
+			final Cache cache = CacheManager.instance.getCache(astObject
+					.eResource());
+			irObject = cache.getIrMap().get(astObject);
 		}
 
-		// no need to put the mapping back because the AstTransformer does it
-		// that's also why we don't use getOrCompute
-		EObject irObject = internalGetMapping(eObject);
 		if (irObject == null) {
-			irObject = new StructTransformer().doSwitch(eObject);
+			OrccLogger.warnln("* " + astObject + " is missing from cache");
+			// AST -> IR transformation. putMapping() is called in the
+			// transformer, we don't need to call it now.
+			irObject = new StructTransformer().doSwitch(astObject);
 		}
 
 		return (T) irObject;
 	}
 
-	public static List<Procedure> getProcedures(AstEntity astEntity) {
-		EObject entity = getEntity(astEntity);
-		if (entity instanceof Actor) {
-			return ((Actor) entity).getProcs();
-		} else if (entity instanceof Unit) {
-			return ((Unit) entity).getProcedures();
-		} else {
-			return null;
-		}
-	}
-
 	/**
-	 * Returns the IR equivalent of the given AST object using its URI.
+	 * <p>Store (in cache) a link between an AST object and its IR equivalent.</p>
 	 * 
-	 * @param eObject
-	 *            an AST object
-	 * @return the IR equivalent of the given object
-	 */
-	private static EObject internalGetMapping(EObject eObject) {
-		Resource resource = eObject.eResource();
-		if (resource != null) {
-			Cache cache = CacheManager.instance.getCache(resource);
-			return cache.getIrMap().get(eObject);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the IR equivalent of the given AST object using its URI.
+	 * <p>This mechanism avoid to transform twice the same object. It is also
+	 * useful to set references to variables, procedures, functions, etc.
+	 * References in AST model are kept in the IR model. It is mandatory to have
+	 * a consistent model to avoid exception when the IR will be serialized.</p>
 	 * 
-	 * @param eObject
+	 * @param astObject
 	 *            an AST object
-	 * @return the IR equivalent of the given object
+	 * @param irObject
+	 *            an equivalent IR object
+	 * @see #getMapping(EObject)
 	 */
-	public static void putMapping(EObject astObject, EObject irObject) {
-		Resource resource = astObject.eResource();
+	public void putMapping(final EObject astObject, final EObject irObject) {
+		final Resource resource = astObject.eResource();
 		if (resource != null) {
 			Cache cache = CacheManager.instance.getCache(resource);
 			cache.getIrMap().put(astObject, irObject);
+		} else {
+			OrccLogger.warnln("Try to put object not contained in a resource: "
+					+ astObject);
 		}
-	}
-
-	private final ResourceSet set = new ResourceSetImpl();
-
-	public ResourceSet getResourceSet() {
-		return set;
-	}
-
-	/**
-	 * Serializes the given actor or unit.
-	 * 
-	 * @param eObject
-	 *            an actor or unit
-	 */
-	public void serialize(EObject eObject) {
-		IrUtil.serializeActor(set, eObject);
 	}
 }

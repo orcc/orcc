@@ -28,20 +28,32 @@
  */
 package net.sf.orcc.cal;
 
+import net.sf.orcc.cal.generator.CalOutputConfigurationProvider;
 import net.sf.orcc.cal.parser.impl.PatchedPartialParsingHelper;
 import net.sf.orcc.cal.services.CalLinkingService;
 import net.sf.orcc.cal.services.CalQualifiedNameProvider;
 
 import org.eclipse.xtext.conversion.IValueConverterService;
+import org.eclipse.xtext.generator.IOutputConfigurationProvider;
 import org.eclipse.xtext.linking.ILinkingService;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.parser.antlr.IPartialParsingHelper;
 import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider;
 
+import com.google.inject.Binder;
+import com.google.inject.Singleton;
+
 /**
  * Use this class to register components to be used within the IDE.
  */
 public class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
+
+	@Override
+	public void configure(Binder binder) {
+		super.configure(binder);
+		binder.bind(IOutputConfigurationProvider.class)
+				.to(CalOutputConfigurationProvider.class).in(Singleton.class);
+	}
 
 	@Override
 	public Class<? extends ILinkingService> bindILinkingService() {

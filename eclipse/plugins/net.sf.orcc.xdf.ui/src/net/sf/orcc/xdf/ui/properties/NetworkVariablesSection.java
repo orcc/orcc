@@ -36,6 +36,7 @@ import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -131,14 +132,14 @@ public class NetworkVariablesSection extends AbstractTableBasedSection {
 	}
 
 	@Override
-	void editTableItem(TableItem item) {
+	boolean editTableItem(TableItem item) {
 		final VariableItemEditor editor = new VariableItemEditor(item);
-		editor.open();
+		return editor.open() == Window.OK;
 	}
 
 	@Override
 	protected void readValuesFromModels() {
-		final Network network = (Network) businessObject;
+		final Network network = (Network) getSelectedBusinessObject();
 		final TypePrinter typePrinter = new TypePrinter();
 		final ExpressionPrinter exprPrinter = new ExpressionPrinter();
 
@@ -154,7 +155,7 @@ public class NetworkVariablesSection extends AbstractTableBasedSection {
 
 	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Network network = (Network) businessObject;
+		final Network network = (Network) getSelectedBusinessObject();
 
 		// Declare parameters which can be referenced by this variable
 		calParser.setDeclaredVars(network.getParameters());

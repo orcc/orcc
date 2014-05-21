@@ -34,21 +34,19 @@ import static net.sf.orcc.OrccLaunchConstants.CLASSIFY;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTIONS;
 import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
-import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
-import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
-import static net.sf.orcc.backends.BackendsConstants.DYNAMIC_MAPPING;
-import static net.sf.orcc.backends.BackendsConstants.PROFILE_NETWORK;
-import static net.sf.orcc.backends.BackendsConstants.PROFILE_ACTIONS;
 import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
+import static net.sf.orcc.backends.BackendsConstants.PROFILE;
 import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
@@ -84,7 +82,6 @@ import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccLogger.OrccLevel;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -250,7 +247,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	final private void compileVTL() {
 		// lists actors
 		OrccLogger.traceln("Lists actors...");
-		List<IFile> vtlFiles = OrccUtil.getAllFiles("ir", vtlFolders);
+		List<IFile> vtlFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX,
+				vtlFolders);
 		doVtlCodeGeneration(vtlFiles);
 	}
 
@@ -790,7 +788,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
-		inputFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
+		inputFile = getFile(project, getAttribute(XDF_FILE, ""),
+				OrccUtil.NETWORK_SUFFIX);
 
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		debug = getAttribute(DEBUG_MODE, true);
@@ -819,13 +818,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					"orcc");
 			tempOrccDir.mkdir();
 			outputFolder = tempOrccDir.getAbsolutePath();
-		} else if (outputFolder.startsWith("~")) {
-			outputFolder = outputFolder.replace("~",
-					System.getProperty("user.home"));
+		} else {
+			outputFolder = OrccUtil.resolveFromHome(outputFolder);
 		}
 
 		if (debug) {
-			OrccLogger.setLevel(OrccLevel.DEBUG);
+			OrccLogger.setLevel(OrccLogger.DEBUG);
 			OrccLogger.debugln("Debug mode is enabled");
 		}
 
@@ -842,7 +840,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
-
 		Options options = new Options();
 		Option opt;
 
@@ -870,15 +867,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("m2m", "multi2mono", false,
 				"Transform high-level actors with multi-tokens actions"
 						+ " in low-level actors with mono-token actions");
-		options.addOption("pnet", "profile-network", false,
-				"(C) Allow network profiling for mapping");
-		options.addOption("pact", "profile-actions", false,
-				"(C) Allow actions profiling");
-		options.addOption("dm", "dynamic-mapping", false,
-				"(C) Enable load balancing on multi-core platforms");
+		options.addOption("prof", "profile", false, "(C) Enable profiling");
 		options.addOption("et", "enable-traces", true,
 				"(C) Enable tracing of the FIFOs in the given directory");
-		options.addOption("ttapc", "tta-processorconf", true,
+		options.addOption(
+				"ttapc",
+				"tta-processorconf",
+				true,
 				"(TTA) Predefined configurations for the processors (Standard|Custom|Fast|Huge)");
 
 		// FIXME: choose independently the transformation to apply
@@ -953,22 +948,22 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				optionMap.put(ENABLE_TRACES, true);
 				optionMap.put(TRACES_FOLDER, line.getOptionValue("et"));
 			}
-			
+
 			if (line.hasOption("ttapc")) {
 				String pc = line.getOptionValue("ttapc");
-				if (pc.equals("Standard") || pc.equals("Custom") || pc.equals("Fast") || pc.equals("Huge")) {
-					optionMap.put(TTA_PROCESSORS_CONFIGURATION, pc);					
+				if (pc.equals("Standard") || pc.equals("Custom")
+						|| pc.equals("Fast") || pc.equals("Huge")) {
+					optionMap.put(TTA_PROCESSORS_CONFIGURATION, pc);
 				} else {
-					OrccLogger.warnln("Unknown processors configuration for TTA. Standard configuration will be apply.");
+					OrccLogger
+							.warnln("Unknown processors configuration for TTA. Standard configuration will be apply.");
 				}
 			}
 
 			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
-			optionMap.put(PROFILE_NETWORK, line.hasOption("pnet"));
-			optionMap.put(PROFILE_ACTIONS, line.hasOption("pact"));
-			optionMap.put(DYNAMIC_MAPPING, line.hasOption("dm"));
+			optionMap.put(PROFILE, line.hasOption("prof"));
 
 			// Set backend name in options map
 			String backend = this.getClass().getName();
@@ -982,12 +977,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 			}
 			optionMap.put(BACKEND, backend);
-
 			try {
-				setOptions(optionMap);
 
+				setOptions(optionMap);
 				compile();
 				return IApplication.EXIT_OK;
+
 			} catch (OrccRuntimeException e) {
 
 				if (e.getMessage() != null && !e.getMessage().isEmpty()) {
@@ -995,7 +990,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 				OrccLogger.severeln(backend
 						+ " backend could not generate code (" + e.getCause()
-						+ ")");
+						+ ")[OrccRuntimeException]");
 
 			} catch (Exception e) {
 
@@ -1004,11 +999,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 				OrccLogger.severeln(backend
 						+ " backend could not generate code (" + e.getCause()
-						+ ")");
+						+ ")[Exception]");
 
 				e.printStackTrace();
 			}
-			return IApplication.EXIT_RELAUNCH;
 
 		} catch (UnrecognizedOptionException uoe) {
 			printUsage(context, options, uoe.getLocalizedMessage());
@@ -1035,5 +1029,4 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			doTransformActor(actor);
 		}
 	}
-
 }

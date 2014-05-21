@@ -41,7 +41,7 @@ Workflow {
 			fragment = grammarAccess.GrammarAccessFragment auto-inject {}
 
 			// Generate java classes for Ecore models
-			fragment = ecore.EcoreGeneratorFragment auto-inject {}
+			fragment = ecore.EMFGeneratorFragment auto-inject {}
 
 			// the serialization component
 			fragment = parseTreeConstructor.ParseTreeConstructorFragment auto-inject {}
@@ -69,6 +69,12 @@ Workflow {
 			fragment = scoping.ImportNamespacesScopingFragment auto-inject {}
 			fragment = exporting.QualifiedNamesFragment auto-inject {}
 			fragment = builder.BuilderIntegrationFragment auto-inject {}
+
+			// generator API
+			fragment = generator.GeneratorFragment {
+				generateMwe = false
+				generateJavaMain = false
+			}
 
 			// formatter API 
 			fragment = formatting.FormatterFragment auto-inject {}

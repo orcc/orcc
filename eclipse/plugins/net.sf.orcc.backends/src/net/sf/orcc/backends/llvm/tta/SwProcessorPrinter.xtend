@@ -29,13 +29,18 @@
 package net.sf.orcc.backends.llvm.tta
 
 import java.io.File
+import java.util.Map
 import net.sf.orcc.backends.llvm.aot.LLVMTemplate
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.df.Actor
+import net.sf.orcc.util.OrccUtil
 
 class SwProcessorPrinter extends LLVMTemplate {
 	
+	new(Map<String, Object> options) {
+		super(options)
+	}
+
 	def print(Processor processor, String targetFolder) {
 		val content = processor.print
 		val file = new File(targetFolder + File::separator + processor.getName() + ".ll")
@@ -47,7 +52,7 @@ class SwProcessorPrinter extends LLVMTemplate {
 			return 1
 		}
 	}
-	
+
 	def private print(Processor processor)
 		'''
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

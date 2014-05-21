@@ -61,7 +61,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	
 	override protected printStateTransitions(State state) '''
 		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
-			if («trans.action.inputPattern.checkInputPattern»isSchedulable_«trans.action.name»()) {
+			if («trans.action.inputPattern.checkInputPattern»«trans.action.scheduler.name»()) {
 				«IF trans.action.outputPattern != null»
 					«trans.action.outputPattern.printOutputPattern»
 						_FSM_state = my_state_«state.name»;
@@ -83,7 +83,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// in COMPA backend
 	}
 	
-	override protected actorScheduler() '''
+	override protected printActorScheduler() '''
 		«IF instance.getActor.hasFsm»
 			«printFsm»
 		«ELSE»
@@ -91,7 +91,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				int i = 0;
 				«printCallTokensFunctions»
 				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
-				
+
 			finished:
 				«FOR port : instance.getActor.inputs»
 					read_end_«port.name»();
@@ -108,7 +108,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 	
-	override initializeFunction() '''
+	override printInitialize() '''
 		«FOR init : actor.initializes»
 			«init.print»
 		«ENDFOR»
@@ -145,7 +145,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 			«printCallTokensFunctions»
 
-			// jump to FSM state 
+			// jump to FSM state
 			switch (_FSM_state) {
 			«FOR state : instance.getActor.fsm.states»
 				case my_state_«state.name»:
@@ -174,7 +174,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override protected printActionsScheduling(Iterable<Action> actions) '''
 		// Action loop
 		«FOR action : actions SEPARATOR " else "»
-			if («inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+			if («inputPattern.checkInputPattern»«action.scheduler.name»()) {
 				«IF action.outputPattern != null»
 					«action.outputPattern.printOutputPattern»
 						goto finished;

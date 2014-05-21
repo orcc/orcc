@@ -30,8 +30,9 @@ package net.sf.orcc.xdf.ui.editors;
 
 import java.io.IOException;
 
+import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.xdf.ui.Activator;
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -41,6 +42,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 
@@ -66,6 +68,11 @@ public class XdfDiagramEditor extends DiagramEditor {
 		return new XdfEditorInput(origEditorInput.getUri(), origEditorInput.getProviderId());
 	}
 
+	@Override
+	public Image getTitleImage() {
+		return OrccUiActivator.getImage("icons/network.gif");
+	}
+
 	/**
 	 * Default DiagramEditor class needs to be configured with a diagram input
 	 * file instead of a network one. If the user try to open a xdf file, this
@@ -81,11 +88,13 @@ public class XdfDiagramEditor extends DiagramEditor {
 			final DiagramEditorInput diagramEditorInput = (DiagramEditorInput) input;
 
 			// The input is an Xdf resource
-			if (Activator.NETWORK_SUFFIX.equals(diagramEditorInput.getUri().fileExtension())) {
+			if (OrccUtil.NETWORK_SUFFIX.equals(diagramEditorInput.getUri()
+					.fileExtension())) {
 				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 				final URI xdfUri = diagramEditorInput.getUri();
-				final URI diagramUri = xdfUri.trimFileExtension().appendFileExtension(Activator.DIAGRAM_SUFFIX);
+				final URI diagramUri = xdfUri.trimFileExtension()
+						.appendFileExtension(OrccUtil.DIAGRAM_SUFFIX);
 
 				final IPath diagramPath = new Path(diagramUri.toPlatformString(true));
 

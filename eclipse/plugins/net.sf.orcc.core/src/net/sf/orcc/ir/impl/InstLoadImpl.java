@@ -328,8 +328,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
-		builder.append("Load(")
-				.append(getNameSSA(getTarget().getVariable()))
+		builder.append("Load(").append(getNameSSA(getTarget().getVariable()))
 				.append(", ").append(getSource().getVariable().getName());
 		for (Expression index : getIndexes()) {
 			builder.append("[");

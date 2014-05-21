@@ -32,9 +32,9 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.ui.editor.PartialCalParser;
-import net.sf.orcc.xdf.ui.util.XdfUtil;
+import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -51,6 +51,8 @@ public class PortMainSection extends AbstractGridBasedSection {
 
 	private Text portName;
 	private Text portType;
+
+	final private PartialCalParser calParser = new PartialCalParser();
 
 	@Override
 	protected String getFormText() {
@@ -74,7 +76,7 @@ public class PortMainSection extends AbstractGridBasedSection {
 
 	@Override
 	protected void readValuesFromModels() {
-		final Port port = (Port) businessObject;
+		final Port port = (Port) getSelectedBusinessObject();
 		final TypePrinter typePrinter = new TypePrinter();
 
 		portName.setText(port.getName());
@@ -82,18 +84,37 @@ public class PortMainSection extends AbstractGridBasedSection {
 	}
 
 	@Override
+	protected String checkValueValid(Widget widget) {
+
+		if (widget == portName) {
+			final NetworkPortPattern pattern = getPattern(
+					getSelectedPictogramElement(), NetworkPortPattern.class);
+			if (pattern != null) {
+				return pattern.checkValueValid(portName.getText(),
+						(Port) getSelectedBusinessObject());
+			}
+		} else if (widget == portType) {
+			final Type type = calParser.parseType(portType.getText());
+			if (type == null) {
+				return "Unable to parse this type";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	protected void writeValuesToModel(final Widget widget) {
-		final Port port = (Port) businessObject;
-		final PartialCalParser parser = new PartialCalParser();
+		final Port port = (Port) getSelectedBusinessObject();
 
 		if (widget == portName) {
 			port.setName(portName.getText());
+			final UpdateContext context = new UpdateContext(
+					getSelectedPictogramElement());
+			getFeatureProvider().updateIfPossible(context);
 		} else if (widget == portType) {
-			final Type type = parser.parseType(portType.getText());
-			if (type == null) {
-				MessageDialog.openError(XdfUtil.getDefaultShell(), "Syntax error",
-						"Unable to parse the type you entered.");
-			} else {
+			final Type type = calParser.parseType(portType.getText());
+			if (type != null) {
 				port.setType(type);
 			}
 		}

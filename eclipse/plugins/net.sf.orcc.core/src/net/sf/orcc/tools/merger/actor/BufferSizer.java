@@ -24,6 +24,8 @@ public class BufferSizer {
 
 	private Map<Connection, Integer> maxTokens;
 
+	private Map<Connection, Integer> minTokens;
+
 	private Map<Connection, Integer> tokens;
 
 	protected Network network;
@@ -38,18 +40,31 @@ public class BufferSizer {
 	public Map<Connection, Integer> getMaxTokens(Schedule schedule) {
 		if (maxTokens == null) {
 			maxTokens = new HashMap<Connection, Integer>();
+			minTokens = new HashMap<Connection, Integer>();
 			tokens = new HashMap<Connection, Integer>();
 
 			for (Connection connection : network.getConnections()) {
 				Actor src = connection.getSource().getAdapter(Actor.class);
 				Actor tgt = connection.getTarget().getAdapter(Actor.class);
-				if (src != null && tgt != null)
+				if (src != null && tgt != null) {
 					maxTokens.put(connection, 0);
+					minTokens.put(connection, 0);
+				}
 				tokens.put(connection, 0);
 			}
 			computeMemoryBound(schedule);
 		}
 		return maxTokens;
+	}
+
+	/**
+	 * @return
+	 */
+	public Map<Connection, Integer> getMinTokens(Schedule schedule) {
+		if (minTokens == null) {
+			getMaxTokens(schedule);
+		}
+		return minTokens;
 	}
 
 	/**
@@ -65,8 +80,11 @@ public class BufferSizer {
 					Connection connection = (Connection) edge;
 					Pattern inputPattern = iterand.getAction().getInputPattern();
 					Port targetPort = connection.getTargetPort();
+					int current = tokens.get(connection);
+					int min = minTokens.get(connection);
 					int cns = inputPattern.getNumTokens(targetPort);
-					tokens.put(connection, tokens.get(connection) - cns);
+					tokens.put(connection, current - cns);
+					minTokens.put(connection, min - cns);
 				}
 			}
 

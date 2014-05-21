@@ -35,9 +35,11 @@ import java.util.Map;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
@@ -47,7 +49,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -58,8 +59,6 @@ import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
-import org.eclipse.graphiti.features.context.impl.DeleteContext;
-import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
 import org.eclipse.graphiti.features.context.impl.ResizeShapeContext;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.func.IDirectEditing;
@@ -189,15 +188,32 @@ public class InstancePattern extends AbstractPattern {
 		final PictogramElement pe = context.getPictogramElement();
 		final Instance obj = (Instance) getBusinessObjectForPictogramElement(pe);
 		obj.setName(value);
+
+		updatePictogramElement(pe);
 	}
 
 	@Override
 	public String checkValueValid(String value, IDirectEditingContext context) {
+		final Instance instance = (Instance) getBusinessObjectForPictogramElement(context
+				.getPictogramElement());
+		return checkValueValid(value, instance);
+	}
+
+	public String checkValueValid(final String value, final Instance instance) {
 		if (value.length() < 1) {
 			return "Please enter a text to name the Instance.";
 		}
-		if (!value.matches("[a-zA-Z0-9_]+")) {
-			return "You can only use alphanumeric characters for Instance name";
+		if (!value.matches("[a-zA-Z][a-zA-Z0-9_]*")) {
+			return "Instance name must start with a letter, and contains only alphanumeric characters";
+		}
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		for (final Vertex vertex : network.getVertices()) {
+			if (!vertex.equals(instance) && vertex.getLabel().equals(value)) {
+				final String vertexType = vertex instanceof Instance ? "an instance"
+						: "a port";
+				return "The network already contains a vertex of the same name ("
+						+ vertexType + ")";
+			}
 		}
 
 		// null -> value is valid
@@ -205,41 +221,11 @@ public class InstancePattern extends AbstractPattern {
 	}
 
 	@Override
-	public boolean canDelete(IDeleteContext context) {
-		final int nbConnections = Graphiti
-				.getPeService()
-				.getAllConnections(
-						(AnchorContainer) context.getPictogramElement()).size();
-
-		// When user will be prompted, display the exact number of elements to
-		// delete
-		((DeleteContext) context).setMultiDeleteInfo(new MultiDeleteInfo(true,
-				false, nbConnections + 1));
-
-		return true;
-	}
-
-	/**
-	 * Delete all connections before deleting an instance
-	 */
-	@Override
-	public void preDelete(IDeleteContext mainContext) {
-		final PictogramElement pe = mainContext.getPictogramElement();
-		if (!PropsUtil.isInstance(pe)) {
-			return;
-		}
-
-		final List<Connection> connections = Graphiti.getPeService().getAllConnections((AnchorContainer) pe);
-		for (final Connection connection : connections) {
-			final DeleteContext context = new DeleteContext(connection);
-			// We don't want to prompt user for each connection deletion
-			context.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
-
-			final IDeleteFeature feature = getFeatureProvider()
-					.getDeleteFeature(context);
-			if (feature.canDelete(context)) {
-				feature.execute(context);
-			}
+	public void preDelete(IDeleteContext context) {
+		final PictogramElement pe = context.getPictogramElement();
+		if (pe instanceof AnchorContainer) {
+			XdfUtil.deleteConnections(getFeatureProvider(),
+					(AnchorContainer) pe);
 		}
 	}
 
@@ -332,8 +318,7 @@ public class InstancePattern extends AbstractPattern {
 		link(topLevelShape, addedDomainObject);
 
 		if (addedDomainObject.getEntity() != null) {
-			setInstanceRefinement(topLevelShape, addedDomainObject.getEntity(),
-					false);
+			setInstanceRefinement(topLevelShape, addedDomainObject.getEntity());
 		}
 
 		return topLevelShape;
@@ -426,7 +411,7 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public boolean canUpdate(IUpdateContext context) {
-		return PropsUtil.isInstance(context.getPictogramElement());
+		return isPatternRoot(context.getPictogramElement());
 	}
 
 	@Override
@@ -450,66 +435,41 @@ public class InstancePattern extends AbstractPattern {
 					.createTrueReason("The instance name has been updated from outside of the diagram");
 		}
 
-		final EObject entity = instance.getEntity();
-		if (entity == null) {
-			return Reason.createFalseReason();
-		}
-
 		// Compute list of in and out ports names
-		final List<String> inputsN = new ArrayList<String>(), outputsN = new ArrayList<String>();
+		final List<String> inNames = new ArrayList<String>(), outNames = new ArrayList<String>();
 		for (final Anchor anchor : ((AnchorContainer) pe).getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
 					anchor, PORT_NAME_KEY);
 			if(PropsUtil.isInstanceInPort(anchor)) {
-				inputsN.add(portName);
+				inNames.add(portName);
 			} else if (PropsUtil.isInstanceOutPort(anchor)) {
-				outputsN.add(portName);
+				outNames.add(portName);
 			}
+		}
+
+		final Entity entity = instance.getAdapter(Entity.class);
+		if (entity == null) {
+			return Reason.createFalseReason("Unknown error");
 		}
 
 		final IReason portsUpdatedReason = Reason
 				.createTrueReason("The port order or their names have to be updated.");
-		if (entity instanceof Network) {
-			if (inputsN.size() != ((Network) entity).getInputs().size()
-					|| outputsN.size() != ((Network) entity).getOutputs()
-							.size()) {
+
+		if (inNames.size() != entity.getInputs().size()
+				|| outNames.size() != entity.getOutputs().size()) {
+			return portsUpdatedReason;
+		}
+		for (int i = 0; i < inNames.size(); ++i) {
+			final String portName = entity.getInputs().get(i).getName();
+			if (!inNames.get(i).equals(portName)) {
 				return portsUpdatedReason;
 			}
-			for (int i = 0; i < inputsN.size(); ++i) {
-				final String portName = ((Network) entity).getInputs().get(i)
-						.getName();
-				if (!inputsN.get(i).equals(portName)) {
-					return portsUpdatedReason;
-				}
-			}
-			for (int i = 0; i < outputsN.size(); ++i) {
-				final String portName = ((Network) entity).getOutputs().get(i)
-						.getName();
-				if (!outputsN.get(i).equals(portName)) {
-					return portsUpdatedReason;
-				}
-			}
-		} else if (entity instanceof Actor) {
-			if (inputsN.size() != ((Actor) entity).getInputs().size()
-					|| outputsN.size() != ((Actor) entity).getOutputs().size()) {
+		}
+		for (int i = 0; i < outNames.size(); ++i) {
+			final String portName = entity.getOutputs().get(i).getName();
+			if (!outNames.get(i).equals(portName)) {
 				return portsUpdatedReason;
 			}
-			for (int i = 0; i < inputsN.size(); ++i) {
-				final String portName = ((Actor) entity).getInputs().get(i)
-						.getName();
-				if (!inputsN.get(i).equals(portName)) {
-					return portsUpdatedReason;
-				}
-			}
-			for (int i = 0; i < outputsN.size(); ++i) {
-				final String portName = ((Actor) entity).getOutputs().get(i)
-						.getName();
-				if (!outputsN.get(i).equals(portName)) {
-					return portsUpdatedReason;
-				}
-			}
-		} else {
-			return Reason.createFalseReason("Unknown refinement type");
 		}
 
 		return super.updateNeeded(context);
@@ -533,11 +493,14 @@ public class InstancePattern extends AbstractPattern {
 				return true;
 			}
 
-			// Force to update refinement, by invalidating the current
-			// refinement property on the shape
-			Graphiti.getPeService().setPropertyValue(pe, REFINEMENT_KEY, "");
-			setInstanceRefinement((ContainerShape) pe, instance.getEntity());
+			final ContainerShape instanceShape = (ContainerShape) pe;
 
+			final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
+			final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
+			saveConnections(instanceShape, incomingMap, outgoingMap);
+			setInstanceRefinement(instanceShape, instance.getEntity());
+			restoreConnections(instanceShape, incomingMap, outgoingMap,
+					instance.getName() + " has been updated:");
 			return true;
 		}
 
@@ -546,23 +509,10 @@ public class InstancePattern extends AbstractPattern {
 
 	/**
 	 * Update the refinement (Instance or Network) for the instance linked to
-	 * the given pe. The input and output ports of the given entity are added to
-	 * the shape.
-	 * <p>
-	 * This method automatically updates sizes and layouts for the content. It
-	 * also try to reconnect existing connections to the right port, by
-	 * searching it from its name. If a connection cannot be automatically
-	 * reconnected, it is deleted from the network. The user is prompted with a
-	 * message dialog in that case.
-	 * </p>
-	 * <p>
-	 * If the instance linked to the given instanceShape has already a
-	 * refinement, the property REFINEMENT_KEY will be controlled, and the
-	 * method will do the refinement only if its value is different than the
-	 * given entity URI. If you want to force shape update without modifying the
-	 * entity to refine, simple change the REFINEMENT_KEY value before calling
-	 * this method.
-	 * </p>
+	 * the given instanceShape. The input and output ports of the given entity
+	 * are added to the shape.
+	 * 
+	 * This method automatically updates sizes and layouts for the content.
 	 * 
 	 * @param instanceShape
 	 * @param entity
@@ -570,18 +520,6 @@ public class InstancePattern extends AbstractPattern {
 	 */
 	public boolean setInstanceRefinement(final ContainerShape instanceShape,
 			final EObject entity) {
-		return setInstanceRefinement(instanceShape, entity, true);
-	}
-
-	/**
-	 * @param instanceShape
-	 * @param entity
-	 * @param updateExistingConnections
-	 *            Will try to perform reconnections
-	 * @return
-	 */
-	private boolean setInstanceRefinement(final ContainerShape instanceShape,
-			final EObject entity, boolean updateExistingConnections) {
 		if (!isPatternRoot(instanceShape)) {
 			return false;
 		}
@@ -589,55 +527,28 @@ public class InstancePattern extends AbstractPattern {
 			return false;
 		}
 
-		// Do not allow refining on the same URI as before
-		final String existingRefinement = Graphiti.getPeService()
-				.getPropertyValue(instanceShape, REFINEMENT_KEY);
-		final String entityUri = entity.eResource().getURI()
-				.toPlatformString(true);
-		if (existingRefinement != null && existingRefinement.equals(entityUri)) {
-			return false;
-		}
-
 		// Set the current instance's entity
 		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instanceShape);
 		instance.setEntity(entity);
+		// Store the refinement URI in a property
 		Graphiti.getPeService().setPropertyValue(instanceShape, REFINEMENT_KEY,
-				entityUri);
+				entity.eResource().getURI().toPlatformString(true));
 
-		// Clean all ports anchors and graphics in the instance
-		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(instanceShape
-				.getGraphicsAlgorithm().getGraphicsAlgorithmChildren());
+		// Clean all ports
+		final GraphicsAlgorithm instanceGa = instanceShape
+				.getGraphicsAlgorithm();
+		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(
+				instanceGa.getGraphicsAlgorithmChildren());
 		for (final GraphicsAlgorithm gaChild : gaChildren) {
-			if (gaChild instanceof Text && PropsUtil.isExpectedPc(gaChild, PORT_TEXT_ID)) {
+			if (gaChild instanceof Text
+					&& PropsUtil.isExpectedPc(gaChild, PORT_TEXT_ID)) {
 				EcoreUtil.delete(gaChild, true);
 			}
 		}
-
-		// To perform reconnection later, we need to save which are
-		// connected to in and out anchors
-		final Map<String, Connection> inMap = new HashMap<String, Connection>();
-		final Map<String, Iterable<Connection>> outMap = new HashMap<String, Iterable<Connection>>();
-		if (updateExistingConnections) {
-			// We will delete anchors IN the for loop, we need to copy the list
-			final List<Anchor> anchors = new ArrayList<Anchor>(
-					((AnchorContainer) instanceShape).getAnchors());
-			for (final Anchor anchor : anchors) {
-
-				final String portName = Graphiti.getPeService()
-						.getPropertyValue(anchor, PORT_NAME_KEY);
-				if (anchor.getIncomingConnections().size() >= 1) {
-					// Save incoming connections
-					inMap.put(portName, anchor.getIncomingConnections().get(0));
-				} else if (anchor.getOutgoingConnections().size() >= 1) {
-					// Create a copy of the current outgoing list
-					final List<Connection> conList = new ArrayList<Connection>(
-							anchor.getOutgoingConnections());
-					// Save outgoing connections
-					outMap.put(portName, conList);
-				}
-
-				EcoreUtil.delete(anchor, true);
-			}
+		final List<Anchor> anchors = new ArrayList<Anchor>(
+				instanceShape.getAnchors());
+		for (final Anchor anchor : anchors) {
+			EcoreUtil.delete(anchor, true);
 		}
 
 		// Add ports
@@ -656,24 +567,79 @@ public class InstancePattern extends AbstractPattern {
 		// Resize to minimal size.
 		resizeShapeToMinimal(instanceShape);
 
-		// Check if auto-reconnections are necessary (or disabled)
-		if (!updateExistingConnections || (inMap.isEmpty() && outMap.isEmpty())) {
-			return true;
+		return true;
+	}
+
+	/**
+	 * Loops over the given instanceShape anchors. Store the existing
+	 * connections related to this in 2 different maps.
+	 * 
+	 * Each map is indexed from the port name, which is read from the property
+	 * PORT_NAME_KEY directly in the anchor
+	 * 
+	 * @param instanceShape
+	 * @param incomingMap
+	 * @param outgoingMap
+	 */
+	public void saveConnections(final AnchorContainer instanceShape,
+			final Map<String, Connection> incomingMap,
+			final Map<String, Iterable<Connection>> outgoingMap) {
+
+		// Loop over all instance anchors (in & out ports)
+		for (final Anchor anchor : instanceShape.getAnchors()) {
+			final String portName = Graphiti.getPeService().getPropertyValue(
+					anchor, PORT_NAME_KEY);
+			if (anchor.getIncomingConnections().size() >= 1) {
+				// Save incoming connections
+				incomingMap.put(portName, anchor.getIncomingConnections().get(0));
+			} else if (anchor.getOutgoingConnections().size() >= 1) {
+				// Create a copy of the current outgoing list
+				final List<Connection> conList = new ArrayList<Connection>(
+						anchor.getOutgoingConnections());
+				// Save outgoing connections
+				outgoingMap.put(portName, conList);
+			}
+		}
+	}
+
+	/**
+	 * Try to update existing diagram connections previously saved with
+	 * {@link #saveConnections(AnchorContainer, Map, Map)}. If the given
+	 * instanceShape contains inputs or outputs ports with the same port name
+	 * (read from PORT_NAME_KEY property), the connection is restored with the
+	 * new anchor. Other connections are deleted from the diagram.
+	 * 
+	 * This method also displays a message to user to inform about which
+	 * connections have been restored and/or deleted. The first sentence of the
+	 * message displayed is the given message String.
+	 * 
+	 * @param instanceShape
+	 * @param incomingMap
+	 * @param outgoingMap
+	 * @param message
+	 */
+	public void restoreConnections(final AnchorContainer instanceShape,
+			final Map<String, Connection> incomingMap,
+			final Map<String, Iterable<Connection>> outgoingMap, final String message) {
+
+		if (incomingMap.size() == 0 && outgoingMap.size() == 0) {
+			// Nothing to do
+			return;
 		}
 
 		// Restore connections start or end from port name they were
-		// connected to
+		// connected to.
 		int cptReconnectedTo = 0, cptReconnectedFrom = 0;
 		for (final Anchor anchor : instanceShape.getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
 					anchor, PORT_NAME_KEY);
 			if (PropsUtil.isInstanceInPort(anchor)
-					&& inMap.containsKey(portName)) {
-				inMap.remove(portName).setEnd(anchor);
+					&& incomingMap.containsKey(portName)) {
+				incomingMap.remove(portName).setEnd(anchor);
 				cptReconnectedTo++;
 			} else if (PropsUtil.isInstanceOutPort(anchor)
-					&& outMap.containsKey(portName)) {
-				for (final Connection connection : outMap.remove(portName)) {
+					&& outgoingMap.containsKey(portName)) {
+				for (final Connection connection : outgoingMap.remove(portName)) {
 					connection.setStart(anchor);
 					cptReconnectedFrom++;
 				}
@@ -684,29 +650,43 @@ public class InstancePattern extends AbstractPattern {
 		// a strange state, where some connections have a null source or
 		// target anchor.
 		int cptDeletedConnections = 0;
-		for (final Connection connection : inMap.values()) {
-			Graphiti.getPeService().deletePictogramElement(connection);
+		for (final Connection connection : incomingMap.values()) {
+			XdfUtil.deleteConnection(getFeatureProvider(), connection);
 			cptDeletedConnections++;
 		}
-		for (final Iterable<Connection> connectionList : outMap.values()) {
+		for (final Iterable<Connection> connectionList : outgoingMap.values()) {
 			for (final Connection connection : connectionList) {
-				final DeleteContext context = new DeleteContext(connection);
-				// We don't want to prompt user for each connection deletion
-				context.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 1));
-
-				final IDeleteFeature feature = getFeatureProvider()
-						.getDeleteFeature(context);
-				if (feature.canDelete(context)) {
-					feature.execute(context);
-				}
+				XdfUtil.deleteConnection(getFeatureProvider(), connection);
 				cptDeletedConnections++;
+			}
+		}
+
+		// Specific case: if this method is executed by update() after a port
+		// renaming outside the diagram editor, the previous block has not
+		// completely deleted invalid connections.
+		// The linked net.sf.orcc.sf.Connection has an URI relative to its
+		// container (Actor or Network). This URI uses the source / target port
+		// name. But at this point, the port name doesn't exists anymore. The
+		// businessObject linked from diagram connection pictogram became a
+		// proxy when the old port has been removed from the diagram.
+		// To completely delete invalid connections from the network, we must
+		// check for invalid objects in source port or target port of each
+		// connection.
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+		final List<net.sf.orcc.df.Connection> connectionsCopy = new ArrayList<net.sf.orcc.df.Connection>(
+				network.getConnections());
+		for (net.sf.orcc.df.Connection dfConnection : connectionsCopy) {
+			final Port src = dfConnection.getSourcePort();
+			final Port tgt = dfConnection.getTargetPort();
+			if ((src != null && src.eIsProxy())
+					|| (tgt != null && tgt.eIsProxy())) {
+				EcoreUtil.delete(dfConnection);
 			}
 		}
 
 		// Build a complete message to inform user about what happened exactly
 		final StringBuilder infoMsg = new StringBuilder();
-		infoMsg.append("The refinement for instance \""
-				+ instance.getSimpleName() + "\" has been updated:").append('\n');
+		infoMsg.append(message).append('\n');
 
 		if (cptReconnectedTo > 0) {
 			infoMsg.append(cptReconnectedTo)
@@ -726,8 +706,7 @@ public class InstancePattern extends AbstractPattern {
 
 		// Inform the user about what happened
 		MessageDialog.openInformation(XdfUtil.getDefaultShell(),
-				"Refinement update finished", infoMsg.toString());
-		return true;
+				"Instance update finished", infoMsg.toString());
 	}
 
 	/**

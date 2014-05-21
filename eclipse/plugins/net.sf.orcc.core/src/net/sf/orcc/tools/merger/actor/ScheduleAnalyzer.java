@@ -3,6 +3,8 @@ package net.sf.orcc.tools.merger.actor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
+
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
@@ -11,8 +13,6 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.util.OrccLogger;
-
-import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
  * This analyzes a given schedule to discover
@@ -26,24 +26,30 @@ public class ScheduleAnalyzer extends BufferSizer {
 
 	protected Map<Port, Var> buffersMap = new HashMap<Port, Var>();
 
-	public ScheduleAnalyzer(Network network) {
+	int totalBalance = 0;
+	
+	Copier copier;
+	
+	public ScheduleAnalyzer(Network network, Copier copier) {
 		super(network);
+		this.copier = copier;
 	}
 	
-	public void analyze(Actor superActor, Schedule schedule, Copier copier) {
+	public boolean analyze(Actor superActor, Schedule schedule) {
 		createBuffers(getMaxTokens(schedule));
+		createBuffers(getMinTokens(schedule));
 		for (Iterand iterand : schedule.getIterands()) {
 			processInputs(iterand.getAction());
 			processOutputs(iterand.getAction());
 		}
-		checkBufferBalance(superActor, copier);
+		return totalBalance < 0;
 	}
 
 	private void createBuffers(Map<Connection, Integer> maxTokens) {
 		int index = 0;
 		for (Connection conn : maxTokens.keySet()) {
 			int size = maxTokens.get(conn);
-			if (size > 0) {
+			if (size != 0) {
 				String name = "buffer_" + index++;
 				Var buffer = IrFactory.eINSTANCE.createVar(
 						IrFactory.eINSTANCE.createTypeList(size,
@@ -65,17 +71,6 @@ public class ScheduleAnalyzer extends BufferSizer {
 	private void processOutputs(Action action) {
 		for (Port source : action.getOutputPattern().getPorts()) {
 			accessBuffer(source, true, action.getOutputPattern().getNumTokens(source));
-			Actor sourceActor = MergerUtil.getOwningActor(network, action, source);
-			if (sourceActor.getOutgoingPortMap().get(source).size() > 1) {
-				for (Connection c : sourceActor.getOutgoingPortMap().get(source)) {
-					Port target = c.getTargetPort();
-					if (target != null) {
-						if (buffersMap.get(target) != buffersMap.get(source)) {
-							accessBuffer(target, true, action.getOutputPattern().getNumTokens(source));
-						}
-					}
-				}
-			}
 		}
 	}
 
@@ -93,22 +88,24 @@ public class ScheduleAnalyzer extends BufferSizer {
 	private void incrementBufferAccess(Var var, int count) {
 		var.setAttribute("rwBalance", new Integer((
 				(Integer)var.getValueAsObject("rwBalance")).intValue() + count));
+		totalBalance += count;
 	}
 
 	private void decrementBufferAccess(Var var, int count) {
 		var.setAttribute("rwBalance", new Integer((
 				(Integer)var.getValueAsObject("rwBalance")).intValue() - count));
+		totalBalance -= count;
 	}
 
-	private void checkBufferBalance(Actor superActor, Copier copier) {
+	public void markInternalFifos(Actor superActor, boolean fullFifos) {
 		for (Actor actor : network.getAllActors()) {
 			for (Port port : actor.getOutputs()) {
 				Var buffer = buffersMap.get(port);
 				if (buffer != null) {
 					if (queryBufferAccess(buffer) > 0) {
-						OrccLogger.traceln("Info: assumed feedback starting from "
+						OrccLogger.traceln("Info: generating internal FIFO starting from "
 								+ port.getName());
-						externalizeConnection(superActor, actor, port, copier);
+						externalizeConnection(superActor, actor, port, fullFifos);
 					}
 				}
 			}
@@ -123,45 +120,45 @@ public class ScheduleAnalyzer extends BufferSizer {
 	}
 
 	private void externalizeConnection(Actor superActor, Actor actor, 
-			Port port, Copier copier) {
-		if (actor.getOutgoingPortMap().get(port).size() > 1) {
-			OrccLogger.traceln("Warning: could not externalize connection starting from port"
-					+ port.getName());
-			OrccLogger.traceln(port.getName() + " as it is a broadcast");
-			return;
-		}
+			Port port, boolean fullFifos) {
 		Connection connection = actor.getOutgoingPortMap().get(port).get(0);
 		// this is the 'port' of 'actor'
-		copyOutputPortIfNotFound(superActor, actor, connection.getSourcePort(), 
-				copier, connection.getTargetPort());
+		copyOutputPortIfNotFound(superActor, actor, connection.getSourcePort(),
+				fullFifos, connection.getTargetPort());
 		// this is the remote port of another actor
 		copyInputPortIfNotFound(superActor, 
 				connection.getTarget().getAdapter(Actor.class),
-				connection.getTargetPort(), copier);
+				connection.getTargetPort(), fullFifos);
 	}
 	
 	private void copyInputPortIfNotFound(Actor superActor, Actor actor, 
-			Port port, Copier copier) {
+			Port port, boolean fullFifos) {
 		for (Port in : superActor.getInputs()) {
 			if (in.getName().equals(port.getName())) {
 				return;
 			}
 		}
 		port.addAttribute("externalized");
-		superActor.getInputs().add((Port)copier.copy(port));
+		if (fullFifos) {
+			port.addAttribute("externalFifo");
+			superActor.getInputs().add((Port)copier.copy(port));
+		}
 	}
 
 	private void copyOutputPortIfNotFound(Actor superActor, Actor actor, 
-			Port port, Copier copier, Port target) {
+			Port port, boolean fullFifos, Port target) {
 		for (Port out : superActor.getOutputs()) {
 			if (out.getName().equals(port.getName())) {
 				return;
 			}
 		}
 		port.addAttribute("externalized");
-		port.addAttribute("targetPort");
-		port.setAttribute("targetPort", target.getName());
-		superActor.getOutputs().add((Port)copier.copy(port));
+		if (fullFifos) {
+			port.addAttribute("externalFifo");
+			port.addAttribute("targetPort");
+			port.setAttribute("targetPort", target.getName());
+			superActor.getOutputs().add((Port)copier.copy(port));
+		}
 	}
 	
 }

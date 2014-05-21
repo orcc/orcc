@@ -30,6 +30,8 @@ package net.sf.orcc.backends.c;
 
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
+import static net.sf.orcc.backends.BackendsConstants.BXDF_FILE;
+import static net.sf.orcc.backends.BackendsConstants.IMPORT_BXDF;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
+import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
@@ -78,6 +81,7 @@ import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
+import net.sf.orcc.tools.mapping.XmlBufferSizeConfiguration;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.tools.stats.StatisticsPrinter;
@@ -102,7 +106,7 @@ public class CBackend extends AbstractBackend {
 	 * Path to target "src" folder
 	 */
 	protected String srcPath;
-	
+
 	@Override
 	protected void doInitializeOptions() {
 		// Create empty folders
@@ -111,12 +115,13 @@ public class CBackend extends AbstractBackend {
 
 		srcPath = path + File.separator + "src";
 	}
-	
+
 	@Override
 	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
 		replacementMap.put("abs", "abs_replaced");
 		replacementMap.put("getw", "getw_replaced");
+		replacementMap.put("exit", "exit_replaced");
 		replacementMap.put("index", "index_replaced");
 		replacementMap.put("log2", "log2_replaced");
 		replacementMap.put("max", "max_replaced");
@@ -125,7 +130,7 @@ public class CBackend extends AbstractBackend {
 		replacementMap.put("OUT", "OUT_REPLACED");
 		replacementMap.put("IN", "IN_REPLACED");
 		replacementMap.put("SIZE", "SIZE_REPLACED");
-		
+
 		if (mergeActions) {
 			new ActionMerger().doSwitch(actor);
 		}
@@ -188,6 +193,9 @@ public class CBackend extends AbstractBackend {
 	}
 
 	protected void doTransformNetwork(Network network) {
+		if (mergeActors) {
+			new BroadcastAdder().doSwitch(network);
+		}
 		OrccLogger.traceln("Instantiating...");
 		new Instantiator(true, fifoSize).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
@@ -201,10 +209,17 @@ public class CBackend extends AbstractBackend {
 		if (mergeActors) {
 			OrccLogger.traceln("Merging of actors...");
 			new ActorMerger().doSwitch(network);
+		} else {
+			new CBroadcastAdder().doSwitch(network);
 		}
 
-		new CBroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
+
+		// if required, load the buffer size from the mapping file
+		if (getAttribute(IMPORT_BXDF, false)) {
+			File f = new File(getAttribute(BXDF_FILE, ""));
+			new XmlBufferSizeConfiguration().load(f, network);
+		}
 	}
 
 	@Override
@@ -216,7 +231,7 @@ public class CBackend extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
-		
+
 		doTransformNetwork(network);
 
 		if (debug) {
@@ -272,20 +287,23 @@ public class CBackend extends AbstractBackend {
 					libsPath, debug);
 			if (orccOk) {
 				OrccLogger.traceRaw("OK" + "\n");
-				new File(libsPath + File.separator + "orcc" + File.separator
-						+ "benchAutoMapping.py").setExecutable(true);
 			} else {
 				OrccLogger.warnRaw("Error" + "\n");
 			}
 
-			final String commonLibPath = libsPath + File.separator + "orcc"
-					+ File.separator + "common";
-			OrccLogger.trace("Export common library files into "
-					+ commonLibPath + "... ");
-			final boolean commonOk = copyFolderToFileSystem("/runtime/common",
-					commonLibPath, debug);
+			String scriptsPath = path + File.separator + "scripts";
+			OrccLogger.trace("Export scripts into " + scriptsPath + "... ");
+			
+			boolean commonOk = copyFolderToFileSystem(
+					"/runtime/common/scripts", scriptsPath, debug)
+					&& copyFolderToFileSystem("/runtime/C/scripts",
+							scriptsPath, debug);
 			if (commonOk) {
 				OrccLogger.traceRaw("OK" + "\n");
+				new File(scriptsPath + File.separator + "profilingAnalyse.py")
+						.setExecutable(true);
+				new File(scriptsPath + File.separator + "benchAutoMapping.py")
+						.setExecutable(true);
 			} else {
 				OrccLogger.warnRaw("Error" + "\n");
 			}

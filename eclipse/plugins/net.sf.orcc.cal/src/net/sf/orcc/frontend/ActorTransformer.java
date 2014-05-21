@@ -54,6 +54,7 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
+import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.df.Action;
@@ -78,6 +79,7 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -103,10 +105,128 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	private int untaggedCount;
 
+	final StructTransformer structTransformer;
+
 	/**
 	 * Creates a new AST to IR transformation.
 	 */
 	public ActorTransformer() {
+		structTransformer = new StructTransformer();
+	}
+
+	/**
+	 * Transforms the given AST Actor to an IR actor.
+	 * 
+	 * @param astActor
+	 *            the AST of the actor
+	 * @return the actor in IR form
+	 */
+	@Override
+	public Actor caseAstActor(AstActor astActor) {
+
+		untaggedCount = 0;
+
+		Actor actor = DfFactory.eINSTANCE.createActor();
+		Frontend.instance.putMapping(astActor, actor);
+
+		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
+
+		int lineNumber = Util.getLocation(astActor);
+		actor.setLineNumber(lineNumber);
+
+		// parameters
+		for (Variable variable : astActor.getParameters()) {
+			final Var var = (Var) structTransformer.doSwitch(variable);
+			actor.getParameters().add(var);
+		}
+
+		// state variables
+		for (Variable variable : astActor.getStateVariables()) {
+			final Var var = (Var) structTransformer.doSwitch(variable);
+			actor.getStateVars().add(var);
+		}
+
+		// Create empty stubs for functions and procedures
+		// This tip will allow to call a function/procedure declared later
+		for (Function function : astActor.getFunctions()) {
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+					function.getName(), 0, Typer.getType(function));
+			Frontend.instance.putMapping(function, procedure);
+			actor.getProcs().add(procedure);
+		}
+		for (AstProcedure astProcedure : astActor.getProcedures()) {
+			final Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+					astProcedure.getName(), 0, Typer.getType(astProcedure));
+			Frontend.instance.putMapping(astProcedure, procedure);
+			actor.getProcs().add(procedure);
+		}
+
+		// Really transform functions / procedures
+		for (Function function : astActor.getFunctions()) {
+			structTransformer.doSwitch(function);
+		}
+		for (AstProcedure astProcedure : astActor.getProcedures()) {
+			structTransformer.doSwitch(astProcedure);
+		}
+
+		// transform ports
+		for (AstPort astPort : astActor.getInputs()) {
+			final Port port = (Port) structTransformer.doSwitch(astPort);
+			actor.getInputs().add(port);
+		}
+		for (AstPort astPort : astActor.getOutputs()) {
+			final Port port = (Port) structTransformer.doSwitch(astPort);
+			actor.getOutputs().add(port);
+		}
+
+		// transform actions
+		ActionList actions = transformActions(astActor.getActions());
+
+		// transform initializes
+		ActionList initializes = transformActions(astActor.getInitializes());
+
+		// sort actions by priority
+		ActionSorter sorter = new ActionSorter(actions);
+		ActionList sortedActions = sorter.applyPriority(astActor
+				.getPriorities());
+
+		// transform FSM
+		ScheduleFsm schedule = astActor.getScheduleFsm();
+		RegExp scheduleRegExp = astActor.getScheduleRegExp();
+		if (schedule == null && scheduleRegExp == null) {
+			actor.getActionsOutsideFsm().addAll(sortedActions.getAllActions());
+		} else {
+			FSM fsm = null;
+			if (schedule != null) {
+				FSMBuilder builder = new FSMBuilder();
+				fsm = builder.buildFSM(schedule.getContents(), sortedActions);
+
+				// set initial state
+				AstState initialState = schedule.getInitialState();
+				State state = (State) Frontend.instance
+						.getMapping(initialState);
+				fsm.setInitialState(state);
+			} else {
+				RegExpConverter converter = new RegExpConverter(scheduleRegExp);
+				fsm = converter.convert(sortedActions);
+			}
+
+			actor.getActionsOutsideFsm().addAll(
+					sortedActions.getUntaggedActions());
+			actor.setFsm(fsm);
+		}
+
+		// create IR actor
+		AstEntity entity = (AstEntity) astActor.eContainer();
+		actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
+		actor.setNative(Util.hasAnnotation("native", entity.getAnnotations()));
+
+		Util.transformAnnotations(actor, entity.getAnnotations());
+
+		actor.getActions().addAll(actions.getAllActions());
+		actor.getInitializes().addAll(initializes.getAllActions());
+
+		return actor;
 	}
 
 	/**
@@ -136,7 +256,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				indexes.add(eINSTANCE.createExprInt(i));
 				int lineNumber = portVariable.getLineNumber();
 
-				Var irToken = Frontend.getMapping(token);
+				Var irToken = Frontend.instance.getMapping(token);
 				InstLoad load = eINSTANCE.createInstLoad(lineNumber, irToken,
 						portVariable, indexes);
 				procedure.getLast().add(load);
@@ -145,7 +265,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			}
 		} else if (tokens.size() == 1) {
 			Variable token = tokens.get(0);
-			Frontend.putMapping(token, portVariable);
+			Frontend.instance.putMapping(token, portVariable);
 		} else {
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
@@ -179,7 +299,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 						portVariable, indexes);
 				block.add(load);
 
-				Var irToken = Frontend.getMapping(token);
+				Var irToken = Frontend.instance.getMapping(token);
 
 				indexes = new ArrayList<Expression>(1);
 				indexes.add(eINSTANCE.createExprVar(loopVar));
@@ -197,20 +317,20 @@ public class ActorTransformer extends CalSwitch<Actor> {
 							loopVar.getType()));
 			block.add(assign);
 
-			// create while node
+			// create while block
 			Expression condition = eINSTANCE
 					.createExprBinary(eINSTANCE.createExprVar(loopVar),
 							OpBinary.LT, eINSTANCE.createExprInt(repeat),
 							eINSTANCE.createTypeBool());
-			List<Block> nodes = new ArrayList<Block>(1);
-			nodes.add(block);
+			List<Block> blocks = new ArrayList<Block>(1);
+			blocks.add(block);
 
-			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
-			nodeWhile.setCondition(condition);
-			nodeWhile.getBlocks().addAll(nodes);
+			BlockWhile blockWhile = eINSTANCE.createBlockWhile();
+			blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
+			blockWhile.setCondition(condition);
+			blockWhile.getBlocks().addAll(blocks);
 
-			procedure.getBlocks().add(nodeWhile);
+			procedure.getBlocks().add(blockWhile);
 		}
 	}
 
@@ -248,7 +368,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			// use directly the port variable
 			Variable variable = ((ExpressionVariable) values.get(0)).getValue()
 					.getVariable();
-			Var old = Frontend.getMapping(variable);
+			Var old = Frontend.instance.getMapping(variable);
 			// replace the use/def of the old variable without moving the new
 			// one from its containing pattern
 			for (Def def : new ArrayList<Def>(old.getDefs())) {
@@ -257,7 +377,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			for (Use use : new ArrayList<Use>(old.getUses())) {
 				use.setVariable(portVariable);
 			}
-			Frontend.putMapping(variable, portVariable);
+			Frontend.instance.putMapping(variable, portVariable);
 			EcoreUtil.remove(old);
 		} else {
 			// creates loop variable and initializes it
@@ -309,125 +429,19 @@ public class ActorTransformer extends CalSwitch<Actor> {
 							loopVar.getType()));
 			block.add(assign);
 
-			// create while node
+			// create while block
 			Expression condition = eINSTANCE
 					.createExprBinary(eINSTANCE.createExprVar(loopVar),
 							OpBinary.LT, eINSTANCE.createExprInt(repeat),
 							eINSTANCE.createTypeBool());
 
-			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
-			nodeWhile.setCondition(condition);
-			nodeWhile.getBlocks().add(block);
+			BlockWhile blockWhile = eINSTANCE.createBlockWhile();
+			blockWhile.setJoinBlock(eINSTANCE.createBlockBasic());
+			blockWhile.setCondition(condition);
+			blockWhile.getBlocks().add(block);
 
-			procedure.getBlocks().add(nodeWhile);
+			procedure.getBlocks().add(blockWhile);
 		}
-	}
-
-	/**
-	 * Transforms the given AST Actor to an IR actor.
-	 * 
-	 * @param astActor
-	 *            the AST of the actor
-	 * @return the actor in IR form
-	 */
-	@Override
-	public Actor caseAstActor(AstActor astActor) {
-		Actor actor = DfFactory.eINSTANCE.createActor();
-		Frontend.putMapping(astActor, actor);
-
-		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
-		actor.setAttribute("project", Util.getProjectName(astActor));
-
-		int lineNumber = Util.getLocation(astActor);
-		actor.setLineNumber(lineNumber);
-
-		// parameters
-		for (Variable variable : astActor.getParameters()) {
-			Var var = Frontend.getMapping(variable, false);
-			actor.getParameters().add(var);
-		}
-
-		// state variables
-		for (Variable variable : astActor.getStateVariables()) {
-			Var var = Frontend.getMapping(variable, false);
-			actor.getStateVars().add(var);
-		}
-
-		// functions
-		for (Function function : astActor.getFunctions()) {
-			String fnName = function.getName();
-			if ("print".equals(fnName) || "println".equals(fnName)) {
-				continue;
-			}
-			Procedure procedure = Frontend.getMapping(function, false);
-			actor.getProcs().add(procedure);
-		}
-
-		// procedures
-		for (AstProcedure astProcedure : astActor.getProcedures()) {
-			Procedure procedure = Frontend.getMapping(astProcedure, false);
-			actor.getProcs().add(procedure);
-		}
-
-		// transform ports
-		for (AstPort astPort : astActor.getInputs()) {
-			Port port = Frontend.getMapping(astPort, false);
-			actor.getInputs().add(port);
-		}
-		for (AstPort astPort : astActor.getOutputs()) {
-			Port port = Frontend.getMapping(astPort, false);
-			actor.getOutputs().add(port);
-		}
-
-		// transform actions
-		ActionList actions = transformActions(astActor.getActions());
-
-		// transform initializes
-		ActionList initializes = transformActions(astActor.getInitializes());
-
-		// sort actions by priority
-		ActionSorter sorter = new ActionSorter(actions);
-		ActionList sortedActions = sorter.applyPriority(astActor
-				.getPriorities());
-
-		// transform FSM
-		ScheduleFsm schedule = astActor.getScheduleFsm();
-		RegExp scheduleRegExp = astActor.getScheduleRegExp();
-		if (schedule == null && scheduleRegExp == null) {
-			actor.getActionsOutsideFsm().addAll(sortedActions.getAllActions());
-		} else {
-			FSM fsm = null;
-			if (schedule != null) {
-				FSMBuilder builder = new FSMBuilder();
-				fsm = builder.buildFSM(schedule.getContents(), sortedActions);
-
-				// set initial state
-				AstState initialState = schedule.getInitialState();
-				State state = (State) Frontend.getMapping(initialState, false);
-				fsm.setInitialState(state);
-			} else {
-				RegExpConverter converter = new RegExpConverter(scheduleRegExp);
-				fsm = converter.convert(sortedActions);
-			}
-
-			actor.getActionsOutsideFsm().addAll(
-					sortedActions.getUntaggedActions());
-			actor.setFsm(fsm);
-		}
-
-		// create IR actor
-		AstEntity entity = (AstEntity) astActor.eContainer();
-		actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
-		actor.setNative(Util.hasAnnotation("native", entity.getAnnotations()));
-		Util.transformAnnotations(actor, entity.getAnnotations());
-		actor.getActions().addAll(actions.getAllActions());
-		actor.getInitializes().addAll(initializes.getAllActions());
-
-		// serialize actor and cache
-		Frontend.instance.serialize(actor);
-
-		return actor;
 	}
 
 	/**
@@ -495,17 +509,20 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			return true;
 		}
 		// Input port variables have to be copied as well
-		Var var = Frontend.getMapping(variable);
+		Var var = Frontend.instance.getMapping(variable);
 		if (EcoreHelper.getContainerOfType(var, Pattern.class) != null) {
 			return true;
 		}
 		// Variables used by a procedure have to be copied as well
-		for(Use use: var.getUses()) {
-			if(EcoreHelper.getContainerOfType(use, InstCall.class) != null) {
+		for (Use use : var.getUses()) {
+			if (EcoreHelper.getContainerOfType(use, InstCall.class) != null) {
+				// Mark the variable as a local copy of port variable to allow
+				// later optimizations (at backend-level)
+				var.addAttribute("copyOfTokens");
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -712,12 +729,12 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		if (astPattern instanceof InputPattern) {
 			InputPattern pattern = ((InputPattern) astPattern);
 			astRepeat = pattern.getRepeat();
-			port = Frontend.getMapping(pattern.getPort());
+			port = Frontend.instance.getMapping(pattern.getPort());
 			totalConsumption = pattern.getTokens().size();
 		} else {
 			OutputPattern pattern = ((OutputPattern) astPattern);
 			astRepeat = pattern.getRepeat();
-			port = Frontend.getMapping(pattern.getPort());
+			port = Frontend.instance.getMapping(pattern.getPort());
 			totalConsumption = pattern.getValues().size();
 		}
 

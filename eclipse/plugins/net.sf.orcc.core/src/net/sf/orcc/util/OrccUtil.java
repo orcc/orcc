@@ -39,8 +39,12 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import net.sf.orcc.OrccProjectNature;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -53,6 +57,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.Diagnostician;
 import org.eclipse.jdt.core.IJavaProject;
@@ -65,9 +70,26 @@ import org.eclipse.jdt.core.JavaModelException;
  * This class contains utility methods for dealing with resources.
  * 
  * @author Matthieu Wipliez
+ * @author Antoine Lorence
  * 
  */
 public class OrccUtil {
+
+	public static final String IR_SUFFIX = "ir";
+	public static final String CAL_SUFFIX = "cal";
+	public static final String NETWORK_SUFFIX = "xdf";
+	public static final String DIAGRAM_SUFFIX = "xdfdiag";
+
+	public static final String PROJECT_OUTPUT_DIR = "bin";
+
+	private static IWorkspaceRoot workspaceRoot;
+
+	public static IWorkspaceRoot workspaceRoot() {
+		if (workspaceRoot == null) {
+			workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		}
+		return workspaceRoot;
+	}
 
 	/**
 	 * Creates a new file if needed and returns its path
@@ -158,20 +180,52 @@ public class OrccUtil {
 		return newPath;
 	}
 
-	private static void findFiles(String fileExt, List<IFile> vtlFiles,
-			IFolder vtl) throws CoreException {
-		for (IResource resource : vtl.members()) {
+	/**
+	 * Search in given folder for files resources with given suffix, and add
+	 * them to the given files list
+	 * 
+	 * @param suffix
+	 * @param files
+	 * @param folder
+	 * @throws CoreException
+	 */
+	private static void findFiles(final String suffix, final List<IFile> files,
+			final IFolder folder) throws CoreException {
+		for (IResource resource : folder.members()) {
 			if (resource.getType() == IResource.FOLDER) {
-				findFiles(fileExt, vtlFiles, (IFolder) resource);
+				findFiles(suffix, files, (IFolder) resource);
 			} else if (resource.getType() == IResource.FILE
-					&& resource.getFileExtension().equals(fileExt)) {
-				vtlFiles.add((IFile) resource);
+					&& resource.getFileExtension().equals(suffix)) {
+				files.add((IFile) resource);
 			}
 		}
 	}
 
 	/**
-	 * Returns all the files with the given extension in the given folders.
+	 * Returns the list of IFolder containing:
+	 * <ul>
+	 * <li>Source folders of the given project</li>
+	 * <li>Source folders of the projects depending on the given project</li>
+	 * </ul>
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public static List<IFolder> getAllDependingSourceFolders(
+			final IProject project) {
+		final List<IFolder> srcFolders = new ArrayList<IFolder>();
+		srcFolders.addAll(getSourceFolders(project));
+
+		for (final IProject dependingProject : getReferencingProjects(project)) {
+			srcFolders.addAll(getSourceFolders(dependingProject));
+		}
+
+		return srcFolders;
+	}
+
+	/**
+	 * Returns all the files with the given extension found in the given
+	 * folders.
 	 * 
 	 * @param srcFolders
 	 *            a list of folders
@@ -203,8 +257,11 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Returns the list of ALL source folders of the required projects as well
-	 * as of the given project as a list of absolute workspace paths.
+	 * Returns the list of IFolder containing:
+	 * <ul>
+	 * <li>Source folders of the given project</li>
+	 * <li>Source folders of the projects the given project depends on</li>
+	 * </ul>
 	 * 
 	 * @param project
 	 *            a project
@@ -236,15 +293,22 @@ public class OrccUtil {
 		return srcFolders;
 	}
 
-	public static String getContents(InputStream in) throws IOException {
+	/**
+	 * Read the given stream and return its content as a String
+	 * 
+	 * @param stream
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getContents(InputStream stream) throws IOException {
 		StringBuilder builder = new StringBuilder();
-		int n = in.available();
+		int n = stream.available();
 		while (n > 0) {
 			byte[] bytes = new byte[n];
-			n = in.read(bytes);
+			n = stream.read(bytes);
 			String str = new String(bytes, 0, n);
 			builder.append(str);
-			n = in.available();
+			n = stream.available();
 		}
 
 		return builder.toString();
@@ -330,19 +394,7 @@ public class OrccUtil {
 	 *         none is found
 	 */
 	public static IFolder getOutputFolder(IProject project) {
-		IJavaProject javaProject = JavaCore.create(project);
-		if (!javaProject.exists()) {
-			return null;
-		}
-
-		IPath path;
-		try {
-			path = javaProject.getOutputLocation();
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			return root.getFolder(path);
-		} catch (JavaModelException e) {
-			return null;
-		}
+		return project.getFolder(PROJECT_OUTPUT_DIR);
 	}
 
 	/**
@@ -468,6 +520,48 @@ public class OrccUtil {
 	}
 
 	/**
+	 * Returns a list of projects which depends on the given project.
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public static Set<IProject> getReferencingProjects(final IProject project) {
+
+		final Set<IProject> result = new HashSet<IProject>();
+		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
+		// Check all projects in the workspace root
+		for (final IProject wpProject : wpRoot.getProjects()) {
+			try {
+				// Keep only open Orcc projects, different from the given
+				// project
+				if (!wpProject.isOpen()
+						|| !project.hasNature(OrccProjectNature.NATURE_ID)
+						|| wpProject == project) {
+					continue;
+				}
+				// Keep only valid Java projects
+				final IJavaProject wpJavaProject = JavaCore.create(wpProject);
+				if (!wpJavaProject.exists()) {
+					// This should never happen
+					continue;
+				}
+				// Loop over all classpath entries of the wpJavaProject
+				for (final String requiredProject : wpJavaProject
+						.getRequiredProjectNames()) {
+					// The wpJavaProject require the given IProject
+					if (wpRoot.getProject(requiredProject).equals(project)) {
+						result.add(wpProject);
+					}
+				}
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * Returns the list of source folders of the given project as a list of
 	 * absolute workspace paths.
 	 * 
@@ -543,6 +637,42 @@ public class OrccUtil {
 		}
 
 		return builder.toString();
+	}
+
+	/**
+	 * Checks if the String contains only unicode digits. A decimal point is not
+	 * a unicode digit and returns false. <code>null</code> will return <code>false</code>.
+	 * An empty String (length()=0) will return <code>true</code>.
+	 * 
+	 * NOTE: method taken from the apache common lang library (scb)
+	 * 
+	 * <pre>
+	 *      StringUtils.isNumeric(null)   = false
+	 *      StringUtils.isNumeric("")     = true
+	 *      StringUtils.isNumeric("  ")   = false
+	 *      StringUtils.isNumeric("123")  = true
+	 *      StringUtils.isNumeric("12 3") = false
+	 *      StringUtils.isNumeric("ab2c") = false
+	 *      StringUtils.isNumeric("12-3") = false
+	 *      StringUtils.isNumeric("12.3") = false
+	 * </pre>
+	 * 
+	 * @param str
+	 *            the String to check, may be <code>null</code>
+	 * @return if only contains digits, and is non-<code>null</code>
+	 */
+	public static boolean isNumeric(final String str) {
+		if (str == null || str.isEmpty()) {
+			return false;
+		}
+
+		final int sz = str.length();
+		for (int i = 0; i < sz; i++) {
+			if (Character.isDigit(str.charAt(i)) == false) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -675,5 +805,50 @@ public class OrccUtil {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Compute the URI of an IR file corresponding to the given cal file URI
+	 * 
+	 * @param calUri
+	 * @return
+	 */
+	public static URI getIrUri(final URI calUri) {
+		// Get the given URI as IFile instance
+		final IFile file = workspaceRoot().getFile(
+				new Path(calUri.toPlatformString(true)));
+		// Get the path relative to project source folder, update suffix
+		final IPath sourceRelativePath = file.getProjectRelativePath()
+				.removeFirstSegments(1).removeFileExtension()
+				.addFileExtension(IR_SUFFIX);
+		// Build the IR path, from project output folder
+		final IPath irPath = getOutputFolder(file.getProject()).getFile(
+				sourceRelativePath).getFullPath();
+
+		return URI.createPlatformResourceURI(irPath.toString(), true);
+	}
+
+	/**
+	 * If the given path starts with '~' char, returns a copy after replacing
+	 * the character by the current user HOME directory.
+	 * 
+	 * In other cases, return the given path.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String resolveFromHome(final String path) {
+
+		if (path == null || path.isEmpty()) {
+			return path;
+		}
+
+		if (path.charAt(0) == '~') {
+			final StringBuilder builder = new StringBuilder(
+					System.getProperty("user.home"));
+			builder.append(File.separatorChar).append(path.substring(1));
+			return builder.toString();
+		}
+		return path;
 	}
 }

@@ -50,7 +50,7 @@ public class XdfImageProvider extends AbstractImageProvider {
 
 		addImageFilePath(NETWORK, "icons/network.gif");
 		addImageFilePath(ACTOR, "icons/orcc.png");
-		addImageFilePath(CONNECTION, "icons/add_connection_20.png");
+		addImageFilePath(CONNECTION, "icons/FatCow_Icons16x16/link_add.png");
 
 	}
 

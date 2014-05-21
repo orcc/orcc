@@ -457,7 +457,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 	@Override
 	public Boolean caseStatementCall(StatementCall call) {
-		for (AstExpression parameter : call.getParameters()) {
+		for (AstExpression parameter : call.getArguments()) {
 			if (doSwitch(parameter)) {
 				return true;
 			}

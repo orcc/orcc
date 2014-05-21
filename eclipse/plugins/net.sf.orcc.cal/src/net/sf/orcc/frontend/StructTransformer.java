@@ -35,7 +35,6 @@ import java.util.List;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Statement;
 import net.sf.orcc.cal.cal.Variable;
@@ -45,7 +44,6 @@ import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.State;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
@@ -75,7 +73,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 	/**
 	 * Creates a new AST to IR transformer, which will append instructions and
-	 * nodes to the given procedure.
+	 * blocks to the given procedure.
 	 * 
 	 * @param procedure
 	 *            a procedure
@@ -104,7 +102,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Type type = EcoreUtil.copy(Typer.getType(astPort));
 		Port port = DfFactory.eINSTANCE.createPort(type, astPort.getName(),
 				Util.hasAnnotation("native", astPort.getAnnotations()));
-		Frontend.putMapping(astPort, port);
+		Frontend.instance.putMapping(astPort, port);
 		return port;
 	}
 
@@ -118,12 +116,13 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 */
 	@Override
 	public Procedure caseAstProcedure(AstProcedure astProcedure) {
-		String name = astProcedure.getName();
-		int lineNumber = Util.getLocation(astProcedure);
 
-		// create procedure
-		procedure = eINSTANCE.createProcedure(name, lineNumber,
-				eINSTANCE.createTypeVoid());
+		// Get existing procedure
+		procedure = Frontend.instance.getMapping(astProcedure);
+		// Set attributes
+		procedure.setName(astProcedure.getName());
+		procedure.setLineNumber(Util.getLocation(astProcedure));
+		procedure.setReturnType(eINSTANCE.createTypeVoid());
 
 		// set native flag
 		if (Util.hasAnnotation("native", astProcedure.getAnnotations())) {
@@ -134,7 +133,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Util.transformAnnotations(procedure, astProcedure.getAnnotations());
 
 		// add mapping now (in case this procedure is recursive)
-		Frontend.putMapping(astProcedure, procedure);
+		Frontend.instance.putMapping(astProcedure, procedure);
 
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());
@@ -143,13 +142,6 @@ public class StructTransformer extends CalSwitch<EObject> {
 		addReturn(procedure, null);
 
 		return procedure;
-	}
-
-	@Override
-	public EObject caseAstState(AstState astState) {
-		State state = DfFactory.eINSTANCE.createState(astState.getName());
-		Frontend.putMapping(astState, state);
-		return state;
 	}
 
 	/**
@@ -162,12 +154,13 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 */
 	@Override
 	public Procedure caseFunction(Function function) {
-		String name = function.getName();
-		int lineNumber = Util.getLocation(function);
-		Type type = Typer.getType(function);
 
-		// create procedure
-		procedure = eINSTANCE.createProcedure(name, lineNumber, type);
+		// Get existing procedure
+		procedure = Frontend.instance.getMapping(function);
+		// Set attributes
+		procedure.setName(function.getName());
+		procedure.setLineNumber(Util.getLocation(function));
+		procedure.setReturnType(Typer.getType(function));
 
 		// set native flag
 		if (Util.hasAnnotation("native", function.getAnnotations())) {
@@ -178,7 +171,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Util.transformAnnotations(procedure, function.getAnnotations());
 
 		// add mapping now (in case this function is recursive)
-		Frontend.putMapping(function, procedure);
+		Frontend.instance.putMapping(function, procedure);
 
 		transformParameters(function.getParameters());
 		transformLocalVariables(function.getVariables());
@@ -228,7 +221,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Var var = eINSTANCE.createVar(lineNumber, type, name, assignable,
 				initialValue);
 		Util.transformAnnotations(var, variable.getAnnotations());
-		Frontend.putMapping(variable, var);
+		Frontend.instance.putMapping(variable, var);
 
 		return var;
 	}
@@ -258,7 +251,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 			AstIrUtil.unsetLocal(local);
 		}
 
-		Frontend.putMapping(variable, local);
+		Frontend.instance.putMapping(variable, local);
 		return local;
 	}
 
@@ -292,7 +285,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	}
 
 	/**
-	 * Transforms the given AST statements to IR instructions and/or nodes that
+	 * Transforms the given AST statements to IR instructions and/or blocks that
 	 * are added directly to the current {@link #procedure}.
 	 * 
 	 * @param statements

@@ -116,7 +116,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private String profileFolder;
 
-	private Boolean[] typeResizer = { false, false, false, false };
+	private final Boolean[] typeResizer = { false, false, false, false };
 
 	protected List<IFolder> vtlFolders;
 
@@ -265,6 +265,7 @@ public class SlowSimulator extends AbstractSimulator {
 	 */
 	protected void killDescriptors() {
 		Runnable killer = new Runnable() {
+			@Override
 			public void run() {
 				SimulatorDescriptor.killDescriptors();
 				Display.clearAll();
@@ -280,7 +281,8 @@ public class SlowSimulator extends AbstractSimulator {
 
 			interpreters = new HashMap<Actor, ActorInterpreter>();
 
-			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
+			IFile file = OrccUtil.getFile(project, xdfFile,
+					OrccUtil.NETWORK_SUFFIX);
 			ResourceSet set = new ResourceSetImpl();
 			Network network = EcoreHelper.getEObject(set, file);
 

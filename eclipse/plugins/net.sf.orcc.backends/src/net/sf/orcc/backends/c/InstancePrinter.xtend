@@ -57,6 +57,7 @@ import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
+import net.sf.orcc.ir.Param
 import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
@@ -85,21 +86,21 @@ class InstancePrinter extends CTemplate {
 
 	protected var String entityName
 
-	protected var boolean profileNetwork = false
-	protected var boolean profileActions = false
-	protected var boolean dynamicMapping = false
-	protected var boolean isActionVectorizable = false
-	protected var boolean checkArrayInbounds = false
-
+	var boolean profile = false
+	
+	var boolean inlineActors = false
+	var boolean inlineActions = false
+	
+	var boolean checkArrayInbounds = false
+	
 	var boolean newSchedul = false
-	var boolean ringTopology = false
-
+	
 	var boolean enableTrace = false
 	var String traceFolder
-	var int threadsNb = 1;
-
-	protected var inlineActors = false
-	protected var inlineActions = false
+	
+	var boolean isActionAligned = false
+	
+	var boolean debugActor = false
 
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
@@ -122,32 +123,15 @@ class InstancePrinter extends CTemplate {
 			fifoSize = 512
 		}
 
-		if (options.containsKey(PROFILE_NETWORK)) {
-			profileNetwork = options.get(PROFILE_NETWORK) as Boolean
-			if(options.containsKey(PROFILE_ACTIONS)){
-				profileActions = options.get(PROFILE_ACTIONS) as Boolean
-			}
-		}
-		if (options.containsKey(DYNAMIC_MAPPING)) {
-			dynamicMapping = options.get(DYNAMIC_MAPPING) as Boolean
+		if(options.containsKey(PROFILE)){
+			profile = options.get(PROFILE) as Boolean
 		}
 		if (options.containsKey(CHECK_ARRAY_INBOUNDS)) {
 			checkArrayInbounds = options.get(CHECK_ARRAY_INBOUNDS) as Boolean
 		}
 
-		if (options.containsKey(THREADS_NB)) {
-			if(options.get(THREADS_NB) instanceof String) {
-				threadsNb = Integer::valueOf(options.get(THREADS_NB) as String)
-			} else {
-				threadsNb = options.get(THREADS_NB) as Integer
-			}
-		}
-
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
-		}
-		if (options.containsKey(NEW_SCHEDULER_TOPOLOGY)) {
-			ringTopology = options.get(NEW_SCHEDULER_TOPOLOGY).equals("Ring")
 		}
 		if (options.containsKey(ENABLE_TRACES)) {
 			enableTrace = options.get(ENABLE_TRACES) as Boolean
@@ -213,6 +197,7 @@ class InstancePrinter extends CTemplate {
 		this.incomingPortMap = instance.incomingPortMap
 		this.outgoingPortMap = instance.outgoingPortMap
 
+		setDebug
 		buildInputPattern
 		buildTransitionPattern
 	}
@@ -224,6 +209,7 @@ class InstancePrinter extends CTemplate {
 		this.incomingPortMap = actor.incomingPortMap
 		this.outgoingPortMap = actor.outgoingPortMap
 
+		setDebug
 		buildInputPattern
 		buildTransitionPattern
 	}
@@ -233,17 +219,20 @@ class InstancePrinter extends CTemplate {
 
 		#include <stdio.h>
 		#include <stdlib.h>
+		«printAdditionalIncludes»
 		«IF checkArrayInbounds»
 			#include <assert.h>
 		«ENDIF»
+		#include "config.h"
 
 		#include "types.h"
 		#include "fifo.h"
 		#include "util.h"
 		#include "scheduler.h"
 		#include "dataflow.h"
-		«IF profileNetwork || dynamicMapping»
-			#include "cycle.h"
+		#include "cycle.h"
+		«IF profile»
+			#include "profiling.h"
 		«ENDIF»
 
 		#define SIZE «fifoSize»
@@ -251,10 +240,6 @@ class InstancePrinter extends CTemplate {
 			«instance.printAttributes»
 		«ELSE»
 			«actor.printAttributes»
-		«ENDIF»
-		«IF newSchedul»
-
-			#define RING_TOPOLOGY «IF ringTopology»1«ELSE»0«ENDIF»
 		«ENDIF»
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +250,7 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
 			«FOR port : actor.inputs»
-				«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
+				«if (incomingPortMap.get(port) != null) "extern "»fifo_«port.type.doSwitch»_t *«port.fullName»;
 			«ENDFOR»
 
 			////////////////////////////////////////////////////////////////////////////////
@@ -276,10 +261,8 @@ class InstancePrinter extends CTemplate {
 				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
 				
-				«IF profileNetwork || dynamicMapping»
-					extern connection_t connection_«entityName»_«port.name»;
-					#define rate_«port.name» connection_«entityName»_«port.name».rate
-				«ENDIF»
+				«if (incomingPortMap.get(port) != null) "extern "»connection_t connection_«entityName»_«port.name»;
+				#define rate_«port.name» connection_«entityName»_«port.name».rate
 				
 			«ENDFOR»
 			«IF enableTrace»
@@ -346,18 +329,18 @@ class InstancePrinter extends CTemplate {
 				«ENDFOR»
 			«ELSE»
 				«FOR variable : actor.parameters»
-					«variable.declareStateVar»
+					«variable.declare»
 				«ENDFOR»
 			«ENDIF»
 
 		«ENDIF»
-		«IF profileActions && profileNetwork»
+		«IF profile»
 			////////////////////////////////////////////////////////////////////////////////
 			// Action's workload for profiling
 			«FOR action : actor.actions»
-				extern action_t action_«actor.name»_«action.body.name»;
-				#define ticks_«action.body.name» action_«actor.name»_«action.body.name».ticks
-			«ENDFOR»		
+				extern action_t action_«actor.name»_«action.name»;
+				#define action_«action.name» action_«actor.name»_«action.name»
+			«ENDFOR»
 			
 		«ENDIF»
 		
@@ -365,7 +348,7 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// State variables of the actor
 			«FOR variable : actor.stateVars»
-				«variable.declareStateVar»
+				«variable.declare»
 			«ENDFOR»
 
 		«ENDIF»
@@ -387,6 +370,9 @@ class InstancePrinter extends CTemplate {
 			static enum states _FSM_state;
 
 		«ENDIF»
+		
+		«additionalDeclarations»
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// Token functions
 		«FOR port : actor.inputs»
@@ -415,14 +401,14 @@ class InstancePrinter extends CTemplate {
 
 		////////////////////////////////////////////////////////////////////////////////
 		// Initializes
-		«initializeFunction»
+		«printInitialize»
 
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		«actorScheduler»
+		«printActorScheduler»
 	'''
 
-	def protected actorScheduler() '''
+	def protected printActorScheduler() '''
 		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
@@ -524,7 +510,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	def protected printVectorizationConditions(Action action) '''
+	def protected printAlignmentConditions(Action action) '''
 		{
 			int isAligned = 1;
 			«FOR port : action.inputPattern.ports»
@@ -541,7 +527,7 @@ class InstancePrinter extends CTemplate {
 
 	def protected printStateTransition(State state, Transition trans) {
 		val output = '''
-			if («trans.action.inputPattern.checkInputPattern»isSchedulable_«trans.action.name»()) {
+			if («trans.action.inputPattern.checkInputPattern»«trans.action.scheduler.name»()) {
 				«IF !trans.action.outputPattern.empty»
 					«trans.action.outputPattern.printOutputPattern»
 						_FSM_state = my_state_«state.name»;
@@ -553,7 +539,7 @@ class InstancePrinter extends CTemplate {
 				«IF trans.action.hasAttribute(ALIGNED_ALWAYS)»
 					«trans.action.body.name»_aligned();
 				«ELSEIF trans.action.hasAttribute(ALIGNABLE)»
-					«trans.action.printVectorizationConditions»
+					«trans.action.printAlignmentConditions»
 						if (isAligned) {
 							«trans.action.body.name»_aligned();
 						} else {
@@ -595,7 +581,7 @@ class InstancePrinter extends CTemplate {
 		if (numTokens_«port.name» - index_«port.name» < «pattern.getNumTokens(port)») {
 			if( ! «entityName».sched->round_robin || i > 0) {
 				«IF incomingPortMap.containsKey(port)»
-					sched_add_schedulable(«entityName».sched, &«incomingPortMap.get(port).source.label», RING_TOPOLOGY);
+					sched_add_schedulable(«entityName».sched, &«incomingPortMap.get(port).source.label»);
 				«ENDIF»
 			}
 		}
@@ -610,32 +596,39 @@ class InstancePrinter extends CTemplate {
 		«ENDFOR»
 	'''
 
-	def protected initializeFunction() '''
+	def protected printInitialize() '''
 		«FOR init : actor.initializes»
 			«init.print()»
 		«ENDFOR»
 
 		«inline»void «entityName»_initialize(schedinfo_t *si) {
 			int i = 0;
+			«additionalInitializes»
+			«FOR port : actor.outputs.notNative»
+				write_«port.name»();
+			«ENDFOR»
 			«IF actor.hasFsm»
 				/* Set initial state to current FSM state */
 				_FSM_state = my_state_«actor.fsm.initialState.name»;
 			«ENDIF»
-			«IF !actor.initializes.nullOrEmpty»
-				«actor.initializes.printActionsScheduling»
-			«ENDIF»
-
+			«FOR initialize : actor.initializes»
+				if(«initialize.scheduler.name»()) {
+					«initialize.name»();
+				}
+			«ENDFOR»
 		finished:
-			// no read_end/write_end here!
+			«FOR port : actor.outputs.notNative»
+				write_end_«port.name»();
+			«ENDFOR»
 			return;
 		}
 	'''
 
 	def private checkConnectivy() {
-		for(port : actor.inputs.filter[!inputConneted]) {
+		for(port : actor.inputs.filter[incomingPortMap.get(it) == null]) {
 			OrccLogger::noticeln("["+entityName+"] Input port "+port.name+" not connected.")
 		}
-		for(port : actor.outputs.filter[!outputConnected]) {
+		for(port : actor.outputs.filter[outgoingPortMap.get(it).nullOrEmpty]) {
 			OrccLogger::noticeln("["+entityName+"] Output port "+port.name+" not connected.")
 		}
 	}
@@ -648,7 +641,7 @@ class InstancePrinter extends CTemplate {
 
 	def protected printActionScheduling(Action action) {
 		val output = '''
-			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+			if («action.inputPattern.checkInputPattern»«action.scheduler.name»()) {
 				«IF !action.outputPattern.empty»
 					«action.outputPattern.printOutputPattern»
 						si->num_firings = i;
@@ -659,7 +652,7 @@ class InstancePrinter extends CTemplate {
 				«IF action.hasAttribute(ALIGNED_ALWAYS)»
 					«action.body.name»_aligned();
 				«ELSEIF action.hasAttribute(ALIGNABLE)»
-					«action.printVectorizationConditions»
+					«action.printAlignmentConditions»
 						if (isAligned) {
 							«action.body.name»_aligned();
 						} else {
@@ -683,37 +676,23 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def protected printOutputPattern(Pattern pattern) {
-		'''
+	def protected printOutputPattern(Pattern outputPattern) '''
 		int stop = 0;
-		«FOR port : pattern.ports»
-			«printOutputPatternsPort(pattern, port)»
+		«FOR outPort : outputPattern.ports»
+			«var i = -1»
+			«FOR connection : outgoingPortMap.get(outPort)»
+				if («outputPattern.getNumTokens(outPort)» > SIZE_«outPort.name» - index_«outPort.name» + «outPort.fullName»->read_inds[«i = i + 1»]) {
+					stop = 1;
+					«IF newSchedul»
+						if( ! «entityName».sched->round_robin || i > 0) {
+							sched_add_schedulable(«entityName».sched, &«connection.target.label»);
+						}
+					«ENDIF»
+				}
+			«ENDFOR»
 		«ENDFOR»
 		if (stop != 0) {
-		'''
-	}
-
-	def protected printOutputPatternsPort(Pattern pattern, Port port) {
-		var i = -1
-		'''
-			«FOR successor : outgoingPortMap.get(port)»
-				«printOutputPatternPort(pattern, port, successor, i = i + 1)»
-			«ENDFOR»
-		'''
-	}
-
-	def protected printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) {
-		'''
-		if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«id»]) {
-			stop = 1;
-			«IF newSchedul»
-				if( ! «entityName».sched->round_robin || i > 0) {
-					sched_add_schedulable(«entityName».sched, &«successor.target.label», RING_TOPOLOGY);
-				}
-			«ENDIF»
-		}
-		'''
-	}
+	'''
 
 	def protected checkInputPattern(Pattern pattern)
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.getNumTokens(port)» && «ENDFOR»'''
@@ -762,6 +741,9 @@ class InstancePrinter extends CTemplate {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
+			«IF debugActor»
+				printf("-- «entityName»: «action.name»«IF isAligned» (aligned)«ENDIF»\n");
+			«ENDIF»
 			«writeTraces(action.inputPattern)»
 			«beforeActionBody»
 
@@ -794,6 +776,13 @@ class InstancePrinter extends CTemplate {
 	def protected afterActionBody() ''''''
 	def protected beforeActionBody() ''''''
 	
+	// This method can be override by other backends to print additional initializations 
+	def protected additionalInitializes()''''''
+	// This method can be override by other backends to print additional declarations 
+	def protected additionalDeclarations() ''''''
+	// This method can be override by other backends to print additional includes
+	def protected printAdditionalIncludes() ''''''
+	
 	def private writeTraces(Pattern pattern) {
 		if(!enableTrace) return ''''''
 		'''
@@ -809,37 +798,38 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 	
-	def private profileStart(Action action) '''
-		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
+	def protected profileStart(Action action) '''
+		«IF profile && !actor.initializes.contains(action)»
 			ticks tick_in = getticks();
 			ticks tick_out;
 			double diff_tick;
 		«ENDIF»
 	'''
 
-	def private profileEnd(Action action) '''
-		«IF (profileNetwork || dynamicMapping) && !actor.initializes.contains(action)»
+	def protected profileEnd(Action action) '''
+		«IF !actor.initializes.contains(action)»
 			«FOR port : action.inputPattern.ports»
 				rate_«port.name» += «action.inputPattern.getNumTokens(port)»;
 			«ENDFOR»
 		«ENDIF»
-		«IF profileActions && profileNetwork && !actor.initializes.contains(action)»
+		«IF profile && !actor.initializes.contains(action)»
 			tick_out = getticks();
 			diff_tick = elapsed(tick_out, tick_in);
-			ticks_«action.name» += diff_tick;
+			update_ticks_stats(&action_«action.name», diff_tick);
+			action_«action.name».firings++;
 		«ENDIF»
 	'''
 
 	def protected print(Action action) {
 		currentAction = action
-		isActionVectorizable = false
+		isActionAligned = false
 		'''
 		«action.scheduler.print»
 		
 		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
 			«printCore(action, false)»
 		«ENDIF»
-		«IF isActionVectorizable = action.hasAttribute(ALIGNABLE)»
+		«IF isActionAligned = action.hasAttribute(ALIGNABLE)»
 			«printCore(action, true)»
 		«ENDIF»
 		'''
@@ -850,9 +840,9 @@ class InstancePrinter extends CTemplate {
 		val optCond = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("condition")
 		val optName = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("name")
 		'''
-		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[variable.declare]») {
+		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]») {
 			«IF isOptimizable»
-				#ifdef «optCond»
+				#if «optCond»
 				«optName»(«proc.parameters.join(", ")[variable.name]»);
 				#else
 			«ENDIF»
@@ -869,21 +859,34 @@ class InstancePrinter extends CTemplate {
 		}
 		'''
 	}
-
-	def protected declareStateVar(Var variable) {
-		val varDecl =
-			if(variable.initialized && !variable.assignable && !variable.type.list) {
-				'''#define «variable.name» «variable.initialValue.doSwitch»'''
-			} else {
-				// else branch are important here, to avoid a null value in the list of concat terms
-				val const = if(!variable.assignable) '''const ''' else ''''''
-				val init = if(variable.initialized) ''' = «variable.initialValue.doSwitch»''' else ''''''
-
-				'''static «const»«variable.declare»«init»;'''
-			}
+	
+	def protected declare(Procedure proc){
+		val modifier = if(proc.native) "extern" else "static"
 		'''
-			«varDecl»
+			«IF proc.name != "print"»
+				«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]»);
+			«ENDIF»
 		'''
+	}
+
+	override protected declare(Var variable) {
+		if(variable.global && variable.initialized && !variable.assignable && !variable.type.list) {
+			'''#define «variable.name» «variable.initialValue.doSwitch»'''
+		} else {
+			val const = if(!variable.assignable && variable.global) "const "
+			val global = if(variable.global) "static "
+			val type = variable.type
+			val dims = variable.type.dimensionsExpr.printArrayIndexes
+			val init = if(variable.initialized) " = " + variable.initialValue.doSwitch
+			val end = if(variable.global) ";"
+			
+			'''«global»«const»«type.doSwitch» «variable.name»«dims»«init»«end»'''
+		}
+	}
+	
+	def protected declare(Param param) {
+		val variable = param.variable
+		'''«variable.type.doSwitch» «variable.name»«variable.type.dimensionsExpr.printArrayIndexes»'''
 	}
 
 	def private getReaderId(Port port) {
@@ -930,13 +933,17 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 
-	override caseBlockWhile(BlockWhile blockWhile)'''
-		while («blockWhile.condition.doSwitch») {
-			«FOR block : blockWhile.blocks»
-				«block.doSwitch»
-			«ENDFOR»
+	override caseBlockWhile(BlockWhile blockWhile) {
+		if(!isActionAligned || !blockWhile.hasAttribute("removableCopy")){
+			'''
+			while («blockWhile.condition.doSwitch») {
+				«FOR block : blockWhile.blocks»
+					«block.doSwitch»
+				«ENDFOR»
+			}
+			'''
 		}
-	'''
+	}
 
 	override caseBlockBasic(BlockBasic block) '''
 		«FOR instr : block.instructions»
@@ -973,7 +980,7 @@ class InstancePrinter extends CTemplate {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«IF (isActionVectorizable && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
+				«IF (isActionAligned && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_aligned_«srcPort.name» + («load.indexes.head.doSwitch»))];
 				«ELSE»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
@@ -994,7 +1001,7 @@ class InstancePrinter extends CTemplate {
 			«IF trgtPort.native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF (isActionVectorizable && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
+				«IF (isActionAligned && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
 					tokens_«trgtPort.name»[(index_aligned_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
@@ -1013,7 +1020,7 @@ class InstancePrinter extends CTemplate {
 		«IF call.print»
 			printf(«call.arguments.printfArgs.join(", ")»);
 		«ELSE»
-			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
+			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[print]»);
 		«ENDIF»
 	'''
 
@@ -1029,7 +1036,7 @@ class InstancePrinter extends CTemplate {
 	
 	override caseExprVar(ExprVar expr) {
 		val port = expr.copyOf
-		if(port != null && isActionVectorizable){
+		if(port != null && isActionAligned){
 			// If the argument is just a local copy of input/output tokens
 			// use directly the FIFO when the tokens are aligned
 			'''&tokens_«port.name»[index_aligned_«port.name»]'''
@@ -1072,7 +1079,7 @@ class InstancePrinter extends CTemplate {
 		return variable.getValueAsEObject("copyOfTokens") as Port
 	}
 
-	def private printCallArg(Arg arg) {
+	def private print(Arg arg) {
 		if(arg.byRef) {
 			"&" + (arg as ArgByRef).use.variable.name + (arg as ArgByRef).indexes.printArrayIndexes
 		} else {
@@ -1085,15 +1092,9 @@ class InstancePrinter extends CTemplate {
 
 	def private getNoInline()
 		'''«IF inlineActors»__attribute__((noinline)) «ENDIF»'''
-
-	def private isOutputConnected(Port port) {
-		// If the port has a list of output connections not defined or empty, returns false
-		!outgoingPortMap.get(port).nullOrEmpty
-	}
-
-	def private isInputConneted(Port port) {
-		// If the port has an input connection, returns true
-		incomingPortMap.get(port) != null
+		
+	def private setDebug() {
+		debugActor = actor.hasAttribute("DEBUG")
 	}
 
 	//========================================

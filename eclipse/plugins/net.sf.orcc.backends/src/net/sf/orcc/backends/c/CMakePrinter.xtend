@@ -71,8 +71,17 @@ class CMakePrinter extends CommonPrinter {
 		# Configure ouput folder for generated binary
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 		
+		# Definitions configured and used in subdirectories
+		set(extra_definitions)
+		set(extra_includes)
+		set(extra_libraries)
+		
 		# Runtime libraries inclusion
-		include_directories(libs/orcc/include)
+		include_directories(
+			${PROJECT_BINARY_DIR}/libs # to find config.h
+			libs/orcc-native/include
+			libs/orcc-runtime/include
+		)
 		
 		«addLibrariesSubdirs»
 	'''
@@ -84,6 +93,7 @@ class CMakePrinter extends CommonPrinter {
 	def protected addLibrariesSubdirs() '''
 		# Compile required libs
 		add_subdirectory(libs)
+		
 		# Compile application
 		add_subdirectory(src)
 	'''
@@ -100,10 +110,13 @@ class CMakePrinter extends CommonPrinter {
 				«child.label».c
 			«ENDFOR»
 		)
-
+		
+		
+		include_directories(${extra_includes})
+		add_definitions(${extra_definitions})
 		add_executable(«network.simpleName» ${filenames})
 
 		# Build library without any external library required
-		target_link_libraries(«network.simpleName» orcc)
+		target_link_libraries(«network.simpleName» orcc-native orcc-runtime ${extra_libraries})
 	'''
 }

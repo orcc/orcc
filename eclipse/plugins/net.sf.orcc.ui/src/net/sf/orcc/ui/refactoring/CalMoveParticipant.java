@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, IETR/INSA of Rennes
+ * Copyright (c) 2014, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,7 @@
  */
 package net.sf.orcc.ui.refactoring;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.regex.Pattern;
 
 import net.sf.orcc.util.OrccUtil;
 
@@ -41,89 +40,144 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.ltk.core.refactoring.TextChange;
-import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
-import org.eclipse.text.edits.MultiTextEdit;
-import org.eclipse.text.edits.ReplaceEdit;
 
 /**
- * This class defines a MoveParticipant for Cal actors.
+ * Perform updates when user trigger the move refactoring on a cal file (Actor
+ * or Unit)
  * 
- * @author Matthieu Wipliez
+ * @author Antoine Lorence
  * 
  */
 public class CalMoveParticipant extends MoveParticipant {
 
-	private IFile actorFile;
+	private final ChangesFactory factory;
 
-	private XdfReferencesUpdater referenceUpdater;
+	private IFile originalFile;
+	private IFile destinationFile;
+	private IFolder destination;
+
+	public CalMoveParticipant() {
+		super();
+		factory = new ChangesFactory();
+	}
+
+	@Override
+	protected boolean initialize(Object element) {
+		if (element instanceof IFile) {
+			originalFile = (IFile) element;
+			destination = (IFolder) getArguments().getDestination();
+
+			destinationFile = destination.getFile(originalFile.getName());
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String getName() {
+		return "Actor/Unit move particpant";
+	}
 
 	@Override
 	public RefactoringStatus checkConditions(IProgressMonitor pm,
 			CheckConditionsContext context) throws OperationCanceledException {
-		// create reference updater
-		referenceUpdater = new XdfReferencesUpdater(actorFile);
-		referenceUpdater.checkConditions(context);
-
 		return new RefactoringStatus();
+	}
+
+	@Override
+	public Change createPreChange(IProgressMonitor pm) throws CoreException,
+			OperationCanceledException {
+		final CompositeChange changes = new CompositeChange("Pre-move updates");
+		changes.add(getFileContentUpdatesChange());
+		return changes.getChildren().length > 0 ? changes : null;
 	}
 
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
-		Object dest = getArguments().getDestination();
-		if (dest instanceof IFolder) {
-			IFolder destFolder = (IFolder) dest;
-			IFile destFile = destFolder.getFile(actorFile.getName());
-			String oldPackage = OrccUtil.getQualifiedPackage(actorFile);
-			String newPackage = OrccUtil.getQualifiedPackage(destFile);
-			String newQualifiedName = OrccUtil.getQualifiedName(destFile);
 
-			// composite change
-			CompositeChange change = new CompositeChange("Replace package '"
-					+ oldPackage + "' by references to '" + newPackage + "'");
-
-			// change package
-			InputStream in = actorFile.getContents();
-			try {
-				String actorContents = OrccUtil.getContents(in);
-				in.close();
-				int offset = actorContents.indexOf(oldPackage);
-
-				TextChange textChange = new TextFileChange("Replace package '"
-						+ oldPackage + "' by references to '" + newPackage
-						+ "'", destFile);
-				change.add(textChange);
-
-				ReplaceEdit edit = new ReplaceEdit(offset, oldPackage.length(),
-						newPackage);
-
-				// necessary
-				MultiTextEdit multiEdit = new MultiTextEdit();
-				textChange.setEdit(multiEdit);
-				multiEdit.addChild(edit);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			change.add(referenceUpdater.createChange(newQualifiedName));
-			return change;
-		}
-
-		return null;
+		final CompositeChange changes = new CompositeChange("Post-move updates");
+		changes.add(getNetworksContentUpdatesChanges());
+		changes.add(getDiagramsContentUpdatesChanges());
+		changes.add(getOtherCalContentUpdatesChanges());
+		return changes.getChildren().length > 0 ? changes : null;
 	}
 
-	@Override
-	public String getName() {
-		return "Cal move participant";
+	/**
+	 * Update the moved cal file
+	 * 
+	 * @return
+	 */
+	private Change getFileContentUpdatesChange() {
+		factory.clearReplacementMaps();
+
+		final String originalPackage = OrccUtil
+				.getQualifiedPackage(originalFile);
+		final String destinationPackage = OrccUtil
+				.getQualifiedPackage(destinationFile);
+
+		final Pattern packagePattern = Pattern.compile("package(\\s+)"
+				+ originalPackage + "(\\s*);");
+		final String replacement = "package$1" + destinationPackage + "$2;";
+		factory.addReplacement(packagePattern, replacement);
+
+		return factory
+				.getReplacementChange(originalFile, "Update file content");
 	}
 
-	@Override
-	protected boolean initialize(Object element) {
-		actorFile = (IFile) element;
-		return true;
+	private Change getOtherCalContentUpdatesChanges() {
+		factory.clearReplacementMaps();
+
+		final String originalQualifiedName = OrccUtil
+				.getQualifiedName(originalFile);
+		final Pattern importPattern = Pattern.compile("import(\\s+)"
+				+ originalQualifiedName + "(\\.(\\*|\\w+))(\\s*);");
+		final String targetQualifiedName = OrccUtil
+				.getQualifiedName(destinationFile);
+		final String replacement = "import$1" + targetQualifiedName + "$2$4;";
+		factory.addReplacement(importPattern, replacement);
+
+		return factory.getReplacementChange(originalFile.getProject(),
+				OrccUtil.CAL_SUFFIX, "Update actors referencing this unit.");
 	}
 
+	private Change getNetworksContentUpdatesChanges() {
+		factory.clearReplacementMaps();
+
+		final String oldQualifiedName = OrccUtil.getQualifiedName(originalFile);
+		final String newQualifiedName = OrccUtil
+				.getQualifiedName(destinationFile);
+		factory.addReplacement("<Class name=\"" + oldQualifiedName + "\"/>",
+				"<Class name=\"" + newQualifiedName + "\"/>");
+
+		return factory.getReplacementChange(originalFile.getProject(),
+				OrccUtil.NETWORK_SUFFIX, "Update network files");
+	}
+
+	private Change getDiagramsContentUpdatesChanges() {
+		factory.clearReplacementMaps();
+
+		final IFile irFile = OrccUtil.getFile(originalFile.getProject(),
+				OrccUtil.getQualifiedName(originalFile), OrccUtil.IR_SUFFIX);
+
+		final String originalRefinement = irFile.getFullPath().toString();
+
+		final String originalRelativeFolder = originalFile.getParent()
+				.getProjectRelativePath()
+				.removeFirstSegments(1).toString();
+		final String newRelativeFolder = destination.getProjectRelativePath()
+				.removeFirstSegments(1).toString();
+
+		final String newRefinement = originalRefinement.replace(
+				originalRelativeFolder, newRelativeFolder);
+
+		factory.addReplacement("key=\"refinement\" value=\""
+				+ originalRefinement + "\"", "key=\"refinement\" value=\""
+				+ newRefinement + "\"");
+
+		return factory.getReplacementChange(originalFile.getProject(),
+				OrccUtil.DIAGRAM_SUFFIX, "Update diagram files");
+	}
 }

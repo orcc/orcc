@@ -37,7 +37,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.xdf.ui.Activator;
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
@@ -52,9 +52,9 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
-import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
@@ -110,7 +110,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		final Object linkedBo = getBusinessObjectForPictogramElement(diagram);
 
 		final URI diagramUri = diagram.eResource().getURI();
-		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(Activator.NETWORK_SUFFIX);
+		final URI xdfUri = diagramUri.trimFileExtension().appendFileExtension(
+				OrccUtil.NETWORK_SUFFIX);
 
 		final Network network;
 		if (linkedBo == null || !(linkedBo instanceof Network)) {
@@ -139,27 +140,28 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			}
 		}
 		
-		final List<String> updatedNetworkWarnings = new ArrayList<String>();
-
-		hasDoneChanges |= fixNetwork(network, updatedNetworkWarnings);
-
 		if (diagram.getChildren().size() == 0 && network.getChildren().size() > 0) {
+			final List<String> updatedNetworkWarnings = new ArrayList<String>();
+
+			hasDoneChanges |= fixNetwork(network, updatedNetworkWarnings);
 			hasDoneChanges |= initializeDiagramFromNetwork(network, diagram);
+
+			// Display a synthesis message to user, to tell him what have been
+			// automatically modified in the diagram/network he just opened
+			if (updatedNetworkWarnings.size() > 0) {
+				final StringBuilder message = new StringBuilder(
+						"The network has been automatically updated:");
+				message.append('\n');
+
+				for (final String msg : updatedNetworkWarnings) {
+					message.append(msg).append('\n');
+				}
+				MessageDialog.openInformation(XdfUtil.getDefaultShell(),
+						"Network update", message.toString());
+			}
 		}
 
 		updateVersion(diagram);
-
-		// Display a synthesis message to user, to tell him what have been
-		// automatically modified in the diagram/network he just opened
-		if(updatedNetworkWarnings.size() > 0) {
-			final StringBuilder message = new StringBuilder("The network has been automatically updated:");
-			message.append('\n');
-
-			for(final String msg : updatedNetworkWarnings) {
-				message.append(msg).append('\n');
-			}
-			MessageDialog.openInformation(XdfUtil.getDefaultShell(), "Network update", message.toString());
-		}
 
 		return hasDoneChanges;
 	}
@@ -290,9 +292,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			addBoToDiagram(diagram, port);
 		}
 		for (net.sf.orcc.df.Connection connection : network.getConnections()) {
-			final AddConnectionContext ctxt = XdfUtil.getAddConnectionContext(
+			final IAddConnectionContext ctxt = XdfUtil.getAddConnectionContext(
 					xdfFeatureProvider, getDiagram(), connection);
-			ctxt.setNewObject(connection);
 			getFeatureProvider().addIfPossible(ctxt);
 		}
 

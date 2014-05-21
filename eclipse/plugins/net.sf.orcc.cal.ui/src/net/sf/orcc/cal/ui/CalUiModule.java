@@ -29,10 +29,15 @@
 package net.sf.orcc.cal.ui;
 
 import net.sf.orcc.cal.ui.editor.hover.CalObjectHover;
+import net.sf.orcc.cal.ui.editor.hyperlinking.CalHyperlinkHelper;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.xtext.builder.IXtextBuilderParticipant;
 import org.eclipse.xtext.resource.ILocationInFileProvider;
 import org.eclipse.xtext.ui.editor.hover.IEObjectHoverProvider;
+import org.eclipse.xtext.ui.editor.hyperlinking.IHyperlinkHelper;
+
+import com.google.inject.Binder;
 
 /**
  * This class extends the default abstract CAL UI module to define customized
@@ -44,6 +49,12 @@ public class CalUiModule extends net.sf.orcc.cal.ui.AbstractCalUiModule {
 		super(plugin);
 	}
 
+	@Override
+	public void configure(Binder binder) {
+		super.configure(binder);
+		binder.bind(IHyperlinkHelper.class).to(CalHyperlinkHelper.class);
+	}
+
 	public Class<? extends IEObjectHoverProvider> bindIEObjectHoverProvider() {
 		return CalObjectHover.class;
 	}
@@ -52,4 +63,8 @@ public class CalUiModule extends net.sf.orcc.cal.ui.AbstractCalUiModule {
 		return CalLocationProvider.class;
 	}
 
+	@Override
+	public Class<? extends IXtextBuilderParticipant> bindIXtextBuilderParticipant() {
+		return net.sf.orcc.cal.ui.builder.CalBuilder.class;
+	}
 }

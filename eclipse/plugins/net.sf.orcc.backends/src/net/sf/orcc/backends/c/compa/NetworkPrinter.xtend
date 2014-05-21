@@ -38,27 +38,27 @@ import net.sf.orcc.df.Network
  * 
  */
 class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
-	
+
 	new(Network network, Map<String, Object> options) {
 		super(network, options)
 	}
-	
+
 	override protected getNetworkFileContent() '''
 		// Generated from "«network.name»"
 
 		#include <locale.h>
 		#include <stdio.h>
 		#include <stdlib.h>
-		
+
 		#ifndef _WIN32
 		#define __USE_GNU
 		#endif
-		
+
 		#include "types.h"
 		#include "fifo.h"
 		#include "scheduler.h"
 		#include "util.h"
-		
+
 		#define SIZE «fifoSize»
 		// #define PRINT_FIRINGS
 
@@ -67,19 +67,19 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		«FOR vertice : network.children.actorInstances»
 			«vertice.allocateFifos»
 		«ENDFOR»
-		
+
 		/////////////////////////////////////////////////
 		// FIFO pointer assignments
 		«FOR instance : network.children.actorInstances»
 			«instance.assignFifo»
 		«ENDFOR»
-		
+
 		/////////////////////////////////////////////////
 		// Action initializes
 		«FOR instance : network.children.actorInstances»
 			extern void «instance.name»_initialize();
 		«ENDFOR»
-		
+
 		/////////////////////////////////////////////////
 		// Action schedulers
 		«FOR instance : network.children.actorInstances»
@@ -117,5 +117,4 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			return compareErrors;
 		}
 	'''
-
 }

@@ -66,34 +66,46 @@ public class ActorMergerBase extends DfSwitch<Actor> {
 
 	protected Actor superActor;
 
-	protected void createBuffers(Procedure body, Map<Connection, Integer> maxTokens) {
+	protected void createBuffers(Procedure body,
+			Map<Connection, Integer> maxTokens, boolean createVars) {
 
 		BlockBasic block = body.getLast();
 
 		int index = 0;
 		// Create buffers and counters for inner connections
 		for (Connection conn : maxTokens.keySet()) {
+			if (!conn.getSourcePort().hasAttribute("externalized")) {
 
-			// create inner buffer
-			int size = maxTokens.get(conn);
-			if (size > 0) {
-				String name = "buffer_" + index++;
-				Type eltType = conn.getSourcePort().getType();
-				Type type = irFactory.createTypeList(size, eltType);
-				Var buffer = body.newTempLocalVariable(type, name);
-	
-				// create write counter
-				Var writeIdx = body.newTempLocalVariable(
-						irFactory.createTypeInt(32), name + "_w");
-				block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
-	
-				// create read counter
-				Var readIdx = body.newTempLocalVariable(
-						irFactory.createTypeInt(32), name + "_r");
-				block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
-	
-				buffersMap.put(conn.getSourcePort(), buffer);
-				buffersMap.put(conn.getTargetPort(), buffer);
+				// create inner buffer
+				int size = maxTokens.get(conn);
+				if (size > 0) {
+					String name = "buffer_" + index++;
+					Type eltType = conn.getSourcePort().getType();
+					Type type = irFactory.createTypeList(size, eltType);
+					Var buffer = body.newTempLocalVariable(type, name);
+
+					if (createVars)
+					{
+						// create write counter
+						Var writeIdx = body.newTempLocalVariable(
+								irFactory.createTypeInt(32), name + "_w");
+						block.add(irFactory.createInstAssign(writeIdx, irFactory.createExprInt(0)));
+			
+						// create read counter
+						Var readIdx = body.newTempLocalVariable(
+								irFactory.createTypeInt(32), name + "_r");
+						block.add(irFactory.createInstAssign(readIdx, irFactory.createExprInt(0)));
+					} else {
+						buffer.addAttribute("_w");
+						buffer.setAttribute("_w", new Integer(0));
+
+						buffer.addAttribute("_r");
+						buffer.setAttribute("_r", new Integer(0));
+					}
+					
+					buffersMap.put(conn.getSourcePort(), buffer);
+					buffersMap.put(conn.getTargetPort(), buffer);
+				}
 			}
 		}
 	}
