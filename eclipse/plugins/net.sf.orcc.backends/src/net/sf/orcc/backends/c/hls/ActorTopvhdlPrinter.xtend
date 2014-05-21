@@ -400,7 +400,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 									ap_idle => top_ap_idle,
 									ap_ready => top_ap_ready);
 								
-			
+
 			«ENDFOR»
 	'''
 
@@ -612,70 +612,68 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«FOR port : instance.getActor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(port)»
 				
-					component cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler IS
-					port (
-					«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
-					«connection.ramName»_ce0 : OUT STD_LOGIC;
-					«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
-					
-					«connection.wName»_address0    : OUT STD_LOGIC_VECTOR (0 downto 0);
-					«connection.wName»_ce0 : OUT STD_LOGIC;
-					«connection.wName»_q0  : IN  STD_LOGIC_VECTOR (31  downto 0);
-					
-					«connection.rName»_address0    :OUT  STD_LOGIC_VECTOR (0 downto 0);
-					«connection.rName»_ce0 : OUT STD_LOGIC;
-					«connection.rName»_we0  : OUT STD_LOGIC;
-					«connection.rName»_d0  : OUT  STD_LOGIC_VECTOR (31  downto 0);
-					
-					«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
-					«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
-					«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
-					
-					
-					ap_clk : IN STD_LOGIC;
-					ap_rst : IN STD_LOGIC;
-					ap_start : IN STD_LOGIC;
-					ap_done : OUT STD_LOGIC;
-					ap_idle : OUT STD_LOGIC;
-					ap_ready : OUT STD_LOGIC);
-					end component;
+				component cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler IS
+				port (
+				«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
+				«connection.ramName»_ce0 : OUT STD_LOGIC;
+				«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
+				
+				«connection.wName»_address0    : OUT STD_LOGIC_VECTOR (0 downto 0);
+				«connection.wName»_ce0 : OUT STD_LOGIC;
+				«connection.wName»_q0  : IN  STD_LOGIC_VECTOR (31  downto 0);
+				
+				«connection.rName»_address0    :OUT  STD_LOGIC_VECTOR (0 downto 0);
+				«connection.rName»_ce0 : OUT STD_LOGIC;
+				«connection.rName»_we0  : OUT STD_LOGIC;
+				«connection.rName»_d0  : OUT  STD_LOGIC_VECTOR (31  downto 0);
+				
+				«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
+				«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
+				«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
+				
+				
+				ap_clk : IN STD_LOGIC;
+				ap_rst : IN STD_LOGIC;
+				ap_start : IN STD_LOGIC;
+				ap_done : OUT STD_LOGIC;
+				ap_idle : OUT STD_LOGIC;
+				ap_ready : OUT STD_LOGIC);
+				end component;
 				
 			«ENDFOR»
-			«ENDFOR»
-			«FOR port : instance.getActor.inputs»			
-		
-				component cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler IS
-						port (
-						«instance.incomingPortMap.get(port).ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
-						«instance.incomingPortMap.get(port).ramName»_ce0 : OUT STD_LOGIC;
-						«instance.incomingPortMap.get(port).ramName»_we0  : OUT STD_LOGIC;
-						«instance.incomingPortMap.get(port).ramName»_d0  : OUT STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).
-			fifoType.sizeInBits - 1»  downto 0);
-						
-						«instance.incomingPortMap.get(port).wName»_address0    :  OUT STD_LOGIC_VECTOR (0 downto 0);
-						«instance.incomingPortMap.get(port).wName»_ce0 :  OUT STD_LOGIC;
-						«instance.incomingPortMap.get(port).wName»_we0  : OUT STD_LOGIC;
-						«instance.incomingPortMap.get(port).wName»_d0  :  OUT STD_LOGIC_VECTOR (31  downto 0);
-						
-						«instance.incomingPortMap.get(port).rName»_address0    : OUT STD_LOGIC_VECTOR (0 downto 0);
-						«instance.incomingPortMap.get(port).rName»_ce0 : OUT STD_LOGIC;
-						«instance.incomingPortMap.get(port).rName»_q0  : IN  STD_LOGIC_VECTOR (31  downto 0);
-								
-						«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.
-			get(port).fifoType.sizeInBits - 1» downto 0);
-						«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
-						«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
-								
-								
-								ap_clk : IN STD_LOGIC;
-								ap_rst : IN STD_LOGIC;
-								ap_start : IN STD_LOGIC;
-								ap_done : OUT STD_LOGIC;
-								ap_idle : OUT STD_LOGIC;
-								ap_ready : OUT STD_LOGIC);
-								end component;
-			
-			«ENDFOR»
+		«ENDFOR»
+		«FOR port : instance.getActor.inputs»			
+
+			component cast_«instance.name»_«instance.incomingPortMap.get(port).targetPort.name»_write_scheduler IS
+					port (
+					«instance.incomingPortMap.get(port).ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
+					«instance.incomingPortMap.get(port).ramName»_ce0 : OUT STD_LOGIC;
+					«instance.incomingPortMap.get(port).ramName»_we0  : OUT STD_LOGIC;
+					«instance.incomingPortMap.get(port).ramName»_d0  : OUT STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoType.sizeInBits - 1»  downto 0);
+					
+					«instance.incomingPortMap.get(port).wName»_address0    :  OUT STD_LOGIC_VECTOR (0 downto 0);
+					«instance.incomingPortMap.get(port).wName»_ce0 :  OUT STD_LOGIC;
+					«instance.incomingPortMap.get(port).wName»_we0  : OUT STD_LOGIC;
+					«instance.incomingPortMap.get(port).wName»_d0  :  OUT STD_LOGIC_VECTOR (31  downto 0);
+					
+					«instance.incomingPortMap.get(port).rName»_address0    : OUT STD_LOGIC_VECTOR (0 downto 0);
+					«instance.incomingPortMap.get(port).rName»_ce0 : OUT STD_LOGIC;
+					«instance.incomingPortMap.get(port).rName»_q0  : IN  STD_LOGIC_VECTOR (31  downto 0);
+							
+					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoType.sizeInBits - 1» downto 0);
+					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
+					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
+							
+							
+							ap_clk : IN STD_LOGIC;
+							ap_rst : IN STD_LOGIC;
+							ap_start : IN STD_LOGIC;
+							ap_done : OUT STD_LOGIC;
+							ap_idle : OUT STD_LOGIC;
+							ap_ready : OUT STD_LOGIC);
+							end component;
+
+		«ENDFOR»
 	'''
 
 	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
