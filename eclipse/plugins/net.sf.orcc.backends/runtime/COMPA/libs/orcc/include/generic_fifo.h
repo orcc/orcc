@@ -71,7 +71,7 @@ static unsigned int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_re
 
 static void FIFO_CLEAR(T)(struct FIFO_S(T) *fifo) {
     unsigned int i;
-    fifo->write_ind = 0;
+    (*fifo->write_ind) = 0;
     for (i = 0; i < fifo->readers_nb; i++) {
         fifo->read_inds[i] = 0;
     }
@@ -85,5 +85,5 @@ static T FIFO_READ(T)(struct FIFO_S(T) *fifo, unsigned int reader_id) {
 
 static void FIFO_WRITE(T)(struct FIFO_S(T) *fifo, T value) {
     fifo->contents[(*fifo->write_ind) & (fifo->size - 1)] = value;
-    fifo->write_ind++;
+    (*fifo->write_ind)++;
 }
