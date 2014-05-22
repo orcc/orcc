@@ -55,7 +55,7 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public class ExpressionEvaluator extends IrSwitch<Object> {
-	
+
 	private static ExpressionEvaluator INSTANCE = new ExpressionEvaluator();
 
 	private TypeList typeList;
@@ -129,6 +129,10 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 	public Object caseExprVar(ExprVar expr) {
 		Var var = expr.getUse().getVariable();
 		Object value = var.getValue();
+		if (!var.isAssignable() && value == null) {
+			// if this is a constant
+			value = doSwitch(var.getInitialValue());
+		}
 		if (value == null) {
 			throw new OrccRuntimeException("Uninitialized variable: "
 					+ var.getName());
