@@ -150,6 +150,7 @@ public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
 
 			if (vertex instanceof Instance) {
 				final Instance subInstance = IrUtil.copy((Instance) vertex);
+				subInstance.setName(XdfUtil.uniqueVertexName(thisNetwork, subInstance.getName()));
 
 				copies.put((Instance) vertex, subInstance);
 
