@@ -496,9 +496,11 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	private Var createPortVariable(int lineNumber, Port port,
 			Expression numTokens) {
 		// create the variable to hold the tokens
-		return eINSTANCE.createVar(lineNumber,
-				eINSTANCE.createTypeList(numTokens, port.getType()),
-				port.getName(), true, 0);
+		Type type = eINSTANCE.createTypeList(numTokens, port.getType());
+		Var var = eINSTANCE.createVar(lineNumber, type, port.getName(), true);
+		// remove the type copied by the factory
+		IrUtil.delete(type);
+		return var;
 	}
 
 	/**
@@ -759,15 +761,15 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			exprRepeat = new ExprTransformer(null, null).doSwitch(astRepeat);
 			if (totalConsumption > 1) {
 				totalConsumptionExpr = eINSTANCE.createExprBinary(
-						totalConsumptionExpr, OpBinary.TIMES,IrUtil.copy(exprRepeat),
+						totalConsumptionExpr, OpBinary.TIMES, exprRepeat,
 						eINSTANCE.createTypeInt());
 			} else {
-				totalConsumptionExpr = IrUtil.copy(exprRepeat);
+				totalConsumptionExpr = exprRepeat;
 			}
 		} else {
 			exprRepeat = eINSTANCE.createExprInt(1);
 		}
-		irPattern.setNumTokens(port, IrUtil.copy(totalConsumptionExpr));
+		irPattern.setNumTokens(port, totalConsumptionExpr);
 
 		// create port variable
 		Var variable = createPortVariable(procedure.getLineNumber(), port,
@@ -779,12 +781,12 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			InputPattern pattern = (InputPattern) astPattern;
 			List<Variable> tokens = pattern.getTokens();
 			actionLoadTokens(transformer, procedure, variable, tokens,
-					IrUtil.copy(exprRepeat));
+					exprRepeat);
 		} else {
 			OutputPattern pattern = (OutputPattern) astPattern;
 			List<AstExpression> values = pattern.getValues();
 			actionStoreTokens(transformer, procedure, variable, values,
-					IrUtil.copy(exprRepeat));
+					exprRepeat);
 		}
 	}
 
