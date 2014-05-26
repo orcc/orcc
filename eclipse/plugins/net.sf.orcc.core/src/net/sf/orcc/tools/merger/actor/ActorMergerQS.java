@@ -210,20 +210,6 @@ public class ActorMergerQS extends ActorMergerBase {
 	}
 	
 	private void copyActions(Network network) {
-
-		// TODO: add support for initializes with output patterns
-		
-		Procedure isSchedulable = irFactory.createProcedure(
-				"isSchedulable_initialize", 0, irFactory.createTypeBool());
-		isSchedulable.getLast().add(
-				irFactory.createInstReturn(irFactory.createExprBool(true)));
-		Action initialize = dfFactory.createAction("initialize",
-				dfFactory.createPattern(), dfFactory.createPattern(),
-				dfFactory.createPattern(), isSchedulable, 
-				irFactory.createProcedure("initialize", 0, 
-						irFactory.createTypeVoid()));
-		superActor.getInitializes().add(initialize);
-		
 		for (Vertex vertex : network.getChildren()) {
 			Actor actor = vertex.getAdapter(Actor.class);
 			for (Action action : actor.getActions()) {
@@ -231,10 +217,6 @@ public class ActorMergerQS extends ActorMergerBase {
 			}
 			for (Action action : actor.getInitializes()) {
 				copyAction(actor.getName(), action);
-				Instruction instruction = irFactory.createInstCall(
-						null, correspondences.getProcedure(action),
-						null);
-				initialize.getBody().getLast().add(instruction);
 			}
 		}
 	}
