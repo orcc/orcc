@@ -33,6 +33,7 @@ import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Network
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.df.Port
 
 /**
  * Generate and print network source file for COMPA backend.
@@ -112,7 +113,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
-			init_orcc(argc, argv);
+«««			init_orcc(argc, argv);
 
 			scheduler();
 
@@ -156,15 +157,18 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		«ENDFOR»		
 		
 	'''
-	
+
 	 override protected allocateFifo(Connection conn, int nbReaders) {
-	  val size = if (conn.size != null) conn.size else fifoSize
-	  val bufferAddr = memoryBaseAddr
-	  val rdIndicesAddr = memoryBaseAddr + size
-	  val wrIndexAddr = rdIndicesAddr + nbReaders * 4
-	  memoryBaseAddr = wrIndexAddr + 4
-	  '''
-	   fifo_«conn.sourcePort.type.doSwitch»_t fifo_«conn.<Object>getValueAsObject("idNoBcast")» = {«size», («conn.sourcePort.type.doSwitch» *) «String.format("0x%x", bufferAddr)», «nbReaders», (unsigned int *) «String.format("0x%x", rdIndicesAddr)», (unsigned int *) «String.format("0x%x", wrIndexAddr)»};
-	  '''
+	  	val size = if (conn.size != null) conn.size else fifoSize
+		val id = conn.<Object>getValueAsObject("idNoBcast")
+	  	val portSizeInBytes = if (conn.sourcePort.type.sizeInBits == 1) 4 else (conn.sourcePort.type.sizeInBits/8)
+	  	val bufferAddr = memoryBaseAddr
+	  	val rdIndicesAddr = memoryBaseAddr + size * portSizeInBytes
+	  	val wrIndexAddr = rdIndicesAddr + nbReaders * 4
+	  	memoryBaseAddr = wrIndexAddr + 4
+ 		'''
+««« 		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «size», «id», «nbReaders», «String.format("0x%x", bufferAddr)», «String.format("0x%x", rdIndicesAddr)», «String.format("0x%x", wrIndexAddr)»)
+			static fifo_«conn.sourcePort.type.doSwitch»_t fifo_«id» = {«size», («conn.sourcePort.type.doSwitch» *) «String.format("0x%x", bufferAddr)», «nbReaders», (unsigned int *) «String.format("0x%x", rdIndicesAddr)», (unsigned int *) «String.format("0x%x", wrIndexAddr)»};
+		'''
 	 }
 }
