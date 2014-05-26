@@ -189,7 +189,7 @@ void hevc_v_loop_filter_chroma_orcc (u8 *_pix, int _stride, int *_tc, u8 *_no_p,
 
 void hevc_h_loop_filter_chroma_orcc (u8 *_pix, int _stride, int *_tc, u8 *_no_p, u8 *_no_q, u16 blkAddr[2][2])
 {
-	u8 * pix = &_pix[(blkAddr[0][1] >> 1) * _stride + (blkAddr[0][0] >> 1)];
+  u8 * pix = &_pix[(blkAddr[0][1] >> 1) * _stride + (blkAddr[0][0] >> 1)];
   hevcDsp.hevc_h_loop_filter_chroma(pix, _stride, _tc, _no_p, _no_q);
 }
 

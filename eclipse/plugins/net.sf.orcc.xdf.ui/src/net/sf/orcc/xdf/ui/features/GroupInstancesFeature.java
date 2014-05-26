@@ -44,7 +44,6 @@ import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Var;
@@ -198,7 +197,7 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 		monitor.newChild(5);
 
 		// Create an Instance refined on the new Network
-		final String instanceName = uniqueVertexName(currentNetwork,
+		final String instanceName = XdfUtil.uniqueVertexName(currentNetwork,
 				"groupedInstances");
 		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
 				instanceName, newNetwork);
@@ -287,8 +286,8 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 				// Create an input Port in the new Network
 				final Port newInputPort = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getTargetPort().getType()),
-						uniqueVertexName(newNetwork, connection.getTargetPort()
-								.getName()));
+						XdfUtil.uniqueVertexName(newNetwork, connection
+								.getTargetPort().getName()));
 				newNetwork.addInput(newInputPort);
 
 				// Create a Connection in the new Network
@@ -311,8 +310,8 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 				// Create an output Port in the new Network
 				final Port newOutputPort = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getSourcePort().getType()),
-						uniqueVertexName(newNetwork, connection.getSourcePort()
-								.getName()));
+						XdfUtil.uniqueVertexName(newNetwork, connection
+								.getSourcePort().getName()));
 				newNetwork.addOutput(newOutputPort);
 
 				// Create a Connection in the new Network
@@ -433,34 +432,5 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 				.getDirectEditingInfo();
 		dei.setMainPictogramElement(newInstancePe);
 		dei.setActive(true);
-	}
-
-	/**
-	 * Check if the given network contains a vertex (instance or port) with the
-	 * given base name. If yes, return a new unique name formed from the given
-	 * base and a numeric suffix. If not, returns the given base.
-	 * 
-	 * @param network
-	 *            The network to check for existing vertex with the given name
-	 * @param base
-	 *            The base name to assign to a new vertex
-	 * @return A unique name to assign to a new Instance / Port in the given
-	 *         network
-	 */
-	private String uniqueVertexName(final Network network, final String base) {
-		final Set<String> existingNames = new HashSet<String>();
-		for (Vertex vertex : network.getVertices()) {
-			existingNames.add(vertex.getLabel());
-		}
-
-		if (!existingNames.contains(base)) {
-			return base;
-		} else {
-			int index = 0;
-			while (existingNames.contains(base + '_' + index)) {
-				++index;
-			}
-			return base + '_' + index;
-		}
 	}
 }
