@@ -5,7 +5,7 @@
       version="2.0.2.qualifier"
       provider-name="IETR/INSA Rennes">
 
-   <description url="http://orcc.sf.net/eclipse/updates/">
+   <description url="http://orcc.sf.net">
       The Open RVC-CAL Compiler (Orcc) is a collection of support tools under BSD license created by IETR/INSA Rennes for the RVC-CAL dataflow programming language. Its primary purpose is to provide developers with a compiler infrastructure to allow several languages and combination of languages (in the case of co-design) to be generated from RVC-CAL actors and XDF networks.
    </description>
 
@@ -32,7 +32,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&
    </license>
 
    <url>
-      <update label="Orcc Project Update Site" url="http://orcc.sourceforge.net/eclipse/updates/"/>
+      <update label="Open RVC-CAL Compiler - Stable releases" url="http://orcc.sourceforge.net/eclipse"/>
    </url>
 
    <plugin
