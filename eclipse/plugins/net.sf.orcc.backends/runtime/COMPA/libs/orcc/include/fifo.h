@@ -32,9 +32,11 @@
 #include "types.h"
 
 // declare FIFO with a size equal to (size)
-#define DECLARE_FIFO(type, size, count, readersnb) static type array_##count[(size)]; \
-static unsigned int read_inds_##count[readersnb] = {0}; \
-static struct FIFO_S(type) fifo_##count = { (size), array_##count, readersnb, read_inds_##count, 0 };
+#define DECLARE_FIFO(type, size, count, readersnb, baseAddr, rdIndAddr, wrIndAddr) \
+		static type array_##count[(size)] = baseAddr; \
+		static unsigned int read_inds_##count[readersnb] = rdIndAddr; \
+		static unsigned int write_ind_##count[1] = wrIndAddr; \
+		static struct FIFO_S(type) fifo_##count = { (size), array_##count, readersnb, read_inds_##count, write_ind_##count};
 
 #define FIFO_CLEAR(T) FIFO_CLEAR_EXPAND(T)
 #define FIFO_CLEAR_EXPAND(T) fifo_ ## T ## _clear
