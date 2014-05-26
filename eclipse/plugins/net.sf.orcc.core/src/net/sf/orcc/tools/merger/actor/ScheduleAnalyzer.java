@@ -124,7 +124,7 @@ public class ScheduleAnalyzer extends BufferSizer {
 		Connection connection = actor.getOutgoingPortMap().get(port).get(0);
 		// this is the 'port' of 'actor'
 		copyOutputPortIfNotFound(superActor, actor, connection.getSourcePort(),
-				fullFifos, connection.getTargetPort());
+				fullFifos, connection.getTargetPort(), connection.getSize());
 		// this is the remote port of another actor
 		copyInputPortIfNotFound(superActor, 
 				connection.getTarget().getAdapter(Actor.class),
@@ -146,7 +146,7 @@ public class ScheduleAnalyzer extends BufferSizer {
 	}
 
 	private void copyOutputPortIfNotFound(Actor superActor, Actor actor, 
-			Port port, boolean fullFifos, Port target) {
+			Port port, boolean fullFifos, Port target, Integer size) {
 		for (Port out : superActor.getOutputs()) {
 			if (out.getName().equals(port.getName())) {
 				return;
@@ -155,6 +155,7 @@ public class ScheduleAnalyzer extends BufferSizer {
 		port.addAttribute("externalized");
 		if (fullFifos) {
 			port.addAttribute("externalFifo");
+			port.setAttribute("externalFifo", new Integer(size));
 			port.addAttribute("targetPort");
 			port.setAttribute("targetPort", target.getName());
 			superActor.getOutputs().add((Port)copier.copy(port));
