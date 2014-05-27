@@ -588,8 +588,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	public void checkTypeInt(AstTypeInt type) {
 		AstExpression size = type.getSize();
 		if (size != null) {
-			int value = Evaluator.getIntValue(size);
-			if (value <= 0) {
+			Integer value = Evaluator.getIntValue(size);
+			if (value != null && value <= 0) {
 				error("This size must evaluate to a compile-time "
 						+ "constant greater than zero", type,
 						eINSTANCE.getAstTypeInt_Size());
@@ -601,8 +601,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	public void checkTypeList(AstTypeList type) {
 		AstExpression size = type.getSize();
 		if (size != null) {
-			int value = Evaluator.getIntValue(size);
-			if (value <= 0) {
+			Integer value = Evaluator.getIntValue(size);
+			if (value != null && value <= 0) {
 				error("This size must evaluate to a compile-time "
 						+ "constant greater than zero", type,
 						eINSTANCE.getAstTypeList_Size());
@@ -614,8 +614,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	public void checkTypeUint(AstTypeUint type) {
 		AstExpression size = type.getSize();
 		if (size != null) {
-			int value = Evaluator.getIntValue(size);
-			if (value <= 0) {
+			Integer value = Evaluator.getIntValue(size);
+			if (value != null && value <= 0) {
 				error("This size must evaluate to a compile-time "
 						+ "constant greater than zero", type,
 						eINSTANCE.getAstTypeUint_Size());

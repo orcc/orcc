@@ -121,8 +121,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				int repeat = Evaluator.getIntValue(astRepeat);
-				if (repeat <= 0) {
+				Integer repeat = Evaluator.getIntValue(astRepeat);
+				if (repeat != null && repeat <= 0) {
 					error("This repeat clause must evaluate to a compile-time "
 							+ "constant greater than zero", pattern,
 							eINSTANCE.getInputPattern_Repeat(), -1);
@@ -151,8 +151,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				int repeat = Evaluator.getIntValue(astRepeat);
-				if (repeat <= 0) {
+				Integer repeat = Evaluator.getIntValue(astRepeat);
+				if (repeat != null && repeat <= 0) {
 					error("This repeat clause must evaluate to a compile-time "
 							+ "constant greater than zero", pattern,
 							eINSTANCE.getOutputPattern_Repeat(), -1);
@@ -422,8 +422,9 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 * @param source
 	 * @param feature
 	 */
-	private void checkDuplicatesLitterals(final AstUnit unit, final String name,
-			final EObject source, final EStructuralFeature feature) {
+	private void checkDuplicatesLitterals(final AstUnit unit,
+			final String name, final EObject source,
+			final EStructuralFeature feature) {
 
 		for (final Variable var : unit.getVariables()) {
 			if (var.getName().equals(name) && var != source) {
@@ -516,10 +517,18 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkGenerator(Generator generator) {
-		int lower = Evaluator.getIntValue(generator.getLower());
-		int higher = Evaluator.getIntValue(generator.getHigher());
+		Integer lower = Evaluator.getIntValue(generator.getLower());
+		Integer higher = Evaluator.getIntValue(generator.getHigher());
 
-		if (higher < lower) {
+		if (lower == null) {
+			error("lower bound must be evaluable at compile time", generator,
+					eINSTANCE.getGenerator_Lower(), -1);
+			return;
+		} else if (higher == null) {
+			error("higher bound must be evaluable at compile time", generator,
+					eINSTANCE.getGenerator_Higher(), -1);
+			return;
+		} else if (higher < lower) {
 			error("higher bound must be greater than lower bound", generator,
 					eINSTANCE.getGenerator_Higher(), -1);
 			return;

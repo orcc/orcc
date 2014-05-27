@@ -78,9 +78,10 @@ public class Evaluator extends CalSwitch<Expression> {
 	 * 
 	 * @param eObject
 	 *            an AST node
-	 * @return the integer value associated with the given object
+	 * @return the integer value associated with the given object or null if the
+	 *         value cannot be evaluated
 	 */
-	public static int getIntValue(EObject eObject) {
+	public static Integer getIntValue(EObject eObject) {
 		Expression value = getValue(eObject);
 		if (value != null && value.isExprInt()) {
 			ExprInt intExpr = (ExprInt) value;
@@ -90,7 +91,7 @@ public class Evaluator extends CalSwitch<Expression> {
 		}
 
 		// evaluated ok, but not as an integer
-		return -1;
+		return null;
 	}
 
 	/**
@@ -250,12 +251,12 @@ public class Evaluator extends CalSwitch<Expression> {
 	@Override
 	public Expression caseExpressionUnary(ExpressionUnary expression) {
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
-		
+
 		Expression expr = getValue(expression.getExpression());
 		if (expr == null) {
 			return null;
 		}
-		
+
 		Object value = ValueUtil.getValue(expr);
 		Object result = ValueUtil.compute(op, value);
 		return ValueUtil.getExpression(result);
