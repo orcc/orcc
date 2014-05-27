@@ -48,11 +48,11 @@ import net.sf.orcc.util.OrccLogger
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {	
 	// Whether the actor has a main function or the main is within the Top file.
 	private boolean printMainFunc
-	private boolean enableTest
+	private boolean enableTest = false
 	
 	new(Map<String, Object> options, boolean printTop) {
 		super(options)
-		printMainFunc = enableTest = !printTop
+		printMainFunc = !printTop
 	}
 	
 	override protected print(String targetFolder) {
@@ -363,7 +363,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 			«entityName»_initialize();
 
-			while(!stop) {
+			while(1) {
 				i = 0;
 				
 				«IF enableTest»
@@ -382,11 +382,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
 			index_«port.name» = (*«port.fullName»->write_ind);
+«««			index_«port.name» = «port.fullName»->write_ind;
 			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name»);
 		}
 
 		static void write_end_«port.name»() {
 			(*«port.fullName»->write_ind) = index_«port.name»;
+«««			«port.fullName»->write_ind = index_«port.name»;
 		}
 	'''
 
@@ -424,6 +426,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 «««		#include "platform.h"
 «««		#include "xparameters.h"
 		extern void xil_printf( const char *ctrl1, ...);
+«««		#define xil_printf	printf
 		
 		«IF profileNetwork || dynamicMapping»
 			#include "cycle.h"
