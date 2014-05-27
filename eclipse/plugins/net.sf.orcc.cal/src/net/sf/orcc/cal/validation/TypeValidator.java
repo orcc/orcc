@@ -90,14 +90,13 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	}
 
 	private void checkActionGuards(AstAction action) {
-		List<AstExpression> guards = action.getGuards();
 		int index = 0;
-		for (AstExpression guard : guards) {
-			Type type = Typer.getType(guard);
+		for (AstExpression guardExpression : action.getGuard().getExpressions()) {
+			Type type = Typer.getType(guardExpression);
 			if (!TypeUtil.isConvertibleTo(type,
 					IrFactory.eINSTANCE.createTypeBool())) {
 				error("Type mismatch: cannot convert from " + print(type)
-						+ " to bool", action, eINSTANCE.getAstAction_Guards(),
+						+ " to bool", action, eINSTANCE.getGuard_Expressions(),
 						index);
 			}
 			index++;

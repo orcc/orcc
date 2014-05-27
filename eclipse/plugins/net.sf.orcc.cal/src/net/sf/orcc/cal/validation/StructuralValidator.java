@@ -208,7 +208,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		checkActionInputs(action.getInputs());
 		checkActionOutputs(action.getOutputs());
 
-		checkInnerVarDecls(action, eINSTANCE.getAstAction_Guards());
+		checkInnerVarDecls(action, eINSTANCE.getGuard_Expressions());
 		checkInnerVarDecls(action, eINSTANCE.getAstAction_Statements());
 	}
 

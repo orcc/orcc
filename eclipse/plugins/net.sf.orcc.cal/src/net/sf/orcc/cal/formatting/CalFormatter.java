@@ -104,11 +104,11 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		// "guard" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getGuardKeyword_7_0(),
-				access.getCommaKeyword_7_2_0());
+				access.getCommaKeyword_6_1_0());
 
 		// "var" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getVarKeyword_8_0(),
-				access.getCommaKeyword_7_2_0());
+				access.getCommaKeyword_6_1_0());
 
 		body(c, access.getDoKeyword_9_0(), access.getEndKeyword_10());
 	}
@@ -330,11 +330,11 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		// "guard" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getGuardKeyword_6_0(),
-				access.getCommaKeyword_6_2_0());
+				access.getCommaKeyword_7_2_0());
 
 		// "var" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getVarKeyword_7_0(),
-				access.getCommaKeyword_6_2_0());
+				access.getCommaKeyword_7_2_0());
 
 		body(c, access.getDoKeyword_8_0(), access.getEndKeyword_9());
 	}
