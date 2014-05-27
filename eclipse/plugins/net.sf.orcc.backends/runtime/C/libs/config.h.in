@@ -4,6 +4,9 @@
 #define TRUE  1
 #define FALSE 0
 
+#define ON  1
+#define OFF 0
+
 #define HAVE_AVX     @USE_AVX@
 #define HAVE_AVX2    @USE_AVX2@
 
