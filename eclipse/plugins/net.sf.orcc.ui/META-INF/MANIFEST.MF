@@ -4,8 +4,7 @@ Bundle-Name: Orcc UI
 Bundle-SymbolicName: net.sf.orcc.ui;singleton:=true
 Bundle-Version: 2.0.2.qualifier
 Bundle-Activator: net.sf.orcc.ui.OrccUiActivator
-Require-Bundle: net.sf.orcc.graphiti.ui;bundle-version="2.0.2",
- net.sf.orcc.backends;bundle-version="2.0.2",
+Require-Bundle: net.sf.orcc.backends;bundle-version="2.0.2",
  net.sf.orcc.cal.ui;bundle-version="2.0.2",
  net.sf.orcc.core;bundle-version="2.0.2",
  net.sf.orcc.simulators;bundle-version="2.0.2",
