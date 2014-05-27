@@ -178,30 +178,6 @@
       </propertyTabs>
    </extension>
    <extension
-         point="org.eclipse.ui.views.properties.tabbed.propertySections">
-      <propertySections
-            contributorId="net.sf.orcc.graphiti.ui.properties.contributor">
-         <propertySection
-               class="net.sf.orcc.ui.properties.VertexParametersMapSection"
-               filter="net.sf.orcc.ui.properties.OrccVertexFilter"
-               id="net.sf.orcc.ui.properties.section.vertex.parameters"
-               tab="net.sf.orcc.ui.properties.tab.vertex.parameters">
-         </propertySection>
-         <propertySection
-               class="net.sf.orcc.ui.properties.GraphParametersListSection"
-               filter="net.sf.orcc.ui.properties.OrccGraphFilter"
-               id="net.sf.orcc.ui.properties.section.graph.parameters"
-               tab="net.sf.orcc.ui.properties.tab.graph.parameters">
-         </propertySection>
-         <propertySection
-               class="net.sf.orcc.ui.properties.GraphVariablesMapSection"
-               filter="net.sf.orcc.ui.properties.OrccGraphFilter"
-               id="net.sf.orcc.ui.properties.section.graph.variables"
-               tab="net.sf.orcc.ui.properties.tab.graph.variables">
-         </propertySection>
-      </propertySections>
-   </extension>
-   <extension
          point="org.eclipse.ltk.core.refactoring.renameParticipants">
       <renameParticipant
             class="net.sf.orcc.ui.refactoring.NetworkRenameParticipant"
