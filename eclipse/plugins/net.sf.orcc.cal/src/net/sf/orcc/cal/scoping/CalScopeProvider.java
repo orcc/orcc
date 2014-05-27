@@ -29,6 +29,7 @@
 package net.sf.orcc.cal.scoping;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +47,7 @@ import net.sf.orcc.cal.cal.ExternalTarget;
 import net.sf.orcc.cal.cal.Fsm;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.Guard;
 import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.ScheduleFsm;
 import net.sf.orcc.cal.cal.StatementForeach;
@@ -322,6 +324,29 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 		elements.addAll(actor.getStateVariables());
 
 		return Scopes.scopeFor(elements, delegateGetScope(actor, reference));
+	}
+
+	/**
+	 * Returns a scope for variables referenced in a guard. The scope is the
+	 * same as the action's one, but doesn't contains local variables of this
+	 * action.
+	 * 
+	 * @param guard
+	 * @param reference
+	 * @return
+	 */
+	public IScope scope_VariableReference_variable(Guard guard,
+			EReference reference) {
+		final AstAction action = (AstAction) guard.eContainer();
+
+		// Compute the list of input ports variables for the current Action
+		final List<Variable> tokens = new ArrayList<Variable>();
+		for (final InputPattern pattern : action.getInputs()) {
+			tokens.addAll(pattern.getTokens());
+		}
+
+		return getScope(action, tokens, Collections.<Variable> emptyList(),
+				reference);
 	}
 
 	/**
