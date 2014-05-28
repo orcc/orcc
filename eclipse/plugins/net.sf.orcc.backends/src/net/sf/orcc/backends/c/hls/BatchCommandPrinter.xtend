@@ -41,7 +41,6 @@ import java.io.File
  * @author Khaled Jerbi
  * 
  */
- 
  class BatchCommandPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 
 	new(Network bat, Map<String,Object> options) {

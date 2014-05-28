@@ -170,7 +170,7 @@ AstAction:
 	'==>'
 	(outputs += OutputPattern (',' outputs += OutputPattern)*)?
 
-	('guard' guards += AstExpression (',' guards += AstExpression)*)?
+	('guard' guard = Guard )?
 	('var'
 		variables += ValuedVariableDeclaration
 		(',' variables += ValuedVariableDeclaration)*)?
@@ -187,7 +187,7 @@ Initialize returns AstAction:
 	'initialize'
 	'==>'
 	(outputs += OutputPattern (',' outputs += OutputPattern)*)?
-	('guard' guards += AstExpression (',' guards += AstExpression)*)?
+	('guard' guard = Guard )?
 	('var'
 		variables += ValuedVariableDeclaration
 		(',' variables += ValuedVariableDeclaration)*)?
@@ -196,13 +196,18 @@ Initialize returns AstAction:
 	)?
 	'end';
 
+Token returns Variable: name=ID;
+
 InputPattern: port=[AstPort] ':' '[' tokens+=Token (',' tokens+=Token)* ']'
 	('repeat' repeat=AstExpression)?;
 
-Token returns Variable: name=ID;
-
 OutputPattern: port=[AstPort] ':' '[' values+=AstExpression (',' values+=AstExpression)* ']'
 	('repeat' repeat=AstExpression)?;
+
+Guard:
+	{Guard}
+	expressions += AstExpression (',' expressions += AstExpression)*
+;
 
 ///////////////////////////////////////////////////////////////////////////////
 // statements

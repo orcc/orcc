@@ -1,5 +1,15 @@
-# Next release
+# 2.0.2 Next release
 ### Notable changes and features
+- Network editor
+    + Copy / Paste ports or instances in a diagram or accross different diagrams is now supported [#107]
+
+### Bugfixes
+
+### Known issues
+
+### Miscellaneous
+
+# 2.0.1 May 20, 2014
 
 ### Bugfixes
 - Network editor
@@ -8,8 +18,6 @@
     + [#104] Updating the target or the source of an existing connection now updates properly the XDF file
 - Back-ends
     + [#99] Performance of the data-driven/demand-driven scheduler
-
-### Known issues
 
 ### Miscellaneous
 - Back-ends

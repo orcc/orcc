@@ -166,3 +166,30 @@ void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i3
 
     hevcPred.pred_planar[log2size - 2](src, top, left, stride);
 }
+
+/* DBF */
+
+void hevc_v_loop_filter_luma_orcc (u8 *_pix, int _stride, int *_beta, int *_tc, u8 *_no_p, u8 *_no_q, u16 blkAddr[2][2], int idxBlk)
+{
+  u8 * pix = &_pix[blkAddr[0][1] * _stride + blkAddr[0][0]];
+  hevcDsp.hevc_v_loop_filter_luma(pix, _stride, _beta, _tc, _no_p, _no_q);
+}
+
+void hevc_h_loop_filter_luma_orcc (u8 *_pix, int _stride, int *_beta, int *_tc, u8 *_no_p, u8 *_no_q, u16 blkAddr[2][2], int idxBlk)
+{
+  u8 * pix = &_pix[blkAddr[0][1] * _stride + blkAddr[0][0]];
+  hevcDsp.hevc_h_loop_filter_luma(pix, _stride, _beta, _tc, _no_p, _no_q);
+}
+
+void hevc_v_loop_filter_chroma_orcc (u8 *_pix, int _stride, int *_tc, u8 *_no_p, u8 *_no_q, u16 blkAddr[2][2])
+{
+  u8 * pix = &_pix[(blkAddr[0][1] >> 1) * _stride + (blkAddr[0][0] >> 1)];
+  hevcDsp.hevc_v_loop_filter_chroma(pix, _stride, _tc, _no_p, _no_q);
+}
+
+void hevc_h_loop_filter_chroma_orcc (u8 *_pix, int _stride, int *_tc, u8 *_no_p, u8 *_no_q, u16 blkAddr[2][2])
+{
+  u8 * pix = &_pix[(blkAddr[0][1] >> 1) * _stride + (blkAddr[0][0] >> 1)];
+  hevcDsp.hevc_h_loop_filter_chroma(pix, _stride, _tc, _no_p, _no_q);
+}
+

@@ -48,6 +48,7 @@ import net.sf.orcc.cal.cal.ExpressionIf;
 import net.sf.orcc.cal.cal.ExpressionIndex;
 import net.sf.orcc.cal.cal.ExpressionUnary;
 import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Guard;
 import net.sf.orcc.cal.cal.OutputPattern;
 import net.sf.orcc.cal.cal.StatementAssign;
 import net.sf.orcc.cal.cal.StatementCall;
@@ -89,15 +90,14 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		printer = new TypePrinter();
 	}
 
-	private void checkActionGuards(AstAction action) {
-		List<AstExpression> guards = action.getGuards();
+	private void checkActionGuard(Guard guard) {
 		int index = 0;
-		for (AstExpression guard : guards) {
-			Type type = Typer.getType(guard);
+		for (AstExpression guardExpression : guard.getExpressions()) {
+			Type type = Typer.getType(guardExpression);
 			if (!TypeUtil.isConvertibleTo(type,
 					IrFactory.eINSTANCE.createTypeBool())) {
 				error("Type mismatch: cannot convert from " + print(type)
-						+ " to bool", action, eINSTANCE.getAstAction_Guards(),
+						+ " to bool", guard, eINSTANCE.getGuard_Expressions(),
 						index);
 			}
 			index++;
@@ -157,7 +157,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkAstAction(AstAction action) {
-		checkActionGuards(action);
+		checkActionGuard(action.getGuard());
 		checkActionOutputs(action.getOutputs());
 	}
 

@@ -440,3 +440,48 @@ void ff_hevc_transform0_32x32_4_8_zscan_sse4 (
 
 void (* ff_hevc_transform0_32x32_8_zscan_sse4_orcc[2])(
     i16 *_dst, i16 *coeffs, ptrdiff_t _stride);
+
+/* DBF */
+#define LFC_FUNC(DIR, DEPTH, OPT)                                        \
+void ff_hevc_ ## DIR ## _loop_filter_chroma_ ## DEPTH ## _ ## OPT(uint8_t *_pix, ptrdiff_t _stride, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
+
+#define LFL_FUNC(DIR, DEPTH, OPT)                                        \
+void ff_hevc_ ## DIR ## _loop_filter_luma_ ## DEPTH ## _ ## OPT(uint8_t *_pix, ptrdiff_t stride, int *_beta, int *_tc, \
+uint8_t *_no_p, uint8_t *_no_q);
+
+#define LFC_FUNCS(type, depth) \
+LFC_FUNC(h, depth, sse2)  \
+LFC_FUNC(v, depth, sse2)
+
+#define LFL_FUNCS(type, depth) \
+LFL_FUNC(h, depth, ssse3)  \
+LFL_FUNC(v, depth, ssse3)
+
+LFC_FUNCS(uint8_t,   8)
+// LFC_FUNCS(uint8_t,  10)
+LFL_FUNCS(uint8_t,   8)
+// LFL_FUNCS(uint8_t,  10)
+
+void (* hevc_h_loop_filter_luma)(
+  uint8_t *_pix, ptrdiff_t _stride, int *_beta, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
+
+void (* hevc_v_loop_filter_luma)(
+  uint8_t *_pix, ptrdiff_t _stride, int *_beta, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
+
+void (* hevc_h_loop_filter_chroma)(
+  uint8_t *_pix, ptrdiff_t _stride, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
+
+void (* hevc_v_loop_filter_chroma)(
+  uint8_t *_pix, ptrdiff_t _stride, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
+
+void (* hevc_h_loop_filter_luma_c)(
+  uint8_t *_pix, ptrdiff_t _stride, int *_beta, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
+
+void (* hevc_v_loop_filter_luma_c)(
+  uint8_t *_pix, ptrdiff_t _stride, int *_beta, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
+
+void (* hevc_h_loop_filter_chroma_c)(
+  uint8_t *_pix, ptrdiff_t _stride, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
+
+void (* hevc_v_loop_filter_chroma_c)(
+  uint8_t *_pix, ptrdiff_t _stride, int *_tc, uint8_t *_no_p, uint8_t *_no_q);

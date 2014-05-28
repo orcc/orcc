@@ -780,7 +780,7 @@ int sse_init_context()
 
     ff_hevc_transform0_32x32_8_zscan_sse4_orcc[0] = ff_hevc_transform0_32x32_2_8_zscan_sse4;
     ff_hevc_transform0_32x32_8_zscan_sse4_orcc[1] = ff_hevc_transform0_32x32_4_8_zscan_sse4;
-#endif
+#endif // HAVE_SSE4
 
     return 0;
 }

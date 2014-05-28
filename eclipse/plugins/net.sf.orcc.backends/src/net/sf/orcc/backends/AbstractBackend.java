@@ -488,6 +488,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 				return result;
 			} else {
+				OrccLogger.warnln("Unknown directory URL format. dirUrl="
+						+ dirUrl.toString());
 				return false;
 			}
 		} catch (IOException e) {

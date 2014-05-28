@@ -30,12 +30,15 @@ package net.sf.orcc.xdf.ui.util;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
@@ -360,5 +363,35 @@ public class XdfUtil {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Check if the given network contains a vertex (instance or port) with the
+	 * given base name. If yes, return a new unique name formed from the given
+	 * base and a numeric suffix. If not, returns the given base.
+	 * 
+	 * @param network
+	 *            The network to check for existing vertex with the given name
+	 * @param base
+	 *            The base name to assign to a new vertex
+	 * @return A unique name to assign to a new Instance / Port in the given
+	 *         network
+	 */
+	public static String uniqueVertexName(final Network network,
+			final String base) {
+		final Set<String> existingNames = new HashSet<String>();
+		for (Vertex vertex : network.getVertices()) {
+			existingNames.add(vertex.getLabel());
+		}
+
+		if (!existingNames.contains(base)) {
+			return base;
+		} else {
+			int index = 0;
+			while (existingNames.contains(base + '_' + index)) {
+				++index;
+			}
+			return base + '_' + index;
+		}
 	}
 }
