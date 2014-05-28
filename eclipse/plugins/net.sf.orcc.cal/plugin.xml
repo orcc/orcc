@@ -2,14 +2,6 @@
 <?eclipse version="3.0"?>
 
 <plugin>
-
-  <extension point="org.eclipse.emf.ecore.generated_package">
-    <package 
-       uri = "http://orcc.sf.net/cal/Cal" 
-       class = "net.sf.orcc.cal.cal.CalPackage"
-       genModel = "net/sf/orcc/cal/Cal.genmodel" /> 
-	
-  </extension>
   <extension
         id="cli"
         point="org.eclipse.core.runtime.applications">
@@ -33,4 +25,5 @@
               class="net.sf.orcc.cal.util.WorkspaceCreator">
         </run>
      </application>
-  </extension></plugin>
+  </extension>
+</plugin>

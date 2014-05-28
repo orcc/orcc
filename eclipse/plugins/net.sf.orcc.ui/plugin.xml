@@ -157,27 +157,6 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
-      <propertyTabs
-            contributorId="net.sf.orcc.graphiti.ui.properties.contributor">
-         <propertyTab
-               category="net.sf.orcc.graphiti.ui.properties.category.vertex"
-               id="net.sf.orcc.ui.properties.tab.vertex.parameters"
-               label="Instance parameters">
-         </propertyTab>
-         <propertyTab
-               category="net.sf.orcc.graphiti.ui.properties.category.graph"
-               id="net.sf.orcc.ui.properties.tab.graph.parameters"
-               label="Network parameters">
-         </propertyTab>
-         <propertyTab
-               category="net.sf.orcc.graphiti.ui.properties.category.graph"
-               id="net.sf.orcc.ui.properties.tab.graph.variables"
-               label="Network variable declarations">
-         </propertyTab>
-      </propertyTabs>
-   </extension>
-   <extension
          point="org.eclipse.ltk.core.refactoring.renameParticipants">
       <renameParticipant
             class="net.sf.orcc.ui.refactoring.NetworkRenameParticipant"
