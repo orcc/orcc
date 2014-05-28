@@ -59,7 +59,7 @@ def main():
             basePattern = 'Bundle-Version: %s.qualifier'
             simpleReplace(filepath, basePattern % current, basePattern % new)
 
-            basePattern = '(net\.sf\.orcc|org\.xronos)\.([a-zA-Z.]+);bundle-version="%s"(,|;|)' % current
+            basePattern = '(net\.sf\.orcc|org\.xronos)\.([a-zA-Z.:=;]+);bundle-version="%s"(,|;|)' % current
             replacement = '\\1.\\2;bundle-version="%s"\\3' % new
             regExpReplace(filepath, basePattern, replacement)
 
