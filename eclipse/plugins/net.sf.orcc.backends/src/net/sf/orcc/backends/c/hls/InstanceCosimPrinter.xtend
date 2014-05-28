@@ -28,12 +28,11 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.util.Map
-
-import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.df.Connection
 import java.io.File
+import java.util.Map
+import net.sf.orcc.df.Connection
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.util.OrccUtil
 
 /**
  * generates testbench for for vivado co-simulation
@@ -145,7 +144,7 @@ import net.sf.orcc.ir.TypeBool
 			// write results	
 			«FOR port : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
-					fp=fopen("«instance.name»_«port.name».txt","w");
+					fp=fopen("gold_«instance.name»_«port.name».txt","w");
 					for (i=0 ; i<1000 ; i++){
 						tmp_«connection.fifoName»=tab_«connection.fifoName»[i];
 						fprintf(fp, "%d \n", tmp_«connection.fifoName»);
