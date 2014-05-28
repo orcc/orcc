@@ -5,8 +5,7 @@ Bundle-SymbolicName: net.sf.orcc.xdf.ui;singleton:=true
 Bundle-Version: 2.0.2.qualifier
 Bundle-Activator: net.sf.orcc.xdf.ui.Activator
 Bundle-Vendor: IETR/INSA Rennes
-Require-Bundle: net.sf.orcc.core,
- net.sf.orcc.ui,
+Require-Bundle: net.sf.orcc.ui,
  net.sf.orcc.cal,
  org.eclipse.ui,
  org.eclipse.ui.ide,

@@ -5,7 +5,7 @@ Bundle-Vendor: IETR/INSA Rennes
 Bundle-Version: 2.0.2.qualifier
 Bundle-SymbolicName: net.sf.orcc.cal; singleton:=true
 Bundle-ActivationPolicy: lazy
-Require-Bundle: net.sf.orcc.core;bundle-version="2.0.2",
+Require-Bundle: net.sf.orcc.core;bundle-version="2.0.2";visibility:=reexport,
  org.eclipse.xtext;bundle-version="2.0.0",
  org.antlr.runtime;bundle-version="3.2.0",
  org.apache.commons.logging;resolution:=optional,
