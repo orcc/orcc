@@ -239,9 +239,9 @@ class HwProjectPrinter extends TTAPrinter {
 		    <property xil_pn:name="Implementation Top" xil_pn:value="Architecture|top|bdf_type" xil_pn:valueState="non-default"/>
 		    <property xil_pn:name="Implementation Top File" xil_pn:value="top.vhd" xil_pn:valueState="non-default"/>
 		    <property xil_pn:name="Implementation Top Instance Path" xil_pn:value="/top" xil_pn:valueState="non-default"/>
-		    <property xil_pn:name="Device Family" xil_pn:value="Virtex6" xil_pn:valueState="non-default"/>
-		    <property xil_pn:name="Device" xil_pn:value="xc6vlx240t" xil_pn:valueState="non-default"/>
-		    <property xil_pn:name="Package" xil_pn:value="ff1156" xil_pn:valueState="default"/>
+		    <property xil_pn:name="Device Family" xil_pn:value="«fpga.family»" xil_pn:valueState="non-default"/>
+		    <property xil_pn:name="Device" xil_pn:value="«fpga.device»" xil_pn:valueState="non-default"/>
+		    <property xil_pn:name="Package" xil_pn:value="«fpga.package»" xil_pn:valueState="default"/>
 		    <property xil_pn:name="Speed Grade" xil_pn:value="-1" xil_pn:valueState="non-default"/>
 		  </properties>
 		

@@ -19,6 +19,7 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.util.BinOpSeqParser;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -27,6 +28,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccLogger;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -76,6 +78,9 @@ public class SuperactorParser {
 			if (expr == null) {
 				throw new OrccRuntimeException("Expected an Expr element");
 			} else {
+				if(expr.isExprBinary()) {
+					((ExprBinary)expr).setType(IrFactory.eINSTANCE.createTypeBool());
+				}
 				return expr;
 			}
 		}
@@ -180,7 +185,7 @@ public class SuperactorParser {
 						String name = elt.getAttribute("name");
 						// look up variable, in variables scope, and if not
 						// found in parameters scope
-						Var var = findStateVar(network, name);
+						Var var = findStateVar(network, name, thisGuard);
 						if (var == null) {
 							var = findPortVariable(network, name, thisGuard);
 						}
@@ -414,7 +419,18 @@ public class SuperactorParser {
 					}
 				}
 				if (node.getNodeName().equals("guard")) {
-					guardExpression = parseGuard(guard, elt);
+					Expression expr = parseGuard(guard, elt);
+					if (expr != null) {
+						Var resultVar = guard.getBody().newTempLocalVariable(
+								IrFactory.eINSTANCE.createTypeBool(), "result");
+						guard.getBody().getLast().add(
+								IrFactory.eINSTANCE.createInstAssign(
+										resultVar, expr));
+						guardExpression = IrFactory.eINSTANCE.createExprVar(resultVar);
+					} else {
+						guardExpression = null;
+					}
+					
 				}
 			}
 			node = node.getNextSibling();
@@ -534,8 +550,7 @@ public class SuperactorParser {
 	private Instruction createPeekInstruction(Var target, Port port) {
 		Var indexVar = MergerUtil.createIndexVar(port);
 		return IrFactory.eINSTANCE.createInstLoad(target, IrFactory.eINSTANCE
-				.createVar(0,
-						IrFactory.eINSTANCE.createTypeList(1, port.getType()),
+				.createVar(0, EcoreUtil.copy(port.getType()),
 						"tokens_" + port.getName(), true, 0),
 				MergerUtil.createModuloIndex(port, indexVar));
 	}
@@ -552,11 +567,14 @@ public class SuperactorParser {
 		return null;
 	}
 
-	private Var findStateVar(Network network, String name) {
+	private Var findStateVar(Network network, String name, Action guard) {
 		for (Actor actor : network.getAllActors()) {
 			for (Var var : actor.getStateVars()) {
 				if (var.getName().equals(name)) {
-					return var;
+					Var peekVar = guard.getBody().newTempLocalVariable(
+							EcoreUtil.copy(var.getType()), name + "_peek");
+					guard.getBody().getLast().add(IrFactory.eINSTANCE.createInstLoad(peekVar, var));
+					return peekVar;
 				}
 			}
 		}
@@ -577,7 +595,7 @@ public class SuperactorParser {
 	private Var addToPeekList(Action guard, Port port) {
 		createVariableIntroduction(guard, port);
 		Var peekVar = IrFactory.eINSTANCE.createVar(0,
-				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
+				EcoreUtil.copy(port.getType()),
 				new String(port.getName() + "_peek"), true, 0);
 		guard.getBody().getLast().add(
 				createPeekInstruction(peekVar, port));

@@ -40,30 +40,25 @@ struct global_scheduler_s {
 };
 
 struct local_scheduler_s {
-	int id; /** Unique ID of this scheduler */
+    int id; /** Unique ID of this scheduler */
     int nb_schedulers;
-    options_t *opt;
     schedstrategy_et strategy; /** Scheduling strategy */
 
-	/* Round robin */
-	int num_actors; /** number of actors managed by this scheduler */
+    /* Round robin */
+    int num_actors; /** number of actors managed by this scheduler */
     actor_t **actors; /** static list of actors managed by this scheduler */
-	int rr_next_schedulable; /** index of the next actor to schedule in last list */
+    int rr_next_schedulable; /** index of the next actor to schedule in last list */
 
-	/* Data demand/driven scheduler */
+    /* Data demand/driven scheduler */
     actor_t *schedulable[MAX_ACTORS]; /** dynamic list of the next actors to schedule */
-	unsigned int ddd_next_entry; /** index of the next actor to schedule in last list */
-	unsigned int ddd_next_schedulable; /** index of next actor added in the list */
+    unsigned int ddd_next_entry; /** index of the next actor to schedule in last list */
+    unsigned int ddd_next_schedulable; /** index of next actor added in the list */
 
-	/* Multicore with data demand/driven scheduler */
-	int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
-	/* ring topology */
-    waiting_t *ring_waiting_schedulable; /** receiving list of some actors to schedule */
-    waiting_t *ring_sending_schedulable; /** sending list of some actors to schedule */
-	/* mesh topology */
-    waiting_t **mesh_waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
+    /* Multicore with data demand/driven scheduler */
+    int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
+    waiting_t **waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
 
-	/* Genetic algorithm */
+    /* Genetic algorithm */
     sync_t *sync;
     orcc_semaphore_t sem_thread;
 };
@@ -90,8 +85,7 @@ global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync);
 
 void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, options_t *opt);
 
-local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_schedulable,
-        waiting_t *ring_sending_schedulable, int schedulers_nb, sync_t *sync);
+local_scheduler_t *allocate_local_scheduler(int id, int schedulers_nb, sync_t *sync);
 
 /**
  * Initialize the given scheduler.
@@ -102,12 +96,6 @@ void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **ac
  * Initialize the actors mapped to the given scheduler.
  */
 void sched_init_actors(local_scheduler_t *sched, schedinfo_t *si);
-
-/**
- * Reinitialize the given scheduler.
- */
-void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology);
-
 
 /**
  * Returns the next schedulable actor.
@@ -128,23 +116,10 @@ actor_t *sched_get_next_rr(local_scheduler_t *sched);
 actor_t *sched_get_next_ddd(local_scheduler_t *sched);
 
 /**
- * Add the actor to the schedulable or waiting list.
- * The list is chosen according to associate scheduler of the actor.
- */
-void sched_add_schedulable(local_scheduler_t *sched, actor_t *actor, int use_ring_topology);
-
-/**
- * Add waited actors to the schedulable or waiting list.
- * The list is chosen according to associate scheduler of the actor.
- * This function use ring topology of communications.
- */
-void sched_add_ring_waiting_list(local_scheduler_t *sched);
-
-/**
  * Add waited actors to the schedulable list.
- * This function use mesh topology of communications.
+ * Use a fully connected topology of communications.
  */
-void sched_add_mesh_waiting_list(local_scheduler_t *sched);
+void sched_add_waiting_list(local_scheduler_t *sched);
 
 void *scheduler_routine(void *data);
 

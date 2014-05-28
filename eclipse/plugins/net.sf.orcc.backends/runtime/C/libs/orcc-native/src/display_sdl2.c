@@ -62,15 +62,15 @@ static void displayYUV_setSize(int width, int height) {
 void displayYUV_displayPicture(unsigned char *pictureBufferY,
                                unsigned char *pictureBufferU, unsigned char *pictureBufferV,
                                unsigned int   pictureWidth,   unsigned int   pictureHeight) {
-	static unsigned int lastWidth = 0;
+    static unsigned int lastWidth = 0;
     static unsigned int lastHeight = 0;
     SDL_Event event;
 
-	if ((pictureHeight != lastHeight) || (pictureWidth != lastWidth)) {
-		displayYUV_setSize(pictureWidth, pictureHeight);
-		lastHeight = pictureHeight;
-		lastWidth = pictureWidth;
-	}
+    if ((pictureHeight != lastHeight) || (pictureWidth != lastWidth)) {
+        displayYUV_setSize(pictureWidth, pictureHeight);
+        lastHeight = pictureHeight;
+        lastWidth = pictureWidth;
+    }
 
     size1 = pictureWidth * pictureHeight;
 
@@ -85,16 +85,16 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY,
     SDL_RenderCopy(pRenderer1, bmpTex1, NULL, NULL);
     SDL_RenderPresent(pRenderer1);
 
-	/* Grab all the events off the queue. */
-	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
-		case SDL_QUIT:
-			exit(0);
-			break;
-		default:
-			break;
-		}
-	}
+    /* Grab all the events off the queue. */
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+            exit(0);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 void displayYUV_init() {
@@ -120,5 +120,5 @@ int displayYUV_getNbFrames() {
 }
 
 void display_close() {
-	SDL_Quit();
+    SDL_Quit();
 }

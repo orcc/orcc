@@ -28,24 +28,34 @@
  */
 package net.sf.orcc.xdf.ui.diagram;
 
+import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.xdf.ui.features.CopyFeature;
 import net.sf.orcc.xdf.ui.features.DropInstanceFromFileFeature;
+import net.sf.orcc.xdf.ui.features.PasteFeature;
 import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 import net.sf.orcc.xdf.ui.layout.AutoLayoutFeature;
 import net.sf.orcc.xdf.ui.patterns.ConnectionPattern;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.patterns.OutputNetworkPortPattern;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
+import org.eclipse.graphiti.features.ICopyFeature;
 import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.IPasteFeature;
 import org.eclipse.graphiti.features.IReconnectionFeature;
 import org.eclipse.graphiti.features.IRemoveFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.ICopyContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
+import org.eclipse.graphiti.features.context.IPasteContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.IReconnectionContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
@@ -74,6 +84,8 @@ import de.cau.cs.kieler.kiml.options.LayoutOptions;
 public class XdfDiagramFeatureProvider extends
 		DefaultFeatureProviderWithPatterns {
 
+	private final PasteFeature pasteFeature;
+	private final CopyFeature copyFeature;
 	private final UpdateDiagramFeature updateFeature;
 	private final DropInstanceFromFileFeature dropInstanceFeature;
 	private final ICustomFeature[] layoutFeatures;
@@ -85,6 +97,8 @@ public class XdfDiagramFeatureProvider extends
 		addPattern(new OutputNetworkPortPattern());
 		addConnectionPattern(new ConnectionPattern());
 
+		copyFeature = new CopyFeature(this);
+		pasteFeature = new PasteFeature(this);
 		updateFeature = new UpdateDiagramFeature(this);
 		dropInstanceFeature = new DropInstanceFromFileFeature(this);
 
@@ -161,6 +175,16 @@ public class XdfDiagramFeatureProvider extends
 		return super.getAddFeature(context);
 	}
 
+	@Override
+	public ICopyFeature getCopyFeature(ICopyContext context) {
+		return copyFeature;
+	}
+
+	@Override
+	public IPasteFeature getPasteFeature(IPasteContext context) {
+		return pasteFeature;
+	}
+
 	/**
 	 * We never want to remove elements from the diagram. We always want to
 	 * delete them. So it is useless to display the menu entry, the button in
@@ -212,6 +236,48 @@ public class XdfDiagramFeatureProvider extends
 					ctxt.setSourceAnchor(newAnchor);
 					ctxt.setTargetAnchor(connection.getEnd());
 					return conPattern.canStartConnection(ctxt);
+				}
+			}
+
+			@Override
+			public void postReconnect(IReconnectionContext context) {
+
+				// On reconnection, we have to update the business model object
+				// source or target
+				final net.sf.orcc.df.Connection dfConnection = (net.sf.orcc.df.Connection) getBusinessObjectForPictogramElement(context
+						.getConnection());
+				final Anchor newAnchor = context.getNewAnchor();
+				final Vertex vertex = (Vertex) getBusinessObjectForPictogramElement(newAnchor
+						.getParent());
+
+				if (context.getReconnectType().equals(
+						ReconnectionContext.RECONNECT_SOURCE)) {
+
+					if (PropsUtil.isInputPort(newAnchor.getParent())) {
+						dfConnection.setSource(vertex);
+						dfConnection.setSourcePort(null);
+
+					} else if (PropsUtil.isInstanceOutPort(newAnchor)) {
+						dfConnection.setSource(vertex);
+						final Port port = (Port) getBusinessObjectForPictogramElement(newAnchor);
+						dfConnection.setSourcePort(port);
+					} else {
+						OrccLogger
+								.severeln("Unable to get the new source type.");
+					}
+				} else {
+					if (PropsUtil.isOutputPort(newAnchor.getParent())) {
+						dfConnection.setTarget(vertex);
+						dfConnection.setTargetPort(null);
+
+					} else if (PropsUtil.isInstanceInPort(newAnchor)) {
+						dfConnection.setTarget(vertex);
+						final Port port = (Port) getBusinessObjectForPictogramElement(newAnchor);
+						dfConnection.setTargetPort(port);
+					} else {
+						OrccLogger
+								.severeln("Unable to get the new target type.");
+					}
 				}
 			}
 		};

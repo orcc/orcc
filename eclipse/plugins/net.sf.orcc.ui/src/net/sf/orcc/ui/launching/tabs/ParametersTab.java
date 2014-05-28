@@ -75,7 +75,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 
 	private class Variable {
 
-		private String name;
+		private final String name;
 
 		private String value;
 
@@ -103,16 +103,18 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 	 */
 	private class VariableContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {
 		}
 
 		@SuppressWarnings("unchecked")
+		@Override
 		public Object[] getElements(Object inputElement) {
 			Variable[] elements = new Variable[0];
 			ILaunchConfiguration config = (ILaunchConfiguration) inputElement;
 			Map<String, String> m;
 			try {
-				m = config.getAttribute(PARAMETERS, (Map<?, ?>) null);
+				m = config.getAttribute(PARAMETERS, (Map<String, String>) null);
 			} catch (CoreException e) {
 				return elements;
 			}
@@ -128,6 +130,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 			return elements;
 		}
 
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			if (newInput == null) {
 				return;
@@ -157,7 +160,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 
 	private class VariableEditingSupport extends EditingSupport {
 
-		private TextCellEditor editor;
+		private final TextCellEditor editor;
 
 		/**
 		 * Creates a new {@link VariableEditingSupport}.
@@ -338,7 +341,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 		}
 
 		if (map.size() == 0) {
-			configuration.setAttribute(PARAMETERS, (Map<?, ?>) null);
+			configuration.setAttribute(PARAMETERS, (Map<String, String>) null);
 		} else {
 			configuration.setAttribute(PARAMETERS, map);
 		}
@@ -346,6 +349,6 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(PARAMETERS, (Map<?, ?>) null);
+		configuration.setAttribute(PARAMETERS, (Map<String, String>) null);
 	}
 }

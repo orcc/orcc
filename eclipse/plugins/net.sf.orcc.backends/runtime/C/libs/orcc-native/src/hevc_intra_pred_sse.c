@@ -1,13 +1,21 @@
-#include "sse.h"
+#include "hevc_sse.h"
 
-#ifdef __SSE2__
+#include "config.h"
+
+#if HAVE_SSE2
 #include <emmintrin.h>
 #endif
-#ifdef __SSSE3__
+#if HAVE_SSE3
 #include <tmmintrin.h>
 #endif
-#ifdef __SSE4_1__
+#if HAVE_SSE4
 #include <smmintrin.h>
+#endif
+
+#if defined(_MSC_VER)
+#define _MM_STORE_SI128      _mm_storeu_si128
+#else
+#define _MM_STORE_SI128      _mm_store_si128
 #endif
 
 
@@ -496,9 +504,9 @@
     ref[16] = src1[15]
 #define PRED_ANGULAR_STORE1_32_8()                                             \
     r0 = _mm_loadu_si128((__m128i*) (src1-1));                                 \
-    _mm_store_si128((__m128i *) ref, r0);                                      \
+    _MM_STORE_SI128((__m128i *) ref, r0);                                      \
     r0 = _mm_loadu_si128((__m128i*) (src1+15));                                \
-    _mm_store_si128((__m128i *) (ref + 16), r0);                               \
+    _MM_STORE_SI128((__m128i *) (ref + 16), r0);                               \
     ref[32] = src1[31]
 
 #define PRED_ANGULAR_STORE1_4_10()                                             \
@@ -507,23 +515,23 @@
     ref[4] = src1[3]
 #define PRED_ANGULAR_STORE1_8_10()                                             \
     r0 = _mm_loadu_si128((__m128i*) (&src1[-1]));                              \
-    _mm_store_si128((__m128i *) ref, r0);                                      \
+    _MM_STORE_SI128((__m128i *) ref, r0);                                      \
     ref[8] = src1[7]
 #define PRED_ANGULAR_STORE1_16_10()                                            \
     r0 = _mm_loadu_si128((__m128i*) (&src1[-1]));                              \
-    _mm_store_si128((__m128i *) ref, r0);                                      \
+    _MM_STORE_SI128((__m128i *) ref, r0);                                      \
     r0 = _mm_loadu_si128((__m128i*) (&src1[7]));                               \
-    _mm_store_si128((__m128i *) (&ref[8]), r0);                                \
+    _MM_STORE_SI128((__m128i *) (&ref[8]), r0);                                \
     ref[16] = src1[15]
 #define PRED_ANGULAR_STORE1_32_10()                                            \
     r0 = _mm_loadu_si128((__m128i*) (&src1[-1]));                              \
-    _mm_store_si128((__m128i *) ref, r0);                                      \
+    _MM_STORE_SI128((__m128i *) ref, r0);                                      \
     r0 = _mm_loadu_si128((__m128i*) (&src1[7]));                               \
-    _mm_store_si128((__m128i *) (&ref[ 8]), r0);                               \
+    _MM_STORE_SI128((__m128i *) (&ref[ 8]), r0);                               \
     r0 = _mm_loadu_si128((__m128i*) (&src1[15]));                              \
-    _mm_store_si128((__m128i *) (&ref[16]), r0);                               \
+    _MM_STORE_SI128((__m128i *) (&ref[16]), r0);                               \
     r0 = _mm_loadu_si128((__m128i*) (&src1[23]));                              \
-    _mm_store_si128((__m128i *) (&ref[24]), r0);                               \
+    _MM_STORE_SI128((__m128i *) (&ref[24]), r0);                               \
     ref[32] = src1[31]
 
 #define PRED_ANGULAR_WAR()                                                     \
@@ -534,7 +542,7 @@
     PRED_ANGULAR_WAR();                                                        \
     __m128i r2
 #define PRED_ANGULAR_WAR8_8()                                                  \
-    PRED_ANGULAR_WAR4_8();                                                       \
+    PRED_ANGULAR_WAR4_8();                                                     \
     int x
 #define PRED_ANGULAR_WAR16_8()                                                 \
     PRED_ANGULAR_WAR8_8()
@@ -593,7 +601,7 @@ void pred_angular_ ## W ##_ ## D ## _sse(uint8_t *_src, const uint8_t *_top,   \
     }                                                                          \
 }
 
-#ifdef __SSE4_1__
+#if HAVE_SSE4
 PRED_ANGULAR( 4, 8)
 PRED_ANGULAR( 8, 8)
 PRED_ANGULAR(16, 8)

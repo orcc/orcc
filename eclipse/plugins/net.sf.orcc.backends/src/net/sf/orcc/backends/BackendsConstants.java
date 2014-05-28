@@ -37,14 +37,7 @@ public class BackendsConstants {
 	public static final String PROFILE = "net.sf.orcc.backends.profile";
 	public static final String CHECK_ARRAY_INBOUNDS = "net.sf.orcc.backends.checkArrayInbounds";
 	public static final String NEW_SCHEDULER = "net.sf.orcc.backends.newScheduler";
-	public static final String NEW_SCHEDULER_TOPOLOGY = "net.sf.orcc.backends.newScheduler.topology";
-
-	public static enum Topology {
-		Ring, Mesh
-	}
-
-	public static final String THREADS_NB = "net.sf.orcc.backends.processorsNumber";
-
+	
 	public static final String CONVERT_MULTI2MONO = "net.sf.orcc.backends.multi2mono";
 	public static final String ADDITIONAL_TRANSFOS = "net.sf.orcc.backends.add_transfos";
 

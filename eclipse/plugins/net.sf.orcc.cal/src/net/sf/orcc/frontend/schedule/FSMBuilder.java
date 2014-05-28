@@ -54,7 +54,7 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.StringEdgeNameProvider;
 import org.jgrapht.ext.StringNameProvider;
-import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.graph.DirectedPseudograph;
 
 /**
  * This class defines a FSM builder.
@@ -72,7 +72,7 @@ public class FSMBuilder {
 	 * Creates a FSM builder.
 	 */
 	public FSMBuilder() {
-		graph = new DirectedMultigraph<AstState, UniqueEdge>(UniqueEdge.class);
+		graph = new DirectedPseudograph<AstState, UniqueEdge>(UniqueEdge.class);
 	}
 
 	/**
@@ -198,6 +198,7 @@ public class FSMBuilder {
 	private Map<Action, State> getTargets(AstState source, ActionList actionList) {
 		Map<Action, State> targets = new HashMap<Action, State>();
 		Set<UniqueEdge> edges = graph.outgoingEdgesOf(source);
+
 		for (UniqueEdge edge : edges) {
 			AstState astTarget = graph.getEdgeTarget(edge);
 			State target = Frontend.instance.getMapping(astTarget);

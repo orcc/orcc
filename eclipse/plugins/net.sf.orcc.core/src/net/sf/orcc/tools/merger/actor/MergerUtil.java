@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
@@ -83,25 +85,29 @@ public class MergerUtil {
 
 	public static Var createIndexVar(Port port) {
 		return IrFactory.eINSTANCE.createVar(0,
-				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
+				EcoreUtil.copy(port.getType()),
 				new String("index_" + port.getName()), true, 0);
 	}
 
 	public static List<Expression> createModuloIndex(Port port, Var indexVar) {
 		Var sizeVar = IrFactory.eINSTANCE.createVar(0,
-				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
+				EcoreUtil.copy(port.getType()),
 				new String("SIZE_" + port.getName()), true, 0);
 		List<Expression> indexExpression = new ArrayList<Expression>(1);
 		indexExpression.add(IrFactory.eINSTANCE.createExprBinary(
 				IrFactory.eINSTANCE.createExprVar(indexVar), OpBinary.MOD,
-				IrFactory.eINSTANCE.createExprVar(sizeVar), port.getType()));
+				IrFactory.eINSTANCE.createExprVar(sizeVar),
+				EcoreUtil.copy(port.getType())));
 		return indexExpression;
 	}
 	
-	public static Instruction createBinOpStore(Var variable, OpBinary operation, int constant) {
+	public static Instruction createBinOpStore(Var variable, OpBinary operation,
+			int constant) {
 		return IrFactory.eINSTANCE.createInstStore(variable, 
-				IrFactory.eINSTANCE.createExprBinary(IrFactory.eINSTANCE.createExprVar(variable), operation, 
-				IrFactory.eINSTANCE.createExprInt(constant), IrFactory.eINSTANCE.createTypeInt()));		
+				IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprVar(variable), operation, 
+				IrFactory.eINSTANCE.createExprInt(constant), 
+				IrFactory.eINSTANCE.createTypeInt()));		
 	}
 	
 }

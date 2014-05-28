@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.c
 
 import java.io.File
-import java.util.HashMap
 import java.util.Map
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Network
@@ -39,7 +39,6 @@ import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.OrccLaunchConstants.*
-import net.sf.orcc.df.Actor
 import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
@@ -53,15 +52,8 @@ class NetworkPrinter extends CTemplate {
 	protected val Network network;
 	protected val int fifoSize;
 	
-	protected var boolean profile = false
-	var boolean ringTopology = false
-	
+	protected var boolean profile = false	
 	protected var boolean newSchedul = false
-	
-	var int threadsNb = 1;
-	
-	val int numberOfGroups
-	protected val Map<Vertex, Integer> vertexToIdMap
 	
 	new(Network network, Map<String, Object> options) {
 		this.network = network
@@ -77,24 +69,6 @@ class NetworkPrinter extends CTemplate {
 		}
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
-		}
-		if (options.containsKey(NEW_SCHEDULER_TOPOLOGY) ) {
-			ringTopology = options.get(NEW_SCHEDULER_TOPOLOGY).equals("Ring")
-		}
-		if (options.containsKey(THREADS_NB)) {
-			if(options.get(THREADS_NB) instanceof String) {
-				threadsNb = Integer::valueOf(options.get(THREADS_NB) as String)
-			} else {
-				threadsNb = options.get(THREADS_NB) as Integer
-			}
-		}
-		
-		//Template data :
-		// TODO : set the right values when genetic algorithm will be fixed
-		numberOfGroups = 0
-		vertexToIdMap = new HashMap<Vertex, Integer>
-		for(instance : network.children) {
-			vertexToIdMap.put(instance, 0)
 		}
 	}
 	
@@ -178,9 +152,9 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the actors array
 		«FOR child : network.children»
 			«IF profile»
-				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0, "«child.getAdapter(typeof(Actor)).getFile().getProjectRelativePath().removeFirstSegments(1).removeFileExtension().toString().replace("/", ".")»", 0, 0, 0};
+				actor_t «child.label» = {"«child.label»", «child.label»_initialize, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, «child.label»_actions, «child.getAdapter(typeof(Actor)).actions.size», 0, "«child.getAdapter(typeof(Actor)).getFile().getProjectRelativePath().removeFirstSegments(1).removeFileExtension().toString().replace("/", ".")»", 0, 0, 0};
 			«ELSE»
-				actor_t «child.label» = {"«child.label»", «vertexToIdMap.get(child)», «child.label»_initialize, NULL, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, NULL, 0, 0, "", 0, 0, 0};
+				actor_t «child.label» = {"«child.label»", «child.label»_initialize, «child.label»_scheduler, 0, 0, 0, 0, NULL, -1, «network.children.indexOf(child)», 0, 1, 0, 0, 0, NULL, 0, 0, "", 0, 0, 0};
 			«ENDIF»						
 		«ENDFOR»
 
@@ -223,7 +197,7 @@ class NetworkPrinter extends CTemplate {
 			
 			options_t *opt = init_orcc(argc, argv);
 			atexit(atexit_actions);
-			set_scheduling_strategy(«IF !newSchedul»"RR"«ELSEIF ringTopology»"DDR"«ELSE»"DDF"«ENDIF», opt);
+			set_scheduling_strategy(«IF !newSchedul»"RR"«ELSE»"DD"«ENDIF», opt);
 			
 			launcher(opt, &network);
 			«afterMain»

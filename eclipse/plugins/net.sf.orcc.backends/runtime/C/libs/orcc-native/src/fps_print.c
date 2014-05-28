@@ -43,10 +43,10 @@ static int numAlreadyDecoded;
 static int partialNumPicturesDecoded;
 
 static void print_fps_avg() {
-	unsigned int endTime = SDL_GetTicks();
+    unsigned int endTime = SDL_GetTicks();
 
     print_orcc_trace(ORCC_VL_QUIET, "%i images in %f seconds: %f FPS", numPicturesDecoded,
-		(float) (endTime - startTime)/ 1000.0f,
+        (float) (endTime - startTime)/ 1000.0f,
         1000.0f * (float) numPicturesDecoded / (float) (endTime - startTime));
 }
 
@@ -59,12 +59,12 @@ static void print_fps_mapping() {
 }
 
 void fpsPrintInit() {
-	startTime = SDL_GetTicks();
-	numPicturesDecoded = 0;
+    startTime = SDL_GetTicks();
+    numPicturesDecoded = 0;
     partialNumPicturesDecoded = 0;
-	lastNumPic = 0;
+    lastNumPic = 0;
     atexit(print_fps_avg);
-	relativeStartTime = startTime;
+    relativeStartTime = startTime;
 }
 
 void fpsPrintInit_mapping() {
@@ -75,18 +75,18 @@ void fpsPrintInit_mapping() {
 
 
 void fpsPrintNewPicDecoded(void) {
-	unsigned int endTime;
-	numPicturesDecoded++;
+    unsigned int endTime;
+    numPicturesDecoded++;
     partialNumPicturesDecoded++;
-	endTime = SDL_GetTicks();
+    endTime = SDL_GetTicks();
     if ((endTime - relativeStartTime) / 1000.0f >= 5) {
         print_orcc_trace(ORCC_VL_QUIET, "%f images/sec",
-				1000.0f * (float) (numPicturesDecoded - lastNumPic)
-						/ (float) (endTime - relativeStartTime));
+                1000.0f * (float) (numPicturesDecoded - lastNumPic)
+                        / (float) (endTime - relativeStartTime));
 
-		relativeStartTime = endTime;
-		lastNumPic = numPicturesDecoded;
-	}
+        relativeStartTime = endTime;
+        lastNumPic = numPicturesDecoded;
+    }
 }
 
 int get_partialNumPicturesDecoded() {

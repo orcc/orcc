@@ -45,6 +45,17 @@ typedef int32_t idx_t;
 
 #endif
 
+// from APR
+/* Ignore Microsoft's interpretation of secure development
+* and the POSIX string handling API
+*/
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#pragma warning(disable: 4996)
+#endif
+
 typedef struct sync_s sync_t;
 typedef struct options_s options_t;
 typedef struct global_scheduler_s global_scheduler_t;
@@ -59,7 +70,9 @@ typedef struct waiting_s waiting_t;
 typedef struct agent_s agent_t;
 typedef struct adjacency_list_s adjacency_list;
 
-typedef enum { FALSE, TRUE } boolean;
+typedef int boolean;
+#define TRUE  1
+#define FALSE 0
 
 /* Error codes */
 /* !TODO : Add more errors */
@@ -92,8 +105,7 @@ typedef enum {
 /* Scheduling strategy codes */
 typedef enum {
     ORCC_SS_ROUND_ROBIN,
-    ORCC_SS_RING_DD_DRIVEN, /* data-driven & demand-driven with ring-connected topology */
-    ORCC_SS_FULL_DD_DRIVEN, /* data-driven & demand-driven with full-connected topology */
+    ORCC_SS_DD_DRIVEN, /* data-driven & demand-driven */
     ORCC_SS_SIZE /* only used for string tab declaration */
 } schedstrategy_et;
 

@@ -36,15 +36,16 @@ import tempita
 
 class Memory:
 
-    def __init__(self, name, width, depth):
+    def __init__(self, name, width, depth, version):
         self.width = width
         self.depth = depth
         self.name = name
+        self.version = version
         
     def generate(self, instanceName, templateFile, targetFile):
         template = tempita.Template.from_filename(templateFile, namespace={}, encoding=None)
         result = template.substitute(id=instanceName, width=self.getWidth(),
-                            depth=self.getDepth(), addr=self.getAddr())
+                            depth=self.getDepth(), addr=self.getAddr(), bm_vers=self.getVersion())
         open(targetFile, "w").write(result)
     
     def getAddr(self):
@@ -63,4 +64,6 @@ class Memory:
     def getName(self):
         return self.name
         
+    def getVersion(self):
+        return self.version
 

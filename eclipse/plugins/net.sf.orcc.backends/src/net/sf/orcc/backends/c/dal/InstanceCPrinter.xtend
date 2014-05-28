@@ -433,10 +433,10 @@ class InstanceCPrinter extends CTemplate {
 	def private printStateTransitions(State state) '''
 		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
 			«IF (actor.hasAttribute("variableInputPattern"))»
-				if (isSchedulable_«trans.action.name»(_p)) {
+				if («trans.action.scheduler.name»(_p)) {
 					«trans.action.body.name»(_p«FOR port : actor.getOutputs»«IF port.getNumTokensProduced() > 0», «port.getName()»_buffer, &«port.getName()»_index«ENDIF»«ENDFOR»);
 			«ELSE»
-				if (isSchedulable_«trans.action.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR», &iter)) {
+				if («trans.action.scheduler.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR», &iter)) {
 					«trans.action.body.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR»«FOR port : actor.getOutputs»«IF port.getNumTokensProduced() > 0», «port.getName()»_buffer, &«port.getName()»_index«ENDIF»«ENDFOR», &iter);
 			«ENDIF»
 				«IF !trans.target.name.equals(state.name)»
@@ -502,10 +502,10 @@ class InstanceCPrinter extends CTemplate {
 	def private printActions(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
 			«IF (actor.hasAttribute("variableInputPattern"))»
-				if (isSchedulable_«action.name»(_p)) {
+				if («action.scheduler.name»(_p)) {
 					«action.body.name»(_p«FOR port : actor.getOutputs»«IF port.getNumTokensProduced() > 0», «port.getName()»_buffer, &«port.getName()»_index«ENDIF»«ENDFOR»);
 			«ELSE»
-				if (isSchedulable_«action.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR», &iter)) {
+				if («action.scheduler.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR», &iter)) {
 					«action.body.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR»«FOR port : actor.getOutputs»«IF port.getNumTokensProduced() > 0», «port.getName()»_buffer, &«port.getName()»_index«ENDIF»«ENDFOR», &iter);
 			«ENDIF»
 				goto finished;
@@ -518,10 +518,10 @@ class InstanceCPrinter extends CTemplate {
 	def private printOutsideFSMActions(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
 			«IF (actor.hasAttribute("variableInputPattern"))»
-				if (isSchedulable_«action.name»(_p)) {
+				if («action.scheduler.name»(_p)) {
 					«action.body.name»(_p«FOR port : actor.getOutputs»«IF port.getNumTokensProduced() > 0», «port.getName()»_buffer, «port.getName()»_index«ENDIF»«ENDFOR»);
 			«ELSE»
-				if (isSchedulable_«action.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, «port.getName()»_index«ENDFOR», iter)) {
+				if («action.scheduler.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, «port.getName()»_index«ENDFOR», iter)) {
 					«action.body.name»(_p«FOR port : actor.getInputs», «port.getName()»_buffer, «port.getName()»_index«ENDFOR»«FOR port : actor.getOutputs»«IF port.getNumTokensProduced() > 0», «port.getName()»_buffer, «port.getName()»_index«ENDIF»«ENDFOR», iter);
 			«ENDIF»
 				goto finished;

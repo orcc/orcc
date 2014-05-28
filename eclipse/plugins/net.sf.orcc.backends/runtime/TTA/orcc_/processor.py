@@ -44,9 +44,12 @@ import datetime
 
 class Processor:
 
-    def __init__(self, name, actors, inputs, outputs, usePrint):
+    def __init__(self, name, actors, inputs, outputs, usePrint, family, device, package):
         # General
         self.id = name
+        self.family = family
+        self.device = device
+        self.package = package
         # Ports
         self.inputs = inputs
         self.outputs = outputs
@@ -227,7 +230,7 @@ class Processor:
                 depth = content[2]
                 depth = depth[:len(depth) - 1]
         
-        return Memory(fileName, int(width), int(depth))
+        return Memory(fileName, int(width), int(depth), "")
 
     def _readAdf(self, fileName):
         adf = parse(fileName)
@@ -237,7 +240,7 @@ class Processor:
                 minAddress = int(node.getElementsByTagName("min-address")[0].childNodes[0].nodeValue)
                 maxAddress = int(node.getElementsByTagName("max-address")[0].childNodes[0].nodeValue)
                 depth = int((maxAddress - minAddress) / 4)
-        return Memory(fileName, width, depth)
+        return Memory(fileName, width, depth, "")
         
     def _hasNativePort(self):
         for input in self.inputs:
@@ -258,13 +261,13 @@ class Processor:
     def generateCgFiles(self, libPath, genPath):
         templatePath = os.path.join(libPath, "templates")
         template = tempita.Template.from_filename(os.path.join(templatePath, "cg_project.template"), namespace={}, encoding=None)
-        result = template.substitute(path=genPath)
+        result = template.substitute(path=genPath, family=self.family, device=self.device, package=self.package)
         open(os.path.join(genPath, "cg_project.cgp"), "w").write(result)
         template = tempita.Template.from_filename(os.path.join(templatePath, "xco_ram_1p.template"), namespace={}, encoding=None)
-        result = template.substitute(path=genPath, id=self.id, width=self.dram.getWidth(), depth=self.dram.getDepth())
+        result = template.substitute(path=genPath, id=self.id, width=self.dram.getWidth(), depth=self.dram.getDepth(), bm_vers=self.dram.getVersion())
         open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
         template = tempita.Template.from_filename(os.path.join(templatePath, "xco_rom.template"), namespace={}, encoding=None)
-        result = template.substitute(path=genPath, id=self.id, width=self.irom.getWidth(), depth=self.irom.getDepth())
+        result = template.substitute(path=genPath, id=self.id, width=self.irom.getWidth(), depth=self.irom.getDepth(), bm_vers=self.dram.getVersion())
         open(os.path.join(genPath, self._xoeRomFile), "w").write(result)
 
 

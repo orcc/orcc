@@ -74,10 +74,14 @@ class CMakePrinter extends CommonPrinter {
 		# Definitions configured and used in subdirectories
 		set(extra_definitions)
 		set(extra_includes)
+		set(extra_libraries)
 		
 		# Runtime libraries inclusion
-		include_directories(libs/orcc-native/include)
-		include_directories(libs/orcc-runtime/include)
+		include_directories(
+			${PROJECT_BINARY_DIR}/libs # to find config.h
+			libs/orcc-native/include
+			libs/orcc-runtime/include
+		)
 		
 		«addLibrariesSubdirs»
 	'''
@@ -113,6 +117,6 @@ class CMakePrinter extends CommonPrinter {
 		add_executable(«network.simpleName» ${filenames})
 
 		# Build library without any external library required
-		target_link_libraries(«network.simpleName» orcc-native orcc-runtime)
+		target_link_libraries(«network.simpleName» orcc-native orcc-runtime ${extra_libraries})
 	'''
 }

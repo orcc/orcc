@@ -209,22 +209,7 @@
                description="Uses an experimental scheduler instead of using the default round-robin scheduler"
                id="net.sf.orcc.backends.newScheduler"
                name="Use a smarter scheduler">
-            <checkBox>
-	            <option
-	               defaultValue="Ring"
-	               description="Select a communication topology between actor schedulers"
-	               id="net.sf.orcc.backends.newScheduler.topology"
-	               name="Communication topology between actor schedulers:">
-	            <comboBox>
-	               <comboBoxItem
-	                     id="Ring">
-	               </comboBoxItem>
-	               <comboBoxItem
-	                     id="Fully">
-	               </comboBoxItem>
-            	</comboBox>
-         		</option>
-            </checkBox>
+		    <checkBox></checkBox>
          </option>
 		 <option
 		       defaultValue="false"
@@ -321,6 +306,9 @@
                </comboBoxItem>
                <comboBoxItem
                   id="Virtex6 (xc6vlx240t)">
+               </comboBoxItem>
+               <comboBoxItem
+                  id="ZedBoard (xc7z020)">
                </comboBoxItem>
                <comboBoxItem
                   id="Others">

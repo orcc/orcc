@@ -32,35 +32,41 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
 import net.sf.orcc.xdf.ui.dialogs.NewNetworkWizard;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
-import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
@@ -78,18 +84,12 @@ import org.eclipse.ui.PlatformUI;
  * @author Antoine Lorence
  * 
  */
-public class GroupInstancesFeature extends AbstractCustomFeature {
-
-	private boolean hasDoneChanges;
-
-	private final Map<String, Integer> portNamesIndexes;
+public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 
 	private Network newNetwork;
 
 	public GroupInstancesFeature(IFeatureProvider fp) {
 		super(fp);
-		hasDoneChanges = false;
-		portNamesIndexes = new HashMap<String, Integer>();
 	}
 
 	@Override
@@ -134,15 +134,14 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 		return cptInstances >= 2;
 	}
 
-	@Override
-	public void execute(ICustomContext context) {
-		beforeJobExecution();
-		execute(context, new NullProgressMonitor());
-	}
-
-	protected void beforeJobExecution() {
-		portNamesIndexes.clear();
-
+	/**
+	 * Display a window to user, to configure location and name of the Network
+	 * which will be created to store grouped instances.
+	 * 
+	 * @return A valid Network instance, configured with its name, fileName and
+	 *         registered in a Resource
+	 */
+	protected Network selectNewNetworkResource() {
 		final Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
 
 		// Create the wizard used to select name and location for the new
@@ -158,188 +157,119 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 				wizard);
 		dialog.open();
 		if (dialog.getReturnCode() != Dialog.OK) {
-			return;
+			return null;
 		}
 
-		// The new network
-		newNetwork = wizard.getCreatedNetwork();
+		return wizard.getCreatedNetwork();
 	}
 
-	protected void execute(ICustomContext context,
-			IProgressMonitor parentMonitor) {
+	@Override
+	protected void beforeJobExecution() {
+		// The network to fill with selected content
+		newNetwork = selectNewNetworkResource();
+	}
 
+	@Override
+	public void execute(ICustomContext context, IProgressMonitor parentMonitor) {
 		if (newNetwork == null) {
 			return;
 		}
 
+		// The current network, where the selected content will be replaced by a
+		// new instance
 		final Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
-		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
 
-		final SubMonitor monitor = SubMonitor.convert(parentMonitor, 140);
-
-		final Set<Instance> selection = new HashSet<Instance>();
-		final Set<PictogramElement> peSelection = new HashSet<PictogramElement>();
+		// Configure lists of selected Instances and PictogramElements. If user
+		// selected Ports or Connections, they are ignored
+		final Set<Instance> selectedInstances = new HashSet<Instance>();
+		final Set<PictogramElement> selectedPe = new HashSet<PictogramElement>();
 		for (final PictogramElement pe : context.getPictogramElements()) {
 			final Object selected = getBusinessObjectForPictogramElement(pe);
 			if (selected instanceof Instance) {
-				selection.add((Instance) selected);
-				peSelection.add(pe);
+				selectedInstances.add((Instance) selected);
+				selectedPe.add(pe);
 			} else {
 				continue;
 			}
 		}
 
-		monitor.worked(10);
+		final SubMonitor monitor = SubMonitor.convert(parentMonitor, 100);
+		monitor.newChild(5);
+
+		// Create an Instance refined on the new Network
+		final String instanceName = XdfUtil.uniqueVertexName(currentNetwork,
+				"groupedInstances");
+		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
+				instanceName, newNetwork);
+		currentNetwork.add(newInstance);
+
+		SubMonitor loopProgress = monitor.newChild(5).setWorkRemaining(
+				selectedInstances.size());
+		monitor.setTaskName("Initialization");
+
+		// This will store the mapping between original instances and their copy
+		// in the new Network
+		final Map<Instance, Instance> copyMap = new HashMap<Instance, Instance>();
+
+		// Copy each selected Instance into the new Network
+		for (final Instance originalInstance : selectedInstances) {
+			loopProgress.newChild(1);
+			final Instance copyInstance = IrUtil.copy(originalInstance);
+			copyMap.put(originalInstance, copyInstance);
+			newNetwork.add(copyInstance);
+
+			// IrUtil.copy() duplicated all arguments, and set their Use objects
+			// to original variables, owned by the current network
+			for (Argument arg : copyInstance.getArguments()) {
+
+				for (Iterator<EObject> it = arg.eAllContents(); it.hasNext();) {
+					final EObject childEObject = it.next();
+
+					if (childEObject instanceof ExprVar) {
+
+						final ExprVar exprVar = (ExprVar) childEObject;
+						final Var varOrig = exprVar.getUse().getVariable();
+
+						// Create a copy of the original variable (owned by
+						// currentNetwork)
+						final Var varCopy = EcoreUtil.copy(varOrig);
+						// The newNetwork must contains this copy
+						newNetwork.getParameters().add(varCopy);
+						exprVar.getUse().setVariable(varCopy);
+
+						final ExprVar newExprVar = IrFactory.eINSTANCE
+								.createExprVar(varOrig);
+						final Argument newArg = DfFactory.eINSTANCE
+								.createArgument(varCopy, newExprVar);
+						newInstance.getArguments().add(newArg);
+					}
+				}
+			}
+		}
 
 		// This set will be filled with connections which needs to be
 		// re-added to the diagram
 		final Set<Connection> toUpdateInDiagram = new HashSet<Connection>();
-		final Instance newInstance;
-		try {
-			// Update the current and the created network. Also create the new
-			// instance used to replace all selected elements
-			newInstance = updateNetworksAndCreateInstance(currentNetwork,
-					newNetwork, selection, toUpdateInDiagram,
-					monitor.newChild(50));
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
 
-		// Adds it to the current network
-		final AddContext addContext = new AddContext();
-		addContext.setTargetContainer(getDiagram());
-		addContext.setNewObject(newInstance);
-		// We will run the layout at the end
-		addContext.setLocation(10, 10);
-		final PictogramElement newInstancePe = getFeatureProvider()
-				.addIfPossible(addContext);
-
-		monitor.worked(10);
-
-		SubMonitor loopProgress = monitor.newChild(30).setWorkRemaining(
-				toUpdateInDiagram.size());
-		monitor.setTaskName("Update existing connections");
-
-		// Update connections to/from the new instance
-		for (final Connection connection : toUpdateInDiagram) {
-
-			// Delete the link, to avoid loosing the connection when instance will be deleted
-			final List<PictogramElement> pes = Graphiti.getLinkService().getPictogramElements(getDiagram(), connection);
-			for(PictogramElement linkedPe : pes) {
-				EcoreUtil.delete(linkedPe.getLink(), true);
-			}
-
-			final IAddConnectionContext addConContext =
-					XdfUtil.getAddConnectionContext(fp, getDiagram(), connection);
-			getFeatureProvider().addIfPossible(addConContext);
-
-			loopProgress.worked(1);
-		}
-
-		loopProgress = monitor.newChild(30)
-				.setWorkRemaining(peSelection.size());
-		monitor.setTaskName("Delete useless elements");
-
-		// Finally remove from diagram useless elements. Inner connections
-		// are also deleted, since deleting an instance or a port from a
-		// diagram also clean related connections
-		for (final PictogramElement pe : peSelection) {
-			final IPattern pattern = fp.getPatternForPictogramElement(pe);
-			final DeleteContext delContext = new DeleteContext(pe);
-			delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
-			pattern.delete(delContext);
-
-			loopProgress.worked(1);
-		}
-
-		monitor.setTaskName("Lay out the diagram");
-
-		// Layout the resulting diagram
-		final IContext layoutContext = new CustomContext();
-		final ICustomFeature layoutFeature = ((XdfDiagramFeatureProvider) getFeatureProvider())
-				.getDefaultLayoutFeature();
-		if (layoutFeature.canExecute(layoutContext)) {
-			layoutFeature.execute(layoutContext);
-		}
-
-		// Finally, active direct editing on the freshly created instance
-		final IDirectEditingInfo dei = getFeatureProvider()
-				.getDirectEditingInfo();
-		dei.setMainPictogramElement(newInstancePe);
-		dei.setActive(true);
-
-		monitor.worked(10);
-
-		hasDoneChanges = true;
-	}
-
-	/**
-	 * <p>
-	 * Here is the magic. In this function, both current and new network are
-	 * updated to reflect changes of this feature.
-	 * </p>
-	 * 
-	 * <p>
-	 * All vertices (ports/instances) selected by user are duplicated. Copies
-	 * are added to the new network, originals are removed from the current
-	 * network. If selection cut connections in the current diagram, new ports
-	 * are created and correctly connected in the new network. They are also
-	 * updated to connect to the right port on the new instance.
-	 * </p>
-	 * 
-	 * <p>
-	 * This function modify networks only. It does not update corresponding
-	 * diagrams.
-	 * </p>
-	 * 
-	 * @param currentNetwork
-	 *            The network user is working on
-	 * @param newNetwork
-	 *            The network created to contains elements selected by user
-	 * @param selection
-	 *            Vertices selected.
-	 * @param toUpdateInDiagram
-	 *            A set of connections. Needs to adds all these connections to
-	 *            the current diagram
-	 * @return The instance created
-	 * @throws IOException
-	 */
-	private Instance updateNetworksAndCreateInstance(
-			final Network currentNetwork, final Network newNetwork,
-			final Set<Instance> selection,
-			final Set<Connection> toUpdateInDiagram, final SubMonitor monitor)
-			throws IOException {
-
-		final Map<Instance, Instance> copies = new HashMap<Instance, Instance>();
-		final Map<Connection, Port> toReconnectToTarget = new HashMap<Connection, Port>();
-		final Map<Connection, Port> toReconnectFromSource = new HashMap<Connection, Port>();
-
-		monitor.setWorkRemaining(100);
-
-		SubMonitor loopProgress = monitor.newChild(20).setWorkRemaining(
-				selection.size());
-		// Adds copies of selected objects to the new network
-		for (final Instance originalInstance : selection) {
-			final Instance copy = EcoreUtil.copy(originalInstance);
-			copies.put(originalInstance, copy);
-			newNetwork.add(copy);
-			loopProgress.worked(1);
-		}
-
-		loopProgress = monitor.newChild(40).setWorkRemaining(
+		loopProgress = monitor.newChild(5).setWorkRemaining(
 				currentNetwork.getConnections().size());
+		monitor.setTaskName("Update current network connections");
 
-		// Manage connections
+		// Manage Connections in the current Network. Connections will NOT be
+		// deleted, only updated, so it is not mandatory to make a copy before
+		// looping on the list
 		for (final Connection connection : currentNetwork.getConnections()) {
+
+			loopProgress.newChild(1);
+
 			// 1 - Inner connection: connect 2 vertex both contained in the
 			// selection
-			if (selection.contains(connection.getSource())
-					&& selection.contains(connection.getTarget())) {
+			if (selectedInstances.contains(connection.getSource())
+					&& selectedInstances.contains(connection.getTarget())) {
 				final Connection copy = EcoreUtil.copy(connection);
 
-				final Instance src = copies.get(connection.getSource());
-				final Instance tgt = copies.get(connection.getTarget());
+				final Instance src = copyMap.get(connection.getSource());
+				final Instance tgt = copyMap.get(connection.getTarget());
 
 				copy.setSource(src);
 				copy.setTarget(tgt);
@@ -352,117 +282,155 @@ public class GroupInstancesFeature extends AbstractCustomFeature {
 			}
 			// 2 - Cut connection: connected TO a vertex contained in the
 			// selection
-			else if (selection.contains(connection.getTarget())) {
-				// Create a new port
-				final Port p = DfFactory.eINSTANCE.createPort(
+			else if (selectedInstances.contains(connection.getTarget())) {
+				// Create an input Port in the new Network
+				final Port newInputPort = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getTargetPort().getType()),
-						uniquePortName(connection.getTargetPort().getName()));
-				newNetwork.addInput(p);
-				// We will reconnect this connection when new instance will be
-				// created
-				toReconnectToTarget.put(connection, p);
-				// Create a new connection, ...
-				final Instance target = copies.get(connection.getTarget());
+						XdfUtil.uniqueVertexName(newNetwork, connection
+								.getTargetPort().getName()));
+				newNetwork.addInput(newInputPort);
+
+				// Create a Connection in the new Network
+				final Instance target = copyMap.get(connection.getTarget());
 				final Port targetPort = target.getAdapter(Entity.class)
 						.getInput(connection.getTargetPort().getName());
-				final Connection c = DfFactory.eINSTANCE.createConnection(p,
-						null, target, targetPort);
-				// ... fully contained in the new network
-				newNetwork.add(c);
+				newNetwork.add(DfFactory.eINSTANCE.createConnection(newInputPort, null,
+						target, targetPort));
+
+				// Update this Connection target: the new Instance, on the right
+				// input Port
+				connection.setTarget(newInstance);
+				connection.setTargetPort(newInputPort);
+
+				toUpdateInDiagram.add(connection);
 			}
 			// 3 - Cut connections: connected FROM a vertex contained in the
 			// selection
-			else if (selection.contains(connection.getSource())) {
-				// Create a new port
-				final Port p = DfFactory.eINSTANCE.createPort(
+			else if (selectedInstances.contains(connection.getSource())) {
+				// Create an output Port in the new Network
+				final Port newOutputPort = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(connection.getSourcePort().getType()),
-						uniquePortName(connection.getSourcePort().getName()));
-				newNetwork.addOutput(p);
-				// We will reconnect this connection when new instance will be
-				// created
-				toReconnectFromSource.put(connection, p);
-				// Create a new connection, ...
-				final Instance source = copies.get(connection.getSource());
+						XdfUtil.uniqueVertexName(newNetwork, connection
+								.getSourcePort().getName()));
+				newNetwork.addOutput(newOutputPort);
+
+				// Create a Connection in the new Network
+				final Instance source = copyMap.get(connection.getSource());
 				final Port sourcePort = source.getAdapter(Entity.class)
 						.getOutput(connection.getSourcePort().getName());
+				newNetwork.add(DfFactory.eINSTANCE.createConnection(source,
+						sourcePort, newOutputPort, null));
 
-				final Connection c = DfFactory.eINSTANCE.createConnection(
-						source, sourcePort, p, null);
-				// ... fully contained in the new network
-				newNetwork.add(c);
+				// Update this Connection source: the new Instance, on the right
+				// output Port
+				connection.setSource(newInstance);
+				connection.setSourcePort(newOutputPort);
+
+				toUpdateInDiagram.add(connection);
 			}
-
-			loopProgress.worked(1);
 		}
 
-		// Save the new network on the disk
-		newNetwork.eResource().save(Collections.EMPTY_MAP);
+		monitor.newChild(5);
+		monitor.setTaskName("Add the new instance");
 
-		monitor.worked(20);
+		// Now the new Network is up-to-date. In particular, it contains all its
+		// Ports. We can add the new Instance refined on this Network in the
+		// current Diagram. Doing this now allows to have Anchors for Instance
+		// Port available. These Anchors will be used to update existing
+		// FreeFormConnections
+		final AddContext addContext = new AddContext();
+		addContext.setTargetContainer(getDiagram());
+		addContext.setNewObject(newInstance);
+		// We will run the layout at the end
+		addContext.setLocation(10, 10);
+		final PictogramElement newInstancePe = getFeatureProvider()
+				.addIfPossible(addContext);
 
-		final String instanceName = uniqueInstanceName(currentNetwork,
-				"groupedInstances");
-		// Create the new instance
-		final Instance newInstance = DfFactory.eINSTANCE.createInstance(
-				instanceName, newNetwork);
-		currentNetwork.add(newInstance);
+		// Get the instancePattern
+		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
+		final InstancePattern instancePattern = (InstancePattern) fp
+				.getPatternForPictogramElement(newInstancePe);
 
-		monitor.worked(10);
+		loopProgress = monitor.newChild(5).setWorkRemaining(
+				toUpdateInDiagram.size());
+		monitor.setTaskName("Update FreeFormConnections");
 
-		// Update existing connections. Re-connect them to the new instance, on
-		// the right port
-		for (final Map.Entry<Connection, Port> entry : toReconnectToTarget
-				.entrySet()) {
-			final Connection connection = entry.getKey();
-			final Port targetPort = entry.getValue();
+		// We can update graphiti Connections to start or end from/to the newly
+		// added Instance
+		for (final Connection connection : toUpdateInDiagram) {
 
-			connection.setTarget(newInstance);
-			connection.setTargetPort(targetPort);
-			toUpdateInDiagram.add(connection);
+			loopProgress.newChild(1);
+
+			final List<PictogramElement> pictogramElements = Graphiti
+					.getLinkService().getPictogramElements(getDiagram(),
+							connection);
+			if (newInstance.equals(connection.getTarget())) {
+				// Update the PE connection(s) target
+				// (org.eclipse.graphiti.mm.pictograms.Connection#setEnd())
+				for (final PictogramElement pe : pictogramElements) {
+					if (pe instanceof org.eclipse.graphiti.mm.pictograms.Connection) {
+						org.eclipse.graphiti.mm.pictograms.Connection peConnection = (org.eclipse.graphiti.mm.pictograms.Connection) pe;
+						peConnection.setEnd(instancePattern.getAnchorForPort(
+								newInstancePe, connection.getTargetPort()));
+					}
+				}
+			} else if (newInstance.equals(connection.getSource())) {
+				// Update the PE connection(s) source
+				// (org.eclipse.graphiti.mm.pictograms.Connection#setStart())
+				for (final PictogramElement pe : pictogramElements) {
+					if (pe instanceof org.eclipse.graphiti.mm.pictograms.Connection) {
+						org.eclipse.graphiti.mm.pictograms.Connection peConnection = (org.eclipse.graphiti.mm.pictograms.Connection) pe;
+						peConnection.setStart(instancePattern.getAnchorForPort(
+								newInstancePe, connection.getSourcePort()));
+					}
+				}
+			} else {
+				OrccLogger.severeln("Some connections will not be updated. "
+						+ "This is an error in the code. Please report a bug.");
+			}
 		}
 
-		for (final Map.Entry<Connection, Port> entry : toReconnectFromSource
-				.entrySet()) {
-			final Connection connection = entry.getKey();
-			final Port sourcePort = entry.getValue();
+		loopProgress = monitor.newChild(60).setWorkRemaining(selectedPe.size());
+		monitor.setTaskName("Delete selected instances");
 
-			connection.setSource(newInstance);
-			connection.setSourcePort(sourcePort);
-			toUpdateInDiagram.add(connection);
+		// Finally remove from diagram useless elements. Inner connections
+		// are also deleted, since deleting an instance or a port from a
+		// diagram also clean related connections
+		for (final PictogramElement pe : selectedPe) {
+			loopProgress.newChild(1);
+			final IPattern pattern = fp.getPatternForPictogramElement(pe);
+			final DeleteContext delContext = new DeleteContext(pe);
+			delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
+			pattern.delete(delContext);
 		}
 
-		monitor.worked(10);
+		monitor.newChild(10);
+		monitor.setTaskName("Lay out the diagram");
 
-		return newInstance;
-	}
-
-	private String uniquePortName(final String baseName) {
-		if (portNamesIndexes.containsKey(baseName)) {
-			final int index = portNamesIndexes.get(baseName) + 1;
-			portNamesIndexes.put(baseName, index);
-			return uniquePortName(baseName + "_" + index);
-		} else {
-			portNamesIndexes.put(baseName, 0);
-			return baseName;
+		// Layout the resulting diagram
+		final IContext layoutContext = new CustomContext();
+		final ICustomFeature layoutFeature = ((XdfDiagramFeatureProvider) getFeatureProvider())
+				.getDefaultLayoutFeature();
+		if (layoutFeature.canExecute(layoutContext)) {
+			layoutFeature.execute(layoutContext);
 		}
-	}
 
-	private String uniqueInstanceName(final Network network, final String base) {
-		if (network.getChild(base) == null) {
-			return base;
-		} else {
-			int index = 0;
-			String uniqueName;
-			do {
-				uniqueName = base + '_' + index;
-				++index;
-			} while (network.getChild(uniqueName) != null);
-			return uniqueName;
+		monitor.newChild(10);
+		monitor.setTaskName("Save all");
+
+		// Save the new Network on the disk
+		try {
+			newNetwork.eResource().save(Collections.EMPTY_MAP);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-	}
 
-	@Override
-	public boolean hasDoneChanges() {
-		return hasDoneChanges;
+		monitor.done();
+
+		// Finally, active direct editing on the newly created instance
+		final IDirectEditingInfo dei = getFeatureProvider()
+				.getDirectEditingInfo();
+		dei.setMainPictogramElement(newInstancePe);
+		dei.setActive(true);
 	}
 }

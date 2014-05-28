@@ -469,15 +469,14 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	private void createActionTest(StructTransformer transformer,
 			Procedure procedure, AstAction astAction, Pattern peekPattern,
 			Var result) {
-		List<AstExpression> guards = astAction.getGuards();
 		Expression value;
-		if (guards.isEmpty()) {
+		if (astAction.getGuard() == null) {
 			value = eINSTANCE.createExprBool(true);
 		} else {
 			transformInputPatternPeek(transformer, procedure, astAction,
 					peekPattern);
-			value = transformGuards(transformer, procedure,
-					astAction.getGuards());
+			value = transformGuards(transformer, procedure, astAction
+					.getGuard().getExpressions());
 		}
 
 		InstAssign assign = eINSTANCE.createInstAssign(result, value);
@@ -652,8 +651,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		Var result = scheduler.newTempLocalVariable(eINSTANCE.createTypeBool(),
 				"result");
 
-		List<AstExpression> guards = astAction.getGuards();
-		if (peekPattern.isEmpty() && guards.isEmpty()) {
+		if (peekPattern.isEmpty() && astAction.getGuard() == null) {
 			// the action is always fireable
 			InstAssign assign = eINSTANCE.createInstAssign(result,
 					eINSTANCE.createExprBool(true));
@@ -713,7 +711,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		};
 
 		// fills the patterns set by visiting guards
-		for (AstExpression guard : astAction.getGuards()) {
+		for (AstExpression guard : astAction.getGuard().getExpressions()) {
 			peekVariables.doSwitch(guard);
 		}
 

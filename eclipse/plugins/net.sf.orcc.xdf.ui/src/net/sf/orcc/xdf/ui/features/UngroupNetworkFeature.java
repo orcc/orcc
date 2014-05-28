@@ -29,9 +29,11 @@
 package net.sf.orcc.xdf.ui.features;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
@@ -40,14 +42,18 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
+import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IContext;
@@ -56,11 +62,12 @@ import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.features.context.impl.MultiDeleteInfo;
-import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
+import org.eclipse.graphiti.services.Graphiti;
 
 /**
  * Replace the selected instance by the content of the network it refined on.
@@ -68,13 +75,10 @@ import org.eclipse.graphiti.pattern.IPattern;
  * @author Antoine Lorence
  * 
  */
-public class UngroupNetworkFeature extends AbstractCustomFeature {
-
-	private boolean hasDoneChanges;
+public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
 
 	public UngroupNetworkFeature(IFeatureProvider fp) {
 		super(fp);
-		hasDoneChanges = false;
 	}
 
 	@Override
@@ -121,10 +125,6 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 	}
 
 	@Override
-	public void execute(ICustomContext context) {
-		execute(context, new NullProgressMonitor());
-	}
-
 	public void execute(ICustomContext context, IProgressMonitor parentMonitor) {
 		final PictogramElement instancePe = context.getPictogramElements()[0];
 		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instancePe);
@@ -133,19 +133,24 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 
 		final IFeatureProviderWithPatterns fp = (IFeatureProviderWithPatterns) getFeatureProvider();
 
-		final SubMonitor monitor = SubMonitor.convert(parentMonitor, 100);
-
-		SubMonitor loopProgress = monitor.newChild(10).setWorkRemaining(
-				subNetwork.getChildren().size());
-		loopProgress.setTaskName("Copy instances from "
-				+ subNetwork.getSimpleName() + " in this network");
-
 		final Map<Instance, Instance> copies = new HashMap<Instance, Instance>();
+		final Map<Instance, PictogramElement> peMap = new HashMap<Instance, PictogramElement>();
+
+		final SubMonitor monitor = SubMonitor.convert(parentMonitor, 100);
+		monitor.newChild(5);
+		monitor.setTaskName("Initialization");
+
+		// Copy subNetwork variables into the current network
+		for (Var variable : subNetwork.getVariables()) {
+			thisNetwork.getVariables().add(IrUtil.copy(variable));
+		}
+
 		// Copy content of sub network in this network
 		for (final Vertex vertex : subNetwork.getChildren()) {
 
 			if (vertex instanceof Instance) {
-				final Instance subInstance = EcoreUtil.copy((Instance) vertex);
+				final Instance subInstance = IrUtil.copy((Instance) vertex);
+				subInstance.setName(XdfUtil.uniqueVertexName(thisNetwork, subInstance.getName()));
 
 				copies.put((Instance) vertex, subInstance);
 
@@ -153,17 +158,50 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 				addCtxt.setLocation(10, 10);
 				addCtxt.setNewObject(subInstance);
 				addCtxt.setTargetContainer(getDiagram());
-				getFeatureProvider().addIfPossible(addCtxt);
+				final PictogramElement pe = getFeatureProvider().addIfPossible(addCtxt);
+				if(pe != null) {
+					peMap.put(subInstance, pe);
+				}
+
+				// Update subInstance argument variable use
+				for (Argument arg : subInstance.getArguments()) {
+					for (Iterator<EObject> it = arg.eAllContents(); it
+							.hasNext();) {
+						final EObject childEObject = it.next();
+
+						if (childEObject instanceof ExprVar) {
+							final ExprVar exprVar = (ExprVar) childEObject;
+							final String varName = exprVar.getUse().getVariable().getName();
+
+							Var theVar = thisNetwork.getVariable(varName);
+							if (theVar == null) {
+								theVar = thisNetwork.getParameter(varName);
+							}
+							if (theVar == null) {
+								OrccLogger
+										.severeln("Unable to retrieve the variable "
+												+ varName
+												+ " in the current network. Its is used in a "
+												+ instance.getName()
+												+ "'s argument");
+							} else {
+								exprVar.getUse().setVariable(theVar);
+							}
+						}
+					}
+				}
 			}
-			loopProgress.newChild(1);
 		}
 
-		loopProgress = monitor.newChild(10).setWorkRemaining(
+		SubMonitor loopProgress = monitor.newChild(20).setWorkRemaining(
 				subNetwork.getConnections().size());
-		loopProgress.setTaskName("Generate new connections");
+		monitor.setTaskName("Update connections");
 
 		// Re-generate connections between subNetwork instances
 		for(final Connection connection : subNetwork.getConnections()) {
+
+			loopProgress.newChild(1);
+
 			// The connection is between 2 instances
 			// Connections from/to a network port are analyzed later
 			if(connection.getSourcePort() != null && connection.getTargetPort() != null) {
@@ -184,15 +222,19 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 				final IAddConnectionContext addConContext = XdfUtil
 						.getAddConnectionContext(fp, getDiagram(), newConnection);
 				getFeatureProvider().addIfPossible(addConContext);
-				loopProgress.newChild(1);
 			}
 		}
+
+		loopProgress.setWorkRemaining(subNetwork.getInputs().size()
+				+ subNetwork.getOutputs().size());
 
 		// Merge connections:
 		// outerCon = connected from something in the current graph to an input of the instance
 		// innerCon = connected from a subNetwork input to something else (in
 		// subNetwork too)
 		for (final Port inPort : subNetwork.getInputs()) {
+
+			loopProgress.newChild(1);
 
 			final Connection outerCon = instance.getIncomingPortMap().get(inPort);
 			if (outerCon == null) {
@@ -217,14 +259,18 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 				final IAddConnectionContext addConContext = XdfUtil
 						.getAddConnectionContext(fp, getDiagram(), c);
 				getFeatureProvider().addIfPossible(addConContext);
-				loopProgress.newChild(1);
 			}
 		}
+
+		final InstancePattern instancePattern = (InstancePattern) ((IFeatureProviderWithPatterns) getFeatureProvider())
+				.getPatternForPictogramElement(instancePe);
 
 		// Merge connections:
 		// outerCons = connected from an output of the instance to something in the current graph
 		// innerCon = connected from something to an output in the subNetwork
 		for (final Port outPort : subNetwork.getOutputs()) {
+
+			loopProgress.newChild(1);
 
 			final List<Connection> outerCons = instance.getOutgoingPortMap()
 					.get(outPort);
@@ -239,27 +285,30 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 					final Instance source = copies.get(innerCon.getSource());
 					final Port sourcePort = source.getAdapter(Entity.class).getOutput(innerCon.getSourcePort().getName());
 
-					final Connection c = DfFactory.eINSTANCE.createConnection(
-							source, sourcePort,
-							outerCon.getTarget(), outerCon.getTargetPort());
+					// Update this network connection with the new source
+					// instance
+					outerCon.setSource(source);
+					outerCon.setSourcePort(sourcePort);
 
-					// We will 'add' a new Connection to a diagram (not create
-					// it, in Graphiti context). It must exists in the current
-					// network
-					thisNetwork.add(c);
-
-					// Really add the connection
-					final IAddConnectionContext addConContext = XdfUtil
-							.getAddConnectionContext(fp, getDiagram(), c);
-					getFeatureProvider().addIfPossible(addConContext);
-					loopProgress.newChild(1);
+					// Update this diagram connection with the new start anchor
+					final List<PictogramElement> linkedPes = Graphiti
+							.getLinkService().getPictogramElements(
+									getDiagram(), outerCon);
+					for (final PictogramElement pe : linkedPes) {
+						if (pe instanceof org.eclipse.graphiti.mm.pictograms.Connection) {
+							final Anchor anchor = instancePattern
+									.getAnchorForPort(peMap.get(source),
+											sourcePort);
+							((org.eclipse.graphiti.mm.pictograms.Connection) pe)
+									.setStart(anchor);
+						}
+					}
 				}
 			}
 		}
 
-		monitor.newChild(80);
-		monitor.setTaskName("Deleting " + instance.getSimpleName()
-				+ " instance");
+		monitor.newChild(70);
+		monitor.setTaskName("Delete useless network instance");
 
 		// Delete the selected instance PictogramElement from the current
 		// diagram. This will also delete:
@@ -272,7 +321,7 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 		delContext.setMultiDeleteInfo(new MultiDeleteInfo(false, false, 0));
 		pattern.delete(delContext);
 		
-		monitor.newChild(10);
+		monitor.newChild(5);
 		monitor.setTaskName("Lay out the diagram");
 
 		// And layout the resulting diagram
@@ -282,11 +331,7 @@ public class UngroupNetworkFeature extends AbstractCustomFeature {
 		if (layoutFeature.canExecute(layoutContext)) {
 			layoutFeature.execute(layoutContext);
 		}
-		hasDoneChanges = true;
-	}
 
-	@Override
-	public boolean hasDoneChanges() {
-		return hasDoneChanges;
+		monitor.done();
 	}
 }

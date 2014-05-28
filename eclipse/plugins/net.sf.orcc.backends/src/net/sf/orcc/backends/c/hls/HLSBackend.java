@@ -114,7 +114,7 @@ public class HLSBackend extends CBackend {
 		transformations.add(new TypeResizer(true, true, true, false));
 
 		transformations.add(new RenameTransformation(replacementMap));
-		transformations.add(new Multi2MonoToken());
+		//transformations.add(new Multi2MonoToken());
 		transformations.add(new DfVisitor<Void>(new CastArgFuncCall()));
 		// transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 		// transformations.add(new DivisionSubstitution());//don't work for HEVC
@@ -198,6 +198,7 @@ public class HLSBackend extends CBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
+	
 
 	}
 
@@ -206,6 +207,11 @@ public class HLSBackend extends CBackend {
 		new InstanceTestBenchPrinter(options)
 				.print(VHDLTestBenchPath, instance);
 		new InstanceCosimPrinter(options).print(srcPath, instance);
+		new InstancePrinterCast(options).print(srcPath, instance);
+		new ActorTopVhdlPrinter(options).print(srcPath, instance);
+		new ActorNetworkTestBenchPrinter(options).print(srcPath, instance);
+		new UnitaryBatchCommandPrinter(options).print(commandPath, instance);
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
+		
 	}
 }

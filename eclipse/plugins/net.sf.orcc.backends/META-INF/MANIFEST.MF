@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Orcc back-ends plug-in
 Bundle-SymbolicName: net.sf.orcc.backends;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.0.2.qualifier
 Bundle-Vendor: IETR/INSA Rennes
-Require-Bundle: net.sf.orcc.core;bundle-version="2.0.0",
+Require-Bundle: net.sf.orcc.core;bundle-version="2.0.2",
  org.eclipse.xtext.xbase.lib;bundle-version="2.4.0",
  org.apache.commons.cli;bundle-version="1.2.0",
  org.apache.commons.lang;bundle-version="2.6.0"

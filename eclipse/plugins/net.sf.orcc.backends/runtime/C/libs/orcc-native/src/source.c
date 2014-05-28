@@ -33,19 +33,9 @@
 #include <time.h>
 #include <string.h>
 
+#include "orcc.h"
 #include "util.h"
 #include "options.h"
-
-// from APR
-/* Ignore Microsoft's interpretation of secure development
- * and the POSIX string handling API
- */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-#ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-#pragma warning(disable: 4996)
-#endif
 
 #define LOOP_NUMBER 1
 
@@ -61,13 +51,13 @@ static unsigned int nbByteRead = 0;
 int loopsCount;
 
 void printSpeed(void) {
-	double executionTime;
-	double speed;
+    double executionTime;
+    double speed;
 
-	executionTime = (double)(clock() - startTime)/CLOCKS_PER_SEC;
-	speed = nbByteRead / executionTime;
-	speed /= 1024;
-	printf("Speed : %f Kib/s\n",speed);
+    executionTime = (double)(clock() - startTime)/CLOCKS_PER_SEC;
+    speed = nbByteRead / executionTime;
+    speed /= 1024;
+    printf("Speed : %f Kib/s\n",speed);
 }
 
 // Called before any *_scheduler function.
@@ -75,59 +65,59 @@ void source_init() {
     stop = 0;
 
     if (opt->input_file == NULL) {
-		print_usage();
+        print_usage();
         fprintf(stderr, "No input file given!\n");
-		exit(1);
-	}
+        exit(1);
+    }
 
     file = fopen(opt->input_file, "rb");
-	if (file == NULL) {
+    if (file == NULL) {
         if (opt->input_file == NULL) {
             opt->input_file = "<null>";
-		}
+        }
 
         fprintf(stderr, "could not open file \"%s\"\n", opt->input_file);
-		exit(1);
-	}
-	if(PRINT_SPEED) {
-		atexit(printSpeed);
-	}
-	startTime = clock();
+        exit(1);
+    }
+    if(PRINT_SPEED) {
+        atexit(printSpeed);
+    }
+    startTime = clock();
     loopsCount = opt->nbLoops;
 }
 
 long long source_open(char* fileName) {
-	char fullPathName[256];
-	FILE *file = NULL;
+    char fullPathName[256];
+    FILE *file = NULL;
 
     stop = 0;
     if(opt->input_directory == NULL) {
-		file = fopen(fileName, "rb");
-		if (file == NULL) {
+        file = fopen(fileName, "rb");
+        if (file == NULL) {
             fprintf(stderr, "could not open file \"%s\"\n", fileName);
-			exit(1);
-		}
-	}
-	else {
+            exit(1);
+        }
+    }
+    else {
         if(strlen(fileName)+strlen(opt->input_directory)>=256) {
             fprintf(stderr, "Path too long : input_directory : %s ; fileName : %s\n", opt->input_directory, fileName);
-			exit(-1);
-		}
+            exit(-1);
+        }
         strcpy(fullPathName, opt->input_directory);
-		strcat(fullPathName, fileName);
-		file = fopen(fullPathName, "rb");
-		if (file == NULL) {
+        strcat(fullPathName, fileName);
+        file = fopen(fullPathName, "rb");
+        if (file == NULL) {
             fprintf(stderr, "could not open file \"%s\"\n", fullPathName);
-			exit(1);
-		}
-	}
+            exit(1);
+        }
+    }
 
-	if(PRINT_SPEED) {
-		atexit(printSpeed);
-	}
-	startTime = clock();
+    if(PRINT_SPEED) {
+        atexit(printSpeed);
+    }
+    startTime = clock();
     loopsCount = opt->nbLoops;
-	return (long long)file;
+    return (long long)file;
 }
 
 unsigned int source_getNbLoop(void)
@@ -137,101 +127,101 @@ unsigned int source_getNbLoop(void)
 
 void source_exit(int exitCode)
 {
-	if(exitCode != 0){
-		exit(exitCode);
-	} else {
-		// compareErrors' default value is 0
-		exit(compareErrors);
-	}
+    if(exitCode != 0){
+        exit(exitCode);
+    } else {
+        // compareErrors' default value is 0
+        exit(compareErrors);
+    }
 }
 
 unsigned int source_sizeOfFile() {
-	struct stat st; 
-	fstat(fileno(file), &st); 
-	return st.st_size; 
+    struct stat st; 
+    fstat(fileno(file), &st); 
+    return st.st_size; 
 }
 
 int source_sizeOfFileFd(long long fdVal) {
-	FILE* fd = (FILE*) fdVal;
-	struct stat st;
-	fstat(fileno(fd), &st);
-	return st.st_size;
+    FILE* fd = (FILE*) fdVal;
+    struct stat st;
+    fstat(fileno(fd), &st);
+    return st.st_size;
 }
 
 int source_is_stopped() {
-	return stop;
+    return stop;
 }
 
 void source_rewind() {
-	if(file != NULL) {
-		rewind(file);
-	}
+    if(file != NULL) {
+        rewind(file);
+    }
 }
 
 void source_rewindFd(long long fdVal) {
-	FILE* fd = (FILE*) fdVal;
-	if(fd != NULL) {
-		rewind(fd);
-	}
+    FILE* fd = (FILE*) fdVal;
+    if(fd != NULL) {
+        rewind(fd);
+    }
 }
 
 void source_close() {
-	if(file != NULL) {
-		int n = fclose(file);
-	}
+    if(file != NULL) {
+        int n = fclose(file);
+    }
 }
 
 void source_closeFd(long long fdVal) {
-	FILE* fd = (FILE*) fdVal;
-	if(fd != NULL) {
-		int n = fclose(fd);
-	}
+    FILE* fd = (FILE*) fdVal;
+    if(fd != NULL) {
+        int n = fclose(fd);
+    }
 }
 
 unsigned int source_readByte(){
-	unsigned char buf[1];
-	int n = fread(&buf, 1, 1, file);
+    unsigned char buf[1];
+    int n = fread(&buf, 1, 1, file);
 
-	if (n < 1) {
-		if (feof(file)) {
-			printf("warning\n");
-			rewind(file);
+    if (n < 1) {
+        if (feof(file)) {
+            printf("warning\n");
+            rewind(file);
             n = fread(&buf, 1, 1, file);
-		}
-		else {
-			fprintf(stderr,"Problem when reading input file.\n");
-		}
-	}
-	nbByteRead += 8;
-	return buf[0];
+        }
+        else {
+            fprintf(stderr,"Problem when reading input file.\n");
+        }
+    }
+    nbByteRead += 8;
+    return buf[0];
 }
 
 
 void source_readNBytes(unsigned char *outTable, unsigned int nbTokenToRead){
-	int n = fread(outTable, 1, nbTokenToRead, file);
+    int n = fread(outTable, 1, nbTokenToRead, file);
 
-	if(n < nbTokenToRead) {
-		fprintf(stderr,"Problem when reading input file.\n");
-		exit(-4);
-	}
-	nbByteRead += nbTokenToRead * 8;
+    if(n < nbTokenToRead) {
+        fprintf(stderr,"Problem when reading input file.\n");
+        exit(-4);
+    }
+    nbByteRead += nbTokenToRead * 8;
 }
 
 
 void source_readNBytesFd(long long fdVal, unsigned char *outTable, unsigned int nbTokenToRead){
-	FILE* fd = (FILE*) fdVal;
-	int n = fread(outTable, 1, nbTokenToRead, fd);
+    FILE* fd = (FILE*) fdVal;
+    int n = fread(outTable, 1, nbTokenToRead, fd);
 
-	if(n < nbTokenToRead) {
-		fprintf(stderr,"Problem when reading input file.\n");
-		exit(-4);
-	}
-	nbByteRead += nbTokenToRead * 8;
+    if(n < nbTokenToRead) {
+        fprintf(stderr,"Problem when reading input file.\n");
+        exit(-4);
+    }
+    nbByteRead += nbTokenToRead * 8;
 }
 
 // This function is deprecated and will be removed in the future. Please don't use it anymore.
 void source_decrementNbLoops(){
-	--loopsCount;
+    --loopsCount;
 }
 
 // This function is deprecated and will be removed in the future. Please don't use it anymore.

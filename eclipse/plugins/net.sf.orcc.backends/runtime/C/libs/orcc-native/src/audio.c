@@ -42,70 +42,70 @@ SDL_AudioCVT cvt;
 int nBytesRead = 0;
 
 Uint16 audio_checkFormat(unsigned short bitPS){
-	
-	if (bitPS == 8)
-		return AUDIO_U8;
-	else if (bitPS == 16)
-		return AUDIO_S16;
-	else {
-		fprintf(stderr, "Format of the file is incorrect (only 8 or 16 bits per sample are supported).");
-		getchar();
-		exit(0);
-	}
+    
+    if (bitPS == 8)
+        return AUDIO_U8;
+    else if (bitPS == 16)
+        return AUDIO_S16;
+    else {
+        fprintf(stderr, "Format of the file is incorrect (only 8 or 16 bits per sample are supported).");
+        getchar();
+        exit(0);
+    }
 }
 
 void audio_initAudioFormat(unsigned int SampleRate, unsigned short SampleSizeInBits, unsigned short Channels){
-	SDL_Init(SDL_INIT_AUDIO); 
-	wanted.freq = SampleRate; 
-	wanted.format = audio_checkFormat(SampleSizeInBits); 
-	wanted.channels = Channels;
-	wanted.samples = 1024;  /* Good low-latency value for callback */ 
-	wanted.callback = audio_fill; 
-	wanted.userdata = NULL; 
-	if ( SDL_OpenAudio(&wanted, NULL) < 0 ) { 
-		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError()); 
-		return;
-	} 
-	SDL_PauseAudio(1); 
-	SDL_BuildAudioCVT(&cvt, audio_checkFormat(SampleSizeInBits), Channels, SampleRate, wanted.format, wanted.channels, wanted.freq);
-	audio_chunk = (Uint8 *)malloc(audio_len * sizeof(Uint8));
-	memset(audio_chunk, 0, audio_len);
+    SDL_Init(SDL_INIT_AUDIO); 
+    wanted.freq = SampleRate; 
+    wanted.format = audio_checkFormat(SampleSizeInBits); 
+    wanted.channels = Channels;
+    wanted.samples = 1024;  /* Good low-latency value for callback */ 
+    wanted.callback = audio_fill; 
+    wanted.userdata = NULL; 
+    if ( SDL_OpenAudio(&wanted, NULL) < 0 ) { 
+        fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError()); 
+        return;
+    } 
+    SDL_PauseAudio(1); 
+    SDL_BuildAudioCVT(&cvt, audio_checkFormat(SampleSizeInBits), Channels, SampleRate, wanted.format, wanted.channels, wanted.freq);
+    audio_chunk = (Uint8 *)malloc(audio_len * sizeof(Uint8));
+    memset(audio_chunk, 0, audio_len);
 }
 
 void audio_receive(unsigned char data){
-	audio_chunk[nBytesRead] = data;
-	nBytesRead++; 
+    audio_chunk[nBytesRead] = data;
+    nBytesRead++; 
 }
 
 void audio_play(){
-	audio_len = nBytesRead;
-	cvt.buf = (Uint8 *)malloc(audio_len * cvt.len_mult); 
-	memcpy(cvt.buf, audio_chunk, audio_len); 
-	SDL_ConvertAudio(&cvt);  
-	memset(audio_chunk, 0, audio_len);
-	audio_pos = cvt.buf; 
-	SDL_PauseAudio(0); 
-	while ( audio_len > 0 ) { 
-		SDL_Delay(100);         /* Sleep 1/10 second */ 
-	} 
-	audio_len = AUDIO_BUFFER_SIZE;
-	nBytesRead = 0;
-	SDL_PauseAudio(1); 
+    audio_len = nBytesRead;
+    cvt.buf = (Uint8 *)malloc(audio_len * cvt.len_mult); 
+    memcpy(cvt.buf, audio_chunk, audio_len); 
+    SDL_ConvertAudio(&cvt);  
+    memset(audio_chunk, 0, audio_len);
+    audio_pos = cvt.buf; 
+    SDL_PauseAudio(0); 
+    while ( audio_len > 0 ) { 
+        SDL_Delay(100);         /* Sleep 1/10 second */ 
+    } 
+    audio_len = AUDIO_BUFFER_SIZE;
+    nBytesRead = 0;
+    SDL_PauseAudio(1); 
 }
 
 void audio_close(){
-	free(audio_chunk);
-	free(cvt.buf);
-	SDL_CloseAudio(); 
-	SDL_Quit(); 
+    free(audio_chunk);
+    free(cvt.buf);
+    SDL_CloseAudio(); 
+    SDL_Quit(); 
 }
 
 int audio_bufferFull(){
-	if (nBytesRead == audio_len) {
-		return 1;
-	} else {
-		return 0;
-	}
+    if (nBytesRead == audio_len) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 void audio_fill(void * udata, Uint8 * stream, int len) 

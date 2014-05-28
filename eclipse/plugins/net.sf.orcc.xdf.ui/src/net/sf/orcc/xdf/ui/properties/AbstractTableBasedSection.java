@@ -137,8 +137,9 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 		addButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				editTableItem(new TableItem(table, SWT.NONE));
-				writeValuesInTransaction(table);
+				if (editTableItem(new TableItem(table, SWT.NONE))) {
+					writeValuesInTransaction(table);
+				}
 			}
 		});
 		removeButton.addSelectionListener(new SelectionAdapter() {
@@ -158,8 +159,9 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 				if (selection.length == 0) {
 					return;
 				}
-				editTableItem(selection[0]);
-				writeValuesInTransaction(table);
+				if (editTableItem(selection[0])) {
+					writeValuesInTransaction(table);
+				}
 			}
 		});
 
@@ -170,8 +172,9 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 				if (selection.length == 0) {
 					return;
 				}
-				editTableItem(selection[0]);
-				writeValuesInTransaction(table);
+				if (editTableItem(selection[0])) {
+					writeValuesInTransaction(table);
+				}
 			}
 		});
 	}
@@ -189,6 +192,7 @@ abstract public class AbstractTableBasedSection extends AbstractDiagramSection {
 	 * Opens a dialog which allow user to edit the fields
 	 * 
 	 * @param item
+	 * @return True if user clicked on OK, false if he selected CANCEL
 	 */
-	abstract void editTableItem(final TableItem item);
+	abstract boolean editTableItem(final TableItem item);
 }

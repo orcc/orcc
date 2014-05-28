@@ -43,27 +43,23 @@
 global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync) {
     int i;
     global_scheduler_t *sched = (global_scheduler_t*) malloc(sizeof(global_scheduler_t));
-    waiting_t *waiting_schedulables = (waiting_t *) malloc(nb_schedulers * sizeof(waiting_t));
     sched->nb_schedulers = nb_schedulers;
     sched->schedulers = (local_scheduler_t**) malloc(nb_schedulers * sizeof(local_scheduler_t*));
     for (i = 0; i < nb_schedulers; i++) {
-        sched->schedulers[i] = allocate_local_scheduler(i, &waiting_schedulables[i], &waiting_schedulables[(i+1) % nb_schedulers], nb_schedulers, sync);
+        sched->schedulers[i] = allocate_local_scheduler(i, nb_schedulers, sync);
     }
     return sched;
 }
 
-local_scheduler_t *allocate_local_scheduler(int id, waiting_t *ring_waiting_schedulable,
-        waiting_t *ring_sending_schedulable, int nb_schedulers, sync_t *sync) {
+local_scheduler_t *allocate_local_scheduler(int id, int nb_schedulers, sync_t *sync) {
     int i;
     local_scheduler_t *sched = (local_scheduler_t*) malloc(sizeof(local_scheduler_t));
 
     sched->id = id;
     sched->nb_schedulers = nb_schedulers;
-    sched->ring_waiting_schedulable = ring_waiting_schedulable;
-    sched->ring_sending_schedulable = ring_sending_schedulable;
-    sched->mesh_waiting_schedulable = (waiting_t **) malloc(nb_schedulers * sizeof(waiting_t *));
+    sched->waiting_schedulable = (waiting_t **) malloc(nb_schedulers * sizeof(waiting_t *));
     for (i = 0; i < nb_schedulers; i++) {
-        sched->mesh_waiting_schedulable[i] = (waiting_t *) malloc(sizeof(waiting_t));
+        sched->waiting_schedulable[i] = (waiting_t *) malloc(sizeof(waiting_t));
     }
     sched->sync = sync;
     orcc_semaphore_create(sched->sem_thread, 0);
@@ -88,7 +84,6 @@ void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, option
 void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, options_t *opt) {
     int i;
 
-    sched->opt = opt;
     sched->num_actors = num_actors;
     sched->actors = actors;
     for (i = 0; i < num_actors; i++) {
@@ -97,52 +92,41 @@ void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **ac
         actors[i]->in_waiting = 0;
     }
 
+    sched->strategy = opt->sched_strategy;
     sched->round_robin = 1;
-	sched->rr_next_schedulable = 0;
-	sched->ddd_next_entry = 0;
+    sched->rr_next_schedulable = 0;
+    sched->ddd_next_entry = 0;
     sched->ddd_next_schedulable = 0;
-	sched->ring_waiting_schedulable->next_entry = 0;
-    sched->ring_waiting_schedulable->next_waiting = 0;
-	sched->ring_sending_schedulable->next_entry = 0;
-	sched->ring_sending_schedulable->next_waiting = 0;
 
     for (i = 0; i < sched->nb_schedulers; i++) {
-		sched->mesh_waiting_schedulable[i]->next_entry = 0;
-		sched->mesh_waiting_schedulable[i]->next_waiting = 0;
-	}
+        sched->waiting_schedulable[i]->next_entry = 0;
+        sched->waiting_schedulable[i]->next_waiting = 0;
+    }
 }
 
 /**
  * Reinitialize the given scheduler with new actors list.
  */
-void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, int use_ring_topology) {
-	int i;
+void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors) {
+    int i;
 
-	sched->actors = actors;
-	sched->num_actors = num_actors;
-	sched->rr_next_schedulable = 0;
-	sched->ddd_next_entry = 0;
-	sched->ddd_next_schedulable = 0;
-	sched->round_robin = 1;
-
-	sched->ring_waiting_schedulable->next_entry = 0;
-	sched->ring_waiting_schedulable->next_waiting = 0;
-	sched->ring_sending_schedulable->next_entry = 0;
-	sched->ring_sending_schedulable->next_waiting = 0;
+    sched->actors = actors;
+    sched->num_actors = num_actors;
+    sched->rr_next_schedulable = 0;
+    sched->ddd_next_entry = 0;
+    sched->ddd_next_schedulable = 0;
+    sched->round_robin = 1;
 
     for (i = 0; i < sched->nb_schedulers; i++) {
-		sched->mesh_waiting_schedulable[i]->next_entry = 0;
-		sched->mesh_waiting_schedulable[i]->next_waiting = 0;
-	}
+        sched->waiting_schedulable[i]->next_entry = 0;
+        sched->waiting_schedulable[i]->next_waiting = 0;
+    }
 
-	for (i = 0; i < num_actors; i++) {
-		actors[i]->sched = sched;
-		actors[i]->in_list = 0;
-		actors[i]->in_waiting = 0;
-		if (!strcmp(actors[i]->name, "source")) {
-			sched_add_schedulable(sched, actors[i], use_ring_topology);
-		}
-	}
+    for (i = 0; i < num_actors; i++) {
+        actors[i]->sched = sched;
+        actors[i]->in_list = 0;
+        actors[i]->in_waiting = 0;
+    }
 
 }
 
@@ -150,24 +134,12 @@ void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors, in
  * Initialize the actors mapped to the given scheduler.
  */
 void sched_init_actors(local_scheduler_t *sched, schedinfo_t *si) {
-	int i;
+    int i;
 
-	for (i = 0; i < sched->num_actors; i++) {
-		sched->actors[i]->init_func(si);
-	}
-	
-}
-
-/**
- * Re-initialize the actors mapped to the given scheduler.
- */
-void sched_reinit_actors(local_scheduler_t *sched, schedinfo_t *si) {
-	int i;
-
-	for (i = 0; i < sched->num_actors; i++) {
-		sched->actors[i]->reinit_func(si);
-	}
-	
+    for (i = 0; i < sched->num_actors; i++) {
+        sched->actors[i]->init_func(si);
+    }
+    
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -189,15 +161,15 @@ actor_t *sched_get_next_schedulable(local_scheduler_t *sched) {
  */
 actor_t *sched_get_next_rr(local_scheduler_t *sched) {
     actor_t *actor;
-	if (sched->num_actors == 0) {
-		return NULL;
-	}
-	actor = sched->actors[sched->rr_next_schedulable];
-	sched->rr_next_schedulable++;
-	if (sched->rr_next_schedulable == sched->num_actors) {
-		sched->rr_next_schedulable = 0;
-	}
-	return actor;
+    if (sched->num_actors == 0) {
+        return NULL;
+    }
+    actor = sched->actors[sched->rr_next_schedulable];
+    sched->rr_next_schedulable++;
+    if (sched->rr_next_schedulable == sched->num_actors) {
+        sched->rr_next_schedulable = 0;
+    }
+    return actor;
 }
 
 /**
@@ -208,9 +180,7 @@ actor_t *sched_get_next_rr(local_scheduler_t *sched) {
 actor_t *sched_get_next_ddd(local_scheduler_t *sched) {
     actor_t *actor;
     // check if other schedulers sent some schedulable actors
-    sched->strategy == ORCC_SS_RING_DD_DRIVEN ?
-                sched_add_ring_waiting_list(sched)
-              : sched_add_mesh_waiting_list(sched);
+    sched_add_waiting_list(sched);
     if (sched->ddd_next_schedulable == sched->ddd_next_entry) {
         // static actors list is used when schedulable list is empty
         actor = sched_get_next_rr(sched);
@@ -230,69 +200,42 @@ actor_t *sched_get_next_ddd(local_scheduler_t *sched) {
  * Add the actor to the schedulable or waiting list.
  * The list is chosen according to associate scheduler of the actor.
  */
-void sched_add_schedulable(local_scheduler_t *sched, actor_t *actor, int use_ring_topology) {
-	// only add the actor in the lists if it is not already there
-	// like a list.contains(actor) but in O(1) instead of O(n)
-	if (!actor->in_list) {
-		if (sched == actor->sched) {
-			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
-			actor->in_list = 1;
-			sched->ddd_next_entry++;
-		} else if (!actor->in_waiting) {
-			// this actor isn't launch by this scheduler so it is sent to the next one
-            waiting_t *send = sched->strategy ==
-                    use_ring_topology ? sched->ring_sending_schedulable
-                            : actor->sched->mesh_waiting_schedulable[sched->id];
-			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
-			actor->in_waiting = 1;
-			send->next_entry++;
-		}
-	}
-}
-
-/**
- * Add waited actors to the schedulable or waiting list.
- * The list is chosen according to associate scheduler of the actor.
- * This function use ring topology of communications.
- */
-void sched_add_ring_waiting_list(local_scheduler_t *sched) {
-    actor_t *actor;
-    waiting_t *wait = sched->ring_waiting_schedulable;
-	while (wait->next_entry - wait->next_waiting >= 1) {
-		actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
-		if (sched == actor->sched) {
-			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
-			actor->in_list = 1;
-			actor->in_waiting = 0;
-			sched->ddd_next_entry++;
-		} else {
-			// this actor isn't launch by this scheduler so it is sent to the next one
-            waiting_t *send = sched->ring_sending_schedulable;
-			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
-			send->next_entry++;
-		}
-		wait->next_waiting++;
-	}
+void sched_add_schedulable(local_scheduler_t *sched, actor_t *actor) {
+    // only add the actor in the lists if it is not already there
+    // like a list.contains(actor) but in O(1) instead of O(n)
+    if (!actor->in_list) {
+        if (sched == actor->sched) {
+            sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
+            actor->in_list = 1;
+            sched->ddd_next_entry++;
+        } else if (!actor->in_waiting) {
+            // this actor isn't launch by this scheduler so it is sent to the next one
+            waiting_t *send = actor->sched->waiting_schedulable[sched->id];
+            send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
+            actor->in_waiting = 1;
+            send->next_entry++;
+        }
+    }
 }
 
 /**
  * Add waited actors to the schedulable list.
  * This function use mesh topology of communications.
  */
-void sched_add_mesh_waiting_list(local_scheduler_t *sched) {
-	int i;
+void sched_add_waiting_list(local_scheduler_t *sched) {
+    int i;
     actor_t *actor;
     for (i = 0; i < sched->nb_schedulers; i++) {
-        waiting_t *wait = sched->mesh_waiting_schedulable[i];
-		while (wait->next_entry - wait->next_waiting >= 1) {
-			actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
-			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
-			actor->in_list = 1;
-			actor->in_waiting = 0;
-			sched->ddd_next_entry++;
-			wait->next_waiting++;
-		}
-	}
+        waiting_t *wait = sched->waiting_schedulable[i];
+        while (wait->next_entry - wait->next_waiting >= 1) {
+            actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
+            sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
+            actor->in_list = 1;
+            actor->in_waiting = 0;
+            sched->ddd_next_entry++;
+            wait->next_waiting++;
+        }
+    }
 }
 
 // #define PRINT_FIRINGS
