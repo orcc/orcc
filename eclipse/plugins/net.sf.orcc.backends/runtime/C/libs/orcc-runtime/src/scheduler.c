@@ -35,6 +35,7 @@
 #include "mapping.h"
 #include "cycle.h"
 #include "options.h"
+#include "util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduling functions
@@ -238,8 +239,6 @@ void sched_add_waiting_list(local_scheduler_t *sched) {
     }
 }
 
-// #define PRINT_FIRINGS
-
 void *scheduler_routine(void *data) {
     local_scheduler_t *sched = (local_scheduler_t *) data;
     actor_t *my_actor;
@@ -266,9 +265,9 @@ void *scheduler_routine(void *data) {
             if (si.num_firings == 0) {
                 my_actor->misses++;
             }
-#ifdef PRINT_FIRINGS
-            printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
-#endif
+            if(opt->print_firings) {
+                printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
+            }
         }
 
         if(my_actor == NULL || needMapping()) {

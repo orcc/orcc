@@ -63,6 +63,9 @@ static const char *usage =
     "       1 : summary and results\n"
     "       2 : debug informations\n"
     "-h                 Print this message.\n"
+
+    "\nDebug arguments:\n"
+    "-z                 Print the firings.\n"
     // "-t <trace directory>       Specify an output directory for the FIFO trace files.\n"
 
     "\nVideo-specific arguments:\n"
@@ -107,7 +110,7 @@ void pause() {
 options_t* init_orcc(int argc, char *argv[]) {
     // every command line option must be followed by ':' if it takes an
     // argument, and '::' if this argument is optional
-    const char *ostr = "i:no:d:m:f:w:l:r:ac:s:v:p:h";
+    const char *ostr = "i:no:d:m:f:w:l:zr:ac:s:v:p:h";
     int c;
 
     opt = set_default_options();
@@ -171,6 +174,9 @@ options_t* init_orcc(int argc, char *argv[]) {
             break;
         case 'v':
             set_verbose_level(optarg, opt);
+            break;
+        case 'z':
+            opt->print_firings = TRUE;
             break;
         case 'h':
             print_usage();
