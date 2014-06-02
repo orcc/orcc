@@ -62,6 +62,18 @@ import java.io.File
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			
 			%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
+			«FOR portIN : instance.getActor.inputs»
+					«IF instance.incomingPortMap.get(portIN).sourcePort==null»
+						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write.tcl
+					«ENDIF»
+				«ENDFOR»		
+				«FOR portout : instance.getActor.outputs.filter[! native]»			
+					«FOR connection : instance.outgoingPortMap.get(portout)»
+						«IF connection.targetPort == null»
+						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read.tcl					
+						«ENDIF»
+					«ENDFOR»
+				«ENDFOR»
 			
 		«ENDFOR»
 		
@@ -69,11 +81,22 @@ import java.io.File
 		
 		
 		copy %cd%\sim_package.vhd %cd%\TopVHDL
-
+	copy %cd%\TopVHDL\ram_tab.vhd %cd%\TopVHDL
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\TopVHDL
-			copy %cd%\sim_package.vhd %cd%\subProject_«instance.name»\solution1\syn\vhdl
-			copy %cd%\UnitaryVHDLTestBENCH\«instance.name»TestBench.vhd %cd%\subProject_«instance.name»\solution1\syn\vhdl
+			«FOR portIN : instance.getActor.inputs»
+				«IF instance.incomingPortMap.get(portIN).sourcePort==null»
+					copy %cd%\subProject_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write\solution1\syn\vhdl %cd%\TopVHDL
+				«ENDIF»
+			«ENDFOR»
+			«FOR portout : instance.getActor.outputs.filter[! native]»
+				«FOR connection : instance.outgoingPortMap.get(portout)»
+						«IF connection.targetPort == null»				
+						copy %cd%\subProject_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read\solution1\syn\vhdl %cd%\TopVHDL
+						
+				«ENDIF»
+					«ENDFOR»
+			«ENDFOR»
 		«ENDFOR»
 	''' 
 	
