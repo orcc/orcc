@@ -1,10 +1,12 @@
-package net.sf.orcc.cal;
+package net.sf.orcc.test;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccProjectNature;
+import net.sf.orcc.cal.CalInjectorProvider;
+import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.services.Evaluator;
@@ -17,6 +19,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.ExpressionPrinter;
+import net.sf.orcc.test.util.TestInterpreter;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
