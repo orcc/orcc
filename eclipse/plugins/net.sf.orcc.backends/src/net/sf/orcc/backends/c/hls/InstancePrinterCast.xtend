@@ -84,7 +84,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
-		static void cast_«instance.name»_«conn.targetPort.name»_write_untagged_0() {
+		static void cast_«entityName»_«conn.targetPort.name»_write_untagged_0() {
 			i32 «conn.maskName» = «conn.localwName» & 8191;
 			«IF conn.fifoType.bool»
 				«conn.fifoType» tmp_«conn.sourcePort.name»;
@@ -106,10 +106,10 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		void cast_«instance.name»_«conn.targetPort.name»_write_scheduler() {		
+		void cast_«entityName»_«conn.targetPort.name»_write_scheduler() {		
 			if (!«conn.castfifoNameWrite».empty() && isSchedulable_untagged_0()) {
 				if(1 && (8192 - «conn.localwName» + «conn.rName»[0] >= 1)) {
-					cast_«instance.name»_«conn.targetPort.name»_write_untagged_0();
+					cast_«entityName»_«conn.targetPort.name»_write_untagged_0();
 				}
 			} else {
 				goto finished;
@@ -157,7 +157,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
-		static void cast_«instance.name»_«connOut.sourcePort.name»_read_untagged_0() {
+		static void cast_«entityName»_«connOut.sourcePort.name»_read_untagged_0() {
 			i32 «connOut.maskName» = «connOut.localrName» & 8191;
 			«IF connOut.fifoType.bool»
 				«connOut.fifoType» tmp_«connOut.targetPort.name»;
@@ -178,10 +178,10 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		void cast_«instance.name»_«connOut.sourcePort.name»_read_scheduler() {		
+		void cast_«entityName»_«connOut.sourcePort.name»_read_scheduler() {		
 			if («connOut.wName»[0] - «connOut.localrName» >= 1  && isSchedulable_untagged_0()) {
 				if(1 && (!«connOut.castfifoNameRead».full())) {
-					cast_«instance.name»_«connOut.sourcePort.name»_read_untagged_0();
+					cast_«entityName»_«connOut.sourcePort.name»_read_untagged_0();
 				}
 			} else {
 				goto finished;
@@ -193,33 +193,33 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	override print(String targetFolder) {
-		for (portIn : instance.getActor.inputs) {
-			val connIn = instance.incomingPortMap.get(portIn)
+		for (portIn : actor.inputs) {
+			val connIn = incomingPortMap.get(portIn)
 			if(connIn != null) {
 				OrccUtil::printFile(getFileContentWrite(connIn),
 					new File(
-						targetFolder + File::separator + "cast_" + instance.name + "_" +
+						targetFolder + File::separator + "cast_" + entityName + "_" +
 							connIn.targetPort.name + "_write" + ".cpp"))
 				OrccUtil::printFile(
 					script(targetFolder,
-						"cast_" + instance.name + "_" + connIn.targetPort.name + "_write"),
+						"cast_" + entityName + "_" + connIn.targetPort.name + "_write"),
 					new File(
-						targetFolder + File::separator + "script_" + "cast_" + instance.name + "_" +
+						targetFolder + File::separator + "script_" + "cast_" + entityName + "_" +
 							connIn.targetPort.name + "_write" + ".tcl"))
 			}
 		}
-		for (portOut : instance.getActor.outputs.filter[! native]) {
-			val connOut = instance.outgoingPortMap.get(portOut).head
+		for (portOut : actor.outputs.filter[! native]) {
+			val connOut = outgoingPortMap.get(portOut).head
 			if(connOut != null) {
 				OrccUtil::printFile(getFileContentRead(connOut),
 					new File(
-						targetFolder + File::separator + "cast_" + instance.name + "_" +
+						targetFolder + File::separator + "cast_" + entityName + "_" +
 							connOut.sourcePort.name + "_read" + ".cpp"))
 				OrccUtil::printFile(
 					script(targetFolder,
-						"cast_" + instance.name + "_" + connOut.sourcePort.name + "_read"),
+						"cast_" + entityName + "_" + connOut.sourcePort.name + "_read"),
 					new File(
-						targetFolder + File::separator + "script_" + "cast_" + instance.name + "_" +
+						targetFolder + File::separator + "script_" + "cast_" + entityName + "_" +
 							connOut.sourcePort.name + "_read" + ".tcl"))
 			}
 		}

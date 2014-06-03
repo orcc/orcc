@@ -63,8 +63,8 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		
 		
-		«FOR port : instance.getActor.inputs»			
-			«val connection = instance.incomingPortMap.get(port)»
+		«FOR port : actor.inputs»			
+			«val connection = incomingPortMap.get(port)»
 			«IF connection != null»
 				«connection.castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
 				«connection.castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
@@ -72,8 +72,8 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDIF»
 			
 		«ENDFOR»
-		«FOR portout : instance.getActor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(portout)»
+		«FOR portout : actor.outputs.filter[! native]»
+			«FOR connection : outgoingPortMap.get(portout)»
 				«IF connection != null»
 					«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
 					«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
@@ -107,8 +107,8 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		-- FIFO Instantiation
 		
-		«FOR port : instance.getActor.inputs»
-			«val connection = instance.incomingPortMap.get(port)»
+		«FOR port : actor.inputs»
+			«val connection = incomingPortMap.get(port)»
 			«IF connection != null»
 				signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
 				signal top_«connection.ramName»_ce0 :  STD_LOGIC;
@@ -142,8 +142,8 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDIF»
 
 		«ENDFOR»
-		«FOR portout : instance.getActor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(portout)»
+		«FOR portout : actor.outputs.filter[! native]»
+			«FOR connection : outgoingPortMap.get(portout)»
 				«IF connection != null»
 					signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
 					signal top_«connection.ramName»_ce1 :  STD_LOGIC;
@@ -186,7 +186,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		-- ---------------------------------------------------------------------------------------
 		
 		
-			«instance.declareComponentSignal»
+			«declareComponentSignal»
 		
 		
 		
@@ -210,27 +210,27 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		begin
 		
-			«FOR port : instance.getActor.outputs.filter[! native]»
-				«FOR connection : instance.outgoingPortMap.get(port).filterNull»
+			«FOR port : actor.outputs.filter[! native]»
+				«FOR connection : outgoingPortMap.get(port).filterNull»
 					
 					«connection.printFifoMapping»
 					
 				«ENDFOR»
 			«ENDFOR»
-			«FOR port : instance.getActor.inputs»
+			«FOR port : actor.inputs»
 				
-				«instance.incomingPortMap.get(port)?.printFifoMapping»
+				«incomingPortMap.get(port)?.printFifoMapping»
 				
 			«ENDFOR»
-			«instance.mappingComponentSignal»
+			«mappingComponentSignal»
 		
 			---------------------------------------------------------------------------
 			-- Network Ports Instantiation 
 			---------------------------------------------------------------------------
 			
 		
-			«FOR port : instance.getActor.inputs»
-				«val connection = instance.incomingPortMap.get(port)»
+			«FOR port : actor.inputs»
+				«val connection = incomingPortMap.get(port)»
 				«IF connection != null»		
 				
 					top_«connection.castfifoNameWrite»_V_dout <= «connection.castfifoNameWrite»_V_dout;
@@ -240,8 +240,8 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«ENDIF»
 			«ENDFOR»	
 
-			«FOR portout : instance.getActor.outputs.filter[! native]»
-				«FOR connection : instance.outgoingPortMap.get(portout)»
+			«FOR portout : actor.outputs.filter[! native]»
+				«FOR connection : outgoingPortMap.get(portout)»
 				
 					«connection.castfifoNameRead»_V_din <= top_«connection.castfifoNameRead»_V_din;
 					top_«connection.castfifoNameRead»_V_full_n <= «connection.castfifoNameRead»_V_full_n;
@@ -258,14 +258,14 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def assignNetworkPorts(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
+		«FOR connList : outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
 				«connList.head.castfifoNameRead»_V_din <= top_«connList.head.castfifoNameRead»_V_din;
 				top_«connList.head.castfifoNameRead»_full_n <= «connList.head.castfifoNameRead»_V_full_n;
 				«connList.head.castfifoNameRead»_V_write <= top_«connList.head.castfifoNameRead»_V_write;
 			«ENDIF»
 		«ENDFOR»
-		«FOR connList : instance.incomingPortMap.values»
+		«FOR connList : incomingPortMap.values»
 			«IF (connList.source instanceof Port) && !(connList.target instanceof Port)»
 				top_«connList.castfifoNameWrite»_V_dout <= «connList.castfifoNameWrite»_V_dout;
 				top_«connList.castfifoNameWrite»_V_empty_n <= «connList.castfifoNameWrite»_V_empty_n;
@@ -277,7 +277,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override print(String targetFolder) {
 		val contentNetwork = ActorTopFileContent
 		val NetworkFile = new File(
-			targetFolder + File::separator + instance.name + "TopVHDL" + File::separator + instance.name + "Top" +
+			targetFolder + File::separator + entityName + "TopVHDL" + File::separator + entityName + "Top" +
 				".vhd")
 
 		if (needToWriteFile(contentNetwork, NetworkFile)) {
@@ -288,10 +288,10 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	}
 
-	def mappingComponentSignal(Instance instance) '''
-		call_«instance.name»_scheduler : component «instance.name»_scheduler
+	def mappingComponentSignal() '''
+		call_«entityName»_scheduler : component «entityName»_scheduler
 		port map(
-			«FOR connList : instance.outgoingPortMap.values»
+			«FOR connList : outgoingPortMap.values»
 				
 				«connList.head.ramName»_address0 => top_«connList.head.ramName»_address1,
 				«connList.head.ramName»_ce0 => top_«connList.head.ramName»_ce1,
@@ -308,7 +308,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«connList.head.rName»_q0 => top_«connList.head.rName»_q1,
 						
 			«ENDFOR»
-			«FOR connList : instance.incomingPortMap.values»
+			«FOR connList : incomingPortMap.values»
 				
 				«connList.ramName»_address0 => top_«connList.ramName»_address0,
 				«connList.ramName»_ce0 => top_«connList.ramName»_ce0,
@@ -333,10 +333,10 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			ap_ready => top_ap_ready
 		);
 		
-		«FOR port : instance.getActor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(port)»
+		«FOR port : actor.outputs.filter[! native]»
+			«FOR connection : outgoingPortMap.get(port)»
 				
-				call_cast_«instance.name»_«connection.sourcePort.name»_read_scheduler : component cast_«instance.name»_«connection.sourcePort.name»_read_scheduler
+				call_cast_«entityName»_«connection.sourcePort.name»_read_scheduler : component cast_«entityName»_«connection.sourcePort.name»_read_scheduler
 				port map(
 					«connection.ramName»_address0 => top_«connection.ramName»_address0, 
 					«connection.ramName»_ce0 => top_«connection.ramName»_ce0,
@@ -365,10 +365,10 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				
 			«ENDFOR»
 		«ENDFOR»
-		«FOR port : instance.getActor.inputs»			
-			«val connection = instance.incomingPortMap.get(port)»
+		«FOR port : actor.inputs»			
+			«val connection = incomingPortMap.get(port)»
 			«IF connection != null»
-				call_cast_«instance.name»_«connection.targetPort.name»_write_scheduler :component cast_«instance.name»_«connection.targetPort.name»_write_scheduler
+				call_cast_«entityName»_«connection.targetPort.name»_write_scheduler :component cast_«entityName»_«connection.targetPort.name»_write_scheduler
 				port map(
 					«connection.ramName»_address0   => top_«connection.ramName»_address1,
 					«connection.ramName»_ce0 => top_«connection.ramName»_ce1,
@@ -402,7 +402,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	def mappingComponentFifoSignal(Instance instance) '''
 		
-		«FOR connection : instance.incomingPortMap.values»
+		«FOR connection : incomingPortMap.values»
 			«IF !(connection.source instanceof Port) && !(connection.target instanceof Port)»
 				«printFifoMapping(connection)»
 			«ENDIF»
@@ -464,12 +464,12 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def assignFifo(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
+		«FOR connList : outgoingPortMap.values»
 			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
 				«printOutputFifoAssignHLS(connList.head)»
 			«ENDIF»
 		«ENDFOR»
-		«FOR connList : instance.incomingPortMap.values»
+		«FOR connList : incomingPortMap.values»
 			«IF (connList.source instanceof Port) && !(connList.target instanceof Port)»
 				«printInputFifoAssignHLS(connList)»
 			«ENDIF»
@@ -489,7 +489,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def assignFifoSignal(Instance instance) '''
-		«FOR connList : instance.outgoingPortMap.values»
+		«FOR connList : outgoingPortMap.values»
 			«IF connList.head.target instanceof Port»
 				«printOutputFifoSignalAssignHLS(connList.head)»
 			«ELSE»
@@ -497,7 +497,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					
 			«ENDIF»
 		«ENDFOR»
-		«FOR connection : instance.incomingPortMap.values»
+		«FOR connection : incomingPortMap.values»
 			«IF connection.source instanceof Port»
 				«printInputFifoSignalAssignHLS(connection)»
 			«ELSE»
@@ -588,15 +588,15 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		signal top_«connection.castfifoNameWrite»_V_read    :  STD_LOGIC;
 	'''
 
-	def declareComponentSignal(Instance instance) '''
-		component «instance.name»_scheduler IS
+	def declareComponentSignal() '''
+		component «entityName»_scheduler IS
 			port (
-				«FOR connList : instance.outgoingPortMap.values»
+				«FOR connList : outgoingPortMap.values»
 					
 						«printOutputRamAssignHLS(connList.head)»
 					
 				«ENDFOR»
-				«FOR connList : instance.incomingPortMap.values»
+				«FOR connList : incomingPortMap.values»
 					
 						«printInputRAMAssignHLS(connList)»
 					
@@ -610,10 +610,10 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				ap_ready : OUT STD_LOGIC
 			);
 		end component;
-		«FOR port : instance.getActor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(port)»
+		«FOR port : actor.outputs.filter[! native]»
+			«FOR connection : outgoingPortMap.get(port)»
 				
-				component cast_«instance.name»_«connection.sourcePort.name»_read_scheduler IS
+				component cast_«entityName»_«connection.sourcePort.name»_read_scheduler IS
 					port (
 						«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
 						«connection.ramName»_ce0 : OUT STD_LOGIC;
@@ -644,11 +644,11 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				
 			«ENDFOR»
 		«ENDFOR»
-		«FOR port : instance.getActor.inputs»
-			«val connection = instance.incomingPortMap.get(port)»
+		«FOR port : actor.inputs»
+			«val connection = incomingPortMap.get(port)»
 			«IF connection != null»
 
-				component cast_«instance.name»_«connection.targetPort.name»_write_scheduler IS
+				component cast_«entityName»_«connection.targetPort.name»_write_scheduler IS
 					port (
 						«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
 						«connection.ramName»_ce0 : OUT STD_LOGIC;
