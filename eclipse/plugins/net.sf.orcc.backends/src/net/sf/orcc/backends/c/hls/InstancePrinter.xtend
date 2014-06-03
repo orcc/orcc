@@ -42,6 +42,7 @@ import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.backends.util.FPGA
 
 /*
  * Compile Instance c source code
@@ -50,7 +51,7 @@ import net.sf.orcc.util.OrccUtil
  * 
  */
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
-
+	private FPGA fpga=FPGA.builder("Virtex7 (xc7v2000t)") ;
 	new(Map<String, Object> options) {
 		super(options)
 	}
@@ -436,7 +437,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		add_files «entityName».cpp
 		add_files -tb «entityName»TestBench.cpp
 		open_solution -reset "solution1"
-		set_part  {xc7v2000tflg1925-1}
+		set_part  {«fpga.device»«fpga.package»«fpga.version»}
 		create_clock -period 20
 		
 		
