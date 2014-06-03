@@ -56,40 +56,38 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 		set COMSPEC=%WINDIR%\System32\cmd.exe
 		:START
 		
-			cd ..
-				
-			%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
-				«FOR portIN : instance.getActor.inputs»
-					
-						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write.tcl
-					
-				«ENDFOR»		
-				«FOR portout : instance.getActor.outputs.filter[! native]»			
-					
-						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read.tcl					
-					
-				«ENDFOR»
+		cd ..
+			
+		%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
+		«FOR port : instance.getActor.inputs»
+			«val connection = instance.incomingPortMap.get(port)»
+			«IF connection != null»
+				%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«connection.targetPort.name»_write.tcl
+			«ENDIF»
+		«ENDFOR»		
+		«FOR port : instance.getActor.outputs.filter[! native]»			
+			«FOR connection : instance.outgoingPortMap.get(port)»
+				%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«connection.sourcePort.name»_read.tcl					
+			«ENDFOR»
+		«ENDFOR»
 		
 		copy %cd%\TopVHDL\sim_package.vhd %cd%\«instance.name»TopVHDL
 		copy %cd%\TopVHDL\ram_tab.vhd %cd%\«instance.name»TopVHDL
 		
 		
-			copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
-			
-			«FOR portIN : instance.getActor.inputs»
-				
-					copy %cd%\subProject_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write\solution1\syn\vhdl %cd%\«instance.
-			name»TopVHDL
-				
+		copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
+		
+		«FOR port : instance.getActor.inputs»
+			«val connection = instance.incomingPortMap.get(port)»
+			«IF connection != null»
+				copy %cd%\subProject_cast_«instance.name»_«connection.targetPort.name»_write\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
+			«ENDIF»
+		«ENDFOR»
+		«FOR port : instance.getActor.outputs.filter[! native]»
+			«FOR connection : instance.outgoingPortMap.get(port)»
+				copy %cd%\subProject_cast_«instance.name»_«connection.sourcePort.name»_read\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
 			«ENDFOR»
-			«FOR portout : instance.getActor.outputs.filter[! native]»
-				
-					
-						copy %cd%\subProject_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read\solution1\syn\vhdl %cd%\«instance.
-			name»TopVHDL
-						
-				
-			«ENDFOR»
+		«ENDFOR»
 			
 		
 	'''

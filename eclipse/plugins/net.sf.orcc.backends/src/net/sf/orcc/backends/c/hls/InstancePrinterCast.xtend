@@ -193,32 +193,35 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	override print(String targetFolder) {
-		for (portIN : instance.getActor.inputs) {
-			OrccUtil::printFile(getFileContentWrite(instance.incomingPortMap.get(portIN)),
-				new File(
-					targetFolder + File::separator + "cast_" + instance.name + "_" +
-						instance.incomingPortMap.get(portIN).targetPort.name + "_write" + ".cpp"))
-			OrccUtil::printFile(
-				script(targetFolder,
-					"cast_" + instance.name + "_" + instance.incomingPortMap.get(portIN).targetPort.name + "_write"),
-				new File(
-					targetFolder + File::separator + "script_" + "cast_" + instance.name + "_" +
-						instance.incomingPortMap.get(portIN).targetPort.name + "_write" + ".tcl"
-				))
+		for (portIn : instance.getActor.inputs) {
+			val connIn = instance.incomingPortMap.get(portIn)
+			if(connIn != null) {
+				OrccUtil::printFile(getFileContentWrite(connIn),
+					new File(
+						targetFolder + File::separator + "cast_" + instance.name + "_" +
+							connIn.targetPort.name + "_write" + ".cpp"))
+				OrccUtil::printFile(
+					script(targetFolder,
+						"cast_" + instance.name + "_" + connIn.targetPort.name + "_write"),
+					new File(
+						targetFolder + File::separator + "script_" + "cast_" + instance.name + "_" +
+							connIn.targetPort.name + "_write" + ".tcl"))
+			}
 		}
-		for (portout : instance.getActor.outputs.filter[! native]) {
-			OrccUtil::printFile(getFileContentRead(instance.outgoingPortMap.get(portout).head),
-				new File(
-					targetFolder + File::separator + "cast_" + instance.name + "_" +
-						instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read" + ".cpp"))
-			OrccUtil::printFile(
-				script(targetFolder,
-					"cast_" + instance.name + "_" +
-						instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read"),
-			new File(
-				targetFolder + File::separator + "script_" + "cast_" + instance.name + "_" +
-					instance.outgoingPortMap.get(portout).head.sourcePort.name + "_read" + ".tcl"
-			))
+		for (portOut : instance.getActor.outputs.filter[! native]) {
+			val connOut = instance.outgoingPortMap.get(portOut).head
+			if(connOut != null) {
+				OrccUtil::printFile(getFileContentRead(connOut),
+					new File(
+						targetFolder + File::separator + "cast_" + instance.name + "_" +
+							connOut.sourcePort.name + "_read" + ".cpp"))
+				OrccUtil::printFile(
+					script(targetFolder,
+						"cast_" + instance.name + "_" + connOut.sourcePort.name + "_read"),
+					new File(
+						targetFolder + File::separator + "script_" + "cast_" + instance.name + "_" +
+							connOut.sourcePort.name + "_read" + ".tcl"))
+			}
 		}
 		return 0
 	}

@@ -68,11 +68,12 @@ import net.sf.orcc.util.OrccUtil
 		// Input FIFOS
 		
 		«FOR port : instance.getActor.inputs»
-			«IF instance.incomingPortMap.get(port) != null»
-				stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
-				int counter_«instance.incomingPortMap.get(port).fifoName»;
-				«instance.incomingPortMap.get(port).fifoType.doSwitch» tab_«instance.incomingPortMap.get(port).fifoName»[1000];
-				«instance.incomingPortMap.get(port).fifoType.doSwitch» tmp_«instance.incomingPortMap.get(port).fifoName»;
+			«val connection = instance.incomingPortMap.get(port)»
+			«IF connection != null»
+				stream<«connection.fifoType.doSwitch»>	«connection.fifoName»;
+				int counter_«connection.fifoName»;
+				«connection.fifoType.doSwitch» tab_«connection.fifoName»[1000];
+				«connection.fifoType.doSwitch» tmp_«connection.fifoName»;
 				
 			«ENDIF»
 		«ENDFOR»
@@ -104,11 +105,12 @@ import net.sf.orcc.util.OrccUtil
 			int retval = 0;
 			// read data
 			«FOR port : instance.getActor.inputs»
-				«IF instance.incomingPortMap.get(port) != null»
+				«val connection = instance.incomingPortMap.get(port)»
+				«IF connection != null»
 					fp=fopen("«instance.name»_«port.name».txt","r");
 					for (i=0 ; i<1000 ; i++){
-						fscanf(fp, "%d", &tmp_«instance.incomingPortMap.get(port).fifoName»);
-						tab_«instance.incomingPortMap.get(port).fifoName»[i]=tmp_«instance.incomingPortMap.get(port).fifoName»;
+						fscanf(fp, "%d", &tmp_«connection.fifoName»);
+						tab_«connection.fifoName»[i]=tmp_«connection.fifoName»;
 						
 					}
 					fclose(fp);
@@ -118,11 +120,12 @@ import net.sf.orcc.util.OrccUtil
 			// scheduler execution
 			
 				«FOR port : instance.getActor.inputs»
-					«IF instance.incomingPortMap.get(port) != null»
+					«val connection = instance.incomingPortMap.get(port)»
+					«IF connection != null»
 					for (i=0 ; i<1000 ; i++){
-						if(!«instance.incomingPortMap.get(port).fifoName».full()){
-							«instance.incomingPortMap.get(port).fifoName».write(tab_«instance.incomingPortMap.get(port).fifoName»[counter_«instance.incomingPortMap.get(port).fifoName»]);
-							counter_«instance.incomingPortMap.get(port).fifoName» ++;
+						if(!«connection.fifoName».full()){
+							«connection.fifoName».write(tab_«connection.fifoName»[counter_«connection.fifoName»]);
+							counter_«connection.fifoName» ++;
 						}
 					}
 					«ENDIF»

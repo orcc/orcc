@@ -87,9 +87,12 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 			ap_ready : OUT STD_LOGIC;
 			
 			«FOR port : instance.getActor.inputs»
-				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoTypeIn.sizeInBits - 1» downto 0);
-				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
-				«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
+				«val connection = instance.incomingPortMap.get(port)»
+				«IF connection != null»
+					«connection.castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
+					«connection.castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
+					«connection.castfifoNameWrite»_V_read    : OUT STD_LOGIC;
+				«ENDIF»
 			«ENDFOR»
 			
 			«FOR portout : instance.getActor.outputs.filter[! native]»
@@ -112,11 +115,13 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 		signal ap_ready :  STD_LOGIC;
 		
 		«FOR port : instance.getActor.inputs»
-			
-			Signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoTypeIn.sizeInBits - 1» downto 0);
-			Signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
-			Signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
-			
+			«val connection = instance.incomingPortMap.get(port)»
+			«IF connection != null»
+				Signal «connection.castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
+				Signal «connection.castfifoNameWrite»_V_empty_n :  STD_LOGIC;
+				Signal «connection.castfifoNameWrite»_V_read    :  STD_LOGIC;
+				
+			«ENDIF»
 		«ENDFOR»
 		«FOR portout : instance.getActor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(portout)»
@@ -160,9 +165,12 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				ap_idle => ap_idle,
 				ap_ready =>ap_ready,
 				«FOR port : instance.getActor.inputs»
-					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   => «instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout,
-					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n => «instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n,
-					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    => «instance.incomingPortMap.get(port).castfifoNameWrite»_V_read,
+					«val connection = instance.incomingPortMap.get(port)»
+					«IF connection != null»
+						«connection.castfifoNameWrite»_V_dout   => «connection.castfifoNameWrite»_V_dout,
+						«connection.castfifoNameWrite»_V_empty_n => «connection.castfifoNameWrite»_V_empty_n,
+						«connection.castfifoNameWrite»_V_read    => «connection.castfifoNameWrite»_V_read,
+					«ENDIF»
 				«ENDFOR»
 				«FOR portout : instance.getActor.outputs.filter[! native]»
 					«FOR connection : instance.outgoingPortMap.get(portout)»
@@ -199,15 +207,19 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				variable Input_bit   : integer range 2147483647 downto - 2147483648;
 				variable line_number : line;
 				«FOR port : instance.getActor.inputs»
-					variable count«instance.incomingPortMap.get(port).castfifoNameWrite»: integer:= 0;
+					«val connection = instance.incomingPortMap.get(port)»
+					«IF connection != null»
+						variable count«connection.castfifoNameWrite»: integer:= 0;
+					«ENDIF»
 				«ENDFOR»
 	
 			begin
 				if rising_edge(ap_clk) then
 				«FOR port : instance.getActor.inputs»
-				
-					«printInputWaveGen(instance, instance.incomingPortMap.get(port),instance.incomingPortMap.get(port).castfifoNameWrite)»
-				
+					«val connection = instance.incomingPortMap.get(port)»
+					«IF connection != null»
+						«printInputWaveGen(instance, connection,connection.castfifoNameWrite)»
+					«ENDIF»
 				«ENDFOR»
 				end if;
 			end process WaveGen_Proc_In;

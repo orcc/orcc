@@ -86,10 +86,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Input FIFOS
 		«FOR port : instance.getActor.inputs»
-			extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[8192];
-			extern unsigned int	«instance.incomingPortMap.get(port).wName»[1];
-			extern unsigned int	«instance.incomingPortMap.get(port).rName»[1];
-			unsigned int «instance.incomingPortMap.get(port).localrName»=0;		
+			«val connection = instance.incomingPortMap.get(port)»
+			«IF connection != null»
+				extern «connection.fifoTypeIn.doSwitch»	«connection.ramName»[8192];
+				extern unsigned int	«connection.wName»[1];
+				extern unsigned int	«connection.rName»[1];
+				unsigned int «connection.localrName»=0;
+			«ENDIF»
 		«ENDFOR»
 		
 		////////////////////////////////////////////////////////////////////////////////
@@ -220,8 +223,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	def printOutputPatternsPort(Pattern pattern, Port port) {
 		var i = -1
 		'''
-		«FOR successor : instance.outgoingPortMap.get(port)»
-			«printOutputPatternPort(pattern, port, successor, i = i + 1)»
+		«FOR connection : instance.outgoingPortMap.get(port)»
+			«printOutputPatternPort(pattern, port, connection, i = i + 1)»
 		«ENDFOR»
 		'''
 	}
@@ -234,12 +237,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	//«instance.incomingPortMap.get(port).wName»[0] - «instance.incomingPortMap.get(port).localrName» >= «pattern.getNumTokens(port)»  &&
-	override checkInputPattern(Pattern pattern) '''«FOR port : pattern.ports»
-		
-			«instance.incomingPortMap.get(port).wName»[0] - «instance.incomingPortMap.get(port).localrName» >= «pattern.
-		getNumTokens(port)»  &&
-		
-	«ENDFOR»'''
+	override checkInputPattern(Pattern pattern) '''
+		«FOR port : pattern.ports»
+			«val connection = instance.incomingPortMap.get(port)»
+			«IF connection != null»
+				«connection.wName»[0] - «connection.localrName» >= «pattern.getNumTokens(port)»  &&
+			«ENDIF»
+		«ENDFOR»
+	'''
 
 	override print(String targetFolder) {
 		val content = getFileContent
@@ -274,13 +279,18 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					«block.doSwitch»
 				«ENDFOR»
 			
-				«FOR portin1 : action.inputPattern.ports»
-					«instance.incomingPortMap.get(portin1).localrName» = «instance.incomingPortMap.get(portin1).localrName»+«action.inputPattern.getNumTokens(portin1)»;
-					«instance.incomingPortMap.get(portin1).rName»[0] = «instance.incomingPortMap.get(portin1).localrName»;
+				«FOR port : action.inputPattern.ports»
+					«val connection = instance.incomingPortMap.get(port)»
+					«IF connection != null»
+						«connection.localrName» = «connection.localrName»+«action.inputPattern.getNumTokens(port)»;
+						«connection.rName»[0] = «connection.localrName»;
+					«ENDIF»
 				«ENDFOR»
-				«FOR portout1 : action.outputPattern.ports»	
-					«instance.outgoingPortMap.get(portout1).head.localwName» = «instance.outgoingPortMap.get(portout1).head.localwName» +«action.outputPattern.getNumTokens(portout1)»;
-					«instance.outgoingPortMap.get(portout1).head.wName»[0] = «instance.outgoingPortMap.get(portout1).head.localwName»;
+				«FOR port : action.outputPattern.ports»	
+					«FOR connection : instance.outgoingPortMap.get(port)»
+						«connection.localwName» = «connection.localwName» + «action.outputPattern.getNumTokens(port)»;
+						«connection.wName»[0] = «connection.localwName»;
+					«ENDFOR»
 				«ENDFOR»
 				
 			}
