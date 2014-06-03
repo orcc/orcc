@@ -445,6 +445,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def directive(String path) '''
-		set_directive_inline -region -recursive «entityName»_scheduler
+	
+	«FOR port : actor.inputs»
+	«FOR action : actor.actions»
+			«val connection = incomingPortMap.get(port)»
+			«IF action.inputPattern.contains(port)»
+					set_directive_resource -core RAM_1P "«entityName»_«action.body.name»" «connection.ramName»
+			«ENDIF»
+	«ENDFOR»
+	«ENDFOR»
+	
 	'''
 }
