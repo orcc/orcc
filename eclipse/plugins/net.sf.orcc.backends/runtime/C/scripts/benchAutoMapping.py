@@ -39,6 +39,36 @@ import subprocess
 import argparse
 import time
 
+# Constants
+DEFAULT_OUTPUT_TAG = "bench"
+DEFAULT_NBFRAME = 600
+DEFAULT_TIMEOUT = 600
+DEFAULT_RECONF = 100
+DECODER_CONF = "HEVC"
+
+# MPEG4 Conf 
+MPEG4_SEQUENCE_EXT = "" # Not used with MPEG4 decoders
+MPEG4_SEQUENCE_NAMES = ["foreman_qcif_30.bit", "old_town_cross_420_720p_MPEG4_SP_6Mbps.bit"]
+MPEG4_SEQTYPE_LIST = ["mpeg4"]
+MPEG4_QP_LIST = ["mpeg4"]
+
+# HEVC Conf
+HEVC_SEQUENCE_EXT = ".bin"
+HEVC_SEQUENCE_NAMES = ["BasketballDrive_1920x1080_50_qp"]
+HEVC_SEQTYPE_LIST = ["i_main", "ld_main", "ra_main"]
+HEVC_QP_LIST = ["37", "32", "27", "22"]
+
+# Mapping Conf
+# MR   : METIS Recursive graph partition mapping
+# MKCV : METIS KWay graph partition mapping (Optimize Communication volume)
+# MKEC : METIS KWay graph partition mapping (Optimize Edge-cut)
+# RR   : A simple Round-Robin mapping
+# WLB  : Weighted Load Balancing
+# KLR  : Kernighan Lin Refinement Weighted Load Balancing
+PROCS_LIST = ["1", "2", "3", "4", "5", "6"]
+STRATEGIES = ["MR", "MKCV", "MKEC", "RR", "WLB"]
+
+
 class OrccMappingData:
     def __init__(self, nbPartitions=0, loadBalancing=0.0, edgeCut=0, communicationVolume=0, fps=0.0, mappingTime=0.0):
         self.nbPartitions = nbPartitions
@@ -95,6 +125,7 @@ class BenchMapping(OrccAnalyse):
         print ("* ORCC Mapping Bench")
         print ("*********************************************************************")
         print ("==> Decoder : %s" % (self.DEFAULT_EXE))
+        print ("==> Decoder configuration : %s" % (DECODER_CONF))
         print ("==> Sequences : %s" % (self.SEQ_PATH))
         print ("==> nb of frames : %d " % (self.NBFRAME))
 
@@ -119,10 +150,14 @@ class BenchMapping(OrccAnalyse):
 
     def performDecoder(self, seqName, nbProcs, seqType, seqQp, strategy):
         self.log_file = open(self.SUMMARY_TXT, 'a')
-        seqfile = self.SEQ_PATH + "/" + seqType + "/" + seqName + seqQp + SEQUENCE_EXT
+        if seqType == "mpeg4" or seqQp == "mpeg4":
+            seqfile = self.SEQ_PATH + "/" + seqName
+        else:
+            seqfile = self.SEQ_PATH + "/" + seqType + "/" + seqName + seqQp + SEQUENCE_EXT
+
         print ("  * Processing on sequence : %s" % (seqfile))
         try:
-            proc = subprocess.call([self.DEFAULT_EXE, "-v2", "-r100", "-s", strategy, "-c", str(nbProcs), "-f", str(self.NBFRAME), "-n", "-i", seqfile], stdout=self.log_file, timeout=600)
+            proc = subprocess.call([self.DEFAULT_EXE, "-v2", "-r", str(DEFAULT_RECONF), "-s", strategy, "-c", str(nbProcs), "-f", str(self.NBFRAME), "-n", "-i", seqfile], stdout=self.log_file, timeout=DEFAULT_TIMEOUT)
         except subprocess.TimeoutExpired:
             self.log_file.write("Timeout expired !\n")
             print("    => Timeout expired !")
@@ -242,39 +277,26 @@ class BenchMapping(OrccAnalyse):
         pass
 
 # Main
-# DEFAULT
-# MR   : METIS Recursive graph partition mapping
-# MKCV : METIS KWay graph partition mapping (Optimize Communication volume)
-# MKEC : METIS KWay graph partition mapping (Optimize Edge-cut)
-# RR   : A simple Round-Robin mapping
-# WLB  : Weighted Load Balancing
-# KLR  : Kernighan Lin Refinement Weighted Load Balancing
-DEFAULT_OUTPUT_TAG = "bench"
-DEFAULT_NBFRAME = 600
-
 # Parse args
 parser = argparse.ArgumentParser(description='Open RVC-CAL Compiler - BenchMapping - Massive dynamic mapping bench')
 parser.add_argument('-d', dest='decoder_path', help='Path to your orcc decoder binary', required=True)
 parser.add_argument('-s', dest='sequences_path', help='Path to the directory containing the sequences', required=True)
 parser.add_argument('-f', dest='nb_frames', type=int, default=DEFAULT_NBFRAME, help='Number of frames of the sequence (default value = 600)')
 parser.add_argument('-o', dest='output_tag', default=DEFAULT_OUTPUT_TAG, help='Allow to tag bench output with a name')
+parser.add_argument('-m', dest='mpeg4', action="store_true", help='Set configuration to MPEG4 instead of HEVC')
 args = parser.parse_args()
 
-# MPEG4 Conf 
-# SEQUENCE_EXT = ".m4v"
-# SEQUENCE_NAMES = ["???"]
-# SEQTYPE_LIST = ["mpeg4"]
-# QP_LIST = ["mpeg4"]
-
-# HEVC Conf
-SEQUENCE_EXT = ".bin"
-SEQUENCE_NAMES = ["BasketballDrive_1920x1080_50_qp"]
-SEQTYPE_LIST = ["i_main", "ld_main", "ra_main"]
-QP_LIST = ["37", "32", "27", "22"]
-
-# Mapping Conf
-PROCS_LIST = ["1", "2", "3", "4", "5", "6"]
-STRATEGIES = ["MR", "MKCV", "MKEC", "RR", "WLB", "KLR"]
+if args.mpeg4 == True:
+    DECODER_CONF = "MPEG4"
+    SEQUENCE_EXT = MPEG4_SEQUENCE_EXT
+    SEQUENCE_NAMES = MPEG4_SEQUENCE_NAMES
+    SEQTYPE_LIST = MPEG4_SEQTYPE_LIST
+    QP_LIST = MPEG4_QP_LIST
+else:
+    SEQUENCE_EXT = HEVC_SEQUENCE_EXT
+    SEQUENCE_NAMES = HEVC_SEQUENCE_NAMES
+    SEQTYPE_LIST = HEVC_SEQTYPE_LIST
+    QP_LIST = HEVC_QP_LIST
 
 # Begin
 bench = BenchMapping(args.output_tag, args.nb_frames, args.decoder_path, args.sequences_path)
