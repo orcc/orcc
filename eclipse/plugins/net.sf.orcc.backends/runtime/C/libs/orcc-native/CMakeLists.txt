@@ -7,10 +7,12 @@ set(orcc_native_sources
     src/compare.c
     src/compareyuv.c
     src/native.c
+    src/native_util.c
 )
 
 set(orcc_native_headers
     include/native.h
+    include/native_util.h
 )
 
 # Helps CMake to find SDL libraries (Windows only)

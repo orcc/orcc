@@ -26,7 +26,6 @@
 * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 * SUCH DAMAGE.
 */
-#include <sys/stat.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,6 +34,8 @@
 #include "types.h"
 #include "util.h"
 #include "options.h"
+#include "native_util.h"
+
 
 static FILE        *ptrFile ;
 static unsigned int fileSize;
@@ -89,8 +90,6 @@ static int compareYUV_compareComponent(
 
 void compareYUV_init()
 {
-    struct stat st;
-
     //Fix me!! Dirty but it's the only way for the moment.
     if (opt->yuv_file == NULL) {
         useCompare = 0;
@@ -103,8 +102,7 @@ void compareYUV_init()
         exit(-1);
     }
 
-    fstat(fileno(ptrFile), &st);
-    fileSize = st.st_size;
+    fileSize = fsize(ptrFile);
 
     compareErrors = 0;
 }

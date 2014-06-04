@@ -29,7 +29,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 
 #include "orcc.h"
 #include "util.h"
