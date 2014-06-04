@@ -17,17 +17,22 @@ endif()
 
 configure_file(config.h.in config.h)
 
-if(NOT NO_EXTERNAL_DEPENDENCIES)
-    include_directories(roxml/include)
-    add_subdirectory(roxml)
+find_package(THREADS QUIET)
+if(THREADS_FOUND)
+    list(APPEND extra_libraries ${CMAKE_THREAD_LIBS_INIT})
+    list(APPEND extra_definitions -DTHREADS_ENABLE)
+else()
+    message(STATUS "Cannot find Threads")
 endif()
 
 include_directories(
     ${PROJECT_BINARY_DIR} # to find config.h
+    roxml/include
     orcc-runtime/include
     orcc-native/include
 )
 
+add_subdirectory(roxml)
 add_subdirectory(orcc-runtime)
 add_subdirectory(orcc-native)
 

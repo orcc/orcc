@@ -2,45 +2,49 @@
 # Orcc library files
 set(orcc_runtime_sources
     src/dataflow.c
-    src/getopt.c
     src/graph.c
     src/options.c
     src/scheduler.c
     src/trace.c
     src/util.c
-    include/util.h
-    include/types.h
+    src/mapping.c
+    src/profiling.c
+    src/getopt.c
 )
 
-# Build library with all features (require thread, etc)
-if(NOT NO_EXTERNAL_DEPENDENCIES)
+set(orcc_runtime_headers
+    include/dataflow.h
+    include/graph.h
+    include/options.h
+    include/scheduler.h
+    include/trace.h
+    include/util.h
+    include/mapping.h
+    include/profiling.h
+    include/types.h
+    include/orcc.h
+)
 
-    file(GLOB orcc_runtime_headers
-        include/*.h
-    )
-
-    list(APPEND orcc_runtime_sources
-        src/mapping.c
-        src/serialize.c
-        src/thread.c
-        src/profiling.c
-    )
-
-    find_package(Threads REQUIRED)
-    list(APPEND extra_libraries ${CMAKE_THREAD_LIBS_INIT})
-    list(APPEND extra_libraries roxml)
-
-    find_package(METIS QUIET)
-    if(METIS_FOUND)
-        list(APPEND extra_definitions -DMETIS_ENABLE)
-        list(APPEND extra_libraries ${METIS_LIBRARY})
-        list(APPEND extra_includes ${METIS_INCLUDE_DIR})
-        message(STATUS "Find Metis: ${METIS_LIBRARY}")
-    else()
-        message(STATUS "Cannot find Metis")
-    endif()
-
+if(THREADS_FOUND)
+    list(APPEND orcc_runtime_sources src/thread.c)
+    list(APPEND orcc_runtime_headers include/thread.h)
 endif()
+
+if(ROXML_ENABLE)
+    list(APPEND orcc_runtime_sources src/serialize.c)
+    list(APPEND orcc_runtime_headers include/serialize.h)
+endif()
+
+find_package(METIS QUIET)
+if(METIS_FOUND)
+    list(APPEND extra_definitions -DMETIS_ENABLE)
+    list(APPEND extra_libraries ${METIS_LIBRARY})
+    list(APPEND extra_includes ${METIS_INCLUDE_DIR})
+    message(STATUS "Find Metis: ${METIS_LIBRARY}")
+else()
+    message(STATUS "Cannot find Metis")
+endif()
+
 
 include_directories(${extra_includes})
 add_definitions(${extra_definitions})

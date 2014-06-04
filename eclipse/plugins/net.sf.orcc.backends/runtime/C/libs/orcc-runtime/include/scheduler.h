@@ -30,7 +30,10 @@
 #define _ORCC_SCHEDULER_H_
 
 #include "orcc.h"
+
+#ifdef THREADS_ENABLE
 #include "thread.h"
+#endif
 
 #define MAX_ACTORS 1024
 
@@ -58,9 +61,11 @@ struct local_scheduler_s {
     int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
     waiting_t **waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
 
-    /* Genetic algorithm */
+#ifdef THREADS_ENABLE
+    /* Mapping synchronization */
     sync_t *sync;
     orcc_semaphore_t sem_thread;
+#endif
 };
 
 struct waiting_s {

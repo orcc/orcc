@@ -62,8 +62,11 @@ local_scheduler_t *allocate_local_scheduler(int id, int nb_schedulers, sync_t *s
     for (i = 0; i < nb_schedulers; i++) {
         sched->waiting_schedulable[i] = (waiting_t *) malloc(sizeof(waiting_t));
     }
+
+#ifdef THREADS_ENABLE
     sched->sync = sync;
     orcc_semaphore_create(sched->sem_thread, 0);
+#endif
 
     return sched;
 }
@@ -270,10 +273,12 @@ void *scheduler_routine(void *data) {
             }
         }
 
+#ifdef THREADS_ENABLE
         if(my_actor == NULL || needMapping()) {
             orcc_semaphore_set(sched->sync->sem_monitor);
             orcc_semaphore_wait(sched->sem_thread);
         }
+#endif
     }
 }
 
@@ -282,11 +287,13 @@ void launcher(options_t *opt, network_t *network) {
     mapping_t *mapping = map_actors(network);
     int nb_threads = opt->nb_processors;
 
+#ifdef THREADS_ENABLE
     cpu_set_t cpuset;
     orcc_thread_t threads[MAX_THREAD_NB];
     orcc_thread_id_t threads_id[MAX_THREAD_NB];
     orcc_thread_t thread_agent;
     orcc_thread_id_t thread_agent_id;
+#endif
     sync_t sync;
 
     global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, &sync);
@@ -295,6 +302,7 @@ void launcher(options_t *opt, network_t *network) {
 
     global_scheduler_init(scheduler, mapping, opt);
 
+#ifdef THREADS_ENABLE
     orcc_clear_cpu_set(cpuset);
 
     for(i=0 ; i < nb_threads; i++){
@@ -307,4 +315,5 @@ void launcher(options_t *opt, network_t *network) {
         orcc_thread_join(threads[i]);
     }
     orcc_thread_join(thread_agent);
+#endif
 }
