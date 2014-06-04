@@ -34,4 +34,11 @@
 
 void update_ticks_stats(action_t *action, double diff_tick);
 
+/**
+ * Reset profiling information for the given network.
+ */
+void reset_profiling(network_t *network);
+
+void compute_workloads(network_t *network);
+
 #endif  /* _ORCC_PROFILING_H_ */
