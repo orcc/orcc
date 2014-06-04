@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, IETR/INSA of Rennes
  * All rights reserved.
- * 
+ * 4
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -71,8 +71,8 @@ use ieee.std_logic_unsigned.all;
 entity ram_tab is 
     generic(
             dwidth     : integer := 32; 
-            awidth     : integer := 12; 
-            mem_size    : integer := 4096
+            awidth     : integer := «closestLog_2(fifoSize)»; 
+            mem_size    : integer := «fifoSize»
     ); 
     port (
           addr0     : in std_logic_vector(awidth-1 downto 0); 

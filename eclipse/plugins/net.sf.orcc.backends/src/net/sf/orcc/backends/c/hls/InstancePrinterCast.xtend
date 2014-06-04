@@ -32,6 +32,7 @@ import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.backends.util.FPGA
 
 /*
  * Compile Instance c source code
@@ -40,6 +41,7 @@ import net.sf.orcc.util.OrccUtil
  * 
  */
 class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
+	private FPGA fpga = FPGA.builder("Virtex7 (xc7v2000t)") ;
 
 	new(Map<String, Object> options) {
 		super(options)
@@ -63,19 +65,17 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		«IF conn.fifoType.bool»
 			// Input FIFOs
-			extern stream<«conn.fifoType»> «conn.
-			castfifoNameWrite»;
+			extern stream<«conn.fifoType»> «conn.castfifoNameWrite»;
 			// Output FIFOS
-			extern «conn.fifoType»	«conn.ramName»[8192];
+			extern «conn.fifoType»	«conn.ramName»[«conn.size»];
 			extern unsigned int	«conn.wName»[1];
 			extern unsigned int	«conn.rName»[1];
 			unsigned int «conn.localwName»=0;					
 		«ELSE»
 			// Input FIFOs
-			extern stream<«conn.fifoType.doSwitch»> «conn.
-			castfifoNameWrite»;
+			extern stream<«conn.fifoType.doSwitch»> «conn.castfifoNameWrite»;
 			// Output FIFOS
-			extern «conn.fifoType.doSwitch»	«conn.ramName»[8192];
+			extern «conn.fifoType.doSwitch»	«conn.ramName»[«conn.size»];
 			extern unsigned int	«conn.wName»[1];
 			extern unsigned int	«conn.rName»[1];
 			unsigned int «conn.localwName»=0;	
@@ -85,7 +85,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
 		static void cast_«entityName»_«conn.targetPort.name»_write_untagged_0() {
-			i32 «conn.maskName» = «conn.localwName» & 8191;
+			i32 «conn.maskName» = «conn.localwName» & («conn.size - 1»);
 			«IF conn.fifoType.bool»
 				«conn.fifoType» tmp_«conn.sourcePort.name»;
 			«ELSE»
@@ -108,7 +108,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		// Action scheduler
 		void cast_«entityName»_«conn.targetPort.name»_write_scheduler() {		
 			if (!«conn.castfifoNameWrite».empty() && isSchedulable_untagged_0()) {
-				if(1 && (8192 - «conn.localwName» + «conn.rName»[0] >= 1)) {
+				if(1 && («conn.size» - «conn.localwName» + «conn.rName»[0] >= 1)) {
 					cast_«entityName»_«conn.targetPort.name»_write_untagged_0();
 				}
 			} else {
@@ -139,7 +139,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		«IF connOut.fifoType.bool»
 			// Input FIFOS
-			extern «connOut.fifoType» «connOut.ramName»[8192];
+			extern «connOut.fifoType» «connOut.ramName»[«connOut.size»];
 			extern unsigned int «connOut.wName»[1];
 			extern unsigned int «connOut.rName»[1];
 			unsigned int «connOut.localrName»=0;
@@ -147,7 +147,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			extern stream<«connOut.fifoType»> «connOut.castfifoNameRead»;
 		«ELSE»
 			// Input FIFOS
-			extern «connOut.fifoType.doSwitch» «connOut.ramName»[8192];
+			extern «connOut.fifoType.doSwitch» «connOut.ramName»[«connOut.size»];
 			extern unsigned int «connOut.wName»[1];
 			extern unsigned int «connOut.rName»[1];
 			unsigned int «connOut.localrName»=0;
@@ -158,7 +158,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
 		static void cast_«entityName»_«connOut.sourcePort.name»_read_untagged_0() {
-			i32 «connOut.maskName» = «connOut.localrName» & 8191;
+			i32 «connOut.maskName» = «connOut.localrName» & («connOut.size - 1» );
 			«IF connOut.fifoType.bool»
 				«connOut.fifoType» tmp_«connOut.targetPort.name»;
 			«ELSE»
@@ -195,14 +195,13 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 	override print(String targetFolder) {
 		for (portIn : actor.inputs) {
 			val connIn = incomingPortMap.get(portIn)
-			if(connIn != null) {
+			if (connIn != null) {
 				OrccUtil::printFile(getFileContentWrite(connIn),
 					new File(
-						targetFolder + File::separator + "cast_" + entityName + "_" +
-							connIn.targetPort.name + "_write" + ".cpp"))
+						targetFolder + File::separator + "cast_" + entityName + "_" + connIn.targetPort.name + "_write" +
+							".cpp"))
 				OrccUtil::printFile(
-					script(targetFolder,
-						"cast_" + entityName + "_" + connIn.targetPort.name + "_write"),
+					script(targetFolder, "cast_" + entityName + "_" + connIn.targetPort.name + "_write"),
 					new File(
 						targetFolder + File::separator + "script_" + "cast_" + entityName + "_" +
 							connIn.targetPort.name + "_write" + ".tcl"))
@@ -210,14 +209,13 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 		for (portOut : actor.outputs.filter[! native]) {
 			val connOut = outgoingPortMap.get(portOut).head
-			if(connOut != null) {
+			if (connOut != null) {
 				OrccUtil::printFile(getFileContentRead(connOut),
 					new File(
-						targetFolder + File::separator + "cast_" + entityName + "_" +
-							connOut.sourcePort.name + "_read" + ".cpp"))
+						targetFolder + File::separator + "cast_" + entityName + "_" + connOut.sourcePort.name + "_read" +
+							".cpp"))
 				OrccUtil::printFile(
-					script(targetFolder,
-						"cast_" + entityName + "_" + connOut.sourcePort.name + "_read"),
+					script(targetFolder, "cast_" + entityName + "_" + connOut.sourcePort.name + "_read"),
 					new File(
 						targetFolder + File::separator + "script_" + "cast_" + entityName + "_" +
 							connOut.sourcePort.name + "_read" + ".tcl"))
@@ -226,30 +224,24 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		return 0
 	}
 
-	def castfifoNameWrite(Connection connection) 
-		'''«IF connection != null»myStream_cast_«connection.getAttribute("id").objectValue»_write«ENDIF»'''
+	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+		objectValue»_write«ENDIF»'''
 
-	def castfifoNameRead(Connection connection) 
-		'''«IF connection != null»myStream_cast_«connection.getAttribute("id").objectValue»_read«ENDIF»'''
+	def castfifoNameRead(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+		objectValue»_read«ENDIF»'''
 
-	def ramName(Connection connection) 
-		'''«IF connection != null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def ramName(Connection connection) '''«IF connection != null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def wName(Connection connection) 
-		'''«IF connection != null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def wName(Connection connection) '''«IF connection != null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localwName(Connection connection) 
-		'''«IF connection != null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localwName(Connection connection) '''«IF connection != null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localrName(Connection connection) 
-		'''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localrName(Connection connection) '''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def rName(Connection connection) 
-		'''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def rName(Connection connection) '''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def maskName(Connection connection) 
-		'''«IF connection != null»mask_«connection.getAttribute("id").objectValue»«ENDIF»'''
-		
+	def maskName(Connection connection) '''«IF connection != null»mask_«connection.getAttribute("id").objectValue»«ENDIF»'''
+
 	def fifoTypeOut(Connection connection) {
 		if (connection.targetPort == null) {
 			connection.sourcePort.type
@@ -265,7 +257,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			connection.targetPort.type
 		}
 	}
-	
+
 	def fifoType(Connection connection) {
 		if (connection.sourcePort != null) {
 			connection.sourcePort.type
@@ -273,7 +265,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			connection.targetPort.type
 		}
 	}
-	
+
 	def script(String path, String Instname) '''
 		
 		open_project -reset subProject_«Instname»
@@ -281,7 +273,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		add_files «Instname».cpp
 		add_files -tb «Instname»TestBench.cpp
 		open_solution -reset "solution1"
-		set_part  {xc7v2000tflg1925-1}
+		set_part  {«fpga.device»«fpga.package»«fpga.version»}
 		create_clock -period 20
 		
 		

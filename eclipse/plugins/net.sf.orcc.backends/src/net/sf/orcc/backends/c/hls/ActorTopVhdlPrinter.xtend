@@ -416,8 +416,8 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«connection.ramName» : ram_tab
 		generic map (
 			dwidth     => «connection.fifoType.sizeInBits»,
-			awidth     => 13,
-			mem_size   => 8192
+			awidth     => «closestLog_2(connection.size)»,
+			mem_size   => «connection.size»
 		)
 		port map (
 			clk => top_ap_clk,
@@ -511,7 +511,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def printOutputRamSignalAssignHLS(Connection connection) '''
-		signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
+		signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 		signal top_«connection.ramName»_ce1 :  STD_LOGIC;
 		signal top_«connection.ramName»_we1  :  STD_LOGIC;
 		signal top_«connection.ramName»_d1  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -528,7 +528,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def printInputRAMSignalAssignHLS(Connection connection) '''
-		signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
+		signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 		signal top_«connection.ramName»_ce0 :  STD_LOGIC;
 		signal top_«connection.ramName»_q0  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 		
@@ -544,7 +544,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def printOutputRamAssignHLS(Connection connection) '''
-		«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
+		«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 		«connection.ramName»_ce0 : OUT STD_LOGIC;
 		«connection.ramName»_we0  : OUT STD_LOGIC;
 		«connection.ramName»_d0  : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -561,7 +561,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def printInputRAMAssignHLS(Connection connection) '''
-		«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
+		«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 		«connection.ramName»_ce0 : OUT STD_LOGIC;
 		«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 		
@@ -615,7 +615,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				
 				component cast_«entityName»_«connection.sourcePort.name»_read_scheduler IS
 					port (
-						«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR (12 downto 0);
+						«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 						«connection.ramName»_ce0 : OUT STD_LOGIC;
 						«connection.ramName»_q0  :  IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 						
@@ -650,7 +650,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 				component cast_«entityName»_«connection.targetPort.name»_write_scheduler IS
 					port (
-						«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR (12 downto 0);
+						«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 						«connection.ramName»_ce0 : OUT STD_LOGIC;
 						«connection.ramName»_we0  : OUT STD_LOGIC;
 						«connection.ramName»_d0  : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -711,5 +711,14 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		} else {
 			connection.targetPort.type
 		}
+	}
+	def closestLog_2(int x) {
+		var p = 1;
+		var r = 0;
+		while (p < x) {
+			p = p * 2
+			r = r + 1
+		}
+		return r;
 	}
 }
