@@ -40,18 +40,19 @@ static FILE        *ptrFile ;
 static unsigned int fileSize;
 static char         useCompare;
 
-static int compareYUV_compareComponent(const int x_size, const int y_size, 
-               const unsigned char *true_img_uchar, const unsigned char *test_img_uchar,
-               unsigned char SizeMbSide, char Component_Type) {
+static int compareYUV_compareComponent(
+        const int x_size, const int y_size,
+        const unsigned char *true_img_uchar,
+        const unsigned char *test_img_uchar,
+        unsigned char SizeMbSide, char Component_Type)
+{
     int pix_x, pix_y,blk_x,blk_y;
     int error = 0;
     int WidthSzInBlk  = x_size / SizeMbSide;
     int HeightSzInBlk = y_size / SizeMbSide;
 
-    for(blk_y = 0 ; blk_y < HeightSzInBlk ; blk_y++)
-    {
-        for(blk_x = 0 ; blk_x < WidthSzInBlk ; blk_x++)
-        {
+    for(blk_y = 0 ; blk_y < HeightSzInBlk ; blk_y++) {
+        for(blk_x = 0 ; blk_x < WidthSzInBlk ; blk_x++) {
             for (pix_y = 0; pix_y < SizeMbSide; pix_y++)
             {
                 for (pix_x = 0; pix_x < SizeMbSide; pix_x++)

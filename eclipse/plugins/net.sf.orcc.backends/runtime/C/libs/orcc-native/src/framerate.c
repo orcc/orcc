@@ -27,39 +27,42 @@
  * SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <SDL.h>
-
 #include "options.h"
 #include "trace.h"
 
-static unsigned int startTime;
-static unsigned int mappingTime;
-static unsigned int relativeStartTime;
+#include <time.h>
+
+static clock_t startTime;
+static clock_t mappingTime;
+static clock_t relativeStartTime;
 static int lastNumPic;
 static int numPicturesDecoded;
 static int numAlreadyDecoded;
 static int partialNumPicturesDecoded;
 
 static void print_fps_avg() {
-    unsigned int endTime = SDL_GetTicks();
+    clock_t endTime = clock();
 
-    print_orcc_trace(ORCC_VL_QUIET, "%i images in %f seconds: %f FPS", numPicturesDecoded,
-        (float) (endTime - startTime)/ 1000.0f,
-        1000.0f * (float) numPicturesDecoded / (float) (endTime - startTime));
+    float decodingTime = (endTime - startTime) / CLOCKS_PER_SEC;
+    float framerate = numPicturesDecoded / decodingTime;
+
+    print_orcc_trace(ORCC_VL_QUIET, "%i images in %f seconds: %f FPS",
+                     numPicturesDecoded, decodingTime, framerate);
 }
 
 static void print_fps_mapping() {
-    unsigned int endTime = SDL_GetTicks();
+    clock_t endTime = clock();
 
-    print_orcc_trace(ORCC_VL_QUIET, "PostMapping : %i images in %f seconds: %f FPS", numPicturesDecoded - numAlreadyDecoded,
-        (float) (endTime - mappingTime)/ 1000.0f,
-        1000.0f * (float) (numPicturesDecoded - numAlreadyDecoded) / (float) (endTime - mappingTime));
+    int numPicturesDecodedMapping = numPicturesDecoded - numAlreadyDecoded;
+    float decodingTime = (endTime - mappingTime) / CLOCKS_PER_SEC;
+    float framerate = numPicturesDecodedMapping / decodingTime;
+
+    print_orcc_trace(ORCC_VL_QUIET, "PostMapping : %i images in %f seconds: %f FPS",
+                     numPicturesDecodedMapping, decodingTime, framerate);
 }
 
 void fpsPrintInit() {
-    startTime = SDL_GetTicks();
+    startTime = clock();
     numPicturesDecoded = 0;
     partialNumPicturesDecoded = 0;
     lastNumPic = 0;
@@ -68,7 +71,7 @@ void fpsPrintInit() {
 }
 
 void fpsPrintInit_mapping() {
-    mappingTime = SDL_GetTicks();
+    mappingTime = clock();
     numAlreadyDecoded = numPicturesDecoded;
     atexit(print_fps_mapping);
 }
@@ -78,11 +81,13 @@ void fpsPrintNewPicDecoded(void) {
     unsigned int endTime;
     numPicturesDecoded++;
     partialNumPicturesDecoded++;
-    endTime = SDL_GetTicks();
-    if ((endTime - relativeStartTime) / 1000.0f >= 5) {
-        print_orcc_trace(ORCC_VL_QUIET, "%f images/sec",
-                1000.0f * (float) (numPicturesDecoded - lastNumPic)
-                        / (float) (endTime - relativeStartTime));
+    endTime = clock();
+
+    float relativeTime = (endTime - relativeStartTime) / CLOCKS_PER_SEC;
+
+    if(relativeTime >= 5) {
+        float framerate = (numPicturesDecoded - lastNumPic) / relativeTime;
+        print_orcc_trace(ORCC_VL_QUIET, "%f images/sec", framerate);
 
         relativeStartTime = endTime;
         lastNumPic = numPicturesDecoded;
