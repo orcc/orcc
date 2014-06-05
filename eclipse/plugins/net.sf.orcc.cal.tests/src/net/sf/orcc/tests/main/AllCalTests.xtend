@@ -32,6 +32,7 @@ import com.google.inject.Inject
 import net.sf.orcc.cal.CalInjectorProvider
 import net.sf.orcc.cal.services.Evaluator
 import net.sf.orcc.cal.services.Typer
+import net.sf.orcc.df.Actor
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.IrFactory
 import net.sf.orcc.tests.util.CalTestsHelper
@@ -117,5 +118,15 @@ class AllCalTests extends CalTestsHelper {
 		expected.value.add(l1)
 
 		EcoreUtil::equals(expected, varValue).assertTrue
+	}
+
+	@Test
+	def testElseIf() {
+		val entity = parseFile("/test/pass/Elsif.cal")
+
+		entity.assertNoErrors
+
+		val resultString = (entity.transformEntity as Actor).runInterpreter
+		"okok".assertEquals(resultString)
 	}
 }
