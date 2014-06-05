@@ -110,7 +110,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
 			«IF connection != null»
-				signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
+				signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 				signal top_«connection.ramName»_ce0 :  STD_LOGIC;
 				signal top_«connection.ramName»_q0  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
 				
@@ -126,7 +126,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				signal top_«connection.castfifoNameWrite»_V_empty_n :  STD_LOGIC;
 				signal top_«connection.castfifoNameWrite»_V_read    :  STD_LOGIC;
 				
-				signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
+				signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 				signal top_«connection.ramName»_ce1 :  STD_LOGIC;
 				signal top_«connection.ramName»_we1  :  STD_LOGIC;
 				signal top_«connection.ramName»_d1  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -145,7 +145,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«FOR portout : actor.outputs.filter[! native]»
 			«FOR connection : outgoingPortMap.get(portout)»
 				«IF connection != null»
-					signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR (12 downto 0);
+					signal top_«connection.ramName»_address1    :  STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 					signal top_«connection.ramName»_ce1 :  STD_LOGIC;
 					signal top_«connection.ramName»_we1  :  STD_LOGIC;
 					signal top_«connection.ramName»_d1  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);
@@ -163,7 +163,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					signal top_«connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
 					signal top_«connection.castfifoNameRead»_V_write  :  STD_LOGIC;
 					
-					signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR (12 downto 0);
+					signal top_«connection.ramName»_address0    :  STD_LOGIC_VECTOR («closestLog_2(connection.size)»-1 downto 0);
 					signal top_«connection.ramName»_ce0 :  STD_LOGIC;
 					signal top_«connection.ramName»_q0  :   STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1»  downto 0);	
 						

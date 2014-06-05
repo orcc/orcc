@@ -439,10 +439,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		open_project -reset subProject_«entityName»
 		set_top «entityName»_scheduler
 		add_files «entityName».cpp
-		add_files -tb «entityName»TestBench.cpp
 		open_solution -reset "solution1"
 		set_part  {«fpga.device»«fpga.package»«fpga.version»}
 		create_clock -period 20
+		source "directive_«entityName».tcl"
 		
 		
 		csynth_design
