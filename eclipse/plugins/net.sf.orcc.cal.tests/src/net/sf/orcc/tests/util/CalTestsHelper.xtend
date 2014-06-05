@@ -55,13 +55,14 @@ import org.eclipse.xtext.resource.XtextResourceSet
 public class CalTestsHelper extends AbstractXtextTests {
 
 	@Inject
-	private extension ParseHelper<AstEntity>
-	@Inject
 	private Provider<XtextResourceSet> resourceSetProvider;
 	@Inject
-	private CalJavaValidator validator
-	@Inject
 	private Injector injector
+
+	@Inject
+	protected extension ParseHelper<AstEntity>
+	@Inject
+	protected CalJavaValidator validator
 
 	/**
 	 * Open the given path as resource stream and parse it as CAL file.

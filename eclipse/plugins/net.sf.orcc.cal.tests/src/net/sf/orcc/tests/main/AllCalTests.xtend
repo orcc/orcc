@@ -47,7 +47,12 @@ class AllCalTests extends CalTestsHelper {
 
 	@Test
 	def testActor_initializeOnly() {
-		val entity = parseFile("/test/pass/InitializePattern.cal")
+		val entity = '''
+			actor InitializePattern() int I ==> int O :
+			    initialize ==> O:[42]
+			    end
+			end
+		'''.parse
 
 		entity.assertNotNull
 		entity.assertNoErrors
