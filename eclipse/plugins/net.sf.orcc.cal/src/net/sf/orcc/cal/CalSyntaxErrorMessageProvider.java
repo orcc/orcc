@@ -50,19 +50,19 @@ public class CalSyntaxErrorMessageProvider implements
 			if ("schedule".equals(mte.token.getText())) {
 				return new SyntaxErrorMessage(
 						"At most one \"schedule\" construct allowed",
-						CalConstants.ERROR_SCHEDULE);
+						CalDiagnostic.ERROR_SCHEDULE);
 			}
 		}
 
 		return new SyntaxErrorMessage(context.getDefaultMessage(),
-				CalConstants.ERROR_DEFAULT);
+				CalDiagnostic.ERROR_DEFAULT);
 	}
 
 	@Override
 	public SyntaxErrorMessage getSyntaxErrorMessage(
 			IValueConverterErrorContext context) {
 		return new SyntaxErrorMessage(context.getDefaultMessage(),
-				CalConstants.ERROR_DEFAULT);
+				CalDiagnostic.ERROR_DEFAULT);
 	}
 
 }

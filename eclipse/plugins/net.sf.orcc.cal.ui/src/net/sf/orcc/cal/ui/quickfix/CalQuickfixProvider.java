@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.cal.ui.quickfix;
 
-import net.sf.orcc.cal.CalConstants;
+import net.sf.orcc.cal.CalDiagnostic;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.xtext.ui.editor.model.IXtextDocument;
@@ -48,7 +48,7 @@ import org.eclipse.xtext.validation.Issue;
  */
 public class CalQuickfixProvider extends DefaultQuickfixProvider {
 
-	@Fix(CalConstants.ERROR_LIST)
+	@Fix(CalDiagnostic.ERROR_LIST)
 	public void capitalizeList(final Issue issue,
 			IssueResolutionAcceptor acceptor) {
 		acceptor.accept(issue, "Capitalize name", "Capitalize name of type",
@@ -65,7 +65,7 @@ public class CalQuickfixProvider extends DefaultQuickfixProvider {
 				});
 	}
 
-	@Fix(CalConstants.ERROR_NAME)
+	@Fix(CalDiagnostic.ERROR_NAME)
 	public void correctEntityName(final Issue issue,
 			IssueResolutionAcceptor acceptor) {
 		String packageName = issue.getData()[0];
@@ -86,7 +86,7 @@ public class CalQuickfixProvider extends DefaultQuickfixProvider {
 				});
 	}
 
-	@Fix(CalConstants.ERROR_MISSING_PACKAGE)
+	@Fix(CalDiagnostic.ERROR_MISSING_PACKAGE)
 	public void correctEntityMissingPackage(final Issue issue,
 			IssueResolutionAcceptor acceptor) {
 		final String expectedName = issue.getData()[1];
@@ -110,7 +110,7 @@ public class CalQuickfixProvider extends DefaultQuickfixProvider {
 				});
 	}
 
-	@Fix(CalConstants.ERROR_PACKAGE)
+	@Fix(CalDiagnostic.ERROR_PACKAGE)
 	public void correctEntityPackage(final Issue issue,
 			IssueResolutionAcceptor acceptor) {
 		String packageName = issue.getData()[0];

@@ -46,7 +46,7 @@ import org.junit.runner.RunWith
 
 import static net.sf.orcc.cal.cal.CalPackage.Literals.*
 import static org.eclipse.xtext.diagnostics.Diagnostic.*
-import static net.sf.orcc.cal.CalConstants.*
+import static net.sf.orcc.cal.CalDiagnostic.*
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(CalInjectorProvider))

@@ -34,21 +34,21 @@ package net.sf.orcc.cal;
  * @author Matthieu Wipliez
  * 
  */
-public interface CalConstants {
+public interface CalDiagnostic {
 
-	public static final String ERROR_DEFAULT = "default";
+	static final String ERROR_DEFAULT = "default";
 
-	public static final String ERROR_EXTRANEOUS_PACKAGE = "extraneous_package";
+	static final String ERROR_EXTRANEOUS_PACKAGE = "extraneous_package";
 
-	public static final String ERROR_LIST = "list";
+	static final String ERROR_LIST = "list";
 
-	public static final String ERROR_MISSING_PACKAGE = "missing_package";
+	static final String ERROR_MISSING_PACKAGE = "missing_package";
 
-	public static final String ERROR_NAME = "name";
+	static final String ERROR_NAME = "name";
 
-	public static final String ERROR_PACKAGE = "package";
+	static final String ERROR_PACKAGE = "package";
 
-	public static final String ERROR_SCHEDULE = "schedule";
+	static final String ERROR_SCHEDULE = "schedule";
 
 	static final String ERROR_CONSTANT_ASSIGNATION = "net.sf.orcc.error.param.assignation";
 

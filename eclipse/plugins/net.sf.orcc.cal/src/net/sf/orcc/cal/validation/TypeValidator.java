@@ -33,7 +33,7 @@ import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.cal.CalConstants;
+import net.sf.orcc.cal.CalDiagnostic;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
@@ -330,7 +330,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		if (!Util.isAssignable(variable)) {
 			error("The variable " + variable.getName() + " is not assignable",
 					eINSTANCE.getStatementAssign_Target(),
-					CalConstants.ERROR_CONSTANT_ASSIGNATION);
+					CalDiagnostic.ERROR_CONSTANT_ASSIGNATION);
 		}
 
 		// create expression
