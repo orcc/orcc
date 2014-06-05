@@ -1,9 +1,0 @@
-package net.sf.orcc.cal.test.pass;
-
-actor TypeInt() ==> :
-
-	uint(size=3) x := 7;
-
-	int(size=15) y := x + 1;
-
-end

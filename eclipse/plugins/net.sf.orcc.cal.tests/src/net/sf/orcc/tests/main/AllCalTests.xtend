@@ -60,7 +60,13 @@ class AllCalTests extends CalTestsHelper {
 
 	@Test
 	def testIntTypes() {
-		val entity = parseFile("/test/pass/TypeInt.cal");
+		val entity = '''
+			actor TypeInt() ==> :
+				uint(size=3) x := 7;
+				int(size=15) y := x + 1;
+			end
+		'''.parse
+
 		val stateVars = entity.actor.stateVariables
 		val x = stateVars.get(0);
 		val y = stateVars.get(1);
@@ -69,9 +75,7 @@ class AllCalTests extends CalTestsHelper {
 		expected.assertEquals(Typer::getType(x))
 		expected.assertEquals(Typer::getType(x.value))
 
-		// type of "x + 1" is type of "8", i.e. uint(size=4)
-		// but because the expression is assigned to y whose type is int(...)
-		// it becomes int(size=5)
+		// type of "x + 1" is type of x (u3) with one more bit, so u4
 		IrFactory::eINSTANCE.createTypeUint(4).assertEquals(Typer::getType(y.value))
 	}
 }
