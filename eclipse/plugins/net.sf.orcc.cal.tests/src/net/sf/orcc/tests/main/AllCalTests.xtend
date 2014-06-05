@@ -30,9 +30,12 @@ package net.sf.orcc.tests.main
 
 import com.google.inject.Inject
 import net.sf.orcc.cal.CalInjectorProvider
+import net.sf.orcc.cal.services.Evaluator
 import net.sf.orcc.cal.services.Typer
+import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.IrFactory
 import net.sf.orcc.tests.util.CalTestsHelper
+import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.junit4.InjectWith
 import org.eclipse.xtext.junit4.XtextRunner
 import org.eclipse.xtext.junit4.validation.ValidationTestHelper
@@ -44,6 +47,8 @@ import org.junit.runner.RunWith
 class AllCalTests extends CalTestsHelper {
 
 	@Inject extension ValidationTestHelper
+	
+	private val irFact = IrFactory::eINSTANCE
 
 	@Test
 	def testActor_initializeOnly() {
@@ -71,11 +76,46 @@ class AllCalTests extends CalTestsHelper {
 		val x = stateVars.get(0);
 		val y = stateVars.get(1);
 
-		val expected = IrFactory::eINSTANCE.createTypeUint(3)
+		val expected = irFact.createTypeUint(3)
 		expected.assertEquals(Typer::getType(x))
 		expected.assertEquals(Typer::getType(x.value))
 
 		// type of "x + 1" is type of x (u3) with one more bit, so u4
-		IrFactory::eINSTANCE.createTypeUint(4).assertEquals(Typer::getType(y.value))
+		irFact.createTypeUint(4).assertEquals(Typer::getType(y.value))
+	}
+
+	@Test
+	def testGenerator() {
+		val entity = '''
+			actor Generator() ==> :
+				int stateVar[1][2][3] :=
+				[
+				  [
+				    [ i * j * k : for int i in 1 .. 3 ] : for int j in 1 .. 2
+				  ] : for int k in 1 .. 1
+				];
+			end
+		'''.parse
+
+		val varValue = Evaluator::getValue(entity.actor.stateVariables.head);
+
+		val l11 = irFact.createExprList(#[
+			irFact.createExprInt(1) as Expression,
+			irFact.createExprInt(2) as Expression,
+			irFact.createExprInt(3) as Expression
+		])
+		val l12 = irFact.createExprList(#[
+			irFact.createExprInt(2) as Expression,
+			irFact.createExprInt(4) as Expression,
+			irFact.createExprInt(6) as Expression
+		])
+		val l1 = irFact.createExprList()
+		l1.value.add(l11)
+		l1.value.add(l12)
+
+		val expected = irFact.createExprList()
+		expected.value.add(l1)
+
+		EcoreUtil::equals(expected, varValue).assertTrue
 	}
 }
