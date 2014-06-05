@@ -26,18 +26,18 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.test
+package net.sf.orcc.tests.main
 
 import com.google.inject.Inject
 import net.sf.orcc.cal.CalInjectorProvider
+import net.sf.orcc.cal.services.Typer
+import net.sf.orcc.ir.IrFactory
+import net.sf.orcc.tests.util.CalTestsHelper
 import org.eclipse.xtext.junit4.InjectWith
 import org.eclipse.xtext.junit4.XtextRunner
 import org.eclipse.xtext.junit4.validation.ValidationTestHelper
 import org.junit.Test
 import org.junit.runner.RunWith
-import net.sf.orcc.cal.services.Typer
-import net.sf.orcc.ir.IrFactory
-import net.sf.orcc.test.util.CalTestsHelper
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(CalInjectorProvider))
