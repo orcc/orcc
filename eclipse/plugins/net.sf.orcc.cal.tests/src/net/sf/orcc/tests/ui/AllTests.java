@@ -57,7 +57,7 @@ import com.google.inject.Provider;
 @InjectWith(CalInjectorProvider.class)
 public class AllTests extends AbstractXtextTests {
 
-	private static final String prefix = "net/sf/orcc/cal/test/";
+	private static final String prefix = "test/";
 
 	private static final String projectName = "Tests";
 
