@@ -40,6 +40,7 @@
 struct global_scheduler_s {
     local_scheduler_t **schedulers;
     int nb_schedulers;
+    agent_t *agent;
 };
 
 struct local_scheduler_s {
@@ -63,7 +64,7 @@ struct local_scheduler_s {
 
 #ifdef THREADS_ENABLE
     /* Mapping synchronization */
-    sync_t *sync;
+    agent_t *agent;
     orcc_semaphore_t sem_thread;
 #endif
 };
@@ -86,16 +87,16 @@ struct schedinfo_s {
 };
 
 
-global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync);
+global_scheduler_t *allocate_global_scheduler(int nb_schedulers);
 
-void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, options_t *opt);
+void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, agent_t *agent, options_t *opt);
 
-local_scheduler_t *allocate_local_scheduler(int id, int schedulers_nb, sync_t *sync);
+local_scheduler_t *allocate_local_scheduler(int id, int schedulers_nb);
 
 /**
  * Initialize the given scheduler.
  */
-void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, options_t *opt);
+void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, agent_t *agent, options_t *opt);
 
 /**
  * Initialize the actors mapped to the given scheduler.

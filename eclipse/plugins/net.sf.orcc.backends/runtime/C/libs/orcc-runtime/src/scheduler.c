@@ -41,18 +41,18 @@
 // Scheduling functions
 ///////////////////////////////////////////////////////////////////////////////
 
-global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync) {
+global_scheduler_t *allocate_global_scheduler(int nb_schedulers) {
     int i;
     global_scheduler_t *sched = (global_scheduler_t*) malloc(sizeof(global_scheduler_t));
     sched->nb_schedulers = nb_schedulers;
     sched->schedulers = (local_scheduler_t**) malloc(nb_schedulers * sizeof(local_scheduler_t*));
     for (i = 0; i < nb_schedulers; i++) {
-        sched->schedulers[i] = allocate_local_scheduler(i, nb_schedulers, sync);
+        sched->schedulers[i] = allocate_local_scheduler(i, nb_schedulers);
     }
     return sched;
 }
 
-local_scheduler_t *allocate_local_scheduler(int id, int nb_schedulers, sync_t *sync) {
+local_scheduler_t *allocate_local_scheduler(int id, int nb_schedulers) {
     int i;
     local_scheduler_t *sched = (local_scheduler_t*) malloc(sizeof(local_scheduler_t));
 
@@ -64,28 +64,29 @@ local_scheduler_t *allocate_local_scheduler(int id, int nb_schedulers, sync_t *s
     }
 
 #ifdef THREADS_ENABLE
-    sched->sync = sync;
     orcc_semaphore_create(sched->sem_thread, 0);
 #endif
 
     return sched;
 }
 
-void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, options_t *opt) {
+void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, agent_t *agent, options_t *opt) {
     int i;
     for (i = 0; i < sched->nb_schedulers; i++) {
         if(i < mapping->number_of_threads) {
-            local_scheduler_init(sched->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], opt);
+            local_scheduler_init(sched->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], agent, opt);
         } else {
-            local_scheduler_init(sched->schedulers[i], 0, NULL, opt);
+            local_scheduler_init(sched->schedulers[i], 0, NULL, agent, opt);
         }
     }
+
+    sched->agent = agent;
 }
 
 /**
  * Initializes the given scheduler.
  */
-void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, options_t *opt) {
+void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, agent_t *agent, options_t *opt) {
     int i;
 
     sched->num_actors = num_actors;
@@ -106,6 +107,9 @@ void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **ac
         sched->waiting_schedulable[i]->next_entry = 0;
         sched->waiting_schedulable[i]->next_waiting = 0;
     }
+
+    sched->agent = agent;
+    orcc_semaphore_create(sched->sem_thread, 0);
 }
 
 /**
@@ -275,7 +279,7 @@ void *scheduler_routine(void *data) {
 
 #ifdef THREADS_ENABLE
         if(my_actor == NULL || needMapping()) {
-            orcc_semaphore_set(sched->sync->sem_monitor);
+            orcc_semaphore_set(sched->agent->sem_agent);
             orcc_semaphore_wait(sched->sem_thread);
         }
 #endif
@@ -294,13 +298,11 @@ void launcher(options_t *opt, network_t *network) {
     orcc_thread_t thread_agent;
     orcc_thread_id_t thread_agent_id;
 #endif
-    sync_t sync;
 
-    global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads, &sync);
-    agent_t *agent = agent_init(&sync, opt, scheduler, network, nb_threads);
-    sync_init(&sync);
+    global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads);
+    agent_t *agent = agent_init(opt, scheduler, network, nb_threads);
 
-    global_scheduler_init(scheduler, mapping, opt);
+    global_scheduler_init(scheduler, mapping, agent, opt);
 
 #ifdef THREADS_ENABLE
     orcc_clear_cpu_set(cpuset);

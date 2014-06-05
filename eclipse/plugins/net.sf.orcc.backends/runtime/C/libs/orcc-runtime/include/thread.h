@@ -135,14 +135,6 @@
 
 #endif
 
-
-struct sync_s {
-    orcc_semaphore_t sem_monitor;
-    int active_sync;
-};
-
-void sync_init(sync_t *sync);
-
 void set_realtime_priority();
 
 #endif  /* _ORCC_THREAD_H_ */

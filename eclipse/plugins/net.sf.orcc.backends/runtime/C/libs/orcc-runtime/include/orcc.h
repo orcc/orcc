@@ -56,7 +56,6 @@ typedef int32_t idx_t;
 #pragma warning(disable: 4996)
 #endif
 
-typedef struct sync_s sync_t;
 typedef struct options_s options_t;
 typedef struct global_scheduler_s global_scheduler_t;
 typedef struct local_scheduler_s local_scheduler_t;

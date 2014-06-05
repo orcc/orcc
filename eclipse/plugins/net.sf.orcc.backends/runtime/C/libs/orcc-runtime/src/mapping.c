@@ -734,7 +734,7 @@ void *agent_routine(void *data) {
 
         // wait threads synchro
         for (i = 0; i < agent->nb_threads; i++) {
-            orcc_semaphore_wait(agent->sync->sem_monitor);
+            orcc_semaphore_wait(agent->sem_agent);
         }
 
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Remap the actors...");
@@ -763,14 +763,14 @@ void *agent_routine(void *data) {
 /**
  * Initialize the given agent structure.
  */
-agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads) {
+agent_t* agent_init(options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads) {
     agent_t *agent = (agent_t *) malloc(sizeof(agent_t));
-    agent->sync = sync;
     agent->options = options;
     agent->scheduler = scheduler;
     agent->network = network;
     agent->mapping = allocate_mapping(nb_threads, network->nb_actors);
     agent->nb_threads = nb_threads;
+    orcc_semaphore_create(agent->sem_agent, 0);
     return agent;
 }
 
