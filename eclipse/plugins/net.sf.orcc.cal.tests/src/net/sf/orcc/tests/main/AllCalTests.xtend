@@ -46,6 +46,7 @@ import org.junit.runner.RunWith
 
 import static net.sf.orcc.cal.cal.CalPackage.Literals.*
 import static org.eclipse.xtext.diagnostics.Diagnostic.*
+import static net.sf.orcc.cal.CalConstants.*
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(CalInjectorProvider))
@@ -215,6 +216,6 @@ class AllCalTests extends CalTestsHelper {
 		entity.assertNotNull
 		entity.assertNoErrors
 
-		entity.typesValidation.assertErrorContains("param is not assignable")
+		entity.typesValidation.assertError(ERROR_CONSTANT_ASSIGNATION, "param is not assignable")
 	}
 }

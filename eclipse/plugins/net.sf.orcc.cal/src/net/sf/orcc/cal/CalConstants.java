@@ -50,4 +50,6 @@ public interface CalConstants {
 
 	public static final String ERROR_SCHEDULE = "schedule";
 
+	static final String ERROR_CONSTANT_ASSIGNATION = "net.sf.orcc.error.param.assignation";
+
 }
