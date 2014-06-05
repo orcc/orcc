@@ -36,6 +36,7 @@ import net.sf.orcc.df.Actor
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.IrFactory
 import net.sf.orcc.tests.util.CalTestsHelper
+import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.junit4.InjectWith
 import org.eclipse.xtext.junit4.XtextRunner
@@ -197,5 +198,23 @@ class AllCalTests extends CalTestsHelper {
 
 		// FSM transitions references undeclared states (State2 and State3)
 		entity.assertError(AST_TRANSITION, LINKING_DIAGNOSTIC)
+	}
+
+	@Test
+	def testParamIsConstant() {
+		val entity = '''
+			actor Param(int param) ==> :
+				action ==>
+				do
+					param := param + 1;
+				end
+			end
+		'''.parse(URI::createPlatformResourceURI("Param.cal", true), resourceSetProvider.get)
+
+		// Before validation, everything is ok here
+		entity.assertNotNull
+		entity.assertNoErrors
+
+		entity.typesValidation.assertErrorContains("param is not assignable")
 	}
 }

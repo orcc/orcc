@@ -35,6 +35,9 @@ import java.util.Collections
 import net.sf.orcc.cal.CalInjectorProvider
 import net.sf.orcc.cal.cal.AstEntity
 import net.sf.orcc.cal.validation.CalJavaValidator
+import net.sf.orcc.cal.validation.StructuralValidator
+import net.sf.orcc.cal.validation.TypeValidator
+import net.sf.orcc.cal.validation.WarningValidator
 import net.sf.orcc.df.Actor
 import net.sf.orcc.frontend.ActorTransformer
 import net.sf.orcc.frontend.UnitTransformer
@@ -55,14 +58,20 @@ import org.eclipse.xtext.resource.XtextResourceSet
 public class CalTestsHelper extends AbstractXtextTests {
 
 	@Inject
-	private Provider<XtextResourceSet> resourceSetProvider;
-	@Inject
 	private Injector injector
 
 	@Inject
+	protected Provider<XtextResourceSet> resourceSetProvider;
+	@Inject
 	protected extension ParseHelper<AstEntity>
 	@Inject
-	protected CalJavaValidator validator
+	protected CalJavaValidator defaultValidator
+	@Inject
+	protected StructuralValidator structuralValidator
+	@Inject
+	protected TypeValidator typesValidator
+	@Inject
+	protected WarningValidator warningsValidator
 
 	/**
 	 * Open the given path as resource stream and parse it as CAL file.
@@ -118,7 +127,16 @@ public class CalTestsHelper extends AbstractXtextTests {
 	 * AssertableDiagnostics object can be checked for specific errors/warning
 	 * set from this validator
 	 */
-	def calJavaValidation(EObject object) {
-		new ValidatorTester<CalJavaValidator>(validator, injector).validate(object)
+	def defaultValidation(EObject object) {
+		new ValidatorTester<CalJavaValidator>(defaultValidator, injector).validate(object)
+	}
+	def structuralValidation(EObject object) {
+		new ValidatorTester<StructuralValidator>(structuralValidator, injector).validate(object)
+	}
+	def typesValidation(EObject object) {
+		new ValidatorTester<TypeValidator>(typesValidator, injector).validate(object)
+	}
+	def warningsValidation(EObject object) {
+		new ValidatorTester<WarningValidator>(warningsValidator, injector).validate(object)
 	}
 }
