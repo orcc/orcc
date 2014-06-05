@@ -180,17 +180,6 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the network
 		network_t network = {"«network.name»", actors, connections, «network.allActors.size», «network.connections.size»};
 		
-		/////////////////////////////////////////////////
-		// Actions to do when exting properly
-		static void atexit_actions() {
-			if (opt->profiling_file != NULL) {
-				compute_workloads(&network);
-		#ifdef ROXML_ENABLE
-				save_profiling(opt->profiling_file, &network);
-		#endif
-			}
-			«additionalAtExitActions»
-		}
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
@@ -198,7 +187,6 @@ class NetworkPrinter extends CTemplate {
 			«beforeMain»
 			
 			options_t *opt = init_orcc(argc, argv);
-			atexit(atexit_actions);
 			set_scheduling_strategy(«IF !newSchedul»"RR"«ELSE»"DD"«ENDIF», opt);
 			
 			launcher(opt, &network);

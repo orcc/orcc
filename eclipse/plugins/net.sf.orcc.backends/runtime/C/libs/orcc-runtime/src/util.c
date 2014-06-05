@@ -120,6 +120,7 @@ options_t* init_orcc(int argc, char *argv[]) {
 #ifdef _MSC_VER
     atexit(&pause);
 #endif
+    atexit(atexit_actions);
     init_native_context();
 
     while ((c = getopt(argc, argv, ostr)) != -1) {
@@ -189,4 +190,14 @@ options_t* init_orcc(int argc, char *argv[]) {
     }
 
     return opt;
+}
+
+// Actions to do when exting properly
+void atexit_actions() {
+    if (opt->profiling_file != NULL) {
+        compute_workloads(&network);
+#ifdef ROXML_ENABLE
+        save_profiling(opt->profiling_file, &network);
+#endif
+    }
 }
