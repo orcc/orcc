@@ -53,7 +53,7 @@ import static net.sf.orcc.cal.CalDiagnostic.*
 class AllCalTests extends CalTestsHelper {
 
 	@Inject extension ValidationTestHelper
-	
+
 	private val irFact = IrFactory::eINSTANCE
 
 	@Test
@@ -218,4 +218,22 @@ class AllCalTests extends CalTestsHelper {
 
 		entity.typesValidation.assertError(ERROR_CONSTANT_ASSIGNATION, "param is not assignable")
 	}
+
+	@Test
+	def testPattern1 () {
+		val entity = '''
+			actor Pattern1() int I ==> int O :
+				action O:[o] ==>
+				end
+			end
+		'''.parse
+
+		// Before validation, everything is ok here
+		entity.assertNotNull
+
+		// Input reference an unknown port (i.e. an output port
+		// is unknown for an input pattern
+		entity.assertError(INPUT_PATTERN, LINKING_DIAGNOSTIC)
+	}
+
 }
