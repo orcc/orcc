@@ -36,14 +36,17 @@
 #include "dataflow.h"
 #include "graph.h"
 #include "util.h"
-#include "serialize.h"
 #include "scheduler.h"
 #include "options.h"
 #include "trace.h"
 #include "cycle.h"
+#include "profiling.h"
 
 #ifdef THREADS_ENABLE
 #include "thread.h"
+#endif
+#ifdef ROXML_ENABLE
+#include "serialize.h"
 #endif
 
 /*
@@ -802,6 +805,6 @@ void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThre
     assert(scheduler != NULL);
 
     for (i = 0; i < nbThreads; i++) {
-        sched_reinit(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0);
+        sched_reinit(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i]);
     }
 }

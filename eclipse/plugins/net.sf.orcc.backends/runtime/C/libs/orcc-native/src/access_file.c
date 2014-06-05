@@ -33,6 +33,7 @@
 #include <stdlib.h>
 
 #include "orcc.h"
+#include "native_util.h"
 
 long openFile(char* filename) {
     FILE* fd = NULL;

@@ -39,6 +39,11 @@
 #include "options.h"
 #include "trace.h"
 #include "native.h"
+#include "profiling.h"
+
+#ifdef ROXML_ENABLE
+#include "serialize.h"
+#endif
 
 extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);

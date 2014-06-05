@@ -98,6 +98,8 @@ local_scheduler_t *allocate_local_scheduler(int id, int schedulers_nb);
  */
 void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, agent_t *agent, options_t *opt);
 
+void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors);
+
 /**
  * Initialize the actors mapped to the given scheduler.
  */
