@@ -288,8 +288,20 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
-		// get the file (we know it's a file)
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspace workspace;
+		try {
+			// get the file (we know it's a file)
+			workspace = ResourcesPlugin.getWorkspace();
+		} catch (IllegalStateException e) {
+			// This validation step is executed without a workspace open. This
+			// is normal if the validation is performed from JUnit tests in full
+			// headless environment (i.e. Without opening the second eclipse and
+			// without any GUI). In that case, we catch the exception and stop
+			// this method. Doing this, all others validations will be performed
+			// as expected.
+			return;
+		}
+
 		IFile file = (IFile) workspace.getRoot().findMember(platformPath);
 		if (file == null) {
 			return;
