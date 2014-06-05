@@ -696,8 +696,10 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		};
 
 		// fills the patterns set by visiting guards
-		for (AstExpression guard : astAction.getGuard().getExpressions()) {
-			peekVariables.doSwitch(guard);
+		if (astAction.getGuard() != null) {
+			for (AstExpression guard : astAction.getGuard().getExpressions()) {
+				peekVariables.doSwitch(guard);
+			}
 		}
 
 		// add peeks for each pattern of the patterns set

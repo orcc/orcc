@@ -87,8 +87,11 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(input);
 		}
 
-		for (AstExpression guardExpression : action.getGuard().getExpressions()) {
-			doSwitch(guardExpression);
+		if (action.getGuard() != null) {
+			for (AstExpression guardExpression : action.getGuard()
+					.getExpressions()) {
+				doSwitch(guardExpression);
+			}
 		}
 
 		for (Variable variable : action.getVariables()) {

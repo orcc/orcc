@@ -91,6 +91,10 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	}
 
 	private void checkActionGuard(Guard guard) {
+
+		if (guard == null)
+			return;
+
 		int index = 0;
 		for (AstExpression guardExpression : guard.getExpressions()) {
 			Type type = Typer.getType(guardExpression);
