@@ -129,4 +129,55 @@ class AllCalTests extends CalTestsHelper {
 		val resultString = (entity.transformEntity as Actor).runInterpreter
 		"okok".assertEquals(resultString)
 	}
+
+	@Test
+	def testElseIfExpr() {
+		val entity = parseFile("/test/pass/ElsifExpr.cal")
+
+		entity.assertNoErrors
+
+		val resultString = (entity.transformEntity as Actor).runInterpreter
+		"result = 0".assertEquals(resultString)
+	}
+
+	@Test
+	def testElseIfStateVar() {
+		val entity = parseFile("/test/pass/ElsifStateVar.cal")
+
+		entity.assertNoErrors
+
+		val resultString = (entity.transformEntity as Actor).runInterpreter
+		"ok".assertEquals(resultString)
+	}
+
+	@Test
+	def testInitStateVarFunction() {
+		val entity = parseFile("/test/pass/InitStateVarFunction.cal")
+
+		entity.assertNoErrors
+
+		val resultString = (entity.transformEntity as Actor).runInterpreter
+		"pp = 8".assertEquals(resultString)
+	}
+
+	@Test
+	def testExecShadow() {
+		val entity = parseFile("/test/pass/Shadowing.cal")
+
+		entity.assertNoErrors
+
+		val resultString = (entity.transformEntity as Actor).runInterpreter
+		"x = 0".assertEquals(resultString)
+	}
+
+	@Test
+	def testExecWhile() throws Exception {
+		val entity = parseFile("/test/pass/CodegenWhile.cal")
+
+		entity.assertNoErrors
+
+		val resultString = (entity.transformEntity as Actor).runInterpreter
+		"idx is 60".assertEquals(resultString)
+	}
+
 }
