@@ -31,7 +31,10 @@
 #define _ORCC_MAPPING_H_
 
 #include "orcc.h"
+
+#ifdef THREADS_ENABLE
 #include "thread.h"
+#endif
 
 /*
  * Mapping structure store the mapping result
@@ -49,7 +52,9 @@ struct agent_s {
     network_t *network;
     mapping_t *mapping;
     int nb_threads;
+#ifdef THREADS_ENABLE
     orcc_semaphore_t sem_agent;
+#endif
 };
 
 typedef struct proc_info_s {

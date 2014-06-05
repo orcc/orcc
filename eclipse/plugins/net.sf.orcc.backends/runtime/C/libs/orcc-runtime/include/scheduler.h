@@ -62,9 +62,9 @@ struct local_scheduler_s {
     int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
     waiting_t **waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
 
-#ifdef THREADS_ENABLE
     /* Mapping synchronization */
     agent_t *agent;
+#ifdef THREADS_ENABLE
     orcc_semaphore_t sem_thread;
 #endif
 };

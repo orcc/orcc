@@ -185,7 +185,9 @@ class NetworkPrinter extends CTemplate {
 		static void atexit_actions() {
 			if (opt->profiling_file != NULL) {
 				compute_workloads(&network);
+		#ifdef ROXML_ENABLE
 				save_profiling(opt->profiling_file, &network);
+		#endif
 			}
 			«additionalAtExitActions»
 		}

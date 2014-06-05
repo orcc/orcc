@@ -109,7 +109,9 @@ void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **ac
     }
 
     sched->agent = agent;
+#ifdef THREADS_ENABLE
     orcc_semaphore_create(sched->sem_thread, 0);
+#endif
 }
 
 /**
@@ -254,7 +256,9 @@ void *scheduler_routine(void *data) {
     ticks tick_in, tick_out;
     double diff_tick;
 
+#ifdef THREADS_ENABLE
     set_realtime_priority();
+#endif
     sched_init_actors(sched, &si);
 
     while (1) {
@@ -301,7 +305,6 @@ void launcher(options_t *opt, network_t *network) {
 
     global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads);
     agent_t *agent = agent_init(opt, scheduler, network, nb_threads);
-
     global_scheduler_init(scheduler, mapping, agent, opt);
 
 #ifdef THREADS_ENABLE
@@ -317,5 +320,7 @@ void launcher(options_t *opt, network_t *network) {
         orcc_thread_join(threads[i]);
     }
     orcc_thread_join(thread_agent);
+#else
+    (*scheduler_routine)((void *) scheduler->schedulers[i]);
 #endif
 }
