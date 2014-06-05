@@ -43,6 +43,9 @@ import org.eclipse.xtext.junit4.validation.ValidationTestHelper
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static net.sf.orcc.cal.cal.CalPackage.Literals.*
+import static org.eclipse.xtext.diagnostics.Diagnostic.*
+
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(CalInjectorProvider))
 class AllCalTests extends CalTestsHelper {
@@ -180,4 +183,19 @@ class AllCalTests extends CalTestsHelper {
 		"idx is 60".assertEquals(resultString)
 	}
 
+	@Test
+	def testInvalidFSM() {
+		val entity = '''
+			actor BadFsm() ==> :
+				action1: action ==> end
+				schedule fsm State1:
+					State1 (action1) --> State2;
+					State1 (action1) --> State3;
+				end
+			end
+		'''.parse
+
+		// FSM transitions references undeclared states (State2 and State3)
+		entity.assertError(AST_TRANSITION, LINKING_DIAGNOSTIC)
+	}
 }
