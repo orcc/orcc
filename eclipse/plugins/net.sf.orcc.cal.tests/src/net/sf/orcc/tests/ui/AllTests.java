@@ -1,10 +1,12 @@
-package net.sf.orcc.cal;
+package net.sf.orcc.tests.ui;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccProjectNature;
+import net.sf.orcc.cal.CalInjectorProvider;
+import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.services.Evaluator;
@@ -17,6 +19,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.ExpressionPrinter;
+import net.sf.orcc.tests.util.TestInterpreter;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -31,7 +34,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.xtext.diagnostics.Severity;
-import org.eclipse.xtext.junit.AbstractXtextTests;
+import org.eclipse.xtext.junit4.AbstractXtextTests;
 import org.eclipse.xtext.junit4.InjectWith;
 import org.eclipse.xtext.junit4.XtextRunner;
 import org.eclipse.xtext.junit4.util.ParseHelper;
@@ -54,7 +57,7 @@ import com.google.inject.Provider;
 @InjectWith(CalInjectorProvider.class)
 public class AllTests extends AbstractXtextTests {
 
-	private static final String prefix = "net/sf/orcc/cal/test/";
+	private static final String prefix = "test/";
 
 	private static final String projectName = "Tests";
 
