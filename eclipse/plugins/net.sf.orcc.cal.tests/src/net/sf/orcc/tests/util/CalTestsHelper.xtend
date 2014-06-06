@@ -29,25 +29,16 @@
 package net.sf.orcc.tests.util;
 
 import com.google.inject.Inject
-import com.google.inject.Injector
 import com.google.inject.Provider
 import java.util.Collections
 import net.sf.orcc.cal.CalInjectorProvider
 import net.sf.orcc.cal.cal.AstEntity
-import net.sf.orcc.cal.validation.CalJavaValidator
-import net.sf.orcc.cal.validation.StructuralValidator
-import net.sf.orcc.cal.validation.TypeValidator
-import net.sf.orcc.cal.validation.WarningValidator
-import net.sf.orcc.df.Actor
-import net.sf.orcc.frontend.ActorTransformer
-import net.sf.orcc.frontend.UnitTransformer
 import org.eclipse.emf.common.util.URI
-import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.junit4.AbstractXtextTests
 import org.eclipse.xtext.junit4.InjectWith
 import org.eclipse.xtext.junit4.util.ParseHelper
-import org.eclipse.xtext.junit4.validation.ValidatorTester
 import org.eclipse.xtext.resource.XtextResourceSet
+import com.google.inject.Injector
 
 /**
  * This class provides methods to test more efficiently CAL actors and units
@@ -57,21 +48,12 @@ import org.eclipse.xtext.resource.XtextResourceSet
  @InjectWith(typeof(CalInjectorProvider))
 public class CalTestsHelper extends AbstractXtextTests {
 
-	@Inject
-	private Injector injector
-
+ 	@Inject
+	protected Injector injector
 	@Inject
 	protected Provider<XtextResourceSet> resourceSetProvider;
 	@Inject
 	protected extension ParseHelper<AstEntity>
-	@Inject
-	protected CalJavaValidator defaultValidator
-	@Inject
-	protected StructuralValidator structuralValidator
-	@Inject
-	protected TypeValidator typesValidator
-	@Inject
-	protected WarningValidator warningsValidator
 
 	/**
 	 * Open the given path as resource stream and parse it as CAL file.
@@ -96,47 +78,5 @@ public class CalTestsHelper extends AbstractXtextTests {
 			parsedEntities.add(parse(input, uri, Collections::EMPTY_MAP, rs))
 		}
 		return parsedEntities
-	}
-
-	/**
-	 * Transform the given AstEntity into its Actor / Unit equivalent 
-	 */
-	def transformEntity(AstEntity entity) {
-		if (entity.actor != null) {
-			return new ActorTransformer().doSwitch(entity.actor);
-		} else if (entity.unit != null) {
-			return new UnitTransformer().doSwitch(entity.unit);
-		}
-		fail("The given AstEntity is not an Actor or a Unit.")
-	}
-
-	/**
-	 * Run the specific test interpreter on the given Actor. Returns
-	 * a String with all content printed while this actor's execution.
-	 */
-	def runInterpreter(Actor actor) {
-		val interpreter = new TestInterpreter(actor);
-		interpreter.initialize();
-		interpreter.schedule();
-
-		interpreter.getOutput();
-	}
-
-	/**
-	 * Test the given EObject with the CalJavaValidator. The returned
-	 * AssertableDiagnostics object can be checked for specific errors/warning
-	 * set from this validator
-	 */
-	def defaultValidation(EObject object) {
-		new ValidatorTester<CalJavaValidator>(defaultValidator, injector).validate(object)
-	}
-	def structuralValidation(EObject object) {
-		new ValidatorTester<StructuralValidator>(structuralValidator, injector).validate(object)
-	}
-	def typesValidation(EObject object) {
-		new ValidatorTester<TypeValidator>(typesValidator, injector).validate(object)
-	}
-	def warningsValidation(EObject object) {
-		new ValidatorTester<WarningValidator>(warningsValidator, injector).validate(object)
 	}
 }

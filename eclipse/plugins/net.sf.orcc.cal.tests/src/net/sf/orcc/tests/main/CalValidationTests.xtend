@@ -30,159 +30,55 @@ package net.sf.orcc.tests.main
 
 import com.google.inject.Inject
 import net.sf.orcc.cal.CalInjectorProvider
-import net.sf.orcc.cal.services.Evaluator
-import net.sf.orcc.cal.services.Typer
-import net.sf.orcc.df.Actor
-import net.sf.orcc.ir.Expression
-import net.sf.orcc.ir.IrFactory
+import net.sf.orcc.cal.validation.CalJavaValidator
+import net.sf.orcc.cal.validation.StructuralValidator
+import net.sf.orcc.cal.validation.TypeValidator
+import net.sf.orcc.cal.validation.WarningValidator
 import net.sf.orcc.tests.util.CalTestsHelper
 import org.eclipse.emf.common.util.URI
-import org.eclipse.emf.ecore.util.EcoreUtil
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.junit4.InjectWith
 import org.eclipse.xtext.junit4.XtextRunner
 import org.eclipse.xtext.junit4.validation.ValidationTestHelper
+import org.eclipse.xtext.junit4.validation.ValidatorTester
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static net.sf.orcc.cal.CalDiagnostic.*
 import static net.sf.orcc.cal.cal.CalPackage.Literals.*
 import static org.eclipse.xtext.diagnostics.Diagnostic.*
-import static net.sf.orcc.cal.CalDiagnostic.*
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(CalInjectorProvider))
-class AllCalTests extends CalTestsHelper {
+class CalValidationTests extends CalTestsHelper {
 
 	@Inject extension ValidationTestHelper
+	@Inject
+	protected CalJavaValidator defaultValidator
+	@Inject
+	protected StructuralValidator structuralValidator
+	@Inject
+	protected TypeValidator typesValidator
+	@Inject
+	protected WarningValidator warningsValidator
 
-	private val irFact = IrFactory::eINSTANCE
+	/*
+	 * Test the given EObject with the available validators. The returned
+	 * AssertableDiagnostics object can be checked for specific errors/warning
+	 * set from them
+	 */
 
-	@Test
-	def testActor_initializeOnly() {
-		val entity = '''
-			actor InitializePattern() int I ==> int O :
-			    initialize ==> O:[42]
-			    end
-			end
-		'''.parse
-
-		entity.assertNotNull
-		entity.assertNoErrors
+	def defaultValidation(EObject object) {
+		new ValidatorTester<CalJavaValidator>(defaultValidator, injector).validate(object)
 	}
-
-	@Test
-	def testIntTypes() {
-		val entity = '''
-			actor TypeInt() ==> :
-				uint(size=3) x := 7;
-				int(size=15) y := x + 1;
-			end
-		'''.parse
-
-		val stateVars = entity.actor.stateVariables
-		val x = stateVars.get(0);
-		val y = stateVars.get(1);
-
-		val expected = irFact.createTypeUint(3)
-		expected.assertEquals(Typer::getType(x))
-		expected.assertEquals(Typer::getType(x.value))
-
-		// type of "x + 1" is type of x (u3) with one more bit, so u4
-		irFact.createTypeUint(4).assertEquals(Typer::getType(y.value))
+	def structuralValidation(EObject object) {
+		new ValidatorTester<StructuralValidator>(structuralValidator, injector).validate(object)
 	}
-
-	@Test
-	def testGenerator() {
-		val entity = '''
-			actor Generator() ==> :
-				int stateVar[1][2][3] :=
-				[
-				  [
-				    [ i * j * k : for int i in 1 .. 3 ] : for int j in 1 .. 2
-				  ] : for int k in 1 .. 1
-				];
-			end
-		'''.parse
-
-		val varValue = Evaluator::getValue(entity.actor.stateVariables.head);
-
-		val l11 = irFact.createExprList(#[
-			irFact.createExprInt(1) as Expression,
-			irFact.createExprInt(2) as Expression,
-			irFact.createExprInt(3) as Expression
-		])
-		val l12 = irFact.createExprList(#[
-			irFact.createExprInt(2) as Expression,
-			irFact.createExprInt(4) as Expression,
-			irFact.createExprInt(6) as Expression
-		])
-		val l1 = irFact.createExprList()
-		l1.value.add(l11)
-		l1.value.add(l12)
-
-		val expected = irFact.createExprList()
-		expected.value.add(l1)
-
-		EcoreUtil::equals(expected, varValue).assertTrue
+	def typesValidation(EObject object) {
+		new ValidatorTester<TypeValidator>(typesValidator, injector).validate(object)
 	}
-
-	@Test
-	def testElseIf() {
-		val entity = parseFile("/test/pass/Elsif.cal")
-
-		entity.assertNoErrors
-
-		val resultString = (entity.transformEntity as Actor).runInterpreter
-		"okok".assertEquals(resultString)
-	}
-
-	@Test
-	def testElseIfExpr() {
-		val entity = parseFile("/test/pass/ElsifExpr.cal")
-
-		entity.assertNoErrors
-
-		val resultString = (entity.transformEntity as Actor).runInterpreter
-		"result = 0".assertEquals(resultString)
-	}
-
-	@Test
-	def testElseIfStateVar() {
-		val entity = parseFile("/test/pass/ElsifStateVar.cal")
-
-		entity.assertNoErrors
-
-		val resultString = (entity.transformEntity as Actor).runInterpreter
-		"ok".assertEquals(resultString)
-	}
-
-	@Test
-	def testInitStateVarFunction() {
-		val entity = parseFile("/test/pass/InitStateVarFunction.cal")
-
-		entity.assertNoErrors
-
-		val resultString = (entity.transformEntity as Actor).runInterpreter
-		"pp = 8".assertEquals(resultString)
-	}
-
-	@Test
-	def testExecShadow() {
-		val entity = parseFile("/test/pass/Shadowing.cal")
-
-		entity.assertNoErrors
-
-		val resultString = (entity.transformEntity as Actor).runInterpreter
-		"x = 0".assertEquals(resultString)
-	}
-
-	@Test
-	def testExecWhile() throws Exception {
-		val entity = parseFile("/test/pass/CodegenWhile.cal")
-
-		entity.assertNoErrors
-
-		val resultString = (entity.transformEntity as Actor).runInterpreter
-		"idx is 60".assertEquals(resultString)
+	def warningsValidation(EObject object) {
+		new ValidatorTester<WarningValidator>(warningsValidator, injector).validate(object)
 	}
 
 	@Test
