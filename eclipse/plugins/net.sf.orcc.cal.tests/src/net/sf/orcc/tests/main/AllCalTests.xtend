@@ -306,4 +306,28 @@ class AllCalTests extends CalTestsHelper {
 		entity.typesValidation.assertError(ERROR_TYPE_CONVERSION,
 			"Type mismatch: cannot convert from List")
 	}
+
+	@Test
+	def testTypeError2 () {
+		val entity = '''
+			actor TypeError2() ==> :
+				@native procedure compare_init() end
+				@native procedure compare_NBytes(uint(size=8) outTable[1], uint(size=12) nbTokenToRead) end
+				readByte : action ==>
+				var
+					int(size=8)  tmp := 17
+				do
+					compare_NBytes(tmp, 1);
+				end
+			end
+		'''.parse(URI::createPlatformResourceURI("TypeError2.cal", true), resourceSetProvider.get)
+
+		entity.assertNotNull
+		// There shouldn't be any structural issue here
+		entity.assertNoErrors
+		entity.defaultValidation.assertOK
+		// Passing int to a procedure with uint argument
+		entity.typesValidation.assertError(ERROR_TYPE_CONVERSION,
+			"Type mismatch: cannot convert from int")
+	}
 }
