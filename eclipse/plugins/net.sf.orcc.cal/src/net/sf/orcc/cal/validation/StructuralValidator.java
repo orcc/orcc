@@ -114,7 +114,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			AstPort port = pattern.getPort();
 			if (ports.contains(port)) {
 				error("duplicate reference to port " + port.getName(), pattern,
-						eINSTANCE.getInputPattern_Port(), -1);
+						eINSTANCE.getInputPattern_Port(),
+						CalDiagnostic.ERROR_DUPLICATE_PORT_REFERENCE);
 			} else {
 				ports.add(port);
 			}
@@ -144,7 +145,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			AstPort port = pattern.getPort();
 			if (ports.contains(port)) {
 				error("duplicate reference to port " + port.getName(), pattern,
-						eINSTANCE.getOutputPattern_Port(), -1);
+						eINSTANCE.getOutputPattern_Port(),
+						CalDiagnostic.ERROR_DUPLICATE_PORT_REFERENCE);
 			} else {
 				ports.add(port);
 			}

@@ -237,7 +237,7 @@ class AllCalTests extends CalTestsHelper {
 	}
 
 	@Test
-	def testPattern2() {
+	def testPattern2 () {
 		val entity = '''
 			actor Pattern2() int I ==> int O :
 			    action I:[42] ==>
@@ -250,5 +250,21 @@ class AllCalTests extends CalTestsHelper {
 
 		// 42 is not a valid token, a variable must be declared instead
 		entity.assertError(INPUT_PATTERN, SYNTAX_DIAGNOSTIC)
+	}
+
+	@Test
+	def testPattern3 () {
+		val entity = '''
+			actor Pattern3() int I ==> :
+			    action I:[x], I:[y] ==>
+			    end
+			end
+		'''.parse(URI::createPlatformResourceURI("Pattern3.cal", true), resourceSetProvider.get)
+
+		// Before validation, everything is ok here
+		entity.assertNotNull
+
+		// 42 is not a valid token, a variable must be declared instead
+		entity.structuralValidation.assertError(ERROR_DUPLICATE_PORT_REFERENCE, "duplicate reference to port I")
 	}
 }

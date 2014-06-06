@@ -50,4 +50,6 @@ public interface CalDiagnostic {
 
 	static final String ERROR_CONSTANT_ASSIGNATION = "net.sf.orcc.error.param.assignation";
 
+	static final String ERROR_DUPLICATE_PORT_REFERENCE = "net.sf.orcc.error.pattern.duplicated.port.ref";
+
 }
