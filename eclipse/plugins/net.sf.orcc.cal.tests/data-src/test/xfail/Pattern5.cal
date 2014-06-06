@@ -1,8 +1,0 @@
-package net.sf.orcc.cal.test.xfail;
-
-actor Pattern5() ==> int O :
-
-    action ==> O:[1], O:[2]
-    end
-
-end

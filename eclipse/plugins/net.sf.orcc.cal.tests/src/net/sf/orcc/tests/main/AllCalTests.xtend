@@ -267,4 +267,20 @@ class AllCalTests extends CalTestsHelper {
 		// 42 is not a valid token, a variable must be declared instead
 		entity.structuralValidation.assertError(ERROR_DUPLICATE_PORT_REFERENCE, "duplicate reference to port I")
 	}
+
+	@Test
+	def testPattern4 () {
+		val entity = '''
+			actor Pattern4() ==> int O :
+			    action ==> O:[1], O:[2]
+			    end
+			end
+		'''.parse(URI::createPlatformResourceURI("Pattern4.cal", true), resourceSetProvider.get)
+
+		// Before validation, everything is ok here
+		entity.assertNotNull
+
+		// 42 is not a valid token, a variable must be declared instead
+		entity.structuralValidation.assertError(ERROR_DUPLICATE_PORT_REFERENCE, "duplicate reference to port O")
+	}
 }
