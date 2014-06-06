@@ -68,16 +68,16 @@ class CalValidationTests extends CalTestsHelper {
 	 * set from them
 	 */
 
-	def defaultValidation(EObject object) {
+	def private defaultValidation(EObject object) {
 		new ValidatorTester<CalJavaValidator>(defaultValidator, injector).validate(object)
 	}
-	def structuralValidation(EObject object) {
+	def private structuralValidation(EObject object) {
 		new ValidatorTester<StructuralValidator>(structuralValidator, injector).validate(object)
 	}
-	def typesValidation(EObject object) {
+	def private typesValidation(EObject object) {
 		new ValidatorTester<TypeValidator>(typesValidator, injector).validate(object)
 	}
-	def warningsValidation(EObject object) {
+	def private warningsValidation(EObject object) {
 		new ValidatorTester<WarningValidator>(warningsValidator, injector).validate(object)
 	}
 
@@ -249,5 +249,22 @@ class CalValidationTests extends CalTestsHelper {
 		// Passing int with size < 0 is invalid
 		entity.typesValidation.assertError(ERROR_TYPE_SYNTAX,
 			"This size must evaluate to a compile-time constant greater than zero")
+	}
+	
+	@Test
+	def testWarningVariableUnused () {
+		val entity = '''
+			actor UnusedVariable() ==> :
+				int aStateVariable := 8;
+
+				action1: action ==> 
+				do
+					print("something");
+				end
+			end
+		'''.parse
+
+		entity.assertNoIssues
+		entity.warningsValidation.assertWarning(WARNING_UNUSED, "The variable aStateVariable is never used")
 	}
 }

@@ -56,4 +56,6 @@ public interface CalDiagnostic {
 
 	static final String ERROR_TYPE_SYNTAX = "net.sf.orcc.error.type.syntax";
 
+	static final String WARNING_UNUSED = "net.sf.orcc.warning.unused";
+
 }

@@ -32,6 +32,7 @@ import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
 import java.util.List;
 
+import net.sf.orcc.cal.CalDiagnostic;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstProcedure;
@@ -272,7 +273,8 @@ public class WarningValidator extends AbstractCalJavaValidator {
 		// used for system actors
 		if (!isRead && !isWritten) {
 			warning("The variable " + variable.getName() + " is never used",
-					variable, eINSTANCE.getVariable_Name(), -1);
+					variable, eINSTANCE.getVariable_Name(),
+					CalDiagnostic.WARNING_UNUSED);
 		} else if (!isRead) {
 			if (reference == eINSTANCE.getAstProcedure_Parameters()
 					&& Typer.getType(variable).isList()) {
@@ -280,7 +282,8 @@ public class WarningValidator extends AbstractCalJavaValidator {
 			}
 
 			warning("The variable " + variable.getName() + " is never read",
-					variable, eINSTANCE.getVariable_Name(), -1);
+					variable, eINSTANCE.getVariable_Name(),
+					CalDiagnostic.WARNING_UNUSED);
 		} else if (!isWritten) {
 			if (!Util.isAssignable(variable)
 					|| reference == eINSTANCE.getFunction_Parameters()
