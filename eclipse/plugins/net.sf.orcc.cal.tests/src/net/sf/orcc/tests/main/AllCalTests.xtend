@@ -330,4 +330,21 @@ class AllCalTests extends CalTestsHelper {
 		entity.typesValidation.assertError(ERROR_TYPE_CONVERSION,
 			"Type mismatch: cannot convert from int")
 	}
+
+	@Test
+	def testTypeError3 () {
+		val entity = '''
+			actor TypeError3 () ==> :
+				int(size=-42) x;
+			end
+		'''.parse(URI::createPlatformResourceURI("TypeError3.cal", true), resourceSetProvider.get)
+
+		entity.assertNotNull
+		// There shouldn't be any structural issue here
+		entity.assertNoErrors
+		entity.defaultValidation.assertOK
+		// Passing int with size < 0 is invalid
+		entity.typesValidation.assertError(ERROR_TYPE_SYNTAX,
+			"This size must evaluate to a compile-time constant greater than zero")
+	}
 }

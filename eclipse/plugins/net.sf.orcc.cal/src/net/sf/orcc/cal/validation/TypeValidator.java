@@ -606,7 +606,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			if (value <= 0) {
 				error("This size must evaluate to a compile-time "
 						+ "constant greater than zero", type,
-						eINSTANCE.getAstTypeInt_Size());
+						eINSTANCE.getAstTypeInt_Size(),
+						CalDiagnostic.ERROR_TYPE_SYNTAX);
 			}
 		}
 	}

@@ -54,4 +54,6 @@ public interface CalDiagnostic {
 
 	static final String ERROR_TYPE_CONVERSION = "net.sf.orcc.error.type.conversion";
 
+	static final String ERROR_TYPE_SYNTAX = "net.sf.orcc.error.type.syntax";
+
 }
