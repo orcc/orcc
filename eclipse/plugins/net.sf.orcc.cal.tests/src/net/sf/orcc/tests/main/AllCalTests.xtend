@@ -283,4 +283,27 @@ class AllCalTests extends CalTestsHelper {
 		// 42 is not a valid token, a variable must be declared instead
 		entity.structuralValidation.assertError(ERROR_DUPLICATE_PORT_REFERENCE, "duplicate reference to port O")
 	}
+
+	@Test
+	def testTypeError1 () {
+		val entity = '''
+			unit TypeError1 :
+				function abc(uint c) --> bool :
+					c > 4
+				end
+				procedure buggy()
+				var
+					uint a[3][2],
+					bool b := abc(a[2])
+				begin
+				end
+			end
+		'''.parse
+
+		entity.assertNotNull
+		entity.assertNoErrors
+
+		entity.typesValidation.assertError(ERROR_TYPE_CONVERSION,
+			"Type mismatch: cannot convert from List")
+	}
 }

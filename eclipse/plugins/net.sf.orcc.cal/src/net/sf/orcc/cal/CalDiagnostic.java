@@ -52,4 +52,6 @@ public interface CalDiagnostic {
 
 	static final String ERROR_DUPLICATE_PORT_REFERENCE = "net.sf.orcc.error.pattern.duplicated.port.ref";
 
+	static final String ERROR_TYPE_CONVERSION = "net.sf.orcc.error.type.conversion";
+
 }
