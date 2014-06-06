@@ -231,7 +231,7 @@ class AllCalTests extends CalTestsHelper {
 		// Before validation, everything is ok here
 		entity.assertNotNull
 
-		// Input reference an unknown port (i.e. an output port
+		// Input references an unknown port (i.e. an output port
 		// is unknown for an input pattern
 		entity.assertError(INPUT_PATTERN, LINKING_DIAGNOSTIC)
 	}
@@ -247,7 +247,6 @@ class AllCalTests extends CalTestsHelper {
 
 		// Before validation, everything is ok here
 		entity.assertNotNull
-
 		// 42 is not a valid token, a variable must be declared instead
 		entity.assertError(INPUT_PATTERN, SYNTAX_DIAGNOSTIC)
 	}
@@ -263,6 +262,9 @@ class AllCalTests extends CalTestsHelper {
 
 		// Before validation, everything is ok here
 		entity.assertNotNull
+		// There shouldn't be any structural issue here
+		entity.assertNoErrors
+		entity.defaultValidation.assertOK
 
 		// 42 is not a valid token, a variable must be declared instead
 		entity.structuralValidation.assertError(ERROR_DUPLICATE_PORT_REFERENCE, "duplicate reference to port I")
@@ -279,6 +281,9 @@ class AllCalTests extends CalTestsHelper {
 
 		// Before validation, everything is ok here
 		entity.assertNotNull
+		// There shouldn't be any structural issue here
+		entity.assertNoErrors
+		entity.defaultValidation.assertOK
 
 		// 42 is not a valid token, a variable must be declared instead
 		entity.structuralValidation.assertError(ERROR_DUPLICATE_PORT_REFERENCE, "duplicate reference to port O")
@@ -298,11 +303,13 @@ class AllCalTests extends CalTestsHelper {
 				begin
 				end
 			end
-		'''.parse
+		'''.parse(URI::createPlatformResourceURI("TypeError1.cal", true), resourceSetProvider.get)
 
 		entity.assertNotNull
+		// There shouldn't be any structural issue here
 		entity.assertNoErrors
-
+		entity.defaultValidation.assertOK
+		// a[2] is a list, abc() procedure needs an int as argument
 		entity.typesValidation.assertError(ERROR_TYPE_CONVERSION,
 			"Type mismatch: cannot convert from List")
 	}
