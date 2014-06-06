@@ -50,6 +50,17 @@ class CalParserTests extends CalTestsHelper {
 	@Inject extension ValidationTestHelper
 
 	@Test
+	def testSimpleActor () {
+		// The most basic actor ever
+		val entity = '''
+			actor SimpleActor() ==> :
+			end
+		'''.parse
+		entity.assertNotNull
+		entity.assertNoErrors
+	}
+
+	@Test
 	def testActor_initializeOnly() {
 		val entity = '''
 			actor InitializePattern() int I ==> int O :
