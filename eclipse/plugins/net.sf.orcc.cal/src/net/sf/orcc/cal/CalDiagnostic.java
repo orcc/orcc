@@ -36,8 +36,6 @@ package net.sf.orcc.cal;
  */
 public interface CalDiagnostic {
 
-	static final String ERROR_DEFAULT = "default";
-
 	static final String ERROR_EXTRANEOUS_PACKAGE = "extraneous_package";
 
 	static final String ERROR_LIST = "list";

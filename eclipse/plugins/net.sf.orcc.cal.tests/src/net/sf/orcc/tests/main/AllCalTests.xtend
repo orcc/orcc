@@ -236,4 +236,19 @@ class AllCalTests extends CalTestsHelper {
 		entity.assertError(INPUT_PATTERN, LINKING_DIAGNOSTIC)
 	}
 
+	@Test
+	def testPattern2() {
+		val entity = '''
+			actor Pattern2() int I ==> int O :
+			    action I:[42] ==>
+			    end
+			end
+		'''.parse
+
+		// Before validation, everything is ok here
+		entity.assertNotNull
+
+		// 42 is not a valid token, a variable must be declared instead
+		entity.assertError(INPUT_PATTERN, SYNTAX_DIAGNOSTIC)
+	}
 }

@@ -30,6 +30,7 @@ package net.sf.orcc.cal;
 
 import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.RecognitionException;
+import org.eclipse.xtext.diagnostics.Diagnostic;
 import org.eclipse.xtext.nodemodel.SyntaxErrorMessage;
 import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider;
 
@@ -55,14 +56,14 @@ public class CalSyntaxErrorMessageProvider implements
 		}
 
 		return new SyntaxErrorMessage(context.getDefaultMessage(),
-				CalDiagnostic.ERROR_DEFAULT);
+				Diagnostic.SYNTAX_DIAGNOSTIC);
 	}
 
 	@Override
 	public SyntaxErrorMessage getSyntaxErrorMessage(
 			IValueConverterErrorContext context) {
 		return new SyntaxErrorMessage(context.getDefaultMessage(),
-				CalDiagnostic.ERROR_DEFAULT);
+				Diagnostic.SYNTAX_DIAGNOSTIC);
 	}
 
 }
