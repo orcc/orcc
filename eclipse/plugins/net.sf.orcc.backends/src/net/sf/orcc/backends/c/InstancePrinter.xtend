@@ -101,6 +101,7 @@ class InstancePrinter extends CTemplate {
 	var boolean isActionAligned = false
 	
 	var boolean debugActor = false
+	var boolean debugAction = false
 
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
@@ -741,8 +742,11 @@ class InstancePrinter extends CTemplate {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
-			«IF debugActor»
+			«IF debugActor || debugAction»
 				printf("-- «entityName»: «action.name»«IF isAligned» (aligned)«ENDIF»\n");
+			«ENDIF»
+			«IF debugAction»
+				«debugTokens(action.inputPattern)»
 			«ENDIF»
 			«writeTraces(action.inputPattern)»
 			«beforeActionBody»
@@ -752,6 +756,9 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 
 			«afterActionBody»
+			«IF debugAction»
+				«debugTokens(action.outputPattern)»
+			«ENDIF»
 			«writeTraces(action.outputPattern)»
 			// Update ports indexes
 			«FOR port : action.inputPattern.ports»
@@ -798,6 +805,19 @@ class InstancePrinter extends CTemplate {
 		'''
 	}
 	
+	def private debugTokens(Pattern pattern) '''
+		«FOR port : pattern.ports»
+			{
+				int i;
+				printf("--- «port.name»: ");
+				for (i = 0; i < «pattern.getNumTokens(port)»; i++) {
+					printf("%«port.type.printfFormat» ", tokens_«port.name»[(index_«port.name» + i) % SIZE_«port.name»]);
+				}
+				printf("\n");
+			}
+		«ENDFOR»
+	'''
+	
 	def protected profileStart(Action action) '''
 		«IF profile && !actor.initializes.contains(action)»
 			ticks tick_in = getticks();
@@ -823,6 +843,7 @@ class InstancePrinter extends CTemplate {
 	def protected print(Action action) {
 		currentAction = action
 		isActionAligned = false
+		debugAction = action.hasAttribute("DEBUG")
 		'''
 		«action.scheduler.print»
 		
