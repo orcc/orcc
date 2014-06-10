@@ -37,19 +37,18 @@
  */
 struct options_s
 {
+    /* Video specific options */
     char *input_file;
     char *input_directory;               // Directory for input files.
 
-    /* Video specific option */
+    /* Video specific options */
     char display_flags;                  // Display flags
     int nbLoops;                         // (Deprecated) Number of times the input file is read
     int nbFrames;                        // Number of frames to display before closing application
     char *yuv_file;                      // Reference YUV file
 
-    /* Actor scheduling */
+    /* Runtime options */
     schedstrategy_et sched_strategy;     // Strategy for the actor scheduling
-
-    /* Actor mapping */
     char *mapping_input_file;            // Predefined mapping configuration
     char *mapping_output_file;           //
     int nb_processors;
@@ -60,6 +59,9 @@ struct options_s
 
     char *profiling_file; // profiling file
     char *write_file; // write file
+
+    /* Debugging options */
+    boolean print_firings;
 };
 
 /**

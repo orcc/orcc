@@ -100,14 +100,7 @@ struct network_s {
  */
 actor_t *find_actor_by_name(actor_t **actors, char *name, int nb_actors);
 
-/**
- * Reset profiling information for the given network.
- */
-void reset_profiling(network_t *network);
-
 network_t* allocate_network(int nb_actors, int nb_connections);
-
-void compute_workloads(network_t *network);
 
 void print_network(network_t *network);
 

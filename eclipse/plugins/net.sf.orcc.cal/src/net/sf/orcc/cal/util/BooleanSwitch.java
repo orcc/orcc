@@ -91,9 +91,12 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 			}
 		}
 
-		for (AstExpression guardExpression : action.getGuard().getExpressions()) {
-			if (doSwitch(guardExpression)) {
-				return true;
+		if (action.getGuard() != null) {
+			for (AstExpression guardExpression : action.getGuard()
+					.getExpressions()) {
+				if (doSwitch(guardExpression)) {
+					return true;
+				}
 			}
 		}
 

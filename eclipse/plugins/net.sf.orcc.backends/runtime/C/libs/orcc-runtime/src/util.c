@@ -39,6 +39,11 @@
 #include "options.h"
 #include "trace.h"
 #include "native.h"
+#include "profiling.h"
+
+#ifdef ROXML_ENABLE
+#include "serialize.h"
+#endif
 
 extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
@@ -63,6 +68,9 @@ static const char *usage =
     "       1 : summary and results\n"
     "       2 : debug informations\n"
     "-h                 Print this message.\n"
+
+    "\nDebug arguments:\n"
+    "-z                 Print the firings.\n"
     // "-t <trace directory>       Specify an output directory for the FIFO trace files.\n"
 
     "\nVideo-specific arguments:\n"
@@ -107,7 +115,7 @@ void pause() {
 options_t* init_orcc(int argc, char *argv[]) {
     // every command line option must be followed by ':' if it takes an
     // argument, and '::' if this argument is optional
-    const char *ostr = "i:no:d:m:f:w:l:r:ac:s:v:p:h";
+    const char *ostr = "i:no:d:m:f:w:l:zr:ac:s:v:p:h";
     int c;
 
     opt = set_default_options();
@@ -117,6 +125,7 @@ options_t* init_orcc(int argc, char *argv[]) {
 #ifdef _MSC_VER
     atexit(&pause);
 #endif
+    atexit(atexit_actions);
     init_native_context();
 
     while ((c = getopt(argc, argv, ostr)) != -1) {
@@ -172,6 +181,9 @@ options_t* init_orcc(int argc, char *argv[]) {
         case 'v':
             set_verbose_level(optarg, opt);
             break;
+        case 'z':
+            opt->print_firings = TRUE;
+            break;
         case 'h':
             print_usage();
             exit(ORCC_OK);
@@ -183,4 +195,14 @@ options_t* init_orcc(int argc, char *argv[]) {
     }
 
     return opt;
+}
+
+// Actions to do when exting properly
+void atexit_actions() {
+    if (opt->profiling_file != NULL) {
+        compute_workloads(&network);
+#ifdef ROXML_ENABLE
+        save_profiling(opt->profiling_file, &network);
+#endif
+    }
 }

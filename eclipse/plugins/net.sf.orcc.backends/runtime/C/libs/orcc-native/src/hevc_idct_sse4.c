@@ -268,7 +268,7 @@ DECLARE_ALIGNED(16, static const i16, transform32x32[8][16][8] )=
 #define add_1st (1 << (shift_1st - 1))
 
 #if HAVE_SSE4
-void ff_hevc_transform_skip_8_sse(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
+void ff_hevc_transform_skip_8_sse4(i16 *_dst, i16 *coeffs, ptrdiff_t _stride)
 {
     i16 *dst = (i16*)_dst;
     ptrdiff_t stride = _stride;

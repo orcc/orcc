@@ -33,6 +33,7 @@
 #include "orcc.h"
 
 extern options_t *opt;
+extern network_t network;
 
 // compute number of errors in the program
 extern int compareErrors;
@@ -42,6 +43,8 @@ options_t* init_orcc(int argc, char *argv[]);
 
 // print usage
 void print_usage();
+
+void atexit_actions();
 
 #define DISPLAY_DISABLE 0
 // DISPLAY_ENABLE is set to 3 for the moment, for backward compatibility.

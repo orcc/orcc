@@ -42,6 +42,7 @@ import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.backends.util.FPGA
 
 /*
  * Compile Instance c source code
@@ -50,13 +51,14 @@ import net.sf.orcc.util.OrccUtil
  * 
  */
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
+	private FPGA fpga = FPGA.builder("Virtex7 (xc7v2000t)") ;
 
 	new(Map<String, Object> options) {
 		super(options)
 	}
 
 	override getFileContent() '''
-		// Source file is "«instance.getActor.file»"
+		// Source file is "«actor.file»"
 		
 		#include <hls_stream.h>
 		using namespace hls;
@@ -74,70 +76,78 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		typedef unsigned long long int u64;
 		
 		
-		// Parameter values of the instance
-		«FOR arg : instance.arguments»
-			«IF arg.value.exprList»
-				static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
-			«ELSE»
-				#define «arg.variable.name» «arg.value.doSwitch»
+		«IF instance != null»
+			// Parameter values of the instance
+			«FOR arg : instance.arguments»
+				«IF arg.value.exprList»
+					static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.
+			dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
+				«ELSE»
+					#define «arg.variable.name» «arg.value.doSwitch»
+				«ENDIF»
+			«ENDFOR»
+		«ENDIF»
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// Input FIFOS
+		«FOR port : actor.inputs»
+			«val connection = incomingPortMap.get(port)»
+			«IF connection != null»
+				extern «connection.fifoTypeIn.doSwitch»	«connection.ramName»[«connection.size»];
+				extern unsigned int	«connection.wName»[1];
+				extern unsigned int	«connection.rName»[1];
+				unsigned int «connection.localrName»=0;
+				#define SIZE_«port.name» «connection.size - 1»
 			«ENDIF»
 		«ENDFOR»
 		
 		////////////////////////////////////////////////////////////////////////////////
-		// Input FIFOS
-		«FOR port : instance.getActor.inputs»
-			extern «instance.incomingPortMap.get(port).fifoTypeIn.doSwitch»	«instance.incomingPortMap.get(port).ramName»[8192];
-			extern unsigned int	«instance.incomingPortMap.get(port).wName»[1];
-			extern unsigned int	«instance.incomingPortMap.get(port).rName»[1];
-			unsigned int «instance.incomingPortMap.get(port).localrName»=0;		
-		«ENDFOR»
-		
-		////////////////////////////////////////////////////////////////////////////////
 		// Output FIFOs
-		«FOR port : instance.getActor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(port)»					
-				extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[8192];
+		«FOR port : actor.outputs.filter[! native]»
+			«FOR connection : outgoingPortMap.get(port)»					
+				extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[«connection.size»];
 				extern unsigned int «connection.wName»[1];
 				extern unsigned int «connection.rName»[1];
 				unsigned int «connection.localwName»=0;
 			«ENDFOR»
 		«ENDFOR»
 		
-		«IF instance.getActor.outputs.empty»
-			extern stream<int> outFIFO_«instance.name»;
+		«IF actor.outputs.empty»
+			extern stream<int> outFIFO_«entityName»;
 		«ENDIF»
 		
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// State variables of the actor
-		«FOR variable : instance.getActor.stateVars»
+		«FOR variable : actor.stateVars»
 			«variable.declare»
 		«ENDFOR»
-		«IF instance.getActor.hasFsm»
+		«IF actor.hasFsm»
 			////////////////////////////////////////////////////////////////////////////////
 			// Initial FSM state of the actor
 			enum states {
-				«FOR state : instance.getActor.fsm.states SEPARATOR ","»
+				«FOR state : actor.fsm.states SEPARATOR ","»
 					my_state_«state.name»
 				«ENDFOR»
 			};
 			
-			static enum states _FSM_state = my_state_«instance.getActor.fsm.initialState.name»;
+			static enum states _FSM_state = my_state_«actor.fsm.initialState.name»;
 		«ENDIF»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
-		«FOR proc : instance.getActor.procs»
-			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ", [variable.declare])»);
+		«FOR proc : actor.procs»
+			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ",
+			[variable.declare])»);
 		«ENDFOR»
 		
-		«FOR proc : instance.getActor.procs.filter[!native]»
+		«FOR proc : actor.procs.filter[!native]»
 			«proc.print»
 		«ENDFOR»
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
-		«FOR action : instance.getActor.actions»
+		«FOR action : actor.actions»
 			«action.print»
 		«ENDFOR»
 		
@@ -147,16 +157,16 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		////////////////////////////////////////////////////////////////////////////////
 		// Action scheduler
-		«IF instance.getActor.hasFsm»
+		«IF actor.hasFsm»
 			«printFsm»
 		«ELSE»
-			void «instance.name»_scheduler() {		
-			«IF instance.getActor.outputs.empty»
-				if (! outFIFO_«instance.name».full()){
-					outFIFO_«instance.name».write(0);
+			void «entityName»_scheduler() {		
+			«IF actor.outputs.empty»
+				if (! outFIFO_«entityName».full()){
+					outFIFO_«entityName».write(0);
 				}
 			«ENDIF»
-			«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
+			«actor.actionsOutsideFsm.printActionSchedulingLoop»
 			
 			finished:
 				return;
@@ -165,23 +175,23 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	override printFsm() '''
-		«IF ! instance.getActor.actionsOutsideFsm.empty»
-			void «instance.name»_outside_FSM_scheduler() {
-				«instance.getActor.actionsOutsideFsm.printActionSchedulingLoop»
+		«IF ! actor.actionsOutsideFsm.empty»
+			void «entityName»_outside_FSM_scheduler() {
+				«actor.actionsOutsideFsm.printActionSchedulingLoop»
 			finished:
 				return;
 			}
 		«ENDIF»
 		
-		void «instance.name»_scheduler() {
+		void «entityName»_scheduler() {
 			// jump to FSM state 
-			«IF instance.getActor.outputs.empty»
-				if (! outFIFO_«instance.name».full()){
-					outFIFO_«instance.name».write(0);
+			«IF actor.outputs.empty»
+				if (! outFIFO_«entityName».full()){
+					outFIFO_«entityName».write(0);
 				}
 			«ENDIF»
 			switch (_FSM_state) {
-				«FOR state : instance.getActor.fsm.states»
+				«FOR state : actor.fsm.states»
 					case my_state_«state.name»:
 						goto l_«state.name»;
 				«ENDFOR»
@@ -189,7 +199,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				goto finished;
 			}
 			// FSM transitions
-		«FOR state : instance.getActor.fsm.states»
+		«FOR state : actor.fsm.states»
 			«state.printStateLabel»
 		«ENDFOR»
 		finished:
@@ -203,8 +213,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override printStateLabel(State state) '''
 		l_«state.name»:
-			«IF ! instance.getActor.actionsOutsideFsm.empty»
-				«instance.name»_outside_FSM_scheduler();
+			«IF ! actor.actionsOutsideFsm.empty»
+				«entityName»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF !state.outgoing.empty»
 				«printStateTransitions(state)»
@@ -220,36 +230,39 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	def printOutputPatternsPort(Pattern pattern, Port port) {
 		var i = -1
 		'''
-		«FOR successor : instance.outgoingPortMap.get(port)»
-			«printOutputPatternPort(pattern, port, successor, i = i + 1)»
-		«ENDFOR»
+			«FOR connection : outgoingPortMap.get(port)»
+				«printOutputPatternPort(pattern, port, connection, i = i + 1)»
+			«ENDFOR»
 		'''
 	}
 
-	//&& (512 - «instance.outgoingPortMap.get(port).head.localwName» + «instance.outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)			
+	//&& (512 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)			
 	def printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''		
 		
-			&& (8192 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)
+			&& («successor.size» - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.
+			getNumTokens(port)»)
 		
 	'''
 
-	//«instance.incomingPortMap.get(port).wName»[0] - «instance.incomingPortMap.get(port).localrName» >= «pattern.getNumTokens(port)»  &&
-	override checkInputPattern(Pattern pattern) '''«FOR port : pattern.ports»
-		
-			«instance.incomingPortMap.get(port).wName»[0] - «instance.incomingPortMap.get(port).localrName» >= «pattern.
-		getNumTokens(port)»  &&
-		
-	«ENDFOR»'''
+	//«incomingPortMap.get(port).wName»[0] - «incomingPortMap.get(port).localrName» >= «pattern.getNumTokens(port)»  &&
+	override checkInputPattern(Pattern pattern) '''
+		«FOR port : pattern.ports»
+			«val connection = incomingPortMap.get(port)»
+			«IF connection != null»
+				«connection.wName»[0] - «connection.localrName» >= «pattern.getNumTokens(port)»  &&
+			«ENDIF»
+		«ENDFOR»
+	'''
 
 	override print(String targetFolder) {
 		val content = getFileContent
 		val scriptContent = script(targetFolder);
 		val directiveContent = directive(targetFolder);
-		val file = new File(targetFolder + File::separator + instance.name + ".cpp")
+		val file = new File(targetFolder + File::separator + entityName + ".cpp")
 		val scriptFile = new File(
-			targetFolder + File::separator + "script_" + instance.name + ".tcl"
+			targetFolder + File::separator + "script_" + entityName + ".tcl"
 		)
-		val directiveFile = new File(targetFolder + File::separator + "directive_" + instance.name + ".tcl")
+		val directiveFile = new File(targetFolder + File::separator + "directive_" + entityName + ".tcl")
 
 		if (needToWriteFile(content, file)) {
 			OrccUtil::printFile(scriptContent, scriptFile)
@@ -264,8 +277,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override print(Action action) {
 		currentAction = action
 		val output = '''
-			static void «instance.name»_«action.body.name»() {
-
+			static void «entityName»_«action.body.name»() {
+			
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
@@ -274,13 +287,18 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					«block.doSwitch»
 				«ENDFOR»
 			
-				«FOR portin1 : action.inputPattern.ports»
-					«instance.incomingPortMap.get(portin1).localrName» = «instance.incomingPortMap.get(portin1).localrName»+«action.inputPattern.getNumTokens(portin1)»;
-					«instance.incomingPortMap.get(portin1).rName»[0] = «instance.incomingPortMap.get(portin1).localrName»;
+				«FOR port : action.inputPattern.ports»
+					«val connection = incomingPortMap.get(port)»
+					«IF connection != null»
+						«connection.localrName» = «connection.localrName»+«action.inputPattern.getNumTokens(port)»;
+						«connection.rName»[0] = «connection.localrName»;
+					«ENDIF»
 				«ENDFOR»
-				«FOR portout1 : action.outputPattern.ports»	
-					«instance.outgoingPortMap.get(portout1).head.localwName» = «instance.outgoingPortMap.get(portout1).head.localwName» +«action.outputPattern.getNumTokens(portout1)»;
-					«instance.outgoingPortMap.get(portout1).head.wName»[0] = «instance.outgoingPortMap.get(portout1).head.localwName»;
+				«FOR port : action.outputPattern.ports»	
+					«FOR connection : outgoingPortMap.get(port)»
+						«connection.localwName» = «connection.localwName» + «action.outputPattern.getNumTokens(port)»;
+						«connection.wName»[0] = «connection.localwName»;
+					«ENDFOR»
 				«ENDFOR»
 				
 			}
@@ -288,38 +306,43 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«action.scheduler.print»
 			
 		'''
-		
+
 		currentAction = null
 		return output
 	}
 
-	//i32 «instance.incomingPortMap.get(srcPort).maskName» = «instance.incomingPortMap.get(srcPort).localrName» & 511;
-	//«instance.incomingPortMap.get(srcPort).localrName» = «instance.incomingPortMap.get(srcPort).localrName»+1;
-	//«instance.incomingPortMap.get(srcPort).rName»[0] = «instance.incomingPortMap.get(srcPort).localrName»;
-	//«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[(«instance.incomingPortMap.get(srcPort).maskName»  + («load.indexes.head.doSwitch»))];
+	//i32 «incomingPortMap.get(srcPort).maskName» = «incomingPortMap.get(srcPort).localrName» & 511;
+	//«incomingPortMap.get(srcPort).localrName» = «incomingPortMap.get(srcPort).localrName»+1;
+	//«incomingPortMap.get(srcPort).rName»[0] = «incomingPortMap.get(srcPort).localrName»;
+	//«load.target.variable.name» = «incomingPortMap.get(srcPort).ramName»[(«incomingPortMap.get(srcPort).maskName»  + («load.indexes.head.doSwitch»))];
 	override caseInstLoad(InstLoad load) {
 		if (load.eContainer != null) {
 			val srcPort = load.source.variable.getPort
 			'''
-				«IF (srcPort != null)» 
-					«load.target.variable.name» = «instance.incomingPortMap.get(srcPort).ramName»[((«instance.incomingPortMap.get(srcPort).localrName» & 8191)  + («load.indexes.head.doSwitch»))];
-				«ELSE»
-					«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
-				«ENDIF»
-			'''
+				
+					
+					
+						«IF (srcPort != null)»
+							«load.target.variable.name» = «incomingPortMap.get(srcPort).ramName»[((«incomingPortMap.get(srcPort).localrName» & SIZE_«srcPort.
+					name»)  + («load.indexes.head.doSwitch»))];
+						«ELSE»
+							«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
+						«ENDIF»
+				'''
 
 		}
 	}
 
-	//i32 «instance.outgoingPortMap.get(trgtPort).head.maskName» = «instance.outgoingPortMap.get(trgtPort).head.localwName» & 511;
-	//«instance.outgoingPortMap.get(trgtPort).head.localwName» = «instance.outgoingPortMap.get(trgtPort).head.localwName» +1;
-	//«instance.outgoingPortMap.get(trgtPort).head.wName»[0] = «instance.outgoingPortMap.get(trgtPort).head.localwName»;
-	//«instance.outgoingPortMap.get(trgtPort).head.ramName»[(«instance.outgoingPortMap.get(trgtPort).head.maskName» + («store.indexes.head.doSwitch»))]=«store.value.doSwitch»;
+	//i32 «outgoingPortMap.get(trgtPort).head.maskName» = «outgoingPortMap.get(trgtPort).head.localwName» & 511;
+	//«outgoingPortMap.get(trgtPort).head.localwName» = «outgoingPortMap.get(trgtPort).head.localwName» +1;
+	//«outgoingPortMap.get(trgtPort).head.wName»[0] = «outgoingPortMap.get(trgtPort).head.localwName»;
+	//«outgoingPortMap.get(trgtPort).head.ramName»[(«outgoingPortMap.get(trgtPort).head.maskName» + («store.indexes.head.doSwitch»))]=«store.value.doSwitch»;
 	override caseInstStore(InstStore store) {
 		val trgtPort = store.target.variable.port
 		'''
 			«IF (trgtPort != null)»
-				«instance.outgoingPortMap.get(trgtPort).head.ramName»[((«instance.outgoingPortMap.get(trgtPort).head.localwName» & 8191) + («store.indexes.head.doSwitch»))]=«store.value.doSwitch»;
+				«outgoingPortMap.get(trgtPort).head.ramName»[((«outgoingPortMap.get(trgtPort).head.localwName» & («outgoingPortMap.
+				get(trgtPort).head.size - 1» )) + («store.indexes.head.doSwitch»))]=«store.value.doSwitch»;
 			«ELSE»
 				«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 			«ENDIF»
@@ -330,26 +353,19 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«actions.printActionsScheduling»
 	'''
 
-	def fifoName(Connection connection) 
-		'''«IF connection != null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def fifoName(Connection connection) '''«IF connection != null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def ramName(Connection connection) 
-		'''«IF connection != null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def ramName(Connection connection) '''«IF connection != null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def wName(Connection connection) 
-		'''«IF connection != null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def wName(Connection connection) '''«IF connection != null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localwName(Connection connection) 
-		'''«IF connection != null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localwName(Connection connection) '''«IF connection != null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localrName(Connection connection) 
-		'''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localrName(Connection connection) '''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def rName(Connection connection) 
-		'''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def rName(Connection connection) '''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def maskName(Connection connection) 
-		'''«IF connection != null»mask_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def maskName(Connection connection) '''«IF connection != null»mask_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
 	def fifoTypeOut(Connection connection) {
 		if (connection.sourcePort == null) {
@@ -366,16 +382,16 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			connection.targetPort.type
 		}
 	}
-	
+
 	def initializeFunction() '''
-		«IF ! instance.getActor.initializes.empty»
-			«FOR init : instance.getActor.initializes»
+		«IF ! actor.initializes.empty»
+			«FOR init : actor.initializes»
 				«init.print»
 			«ENDFOR»
 			
 			static void initialize() {
 				
-				«instance.getActor.initializes.printActionsScheduling»
+				«actor.initializes.printActionsScheduling»
 				
 			finished:
 				// no read_end/write_end here!
@@ -392,7 +408,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«IF action.outputPattern != null»
 					«action.outputPattern.printOutputPattern»
 				«ENDIF»){
-					«instance.name»_«action.body.name»();
+					«entityName»_«action.body.name»();
 				}
 			}«ENDFOR» else {
 			goto finished;
@@ -401,8 +417,9 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
-			if («transitions.action.inputPattern.checkInputPattern» isSchedulable_«transitions.action.name»() «transitions.action.outputPattern.printOutputPattern») {
-				«instance.name»_«transitions.action.body.name»();
+			if («transitions.action.inputPattern.checkInputPattern» isSchedulable_«transitions.action.name»() «transitions.
+			action.outputPattern.printOutputPattern») {
+				«entityName»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;
 				}
@@ -419,13 +436,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	def script(String path) '''
 		
-		open_project -reset subProject_«instance.name»
-		set_top «instance.name»_scheduler
-		add_files «instance.name».cpp
-		add_files -tb «instance.name»TestBench.cpp
+		open_project -reset subProject_«entityName»
+		set_top «entityName»_scheduler
+		add_files «entityName».cpp
 		open_solution -reset "solution1"
-		set_part  {xc7v2000tflg1925-1}
+		set_part  {«fpga.device»«fpga.package»«fpga.version»}
 		create_clock -period 20
+		source "directive_«entityName».tcl"
 		
 		
 		csynth_design
@@ -433,6 +450,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	def directive(String path) '''
-		set_directive_inline -region -recursive «instance.name»_scheduler
+		
+		«FOR port : actor.inputs»
+			«FOR action : actor.actions»
+				«val connection = incomingPortMap.get(port)»
+				«IF action.inputPattern.contains(port)»
+					set_directive_resource -core RAM_1P "«entityName»_«action.body.name»" «connection.ramName»
+				«ENDIF»
+			«ENDFOR»
+		«ENDFOR»
+		
 	'''
 }

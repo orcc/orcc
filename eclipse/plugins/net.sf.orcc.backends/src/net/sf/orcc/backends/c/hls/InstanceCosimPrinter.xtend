@@ -67,12 +67,13 @@ import net.sf.orcc.util.OrccUtil
 		////////////////////////////////////////////////////////////////////////////////
 		// Input FIFOS
 		
-		«FOR port : instance.getActor.inputs»
-			«IF instance.incomingPortMap.get(port) != null»
-				stream<«instance.incomingPortMap.get(port).fifoType.doSwitch»>	«instance.incomingPortMap.get(port).fifoName»;
-				int counter_«instance.incomingPortMap.get(port).fifoName»;
-				«instance.incomingPortMap.get(port).fifoType.doSwitch» tab_«instance.incomingPortMap.get(port).fifoName»[1000];
-				«instance.incomingPortMap.get(port).fifoType.doSwitch» tmp_«instance.incomingPortMap.get(port).fifoName»;
+		«FOR port : actor.inputs»
+			«val connection = incomingPortMap.get(port)»
+			«IF connection != null»
+				stream<«connection.fifoType.doSwitch»>	«connection.fifoName»;
+				int counter_«connection.fifoName»;
+				«connection.fifoType.doSwitch» tab_«connection.fifoName»[1000];
+				«connection.fifoType.doSwitch» tmp_«connection.fifoName»;
 				
 			«ENDIF»
 		«ENDFOR»
@@ -80,8 +81,8 @@ import net.sf.orcc.util.OrccUtil
 		////////////////////////////////////////////////////////////////////////////////
 		// Output FIFOs
 		
-		«FOR port : instance.getActor.outputs.filter[! native]»
-			«FOR connection : instance.outgoingPortMap.get(port)»
+		«FOR port : actor.outputs.filter[! native]»
+			«FOR connection : outgoingPortMap.get(port)»
 				stream<«connection.fifoType.doSwitch»> «connection.fifoName»;
 				int counter_«connection.fifoName»;
 				«connection.fifoType.doSwitch» tab_«connection.fifoName» [1000];
@@ -93,7 +94,7 @@ import net.sf.orcc.util.OrccUtil
 		////////////////////////////////////////////////////////////////////////////////
 		// functions definition
 		
-		void «instance.name»_scheduler();
+		void «entityName»_scheduler();
 		
 		////////////////////////////////////////////////////////////////////////////////
 		
@@ -103,12 +104,13 @@ import net.sf.orcc.util.OrccUtil
 			int i;
 			int retval = 0;
 			// read data
-			«FOR port : instance.getActor.inputs»
-				«IF instance.incomingPortMap.get(port) != null»
-					fp=fopen("«instance.name»_«port.name».txt","r");
+			«FOR port : actor.inputs»
+				«val connection = incomingPortMap.get(port)»
+				«IF connection != null»
+					fp=fopen("«entityName»_«port.name».txt","r");
 					for (i=0 ; i<1000 ; i++){
-						fscanf(fp, "%d", &tmp_«instance.incomingPortMap.get(port).fifoName»);
-						tab_«instance.incomingPortMap.get(port).fifoName»[i]=tmp_«instance.incomingPortMap.get(port).fifoName»;
+						fscanf(fp, "%d", &tmp_«connection.fifoName»);
+						tab_«connection.fifoName»[i]=tmp_«connection.fifoName»;
 						
 					}
 					fclose(fp);
@@ -117,22 +119,23 @@ import net.sf.orcc.util.OrccUtil
 			
 			// scheduler execution
 			
-				«FOR port : instance.getActor.inputs»
-					«IF instance.incomingPortMap.get(port) != null»
+				«FOR port : actor.inputs»
+					«val connection = incomingPortMap.get(port)»
+					«IF connection != null»
 					for (i=0 ; i<1000 ; i++){
-						if(!«instance.incomingPortMap.get(port).fifoName».full()){
-							«instance.incomingPortMap.get(port).fifoName».write(tab_«instance.incomingPortMap.get(port).fifoName»[counter_«instance.incomingPortMap.get(port).fifoName»]);
-							counter_«instance.incomingPortMap.get(port).fifoName» ++;
+						if(!«connection.fifoName».full()){
+							«connection.fifoName».write(tab_«connection.fifoName»[counter_«connection.fifoName»]);
+							counter_«connection.fifoName» ++;
 						}
 					}
 					«ENDIF»
 				«ENDFOR»
 			
 				for (i=0 ; i<1000 ; i++){
-				«instance.name»_scheduler();
+				«entityName»_scheduler();
 				
-				«FOR port : instance.getActor.outputs.filter[! native]»
-					«FOR connection : instance.outgoingPortMap.get(port)»
+				«FOR port : actor.outputs.filter[! native]»
+					«FOR connection : outgoingPortMap.get(port)»
 						if(!«connection.fifoName».empty()){
 							«connection.fifoName».read(tab_«connection.fifoName»[counter_«connection.fifoName»]);
 							counter_«connection.fifoName» ++;
@@ -142,9 +145,9 @@ import net.sf.orcc.util.OrccUtil
 			}
 			
 			// write results	
-			«FOR port : instance.getActor.outputs.filter[! native]»
-				«FOR connection : instance.outgoingPortMap.get(port)»
-					fp=fopen("gold_«instance.name»_«port.name».txt","w");
+			«FOR port : actor.outputs.filter[! native]»
+				«FOR connection : outgoingPortMap.get(port)»
+					fp=fopen("gold_«entityName»_«port.name».txt","w");
 					for (i=0 ; i<1000 ; i++){
 						tmp_«connection.fifoName»=tab_«connection.fifoName»[i];
 						fprintf(fp, "%d \n", tmp_«connection.fifoName»);
@@ -155,9 +158,9 @@ import net.sf.orcc.util.OrccUtil
 			«ENDFOR»
 			
 			// comparison with reference (gold) files
-			«FOR port : instance.getActor.outputs.filter[! native]»
-				«FOR connection : instance.outgoingPortMap.get(port)»
-					retval += system("diff --brief -w «instance.name»_«port.name».txt gold_«instance.name»_«port.name».txt");
+			«FOR port : actor.outputs.filter[! native]»
+				«FOR connection : outgoingPortMap.get(port)»
+					retval += system("diff --brief -w «entityName»_«port.name».txt gold_«entityName»_«port.name».txt");
 				«ENDFOR»
 			«ENDFOR»
 			
@@ -175,7 +178,7 @@ import net.sf.orcc.util.OrccUtil
 	'''	
 	override print(String targetFolder) {
 		val content = fileContent
-		val file = new File(targetFolder + File::separator + instance.name+ "TestBench" + ".cpp")//"_Csim_tb"
+		val file = new File(targetFolder + File::separator + entityName+ "TestBench" + ".cpp")//"_Csim_tb"
 		
 		if(needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)

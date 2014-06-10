@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2014, INSA Rennes
@@ -30,32 +30,82 @@
 #
 # @author Alexandre Sanchez
 
-from __future__ import division
-from common.orccAnalyse import OrccAnalyse
+from orccAnalyse import OrccAnalyse
 import os
+import glob
+import shutil
 import sys
+import subprocess
 import argparse
+import time
 
-class VideoBenchData:
-    def __init__(self, sequence):
-        self.sequence = sequence
-        self.fps = 0.0
+# Constants
+DEFAULT_OUTPUT_TAG = "bench"
+DEFAULT_NBFRAME = 600
+DEFAULT_TIMEOUT = 600
+DEFAULT_RECONF = 100
+DECODER_CONF = "HEVC"
+
+# MPEG4 Conf 
+MPEG4_SEQUENCE_EXT = "" # Not used with MPEG4 decoders
+MPEG4_SEQUENCE_NAMES = ["foreman_qcif_30.bit", "old_town_cross_420_720p_MPEG4_SP_6Mbps.bit"]
+MPEG4_SEQTYPE_LIST = ["mpeg4"]
+MPEG4_QP_LIST = ["mpeg4"]
+
+# HEVC Conf
+HEVC_SEQUENCE_EXT = ".bin"
+HEVC_SEQUENCE_NAMES = ["BasketballDrive_1920x1080_50_qp"]
+HEVC_SEQTYPE_LIST = ["i_main", "ld_main", "ra_main"]
+HEVC_QP_LIST = ["37", "32", "27", "22"]
+
+# Mapping Conf
+# MR   : METIS Recursive graph partition mapping
+# MKCV : METIS KWay graph partition mapping (Optimize Communication volume)
+# MKEC : METIS KWay graph partition mapping (Optimize Edge-cut)
+# RR   : A simple Round-Robin mapping
+# WLB  : Weighted Load Balancing
+# KLR  : Kernighan Lin Refinement Weighted Load Balancing
+PROCS_LIST = ["1", "2", "3", "4", "5", "6"]
+STRATEGIES = ["MR", "MKCV", "MKEC", "RR", "WLB"]
+
+
+class OrccMappingData:
+    def __init__(self, nbPartitions=0, loadBalancing=0.0, edgeCut=0, communicationVolume=0, fps=0.0, mappingTime=0.0):
+        self.nbPartitions = nbPartitions
+        self.loadBalancing = loadBalancing
+        self.edgeCut = edgeCut
+        self.communicationVolume = communicationVolume
+        self.fps = fps
+        self.mappingTime = mappingTime
         self.speedUp = 0.0
-        self.loadBalancing = 0.0
-        self.edgeCut = 0
-        self.communicationVolume = 0
-        self.mappingTime = 0
-        self.nbPartitions = 0
 
-class BenchAutoMapping(OrccAnalyse):
-    def __init__(self, nb_procs, tag, nb_frames, decoder_path, sequences_path, bRange):
+class OrccSequenceData:
+    def __init__(self):
+        self.mappingData = {}
+
+    def add(self, nbProcs, seqType, seqQp, strategy, mapData):
+        self.mappingData[nbProcs, seqType, seqQp, strategy] = mapData
+
+class OrccBenchMappingData:
+    def __init__(self):
+        self.sequences = {}
+
+    def add(self, name):
+        if name not in self.sequences:
+            seq = OrccSequenceData()
+            self.sequences[name] = seq
+
+class BenchMapping(OrccAnalyse):
+    def __init__(self, tag, nb_frames, decoder_path, sequences_path):
         OrccAnalyse.__init__(self, tag)
         self.NBFRAME = nb_frames
         self.DEFAULT_EXE = decoder_path
         self.SEQ_PATH =  sequences_path
-        self.NBPROC = nb_procs
-        self.RANGE = bRange
+        if self.SEQ_PATH.endswith("/"):
+            self.SEQ_PATH = self.SEQ_PATH[0:len(self.SEQ_PATH)-1]
         self.FILE_HEAD = "bench_"
+        self.DEFAULT_LOG_EXT = ".log"
+        self.TOKEN_NEW_PROCESSING = "Processing on sequence "
         self.TOKEN_FPS = "FPS"
         self.TOKEN_FPS_POST_MAPPING = "PostMapping :"
         self.TOKEN_LB = "Load balancing"
@@ -63,180 +113,191 @@ class BenchAutoMapping(OrccAnalyse):
         self.TOKEN_CV = "Communication volume :"
         self.TOKEN_MT = "Mapping time :"
         self.TOKEN_PART = "partitions"
-        self.DEFAULT_LOG_EXT = ".log"
-        self.SEQ_EXT = ["_qp27.bin", ".bit", ".m4v"]
-        # self.MS_LIST = ["MR", "MKV", "MKC", "RR", "QM", "WLB", "COWLB", "KRWLB"]
-        self.MS_LIST = ["MR", "MKV", "MKC", "WLB", "COWLB"]
-        # self.NBS_LIST = ["0", "1", "2", "3", "4", "5", "6", "7"]
-        self.NBS_LIST = ["0", "1", "2", "5", "6"]
         self.logTXT = False
         self.logXML = False
         self.logHTML = False
+        self.logCSV = True
         self.logPDF = False
-        self.benchData = {}
-        self.rangeProcs = list()
-
-        self.rangeProcs.append(1)
-        if self.RANGE:
-            minRange = 2
-        else:
-            minRange = self.NBPROC
-
-        for nbP in range(minRange, self.NBPROC+1):
-            self.rangeProcs.append(nbP)
+        self.data = OrccBenchMappingData()
 
     def performBench(self):
         print ("*********************************************************************")
-        print ("* ORCC Auto-Mapping Bench")
+        print ("* ORCC Mapping Bench")
         print ("*********************************************************************")
         print ("==> Decoder : %s" % (self.DEFAULT_EXE))
+        print ("==> Decoder configuration : %s" % (DECODER_CONF))
         print ("==> Sequences : %s" % (self.SEQ_PATH))
         print ("==> nb of frames : %d " % (self.NBFRAME))
-        print ("==> nb of procs : %d " % (self.NBPROC))
 
-        for nbP in self.rangeProcs:
-            self.performMapping(nbP)
-
-    def performMappingWithStrategy(self, fic, nbProcs, Strategy):
-        SEQUENCE_NAME = fic[0:len(fic)-len(self.DEFAULT_LOG_EXT)]
-        baseName = self.FILE_HEAD + SEQUENCE_NAME + "_" + str(nbProcs) + "Procs"
-
-        if nbProcs == 1:
-            log_file = open(baseName + self.DEFAULT_LOG_EXT, 'w')
-        else:
-            print ("      => Applying mapping strategy : %s" % (self.MS_LIST[Strategy]))
-            log_file = open(baseName + "_" + self.MS_LIST[Strategy]  + self.DEFAULT_LOG_EXT, 'w')
-
-        try:
-            proc = subprocess.call([self.DEFAULT_EXE, "-f", str(self.NBFRAME), "-n", "-v1", "-i", os.path.join(self.SEQ_PATH, fic), "-c", str(nbProcs), "-r100", "-s", str(self.NBS_LIST[Strategy])], stdout=log_file, timeout=600)
-        except subprocess.TimeoutExpired:
-            print("    => Timeout expired !")
-
-
-    def performMapping(self, nbProcs):
         print ("\n*********************************************************************")
-        print ("Perform mapping for " + str(nbProcs) + " processors for each sequence in " + self.SEQ_PATH)
-        for fic in os.listdir(self.SEQ_PATH):
-            if fic.endswith(self.SEQ_EXT[0]) or fic.endswith(self.SEQ_EXT[1]) or fic.endswith(self.SEQ_EXT[2]):
-                SEQUENCE_NAME = fic[0:len(fic)-4]
+        for seqName in SEQUENCE_NAMES:
+            for nbProcs in PROCS_LIST:
+                print ("Perform bench for " + str(nbProcs) + " processors ")
+                for seqType in SEQTYPE_LIST:
+                    for seqQp in QP_LIST:
+                        if nbProcs == "1":
+                            self.printSequenceInfo(seqName, nbProcs, seqType, seqQp, "MR")
+                            self.performDecoder(seqName, nbProcs, seqType, seqQp, "MR")
+                        else:
+                            for strategy in STRATEGIES:
+                                self.printSequenceInfo(seqName, nbProcs, seqType, seqQp, strategy)
+                                self.performDecoder(seqName, nbProcs, seqType, seqQp, strategy)
 
-                print ("  * Processing on sequence : %s" % (SEQUENCE_NAME))
+    def printSequenceInfo(self, seqName, nbProcs, seqType, seqQp, strategy):
+        self.log_file = open(self.SUMMARY_TXT, 'a')
+        self.log_file.write("Processing on sequence " + seqName + " -- " + seqType + " -- " + seqQp + " -- " + nbProcs + " processors" + " -- Strategy " + strategy +"\n")
+        self.log_file.close()
 
-                if nbProcs == 1:
-                    self.performMappingWithStrategy(fic, nbProcs, 0)
+    def performDecoder(self, seqName, nbProcs, seqType, seqQp, strategy):
+        self.log_file = open(self.SUMMARY_TXT, 'a')
+        if seqType == "mpeg4" or seqQp == "mpeg4":
+            seqfile = self.SEQ_PATH + "/" + seqName
+        else:
+            seqfile = self.SEQ_PATH + "/" + seqType + "/" + seqName + seqQp + SEQUENCE_EXT
 
-                else:
-                    for strategy in range(0, len(self.MS_LIST)):
-                        self.performMappingWithStrategy(fic, nbProcs, strategy)
+        print ("  * Processing on sequence : %s" % (seqfile))
+        try:
+            proc = subprocess.call([self.DEFAULT_EXE, "-v2", "-r", str(DEFAULT_RECONF), "-s", strategy, "-c", str(nbProcs), "-f", str(self.NBFRAME), "-n", "-i", seqfile], stdout=self.log_file, timeout=DEFAULT_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            self.log_file.write("Timeout expired !\n")
+            print("    => Timeout expired !")
+        self.log_file.write("\n")
+        self.log_file.close()
 
     def extractData(self):
         print ("\n  * Extracting data from logs")
-        for fic in os.listdir("."):
-            if fic.count("_1Procs"+self.DEFAULT_LOG_EXT):
-                SEQUENCE_NAME = fic[len(self.FILE_HEAD):len(fic)-len("_1Procs")-len(self.DEFAULT_LOG_EXT)]
-                data = {}
 
-                for nbP in self.rangeProcs:
-                    baseName = SEQUENCE_NAME + "_" + str(nbP) + "Procs" + "_"
-                    data[nbP] = {}
+        fp = open(self.SUMMARY_TXT)
+        seqName = ""
+        nbProcs = ""
+        seqType = ""
+        seqQp = ""
+        strategy = ""
 
-                    if nbP == 1:
-                        data[nbP] = VideoBenchData(SEQUENCE_NAME)
-                        fp = open(fic)
-                        for line in fp:
-                            if line.count(self.TOKEN_FPS) == 1:
-                                data[nbP].fps = round(float(line.split()[5]), 2)
-                        fp = fp.close()
-                    else:
-                        for strategy in self.MS_LIST:
-                            log_file = "./" + self.FILE_HEAD + baseName + strategy + self.DEFAULT_LOG_EXT
+        for line in fp:
+            if line.count(self.TOKEN_NEW_PROCESSING) == 1:
+                seqName = line.split()[3]
+                seqType = line.split()[5]
+                seqQp = line.split()[7]
+                nbProcs = line.split()[9]
+                strategy = line.split()[13]
+                nbPartitions = 0
+                loadBalancing = 0.0
+                edgeCut = 0
+                communicationVolume = 0
+                fps = 0.0
+                mappingTime = 0.0
+                self.data.add(seqName)
+                print (seqName + nbProcs+seqType+seqQp+strategy)
+                mappingData = OrccMappingData()
+                self.data.sequences[seqName].add(nbProcs, seqType, seqQp, strategy, mappingData)
 
-                            data[nbP][strategy] = VideoBenchData(SEQUENCE_NAME)
+            if line.count(self.TOKEN_FPS_POST_MAPPING) == 1:
+                fps = round(float(line.split()[7]), 2)
+                mappingData = OrccMappingData(nbPartitions, loadBalancing, edgeCut, communicationVolume, fps, mappingTime)
+                self.data.sequences[seqName].add(nbProcs, seqType, seqQp, strategy, mappingData)
 
-                            fp = open(log_file)
-                            for line in fp:
-                                if line.count(self.TOKEN_FPS_POST_MAPPING) == 1:
-                                    data[nbP][strategy].fps = round(float(line.split()[7]), 2)
+            if line.count(self.TOKEN_LB) == 1 and line.count(self.TOKEN_PART) == 1:
+                loadBalancing = round(float(line.split()[2]), 2)
+                nbPartitions = int(line.split()[4])
 
-                                if line.count(self.TOKEN_LB) == 1 and line.count(self.TOKEN_PART) == 1:
-                                    data[nbP][strategy].loadBalancing = round(float(line.split()[2]), 2)
-                                    data[nbP][strategy].nbPartitions = int(line.split()[4])
+            if line.count(self.TOKEN_EC) == 1 and line.count(self.TOKEN_CV) == 1:
+                edgeCut = int(line.split()[2])
 
-                                if line.count(self.TOKEN_EC) == 1:
-                                    data[nbP][strategy].edgeCut = int(line.split()[2])
+            if line.count(self.TOKEN_CV) == 1:
+                communicationVolume = int(line.split()[6])
 
-                                if line.count(self.TOKEN_CV) == 1:
-                                    data[nbP][strategy].communicationVolume = int(line.split()[6])
+            if line.count(self.TOKEN_MT) == 1:
+                mappingTime = int(line.split()[3])
 
-                                if line.count(self.TOKEN_MT) == 1:
-                                    data[nbP][strategy].mappingTime = int(line.split()[3])
-                            fp = fp.close()
-                            data[nbP][strategy].speedUp = round(data[nbP][strategy].fps/data[1].fps, 2)
+        fp = fp.close()
 
-                    self.benchData[SEQUENCE_NAME] = data
+    def computeData(self):
+        print ("\n  * Computing data from logs")
+        for seqName in SEQUENCE_NAMES:
+            for seqType in SEQTYPE_LIST:
+                for seqQp in QP_LIST:
+                    refFPS = self.data.sequences[seqName].mappingData["1", seqType, seqQp, "MR"].fps
+                    for nbProcs in PROCS_LIST:
+                        if nbProcs != "1":
+                            for strategy in STRATEGIES:
+                                if refFPS != 0:
+                                    data = self.data.sequences[seqName].mappingData[nbProcs, seqType, seqQp, strategy]
+                                    data.speedUp = round(data.fps/refFPS, 2)
 
     def logInCSV(self):
         print ("\n  * Generate CSV Result file : " + self.SUMMARY_CSV)
         fd = open(self.SUMMARY_CSV, 'w')
 
-        for bData in self.benchData:
-            # Header
-            fd.write("Sequence;\n")
-            fd.write(bData + ";\n")
+        # Body
+        for seqName in SEQUENCE_NAMES:
+            seq = self.data.sequences[seqName]
+            for seqType in SEQTYPE_LIST:
+                for seqQp in QP_LIST:
+                    # Header
+                    fd.write("Sequence;\n")
+                    fd.write(seqType + "/" + seqName + seqQp + ";\n")
 
-            for nbProcs in self.rangeProcs:
-                if nbProcs != 1:
-                    fd.write(";Nb procs;" + str(nbProcs) + ";;;;;;;")
-            fd.write("\n")
+                    for nbProcs in PROCS_LIST:
+                        if nbProcs != "1":
+                            fd.write(";Nb procs;" + nbProcs + ";;;;;;")
+                    fd.write("\n")
 
-            for nbProcs in self.rangeProcs:
-                if nbProcs != 1:
-                    fd.write(";Strategy;FPS;Acc;LB;EC;CV;MT;Parts;")
-            fd.write("\n")
+                    for nbProcs in PROCS_LIST:
+                        if nbProcs != "1":
+                            fd.write(";Strategy;FPS;Acc;LB;EC;CV;Parts;")
+                    fd.write("\n")
 
-            for nbProcs in self.rangeProcs:
-                if nbProcs != 1:
-                    fd.write(";Ref;")
-                    fd.write(str(self.benchData[bData][1].fps).replace(".", ",") + ";;;;;;;")
-            fd.write("\n")
+                    for nbProcs in PROCS_LIST:
+                        if nbProcs != "1":
+                            fd.write(";Ref;")
+                            fd.write(str(seq.mappingData["1", seqType, seqQp, "MR"].fps).replace(".", ",") + ";;;;;;")
+                    fd.write("\n")
 
-            # Body
-            for strategy in self.MS_LIST:
-                for nbProcs in self.rangeProcs:
-                    if nbProcs != 1:
-                        data = self.benchData[bData][nbProcs][strategy]
-                        fd.write(";" + strategy + ";")
-                        fd.write(str(data.fps).replace(".", ",") + ";")
-                        fd.write(str(data.speedUp).replace(".", ",") + ";")
-                        fd.write(str(data.loadBalancing).replace(".", ",") + ";")
-                        fd.write(str(data.edgeCut) + ";")
-                        fd.write(str(data.communicationVolume) + ";")
-                        fd.write(str(data.mappingTime) + ";")
-                        fd.write(str(data.nbPartitions) + ";")
-                fd.write("\n")
+                    # Body
+                    for strategy in STRATEGIES:
+                        for nbProcs in PROCS_LIST:
+                            if nbProcs != "1":
+                                data = seq.mappingData[nbProcs, seqType, seqQp, strategy]
+                                fd.write(";" + strategy + ";")
+                                fd.write(str(data.fps).replace(".", ",") + ";")
+                                fd.write(str(data.speedUp).replace(".", ",") + ";")
+                                fd.write(str(data.loadBalancing).replace(".", ",") + ";")
+                                fd.write(str(data.edgeCut) + ";")
+                                fd.write(str(data.communicationVolume) + ";")
+                                fd.write(str(data.nbPartitions) + ";")
+                        fd.write("\n")
 
-            # Footer
-            fd.write("\n\n")
+                    # Footer
+                    fd.write("\n\n")
 
         fd.close()
 
-# Main
-# DEFAULT
-DEFAULT_OUTPUT_TAG = "bench"
-DEFAULT_NBFRAME = 1000
-DEFAULT_NBPROC = 4
-DEFAULT_RANGE = False
+    def archiveLogs(self):
+        pass
 
+# Main
 # Parse args
-parser = argparse.ArgumentParser(description='Open RVC-CAL Compiler - benchAutoMapping - ??????')
+parser = argparse.ArgumentParser(description='Open RVC-CAL Compiler - BenchMapping - Massive dynamic mapping bench')
 parser.add_argument('-d', dest='decoder_path', help='Path to your orcc decoder binary', required=True)
 parser.add_argument('-s', dest='sequences_path', help='Path to the directory containing the sequences', required=True)
-parser.add_argument('-n', dest='nb_procs', type=int, default=DEFAULT_NBPROC, help='Number of processors for mapping (default value = 4)')
-parser.add_argument('-f', dest='nb_frames', type=int, default=DEFAULT_NBFRAME, help='Number of frames of the sequence (default value = 1000)')
+parser.add_argument('-f', dest='nb_frames', type=int, default=DEFAULT_NBFRAME, help='Number of frames of the sequence (default value = 600)')
 parser.add_argument('-o', dest='output_tag', default=DEFAULT_OUTPUT_TAG, help='Allow to tag bench output with a name')
-parser.add_argument('-r', dest='range', action="store_true", help='Make mapping for all numbers of processors setted')
+parser.add_argument('-m', dest='mpeg4', action="store_true", help='Set configuration to MPEG4 instead of HEVC')
 args = parser.parse_args()
 
+if args.mpeg4 == True:
+    DECODER_CONF = "MPEG4"
+    SEQUENCE_EXT = MPEG4_SEQUENCE_EXT
+    SEQUENCE_NAMES = MPEG4_SEQUENCE_NAMES
+    SEQTYPE_LIST = MPEG4_SEQTYPE_LIST
+    QP_LIST = MPEG4_QP_LIST
+else:
+    SEQUENCE_EXT = HEVC_SEQUENCE_EXT
+    SEQUENCE_NAMES = HEVC_SEQUENCE_NAMES
+    SEQTYPE_LIST = HEVC_SEQTYPE_LIST
+    QP_LIST = HEVC_QP_LIST
+
 # Begin
-bench = BenchAutoMapping(args.nb_procs, args.output_tag, args.nb_frames, args.decoder_path, args.sequences_path, (args.range or DEFAULT_RANGE))
+bench = BenchMapping(args.output_tag, args.nb_frames, args.decoder_path, args.sequences_path)
 bench.start()

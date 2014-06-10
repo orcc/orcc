@@ -56,47 +56,45 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 		set COMSPEC=%WINDIR%\System32\cmd.exe
 		:START
 		
-			cd ..
-				
-			%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
-				«FOR portIN : instance.getActor.inputs»
-					
-						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write.tcl
-					
-				«ENDFOR»		
-				«FOR portout : instance.getActor.outputs.filter[! native]»			
-					
-						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read.tcl					
-					
-				«ENDFOR»
-		
-		copy %cd%\TopVHDL\sim_package.vhd %cd%\«instance.name»TopVHDL
-		copy %cd%\TopVHDL\ram_tab.vhd %cd%\«instance.name»TopVHDL
-		
-		
-			copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\«instance.name»TopVHDL
+		cd ..
 			
-			«FOR portIN : instance.getActor.inputs»
-				
-					copy %cd%\subProject_cast_«instance.name»_«instance.incomingPortMap.get(portIN).targetPort.name»_write\solution1\syn\vhdl %cd%\«instance.
-			name»TopVHDL
-				
+		%COMSPEC% /C vivado_hls -f script_«entityName».tcl
+		«FOR port : actor.inputs»
+			«val connection = incomingPortMap.get(port)»
+			«IF connection != null»
+				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_«connection.targetPort.name»_write.tcl
+			«ENDIF»
+		«ENDFOR»		
+		«FOR port : actor.outputs.filter[! native]»			
+			«FOR connection : outgoingPortMap.get(port)»
+				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_«connection.sourcePort.name»_read.tcl					
 			«ENDFOR»
-			«FOR portout : instance.getActor.outputs.filter[! native]»
-				
-					
-						copy %cd%\subProject_cast_«instance.name»_«instance.outgoingPortMap.get(portout).head.sourcePort.name»_read\solution1\syn\vhdl %cd%\«instance.
-			name»TopVHDL
-						
-				
+		«ENDFOR»
+		
+		copy %cd%\TopVHDL\sim_package.vhd %cd%\«entityName»TopVHDL
+		copy %cd%\TopVHDL\ram_tab.vhd %cd%\«entityName»TopVHDL
+		
+		
+		copy %cd%\subProject_«entityName»\solution1\syn\vhdl %cd%\«entityName»TopVHDL
+		
+		«FOR port : actor.inputs»
+			«val connection = incomingPortMap.get(port)»
+			«IF connection != null»
+				copy %cd%\subProject_cast_«entityName»_«connection.targetPort.name»_write\solution1\syn\vhdl %cd%\«entityName»TopVHDL
+			«ENDIF»
+		«ENDFOR»
+		«FOR port : actor.outputs.filter[! native]»
+			«FOR connection : outgoingPortMap.get(port)»
+				copy %cd%\subProject_cast_«entityName»_«connection.sourcePort.name»_read\solution1\syn\vhdl %cd%\«entityName»TopVHDL
 			«ENDFOR»
+		«ENDFOR»
 			
 		
 	'''
 
 	override print(String targetFolder) {
 		val contentNetwork = getFileContentBatch
-		val NetworkFile = new File(targetFolder + File::separator + "Command" + "_" + instance.name + ".bat")
+		val NetworkFile = new File(targetFolder + File::separator + "Command" + "_" + entityName + ".bat")
 
 		if (needToWriteFile(contentNetwork, NetworkFile)) {
 			OrccUtil::printFile(contentNetwork, NetworkFile)

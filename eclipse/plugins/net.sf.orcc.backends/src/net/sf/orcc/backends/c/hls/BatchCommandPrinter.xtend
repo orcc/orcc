@@ -47,7 +47,7 @@ import java.io.File
 		super(bat, options)
 	}
 
-	override getNetworkFileContent()'''
+	override getNetworkFileContent() '''
 		PATH=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin;%PATH%;D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\msys\bin
 		set AUTOESL_HOME=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin
 		set VIVADO_HLS_HOME=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin
@@ -62,18 +62,39 @@ import java.io.File
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			
 			%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
+			«FOR port : instance.getActor.inputs»
+				«val connection = instance.incomingPortMap.get(port)»
+				«IF connection != null && connection.sourcePort == null»
+					%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«connection.targetPort.name»_write.tcl
+				«ENDIF»
+			«ENDFOR»		
+			«FOR port : instance.getActor.outputs.filter[! native]»			
+				«FOR connection : instance.outgoingPortMap.get(port)»
+					«IF connection.targetPort == null»
+						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«connection.sourcePort.name»_read.tcl					
+					«ENDIF»
+				«ENDFOR»
+			«ENDFOR»
 			
 		«ENDFOR»
 		
-		
-		
-		
 		copy %cd%\sim_package.vhd %cd%\TopVHDL
-
+		copy %cd%\TopVHDL\ram_tab.vhd %cd%\TopVHDL
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\TopVHDL
-			copy %cd%\sim_package.vhd %cd%\subProject_«instance.name»\solution1\syn\vhdl
-			copy %cd%\UnitaryVHDLTestBENCH\«instance.name»TestBench.vhd %cd%\subProject_«instance.name»\solution1\syn\vhdl
+			«FOR port : instance.getActor.inputs»
+				«val connection = instance.incomingPortMap.get(port)»
+				«IF connection != null && connection.sourcePort == null»
+					copy %cd%\subProject_cast_«instance.name»_«connection.targetPort.name»_write\solution1\syn\vhdl %cd%\TopVHDL
+				«ENDIF»
+			«ENDFOR»
+			«FOR port : instance.getActor.outputs.filter[! native]»
+				«FOR connection : instance.outgoingPortMap.get(port)»
+					«IF connection.targetPort == null»				
+						copy %cd%\subProject_cast_«instance.name»_«connection.sourcePort.name»_read\solution1\syn\vhdl %cd%\TopVHDL
+					«ENDIF»
+				«ENDFOR»
+			«ENDFOR»
 		«ENDFOR»
 	''' 
 	

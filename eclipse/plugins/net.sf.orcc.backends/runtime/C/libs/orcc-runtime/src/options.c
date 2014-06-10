@@ -57,6 +57,7 @@ options_t *set_default_options() {
     opt->display_flags = DISPLAY_ENABLE;
     opt->yuv_file = NULL;
     opt->profiling_file = NULL;
+    opt->print_firings = FALSE;
 
     return opt;
 }

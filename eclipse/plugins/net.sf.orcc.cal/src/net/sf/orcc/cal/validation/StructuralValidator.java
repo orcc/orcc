@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.cal.CalConstants;
+import net.sf.orcc.cal.CalDiagnostic;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
@@ -114,7 +114,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			AstPort port = pattern.getPort();
 			if (ports.contains(port)) {
 				error("duplicate reference to port " + port.getName(), pattern,
-						eINSTANCE.getInputPattern_Port(), -1);
+						eINSTANCE.getInputPattern_Port(),
+						CalDiagnostic.ERROR_DUPLICATE_PORT_REFERENCE);
 			} else {
 				ports.add(port);
 			}
@@ -144,7 +145,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			AstPort port = pattern.getPort();
 			if (ports.contains(port)) {
 				error("duplicate reference to port " + port.getName(), pattern,
-						eINSTANCE.getOutputPattern_Port(), -1);
+						eINSTANCE.getOutputPattern_Port(),
+						CalDiagnostic.ERROR_DUPLICATE_PORT_REFERENCE);
 			} else {
 				ports.add(port);
 			}
@@ -270,7 +272,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			error("The qualified name " + entityName
 					+ " does not match the expected name " + expectedName,
 					entity, eINSTANCE.getAstEntity_Name(),
-					CalConstants.ERROR_NAME, entityName, expectedName);
+					CalDiagnostic.ERROR_NAME, entityName, expectedName);
 		}
 	}
 
@@ -288,8 +290,20 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
-		// get the file (we know it's a file)
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspace workspace;
+		try {
+			// get the file (we know it's a file)
+			workspace = ResourcesPlugin.getWorkspace();
+		} catch (IllegalStateException e) {
+			// This validation step is executed without a workspace open. This
+			// is normal if the validation is performed from JUnit tests in full
+			// headless environment (i.e. Without opening the second eclipse and
+			// without any GUI). In that case, we catch the exception and stop
+			// this method. Doing this, all others validations will be performed
+			// as expected.
+			return;
+		}
+
 		IFile file = (IFile) workspace.getRoot().findMember(platformPath);
 		if (file == null) {
 			return;
@@ -332,11 +346,11 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 							file.getFullPath());
 					String code;
 					if (packageName == DEFAULT) {
-						code = CalConstants.ERROR_MISSING_PACKAGE;
+						code = CalDiagnostic.ERROR_MISSING_PACKAGE;
 					} else if (expectedName == DEFAULT) {
-						code = CalConstants.ERROR_EXTRANEOUS_PACKAGE;
+						code = CalDiagnostic.ERROR_EXTRANEOUS_PACKAGE;
 					} else {
-						code = CalConstants.ERROR_PACKAGE;
+						code = CalDiagnostic.ERROR_PACKAGE;
 					}
 
 					error("The package " + packageName

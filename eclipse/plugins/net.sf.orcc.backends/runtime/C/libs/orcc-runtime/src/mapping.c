@@ -28,7 +28,6 @@
  */
 
 #include <assert.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,12 +36,18 @@
 #include "dataflow.h"
 #include "graph.h"
 #include "util.h"
-#include "serialize.h"
 #include "scheduler.h"
 #include "options.h"
 #include "trace.h"
 #include "cycle.h"
+#include "profiling.h"
+
+#ifdef THREADS_ENABLE
 #include "thread.h"
+#endif
+#ifdef ROXML_ENABLE
+#include "serialize.h"
+#endif
 
 /*
  * Functions declared in fps_print.c
@@ -113,10 +118,12 @@ mapping_t* map_actors(network_t *network) {
         memcpy(mapping->partitions_of_actors[0], network->actors, network->nb_actors * sizeof(actor_t*));
         return mapping;
     } else {
+#ifdef ROXML_ENABLE
         mapping = load_mapping(opt->mapping_input_file, network);
         if(mapping->number_of_threads > opt->nb_processors){
             opt->nb_processors = mapping->number_of_threads;
         }
+#endif
     }
     return mapping;
 }
@@ -733,10 +740,12 @@ void *agent_routine(void *data) {
     while (1) {
         int i;
 
+#ifdef THREADS_ENABLE
         // wait threads synchro
         for (i = 0; i < agent->nb_threads; i++) {
-            orcc_semaphore_wait(agent->sync->sem_monitor);
+            orcc_semaphore_wait(agent->sem_agent);
         }
+#endif
 
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Remap the actors...");
         compute_workloads(agent->network);
@@ -751,10 +760,12 @@ void *agent_routine(void *data) {
             fpsPrintInit_mapping();
         }
 
+#ifdef THREADS_ENABLE
         // wakeup all threads
         for (i = 0; i < agent->nb_threads; i++) {
             orcc_semaphore_set(agent->scheduler->schedulers[i]->sem_thread);
         }
+#endif
 
     }
 
@@ -764,14 +775,16 @@ void *agent_routine(void *data) {
 /**
  * Initialize the given agent structure.
  */
-agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads) {
+agent_t* agent_init(options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads) {
     agent_t *agent = (agent_t *) malloc(sizeof(agent_t));
-    agent->sync = sync;
     agent->options = options;
     agent->scheduler = scheduler;
     agent->network = network;
     agent->mapping = allocate_mapping(nb_threads, network->nb_actors);
     agent->nb_threads = nb_threads;
+#ifdef THREADS_ENABLE
+    orcc_semaphore_create(agent->sem_agent, 0);
+#endif
     return agent;
 }
 
@@ -792,6 +805,6 @@ void apply_mapping(mapping_t *mapping, global_scheduler_t *scheduler, int nbThre
     assert(scheduler != NULL);
 
     for (i = 0; i < nbThreads; i++) {
-        sched_reinit(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i], 0);
+        sched_reinit(scheduler->schedulers[i], mapping->partitions_size[i], mapping->partitions_of_actors[i]);
     }
 }

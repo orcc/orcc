@@ -29,11 +29,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 #include <time.h>
 #include <string.h>
 
 #include "orcc.h"
+#include "native_util.h"
 #include "util.h"
 #include "options.h"
 
@@ -136,16 +136,12 @@ void source_exit(int exitCode)
 }
 
 unsigned int source_sizeOfFile() {
-    struct stat st; 
-    fstat(fileno(file), &st); 
-    return st.st_size; 
+    return fsize(file);
 }
 
 int source_sizeOfFileFd(long long fdVal) {
     FILE* fd = (FILE*) fdVal;
-    struct stat st;
-    fstat(fileno(fd), &st);
-    return st.st_size;
+    return fsize(fd);
 }
 
 int source_is_stopped() {

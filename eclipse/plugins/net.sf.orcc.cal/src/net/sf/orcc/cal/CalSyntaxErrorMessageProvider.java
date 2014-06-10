@@ -30,6 +30,7 @@ package net.sf.orcc.cal;
 
 import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.RecognitionException;
+import org.eclipse.xtext.diagnostics.Diagnostic;
 import org.eclipse.xtext.nodemodel.SyntaxErrorMessage;
 import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider;
 
@@ -50,19 +51,19 @@ public class CalSyntaxErrorMessageProvider implements
 			if ("schedule".equals(mte.token.getText())) {
 				return new SyntaxErrorMessage(
 						"At most one \"schedule\" construct allowed",
-						CalConstants.ERROR_SCHEDULE);
+						CalDiagnostic.ERROR_SCHEDULE);
 			}
 		}
 
 		return new SyntaxErrorMessage(context.getDefaultMessage(),
-				CalConstants.ERROR_DEFAULT);
+				Diagnostic.SYNTAX_DIAGNOSTIC);
 	}
 
 	@Override
 	public SyntaxErrorMessage getSyntaxErrorMessage(
 			IValueConverterErrorContext context) {
 		return new SyntaxErrorMessage(context.getDefaultMessage(),
-				CalConstants.ERROR_DEFAULT);
+				Diagnostic.SYNTAX_DIAGNOSTIC);
 	}
 
 }

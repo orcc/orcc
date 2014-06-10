@@ -32,12 +32,6 @@
 #include "trace.h"
 #include "thread.h"
 
-void sync_init(sync_t *sync) {
-    orcc_semaphore_create(sync->sem_monitor, 0);
-    sync->active_sync = 1;
-}
-
-
 void set_realtime_priority() {
     #ifdef __linux__
     int ret;

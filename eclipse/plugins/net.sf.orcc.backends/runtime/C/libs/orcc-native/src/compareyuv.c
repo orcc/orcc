@@ -26,7 +26,6 @@
 * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 * SUCH DAMAGE.
 */
-#include <sys/stat.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,23 +34,26 @@
 #include "types.h"
 #include "util.h"
 #include "options.h"
+#include "native_util.h"
+
 
 static FILE        *ptrFile ;
 static unsigned int fileSize;
 static char         useCompare;
 
-static int compareYUV_compareComponent(const int x_size, const int y_size, 
-               const unsigned char *true_img_uchar, const unsigned char *test_img_uchar,
-               unsigned char SizeMbSide, char Component_Type) {
+static int compareYUV_compareComponent(
+        const int x_size, const int y_size,
+        const unsigned char *true_img_uchar,
+        const unsigned char *test_img_uchar,
+        unsigned char SizeMbSide, char Component_Type)
+{
     int pix_x, pix_y,blk_x,blk_y;
     int error = 0;
     int WidthSzInBlk  = x_size / SizeMbSide;
     int HeightSzInBlk = y_size / SizeMbSide;
 
-    for(blk_y = 0 ; blk_y < HeightSzInBlk ; blk_y++)
-    {
-        for(blk_x = 0 ; blk_x < WidthSzInBlk ; blk_x++)
-        {
+    for(blk_y = 0 ; blk_y < HeightSzInBlk ; blk_y++) {
+        for(blk_x = 0 ; blk_x < WidthSzInBlk ; blk_x++) {
             for (pix_y = 0; pix_y < SizeMbSide; pix_y++)
             {
                 for (pix_x = 0; pix_x < SizeMbSide; pix_x++)
@@ -88,8 +90,6 @@ static int compareYUV_compareComponent(const int x_size, const int y_size,
 
 void compareYUV_init()
 {
-    struct stat st;
-
     //Fix me!! Dirty but it's the only way for the moment.
     if (opt->yuv_file == NULL) {
         useCompare = 0;
@@ -102,8 +102,7 @@ void compareYUV_init()
         exit(-1);
     }
 
-    fstat(fileno(ptrFile), &st);
-    fileSize = st.st_size;
+    fileSize = fsize(ptrFile);
 
     compareErrors = 0;
 }

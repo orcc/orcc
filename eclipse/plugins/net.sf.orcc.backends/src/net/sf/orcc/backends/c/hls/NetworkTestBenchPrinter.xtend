@@ -89,12 +89,14 @@ import net.sf.orcc.util.OrccUtil
 		ap_ready : OUT STD_LOGIC;
 		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			«FOR port : instance.getActor.inputs»			
-				«IF instance.incomingPortMap.get(port).sourcePort == null»
-					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («instance.incomingPortMap.
-				get(port).fifoType.sizeInBits - 1» downto 0);
-					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
-					«instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    : OUT STD_LOGIC;
+			«FOR port : instance.getActor.inputs»
+				«val connection = instance.incomingPortMap.get(port)»
+				«IF connection != null»
+					«IF connection.sourcePort == null»
+						«connection.castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
+						«connection.castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
+						«connection.castfifoNameWrite»_V_read    : OUT STD_LOGIC;
+					«ENDIF»
 				«ENDIF»
 			«ENDFOR»
 			«FOR portout : instance.getActor.outputs.filter[! native]»
@@ -119,11 +121,14 @@ import net.sf.orcc.util.OrccUtil
 		signal ap_idle :  STD_LOGIC;
 		signal ap_ready :  STD_LOGIC;
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			«FOR port : instance.getActor.inputs»			
-				«IF instance.incomingPortMap.get(port).sourcePort == null»
-					signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («instance.incomingPortMap.get(port).fifoType.sizeInBits - 1» downto 0);
-					signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_empty_n :  STD_LOGIC;
-					signal «instance.incomingPortMap.get(port).castfifoNameWrite»_V_read    :  STD_LOGIC;
+			«FOR port : instance.getActor.inputs»
+				«val connection = instance.incomingPortMap.get(port)»
+				«IF connection != null»
+					«IF connection.sourcePort == null»
+						signal «connection.castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
+						signal «connection.castfifoNameWrite»_V_empty_n :  STD_LOGIC;
+						signal «connection.castfifoNameWrite»_V_read    :  STD_LOGIC;
+					«ENDIF»
 				«ENDIF»
 			«ENDFOR»
 			«FOR portout : instance.getActor.outputs.filter[! native]»
@@ -132,7 +137,7 @@ import net.sf.orcc.util.OrccUtil
 						signal «connection.castfifoNameRead»_V_din    : STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
 						signal «connection.castfifoNameRead»_V_full_n : STD_LOGIC;
 						signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
-					«ENDIF»				
+					«ENDIF»
 				«ENDFOR»
 			«ENDFOR»
 		«ENDFOR»
@@ -195,9 +200,12 @@ import net.sf.orcc.util.OrccUtil
 			variable line_number : line;
 			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 				«FOR port : instance.getActor.inputs»			
-					«IF instance.incomingPortMap.get(port).sourcePort == null»
-						variable count«instance.incomingPortMap.get(port).castfifoNameWrite»: integer:= 0;
-			   		«ENDIF»
+					«val connection = instance.incomingPortMap.get(port)»
+					«IF connection != null»
+						«IF connection.sourcePort == null»
+							variable count«connection.castfifoNameWrite»: integer:= 0;
+				   		«ENDIF»
+				   	«ENDIF»
 				«ENDFOR»
 			«ENDFOR»
 			
@@ -335,9 +343,12 @@ import net.sf.orcc.util.OrccUtil
 	'''
 	
 	def waveGenInputs(Instance instance) '''
-			«FOR port : instance.getActor.inputs»			
-			«IF instance.incomingPortMap.get(port).sourcePort == null»
-				«printInputWaveGen(instance.incomingPortMap.get(port).target as Instance ,instance.incomingPortMap.get(port))»
+		«FOR port : instance.getActor.inputs»
+			«val connection = instance.incomingPortMap.get(port)»
+			«IF connection != null»
+				«IF connection.sourcePort == null»
+					«printInputWaveGen(connection.target as Instance, connection)»
+				«ENDIF»
 			«ENDIF»
 		«ENDFOR»
 	'''

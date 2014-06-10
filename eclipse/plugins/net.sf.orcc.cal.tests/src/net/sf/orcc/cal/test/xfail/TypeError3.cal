@@ -1,8 +1,0 @@
-package net.sf.orcc.cal.test.xfail;
-
-actor TypeError3() ==> :
-
-	int(size=-42) x;
-
-end
-

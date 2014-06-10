@@ -30,13 +30,17 @@
 #define _ORCC_SCHEDULER_H_
 
 #include "orcc.h"
+
+#ifdef THREADS_ENABLE
 #include "thread.h"
+#endif
 
 #define MAX_ACTORS 1024
 
 struct global_scheduler_s {
     local_scheduler_t **schedulers;
     int nb_schedulers;
+    agent_t *agent;
 };
 
 struct local_scheduler_s {
@@ -58,9 +62,11 @@ struct local_scheduler_s {
     int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
     waiting_t **waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
 
-    /* Genetic algorithm */
-    sync_t *sync;
+    /* Mapping synchronization */
+    agent_t *agent;
+#ifdef THREADS_ENABLE
     orcc_semaphore_t sem_thread;
+#endif
 };
 
 struct waiting_s {
@@ -81,16 +87,18 @@ struct schedinfo_s {
 };
 
 
-global_scheduler_t *allocate_global_scheduler(int nb_schedulers, sync_t *sync);
+global_scheduler_t *allocate_global_scheduler(int nb_schedulers);
 
-void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, options_t *opt);
+void global_scheduler_init(global_scheduler_t *sched, mapping_t *mapping, agent_t *agent, options_t *opt);
 
-local_scheduler_t *allocate_local_scheduler(int id, int schedulers_nb, sync_t *sync);
+local_scheduler_t *allocate_local_scheduler(int id, int schedulers_nb);
 
 /**
  * Initialize the given scheduler.
  */
-void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, options_t *opt);
+void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **actors, agent_t *agent, options_t *opt);
+
+void sched_reinit(local_scheduler_t *sched, int num_actors, actor_t **actors);
 
 /**
  * Initialize the actors mapped to the given scheduler.

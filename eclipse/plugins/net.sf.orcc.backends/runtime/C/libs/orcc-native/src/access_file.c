@@ -31,9 +31,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 
 #include "orcc.h"
+#include "native_util.h"
 
 long openFile(char* filename) {
     FILE* fd = NULL;
@@ -58,9 +58,7 @@ int closeFile(long desc) {
 
 int sizeOfFile(long desc){
     FILE* fd = (FILE*) desc;
-    struct stat st; 
-    fstat(fileno(fd), &st); 
-    return st.st_size;
+    return fsize(fd);
 }
 
 unsigned char readByte(long desc){

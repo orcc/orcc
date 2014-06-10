@@ -32,6 +32,10 @@
 
 #include "orcc.h"
 
+#ifdef THREADS_ENABLE
+#include "thread.h"
+#endif
+
 /*
  * Mapping structure store the mapping result
  */
@@ -43,12 +47,14 @@ struct mapping_s {
 };
 
 struct agent_s {
-    sync_t *sync; /** Synchronization resources */
     options_t *options; /** Mapping options */
     global_scheduler_t *scheduler;
     network_t *network;
     mapping_t *mapping;
     int nb_threads;
+#ifdef THREADS_ENABLE
+    orcc_semaphore_t sem_agent;
+#endif
 };
 
 typedef struct proc_info_s {
@@ -64,7 +70,7 @@ void *agent_routine(void *data);
 /**
  * Initialize the given agent structure.
  */
-agent_t* agent_init(sync_t *sync, options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads);
+agent_t* agent_init(options_t *options, global_scheduler_t *scheduler, network_t *network, int nb_threads);
 
 int needMapping();
 void resetMapping();
