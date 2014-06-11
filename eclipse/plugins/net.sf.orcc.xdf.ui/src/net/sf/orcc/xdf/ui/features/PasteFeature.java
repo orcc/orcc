@@ -32,6 +32,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -40,6 +41,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IPasteContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.AbstractPasteFeature;
 
 /**
@@ -103,10 +105,37 @@ public class PasteFeature extends AbstractPasteFeature {
 	private void addToDiagram(final IPasteContext context,
 			final Diagram diagram, final EObject object) {
 		final AddContext ac = new AddContext();
-		// For simplicity paste all objects at the location given in the
-		// context (no stacking or similar)
-		ac.setLocation(context.getX(), context.getY());
+		// Set the location for the element to add in diagram
+		configureAddLocation(context, ac);
 		ac.setTargetContainer(diagram);
 		addGraphicalRepresentation(ac, object);
+	}
+
+	/**
+	 * Calculate the better position for the next added element. If nothing is
+	 * selected (or the diagram is the current selection), the position for the
+	 * next added element will be the mouse coordinates. If a port or an
+	 * instance is selected, the next position will be this element with 10px
+	 * added in both x and y coordinates.
+	 * 
+	 * @param pasteContext
+	 * @param[out] addContext
+	 */
+	private void configureAddLocation(final IPasteContext pasteContext,
+			final AddContext addContext) {
+
+		final PictogramElement[] selected = pasteContext.getPictogramElements();
+		if (selected != null && selected.length != 0) {
+			final PictogramElement element = selected[0];
+			if (PropsUtil.isInstance(element) || PropsUtil.isPort(element)) {
+				final int x = element.getGraphicsAlgorithm().getX() + 10;
+				final int y = element.getGraphicsAlgorithm().getY() + 10;
+				addContext.setLocation(x, y);
+				return;
+			}
+		}
+
+		// Fallback
+		addContext.setLocation(pasteContext.getX(), pasteContext.getY());
 	}
 }
