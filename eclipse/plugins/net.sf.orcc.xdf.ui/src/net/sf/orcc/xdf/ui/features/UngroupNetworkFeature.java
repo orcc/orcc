@@ -54,6 +54,7 @@ import net.sf.orcc.xdf.ui.util.XdfUtil;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IContext;
@@ -159,11 +160,11 @@ public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
 				addCtxt.setNewObject(subInstance);
 				addCtxt.setTargetContainer(getDiagram());
 				final PictogramElement pe = getFeatureProvider().addIfPossible(addCtxt);
-				if(pe != null) {
+				if (pe != null) {
 					peMap.put(subInstance, pe);
 				}
 
-				// Update subInstance argument variable use
+				// Update subInstance argument variable uses
 				for (Argument arg : subInstance.getArguments()) {
 					for (Iterator<EObject> it = arg.eAllContents(); it
 							.hasNext();) {
@@ -171,21 +172,38 @@ public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
 
 						if (childEObject instanceof ExprVar) {
 							final ExprVar exprVar = (ExprVar) childEObject;
-							final String varName = exprVar.getUse().getVariable().getName();
+							final String varName = exprVar.getUse()
+									.getVariable().getName();
 
-							Var theVar = thisNetwork.getVariable(varName);
-							if (theVar == null) {
-								theVar = thisNetwork.getParameter(varName);
-							}
-							if (theVar == null) {
-								OrccLogger
-										.severeln("Unable to retrieve the variable "
-												+ varName
-												+ " in the current network. Its is used in a "
-												+ instance.getName()
-												+ "'s argument");
+							Var theVar = subNetwork.getVariable(varName);
+							if (theVar != null) {
+								theVar = EcoreUtil.copy(theVar);
+								thisNetwork.getVariables().add(theVar);
 							} else {
+								theVar = subNetwork.getParameter(varName);
+								if (theVar != null) {
+									theVar = EcoreUtil.copy(theVar);
+									thisNetwork.getVariables().add(theVar);
+
+									final Argument argument = instance
+											.getArgument(varName);
+									if (argument.getValue() != null) {
+										theVar.setInitialValue(argument
+												.getValue());
+									}
+								}
+							}
+
+							if (theVar != null) {
 								exprVar.getUse().setVariable(theVar);
+							} else {
+								final StringBuilder msg = new StringBuilder()
+										.append("Unable to retrieve the variable ")
+										.append(varName)
+										.append(" in the current network. It is used in a ")
+										.append(instance.getName())
+										.append("'s argument");
+								OrccLogger.severeln(msg.toString());
 							}
 						}
 					}
