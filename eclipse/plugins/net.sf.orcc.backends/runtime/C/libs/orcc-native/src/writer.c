@@ -44,7 +44,6 @@ static int cnt = 0;
 static char stop = 0;
 
 void Writer_init() {
-    
     if (opt->write_file == NULL) {
         print_usage();
         fprintf(stderr, "No write file given!\n");
@@ -62,7 +61,7 @@ void Writer_init() {
         //wait_for_key();
         exit(1);
     }else{
-        fseek(F,0,SEEK_SET);    
+        fseek(F,0,SEEK_SET);
     }
 }
 
@@ -70,7 +69,7 @@ void Writer_write(u8 byte){
 
     fseek(F,sizeof(u8)*cnt,SEEK_SET);
     fwrite(&byte,sizeof(u8),1,F);
-    cnt++;    
+    cnt++;
 }
 
 void Writer_close(){

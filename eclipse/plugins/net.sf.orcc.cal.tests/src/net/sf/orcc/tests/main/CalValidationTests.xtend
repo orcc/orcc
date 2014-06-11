@@ -250,14 +250,14 @@ class CalValidationTests extends CalTestsHelper {
 		entity.typesValidation.assertError(ERROR_TYPE_SYNTAX,
 			"This size must evaluate to a compile-time constant greater than zero")
 	}
-	
+
 	@Test
 	def testWarningVariableUnused () {
 		val entity = '''
 			actor UnusedVariable() ==> :
 				int aStateVariable := 8;
 
-				action1: action ==> 
+				action1: action ==>
 				do
 					print("something");
 				end

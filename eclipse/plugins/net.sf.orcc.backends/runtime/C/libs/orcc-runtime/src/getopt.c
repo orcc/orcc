@@ -40,15 +40,15 @@ static char *rcsid = "$Id: getopt.c,v 1.2 1998/01/21 22:27:05 billm Exp $";
 #include <stdlib.h>
 #include <string.h>
 
-int    opterr = 1,        /* if error message should be printed */
-        optind = 1,        /* index into parent argv vector */
-        optopt,            /* character checked for validity */
-        optreset;        /* reset getopt */
-char*    optarg;            /* argument associated with option */
+int     opterr = 1,     /* if error message should be printed */
+        optind = 1,     /* index into parent argv vector */
+        optopt,         /* character checked for validity */
+        optreset;       /* reset getopt */
+char*   optarg;         /* argument associated with option */
 
-#define    BADCH        (int)'?'
-#define    BADARG    (int)':'
-#define    EMSG        ""
+#define    BADCH    (int)'?'
+#define    BADARG   (int)':'
+#define    EMSG     ""
 
 /*
  * getopt --

@@ -90,7 +90,7 @@ if(USE_SSE)
         src/hevc_mc_sse.c
     )
     list(APPEND orcc_native_headers include/hevc_sse.h)
-    
+
     if(OPENHEVC_FOUND)
         list(APPEND extra_definitions -DOPENHEVC_ENABLE)
         list(APPEND orcc_native_sources src/openhevc_sse.c)
