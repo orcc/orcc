@@ -40,7 +40,6 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IPasteContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.AbstractPasteFeature;
 
 /**
@@ -57,12 +56,6 @@ public class PasteFeature extends AbstractPasteFeature {
 
 	@Override
 	public boolean canPaste(IPasteContext context) {
-		// Only support pasting directly in the diagram (nothing else selected)
-		final PictogramElement[] pes = context.getPictogramElements();
-		if (pes.length != 1 || !(pes[0] instanceof Diagram)) {
-			return false;
-		}
-
 		// Can paste, if all objects on the clipboard are Instance or Port
 		final Object[] fromClipboard = getFromClipboard();
 		if (fromClipboard == null || fromClipboard.length == 0) {
@@ -79,11 +72,7 @@ public class PasteFeature extends AbstractPasteFeature {
 
 	@Override
 	public void paste(IPasteContext context) {
-		// We already verified, that we paste directly in the diagram
-		final PictogramElement[] pes = context.getPictogramElements();
-		final Diagram diagram = (Diagram) pes[0];
-
-		final Network network = (Network) getBusinessObjectForPictogramElement(diagram);
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
 
 		final Object[] objects = getFromClipboard();
 		for (final Object object : objects) {
@@ -100,13 +89,13 @@ public class PasteFeature extends AbstractPasteFeature {
 					OrccLogger.warnln("The port " + origPort.getName()
 							+ " can't be recognized as input or output");
 				}
-				addToDiagram(context, diagram, port);
+				addToDiagram(context, getDiagram(), port);
 			} else if (object instanceof Instance) {
 				final Instance instance = EcoreUtil.copy((Instance) object);
 				instance.setName(XdfUtil.uniqueVertexName(network,
 						instance.getName()));
 				network.add(instance);
-				addToDiagram(context, diagram, instance);
+				addToDiagram(context, getDiagram(), instance);
 			}
 		}
 	}
