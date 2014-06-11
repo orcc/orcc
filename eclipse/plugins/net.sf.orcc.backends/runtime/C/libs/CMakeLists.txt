@@ -17,7 +17,7 @@ endif()
 
 configure_file(config.h.in config.h)
 
-find_package(THREADS QUIET)
+find_package(Threads QUIET)
 if(THREADS_FOUND)
     list(APPEND extra_libraries ${CMAKE_THREAD_LIBS_INIT})
     list(APPEND extra_definitions -DTHREADS_ENABLE)
