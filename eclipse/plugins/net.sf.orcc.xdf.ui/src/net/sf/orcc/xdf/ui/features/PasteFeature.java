@@ -31,7 +31,6 @@ package net.sf.orcc.xdf.ui.features;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
@@ -83,20 +82,11 @@ public class PasteFeature extends AbstractPasteFeature {
 				final Port origPort = (Port) object;
 				final Port port = EcoreUtil.copy(origPort);
 				port.setName(XdfUtil.uniqueVertexName(network, port.getName()));
-				if (XdfUtil.isInputNetworkPort(origPort)) {
-					network.addInput(port);
-				} else if (XdfUtil.isOutputNetworkPort(origPort)) {
-					network.addOutput(port);
-				} else {
-					OrccLogger.warnln("The port " + origPort.getName()
-							+ " can't be recognized as input or output");
-				}
 				addToDiagram(context, getDiagram(), port);
 			} else if (object instanceof Instance) {
 				final Instance instance = EcoreUtil.copy((Instance) object);
 				instance.setName(XdfUtil.uniqueVertexName(network,
 						instance.getName()));
-				network.add(instance);
 				addToDiagram(context, getDiagram(), instance);
 			}
 		}
