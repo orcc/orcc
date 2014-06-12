@@ -238,7 +238,6 @@ public class StyleUtil {
 		if (style == null) { // style not found - create new style
 			style = gaService.createPlainStyle(diagram, styleId);
 			style.setFilled(false);
-			style.setAngle(0);
 			style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 			style.setForeground(gaService.manageColor(diagram, INSTANCE_FOREGROUND));
