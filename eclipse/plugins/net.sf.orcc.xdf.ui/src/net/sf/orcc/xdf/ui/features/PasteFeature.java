@@ -30,6 +30,7 @@ package net.sf.orcc.xdf.ui.features;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Instance;
@@ -88,71 +89,15 @@ public class PasteFeature extends AbstractPasteFeature {
 
 		for (final Object object : objects) {
 
-			final HashSet<Argument> argumentsToDelete = new HashSet<Argument>();
-
+			final Set<Argument> argumentsToDelete = new HashSet<Argument>();
 			if (object instanceof Port) {
 				final Port origPort = (Port) object;
 				final Port port = EcoreUtil.copy(origPort);
 				port.setName(XdfUtil.uniqueVertexName(network, port.getName()));
 				addToDiagram(context, getDiagram(), port);
 			} else if (object instanceof Instance) {
-
-				// We use a Copier instance here, to keep track of mapping
-				// between original object and its copy
-				final Copier copier = new Copier();
-
-				// Get a copy of the instance
-				final Instance origInstance = (Instance) object;
-				final Instance copyInstance = (Instance) copier
-						.copy(origInstance);
-				// Also copy references
-				copier.copyReferences();
-
-				// Update the name of the new instance, ensuring it is unique
-				copyInstance.setName(XdfUtil.uniqueVertexName(network,
-						origInstance.getName()));
-				// Add the new instance to the diagram (really paste the object)
-				addToDiagram(context, getDiagram(), copyInstance);
-
-				// Update each argument, according to variables declared in the
-				// target diagram
-				// Firstly, we loop over arguments in the original instance
-				for (final Argument arg : origInstance.getArguments()) {
-					// Get the uses objects in each argument value
-					for (final Iterator<EObject> it = arg.eAllContents(); it
-							.hasNext();) {
-						final EObject content = it.next();
-						if (content instanceof Use) {
-							// The original Use (valid)
-							final Use use = (Use) content;
-							// The copied one (probably invalid, referencing a
-							// variable not visible in the new context)
-							final Use copyUse = (Use) copier.get(use);
-							if (copyUse.getVariable() == null) {
-								final String varName = use.getVariable()
-										.getName();
-								// Try to find an existing variable / parameter
-								// in the target network
-								Var theVar = network.getVariable(varName);
-								if (theVar == null) {
-									theVar = network.getParameter(varName);
-								}
-
-								// Not found, the arg must be deleted from
-								// pasted instance
-								if (theVar == null) {
-									argumentsToDelete.add(EcoreHelper
-											.getContainerOfType(copyUse,
-													Argument.class));
-								}
-								// Found, pasted instance argument is updated
-								else {
-									copyUse.setVariable(theVar);
-								}
-							}
-						}
-					}
-				}
+				pasteInstance((Instance) object, network, context,
+						argumentsToDelete);
 			}
 
 			if (!argumentsToDelete.isEmpty()) {
@@ -207,5 +152,71 @@ public class PasteFeature extends AbstractPasteFeature {
 
 		// Fallback
 		addContext.setLocation(pasteContext.getX(), pasteContext.getY());
+	}
+
+	/**
+	 * Specific method to paste an instance copied from the same or another
+	 * network to the given targetNetwork
+	 * 
+	 * @param origInstance
+	 * @param targetNetwork
+	 * @param context
+	 * @param argumentsToDelete
+	 */
+	private void pasteInstance(final Instance origInstance,
+			final Network targetNetwork, final IPasteContext context,
+			final Set<Argument> argumentsToDelete) {
+		// We use a Copier instance here, to keep track of mapping
+		// between original object and its copy
+		final Copier copier = new Copier();
+
+		// Get a copy of the instance
+		final Instance copyInstance = (Instance) copier.copy(origInstance);
+		// Also copy references
+		copier.copyReferences();
+
+		// Update the name of the new instance, ensuring it is unique
+		copyInstance.setName(XdfUtil.uniqueVertexName(targetNetwork,
+				origInstance.getName()));
+		// Add the new instance to the diagram (really paste the object)
+		addToDiagram(context, getDiagram(), copyInstance);
+
+		// Update each argument, according to variables declared in the
+		// target diagram
+		// Firstly, we loop over arguments in the original instance
+		for (final Argument arg : origInstance.getArguments()) {
+			// Get the uses objects in each argument value
+			for (final Iterator<EObject> it = arg.eAllContents(); it.hasNext();) {
+				final EObject content = it.next();
+				if (content instanceof Use) {
+					// The original Use (valid)
+					final Use use = (Use) content;
+					// The copied one (probably invalid, referencing a
+					// variable not visible in the new context)
+					final Use copyUse = (Use) copier.get(use);
+					if (copyUse.getVariable() == null) {
+						final String varName = use.getVariable().getName();
+						// Try to find an existing variable / parameter
+						// in the target network
+						Var theVar = targetNetwork.getVariable(varName);
+						if (theVar == null) {
+							theVar = targetNetwork.getParameter(varName);
+						}
+
+						// Not found, the arg must be deleted from
+						// pasted instance
+						if (theVar == null) {
+							argumentsToDelete
+									.add(EcoreHelper.getContainerOfType(
+											copyUse, Argument.class));
+						}
+						// Found, pasted instance argument is updated
+						else {
+							copyUse.setVariable(theVar);
+						}
+					}
+				}
+			}
+		}
 	}
 }
