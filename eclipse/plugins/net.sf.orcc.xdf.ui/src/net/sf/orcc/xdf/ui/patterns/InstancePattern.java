@@ -243,9 +243,10 @@ public class InstancePattern extends AbstractPattern {
 
 	@Override
 	public Object[] create(ICreateContext context) {
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+
 		final Instance newInstance = DfFactory.eINSTANCE.createInstance();
-		final int objectCpt = context.getTargetContainer().getChildren().size() + 1;
-		newInstance.setName("instance_" + objectCpt);
+		newInstance.setName(XdfUtil.uniqueVertexName(network, "instance"));
 
 		// Request adding the shape to the diagram
 		addGraphicalRepresentation(context, newInstance);

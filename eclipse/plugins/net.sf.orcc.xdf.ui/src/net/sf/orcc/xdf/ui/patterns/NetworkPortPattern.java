@@ -209,16 +209,17 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 
 	@Override
 	public Object[] create(ICreateContext context) {
+		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
+
 		// Create the Port instance
 		final Port newPort = DfFactory.eINSTANCE.createPort();
-		final int objectCpt = context.getTargetContainer().getChildren().size() + 1;
-		newPort.setName("port_" + objectCpt);
+		newPort.setName(XdfUtil.uniqueVertexName(network, "port"));
 
 		// Set default type to i32 for the port
 		newPort.setType(IrFactory.eINSTANCE.createTypeInt());
 
 		// Add the newly created port to the network
-		addPortToNetwork(newPort, (Network) getBusinessObjectForPictogramElement(getDiagram()));
+		addPortToNetwork(newPort, network);
 
 		addGraphicalRepresentation(context, newPort);
 
