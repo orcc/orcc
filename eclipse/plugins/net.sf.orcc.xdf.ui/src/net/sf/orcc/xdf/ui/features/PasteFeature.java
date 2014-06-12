@@ -28,20 +28,29 @@
  */
 package net.sf.orcc.xdf.ui.features;
 
+import java.util.HashSet;
+import java.util.Iterator;
+
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.util.EcoreHelper;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IPasteContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.AbstractPasteFeature;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
  * Implements the ability to paste previously copied/cut objects into diagram.
@@ -76,7 +85,10 @@ public class PasteFeature extends AbstractPasteFeature {
 		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
 
 		final Object[] objects = getFromClipboard();
+
 		for (final Object object : objects) {
+
+			final HashSet<Argument> argumentsToDelete = new HashSet<Argument>();
 
 			if (object instanceof Port) {
 				final Port origPort = (Port) object;
@@ -84,10 +96,76 @@ public class PasteFeature extends AbstractPasteFeature {
 				port.setName(XdfUtil.uniqueVertexName(network, port.getName()));
 				addToDiagram(context, getDiagram(), port);
 			} else if (object instanceof Instance) {
-				final Instance instance = EcoreUtil.copy((Instance) object);
-				instance.setName(XdfUtil.uniqueVertexName(network,
-						instance.getName()));
-				addToDiagram(context, getDiagram(), instance);
+
+				// We use a Copier instance here, to keep track of mapping
+				// between original object and its copy
+				final Copier copier = new Copier();
+
+				// Get a copy of the instance
+				final Instance origInstance = (Instance) object;
+				final Instance copyInstance = (Instance) copier
+						.copy(origInstance);
+				// Also copy references
+				copier.copyReferences();
+
+				// Update the name of the new instance, ensuring it is unique
+				copyInstance.setName(XdfUtil.uniqueVertexName(network,
+						origInstance.getName()));
+				// Add the new instance to the diagram (really paste the object)
+				addToDiagram(context, getDiagram(), copyInstance);
+
+				// Update each argument, according to variables declared in the
+				// target diagram
+				// Firstly, we loop over arguments in the original instance
+				for (final Argument arg : origInstance.getArguments()) {
+					// Get the uses objects in each argument value
+					for (final Iterator<EObject> it = arg.eAllContents(); it
+							.hasNext();) {
+						final EObject content = it.next();
+						if (content instanceof Use) {
+							// The original Use (valid)
+							final Use use = (Use) content;
+							// The copied one (probably invalid, referencing a
+							// variable not visible in the new context)
+							final Use copyUse = (Use) copier.get(use);
+							if (copyUse.getVariable() == null) {
+								final String varName = use.getVariable()
+										.getName();
+								// Try to find an existing variable / parameter
+								// in the target network
+								Var theVar = network.getVariable(varName);
+								if (theVar == null) {
+									theVar = network.getParameter(varName);
+								}
+
+								// Not found, the arg must be deleted from
+								// pasted instance
+								if (theVar == null) {
+									argumentsToDelete.add(EcoreHelper
+											.getContainerOfType(copyUse,
+													Argument.class));
+								}
+								// Found, pasted instance argument is updated
+								else {
+									copyUse.setVariable(theVar);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (!argumentsToDelete.isEmpty()) {
+				for (Argument arg : argumentsToDelete) {
+					EcoreUtil.delete(arg);
+				}
+
+				MessageDialog.openInformation(XdfUtil.getDefaultShell(),
+						"Arguments deleted", argumentsToDelete.size()
+								+ " instances' arguments were referencing "
+								+ "variables unknown in the target context. "
+								+ "They have been deleted.");
+				argumentsToDelete.clear();
 			}
 		}
 	}
@@ -102,14 +180,16 @@ public class PasteFeature extends AbstractPasteFeature {
 	}
 
 	/**
-	 * Calculate the better position for the next added element. If nothing is
+	 * Calculate the best position for the next added element. If nothing is
 	 * selected (or the diagram is the current selection), the position for the
 	 * next added element will be the mouse coordinates. If a port or an
 	 * instance is selected, the next position will be this element with 10px
 	 * added in both x and y coordinates.
 	 * 
 	 * @param pasteContext
-	 * @param[out] addContext
+	 *            The paste context
+	 * @param addContext
+	 *            [out] The add context to update with a new location
 	 */
 	private void configureAddLocation(final IPasteContext pasteContext,
 			final AddContext addContext) {
