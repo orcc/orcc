@@ -155,24 +155,6 @@ void add_8_16_clip_256_32x32_orcc(
     u8 Sample[256],
     u16 idxBlkStride);
 
-void addClip_orcc(
-    u16 blkAddr[2],
-    u16 blkAddrChr[2],
-    u16 blkAddrRes[2],
-    u16 blkAddrResChr[2],
-    u32 intraIdx,
-    u32 idxRes,
-    u8 dbfIdx,
-    u8 numBlkSide,
-    i16 puAddr[2],
-    i16 puAddrChr[2],
-    u16 tuAddr[2],
-    u16 tuAddrChr[2],
-    u8 dbfPict[2][3][4096][2048],
-    u8 lumaPred[1024][64][64],
-    u8 chromaPred[1024][2][32][32],
-    i16 residual[8192][6144]);
-
 /*************************/
 /* DecodingPictureBuffer */
 /*************************/
@@ -485,3 +467,40 @@ void (* hevc_h_loop_filter_chroma_c)(
 
 void (* hevc_v_loop_filter_chroma_c)(
   uint8_t *_pix, ptrdiff_t _stride, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
+
+/* DBF - GenerateBS */
+
+#if HAVE_SSE4
+
+/* 32 bit motion vectors */
+
+void boundaryStrength_mv32_orcc(
+  u8 bS[1],
+  i32 * mvP0,
+  i32 * mvQ0,
+  i16 * refPocP0,
+  i16 * refPocQ0);
+
+void boundaryStrength0_mv32_orcc(
+  u8 bS[1],
+  i32 * mvP0,
+  i32 * mvQ0);
+
+void boundaryStrength1_mv32_orcc(
+  u8 bS[1],
+  i32 * mvP0,
+  i32 * mvQ0);
+
+void boundaryStrength2_mv32_orcc(
+  u8 bS[1],
+  i32 * mvP0,
+  i32 * mvQ0);
+
+void boundaryStrength3_mv32_orcc(
+  u8 * bS,
+  u8 predModeP0,
+  u8 predModeQ0,
+  i32 * mvP0,
+  i32 * mvQ0);
+
+#endif // HAVE_SSE4

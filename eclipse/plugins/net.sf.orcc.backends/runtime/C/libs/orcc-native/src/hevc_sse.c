@@ -211,146 +211,127 @@ static i32 clip_i32(i32 Value, i32 minVal, i32 maxVal) {
     return tmp_if;
 }
 
-// For shared_memory
-void addClip_orcc(
-  u16 blkAddr[2],
-  u16 blkAddrChr[2],
-  u16 blkAddrRes[2],
-  u16 blkAddrResChr[2],
-  u32 intraIdx,
-  u32 idxRes,
-  u8 dbfIdx,
-  u8 numBlkSide,
-  i16 puAddr[2],
-  i16 puAddrChr[2],
-  u16 tuAddr[2],
-  u16 tuAddrChr[2],
-  u8 dbfPict[2][3][4096][2048],
-  u8 lumaPred[1024][64][64],
-  u8 chromaPred[1024][2][32][32],
-  i16 residual[8192][6144])
+/* DBF - GenerateBS */
+
+#if HAVE_SSE4
+
+/* 32 bit motion vectors */
+
+void boundaryStrength_mv32_orcc(
+  u8 bS[1],
+  i32 * mvP0,
+  i32 * mvQ0,
+  i16 * refPocP0,
+  i16 * refPocQ0)
 {
-  u32 xOffDbf = puAddr[0] + blkAddr[0];
-  u32 yOffDbf = puAddr[1] + blkAddr[1];
-  u32 xOffLumaPred = tuAddr[0] + blkAddr[0];
-  u32 yOffLumaPred = tuAddr[1] + blkAddr[1];
-  u32 offRes = blkAddrRes[0] * 64 + blkAddrRes[1];
+	__m128i x0, x1, x2;
 
-  u32 xOffChrDbf = puAddrChr[0] + blkAddrChr[0];
-  u32 yOffChrDbf = puAddrChr[1] + blkAddrChr[1];
-  u32 xOffChrLumaPred = tuAddrChr[0] + blkAddrChr[0];
-  u32 yOffChrLumaPred = tuAddrChr[1] + blkAddrChr[1];
-  u32 offChrRes[3];
-  int x, y;
-  u32 compIdx = 0;
-
-  offChrRes[0] = 0;
-  offChrRes[1] = 64*64 + blkAddrResChr[0] * 32 + blkAddrResChr[1];
-  offChrRes[2] = 64*64 + 32*32 + blkAddrResChr[0] * 32 + blkAddrResChr[1];
-
-  switch (numBlkSide)
-  {
-    case 1:
-    {
-      for (x = 0; x < 4 * 1; x++)
-      {
-        for (y = 0; y < 4 * 1; y++)
-        {
-          dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + y] =
-            clip_i32(lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred + y] +
-            residual[idxRes][offRes + x * 64 + y], 0, 255);
-        }
-      }
-      for (compIdx = 1; compIdx <= 2; compIdx++)
-      {
-        for (x = 0; x < 2 * 1; x++)
-        {
-          for (y = 0; y < 2 * 1; y++)
-          {
-            dbfPict[dbfIdx][compIdx][xOffChrDbf + x][yOffChrDbf + y] =
-              clip_i32(chromaPred[intraIdx][compIdx-1][xOffChrLumaPred + x]
-                [yOffChrLumaPred + y] + residual[idxRes][offChrRes[compIdx] +
-                x * 32 + y], 0, 255);
-          }
-        }
-      }
-      break;
-    }
-    case 2:
-      {
-        for (x = 0; x < 4 * 2; x++)
-        {
-          add_8_16_clip_8_64x64_orcc(
-            &lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred],
-            &residual[idxRes][offRes + x * 64 + 0],
-            &dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + 0],
-            0);
-        }
-        for (compIdx = 1; compIdx <= 2; compIdx++)
-        {
-          for (x = 0; x < 2 * 2; x++)
-          {
-            for (y = 0; y < 2 * 2; y++)
-            {
-              dbfPict[dbfIdx][compIdx][xOffChrDbf + x][yOffChrDbf + y] =
-                clip_i32(chromaPred[intraIdx][compIdx-1][xOffChrLumaPred + x]
-                  [yOffChrLumaPred + y] + residual[idxRes][offChrRes[compIdx] +
-                  x * 32 + y], 0, 255);
-            }
-          }
-        }
-        break;
-      }
-    case 4:
-      {
-        for (x = 0; x < 4 * 4; x++)
-        {
-          add_8_16_clip_16_64x64_orcc(
-            &lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred],
-            &residual[idxRes][offRes + x * 64 + 0],
-            &dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + 0],
-            0);
-        }
-        for (compIdx = 1; compIdx <= 2; compIdx++)
-        {
-          for (x = 0; x < 2 * 4; x++)
-          {
-            add_8_16_clip_8_64x64_orcc(
-              &chromaPred[intraIdx][compIdx - 1][xOffChrLumaPred + x][yOffChrLumaPred],
-              &residual[idxRes][offChrRes[compIdx] + x * 32 + 0],
-              &dbfPict[dbfIdx][compIdx][xOffChrDbf + x][yOffChrDbf + 0],
-              0);
-          }
-        }
-        break;
-      }
-    case 8:
-      {
-        for (x = 0; x < 4 * 8; x++)
-        {
-          add_8_16_clip_32_64x64_orcc(
-            &lumaPred[intraIdx][xOffLumaPred + x][yOffLumaPred],
-            &residual[idxRes][offRes + x * 64 + 0],
-            &dbfPict[dbfIdx][0][xOffDbf + x][yOffDbf + 0],
-            0);
-        }
-        for (compIdx = 1; compIdx <= 2; compIdx++)
-        {
-          for (x = 0; x < 2 * 8; x++)
-          {
-            add_8_16_clip_16_64x64_orcc(
-              &chromaPred[intraIdx][compIdx - 1][xOffChrLumaPred + x][yOffChrLumaPred],
-              &residual[idxRes][offChrRes[compIdx] + x * 32 + 0],
-              &dbfPict[dbfIdx][compIdx][xOffChrDbf + x][yOffChrDbf + 0],
-              0);
-          }
-        }
-        break;
-      }
-    default:
-      break;
-  }
+   if (refPocQ0[0] == refPocP0[0] &&
+     refPocQ0[0] == refPocQ0[1] &&
+     refPocP0[0] == refPocP0[1]) {
+	 x0 = _mm_loadu_si128((__m128i *) mvP0);
+	 x1 = _mm_loadu_si128((__m128i *) mvQ0);
+	 x2 = _mm_shuffle_epi32(x0, 0x4E);
+	 x0 = _mm_sub_epi32(x0, x1);
+	 x2 = _mm_sub_epi32(x2, x1);
+	 x1 = _mm_set1_epi32(4);
+	 x0 = _mm_abs_epi32(x0);
+	 x2 = _mm_abs_epi32(x2);
+	 x0 = _mm_cmplt_epi32(x0, x1);
+	 x2 = _mm_cmplt_epi32(x2, x1);
+	 bS[0] = !(_mm_test_all_ones(x0) || _mm_test_all_ones(x2));
+   } else if (refPocP0[0] == refPocQ0[0] &&
+     refPocP0[1] == refPocQ0[1]) {
+	 x0 = _mm_loadu_si128((__m128i *) mvP0);
+	 x1 = _mm_loadu_si128((__m128i *) mvQ0);
+	 x0 = _mm_sub_epi32(x0, x1);
+	 x1 = _mm_set1_epi32(4);
+	 x0 = _mm_abs_epi32(x0);
+	 x0 = _mm_cmplt_epi32(x0, x1);
+	 bS[0] = !(_mm_test_all_ones(x0));
+   } else if (refPocP0[1] == refPocQ0[0] &&
+     refPocP0[0] == refPocQ0[1]) {
+	 x0 = _mm_loadu_si128((__m128i *) mvP0);
+	 x1 = _mm_loadu_si128((__m128i *) mvQ0);
+	 x2 = _mm_shuffle_epi32(x0, 0x4E);
+	 x2 = _mm_sub_epi32(x2, x1);
+	 x1 = _mm_set1_epi32(4);
+	 x2 = _mm_abs_epi32(x2);
+	 x2 = _mm_cmplt_epi32(x2, x1);
+	 bS[0] = !(_mm_test_all_ones(x2));
+   } else {
+     bS[0] = 1;
+   }
 }
+
+void boundaryStrength0_mv32_orcc(
+  u8 bS[1],
+  i32 * mvP0,
+  i32 * mvQ0)
+{
+   __m128i x0, x1, x2;
+   x0 = _mm_loadu_si128((__m128i *) mvP0);
+   x1 = _mm_loadu_si128((__m128i *) mvQ0);
+   x2 = _mm_shuffle_epi32(x0, 0x4E);
+   x0 = _mm_sub_epi32(x0, x1);
+   x2 = _mm_sub_epi32(x2, x1);
+   x1 = _mm_set1_epi32(4);
+   x0 = _mm_abs_epi32(x0);
+   x2 = _mm_abs_epi32(x2);
+   x0 = _mm_cmplt_epi32(x0, x1);
+   x2 = _mm_cmplt_epi32(x2, x1);
+   bS[0] = !(_mm_test_all_ones(x0) || _mm_test_all_ones(x2));
+}
+
+void boundaryStrength1_mv32_orcc(
+  u8 bS[1],
+  i32 * mvP0,
+  i32 * mvQ0)
+{
+   __m128i x0, x1;
+   x0 = _mm_loadu_si128((__m128i *) mvP0);
+   x1 = _mm_loadu_si128((__m128i *) mvQ0);
+   x0 = _mm_sub_epi32(x0, x1);
+   x1 = _mm_set1_epi32(4);
+   x0 = _mm_abs_epi32(x0);
+   x0 = _mm_cmplt_epi32(x0, x1);
+   bS[0] = !(_mm_test_all_ones(x0));
+}
+
+void boundaryStrength2_mv32_orcc(
+  u8 bS[1],
+  i32 * mvP0,
+  i32 * mvQ0)
+{
+   __m128i x0, x1, x2;
+   x0 = _mm_loadu_si128((__m128i *) mvP0);
+   x1 = _mm_loadu_si128((__m128i *) mvQ0);
+   x2 = _mm_shuffle_epi32(x0, 0x4E);
+   x2 = _mm_sub_epi32(x2, x1);
+   x1 = _mm_set1_epi32(4);
+   x2 = _mm_abs_epi32(x2);
+   x2 = _mm_cmplt_epi32(x2, x1);
+   bS[0] = !(_mm_test_all_ones(x2));
+}
+
+void boundaryStrength3_mv32_orcc(
+  u8 * bS,
+  u8 predModeP0,
+  u8 predModeQ0,
+  i32 * mvP0,
+  i32 * mvQ0)
+{
+  __m128i x0, x1;
+    x0 = _mm_loadl_epi64((__m128i *) &mvP0[predModeP0 << 1]);
+    x1 = _mm_loadl_epi64((__m128i *) &mvQ0[predModeQ0 << 1]);
+	x0 = _mm_sub_epi32(x0, x1);
+	x1 = _mm_set1_epi32(4);
+	x0 = _mm_abs_epi32(x0);
+	x0 = _mm_cmplt_epi32(x0, x1);
+	bS[0] = !(_mm_test_all_ones(x0));
+}
+
+#endif // HAVE_SSE4
 
 /* DECODING PICTURE BUFFER */
 
