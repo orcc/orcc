@@ -14,19 +14,24 @@ if [ ! -e $path ] || [ ! -d $path ]; then
   exit 1
 fi
 
-find ${ORCCDIR} -name "*.java" -exec "fromdos" {} ";"
-find ${ORCCDIR} -name "*.xtend" -exec "fromdos" {} ";"
-find ${ORCCDIR} -name "*.ecore" -exec "fromdos" {} ";"
-find ${ORCCDIR} -name "*.genmodel" -exec "fromdos" {} ";"
+find ${path} -name "*.java" -exec "fromdos" {} ";"
+find ${path} -name "*.xtend" -exec "fromdos" {} ";"
+find ${path} -name "*.ecore" -exec "fromdos" {} ";"
+find ${path} -name "*.genmodel" -exec "fromdos" {} ";"
 
-find ${ORCCDIR} -name "*.xml" -exec "fromdos" {} ";"
-find ${ORCCDIR} -name "*.xslt" -exec "fromdos" {} ";"
-find ${ORCCDIR} -name "*.exsd" -exec "fromdos" {} ";"
+find ${path} -name "*.xml" -exec "fromdos" {} ";"
+find ${path} -name "*.xslt" -exec "fromdos" {} ";"
+find ${path} -name "*.exsd" -exec "fromdos" {} ";"
 
-find ${ORCCDIR} -name ".classpath" -exec "fromdos" {} ";"
-find ${ORCCDIR} -name ".project" -exec "fromdos" {} ";"
+find ${path} -name ".classpath" -exec "fromdos" {} ";"
+find ${path} -name ".project" -exec "fromdos" {} ";"
 
-find ${ORCCDIR} -name "CMakeLists.txt" -exec "fromdos" {} ";"
-find ${ORCCDIR} -name "*.c" -exec "fromdos" {} ";"
-find ${ORCCDIR} -name "*.cpp" -exec "fromdos" {} ";"
-find ${ORCCDIR} -name "*.h" -exec "fromdos" {} ";"
+find ${path} -name "CMakeLists.txt" -exec "fromdos" {} ";"
+find ${path} -name "*.c" -exec "fromdos" {} ";"
+find ${path} -name "*.cpp" -exec "fromdos" {} ";"
+find ${path} -name "*.h" -exec "fromdos" {} ";"
+
+find ${path} -name "*.cal" -exec "fromdos" {} ";"
+find ${path} -name "*.xdf" -exec "fromdos" {} ";"
+find ${path} -name "*.xdfdiag" -exec "fromdos" {} ";"
+find ${path} -name "*.layout" -exec "fromdos" {} ";"
