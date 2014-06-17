@@ -1,3 +1,0 @@
-General options > max_message_size: 0 Kb
-Digest options > digestable: No
-Privacy options... > Sender filters > generic_nonmember_action: Accept
