@@ -96,7 +96,7 @@ class InstancePrinter extends LLVMTemplate {
 	protected var optionDatalayout = BackendsConstants::LLVM_DEFAULT_TARGET_DATALAYOUT
 	protected var optionArch = BackendsConstants::LLVM_DEFAULT_TARGET_TRIPLE
 
-	protected var boolean isActionVectorizable = false
+	protected var boolean isActionAligned = false
 
 	/**
 	 * Default constructor, do not activate profile option
@@ -378,15 +378,15 @@ class InstancePrinter extends LLVMTemplate {
 
 			bb_«extName»_fire:
 			«IF action.hasAttribute(ALIGNED_ALWAYS)»
-					call void @«action.body.name»_vectorizable()
+					call void @«action.body.name»_aligned()
 			«ELSEIF action.hasAttribute(ALIGNABLE)»
-				«action.printVectorizationConditions(state)»
+				«action.printAlignmentConditions(state)»
 
-				bb_«extName»_fire_vectorizable:
-					call void @«action.body.name»_vectorizable()
+				bb_«extName»_fire_aligned:
+					call void @«action.body.name»_aligned()
 					br label %bb_«extName»_fire_ret
 
-				bb_«extName»_fire_notvectorizable:
+				bb_«extName»_fire_aligned:
 					call void @«action.body.name»()
 					br label %bb_«extName»_fire_ret
 
@@ -426,7 +426,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	'''
 
-	def protected printVectorizationConditions(Action action, State state) '''
+	def protected printAlignmentConditions(Action action, State state) '''
 		«val stateName = if(state != null) '''«state.name»_''' else ""»
 		«val actionName = if(state != null) '''«state.name»_«action.name»''' else '''«action.name»'''»
 		«val portToIndexMap = portToIndexByPatternMap.get(action.inputPattern)»
@@ -434,13 +434,13 @@ class InstancePrinter extends LLVMTemplate {
 		«FOR port : action.inputPattern.ports»
 			«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
 				«val extName = port.name + "_" + stateName + action.name + "_" + portToIndexMap.get(port)»
-					%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
-					%tmp_vect2_«extName» = add i32 %index_«extName», «action.inputPattern.numTokensMap.get(port)»
-					%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
-					%is_vectorizable_«extName» = icmp slt i32 %tmp_vect1_«extName», %tmp_vect3_«extName»
-					br i1 %is_vectorizable_«extName», label %next_vectorizable_«extName», label %bb_«actionName»_fire_notvectorizable
+					%tmp_align1_«extName» = urem i32 %index_«extName», %size_«extName»
+					%tmp_align2_«extName» = add i32 %index_«extName», «action.inputPattern.numTokensMap.get(port)»
+					%tmp_align3_«extName» = urem i32 %tmp_align2_«extName», %size_«extName»
+					%is_aligned_«extName» = icmp slt i32 %tmp_align1_«extName», %tmp_align3_«extName»
+					br i1 %is_aligned_«extName», label %next_aligned_«extName», label %bb_«actionName»_fire_notaligned
 
-				next_vectorizable_«extName»:
+				next_aligned_«extName»:
 			«ENDIF»
 		«ENDFOR»
 		«FOR connection : connections»
@@ -450,16 +450,16 @@ class InstancePrinter extends LLVMTemplate {
 			«val numTokens = action.outputPattern.numTokensMap.get(port)»
 			«IF port.hasAttribute(action.name + "_" + ALIGNABLE) && !port.hasAttribute(ALIGNED_ALWAYS)»
 			
-				%tmp_vect1_«extName» = urem i32 %index_«extName», %size_«extName»
-				%tmp_vect2_«extName» = add i32 %index_«extName», «numTokens»
-				%tmp_vect3_«extName» = urem i32 %tmp_vect2_«extName», %size_«extName»
-				%is_vectorizable_«extName» = icmp slt i32 %tmp_vect1_«extName», %tmp_vect3_«extName»
-				br i1 %is_vectorizable_«extName», label %next_vectorizable_«extName», label %bb_«actionName»_fire_notvectorizable
+				%tmp_align1_«extName» = urem i32 %index_«extName», %size_«extName»
+				%tmp_align2_«extName» = add i32 %index_«extName», «numTokens»
+				%tmp_align3_«extName» = urem i32 %tmp_align2_«extName», %size_«extName»
+				%is_aligned_«extName» = icmp slt i32 %tmp_align1_«extName», %tmp_align3_«extName»
+				br i1 %is_aligned_«extName», label %next_aligned_«extName», label %bb_«actionName»_fire_notaligned
 
-			next_vectorizable_«extName»:
+			next_aligned_«extName»:
 			«ENDIF»
 		«ENDFOR»
-			br label %bb_«actionName»_fire_vectorizable
+			br label %bb_«actionName»_fire_aligned
 	'''
 
 	def private printActionLoop(EList<Action> actions, boolean outsideFSM) '''
@@ -499,15 +499,15 @@ class InstancePrinter extends LLVMTemplate {
 
 			bb_«name»_fire:
 			«IF action.hasAttribute(ALIGNED_ALWAYS)»
-					call void @«action.body.name»_vectorizable()
+					call void @«action.body.name»_aligned()
 			«ELSEIF action.hasAttribute(ALIGNABLE)»
-				«action.printVectorizationConditions(null)»
+				«action.printAlignmentConditions(null)»
 
-				bb_«name»_fire_vectorizable:
-					call void @«action.body.name»_vectorizable()
+				bb_«name»_fire_aligned:
+					call void @«action.body.name»_aligned()
 					br label %bb_«name»_fire_ret
 
-				bb_«name»_fire_notvectorizable:
+				bb_«name»_fire_notaligned:
 					call void @«action.body.name»()
 					br label %bb_«name»_fire_ret
 
@@ -607,14 +607,14 @@ class InstancePrinter extends LLVMTemplate {
 		«ENDFOR»
 	'''
 
-	def protected printVectorizable(Action action) {
-		isActionVectorizable = action.hasAttribute(ALIGNABLE)
+	def protected printAligned(Action action) {
+		isActionAligned = action.hasAttribute(ALIGNABLE)
 		val output = '''
 		«val inputPattern = action.inputPattern»
 		«val outputPattern = action.outputPattern»
-		«IF isActionVectorizable»
+		«IF isActionAligned»
 
-		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionInline»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»_aligned() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
@@ -644,7 +644,7 @@ class InstancePrinter extends LLVMTemplate {
 		}
 		«ENDIF»
 		'''
-		isActionVectorizable = false
+		isActionAligned = false
 		return output
 	}
 
@@ -696,12 +696,12 @@ class InstancePrinter extends LLVMTemplate {
 				ret void
 			}
 		«ENDIF»
-		«action.printVectorizable»
+		«action.printAligned»
 	'''
 
 	def protected loadVar(Port port, Connection connection, String actionName) '''
 		%local_size_«port.name»_«connection.getSafeId(port)» = load i32* @SIZE_«port.name»_«connection.getSafeId(port)»
-		«IF (isActionVectorizable && port.hasAttribute(actionName + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
+		«IF (isActionAligned && port.hasAttribute(actionName + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
 		%orig_local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
 		%local_index_«port.name»_«connection.getSafeId(port)» = urem i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», %local_size_«port.name»_«connection.getSafeId(port)»
 		«ELSE»
@@ -710,7 +710,7 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 
 	def protected updateVar(Port port, Connection connection, Integer numTokens, String actionName) '''
-		«IF (isActionVectorizable && port.hasAttribute(actionName + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
+		«IF (isActionAligned && port.hasAttribute(actionName + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
 		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
 		«ELSE»
 		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
@@ -1065,7 +1065,7 @@ class InstancePrinter extends LLVMTemplate {
 			«IF needCast»
 				%cast_index_«extName» = «IF indexSize < 32»zext«ELSE»trunc«ENDIF» «index.type.doSwitch» «index.doSwitch» to i32
 			«ENDIF»
-			«IF (isActionVectorizable && port.hasAttribute(action.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
+			«IF (isActionAligned && port.hasAttribute(action.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
 				%final_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«index.doSwitch»«ENDIF»
 			«ELSE»
 				%tmp_index_«extName» = add i32 %local_index_«fifoName», «IF needCast»%cast_index_«extName»«ELSE»«index.doSwitch»«ENDIF»

@@ -78,12 +78,12 @@ class SwActorPrinter extends InstancePrinter {
 
 	override protected printArchitecture() ''''''
 
-	override protected printVectorizable(Action action) {
-		isActionVectorizable = action.hasAttribute(ALIGNABLE)
+	override protected printAligned(Action action) {
+		isActionAligned = action.hasAttribute(ALIGNABLE)
 		val output = '''
-		«IF isActionVectorizable»
+		«IF isActionAligned»
 
-		define internal «action.body.returnType.doSwitch» @«action.body.name»_vectorizable() «IF optionInline»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»_aligned() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
@@ -120,7 +120,7 @@ class SwActorPrinter extends InstancePrinter {
 		}
 		«ENDIF»	
 		'''
-		isActionVectorizable = false
+		isActionAligned = false
 		return output
 	}
 
@@ -178,7 +178,7 @@ class SwActorPrinter extends InstancePrinter {
 			ret void
 		}
 		«ENDIF»
-		«action.printVectorizable»
+		«action.printAligned»
 	'''
 	
 	override caseInstCall(InstCall call) '''
