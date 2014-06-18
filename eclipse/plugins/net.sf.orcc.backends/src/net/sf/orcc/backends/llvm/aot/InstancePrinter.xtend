@@ -606,15 +606,38 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDFOR»
 		«ENDFOR»
 	'''
+	
+	def protected print(Action action) {
+		isActionAligned = false
+		'''
+		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
+		entry:
+			«FOR local : action.scheduler.locals»
+				«local.declare»
+			«ENDFOR»
+			«FOR port : action.peekPattern.ports.notNative»
+				«port.loadVar(incomingPortMap.get(port), action.body.name)»
+			«ENDFOR»
+			br label %b«action.scheduler.blocks.head.label»
 
-	def protected printAligned(Action action) {
-		isActionAligned = action.hasAttribute(ALIGNABLE)
-		val output = '''
+		«FOR block : action.scheduler.blocks»
+			«block.doSwitch»
+		«ENDFOR»
+		}
+		
+		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
+			«printCore(action, false)»
+		«ENDIF»
+		«IF isActionAligned = action.hasAttribute(ALIGNABLE)»
+			«printCore(action, true)»
+		«ENDIF»
+		'''
+	}
+	
+	def protected printCore(Action action, boolean isAligned) '''
 		«val inputPattern = action.inputPattern»
 		«val outputPattern = action.outputPattern»
-		«IF isActionAligned»
-
-		define internal «action.body.returnType.doSwitch» @«action.body.name»_aligned() «IF optionInline»noinline «ENDIF»nounwind {
+		define internal «action.body.returnType.doSwitch» @«action.body.name»«IF isAligned»_aligned«ENDIF»() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
@@ -642,61 +665,6 @@ class InstancePrinter extends LLVMTemplate {
 			«ENDFOR»
 			ret void
 		}
-		«ENDIF»
-		'''
-		isActionAligned = false
-		return output
-	}
-
-	def protected print(Action action) '''
-		«val inputPattern = action.inputPattern»
-		«val outputPattern = action.outputPattern»
-		«val peekPattern = action.peekPattern»
-		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
-		entry:
-			«FOR local : action.scheduler.locals»
-				«local.declare»
-			«ENDFOR»
-			«FOR port : peekPattern.ports.notNative»
-				«port.loadVar(incomingPortMap.get(port), action.body.name)»
-			«ENDFOR»
-			br label %b«action.scheduler.blocks.head.label»
-
-		«FOR block : action.scheduler.blocks»
-			«block.doSwitch»
-		«ENDFOR»
-		}
-		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
-			define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionInline»noinline «ENDIF»nounwind {
-			entry:
-				«FOR local : action.body.locals»
-					«local.declare»
-				«ENDFOR»
-				«FOR port : inputPattern.ports.notNative»
-					«port.loadVar(incomingPortMap.get(port), action.body.name)»
-				«ENDFOR»
-				«FOR port : outputPattern.ports.notNative»
-					«FOR connection : outgoingPortMap.get(port)»
-						«port.loadVar(connection, action.body.name)»
-					«ENDFOR»
-				«ENDFOR»
-				br label %b«action.body.blocks.head.label»
-
-			«FOR block : action.body.blocks»
-				«block.doSwitch»
-			«ENDFOR»
-				«FOR port : inputPattern.ports.notNative»
-					«port.updateVar(incomingPortMap.get(port), inputPattern.getNumTokens(port), action.body.name)»
-				«ENDFOR»
-				«FOR port : outputPattern.ports.notNative»
-					«FOR connection : outgoingPortMap.get(port)»
-						«port.updateVar(connection, outputPattern.getNumTokens(port), action.body.name)»
-					«ENDFOR»
-				«ENDFOR»
-				ret void
-			}
-		«ENDIF»
-		«action.printAligned»
 	'''
 
 	def protected loadVar(Port port, Connection connection, String actionName) '''

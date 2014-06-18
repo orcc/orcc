@@ -31,72 +31,68 @@ package net.sf.orcc.backends.llvm.tta
 import java.util.Map
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
+import net.sf.orcc.df.Action
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Port
-import net.sf.orcc.df.Action
-import net.sf.orcc.ir.Var
-import net.sf.orcc.ir.TypeList
+import net.sf.orcc.ir.Arg
 import net.sf.orcc.ir.InstCall
 import net.sf.orcc.ir.Procedure
-import net.sf.orcc.ir.Arg
+import net.sf.orcc.ir.TypeList
+import net.sf.orcc.ir.Var
 import org.eclipse.emf.common.util.EList
 
-import static net.sf.orcc.backends.BackendsConstants.*
-
 class SwActorPrinter extends InstancePrinter {
-	
+
 	Processor processor;
-	
+
 	new(Map<String, Object> options, Processor processor) {
 		super(options)
 		this.processor = processor
 	}
-	
+
 	override protected getAddrSpace(Connection connection) {
 		val id = processor.getAddrSpaceId(connection)
-		if(id != null) {
+		if (id != null) {
 			''' addrspace(«id»)'''
 		}
 	}
-	
+
 	override protected getProperties(Port port) {
-		if(!outgoingPortMap.get(port).nullOrEmpty || incomingPortMap.get(port) != null) {
+		if (!outgoingPortMap.get(port).nullOrEmpty || incomingPortMap.get(port) != null) {
 			''' volatile'''
 		}
 	}
-	
+
 	def private printNativeWrite(Port port, Var variable) {
 		val innerType = (variable.type as TypeList).innermostType.doSwitch
 		'''
-		%tmp_«variable.name»_elt = getelementptr «variable.type.doSwitch»* «variable.print», i32 0, i1 0 
-		%tmp_«variable.name» = load «innerType»* %tmp_«variable.name»_elt
-		tail call void asm sideeffect "SIG_OUT_«port.name».LEDS", "ir"(«innerType» %tmp_«variable.name») nounwind
+			%tmp_«variable.name»_elt = getelementptr «variable.type.doSwitch»* «variable.print», i32 0, i1 0 
+			%tmp_«variable.name» = load «innerType»* %tmp_«variable.name»_elt
+			tail call void asm sideeffect "SIG_OUT_«port.name».LEDS", "ir"(«innerType» %tmp_«variable.name») nounwind
 		'''
 	}
-	
+
 	override protected printDatalayout() ''''''
 
 	override protected printArchitecture() ''''''
 
-	override protected printAligned(Action action) {
-		isActionAligned = action.hasAttribute(ALIGNABLE)
-		val output = '''
-		«IF isActionAligned»
-
-		define internal «action.body.returnType.doSwitch» @«action.body.name»_aligned() «IF optionInline»noinline «ENDIF»nounwind {
+	override protected printCore(Action action, boolean isAligned) '''
+		«val inputPattern = action.inputPattern»
+		«val outputPattern = action.outputPattern»
+		define internal «action.body.returnType.doSwitch» @«action.body.name»«IF isAligned»_aligned«ENDIF»() «IF optionInline»noinline «ENDIF»nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.filter[native]»
-				«action.outputPattern.getVariable(port).declare»
+			«FOR port : outputPattern.ports.filter[native]»
+				«outputPattern.getVariable(port).declare»
 			«ENDFOR»
-			«FOR port : action.inputPattern.ports.notNative»
-				«port.loadVar(incomingPortMap.get(port), action.name)»
+			«FOR port : inputPattern.ports.notNative»
+				«port.loadVar(incomingPortMap.get(port), action.body.name)»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.notNative»
+			«FOR port : outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
-					«port.loadVar(connection, action.name)»
+					«port.loadVar(connection, action.body.name)»
 				«ENDFOR»
 			«ENDFOR»
 			br label %b«action.body.blocks.head.label»
@@ -104,100 +100,40 @@ class SwActorPrinter extends InstancePrinter {
 		«FOR block : action.body.blocks»
 			«block.doSwitch»
 		«ENDFOR»
-			«FOR port : action.inputPattern.ports.notNative»
-				«val connection = incomingPortMap.get(port)»
-				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port), action.name)»
+			«FOR port : inputPattern.ports.notNative»
+				«port.updateVar(incomingPortMap.get(port), inputPattern.getNumTokens(port), action.body.name)»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.notNative»
+			«FOR port : outputPattern.ports.notNative»
 				«FOR connection : outgoingPortMap.get(port)»
-					«port.updateVar(connection, action.outputPattern.getNumTokens(port), action.name)»
+					«port.updateVar(connection, outputPattern.getNumTokens(port), action.body.name)»
 				«ENDFOR»
 			«ENDFOR»
-			«FOR port : action.outputPattern.ports.filter[native]»
+			«FOR port : outputPattern.ports.filter[native]»
 				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
 			«ENDFOR»
 			ret void
 		}
-		«ENDIF»	
-		'''
-		isActionAligned = false
-		return output
-	}
-
-	override protected print(Action action) '''
-		define internal «action.scheduler.returnType.doSwitch» @«action.scheduler.name»() nounwind {
-		entry:
-			«FOR local : action.scheduler.locals»
-				«local.declare»
-			«ENDFOR»
-			«FOR port : action.peekPattern.ports.notNative»
-				«port.loadVar(incomingPortMap.get(port), action.name)»
-			«ENDFOR»
-			br label %b«action.scheduler.blocks.head.label»
-		
-		«FOR block : action.scheduler.blocks»
-			«block.doSwitch»
-		«ENDFOR»
-		}
-		«IF !action.hasAttribute(ALIGNED_ALWAYS)»
-
-		define internal «action.body.returnType.doSwitch» @«action.body.name»() «IF optionInline»noinline «ENDIF»nounwind {
-		entry:
-			«FOR local : action.body.locals»
-				«local.declare»
-			«ENDFOR»
-			«FOR port : action.outputPattern.ports.filter[native]»
-				«action.outputPattern.getVariable(port).declare»
-			«ENDFOR»
-			«FOR port : action.inputPattern.ports.notNative»
-				«port.loadVar(incomingPortMap.get(port), action.name)»
-			«ENDFOR»
-			«FOR port : action.outputPattern.ports.notNative»
-				«FOR connection : outgoingPortMap.get(port)»
-					«port.loadVar(connection, action.name)»
-				«ENDFOR»
-			«ENDFOR»
-			br label %b«action.body.blocks.head.label»
-		
-		«FOR block : action.body.blocks»
-			«block.doSwitch»
-		«ENDFOR»
-			«FOR port : action.inputPattern.ports.notNative»
-				«val connection = incomingPortMap.get(port)»
-				«port.updateVar(connection, action.inputPattern.numTokensMap.get(port), action.name)»
-			«ENDFOR»
-			«FOR port : action.outputPattern.ports.notNative»
-				«FOR connection : outgoingPortMap.get(port)»
-					«port.updateVar(connection, action.outputPattern.getNumTokens(port), action.name)»
-				«ENDFOR»
-			«ENDFOR»
-			«FOR port : action.outputPattern.ports.filter[native]»
-				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
-			«ENDFOR»
-			
-			ret void
-		}
-		«ENDIF»
-		«action.printAligned»
 	'''
-	
+
 	override caseInstCall(InstCall call) '''
 		«val target = call.target»
 		«val args = call.arguments»
 		«val parameters = call.procedure.parameters»
 		«IF call.procedure.native»
-			«IF target != null»%«target.variable.name» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
+			«IF target != null»%«target.variable.name» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.
+			procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.
+			format(parameters).join(", ")»«ENDIF») nounwind
 		«ELSE»
 			«super.caseInstCall(call)»
 		«ENDIF»
 	'''
-	
+
 	override protected print(Procedure procedure) '''
 		«IF !procedure.native»
 			«super.print(procedure)»
 		«ENDIF»
 	'''
-	
+
 	def private getIr(EList<Arg> args) {
 		var irs = new String;
 		for (arg : args) {
