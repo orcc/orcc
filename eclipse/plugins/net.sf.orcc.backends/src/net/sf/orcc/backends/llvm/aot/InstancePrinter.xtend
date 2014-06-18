@@ -702,24 +702,24 @@ class InstancePrinter extends LLVMTemplate {
 	def protected loadVar(Port port, Connection connection, String actionName) '''
 		%local_size_«port.name»_«connection.getSafeId(port)» = load i32* @SIZE_«port.name»_«connection.getSafeId(port)»
 		«IF (isActionAligned && port.hasAttribute(actionName + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
-		%orig_local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
-		%local_index_«port.name»_«connection.getSafeId(port)» = urem i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», %local_size_«port.name»_«connection.getSafeId(port)»
+			%orig_local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
+			%local_index_«port.name»_«connection.getSafeId(port)» = urem i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», %local_size_«port.name»_«connection.getSafeId(port)»
 		«ELSE»
-		%local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
+			%local_index_«port.name»_«connection.getSafeId(port)» = load i32* @index_«port.name»_«connection.getSafeId(port)»
 		«ENDIF»
 	'''
 
 	def protected updateVar(Port port, Connection connection, Integer numTokens, String actionName) '''
 		«IF (isActionAligned && port.hasAttribute(actionName + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
-		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
+			%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %orig_local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
 		«ELSE»
-		%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
+			%new_index_«port.name»_«connection.getSafeId(port)» = add i32 %local_index_«port.name»_«connection.getSafeId(port)», «numTokens»
 		«ENDIF»
 		store i32 %new_index_«port.name»_«connection.getSafeId(port)», i32* @index_«port.name»_«connection.getSafeId(port)»
 	'''
 
 	def protected print(Procedure procedure) '''
-		«val parameters = procedure.parameters.join(", ")[argumentDeclaration]»
+		«val parameters = procedure.parameters.join(", ")[declare]»
 		«IF procedure.native || procedure.blocks.nullOrEmpty»
 			declare «procedure.returnType.doSwitch» @«procedure.name»(«parameters») nounwind
 		«ELSE»
@@ -751,11 +751,12 @@ class InstancePrinter extends LLVMTemplate {
 		else "zeroinitializer"
 	}
 
-	def protected argumentDeclaration(Param param) {
-		val variable = param.variable
-		if (variable.type.string) '''i8* %«variable.name»'''
-		else if (variable.type.list) '''«variable.type.doSwitch»* noalias %«variable.name»'''
-		else '''«variable.type.doSwitch» %«variable.name»'''
+	def protected declare(Param param) {
+		val pName = param.variable.name
+		val pType = param.variable.type
+		if (pType.string) '''i8* %«pName»'''
+		else if (pType.list) '''«pType.doSwitch»* noalias %«pName»'''
+		else '''«pType.doSwitch» %«pName»'''
 	}
 
 	def private printInput(Connection connection, Port port) '''

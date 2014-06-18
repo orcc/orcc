@@ -454,7 +454,7 @@ class ActorPrinter extends InstancePrinter {
 	}
 
 	override protected print(Action action) '''
-		define «action.scheduler.returnType.doSwitch» @«action.scheduler.name»(«action.scheduler.parameters.join(", ")[argumentDeclaration]») nounwind {
+		define «action.scheduler.returnType.doSwitch» @«action.scheduler.name»(«action.scheduler.parameters.join(", ")[declare]») nounwind {
 		entry:
 			«FOR local : action.scheduler.locals»
 				«local.declare»
@@ -469,7 +469,7 @@ class ActorPrinter extends InstancePrinter {
 		«ENDFOR»
 		}
 
-		define void @«action.body.name»(«action.body.parameters.join(", ")[argumentDeclaration]») nounwind {
+		define void @«action.body.name»(«action.body.parameters.join(", ")[declare]») nounwind {
 		entry:
 			«FOR local : action.body.locals»
 				«local.declare»
