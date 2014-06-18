@@ -386,7 +386,7 @@ class InstancePrinter extends LLVMTemplate {
 					call void @«action.body.name»_aligned()
 					br label %bb_«extName»_fire_ret
 
-				bb_«extName»_fire_aligned:
+				bb_«extName»_fire_notaligned:
 					call void @«action.body.name»()
 					br label %bb_«extName»_fire_ret
 
