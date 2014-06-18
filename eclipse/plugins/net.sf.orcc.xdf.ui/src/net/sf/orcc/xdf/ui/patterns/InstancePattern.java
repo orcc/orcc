@@ -115,6 +115,7 @@ public class InstancePattern extends AbstractPattern {
 	private static final String PORT_NAME_KEY = "REF_PORT_NAME";
 
 	private static final String REFINEMENT_KEY = "refinement";
+	private static final String INVALIDATED_REFINEMENT = "no-refinement";
 
 	private enum Direction {
 		INPUTS, OUTPUTS
@@ -436,6 +437,21 @@ public class InstancePattern extends AbstractPattern {
 					.createTrueReason("The instance name has been updated from outside of the diagram");
 		}
 
+		final EObject refinement = instance.getEntity();
+		if (refinement == null || refinement.eIsProxy()) {
+			final String plateforStringUri = Graphiti.getPeService()
+					.getPropertyValue(pe, REFINEMENT_KEY);
+			if (plateforStringUri == null) {
+				// The instance has never been refined
+				return Reason.createFalseReason();
+			} else if (INVALIDATED_REFINEMENT.equals(plateforStringUri)) {
+				// The null refinement is already up-to-date
+				return Reason.createFalseReason();
+			} else {
+				return Reason.createTrueReason("Invalid refinement");
+			}
+		}
+
 		// Compute list of in and out ports names
 		final List<String> inNames = new ArrayList<String>(), outNames = new ArrayList<String>();
 		for (final Anchor anchor : ((AnchorContainer) pe).getAnchors()) {
@@ -448,13 +464,10 @@ public class InstancePattern extends AbstractPattern {
 			}
 		}
 
-		final Entity entity = instance.getAdapter(Entity.class);
-		if (entity == null) {
-			return Reason.createFalseReason("Unknown error");
-		}
-
+		// Initialize the reason object, used in folowing tests
 		final IReason portsUpdatedReason = Reason
 				.createTrueReason("The port order or their names have to be updated.");
+		final Entity entity = instance.getAdapter(Entity.class);
 
 		if (inNames.size() != entity.getInputs().size()
 				|| outNames.size() != entity.getOutputs().size()) {
@@ -495,6 +508,11 @@ public class InstancePattern extends AbstractPattern {
 			}
 
 			final ContainerShape instanceShape = (ContainerShape) pe;
+			final EObject refinement = instance.getEntity();
+			if (refinement == null || refinement.eIsProxy()) {
+				deleteInstanceRefinement(instanceShape);
+				return true;
+			}
 
 			final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
 			final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
@@ -564,6 +582,58 @@ public class InstancePattern extends AbstractPattern {
 			// Update instance style
 			instanceShape.getGraphicsAlgorithm().setStyle(StyleUtil.networkInstanceShape(getDiagram()));
 		}
+
+		// Resize to minimal size.
+		resizeShapeToMinimal(instanceShape);
+
+		return true;
+	}
+
+	/**
+	 * Remove the refinement for the given instance shape and the corresponding
+	 * business object. This method remove all ports from the shape and update
+	 * its properties, style and size.
+	 * 
+	 * @param instanceShape
+	 * @return true if the action correctly ends
+	 */
+	private boolean deleteInstanceRefinement(final ContainerShape instanceShape) {
+		if (!isPatternRoot(instanceShape)) {
+			return false;
+		}
+		// Reset instance refinement
+		final Instance instance = (Instance) getBusinessObjectForPictogramElement(instanceShape);
+		instance.setEntity(null);
+
+		// Delete all connections from/to this instance shape
+		XdfUtil.deleteConnections(getFeatureProvider(), instanceShape);
+
+		// Clean all ports texts
+		final GraphicsAlgorithm instanceGa = instanceShape
+				.getGraphicsAlgorithm();
+		final List<GraphicsAlgorithm> gaChildren = new ArrayList<GraphicsAlgorithm>(
+				instanceGa.getGraphicsAlgorithmChildren());
+		for (final GraphicsAlgorithm gaChild : gaChildren) {
+			if (gaChild instanceof Text
+					&& PropsUtil.isExpectedPc(gaChild, PORT_TEXT_ID)) {
+				EcoreUtil.delete(gaChild, true);
+			}
+		}
+
+		// Clean all ports anchors
+		final List<Anchor> anchors = new ArrayList<Anchor>(
+				instanceShape.getAnchors());
+		for (final Anchor anchor : anchors) {
+			EcoreUtil.delete(anchor, true);
+		}
+
+		// Invalidate the refinement property
+		Graphiti.getPeService().setPropertyValue(instanceShape, REFINEMENT_KEY,
+				INVALIDATED_REFINEMENT);
+
+		// Reset shape style to basic state
+		instanceShape.getGraphicsAlgorithm().setStyle(
+				StyleUtil.basicInstanceShape(getDiagram()));
 
 		// Resize to minimal size.
 		resizeShapeToMinimal(instanceShape);
@@ -985,6 +1055,9 @@ public class InstancePattern extends AbstractPattern {
 	public EObject getRefinementFromShape(final PictogramElement pe) {
 		if (isPatternRoot(pe)) {
 			final String plateforStringUri = Graphiti.getPeService().getPropertyValue(pe, REFINEMENT_KEY);
+			if (INVALIDATED_REFINEMENT.equals(plateforStringUri)) {
+				return null;
+			}
 			final URI resUri = URI.createPlatformResourceURI(plateforStringUri, true);
 			final Resource res = getDiagramBehavior().getEditingDomain().getResourceSet().getResource(resUri, true);
 			if (res.getContents().size() > 0) {

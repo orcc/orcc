@@ -29,6 +29,7 @@
 package net.sf.orcc.xdf.ui.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -36,8 +37,10 @@ import java.util.Set;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.xdf.ui.Activator;
@@ -53,6 +56,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
@@ -337,6 +341,24 @@ public class XdfUtil {
 				.getPeService().getAllConnections(ac);
 		for (final org.eclipse.graphiti.mm.pictograms.Connection connection : connections) {
 			deleteConnection(fp, connection);
+		}
+
+		// Manage specific case: When deleteConnections is invoked on instance
+		// with invalid refinement, the Df Connections linked to Graphiti
+		// Connections are proxy, and are not contained. Because of that, the
+		// business conenctions remains after deleting all graphical
+		// connections. To avoid that, we manually delete objects from
+		// instance's incoming and outgoing reference lists.
+		final Object bo = Graphiti.getLinkService()
+				.getBusinessObjectForLinkedPictogramElement(ac);
+		if (bo instanceof Instance) {
+			final Instance instance = (Instance) bo;
+			final List<Edge> edges = new ArrayList<Edge>(
+					instance.getIncoming());
+			edges.addAll(instance.getOutgoing());
+			for (Edge c : edges) {
+				EcoreUtil.delete(c);
+			}
 		}
 	}
 
