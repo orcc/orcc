@@ -153,7 +153,7 @@
                id="net.sf.orcc.backends.tta.finalizeGeneration">
          </option>
          <option
-               id="net.sf.orcc.backends.tta.fpga">
+               id="net.sf.orcc.backends.fpga">
          </option>
          <option
                id="net.sf.orcc.backends.importXCF">
@@ -298,7 +298,7 @@
          <option
                defaultValue="Stratix III (EP3SL150F1152C2)"
                description="Name of your FPGA device"
-               id="net.sf.orcc.backends.tta.fpga"
+               id="net.sf.orcc.backends.fpga"
                name="FPGA board">
             <comboBox>
                <comboBoxItem

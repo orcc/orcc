@@ -29,7 +29,10 @@
 package net.sf.orcc.backends.llvm.tta;
 
 import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
+import static net.sf.orcc.backends.BackendsConstants.FPGA_CONFIGURATION;
+import static net.sf.orcc.backends.BackendsConstants.FPGA_DEFAULT_CONFIGURATION;
 import static net.sf.orcc.backends.BackendsConstants.TTA_DEFAULT_PROCESSORS_CONFIGURATION;
+import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -105,10 +108,10 @@ public class TTABackend extends LLVMBackend {
 	protected void doInitializeOptions() {
 		finalize = getAttribute("net.sf.orcc.backends.tta.finalizeGeneration",
 				false);
-		fpga = FPGA.builder(getAttribute("net.sf.orcc.backends.tta.fpga",
-				"Stratix III (EP3SL150F1152C2)"));
+		fpga = FPGA.builder(getAttribute(FPGA_CONFIGURATION,
+				FPGA_DEFAULT_CONFIGURATION));
 		configuration = ProcessorConfiguration.getByName(getAttribute(
-				"net.sf.orcc.backends.llvm.tta.configuration",
+				TTA_PROCESSORS_CONFIGURATION,
 				TTA_DEFAULT_PROCESSORS_CONFIGURATION));
 		reduceConnections = getAttribute(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
@@ -187,7 +190,7 @@ public class TTABackend extends LLVMBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		doTransformNetwork(network);
 
-		// update "vectorizable" information
+		// update alignment information
 		Alignable.setAlignability(network);
 
 		// Compute the actor mapping
