@@ -29,6 +29,7 @@
 package net.sf.orcc.frontend;
 
 import static net.sf.orcc.ir.IrFactory.eINSTANCE;
+import static net.sf.orcc.util.OrccAttributes.COPY_OF_TOKENS;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -517,7 +518,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			if (EcoreHelper.getContainerOfType(use, InstCall.class) != null) {
 				// Mark the variable as a local copy of port variable to allow
 				// later optimizations (at backend-level)
-				var.addAttribute("copyOfTokens");
+				var.addAttribute(COPY_OF_TOKENS);
 				return true;
 			}
 		}

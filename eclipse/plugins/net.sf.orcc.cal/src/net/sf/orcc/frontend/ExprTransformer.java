@@ -32,6 +32,8 @@ import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 import static net.sf.orcc.ir.OpBinary.MINUS;
 import static net.sf.orcc.ir.OpBinary.PLUS;
 import static net.sf.orcc.ir.OpBinary.TIMES;
+import static net.sf.orcc.util.OrccAttributes.COPY_OF_TOKENS;
+import static net.sf.orcc.util.OrccAttributes.REMOVABLE_COPY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -385,7 +387,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 						// Mark the variable as a local copy of input data and
 						// reference the associated port.
 						Port port = inputPattern.getPort(var);
-						target.setAttribute("copyOfTokens", port);
+						target.setAttribute(COPY_OF_TOKENS, port);
 
 						return eINSTANCE.createExprVar(target);
 					}
@@ -397,14 +399,14 @@ public class ExprTransformer extends CalSwitch<Expression> {
 				// ActorTransformer as an optimizable copy of output variable
 				// (when it used as procedure argument). Then, annotate the IR
 				// to allow optimizations at back-end level.
-				if (var.hasAttribute("copyOfTokens")) {
+				if (var.hasAttribute(COPY_OF_TOKENS)) {
 					expr = copyList(var, true);
 
 					// Mark the variable as a local copy of output data and
 					// reference the associated port.
 					Pattern outputPattern = ((Action) procedure.eContainer())
 							.getOutputPattern();
-					var.setAttribute("copyOfTokens",
+					var.setAttribute(COPY_OF_TOKENS,
 							outputPattern.getPort(target));
 				} else {
 					expr = copyList(var, false);
@@ -475,7 +477,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			blocks = blockWhile.getBlocks();
 
 			if (removable) {
-				blockWhile.addAttribute("removableCopy");
+				blockWhile.addAttribute(REMOVABLE_COPY);
 			}
 		}
 

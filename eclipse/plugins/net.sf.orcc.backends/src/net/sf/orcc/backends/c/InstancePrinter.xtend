@@ -68,6 +68,7 @@ import net.sf.orcc.util.util.EcoreHelper
 
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
+import static net.sf.orcc.util.OrccAttributes.*
 
 /**
  * Generate and print instance source file for C backend.
@@ -843,7 +844,7 @@ class InstancePrinter extends CTemplate {
 	def protected print(Action action) {
 		currentAction = action
 		isActionAligned = false
-		debugAction = action.hasAttribute("DEBUG")
+		debugAction = action.hasAttribute(DIRECTIVE_DEBUG)
 		'''
 		«action.scheduler.print»
 		
@@ -857,9 +858,9 @@ class InstancePrinter extends CTemplate {
 	}
 
 	def protected print(Procedure proc) {
-		val isOptimizable = proc.hasAttribute(C_DIRECTIVE_OPTIMIZE);
-		val optCond = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("condition")
-		val optName = proc.getAttribute(C_DIRECTIVE_OPTIMIZE)?.getValueAsString("name")
+		val isOptimizable = proc.hasAttribute(DIRECTIVE_OPTIMIZE_C);
+		val optCond = proc.getAttribute(DIRECTIVE_OPTIMIZE_C)?.getValueAsString("condition")
+		val optName = proc.getAttribute(DIRECTIVE_OPTIMIZE_C)?.getValueAsString("name")
 		'''
 		static «inline»«proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]») {
 			«IF isOptimizable»
@@ -955,7 +956,7 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	override caseBlockWhile(BlockWhile blockWhile) {
-		if(!isActionAligned || !blockWhile.hasAttribute("removableCopy")){
+		if(!isActionAligned || !blockWhile.hasAttribute(REMOVABLE_COPY)){
 			'''
 			while («blockWhile.condition.doSwitch») {
 				«FOR block : blockWhile.blocks»
@@ -1094,10 +1095,10 @@ class InstancePrinter extends CTemplate {
 	def private copyOf(ExprVar expr) {
 		val action = EcoreHelper.getContainerOfType(expr, Action)
 		val variable = expr.use.variable
-		if(action == null || !expr.type.list || !variable.hasAttribute("copyOfTokens")) {
+		if(action == null || !expr.type.list || !variable.hasAttribute(COPY_OF_TOKENS)) {
 			return null
 		}
-		return variable.getValueAsEObject("copyOfTokens") as Port
+		return variable.getValueAsEObject(COPY_OF_TOKENS) as Port
 	}
 
 	def private print(Arg arg) {
@@ -1115,7 +1116,7 @@ class InstancePrinter extends CTemplate {
 		'''«IF inlineActors»__attribute__((noinline)) «ENDIF»'''
 		
 	def private setDebug() {
-		debugActor = actor.hasAttribute("DEBUG")
+		debugActor = actor.hasAttribute(DIRECTIVE_DEBUG)
 	}
 
 	//========================================
