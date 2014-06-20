@@ -63,9 +63,6 @@
          <option
                id="net.sf.orcc.backends.c.dal.outputBuffering">
          </option>
-         <option
-               id="net.sf.orcc.backends.c.dal.checkGuards">
-         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.hmpp.HMPPBackend"
@@ -397,13 +394,6 @@
                description="Perform sample buffering on actor outputs"
                id="net.sf.orcc.backends.c.dal.outputBuffering"
                name="Output buffering">
-            <checkBox></checkBox>
-         </option>
-         <option
-               defaultValue="false"
-               description="Check actors action guards to better identify non-determinism"
-               id="net.sf.orcc.backends.c.dal.checkGuards"
-               name="Check Guards">
             <checkBox></checkBox>
          </option>
          <option

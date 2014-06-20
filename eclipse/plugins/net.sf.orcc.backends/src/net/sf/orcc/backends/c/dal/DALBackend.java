@@ -22,7 +22,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * Distributed Application Layer
  * 
  * @author Jani Boutellier
- * @author James Guthrie
  * 
  * Based on Orcc C backend
  */
@@ -34,7 +33,6 @@ public class DALBackend extends CBackend {
 	protected String srcPath;
 	protected boolean outputBuffering;
 	protected boolean inputBuffering;
-	protected boolean checkGuards;
 
 	@Override
 	protected void doInitializeOptions() {
@@ -43,11 +41,8 @@ public class DALBackend extends CBackend {
 				false);
 		outputBuffering = getAttribute("net.sf.orcc.backends.c.dal.outputBuffering",
 				false);
-		checkGuards = getAttribute("net.sf.orcc.backends.c.dal.checkGuards",
-		        false);
 	}
 	
-	@Override
 	protected void doTransformNetwork(Network network) {
 		OrccLogger.traceln("Instantiating network...");
 		new Instantiator(false, fifoSize).doSwitch(network);
@@ -73,7 +68,7 @@ public class DALBackend extends CBackend {
 
 		new ArgumentEvaluator().doSwitch(network);
 		
-		KPNValidator validator = new KPNValidator(checkGuards);
+		KPNValidator validator = new KPNValidator();
 		validator.validate(network);
 		validator.analyzeInputs(network);
 		validator.analyzeOutputs(network);
