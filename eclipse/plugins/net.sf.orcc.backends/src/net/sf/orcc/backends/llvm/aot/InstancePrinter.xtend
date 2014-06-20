@@ -73,6 +73,7 @@ import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.backends.BackendsConstants.*
 import net.sf.orcc.backends.BackendsConstants
+import static net.sf.orcc.util.OrccAttributes.*
 
 /*
  * Compile Instance llvm source code

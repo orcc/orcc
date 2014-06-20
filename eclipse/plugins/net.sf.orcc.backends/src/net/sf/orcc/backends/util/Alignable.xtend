@@ -38,6 +38,7 @@ import net.sf.orcc.util.Attribute
 import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.backends.BackendsConstants.*
+import static net.sf.orcc.util.OrccAttributes.*
 
 /**
  * Class containing static methods useful to set potential alignment information of ports
