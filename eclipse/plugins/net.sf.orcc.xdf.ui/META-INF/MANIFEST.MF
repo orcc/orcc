@@ -18,7 +18,8 @@ Require-Bundle: net.sf.orcc.ui,
  org.eclipse.draw2d,
  org.eclipse.gef,
  org.eclipse.emf.transaction,
- com.google.guava
+ com.google.guava,
+ org.eclipse.jdt.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: net.sf.orcc.ui
