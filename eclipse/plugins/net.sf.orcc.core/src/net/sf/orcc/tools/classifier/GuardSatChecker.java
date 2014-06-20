@@ -252,7 +252,7 @@ public class GuardSatChecker {
 		public Object caseInstCall(InstCall call) {
 			if (call.getTarget() != null) {
 				Procedure proc = call.getProcedure();
-				if (!procs.contains(procs)) {
+				if (!procs.contains(proc)) {
 					doSwitch(proc);
 				}
 
