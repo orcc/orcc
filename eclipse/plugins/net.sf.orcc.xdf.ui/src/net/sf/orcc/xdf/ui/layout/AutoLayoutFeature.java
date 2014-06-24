@@ -111,8 +111,7 @@ public class AutoLayoutFeature extends AbstractCustomFeature {
 				if (shapeLayout != null) {
 					configureInstanceNode(shapeLayout);
 				}
-			} else if (PropsUtil.isOutputPort(shape)
-					|| PropsUtil.isInputPort(shape)) {
+			} else if (PropsUtil.isPort(shape)) {
 				if (shapeLayout != null) {
 					configureNetworkPortNode(shapeLayout);
 				}

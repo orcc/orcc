@@ -215,8 +215,7 @@ public class XdfDiagramLayoutManager {
 			if (ge instanceof KNode) {
 				if (PropsUtil.isInstance(pe)) {
 					applyLayoutToInstanceNode(pe, (KNode) ge);
-				} else if (PropsUtil.isOutputPort(pe)
-						|| PropsUtil.isInputPort(pe)) {
+				} else if (PropsUtil.isPort(pe)) {
 					applyLayoutToPortNode(pe, (KNode) ge);
 				}
 			} else if (ge instanceof KEdge) {
