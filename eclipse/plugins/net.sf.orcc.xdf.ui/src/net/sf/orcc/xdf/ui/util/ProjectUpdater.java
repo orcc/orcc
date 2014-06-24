@@ -66,6 +66,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * goal is to update {@link XdfResourceImpl} methods to avoid errors when a
  * port/instance is renamed.
  * 
+ * This class is associated with an org.eclipse.ui.commands in plugin.xml, and
+ * is triggered with a org.eclipse.ui.menus extension (context menu entry)
+ * 
  * @author Antoine Lorence
  *
  */
