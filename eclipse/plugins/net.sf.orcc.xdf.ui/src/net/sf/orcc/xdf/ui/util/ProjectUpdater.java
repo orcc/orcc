@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.impl.XdfResourceImpl;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
@@ -129,8 +130,14 @@ public class ProjectUpdater extends AbstractHandler {
 				// Save the resource. The diagram file will now have updated
 				// links URI
 				res.save(Collections.EMPTY_MAP);
+			} catch (OrccRuntimeException e) {
+				OrccLogger.severeln(diagramFile.getName()
+						+ "[OrccRuntimeException]");
+				OrccLogger.traceln("message: " + e.getMessage());
+				continue;
 			} catch (Exception e) {
-				OrccLogger.severeln(diagramFile.getName());
+				OrccLogger.severeln(diagramFile.getName() + "["
+						+ e.getCause().getClass().toString() + "]");
 				OrccLogger.traceln("message: " + e.getMessage());
 				continue;
 			}
