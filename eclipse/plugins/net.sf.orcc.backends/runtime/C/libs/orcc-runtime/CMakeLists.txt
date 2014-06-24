@@ -25,11 +25,6 @@ set(orcc_runtime_headers
     include/orcc.h
 )
 
-if(THREADS_FOUND)
-    list(APPEND orcc_runtime_sources src/thread.c)
-    list(APPEND orcc_runtime_headers include/thread.h)
-endif()
-
 if(ROXML_ENABLE)
     list(APPEND orcc_runtime_sources src/serialize.c)
     list(APPEND orcc_runtime_headers include/serialize.h)

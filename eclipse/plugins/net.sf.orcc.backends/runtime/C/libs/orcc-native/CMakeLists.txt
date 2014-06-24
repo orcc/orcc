@@ -15,6 +15,11 @@ set(orcc_native_headers
     include/native_util.h
 )
 
+if(THREADS_FOUND)
+    list(APPEND orcc_native_sources src/thread.c)
+    list(APPEND orcc_native_headers include/thread.h)
+endif()
+
 # Helps CMake to find SDL libraries (Windows only)
 if(WIN32)
     # Detect current architecture. Depending on CMAKE_LIBRARY_ARCHITECTURE value,
