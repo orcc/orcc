@@ -732,29 +732,6 @@ public class InstancePattern extends AbstractPattern {
 			}
 		}
 
-		// Specific case: if this method is executed by update() after a port
-		// renaming outside the diagram editor, the previous block has not
-		// completely deleted invalid connections.
-		// The linked net.sf.orcc.sf.Connection has an URI relative to its
-		// container (Actor or Network). This URI uses the source / target port
-		// name. But at this point, the port name doesn't exists anymore. The
-		// businessObject linked from diagram connection pictogram became a
-		// proxy when the old port has been removed from the diagram.
-		// To completely delete invalid connections from the network, we must
-		// check for invalid objects in source port or target port of each
-		// connection.
-		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
-		final List<net.sf.orcc.df.Connection> connectionsCopy = new ArrayList<net.sf.orcc.df.Connection>(
-				network.getConnections());
-		for (net.sf.orcc.df.Connection dfConnection : connectionsCopy) {
-			final Port src = dfConnection.getSourcePort();
-			final Port tgt = dfConnection.getTargetPort();
-			if ((src != null && src.eIsProxy())
-					|| (tgt != null && tgt.eIsProxy())) {
-				EcoreUtil.delete(dfConnection);
-			}
-		}
-
 		// Build a complete message to inform user about what happened exactly
 		final StringBuilder infoMsg = new StringBuilder();
 		infoMsg.append(message).append('\n');
