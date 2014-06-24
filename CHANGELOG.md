@@ -2,6 +2,14 @@
 ### Notable changes and features
 - Network editor
     + Copy / Paste ports or instances in a diagram or accross different diagrams is now supported [#107]
+- Back-ends
+    + [C] New debugging features:
+        - Use "@DEBUG" annotation on action signature to display its production/consumption during the execution
+        - Add option "-z" to display the actor firings (instead of setting PRINT_FIRING)
+    + [C] Add experimental support of FFMPEG public API through native functions
+    + [C] Make external libraries (SDL, Threads, etc) fully optional to compile the orcc library, the only requirement is now the C standard library 
+    + [HLS] Performance improvement of the generated design by using dual-port RAMs for the FIFOs
+    + [TTA] Initial support of zynq platforms
 
 ### Bugfixes
 
