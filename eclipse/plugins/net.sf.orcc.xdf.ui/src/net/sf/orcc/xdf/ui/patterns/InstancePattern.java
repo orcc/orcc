@@ -317,7 +317,7 @@ public class InstancePattern extends AbstractPattern {
 		link(topLevelShape, addedDomainObject);
 
 		if (addedDomainObject.getEntity() != null) {
-			setInstanceRefinement(topLevelShape, addedDomainObject.getEntity());
+			updateRefinement(topLevelShape, addedDomainObject.getEntity());
 		}
 
 		return topLevelShape;
@@ -504,14 +504,14 @@ public class InstancePattern extends AbstractPattern {
 			final ContainerShape instanceShape = (ContainerShape) pe;
 			final EObject refinement = instance.getEntity();
 			if (refinement == null || refinement.eIsProxy()) {
-				deleteInstanceRefinement(instanceShape);
+				deleteRefinement(instanceShape);
 				return true;
 			}
 
 			final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
 			final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
 			saveConnections(instanceShape, incomingMap, outgoingMap);
-			setInstanceRefinement(instanceShape, instance.getEntity());
+			updateRefinement(instanceShape, instance.getEntity());
 			restoreConnections(instanceShape, incomingMap, outgoingMap,
 					instance.getName() + " has been updated:");
 			return true;
@@ -531,7 +531,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @param entity
 	 * @return true if the refinement has been performed
 	 */
-	public boolean setInstanceRefinement(final ContainerShape instanceShape,
+	public boolean updateRefinement(final ContainerShape instanceShape,
 			final EObject entity) {
 		if (!isPatternRoot(instanceShape)) {
 			return false;
@@ -591,7 +591,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @param instanceShape
 	 * @return true if the action correctly ends
 	 */
-	private boolean deleteInstanceRefinement(final ContainerShape instanceShape) {
+	private boolean deleteRefinement(final ContainerShape instanceShape) {
 		if (!isPatternRoot(instanceShape)) {
 			return false;
 		}
@@ -774,7 +774,7 @@ public class InstancePattern extends AbstractPattern {
 	 * layout method. layout() is called explicitly or implicitly from some
 	 * methods.
 	 * 
-	 * {@link #setInstanceRefinement(ContainerShape, EObject)} executes this
+	 * {@link #updateRefinement(ContainerShape, EObject)} executes this
 	 * method and apply a resize just after. The layout() method is called from
 	 * resizeShape() method.
 	 * 

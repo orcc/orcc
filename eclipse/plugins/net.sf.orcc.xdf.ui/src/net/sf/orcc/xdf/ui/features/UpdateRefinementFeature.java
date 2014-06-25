@@ -150,7 +150,7 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 		final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
 		final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
 		pattern.saveConnections(instanceShape, incomingMap, outgoingMap);
-		hasDoneChanges = pattern.setInstanceRefinement(instanceShape,
+		hasDoneChanges = pattern.updateRefinement(instanceShape,
 				refinement);
 		pattern.restoreConnections(instanceShape, incomingMap, outgoingMap,
 				"The refinement for instance \"" + instance.getSimpleName()
