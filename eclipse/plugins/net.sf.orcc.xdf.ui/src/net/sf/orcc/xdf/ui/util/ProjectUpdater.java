@@ -153,7 +153,7 @@ public class ProjectUpdater extends AbstractHandler {
 		for (IResource member : container.members()) {
 			if (member.getType() == IResource.FILE) {
 				final IFile file = (IFile) member;
-				if (file.getFileExtension().equals(OrccUtil.DIAGRAM_SUFFIX)) {
+				if (OrccUtil.DIAGRAM_SUFFIX.equals(file.getFileExtension())) {
 					files.add(file);
 				}
 			} else if (member.getType() == IResource.FOLDER) {
