@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.xdf.ui.features;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.xdf.ui.dialogs.EntitySelectionDialog;
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
@@ -41,7 +38,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
-import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.pattern.IFeatureProviderWithPatterns;
@@ -147,14 +143,10 @@ public class UpdateRefinementFeature extends AbstractCustomFeature {
 		final InstancePattern pattern = (InstancePattern) ipattern;
 
 		// Set refinement on selected instance.
-		final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
-		final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
-		pattern.saveConnections(instanceShape, incomingMap, outgoingMap);
-		hasDoneChanges = pattern.updateRefinement(instanceShape,
-				refinement);
-		pattern.restoreConnections(instanceShape, incomingMap, outgoingMap,
-				"The refinement for instance \"" + instance.getSimpleName()
-						+ "\" has been updated:");
+		hasDoneChanges = pattern.updateRefinementAndRestoreConnections(
+				instanceShape, refinement, "The refinement for instance \""
+						+ instance.getSimpleName() + "\" has been updated:");
+
 	}
 
 	@Override

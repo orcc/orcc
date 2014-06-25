@@ -45,6 +45,7 @@ import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
@@ -80,6 +81,7 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.jface.dialogs.MessageDialog;
+
 
 /**
  * This class configure as most features as possible, relative to Instances that
@@ -508,12 +510,9 @@ public class InstancePattern extends AbstractPattern {
 				return true;
 			}
 
-			final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
-			final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
-			saveConnections(instanceShape, incomingMap, outgoingMap);
-			updateRefinement(instanceShape, instance.getEntity());
-			restoreConnections(instanceShape, incomingMap, outgoingMap,
-					instance.getName() + " has been updated:");
+			updateRefinementAndRestoreConnections(instanceShape,
+					instance.getEntity(), instance.getName()
+							+ " has been updated:");
 			return true;
 		}
 
@@ -521,18 +520,32 @@ public class InstancePattern extends AbstractPattern {
 	}
 
 	/**
+	 * <p>
 	 * Update the refinement (Instance or Network) for the instance linked to
 	 * the given instanceShape. The input and output ports of the given entity
 	 * are added to the shape.
+	 * </p>
 	 * 
-	 * This method automatically updates sizes and layouts for the content.
+	 * <p>
+	 * This method automatically updates sizes and layouts for the content. It
+	 * doesn't save and restore existing connections eventually connected to the
+	 * instance. Please use
+	 * {@link InstancePattern#updateRefinementAndRestoreConnections(ContainerShape, EObject, String)}
+	 * if the instance could already have connection (most cases).
+	 * </p>
+	 * 
+	 * <p>
+	 * This method must not be called with 'null' as given entity. In that case,
+	 * {@link #deleteRefinement(ContainerShape)} must be used instead
+	 * </p>
 	 * 
 	 * @param instanceShape
 	 * @param entity
 	 * @return true if the refinement has been performed
 	 */
-	public boolean updateRefinement(final ContainerShape instanceShape,
+	private boolean updateRefinement(final ContainerShape instanceShape,
 			final EObject entity) {
+		Assert.isNotNull(entity, "Given Entity must not be null");
 		if (!isPatternRoot(instanceShape)) {
 			return false;
 		}
@@ -584,6 +597,50 @@ public class InstancePattern extends AbstractPattern {
 	}
 
 	/**
+	 * <p>
+	 * Update the refinement (Instance or Network) for the instance linked to
+	 * the given instanceShape. The input and output ports of the given entity
+	 * are added to the shape.
+	 * </p>
+	 * 
+	 * <p>
+	 * This method internally call
+	 * {@link #updateRefinement(ContainerShape, EObject)} but in addition, it
+	 * saves existing connections from/to the given instance and try to restore
+	 * them after performing the refinement update.
+	 * </p>
+	 * 
+	 * <p>
+	 * This method must not be called with 'null' as given entity. In that case,
+	 * {@link #deleteRefinement(ContainerShape)} must be used instead
+	 * </p>
+	 * 
+	 * @param instanceShape
+	 *            The instance shape to update
+	 * @param entity
+	 *            The new actor/network to refine this instance on (Must not be
+	 *            null)
+	 * @param msg
+	 *            The beginning of the message displayed to user at the end of
+	 *            the process
+	 * @return true if the refinement has been performed
+	 */
+	public boolean updateRefinementAndRestoreConnections(
+			final ContainerShape instanceShape, final EObject entity,
+			final String msg) {
+		Assert.isNotNull(entity, "Given Entity must not be null");
+
+		final Map<String, Connection> incomingMap = new HashMap<String, Connection>();
+		final Map<String, Iterable<Connection>> outgoingMap = new HashMap<String, Iterable<Connection>>();
+
+		saveConnections(instanceShape, incomingMap, outgoingMap);
+		boolean result = updateRefinement(instanceShape, entity);
+		restoreConnections(instanceShape, incomingMap, outgoingMap, msg);
+
+		return result;
+	}
+
+	/**
 	 * Remove the refinement for the given instance shape and the corresponding
 	 * business object. This method remove all ports from the shape and update
 	 * its properties, style and size.
@@ -591,7 +648,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @param instanceShape
 	 * @return true if the action correctly ends
 	 */
-	private boolean deleteRefinement(final ContainerShape instanceShape) {
+	public boolean deleteRefinement(final ContainerShape instanceShape) {
 		if (!isPatternRoot(instanceShape)) {
 			return false;
 		}
@@ -645,7 +702,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @param incomingMap
 	 * @param outgoingMap
 	 */
-	public void saveConnections(final AnchorContainer instanceShape,
+	private void saveConnections(final AnchorContainer instanceShape,
 			final Map<String, Connection> incomingMap,
 			final Map<String, Iterable<Connection>> outgoingMap) {
 
@@ -682,7 +739,7 @@ public class InstancePattern extends AbstractPattern {
 	 * @param outgoingMap
 	 * @param message
 	 */
-	public void restoreConnections(final AnchorContainer instanceShape,
+	private void restoreConnections(final AnchorContainer instanceShape,
 			final Map<String, Connection> incomingMap,
 			final Map<String, Iterable<Connection>> outgoingMap, final String message) {
 
@@ -774,8 +831,8 @@ public class InstancePattern extends AbstractPattern {
 	 * layout method. layout() is called explicitly or implicitly from some
 	 * methods.
 	 * 
-	 * {@link #updateRefinement(ContainerShape, EObject)} executes this
-	 * method and apply a resize just after. The layout() method is called from
+	 * {@link #updateRefinement(ContainerShape, EObject)} calls this method and
+	 * apply a resize just after. The layout() method is called from
 	 * resizeShape() method.
 	 * 
 	 * @param instanceShape
