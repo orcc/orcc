@@ -2,11 +2,7 @@
 ### Notable changes and features
 - Network editor
     + Copy / Paste ports or instances in a diagram or across different diagrams is now supported [#107]
-    + Improve diagrams serialization process. Links to network objects now uses default EMF fragments. As a result, the diagram editor is more stable and generates less errors in following cases:
-        * Update an instance after renaming a port in the entity it is refined on
-        * Update an instance after deleting the entity it is refined on
-
-      This change implies that all diagrams generated from a previous version have to be updated.
+    + Improve diagrams serialization to avoid problems when updating instances whose refined entities have been previously modified or removed. This change implies that all diagrams generated from previous versions have to be updated.
 - Back-ends
     + [C] New debugging features:
         - Use "@DEBUG" annotation on action signature to display its production/consumption during the execution
@@ -23,6 +19,7 @@
 ### Known issues
 - [#112] Refactoring: Moving more than one file at a time could cause errors in updated files. Undo should always be available if errors appears. Moving files one by one should work as expected.
 - [#79] Using sub-list as procedure argument produces wrong code.
+- [#108] [C] Modifying output port variables both in action body and in procedure produces wrong code.
 
 # 2.0.1 May 20, 2014
 ### Bugfixes
