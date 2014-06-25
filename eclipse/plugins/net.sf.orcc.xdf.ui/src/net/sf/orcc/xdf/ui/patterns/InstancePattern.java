@@ -678,7 +678,7 @@ public class InstancePattern extends AbstractPattern {
 				// Update df connection
 				final net.sf.orcc.df.Connection dfConnection = ((net.sf.orcc.df.Connection) getBusinessObjectForPictogramElement(connection));
 				final Port inPort = entity.getInput(portName);
-				dfConnection.setSourcePort(inPort);
+				dfConnection.setTargetPort(inPort);
 				// Update Graphiti connection
 				connection.setEnd(anchor);
 				cptReconnectedTo++;
