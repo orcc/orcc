@@ -45,9 +45,7 @@ import net.sf.orcc.xdf.ui.styles.StyleUtil;
 import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IReason;
@@ -115,7 +113,6 @@ public class InstancePattern extends AbstractPattern {
 	private static final String PORT_NAME_KEY = "REF_PORT_NAME";
 
 	private static final String REFINEMENT_KEY = "refinement";
-	private static final String INVALIDATED_REFINEMENT = "no-refinement";
 
 	private enum Direction {
 		INPUTS, OUTPUTS
@@ -444,9 +441,6 @@ public class InstancePattern extends AbstractPattern {
 			if (plateforStringUri == null) {
 				// The instance has never been refined
 				return Reason.createFalseReason();
-			} else if (INVALIDATED_REFINEMENT.equals(plateforStringUri)) {
-				// The null refinement is already up-to-date
-				return Reason.createFalseReason();
 			} else {
 				return Reason.createTrueReason("Invalid refinement");
 			}
@@ -628,8 +622,7 @@ public class InstancePattern extends AbstractPattern {
 		}
 
 		// Invalidate the refinement property
-		Graphiti.getPeService().setPropertyValue(instanceShape, REFINEMENT_KEY,
-				INVALIDATED_REFINEMENT);
+		Graphiti.getPeService().removeProperty(instanceShape, REFINEMENT_KEY);
 
 		// Reset shape style to basic state
 		instanceShape.getGraphicsAlgorithm().setStyle(
@@ -729,29 +722,6 @@ public class InstancePattern extends AbstractPattern {
 			for (final Connection connection : connectionList) {
 				XdfUtil.deleteConnection(getFeatureProvider(), connection);
 				cptDeletedConnections++;
-			}
-		}
-
-		// Specific case: if this method is executed by update() after a port
-		// renaming outside the diagram editor, the previous block has not
-		// completely deleted invalid connections.
-		// The linked net.sf.orcc.sf.Connection has an URI relative to its
-		// container (Actor or Network). This URI uses the source / target port
-		// name. But at this point, the port name doesn't exists anymore. The
-		// businessObject linked from diagram connection pictogram became a
-		// proxy when the old port has been removed from the diagram.
-		// To completely delete invalid connections from the network, we must
-		// check for invalid objects in source port or target port of each
-		// connection.
-		final Network network = (Network) getBusinessObjectForPictogramElement(getDiagram());
-		final List<net.sf.orcc.df.Connection> connectionsCopy = new ArrayList<net.sf.orcc.df.Connection>(
-				network.getConnections());
-		for (net.sf.orcc.df.Connection dfConnection : connectionsCopy) {
-			final Port src = dfConnection.getSourcePort();
-			final Port tgt = dfConnection.getTargetPort();
-			if ((src != null && src.eIsProxy())
-					|| (tgt != null && tgt.eIsProxy())) {
-				EcoreUtil.delete(dfConnection);
 			}
 		}
 
@@ -1043,28 +1013,6 @@ public class InstancePattern extends AbstractPattern {
 			return text.getValue();
 		}
 		return "";
-	}
-
-	/**
-	 * If the instance corresponding to the given PictogramElement has a
-	 * refinement defined (Actor or Network), returns it. If not, returns null.
-	 * 
-	 * @param pe
-	 * @return
-	 */
-	public EObject getRefinementFromShape(final PictogramElement pe) {
-		if (isPatternRoot(pe)) {
-			final String plateforStringUri = Graphiti.getPeService().getPropertyValue(pe, REFINEMENT_KEY);
-			if (INVALIDATED_REFINEMENT.equals(plateforStringUri)) {
-				return null;
-			}
-			final URI resUri = URI.createPlatformResourceURI(plateforStringUri, true);
-			final Resource res = getDiagramBehavior().getEditingDomain().getResourceSet().getResource(resUri, true);
-			if (res.getContents().size() > 0) {
-				return res.getContents().get(0);
-			}
-		}
-		return null;
 	}
 
 	/**

@@ -36,16 +36,12 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.df.util.XdfParser;
 import net.sf.orcc.df.util.XdfWriter;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -172,7 +168,7 @@ public class XdfResourceImpl extends ResourceImpl {
 		String fragment = uriFragment.substring(3);
 		EObject root = getContents().get(0);
 		if (root instanceof Network) {
-			Network network = (Network) root;
+			final Network network = (Network) root;
 			if (fragment.startsWith("connections:")) {
 				return getConnection(network, fragment);
 			} else {
@@ -196,53 +192,4 @@ public class XdfResourceImpl extends ResourceImpl {
 
 		return super.getEObject(uriFragment);
 	}
-
-	@Override
-	public String getURIFragment(EObject eObject) {
-		if (eObject instanceof Network) {
-			// only one network per XdfResource
-			return "/";
-		} else if (eObject instanceof Instance) {
-			Instance instance = (Instance) eObject;
-			return "//@instances." + instance.getName();
-		} else if (eObject instanceof Port) {
-			Port port = (Port) eObject;
-			if (DfUtil.isInput(port)) {
-				return "//@inputs." + port.getName();
-			} else {
-				return "//@outputs." + port.getName();
-			}
-		} else if (eObject instanceof Var) {
-			Var var = (Var) eObject;
-			if (var.eContainingFeature() == DfPackage.Literals.NETWORK__PARAMETERS) {
-				return "//@parameters." + var.getName();
-			} else {
-				return "//@variables." + var.getName();
-			}
-		} else if (eObject instanceof Connection) {
-			Connection connection = (Connection) eObject;
-			StringBuilder builder = new StringBuilder("//@connections:");
-
-			builder.append(connection.getSource().getLabel());
-			Port sourcePort = connection.getSourcePort();
-			if (sourcePort != null) {
-				builder.append('.');
-				builder.append(sourcePort.getName());
-			}
-			builder.append('-');
-
-			builder.append(connection.getTarget().getLabel());
-			Port targetPort = connection.getTargetPort();
-			if (targetPort != null) {
-				builder.append('.');
-				builder.append(targetPort.getName());
-			}
-
-			return builder.toString();
-		}
-
-		// for other objects (types, expressions...)
-		return super.getURIFragment(eObject);
-	}
-
 }
