@@ -1,24 +1,30 @@
-# 2.0.2 Next release
+# 2.1.0 Next release
 ### Notable changes and features
 - Network editor
-    + Copy / Paste ports or instances in a diagram or accross different diagrams is now supported [#107]
+    + Copy / Paste ports or instances in a diagram or across different diagrams is now supported [#107]
+    + Improve diagrams serialization process. Links to network objects now uses default EMF fragments. As a result, the diagram editor is more stable and generates less errors in following cases:
+        * Update an instance after renaming a port in the entity it is refined on
+        * Update an instance after deleting the entity it is refined on
+
+      This change implies that all diagrams generated from a previous version have to be updated.
 - Back-ends
     + [C] New debugging features:
         - Use "@DEBUG" annotation on action signature to display its production/consumption during the execution
         - Add option "-z" to display the actor firings (instead of setting PRINT_FIRING)
     + [C] Add experimental support of FFMPEG public API through native functions
-    + [C] Make external libraries (SDL, Threads, etc) fully optional to compile the orcc library, the only requirement is now the C standard library 
+    + [C] Make external libraries (SDL, Threads, etc) fully optional to compile the orcc library, the only requirement is now the C standard library
     + [HLS] Performance improvement of the generated design by using dual-port RAMs for the FIFOs
     + [TTA] Initial support of zynq platforms
 
 ### Bugfixes
+- Front-end
+    + [#103] Using a local variable in a guard is now forbidden
 
 ### Known issues
-
-### Miscellaneous
+- [#112] Refactoring: Moving more than one file at a time could cause errors in updated files. Undo should always be available if errors appears. Moving files one by one should work as expected.
+- [#79] Using sub-list as procedure argument produces wrong code.
 
 # 2.0.1 May 20, 2014
-
 ### Bugfixes
 - Network editor
     + Grouping/ungrouping instances in a Network now manage correctly arguments and parameters
@@ -84,7 +90,7 @@
 
 ### Known issues
 - Refactoring: Moving more than one file at a time could cause errors in updated files. Undo should always be available if errors appears. Moving files one by one should work as expected.
-- Using sub-list as procedure argument produces wrong code.
+- [#79] Using sub-list as procedure argument produces wrong code.
 
 ### Miscellaneous
 - Java, C++ and OpenCL backends have been removed. They were not maintained for a long time, and seemed to be unused.
@@ -97,7 +103,6 @@
     * Remove unfinished soket-based FIFO implementation.
 
 # 1.4.0 October 2013
-
 ### Notable changes and features
 - Backends:
     * New experimental HMPP backend
@@ -119,11 +124,8 @@ running a backend stops with an error message.
 ### Known issues
 - HEVC decoder built in release mode with LLVM Backend does not work.
 
-
 # 1.3.1 May 2013
-
 ### Notable changes and features
-
 - Front-end:
     * Annotations are allowed on a call instruction
 - Backends:
@@ -131,15 +133,12 @@ running a backend stops with an error message.
 <loops_count>" in most cases.
 
 ### Bugfixes
-
 - Front-end:
     * Fixed #44: Use of an annotation multiple time in the same scope cause editor to report
 a syntax error
 
 # 1.3.0 March 2013
-
 ### Notable changes and features
-
 - Front-end:
     * Optimization of the generated intermediated representation by removing most of useless
     memory copies.
@@ -172,7 +171,6 @@ a syntax error
     * Supports now the Z3 solver v4.12+, the support of other solver is dropped.
 
 ### Bugfixes
-
 - User interface:
     * When creating an instance in a graph, existing names are checked in case insensitive
     mode to fix Microsoft Windows bug when printing source files.
@@ -188,25 +186,20 @@ a syntax error
 - Fix a bug related to the support of floating-point operation.
 
 ### Misc
-
 - Move Graphiti-editor plugins into Orcc repository. Only one eclipse feature has to be
 installed to use Orcc. Separate Graphiti-editor plugin is not needed anymore.
 - All backends use now Xtend instead of StringTemplate to print code.
 - Deletion of the XLIM back-end (replaced by Xronos).
 
 ### Known issues
-
 - Declaration of a variable outside the explicit 'var' declaration blocks.
 - Wrong classification in case of complex data dependant behavior or floating points types usage.
 
 # 1.2.1 Oct 2012
-
 - Fix library extraction in C backend
 
 # 1.2.0 Sept 2012
-
 ### Notable changes and features
-
 - Front-end: experimental support of new floating point types (half and double).
 - New LLVM backend with static compilation (the old version is renamed as Jade
 backend).
@@ -235,7 +228,6 @@ is now written in ```bin``` folder
 - UI: Improve user experience by printing better error messages.
 
 ### Bugfixes
-
 - UI: Removing an existing mapping was not possible without removing the runtime configuration.
 - Tools: The classifier, the action merger and the actor merger are (almost) working back and their
 performances have been improved.
@@ -243,49 +235,36 @@ performances have been improved.
 - RoXML: Update to latest version to fix some parsing errors on Windows caused by CRLF for end of line.
 
 ### Misc
-
 - Move the 'models' plugin in Orcc repository and remove dependencies to dftools.
 - The Java backend is now using Xtend instead StringTemplate to generate the files.
 
 # 1.1.1 April 2012
-
 ### Notable changes and features
-
 - Interpreter: bit exact simulation and floating point simulation.
 
 ### Smaller features
-
 - TTA backend: reduction of the logic utilization on the target platform.
 
 # 1.1 March 2012
-
 ### Notable changes and features
-
 - Embedded runtime libraries (C, Java and TTA) automatically extracted during the code generation.
 
 ### Smaller features
-
 - TTA back-end: support Xilinx device.
 - Code generator is now able to print For loops.
 
 ### Misc
-
 - Addition of a New Control Flow Graph API.
 - Removed dependencies to JGraphT (FSM builder, Merger, etc) in favor of DFtools graph API.
 
 # 1.0 January 2012
-
 ### Notable changes and features
-
 - First usable version of the TTA back-end (only for Altera device).
 
 ### Misc
-
 - Deletion of the VHDL back-end (not maintained anymore).
 - Deletion of the C++ back-end (not used anymore).
 
 # 0.9.5 May 2011
-
 ### Notable changes and features
-
 - Addition of an earlier version of the TTA back-end.
