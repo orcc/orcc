@@ -691,19 +691,34 @@ public class InstancePattern extends AbstractPattern {
 			return;
 		}
 
+		final Entity entity = ((Instance) getBusinessObjectForPictogramElement(instanceShape))
+				.getAdapter(Entity.class);
+
 		// Restore connections start or end from port name they were
 		// connected to.
 		int cptReconnectedTo = 0, cptReconnectedFrom = 0;
 		for (final Anchor anchor : instanceShape.getAnchors()) {
 			final String portName = Graphiti.getPeService().getPropertyValue(
 					anchor, PORT_NAME_KEY);
+
 			if (PropsUtil.isInstanceInPort(anchor)
 					&& incomingMap.containsKey(portName)) {
-				incomingMap.remove(portName).setEnd(anchor);
+				final Connection connection = incomingMap.remove(portName);
+				// Update df connection
+				final net.sf.orcc.df.Connection dfConnection = ((net.sf.orcc.df.Connection) getBusinessObjectForPictogramElement(connection));
+				final Port inPort = entity.getInput(portName);
+				dfConnection.setSourcePort(inPort);
+				// Update Graphiti connection
+				connection.setEnd(anchor);
 				cptReconnectedTo++;
 			} else if (PropsUtil.isInstanceOutPort(anchor)
 					&& outgoingMap.containsKey(portName)) {
 				for (final Connection connection : outgoingMap.remove(portName)) {
+					// Update df connection
+					final net.sf.orcc.df.Connection dfConnection = ((net.sf.orcc.df.Connection) getBusinessObjectForPictogramElement(connection));
+					final Port outPort = entity.getOutput(portName);
+					dfConnection.setSourcePort(outPort);
+					// Update Graphiti connection
 					connection.setStart(anchor);
 					cptReconnectedFrom++;
 				}
