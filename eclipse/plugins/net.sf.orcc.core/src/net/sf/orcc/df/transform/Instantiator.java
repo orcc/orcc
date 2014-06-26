@@ -59,8 +59,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class Instantiator extends DfSwitch<Void> {
 
-	private final int defaultFifoSize;
-
 	private final boolean instantiateActors;
 
 	/**
@@ -90,7 +88,6 @@ public class Instantiator extends DfSwitch<Void> {
 	 *            default FIFO size
 	 */
 	public Instantiator(boolean instantiateActors, int defaultFifoSize) {
-		this.defaultFifoSize = defaultFifoSize;
 		this.instantiateActors = instantiateActors;
 	}
 
@@ -127,13 +124,6 @@ public class Instantiator extends DfSwitch<Void> {
 								+ actor.getSimpleName());
 					}
 				}
-			}
-		}
-
-		// update FIFO size
-		for (Connection connection : network.getConnections()) {
-			if (connection.getSize() == null && defaultFifoSize != 0) {
-				connection.setSize(defaultFifoSize);
 			}
 		}
 		return null;
