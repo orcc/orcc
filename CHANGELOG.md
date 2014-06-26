@@ -1,4 +1,4 @@
-# 2.1.0 Next release
+# 2.1.0 June 26, 2014
 ### Notable changes and features
 - Network editor
     + Copy / Paste ports or instances in a diagram or across different diagrams is now supported [#107]
