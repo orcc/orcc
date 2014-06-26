@@ -50,6 +50,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.graphiti.mm.algorithms.styles.Style;
+import org.eclipse.graphiti.mm.algorithms.styles.StylesPackage;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -130,6 +132,12 @@ public class ProjectUpdater extends AbstractHandler {
 							.getBusinessObjectForLinkedPictogramElement(
 									connection);
 				}
+
+				// Remove all 'angle' attributes
+				for(Style style : diagram.getStyles()) {
+					style.eUnset(StylesPackage.eINSTANCE.getStyle_Angle());
+				}
+
 				// Save the resource. The diagram file will now have updated
 				// links URI
 				res.save(Collections.EMPTY_MAP);
