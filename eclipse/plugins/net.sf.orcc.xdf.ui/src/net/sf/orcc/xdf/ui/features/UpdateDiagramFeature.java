@@ -349,7 +349,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			return;
 		}
 
-		final int version = Integer.getInteger(property.getValue()).intValue();
+		final int version = Integer.parseInt(property.getValue());
 		if (CURRENT_EDITOR_VERSION == version) {
 			// The diagram is up-to-date, nothing to do
 			return;
