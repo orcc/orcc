@@ -59,6 +59,8 @@ import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
+import org.eclipse.graphiti.mm.algorithms.styles.Style;
+import org.eclipse.graphiti.mm.algorithms.styles.StylesPackage;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -80,7 +82,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 	private static String GLOBAL_VERSION_KEY = "xdf_diagram_version";
-	private static String CURRENT_EDITOR_VERSION = "1";
+	private static String VERSION_1 = "1";
+	private static String CURRENT_EDITOR_VERSION = "2";
 
 	private boolean hasDoneChanges;
 
@@ -336,14 +339,34 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	 * @param diagram
 	 */
 	private void updateVersion(final Diagram diagram) {
-		// A new Diagram: set version to current
-		final String version = Graphiti.getPeService().getPropertyValue(diagram, GLOBAL_VERSION_KEY);
-		if (version == null) {
-			Graphiti.getPeService().setPropertyValue(diagram, GLOBAL_VERSION_KEY, CURRENT_EDITOR_VERSION);
+		final String version = Graphiti.getPeService().getPropertyValue(
+				diagram, GLOBAL_VERSION_KEY);
+
+		if (CURRENT_EDITOR_VERSION.equals(version)) {
+			return;
+		} else if (version == null) {
+			// A new Diagram: set version to current
+			Graphiti.getPeService().setPropertyValue(diagram,
+					GLOBAL_VERSION_KEY, CURRENT_EDITOR_VERSION);
+			return;
 		}
-		// In future versions of this diagram editor, the diagram version should
-		// be checked here. This should be used to automatically update diagrams
-		// (styles, shapes tree, etc.) from an older to the current version of
-		// the editor.
+
+		/*
+		 * Eclipse Luna comes with Graphiti 0.11. This new Graphiti version
+		 * replaces 'angle' feature with 'rotation' equivalent. Unfortunately,
+		 * 'rotation' is not defined in Graphiti model before 0.11. If a xdfdiag
+		 * contains an 'angle' value, it will be converted by newer versions to
+		 * 'rotation'. As a result, the diagram will become invalid for all
+		 * older versions of Orcc. To fix the issue, we force to remove all
+		 * usage of 'angle' property. They are not used and were in the default
+		 * "COMMON_TEXT" style only because of a copy/paste from Graphiti doc.
+		 */
+		if (VERSION_1.equals(version)) {
+			for (Style style : diagram.getStyles()) {
+				if (style.eIsSet(StylesPackage.eINSTANCE.getStyle_Angle())) {
+					style.eUnset(StylesPackage.eINSTANCE.getStyle_Angle());
+				}
+			}
+		}
 	}
 }
