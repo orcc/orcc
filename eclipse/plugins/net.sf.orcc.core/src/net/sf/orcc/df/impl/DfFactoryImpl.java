@@ -316,7 +316,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	@Override
 	public Connection createConnection(Vertex source, Port sourcePort,
-			Vertex target, Port targetPort, int size) {
+			Vertex target, Port targetPort, Integer size) {
 		Connection connection = createConnection(source, sourcePort, target,
 				targetPort);
 		connection.setSize(size);

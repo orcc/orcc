@@ -173,7 +173,7 @@ public interface DfFactory extends EFactory {
 	 *            target port
 	 */
 	Connection createConnection(Vertex source, Port sourcePort, Vertex target,
-			Port targetPort, int size);
+			Port targetPort, Integer size);
 
 	/**
 	 * Returns a new object of class '<em>FSM</em>'.

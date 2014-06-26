@@ -229,8 +229,9 @@ public class UngroupNetworkFeature extends AbstractTimeConsumingCustomFeature {
 				final Instance target = copies.get(connection.getTarget());
 				final Port targetPort = target.getAdapter(Entity.class).getInput(connection.getTargetPort().getName());
 				
-				final Connection newConnection = DfFactory.eINSTANCE.createConnection(
-						source, sourcePort, target, targetPort);
+				final Connection newConnection = DfFactory.eINSTANCE
+						.createConnection(source, sourcePort, target,
+								targetPort, connection.getSize());
 
 				// We will 'add' a new Connection to a diagram (not create it,
 				// in Graphiti context). It must exists in the current network

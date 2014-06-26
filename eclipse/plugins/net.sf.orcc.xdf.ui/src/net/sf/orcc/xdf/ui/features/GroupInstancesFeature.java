@@ -294,8 +294,9 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 				final Instance target = copyMap.get(connection.getTarget());
 				final Port targetPort = target.getAdapter(Entity.class)
 						.getInput(connection.getTargetPort().getName());
-				newNetwork.add(DfFactory.eINSTANCE.createConnection(newInputPort, null,
-						target, targetPort));
+				newNetwork.add(DfFactory.eINSTANCE.createConnection(
+						newInputPort, null, target, targetPort,
+						connection.getSize()));
 
 				// Update this Connection target: the new Instance, on the right
 				// input Port
@@ -319,7 +320,7 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 				final Port sourcePort = source.getAdapter(Entity.class)
 						.getOutput(connection.getSourcePort().getName());
 				newNetwork.add(DfFactory.eINSTANCE.createConnection(source,
-						sourcePort, newOutputPort, null));
+						sourcePort, newOutputPort, null, connection.getSize()));
 
 				// Update this Connection source: the new Instance, on the right
 				// output Port
