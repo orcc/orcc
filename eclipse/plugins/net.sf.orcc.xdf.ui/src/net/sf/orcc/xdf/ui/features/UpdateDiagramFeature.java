@@ -59,6 +59,7 @@ import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
+import org.eclipse.graphiti.mm.Property;
 import org.eclipse.graphiti.mm.algorithms.styles.Style;
 import org.eclipse.graphiti.mm.algorithms.styles.StylesPackage;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -82,8 +83,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 
 	private static String GLOBAL_VERSION_KEY = "xdf_diagram_version";
-	private static String VERSION_1 = "1";
-	private static String CURRENT_EDITOR_VERSION = "2";
+	private static int VERSION_1 = 1;
+	private static int CURRENT_EDITOR_VERSION = 2;
 
 	private boolean hasDoneChanges;
 
@@ -339,15 +340,18 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	 * @param diagram
 	 */
 	private void updateVersion(final Diagram diagram) {
-		final String version = Graphiti.getPeService().getPropertyValue(
-				diagram, GLOBAL_VERSION_KEY);
-
-		if (CURRENT_EDITOR_VERSION.equals(version)) {
-			return;
-		} else if (version == null) {
-			// A new Diagram: set version to current
+		final Property property = Graphiti.getPeService().getProperty(diagram,
+				GLOBAL_VERSION_KEY);
+		if (property == null || property.getValue() == null) {
+			// The Diagram has just been created: set version to "current"
 			Graphiti.getPeService().setPropertyValue(diagram,
-					GLOBAL_VERSION_KEY, CURRENT_EDITOR_VERSION);
+					GLOBAL_VERSION_KEY, String.valueOf(CURRENT_EDITOR_VERSION));
+			return;
+		}
+
+		final int version = Integer.getInteger(property.getValue()).intValue();
+		if (CURRENT_EDITOR_VERSION == version) {
+			// The diagram is up-to-date, nothing to do
 			return;
 		}
 
@@ -361,12 +365,14 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		 * usage of 'angle' property. They are not used and were in the default
 		 * "COMMON_TEXT" style only because of a copy/paste from Graphiti doc.
 		 */
-		if (VERSION_1.equals(version)) {
+		if (version <= VERSION_1) {
 			for (Style style : diagram.getStyles()) {
 				if (style.eIsSet(StylesPackage.eINSTANCE.getStyle_Angle())) {
 					style.eUnset(StylesPackage.eINSTANCE.getStyle_Angle());
 				}
 			}
 		}
+
+		property.setValue(String.valueOf(CURRENT_EDITOR_VERSION));
 	}
 }
