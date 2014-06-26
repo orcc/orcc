@@ -23,7 +23,6 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 
@@ -85,8 +84,7 @@ public class XmlBufferSizeConfiguration {
 					}
 				}
 
-				connection.setAttribute(Connection.BUFFER_SIZE,
-						IrFactory.eINSTANCE.createExprInt(size));
+				connection.setSize(size);
 			}
 
 			return null;
@@ -142,6 +140,7 @@ public class XmlBufferSizeConfiguration {
 			}
 		}
 
+		@Override
 		public String toString() {
 			StringBuffer b = new StringBuffer();
 			b.append(sourceActor != null ? sourceActor : "");

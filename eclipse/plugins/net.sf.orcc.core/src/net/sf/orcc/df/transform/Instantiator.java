@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.df.transform;
 
-import static net.sf.orcc.df.Connection.BUFFER_SIZE;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,9 +59,9 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class Instantiator extends DfSwitch<Void> {
 
-	private int defaultFifoSize;
+	private final int defaultFifoSize;
 
-	private boolean instantiateActors;
+	private final boolean instantiateActors;
 
 	/**
 	 * Creates an instantiator, equivalent to
@@ -134,9 +132,8 @@ public class Instantiator extends DfSwitch<Void> {
 
 		// update FIFO size
 		for (Connection connection : network.getConnections()) {
-			if (connection.getAttribute(BUFFER_SIZE) == null
-					&& defaultFifoSize != 0) {
-				connection.setAttribute(BUFFER_SIZE, defaultFifoSize);
+			if (connection.getSize() == null && defaultFifoSize != 0) {
+				connection.setSize(defaultFifoSize);
 			}
 		}
 		return null;

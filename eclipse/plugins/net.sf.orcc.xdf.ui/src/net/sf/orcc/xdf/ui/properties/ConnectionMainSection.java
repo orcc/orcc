@@ -29,7 +29,6 @@
 package net.sf.orcc.xdf.ui.properties;
 
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -101,14 +100,13 @@ public class ConnectionMainSection extends AbstractGridBasedSection {
 		final Connection connection = (Connection) getSelectedBusinessObject();
 		if(widget == connectionSize) {
 			if (connectionSize.getText().isEmpty()) {
-				connection.removeAttribute(Connection.BUFFER_SIZE);
+				connection.unsetSize();
 				return;
 			}
 			try {
 				final String sizeText = connectionSize.getText();
 				final Integer bufferSize = Integer.parseInt(sizeText);
-				connection.setAttribute(Connection.BUFFER_SIZE,
-						IrFactory.eINSTANCE.createExprInt(bufferSize));
+				connection.setSize(bufferSize);
 			} catch (NumberFormatException e) {
 				MessageDialog.openError(XdfUtil.getDefaultShell(), "Syntax error",
 						"Unable to parse the size you entered.");

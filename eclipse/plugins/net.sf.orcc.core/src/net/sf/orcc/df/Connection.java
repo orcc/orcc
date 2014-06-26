@@ -41,16 +41,22 @@ import net.sf.orcc.graph.Edge;
 public interface Connection extends Edge {
 
 	/**
-	 * the bufferSize attribute can be attached to a FIFO to specify its size
-	 */
-	static final String BUFFER_SIZE = "bufferSize";
-
-	/**
 	 * Returns the size of this connection.
 	 * 
-	 * @return the size of this connection
+	 * @return the size of this connection, or null if this connection doesn't
+	 *         have a specific size
 	 */
 	Integer getSize();
+
+	/**
+	 * Set the size of this connection.
+	 */
+	void setSize(Integer size);
+
+	/**
+	 * Remove the size information from this connection
+	 */
+	void unsetSize();
 
 	/**
 	 * Returns this connection's source port (may be <code>null</code>).

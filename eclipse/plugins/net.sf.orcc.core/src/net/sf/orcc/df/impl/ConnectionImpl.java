@@ -33,6 +33,7 @@ import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.impl.EdgeImpl;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.util.Attribute;
 
@@ -50,6 +51,11 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * @generated
  */
 public class ConnectionImpl extends EdgeImpl implements Connection {
+
+	/**
+	 * the bufferSize attribute can be attached to a FIFO to specify its size
+	 */
+	protected static final String BUFFER_SIZE = "bufferSize";
 
 	/**
 	 * The cached value of the '{@link #getSourcePort() <em>Source Port</em>}' reference.
@@ -220,6 +226,13 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 		return targetPort;
 	}
 
+	@Override
+	public void setSize(Integer size) {
+		if (size != null) {
+			setAttribute(BUFFER_SIZE, IrFactory.eINSTANCE.createExprInt(size));
+		}
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -244,6 +257,11 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					DfPackage.CONNECTION__TARGET_PORT, oldTargetPort,
 					targetPort));
+	}
+
+	@Override
+	public void unsetSize() {
+		removeAttribute(BUFFER_SIZE);
 	}
 
 	@Override

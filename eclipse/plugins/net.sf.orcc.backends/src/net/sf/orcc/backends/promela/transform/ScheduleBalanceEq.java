@@ -181,7 +181,7 @@ public class ScheduleBalanceEq {
 					}
 				}
 			}
-			cInfo.connection.setAttribute(Connection.BUFFER_SIZE, cInfo.smallestFifoSize);
+			cInfo.connection.setSize(cInfo.smallestFifoSize);
 		}
 	}
 	
