@@ -1,5 +1,8 @@
 # Next release
 ### Notable changes and features
+- Network editor
+    + Specific size on connections are now managed correctly when group / ungroup features are used.
+
 ### Bugfixes
 ### Known issues
 ### Miscellaneous
