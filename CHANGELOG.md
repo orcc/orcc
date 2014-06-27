@@ -1,3 +1,9 @@
+# Next release
+### Notable changes and features
+### Bugfixes
+### Known issues
+### Miscellaneous
+
 # 2.1.1 June 27, 2014
 ### Notable changes and features
 A patch has been applied to ensure a smooth transition from Graphiti 0.10 to Graphiti 0.11. Thus, Orcc developers and users are free to use either Eclipse Kepler or Luna (the new release) without any backward or forward compatibility issue.
