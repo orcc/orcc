@@ -159,19 +159,50 @@ void add_8_16_clip_256_32x32_orcc(
 /* DecodingPictureBuffer */
 /*************************/
 
-void copy_cu_dpb_luma_orcc(
+void copy_cu_dpb_luma_x64_orcc(
+	u8 samp[4096],
+	u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT + 2 * BORDER_SIZE][PICT_WIDTH + 2 * BORDER_SIZE],
+	i32 xPixIdx,
+	i32 yPixIdx,
+	i8  lastIdx);
+
+void copy_cu_dpb_luma_x32_orcc(
+	u8 samp[1024],
+	u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT + 2 * BORDER_SIZE][PICT_WIDTH + 2 * BORDER_SIZE],
+	i32 xPixIdx,
+	i32 yPixIdx,
+	i8  lastIdx);
+
+
+void copy_cu_dpb_luma_x16_orcc(
     u8 samp[256],
     u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
     i32 xPixIdx,
     i32 yPixIdx,
     i8  lastIdx);
 
-void copy_cu_dpb_chroma_orcc(
-    u8 samp[64],
+void copy_cu_dpb_chroma_x64_orcc(
+    u8 samp[1024],
     u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT/2+2*BORDER_SIZE][PICT_WIDTH/2+2*BORDER_SIZE],
     i32 xPixIdx,
     i32 yPixIdx,
     i8  lastIdx);
+
+void copy_cu_dpb_chroma_x32_orcc(
+	u8 samp[256],
+	u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT / 2 + 2 * BORDER_SIZE][PICT_WIDTH / 2 + 2 * BORDER_SIZE],
+	i32 xPixIdx,
+	i32 yPixIdx,
+	i8  lastIdx);
+
+
+void copy_cu_dpb_chroma_x16_orcc(
+	u8 samp[64],
+	u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT / 2 + 2 * BORDER_SIZE][PICT_WIDTH / 2 + 2 * BORDER_SIZE],
+	i32 xPixIdx,
+	i32 yPixIdx,
+	i8  lastIdx);
+
 
 void getmvinfo_dpb_64_luma_orcc(
     u8 pictureBuffer[DPB_SIZE][PICT_HEIGHT+2*BORDER_SIZE][PICT_WIDTH+2*BORDER_SIZE],
