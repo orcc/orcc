@@ -137,7 +137,9 @@ public class SlowSimulator extends AbstractSimulator {
 			Actor tgt = connection.getTarget().getAdapter(Actor.class);
 			Port srcPort = connection.getSourcePort();
 			Port tgtPort = connection.getTargetPort();
-			int size = connection.getSize();
+
+			Integer fifoSize = connection.getSize();
+			int size = fifoSize == null ? getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE) : fifoSize;
 
 			if (src == null || tgt == null || srcPort == null
 					|| tgtPort == null) {
