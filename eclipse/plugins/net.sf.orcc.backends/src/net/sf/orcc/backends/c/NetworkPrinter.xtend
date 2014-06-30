@@ -54,6 +54,7 @@ class NetworkPrinter extends CTemplate {
 	protected var boolean newSchedul = false
 	
 	new(Network network, Map<String, Object> options) {
+		super(options)
 		this.network = network
 
 		if(options.containsKey(PROFILE)){

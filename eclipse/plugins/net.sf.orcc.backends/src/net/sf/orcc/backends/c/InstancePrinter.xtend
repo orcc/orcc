@@ -114,7 +114,6 @@ class InstancePrinter extends CTemplate {
 	 */
 	protected new() {
 		instance = null
-		fifoSize = DEFAULT_FIFO_SIZE
 	}
 
 	new(Map<String, Object> options) {
