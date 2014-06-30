@@ -118,6 +118,7 @@ class InstancePrinter extends CTemplate {
 	}
 
 	new(Map<String, Object> options) {
+		super(options)
 		if(options.containsKey(PROFILE)){
 			profile = options.get(PROFILE) as Boolean
 		}
