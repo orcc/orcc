@@ -4,9 +4,9 @@ import java.io.File
 import java.util.HashMap
 import java.util.List
 import java.util.Map
+import net.sf.orcc.backends.c.CTemplate
 import net.sf.orcc.backends.ir.BlockFor
 import net.sf.orcc.backends.ir.InstTernary
-import net.sf.orcc.backends.c.CTemplate
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
@@ -28,14 +28,12 @@ import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Procedure
-import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeBool
+import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
 import net.sf.orcc.util.OrccUtil
-
-import static net.sf.orcc.OrccLaunchConstants.*
 
 /**
  * Generate and print actor source file for DAL backend.
@@ -69,16 +67,13 @@ class InstanceCPrinter extends CTemplate {
 	 * not print instances but actors
 	 */
 	protected new() {
+		super()
 		instance = null
 		maxIter = 0
 	}
 	
 	new(Map<String, Object> options) {		
-		if (options.containsKey(FIFO_SIZE)) {
-			fifoSize = options.get(FIFO_SIZE) as Integer
-		} else {
-			fifoSize = 512
-		}
+		super(options)
 	}
 	
 	override caseTypeBool(TypeBool type) 

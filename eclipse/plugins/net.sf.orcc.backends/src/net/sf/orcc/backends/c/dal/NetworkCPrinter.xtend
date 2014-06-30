@@ -15,8 +15,6 @@ import net.sf.orcc.graph.Vertex
 import net.sf.orcc.ir.Type
 import net.sf.orcc.util.OrccUtil
 
-import static net.sf.orcc.OrccLaunchConstants.*
-
 /**
  * Generate and print process network description for DAL backend.
  *  
@@ -25,20 +23,14 @@ import static net.sf.orcc.OrccLaunchConstants.*
  * Modified from Orcc C NetworkPrinter
  */
 class NetworkCPrinter extends CTemplate {
-	
+
 	protected val Network network
-	protected val int fifoSize
-	
+
 	new(Network network, Map<String, Object> options) {
+		super(options)
 		this.network = network
-		
-		if (options.containsKey(FIFO_SIZE)) {
-			fifoSize = options.get(FIFO_SIZE) as Integer
-		} else {
-			fifoSize = DEFAULT_FIFO_SIZE
-		}
 	}
-	
+
 	def print(String targetFolder) {
 		
 		val content = networkFileContent

@@ -93,11 +93,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
 			«IF connection != null»
-				extern «connection.fifoTypeIn.doSwitch»	«connection.ramName»[«connection.size»];
+				extern «connection.fifoTypeIn.doSwitch»	«connection.ramName»[«connection.safeSize»];
 				extern unsigned int	«connection.wName»[1];
 				extern unsigned int	«connection.rName»[1];
 				unsigned int «connection.localrName»=0;
-				#define SIZE_«port.name» «connection.size - 1»
+				#define SIZE_«port.name» «connection.safeSize - 1»
 			«ENDIF»
 		«ENDFOR»
 		
@@ -105,7 +105,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Output FIFOs
 		«FOR port : actor.outputs.filter[! native]»
 			«FOR connection : outgoingPortMap.get(port)»					
-				extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[«connection.size»];
+				extern «connection.fifoTypeOut.doSwitch» «connection.ramName»[«connection.safeSize»];
 				extern unsigned int «connection.wName»[1];
 				extern unsigned int «connection.rName»[1];
 				unsigned int «connection.localwName»=0;
@@ -239,7 +239,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	//&& (512 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)			
 	def printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''		
 		
-			&& («successor.size» - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.
+			&& («successor.safeSize» - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.
 			getNumTokens(port)»)
 		
 	'''
@@ -342,7 +342,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 			«IF (trgtPort != null)»
 				«outgoingPortMap.get(trgtPort).head.ramName»[((«outgoingPortMap.get(trgtPort).head.localwName» & («outgoingPortMap.
-				get(trgtPort).head.size - 1» )) + («store.indexes.head.doSwitch»))]=«store.value.doSwitch»;
+				get(trgtPort).head.safeSize - 1» )) + («store.indexes.head.doSwitch»))]=«store.value.doSwitch»;
 			«ELSE»
 				«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 			«ENDIF»

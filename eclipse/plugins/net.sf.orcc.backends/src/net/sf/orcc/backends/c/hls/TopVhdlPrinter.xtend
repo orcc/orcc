@@ -35,7 +35,7 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.util.OrccUtil
-
+import static net.sf.orcc.OrccLaunchConstants.*
 /**
  * Compile top Network c source code 
  *  
@@ -473,12 +473,8 @@ class TopVhdlPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 				«printOutputRamSignalAssignHLS(connection)»
 			«ENDIF»
 				«printInputRAMSignalAssignHLS(connection)»
-					
-			
-			
 			
 		«ENDFOR»
-		
 	'''
 
 	def printOutputRamSignalAssignHLS(Connection connection) '''
@@ -606,6 +602,10 @@ def castfifoNameWrite(Connection connection) '''«IF connection != null»myStrea
 		} else {
 			connection.targetPort.type
 		}
+	}
+	def closestLog_2(Integer x) {
+		if(x == null) closestLog_2(DEFAULT_FIFO_SIZE)
+		else closestLog_2(x.intValue)
 	}
 	def closestLog_2(int x) {
 		var p = 1;

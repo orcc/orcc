@@ -38,7 +38,6 @@ import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccUtil
 
-import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
@@ -50,19 +49,12 @@ import static net.sf.orcc.backends.BackendsConstants.*
 class NetworkPrinter extends CTemplate {
 	
 	protected val Network network;
-	protected val int fifoSize;
 	
 	protected var boolean profile = false	
 	protected var boolean newSchedul = false
 	
 	new(Network network, Map<String, Object> options) {
 		this.network = network
-		
-		if (options.containsKey(FIFO_SIZE)) {
-			fifoSize = options.get(FIFO_SIZE) as Integer
-		} else {
-			fifoSize = DEFAULT_FIFO_SIZE
-		}
 
 		if(options.containsKey(PROFILE)){
 			profile = options.get(PROFILE) as Boolean

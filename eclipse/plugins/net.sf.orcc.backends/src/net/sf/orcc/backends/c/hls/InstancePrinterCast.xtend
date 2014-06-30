@@ -67,7 +67,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			// Input FIFOs
 			extern stream<«conn.fifoType»> «conn.castfifoNameWrite»;
 			// Output FIFOS
-			extern «conn.fifoType»	«conn.ramName»[«conn.size»];
+			extern «conn.fifoType»	«conn.ramName»[«conn.safeSize»];
 			extern unsigned int	«conn.wName»[1];
 			extern unsigned int	«conn.rName»[1];
 			unsigned int «conn.localwName»=0;					
@@ -75,7 +75,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			// Input FIFOs
 			extern stream<«conn.fifoType.doSwitch»> «conn.castfifoNameWrite»;
 			// Output FIFOS
-			extern «conn.fifoType.doSwitch»	«conn.ramName»[«conn.size»];
+			extern «conn.fifoType.doSwitch»	«conn.ramName»[«conn.safeSize»];
 			extern unsigned int	«conn.wName»[1];
 			extern unsigned int	«conn.rName»[1];
 			unsigned int «conn.localwName»=0;	
@@ -85,7 +85,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
 		static void cast_«entityName»_«conn.targetPort.name»_write_untagged_0() {
-			i32 «conn.maskName» = «conn.localwName» & («conn.size - 1»);
+			i32 «conn.maskName» = «conn.localwName» & («conn.safeSize - 1»);
 			«IF conn.fifoType.bool»
 				«conn.fifoType» tmp_«conn.sourcePort.name»;
 			«ELSE»
@@ -108,7 +108,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		// Action scheduler
 		void cast_«entityName»_«conn.targetPort.name»_write_scheduler() {		
 			if (!«conn.castfifoNameWrite».empty() && isSchedulable_untagged_0()) {
-				if(1 && («conn.size» - «conn.localwName» + «conn.rName»[0] >= 1)) {
+				if(1 && («conn.safeSize» - «conn.localwName» + «conn.rName»[0] >= 1)) {
 					cast_«entityName»_«conn.targetPort.name»_write_untagged_0();
 				}
 			} else {
@@ -139,7 +139,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		«IF connOut.fifoType.bool»
 			// Input FIFOS
-			extern «connOut.fifoType» «connOut.ramName»[«connOut.size»];
+			extern «connOut.fifoType» «connOut.ramName»[«connOut.safeSize»];
 			extern unsigned int «connOut.wName»[1];
 			extern unsigned int «connOut.rName»[1];
 			unsigned int «connOut.localrName»=0;
@@ -158,7 +158,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
 		static void cast_«entityName»_«connOut.sourcePort.name»_read_untagged_0() {
-			i32 «connOut.maskName» = «connOut.localrName» & («connOut.size - 1» );
+			i32 «connOut.maskName» = «connOut.localrName» & («connOut.safeSize - 1» );
 			«IF connOut.fifoType.bool»
 				«connOut.fifoType» tmp_«connOut.targetPort.name»;
 			«ELSE»

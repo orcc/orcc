@@ -31,6 +31,7 @@ package net.sf.orcc.backends.c.transform;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
@@ -65,7 +66,8 @@ public class CBroadcastAdder extends BroadcastAdder {
 
 	private void createNeededBcast(Port srcPort, List<? extends Edge> edges) {
 		if (edges.size() > 1) {
-			int size = ((Connection) edges.get(0)).getSize();
+			Integer objectSize = ((Connection) edges.get(0)).getSize();
+			int size = objectSize == null ? OrccLaunchConstants.DEFAULT_FIFO_SIZE : objectSize;
 			for (Edge edge : edges) {
 				if (size != ((Connection) edge).getSize()) {
 					createBroadcast(network.getSimpleName(), srcPort, edges);
@@ -78,7 +80,6 @@ public class CBroadcastAdder extends BroadcastAdder {
 				}
 			}
 		}
-
 	}
 
 }

@@ -81,7 +81,6 @@ class InstancePrinter extends CTemplate {
 	protected var Instance instance
 	protected var Actor actor
 	protected var Attributable attributable
-	protected var int fifoSize
 	protected var Map<Port, Connection> incomingPortMap
 	protected var Map<Port, List<Connection>> outgoingPortMap
 
@@ -115,16 +114,10 @@ class InstancePrinter extends CTemplate {
 	 */
 	protected new() {
 		instance = null
-		fifoSize = 0
+		fifoSize = DEFAULT_FIFO_SIZE
 	}
 
 	new(Map<String, Object> options) {
-		if (options.containsKey(FIFO_SIZE)) {
-			fifoSize = options.get(FIFO_SIZE) as Integer
-		} else {
-			fifoSize = 512
-		}
-
 		if(options.containsKey(PROFILE)){
 			profile = options.get(PROFILE) as Boolean
 		}

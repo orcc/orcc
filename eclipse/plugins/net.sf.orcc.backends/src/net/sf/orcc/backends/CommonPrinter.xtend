@@ -8,6 +8,7 @@ import java.io.IOException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.List
+import java.util.Map
 import net.sf.orcc.backends.ir.BlockFor
 import net.sf.orcc.backends.ir.InstTernary
 import net.sf.orcc.df.Instance
@@ -24,6 +25,7 @@ import net.sf.orcc.ir.ExprVar
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.OpBinary
 import net.sf.orcc.ir.OpUnary
+import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeFloat
 import net.sf.orcc.ir.TypeInt
@@ -36,7 +38,9 @@ import net.sf.orcc.util.OrccLogger
 import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
 import org.eclipse.emf.ecore.EObject
-import net.sf.orcc.ir.Procedure
+
+import static net.sf.orcc.OrccLaunchConstants.*
+import net.sf.orcc.df.Connection
 
 /**
  * Define commons methods for all backends printers
@@ -46,6 +50,8 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	
 	protected var precedence = Integer::MAX_VALUE
 	protected var branch = 0
+
+	protected var int fifoSize
 	
 	/**
 	 * The algorithm used with MessageDigest. Can be MD, SHA, etc (see <a
@@ -56,6 +62,16 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	
 	new() {
 		super(true)
+	}
+
+	new(Map<String, Object> options) {
+		super(true)
+
+		if (options.containsKey(FIFO_SIZE)) {
+			fifoSize = options.get(FIFO_SIZE) as Integer
+		} else {
+			fifoSize = DEFAULT_FIFO_SIZE
+		}
 	}
 
 	/**
@@ -86,7 +102,26 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	def protected wrap(CharSequence charSeq) {
 		wrap(charSeq, 80)
 	}
-	
+
+	/**
+	 * Check if the given connection has a specified BUFFER_SIZE.
+	 */
+	def protected hasSpecificSize(Connection connection) {
+		connection.size != null
+	}
+
+	/**
+	 * Return the specified size of the connection, or the
+	 * default size for all other connections
+	 */
+	def protected safeSize(Connection connection) {
+		if(connection.hasSpecificSize) {
+			connection.size.intValue
+		} else {
+			fifoSize
+		}
+	}
+
 	/**
 	 * Return the hash array for the byte[] content
 	 * 

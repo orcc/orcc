@@ -50,7 +50,6 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
-import net.sf.orcc.OrccLaunchConstants
 
 /*
  * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
@@ -64,15 +63,8 @@ abstract class LLVMTemplate extends CommonPrinter {
 	var signed = false
 	var floating = false
 
-	val Integer defaultFifoSize;
-
 	new (Map<String, Object> options) {
-		super()
-		if(options.containsKey(OrccLaunchConstants.FIFO_SIZE)) {
-			defaultFifoSize = options.get(OrccLaunchConstants.FIFO_SIZE) as Integer 
-		} else {
-			defaultFifoSize = OrccLaunchConstants.DEFAULT_FIFO_SIZE
-		}
+		super(options)
 	}
 
 	/////////////////////////////////
@@ -226,10 +218,6 @@ abstract class LLVMTemplate extends CommonPrinter {
 	
 	def protected getSafeId(Connection connection, Port port) {
 		connection?.getAttribute("id")?.objectValue ?: port.name
-	}
-
-	def protected getSafeSize(Connection connection) {
-		connection?.size?.toString ?: defaultFifoSize.toString
 	}
 	
 	def protected print(Var variable)
