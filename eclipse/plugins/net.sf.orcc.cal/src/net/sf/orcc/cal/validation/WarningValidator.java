@@ -54,6 +54,7 @@ import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -132,8 +133,22 @@ public class WarningValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkImport(Import theImport) {
-		final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace()
-				.getRoot();
+
+		IWorkspace workspace;
+		try {
+			// get the file (we know it's a file)
+			workspace = ResourcesPlugin.getWorkspace();
+		} catch (IllegalStateException e) {
+			// This validation step is executed without a workspace open. This
+			// is normal if the validation is performed from JUnit tests in full
+			// headless environment (i.e. Without opening the second eclipse and
+			// without any GUI). In that case, we catch the exception and stop
+			// this method. Doing this, all others validations will be performed
+			// as expected.
+			return;
+		}
+
+		final IWorkspaceRoot wsRoot = workspace.getRoot();
 
 		final String importString = theImport.getImportedNamespace();
 		final int lastDotOffset = importString.lastIndexOf('.');
@@ -150,10 +165,10 @@ public class WarningValidator extends AbstractCalJavaValidator {
 		for (final IFolder folder : srcFolders) {
 			final IPath resourceFullPath = folder.getFullPath().append(
 					resourcePath);
-			if (workspace.exists(resourceFullPath)) {
+			if (wsRoot.exists(resourceFullPath)) {
 				final String importedElement = importString
 						.substring(lastDotOffset + 1);
-				checkImportedElement(resourceFullPath, importedElement, project);
+				checkImportedElement(resourceFullPath, importedElement);
 				return;
 			}
 		}
@@ -163,7 +178,7 @@ public class WarningValidator extends AbstractCalJavaValidator {
 				eINSTANCE.getImport_ImportedNamespace());
 	}
 
-	private void checkImportedElement(final IPath path, final String element, final IProject project) {
+	private void checkImportedElement(final IPath path, final String element) {
 		// Check if imported entity is a valid resource
 		final Resource resource = rs.getResource(
 				URI.createPlatformResourceURI(path.toString(), true),
