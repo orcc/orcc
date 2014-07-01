@@ -140,7 +140,7 @@ class OrccFilesManager {
 
 	static def readFile(String path) {
 		val contentBuilder = new StringBuilder
-		val reader = new FileReader(path)
+		val reader = new FileReader(path.fileResource)
 
 		var int c
 		while ((c = reader.read) != -1) {

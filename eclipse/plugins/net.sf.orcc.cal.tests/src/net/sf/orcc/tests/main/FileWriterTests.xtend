@@ -60,19 +60,24 @@ class FileWriterTests extends Assert {
 		return
 	}
 
+	def private getTempFilePath(String fileName) {
+		'''«tempDir»«File.separatorChar»«fileName»'''.toString
+	}
+
 	@Test
 	def testSimpleWrite() {
-		assertTrue(OrccFilesManager.writeFile("azerty", '''«tempDir»«File.separatorChar»azertyfile'''))
+		assertTrue(OrccFilesManager.writeFile("azerty", "azer".tempFilePath))
 	}
 
 	@Test
 	def testReadFile() {
-		"azerty".assertEquals(OrccFilesManager.readFile("/test/files/basic.txt"))
+		val ouff = OrccFilesManager.readFile("/test/files/basic.txt")
+		"azerty".assertEquals(ouff)
 	}
 
 	@Test
 	def testValidWrittenContent() {
-		val theFile = '''«tempDir»«File.separatorChar»aFile.txt'''
+		val theFile = "aFile.txt".tempFilePath
 		val theContent = '''
 			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
 			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
@@ -91,7 +96,21 @@ class FileWriterTests extends Assert {
 		val targetFile = new File('''«tempDir»«File.separatorChar»CodegenWhile.cal''')
 		assertTrue(targetFile.exists)
 
-		val source = new File(FileWriterTests.getResource("/test/pass/CodegenWhile.cal").toURI)
-		assertTrue(OrccFilesManager::isContentEqual(new FileInputStream(source), targetFile))
+		targetFile.length.assertNotEquals(0)
+	}
+
+	@Test
+	def testContentequals() {
+		val theContent = '''
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+		'''
+		val f1 = "file1".tempFilePath
+		val f2 = "file2".tempFilePath
+
+		OrccFilesManager.writeFile(theContent, f1)
+		OrccFilesManager.writeFile(theContent, f2)
+
+		OrccFilesManager::isContentEqual(new FileInputStream(f1), new File(f2)).assertTrue
 	}
 }
