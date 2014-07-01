@@ -38,6 +38,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.llvm.aot.LLVMBackend;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
@@ -203,8 +204,9 @@ public class TTABackend extends LLVMBackend {
 		// Build the design from the mapping
 		OrccLogger.traceln("TTA Architecture configuration setted to : "
 				+ configuration.getName());
+		int fifosize = getAttribute(OrccLaunchConstants.FIFO_SIZE, OrccLaunchConstants.DEFAULT_FIFO_SIZE);
 		design = new ArchitectureBuilder().build(network, configuration,
-				computedMapping, reduceConnections);
+				computedMapping, reduceConnections, fifosize);
 
 		// Generate files
 		actorsPath = OrccUtil.createFolder(path, "actors");

@@ -63,6 +63,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private int bufferId = 0;
 	private int signalId = 0;
+	private int fifosize = 0;
 
 	private Map<Vertex, Component> componentMap;
 
@@ -145,10 +146,11 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	 * @return A new design
 	 */
 	public Design build(Network network, ProcessorConfiguration configuration,
-			Mapping mapping, boolean reduceConnections) {
+			Mapping mapping, boolean reduceConnections, int fifosize) {
 		this.componentMap = new HashMap<Vertex, Component>();
 		this.reduceConnections = reduceConnections;
 		this.design = factory.createDesign();
+		this.fifosize = fifosize;
 
 		// Map all unmapped component to its own processor
 		for (Vertex unmapped : new ArrayList<Vertex>(mapping.getUnmapped())) {
@@ -202,7 +204,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			}
 		}
 
-		new ArchitectureMemoryEstimator().doSwitch(design);
+		new ArchitectureMemoryEstimator(fifosize).doSwitch(design);
 
 		for (Processor processor : design.getProcessors()) {
 			if (ArchitectureUtil.needOrccFu(processor.getMappedActors())) {

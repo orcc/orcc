@@ -60,6 +60,8 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 	 * the given dataflow entities.
 	 */
 	private class InnerDfVisitor extends DfVisitor<Long> {
+		private int fifosize = 0;
+		
 		private class InnerIrVisitor extends AbstractIrVisitor<Long> {
 
 			@Override
@@ -78,8 +80,9 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
 		}
 
-		public InnerDfVisitor() {
+		public InnerDfVisitor(int fifosize) {
 			this.irVisitor = new InnerIrVisitor();
+			this.fifosize = fifosize;
 		}
 
 		@Override
@@ -107,7 +110,13 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
 		@Override
 		public Long caseConnection(Connection connection) {
-			int bits = connection.getSize()
+			Integer size = connection.getSize();
+			
+			if (size == null) {
+				size = fifosize;
+			}
+
+			int bits = size
 					* getSize(connection.getSourcePort().getType()) + 2 * 32;
 			return (long) Math.ceil(bits);
 		}
@@ -120,8 +129,8 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
 	private DfVisitor<Long> dfVisitor;
 
-	public ArchitectureMemoryEstimator() {
-		dfVisitor = new InnerDfVisitor();
+	public ArchitectureMemoryEstimator(int fifosize) {
+		dfVisitor = new InnerDfVisitor(fifosize);
 	}
 
 	@Override
