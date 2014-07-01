@@ -167,7 +167,6 @@ MEMSET(32)
 		\
 		_mm_storeu_si128(pm128iSample + i, _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1));     \
 	}                                                                                                     \
-	\
 	if (SCU_SIZE_MOD16(H) == 8)                                                                           \
 	{                                                                                                     \
 		m128itmp_predSamp = \
@@ -463,16 +462,15 @@ void copy_cu_dpb_chroma_x16_orcc(
 	i32 yOffset)                                                                              \
 {                                                                                              \
 	int y;                                                                                     \
-	\
-for (y = 0; y < sideMax; y++)                                                                 \
-{                                                                                              \
-	memcpy_8_orcc(\
-	&RefCu[y * (sideMax)], \
-	pictureBuffer[idx][yOffset + y], \
-	0, \
-	xOffset, \
-	sideMax);                                                                             \
-}                                                                                       \
+	for (y = 0; y < sideMax; y++)                                                             \
+	{                                                                                         \
+		memcpy_8_orcc(\
+		&RefCu[y * (sideMax)], \
+		pictureBuffer[idx][yOffset + y], \
+		0, \
+		xOffset, \
+		sideMax);                                                                             \
+	}                                                                                       \
 }
 
 GETMVINFO_DPB_LUMA(64)
@@ -491,15 +489,15 @@ GETMVINFO_DPB_LUMA(8)
 {                                                                                                             \
 	int y;                                                                                                   \
 	\
-for (y = 0; y < sideMax; y++)                                                                                 \
-{                                                                                                            \
-	memcpy_8_orcc(\
-	&RefCu[y * (sideMax)], \
-	pictureBuffer[idx][y + yOffset], \
-	0, \
-	xOffset, \
-	sideMax);                                                                                                \
-}                                                                                                            \
+	for (y = 0; y < sideMax; y++)                                                                                 \
+	{                                                                                                            \
+		memcpy_8_orcc(\
+		&RefCu[y * (sideMax)], \
+		pictureBuffer[idx][y + yOffset], \
+		0, \
+		xOffset, \
+		sideMax);                                                                                                \
+	}                                                                                                            \
 }
 
 GETMVINFO_DPB_CHROMA(64)
