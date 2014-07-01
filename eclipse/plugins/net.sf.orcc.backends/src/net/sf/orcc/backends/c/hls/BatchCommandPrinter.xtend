@@ -36,14 +36,14 @@ import net.sf.orcc.df.Instance
 import java.io.File
 
 /**
- * Compile top Network c source code 
+ *Batch Command for the network
  *  
- * @author Khaled Jerbi
+ * @author Khaled Jerbi and Mariem Abid
  * 
  */
- class BatchCommandPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
+class BatchCommandPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 
-	new(Network bat, Map<String,Object> options) {
+	new(Network bat, Map<String, Object> options) {
 		super(bat, options)
 	}
 
@@ -96,20 +96,19 @@ import java.io.File
 				«ENDFOR»
 			«ENDFOR»
 		«ENDFOR»
-	''' 
-	
+	'''
+
 	override print(String targetFolder) {
-		
+
 		val contentNetwork = networkFileContent
 		val NetworkFile = new File(targetFolder + File::separator + "Command" + ".bat")
-		
-		if(needToWriteFile(contentNetwork, NetworkFile)) {
+
+		if (needToWriteFile(contentNetwork, NetworkFile)) {
 			OrccUtil::printFile(contentNetwork, NetworkFile)
 			return 0
 		} else {
 			return 1
 		}
 	}
-	
+
 }
- 

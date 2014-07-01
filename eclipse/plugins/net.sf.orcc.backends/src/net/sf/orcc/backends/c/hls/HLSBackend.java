@@ -62,20 +62,15 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 /**
  * C backend targeting high-level synthesis tools
  * 
- * @author Herve Yviquel
+ * @author Herve Yviquel and Mariem Abid
  */
 public class HLSBackend extends CBackend {
 
 	/**
 	 * Path to target "testBench" folder
 	 */
-	private String VHDLTestBenchPath;
+	
 	private String commandPath;
-
-	/**
-	 * Configuration mapping
-	 */
-	protected Map<String, List<Instance>> targetToInstancesMap;
 
 	@Override
 	protected boolean exportRuntimeLibrary() {
@@ -85,7 +80,6 @@ public class HLSBackend extends CBackend {
 	@Override
 	protected void doInitializeOptions() {
 		srcPath = path + File.separator + "HLSBackend";
-		VHDLTestBenchPath = srcPath + File.separator + "UnitaryVHDLTestBENCH";
 		commandPath = srcPath + File.separator + "batchCommand";
 	}
 
@@ -114,10 +108,7 @@ public class HLSBackend extends CBackend {
 		transformations.add(new TypeResizer(true, true, true, false));
 
 		transformations.add(new RenameTransformation(replacementMap));
-		//transformations.add(new Multi2MonoToken());
 		transformations.add(new DfVisitor<Void>(new CastArgFuncCall()));
-		// transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
-		// transformations.add(new DivisionSubstitution());//don't work for HEVC
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			if (debug) {
@@ -198,20 +189,18 @@ public class HLSBackend extends CBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
-	
 
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		new InstanceTestBenchPrinter(options)
-				.print(VHDLTestBenchPath, instance);
+
 		new InstanceCosimPrinter(options).print(srcPath, instance);
 		new InstancePrinterCast(options).print(srcPath, instance);
 		new ActorTopVhdlPrinter(options).print(srcPath, instance);
 		new ActorNetworkTestBenchPrinter(options).print(srcPath, instance);
 		new UnitaryBatchCommandPrinter(options).print(commandPath, instance);
 		return new InstancePrinter(options).print(srcPath, instance) > 0;
-		
+
 	}
 }

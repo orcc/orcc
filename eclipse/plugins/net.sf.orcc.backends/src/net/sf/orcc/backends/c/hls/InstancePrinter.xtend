@@ -47,10 +47,11 @@ import net.sf.orcc.backends.util.FPGA
 /*
  * Compile Instance c source code
  *  
- * @author Antoine Lorence and Khaled Jerbi 
+ * @author Antoine Lorence, Khaled Jerbi and Mariem Abid
  * 
  */
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
+
 	private FPGA fpga = FPGA.builder("Virtex7 (xc7v2000t)") ;
 
 	new(Map<String, Object> options) {
@@ -207,10 +208,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	'''
 
-	def getId(Connection connection, Port port) {
-		if(connection != null) connection.getAttribute("id").objectValue else port.name
-	}
-
 	override printStateLabel(State state) '''
 		l_«state.name»:
 			«IF ! actor.actionsOutsideFsm.empty»
@@ -221,6 +218,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDIF»
 	'''
 
+	// the condition that enough place is available in the output channel
 	override printOutputPattern(Pattern pattern) '''
 		«FOR port : pattern.ports» 
 			«printOutputPatternsPort(pattern, port)»
@@ -236,7 +234,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		'''
 	}
 
-	//&& (512 - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.getNumTokens(port)»)			
 	def printOutputPatternPort(Pattern pattern, Port port, Connection successor, int id) '''		
 		
 			&& («successor.safeSize» - «outgoingPortMap.get(port).head.localwName» + «outgoingPortMap.get(port).head.rName»[0] >= «pattern.
@@ -244,7 +241,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 	'''
 
-	//«incomingPortMap.get(port).wName»[0] - «incomingPortMap.get(port).localrName» >= «pattern.getNumTokens(port)»  &&
+	// the number of available tokens in the input channel
 	override checkInputPattern(Pattern pattern) '''
 		«FOR port : pattern.ports»
 			«val connection = incomingPortMap.get(port)»
@@ -311,32 +308,20 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		return output
 	}
 
-	//i32 «incomingPortMap.get(srcPort).maskName» = «incomingPortMap.get(srcPort).localrName» & 511;
-	//«incomingPortMap.get(srcPort).localrName» = «incomingPortMap.get(srcPort).localrName»+1;
-	//«incomingPortMap.get(srcPort).rName»[0] = «incomingPortMap.get(srcPort).localrName»;
-	//«load.target.variable.name» = «incomingPortMap.get(srcPort).ramName»[(«incomingPortMap.get(srcPort).maskName»  + («load.indexes.head.doSwitch»))];
 	override caseInstLoad(InstLoad load) {
 		if (load.eContainer != null) {
 			val srcPort = load.source.variable.getPort
-			'''
-				
-					
-					
-						«IF (srcPort != null)»
-							«load.target.variable.name» = «incomingPortMap.get(srcPort).ramName»[((«incomingPortMap.get(srcPort).localrName» & SIZE_«srcPort.
+			'''	
+				«IF (srcPort != null)»
+					«load.target.variable.name» = «incomingPortMap.get(srcPort).ramName»[((«incomingPortMap.get(srcPort).localrName» & SIZE_«srcPort.
 					name»)  + («load.indexes.head.doSwitch»))];
-						«ELSE»
-							«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
-						«ENDIF»
-				'''
-
+					«ELSE»
+					«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
+					«ENDIF»
+			'''
 		}
 	}
 
-	//i32 «outgoingPortMap.get(trgtPort).head.maskName» = «outgoingPortMap.get(trgtPort).head.localwName» & 511;
-	//«outgoingPortMap.get(trgtPort).head.localwName» = «outgoingPortMap.get(trgtPort).head.localwName» +1;
-	//«outgoingPortMap.get(trgtPort).head.wName»[0] = «outgoingPortMap.get(trgtPort).head.localwName»;
-	//«outgoingPortMap.get(trgtPort).head.ramName»[(«outgoingPortMap.get(trgtPort).head.maskName» + («store.indexes.head.doSwitch»))]=«store.value.doSwitch»;
 	override caseInstStore(InstStore store) {
 		val trgtPort = store.target.variable.port
 		'''
@@ -353,19 +338,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«actions.printActionsScheduling»
 	'''
 
-	def fifoName(Connection connection) '''«IF connection != null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
-
 	def ramName(Connection connection) '''«IF connection != null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
 	def wName(Connection connection) '''«IF connection != null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
 	def localwName(Connection connection) '''«IF connection != null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localrName(Connection connection) '''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
-
 	def rName(Connection connection) '''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def maskName(Connection connection) '''«IF connection != null»mask_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localrName(Connection connection) '''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
 	def fifoTypeOut(Connection connection) {
 		if (connection.sourcePort == null) {

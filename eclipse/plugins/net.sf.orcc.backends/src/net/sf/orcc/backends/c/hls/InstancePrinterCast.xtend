@@ -35,12 +35,13 @@ import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.backends.util.FPGA
 
 /*
- * Compile Instance c source code
+ * Add instances for each port in case of actor debug
  *  
- * @author Antoine Lorence and Khaled Jerbi 
+ * @author Antoine Lorence, Khaled Jerbi and Mariem Abid
  * 
  */
 class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
+
 	private FPGA fpga = FPGA.builder("Virtex7 (xc7v2000t)") ;
 
 	new(Map<String, Object> options) {
@@ -241,22 +242,6 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 	def rName(Connection connection) '''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
 	def maskName(Connection connection) '''«IF connection != null»mask_«connection.getAttribute("id").objectValue»«ENDIF»'''
-
-	def fifoTypeOut(Connection connection) {
-		if (connection.targetPort == null) {
-			connection.sourcePort.type
-		} else {
-			connection.targetPort.type
-		}
-	}
-
-	def fifoTypeIn(Connection connection) {
-		if (connection.sourcePort == null) {
-			connection.sourcePort.type
-		} else {
-			connection.targetPort.type
-		}
-	}
 
 	def fifoType(Connection connection) {
 		if (connection.sourcePort != null) {

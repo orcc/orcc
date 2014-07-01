@@ -31,14 +31,12 @@ package net.sf.orcc.backends.c.hls
 import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
-import net.sf.orcc.df.Port
 import net.sf.orcc.util.OrccUtil
 
 /**
- * generates top Network testbench
+ * Top VHDL testbench for actor debug 
  *  
- * @author Khaled Jerbi
+ * @author Khaled Jerbi and Mariem Abid
  * 
  */
 class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinter {
@@ -50,8 +48,8 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 	override print(String targetFolder) {
 		val contentNetwork = actorNetworkFileContent
 		val NetworkFile = new File(
-			targetFolder + File::separator + entityName + "TopVHDL" + File::separator + entityName +
-				"_TopTestBench" + ".vhd")
+			targetFolder + File::separator + entityName + "TopVHDL" + File::separator + entityName + "_TopTestBench" +
+				".vhd")
 
 		if (needToWriteFile(contentNetwork, NetworkFile)) {
 			OrccUtil::printFile(contentNetwork, NetworkFile)
@@ -62,23 +60,23 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 	}
 
 	def actorNetworkFileContent() '''
-		LIBRARY ieee;
-		USE ieee.std_logic_1164.ALL;
-		USE ieee.std_logic_unsigned.all;
-		USE ieee.numeric_std.ALL;
-		USE std.textio.all;
-		
-		LIBRARY work;
-		USE work.sim_package.all;
-		
-		ENTITY testbench IS
-		END testbench;
-		
-		ARCHITECTURE behavior OF testbench IS
-		
-		-- Component Declaration
-		COMPONENT TopDesign
-		PORT(
+			LIBRARY ieee;
+			USE ieee.std_logic_1164.ALL;
+			USE ieee.std_logic_unsigned.all;
+			USE ieee.numeric_std.ALL;
+			USE std.textio.all;
+			
+			LIBRARY work;
+			USE work.sim_package.all;
+			
+			ENTITY testbench IS
+			END testbench;
+			
+			ARCHITECTURE behavior OF testbench IS
+			
+			-- Component Declaration
+			COMPONENT TopDesign
+			PORT(
 			ap_clk : IN STD_LOGIC;
 			ap_rst : IN STD_LOGIC;
 			ap_start : IN STD_LOGIC;
@@ -104,17 +102,17 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 			«ENDFOR»
 			
 			ap_return : OUT STD_LOGIC_VECTOR (31 downto 0)
-		);
-		END COMPONENT;	
-		
-		signal ap_clk :  STD_LOGIC:= '0';
-		signal ap_rst : STD_LOGIC:= '0';
-		signal ap_start : STD_LOGIC:= '0';
-		signal ap_done :  STD_LOGIC;
-		signal ap_idle :  STD_LOGIC;
-		signal ap_ready :  STD_LOGIC;
-		
-		«FOR port : actor.inputs»
+			);
+			END COMPONENT;	
+			
+			signal ap_clk :  STD_LOGIC:= '0';
+			signal ap_rst : STD_LOGIC:= '0';
+			signal ap_start : STD_LOGIC:= '0';
+			signal ap_done :  STD_LOGIC;
+			signal ap_idle :  STD_LOGIC;
+			signal ap_ready :  STD_LOGIC;
+			
+			«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
 			«IF connection != null»
 				Signal «connection.castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
@@ -122,8 +120,8 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				Signal «connection.castfifoNameWrite»_V_read    :  STD_LOGIC;
 				
 			«ENDIF»
-		«ENDFOR»
-		«FOR portout : actor.outputs.filter[! native]»
+			«ENDFOR»
+			«FOR portout : actor.outputs.filter[! native]»
 			«FOR connection : outgoingPortMap.get(portout)»
 				
 				Signal «connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
@@ -131,32 +129,33 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				Signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
 				
 			«ENDFOR»
-		«ENDFOR»
-
-		signal ap_return :  STD_LOGIC_VECTOR (31 downto 0):= (others => '0');
+			«ENDFOR»
 		
-		-- Configuration
-		signal count       : integer range 255 downto 0 := 0;
-		
-		constant PERIOD : time := 20 ns;
-		constant DUTY_CYCLE : real := 0.5;
-		constant OFFSET : time := 100 ns;
-		
-		type severity_level is (note, warning, error, failure);
-		type tb_type is (after_reset, read_file, CheckRead);
-		
-		-- Input and Output files
-		signal tb_FSM_bits  : tb_type;
-		
-		«FOR connection : outgoingPortMap.values»
-			file sim_file_«entityName»_«connection.head.sourcePort.name»  : text is "«entityName»_«connection.head.sourcePort.name».txt";
-		«ENDFOR»
-		«FOR connection : incomingPortMap.values»
+			signal ap_return :  STD_LOGIC_VECTOR (31 downto 0):= (others => '0');
+			
+			-- Configuration
+			signal count       : integer range 255 downto 0 := 0;
+			
+			constant PERIOD : time := 20 ns;
+			constant DUTY_CYCLE : real := 0.5;
+			constant OFFSET : time := 100 ns;
+			
+			type severity_level is (note, warning, error, failure);
+			type tb_type is (after_reset, read_file, CheckRead);
+			
+			-- Input and Output files
+			signal tb_FSM_bits  : tb_type;
+			
+			«FOR connection : outgoingPortMap.values»
+			file sim_file_«entityName»_«connection.head.sourcePort.name»  : text is "«entityName»_«connection.head.sourcePort.
+			name».txt";
+			«ENDFOR»
+			«FOR connection : incomingPortMap.values»
 			file sim_file_«entityName»_«connection.targetPort.name»  : text is "«entityName»_«connection.targetPort.name».txt";
-		«ENDFOR»
-		
-		begin
-		
+			«ENDFOR»
+			
+			begin
+			
 			uut : TopDesign port map (
 				ap_clk => ap_clk,
 				ap_rst => ap_rst,
@@ -181,179 +180,83 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				«ENDFOR»
 				ap_return => ap_return
 			);
-	
-			clockProcess : process
-			begin
-				wait for OFFSET;
-				clock_LOOP : loop
-					ap_clk <= '0';
-			        wait for (PERIOD - (PERIOD * DUTY_CYCLE));
-			        ap_clk <= '1';
-			        wait for (PERIOD * DUTY_CYCLE);
-			  	end loop clock_LOOP;
-			end process;
-			
-			resetProcess : process
-			begin                
-				wait for OFFSET;
-				-- reset state for 100 ns.
-				ap_rst <= '1';
-				wait for 100 ns;
-				ap_rst <= '0';
-				wait;
-			end process;
-	
-			WaveGen_Proc_In : process (ap_clk)
-				variable Input_bit   : integer range 2147483647 downto - 2147483648;
-				variable line_number : line;
-				«FOR port : actor.inputs»
-					«val connection = incomingPortMap.get(port)»
-					«IF connection != null»
-						variable count«connection.castfifoNameWrite»: integer:= 0;
-					«ENDIF»
-				«ENDFOR»
-	
-			begin
-				if rising_edge(ap_clk) then
-				«FOR port : actor.inputs»
-					«val connection = incomingPortMap.get(port)»
-					«IF connection != null»
-						«printInputWaveGen(connection, connection.castfifoNameWrite)»
-					«ENDIF»
-				«ENDFOR»
-				end if;
-			end process WaveGen_Proc_In;
-	
-			WaveGen_Proc_Out : process (ap_clk)
-				variable Input_bit   : integer range 2147483647 downto - 2147483648;
-				variable line_number : line;
-				«FOR port : actor.outputs.filter[! native]»
-					«FOR connection : outgoingPortMap.get(port)»
-						variable count«connection.castfifoNameRead»: integer:= 0;
+		
+				clockProcess : process
+				begin
+					wait for OFFSET;
+					clock_LOOP : loop
+						ap_clk <= '0';
+						      wait for (PERIOD - (PERIOD * DUTY_CYCLE));
+						      ap_clk <= '1';
+						      wait for (PERIOD * DUTY_CYCLE);
+						end loop clock_LOOP;
+				end process;
+				
+				resetProcess : process
+				begin                
+					wait for OFFSET;
+					-- reset state for 100 ns.
+					ap_rst <= '1';
+					wait for 100 ns;
+					ap_rst <= '0';
+					wait;
+				end process;
+		
+				WaveGen_Proc_In : process (ap_clk)
+					variable Input_bit   : integer range 2147483647 downto - 2147483648;
+					variable line_number : line;
+					«FOR port : actor.inputs»
+						«val connection = incomingPortMap.get(port)»
+						«IF connection != null»
+							variable count«connection.castfifoNameWrite»: integer:= 0;
+						«ENDIF»
 					«ENDFOR»
-				«ENDFOR»
-	
-			begin
-				if (rising_edge(ap_clk)) then
-			
+		
+				begin
+					if rising_edge(ap_clk) then
+					«FOR port : actor.inputs»
+						«val connection = incomingPortMap.get(port)»
+						«IF connection != null»
+							«printInputWaveGen(connection, connection.castfifoNameWrite)»
+						«ENDIF»
+					«ENDFOR»
+					end if;
+				end process WaveGen_Proc_In;
+		
+				WaveGen_Proc_Out : process (ap_clk)
+					variable Input_bit   : integer range 2147483647 downto - 2147483648;
+					variable line_number : line;
 					«FOR port : actor.outputs.filter[! native]»
 						«FOR connection : outgoingPortMap.get(port)»
-							
-							«printOutputWaveGen(connection, connection.castfifoNameRead)»
-							
+							variable count«connection.castfifoNameRead»: integer:= 0;
 						«ENDFOR»
 					«ENDFOR»
+		
+				begin
+					if (rising_edge(ap_clk)) then
+				
+						«FOR port : actor.outputs.filter[! native]»
+							«FOR connection : outgoingPortMap.get(port)»
+								
+								«printOutputWaveGen(connection, connection.castfifoNameRead)»
+								
+							«ENDFOR»
+						«ENDFOR»
 				
 				end if;
-			end process WaveGen_Proc_Out;
-			
-	
-			«FOR portout : actor.outputs.filter[! native]»
-				«FOR connection : outgoingPortMap.get(portout)»
-					
-					«connection.castfifoNameRead»_V_full_n <= '1';
-					
+				end process WaveGen_Proc_Out;
+				
+		
+				«FOR portout : actor.outputs.filter[! native]»
+					«FOR connection : outgoingPortMap.get(portout)»
+						
+						«connection.castfifoNameRead»_V_full_n <= '1';
+						
+					«ENDFOR»
 				«ENDFOR»
-			«ENDFOR»
-	
-		END;
-	'''
-
-	def assignFifo(Instance instance) '''
-		«FOR connList : outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«printOutputFifoAssignHLS(connList.head)»
-			«ENDIF»
-		«ENDFOR»
-		«FOR connList : incomingPortMap.values»
-			«IF (connList.source instanceof Port) && !(connList.target instanceof Port)»
-				«printInputFifoAssignHLS(connList)»
-			«ENDIF»
-		«ENDFOR»
-	'''
-
-	def assignFifoSignal(Instance instance) '''
-		«FOR connList : outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«printOutputSignalFifoAssignHLS(connList.head)»
-			«ENDIF»
-		«ENDFOR»
-		«FOR connList : incomingPortMap.values»
-			«IF (connList.source instanceof Port) && !(connList.target instanceof Port)»
-				«printInputSignalFifoAssignHLS(connList)»
-			«ENDIF»
-		«ENDFOR»
-	'''
-
-	def printOutputFifoAssignHLS(Connection connection) '''
 		
-		«connection.fifoName»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
-		«connection.fifoName»_V_full_n : IN STD_LOGIC;
-		«connection.fifoName»_V_write  : OUT STD_LOGIC;
+			END;
 	'''
-
-	def printInputFifoAssignHLS(Connection connection) '''
-		
-		«connection.fifoName»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
-		«connection.fifoName»_V_empty_n : IN STD_LOGIC;
-		«connection.fifoName»_V_read    : OUT STD_LOGIC;
-	'''
-
-	def printOutputSignalFifoAssignHLS(Connection connection) '''
-		
-		signal «connection.fifoName»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0) := (others => '0');
-		signal «connection.fifoName»_V_full_n :  STD_LOGIC := '0';
-		signal «connection.fifoName»_V_write  :  STD_LOGIC := '0';
-	'''
-
-	def printInputSignalFifoAssignHLS(Connection connection) '''
-		
-		signal «connection.fifoName»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0) := (others => '0');
-		signal «connection.fifoName»_V_empty_n :  STD_LOGIC := '0';
-		signal «connection.fifoName»_V_read    :  STD_LOGIC := '0';
-	'''
-
-	def assignFifoFile(Instance instance) '''
-		«FOR connList : outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				file sim_file_«entityName»_«connList.head.sourcePort.name»  : text is "«entityName»_«connList.head.sourcePort.
-			name».txt";
-			«ENDIF»
-		«ENDFOR»
-		«FOR connList : incomingPortMap.values»
-			«IF (connList.source instanceof Port) && !(connList.target instanceof Port)»
-				file sim_file_«entityName»_«connList.targetPort.name»  : text is "«entityName»_«connList.targetPort.name».txt";
-			«ENDIF»
-		«ENDFOR»
-	'''
-
-	def mappingFifoSignal(Instance instance) '''
-		«FOR connList : outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«printOutputFifoMappingHLS(connList.head)»
-			«ENDIF»
-		«ENDFOR»
-		«FOR connList : incomingPortMap.values»
-			«IF (connList.source instanceof Port
-			) && !(connList.target instanceof Port)»
-				«printInputFifoMappingHLS(connList)»
-			«ENDIF»
-		«ENDFOR»
-	'''
-
-	def printOutputFifoMappingHLS(Connection connection) '''
-		«connection.fifoName»_V_din    => «connection.fifoName»_V_din,
-		«connection.fifoName»_V_full_n => «connection.fifoName»_V_full_n,
-		«connection.fifoName»_V_write  => «connection.fifoName»_V_write,
-	'''
-
-	def printInputFifoMappingHLS(Connection connection) '''
-		«connection.fifoName»_V_dout    => «connection.fifoName»_V_dout,
-		«connection.fifoName»_V_empty_n => «connection.fifoName»_V_empty_n,
-		«connection.fifoName»_V_read    => «connection.fifoName»_V_read,
-	'''
-
-
 
 	def printInputWaveGen(Connection connection, CharSequence Fname) '''
 		case tb_FSM_bits is
@@ -397,21 +300,21 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 			readline(sim_file_«entityName»_«connection.targetPort.name», line_number);
 				if (line_number'length > 0 and line_number(1) /= '/') then
 					read(line_number, input_bit);
-				 	«IF connection.fifoTypeIn.int»
-				 		«Fname»_V_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoTypeIn.sizeInBits»));
-				 	«ENDIF»
-				 	«IF connection.fifoTypeIn.uint»
-				 		«Fname»_V_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeIn.sizeInBits»));
-				 	«ENDIF»
-				 	«Fname»_V_empty_n <= '1';
-				 	«IF connection.fifoTypeIn.bool»
-				 		if (input_bit = 1) then 
-				 		«Fname»_V_dout  <= "1";
-				 		else
-				 		«Fname»_V_dout  <= "0";
-				 		end if;
-				 	«ENDIF»
-				 	ap_start <= '1';      
+						«IF connection.fifoTypeIn.int»
+							«Fname»_V_dout  <= std_logic_vector(to_signed(input_bit, «connection.fifoTypeIn.sizeInBits»));
+						«ENDIF»
+						«IF connection.fifoTypeIn.uint»
+							«Fname»_V_dout  <= std_logic_vector(to_unsigned(input_bit, «connection.fifoTypeIn.sizeInBits»));
+						«ENDIF»
+						«Fname»_V_empty_n <= '1';
+						«IF connection.fifoTypeIn.bool»
+							if (input_bit = 1) then 
+							«Fname»_V_dout  <= "1";
+							else
+							«Fname»_V_dout  <= "0";
+							end if;
+						«ENDIF»
+						ap_start <= '1';      
 				end if;
 			elsif (endfile (sim_file_«entityName»_«connection.targetPort.name»)) then
 				ap_start <= '1';
@@ -423,7 +326,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 	'''
 
 	def printOutputWaveGen(Connection connection, CharSequence Fname) '''
-		if (not endfile (sim_file_«entityName»_«connection.sourcePort.name») and «Fname»_V_write = '1') then
+			if (not endfile (sim_file_«entityName»_«connection.sourcePort.name») and «Fname»_V_write = '1') then
 			count«Fname» := count«Fname» + 1;
 			report "Number of outputs«Fname» = " & integer'image(count«Fname»);
 			readline(sim_file_«entityName»_«connection.sourcePort.name», line_number);
@@ -451,32 +354,21 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 						report "on port «Fname» 1 instead of 0"
 						severity error;
 					end if;
-			 	«ENDIF»
-	
-			 	--assert («Fname»_V_din /= std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
-			 	--report "on port «Fname» correct value computed : " & str(to_integer(signed(«Fname»_V_din))) & " equals :" & str(input_bit)
-			 	--severity note;
+				«ENDIF»
 		
+				 	--assert («Fname»_V_din /= std_logic_vector(to_signed(input_bit, «connection.fifoTypeOut.sizeInBits»)))
+				 	--report "on port «Fname» correct value computed : " & str(to_integer(signed(«Fname»_V_din))) & " equals :" & str(input_bit)
+				 	--severity note;
+			
 			end if;
-		end if;
+			end if;
 	'''
 
-	def initOutputs() '''
-		«FOR connList : outgoingPortMap.values»
-			«IF !(connList.head.source instanceof Port) && (connList.head.target instanceof Port)»
-				«connList.head.fifoName»_V_full_n <= '1';
-			«ENDIF»
-		«ENDFOR»
-	'''
+	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+		objectValue»_write«ENDIF»'''
 
-	def fifoName(Connection connection) 
-		'''myStream_«connection.getAttribute("id").objectValue»'''
-
-	def castfifoNameWrite(Connection connection)
-		'''«IF connection != null»myStream_cast_«connection.getAttribute("id").objectValue»_write«ENDIF»'''
-
-	def castfifoNameRead(Connection connection) 
-		'''«IF connection != null»myStream_cast_«connection.getAttribute("id").objectValue»_read«ENDIF»'''
+	def castfifoNameRead(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+		objectValue»_read«ENDIF»'''
 
 	def fifoTypeOut(Connection connection) {
 		if (connection.sourcePort == null) {

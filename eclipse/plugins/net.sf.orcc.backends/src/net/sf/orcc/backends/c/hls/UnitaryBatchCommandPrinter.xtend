@@ -33,9 +33,9 @@ import java.util.Map
 import net.sf.orcc.util.OrccUtil
 
 /**
- * Compile top Network c source code 
+ * Bach command for each actor
  *  
- * @author Khaled Jerbi
+ * @author Khaled Jerbi and Mariem Abid
  * 
  */
 class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter {
