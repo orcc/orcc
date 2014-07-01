@@ -107,7 +107,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * Check if the given connection has a specified BUFFER_SIZE.
 	 */
 	def protected hasSpecificSize(Connection connection) {
-		connection.size != null
+		connection?.size != null
 	}
 
 	/**
