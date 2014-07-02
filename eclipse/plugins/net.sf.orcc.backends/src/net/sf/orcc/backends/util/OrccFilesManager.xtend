@@ -47,6 +47,13 @@ import org.eclipse.core.runtime.FileLocator
  */
 class OrccFilesManager {
 
+	enum OS {
+		WINDOWS,
+		LINUX,
+		MACOS,
+		UNKNOWN
+	}
+
 	def static extract(String path, String targetFolder) {
 		extract(path, new File(targetFolder))
 	}
@@ -237,5 +244,18 @@ class OrccFilesManager {
 		}
 
 		return path
+	}
+
+	static def getCurrentOS() {
+		val systemname = System.getProperty("os.name").toLowerCase()
+		if(systemname.startsWith("win")) {
+			OrccFilesManager.OS.WINDOWS
+		} else if (systemname.equals("linux")) {
+			OrccFilesManager.OS.LINUX
+		} else if (systemname.contains("mac")) {
+			OrccFilesManager.OS.MACOS
+		} else {
+			OrccFilesManager.OS.UNKNOWN
+		}
 	}
 }

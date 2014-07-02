@@ -68,6 +68,19 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
+	def testOSdetection() {
+		val os = OrccFilesManager.getCurrentOS
+		if (os == OrccFilesManager.OS.WINDOWS) {
+			new File("C:/Windows").directory.assertTrue
+		} else if (os == OrccFilesManager.OS.LINUX) {
+			new File("/home").directory.assertTrue
+		} else if (os == OrccFilesManager.OS.MACOS) {
+			new File("/Library").directory.assertTrue
+		} else {
+			fail("Unable to detect System")
+		}
+	}
+
 	def testSimpleWrite() {
 		assertTrue(OrccFilesManager.writeFile("azerty", "azer".tempFilePath))
 	}
@@ -126,6 +139,7 @@ class FilesManagerTests extends Assert {
 		OrccFilesManager::extract("/test/extract", tempDir)
 
 		val targetFolder = new File("extract".tempFilePath)
+
 		// Check if 'extract folder exists in temp dir'
 		targetFolder.directory.assertTrue
 
