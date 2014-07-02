@@ -38,6 +38,7 @@ import java.io.InputStream
 import java.io.PrintStream
 import net.sf.orcc.util.OrccLogger
 import org.eclipse.core.runtime.Assert
+import org.eclipse.core.runtime.FileLocator
 
 /**
  * Utility class to manipulate files. It brings everything needed to extract files
@@ -138,10 +139,17 @@ class OrccFilesManager {
 		val fsResource = new File(sanitizedPath)
 		if(fsResource.exists) return fsResource
 
-		val res = OrccFilesManager.getResource(sanitizedPath)
-		if (res != null) {
-			val cpResource = new File(res.toURI)
-			if(cpResource.exists) return cpResource
+		var uri = OrccFilesManager.getResource(sanitizedPath).toURI
+		if (uri != null) {
+			if(uri.scheme.equalsIgnoreCase("file")) {
+				val cpResource = new File(uri)
+				if(cpResource.exists) return cpResource
+			} else if (uri.scheme.equalsIgnoreCase("bundleresource")) {
+				val cpResource = new File(FileLocator.resolve(uri.toURL).toURI)
+				if(cpResource.exists) return cpResource
+			} else {
+				System::out.println("scheme: " + uri.scheme)
+			}
 		}
 
 		throw new FileNotFoundException(path)
