@@ -59,6 +59,10 @@ class FilesManagerTests extends Assert {
 		return
 	}
 
+	/**
+	 * Append the given <em>fileName</em> to the current temp directory,
+	 * using the OS specific path separator, to build a new temp path.
+	 */
 	def private getTempFilePath(String fileName) {
 		'''«tempDir»«File.separatorChar»«fileName»'''.toString
 	}
@@ -120,5 +124,21 @@ class FilesManagerTests extends Assert {
 	@Test
 	def testFolderExtraction() {
 		OrccFilesManager::extract("/test/extract", tempDir)
+
+		val targetFolder = new File("extract".tempFilePath)
+		// Check if 'extract folder exists in temp dir'
+		targetFolder.directory.assertTrue
+
+		// Check if 'files' folder has correctly been extracted
+		new File(targetFolder, "files").directory.assertTrue
+
+		// Check if files have correctly been extrated
+		new File(targetFolder, "subfolder/aaa.z").file.assertTrue
+		new File(targetFolder, "subfolder/qwert/xxxxx.txt").file.assertTrue
+
+		// Check the content of extracted files
+		"xxxx".assertEquals(
+			OrccFilesManager.readFile('''«tempDir»/extract/subfolder/qwert/xxxxx.txt''')
+		)
 	}
 }

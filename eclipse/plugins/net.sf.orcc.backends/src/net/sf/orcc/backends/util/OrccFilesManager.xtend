@@ -139,7 +139,7 @@ class OrccFilesManager {
 		val fsResource = new File(sanitizedPath)
 		if(fsResource.exists) return fsResource
 
-		var uri = OrccFilesManager.getResource(sanitizedPath).toURI
+		var uri = OrccFilesManager.getResource(sanitizedPath)?.toURI
 		if (uri != null) {
 			if(uri.scheme.equalsIgnoreCase("file")) {
 				val cpResource = new File(uri)
