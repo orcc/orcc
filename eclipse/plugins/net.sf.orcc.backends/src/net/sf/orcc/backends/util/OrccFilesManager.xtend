@@ -38,8 +38,6 @@ import java.io.InputStream
 import java.io.PrintStream
 import net.sf.orcc.util.OrccLogger
 
-import static extension com.google.common.io.CharStreams.*
-
 /**
  * Utility class to manipulate files. It brings everything needed to extract files
  * from a jar plugin to the filesystem, check if 2 files are identical, read/write
@@ -59,15 +57,19 @@ class OrccFilesManager {
 		if (!source.exists) {
 			throw new FileNotFoundException(source.path)
 		}
-		if(source.file) source.extractFile(new File(targetFolder, source.name)) else if(source.directory) source.
-			extractDirectory(targetFolder)
+		if (source.file)
+			source.extractFile(new File(targetFolder, source.name))
+		else if (source.directory)
+			source.extractDirectory(targetFolder)
 	}
 
 	def static extractFile(File source, File targetFile) {
 		val reader = new FileReader(source)
 		val writer = new FileWriter(targetFile)
-		for (line : reader.readLines) {
-			writer.write(line)
+
+		var int c
+		while ((c = reader.read) != -1) {
+			writer.append(c as char)
 		}
 
 		reader.close
