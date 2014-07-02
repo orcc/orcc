@@ -237,7 +237,9 @@ class OrccFilesManager {
 	 * 
 	 */
 	static def sanitize(String path) {
-		if (!path.nullOrEmpty && path.charAt(0) == '~') {
+		// We use the following construction because Xtend infer '~' as a String instead of a char
+		// path.substring(0,1).equals('~')
+		if (!path.nullOrEmpty && path.substring(0,1).equals('~')) {
 			val builder = new StringBuilder(System::getProperty("user.home"))
 			builder.append(File.separatorChar).append(path.substring(1))
 			return builder.toString()

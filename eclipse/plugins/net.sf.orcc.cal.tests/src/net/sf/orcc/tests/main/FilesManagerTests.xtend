@@ -45,6 +45,7 @@ import org.junit.runners.JUnit4
 class FilesManagerTests extends Assert {
 
 	var tempDir = ""
+	var standardFolder = "~/.ssh"
 
 	@Before
 	def void initialization() {
@@ -78,6 +79,16 @@ class FilesManagerTests extends Assert {
 			new File("/Library").directory.assertTrue
 		} else {
 			fail("Unable to detect System")
+		}
+	}
+
+	@Test
+	def testPathSanitization() {
+		standardFolder.startsWith("~").assertTrue
+		val result = OrccFilesManager.sanitize(standardFolder)
+		result.startsWith("~").assertFalse
+		if (OrccFilesManager.getCurrentOS.equals(OrccFilesManager.OS.LINUX)) {
+			result.startsWith("/home").assertTrue
 		}
 	}
 
