@@ -70,7 +70,7 @@ class FilesManagerTests extends Assert {
 
 	@Test
 	def testReadFile() {
-		"azerty".assertEquals(OrccFilesManager.readFile("/test/files/basic.txt"))
+		"azerty".assertEquals(OrccFilesManager.readFile("/test/extract/files/basic.txt"))
 	}
 
 	@Test
@@ -88,7 +88,7 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def testExtraction() {
+	def testFileExtraction() {
 		OrccFilesManager::extract("/test/pass/CodegenWhile.cal", tempDir)
 
 		val targetFile = new File('''«tempDir»«File.separatorChar»CodegenWhile.cal''')
@@ -115,5 +115,10 @@ class FilesManagerTests extends Assert {
 		OrccFilesManager.writeFile(theContent, f2)
 
 		OrccFilesManager::isContentEqual(new FileInputStream(f1), new File(f2)).assertTrue
+	}
+
+	@Test
+	def testFolderExtraction() {
+		OrccFilesManager::extract("/test/extract", tempDir)
 	}
 }

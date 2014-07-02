@@ -37,6 +37,7 @@ import java.io.FileWriter
 import java.io.InputStream
 import java.io.PrintStream
 import net.sf.orcc.util.OrccLogger
+import org.eclipse.core.runtime.Assert
 
 /**
  * Utility class to manipulate files. It brings everything needed to extract files
@@ -62,14 +63,15 @@ class OrccFilesManager {
 	 * @param targetFolder
 	 * 			The target folder to copy the file
 	 */
-	def static extract(File source, File targetFolder) {
+	def static void extract(File source, File targetFolder) {
 		if (!source.exists) {
 			throw new FileNotFoundException(source.path)
 		}
+		val target = new File(targetFolder, source.name)
 		if (source.file)
-			source.extractFile(new File(targetFolder, source.name))
+			source.extractFile(target)
 		else if (source.directory)
-			source.extractDirectory(targetFolder)
+			source.extractDirectory(target)
 	}
 
 	/**
@@ -83,7 +85,7 @@ class OrccFilesManager {
 	 * @param targetFile
 	 * 			The target path of a writable file
 	 */
-	def static extractFile(File source, File targetFile) {
+	private def static extractFile(File source, File targetFile) {
 		val reader = new FileReader(source)
 		val writer = new FileWriter(targetFile)
 
@@ -97,16 +99,24 @@ class OrccFilesManager {
 	}
 
 	/**
-	 * Extract the directory at the given <i>source</i> path to the path
-	 * encapsulated in the given <em>targetFile</em>.
+	 * Copy the given <i>source</i> directory and its content into
+	 * the given <em>targetFolder</em> directory.
 	 * 
 	 * @param source
 	 * 			The source path of an existing file
-	 * @param targetFile
-	 * 			The target path of a writable file
+	 * @param targetFolder
+	 * 			Path to the folder where source will be copied
 	 */
-	def static extractDirectory(File source, File targetFolder) {
-		throw new UnsupportedOperationException
+	private def static extractDirectory(File source, File targetFolder) {
+		Assert.isTrue(source.directory)
+		if(!targetFolder.exists)
+			Assert.isTrue(targetFolder.mkdirs)
+		else
+			Assert.isTrue(targetFolder.directory)
+
+		for (file : source.listFiles) {
+			file.extract(targetFolder)
+		}
 	}
 
 	/**
