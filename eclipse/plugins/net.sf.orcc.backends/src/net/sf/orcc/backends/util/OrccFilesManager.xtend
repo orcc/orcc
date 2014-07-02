@@ -53,6 +53,15 @@ class OrccFilesManager {
 		extract(path.fileResource, targetFolder)
 	}
 
+	/**
+	 * Copy the given <i>source</i> file to the given <em>targetFile</em>
+	 * path.
+	 * 
+	 * @param source
+	 * 			An existing File instance
+	 * @param targetFolder
+	 * 			The target folder to copy the file
+	 */
 	def static extract(File source, File targetFolder) {
 		if (!source.exists) {
 			throw new FileNotFoundException(source.path)
@@ -63,6 +72,17 @@ class OrccFilesManager {
 			source.extractDirectory(targetFolder)
 	}
 
+	/**
+	 * Copy the file at the given <i>source</i> path to the path
+	 * encapsulated in the given <em>targetFile</em>. It is called
+	 * 'extract' because in most case, this method is used to extract
+	 * files from a plugin in classpath to the filesystem.
+	 * 
+	 * @param source
+	 * 			The source path of an existing file
+	 * @param targetFile
+	 * 			The target path of a writable file
+	 */
 	def static extractFile(File source, File targetFile) {
 		val reader = new FileReader(source)
 		val writer = new FileWriter(targetFile)
@@ -76,21 +96,45 @@ class OrccFilesManager {
 		writer.close
 	}
 
+	/**
+	 * Extract the directory at the given <i>source</i> path to the path
+	 * encapsulated in the given <em>targetFile</em>.
+	 * 
+	 * @param source
+	 * 			The source path of an existing file
+	 * @param targetFile
+	 * 			The target path of a writable file
+	 */
 	def static extractDirectory(File source, File targetFolder) {
 		throw new UnsupportedOperationException
 	}
 
+	/**
+	 * Return a valid, existing {@link File} instance from the
+	 * given <em>path</em>. To perform that, this method first check
+	 * on the file system for an existing file. Then, it try to load
+	 * resource from the current classpath.
+	 * 
+	 * @param path
+	 * 			The path to the resource, as a string
+	 * @return
+	 * 			The path to the resource, as File instance.
+	 * @throws FileNotFoundException
+	 * 			If the given path can't be found
+	 */
 	def static getFileResource(String path) {
-		val fsResource = new File(path)
+		val sanitizedPath = path.sanitize
+
+		val fsResource = new File(sanitizedPath)
 		if(fsResource.exists) return fsResource
 
-		val res = OrccFilesManager.getResource(path)
+		val res = OrccFilesManager.getResource(sanitizedPath)
 		if (res != null) {
 			val cpResource = new File(res.toURI)
 			if(cpResource.exists) return cpResource
 		}
 
-		throw new FileNotFoundException()
+		throw new FileNotFoundException(path)
 	}
 
 	/**
@@ -114,14 +158,14 @@ class OrccFilesManager {
 	}
 
 	/**
-	 * Unconditionally write content to target path
+	 * Unconditionally write <em>content</em> to target file <em>path</em>
 	 */
 	static def writeFile(CharSequence content, String path) {
 		content.writeFile(new File(path))
 	}
 
 	/**
-	 * Unconditionally write content to target file
+	 * Unconditionally write <em>content</em> to given <em>target</em> file
 	 */
 	static def writeFile(CharSequence content, File target) {
 		try {
@@ -140,6 +184,17 @@ class OrccFilesManager {
 		}
 	}
 
+	/**
+	 * Read the file at the given <em>path</em> and returns its content
+	 * as a String.
+	 * 
+	 * @param path
+	 * 			The path of the file tio read
+	 * @returns
+	 * 			The content of the file
+	 * @throws FileNotFoundException
+	 * 			If the file doesn't exists
+	 */
 	static def readFile(String path) {
 		val contentBuilder = new StringBuilder
 		val reader = new FileReader(path.fileResource)
