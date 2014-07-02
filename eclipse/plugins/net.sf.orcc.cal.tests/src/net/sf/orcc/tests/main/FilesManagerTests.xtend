@@ -141,4 +141,12 @@ class FilesManagerTests extends Assert {
 			OrccFilesManager.readFile('''«tempDir»/extract/subfolder/qwert/xxxxx.txt''')
 		)
 	}
+
+	@Test
+	def testExtractFromJar() {
+		val targetDirectory = "jarExtract".tempFilePath
+		OrccFilesManager.extract("/java/lang/Class.class", targetDirectory)
+
+		new File(targetDirectory, "Class.class").file.assertTrue
+	}
 }
