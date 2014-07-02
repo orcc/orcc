@@ -45,6 +45,9 @@ import org.junit.runners.JUnit4
 class FilesManagerTests extends Assert {
 
 	var tempDir = ""
+	var jarFile = "/java/lang/Class.class"
+	var bundleFile = "/test/extract/subfolder/zzz.txt"
+	var bundleFolder = "/test/extract"
 	var standardFolder = "~/.ssh"
 
 	@Before
@@ -92,6 +95,22 @@ class FilesManagerTests extends Assert {
 		}
 	}
 
+	@Test
+	def testURLDetection() {
+		var url = OrccFilesManager.getUrl(jarFile)
+		url.protocol.assertEquals("jar")
+
+		url = OrccFilesManager.getUrl(bundleFile)
+		url.protocol.assertEquals("file")
+
+		url = OrccFilesManager.getUrl(bundleFolder)
+		url.protocol.assertEquals("file")
+
+		url = OrccFilesManager.getUrl(standardFolder)
+		url.protocol.assertEquals("file")
+	}
+
+	@Test
 	def testSimpleWrite() {
 		assertTrue(OrccFilesManager.writeFile("azerty", "azer".tempFilePath))
 	}

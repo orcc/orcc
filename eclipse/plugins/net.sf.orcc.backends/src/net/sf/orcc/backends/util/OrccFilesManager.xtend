@@ -148,18 +148,47 @@ class OrccFilesManager {
 
 		var uri = OrccFilesManager.getResource(sanitizedPath)?.toURI
 		if (uri != null) {
-			if(uri.scheme.equalsIgnoreCase("file")) {
+			if (uri.scheme.equalsIgnoreCase("file")) {
 				val cpResource = new File(uri)
 				if(cpResource.exists) return cpResource
 			} else if (uri.scheme.equalsIgnoreCase("bundleresource")) {
 				val cpResource = new File(FileLocator.resolve(uri.toURL).toURI)
 				if(cpResource.exists) return cpResource
+			} else if (uri.scheme.equalsIgnoreCase("jar")) {
+				throw new UnsupportedOperationException("Jar files are not supported for the moment")
 			} else {
-				System::out.println("scheme: " + uri.scheme)
+				throw new UnsupportedOperationException(
+					'''Extracting file from scheme «uri.scheme» is not supported'''
+				)
 			}
 		}
 
 		throw new FileNotFoundException(path)
+	}
+
+	/**
+	 * Search on the file system for a file or folder corresponding to the
+	 * given path. If not found, search on the current classpath. If this method
+	 * return  an URL, this URL always point to an existing file.
+	 * 
+	 * @param path
+	 * 			A path
+	 * @return
+	 * 			An URL for an existing file, or null
+	 */
+	def static getUrl(String path) {
+		val sanitizedPath = path.sanitize
+
+		val file = new File(sanitizedPath)
+		if (file.exists)
+			return file.toURI.toURL
+
+		val url = OrccFilesManager.getResource(sanitizedPath)
+
+		if ("bundleresource".equalsIgnoreCase(url?.protocol))
+			FileLocator.resolve(url)
+		else
+			url
 	}
 
 	/**
