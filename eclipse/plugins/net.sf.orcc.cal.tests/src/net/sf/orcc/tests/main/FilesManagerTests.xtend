@@ -42,7 +42,7 @@ import org.junit.runners.JUnit4
  * Test methods of OrccFileWriter utility class
  */
 @RunWith(typeof(JUnit4))
-class FileWriterTests extends Assert {
+class FilesManagerTests extends Assert {
 
 	var tempDir = ""
 
@@ -56,7 +56,6 @@ class FileWriterTests extends Assert {
 				throw new IOException
 			}
 		}
-		f.deleteOnExit
 		return
 	}
 
@@ -71,8 +70,7 @@ class FileWriterTests extends Assert {
 
 	@Test
 	def testReadFile() {
-		val ouff = OrccFilesManager.readFile("/test/files/basic.txt")
-		"azerty".assertEquals(ouff)
+		"azerty".assertEquals(OrccFilesManager.readFile("/test/files/basic.txt"))
 	}
 
 	@Test
@@ -97,6 +95,11 @@ class FileWriterTests extends Assert {
 		assertTrue(targetFile.exists)
 
 		targetFile.length.assertNotEquals(0)
+
+		OrccFilesManager::isContentEqual(
+			new FileInputStream(targetFile),
+			OrccFilesManager::getFileResource("/test/pass/CodegenWhile.cal")
+		).assertTrue
 	}
 
 	@Test
