@@ -63,7 +63,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private int bufferId = 0;
 	private int signalId = 0;
-	private int fifosize = 0;
 
 	private Map<Vertex, Component> componentMap;
 
@@ -150,7 +149,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		this.componentMap = new HashMap<Vertex, Component>();
 		this.reduceConnections = reduceConnections;
 		this.design = factory.createDesign();
-		this.fifosize = fifosize;
 
 		// Map all unmapped component to its own processor
 		for (Vertex unmapped : new ArrayList<Vertex>(mapping.getUnmapped())) {
