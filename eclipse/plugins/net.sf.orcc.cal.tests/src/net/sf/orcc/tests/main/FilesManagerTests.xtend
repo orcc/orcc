@@ -46,6 +46,7 @@ class FilesManagerTests extends Assert {
 
 	var tempDir = ""
 	var jarFile = "/java/lang/Class.class"
+	var jarFolder = "/myjar/a"
 	var bundleFile = "/test/extract/subfolder/zzz.txt"
 	var bundleFolder = "/test/extract"
 	var standardFolder = "~/.ssh"
@@ -98,6 +99,9 @@ class FilesManagerTests extends Assert {
 	@Test
 	def testURLDetection() {
 		var url = OrccFilesManager.getUrl(jarFile)
+		url.protocol.assertEquals("jar")
+
+		url = OrccFilesManager.getUrl(jarFolder)
 		url.protocol.assertEquals("jar")
 
 		url = OrccFilesManager.getUrl(bundleFile)
@@ -189,8 +193,11 @@ class FilesManagerTests extends Assert {
 	@Test
 	def testExtractFromJar() {
 		val targetDirectory = "jarExtract".tempFilePath
-		OrccFilesManager.extract("/java/lang/Class.class", targetDirectory)
+		OrccFilesManager.extract(jarFile, targetDirectory)
+		OrccFilesManager.extract(jarFolder, targetDirectory)
 
 		new File(targetDirectory, "Class.class").file.assertTrue
+		new File(targetDirectory, "myjar").directory.assertTrue
+		new File(targetDirectory, "myjar/a").directory.assertTrue
 	}
 }
