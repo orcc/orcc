@@ -274,7 +274,7 @@ public class TTABackend extends LLVMBackend {
 
 		// Create TCE project
 		new PyDesignPrinter(fpga).print(design, path);
-		new TceDesignPrinter(path).print(design, path);
+		new TceDesignPrinter(options, path).print(design, path);
 
 		new Dota().print(design, path, "top.dot");
 

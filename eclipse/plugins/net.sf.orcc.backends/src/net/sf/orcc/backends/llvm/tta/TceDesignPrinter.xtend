@@ -35,6 +35,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.df.Port
 import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.df.Actor
+import java.util.Map
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -46,10 +47,11 @@ class TceDesignPrinter extends TTAPrinter {
 	
 	String path;
 	
-	new(String path){
+	new(Map<String, Object> options, String path){
+		super(options)
 		this.path = path;
 	}
-	
+		
 	def print(Design design, String targetFolder) {
 		val file = new File(targetFolder + File::separator + "top.pndf")
 		OrccUtil::printFile(design.pndf, file)
@@ -80,7 +82,7 @@ class TceDesignPrinter extends TTAPrinter {
 							<var-name>fifo_«incoming.getValueAsObject("id").toString»</var-name>
 							<signed>«input.type.int»</signed>
 							<width>«input.width»</width>
-							<size>«incoming.size»</size>
+							<size>«incoming.safeSize»</size>
 							<trace>«path»/trace/«IF !vertex.label.contains("cluster")»«vertex.label»_«ENDIF»«input.name».txt</trace>
 						</input>
 					«ENDIF»
@@ -94,7 +96,7 @@ class TceDesignPrinter extends TTAPrinter {
 								<var-name>fifo_«id»</var-name>
 								<signed>«output.type.int»</signed>
 								<width>«output.width»</width>
-								<size>«outgoing.size»</size>
+								<size>«outgoing.safeSize»</size>
 								<trace>«path»/trace/«IF !vertex.label.contains("cluster")»«vertex.label»_«ENDIF»«output.name».txt</trace>
 							</output>
 						«ENDIF»
