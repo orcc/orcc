@@ -197,7 +197,11 @@ class FilesManagerTests extends Assert {
 		OrccFilesManager.extract(jarFolder, targetDirectory)
 
 		new File(targetDirectory, "Class.class").file.assertTrue
-		new File(targetDirectory, "myjar").directory.assertTrue
-		new File(targetDirectory, "myjar/a").directory.assertTrue
+		new File(targetDirectory, "a").directory.assertTrue
+
+		new File(targetDirectory, "a/1.txt").file.assertTrue
+		"in folder a, 3.txt".assertEquals(
+			OrccFilesManager.readFile('''«targetDirectory»/a/3.txt''')
+		)
 	}
 }

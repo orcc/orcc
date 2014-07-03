@@ -161,11 +161,22 @@ class OrccFilesManager {
 	}
 
 	private def static jarDirectoryExtract(JarFile jar, ZipEntry entry, File target) {
-		throw new UnsupportedOperationException
+		val prefix = entry.name
+		val entries = Collections::list(jar.entries).filter[name.startsWith(prefix)]
+		for (e : entries) {
+			jarFileExtract(jar, e, new File(target, e.name.substring(prefix.length)))
+		}
 	}
 
+	/**
+	 * 
+	 */
 	private def static jarFileExtract(JarFile jar, ZipEntry entry, File target) {
 		target.parentFile.mkdirs
+		if(entry.directory) {
+			target.mkdir
+			return
+		}
 		val is = jar.getInputStream(entry)
 		val os = new FileOutputStream(target)
 
