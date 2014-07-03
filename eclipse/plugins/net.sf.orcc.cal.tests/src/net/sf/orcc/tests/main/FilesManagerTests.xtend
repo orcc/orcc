@@ -115,13 +115,13 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def testSimpleWrite() {
-		assertTrue(OrccFilesManager.writeFile("azerty", "azer".tempFilePath))
+	def testSimpleRead() {
+		"azerty".assertEquals(OrccFilesManager.readFile("/test/extract/files/basic.txt"))
 	}
 
 	@Test
-	def testReadFile() {
-		"azerty".assertEquals(OrccFilesManager.readFile("/test/extract/files/basic.txt"))
+	def testSimpleWrite() {
+		OrccFilesManager.writeFile("azerty", "azer".tempFilePath).assertTrue
 	}
 
 	@Test
@@ -139,6 +139,23 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
+	def testContentsEquals() {
+		val theContent = '''
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+		'''
+		val f1 = "file1".tempFilePath
+		val f2 = "file2".tempFilePath
+
+		OrccFilesManager.writeFile(theContent, f1)
+		OrccFilesManager.writeFile(theContent, f2)
+
+		OrccFilesManager::isContentEqual(new FileInputStream(f1), new File(f2)).assertTrue
+		theContent.assertEquals(OrccFilesManager::readFile(f1))
+		theContent.assertEquals(OrccFilesManager::readFile(f2))
+	}
+
+	@Test
 	def testFileExtraction() {
 		OrccFilesManager::extract("/test/pass/CodegenWhile.cal", tempDir)
 
@@ -151,21 +168,6 @@ class FilesManagerTests extends Assert {
 			new FileInputStream(targetFile),
 			OrccFilesManager::getFileResource("/test/pass/CodegenWhile.cal")
 		).assertTrue
-	}
-
-	@Test
-	def testContentequals() {
-		val theContent = '''
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
-		'''
-		val f1 = "file1".tempFilePath
-		val f2 = "file2".tempFilePath
-
-		OrccFilesManager.writeFile(theContent, f1)
-		OrccFilesManager.writeFile(theContent, f2)
-
-		OrccFilesManager::isContentEqual(new FileInputStream(f1), new File(f2)).assertTrue
 	}
 
 	@Test
@@ -191,7 +193,7 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def testExtractFromJar() {
+	def testJarExtractions() {
 		val targetDirectory = "jarExtract".tempFilePath
 		OrccFilesManager.extract(jarFile, targetDirectory)
 		OrccFilesManager.extract(jarFolder, targetDirectory)
