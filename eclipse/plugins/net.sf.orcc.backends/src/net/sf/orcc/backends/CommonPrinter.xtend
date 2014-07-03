@@ -127,7 +127,9 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * 
 	 * @param content
 	 * @return a byte[] containing the hash
+	 * @deprecated Use methods in {@link OrccFilesManager} instead
 	 */
+	@Deprecated
 	def private hash(byte[] content) {
 		try {
 			// MessageDigest is NOT thread safe, it must be created locally on
@@ -145,7 +147,9 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * 
 	 * @param file
 	 * @return a byte[] containing the hash
+	 * @deprecated Use methods in {@link OrccFilesManager} instead
 	 */
+	@Deprecated
 	def private hash(File file) {
 		try {
 			// MessageDigest is NOT thread safe, it must be created locally on
@@ -183,7 +187,9 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * 
 	 * @param targetFile
 	 * @param content
+	 * @deprecated Use methods in {@link OrccFilesManager} instead
 	 */
+	@Deprecated
 	def protected needToWriteFile(CharSequence content, File target) {
 		return ! target.exists()
 				|| ! MessageDigest::isEqual(hash(target), hash(content.toString.bytes));
