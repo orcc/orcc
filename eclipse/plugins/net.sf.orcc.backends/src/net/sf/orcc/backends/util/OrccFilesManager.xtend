@@ -33,6 +33,8 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.FileWriter
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.io.PrintStream
 import java.io.Reader
 import java.io.StringReader
@@ -54,6 +56,33 @@ class OrccFilesManager {
 		LINUX,
 		MACOS,
 		UNKNOWN
+	}
+
+	static val OK = new OrccFilesManager.Result(1, 0, 0)
+	static val CACHED = new OrccFilesManager.Result(0, 1, 0)
+	static val EMPTY_RESULT = new OrccFilesManager.Result(0, 0, 0)
+
+	static class Result {
+		var written = 0
+		var cached = 0
+
+		new(int w, int c, int e) {
+			written = w
+			cached = c
+		}
+
+		def merge(OrccFilesManager.Result other) {
+			written = written + other.written
+			cached = cached + other.cached
+		}
+
+		def cached() {
+			cached
+		}
+
+		def written() {
+			written
+		}
 	}
 
 	/**
@@ -86,7 +115,7 @@ class OrccFilesManager {
 	 * @param targetFolder
 	 * 			The target folder to copy the file
 	 */
-	private def static void basicExtraction(File source, File targetFolder) {
+	private def static OrccFilesManager.Result basicExtraction(File source, File targetFolder) {
 		if (!source.exists) {
 			throw new FileNotFoundException(source.path)
 		}
@@ -110,15 +139,18 @@ class OrccFilesManager {
 	 */
 	private def static basicFileExtraction(File source, File targetFile) {
 		val reader = new FileReader(source)
-		val writer = new FileWriter(targetFile)
+		if (reader.isContentEqual(targetFile)) {
+			return CACHED
+		}
 
+		val writer = new FileWriter(targetFile)
 		var int c
 		while ((c = reader.read) != -1) {
 			writer.append(c as char)
 		}
-
 		reader.close
 		writer.close
+		return OK
 	}
 
 	/**
@@ -137,14 +169,17 @@ class OrccFilesManager {
 		else
 			Assert.isTrue(targetFolder.directory)
 
+		val result = EMPTY_RESULT
 		for (file : source.listFiles) {
-			file.basicExtraction(targetFolder)
+			result.merge(
+				file.basicExtraction(targetFolder)
+			)
 		}
+		return result
 	}
 
 	private def static jarExtract(JarFile jar, String path, File targetFolder) {
-		val updatedPath =
-			if(path.startsWith("/")) {
+		val updatedPath = if (path.startsWith("/")) {
 				path.substring(1)
 			} else {
 				path
@@ -156,7 +191,7 @@ class OrccFilesManager {
 			jarDirectoryExtract(jar, entry, new File(targetFolder, fileName))
 		} else {
 			val entries = Collections::list(jar.entries).filter[name.startsWith(updatedPath)]
-			if(entries.size > 1) {
+			if (entries.size > 1) {
 				jarDirectoryExtract(jar, entry, new File(targetFolder, fileName))
 			} else {
 				jarFileExtract(jar, entry, new File(targetFolder, fileName))
@@ -167,9 +202,13 @@ class OrccFilesManager {
 	private def static jarDirectoryExtract(JarFile jar, ZipEntry entry, File target) {
 		val prefix = entry.name
 		val entries = Collections::list(jar.entries).filter[name.startsWith(prefix)]
+		val result = OrccFilesManager.EMPTY_RESULT
 		for (e : entries) {
-			jarFileExtract(jar, e, new File(target, e.name.substring(prefix.length)))
+			result.merge(
+				jarFileExtract(jar, e, new File(target, e.name.substring(prefix.length)))
+			)
 		}
+		return result
 	}
 
 	/**
@@ -177,18 +216,26 @@ class OrccFilesManager {
 	 */
 	private def static jarFileExtract(JarFile jar, ZipEntry entry, File target) {
 		target.parentFile.mkdirs
-		if(entry.directory) {
+		if (entry.directory) {
 			target.mkdir
-			return
+			return OrccFilesManager.EMPTY_RESULT
 		}
 		val is = jar.getInputStream(entry)
+
+		if (is.isContentEqual(target)) {
+			return CACHED
+		}
+
 		val os = new FileOutputStream(target)
 
 		val byte[] buffer = newByteArrayOfSize(512)
 		var readLen = 0
-		while( (readLen = is.read(buffer)) != -1) {
+		while ((readLen = is.read(buffer)) != -1) {
 			os.write(buffer, 0, readLen)
 		}
+		is.close
+		os.close
+		return OK
 	}
 
 	/**
@@ -220,6 +267,10 @@ class OrccFilesManager {
 		new StringReader(a.toString).isContentEqual(b)
 	}
 
+	static def isContentEqual(InputStream a, File b) {
+		new InputStreamReader(a).isContentEqual(b)
+	}
+
 	/**
 	 * Check if given files have exactly the same content
 	 */
@@ -227,12 +278,14 @@ class OrccFilesManager {
 		if(!b.exists) return false
 		val readerB = new FileReader(b)
 
-		var byteA = 0; var byteB = 0
+		var byteA = 0;
+		var byteB = 0
 		do {
 			byteA = readerA.read
 			byteB = readerB.read
 		} while (byteA == byteB && byteA != -1)
-		readerA.close; readerB.close
+		readerA.close
+		readerB.close
 
 		return byteA == -1
 	}
@@ -243,12 +296,17 @@ class OrccFilesManager {
 	static def writeFile(CharSequence content, String path) {
 		val target = new File(path)
 
+		if (content.isContentEqual(target)) {
+			return CACHED
+		}
+
 		if (!target.parentFile.exists) {
 			target.parentFile.mkdirs
 		}
 		val ps = new PrintStream(new FileOutputStream(target))
 		ps.print(content)
 		ps.close
+		return OK
 	}
 
 	/**
@@ -302,5 +360,16 @@ class OrccFilesManager {
 		} else {
 			OrccFilesManager.OS.UNKNOWN
 		}
+	}
+
+	static def void recursiveDelete(File d) {
+		for (e : d.listFiles) {
+			if (e.file) {
+				e.delete
+			} else if (e.directory) {
+				e.recursiveDelete
+			}
+		}
+		d.delete
 	}
 }

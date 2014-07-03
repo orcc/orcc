@@ -30,10 +30,9 @@ package net.sf.orcc.tests.main
 
 import java.io.File
 import java.io.FileReader
-import java.io.IOException
 import net.sf.orcc.backends.util.OrccFilesManager
 import org.junit.Assert
-import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -44,24 +43,20 @@ import org.junit.runners.JUnit4
 @RunWith(typeof(JUnit4))
 class FilesManagerTests extends Assert {
 
-	var tempDir = ""
+	static var tempDir = ""
 	var jarFile = "/java/lang/Class.class"
 	var jarFolder = "/myjar/a"
 	var bundleFile = "/test/extract/subfolder/zzz.txt"
 	var bundleFolder = "/test/extract"
 	var standardFolder = "~/.ssh"
 
-	@Before
-	def void initialization() {
+	@BeforeClass
+	static def void initialization() {
 		tempDir = '''«System.getProperty("java.io.tmpdir")»«File.separatorChar»ORCC_FILE_TESTS'''
 		val f = new File(tempDir)
-		if (!f.exists) {
-			f.delete
-			if (!f.mkdirs) {
-				throw new IOException
-			}
+		if (f.exists) {
+			OrccFilesManager.recursiveDelete(f)
 		}
-		return
 	}
 
 	/**
@@ -207,5 +202,33 @@ class FilesManagerTests extends Assert {
 		"in folder a, 3.txt".assertEquals(
 			OrccFilesManager.readFile('''«targetDirectory»/a/3.txt''')
 		)
+	}
+
+	@Test
+	def testCachedFiles() {
+		val path = "testCached".tempFilePath
+		val file = new File(path)
+
+		val content = '''
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur.
+		'''
+
+		var result = OrccFilesManager.writeFile(content, path)
+		result.cached.assertEquals(0)
+		result.written.assertEquals(1)
+
+		val timestamp = file.lastModified
+		timestamp.assertNotEquals(0)
+		Thread.sleep(1500)
+
+		result = OrccFilesManager.writeFile(content, path)
+		result.cached.assertEquals(1)
+		result.written.assertEquals(0)
+
+		timestamp.assertEquals(file.lastModified)
 	}
 }
