@@ -39,6 +39,7 @@ import java.io.PrintStream
 import java.io.Reader
 import java.io.StringReader
 import java.util.Collections
+import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.zip.ZipEntry
 import org.eclipse.core.runtime.Assert
@@ -150,6 +151,7 @@ class OrccFilesManager {
 		}
 		reader.close
 		writer.close
+
 		return OK
 	}
 
@@ -185,7 +187,7 @@ class OrccFilesManager {
 				path
 			}
 
-		val entry = jar.getEntry(updatedPath)
+		val entry = jar.getJarEntry(updatedPath)
 		val fileName = entry.name.substring(entry.name.lastIndexOf("/"))
 		if (entry.directory) {
 			jarDirectoryExtract(jar, entry, new File(targetFolder, fileName))
@@ -214,7 +216,7 @@ class OrccFilesManager {
 	/**
 	 * 
 	 */
-	private def static jarFileExtract(JarFile jar, ZipEntry entry, File target) {
+	private def static jarFileExtract(JarFile jar, JarEntry entry, File target) {
 		target.parentFile.mkdirs
 		if (entry.directory) {
 			target.mkdir
@@ -235,6 +237,7 @@ class OrccFilesManager {
 		}
 		is.close
 		os.close
+
 		return OK
 	}
 
