@@ -36,6 +36,9 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.io.InputStream
 import java.io.PrintStream
+import java.util.Collections
+import java.util.jar.JarFile
+import java.util.zip.ZipEntry
 import net.sf.orcc.util.OrccLogger
 import org.eclipse.core.runtime.Assert
 import org.eclipse.core.runtime.FileLocator
@@ -59,7 +62,15 @@ class OrccFilesManager {
 	}
 
 	def static extract(String path, File targetFolder) {
-		extract(path.fileResource, targetFolder)
+
+		val url = getUrl(path)
+		if (url.protocol.equals("jar")) {
+			val splittedURL = url.file.split("!")
+			val jar = new JarFile(splittedURL.head.substring(5))
+			jarExtract(jar, splittedURL.last, targetFolder)
+		} else {
+			basicExtraction(path.fileResource, targetFolder)
+		}
 	}
 
 	/**
@@ -71,15 +82,15 @@ class OrccFilesManager {
 	 * @param targetFolder
 	 * 			The target folder to copy the file
 	 */
-	def static void extract(File source, File targetFolder) {
+	private def static void basicExtraction(File source, File targetFolder) {
 		if (!source.exists) {
 			throw new FileNotFoundException(source.path)
 		}
 		val target = new File(targetFolder, source.name)
 		if (source.file)
-			source.extractFile(target)
+			source.basicFileExtraction(target)
 		else if (source.directory)
-			source.extractDirectory(target)
+			source.basicDirectoryExtraction(target)
 	}
 
 	/**
@@ -93,7 +104,7 @@ class OrccFilesManager {
 	 * @param targetFile
 	 * 			The target path of a writable file
 	 */
-	private def static extractFile(File source, File targetFile) {
+	private def static basicFileExtraction(File source, File targetFile) {
 		val reader = new FileReader(source)
 		val writer = new FileWriter(targetFile)
 
@@ -115,15 +126,53 @@ class OrccFilesManager {
 	 * @param targetFolder
 	 * 			Path to the folder where source will be copied
 	 */
-	private def static extractDirectory(File source, File targetFolder) {
+	private def static basicDirectoryExtraction(File source, File targetFolder) {
 		Assert.isTrue(source.directory)
-		if(!targetFolder.exists)
+		if (!targetFolder.exists)
 			Assert.isTrue(targetFolder.mkdirs)
 		else
 			Assert.isTrue(targetFolder.directory)
 
 		for (file : source.listFiles) {
-			file.extract(targetFolder)
+			file.basicExtraction(targetFolder)
+		}
+	}
+
+	private def static jarExtract(JarFile jar, String path, File targetFolder) {
+		val updatedPath =
+			if(path.startsWith("/")) {
+				path.substring(1)
+			} else {
+				path
+			}
+
+		val entry = jar.getEntry(updatedPath)
+		val fileName = entry.name.substring(entry.name.lastIndexOf("/"))
+		if (entry.directory) {
+			jarDirectoryExtract(jar, entry, new File(targetFolder, fileName))
+		} else {
+			val entries = Collections::list(jar.entries).filter[name.startsWith(updatedPath)]
+			if(entries.size > 1) {
+				jarDirectoryExtract(jar, entry, new File(targetFolder, fileName))
+			} else {
+				jarFileExtract(jar, entry, new File(targetFolder, fileName))
+			}
+		}
+	}
+
+	private def static jarDirectoryExtract(JarFile jar, ZipEntry entry, File target) {
+		throw new UnsupportedOperationException
+	}
+
+	private def static jarFileExtract(JarFile jar, ZipEntry entry, File target) {
+		target.parentFile.mkdirs
+		val is = jar.getInputStream(entry)
+		val os = new FileOutputStream(target)
+
+		val byte[] buffer = newByteArrayOfSize(512)
+		var readLen = 0
+		while( (readLen = is.read(buffer)) != -1) {
+			os.write(buffer, 0, readLen)
 		}
 	}
 
@@ -266,9 +315,10 @@ class OrccFilesManager {
 	 * 
 	 */
 	static def sanitize(String path) {
+
 		// We use the following construction because Xtend infer '~' as a String instead of a char
 		// path.substring(0,1).equals('~')
-		if (!path.nullOrEmpty && path.substring(0,1).equals('~')) {
+		if (!path.nullOrEmpty && path.substring(0, 1).equals('~')) {
 			val builder = new StringBuilder(System::getProperty("user.home"))
 			builder.append(File.separatorChar).append(path.substring(1))
 			return builder.toString()
@@ -279,7 +329,7 @@ class OrccFilesManager {
 
 	static def getCurrentOS() {
 		val systemname = System.getProperty("os.name").toLowerCase()
-		if(systemname.startsWith("win")) {
+		if (systemname.startsWith("win")) {
 			OrccFilesManager.OS.WINDOWS
 		} else if (systemname.equals("linux")) {
 			OrccFilesManager.OS.LINUX
