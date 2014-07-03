@@ -39,7 +39,6 @@ import java.io.PrintStream
 import java.util.Collections
 import java.util.jar.JarFile
 import java.util.zip.ZipEntry
-import net.sf.orcc.util.OrccLogger
 import org.eclipse.core.runtime.Assert
 import org.eclipse.core.runtime.FileLocator
 
@@ -57,19 +56,24 @@ class OrccFilesManager {
 		UNKNOWN
 	}
 
+	/**
+	 * Copy the file or the folder at given <em>path</em> to the given
+	 * <em>target folder</em>.
+	 * 
+	 * @param path
+	 * @param targetFolder
+	 * @return
+	 * @throws FileNotFoundException
+	 */
 	def static extract(String path, String targetFolder) {
-		extract(path, new File(targetFolder))
-	}
-
-	def static extract(String path, File targetFolder) {
-
+		val targetF = new File(targetFolder)
 		val url = getUrl(path)
 		if (url.protocol.equals("jar")) {
 			val splittedURL = url.file.split("!")
 			val jar = new JarFile(splittedURL.head.substring(5))
-			jarExtract(jar, splittedURL.last, targetFolder)
+			jarExtract(jar, splittedURL.last, targetF)
 		} else {
-			basicExtraction(path.fileResource, targetFolder)
+			basicExtraction(new File(path.url.toURI), targetF)
 		}
 	}
 
@@ -188,45 +192,6 @@ class OrccFilesManager {
 	}
 
 	/**
-	 * Return a valid, existing {@link File} instance from the
-	 * given <em>path</em>. To perform that, this method first check
-	 * on the file system for an existing file. Then, it try to load
-	 * resource from the current classpath.
-	 * 
-	 * @param path
-	 * 			The path to the resource, as a string
-	 * @return
-	 * 			The path to the resource, as File instance.
-	 * @throws FileNotFoundException
-	 * 			If the given path can't be found
-	 */
-	def static getFileResource(String path) {
-		val sanitizedPath = path.sanitize
-
-		val fsResource = new File(sanitizedPath)
-		if(fsResource.exists) return fsResource
-
-		var uri = OrccFilesManager.getResource(sanitizedPath)?.toURI
-		if (uri != null) {
-			if (uri.scheme.equalsIgnoreCase("file")) {
-				val cpResource = new File(uri)
-				if(cpResource.exists) return cpResource
-			} else if (uri.scheme.equalsIgnoreCase("bundleresource")) {
-				val cpResource = new File(FileLocator.resolve(uri.toURL).toURI)
-				if(cpResource.exists) return cpResource
-			} else if (uri.scheme.equalsIgnoreCase("jar")) {
-				throw new UnsupportedOperationException("Jar files are not supported for the moment")
-			} else {
-				throw new UnsupportedOperationException(
-					'''Extracting file from scheme «uri.scheme» is not supported'''
-				)
-			}
-		}
-
-		throw new FileNotFoundException(path)
-	}
-
-	/**
 	 * Search on the file system for a file or folder corresponding to the
 	 * given path. If not found, search on the current classpath. If this method
 	 * return  an URL, this URL always point to an existing file.
@@ -275,27 +240,14 @@ class OrccFilesManager {
 	 * Unconditionally write <em>content</em> to target file <em>path</em>
 	 */
 	static def writeFile(CharSequence content, String path) {
-		content.writeFile(new File(path))
-	}
+		val target = new File(path)
 
-	/**
-	 * Unconditionally write <em>content</em> to given <em>target</em> file
-	 */
-	static def writeFile(CharSequence content, File target) {
-		try {
-			if (!target.parentFile.exists) {
-				target.parentFile.mkdirs
-			}
-			val ps = new PrintStream(new FileOutputStream(target))
-			ps.print(content)
-			ps.close
-			return true
-		} catch (FileNotFoundException e) {
-			OrccLogger.severe('''Unable to write file «target.path»: «e.cause»''')
-			OrccLogger.severe(e.getLocalizedMessage)
-			e.printStackTrace
-			return false;
+		if (!target.parentFile.exists) {
+			target.parentFile.mkdirs
 		}
+		val ps = new PrintStream(new FileOutputStream(target))
+		ps.print(content)
+		ps.close
 	}
 
 	/**
@@ -311,7 +263,7 @@ class OrccFilesManager {
 	 */
 	static def readFile(String path) {
 		val contentBuilder = new StringBuilder
-		val reader = new FileReader(path.fileResource)
+		val reader = new FileReader(new File(path.url.toURI))
 
 		var int c
 		while ((c = reader.read) != -1) {

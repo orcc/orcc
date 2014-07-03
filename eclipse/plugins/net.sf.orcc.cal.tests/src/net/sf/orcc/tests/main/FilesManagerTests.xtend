@@ -121,7 +121,9 @@ class FilesManagerTests extends Assert {
 
 	@Test
 	def testSimpleWrite() {
-		OrccFilesManager.writeFile("azerty", "azer".tempFilePath).assertTrue
+		val filePath = "azer".tempFilePath
+		OrccFilesManager.writeFile("azerty", filePath)
+		"azerty".assertEquals(OrccFilesManager.readFile(filePath))
 	}
 
 	@Test
@@ -166,7 +168,7 @@ class FilesManagerTests extends Assert {
 
 		OrccFilesManager::isContentEqual(
 			new FileInputStream(targetFile),
-			OrccFilesManager::getFileResource("/test/pass/CodegenWhile.cal")
+			new File(OrccFilesManager.getUrl("/test/pass/CodegenWhile.cal").toURI)
 		).assertTrue
 	}
 
