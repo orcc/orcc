@@ -29,7 +29,7 @@
 package net.sf.orcc.tests.main
 
 import java.io.File
-import java.io.FileInputStream
+import java.io.FileReader
 import java.io.IOException
 import net.sf.orcc.backends.util.OrccFilesManager
 import org.junit.Assert
@@ -152,7 +152,7 @@ class FilesManagerTests extends Assert {
 		OrccFilesManager.writeFile(theContent, f1)
 		OrccFilesManager.writeFile(theContent, f2)
 
-		OrccFilesManager::isContentEqual(new FileInputStream(f1), new File(f2)).assertTrue
+		OrccFilesManager::isContentEqual(new FileReader(f1), new File(f2)).assertTrue
 		theContent.assertEquals(OrccFilesManager::readFile(f1))
 		theContent.assertEquals(OrccFilesManager::readFile(f2))
 	}
@@ -167,7 +167,7 @@ class FilesManagerTests extends Assert {
 		targetFile.length.assertNotEquals(0)
 
 		OrccFilesManager::isContentEqual(
-			new FileInputStream(targetFile),
+			new FileReader(targetFile),
 			new File(OrccFilesManager.getUrl("/test/pass/CodegenWhile.cal").toURI)
 		).assertTrue
 	}

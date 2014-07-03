@@ -29,13 +29,13 @@
 package net.sf.orcc.backends.util
 
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.FileWriter
-import java.io.InputStream
 import java.io.PrintStream
+import java.io.Reader
+import java.io.StringReader
 import java.util.Collections
 import java.util.jar.JarFile
 import java.util.zip.ZipEntry
@@ -216,24 +216,25 @@ class OrccFilesManager {
 			url
 	}
 
+	static def isContentEqual(CharSequence a, File b) {
+		new StringReader(a.toString).isContentEqual(b)
+	}
+
 	/**
 	 * Check if given files have exactly the same content
 	 */
-	static def isContentEqual(InputStream streamA, File b) {
+	static def isContentEqual(Reader readerA, File b) {
 		if(!b.exists) return false
-		val streamB = new FileInputStream(b)
+		val readerB = new FileReader(b)
 
-		var theByte = 0
-		var theByte2 = 0
+		var byteA = 0; var byteB = 0
 		do {
-			theByte = streamA.read
-			theByte2 = streamB.read
-		} while (theByte == theByte2 && theByte != -1)
+			byteA = readerA.read
+			byteB = readerB.read
+		} while (byteA == byteB && byteA != -1)
+		readerA.close; readerB.close
 
-		streamA.close
-		streamB.close
-
-		return theByte == -1
+		return byteA == -1
 	}
 
 	/**
