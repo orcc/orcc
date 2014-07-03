@@ -57,9 +57,7 @@ import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.OrccFilesManager;
 import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.backends.util.OrccFilesManager.OS;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -87,6 +85,7 @@ import net.sf.orcc.tools.mapping.XmlBufferSizeConfiguration;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.tools.stats.StatisticsPrinter;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Void;
@@ -271,19 +270,19 @@ public class CBackend extends AbstractBackend {
 		boolean exportLibrary = !getAttribute(NO_LIBRARY_EXPORT, false);
 
 		if (exportLibrary) {
-			OrccFilesManager.extract("/runtime/C/README.txt", path);
+			FilesManager.extract("/runtime/C/README.txt", path);
 			// Copy specific windows batch file
-			if (OrccFilesManager.getCurrentOS() == OS.WINDOWS) {
-				OrccFilesManager.extract("/runtime/C/run_cmake_with_VS_env.bat", path);
+			if (FilesManager.getCurrentOS() == FilesManager.OS.WINDOWS) {
+				FilesManager.extract("/runtime/C/run_cmake_with_VS_env.bat", path);
 			}
 
 			OrccLogger.traceln("Export libraries sources");
-			OrccFilesManager.extract("/runtime/C/libs", path);
+			FilesManager.extract("/runtime/C/libs", path);
 
 			String scriptsPath = path + File.separator + "scripts";
 			OrccLogger.traceln("Export scripts into " + scriptsPath + "... ");
-			OrccFilesManager.extract("/runtime/common/scripts", path);
-			OrccFilesManager.extract("/runtime/C/scripts", path);
+			FilesManager.extract("/runtime/common/scripts", path);
+			FilesManager.extract("/runtime/C/scripts", path);
 
 			// Fix some permissions on scripts
 			new File(scriptsPath + File.separator + "profilingAnalyse.py")

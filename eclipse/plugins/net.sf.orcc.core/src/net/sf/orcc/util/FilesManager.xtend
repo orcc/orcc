@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.util
+package net.sf.orcc.util
 
 import java.io.File
 import java.io.FileNotFoundException
@@ -50,7 +50,7 @@ import org.eclipse.core.runtime.FileLocator
  * from a jar plugin to the filesystem, check if 2 files are identical, read/write
  * files, etc.
  */
-class OrccFilesManager {
+class FilesManager {
 
 	enum OS {
 		WINDOWS,
@@ -59,9 +59,9 @@ class OrccFilesManager {
 		UNKNOWN
 	}
 
-	static val OK = new OrccFilesManager.Result(1, 0, 0)
-	static val CACHED = new OrccFilesManager.Result(0, 1, 0)
-	static val EMPTY_RESULT = new OrccFilesManager.Result(0, 0, 0)
+	static val OK = new FilesManager.Result(1, 0, 0)
+	static val CACHED = new FilesManager.Result(0, 1, 0)
+	static val EMPTY_RESULT = new FilesManager.Result(0, 0, 0)
 
 	static class Result {
 		var written = 0
@@ -72,7 +72,7 @@ class OrccFilesManager {
 			cached = c
 		}
 
-		def merge(OrccFilesManager.Result other) {
+		def merge(FilesManager.Result other) {
 			written = written + other.written
 			cached = cached + other.cached
 		}
@@ -116,7 +116,7 @@ class OrccFilesManager {
 	 * @param targetFolder
 	 * 			The target folder to copy the file
 	 */
-	private def static OrccFilesManager.Result basicExtraction(File source, File targetFolder) {
+	private def static FilesManager.Result basicExtraction(File source, File targetFolder) {
 		if (!source.exists) {
 			throw new FileNotFoundException(source.path)
 		}
@@ -204,7 +204,7 @@ class OrccFilesManager {
 	private def static jarDirectoryExtract(JarFile jar, ZipEntry entry, File target) {
 		val prefix = entry.name
 		val entries = Collections::list(jar.entries).filter[name.startsWith(prefix)]
-		val result = OrccFilesManager.EMPTY_RESULT
+		val result = FilesManager.EMPTY_RESULT
 		for (e : entries) {
 			result.merge(
 				jarFileExtract(jar, e, new File(target, e.name.substring(prefix.length)))
@@ -220,7 +220,7 @@ class OrccFilesManager {
 		target.parentFile.mkdirs
 		if (entry.directory) {
 			target.mkdir
-			return OrccFilesManager.EMPTY_RESULT
+			return FilesManager.EMPTY_RESULT
 		}
 		val is = jar.getInputStream(entry)
 
@@ -258,7 +258,7 @@ class OrccFilesManager {
 		if (file.exists)
 			return file.toURI.toURL
 
-		val url = OrccFilesManager.getResource(sanitizedPath)
+		val url = FilesManager.getResource(sanitizedPath)
 
 		if ("bundleresource".equalsIgnoreCase(url?.protocol))
 			FileLocator.resolve(url)
@@ -355,13 +355,13 @@ class OrccFilesManager {
 	static def getCurrentOS() {
 		val systemname = System.getProperty("os.name").toLowerCase()
 		if (systemname.startsWith("win")) {
-			OrccFilesManager.OS.WINDOWS
+			FilesManager.OS.WINDOWS
 		} else if (systemname.equals("linux")) {
-			OrccFilesManager.OS.LINUX
+			FilesManager.OS.LINUX
 		} else if (systemname.contains("mac")) {
-			OrccFilesManager.OS.MACOS
+			FilesManager.OS.MACOS
 		} else {
-			OrccFilesManager.OS.UNKNOWN
+			FilesManager.OS.UNKNOWN
 		}
 	}
 

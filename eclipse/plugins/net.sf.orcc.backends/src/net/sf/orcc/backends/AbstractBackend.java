@@ -74,7 +74,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.backends.util.OrccFilesManager;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -82,6 +81,7 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ValueUtil;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -285,7 +285,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            set to true to ensure files will be really wrote. If not, MD5
 	 *            sum will be computed to check if files need to be written
 	 * @return <code>true</code> if the file has been successfully copied
-	 * @deprecated Use methods in {@link OrccFilesManager} instead
+	 * @deprecated Use methods in {@link FilesManager} instead
 	 */
 	@Deprecated
 	protected boolean copyFileToFilesystem(final String source,
@@ -397,7 +397,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            set to true to ensure files will be really wrote. If not, MD5
 	 *            sum will be computed to check if files need to be written
 	 * @return <code>true</code> if the folder has been successfully copied
-	 * @deprecated Use methods in {@link OrccFilesManager} instead
+	 * @deprecated Use methods in {@link FilesManager} instead
 	 */
 	@Deprecated
 	protected boolean copyFolderToFileSystem(String source, String destination,
@@ -826,7 +826,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			tempOrccDir.mkdir();
 			outputFolder = tempOrccDir.getAbsolutePath();
 		} else {
-			outputFolder = OrccFilesManager.sanitize(outputFolder);
+			outputFolder = FilesManager.sanitize(outputFolder);
 		}
 
 		if (debug) {

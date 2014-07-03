@@ -127,7 +127,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * 
 	 * @param content
 	 * @return a byte[] containing the hash
-	 * @deprecated Use methods in {@link OrccFilesManager} instead
+	 * @deprecated Use methods in {@link FilesManager} instead
 	 */
 	@Deprecated
 	def private hash(byte[] content) {
@@ -147,7 +147,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * 
 	 * @param file
 	 * @return a byte[] containing the hash
-	 * @deprecated Use methods in {@link OrccFilesManager} instead
+	 * @deprecated Use methods in {@link FilesManager} instead
 	 */
 	@Deprecated
 	def private hash(File file) {
@@ -187,7 +187,7 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	 * 
 	 * @param targetFile
 	 * @param content
-	 * @deprecated Use methods in {@link OrccFilesManager} instead
+	 * @deprecated Use methods in {@link FilesManager} instead
 	 */
 	@Deprecated
 	def protected needToWriteFile(CharSequence content, File target) {

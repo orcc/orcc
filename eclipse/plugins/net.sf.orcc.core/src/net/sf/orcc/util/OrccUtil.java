@@ -684,7 +684,7 @@ public class OrccUtil {
 	 * @param target
 	 *            file to write content to
 	 * @return true if the file has correctly been written
-	 * @deprecated Use methods in {@link OrccFilesManager} instead
+	 * @deprecated Use methods in {@link FilesManager} instead
 	 */
 	@Deprecated
 	public static boolean printFile(CharSequence content, File target) {
@@ -838,7 +838,7 @@ public class OrccUtil {
 	 * 
 	 * @param path
 	 * @return
-	 * @deprecated Use methods in {@link OrccFilesManager} instead
+	 * @deprecated Use methods in {@link FilesManager} instead
 	 */
 	@Deprecated
 	public static String resolveFromHome(final String path) {

@@ -30,7 +30,7 @@ package net.sf.orcc.tests.main
 
 import java.io.File
 import java.io.FileReader
-import net.sf.orcc.backends.util.OrccFilesManager
+import net.sf.orcc.util.FilesManager
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
@@ -55,7 +55,7 @@ class FilesManagerTests extends Assert {
 		tempDir = '''«System.getProperty("java.io.tmpdir")»«File.separatorChar»ORCC_FILE_TESTS'''
 		val f = new File(tempDir)
 		if (f.exists) {
-			OrccFilesManager.recursiveDelete(f)
+			FilesManager.recursiveDelete(f)
 		}
 	}
 
@@ -69,12 +69,12 @@ class FilesManagerTests extends Assert {
 
 	@Test
 	def testOSdetection() {
-		val os = OrccFilesManager.getCurrentOS
-		if (os == OrccFilesManager.OS.WINDOWS) {
+		val os = FilesManager.getCurrentOS
+		if (os == FilesManager.OS.WINDOWS) {
 			new File("C:/Windows").directory.assertTrue
-		} else if (os == OrccFilesManager.OS.LINUX) {
+		} else if (os == FilesManager.OS.LINUX) {
 			new File("/home").directory.assertTrue
-		} else if (os == OrccFilesManager.OS.MACOS) {
+		} else if (os == FilesManager.OS.MACOS) {
 			new File("/Library").directory.assertTrue
 		} else {
 			fail("Unable to detect System")
@@ -84,41 +84,41 @@ class FilesManagerTests extends Assert {
 	@Test
 	def testPathSanitization() {
 		standardFolder.startsWith("~").assertTrue
-		val result = OrccFilesManager.sanitize(standardFolder)
+		val result = FilesManager.sanitize(standardFolder)
 		result.startsWith("~").assertFalse
-		if (OrccFilesManager.getCurrentOS.equals(OrccFilesManager.OS.LINUX)) {
+		if (FilesManager.getCurrentOS.equals(FilesManager.OS.LINUX)) {
 			result.startsWith("/home").assertTrue
 		}
 	}
 
 	@Test
 	def testURLDetection() {
-		var url = OrccFilesManager.getUrl(jarFile)
+		var url = FilesManager.getUrl(jarFile)
 		url.protocol.assertEquals("jar")
 
-		url = OrccFilesManager.getUrl(jarFolder)
+		url = FilesManager.getUrl(jarFolder)
 		url.protocol.assertEquals("jar")
 
-		url = OrccFilesManager.getUrl(bundleFile)
+		url = FilesManager.getUrl(bundleFile)
 		url.protocol.assertEquals("file")
 
-		url = OrccFilesManager.getUrl(bundleFolder)
+		url = FilesManager.getUrl(bundleFolder)
 		url.protocol.assertEquals("file")
 
-		url = OrccFilesManager.getUrl(standardFolder)
+		url = FilesManager.getUrl(standardFolder)
 		url.protocol.assertEquals("file")
 	}
 
 	@Test
 	def testSimpleRead() {
-		"azerty".assertEquals(OrccFilesManager.readFile("/test/extract/files/basic.txt"))
+		"azerty".assertEquals(FilesManager.readFile("/test/extract/files/basic.txt"))
 	}
 
 	@Test
 	def testSimpleWrite() {
 		val filePath = "azer".tempFilePath
-		OrccFilesManager.writeFile("azerty", filePath)
-		"azerty".assertEquals(OrccFilesManager.readFile(filePath))
+		FilesManager.writeFile("azerty", filePath)
+		"azerty".assertEquals(FilesManager.readFile(filePath))
 	}
 
 	@Test
@@ -131,8 +131,8 @@ class FilesManagerTests extends Assert {
 			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
 			cillum dolore eu fugiat nulla pariatur.
 		'''
-		OrccFilesManager.writeFile(theContent, theFile)
-		theContent.assertEquals(OrccFilesManager.readFile(theFile))
+		FilesManager.writeFile(theContent, theFile)
+		theContent.assertEquals(FilesManager.readFile(theFile))
 	}
 
 	@Test
@@ -144,32 +144,32 @@ class FilesManagerTests extends Assert {
 		val f1 = "file1".tempFilePath
 		val f2 = "file2".tempFilePath
 
-		OrccFilesManager.writeFile(theContent, f1)
-		OrccFilesManager.writeFile(theContent, f2)
+		FilesManager.writeFile(theContent, f1)
+		FilesManager.writeFile(theContent, f2)
 
-		OrccFilesManager::isContentEqual(new FileReader(f1), new File(f2)).assertTrue
-		theContent.assertEquals(OrccFilesManager::readFile(f1))
-		theContent.assertEquals(OrccFilesManager::readFile(f2))
+		FilesManager::isContentEqual(new FileReader(f1), new File(f2)).assertTrue
+		theContent.assertEquals(FilesManager::readFile(f1))
+		theContent.assertEquals(FilesManager::readFile(f2))
 	}
 
 	@Test
 	def testFileExtraction() {
-		OrccFilesManager::extract("/test/pass/CodegenWhile.cal", tempDir)
+		FilesManager::extract("/test/pass/CodegenWhile.cal", tempDir)
 
 		val targetFile = new File('''«tempDir»«File.separatorChar»CodegenWhile.cal''')
 		assertTrue(targetFile.exists)
 
 		targetFile.length.assertNotEquals(0)
 
-		OrccFilesManager::isContentEqual(
+		FilesManager::isContentEqual(
 			new FileReader(targetFile),
-			new File(OrccFilesManager.getUrl("/test/pass/CodegenWhile.cal").toURI)
+			new File(FilesManager.getUrl("/test/pass/CodegenWhile.cal").toURI)
 		).assertTrue
 	}
 
 	@Test
 	def testFolderExtraction() {
-		OrccFilesManager::extract("/test/extract", tempDir)
+		FilesManager::extract("/test/extract", tempDir)
 
 		val targetFolder = new File("extract".tempFilePath)
 
@@ -185,22 +185,22 @@ class FilesManagerTests extends Assert {
 
 		// Check the content of extracted files
 		"xxxx".assertEquals(
-			OrccFilesManager.readFile('''«tempDir»/extract/subfolder/qwert/xxxxx.txt''')
+			FilesManager.readFile('''«tempDir»/extract/subfolder/qwert/xxxxx.txt''')
 		)
 	}
 
 	@Test
 	def testJarExtractions() {
 		val targetDirectory = "jarExtract".tempFilePath
-		OrccFilesManager.extract(jarFile, targetDirectory)
-		OrccFilesManager.extract(jarFolder, targetDirectory)
+		FilesManager.extract(jarFile, targetDirectory)
+		FilesManager.extract(jarFolder, targetDirectory)
 
 		new File(targetDirectory, "Class.class").file.assertTrue
 		new File(targetDirectory, "a").directory.assertTrue
 
 		new File(targetDirectory, "a/1.txt").file.assertTrue
 		"in folder a, 3.txt".assertEquals(
-			OrccFilesManager.readFile('''«targetDirectory»/a/3.txt''')
+			FilesManager.readFile('''«targetDirectory»/a/3.txt''')
 		)
 	}
 
@@ -217,7 +217,7 @@ class FilesManagerTests extends Assert {
 			cillum dolore eu fugiat nulla pariatur.
 		'''
 
-		var result = OrccFilesManager.writeFile(content, path)
+		var result = FilesManager.writeFile(content, path)
 		result.cached.assertEquals(0)
 		result.written.assertEquals(1)
 
@@ -225,7 +225,7 @@ class FilesManagerTests extends Assert {
 		timestamp.assertNotEquals(0)
 		Thread.sleep(1500)
 
-		result = OrccFilesManager.writeFile(content, path)
+		result = FilesManager.writeFile(content, path)
 		result.cached.assertEquals(1)
 		result.written.assertEquals(0)
 
