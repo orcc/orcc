@@ -369,7 +369,7 @@ class FilesManager {
 	 * Transform the given path to a valid filesystem one.
 	 * 
 	 * <ul>
-	 * <li>It replace first '~' by the home directory of the current user.</li>
+	 * <li>It replaces first '~' by the home directory of the current user.</li>
 	 * </ul>
 	 */
 	static def sanitize(String path) {
@@ -384,6 +384,13 @@ class FilesManager {
 		return path
 	}
 
+	/**
+	 * <p>Detect the current user operating system, and return one of the constants
+	 * <em>OS_WINDOWS, OS_LINUX, OS_MACOS, OS_UNKNOWN</em> to indicate which system
+	 * has been detected.</p>
+	 * 
+	 * <p>TODO: this method should be tested and fixed on Mac OS</p>
+	 */
 	static def getCurrentOS() {
 		val systemname = System.getProperty("os.name").toLowerCase()
 		if (systemname.startsWith("win")) {
@@ -397,6 +404,9 @@ class FilesManager {
 		}
 	}
 
+	/**
+	 * Delete the given d directory and all its content
+	 */
 	static def void recursiveDelete(File d) {
 		for (e : d.listFiles) {
 			if (e.file) {
