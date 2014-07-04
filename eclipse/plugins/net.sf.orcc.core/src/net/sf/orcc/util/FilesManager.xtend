@@ -41,7 +41,6 @@ import java.io.StringReader
 import java.util.Collections
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import java.util.zip.ZipEntry
 import org.eclipse.core.runtime.Assert
 import org.eclipse.core.runtime.FileLocator
 import org.osgi.framework.FrameworkUtil
@@ -63,13 +62,22 @@ class FilesManager {
 	public static val OS_UNKNOWN = 4
 
 	/**
-	 * Copy the file or the folder at given <em>path</em> to the given
-	 * <em>target folder</em>.
+	 * <p>Copy the file or the folder at given <em>path</em> to the given
+	 * <em>target folder</em>.</p>
 	 * 
-	 * @param path
-	 * @param targetFolder
-	 * @return
-	 * @throws FileNotFoundException
+	 * <p>It is important to understand that the resource (file or folder) at the given path
+	 * will be copiend <b>into</b> the target folder. For example,
+	 * <code>extract("/path/to/file.txt", "/home/johndoe")</code> will copy <em>file.txt</em>
+	 * into <em>/home/johndoe</em>, and <code>extract("/path/to/MyFolder", "/home/johndoe")</code>
+	 * will create <em>MyFolder</em> directory in <em>/home/johndoe</em> and copy all files
+	 * from the source folder into it.
+	 * </p>
+	 * 
+	 * @param path The path of the source (folder or file) to copy
+	 * @param targetFolder The directory where to copy the source element
+	 * @return A Result object counting exactly how many files have been really
+	 * 		written, and how many haven't because they were already up-to-date
+	 * @throws FileNotFoundException If not resource have been found at the given path
 	 */
 	def static extract(String path, String targetFolder) {
 		val targetF = new File(targetFolder)
@@ -82,7 +90,7 @@ class FilesManager {
 			val jar = new JarFile(splittedURL.head.substring(5))
 			jarExtract(jar, splittedURL.last, targetF)
 		} else {
-			basicExtraction(new File(path.url.toURI), targetF)
+			fsExtract(new File(path.url.toURI), targetF)
 		}
 	}
 
@@ -95,15 +103,15 @@ class FilesManager {
 	 * @param targetFolder
 	 * 			The target folder to copy the file
 	 */
-	private def static Result basicExtraction(File source, File targetFolder) {
+	private def static Result fsExtract(File source, File targetFolder) {
 		if (!source.exists) {
 			throw new FileNotFoundException(source.path)
 		}
 		val target = new File(targetFolder, source.name)
 		if (source.file)
-			source.basicFileExtraction(target)
+			source.fsFileExtract(target)
 		else if (source.directory)
-			source.basicDirectoryExtraction(target)
+			source.fsDirectoryExtract(target)
 	}
 
 	/**
@@ -117,7 +125,7 @@ class FilesManager {
 	 * @param targetFile
 	 * 			The target path of a writable file
 	 */
-	private def static basicFileExtraction(File source, File targetFile) {
+	private def static fsFileExtract(File source, File targetFile) {
 		val reader = new FileReader(source)
 		if (reader.isContentEqual(targetFile)) {
 			return CACHED
@@ -143,7 +151,7 @@ class FilesManager {
 	 * @param targetFolder
 	 * 			Path to the folder where source will be copied
 	 */
-	private def static basicDirectoryExtraction(File source, File targetFolder) {
+	private def static fsDirectoryExtract(File source, File targetFolder) {
 		Assert.isTrue(source.directory)
 		if (!targetFolder.exists)
 			Assert.isTrue(targetFolder.mkdirs)
@@ -153,12 +161,15 @@ class FilesManager {
 		val result = EMPTY_RESULT
 		for (file : source.listFiles) {
 			result.merge(
-				file.basicExtraction(targetFolder)
+				file.fsExtract(targetFolder)
 			)
 		}
 		return result
 	}
 
+	/**
+	 * Starting point for extraction of a file/folder resource from a jar. 
+	 */
 	private def static jarExtract(JarFile jar, String path, File targetFolder) {
 		val updatedPath = if (path.startsWith("/")) {
 				path.substring(1)
@@ -192,36 +203,38 @@ class FilesManager {
 	}
 
 	/**
-	 *
+	 * Extract all files in the given <em>entry</em> from the given <em>jar</em> into
+	 * the <em>target folder</em>.
 	 */
-	private def static jarDirectoryExtract(JarFile jar, ZipEntry entry, File target) {
+	private def static jarDirectoryExtract(JarFile jar, JarEntry entry, File targetFolder) {
 		val prefix = entry.name
 		val entries = Collections::list(jar.entries).filter[name.startsWith(prefix)]
 		val result = EMPTY_RESULT
 		for (e : entries) {
 			result.merge(
-				jarFileExtract(jar, e, new File(target, e.name.substring(prefix.length)))
+				jarFileExtract(jar, e, new File(targetFolder, e.name.substring(prefix.length)))
 			)
 		}
 		return result
 	}
 
 	/**
-	 * 
+	 * Extract the file <em>entry</em> from the given <em>jar</em> into the <em>target
+	 * file</em>.
 	 */
-	private def static jarFileExtract(JarFile jar, JarEntry entry, File target) {
-		target.parentFile.mkdirs
+	private def static jarFileExtract(JarFile jar, JarEntry entry, File targetFile) {
+		targetFile.parentFile.mkdirs
 		if (entry.directory) {
-			target.mkdir
+			targetFile.mkdir
 			return EMPTY_RESULT
 		}
 		val is = jar.getInputStream(entry)
 
-		if (is.isContentEqual(target)) {
+		if (is.isContentEqual(targetFile)) {
 			return CACHED
 		}
 
-		val os = new FileOutputStream(target)
+		val os = new FileOutputStream(targetFile)
 
 		val byte[] buffer = newByteArrayOfSize(512)
 		var readLen = 0
@@ -267,10 +280,18 @@ class FilesManager {
 			url
 	}
 
+	/**
+	 * Check if given a CharSequence have exactly the same content
+	 * than file b.
+	 */
 	static def isContentEqual(CharSequence a, File b) {
 		new StringReader(a.toString).isContentEqual(b)
 	}
 
+	/**
+	 * Check if given a InputStream have exactly the same content
+	 * than file b.
+	 */
 	static def isContentEqual(InputStream a, File b) {
 		new InputStreamReader(a).isContentEqual(b)
 	}
@@ -295,7 +316,9 @@ class FilesManager {
 	}
 
 	/**
-	 * Unconditionally write <em>content</em> to target file <em>path</em>
+	 * Write <em>content</em> to target file <em>path</em>, if necessary. This method
+	 * will not write the content to the target file if this one already have exactly
+	 * the same content.
 	 */
 	static def writeFile(CharSequence content, String path) {
 		val target = new File(path)
@@ -343,10 +366,13 @@ class FilesManager {
 	}
 
 	/**
+	 * Transform the given path to a valid filesystem one.
 	 * 
+	 * <ul>
+	 * <li>It replace first '~' by the home directory of the current user.</li>
+	 * </ul>
 	 */
 	static def sanitize(String path) {
-
 		// We use the following construction because Xtend infer '~' as a String instead of a char
 		// path.substring(0,1).equals('~')
 		if (!path.nullOrEmpty && path.substring(0, 1).equals('~')) {
