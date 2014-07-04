@@ -44,6 +44,7 @@ import java.util.jar.JarFile
 import java.util.zip.ZipEntry
 import org.eclipse.core.runtime.Assert
 import org.eclipse.core.runtime.FileLocator
+import org.osgi.framework.FrameworkUtil
 
 import static net.sf.orcc.util.Result.*
 
@@ -236,9 +237,17 @@ class FilesManager {
 		if (file.exists)
 			return file.toURI.toURL
 
-		val url = FilesManager.getResource(sanitizedPath)
+		// Search in all reachable bundles for the given path resource
+		val bundles = FrameworkUtil::getBundle(FilesManager).bundleContext.bundles
+		var url = bundles
+			// Search only in Orcc plugins
+			.filter[symbolicName.startsWith("net.sf.orcc")]
+			// We want an URL to the resource
+			.map[getEntry(path)]
+			// We keep the first URL not null (we found the resource)
+			.findFirst[it != null]
 
-		if ("bundleresource".equalsIgnoreCase(url?.protocol))
+		if (#["bundle", "bundleresource", "bundleentry"].contains(url?.protocol))
 			FileLocator.resolve(url)
 		else
 			url
@@ -303,6 +312,7 @@ class FilesManager {
 	 */
 	static def readFile(String path) {
 		val contentBuilder = new StringBuilder
+
 		val url = path.url
 		if(url == null) {
 			throw new FileNotFoundException(path)
