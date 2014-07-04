@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.util
+package net.sf.orcc.backends.util
 
 import java.io.File
 import java.io.FileNotFoundException
@@ -44,8 +44,7 @@ import java.util.jar.JarFile
 import java.util.zip.ZipEntry
 import org.eclipse.core.runtime.Assert
 import org.eclipse.core.runtime.FileLocator
-
-import static net.sf.orcc.util.Result.*
+import static net.sf.orcc.backends.util.Result.*
 
 /**
  * Utility class to manipulate files. It brings everything needed to extract files

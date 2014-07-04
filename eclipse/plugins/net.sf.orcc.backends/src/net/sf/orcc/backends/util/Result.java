@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.util;
+package net.sf.orcc.backends.util;
 
 /**
  * This class is used to store files writing results. It maintains tyhe number
