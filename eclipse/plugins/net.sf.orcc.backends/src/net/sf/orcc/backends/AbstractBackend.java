@@ -74,7 +74,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.backends.util.FilesManager;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -82,6 +81,7 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ValueUtil;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;

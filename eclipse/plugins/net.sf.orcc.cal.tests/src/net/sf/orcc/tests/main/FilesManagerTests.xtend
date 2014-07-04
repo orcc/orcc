@@ -30,7 +30,7 @@ package net.sf.orcc.tests.main
 
 import java.io.File
 import java.io.FileReader
-import net.sf.orcc.backends.util.FilesManager
+import net.sf.orcc.util.FilesManager
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
