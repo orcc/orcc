@@ -46,6 +46,7 @@ class FilesManagerTests extends Assert {
 	static var tempDir = ""
 	var jarFile = "/java/lang/Class.class"
 	var jarFolder = "/myjar/a"
+	var jarFolder2 = "/myjar/b/"
 	var bundleFile = "/test/extract/subfolder/zzz.txt"
 	var bundleFolder = "/test/extract"
 	var standardFolder = "~/.ssh"
@@ -194,6 +195,7 @@ class FilesManagerTests extends Assert {
 		val targetDirectory = "jarExtract".tempFilePath
 		FilesManager.extract(jarFile, targetDirectory)
 		FilesManager.extract(jarFolder, targetDirectory)
+		FilesManager.extract(jarFolder2, targetDirectory)
 
 		new File(targetDirectory, "Class.class").file.assertTrue
 		new File(targetDirectory, "a").directory.assertTrue
@@ -201,6 +203,12 @@ class FilesManagerTests extends Assert {
 		new File(targetDirectory, "a/1.txt").file.assertTrue
 		"in folder a, 3.txt".assertEquals(
 			FilesManager.readFile('''«targetDirectory»/a/3.txt''')
+		)
+
+		new File(targetDirectory, "b").directory.assertTrue
+		new File(targetDirectory, "b/3.txt").file.assertTrue
+		"in folder b, 2.txt".assertEquals(
+			FilesManager.readFile('''«targetDirectory»/b/2.txt''')
 		)
 	}
 

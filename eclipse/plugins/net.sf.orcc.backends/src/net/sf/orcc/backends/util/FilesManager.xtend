@@ -165,7 +165,18 @@ class FilesManager {
 			}
 
 		val entry = jar.getJarEntry(updatedPath)
-		val fileName = entry.name.substring(entry.name.lastIndexOf("/"))
+		// Remove the last char if it is '/'
+		val name =
+			if(entry.name.endsWith("/"))
+				entry.name.substring(0, entry.name.length - 1)
+			else
+				entry.name
+		val fileName =
+			if(name.lastIndexOf("/") != -1)
+				name.substring(name.lastIndexOf("/"))
+			else
+				name
+
 		if (entry.directory) {
 			jarDirectoryExtract(jar, entry, new File(targetFolder, fileName))
 		} else {
@@ -178,6 +189,9 @@ class FilesManager {
 		}
 	}
 
+	/**
+	 *
+	 */
 	private def static jarDirectoryExtract(JarFile jar, ZipEntry entry, File target) {
 		val prefix = entry.name
 		val entries = Collections::list(jar.entries).filter[name.startsWith(prefix)]
