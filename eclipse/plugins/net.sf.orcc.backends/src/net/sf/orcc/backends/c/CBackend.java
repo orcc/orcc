@@ -272,7 +272,7 @@ public class CBackend extends AbstractBackend {
 		if (exportLibrary) {
 			FilesManager.extract("/runtime/C/README.txt", path);
 			// Copy specific windows batch file
-			if (FilesManager.getCurrentOS() == FilesManager.OS.WINDOWS) {
+			if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
 				FilesManager.extract("/runtime/C/run_cmake_with_VS_env.bat", path);
 			}
 

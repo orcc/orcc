@@ -70,11 +70,11 @@ class FilesManagerTests extends Assert {
 	@Test
 	def testOSdetection() {
 		val os = FilesManager.getCurrentOS
-		if (os == FilesManager.OS.WINDOWS) {
+		if (os == FilesManager.OS_WINDOWS) {
 			new File("C:/Windows").directory.assertTrue
-		} else if (os == FilesManager.OS.LINUX) {
+		} else if (os == FilesManager.OS_LINUX) {
 			new File("/home").directory.assertTrue
-		} else if (os == FilesManager.OS.MACOS) {
+		} else if (os == FilesManager.OS_MACOS) {
 			new File("/Library").directory.assertTrue
 		} else {
 			fail("Unable to detect System")
@@ -86,7 +86,7 @@ class FilesManagerTests extends Assert {
 		standardFolder.startsWith("~").assertTrue
 		val result = FilesManager.sanitize(standardFolder)
 		result.startsWith("~").assertFalse
-		if (FilesManager.getCurrentOS.equals(FilesManager.OS.LINUX)) {
+		if (FilesManager.getCurrentOS.equals(FilesManager.OS_LINUX)) {
 			result.startsWith("/home").assertTrue
 		}
 	}

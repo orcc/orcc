@@ -45,6 +45,8 @@ import java.util.zip.ZipEntry
 import org.eclipse.core.runtime.Assert
 import org.eclipse.core.runtime.FileLocator
 
+import static net.sf.orcc.util.Result.*
+
 /**
  * Utility class to manipulate files. It brings everything needed to extract files
  * from a jar plugin to the filesystem, check if 2 files are identical, read/write
@@ -52,39 +54,12 @@ import org.eclipse.core.runtime.FileLocator
  */
 class FilesManager {
 
-	enum OS {
-		WINDOWS,
-		LINUX,
-		MACOS,
-		UNKNOWN
-	}
-
-	static val OK = new FilesManager.Result(1, 0, 0)
-	static val CACHED = new FilesManager.Result(0, 1, 0)
-	static val EMPTY_RESULT = new FilesManager.Result(0, 0, 0)
-
-	static class Result {
-		var written = 0
-		var cached = 0
-
-		new(int w, int c, int e) {
-			written = w
-			cached = c
-		}
-
-		def merge(FilesManager.Result other) {
-			written = written + other.written
-			cached = cached + other.cached
-		}
-
-		def cached() {
-			cached
-		}
-
-		def written() {
-			written
-		}
-	}
+	// TODO: In a future version, an classical java enum could be
+	// used here. This is possible only with Xtend 2.4
+	public static val OS_WINDOWS = 1
+	public static val OS_LINUX = 2
+	public static val OS_MACOS = 3
+	public static val OS_UNKNOWN = 4
 
 	/**
 	 * Copy the file or the folder at given <em>path</em> to the given
@@ -116,7 +91,7 @@ class FilesManager {
 	 * @param targetFolder
 	 * 			The target folder to copy the file
 	 */
-	private def static FilesManager.Result basicExtraction(File source, File targetFolder) {
+	private def static Result basicExtraction(File source, File targetFolder) {
 		if (!source.exists) {
 			throw new FileNotFoundException(source.path)
 		}
@@ -204,7 +179,7 @@ class FilesManager {
 	private def static jarDirectoryExtract(JarFile jar, ZipEntry entry, File target) {
 		val prefix = entry.name
 		val entries = Collections::list(jar.entries).filter[name.startsWith(prefix)]
-		val result = FilesManager.EMPTY_RESULT
+		val result = EMPTY_RESULT
 		for (e : entries) {
 			result.merge(
 				jarFileExtract(jar, e, new File(target, e.name.substring(prefix.length)))
@@ -220,7 +195,7 @@ class FilesManager {
 		target.parentFile.mkdirs
 		if (entry.directory) {
 			target.mkdir
-			return FilesManager.EMPTY_RESULT
+			return EMPTY_RESULT
 		}
 		val is = jar.getInputStream(entry)
 
@@ -355,13 +330,13 @@ class FilesManager {
 	static def getCurrentOS() {
 		val systemname = System.getProperty("os.name").toLowerCase()
 		if (systemname.startsWith("win")) {
-			FilesManager.OS.WINDOWS
+			OS_WINDOWS
 		} else if (systemname.equals("linux")) {
-			FilesManager.OS.LINUX
+			OS_LINUX
 		} else if (systemname.contains("mac")) {
-			FilesManager.OS.MACOS
+			OS_MACOS
 		} else {
-			FilesManager.OS.UNKNOWN
+			OS_UNKNOWN
 		}
 	}
 
