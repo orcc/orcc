@@ -72,7 +72,10 @@ class FilesManager {
 	 */
 	def static extract(String path, String targetFolder) {
 		val targetF = new File(targetFolder)
-		val url = getUrl(path)
+		val url = path.url
+		if(url == null) {
+			throw new FileNotFoundException(path)
+		}
 		if (url.protocol.equals("jar")) {
 			val splittedURL = url.file.split("!")
 			val jar = new JarFile(splittedURL.head.substring(5))
@@ -292,7 +295,7 @@ class FilesManager {
 	 * as a String.
 	 * 
 	 * @param path
-	 * 			The path of the file tio read
+	 * 			The path of the file to read
 	 * @returns
 	 * 			The content of the file
 	 * @throws FileNotFoundException
@@ -300,7 +303,11 @@ class FilesManager {
 	 */
 	static def readFile(String path) {
 		val contentBuilder = new StringBuilder
-		val reader = new FileReader(new File(path.url.toURI))
+		val url = path.url
+		if(url == null) {
+			throw new FileNotFoundException(path)
+		}
+		val reader = new FileReader(new File(url.toURI))
 
 		var int c
 		while ((c = reader.read) != -1) {
