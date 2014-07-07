@@ -108,19 +108,12 @@ class FilesManagerTests extends Assert {
 		url.assertNotNull
 		"jar".assertEquals(url.protocol)
 
-		val bundleProtocol =
-			if(FrameworkUtil::getBundle(FilesManagerTests) != null) {
-				"jar"
-			} else {
-				"file"
-			}
+
 		url = FilesManager.getUrl(bundleFile)
 		url.assertNotNull
-		bundleProtocol.assertEquals(url.protocol)
 
 		url = FilesManager.getUrl(bundleFolder)
 		url.assertNotNull
-		bundleProtocol.assertEquals(url.protocol)
 
 		url = FilesManager.getUrl(standardFolder)
 		url.assertNotNull
