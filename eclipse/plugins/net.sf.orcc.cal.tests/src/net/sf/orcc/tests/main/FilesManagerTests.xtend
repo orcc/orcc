@@ -38,6 +38,7 @@ import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.osgi.framework.FrameworkUtil
 
 /**
  * Test methods of OrccFileWriter utility class
@@ -101,23 +102,29 @@ class FilesManagerTests extends Assert {
 	def classpathFilesFolderLookup() {
 		var url = FilesManager.getUrl(jarFile)
 		url.assertNotNull
-		url.protocol.assertEquals("jar")
+		"jar".assertEquals(url.protocol)
 
 		url = FilesManager.getUrl(jarFolder)
 		url.assertNotNull
-		url.protocol.assertEquals("jar")
+		"jar".assertEquals(url.protocol)
 
+		val bundleProtocol =
+			if(FrameworkUtil::getBundle(FilesManagerTests) != null) {
+				"jar"
+			} else {
+				"file"
+			}
 		url = FilesManager.getUrl(bundleFile)
 		url.assertNotNull
-		url.protocol.assertEquals("file")
+		bundleProtocol.assertEquals(url.protocol)
 
 		url = FilesManager.getUrl(bundleFolder)
 		url.assertNotNull
-		url.protocol.assertEquals("file")
+		bundleProtocol.assertEquals(url.protocol)
 
 		url = FilesManager.getUrl(standardFolder)
 		url.assertNotNull
-		url.protocol.assertEquals("file")
+		"file".assertEquals(url.protocol)
 	}
 
 	@Test
