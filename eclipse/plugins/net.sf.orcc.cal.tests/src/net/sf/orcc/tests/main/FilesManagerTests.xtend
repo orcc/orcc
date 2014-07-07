@@ -28,17 +28,16 @@
  */
 package net.sf.orcc.tests.main
 
+import com.google.common.base.Charsets
+import com.google.common.io.Files
 import java.io.File
 import java.io.FileReader
-import java.io.InputStreamReader
 import net.sf.orcc.util.FilesManager
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import com.google.common.base.Charsets
-import com.google.common.io.Files
 
 /**
  * Test methods of OrccFileWriter utility class
