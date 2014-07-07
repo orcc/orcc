@@ -363,7 +363,23 @@ class FilesManager {
 		if(url == null) {
 			throw new FileNotFoundException(path)
 		}
-		val reader = new FileReader(new File(url.toURI))
+
+		val reader =
+			if (url.protocol.equals("jar")) {
+				val splittedURL = url.file.split("!")
+				val jar = new JarFile(splittedURL.head.substring(5))
+				val entryPath = splittedURL.last
+				val updatedPath = if (entryPath.startsWith("/")) {
+						entryPath.substring(1)
+					} else {
+						path
+					}
+				val is = jar.getInputStream(jar.getEntry(updatedPath))
+
+				new InputStreamReader(is)
+			} else {
+				new FileReader(new File(url.toURI))
+			}
 
 		var int c
 		while ((c = reader.read) != -1) {

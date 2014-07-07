@@ -239,4 +239,12 @@ class FilesManagerTests extends Assert {
 
 		timestamp.assertEquals(file.lastModified)
 	}
+
+	@Test
+	def testReadInJar() {
+		val readContent = FilesManager.readFile("/myjar/a/1.txt")
+		val theContent = "in folder a, 1.txt"
+
+		theContent.assertEquals(readContent)
+	}
 }
