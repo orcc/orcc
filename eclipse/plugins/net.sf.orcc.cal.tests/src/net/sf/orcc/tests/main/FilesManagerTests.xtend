@@ -38,7 +38,6 @@ import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.osgi.framework.FrameworkUtil
 
 /**
  * Test methods of OrccFileWriter utility class
