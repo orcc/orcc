@@ -250,7 +250,7 @@ class FilesManager {
 	/**
 	 * Search on the file system for a file or folder corresponding to the
 	 * given path. If not found, search on the current classpath. If this method
-	 * return  an URL, this URL always point to an existing file.
+	 * returns an URL, it always represents an existing file.
 	 * 
 	 * @param path
 	 * 			A path
@@ -265,16 +265,25 @@ class FilesManager {
 			return file.toURI.toURL
 
 		// Search in all reachable bundles for the given path resource
-		val bundles = FrameworkUtil::getBundle(FilesManager).bundleContext.bundles
-		var url = bundles
-			// Search only in Orcc plugins
-			.filter[symbolicName.startsWith("net.sf.orcc")]
-			// We want an URL to the resource
-			.map[getEntry(path)]
-			// We keep the first URL not null (we found the resource)
-			.findFirst[it != null]
+		val bundle = FrameworkUtil::getBundle(FilesManager)
+		val url =
+			if(bundle != null) {
+				val bundles = bundle.bundleContext.bundles
+				bundles
+					// Search only in Orcc plugins
+					.filter[symbolicName.startsWith("net.sf.orcc")]
+					// We want an URL to the resource
+					.map[getEntry(path)]
+					// We keep the first URL not null (we found the resource)
+					.findFirst[it != null]
+			}
+			// Fallback, we are not in a bundle context (maybe unit tests execution?),
+			// we use the default ClassLoader method.
+			else {
+				FilesManager.getResource(path)
+			}
 
-		if (#["bundle", "bundleresource", "bundleentry"].contains(url?.protocol))
+		if (#["bundle", "bundleresource", "bundleentry"].contains(url?.protocol?.toLowerCase))
 			FileLocator.resolve(url)
 		else
 			url
