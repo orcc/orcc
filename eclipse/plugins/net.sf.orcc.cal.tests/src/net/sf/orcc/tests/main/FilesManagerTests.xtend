@@ -30,12 +30,15 @@ package net.sf.orcc.tests.main
 
 import java.io.File
 import java.io.FileReader
+import java.io.InputStreamReader
 import net.sf.orcc.util.FilesManager
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import com.google.common.base.Charsets
+import com.google.common.io.Files
 
 /**
  * Test methods of OrccFileWriter utility class
@@ -51,8 +54,8 @@ class FilesManagerTests extends Assert {
 	// These path are directly in the current classpath if the test
 	// suite is ran in eclipse, in the test bundle if test suite is
 	// ran from command line
-	var bundleFile = "/test/extract/subfolder/zzz.txt"
-	var bundleFolder = "/test/extract"
+	var bundleFile = "/test/extraction/subfolder/aaa.z"
+	var bundleFolder = "/test/extraction"
 	// A folder on the machine (real path)
 	var standardFolder = "~/.ssh"
 
@@ -74,7 +77,7 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def testOSdetection() {
+	def operatingSystemDetection() {
 		val os = FilesManager.getCurrentOS
 		if (os == FilesManager.OS_WINDOWS) {
 			new File("C:/Windows").directory.assertTrue
@@ -88,7 +91,7 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def testPathSanitization() {
+	def pathSanitization() {
 		standardFolder.startsWith("~").assertTrue
 		val result = FilesManager.sanitize(standardFolder)
 		result.startsWith("~").assertFalse
@@ -96,38 +99,48 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def testURLDetection() {
+	def classpathFilesFolderLookup() {
 		var url = FilesManager.getUrl(jarFile)
+		url.assertNotNull
 		url.protocol.assertEquals("jar")
 
 		url = FilesManager.getUrl(jarFolder)
+		url.assertNotNull
 		url.protocol.assertEquals("jar")
 
 		url = FilesManager.getUrl(bundleFile)
+		url.assertNotNull
 		url.protocol.assertEquals("file")
 
 		url = FilesManager.getUrl(bundleFolder)
+		url.assertNotNull
 		url.protocol.assertEquals("file")
 
 		url = FilesManager.getUrl(standardFolder)
+		url.assertNotNull
 		url.protocol.assertEquals("file")
 	}
 
 	@Test
-	def testSimpleRead() {
-		"azerty".assertEquals(FilesManager.readFile("/test/extract/files/basic.txt"))
+	def simpleFileRead() {
+		"azerty".assertEquals(FilesManager.readFile("/test/extraction/aTextFile.txt"))
 	}
 
 	@Test
-	def testSimpleWrite() {
-		val filePath = "azer".tempFilePath
-		FilesManager.writeFile("azerty", filePath)
-		"azerty".assertEquals(FilesManager.readFile(filePath))
+	def simpleFileWrite() {
+		val filePath = "writtenFile.txt".tempFilePath
+		FilesManager.writeFile("consectetur adipisicing elit, sed", filePath)
+
+		val targetFile = new File(filePath)
+		targetFile.file.assertTrue
+		targetFile.length.assertNotEquals(0)
+
+		"consectetur adipisicing elit, sed".assertEquals(Files.toString(targetFile, Charsets.UTF_8))
 	}
 
 	@Test
-	def testValidWrittenContent() {
-		val theFile = "aFile.txt".tempFilePath
+	def validWrittenContent() {
+		val theFile = "loremIpsumContentTest.txt".tempFilePath
 		val theContent = '''
 			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
 			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
@@ -140,13 +153,13 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def testContentsEquals() {
+	def contentEquality() {
 		val theContent = '''
 			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
 			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
 		'''
-		val f1 = "file1".tempFilePath
-		val f2 = "file2".tempFilePath
+		val f1 = "contentEquality1.txt".tempFilePath
+		val f2 = "contentEquality2.txt".tempFilePath
 
 		FilesManager.writeFile(theContent, f1)
 		FilesManager.writeFile(theContent, f2)
@@ -154,15 +167,17 @@ class FilesManagerTests extends Assert {
 		FilesManager::isContentEqual(new FileReader(f1), new File(f2)).assertTrue
 		theContent.assertEquals(FilesManager::readFile(f1))
 		theContent.assertEquals(FilesManager::readFile(f2))
+
+		FilesManager::isContentEqual(theContent, new File(f1)).assertTrue
+		FilesManager::isContentEqual(theContent, new File(f2)).assertTrue
 	}
 
 	@Test
-	def testFileExtraction() {
+	def fileExtraction() {
 		FilesManager::extract("/test/pass/CodegenWhile.cal", tempDir)
 
-		val targetFile = new File('''«tempDir»«File.separatorChar»CodegenWhile.cal''')
-		assertTrue(targetFile.exists)
-
+		val targetFile = new File(tempDir, "CodegenWhile.cal")
+		targetFile.exists.assertTrue
 		targetFile.length.assertNotEquals(0)
 
 		FilesManager::isContentEqual(
@@ -172,40 +187,41 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def testFolderExtraction() {
-		FilesManager::extract("/test/extract", tempDir)
+	def folderExtraction() {
+		FilesManager::extract("/test/extraction", tempDir)
 
-		val targetFolder = new File("extract".tempFilePath)
+		val targetFolder = new File(tempDir, "extraction")
 
 		// Check if 'extract folder exists in temp dir'
 		targetFolder.directory.assertTrue
 
 		// Check if 'files' folder has been correctly extracted
-		new File(targetFolder, "files").directory.assertTrue
+		new File(targetFolder, "subfolder").directory.assertTrue
 
 		// Check if files have been correctly extracted
 		new File(targetFolder, "subfolder/aaa.z").file.assertTrue
-		new File(targetFolder, "subfolder/qwert/xxxxx.txt").file.assertTrue
+		new File(targetFolder, "subfolder/subsubfolder/zzz.txt").file.assertTrue
 
 		// Check the content of extracted files
 		"xxxx".assertEquals(
-			FilesManager.readFile('''«tempDir»/extract/subfolder/qwert/xxxxx.txt''')
+			FilesManager.readFile('''«tempDir»/extraction/subfolder/subsubfolder/xxxxx.txt''')
 		)
 	}
 
 	@Test
-	def testJarExtractions() {
+	def jarExtractions() {
 		val targetDirectory = "jarExtract".tempFilePath
+
 		FilesManager.extract(jarFile, targetDirectory)
 		new File(targetDirectory, "Class.class").file.assertTrue
 
 		FilesManager.extract(jarFolder, targetDirectory)
-		new File(targetDirectory, "org/jgrapht/graph").directory.assertTrue
-		new File(targetDirectory, "org/jgrapht/graph/DefaultListenableGraph.class").file.assertTrue
+		new File(targetDirectory, "graph").directory.assertTrue
+		new File(targetDirectory, "graph/DefaultListenableGraph.class").file.assertTrue
 	}
 
 	@Test
-	def testCachedFiles() {
+	def cachedFiles() {
 		val path = "testCached".tempFilePath
 		val file = new File(path)
 
