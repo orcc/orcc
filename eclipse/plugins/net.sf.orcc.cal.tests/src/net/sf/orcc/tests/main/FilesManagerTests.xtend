@@ -36,7 +36,6 @@ import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.osgi.framework.FrameworkUtil
 
 /**
  * Test methods of OrccFileWriter utility class
@@ -45,11 +44,16 @@ import org.osgi.framework.FrameworkUtil
 class FilesManagerTests extends Assert {
 
 	static var tempDir = ""
+	// In all case these 2 paths reference files/folders in jar
+	// archive in the classpath
 	var jarFile = "/java/lang/Class.class"
-	var jarFolder = "/myjar/a"
-	var jarFolder2 = "/myjar/b/"
+	var jarFolder = "/org/jgrapht/graph"
+	// These path are directly in the current classpath if the test
+	// suite is ran in eclipse, in the test bundle if test suite is
+	// ran from command line
 	var bundleFile = "/test/extract/subfolder/zzz.txt"
 	var bundleFolder = "/test/extract"
+	// A folder on the machine (real path)
 	var standardFolder = "~/.ssh"
 
 	@BeforeClass
@@ -176,10 +180,10 @@ class FilesManagerTests extends Assert {
 		// Check if 'extract folder exists in temp dir'
 		targetFolder.directory.assertTrue
 
-		// Check if 'files' folder has correctly been extracted
+		// Check if 'files' folder has been correctly extracted
 		new File(targetFolder, "files").directory.assertTrue
 
-		// Check if files have correctly been extrated
+		// Check if files have been correctly extracted
 		new File(targetFolder, "subfolder/aaa.z").file.assertTrue
 		new File(targetFolder, "subfolder/qwert/xxxxx.txt").file.assertTrue
 
@@ -193,22 +197,11 @@ class FilesManagerTests extends Assert {
 	def testJarExtractions() {
 		val targetDirectory = "jarExtract".tempFilePath
 		FilesManager.extract(jarFile, targetDirectory)
-		FilesManager.extract(jarFolder, targetDirectory)
-		FilesManager.extract(jarFolder2, targetDirectory)
-
 		new File(targetDirectory, "Class.class").file.assertTrue
-		new File(targetDirectory, "a").directory.assertTrue
 
-		new File(targetDirectory, "a/1.txt").file.assertTrue
-		"in folder a, 3.txt".assertEquals(
-			FilesManager.readFile('''«targetDirectory»/a/3.txt''')
-		)
-
-		new File(targetDirectory, "b").directory.assertTrue
-		new File(targetDirectory, "b/3.txt").file.assertTrue
-		"in folder b, 2.txt".assertEquals(
-			FilesManager.readFile('''«targetDirectory»/b/2.txt''')
-		)
+		FilesManager.extract(jarFolder, targetDirectory)
+		new File(targetDirectory, "org/jgrapht/graph").directory.assertTrue
+		new File(targetDirectory, "org/jgrapht/graph/DefaultListenableGraph.class").file.assertTrue
 	}
 
 	@Test
@@ -237,16 +230,5 @@ class FilesManagerTests extends Assert {
 		result.written.assertEquals(0)
 
 		timestamp.assertEquals(file.lastModified)
-	}
-
-	@Test
-	def testReadFromJarInClasspath() {
-		// This test will always fail if it is run without osgi/bundles context
-		if(FrameworkUtil::getBundle(FilesManagerTests) != null) {
-			val readContent = FilesManager.readFile("/myjar/a/1.txt")
-			val theContent = "in folder a, 1.txt"
-
-			theContent.assertEquals(readContent)
-		}
 	}
 }
