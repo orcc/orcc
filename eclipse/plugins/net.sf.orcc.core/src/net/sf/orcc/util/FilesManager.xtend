@@ -278,7 +278,9 @@ class FilesManager {
 					.findFirst[it != null]
 			}
 			// Fallback, we are not in a bundle context (maybe unit tests execution?),
-			// we use the default ClassLoader method.
+			// we use the default ClassLoader method. The problem with this method is
+			// that it is not possible to locate resources in other jar archives (even
+			// if they are in the classpath)
 			else {
 				FilesManager.getResource(path)
 			}

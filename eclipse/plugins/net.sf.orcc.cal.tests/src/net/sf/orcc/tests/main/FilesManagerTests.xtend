@@ -36,6 +36,7 @@ import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.osgi.framework.FrameworkUtil
 
 /**
  * Test methods of OrccFileWriter utility class
@@ -87,9 +88,7 @@ class FilesManagerTests extends Assert {
 		standardFolder.startsWith("~").assertTrue
 		val result = FilesManager.sanitize(standardFolder)
 		result.startsWith("~").assertFalse
-		if (FilesManager.getCurrentOS.equals(FilesManager.OS_LINUX)) {
-			result.startsWith("/home").assertTrue
-		}
+		result.startsWith(System::getProperty("user.home")).assertTrue
 	}
 
 	@Test
@@ -163,8 +162,8 @@ class FilesManagerTests extends Assert {
 		targetFile.length.assertNotEquals(0)
 
 		FilesManager::isContentEqual(
-			new FileReader(targetFile),
-			new File(FilesManager.getUrl("/test/pass/CodegenWhile.cal").toURI)
+			FilesManager::readFile("/test/pass/CodegenWhile.cal"),
+			targetFile
 		).assertTrue
 	}
 
@@ -241,10 +240,13 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def testReadInJar() {
-		val readContent = FilesManager.readFile("/myjar/a/1.txt")
-		val theContent = "in folder a, 1.txt"
+	def testReadFromJarInClasspath() {
+		// This test will always fail if it is run without osgi/bundles context
+		if(FrameworkUtil::getBundle(FilesManagerTests) != null) {
+			val readContent = FilesManager.readFile("/myjar/a/1.txt")
+			val theContent = "in folder a, 1.txt"
 
-		theContent.assertEquals(readContent)
+			theContent.assertEquals(readContent)
+		}
 	}
 }
