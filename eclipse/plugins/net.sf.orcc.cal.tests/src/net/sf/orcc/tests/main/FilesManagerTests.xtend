@@ -31,7 +31,6 @@ package net.sf.orcc.tests.main
 import com.google.common.base.Charsets
 import com.google.common.io.Files
 import java.io.File
-import java.io.FileReader
 import net.sf.orcc.util.FilesManager
 import org.junit.Assert
 import org.junit.BeforeClass
@@ -162,7 +161,7 @@ class FilesManagerTests extends Assert {
 		FilesManager.writeFile(theContent, f1)
 		FilesManager.writeFile(theContent, f2)
 
-		FilesManager::isContentEqual(new FileReader(f1), new File(f2)).assertTrue
+		FilesManager::isContentEqual(new File(f1), new File(f2)).assertTrue
 		theContent.assertEquals(FilesManager::readFile(f1))
 		theContent.assertEquals(FilesManager::readFile(f2))
 

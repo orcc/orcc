@@ -28,16 +28,14 @@
  */
 package net.sf.orcc.util
 
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
-import java.io.FileReader
 import java.io.InputStream
-import java.io.InputStreamReader
 import java.io.PrintStream
-import java.io.Reader
-import java.io.StringReader
 import java.util.Collections
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -61,6 +59,8 @@ class FilesManager {
 	public static val OS_MACOS = 3
 	public static val OS_UNKNOWN = 4
 
+	private static val BUFFER_SIZE = 1024
+
 	/**
 	 * <p>Copy the file or the folder at given <em>path</em> to the given
 	 * <em>target folder</em>.</p>
@@ -80,7 +80,7 @@ class FilesManager {
 	 * @throws FileNotFoundException If not resource have been found at the given path
 	 */
 	def static extract(String path, String targetFolder) {
-		val targetF = new File(targetFolder)
+		val targetF = new File(targetFolder.sanitize)
 		val url = path.url
 		if(url == null) {
 			throw new FileNotFoundException(path)
@@ -109,38 +109,9 @@ class FilesManager {
 		}
 		val target = new File(targetFolder, source.name)
 		if (source.file)
-			source.fsFileExtract(target)
+			new FileInputStream(source).streamExtract(target)
 		else if (source.directory)
 			source.fsDirectoryExtract(target)
-	}
-
-	/**
-	 * Copy the file at the given <i>source</i> path to the path
-	 * encapsulated in the given <em>targetFile</em>. It is called
-	 * 'extract' because in most case, this method is used to extract
-	 * files from a plugin in classpath to the filesystem.
-	 * 
-	 * @param source
-	 * 			The source path of an existing file
-	 * @param targetFile
-	 * 			The target path of a writable file
-	 */
-	private def static fsFileExtract(File source, File targetFile) {
-		val inputStream = new FileInputStream(source)
-		if (inputStream.isContentEqual(targetFile)) {
-			return CACHED
-		}
-
-		val outputStream = new FileOutputStream(targetFile)
-		val byte[] buffer = newByteArrayOfSize(512)
-		var readLength = 0
-		while ((readLength = inputStream.read(buffer)) != -1) {
-			outputStream.write(buffer, 0, readLength)
-		}
-		inputStream.close
-		outputStream.close
-
-		return OK
 	}
 
 	/**
@@ -229,15 +200,22 @@ class FilesManager {
 			targetFile.mkdir
 			return EMPTY_RESULT
 		}
-		val inputStream = jar.getInputStream(entry)
+		jar.getInputStream(entry).streamExtract(targetFile)
+	}
 
+	/**
+	 * Copy the content represented by the given <em>inputStream</em> into the
+	 * <em>target file</em>.
+	 * @return A Result object with information about extraction status (cached or written)
+	 */
+	private def static streamExtract(InputStream inputStream, File targetFile) {
 		if (inputStream.isContentEqual(targetFile)) {
 			return CACHED
 		}
 
 		val outputStream = new FileOutputStream(targetFile)
 
-		val byte[] buffer = newByteArrayOfSize(512)
+		val byte[] buffer = newByteArrayOfSize(BUFFER_SIZE)
 		var readLength = 0
 		while ((readLength = inputStream.read(buffer)) != -1) {
 			outputStream.write(buffer, 0, readLength)
@@ -297,32 +275,34 @@ class FilesManager {
 	 * than file b.
 	 */
 	static def isContentEqual(CharSequence a, File b) {
-		new StringReader(a.toString).isContentEqual(b)
+		new ByteArrayInputStream(a.toString.bytes).isContentEqual(b)
 	}
 
 	/**
-	 * Check if given a InputStream have exactly the same content
-	 * than file b.
+	 * Check if given File a have exactly the same content
+	 * than File b.
 	 */
-	static def isContentEqual(InputStream a, File b) {
-		new InputStreamReader(a).isContentEqual(b)
+	static def isContentEqual(File a, File b) {
+		val fis = new FileInputStream(a)
+		val result = fis.isContentEqual(b)
+		fis.close
+		return result
 	}
 
 	/**
 	 * Check if given files have exactly the same content
 	 */
-	static def isContentEqual(Reader readerA, File b) {
+	static def isContentEqual(InputStream inputStreamA, File b) {
 		if(!b.exists) return false
-		val readerB = new FileReader(b)
+		val inputStreamB = new FileInputStream(b)
 
-		var byteA = 0;
+		var byteA = 0
 		var byteB = 0
 		do {
-			byteA = readerA.read
-			byteB = readerB.read
+			byteA = inputStreamA.read
+			byteB = inputStreamB.read
 		} while (byteA == byteB && byteA != -1)
-		readerA.close
-		readerB.close
+		inputStreamB.close
 
 		return byteA == -1
 	}
@@ -333,7 +313,7 @@ class FilesManager {
 	 * the same content.
 	 */
 	static def writeFile(CharSequence content, String path) {
-		val target = new File(path)
+		val target = new File(path.sanitize)
 
 		if (content.isContentEqual(target)) {
 			return CACHED
@@ -360,7 +340,6 @@ class FilesManager {
 	 * 			If the file doesn't exists
 	 */
 	static def readFile(String path) {
-		val contentBuilder = new StringBuilder
 
 		val url = path.url
 		if(url == null) {
@@ -377,20 +356,20 @@ class FilesManager {
 					} else {
 						path
 					}
-				val is = jar.getInputStream(jar.getEntry(updatedPath))
-
-				new InputStreamReader(is)
+				jar.getInputStream(jar.getEntry(updatedPath))
 			} else {
-				new FileReader(new File(url.toURI))
+				new FileInputStream(new File(url.toURI))
 			}
 
-		var int c
-		while ((c = reader.read) != -1) {
-			contentBuilder.append(c as char)
+		var readLength = 0
+		var buffer = newByteArrayOfSize(BUFFER_SIZE)
+		val outputStream = new ByteArrayOutputStream
+		while ((readLength = reader.read(buffer)) != -1) {
+			outputStream.write(buffer, 0, readLength)
 		}
 
 		reader.close
-		contentBuilder.toString
+		outputStream.toString
 	}
 
 	/**
