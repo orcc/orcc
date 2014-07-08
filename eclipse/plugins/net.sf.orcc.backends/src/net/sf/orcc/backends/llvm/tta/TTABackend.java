@@ -82,6 +82,7 @@ import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
@@ -221,36 +222,26 @@ public class TTABackend extends LLVMBackend {
 
 	@Override
 	protected Result extractLibraries() {
+
+		Result result = FilesManager.extract("/runtime/TTA/libs", path);
+		result.merge(FilesManager.extract("/runtime/common/scripts", path));
+
+		// Will be used later to execute the scripts
 		libPath = path + File.separator + "libs";
-		String commonLibPath = libPath + File.separator + "common";
 
-		OrccLogger.trace("Export common library files into "
-				+ commonLibPath + "... ");
-		if (copyFolderToFileSystem("/runtime/common/scripts",
-				commonLibPath, debug) == false) {
-			OrccLogger.warnRaw("Error" + "\n");
-			return Result.EMPTY_RESULT;
-		}
+		// Ensure scripts have execution rights
+		new File(libPath, "ttanetgen").setExecutable(true);
+		new File(libPath, "ttaanalyse.py").setExecutable(true);
+		new File(libPath, "ttamergehtml.py").setExecutable(true);
+		new File(libPath, "ttamergecsv.py").setExecutable(true);
+		new File(libPath, "ttamerge.py").setExecutable(true);
 
-		OrccLogger.trace("Export library files into " + libPath + "... ");
-		if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
-			OrccLogger.traceRaw("OK" + "\n");
-			new File(libPath + File.separator + "ttanetgen")
-					.setExecutable(true);
-			new File(libPath + File.separator + "ttaanalyse.py")
-					.setExecutable(true);
-			new File(libPath + File.separator + "ttamergehtml.py")
-					.setExecutable(true);
-			new File(libPath + File.separator + "ttamergecsv.py")
-					.setExecutable(true);
-			new File(libPath + File.separator + "ttamerge.py")
-					.setExecutable(true);
-			return Result.OK;
-		} else {
-			OrccLogger.warnRaw("Error" + "\n");
-		}
+		// TODO: This renaming will become useless when the TTA specific scripts
+		// will be moved into the right folder (/runtime/TTA/scripts) and
+		// extracted under <path>/scripts
+		new File(path, "scripts").renameTo(new File(path, "libs/common"));
 
-		return Result.EMPTY_RESULT;
+		return result;
 	}
 
 	/**
