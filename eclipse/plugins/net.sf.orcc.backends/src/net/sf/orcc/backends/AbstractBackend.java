@@ -39,6 +39,7 @@ import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTIONS;
 import static net.sf.orcc.OrccLaunchConstants.MERGE_ACTORS;
+import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
@@ -84,6 +85,7 @@ import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Result;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.apache.commons.cli.CommandLine;
@@ -235,7 +237,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		OrccLogger.traceln("*********************************************"
 				+ "************************************");
 
+		// If user checked the option "Don't export library", the method
+		// extractLibraries() must not be called
+		if(!getAttribute(NO_LIBRARY_EXPORT, false)) {
+			extractLibraries();
+		}
+		// Only for old backends
 		exportRuntimeLibrary();
+
 		compileVTL();
 
 		if (compilexdf) {
@@ -546,8 +555,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @return <code>true</code> if the libraries were correctly exported
 	 */
+	@Deprecated
 	protected boolean exportRuntimeLibrary() {
 		return false;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	protected Result extractLibraries() {
+		return Result.EMPTY_RESULT;
 	}
 
 	/**
