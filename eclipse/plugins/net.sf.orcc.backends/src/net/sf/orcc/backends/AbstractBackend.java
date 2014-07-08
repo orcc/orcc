@@ -117,13 +117,13 @@ import org.osgi.framework.Bundle;
  * </p>
  * 
  * The following methods may be extended by back-ends, if they print actors or
- * instances respectively, or if a library must be exported with source file
- * produced.
+ * instances respectively, or if a library must be exported with source files
+ * generated.
  * <ul>
  * <li>{@link #printActor(Actor)} is called by {@link #printActors(List)}.</li>
  * <li>{@link #printInstance(Instance)} is called by
  * {@link #printInstances(Network)}.</li>
- * <li>{@link #exportRuntimeLibrary()} is called by {@link #start}.</li>
+ * <li>{@link #extractLibraries()} is called by {@link #compile()}.</li>
  * </ul>
  * 
  * The other methods declared <code>final</code> may be called by back-ends.
@@ -297,8 +297,19 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	abstract protected void doXdfCodeGeneration(Network network);
 
 	/**
+	 * <p>
+	 * This method must be implemented in concrete back-ends if some runtime
+	 * libraries files have to be extracted while code is generated.
+	 * </p>
 	 * 
-	 * @return
+	 * <p>
+	 * This method is called from {@link #compile()} only if user didn't check
+	 * the back-end option "Don't export library".
+	 * </p>
+	 * 
+	 * @return A Result instance representing the number of files really written
+	 *         to the disk and the number cached (not written because already
+	 *         up-to-date)
 	 */
 	protected Result extractLibraries() {
 		return Result.EMPTY_RESULT;
