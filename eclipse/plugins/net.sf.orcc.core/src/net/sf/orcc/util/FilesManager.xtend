@@ -29,10 +29,10 @@
 package net.sf.orcc.util
 
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.FileReader
-import java.io.FileWriter
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.PrintStream
@@ -126,18 +126,19 @@ class FilesManager {
 	 * 			The target path of a writable file
 	 */
 	private def static fsFileExtract(File source, File targetFile) {
-		val reader = new FileReader(source)
-		if (reader.isContentEqual(targetFile)) {
+		val inputStream = new FileInputStream(source)
+		if (inputStream.isContentEqual(targetFile)) {
 			return CACHED
 		}
 
-		val writer = new FileWriter(targetFile)
-		var int c
-		while ((c = reader.read) != -1) {
-			writer.append(c as char)
+		val outputStream = new FileOutputStream(targetFile)
+		val byte[] buffer = newByteArrayOfSize(512)
+		var readLength = 0
+		while ((readLength = inputStream.read(buffer)) != -1) {
+			outputStream.write(buffer, 0, readLength)
 		}
-		reader.close
-		writer.close
+		inputStream.close
+		outputStream.close
 
 		return OK
 	}
@@ -228,21 +229,21 @@ class FilesManager {
 			targetFile.mkdir
 			return EMPTY_RESULT
 		}
-		val is = jar.getInputStream(entry)
+		val inputStream = jar.getInputStream(entry)
 
-		if (is.isContentEqual(targetFile)) {
+		if (inputStream.isContentEqual(targetFile)) {
 			return CACHED
 		}
 
-		val os = new FileOutputStream(targetFile)
+		val outputStream = new FileOutputStream(targetFile)
 
 		val byte[] buffer = newByteArrayOfSize(512)
-		var readLen = 0
-		while ((readLen = is.read(buffer)) != -1) {
-			os.write(buffer, 0, readLen)
+		var readLength = 0
+		while ((readLength = inputStream.read(buffer)) != -1) {
+			outputStream.write(buffer, 0, readLength)
 		}
-		is.close
-		os.close
+		inputStream.close
+		outputStream.close
 
 		return OK
 	}
