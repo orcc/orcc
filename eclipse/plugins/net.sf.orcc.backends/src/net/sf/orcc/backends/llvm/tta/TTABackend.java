@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.tta;
 
-import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 import static net.sf.orcc.backends.BackendsConstants.FPGA_CONFIGURATION;
 import static net.sf.orcc.backends.BackendsConstants.FPGA_DEFAULT_CONFIGURATION;
 import static net.sf.orcc.backends.BackendsConstants.TTA_DEFAULT_PROCESSORS_CONFIGURATION;
@@ -85,6 +84,7 @@ import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
 /**
@@ -220,39 +220,37 @@ public class TTABackend extends LLVMBackend {
 	}
 
 	@Override
-	protected boolean exportRuntimeLibrary() {
-		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
-			libPath = path + File.separator + "libs";
-			String commonLibPath = libPath + File.separator + "common";
+	protected Result extractLibraries() {
+		libPath = path + File.separator + "libs";
+		String commonLibPath = libPath + File.separator + "common";
 
-			OrccLogger.trace("Export common library files into "
-					+ commonLibPath + "... ");
-			if (copyFolderToFileSystem("/runtime/common/scripts",
-					commonLibPath, debug) == false) {
-				OrccLogger.warnRaw("Error" + "\n");
-				return false;
-			}
-
-			OrccLogger.trace("Export library files into " + libPath + "... ");
-			if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
-				OrccLogger.traceRaw("OK" + "\n");
-				new File(libPath + File.separator + "ttanetgen")
-						.setExecutable(true);
-				new File(libPath + File.separator + "ttaanalyse.py")
-						.setExecutable(true);
-				new File(libPath + File.separator + "ttamergehtml.py")
-						.setExecutable(true);
-				new File(libPath + File.separator + "ttamergecsv.py")
-						.setExecutable(true);
-				new File(libPath + File.separator + "ttamerge.py")
-						.setExecutable(true);
-				return true;
-			} else {
-				OrccLogger.warnRaw("Error" + "\n");
-				return false;
-			}
+		OrccLogger.trace("Export common library files into "
+				+ commonLibPath + "... ");
+		if (copyFolderToFileSystem("/runtime/common/scripts",
+				commonLibPath, debug) == false) {
+			OrccLogger.warnRaw("Error" + "\n");
+			return Result.EMPTY_RESULT;
 		}
-		return false;
+
+		OrccLogger.trace("Export library files into " + libPath + "... ");
+		if (copyFolderToFileSystem("/runtime/TTA", libPath, debug)) {
+			OrccLogger.traceRaw("OK" + "\n");
+			new File(libPath + File.separator + "ttanetgen")
+					.setExecutable(true);
+			new File(libPath + File.separator + "ttaanalyse.py")
+					.setExecutable(true);
+			new File(libPath + File.separator + "ttamergehtml.py")
+					.setExecutable(true);
+			new File(libPath + File.separator + "ttamergecsv.py")
+					.setExecutable(true);
+			new File(libPath + File.separator + "ttamerge.py")
+					.setExecutable(true);
+			return Result.OK;
+		} else {
+			OrccLogger.warnRaw("Error" + "\n");
+		}
+
+		return Result.EMPTY_RESULT;
 	}
 
 	/**
