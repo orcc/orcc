@@ -44,6 +44,7 @@ import org.eclipse.core.runtime.FileLocator
 import org.osgi.framework.FrameworkUtil
 
 import static net.sf.orcc.util.Result.*
+import java.net.URI
 
 /**
  * Utility class to manipulate files. It brings everything needed to extract files
@@ -87,7 +88,8 @@ class FilesManager {
 		}
 		if (url.protocol.equals("jar")) {
 			val splittedURL = url.file.split("!")
-			val jar = new JarFile(splittedURL.head.substring(5))
+			val fileUri = new URI(splittedURL.head)
+			val jar = new JarFile(new File(fileUri))
 			jarExtract(jar, splittedURL.last, targetF)
 		} else {
 			fsExtract(new File(path.url.toURI), targetF)
