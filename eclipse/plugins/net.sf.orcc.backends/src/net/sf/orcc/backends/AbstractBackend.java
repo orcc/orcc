@@ -242,8 +242,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		if(!getAttribute(NO_LIBRARY_EXPORT, false)) {
 			extractLibraries();
 		}
-		// Only for old backends
-		exportRuntimeLibrary();
 
 		compileVTL();
 
@@ -547,18 +545,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            a network
 	 */
 	abstract protected void doXdfCodeGeneration(Network network);
-
-	/**
-	 * Export runtime library used by source produced. Should be overridden by
-	 * back-ends that produce code source which need third party libraries at
-	 * runtime.
-	 * 
-	 * @return <code>true</code> if the libraries were correctly exported
-	 */
-	@Deprecated
-	protected boolean exportRuntimeLibrary() {
-		return false;
-	}
 
 	/**
 	 * 
