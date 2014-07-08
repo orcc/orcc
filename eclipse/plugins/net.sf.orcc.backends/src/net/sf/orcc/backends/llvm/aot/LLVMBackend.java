@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.aot;
 
-import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,8 +46,8 @@ import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
-import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.backends.util.Alignable;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -73,8 +71,10 @@ import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
@@ -91,10 +91,6 @@ public class LLVMBackend extends AbstractBackend {
 	 * Path to target "src" folder
 	 */
 	private String srcPath;
-	/**
-	 * Path to target "lib" folder
-	 */
-	private String libPath;
 
 	protected final Map<String, String> renameMap;
 
@@ -132,7 +128,6 @@ public class LLVMBackend extends AbstractBackend {
 
 		// Set src directory as path
 		srcPath = srcDir.getAbsolutePath();
-		libPath = path + File.separator + "libs";
 	}
 
 	@Override
@@ -210,7 +205,7 @@ public class LLVMBackend extends AbstractBackend {
 
 		// update "vectorizable" information
 		Alignable.setAlignability(network);
-		
+
 		// print instances and entities
 		printChildren(network);
 
@@ -222,25 +217,18 @@ public class LLVMBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean exportRuntimeLibrary() {
-		if (!getAttribute(NO_LIBRARY_EXPORT, false)) {
-			// Copy specific windows batch file
-			if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-				copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat",
-						path + File.separator + "run_cmake_with_VS_env.bat",
-						debug);
-			}
-			OrccLogger.trace("Export libraries sources into " + libPath
-					+ "... ");
-			if (copyFolderToFileSystem("/runtime/C/libs", libPath, debug)) {
-				OrccLogger.traceRaw("OK" + "\n");
-				return true;
-			} else {
-				OrccLogger.warnRaw("Error" + "\n");
-				return false;
-			}
+	protected Result extractLibraries() {
+		Result result = FilesManager.extract("/runtime/C/README.txt", path);
+		// Copy specific windows batch file
+		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
+			result.merge(FilesManager.extract(
+					"/runtime/C/run_cmake_with_VS_env.bat", path));
 		}
-		return false;
+
+		OrccLogger.traceln("Export libraries sources");
+		result.merge(FilesManager.extract("/runtime/C/libs", path));
+
+		return super.extractLibraries();
 	}
 
 	@Override
