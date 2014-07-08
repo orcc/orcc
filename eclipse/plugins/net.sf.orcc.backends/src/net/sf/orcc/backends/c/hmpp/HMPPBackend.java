@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.c.hmpp;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +46,9 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
-import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Result;
 
 /**
  * HMPP back-end.
@@ -116,20 +116,18 @@ public class HMPPBackend extends CBackend {
 	}
 
 	@Override
-	protected boolean exportRuntimeLibrary() {
-		String target = path + File.separator + "libs";
-		OrccLogger.traceln("Export libraries sources into " + target + "... ");
+	protected Result extractLibraries() {
+
+		Result result = FilesManager.extract("/runtime/C/libs", path);
+		result.merge(FilesManager.extract("/runtime/C/README.txt", path));
 
 		// Copy specific windows batch file
-		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-			copyFileToFilesystem("/runtime/C/run_cmake_with_VS_env.bat", target
-					+ File.separator + "run_cmake_with_VS_env.bat", debug);
+		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
+			result.merge(FilesManager.extract(
+					"/runtime/C/run_cmake_with_VS_env.bat", path));
 		}
 
-		// copyFileToFilesystem("/runtime/C/README.txt", target + File.separator
-		// + "README.txt", debug);
-
-		return copyFolderToFileSystem("/runtime/C/libs", target, debug);
+		return result;
 	}
 
 	@Override

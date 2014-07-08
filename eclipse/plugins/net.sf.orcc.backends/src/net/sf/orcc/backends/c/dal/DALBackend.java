@@ -14,6 +14,7 @@ import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Result;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -132,10 +133,12 @@ public class DALBackend extends CBackend {
 			}
 		}
 	}
-	
+
 	@Override
-	protected boolean exportRuntimeLibrary() {
-		return true;
+	protected Result extractLibraries() {
+		// Never extract libraries (Note: we can also force attribute
+		// NO_LIBRARY_EXPORT to true)
+		return Result.EMPTY_RESULT;
 	}
 
 	private boolean printNetwork(Network network, String srcPath) {

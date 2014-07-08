@@ -55,6 +55,7 @@ import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Result;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -73,8 +74,10 @@ public class HLSBackend extends CBackend {
 	private String commandPath;
 
 	@Override
-	protected boolean exportRuntimeLibrary() {
-		return false;
+	protected Result extractLibraries() {
+		// Never extract libraries (Note: we can also force attribute
+		// NO_LIBRARY_EXPORT to true)
+		return Result.EMPTY_RESULT;
 	}
 
 	@Override

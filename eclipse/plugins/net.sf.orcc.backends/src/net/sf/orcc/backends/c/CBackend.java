@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.c;
 
-import static net.sf.orcc.OrccLaunchConstants.NO_LIBRARY_EXPORT;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.BXDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.IMPORT_BXDF;
@@ -88,6 +87,7 @@ import net.sf.orcc.tools.stats.StatisticsPrinter;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
@@ -266,32 +266,32 @@ public class CBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean exportRuntimeLibrary() {
-		boolean exportLibrary = !getAttribute(NO_LIBRARY_EXPORT, false);
+	protected Result extractLibraries() {
+		Result result = FilesManager.extract("/runtime/C/README.txt", path);
 
-		if (exportLibrary) {
-			FilesManager.extract("/runtime/C/README.txt", path);
-			// Copy specific windows batch file
-			if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
-				FilesManager.extract("/runtime/C/run_cmake_with_VS_env.bat", path);
-			}
-
-			OrccLogger.traceln("Export libraries sources");
-			FilesManager.extract("/runtime/C/libs", path);
-
-			String scriptsPath = path + File.separator + "scripts";
-			OrccLogger.traceln("Export scripts into " + scriptsPath + "... ");
-			FilesManager.extract("/runtime/common/scripts", path);
-			FilesManager.extract("/runtime/C/scripts", path);
-
-			// Fix some permissions on scripts
-			new File(scriptsPath + File.separator + "profilingAnalyse.py")
-					.setExecutable(true);
-			new File(scriptsPath + File.separator + "benchAutoMapping.py")
-					.setExecutable(true);
-			return true;
+		// Copy specific windows batch file
+		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
+			result.merge(FilesManager.extract(
+					"/runtime/C/run_cmake_with_VS_env.bat", path));
 		}
-		return false;
+
+		OrccLogger.traceln("Export libraries sources");
+		result.merge(FilesManager.extract("/runtime/C/libs", path));
+
+		String scriptsPath = path + File.separator + "scripts";
+
+		OrccLogger.traceln("Export scripts into " + scriptsPath + "... ");
+
+		result.merge(FilesManager.extract("/runtime/common/scripts", path));
+		result.merge(FilesManager.extract("/runtime/C/scripts", path));
+
+		// Fix some permissions on scripts
+		new File(scriptsPath + File.separator + "profilingAnalyse.py")
+				.setExecutable(true);
+		new File(scriptsPath + File.separator + "benchAutoMapping.py")
+				.setExecutable(true);
+
+		return result;
 	}
 
 	@Override

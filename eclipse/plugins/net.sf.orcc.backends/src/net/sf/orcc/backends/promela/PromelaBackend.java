@@ -29,7 +29,6 @@
 
 package net.sf.orcc.backends.promela;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,7 +63,9 @@ import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
@@ -158,7 +159,8 @@ public class PromelaBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(actor, options, schedulingModel).printInstance(path) > 0;
+		return new InstancePrinter(actor, options, schedulingModel)
+				.printInstance(path) > 0;
 	}
 
 	/**
@@ -177,23 +179,16 @@ public class PromelaBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean exportRuntimeLibrary() {
-		String libsPath = path + File.separator + "pylibs";
-		OrccLogger.trace("Export libraries sources into " + libsPath + "... ");
-		if (copyFolderToFileSystem("/runtime/Promela/pylibs", libsPath, debug)) {
-			OrccLogger.traceRaw("OK" + "\n");
-			return true;
-		} else {
-			OrccLogger.warnRaw("Error" + "\n");
-			return false;
-		}
+	protected Result extractLibraries() {
+		return FilesManager.extract("/runtime/Promela/pylibs", path);
 	}
 
 	private void transformActorAgain(Actor actor) {
 		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
-		transfos.add(new IdentifyStatelessActors(schedulingModel.getActorModel(actor)));
-		transfos.add(new PromelaDeadGlobalElimination(
-				schedulingModel.getActorModel(actor).getAllReacableSchedulingVars(), 
+		transfos.add(new IdentifyStatelessActors(schedulingModel
+				.getActorModel(actor)));
+		transfos.add(new PromelaDeadGlobalElimination(schedulingModel
+				.getActorModel(actor).getAllReacableSchedulingVars(),
 				schedulingModel.getActorModel(actor).getPortsUsedInScheduling()));
 		transfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
 		transfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
