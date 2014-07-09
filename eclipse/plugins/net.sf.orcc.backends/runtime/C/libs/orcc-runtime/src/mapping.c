@@ -106,7 +106,7 @@ void delete_mapping(mapping_t *mapping) {
 /**
  * Computes a partitionment of actors on threads from an XML file given in parameter.
  */
-mapping_t* map_actors(network_t *network) {
+mapping_t* map_actors(network_t *network, options_t *opt) {
     mapping_t *mapping;
     assert(network != NULL);
 

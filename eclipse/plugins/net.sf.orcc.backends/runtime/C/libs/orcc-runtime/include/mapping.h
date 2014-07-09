@@ -83,7 +83,7 @@ int find_mapped_core(mapping_t *mapping, actor_t *actor);
 /**
  * Compute a partitionment of actors on threads from an XML file given in parameter.
  */
-mapping_t* map_actors(network_t *network);
+mapping_t* map_actors(network_t *network, options_t *opt);
 
 
 /********************************************************************************************

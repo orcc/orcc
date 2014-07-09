@@ -292,7 +292,7 @@ void *scheduler_routine(void *data) {
 
 void launcher(options_t *opt, network_t *network) {
     int i;
-    mapping_t *mapping = map_actors(network);
+    mapping_t *mapping = map_actors(network, opt);
     int nb_threads = opt->nb_processors;
 
 #ifdef THREADS_ENABLE
