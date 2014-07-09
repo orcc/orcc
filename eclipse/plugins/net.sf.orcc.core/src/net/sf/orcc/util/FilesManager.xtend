@@ -252,7 +252,7 @@ class FilesManager {
 				val bundles = bundle.bundleContext.bundles
 				bundles
 					// Search only in Orcc plugins
-					.filter[symbolicName.startsWith("net.sf.orcc")]
+					.filter[symbolicName.contains("orcc")]
 					// We want an URL to the resource
 					.map[getEntry(path)]
 					// We keep the first URL not null (we found the resource)
