@@ -33,7 +33,6 @@
 #include "orcc.h"
 
 extern options_t *opt;
-extern network_t network;
 
 // compute number of errors in the program
 extern int compareErrors;

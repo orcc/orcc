@@ -41,6 +41,8 @@
 extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
+options_t *opt;
+
 static const char *usage =
     "Orcc mapping tool -- See orcc.sf.net for more information\n"
 
@@ -107,7 +109,7 @@ int main (int argc, char **argv) {
     int c;
     const char *ostr = "n:i:o:m:v::h";
 
-    options_t *opt = set_default_options();
+    opt = set_default_options();
 
     while ((c = getopt(argc, argv, ostr)) != -1) {
         switch (c) {

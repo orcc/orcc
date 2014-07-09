@@ -48,12 +48,10 @@
 extern char *optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
+options_t *opt;
 
 // compute number of errors in the program
 int compareErrors = 0;
-
-options_t *opt;
-
 
 static char *program;
 static const char *usage =
@@ -196,6 +194,8 @@ options_t* init_orcc(int argc, char *argv[]) {
 
     return opt;
 }
+
+extern network_t network;
 
 // Actions to do when exting properly
 void atexit_actions() {
