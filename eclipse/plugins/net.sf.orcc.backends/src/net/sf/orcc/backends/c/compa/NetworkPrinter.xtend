@@ -28,8 +28,11 @@
  */
 package net.sf.orcc.backends.c.compa
 
+import java.io.File
 import java.util.Map
+import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Network
+import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate and print network source file for COMPA backend.
@@ -38,7 +41,10 @@ import net.sf.orcc.df.Network
  * 
  */
 class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
-
+	
+//	int memoryBaseAddr = 0x30000000
+	int memoryBaseAddr = 0x40000000
+	
 	new(Network network, Map<String, Object> options) {
 		super(network, options)
 	}
@@ -53,37 +59,35 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		#ifndef _WIN32
 		#define __USE_GNU
 		#endif
-
-		#include "types.h"
-		#include "fifo.h"
-		#include "scheduler.h"
+		
+		#include "fifoAllocations.h"
 		#include "util.h"
-
-		#define SIZE «fifoSize»
-		// #define PRINT_FIRINGS
-
-		/////////////////////////////////////////////////
-		// FIFO allocation
-		«FOR vertice : network.children.actorInstances»
-			«vertice.allocateFifos»
-		«ENDFOR»
-
-		/////////////////////////////////////////////////
-		// FIFO pointer assignments
-		«FOR instance : network.children.actorInstances»
-			«instance.assignFifo»
-		«ENDFOR»
-
+		
+«««		#define SIZE «fifoSize»
+«««		// #define PRINT_FIRINGS
+«««
+«««		/////////////////////////////////////////////////
+«««		// FIFO allocation
+«««		«FOR vertice : network.children.actorInstances»
+«««			«vertice.allocateFifos»
+«««		«ENDFOR»
+«««		
+«««		/////////////////////////////////////////////////
+«««		// FIFO pointer assignments
+«««		«FOR instance : network.children.actorInstances»
+«««			«instance.assignFifo»
+«««		«ENDFOR»
+		
 		/////////////////////////////////////////////////
 		// Action initializes
-		«FOR instance : network.children.actorInstances»
-			extern void «instance.name»_initialize();
+		«FOR child : network.children»
+			extern void «child.label»_initialize();
 		«ENDFOR»
 
 		/////////////////////////////////////////////////
 		// Action schedulers
-		«FOR instance : network.children.actorInstances»
-			extern int «instance.name»_scheduler();
+		«FOR child : network.children»
+			extern int «child.label»_scheduler();
 		«ENDFOR»
 
 		/////////////////////////////////////////////////
@@ -91,15 +95,15 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		static void scheduler() {
 			int stop = 0;
 
-			«FOR instance : network.children.actorInstances»
-				«instance.name»_initialize();
+			«FOR child : network.children»
+				«child.label»_initialize();
 			«ENDFOR»
 
 			int i;
 			while(!stop) {
 				i = 0;
-				«FOR instance : network.children.actorInstances»
-					i += «instance.name»_scheduler();
+				«FOR child : network.children»
+					i += «child.label»_scheduler();
 				«ENDFOR»
 
 				stop = stop || (i == 0);
@@ -109,7 +113,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
-			init_orcc(argc, argv);
+«««			init_orcc(argc, argv);
 
 			scheduler();
 
@@ -117,4 +121,54 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			return compareErrors;
 		}
 	'''
+
+	def printFifoFile(String targetFolder){
+		val content = fifoFileContent
+		val file = new File(targetFolder + File::separator + "fifoAllocations.h")
+		
+		if(needToWriteFile(content, file)) {
+			OrccUtil::printFile(content, file)
+			return 0
+		} else {
+			return 1
+		}
+	}
+
+
+	def private getFifoFileContent()'''
+		// Generated from "«network.name»"
+
+		#include "types.h"
+		#include "fifo.h"
+		
+		#define SIZE «fifoSize»
+		// #define PRINT_FIRINGS
+
+		/////////////////////////////////////////////////
+		// FIFO allocation
+		«FOR child : network.children»
+			«child.allocateFifos»
+		«ENDFOR»
+		
+		/////////////////////////////////////////////////
+		// FIFO pointer assignments
+		«FOR child : network.children»
+			«child.assignFifo»
+		«ENDFOR»		
+		
+	'''
+
+	 override protected allocateFifo(Connection conn, int nbReaders) {
+	  	val size = if (conn.size != null) conn.size else fifoSize
+		val id = conn.<Object>getValueAsObject("idNoBcast")
+	  	val portSizeInBytes = if (conn.sourcePort.type.sizeInBits == 1) 4 else (conn.sourcePort.type.sizeInBits/8)
+	  	val bufferAddr = memoryBaseAddr
+	  	val rdIndicesAddr = memoryBaseAddr + size * portSizeInBytes
+	  	val wrIndexAddr = rdIndicesAddr + nbReaders * 4
+	  	memoryBaseAddr = wrIndexAddr + 4
+ 		'''
+««« 		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «size», «id», «nbReaders», «String.format("0x%x", bufferAddr)», «String.format("0x%x", rdIndicesAddr)», «String.format("0x%x", wrIndexAddr)»)
+			static fifo_«conn.sourcePort.type.doSwitch»_t fifo_«id» = {«size», («conn.sourcePort.type.doSwitch» *) «String.format("0x%x", bufferAddr)», «nbReaders», (unsigned int *) «String.format("0x%x", rdIndicesAddr)», (unsigned int *) «String.format("0x%x", wrIndexAddr)»};
+		'''
+	 }
 }

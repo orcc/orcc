@@ -36,28 +36,24 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.c.compa.transform.XdfExtender;
-import net.sf.orcc.backends.transform.Inliner;
+import net.sf.orcc.backends.c.transform.CBroadcastAdder;
+import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
-import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
-import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transform.RenameTransformation;
-import net.sf.orcc.tools.classifier.Classifier;
-import net.sf.orcc.tools.merger.action.ActionMerger;
-import net.sf.orcc.tools.merger.actor.ActorMerger;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.Void;
+import net.sf.orcc.util.Result;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
@@ -71,29 +67,46 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Antoine Lorence
  */
 public class COMPABackend extends CBackend {
+	final boolean printTop = true;
+	
+	@Override
+	protected void doInitializeOptions() {
+//		// Create empty folders
+//		new File(path + File.separator + "build").mkdirs();
+//		new File(path + File.separator + "bin").mkdirs();
+//
+		srcPath = path + File.separator + "src";
+	}
+	
+	
+	@Override
+	protected Result extractLibraries() {
+		OrccLogger.trace("Export libraries sources");
+		Result result = FilesManager.extract("/runtime/COMPA/libs", path);
+		result.merge(FilesManager.extract("/runtime/COMPA/cmake", path));
 
+		return result;
+	}
+	
 	@Override
 	protected void doTransformActor(Actor actor) {
 		Map<String, String> replacementMap = new HashMap<String, String>();
-		replacementMap.put("abs", "abs_my_precious");
-		replacementMap.put("getw", "getw_my_precious");
-		replacementMap.put("index", "index_my_precious");
-		replacementMap.put("max", "max_my_precious");
-		replacementMap.put("min", "min_my_precious");
-		replacementMap.put("select", "select_my_precious");
-		replacementMap.put("OUT", "OUT_my_precious");
-		replacementMap.put("IN", "IN_my_precious");
-		replacementMap.put("bitand", "bitand_my_precious");
-
-		if (mergeActions) {
-			new ActionMerger().doSwitch(actor);
-		}
+		replacementMap.put("abs", "abs_replaced");
+		replacementMap.put("getw", "getw_replaced");
+		replacementMap.put("exit", "exit_replaced");
+		replacementMap.put("index", "index_replaced");
+		replacementMap.put("log2", "log2_replaced");
+		replacementMap.put("max", "max_replaced");
+		replacementMap.put("min", "min_replaced");
+		replacementMap.put("select", "select_replaced");
+		replacementMap.put("OUT", "OUT_REPLACED");
+		replacementMap.put("IN", "IN_REPLACED");
+		replacementMap.put("SIZE", "SIZE_REPLACED");
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new UnitImporter());
 		transformations.add(new TypeResizer(true, false, true, false));
 		transformations.add(new RenameTransformation(replacementMap));
-		transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
+		transformations.add(new DisconnectedOutputPortRemoval());
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -108,23 +121,15 @@ public class COMPABackend extends CBackend {
 	protected void doTransformNetwork(Network network) {
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
-		new Instantiator(false, fifoSize).doSwitch(network);
+		new Instantiator(true, fifoSize).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
+		new UnitImporter().doSwitch(network);
 
-		if (classify) {
-			OrccLogger.traceln("Classification of actors...");
-			new Classifier().doSwitch(network);
-		}
-		if (mergeActors) {
-			OrccLogger.traceln("Merging of actors...");
-			new ActorMerger().doSwitch(network);
-		}
-
-		new BroadcastAdder().doSwitch(network);
+		new CBroadcastAdder().doSwitch(network);
 		new ArgumentEvaluator().doSwitch(network);
 
-		new XdfExtender().doSwitch(network);
+		//new XdfExtender().doSwitch(network);
 	}
 
 	@Override
@@ -149,15 +154,25 @@ public class COMPABackend extends CBackend {
 
 		// print instances
 		printChildren(network);
-
-		// print network
-		OrccLogger.trace("Printing network... ");
-		if (new NetworkPrinter(network, options).print(srcPath) > 0) {
+		
+		// Print fifo allocation file into the orcc lib include folder.
+		OrccLogger.trace("Printing the fifo allocation file... ");
+		if (new NetworkPrinter(network, options).printFifoFile(path + "/libs/orcc/include") > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
-			OrccLogger.traceRaw("Done\n");
+		OrccLogger.traceRaw("Done\n");
 		}
-
+			
+		if (printTop){
+			// print network
+			OrccLogger.trace("Printing network... ");
+			if (new NetworkPrinter(network, options).print(srcPath) > 0) {
+				OrccLogger.traceRaw("Cached\n");
+			} else {
+				OrccLogger.traceRaw("Done\n");
+			}			
+		}
+		
 		new CMakePrinter(network).printCMakeFiles(path);
 
 		OrccLogger.traceln("Print flattened and attributed network...");
@@ -175,8 +190,28 @@ public class COMPABackend extends CBackend {
 		new Mapping(network, mapping).print(srcPath);
 	}
 
+
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(options).print(srcPath, instance) > 0;
+//		// Copy Xilinx platform specific files into the instance source folder.
+//		OrccLogger.trace("Copying Xilinx platform files... ");
+//		final boolean xilFilesOk = copyFolderToFileSystem("/runtime/COMPA/xilinx",	path + File.separator + instance.getSimpleName(), debug);
+//		if (xilFilesOk) {
+//			OrccLogger.traceRaw("OK" + "\n");
+//		} else {
+//			OrccLogger.warnRaw("Error" + "\n");
+//		}
+		if (printTop)
+			return new InstancePrinter(options, printTop).print(srcPath, instance) > 0;
+		else
+			return new InstancePrinter(options, printTop).print(path + File.separator + instance.getSimpleName(), instance) > 0;
+	}
+	
+	@Override
+	protected boolean printActor(Actor actor) {
+		if (printTop)
+			return new InstancePrinter(options, printTop).print(srcPath, actor) > 0;
+		else
+			return new InstancePrinter(options, printTop).print(path + File.separator + actor.getSimpleName(), actor) > 0;
 	}
 }

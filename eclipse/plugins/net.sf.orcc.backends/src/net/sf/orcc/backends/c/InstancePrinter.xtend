@@ -619,7 +619,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def private checkConnectivy() {
+	def protected checkConnectivy() {
 		for(port : actor.inputs.filter[incomingPortMap.get(it) == null]) {
 			OrccLogger::noticeln("["+entityName+"] Input port "+port.name+" not connected.")
 		}
@@ -692,7 +692,7 @@ class InstancePrinter extends CTemplate {
 	def protected checkInputPattern(Pattern pattern)
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.getNumTokens(port)» && «ENDFOR»'''
 
-	def private writeTokensFunctions(Port port) '''
+	def protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
 			index_«port.name» = «port.fullName»->write_ind;
 			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name»);
@@ -703,7 +703,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def private readTokensFunctions(Port port) '''
+	def protected readTokensFunctions(Port port) '''
 		static void read_«port.name»() {
 			«IF incomingPortMap.containsKey(port)»
 				index_«port.name» = «port.fullName»->read_inds[«port.readerId»];
@@ -915,7 +915,7 @@ class InstancePrinter extends CTemplate {
 	def protected fullName(Port port)
 		'''«entityName»_«port.name»'''
 
-	def private sizeOrDefaultSize(Connection conn) {
+	def protected sizeOrDefaultSize(Connection conn) {
 		if(conn == null || conn.size == null) "SIZE"
 		else conn.size
 	}
