@@ -79,7 +79,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			
 		«ENDFOR»
 	«ENDFOR»
-	«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+	«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 		«FOR action : actor.actions»	
 			myStream_cast_tab_«action.name»_read_V_din    : OUT STD_LOGIC_VECTOR (7 downto 0);
 			myStream_cast_tab_«action.name»_read_V_full_n : IN STD_LOGIC;
@@ -183,7 +183,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDFOR»
 	«ENDFOR»
 
-	«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+	«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 		«FOR action : actor.actions»	
 				signal top_tab_«action.name»_address1    :  STD_LOGIC_VECTOR (14-1 downto 0);
 				signal top_tab_«action.name»_ce1 :  STD_LOGIC;
@@ -253,7 +253,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«val connection = incomingPortMap.get(port)»	
 				«connection.printFifoMapping»			
 		«ENDFOR»
-		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 			«FOR action : actor.actions»
 				tab_«action.name» : ram_tab
 				generic map (
@@ -329,7 +329,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«connection.castfifoNameRead»_V_write <= top_«connection.castfifoNameRead»_V_write;				
 			«ENDFOR»
 		«ENDFOR»
-		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 			«FOR action : actor.actions»
 			myStream_cast_tab_«action.name»_read_V_din <= top_myStream_cast_tab_«action.name»_read_V_din;
 			top_myStream_cast_tab_«action.name»_read_V_full_n <= myStream_cast_tab_«action.name»_read_V_full_n;
@@ -395,7 +395,7 @@ def mappingComponentSignal() '''
 			«connList.rName»_d0 => top_«connList.rName»_d0,
 			
 		«ENDFOR»
-		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 			«FOR action : actor.actions»
 			tab_«action.name»_address0 => top_tab_«action.name»_address1,
 			tab_«action.name»_ce0 => top_tab_«action.name»_ce1,
@@ -486,7 +486,7 @@ def mappingComponentSignal() '''
 		«ENDIF»		
 	«ENDFOR»
 	
-	«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+	«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 		«FOR action : actor.actions»
 		call_cast_«entityName»_tab_«action.name»_read_scheduler : component cast_«entityName»_tab_«action.name»_read_scheduler
 			port map(
@@ -613,7 +613,7 @@ def declareComponentSignal() '''
 			«FOR connList : incomingPortMap.values»				
 				«printInputRAMAssignHLS(connList)»				
 			«ENDFOR»
-			«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+			«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 				«FOR action : actor.actions»
 					tab_«action.name»_address0    : OUT  STD_LOGIC_VECTOR (14-1 downto 0);
 					tab_«action.name»_ce0 : OUT STD_LOGIC;
@@ -706,7 +706,7 @@ def declareComponentSignal() '''
 			end component;
 		«ENDIF»
 	«ENDFOR»
-	«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+	«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 		«FOR action : actor.actions»
 		component cast_«entityName»_tab_«action.name»_read_scheduler IS
 				port (

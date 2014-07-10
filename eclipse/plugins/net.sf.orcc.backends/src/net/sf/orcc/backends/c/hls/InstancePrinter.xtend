@@ -116,7 +116,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDFOR»
 		«ENDFOR»
 		/*IF DEBUG ACTION */
-		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»			
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG)»			
 			«FOR action : actor.actions»	
 				extern u8 tab_«action.body.name»[16384];
 				extern unsigned int writeIdx_«action.body.name»[1];
@@ -304,7 +304,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					«block.doSwitch»
 				«ENDFOR»
 				/*IF DEBUG ACTION */
-				«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»			
+				«IF actor.hasAttribute(DIRECTIVE_DEBUG)»			
 					tab_«action.name»[wIdx_«action.name» & 16383]=1;
 					wIdx_«action.name» = wIdx_«action.name» + 1;
 					writeIdx_«action.name»[0] = wIdx_«action.name»;				
@@ -414,7 +414,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				if(1
 				«IF action.outputPattern != null»
 					«action.outputPattern.printOutputPattern»
-				«ENDIF» «IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)» && (16384 - wIdx_«action.name» + readIdx_«action.name»[0] >= 1) «ENDIF»){
+				«ENDIF» «IF actor.hasAttribute(DIRECTIVE_DEBUG)» && (16384 - wIdx_«action.name» + readIdx_«action.name»[0] >= 1) «ENDIF»){
 					«entityName»_«action.body.name»();
 				}
 			}«ENDFOR» else {
@@ -425,7 +425,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
 			if («transitions.action.inputPattern.checkInputPattern» isSchedulable_«transitions.action.name»() «transitions.
-			action.outputPattern.printOutputPattern» «IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)» && (16384 - wIdx_«transitions.action.name» + readIdx_«transitions.action.name»[0] >= 1) «ENDIF») {
+			action.outputPattern.printOutputPattern» «IF actor.hasAttribute(DIRECTIVE_DEBUG)» && (16384 - wIdx_«transitions.action.name» + readIdx_«transitions.action.name»[0] >= 1) «ENDIF») {
 				«entityName»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;

@@ -102,7 +102,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				«ENDFOR»
 			«ENDFOR»
 			
-			«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+			«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 				«FOR action : actor.actions»	
 				myStream_cast_tab_«action.name»_read_V_din    : OUT STD_LOGIC_VECTOR (7 downto 0);
 				myStream_cast_tab_«action.name»_read_V_full_n : IN STD_LOGIC;
@@ -136,7 +136,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				Signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;				
 			«ENDFOR»
 			«ENDFOR»
-			«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+			«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 				«FOR action : actor.actions»	
 				Signal myStream_cast_tab_«action.name»_read_V_din    :  STD_LOGIC_VECTOR (7 downto 0);
 				Signal myStream_cast_tab_«action.name»_read_V_full_n : STD_LOGIC;
@@ -191,7 +191,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 						«connection.castfifoNameRead»_V_write  => «connection.castfifoNameRead»_V_write,
 					«ENDFOR»
 				«ENDFOR»
-				«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+				«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 				«FOR action : actor.actions»	
 					myStream_cast_tab_«action.name»_read_V_din    => myStream_cast_tab_«action.name»_read_V_din,
 					myStream_cast_tab_«action.name»_read_V_full_n => myStream_cast_tab_«action.name»_read_V_full_n,
@@ -251,7 +251,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 							variable count«connection.castfifoNameRead»: integer:= 0;
 						«ENDFOR»
 					«ENDFOR»
-					«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+					«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 						«FOR action : actor.actions»	
 							variable count_myStream_cast_tab_«action.name»_read: integer:= 0;
 						«ENDFOR»
@@ -265,7 +265,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 								«printOutputWaveGen(connection, connection.castfifoNameRead)»								
 							«ENDFOR»
 						«ENDFOR»
-						«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+						«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 							«FOR action : actor.actions»						
 							if ( myStream_cast_tab_«action.name»_read_V_write = '1') then
 							count_myStream_cast_tab_«action.name»_read := count_myStream_cast_tab_«action.name»_read + 1;
@@ -283,7 +283,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 						«connection.castfifoNameRead»_V_full_n <= '1';						
 					«ENDFOR»
 				«ENDFOR»
-				«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+				«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 					«FOR action : actor.actions»	
 						myStream_cast_tab_«action.name»_read_V_full_n <= '1';
 					«ENDFOR»

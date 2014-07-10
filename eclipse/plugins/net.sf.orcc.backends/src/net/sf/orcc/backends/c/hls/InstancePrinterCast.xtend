@@ -253,7 +253,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override print(String targetFolder) {
 		/*IF DEBUG ACTION */
-		if(actor.hasAttribute(DIRECTIVE_DEBUG_HLS)){
+		if(actor.hasAttribute(DIRECTIVE_DEBUG)){
 			for (action : actor.actions) {
 			OrccUtil::printFile(getFileContentReadDebug(action.name),
 					new File(

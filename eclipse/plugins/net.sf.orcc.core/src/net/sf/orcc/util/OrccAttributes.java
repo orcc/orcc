@@ -44,8 +44,6 @@ public interface OrccAttributes {
 	
 	public static final String DIRECTIVE_DEBUG = "DEBUG";
 	
-	public static final String DIRECTIVE_DEBUG_HLS = "DEBUGHLS";
-
 	public static final String ALIGNABLE = "ALIGNABLE";
 	public static final String ALIGNED_ALWAYS = "ALIGNED_ALWAYS";	
 }

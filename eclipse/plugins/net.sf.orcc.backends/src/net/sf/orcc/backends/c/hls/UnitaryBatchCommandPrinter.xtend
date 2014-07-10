@@ -71,7 +71,7 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_«connection.sourcePort.name»_read.tcl					
 			«ENDFOR»
 		«ENDFOR»
-		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 			«FOR action : actor.actions»
 				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_tab_«action.name»_read.tcl
 			«ENDFOR»
@@ -94,7 +94,7 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 				copy %cd%\subProject_cast_«entityName»_«connection.sourcePort.name»_read\solution1\syn\vhdl %cd%\«entityName»TopVHDL
 			«ENDFOR»
 		«ENDFOR»
-		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 			«FOR action : actor.actions»
 				copy %cd%\subProject_cast_«entityName»_tab_«action.name»_read\solution1\syn\vhdl %cd%\«entityName»TopVHDL
 			«ENDFOR»
