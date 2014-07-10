@@ -32,6 +32,7 @@ import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.util.OrccUtil
+import static net.sf.orcc.util.OrccAttributes.*
 
 /**
  * Top VHDL testbench for actor debug 
@@ -101,6 +102,14 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				«ENDFOR»
 			«ENDFOR»
 			
+			«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+				«FOR action : actor.actions»	
+				myStream_cast_tab_«action.name»_read_V_din    : OUT STD_LOGIC_VECTOR (7 downto 0);
+				myStream_cast_tab_«action.name»_read_V_full_n : IN STD_LOGIC;
+				myStream_cast_tab_«action.name»_read_V_write  : OUT STD_LOGIC;
+				«ENDFOR»
+			«ENDIF»
+			
 			ap_return : OUT STD_LOGIC_VECTOR (31 downto 0)
 			);
 			END COMPONENT;	
@@ -117,19 +126,23 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 			«IF connection != null»
 				Signal «connection.castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
 				Signal «connection.castfifoNameWrite»_V_empty_n :  STD_LOGIC;
-				Signal «connection.castfifoNameWrite»_V_read    :  STD_LOGIC;
-				
+				Signal «connection.castfifoNameWrite»_V_read    :  STD_LOGIC;				
 			«ENDIF»
 			«ENDFOR»
 			«FOR portout : actor.outputs.filter[! native]»
-			«FOR connection : outgoingPortMap.get(portout)»
-				
+			«FOR connection : outgoingPortMap.get(portout)»				
 				Signal «connection.castfifoNameRead»_V_din    :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0);
 				Signal «connection.castfifoNameRead»_V_full_n :  STD_LOGIC;
-				Signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
-				
+				Signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;				
 			«ENDFOR»
 			«ENDFOR»
+			«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+				«FOR action : actor.actions»	
+				Signal myStream_cast_tab_«action.name»_read_V_din    :  STD_LOGIC_VECTOR (7 downto 0);
+				Signal myStream_cast_tab_«action.name»_read_V_full_n : STD_LOGIC;
+				Signal myStream_cast_tab_«action.name»_read_V_write  :  STD_LOGIC;
+				«ENDFOR»
+			«ENDIF»
 		
 			signal ap_return :  STD_LOGIC_VECTOR (31 downto 0):= (others => '0');
 			
@@ -178,6 +191,13 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 						«connection.castfifoNameRead»_V_write  => «connection.castfifoNameRead»_V_write,
 					«ENDFOR»
 				«ENDFOR»
+				«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+				«FOR action : actor.actions»	
+					myStream_cast_tab_«action.name»_read_V_din    => myStream_cast_tab_«action.name»_read_V_din,
+					myStream_cast_tab_«action.name»_read_V_full_n => myStream_cast_tab_«action.name»_read_V_full_n,
+					myStream_cast_tab_«action.name»_read_V_write  => myStream_cast_tab_«action.name»_read_V_write,
+				«ENDFOR»
+			«ENDIF»
 				ap_return => ap_return
 			);
 		
@@ -231,29 +251,43 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 							variable count«connection.castfifoNameRead»: integer:= 0;
 						«ENDFOR»
 					«ENDFOR»
+					«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+						«FOR action : actor.actions»	
+							variable count_myStream_cast_tab_«action.name»_read: integer:= 0;
+						«ENDFOR»
+					«ENDIF»
 		
 				begin
 					if (rising_edge(ap_clk)) then
 				
 						«FOR port : actor.outputs.filter[! native]»
-							«FOR connection : outgoingPortMap.get(port)»
-								
-								«printOutputWaveGen(connection, connection.castfifoNameRead)»
-								
+							«FOR connection : outgoingPortMap.get(port)»								
+								«printOutputWaveGen(connection, connection.castfifoNameRead)»								
 							«ENDFOR»
 						«ENDFOR»
+						«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+							«FOR action : actor.actions»						
+							if ( myStream_cast_tab_«action.name»_read_V_write = '1') then
+							count_myStream_cast_tab_«action.name»_read := count_myStream_cast_tab_«action.name»_read + 1;
+							report "Number of myStream_cast_tab_«action.name»_read = " & integer'image(count_myStream_cast_tab_«action.name»_read);
+							end if;
+							«ENDFOR»
+						«ENDIF»
 				
 				end if;
 				end process WaveGen_Proc_Out;
 				
 		
 				«FOR portout : actor.outputs.filter[! native]»
-					«FOR connection : outgoingPortMap.get(portout)»
-						
-						«connection.castfifoNameRead»_V_full_n <= '1';
-						
+					«FOR connection : outgoingPortMap.get(portout)»						
+						«connection.castfifoNameRead»_V_full_n <= '1';						
 					«ENDFOR»
 				«ENDFOR»
+				«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+					«FOR action : actor.actions»	
+						myStream_cast_tab_«action.name»_read_V_full_n <= '1';
+					«ENDFOR»
+				«ENDIF»
 		
 			END;
 	'''

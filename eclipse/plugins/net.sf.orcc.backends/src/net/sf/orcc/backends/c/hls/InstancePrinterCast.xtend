@@ -33,7 +33,7 @@ import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.backends.util.FPGA
-
+import static net.sf.orcc.util.OrccAttributes.*
 /*
  * Add instances for each port in case of actor debug
  *  
@@ -119,7 +119,65 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			return;
 		}
 	'''
-
+	def getFileContentReadDebug(String ActionName) '''
+		#include <hls_stream.h>
+		using namespace hls;
+		#include <stdio.h>
+		#include <stdlib.h>
+		
+		typedef signed char i8;
+		typedef short i16;
+		typedef int i32;
+		typedef long long int i64;
+		
+		typedef unsigned char u8;
+		typedef unsigned short u16;
+		typedef unsigned int u32;
+		typedef unsigned long long int u64;
+		////////////////////////////////////////////////////////////////////////////////
+		
+		
+			// Input FIFOS
+			extern u8 tab_«ActionName»[16384];
+			extern unsigned int writeIdx_«ActionName»[1];
+			extern unsigned int readIdx_«ActionName»[1];
+			unsigned int rIdx_«ActionName»=0;	
+			// Output FIFOs
+			extern stream<u8> myStream_cast_tab_«ActionName»_read;
+		
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// Actions
+		static void cast_«entityName»_tab_«ActionName»_read_untagged_0() {
+			i32 mask_«ActionName» = rIdx_«ActionName» & (16383 );
+			u8 tmp_tab_«ActionName»;
+			tmp_tab_«ActionName» = tab_«ActionName»[mask_«ActionName»];
+			myStream_cast_tab_«ActionName»_read.write_nb(tmp_tab_«ActionName»);
+			rIdx_«ActionName» = rIdx_«ActionName» +1;
+			readIdx_«ActionName»[0] = rIdx_«ActionName»;
+		
+		}
+		
+		static bool isSchedulable_untagged_0() {
+			bool result;
+			result = 1;
+			return result;
+		}
+		////////////////////////////////////////////////////////////////////////////////
+		// Action scheduler
+		void cast_«entityName»_tab_«ActionName»_read_scheduler() {	
+			
+			if (writeIdx_«ActionName»[0] - rIdx_«ActionName» >= 1  && isSchedulable_untagged_0()) {
+				if(1 && (!myStream_cast_tab_«ActionName»_read.full())) {
+					cast_«entityName»_tab_«ActionName»_read_untagged_0();
+				}
+			} else {
+				goto finished;
+			}		
+			finished:
+			return;
+		}
+	'''
 	def getFileContentRead(Connection connOut) '''
 		
 		#include <hls_stream.h>
@@ -194,6 +252,22 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 
 	override print(String targetFolder) {
+		/*IF DEBUG ACTION */
+		if(actor.hasAttribute(DIRECTIVE_DEBUG_HLS)){
+			for (action : actor.actions) {
+			OrccUtil::printFile(getFileContentReadDebug(action.name),
+					new File(
+						targetFolder + File::separator + "cast_" + entityName + "_" + "tab_" + action.name + "_read" +
+							".cpp"))
+				OrccUtil::printFile(
+					script(targetFolder, "cast_" + entityName + "_" + "tab_" + action.name + "_read"),
+					new File(
+						targetFolder + File::separator + "script_" + "cast_" + entityName + "_" + "tab_" + action.name + "_read" + ".tcl"))
+							
+							}
+		}		
+		
+		
 		for (portIn : actor.inputs) {
 			val connIn = incomingPortMap.get(portIn)
 			if (connIn != null) {

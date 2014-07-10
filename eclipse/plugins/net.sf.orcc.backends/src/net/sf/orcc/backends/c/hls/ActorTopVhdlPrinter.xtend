@@ -32,6 +32,7 @@ import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.util.OrccUtil
+import static net.sf.orcc.util.OrccAttributes.*
 
 /**
  * Top VHDL for actor debug
@@ -78,7 +79,13 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			
 		«ENDFOR»
 	«ENDFOR»
-	
+	«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+		«FOR action : actor.actions»	
+			myStream_cast_tab_«action.name»_read_V_din    : OUT STD_LOGIC_VECTOR (7 downto 0);
+			myStream_cast_tab_«action.name»_read_V_full_n : IN STD_LOGIC;
+			myStream_cast_tab_«action.name»_read_V_write  : OUT STD_LOGIC;
+		«ENDFOR»
+	«ENDIF»
 	
 	
 	ap_return : OUT STD_LOGIC_VECTOR (31 downto 0));
@@ -176,7 +183,40 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDFOR»
 	«ENDFOR»
 
-	
+	«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+		«FOR action : actor.actions»	
+				signal top_tab_«action.name»_address1    :  STD_LOGIC_VECTOR (14-1 downto 0);
+				signal top_tab_«action.name»_ce1 :  STD_LOGIC;
+				signal top_tab_«action.name»_we1  :  STD_LOGIC;
+				signal top_tab_«action.name»_d1  :   STD_LOGIC_VECTOR (7  downto 0);
+				
+				signal top_writeIdx_«action.name»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
+				signal top_writeIdx_«action.name»_ce1 :  STD_LOGIC;
+				signal top_writeIdx_«action.name»_we1  :  STD_LOGIC;
+				signal top_writeIdx_«action.name»_d1  :   STD_LOGIC_VECTOR (31  downto 0);
+				
+				signal top_readIdx_«action.name»_address1    :  STD_LOGIC_VECTOR (0 downto 0);
+				signal top_readIdx_«action.name»_ce1 :  STD_LOGIC;
+				signal top_readIdx_«action.name»_q1  :   STD_LOGIC_VECTOR (31  downto 0);
+				
+				signal top_myStream_cast_tab_«action.name»_read_V_din    :  STD_LOGIC_VECTOR (7  downto 0);
+				signal top_myStream_cast_tab_«action.name»_read_V_full_n :  STD_LOGIC;
+				signal top_myStream_cast_tab_«action.name»_read_V_write  :  STD_LOGIC;
+				
+				signal top_tab_«action.name»_address0    :  STD_LOGIC_VECTOR (14-1 downto 0);
+				signal top_tab_«action.name»_ce0 :  STD_LOGIC;
+				signal top_tab_«action.name»_q0  :   STD_LOGIC_VECTOR (7  downto 0);	
+					
+				signal top_writeIdx_«action.name»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
+				signal top_writeIdx_«action.name»_ce0 :  STD_LOGIC;
+				signal top_writeIdx_«action.name»_q0  :   STD_LOGIC_VECTOR (31  downto 0);		
+				
+				signal top_readIdx_«action.name»_address0    :  STD_LOGIC_VECTOR (0 downto 0);
+				signal top_readIdx_«action.name»_ce0 :  STD_LOGIC;
+				signal top_readIdx_«action.name»_we0  :  STD_LOGIC;
+				signal top_readIdx_«action.name»_d0  :   STD_LOGIC_VECTOR (31  downto 0);
+		«ENDFOR»
+	«ENDIF»
 	-- ----------------------------------------------------------------------------------
 	-- Components of the Network
 	-- ---------------------------------------------------------------------------------------
@@ -210,10 +250,63 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDFOR»
 		«ENDFOR»
 		«FOR port : actor.inputs»				
-			«FOR connection : incomingPortMap.values»  			
-				«printFifoMapping(connection)»		
-			«ENDFOR»	
+			«val connection = incomingPortMap.get(port)»	
+				«connection.printFifoMapping»			
 		«ENDFOR»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+			«FOR action : actor.actions»
+				tab_«action.name» : ram_tab
+				generic map (
+					dwidth     => 8,
+					awidth     => 14,
+					mem_size   => 16384
+				)
+				port map (
+					clk => top_ap_clk,
+					addr0 => top_tab_«action.name»_address0,
+					ce0 => top_tab_«action.name»_ce0,
+					q0 => top_tab_«action.name»_q0,
+					addr1 => top_tab_«action.name»_address1,
+					ce1 => top_tab_«action.name»_ce1,
+					we1 => top_tab_«action.name»_we1,
+					d1 => top_tab_«action.name»_d1
+				);
+				readIdx_«action.name» : ram_tab
+				generic map (
+					dwidth     => 32,
+					awidth     => 1,
+					mem_size   => 1
+				)
+				port map (
+					clk => top_ap_clk,
+					addr0 => top_readIdx_«action.name»_address1,
+					ce0 => top_readIdx_«action.name»_ce1,
+					q0 => top_readIdx_«action.name»_q1,
+					addr1 => top_readIdx_«action.name»_address0,
+					ce1 => top_readIdx_«action.name»_ce0,
+					we1 => top_readIdx_«action.name»_we0,
+					d1 => top_readIdx_«action.name»_d0
+				);
+				writeIdx_«action.name» : ram_tab
+				generic map (
+					dwidth     => 32,
+				    awidth     => 1,
+				    mem_size   => 1
+				)
+				port map (
+					clk => top_ap_clk,
+					addr0 => top_writeIdx_«action.name»_address0,
+					ce0 => top_writeIdx_«action.name»_ce0,
+					q0 => top_writeIdx_«action.name»_q0,
+					addr1 => top_writeIdx_«action.name»_address1,
+					ce1 => top_writeIdx_«action.name»_ce1,
+					we1 => top_writeIdx_«action.name»_we1,
+					d1 => top_writeIdx_«action.name»_d1
+				);
+			«ENDFOR»
+		«ENDIF»
+		
+		
 		«mappingComponentSignal»
 	
 		---------------------------------------------------------------------------
@@ -236,6 +329,14 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«connection.castfifoNameRead»_V_write <= top_«connection.castfifoNameRead»_V_write;				
 			«ENDFOR»
 		«ENDFOR»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+			«FOR action : actor.actions»
+			myStream_cast_tab_«action.name»_read_V_din <= top_myStream_cast_tab_«action.name»_read_V_din;
+			top_myStream_cast_tab_«action.name»_read_V_full_n <= myStream_cast_tab_«action.name»_read_V_full_n;
+			myStream_cast_tab_«action.name»_read_V_write <= top_myStream_cast_tab_«action.name»_read_V_write;		
+			«ENDFOR»	
+		«ENDIF»
+			
 		
 		top_ap_start <= ap_start;
 		top_ap_clk <= ap_clk;
@@ -294,6 +395,23 @@ def mappingComponentSignal() '''
 			«connList.rName»_d0 => top_«connList.rName»_d0,
 			
 		«ENDFOR»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+			«FOR action : actor.actions»
+			tab_«action.name»_address0 => top_tab_«action.name»_address1,
+			tab_«action.name»_ce0 => top_tab_«action.name»_ce1,
+			tab_«action.name»_we0 => top_tab_«action.name»_we1,
+			tab_«action.name»_d0 => top_tab_«action.name»_d1,
+			
+			writeIdx_«action.name»_address0 => top_writeIdx_«action.name»_address1,
+			writeIdx_«action.name»_ce0 => top_writeIdx_«action.name»_ce1,
+			writeIdx_«action.name»_we0 => top_writeIdx_«action.name»_we1,
+			writeIdx_«action.name»_d0 => top_writeIdx_«action.name»_d1,
+			
+			readIdx_«action.name»_address0 => top_readIdx_«action.name»_address1,
+			readIdx_«action.name»_ce0 => top_readIdx_«action.name»_ce1,
+			readIdx_«action.name»_q0 => top_readIdx_«action.name»_q1,
+			«ENDFOR»
+		«ENDIF»
 		
 		ap_start => top_ap_start,
 		ap_clk => top_ap_clk,
@@ -365,9 +483,39 @@ def mappingComponentSignal() '''
 				ap_idle => top_ap_idle,
 				ap_ready => top_ap_ready
 			);
-		«ENDIF»
-		
+		«ENDIF»		
 	«ENDFOR»
+	
+	«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+		«FOR action : actor.actions»
+		call_cast_«entityName»_tab_«action.name»_read_scheduler : component cast_«entityName»_tab_«action.name»_read_scheduler
+			port map(
+				tab_«action.name»_address0 => top_tab_«action.name»_address0, 
+				tab_«action.name»_ce0 => top_tab_«action.name»_ce0,
+				tab_«action.name»_q0  => top_tab_«action.name»_q0,
+				
+				writeIdx_«action.name»_address0 => top_writeIdx_«action.name»_address0,
+				writeIdx_«action.name»_ce0 => top_writeIdx_«action.name»_ce0,
+				writeIdx_«action.name»_q0  => top_writeIdx_«action.name»_q0,
+				
+				readIdx_«action.name»_address0 => top_readIdx_«action.name»_address0,
+				readIdx_«action.name»_ce0 => top_readIdx_«action.name»_ce0,
+				readIdx_«action.name»_we0  => top_readIdx_«action.name»_we0,
+				readIdx_«action.name»_d0  => top_readIdx_«action.name»_d0,
+				
+				myStream_cast_tab_«action.name»_read_V_din    => top_myStream_cast_tab_«action.name»_read_V_din,
+				myStream_cast_tab_«action.name»_read_V_full_n => top_myStream_cast_tab_«action.name»_read_V_full_n,
+				myStream_cast_tab_«action.name»_read_V_write  => top_myStream_cast_tab_«action.name»_read_V_write,
+				
+				ap_start => top_ap_start,
+				ap_clk => top_ap_clk,
+				ap_rst => top_ap_rst,
+				ap_done => top_ap_done,
+				ap_idle => top_ap_idle,
+				ap_ready => top_ap_ready
+			);	
+		«ENDFOR»
+	«ENDIF»	
 '''
 
 def printFifoMapping(Connection connection) '''
@@ -465,6 +613,23 @@ def declareComponentSignal() '''
 			«FOR connList : incomingPortMap.values»				
 				«printInputRAMAssignHLS(connList)»				
 			«ENDFOR»
+			«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+				«FOR action : actor.actions»
+					tab_«action.name»_address0    : OUT  STD_LOGIC_VECTOR (14-1 downto 0);
+					tab_«action.name»_ce0 : OUT STD_LOGIC;
+					tab_«action.name»_we0  : OUT STD_LOGIC;
+					tab_«action.name»_d0  : OUT STD_LOGIC_VECTOR (7  downto 0);
+					
+					writeIdx_«action.name»_address0    :  OUT STD_LOGIC_VECTOR (0 downto 0);
+					writeIdx_«action.name»_ce0 :  OUT STD_LOGIC;
+					writeIdx_«action.name»_we0  : OUT STD_LOGIC;
+					writeIdx_«action.name»_d0  :  OUT STD_LOGIC_VECTOR (31  downto 0);
+					
+					readIdx_«action.name»_address0    : OUT STD_LOGIC_VECTOR (0 downto 0);
+					readIdx_«action.name»_ce0 : OUT STD_LOGIC;
+					readIdx_«action.name»_q0  : IN  STD_LOGIC_VECTOR (31  downto 0);
+				«ENDFOR»
+			«ENDIF»
 			
 			ap_clk : IN STD_LOGIC;
 			ap_rst : IN STD_LOGIC;
@@ -540,8 +705,39 @@ def declareComponentSignal() '''
 				);
 			end component;
 		«ENDIF»
-
 	«ENDFOR»
+	«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+		«FOR action : actor.actions»
+		component cast_«entityName»_tab_«action.name»_read_scheduler IS
+				port (
+					tab_«action.name»_address0    : OUT STD_LOGIC_VECTOR (14-1 downto 0);
+					tab_«action.name»_ce0 : OUT STD_LOGIC;
+					tab_«action.name»_q0  :  IN STD_LOGIC_VECTOR (7  downto 0);
+					
+					writeIdx_«action.name»_address0    : OUT STD_LOGIC_VECTOR (0 downto 0);
+					writeIdx_«action.name»_ce0 : OUT STD_LOGIC;
+					writeIdx_«action.name»_q0  : IN  STD_LOGIC_VECTOR (31  downto 0);
+					
+					readIdx_«action.name»_address0    :OUT  STD_LOGIC_VECTOR (0 downto 0);
+					readIdx_«action.name»_ce0 : OUT STD_LOGIC;
+					readIdx_«action.name»_we0  : OUT STD_LOGIC;
+					readIdx_«action.name»_d0  : OUT  STD_LOGIC_VECTOR (31  downto 0);
+					
+					myStream_cast_tab_«action.name»_read_V_din    : OUT STD_LOGIC_VECTOR (7 downto 0);
+					myStream_cast_tab_«action.name»_read_V_full_n : IN STD_LOGIC;
+					myStream_cast_tab_«action.name»_read_V_write  : OUT STD_LOGIC;
+					
+					
+					ap_clk : IN STD_LOGIC;
+					ap_rst : IN STD_LOGIC;
+					ap_start : IN STD_LOGIC;
+					ap_done : OUT STD_LOGIC;
+					ap_idle : OUT STD_LOGIC;
+					ap_ready : OUT STD_LOGIC
+				);
+			end component;
+		«ENDFOR»
+	«ENDIF»
 '''
 
 def castfifoNameWrite(Connection connection) 

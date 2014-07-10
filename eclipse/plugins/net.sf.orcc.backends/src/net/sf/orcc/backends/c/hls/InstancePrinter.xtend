@@ -43,6 +43,7 @@ import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.backends.util.FPGA
+import static net.sf.orcc.util.OrccAttributes.*
 
 /*
  * Compile Instance c source code
@@ -53,6 +54,8 @@ import net.sf.orcc.backends.util.FPGA
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	private FPGA fpga = FPGA.builder("Virtex7 (xc7v2000t)") ;
+	
+
 
 	new(Map<String, Object> options) {
 		super(options)
@@ -112,7 +115,24 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				unsigned int «connection.localwName»=0;
 			«ENDFOR»
 		«ENDFOR»
-		
+		/*IF DEBUG ACTION */
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»			
+			«FOR action : actor.actions»	
+				extern u8 tab_«action.body.name»[16384];
+				extern unsigned int writeIdx_«action.body.name»[1];
+				extern unsigned int readIdx_«action.body.name»[1];
+				unsigned int wIdx_«action.body.name»=0;	
+			«ENDFOR»
+			«IF ! actor.initializes.empty»
+				«FOR init : actor.initializes»
+					extern u8 tab_«init.body.name»[16384];
+					extern unsigned int writeIdx_«init.body.name»[1];
+					extern unsigned int readIdx_«init.body.name»[1];
+					unsigned int wIdx_«init.body.name»=0;	
+				«ENDFOR»			
+			«ENDIF»				
+		«ENDIF»
+		/******************/
 		«IF actor.outputs.empty»
 			extern stream<int> outFIFO_«entityName»;
 		«ENDIF»
@@ -283,7 +303,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
 				«ENDFOR»
-			
+				/*IF DEBUG ACTION */
+				«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»			
+					tab_«action.name»[wIdx_«action.name» & 16383]=1;
+					wIdx_«action.name» = wIdx_«action.name» + 1;
+					writeIdx_«action.name»[0] = wIdx_«action.name»;				
+				«ENDIF»
+				/******************/
 				«FOR port : action.inputPattern.ports»
 					«val connection = incomingPortMap.get(port)»
 					«IF connection != null»
@@ -388,7 +414,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				if(1
 				«IF action.outputPattern != null»
 					«action.outputPattern.printOutputPattern»
-				«ENDIF»){
+				«ENDIF» «IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)» && (16384 - wIdx_«action.name» + readIdx_«action.name»[0] >= 1) «ENDIF»){
 					«entityName»_«action.body.name»();
 				}
 			}«ENDFOR» else {
@@ -399,7 +425,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
 			if («transitions.action.inputPattern.checkInputPattern» isSchedulable_«transitions.action.name»() «transitions.
-			action.outputPattern.printOutputPattern») {
+			action.outputPattern.printOutputPattern» «IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)» && (16384 - wIdx_«transitions.action.name» + readIdx_«transitions.action.name»[0] >= 1) «ENDIF») {
 				«entityName»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;

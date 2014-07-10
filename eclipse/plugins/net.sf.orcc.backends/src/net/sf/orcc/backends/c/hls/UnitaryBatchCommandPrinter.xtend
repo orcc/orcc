@@ -31,6 +31,7 @@ package net.sf.orcc.backends.c.hls
 import java.io.File
 import java.util.Map
 import net.sf.orcc.util.OrccUtil
+import static net.sf.orcc.util.OrccAttributes.*
 
 /**
  * Bach command for each actor
@@ -70,6 +71,11 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_«connection.sourcePort.name»_read.tcl					
 			«ENDFOR»
 		«ENDFOR»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+			«FOR action : actor.actions»
+				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_tab_«action.name»_read.tcl
+			«ENDFOR»
+		«ENDIF»
 		
 		copy %cd%\TopVHDL\sim_package.vhd %cd%\«entityName»TopVHDL
 		copy %cd%\TopVHDL\ram_tab.vhd %cd%\«entityName»TopVHDL
@@ -88,6 +94,11 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 				copy %cd%\subProject_cast_«entityName»_«connection.sourcePort.name»_read\solution1\syn\vhdl %cd%\«entityName»TopVHDL
 			«ENDFOR»
 		«ENDFOR»
+		«IF actor.hasAttribute(DIRECTIVE_DEBUG_HLS)»
+			«FOR action : actor.actions»
+				copy %cd%\subProject_cast_«entityName»_tab_«action.name»_read\solution1\syn\vhdl %cd%\«entityName»TopVHDL
+			«ENDFOR»
+		«ENDIF»
 			
 		
 	'''
