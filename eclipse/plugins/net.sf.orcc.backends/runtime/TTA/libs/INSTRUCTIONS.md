@@ -15,7 +15,7 @@ We assume that you have already [installed Orcc](http://orcc.sourceforge.net/get
 ## Set up the TCE
 
 The TTA backend uses an open-source toolset, called [TTA-based Co-design Environment (TCE)](http://tce.cs.tut.fi/), to perform the lower stages of the design flow :
-- Download a specific branch of the TCE using Bazaar `bzr branch lp:~elldekaa/tce/Multiprocessor`.
+- Download a specific branch of the TCE using Bazaar `bzr branch lp:~orcc/tce/Multiprocessor`.
 - Install the TCE as described in the installation procedure available in tce/tce/INSTALL. Since the TCE has been downloaded from the version control, you have to do the optional step 'Creating the build scripts' before building the TCE.
 - Do not forget to check that your environment is correcty setting up by running ``tce-selftest -v``.
 
