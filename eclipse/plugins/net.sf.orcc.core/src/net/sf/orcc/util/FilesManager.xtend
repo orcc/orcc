@@ -310,21 +310,42 @@ class FilesManager {
 	}
 
 	/**
-	 * Write <em>content</em> to target file <em>path</em>, if necessary. This method
-	 * will not write the content to the target file if this one already have exactly
-	 * the same content.
+	 * Write <em>content</em> to the given <em>targetFolder</em> in a new file called
+	 * <em>fileName</em>. This method will write the content to the target file only if
+	 * it is empty or if its content is different than that given.
+	 * 
+	 * @param content The text content to write
+	 * @param targetFolder The folder where the file should be created
+	 * @param fileName The name of the new file 
+	 */
+	static def writeFile(CharSequence content, String targetFolder, String fileName) {
+		content.writeFile(new File(targetFolder.sanitize, fileName))
+	}
+
+	/**
+	 * Write <em>content</em> to the given file <em>path</em>. This method will write the
+	 * content to the target file only if it is empty or if its content is different than
+	 * that given.
+	 * 
+	 * @param content The text content to write
+	 * @param path The path of the file to write
 	 */
 	static def writeFile(CharSequence content, String path) {
-		val target = new File(path.sanitize)
+		content.writeFile(new File(path.sanitize))
+	}
 
-		if (content.isContentEqual(target)) {
+	/**
+	 * Write the <em>content</em> into the <em>targetFile</em> only if necessary.
+	 */
+	private static def writeFile(CharSequence content, File targetFile) {
+		if (content.isContentEqual(targetFile)) {
 			return CACHED
 		}
 
-		if (!target.parentFile.exists) {
-			target.parentFile.mkdirs
+		if (!targetFile.parentFile.exists) {
+			targetFile.parentFile.mkdirs
 		}
-		val ps = new PrintStream(new FileOutputStream(target))
+		val ps = new PrintStream(new FileOutputStream(targetFile))
 		ps.print(content)
 		ps.close
 		return OK
