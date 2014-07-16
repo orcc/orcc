@@ -228,7 +228,7 @@ public class LLVMBackend extends AbstractBackend {
 		OrccLogger.traceln("Export libraries sources");
 		result.merge(FilesManager.extract("/runtime/C/libs", path));
 
-		return super.extractLibraries();
+		return result;
 	}
 
 	@Override
