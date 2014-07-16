@@ -40,7 +40,6 @@ import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.util.OrccUtil
 import org.w3c.dom.Element
 
 /**
@@ -74,11 +73,6 @@ class Mapping extends CommonPrinter {
 	public new(Network network, File xcfFile) {
 		this(network)
 		computeFromFile(xcfFile)
-	}
-
-	def print(String targetFolder) {
-		val xcfFile = new File(targetFolder + File::separator + network.simpleName + ".xcf")
-		OrccUtil::printFile(network.contentFile, xcfFile)
 	}
 
 	def private void computeFromMap(Map<String, String> map) {
@@ -153,7 +147,7 @@ class Mapping extends CommonPrinter {
 		}
 	}
 
-	def private getContentFile(Network network) '''
+	def getContentFile() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<Configuration>
 			<Partitioning>

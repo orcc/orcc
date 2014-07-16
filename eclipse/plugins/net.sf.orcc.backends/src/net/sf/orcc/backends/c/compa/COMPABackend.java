@@ -187,7 +187,8 @@ public class COMPABackend extends CBackend {
 		}
 
 		OrccLogger.traceln("Print network meta-informations...");
-		new Mapping(network, mapping).print(srcPath);
+		final CharSequence content = new Mapping(network, mapping).getContentFile();
+		FilesManager.writeFile(content, srcPath, network.getSimpleName() + ".xcf");
 	}
 
 

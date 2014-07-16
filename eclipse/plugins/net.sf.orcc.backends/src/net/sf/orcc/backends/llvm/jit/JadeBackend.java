@@ -68,6 +68,7 @@ import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Void;
 
@@ -194,7 +195,8 @@ public class JadeBackend extends AbstractBackend {
 			e.printStackTrace();
 		}
 
-		new Mapping(network, mapping).print(path);
+		final CharSequence content = new Mapping(network, mapping).getContentFile();
+		FilesManager.writeFile(content, path, network.getSimpleName() + ".xcf");
 	}
 
 	@Override

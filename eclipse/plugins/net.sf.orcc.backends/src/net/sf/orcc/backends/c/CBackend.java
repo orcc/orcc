@@ -256,7 +256,9 @@ public class CBackend extends AbstractBackend {
 
 		printCMake(network);
 		new StatisticsPrinter().print(srcPath, network);
-		new Mapping(network, mapping).print(srcPath);
+
+		final CharSequence content = new Mapping(network, mapping).getContentFile();
+		FilesManager.writeFile(content, srcPath, network.getSimpleName() + ".xcf");
 	}
 
 	protected void printCMake(Network network) {
