@@ -62,9 +62,8 @@ public class Instantiator extends DfSwitch<Void> {
 	private final boolean instantiateActors;
 
 	/**
-	 * Creates an instantiator, equivalent to
-	 * <code>Instantiator(instantiateActors, 0)</code>, that will replace
-	 * instances of networks by instantiated networks, and if instantiateActors
+	 * Creates an instantiator that will replace
+	 * instances of networks by instantiated networks. If instantiateActors
 	 * is <code>true</code>, then the instantiator also replaces instances of
 	 * actors by instantiated actors. The instantiator does not set default FIFO
 	 * size.
@@ -73,21 +72,6 @@ public class Instantiator extends DfSwitch<Void> {
 	 *            <code>true</code> if actors should be duplicated
 	 */
 	public Instantiator(boolean instantiateActors) {
-		this(instantiateActors, 0);
-	}
-
-	/**
-	 * Creates an instantiator that will replace instances of networks by
-	 * instantiated networks, and if instantiateActors is <code>true</code>,
-	 * then the instantiator also replaces instances of actors by instantiated
-	 * actors.
-	 * 
-	 * @param instantiateActors
-	 *            <code>true</code> if actors should be duplicated
-	 * @param defaultFifoSize
-	 *            default FIFO size
-	 */
-	public Instantiator(boolean instantiateActors, int defaultFifoSize) {
 		this.instantiateActors = instantiateActors;
 	}
 
