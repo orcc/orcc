@@ -125,7 +125,7 @@ public class HLSBackend extends CBackend {
 	protected void doTransformNetwork(Network network) {
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
-		new Instantiator(false, fifoSize).doSwitch(network);
+		new Instantiator(false).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 

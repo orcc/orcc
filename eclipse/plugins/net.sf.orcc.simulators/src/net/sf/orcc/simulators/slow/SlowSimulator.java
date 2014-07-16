@@ -94,8 +94,6 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private boolean enableTypeResizer;
 
-	private int fifoSize;
-
 	private String goldenReferenceFile;
 
 	private boolean hasGoldenReference;
@@ -230,7 +228,6 @@ public class SlowSimulator extends AbstractSimulator {
 
 	@Override
 	protected void initializeOptions() {
-		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		stimulusFile = getAttribute(INPUT_STIMULUS, "");
 		hasGoldenReference = getAttribute(GOLDEN_REFERENCE, false);
 		goldenReferenceFile = getAttribute(GOLDEN_REFERENCE_FILE, "");
@@ -289,7 +286,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Network network = EcoreHelper.getEObject(set, file);
 
 			// full instantiation (no more instances)
-			new Instantiator(true, fifoSize).doSwitch(network);
+			new Instantiator(true).doSwitch(network);
 
 			// flattens network
 			new NetworkFlattener().doSwitch(network);

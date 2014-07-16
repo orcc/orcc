@@ -140,7 +140,7 @@ public class LLVMBackend extends AbstractBackend {
 
 		List<DfSwitch<?>> visitors = new ArrayList<DfSwitch<?>>();
 
-		visitors.add(new Instantiator(!debug, fifoSize));
+		visitors.add(new Instantiator(!debug));
 		visitors.add(new NetworkFlattener());
 		visitors.add(new UnitImporter());
 

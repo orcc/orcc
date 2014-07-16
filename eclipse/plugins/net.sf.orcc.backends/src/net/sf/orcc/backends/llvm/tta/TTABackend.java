@@ -132,7 +132,7 @@ public class TTABackend extends LLVMBackend {
 
 		visitors.add(new ComplexHwOpDetector());
 		visitors.add(new UnitImporter());
-		visitors.add(new Instantiator(true, fifoSize));
+		visitors.add(new Instantiator(true));
 		visitors.add(new NetworkFlattener());
 
 		if (classify) {

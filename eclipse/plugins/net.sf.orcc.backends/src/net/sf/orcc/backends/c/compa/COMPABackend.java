@@ -121,7 +121,7 @@ public class COMPABackend extends CBackend {
 	protected void doTransformNetwork(Network network) {
 		// instantiate and flattens network
 		OrccLogger.traceln("Instantiating...");
-		new Instantiator(true, fifoSize).doSwitch(network);
+		new Instantiator(true).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 		new UnitImporter().doSwitch(network);

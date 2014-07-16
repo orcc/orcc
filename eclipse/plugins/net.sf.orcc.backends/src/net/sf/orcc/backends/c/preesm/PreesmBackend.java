@@ -68,7 +68,7 @@ public class PreesmBackend extends AbstractBackend {
 		printActors(network.getAllActors());
 
 		// instantiate and flattens network
-		new Instantiator(false, fifoSize).doSwitch(network);
+		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
 		// This call is needed to associate instances to network vertices

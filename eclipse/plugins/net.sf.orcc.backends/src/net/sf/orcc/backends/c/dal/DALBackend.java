@@ -46,7 +46,7 @@ public class DALBackend extends CBackend {
 	
 	protected void doTransformNetwork(Network network) {
 		OrccLogger.traceln("Instantiating network...");
-		new Instantiator(false, fifoSize).doSwitch(network);
+		new Instantiator(false).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 
@@ -54,7 +54,7 @@ public class DALBackend extends CBackend {
 		new BroadcastAdder().doSwitch(network);
 
 		OrccLogger.traceln("Instantiating actors...");
-		new Instantiator(true, fifoSize).doSwitch(network);
+		new Instantiator(true).doSwitch(network);
 	
 		new UnitImporter().doSwitch(network);
 

@@ -198,7 +198,7 @@ public class CBackend extends AbstractBackend {
 			new BroadcastAdder().doSwitch(network);
 		}
 		OrccLogger.traceln("Instantiating...");
-		new Instantiator(true, fifoSize).doSwitch(network);
+		new Instantiator(true).doSwitch(network);
 		OrccLogger.traceln("Flattening...");
 		new NetworkFlattener().doSwitch(network);
 		new UnitImporter().doSwitch(network);
