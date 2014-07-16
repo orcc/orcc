@@ -599,11 +599,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	@Override
-	public void setProgressMonitor(IProgressMonitor monitor) {
-		this.monitor = monitor;
-	}
-
-	@Override
 	public Object start(IApplicationContext context) throws Exception {
 		Options options = new Options();
 		Option opt;

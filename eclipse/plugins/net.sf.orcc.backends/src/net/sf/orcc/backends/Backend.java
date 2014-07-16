@@ -30,8 +30,6 @@ package net.sf.orcc.backends;
 
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 /**
  * This interface defines a back-end.
  * 
@@ -52,14 +50,5 @@ public interface Backend {
 	 * @param options
 	 *            a map of string to object
 	 */
-	public void setOptions(Map<String, Object> options);
-
-	/**
-	 * Sets the progress monitor used by this back-end.
-	 * 
-	 * @param monitor
-	 *            a progress monitor
-	 */
-	void setProgressMonitor(IProgressMonitor monitor);
-
+	void setOptions(Map<String, Object> options);
 }
