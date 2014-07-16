@@ -28,12 +28,10 @@
  */
 package net.sf.orcc.tools.stats
 
-import java.io.File
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Network
 import net.sf.orcc.graph.Vertex
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate statistics about an application.
@@ -42,12 +40,7 @@ import net.sf.orcc.util.OrccUtil
  */
 class StatisticsPrinter {
 	
-	def print(String targetFolder, Network network) {
-		val file = new File(targetFolder + File::separator + network.simpleName + ".csv")
-		OrccUtil::printFile(network.content, file)
-	}
-	
-	def private getContent(Network network) '''
+	def getContent(Network network) '''
 		«networkHeader»
 		«network.stats»
 		

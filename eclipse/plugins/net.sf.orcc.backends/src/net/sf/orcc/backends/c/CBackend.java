@@ -255,9 +255,11 @@ public class CBackend extends AbstractBackend {
 		}
 
 		printCMake(network);
-		new StatisticsPrinter().print(srcPath, network);
 
-		final CharSequence content = new Mapping(network, mapping).getContentFile();
+		CharSequence content = new StatisticsPrinter().getContent(network);
+		FilesManager.writeFile(content, srcPath, network.getSimpleName() + ".csv");
+
+		content = new Mapping(network, mapping).getContentFile();
 		FilesManager.writeFile(content, srcPath, network.getSimpleName() + ".xcf");
 	}
 

@@ -69,6 +69,8 @@ import net.sf.orcc.simulators.SimulatorDescriptor;
 import net.sf.orcc.simulators.runtime.impl.GenericDisplay;
 import net.sf.orcc.simulators.runtime.impl.GenericSource;
 import net.sf.orcc.simulators.runtime.std.video.impl.Display;
+import net.sf.orcc.tools.stats.StatisticsPrinter;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -316,7 +318,8 @@ public class SlowSimulator extends AbstractSimulator {
 			}
 
 			if (profile) {
-				new ProfilingPrinter().print(profileFolder, network);
+				CharSequence content = new StatisticsPrinter().getContent(network);
+				FilesManager.writeFile(content, profileFolder, network.getSimpleName() + ".csv");
 			}
 		} finally {
 			// clean up to prevent memory leak
