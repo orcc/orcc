@@ -44,7 +44,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 	/**
 	 * Return CMakeList's content to write in the root target folder
 	 */
-	 override protected rootCMakeContent() '''
+	 override rootCMakeContent() '''
 		# Generated from «network.simpleName»
 		cmake_minimum_required (VERSION 2.6)
 
@@ -77,7 +77,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 	/**
 	 * Return CMakeList's content to write in the src subdirectory
 	 */
-	override protected srcCMakeContent() '''
+	override srcCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		set(«network.simpleName»_SRCS

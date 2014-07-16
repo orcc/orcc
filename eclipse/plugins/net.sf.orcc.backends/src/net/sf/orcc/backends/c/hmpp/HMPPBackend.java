@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.backends.BackendsConstants;
 import net.sf.orcc.backends.c.CBackend;
+import net.sf.orcc.backends.c.CMakePrinter;
 import net.sf.orcc.backends.c.hmpp.transformations.CodeletInliner;
 import net.sf.orcc.backends.c.hmpp.transformations.ConstantRegisterCleaner;
 import net.sf.orcc.backends.c.hmpp.transformations.DisableAnnotations;
@@ -132,6 +133,8 @@ public class HMPPBackend extends CBackend {
 
 	@Override
 	protected void printCMake(Network network) {
-		new CMakePrinter(network).printCMakeFiles(path);
+		CMakePrinter printer = new CMakePrinter(network);
+		FilesManager.writeFile(printer.rootCMakeContent(), path, "CMakeLists.txt");
+		FilesManager.writeFile(printer.srcCMakeContent(), srcPath, "CMakeLists.txt");
 	}
 }

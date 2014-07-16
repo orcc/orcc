@@ -37,7 +37,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		super(network)
 	}
 	
-	override protected rootCMakeContent() '''
+	override rootCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		cmake_minimum_required (VERSION 2.6)
@@ -66,7 +66,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		«addLibrariesSubdirs»
 	'''
 	
-	override protected srcCMakeContent() '''
+	override srcCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		cmake_minimum_required (VERSION 2.6)

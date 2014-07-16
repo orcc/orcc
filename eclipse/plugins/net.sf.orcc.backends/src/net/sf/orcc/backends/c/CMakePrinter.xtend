@@ -28,11 +28,9 @@
  */
 package net.sf.orcc.backends.c
 
-import java.io.File
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate CMakeList.txt content
@@ -47,21 +45,7 @@ class CMakePrinter extends CommonPrinter {
 		this.network = network
 	}
 	
-	def printCMakeFiles(String targetFolder) {
-		val root = new File(targetFolder + File::separator + "CMakeLists.txt")
-		val src = new File(targetFolder + File::separator + "src" + File::separator + "CMakeLists.txt")
-		val rootContent = rootCMakeContent
-		val srcContent = srcCMakeContent
-		
-		if(needToWriteFile(rootContent, root)) {
-			OrccUtil::printFile(rootContent, root)
-		}
-		if(needToWriteFile(srcContent, src)) {
-			OrccUtil::printFile(srcContent, src)
-		}
-	}
-	
-	def protected rootCMakeContent() '''
+	def rootCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		cmake_minimum_required (VERSION 2.6)
@@ -98,7 +82,7 @@ class CMakePrinter extends CommonPrinter {
 		add_subdirectory(src)
 	'''
 
-	def protected srcCMakeContent() '''
+	def srcCMakeContent() '''
 		# Generated from «network.simpleName»
 
 		set(filenames

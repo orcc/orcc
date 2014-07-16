@@ -266,7 +266,10 @@ public class CBackend extends AbstractBackend {
 	protected void printCMake(Network network) {
 		// print CMakeLists
 		OrccLogger.traceln("Printing CMake project files");
-		new CMakePrinter(network).printCMakeFiles(path);
+		CMakePrinter printer = new CMakePrinter(network);
+		
+		FilesManager.writeFile(printer.rootCMakeContent(), path, "CMakeLists.txt");
+		FilesManager.writeFile(printer.srcCMakeContent(), srcPath, "CMakeLists.txt");
 	}
 
 	@Override

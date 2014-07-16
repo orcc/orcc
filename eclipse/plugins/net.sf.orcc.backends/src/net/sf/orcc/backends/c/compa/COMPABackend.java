@@ -172,8 +172,6 @@ public class COMPABackend extends CBackend {
 				OrccLogger.traceRaw("Done\n");
 			}			
 		}
-		
-		new CMakePrinter(network).printCMakeFiles(path);
 
 		OrccLogger.traceln("Print flattened and attributed network...");
 		URI uri = URI.createFileURI(srcPath + File.separator
@@ -204,15 +202,21 @@ public class COMPABackend extends CBackend {
 //		}
 		if (printTop)
 			return new InstancePrinter(options, printTop).print(srcPath, instance) > 0;
-		else
+		else {
+			CharSequence content = new CMakePrinter().rootCMakeContent(instance.getSimpleName());
+			FilesManager.writeFile(content, path + File.separator + instance.getSimpleName(), "CMakeLists.txt");
 			return new InstancePrinter(options, printTop).print(path + File.separator + instance.getSimpleName(), instance) > 0;
+		}
 	}
 	
 	@Override
 	protected boolean printActor(Actor actor) {
 		if (printTop)
 			return new InstancePrinter(options, printTop).print(srcPath, actor) > 0;
-		else
+		else {
+			CharSequence content = new CMakePrinter().rootCMakeContent(actor.getSimpleName());
+			FilesManager.writeFile(content, path + File.separator + actor.getSimpleName(), "CMakeLists.txt");
 			return new InstancePrinter(options, printTop).print(path + File.separator + actor.getSimpleName(), actor) > 0;
+		}
 	}
 }
