@@ -249,7 +249,7 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«connection.printFifoMapping»					
 			«ENDFOR»
 		«ENDFOR»
-		«FOR port : actor.inputs»				
+		«FOR port : actor.inputs.filter[incomingPortMap.get(it) != null]»
 			«val connection = incomingPortMap.get(port)»	
 				«connection.printFifoMapping»			
 		«ENDFOR»
