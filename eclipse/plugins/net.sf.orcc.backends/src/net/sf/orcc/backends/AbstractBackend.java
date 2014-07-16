@@ -33,6 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.CLASSIFY;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DEBUG;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
@@ -142,10 +143,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	private IFile inputFile;
 
 	protected Map<String, String> mapping;
-	protected boolean balanceMapping;
 	protected boolean importXcfFile;
 	protected File xcfFile;
-	protected int processorNumber;
 
 	/**
 	 * List of transformations to apply on each network
@@ -564,18 +563,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				OrccUtil.NETWORK_SUFFIX);
 
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-		debug = getAttribute(DEBUG_MODE, true);
+		debug = getAttribute(DEBUG_MODE, DEFAULT_DEBUG);
 
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-		balanceMapping = getAttribute("net.sf.orcc.backends.metricMapping",
-				false);
 		importXcfFile = getAttribute(BackendsConstants.IMPORT_XCF, false);
 		if (importXcfFile) {
 			xcfFile = new File(getAttribute(BackendsConstants.XCF_FILE, ""));
 		}
-
-		processorNumber = Integer.parseInt(getAttribute(
-				"net.sf.orcc.backends.processorsNumber", "0"));
 
 		classify = getAttribute(CLASSIFY, false);
 		// Merging transformations need the results of classification
@@ -593,14 +587,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		} else {
 			outputFolder = FilesManager.sanitize(outputFolder);
 		}
+		// set output path
+		path = new File(outputFolder).getAbsolutePath();
 
 		if (debug) {
 			OrccLogger.setLevel(OrccLogger.DEBUG);
 			OrccLogger.debugln("Debug mode is enabled");
 		}
-
-		// set output path
-		path = new File(outputFolder).getAbsolutePath();
 
 		doInitializeOptions();
 	}
