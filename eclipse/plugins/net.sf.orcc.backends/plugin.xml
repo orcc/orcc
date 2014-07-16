@@ -522,4 +522,16 @@
          </run>
       </application>
    </extension>
+   <extension
+         id="compa"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.c.compa.COMPABackend">
+         </run>
+      </application>
+   </extension>
 </plugin>
