@@ -28,9 +28,12 @@
  */
 package net.sf.orcc.backends.llvm.jit;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,10 +76,6 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Void;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * LLVM back-end.
@@ -183,14 +182,10 @@ public class JadeBackend extends AbstractBackend {
 
 		// print network
 		OrccLogger.traceln("Printing network...");
-		String pathName = path + "/" + network.getSimpleName() + ".xdf";
-		URI uri = URI.createFileURI(pathName);
-
-		ResourceSet set = new ResourceSetImpl();
-		Resource resource = set.createResource(uri);
-		resource.getContents().add(network);
+		OutputStream outputStream = new ByteArrayOutputStream();
 		try {
-			resource.save(null);
+			network.eResource().save(outputStream, Collections.emptyMap());
+			FilesManager.writeFile(outputStream.toString(), path, network.getSimpleName() + ".xdf");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
