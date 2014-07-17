@@ -90,6 +90,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -446,12 +447,27 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * Returns true if this process has been canceled.
 	 * 
 	 * @return true if this process has been canceled
+	 * @deprecated Use {@link #stopIfRequested()} instead
 	 */
+	@Deprecated
 	protected boolean isCanceled() {
 		if (monitor == null) {
 			return false;
 		} else {
 			return monitor.isCanceled();
+		}
+	}
+
+	/**
+	 * Check the current ProgressMonitor for cancellation, and throws a
+	 * OperationCanceledException if needed. This will simply stop the back-end
+	 * execution.
+	 */
+	private void stopIfRequested() {
+		if(monitor != null) {
+			if(monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
 		}
 	}
 
