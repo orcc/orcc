@@ -137,15 +137,24 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	private boolean isVTLBackend;
 
-	protected boolean debug;
 	/**
-	 * Fifo size used in backend.
+	 * Indicates that the backend has been launched in debug mode or not
+	 */
+	protected boolean debug;
+
+	/**
+	 * Fifo size used in back-end.
 	 */
 	protected int fifoSize;
 
-	private IFile inputFile;
-
+	/**
+	 * Contains mapping informations configured before back-end launch. Key is
+	 * the name of an instance, value is a core identifier.
+	 */
 	protected Map<String, String> mapping;
+
+	// FIXME: XCF files are used only in TTA backend. These variables should be
+	// moved in TTABackend class
 	protected boolean importXcfFile;
 	protected File xcfFile;
 
@@ -156,17 +165,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	/**
 	 * List of transformations to apply on each actor
 	 */
-	protected List<DfSwitch<?>> actorTransfos;
+	protected List<DfSwitch<?>> vtlActorsTransfos;
+	/**
+	 * List of transformations to apply on each children
+	 */
+	protected List<DfSwitch<?>> childrenTransfos;
 
+	// Other options
 	protected boolean classify;
 	protected boolean mergeActions;
 	protected boolean mergeActors;
 	protected boolean convertMulti2Mono;
-
-	/**
-	 * the progress monitor
-	 */
-	private IProgressMonitor monitor;
 
 	/**
 	 * Options of backend execution. Its content can be manipulated with
@@ -185,25 +194,30 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected IProject project;
 
 	/**
-	 * Path of the folder that contains VTL under IR form.
-	 */
-	private List<IFolder> vtlFolders;
-
-	/**
 	 * This ResourceSet can be used by concrete back-ends when needed
 	 */
 	protected ResourceSet currentResourceSet;
+	/**
+	 * the progress monitor
+	 */
+	private IProgressMonitor monitor;
 
 	/**
-	 * Initialize some members
+	 * Construct a new standard back-end.
 	 */
 	public AbstractBackend() {
 		this(false);
 	}
 
+	/**
+	 * Construct a new back-end instance.
+	 * 
+	 * @param isVTLBackend Set to true if this back-end will generate a complete VTL.
+	 */
 	public AbstractBackend(boolean isVTLBackend) {
-		actorTransfos = new ArrayList<DfSwitch<?>>();
 		networkTransfos = new ArrayList<DfSwitch<?>>();
+		vtlActorsTransfos = new ArrayList<DfSwitch<?>>();
+		childrenTransfos = new ArrayList<DfSwitch<?>>();
 
 		currentResourceSet = new ResourceSetImpl();
 
@@ -254,19 +268,24 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	final private void compileVTL() {
+
 		// lists actors
 		OrccLogger.traceln("Lists actors...");
-		List<IFile> vtlFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX,
-				vtlFolders);
-		doVtlCodeGeneration(vtlFiles);
+		List<IFolder> projectsFolders = OrccUtil.getOutputFolders(project);
+		List<IFile> irFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX,
+				projectsFolders);
+		doVtlCodeGeneration(irFiles);
 	}
 
 	final private void compileXDF() {
+		IFile xdfFile = getFile(project, getAttribute(XDF_FILE, ""),
+				OrccUtil.NETWORK_SUFFIX);
+
 		// parses top network
-		if (inputFile == null) {
+		if (xdfFile == null) {
 			throw new OrccRuntimeException("The input XDF file does not exist.");
 		}
-		Network network = EcoreHelper.getEObject(currentResourceSet, inputFile);
+		Network network = EcoreHelper.getEObject(currentResourceSet, xdfFile);
 		if (isCanceled()) {
 			return;
 		}
@@ -411,7 +430,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Returns a map containing the backend attributes in this launch
+	 * Returns a map containing the back-end attributes in this launch
 	 * configuration. Returns an empty map if the backend configuration has no
 	 * attributes.
 	 * 
@@ -542,7 +561,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Prints the given instance. Should be overridden by back-ends that wish to
+	 * Prints the given instance. Should be overridden by back-ends that need to
 	 * print the given instance.
 	 * 
 	 * @param instance
@@ -574,11 +593,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		project = root.getProject(getAttribute(PROJECT, ""));
-
-		vtlFolders = OrccUtil.getOutputFolders(project);
-
-		inputFile = getFile(project, getAttribute(XDF_FILE, ""),
-				OrccUtil.NETWORK_SUFFIX);
 
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		debug = getAttribute(DEBUG_MODE, DEFAULT_DEBUG);
