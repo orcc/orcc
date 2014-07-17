@@ -66,4 +66,7 @@ public class BackendsConstants {
 	public static final String FPGA_CONFIGURATION = "net.sf.orcc.backends.fpga";
 	public static final String FPGA_DEFAULT_CONFIGURATION = "Stratix III (EP3SL150F1152C2)";
 
+	public static final String JIT_BIT_ACCURATE = "net.sf.orcc.backends.llvm.jit.bitaccurate";
+	public static final boolean JIT_BIT_ACCURATE_DEFAULT = false;
+
 }

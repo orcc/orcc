@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.BackendsConstants;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
@@ -106,7 +107,8 @@ public class JadeBackend extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		bitAccurate = getAttribute("net.sf.orcc.backends.llvm.jit.bitaccurate", false);
+		bitAccurate = getAttribute(BackendsConstants.JIT_BIT_ACCURATE,
+				BackendsConstants.JIT_BIT_ACCURATE_DEFAULT);
 	}
 
 	@Override
