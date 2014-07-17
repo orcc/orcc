@@ -91,6 +91,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -187,11 +188,18 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	private List<IFolder> vtlFolders;
 
 	/**
+	 * This ResourceSet can be used by concrete back-ends when needed
+	 */
+	protected ResourceSet currentResourceSet;
+
+	/**
 	 * Initialize some members
 	 */
 	public AbstractBackend() {
 		actorTransfos = new ArrayList<DfSwitch<?>>();
 		networkTransfos = new ArrayList<DfSwitch<?>>();
+
+		currentResourceSet = new ResourceSetImpl();
 	}
 
 	@Override
@@ -244,13 +252,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	final private void compileXDF() {
-		ResourceSet set = new ResourceSetImpl();
-
 		// parses top network
 		if (inputFile == null) {
 			throw new OrccRuntimeException("The input XDF file does not exist.");
 		}
-		Network network = EcoreHelper.getEObject(set, inputFile);
+		Network network = EcoreHelper.getEObject(currentResourceSet, inputFile);
 		if (isCanceled()) {
 			return;
 		}
@@ -429,10 +435,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// particular concerning types), and instantiation then complains.
 
 		OrccLogger.traceln("Parsing " + files.size() + " actors...");
-		ResourceSet set = new ResourceSetImpl();
+
 		List<Actor> actors = new ArrayList<Actor>();
 		for (IFile file : files) {
-			Resource resource = set.getResource(org.eclipse.emf.common.util.URI
+			Resource resource = currentResourceSet.getResource(URI
 					.createPlatformResourceURI(file.getFullPath().toString(),
 							true), true);
 			EObject eObject = resource.getContents().get(0);

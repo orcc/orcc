@@ -58,7 +58,6 @@ import net.sf.orcc.util.Result;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -176,7 +175,7 @@ public class COMPABackend extends CBackend {
 		OrccLogger.traceln("Print flattened and attributed network...");
 		URI uri = URI.createFileURI(srcPath + File.separator
 				+ network.getSimpleName() + ".xdf");
-		Resource resource = new ResourceSetImpl().createResource(uri);
+		Resource resource = currentResourceSet.createResource(uri);
 		resource.getContents().add(network);
 		try {
 			resource.save(null);
