@@ -102,8 +102,9 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			return clasz.getMethod(procedure.getName(), parameterTypes).invoke(
 					null, args);
 		} catch (Exception e) {
-			throw new OrccRuntimeException("Native produre call Exception for "
-					+ procedure.getName(), e);
+			throw new OrccRuntimeException(
+					"Native procedure call Exception for "
+							+ procedure.getName(), e);
 		}
 	}
 
