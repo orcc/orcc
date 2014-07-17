@@ -205,7 +205,7 @@ void saoFilterEdge_orcc(u8 saoEoClass, u8 cIdx, u8 cIdxOffset, u16 idxOrig[2], u
 	borders[2] = (idxOrig[0] + xMax2 == picSize[0]);
 	borders[3] = (idxOrig[1] + yMax2 == picSize[1]);
 
-	ff_hevc_sao_edge_filter_0_8_mult_stride_sse(ptrDst, 4096, ptrSrc,
+	ff_hevc_sao_edge_filter_0_8_sse(ptrDst, ptrSrc,
 		4096, &sao, borders, xMax2, yMax2, cIdx, NULL, NULL, NULL);
 }
 
@@ -226,9 +226,8 @@ void saoBandFilter_orcc(u8 saoLeftClass, i32 saoOffset[5], u8 cIdx, u8 cIdxOffse
 		sao.offset_val[cIdx][i] = saoOffset[i];
 	}
 
-	ff_hevc_sao_band_filter_0_8_mult_stride_sse(ptrDst, 4096,
-		ptrSrc, 4096, &sao, NULL, idxMax[0] - idxMin[0] + 1,
-		idxMax[1] - idxMin[1] + 1, cIdx);
+	ff_hevc_sao_band_filter_0_8_sse(ptrDst, ptrSrc,
+		4096, &sao, NULL, idxMax[0] - idxMin[0] + 1, idxMax[1] - idxMin[1] + 1,	cIdx);
 }
 
 /* DBF */
