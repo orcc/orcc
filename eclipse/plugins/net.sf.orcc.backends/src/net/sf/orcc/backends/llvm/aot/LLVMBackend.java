@@ -77,8 +77,6 @@ import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
-import org.eclipse.core.resources.IFile;
-
 /**
  * LLVM back-end.
  * 
@@ -189,11 +187,6 @@ public class LLVMBackend extends AbstractBackend {
 
 		new DfVisitor<Void>(new TemplateInfoComputing()).doSwitch(network);
 		network.computeTemplateMaps();
-	}
-
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		// do not generate a VTL
 	}
 
 	@Override

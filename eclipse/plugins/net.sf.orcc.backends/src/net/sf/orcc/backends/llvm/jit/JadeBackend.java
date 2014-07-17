@@ -96,6 +96,10 @@ public class JadeBackend extends AbstractBackend {
 	 * transformation hash map.
 	 */
 	public JadeBackend() {
+		// This back-end must generate a VTL. Configure this option with the
+		// specific constructor call.
+		super(true);
+
 		renameMap = new HashMap<String, String>();
 		renameMap.put("abs", "abs_");
 		renameMap.put("getw", "getw_");

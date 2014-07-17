@@ -57,7 +57,6 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -142,11 +141,6 @@ public class HLSBackend extends CBackend {
 		new ArgumentEvaluator().doSwitch(network);
 		new DisconnectedOutputPortRemoval().doSwitch(network);
 
-	}
-
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		// do not generate a C VTL
 	}
 
 	@Override

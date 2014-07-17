@@ -135,6 +135,8 @@ import org.osgi.framework.Bundle;
  */
 public abstract class AbstractBackend implements Backend, IApplication {
 
+	private boolean isVTLBackend;
+
 	protected boolean debug;
 	/**
 	 * Fifo size used in backend.
@@ -196,10 +198,16 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * Initialize some members
 	 */
 	public AbstractBackend() {
+		this(false);
+	}
+
+	public AbstractBackend(boolean isVTLBackend) {
 		actorTransfos = new ArrayList<DfSwitch<?>>();
 		networkTransfos = new ArrayList<DfSwitch<?>>();
 
 		currentResourceSet = new ResourceSetImpl();
+
+		this.isVTLBackend = isVTLBackend;
 	}
 
 	@Override
@@ -234,7 +242,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			extractLibraries();
 		}
 
-		compileVTL();
+		if(isVTLBackend) {
+			compileVTL();
+		}
 
 		if (compilexdf) {
 			compileXDF();
@@ -290,7 +300,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param files
 	 *            a list of IR files
 	 */
-	abstract protected void doVtlCodeGeneration(List<IFile> files);
+	protected void doVtlCodeGeneration(List<IFile> files) {
+		throw new UnsupportedOperationException("This backend is not supposed to generate a VTL!");
+	}
 
 	/**
 	 * This method must be implemented by subclasses to do the actual code

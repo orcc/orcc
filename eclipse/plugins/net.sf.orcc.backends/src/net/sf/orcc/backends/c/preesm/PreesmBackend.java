@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.c.preesm;
 
-import java.util.List;
-
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
@@ -39,8 +37,6 @@ import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.util.OrccLogger;
-
-import org.eclipse.core.resources.IFile;
 
 /**
  * C backend targetting embedded systems
@@ -55,11 +51,6 @@ public class PreesmBackend extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) {
-	}
-
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		// do not generate an embedded C VTL
 	}
 
 	@Override

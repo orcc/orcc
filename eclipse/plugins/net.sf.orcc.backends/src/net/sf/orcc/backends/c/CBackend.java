@@ -90,7 +90,6 @@ import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -221,11 +220,6 @@ public class CBackend extends AbstractBackend {
 			File f = new File(getAttribute(BXDF_FILE, ""));
 			new XmlBufferSizeConfiguration().load(f, network);
 		}
-	}
-
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		// do not generate a C VTL
 	}
 
 	@Override

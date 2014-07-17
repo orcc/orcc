@@ -68,7 +68,6 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -122,11 +121,6 @@ public class PromelaBackend extends AbstractBackend {
 		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(actor);
 		}
-	}
-
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		// do not generate a PROMELA VTL
 	}
 
 	@Override
