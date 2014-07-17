@@ -36,7 +36,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.ExprVar;
@@ -44,6 +44,8 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.SwitchUtil;
+import net.sf.orcc.util.Void;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
@@ -59,7 +61,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Herve Yviquel
  * 
  */
-public class NetworkFlattener extends DfSwitch<Void> {
+public class NetworkFlattener extends DfVisitor<Void> {
 
 	@Override
 	public Void caseNetwork(Network network) {
@@ -90,7 +92,7 @@ public class NetworkFlattener extends DfSwitch<Void> {
 			subNetwork.removeEdges(subNetwork.getConnections());
 		}
 
-		return null;
+		return SwitchUtil.DONE;
 	}
 
 	/**

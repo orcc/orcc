@@ -37,13 +37,15 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.SwitchUtil;
+import net.sf.orcc.util.Void;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -57,7 +59,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Hervé Yviquel
  * 
  */
-public class Instantiator extends DfSwitch<Void> {
+public class Instantiator extends DfVisitor<Void> {
 
 	private final boolean instantiateActors;
 
@@ -110,7 +112,7 @@ public class Instantiator extends DfSwitch<Void> {
 				}
 			}
 		}
-		return null;
+		return SwitchUtil.DONE;
 	}
 
 	/**
