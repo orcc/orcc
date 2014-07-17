@@ -65,6 +65,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ValueUtil;
@@ -92,9 +93,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.equinox.app.IApplication;
@@ -166,7 +165,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	/**
 	 * List of transformations to apply on each actor
 	 */
-	protected List<DfSwitch<?>> vtlActorsTransfos;
+	protected List<DfVisitor<?>> vtlActorsTransfos;
 	/**
 	 * List of transformations to apply on each children
 	 */
@@ -218,7 +217,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	public AbstractBackend(boolean isVTLBackend) {
 		networkTransfos = new ArrayList<DfSwitch<?>>();
-		vtlActorsTransfos = new ArrayList<DfSwitch<?>>();
+		vtlActorsTransfos = new ArrayList<DfVisitor<?>>();
 		childrenTransfos = new ArrayList<DfSwitch<?>>();
 
 		currentResourceSet = new ResourceSetImpl();
@@ -285,7 +284,30 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			List<IFolder> projectsFolders = OrccUtil.getOutputFolders(project);
 			List<IFile> irFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX,
 					projectsFolders);
-			doVtlCodeGeneration(irFiles);
+			List<Actor> actors = new ArrayList<Actor>();
+			OrccLogger.traceln("Parsing " + irFiles.size() + " actors...");
+
+			for (IFile file : irFiles) {
+				EObject eObject = EcoreHelper.getEObject(currentResourceSet, file);
+				if (eObject instanceof Actor) {
+					// do not add units
+					actors.add((Actor) eObject);
+				}
+			}
+
+			// The old way to transform and print VTL actors
+			transformActors(actors);
+			printActors(actors);
+
+			// The new way
+			applyTransformations(actors, vtlActorsTransfos);
+			Result result = Result.EMPTY_RESULT;
+			for(final Actor actor : actors) {
+				result.merge(printActor2(actor));
+			}
+
+			// Finalize actor generation
+			OrccLogger.traceln("Finalize actors...");
 		}
 
 		OrccLogger.traceln("Orcc backend done.");
@@ -344,6 +366,18 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected Result extractLibraries() {
 		return Result.EMPTY_RESULT;
+	}
+
+	private <T extends EObject> void applyTransformations(Iterable<T> objects, Iterable<DfVisitor<?>> transformations) {
+		for(final T object : objects) {
+			applyTransformations(object, transformations);
+		}
+	}
+
+	private void applyTransformations(EObject object, Iterable<DfVisitor<?>> transformations) {
+		for(final DfVisitor<?> transformation : transformations) {
+			transformation.doSwitch(object);
+		}
 	}
 
 	/**
@@ -479,10 +513,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		List<Actor> actors = new ArrayList<Actor>();
 		for (IFile file : files) {
-			Resource resource = currentResourceSet.getResource(URI
-					.createPlatformResourceURI(file.getFullPath().toString(),
-							true), true);
-			EObject eObject = resource.getContents().get(0);
+			EObject eObject = EcoreHelper.getEObject(currentResourceSet, file);
 			if (eObject instanceof Actor) {
 				// do not add units
 				actors.add((Actor) eObject);
@@ -504,8 +535,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            the actor
 	 * @return <code>true</code> if the actor was cached
 	 */
+	@Deprecated
 	protected boolean printActor(Actor actor) {
 		return false;
+	}
+
+	// TODO: rename this method to printActor when the original will be removed.
+	protected Result printActor2(final Actor actor) {
+		return Result.EMPTY_RESULT;
 	}
 
 	/**
@@ -514,6 +551,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param actors
 	 *            a list of actors
 	 */
+	@Deprecated
 	final public void printActors(List<Actor> actors) {
 		OrccLogger.traceln("Printing actors...");
 		long t0 = System.currentTimeMillis();
@@ -825,6 +863,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param actors
 	 *            a list of actors
 	 */
+	@Deprecated
 	final public void transformActors(List<Actor> actors) {
 		OrccLogger.traceln("Transforming actors...");
 		for (Actor actor : actors) {

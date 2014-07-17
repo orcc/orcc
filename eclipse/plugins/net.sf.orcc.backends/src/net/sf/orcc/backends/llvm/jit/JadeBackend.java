@@ -76,8 +76,6 @@ import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Void;
 
-import org.eclipse.core.resources.IFile;
-
 /**
  * LLVM back-end.
  * 
@@ -155,22 +153,6 @@ public class JadeBackend extends AbstractBackend {
 		for (DfSwitch<?> transformation : transfos) {
 			transformation.doSwitch(actor);
 		}
-	}
-
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		List<Actor> actors = parseActors(files);
-
-		// transforms and prints actors
-		transformActors(actors);
-		printActors(actors);
-
-		if (isCanceled()) {
-			return;
-		}
-
-		// Finalize actor generation
-		OrccLogger.traceln("Finalize actors...");
 	}
 
 	@Override
