@@ -42,11 +42,20 @@ static int init = 0;
 static int x, y , onclick = 0;
 static SDL_Rect rect;
 
+
+void getSdlOverlay(SDL_Overlay **overlay) {
+	*overlay = m_overlay;
+}
+
+void getSdlRect(SDL_Rect **rect_env) {
+	*rect_env = &rect;
+}
+
 char displayYUV_getFlags(){
     return opt->display_flags;
 }
 
-static void displayYUV_setSize(int width, int height) {
+void displayYUV_setSize(int width, int height) {
     print_orcc_trace(ORCC_VL_VERBOSE_1, "set display to %ix%i", width, height);
 
     m_screen = SDL_SetVideoMode(width, height, 32, SDL_HWSURFACE);

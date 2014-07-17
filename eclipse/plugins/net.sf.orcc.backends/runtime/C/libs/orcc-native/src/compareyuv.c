@@ -41,7 +41,7 @@ static FILE        *ptrFile ;
 static unsigned int fileSize;
 static char         useCompare;
 
-static int compareYUV_compareComponent(
+int compareYUV_compareComponent(
         const int x_size, const int y_size,
         const unsigned char *true_img_uchar,
         const unsigned char *test_img_uchar,
@@ -107,7 +107,7 @@ void compareYUV_init()
     compareErrors = 0;
 }
 
-static void compareYUV_readComponent(unsigned char **Component, unsigned short width, unsigned short height, char sizeChanged) {
+void compareYUV_readComponent(unsigned char **Component, unsigned short width, unsigned short height, char sizeChanged) {
     size_t numByteRead;
 
     if(*Component == NULL) {
