@@ -284,7 +284,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// parses top network
 		if (xdfFile == null) {
-			throw new OrccRuntimeException("The input XDF file does not exist.");
+			throw new OrccRuntimeException("The input XDF file does not exists.");
 		}
 		Network network = EcoreHelper.getEObject(currentResourceSet, xdfFile);
 		if (isCanceled()) {
