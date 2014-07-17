@@ -204,7 +204,7 @@ public class LLVMBackend extends AbstractBackend {
 
 		// print network
 		OrccLogger.traceln("Printing network...");
-		new NetworkPrinter(network, options).print(srcPath);
+		new NetworkPrinter(network, getOptions()).print(srcPath);
 
 		CMakePrinter printer = new CMakePrinter(network);
 		FilesManager.writeFile(printer.rootCMakeContent(), path, "CMakeLists.txt");
@@ -228,12 +228,12 @@ public class LLVMBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(options).print(srcPath, instance) > 0;
+		return new InstancePrinter(getOptions()).print(srcPath, instance) > 0;
 	}
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(options).print(srcPath, actor) > 0;
+		return new InstancePrinter(getOptions()).print(srcPath, actor) > 0;
 	}
 
 }

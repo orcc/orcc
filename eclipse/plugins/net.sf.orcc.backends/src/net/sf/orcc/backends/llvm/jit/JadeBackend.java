@@ -111,7 +111,7 @@ public class JadeBackend extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		bitAccurate = getAttribute(BackendsConstants.JIT_BIT_ACCURATE,
+		bitAccurate = getOption(BackendsConstants.JIT_BIT_ACCURATE,
 				BackendsConstants.JIT_BIT_ACCURATE_DEFAULT);
 	}
 
@@ -203,6 +203,6 @@ public class JadeBackend extends AbstractBackend {
 	@Override
 	protected boolean printActor(Actor actor) {
 		String folder = path + File.separator + DfUtil.getFolder(actor);
-		return new ActorPrinter(options).print(folder, actor) > 0;
+		return new ActorPrinter(getOptions()).print(folder, actor) > 0;
 	}
 }

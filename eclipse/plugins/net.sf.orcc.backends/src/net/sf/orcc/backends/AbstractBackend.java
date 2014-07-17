@@ -181,7 +181,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * Options of backend execution. Its content can be manipulated with
 	 * {@link #getAttribute} and {@link #setAttribute}
 	 */
-	protected Map<String, Object> options;
+	private Map<String, Object> options;
 
 	/**
 	 * Path where output files will be written.
@@ -212,7 +212,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	/**
 	 * Construct a new back-end instance.
 	 * 
-	 * @param isVTLBackend Set to true if this back-end will generate a complete VTL.
+	 * @param isVTLBackend
+	 *            Set to true if this back-end will generate a complete VTL.
 	 */
 	public AbstractBackend(boolean isVTLBackend) {
 		networkTransfos = new ArrayList<DfSwitch<?>>();
@@ -227,7 +228,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	@Override
 	public void compile() {
 
-		boolean compilexdf = getAttribute(COMPILE_XDF, false);
+		boolean compilexdf = getOption(COMPILE_XDF, false);
 
 		String orccVersion = "<unknown>";
 		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
@@ -235,7 +236,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			orccVersion = bundle.getHeaders().get("Bundle-Version");
 		}
 
-		String backendName = getAttribute(BACKEND, "<unknown>");
+		String backendName = getOption(BACKEND, "<unknown>");
 
 		OrccLogger.traceln("*********************************************"
 				+ "************************************");
@@ -243,7 +244,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		OrccLogger.traceln("* Backend : " + backendName);
 		OrccLogger.traceln("* Project : " + project.getName());
 		if (compilexdf) {
-			String topNetwork = getAttribute(XDF_FILE, "<unknown>");
+			String topNetwork = getOption(XDF_FILE, "<unknown>");
 			OrccLogger.traceln("* Network : " + topNetwork);
 		}
 		OrccLogger.traceln("* Output folder : " + path);
@@ -252,11 +253,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// If user checked the option "Don't export library", the method
 		// extractLibraries() must not be called
-		if(!getAttribute(NO_LIBRARY_EXPORT, false)) {
+		if (!getOption(NO_LIBRARY_EXPORT, false)) {
 			extractLibraries();
 		}
 
-		if(isVTLBackend) {
+		if (isVTLBackend) {
 			compileVTL();
 		}
 
@@ -278,7 +279,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	final private void compileXDF() {
-		IFile xdfFile = getFile(project, getAttribute(XDF_FILE, ""),
+		IFile xdfFile = getFile(project, getOption(XDF_FILE, ""),
 				OrccUtil.NETWORK_SUFFIX);
 
 		// parses top network
@@ -320,7 +321,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            a list of IR files
 	 */
 	protected void doVtlCodeGeneration(List<IFile> files) {
-		throw new UnsupportedOperationException("This backend is not supposed to generate a VTL!");
+		throw new UnsupportedOperationException(
+				"This backend is not supposed to generate a VTL!");
 	}
 
 	/**
@@ -361,7 +363,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            the value to use if no value is found
 	 * @return the value or the default value if no value was found.
 	 */
-	final public boolean getAttribute(String attributeName, boolean defaultValue) {
+	final public boolean getOption(String attributeName, boolean defaultValue) {
 		Object obj = options.get(attributeName);
 		if (obj instanceof Boolean) {
 			return (Boolean) obj;
@@ -380,7 +382,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            the value to use if no value is found
 	 * @return the value or the default value if no value was found.
 	 */
-	final public int getAttribute(String attributeName, int defaultValue) {
+	final public int getOption(String attributeName, int defaultValue) {
 		Object obj = options.get(attributeName);
 		if (obj instanceof Integer) {
 			return (Integer) obj;
@@ -400,7 +402,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @return the value or the default value if no value was found.
 	 */
 	@SuppressWarnings("unchecked")
-	final public Map<String, String> getAttribute(String attributeName,
+	final public Map<String, String> getOption(String attributeName,
 			Map<String, String> defaultValue) {
 		Object obj = options.get(attributeName);
 		if (obj instanceof Map<?, ?>) {
@@ -420,7 +422,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            the value to use if no value is found
 	 * @return the value or the default value if no value was found.
 	 */
-	final public String getAttribute(String attributeName, String defaultValue) {
+	final public String getOption(String attributeName, String defaultValue) {
 		Object obj = options.get(attributeName);
 		if (obj instanceof String) {
 			return (String) obj;
@@ -436,7 +438,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @return a map of attribute keys and values.
 	 */
-	final public Map<String, Object> getAttributes() {
+	final public Map<String, Object> getOptions() {
 		return options;
 	}
 
@@ -592,25 +594,25 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		this.options = options;
 
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		project = root.getProject(getAttribute(PROJECT, ""));
+		project = root.getProject(getOption(PROJECT, ""));
 
-		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-		debug = getAttribute(DEBUG_MODE, DEFAULT_DEBUG);
+		fifoSize = getOption(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+		debug = getOption(DEBUG_MODE, DEFAULT_DEBUG);
 
-		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-		importXcfFile = getAttribute(BackendsConstants.IMPORT_XCF, false);
+		mapping = getOption(MAPPING, new HashMap<String, String>());
+		importXcfFile = getOption(BackendsConstants.IMPORT_XCF, false);
 		if (importXcfFile) {
-			xcfFile = new File(getAttribute(BackendsConstants.XCF_FILE, ""));
+			xcfFile = new File(getOption(BackendsConstants.XCF_FILE, ""));
 		}
 
-		classify = getAttribute(CLASSIFY, false);
+		classify = getOption(CLASSIFY, false);
 		// Merging transformations need the results of classification
-		mergeActions = classify && getAttribute(MERGE_ACTIONS, false);
-		mergeActors = classify && getAttribute(MERGE_ACTORS, false);
+		mergeActions = classify && getOption(MERGE_ACTIONS, false);
+		mergeActors = classify && getOption(MERGE_ACTORS, false);
 
-		convertMulti2Mono = getAttribute(CONVERT_MULTI2MONO, false);
+		convertMulti2Mono = getOption(CONVERT_MULTI2MONO, false);
 
-		String outputFolder = getAttribute(OUTPUT_FOLDER, "");
+		String outputFolder = getOption(OUTPUT_FOLDER, "");
 		if (outputFolder.isEmpty()) {
 			File tempOrccDir = new File(System.getProperty("java.io.tmpdir"),
 					"orcc");

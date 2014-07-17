@@ -108,14 +108,14 @@ public class TTABackend extends LLVMBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		finalize = getAttribute("net.sf.orcc.backends.tta.finalizeGeneration",
+		finalize = getOption("net.sf.orcc.backends.tta.finalizeGeneration",
 				false);
-		fpga = FPGA.builder(getAttribute(FPGA_CONFIGURATION,
+		fpga = FPGA.builder(getOption(FPGA_CONFIGURATION,
 				FPGA_DEFAULT_CONFIGURATION));
-		configuration = ProcessorConfiguration.getByName(getAttribute(
+		configuration = ProcessorConfiguration.getByName(getOption(
 				TTA_PROCESSORS_CONFIGURATION,
 				TTA_DEFAULT_PROCESSORS_CONFIGURATION));
-		reduceConnections = getAttribute(
+		reduceConnections = getOption(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
 	}
 
@@ -205,7 +205,7 @@ public class TTABackend extends LLVMBackend {
 		// Build the design from the mapping
 		OrccLogger.traceln("TTA Architecture configuration setted to : "
 				+ configuration.getName());
-		int fifosize = getAttribute(OrccLaunchConstants.FIFO_SIZE, OrccLaunchConstants.DEFAULT_FIFO_SIZE);
+		int fifosize = getOption(OrccLaunchConstants.FIFO_SIZE, OrccLaunchConstants.DEFAULT_FIFO_SIZE);
 		design = new ArchitectureBuilder().build(network, configuration,
 				computedMapping, reduceConnections, fifosize);
 
@@ -263,7 +263,7 @@ public class TTABackend extends LLVMBackend {
 
 		// Create TCE project
 		new PyDesignPrinter(fpga).print(design, path);
-		new TceDesignPrinter(options, path).print(design, path);
+		new TceDesignPrinter(getOptions(), path).print(design, path);
 
 		new Dota().print(design, path, "top.dot");
 
@@ -316,20 +316,20 @@ public class TTABackend extends LLVMBackend {
 				tta, processorPath);
 
 		// Print assembly code of actor-scheduler
-		cached += new SwProcessorPrinter(options).print(tta, processorPath);
+		cached += new SwProcessorPrinter(getOptions()).print(tta, processorPath);
 
 		return cached;
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new SwActorPrinter(options, design.getActorToProcessorMap().get(
+		return new SwActorPrinter(getOptions(), design.getActorToProcessorMap().get(
 				instance)).print(actorsPath, instance) > 0;
 	}
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		return new SwActorPrinter(options, design.getActorToProcessorMap().get(
+		return new SwActorPrinter(getOptions(), design.getActorToProcessorMap().get(
 				actor)).print(actorsPath, actor) > 0;
 	}
 

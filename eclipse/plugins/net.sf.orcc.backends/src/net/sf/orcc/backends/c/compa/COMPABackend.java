@@ -150,7 +150,7 @@ public class COMPABackend extends CBackend {
 		
 		// Print fifo allocation file into the orcc lib include folder.
 		OrccLogger.trace("Printing the fifo allocation file... ");
-		if (new NetworkPrinter(network, options).printFifoFile(path + "/libs/orcc/include") > 0) {
+		if (new NetworkPrinter(network, getOptions()).printFifoFile(path + "/libs/orcc/include") > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 		OrccLogger.traceRaw("Done\n");
@@ -159,7 +159,7 @@ public class COMPABackend extends CBackend {
 		if (printTop){
 			// print network
 			OrccLogger.trace("Printing network... ");
-			if (new NetworkPrinter(network, options).print(srcPath) > 0) {
+			if (new NetworkPrinter(network, getOptions()).print(srcPath) > 0) {
 				OrccLogger.traceRaw("Cached\n");
 			} else {
 				OrccLogger.traceRaw("Done\n");
@@ -194,22 +194,22 @@ public class COMPABackend extends CBackend {
 //			OrccLogger.warnRaw("Error" + "\n");
 //		}
 		if (printTop)
-			return new InstancePrinter(options, printTop).print(srcPath, instance) > 0;
+			return new InstancePrinter(getOptions(), printTop).print(srcPath, instance) > 0;
 		else {
 			CharSequence content = new CMakePrinter().rootCMakeContent(instance.getSimpleName());
 			FilesManager.writeFile(content, path + File.separator + instance.getSimpleName(), "CMakeLists.txt");
-			return new InstancePrinter(options, printTop).print(path + File.separator + instance.getSimpleName(), instance) > 0;
+			return new InstancePrinter(getOptions(), printTop).print(path + File.separator + instance.getSimpleName(), instance) > 0;
 		}
 	}
 	
 	@Override
 	protected boolean printActor(Actor actor) {
 		if (printTop)
-			return new InstancePrinter(options, printTop).print(srcPath, actor) > 0;
+			return new InstancePrinter(getOptions(), printTop).print(srcPath, actor) > 0;
 		else {
 			CharSequence content = new CMakePrinter().rootCMakeContent(actor.getSimpleName());
 			FilesManager.writeFile(content, path + File.separator + actor.getSimpleName(), "CMakeLists.txt");
-			return new InstancePrinter(options, printTop).print(path + File.separator + actor.getSimpleName(), actor) > 0;
+			return new InstancePrinter(getOptions(), printTop).print(path + File.separator + actor.getSimpleName(), actor) > 0;
 		}
 	}
 }

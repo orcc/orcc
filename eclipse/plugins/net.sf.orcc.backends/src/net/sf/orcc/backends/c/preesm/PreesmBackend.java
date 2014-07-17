@@ -109,6 +109,6 @@ public class PreesmBackend extends AbstractBackend {
 	 */
 	@Override
 	protected boolean printActor(Actor actor) {
-		return new ActorPrinter(options).print(path, actor) != 0;
+		return new ActorPrinter(getOptions()).print(path, actor) != 0;
 	}
 }

@@ -147,7 +147,7 @@ public class CBackend extends AbstractBackend {
 
 		// If "-t" option is passed to command line, apply additional
 		// transformations
-		if (getAttribute(ADDITIONAL_TRANSFOS, false)) {
+		if (getOption(ADDITIONAL_TRANSFOS, false)) {
 			transformations.add(new StoreOnceTransformation());
 			transformations.add(new DfVisitor<Void>(new SSATransformation()));
 			transformations.add(new DfVisitor<Void>(new PhiRemoval()));
@@ -216,8 +216,8 @@ public class CBackend extends AbstractBackend {
 		new ArgumentEvaluator().doSwitch(network);
 
 		// if required, load the buffer size from the mapping file
-		if (getAttribute(IMPORT_BXDF, false)) {
-			File f = new File(getAttribute(BXDF_FILE, ""));
+		if (getOption(IMPORT_BXDF, false)) {
+			File f = new File(getOption(BXDF_FILE, ""));
 			new XmlBufferSizeConfiguration().load(f, network);
 		}
 	}
@@ -242,7 +242,7 @@ public class CBackend extends AbstractBackend {
 
 		// print network
 		OrccLogger.trace("Printing network... ");
-		if (new NetworkPrinter(network, options).print(srcPath) > 0) {
+		if (new NetworkPrinter(network, getOptions()).print(srcPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
@@ -297,12 +297,12 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(options).print(srcPath, instance) > 0;
+		return new InstancePrinter(getOptions()).print(srcPath, instance) > 0;
 	}
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(options).print(srcPath, actor) > 0;
+		return new InstancePrinter(getOptions()).print(srcPath, actor) > 0;
 	}
 
 }

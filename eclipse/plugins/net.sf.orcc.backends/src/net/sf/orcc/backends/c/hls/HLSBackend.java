@@ -160,28 +160,28 @@ public class HLSBackend extends CBackend {
 
 		// print network
 		OrccLogger.trace("Printing network... ");
-		if (new NetworkPrinter(network, options).print(srcPath) > 0) {
+		if (new NetworkPrinter(network, getOptions()).print(srcPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
 
 		OrccLogger.trace("Printing network testbench... ");
-		if (new NetworkTestBenchPrinter(network, options).print(srcPath) > 0) {// VHDLTestBenchPath
+		if (new NetworkTestBenchPrinter(network, getOptions()).print(srcPath) > 0) {// VHDLTestBenchPath
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
 
 		OrccLogger.trace("Printing network VHDL Top... ");
-		if (new TopVhdlPrinter(network, options).print(srcPath) > 0) {
+		if (new TopVhdlPrinter(network, getOptions()).print(srcPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
 
 		OrccLogger.trace("Printing batch command... ");
-		if (new BatchCommandPrinter(network, options).print(commandPath) > 0) {
+		if (new BatchCommandPrinter(network, getOptions()).print(commandPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
@@ -192,12 +192,12 @@ public class HLSBackend extends CBackend {
 	@Override
 	protected boolean printInstance(Instance instance) {
 
-		new InstanceCosimPrinter(options).print(srcPath, instance);
-		new InstancePrinterCast(options).print(srcPath, instance);
-		new ActorTopVhdlPrinter(options).print(srcPath, instance);
-		new ActorNetworkTestBenchPrinter(options).print(srcPath, instance);
-		new UnitaryBatchCommandPrinter(options).print(commandPath, instance);
-		return new InstancePrinter(options).print(srcPath, instance) > 0;
+		new InstanceCosimPrinter(getOptions()).print(srcPath, instance);
+		new InstancePrinterCast(getOptions()).print(srcPath, instance);
+		new ActorTopVhdlPrinter(getOptions()).print(srcPath, instance);
+		new ActorNetworkTestBenchPrinter(getOptions()).print(srcPath, instance);
+		new UnitaryBatchCommandPrinter(getOptions()).print(commandPath, instance);
+		return new InstancePrinter(getOptions()).print(srcPath, instance) > 0;
 
 	}
 }
