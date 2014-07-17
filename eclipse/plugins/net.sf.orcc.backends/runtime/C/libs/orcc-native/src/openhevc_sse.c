@@ -79,6 +79,7 @@ int openhevc_init_context()
 {
     ff_hevc_dsp_init(&hevcDsp, 8);
     ff_hevc_pred_init(&hevcPred, 8);
+
     return 0;
 }
 
@@ -165,6 +166,69 @@ void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i3
     u8 *left = _left + 1;
 
     hevcPred.pred_planar[log2size - 2](src, top, left, stride);
+}
+
+/* SAO */
+
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+
+void saoFilterEdge_orcc(u8 saoEoClass, u8 cIdx, u8 cIdxOffset, u16 idxOrig[2], u8 lcuSizeMax,
+	u16 picSize[2], u8 lcuIsPictBorder, i32 saoOffset[5],
+	u8 filtAcrossSlcAndTiles,
+	u8 * pucOrigPict,
+	u8 * pucFiltPict,
+	u8 saoTypeIdx[8])
+{
+	u8 * ptrDst = &pucFiltPict[cIdxOffset * 2048 * 4096 + idxOrig[1] * 4096 + idxOrig[0]];
+	u8 * ptrSrc = &pucOrigPict[cIdxOffset * 2048 * 4096 + idxOrig[1] * 4096 + idxOrig[0]];
+
+	int borders[4];
+	struct SAOParams sao;
+	int i, x, y;
+	i16 xMax;
+	u16 yMax;
+	i16 xMax2;
+	u16 yMax2;
+
+	sao.eo_class[cIdx] = saoEoClass;
+	for(i = 0; i < 5; i++) {
+		sao.offset_val[cIdx][i] = saoOffset[i];
+	}
+
+	xMax = min(lcuSizeMax - 1, picSize[0] - idxOrig[0] - 1);
+	yMax = min(lcuSizeMax - 1, picSize[1] - idxOrig[1] - 1);
+	xMax2 = min(lcuSizeMax, picSize[0] - idxOrig[0]);
+	yMax2 = min(lcuSizeMax, picSize[1] - idxOrig[1]);
+
+	borders[0] = (idxOrig[0] == 0);
+	borders[1] = (idxOrig[1] == 0);
+	borders[2] = (idxOrig[0] + xMax2 == picSize[0]);
+	borders[3] = (idxOrig[1] + yMax2 == picSize[1]);
+
+	ff_hevc_sao_edge_filter_0_8_mult_stride_sse(ptrDst, 4096, ptrSrc,
+		4096, &sao, borders, xMax2, yMax2, cIdx, NULL, NULL, NULL);
+}
+
+
+void saoBandFilter_orcc(u8 saoLeftClass, i32 saoOffset[5], u8 cIdx, u8 cIdxOffset, i16 idxMin[2],
+	i16 idxMax[2],
+	u8 * pucOrigPict,
+	u8 * pucFiltPict) {
+
+	u8 * ptrDst = &pucFiltPict[cIdxOffset * 2048 * 4096 + idxMin[1] * 4096 + idxMin[0]];
+	u8 * ptrSrc = &pucOrigPict[cIdxOffset * 2048 * 4096 + idxMin[1] * 4096 + idxMin[0]];
+
+	struct SAOParams sao;
+	int i;
+
+	sao.band_position[cIdx] = saoLeftClass;
+	for(i = 0; i < 5; i++) {
+		sao.offset_val[cIdx][i] = saoOffset[i];
+	}
+
+	ff_hevc_sao_band_filter_0_8_mult_stride_sse(ptrDst, 4096,
+		ptrSrc, 4096, &sao, NULL, idxMax[0] - idxMin[0] + 1,
+		idxMax[1] - idxMin[1] + 1, cIdx);
 }
 
 /* DBF */
