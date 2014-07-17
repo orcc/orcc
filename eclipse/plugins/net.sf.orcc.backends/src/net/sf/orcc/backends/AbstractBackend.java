@@ -234,11 +234,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			extractLibraries();
 		}
 
-		compileVTL();
-
 		if (compilexdf) {
 			compileXDF();
 		}
+
+		compileVTL();
 
 		OrccLogger.traceln("Orcc backend done.");
 	}
