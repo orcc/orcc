@@ -259,44 +259,36 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		if (compilexdf) {
-			compileXDF();
+			IFile xdfFile = getFile(project, getOption(XDF_FILE, ""),
+					OrccUtil.NETWORK_SUFFIX);
+
+			// parses top network
+			if (xdfFile == null) {
+				throw new OrccRuntimeException(
+						"The input XDF file does not exists.");
+			}
+			Network network = EcoreHelper.getEObject(currentResourceSet,
+					xdfFile);
+			if (isCanceled()) {
+				return;
+			}
+			new NetworkValidator().doSwitch(network);
+
+			if (isCanceled()) {
+				return;
+			}
+			doXdfCodeGeneration(network);
 		}
 
 		if (isVTLBackend) {
-			compileVTL();
+			OrccLogger.traceln("Lists actors...");
+			List<IFolder> projectsFolders = OrccUtil.getOutputFolders(project);
+			List<IFile> irFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX,
+					projectsFolders);
+			doVtlCodeGeneration(irFiles);
 		}
 
 		OrccLogger.traceln("Orcc backend done.");
-	}
-
-	final private void compileVTL() {
-
-		// lists actors
-		OrccLogger.traceln("Lists actors...");
-		List<IFolder> projectsFolders = OrccUtil.getOutputFolders(project);
-		List<IFile> irFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX,
-				projectsFolders);
-		doVtlCodeGeneration(irFiles);
-	}
-
-	final private void compileXDF() {
-		IFile xdfFile = getFile(project, getOption(XDF_FILE, ""),
-				OrccUtil.NETWORK_SUFFIX);
-
-		// parses top network
-		if (xdfFile == null) {
-			throw new OrccRuntimeException("The input XDF file does not exists.");
-		}
-		Network network = EcoreHelper.getEObject(currentResourceSet, xdfFile);
-		if (isCanceled()) {
-			return;
-		}
-		new NetworkValidator().doSwitch(network);
-
-		if (isCanceled()) {
-			return;
-		}
-		doXdfCodeGeneration(network);
 	}
 
 	/**
