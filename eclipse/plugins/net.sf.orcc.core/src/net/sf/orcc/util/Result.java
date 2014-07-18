@@ -81,4 +81,8 @@ public class Result {
 		builder.append(cached).append(" file(s) cached");
 		return builder.toString();
 	}
+
+	public boolean isEmpty() {
+		return written == 0 && cached == 0;
+	}
 }
