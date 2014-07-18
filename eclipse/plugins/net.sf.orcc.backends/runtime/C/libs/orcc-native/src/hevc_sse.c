@@ -86,7 +86,7 @@ void copy_ ## H ## _ ## J ## _ ## K ## _orcc(                                   
 		m128iInputSample = _mm_loadu_si128(pm128iInputSample + i);                      \
 		_mm_storeu_si128(pm128iOutputSample + i, m128iInputSample);                     \
 	}                                                                                   \
-	if (BLKSIZE_MOD_VECTSIZE(K, H, 128) == 8)                                           \
+	if (BLKSIZE_MOD_VECTSIZE(K, H, 128) == 64)                                           \
 	{                                                                                   \
 		m128iInputSample = _mm_loadl_epi64(pm128iInputSample + i);                  	\
 		_mm_storel_epi64(pm128iOutputSample + i, m128iInputSample);                 	\
@@ -173,7 +173,7 @@ void add_8_16_clip_ ## H ## _orcc(                                              
 		                                                                                                 \
 		_mm_storeu_si128(pm128iSample + i, _mm_packus_epi16(m128itmp_add_i16_0, m128itmp_add_i16_1));    \
 	}                                                                                                    \
-	if (BLKSIZE_MOD_VECTSIZE(H, 8, 128) == 8)                                                            \
+	if (BLKSIZE_MOD_VECTSIZE(H, 8, 128) == 64)                                                            \
 	{                                                                                                    \
 		m128itmp_predSamp =                                                                              \
 		_mm_unpacklo_epi8(                                                                               \
