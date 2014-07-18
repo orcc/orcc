@@ -226,7 +226,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		monitor = progressMonitor;
 
-		boolean compilexdf = getOption(COMPILE_XDF, false);
+		boolean compileXdf = getOption(COMPILE_XDF, false);
 
 		String orccVersion = "<unknown>";
 		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
@@ -241,7 +241,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		OrccLogger.traceln("* Orcc version : " + orccVersion);
 		OrccLogger.traceln("* Backend : " + backendName);
 		OrccLogger.traceln("* Project : " + project.getName());
-		if (compilexdf) {
+		if (compileXdf) {
 			String topNetwork = getOption(XDF_FILE, "<unknown>");
 			OrccLogger.traceln("* Network : " + topNetwork);
 		}
@@ -255,17 +255,19 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			extractLibraries();
 		}
 
-		if (compilexdf) {
-			IFile xdfFile = getFile(project, getOption(XDF_FILE, ""),
-					OrccUtil.NETWORK_SUFFIX);
+		final IFile xdfFile = getFile(project, getOption(XDF_FILE, ""),
+				OrccUtil.NETWORK_SUFFIX);
+		final Network network = EcoreHelper.getEObject(currentResourceSet,
+				xdfFile);
 
-			// parses top network
+		if (compileXdf) {
 			if (xdfFile == null) {
 				throw new OrccRuntimeException(
 						"The input XDF file does not exists.");
+			} else if (network == null) {
+				throw new OrccRuntimeException(
+						"The input file seems to not contains any network");
 			}
-			final Network network = EcoreHelper.getEObject(currentResourceSet,
-					xdfFile);
 
 			stopIfRequested();
 			new NetworkValidator().doSwitch(network);
@@ -282,7 +284,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			doAdditionalGeneration(network);
 
 			// For backward compatibility
-			if(result.equals(Result.EMPTY_RESULT)) {
+			if(result.isEmpty()) {
 				doXdfCodeGeneration(network);
 			}
 		}
@@ -314,6 +316,47 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			// Finalize actor generation
 			OrccLogger.traceln("Finalize actors...");
+		} else {
+			OrccLogger.traceln("Printing children...");
+			long t0 = System.currentTimeMillis();
+
+			int numCached = 0;
+			for (final Vertex vertex : network.getChildren()) {
+				final Instance instance = vertex.getAdapter(Instance.class);
+				final Actor actor = vertex.getAdapter(Actor.class);
+				if (instance != null) {
+
+					Result result = printInstance2(instance);
+					result.merge(doAdditionalGeneration(instance));
+
+					// For backward compatibility only
+					if (result.isEmpty()) {
+						if (printInstance(instance)) {
+							++numCached;
+						}
+					}
+				} else if (actor != null) {
+
+					Result result = printActor2(actor);
+					result.merge(doAdditionalGeneration(instance));
+
+					// For backward compatibility only
+					if (result.isEmpty()) {
+						if (printActor(actor)) {
+							++numCached;
+						}
+					}
+				}
+			}
+
+			long t1 = System.currentTimeMillis();
+			OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
+					+ "s");
+
+			if (numCached > 0) {
+				OrccLogger.noticeln(numCached + " entities were not regenerated "
+						+ "because they were already up-to-date.");
+			}
 		}
 
 		OrccLogger.traceln("Orcc backend done.");
@@ -554,12 +597,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		return Result.EMPTY_RESULT;
 	}
 
+	protected Result doAdditionalGeneration(final Actor actor) {
+		return Result.EMPTY_RESULT;
+	}
+
 	/**
 	 * Print entities of the given network.
 	 * 
 	 * @param entities
 	 *            a list of entities
 	 */
+	@Deprecated
 	final public void printChildren(Network network) {
 		OrccLogger.traceln("Printing children...");
 		long t0 = System.currentTimeMillis();
@@ -599,6 +647,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected boolean printInstance(Instance instance) {
 		return false;
+	}
+
+	// TODO: rename this method to printActor when the original will be removed.
+	protected Result printInstance2(final Instance instance) {
+		return Result.EMPTY_RESULT;
+	}
+	
+	protected Result doAdditionalGeneration(final Instance instance) {
+		return Result.EMPTY_RESULT;
 	}
 
 	private void printUsage(IApplicationContext context, Options options,
