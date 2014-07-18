@@ -67,8 +67,18 @@ public class Result {
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Result) {
-			return ((Result) obj).written == written && ((Result) obj).cached == cached;
+			return ((Result) obj).written == written
+					&& ((Result) obj).cached == cached;
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("Result: ");
+		builder.append(written).append (" file(s) written - ");
+		builder.append(cached).append(" file(s) cached");
+		return builder.toString();
 	}
 }
