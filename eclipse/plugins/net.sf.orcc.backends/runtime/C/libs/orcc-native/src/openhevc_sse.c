@@ -172,6 +172,7 @@ void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i3
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
+#if HAVE_SSE4
 void saoFilterEdge_orcc(u8 saoEoClass, u8 cIdx, u8 cIdxOffset, u16 idxOrig[2], u8 lcuSizeMax,
 	u16 picSize[2], u8 lcuIsPictBorder, i32 saoOffset[5],
 	u8 filtAcrossSlcAndTiles,
@@ -208,7 +209,7 @@ void saoFilterEdge_orcc(u8 saoEoClass, u8 cIdx, u8 cIdxOffset, u16 idxOrig[2], u
 	ff_hevc_sao_edge_filter_0_8_sse(ptrDst, ptrSrc,
 		4096, &sao, borders, xMax2, yMax2, cIdx, NULL, NULL, NULL);
 }
-
+#endif // HAVE_SSE4
 
 void saoBandFilter_orcc(u8 saoLeftClass, i32 saoOffset[5], u8 cIdx, u8 cIdxOffset, i16 idxMin[2],
 	i16 idxMax[2],
