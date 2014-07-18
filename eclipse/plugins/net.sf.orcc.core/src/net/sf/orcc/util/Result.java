@@ -38,14 +38,14 @@ package net.sf.orcc.util;
  */
 public class Result {
 
-	public static final Result OK = new Result(1, 0, 0);
-	public static final Result CACHED = new Result(0, 1, 0);
-	public static final Result EMPTY_RESULT = new Result(0, 0, 0);
+	public static final Result OK = new Result(1, 0);
+	public static final Result CACHED = new Result(0, 1);
+	public static final Result EMPTY_RESULT = new Result(0, 0);
 
 	private int written = 0;
 	private int cached = 0;
 
-	private Result(int w, int c, int e) {
+	private Result(int w, int c) {
 		written = w;
 		cached = c;
 	}
@@ -62,5 +62,13 @@ public class Result {
 
 	public int written() {
 		return written;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Result) {
+			return ((Result) obj).written == written && ((Result) obj).cached == cached;
+		}
+		return false;
 	}
 }

@@ -61,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -272,7 +273,18 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			stopIfRequested();
 
 			applyTransformations(network, networkTransfos);
-			doXdfCodeGeneration(network);
+
+			OrccLogger.traceln("Printing network...");
+
+			doValidate(network);
+
+			Result result = doGenerateNetwork(network);
+			doAdditionalGeneration(network);
+
+			// For backward compatibility
+			if(result.equals(Result.EMPTY_RESULT)) {
+				doXdfCodeGeneration(network);
+			}
 		}
 
 		if (isVTLBackend) {
@@ -305,6 +317,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		OrccLogger.traceln("Orcc backend done.");
+	}
+
+	protected void doValidate(Network network) {
+		Validator.checkTopLevel(network);
+		Validator.checkMinimalFifoSize(network, fifoSize);
 	}
 
 	/**
@@ -344,7 +361,31 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param network
 	 *            a network
 	 */
-	abstract protected void doXdfCodeGeneration(Network network);
+	@Deprecated
+	protected void doXdfCodeGeneration(Network network) {
+		throw new UnsupportedOperationException("This method will be removed in the next few days");
+	}
+
+	/**
+	 * This method must be implemented by subclasses to do the actual code
+	 * generation for the network or its instances or both.
+	 * 
+	 * @param network
+	 *            a network
+	 */
+	protected Result doGenerateNetwork(Network network) {
+		return Result.EMPTY_RESULT;
+	}
+
+	/**
+	 * Can be overridden in back-ends to generates files others than Network
+	 * 
+	 * @param network
+	 * @return The generation Result object
+	 */
+	protected Result doAdditionalGeneration(final Network network) {
+		return Result.EMPTY_RESULT;
+	}
 
 	/**
 	 * <p>

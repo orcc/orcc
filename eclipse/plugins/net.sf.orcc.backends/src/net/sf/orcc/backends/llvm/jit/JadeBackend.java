@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.BackendsConstants;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
@@ -70,12 +71,11 @@ import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.util.FilesManager;
-import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
 /**
- * LLVM back-end.
+ * Jade back-end.
  * 
  * @author Jerome GORIN
  * @author Herve Yviquel
@@ -161,24 +161,33 @@ public class JadeBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) {
+	protected void doValidate(Network network) {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize, false);
+	}
 
-		// print network
-		OrccLogger.traceln("Printing network...");
+	@Override
+	protected Result doGenerateNetwork(Network network) {
+		// Generate the flattened network (.xdf file)
 		OutputStream outputStream = new ByteArrayOutputStream();
 		try {
 			network.eResource().save(outputStream, Collections.emptyMap());
-			FilesManager.writeFile(outputStream.toString(), path,
+			return FilesManager.writeFile(outputStream.toString(), path,
 					network.getSimpleName() + ".xdf");
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw new OrccRuntimeException(
+					"Unable to serialialize the flattened network");
 		}
+	}
 
+	@Override
+	protected Result doAdditionalGeneration(Network network) {
+		// Generates the .xcf mapping file
 		final CharSequence content = new Mapping(network, mapping)
 				.getContentFile();
-		FilesManager.writeFile(content, path, network.getSimpleName() + ".xcf");
+		return FilesManager.writeFile(content, path, network.getSimpleName()
+				+ ".xcf");
 	}
 
 	@Override
