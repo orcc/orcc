@@ -69,25 +69,41 @@ int sse_init_context();
  SelectCu
  ***********************************************************************************************************************************/
 
-void copy_8_8_16_64x64_orcc(
-    u8 outputSample[64 * 64],
-    u8 inputSample[16],
-    u32 idxBlkStride);
+void copy_8_8_8_orcc(
+    u8 * outputSample,
+    u8 * inputSample,
+    u32 outputStride,
+    u32 inputStride);
 
-void copy_8_8_16_32x32_orcc(
-    u8 outputSample[32 * 32],
-    u8 inputSample[16],
-    u32 idxBlkStride);
+void copy_8_8_16_orcc(
+    u8 * outputSample,
+    u8 * inputSample,
+    u32 outputStride,
+    u32 inputStride);
 
-void copy_8_8_16_1x4352_orcc(
-    u8 outputSample[1 * 4352],
-    u8 inputSample[16],
-    u32 idxBlkStride);
+void copy_8_8_8_orcc(
+    u8 * outputSample,
+    u8 * inputSample,
+    u32 outputStride,
+    u32 inputStride);
 
-void copy_8_8_8_1x2304_orcc(
-    u8 outputSample[1 * 2304],
-    u8 inputSample[16],
-    u32 idxBlkStride);
+void copy_8_8_64_orcc(
+    u8 * outputSample,
+    u8 * inputSample,
+    u32 outputStride,
+    u32 inputStride);
+
+void copy_8_8_256_orcc(
+    u8 * outputSample,
+    u8 * inputSample,
+    u32 outputStride,
+    u32 inputStride);
+
+void copy_8_8_1024_orcc(
+    u8 * outputSample,
+    u8 * inputSample,
+    u32 outputStride,
+    u32 inputStride);
 
 void copy_8_8_var_orcc(
     u8 * outputSample,
@@ -95,65 +111,53 @@ void copy_8_8_var_orcc(
     u32 idxBlkStride,
     u8 size);
 
-void add_8_16_clip_16_1x16_orcc(
-    u8 predSample[1 * 16],
-    i16 resSample[16],
-    u8 Sample[16],
-    u16 idxBlkStride);
+void add_8_16_clip_8_orcc(
+	u8 * predSample,
+	i16 * resSample,
+	u8 * Sample,
+	u16 offsetPred,
+	u16 offsetRes,
+	u16 OffsetOut);
 
-void add_8_16_clip_8_64x64_orcc(
-    u8 predSample[64 * 64],
-    i16 resSample[8],
-    u8 Sample[8],
-    u16 idxBlkStride);
+void add_8_16_clip_16_orcc(
+	u8 * predSample,
+	i16 * resSample,
+	u8 * Sample,
+	u16 offsetPred,
+	u16 offsetRes,
+	u16 OffsetOut);
 
-void add_8_16_clip_16_64x64_orcc(
-    u8 predSample[64 * 64],
-    i16 resSample[16],
-    u8 Sample[16],
-    u16 idxBlkStride);
+void add_8_16_clip_32_orcc(
+	u8 * predSample,
+	i16 * resSample,
+	u8 * Sample,
+	u16 offsetPred,
+	u16 offsetRes,
+	u16 OffsetOut);
 
-void add_8_16_clip_32_64x64_orcc(
-    u8 predSample[64 * 64],
-    i16 resSample[32],
-    u8 Sample[32],
-    u16 idxBlkStride);
+void add_8_16_clip_64_orcc(
+	u8 * predSample,
+	i16 * resSample,
+	u8 * Sample,
+	u16 offsetPred,
+	u16 offsetRes,
+	u16 OffsetOut);
 
-void add_8_16_clip_64_64x64_orcc(
-    u8 predSample[64 * 64],
-    i16 resSample[64],
-    u8 Sample[64],
-    u16 idxBlkStride);
+void add_8_16_clip_256_orcc(
+	u8 * predSample,
+	i16 * resSample,
+	u8 * Sample,
+	u16 offsetPred,
+	u16 offsetRes,
+	u16 OffsetOut);
 
-void add_8_16_clip_256_64x64_orcc(
-    u8 predSample[64 * 64],
-    i16 resSample[256],
-    u8 Sample[256],
-    u16 idxBlkStride);
-
-void add_8_16_clip_1024_64x64_orcc(
-    u8 predSample[64 * 64],
-    i16 resSample[1024],
-    u8 Sample[1024],
-    u16 idxBlkStride);
-
-void add_8_16_clip_16_32x32_orcc(
-    u8 predSample[32 * 32],
-    i16 resSample[16],
-    u8 Sample[16],
-    u16 idxBlkStride);
-
-void add_8_16_clip_64_32x32_orcc(
-    u8 predSample[32 * 32],
-    i16 resSample[64],
-    u8 Sample[64],
-    u16 idxBlkStride);
-
-void add_8_16_clip_256_32x32_orcc(
-    u8 predSample[32 * 32],
-    i16 resSample[256],
-    u8 Sample[256],
-    u16 idxBlkStride);
+void add_8_16_clip_1024_orcc(
+	u8 * predSample,
+	i16 * resSample,
+	u8 * Sample,
+	u16 offsetPred,
+	u16 offsetRes,
+	u16 OffsetOut);
 
 /*************************/
 /* DecodingPictureBuffer */
@@ -172,7 +176,6 @@ void copy_cu_dpb_luma_x32_orcc(
 	i32 xPixIdx,
 	i32 yPixIdx,
 	i8  lastIdx);
-
 
 void copy_cu_dpb_luma_x16_orcc(
     u8 samp[256],
