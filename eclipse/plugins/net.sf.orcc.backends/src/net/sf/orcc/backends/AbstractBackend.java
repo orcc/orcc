@@ -90,6 +90,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.ecore.EObject;
@@ -220,7 +221,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	@Override
-	public void compile() {
+	public void compile(IProgressMonitor progressMonitor) {
+
+		monitor = progressMonitor;
 
 		boolean compilexdf = getOption(COMPILE_XDF, false);
 
@@ -260,16 +263,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				throw new OrccRuntimeException(
 						"The input XDF file does not exists.");
 			}
-			Network network = EcoreHelper.getEObject(currentResourceSet,
+			final Network network = EcoreHelper.getEObject(currentResourceSet,
 					xdfFile);
-			if (isCanceled()) {
-				return;
-			}
+
+			stopIfRequested();
 			new NetworkValidator().doSwitch(network);
 
-			if (isCanceled()) {
-				return;
-			}
+			stopIfRequested();
+
 			applyTransformations(network, networkTransfos);
 			doXdfCodeGeneration(network);
 		}
@@ -466,21 +467,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Returns true if this process has been canceled.
-	 * 
-	 * @return true if this process has been canceled
-	 * @deprecated Use {@link #stopIfRequested()} instead
-	 */
-	@Deprecated
-	protected boolean isCanceled() {
-		if (monitor == null) {
-			return false;
-		} else {
-			return monitor.isCanceled();
-		}
-	}
-
-	/**
 	 * Check the current ProgressMonitor for cancellation, and throws a
 	 * OperationCanceledException if needed. This will simply stop the back-end
 	 * execution.
@@ -515,9 +501,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				actors.add((Actor) eObject);
 			}
 
-			if (isCanceled()) {
-				break;
-			}
+			stopIfRequested();
 		}
 
 		return actors;
@@ -816,7 +800,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			try {
 
 				setOptions(optionMap);
-				compile();
+				compile(new NullProgressMonitor());
 				return IApplication.EXIT_OK;
 
 			} catch (OrccRuntimeException e) {
@@ -850,7 +834,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	@Override
 	public void stop() {
-
+		monitor.setCanceled(true);
 	}
 
 	/**

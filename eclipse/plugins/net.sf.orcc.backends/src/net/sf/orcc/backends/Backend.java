@@ -30,6 +30,8 @@ package net.sf.orcc.backends;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 /**
  * This interface defines a back-end.
  * 
@@ -41,7 +43,7 @@ public interface Backend {
 	/**
 	 * Launches a compilation using the options provided to this back-end.
 	 */
-	void compile();
+	void compile(IProgressMonitor progressMonitor);
 
 	/**
 	 * Register options set on eclipse "Run configuration" or command line to
