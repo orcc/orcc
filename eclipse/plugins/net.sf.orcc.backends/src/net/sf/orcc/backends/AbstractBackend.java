@@ -290,8 +290,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 			}
 
+			OrccLogger.traceln("Transform actors");
 			applyTransformations(actors, childrenTransfos);
 
+			OrccLogger.traceln("Print actors");
 			Result result = Result.EMPTY_RESULT;
 			for(final Actor actor : actors) {
 				result.merge(printActor2(actor));

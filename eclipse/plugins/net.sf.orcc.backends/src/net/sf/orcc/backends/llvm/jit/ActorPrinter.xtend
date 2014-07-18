@@ -53,6 +53,7 @@ import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
 import net.sf.orcc.moc.QSDFMoC
 import net.sf.orcc.util.OrccUtil
+import net.sf.orcc.df.Instance
 
 /**
  * Generate Jade content
@@ -86,8 +87,7 @@ class ActorPrinter extends InstancePrinter {
 	}
 
 	override protected setActor(Actor actor) {
-		this.name = actor.name
-		this.actor = actor
+		super.setActor(actor)
 
 		// Patterns and objects references lists are computed
 		// from the current actor
@@ -96,6 +96,11 @@ class ActorPrinter extends InstancePrinter {
 
 		objRefList.clear
 		computeCastedList
+	}
+
+	override getContent(Instance instance) {
+		throw new UnsupportedOperationException("Jade backend is unable"+
+			" to generate code from Instances")
 	}
 
 	/**
