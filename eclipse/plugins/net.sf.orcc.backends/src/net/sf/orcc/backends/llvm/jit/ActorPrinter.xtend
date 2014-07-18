@@ -64,10 +64,15 @@ class ActorPrinter extends InstancePrinter {
 	val List<Integer> objRefList = new ArrayList<Integer>
 	val List<Pattern> patternList = new ArrayList<Pattern>
 
+	new() {
+		super()
+	}
+
 	new(Map<String, Object> options) {
 		super(options)
 	}
 
+	@Deprecated
 	override protected print(String targetFolder) {
 		val content = fileContent
 		val file = new File(targetFolder + File::separator + actor.simpleName)

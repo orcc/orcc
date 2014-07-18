@@ -63,7 +63,11 @@ abstract class LLVMTemplate extends CommonPrinter {
 	var signed = false
 	var floating = false
 
-	new (Map<String, Object> options) {
+	new() {
+		super()
+	}
+
+	new(Map<String, Object> options) {
 		super(options)
 	}
 

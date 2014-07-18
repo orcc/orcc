@@ -99,11 +99,20 @@ class InstancePrinter extends LLVMTemplate {
 
 	protected var boolean isActionAligned = false
 
+	new() {
+		super()
+	}
+
 	/**
 	 * Default constructor, do not activate profile option
 	 */
 	new(Map<String, Object> options) {
 		super(options)
+	}
+
+	override setOptions(Map<String, Object> options) {
+		super.setOptions(options)
+
 		if(options.containsKey(INLINE)){
 			optionInline = options.get(INLINE) as Boolean
 		}
@@ -122,6 +131,7 @@ class InstancePrinter extends LLVMTemplate {
 	 * @param instance the given instance
 	 * @return 1 if file was cached, 0 if file was printed
 	 */
+	@Deprecated
 	def print(String targetFolder, Instance instance) {
 		setInstance(instance)
 		print(targetFolder)
@@ -134,11 +144,13 @@ class InstancePrinter extends LLVMTemplate {
 	 * @param instance the given instance
 	 * @return 1 if file was cached, 0 if file was printed
 	 */
+	@Deprecated
 	def print(String targetFolder, Actor actor) {
 		setActor(actor)
 		print(targetFolder)
 	}
 
+	@Deprecated
 	def protected print(String targetFolder) {
 		val content = fileContent
 		val file = new File(targetFolder + File::separator + name + ".ll")
@@ -149,6 +161,16 @@ class InstancePrinter extends LLVMTemplate {
 		} else {
 			return 1
 		}
+	}
+
+	def getContent(Instance instance) {
+		setInstance(instance)
+		fileContent
+	}
+
+	def getContent(Actor actor) {
+		setActor(actor)
+		fileContent
 	}
 
 	def protected setInstance(Instance instance) {
