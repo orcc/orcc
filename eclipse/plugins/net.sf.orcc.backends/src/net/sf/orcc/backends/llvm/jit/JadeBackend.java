@@ -71,6 +71,7 @@ import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
 /**
@@ -84,6 +85,8 @@ public class JadeBackend extends AbstractBackend {
 
 	private boolean bitAccurate;
 
+	private ActorPrinter printer;
+
 	/**
 	 * Creates a new instance of the LLVM back-end.
 	 */
@@ -91,10 +94,16 @@ public class JadeBackend extends AbstractBackend {
 		// This back-end must generate a VTL. Configure this option with the
 		// specific constructor call.
 		super(true);
+
+		printer = new ActorPrinter();
 	}
 
 	@Override
 	protected void doInitializeOptions() {
+
+		// Load options map into the code generator class
+		printer.setOptions(getOptions());
+
 		// Is the Jade back-end supposed to generate bit-accurate code ?
 		bitAccurate = getOption(BackendsConstants.JIT_BIT_ACCURATE,
 				BackendsConstants.JIT_BIT_ACCURATE_DEFAULT);
@@ -173,8 +182,10 @@ public class JadeBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) {
-		String folder = path + File.separator + DfUtil.getFolder(actor);
-		return new ActorPrinter(getOptions()).print(folder, actor) > 0;
+	protected Result printActor2(Actor actor) {
+		final File targetFolder = new File(path, DfUtil.getFolder(actor));
+		final File targetFile = new File(targetFolder, actor.getSimpleName());
+		final CharSequence content = printer.getContent(actor);
+		return FilesManager.writeFile(content, targetFile);
 	}
 }

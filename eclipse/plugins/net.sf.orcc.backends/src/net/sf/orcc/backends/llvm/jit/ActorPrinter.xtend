@@ -89,7 +89,12 @@ class ActorPrinter extends InstancePrinter {
 		this.name = actor.name
 		this.actor = actor
 
+		// Patterns and objects references lists are computed
+		// from the current actor
+		patternList.clear
 		computePatterns
+
+		objRefList.clear
 		computeCastedList
 	}
 
