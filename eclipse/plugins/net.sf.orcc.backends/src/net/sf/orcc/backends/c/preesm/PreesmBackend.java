@@ -37,6 +37,7 @@ import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Result;
 
 /**
  * C backend targetting embedded systems
@@ -44,6 +45,10 @@ import net.sf.orcc.util.OrccLogger;
  * @author mpelcat
  */
 public class PreesmBackend extends AbstractBackend {
+
+	public PreesmBackend() {
+		super(true);
+	}
 
 	@Override
 	protected void doInitializeOptions() {
@@ -55,9 +60,6 @@ public class PreesmBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		// Print actors
-		printActors(network.getAllActors());
-
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
@@ -110,5 +112,11 @@ public class PreesmBackend extends AbstractBackend {
 	@Override
 	protected boolean printActor(Actor actor) {
 		return new ActorPrinter(getOptions()).print(path, actor) != 0;
+	}
+
+	@Override
+	protected Result printActor2(Actor actor) {
+		new ActorPrinter(getOptions()).print(path, actor);
+		return super.printActor2(actor);
 	}
 }
