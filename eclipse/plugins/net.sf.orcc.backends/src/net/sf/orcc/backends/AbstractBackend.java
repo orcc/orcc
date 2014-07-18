@@ -64,7 +64,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.graph.Vertex;
@@ -161,15 +160,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	/**
 	 * List of transformations to apply on each network
 	 */
-	protected List<DfSwitch<?>> networkTransfos;
+	protected List<DfVisitor<?>> networkTransfos;
 	/**
-	 * List of transformations to apply on each actor
+	 * List of transformations to apply on each child
 	 */
-	protected List<DfVisitor<?>> vtlActorsTransfos;
-	/**
-	 * List of transformations to apply on each children
-	 */
-	protected List<DfSwitch<?>> childrenTransfos;
+	protected List<DfVisitor<?>> childrenTransfos;
 
 	// Other options
 	protected boolean classify;
@@ -216,9 +211,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            Set to true if this back-end will generate a complete VTL.
 	 */
 	public AbstractBackend(boolean isVTLBackend) {
-		networkTransfos = new ArrayList<DfSwitch<?>>();
-		vtlActorsTransfos = new ArrayList<DfVisitor<?>>();
-		childrenTransfos = new ArrayList<DfSwitch<?>>();
+		networkTransfos = new ArrayList<DfVisitor<?>>();
+		childrenTransfos = new ArrayList<DfVisitor<?>>();
 
 		currentResourceSet = new ResourceSetImpl();
 
@@ -276,6 +270,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			if (isCanceled()) {
 				return;
 			}
+			applyTransformations(network, networkTransfos);
 			doXdfCodeGeneration(network);
 		}
 
@@ -295,16 +290,16 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 			}
 
-			// The old way to transform and print VTL actors
-			transformActors(actors);
-			printActors(actors);
+			applyTransformations(actors, childrenTransfos);
 
-			// The new way
-			applyTransformations(actors, vtlActorsTransfos);
 			Result result = Result.EMPTY_RESULT;
 			for(final Actor actor : actors) {
 				result.merge(printActor2(actor));
 			}
+
+			// For backward compatibility:
+			transformActors(actors);
+			printActors(actors);
 
 			// Finalize actor generation
 			OrccLogger.traceln("Finalize actors...");
@@ -326,7 +321,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param actor
 	 *            the actor
 	 */
-	abstract protected void doTransformActor(Actor actor);
+	@Deprecated
+	protected void doTransformActor(Actor actor) {
+		new UnsupportedOperationException("This method will be removed in the next days");
+	}
 
 	/**
 	 * This method must be implemented by subclasses to do the actual code
