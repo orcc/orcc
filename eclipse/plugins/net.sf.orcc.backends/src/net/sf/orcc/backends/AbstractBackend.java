@@ -555,34 +555,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Print instances of the given network.
-	 * 
-	 * @param actors
-	 *            a list of actors
-	 */
-	@Deprecated
-	final public void printActors(List<Actor> actors) {
-		OrccLogger.traceln("Printing actors...");
-		long t0 = System.currentTimeMillis();
-
-		int numCached = 0;
-		for (final Actor actor : actors) {
-			if (printActor(actor)) {
-				++numCached;
-			}
-		}
-
-		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-				+ "s");
-
-		if (numCached > 0) {
-			OrccLogger.noticeln(numCached + " actors were not regenerated "
-					+ "because they were already up-to-date.");
-		}
-	}
-
-	/**
 	 * Print entities of the given network.
 	 * 
 	 * @param entities
