@@ -299,10 +299,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				result.merge(printActor2(actor));
 			}
 
-			// For backward compatibility:
-			transformActors(actors);
-			printActors(actors);
-
 			// Finalize actor generation
 			OrccLogger.traceln("Finalize actors...");
 		}

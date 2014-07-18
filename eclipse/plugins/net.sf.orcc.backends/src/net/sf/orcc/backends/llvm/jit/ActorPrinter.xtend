@@ -28,14 +28,13 @@
  */
 package net.sf.orcc.backends.llvm.jit
 
-import java.io.File
 import java.util.ArrayList
 import java.util.List
-import java.util.Map
 import net.sf.orcc.backends.ir.InstCast
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
+import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
@@ -52,8 +51,6 @@ import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
 import net.sf.orcc.moc.QSDFMoC
-import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.df.Instance
 
 /**
  * Generate Jade content
@@ -67,23 +64,6 @@ class ActorPrinter extends InstancePrinter {
 
 	new() {
 		super()
-	}
-
-	new(Map<String, Object> options) {
-		super(options)
-	}
-
-	@Deprecated
-	override protected print(String targetFolder) {
-		val content = fileContent
-		val file = new File(targetFolder + File::separator + actor.simpleName)
-
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
 	}
 
 	override protected setActor(Actor actor) {
