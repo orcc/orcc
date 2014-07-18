@@ -198,13 +198,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	public AbstractBackend() {
 		actorTransfos = new ArrayList<DfSwitch<?>>();
 		networkTransfos = new ArrayList<DfSwitch<?>>();
-
-		currentResourceSet = new ResourceSetImpl();
 	}
 
 	@Override
 	public void compile() {
 
+		// New ResourceSet for a new compilation
+		currentResourceSet = new ResourceSetImpl();
 		boolean compilexdf = getAttribute(COMPILE_XDF, false);
 
 		String orccVersion = "<unknown>";
