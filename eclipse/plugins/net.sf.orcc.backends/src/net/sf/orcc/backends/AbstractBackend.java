@@ -311,7 +311,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			OrccLogger.traceln("Print actors");
 			Result result = Result.EMPTY_RESULT;
 			for(final Actor actor : actors) {
-				result.merge(printActor2(actor));
+				result.merge(doGenerateActor(actor));
 			}
 
 			// Finalize actor generation
@@ -326,7 +326,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				final Actor actor = vertex.getAdapter(Actor.class);
 				if (instance != null) {
 
-					Result result = printInstance2(instance);
+					Result result = doGenerateInstance(instance);
 					result.merge(doAdditionalGeneration(instance));
 
 					// For backward compatibility only
@@ -337,7 +337,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					}
 				} else if (actor != null) {
 
-					Result result = printActor2(actor);
+					Result result = doGenerateActor(actor);
 					result.merge(doAdditionalGeneration(instance));
 
 					// For backward compatibility only
@@ -592,8 +592,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		return false;
 	}
 
-	// TODO: rename this method to printActor when the original will be removed.
-	protected Result printActor2(final Actor actor) {
+	protected Result doGenerateActor(final Actor actor) {
 		return Result.EMPTY_RESULT;
 	}
 
@@ -645,15 +644,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            the instance
 	 * @return <code>true</code> if the actor was cached
 	 */
+	@Deprecated
 	protected boolean printInstance(Instance instance) {
 		return false;
 	}
 
-	// TODO: rename this method to printActor when the original will be removed.
-	protected Result printInstance2(final Instance instance) {
+	protected Result doGenerateInstance(final Instance instance) {
 		return Result.EMPTY_RESULT;
 	}
-	
+
 	protected Result doAdditionalGeneration(final Instance instance) {
 		return Result.EMPTY_RESULT;
 	}

@@ -115,8 +115,8 @@ public class PreesmBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected Result printActor2(Actor actor) {
+	protected Result doGenerateActor(Actor actor) {
 		new ActorPrinter(getOptions()).print(path, actor);
-		return super.printActor2(actor);
+		return super.doGenerateActor(actor);
 	}
 }
