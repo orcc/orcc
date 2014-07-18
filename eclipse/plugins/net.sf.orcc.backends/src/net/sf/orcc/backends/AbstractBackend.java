@@ -344,18 +344,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	/**
 	 * This method must be implemented by subclasses to do the actual code
-	 * generation for VTL.
-	 * 
-	 * @param files
-	 *            a list of IR files
-	 */
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		throw new UnsupportedOperationException(
-				"This backend is not supposed to generate a VTL!");
-	}
-
-	/**
-	 * This method must be implemented by subclasses to do the actual code
 	 * generation for the network or its instances or both.
 	 * 
 	 * @param network
