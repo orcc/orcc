@@ -673,12 +673,12 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def protected printOutputPattern(Pattern outputPattern) '''
+	def protected printOutputPattern(Pattern pattern) '''
 		int stop = 0;
-		«FOR outPort : outputPattern.ports»
+		«FOR port : pattern.ports»
 			«var i = -1»
-			«FOR connection : outgoingPortMap.get(outPort)»
-				if («outputPattern.getNumTokens(outPort)» > SIZE_«outPort.name» - index_«outPort.name» + «outPort.fullName»->read_inds[«i = i + 1»]) {
+			«FOR connection : outgoingPortMap.get(port)»
+				if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«i = i + 1»]) {
 					stop = 1;
 					«IF newSchedul»
 						if( ! «entityName».sched->round_robin || i > 0) {
