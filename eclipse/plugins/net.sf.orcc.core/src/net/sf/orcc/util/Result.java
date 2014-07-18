@@ -38,16 +38,24 @@ package net.sf.orcc.util;
  */
 public class Result {
 
-	public static final Result OK = new Result(1, 0);
-	public static final Result CACHED = new Result(0, 1);
-	public static final Result EMPTY_RESULT = new Result(0, 0);
-
 	private int written = 0;
 	private int cached = 0;
 
-	private Result(int w, int c) {
-		written = w;
-		cached = c;
+	private Result(int written, int cached) {
+		this.written = written;
+		this.cached = cached;
+	}
+
+	public static Result newInstance() {
+		return new Result(0, 0);
+	}
+
+	public static Result newOkInstance() {
+		return new Result(1, 0);
+	}
+
+	public static Result newCachedInstance() {
+		return new Result(0, 1);
 	}
 
 	public Result merge(final Result other) {

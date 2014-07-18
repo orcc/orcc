@@ -309,7 +309,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			applyTransformations(actors, childrenTransfos);
 
 			OrccLogger.traceln("Print actors");
-			Result result = Result.EMPTY_RESULT;
+			Result result = Result.newInstance();
 			for(final Actor actor : actors) {
 				result.merge(doGenerateActor(actor));
 			}
@@ -405,7 +405,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            a network
 	 */
 	protected Result doGenerateNetwork(Network network) {
-		return Result.EMPTY_RESULT;
+		return Result.newInstance();
 	}
 
 	/**
@@ -415,7 +415,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @return The generation Result object
 	 */
 	protected Result doAdditionalGeneration(final Network network) {
-		return Result.EMPTY_RESULT;
+		return Result.newInstance();
 	}
 
 	/**
@@ -434,7 +434,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *         up-to-date)
 	 */
 	protected Result extractLibraries() {
-		return Result.EMPTY_RESULT;
+		return Result.newInstance();
 	}
 
 	private <T extends EObject> void applyTransformations(Iterable<T> objects, Iterable<DfVisitor<?>> transformations) {
@@ -593,11 +593,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	protected Result doGenerateActor(final Actor actor) {
-		return Result.EMPTY_RESULT;
+		return Result.newInstance();
 	}
 
 	protected Result doAdditionalGeneration(final Actor actor) {
-		return Result.EMPTY_RESULT;
+		return Result.newInstance();
 	}
 
 	/**
@@ -650,11 +650,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	protected Result doGenerateInstance(final Instance instance) {
-		return Result.EMPTY_RESULT;
+		return Result.newInstance();
 	}
 
 	protected Result doAdditionalGeneration(final Instance instance) {
-		return Result.EMPTY_RESULT;
+		return Result.newInstance();
 	}
 
 	private void printUsage(IApplicationContext context, Options options,

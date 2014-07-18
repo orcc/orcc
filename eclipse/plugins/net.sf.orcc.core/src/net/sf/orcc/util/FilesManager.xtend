@@ -36,15 +36,13 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.PrintStream
+import java.net.URI
 import java.util.Collections
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import org.eclipse.core.runtime.Assert
 import org.eclipse.core.runtime.FileLocator
 import org.osgi.framework.FrameworkUtil
-
-import static net.sf.orcc.util.Result.*
-import java.net.URI
 
 /**
  * Utility class to manipulate files. It brings everything needed to extract files
@@ -132,7 +130,7 @@ class FilesManager {
 		else
 			Assert.isTrue(targetFolder.directory)
 
-		val result = EMPTY_RESULT
+		val result = Result::newInstance
 		for (file : source.listFiles) {
 			result.merge(
 				file.fsExtract(targetFolder)
@@ -183,7 +181,7 @@ class FilesManager {
 	private def static jarDirectoryExtract(JarFile jar, JarEntry entry, File targetFolder) {
 		val prefix = entry.name
 		val entries = Collections::list(jar.entries).filter[name.startsWith(prefix)]
-		val result = EMPTY_RESULT
+		val result = Result::newInstance
 		for (e : entries) {
 			result.merge(
 				jarFileExtract(jar, e, new File(targetFolder, e.name.substring(prefix.length)))
@@ -200,7 +198,7 @@ class FilesManager {
 		targetFile.parentFile.mkdirs
 		if (entry.directory) {
 			targetFile.mkdir
-			return EMPTY_RESULT
+			return Result::newInstance
 		}
 		jar.getInputStream(entry).streamExtract(targetFile)
 	}
@@ -212,7 +210,7 @@ class FilesManager {
 	 */
 	private def static streamExtract(InputStream inputStream, File targetFile) {
 		if (inputStream.isContentEqual(targetFile)) {
-			return CACHED
+			return Result::newCachedInstance
 		}
 
 		val outputStream = new FileOutputStream(targetFile)
@@ -225,7 +223,7 @@ class FilesManager {
 		inputStream.close
 		outputStream.close
 
-		return OK
+		return Result::newOkInstance
 	}
 
 	/**
@@ -339,7 +337,7 @@ class FilesManager {
 	 */
 	static def writeFile(CharSequence content, File targetFile) {
 		if (content.isContentEqual(targetFile)) {
-			return CACHED
+			return Result::newCachedInstance
 		}
 
 		if (!targetFile.parentFile.exists) {
@@ -348,7 +346,7 @@ class FilesManager {
 		val ps = new PrintStream(new FileOutputStream(targetFile))
 		ps.print(content)
 		ps.close
-		return OK
+		return Result::newOkInstance
 	}
 
 	/**

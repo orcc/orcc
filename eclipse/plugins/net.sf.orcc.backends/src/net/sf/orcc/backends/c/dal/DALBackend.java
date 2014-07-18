@@ -138,7 +138,7 @@ public class DALBackend extends CBackend {
 	protected Result extractLibraries() {
 		// Never extract libraries (Note: we can also force attribute
 		// NO_LIBRARY_EXPORT to true)
-		return Result.EMPTY_RESULT;
+		return Result.newInstance();
 	}
 
 	private boolean printNetwork(Network network, String srcPath) {
