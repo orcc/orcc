@@ -523,7 +523,7 @@ class InstancePrinter extends CTemplate {
 	def protected printStateTransition(State state, Transition trans) {
 		val output = '''
 			«val outputSchedulable = trans.action.hasAttribute(OUTPUT_SCHEDULABLE) || actor.hasAttribute(OUTPUT_SCHEDULABLE)»
-			if («trans.action.inputPattern.checkInputPattern»«IF outputSchedulable»«trans.action.outputPattern.checkOutputPattern_outputSched»«ENDIF»«trans.action.scheduler.name»()) {
+			if («trans.action.inputPattern.checkInputPattern»«IF outputSchedulable»«trans.action.outputPattern.checkOutputPattern»«ENDIF»«trans.action.scheduler.name»()) {
 				«IF !trans.action.outputPattern.empty && !outputSchedulable»
 					«trans.action.outputPattern.printOutputPattern»
 						_FSM_state = my_state_«state.name»;
@@ -695,11 +695,7 @@ class InstancePrinter extends CTemplate {
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.getNumTokens(port)» && «ENDFOR»'''
 
 	def protected checkOutputPattern(Pattern pattern)
-		'''«FOR port : pattern.ports»«var i = -1»«FOR connection : outgoingPortMap.get(port)»«pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«i = i + 1»] && «ENDFOR»«ENDFOR»'''
-	
-	def protected checkOutputPattern_outputSched(Pattern pattern)
 		'''«FOR port : pattern.ports»«var i = -1»«FOR connection : outgoingPortMap.get(port)»!(«pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«i = i + 1»]) && «ENDFOR»«ENDFOR»'''
-	
 
 	def protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
