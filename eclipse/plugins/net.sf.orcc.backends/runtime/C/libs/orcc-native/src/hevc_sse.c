@@ -69,17 +69,17 @@
 #define BLKSIZE_MOD_VECTSIZE(H, J, K) ((H * J) & (K - 1))
 
 
-/* copy K H-bits elements into an array of J-bits elements */
+/* copy K H-bits contiguous elements into an array of J-bits elements */
 #define COPY(H, J, K)                                                                   \
 void copy_ ## H ## _ ## J ## _ ## K ## _orcc(                                           \
 	u ## J * outputSample,                                                              \
 	u ## H * inputSample,                                                               \
-	u32 outputStride,                                                                   \
-    u32 inputStride)                                                                    \
+	u32 outputOffset,                                                                   \
+    u32 inputOffset)                                                                    \
 {                                                                                       \
 	int i = 0;                                                                          \
-	__m128i * pm128iInputSample = (__m128i *) &inputSample[inputStride];                \
-	__m128i * pm128iOutputSample = (__m128i *) &outputSample[outputStride];             \
+	__m128i * pm128iInputSample = (__m128i *) &inputSample[inputOffset];                \
+	__m128i * pm128iOutputSample = (__m128i *) &outputSample[outputOffset];             \
 	__m128i m128iInputSample;                                                           \
 	for (i = 0; i < BLKSIZE_DIV_VECTSIZE(K, H, 128); i++)                               \
 	{                                                                                   \
@@ -102,6 +102,47 @@ COPY(8, 8,   64)
 COPY(8, 8,  256)
 COPY(8, 8, 1024)
 COPY(8, 8, 4096)
+#endif
+
+/* copy KxL H-bits non-contiguous elements into an array of J-bits elements */
+#define COPY_2D(H, J, K, L)                                                                \
+void copy_2D_ ## H ## _ ## J ## _ ## K ## x ## L ## _orcc(                                 \
+	u ## J * outputSample,                                                              \
+	u ## H * inputSample,                                                               \
+	u32 outputOffset,                                                                   \
+    u32 inputOffset,                                                                    \
+    u32 outputStride,                                                                   \
+    u32 inputStride)                                                                    \
+{                                                                                       \
+	int i = 0, j = 0;                                                                          \
+	__m128i * pm128iInputSample = (__m128i *) &inputSample[inputOffset];                \
+	__m128i * pm128iOutputSample = (__m128i *) &outputSample[outputOffset];             \
+	__m128i m128iInputSample;                                                           \
+	int inputVectorStride = H * inputStride / 128;                                                           \
+	int outputVectorStride = H * outputStride / 128;                                                           \
+	for (i = 0; i < L; i++)                                                             \
+	{                                                                                   \
+	  for (j = 0; j < BLKSIZE_DIV_VECTSIZE(K, H, 128); j++)                               \
+	  {                                                                                   \
+		m128iInputSample = _mm_loadu_si128(pm128iInputSample + j);                      \
+		_mm_storeu_si128(pm128iOutputSample + j, m128iInputSample);                     \
+	  }                                                                                   \
+	  if (BLKSIZE_MOD_VECTSIZE(K, H, 128) == 64)                                          \
+	  {                                                                                   \
+		m128iInputSample = _mm_loadl_epi64(pm128iInputSample + j);                  	\
+		_mm_storel_epi64(pm128iOutputSample + j, m128iInputSample);                 	\
+	  }                                                                               	\
+	  pm128iInputSample += inputVectorStride;                                                 \
+	  pm128iOutputSample += outputVectorStride;                                               \
+	}                                                                               	\
+}
+
+#if HAVE_SSE2
+// Declare more functions if needed
+COPY_2D(8, 8,  8,  8)
+COPY_2D(8, 8, 16, 16)
+COPY_2D(8, 8, 32, 32)
+COPY_2D(8, 8, 64, 64)
 #endif
 
 /* Copy with variable number of elements to be copied */
@@ -629,7 +670,7 @@ void gather32_4x4_orcc(
 	u8 strideOut,
 	u8 strideIn)
 {
-	__m128i * __restrict pm128iOutputSample = (__m128i *) &outputSample[0];
+	__m128i * __restrict pm128iOutputSample = (__m128i *) &outputSample[offsetOut];
 #if !HAVE_AVX2
 	u8 * pucInputSample = &inputSample[offsetIn];
 	__m128i * __restrict pm128iInputSample;
