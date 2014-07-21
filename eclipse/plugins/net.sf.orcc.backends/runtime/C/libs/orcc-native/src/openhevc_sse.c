@@ -27,6 +27,13 @@
  * SUCH DAMAGE.
  */
 
+/**
+ * openHEVC optimized procedures.
+ *
+ * @author Herve Yviquel (Insa of Rennes)
+ *         Daniele Renzi (EPFL) <daniele.renzi@epfl.ch>
+ *         Damien de Saint Jorre (EPFL) <dam.dsj@gmail.com>
+ */
 #include "openhevc_sse.h"
 
 #include "hevcpred.h"
@@ -75,11 +82,35 @@ static const int LUT_WEIGHTED_FUNC[65] = {
    -1, -1, -1, -1, -1, -1, -1, -1,
     5};
 
+static void (*copy_8_8_Lcu[10])(u8 *outputSample, u8 *inputSample,
+    u32 outputOffset, u32 inputOffset,
+    u32 outputStride, u32 inputStride);
+
+void copy_2D_8_8_8x8_orcc(u8 *outputSample, u8 *inputSample,
+    u32 outputOffset, u32 inputOffset,
+    u32 outputStride, u32 inputStride);
+
+void copy_2D_8_8_16x16_orcc(u8 *outputSample, u8 *inputSample,
+    u32 outputOffset, u32 inputOffset,
+    u32 outputStride, u32 inputStride);
+
+void copy_2D_8_8_32x32_orcc(u8 *outputSample, u8 *inputSample,
+    u32 outputOffset, u32 inputOffset,
+    u32 outputStride, u32 inputStride);
+
+void copy_2D_8_8_64x64_orcc(u8 *outputSample, u8 *inputSample,
+    u32 outputOffset, u32 inputOffset,
+    u32 outputStride, u32 inputStride);
+
 int openhevc_init_context()
 {
     ff_hevc_dsp_init(&hevcDsp, 8);
     ff_hevc_pred_init(&hevcPred, 8);
 
+    copy_8_8_Lcu[2] = copy_2D_8_8_8x8_orcc;
+	copy_8_8_Lcu[3] = copy_2D_8_8_16x16_orcc;
+	copy_8_8_Lcu[4] = copy_2D_8_8_32x32_orcc;
+	copy_8_8_Lcu[5] = copy_2D_8_8_64x64_orcc;
     return 0;
 }
 
@@ -172,15 +203,26 @@ void pred_planar_orcc(u8 _src[4096], u8 _top[129], u8 _left[129], i32 stride, i3
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
+static int Sign3(int a) {
+	return (a > 0) - (a < 0);
+}
+
+static int clip_i32(int val, int min, int max) {
+	if(val < min) return min;
+	if(val > max) return max;
+	return val;
+}
+
+#if HAVE_SSE4
 void saoFilterEdge_orcc(u8 saoEoClass, u8 cIdx, u8 cIdxOffset, u16 idxOrig[2], u8 lcuSizeMax,
 	u16 picSize[2], u8 lcuIsPictBorder, i32 saoOffset[5],
 	u8 filtAcrossSlcAndTiles,
-	u8 * pucOrigPict,
-	u8 * pucFiltPict,
+    u8 * pucOrigPict,
+    u8 * pucPict,
 	u8 saoTypeIdx[8])
 {
-	u8 * ptrDst = &pucFiltPict[cIdxOffset * 2048 * 4096 + idxOrig[1] * 4096 + idxOrig[0]];
-	u8 * ptrSrc = &pucOrigPict[cIdxOffset * 2048 * 4096 + idxOrig[1] * 4096 + idxOrig[0]];
+	u8 * ptrDst = &pucPict[cIdxOffset * 2048 * 4096 + idxOrig[1] * 4096 + idxOrig[0]];
+	u8 * ptrSrc = ptrDst;
 
 	int borders[4];
 	struct SAOParams sao;
@@ -189,6 +231,7 @@ void saoFilterEdge_orcc(u8 saoEoClass, u8 cIdx, u8 cIdxOffset, u16 idxOrig[2], u
 	u16 yMax;
 	i16 xMax2;
 	u16 yMax2;
+	u8  newPix[66][4096];
 
 	sao.eo_class[cIdx] = saoEoClass;
 	for(i = 0; i < 5; i++) {
@@ -200,23 +243,167 @@ void saoFilterEdge_orcc(u8 saoEoClass, u8 cIdx, u8 cIdxOffset, u16 idxOrig[2], u
 	xMax2 = min(lcuSizeMax, picSize[0] - idxOrig[0]);
 	yMax2 = min(lcuSizeMax, picSize[1] - idxOrig[1]);
 
+
+	if(saoEoClass != 0 && saoEoClass != 1) {
+		//UP-LEFT
+		if(saoTypeIdx[0] && idxOrig[0] != 0 && idxOrig[1] != 0) {
+			x = idxOrig[0] - 1;
+			y = idxOrig[1] - 1;
+			newPix[y - idxOrig[1] + 1][0] = pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+			pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = pucOrigPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+		}
+
+		//UP-RIGHT
+		if(saoTypeIdx[2] && xMax == lcuSizeMax - 1 && idxOrig[1] != 0) {
+			x = idxOrig[0] + lcuSizeMax;
+			y = idxOrig[1] - 1;
+			newPix[y - idxOrig[1] + 1][lcuSizeMax + 1] = pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+			pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = pucOrigPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+		}
+
+		//DOWN-LEFT
+		if(saoTypeIdx[6] && idxOrig[0] != 0 && yMax == lcuSizeMax - 1) {
+			x = idxOrig[0] - 1;
+			y = idxOrig[1] + lcuSizeMax;
+			newPix[y - idxOrig[1] + 1][0] = pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+			pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = pucOrigPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+		}
+
+		//DOWN-RIGHT
+		if(saoTypeIdx[4] && xMax == lcuSizeMax - 1 && yMax == lcuSizeMax - 1) {
+			x = idxOrig[0] + lcuSizeMax;
+			y = idxOrig[1] + lcuSizeMax;
+			newPix[y - idxOrig[1] + 1][lcuSizeMax + 1] = pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+			pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = pucOrigPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+		}
+	}
+
+	if(saoEoClass != 1) {
+		//LEFT
+		if(saoTypeIdx[7] && idxOrig[0] != 0) {
+			x = idxOrig[0] - 1;
+			for(y = idxOrig[1]; y < idxOrig[1] + lcuSizeMax; y++) {
+				newPix[y - idxOrig[1] + 1][0] = pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+				pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = pucOrigPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+			}
+		}
+
+		//RIGHT
+		if(saoTypeIdx[3] && xMax == lcuSizeMax - 1) {
+			x = idxOrig[0] + lcuSizeMax;
+			for(y = idxOrig[1]; y < idxOrig[1] + lcuSizeMax; y++) {
+				newPix[y - idxOrig[1] + 1][lcuSizeMax + 1] = pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+				pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = pucOrigPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+			}
+		}
+	}
+
+	if(saoEoClass != 0) {
+		//UP
+		if(saoTypeIdx[1] && idxOrig[1] != 0) {
+			y = idxOrig[1] - 1;
+			for(x = idxOrig[0]; x < idxOrig[0] + lcuSizeMax; x++) {
+				newPix[0][x - idxOrig[0] + 1] = pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+				pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = pucOrigPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+			}
+		}
+
+		//DOWN
+		if(saoTypeIdx[5] && yMax == lcuSizeMax - 1) {
+			y = idxOrig[1] + lcuSizeMax;
+			for(x = idxOrig[0]; x < idxOrig[0] + lcuSizeMax; x++) {
+				newPix[lcuSizeMax + 1][x - (idxOrig[0] - 1)] = pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+				pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = pucOrigPict[cIdxOffset * 2048 * 4096 + y * 4096 + x];
+			}
+		}
+	}
+
 	borders[0] = (idxOrig[0] == 0);
 	borders[1] = (idxOrig[1] == 0);
 	borders[2] = (idxOrig[0] + xMax2 == picSize[0]);
 	borders[3] = (idxOrig[1] + yMax2 == picSize[1]);
 
-	ff_hevc_sao_edge_filter_0_8_sse(ptrDst, ptrSrc,
+	ff_hevc_sao_edge_filter_0_8_sse(&newPix[1][1], ptrSrc,
 		4096, &sao, borders, xMax2, yMax2, cIdx, NULL, NULL, NULL);
-}
 
+	copy_8_8_Lcu[LUT_WEIGHTED_FUNC[lcuSizeMax]]( &pucPict[cIdxOffset * 2048 * 4096 + idxOrig[1] * 4096 + idxOrig[0]], &newPix[1][1],
+		0, 0, 4096, 4096);
+
+	if(saoEoClass != 0 && saoEoClass != 1) {
+		//UP-LEFT
+		if(saoTypeIdx[0] && idxOrig[0] != 0 && idxOrig[1] != 0) {
+			x = idxOrig[0] - 1;
+			y = idxOrig[1] - 1;
+			pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = newPix[y - idxOrig[1] + 1][0];
+		}
+
+		//UP-RIGHT
+		if(saoTypeIdx[2] && xMax == lcuSizeMax - 1 && idxOrig[1] != 0) {
+			x = idxOrig[0] + lcuSizeMax;
+			y = idxOrig[1] - 1;
+			pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = newPix[y - idxOrig[1] + 1][lcuSizeMax + 1];
+		}
+
+		//DOWN-LEFT
+		if(saoTypeIdx[6] && idxOrig[0] != 0 && yMax == lcuSizeMax - 1) {
+			x = idxOrig[0] - 1;
+			y = idxOrig[1] + lcuSizeMax;
+			pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = newPix[y - idxOrig[1] + 1][0];
+		}
+
+		//DOWN-RIGHT
+		if(saoTypeIdx[4] && xMax == lcuSizeMax - 1 && yMax == lcuSizeMax - 1) {
+			x = idxOrig[0] + lcuSizeMax;
+			y = idxOrig[1] + lcuSizeMax;
+			pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = newPix[y - idxOrig[1] + 1][lcuSizeMax + 1];
+		}
+	}
+
+	if(saoEoClass != 1) {
+		//LEFT
+		if(saoTypeIdx[7] && idxOrig[0] != 0) {
+			x = idxOrig[0] - 1;
+			for(y = idxOrig[1]; y < idxOrig[1] + lcuSizeMax; y++) {
+				pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = newPix[y - idxOrig[1] + 1][0];
+			}
+		}
+
+		//RIGHT
+		if(saoTypeIdx[3] && xMax == lcuSizeMax - 1) {
+			x = idxOrig[0] + lcuSizeMax;
+			for(y = idxOrig[1]; y < idxOrig[1] + lcuSizeMax; y++) {
+				pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = newPix[y - idxOrig[1] + 1][lcuSizeMax + 1];
+			}
+		}
+	}
+
+
+	if(saoEoClass != 0) {
+		//UP
+		if(saoTypeIdx[1] && idxOrig[1] != 0) {
+			y = idxOrig[1] - 1;
+			for(x = idxOrig[0]; x < idxOrig[0] + lcuSizeMax; x++) {
+				pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = newPix[0][x - (idxOrig[0] - 1)];
+			}
+		}
+
+		//DOWN
+		if(saoTypeIdx[5] && yMax == lcuSizeMax - 1) {
+			y = idxOrig[1] + lcuSizeMax;
+			for(x = idxOrig[0]; x < idxOrig[0] + lcuSizeMax; x++) {
+				pucPict[cIdxOffset * 2048 * 4096 + y * 4096 + x] = newPix[lcuSizeMax + 1][x - (idxOrig[0] - 1)];
+			}
+		}
+	}
+}
+#endif // HAVE_SSE4
 
 void saoBandFilter_orcc(u8 saoLeftClass, i32 saoOffset[5], u8 cIdx, u8 cIdxOffset, i16 idxMin[2],
 	i16 idxMax[2],
-	u8 * pucOrigPict,
-	u8 * pucFiltPict) {
+	u8 * pucOrigPict) {
 
-	u8 * ptrDst = &pucFiltPict[cIdxOffset * 2048 * 4096 + idxMin[1] * 4096 + idxMin[0]];
-	u8 * ptrSrc = &pucOrigPict[cIdxOffset * 2048 * 4096 + idxMin[1] * 4096 + idxMin[0]];
+	u8 * ptrDst = &pucOrigPict[cIdxOffset * 2048 * 4096 + idxMin[1] * 4096 + idxMin[0]];
+	u8 * ptrSrc = ptrDst;
 
 	struct SAOParams sao;
 	int i;

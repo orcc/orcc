@@ -522,8 +522,9 @@ class InstancePrinter extends CTemplate {
 
 	def protected printStateTransition(State state, Transition trans) {
 		val output = '''
-			if («trans.action.inputPattern.checkInputPattern»«trans.action.scheduler.name»()) {
-				«IF !trans.action.outputPattern.empty»
+			«val outputSchedulable = trans.action.hasAttribute(OUTPUT_SCHEDULABLE) || actor.hasAttribute(OUTPUT_SCHEDULABLE)»
+			if («trans.action.inputPattern.checkInputPattern»«IF outputSchedulable»«trans.action.outputPattern.checkOutputPattern»«ENDIF»«trans.action.scheduler.name»()) {
+				«IF !trans.action.outputPattern.empty && !outputSchedulable»
 					«trans.action.outputPattern.printOutputPattern»
 						_FSM_state = my_state_«state.name»;
 						si->num_firings = i;
@@ -636,8 +637,9 @@ class InstancePrinter extends CTemplate {
 
 	def protected printActionScheduling(Action action) {
 		val output = '''
-			if («action.inputPattern.checkInputPattern»«action.scheduler.name»()) {
-				«IF !action.outputPattern.empty»
+			«val outputSchedulable = action.hasAttribute(OUTPUT_SCHEDULABLE) || actor.hasAttribute(OUTPUT_SCHEDULABLE)»
+			if («action.inputPattern.checkInputPattern»«IF outputSchedulable»«action.outputPattern.checkOutputPattern»«ENDIF»«action.scheduler.name»()) {
+				«IF !action.outputPattern.empty && !outputSchedulable»
 					«action.outputPattern.printOutputPattern»
 						si->num_firings = i;
 						si->reason = full;
@@ -671,12 +673,12 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 
-	def protected printOutputPattern(Pattern outputPattern) '''
+	def protected printOutputPattern(Pattern pattern) '''
 		int stop = 0;
-		«FOR outPort : outputPattern.ports»
+		«FOR port : pattern.ports»
 			«var i = -1»
-			«FOR connection : outgoingPortMap.get(outPort)»
-				if («outputPattern.getNumTokens(outPort)» > SIZE_«outPort.name» - index_«outPort.name» + «outPort.fullName»->read_inds[«i = i + 1»]) {
+			«FOR connection : outgoingPortMap.get(port)»
+				if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«i = i + 1»]) {
 					stop = 1;
 					«IF newSchedul»
 						if( ! «entityName».sched->round_robin || i > 0) {
@@ -691,6 +693,9 @@ class InstancePrinter extends CTemplate {
 
 	def protected checkInputPattern(Pattern pattern)
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.getNumTokens(port)» && «ENDFOR»'''
+
+	def protected checkOutputPattern(Pattern pattern)
+		'''«FOR port : pattern.ports»«var i = -1»«FOR connection : outgoingPortMap.get(port)»!(«pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«i = i + 1»]) && «ENDFOR»«ENDFOR»'''
 
 	def protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {

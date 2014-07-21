@@ -216,8 +216,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		networkTransfos = new ArrayList<DfVisitor<?>>();
 		childrenTransfos = new ArrayList<DfVisitor<?>>();
 
-		currentResourceSet = new ResourceSetImpl();
-
 		this.isVTLBackend = isVTLBackend;
 	}
 
@@ -227,6 +225,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		monitor = progressMonitor;
 
 		boolean compileXdf = getOption(COMPILE_XDF, false);
+
+		// New ResourceSet for a new compilation
+		currentResourceSet = new ResourceSetImpl();
 
 		String orccVersion = "<unknown>";
 		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);

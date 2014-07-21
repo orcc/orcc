@@ -193,8 +193,8 @@ public class JadeBackend extends AbstractBackend {
 	@Override
 	protected Result doGenerateActor(Actor actor) {
 		final File targetFolder = new File(path, DfUtil.getFolder(actor));
-		final File targetFile = new File(targetFolder, actor.getSimpleName());
 		final CharSequence content = printer.getContent(actor);
-		return FilesManager.writeFile(content, targetFile);
+		return FilesManager.writeFile(content, targetFolder.getAbsolutePath(),
+				actor.getSimpleName());
 	}
 }

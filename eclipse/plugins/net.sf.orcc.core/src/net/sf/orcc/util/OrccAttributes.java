@@ -35,15 +35,17 @@ package net.sf.orcc.util;
  * 
  */
 public interface OrccAttributes {
-	
+
 	public static final String REMOVABLE_COPY = "removableCopy";
-	
+
 	public static final String COPY_OF_TOKENS = "copyOfTokens";
-	
+
 	public static final String DIRECTIVE_OPTIMIZE_C = "optimize_c";
-	
+
 	public static final String DIRECTIVE_DEBUG = "DEBUG";
-	
+
 	public static final String ALIGNABLE = "ALIGNABLE";
-	public static final String ALIGNED_ALWAYS = "ALIGNED_ALWAYS";	
+	public static final String ALIGNED_ALWAYS = "ALIGNED_ALWAYS";
+	
+	public static final String OUTPUT_SCHEDULABLE = "schedule_outputs";
 }

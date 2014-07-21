@@ -29,6 +29,7 @@
 package net.sf.orcc.util
 
 import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -44,6 +45,8 @@ import java.util.jar.JarFile
 import org.eclipse.core.runtime.Assert
 import org.eclipse.core.runtime.FileLocator
 import org.osgi.framework.FrameworkUtil
+
+import static net.sf.orcc.util.Result.*
 
 /**
  * Utility class to manipulate files. It brings everything needed to extract files
@@ -82,7 +85,7 @@ class FilesManager {
 	def static extract(String path, String targetFolder) {
 		val targetF = new File(targetFolder.sanitize)
 		val url = path.url
-		if (url == null) {
+		if(url == null) {
 			throw new FileNotFoundException(path)
 		}
 		if (url.protocol.equals("jar")) {
@@ -109,8 +112,13 @@ class FilesManager {
 			throw new FileNotFoundException(source.path)
 		}
 		val target = new File(targetFolder, source.name)
-		if (source.file)
-			new FileInputStream(source).streamExtract(target)
+		if (source.file) {
+			if (source.isContentEqual(target)) {
+				newCachedInstance
+			} else {
+				new FileInputStream(source).streamExtract(target)
+			}
+		}
 		else if (source.directory)
 			source.fsDirectoryExtract(target)
 	}
@@ -131,7 +139,7 @@ class FilesManager {
 		else
 			Assert.isTrue(targetFolder.directory)
 
-		val result = Result::newInstance
+		val result = newInstance
 		for (file : source.listFiles) {
 			result.merge(
 				file.fsExtract(targetFolder)
@@ -153,12 +161,12 @@ class FilesManager {
 		val entry = jar.getJarEntry(updatedPath)
 		// Remove the last char if it is '/'
 		val name =
-			if (entry.name.endsWith("/"))
+			if(entry.name.endsWith("/"))
 				entry.name.substring(0, entry.name.length - 1)
 			else
 				entry.name
 		val fileName =
-			if (name.lastIndexOf("/") != -1)
+			if(name.lastIndexOf("/") != -1)
 				name.substring(name.lastIndexOf("/"))
 			else
 				name
@@ -182,7 +190,7 @@ class FilesManager {
 	private def static jarDirectoryExtract(JarFile jar, JarEntry entry, File targetFolder) {
 		val prefix = entry.name
 		val entries = Collections::list(jar.entries).filter[name.startsWith(prefix)]
-		val result = Result::newInstance
+		val result = newInstance
 		for (e : entries) {
 			result.merge(
 				jarFileExtract(jar, e, new File(targetFolder, e.name.substring(prefix.length)))
@@ -199,32 +207,37 @@ class FilesManager {
 		targetFile.parentFile.mkdirs
 		if (entry.directory) {
 			targetFile.mkdir
-			return Result::newInstance
+			return newInstance
 		}
-		jar.getInputStream(entry).streamExtract(targetFile)
+		if (jar.getInputStream(entry).isContentEqual(targetFile)) {
+			newCachedInstance
+		} else {
+			jar.getInputStream(entry).streamExtract(targetFile)
+		}
 	}
 
 	/**
 	 * Copy the content represented by the given <em>inputStream</em> into the
-	 * <em>target file</em>.
-	 * @return A Result object with information about extraction status (cached or written)
+	 * <em>target file</em>. No checking is performed for equality between input
+	 * stream and target file. Data are always written.
+	 * 
+	 * @return A Result object with information about extraction status
 	 */
 	private def static streamExtract(InputStream inputStream, File targetFile) {
-		if (inputStream.isContentEqual(targetFile)) {
-			return Result::newCachedInstance
-		}
-
-		val outputStream = new FileOutputStream(targetFile)
+		val bufferedInput = new BufferedInputStream(inputStream)
+		val outputStream = new BufferedOutputStream(
+			new FileOutputStream(targetFile)
+		)
 
 		val byte[] buffer = newByteArrayOfSize(BUFFER_SIZE)
 		var readLength = 0
-		while ((readLength = inputStream.read(buffer)) != -1) {
+		while ((readLength = bufferedInput.read(buffer)) != -1) {
 			outputStream.write(buffer, 0, readLength)
 		}
-		inputStream.close
+		bufferedInput.close
 		outputStream.close
 
-		return Result::newOkInstance
+		return newOkInstance
 	}
 
 	/**
@@ -247,7 +260,7 @@ class FilesManager {
 		// Search in all reachable bundles for the given path resource
 		val bundle = FrameworkUtil::getBundle(FilesManager)
 		val url =
-			if (bundle != null) {
+			if(bundle != null) {
 				val bundles = bundle.bundleContext.bundles
 				bundles
 					// Search only in Orcc plugins
@@ -276,13 +289,7 @@ class FilesManager {
 	 * than file b.
 	 */
 	static def isContentEqual(CharSequence a, File b) {
-		val inputA = new BufferedInputStream(
-			new ByteArrayInputStream(a.toString.bytes)
-		)
-
-		val result = inputA.isContentEqual(b)
-		inputA.close
-		return result
+		new ByteArrayInputStream(a.toString.bytes).isContentEqual(b)
 	}
 
 	/**
@@ -290,17 +297,23 @@ class FilesManager {
 	 * than File b.
 	 */
 	static def isContentEqual(File a, File b) {
-		val inputA = new BufferedInputStream(new FileInputStream(a))
-		val result = inputA.isContentEqual(b)
-		inputA.close
-		return result
+		new FileInputStream(a).isContentEqual(b)
 	}
 
 	/**
-	 * Check if given files have exactly the same content
+	 * <p>Compare the content of input stream <em>a</em> and file <em>b</em>.
+	 * Returns true if the </p>
+	 * 
+	 * <p><strong>Important</strong>: This method will close the input stream
+	 * <em>a</em> before returning the result.</p>
+	 * 
+	 * @param a An input stream
+	 * @param b A file
+	 * @return true if content in a is equals to content in b
 	 */
-	static def isContentEqual(InputStream inputStreamA, File b) {
-		if (!b.exists) return false
+	static def isContentEqual(InputStream a, File b) {
+		if(!b.exists) return false
+		val inputStreamA = new BufferedInputStream(a)
 		val inputStreamB = new BufferedInputStream(new FileInputStream(b))
 
 		var byteA = 0
@@ -309,6 +322,7 @@ class FilesManager {
 			byteA = inputStreamA.read
 			byteB = inputStreamB.read
 		} while (byteA == byteB && byteA != -1)
+		inputStreamA.close
 		inputStreamB.close
 
 		return byteA == -1
@@ -342,9 +356,9 @@ class FilesManager {
 	/**
 	 * Write the <em>content</em> into the <em>targetFile</em> only if necessary.
 	 */
-	static def writeFile(CharSequence content, File targetFile) {
+	private static def writeFile(CharSequence content, File targetFile) {
 		if (content.isContentEqual(targetFile)) {
-			return Result::newCachedInstance
+			return newCachedInstance
 		}
 
 		if (!targetFile.parentFile.exists) {
@@ -353,7 +367,7 @@ class FilesManager {
 		val ps = new PrintStream(new FileOutputStream(targetFile))
 		ps.print(content)
 		ps.close
-		return Result::newOkInstance
+		return newOkInstance
 	}
 
 	/**
@@ -370,11 +384,11 @@ class FilesManager {
 	static def readFile(String path) {
 
 		val url = path.url
-		if (url == null) {
+		if(url == null) {
 			throw new FileNotFoundException(path)
 		}
 
-		val reader =
+		val inputStream =
 			if (url.protocol.equals("jar")) {
 				val splittedURL = url.file.split("!")
 				val jar = new JarFile(splittedURL.head.substring(5))
@@ -391,12 +405,15 @@ class FilesManager {
 
 		var readLength = 0
 		var buffer = newByteArrayOfSize(BUFFER_SIZE)
+
+		val bufferedInput = new BufferedInputStream(inputStream)
 		val outputStream = new ByteArrayOutputStream
-		while ((readLength = reader.read(buffer)) != -1) {
+
+		while ((readLength = bufferedInput.read(buffer)) != -1) {
 			outputStream.write(buffer, 0, readLength)
 		}
 
-		reader.close
+		bufferedInput.close
 		outputStream.toString
 	}
 
