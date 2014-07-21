@@ -90,13 +90,18 @@ public class LLVMBackend extends AbstractBackend {
 	 */
 	private String srcPath;
 
-	protected final Map<String, String> renameMap;
+	@Override
+	protected void doInitializeOptions() {
 
-	/**
-	 * Creates a new instance of the LLVM back-end. Initializes the
-	 * transformation hash map.
-	 */
-	public LLVMBackend() {
+		// Create the empty folders
+		new File(path, "bin").mkdir();
+		new File(path, "build").mkdir();
+
+		// Configure the path where source files will be written
+		srcPath = new File(path, "src").toString();
+
+		// Configure the map used in RenameTransformation
+		final Map<String, String> renameMap;
 		renameMap = new HashMap<String, String>();
 		renameMap.put("abs", "abs_");
 		renameMap.put("getw", "getw_");
@@ -104,86 +109,53 @@ public class LLVMBackend extends AbstractBackend {
 		renameMap.put("min", "min_");
 		renameMap.put("max", "max_");
 		renameMap.put("select", "select_");
-	}
 
-	@Override
-	protected void doInitializeOptions() {
-		// Set build and src directory
-		File srcDir = new File(path + File.separator + "src");
-		File buildDir = new File(path + File.separator + "build");
-		File binDir = new File(path + File.separator + "bin");
-
-		// If directories don't exist, create them
-		if (!srcDir.exists()) {
-			srcDir.mkdirs();
-		}
-		if (!buildDir.exists()) {
-			buildDir.mkdirs();
-		}
-		if (!binDir.exists()) {
-			binDir.mkdirs();
-		}
-
-		// Set src directory as path
-		srcPath = srcDir.getAbsolutePath();
-	}
-
-	@Override
-	protected void doTransformActor(Actor actor) {
-		// do not transform actor
-	}
-
-	protected void doTransformNetwork(Network network) {
-		OrccLogger.traceln("Analyze and transform the network...");
-
-		List<DfSwitch<?>> visitors = new ArrayList<DfSwitch<?>>();
-
-		visitors.add(new Instantiator(!debug));
-		visitors.add(new NetworkFlattener());
-		visitors.add(new UnitImporter());
+		// -----------------------------------------------------
+		// Transformations that will be applied on the Network
+		// -----------------------------------------------------
+		networkTransfos.add(new Instantiator(!debug));
+		networkTransfos.add(new NetworkFlattener());
+		networkTransfos.add(new UnitImporter());
 
 		if (classify) {
-			visitors.add(new Classifier());
+			networkTransfos.add(new Classifier());
 		}
 		if (mergeActions) {
-			visitors.add(new ActionMerger());
+			networkTransfos.add(new ActionMerger());
 		}
 		if (mergeActors) {
-			visitors.add(new ActorMerger());
+			networkTransfos.add(new ActorMerger());
 		}
 		if (convertMulti2Mono) {
-			visitors.add(new Multi2MonoToken());
+			networkTransfos.add(new Multi2MonoToken());
 		}
 
-		visitors.add(new DisconnectedOutputPortRemoval());
-
-		visitors.add(new TypeResizer(true, false, false, false));
-		visitors.add(new StringTransformation());
-		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
-		visitors.add(new DfVisitor<Void>(new SSATransformation()));
-		visitors.add(new DeadGlobalElimination());
-		visitors.add(new DfVisitor<Void>(new DeadCodeElimination()));
-		visitors.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-		visitors.add(new RenameTransformation(this.renameMap));
-		visitors.add(new DfVisitor<Expression>(new TacTransformation()));
-		visitors.add(new DfVisitor<Void>(new CopyPropagator()));
-		visitors.add(new DfVisitor<Void>(new ConstantPropagator()));
-		visitors.add(new DfVisitor<Void>(new InstPhiTransformation()));
-		visitors.add(new DfVisitor<Expression>(new CastAdder(false, true)));
-		visitors.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-		visitors.add(new DfVisitor<Void>(new BlockCombine()));
-		visitors.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
-		visitors.add(new DfVisitor<Void>(new ListInitializer()));
+		networkTransfos.add(new DisconnectedOutputPortRemoval());
+		networkTransfos.add(new TypeResizer(true, false, false, false));
+		networkTransfos.add(new StringTransformation());
+		networkTransfos.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
+		networkTransfos.add(new DfVisitor<Void>(new SSATransformation()));
+		networkTransfos.add(new DeadGlobalElimination());
+		networkTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		networkTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+		networkTransfos.add(new RenameTransformation(renameMap));
+		networkTransfos.add(new DfVisitor<Expression>(new TacTransformation()));
+		networkTransfos.add(new DfVisitor<Void>(new CopyPropagator()));
+		networkTransfos.add(new DfVisitor<Void>(new ConstantPropagator()));
+		networkTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		networkTransfos.add(new DfVisitor<Expression>(new CastAdder(false, true)));
+		networkTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		networkTransfos.add(new DfVisitor<Void>(new BlockCombine()));
+		networkTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		networkTransfos.add(new DfVisitor<Void>(new ListInitializer()));
 
 		// computes names of local variables
-		visitors.add(new DfVisitor<Void>(new SSAVariableRenamer()));
+		networkTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
+	}
 
-		for (DfSwitch<?> transfo : visitors) {
-			transfo.doSwitch(network);
-			if (debug) {
-				OrccUtil.validateObject(transfo.toString(), network);
-			}
-		}
+	@Override
+	protected void doValidate(Network network) {
+		super.doValidate(network);
 
 		new DfVisitor<Void>(new TemplateInfoComputing()).doSwitch(network);
 		network.computeTemplateMaps();
@@ -193,8 +165,6 @@ public class LLVMBackend extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
-
-		doTransformNetwork(network);
 
 		// update "vectorizable" information
 		Alignable.setAlignability(network);
@@ -235,5 +205,4 @@ public class LLVMBackend extends AbstractBackend {
 	protected boolean printActor(Actor actor) {
 		return new InstancePrinter(getOptions()).print(srcPath, actor) > 0;
 	}
-
 }
