@@ -386,6 +386,20 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
+	 * Transforms instances of the given network.
+	 * 
+	 * @param actors
+	 *            a list of actors
+	 */
+	@Deprecated
+	final public void transformActors(List<Actor> actors) {
+		OrccLogger.traceln("Transforming actors...");
+		for (Actor actor : actors) {
+			doTransformActor(actor);
+		}
+	}
+
+	/**
 	 * This method must be implemented by subclasses to do the actual code
 	 * generation for the network or its instances or both.
 	 * 
@@ -549,34 +563,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				throw new OperationCanceledException();
 			}
 		}
-	}
-
-	/**
-	 * Parses the given file list and returns a list of actors.
-	 * 
-	 * @param files
-	 *            a list of JSON files
-	 * @return a list of actors
-	 */
-	final public List<Actor> parseActors(List<IFile> files) {
-		// NOTE: the actors are parsed but are NOT put in the actor pool because
-		// they may be transformed and not have the same properties (in
-		// particular concerning types), and instantiation then complains.
-
-		OrccLogger.traceln("Parsing " + files.size() + " actors...");
-
-		List<Actor> actors = new ArrayList<Actor>();
-		for (IFile file : files) {
-			EObject eObject = EcoreHelper.getEObject(currentResourceSet, file);
-			if (eObject instanceof Actor) {
-				// do not add units
-				actors.add((Actor) eObject);
-			}
-
-			stopIfRequested();
-		}
-
-		return actors;
 	}
 
 	/**
@@ -892,19 +878,5 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	@Override
 	public void stop() {
 		monitor.setCanceled(true);
-	}
-
-	/**
-	 * Transforms instances of the given network.
-	 * 
-	 * @param actors
-	 *            a list of actors
-	 */
-	@Deprecated
-	final public void transformActors(List<Actor> actors) {
-		OrccLogger.traceln("Transforming actors...");
-		for (Actor actor : actors) {
-			doTransformActor(actor);
-		}
 	}
 }
