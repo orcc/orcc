@@ -407,9 +407,7 @@ class FilesManager {
 		var buffer = newByteArrayOfSize(BUFFER_SIZE)
 
 		val bufferedInput = new BufferedInputStream(inputStream)
-		val outputStream = new BufferedOutputStream(
-			new ByteArrayOutputStream
-		)
+		val outputStream = new ByteArrayOutputStream
 
 		while ((readLength = bufferedInput.read(buffer)) != -1) {
 			outputStream.write(buffer, 0, readLength)
