@@ -29,6 +29,7 @@
 
 // Author : Endri Bezati (endri.bezati@epfl.ch)
 // Author : Damien de Saint Jorre
+// Author : Rob Stewart (R.Stewart@hw.ac.uk)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,6 +41,13 @@
 #include "options.h"
 
 FILE *F = NULL;
+
+/*
+Rob Stewart: Now that `cnt` is not used beyond the fix to
+             https://github.com/orcc/orcc/issues/115 ,
+             it may be a candidate for obsolescence; it is
+             only used in `writer_closeAndQuit(..)`.
+*/
 static int cnt = 0;
 static char stop = 0;
 
@@ -66,9 +74,7 @@ void Writer_init() {
 }
 
 void Writer_write(u8 byte){
-
-    fseek(F,sizeof(u8)*cnt,SEEK_SET);
-    fwrite(&byte,sizeof(u8),1,F);
+    putc(byte,F);
     cnt++;
 }
 
