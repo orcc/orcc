@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.util
 
+import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -275,7 +276,9 @@ class FilesManager {
 	 * than file b.
 	 */
 	static def isContentEqual(CharSequence a, File b) {
-		new ByteArrayInputStream(a.toString.bytes).isContentEqual(b)
+		new BufferedInputStream(
+			new ByteArrayInputStream(a.toString.bytes)
+		).isContentEqual(b)
 	}
 
 	/**
@@ -283,7 +286,7 @@ class FilesManager {
 	 * than File b.
 	 */
 	static def isContentEqual(File a, File b) {
-		val fis = new FileInputStream(a)
+		val fis = new BufferedInputStream(new FileInputStream(a))
 		val result = fis.isContentEqual(b)
 		fis.close
 		return result
@@ -294,7 +297,7 @@ class FilesManager {
 	 */
 	static def isContentEqual(InputStream inputStreamA, File b) {
 		if(!b.exists) return false
-		val inputStreamB = new FileInputStream(b)
+		val inputStreamB = new BufferedInputStream(new FileInputStream(b))
 
 		var byteA = 0
 		var byteB = 0
