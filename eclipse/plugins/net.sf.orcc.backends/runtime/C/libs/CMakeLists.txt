@@ -32,6 +32,15 @@ include_directories(
     orcc-native/include
 )
 
+set(USR_LIB_DIR "" CACHE PATH "User lib directory")
+set(USR_LIB "" CACHE STRING "Additional library in USR_LIB_DIR")
+
+if(USR_LIB)
+	FIND_LIBRARY(USR_LIBRARY ${USR_LIB} PATHS ${USR_LIB_DIR})
+    SET(USR_LIBRARY "${USR_LIBRARY}" CACHE INTERNAL "")
+	set(extra_libraries ${extra_libraries} ${USR_LIBRARY})
+endif(USR_LIB)
+
 add_subdirectory(roxml)
 add_subdirectory(orcc-runtime)
 add_subdirectory(orcc-native)
