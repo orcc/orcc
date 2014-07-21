@@ -45,6 +45,8 @@ import org.osgi.framework.FrameworkUtil
 
 import static net.sf.orcc.util.Result.*
 import java.net.URI
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
 
 /**
  * Utility class to manipulate files. It brings everything needed to extract files
@@ -110,8 +112,13 @@ class FilesManager {
 			throw new FileNotFoundException(source.path)
 		}
 		val target = new File(targetFolder, source.name)
-		if (source.file)
-			new FileInputStream(source).streamExtract(target)
+		if (source.file) {
+			if (source.isContentEqual(target)) {
+				CACHED
+			} else {
+				new FileInputStream(source).streamExtract(target)
+			}
+		}
 		else if (source.directory)
 			source.fsDirectoryExtract(target)
 	}
@@ -202,27 +209,32 @@ class FilesManager {
 			targetFile.mkdir
 			return EMPTY_RESULT
 		}
-		jar.getInputStream(entry).streamExtract(targetFile)
+		if (jar.getInputStream(entry).isContentEqual(targetFile)) {
+			CACHED
+		} else {
+			jar.getInputStream(entry).streamExtract(targetFile)
+		}
 	}
 
 	/**
 	 * Copy the content represented by the given <em>inputStream</em> into the
-	 * <em>target file</em>.
-	 * @return A Result object with information about extraction status (cached or written)
+	 * <em>target file</em>. No checking is performed for equality between input
+	 * stream and target file. Data are always written.
+	 * 
+	 * @return A Result object with information about extraction status
 	 */
 	private def static streamExtract(InputStream inputStream, File targetFile) {
-		if (inputStream.isContentEqual(targetFile)) {
-			return CACHED
-		}
-
-		val outputStream = new FileOutputStream(targetFile)
+		val bufferedInput = new BufferedInputStream(inputStream)
+		val outputStream = new BufferedOutputStream(
+			new FileOutputStream(targetFile)
+		)
 
 		val byte[] buffer = newByteArrayOfSize(BUFFER_SIZE)
 		var readLength = 0
-		while ((readLength = inputStream.read(buffer)) != -1) {
+		while ((readLength = bufferedInput.read(buffer)) != -1) {
 			outputStream.write(buffer, 0, readLength)
 		}
-		inputStream.close
+		bufferedInput.close
 		outputStream.close
 
 		return OK
@@ -285,18 +297,24 @@ class FilesManager {
 	 * than File b.
 	 */
 	static def isContentEqual(File a, File b) {
-		val fis = new FileInputStream(a)
-		val result = fis.isContentEqual(b)
-		fis.close
-		return result
+		new FileInputStream(a).isContentEqual(b)
 	}
 
 	/**
-	 * Check if given files have exactly the same content
+	 * <p>Compare the content of input stream <em>a</em> and file <em>b</em>.
+	 * Returns true if the </p>
+	 * 
+	 * <p><strong>Important</strong>: This method will close the input stream
+	 * <em>a</em> before returning the result.</p>
+	 * 
+	 * @param a An input stream
+	 * @param b A file
+	 * @return true if content in a is equals to content in b
 	 */
-	static def isContentEqual(InputStream inputStreamA, File b) {
+	static def isContentEqual(InputStream a, File b) {
 		if(!b.exists) return false
-		val inputStreamB = new FileInputStream(b)
+		val inputStreamA = new BufferedInputStream(a)
+		val inputStreamB = new BufferedInputStream(new FileInputStream(b))
 
 		var byteA = 0
 		var byteB = 0
@@ -304,6 +322,7 @@ class FilesManager {
 			byteA = inputStreamA.read
 			byteB = inputStreamB.read
 		} while (byteA == byteB && byteA != -1)
+		inputStreamA.close
 		inputStreamB.close
 
 		return byteA == -1
@@ -369,7 +388,7 @@ class FilesManager {
 			throw new FileNotFoundException(path)
 		}
 
-		val reader =
+		val inputStream =
 			if (url.protocol.equals("jar")) {
 				val splittedURL = url.file.split("!")
 				val jar = new JarFile(splittedURL.head.substring(5))
@@ -386,12 +405,17 @@ class FilesManager {
 
 		var readLength = 0
 		var buffer = newByteArrayOfSize(BUFFER_SIZE)
-		val outputStream = new ByteArrayOutputStream
-		while ((readLength = reader.read(buffer)) != -1) {
+
+		val bufferedInput = new BufferedInputStream(inputStream)
+		val outputStream = new BufferedOutputStream(
+			new ByteArrayOutputStream
+		)
+
+		while ((readLength = bufferedInput.read(buffer)) != -1) {
 			outputStream.write(buffer, 0, readLength)
 		}
 
-		reader.close
+		bufferedInput.close
 		outputStream.toString
 	}
 
