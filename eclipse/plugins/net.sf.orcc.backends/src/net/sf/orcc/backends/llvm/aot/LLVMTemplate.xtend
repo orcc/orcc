@@ -50,6 +50,7 @@ import net.sf.orcc.ir.TypeString
 import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.util.TypeUtil
 
 /*
  * Default LLVM Printer. Call ExpressionPrinter when necessary and print data types.
@@ -136,7 +137,7 @@ abstract class LLVMTemplate extends CommonPrinter {
 		val e1 = expr.e1
 		val e2 = expr.e2
 
-		val type = e1.type
+		val type = TypeUtil.getLub(e1.type, e2.type);
 
 		signed = !type.uint
 		floating = type.float
