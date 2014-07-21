@@ -117,7 +117,7 @@ public class HMPPBackend extends CBackend {
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 
 		Result result = FilesManager.extract("/runtime/C/libs", path);
 		result.merge(FilesManager.extract("/runtime/C/README.txt", path));

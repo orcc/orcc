@@ -78,7 +78,7 @@ public class COMPABackend extends CBackend {
 	
 	
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 		OrccLogger.trace("Export libraries sources");
 		Result result = FilesManager.extract("/runtime/COMPA/libs", path);
 		result.merge(FilesManager.extract("/runtime/COMPA/cmake", path));

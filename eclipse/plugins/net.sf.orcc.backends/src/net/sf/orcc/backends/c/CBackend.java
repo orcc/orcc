@@ -267,7 +267,7 @@ public class CBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 		Result result = FilesManager.extract("/runtime/C/README.txt", path);
 
 		// Copy specific windows batch file

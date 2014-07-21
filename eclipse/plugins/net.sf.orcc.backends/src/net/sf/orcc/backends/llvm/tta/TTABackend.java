@@ -220,7 +220,7 @@ public class TTABackend extends LLVMBackend {
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 
 		Result result = FilesManager.extract("/runtime/TTA/libs", path);
 		result.merge(FilesManager.extract("/runtime/common/scripts", path));

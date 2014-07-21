@@ -173,7 +173,7 @@ public class PromelaBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 		return FilesManager.extract("/runtime/Promela/pylibs", path);
 	}
 

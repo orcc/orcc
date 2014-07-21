@@ -126,7 +126,7 @@ import org.osgi.framework.Bundle;
  * <li>{@link #printActor(Actor)} is called by {@link #printActors(List)}.</li>
  * <li>{@link #printInstance(Instance)} is called by
  * {@link #printInstances(Network)}.</li>
- * <li>{@link #extractLibraries()} is called by {@link #compile()}.</li>
+ * <li>{@link #doLibrariesExtraction()} is called by {@link #compile()}.</li>
  * </ul>
  * 
  * The other methods declared <code>final</code> may be called by back-ends.
@@ -252,7 +252,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// If user checked the option "Don't export library", the method
 		// extractLibraries() must not be called
 		if (!getOption(NO_LIBRARY_EXPORT, false)) {
-			extractLibraries();
+			doLibrariesExtraction();
 		}
 
 		final IFile xdfFile = getFile(project, getOption(XDF_FILE, ""),
@@ -447,7 +447,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *         to the disk and the number cached (not written because already
 	 *         up-to-date)
 	 */
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 		return Result.newInstance();
 	}
 

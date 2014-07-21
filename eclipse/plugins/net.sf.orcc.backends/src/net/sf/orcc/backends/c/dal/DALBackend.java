@@ -135,7 +135,7 @@ public class DALBackend extends CBackend {
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 		// Never extract libraries (Note: we can also force attribute
 		// NO_LIBRARY_EXPORT to true)
 		return Result.newInstance();

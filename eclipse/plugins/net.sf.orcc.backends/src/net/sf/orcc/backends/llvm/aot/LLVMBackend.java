@@ -178,7 +178,7 @@ public class LLVMBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 		Result result = FilesManager.extract("/runtime/C/README.txt", path);
 		// Copy specific windows batch file
 		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
