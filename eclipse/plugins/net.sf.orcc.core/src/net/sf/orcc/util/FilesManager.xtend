@@ -82,7 +82,7 @@ class FilesManager {
 	def static extract(String path, String targetFolder) {
 		val targetF = new File(targetFolder.sanitize)
 		val url = path.url
-		if(url == null) {
+		if (url == null) {
 			throw new FileNotFoundException(path)
 		}
 		if (url.protocol.equals("jar")) {
@@ -153,12 +153,12 @@ class FilesManager {
 		val entry = jar.getJarEntry(updatedPath)
 		// Remove the last char if it is '/'
 		val name =
-			if(entry.name.endsWith("/"))
+			if (entry.name.endsWith("/"))
 				entry.name.substring(0, entry.name.length - 1)
 			else
 				entry.name
 		val fileName =
-			if(name.lastIndexOf("/") != -1)
+			if (name.lastIndexOf("/") != -1)
 				name.substring(name.lastIndexOf("/"))
 			else
 				name
@@ -247,7 +247,7 @@ class FilesManager {
 		// Search in all reachable bundles for the given path resource
 		val bundle = FrameworkUtil::getBundle(FilesManager)
 		val url =
-			if(bundle != null) {
+			if (bundle != null) {
 				val bundles = bundle.bundleContext.bundles
 				bundles
 					// Search only in Orcc plugins
@@ -276,9 +276,13 @@ class FilesManager {
 	 * than file b.
 	 */
 	static def isContentEqual(CharSequence a, File b) {
-		new BufferedInputStream(
+		val inputA = new BufferedInputStream(
 			new ByteArrayInputStream(a.toString.bytes)
-		).isContentEqual(b)
+		)
+
+		val result = inputA.isContentEqual(b)
+		inputA.close
+		return result
 	}
 
 	/**
@@ -286,9 +290,9 @@ class FilesManager {
 	 * than File b.
 	 */
 	static def isContentEqual(File a, File b) {
-		val fis = new BufferedInputStream(new FileInputStream(a))
-		val result = fis.isContentEqual(b)
-		fis.close
+		val inputA = new BufferedInputStream(new FileInputStream(a))
+		val result = inputA.isContentEqual(b)
+		inputA.close
 		return result
 	}
 
@@ -296,7 +300,7 @@ class FilesManager {
 	 * Check if given files have exactly the same content
 	 */
 	static def isContentEqual(InputStream inputStreamA, File b) {
-		if(!b.exists) return false
+		if (!b.exists) return false
 		val inputStreamB = new BufferedInputStream(new FileInputStream(b))
 
 		var byteA = 0
@@ -366,7 +370,7 @@ class FilesManager {
 	static def readFile(String path) {
 
 		val url = path.url
-		if(url == null) {
+		if (url == null) {
 			throw new FileNotFoundException(path)
 		}
 
