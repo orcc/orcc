@@ -804,7 +804,7 @@ TRANSFORM_ADD8x8( 8)
 ////////////////////////////////////////////////////////////////////////////////
 // ff_hevc_transform_XxX_add_X_sse4
 ////////////////////////////////////////////////////////////////////////////////
-#define TRANSFORM_ADD2(H, D)                                                   \
+#define TRANSFORM(H, D)                                                   \
 void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _sse4 (                \
     i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
     int i, j, k, add;                                                          \
@@ -814,6 +814,7 @@ void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _sse4 (                \
     i16  tmp_2[H*H];                                                       \
     i16  tmp_3[H*H];                                                       \
     i16 *p_dst, *p_tra = tmp_2;                                            \
+    i16 stride = H;                                                        \
     __m128i src0, src1, src2, src3;                                            \
     __m128i tmp0, tmp1, tmp2, tmp3, tmp4;                                      \
     __m128i e0, e1, e2, e3, e4, e5, e6, e7;                                    \
@@ -824,20 +825,21 @@ void ff_hevc_transform_ ## H ## x ## H ## _ ## D ## _sse4 (                \
             TR_ ## H ## _1(p_dst, H, src);                                     \
             src   += 8;                                                        \
             for (j = 0; j < H; j+=8) {                                         \
-               TRANSPOSE8x8_16_LS((&p_tra[i*H+j]), H, (&tmp[j*H+i]), H, SAVE_8x16_2);\
+               TRANSPOSE8x8_16_LS((&p_tra[i*stride+j]), stride, (&tmp[j*H+i]), H, SAVE_8x16_2);\
             }                                                                  \
         }                                                                      \
         src   = tmp_2;                                                         \
-        p_tra = _dst;                                                         \
+        p_tra = _dst;                                                          \
         shift = 20 - D;                                                        \
-    }    \
+        stride = _stride;                                                      \
+    }                                                                          \
 }
 
-TRANSFORM_ADD2(16,  8);
-//TRANSFORM_ADD2(16, 10);
+TRANSFORM(16,  8);
+//TRANSFORM(16, 10);
 
-TRANSFORM_ADD2(32,  8);
-//TRANSFORM_ADD2(32, 10);
+TRANSFORM(32,  8);
+//TRANSFORM(32, 10);
 
 /* Zscan */
 
