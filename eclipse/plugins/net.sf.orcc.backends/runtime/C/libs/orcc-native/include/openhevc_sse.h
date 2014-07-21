@@ -61,14 +61,13 @@ void weighted_pred_avg_orcc(int logWD , int weightCu[2], int offsetCu[2] ,
 void saoFilterEdge_orcc(u8 saoEoClass, u8 cIdx, u8 cIdxOffset, u16 idxOrig[2], u8 lcuSizeMax,
 	u16 picSize[2], u8 lcuIsPictBorder, i32 saoOffset[5],
 	u8 filtAcrossSlcAndTiles,
-	u8 * pucOrigPict,
-	u8 * pucFiltPict,
+    u8 * pucOrigPict,
+    u8 * pucPict,
 	u8 saoTypeIdx[8]);
 #endif // HAVE_SSE4
 
 void saoBandFilter_orcc(u8 saoLeftClass, i32 saoOffset[5], u8 cIdx, u8 cIdxOffset, i16 idxMin[2],
 	i16 idxMax[2],
-	u8 * pucOrigPict,
-	u8 * pucFiltPict);
+	u8 * pucOrigPict);
 
 #endif  /* _ORCC_OPENHEVC_H_ */
