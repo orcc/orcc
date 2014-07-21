@@ -29,9 +29,7 @@
 package net.sf.orcc.backends.llvm.aot;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
@@ -47,7 +45,6 @@ import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Alignable;
-import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -55,7 +52,6 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
@@ -73,7 +69,6 @@ import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
@@ -90,18 +85,20 @@ public class LLVMBackend extends AbstractBackend {
 	 */
 	private String srcPath;
 
-	@Override
-	protected void doInitializeOptions() {
+	private final NetworkPrinter netPrinter;
+	private final CMakePrinter cmakePrinter;
+	private final InstancePrinter childrenPrinter;
 
-		// Create the empty folders
-		new File(path, "bin").mkdir();
-		new File(path, "build").mkdir();
+	// The map will also be used in TTABackend, that's why it is
+	// declared as class member
+	protected final Map<String, String> renameMap;
 
-		// Configure the path where source files will be written
-		srcPath = new File(path, "src").toString();
+	public LLVMBackend() {
+		netPrinter = new NetworkPrinter();
+		cmakePrinter = new CMakePrinter();
+		childrenPrinter = new InstancePrinter();
 
 		// Configure the map used in RenameTransformation
-		final Map<String, String> renameMap;
 		renameMap = new HashMap<String, String>();
 		renameMap.put("abs", "abs_");
 		renameMap.put("getw", "getw_");
@@ -109,6 +106,20 @@ public class LLVMBackend extends AbstractBackend {
 		renameMap.put("min", "min_");
 		renameMap.put("max", "max_");
 		renameMap.put("select", "select_");
+	}
+
+	@Override
+	protected void doInitializeOptions() {
+		// Configure the options used in code generation
+		netPrinter.setOptions(getOptions());
+		childrenPrinter.setOptions(getOptions());
+
+		// Create the empty folders
+		new File(path, "bin").mkdir();
+		new File(path, "build").mkdir();
+
+		// Configure the path where source files will be written
+		srcPath = new File(path, "src").toString();
 
 		// -----------------------------------------------------
 		// Transformations that will be applied on the Network
@@ -133,7 +144,8 @@ public class LLVMBackend extends AbstractBackend {
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
 		networkTransfos.add(new TypeResizer(true, false, false, false));
 		networkTransfos.add(new StringTransformation());
-		networkTransfos.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
+		networkTransfos.add(new DfVisitor<Expression>(
+				new ShortCircuitTransformation()));
 		networkTransfos.add(new DfVisitor<Void>(new SSATransformation()));
 		networkTransfos.add(new DeadGlobalElimination());
 		networkTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
@@ -143,7 +155,8 @@ public class LLVMBackend extends AbstractBackend {
 		networkTransfos.add(new DfVisitor<Void>(new CopyPropagator()));
 		networkTransfos.add(new DfVisitor<Void>(new ConstantPropagator()));
 		networkTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
-		networkTransfos.add(new DfVisitor<Expression>(new CastAdder(false, true)));
+		networkTransfos.add(new DfVisitor<Expression>(
+				new CastAdder(false, true)));
 		networkTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
 		networkTransfos.add(new DfVisitor<Void>(new BlockCombine()));
 		networkTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
@@ -159,26 +172,9 @@ public class LLVMBackend extends AbstractBackend {
 
 		new DfVisitor<Void>(new TemplateInfoComputing()).doSwitch(network);
 		network.computeTemplateMaps();
-	}
-
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		Validator.checkTopLevel(network);
-		Validator.checkMinimalFifoSize(network, fifoSize);
 
 		// update "vectorizable" information
 		Alignable.setAlignability(network);
-
-		// print instances and entities
-		printChildren(network);
-
-		// print network
-		OrccLogger.traceln("Printing network...");
-		new NetworkPrinter(network, getOptions()).print(srcPath);
-
-		CMakePrinter printer = new CMakePrinter(network);
-		FilesManager.writeFile(printer.rootCMakeContent(), path, "CMakeLists.txt");
-		FilesManager.writeFile(printer.srcCMakeContent(), srcPath, "CMakeLists.txt");
 	}
 
 	@Override
@@ -197,12 +193,38 @@ public class LLVMBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(getOptions()).print(srcPath, instance) > 0;
+	protected Result doGenerateNetwork(Network network) {
+		// Configure the network
+		netPrinter.setNetwork(network);
+		// Write the file
+		return FilesManager.writeFile(netPrinter.getNetworkFileContent(),
+				srcPath, network.getSimpleName() + ".ll");
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(getOptions()).print(srcPath, actor) > 0;
+	protected Result doAdditionalGeneration(Network network) {
+
+		cmakePrinter.setNetwork(network);
+
+		final Result result = Result.newInstance();
+		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(),
+				path, "CMakeLists.txt"));
+		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(),
+				srcPath, "CMakeLists.txt"));
+
+		return result;
+	}
+
+	@Override
+	protected Result doGenerateInstance(Instance instance) {
+		childrenPrinter.setInstance(instance);
+		return FilesManager.writeFile(childrenPrinter.getContent(instance),
+				srcPath, instance.getName() + ".ll");
+	}
+
+	@Override
+	protected Result doGenerateActor(Actor actor) {
+		return FilesManager.writeFile(childrenPrinter.getContent(actor),
+				srcPath, actor.getName() + ".ll");
 	}
 }

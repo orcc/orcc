@@ -42,37 +42,49 @@ import net.sf.orcc.util.OrccUtil
  * 
  */
 class NetworkPrinter extends LLVMTemplate {
-	
-	val Network network;
+
+	private var Network network;
 	protected var optionDatalayout = BackendsConstants::LLVM_DEFAULT_TARGET_DATALAYOUT
 	protected var optionArch = BackendsConstants::LLVM_DEFAULT_TARGET_TRIPLE
-	
-	new(Network network, Map<String, Object> options){
-		super(options)
+
+	new() {
+	}
+
+	new(Network network, Map<String, Object> options) {
+		setNetwork(network)
+		setOptions(options)
+	}
+
+	def setNetwork(Network network) {
 		this.network = network
-		
-		if(options.containsKey(BackendsConstants::LLVM_TARGET_TRIPLE)){
+	}
+
+	override setOptions(Map<String, Object> options) {
+		super.setOptions(options)
+
+		if (options.containsKey(BackendsConstants::LLVM_TARGET_TRIPLE)) {
 			optionArch = options.get(BackendsConstants::LLVM_TARGET_TRIPLE) as String
 		}
-		if(options.containsKey(BackendsConstants::LLVM_TARGET_DATALAYOUT)){
+		if (options.containsKey(BackendsConstants::LLVM_TARGET_DATALAYOUT)) {
 			optionDatalayout = options.get(BackendsConstants::LLVM_TARGET_DATALAYOUT) as String
 		}
 	}
-		
+
+	@Deprecated
 	def print(String targetFolder) {
-		
+
 		val content = networkFileContent
 		val file = new File(targetFolder + File::separator + network.simpleName + ".ll")
-		
-		if(needToWriteFile(content, file)) {
+
+		if (needToWriteFile(content, file)) {
 			OrccUtil::printFile(content, file)
 			return 0
 		} else {
 			return 1
 		}
 	}
-	
-	def private getNetworkFileContent() '''
+
+	def getNetworkFileContent() '''
 		target datalayout = "«optionDatalayout»"
 		target triple = "«optionArch»"
 		

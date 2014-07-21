@@ -37,10 +37,13 @@ import net.sf.orcc.df.Network
  */
 class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 
+	new() {
+	}
+
 	new(Network network) {
 		super(network);
 	}
-	
+
 	/**
 	 * Return CMakeList's content to write in the root target folder
 	 */
