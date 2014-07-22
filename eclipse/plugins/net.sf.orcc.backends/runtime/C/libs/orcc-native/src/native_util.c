@@ -34,9 +34,10 @@
 
 
 int fsize(FILE *fp) {
+    int sz;
     int prev=ftell(fp);
     fseek(fp, 0L, SEEK_END);
-    int sz=ftell(fp);
+    sz=ftell(fp);
     fseek(fp,prev,SEEK_SET); //go back to where we were
     return sz;
 }

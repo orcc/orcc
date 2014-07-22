@@ -79,12 +79,13 @@ void fpsPrintInit_mapping() {
 
 void fpsPrintNewPicDecoded(void) {
     unsigned int endTime;
+    float relativeTime;
 
     numPicturesDecoded++;
     partialNumPicturesDecoded++;
     endTime = SDL_GetTicks();
 
-    float relativeTime = (endTime - relativeStartTime) / 1000.0f;
+    relativeTime = (endTime - relativeStartTime) / 1000.0f;
 
     if(relativeTime >= 5) {
         float framerate = (numPicturesDecoded - lastNumPic) / relativeTime;
