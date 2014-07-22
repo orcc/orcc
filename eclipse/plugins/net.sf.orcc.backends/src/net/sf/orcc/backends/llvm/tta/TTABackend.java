@@ -58,6 +58,7 @@ import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -65,7 +66,6 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.util.Dota;
 import net.sf.orcc.ir.CfgNode;
@@ -117,35 +117,28 @@ public class TTABackend extends LLVMBackend {
 				TTA_DEFAULT_PROCESSORS_CONFIGURATION));
 		reduceConnections = getOption(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
-	}
-
-	@Override
-	protected void doTransformActor(Actor actor) {
-		// do not transform actors
-	}
-
-	protected void doTransformNetwork(Network network) {
-		OrccLogger.traceln("Analyze and transform the network...");
-
-		List<DfSwitch<?>> visitors = new ArrayList<DfSwitch<?>>();
-
-		visitors.add(new ComplexHwOpDetector());
-		visitors.add(new UnitImporter());
-		visitors.add(new Instantiator(true));
-		visitors.add(new NetworkFlattener());
+		
+		// -----------------------------------------------------
+		// Transformations that will be applied on the Network
+		// -----------------------------------------------------
+		
+		networkTransfos.add(new ComplexHwOpDetector());
+		networkTransfos.add(new UnitImporter());
+		networkTransfos.add(new Instantiator(true));
+		networkTransfos.add(new NetworkFlattener());
 
 		if (classify) {
-			visitors.add(new Classifier());
+			networkTransfos.add(new Classifier());
 		}
 		if (mergeActions) {
-			visitors.add(new ActionMerger());
+			networkTransfos.add(new ActionMerger());
 		}
 		if (mergeActors) {
-			visitors.add(new ActorMerger());
+			networkTransfos.add(new ActorMerger());
 		}
 
 		if (!debug) {
-			visitors.add(new PrintRemoval());
+			networkTransfos.add(new PrintRemoval());
 			OrccLogger.noticeln("All calls to printing functions are"
 					+ " removed for performance purpose.");
 		} else {
@@ -153,47 +146,44 @@ public class TTABackend extends LLVMBackend {
 					+ "performance could appear due to printing call.");
 		}
 
-		visitors.add(new DisconnectedOutputPortRemoval());
+		networkTransfos.add(new DisconnectedOutputPortRemoval());
 
-		visitors.add(new TypeResizer(true, true, false, true));
-		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
-		visitors.add(new DfVisitor<Void>(new SSATransformation()));
-		visitors.add(new StringTransformation());
-		visitors.add(new RenameTransformation(this.renameMap));
-		visitors.add(new DfVisitor<Expression>(new TacTransformation()));
-		visitors.add(new DeadGlobalElimination());
-		visitors.add(new DfVisitor<Void>(new DeadCodeElimination()));
-		visitors.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-		visitors.add(new DfVisitor<Void>(new CopyPropagator()));
-		visitors.add(new DfVisitor<Void>(new ConstantPropagator()));
-		visitors.add(new DfVisitor<Void>(new InstPhiTransformation()));
-		visitors.add(new DfVisitor<Expression>(new CastAdder(false, true)));
-		visitors.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-		visitors.add(new DfVisitor<Void>(new BlockCombine()));
-		visitors.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
-		visitors.add(new DfVisitor<Void>(new ListInitializer()));
-		visitors.add(new DfVisitor<Void>(new TemplateInfoComputing()));
+		networkTransfos.add(new TypeResizer(true, true, false, true));
+		networkTransfos.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
+		networkTransfos.add(new DfVisitor<Void>(new SSATransformation()));
+		networkTransfos.add(new StringTransformation());
+		networkTransfos.add(new RenameTransformation(this.renameMap));
+		networkTransfos.add(new DfVisitor<Expression>(new TacTransformation()));
+		networkTransfos.add(new DeadGlobalElimination());
+		networkTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		networkTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+		networkTransfos.add(new DfVisitor<Void>(new CopyPropagator()));
+		networkTransfos.add(new DfVisitor<Void>(new ConstantPropagator()));
+		networkTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		networkTransfos.add(new DfVisitor<Expression>(new CastAdder(false, true)));
+		networkTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		networkTransfos.add(new DfVisitor<Void>(new BlockCombine()));
+		networkTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		networkTransfos.add(new DfVisitor<Void>(new ListInitializer()));
+		networkTransfos.add(new DfVisitor<Void>(new TemplateInfoComputing()));
 
 		// computes names of local variables
-		visitors.add(new DfVisitor<Void>(new SSAVariableRenamer()));
-
-		for (DfSwitch<?> transfo : visitors) {
-			transfo.doSwitch(network);
-			if (debug) {
-				OrccUtil.validateObject(transfo.toString(), network);
-			}
-		}
-
-		network.computeTemplateMaps();
+		networkTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
+		
 	}
-
+	
 	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		doTransformNetwork(network);
+	protected void doValidate(Network network) {
+		Validator.checkMinimalFifoSize(network, fifoSize);
+		
+		network.computeTemplateMaps();
 
 		// update alignment information
 		Alignable.setAlignability(network);
-
+	}
+	
+	@Override
+	protected Result doGenerateNetwork(Network network) {
 		// Compute the actor mapping
 		if (importXcfFile) {
 			computedMapping = new Mapping(network, xcfFile);
@@ -217,11 +207,21 @@ public class TTABackend extends LLVMBackend {
 			// Launch the TCE toolset
 			runPythonScript();
 		}
+		
+		return Result.newInstance();
+	}
+	
+	@Override
+	protected Result doAdditionalGeneration(Network network) {
+		return Result.newInstance();
 	}
 
 	@Override
-	protected Result doLibrariesExtraction() {
+	protected void doXdfCodeGeneration(Network network) {		
 
+	}
+	@Override
+	protected Result doLibrariesExtraction() {
 		Result result = FilesManager.extract("/runtime/TTA/libs", path);
 		result.merge(FilesManager.extract("/runtime/common/scripts", path));
 
@@ -330,6 +330,11 @@ public class TTABackend extends LLVMBackend {
 	protected boolean printActor(Actor actor) {
 		return new SwActorPrinter(getOptions(), design.getActorToProcessorMap().get(
 				actor)).print(actorsPath, actor) > 0;
+	}
+	
+	@Override
+	protected Result doGenerateActor(Actor actor) {
+		return Result.newInstance();
 	}
 
 	/**
