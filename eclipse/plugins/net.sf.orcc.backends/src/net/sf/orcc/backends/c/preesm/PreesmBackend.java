@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.c.preesm;
 
-import java.util.List;
-
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
@@ -39,8 +37,7 @@ import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.util.OrccLogger;
-
-import org.eclipse.core.resources.IFile;
+import net.sf.orcc.util.Result;
 
 /**
  * C backend targetting embedded systems
@@ -48,6 +45,10 @@ import org.eclipse.core.resources.IFile;
  * @author mpelcat
  */
 public class PreesmBackend extends AbstractBackend {
+
+	public PreesmBackend() {
+		super(true);
+	}
 
 	@Override
 	protected void doInitializeOptions() {
@@ -58,15 +59,7 @@ public class PreesmBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		// do not generate an embedded C VTL
-	}
-
-	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		// Print actors
-		printActors(network.getAllActors());
-
 		// instantiate and flattens network
 		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
@@ -118,6 +111,12 @@ public class PreesmBackend extends AbstractBackend {
 	 */
 	@Override
 	protected boolean printActor(Actor actor) {
-		return new ActorPrinter(options).print(path, actor) != 0;
+		return new ActorPrinter(getOptions()).print(path, actor) != 0;
+	}
+
+	@Override
+	protected Result doGenerateActor(Actor actor) {
+		new ActorPrinter(getOptions()).print(path, actor);
+		return super.doGenerateActor(actor);
 	}
 }

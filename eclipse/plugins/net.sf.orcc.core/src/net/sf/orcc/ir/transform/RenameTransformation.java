@@ -30,7 +30,6 @@ package net.sf.orcc.ir.transform;
 
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
@@ -58,11 +57,8 @@ public class RenameTransformation extends DfVisitor<Object> {
 		@Override
 		public Object caseProcedure(Procedure procedure) {
 			String name = procedure.getName();
-			if (transformations != null && transformations.containsKey(name)) {
+			if (transformations.containsKey(name)) {
 				procedure.setName(transformations.get(name));
-			} else if (pattern != null) {
-				procedure
-						.setName(pattern.matcher(name).replaceAll(replacement));
 			}
 
 			checkParameters(procedure.getParameters());
@@ -71,10 +67,6 @@ public class RenameTransformation extends DfVisitor<Object> {
 		}
 
 	}
-
-	private final Pattern pattern;
-
-	private final String replacement;
 
 	private final Map<String, String> transformations;
 
@@ -86,25 +78,6 @@ public class RenameTransformation extends DfVisitor<Object> {
 	 */
 	public RenameTransformation(Map<String, String> transformations) {
 		this.transformations = transformations;
-		pattern = null;
-		replacement = null;
-
-		irVisitor = new IrVisitor();
-	}
-
-	/**
-	 * Creates a transformation that replaces variable and procedure that match
-	 * the given pattern by the given replacement.
-	 * 
-	 * @param pattern
-	 *            a regular expression pattern
-	 * @param replacement
-	 *            a replacement
-	 */
-	public RenameTransformation(Pattern pattern, String replacement) {
-		transformations = null;
-		this.pattern = pattern;
-		this.replacement = replacement;
 
 		irVisitor = new IrVisitor();
 	}
@@ -134,10 +107,8 @@ public class RenameTransformation extends DfVisitor<Object> {
 
 	private void checkport(Port port) {
 		String name = port.getName().toLowerCase();
-		if (transformations != null && transformations.containsKey(name)) {
+		if (transformations.containsKey(name)) {
 			port.setName(transformations.get(name));
-		} else if (pattern != null) {
-			port.setName(pattern.matcher(name).replaceAll(replacement));
 		}
 	}
 
@@ -149,10 +120,8 @@ public class RenameTransformation extends DfVisitor<Object> {
 
 	private void checkVariable(Var var) {
 		String name = var.getName();
-		if (transformations != null && transformations.containsKey(name)) {
+		if (transformations.containsKey(name)) {
 			var.setName(transformations.get(name));
-		} else if (pattern != null) {
-			var.setName(pattern.matcher(name).replaceAll(replacement));
 		}
 	}
 

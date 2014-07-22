@@ -65,13 +65,18 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 	}
 
 	new(Map<String, Object> options) {
-		super(true)
+		this()
+		setOptions(options)
+	}
 
+	def setOptions(Map<String, Object> options) {
 		if (options.containsKey(FIFO_SIZE)) {
 			fifoSize = options.get(FIFO_SIZE) as Integer
 		} else {
 			fifoSize = DEFAULT_FIFO_SIZE
 		}
+		// Force the method return type to void
+		return
 	}
 
 	/**

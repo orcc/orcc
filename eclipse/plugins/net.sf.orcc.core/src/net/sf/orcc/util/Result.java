@@ -29,27 +29,57 @@
 package net.sf.orcc.util;
 
 /**
- * This class is used to store files writing results. It maintains tyhe number
- * of really written files in an operation, and the number of files not written
- * (because already up-to-date)
+ * Used to store files writing results. It maintains the number of really
+ * written files in an operation, and the number of cached files (not written
+ * because already up-to-date)
  * 
- * @author alorence
+ * @author Antoine Lorence
  * 
  */
 public class Result {
 
-	public static final Result OK = new Result(1, 0, 0);
-	public static final Result CACHED = new Result(0, 1, 0);
-	public static final Result EMPTY_RESULT = new Result(0, 0, 0);
-
 	private int written = 0;
 	private int cached = 0;
 
-	private Result(int w, int c, int e) {
-		written = w;
-		cached = c;
+	private Result(int written, int cached) {
+		this.written = written;
+		this.cached = cached;
 	}
 
+	/**
+	 * Create a new empty Result instance.
+	 * 
+	 * @return
+	 */
+	public static Result newInstance() {
+		return new Result(0, 0);
+	}
+
+	/**
+	 * Create a new Result instance for a written file.
+	 * 
+	 * @return
+	 */
+	public static Result newOkInstance() {
+		return new Result(1, 0);
+	}
+
+	/**
+	 * Create a new Result instance for a cached file.
+	 * 
+	 * @return
+	 */
+	public static Result newCachedInstance() {
+		return new Result(0, 1);
+	}
+
+	/**
+	 * Merge the given <em>other</em> instance into this one by adding their
+	 * respective members.
+	 * 
+	 * @param other
+	 * @return
+	 */
 	public Result merge(final Result other) {
 		written += other.written;
 		cached += other.cached;
@@ -62,5 +92,27 @@ public class Result {
 
 	public int written() {
 		return written;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Result) {
+			return ((Result) obj).written == written
+					&& ((Result) obj).cached == cached;
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("Result: ");
+		builder.append(written).append (" file(s) written - ");
+		builder.append(cached).append(" file(s) cached");
+		return builder.toString();
+	}
+
+	public boolean isEmpty() {
+		return written == 0 && cached == 0;
 	}
 }

@@ -38,9 +38,9 @@ public class DALBackend extends CBackend {
 	@Override
 	protected void doInitializeOptions() {
 		srcPath = path;
-		inputBuffering = getAttribute("net.sf.orcc.backends.c.dal.inputBuffering",
+		inputBuffering = getOption("net.sf.orcc.backends.c.dal.inputBuffering",
 				false);
-		outputBuffering = getAttribute("net.sf.orcc.backends.c.dal.outputBuffering",
+		outputBuffering = getOption("net.sf.orcc.backends.c.dal.outputBuffering",
 				false);
 	}
 	
@@ -135,15 +135,15 @@ public class DALBackend extends CBackend {
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 		// Never extract libraries (Note: we can also force attribute
 		// NO_LIBRARY_EXPORT to true)
-		return Result.EMPTY_RESULT;
+		return Result.newInstance();
 	}
 
 	private boolean printNetwork(Network network, String srcPath) {
 		boolean successC, successM;
-		successC = new NetworkCPrinter(network, options).print(srcPath) > 0;		
+		successC = new NetworkCPrinter(network, getOptions()).print(srcPath) > 0;		
 		successM = new NetworkMPrinter(network, mapping).print(srcPath) > 0;		
 		return successC & successM;
 	}
@@ -151,7 +151,7 @@ public class DALBackend extends CBackend {
 	@Override
 	protected boolean printActor(Actor actor) {
 		boolean successC, successH;
-		successC = new InstanceCPrinter(options).print(srcPath, actor) > 0;
+		successC = new InstanceCPrinter(getOptions()).print(srcPath, actor) > 0;
 		successH = new InstanceHPrinter().print(srcPath, actor) > 0;
 		return successC & successH;
 	}

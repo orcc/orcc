@@ -28,14 +28,13 @@
  */
 package net.sf.orcc.backends.llvm.jit
 
-import java.io.File
 import java.util.ArrayList
 import java.util.List
-import java.util.Map
 import net.sf.orcc.backends.ir.InstCast
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
+import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
@@ -52,7 +51,6 @@ import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.Var
 import net.sf.orcc.moc.CSDFMoC
 import net.sf.orcc.moc.QSDFMoC
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate Jade content
@@ -64,28 +62,25 @@ class ActorPrinter extends InstancePrinter {
 	val List<Integer> objRefList = new ArrayList<Integer>
 	val List<Pattern> patternList = new ArrayList<Pattern>
 
-	new(Map<String, Object> options) {
-		super(options)
-	}
-
-	override protected print(String targetFolder) {
-		val content = fileContent
-		val file = new File(targetFolder + File::separator + actor.simpleName)
-
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
+	new() {
+		super()
 	}
 
 	override protected setActor(Actor actor) {
-		this.name = actor.name
-		this.actor = actor
+		super.setActor(actor)
 
+		// Patterns and objects references lists are computed
+		// from the current actor
+		patternList.clear
 		computePatterns
+
+		objRefList.clear
 		computeCastedList
+	}
+
+	override getContent(Instance instance) {
+		throw new UnsupportedOperationException("Jade backend is unable"+
+			" to generate code from Instances")
 	}
 
 	/**

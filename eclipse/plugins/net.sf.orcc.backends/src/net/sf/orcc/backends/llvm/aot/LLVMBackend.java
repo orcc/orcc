@@ -29,9 +29,7 @@
 package net.sf.orcc.backends.llvm.aot;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
@@ -47,7 +45,6 @@ import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Alignable;
-import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -55,7 +52,6 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
@@ -73,11 +69,8 @@ import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
-
-import org.eclipse.core.resources.IFile;
 
 /**
  * LLVM back-end.
@@ -92,13 +85,20 @@ public class LLVMBackend extends AbstractBackend {
 	 */
 	private String srcPath;
 
+	private final NetworkPrinter netPrinter;
+	private final CMakePrinter cmakePrinter;
+	private final InstancePrinter childrenPrinter;
+
+	// The map will also be used in TTABackend, that's why it is
+	// declared as class member
 	protected final Map<String, String> renameMap;
 
-	/**
-	 * Creates a new instance of the LLVM back-end. Initializes the
-	 * transformation hash map.
-	 */
 	public LLVMBackend() {
+		netPrinter = new NetworkPrinter();
+		cmakePrinter = new CMakePrinter();
+		childrenPrinter = new InstancePrinter();
+
+		// Configure the map used in RenameTransformation
 		renameMap = new HashMap<String, String>();
 		renameMap.put("abs", "abs_");
 		renameMap.put("getw", "getw_");
@@ -110,116 +110,75 @@ public class LLVMBackend extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		// Set build and src directory
-		File srcDir = new File(path + File.separator + "src");
-		File buildDir = new File(path + File.separator + "build");
-		File binDir = new File(path + File.separator + "bin");
+		// Configure the options used in code generation
+		netPrinter.setOptions(getOptions());
+		childrenPrinter.setOptions(getOptions());
 
-		// If directories don't exist, create them
-		if (!srcDir.exists()) {
-			srcDir.mkdirs();
+		// Create the empty folders
+		new File(path, "bin").mkdir();
+		new File(path, "build").mkdir();
+
+		// Configure the path where source files will be written
+		srcPath = new File(path, "src").toString();
+
+		// -----------------------------------------------------
+		// Transformations that will be applied on the Network
+		// -----------------------------------------------------
+		networkTransfos.add(new Instantiator(!debug));
+		networkTransfos.add(new NetworkFlattener());
+		networkTransfos.add(new UnitImporter());
+
+		if (classify) {
+			networkTransfos.add(new Classifier());
 		}
-		if (!buildDir.exists()) {
-			buildDir.mkdirs();
+		if (mergeActions) {
+			networkTransfos.add(new ActionMerger());
 		}
-		if (!binDir.exists()) {
-			binDir.mkdirs();
+		if (mergeActors) {
+			networkTransfos.add(new ActorMerger());
+		}
+		if (convertMulti2Mono) {
+			networkTransfos.add(new Multi2MonoToken());
 		}
 
-		// Set src directory as path
-		srcPath = srcDir.getAbsolutePath();
+		networkTransfos.add(new DisconnectedOutputPortRemoval());
+		networkTransfos.add(new TypeResizer(true, false, false, false));
+		networkTransfos.add(new StringTransformation());
+		networkTransfos.add(new DfVisitor<Expression>(
+				new ShortCircuitTransformation()));
+		networkTransfos.add(new DfVisitor<Void>(new SSATransformation()));
+		networkTransfos.add(new DeadGlobalElimination());
+		networkTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		networkTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+		networkTransfos.add(new RenameTransformation(renameMap));
+		networkTransfos.add(new DfVisitor<Expression>(new TacTransformation()));
+		networkTransfos.add(new DfVisitor<Void>(new CopyPropagator()));
+		networkTransfos.add(new DfVisitor<Void>(new ConstantPropagator()));
+		networkTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		networkTransfos.add(new DfVisitor<Expression>(
+				new CastAdder(false, true)));
+		networkTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		networkTransfos.add(new DfVisitor<Void>(new BlockCombine()));
+		networkTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		networkTransfos.add(new DfVisitor<Void>(new ListInitializer()));
+
+		// computes names of local variables
+		networkTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 	}
 
 	@Override
-	protected void doTransformActor(Actor actor) {
-		// do not transform actor
-	}
-
-	protected void doTransformNetwork(Network network) {
-		OrccLogger.traceln("Analyze and transform the network...");
-
-		List<DfSwitch<?>> visitors = new ArrayList<DfSwitch<?>>();
-
-		visitors.add(new Instantiator(!debug));
-		visitors.add(new NetworkFlattener());
-		visitors.add(new UnitImporter());
-
-		if (classify) {
-			visitors.add(new Classifier());
-		}
-		if (mergeActions) {
-			visitors.add(new ActionMerger());
-		}
-		if (mergeActors) {
-			visitors.add(new ActorMerger());
-		}
-		if (convertMulti2Mono) {
-			visitors.add(new Multi2MonoToken());
-		}
-
-		visitors.add(new DisconnectedOutputPortRemoval());
-
-		visitors.add(new TypeResizer(true, false, false, false));
-		visitors.add(new StringTransformation());
-		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
-		visitors.add(new DfVisitor<Void>(new SSATransformation()));
-		visitors.add(new DeadGlobalElimination());
-		visitors.add(new DfVisitor<Void>(new DeadCodeElimination()));
-		visitors.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-		visitors.add(new RenameTransformation(this.renameMap));
-		visitors.add(new DfVisitor<Expression>(new TacTransformation()));
-		visitors.add(new DfVisitor<Void>(new CopyPropagator()));
-		visitors.add(new DfVisitor<Void>(new ConstantPropagator()));
-		visitors.add(new DfVisitor<Void>(new InstPhiTransformation()));
-		visitors.add(new DfVisitor<Expression>(new CastAdder(false, true)));
-		visitors.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-		visitors.add(new DfVisitor<Void>(new BlockCombine()));
-		visitors.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
-		visitors.add(new DfVisitor<Void>(new ListInitializer()));
-
-		// computes names of local variables
-		visitors.add(new DfVisitor<Void>(new SSAVariableRenamer()));
-
-		for (DfSwitch<?> transfo : visitors) {
-			transfo.doSwitch(network);
-			if (debug) {
-				OrccUtil.validateObject(transfo.toString(), network);
-			}
-		}
+	protected void doValidate(Network network) {
+		super.doValidate(network);
 
 		new DfVisitor<Void>(new TemplateInfoComputing()).doSwitch(network);
 		network.computeTemplateMaps();
-	}
-
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		// do not generate a VTL
-	}
-
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		Validator.checkTopLevel(network);
-		Validator.checkMinimalFifoSize(network, fifoSize);
-
-		doTransformNetwork(network);
 
 		// update "vectorizable" information
 		Alignable.setAlignability(network);
-
-		// print instances and entities
-		printChildren(network);
-
-		// print network
-		OrccLogger.traceln("Printing network...");
-		new NetworkPrinter(network, options).print(srcPath);
-
-		CMakePrinter printer = new CMakePrinter(network);
-		FilesManager.writeFile(printer.rootCMakeContent(), path, "CMakeLists.txt");
-		FilesManager.writeFile(printer.srcCMakeContent(), srcPath, "CMakeLists.txt");
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 		Result result = FilesManager.extract("/runtime/C/README.txt", path);
 		// Copy specific windows batch file
 		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
@@ -234,13 +193,38 @@ public class LLVMBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(options).print(srcPath, instance) > 0;
+	protected Result doGenerateNetwork(Network network) {
+		// Configure the network
+		netPrinter.setNetwork(network);
+		// Write the file
+		return FilesManager.writeFile(netPrinter.getNetworkFileContent(),
+				srcPath, network.getSimpleName() + ".ll");
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(options).print(srcPath, actor) > 0;
+	protected Result doAdditionalGeneration(Network network) {
+
+		cmakePrinter.setNetwork(network);
+
+		final Result result = Result.newInstance();
+		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(),
+				path, "CMakeLists.txt"));
+		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(),
+				srcPath, "CMakeLists.txt"));
+
+		return result;
 	}
 
+	@Override
+	protected Result doGenerateInstance(Instance instance) {
+		childrenPrinter.setInstance(instance);
+		return FilesManager.writeFile(childrenPrinter.getContent(instance),
+				srcPath, instance.getName() + ".ll");
+	}
+
+	@Override
+	protected Result doGenerateActor(Actor actor) {
+		return FilesManager.writeFile(childrenPrinter.getContent(actor),
+				srcPath, actor.getName() + ".ll");
+	}
 }

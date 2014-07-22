@@ -68,7 +68,6 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -125,20 +124,15 @@ public class PromelaBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		// do not generate a PROMELA VTL
-	}
-
-	@Override
 	protected void doXdfCodeGeneration(Network network) {
 		new BroadcastAdder().doSwitch(network);
 		new Instantiator(true).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 		new Classifier(true).doSwitch(network);
 
-		options.put("guards", guards);
-		options.put("priority", priority);
-		options.put("loadPeeks", loadPeeks);
+		getOptions().put("guards", guards);
+		getOptions().put("priority", priority);
+		getOptions().put("loadPeeks", loadPeeks);
 
 		transformActors(network.getAllActors());
 
@@ -159,7 +153,7 @@ public class PromelaBackend extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(actor, options, schedulingModel)
+		return new InstancePrinter(actor, getOptions(), schedulingModel)
 				.printInstance(path) > 0;
 	}
 
@@ -172,14 +166,14 @@ public class PromelaBackend extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	private void printNetwork(Network network) {
-		new NetworkPrinter(network, options).print(path);
+		new NetworkPrinter(network, getOptions()).print(path);
 		new SchedulePrinter(network, actorSchedulers).print(path);
 		new ScheduleInfoPrinter(network, balanceEq).print(path);
 		new ScriptPrinter(network).print(path);
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 		return FilesManager.extract("/runtime/Promela/pylibs", path);
 	}
 

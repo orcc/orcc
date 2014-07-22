@@ -65,7 +65,7 @@ public class HMPPBackend extends CBackend {
 	public void doInitializeOptions() {
 		super.doInitializeOptions();
 
-		disableAnnotation = getAttribute(BackendsConstants.HMPP_NO_PRAGMAS,
+		disableAnnotation = getOption(BackendsConstants.HMPP_NO_PRAGMAS,
 				false);
 	}
 
@@ -108,16 +108,16 @@ public class HMPPBackend extends CBackend {
 	 */
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(options).print(srcPath, instance) > 0;
+		return new InstancePrinter(getOptions()).print(srcPath, instance) > 0;
 	}
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(options).print(srcPath, actor) > 0;
+		return new InstancePrinter(getOptions()).print(srcPath, actor) > 0;
 	}
 
 	@Override
-	protected Result extractLibraries() {
+	protected Result doLibrariesExtraction() {
 
 		Result result = FilesManager.extract("/runtime/C/libs", path);
 		result.merge(FilesManager.extract("/runtime/C/README.txt", path));

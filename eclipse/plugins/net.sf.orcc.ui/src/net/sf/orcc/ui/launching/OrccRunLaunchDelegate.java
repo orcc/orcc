@@ -90,7 +90,7 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 					// user
 					backend.setOptions(configuration.getAttributes());
 					// Launch compilation
-					backend.compile();
+					backend.compile(monitor);
 
 				} catch (OrccRuntimeException e) {
 

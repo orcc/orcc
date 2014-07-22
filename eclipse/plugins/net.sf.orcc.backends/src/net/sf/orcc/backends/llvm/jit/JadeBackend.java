@@ -32,12 +32,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.BackendsConstants;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
@@ -56,7 +55,6 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
@@ -73,13 +71,11 @@ import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.util.FilesManager;
-import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
-import org.eclipse.core.resources.IFile;
-
 /**
- * LLVM back-end.
+ * Jade back-end.
  * 
  * @author Jerome GORIN
  * @author Herve Yviquel
@@ -89,116 +85,117 @@ public class JadeBackend extends AbstractBackend {
 
 	private boolean bitAccurate;
 
-	private final Map<String, String> renameMap;
+	private ActorPrinter printer;
 
 	/**
-	 * Creates a new instance of the LLVM back-end. Initializes the
-	 * transformation hash map.
+	 * Creates a new instance of the LLVM back-end.
 	 */
 	public JadeBackend() {
-		renameMap = new HashMap<String, String>();
+		// This back-end must generate a VTL. Configure this option with the
+		// specific constructor call.
+		super(true);
+
+		printer = new ActorPrinter();
+	}
+
+	@Override
+	protected void doInitializeOptions() {
+
+		// Load options map into the code generator class
+		printer.setOptions(getOptions());
+
+		// Is the Jade back-end supposed to generate bit-accurate code ?
+		bitAccurate = getOption(BackendsConstants.JIT_BIT_ACCURATE,
+				BackendsConstants.JIT_BIT_ACCURATE_DEFAULT);
+
+		// Configure the map used in RenameTransformation
+		final Map<String, String> renameMap = new HashMap<String, String>();
 		renameMap.put("abs", "abs_");
 		renameMap.put("getw", "getw_");
 		renameMap.put("index", "index_");
 		renameMap.put("min", "min_");
 		renameMap.put("max", "max_");
 		renameMap.put("select", "select_");
-	}
 
-	@Override
-	public void doInitializeOptions() {
-		bitAccurate = getAttribute(BackendsConstants.JIT_BIT_ACCURATE,
-				BackendsConstants.JIT_BIT_ACCURATE_DEFAULT);
-	}
+		// -----------------------------------------------------
+		// Transformations that will be applied on the Network
+		// -----------------------------------------------------
+		networkTransfos.add(new Instantiator(false));
+		networkTransfos.add(new NetworkFlattener());
+		// If a port is renamed in an actor, the same renaming have to be
+		// applied on the network's connection
+		networkTransfos.add(new RenameTransformation(renameMap));
 
-	@Override
-	protected void doTransformActor(Actor actor) {
+		// -----------------------------------------------------
+		// Transformations that will be applied on VTL Actors
+		// -----------------------------------------------------
 		if (classify) {
-			new Classifier().doSwitch(actor);
+			childrenTransfos.add(new Classifier());
 		}
 		if (mergeActions) {
-			new ActionMerger().doSwitch(actor);
+			childrenTransfos.add(new ActionMerger());
 		}
-
-		new UnitImporter().doSwitch(actor);
-		new DfVisitor<Void>(new SSATransformation()).doSwitch(actor);
-		new DeadGlobalElimination().doSwitch(actor);
-
+		childrenTransfos.add(new UnitImporter());
+		childrenTransfos.add(new DfVisitor<Void>(new SSATransformation()));
+		childrenTransfos.add(new DeadGlobalElimination());
 		if (!bitAccurate) {
-			new TypeResizer(true, false, false, false).doSwitch(actor);
+			childrenTransfos.add(new TypeResizer(true, false, false, false));
 		}
-
-		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
-
-		transfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
-		transfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-		transfos.add(new StringTransformation());
-		transfos.add(new RenameTransformation(this.renameMap));
-		transfos.add(new DfVisitor<Expression>(new TacTransformation()));
-		transfos.add(new DfVisitor<Void>(new CopyPropagator()));
-		transfos.add(new DfVisitor<Void>(new ConstantPropagator()));
-		transfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
-		transfos.add(new DfVisitor<Expression>(new CastAdder(false, true)));
-		transfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-		transfos.add(new DfVisitor<Void>(new BlockCombine()));
-		transfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
-		transfos.add(new DfVisitor<Void>(new ListInitializer()));
-		transfos.add(new DfVisitor<Void>(new TemplateInfoComputing()));
-
+		childrenTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		childrenTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+		childrenTransfos.add(new StringTransformation());
+		childrenTransfos.add(new RenameTransformation(renameMap));
+		childrenTransfos
+				.add(new DfVisitor<Expression>(new TacTransformation()));
+		childrenTransfos.add(new DfVisitor<Void>(new CopyPropagator()));
+		childrenTransfos.add(new DfVisitor<Void>(new ConstantPropagator()));
+		childrenTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
+		childrenTransfos.add(new DfVisitor<Expression>(new CastAdder(false,
+				true)));
+		childrenTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+		childrenTransfos.add(new DfVisitor<Void>(new BlockCombine()));
+		childrenTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		childrenTransfos.add(new DfVisitor<Void>(new ListInitializer()));
+		childrenTransfos.add(new DfVisitor<Void>(new TemplateInfoComputing()));
 		// computes names of local variables
-		transfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
-
-		for (DfSwitch<?> transformation : transfos) {
-			transformation.doSwitch(actor);
-		}
+		childrenTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) {
-		List<Actor> actors = parseActors(files);
-
-		// transforms and prints actors
-		transformActors(actors);
-		printActors(actors);
-
-		if (isCanceled()) {
-			return;
-		}
-
-		// Finalize actor generation
-		OrccLogger.traceln("Finalize actors...");
-	}
-
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
+	protected void doValidate(Network network) {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize, false);
+	}
 
-		// instantiate and flattens network
-		new Instantiator(false).doSwitch(network);
-		new NetworkFlattener().doSwitch(network);
-
-		// If ports have been renamed in actors, the same transformation must be
-		// applied on network
-		new RenameTransformation(this.renameMap).doSwitch(network);
-
-		// print network
-		OrccLogger.traceln("Printing network...");
+	@Override
+	protected Result doGenerateNetwork(Network network) {
+		// Generate the flattened network (.xdf file)
 		OutputStream outputStream = new ByteArrayOutputStream();
 		try {
 			network.eResource().save(outputStream, Collections.emptyMap());
-			FilesManager.writeFile(outputStream.toString(), path, network.getSimpleName() + ".xdf");
+			return FilesManager.writeFile(outputStream.toString(), path,
+					network.getSimpleName() + ".xdf");
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw new OrccRuntimeException(
+					"Unable to serialialize the flattened network");
 		}
-
-		final CharSequence content = new Mapping(network, mapping).getContentFile();
-		FilesManager.writeFile(content, path, network.getSimpleName() + ".xcf");
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) {
-		String folder = path + File.separator + DfUtil.getFolder(actor);
-		return new ActorPrinter(options).print(folder, actor) > 0;
+	protected Result doAdditionalGeneration(Network network) {
+		// Generates the .xcf mapping file
+		final CharSequence content = new Mapping(network, mapping)
+				.getContentFile();
+		return FilesManager.writeFile(content, path, network.getSimpleName()
+				+ ".xcf");
+	}
+
+	@Override
+	protected Result doGenerateActor(Actor actor) {
+		final File targetFolder = new File(path, DfUtil.getFolder(actor));
+		final CharSequence content = printer.getContent(actor);
+		return FilesManager.writeFile(content, targetFolder.getAbsolutePath(),
+				actor.getSimpleName());
 	}
 }
