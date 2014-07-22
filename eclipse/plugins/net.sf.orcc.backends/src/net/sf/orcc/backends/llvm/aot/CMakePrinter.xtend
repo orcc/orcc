@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
-import net.sf.orcc.df.Network
-
 /**
  * Generate CMakeList.txt content
  * 
@@ -38,10 +36,6 @@ import net.sf.orcc.df.Network
 class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 
 	new() {
-	}
-
-	new(Network network) {
-		super(network);
 	}
 
 	/**
@@ -76,7 +70,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 		# Compile application
 		add_subdirectory(src)
 	'''
-	
+
 	/**
 	 * Return CMakeList's content to write in the src subdirectory
 	 */
@@ -89,7 +83,7 @@ class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 				«child.label».ll
 			«ENDFOR»
 		)
-		
+
 		foreach(_infile ${«network.simpleName»_SRCS})
 		    string(REPLACE ".ll" ${CMAKE_C_OUTPUT_EXTENSION} _outfile ${_infile})
 		    set(_inpath ${CMAKE_CURRENT_SOURCE_DIR}/${_infile})
