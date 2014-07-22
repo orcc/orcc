@@ -47,15 +47,14 @@ import net.sf.orcc.util.OrccUtil
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
-	new(Map<String, Object> options) {
-		super(options)
-	}
+	new() {}
 
 	/**
 	 * Will be used when we will print codelet
 	 * content in its own file
 	 */
 	private var String srcFolder = ""
+
 	override protected print(String targetFolder) {
 		srcFolder = targetFolder
 		super.print(targetFolder)

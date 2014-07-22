@@ -28,14 +28,9 @@
  */
 package net.sf.orcc.backends.c.hmpp
 
-import net.sf.orcc.df.Network
 import net.sf.orcc.df.Actor
 
 class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
-	
-	new(Network network) {
-		super(network)
-	}
 	
 	override rootCMakeContent() '''
 		# Generated from «network.simpleName»

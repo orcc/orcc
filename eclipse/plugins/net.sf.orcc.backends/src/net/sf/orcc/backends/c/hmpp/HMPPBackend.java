@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.backends.c.hmpp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.orcc.backends.BackendsConstants;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.CMakePrinter;
@@ -43,12 +40,10 @@ import net.sf.orcc.backends.transform.BlockForAdder;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.util.FilesManager;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 
 /**
@@ -59,9 +54,19 @@ import net.sf.orcc.util.Result;
  */
 public class HMPPBackend extends CBackend {
 
+	final private InstancePrinter instancePrinter;
+	final private CMakePrinter cmakePrinter;
+
+	public HMPPBackend() {
+		instancePrinter = new InstancePrinter();
+		cmakePrinter = new CMakePrinter();
+	}
+
 	@Override
 	public void doInitializeOptions() {
 		super.doInitializeOptions();
+
+		instancePrinter.setOptions(getOptions());
 
 		boolean disableAnnotation = getOption(BackendsConstants.HMPP_NO_PRAGMAS,
 				false);
@@ -91,12 +96,12 @@ public class HMPPBackend extends CBackend {
 	 */
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(getOptions()).print(srcPath, instance) > 0;
+		return instancePrinter.print(srcPath, instance) > 0;
 	}
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(getOptions()).print(srcPath, actor) > 0;
+		return instancePrinter.print(srcPath, actor) > 0;
 	}
 
 	@Override
@@ -115,9 +120,11 @@ public class HMPPBackend extends CBackend {
 	}
 
 	@Override
-	protected void printCMake(Network network) {
-		CMakePrinter printer = new CMakePrinter(network);
-		FilesManager.writeFile(printer.rootCMakeContent(), path, "CMakeLists.txt");
-		FilesManager.writeFile(printer.srcCMakeContent(), srcPath, "CMakeLists.txt");
+	protected Result doAdditionalGeneration(Network network) {
+		cmakePrinter.setNetwork(network);
+		final Result result = Result.newInstance();
+		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(), path, "CMakeLists.txt"));
+		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(), srcPath, "CMakeLists.txt"));
+		return result;
 	}
 }
