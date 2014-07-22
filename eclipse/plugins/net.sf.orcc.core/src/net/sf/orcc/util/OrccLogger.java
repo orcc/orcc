@@ -200,7 +200,7 @@ public class OrccLogger {
 	 */
 	public static void debugRaw(Object content) {
 		LogRecord record = new LogRecord(DEBUG, content.toString());
-		record.setParameters(new Object[] { "-raw" });
+		record.setParameters(new Object[] { RAW_FLAG });
 		getLogger().log(record);
 	}
 
@@ -231,7 +231,7 @@ public class OrccLogger {
 	 */
 	public static void noticeRaw(Object content) {
 		LogRecord record = new LogRecord(NOTICE, content.toString());
-		record.setParameters(new Object[] { "-raw" });
+		record.setParameters(new Object[] { RAW_FLAG });
 		getLogger().log(record);
 	}
 
@@ -262,7 +262,7 @@ public class OrccLogger {
 	 */
 	public static void severeRaw(Object content) {
 		LogRecord record = new LogRecord(SEVERE, content.toString());
-		record.setParameters(new Object[] { "-raw" });
+		record.setParameters(new Object[] { RAW_FLAG });
 		getLogger().log(record);
 	}
 
@@ -293,7 +293,7 @@ public class OrccLogger {
 	 */
 	public static void traceRaw(Object content) {
 		LogRecord record = new LogRecord(TRACE, content.toString());
-		record.setParameters(new Object[] { "-raw" });
+		record.setParameters(new Object[] { RAW_FLAG });
 		getLogger().log(record);
 	}
 
@@ -324,7 +324,7 @@ public class OrccLogger {
 	 */
 	public static void warnRaw(Object content) {
 		LogRecord record = new LogRecord(WARNING, content.toString());
-		record.setParameters(new Object[] { "-raw" });
+		record.setParameters(new Object[] { RAW_FLAG });
 		getLogger().log(record);
 	}
 
