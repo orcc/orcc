@@ -107,7 +107,7 @@ import org.osgi.framework.Bundle;
  * standard back-ends to generate code from a network and its (instantiated or
  * not children). It also can be used to produce a Video Tool Library (VTL) from
  * CAL projects. To do so, simply use {@link #AbstractBackend(boolean)}
- * signature in the constructore of the concrete back-end class. signature.
+ * signature in the constructor of the concrete back-end class. signature.
  * </p>
  * 
  * <p>
@@ -142,7 +142,7 @@ import org.osgi.framework.Bundle;
  * </ol>
  * 
  * <p>
- * The following methods was used in previous versions of Orcc. It will be
+ * The following methods were used in previous versions of Orcc. They will be
  * removed and shouldn't be used anymore. Documentation on each method indicates
  * the new alternative to use.
  * <ul>
