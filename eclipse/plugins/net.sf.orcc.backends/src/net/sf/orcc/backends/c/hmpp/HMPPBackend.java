@@ -59,44 +59,27 @@ import net.sf.orcc.util.Result;
  */
 public class HMPPBackend extends CBackend {
 
-	protected boolean disableAnnotation;
-
 	@Override
 	public void doInitializeOptions() {
 		super.doInitializeOptions();
 
-		disableAnnotation = getOption(BackendsConstants.HMPP_NO_PRAGMAS,
+		boolean disableAnnotation = getOption(BackendsConstants.HMPP_NO_PRAGMAS,
 				false);
-	}
-
-	@Override
-	protected void doTransformActor(Actor actor) {
-		super.doTransformActor(actor);
-
-		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 
 		// Must be applied before CodeletInliner:
-		transformations.add(new DfVisitor<Void>(new PrepareHMPPAnnotations()));
-		transformations.add(new DfVisitor<Void>(new ConstantRegisterCleaner()));
+		childrenTransfos.add(new DfVisitor<Void>(new PrepareHMPPAnnotations()));
+		childrenTransfos.add(new DfVisitor<Void>(new ConstantRegisterCleaner()));
 
 		// Must be applied after PrepareHMPPAnnotations:
-		transformations.add(new DfVisitor<Void>(new CodeletInliner()));
+		childrenTransfos.add(new DfVisitor<Void>(new CodeletInliner()));
 		// Must be applied after CodeletInliner:
-		transformations.add(new SetHMPPAnnotations());
+		childrenTransfos.add(new SetHMPPAnnotations());
 
-		transformations.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
-		transformations.add(new BlockForAdder());
-
-		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(actor);
-			if (debug) {
-				OrccUtil.validateObject(transformation.toString() + " on "
-						+ actor.getName(), actor);
-			}
-		}
+		childrenTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+		childrenTransfos.add(new BlockForAdder());
 
 		if (disableAnnotation) {
-			new DisableAnnotations().doSwitch(actor);
+			childrenTransfos.add(new DisableAnnotations());
 		}
 	}
 
