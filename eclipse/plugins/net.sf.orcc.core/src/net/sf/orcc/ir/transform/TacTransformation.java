@@ -161,7 +161,8 @@ public class TacTransformation extends AbstractIrVisitor<Expression> {
 					IrUtil.copy(expr.getType()));
 			break;
 		case LOGIC_NOT:
-			if (expr.getExpr().getType().isInt()) {
+			if (expr.getExpr().getType().isInt()
+					|| expr.getExpr().getType().isUint()) {
 				newExpr = factory.createExprBinary(IrUtil.copy(expr.getExpr()),
 						OpBinary.EQ, factory.createExprInt(0),
 						IrUtil.copy(expr.getType()));
