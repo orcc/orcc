@@ -346,10 +346,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			OrccLogger.traceln("Done in " + getDuration(t0) + "s. " + result);
 
 			// For backward compatibility
-			if (result.isEmpty()) {
-				stopIfRequested();
-				doXdfCodeGeneration(network);
-			}
+			stopIfRequested();
+			doXdfCodeGeneration(network);
 		}
 
 		// -----------------------------------------------------
@@ -410,6 +408,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			final long t0 = System.currentTimeMillis();
 			final Result result = Result.newInstance();
 			for (final Vertex vertex : network.getChildren()) {
+				stopIfRequested();
 				final Instance instance = vertex.getAdapter(Instance.class);
 				final Actor actor = vertex.getAdapter(Actor.class);
 				if (instance != null) {
@@ -417,17 +416,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					result.merge(doAdditionalGeneration(instance));
 
 					// For backward compatibility only
-					if (result.isEmpty()) {
-						printInstance(instance);
-					}
+					printInstance(instance);
 				} else if (actor != null) {
 					result.merge(doGenerateActor(actor));
 					result.merge(doAdditionalGeneration(instance));
 
 					// For backward compatibility only
-					if (result.isEmpty()) {
-						printActor(actor);
-					}
+					printActor(actor);
 				}
 			}
 
@@ -467,8 +462,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	@Deprecated
 	protected void doTransformActor(Actor actor) {
-		new UnsupportedOperationException(
-				"This method will be removed in the next days");
 	}
 
 	/**
@@ -499,8 +492,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	@Deprecated
 	protected void doXdfCodeGeneration(Network network) {
-		throw new UnsupportedOperationException(
-				"This method will be removed in the next few days");
 	}
 
 	/**
