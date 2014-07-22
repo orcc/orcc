@@ -108,6 +108,7 @@ public class JadeBackend extends AbstractBackend {
 		bitAccurate = getOption(BackendsConstants.JIT_BIT_ACCURATE,
 				BackendsConstants.JIT_BIT_ACCURATE_DEFAULT);
 
+		// Configure the map used in RenameTransformation
 		final Map<String, String> renameMap = new HashMap<String, String>();
 		renameMap.put("abs", "abs_");
 		renameMap.put("getw", "getw_");

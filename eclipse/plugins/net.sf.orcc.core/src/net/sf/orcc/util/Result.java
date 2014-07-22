@@ -29,11 +29,11 @@
 package net.sf.orcc.util;
 
 /**
- * This class is used to store files writing results. It maintains tyhe number
- * of really written files in an operation, and the number of files not written
- * (because already up-to-date)
+ * Used to store files writing results. It maintains the number of really
+ * written files in an operation, and the number of cached files (not written
+ * because already up-to-date)
  * 
- * @author alorence
+ * @author Antoine Lorence
  * 
  */
 public class Result {
@@ -46,18 +46,40 @@ public class Result {
 		this.cached = cached;
 	}
 
+	/**
+	 * Create a new empty Result instance.
+	 * 
+	 * @return
+	 */
 	public static Result newInstance() {
 		return new Result(0, 0);
 	}
 
+	/**
+	 * Create a new Result instance for a written file.
+	 * 
+	 * @return
+	 */
 	public static Result newOkInstance() {
 		return new Result(1, 0);
 	}
 
+	/**
+	 * Create a new Result instance for a cached file.
+	 * 
+	 * @return
+	 */
 	public static Result newCachedInstance() {
 		return new Result(0, 1);
 	}
 
+	/**
+	 * Merge the given <em>other</em> instance into this one by adding their
+	 * respective members.
+	 * 
+	 * @param other
+	 * @return
+	 */
 	public Result merge(final Result other) {
 		written += other.written;
 		cached += other.cached;

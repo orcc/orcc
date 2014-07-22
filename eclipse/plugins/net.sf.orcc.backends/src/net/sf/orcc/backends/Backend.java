@@ -42,6 +42,10 @@ public interface Backend {
 
 	/**
 	 * Launches a compilation using the options provided to this back-end.
+	 * 
+	 * @param progressMonitor
+	 *            A monitor used to provide information about progression of
+	 *            generation and cancellation support
 	 */
 	void compile(IProgressMonitor progressMonitor);
 

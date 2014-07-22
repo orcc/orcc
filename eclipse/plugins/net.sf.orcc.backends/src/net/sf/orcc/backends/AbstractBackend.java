@@ -102,44 +102,72 @@ import org.eclipse.equinox.app.IApplicationContext;
 import org.osgi.framework.Bundle;
 
 /**
- * This class is an abstract implementation of {@link Backend}. The two entry
- * points of this class are the public methods {@link #compileVTL()} and
- * {@link #compileXDF()} which should NOT be called by back-ends themselves.
- * 
  * <p>
- * The following methods are abstract and must be implemented by back-ends:
- * <ul>
- * <li>{@link #doInitializeOptions()} is called at the end of
- * {@link #setOptions(Map)} to initialize the options of the back-end.</li>
- * <li>{@link #doTransformActor(Actor)} is called by
- * {@link #transformActors(List)} to transform a list of actors.</li>
- * <li>{@link #doVtlCodeGeneration(List)} is called to compile a list of actors.
- * </li>
- * <li>{@link #doXdfCodeGeneration(Network)} is called to compile a network.</li>
- * </ul>
+ * This class is an abstract implementation of {@link Backend}. It supports
+ * standard back-ends to generate code from a network and its (instantiated or
+ * not children). It also can be used to produce a Video Tool Library (VTL) from
+ * CAL projects. To do so, simply use {@link #AbstractBackend(boolean)}
+ * signature in the constructore of the concrete back-end class. signature.
  * </p>
  * 
- * The following methods may be extended by back-ends, if they print actors or
- * instances respectively, or if a library must be exported with source files
- * generated.
+ * <p>
+ * When a back-end is launched, the method {@link #setOptions(Map)} is called to
+ * configure back-end options, then {@link #compile(IProgressMonitor)} calls all
+ * the methods required to transform the IR, validate the result, generate the
+ * target code and extract the required libraries.
+ * </p>
+ * 
+ * <p>
+ * The following methods may be extended by back-ends depending on their needs.
+ * </p>
+ * 
  * <ul>
- * <li>{@link #printActor(Actor)} is called by {@link #printActors(List)}.</li>
- * <li>{@link #printInstance(Instance)} is called by
- * {@link #printInstances(Network)}.</li>
- * <li>{@link #doLibrariesExtraction()} is called by {@link #compile()}.</li>
+ * <li>{@link #doInitializeOptions()} is called at the end of
+ * {@link #setOptions(Map)} to initialize some member variables. It is also used
+ * to fill transformations maps {@link #networkTransfos} and
+ * {@link #childrenTransfos}.</li>
+ * </ul>
+ * <p>
+ * Then the full compilation is run:
+ * </p>
+ * <ol>
+ * <li>{@link #doValidate(Network)} checks some constraints on the given network
+ * </li>
+ * <li>{@link #doGenerateNetwork(Network)} produces code from the given network</li>
+ * <li>{@link #doAdditionalGeneration(Network)} can be used to generate other
+ * files from the given network</li>
+ * <li>{@link #doGenerateActor(Actor)} or {@link #doGenerateInstance(Instance)}</li>
+ * <li>{@link #doAdditionalGeneration(Actor)} or
+ * {@link #doAdditionalGeneration(Instance)}</li>
+ * </ol>
+ * 
+ * <p>
+ * The following methods was used in previous versions of Orcc. It will be
+ * removed and shouldn't be used anymore. Documentation on each method indicates
+ * the new alternative to use.
+ * <ul>
+ * <li>{@link #doTransformActor(Actor)}</li>
+ * <li>{@link #transformActors(List)}</li>
+ * <li>{@link #doXdfCodeGeneration(Network)}</li>
+ * <li>{@link #printActor(Actor)}</li>
+ * <li>{@link #printActors(List)}</li>
+ * <li>{@link #printChildren(Network)}</li>
+ * <li>{@link #printInstance(Instance)}</li>
  * </ul>
  * 
- * The other methods declared <code>final</code> may be called by back-ends.
- * 
  * @author Matthieu Wipliez
+ * @author Antoine Lorence
  * 
  */
 public abstract class AbstractBackend implements Backend, IApplication {
 
+	/**
+	 * Indicates that this is a VTL back-end or not (i.e. a standard back-end).
+	 */
 	private boolean isVTLBackend;
 
 	/**
-	 * Indicates that the backend has been launched in debug mode or not
+	 * Indicates that the back-end has been launched in debug mode or not
 	 */
 	protected boolean debug;
 
@@ -149,12 +177,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected int fifoSize;
 
 	/**
-	 * Contains mapping informations configured before back-end launch. Key is
+	 * Contains mapping information configured before back-end launch. Key is
 	 * the name of an instance, value is a core identifier.
 	 */
 	protected Map<String, String> mapping;
 
-	// FIXME: XCF files are used only in TTA backend. These variables should be
+	// FIXME: XCF files are used only in TTA back-end. These variables should be
 	// moved in TTABackend class
 	protected boolean importXcfFile;
 	protected File xcfFile;
@@ -164,9 +192,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected List<DfVisitor<?>> networkTransfos;
 	/**
-	 * List of transformations to apply on each child
+	 * List of transformations to apply on each child.
 	 */
 	protected List<DfVisitor<?>> childrenTransfos;
+
+	/**
+	 * Options of back-end execution. Its content can be manipulated with
+	 * {@link #getOption} methods.
+	 */
+	private Map<String, Object> options;
 
 	// Other options
 	protected boolean classify;
@@ -175,23 +209,18 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected boolean convertMulti2Mono;
 
 	/**
-	 * Options of backend execution. Its content can be manipulated with
-	 * {@link #getAttribute} and {@link #setAttribute}
-	 */
-	private Map<String, Object> options;
-
-	/**
 	 * Path where output files will be written.
+	 * TODO: Rename the variable to something more explicit (outputPath, or something else)
 	 */
 	protected String path;
 
 	/**
-	 * Represents the project where call application to build is located
+	 * Represents the project where application to build is located
 	 */
 	protected IProject project;
 
 	/**
-	 * This ResourceSet can be used by concrete back-ends when needed
+	 * Common ResourceSet can be used by concrete back-ends if needed
 	 */
 	protected ResourceSet currentResourceSet;
 	/**
@@ -363,6 +392,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		OrccLogger.traceln("Orcc backend done.");
 	}
 
+	/**
+	 * Validate the network. The default implementation calls
+	 * {@link Validator#checkTopLevel(Network)} and
+	 * {@link Validator#checkMinimalFifoSize(Network, int)}
+	 * 
+	 * @param network
+	 */
 	protected void doValidate(Network network) {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
@@ -370,16 +406,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	/**
 	 * Called by {@link #setOptions(Map)} when options are initialized. This
-	 * method may be implemented by backend to set member variables specific to
-	 * it.
+	 * method must be implemented by back-end to set specific member variables
+	 * and additional back-end specific options.
 	 */
 	abstract protected void doInitializeOptions();
 
 	/**
-	 * Transforms the given actor.
+	 * Do not use or override this method anymore. Instead, fill the
+	 * {@link #childrenTransfos} list with all transformations to apply at Actor
+	 * level.
 	 * 
-	 * @param actor
-	 *            the actor
+	 * @deprecated
 	 */
 	@Deprecated
 	protected void doTransformActor(Actor actor) {
@@ -387,10 +424,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Transforms instances of the given network.
+	 * Do not use or override this method anymore. Instead, fill the
+	 * {@link #childrenTransfos} list with all transformations to apply at Actor
+	 * level.
 	 * 
-	 * @param actors
-	 *            a list of actors
+	 * @deprecated
 	 */
 	@Deprecated
 	final public void transformActors(List<Actor> actors) {
@@ -401,30 +439,37 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * This method must be implemented by subclasses to do the actual code
-	 * generation for the network or its instances or both.
+	 * Do not use or override this method anymore. Instead, extends
+	 * {@link #doGenerateNetwork(Network)} to print code from a Network, and/or
+	 * {@link #doGenerateActor(Actor)} or {@link #doGenerateInstance(Instance)}
+	 * to print code from its children.
 	 * 
-	 * @param network
-	 *            a network
+	 * @see #doAdditionalGeneration(Network)
+	 * @see #doAdditionalGeneration(Instance)
+	 * @see #doAdditionalGeneration(Actor)
+	 * @deprecated
 	 */
 	@Deprecated
 	protected void doXdfCodeGeneration(Network network) {
-		throw new UnsupportedOperationException("This method will be removed in the next few days");
+		throw new UnsupportedOperationException(
+				"This method will be removed in the next few days");
 	}
 
 	/**
-	 * This method must be implemented by subclasses to do the actual code
-	 * generation for the network or its instances or both.
+	 * This method may be implemented by subclasses to do the code generation
+	 * at network level.
 	 * 
 	 * @param network
 	 *            a network
+	 * @return The generation Result object
 	 */
 	protected Result doGenerateNetwork(Network network) {
 		return Result.newInstance();
 	}
 
 	/**
-	 * Can be overridden in back-ends to generates files others than Network
+	 * Can be overridden in back-ends to generates files at network level,
+	 * but not directly related to the network itself.
 	 * 
 	 * @param network
 	 * @return The generation Result object
@@ -435,8 +480,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	/**
 	 * <p>
-	 * This method must be implemented in concrete back-ends if some runtime
-	 * libraries files have to be extracted while code is generated.
+	 * This method may be implemented in concrete back-ends if some runtime
+	 * libraries files have to be extracted while code generation.
 	 * </p>
 	 * 
 	 * <p>
@@ -452,30 +497,42 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		return Result.newInstance();
 	}
 
-	private <T extends EObject> void applyTransformations(Iterable<T> objects, Iterable<DfVisitor<?>> transformations) {
+	/**
+	 * Apply given <em>transformations</em> on given <em>objects</em>.
+	 * 
+	 * @param objects
+	 * @param transformations
+	 */
+	final private <T extends EObject> void applyTransformations(Iterable<T> objects, Iterable<DfVisitor<?>> transformations) {
 		for(final T object : objects) {
 			applyTransformations(object, transformations);
 		}
 	}
 
-	private void applyTransformations(EObject object, Iterable<DfVisitor<?>> transformations) {
+	/**
+	 * Apply given <em>transformations</em> on given <em>object</em>.
+	 * 
+	 * @param object
+	 * @param transformations
+	 */
+	final private void applyTransformations(EObject object, Iterable<DfVisitor<?>> transformations) {
 		for(final DfVisitor<?> transformation : transformations) {
 			transformation.doSwitch(object);
 		}
 	}
 
 	/**
-	 * Returns the boolean-valued attribute with the given name. Returns the
-	 * given default value if the attribute is undefined.
+	 * Returns the boolean-valued option with the given name. Returns the
+	 * given default value if the option is undefined.
 	 * 
-	 * @param attributeName
-	 *            the name of the attribute
+	 * @param optionName
+	 *            the name of the option
 	 * @param defaultValue
 	 *            the value to use if no value is found
-	 * @return the value or the default value if no value was found.
+	 * @return the value or the fallback default value
 	 */
-	final public boolean getOption(String attributeName, boolean defaultValue) {
-		Object obj = options.get(attributeName);
+	final public boolean getOption(String optionName, boolean defaultValue) {
+		Object obj = options.get(optionName);
 		if (obj instanceof Boolean) {
 			return (Boolean) obj;
 		} else {
@@ -484,17 +541,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Returns the integer-valued attribute with the given name. Returns the
-	 * given default value if the attribute is undefined.
+	 * Returns the integer-valued option with the given name. Returns the
+	 * given default value if the option is undefined.
 	 * 
-	 * @param attributeName
-	 *            the name of the attribute
+	 * @param optionName
+	 *            the name of the option
 	 * @param defaultValue
 	 *            the value to use if no value is found
-	 * @return the value or the default value if no value was found.
+	 * @return the value or the fallback default value
 	 */
-	final public int getOption(String attributeName, int defaultValue) {
-		Object obj = options.get(attributeName);
+	final public int getOption(String optionName, int defaultValue) {
+		Object obj = options.get(optionName);
 		if (obj instanceof Integer) {
 			return (Integer) obj;
 		} else {
@@ -503,19 +560,19 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Returns the map-valued attribute with the given name. Returns the given
-	 * default value if the attribute is undefined.
+	 * Returns the map-valued option with the given name. Returns the
+	 * given default value if the option is undefined.
 	 * 
-	 * @param attributeName
-	 *            the name of the attribute
+	 * @param optionName
+	 *            the name of the option
 	 * @param defaultValue
 	 *            the value to use if no value is found
-	 * @return the value or the default value if no value was found.
+	 * @return the value or the fallback default value
 	 */
 	@SuppressWarnings("unchecked")
-	final public Map<String, String> getOption(String attributeName,
+	final public Map<String, String> getOption(String optionName,
 			Map<String, String> defaultValue) {
-		Object obj = options.get(attributeName);
+		Object obj = options.get(optionName);
 		if (obj instanceof Map<?, ?>) {
 			return (Map<String, String>) obj;
 		} else {
@@ -524,17 +581,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Returns the string-valued attribute with the given name. Returns the
-	 * given default value if the attribute is undefined.
+	 * Returns the string-valued option with the given name. Returns the
+	 * given default value if the option is undefined.
 	 * 
-	 * @param attributeName
-	 *            the name of the attribute
+	 * @param optionName
+	 *            the name of the option
 	 * @param defaultValue
 	 *            the value to use if no value is found
-	 * @return the value or the default value if no value was found.
+	 * @return the value or the fallback default value
 	 */
-	final public String getOption(String attributeName, String defaultValue) {
-		Object obj = options.get(attributeName);
+	final public String getOption(String optionName, String defaultValue) {
+		Object obj = options.get(optionName);
 		if (obj instanceof String) {
 			return (String) obj;
 		} else {
@@ -543,11 +600,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Returns a map containing the back-end attributes in this launch
-	 * configuration. Returns an empty map if the backend configuration has no
-	 * attributes.
+	 * Returns a map containing the back-end options in this launch
+	 * configuration. Returns an empty map if the back-end configuration has no
+	 * options.
 	 * 
-	 * @return a map of attribute keys and values.
+	 * @return a map of options keys and values.
 	 */
 	final public Map<String, Object> getOptions() {
 		return options;
@@ -567,31 +624,51 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Prints the given actor. Should be overridden by back-ends that wish to
-	 * print the given actor.
+	 * Do not use or override this method anymore. Instead, extends
+	 * {@link #doGenerateActor(Actor)}.
 	 * 
-	 * @param actor
-	 *            the actor
-	 * @return <code>true</code> if the actor was cached
+	 * @see #doAdditionalGeneration(Actor)
+	 * @deprecated
 	 */
 	@Deprecated
 	protected boolean printActor(Actor actor) {
 		return false;
 	}
 
+	/**
+	 * This method may be implemented by subclasses to do the code generation at
+	 * actor level. It will automatically be called at code generation time by
+	 * VTL back-ends and by standard back-ends (if network has been fully
+	 * instantiated).
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @see #doAdditionalGeneration(Actor)
+	 * @return The generation Result object
+	 */
 	protected Result doGenerateActor(final Actor actor) {
 		return Result.newInstance();
 	}
 
+	/**
+	 * This method may be implemented by subclasses to do additional generation at
+	 * actor level.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @return The generation Result object
+	 */
 	protected Result doAdditionalGeneration(final Actor actor) {
 		return Result.newInstance();
 	}
 
 	/**
-	 * Print entities of the given network.
+	 * Do not use or override this method anymore. Instead, extends
+	 * {@link #doGenerateActor(Actor)} and/or {@link #doGenerateInstance(Instance)} .
 	 * 
-	 * @param entities
-	 *            a list of entities
+	 * @see #doAdditionalGeneration(Actor)
+	 * @see #doAdditionalGeneration(Instance)
+	 * @deprecated
 	 */
 	@Deprecated
 	final public void printChildren(Network network) {
@@ -624,28 +701,53 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Prints the given instance. Should be overridden by back-ends that need to
-	 * print the given instance.
+	 * Do not use or override this method anymore. Instead, extends
+	 * {@link #doGenerateInstance(Instance)} .
 	 * 
-	 * @param instance
-	 *            the instance
-	 * @return <code>true</code> if the actor was cached
+	 * @see #doAdditionalGeneration(Actor)
+	 * @see #doAdditionalGeneration(Instance)
+	 * @deprecated
 	 */
 	@Deprecated
 	protected boolean printInstance(Instance instance) {
 		return false;
 	}
 
+	/**
+	 * This method may be implemented by subclasses to do the code generation at
+	 * instance level. It will automatically be called at code generation time
+	 * by standard back-ends.
+	 * 
+	 * @param instance
+	 *            an instance
+	 * @see #doAdditionalGeneration(Actor)
+	 * @return The generation Result object
+	 */
+
 	protected Result doGenerateInstance(final Instance instance) {
 		return Result.newInstance();
 	}
 
+	/**
+	 * This method may be implemented by subclasses to do additional generation at
+	 * instance level.
+	 * 
+	 * @param instance
+	 *            an instance
+	 * @return The generation Result object
+	 */
 	protected Result doAdditionalGeneration(final Instance instance) {
 		return Result.newInstance();
 	}
 
-	private void printUsage(IApplicationContext context, Options options,
-			String parserMsg) {
+	/**
+	 * Print command line documentation on options
+	 * 
+	 * @param context
+	 * @param options
+	 * @param parserMsg
+	 */
+	private void printUsage(Options options, String parserMsg) {
 
 		String footer = "";
 		if (parserMsg != null && !parserMsg.isEmpty()) {
@@ -660,7 +762,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	@Override
-	public void setOptions(Map<String, Object> options) {
+	final public void setOptions(Map<String, Object> options) {
 		this.options = options;
 
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -829,7 +931,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 			optionMap.put(PROFILE, line.hasOption("prof"));
 
-			// Set backend name in options map
+			// Set back-end name in options map
 			String backend = this.getClass().getName();
 			IConfigurationElement[] elements = Platform.getExtensionRegistry()
 					.getConfigurationElementsFor(
@@ -869,15 +971,16 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			}
 
 		} catch (UnrecognizedOptionException uoe) {
-			printUsage(context, options, uoe.getLocalizedMessage());
+			printUsage(options, uoe.getLocalizedMessage());
 		} catch (ParseException exp) {
-			printUsage(context, options, exp.getLocalizedMessage());
+			printUsage(options, exp.getLocalizedMessage());
 		}
 		return IApplication.EXIT_RELAUNCH;
 	}
 
 	@Override
 	public void stop() {
+		OrccLogger.traceln("The ");
 		monitor.setCanceled(true);
 	}
 }
