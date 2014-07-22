@@ -156,12 +156,12 @@ public class TTABackend extends LLVMBackend {
 
 		visitors.add(new DisconnectedOutputPortRemoval());
 
+		visitors.add(new TypeResizer(true, true, false, true));
 		visitors.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
 		visitors.add(new DfVisitor<Void>(new SSATransformation()));
 		visitors.add(new StringTransformation());
 		visitors.add(new RenameTransformation(this.renameMap));
 		visitors.add(new DfVisitor<Expression>(new TacTransformation()));
-		visitors.add(new TypeResizer(true, true, false, true));
 		visitors.add(new DeadGlobalElimination());
 		visitors.add(new DfVisitor<Void>(new DeadCodeElimination()));
 		visitors.add(new DfVisitor<Void>(new DeadVariableRemoval()));

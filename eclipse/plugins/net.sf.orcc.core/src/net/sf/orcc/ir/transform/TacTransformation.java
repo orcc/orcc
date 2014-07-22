@@ -161,9 +161,15 @@ public class TacTransformation extends AbstractIrVisitor<Expression> {
 					IrUtil.copy(expr.getType()));
 			break;
 		case LOGIC_NOT:
-			newExpr = factory.createExprBinary(IrUtil.copy(expr.getExpr()),
-					OpBinary.EQ, factory.createExprBool(false),
-					IrUtil.copy(expr.getType()));
+			if (expr.getExpr().getType().isInt()) {
+				newExpr = factory.createExprBinary(IrUtil.copy(expr.getExpr()),
+						OpBinary.EQ, factory.createExprInt(0),
+						IrUtil.copy(expr.getType()));
+			} else {
+				newExpr = factory.createExprBinary(IrUtil.copy(expr.getExpr()),
+						OpBinary.EQ, factory.createExprBool(false),
+						IrUtil.copy(expr.getType()));
+			}
 			break;
 		case BITNOT:
 			// Create an expression with all bits at '1'
