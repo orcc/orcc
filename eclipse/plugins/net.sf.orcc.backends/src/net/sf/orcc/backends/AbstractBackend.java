@@ -209,8 +209,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected boolean convertMulti2Mono;
 
 	/**
-	 * Path where output files will be written.
-	 * TODO: Rename the variable to something more explicit (outputPath, or something else)
+	 * Path where output files will be written. TODO: Rename the variable to
+	 * something more explicit (outputPath, or something else)
 	 */
 	protected String path;
 
@@ -248,16 +248,32 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		this.isVTLBackend = isVTLBackend;
 	}
 
+	/**
+	 * Calculate the time elapsed between the given <em>t0</em> and the current
+	 * timestamp.
+	 * 
+	 * @return The number of seconds, as a float
+	 */
+	final private float getDuration(long t0) {
+		return (float) (System.currentTimeMillis() - t0) / 1000;
+	}
+
 	@Override
 	public void compile(IProgressMonitor progressMonitor) {
-
-		monitor = progressMonitor;
-
-		boolean compileXdf = getOption(COMPILE_XDF, false);
 
 		// New ResourceSet for a new compilation
 		currentResourceSet = new ResourceSetImpl();
 
+		// Initialize the monitor. Can be used to stop the back-end
+		// execution and provide feedback to user
+		monitor = progressMonitor;
+
+		// Does code generation at network level should happen ?
+		boolean compileXdf = getOption(COMPILE_XDF, false);
+
+		// -----------------------------------------------------
+		// Configure the console log header
+		// -----------------------------------------------------
 		String orccVersion = "<unknown>";
 		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
 		if (bundle != null) {
@@ -279,12 +295,23 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		OrccLogger.traceln("*********************************************"
 				+ "************************************");
 
+		// -----------------------------------------------------
+		// Libraries files export
+		// -----------------------------------------------------
 		// If user checked the option "Don't export library", the method
 		// extractLibraries() must not be called
 		if (!getOption(NO_LIBRARY_EXPORT, false)) {
-			doLibrariesExtraction();
+			stopIfRequested();
+			final long t0 = System.currentTimeMillis();
+			final Result result = doLibrariesExtraction();
+			if(!result.isEmpty()) {
+				OrccLogger.traceln("Library export done in " + getDuration(t0) + "s");
+			}
 		}
 
+		// -----------------------------------------------------
+		// Network level code generation
+		// -----------------------------------------------------
 		final IFile xdfFile = getFile(project, getOption(XDF_FILE, ""),
 				OrccUtil.NETWORK_SUFFIX);
 		final Network network = EcoreHelper.getEObject(currentResourceSet,
@@ -299,94 +326,112 @@ public abstract class AbstractBackend implements Backend, IApplication {
 						"The input file seems to not contains any network");
 			}
 
-			stopIfRequested();
-			new NetworkValidator().doSwitch(network);
+			if (!networkTransfos.isEmpty()) {
+				stopIfRequested();
+				OrccLogger.traceln("Network transformations");
+				final long t0 = System.currentTimeMillis();
+				applyTransformations(network, networkTransfos);
+				OrccLogger.traceln("Done in " + getDuration(t0) + "s");
+			}
 
 			stopIfRequested();
-
-			applyTransformations(network, networkTransfos);
-
-			OrccLogger.traceln("Printing network...");
-
+			OrccLogger.traceln("Network validation");
 			doValidate(network);
 
-			Result result = doGenerateNetwork(network);
-			doAdditionalGeneration(network);
+			stopIfRequested();
+			OrccLogger.traceln("Network generation");
+			final long t0 = System.currentTimeMillis();
+			final Result result = doGenerateNetwork(network);
+			result.merge(doAdditionalGeneration(network));
+			OrccLogger.traceln("Done in " + getDuration(t0) + "s. " + result);
 
 			// For backward compatibility
-			if(result.isEmpty()) {
+			if (result.isEmpty()) {
+				stopIfRequested();
 				doXdfCodeGeneration(network);
 			}
 		}
 
+		// -----------------------------------------------------
+		// VTL back-ends code generation
+		// -----------------------------------------------------
 		if (isVTLBackend) {
-			OrccLogger.traceln("Lists actors...");
+			stopIfRequested();
+			OrccLogger.traceln("Compute the list of actors to generate");
 			List<IFolder> projectsFolders = OrccUtil.getOutputFolders(project);
 			List<IFile> irFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX,
 					projectsFolders);
-			List<Actor> actors = new ArrayList<Actor>();
-			OrccLogger.traceln("Parsing " + irFiles.size() + " actors...");
 
+			OrccLogger.traceln("Parsing " + irFiles.size() + " IR files");
+			List<Actor> actors = new ArrayList<Actor>();
 			for (IFile file : irFiles) {
-				EObject eObject = EcoreHelper.getEObject(currentResourceSet, file);
+				final EObject eObject = EcoreHelper.getEObject(
+						currentResourceSet, file);
+				// do not add units
 				if (eObject instanceof Actor) {
-					// do not add units
 					actors.add((Actor) eObject);
 				}
 			}
+			OrccLogger.traceln(actors.size()  + " actors will be added to the VTL (other IR files are units)");
 
-			OrccLogger.traceln("Transform actors");
-			applyTransformations(actors, childrenTransfos);
-
-			OrccLogger.traceln("Print actors");
-			Result result = Result.newInstance();
-			for(final Actor actor : actors) {
-				result.merge(doGenerateActor(actor));
+			if (!childrenTransfos.isEmpty()) {
+				stopIfRequested();
+				OrccLogger.traceln("Actors transformations");
+				final long t0 = System.currentTimeMillis();
+				applyTransformations(actors, childrenTransfos);
+				OrccLogger.traceln("Done in " + getDuration(t0) + "s");
 			}
 
-			// Finalize actor generation
-			OrccLogger.traceln("Finalize actors...");
-		} else {
-			OrccLogger.traceln("Printing children...");
-			long t0 = System.currentTimeMillis();
+			stopIfRequested();
+			OrccLogger.traceln("Actors generation");
+			final long t0 = System.currentTimeMillis();
+			final Result result = Result.newInstance();
+			for (final Actor actor : actors) {
+				result.merge(doGenerateActor(actor));
+				result.merge(doAdditionalGeneration(actor));
+			}
+			OrccLogger.traceln("Done in " + getDuration(t0) + "s. " + result);
+		}
+		// -----------------------------------------------------
+		// Standard back-ends children level code generation
+		// -----------------------------------------------------
+		else {
 
-			int numCached = 0;
+			if (!childrenTransfos.isEmpty()) {
+				stopIfRequested();
+				OrccLogger.traceln("Children transformations");
+				final long t0 = System.currentTimeMillis();
+				applyTransformations(network.getAllActors(), childrenTransfos);
+				OrccLogger.traceln("Done in " + getDuration(t0) + "s");
+			}
+
+			stopIfRequested();
+			OrccLogger.traceln("Children generation");
+			final long t0 = System.currentTimeMillis();
+			final Result result = Result.newInstance();
 			for (final Vertex vertex : network.getChildren()) {
 				final Instance instance = vertex.getAdapter(Instance.class);
 				final Actor actor = vertex.getAdapter(Actor.class);
 				if (instance != null) {
-
-					Result result = doGenerateInstance(instance);
+					result.merge(doGenerateInstance(instance));
 					result.merge(doAdditionalGeneration(instance));
 
 					// For backward compatibility only
 					if (result.isEmpty()) {
-						if (printInstance(instance)) {
-							++numCached;
-						}
+						printInstance(instance);
 					}
 				} else if (actor != null) {
-
-					Result result = doGenerateActor(actor);
+					result.merge(doGenerateActor(actor));
 					result.merge(doAdditionalGeneration(instance));
 
 					// For backward compatibility only
 					if (result.isEmpty()) {
-						if (printActor(actor)) {
-							++numCached;
-						}
+						printActor(actor);
 					}
 				}
 			}
 
-			long t1 = System.currentTimeMillis();
-			OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-					+ "s");
-
-			if (numCached > 0) {
-				OrccLogger.noticeln(numCached + " entities were not regenerated "
-						+ "because they were already up-to-date.");
-			}
+			OrccLogger.traceln("Done in " + getDuration(t0) + "s. " + result);
 		}
 
 		OrccLogger.traceln("Orcc backend done.");
@@ -402,6 +447,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected void doValidate(Network network) {
 		Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
+
+		new NetworkValidator().doSwitch(network);
 	}
 
 	/**
@@ -420,7 +467,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	@Deprecated
 	protected void doTransformActor(Actor actor) {
-		new UnsupportedOperationException("This method will be removed in the next days");
+		new UnsupportedOperationException(
+				"This method will be removed in the next days");
 	}
 
 	/**
@@ -456,8 +504,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * This method may be implemented by subclasses to do the code generation
-	 * at network level.
+	 * This method may be implemented by subclasses to do the code generation at
+	 * network level.
 	 * 
 	 * @param network
 	 *            a network
@@ -468,8 +516,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Can be overridden in back-ends to generates files at network level,
-	 * but not directly related to the network itself.
+	 * Can be overridden in back-ends to generates files at network level, but
+	 * not directly related to the network itself.
 	 * 
 	 * @param network
 	 * @return The generation Result object
@@ -503,8 +551,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param objects
 	 * @param transformations
 	 */
-	final private <T extends EObject> void applyTransformations(Iterable<T> objects, Iterable<DfVisitor<?>> transformations) {
-		for(final T object : objects) {
+	final private <T extends EObject> void applyTransformations(
+			Iterable<T> objects, Iterable<DfVisitor<?>> transformations) {
+		for (final T object : objects) {
 			applyTransformations(object, transformations);
 		}
 	}
@@ -515,15 +564,16 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param object
 	 * @param transformations
 	 */
-	final private void applyTransformations(EObject object, Iterable<DfVisitor<?>> transformations) {
-		for(final DfVisitor<?> transformation : transformations) {
+	final private void applyTransformations(EObject object,
+			Iterable<DfVisitor<?>> transformations) {
+		for (final DfVisitor<?> transformation : transformations) {
 			transformation.doSwitch(object);
 		}
 	}
 
 	/**
-	 * Returns the boolean-valued option with the given name. Returns the
-	 * given default value if the option is undefined.
+	 * Returns the boolean-valued option with the given name. Returns the given
+	 * default value if the option is undefined.
 	 * 
 	 * @param optionName
 	 *            the name of the option
@@ -541,8 +591,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Returns the integer-valued option with the given name. Returns the
-	 * given default value if the option is undefined.
+	 * Returns the integer-valued option with the given name. Returns the given
+	 * default value if the option is undefined.
 	 * 
 	 * @param optionName
 	 *            the name of the option
@@ -560,8 +610,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Returns the map-valued option with the given name. Returns the
-	 * given default value if the option is undefined.
+	 * Returns the map-valued option with the given name. Returns the given
+	 * default value if the option is undefined.
 	 * 
 	 * @param optionName
 	 *            the name of the option
@@ -581,8 +631,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Returns the string-valued option with the given name. Returns the
-	 * given default value if the option is undefined.
+	 * Returns the string-valued option with the given name. Returns the given
+	 * default value if the option is undefined.
 	 * 
 	 * @param optionName
 	 *            the name of the option
@@ -616,8 +666,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * execution.
 	 */
 	private void stopIfRequested() {
-		if(monitor != null) {
-			if(monitor.isCanceled()) {
+		if (monitor != null) {
+			if (monitor.isCanceled()) {
 				throw new OperationCanceledException();
 			}
 		}
@@ -651,8 +701,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * This method may be implemented by subclasses to do additional generation at
-	 * actor level.
+	 * This method may be implemented by subclasses to do additional generation
+	 * at actor level.
 	 * 
 	 * @param actor
 	 *            an actor
@@ -664,7 +714,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 	/**
 	 * Do not use or override this method anymore. Instead, extends
-	 * {@link #doGenerateActor(Actor)} and/or {@link #doGenerateInstance(Instance)} .
+	 * {@link #doGenerateActor(Actor)} and/or
+	 * {@link #doGenerateInstance(Instance)} .
 	 * 
 	 * @see #doAdditionalGeneration(Actor)
 	 * @see #doAdditionalGeneration(Instance)
@@ -729,8 +780,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * This method may be implemented by subclasses to do additional generation at
-	 * instance level.
+	 * This method may be implemented by subclasses to do additional generation
+	 * at instance level.
 	 * 
 	 * @param instance
 	 *            an instance
@@ -801,6 +852,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			OrccLogger.debugln("Debug mode is enabled");
 		}
 
+		// To avoid applying many times the same transformations when the same
+		// back-end is re-run, we have to clear transfos lists. They will be
+		// filled in doInitializeOptions()
+		networkTransfos.clear();
+		childrenTransfos.clear();
 		doInitializeOptions();
 	}
 
@@ -943,12 +999,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				}
 			}
 			optionMap.put(BACKEND, backend);
-			try {
 
+			try {
 				setOptions(optionMap);
 				compile(new NullProgressMonitor());
 				return IApplication.EXIT_OK;
-
 			} catch (OrccRuntimeException e) {
 
 				if (e.getMessage() != null && !e.getMessage().isEmpty()) {
