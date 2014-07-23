@@ -61,8 +61,8 @@ import net.sf.orcc.ir.util.TypeUtil
 abstract class LLVMTemplate extends CommonPrinter {
 	
 	var Type currentType = null
-	var signed = false
-	var floating = false
+	protected var signed = false
+	protected var floating = false
 
 	new() {
 		super()
