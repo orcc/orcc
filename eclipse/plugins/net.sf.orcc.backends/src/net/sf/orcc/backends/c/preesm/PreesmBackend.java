@@ -29,10 +29,12 @@
 package net.sf.orcc.backends.c.preesm;
 
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.tools.classifier.Classifier;
@@ -56,6 +58,16 @@ public class PreesmBackend extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) {
+	}
+
+	/**
+	 * Remove the fifo size check validation step
+	 */
+	@Override
+	protected void doValidate(Network network) {
+		Validator.checkTopLevel(network);
+
+		new NetworkValidator().doSwitch(network);
 	}
 
 	@Override
