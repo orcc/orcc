@@ -147,9 +147,6 @@
                id="net.sf.orcc.backends.llvm.tta.reduceConnections">
          </option>
          <option
-               id="net.sf.orcc.backends.tta.finalizeGeneration">
-         </option>
-         <option
                id="net.sf.orcc.backends.fpga">
          </option>
          <option
@@ -283,13 +280,6 @@
                defaultValue="false"
                id="net.sf.orcc.backends.llvm.jit.bitaccurate"
                name="Generate bit-accurate code">
-            <checkBox></checkBox>
-         </option>
-         <option
-               defaultValue="false"
-               description="Finalize the generation of the design in VHDL description using TCE tools"
-               id="net.sf.orcc.backends.tta.finalizeGeneration"
-               name="Finalize the generation">
             <checkBox></checkBox>
          </option>
          <option

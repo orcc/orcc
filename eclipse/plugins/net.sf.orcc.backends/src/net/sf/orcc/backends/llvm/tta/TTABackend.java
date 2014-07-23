@@ -34,8 +34,6 @@ import static net.sf.orcc.backends.BackendsConstants.TTA_DEFAULT_PROCESSORS_CONF
 import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.orcc.backends.llvm.aot.LLVMBackend;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
@@ -98,10 +96,8 @@ public class TTABackend extends LLVMBackend {
 	private Mapping computedMapping;
 	private ProcessorConfiguration configuration;
 	private Design design;
-	private boolean finalize;
 
 	private FPGA fpga;
-	private String libPath;
 	private boolean reduceConnections;
 
 	private HwDesignPrinter hwDesignPrinter;
@@ -132,8 +128,6 @@ public class TTABackend extends LLVMBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		finalize = getOption("net.sf.orcc.backends.tta.finalizeGeneration",
-				false);
 		fpga = FPGA.builder(getOption(FPGA_CONFIGURATION,
 				FPGA_DEFAULT_CONFIGURATION));
 		configuration = ProcessorConfiguration.getByName(getOption(
@@ -306,11 +300,6 @@ public class TTABackend extends LLVMBackend {
 		dota.print(design, path, "top.dot");
 		result.merge(FilesManager.writeFile(dota.dot(design), path, "top.dot"));
 
-		if (finalize) {
-			// Launch the TCE toolset
-			runPythonScript();
-		}
-
 		return result;
 	}
 
@@ -320,7 +309,7 @@ public class TTABackend extends LLVMBackend {
 		result.merge(FilesManager.extract("/runtime/common/scripts", path));
 
 		// Will be used later to execute the scripts
-		libPath = path + File.separator + "libs";
+		String libPath = path + File.separator + "libs";
 
 		// Ensure scripts have execution rights
 		new File(libPath, "ttanetgen").setExecutable(true);
@@ -342,26 +331,6 @@ public class TTABackend extends LLVMBackend {
 		swActorPrinter.setProcessor(design.getActorToProcessorMap().get(actor));
 		return FilesManager.writeFile(swActorPrinter.getContent(actor),
 				actorsPath, actor.getName() + ".ll");
-	}
-
-	/**
-	 * Runs the python script to compile the application and generate the whole
-	 * design using the TCE toolset. (FIXME: Rewrite this awful method)
-	 */
-	private void runPythonScript() {
-		List<String> cmdList = new ArrayList<String>();
-		cmdList.add(libPath + File.separator + "ttanetgen");
-		cmdList.add("-cg");
-		if (debug) {
-			cmdList.add("--debug");
-		}
-		cmdList.add(path);
-
-		OrccLogger.traceln("Generating design...");
-		long t0 = System.currentTimeMillis();
-		OrccUtil.runExternalProgram(cmdList);
-		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + (t1 - t0) / 1000.0 + "s");
 	}
 
 }
