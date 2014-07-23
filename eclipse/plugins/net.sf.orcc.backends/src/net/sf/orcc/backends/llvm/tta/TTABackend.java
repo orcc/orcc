@@ -30,8 +30,6 @@ package net.sf.orcc.backends.llvm.tta;
 
 import static net.sf.orcc.backends.BackendsConstants.FPGA_CONFIGURATION;
 import static net.sf.orcc.backends.BackendsConstants.FPGA_DEFAULT_CONFIGURATION;
-import static net.sf.orcc.backends.BackendsConstants.TTA_DEFAULT_PROCESSORS_CONFIGURATION;
-import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
 
 import java.io.File;
 
@@ -40,7 +38,6 @@ import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
-import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureBuilder;
 import net.sf.orcc.backends.llvm.tta.transform.ComplexHwOpDetector;
 import net.sf.orcc.backends.llvm.tta.transform.PrintRemoval;
@@ -92,13 +89,11 @@ import net.sf.orcc.util.Void;
  */
 public class TTABackend extends LLVMBackend {
 
-	String actorsPath;
-	private Mapping computedMapping;
-	private ProcessorConfiguration configuration;
-	private Design design;
+	private String actorsPath;
 
+	private ArchitectureBuilder architectureBuilder;
+	private Design design;
 	private FPGA fpga;
-	private boolean reduceConnections;
 
 	private HwDesignPrinter hwDesignPrinter;
 	private HwProcessorPrinter hwProcessorPrinter;
@@ -124,20 +119,18 @@ public class TTABackend extends LLVMBackend {
 		tceDesignPrinter = new TceDesignPrinter();
 		tceProcessorPrinter = new TceProcessorPrinter();
 		dota = new Dota();
+
+		architectureBuilder = new ArchitectureBuilder();
 	}
 
 	@Override
 	protected void doInitializeOptions() {
 		fpga = FPGA.builder(getOption(FPGA_CONFIGURATION,
 				FPGA_DEFAULT_CONFIGURATION));
-		configuration = ProcessorConfiguration.getByName(getOption(
-				TTA_PROCESSORS_CONFIGURATION,
-				TTA_DEFAULT_PROCESSORS_CONFIGURATION));
-		reduceConnections = getOption(
-				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
 
 		// Configure the options used in code generation
 		swActorPrinter.setOptions(getOptions());
+		architectureBuilder.setOptions(getOptions());
 
 		// Create the directory tree
 		actorsPath = OrccUtil.createFolder(path, "actors");
@@ -163,7 +156,7 @@ public class TTABackend extends LLVMBackend {
 
 		if (!debug) {
 			networkTransfos.add(new PrintRemoval());
-		} 
+		}
 
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
 
@@ -192,7 +185,7 @@ public class TTABackend extends LLVMBackend {
 		networkTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 
 	}
-	
+
 	@Override
 	protected Result doGenerateNetwork(Network network) {
 		// Do nothing
@@ -204,11 +197,12 @@ public class TTABackend extends LLVMBackend {
 		// FIXME: Allow native ports in top level checking
 		// Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
-		
-		// Configuration before the code generation 
+
+		// Configuration before the code generation
 		// FIXME: Make it in better place
 
 		// Compute the actor mapping from a xcf file or from the user interface
+		Mapping computedMapping;
 		if (importXcfFile) {
 			computedMapping = new Mapping(network, xcfFile);
 		} else {
@@ -219,7 +213,7 @@ public class TTABackend extends LLVMBackend {
 
 		// Update alignment information
 		Alignable.setAlignability(network);
-		
+
 		if (!debug) {
 			OrccLogger.noticeln("All calls to printing functions are"
 					+ " removed for performance purpose.");
@@ -227,19 +221,14 @@ public class TTABackend extends LLVMBackend {
 			OrccLogger.noticeln("A noticeable deterioration in "
 					+ "performance could appear due to printing call.");
 		}
-		OrccLogger.traceln("TTA Architecture configuration setted to : "
-				+ configuration.getName());
-		
+
+		// Build the design from the mapping
+		design = architectureBuilder.build(network, computedMapping);
 	}
 
 	@Override
 	protected Result doAdditionalGeneration(Network network) {
 		final Result result = Result.newInstance();
-
-		// Build the design from the mapping
-
-		design = new ArchitectureBuilder().build(network, configuration,
-				computedMapping, reduceConnections, fifoSize);
 
 		OrccLogger.traceln("Design generation...");
 

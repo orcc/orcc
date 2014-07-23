@@ -28,6 +28,13 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.util;
 
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.backends.BackendsConstants.TTA_CONNECTION_REDUCTION;
+import static net.sf.orcc.backends.BackendsConstants.TTA_CONNECTION_REDUCTION_DEFAULT;
+import static net.sf.orcc.backends.BackendsConstants.TTA_DEFAULT_PROCESSORS_CONFIGURATION;
+import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,14 +68,39 @@ import net.sf.orcc.util.OrccLogger;
  */
 public class ArchitectureBuilder extends DfSwitch<Design> {
 
-	private int bufferId = 0;
-	private int signalId = 0;
+	private int bufferId;
+	private int signalId;
 
 	private Map<Vertex, Component> componentMap;
 
 	private Design design;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
+
 	private boolean reduceConnections;
+	private ProcessorConfiguration configuration;
+	private int fifoSize;
+
+	public void setOptions(Map<String, Object> options) {
+		if (options.containsKey(TTA_CONNECTION_REDUCTION)) {
+			reduceConnections = (Boolean) options.get(TTA_CONNECTION_REDUCTION);
+		} else {
+			reduceConnections = TTA_CONNECTION_REDUCTION_DEFAULT;
+		}
+
+		String confName;
+		if (options.containsKey(TTA_PROCESSORS_CONFIGURATION)) {
+			confName = (String) options.get(TTA_PROCESSORS_CONFIGURATION);
+		} else {
+			confName = TTA_DEFAULT_PROCESSORS_CONFIGURATION;
+		}
+		configuration = ProcessorConfiguration.getByName(confName);
+
+		if (options.containsKey(FIFO_SIZE)) {
+			fifoSize = (Integer) options.get(FIFO_SIZE);
+		} else {
+			fifoSize = DEFAULT_FIFO_SIZE;
+		}
+	}
 
 	/**
 	 * Add a simple signal to the design. The signal is the translation of
@@ -144,11 +176,12 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	 *            processors
 	 * @return A new design
 	 */
-	public Design build(Network network, ProcessorConfiguration configuration,
-			Mapping mapping, boolean reduceConnections, int fifosize) {
+	public Design build(Network network, Mapping mapping) {
 		this.componentMap = new HashMap<Vertex, Component>();
-		this.reduceConnections = reduceConnections;
 		this.design = factory.createDesign();
+		
+		bufferId = 0;
+		signalId = 0;
 
 		// Map all unmapped component to its own processor
 		for (Vertex unmapped : new ArrayList<Vertex>(mapping.getUnmapped())) {
@@ -202,7 +235,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			}
 		}
 
-		new ArchitectureMemoryEstimator(fifosize).doSwitch(design);
+		new ArchitectureMemoryEstimator(fifoSize).doSwitch(design);
 
 		for (Processor processor : design.getProcessors()) {
 			if (ArchitectureUtil.needOrccFu(processor.getMappedActors())) {
@@ -213,6 +246,12 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 				processor.getFunctionUnits().add(factory.createIoFU(processor));
 			}
 		}
+
+		OrccLogger.traceln("Processor configuration : "
+				+ configuration.getName());
+		OrccLogger.traceln("Design configuration    : "
+				+ design.getProcessors().size() + " processors -  "
+				+ design.getSharedMemories().size() + " shared RAMs");
 
 		return design;
 	}
