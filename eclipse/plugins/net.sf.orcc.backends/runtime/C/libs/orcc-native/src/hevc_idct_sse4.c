@@ -686,6 +686,13 @@ TRANSFORM_LUMA_ADD( 8);
     TR_8( dst, dst_stride, src,  8, SCALE8x8_2x32_WRAPPER);                    \
     TRANSPOSE8x8_16_S(dst, dst_stride, e, SAVE_8x16)
 
+#define TR_8_1_stride( dst, dst_stride, src)                                         \
+    TR_8( dst, dst_stride, src,  8, SCALE8x8_2x32_WRAPPER);                    \
+    TRANSPOSE8x8_16_S(dst, dst_stride, e, SAVE_8x16_2)
+#define TR_8_2_stride( dst, dst_stride, src, D)                                       \
+    TR_8( dst, dst_stride, src,  8, SCALE8x8_2x32_WRAPPER);                    \
+    TRANSPOSE8x8_16_S(dst, dst_stride, e, SAVE_8x16_2)
+
 ////////////////////////////////////////////////////////////////////////////////
 // ff_hevc_transform_XxX_add_X_sse4
 ////////////////////////////////////////////////////////////////////////////////
@@ -704,8 +711,8 @@ void ff_hevc_transform_4x4_ ## D ## _sse4 (                                \
     add     = 1 << (shift - 1);                                                \
     TR_4_2(dst, stride, tmp, D);                                               \
 }
-#define TRANSFORM_ADD8x8(D)                                                    \
-void ff_hevc_transform_8x8_ ## D ## _sse4 (                                \
+#define TRANSFORM_ADD8x8(D, S)                                                    \
+void ff_hevc_transform_8x8_ ## D ## S ## _sse4 (                                \
     i16 *_dst, i16 *coeffs, ptrdiff_t _stride) {                       \
     i16 tmp[8*8];                                                          \
     i16 *src    = coeffs;                                                  \
@@ -716,19 +723,20 @@ void ff_hevc_transform_8x8_ ## D ## _sse4 (                                \
     __m128i src0, src1, src2, src3;                                            \
     __m128i tmp0, tmp1, tmp2, tmp3;                                            \
     __m128i e0, e1, e2, e3, e4, e5, e6, e7;                                    \
-    TR_8_1(p_dst1, 8, src);                                                    \
+    TR_8_1 ## S(p_dst1, 8, src);                                                    \
     shift   = 20 - D;                                                          \
     add     = 1 << (shift - 1);                                                \
     {                                                                          \
         INIT8_ ## D();                                                    \
-        TR_8_2(dst, stride, tmp, D);                                           \
+        TR_8_2 ## S(dst, stride, tmp, D);                                           \
     }                                                                          \
 }
 
 TRANSFORM_ADD4x4( 8)
 //TRANSFORM_ADD4x4(10)
-TRANSFORM_ADD8x8( 8)
+TRANSFORM_ADD8x8( 8,)
 //TRANSFORM_ADD8x8(10)
+TRANSFORM_ADD8x8( 8, _stride)
 
 
 ////////////////////////////////////////////////////////////////////////////////

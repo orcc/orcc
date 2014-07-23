@@ -239,7 +239,7 @@ ADD_8_16_CLIP( 256)
 ADD_8_16_CLIP(1024)
 #endif
 
-static i32 clip_i32(i32 Value, i32 minVal, i32 maxVal) {
+i32 clip_i32(i32 Value, i32 minVal, i32 maxVal) {
 	i32 tmp_if;
 
 	if (Value > maxVal) {
