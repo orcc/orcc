@@ -136,9 +136,6 @@ public class TTABackend extends LLVMBackend {
 		reduceConnections = getOption(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
 
-		OrccLogger.traceln("TTA Architecture configuration setted to : "
-				+ configuration.getName());
-
 		// Configure the options used in code generation
 		swActorPrinter.setOptions(getOptions());
 
@@ -166,12 +163,7 @@ public class TTABackend extends LLVMBackend {
 
 		if (!debug) {
 			networkTransfos.add(new PrintRemoval());
-			OrccLogger.noticeln("All calls to printing functions are"
-					+ " removed for performance purpose.");
-		} else {
-			OrccLogger.noticeln("A noticeable deterioration in "
-					+ "performance could appear due to printing call.");
-		}
+		} 
 
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
 
@@ -227,6 +219,17 @@ public class TTABackend extends LLVMBackend {
 
 		// Update alignment information
 		Alignable.setAlignability(network);
+		
+		if (!debug) {
+			OrccLogger.noticeln("All calls to printing functions are"
+					+ " removed for performance purpose.");
+		} else {
+			OrccLogger.noticeln("A noticeable deterioration in "
+					+ "performance could appear due to printing call.");
+		}
+		OrccLogger.traceln("TTA Architecture configuration setted to : "
+				+ configuration.getName());
+		
 	}
 
 	@Override
@@ -238,7 +241,7 @@ public class TTABackend extends LLVMBackend {
 		design = new ArchitectureBuilder().build(network, configuration,
 				computedMapping, reduceConnections, fifoSize);
 
-		OrccLogger.traceln("Printing design...");
+		OrccLogger.traceln("Design generation...");
 
 		hwProcessorPrinter.setFpga(fpga);
 		tceProcessorPrinter.setHwDb(design.getHardwareDatabase());
