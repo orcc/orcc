@@ -91,6 +91,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 
 	def getDefaultContent(Procedure procedure) {
+		// Returns the full procedure c code
 		super.print(procedure)
 	}
 
@@ -98,10 +99,15 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		#include "«procedure.defaultFileName»"
 	'''
 
-	def getSelectorContent(Procedure procedure) {
-		// The content of the selector full will be the full
-		// procedure code
-		super.print(procedure)
+	def getSelectorContent(InstCall call) {
+		val group = call.getAttribute("callsite").attributes.filterGroupsLabels.head
+		'''
+			/* Group name chosen */
+			#pragma orcc2hmpp group=«group.name.replaceAll("<|>", "")»
+			/* Accelerator identifier */
+			#pragma orcc2hmpp GPU=1
+			#pragma hmpp «group.name» cdlt_«call.procedure.name» callsite
+		'''
 	}
 
 	override protected print(Procedure proc) {
@@ -109,7 +115,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		if(proc.hasAttribute("codelet")) {
 			codelets.add(proc)
 			'''
-				#include "CODELET_CODE_«proc.name»_GEN_WRAPPER.c"
+				#include "«proc.wrapperFileName»"
 			'''
 		} else {
 			super.print(proc)
@@ -163,7 +169,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	def private printCallsite(InstCall call) {
 		if(call.hasAttribute("callsite")) {
 			callsites.add(call)
-			'''#include "«selectorFileName(call)»"'''
+			'''#include "«call.selectorFileName»"'''
 		}
 	}
 
@@ -202,5 +208,4 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	def private filterCodeletsLabels(Iterable<Attribute> attrs) {
 		attrs.filter[it.name.startsWith("cdlt_")]
 	}
-
 }

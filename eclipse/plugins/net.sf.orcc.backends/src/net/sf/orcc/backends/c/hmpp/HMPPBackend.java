@@ -42,6 +42,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
+import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.util.FilesManager;
@@ -115,6 +116,13 @@ public class HMPPBackend extends CBackend {
 					instancePrinter.getWrapperContent(proc), srcPath,
 					instancePrinter.wrapperFileName(proc)));
 		}
+
+		for (InstCall call : instancePrinter.getCallSites()) {
+			result.merge(FilesManager.writeFile(
+					instancePrinter.getSelectorContent(call), srcPath,
+					instancePrinter.selectorFileName(call)));
+		}
+
 		return result;
 	}
 
