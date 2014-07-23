@@ -72,10 +72,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«super.caseBlockFor(block)»
 	'''
 
+	// Note: this method shoudn't add a new line at the end of
+	// the returned string
 	override protected declare(Var variable) '''
 		«variable.printResident»
-		«super.declare(variable)»
-	'''
+		«super.declare(variable)»'''
 
 	override protected declare(Procedure proc) '''
 		«proc.printCodelet»

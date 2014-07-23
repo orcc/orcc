@@ -52,6 +52,7 @@ import net.sf.orcc.util.Result;
  * HMPP back-end.
  * 
  * @author Jérôme Gorin
+ * @author Antoine Lorence
  * 
  */
 public class HMPPBackend extends CBackend {
@@ -65,7 +66,7 @@ public class HMPPBackend extends CBackend {
 	}
 
 	@Override
-	public void doInitializeOptions() {
+	protected void doInitializeOptions() {
 		super.doInitializeOptions();
 
 		instancePrinter.setOptions(getOptions());
