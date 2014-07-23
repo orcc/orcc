@@ -29,13 +29,10 @@
  
  package net.sf.orcc.backends.llvm.tta
 
-import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
-import net.sf.orcc.df.Port
-import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.df.Actor
-import java.util.Map
+import net.sf.orcc.df.Port
 
 /*
  * The template to print the Multiprocessor Architecture Description File.
@@ -47,17 +44,11 @@ class TceDesignPrinter extends TTAPrinter {
 	
 	String path;
 	
-	new(Map<String, Object> options, String path){
-		super(options)
+	def setPath(String path) {
 		this.path = path;
 	}
-		
-	def print(Design design, String targetFolder) {
-		val file = new File(targetFolder + File::separator + "top.pndf")
-		OrccUtil::printFile(design.pndf, file)
-	}
 	
-	def private getPndf(Design design)
+	def getPndf(Design design)
 		'''
 		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 		<processor-network version="0.1">

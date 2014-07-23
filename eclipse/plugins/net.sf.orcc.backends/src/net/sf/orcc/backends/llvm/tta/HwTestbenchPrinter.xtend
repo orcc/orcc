@@ -28,35 +28,22 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
-import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.util.FPGA
-import net.sf.orcc.util.OrccUtil
 
 class HwTestbenchPrinter extends TTAPrinter {
 	
 	private FPGA fpga;
 	
-	new(FPGA fpga) {
+	def setFpga(FPGA fpga) {
 		this.fpga = fpga;
-	}
+	}	
 	
-	def print(Design design, String targetFolder) {
-		val vhdlFile = new File(targetFolder + File::separator + "top_tb.vhd")
-		val waveFile = new File(targetFolder + File::separator + "wave.do")
-		val tclFile = new File(targetFolder + File::separator + "top.tcl")
-		
-		OrccUtil::printFile(design.vhdl, vhdlFile)
-		OrccUtil::printFile(design.wave, waveFile)
-		OrccUtil::printFile(design.tcl, tclFile)
-	}
-	
-	
-	def private getVhdl(Design design)
+	def getVhdl(Design design)
 		'''
 		------------------------------------------------------------------------------
 		-- Generated from «design.name»
@@ -139,7 +126,7 @@ class HwTestbenchPrinter extends TTAPrinter {
 		«port.name» => «port.name»,
 		'''
 	
-	def private getWave(Design design) 
+	def getWave(Design design) 
 		'''
 		onerror {resume}
 		quietly WaveActivateNextPane {} 0
@@ -211,7 +198,7 @@ class HwTestbenchPrinter extends TTAPrinter {
 		«ENDIF»
 		'''
 		
-		def private getTcl(Design design) 
+	def getTcl(Design design) 
 		'''
 		# Remove old libraries
 		vdel -all -lib work

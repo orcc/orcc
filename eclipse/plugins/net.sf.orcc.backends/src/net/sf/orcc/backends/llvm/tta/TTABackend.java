@@ -37,7 +37,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.llvm.aot.LLVMBackend;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
@@ -60,7 +59,6 @@ import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
@@ -106,6 +104,32 @@ public class TTABackend extends LLVMBackend {
 	private String libPath;
 	private boolean reduceConnections;
 
+	private HwDesignPrinter hwDesignPrinter;
+	private HwProcessorPrinter hwProcessorPrinter;
+	private HwProjectPrinter hwProjectPrinter;
+	private HwTestbenchPrinter hwTestbenchPrinter;
+	private PyDesignPrinter pyDesignPrinter;
+	private SwActorPrinter swActorPrinter;
+	private SwProcessorPrinter swProcessorPrinter;
+	private TceDesignPrinter tceDesignPrinter;
+	private TceProcessorPrinter tceProcessorPrinter;
+	private Dota dota;
+
+	public TTABackend() {
+		super();
+
+		hwDesignPrinter = new HwDesignPrinter();
+		hwProcessorPrinter = new HwProcessorPrinter();
+		hwProjectPrinter = new HwProjectPrinter();
+		hwTestbenchPrinter = new HwTestbenchPrinter();
+		pyDesignPrinter = new PyDesignPrinter();
+		swActorPrinter = new SwActorPrinter();
+		swProcessorPrinter = new SwProcessorPrinter();
+		tceDesignPrinter = new TceDesignPrinter();
+		tceProcessorPrinter = new TceProcessorPrinter();
+		dota = new Dota();
+	}
+
 	@Override
 	protected void doInitializeOptions() {
 		finalize = getOption("net.sf.orcc.backends.tta.finalizeGeneration",
@@ -117,11 +141,20 @@ public class TTABackend extends LLVMBackend {
 				TTA_DEFAULT_PROCESSORS_CONFIGURATION));
 		reduceConnections = getOption(
 				"net.sf.orcc.backends.llvm.tta.reduceConnections", false);
-		
+
+		OrccLogger.traceln("TTA Architecture configuration setted to : "
+				+ configuration.getName());
+
+		// Configure the options used in code generation
+		swActorPrinter.setOptions(getOptions());
+
+		// Create the directory tree
+		actorsPath = OrccUtil.createFolder(path, "actors");
+
 		// -----------------------------------------------------
 		// Transformations that will be applied on the Network
 		// -----------------------------------------------------
-		
+
 		networkTransfos.add(new ComplexHwOpDetector());
 		networkTransfos.add(new UnitImporter());
 		networkTransfos.add(new Instantiator(true));
@@ -149,7 +182,8 @@ public class TTABackend extends LLVMBackend {
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
 
 		networkTransfos.add(new TypeResizer(true, true, false, true));
-		networkTransfos.add(new DfVisitor<Expression>(new ShortCircuitTransformation()));
+		networkTransfos.add(new DfVisitor<Expression>(
+				new ShortCircuitTransformation()));
 		networkTransfos.add(new DfVisitor<Void>(new SSATransformation()));
 		networkTransfos.add(new StringTransformation());
 		networkTransfos.add(new RenameTransformation(this.renameMap));
@@ -160,7 +194,8 @@ public class TTABackend extends LLVMBackend {
 		networkTransfos.add(new DfVisitor<Void>(new CopyPropagator()));
 		networkTransfos.add(new DfVisitor<Void>(new ConstantPropagator()));
 		networkTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
-		networkTransfos.add(new DfVisitor<Expression>(new CastAdder(false, true)));
+		networkTransfos.add(new DfVisitor<Expression>(
+				new CastAdder(false, true)));
 		networkTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
 		networkTransfos.add(new DfVisitor<Void>(new BlockCombine()));
 		networkTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
@@ -169,57 +204,116 @@ public class TTABackend extends LLVMBackend {
 
 		// computes names of local variables
 		networkTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
-		
-	}
-	
-	@Override
-	protected void doValidate(Network network) {
-		Validator.checkMinimalFifoSize(network, fifoSize);
-		
-		network.computeTemplateMaps();
 
-		// update alignment information
-		Alignable.setAlignability(network);
 	}
 	
 	@Override
 	protected Result doGenerateNetwork(Network network) {
-		// Compute the actor mapping
+		// Do nothing
+		return Result.newInstance();
+	}
+
+	@Override
+	protected void doValidate(Network network) {
+		// FIXME: Allow native ports in top level checking
+		// Validator.checkTopLevel(network);
+		Validator.checkMinimalFifoSize(network, fifoSize);
+		
+		// Configuration before the code generation 
+		// FIXME: Make it in better place
+
+		// Compute the actor mapping from a xcf file or from the user interface
 		if (importXcfFile) {
 			computedMapping = new Mapping(network, xcfFile);
 		} else {
 			computedMapping = new Mapping(network, mapping);
 		}
 
-		// Build the design from the mapping
-		OrccLogger.traceln("TTA Architecture configuration setted to : "
-				+ configuration.getName());
-		int fifosize = getOption(OrccLaunchConstants.FIFO_SIZE, OrccLaunchConstants.DEFAULT_FIFO_SIZE);
-		design = new ArchitectureBuilder().build(network, configuration,
-				computedMapping, reduceConnections, fifosize);
+		network.computeTemplateMaps();
 
-		// Generate files
-		actorsPath = OrccUtil.createFolder(path, "actors");
-		printChildren(network);
-		printDesign(design);
+		// Update alignment information
+		Alignable.setAlignability(network);
+	}
+
+	@Override
+	protected Result doAdditionalGeneration(Network network) {
+		final Result result = Result.newInstance();
+
+		// Build the design from the mapping
+
+		design = new ArchitectureBuilder().build(network, configuration,
+				computedMapping, reduceConnections, fifoSize);
+
+		OrccLogger.traceln("Printing design...");
+
+		hwProcessorPrinter.setFpga(fpga);
+		tceProcessorPrinter.setHwDb(design.getHardwareDatabase());
+		swProcessorPrinter.setOptions(getOptions());
+
+		for (Processor tta : design.getProcessors()) {
+			String processorPath = OrccUtil.createFolder(path, tta.getName());
+
+			// Print VHDL description
+			result.merge(FilesManager.writeFile(
+					hwProcessorPrinter.getVhdl(tta), processorPath,
+					tta.getName() + ".vhd"));
+			// Print high-level description
+			tceProcessorPrinter.print(tta, processorPath);
+			// Print assembly code of actor-scheduler
+			result.merge(FilesManager.writeFile(
+					swProcessorPrinter.getContent(tta), processorPath,
+					tta.getName() + ".ll"));
+		}
+
+		// Create HDL project
+		hwDesignPrinter.setFpga(fpga);
+		result.merge(FilesManager.writeFile(hwDesignPrinter.getVhdl(design),
+				path, "top.vhd"));
+
+		hwProjectPrinter.setFpga(fpga);
+		if (fpga.isAltera()) {
+			result.merge(FilesManager.writeFile(
+					hwProjectPrinter.getQcf(design), path, "top.qsf"));
+			result.merge(FilesManager.writeFile(
+					hwProjectPrinter.getQpf(design), path, "top.qpf"));
+		} else {
+			result.merge(FilesManager.writeFile(
+					hwProjectPrinter.getUcf(design), path, "top.ucf"));
+			result.merge(FilesManager.writeFile(
+					hwProjectPrinter.getXise(design), path, "top.xise"));
+		}
+
+		hwTestbenchPrinter.setFpga(fpga);
+		result.merge(FilesManager.writeFile(hwTestbenchPrinter.getVhdl(design),
+				path, "top_tb.vhd"));
+		result.merge(FilesManager.writeFile(hwTestbenchPrinter.getWave(design),
+				path, "wave.do"));
+		result.merge(FilesManager.writeFile(hwTestbenchPrinter.getTcl(design),
+				path, "top.tcl"));
+
+		// Create TCE project
+		String pyPath = OrccUtil.createFolder(path, "informations_");
+		OrccUtil.createFile(pyPath, "__init__.py");
+		pyDesignPrinter.setFpga(fpga);
+		result.merge(FilesManager.writeFile(pyDesignPrinter.getPython(design),
+				pyPath, "informations.py"));
+
+		tceDesignPrinter.setOptions(getOptions());
+		tceDesignPrinter.setPath(path);
+		result.merge(FilesManager.writeFile(tceDesignPrinter.getPndf(design),
+				path, "top.pndf"));
+
+		dota.print(design, path, "top.dot");
+		result.merge(FilesManager.writeFile(dota.dot(design), path, "top.dot"));
 
 		if (finalize) {
 			// Launch the TCE toolset
 			runPythonScript();
 		}
-		
-		return Result.newInstance();
-	}
-	
-	@Override
-	protected Result doAdditionalGeneration(Network network) {
-		return Result.newInstance();
+
+		return result;
 	}
 
-	@Override
-	protected void doXdfCodeGeneration(Network network) {		
-
-	}
 	@Override
 	protected Result doLibrariesExtraction() {
 		Result result = FilesManager.extract("/runtime/TTA/libs", path);
@@ -243,98 +337,11 @@ public class TTABackend extends LLVMBackend {
 		return result;
 	}
 
-	/**
-	 * Prints a set of files used to generate the given design.
-	 * 
-	 * @param design
-	 *            a design
-	 */
-	private void printDesign(Design design) {
-		printProcessors(design);
-
-		OrccLogger.traceln("Printing design...");
-		long t0 = System.currentTimeMillis();
-
-		// Create HDL project
-		new HwDesignPrinter(fpga).print(design, path);
-		new HwProjectPrinter(fpga).print(design, path);
-		new HwTestbenchPrinter(fpga).print(design, path);
-
-		// Create TCE project
-		new PyDesignPrinter(fpga).print(design, path);
-		new TceDesignPrinter(getOptions(), path).print(design, path);
-
-		new Dota().print(design, path, "top.dot");
-
-		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + (t1 - t0) / 1000.0 + "s");
-	}
-
-	/**
-	 * Print processor of the given design. If some files already exist and are
-	 * identical, then they are not printed.
-	 * 
-	 * @param design
-	 *            the given design
-	 */
-	private void printProcessors(Design design) {
-		OrccLogger.traceln("Printing processors...");
-		long t0 = System.currentTimeMillis();
-
-		int numCached = 0;
-
-		for (Processor processor : design.getProcessors()) {
-			numCached += printProcessor(processor);
-		}
-
-		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + (t1 - t0) / 1000.0 + "s");
-
-		if (numCached > 0) {
-			OrccLogger.noticeln(numCached + " files were not regenerated "
-					+ "because they were already up-to-date.");
-		}
-	}
-
-	/**
-	 * Prints a set of files used to generate the given processor.
-	 * 
-	 * @param tta
-	 *            a processor
-	 * @return the number of cached files
-	 */
-	private int printProcessor(Processor tta) {
-		String processorPath = OrccUtil.createFolder(path, tta.getName());
-		int cached = 0;
-
-		// Print VHDL description
-		cached += new HwProcessorPrinter(fpga).print(tta, processorPath);
-
-		// Print high-level description
-		cached += new TceProcessorPrinter(design.getHardwareDatabase()).print(
-				tta, processorPath);
-
-		// Print assembly code of actor-scheduler
-		cached += new SwProcessorPrinter(getOptions()).print(tta, processorPath);
-
-		return cached;
-	}
-
-	@Override
-	protected boolean printInstance(Instance instance) {
-		return new SwActorPrinter(getOptions(), design.getActorToProcessorMap().get(
-				instance)).print(actorsPath, instance) > 0;
-	}
-
-	@Override
-	protected boolean printActor(Actor actor) {
-		return new SwActorPrinter(getOptions(), design.getActorToProcessorMap().get(
-				actor)).print(actorsPath, actor) > 0;
-	}
-	
 	@Override
 	protected Result doGenerateActor(Actor actor) {
-		return Result.newInstance();
+		swActorPrinter.setProcessor(design.getActorToProcessorMap().get(actor));
+		return FilesManager.writeFile(swActorPrinter.getContent(actor),
+				actorsPath, actor.getName() + ".ll");
 	}
 
 	/**

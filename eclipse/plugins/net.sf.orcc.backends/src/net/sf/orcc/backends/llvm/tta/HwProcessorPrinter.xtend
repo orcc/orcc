@@ -28,36 +28,22 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
-import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Link
 import net.sf.orcc.backends.llvm.tta.architecture.Memory
 import net.sf.orcc.backends.llvm.tta.architecture.Port
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.backends.llvm.tta.architecture.Signal
 import net.sf.orcc.backends.util.FPGA
-import net.sf.orcc.util.OrccUtil
 
 class HwProcessorPrinter extends TTAPrinter {
 	
 	FPGA fpga;
 	
-	new(FPGA fpga) {
+	def setFpga(FPGA fpga) {
 		this.fpga = fpga;
 	}
-	
-	def print(Processor processor, String targetFolder) {
-		val file = new File(targetFolder + File::separator + processor.getName() + ".vhd")
-		val content = processor.vhdl
 		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
-		
-	def private getVhdl(Processor processor)
+	def getVhdl(Processor processor)
 		'''
 		-------------------------------------------------------------------------------
 		-- Title      : «processor.name»

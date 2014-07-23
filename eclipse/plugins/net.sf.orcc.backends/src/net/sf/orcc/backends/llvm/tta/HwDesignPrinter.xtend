@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
-import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Component
 import net.sf.orcc.backends.llvm.tta.architecture.Design
 import net.sf.orcc.backends.llvm.tta.architecture.Link
@@ -39,7 +38,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.Signal
 import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.ir.util.ExpressionPrinter
 import net.sf.orcc.util.Attribute
-import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.common.util.EList
 
 class HwDesignPrinter extends TTAPrinter {
@@ -47,17 +45,15 @@ class HwDesignPrinter extends TTAPrinter {
 	ExpressionPrinter exprPrinter;
 	FPGA fpga;
 	
-	new(FPGA fpga) {
-		this.fpga = fpga;
+	new() {
 		this.exprPrinter = new ExpressionPrinter();
 	}
 	
-	def print(Design design, String targetFolder) {
-		val file = new File(targetFolder + File::separator + "top.vhd")
-		OrccUtil::printFile(design.vhdl, file)
+	def setFpga(FPGA fpga) {
+		this.fpga = fpga;
 	}
 	
-	def private getVhdl(Design design)
+	def getVhdl(Design design)
 		'''
 		-------------------------------------------------------------------------------
 		-- Title      : Network: «design.name»

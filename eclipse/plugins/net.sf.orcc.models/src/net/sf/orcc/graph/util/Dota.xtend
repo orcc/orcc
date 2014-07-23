@@ -59,7 +59,7 @@ class Dota {
 		ps.close();
 	}
 
-	def private dot(Graph graph) '''
+	def dot(Graph graph) '''
 		digraph G {
 			node [label="", shape=box];
 			«FOR vertex : graph.vertices»

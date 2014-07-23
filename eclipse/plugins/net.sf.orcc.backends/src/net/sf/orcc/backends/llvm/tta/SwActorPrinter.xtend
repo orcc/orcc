@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
-import java.util.Map
 import net.sf.orcc.backends.llvm.aot.InstancePrinter
 import net.sf.orcc.backends.llvm.tta.architecture.Processor
 import net.sf.orcc.df.Action
@@ -44,11 +43,10 @@ import org.eclipse.emf.common.util.EList
 class SwActorPrinter extends InstancePrinter {
 
 	Processor processor;
-
-	new(Map<String, Object> options, Processor processor) {
-		super(options)
-		this.processor = processor
-	}
+	
+	def setProcessor(Processor processor) {
+ 		this.processor = processor
+ 	}
 
 	override protected getAddrSpace(Connection connection) {
 		val id = processor.getAddrSpaceId(connection)

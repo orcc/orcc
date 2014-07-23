@@ -59,7 +59,7 @@ class TceProcessorPrinter extends TTAPrinter {
 	EMap<String, Implementation> hwDb
 	val MAX_ADDRESS = Integer::MAX_VALUE;
 	
-	new(EMap<String, Implementation> hwDb) {
+	def setHwDb(EMap<String, Implementation> hwDb) {
 		this.hwDb = hwDb;
 	}
 	
