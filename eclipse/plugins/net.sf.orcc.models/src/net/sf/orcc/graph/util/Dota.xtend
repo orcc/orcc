@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.graph.util
 
-import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintStream
 import java.util.HashMap
 import java.util.Map
 import net.sf.orcc.graph.Edge
@@ -50,13 +47,6 @@ class Dota {
 	
 	new() {
 		vertexMap = new HashMap<Vertex, Integer>()
-	}
-	
-	def print(Graph graph, String targetFolder, String filename) {
-		val file = new File(targetFolder+ File::separator + filename);
-		val ps = new PrintStream(new FileOutputStream(file));
-		ps.print(graph.dot);
-		ps.close();
 	}
 
 	def dot(Graph graph) '''

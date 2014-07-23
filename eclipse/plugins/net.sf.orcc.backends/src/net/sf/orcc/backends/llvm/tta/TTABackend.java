@@ -289,7 +289,6 @@ public class TTABackend extends LLVMBackend {
 		result.merge(FilesManager.writeFile(tceDesignPrinter.getPndf(design),
 				path, "top.pndf"));
 
-		dota.print(design, path, "top.dot");
 		result.merge(FilesManager.writeFile(dota.dot(design), path, "top.dot"));
 
 		return result;
