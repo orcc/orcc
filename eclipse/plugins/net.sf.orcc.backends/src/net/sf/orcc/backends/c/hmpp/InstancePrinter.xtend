@@ -29,7 +29,7 @@
  
 package net.sf.orcc.backends.c.hmpp
 
-import java.io.File
+import java.util.List
 import java.util.Map
 import java.util.Set
 import net.sf.orcc.backends.ir.BlockFor
@@ -42,23 +42,25 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.Attribute
-import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.util.OrccUtil
 
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
+	val List<Procedure> codelets = newArrayList
+	val List<InstCall> callsites = newArrayList
+
 	new() {}
 
-	/**
-	 * Will be used when we will print codelet
-	 * content in its own file
-	 */
-	private var String srcFolder = ""
-
-	override protected print(String targetFolder) {
-		srcFolder = targetFolder
-		super.print(targetFolder)
+	def getCodelets() {
+		codelets
 	}
+
+	def getCallSites() {
+		callsites
+	}
+
+	def String defaultFileName(Procedure procedure) '''CODELET_CODE_«procedure.name»_DEFAULT.c'''
+	def String wrapperFileName(Procedure procedure) '''CODELET_CODE_«procedure.name»_GEN_WRAPPER.c'''
+	def String selectorFileName(InstCall call) '''CODELET_CODE_«call.procedure.name»_SELECTOR.c'''
 
 	override caseInstCall(InstCall call) '''
 		«call.printCallsite»
@@ -88,38 +90,30 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		currentAction.body.printDelegatedstore
 	}
 
+	def getDefaultContent(Procedure procedure) {
+		super.print(procedure)
+	}
+
+	def getWrapperContent(Procedure procedure) '''
+		#include "«procedure.defaultFileName»"
+	'''
+
+	def getSelectorContent(Procedure procedure) {
+		// The content of the selector full will be the full
+		// procedure code
+		super.print(procedure)
+	}
+
 	override protected print(Procedure proc) {
 		// This method override only codelet printing
-		if(!proc.hasAttribute("codelet")) {
-			return super.print(proc)
+		if(proc.hasAttribute("codelet")) {
+			codelets.add(proc)
+			'''
+				#include "CODELET_CODE_«proc.name»_GEN_WRAPPER.c"
+			'''
+		} else {
+			super.print(proc)
 		}
-
-		if(srcFolder == null || srcFolder.empty) {
-			OrccLogger::severeln("[hmpp.InstancePrinter#print(Procedure)] srcFolder has not been defined")
-			return ''
-		}
-
-		val templateFileName = '''CODELET_CODE_«proc.name»_DEFAULT.c'''
-		val wrapperFileName  = '''CODELET_CODE_«proc.name»_GEN_WRAPPER.c'''
-
-		val wrapperContent = '''
-			#include "«templateFileName»"
-		'''
-		val wrapperFile = new File(srcFolder + File::separator + wrapperFileName)
-		if(needToWriteFile(wrapperContent, wrapperFile)) {
-			OrccUtil::printFile(wrapperContent, wrapperFile)
-		}
-
-		val templateContent = super.print(proc)
-		val templateFile = new File(srcFolder + File::separator + templateFileName)
-		if(needToWriteFile(templateContent, templateFile)) {
-			OrccUtil::printFile(templateContent, templateFile)
-		}
-
-		// Finally #include the wrapper instead of printing the procedure definition
-		'''
-			#include "«wrapperFileName»"
-		'''
 	}
 
 	override protected printAttributes(Attributable object) '''
@@ -166,31 +160,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«ENDIF»
 	'''
 
-	def private printCallsite(InstCall call) '''
-		«IF call.hasAttribute("callsite")»
-			«FOR grp : call.getAttribute("callsite").attributes.filterGroupsLabels»
-				«FOR cdlt : grp.attributes.filterCodeletsLabels»
-					«printSelector(grp, call.procedure.name)»
-				«ENDFOR»
-			«ENDFOR»
-		«ENDIF»
-	'''
-
-	def private printSelector(Attribute group, String procedureName) {
-		val selectorContent = '''
-			/* Group name chosen */
-			#pragma orcc2hmpp group=«group.name.replaceAll("<|>", "")»
-			/* Accelerator identifier */
-			#pragma orcc2hmpp GPU=1
-			#pragma hmpp «group.name» cdlt_«procedureName» callsite
-		'''
-		val selectorFileName = '''CODELET_CODE_«procedureName»_SELECTOR.c'''
-		val selectorFile = new File(srcFolder + File::separator + selectorFileName)
-		if(needToWriteFile(selectorContent, selectorFile)) {
-			OrccUtil::printFile(selectorContent, selectorFile)
+	def private printCallsite(InstCall call) {
+		if(call.hasAttribute("callsite")) {
+			callsites.add(call)
+			'''#include "«selectorFileName(call)»"'''
 		}
-
-		'''#include "«selectorFileName»"'''
 	}
 
 	def private printAdvancedload(Procedure procedure) '''

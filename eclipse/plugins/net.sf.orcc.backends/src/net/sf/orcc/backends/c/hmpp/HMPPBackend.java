@@ -42,6 +42,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.Result;
@@ -88,26 +89,39 @@ public class HMPPBackend extends CBackend {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.orcc.backends.c.CBackend#printInstance(net.sf.orcc.df.Instance)
-	 */
 	@Override
-	protected boolean printInstance(Instance instance) {
-		return instancePrinter.print(srcPath, instance) > 0;
+	protected Result doGenerateInstance(Instance instance) {
+		return FilesManager.writeFile(
+				instancePrinter.getInstanceContent(instance), srcPath,
+				instance.getName() + ".c");
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) {
-		return instancePrinter.print(srcPath, actor) > 0;
+	protected Result doGenerateActor(Actor actor) {
+		return FilesManager.writeFile(
+				instancePrinter.getActorContent(actor), srcPath,
+				actor.getName() + ".c");
+	}
+
+	@Override
+	protected Result doAdditionalGeneration(Instance instance) {
+		final Result result = Result.newInstance();
+		for(Procedure proc : instancePrinter.getCodelets()) {
+			result.merge(FilesManager.writeFile(
+					instancePrinter.getDefaultContent(proc), srcPath,
+					instancePrinter.defaultFileName(proc)));
+
+			result.merge(FilesManager.writeFile(
+					instancePrinter.getWrapperContent(proc), srcPath,
+					instancePrinter.wrapperFileName(proc)));
+		}
+		return result;
 	}
 
 	@Override
 	protected Result doLibrariesExtraction() {
 
-		Result result = FilesManager.extract("/runtime/C/libs", path);
+		final Result result = FilesManager.extract("/runtime/C/libs", path);
 		result.merge(FilesManager.extract("/runtime/C/README.txt", path));
 
 		// Copy specific windows batch file
@@ -127,4 +141,11 @@ public class HMPPBackend extends CBackend {
 		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(), srcPath, "CMakeLists.txt"));
 		return result;
 	}
+
+	// FIXME: these overrides are needed as long as the c back-end will not
+	// completely be updated to the new infrastructure
+	@Override
+	protected boolean printActor(Actor actor) { return false;}
+	@Override
+	protected boolean printInstance(Instance instance) {return false;}
 }
