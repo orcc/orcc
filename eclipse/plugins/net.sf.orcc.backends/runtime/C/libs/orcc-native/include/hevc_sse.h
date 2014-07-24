@@ -281,7 +281,7 @@ void ff_hevc_weighted_pred_mono4_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 
 void ff_hevc_weighted_pred_mono8_8_sse (u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
 void ff_hevc_weighted_pred_mono16_8_sse(u8 denom, i16 wlxFlag, i16 olxFlag, i16 ol1Flag, u8 *_dst, int _dststride, i16 *src, int srcstride, int width, int height);
 
-void (*weighted_pred_mono[4])(
+extern void (*weighted_pred_mono[4])(
     u8 denom,
     i16 wlxFlag,
     i16 olxFlag, i16 ol1Flag,

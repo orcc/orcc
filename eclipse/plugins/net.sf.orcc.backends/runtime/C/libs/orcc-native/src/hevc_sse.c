@@ -55,6 +55,15 @@
 #include <immintrin.h>
 #endif
 
+void (*weighted_pred_mono[4])(
+    u8 denom,
+    i16 wlxFlag,
+    i16 olxFlag, i16 ol1Flag,
+    u8 *_dst, int _dststride,
+    i16 *src,
+    int srcstride,
+    int width, int height);
+
 /*****************************************************************************************************************/
 
 
