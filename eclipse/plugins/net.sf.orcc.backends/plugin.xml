@@ -298,6 +298,9 @@
                   id="ZedBoard (xc7z020)">
                </comboBoxItem>
                <comboBoxItem
+                  id="Zc706 (xc7z045)">
+               </comboBoxItem>
+               <comboBoxItem
                   id="Others">
                </comboBoxItem>
             </comboBox>

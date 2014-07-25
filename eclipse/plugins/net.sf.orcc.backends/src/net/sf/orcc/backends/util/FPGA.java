@@ -41,7 +41,7 @@ public class FPGA {
 	}
 
 	public enum Family {
-		STRATIX3, VIRTEX5, VIRTEX6, VIRTEX7, ZEDBOARD;
+		STRATIX3, VIRTEX5, VIRTEX6, VIRTEX7, ZEDBOARD, ZC706;
 
 		@Override
 		public String toString() {
@@ -54,6 +54,8 @@ public class FPGA {
 				return "virtex7";
 			case VIRTEX7:
 				return "virtex6";
+			case ZC706:
+				return "zynq";
 			case ZEDBOARD:
 				return "zynq";
 			default:
@@ -74,6 +76,9 @@ public class FPGA {
 		} else if (name.equals("ZedBoard (xc7z020)")) {
 			return new FPGA(Brand.XILINX, Family.ZEDBOARD, "xc7z020",
 					"clg484", "7.3");
+		} else if (name.equals("Zc706 (xc7z045)")) {
+			return new FPGA(Brand.XILINX, Family.ZC706, "xc7z045",
+					"ffg900", "7.3");
 		} else {
 			return new FPGA(Brand.OTHER);
 		}
