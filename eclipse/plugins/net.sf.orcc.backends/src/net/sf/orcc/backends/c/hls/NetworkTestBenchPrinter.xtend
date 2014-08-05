@@ -92,7 +92,7 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 				«val connection = instance.incomingPortMap.get(port)»
 				«IF connection != null»
 					«IF connection.sourcePort == null»
-						«connection.castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); //fifotype
+						«connection.castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); 
 						«connection.castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
 						«connection.castfifoNameWrite»_V_read    : OUT STD_LOGIC;
 					«ENDIF»
@@ -101,7 +101,7 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			«FOR portout : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(portout)»
 					«IF connection.targetPort == null»
-						«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); //fifotype
+						«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); 
 						«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
 						«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
 					«ENDIF»				
@@ -124,7 +124,7 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 				«val connection = instance.incomingPortMap.get(port)»
 				«IF connection != null»
 					«IF connection.sourcePort == null»
-						signal «connection.castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); //fifotype
+						signal «connection.castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); 
 						signal «connection.castfifoNameWrite»_V_empty_n :  STD_LOGIC;
 						signal «connection.castfifoNameWrite»_V_read    :  STD_LOGIC;
 					«ENDIF»
@@ -133,7 +133,7 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			«FOR portout : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(portout)»
 					«IF connection.targetPort == null»
-						signal «connection.castfifoNameRead»_V_din    : STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); //fifotype
+						signal «connection.castfifoNameRead»_V_din    : STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); 
 						signal «connection.castfifoNameRead»_V_full_n : STD_LOGIC;
 						signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
 					«ENDIF»
