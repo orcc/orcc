@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2012, IETR/INSA of Rennes
+ * Copyright (c) 2014, Heriot-Watt University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -36,70 +37,61 @@ import static net.sf.orcc.util.OrccAttributes.*
 /**
  * Bach command for each actor
  *  
- * @author Khaled Jerbi and Mariem Abid
+ * @author Rob Stewart and Khaled Jerbi and Mariem Abid
  * 
  */
-class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter {
+class UnitaryBatchCommandPrinterLinux extends net.sf.orcc.backends.c.InstancePrinter {
 
 	new(Map<String, Object> options) {
 		super(options)
 	}
 
 	def getFileContentBatch() '''
-		:: The path variable must be set system wide to include vivado_hls and msys binaries, e.g.
-		:: PATH=D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\bin;%PATH%;D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\msys\bin
-		::
-		:: Two environment variables must be set system wide to include vivado_hls , e.g.
-		:: set AUTOESL_HOME=D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\bin
-		:: set VIVADO_HLS_HOME=D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\bin
-
-		if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
-		set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
-		goto START
-		:_NotX64
-		set COMSPEC=%WINDIR%\System32\cmd.exe
-		:START
+		# Two additions to your ~/.bash_profile or ~/.profile must be made,
+		# to modify the $XILINXD_LICENSE_FILE and $PATH environment variables
+		# 
+		# Step 1. The $XILINXD_LICENSE_FILE environment variable must be set, e.g.
+		# export XILINXD_LICENSE_FILE="<path>/Xilinx.lic"
+		#
+		# Step 2. The $PATH environment variable must include the Vivado HLS bin/ e.g.
+		# export PATH=~/path/to/vivado-hls/bin:$PATH
 		
 		cd ..
 			
-		%COMSPEC% /C vivado_hls -f script_«entityName».tcl
+		vivado_hls -f script_«entityName».tcl
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
 			«IF connection != null»
-				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_«connection.targetPort.name»_write.tcl
+				vivado_hls -f script_cast_«entityName»_«connection.targetPort.name»_write.tcl
 			«ENDIF»
 		«ENDFOR»		
 		«FOR port : actor.outputs.filter[! native]»			
 			«FOR connection : outgoingPortMap.get(port)»
-				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_«connection.sourcePort.name»_read.tcl					
+				vivado_hls -f script_cast_«entityName»_«connection.sourcePort.name»_read.tcl					
 			«ENDFOR»
 		«ENDFOR»
 		«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 			«FOR action : actor.actions»
-				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_tab_«action.name»_read.tcl
+				vivado_hls -f script_cast_«entityName»_tab_«action.name»_read.tcl
 			«ENDFOR»
 		«ENDIF»
 		
-		copy %cd%\TopVHDL\sim_package.vhd %cd%\«entityName»TopVHDL
-		copy %cd%\TopVHDL\ram_tab.vhd %cd%\«entityName»TopVHDL
-		
-		
-		copy %cd%\subProject_«entityName»\solution1\syn\vhdl %cd%\«entityName»TopVHDL
+		cp subProject_«entityName»/solution1/syn/vhdl/* «entityName»TopVHDL/
 		
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
 			«IF connection != null»
-				copy %cd%\subProject_cast_«entityName»_«connection.targetPort.name»_write\solution1\syn\vhdl %cd%\«entityName»TopVHDL
+				cp subProject_cast_«entityName»_«connection.targetPort.name»_write/solution1/syn/vhdl/* «entityName»TopVHDL/
 			«ENDIF»
 		«ENDFOR»
 		«FOR port : actor.outputs.filter[! native]»
 			«FOR connection : outgoingPortMap.get(port)»
-				copy %cd%\subProject_cast_«entityName»_«connection.sourcePort.name»_read\solution1\syn\vhdl %cd%\«entityName»TopVHDL
+				cp subProject_cast_«entityName»_«connection.sourcePort.name»_read/solution1/syn/vhdl/* «entityName»TopVHDL/
 			«ENDFOR»
 		«ENDFOR»
 		«IF actor.hasAttribute(DIRECTIVE_DEBUG)»
 			«FOR action : actor.actions»
-				copy %cd%\subProject_cast_«entityName»_tab_«action.name»_read\solution1\syn\vhdl %cd%\«entityName»TopVHDL
+				cp subProject_cast_«entityName»_tab_«action.name»_read/solution1/syn/vhdl/* «entityName»TopVHDL/
 			«ENDFOR»
 		«ENDIF»
 			
@@ -108,7 +100,7 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 
 	override print(String targetFolder) {
 		val contentNetwork = getFileContentBatch
-		val NetworkFile = new File(targetFolder + File::separator + "Command" + "_" + entityName + ".bat")
+		val NetworkFile = new File(targetFolder + File::separator + "command-linux" + "_" + entityName + ".sh")
 
 		if (needToWriteFile(contentNetwork, NetworkFile)) {
 			OrccUtil::printFile(contentNetwork, NetworkFile)

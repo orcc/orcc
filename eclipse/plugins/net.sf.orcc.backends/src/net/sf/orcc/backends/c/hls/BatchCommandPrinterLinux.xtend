@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2012, IETR/INSA of Rennes
+ * Copyright (c) 2014, Heriot-Watt University 
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -38,63 +39,57 @@ import java.io.File
 /**
  *Batch Command for the network
  *  
- * @author Khaled Jerbi and Mariem Abid
+ * @author Rob Stewart and Khaled Jerbi and Mariem Abid
  * 
  */
-class BatchCommandPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
+class BatchCommandPrinterLinux extends net.sf.orcc.backends.c.NetworkPrinter {
 
 	new(Network bat, Map<String, Object> options) {
 		super(bat, options)
 	}
 
 	override getNetworkFileContent() '''
-		:: The path variable must be set system wide to include vivado_hls and msys binaries, e.g.
-		:: PATH=D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\bin;%PATH%;D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\msys\bin
-		::
-		:: Two environment variables must be set system wide to include vivado_hls , e.g.
-		:: set AUTOESL_HOME=D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\bin
-		:: set VIVADO_HLS_HOME=D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\bin
+		# Two additions to your ~/.bash_profile or ~/.profile must be made,
+		# to modify the $XILINXD_LICENSE_FILE and $PATH environment variables
+		# 
+		# Step 1. The $XILINXD_LICENSE_FILE environment variable must be set, e.g.
+		# export XILINXD_LICENSE_FILE="<path>/Xilinx.lic"
+		#
+		# Step 2. The $PATH environment variable must include the Vivado HLS bin/ e.g.
+		# export PATH=~/path/to/vivado-hls/bin:$PATH
 		
-		if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
-		set COMSPEC=%WINDIR%\SysWOW64\cmd.exe
-		goto START
-		:_NotX64
-		set COMSPEC=%WINDIR%\System32\cmd.exe
-		:START
 		cd ..
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			
-			%COMSPEC% /C vivado_hls -f script_«instance.name».tcl
+			vivado_hls -f script_«instance.name».tcl
 			«FOR port : instance.getActor.inputs»
 				«val connection = instance.incomingPortMap.get(port)»
 				«IF connection != null && connection.sourcePort == null»
-					%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«connection.targetPort.name»_write.tcl
+					vivado_hls -f script_cast_«instance.name»_«connection.targetPort.name»_write.tcl
 				«ENDIF»
 			«ENDFOR»		
 			«FOR port : instance.getActor.outputs.filter[! native]»			
 				«FOR connection : instance.outgoingPortMap.get(port)»
 					«IF connection.targetPort == null»
-						%COMSPEC% /C vivado_hls -f script_cast_«instance.name»_«connection.sourcePort.name»_read.tcl					
+						vivado_hls -f script_cast_«instance.name»_«connection.sourcePort.name»_read.tcl
 					«ENDIF»
 				«ENDFOR»
 			«ENDFOR»
 			
 		«ENDFOR»
 		
-		copy %cd%\sim_package.vhd %cd%\TopVHDL
-		copy %cd%\TopVHDL\ram_tab.vhd %cd%\TopVHDL
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			copy %cd%\subProject_«instance.name»\solution1\syn\vhdl %cd%\TopVHDL
+			cp subProject_«instance.name»/solution1/syn/vhdl/* TopVHDL/
 			«FOR port : instance.getActor.inputs»
 				«val connection = instance.incomingPortMap.get(port)»
 				«IF connection != null && connection.sourcePort == null»
-					copy %cd%\subProject_cast_«instance.name»_«connection.targetPort.name»_write\solution1\syn\vhdl %cd%\TopVHDL
+					cp subProject_cast_«instance.name»_«connection.targetPort.name»_write/solution1/syn/vhdl/* TopVHDL/
 				«ENDIF»
 			«ENDFOR»
 			«FOR port : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
 					«IF connection.targetPort == null»				
-						copy %cd%\subProject_cast_«instance.name»_«connection.sourcePort.name»_read\solution1\syn\vhdl %cd%\TopVHDL
+						cp subProject_cast_«instance.name»_«connection.sourcePort.name»_read/solution1/syn/vhdl/* TopVHDL/
 					«ENDIF»
 				«ENDFOR»
 			«ENDFOR»
@@ -104,7 +99,7 @@ class BatchCommandPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	override print(String targetFolder) {
 
 		val contentNetwork = networkFileContent
-		val NetworkFile = new File(targetFolder + File::separator + "Command" + ".bat")
+		val NetworkFile = new File(targetFolder + File::separator + "command-linux" + ".sh")
 
 		if (needToWriteFile(contentNetwork, NetworkFile)) {
 			OrccUtil::printFile(contentNetwork, NetworkFile)

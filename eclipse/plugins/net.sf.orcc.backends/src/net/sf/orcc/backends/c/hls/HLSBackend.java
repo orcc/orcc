@@ -188,8 +188,15 @@ public class HLSBackend extends CBackend {
 			OrccLogger.traceRaw("Done\n");
 		}
 
-		OrccLogger.trace("Printing batch command... ");
+		OrccLogger.trace("Printing Windows batch command... ");
 		if (new BatchCommandPrinter(network, getOptions()).print(commandPath) > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}
+		
+		OrccLogger.trace("Printing Linux batch command... ");
+		if (new BatchCommandPrinterLinux(network, getOptions()).print(commandPath) > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
@@ -205,6 +212,7 @@ public class HLSBackend extends CBackend {
 		new ActorTopVhdlPrinter(getOptions()).print(srcPath, instance);
 		new ActorNetworkTestBenchPrinter(getOptions()).print(srcPath, instance);
 		new UnitaryBatchCommandPrinter(getOptions()).print(commandPath, instance);
+		new UnitaryBatchCommandPrinterLinux(getOptions()).print(commandPath, instance);
 		return new InstancePrinter(getOptions()).print(srcPath, instance) > 0;
 
 	}
