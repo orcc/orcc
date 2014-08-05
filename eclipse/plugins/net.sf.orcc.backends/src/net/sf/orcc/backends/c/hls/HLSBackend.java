@@ -38,6 +38,7 @@ import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.transform.CastArgFuncCall;
 import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -49,6 +50,7 @@ import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
@@ -119,7 +121,13 @@ public class HLSBackend extends CBackend {
 			}
 		}
 	}
+	@Override
+	protected void doValidate(Network network) {
+		// TODO Auto-generated method stub
+		Validator.checkMinimalFifoSize(network, fifoSize);
 
+		new NetworkValidator().doSwitch(network);
+	}
 	@Override
 	protected void doTransformNetwork(Network network) {
 		// instantiate and flattens network
