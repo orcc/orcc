@@ -47,6 +47,14 @@ class UnitaryBatchCommandPrinterLinux extends net.sf.orcc.backends.c.InstancePri
 	}
 
 	def getFileContentBatch() '''
+		# Two additions to your ~/.bash_profile or ~/.profile must be made,
+		# to modify the $XILINXD_LICENSE_FILE and $PATH environment variables
+		# 
+		# Step 1. The $XILINXD_LICENSE_FILE environment variable must be set, e.g.
+		# export XILINXD_LICENSE_FILE="<path>/Xilinx.lic"
+		#
+		# Step 2. The $PATH environment variable must include the Vivado HLS bin/ e.g.
+		# export PATH=~/path/to/vivado-hls/bin:$PATH
 		
 		cd ..
 			

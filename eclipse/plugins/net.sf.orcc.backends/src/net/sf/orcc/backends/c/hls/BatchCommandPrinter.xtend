@@ -48,9 +48,12 @@ class BatchCommandPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	}
 
 	override getNetworkFileContent() '''
-		PATH=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin;%PATH%;D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\msys\bin
-		set AUTOESL_HOME=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin
-		set VIVADO_HLS_HOME=D:\Users\mabid\2013.4\Xilinx\Vivado_HLS\2013.4\bin
+		:: The path variable must be set system wide to include vivado_hls and msys binaries, e.g.
+		:: PATH=D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\bin;%PATH%;D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\msys\bin
+		::
+		:: Two environment variables must be set system wide to include vivado_hls , e.g.
+		:: set AUTOESL_HOME=D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\bin
+		:: set VIVADO_HLS_HOME=D:\Users\JoeBloggs\2013.4\Xilinx\Vivado_HLS\2013.4\bin
 		
 		if not "x%PROCESSOR_ARCHITECTURE%" == "xAMD64" goto _NotX64
 		set COMSPEC=%WINDIR%\SysWOW64\cmd.exe

@@ -49,6 +49,14 @@ class BatchCommandPrinterLinux extends net.sf.orcc.backends.c.NetworkPrinter {
 	}
 
 	override getNetworkFileContent() '''
+		# Two additions to your ~/.bash_profile or ~/.profile must be made,
+		# to modify the $XILINXD_LICENSE_FILE and $PATH environment variables
+		# 
+		# Step 1. The $XILINXD_LICENSE_FILE environment variable must be set, e.g.
+		# export XILINXD_LICENSE_FILE="<path>/Xilinx.lic"
+		#
+		# Step 2. The $PATH environment variable must include the Vivado HLS bin/ e.g.
+		# export PATH=~/path/to/vivado-hls/bin:$PATH
 		
 		cd ..
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
@@ -63,7 +71,7 @@ class BatchCommandPrinterLinux extends net.sf.orcc.backends.c.NetworkPrinter {
 			«FOR port : instance.getActor.outputs.filter[! native]»			
 				«FOR connection : instance.outgoingPortMap.get(port)»
 					«IF connection.targetPort == null»
-						vivado_hls -f script_cast_«instance.name»_«connection.sourcePort.name»_read.tcl					
+						vivado_hls -f script_cast_«instance.name»_«connection.sourcePort.name»_read.tcl
 					«ENDIF»
 				«ENDFOR»
 			«ENDFOR»
@@ -71,7 +79,7 @@ class BatchCommandPrinterLinux extends net.sf.orcc.backends.c.NetworkPrinter {
 		«ENDFOR»
 		
 		«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
-			cp subProject_«instance.name»/solution1/syn/vhdl TopVHDL/
+			cp subProject_«instance.name»/solution1/syn/vhdl/* TopVHDL/
 			«FOR port : instance.getActor.inputs»
 				«val connection = instance.incomingPortMap.get(port)»
 				«IF connection != null && connection.sourcePort == null»
