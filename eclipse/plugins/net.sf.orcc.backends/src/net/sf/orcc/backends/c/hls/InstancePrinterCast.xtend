@@ -206,7 +206,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 			extern stream<«connOut.fifoType»> «connOut.castfifoNameRead»;
 		«ELSE»
 			// Input FIFOS
-			extern «connOut.fifoType.doSwitch» «connOut.ramName»[«connOut.size»];
+			extern «connOut.fifoType.doSwitch» «connOut.ramName»[«connOut.safeSize»];
 			extern unsigned int «connOut.wName»[1];
 			extern unsigned int «connOut.rName»[1];
 			unsigned int «connOut.localrName»=0;
