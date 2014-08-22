@@ -20,6 +20,18 @@ if(THREADS_FOUND)
     list(APPEND orcc_native_headers include/thread.h)
 endif()
 
+# try to find openCV
+find_package(OpenCV)
+
+if(OPENCV_FOUND)
+    list(APPEND orcc_native_sources src/source_camera.c)
+    list(APPEND extra_libraries ${OpenCV_LIBS}) # opencv libs
+    list(APPEND extra_libraries m) # maths lib required
+else()
+    message(STATUS "Cannot find OpenCV")
+endif()
+
+
 # Helps CMake to find SDL libraries (Windows only)
 if(WIN32)
     # Detect current architecture. Depending on CMAKE_LIBRARY_ARCHITECTURE value,
