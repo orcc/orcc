@@ -194,6 +194,7 @@ public class CBackend extends AbstractBackend {
 
 	protected void doTransformNetwork(Network network) {
 		if (mergeActors) {
+			network.setAttribute("defaultFifoSize", fifoSize);
 			new BroadcastAdder().doSwitch(network);
 		}
 		OrccLogger.traceln("Instantiating...");

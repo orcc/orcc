@@ -380,21 +380,25 @@ public class ActorMergerQS extends ActorMergerBase {
 				Var buffer = null;
 				if (!conn.hasAttribute("bufferCreated")) {
 					// create actor-level buffer
-					int size = conn.getSize();
-					if (size > 0) {
-						String name = "buffer_" + conn.getSourcePort().getName() + "_" + conn.getTargetPort().getName();
-						Type eltType = conn.getSourcePort().getType();
-						Type type = irFactory.createTypeList(size, eltType);
-						buffer = irFactory.createVar(0, type, name, true);
-						superActor.addStateVar(buffer);
-			
-						// create read and write counters
-						buffer.addAttribute("_w");
-						buffer.addAttribute("_r");
-			
-						buffersMap.put(conn.getSourcePort(), buffer);
-						buffersMap.put(conn.getTargetPort(), buffer);
+					int size;
+					if (conn.getSize() == null) {
+						size = ((Integer) network.getValueAsObject("defaultFifoSize")).intValue();
+					} else {
+						size = conn.getSize();
 					}
+					String name = "buffer_" + conn.getSourcePort().getName() + "_" + conn.getTargetPort().getName();
+					Type eltType = conn.getSourcePort().getType();
+					Type type = irFactory.createTypeList(size, eltType);
+					buffer = irFactory.createVar(0, type, name, true);
+					superActor.addStateVar(buffer);
+
+					// create read and write counters
+					buffer.addAttribute("_w");
+					buffer.addAttribute("_r");
+
+					buffersMap.put(conn.getSourcePort(), buffer);
+					buffersMap.put(conn.getTargetPort(), buffer);
+
 					conn.addAttribute("bufferCreated");
 				} else {
 					buffer = buffersMap.get(conn.getSourcePort());

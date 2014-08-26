@@ -112,7 +112,11 @@ public class ActorMerger extends DfVisitor<Void> {
 					Port inputPort = EcoreUtil.copy(input);
 					subNetwork.addInput(inputPort);
 					if (actor.getIncomingPortMap().get(input) != null) {
-						size = actor.getIncomingPortMap().get(input).getSize();
+						if (actor.getIncomingPortMap().get(input).getSize() == null) {
+							size = ((Integer) network.getValueAsObject("defaultFifoSize")).intValue();
+						} else {
+							size = actor.getIncomingPortMap().get(input).getSize();
+						}
 					}
 					subNetwork.add(dfFactory.createConnection(inputPort, null,
 							vertex, input, size));
@@ -125,7 +129,11 @@ public class ActorMerger extends DfVisitor<Void> {
 					Port outputPort = EcoreUtil.copy(output);
 					subNetwork.addOutput(outputPort);
 					if (actor.getOutgoingPortMap().get(output) != null) {
-						size = actor.getOutgoingPortMap().get(output).get(0).getSize();
+						if (actor.getOutgoingPortMap().get(output).get(0).getSize() == null) {
+							size = ((Integer) network.getValueAsObject("defaultFifoSize")).intValue();
+						} else {
+							size = actor.getOutgoingPortMap().get(output).get(0).getSize();
+						}
 					}
 					subNetwork.add(dfFactory.createConnection(vertex, output,
 							outputPort, null, size));
@@ -228,9 +236,14 @@ public class ActorMerger extends DfVisitor<Void> {
 							+ "_"
 							+ connection.getTargetPort().getName());
 					// Add connection to the parent network
+					int size;
+					if (connection.getSize() == null) {
+						size = ((Integer) network.getValueAsObject("defaultFifoSize")).intValue();
+					} else {
+						size = connection.getSize();
+					}
 					newConnections.add(dfFactory.createConnection(src,
-							connection.getSourcePort(), superActor, tgtPort,
-							connection.getSize()));
+							connection.getSourcePort(), superActor, tgtPort, size));
 
 				} else if (instances.contains(src) && !instances.contains(tgt)) {
 					Port srcPort = superActor.getOutput(connection.getSource()
@@ -238,10 +251,14 @@ public class ActorMerger extends DfVisitor<Void> {
 							+ "_"
 							+ connection.getSourcePort().getName());
 					// Add connection to the parent network
+					int size;
+					if (connection.getSize() == null) {
+						size = ((Integer) network.getValueAsObject("defaultFifoSize")).intValue();
+					} else {
+						size = connection.getSize();
+					}
 					newConnections.add(dfFactory.createConnection(superActor,
-							srcPort, tgt, connection.getTargetPort(),
-							connection.getSize()));
-
+							srcPort, tgt, connection.getTargetPort(), size));
 				}
 			}
 

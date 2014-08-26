@@ -122,9 +122,15 @@ public class ScheduleAnalyzer extends BufferSizer {
 	private void externalizeConnection(Actor superActor, Actor actor, 
 			Port port, boolean fullFifos) {
 		Connection connection = actor.getOutgoingPortMap().get(port).get(0);
+		int size;
+		if (connection.getSize() == null) {
+			size = ((Integer) network.getValueAsObject("defaultFifoSize")).intValue();
+		} else {
+			size = connection.getSize();
+		}
 		// this is the 'port' of 'actor'
 		copyOutputPortIfNotFound(superActor, actor, connection.getSourcePort(),
-				fullFifos, connection.getTargetPort(), connection.getSize());
+				fullFifos, connection.getTargetPort(), size);
 		// this is the remote port of another actor
 		copyInputPortIfNotFound(superActor, 
 				connection.getTarget().getAdapter(Actor.class),
