@@ -41,7 +41,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.BlockBasic;
@@ -50,7 +50,8 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
-
+import net.sf.orcc.util.SwitchUtil;
+import net.sf.orcc.util.Void;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -60,7 +61,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Herve Yviquel
  * 
  */
-public class BroadcastAdder extends DfSwitch<Void> {
+public class BroadcastAdder extends DfVisitor<Void> {
 
 	private static DfFactory dfFactory = DfFactory.eINSTANCE;
 	private static IrFactory irFactory = IrFactory.eINSTANCE;
@@ -90,7 +91,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 		handle(network);
 
-		return null;
+		return SwitchUtil.DONE;
 	}
 
 	@Override

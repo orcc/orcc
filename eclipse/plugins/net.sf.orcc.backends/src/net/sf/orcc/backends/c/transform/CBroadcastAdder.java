@@ -38,6 +38,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.Void;
 import net.sf.orcc.util.OrccLogger;
 
 /**
