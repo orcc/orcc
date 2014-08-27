@@ -15,7 +15,6 @@ import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Var;
@@ -83,12 +82,6 @@ public class MergerUtil {
 		}
 	}
 
-	public static Var createIndexVar(Port port) {
-		return IrFactory.eINSTANCE.createVar(0,
-				EcoreUtil.copy(port.getType()),
-				new String("index_" + port.getName()), true, 0);
-	}
-
 	public static List<Expression> createModuloIndex(Port port, Var indexVar) {
 		Var sizeVar = IrFactory.eINSTANCE.createVar(0,
 				EcoreUtil.copy(port.getType()),
@@ -100,14 +93,5 @@ public class MergerUtil {
 				EcoreUtil.copy(port.getType())));
 		return indexExpression;
 	}
-	
-	public static Instruction createBinOpStore(Var variable, OpBinary operation,
-			int constant) {
-		return IrFactory.eINSTANCE.createInstStore(variable, 
-				IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(variable), operation, 
-				IrFactory.eINSTANCE.createExprInt(constant), 
-				IrFactory.eINSTANCE.createTypeInt()));		
-	}
-	
+
 }

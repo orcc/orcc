@@ -547,8 +547,14 @@ public class SuperactorParser {
 	 * Guard parser specific methods
 	 */
 
+	private Var createIndexVar(Port port) {
+		return IrFactory.eINSTANCE.createVar(0,
+				EcoreUtil.copy(port.getType()),
+				new String("index_" + port.getName()), true, 0);
+	}
+
 	private Instruction createPeekInstruction(Var target, Port port) {
-		Var indexVar = MergerUtil.createIndexVar(port);
+		Var indexVar = createIndexVar(port);
 		return IrFactory.eINSTANCE.createInstLoad(target, IrFactory.eINSTANCE
 				.createVar(0, EcoreUtil.copy(port.getType()),
 						"tokens_" + port.getName(), true, 0),

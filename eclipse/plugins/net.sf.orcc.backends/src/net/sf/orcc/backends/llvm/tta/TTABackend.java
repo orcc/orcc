@@ -55,6 +55,8 @@ import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transform.BroadcastAdder;
+import net.sf.orcc.df.transform.FifoSizePropagator;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
@@ -139,6 +141,10 @@ public class TTABackend extends LLVMBackend {
 		// Transformations that will be applied on the Network
 		// -----------------------------------------------------
 
+		if (mergeActors) {
+			networkTransfos.add(new FifoSizePropagator(fifoSize));
+			networkTransfos.add(new BroadcastAdder());
+		}
 		networkTransfos.add(new ComplexHwOpDetector());
 		networkTransfos.add(new UnitImporter());
 		networkTransfos.add(new Instantiator(true));
