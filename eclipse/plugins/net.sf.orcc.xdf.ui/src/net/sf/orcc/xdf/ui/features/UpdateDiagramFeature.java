@@ -354,8 +354,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 			final Object bo = getBusinessObjectForPictogramElement(shape);
 			if (bo == null) {
 				missing++;
-			}
-			if (PropsUtil.isInstance(shape)) {
+			} else if (PropsUtil.isInstance(shape)) {
 				if (!(bo instanceof Instance)) {
 					badlinks++;
 				}
@@ -370,6 +369,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 					badlinks++;
 				}
 			}
+
 		}
 
 		if (missing + badlinks != 0) {
