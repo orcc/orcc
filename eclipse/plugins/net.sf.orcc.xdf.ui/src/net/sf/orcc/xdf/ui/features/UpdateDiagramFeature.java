@@ -40,6 +40,7 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.xdf.ui.diagram.OrccDiagramTypeProvider;
 import net.sf.orcc.xdf.ui.diagram.XdfDiagramFeatureProvider;
+import net.sf.orcc.xdf.ui.util.PropsUtil;
 import net.sf.orcc.xdf.ui.util.XdfUtil;
 
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -64,6 +65,7 @@ import org.eclipse.graphiti.mm.algorithms.styles.Style;
 import org.eclipse.graphiti.mm.algorithms.styles.StylesPackage;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -143,11 +145,16 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 				hasDoneChanges = true;
 			}
 		}
-		
-		if (diagram.getChildren().size() == 0 && network.getChildren().size() > 0) {
+
+		// Check network validity / initialize diagram.
+		if (diagram.getChildren().size() == 0
+				&& network.getChildren().size() > 0) {
+			// Diagram is new / empty. We check network validity
 			final List<String> updatedNetworkWarnings = new ArrayList<String>();
 
 			hasDoneChanges |= fixNetwork(network, updatedNetworkWarnings);
+
+			// Initialize the new diagram
 			hasDoneChanges |= initializeDiagramFromNetwork(network, diagram);
 
 			// Display a synthesis message to user, to tell him what have been
@@ -163,6 +170,8 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 				MessageDialog.openInformation(XdfUtil.getDefaultShell(),
 						"Network update", message.toString());
 			}
+		} else {
+			checkDiagramValidity(getDiagram());
 		}
 
 		updateVersion(diagram);
@@ -331,6 +340,57 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 		addContext.setLocation(10, 10);
 
 		return getFeatureProvider().addIfPossible(addContext);
+	}
+
+	/**
+	 * Check the given network validity. If errors are detected, an error dialog
+	 * is shown with details about issues and how to resolve it
+	 */
+	private void checkDiagramValidity (final Diagram diagram) {
+		int missing = 0, badlinks = 0;
+		// Diagram already exists. We check for compatibility between
+		// network and diagram
+		for (final Shape shape : diagram.getChildren()) {
+			final Object bo = getBusinessObjectForPictogramElement(shape);
+			if (bo == null) {
+				missing++;
+			}
+			if (PropsUtil.isInstance(shape)) {
+				if (!(bo instanceof Instance)) {
+					badlinks++;
+				}
+			} else if (PropsUtil.isInputPort(shape)) {
+				if (!(bo instanceof Port && XdfUtil
+						.isInputNetworkPort((Port) bo))) {
+					badlinks++;
+				}
+			} else if (PropsUtil.isOutputPort(shape)) {
+				if (!(bo instanceof Port && XdfUtil
+						.isOutputNetworkPort((Port) bo))) {
+					badlinks++;
+				}
+			}
+		}
+
+		if (missing + badlinks != 0) {
+			final StringBuilder errorMsg = new StringBuilder(
+					"There is error in the diagram:");
+			errorMsg.append(System.getProperty("line.separator"));
+			if (missing != 0) {
+				errorMsg.append(missing);
+				errorMsg.append(" shape(s) have no business object linked");
+				errorMsg.append(System.getProperty("line.separator"));
+			}
+			if (badlinks != 0) {
+				errorMsg.append(badlinks);
+				errorMsg.append(" shape(s) are linked to a business object with the wrong type");
+				errorMsg.append(System.getProperty("line.separator"));
+			}
+			errorMsg.append("Please re-generate the diagram (delete it and re-open the network).");
+
+			MessageDialog.openError(XdfUtil.getDefaultShell(),
+					"Issues in diagram", errorMsg.toString());
+		}
 	}
 
 	/**
