@@ -34,6 +34,6 @@
 
 void ffmpeg_initSource();
 void ffmpeg_closeSource();
-void ffmpeg_readFrame(u8 data[2][100000], int size[2][1], int index);
+void ffmpeg_readFrame(u8 data[16][100000], int size[1], int index);
 
 #endif  /* _ORCC_FFMPEG_UTIL_H_ */

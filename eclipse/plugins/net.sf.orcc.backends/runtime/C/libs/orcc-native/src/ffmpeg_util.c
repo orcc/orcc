@@ -69,13 +69,13 @@ void ffmpeg_closeSource() {
     }
 }
 
-void ffmpeg_readFrame(u8 data[2][100000], int size[2][1], int index) {
+void ffmpeg_readFrame(u8 data[16][100000], int size[2], int index) {
     int n = av_read_frame(pFormatCtx, pPacket);
     if(n != 0) {
         fprintf(stderr,"Problem when reading input file.\n");
         exit(-4);
     }
 
-    memcpy(&data[index], pPacket->data, pPacket->size);
-    size[index][0] = pPacket->size;
+    memcpy(data[index], pPacket->data, pPacket->size);
+    size[0] = pPacket->size;
 }
