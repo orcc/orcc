@@ -186,6 +186,15 @@ public class XdfResourceImpl extends ResourceImpl {
 					} else if (fragment.startsWith("variables.")) {
 						return network.getVariable(name);
 					}
+				} else {
+					final int idx = Integer.parseInt(fragment.substring(index));
+					if (fragment.startsWith("inputs.")) {
+						return network.getInputs().get(idx);
+					} else if (fragment.startsWith("outputs.")) {
+						return network.getOutputs().get(idx);
+					} else if (fragment.startsWith("instances.")) {
+						return network.getChildren().get(idx);
+					}
 				}
 			}
 		}
