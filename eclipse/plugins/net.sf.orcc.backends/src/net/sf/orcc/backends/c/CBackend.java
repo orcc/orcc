@@ -250,23 +250,29 @@ public class CBackend extends AbstractBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
-		if(getOption(ENABLE_TRACES,true)) {new TracesPrinter(network, getOptions()).print(srcPath);}
+		if (getOption(ENABLE_TRACES, true)) {
+			new TracesPrinter(network, getOptions()).print(srcPath);
+		}
 		printCMake(network);
 
 		CharSequence content = new StatisticsPrinter().getContent(network);
-		FilesManager.writeFile(content, srcPath, network.getSimpleName() + ".csv");
+		FilesManager.writeFile(content, srcPath, network.getSimpleName()
+				+ ".csv");
 
 		content = new Mapping(network, mapping).getContentFile();
-		FilesManager.writeFile(content, srcPath, network.getSimpleName() + ".xcf");
+		FilesManager.writeFile(content, srcPath, network.getSimpleName()
+				+ ".xcf");
 	}
 
 	protected void printCMake(Network network) {
 		// print CMakeLists
 		OrccLogger.traceln("Printing CMake project files");
 		CMakePrinter printer = new CMakePrinter(network);
-		
-		FilesManager.writeFile(printer.rootCMakeContent(), path, "CMakeLists.txt");
-		FilesManager.writeFile(printer.srcCMakeContent(), srcPath, "CMakeLists.txt");
+
+		FilesManager.writeFile(printer.rootCMakeContent(), path,
+				"CMakeLists.txt");
+		FilesManager.writeFile(printer.srcCMakeContent(), srcPath,
+				"CMakeLists.txt");
 	}
 
 	@Override

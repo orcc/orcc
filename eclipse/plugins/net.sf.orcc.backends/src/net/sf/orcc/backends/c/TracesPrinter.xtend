@@ -30,15 +30,8 @@ package net.sf.orcc.backends.c
 
 import java.io.File
 import java.util.Map
-import net.sf.orcc.df.Actor
-import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Network
-import net.sf.orcc.df.Port
-import net.sf.orcc.graph.Vertex
 import net.sf.orcc.util.OrccUtil
-
-import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
  * Generate and print couples of traces file names.
@@ -50,19 +43,9 @@ class TracesPrinter extends CTemplate {
 	
 	protected val Network network;
 	
-	protected var boolean profile = false	
-	protected var boolean newSchedul = false
-	
 	new(Network network, Map<String, Object> options) {
 		super(options)
 		this.network = network
-
-		if(options.containsKey(PROFILE)){
-			profile = options.get(PROFILE) as Boolean
-		}
-		if (options.containsKey(NEW_SCHEDULER)) {
-			newSchedul = options.get(NEW_SCHEDULER) as Boolean
-		}
 	}
 	
 	/**
