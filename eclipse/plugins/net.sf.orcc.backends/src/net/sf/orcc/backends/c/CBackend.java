@@ -31,6 +31,7 @@ package net.sf.orcc.backends.c;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.BXDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.IMPORT_BXDF;
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -249,7 +250,7 @@ public class CBackend extends AbstractBackend {
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
-
+		if(getOption(ENABLE_TRACES,true)) {new TracesPrinter(network, getOptions()).print(srcPath);}
 		printCMake(network);
 
 		CharSequence content = new StatisticsPrinter().getContent(network);
