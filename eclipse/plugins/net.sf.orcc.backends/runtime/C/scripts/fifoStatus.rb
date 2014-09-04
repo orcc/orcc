@@ -3,26 +3,31 @@ require 'ostruct'
 options = OpenStruct.new
 options.tf = String
 options.td = String
+options.to = String
 OptionParser.new do |opts|
   opts.banner = "Usage: RubyFile.rb [options]"
 
-  #options[:tracesFile] = nil
 	opts.on( '-t', '--tracesFile FILE', 'set tracesFile' ) do |t|
     	options.tf = t
    	end
-  #options[:tracesDirectory] = nil
+
 	opts.on( '-d', '--tracesDirectory DIR', 'set tracesDirectory' ) do |d|
     	options.td = d
    	end
-    
+
+    opts.on( '-o', '--outputFileDirectory DIR2', 'set outputFileDirectory' ) do |o|
+    	options.to = o
+   	end
+
 end.parse!
 
 TRACES_FILE = options.tf
 TRACES_DIR  = options.td
+OUTPUT_DIR  = options.to
 
 Connection = Struct.new(:targetActor, :targetPort, :sourceActor, :sourcePort, :fifoSize , :remainingTokens, :fifoStatus)
 
-OUT_FILE = File.new("out.html", "w")
+OUT_FILE = File.new(OUTPUT_DIR + "fifoStatus.html", "w")
 OUT_FILE.write(
 '<html lang="fr"><head>
 <meta http-equiv="content-type" content="text/html; charset=windows-1252">
