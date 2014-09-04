@@ -166,9 +166,9 @@ public class TTABackend extends LLVMBackend {
 
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
 
-		networkTransfos.add(new TypeResizer(true, true, false, true));
 		networkTransfos.add(new DfVisitor<Expression>(
 				new ShortCircuitTransformation()));
+		networkTransfos.add(new TypeResizer(true, true, false, true));
 		networkTransfos.add(new DfVisitor<Void>(new SSATransformation()));
 		networkTransfos.add(new StringTransformation());
 		networkTransfos.add(new RenameTransformation(this.renameMap));

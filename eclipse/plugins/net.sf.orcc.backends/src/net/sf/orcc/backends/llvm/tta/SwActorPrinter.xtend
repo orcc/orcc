@@ -39,7 +39,6 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import org.eclipse.emf.common.util.EList
-import net.sf.orcc.ir.ExprBinary
 
 class SwActorPrinter extends InstancePrinter {
 
@@ -49,23 +48,6 @@ class SwActorPrinter extends InstancePrinter {
  		this.processor = processor
  	}
  	
- 	/**
-	 * FIXME: Temporary work-around to fix the actor simulation. 
-	 * The parent method defined in LLVMTemplate should be used instead.
-	 */
- 	override caseExprBinary(ExprBinary expr) {
-  		val op = expr.op
-  		val e1 = expr.e1
-  		val e2 = expr.e2
-  
- 		val type = e1.type
-  
-  		signed = !type.uint
-  		floating = type.float
-  
-  		'''«op.stringRepresentation» «e1.type.doSwitch» «e1.doSwitch», «e2.doSwitch»'''
-  	}
-
 	override protected getAddrSpace(Connection connection) {
 		val id = processor.getAddrSpaceId(connection)
 		if (id != null) {
