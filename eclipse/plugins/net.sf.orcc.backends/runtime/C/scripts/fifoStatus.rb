@@ -1,5 +1,24 @@
-TRACES_FILE = ARGV[0]
-TRACES_DIR  = ARGV[1]
+require 'optparse'
+require 'ostruct'
+options = OpenStruct.new
+options.tf = String
+options.td = String
+OptionParser.new do |opts|
+  opts.banner = "Usage: RubyFile.rb [options]"
+
+  #options[:tracesFile] = nil
+	opts.on( '-t', '--tracesFile FILE', 'set tracesFile' ) do |t|
+    	options.tf = t
+   	end
+  #options[:tracesDirectory] = nil
+	opts.on( '-d', '--tracesDirectory DIR', 'set tracesDirectory' ) do |d|
+    	options.td = d
+   	end
+    
+end.parse!
+
+TRACES_FILE = options.tf
+TRACES_DIR  = options.td
 
 Connection = Struct.new(:targetActor, :targetPort, :sourceActor, :sourcePort, :fifoSize , :remainingTokens, :fifoStatus)
 
@@ -115,7 +134,8 @@ File.readlines(TRACES_FILE).each do |line|
 
 end
 OUT_FILE.write(
-'          </thead>
+'          
+		  </thead>
       </table>
 
   </body>
