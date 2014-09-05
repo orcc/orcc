@@ -28,12 +28,12 @@
  */
  package net.sf.orcc.backends.llvm.aot
 
-import java.io.File
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import java.util.Map
 import net.sf.orcc.OrccRuntimeException
+import net.sf.orcc.backends.BackendsConstants
 import net.sf.orcc.backends.ir.ExprNull
 import net.sf.orcc.backends.ir.InstCast
 import net.sf.orcc.df.Action
@@ -67,12 +67,10 @@ import net.sf.orcc.ir.Type
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.util.util.EcoreHelper
 import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.backends.BackendsConstants.*
-import net.sf.orcc.backends.BackendsConstants
 import static net.sf.orcc.util.OrccAttributes.*
 
 /*
@@ -137,43 +135,7 @@ class InstancePrinter extends LLVMTemplate {
 		print(targetFolder)
 	}
 
-	/**
-	 * Print file content from a given actor
-	 *
-	 * @param targetFolder folder to print the instance file
-	 * @param instance the given instance
-	 * @return 1 if file was cached, 0 if file was printed
-	 */
-	@Deprecated
-	def print(String targetFolder, Actor actor) {
-		setActor(actor)
-		print(targetFolder)
-	}
-
-	@Deprecated
-	def protected print(String targetFolder) {
-		val content = fileContent
-		val file = new File(targetFolder + File::separator + name + ".ll")
-
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
-
-	def getContent(Instance instance) {
-		setInstance(instance)
-		fileContent
-	}
-
-	def getContent(Actor actor) {
-		setActor(actor)
-		fileContent
-	}
-
-	def protected setInstance(Instance instance) {
+	def setInstance(Instance instance) {
 		if (!instance.isActor) {
 			throw new OrccRuntimeException("Instance " + instance.name + " is not an Actor's instance")
 		}
@@ -189,7 +151,7 @@ class InstancePrinter extends LLVMTemplate {
 		computePortToIndexByPatternMap
 	}
 
-	def protected setActor(Actor actor) {
+	def setActor(Actor actor) {
 		this.name = actor.name
 		this.actor = actor
 		this.incomingPortMap = actor.incomingPortMap
@@ -200,7 +162,7 @@ class InstancePrinter extends LLVMTemplate {
 		computePortToIndexByPatternMap
 	}
 
-	def protected getFileContent() '''
+	def getContent() '''
 		«val inputs = actor.inputs.notNative»
 		«val outputs = actor.outputs.notNative»
 		«printDatalayout»

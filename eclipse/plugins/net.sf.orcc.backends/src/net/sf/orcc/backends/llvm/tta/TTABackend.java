@@ -326,7 +326,8 @@ public class TTABackend extends LLVMBackend {
 	@Override
 	protected Result doGenerateActor(Actor actor) {
 		swActorPrinter.setProcessor(design.getActorToProcessorMap().get(actor));
-		return FilesManager.writeFile(swActorPrinter.getContent(actor),
+		swActorPrinter.setActor(actor);
+		return FilesManager.writeFile(swActorPrinter.getContent(),
 				actorsPath, actor.getName() + ".ll");
 	}
 
