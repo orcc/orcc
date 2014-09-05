@@ -120,7 +120,7 @@ File.readlines(TRACES_FILE).each do |line|
 
   	if fifoContent == 0 then 
   		status = "warning"
-  	elsif fifoContent == orccArgs[4] then
+  	elsif fifoContent >= orccArgs[6].to_i then
   		status = "blocked"
   	else
   		status = "connection"
