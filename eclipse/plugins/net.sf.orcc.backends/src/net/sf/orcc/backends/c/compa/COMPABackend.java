@@ -52,6 +52,7 @@ import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
@@ -68,7 +69,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Antoine Lorence
  */
 public class COMPABackend extends CBackend {
-	final boolean printTop = true;
+	private static final int currentMappingNb = 14;
+	private static final int nbProcessors = 15;
+	private final boolean printTop = false;
+	private final boolean[][] currentMap = new mappings().mapping[currentMappingNb];
 	
 	@Override
 	protected void doInitializeOptions() {
@@ -202,16 +206,21 @@ public class COMPABackend extends CBackend {
 		network.computeTemplateMaps();
 
 		// print instances
-		printChildren(network);
+//		printChildren(network);
+		printChildrenCompa(network);
+		
 		
 		// Print fifo allocation file into the orcc lib include folder.
 		OrccLogger.trace("Printing the fifo allocation file... ");
 		if (new NetworkPrinter(network, options).printFifoFile(path + "/libs/orcc/include") > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
-		OrccLogger.traceRaw("Done\n");
+			OrccLogger.traceRaw("Done\n");
 		}
-			
+		
+		// Print Top files
+		new TopFilePrinter(network, currentMap, nbProcessors).print(srcPath);
+		
 		if (printTop){
 			// print network
 			OrccLogger.trace("Printing network... ");
@@ -250,17 +259,55 @@ public class COMPABackend extends CBackend {
 //		} else {
 //			OrccLogger.warnRaw("Error" + "\n");
 //		}
-		if (printTop)
+//		if (printTop)
 			return new InstancePrinter(options, printTop).print(srcPath, instance) > 0;
-		else
-			return new InstancePrinter(options, printTop).print(path + File.separator + instance.getSimpleName(), instance) > 0;
+//		else
+//			return new InstancePrinter(options, printTop).print(srcPath + File.separator + instance.getSimpleName(), instance) > 0;
 	}
 	
 	@Override
 	protected boolean printActor(Actor actor) {
-		if (printTop)
+//		if (printTop)
 			return new InstancePrinter(options, printTop).print(srcPath, actor) > 0;
-		else
-			return new InstancePrinter(options, printTop).print(path + File.separator + actor.getSimpleName(), actor) > 0;
+//		else
+//			return new InstancePrinter(options, printTop).print(srcPath + File.separator + actor.getSimpleName(), actor) > 0;
+	}
+	
+	protected boolean printVertex(Vertex vertex, String targetFolder){
+		final Actor actor = vertex.getAdapter(Actor.class);
+		return new InstancePrinter(options, printTop).print(targetFolder, actor) > 0;
+		
+	}
+	
+	/**
+	 * Print entities of the given network.
+	 * 
+	 * @param entities
+	 *            a list of entities
+	 */
+	protected void printChildrenCompa(Network network) {
+//		checkConnectivy
+		String procFolder;
+		for (int i=0; i< nbProcessors; i++) {
+			if (i<10){
+				procFolder = srcPath + File.separator + "Top_0" + i;
+//				procFolder = targetFolder + File::separator + "Top_0" + i + File::separator + "Top_0" + i + ".c"
+			}
+			else{
+				procFolder = srcPath + File.separator + "Top_" + i;
+//				procFolder = targetFolder + File::separator + "Top_" + i + File::separator + "Top_" + i + ".c"
+			}
+			
+			if(i < currentMap.length){
+				// Print assigned actors into the corresponding folder
+				OrccLogger.traceln("Processor " + i + " : ");
+				for (ActorsIndex actorIx : ActorsIndex.values()){
+					if(currentMap[i][actorIx.ordinal()]){
+						OrccLogger.traceln(network.getChild(actorIx.toString()).getLabel());
+						printVertex(network.getChild(actorIx.toString()), procFolder);
+					}
+				}		
+			}
+		}
 	}
 }

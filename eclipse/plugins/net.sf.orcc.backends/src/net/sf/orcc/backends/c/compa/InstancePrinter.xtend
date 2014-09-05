@@ -28,16 +28,17 @@
  */
 package net.sf.orcc.backends.c.compa
 
+import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Pattern
+import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
 import net.sf.orcc.ir.TypeList
-import net.sf.orcc.df.Port
-import java.io.File
 import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.util.OrccLogger
+import net.sf.orcc.ir.InstCall
+import net.sf.orcc.ir.Procedure
 
 /**
  * Generate and print instance source file for COMPA backend.
@@ -48,7 +49,12 @@ import net.sf.orcc.util.OrccLogger
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {	
 	// Whether the actor has a main function or the main is within the Top file.
 	private boolean printMainFunc
+	private boolean measureTime = false
 	private boolean enableTest = false
+	int nbProc = 15
+	int currentMappingNb = 14
+	val mappings = new mappings
+	val boolean[][] currentMap = mappings.mapping.get(currentMappingNb)
 	
 	new(Map<String, Object> options, boolean printTop) {
 		super(options)
@@ -56,18 +62,20 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	}
 	
 	override protected print(String targetFolder) {
-		checkConnectivy
+//		checkConnectivy
 
 		val content = fileContent
-		val testContent = testFileContent
+		val topContent = topFileContent
+//		val testContent = testFileContent
 		val file = new File(targetFolder + File::separator + entityName + ".c")
-		val testFile = new File(targetFolder + File::separator + entityName + "_test.h")
+		val topFile = new File(targetFolder + File::separator + "Top_" + entityName + ".c")
+//		val testFile = new File(targetFolder + File::separator + entityName + "_test.h")
 
 		if(actor.native) {
 //			OrccLogger::noticeln(entityName + " is native and not generated.")
-		} else if(needToWriteFile(content, file) || needToWriteFile(testContent, testFile)) {
+		} else if(needToWriteFile(content, file) || needToWriteFile(topContent, topFile)) {
 			OrccUtil::printFile(content, file)
-			OrccUtil::printFile(testContent, testFile)
+//			OrccUtil::printFile(topContent, topFile)
 			return 0
 		} else {
 			return 1
@@ -180,7 +188,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					goto l_«state.name»;
 			«ENDFOR»
 			default:
-				xil_printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]);
+«««				xil_printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]					
 				exit(1);
 			}
 
@@ -303,8 +311,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 						i = 0;
 						memset(value, 0, sizeof(value));
 						do{
-							rc = f_read(&fil_«port.name», &value[i], 1, 0);
-							if(rc != FR_OK){
+							rc = f_read(&fil_«port.name», &value[i], 1, 0);									if(rc != FR_OK){
 								xil_printf("f_read failed: %d\n", rc);
 								exit(-1);
 							}
@@ -349,36 +356,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	'''
 	
-	
-	def protected printMain() '''
-		int main(int argc, char *argv[]) {
-			int i;
-			int stop = 0;
-			
-«««		    init_platform();
-«««			init_orcc(argc, argv);
-			«IF enableTest»
-				testInit();
-			«ENDIF»
-
-			«entityName»_initialize();
-
-			while(1) {
-				i = 0;
-				
-				«IF enableTest»
-					testScheduler();
-				«ENDIF»
-		
-				i += «entityName»_scheduler();
-				stop = stop || (i == 0);
-			}
-			xil_printf("End of simulation !\n");
-			
-			return compareErrors;
-		}
-	'''
-	
 	override protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
 			index_«port.name» = (*«port.fullName»->write_ind);
@@ -412,11 +389,12 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			#include <assert.h>
 		«ENDIF»
 
-		«IF printMainFunc»
-			#include "fifoAllocations.h"
-		«ELSE»
+«««		«IF printMainFunc»
+«««			#include "fifoAllocations.h"
+«««			
+«««		«ELSE»
 			#include "fifo.h"
-		«ENDIF»
+«««		«ENDIF»
 		#include "util.h"
 		#include "dataflow.h"
 		
@@ -425,7 +403,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 «««		«ENDIF»
 «««		#include "platform.h"
 «««		#include "xparameters.h"
-		extern void xil_printf( const char *ctrl1, ...);
+«««		extern void xil_printf( const char *ctrl1, ...);
 «««		#define xil_printf	printf
 		
 		«IF profileNetwork || dynamicMapping»
@@ -453,11 +431,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF !actor.inputs.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
-			«IF printMainFunc != true»
+«««			«IF printMainFunc != true»
 				«FOR port : actor.inputs»
 					«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
 				«ENDFOR»
-			«ENDIF»
+«««			«ENDIF»
 			////////////////////////////////////////////////////////////////////////////////
 			// Input Fifo control variables
 			«FOR port : actor.inputs»
@@ -492,11 +470,11 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF !actor.outputs.filter[! native].nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Output FIFOs
-			«IF printMainFunc != true»
+«««			«IF printMainFunc != true»
 				«FOR port : actor.outputs.filter[! native]»
 					extern fifo_«port.type.doSwitch»_t *«port.fullName»;
 				«ENDFOR»
-			«ENDIF»
+«««			«ENDIF»
 			////////////////////////////////////////////////////////////////////////////////
 			// Output Fifo control variables
 			«FOR port : actor.outputs.filter[! native]»
@@ -618,13 +596,86 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Action scheduler
 		«printActorScheduler»
 		
-		«IF printMainFunc»
-			////////////////////////////////////////////////////////////////////////////////
-			// main
-			«printMain»
-		«ENDIF»
+«««		«IF printMainFunc»
+«««			////////////////////////////////////////////////////////////////////////////////
+«««			// main
+«««			«printMain»
+«««		«ENDIF»
 	'''
+	def protected getTopFileContent() '''
+		#include "xil_cache.h"
+		«IF measureTime»
+			#include "xtmrctr.h"
+			
+			#define TIMER_CNTR_0	0
+		«ENDIF»
+		
+		extern void xil_printf( const char *ctrl1, ...);	
+		extern void «entityName»_initialize();
+		extern int «entityName»_scheduler();
+		
+		//int main(int argc, char *argv[]) __attribute__((section(".compak")));
+		int main(int argc, char *argv[]) {
+			int i;
+			int stop = 0;
+			
+			«IF measureTime»
+				int Status;
+				u32 startTime, stopTime, acumTime = 0;
+				
+				XTmrCtr xtimer;
+				XTmrCtr* TmrCtrInstancePtr = &xtimer;
+				
+				Status = XTmrCtr_Initialize(TmrCtrInstancePtr, XPAR_TMRCTR_0_DEVICE_ID);
+				
+				if (Status != XST_SUCCESS) {
+					xil_printf("Init timer error\n");
+				}
+				
+				XTmrCtr_SetResetValue(TmrCtrInstancePtr, TIMER_CNTR_0, 0);
+				XTmrCtr_SetOptions(TmrCtrInstancePtr, TIMER_CNTR_0,
+									XTC_AUTO_RELOAD_OPTION |
+									XTC_CASCADE_MODE_OPTION);
+				XTmrCtr_Reset(TmrCtrInstancePtr, TIMER_CNTR_0);
+				XTmrCtr_Start(TmrCtrInstancePtr, TIMER_CNTR_0);
+			«ENDIF»
+			
+«««		    init_platform();
+«««			init_orcc(argc, argv);
+
+«««			microblaze_enable_icache();
+«««			microblaze_enable_dcache();
 	
+			«IF enableTest»
+				testInit();
+			«ENDIF»
+
+			«entityName»_initialize();
+
+			while(1) {
+«««			while((*execEnd) == 0) {
+				i = 0;
+				
+				«IF enableTest»
+					testScheduler();
+				«ENDIF»
+				«IF measureTime»
+				startTime = XTmrCtr_GetValue(TmrCtrInstancePtr, TIMER_CNTR_0);
+				«ENDIF»
+				i += «entityName»_scheduler();
+				«IF measureTime»
+				stopTime = XTmrCtr_GetValue(TmrCtrInstancePtr, TIMER_CNTR_0);
+				if(i!=0){
+					acumTime += (stopTime - startTime);
+				}
+				«ENDIF»
+				stop = stop || (i == 0);
+			}
+«««			xil_printf("Execution time %d\n", acumTime);
+			
+			return 0;
+		}
+	'''
 	
 	def protected getTestFileContent() '''
 		#include "ff.h"
@@ -677,5 +728,19 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«printTestScheduler»
 		
 	'''
+
+//	override caseInstCall(InstCall call) '''
+//		«IF call.print»
+//«««			printf(«call.arguments.printfArgs.join(", ")»);
+//		«ELSE»
+//			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[print]»);
+//		«ENDIF»
+//	'''
+
+	override protected declare(Procedure proc){
+		val modifier = if(proc.native) "extern" else "static"
+		if(proc.name != "print")
+		'''«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]»);'''
+	}
 }
 
