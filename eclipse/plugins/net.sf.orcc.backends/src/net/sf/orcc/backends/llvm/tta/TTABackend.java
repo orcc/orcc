@@ -166,9 +166,9 @@ public class TTABackend extends LLVMBackend {
 
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
 
-		networkTransfos.add(new TypeResizer(true, true, false, true));
 		networkTransfos.add(new DfVisitor<Expression>(
 				new ShortCircuitTransformation()));
+		networkTransfos.add(new TypeResizer(true, true, false, true));
 		networkTransfos.add(new DfVisitor<Void>(new SSATransformation()));
 		networkTransfos.add(new StringTransformation());
 		networkTransfos.add(new RenameTransformation(this.renameMap));
@@ -326,7 +326,8 @@ public class TTABackend extends LLVMBackend {
 	@Override
 	protected Result doGenerateActor(Actor actor) {
 		swActorPrinter.setProcessor(design.getActorToProcessorMap().get(actor));
-		return FilesManager.writeFile(swActorPrinter.getContent(actor),
+		swActorPrinter.setActor(actor);
+		return FilesManager.writeFile(swActorPrinter.getContent(),
 				actorsPath, actor.getName() + ".ll");
 	}
 

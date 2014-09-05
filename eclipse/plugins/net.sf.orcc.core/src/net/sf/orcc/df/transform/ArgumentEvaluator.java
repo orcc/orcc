@@ -31,7 +31,7 @@ package net.sf.orcc.df.transform;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
@@ -44,7 +44,7 @@ import net.sf.orcc.ir.util.ValueUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class ArgumentEvaluator extends DfSwitch<Void> {
+public class ArgumentEvaluator extends DfVisitor<Void> {
 
 	@Override
 	public Void caseInstance(Instance instance) {

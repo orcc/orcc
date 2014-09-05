@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.c.compa
 
-import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Pattern
@@ -36,7 +35,6 @@ import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
 import net.sf.orcc.ir.TypeList
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate and print instance source file for COMPA backend.
@@ -49,28 +47,13 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	private boolean printMainFunc
 	private boolean enableTest = false
 	
-	new(Map<String, Object> options, boolean printTop) {
-		super(options)
-		printMainFunc = !printTop
+	new() {
+		
 	}
 	
-	override protected print(String targetFolder) {
-		checkConnectivy
-
-		val content = fileContent
-		val testContent = testFileContent
-		val file = new File(targetFolder + File::separator + entityName + ".c")
-		val testFile = new File(targetFolder + File::separator + entityName + "_test.h")
-
-		if(actor.native) {
-//			OrccLogger::noticeln(entityName + " is native and not generated.")
-		} else if(needToWriteFile(content, file) || needToWriteFile(testContent, testFile)) {
-			OrccUtil::printFile(content, file)
-			OrccUtil::printFile(testContent, testFile)
-			return 0
-		} else {
-			return 1
-		}
+	def setOptions(Map<String, Object> options, boolean printTop) {
+		super.setOptions(options)
+		printMainFunc = !printTop
 	}
 	
 	override protected printStateLabel(State state) '''
@@ -79,11 +62,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				i += «entityName»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF state.outgoing.empty»
-<<<<<<< HEAD
-				printf("Stuck in state "«state.name»" in the instance «entityName»\n");
-=======
 				xil_printf("Stuck in state "«state.name»" in the instance «entityName»\n");
->>>>>>> bckendCOMPAmicroblaze
 				exit(1);
 			«ELSE»
 				«state.printStateTransitions»
@@ -183,11 +162,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					goto l_«state.name»;
 			«ENDFOR»
 			default:
-<<<<<<< HEAD
-				printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]);
-=======
 				xil_printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]);
->>>>>>> bckendCOMPAmicroblaze
 				exit(1);
 			}
 
@@ -410,7 +385,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	'''
 	
-	override protected getFileContent() '''
+	def getContent() '''
 		// Source file is "«actor.file»"
 
 		#include <stdio.h>
@@ -592,7 +567,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	'''
 	
 	
-	def protected getTestFileContent() '''
+	def getTestContent() '''
 		#include "ff.h"
 		#include "xparameters.h"
 		#include "platform.h"

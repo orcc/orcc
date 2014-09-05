@@ -193,7 +193,7 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 
-	def protected setInstance(Instance instance) {
+	def setInstance(Instance instance) {
 		if (!instance.isActor) {
 			throw new OrccRuntimeException("Instance " + entityName + " is not an Actor's instance")
 		}
@@ -210,7 +210,7 @@ class InstancePrinter extends CTemplate {
 		buildTransitionPattern
 	}
 
-	def protected setActor(Actor actor) {
+	def setActor(Actor actor) {
 		this.entityName = actor.name
 		this.actor = actor
 		this.attributable = actor

@@ -66,7 +66,7 @@ class ActorPrinter extends InstancePrinter {
 		super()
 	}
 
-	override protected setActor(Actor actor) {
+	override setActor(Actor actor) {
 		super.setActor(actor)
 
 		// Patterns and objects references lists are computed
@@ -78,7 +78,7 @@ class ActorPrinter extends InstancePrinter {
 		computeCastedList
 	}
 
-	override getContent(Instance instance) {
+	override setInstance(Instance instance) {
 		throw new UnsupportedOperationException("Jade backend is unable"+
 			" to generate code from Instances")
 	}
@@ -101,7 +101,7 @@ class ActorPrinter extends InstancePrinter {
 		return '''!«id»'''
 	}
 
-	override protected getFileContent() '''
+	override getContent() '''
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Generated from "«actor.name»"
 		declare i32 @printf(i8* noalias , ...) nounwind

@@ -218,13 +218,14 @@ public class LLVMBackend extends AbstractBackend {
 	@Override
 	protected Result doGenerateInstance(Instance instance) {
 		childrenPrinter.setInstance(instance);
-		return FilesManager.writeFile(childrenPrinter.getContent(instance),
-				srcPath, instance.getName() + ".ll");
+		return FilesManager.writeFile(childrenPrinter.getContent(), srcPath,
+				instance.getName() + ".ll");
 	}
 
 	@Override
 	protected Result doGenerateActor(Actor actor) {
-		return FilesManager.writeFile(childrenPrinter.getContent(actor),
-				srcPath, actor.getName() + ".ll");
+		childrenPrinter.setActor(actor);
+		return FilesManager.writeFile(childrenPrinter.getContent(), srcPath,
+				actor.getName() + ".ll");
 	}
 }
