@@ -64,7 +64,9 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 /**
  * C backend targeting high-level synthesis tools
  * 
- * @author Herve Yviquel and Mariem Abid
+ * @author Mariem Abid
+ * @author Khaled Jerbi
+ * @author Herve Yviquel
  */
 public class HLSBackend extends CBackend {
 

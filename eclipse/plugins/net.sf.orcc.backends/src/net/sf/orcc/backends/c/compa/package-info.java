@@ -27,10 +27,9 @@
  * SUCH DAMAGE.
  */
 /**
- * Provide a c backend without dependencies (SDL, pthread, etc.),
- * to allow source code produced to be compiled on HW platforms.
+ * Provides Java and Xtend classes for the implementation of a C backend dedicated 
+ * to Xilinx Zynq platforms.
  * 
  * @author Antoine Lorence
- *
  */
 package net.sf.orcc.backends.c.compa;

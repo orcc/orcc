@@ -42,9 +42,11 @@ import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
 
 /**
- * C backend targetting embedded systems
+ * C backend targeting rapid prototyping for embedded systems using Preesm.
+ * @see <a href="http://preesm.sourceforge.net/">Preesm website</a>
  * 
- * @author mpelcat
+ * @author Maxime Pelcat
+ * @author Karol Desnos
  */
 public class PreesmBackend extends AbstractBackend {
 
