@@ -62,11 +62,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				i += «entityName»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF state.outgoing.empty»
-<<<<<<< HEAD
-				printf("Stuck in state "«state.name»" in the instance «entityName»\n");
-=======
 				xil_printf("Stuck in state "«state.name»" in the instance «entityName»\n");
->>>>>>> bckendCOMPAmicroblaze
 				exit(1);
 			«ELSE»
 				«state.printStateTransitions»
@@ -166,11 +162,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					goto l_«state.name»;
 			«ENDFOR»
 			default:
-<<<<<<< HEAD
-				printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]);
-=======
 				xil_printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]);
->>>>>>> bckendCOMPAmicroblaze
 				exit(1);
 			}
 
