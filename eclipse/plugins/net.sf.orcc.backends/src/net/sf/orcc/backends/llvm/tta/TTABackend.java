@@ -249,8 +249,15 @@ public class TTABackend extends LLVMBackend {
 			result.merge(FilesManager.writeFile(
 					hwProcessorPrinter.getVhdl(tta), processorPath,
 					tta.getName() + ".vhd"));
+
 			// Print high-level description
-			tceProcessorPrinter.print(tta, processorPath);
+			result.merge(FilesManager.writeFile(
+					tceProcessorPrinter.getAdf(tta), processorPath,
+					tta.getName() + ".adf"));
+			result.merge(FilesManager.writeFile(
+					tceProcessorPrinter.getIdf(tta), processorPath,
+					tta.getName() + ".idf"));
+
 			// Print assembly code of actor-scheduler
 			result.merge(FilesManager.writeFile(
 					swProcessorPrinter.getContent(tta), processorPath,
@@ -327,8 +334,8 @@ public class TTABackend extends LLVMBackend {
 	protected Result doGenerateActor(Actor actor) {
 		swActorPrinter.setProcessor(design.getActorToProcessorMap().get(actor));
 		swActorPrinter.setActor(actor);
-		return FilesManager.writeFile(swActorPrinter.getContent(),
-				actorsPath, actor.getName() + ".ll");
+		return FilesManager.writeFile(swActorPrinter.getContent(), actorsPath,
+				actor.getName() + ".ll");
 	}
 
 }

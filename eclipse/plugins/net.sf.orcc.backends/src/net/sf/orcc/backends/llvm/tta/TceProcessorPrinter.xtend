@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.tta
 
-import java.io.File
 import net.sf.orcc.backends.llvm.tta.architecture.Bus
 import net.sf.orcc.backends.llvm.tta.architecture.ExprBinary
 import net.sf.orcc.backends.llvm.tta.architecture.ExprFalse
@@ -51,289 +50,238 @@ import net.sf.orcc.backends.llvm.tta.architecture.TermBool
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit
 import net.sf.orcc.backends.llvm.tta.architecture.Writes
 import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.common.util.EMap
 
 class TceProcessorPrinter extends TTAPrinter {
-	
+
 	EMap<String, Implementation> hwDb
 	val MAX_ADDRESS = Integer::MAX_VALUE;
-	
+
 	def setHwDb(EMap<String, Implementation> hwDb) {
 		this.hwDb = hwDb;
 	}
-	
-	def print(Processor processor, String targetFolder) {
-		val adfFile = new File(targetFolder + File::separator + processor.getName() + ".adf")
-		val idfFile = new File(targetFolder + File::separator + processor.getName() + ".idf")
-		val adfContent = processor.adf
-		val idfContent = processor.idf
-		var cached = 0
-		
-		if(needToWriteFile(adfContent, adfFile)) {
-			OrccUtil::printFile(adfContent, adfFile)
-		} else {
-			cached = cached + 1
-		}
-		if(needToWriteFile(idfContent, idfFile)) {
-			OrccUtil::printFile(idfContent, idfFile)
-		} else {
-			cached = cached + 1
-		}
-		
-		return cached
-	}
-		
-	def private getAdf(Processor processor)
-		'''
+
+	def getAdf(Processor processor) '''
 		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 		<adf version="1.7">
-			«FOR bus: processor.buses»
+			«FOR bus : processor.buses»
 				«bus.adf»
 			«ENDFOR»
-			«FOR socket: processor.sockets»
+			«FOR socket : processor.sockets»
 				«socket.adf»
 			«ENDFOR»
-			«FOR fu: processor.functionUnits»
+			«FOR fu : processor.functionUnits»
 				«fu.adf»
 			«ENDFOR»
-			«FOR rf: processor.registerFiles»
+			«FOR rf : processor.registerFiles»
 				«rf.adf»
 			«ENDFOR»
 			«processor.ROM.getAdf(processor, false)»
-			«FOR ram: processor.localRAMs»
+			«FOR ram : processor.localRAMs»
 				«ram.getAdf(processor, true)»
 			«ENDFOR»
-			«FOR ram: processor.sharedRAMs»
+			«FOR ram : processor.sharedRAMs»
 				«ram.getAdf(processor, true)»
 			«ENDFOR»
 			«processor.gcu?.adf»
 		</adf>
-		'''
-	
-	def private getAdf(Bus bus) 
-		'''
+	'''
+
+	def private getAdf(Bus bus) '''
 		<bus name="«bus.name»">
 			<width>«bus.width»</width>
-			«FOR guard: bus.guards»
+			«FOR guard : bus.guards»
 				<guard>
 					«guard.adfExpr»
 				</guard>
 			«ENDFOR»
-			«FOR segment: bus.segments»
+			«FOR segment : bus.segments»
 				«segment.adf»
 			«ENDFOR»
 			«bus.shortImmediate.adf»
 		</bus>
-		'''
-	
-	def private dispatch CharSequence getAdfExpr(ExprBinary expr) 
-		'''
-		«IF(expr.and)»<and-expr>«ELSE»<or-expr>«ENDIF»
+	'''
+
+	def private dispatch CharSequence getAdfExpr(ExprBinary expr) '''
+		«IF (expr.and)»<and-expr>«ELSE»<or-expr>«ENDIF»
 			«expr.e1.adfExpr»
 			«expr.e2.adfExpr»
-		«IF(expr.and)»</and-expr>«ELSE»</or-expr>«ENDIF»
-		'''
-	
-	def private dispatch CharSequence getAdfExpr(ExprUnary expr) 
-		'''
-		«IF(expr.simple)»<simple-expr>«ELSE»<inverted-expr>«ENDIF»
+		«IF (expr.and)»</and-expr>«ELSE»</or-expr>«ENDIF»
+	'''
+
+	def private dispatch CharSequence getAdfExpr(ExprUnary expr) '''
+		«IF (expr.simple)»<simple-expr>«ELSE»<inverted-expr>«ENDIF»
 			«expr.term.adfTerm»
-		«IF(expr.simple)»</simple-expr>«ELSE»</inverted-expr>«ENDIF»
-		'''
-	
-	def private dispatch CharSequence getAdfExpr(ExprFalse object) 
-		'''
+		«IF (expr.simple)»</simple-expr>«ELSE»</inverted-expr>«ENDIF»
+	'''
+
+	def private dispatch CharSequence getAdfExpr(ExprFalse object) '''
 		<always-false/>
-		'''
-	
-	def private dispatch CharSequence getAdfExpr(ExprTrue object) 
-		'''
+	'''
+
+	def private dispatch CharSequence getAdfExpr(ExprTrue object) '''
 		<always-true/>
-		'''
-		
-	def private dispatch getAdfTerm(TermBool term)
-		'''
+	'''
+
+	def private dispatch getAdfTerm(TermBool term) '''
 		<bool>
 			<name>«term.register.name»</name>
 			<index>«term.index»</index>
 		</bool>
-		'''
-	
-	def private dispatch getAdfTerm(TermUnit term)
-		'''
+	'''
+
+	def private dispatch getAdfTerm(TermUnit term) '''
 		<unit>
 			<name>«term.functionUnit.name»</name>
 			<port>«term.port.name»</port>
 		</unit>
-		'''
-		
-	def private dispatch getAdfElement(Reads element)
-		'''
+	'''
+
+	def private dispatch getAdfElement(Reads element) '''
 		«val Operation op = element.eContainer as Operation»
 		<reads name="«op.portToIndexMap.get(element.port)»">
 			<start-cycle>«element.startCycle»</start-cycle>
 			<cycles>«element.cycles»</cycles>
 		</reads>
-		'''
+	'''
 
-	def private dispatch getAdfElement(Writes element) 
-		'''
+	def private dispatch getAdfElement(Writes element) '''
 		«val Operation op = element.eContainer as Operation»
 		<writes name="«op.portToIndexMap.get(element.port)»">
 			<start-cycle>«element.startCycle»</start-cycle>
 			<cycles>«element.cycles»</cycles>
 		</writes>
-		'''
+	'''
 
-	def private dispatch getAdfElement(Resource element)
-		'''
+	def private dispatch getAdfElement(Resource element) '''
 		<resource name="«element.name»">
 			<start-cycle>«element.startCycle»</start-cycle>
 			<cycles>«element.cycles»</cycles>
 		</resource>
-		'''
-	
-	
-	def private getAdf(FuPort port, boolean needWidth, boolean isSpecial) 
-		'''
-		<«IF(isSpecial)»special-«ENDIF»port name="«port.name»">
+	'''
+
+	def private getAdf(FuPort port, boolean needWidth, boolean isSpecial) '''
+		<«IF (isSpecial)»special-«ENDIF»port name="«port.name»">
 			«port.inputSocket?.connect»
 			«port.outputSocket?.connect»
-			«IF(needWidth)»<width>«port.width»</width>«ENDIF»
-			«IF(port.trigger)»<triggers/>«ENDIF»
-			«IF(port.opcodeSelector)»<sets-opcode/>«ENDIF»
-		</«IF(isSpecial)»special-«ENDIF»port>
-		'''
-	
-	def private getAdf(FunctionUnit fu) 
-		'''
+			«IF (needWidth)»<width>«port.width»</width>«ENDIF»
+			«IF (port.trigger)»<triggers/>«ENDIF»
+			«IF (port.opcodeSelector)»<sets-opcode/>«ENDIF»
+		</«IF (isSpecial)»special-«ENDIF»port>
+	'''
+
+	def private getAdf(FunctionUnit fu) '''
 		<function-unit name="«fu.name»">
-			«FOR port: fu.ports»
+			«FOR port : fu.ports»
 				«port.getAdf(true, false)»
 			«ENDFOR»
-			«FOR operation: fu.operations»
+			«FOR operation : fu.operations»
 				«operation.getAdf(false)»
 			«ENDFOR»
 			«fu.addressSpace.connect»
 		</function-unit>
-		'''
-	
-	def private getAdf(GlobalControlUnit gcu) 
-		'''
+	'''
+
+	def private getAdf(GlobalControlUnit gcu) '''
 		<global-control-unit name="«gcu.name»">
-			«FOR port: gcu.ports»
+			«FOR port : gcu.ports»
 				«port.getAdf(true, false)»
 			«ENDFOR»
 			«gcu.returnAddress.getAdf(true, true)»
 			<return-address>«gcu.returnAddress.name»</return-address>
-			«FOR operation: gcu.operations»
+			«FOR operation : gcu.operations»
 				«operation.getAdf(true)»
 			«ENDFOR»
 			<address-space>«gcu.addressSpace.name»</address-space>
 			<delay-slots>«gcu.delaySlots»</delay-slots>
 			<guard-latency>«gcu.guardLatency»</guard-latency>
 		</global-control-unit>
-		'''
-	
-	def private getAdf(Operation operation, boolean isControl) 
-		'''
-		<«IF(isControl)»ctrl-«ENDIF»operation>
+	'''
+
+	def private getAdf(Operation operation, boolean isControl) '''
+		<«IF (isControl)»ctrl-«ENDIF»operation>
 			<name>«operation.name»</name>
-			«FOR port: operation.ports»
+			«FOR port : operation.ports»
 				<bind name="«operation.portToIndexMap.get(port)»">«port.name»</bind>
 			«ENDFOR»
 			<pipeline>
-				«FOR element: operation.pipeline»
+				«FOR element : operation.pipeline»
 					«element.adfElement»
 				«ENDFOR»
 			</pipeline>
-		</«IF(isControl)»ctrl-«ENDIF»operation>
-		'''
-	
-	def private getAdf(RegisterFile rf) 
-		'''
+		</«IF (isControl)»ctrl-«ENDIF»operation>
+	'''
+
+	def private getAdf(RegisterFile rf) '''
 		<register-file name="«rf.name»">
 			<type>normal</type>
 			<size>«rf.size»</size>
 			<width>«rf.width»</width>
 			<max-reads>«rf.maxReads»</max-reads>
 			<max-writes>«rf.maxWrites»</max-writes>
-			«FOR port: rf.ports»
+			«FOR port : rf.ports»
 				«port.getAdf(false, false)»
 			«ENDFOR»
 		</register-file>
-		'''
-	
-	def private getAdf(Socket socket) 
-		'''
+	'''
+
+	def private getAdf(Socket socket) '''
 		<socket name="«socket.name»">
-			«FOR segment: socket.connectedSegments»
+			«FOR segment : socket.connectedSegments»
 				«segment.connect(socket)»
 			«ENDFOR»
 		</socket>
-		'''
-	
+	'''
+
 	def private getAdf(Memory addressSpace, Processor processor, boolean isRAM) {
-		val maxAddress = 
-			if(addressSpace.maxAddress < 0 || addressSpace.maxAddress > MAX_ADDRESS) {
-				OrccLogger::warnln("Address-space '" 
-					+ addressSpace.name + "' of " + processor.name 
-					+ " exceeds the maximal size."
+		val maxAddress = if (addressSpace.maxAddress < 0 || addressSpace.maxAddress > MAX_ADDRESS) {
+				OrccLogger::warnln(
+					"Address-space '" + addressSpace.name + "' of " + processor.name + " exceeds the maximal size."
 				)
 				MAX_ADDRESS
 			} else {
 				addressSpace.maxAddress
 			}
 		'''
-		<address-space name="«addressSpace.name»">
-			<width>«addressSpace.wordWidth»</width>
-			<min-address>«addressSpace.minAddress»</min-address>
-			<max-address>«maxAddress»</max-address>
-			<shared-memory>«addressSpace.shared»</shared-memory>
-			«IF(isRAM)»<numerical-id>«processor.memToAddrSpaceIdMap.get(addressSpace)»</numerical-id>«ENDIF»
-		</address-space>
+			<address-space name="«addressSpace.name»">
+				<width>«addressSpace.wordWidth»</width>
+				<min-address>«addressSpace.minAddress»</min-address>
+				<max-address>«maxAddress»</max-address>
+				<shared-memory>«addressSpace.shared»</shared-memory>
+				«IF (isRAM)»<numerical-id>«processor.memToAddrSpaceIdMap.get(addressSpace)»</numerical-id>«ENDIF»
+			</address-space>
 		'''
 	}
-		
-	def private getAdf(Segment segment) 
-		'''
+
+	def private getAdf(Segment segment) '''
 		<segment name="«segment.name»">
 			<writes-to/>
 		</segment>
-		'''
+	'''
 
-	def private getAdf(ShortImmediate shortImmediate) 
-		'''
+	def private getAdf(ShortImmediate shortImmediate) '''
 		<short-immediate>
 			<extension>zero</extension>
 			<width>«shortImmediate.width»</width>
 		</short-immediate>
-		'''
-		
-	def private connect(Segment segment, Socket socket)
-		'''
-		«IF(socket.input)»<reads-from>«ELSE»<writes-to>«ENDIF»
+	'''
+
+	def private connect(Segment segment, Socket socket) '''
+		«IF (socket.input)»<reads-from>«ELSE»<writes-to>«ENDIF»
 			<bus>«segment.bus.name»</bus>
 			<segment>«segment.name»</segment>
-		«IF(socket.input)»</reads-from>«ELSE»</writes-to>«ENDIF»
-		'''
-		
-	def private connect(Socket socket)
-		'''
-		<connects-to>«socket.name»</connects-to>
-		'''
-		
-	def private connect(Memory addressSpace)
-		'''
-		«IF(addressSpace == null)»<address-space/>«ELSE»<address-space>«addressSpace.name»</address-space>«ENDIF»
-		'''
-		
+		«IF (socket.input)»</reads-from>«ELSE»</writes-to>«ENDIF»
+	'''
 
-		
-		
-	def private getIdf(Processor processor)
-		'''
+	def private connect(Socket socket) '''
+		<connects-to>«socket.name»</connects-to>
+	'''
+
+	def private connect(Memory addressSpace) '''
+		«IF (addressSpace == null)»<address-space/>«ELSE»<address-space>«addressSpace.name»</address-space>«ENDIF»
+	'''
+
+	def getIdf(Processor processor) '''
 		<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 		<adf-implementation>
 			
@@ -343,42 +291,42 @@ class TceProcessorPrinter extends TTAPrinter {
 				<hdb-file>asic_130nm_1.5V.hdb</hdb-file>
 			</ic-decoder-plugin>
 			
-			«FOR fu: processor.functionUnits»
+			«FOR fu : processor.functionUnits»
 				«fu.idf»
 			«ENDFOR»
-			«FOR rf: processor.registerFiles»
+			«FOR rf : processor.registerFiles»
 				«rf.idf»
 			«ENDFOR»
 			
 		</adf-implementation>
-		'''
+	'''
 
 	def private getIdf(FunctionUnit fu) {
 		val impl = hwDb.get(fu.implementation)
-		if(impl == null){
-			OrccLogger::noticeln("Unknown implementation of " + fu.name + 
-			", the design will not be able to be generated.")
+		if (impl == null) {
+			OrccLogger::noticeln(
+				"Unknown implementation of " + fu.name + ", the design will not be able to be generated.")
 		} else {
 			'''
-			<fu name="«fu.name»">
-				<hdb-file>«impl.hdbFile»</hdb-file>
-				<fu-id>«impl.id»</fu-id>
-			</fu>
+				<fu name="«fu.name»">
+					<hdb-file>«impl.hdbFile»</hdb-file>
+					<fu-id>«impl.id»</fu-id>
+				</fu>
 			'''
 		}
 	}
 
 	def private getIdf(RegisterFile rf) {
 		val impl = hwDb.get(rf.implementation)
-		if(impl == null){
-			OrccLogger::noticeln("Unknown implementation of " + rf.name + 
-			", the design will not be able to be generated.")
+		if (impl == null) {
+			OrccLogger::noticeln(
+				"Unknown implementation of " + rf.name + ", the design will not be able to be generated.")
 		} else {
 			'''
-			<rf name="«rf.name»">
-				<hdb-file>«impl.hdbFile»</hdb-file>
-			    <rf-id>«impl.id»</rf-id>
-			</rf>
+				<rf name="«rf.name»">
+					<hdb-file>«impl.hdbFile»</hdb-file>
+					   <rf-id>«impl.id»</rf-id>
+				</rf>
 			'''
 		}
 	}
