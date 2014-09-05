@@ -29,15 +29,13 @@
 package net.sf.orcc.backends.c.compa;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
+import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
@@ -48,35 +46,83 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.XdfWriter;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 /**
- * C backend targeting hardware platforms
+ * C backend targeting Xilinx Zynq platforms
  * 
  * @author Antoine Lorence
+ * @author Yaset Oliva
  */
 public class COMPABackend extends CBackend {
-	final boolean printTop = true;
-	
+
+	final boolean printTop = false;
+
+	// FIXME: The map should be declare as class member of CBackend
+	protected final Map<String, String> renameMap;
+
+	private NetworkPrinter netPrinter;
+	private InstancePrinter childrenPrinter;
+	private CMakePrinter cmakePrinter;
+
+	private Mapping computedMapping;
+
+	public COMPABackend() {
+
+		// Configure the map used in RenameTransformation
+		renameMap = new HashMap<String, String>();
+		renameMap.put("abs", "abs_replaced");
+		renameMap.put("getw", "getw_replaced");
+		renameMap.put("exit", "exit_replaced");
+		renameMap.put("index", "index_replaced");
+		renameMap.put("log2", "log2_replaced");
+		renameMap.put("max", "max_replaced");
+		renameMap.put("min", "min_replaced");
+		renameMap.put("select", "select_replaced");
+		renameMap.put("OUT", "OUT_REPLACED");
+		renameMap.put("IN", "IN_REPLACED");
+		renameMap.put("SIZE", "SIZE_REPLACED");
+
+		netPrinter = new NetworkPrinter();
+		childrenPrinter = new InstancePrinter();
+		cmakePrinter = new CMakePrinter();
+	}
+
 	@Override
 	protected void doInitializeOptions() {
-//		// Create empty folders
-//		new File(path + File.separator + "build").mkdirs();
-//		new File(path + File.separator + "bin").mkdirs();
-//
-		srcPath = path + File.separator + "src";
+		// Configure the options used in code generation
+		netPrinter.setOptions(getOptions());
+		childrenPrinter.setOptions(getOptions(), printTop);
+
+		// Create the directory tree
+		new File(path, "src").mkdir();
+		srcPath = new File(path, "src").toString();
+
+		// -----------------------------------------------------
+		// Transformations that will be applied on the Network
+		// -----------------------------------------------------
+		networkTransfos.add(new Instantiator(true));
+		networkTransfos.add(new NetworkFlattener());
+		networkTransfos.add(new UnitImporter());
+		networkTransfos.add(new UnitImporter());
+
+		networkTransfos.add(new CBroadcastAdder());
+		networkTransfos.add(new ArgumentEvaluator());
+		// networkTransfos.add(new XdfExtender());
+
+		// -----------------------------------------------------
+		// Transformations that will be applied on Actors
+		// -----------------------------------------------------
+		networkTransfos.add(new TypeResizer(true, false, true, false));
+		networkTransfos.add(new RenameTransformation(renameMap));
+		networkTransfos.add(new DisconnectedOutputPortRemoval());
 	}
-	
-	
+
 	@Override
 	protected Result doLibrariesExtraction() {
 		OrccLogger.trace("Export libraries sources");
@@ -85,131 +131,109 @@ public class COMPABackend extends CBackend {
 
 		return result;
 	}
-	
+
 	@Override
-	protected void doTransformActor(Actor actor) {
-		Map<String, String> replacementMap = new HashMap<String, String>();
-		replacementMap.put("abs", "abs_replaced");
-		replacementMap.put("getw", "getw_replaced");
-		replacementMap.put("exit", "exit_replaced");
-		replacementMap.put("index", "index_replaced");
-		replacementMap.put("log2", "log2_replaced");
-		replacementMap.put("max", "max_replaced");
-		replacementMap.put("min", "min_replaced");
-		replacementMap.put("select", "select_replaced");
-		replacementMap.put("OUT", "OUT_REPLACED");
-		replacementMap.put("IN", "IN_REPLACED");
-		replacementMap.put("SIZE", "SIZE_REPLACED");
+	protected void doValidate(Network network) {
+		Validator.checkTopLevel(network);
+		Validator.checkMinimalFifoSize(network, fifoSize);
 
-		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new TypeResizer(true, false, true, false));
-		transformations.add(new RenameTransformation(replacementMap));
-		transformations.add(new DisconnectedOutputPortRemoval());
+		network.computeTemplateMaps();
 
-		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(actor);
-			if (debug) {
-				OrccUtil.validateObject(transformation.toString() + " on "
-						+ actor.getName(), actor);
-			}
-		}
+		// Compute the actor mapping
+		computedMapping = new Mapping(network, mapping);
+
+		// update "vectorizable" information
+		Alignable.setAlignability(network);
 	}
 
 	@Override
-	protected void doTransformNetwork(Network network) {
-		// instantiate and flattens network
-		OrccLogger.traceln("Instantiating...");
-		new Instantiator(true).doSwitch(network);
-		OrccLogger.traceln("Flattening...");
-		new NetworkFlattener().doSwitch(network);
-		new UnitImporter().doSwitch(network);
+	protected Result doGenerateNetwork(Network network) {
+		final Result result = Result.newInstance();
 
-		new CBroadcastAdder().doSwitch(network);
-		new ArgumentEvaluator().doSwitch(network);
+		// Configure the network
+		netPrinter.setNetwork(network);
+		netPrinter.setOptions(getOptions());
 
-		//new XdfExtender().doSwitch(network);
+		result.merge(FilesManager.writeFile(netPrinter.getFifoContent(), path
+				+ "/libs/orcc/include", "fifoAllocations.h"));
+		if (printTop) {
+			result.merge(FilesManager.writeFile(netPrinter.getContent(),
+					srcPath, network.getSimpleName() + ".c"));
+		}
+
+		return result;
+	}
+
+	@Override
+	protected Result doAdditionalGeneration(Network network) {
+		final Result result = Result.newInstance();
+
+		OrccLogger.traceln("Print flattened and attributed network...");
+		new XdfWriter().write(new File(srcPath), network);
+
+		OrccLogger.traceln("Print network meta-informations...");
+		result.merge(FilesManager.writeFile(computedMapping.getContentFile(),
+				srcPath, network.getSimpleName() + ".xcf"));
+
+		return result;
+	}
+
+	@Override
+	protected Result doGenerateInstance(Instance instance) {
+		final Result result = Result.newInstance();
+		childrenPrinter.setInstance(instance);
+
+		if (printTop) {
+			result.merge(FilesManager.writeFile(childrenPrinter.getContent(),
+					srcPath, instance.getName() + ".c"));
+			result.merge(FilesManager.writeFile(
+					childrenPrinter.getTestContent(), srcPath,
+					instance.getName() + "_test.h"));
+		} else {
+			String childPath = OrccUtil.createFolder(path,
+					instance.getSimpleName());
+			result.merge(FilesManager.writeFile(childrenPrinter.getContent(),
+					childPath, instance.getName() + ".c"));
+			result.merge(FilesManager.writeFile(
+					childrenPrinter.getTestContent(), childPath,
+					instance.getName() + "_test.h"));
+			result.merge(FilesManager.writeFile(
+					cmakePrinter.rootCMakeContent(instance.getSimpleName()),
+					childPath, "CMakeLists.txt"));
+		}
+
+		return result;
 	}
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		Validator.checkTopLevel(network);
-		Validator.checkMinimalFifoSize(network, fifoSize);
+		// FIXME: Override until the C back-end is migrated
+	}
 
-		doTransformNetwork(network);
+	@Override
+	protected Result doGenerateActor(Actor actor) {
+		final Result result = Result.newInstance();
+		childrenPrinter.setActor(actor);
 
-		if (debug) {
-			// Serialization of the actors will break proxy link
-			EcoreUtil.resolveAll(network);
-		}
-
-		transformActors(network.getAllActors());
-		network.computeTemplateMaps();
-
-		// print instances
-		printChildren(network);
-		
-		// Print fifo allocation file into the orcc lib include folder.
-		OrccLogger.trace("Printing the fifo allocation file... ");
-		if (new NetworkPrinter(network, getOptions()).printFifoFile(path + "/libs/orcc/include") > 0) {
-			OrccLogger.traceRaw("Cached\n");
+		if (printTop) {
+			result.merge(FilesManager.writeFile(childrenPrinter.getContent(),
+					srcPath, actor.getName() + ".c"));
+			result.merge(FilesManager.writeFile(
+					childrenPrinter.getTestContent(), srcPath, actor.getName()
+							+ "_test.h"));
 		} else {
-		OrccLogger.traceRaw("Done\n");
-		}
-			
-		if (printTop){
-			// print network
-			OrccLogger.trace("Printing network... ");
-			if (new NetworkPrinter(network, getOptions()).print(srcPath) > 0) {
-				OrccLogger.traceRaw("Cached\n");
-			} else {
-				OrccLogger.traceRaw("Done\n");
-			}			
-		}
-
-		OrccLogger.traceln("Print flattened and attributed network...");
-		URI uri = URI.createFileURI(srcPath + File.separator
-				+ network.getSimpleName() + ".xdf");
-		Resource resource = currentResourceSet.createResource(uri);
-		resource.getContents().add(network);
-		try {
-			resource.save(null);
-		} catch (IOException e) {
-			e.printStackTrace();
+			String childPath = OrccUtil.createFolder(path,
+					actor.getSimpleName());
+			result.merge(FilesManager.writeFile(childrenPrinter.getContent(),
+					childPath, actor.getName() + ".c"));
+			result.merge(FilesManager.writeFile(
+					childrenPrinter.getTestContent(), childPath,
+					actor.getName() + "_test.h"));
+			result.merge(FilesManager.writeFile(
+					cmakePrinter.rootCMakeContent(actor.getSimpleName()),
+					childPath, "CMakeLists.txt"));
 		}
 
-		OrccLogger.traceln("Print network meta-informations...");
-		final CharSequence content = new Mapping(network, mapping).getContentFile();
-		FilesManager.writeFile(content, srcPath, network.getSimpleName() + ".xcf");
-	}
-
-
-	@Override
-	protected boolean printInstance(Instance instance) {
-//		// Copy Xilinx platform specific files into the instance source folder.
-//		OrccLogger.trace("Copying Xilinx platform files... ");
-//		final boolean xilFilesOk = copyFolderToFileSystem("/runtime/COMPA/xilinx",	path + File.separator + instance.getSimpleName(), debug);
-//		if (xilFilesOk) {
-//			OrccLogger.traceRaw("OK" + "\n");
-//		} else {
-//			OrccLogger.warnRaw("Error" + "\n");
-//		}
-		if (printTop)
-			return new InstancePrinter(getOptions(), printTop).print(srcPath, instance) > 0;
-		else {
-			CharSequence content = new CMakePrinter().rootCMakeContent(instance.getSimpleName());
-			FilesManager.writeFile(content, path + File.separator + instance.getSimpleName(), "CMakeLists.txt");
-			return new InstancePrinter(getOptions(), printTop).print(path + File.separator + instance.getSimpleName(), instance) > 0;
-		}
-	}
-	
-	@Override
-	protected boolean printActor(Actor actor) {
-		if (printTop)
-			return new InstancePrinter(getOptions(), printTop).print(srcPath, actor) > 0;
-		else {
-			CharSequence content = new CMakePrinter().rootCMakeContent(actor.getSimpleName());
-			FilesManager.writeFile(content, path + File.separator + actor.getSimpleName(), "CMakeLists.txt");
-			return new InstancePrinter(getOptions(), printTop).print(path + File.separator + actor.getSimpleName(), actor) > 0;
-		}
+		return result;
 	}
 }

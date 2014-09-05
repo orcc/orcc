@@ -48,10 +48,13 @@ import static net.sf.orcc.backends.BackendsConstants.*
  */
 class NetworkPrinter extends CTemplate {
 	
-	protected val Network network;
+	protected var Network network;
 	
 	protected var boolean profile = false	
 	protected var boolean newSchedul = false
+	
+	new() {
+	}
 	
 	new(Network network, Map<String, Object> options) {
 		super(options)

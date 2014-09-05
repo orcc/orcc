@@ -28,11 +28,8 @@
  */
 package net.sf.orcc.backends.c.compa
 
-import java.io.File
-import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate and print network source file for COMPA backend.
@@ -45,11 +42,15 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 //	int memoryBaseAddr = 0x30000000
 	int memoryBaseAddr = 0x40000000
 	
-	new(Network network, Map<String, Object> options) {
-		super(network, options)
+	new() {
+		super()
+	}
+	
+	def setNetwork(Network network) {
+		this.network = network
 	}
 
-	override protected getNetworkFileContent() '''
+	def getContent() '''
 		// Generated from "«network.name»"
 
 		#include <locale.h>
@@ -122,20 +123,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 		}
 	'''
 
-	def printFifoFile(String targetFolder){
-		val content = fifoFileContent
-		val file = new File(targetFolder + File::separator + "fifoAllocations.h")
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
-
-
-	def private getFifoFileContent()'''
+	def getFifoContent()'''
 		// Generated from "«network.name»"
 
 		#include "types.h"
