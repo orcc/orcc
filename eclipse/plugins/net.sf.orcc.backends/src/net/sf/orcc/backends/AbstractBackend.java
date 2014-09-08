@@ -133,9 +133,11 @@ import org.osgi.framework.Bundle;
  * <ol>
  * <li>{@link #doValidate(Network)} checks some constraints on the given network
  * </li>
+ * <li>{@link #beforeGeneration(Network)} can be used to perform some additional operations</li>
  * <li>{@link #doGenerateNetwork(Network)} produces code from the given network</li>
  * <li>{@link #doAdditionalGeneration(Network)} can be used to generate other
  * files from the given network</li>
+ * <li>{@link #beforeGeneration(Actor)} or {@link #beforeGeneration(Instance)}</li>
  * <li>{@link #doGenerateActor(Actor)} or {@link #doGenerateInstance(Instance)}</li>
  * <li>{@link #doAdditionalGeneration(Actor)} or
  * {@link #doAdditionalGeneration(Instance)}</li>
@@ -335,6 +337,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			}
 
 			stopIfRequested();
+			beforeGeneration(network);
+
+			stopIfRequested();
 			OrccLogger.traceln("Network validation");
 			doValidate(network);
 
@@ -385,6 +390,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			final long t0 = System.currentTimeMillis();
 			final Result result = Result.newInstance();
 			for (final Actor actor : actors) {
+				beforeGeneration(actor);
 				result.merge(doGenerateActor(actor));
 				result.merge(doAdditionalGeneration(actor));
 			}
@@ -412,12 +418,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				final Instance instance = vertex.getAdapter(Instance.class);
 				final Actor actor = vertex.getAdapter(Actor.class);
 				if (instance != null) {
+					beforeGeneration(instance);
 					result.merge(doGenerateInstance(instance));
 					result.merge(doAdditionalGeneration(instance));
 
 					// For backward compatibility only
 					printInstance(instance);
 				} else if (actor != null) {
+					beforeGeneration(actor);
 					result.merge(doGenerateActor(actor));
 					result.merge(doAdditionalGeneration(instance));
 
@@ -492,6 +500,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	@Deprecated
 	protected void doXdfCodeGeneration(Network network) {
+	}
+
+	/**
+	 * Callback called before network generation, just after network
+	 * transformations. It can be used to perform additional transformations,
+	 * validations, or other operations at network level.
+	 * 
+	 * @param network
+	 */
+	protected void beforeGeneration(final Network network) {
+		// Does nothing by default
 	}
 
 	/**
@@ -677,6 +696,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
+	 * Callback called before actor generation, just after actors
+	 * transformations. It can be used to perform additional transformations,
+	 * validations, or other operations at actor level.
+	 * 
+	 * @param actor
+	 */
+	protected void beforeGeneration(final Actor actor) {
+		// Does nothing by default
+	}
+
+	/**
 	 * This method may be implemented by subclasses to do the code generation at
 	 * actor level. It will automatically be called at code generation time by
 	 * VTL back-ends and by standard back-ends (if network has been fully
@@ -753,6 +783,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	@Deprecated
 	protected boolean printInstance(Instance instance) {
 		return false;
+	}
+
+	/**
+	 * Callback called before instance generation, just after instances
+	 * transformations. It can be used to perform additional transformations,
+	 * validations, or other operations at instance level.
+	 * 
+	 * @param instance
+	 */
+	protected void beforeGeneration(final Instance instance) {
+		// Does nothing by default
 	}
 
 	/**
