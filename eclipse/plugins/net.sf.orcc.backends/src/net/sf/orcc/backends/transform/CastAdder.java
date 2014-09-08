@@ -57,7 +57,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
@@ -66,6 +65,7 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.ir.util.TypeUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.BasicEList;
@@ -144,15 +144,7 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		Type oldParentType = parentType;
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
-		if (isTypeReducer(expr.getOp())) {
-			// FIXME: Probably a better solution
-			expr.setType(IrUtil.copy(getBigger(e1.getType(), e2.getType())));
-		}
-		if (expr.getOp().isComparison()) {
-			parentType = getBigger(e1.getType(), e2.getType());
-		} else {
-			parentType = expr.getType();
-		}
+		parentType = TypeUtil.getCompatibleType(expr);
 		expr.setE1(doSwitch(e1));
 		expr.setE2(doSwitch(e2));
 		parentType = oldParentType;
@@ -324,7 +316,8 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 						}
 
 						// target name and type are updated
-						Var target = procedure.newTempLocalVariable(targetType, "casted_32_" + source.getName());
+						Var target = procedure.newTempLocalVariable(targetType,
+								"casted_32_" + source.getName());
 						target.setType(targetType);
 
 						// Update variable used in call parameter
@@ -519,24 +512,6 @@ public class CastAdder extends AbstractIrVisitor<Expression> {
 		}
 		expressions.clear();
 		expressions.addAll(newExpressions);
-	}
-
-	private Type getBigger(Type type1, Type type2) {
-		if (type1.getSizeInBits() < type2.getSizeInBits()) {
-			return type2;
-		} else {
-			return type1;
-		}
-	}
-
-	private boolean isTypeReducer(OpBinary op) {
-		switch (op) {
-		case SHIFT_RIGHT:
-		case MOD:
-			return true;
-		default:
-			return false;
-		}
 	}
 
 	protected boolean needCast(Type type1, Type type2) {

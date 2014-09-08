@@ -140,18 +140,14 @@ abstract class LLVMTemplate extends CommonPrinter {
 		val op = expr.op
 		val e1 = expr.e1
 		val e2 = expr.e2
-		var Type type
 		
-		if (op == OpBinary::SHIFT_RIGHT) {
-			type = e1.type;
-		} else {
-			type = TypeUtil.getLub(e1.type, e2.type);
-		}
+		val Type type = TypeUtil.getCompatibleType(expr);
 		if (type == null) {
 			throw new OrccRuntimeException(
 				"Type mismatch: cannot evaluate the least upper bound between " 
 				+ e1.type + " and " + e2.type);
 		}
+		
 
 		signed = !type.uint
 		floating = type.float

@@ -31,6 +31,7 @@ package net.sf.orcc.ir.util;
 import java.math.BigInteger;
 import java.util.Iterator;
 
+import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -429,6 +430,53 @@ public class TypeUtil {
 		case LOGIC_OR:
 			return IrFactory.eINSTANCE.createTypeBool();
 
+		default:
+			return null;
+		}
+	}
+
+	/**
+	 * Returns the compatible type of the operands of a binary expression.
+	 * 
+	 * @param expr
+	 *            the expression binary
+	 * @return the compatible type of the binary expression, or
+	 *         <code>null</code>
+	 */
+	public static Type getCompatibleType(ExprBinary expr) {
+		OpBinary op = expr.getOp();
+		Type texpr = expr.getType();
+		Type t1 = expr.getE1().getType();
+		Type t2 = expr.getE2().getType();
+
+		if (t1 == null || t2 == null) {
+			return null;
+		}
+
+		switch (op) {
+		case BITAND:
+		case BITOR:
+		case BITXOR:
+		case TIMES:
+		case MINUS:
+		case PLUS:
+		case DIV:
+		case DIV_INT:
+		case SHIFT_RIGHT:
+		case MOD:
+		case SHIFT_LEFT:
+			return EcoreUtil.copy(texpr);
+		case EQ:
+		case GE:
+		case GT:
+		case LE:
+		case LT:
+		case NE:
+		case LOGIC_AND:
+		case LOGIC_OR:
+			return createType(t1, t2, Lub.instance);
+
+		case EXP:
 		default:
 			return null;
 		}
