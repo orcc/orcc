@@ -36,6 +36,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.XdfParser;
@@ -173,6 +174,7 @@ public class XdfResourceImpl extends ResourceImpl {
 				return getConnection(network, fragment);
 			} else {
 				int index = fragment.lastIndexOf('.') + 1;
+				// The old objects paths style
 				if (!Character.isDigit(fragment.charAt(index))) {
 					String name = fragment.substring(index);
 					if (fragment.startsWith("inputs.")) {
@@ -186,7 +188,9 @@ public class XdfResourceImpl extends ResourceImpl {
 					} else if (fragment.startsWith("variables.")) {
 						return network.getVariable(name);
 					}
-				} else {
+				}
+				// The new objects paths style
+				else {
 					final int idx = Integer.parseInt(fragment.substring(index));
 					if (fragment.startsWith("inputs.")) {
 						return network.getInputs().get(idx);
@@ -200,5 +204,34 @@ public class XdfResourceImpl extends ResourceImpl {
 		}
 
 		return super.getEObject(uriFragment);
+	}
+
+	@Override
+	public String getURIFragment(EObject eObject) {
+		if(eObject.eContainer() instanceof Network) {
+			final Network network = (Network) eObject.eContainer();
+
+			final StringBuilder fragment = new StringBuilder("//@");
+			// We customize fragments only for instances and ports
+			if(eObject instanceof Port) {
+				final Port port = (Port) eObject;
+
+				if(network.getInputs().contains(port)) {
+					fragment.append("inputs.");
+					fragment.append(network.getInputs().indexOf(port));
+				} else if (network.getOutputs().contains(port)) {
+					fragment.append("outputs.");
+					fragment.append(network.getOutputs().indexOf(port));
+				}
+				return fragment.toString();
+			} else if (eObject instanceof Instance) {
+				final Instance instance = (Instance) eObject;
+				fragment.append("instances.");
+				fragment.append(network.getChildren().indexOf(instance));
+				return fragment.toString();
+			}
+		}
+
+		return super.getURIFragment(eObject);
 	}
 }
