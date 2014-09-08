@@ -63,9 +63,6 @@ public class COMPABackend extends CBackend {
 
 	final boolean printTop = false;
 
-	// FIXME: The map should be declare as class member of CBackend
-	protected final Map<String, String> renameMap;
-
 	private NetworkPrinter netPrinter;
 	private InstancePrinter childrenPrinter;
 	private CMakePrinter cmakePrinter;
@@ -73,21 +70,6 @@ public class COMPABackend extends CBackend {
 	private Mapping computedMapping;
 
 	public COMPABackend() {
-
-		// Configure the map used in RenameTransformation
-		renameMap = new HashMap<String, String>();
-		renameMap.put("abs", "abs_replaced");
-		renameMap.put("getw", "getw_replaced");
-		renameMap.put("exit", "exit_replaced");
-		renameMap.put("index", "index_replaced");
-		renameMap.put("log2", "log2_replaced");
-		renameMap.put("max", "max_replaced");
-		renameMap.put("min", "min_replaced");
-		renameMap.put("select", "select_replaced");
-		renameMap.put("OUT", "OUT_REPLACED");
-		renameMap.put("IN", "IN_REPLACED");
-		renameMap.put("SIZE", "SIZE_REPLACED");
-
 		netPrinter = new NetworkPrinter();
 		childrenPrinter = new InstancePrinter();
 		cmakePrinter = new CMakePrinter();
@@ -102,6 +84,20 @@ public class COMPABackend extends CBackend {
 		// Create the directory tree
 		new File(path, "src").mkdir();
 		srcPath = new File(path, "src").toString();
+
+		// Configure the map used in RenameTransformation
+		final Map<String, String> renameMap = new HashMap<String, String>();
+		renameMap.put("abs", "abs_replaced");
+		renameMap.put("getw", "getw_replaced");
+		renameMap.put("exit", "exit_replaced");
+		renameMap.put("index", "index_replaced");
+		renameMap.put("log2", "log2_replaced");
+		renameMap.put("max", "max_replaced");
+		renameMap.put("min", "min_replaced");
+		renameMap.put("select", "select_replaced");
+		renameMap.put("OUT", "OUT_REPLACED");
+		renameMap.put("IN", "IN_REPLACED");
+		renameMap.put("SIZE", "SIZE_REPLACED");
 
 		// -----------------------------------------------------
 		// Transformations that will be applied on the Network
