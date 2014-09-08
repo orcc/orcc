@@ -347,10 +347,6 @@ public class TypeUtil {
 	 *            type of the first operand
 	 * @param t2
 	 *            type of the second operand
-	 * @param source
-	 *            source object
-	 * @param feature
-	 *            feature
 	 * @return the type of the binary expression, or <code>null</code>
 	 */
 	public static Type getTypeBinary(OpBinary op, Type t1, Type t2) {
