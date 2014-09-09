@@ -1,6 +1,5 @@
 package net.sf.orcc.backends.c.dal
 
-import java.io.File
 import java.util.HashMap
 import java.util.List
 import java.util.Map
@@ -33,7 +32,6 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate and print actor source file for DAL backend.
@@ -55,65 +53,29 @@ class InstanceCPrinter extends CTemplate {
 	protected var int fifoSize
 	
 	protected var String entityName
-		
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
-	
+
 	protected var Action currentAction;
 	protected var boolean isSDF = false;
 
-	/**
-	 * Default constructor, used only by another backend (when subclass) which
-	 * not print instances but actors
-	 */
 	protected new() {
 		super()
 		instance = null
 		maxIter = 0
 	}
 	
-	new(Map<String, Object> options) {		
-		super(options)
-	}
-	
 	override caseTypeBool(TypeBool type) 
 		'''u8'''
-	
-	/**
-	 * Print file content from a given actor
-	 * 
-	 * @param targetFolder folder to print the actor file
-	 * @param actor the given actor
-	 * @return 1 if file was cached, 0 if file was printed
-	 */
-	def print(String targetFolder, Actor actor) {
-		setActor(actor)
-		print(targetFolder)
-	}
-	
-	def protected print(String targetFolder) {
-		checkConnectivy
-		
-		val content = fileContent
-		val file = new File(targetFolder + File::separator + "src" + File::separator + entityName + ".c")
-		
-		if(actor.native) {
-			OrccLogger::noticeln(entityName + " is native and not generated.")
-		} else if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
-	
+
 	def protected setActor(Actor actor) {
 		this.entityName = actor.name
 		this.actor = actor
 		this.attributable = actor
 		this.incomingPortMap = actor.incomingPortMap
 		this.outgoingPortMap = actor.outgoingPortMap		
-		
+
+		checkConnectivy
 		buildInputPattern
 		buildTransitionPattern
 	}

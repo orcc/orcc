@@ -1,21 +1,15 @@
 package net.sf.orcc.backends.c.dal
 
-import java.io.File
 import java.util.List
 import java.util.Map
-import net.sf.orcc.OrccRuntimeException
+import net.sf.orcc.backends.c.CTemplate
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
-import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
-import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.backends.c.CTemplate
 
 /**
  * Generate and print actor header file for DAL backend.
@@ -25,8 +19,7 @@ import net.sf.orcc.backends.c.CTemplate
  * Modified from Orcc C InstancePrinter
  */
 class InstanceHPrinter extends CTemplate {
-	
-	protected var Instance instance
+
 	protected var Actor actor
 	protected var Attributable attributable
 	protected var Map<Port, Connection> incomingPortMap
@@ -42,65 +35,12 @@ class InstanceHPrinter extends CTemplate {
 	 * not print instances but actors
 	 */
 	protected new() {
-		instance = null
-	}
-	
-	/**
-	 * Print file content from a given instance
-	 * 
-	 * @param targetFolder folder to print the instance file
-	 * @param instance the given instance
-	 * @return 1 if file was cached, 0 if file was printed
-	 */
-	def print(String targetFolder, Instance instance) {
-		setInstance(instance)	
-		print(targetFolder)
 	}
 
 	override caseTypeBool(TypeBool type) 
 		'''u8'''
-	
-	/**
-	 * Print file content from a given actor
-	 * 
-	 * @param targetFolder folder to print the actor file
-	 * @param actor the given actor
-	 * @return 1 if file was cached, 0 if file was printed
-	 */
-	def print(String targetFolder, Actor actor) {
-		setActor(actor)
-		print(targetFolder)
-	}
-	
-	def private print(String targetFolder) {
-		
-		val content = fileContent
-		val file = new File(targetFolder + File::separator + "src" + File::separator + entityName + ".h")
-		
-		if(actor.native) {
-			OrccLogger::noticeln(entityName + " is native and not generated.")
-		} else if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
-	
-	def private setInstance(Instance instance) {
-		if (!instance.isActor) {
-			throw new OrccRuntimeException("Instance " + entityName + " is not an Actor's instance")
-		}
-		
-		this.instance = instance
-		this.entityName = instance.name
-		this.actor = instance.getActor
-		this.attributable = instance
-		this.incomingPortMap = instance.incomingPortMap
-		this.outgoingPortMap = instance.outgoingPortMap		
-	}
-	
-	def private setActor(Actor actor) {
+
+	def setActor(Actor actor) {
 		this.entityName = actor.name
 		this.actor = actor
 		this.attributable = actor
@@ -108,7 +48,7 @@ class InstanceHPrinter extends CTemplate {
 		this.outgoingPortMap = actor.outgoingPortMap		
 	}
 	
-	def private getFileContent() '''
+	def getFileContent() '''
 	
 	#ifndef «entityName»_H
 	#define «entityName»_H
@@ -156,24 +96,13 @@ class InstanceHPrinter extends CTemplate {
 		«action.print»
 	«ENDFOR»
 
-		«IF (instance != null && !instance.arguments.nullOrEmpty) || !actor.parameters.nullOrEmpty»
-			////////////////////////////////////////////////////////////////////////////////
-			// Parameter values of the instance
-			«IF instance != null»
-				«FOR arg : instance.arguments»
-					«IF arg.value.exprList»
-						static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
-					«ELSE»
-						#define «arg.variable.name» «arg.value.doSwitch»
-					«ENDIF»
-				«ENDFOR»
-			«ELSE»
-				«FOR variable : actor.parameters»
-					«variable.declareStateVar»
-				«ENDFOR»
-			«ENDIF»
-			
-		«ENDIF»
+	«IF !actor.parameters.nullOrEmpty»
+		////////////////////////////////////////////////////////////////////////////////
+		// Parameter values of the instance
+		«FOR variable : actor.parameters»
+			«variable.declareStateVar»
+		«ENDFOR»
+	«ENDIF»
 
 	#endif	
 	'''

@@ -64,9 +64,14 @@ public class DALBackend extends CBackend {
 	private NetworkCPrinter networkCPrinter;
 	private NetworkMPrinter mappingPrinter;
 
+	private InstanceCPrinter instanceCPrinter;
+	private InstanceHPrinter instanceHPrinter;
+
 	public DALBackend() {
 		networkCPrinter = new NetworkCPrinter();
 		mappingPrinter = new NetworkMPrinter();
+		instanceCPrinter = new InstanceCPrinter();
+		instanceHPrinter = new InstanceHPrinter();
 	}
 
 	@Override
@@ -74,6 +79,7 @@ public class DALBackend extends CBackend {
 		super.doInitializeOptions();
 
 		networkCPrinter.setOptions(getOptions());
+		instanceCPrinter.setOptions(getOptions());
 
 		inputBuffering = getOption("net.sf.orcc.backends.c.dal.inputBuffering",
 				false);
@@ -225,9 +231,15 @@ public class DALBackend extends CBackend {
 
 	@Override
 	protected Result doGenerateActor(Actor actor) {
-		new InstanceCPrinter(getOptions()).print(path, actor);
-		new InstanceHPrinter().print(path, actor);
-		return Result.newInstance();
+
+		instanceCPrinter.setActor(actor);
+		instanceHPrinter.setActor(actor);
+
+		final Result result = Result.newInstance();
+		result.merge(FilesManager.writeFile(instanceCPrinter.getFileContent(), srcPath, actor.getName() + ".c"));
+		result.merge(FilesManager.writeFile(instanceHPrinter.getFileContent(), srcPath, actor.getName() + ".h"));
+
+		return result;
 	}
 
 	// FIXME: following methods will be deleted when C backend is migrated
