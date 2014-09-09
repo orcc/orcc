@@ -1,10 +1,8 @@
 package net.sf.orcc.backends.c.dal
 
-import java.io.File
 import java.util.Map
-import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.backends.c.CTemplate
+import net.sf.orcc.df.Network
 
 /**
  * Generate and print actor mapping file for DAL backend.
@@ -16,27 +14,12 @@ import net.sf.orcc.backends.c.CTemplate
 class NetworkMPrinter extends CTemplate {
 	
 	Network network
-	Map<String, String> mapping
 	
-	new(Network network, Map<String, String> map) {
+	def setNetwork(Network network) {
 		this.network = network
-		this.mapping = map
-	}
-	
-	def print(String targetFolder) {
-		
-		val content = networkFileContent
-		val file = new File(targetFolder + File::separator + "mapping1.xml")
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
 	}
 
-	def protected getNetworkFileContent() '''
+	def protected getMappingFileContent(Map<String, String> mapping) '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<mapping xmlns="http://www.tik.ee.ethz.ch/~euretile/schema/MAPPING" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		  xsi:schemaLocation="http://www.tik.ee.ethz.ch/~euretile/schema/MAPPING     http://www.tik.ee.ethz.ch/~euretile/schema/mapping.xsd" name="mapping1" processnetwork="APP1">

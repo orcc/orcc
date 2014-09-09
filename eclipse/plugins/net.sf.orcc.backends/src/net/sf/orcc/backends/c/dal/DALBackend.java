@@ -61,17 +61,19 @@ public class DALBackend extends CBackend {
 	protected boolean outputBuffering;
 	protected boolean inputBuffering;
 
-	private NetworkCPrinter cprinter;
+	private NetworkCPrinter networkCPrinter;
+	private NetworkMPrinter mappingPrinter;
 
 	public DALBackend() {
-		cprinter = new NetworkCPrinter();
+		networkCPrinter = new NetworkCPrinter();
+		mappingPrinter = new NetworkMPrinter();
 	}
 
 	@Override
 	protected void doInitializeOptions() {
 		super.doInitializeOptions();
 
-		cprinter.setOptions(getOptions());
+		networkCPrinter.setOptions(getOptions());
 
 		inputBuffering = getOption("net.sf.orcc.backends.c.dal.inputBuffering",
 				false);
@@ -207,16 +209,16 @@ public class DALBackend extends CBackend {
 	@Override
 	protected Result doGenerateNetwork(Network network) {
 
-		cprinter.setNetwork(network);
+		networkCPrinter.setNetwork(network);
+		mappingPrinter.setNetwork(network);
 
 		final Result result = Result.newInstance();
-		result.merge(FilesManager.writeFile(cprinter.getNetworkFileContent(),
+		result.merge(FilesManager.writeFile(networkCPrinter.getNetworkFileContent(),
 				path, "pn.xml"));
 		result.merge(FilesManager.writeFile(
-				cprinter.getFifoSizeHeaderContent(), srcPath, "fifosize.h"));
-
-		NetworkMPrinter mprinter = new NetworkMPrinter(network, mapping);
-		mprinter.print(path);
+				networkCPrinter.getFifoSizeHeaderContent(), srcPath, "fifosize.h"));
+		result.merge(FilesManager.writeFile(
+				mappingPrinter.getMappingFileContent(mapping), path, "mapping1.xml"));
 
 		return result;
 	}
