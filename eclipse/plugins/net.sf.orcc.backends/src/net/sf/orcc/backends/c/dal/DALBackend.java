@@ -101,6 +101,7 @@ public class DALBackend extends CBackend {
 			networkTransfos.add(new ActorMerger());
 		}
 		networkTransfos.add(new ArgumentEvaluator());
+		networkTransfos.add(new DisconnectedOutputPortRemoval());
 
 		// FIXME: this list should be stored ibn the C backend, and inherited in this backend
 		// -----------------------------------------------------
@@ -108,7 +109,6 @@ public class DALBackend extends CBackend {
 		// -----------------------------------------------------
 		childrenTransfos.add(new TypeResizer(true, false, true, false));
 		childrenTransfos.add(new RenameTransformation(renameMap));
-		childrenTransfos.add(new DisconnectedOutputPortRemoval());
 		childrenTransfos.add(new DfVisitor<Void>(new InlinerByAnnotation()));
 		childrenTransfos.add(new DfVisitor<Void>(new LoopUnrolling()));
 
