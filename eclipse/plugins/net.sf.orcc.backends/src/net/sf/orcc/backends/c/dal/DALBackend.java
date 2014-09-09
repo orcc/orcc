@@ -1,30 +1,26 @@
 package net.sf.orcc.backends.c.dal;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
+import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 /**
- * DAL C backend targeting ETHZ
- * Distributed Application Layer
- * 
- * @author Jani Boutellier
+ * DAL C backend targeting ETHZ Distributed Application Layer
  * 
  * Based on Orcc C backend
+ * 
+ * @author Jani Boutellier
  */
 public class DALBackend extends CBackend {
 
@@ -32,6 +28,7 @@ public class DALBackend extends CBackend {
 	 * Path to target "src" folder
 	 */
 	protected String srcPath;
+
 	protected boolean outputBuffering;
 	protected boolean inputBuffering;
 
@@ -42,33 +39,26 @@ public class DALBackend extends CBackend {
 				false);
 		outputBuffering = getOption("net.sf.orcc.backends.c.dal.outputBuffering",
 				false);
-	}
-	
-	protected void doTransformNetwork(Network network) {
-		OrccLogger.traceln("Instantiating network...");
-		new Instantiator(false).doSwitch(network);
-		OrccLogger.traceln("Flattening...");
-		new NetworkFlattener().doSwitch(network);
 
-		OrccLogger.traceln("Adding broadcasts...");
-		new BroadcastAdder().doSwitch(network);
-
-		OrccLogger.traceln("Instantiating actors...");
-		new Instantiator(true).doSwitch(network);
-	
-		new UnitImporter().doSwitch(network);
-
+		// -----------------------------------------------------
+		// Transformations that will be applied on the Network
+		// -----------------------------------------------------
+		networkTransfos.add(new Instantiator(false));
+		networkTransfos.add(new NetworkFlattener());
+		networkTransfos.add(new BroadcastAdder());
+		networkTransfos.add(new Instantiator(true));
+		networkTransfos.add(new UnitImporter());
 		if (classify) {
-			OrccLogger.traceln("Classification of actors...");
-			new Classifier().doSwitch(network);
+			networkTransfos.add(new Classifier());
 		}
 		if (mergeActors) {
-			OrccLogger.traceln("Merging of actors...");
-			new ActorMerger().doSwitch(network);
+			networkTransfos.add(new ActorMerger());
 		}
+		networkTransfos.add(new ArgumentEvaluator());
+	}
 
-		new ArgumentEvaluator().doSwitch(network);
-		
+	@Override
+	protected void beforeGeneration(Network network) {
 		KPNValidator validator = new KPNValidator();
 		validator.validate(network);
 		validator.analyzeInputs(network);
@@ -79,25 +69,15 @@ public class DALBackend extends CBackend {
 		optimizer.optimizeOutput(network, outputBuffering, fifoSize);
 
 		labelPeekPorts(network);
-	}
-
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		Validator.checkTopLevel(network);
-		Validator.checkMinimalFifoSize(network, fifoSize);
-		
-		doTransformNetwork(network);
-
-		if (debug) {
-			// Serialization of the actors will break proxy link
-			EcoreUtil.resolveAll(network);
-		}
-		transformActors(network.getAllActors());
 
 		network.computeTemplateMaps();
 
 		enumeratePorts(network);
+	}
 
+	@Override
+	protected void doXdfCodeGeneration(Network network) {
+		transformActors(network.getAllActors());
 		// print instances
 		printChildren(network);
 
@@ -155,5 +135,4 @@ public class DALBackend extends CBackend {
 		successH = new InstanceHPrinter().print(srcPath, actor) > 0;
 		return successC & successH;
 	}
-
 }
