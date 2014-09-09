@@ -111,11 +111,13 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		// Create empty folders
+		srcPath = path + File.separator + "src";
+	}
+
+	@Override
+	protected void beforeGeneration(Network n) {
 		new File(path + File.separator + "build").mkdirs();
 		new File(path + File.separator + "bin").mkdirs();
-
-		srcPath = path + File.separator + "src";
 	}
 
 	@Override
