@@ -30,7 +30,6 @@ import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
-import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
 
 /**
@@ -44,13 +43,11 @@ class InstanceCPrinter extends CTemplate {
 	
 	protected var Instance instance
 	protected var Actor actor
-	protected var Attributable attributable
 	protected var int maxIter
 	protected var int maxOut
 	private var int tmpIter
 	protected var Map<Port, Connection> incomingPortMap
 	protected var Map<Port, List<Connection>> outgoingPortMap
-	protected var int fifoSize
 	
 	protected var String entityName
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
@@ -71,7 +68,6 @@ class InstanceCPrinter extends CTemplate {
 	def protected setActor(Actor actor) {
 		this.entityName = actor.name
 		this.actor = actor
-		this.attributable = actor
 		this.incomingPortMap = actor.incomingPortMap
 		this.outgoingPortMap = actor.outgoingPortMap		
 
