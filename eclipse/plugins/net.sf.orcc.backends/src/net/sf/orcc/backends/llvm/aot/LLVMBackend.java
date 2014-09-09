@@ -42,6 +42,7 @@ import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ShortCircuitTransformation;
+import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Alignable;
@@ -50,7 +51,6 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
-import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
@@ -142,7 +142,6 @@ public class LLVMBackend extends AbstractBackend {
 		}
 
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
-		networkTransfos.add(new TypeResizer(true, false, false, false));
 		networkTransfos.add(new StringTransformation());
 		networkTransfos.add(new DfVisitor<Expression>(
 				new ShortCircuitTransformation()));
@@ -164,6 +163,8 @@ public class LLVMBackend extends AbstractBackend {
 
 		// computes names of local variables
 		networkTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
+
+		networkTransfos.add(new TypeResizer(true, false, false, false));
 	}
 
 	@Override

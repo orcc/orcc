@@ -60,7 +60,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class TypeResizer extends DfVisitor<Void> {
 
-	private class InnerTypeResizer extends AbstractIrVisitor<Void> {
+	protected class InnerTypeResizer extends AbstractIrVisitor<Void> {
 		public InnerTypeResizer() {
 			super(true);
 		}
