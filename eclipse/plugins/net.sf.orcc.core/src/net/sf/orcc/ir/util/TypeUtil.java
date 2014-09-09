@@ -474,7 +474,12 @@ public class TypeUtil {
 		case NE:
 		case LOGIC_AND:
 		case LOGIC_OR:
-			return createType(t1, t2, Lub.instance);
+			if (t1.isBool()) {
+				return EcoreUtil.copy(t2);
+			} else if (t2.isBool()) {
+				return EcoreUtil.copy(t1);
+			}
+			return getLub(t1, t2);
 
 		case EXP:
 		default:
