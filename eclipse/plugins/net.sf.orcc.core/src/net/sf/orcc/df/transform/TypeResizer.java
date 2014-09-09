@@ -109,11 +109,24 @@ public class TypeResizer extends DfVisitor<Void> {
 		}
 	}
 
-	private boolean castNativePort;
-	private boolean castTo32bits;
-	private boolean castToPow2bits;
-	private boolean castBoolToInt;
+	final private boolean castNativePort;
+	final private boolean castTo32bits;
+	final private boolean castToPow2bits;
+	final private boolean castBoolToInt;
 
+	/**
+	 * Default constructor.
+	 * 
+	 * @param castToPow2bits
+	 *            true if the type size should be rounded to the next power of
+	 *            two.
+	 * @param castTo32bits
+	 *            true if the type size should be limited to 32 bits.
+	 * @param castNativePort
+	 *            true if the type of native ports should be resized as well.
+	 * @param castBoolToInt
+	 *            true if the boolean type should be transformed to integer.
+	 */
 	public TypeResizer(boolean castToPow2bits, boolean castTo32bits,
 			boolean castNativePort, boolean castBoolToInt) {
 		this.castToPow2bits = castToPow2bits;
