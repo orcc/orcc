@@ -28,12 +28,12 @@ public class TypeResizer extends net.sf.orcc.df.transform.TypeResizer {
 			Type tSource = source.getType();
 			Type tTarget = target.getType();
 
-			// If the source and target have identical type, then the cast
-			// instruction is useless and can be removed. This situation can
-			// happen after applying multiple IR transformations.
+			// Check if the cast instruction is useless and can be removed. This
+			// situation can happen after applying multiple IR transformations.
 			if (tSource.getSizeInBits() == tTarget.getSizeInBits()
-					&& (tSource.isInt() && tTarget.isUint() || tSource.isUint()
-							&& tTarget.isInt())) {
+					&& ((tSource.getClass() == tTarget.getClass())
+							|| (tSource.isInt() && tTarget.isUint()) || (tSource
+							.isUint() && tTarget.isInt()))) {
 				EList<Use> uses = target.getUses();
 				while (!uses.isEmpty()) {
 					uses.get(0).setVariable(source);
