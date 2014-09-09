@@ -1,19 +1,11 @@
 package net.sf.orcc.backends.c.dal
 
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStreamWriter
-import java.io.Writer
-import java.util.Map
 import net.sf.orcc.backends.c.CTemplate
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Network
 import net.sf.orcc.graph.Vertex
 import net.sf.orcc.ir.Type
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate and print process network description for DAL backend.
@@ -24,43 +16,17 @@ import net.sf.orcc.util.OrccUtil
  */
 class NetworkCPrinter extends CTemplate {
 
-	protected val Network network
+	protected var Network network
 
-	new(Network network, Map<String, Object> options) {
-		super(options)
+	def setNetwork(Network network) {
 		this.network = network
 	}
 
-	def print(String targetFolder) {
-		
-		val content = networkFileContent
-		val file = new File(targetFolder + File::separator + "pn.xml")
-		printFifoSize(targetFolder + File.separator + "src")
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
+	def getFifoSizeHeaderContent() '''
+		#define FIFO_SIZE «fifoSize»
+	'''
 
-	def printFifoSize(String path) {
-		var Writer writer = null;
-		try {
-		    writer = new BufferedWriter(new OutputStreamWriter(
-		          new FileOutputStream(path + File.separator + "fifosize.h"), "utf-8"));
-		    writer.write("#define FIFO_SIZE " + fifoSize);
-		} catch (IOException ex) {
-		  // report
-		} finally {
-		   try {
-			   writer.close();
-		   } catch (Exception ex) 
-		   {}
-		}
-	}
-
-	def protected getNetworkFileContent() '''
+	def getNetworkFileContent() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 		<processnetwork xmlns="http://www.tik.ee.ethz.ch/~euretile/schema/PROCESSNETWORK" 
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 

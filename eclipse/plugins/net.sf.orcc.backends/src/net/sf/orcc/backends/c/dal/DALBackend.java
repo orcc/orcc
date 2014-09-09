@@ -22,6 +22,7 @@ import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
@@ -44,6 +45,7 @@ import net.sf.orcc.ir.transform.SSAVariableRenamer;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
@@ -56,17 +58,21 @@ import net.sf.orcc.util.Void;
  */
 public class DALBackend extends CBackend {
 
-	/**
-	 * Path to target "src" folder
-	 */
-	protected String srcPath;
-
 	protected boolean outputBuffering;
 	protected boolean inputBuffering;
 
+	private NetworkCPrinter cprinter;
+
+	public DALBackend() {
+		cprinter = new NetworkCPrinter();
+	}
+
 	@Override
 	protected void doInitializeOptions() {
-		srcPath = path;
+		super.doInitializeOptions();
+
+		cprinter.setOptions(getOptions());
+
 		inputBuffering = getOption("net.sf.orcc.backends.c.dal.inputBuffering",
 				false);
 		outputBuffering = getOption(
@@ -103,7 +109,8 @@ public class DALBackend extends CBackend {
 		networkTransfos.add(new ArgumentEvaluator());
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
 
-		// FIXME: this list should be stored ibn the C backend, and inherited in this backend
+		// FIXME: this list should be stored ibn the C backend, and inherited in
+		// this backend
 		// -----------------------------------------------------
 		// Transformations that will be applied on VTL Actors
 		// -----------------------------------------------------
@@ -199,15 +206,25 @@ public class DALBackend extends CBackend {
 
 	@Override
 	protected Result doGenerateNetwork(Network network) {
-		new NetworkCPrinter(network, getOptions()).print(srcPath);
-		new NetworkMPrinter(network, mapping).print(srcPath);
-		return Result.newInstance();
+
+		cprinter.setNetwork(network);
+
+		final Result result = Result.newInstance();
+		result.merge(FilesManager.writeFile(cprinter.getNetworkFileContent(),
+				path, "pn.xml"));
+		result.merge(FilesManager.writeFile(
+				cprinter.getFifoSizeHeaderContent(), srcPath, "fifosize.h"));
+
+		NetworkMPrinter mprinter = new NetworkMPrinter(network, mapping);
+		mprinter.print(path);
+
+		return result;
 	}
 
 	@Override
 	protected Result doGenerateActor(Actor actor) {
-		new InstanceCPrinter(getOptions()).print(srcPath, actor);
-		new InstanceHPrinter().print(srcPath, actor);
+		new InstanceCPrinter(getOptions()).print(path, actor);
+		new InstanceHPrinter().print(path, actor);
 		return Result.newInstance();
 	}
 
@@ -215,5 +232,15 @@ public class DALBackend extends CBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
 		// Do nothing
+	}
+
+	@Override
+	protected boolean printActor(Actor actor) {
+		return false;
+	}
+
+	@Override
+	protected boolean printInstance(Instance instance) {
+		return false;
 	}
 }
