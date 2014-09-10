@@ -28,11 +28,8 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.io.File
-import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.ir.TypeBool
-import net.sf.orcc.util.OrccUtil
 
 /**
  * generates testbench for for vivado co-simulation
@@ -43,10 +40,6 @@ import net.sf.orcc.util.OrccUtil
  
  
  class InstanceCosimPrinter extends net.sf.orcc.backends.c.InstancePrinter {
-
-	new(Map<String, Object> options) {
-		super(options)
-	}
 
 	override getFileContent() '''
 		#include <hls_stream.h>
@@ -176,17 +169,6 @@ import net.sf.orcc.util.OrccUtil
 		}
 		
 	'''	
-	override print(String targetFolder) {
-		val content = fileContent
-		val file = new File(targetFolder + File::separator + entityName+ "TestBench" + ".cpp")//"_Csim_tb"
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
 	
 	def fifoType(Connection connection) {
 		if(connection.sourcePort == null){

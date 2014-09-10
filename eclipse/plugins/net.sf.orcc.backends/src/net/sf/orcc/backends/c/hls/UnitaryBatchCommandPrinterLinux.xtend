@@ -29,9 +29,6 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.io.File
-import java.util.Map
-import net.sf.orcc.util.OrccUtil
 import static net.sf.orcc.util.OrccAttributes.*
 
 /**
@@ -41,10 +38,6 @@ import static net.sf.orcc.util.OrccAttributes.*
  * 
  */
 class UnitaryBatchCommandPrinterLinux extends net.sf.orcc.backends.c.InstancePrinter {
-
-	new(Map<String, Object> options) {
-		super(options)
-	}
 
 	def getFileContentBatch() '''
 		# Two additions to your ~/.bash_profile or ~/.profile must be made,
@@ -97,17 +90,4 @@ class UnitaryBatchCommandPrinterLinux extends net.sf.orcc.backends.c.InstancePri
 			
 		
 	'''
-
-	override print(String targetFolder) {
-		val contentNetwork = getFileContentBatch
-		val NetworkFile = new File(targetFolder + File::separator + "command-linux" + "_" + entityName + ".sh")
-
-		if (needToWriteFile(contentNetwork, NetworkFile)) {
-			OrccUtil::printFile(contentNetwork, NetworkFile)
-			return 0
-		} else {
-			return 1
-		}
-	}
-
 }

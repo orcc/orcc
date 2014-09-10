@@ -28,9 +28,8 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.io.File
 import java.util.List
-import java.util.Map
+import net.sf.orcc.backends.util.FPGA
 import net.sf.orcc.df.Action
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Pattern
@@ -41,8 +40,7 @@ import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeList
-import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.backends.util.FPGA
+
 import static net.sf.orcc.util.OrccAttributes.*
 
 /*
@@ -54,12 +52,6 @@ import static net.sf.orcc.util.OrccAttributes.*
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	private FPGA fpga = FPGA.builder("Virtex7 (xc7v2000t)") ;
-	
-
-
-	new(Map<String, Object> options) {
-		super(options)
-	}
 
 	override getFileContent() '''
 		// Source file is "«actor.file»"
@@ -270,26 +262,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDIF»
 		«ENDFOR»
 	'''
-
-	override print(String targetFolder) {
-		val content = getFileContent
-		val scriptContent = script(targetFolder);
-		val directiveContent = directive(targetFolder);
-		val file = new File(targetFolder + File::separator + entityName + ".cpp")
-		val scriptFile = new File(
-			targetFolder + File::separator + "script_" + entityName + ".tcl"
-		)
-		val directiveFile = new File(targetFolder + File::separator + "directive_" + entityName + ".tcl")
-
-		if (needToWriteFile(content, file)) {
-			OrccUtil::printFile(scriptContent, scriptFile)
-			OrccUtil::printFile(directiveContent, directiveFile)
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
 
 	override print(Action action) {
 		currentAction = action

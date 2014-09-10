@@ -28,10 +28,8 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.io.File
-import java.util.Map
 import net.sf.orcc.df.Connection
-import net.sf.orcc.util.OrccUtil
+
 import static net.sf.orcc.util.OrccAttributes.*
 
 /**
@@ -41,10 +39,6 @@ import static net.sf.orcc.util.OrccAttributes.*
  * 
  */
 class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
-
-	new(Map<String, Object> options) {
-		super(options)
-	}
 
 	def ActorTopFileContent() '''
 	library ieee;
@@ -344,20 +338,6 @@ class ActorTopVhdlPrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 	end architecture rtl;
 '''
-
-override print(String targetFolder) {
-	val contentNetwork = ActorTopFileContent
-	val NetworkFile = new File(
-		targetFolder + File::separator + entityName + "TopVHDL" + File::separator + entityName + "Top" +
-			".vhd")
-
-	if (needToWriteFile(contentNetwork, NetworkFile)) {
-		OrccUtil::printFile(contentNetwork, NetworkFile)
-		return 0
-	} else {
-		return 1
-	}
-}
 
 def mappingComponentSignal() '''
 	call_«entityName»_scheduler : component «entityName»_scheduler

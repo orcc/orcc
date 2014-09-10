@@ -28,12 +28,9 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.io.File
-import java.util.Map
-import net.sf.orcc.df.Connection
-import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.backends.util.FPGA
-import static net.sf.orcc.util.OrccAttributes.*
+import net.sf.orcc.df.Connection
+
 /*
  * Add instances for each port in case of actor debug
  *  
@@ -43,10 +40,6 @@ import static net.sf.orcc.util.OrccAttributes.*
 class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 
 	private FPGA fpga = FPGA.builder("Virtex7 (xc7v2000t)") ;
-
-	new(Map<String, Object> options) {
-		super(options)
-	}
 
 	def getFileContentWrite(Connection conn) '''
 		#include <hls_stream.h>
@@ -250,54 +243,6 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 		
 	'''
-
-	override print(String targetFolder) {
-		/*IF DEBUG ACTION */
-		if(actor.hasAttribute(DIRECTIVE_DEBUG)){
-			for (action : actor.actions) {
-			OrccUtil::printFile(getFileContentReadDebug(action.name),
-					new File(
-						targetFolder + File::separator + "cast_" + entityName + "_" + "tab_" + action.name + "_read" +
-							".cpp"))
-				OrccUtil::printFile(
-					script(targetFolder, "cast_" + entityName + "_" + "tab_" + action.name + "_read"),
-					new File(
-						targetFolder + File::separator + "script_" + "cast_" + entityName + "_" + "tab_" + action.name + "_read" + ".tcl"))
-							
-							}
-		}		
-		
-		
-		for (portIn : actor.inputs) {
-			val connIn = incomingPortMap.get(portIn)
-			if (connIn != null) {
-				OrccUtil::printFile(getFileContentWrite(connIn),
-					new File(
-						targetFolder + File::separator + "cast_" + entityName + "_" + connIn.targetPort.name + "_write" +
-							".cpp"))
-				OrccUtil::printFile(
-					script(targetFolder, "cast_" + entityName + "_" + connIn.targetPort.name + "_write"),
-					new File(
-						targetFolder + File::separator + "script_" + "cast_" + entityName + "_" +
-							connIn.targetPort.name + "_write" + ".tcl"))
-			}
-		}
-		for (portOut : actor.outputs.filter[! native]) {
-			val connOut = outgoingPortMap.get(portOut).head
-			if (connOut != null) {
-				OrccUtil::printFile(getFileContentRead(connOut),
-					new File(
-						targetFolder + File::separator + "cast_" + entityName + "_" + connOut.sourcePort.name + "_read" +
-							".cpp"))
-				OrccUtil::printFile(
-					script(targetFolder, "cast_" + entityName + "_" + connOut.sourcePort.name + "_read"),
-					new File(
-						targetFolder + File::separator + "script_" + "cast_" + entityName + "_" +
-							connOut.sourcePort.name + "_read" + ".tcl"))
-			}
-		}
-		return 0
-	}
 
 	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
 		objectValue»_write«ENDIF»'''

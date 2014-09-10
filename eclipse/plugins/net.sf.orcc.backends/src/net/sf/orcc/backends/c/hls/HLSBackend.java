@@ -37,8 +37,12 @@ import net.sf.orcc.backends.transform.CastArgFuncCall;
 import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.util.Validator;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
@@ -51,6 +55,7 @@ import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.util.FilesManager;
+import net.sf.orcc.util.OrccAttributes;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
 
@@ -72,6 +77,13 @@ public class HLSBackend extends CBackend {
 	private final BatchCommandPrinter batchCommandPrinter;
 	private final BatchCommandPrinterLinux batchCommandPrinterLinux;
 
+	private final InstancePrinter instancePrinter;
+	private final InstanceCosimPrinter instanceCosimPrinter;
+	private final InstancePrinterCast instancePrinterCast;
+	private final ActorTopVhdlPrinter actorTopVHDLPrinter;
+	private final ActorNetworkTestBenchPrinter actorNetTestBenchPrinter;
+	private final UnitaryBatchCommandPrinter unitaryBatchCommandPrinter;
+	private final UnitaryBatchCommandPrinterLinux unitaryBatchCommandPrinterLinux;
 
 	public HLSBackend() {
 		networkPrinter = new NetworkPrinter();
@@ -80,6 +92,14 @@ public class HLSBackend extends CBackend {
 		topVHDLPrinter = new TopVhdlPrinter();
 		batchCommandPrinter = new BatchCommandPrinter();
 		batchCommandPrinterLinux = new BatchCommandPrinterLinux();
+
+		instancePrinter = new InstancePrinter();
+		instanceCosimPrinter = new InstanceCosimPrinter();
+		instancePrinterCast = new InstancePrinterCast();
+		actorTopVHDLPrinter = new ActorTopVhdlPrinter();
+		actorNetTestBenchPrinter = new ActorNetworkTestBenchPrinter();
+		unitaryBatchCommandPrinter = new UnitaryBatchCommandPrinter();
+		unitaryBatchCommandPrinterLinux = new UnitaryBatchCommandPrinterLinux();
 	}
 
 	@Override
@@ -106,6 +126,15 @@ public class HLSBackend extends CBackend {
 		topVHDLPrinter.setOptions(getOptions());
 		batchCommandPrinter.setOptions(getOptions());
 		batchCommandPrinterLinux.setOptions(getOptions());
+
+		instancePrinter.setOptions(getOptions());
+		instanceCosimPrinter.setOptions(getOptions());
+		instancePrinterCast.setOptions(getOptions());
+		actorTopVHDLPrinter.setOptions(getOptions());
+		actorNetTestBenchPrinter.setOptions(getOptions());
+		unitaryBatchCommandPrinter.setOptions(getOptions());
+		unitaryBatchCommandPrinterLinux.setOptions(getOptions());
+
 
 		// Configure the map used in RenameTransformation
 		final Map<String, String> renameMap = new HashMap<String, String>();
@@ -174,7 +203,7 @@ public class HLSBackend extends CBackend {
 	@Override
 	protected Result doAdditionalGeneration(Network network) {
 		final Result result = Result.newInstance();
-		
+
 		netTestBenchPrinter.setNetwork(network);
 		topVHDLPrinter.setNetwork(network);
 		batchCommandPrinter.setNetwork(network);
@@ -190,20 +219,105 @@ public class HLSBackend extends CBackend {
 
 	@Override
 	protected Result doGenerateInstance(Instance instance) {
+
+		instancePrinter.setInstance(instance);
+
 		final Result result = Result.newInstance();
-		new InstancePrinter(getOptions()).print(srcPath, instance);
+		result.merge(FilesManager.writeFile(instancePrinter.getFileContent(),
+				srcPath, instance.getName() + ".cpp"));
+		result.merge(FilesManager.writeFile(instancePrinter.script(srcPath),
+				srcPath, "script_" + instance.getName() + ".tcl"));
+		result.merge(FilesManager.writeFile(instancePrinter.directive(srcPath),
+				srcPath, "directive_" + instance.getName() + ".tcl"));
 		return result;
 	}
-	
+
 	@Override
 	protected Result doAdditionalGeneration(Instance instance) {
+
+		instanceCosimPrinter.setInstance(instance);
+		instancePrinterCast.setInstance(instance);
+		actorTopVHDLPrinter.setInstance(instance);
+		actorNetTestBenchPrinter.setInstance(instance);
+		unitaryBatchCommandPrinter.setInstance(instance);
+		unitaryBatchCommandPrinterLinux.setInstance(instance);
+
 		final Result result = Result.newInstance();
-		new InstanceCosimPrinter(getOptions()).print(srcPath, instance);
-		new InstancePrinterCast(getOptions()).print(srcPath, instance);
-		new ActorTopVhdlPrinter(getOptions()).print(srcPath, instance);
-		new ActorNetworkTestBenchPrinter(getOptions()).print(srcPath, instance);
-		new UnitaryBatchCommandPrinter(getOptions()).print(commandPath, instance);
-		new UnitaryBatchCommandPrinterLinux(getOptions()).print(commandPath, instance);
+
+		final String instanceName = instance.getName();
+
+		result.merge(FilesManager.writeFile(
+				instanceCosimPrinter.getFileContent(), srcPath, instanceName
+						+ "TestBench.cpp"));
+
+		{
+			final Actor actor = instance.getActor();
+
+			if (actor.hasAttribute(OrccAttributes.DIRECTIVE_DEBUG)) {
+				for (Action action : actor.getActions()) {
+					// The base used to form folder and files names
+					final String base = "cast_" + instanceName + "_tab_"
+							+ action.getName() + "_read";
+
+					result.merge(FilesManager.writeFile(instancePrinterCast
+							.getFileContentReadDebug(action.getName()),
+							srcPath, base + ".cpp"));
+					result.merge(FilesManager.writeFile(
+							instancePrinterCast.script(srcPath, base), srcPath,
+							"script_" + base + ".tcl"));
+				}
+			}
+			for (final Port portIn : actor.getInputs()) {
+				final Connection connIn = instance.getIncomingPortMap().get(portIn);
+				if (connIn != null) {
+					// The base used to form folder and files names
+					final String base = "cast_" + instanceName + "_"
+							+ connIn.getTargetPort().getName() + "_write";
+
+					result.merge(FilesManager.writeFile(
+							instancePrinterCast.getFileContentWrite(connIn),
+							srcPath, base + ".cpp"));
+
+					result.merge(FilesManager.writeFile(
+							instancePrinterCast.script(srcPath, base), srcPath,
+							"script_" + base + ".tcl"));
+				}
+			}
+			for (final Port portOut : actor.getOutputs()) {
+				final Connection connOut = instance.getOutgoingPortMap()
+						.get(portOut).get(0);
+				if (connOut != null) {
+					// The base used to form folder and files names
+					final String base = "cast_" + instanceName + "_"
+							+ connOut.getSourcePort().getName() + "_read";
+
+					result.merge(FilesManager.writeFile(
+							instancePrinterCast.getFileContentRead(connOut),
+							srcPath, base + ".cpp"));
+
+					result.merge(FilesManager.writeFile(
+							instancePrinterCast.script(srcPath, base), srcPath,
+							"script_" + base + ".tcl"));
+				}
+			}
+		}
+
+		result.merge(FilesManager.writeFile(
+				actorTopVHDLPrinter.ActorTopFileContent(), srcPath
+						+ File.separator + instanceName + "TopVHDL",
+				instanceName + "Top.vhd"));
+		result.merge(FilesManager.writeFile(
+				actorNetTestBenchPrinter.actorNetworkFileContent(), srcPath
+						+ File.separator + instanceName + "TopVHDL",
+				instanceName + "_TopTestBench.vhd"));
+
+		result.merge(FilesManager.writeFile(
+				unitaryBatchCommandPrinter.getFileContentBatch(), commandPath,
+				"Command_" + instanceName + ".bat"));
+		result.merge(FilesManager.writeFile(
+				unitaryBatchCommandPrinterLinux.getFileContentBatch(),
+				commandPath, "command-linux_" + instanceName + ".sh"));
+
 		return result;
 	}
 

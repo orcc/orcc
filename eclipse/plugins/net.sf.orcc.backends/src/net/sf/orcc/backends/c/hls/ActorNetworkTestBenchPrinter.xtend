@@ -28,10 +28,8 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.io.File
-import java.util.Map
 import net.sf.orcc.df.Connection
-import net.sf.orcc.util.OrccUtil
+
 import static net.sf.orcc.util.OrccAttributes.*
 
 /**
@@ -41,24 +39,6 @@ import static net.sf.orcc.util.OrccAttributes.*
  * 
  */
 class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinter {
-
-	new(Map<String, Object> options) {
-		super(options)
-	}
-
-	override print(String targetFolder) {
-		val contentNetwork = actorNetworkFileContent
-		val NetworkFile = new File(
-			targetFolder + File::separator + entityName + "TopVHDL" + File::separator + entityName + "_TopTestBench" +
-				".vhd")
-
-		if (needToWriteFile(contentNetwork, NetworkFile)) {
-			OrccUtil::printFile(contentNetwork, NetworkFile)
-			return 0
-		} else {
-			return 1
-		}
-	}
 
 	def actorNetworkFileContent() '''
 			LIBRARY ieee;
