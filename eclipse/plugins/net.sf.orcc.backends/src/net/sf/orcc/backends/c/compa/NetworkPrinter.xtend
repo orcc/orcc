@@ -45,10 +45,6 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	new() {
 		super()
 	}
-	
-	def setNetwork(Network network) {
-		this.network = network
-	}
 
 	def getContent() '''
 		// Generated from "«network.name»"
