@@ -114,9 +114,9 @@ public class COMPABackend extends CBackend {
 		// -----------------------------------------------------
 		// Transformations that will be applied on Actors
 		// -----------------------------------------------------
-		networkTransfos.add(new TypeResizer(true, false, true, false));
-		networkTransfos.add(new RenameTransformation(renameMap));
-		networkTransfos.add(new DisconnectedOutputPortRemoval());
+		childrenTransfos.add(new TypeResizer(true, false, true, false));
+		childrenTransfos.add(new RenameTransformation(renameMap));
+		childrenTransfos.add(new DisconnectedOutputPortRemoval());
 	}
 
 	@Override
