@@ -28,15 +28,13 @@
  */
 package net.sf.orcc.backends.c;
 
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.BXDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.IMPORT_BXDF;
-import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.AbstractBackend;
@@ -57,7 +55,6 @@ import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -68,7 +65,6 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
@@ -88,11 +84,8 @@ import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.tools.stats.StatisticsPrinter;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
-
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * C back-end.
@@ -112,113 +105,101 @@ public class CBackend extends AbstractBackend {
 	@Override
 	protected void doInitializeOptions() {
 		srcPath = path + File.separator + "src";
-	}
 
-	@Override
-	protected void beforeGeneration(Network n) {
-		new File(path + File.separator + "build").mkdirs();
-		new File(path + File.separator + "bin").mkdirs();
-	}
+		// -----------------------------------------------------
+		// Transformations that will be applied on the Network
+		// -----------------------------------------------------
+		if (mergeActors) {
+			networkTransfos.add(new FifoSizePropagator(fifoSize));
+			networkTransfos.add(new BroadcastAdder());
+		}
+		networkTransfos.add(new Instantiator(true));
+		networkTransfos.add(new NetworkFlattener());
+		networkTransfos.add(new UnitImporter());
+		networkTransfos.add(new DisconnectedOutputPortRemoval());
+		if (classify) {
+			networkTransfos.add(new Classifier());
+		}
+		if (mergeActors) {
+			networkTransfos.add(new ActorMerger());
+		} else {
+			networkTransfos.add(new CBroadcastAdder());
+		}
+		networkTransfos.add(new ArgumentEvaluator());
+		networkTransfos.add(new TypeResizer(true, false, true, false));
 
-	@Override
-	protected void doTransformActor(Actor actor) {
-		Map<String, String> replacementMap = new HashMap<String, String>();
-		replacementMap.put("abs", "abs_replaced");
-		replacementMap.put("getw", "getw_replaced");
-		replacementMap.put("exit", "exit_replaced");
-		replacementMap.put("index", "index_replaced");
-		replacementMap.put("log2", "log2_replaced");
-		replacementMap.put("max", "max_replaced");
-		replacementMap.put("min", "min_replaced");
-		replacementMap.put("select", "select_replaced");
-		replacementMap.put("OUT", "OUT_REPLACED");
-		replacementMap.put("IN", "IN_REPLACED");
-		replacementMap.put("SIZE", "SIZE_REPLACED");
-
+		// -------------------------------------------------------------------
+		// Transformations that will be applied on children (instances/actors
+		// -------------------------------------------------------------------
 		if (mergeActions) {
-			new ActionMerger().doSwitch(actor);
+			childrenTransfos.add(new ActionMerger());
 		}
 		if (convertMulti2Mono) {
-			new Multi2MonoToken().doSwitch(actor);
+			childrenTransfos.add(new Multi2MonoToken());
 		}
-
-		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
-		transformations.add(new TypeResizer(true, false, true, false));
-		transformations.add(new RenameTransformation(replacementMap));
-		transformations.add(new DisconnectedOutputPortRemoval());
-		transformations.add(new DfVisitor<Void>(new InlinerByAnnotation()));
-		transformations.add(new DfVisitor<Void>(new LoopUnrolling()));
+		childrenTransfos.add(new RenameTransformation(getRenameMap()));
+		childrenTransfos.add(new DfVisitor<Void>(new InlinerByAnnotation()));
+		childrenTransfos.add(new DfVisitor<Void>(new LoopUnrolling()));
 
 		// If "-t" option is passed to command line, apply additional
 		// transformations
 		if (getOption(ADDITIONAL_TRANSFOS, false)) {
-			transformations.add(new StoreOnceTransformation());
-			transformations.add(new DfVisitor<Void>(new SSATransformation()));
-			transformations.add(new DfVisitor<Void>(new PhiRemoval()));
-			transformations.add(new Multi2MonoToken());
-			transformations.add(new DivisionSubstitution());
-			transformations.add(new ParameterImporter());
-			transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
+			childrenTransfos.add(new StoreOnceTransformation());
+			childrenTransfos.add(new DfVisitor<Void>(new SSATransformation()));
+			childrenTransfos.add(new DfVisitor<Void>(new PhiRemoval()));
+			childrenTransfos.add(new Multi2MonoToken());
+			childrenTransfos.add(new DivisionSubstitution());
+			childrenTransfos.add(new ParameterImporter());
+			childrenTransfos.add(new DfVisitor<Void>(new Inliner(true, true)));
 
 			// transformations.add(new UnaryListRemoval());
 			// transformations.add(new GlobalArrayInitializer(true));
 
-			transformations.add(new DfVisitor<Void>(new InstTernaryAdder()));
-			transformations.add(new DeadGlobalElimination());
+			childrenTransfos.add(new DfVisitor<Void>(new InstTernaryAdder()));
+			childrenTransfos.add(new DeadGlobalElimination());
 
-			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
-			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-			transformations.add(new DfVisitor<Void>(new ListFlattener()));
-			transformations.add(new DfVisitor<Expression>(
+			childrenTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+			childrenTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+			childrenTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+			childrenTransfos.add(new DfVisitor<Void>(new ListFlattener()));
+			childrenTransfos.add(new DfVisitor<Expression>(
 					new TacTransformation()));
-			transformations.add(new DfVisitor<CfgNode>(
+			childrenTransfos.add(new DfVisitor<CfgNode>(
 					new ControlFlowAnalyzer()));
-			transformations
+			childrenTransfos
 					.add(new DfVisitor<Void>(new InstPhiTransformation()));
-			transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-			transformations.add(new DfVisitor<Void>(new BlockCombine()));
+			childrenTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+			childrenTransfos.add(new DfVisitor<Void>(new BlockCombine()));
 
-			transformations.add(new DfVisitor<Expression>(new CastAdder(true,
+			childrenTransfos.add(new DfVisitor<Expression>(new CastAdder(true,
 					true)));
-			transformations.add(new DfVisitor<Void>(new SSAVariableRenamer()));
+			childrenTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 		}
-
-		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(actor);
-			if (debug) {
-				OrccUtil.validateObject(transformation.toString() + " on "
-						+ actor.getName(), actor);
-			}
-		}
-
-		// update "vectorizable" information
-		Alignable.setAlignability(actor);
 	}
 
-	protected void doTransformNetwork(Network network) {
-		if (mergeActors) {
-			new FifoSizePropagator(fifoSize).doSwitch(network);
-			new BroadcastAdder().doSwitch(network);
-		}
-		OrccLogger.traceln("Instantiating...");
-		new Instantiator(true).doSwitch(network);
-		OrccLogger.traceln("Flattening...");
-		new NetworkFlattener().doSwitch(network);
-		new UnitImporter().doSwitch(network);
+	protected Map<String, String> getRenameMap() {
+		Map<String, String> renameMap = new HashMap<String, String>();
+		renameMap.put("abs", "abs_replaced");
+		renameMap.put("getw", "getw_replaced");
+		renameMap.put("exit", "exit_replaced");
+		renameMap.put("index", "index_replaced");
+		renameMap.put("log2", "log2_replaced");
+		renameMap.put("max", "max_replaced");
+		renameMap.put("min", "min_replaced");
+		renameMap.put("select", "select_replaced");
+		renameMap.put("OUT", "OUT_REPLACED");
+		renameMap.put("IN", "IN_REPLACED");
+		renameMap.put("SIZE", "SIZE_REPLACED");
 
-		if (classify) {
-			OrccLogger.traceln("Classification of actors...");
-			new Classifier().doSwitch(network);
-		}
-		if (mergeActors) {
-			OrccLogger.traceln("Merging of actors...");
-			new ActorMerger().doSwitch(network);
-		} else {
-			new CBroadcastAdder().doSwitch(network);
-		}
+		return renameMap;
+	}
 
-		new ArgumentEvaluator().doSwitch(network);
+	@Override
+	protected void beforeGeneration(Network network) {
+		new File(path + File.separator + "build").mkdirs();
+		new File(path + File.separator + "bin").mkdirs();
+
+		network.computeTemplateMaps();
 
 		// if required, load the buffer size from the mapping file
 		if (getOption(IMPORT_BXDF, false)) {
@@ -229,21 +210,6 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) {
-		Validator.checkTopLevel(network);
-		Validator.checkMinimalFifoSize(network, fifoSize);
-
-		doTransformNetwork(network);
-
-		if (debug) {
-			// Serialization of the actors will break proxy link
-			EcoreUtil.resolveAll(network);
-		}
-		transformActors(network.getAllActors());
-
-		network.computeTemplateMaps();
-
-		// print instances
-		printChildren(network);
 
 		// print network
 		OrccLogger.trace("Printing network... ");
@@ -307,13 +273,28 @@ public class CBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printInstance(Instance instance) {
-		return new InstancePrinter(getOptions()).print(srcPath, instance) > 0;
+	protected void beforeGeneration(Instance instance) {
+		// update "vectorizable" information
+		Alignable.setAlignability(instance.getActor());
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(getOptions()).print(srcPath, actor) > 0;
+	protected Result doGenerateInstance(Instance instance) {
+		new InstancePrinter(getOptions()).print(srcPath, instance);
+		final Result result = Result.newInstance();
+		return result;
 	}
 
+	@Override
+	protected void beforeGeneration(Actor actor) {
+		// update "vectorizable" information
+		Alignable.setAlignability(actor);
+	}
+
+	@Override
+	protected Result doGenerateActor(Actor actor) {
+		new InstancePrinter(getOptions()).print(srcPath, actor);
+		final Result result = Result.newInstance();
+		return result;
+	}
 }
