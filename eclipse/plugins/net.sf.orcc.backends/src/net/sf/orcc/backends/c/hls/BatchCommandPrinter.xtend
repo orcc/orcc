@@ -28,12 +28,7 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import net.sf.orcc.df.Network
-
-import net.sf.orcc.util.OrccUtil
-import java.util.Map
 import net.sf.orcc.df.Instance
-import java.io.File
 
 /**
  *Batch Command for the network
@@ -42,10 +37,6 @@ import java.io.File
  * 
  */
 class BatchCommandPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
-
-	new(Network bat, Map<String, Object> options) {
-		super(bat, options)
-	}
 
 	override getNetworkFileContent() '''
 		:: The path variable must be set system wide to include vivado_hls and msys binaries, e.g.
@@ -100,18 +91,4 @@ class BatchCommandPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			«ENDFOR»
 		«ENDFOR»
 	'''
-
-	override print(String targetFolder) {
-
-		val contentNetwork = networkFileContent
-		val NetworkFile = new File(targetFolder + File::separator + "Command" + ".bat")
-
-		if (needToWriteFile(contentNetwork, NetworkFile)) {
-			OrccUtil::printFile(contentNetwork, NetworkFile)
-			return 0
-		} else {
-			return 1
-		}
-	}
-
 }

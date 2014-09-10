@@ -58,8 +58,8 @@ class NetworkPrinter extends CTemplate {
 	
 	new(Network network, Map<String, Object> options) {
 		super(options)
-		this.network = network
 
+		setNetwork(network)
 		if(options.containsKey(PROFILE)){
 			profile = options.get(PROFILE) as Boolean
 		}
@@ -68,6 +68,10 @@ class NetworkPrinter extends CTemplate {
 		}
 	}
 	
+	def setNetwork(Network network) {
+		this.network = network
+	}
+
 	/**
 	 * Print file content for the network
 	 * @param targetFolder folder to print the network file

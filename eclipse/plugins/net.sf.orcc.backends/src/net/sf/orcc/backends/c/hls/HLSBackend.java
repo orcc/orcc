@@ -66,10 +66,20 @@ public class HLSBackend extends CBackend {
 	private String commandPath;
 	private String vhdlPath;
 
-	private NetworkPrinter networkPrinter;
+	private final NetworkPrinter networkPrinter;
+	private final NetworkTestBenchPrinter netTestBenchPrinter;
+	private final TopVhdlPrinter topVHDLPrinter;
+	private final BatchCommandPrinter batchCommandPrinter;
+	private final BatchCommandPrinterLinux batchCommandPrinterLinux;
+
 
 	public HLSBackend() {
 		networkPrinter = new NetworkPrinter();
+
+		netTestBenchPrinter = new NetworkTestBenchPrinter();
+		topVHDLPrinter = new TopVhdlPrinter();
+		batchCommandPrinter = new BatchCommandPrinter();
+		batchCommandPrinterLinux = new BatchCommandPrinterLinux();
 	}
 
 	@Override
@@ -92,6 +102,10 @@ public class HLSBackend extends CBackend {
 
 		// Load options map into various code generator instances
 		networkPrinter.setOptions(getOptions());
+		netTestBenchPrinter.setOptions(getOptions());
+		topVHDLPrinter.setOptions(getOptions());
+		batchCommandPrinter.setOptions(getOptions());
+		batchCommandPrinterLinux.setOptions(getOptions());
 
 		// Configure the map used in RenameTransformation
 		final Map<String, String> renameMap = new HashMap<String, String>();
@@ -160,33 +174,17 @@ public class HLSBackend extends CBackend {
 	@Override
 	protected Result doAdditionalGeneration(Network network) {
 		final Result result = Result.newInstance();
-		OrccLogger.trace("Printing network testbench... ");
-		if (new NetworkTestBenchPrinter(network, getOptions()).print(srcPath) > 0) {// VHDLTestBenchPath
-			OrccLogger.traceRaw("Cached\n");
-		} else {
-			OrccLogger.traceRaw("Done\n");
-		}
-
-		OrccLogger.trace("Printing network VHDL Top... ");
-		if (new TopVhdlPrinter(network, getOptions()).print(srcPath) > 0) {
-			OrccLogger.traceRaw("Cached\n");
-		} else {
-			OrccLogger.traceRaw("Done\n");
-		}
-
-		OrccLogger.trace("Printing Windows batch command... ");
-		if (new BatchCommandPrinter(network, getOptions()).print(commandPath) > 0) {
-			OrccLogger.traceRaw("Cached\n");
-		} else {
-			OrccLogger.traceRaw("Done\n");
-		}
 		
-		OrccLogger.trace("Printing Linux batch command... ");
-		if (new BatchCommandPrinterLinux(network, getOptions()).print(commandPath) > 0) {
-			OrccLogger.traceRaw("Cached\n");
-		} else {
-			OrccLogger.traceRaw("Done\n");
-		}
+		netTestBenchPrinter.setNetwork(network);
+		topVHDLPrinter.setNetwork(network);
+		batchCommandPrinter.setNetwork(network);
+		batchCommandPrinterLinux.setNetwork(network);
+
+		result.merge(FilesManager.writeFile(netTestBenchPrinter.getNetworkFileContent(), vhdlPath, network.getName() + "_TopTestBench.vhd"));
+		result.merge(FilesManager.writeFile(topVHDLPrinter.getNetworkFileContent(), vhdlPath, network.getName() + "Top.vhd"));
+		result.merge(FilesManager.writeFile(batchCommandPrinter.getNetworkFileContent(), commandPath, "Command.bat"));
+		result.merge(FilesManager.writeFile(batchCommandPrinterLinux.getNetworkFileContent(), commandPath, "command-linux.sh"));
+
 		return result;
 	}
 

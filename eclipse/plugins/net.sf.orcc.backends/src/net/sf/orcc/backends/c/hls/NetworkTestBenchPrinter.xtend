@@ -28,13 +28,9 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.io.File
-import java.util.Map
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
-import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
-import net.sf.orcc.util.OrccUtil
 
 /**
  * generates top Network testbench
@@ -43,24 +39,6 @@ import net.sf.orcc.util.OrccUtil
  * 
  */
 class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
-
-	new(Network benchNetwork, Map<String, Object> options) {
-		super(benchNetwork, options)
-	}
-
-	override print(String targetFolder) {
-
-		val contentNetwork = networkFileContent
-		val NetworkFile = new File(
-			targetFolder + File::separator + "TopVHDL" + File::separator + network.name + "_TopTestBench" + ".vhd")
-
-		if (needToWriteFile(contentNetwork, NetworkFile)) {
-			OrccUtil::printFile(contentNetwork, NetworkFile)
-			return 0
-		} else {
-			return 1
-		}
-	}
 
 	override getNetworkFileContent() '''
 			LIBRARY ieee;
