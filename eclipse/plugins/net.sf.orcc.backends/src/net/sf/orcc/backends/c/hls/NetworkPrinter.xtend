@@ -28,11 +28,6 @@
  */
 package net.sf.orcc.backends.c.hls
 
-import java.io.File
-import java.util.Map
-import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
-
 /**
  *  sim_package and  ram_tab
  *  
@@ -40,26 +35,6 @@ import net.sf.orcc.util.OrccUtil
  * 
  */
 class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
-
-	new(Network network, Map<String, Object> options) {
-		super(network, options)
-	}
-
-	override print(String targetFolder) {
-		val contentVhdlTop = fifoFileContent
-		val contentSimPack = fifoSimPackContent
-		val SimPackFile = new File(targetFolder + File::separator + "TopVHDL" + File::separator + "sim_package" + ".vhd")
-		val FifoVhdlFile = new File(
-			targetFolder + File::separator + "TopVHDL" + File::separator + "ram_tab" + ".vhd")
-		if (needToWriteFile(contentVhdlTop, FifoVhdlFile)) {
-			OrccUtil::printFile(contentVhdlTop, FifoVhdlFile)
-			OrccUtil::printFile(contentSimPack, SimPackFile)
-
-			return 0
-		} else {
-			return 1
-		}
-	}
 
 	/*
 	 * Generic FIFO

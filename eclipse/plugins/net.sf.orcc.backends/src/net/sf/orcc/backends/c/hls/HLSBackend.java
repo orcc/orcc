@@ -50,6 +50,7 @@ import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
 
@@ -63,6 +64,13 @@ import net.sf.orcc.util.Result;
 public class HLSBackend extends CBackend {
 
 	private String commandPath;
+	private String vhdlPath;
+
+	private NetworkPrinter networkPrinter;
+
+	public HLSBackend() {
+		networkPrinter = new NetworkPrinter();
+	}
 
 	@Override
 	protected Result doLibrariesExtraction() {
@@ -74,10 +82,16 @@ public class HLSBackend extends CBackend {
 	@Override
 	protected void doInitializeOptions() {
 
+		// Inherits from C backend options and configuration
 		super.doInitializeOptions();
 
+		// Configure paths were files will be generated
 		srcPath = path + File.separator + "HLSBackend";
 		commandPath = srcPath + File.separator + "batchCommand";
+		vhdlPath = srcPath + File.separator + "TopVHDL";
+
+		// Load options map into various code generator instances
+		networkPrinter.setOptions(getOptions());
 
 		// Configure the map used in RenameTransformation
 		final Map<String, String> renameMap = new HashMap<String, String>();
@@ -138,13 +152,8 @@ public class HLSBackend extends CBackend {
 	@Override
 	protected Result doGenerateNetwork(Network network) {
 		final Result result = Result.newInstance();
-		// print network
-		OrccLogger.trace("Printing network... ");
-		if (new NetworkPrinter(network, getOptions()).print(srcPath) > 0) {
-			OrccLogger.traceRaw("Cached\n");
-		} else {
-			OrccLogger.traceRaw("Done\n");
-		}
+		result.merge(FilesManager.writeFile(networkPrinter.fifoSimPackContent(), vhdlPath, "sim_package.vhd"));
+		result.merge(FilesManager.writeFile(networkPrinter.fifoFileContent(), vhdlPath, "ram_tab.vhd"));
 		return result;
 	}
 
