@@ -55,7 +55,7 @@ import static net.sf.orcc.util.Result.*
  */
 class FilesManager {
 
-	// TODO: In a future version, an classical java enum could be
+	// TODO: In a future version, a classical java enum could be
 	// used here. This is possible only with Xtend 2.4
 	public static val OS_WINDOWS = 1
 	public static val OS_LINUX = 2
@@ -69,7 +69,7 @@ class FilesManager {
 	 * <em>target folder</em>.</p>
 	 * 
 	 * <p>It is important to understand that the resource (file or folder) at the given path
-	 * will be copiend <b>into</b> the target folder. For example,
+	 * will be copied <b>into</b> the target folder. For example,
 	 * <code>extract("/path/to/file.txt", "/home/johndoe")</code> will copy <em>file.txt</em>
 	 * into <em>/home/johndoe</em>, and <code>extract("/path/to/MyFolder", "/home/johndoe")</code>
 	 * will create <em>MyFolder</em> directory in <em>/home/johndoe</em> and copy all files
