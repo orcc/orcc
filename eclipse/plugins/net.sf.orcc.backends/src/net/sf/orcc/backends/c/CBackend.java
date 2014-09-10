@@ -102,9 +102,24 @@ public class CBackend extends AbstractBackend {
 	 */
 	protected String srcPath;
 
+	private final NetworkPrinter networkPrinter;
+	private final CMakePrinter cmakePrinter;
+	private final InstancePrinter instancePrinter;
+
+	public CBackend() {
+		networkPrinter = new NetworkPrinter();
+		cmakePrinter = new CMakePrinter();
+		instancePrinter = new InstancePrinter();
+	}
+
 	@Override
 	protected void doInitializeOptions() {
+		// Configure paths
 		srcPath = path + File.separator + "src";
+
+		// Load options map into code generator instances
+		networkPrinter.setOptions(getOptions());
+		instancePrinter.setOptions(getOptions());
 
 		// -----------------------------------------------------
 		// Transformations that will be applied on the Network
@@ -195,57 +210,8 @@ public class CBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected void beforeGeneration(Network network) {
-		new File(path + File.separator + "build").mkdirs();
-		new File(path + File.separator + "bin").mkdirs();
-
-		network.computeTemplateMaps();
-
-		// if required, load the buffer size from the mapping file
-		if (getOption(IMPORT_BXDF, false)) {
-			File f = new File(getOption(BXDF_FILE, ""));
-			new XmlBufferSizeConfiguration().load(f, network);
-		}
-	}
-
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
-
-		// print network
-		OrccLogger.trace("Printing network... ");
-		if (new NetworkPrinter(network, getOptions()).print(srcPath) > 0) {
-			OrccLogger.traceRaw("Cached\n");
-		} else {
-			OrccLogger.traceRaw("Done\n");
-		}
-		if (getOption(ENABLE_TRACES, true)) {
-			new TracesPrinter(network, getOptions()).print(srcPath);
-		}
-		printCMake(network);
-
-		CharSequence content = new StatisticsPrinter().getContent(network);
-		FilesManager.writeFile(content, srcPath, network.getSimpleName()
-				+ ".csv");
-
-		content = new Mapping(network, mapping).getContentFile();
-		FilesManager.writeFile(content, srcPath, network.getSimpleName()
-				+ ".xcf");
-	}
-
-	protected void printCMake(Network network) {
-		// print CMakeLists
-		OrccLogger.traceln("Printing CMake project files");
-		CMakePrinter printer = new CMakePrinter(network);
-
-		FilesManager.writeFile(printer.rootCMakeContent(), path,
-				"CMakeLists.txt");
-		FilesManager.writeFile(printer.srcCMakeContent(), srcPath,
-				"CMakeLists.txt");
-	}
-
-	@Override
 	protected Result doLibrariesExtraction() {
-		Result result = FilesManager.extract("/runtime/C/README.txt", path);
+		final Result result = FilesManager.extract("/runtime/C/README.txt", path);
 
 		// Copy specific windows batch file
 		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
@@ -253,11 +219,9 @@ public class CBackend extends AbstractBackend {
 					"/runtime/C/run_cmake_with_VS_env.bat", path));
 		}
 
-		OrccLogger.traceln("Export libraries sources");
 		result.merge(FilesManager.extract("/runtime/C/libs", path));
 
 		String scriptsPath = path + File.separator + "scripts";
-
 		OrccLogger.traceln("Export scripts into " + scriptsPath + "... ");
 
 		result.merge(FilesManager.extract("/runtime/common/scripts", path));
@@ -273,6 +237,51 @@ public class CBackend extends AbstractBackend {
 	}
 
 	@Override
+	protected void beforeGeneration(Network network) {
+		new File(path + File.separator + "build").mkdirs();
+		new File(path + File.separator + "bin").mkdirs();
+
+		network.computeTemplateMaps();
+
+		// if required, load the buffer size from the mapping file
+		if (getOption(IMPORT_BXDF, false)) {
+			File f = new File(getOption(BXDF_FILE, ""));
+			new XmlBufferSizeConfiguration().load(f, network);
+		}
+	}
+
+	@Override
+	protected Result doGenerateNetwork(Network network) {
+		networkPrinter.setNetwork(network);
+		return FilesManager.writeFile(networkPrinter.getNetworkFileContent(),
+				srcPath, network.getSimpleName() + ".c");
+	}
+
+	@Override
+	protected Result doAdditionalGeneration(Network network) {
+		cmakePrinter.setNetwork(network);
+		final Result result = Result.newInstance();
+		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(),
+				path, "CMakeLists.txt"));
+		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(),
+				srcPath, "CMakeLists.txt"));
+
+		if (getOption(ENABLE_TRACES, true)) {
+			new TracesPrinter(network, getOptions()).print(srcPath);
+		}
+
+		CharSequence content = new StatisticsPrinter().getContent(network);
+		FilesManager.writeFile(content, srcPath, network.getSimpleName()
+				+ ".csv");
+
+		content = new Mapping(network, mapping).getContentFile();
+		FilesManager.writeFile(content, srcPath, network.getSimpleName()
+				+ ".xcf");
+
+		return result;
+	}
+
+	@Override
 	protected void beforeGeneration(Instance instance) {
 		// update "vectorizable" information
 		Alignable.setAlignability(instance.getActor());
@@ -280,9 +289,9 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected Result doGenerateInstance(Instance instance) {
-		new InstancePrinter(getOptions()).print(srcPath, instance);
-		final Result result = Result.newInstance();
-		return result;
+		instancePrinter.setInstance(instance);
+		return FilesManager.writeFile(instancePrinter.getFileContent(), srcPath,
+				instance.getSimpleName() + ".c");
 	}
 
 	@Override
@@ -293,8 +302,8 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected Result doGenerateActor(Actor actor) {
-		new InstancePrinter(getOptions()).print(srcPath, actor);
-		final Result result = Result.newInstance();
-		return result;
+		instancePrinter.setActor(actor);
+		return FilesManager.writeFile(instancePrinter.getFileContent(), srcPath,
+				actor.getSimpleName() + ".c");
 	}
 }

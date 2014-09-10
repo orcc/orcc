@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.c
 
-import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
@@ -36,7 +35,6 @@ import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
-import net.sf.orcc.util.OrccUtil
 
 import static net.sf.orcc.backends.BackendsConstants.*
 
@@ -53,42 +51,18 @@ class NetworkPrinter extends CTemplate {
 	protected var boolean profile = false	
 	protected var boolean newSchedul = false
 	
-	new() {
+	def setNetwork(Network network) {
+		this.network = network
 	}
-	
-	new(Network network, Map<String, Object> options) {
-		super(options)
 
-		setNetwork(network)
+	override setOptions(Map<String, Object> options) {
+		super.setOptions(options)
 		if(options.containsKey(PROFILE)){
 			profile = options.get(PROFILE) as Boolean
 		}
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
-		}
-	}
-	
-	def setNetwork(Network network) {
-		this.network = network
-	}
-
-	/**
-	 * Print file content for the network
-	 * @param targetFolder folder to print the network file
-	 * @return 1 if file was cached, 0 if file was printed
-	 */
-	def print(String targetFolder) {
-
-		val content = networkFileContent
-		val file = new File(targetFolder + File::separator + network.simpleName + ".c")
-
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
+		}	}
 
 	def protected getNetworkFileContent() '''
 		// Generated from "«network.name»"

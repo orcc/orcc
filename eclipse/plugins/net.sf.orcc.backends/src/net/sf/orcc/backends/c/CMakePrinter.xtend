@@ -41,12 +41,6 @@ class CMakePrinter extends CommonPrinter {
 	
 	protected var Network network
 
-	new() {}
-
-	new (Network network) {
-		setNetwork(network)
-	}
-
 	def setNetwork(Network network) {
 		this.network = network
 	}
