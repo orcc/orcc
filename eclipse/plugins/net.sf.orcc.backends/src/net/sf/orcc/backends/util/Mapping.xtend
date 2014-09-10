@@ -67,15 +67,6 @@ class Mapping extends CommonPrinter {
 
 	public new(Network network, Map<String, String> map) {
 		this(network)
-		computeFromMap(map)
-	}
-
-	public new(Network network, File xcfFile) {
-		this(network)
-		computeFromFile(xcfFile)
-	}
-
-	def private void computeFromMap(Map<String, String> map) {
 		i = 0
 		if (!map.values.forall[nullOrEmpty]) {
 			for (instance : network.children.actorInstances) {
@@ -101,7 +92,8 @@ class Mapping extends CommonPrinter {
 		}
 	}
 
-	def private void computeFromFile(File xcfFile) {
+	public new(Network network, File xcfFile) {
+		this(network)
 		if (!xcfFile.exists || !xcfFile.file)
 			throw new OrccRuntimeException("The XCF file does not exist.")
 

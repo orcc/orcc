@@ -28,10 +28,7 @@
  */
 package net.sf.orcc.backends.c
 
-import java.io.File
-import java.util.Map
 import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate and print couples of traces file names.
@@ -41,32 +38,7 @@ import net.sf.orcc.util.OrccUtil
  */
 class TracesPrinter extends CTemplate {
 	
-	protected val Network network;
-	
-	new(Network network, Map<String, Object> options) {
-		super(options)
-		this.network = network
-	}
-	
-	/**
-	 * Print file content for the network
-	 * @param targetFolder folder to print the network file
-	 * @return 1 if file was cached, 0 if file was printed
-	 */
-	def print(String targetFolder) {
-
-		val content = tracesFileContent
-		val file = new File(targetFolder + File::separator + "traces.txt")
-
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
-
-	def protected getTracesFileContent() '''
+	def protected getTracesFileContent(Network network) '''
 		«FOR connection : network.connections»
 			«connection.target.label»_«connection.targetPort.name».txt «connection.source.label»_«connection.sourcePort.name».txt «connection.target.label» «connection.targetPort.name» «connection.source.label» «connection.sourcePort.name» «connection.safeSize»
 		«ENDFOR»

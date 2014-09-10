@@ -106,10 +106,16 @@ public class CBackend extends AbstractBackend {
 	private final CMakePrinter cmakePrinter;
 	private final InstancePrinter instancePrinter;
 
+	private final TracesPrinter tracesPrinter;
+	private final StatisticsPrinter statsPrinter;
+
 	public CBackend() {
 		networkPrinter = new NetworkPrinter();
 		cmakePrinter = new CMakePrinter();
 		instancePrinter = new InstancePrinter();
+
+		tracesPrinter = new TracesPrinter();
+		statsPrinter = new StatisticsPrinter();
 	}
 
 	@Override
@@ -120,6 +126,7 @@ public class CBackend extends AbstractBackend {
 		// Load options map into code generator instances
 		networkPrinter.setOptions(getOptions());
 		instancePrinter.setOptions(getOptions());
+		tracesPrinter.setOptions(getOptions());
 
 		// -----------------------------------------------------
 		// Transformations that will be applied on the Network
@@ -267,16 +274,17 @@ public class CBackend extends AbstractBackend {
 				srcPath, "CMakeLists.txt"));
 
 		if (getOption(ENABLE_TRACES, true)) {
-			new TracesPrinter(network, getOptions()).print(srcPath);
+			result.merge(FilesManager.writeFile(
+					tracesPrinter.getTracesFileContent(network), srcPath,
+					"traces.txt"));
 		}
 
-		CharSequence content = new StatisticsPrinter().getContent(network);
-		FilesManager.writeFile(content, srcPath, network.getSimpleName()
-				+ ".csv");
+		result.merge(FilesManager.writeFile(statsPrinter.getContent(network),
+				srcPath, network.getSimpleName() + ".csv"));
 
-		content = new Mapping(network, mapping).getContentFile();
-		FilesManager.writeFile(content, srcPath, network.getSimpleName()
-				+ ".xcf");
+		final Mapping mapper = new Mapping(network, mapping);
+		result.merge(FilesManager.writeFile(mapper.getContentFile(), srcPath,
+				network.getSimpleName() + ".xcf"));
 
 		return result;
 	}
