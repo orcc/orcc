@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.c.compa
 
 import net.sf.orcc.df.Connection
-import net.sf.orcc.df.Network
 
 /**
  * Generate and print network source file for COMPA backend.
