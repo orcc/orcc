@@ -29,7 +29,6 @@
 
 package net.sf.orcc.backends.c.preesm
 
-import java.io.File
 import net.sf.orcc.backends.c.CTemplate
 import net.sf.orcc.df.Argument
 import net.sf.orcc.df.Connection
@@ -37,7 +36,6 @@ import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Network
 import net.sf.orcc.moc.CSDFMoC
 import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generate network as graphml file
@@ -46,39 +44,13 @@ import net.sf.orcc.util.OrccUtil
  */
 class NetworkPrinter extends CTemplate {
 
-	val Network network
+	var Network network
 
-	new(Network network) {
+	def setNetwork(Network network) {
 		this.network = network
 	}
 
-	def printNetwork(String targetFolder) {
-
-		var numFilesCached = 0
-
-		val csvFile = new File(targetFolder + File::separator + network.name + ".varSizes.csv")
-		val csvContent = sizesCSV
-		if(needToWriteFile(csvContent, csvFile)) {
-			OrccUtil::printFile(csvContent, csvFile)
-		} else {
-			numFilesCached = numFilesCached + 1
-		}
-		
-		val graphmlContent = networkContent
-		val graphmlFile = new File(targetFolder + File::separator + "Algo"
-			+ File::separator + network.name + ".graphml"
-		)
-
-		if(needToWriteFile(graphmlContent, graphmlFile)) {
-			OrccUtil::printFile(graphmlContent, graphmlFile)
-		} else {
-			numFilesCached = numFilesCached + 1
-		}
-
-		return numFilesCached
-	}
-
-	def private getSizesCSV() {
+	def getSizesCSV() {
 		var keys = newArrayList("i64", "i32", "i16", "i8")
 		var values = newArrayList(8, 4, 2, 1)
 		for(instance : network.children.filter(typeof(Instance))) {
@@ -99,7 +71,7 @@ class NetworkPrinter extends CTemplate {
 		'''
 	}
 
-	def private getNetworkContent() '''
+	def getNetworkContent() '''
 		<?xml version="1.0" encoding="UTF-8"?>
 			<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
 		    <key attr.name="graph_desc" attr.type="string" for="node" id="graph_desc"/>

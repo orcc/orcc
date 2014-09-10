@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.backends.c.preesm;
 
+import java.io.File;
+
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
@@ -36,9 +39,8 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.tools.classifier.Classifier;
-import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.Result;
 
 /**
@@ -50,16 +52,28 @@ import net.sf.orcc.util.Result;
  */
 public class PreesmBackend extends AbstractBackend {
 
+	private final ActorPrinter actorPrinter;
+	private final NetworkPrinter networkPrinter;
+
 	public PreesmBackend() {
 		super(true);
+
+		actorPrinter = new ActorPrinter();
+		networkPrinter = new NetworkPrinter();
 	}
 
 	@Override
 	protected void doInitializeOptions() {
-	}
 
-	@Override
-	protected void doTransformActor(Actor actor) {
+		actorPrinter.setOptions(getOptions());
+		networkPrinter.setOptions(getOptions());
+
+		// -----------------------------------------------------
+		// Transformations that will be applied on the Network
+		// -----------------------------------------------------
+		networkTransfos.add(new Instantiator(false));
+		networkTransfos.add(new NetworkFlattener());
+		networkTransfos.add(new Classifier());
 	}
 
 	/**
@@ -73,64 +87,55 @@ public class PreesmBackend extends AbstractBackend {
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		// instantiate and flattens network
-		new Instantiator(false).doSwitch(network);
-		new NetworkFlattener().doSwitch(network);
-
-		// This call is needed to associate instances to network vertices
+	protected void beforeGeneration(Network network) {
 		network.computeTemplateMaps();
 
-		// The classification gives production and consumption information from
-		// the graph
-		OrccLogger.traceln("Starting classification of actors... ");
-		new Classifier().doSwitch(network);
-		OrccLogger.traceln("done");
-
-		// Check that all actors have SDF MoC
-		// or CSDF (converted to SDF)
-		boolean isSDF = true;
 		for (Actor actor : network.getAllActors()) {
-			MoC moc = actor.getMoC();
-
-			if (moc.isSDF()) {
-				// This is what we want, do nothing
-			} else {
-				if (moc.isCSDF()) {
-					// TODO CSDF actor will be converted into SDF
-				} else {
-					// Actor is neither SDF nor CSDF. Cannot use the backend
-					isSDF = false;
-				}
+			final MoC moc = actor.getMoC();
+			if (!(moc.isSDF() || moc.isCSDF())) {
+				throw new OrccRuntimeException(
+						"The network is not SDF. Other models are not yet supported.");
 			}
-		}
-
-		// Print network
-		if (isSDF) {
-			SDFMoC moc = (SDFMoC) network.getAllActors().get(0).getMoC();
-			moc.toString();
-			OrccLogger.traceln("Printing network...");
-
-			new NetworkPrinter(network).printNetwork(path);
-
-		} else {
-			OrccLogger
-					.traceln("The network is not SDF. Other models are not yet supported.");
 		}
 	}
 
-	/**
-	 * Instead of printing actors' instances like in the C backend, we wish to
-	 * print actors and reference them from the network generated code.
-	 */
 	@Override
-	protected boolean printActor(Actor actor) {
-		return new ActorPrinter(getOptions()).print(path, actor) != 0;
+	protected Result doGenerateNetwork(Network network) {
+		networkPrinter.setNetwork(network);
+		final Result result = Result.newInstance();
+
+		result.merge(FilesManager.writeFile(networkPrinter.getSizesCSV(), path,
+				network.getName() + ".varSizes.csv"));
+
+		result.merge(FilesManager.writeFile(networkPrinter.getNetworkContent(),
+				path + File.separator + "Algo", network.getName() + ".graphml"));
+
+		return result;
 	}
 
 	@Override
 	protected Result doGenerateActor(Actor actor) {
-		new ActorPrinter(getOptions()).print(path, actor);
-		return super.doGenerateActor(actor);
+		actorPrinter.setActor(actor);
+		final Result result = Result.newInstance();
+		result.merge(FilesManager.writeFile(actorPrinter.getActorIDLContent(),
+				path + File.separator + "Code" + File.separator + "IDL",
+				actor.getSimpleName() + ".idl"));
+
+		result.merge(FilesManager.writeFile(actorPrinter.getActorCContent(),
+				path + File.separator + "Code" + File.separator + "src",
+				actor.getSimpleName() + ".c"));
+		return result;
+	}
+
+	// TODO: delete when all backends will have been migrated
+	@Override
+	protected boolean printActor(Actor actor) {
+		return false;
+	}
+	@Override
+	protected void doTransformActor(Actor actor) {
+	}
+	@Override
+	protected void doXdfCodeGeneration(Network network) {
 	}
 }
