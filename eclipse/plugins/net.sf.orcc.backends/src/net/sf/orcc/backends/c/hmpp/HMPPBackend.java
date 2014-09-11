@@ -67,7 +67,6 @@ public class HMPPBackend extends CBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		super.doInitializeOptions();
 
 		instancePrinter.setOptions(getOptions());
 

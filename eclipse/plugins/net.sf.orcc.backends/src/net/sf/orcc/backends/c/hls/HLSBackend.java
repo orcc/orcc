@@ -112,9 +112,6 @@ public class HLSBackend extends CBackend {
 	@Override
 	protected void doInitializeOptions() {
 
-		// Inherits from C backend options and configuration
-		super.doInitializeOptions();
-
 		// Configure paths were files will be generated
 		srcPath = path + File.separator + "HLSBackend";
 		commandPath = srcPath + File.separator + "batchCommand";
