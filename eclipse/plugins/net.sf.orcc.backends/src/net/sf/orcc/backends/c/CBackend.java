@@ -151,7 +151,7 @@ public class CBackend extends AbstractBackend {
 		networkTransfos.add(new TypeResizer(true, false, true, false));
 
 		// -------------------------------------------------------------------
-		// Transformations that will be applied on children (instances/actors
+		// Transformations that will be applied on children (instances/actors)
 		// -------------------------------------------------------------------
 		if (mergeActions) {
 			childrenTransfos.add(new ActionMerger());
