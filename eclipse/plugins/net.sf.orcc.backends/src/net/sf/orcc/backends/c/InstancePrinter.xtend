@@ -63,7 +63,6 @@ import net.sf.orcc.ir.TypeList
 import net.sf.orcc.ir.Var
 import net.sf.orcc.util.Attributable
 import net.sf.orcc.util.OrccLogger
-import net.sf.orcc.util.OrccUtil
 import net.sf.orcc.util.util.EcoreHelper
 
 import static net.sf.orcc.OrccLaunchConstants.*
@@ -116,8 +115,8 @@ class InstancePrinter extends CTemplate {
 		instance = null
 	}
 
-	new(Map<String, Object> options) {
-		super(options)
+	override setOptions(Map<String, Object> options) {
+		super.setOptions(options)
 		if(options.containsKey(PROFILE)){
 			profile = options.get(PROFILE) as Boolean
 		}
@@ -140,32 +139,6 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 
-	/**
-	 * Print file content from a given instance
-	 *
-	 * @param targetFolder folder to print the instance file
-	 * @param instance the given instance
-	 * @return 1 if file was cached, 0 if file was printed
-	 */
-	@Deprecated
-	def print(String targetFolder, Instance instance) {
-		setInstance(instance)
-		print(targetFolder)
-	}
-
-	/**
-	 * Print file content from a given actor
-	 *
-	 * @param targetFolder folder to print the actor file
-	 * @param actor the given actor
-	 * @return 1 if file was cached, 0 if file was printed
-	 */
-	@Deprecated
-	def print(String targetFolder, Actor actor) {
-		setActor(actor)
-		print(targetFolder)
-	}
-
 	def getInstanceContent(Instance instance) {
 		setInstance(instance)
 		fileContent
@@ -174,23 +147,6 @@ class InstancePrinter extends CTemplate {
 	def getActorContent(Actor actor) {
 		setActor(actor)
 		fileContent
-	}
-
-	@Deprecated
-	def protected print(String targetFolder) {
-		checkConnectivy
-
-		val content = fileContent
-		val file = new File(targetFolder + File::separator + entityName + ".c")
-
-		if(actor.native) {
-			OrccLogger::noticeln(entityName + " is native and not generated.")
-		} else if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
 	}
 
 	def setInstance(Instance instance) {
