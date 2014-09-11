@@ -153,6 +153,14 @@ class Design:
             print "Cannot use -q option in simulations when using more than one job."
             return;
 
+        if not os.path.exists(os.path.join(srcPath, "trace")):
+            print "Simulation error : trace directory does not exists."
+            return 2
+
+        if not os.listdir(os.path.join(srcPath, "trace")):
+            print "Simulation error : trace directory is empty."
+            return 2
+
         self.sema = multiprocessing.BoundedSemaphore(value=nbJobs)
         results = multiprocessing.Manager().list()
         jobs = [multiprocessing.Process(target=self.simulateMulti, args=(srcPath, processor, results, args)) 
