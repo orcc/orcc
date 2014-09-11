@@ -1090,6 +1090,7 @@ class InstancePrinter extends CTemplate {
 	//   Old template data initialization
 	//========================================
 	def private buildInputPattern() {
+		inputPattern.clear
 		for (action : actor.actionsOutsideFsm) {
 			val actionPattern = action.inputPattern
 			for (port : actionPattern.ports) {
@@ -1101,6 +1102,7 @@ class InstancePrinter extends CTemplate {
 
 	def private buildTransitionPattern() {
 		val fsm = actor.getFsm()
+		transitionPattern.clear
 
 		if (fsm != null) {
 			for (state : fsm.getStates()) {

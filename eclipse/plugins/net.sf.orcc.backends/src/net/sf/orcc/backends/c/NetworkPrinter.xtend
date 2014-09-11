@@ -62,7 +62,8 @@ class NetworkPrinter extends CTemplate {
 		}
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
-		}	}
+		}
+	}
 
 	def protected getNetworkFileContent() '''
 		// Generated from "«network.name»"
