@@ -224,6 +224,9 @@ class FilesManager {
 	 * @return A Result object with information about extraction status
 	 */
 	private def static streamExtract(InputStream inputStream, File targetFile) {
+		if(!targetFile.parentFile.exists) {
+			targetFile.parentFile.mkdirs
+		}
 		val bufferedInput = new BufferedInputStream(inputStream)
 		val outputStream = new BufferedOutputStream(
 			new FileOutputStream(targetFile)
