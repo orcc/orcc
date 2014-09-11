@@ -149,6 +149,7 @@ public class CBackend extends AbstractBackend {
 		}
 		networkTransfos.add(new ArgumentEvaluator());
 		networkTransfos.add(new TypeResizer(true, false, true, false));
+		networkTransfos.add(new RenameTransformation(getRenameMap()));
 
 		// -------------------------------------------------------------------
 		// Transformations that will be applied on children (instances/actors)
@@ -159,7 +160,6 @@ public class CBackend extends AbstractBackend {
 		if (convertMulti2Mono) {
 			childrenTransfos.add(new Multi2MonoToken());
 		}
-		childrenTransfos.add(new RenameTransformation(getRenameMap()));
 		childrenTransfos.add(new DfVisitor<Void>(new InlinerByAnnotation()));
 		childrenTransfos.add(new DfVisitor<Void>(new LoopUnrolling()));
 
