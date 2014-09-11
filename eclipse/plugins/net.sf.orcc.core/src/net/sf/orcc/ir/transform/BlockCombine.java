@@ -48,7 +48,7 @@ public class BlockCombine extends AbstractIrVisitor<Void> {
 
 	private BlockBasic previous;
 
-	private Boolean combineJoinBlock;
+	private final Boolean combineJoinBlock;
 
 	public BlockCombine() {
 		combineJoinBlock = true;

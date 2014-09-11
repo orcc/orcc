@@ -149,6 +149,7 @@ public class StoreOnceTransformation extends DfVisitor<Object> {
 
 		@Override
 		public Set<Var> caseProcedure(Procedure procedure) {
+			globalsLockedSet.clear();
 			super.caseProcedure(procedure);
 			return globalsLockedSet;
 		}

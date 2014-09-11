@@ -445,6 +445,7 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 	@Override
 	public Void caseActor(Actor actor) {
 		this.actor = actor;
+		divProc = null;
 		checkDiv();
 
 		if (divProc != null) {

@@ -169,6 +169,8 @@ public class PhiRemoval extends AbstractIrVisitor<Void> {
 			procedure.getLocals().remove(local);
 		}
 
+		localsToRemove.clear();
+
 		return DONE;
 	}
 

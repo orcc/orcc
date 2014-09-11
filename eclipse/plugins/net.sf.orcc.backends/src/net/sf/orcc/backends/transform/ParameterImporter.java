@@ -76,6 +76,7 @@ public class ParameterImporter extends DfVisitor<Void> {
 	@Override
 	public Void caseActor(Actor actor) {
 		this.actor = actor;
+		paramToGlobalVarMap.clear();
 
 		for (Var parameter : actor.getParameters()) {
 			Var paramVar = newGlobalVariable(parameter.getType(), "param_"

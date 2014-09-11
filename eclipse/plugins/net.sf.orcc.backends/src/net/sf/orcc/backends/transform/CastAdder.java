@@ -83,10 +83,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class CastAdder extends AbstractIrVisitor<Expression> {
 
-	private static IrFactory factory = IrFactory.eINSTANCE;
-	private static IrSpecificFactory factorySpec = IrSpecificFactory.eINSTANCE;
-	private boolean castToUnsigned;
-	private boolean createEmptyBlockBasic;
+	private final static IrFactory factory = IrFactory.eINSTANCE;
+	private final static IrSpecificFactory factorySpec = IrSpecificFactory.eINSTANCE;
+	private final boolean castToUnsigned;
+	private final boolean createEmptyBlockBasic;
 	protected Type parentType;
 
 	/**
