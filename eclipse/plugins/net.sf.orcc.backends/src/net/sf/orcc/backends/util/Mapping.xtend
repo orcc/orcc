@@ -58,16 +58,8 @@ class Mapping extends CommonPrinter {
 	var List<Vertex> unmapped
 	var int i
 
-	private new(Network network) {
-		this.network = network
-		this.mapping = new HashMap<String, List<Vertex>>
-		this.invMapping = new HashMap<Vertex, String>
-		this.unmapped = new ArrayList<Vertex>
-	}
-
 	public new(Network network, Map<String, String> map) {
-		this(network)
-		i = 0
+		setNetwork(network)
 		if (!map.values.forall[nullOrEmpty]) {
 			for (instance : network.children.actorInstances) {
 				instance.tryToMap(map.get(instance.hierarchicalName))
@@ -93,7 +85,7 @@ class Mapping extends CommonPrinter {
 	}
 
 	public new(Network network, File xcfFile) {
-		this(network)
+		setNetwork(network)
 		if (!xcfFile.exists || !xcfFile.file)
 			throw new OrccRuntimeException("The XCF file does not exist.")
 
@@ -128,6 +120,13 @@ class Mapping extends CommonPrinter {
 		} else {
 			throw new OrccRuntimeException("Wrong XCF file")
 		}
+	}
+
+	private def setNetwork(Network network) {
+		this.network = network
+		this.mapping = new HashMap<String, List<Vertex>>
+		this.invMapping = new HashMap<Vertex, String>
+		this.unmapped = new ArrayList<Vertex>
 	}
 
 	def private tryToMap(Vertex vertex, String component) {
