@@ -152,7 +152,7 @@ class SimulationAnalyse(OrccAnalyse):
             if actor.status == "OK":
                 passed = "yes"
             else:
-                passer = "no"
+                passed = "no"
             fic.write("    <test name=\"" + actor.actor_name + "\" executed=\"yes\">" + "\n");
             fic.write("        <result>" + "\n");
             fic.write("            <success passed=\"" + passed + "\" state=\"100\" hasTimedOut=\"false\" />" + "\n");
