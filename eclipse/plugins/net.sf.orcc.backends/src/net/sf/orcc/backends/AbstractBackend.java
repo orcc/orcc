@@ -314,16 +314,19 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// -----------------------------------------------------
 		// Network level code generation
 		// -----------------------------------------------------
-		final IFile xdfFile = getFile(project, getOption(XDF_FILE, ""),
+		final Network network;
+		final String networkQName = getOption(XDF_FILE, "");
+		final IFile xdfFile = getFile(project, networkQName,
 				OrccUtil.NETWORK_SUFFIX);
-		final Network network = EcoreHelper.getEObject(currentResourceSet,
-				xdfFile);
+		if (xdfFile == null) {
+			throw new OrccRuntimeException("Unable to find the XDF file "
+					+ "corresponding to the network " + networkQName + ".");
+		} else {
+			network = EcoreHelper.getEObject(currentResourceSet, xdfFile);
+		}
 
 		if (compileXdf) {
-			if (xdfFile == null) {
-				throw new OrccRuntimeException(
-						"The input XDF file does not exists.");
-			} else if (network == null) {
+			if (network == null) {
 				throw new OrccRuntimeException(
 						"The input file seems to not contains any network");
 			}
