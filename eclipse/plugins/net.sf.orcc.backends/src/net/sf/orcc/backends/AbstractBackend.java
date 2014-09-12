@@ -335,7 +335,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				stopIfRequested();
 				OrccLogger.traceln("Network transformations");
 				final long t0 = System.currentTimeMillis();
-				applyTransformations(network, networkTransfos);
+				applyTransformations(network, networkTransfos, debug);
 				OrccLogger.traceln("Done in " + getDuration(t0) + "s");
 			}
 
@@ -384,7 +384,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				stopIfRequested();
 				OrccLogger.traceln("Actors transformations");
 				final long t0 = System.currentTimeMillis();
-				applyTransformations(actors, childrenTransfos);
+				applyTransformations(actors, childrenTransfos, debug);
 				OrccLogger.traceln("Done in " + getDuration(t0) + "s");
 			}
 
@@ -408,7 +408,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				stopIfRequested();
 				OrccLogger.traceln("Children transformations");
 				final long t0 = System.currentTimeMillis();
-				applyTransformations(network.getAllActors(), childrenTransfos);
+				applyTransformations(network.getAllActors(), childrenTransfos, debug);
 				OrccLogger.traceln("Done in " + getDuration(t0) + "s");
 			}
 
@@ -563,11 +563,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param objects
 	 * @param transformations
+	 * @param validate
+	 *            Indicates that transformation result must be validated
 	 */
 	final private <T extends EObject> void applyTransformations(
-			Iterable<T> objects, Iterable<DfVisitor<?>> transformations) {
+			Iterable<T> objects, Iterable<DfVisitor<?>> transformations,
+			boolean validate) {
 		for (final T object : objects) {
-			applyTransformations(object, transformations);
+			applyTransformations(object, transformations, validate);
 		}
 	}
 
@@ -576,11 +579,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param object
 	 * @param transformations
+	 * @param validate
+	 *            Indicates that transformation result must be validated
 	 */
 	final private void applyTransformations(EObject object,
-			Iterable<DfVisitor<?>> transformations) {
+			Iterable<DfVisitor<?>> transformations, boolean validate) {
 		for (final DfVisitor<?> transformation : transformations) {
 			transformation.doSwitch(object);
+			if (validate) {
+				OrccUtil.validateObject(transformation.toString() + " on "
+						+ object, object);
+			}
 		}
 	}
 
