@@ -29,9 +29,7 @@
  
 package net.sf.orcc.backends.promela
 
-import java.io.File
 import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
 
 /**
  * Generated an initial schedule with only actor level scheduling completed 
@@ -41,23 +39,10 @@ import net.sf.orcc.util.OrccUtil
  */
 class ScriptPrinter extends PromelaTemplate {
 	
-	val Network network;
+	var Network network;
 	
-	new(Network network) {
+	def setNetwork(Network network) {
 		this.network = network
-	}
-	
-	def print(String targetFolder) {
-		
-		val content = scriptFileContent
-		val file = new File(targetFolder + File::separator + "run_checker_" + network.simpleName + ".py")
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
 	}
 
 	def getScriptFileContent() {

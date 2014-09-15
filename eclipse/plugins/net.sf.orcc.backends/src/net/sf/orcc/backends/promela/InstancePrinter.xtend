@@ -28,11 +28,12 @@
  */
  package net.sf.orcc.backends.promela
 
-import java.io.File
 import java.util.List
 import java.util.Map
 import java.util.Set
+import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel
 import net.sf.orcc.df.Action
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
@@ -46,10 +47,7 @@ import net.sf.orcc.ir.InstLoad
 import net.sf.orcc.ir.InstReturn
 import net.sf.orcc.ir.InstStore
 import net.sf.orcc.ir.Var
-import net.sf.orcc.util.OrccUtil
 import org.eclipse.emf.ecore.EObject
-import net.sf.orcc.df.Actor
-import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel
 
 /*
  * Compile Instance promela
@@ -59,38 +57,28 @@ import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel
  */
 class InstancePrinter extends PromelaTemplate {
 	
-	val Actor actor
-	val Set<Var> schedulingVars
-	
-	val Map<Action, List<InstLoad>> loadPeeks
-	val Map<Action, List<Expression>> guards
-	val Map<EObject, List<Action>> priority
-	
-	new(Actor actor, Map<String, Object> options, PromelaSchedulingModel schedulingModel) {
+	var Actor actor
+	var Set<Var> schedulingVars
+
+	var Map<Action, List<InstLoad>> loadPeeks
+	var Map<Action, List<Expression>> guards
+	var Map<EObject, List<Action>> priority
+
+	def setActor(Actor actor) {
 		this.actor = actor
+	}
+
+	def setSchedulingModel(PromelaSchedulingModel schedulingModel) {
 		this.schedulingVars = schedulingModel.allSchedulingVars
-		
+	}
+
+	override setOptions(Map<String, Object> options) {
+		super.setOptions(options)
 		loadPeeks = options.get("loadPeeks") as Map<Action, List<InstLoad>>
 		guards = options.get("guards") as Map<Action, List<Expression>>
 		priority = options.get("priority") as Map<EObject, List<Action>>
 	}
-	
-	/**
-	 * Print file content for the instance
-	 * 
-	 */
-	def printInstance(String targetFolder) {
-		val content = instanceFileContent
-		val file = new File(targetFolder + File::separator + actor.name + ".pml")
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
-	}
-	
+
 	def getInstanceFileContent() '''
 		«IF actor.hasFsm»
 			/* States of the FSM */

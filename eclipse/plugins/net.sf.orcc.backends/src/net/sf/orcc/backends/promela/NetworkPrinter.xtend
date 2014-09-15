@@ -28,12 +28,9 @@
  */
 package net.sf.orcc.backends.promela
 
-import java.io.File
-import java.util.Map
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.df.Actor
 
 /**
  * Compile top Network Promela source code 
@@ -43,23 +40,10 @@ import net.sf.orcc.df.Actor
  */
 class NetworkPrinter extends PromelaTemplate {
 	
-	val Network network;
+	var Network network;
 	
-	new(Network network, Map<String, Object> options) {
+	def setNetwork(Network network) {
 		this.network = network
-	}
-	
-	def print(String targetFolder) {
-		
-		val content = networkFileContent
-		val file = new File(targetFolder + File::separator + "main_" + network.simpleName + ".pml")
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
 	}
 
 	def getNetworkFileContent() '''

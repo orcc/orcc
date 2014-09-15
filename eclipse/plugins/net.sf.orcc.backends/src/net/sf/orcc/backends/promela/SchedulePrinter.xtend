@@ -29,12 +29,10 @@
  
 package net.sf.orcc.backends.promela
 
-import java.io.File
-import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
 import java.util.Set
-import net.sf.orcc.backends.promela.transform.Scheduler
 import net.sf.orcc.backends.promela.transform.Schedule
+import net.sf.orcc.backends.promela.transform.Scheduler
+import net.sf.orcc.df.Network
 
 /**
  * Generated an initial schedule with only actor level scheduling completed 
@@ -44,25 +42,15 @@ import net.sf.orcc.backends.promela.transform.Schedule
  */
 class SchedulePrinter extends PromelaTemplate {
 	
-	val Network network;
+	var Network network;
 	val Set<Scheduler> actorSchedulers;
 	
-	new(Network network, Set<Scheduler> actorSchedulers) {
-		this.network = network
+	new(Set<Scheduler> actorSchedulers) {
 		this.actorSchedulers = actorSchedulers
 	}
 	
-	def print(String targetFolder) {
-		
-		val content = schedulerFileContent
-		val file = new File(targetFolder + File::separator + "schedule_" + network.simpleName + ".xml")
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
+	def setNetwork(Network network) {
+		this.network = network
 	}
 
 	def getSchedulerFileContent() 

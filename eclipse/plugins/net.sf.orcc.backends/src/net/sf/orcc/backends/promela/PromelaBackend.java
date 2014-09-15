@@ -80,12 +80,29 @@ public class PromelaBackend extends AbstractBackend {
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 	private PromelaSchedulingModel schedulingModel;
-	private ScheduleBalanceEq balanceEq;
 
 	private Set<Scheduler> actorSchedulers;
 
+	private final NetworkPrinter networkPrinter;
+	private final SchedulePrinter schedulerPrinter;
+	private final ScriptPrinter scriptPrinter;
+
+	private final InstancePrinter instancePrinter;
+
+	public PromelaBackend() {
+		actorSchedulers = new HashSet<Scheduler>();
+
+		networkPrinter = new NetworkPrinter();
+		schedulerPrinter = new SchedulePrinter(actorSchedulers);
+		scriptPrinter = new ScriptPrinter();
+
+		instancePrinter = new InstancePrinter();
+	}
+
 	@Override
 	protected void doInitializeOptions() {
+
+		actorSchedulers.clear();
 
 		getOptions().put("guards", guards);
 		getOptions().put("priority", priority);
@@ -122,20 +139,36 @@ public class PromelaBackend extends AbstractBackend {
 	protected void beforeGeneration(Network network) {
 		schedulingModel = new PromelaSchedulingModel(network);
 		schedulingModel.printDependencyGraph();
-
-		actorSchedulers = new HashSet<Scheduler>();
-		balanceEq = new ScheduleBalanceEq(actorSchedulers, network);
-
 		network.computeTemplateMaps();
 	}
 
 	@Override
 	protected Result doGenerateNetwork(Network network) {
-		new NetworkPrinter(network, getOptions()).print(path);
-		new SchedulePrinter(network, actorSchedulers).print(path);
-		new ScheduleInfoPrinter(network, balanceEq).print(path);
-		new ScriptPrinter(network).print(path);
-		return super.doGenerateNetwork(network);
+		networkPrinter.setNetwork(network);
+		return FilesManager.writeFile(networkPrinter.getNetworkFileContent(),
+				path, "main_" + network.getSimpleName() + ".pml");
+	}
+
+	@Override
+	protected Result doAdditionalGeneration(Network network) {
+		// Could be better to have a printer instance for all runs
+		final ScheduleInfoPrinter scheduleInfoPrinter = new ScheduleInfoPrinter(
+				new ScheduleBalanceEq(actorSchedulers, network));
+
+		schedulerPrinter.setNetwork(network);
+		scriptPrinter.setNetwork(network);
+		scheduleInfoPrinter.setNetwork(network);
+
+		final Result result = Result.newInstance();
+		result.merge(FilesManager.writeFile(
+				schedulerPrinter.getSchedulerFileContent(), path, "schedule_"
+						+ network.getSimpleName() + ".xml"));
+		result.merge(FilesManager.writeFile(
+				scheduleInfoPrinter.getSchedulerFileContent(), path,
+				"schedule_info_" + network.getSimpleName() + ".xml"));
+		result.merge(FilesManager.writeFile(scriptPrinter.getScriptFileContent(), path,
+				"run_checker_" + network.getSimpleName() + ".py"));
+		return result;
 	}
 
 	@Override
@@ -161,8 +194,9 @@ public class PromelaBackend extends AbstractBackend {
 
 	@Override
 	protected Result doGenerateActor(Actor actor) {
-		new InstancePrinter(actor, getOptions(), schedulingModel)
-				.printInstance(path);
-		return super.doGenerateActor(actor);
+		instancePrinter.setActor(actor);
+		instancePrinter.setSchedulingModel(schedulingModel);
+
+		return FilesManager.writeFile(instancePrinter.getInstanceFileContent(), path, actor.getName() + ".pml");
 	}
 }

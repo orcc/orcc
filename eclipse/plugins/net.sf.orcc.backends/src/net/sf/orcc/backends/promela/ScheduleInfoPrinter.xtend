@@ -29,14 +29,12 @@
  
 package net.sf.orcc.backends.promela
 
-import java.io.File
-import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.backends.promela.transform.Scheduler
 import net.sf.orcc.backends.promela.transform.Schedule
 import net.sf.orcc.backends.promela.transform.ScheduleBalanceEq
+import net.sf.orcc.backends.promela.transform.Scheduler
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
+import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 
 /**
@@ -48,25 +46,15 @@ import net.sf.orcc.df.Port
  
 class ScheduleInfoPrinter extends PromelaTemplate {
 	
-	val Network network;
+	var Network network;
 	val ScheduleBalanceEq balanceEq;
-	
-	new(Network network, ScheduleBalanceEq balanceEq) {
-		this.network = network
+
+	new(ScheduleBalanceEq balanceEq) {
 		this.balanceEq = balanceEq
 	}
-	
-	def print(String targetFolder) {
-		
-		val content = schedulerFileContent
-		val file = new File(targetFolder + File::separator + "schedule_info_" + network.simpleName + ".xml")
-		
-		if(needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
-		}
+
+	def setNetwork(Network network) {
+		this.network = network
 	}
 
 	def getSchedulerFileContent() 
