@@ -566,7 +566,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param validate
 	 *            Indicates that transformation result must be validated
 	 */
-	final private <T extends EObject> void applyTransformations(
+	final protected <T extends EObject> void applyTransformations(
 			Iterable<T> objects, Iterable<DfVisitor<?>> transformations,
 			boolean validate) {
 		for (final T object : objects) {
@@ -582,7 +582,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param validate
 	 *            Indicates that transformation result must be validated
 	 */
-	final private void applyTransformations(EObject object,
+	final protected void applyTransformations(EObject object,
 			Iterable<DfVisitor<?>> transformations, boolean validate) {
 		for (final DfVisitor<?> transformation : transformations) {
 			transformation.doSwitch(object);

@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.promela.transform.ControlTokenActorModel;
 import net.sf.orcc.backends.promela.transform.GuardsExtractor;
 import net.sf.orcc.backends.promela.transform.IdentifyStatelessActors;
 import net.sf.orcc.backends.promela.transform.PromelaAddPrefixToStateVar;
@@ -54,7 +54,6 @@ import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
@@ -64,7 +63,6 @@ import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.util.FilesManager;
-import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
@@ -84,16 +82,16 @@ public class PromelaBackend extends AbstractBackend {
 	private PromelaSchedulingModel schedulingModel;
 	private ScheduleBalanceEq balanceEq;
 
-	private final Map<String, String> renameMap;
-
 	private Set<Scheduler> actorSchedulers;
 
-	/**
-	 * Creates a new instance of the Promela back-end. Initializes the
-	 * transformation hash map.
-	 */
-	public PromelaBackend() {
-		renameMap = new HashMap<String, String>();
+	@Override
+	protected void doInitializeOptions() {
+
+		getOptions().put("guards", guards);
+		getOptions().put("priority", priority);
+		getOptions().put("loadPeeks", loadPeeks);
+
+		final Map<String, String> renameMap = new HashMap<String, String>();
 		renameMap.put("abs", "abs_prml");
 		renameMap.put("getw", "getw_prml");
 		renameMap.put("index", "index_prml");
@@ -101,75 +99,18 @@ public class PromelaBackend extends AbstractBackend {
 		renameMap.put("min", "min_prml");
 		renameMap.put("select", "select_prml");
 		renameMap.put("len", "len_prml");
-	}
 
-	@Override
-	protected void doInitializeOptions() {
-	}
+		networkTransfos.add(new BroadcastAdder());
+		networkTransfos.add(new Instantiator(true));
+		networkTransfos.add(new NetworkFlattener());
+		networkTransfos.add(new Classifier(true));
 
-	@Override
-	protected void doTransformActor(Actor actor) {
-
-		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
-
-		transfos.add(new UnitImporter());
-		transfos.add(new DfVisitor<Void>(new Inliner(true, true)));
-		transfos.add(new RenameTransformation(renameMap));
-		transfos.add(new DfVisitor<Void>(new PhiRemoval()));
-		transfos.add(new PromelaAddPrefixToStateVar());
-		transfos.add(new GuardsExtractor(guards, priority, loadPeeks));
-		for (DfSwitch<?> transformation : transfos) {
-			transformation.doSwitch(actor);
-		}
-	}
-
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		new BroadcastAdder().doSwitch(network);
-		new Instantiator(true).doSwitch(network);
-		new NetworkFlattener().doSwitch(network);
-		new Classifier(true).doSwitch(network);
-
-		getOptions().put("guards", guards);
-		getOptions().put("priority", priority);
-		getOptions().put("loadPeeks", loadPeeks);
-
-		transformActors(network.getAllActors());
-
-		schedulingModel = new PromelaSchedulingModel(network);
-
-		schedulingModel.printDependencyGraph();
-		actorSchedulers = new HashSet<Scheduler>();
-
-		transformActorsAgain(network.getAllActors());
-
-		balanceEq = new ScheduleBalanceEq(actorSchedulers, network);
-
-		printChildren(network);
-
-		network.computeTemplateMaps();
-		printNetwork(network);
-	}
-
-	@Override
-	protected boolean printActor(Actor actor) {
-		return new InstancePrinter(actor, getOptions(), schedulingModel)
-				.printInstance(path) > 0;
-	}
-
-	/**
-	 * Prints the given network.
-	 * 
-	 * @param network
-	 *            a network
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	private void printNetwork(Network network) {
-		new NetworkPrinter(network, getOptions()).print(path);
-		new SchedulePrinter(network, actorSchedulers).print(path);
-		new ScheduleInfoPrinter(network, balanceEq).print(path);
-		new ScriptPrinter(network).print(path);
+		childrenTransfos.add(new UnitImporter());
+		childrenTransfos.add(new DfVisitor<Void>(new Inliner(true, true)));
+		childrenTransfos.add(new RenameTransformation(renameMap));
+		childrenTransfos.add(new DfVisitor<Void>(new PhiRemoval()));
+		childrenTransfos.add(new PromelaAddPrefixToStateVar());
+		childrenTransfos.add(new GuardsExtractor(guards, priority, loadPeeks));
 	}
 
 	@Override
@@ -177,29 +118,51 @@ public class PromelaBackend extends AbstractBackend {
 		return FilesManager.extract("/runtime/Promela/pylibs", path);
 	}
 
-	private void transformActorAgain(Actor actor) {
-		List<DfSwitch<?>> transfos = new ArrayList<DfSwitch<?>>();
-		transfos.add(new IdentifyStatelessActors(schedulingModel
-				.getActorModel(actor)));
-		transfos.add(new PromelaDeadGlobalElimination(schedulingModel
-				.getActorModel(actor).getAllReacableSchedulingVars(),
-				schedulingModel.getActorModel(actor).getPortsUsedInScheduling()));
-		transfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
-		transfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+	@Override
+	protected void beforeGeneration(Network network) {
+		schedulingModel = new PromelaSchedulingModel(network);
+		schedulingModel.printDependencyGraph();
 
-		for (DfSwitch<?> transformation : transfos) {
-			transformation.doSwitch(actor);
-		}
-		PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
-				schedulingModel.getActorModel(actor));
+		actorSchedulers = new HashSet<Scheduler>();
+		balanceEq = new ScheduleBalanceEq(actorSchedulers, network);
+
+		network.computeTemplateMaps();
+	}
+
+	@Override
+	protected Result doGenerateNetwork(Network network) {
+		new NetworkPrinter(network, getOptions()).print(path);
+		new SchedulePrinter(network, actorSchedulers).print(path);
+		new ScheduleInfoPrinter(network, balanceEq).print(path);
+		new ScriptPrinter(network).print(path);
+		return super.doGenerateNetwork(network);
+	}
+
+	@Override
+	protected void beforeGeneration(Actor actor) {
+		final ControlTokenActorModel actorModel = schedulingModel
+				.getActorModel(actor);
+
+		final List<DfVisitor<?>> additionalTransfos = new ArrayList<DfVisitor<?>>();
+		additionalTransfos.add(new IdentifyStatelessActors(actorModel));
+		additionalTransfos.add(new PromelaDeadGlobalElimination(actorModel
+				.getAllReacableSchedulingVars(), actorModel
+				.getPortsUsedInScheduling()));
+		additionalTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+		additionalTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+
+		applyTransformations(actor, additionalTransfos, false);
+
+		final PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
+				actorModel);
 		actorScheduler.doSwitch(actor);
 		actorSchedulers.add(actorScheduler.getScheduler());
 	}
 
-	private void transformActorsAgain(List<Actor> actors) {
-		OrccLogger.traceln("Transforming instances...");
-		for (Actor a : actors) {
-			transformActorAgain(a);
-		}
+	@Override
+	protected Result doGenerateActor(Actor actor) {
+		new InstancePrinter(actor, getOptions(), schedulingModel)
+				.printInstance(path);
+		return super.doGenerateActor(actor);
 	}
 }
