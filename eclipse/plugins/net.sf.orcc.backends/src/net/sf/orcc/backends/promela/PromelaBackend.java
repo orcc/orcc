@@ -80,6 +80,7 @@ public class PromelaBackend extends AbstractBackend {
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 	private PromelaSchedulingModel schedulingModel;
+	private ScheduleBalanceEq balanceEq;
 
 	private Set<Scheduler> actorSchedulers;
 
@@ -109,6 +110,9 @@ public class PromelaBackend extends AbstractBackend {
 		getOptions().put("guards", guards);
 		getOptions().put("priority", priority);
 		getOptions().put("loadPeeks", loadPeeks);
+		networkPrinter.setOptions(getOptions());
+		schedulerPrinter.setOptions(getOptions());
+		scriptPrinter.setOptions(getOptions());
 		instancePrinter.setOptions(getOptions());
 
 		final Map<String, String> renameMap = new HashMap<String, String>();
@@ -124,13 +128,12 @@ public class PromelaBackend extends AbstractBackend {
 		networkTransfos.add(new Instantiator(true));
 		networkTransfos.add(new NetworkFlattener());
 		networkTransfos.add(new Classifier(true));
-
-		childrenTransfos.add(new UnitImporter());
-		childrenTransfos.add(new DfVisitor<Void>(new Inliner(true, true)));
-		childrenTransfos.add(new RenameTransformation(renameMap));
-		childrenTransfos.add(new DfVisitor<Void>(new PhiRemoval()));
-		childrenTransfos.add(new PromelaAddPrefixToStateVar());
-		childrenTransfos.add(new GuardsExtractor(guards, priority, loadPeeks));
+		networkTransfos.add(new UnitImporter());
+		networkTransfos.add(new DfVisitor<Void>(new Inliner(true, true)));
+		networkTransfos.add(new RenameTransformation(renameMap));
+		networkTransfos.add(new DfVisitor<Void>(new PhiRemoval()));
+		networkTransfos.add(new PromelaAddPrefixToStateVar());
+		networkTransfos.add(new GuardsExtractor(guards, priority, loadPeeks));
 	}
 
 	@Override
@@ -144,11 +147,26 @@ public class PromelaBackend extends AbstractBackend {
 		schedulingModel.printDependencyGraph();
 
 		for (Actor actor : network.getAllActors()) {
+			final ControlTokenActorModel actorModel = schedulingModel
+					.getActorModel(actor);
+
+			final List<DfVisitor<?>> additionalTransfos = new ArrayList<DfVisitor<?>>();
+			additionalTransfos.add(new IdentifyStatelessActors(actorModel));
+			additionalTransfos.add(new PromelaDeadGlobalElimination(actorModel
+					.getAllReacableSchedulingVars(), actorModel
+					.getPortsUsedInScheduling()));
+			additionalTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
+			additionalTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+
+			applyTransformations(actor, additionalTransfos, debug);
+			
 			final PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
-					schedulingModel.getActorModel(actor));
+					actorModel);
 			actorScheduler.doSwitch(actor);
 			actorSchedulers.add(actorScheduler.getScheduler());
 		}
+
+		balanceEq = new ScheduleBalanceEq(actorSchedulers, network);
 		network.computeTemplateMaps();
 	}
 
@@ -163,11 +181,12 @@ public class PromelaBackend extends AbstractBackend {
 	protected Result doAdditionalGeneration(Network network) {
 		// Could be better to have a printer instance for all runs
 		final ScheduleInfoPrinter scheduleInfoPrinter = new ScheduleInfoPrinter(
-				new ScheduleBalanceEq(actorSchedulers, network));
+				balanceEq);
 
 		schedulerPrinter.setNetwork(network);
-		scriptPrinter.setNetwork(network);
 		scheduleInfoPrinter.setNetwork(network);
+		scheduleInfoPrinter.setOptions(getOptions());
+		scriptPrinter.setNetwork(network);
 
 		final Result result = Result.newInstance();
 		result.merge(FilesManager.writeFile(
@@ -179,22 +198,6 @@ public class PromelaBackend extends AbstractBackend {
 		result.merge(FilesManager.writeFile(scriptPrinter.getScriptFileContent(), path,
 				"run_checker_" + network.getSimpleName() + ".py"));
 		return result;
-	}
-
-	@Override
-	protected void beforeGeneration(Actor actor) {
-		final ControlTokenActorModel actorModel = schedulingModel
-				.getActorModel(actor);
-
-		final List<DfVisitor<?>> additionalTransfos = new ArrayList<DfVisitor<?>>();
-		additionalTransfos.add(new IdentifyStatelessActors(actorModel));
-		additionalTransfos.add(new PromelaDeadGlobalElimination(actorModel
-				.getAllReacableSchedulingVars(), actorModel
-				.getPortsUsedInScheduling()));
-		additionalTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
-		additionalTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-
-		applyTransformations(actor, additionalTransfos, debug);
 	}
 
 	@Override
