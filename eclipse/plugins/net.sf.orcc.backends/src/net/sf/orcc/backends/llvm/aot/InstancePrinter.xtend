@@ -798,6 +798,12 @@ class InstancePrinter extends LLVMTemplate {
 	 */
 	def protected getProperties(Port port) ''''''
 
+	/**
+	 * Returns an annotation describing the properties of the access.
+	 * This annotation is required by the TTA backend.
+	 */
+	def protected getProperties(Var variable) ''''''
+
 	def private printExternalFifo(Connection conn, Port port) {
 		val fifoName = "fifo_" + conn.getSafeId(port)
 		val type = port.type.doSwitch
@@ -961,10 +967,10 @@ class InstancePrinter extends LLVMTemplate {
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
 				«ELSE»
 					«varName(variable, load)» = getelementptr «variable.type.doSwitch»* «variable.print», i32 0«load.indexes.join(", ", ", ", "")[printIndex]»
-					«target» = load «innerType.doSwitch»* «varName(variable, load)»
+					«target» = load«variable.properties» «innerType.doSwitch»* «varName(variable, load)»
 				«ENDIF»
 			«ELSE»
-				«target» = load «variable.type.doSwitch»* «variable.print»
+				«target» = load«variable.properties» «variable.type.doSwitch»* «variable.print»
 			«ENDIF»
 		'''
 	}

@@ -61,6 +61,12 @@ class SwActorPrinter extends InstancePrinter {
 		}
 	}
 
+	override protected getProperties(Var variable) {
+		if (variable.assignable) {
+			''' volatile'''
+		}
+	}
+
 	def private printNativeWrite(Port port, Var variable) {
 		val innerType = (variable.type as TypeList).innermostType.doSwitch
 		'''
