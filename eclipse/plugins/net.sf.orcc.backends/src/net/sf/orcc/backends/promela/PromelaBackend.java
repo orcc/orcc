@@ -101,12 +101,15 @@ public class PromelaBackend extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-
 		actorSchedulers.clear();
+		guards.clear();
+		priority.clear();
+		loadPeeks.clear();
 
 		getOptions().put("guards", guards);
 		getOptions().put("priority", priority);
 		getOptions().put("loadPeeks", loadPeeks);
+		instancePrinter.setOptions(getOptions());
 
 		final Map<String, String> renameMap = new HashMap<String, String>();
 		renameMap.put("abs", "abs_prml");
@@ -139,6 +142,13 @@ public class PromelaBackend extends AbstractBackend {
 	protected void beforeGeneration(Network network) {
 		schedulingModel = new PromelaSchedulingModel(network);
 		schedulingModel.printDependencyGraph();
+
+		for (Actor actor : network.getAllActors()) {
+			final PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
+					schedulingModel.getActorModel(actor));
+			actorScheduler.doSwitch(actor);
+			actorSchedulers.add(actorScheduler.getScheduler());
+		}
 		network.computeTemplateMaps();
 	}
 
@@ -184,12 +194,7 @@ public class PromelaBackend extends AbstractBackend {
 		additionalTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
 		additionalTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 
-		applyTransformations(actor, additionalTransfos, false);
-
-		final PromelaSchedulabilityTest actorScheduler = new PromelaSchedulabilityTest(
-				actorModel);
-		actorScheduler.doSwitch(actor);
-		actorSchedulers.add(actorScheduler.getScheduler());
+		applyTransformations(actor, additionalTransfos, debug);
 	}
 
 	@Override

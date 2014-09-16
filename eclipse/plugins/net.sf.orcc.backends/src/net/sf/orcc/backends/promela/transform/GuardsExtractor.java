@@ -100,6 +100,8 @@ public class GuardsExtractor extends DfVisitor<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
+		// reset peek index
+		peekCnt = 0;
 		for (Action action : actor.getActions()) {
 			currAction = action;
 			guardList = new ArrayList<Expression>();
