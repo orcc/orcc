@@ -702,11 +702,6 @@ class InstancePrinter extends CTemplate {
 		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»«IF isAligned»_aligned«ENDIF»() {
 			«action.profileStart»
 
-			// Compute aligned port indexes
-			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
-				i32 index_aligned_«port.name» = index_«port.name» % SIZE_«port.name»;
-			«ENDFOR»
-
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -970,7 +965,7 @@ class InstancePrinter extends CTemplate {
 		'''
 			«IF srcPort != null»
 				«IF (isActionAligned && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
-					«load.target.variable.name» = tokens_«srcPort.name»[(index_aligned_«srcPort.name» + («load.indexes.head.doSwitch»))];
+					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» % SIZE_«srcPort.name») + («load.indexes.head.doSwitch»)];
 				«ELSE»
 					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
 				«ENDIF»
@@ -991,7 +986,7 @@ class InstancePrinter extends CTemplate {
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
 				«IF (isActionAligned && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
-					tokens_«trgtPort.name»[(index_aligned_«trgtPort.name» + («store.indexes.head.doSwitch»))] = «store.value.doSwitch»;
+					tokens_«trgtPort.name»[(index_«trgtPort.name» % SIZE_«trgtPort.name») + («store.indexes.head.doSwitch»)] = «store.value.doSwitch»;
 				«ELSE»
 					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
 				«ENDIF»
@@ -1028,7 +1023,7 @@ class InstancePrinter extends CTemplate {
 		if(port != null && isActionAligned){
 			// If the argument is just a local copy of input/output tokens
 			// use directly the FIFO when the tokens are aligned
-			'''&tokens_«port.name»[index_aligned_«port.name»]'''
+			'''&tokens_«port.name»[index_«port.name» % SIZE_«port.name»]'''
 		} else {
 			expr.use.variable.name
 		}
