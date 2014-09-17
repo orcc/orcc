@@ -78,6 +78,10 @@ public class Classifier extends DfVisitor<Void> {
 	private boolean internalizeGuards;
 	private boolean hasSolver;
 
+	// This is used in toString(), to display the actor classified even when
+	// this.actor has been reseted to null
+	private String lastActorName;
+
 	public Classifier() {
 		this(false);
 	}
@@ -131,6 +135,7 @@ public class Classifier extends DfVisitor<Void> {
 
 		try {
 			this.actor = actor;
+			lastActorName = actor.getName();
 
 			if (internalizeGuards) {
 				// Internalize possible guards to avoid wrong classification
@@ -590,7 +595,7 @@ public class Classifier extends DfVisitor<Void> {
 
 	@Override
 	public String toString() {
-		return actor.toString();
+		return "Classifier[" + lastActorName + "]";
 	}
 
 }

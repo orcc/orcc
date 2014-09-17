@@ -587,8 +587,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		for (final DfVisitor<?> transformation : transformations) {
 			transformation.doSwitch(object);
 			if (validate) {
-				OrccUtil.validateObject(transformation.toString() + " on "
-						+ object, object);
+				OrccUtil.validateObject(transformation + " on " + object,
+						object);
 			}
 		}
 	}
