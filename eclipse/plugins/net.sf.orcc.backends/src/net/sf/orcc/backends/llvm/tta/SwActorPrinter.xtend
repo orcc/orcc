@@ -76,6 +76,8 @@ class SwActorPrinter extends InstancePrinter {
 		'''
 	}
 
+	override protected printCallEndTokenFunctions() ''''''
+
 	override protected printDatalayout() ''''''
 
 	override protected printArchitecture() ''''''
@@ -115,6 +117,17 @@ class SwActorPrinter extends InstancePrinter {
 			«FOR port : outputPattern.ports.filter[native]»
 				«printNativeWrite(port, action.outputPattern.portToVarMap.get(port))»
 			«ENDFOR»
+
+		«FOR port : actor.inputs»
+			«val connection = incomingPortMap.get(port)»
+			call void @read_end_«port.name»_«connection.getSafeId(port)»()
+		«ENDFOR»
+		«FOR port : actor.outputs.notNative»
+			«FOR connection : outgoingPortMap.get(port)»
+				call void @write_end_«port.name»_«connection.getSafeId(port)»()
+			«ENDFOR»
+		«ENDFOR»
+
 			ret void
 		}
 	'''
