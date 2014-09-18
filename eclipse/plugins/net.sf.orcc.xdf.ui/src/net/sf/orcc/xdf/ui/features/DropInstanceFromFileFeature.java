@@ -71,8 +71,8 @@ public class DropInstanceFromFileFeature extends AbstractAddFeature {
 		
 		final IFile file = (IFile) context.getNewObject();
 		final String extension = file.getFileExtension();
-		if (extension.equals(OrccUtil.NETWORK_SUFFIX)
-				|| extension.equals(OrccUtil.CAL_SUFFIX)) {
+		if (OrccUtil.NETWORK_SUFFIX.equals(extension)
+				|| OrccUtil.CAL_SUFFIX.equals(extension)) {
 
 			final ContainerShape target = context.getTargetContainer();
 			if (target == getDiagram() || PropsUtil.isInstance(target)) {

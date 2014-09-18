@@ -97,7 +97,7 @@ public class SccFinder {
 		}
 
 		// If v is a root node, pop the stack and generate an SCC
-		if (lowlinkMap.get(v) == indexMap.get(v)) {
+		if (lowlinkMap.get(v).equals(indexMap.get(v))) {
 			List<Vertex> scc = new ArrayList<Vertex>();
 			Vertex w;
 			do {

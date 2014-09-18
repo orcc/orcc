@@ -148,7 +148,7 @@ public class OrccUtil {
 			if (resource.getType() == IResource.FOLDER) {
 				findFiles(suffix, files, (IFolder) resource);
 			} else if (resource.getType() == IResource.FILE
-					&& resource.getFileExtension().equals(suffix)) {
+					&& suffix.equals(resource.getFileExtension())) {
 				files.add((IFile) resource);
 			}
 		}
