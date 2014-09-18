@@ -140,25 +140,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Creates a new folder if needed and returns its path
-	 * 
-	 * @param path
-	 *            the path of the folder
-	 * @param fileName
-	 *            the name of the folder
-	 * @return the full path to the folder
-	 */
-	public static String createFolder(String path, String folderName) {
-		// checks output folder exists, and if not creates it
-		String newPath = path + File.separator + folderName;
-		File folder = new File(newPath);
-		if (!folder.exists()) {
-			folder.mkdir();
-		}
-		return newPath;
-	}
-
-	/**
 	 * Search in given folder for files resources with given suffix, and add
 	 * them to the given files list
 	 * 

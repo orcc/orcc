@@ -79,7 +79,6 @@ import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 import net.sf.orcc.util.Void;
 
@@ -135,7 +134,7 @@ public class TTABackend extends LLVMBackend {
 		architectureBuilder.setOptions(getOptions());
 
 		// Create the directory tree
-		actorsPath = OrccUtil.createFolder(path, "actors");
+		actorsPath = path  + File.separator + "actors";
 
 		// -----------------------------------------------------
 		// Transformations that will be applied on the Network
@@ -243,7 +242,7 @@ public class TTABackend extends LLVMBackend {
 		swProcessorPrinter.setOptions(getOptions());
 
 		for (Processor tta : design.getProcessors()) {
-			String processorPath = OrccUtil.createFolder(path, tta.getName());
+			String processorPath = path + File.separator + tta.getName();
 
 			// Print VHDL description
 			result.merge(FilesManager.writeFile(
@@ -291,7 +290,7 @@ public class TTABackend extends LLVMBackend {
 				path, "top.tcl"));
 
 		// Create TCE project
-		String pyPath = OrccUtil.createFolder(path, "informations_");
+		String pyPath = path + File.separator + "informations_";
 		FilesManager.writeFile("", pyPath,"__init__.py");
 		pyDesignPrinter.setFpga(fpga);
 		result.merge(FilesManager.writeFile(pyDesignPrinter.getPython(design),

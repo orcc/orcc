@@ -50,7 +50,6 @@ import net.sf.orcc.df.util.XdfWriter;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 
 /**
@@ -186,8 +185,7 @@ public class COMPABackend extends CBackend {
 					childrenPrinter.getTestContent(), srcPath,
 					instance.getName() + "_test.h"));
 		} else {
-			String childPath = OrccUtil.createFolder(path,
-					instance.getSimpleName());
+			String childPath = path + File.separator + instance.getSimpleName();
 			result.merge(FilesManager.writeFile(childrenPrinter.getContent(),
 					childPath, instance.getName() + ".c"));
 			result.merge(FilesManager.writeFile(
@@ -213,8 +211,7 @@ public class COMPABackend extends CBackend {
 					childrenPrinter.getTestContent(), srcPath, actor.getName()
 							+ "_test.h"));
 		} else {
-			String childPath = OrccUtil.createFolder(path,
-					actor.getSimpleName());
+			String childPath = path + File.separator + actor.getSimpleName();
 			result.merge(FilesManager.writeFile(childrenPrinter.getContent(),
 					childPath, actor.getName() + ".c"));
 			result.merge(FilesManager.writeFile(
