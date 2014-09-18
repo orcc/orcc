@@ -52,6 +52,7 @@ options_t *opt;
 
 // compute number of errors in the program
 int compareErrors = 0;
+    const char *ostr = "ra";
 
 static char *program;
 static const char *usage =
@@ -81,6 +82,8 @@ static const char *usage =
     "-m <file>          Define a predefined actor mapping on multi-core platforms using the given XML file.\n"
     "-q <file>          Filename to write the run-time actor mapping.\n"
     "-c <nb cores>      Specify the number of processor cores to use.\n"
+    "-r <nb frames>     Specify the number of frames before mapping or between each mapping {Default : 10}.\n"
+    "-a                 Do a new mapping every <nb frames> setted by previous option.\n"
     "-s <strategy>      Specify the run-time actor mapping strategy.\n"
     "   The possible values are: {Default : ROUND_ROBIN}\n"
 #ifdef METIS_ENABLE
