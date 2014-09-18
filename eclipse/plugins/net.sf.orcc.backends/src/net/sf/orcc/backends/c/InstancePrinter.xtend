@@ -961,41 +961,44 @@ class InstancePrinter extends CTemplate {
 	}
 
 	override caseInstLoad(InstLoad load) {
-		val srcPort = load.source.variable.getPort
+		val target = load.target.variable
+		val source = load.source.variable
+		val port = source.getPort
 		'''
-			«IF srcPort != null»
-				«IF (isActionAligned && srcPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || srcPort.hasAttribute(ALIGNED_ALWAYS)»
-					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» % SIZE_«srcPort.name») + («load.indexes.head.doSwitch»)];
+			«IF port != null» ««« Loading data from input FIFO
+				«IF (isActionAligned && port.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
+					«target.name» = tokens_«port.name»[(index_«port.name» % SIZE_«port.name») + («load.indexes.head.doSwitch»)];
 				«ELSE»
-					«load.target.variable.name» = tokens_«srcPort.name»[(index_«srcPort.name» + («load.indexes.head.doSwitch»)) % SIZE_«srcPort.name»];
+					«target.name» = tokens_«port.name»[(index_«port.name» + («load.indexes.head.doSwitch»)) % SIZE_«port.name»];
 				«ENDIF»
-			«ELSE»
+			«ELSE» ««« Loading data from classical variable
 				«IF checkArrayInbounds»
-					«load.indexes.checkArrayInbounds(load.source.variable.type.dimensions)»
+					«load.indexes.checkArrayInbounds(source.type.dimensions)»
 				«ENDIF»
-				«load.target.variable.name» = «load.source.variable.name»«load.indexes.printArrayIndexes»;
+				«target.name» = «source.name»«load.indexes.printArrayIndexes»;
 			«ENDIF»
 		'''
 	}
 
 	override caseInstStore(InstStore store) {
-		val trgtPort = store.target.variable.port
+		val target = store.target.variable
+		val port = target.port
 		'''
-		«IF trgtPort != null»
-			«IF trgtPort.native»
-				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
+		«IF port != null» ««« Storing data to output FIFO
+			«IF port.native»
+				printf("«port.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF (isActionAligned && trgtPort.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || trgtPort.hasAttribute(ALIGNED_ALWAYS)»
-					tokens_«trgtPort.name»[(index_«trgtPort.name» % SIZE_«trgtPort.name») + («store.indexes.head.doSwitch»)] = «store.value.doSwitch»;
+				«IF (isActionAligned && port.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
+					tokens_«port.name»[(index_«port.name» % SIZE_«port.name») + («store.indexes.head.doSwitch»)] = «store.value.doSwitch»;
 				«ELSE»
-					tokens_«trgtPort.name»[(index_«trgtPort.name» + («store.indexes.head.doSwitch»)) % SIZE_«trgtPort.name»] = «store.value.doSwitch»;
+					tokens_«port.name»[(index_«port.name» + («store.indexes.head.doSwitch»)) % SIZE_«port.name»] = «store.value.doSwitch»;
 				«ENDIF»
 			«ENDIF»
-		«ELSE»
+		«ELSE» ««« Storing data to classical variable
 			«IF checkArrayInbounds»
-				«store.indexes.checkArrayInbounds(store.target.variable.type.dimensions)»
+				«store.indexes.checkArrayInbounds(target.type.dimensions)»
 			«ENDIF»
-			«store.target.variable.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
+			«target.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 		«ENDIF»
 		'''
 	}
@@ -1032,6 +1035,14 @@ class InstancePrinter extends CTemplate {
 	//========================================
 	//            Helper methods
 	//========================================
+	
+	/**
+	 * Returns the port object corresponding to the given variable.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return the corresponding port, or <code>null</code>
+	 */
 	def protected getPort(Var variable) {
 		if(currentAction == null) {
 			null
