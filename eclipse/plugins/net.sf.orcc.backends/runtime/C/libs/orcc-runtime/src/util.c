@@ -79,6 +79,7 @@ static const char *usage =
     "\nRuntime arguments:\n"
     "-p <file>          Filename to write the profiling information.\n"
     "-m <file>          Define a predefined actor mapping on multi-core platforms using the given XML file.\n"
+    "-q <file>          Filename to write the run-time actor mapping.\n"
     "-c <nb cores>      Specify the number of processor cores to use.\n"
     "-s <strategy>      Specify the run-time actor mapping strategy.\n"
     "   The possible values are: {Default : ROUND_ROBIN}\n"
@@ -113,7 +114,7 @@ void pause() {
 options_t* init_orcc(int argc, char *argv[]) {
     // every command line option must be followed by ':' if it takes an
     // argument, and '::' if this argument is optional
-    const char *ostr = "i:no:d:m:f:w:l:zr:ac:s:v:p:h";
+    const char *ostr = "i:no:d:m:q:f:w:l:zr:ac:s:v:p:h";
     int c;
 
     opt = set_default_options();
@@ -157,6 +158,9 @@ options_t* init_orcc(int argc, char *argv[]) {
             break;
         case 'm':
             opt->mapping_input_file = strdup(optarg);
+            break;
+        case 'q':
+            opt->mapping_output_file = strdup(optarg);
             break;
         case 'r':
             opt->nbProfiledFrames = strtoul(optarg, NULL, 10);

@@ -750,6 +750,9 @@ void *agent_routine(void *data) {
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Remap the actors...");
         compute_workloads(agent->network);
         do_mapping(agent->network, agent->options, agent->mapping);
+		if (agent->options->mapping_output_file) {
+			save_mapping(agent->options->mapping_output_file, agent->mapping);
+		}
         apply_mapping(agent->mapping, agent->scheduler, agent->nb_threads);
 
         if(opt->mapping_repetition == REMAP_ALWAYS) {
@@ -768,7 +771,7 @@ void *agent_routine(void *data) {
 #endif
 
     }
-
+		
     return 0;
 }
 
