@@ -29,13 +29,7 @@
 package net.sf.orcc.util;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -250,27 +244,6 @@ public class OrccUtil {
 		}
 
 		return srcFolders;
-	}
-
-	/**
-	 * Read the given stream and return its content as a String
-	 * 
-	 * @param stream
-	 * @return
-	 * @throws IOException
-	 */
-	public static String getContents(InputStream stream) throws IOException {
-		StringBuilder builder = new StringBuilder();
-		int n = stream.available();
-		while (n > 0) {
-			byte[] bytes = new byte[n];
-			n = stream.read(bytes);
-			String str = new String(bytes, 0, n);
-			builder.append(str);
-			n = stream.available();
-		}
-
-		return builder.toString();
 	}
 
 	/**
@@ -632,36 +605,6 @@ public class OrccUtil {
 			}
 		}
 		return true;
-	}
-
-	/**
-	 * Create a file and print content inside it. If parent folder doesn't
-	 * exists, create it.
-	 * 
-	 * @param content
-	 *            text to write in file
-	 * @param target
-	 *            file to write content to
-	 * @return true if the file has correctly been written
-	 * @deprecated Use methods in {@link FilesManager} instead
-	 */
-	@Deprecated
-	public static boolean printFile(CharSequence content, File target) {
-		try {
-			if (!target.getParentFile().exists()) {
-				target.getParentFile().mkdirs();
-			}
-			PrintStream ps = new PrintStream(new FileOutputStream(target));
-			ps.print(content);
-			ps.close();
-			return true;
-		} catch (FileNotFoundException e) {
-			OrccLogger.severe("Unable to write file " + target.getPath()
-					+ " : " + e.getCause());
-			OrccLogger.severe(e.getLocalizedMessage());
-			e.printStackTrace();
-			return false;
-		}
 	}
 
 	/**
