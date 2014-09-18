@@ -30,7 +30,6 @@ package net.sf.orcc.backends.c
 
 import java.util.LinkedList
 import java.util.List
-import java.util.Map
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.ir.Arg
 import net.sf.orcc.ir.ArgByRef
@@ -59,14 +58,6 @@ import net.sf.orcc.util.Attributable
  * 
  */
 abstract class CTemplate extends CommonPrinter {
-
-	new() {
-		super()
-	}
-
-	new(Map<String, Object> options) {
-		super(options)
-	}
 
 	/////////////////////////////////
 	// Expressions

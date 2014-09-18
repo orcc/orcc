@@ -62,10 +62,6 @@ class ActorPrinter extends InstancePrinter {
 	val List<Integer> objRefList = new ArrayList<Integer>
 	val List<Pattern> patternList = new ArrayList<Pattern>
 
-	new() {
-		super()
-	}
-
 	override setActor(Actor actor) {
 		super.setActor(actor)
 

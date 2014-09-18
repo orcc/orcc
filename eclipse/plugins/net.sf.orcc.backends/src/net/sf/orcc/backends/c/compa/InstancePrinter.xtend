@@ -46,11 +46,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	// Whether the actor has a main function or the main is within the Top file.
 	private boolean printMainFunc
 	private boolean enableTest = false
-	
-	new() {
-		
-	}
-	
+
 	def setOptions(Map<String, Object> options, boolean printTop) {
 		super.setOptions(options)
 		printMainFunc = !printTop

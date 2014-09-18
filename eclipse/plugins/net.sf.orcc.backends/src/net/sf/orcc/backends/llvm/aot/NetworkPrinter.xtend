@@ -28,12 +28,10 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
-import java.io.File
 import java.util.Map
 import net.sf.orcc.backends.BackendsConstants
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
-import net.sf.orcc.util.OrccUtil
 
 /*
  * Compile Network LLVM source code 
@@ -47,14 +45,6 @@ class NetworkPrinter extends LLVMTemplate {
 	protected var optionDatalayout = BackendsConstants::LLVM_DEFAULT_TARGET_DATALAYOUT
 	protected var optionArch = BackendsConstants::LLVM_DEFAULT_TARGET_TRIPLE
 
-	new() {
-	}
-
-	new(Network network, Map<String, Object> options) {
-		setNetwork(network)
-		setOptions(options)
-	}
-
 	def setNetwork(Network network) {
 		this.network = network
 	}
@@ -67,20 +57,6 @@ class NetworkPrinter extends LLVMTemplate {
 		}
 		if (options.containsKey(BackendsConstants::LLVM_TARGET_DATALAYOUT)) {
 			optionDatalayout = options.get(BackendsConstants::LLVM_TARGET_DATALAYOUT) as String
-		}
-	}
-
-	@Deprecated
-	def print(String targetFolder) {
-
-		val content = networkFileContent
-		val file = new File(targetFolder + File::separator + network.simpleName + ".ll")
-
-		if (needToWriteFile(content, file)) {
-			OrccUtil::printFile(content, file)
-			return 0
-		} else {
-			return 1
 		}
 	}
 

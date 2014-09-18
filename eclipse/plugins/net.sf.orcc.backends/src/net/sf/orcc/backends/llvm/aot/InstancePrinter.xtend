@@ -97,17 +97,6 @@ class InstancePrinter extends LLVMTemplate {
 
 	protected var boolean isActionAligned = false
 
-	new() {
-		super()
-	}
-
-	/**
-	 * Default constructor, do not activate profile option
-	 */
-	new(Map<String, Object> options) {
-		super(options)
-	}
-
 	override setOptions(Map<String, Object> options) {
 		super.setOptions(options)
 

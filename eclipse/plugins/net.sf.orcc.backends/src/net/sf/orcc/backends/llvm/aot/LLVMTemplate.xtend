@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.aot
 
-import java.util.Map
 import net.sf.orcc.OrccRuntimeException
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Connection
@@ -59,18 +58,10 @@ import net.sf.orcc.ir.util.TypeUtil
  * 
  */
 abstract class LLVMTemplate extends CommonPrinter {
-	
+
 	var Type currentType = null
 	protected var signed = false
 	protected var floating = false
-
-	new() {
-		super()
-	}
-
-	new(Map<String, Object> options) {
-		super(options)
-	}
 
 	/////////////////////////////////
 	// Expressions

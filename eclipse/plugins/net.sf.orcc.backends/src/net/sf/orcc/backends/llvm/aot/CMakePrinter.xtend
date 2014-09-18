@@ -35,9 +35,6 @@ package net.sf.orcc.backends.llvm.aot
  */
 class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
 
-	new() {
-	}
-
 	/**
 	 * Return CMakeList's content to write in the root target folder
 	 */

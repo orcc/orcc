@@ -46,6 +46,7 @@ class HwDesignPrinter extends TTAPrinter {
 	FPGA fpga;
 	
 	new() {
+		super()
 		this.exprPrinter = new ExpressionPrinter();
 	}
 	
