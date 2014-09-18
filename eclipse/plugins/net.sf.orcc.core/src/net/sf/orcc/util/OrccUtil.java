@@ -46,7 +46,6 @@ import java.util.Set;
 
 import net.sf.orcc.OrccProjectNature;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -92,27 +91,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Creates a new file if needed and returns its path
-	 * 
-	 * @param path
-	 *            the path of the file
-	 * @param fileName
-	 *            the name of the file
-	 * @return the full path to the file
-	 */
-	public static String createFile(String path, String fileName) {
-		// checks output folder exists, and if not creates it
-		String newPath = path + File.separator + fileName;
-		File file = new File(newPath);
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return newPath;
-	}
 
 	/**
 	 * If it does not exist, creates the given folder. If the parent folders do
@@ -725,28 +703,6 @@ public class OrccUtil {
 			}
 		} catch (Exception e) {
 			OrccLogger.severeln(e.getMessage());
-		}
-	}
-
-	/**
-	 * Sets the contents of the given file, creating it if it does not exist.
-	 * 
-	 * @param file
-	 *            a file
-	 * @param source
-	 *            an input stream
-	 * @throws CoreException
-	 */
-	public static void setFileContents(IFile file, InputStream source)
-			throws CoreException {
-		if (file.exists()) {
-			file.setContents(source, true, false, null);
-		} else {
-			IContainer container = file.getParent();
-			if (container.getType() == IResource.FOLDER) {
-				createFolder((IFolder) container);
-			}
-			file.create(source, true, null);
 		}
 	}
 

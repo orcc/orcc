@@ -33,7 +33,6 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +52,7 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.sexp.SExp;
@@ -277,8 +277,7 @@ public class SmtSolver {
 
 			IFile file = output.getFile(actor.getSimpleName() + "_"
 					+ System.currentTimeMillis() + ".smt2");
-			InputStream source = new ByteArrayInputStream(bos.toByteArray());
-			OrccUtil.setFileContents(file, source);
+			FilesManager.writeFile(bos.toString(), file.getFullPath().toString());
 
 			launchSolver(file);
 		} catch (Exception e) {

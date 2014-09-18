@@ -292,7 +292,7 @@ public class TTABackend extends LLVMBackend {
 
 		// Create TCE project
 		String pyPath = OrccUtil.createFolder(path, "informations_");
-		OrccUtil.createFile(pyPath, "__init__.py");
+		FilesManager.writeFile("", pyPath,"__init__.py");
 		pyDesignPrinter.setFpga(fpga);
 		result.merge(FilesManager.writeFile(pyDesignPrinter.getPython(design),
 				pyPath, "informations.py"));
