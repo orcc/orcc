@@ -219,11 +219,11 @@ public class DALBackend extends CBackend {
 
 		final Result result = Result.newInstance();
 		result.merge(FilesManager.writeFile(networkCPrinter.getNetworkFileContent(),
-				path, "pn.xml"));
+				outputPath, "pn.xml"));
 		result.merge(FilesManager.writeFile(
 				networkCPrinter.getFifoSizeHeaderContent(), srcPath, "fifosize.h"));
 		result.merge(FilesManager.writeFile(
-				mappingPrinter.getMappingFileContent(mapping), path, "mapping1.xml"));
+				mappingPrinter.getMappingFileContent(mapping), outputPath, "mapping1.xml"));
 
 		return result;
 	}

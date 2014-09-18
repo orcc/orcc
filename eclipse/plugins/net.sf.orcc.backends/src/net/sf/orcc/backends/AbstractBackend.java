@@ -170,11 +170,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected Map<String, String> mapping;
 
-	// FIXME: XCF files are used only in TTA back-end. These variables should be
-	// moved in TTABackend class
-	protected boolean importXcfFile;
-	protected File xcfFile;
-
 	/**
 	 * List of transformations to apply on each network
 	 */
@@ -197,10 +192,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	protected boolean convertMulti2Mono;
 
 	/**
-	 * Path where output files will be written. TODO: Rename the variable to
-	 * something more explicit (outputPath, or something else)
+	 * Path where output files will be written
 	 */
-	protected String path;
+	protected String outputPath;
 
 	/**
 	 * Represents the project where application to build is located
@@ -279,7 +273,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			String topNetwork = getOption(XDF_FILE, "<unknown>");
 			OrccLogger.traceln("* Network : " + topNetwork);
 		}
-		OrccLogger.traceln("* Output folder : " + path);
+		OrccLogger.traceln("* Output folder : " + outputPath);
 		OrccLogger.traceln("*********************************************"
 				+ "************************************");
 
@@ -738,10 +732,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		debug = getOption(DEBUG_MODE, DEFAULT_DEBUG);
 
 		mapping = getOption(MAPPING, new HashMap<String, String>());
-		importXcfFile = getOption(BackendsConstants.IMPORT_XCF, false);
-		if (importXcfFile) {
-			xcfFile = new File(getOption(BackendsConstants.XCF_FILE, ""));
-		}
 
 		classify = getOption(CLASSIFY, false);
 		// Merging transformations need the results of classification
@@ -760,7 +750,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			outputFolder = FilesManager.sanitize(outputFolder);
 		}
 		// set output path
-		path = new File(outputFolder).getAbsolutePath();
+		outputPath = new File(outputFolder).getAbsolutePath();
 
 		if (debug) {
 			OrccLogger.setLevel(OrccLogger.DEBUG);

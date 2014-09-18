@@ -121,7 +121,7 @@ public class CBackend extends AbstractBackend {
 	@Override
 	protected void doInitializeOptions() {
 		// Configure paths
-		srcPath = path + File.separator + "src";
+		srcPath = outputPath + File.separator + "src";
 
 		// Load options map into code generator instances
 		networkPrinter.setOptions(getOptions());
@@ -218,21 +218,21 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected Result doLibrariesExtraction() {
-		final Result result = FilesManager.extract("/runtime/C/README.txt", path);
+		final Result result = FilesManager.extract("/runtime/C/README.txt", outputPath);
 
 		// Copy specific windows batch file
 		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
 			result.merge(FilesManager.extract(
-					"/runtime/C/run_cmake_with_VS_env.bat", path));
+					"/runtime/C/run_cmake_with_VS_env.bat", outputPath));
 		}
 
-		result.merge(FilesManager.extract("/runtime/C/libs", path));
+		result.merge(FilesManager.extract("/runtime/C/libs", outputPath));
 
-		String scriptsPath = path + File.separator + "scripts";
+		String scriptsPath = outputPath + File.separator + "scripts";
 		OrccLogger.traceln("Export scripts into " + scriptsPath + "... ");
 
-		result.merge(FilesManager.extract("/runtime/common/scripts", path));
-		result.merge(FilesManager.extract("/runtime/C/scripts", path));
+		result.merge(FilesManager.extract("/runtime/common/scripts", outputPath));
+		result.merge(FilesManager.extract("/runtime/C/scripts", outputPath));
 
 		// Fix some permissions on scripts
 		new File(scriptsPath + File.separator + "profilingAnalyse.py")
@@ -245,8 +245,8 @@ public class CBackend extends AbstractBackend {
 
 	@Override
 	protected void beforeGeneration(Network network) {
-		new File(path + File.separator + "build").mkdirs();
-		new File(path + File.separator + "bin").mkdirs();
+		new File(outputPath + File.separator + "build").mkdirs();
+		new File(outputPath + File.separator + "bin").mkdirs();
 
 		network.computeTemplateMaps();
 
@@ -269,7 +269,7 @@ public class CBackend extends AbstractBackend {
 		cmakePrinter.setNetwork(network);
 		final Result result = Result.newInstance();
 		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(),
-				path, "CMakeLists.txt"));
+				outputPath, "CMakeLists.txt"));
 		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(),
 				srcPath, "CMakeLists.txt"));
 

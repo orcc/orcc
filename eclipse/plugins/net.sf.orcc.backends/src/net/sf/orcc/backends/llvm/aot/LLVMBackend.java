@@ -115,11 +115,11 @@ public class LLVMBackend extends AbstractBackend {
 		childrenPrinter.setOptions(getOptions());
 
 		// Create the empty folders
-		new File(path, "bin").mkdir();
-		new File(path, "build").mkdir();
+		new File(outputPath, "bin").mkdir();
+		new File(outputPath, "build").mkdir();
 
 		// Configure the path where source files will be written
-		srcPath = new File(path, "src").toString();
+		srcPath = new File(outputPath, "src").toString();
 
 		// -----------------------------------------------------
 		// Transformations that will be applied on the Network
@@ -179,15 +179,15 @@ public class LLVMBackend extends AbstractBackend {
 
 	@Override
 	protected Result doLibrariesExtraction() {
-		Result result = FilesManager.extract("/runtime/C/README.txt", path);
+		Result result = FilesManager.extract("/runtime/C/README.txt", outputPath);
 		// Copy specific windows batch file
 		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
 			result.merge(FilesManager.extract(
-					"/runtime/C/run_cmake_with_VS_env.bat", path));
+					"/runtime/C/run_cmake_with_VS_env.bat", outputPath));
 		}
 
 		OrccLogger.traceln("Export libraries sources");
-		result.merge(FilesManager.extract("/runtime/C/libs", path));
+		result.merge(FilesManager.extract("/runtime/C/libs", outputPath));
 
 		return result;
 	}
@@ -208,7 +208,7 @@ public class LLVMBackend extends AbstractBackend {
 
 		final Result result = Result.newInstance();
 		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(),
-				path, "CMakeLists.txt"));
+				outputPath, "CMakeLists.txt"));
 		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(),
 				srcPath, "CMakeLists.txt"));
 

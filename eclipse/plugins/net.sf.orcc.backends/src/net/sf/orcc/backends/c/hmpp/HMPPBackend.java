@@ -129,13 +129,13 @@ public class HMPPBackend extends CBackend {
 	@Override
 	protected Result doLibrariesExtraction() {
 
-		final Result result = FilesManager.extract("/runtime/C/libs", path);
-		result.merge(FilesManager.extract("/runtime/C/README.txt", path));
+		final Result result = FilesManager.extract("/runtime/C/libs", outputPath);
+		result.merge(FilesManager.extract("/runtime/C/README.txt", outputPath));
 
 		// Copy specific windows batch file
 		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
 			result.merge(FilesManager.extract(
-					"/runtime/C/run_cmake_with_VS_env.bat", path));
+					"/runtime/C/run_cmake_with_VS_env.bat", outputPath));
 		}
 
 		return result;
@@ -145,7 +145,7 @@ public class HMPPBackend extends CBackend {
 	protected Result doAdditionalGeneration(Network network) {
 		cmakePrinter.setNetwork(network);
 		final Result result = Result.newInstance();
-		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(), path, "CMakeLists.txt"));
+		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(), outputPath, "CMakeLists.txt"));
 		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(), srcPath, "CMakeLists.txt"));
 		return result;
 	}

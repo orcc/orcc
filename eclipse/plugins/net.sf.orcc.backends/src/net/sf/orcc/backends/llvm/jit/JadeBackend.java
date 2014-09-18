@@ -173,7 +173,7 @@ public class JadeBackend extends AbstractBackend {
 		OutputStream outputStream = new ByteArrayOutputStream();
 		try {
 			network.eResource().save(outputStream, Collections.emptyMap());
-			return FilesManager.writeFile(outputStream.toString(), path,
+			return FilesManager.writeFile(outputStream.toString(), outputPath,
 					network.getSimpleName() + ".xdf");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -187,13 +187,13 @@ public class JadeBackend extends AbstractBackend {
 		// Generates the .xcf mapping file
 		final CharSequence content = new Mapping(network, mapping)
 				.getContentFile();
-		return FilesManager.writeFile(content, path, network.getSimpleName()
+		return FilesManager.writeFile(content, outputPath, network.getSimpleName()
 				+ ".xcf");
 	}
 
 	@Override
 	protected Result doGenerateActor(Actor actor) {
-		final File targetFolder = new File(path, DfUtil.getFolder(actor));
+		final File targetFolder = new File(outputPath, DfUtil.getFolder(actor));
 		printer.setActor(actor);
 		return FilesManager.writeFile(printer.getContent(),
 				targetFolder.getAbsolutePath(), actor.getSimpleName());

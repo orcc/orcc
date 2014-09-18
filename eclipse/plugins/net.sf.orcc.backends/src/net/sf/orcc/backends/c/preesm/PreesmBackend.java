@@ -104,11 +104,11 @@ public class PreesmBackend extends AbstractBackend {
 		networkPrinter.setNetwork(network);
 		final Result result = Result.newInstance();
 
-		result.merge(FilesManager.writeFile(networkPrinter.getSizesCSV(), path,
+		result.merge(FilesManager.writeFile(networkPrinter.getSizesCSV(), outputPath,
 				network.getName() + ".varSizes.csv"));
 
 		result.merge(FilesManager.writeFile(networkPrinter.getNetworkContent(),
-				path + File.separator + "Algo", network.getName() + ".graphml"));
+				outputPath + File.separator + "Algo", network.getName() + ".graphml"));
 
 		return result;
 	}
@@ -118,11 +118,11 @@ public class PreesmBackend extends AbstractBackend {
 		actorPrinter.setActor(actor);
 		final Result result = Result.newInstance();
 		result.merge(FilesManager.writeFile(actorPrinter.getActorIDLContent(),
-				path + File.separator + "Code" + File.separator + "IDL",
+				outputPath + File.separator + "Code" + File.separator + "IDL",
 				actor.getSimpleName() + ".idl"));
 
 		result.merge(FilesManager.writeFile(actorPrinter.getActorCContent(),
-				path + File.separator + "Code" + File.separator + "src",
+				outputPath + File.separator + "Code" + File.separator + "src",
 				actor.getSimpleName() + ".c"));
 		return result;
 	}

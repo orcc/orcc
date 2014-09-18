@@ -33,6 +33,7 @@ import static net.sf.orcc.backends.BackendsConstants.FPGA_DEFAULT_CONFIGURATION;
 
 import java.io.File;
 
+import net.sf.orcc.backends.BackendsConstants;
 import net.sf.orcc.backends.llvm.aot.LLVMBackend;
 import net.sf.orcc.backends.llvm.transform.ListInitializer;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
@@ -107,6 +108,9 @@ public class TTABackend extends LLVMBackend {
 	private TceProcessorPrinter tceProcessorPrinter;
 	private Dota dota;
 
+	private boolean importXcfFile;
+	private File xcfFile;
+
 	public TTABackend() {
 		super();
 
@@ -128,13 +132,17 @@ public class TTABackend extends LLVMBackend {
 	protected void doInitializeOptions() {
 		fpga = FPGA.builder(getOption(FPGA_CONFIGURATION,
 				FPGA_DEFAULT_CONFIGURATION));
+		importXcfFile = getOption(BackendsConstants.IMPORT_XCF, false);
+		if (importXcfFile) {
+			xcfFile = new File(getOption(BackendsConstants.XCF_FILE, ""));
+		}
 
 		// Configure the options used in code generation
 		swActorPrinter.setOptions(getOptions());
 		architectureBuilder.setOptions(getOptions());
 
 		// Create the directory tree
-		actorsPath = path  + File.separator + "actors";
+		actorsPath = outputPath  + File.separator + "actors";
 
 		// -----------------------------------------------------
 		// Transformations that will be applied on the Network
@@ -242,7 +250,7 @@ public class TTABackend extends LLVMBackend {
 		swProcessorPrinter.setOptions(getOptions());
 
 		for (Processor tta : design.getProcessors()) {
-			String processorPath = path + File.separator + tta.getName();
+			String processorPath = outputPath + File.separator + tta.getName();
 
 			// Print VHDL description
 			result.merge(FilesManager.writeFile(
@@ -266,53 +274,53 @@ public class TTABackend extends LLVMBackend {
 		// Create HDL project
 		hwDesignPrinter.setFpga(fpga);
 		result.merge(FilesManager.writeFile(hwDesignPrinter.getVhdl(design),
-				path, "top.vhd"));
+				outputPath, "top.vhd"));
 
 		hwProjectPrinter.setFpga(fpga);
 		if (fpga.isAltera()) {
 			result.merge(FilesManager.writeFile(
-					hwProjectPrinter.getQcf(design), path, "top.qsf"));
+					hwProjectPrinter.getQcf(design), outputPath, "top.qsf"));
 			result.merge(FilesManager.writeFile(
-					hwProjectPrinter.getQpf(design), path, "top.qpf"));
+					hwProjectPrinter.getQpf(design), outputPath, "top.qpf"));
 		} else {
 			result.merge(FilesManager.writeFile(
-					hwProjectPrinter.getUcf(design), path, "top.ucf"));
+					hwProjectPrinter.getUcf(design), outputPath, "top.ucf"));
 			result.merge(FilesManager.writeFile(
-					hwProjectPrinter.getXise(design), path, "top.xise"));
+					hwProjectPrinter.getXise(design), outputPath, "top.xise"));
 		}
 
 		hwTestbenchPrinter.setFpga(fpga);
 		result.merge(FilesManager.writeFile(hwTestbenchPrinter.getVhdl(design),
-				path, "top_tb.vhd"));
+				outputPath, "top_tb.vhd"));
 		result.merge(FilesManager.writeFile(hwTestbenchPrinter.getWave(design),
-				path, "wave.do"));
+				outputPath, "wave.do"));
 		result.merge(FilesManager.writeFile(hwTestbenchPrinter.getTcl(design),
-				path, "top.tcl"));
+				outputPath, "top.tcl"));
 
 		// Create TCE project
-		String pyPath = path + File.separator + "informations_";
+		String pyPath = outputPath + File.separator + "informations_";
 		FilesManager.writeFile("", pyPath,"__init__.py");
 		pyDesignPrinter.setFpga(fpga);
 		result.merge(FilesManager.writeFile(pyDesignPrinter.getPython(design),
 				pyPath, "informations.py"));
 
 		tceDesignPrinter.setOptions(getOptions());
-		tceDesignPrinter.setPath(path);
+		tceDesignPrinter.setPath(outputPath);
 		result.merge(FilesManager.writeFile(tceDesignPrinter.getPndf(design),
-				path, "top.pndf"));
+				outputPath, "top.pndf"));
 
-		result.merge(FilesManager.writeFile(dota.dot(design), path, "top.dot"));
+		result.merge(FilesManager.writeFile(dota.dot(design), outputPath, "top.dot"));
 
 		return result;
 	}
 
 	@Override
 	protected Result doLibrariesExtraction() {
-		Result result = FilesManager.extract("/runtime/TTA/libs", path);
-		result.merge(FilesManager.extract("/runtime/common/scripts", path));
+		Result result = FilesManager.extract("/runtime/TTA/libs", outputPath);
+		result.merge(FilesManager.extract("/runtime/common/scripts", outputPath));
 
 		// Will be used later to execute the scripts
-		String libPath = path + File.separator + "libs";
+		String libPath = outputPath + File.separator + "libs";
 
 		// Ensure scripts have execution rights
 		new File(libPath, "ttanetgen").setExecutable(true);
@@ -324,7 +332,7 @@ public class TTABackend extends LLVMBackend {
 		// TODO: This renaming will become useless when the TTA specific scripts
 		// will be moved into the right folder (/runtime/TTA/scripts) and
 		// extracted under <path>/scripts
-		new File(path, "scripts").renameTo(new File(path, "libs/common"));
+		new File(outputPath, "scripts").renameTo(new File(outputPath, "libs/common"));
 
 		return result;
 	}
