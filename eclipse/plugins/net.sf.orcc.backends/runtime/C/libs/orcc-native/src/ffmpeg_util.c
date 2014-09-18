@@ -71,6 +71,15 @@ void ffmpeg_closeSource() {
 
 void ffmpeg_readFrame(u8 data[16][100000], int size[1], int index) {
     int n = av_read_frame(pFormatCtx, pPacket);
+
+    if(n == AVERROR_EOF) {
+        // Restart the reading from the beginning
+        avformat_close_input(&pFormatCtx);
+        avformat_open_input(&pFormatCtx, opt->input_file, NULL, NULL);
+        av_dump_format(pFormatCtx, 0, opt->input_file, 0);
+        n = av_read_frame(pFormatCtx, pPacket);
+
+    }
     if(n != 0) {
         fprintf(stderr,"Problem when reading input file.\n");
         exit(-4);
