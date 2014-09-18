@@ -266,14 +266,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		OrccLogger.traceln("*********************************************"
 				+ "************************************");
-		OrccLogger.traceln("* Orcc version : " + orccVersion);
-		OrccLogger.traceln("* Backend : " + backendName);
-		OrccLogger.traceln("* Project : " + project.getName());
+		OrccLogger.traceln("* Orcc version:   " + orccVersion);
+		OrccLogger.traceln("* Backend:        " + backendName);
+		OrccLogger.traceln("* Project:        " + project.getName());
 		if (compileXdf) {
 			String topNetwork = getOption(XDF_FILE, "<unknown>");
-			OrccLogger.traceln("* Network : " + topNetwork);
+			OrccLogger.traceln("* Network:        " + topNetwork);
 		}
-		OrccLogger.traceln("* Output folder : " + outputPath);
+		OrccLogger.traceln("* Output folder:  " + outputPath);
 		OrccLogger.traceln("*********************************************"
 				+ "************************************");
 
